@@ -30,10 +30,7 @@ const VirtualCardSpendingLimitShortI18n = defineMessages({
   },
 });
 
-export function getSpendingLimitIntervalShortString(
-  intl: IntlShape,
-  spendingLimitInterval: VirtualCardLimitInterval,
-): string {
+function getSpendingLimitIntervalShortString(intl: IntlShape, spendingLimitInterval: VirtualCardLimitInterval): string {
   return intl.formatMessage(VirtualCardSpendingLimitShortI18n[spendingLimitInterval]);
 }
 

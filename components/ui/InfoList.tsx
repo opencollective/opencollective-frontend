@@ -2,6 +2,9 @@ import React from 'react';
 
 import { cn } from '../../lib/utils';
 
+// ignore unused exports
+// ui library
+
 export function InfoList({ children, className }: { children: React.ReactNode; className?: string }) {
   return <dl className={cn('grid grid-cols-1', className)}>{children}</dl>;
 }

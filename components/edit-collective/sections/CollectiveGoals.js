@@ -5,7 +5,7 @@ import { cloneDeep, get, sortBy, startCase } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
-import { gqlV1 } from '../../../lib/graphql/helpers';
+import { editCollectiveSettingsMutation } from '../../../lib/graphql/v1/mutations';
 
 import { Sections } from '../../collective-page/_constants';
 import Container from '../../Container';
@@ -318,15 +318,6 @@ class CollectiveGoals extends React.Component {
     );
   }
 }
-
-const editCollectiveSettingsMutation = gqlV1/* GraphQL */ `
-  mutation EditCollectiveSettings($id: Int!, $settings: JSON) {
-    editCollective(collective: { id: $id, settings: $settings }) {
-      id
-      settings
-    }
-  }
-`;
 
 const addEditCollectiveSettingsMutation = graphql(editCollectiveSettingsMutation, {
   name: 'editCollectiveSettings',

@@ -1,12 +1,13 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { CellContext, ColumnDef } from '@tanstack/react-table';
 import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { Account, VirtualCardRequest, VirtualCardRequestStatus } from '../../lib/graphql/types/v2/graphql';
 import { useWindowResize } from '../../lib/hooks/useWindowResize';
+import { i18nVirtualCardRequestStatus } from '../../lib/i18n/virtual-card-request';
 import { getSpendingLimitShortString } from '../../lib/i18n/virtual-card-spending-limit';
 
 import { AccountHoverCard } from '../AccountHoverCard';
@@ -126,7 +127,7 @@ type VirtualCardRequestsTableMeta = {
   intl: IntlShape;
 };
 
-export const tableColumns: ColumnDef<VirtualCardRequest>[] = [
+const tableColumns: ColumnDef<VirtualCardRequest>[] = [
   {
     accessorKey: 'account',
     header: () => <FormattedMessage defaultMessage="Account" />,
@@ -206,9 +207,9 @@ export const tableColumns: ColumnDef<VirtualCardRequest>[] = [
     accessorKey: 'status',
     meta: { className: 'w-28' },
     header: () => <FormattedMessage id="VirtualCards.Status" defaultMessage="Status" />,
-    cell: ({ cell }: CellContext<VirtualCardRequest, string>) => {
+    cell: ({ cell, table }: CellContext<VirtualCardRequest, string>) => {
       const status = cell.getValue();
-
+      const { intl } = table.options.meta as VirtualCardRequestsTableMeta;
       return (
         <StyledTag
           textTransform="uppercase"
@@ -222,7 +223,7 @@ export const tableColumns: ColumnDef<VirtualCardRequest>[] = [
                 : 'error'
           }
         >
-          {status}
+          {i18nVirtualCardRequestStatus(intl, status)}
         </StyledTag>
       );
     },

@@ -1,7 +1,7 @@
-import { gql } from '@apollo/client';
+import { gql } from '../../../lib/graphql/helpers';
 
 import { accountHoverCardFields } from '../../AccountHoverCard';
-import { collectiveNavbarFieldsFragment } from '../../collective-page/graphql/fragments';
+import { accountNavbarFieldsFragment } from '../../collective-navbar/fragments';
 
 export const loggedInAccountExpensePayoutFieldsFragment = gql`
   fragment LoggedInAccountExpensePayoutFields on Individual {
@@ -103,12 +103,15 @@ export const loggedInAccountExpensePayoutFieldsFragment = gql`
   }
 `;
 
-const accountingCategoryFields = gql`
+export const accountingCategoryFields = gql`
   fragment AccountingCategoryFields on AccountingCategory {
     id
     name
+    kind
+    instructions
     friendlyName
     code
+    expensesTypes
   }
 `;
 
@@ -150,7 +153,7 @@ export const expenseHostFields = gql`
     plan {
       id
     }
-    accountingCategories {
+    expenseAccountingCategories: accountingCategories(kind: EXPENSE) {
       nodes {
         id
         ...AccountingCategoryFields
@@ -161,6 +164,28 @@ export const expenseHostFields = gql`
       EXPENSE_CATEGORIZATION {
         requiredForExpenseSubmitters
         requiredForCollectiveAdmins
+      }
+    }
+  }
+  ${accountingCategoryFields}
+`;
+
+export const expenseValuesByRoleFragment = gql`
+  fragment ExpenseValuesByRoleFragment on ExpenseValuesByRole {
+    id
+    submitter {
+      accountingCategory {
+        ...AccountingCategoryFields
+      }
+    }
+    accountAdmin {
+      accountingCategory {
+        ...AccountingCategoryFields
+      }
+    }
+    hostAdmin {
+      accountingCategory {
+        ...AccountingCategoryFields
       }
     }
   }
@@ -186,18 +211,7 @@ export const expensePageExpenseFieldsFragment = gql`
     }
     valuesByRole {
       id
-      submitter {
-        accountingCategory {
-          id
-          ...AccountingCategoryFields
-        }
-      }
-      accountAdmin {
-        accountingCategory {
-          id
-          ...AccountingCategoryFields
-        }
-      }
+      ...ExpenseValuesByRoleFragment
     }
     amountInAccountCurrency: amountV2(currencySource: ACCOUNT) {
       valueInCents
@@ -207,6 +221,8 @@ export const expensePageExpenseFieldsFragment = gql`
         value
         source
         isApproximate
+        fromCurrency
+        toCurrency
       }
     }
     createdAt
@@ -220,6 +236,22 @@ export const expensePageExpenseFieldsFragment = gql`
       incurredAt
       description
       amount
+      amountV2 {
+        valueInCents
+        currency
+        exchangeRate {
+          date
+          value
+          source
+          fromCurrency
+          toCurrency
+        }
+      }
+      referenceExchangeRate {
+        value
+        fromCurrency
+        toCurrency
+      }
       url
       file {
         id
@@ -258,7 +290,6 @@ export const expensePageExpenseFieldsFragment = gql`
       isAdmin
       isActive
       description
-      imageUrl
       ...AccountHoverCardFields
       location {
         id
@@ -360,10 +391,6 @@ export const expensePageExpenseFieldsFragment = gql`
         id
         ...NavbarFields
         MULTI_CURRENCY_EXPENSES
-      }
-      expensesTags {
-        id
-        tag
       }
       location {
         id
@@ -503,6 +530,8 @@ export const expensePageExpenseFieldsFragment = gql`
       }
       transaction {
         id
+        kind
+        type
         amount {
           valueInCents
           currency
@@ -553,6 +582,16 @@ export const expensePageExpenseFieldsFragment = gql`
           id
           currency
           amount
+          feesPayer
+        }
+        relatedTransactions(kind: PAYMENT_PROCESSOR_FEE) {
+          id
+          type
+          kind
+          amount {
+            valueInCents
+            currency
+          }
         }
       }
     }
@@ -570,9 +609,10 @@ export const expensePageExpenseFieldsFragment = gql`
   }
 
   ${expenseHostFields}
-  ${collectiveNavbarFieldsFragment}
+  ${accountNavbarFieldsFragment}
   ${accountingCategoryFields}
   ${accountHoverCardFields}
+  ${expenseValuesByRoleFragment}
 `;
 
 export const expensesListFieldsFragment = gql`
@@ -593,18 +633,7 @@ export const expensesListFieldsFragment = gql`
     }
     valuesByRole {
       id
-      submitter {
-        accountingCategory {
-          id
-          ...AccountingCategoryFields
-        }
-      }
-      accountAdmin {
-        accountingCategory {
-          id
-          ...AccountingCategoryFields
-        }
-      }
+      ...ExpenseValuesByRoleFragment
     }
     amountInAccountCurrency: amountV2(currencySource: ACCOUNT) {
       valueInCents
@@ -614,6 +643,8 @@ export const expensesListFieldsFragment = gql`
         value
         source
         isApproximate
+        fromCurrency
+        toCurrency
       }
     }
     currency
@@ -710,6 +741,7 @@ export const expensesListFieldsFragment = gql`
     }
   }
   ${accountingCategoryFields}
+  ${expenseValuesByRoleFragment}
   ${accountHoverCardFields}
 `;
 
@@ -723,6 +755,18 @@ export const expensesListAdminFieldsFragment = gql`
         hostAgreements {
           totalCount
         }
+      }
+    }
+    createdByAccount {
+      id
+      ... on Individual {
+        emails
+      }
+    }
+    payee {
+      id
+      ... on Individual {
+        emails
       }
     }
     payoutMethod {

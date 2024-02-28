@@ -1,6 +1,5 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Facebook } from '@styled-icons/fa-brands/Facebook';
 import { Mastodon } from '@styled-icons/fa-brands/Mastodon';
@@ -15,7 +14,7 @@ import { AnalyticsEvent } from '../../lib/analytics/events';
 import { track } from '../../lib/analytics/plausible';
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { formatCurrency } from '../../lib/currency-utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { formatManualInstructions } from '../../lib/payment-method-utils';
 import {
   facebookShareURL,
@@ -27,24 +26,24 @@ import {
 import { getWebsiteUrl } from '../../lib/utils';
 
 import Container from '../../components/Container';
-import { formatAccountDetails } from '../../components/edit-collective/utils';
 import { Box, Flex } from '../../components/Grid';
 import I18nFormatters, { getI18nLink, I18nBold } from '../../components/I18nFormatters';
+import Image from '../../components/Image';
 import Loading from '../../components/Loading';
 import MessageBox from '../../components/MessageBox';
 import StyledLink from '../../components/StyledLink';
-import { H3, P } from '../../components/Text';
 import { withUser } from '../../components/UserProvider';
 
 import { isValidExternalRedirect } from '../../pages/external-redirect';
+import { formatAccountDetails } from '../edit-collective/utils';
 import Link from '../Link';
 import { Survey, SURVEY_KEY } from '../Survey';
+import { H3, P } from '../Text';
 import { toast } from '../ui/useToast';
 
 import { orderSuccessFragment } from './graphql/fragments';
 import PublicMessageForm from './ContributionFlowPublicMessage';
 import ContributorCardWithTier from './ContributorCardWithTier';
-import successIllustrationUrl from './success-illustration.jpg';
 import SuccessCTA, { SUCCESS_CTA_TYPE } from './SuccessCTA';
 
 // Styled components
@@ -89,9 +88,8 @@ const BankTransferInfoContainer = styled(Container)`
   background-color: white;
 `;
 
-const SuccessIllustration = styled.img.attrs({ src: successIllustrationUrl })`
+const SuccessIllustration = styled(Container)`
   max-width: 100%;
-  width: 216px;
   margin: 0 auto;
   margin-bottom: 16px;
 `;
@@ -180,7 +178,11 @@ class ContributionFlowSuccess extends React.Component {
 
     return (
       <Flex flexDirection="column" justifyContent="center" p={2}>
-        {callsToAction.length <= 2 && <SuccessIllustration alt="" />}
+        {callsToAction.length >= 2 && (
+          <SuccessIllustration>
+            <Image alt="" width={216} height={152} src="/static/images/success-illustration.jpg" />
+          </SuccessIllustration>
+        )}
         {callsToAction.map((type, idx) => (
           <SuccessCTA
             key={type}

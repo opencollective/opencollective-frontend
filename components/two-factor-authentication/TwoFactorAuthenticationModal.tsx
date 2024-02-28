@@ -1,33 +1,35 @@
 import React from 'react';
 import * as simplewebauthn from '@simplewebauthn/browser';
+import { X } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
-import { createGlobalStyle } from 'styled-components';
+import VerificationInput from 'react-verification-input';
 
 import { createError, ERROR } from '../../lib/errors';
-import { onPressEnter } from '../../lib/form-utils';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { getFromLocalStorage, LOCAL_STORAGE_KEYS, setLocalStorage } from '../../lib/local-storage';
+import {
+  getFromLocalStorage,
+  LOCAL_STORAGE_KEYS,
+  removeFromLocalStorage,
+  setLocalStorage,
+} from '../../lib/local-storage';
 import { useTwoFactorAuthenticationPrompt } from '../../lib/two-factor-authentication/TwoFactorAuthenticationContext';
-import { getSettingsRoute } from '../../lib/url-helpers';
+import { getDashboardRoute } from '../../lib/url-helpers';
 
-import { Box, Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
+import Image from '../Image';
 import Link from '../Link';
-import StyledButton from '../StyledButton';
-import StyledInput from '../StyledInput';
-import StyledLinkButton from '../StyledLinkButton';
-import StyledModal, { Modal, ModalFooter, ModalHeader } from '../StyledModal';
-import { P } from '../Text';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '../ui/AlertDialog';
+import { Button } from '../ui/Button';
+import { Input } from '../ui/Input';
 import { useToast } from '../ui/useToast';
-
-const HideOtherModalsGlobalStyle = createGlobalStyle`
-  ${Modal} {
-    &:not(.twofactor-modal) {
-      opacity: 0;
-    }
-  }
-`;
 
 function initialMethod(supportedMethods: string[]) {
   if (!supportedMethods) {
@@ -55,8 +57,6 @@ export default function TwoFactorAuthenticationModal() {
       return method !== 'recovery_code' || prompt?.allowRecovery;
     });
   }, [prompt?.supportedMethods, prompt.allowRecovery]);
-
-  const cancellable = !prompt.isRequired;
 
   const [selectedMethod, setSelectedMethod] = React.useState(initialMethod(supportedMethods));
   const [twoFactorCode, setTwoFactorCode] = React.useState('');
@@ -95,6 +95,7 @@ export default function TwoFactorAuthenticationModal() {
     setConfirming(false);
     setSelectedMethod(null);
     prompt.rejectAuth(createError(ERROR.TWO_FACTOR_AUTH_CANCELED));
+    removeFromLocalStorage(LOCAL_STORAGE_KEYS.TWO_FACTOR_AUTH_TOKEN);
   }, []);
 
   const confirm = React.useCallback(() => {
@@ -133,101 +134,84 @@ export default function TwoFactorAuthenticationModal() {
 
   const alternativeMethods = supportedMethods.filter(method => method !== selectedMethod);
 
-  if (!isOpen) {
-    return null;
-  }
-
   return (
-    <StyledModal
-      trapFocus
-      preventClose={!cancellable}
-      onClose={cancel}
-      width={495}
-      className="twofactor-modal"
-      zindex="90000"
+    <AlertDialog
+      open={isOpen}
+      onOpenChange={open => {
+        if (!open) {
+          cancel();
+        }
+      }}
     >
-      <HideOtherModalsGlobalStyle />
-      <ModalHeader hideCloseIcon>
-        {supportedMethods.length === 0 ? (
-          <FormattedMessage defaultMessage="You must configure 2FA to access this feature" />
-        ) : (
-          <FormattedMessage defaultMessage="Two Factor Authentication" />
-        )}
-      </ModalHeader>
-      <Box mt={3}>
-        {supportedMethods.length === 0 && (
-          <Flex mt={2} flexDirection="column">
-            <P fontWeight="normal" as="label" mb={4}>
+      <AlertDialogContent className="max-w-sm" withBackdropBlur>
+        <div className="mx-auto rounded-full bg-blue-50 p-4">
+          <Image src="/static/images/lock.png" alt="Lock" width={64} height={64} className="" />
+        </div>
+
+        <AlertDialogHeader className="sm:text-center">
+          <Button onClick={cancel} variant="ghost" size="icon-xs" className="absolute right-1.5 top-1.5">
+            <X size={16} />
+            <span className="sr-only">
+              <FormattedMessage id="Close" defaultMessage="Close" />
+            </span>
+          </Button>
+          <AlertDialogTitle>
+            {supportedMethods.length === 0 ? (
+              <FormattedMessage defaultMessage="You must configure 2FA to access this feature" />
+            ) : (
+              <FormattedMessage defaultMessage="Two Factor Authentication" />
+            )}
+          </AlertDialogTitle>
+          {LoggedInUser && supportedMethods.length === 0 && (
+            <AlertDialogDescription>
               <FormattedMessage
                 defaultMessage="To enable Two-Factor Authentication (2FA), follow the steps <link>here</link>"
                 values={{
                   link: getI18nLink({
-                    href: getSettingsRoute(LoggedInUser.collective, 'user-security'),
+                    href: getDashboardRoute(LoggedInUser.collective, 'user-security#two-factor-auth'),
                     as: Link,
                   }),
                 }}
               />
-            </P>
-          </Flex>
-        )}
-
-        {selectedMethod === 'recovery_code' && (
-          <RecoveryCodeOptions value={twoFactorCode} onChange={setTwoFactorCode} disabled={confirming} />
-        )}
-
-        {selectedMethod === 'totp' && (
-          <AuthenticatorOption
-            value={twoFactorCode}
-            onChange={setTwoFactorCode}
-            supportedMethods={supportedMethods}
-            disabled={confirming}
-            onSubmit={confirm}
-          />
-        )}
-
-        {selectedMethod === 'webauthn' && <WebauthnOption />}
-      </Box>
-
-      {supportedMethods.length > 1 && (
-        <Box mt={4}>
-          <FormattedMessage defaultMessage="You can also use alternative methods:" />
-          <ul className="list-inside list-disc">
-            {alternativeMethods.includes('totp') && (
-              <li>
-                <StyledLinkButton onClick={() => setSelectedMethod('totp')}>
-                  <FormattedMessage defaultMessage="Authenticator Code" />
-                </StyledLinkButton>
-              </li>
-            )}
-            {alternativeMethods.includes('webauthn') && (
-              <li>
-                <StyledLinkButton onClick={() => setSelectedMethod('webauthn')}>
-                  <FormattedMessage defaultMessage="U2F (Hardware Key, Passkey, Phone, etc)" />
-                </StyledLinkButton>
-              </li>
-            )}
-            {alternativeMethods.includes('recovery_code') && (
-              <li>
-                <StyledLinkButton onClick={() => setSelectedMethod('recovery_code')}>
-                  <FormattedMessage defaultMessage="Recovery code" />
-                </StyledLinkButton>
-              </li>
-            )}
-          </ul>
-        </Box>
-      )}
-
-      <ModalFooter isFullWidth dividerMargin="0.65rem 0">
-        <Flex justifyContent="right" flexWrap="wrap">
-          {cancellable && (
-            <StyledButton disabled={confirming} mr={2} minWidth={120} onClick={cancel}>
-              <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-            </StyledButton>
+            </AlertDialogDescription>
           )}
-          <StyledButton
-            ml={2}
-            minWidth={120}
-            buttonStyle="primary"
+          {selectedMethod === 'recovery_code' && (
+            <RecoveryCodeOptions value={twoFactorCode} onChange={setTwoFactorCode} disabled={confirming} />
+          )}
+
+          {selectedMethod === 'totp' && (
+            <AuthenticatorOption
+              value={twoFactorCode}
+              onChange={setTwoFactorCode}
+              supportedMethods={supportedMethods}
+              disabled={confirming}
+            />
+          )}
+
+          {selectedMethod === 'webauthn' && <WebauthnOption />}
+        </AlertDialogHeader>
+
+        <AlertDialogFooter className="justify-end sm:flex-col-reverse">
+          {supportedMethods.length > 1 && (
+            <React.Fragment>
+              {alternativeMethods.includes('totp') && (
+                <Button onClick={() => setSelectedMethod('totp')} variant="ghost">
+                  <FormattedMessage defaultMessage="Use Authenticator code" />
+                </Button>
+              )}
+              {alternativeMethods.includes('webauthn') && (
+                <Button onClick={() => setSelectedMethod('webauthn')} variant="ghost">
+                  <FormattedMessage defaultMessage="Use Security key (U2F)" />
+                </Button>
+              )}
+              {alternativeMethods.includes('recovery_code') && (
+                <Button onClick={() => setSelectedMethod('recovery_code')} variant="ghost">
+                  <FormattedMessage defaultMessage="Use Recovery code" />
+                </Button>
+              )}
+            </React.Fragment>
+          )}
+          <Button
             loading={confirming}
             disabled={!verifyBtnEnabled}
             onClick={selectedMethod === 'webauthn' ? useWebAuthn : confirm}
@@ -237,75 +221,74 @@ export default function TwoFactorAuthenticationModal() {
             ) : (
               <FormattedMessage id="actions.verify" defaultMessage="Verify" />
             )}
-          </StyledButton>
-        </Flex>
-      </ModalFooter>
-    </StyledModal>
+          </Button>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
 
 function AuthenticatorOption(props: {
   value: string;
-  onChange: (string) => void;
-  onSubmit?: () => void;
+  onChange: (val: string) => void;
   supportedMethods: string[];
   disabled: boolean;
 }) {
   return (
-    <Box>
-      <FormattedMessage
-        id="TwoFactorAuth.Setup.Form.InputLabel"
-        defaultMessage="Please enter your 6-digit code without any dashes."
-      />
-
-      <StyledInput
-        id="2fa-code-input"
-        name="2fa-code-input"
-        type="text"
-        mt={3}
-        minHeight={50}
-        fontSize="20px"
-        placeholder={'123456'}
-        pattern={'[0-9]{6}'}
-        inputMode="numeric"
-        value={props.value}
-        onKeyUp={onPressEnter(props.onSubmit)}
-        onChange={e => props.onChange(e.target.value)}
-        disabled={props.disabled}
+    <div className="space-y-4 pb-2">
+      <p className="text-balance text-sm text-muted-foreground">
+        <FormattedMessage
+          id="TwoFactorAuth.Setup.Form.InputLabel"
+          defaultMessage="Please enter the 6-digit code from your authenticator app."
+        />
+      </p>
+      <VerificationInput
+        inputProps={{
+          id: '2fa-code-input',
+          autoComplete: 'one-time-code',
+        }}
+        validChars="0-9"
+        placeholder=""
         autoFocus
+        classNames={{
+          container: 'ml-6 w-auto pr-12 -mr-6', // negative margin to make space for password manager browser extension icon
+          character:
+            'z-10 pointer-events-none rounded-md border border-input bg-background text-lg ring-offset-background items-center flex justify-center',
+          characterInactive: 'bg-muted',
+          characterSelected: 'ring-ring ring-2 ring-offset-2 outline-none text-foreground',
+        }}
+        onChange={val => props.onChange(val)}
       />
-    </Box>
+    </div>
   );
 }
 
 function RecoveryCodeOptions(props: { value: string; onChange: (string) => void; disabled: boolean }) {
   return (
-    <Box>
-      <FormattedMessage
-        id="TwoFactorAuth.RecoveryCodes.Form.InputLabel"
-        defaultMessage="Please enter one of your alphanumeric recovery codes."
-      />
-      <StyledInput
-        id="2fa-code-input"
-        name="2fa-code-input"
+    <div className="space-y-4">
+      <p className="text-balance text-sm text-muted-foreground">
+        <FormattedMessage
+          id="TwoFactorAuth.RecoveryCodes.Form.InputLabel"
+          defaultMessage="Please enter one of your alphanumeric recovery codes."
+        />
+      </p>
+      <Input
+        className="h-12 text-xl"
         type="text"
-        mt={3}
         placeholder="ABCDEFGHIJKLM123"
-        minHeight={50}
-        fontSize="20px"
         value={props.value}
         onChange={e => props.onChange(e.target.value)}
         disabled={props.disabled}
         autoFocus
       />
-    </Box>
+    </div>
   );
 }
 
 function WebauthnOption() {
   return (
-    <Box>
+    <p className="text-sm text-muted-foreground">
       <FormattedMessage defaultMessage="Use your device for two factor authentication" />
-    </Box>
+    </p>
   );
 }

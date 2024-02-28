@@ -11,11 +11,13 @@ export const SECTIONS = {
   HOST_VIRTUAL_CARDS: 'host-virtual-cards',
   HOST_VIRTUAL_CARD_REQUESTS: 'host-virtual-card-requests',
   HOST_APPLICATIONS: 'host-applications',
+  CONTRIBUTORS: 'contributors',
   INCOMING_CONTRIBUTIONS: 'incoming-contributions',
   OUTGOING_CONTRIBUTIONS: 'outgoing-contributions',
   EXPENSES: 'expenses',
   SUBMITTED_EXPENSES: 'submitted-expenses',
   TRANSACTIONS: 'transactions',
+  HOST_TRANSACTIONS: 'host-transactions',
   VIRTUAL_CARDS: 'virtual-cards',
   TEAM: 'team',
   VENDORS: 'vendors',
@@ -115,7 +117,7 @@ export const SECTION_LABELS = defineMessages({
   },
   [ALL_SECTIONS.COLLECTIVE_PAGE]: {
     id: 'editCollective.menu.collectivePage',
-    defaultMessage: 'Profile Page',
+    defaultMessage: 'Profile Sections',
   },
   [ALL_SECTIONS.CONNECTED_ACCOUNTS]: {
     defaultMessage: 'Social Accounts',
@@ -159,7 +161,7 @@ export const SECTION_LABELS = defineMessages({
     defaultMessage: 'Chart of Accounts',
   },
   [ALL_SECTIONS.TEAM]: {
-    id: 'ContributorsFilter.Core',
+    id: 'Team',
     defaultMessage: 'Team',
   },
   [ALL_SECTIONS.PAYMENT_METHODS]: {
@@ -223,6 +225,10 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.NOTIFICATIONS]: {
     id: 'NotificationsSettings.Title',
     defaultMessage: 'Notification Settings',
+  },
+  [ALL_SECTIONS.CONTRIBUTORS]: {
+    id: 'Contributors',
+    defaultMessage: 'Contributors',
   },
   [ALL_SECTIONS.OUTGOING_CONTRIBUTIONS]: {
     id: 'OutgoingContributions',

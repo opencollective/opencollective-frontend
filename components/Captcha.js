@@ -13,7 +13,7 @@ import { useToast } from './ui/useToast';
 import { Box } from './Grid';
 import StyledCheckbox from './StyledCheckbox';
 
-export const PROVIDERS = {
+const PROVIDERS = {
   HCAPTCHA: 'HCAPTCHA',
   RECAPTCHA: 'RECAPTCHA',
 };

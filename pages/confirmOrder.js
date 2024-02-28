@@ -1,12 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import { getStripe } from '../lib/stripe';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
@@ -40,13 +39,13 @@ class ConfirmOrderPage extends React.Component {
 
   componentDidMount() {
     if (!this.props.loadingLoggedInUser && this.props.LoggedInUser) {
-      return this.triggerRequest();
+      this.triggerRequest();
     }
   }
 
   componentDidUpdate() {
     if (!this.state.isRequestSent && !this.props.loadingLoggedInUser && this.props.LoggedInUser) {
-      return this.triggerRequest();
+      this.triggerRequest();
     }
   }
 
@@ -62,7 +61,7 @@ class ConfirmOrderPage extends React.Component {
         this.handleStripeError(orderConfirmed);
       } else {
         this.props.router.replace(
-          `/${orderConfirmed.order.fromAccount.slug}/admin/payment-methods?successType=payment`,
+          `/dashboard/${orderConfirmed.order.fromAccount.slug}/payment-methods?successType=payment`,
         );
       }
     } catch (e) {
@@ -117,7 +116,7 @@ class ConfirmOrderPage extends React.Component {
   }
 }
 
-export const confirmOrderMutation = gql`
+const confirmOrderMutation = gql`
   mutation ConfirmOrder($order: OrderReferenceInput!) {
     confirmOrder(order: $order) {
       order {
@@ -145,4 +144,6 @@ const addConfirmOrderMutation = graphql(confirmOrderMutation, {
   options: { context: API_V2_CONTEXT },
 });
 
+// ignore unused exports default
+// next.js export
 export default withUser(addConfirmOrderMutation(withRouter(ConfirmOrderPage)));

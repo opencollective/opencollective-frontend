@@ -67,7 +67,7 @@ class Host extends React.Component {
 
   updateSelectedOption(option) {
     this.props.router.push({
-      pathname: `/${this.props.collective.slug}/admin/host`,
+      pathname: `/dashboard/${this.props.collective.slug}/host`,
       query: {
         selectedOption: option,
       },
@@ -247,7 +247,7 @@ class Host extends React.Component {
                         values={{
                           type: collective.type,
                           emptyBalanceLink: (
-                            <Link href={`/${collective.slug}/admin/advanced`}>
+                            <Link href={`/dashboard/${collective.slug}/advanced`}>
                               <FormattedMessage id="emptyBalance" defaultMessage="Empty Balance" />
                             </Link>
                           ),
@@ -347,7 +347,7 @@ class Host extends React.Component {
     }
 
     const connectedAccounts = groupBy(collective.connectedAccounts, 'service');
-    const stripeAccount = connectedAccounts && connectedAccounts['stripe'] && connectedAccounts['stripe'][0];
+    const stripeAccount = connectedAccounts['stripe']?.[0];
 
     return (
       <EditCollectiveHostSection>
@@ -432,7 +432,7 @@ class Host extends React.Component {
                         collective={collective}
                         service="stripe"
                         options={{
-                          redirect: `${getWebsiteUrl()}/${collective.slug}/admin/host?selectedOption=selfHost`,
+                          redirect: `${getWebsiteUrl()}/dashboard/${collective.slug}/host?selectedOption=selfHost`,
                         }}
                       />
                     </Box>

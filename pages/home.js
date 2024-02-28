@@ -1,5 +1,4 @@
 import React from 'react';
-import cookie from 'cookie';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { getRequestIntl } from '../lib/i18n/request';
@@ -24,7 +23,7 @@ const messages = defineMessages({
   },
 });
 
-const HomePage = () => {
+export const HomePage = () => {
   const { formatMessage } = useIntl();
 
   return (
@@ -47,18 +46,9 @@ const HomePage = () => {
   );
 };
 
+// ignore unused exports getServerSideProps
+// next.js export
 export const getServerSideProps = async ({ req, res }) => {
-  const cookies = cookie.parse((req && req.headers.cookie) || '');
-  const redirectToDashboard = req.url === '/' && cookies.rootRedirect === 'dashboard';
-  if (redirectToDashboard) {
-    return {
-      redirect: {
-        destination: '/dashboard',
-        permanent: false,
-      },
-    };
-  }
-
   if (res && req) {
     const { locale } = getRequestIntl(req);
     if (locale === 'en') {
@@ -75,4 +65,6 @@ export const getServerSideProps = async ({ req, res }) => {
   return { props: { skipDataFromTree } };
 };
 
+// ignore unused exports default
+// next.js export
 export default HomePage;

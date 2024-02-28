@@ -23,7 +23,7 @@ export const expenseTagFilter: FilterConfig<ExpenseTagFilterValue> = {
 
 export const expenseTagsQuery = gql`
   query ExpenseTags($searchTerm: String, $host: AccountReferenceInput, $account: AccountReferenceInput) {
-    expenseTagStats(tagSearchTerm: $searchTerm, host: $host, account: $account) {
+    tagStats: expenseTagStats(tagSearchTerm: $searchTerm, host: $host, account: $account) {
       nodes {
         id
         tag
@@ -32,7 +32,7 @@ export const expenseTagsQuery = gql`
   }
 `;
 
-export default function ExpenseTagsFilter({
+function ExpenseTagsFilter({
   meta: { expenseTags, hostSlug, accountSlug },
   ...props
 }: FilterComponentProps<ExpenseTagFilterValue, { accountSlug?: string; hostSlug?: string; expenseTags?: string[] }>) {
@@ -68,7 +68,7 @@ export default function ExpenseTagsFilter({
 
   React.useEffect(() => {
     if (!loading) {
-      setOptions(data?.expenseTagStats?.nodes.map(({ tag }) => ({ label: tag, value: tag })) || defaultOptions);
+      setOptions(data?.tagStats?.nodes.map(({ tag }) => ({ label: tag, value: tag })) || defaultOptions);
     }
   }, [loading, data]);
 

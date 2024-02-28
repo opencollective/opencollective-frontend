@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from '../../lib/graphql/helpers';
 
 import { accountHoverCardFields } from '../AccountHoverCard';
 
@@ -9,6 +9,7 @@ export const vendorFieldFragment = gql`
     id
     slug
     name
+    legalName
     type
     description
     tags

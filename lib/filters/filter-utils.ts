@@ -98,17 +98,19 @@ export function getFilterValueFromQueryValue(queryValue, defaultFilterValue) {
   }
 }
 
-export const filterShouldDisplay = (key, { values, filters, defaultSchemaValues }) => {
+export const filterShouldDisplay = (key, { values, filters, defaultSchemaValues, meta }) => {
   return (
     key !== 'orderBy' && // orderBy is handled separately
+    filters[key].hide?.({ meta }) !== true && // hide function should return false if it exists
     (filters[key].static || // static filters should always be displayed
       values[key] !== defaultSchemaValues[key]) // don't show default schema values (will either be undefined or a value that can't be removed)
   );
 };
 
-export const filterShouldBeInAddFilterOptions = (key, { values, filters, defaultSchemaValues }) =>
+export const filterShouldBeInAddFilterOptions = (key, { values, filters, defaultSchemaValues, meta }) =>
   (isUndefined(values[key]) || // the value of the filter should be undefined (otherwise it should render)
     values[key] === defaultSchemaValues[key]) && // OR equal to the default value
+  filters[key].hide?.({ meta }) !== true && // hide function should return false if it exists
   !filters[key].static && // should not be static (otherwise it should render)
   filters[key].Component; // should have a Component (otherwise no filter options available)
 

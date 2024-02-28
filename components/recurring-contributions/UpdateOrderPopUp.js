@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { themeGet } from '@styled-system/theme-get';
 import { first, get, last, startCase } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -12,7 +12,7 @@ import { AmountTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency } from '../../lib/currency-utils';
 import { getIntervalFromContributionFrequency } from '../../lib/date-utils';
 import { getErrorFromGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { DEFAULT_MINIMUM_AMOUNT, DEFAULT_PRESETS } from '../../lib/tier-utils';
 
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
@@ -211,7 +211,7 @@ export const useContributeOptions = (order, tiers, tiersLoading, disableCustomCo
     return getContributeOptions(intl, order, tiers, disableCustomContributions);
   }, [intl, order, tiers, disableCustomContributions]);
 
-  if (!contributeOptions.length === 0) {
+  if (contributeOptions.length === 0) {
     throw new Error('Could not compute at least one contribution option.');
   }
 
@@ -400,7 +400,6 @@ const UpdateOrderPopUp = ({ contribution, onCloseEdit }) => {
                               value={inputAmountValue}
                               onChange={setInputAmountValue}
                               min={DEFAULT_MINIMUM_AMOUNT}
-                              precision={2}
                               px="2px"
                             />
                           </Box>

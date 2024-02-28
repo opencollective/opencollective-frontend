@@ -4,7 +4,7 @@ import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { formatAccountName } from '../../lib/collective.lib';
+import { formatAccountName } from '../../lib/collective';
 import { CollectiveType } from '../../lib/constants/collectives';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { INVITE, PayoutMethodType, VIRTUAL_CARD } from '../../lib/constants/payout-method';
@@ -287,7 +287,7 @@ const ExpenseSummaryAdditionalInformation = ({
               <Container fontSize="11px" fontWeight="500" mb={2}>
                 <FormattedMessage id="ExpenseForm.InvoiceInfo" defaultMessage="Additional invoice information" />
                 &nbsp;&nbsp;
-                <PrivateInfoIcon color="#969BA3" />
+                <PrivateInfoIcon />
               </Container>
               <P fontSize="11px" lineHeight="16px" whiteSpace="pre-wrap">
                 {expense.invoiceInfo}

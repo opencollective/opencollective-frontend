@@ -5,7 +5,7 @@ module.exports = {
     '@storybook/addon-links',
     '@storybook/addon-docs',
     '@storybook/addon-essentials',
-    'storybook-addon-designs',
+    '@storybook/addon-designs',
     '@storybook/addon-mdx-gfm',
   ],
   webpackFinal: config => {
@@ -32,10 +32,7 @@ module.exports = {
     return config;
   },
   staticDirs: ['../public'],
-  framework: {
-    name: '@storybook/nextjs',
-    options: {},
-  },
+  framework: '@storybook/nextjs',
   docs: {
     autodocs: true,
   },

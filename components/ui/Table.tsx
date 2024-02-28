@@ -1,3 +1,5 @@
+// ignore unused exports
+
 import * as React from 'react';
 import { MoreHorizontal } from 'lucide-react';
 
@@ -5,14 +7,15 @@ import { cn } from '../../lib/utils';
 
 const Table = React.forwardRef<
   HTMLTableElement,
-  React.HTMLAttributes<HTMLTableElement> & { mobileTableView?: boolean; innerClassName?: string }
->(({ className, innerClassName, mobileTableView, ...props }, ref) => (
+  React.HTMLAttributes<HTMLTableElement> & { mobileTableView?: boolean; fullWidth?: boolean; innerClassName?: string }
+>(({ className, innerClassName, mobileTableView, fullWidth, ...props }, ref) => (
   <div
     className={cn(
-      'overflow-auto',
-      mobileTableView
-        ? '-mx-4 border-b border-t sm:mx-0 sm:w-full sm:rounded-xl sm:border'
+      'table-auto overflow-auto',
+      mobileTableView || fullWidth
+        ? '-mx-4 border-b border-t 2xl:mx-0 2xl:rounded-xl 2xl:border'
         : 'w-full rounded-xl border',
+      fullWidth ? 'sm:-mx-6' : mobileTableView ? 'sm:mx-0 sm:w-full sm:rounded-xl sm:border' : '',
       className,
     )}
   >
@@ -47,8 +50,8 @@ const TableRow = React.forwardRef<
   <tr
     ref={ref}
     className={cn(
-      'group border-b transition-colors data-[state=selected]:bg-slate-100',
-      highlightOnHover && 'hover:bg-slate-100/50',
+      'group/row border-b ring-inset ring-ring data-[state=selected]:bg-slate-100',
+      highlightOnHover && 'hover:bg-slate-100',
       className,
     )}
     {...props}
@@ -56,34 +59,40 @@ const TableRow = React.forwardRef<
 ));
 TableRow.displayName = 'TableRow';
 
-const TableHead = React.forwardRef<HTMLTableCellElement, React.ThHTMLAttributes<HTMLTableCellElement>>(
-  ({ className, ...props }, ref) => {
-    return (
-      <th
-        ref={ref}
-        className={cn(
-          'h-12 px-2 text-left align-middle font-medium text-slate-500 first:pl-4 last:pr-4  [&:has([role=checkbox])]:pr-0',
-          className,
-        )}
-        {...props}
-      />
-    );
-  },
-);
-TableHead.displayName = 'TableHead';
-
-const TableCell = React.forwardRef<HTMLTableCellElement, React.TdHTMLAttributes<HTMLTableCellElement>>(
-  ({ className, ...props }, ref) => (
-    <td
+const TableHead = React.forwardRef<
+  HTMLTableCellElement,
+  React.ThHTMLAttributes<HTMLTableCellElement> & { fullWidth?: boolean }
+>(({ className, fullWidth, ...props }, ref) => {
+  return (
+    <th
       ref={ref}
       className={cn(
-        'h-[56px] min-h-[56px] px-2 py-3 align-middle first:pl-4 last:pr-4 [&:has([role=checkbox])]:pr-0',
+        'h-12 px-2 text-left align-middle font-medium tracking-tight text-muted-foreground first:pl-4  last:pr-4 [&:has([role=checkbox])]:pr-0',
+        fullWidth && 'sm:first:pl-6 sm:last:pr-6 2xl:first:pl-4 2xl:last:pr-4',
         className,
       )}
       {...props}
     />
-  ),
-);
+  );
+});
+TableHead.displayName = 'TableHead';
+
+const TableCell = React.forwardRef<
+  HTMLTableCellElement,
+  React.TdHTMLAttributes<HTMLTableCellElement> & { fullWidth?: boolean; withIndicator?: boolean; compact?: boolean }
+>(({ className, fullWidth, withIndicator, compact, ...props }, ref) => (
+  <td
+    ref={ref}
+    className={cn(
+      'relative  px-2 py-2 align-middle  first:pl-4 last:pr-4  [&:has([role=checkbox])]:pr-0',
+      withIndicator && 'first:border-l-2 first:border-transparent first:data-[state=indicated]:border-primary',
+      fullWidth && 'sm:first:pl-6 sm:last:pr-6 2xl:first:pl-4 2xl:last:pr-4',
+      compact ? 'h-[45px] min-h-[45px]' : 'h-[56px] min-h-[56px]',
+      className,
+    )}
+    {...props}
+  />
+));
 TableCell.displayName = 'TableCell';
 
 const TableCaption = React.forwardRef<HTMLTableCaptionElement, React.HTMLAttributes<HTMLTableCaptionElement>>(
@@ -98,7 +107,7 @@ const TableActionsButton = React.forwardRef<HTMLButtonElement, React.HTMLAttribu
     <button
       ref={ref}
       className={cn(
-        'flex h-8 w-8 items-center justify-center rounded-lg border border-transparent bg-transparent text-slate-500 shadow-sm shadow-transparent ring-2 ring-transparent transition-colors hover:text-slate-950 hover:shadow-slate-200  focus:outline-none focus-visible:ring-black active:ring-black group-hover:border-slate-200 group-hover:bg-white data-[state=open]:ring-black',
+        'flex h-8 w-8 items-center justify-center rounded-lg border border-transparent bg-transparent text-slate-500 shadow-sm shadow-transparent ring-2 ring-transparent transition-colors hover:text-slate-950 hover:shadow-slate-200  focus:outline-none focus-visible:ring-black active:ring-black group-hover/row:border-slate-200 group-hover/row:bg-white data-[state=open]:ring-black',
         className,
       )}
       {...props}

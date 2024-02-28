@@ -1,22 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { parseDateInterval } from '../../lib/date-utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 
 import { accountHoverCardFields } from '../AccountHoverCard';
 import { parseAmountRange } from '../budget/filters/AmountFilter';
 import { confirmContributionFieldsFragment } from '../ContributionConfirmationModal';
+import { DisputedContributionsWarning } from '../dashboard/sections/collectives/DisputedContributionsWarning';
+import CreatePendingOrderModal from '../dashboard/sections/contributions/CreatePendingOrderModal';
 import { Box, Flex } from '../Grid';
-import CreatePendingOrderModal from '../host-dashboard/CreatePendingOrderModal';
-import { DisputedContributionsWarning } from '../host-dashboard/DisputedContributionsWarning';
 import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
@@ -197,13 +197,14 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
         <h1 className="text-2xl font-bold leading-10 tracking-tight">
           {title || <FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />}
         </h1>
-
-        <SearchBar
-          height="40px"
-          defaultValue={router.query.searchTerm}
-          onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
-          placeholder={intl.formatMessage(messages.searchPlaceholder)}
-        />
+        <div className="w-[276px]">
+          <SearchBar
+            height="40px"
+            defaultValue={router.query.searchTerm}
+            onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
+            placeholder={intl.formatMessage(messages.searchPlaceholder)}
+          />
+        </div>
       </div>
       <hr className="my-5" />
       <Flex mb={34}>

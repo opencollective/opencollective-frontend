@@ -3,14 +3,15 @@ import { ExclamationCircle } from '@styled-icons/fa-solid/ExclamationCircle';
 import { Download as DownloadIcon } from '@styled-icons/feather/Download';
 import { isNil, omit } from 'lodash';
 import { Accept, FileRejection, useDropzone } from 'react-dropzone';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { v4 as uuid } from 'uuid';
 
-import { UploadedFileKind, UploadFileResult } from '../lib/graphql/types/v2/graphql';
+import { OcrParsingOptionsInput, UploadedFileKind, UploadFileResult } from '../lib/graphql/types/v2/graphql';
 import { useGraphQLFileUploader } from '../lib/hooks/useGraphQLFileUploader';
 import { useImageUploader } from '../lib/hooks/useImageUploader';
 
+import { useToast } from './ui/useToast';
 import Container from './Container';
 import { Box } from './Grid';
 import { getI18nLink } from './I18nFormatters';
@@ -19,6 +20,7 @@ import StyledSpinner from './StyledSpinner';
 import { P, Span } from './Text';
 import UploadedFilePreview from './UploadedFilePreview';
 
+// ignore unused exports DROPZONE_ACCEPT_PDF
 export const DROPZONE_ACCEPT_IMAGES = { 'image/*': ['.jpeg', '.png'] };
 export const DROPZONE_ACCEPT_PDF = { 'application/pdf': ['.pdf'] };
 export const DROPZONE_ACCEPT_ALL = { ...DROPZONE_ACCEPT_IMAGES, ...DROPZONE_ACCEPT_PDF };
@@ -106,11 +108,15 @@ const StyledDropzone = ({
   isMulti = true,
   useGraphQL = false,
   parseDocument = false,
+  parsingOptions = {},
   onGraphQLSuccess = undefined,
   UploadingComponent = undefined,
+  limit = undefined,
   kind,
   ...props
 }: StyledDropzoneProps) => {
+  const { toast } = useToast();
+  const intl = useIntl();
   const imgUploaderParams = { isMulti, mockImageGenerator, onSuccess, onReject, kind, accept };
   const { uploadFiles, isUploading, uploadProgress } = useImageUploader(imgUploaderParams);
   const { isUploading: isUploadingWithGraphQL, uploadFile: uploadFileWithGraphQL } = useGraphQLFileUploader({
@@ -129,11 +135,22 @@ const StyledDropzone = ({
 
   const onDropCallback = React.useCallback(
     (acceptedFiles: File[], fileRejections: FileRejection[]) => {
+      if (isMulti && acceptedFiles.length > (limit || 0)) {
+        toast({
+          variant: 'error',
+          message: intl.formatMessage(
+            { defaultMessage: 'You can only upload {count, plural, one {# file} other {# files}} at once' },
+            { count: limit },
+          ),
+        });
+        return;
+      }
+
       onDrop?.(acceptedFiles, fileRejections);
       if (collectFilesOnly) {
         onSuccess?.(acceptedFiles, fileRejections);
       } else if (useGraphQL) {
-        uploadFileWithGraphQL(acceptedFiles.map(file => ({ file, kind, parseDocument })));
+        uploadFileWithGraphQL(acceptedFiles.map(file => ({ file, kind, parseDocument, parsingOptions })));
       } else {
         uploadFiles(acceptedFiles, fileRejections);
       }
@@ -294,7 +311,10 @@ type StyledDropzoneProps = {
   useGraphQL?: boolean;
   onGraphQLSuccess?: (uploadResults: UploadFileResult[]) => void;
   parseDocument?: boolean;
+  parsingOptions?: OcrParsingOptionsInput;
   UploadingComponent?: React.ComponentType;
+  /** When isMulti is true, limit the number of files that can be uploaded */
+  limit?: number;
 } & (
   | {
       /** Collect File only, do not upload files */

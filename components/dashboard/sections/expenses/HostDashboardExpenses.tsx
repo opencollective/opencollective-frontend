@@ -14,13 +14,9 @@ import {
   PayoutMethodType,
 } from '../../../../lib/graphql/types/v2/graphql';
 import { useLazyGraphQLPaginatedResults } from '../../../../lib/hooks/useLazyGraphQLPaginatedResults';
-import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
 
 import ExpensesList from '../../../expenses/ExpensesList';
-import ExpensePipelineOverview from '../../../host-dashboard/expenses/ExpensePipelineOverview';
-import ScheduledExpensesBanner from '../../../host-dashboard/ScheduledExpensesBanner';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
@@ -33,6 +29,7 @@ import { Filterbar } from '../../filters/Filterbar';
 import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
 import { DashboardSectionProps } from '../../types';
 
+import ExpensePipelineOverview from './ExpensePipelineOverview';
 import {
   FilterMeta as CommonFilterMeta,
   filters as commonFilters,
@@ -40,6 +37,7 @@ import {
   toVariables as commonToVariables,
 } from './filters';
 import { hostDashboardExpensesQuery, hostDashboardMetadataQuery } from './queries';
+import ScheduledExpensesBanner from './ScheduledExpensesBanner';
 
 const filterSchema = commonSchema.extend({
   account: z.string().optional(),
@@ -89,19 +87,16 @@ const ROUTE_PARAMS = ['slug', 'section'];
 const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const router = useRouter();
   const intl = useIntl();
-  const { LoggedInUser } = useLoggedInUser();
-  const expensePipelineFeatureIsEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.EXPENSE_PIPELINE);
   const query = router.query;
   const [paypalPreApprovalError, setPaypalPreApprovalError] = React.useState(null);
   const pageRoute = `/dashboard/${hostSlug}/host-expenses`;
 
   const {
     data: metaData,
-    loading: loadingMetaData,
     error: errorMetaData,
     refetch: refetchMetaData,
   } = useQuery(hostDashboardMetadataQuery, {
-    variables: { hostSlug, getViewCounts: Boolean(expensePipelineFeatureIsEnabled), withHoverCard: true },
+    variables: { hostSlug, withHoverCard: true },
     context: API_V2_CONTEXT,
   });
 
@@ -122,7 +117,6 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       label: intl.formatMessage({ id: 'expense.scheduledForPayment', defaultMessage: 'Scheduled for payment' }),
       filter: {
         status: ExpenseStatusFilter.SCHEDULED_FOR_PAYMENT,
-        payout: PayoutMethodType.BANK_ACCOUNT,
         orderBy: 'CREATED_AT,ASC',
       },
       id: 'scheduled_for_payment',
@@ -167,7 +161,7 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     defaultFilterValues: views[1].filter,
     filters,
     meta,
-    views: expensePipelineFeatureIsEnabled ? views : undefined,
+    views,
   });
 
   const variables = {
@@ -195,7 +189,7 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader title={<FormattedMessage id="Expenses" defaultMessage="Expenses" />} />
       {paypalPreApprovalError && (
         <MessageBox type="warning" mb={3} withIcon>
@@ -265,13 +259,13 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       ) : (
         <React.Fragment>
           <ExpensesList
-            isLoading={loading || loadingMetaData}
-            host={metaData?.host}
+            isLoading={loading}
+            host={data?.host}
             nbPlaceholders={paginatedExpenses.limit}
             expenses={paginatedExpenses.nodes}
             view="admin"
             onProcess={(expense, cache) => {
-              queryFilter.hasFilters && onExpenseUpdate({ updatedExpense: expense, cache, variables, refetchMetaData });
+              onExpenseUpdate({ updatedExpense: expense, cache, variables, refetchMetaData });
             }}
             useDrawer
             openExpenseLegacyId={Number(router.query.openExpenseId)}

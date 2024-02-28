@@ -26,6 +26,7 @@ describe('Contribution Flow: contribute with platform tips', () => {
     cy.getByDataCy('ContributionSummary-TodaysCharge').should('contain', '$57.50 USD');
 
     // Switch to the 10% percentage preset
+    cy.contains('Edit').click();
     cy.contains('[data-cy="platform-tip-options"] button', '10%').click();
     cy.contains('[data-cy="platform-tip-options"] button', '10%').should('have.class', 'selected');
     cy.getByDataCy('ContributionSummary-Tip').should('contain', '$5.00 USD');
@@ -82,7 +83,7 @@ describe('Contribution Flow: contribute with platform tips', () => {
       });
 
     // ---- Opt out ----
-    cy.contains('[data-cy="platform-tip-options"] button', 'No thank you').click();
+    cy.contains(`I don't want to contribute to Open Collective`).click();
 
     // Removes the tip
     cy.getByDataCy('ContributionSummary-Tip').should('not.exist');
@@ -97,7 +98,7 @@ describe('Contribution Flow: contribute with platform tips', () => {
   it('Is not displayed when contribution amount is 0', () => {
     // Create a special tier to allow free contributions
     // TODO: Would be great to have that as a cypress command for that part, but there's no mutation to edit tiers on GQLV2 yet
-    cy.login({ redirect: `/${collective.slug}/admin/tiers` });
+    cy.login({ redirect: `/dashboard/${collective.slug}/tiers` });
     cy.getByDataCy('contribute-card-tier').first().find('button').click();
     cy.get('[data-cy="minimumAmount"]input').type('{backspace}{backspace}{backspace}0');
     cy.getByDataCy('confirm-btn').click();

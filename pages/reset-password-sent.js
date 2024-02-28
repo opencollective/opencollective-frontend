@@ -68,4 +68,6 @@ ResetPasswordSent.propTypes = {
   email: PropTypes.string.isRequired,
 };
 
+// ignore unused exports default
+// next.js export
 export default ResetPasswordSent;

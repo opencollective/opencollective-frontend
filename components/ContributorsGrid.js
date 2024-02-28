@@ -12,7 +12,7 @@ import { fadeIn } from './StyledKeyframes';
 import { withUser } from './UserProvider';
 
 // Define static dimensions
-export const COLLECTIVE_CARD_MARGIN_X = 32;
+const COLLECTIVE_CARD_MARGIN_X = 32;
 const COLLECTIVE_CARD_MARGIN_Y = 26;
 const COLLECTIVE_CARD_WIDTH = 144;
 const COLLECTIVE_CARD_HEIGHT = 220;
@@ -135,6 +135,7 @@ const ContributorsGrid = ({
   currency,
   LoggedInUser,
   collectiveId,
+  gridRef,
 }) => {
   const maxNbRows = maxNbRowsForViewports[viewport];
   const [nbCols, nbRows] = getItemsRepartition(contributors.length, width, maxNbRows);
@@ -159,6 +160,7 @@ const ContributorsGrid = ({
         const idx = getContributorIdx(columnIndex, rowIndex, nbRows, nbCols, hasScroll);
         return idx < contributors.length ? contributors[idx].id : `empty-${idx}`;
       }}
+      ref={gridRef}
     >
       {({ columnIndex, rowIndex, style }) => {
         const idx = getContributorIdx(columnIndex, rowIndex, nbRows, nbCols, hasScroll);
@@ -221,6 +223,9 @@ ContributorsGrid.propTypes = {
 
   /** Collective id */
   collectiveId: PropTypes.number,
+
+  /* Reference to the FixedSizedGrid */
+  gridRef: PropTypes.oneOfType([PropTypes.func, PropTypes.shape({ current: PropTypes.any })]),
 };
 
 ContributorsGrid.defaultProps = {

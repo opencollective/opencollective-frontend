@@ -54,7 +54,7 @@ const AttachedFilesForm = ({
             }}
           />
           &nbsp;
-          <PrivateInfoIcon color="#969BA3" size={12} />
+          <PrivateInfoIcon className="text-muted-foreground" size={12} />
         </Span>
         <StyledHr flex="1" borderColor="black.300" mx={2} />
         {isMulti && files?.length > 0 && (

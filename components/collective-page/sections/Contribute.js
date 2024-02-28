@@ -12,7 +12,7 @@ import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { isPastEvent } from '../../../lib/events';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { getCollectiveContributionCardsOrder, TIERS_ORDER_KEY } from '../../../lib/tier-utils';
-import { getCollectivePageRoute } from '../../../lib/url-helpers';
+import { getCollectivePageRoute, getDashboardRoute } from '../../../lib/url-helpers';
 
 import Container from '../../Container';
 import ContainerOverlay from '../../ContainerOverlay';
@@ -320,7 +320,7 @@ class SectionContribute extends React.PureComponent {
                   ))}
                   {isAdmin && (
                     <ContributeCardContainer minHeight={150}>
-                      <CreateNew route={`/${collective.parentCollective.slug}/events/${collective.slug}/admin/tickets`}>
+                      <CreateNew route={getDashboardRoute(collective, 'tickets')}>
                         <FormattedMessage id="SectionTickets.CreateTicket" defaultMessage="Create Ticket" />
                       </CreateNew>
                     </ContributeCardContainer>

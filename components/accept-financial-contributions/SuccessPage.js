@@ -13,8 +13,6 @@ import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 import { H1, H2, P } from '../Text';
 
-import successIllustration from '../../public/static/images/create-collective/acceptContributionsSuccessIllustration.png';
-
 const TIERS_INFO_LINK = 'https://docs.opencollective.com/help/collectives/tiers-goals';
 
 const SmallExternalLink = styled(StyledLink)`
@@ -101,7 +99,12 @@ class SuccessPage extends React.Component {
             mx={[2, 4, 0]}
             my={[2, 4]}
           >
-            <Image alt="" src={successIllustration} width={264} height={352} />
+            <Image
+              alt=""
+              src="/static/images/create-collective/acceptContributionsSuccessIllustration.png"
+              width={264}
+              height={352}
+            />
             <Flex flexDirection="column" ml={[0, 4, 4]} mx={[2, 0]} mt={[4, 0]} maxWidth={'475px'}>
               <H2 fontSize="13px" fontWeight="bold" color="black.800">
                 <FormattedMessage id="tiers.about" defaultMessage="Set up contribution tiers" />
@@ -131,7 +134,7 @@ class SuccessPage extends React.Component {
                       values={{
                         takeMeThere: (
                           <Link
-                            href={`/${collective.host.slug}/admin/fiscal-hosting`}
+                            href={`/dashboard/${collective.host.slug}/fiscal-hosting`}
                             data-cy="afc-success-host-settings-link"
                           >
                             <FormattedMessage id="takeMeThere" defaultMessage="Take me there" />
@@ -153,7 +156,7 @@ class SuccessPage extends React.Component {
                 />
               </StyledButton>
             </Link>
-            <Link href={`/${collective.slug}/admin/tiers`} data-cy="afc-success-host-tiers-link">
+            <Link href={`/dashboard/${collective.slug}/tiers`} data-cy="afc-success-host-tiers-link">
               <StyledButton buttonStyle="dark" mt={[2, 3]} mb={[3, 2]} ml={[null, 3]} px={3}>
                 <FormattedMessage id="createCustomTiers" defaultMessage="Create your own tiers" />
               </StyledButton>

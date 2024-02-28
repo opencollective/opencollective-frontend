@@ -8,16 +8,28 @@ const config: CodegenConfig = {
     },
   },
   generates: {
-    './lib/graphql/types/v2': {
-      preset: 'gql-tag-operations-preset',
-      schema: './lib/graphql/schemaV2.graphql',
-      plugins: [],
+    './lib/graphql/types/v2/': {
+      preset: 'client',
       presetConfig: {
-        augmentedModuleName: '@apollo/client',
-        gqlTagName: 'gql',
+        fragmentMasking: false,
       },
+      schema: './lib/graphql/schemaV2.graphql',
+      plugins: [
+        {
+          add: {
+            content: '/* ignore unused exports */',
+          },
+        },
+      ],
     },
   },
+  pluckConfig: {
+    globalGqlIdentifierName: 'gql',
+    gqlMagicComment: 'GraphQLV2',
+  },
 };
+
+// ignore unused exports default
+// config file
 
 export default config;

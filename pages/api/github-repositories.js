@@ -2,6 +2,8 @@ import { URL } from 'url';
 
 import { pick } from 'lodash';
 
+// ignore unused exports default
+// next.js export
 export default async function handle(req, res) {
   const apiUrl = new URL(`${process.env.API_URL}/github-repositories?api_key=${process.env.API_KEY}`);
 

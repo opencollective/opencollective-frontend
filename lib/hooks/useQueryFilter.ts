@@ -44,7 +44,7 @@ export default function useQueryFilter<
   schema: S; // Schema for all query filters (both those which are available to the user in Query and those which are not)
   filters: FilterComponentConfigs<z.infer<S>, FilterMeta>; // Configuration of filters available to the user in the `Filter` component (used in this hook to determine `hasFilters` and `activeViewId`)
   toVariables?: Partial<FiltersToVariables<z.infer<S>, GQLQueryVars, FilterMeta>>;
-  defaultFilterValues?: Partial<z.infer<S>>; // Default values for filters, views[0].filter will be used if not set
+  defaultFilterValues?: Partial<z.infer<S>>; // Default valuFes for filters, views[0].filter will be used if not set
   meta?: FilterMeta;
   views?: Views<z.infer<S>>;
 }): useQueryFilterReturnType<S, GQLQueryVars> {
@@ -52,7 +52,10 @@ export default function useQueryFilter<
   const intl = useIntl();
 
   // Default values set by the page, views, or the user (eventually)
-  const defaultFilterValues = opts.defaultFilterValues || opts.views?.[0]?.filter || {};
+  const defaultFilterValues = React.useMemo(
+    () => opts.defaultFilterValues || opts.views?.[0]?.filter || {},
+    [opts.defaultFilterValues, opts.views],
+  );
   // Default values defined by the schema
   const defaultSchemaValues = opts.schema.parse({});
 
@@ -78,7 +81,7 @@ export default function useQueryFilter<
       addFilterValidationErrorToast(result.error, intl);
     }
     return opts.schema.parse(defaultFilterValues);
-  }, [opts.schema, router.query, defaultFilterValues]);
+  }, [intl, opts.schema, router.query, defaultFilterValues]);
 
   const variables = React.useMemo(() => {
     let apiVariables: Partial<GQLQueryVars> = {};
@@ -184,9 +187,11 @@ function addFilterValidationErrorToast(error, intl) {
     errorMessage = `${errorMessage} ${error.path.join(', ')}: ${error.message} \n`;
   });
 
-  toast({
-    variant: 'error',
-    title: intl.formatMessage({ defaultMessage: 'Filter validation error' }),
-    message: errorMessage,
+  setImmediate(() => {
+    toast({
+      variant: 'error',
+      title: intl.formatMessage({ defaultMessage: 'Filter validation error' }),
+      message: errorMessage,
+    });
   });
 }

@@ -7,7 +7,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { border } from 'styled-system';
 
-import { isIndividualAccount } from '../../lib/collective.lib';
+import { isIndividualAccount } from '../../lib/collective';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { formatCurrency, getCurrencySymbol } from '../../lib/currency-utils';
 import { AmountPropTypeShape } from '../../lib/prop-types';
@@ -65,15 +65,14 @@ const StatContainer = styled.div`
 
 const BudgetStats = ({ collective, stats, horizontal }) => {
   const { locale } = useIntl();
-  const monthlyRecurring =
-    (stats.activeRecurringContributions?.monthly || 0) + (stats.activeRecurringContributions?.yearly || 0) / 12;
-  const isFund = collective.type === CollectiveType.FUND;
-  const isIndividual = !collective.isHost && isIndividualAccount(collective);
-  const borderTop = ['1px solid #dcdee0', 'none', horizontal ? null : '1px solid #dcdee0'];
 
   if (!stats) {
     return null;
   }
+
+  const isFund = collective.type === CollectiveType.FUND;
+  const isIndividual = !collective.isHost && isIndividualAccount(collective);
+  const borderTop = ['1px solid #dcdee0', 'none', horizontal ? null : '1px solid #dcdee0'];
 
   return (
     <StyledCard
@@ -103,19 +102,21 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
                   textTransform="uppercase"
                   color="black.700"
                   extraTooltipContent={
-                    <Fragment>
-                      <Box mt={2}>
-                        <FormattedMessage
-                          id="budgetSection-balance-consolidated"
-                          defaultMessage="Total consolidated including Projects and Events: {amount}"
-                          values={{
-                            amount: formatCurrency(stats?.consolidatedBalance.valueInCents || 0, collective.currency, {
-                              locale,
-                            }),
-                          }}
-                        />
-                      </Box>
-                    </Fragment>
+                    stats.consolidatedBalance && (
+                      <Fragment>
+                        <Box mt={2}>
+                          <FormattedMessage
+                            id="budgetSection-balance-consolidated"
+                            defaultMessage="Total consolidated including Projects and Events: {amount}"
+                            values={{
+                              amount: formatCurrency(stats.consolidatedBalance.valueInCents || 0, collective.currency, {
+                                locale,
+                              }),
+                            }}
+                          />
+                        </Box>
+                      </Fragment>
+                    )
                   }
                 />
               ) : (
@@ -142,7 +143,7 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
                         id="budgetSection-raised-total"
                         defaultMessage="Total contributed before fees: {amount}"
                         values={{
-                          amount: formatCurrency(stats?.totalAmountRaised.valueInCents || 0, collective.currency, {
+                          amount: formatCurrency(stats.totalAmountRaised.valueInCents || 0, collective.currency, {
                             locale,
                           }),
                         }}
@@ -164,7 +165,7 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
               currency={collective.currency}
             />
           </StatContainer>
-          {!isFund && (
+          {!isFund && stats.totalAmountReceived && stats.yearlyBudget && stats.activeRecurringContributions && (
             <StatContainer data-cy="budgetSection-estimated-budget" borderTop={borderTop}>
               <StatTitle>
                 <Calendar size="12px" />
@@ -178,7 +179,14 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
                         <FormattedMessage
                           id="CollectivePage.SectionBudget.MonthlyRecurringAmount"
                           defaultMessage="Monthly recurring: {amount}"
-                          values={{ amount: formatCurrency(monthlyRecurring, collective.currency, { locale }) }}
+                          values={{
+                            amount: formatCurrency(
+                              (stats.activeRecurringContributions?.monthly || 0) +
+                                (stats.activeRecurringContributions?.yearly || 0) / 12,
+                              collective.currency,
+                              { locale },
+                            ),
+                          }}
                         />
                       </Box>
                       <Box mt={2}>
@@ -186,7 +194,7 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
                           id="CollectivePage.SectionBudget.TotalAmountReceived"
                           defaultMessage="Total received in the last 12 months: {amount}"
                           values={{
-                            amount: formatCurrency(stats?.totalAmountReceived.valueInCents || 0, collective.currency, {
+                            amount: formatCurrency(stats.totalAmountReceived.valueInCents || 0, collective.currency, {
                               locale,
                             }),
                           }}

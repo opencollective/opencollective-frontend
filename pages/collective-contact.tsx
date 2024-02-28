@@ -1,17 +1,17 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
 
-import { getCollectivePageMetadata } from '../lib/collective.lib';
+import { getCollectivePageMetadata } from '../lib/collective';
 import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import { Account } from '../lib/graphql/types/v2/graphql';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
-import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
+import { accountNavbarFieldsFragment } from '../components/collective-navbar/fragments';
 import CollectiveContactForm from '../components/CollectiveContactForm';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
@@ -113,7 +113,9 @@ const collectiveContactPageQuery = gql`
       }
     }
   }
-  ${collectiveNavbarFieldsFragment}
+  ${accountNavbarFieldsFragment}
 `;
 
+// ignore unused exports default
+// next.js export
 export default CollectiveContact;

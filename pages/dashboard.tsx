@@ -4,7 +4,7 @@ import { clsx } from 'clsx';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { isHostAccount, isIndividualAccount } from '../lib/collective.lib';
+import { isHostAccount, isIndividualAccount } from '../lib/collective';
 import roles from '../lib/constants/roles';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLocalStorage from '../lib/hooks/useLocalStorage';
@@ -51,7 +51,10 @@ const messages = defineMessages({
 const getDefaultSectionForAccount = (account, loggedInUser) => {
   if (!account) {
     return null;
-  } else if (isIndividualAccount(account)) {
+  } else if (
+    isIndividualAccount(account) ||
+    (!isHostAccount(account) && loggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW))
+  ) {
     return ALL_SECTIONS.OVERVIEW;
   } else if (isHostAccount(account)) {
     return ALL_SECTIONS.HOST_EXPENSES;
@@ -210,18 +213,18 @@ const DashboardPage = () => {
                   </Link>
                 )}
               </MessageBox>
-              {!LoggedInUser && <SignInOrJoinFree form="signin" disableSignup />}
+              {!LoggedInUser && <SignInOrJoinFree defaultForm="signin" disableSignup />}
             </div>
           ) : !useDynamicTopBar ? (
             <div
-              className="flex min-h-[600px] flex-col justify-center gap-6 px-4 py-6 md:flex-row md:px-6 lg:gap-12 lg:py-8"
+              className="flex min-h-[600px] flex-col justify-center gap-6 px-4 py-6 md:flex-row lg:gap-12 lg:py-8 xl:px-6"
               data-cy="admin-panel-container"
             >
               <AdminPanelSideBar isLoading={isLoading} activeSlug={activeSlug} menuItems={menuItems} />
               {LoggedInUser && require2FAForAdmins(account) && !LoggedInUser.hasTwoFactorAuth ? (
                 <TwoFactorAuthRequiredMessage className="lg:mt-16" />
               ) : (
-                <div className="max-w-[1000px] flex-1 px-1 sm:overflow-x-clip">
+                <div className="min-w-0 max-w-screen-xl flex-1">
                   <DashboardSection
                     section={selectedSection}
                     isLoading={isLoading}
@@ -240,10 +243,12 @@ const DashboardPage = () => {
               ) : (
                 <div
                   className={clsx(
-                    'mx-auto grid w-full max-w-screen-2xl grid-cols-1 justify-center px-3 md:px-6',
-                    subMenu
-                      ? 'lg:grid-cols-[minmax(200px,1fr)_minmax(0,1024px)_minmax(0,1fr)]'
-                      : 'lg:grid-cols-[minmax(0,1fr)_minmax(0,1024px)_minmax(0,1fr)]',
+                    'mx-auto grid w-full max-w-screen-2xl grid-cols-1 justify-center px-3 xl:px-6',
+                    ['host-transactions', 'transactions', 'overview'].includes(selectedSection)
+                      ? 'lg:grid-cols-[minmax(0,1fr)_minmax(0,1536px)_minmax(0,1fr)]'
+                      : subMenu
+                        ? 'lg:grid-cols-[minmax(200px,1fr)_minmax(0,1024px)_minmax(0,1fr)]'
+                        : 'lg:grid-cols-[minmax(0,1fr)_minmax(0,1024px)_minmax(0,1fr)]',
                   )}
                 >
                   {subMenu ? (
@@ -280,4 +285,6 @@ DashboardPage.getInitialProps = () => {
   };
 };
 
+// ignore unused exports default
+// next.js export
 export default DashboardPage;

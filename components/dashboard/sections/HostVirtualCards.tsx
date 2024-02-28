@@ -1,13 +1,13 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { omitBy } from 'lodash';
 import { PlusIcon } from 'lucide-react';
-import { defineMessage, FormattedMessage } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
-import { FilterComponentConfigs, FiltersToVariables } from '../../../lib/filters/filter-types';
+import { FilterComponentConfigs, FiltersToVariables, Views } from '../../../lib/filters/filter-types';
 import { boolean, isMulti, limit, offset } from '../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import { Currency, HostedVirtualCardsQueryVariables, VirtualCardStatus } from '../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 import { i18nHasMissingReceipts } from '../../../lib/i18n/receipts-filter';
@@ -59,6 +59,15 @@ const hostVirtualCardsMetadataQuery = gql`
       id
       slug
       currency
+      active: hostedVirtualCards(status: [ACTIVE], limit: 0) {
+        totalCount
+      }
+      inactive: hostedVirtualCards(status: [INACTIVE], limit: 0) {
+        totalCount
+      }
+      canceled: hostedVirtualCards(status: [CANCELED], limit: 0) {
+        totalCount
+      }
     }
   }
 `;
@@ -237,16 +246,39 @@ const ROUTE_PARAMS = ['slug', 'section'];
 
 const HostVirtualCards = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const { toast } = useToast();
+  const intl = useIntl();
   const { data: metadata } = useQuery(hostVirtualCardsMetadataQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: hostSlug },
   });
+
+  const views: Views<z.infer<typeof schema>> = [
+    {
+      id: 'active',
+      label: intl.formatMessage({ id: 'Subscriptions.Active', defaultMessage: 'Active' }),
+      filter: { status: [VirtualCardStatus.ACTIVE] },
+      count: metadata?.host?.active?.totalCount,
+    },
+    {
+      id: 'inactive',
+      label: intl.formatMessage({ id: 'virtualCard.status.inactive', defaultMessage: 'Inactive' }),
+      filter: { status: [VirtualCardStatus.INACTIVE] },
+      count: metadata?.host?.inactive?.totalCount,
+    },
+    {
+      id: 'canceled',
+      label: intl.formatMessage({ id: 'virtualCard.status.canceled', defaultMessage: 'Canceled' }),
+      filter: { status: [VirtualCardStatus.CANCELED] },
+      count: metadata?.host?.canceled?.totalCount,
+    },
+  ];
 
   const queryFilter = useQueryFilter({
     schema,
     filters,
     toVariables,
     meta: { hostSlug, currency: metadata?.host?.currency },
+    views,
   });
 
   const { error, loading, data, refetch, variables } = useQuery(hostVirtualCardsQuery, {
@@ -281,7 +313,7 @@ const HostVirtualCards = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage id="VirtualCards.Title" defaultMessage="Virtual Cards" />}
         description={

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Ban as UnapproveIcon } from '@styled-icons/fa-solid/Ban';
 import { Check as ApproveIcon } from '@styled-icons/fa-solid/Check';
@@ -10,10 +10,13 @@ import styled from 'styled-components';
 
 import PERMISSION_CODES, { ReasonMessage } from '../../lib/constants/permissions';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { collectiveAdminsMustConfirmAccountingCategory } from './lib/accounting-categories';
 
-import { getScheduledExpensesQueryVariables, scheduledExpensesQuery } from '../host-dashboard/ScheduledExpensesBanner';
+import {
+  getScheduledExpensesQueryVariables,
+  scheduledExpensesQuery,
+} from '../dashboard/sections/expenses/ScheduledExpensesBanner';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledTooltip from '../StyledTooltip';
@@ -310,7 +313,7 @@ const ProcessExpenseButtons = ({
           onDelete={onDelete}
         />
       )}
-      {displaySecurityChecks && expense?.securityChecks?.length && (
+      {displaySecurityChecks && expense?.securityChecks?.length > 0 && (
         <SecurityChecksButton {...buttonProps} minWidth={0} expense={expense} />
       )}
 
@@ -328,6 +331,7 @@ const ProcessExpenseButtons = ({
         <ApproveExpenseModal
           expense={expense}
           host={host}
+          account={collective}
           onConfirm={() => triggerAction('APPROVE')}
           onClose={() => {
             setShowApproveExpenseModal(false);

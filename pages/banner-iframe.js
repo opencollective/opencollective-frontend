@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { Query } from '@apollo/client/react/components';
 import { graphql } from '@apollo/client/react/hoc';
 import { partition } from 'lodash';
@@ -9,7 +8,8 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../lib/constants/collectives';
-import { API_V2_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { collectiveBannerIframeQuery } from '../lib/graphql/v1/queries';
 import { getRequestIntl } from '../lib/i18n/request';
 import { parseToBoolean } from '../lib/utils';
 
@@ -431,30 +431,12 @@ class BannerIframe extends React.Component {
   }
 }
 
-const collectiveBannerIframeQuery = gqlV1/* GraphQL */ `
-  query CollectiveBannerIframe($collectiveSlug: String) {
-    Collective(slug: $collectiveSlug) {
-      id
-      name
-      slug
-      currency
-      stats {
-        id
-        backers {
-          id
-          users
-          organizations
-          collectives
-        }
-      }
-    }
-  }
-`;
-
-export const addCollectiveBannerIframeData = graphql(collectiveBannerIframeQuery, {
+const addCollectiveBannerIframeData = graphql(collectiveBannerIframeQuery, {
   options({ collectiveSlug, useNewFormat }) {
     return { skip: !collectiveSlug || useNewFormat };
   },
 });
 
+// ignore unused exports default
+// next.js export
 export default addCollectiveBannerIframeData(BannerIframe);

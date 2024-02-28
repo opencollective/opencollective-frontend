@@ -137,4 +137,6 @@ const addContributionFlowData = graphql(contributionFlowAccountQuery, {
   }),
 });
 
+// ignore unused exports default
+// next.js export
 export default addContributionFlowData(withUser(injectIntl(withStripeLoader(withRouter(NewContributionFlowPage)))));

@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
 import { pick } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -8,8 +8,9 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { createError, ERROR, i18nGraphqlException } from '../../lib/errors';
 import FormPersister from '../../lib/form-persister';
 import { formatFormErrorMessage } from '../../lib/form-utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
+import EditTags from '../EditTags';
 import CreateConversationFAQ from '../faqs/CreateConversationFAQ';
 import { Box, Flex } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -17,7 +18,6 @@ import MessageBox from '../MessageBox';
 import RichTextEditor from '../RichTextEditor';
 import StyledButton from '../StyledButton';
 import StyledInput from '../StyledInput';
-import StyledInputTags from '../StyledInputTags';
 import { H4, P } from '../Text';
 
 const createConversationMutation = gql`
@@ -113,6 +113,15 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
     }
   }, [values.title, values.html, values.tags]);
 
+  const onChangeTags = useCallback(
+    options =>
+      setFieldValue(
+        'tags',
+        options.map(el => el.value),
+      ),
+    [setFieldValue],
+  );
+
   return (
     <form onSubmit={handleSubmit}>
       <Flex flexWrap="wrap">
@@ -177,16 +186,11 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
               {loading ? (
                 <LoadingPlaceholder height={38} />
               ) : (
-                <StyledInputTags
+                <EditTags
                   name="tags"
                   {...getFieldProps('tags')}
-                  maxWidth={300}
                   suggestedTags={suggestedTags}
-                  onChange={options => {
-                    const tags = [];
-                    options && options.length > 0 ? options.map(option => tags.push(option.value)) : [];
-                    setFieldValue('tags', tags);
-                  }}
+                  onChange={onChangeTags}
                 />
               )}
             </Box>

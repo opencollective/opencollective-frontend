@@ -1,20 +1,19 @@
 import React, { useState } from 'react';
-import { gql } from '@apollo/client';
 import { get, pick } from 'lodash';
 import type { InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 
 import { getSSRQueryHelpers } from '../lib/apollo-client';
-import { shouldIndexAccountOnSearchEngines } from '../lib/collective.lib';
+import { shouldIndexAccountOnSearchEngines } from '../lib/collective';
 import { ERROR } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { stripHTML } from '../lib/html';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
-import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
+import { accountNavbarFieldsFragment } from '../components/collective-navbar/fragments';
 import Container from '../components/Container';
 import CommentForm from '../components/conversations/CommentForm';
 import { commentFieldsFragment } from '../components/conversations/graphql';
@@ -60,7 +59,6 @@ const updatePageQuery = gql`
       ... on Collective {
         isApproved
       }
-      type
       ... on AccountWithParent {
         parent {
           id
@@ -109,7 +107,7 @@ const updatePageQuery = gql`
     }
   }
   ${commentFieldsFragment}
-  ${collectiveNavbarFieldsFragment}
+  ${accountNavbarFieldsFragment}
 `;
 
 type UpdatePageArgs = {
@@ -124,8 +122,12 @@ const updatePageSSRQueryHelpers = getSSRQueryHelpers({
   context: API_V2_CONTEXT,
 });
 
+// ignore unused exports getServerSideProps
+// next.js export
 export const getServerSideProps = updatePageSSRQueryHelpers.getServerSideProps;
 
+// ignore unused exports default
+// next.js export
 export default function UpdatePage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { LoggedInUser } = useLoggedInUser();
   const queryResult = updatePageSSRQueryHelpers.useQuery(props);
@@ -221,7 +223,7 @@ export default function UpdatePage(props: InferGetServerSidePropsType<typeof get
                 <Box display={['none', null, 'block']} flex="0 0" p={3}>
                   <CommentIcon size={24} color="lightgrey" />
                 </Box>
-                <Box flex="1 1" maxWidth={[null, null, 'calc(100% - 56px)']}>
+                <Box flex="1 1" maxWidth={[null, null, 'calc(100% - 56px)']} p={1}>
                   <CommentForm
                     id="new-update"
                     replyingToComment={replyingToComment}

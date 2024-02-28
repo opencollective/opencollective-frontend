@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { useFormik } from 'formik';
 import { debounce } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import CollectivePicker, { FLAG_COLLECTIVE_PICKER_COLLECTIVE } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
@@ -39,7 +39,7 @@ const initialValues = {
 };
 
 const assignNewVirtualCardMutation = gql`
-  mutation assignNewVirtualCard(
+  mutation AssignNewVirtualCard(
     $virtualCard: VirtualCardInput!
     $account: AccountReferenceInput!
     $assignee: AccountReferenceInput!
@@ -251,7 +251,7 @@ const AssignVirtualCardModal = ({ collective = undefined, host, onSuccess, onClo
                     />
                     <Box mt={3}>
                       <StyledLink
-                        href={`/${host.slug}/admin/host-virtual-cards?collective=${formik.values?.collective?.slug}`}
+                        href={`/dashboard/${host.slug}/host-virtual-cards?collective=${formik.values?.collective?.slug}`}
                       >
                         <FormattedMessage defaultMessage="View Assigned Cards" />
                       </StyledLink>

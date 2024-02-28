@@ -85,13 +85,6 @@ const FileName = styled(P)`
   text-overflow: ellipsis;
 `;
 
-const PrivateIconContainer = styled.div`
-  text-align: center;
-  svg {
-    max-height: 32px;
-  }
-`;
-
 const formatFileSize = sizeInBytes => {
   if (sizeInBytes < 1024) {
     return `${sizeInBytes} bytes`;
@@ -133,7 +126,7 @@ const UploadedFilePreview = ({
     content = <StyledSpinner size="50%" />;
   } else if (isPrivate) {
     content = (
-      <PrivateInfoIcon color="#dcdee0" size="60%" tooltipProps={{ childrenContainer: PrivateIconContainer }}>
+      <PrivateInfoIcon size="60%" className="mx-auto text-slate-200">
         <FormattedMessage id="Attachment.Private" defaultMessage="This attachment is private" />
       </PrivateInfoIcon>
     );

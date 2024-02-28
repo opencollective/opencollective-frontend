@@ -1,10 +1,10 @@
 import React from 'react';
-import { gql, useLazyQuery, useQuery } from '@apollo/client';
+import { useLazyQuery, useQuery } from '@apollo/client';
 import { defineMessage } from 'react-intl';
 import { z } from 'zod';
 
 import { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import { Account, AccountHoverCardFieldsFragment } from '../../../lib/graphql/types/v2/graphql';
 
 import { AccountHoverCard, accountHoverCardFields } from '../../AccountHoverCard';
@@ -22,8 +22,8 @@ const accountQuery = gql`
   ${accountHoverCardFields}
 `;
 
-const hostedAccountFilterSearch = gql`
-  query HostedAccountFilterSearchQuery($searchTerm: String, $hostSlug: String, $orderBy: OrderByInput) {
+const hostedAccountFilterSearchQuery = gql`
+  query HostedAccountFilterSearch($searchTerm: String, $hostSlug: String, $orderBy: OrderByInput) {
     accounts(searchTerm: $searchTerm, host: { slug: $hostSlug }, orderBy: $orderBy) {
       nodes {
         id
@@ -58,7 +58,7 @@ export const AccountRenderer = ({
       account={account}
       {...(inOptionsList && { hoverCardContentProps: { side: 'right', sideOffset: 24 } })}
       trigger={
-        <div className="flex h-full w-full items-center justify-between gap-2 overflow-hidden">
+        <div className="flex h-full w-full max-w-48 items-center justify-between gap-2 overflow-hidden">
           <Avatar collective={account} radius={20} />
           <div className="relative flex flex-1 items-center justify-between gap-1 overflow-hidden">
             <span className="truncate">{account.name ?? account.slug}</span>
@@ -86,7 +86,7 @@ const resultNodeToOption = account => ({
   value: account.slug,
 });
 
-export function HostedAccountFilter({
+function HostedAccountFilter({
   meta: { hostSlug, hostedAccounts },
   ...props
 }: FilterComponentProps<
@@ -96,7 +96,7 @@ export function HostedAccountFilter({
   const defaultAccounts = hostedAccounts?.map(resultNodeToOption) || [];
   const [options, setOptions] = React.useState<{ label: React.ReactNode; value: string }[]>(defaultAccounts);
 
-  const [search, { loading, data }] = useLazyQuery(hostedAccountFilterSearch, {
+  const [search, { loading, data }] = useLazyQuery(hostedAccountFilterSearchQuery, {
     variables: { hostSlug },
     fetchPolicy: 'cache-first',
     notifyOnNetworkStatusChange: true,

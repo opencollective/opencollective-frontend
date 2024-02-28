@@ -23,22 +23,6 @@ const renderObject = object =>
     ];
   }, []);
 
-/**
- * @returns boolean: True if the payout method has displayable data
- */
-export const payoutMethodHasData = payoutMethod => {
-  switch (payoutMethod?.type) {
-    case PayoutMethodType.PAYPAL:
-      return Boolean(get(payoutMethod, 'data.email'));
-    case PayoutMethodType.OTHER:
-      return Boolean(get(payoutMethod, 'data.content'));
-    case PayoutMethodType.BANK_ACCOUNT:
-      return Boolean(get(payoutMethod, 'data.details'));
-    default:
-      return false;
-  }
-};
-
 const PRIVATE_DATA_PLACEHOLDER = '********';
 
 const getPmData = (payoutMethod, field, isLoading) => {
@@ -67,7 +51,7 @@ const PayoutMethodData = ({ payoutMethod, showLabel, isLoading }) => {
             <Container fontSize="14px" fontWeight="700" mb={2}>
               <FormattedMessage id="User.EmailAddress" defaultMessage="Email address" />
               &nbsp;&nbsp;
-              <PrivateInfoIcon color="#969BA3" />
+              <PrivateInfoIcon />
             </Container>
           )}
           <Container fontSize="14px" color="black.700">
@@ -82,7 +66,7 @@ const PayoutMethodData = ({ payoutMethod, showLabel, isLoading }) => {
             <Container fontSize="14px" fontWeight="700" mb={2}>
               <FormattedMessage id="Details" defaultMessage="Details" />
               &nbsp;&nbsp;
-              <PrivateInfoIcon color="#969BA3" />
+              <PrivateInfoIcon />
             </Container>
           )}
           <Container fontSize="14px" color="black.700">
@@ -97,7 +81,7 @@ const PayoutMethodData = ({ payoutMethod, showLabel, isLoading }) => {
             <Container fontSize="14px" fontWeight="700" mb={2}>
               <FormattedMessage id="Details" defaultMessage="Details" />
               &nbsp;&nbsp;
-              <PrivateInfoIcon color="#969BA3" />
+              <PrivateInfoIcon />
             </Container>
           )}
           {payoutMethod.data ? (

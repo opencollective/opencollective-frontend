@@ -17,14 +17,8 @@ const OutlineContainer = styled(Container)`
   border-radius: 12px;
 `;
 
-const Illustration = styled.img`
-  width: 248px;
-  height: 248px;
-`;
-
+import Image from '../../Image';
 import Link from '../../Link';
-
-import EmptyCollectivePageIllustration from '../../../public/static/images/collective-navigation/EmptyCollectivePageIllustration.png';
 
 const SectionEmpty = props => {
   const { collective } = props;
@@ -40,7 +34,12 @@ const SectionEmpty = props => {
           px={[3, 4, 6]}
         >
           <Flex alignItems="center" justifyContent="center">
-            <Illustration src={EmptyCollectivePageIllustration} alt="Empty jars illustration" />
+            <Image
+              height={248}
+              width={248}
+              src="/static/images/collective-navigation/EmptyCollectivePageIllustration.png"
+              alt="Empty jars illustration"
+            />
           </Flex>
           <Flex
             flexDirection="column"

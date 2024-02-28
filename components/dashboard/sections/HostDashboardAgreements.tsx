@@ -1,12 +1,12 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { PlusIcon } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
 import { FilterComponentConfigs, FiltersToVariables } from '../../../lib/filters/filter-types';
 import { integer } from '../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import { Agreement, HostAgreementsQueryVariables } from '../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
@@ -90,7 +90,7 @@ const HostDashboardAgreements = ({ accountSlug: hostSlug }: DashboardSectionProp
 
   const canEdit = Boolean(LoggedInUser && !LoggedInUser.isAccountantOnly(data?.host));
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage id="Agreements" defaultMessage="Agreements" />}
         actions={
@@ -126,19 +126,17 @@ const HostDashboardAgreements = ({ accountSlug: hostSlug }: DashboardSectionProp
         />
       ) : (
         <React.Fragment>
-          <div className="min-w-[630px] overflow-x-auto">
-            <AgreementsTable
-              agreements={data?.host.hostedAccountAgreements}
-              loading={loading}
-              nbPlaceholders={NB_AGREEMENTS_DISPLAYED}
-              resetFilters={() => queryFilter.resetFilters({})}
-              onFilePreview={setAgreementFilePreview}
-              openAgreement={agreement => {
-                setAgreementDrawerOpen(true);
-                setAgreementInDrawer(agreement);
-              }}
-            />
-          </div>
+          <AgreementsTable
+            agreements={data?.host.hostedAccountAgreements}
+            loading={loading}
+            nbPlaceholders={NB_AGREEMENTS_DISPLAYED}
+            resetFilters={() => queryFilter.resetFilters({})}
+            onFilePreview={setAgreementFilePreview}
+            openAgreement={agreement => {
+              setAgreementDrawerOpen(true);
+              setAgreementInDrawer(agreement);
+            }}
+          />
 
           <Flex my={4} justifyContent="center">
             {hasPagination(data || previousData, variables) && (
@@ -172,7 +170,6 @@ const HostDashboardAgreements = ({ accountSlug: hostSlug }: DashboardSectionProp
           setAgreementDrawerOpen(false);
           refetch(variables);
         }}
-        onFilePreview={() => setAgreementFilePreview(agreementInDrawer)}
       />
       {agreementFilePreview && (
         <FilesViewerModal

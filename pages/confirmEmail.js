@@ -33,13 +33,13 @@ class ConfirmEmailPage extends React.Component {
 
   componentDidMount() {
     if (!this.props.loadingLoggedInUser) {
-      return this.triggerEmailValidation();
+      this.triggerEmailValidation();
     }
   }
 
   componentDidUpdate() {
     if (!this.state.validationTriggered && !this.props.loadingLoggedInUser) {
-      return this.triggerEmailValidation();
+      this.triggerEmailValidation();
     }
   }
 
@@ -123,8 +123,10 @@ const confirmUserEmailMutation = gqlV1/* GraphQL */ `
   }
 `;
 
-export const addConfirmUserEmailMutation = graphql(confirmUserEmailMutation, {
+const addConfirmUserEmailMutation = graphql(confirmUserEmailMutation, {
   name: 'confirmUserEmail',
 });
 
+// ignore unused exports default
+// next.js export
 export default withUser(addConfirmUserEmailMutation(ConfirmEmailPage));

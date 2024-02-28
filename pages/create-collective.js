@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 
 import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 
 import CreateCollective from '../components/create-collective';
 import ErrorPage from '../components/ErrorPage';
@@ -68,4 +68,6 @@ CreateCollectivePage.propTypes = {
   LoggedInUser: PropTypes.object,
 };
 
+// ignore unused exports default
+// next.js export
 export default withUser(CreateCollectivePage);

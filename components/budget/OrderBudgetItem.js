@@ -19,6 +19,7 @@ import { Box, Flex } from '../Grid';
 import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
+import { OrderAdminAccountingCategoryPill } from '../orders/OrderAccountingCategoryPill';
 import OrderStatusTag from '../orders/OrderStatusTag';
 import ProcessOrderButtons from '../orders/ProcessOrderButtons';
 import StyledLink from '../StyledLink';
@@ -65,7 +66,7 @@ const OrderContainer = styled.div`
   }
 `;
 
-const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign }) => {
+const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign, host }) => {
   const intl = useIntl();
   return (
     <OrderContainer>
@@ -108,6 +109,9 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign }) 
                   )}
                 </AutosizeText>
               </StyledLink>
+              {order.permissions?.canUpdateAccountingCategory && (
+                <OrderAdminAccountingCategoryPill order={order} account={order.toAccount} host={host} />
+              )}
               <P mt="5px" fontSize="12px" color="black.600">
                 <FormattedMessage
                   id="Order.fromTo"
@@ -257,22 +261,6 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign }) 
 OrderBudgetItem.propTypes = {
   isLoading: PropTypes.bool,
   showAmountSign: PropTypes.bool,
-  onDelete: PropTypes.func,
-  onProcess: PropTypes.func,
-  showProcessActions: PropTypes.bool,
-  view: PropTypes.oneOf(['public', 'admin']),
-  collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    currency: PropTypes.string,
-    stats: PropTypes.shape({
-      balance: PropTypes.shape({
-        valueInCents: PropTypes.number,
-      }),
-    }),
-    parent: PropTypes.shape({
-      slug: PropTypes.string.isRequired,
-    }),
-  }),
   host: PropTypes.object,
   order: PropTypes.shape({
     id: PropTypes.string,
@@ -285,6 +273,7 @@ OrderBudgetItem.propTypes = {
     permissions: PropTypes.shape({
       canReject: PropTypes.bool,
       canMarkAsPaid: PropTypes.bool,
+      canUpdateAccountingCategory: PropTypes.bool,
     }),
     pendingContributionData: PropTypes.shape({
       ponumber: PropTypes.number,

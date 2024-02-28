@@ -8,7 +8,7 @@ describe('passwords', () => {
   });
 
   it('can be set from the settings page', () => {
-    cy.login({ email: user.email, redirect: `/${user.collective.slug}/admin/user-security` });
+    cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/user-security` });
     cy.contains("Setting a password is optional but can be useful if you're using a password manager.");
 
     // Submit disabled because no password set
@@ -50,7 +50,7 @@ describe('passwords', () => {
   });
 
   it('can then be edited', () => {
-    cy.login({ sendLink: true, email: user.email, redirect: `/${user.collective.slug}/admin/user-security` });
+    cy.login({ sendLink: true, email: user.email, redirect: `/dashboard/${user.collective.slug}/user-security` });
 
     // Disable button if form is not complete
     cy.contains('button', 'Update Password').should('be.disabled');
@@ -91,6 +91,7 @@ describe('passwords', () => {
       cy.checkToast({ variant: 'error', message: 'Invalid password' });
       cy.get('input[name="password"]:visible').type('{selectall}{backspace}qwerty123456!@#amazing!"edited\'😊');
       cy.getByDataCy('signin-btn').click();
+      cy.getByDataCy('menu-item-overview').should('be.visible');
       cy.assertLoggedIn(user);
     };
 
@@ -102,8 +103,8 @@ describe('passwords', () => {
     cy.getByDataCy('user-menu-trigger').click();
     cy.getByDataCy('logout').click();
 
-    // Login with password on protected page (`/${user.collective.slug}/admin/user-security`)
-    cy.visit(`/${user.collective.slug}/admin/user-security`);
+    // Login with password on protected page (`/${user.collective.slug}/dashboard/user-security`)
+    cy.visit(`/dashboard/${user.collective.slug}/user-security`);
     completeSignInForm();
   });
 

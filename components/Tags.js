@@ -1,16 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { i18nGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 
+import { expenseTagsQuery } from './dashboard/filters/ExpenseTagsFilter';
 import ExpenseTypeTag from './expenses/ExpenseTypeTag';
 import { useToast } from './ui/useToast';
+import EditTags, { AutocompleteEditTags } from './EditTags';
 import { Flex } from './Grid';
-import StyledInputTags from './StyledInputTags';
 import StyledTag from './StyledTag';
 
 const setTagsMutation = gql`
@@ -36,21 +37,31 @@ const TagsForAdmins = ({ expense, order, suggestedTags }) => {
   const tagList = expense?.tags || order?.tags;
   const { toast } = useToast();
   const intl = useIntl();
-  return (
-    <StyledInputTags
-      disabled={loading}
-      value={tagList}
-      suggestedTags={suggestedTags}
-      onChange={async tags => {
-        try {
-          const referencedObject = expense ? { expense: { id: expense.id } } : { order: { id: order.id } };
-          await setTags({ variables: { ...referencedObject, tags: tags.map(tag => tag.value) } });
-        } catch (e) {
-          toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
-        }
-      }}
-    />
+
+  const onChange = React.useCallback(
+    async tags => {
+      try {
+        const referencedObject = expense ? { expense: { id: expense.id } } : { order: { id: order.id } };
+        await setTags({ variables: { ...referencedObject, tags: tags.map(tag => tag.value) } });
+      } catch (e) {
+        toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+      }
+    },
+    [expense, order],
   );
+
+  if (expense) {
+    return (
+      <AutocompleteEditTags
+        disabled={loading}
+        value={tagList}
+        query={expenseTagsQuery}
+        variables={{ account: { slug: expense?.account?.slug } }}
+        onChange={onChange}
+      />
+    );
+  }
+  return <EditTags disabled={loading} value={tagList} suggestedTags={suggestedTags} onChange={onChange} />;
 };
 
 TagsForAdmins.propTypes = {
@@ -61,6 +72,9 @@ TagsForAdmins.propTypes = {
     tags: PropTypes.arrayOf(PropTypes.string),
     legacyId: PropTypes.number,
     type: PropTypes.string,
+    account: PropTypes.shape({
+      slug: PropTypes.string,
+    }),
   }),
   order: PropTypes.shape({
     id: PropTypes.string,

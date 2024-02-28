@@ -47,7 +47,7 @@ const Tabs = ({ tabs, selectedId, onChange, ...props }: TabsProps & Parameters<t
   if (viewport === VIEWPORTS.XSMALL) {
     return (
       <Select onValueChange={val => onChange(val)} value={selectedId ?? ''}>
-        <SelectTrigger className={selectedId && 'font-medium text-primary'}>
+        <SelectTrigger data-cy={`view-${selectedId}`} className={selectedId && 'font-medium text-primary'}>
           <SelectValue className="font-bold" placeholder={intl.formatMessage({ defaultMessage: 'Select a view' })} />
         </SelectTrigger>
         <SelectContent>

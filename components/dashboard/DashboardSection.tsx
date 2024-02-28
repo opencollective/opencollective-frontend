@@ -3,36 +3,38 @@ import PropTypes from 'prop-types';
 import { values } from 'lodash';
 import { useIntl } from 'react-intl';
 
-import { HostAdminAccountingSection } from '../admin-panel/sections/accounting';
-import AccountSettings from '../admin-panel/sections/AccountSettings';
-import InvoicesReceipts from '../admin-panel/sections/invoices-receipts/InvoicesReceipts';
-import NotificationsSettings from '../admin-panel/sections/NotificationsSettings';
-import Team from '../admin-panel/sections/Team';
 import Container from '../Container';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import NotFound from '../NotFound';
 
+import { HostAdminAccountingSection } from './sections/accounting';
+import AccountSettings from './sections/AccountSettings';
 import HostApplications from './sections/collectives/HostApplications';
+import HostedCollectives from './sections/collectives/HostedCollectives';
 import HostFinancialContributions from './sections/contributions/HostFinancialContributions';
 import IncomingContributions from './sections/contributions/IncomingContributions';
 import OutgoingContributions from './sections/contributions/OutgoingContributions';
+import Contributors from './sections/Contributors';
 import HostExpenses from './sections/expenses/HostDashboardExpenses';
 import ReceivedExpenses from './sections/expenses/ReceivedExpenses';
 import SubmittedExpenses from './sections/expenses/SubmittedExpenses';
 import HostDashboardAgreements from './sections/HostDashboardAgreements';
-import HostDashboardHostedCollectives from './sections/HostDashboardHostedCollectives';
-import HostDashboardReports from './sections/HostDashboardReports';
 import HostVirtualCardRequests from './sections/HostVirtualCardRequests';
 import HostVirtualCards from './sections/HostVirtualCards';
-import Overview from './sections/Overview';
-import Transactions from './sections/Transactions';
+import InvoicesReceipts from './sections/invoices-receipts/InvoicesReceipts';
+import NotificationsSettings from './sections/NotificationsSettings';
+import Overview from './sections/overview/Overview';
+import HostDashboardReports from './sections/reports/HostDashboardReports';
+import Team from './sections/Team';
+import AccountTransactions from './sections/transactions/AccountTransactions';
+import HostTransactions from './sections/transactions/HostTransactions';
 import Vendors from './sections/Vendors';
 import VirtualCards from './sections/virtual-cards/VirtualCards';
 import { LEGACY_SECTIONS, LEGACY_SETTINGS_SECTIONS, SECTION_LABELS, SECTIONS, SETTINGS_SECTIONS } from './constants';
 import DashboardHeader from './DashboardHeader';
 
 const DASHBOARD_COMPONENTS = {
-  [SECTIONS.HOSTED_COLLECTIVES]: HostDashboardHostedCollectives,
+  [SECTIONS.HOSTED_COLLECTIVES]: HostedCollectives,
   [SECTIONS.CHART_OF_ACCOUNTS]: HostAdminAccountingSection,
   [SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS]: HostFinancialContributions,
   [SECTIONS.HOST_EXPENSES]: HostExpenses,
@@ -44,9 +46,11 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.OVERVIEW]: Overview,
   [SECTIONS.EXPENSES]: ReceivedExpenses,
   [SECTIONS.SUBMITTED_EXPENSES]: SubmittedExpenses,
+  [SECTIONS.CONTRIBUTORS]: Contributors,
   [SECTIONS.INCOMING_CONTRIBUTIONS]: IncomingContributions,
   [SECTIONS.OUTGOING_CONTRIBUTIONS]: OutgoingContributions,
-  [SECTIONS.TRANSACTIONS]: Transactions,
+  [SECTIONS.TRANSACTIONS]: AccountTransactions,
+  [SECTIONS.HOST_TRANSACTIONS]: HostTransactions,
   [SECTIONS.VIRTUAL_CARDS]: VirtualCards,
   [SECTIONS.TEAM]: Team,
   [SECTIONS.VENDORS]: Vendors,
@@ -80,7 +84,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
 
   if (values(LEGACY_SECTIONS).includes(section)) {
     return (
-      <div className="w-full">
+      <div className="w-full max-w-screen-lg">
         {SECTION_LABELS[section] && <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />}
 
         <AccountSettings account={account} section={section} />
@@ -92,19 +96,23 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
   const SettingsComponent = SETTINGS_COMPONENTS[section];
   if (SettingsComponent) {
     return (
-      <div className="max-w-screen-md">
+      // <div className="flex max-w-screen-lg justify-center">
+      <div className="max-w-screen-md flex-1">
         <SettingsComponent account={account} accountSlug={account.slug} subpath={subpath} />
       </div>
+      // </div>
     );
   }
 
   if (values(LEGACY_SETTINGS_SECTIONS).includes(section)) {
     return (
-      <div className="max-w-screen-md">
+      // <div className="flex max-w-screen-lg justify-center">
+      <div className="max-w-screen-md flex-1">
         {SECTION_LABELS[section] && <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />}
 
         <AccountSettings account={account} section={section} />
       </div>
+      // </div>
     );
   }
 

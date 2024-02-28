@@ -1,16 +1,16 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import { cloneDeep, omit, pick } from 'lodash';
 import { createPortal } from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { getAccountReferenceInput } from '../../lib/collective.lib';
+import { getAccountReferenceInput } from '../../lib/collective';
 import { stripTime } from '../../lib/date-utils';
 import { i18nGraphqlException } from '../../lib/errors';
 import { requireFields } from '../../lib/form-utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { Agreement } from '../../lib/graphql/types/v2/graphql';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { Account, Agreement } from '../../lib/graphql/types/v2/graphql';
 
 import AttachedFilesForm from '../attached-files/AttachedFilesForm';
 import CollectivePickerAsync from '../CollectivePickerAsync';
@@ -113,19 +113,30 @@ const validateAgreement = data => {
   return requireFields(data, ['account', 'title']);
 };
 
-type AgreementFormProps = {
+export type AgreementFormProps = {
   hostLegacyId: number;
   onCreate: (Agreement) => void;
-  onEdit: (Agreement) => void;
+  onEdit?: (Agreement) => void;
   onCancel: () => void;
-  agreement: Agreement;
-  openFileViewer: (fileUrl: string) => void;
+  agreement?: Agreement;
+  account?: Pick<Account, 'id' | 'slug' | 'name' | 'imageUrl'>;
+  openFileViewer?: (fileUrl: string) => void;
+  disableDrawerActions?: boolean;
 };
 
-const AgreementForm = ({ hostLegacyId, agreement, onCreate, onEdit, onCancel, openFileViewer }: AgreementFormProps) => {
+const AgreementForm = ({
+  hostLegacyId,
+  agreement,
+  account,
+  onCreate,
+  onEdit,
+  onCancel,
+  openFileViewer,
+  disableDrawerActions,
+}: AgreementFormProps) => {
   const intl = useIntl();
   const { toast } = useToast();
-  const initialValues = cloneDeep(agreement || {});
+  const initialValues = cloneDeep(agreement || { account });
   const drawerActionsContainer = useDrawerActionsContainer();
   const isEditing = Boolean(agreement);
   const mutation = isEditing ? EDIT_AGREEMENT_MUTATION : ADD_AGREEMENT_MUTATION;
@@ -193,7 +204,7 @@ const AgreementForm = ({ hostLegacyId, agreement, onCreate, onEdit, onCancel, op
                     error={field.error}
                     hostCollectiveIds={[hostLegacyId]}
                     collective={formik.values.account}
-                    disabled={isEditing}
+                    disabled={isEditing || account}
                     onChange={({ value }) => {
                       formik.setFieldValue('account', value);
                     }}
@@ -258,7 +269,7 @@ const AgreementForm = ({ hostLegacyId, agreement, onCreate, onEdit, onCancel, op
               >
                 {({ field }) => <StyledTextarea {...field} width="100%" minHeight={125} maxLength={3000} showCount />}
               </StyledInputFormikField>
-              {drawerActionsContainer ? (
+              {drawerActionsContainer && !disableDrawerActions ? (
                 createPortal(<ActionButtons formik={formik} onCancel={onCancel} />, drawerActionsContainer)
               ) : (
                 <ActionButtons formik={formik} onCancel={onCancel} />

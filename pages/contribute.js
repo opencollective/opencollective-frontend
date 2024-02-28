@@ -4,7 +4,7 @@ import memoizeOne from 'memoize-one';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import { getCollectivePageMetadata } from '../lib/collective.lib';
+import { getCollectivePageMetadata } from '../lib/collective';
 import { TierTypes } from '../lib/constants/tiers-types';
 import { sortEvents } from '../lib/events';
 import { gqlV1 } from '../lib/graphql/helpers';
@@ -366,6 +366,10 @@ const contributePageQuery = gqlV1/* GraphQL */ `
       isHost
       backgroundImageUrl
       imageUrl
+      location {
+        id
+        country
+      }
       parentCollective {
         id
         name
@@ -382,6 +386,10 @@ const contributePageQuery = gqlV1/* GraphQL */ `
         name
         slug
         type
+        location {
+          id
+          country
+        }
       }
       stats {
         id
@@ -464,4 +472,6 @@ const addContributePageData = ssrGraphQLQuery({
   }),
 });
 
+// ignore unused exports default
+// next.js export
 export default withUser(addContributePageData(ContributePage));

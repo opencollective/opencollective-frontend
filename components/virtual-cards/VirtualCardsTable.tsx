@@ -34,7 +34,7 @@ type VirtualCardsTableMeta = {
   onDeleteRefetchQuery?: string;
 };
 
-export const tableColumns: ColumnDef<GraphQLVirtualCard>[] = [
+const tableColumns: ColumnDef<GraphQLVirtualCard>[] = [
   {
     accessorKey: 'account',
     header: () => <FormattedMessage defaultMessage="Account" />,

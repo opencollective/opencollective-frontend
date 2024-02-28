@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from '../../lib/graphql/helpers';
 
 import { accountHoverCardFields } from '../AccountHoverCard';
 
@@ -79,31 +79,6 @@ export const isUserFollowingConversationQuery = gql`
       name
       ... on Individual {
         isFollowingConversation(id: $id)
-      }
-    }
-  }
-`;
-
-export const updateListFragment = gql`
-  fragment UpdateListFragment on UpdateCollection {
-    totalCount
-    offset
-    limit
-    nodes {
-      id
-      slug
-      title
-      summary
-      createdAt
-      publishedAt
-      isPrivate
-      userCanSeeUpdate
-      fromAccount {
-        id
-        type
-        name
-        slug
-        imageUrl
       }
     }
   }

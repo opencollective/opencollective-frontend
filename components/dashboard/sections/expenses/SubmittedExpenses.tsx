@@ -53,7 +53,7 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
   const pageRoute = `/dashboard/${accountSlug}/submitted-expenses`;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage defaultMessage="Submitted Expenses" />}
         description={<FormattedMessage defaultMessage="Expenses that you have submitted to other Collectives." />}
@@ -95,7 +95,7 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
               route={pageRoute}
               total={data?.expenses?.totalCount}
               limit={queryFilter.values.limit}
-              offset={queryFilter.values.limit}
+              offset={queryFilter.values.offset}
               ignoredQueryParams={ROUTE_PARAMS}
             />
           </div>

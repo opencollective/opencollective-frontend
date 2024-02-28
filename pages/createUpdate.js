@@ -1,13 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { ArrowBack } from '@styled-icons/boxicons-regular/ArrowBack';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import { addCollectiveNavbarData } from '../lib/graphql/queries';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL, getCollectivePageRoute } from '../lib/url-helpers';
 import { compose } from '../lib/utils';
@@ -50,28 +49,26 @@ const CreateUpdateWrapper = styled(Flex)`
 `;
 
 const UPDATE_TYPE_MSGS = defineMessages({
+  changelog: { id: 'update.type.changelog', defaultMessage: 'Changelog Entry' },
   normal: {
     id: 'update.type.normal',
     defaultMessage: 'Normal Update',
   },
-  changelog: { id: 'update.type.changelog', defaultMessage: 'Changelog Entry' },
 });
-const UPDATE_TYPES = Object.keys(UPDATE_TYPE_MSGS);
 
 class CreateUpdatePage extends React.Component {
-  static getInitialProps({ query: { collectiveSlug, action } }) {
-    return { slug: collectiveSlug, action };
+  static getInitialProps({ query: { collectiveSlug } }) {
+    return { slug: collectiveSlug };
   }
 
   static propTypes = {
     slug: PropTypes.string, // for addCollectiveNavbarData
-    action: PropTypes.string, // not used atm, not clear where it's coming from, not in the route
     createUpdate: PropTypes.func, // from addMutation/createUpdateQuery
     data: PropTypes.shape({
       account: PropTypes.object,
     }).isRequired, // from withData
     LoggedInUser: PropTypes.object,
-    loadingLoggedInUser: PropTypes.object,
+    loadingLoggedInUser: PropTypes.bool,
     router: PropTypes.object,
     intl: PropTypes.object.isRequired,
   };
@@ -82,7 +79,7 @@ class CreateUpdatePage extends React.Component {
       update: {},
       status: '',
       error: '',
-      updateType: props.data?.account?.slug === 'opencollective' ? UPDATE_TYPES[1] : UPDATE_TYPES[0],
+      updateType: props.data?.account?.slug === 'opencollective' ? 'changelog' : 'normal',
     };
   }
 
@@ -90,6 +87,15 @@ class CreateUpdatePage extends React.Component {
     const { router, data } = this.props;
     const account = data?.account;
     addParentToURLIfMissing(router, account, '/updates/new');
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.data?.account !== this.props.data?.account) {
+      const account = this.props.data?.account;
+      if (account?.slug === 'opencollective' && this.state.updateType === 'normal') {
+        this.setState({ updateType: 'changelog' });
+      }
+    }
   }
 
   createUpdate = async update => {
@@ -133,7 +139,7 @@ class CreateUpdatePage extends React.Component {
   };
 
   isChangelog = () => {
-    return this.state.updateType === UPDATE_TYPES[1];
+    return this.state.updateType === 'changelog';
   };
 
   render() {
@@ -196,7 +202,7 @@ class CreateUpdatePage extends React.Component {
                 {collective.slug === 'opencollective' && isAdmin && (
                   <StyledButtonSet
                     size="medium"
-                    items={UPDATE_TYPES}
+                    items={Object.keys(UPDATE_TYPE_MSGS)}
                     selected={this.state.updateType}
                     onChange={value => this.setState({ updateType: value })}
                   >
@@ -267,4 +273,6 @@ const addCreateUpdateMutation = graphql(createUpdateMutation, {
 
 const addGraphql = compose(addCollectiveNavbarData, addCreateUpdateMutation);
 
+// ignore unused exports default
+// next.js export
 export default withUser(addGraphql(withRouter(injectIntl(CreateUpdatePage))));

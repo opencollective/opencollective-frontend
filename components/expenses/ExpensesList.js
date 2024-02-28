@@ -71,7 +71,6 @@ const ExpensesList = ({
   isLoading,
   nbPlaceholders,
   isInverted,
-  suggestedTags,
   view,
   onDelete,
   onProcess,
@@ -121,7 +120,6 @@ const ExpensesList = ({
                 view={view}
                 onDelete={onDelete}
                 onProcess={onProcess}
-                suggestedTags={suggestedTags}
                 selected={openExpenseLegacyId === expense.legacyId}
                 expandExpense={e => {
                   e.preventDefault();
@@ -176,16 +174,13 @@ ExpensesList.propTypes = {
   nbPlaceholders: PropTypes.number,
   host: PropTypes.object,
   view: PropTypes.oneOf(['public', 'admin', 'submitter']),
-  suggestedTags: PropTypes.arrayOf(PropTypes.string),
   onDelete: PropTypes.func,
   onProcess: PropTypes.func,
   /** Defines the field in `expense` that holds the amount. Useful to display the right one based on the context for multi-currency expenses. */
   expenseFieldForTotalAmount: PropTypes.string,
   collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    parent: PropTypes.shape({
-      slug: PropTypes.string.isRequired,
-    }),
+    slug: PropTypes.string,
+    parent: PropTypes.shape({ slug: PropTypes.string }),
     currency: PropTypes.string,
   }),
   expenses: PropTypes.arrayOf(
@@ -194,7 +189,6 @@ ExpensesList.propTypes = {
       legacyId: PropTypes.number.isRequired,
     }),
   ),
-  totalAmount: PropTypes.number,
   useDrawer: PropTypes.bool,
   setOpenExpenseLegacyId: PropTypes.func,
   openExpenseLegacyId: PropTypes.number,

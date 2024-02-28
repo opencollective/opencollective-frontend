@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import { withRouter } from 'next/router';
 import { createGlobalStyle } from 'styled-components';
 
-import { getCollectivePageMetadata } from '../lib/collective.lib';
+import { getCollectivePageMetadata } from '../lib/collective';
 import { generateNotFoundError } from '../lib/errors';
 import { ssrGraphQLQuery } from '../lib/graphql/with-ssr-query';
 import { getRequestIntl } from '../lib/i18n/request';
@@ -100,7 +100,11 @@ class CollectivePage extends React.Component {
         isGuest: PropTypes.bool,
         parentCollective: PropTypes.shape({ slug: PropTypes.string, image: PropTypes.string }),
         host: PropTypes.object,
-        stats: PropTypes.object,
+        stats: PropTypes.shape({
+          backers: PropTypes.shape({
+            all: PropTypes.number,
+          }),
+        }).isRequired,
         coreContributors: PropTypes.arrayOf(PropTypes.object),
         financialContributors: PropTypes.arrayOf(PropTypes.object),
         tiers: PropTypes.arrayOf(PropTypes.object),
@@ -228,4 +232,6 @@ const addCollectivePageData = ssrGraphQLQuery({
   preload: (client, result) => preloadCollectivePageGraphqlQueries(client, result?.data?.Collective),
 });
 
+// ignore unused exports default
+// next.js export
 export default withRouter(withUser(addCollectivePageData(CollectivePage)));

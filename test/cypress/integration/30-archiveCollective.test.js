@@ -14,7 +14,7 @@ describe('Archive Collective', () => {
 
   describe('Archive organization', () => {
     before(() => {
-      cy.login({ redirect: `/${orgSlug}/admin/advanced` });
+      cy.login({ redirect: `/dashboard/${orgSlug}/advanced` });
     });
 
     it('Should archive organization', () => {
@@ -27,7 +27,7 @@ describe('Archive Collective', () => {
 
   describe('Archive collective', () => {
     before(() => {
-      cy.login({ redirect: `/${collectiveSlug}/admin/advanced` });
+      cy.login({ redirect: `/dashboard/${collectiveSlug}/advanced` });
     });
 
     it('Should archive collective', () => {

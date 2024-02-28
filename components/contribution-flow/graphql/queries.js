@@ -1,9 +1,9 @@
-import { gql } from '@apollo/client';
+import { gql } from '../../../lib/graphql/helpers';
 
 import { contributionFlowAccountFieldsFragment } from './fragments';
 
 export const contributionFlowAccountQuery = gql`
-  query ContributionFlowAccountQuery($collectiveSlug: String!, $tierId: Int, $includeTier: Boolean!) {
+  query ContributionFlowAccount($collectiveSlug: String!, $tierId: Int, $includeTier: Boolean!) {
     account(slug: $collectiveSlug, throwIfMissing: false) {
       id
       ...ContributionFlowAccountFields

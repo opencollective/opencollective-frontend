@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { CardElement } from '@stripe/react-stripe-js';
@@ -9,11 +8,12 @@ import memoizeOne from 'memoize-one';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
+import { isURL } from 'validator';
 
 import { AnalyticsEvent } from '../../lib/analytics/events';
 import { track } from '../../lib/analytics/plausible';
 import { AnalyticsProperty } from '../../lib/analytics/properties';
-import { getCollectiveTypeForUrl } from '../../lib/collective.lib';
+import { getCollectiveTypeForUrl } from '../../lib/collective';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
 import { MODERATION_CATEGORIES_ALIASES } from '../../lib/constants/moderation-categories';
@@ -23,8 +23,8 @@ import { formatCurrency } from '../../lib/currency-utils';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { isPastEvent } from '../../lib/events';
 import { Experiment, isExperimentEnabled } from '../../lib/experiments/experiments';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { addCreateCollectiveMutation } from '../../lib/graphql/mutations';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { addCreateCollectiveMutation } from '../../lib/graphql/v1/mutations';
 import { setGuestToken } from '../../lib/guest-accounts';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { confirmPayment } from '../../lib/stripe/confirm-payment';
@@ -52,7 +52,6 @@ import ContributionFlowStepContainer from './ContributionFlowStepContainer';
 import ContributionFlowStepsProgress from './ContributionFlowStepsProgress';
 import ContributionFlowSuccess from './ContributionFlowSuccess';
 import ContributionSummary from './ContributionSummary';
-import { validateNewOrg } from './CreateOrganizationForm';
 import { PlatformTipOption } from './PlatformTipContainer';
 import { DEFAULT_PLATFORM_TIP_PERCENTAGE } from './PlatformTipInput';
 import {
@@ -114,6 +113,16 @@ const OTHER_MESSAGES = defineMessages({
     defaultMessage: `You're contributing to a past event.`,
   },
 });
+
+const validateNewOrg = values => {
+  if (!values.name) {
+    return false;
+  } else if (values.website && !isURL(values.website)) {
+    return false;
+  }
+
+  return true;
+};
 
 class ContributionFlow extends React.Component {
   static propTypes = {
@@ -531,7 +540,7 @@ class ContributionFlow extends React.Component {
       paymentMethod.paypalInfo = pick(stepPayment.paymentMethod.paypalInfo, paypalFields);
       // Define the right type (doesn't matter that much today, but make it future proof)
       if (paymentMethod.paypalInfo.subscriptionId) {
-        paymentMethod.type === PAYMENT_METHOD_TYPE.SUBSCRIPTION;
+        paymentMethod.type = PAYMENT_METHOD_TYPE.SUBSCRIPTION;
       }
     }
 
@@ -804,7 +813,7 @@ class ContributionFlow extends React.Component {
       steps.push({
         name: 'summary',
         label: intl.formatMessage(STEP_LABELS.summary),
-        isCompleted: noPaymentRequired || get(stepSummary, 'isReady', false),
+        isCompleted: get(stepSummary, 'isReady', false),
       });
     }
 

@@ -10,7 +10,7 @@ import { getDashboardRoute } from '../../../lib/url-helpers';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../ui/DropdownMenu';
 import { DashboardContext } from '../DashboardContext';
 
-export const MenuLink = ({ section, label, href, Icon, isActive, onChangeVisiblity, visibility }) => {
+const MenuLink = ({ section, label, href, Icon, isActive, onChangeVisiblity, visibility }) => {
   const { ref, inView } = useInView({
     /* Optional options */
     threshold: 1,
@@ -71,7 +71,7 @@ const DashboardTopBar = ({ menuItems, isLoading, account }) => {
     ({ section, subMenu }) => section === selectedSection || subMenu?.find(item => item.section === selectedSection),
   );
   return (
-    <div className=" z-10 border-b bg-white py-2 pl-1.5 pr-2 md:px-5">
+    <div className=" z-10 border-b bg-white py-2 pl-1.5 pr-2 xl:px-6">
       <div className="relative  flex justify-between">
         <div className="flex shrink gap-1.5 overflow-hidden">
           {isLoading

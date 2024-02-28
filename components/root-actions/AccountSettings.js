@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import Container from '../Container';
@@ -14,7 +14,7 @@ import StyledCheckbox from '../StyledCheckbox';
 import StyledInputField from '../StyledInputField';
 import { useToast } from '../ui/useToast';
 
-export const editAccountFlagsMutation = gql`
+const editAccountFlagsMutation = gql`
   mutation EditAccountFlags(
     $account: AccountReferenceInput!
     $isArchived: Boolean
@@ -110,7 +110,7 @@ const AccountSettings = () => {
               <Container pt={4}>
                 <MessageBox type="error">
                   <div>Some instructions on what to look when disabling 2FA for a user;</div>
-                  <ul>
+                  <ul className="list-disc">
                     <li>
                       If user has Twitter, GitHub or any other social accounts linked we can ask for a proof to be added
                       to them.

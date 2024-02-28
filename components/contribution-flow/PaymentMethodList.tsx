@@ -1,5 +1,5 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { Elements } from '@stripe/react-stripe-js';
 import { StripeElementsOptions } from '@stripe/stripe-js';
 import { themeGet } from '@styled-system/theme-get';
@@ -7,7 +7,7 @@ import { get, isEmpty, pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { Account, CaptchaInput, Host, Individual, PaymentMethodLegacyType } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getStripe } from '../../lib/stripe';

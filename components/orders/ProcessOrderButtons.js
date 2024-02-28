@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { Check as ApproveIcon } from '@styled-icons/fa-solid/Check';
 import { Times as RejectIcon } from '@styled-icons/fa-solid/Times';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import ConfirmationModal from '../ConfirmationModal';
 import ContributionConfirmationModal from '../ContributionConfirmationModal';
@@ -64,7 +64,7 @@ const ProcessOrderButtons = ({ order, permissions, onSuccess }) => {
     setConfirm(false);
     try {
       await processOrder({ variables: { id: order.id, action } });
-      onSuccess?.();
+      await Promise.resolve(onSuccess?.());
     } catch (e) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     }

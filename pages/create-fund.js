@@ -22,4 +22,6 @@ CreateFundPage.propTypes = {
   loadingLoggedInUser: PropTypes.bool.isRequired,
 };
 
+// ignore unused exports default
+// next.js export
 export default withUser(CreateFundPage);

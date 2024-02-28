@@ -1,0 +1,27 @@
+import { ArgsTable, Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
+import EditTags from '../../components/EditTags';
+import theme from '../../lib/theme';
+
+<Meta
+  title="Design system/EditTags"
+  component={EditTags}
+  argTypes={{
+    defaultValue: { defaultValue: ['OPEN', 'SOURCE', 'RULES'] },
+    suggestedTags: { defaultValue: ['BLUE', 'ORANGE', 'PINK'] },
+  }}
+  parameters={{
+    actions: {
+      handles: ['onChange'],
+    },
+  }}
+/>
+
+# EditTags
+
+## Default
+
+export const DefaultStory = props => <EditTags {...props} />;
+
+<Story name="Default">{DefaultStory.bind({})}</Story>
+
+<ArgsTable story="Default" />

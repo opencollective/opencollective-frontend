@@ -4,13 +4,12 @@ import { omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { getSuggestedTags } from '../../lib/collective.lib';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { addParentToURLIfMissing, getCollectivePageRoute } from '../../lib/url-helpers';
 
 import Container from '../Container';
+import ScheduledExpensesBanner from '../dashboard/sections/expenses/ScheduledExpensesBanner';
 import { Box, Flex } from '../Grid';
-import ScheduledExpensesBanner from '../host-dashboard/ScheduledExpensesBanner';
 import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
@@ -88,8 +87,6 @@ const Expenses = props => {
     }
   }
 
-  const suggestedTags = React.useMemo(() => getSuggestedTags(data?.account), [data?.account]);
-
   const isSelfHosted = data?.account?.id === data?.account?.host?.id;
 
   return (
@@ -118,7 +115,7 @@ const Expenses = props => {
             />
           </Box>
         )}
-        <Box flex="12 1 160px">
+        <Box flex="12 1 160px" width="276px">
           <SearchBar defaultValue={query.searchTerm} onSubmit={searchTerm => handleSearch(searchTerm)} height="40px" />
         </Box>
         <Box flex="0 1 160px">
@@ -173,7 +170,6 @@ const Expenses = props => {
                 host={data?.account?.host ?? (data?.account?.isHost ? data?.account : null)}
                 expenses={data?.expenses?.nodes}
                 nbPlaceholders={variables.limit}
-                suggestedTags={suggestedTags}
                 isInverted={query.direction === 'SUBMITTED'}
                 view={query.direction === 'SUBMITTED' ? 'submitter' : undefined}
                 useDrawer={isDashboard}

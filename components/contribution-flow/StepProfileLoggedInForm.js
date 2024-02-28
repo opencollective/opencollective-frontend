@@ -100,7 +100,7 @@ const StepProfileLoggedInForm = ({ profiles, onChange, collective, tier, data, s
               <FormattedMessage id="collective.address.label" defaultMessage="Address" />
             </P>
             <Span mr={2} lineHeight="0">
-              <PrivateInfoIcon size="14px" tooltipProps={{ containerLineHeight: '0' }} />
+              <PrivateInfoIcon />
             </Span>
             <StyledHr my="18px" borderColor="black.300" width="100%" />
           </Flex>

@@ -1,15 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql, withApollo } from '@apollo/client/react/hoc';
 import { cloneDeep, get, isEmpty, uniqBy, update } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../lib/allowed-features';
-import { getCollectivePageMetadata, shouldIndexAccountOnSearchEngines } from '../lib/collective.lib';
+import { getCollectivePageMetadata, shouldIndexAccountOnSearchEngines } from '../lib/collective';
 import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import { stripHTML } from '../lib/html';
 
 import CollectiveNavbar from '../components/collective-navbar';
@@ -24,6 +23,7 @@ import FollowConversationButton from '../components/conversations/FollowConversa
 import FollowersAvatars from '../components/conversations/FollowersAvatars';
 import { commentFieldsFragment, isUserFollowingConversationQuery } from '../components/conversations/graphql';
 import Thread from '../components/conversations/Thread';
+import EditTags from '../components/EditTags';
 import ErrorPage from '../components/ErrorPage';
 import { Box, Flex } from '../components/Grid';
 import CommentIcon from '../components/icons/CommentIcon';
@@ -34,7 +34,6 @@ import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
 import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
 import StyledButton from '../components/StyledButton';
-import StyledInputTags from '../components/StyledInputTags';
 import StyledLink from '../components/StyledLink';
 import StyledTag from '../components/StyledTag';
 import { H2, H4 } from '../components/Text';
@@ -52,7 +51,6 @@ const conversationPageQuery = gql`
       settings
       imageUrl
       twitterHandle
-      imageUrl
       backgroundImageUrl
       ... on AccountWithParent {
         parent {
@@ -488,7 +486,7 @@ class ConversationPage extends React.Component {
                                     )
                                   ) : (
                                     <Box mx={2}>
-                                      <StyledInputTags
+                                      <EditTags
                                         suggestedTags={this.getSuggestedTags(collective)}
                                         defaultValue={conversation.tags}
                                         onChange={options => this.handleTagsChange(options, setValue)}
@@ -520,4 +518,6 @@ const getData = graphql(conversationPageQuery, {
   },
 });
 
+// ignore unused exports default
+// next.js export
 export default withUser(getData(withRouter(withApollo(ConversationPage))));

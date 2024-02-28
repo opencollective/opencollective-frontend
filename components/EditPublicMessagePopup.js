@@ -95,8 +95,8 @@ const Arrow = styled('div')`
 `;
 
 const editPublicMessageMutation = gqlV1/* GraphQL */ `
-  mutation EditPublicMessage($FromCollectiveId: Int!, $CollectiveId: Int!, $message: String) {
-    editPublicMessage(FromCollectiveId: $FromCollectiveId, CollectiveId: $CollectiveId, message: $message) {
+  mutation EditPublicMessage($fromCollectiveId: Int!, $collectiveId: Int!, $message: String) {
+    editPublicMessage(FromCollectiveId: $fromCollectiveId, CollectiveId: $collectiveId, message: $message) {
       id
       publicMessage
       tier {
@@ -190,8 +190,8 @@ function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef
                     onClick={async () => {
                       await submitMessage({
                         variables: {
-                          FromCollectiveId: fromCollectiveId,
-                          CollectiveId: collectiveId,
+                          fromCollectiveId,
+                          collectiveId,
                           message: messageDraft ? messageDraft.trim() : null,
                         },
                         // Update cache after mutation

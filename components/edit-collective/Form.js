@@ -16,12 +16,12 @@ import { VAT_OPTIONS } from '../../lib/constants/vat';
 import { convertDateFromApiUtc, convertDateToApiUtc } from '../../lib/date-utils';
 import { isValidUrl } from '../../lib/utils';
 
-import { ALL_SECTIONS } from '../admin-panel/constants';
-import ActivityLog from '../admin-panel/sections/ActivityLog';
-import AuthorizedApps from '../admin-panel/sections/AuthorizedApps';
-import ForDevelopers from '../admin-panel/sections/ForDevelopers';
 import Container from '../Container';
 import CreateGiftCardsForm from '../CreateGiftCardsForm';
+import { ALL_SECTIONS } from '../dashboard/constants';
+import ActivityLog from '../dashboard/sections/ActivityLog';
+import AuthorizedApps from '../dashboard/sections/AuthorizedApps';
+import ForDevelopers from '../dashboard/sections/ForDevelopers';
 import { Box, Flex } from '../Grid';
 import { I18nSupportLink } from '../I18nFormatters';
 import InputField from '../InputField';
@@ -44,7 +44,7 @@ import FiscalHosting from './sections/FiscalHosting';
 import GiftCards from './sections/GiftCards';
 import Host from './sections/Host';
 import HostVirtualCardsSettings from './sections/HostVirtualCardsSettings';
-import PaymentMethods from './sections/PaymentMethods';
+import ManagePaymentMethods from './sections/ManagePaymentMethods';
 import PaymentReceipts from './sections/PaymentReceipts';
 import Policies from './sections/Policies';
 import ReceivingMoney from './sections/ReceivingMoney';
@@ -433,7 +433,7 @@ class EditCollectiveForm extends React.Component {
         );
 
       case ALL_SECTIONS.PAYMENT_METHODS:
-        return <PaymentMethods collectiveSlug={collective.slug} />;
+        return <ManagePaymentMethods account={collective} />;
 
       case ALL_SECTIONS.TIERS:
         return <Tiers collective={collective} types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']} />;
@@ -457,8 +457,8 @@ class EditCollectiveForm extends React.Component {
               alignItems="center"
               flexWrap="wrap"
             >
-              <Link href={`/${collective.slug}/admin/gift-cards`}>
-                <StyledButton data-cy="back-to-giftcards-list">
+              <Link href={`/dashboard/${collective.slug}/gift-cards`} data-cy="back-to-giftcards-list">
+                <StyledButton>
                   <ArrowBack size="1em" />{' '}
                   <FormattedMessage id="giftCards.returnToEdit" defaultMessage="Back to Gift Cards list" />
                 </StyledButton>
@@ -789,7 +789,7 @@ class EditCollectiveForm extends React.Component {
       ],
     };
 
-    Object.keys(this.fields).map(fieldname => {
+    for (const fieldname in this.fields) {
       this.fields[fieldname] = this.fields[fieldname].map(field => {
         if (this.messages[`${field.name}.label`]) {
           field.label = intl.formatMessage(this.messages[`${field.name}.label`]);
@@ -809,7 +809,7 @@ class EditCollectiveForm extends React.Component {
 
         return field;
       });
-    });
+    }
 
     const fields = (this.fields[section] || []).filter(field => !field.when || field.when());
     return (

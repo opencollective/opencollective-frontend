@@ -1,13 +1,13 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import type { Content } from '@radix-ui/react-hover-card';
 import clsx from 'clsx';
 import { get } from 'lodash';
 import { Banknote, Building, Calendar, FileText, LucideIcon, Mail, PencilRuler, Receipt, Users } from 'lucide-react';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
-import { isIndividualAccount } from '../lib/collective.lib';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { isIndividualAccount } from '../lib/collective';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import { Account, AccountWithHost, UserContextualMembershipsQuery } from '../lib/graphql/types/v2/graphql';
 import { getCollectivePageRoute } from '../lib/url-helpers';
 
@@ -15,6 +15,7 @@ import PrivateInfoIcon from './icons/PrivateInfoIcon';
 import { Collapsible, CollapsibleContent } from './ui/Collapsible';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from './ui/HoverCard';
 import Avatar from './Avatar';
+import FollowButton from './FollowButton';
 import FormattedMoneyAmount from './FormattedMoneyAmount';
 import Link from './Link';
 import StyledSpinner from './StyledSpinner';
@@ -27,9 +28,10 @@ export const accountHoverCardFields = gql`
     type
     description
     imageUrl
+    isHost
+    isArchived
     ... on Individual {
       isGuest
-      emails
     }
     ... on AccountWithHost {
       host {
@@ -38,6 +40,7 @@ export const accountHoverCardFields = gql`
       }
       approvedAt
     }
+
     ... on AccountWithParent {
       parent {
         id
@@ -77,9 +80,10 @@ type AccountHoverCardProps = {
   };
   infoItems?: InfoItemProps[];
   hoverCardContentProps?: React.ComponentProps<typeof Content>;
+  displayFollowButton?: boolean;
 };
 
-export const userContextualMembershipsQuery = gql`
+const userContextualMembershipsQuery = gql`
   query UserContextualMemberships(
     $userSlug: String!
     $accountSlug: String
@@ -140,6 +144,7 @@ const getInfoItems = (account): InfoItemProps[] => {
       ),
     },
     account?.host &&
+      !account.isHost &&
       account?.approvedAt && {
         Icon: Building,
         info: (
@@ -257,6 +262,7 @@ export const AccountHoverCard = ({
   account,
   includeAdminMembership: { accountSlug, hostSlug } = {},
   hoverCardContentProps,
+  displayFollowButton,
 }: AccountHoverCardProps) => {
   const [open, setOpen] = React.useState(false);
 
@@ -311,20 +317,19 @@ export const AccountHoverCard = ({
         {trigger}
       </HoverCardTrigger>
       <HoverCardContent
-        className="w-80 cursor-default text-left text-sm"
+        className="w-80 cursor-default text-left text-sm font-normal"
         onClick={e => e.stopPropagation()} // Prevent click propagation when used inside other elements such as `HostedAccountFilter`
         {...hoverCardContentProps}
       >
         <div className="relative flex flex-col gap-4 text-sm">
-          <div
-            className={clsx(
-              'flex  gap-3 overflow-hidden break-words',
-              isIndividual ? 'flex-col items-start' : 'items-center',
-            )}
-          >
-            <Link href={getCollectivePageRoute(account)}>
-              <Avatar collective={account} radius={isIndividual ? 64 : 40} />
-            </Link>
+          <div className="flex flex-col gap-3 overflow-hidden break-words">
+            <div className="flex justify-between">
+              <Link href={getCollectivePageRoute(account)}>
+                <Avatar collective={account} radius={64} />
+              </Link>
+
+              {displayFollowButton && <FollowButton account={account} isHoverCard />}
+            </div>
 
             <div className="overflow-hidden">
               <Link href={getCollectivePageRoute(account)}>

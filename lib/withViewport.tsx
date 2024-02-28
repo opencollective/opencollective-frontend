@@ -4,6 +4,8 @@ import { debounce, findIndex, isEqual, zipObject } from 'lodash';
 import breakpoints from './theme/breakpoints';
 import { emToPx } from './theme/helpers';
 
+// ignore unused exports BREAKPOINTS_NAMES, BREAKPOINTS_WIDTHS, viewportIsAbove, isDesktopOrAbove
+
 /**
  * Defines all the breakpoints names as passed by `withViewport`
  */

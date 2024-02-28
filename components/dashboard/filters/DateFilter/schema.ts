@@ -1,6 +1,8 @@
 import dayjs from 'dayjs';
 import { z } from 'zod';
 
+import { SimpleDateString } from '../../../../lib/filters/schemas';
+
 export enum DateFilterType {
   IN_LAST_PERIOD = 'IN_LAST_PERIOD',
   EQUAL_TO = 'EQUAL_TO',
@@ -17,14 +19,13 @@ const BaseDate = z.object({
   tz: z.enum(['local', 'UTC']).optional(),
 });
 
-const SimpleDateString = z.string().regex(/^(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/);
-
 const InBetweenDate = BaseDate.extend({
   type: z.literal(BETWEEN).default(BETWEEN),
   gte: SimpleDateString,
   lte: SimpleDateString,
 });
-export const LegacyPeriod = z
+
+const LegacyPeriod = z
   .string()
   .regex(/^(?<from>[^→]+)(→(?<to>.+?(?=~UTC|$)))?(~(?<timezoneType>UTC))?$/)
   .transform(str => {

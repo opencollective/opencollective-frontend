@@ -28,4 +28,6 @@ const BecomeAHost = () => {
   );
 };
 
+// ignore unused exports default
+// next.js export
 export default BecomeAHost;

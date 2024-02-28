@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { Copy } from '@styled-icons/feather/Copy';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -9,11 +9,10 @@ import { margin } from 'styled-system';
 
 import { formatCurrency } from '../../lib/currency-utils';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { VirtualCardLimitInterval } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getAvailableLimitString } from '../../lib/i18n/virtual-card-spending-limit';
-import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { getDashboardObjectIdURL } from '../../lib/stripe/dashboard';
 
 import Avatar from '../Avatar';
@@ -241,13 +240,7 @@ export const ActionsButton = props => {
           {!props.hideViewTransactions && (
             <React.Fragment>
               <DropdownMenuItem>
-                <Link
-                  href={
-                    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)
-                      ? `/dashboard/${virtualCard.account.slug}/transactions?virtualCard=${virtualCard?.id}`
-                      : `/${virtualCard.account.slug}/transactions?virtualCard=${virtualCard?.id}`
-                  }
-                >
+                <Link href={`/dashboard/${virtualCard.account.slug}/transactions?virtualCard=${virtualCard.id}`}>
                   <FormattedMessage defaultMessage="View transactions" />
                 </Link>
               </DropdownMenuItem>

@@ -74,9 +74,6 @@ InlineField.propTypes = {
   isLabelClickable: PropTypes.bool,
 };
 
-/** Entry title */
-export const Title = styled.summary``;
-
 const DeliverTypeRadioSelector = styled(Flex)`
   justify-content: space-evenly;
   align-items: center;
@@ -237,9 +234,9 @@ class CreateGiftCardsForm extends Component {
 
       this.setState({ submitting: true });
       const variables = {
-        CollectiveId: this.props.collectiveId,
+        collectiveId: this.props.collectiveId,
         amount: values.amount,
-        PaymentMethodId: paymentMethod.id,
+        paymentMethodId: paymentMethod.id,
         expiryDate: values.expiryDate,
         batch: values.batch,
         ...limitations,
@@ -331,7 +328,7 @@ class CreateGiftCardsForm extends Component {
   renderNoPaymentMethodMessage() {
     return (
       <Flex justifyContent="center">
-        <Link href={`/${this.props.collectiveSlug}/admin/payment-methods`}>
+        <Link href={`/dashboard/${this.props.collectiveSlug}/payment-methods`}>
           <StyledButton buttonSize="large" mt="2em" justifyContent="center">
             <FormattedMessage
               id="giftCards.create.requirePM"
@@ -647,7 +644,7 @@ class CreateGiftCardsForm extends Component {
  * gift cards, as a gift card cannot be used as a source payment method
  * for another payment method.
  */
-export const collectiveSourcePaymentMethodsQuery = gqlV1/* GraphQL */ `
+const collectiveSourcePaymentMethodsQuery = gqlV1/* GraphQL */ `
   query CollectiveSourcePaymentMethods($id: Int) {
     Collective(id: $id) {
       id
@@ -692,10 +689,10 @@ const addCollectiveSourcePaymentMethodsQuery = graphql(collectiveSourcePaymentMe
 
 const createGiftCardsMutation = gqlV1/* GraphQL */ `
   mutation CreateGiftCards(
-    $CollectiveId: Int!
+    $collectiveId: Int!
     $numberOfGiftCards: Int
     $emails: [String]
-    $PaymentMethodId: Int
+    $paymentMethodId: Int
     $amount: Int
     $monthlyLimitPerMember: Int
     $description: String
@@ -709,8 +706,8 @@ const createGiftCardsMutation = gqlV1/* GraphQL */ `
     createGiftCards(
       amount: $amount
       monthlyLimitPerMember: $monthlyLimitPerMember
-      CollectiveId: $CollectiveId
-      PaymentMethodId: $PaymentMethodId
+      CollectiveId: $collectiveId
+      PaymentMethodId: $paymentMethodId
       description: $description
       expiryDate: $expiryDate
       currency: $currency

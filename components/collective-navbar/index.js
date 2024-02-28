@@ -1,6 +1,6 @@
 import React, { Fragment, useRef } from 'react';
 import { PropTypes } from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { DotsVerticalRounded } from '@styled-icons/boxicons-regular/DotsVerticalRounded';
 import { Envelope } from '@styled-icons/boxicons-regular/Envelope';
 import { Planet } from '@styled-icons/boxicons-regular/Planet';
@@ -16,17 +16,16 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { display } from 'styled-system';
 
-import { expenseSubmissionAllowed, getContributeRoute } from '../../lib/collective.lib';
+import { expenseSubmissionAllowed, getContributeRoute } from '../../lib/collective';
 import { getFilteredSectionsForCollective, isSectionEnabled } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 import EXPENSE_TYPE from '../../lib/constants/expenseTypes';
 import roles from '../../lib/constants/roles';
 import { isSupportedExpenseType } from '../../lib/expenses';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
-import { getCollectivePageRoute, getDashboardRoute, getSettingsRoute } from '../../lib/url-helpers';
+import { getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
 
 import ActionButton from '../ActionButton';
 import AddFundsBtn from '../AddFundsBtn';
@@ -321,24 +320,11 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
     return {
       type: NAVBAR_ACTION_TYPE.SETTINGS,
       component: (
-        <Link
-          href={
-            LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)
-              ? getDashboardRoute(collective)
-              : getSettingsRoute(collective)
-          }
-          data-cy="edit-collective-btn"
-        >
+        <Link href={getDashboardRoute(collective)} data-cy="edit-collective-btn">
           <ActionButton tabIndex="-1">
             <Settings size="1em" />
             <Span ml={2}>
-              {LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD) ? (
-                <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
-              ) : collective.isHost ? (
-                <FormattedMessage id="AdminPanel.button" defaultMessage="Admin" />
-              ) : (
-                <FormattedMessage id="Settings" defaultMessage="Settings" />
-              )}
+              <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
             </Span>
           </ActionButton>
         </Link>
@@ -395,13 +381,7 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
     return {
       type: NAVBAR_ACTION_TYPE.MANAGE_SUBSCRIPTIONS,
       component: (
-        <Link
-          href={
-            LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)
-              ? getDashboardRoute(collective, 'manage-contributions')
-              : `${getCollectivePageRoute(collective)}/manage-contributions`
-          }
-        >
+        <Link href={getDashboardRoute(collective, 'outgoing-contributions')}>
           <ActionButton tabIndex="-1">
             <Stack size="1em" />
             <Span ml={2}>
@@ -645,20 +625,18 @@ const CollectiveNavbar = ({
                     LoggedInUser={LoggedInUser}
                   />
                 )}
-                {!onlyInfos && (
-                  <Container display={['none', 'flex', null, null, 'none']} alignItems="center">
-                    {isExpanded ? (
-                      <CloseMenuIcon onClick={() => setExpanded(!isExpanded)} />
-                    ) : (
-                      <ExpandMenuIcon
-                        onClick={() => {
-                          mainContainerRef.current?.scrollIntoView(true);
-                          setExpanded(!isExpanded);
-                        }}
-                      />
-                    )}
-                  </Container>
-                )}
+                <Container display={['none', 'flex', null, null, 'none']} alignItems="center">
+                  {isExpanded ? (
+                    <CloseMenuIcon onClick={() => setExpanded(!isExpanded)} />
+                  ) : (
+                    <ExpandMenuIcon
+                      onClick={() => {
+                        mainContainerRef.current?.scrollIntoView(true);
+                        setExpanded(!isExpanded);
+                      }}
+                    />
+                  )}
+                </Container>
               </Container>
             </Container>
           )}

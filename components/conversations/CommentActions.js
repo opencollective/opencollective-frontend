@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { DotsHorizontalRounded } from '@styled-icons/boxicons-regular/DotsHorizontalRounded';
 import { Share2 as ShareIcon } from '@styled-icons/feather/Share2';
 import { X } from '@styled-icons/feather/X';
@@ -11,7 +11,7 @@ import { usePopper } from 'react-popper';
 import styled from 'styled-components';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import useClipboard from '../../lib/hooks/useClipboard';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 

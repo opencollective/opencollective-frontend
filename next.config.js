@@ -11,7 +11,7 @@ const { REWRITES } = require('./rewrites');
 
 const nextConfig = {
   eslint: { ignoreDuringBuilds: true },
-  useFileSystemPublicRoutes: process.env.IS_VERCEL === 'true' || process.env.API_PROXY !== 'true',
+  useFileSystemPublicRoutes: true,
   productionBrowserSourceMaps: true,
   typescript: {
     ignoreBuildErrors: true,
@@ -27,7 +27,7 @@ const nextConfig = {
       '/_document': ['./.next/language-manifest.json'],
     },
   },
-  webpack: (config, { webpack, isServer, dev, buildId }) => {
+  webpack: (config, { webpack, isServer, dev }) => {
     config.resolve.alias['@sentry/replay'] = false;
 
     config.plugins.push(
@@ -42,6 +42,7 @@ const nextConfig = {
         API_KEY: null,
         API_URL: null,
         PDF_SERVICE_URL: null,
+        ML_SERVICE_URL: null,
         DISABLE_MOCK_UPLOADS: false,
         DYNAMIC_IMPORT: true,
         WEBSITE_URL: null,
@@ -55,13 +56,7 @@ const nextConfig = {
         CAPTCHA_PROVIDER: 'HCAPTCHA',
         SENTRY_TRACES_SAMPLE_RATE: null,
         OC_APPLICATION: null,
-        LEDGER_SEPARATE_PAYMENT_PROCESSOR_FEES: false,
-      }),
-    );
-
-    config.plugins.push(
-      new webpack.DefinePlugin({
-        'process.env.SENTRY_RELEASE': JSON.stringify(buildId),
+        LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES: false,
       }),
     );
 
@@ -240,18 +235,24 @@ const nextConfig = {
       // Legacy settings (/edit)
       {
         source: '/:slug/edit/:section*',
-        destination: '/:slug/admin/:section*',
+        destination: '/dashboard/:slug/:section*',
         permanent: false,
       },
       {
         source: '/:parentCollectiveSlug/events/:eventSlug/edit/:section*',
-        destination: '/:parentCollectiveSlug/events/:eventSlug/admin/:section*',
+        destination: '/dashboard/:eventSlug/:section*',
         permanent: false,
       },
       // Legacy host dashboard (/host/dashboard)
       {
         source: '/:slug/dashboard/:section*',
-        destination: '/:slug/admin/:section*',
+        destination: '/dashboard/:slug/:section*',
+        permanent: false,
+      },
+      // Legacy admin panel
+      {
+        source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:slug/admin/:section?/:subpath*',
+        destination: '/dashboard/:slug/:section*/:subpath*',
         permanent: false,
       },
       // Legacy subscriptions
@@ -293,13 +294,20 @@ const nextConfig = {
   },
 };
 
-let exportedConfig = withSentryConfig({
-  ...nextConfig,
-  sentry: {
-    disableServerWebpackPlugin: true,
-    disableClientWebpackPlugin: true,
+let exportedConfig = withSentryConfig(
+  {
+    ...nextConfig,
+    sentry: {
+      hideSourceMaps: true,
+    },
   },
-});
+  {
+    org: 'open-collective',
+    project: 'oc-frontend',
+    authToken: process.env.SENTRY_AUTH_TOKEN,
+    silent: true,
+  },
+);
 
 if (process.env.ANALYZE) {
   // eslint-disable-next-line node/no-unpublished-require

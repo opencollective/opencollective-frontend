@@ -12,7 +12,7 @@ const ProvidersRegexs = {
 export const supportedVideoProviders = Object.keys(ProvidersRegexs);
 
 /** Get provider name, or returns null if URL is null or not supported */
-export const getProvider = url => {
+const getProvider = url => {
   if (!url) {
     return null;
   }

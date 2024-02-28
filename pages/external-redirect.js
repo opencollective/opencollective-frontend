@@ -136,4 +136,6 @@ const ExternalRedirectPage = () => {
   );
 };
 
+// ignore unused exports default
+// next.js export
 export default ExternalRedirectPage;

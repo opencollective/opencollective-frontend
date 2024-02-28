@@ -80,7 +80,7 @@ class GiftCards extends React.Component {
       >
         {({ item, isSelected }) => (
           <Link
-            href={{ pathname: `/${this.props.collectiveSlug}/admin/gift-cards`, query: { ...query, filter: item } }}
+            href={{ pathname: `/dashboard/${this.props.collectiveSlug}/gift-cards`, query: { ...query, filter: item } }}
           >
             <P p="0.5em 1em" color={isSelected ? 'white.full' : 'black.800'} style={{ margin: 0 }}>
               {item === 'all' && <FormattedMessage id="giftCards.filterAll" defaultMessage="All" />}
@@ -96,7 +96,7 @@ class GiftCards extends React.Component {
   renderNoGiftCardMessage(onlyConfirmed) {
     if (onlyConfirmed === undefined) {
       return (
-        <Link href={`/${this.props.collectiveSlug}/admin/gift-cards-create`}>
+        <Link href={`/dashboard/${this.props.collectiveSlug}/gift-cards-create`}>
           <FormattedMessage id="giftCards.createFirst" defaultMessage="Create your first gift card!" />
         </Link>
       );
@@ -145,7 +145,7 @@ class GiftCards extends React.Component {
           >
             {this.renderFilters(onlyConfirmed)}
             <Flex justifyContent="center">
-              <Link href={`/${collectiveSlug}/admin/gift-cards-create`}>
+              <Link href={`/dashboard/${collectiveSlug}/gift-cards-create`}>
                 <StyledButton buttonStyle="primary" buttonSize="medium">
                   <Add size="1em" />
                   {'  '}
@@ -161,7 +161,7 @@ class GiftCards extends React.Component {
                 options={batchesOptions}
                 onChange={({ value }) =>
                   this.props.router.push({
-                    pathname: `/${collectiveSlug}/admin/gift-cards`,
+                    pathname: `/dashboard/${collectiveSlug}/gift-cards`,
                     query: this.getQueryParams(['filter', 'batch'], { batch: value }),
                   })
                 }
@@ -208,8 +208,8 @@ const getIsConfirmedFromFilter = filter => {
 
 /** A query to get the gift cards created by a collective. Must be authenticated. */
 const giftCardsQuery = gqlV1/* GraphQL */ `
-  query EditCollectiveGiftCards($CollectiveId: Int, $isConfirmed: Boolean, $limit: Int, $offset: Int, $batch: String) {
-    Collective(id: $CollectiveId) {
+  query EditCollectiveGiftCards($collectiveId: Int, $isConfirmed: Boolean, $limit: Int, $offset: Int, $batch: String) {
+    Collective(id: $collectiveId) {
       id
       giftCardsBatches {
         id
@@ -234,9 +234,7 @@ const giftCardsQuery = gqlV1/* GraphQL */ `
           balance
           expiryDate
           isConfirmed
-          data
           createdAt
-          expiryDate
           description
           collective {
             id
@@ -252,7 +250,7 @@ const giftCardsQuery = gqlV1/* GraphQL */ `
 `;
 
 const getGiftCardsVariablesFromProps = ({ collectiveId, router, limit }) => ({
-  CollectiveId: collectiveId,
+  collectiveId,
   isConfirmed: getIsConfirmedFromFilter(router.query.filter),
   batch: router.query.batch === NOT_BATCHED_KEY ? null : router.query.batch,
   offset: Number(router.query.offset) || 0,

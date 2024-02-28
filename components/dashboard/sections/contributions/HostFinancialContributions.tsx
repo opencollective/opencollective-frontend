@@ -1,11 +1,11 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { PlusIcon } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { Views } from '../../../../lib/filters/filter-types';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 import { OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../../../lib/hooks/usePrevious';
@@ -14,7 +14,6 @@ import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { accountHoverCardFields } from '../../../AccountHoverCard';
 import { confirmContributionFieldsFragment } from '../../../ContributionConfirmationModal';
 import { Flex } from '../../../Grid';
-import CreatePendingOrderModal from '../../../host-dashboard/CreatePendingOrderModal';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import OrdersList from '../../../orders/OrdersList';
 import Pagination from '../../../Pagination';
@@ -24,6 +23,7 @@ import { EmptyResults } from '../../EmptyResults';
 import { Filterbar } from '../../filters/Filterbar';
 import { DashboardSectionProps } from '../../types';
 
+import CreatePendingOrderModal from './CreatePendingOrderModal';
 import { filters, schema, toVariables } from './filters';
 
 const hostOrdersQuery = gql`
@@ -40,6 +40,23 @@ const hostOrdersQuery = gql`
     $orderBy: ChronologicalOrderInput
     $frequency: ContributionFrequency
   ) {
+    host(slug: $hostSlug) {
+      id
+      slug
+      currency
+      legacyId
+      name
+      isHost
+      accountingCategories {
+        nodes {
+          id
+          name
+          code
+          friendlyName
+          kind
+        }
+      }
+    }
     orders(
       account: { slug: $hostSlug }
       includeHostedAccounts: true
@@ -62,6 +79,12 @@ const hostOrdersQuery = gql`
         description
         createdAt
         status
+        accountingCategory {
+          id
+          name
+          code
+          friendlyName
+        }
         ...ConfirmContributionFields
         paymentMethod {
           id
@@ -106,6 +129,7 @@ const hostOrdersQuery = gql`
           id
           canMarkAsExpired
           canMarkAsPaid
+          canUpdateAccountingCategory
         }
       }
     }
@@ -221,7 +245,7 @@ const HostFinancialContributions = ({ accountSlug: hostSlug }: DashboardSectionP
   }, [LoggedInUser]);
 
   return (
-    <div className="flex w-full flex-col gap-4">
+    <div className="flex w-full max-w-screen-lg flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />}
         description={<FormattedMessage defaultMessage="Contributions for Collectives you host." />}
@@ -268,6 +292,7 @@ const HostFinancialContributions = ({ accountSlug: hostSlug }: DashboardSectionP
             orders={data?.orders?.nodes}
             nbPlaceholders={variables.limit}
             showPlatformTip
+            host={data?.host}
           />
           <Flex mt={5} justifyContent="center">
             <Pagination

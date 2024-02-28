@@ -5,6 +5,7 @@ node_modules
 npm-debug.log.*
 ./report.*.json
 *.log
+logs
 yarn.lock
 .DS_Store
 build
@@ -12,6 +13,7 @@ coverage
 .nyc_output
 test/cypress/screenshots
 test/cypress/videos
+test/cypress/downloads
 dist
 stage
 *.swp
@@ -49,3 +51,6 @@ public/static/scripts/pdf.worker.min.js
 # pdfjs character maps - copied from node_modules by webpack (see next.config.js)
 public/static/cmaps
 .vercel
+
+lib/graphql/types/v2/index.ts
+lib/graphql/types/v2/gql.ts

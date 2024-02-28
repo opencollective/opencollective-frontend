@@ -1,9 +1,9 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import ConfirmationModal from '../ConfirmationModal';
@@ -12,7 +12,7 @@ import StyledInputField from '../StyledInputField';
 import { P } from '../Text';
 import { useToast } from '../ui/useToast';
 
-export const editAccountTypeMutation = gql`
+const editAccountTypeMutation = gql`
   mutation EditAccountType($account: AccountReferenceInput!) {
     editAccountType(account: $account) {
       id

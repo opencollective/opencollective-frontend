@@ -1,20 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { Form, Formik, useFormikContext } from 'formik';
 import { isNil, omit } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { getLegacyIdForCollective } from '../../../lib/collective.lib';
+import { getLegacyIdForCollective } from '../../../lib/collective';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import INTERVALS, { getGQLV2FrequencyFromInterval } from '../../../lib/constants/intervals';
 import { AmountTypes, TierTypes } from '../../../lib/constants/tiers-types';
 import { getIntervalFromContributionFrequency } from '../../../lib/date-utils';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { requireFields } from '../../../lib/form-utils';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import { i18nTaxDescription, i18nTaxType } from '../../../lib/i18n/taxes';
 import { getCollectivePageRoute } from '../../../lib/url-helpers';
 
@@ -618,10 +618,6 @@ const CancelModalButton = styled(StyledButton)`
   }
 `;
 
-const ModalContainer = styled(StyledModal)`
-  padding-bottom: 10px;
-`;
-
 const FieldDescription = styled.div`
   color: #737373;
   font-size: 0.75rem;
@@ -636,9 +632,9 @@ const ContributeCardPreviewContainer = styled.div`
 
 export default function EditTierModal({ tier, collective, onClose, onUpdate, forcedType }) {
   return (
-    <ModalContainer onClose={onClose} ignoreEscapeKey>
+    <StyledModal className="sm:max-w-4xl" onClose={onClose} ignoreEscapeKey>
       <EditTierForm tier={tier} collective={collective} onClose={onClose} forcedType={forcedType} onUpdate={onUpdate} />
-    </ModalContainer>
+    </StyledModal>
   );
 }
 
@@ -650,7 +646,7 @@ EditTierModal.propTypes = {
   forcedType: PropTypes.string,
 };
 
-export function ContributeCardPreview({ tier, collective }) {
+function ContributeCardPreview({ tier, collective }) {
   const intl = useIntl();
 
   const previewTier = {
@@ -678,7 +674,7 @@ ContributeCardPreview.propTypes = {
   collective: PropTypes.object,
 };
 
-export const editTiersFieldsFragment = gql`
+const editTiersFieldsFragment = gql`
   fragment EditTiersFields on Tier {
     id
     legacyId
@@ -713,7 +709,6 @@ export const editTiersFieldsFragment = gql`
     type
     useStandalonePage
     singleTicket
-    invoiceTemplate
   }
 `;
 
@@ -783,7 +778,7 @@ const getRequiredFields = values => {
   return fields;
 };
 
-export function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }) {
+function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }) {
   const intl = useIntl();
   const isEditing = React.useMemo(() => !!tier?.id);
   const initialValues = React.useMemo(() => {

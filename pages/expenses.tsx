@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { gql } from '@apollo/client';
 import { has, isNil, omitBy } from 'lodash';
 import { InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
@@ -7,12 +6,12 @@ import { defineMessages, useIntl } from 'react-intl';
 
 import { FEATURES, isFeatureSupported } from '../lib/allowed-features';
 import { getSSRQueryHelpers } from '../lib/apollo-client';
-import { getCollectivePageMetadata, loggedInUserCanAccessFinancialData } from '../lib/collective.lib';
+import { getCollectivePageMetadata, loggedInUserCanAccessFinancialData } from '../lib/collective';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../lib/constants/payout-method';
 import { parseDateInterval } from '../lib/date-utils';
 import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import { ExpensesPageQuery, ExpenseStatus } from '../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { getCollectivePageCanonicalURL } from '../lib/url-helpers';
@@ -20,8 +19,8 @@ import { getCollectivePageCanonicalURL } from '../lib/url-helpers';
 import { parseAmountRange } from '../components/budget/filters/AmountFilter';
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
+import { accountNavbarFieldsFragment } from '../components/collective-navbar/fragments';
 import { Dimensions } from '../components/collective-page/_constants';
-import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import Expenses from '../components/expenses/ExpensesPage';
@@ -40,7 +39,7 @@ const messages = defineMessages({
 
 const EXPENSES_PER_PAGE = 10;
 
-export const expensesPageQuery = gql`
+const expensesPageQuery = gql`
   query ExpensesPage(
     $collectiveSlug: String!
     $account: AccountReferenceInput
@@ -179,7 +178,7 @@ export const expensesPageQuery = gql`
   }
 
   ${expensesListFieldsFragment}
-  ${collectiveNavbarFieldsFragment}
+  ${accountNavbarFieldsFragment}
   ${expenseHostFields}
 `;
 
@@ -252,10 +251,15 @@ const expensePageQueryHelpers = getSSRQueryHelpers<ReturnType<typeof getVariable
   context: API_V2_CONTEXT,
   getPropsFromContext: ctx => getPropsFromQuery(ctx.query),
   getVariablesFromContext: (ctx, props) => getVariablesFromProps(props),
+  skipClientIfSSRThrows404: true,
 });
 
+// ignore unused exports getServerSideProps
+// next.js export
 export const getServerSideProps = expensePageQueryHelpers.getServerSideProps;
 
+// ignore unused exports default
+// next.js export
 export default function ExpensesPage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const intl = useIntl();
   const router = useRouter();
@@ -269,18 +273,18 @@ export default function ExpensesPage(props: InferGetServerSidePropsType<typeof g
     }
   }, [LoggedInUser]);
 
-  const error = query?.error;
-  const data: ExpensesPageQuery = query?.data;
-
+  const error = query.error || expensePageQueryHelpers.getSSRErrorFromPageProps(props);
+  const data: ExpensesPageQuery = query.data;
+  const account = data?.account;
   const metadata = {
-    ...getCollectivePageMetadata(data.account),
-    title: intl.formatMessage(messages.title, { collectiveName: data.account.name }),
+    ...getCollectivePageMetadata(account),
+    title: intl.formatMessage(messages.title, { collectiveName: account?.name || 'Open Collective' }),
   };
 
   if (!query.loading) {
     if (error) {
-      return <ErrorPage data={data} />;
-    } else if (!data.account || !data.expenses?.nodes) {
+      return <ErrorPage data={data} error={error} />;
+    } else if (!account || !data?.expenses?.nodes) {
       return <ErrorPage error={generateNotFoundError(props.collectiveSlug)} log={false} />;
     } else if (!isFeatureSupported(data.account, FEATURES.RECEIVE_EXPENSES)) {
       return <PageFeatureNotSupported showContactSupportLink />;

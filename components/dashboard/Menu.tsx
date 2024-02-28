@@ -3,6 +3,7 @@ import { get } from 'lodash';
 import {
   ArrowRightLeft,
   BarChart2,
+  BookUserIcon,
   Building,
   Coins,
   CreditCard,
@@ -21,7 +22,7 @@ import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
-import { isHostAccount, isIndividualAccount, isInternalHost, isSelfHostedAccount } from '../../lib/collective.lib';
+import { isHostAccount, isIndividualAccount, isInternalHost, isSelfHostedAccount } from '../../lib/collective';
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
@@ -55,10 +56,12 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
   const isHost = isHostAccount(account);
   const isSelfHosted = isSelfHostedAccount(account);
   const isAccountantOnly = LoggedInUser?.isAccountantOnly(account);
+  const isActive = account.isActive;
+  const isActiveHost = isHost && isActive;
 
   const items: MenuItem[] = [
     {
-      if: isIndividual,
+      if: isIndividual || (LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW) && !isHost),
       section: ALL_SECTIONS.OVERVIEW,
       Icon: LayoutDashboard,
     },
@@ -104,6 +107,12 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       section: ALL_SECTIONS.OUTGOING_CONTRIBUTIONS,
       label: intl.formatMessage({ id: 'Contributions', defaultMessage: 'Contributions' }),
       Icon: Coins,
+    },
+    {
+      if: !isIndividual,
+      section: ALL_SECTIONS.CONTRIBUTORS,
+      label: intl.formatMessage({ id: 'Contributors', defaultMessage: 'Contributors' }),
+      Icon: BookUserIcon,
     },
     {
       if: !isIndividual,
@@ -196,11 +205,19 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       Icon: HeartHandshake,
     },
     {
+      if: !isHost,
       section: ALL_SECTIONS.TRANSACTIONS,
       Icon: ArrowRightLeft,
     },
     {
-      if: !isOneOfTypes(account, [EVENT, USER]) && !isAccountantOnly,
+      if: isHost,
+      section: ALL_SECTIONS.HOST_TRANSACTIONS,
+      Icon: ArrowRightLeft,
+      label: intl.formatMessage({ id: 'menu.transactions', defaultMessage: 'Transactions' }),
+    },
+    {
+      if:
+        !isOneOfTypes(account, [EVENT, USER]) && (account.type !== 'ORGANIZATION' || isActiveHost) && !isAccountantOnly,
       section: ALL_SECTIONS.TIERS,
       Icon: HeartHandshake,
     },
@@ -383,6 +400,7 @@ const Menu = ({ onRoute, menuItems }) => {
         Icon={Globe2}
         label={intl.formatMessage({ id: 'PublicProfile', defaultMessage: 'Public profile' })}
         className="hover:bg-slate-50 hover:text-slate-700"
+        dataCy="public-profile-link"
         external
       />
       <div className="space-y-2">

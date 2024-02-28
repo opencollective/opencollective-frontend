@@ -1,3 +1,5 @@
+// ignore unused exports
+
 'use client';
 
 import * as React from 'react';
@@ -9,7 +11,7 @@ import { DialogProps } from '@radix-ui/react-dialog';
 */
 import { Command as CommandPrimitive } from 'carloslfu-cmdk-internal';
 import clsx from 'clsx';
-import { Loader2, Search } from 'lucide-react';
+import { Loader2, LucideIcon, Search } from 'lucide-react';
 
 import { cn } from '../../lib/utils';
 
@@ -49,12 +51,13 @@ const CommandInput = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Input>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input> & {
     loading?: boolean;
+    customIcon?: LucideIcon;
   }
->(({ className, loading, ...props }, ref) => {
-  const Icon = loading ? Loader2 : Search;
+>(({ className, loading, customIcon, ...props }, ref) => {
+  const Icon = loading ? Loader2 : customIcon ?? Search;
   return (
     // eslint-disable-next-line react/no-unknown-property
-    <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
+    <div className="flex items-center px-3" cmdk-input-wrapper="">
       <Icon className={clsx('mr-2 h-4 w-4 shrink-0 opacity-50', loading && 'animate-spin')} />
       <CommandPrimitive.Input
         ref={ref}
@@ -76,7 +79,7 @@ const CommandList = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.List
     ref={ref}
-    className={cn('max-h-[300px] overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:hidden', className)}
+    className={cn('max-h-[300px] overflow-y-auto overflow-x-hidden border-t [&::-webkit-scrollbar]:hidden', className)}
     cmdk-list-wrapper=""
     {...props}
   />

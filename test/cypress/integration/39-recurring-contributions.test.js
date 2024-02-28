@@ -6,7 +6,7 @@ describe('Recurring contributions', () => {
     cy.createHostedCollective({ type: 'COLLECTIVE' })
       .then(collective => {
         collectiveSlug = collective.slug;
-        cy.login({ redirect: `/${collectiveSlug}/admin/tiers` });
+        cy.login({ redirect: `/dashboard/${collectiveSlug}/tiers` });
         cy.getByDataCy('create-contribute-tier').click();
         cy.get('input[data-cy="name"]').type('Recurring Fixed Donation Tier');
         cy.get('[data-cy="select-interval"]').click();

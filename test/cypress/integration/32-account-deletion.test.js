@@ -8,11 +8,11 @@ describe('Account Deletion', () => {
     cy.createCollective({ type: 'COLLECTIVE' }).then(({ slug }) => {
       collectiveSlug = slug;
     });
-    cy.login({ redirect: `/${collectiveSlug}/admin/advanced` });
+    cy.login({ redirect: `/dashboard/${collectiveSlug}/advanced` });
   });
 
   it('Should delete collective', () => {
-    cy.visit(`/${collectiveSlug}/admin/advanced`);
+    cy.visit(`/dashboard/${collectiveSlug}/advanced`);
     cy.contains('button', 'Delete this Collective', { timeout: 15000 }).click();
     cy.get('[data-cy=delete]').click();
     cy.wait(1000);
@@ -27,7 +27,7 @@ describe('Account Deletion', () => {
     const userParams = { name: userSlug };
     const visitParams = { onBeforeLoad: mockRecaptcha };
 
-    cy.signup({ user: userParams, visitParams, redirect: `/${userSlug}/admin/advanced` });
+    cy.signup({ user: userParams, visitParams, redirect: `/dashboard/${userSlug}/advanced` });
     cy.contains('button', 'Delete this account').click();
     cy.get('[data-cy=delete]').click();
     cy.wait(1000);

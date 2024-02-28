@@ -1,5 +1,5 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { get } from 'lodash';
 import {
   BookOpen,
@@ -18,7 +18,7 @@ import {
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import useLoggedInUser, { UserContextProps } from '../../lib/hooks/useLoggedInUser';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { cn } from '../../lib/utils';
@@ -50,6 +50,7 @@ const MenuItem = ({
   onClick,
   className,
   external,
+  ...props
 }: {
   Icon: LucideIcon;
   appending?: React.ReactNode;
@@ -74,14 +75,14 @@ const MenuItem = ({
   );
   if (onClick) {
     return (
-      <button onClick={onClick} className={classes}>
+      <button onClick={onClick} className={classes} {...props}>
         {content}
       </button>
     );
   }
   if (external) {
     return (
-      <a href={href} className={classes} target="_blank" rel="noreferrer">
+      <a href={href} className={classes} target="_blank" rel="noreferrer" {...props}>
         {content}
         <ExternalLink size={16} className="opacity-0 transition-opacity group-hover:opacity-100" />
       </a>
@@ -89,7 +90,7 @@ const MenuItem = ({
   }
 
   return (
-    <Link href={href} className={classes}>
+    <Link href={href} className={classes} {...props}>
       {content}
     </Link>
   );
@@ -117,7 +118,7 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
     return () => {
       router.events.off('routeChangeStart', handler);
     };
-  }, [router]);
+  }, []);
 
   if (!LoggedInUser) {
     return <LoginBtn />;
@@ -198,7 +199,7 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
 
             <Separator className="my-1" />
 
-            <MenuItem Icon={LogOut} onClick={() => logout(logoutParameters)}>
+            <MenuItem Icon={LogOut} onClick={() => logout(logoutParameters)} data-cy="logout">
               <FormattedMessage id="menu.logout" defaultMessage="Log out" />
             </MenuItem>
           </div>
@@ -225,17 +226,15 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
           </button>
         </PopoverTrigger>
         {!isMobile && (
-          <PopoverContent align="end" className="w-full max-w-lg overflow-hidden rounded-xl p-0">
+          <PopoverContent data-cy="user-menu" align="end" className="w-full max-w-lg overflow-hidden rounded-xl p-0">
             {content}
           </PopoverContent>
         )}
       </Popover>
       {isMobile && (
-        <React.Fragment>
-          <DrawerMenu onClose={() => setMenuOpen(false)} open={isMenuOpen}>
-            {content}
-          </DrawerMenu>
-        </React.Fragment>
+        <DrawerMenu onClose={() => setMenuOpen(false)} open={isMenuOpen}>
+          {content}
+        </DrawerMenu>
       )}
     </React.Fragment>
   );

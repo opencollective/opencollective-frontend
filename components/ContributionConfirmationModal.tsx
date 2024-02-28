@@ -1,6 +1,6 @@
 import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { omit } from 'lodash';
@@ -8,7 +8,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { getCurrentLocalDateStr } from '../lib/date-utils';
 import { i18nGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import { TaxInput } from '../lib/graphql/types/v2/graphql';
 import { i18nTaxType } from '../lib/i18n/taxes';
 
@@ -153,7 +153,7 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
   const applicableTax = getApplicableTaxType(order.toAccount, order.toAccount.host);
 
   return (
-    <StyledModal width="578px" onClose={onClose} trapFocus>
+    <StyledModal width="578px" onClose={onClose}>
       <CollectiveModalHeader
         collective={order.toAccount}
         customText={
@@ -322,9 +322,13 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
             <Flex justifyContent="space-between" alignItems={['left', 'center']} flexDirection={['column', 'row']}>
               <Label fontSize="14px" lineHeight="20px" fontWeight="400" htmlFor="confirmContribution-processedAt">
                 <span>
-                  <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />
+                  <FormattedMessage defaultMessage="Effective Date" />
                   {` `}
-                  <StyledTooltip content={() => <FormattedMessage defaultMessage="Date the funds were received." />}>
+                  <StyledTooltip
+                    content={() => (
+                      <FormattedMessage defaultMessage="The date funds were cleared on your bank, Wise, PayPal, Stripe or any other external account holding these funds." />
+                    )}
+                  >
                     <InfoCircle size={16} />
                   </StyledTooltip>
                 </span>

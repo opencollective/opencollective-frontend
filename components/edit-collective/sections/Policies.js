@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { useFormik } from 'formik';
 import { cloneDeep, filter, get, isEmpty, set, size } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -8,7 +8,8 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { MODERATION_CATEGORIES } from '../../../lib/constants/moderation-categories';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { DEFAULT_SUPPORTED_EXPENSE_TYPES } from '../../../lib/expenses';
-import { API_V2_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
+import { editCollectivePolicyMutation } from '../../../lib/graphql/v1/mutations';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 import { stripHTML } from '../../../lib/html';
 import { PREVIEW_FEATURE_KEYS } from '../../../lib/preview-features';
@@ -38,17 +39,6 @@ const CONTRIBUTION_POLICY_MAX_LENGTH = 3000; // 600 words * 5 characters average
 const updateFilterCategoriesMutation = gql`
   mutation UpdateFilterCategories($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
     editAccountSetting(account: $account, key: $key, value: $value) {
-      id
-      type
-      isActive
-      settings
-    }
-  }
-`;
-
-const editCollectiveMutation = gqlV1/* GraphQL */ `
-  mutation EditCollectiveMutation($collective: CollectiveInputType!) {
-    editCollective(collective: $collective) {
       id
       type
       isActive
@@ -156,7 +146,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
     },
   );
   const [updateCollective, { loading: isSubmittingSettings, error: settingsError }] =
-    useMutation(editCollectiveMutation);
+    useMutation(editCollectivePolicyMutation);
   const [setPolicies, { loading: isSettingPolicies, error: policiesError }] = useMutation(setPoliciesMutation, {
     context: API_V2_CONTEXT,
   });
@@ -658,53 +648,54 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
                 />
               </div>
             </Container>
-            {LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.EXPENSE_CATEGORIZATION) && (
-              <Container>
-                <SettingsSectionTitle mt={4}>
-                  <FormattedMessage defaultMessage="Expense categorization" />
-                </SettingsSectionTitle>
-                <P mb={3}>
-                  <FormattedMessage
-                    defaultMessage="Involve expense submitters and collective admins in expense categorization, based on the categories you've set up in your <LinkAccountingCategories>chart of accounts</LinkAccountingCategories>."
-                    values={{
-                      LinkAccountingCategories: getI18nLink({
-                        as: Link,
-                        href: `/dashboard/${collective.slug}/chart-of-accounts`,
-                      }),
-                    }}
-                  />
-                </P>
+            {LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.EXPENSE_CATEGORIZATION) &&
+              collective.isHost && (
+                <Container>
+                  <SettingsSectionTitle mt={4}>
+                    <FormattedMessage defaultMessage="Expense categorization" />
+                  </SettingsSectionTitle>
+                  <P mb={3}>
+                    <FormattedMessage
+                      defaultMessage="Involve expense submitters and collective admins in expense categorization, based on the categories you've set up in your <LinkAccountingCategories>chart of accounts</LinkAccountingCategories>."
+                      values={{
+                        LinkAccountingCategories: getI18nLink({
+                          as: Link,
+                          href: `/dashboard/${collective.slug}/chart-of-accounts`,
+                        }),
+                      }}
+                    />
+                  </P>
 
-                <div className="mb-1">
-                  <StyledCheckbox
-                    name={`checkbox-EXPENSE_CATEGORIZATION-requiredForExpenseSubmitters`}
-                    label={
-                      <FormattedMessage defaultMessage="Require expense submitters to select a category when submitting an expense" />
-                    }
-                    checked={formik.values.policies?.EXPENSE_CATEGORIZATION?.requiredForExpenseSubmitters}
-                    onChange={({ checked }) => {
-                      const newPolicies = cloneDeep(formik.values.policies);
-                      set(newPolicies, 'EXPENSE_CATEGORIZATION.requiredForExpenseSubmitters', checked);
-                      formik.setFieldValue('policies', newPolicies);
-                    }}
-                  />
-                </div>
-                <div>
-                  <StyledCheckbox
-                    name={`checkbox-EXPENSE_CATEGORIZATION-requiredForCollectiveAdmins`}
-                    label={
-                      <FormattedMessage defaultMessage="Require collective admins to verify expense categories when reviewing and approving expenses" />
-                    }
-                    checked={formik.values.policies?.EXPENSE_CATEGORIZATION?.requiredForCollectiveAdmins}
-                    onChange={({ checked }) => {
-                      const newPolicies = cloneDeep(formik.values.policies);
-                      set(newPolicies, 'EXPENSE_CATEGORIZATION.requiredForCollectiveAdmins', checked);
-                      formik.setFieldValue('policies', newPolicies);
-                    }}
-                  />
-                </div>
-              </Container>
-            )}
+                  <div className="mb-1">
+                    <StyledCheckbox
+                      name={`checkbox-EXPENSE_CATEGORIZATION-requiredForExpenseSubmitters`}
+                      label={
+                        <FormattedMessage defaultMessage="Require expense submitters to select a category when submitting an expense" />
+                      }
+                      checked={formik.values.policies?.EXPENSE_CATEGORIZATION?.requiredForExpenseSubmitters}
+                      onChange={({ checked }) => {
+                        const newPolicies = cloneDeep(formik.values.policies);
+                        set(newPolicies, 'EXPENSE_CATEGORIZATION.requiredForExpenseSubmitters', checked);
+                        formik.setFieldValue('policies', newPolicies);
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <StyledCheckbox
+                      name={`checkbox-EXPENSE_CATEGORIZATION-requiredForCollectiveAdmins`}
+                      label={
+                        <FormattedMessage defaultMessage="Require collective admins to verify expense categories when reviewing and approving expenses" />
+                      }
+                      checked={formik.values.policies?.EXPENSE_CATEGORIZATION?.requiredForCollectiveAdmins}
+                      onChange={({ checked }) => {
+                        const newPolicies = cloneDeep(formik.values.policies);
+                        set(newPolicies, 'EXPENSE_CATEGORIZATION.requiredForCollectiveAdmins', checked);
+                        formik.setFieldValue('policies', newPolicies);
+                      }}
+                    />
+                  </div>
+                </Container>
+              )}
           </React.Fragment>
         )}
         <Container>

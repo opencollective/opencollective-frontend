@@ -8,7 +8,7 @@ import { size, SizeProps, space, SpaceProps } from 'styled-system';
 
 import Container from './Container';
 
-export const Details = styled(Container).attrs({
+const Details = styled(Container).attrs({
   as: 'details',
 })<React.HTMLProps<HTMLDetailsElement>>`
   summary {

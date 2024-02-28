@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { CardElement } from '@stripe/react-stripe-js';
 import { Lock } from '@styled-icons/boxicons-regular/Lock';
 import { themeGet } from '@styled-system/theme-get';
@@ -10,7 +10,7 @@ import styled from 'styled-components';
 
 import { PAYMENT_METHOD_SERVICE } from '../../lib/constants/payment-methods';
 import { getErrorFromGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { getPaymentMethodName } from '../../lib/payment_method_label';
 import { getPaymentMethodIcon, getPaymentMethodMetadata } from '../../lib/payment-method-utils';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
@@ -43,7 +43,7 @@ const messages = defineMessages({
   },
 });
 
-export const paymentMethodFragment = gql`
+const paymentMethodFragment = gql`
   fragment UpdatePaymentMethodFragment on PaymentMethod {
     id
     name
@@ -61,11 +61,11 @@ export const paymentMethodFragment = gql`
   }
 `;
 
-export const paymentMethodsQuery = gql`
+const paymentMethodsQuery = gql`
   query UpdatePaymentMethodPopUpPaymentMethod($accountSlug: String!, $orderId: String!) {
     account(slug: $accountSlug) {
       id
-      paymentMethods(type: [CREDITCARD, GIFTCARD, PREPAID, COLLECTIVE]) {
+      paymentMethods(type: [CREDITCARD, US_BANK_ACCOUNT, SEPA_DEBIT, BACS_DEBIT, GIFTCARD, PREPAID, COLLECTIVE]) {
         id
         ...UpdatePaymentMethodFragment
       }
@@ -81,7 +81,7 @@ export const paymentMethodsQuery = gql`
   ${paymentMethodFragment}
 `;
 
-export const updatePaymentMethodMutation = gql`
+const updatePaymentMethodMutation = gql`
   mutation UpdatePaymentMethod(
     $order: OrderReferenceInput!
     $paymentMethod: PaymentMethodReferenceInput
@@ -107,7 +107,7 @@ export const updatePaymentMethodMutation = gql`
   }
 `;
 
-export const paymentMethodResponseFragment = gql`
+const paymentMethodResponseFragment = gql`
   fragment paymentMethodResponseFragment on CreditCardWithStripeError {
     paymentMethod {
       id
@@ -143,12 +143,7 @@ export const confirmCreditCardMutation = gql`
 
 const mutationOptions = { context: API_V2_CONTEXT };
 
-export const sortAndFilterPaymentMethods = (
-  paymentMethods,
-  contribution,
-  addedPaymentMethod,
-  existingPaymentMethod,
-) => {
+const sortAndFilterPaymentMethods = (paymentMethods, contribution, addedPaymentMethod, existingPaymentMethod) => {
   if (!paymentMethods) {
     return null;
   }

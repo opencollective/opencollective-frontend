@@ -4,7 +4,7 @@ import { Download as IconDownload } from '@styled-icons/feather/Download';
 import { isNil, omit, omitBy, pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { isIndividualAccount } from '../../lib/collective.lib';
+import { isIndividualAccount } from '../../lib/collective';
 import roles from '../../lib/constants/roles';
 import { TransactionKind, TransactionTypes } from '../../lib/constants/transactions';
 import { parseDateInterval } from '../../lib/date-utils';
@@ -154,9 +154,13 @@ const Transactions = ({
   }
 
   function buildFilterLinkParams(params) {
-    const queryParameters = {
-      ...omit(params, ['offset', 'collectiveType', 'parentCollectiveSlug']),
-    };
+    const queryParameters = omit({ ...router.query, ...params }, [
+      'offset',
+      'collectiveSlug',
+      'slug',
+      'section',
+      'parentCollectiveSlug',
+    ]);
 
     return { ...omitBy(queryParameters, value => !value), ...pick(queryParameters, ['displayPendingContributions']) };
   }
@@ -193,7 +197,7 @@ const Transactions = ({
         <h1 className={isDashboard ? 'text-2xl font-bold leading-10 tracking-tight' : 'text-[32px] leading-10'}>
           <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />
         </h1>
-        <div className="flex-grow sm:flex-grow-0">
+        <div className="w-[276px] flex-grow sm:flex-grow-0">
           <SearchBar
             placeholder={intl.formatMessage({ defaultMessage: 'Search transactions…' })}
             defaultValue={router.query.searchTerm}
@@ -212,7 +216,7 @@ const Transactions = ({
         />
         <div className="flex justify-evenly">
           {canDownloadInvoices && (
-            <Link href={`/${account.slug}/admin/payment-receipts`}>
+            <Link href={`/dashboard/${account.slug}/payment-receipts`}>
               <StyledButton
                 buttonSize="small"
                 minWidth={140}
@@ -237,7 +241,7 @@ const Transactions = ({
         flexDirection={['column', 'row']}
         alignItems={['stretch', 'flex-end']}
       >
-        {true && (
+        {state.hasProcessingOrders && (
           <StyledCheckbox
             checked={router.query.displayPendingContributions !== 'false' ? true : false}
             onChange={({ checked }) => updateFilters({ displayPendingContributions: checked })}
@@ -249,7 +253,7 @@ const Transactions = ({
             }
           />
         )}
-        {true && (
+        {state.hasChildren && (
           <StyledCheckbox
             checked={router.query.ignoreChildrenTransactions ? true : false}
             onChange={({ checked }) => updateFilters({ ignoreChildrenTransactions: checked })}
@@ -261,7 +265,7 @@ const Transactions = ({
             }
           />
         )}
-        {true && (
+        {state.hasGiftCards && (
           <StyledCheckbox
             checked={router.query.ignoreGiftCardsTransactions ? true : false}
             onChange={({ checked }) => updateFilters({ ignoreGiftCardsTransactions: checked })}
@@ -270,7 +274,7 @@ const Transactions = ({
             }
           />
         )}
-        {true && (
+        {state.hasIncognito && (
           <StyledCheckbox
             checked={router.query.ignoreIncognitoTransactions ? true : false}
             onChange={({ checked }) => updateFilters({ ignoreIncognitoTransactions: checked })}

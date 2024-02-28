@@ -34,4 +34,6 @@ const E2C = () => {
   );
 };
 
+// ignore unused exports default
+// next.js export
 export default E2C;

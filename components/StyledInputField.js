@@ -12,7 +12,7 @@ import { P, Span } from './Text';
 const PrivateIconWithSpace = () => (
   <React.Fragment>
     &nbsp;
-    <PrivateInfoIcon tooltipProps={{ containerVerticalAlign: 'text-top' }} />
+    <PrivateInfoIcon />
   </React.Fragment>
 );
 
@@ -49,6 +49,7 @@ const StyledInputField = ({
   flexDirection = undefined,
   justifyContent = undefined,
   alignItems = undefined,
+  placeholder = undefined,
   ...props
 }) => {
   const isCheckbox = inputType === 'checkbox';
@@ -115,24 +116,19 @@ const StyledInputField = ({
               success,
               disabled,
               required,
+              placeholder,
             })
           : children}
       </Flex>
       {error && typeof error === 'string' && (
-        <Box pt={2}>
+        <Box pt={2} lineHeight="1em">
           <ExclamationCircle color="#E03F6A" size={16} />
-          <Span ml={1} color="black.700" fontSize="14px" css={{ verticalAlign: 'middle' }}>
+          <Span ml={1} color="black.700" fontSize="0.9em" css={{ verticalAlign: 'middle' }}>
             {error}
           </Span>
         </Box>
       )}
-      {hint && (
-        <Box mt="6px">
-          <Span fontSize="12px" color="black.700" css={{ verticalAlign: 'middle' }}>
-            {hint}
-          </Span>
-        </Box>
-      )}
+      {hint && <div className="mt-1 text-xs font-light text-gray-600">{hint}</div>}
     </Box>
   );
 };

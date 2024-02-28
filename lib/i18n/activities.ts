@@ -2,27 +2,47 @@ import { defineMessages, MessageDescriptor } from 'react-intl';
 
 import { ActivityTypes } from '../constants/activities';
 
-export const ActivityTimelineMessageI18n = defineMessages({
+interface TimelineMessageDescriptor extends MessageDescriptor {
+  avatar?: 'fromAccount' | 'account' | 'individual'; // Used to determine which avatar to display (default is Individual)
+  content?: 'update' | 'conversation'; // Used to determine which content card to display
+}
+
+export const ActivityTimelineMessageI18n = defineMessages<string, TimelineMessageDescriptor>({
+  COLLECTIVE_EXPENSE_CREATED: {
+    defaultMessage:
+      '<Individual></Individual> submitted expense <Expense>{expenseDescription}</Expense> to <Account></Account>',
+  },
   COLLECTIVE_EXPENSE_APPROVED: {
     defaultMessage: '<Individual></Individual> approved <Expense>{expenseDescription}</Expense>',
   },
   COLLECTIVE_EXPENSE_ERROR: {
     defaultMessage: '<FromAccount></FromAccount> expense <Expense>{expenseDescription}</Expense> payment failed',
+    avatar: 'fromAccount',
   },
   COLLECTIVE_EXPENSE_MARKED_AS_INCOMPLETE: {
     defaultMessage: '<Individual></Individual> marked <Expense>{expenseDescription}</Expense> as incomplete',
   },
+  COLLECTIVE_EXPENSE_MARKED_AS_SPAM: {
+    defaultMessage: '<Individual></Individual> marked <Expense>{expenseDescription}</Expense> as spam',
+  },
+  COLLECTIVE_EXPENSE_MARKED_AS_UNPAID: {
+    defaultMessage: '<Individual></Individual> marked <Expense>{expenseDescription}</Expense> as unpaid',
+  },
+  COLLECTIVE_EXPENSE_RE_APPROVAL_REQUESTED: {
+    defaultMessage: '<Individual></Individual> requested re-approval of <Expense>{expenseDescription}</Expense>',
+  },
   COLLECTIVE_EXPENSE_PAID: {
-    defaultMessage: '<Individual></Individual> paid <Expense>{expenseDescription}</Expense>',
+    defaultMessage:
+      '<Individual></Individual> paid <Amount></Amount> to <Payee></Payee> for <Expense>{expenseDescription}</Expense>',
   },
   COLLECTIVE_EXPENSE_REJECTED: {
     defaultMessage: '<Individual></Individual> rejected <Expense>{expenseDescription}</Expense>',
   },
   COLLECTIVE_EXPENSE_UNAPPROVED: {
-    defaultMessage: '<Individual></Individual> unapproved <Expense>{expenseDescription}</Expense>',
+    defaultMessage: '<Individual></Individual> unapproved expense <Expense>{expenseDescription}</Expense>',
   },
   COLLECTIVE_EXPENSE_UPDATED: {
-    defaultMessage: '<Individual></Individual> updated <Expense>{expenseDescription}</Expense>',
+    defaultMessage: '<Individual></Individual> updated expense <Expense>{expenseDescription}</Expense>',
   },
   EXPENSE_COMMENT_CREATED: {
     defaultMessage: '<Individual></Individual> commented on <Expense>{expenseDescription}</Expense>',
@@ -37,12 +57,57 @@ export const ActivityTimelineMessageI18n = defineMessages({
   },
   COLLECTIVE_UPDATE_PUBLISHED: {
     defaultMessage: '<Individual></Individual> published a new update on <Account></Account>',
+    content: 'update',
+  },
+  UPDATE_COMMENT_CREATED: {
+    defaultMessage: '<Individual></Individual> commented on update <Update>{updateTitle}</Update>',
   },
   ORDER_PAYMENT_FAILED: {
-    defaultMessage: '<Individual></Individual> contribution to <Account></Account> failed',
+    defaultMessage: `<Individual></Individual>'s contribution to <Account></Account> failed`,
   },
   PAYMENT_FAILED: {
-    defaultMessage: '<Individual></Individual> payment for <Order>contribution</Order> to <Account></Account> failed',
+    defaultMessage: `<Individual></Individual>'s payment for <Order>contribution</Order> to <Account></Account> failed`,
+  },
+  COLLECTIVE_MEMBER_CREATED: {
+    defaultMessage: '<FromAccount></FromAccount> joined <Account></Account> as <MemberRole></MemberRole>',
+    avatar: 'fromAccount',
+  },
+  CONTRIBUTION_REJECTED: {
+    defaultMessage:
+      // Individual not always available here (added to activity 2024-02-22), using Account as fallback
+      '<IndividualOrAccount></IndividualOrAccount> rejected contribution from <FromAccount></FromAccount>',
+  },
+  COLLECTIVE_CONVERSATION_CREATED: {
+    defaultMessage: '<Individual></Individual> started a new conversation on <Account></Account>',
+    content: 'conversation',
+  },
+  CONVERSATION_COMMENT_CREATED: {
+    defaultMessage:
+      '<Individual></Individual> commented on conversation <Conversation>{conversationTitle}</Conversation>',
+  },
+  COLLECTIVE_VIRTUAL_CARD_REQUEST_APPROVED: {
+    defaultMessage: '<Individual></Individual> approved request for virtual card to <Account></Account>',
+  },
+  COLLECTIVE_VIRTUAL_CARD_REQUEST_REJECTED: {
+    defaultMessage: '<Individual></Individual> rejected request for virtual card to <Account></Account>',
+  },
+  COLLECTIVE_VIRTUAL_CARD_ADDED: {
+    defaultMessage: '<Individual></Individual> added a new virtual card to <Account></Account>',
+  },
+  COLLECTIVE_VIRTUAL_CARD_SUSPENDED: {
+    defaultMessage: '<Individual></Individual> suspended virtual card on <Account></Account>',
+  },
+  VIRTUAL_CARD_REQUESTED: {
+    defaultMessage: '<Individual></Individual> requested a virtual card for <Account></Account> from <Host></Host>',
+  },
+  VIRTUAL_CARD_PURCHASE: {
+    defaultMessage: '<Individual></Individual> made purchase <Expense>{expenseDescription}</Expense> with virtual card',
+  },
+  SUBSCRIPTION_CANCELED: {
+    defaultMessage: '<Individual></Individual> canceled recurring contribution <Order></Order>',
+  },
+  ORDER_PENDING_CONTRIBUTION_NEW: {
+    defaultMessage: '<Individual></Individual> created new pending <Order>contribution</Order> to <Account></Account>',
   },
 });
 
@@ -87,20 +152,17 @@ export const ActivityDescriptionI18n = defineMessages({
   COLLECTIVE_COMMENT_CREATED: {
     defaultMessage: 'New comment on <CommentEntity></CommentEntity>',
   },
-  // TODO: Link update
   UPDATE_COMMENT_CREATED: {
-    defaultMessage: 'New comment on update',
+    defaultMessage: 'New comment on update <Update>{updateTitle}</Update>',
   },
   EXPENSE_COMMENT_CREATED: {
     defaultMessage: 'New comment on expense <Expense>{expenseDescription}</Expense>',
   },
-  // TODO: Link conversation
   CONVERSATION_COMMENT_CREATED: {
-    defaultMessage: 'New comment on conversation',
+    defaultMessage: 'New comment on conversation <Conversation>{conversationTitle}</Conversation>',
   },
-  // TODO Link conversation
   COLLECTIVE_CONVERSATION_CREATED: {
-    defaultMessage: 'New conversation started on <Account></Account>',
+    defaultMessage: 'New conversation <Conversation>{conversationTitle}</Conversation> started on <Account></Account>',
   },
   // Expenses
   COLLECTIVE_EXPENSE_CREATED: {
@@ -151,6 +213,9 @@ export const ActivityDescriptionI18n = defineMessages({
   },
   COLLECTIVE_EXPENSE_ERROR: {
     defaultMessage: 'Expense <Expense>{expenseDescription}</Expense> payment failed',
+  },
+  COLLECTIVE_EXPENSE_RE_APPROVAL_REQUESTED: {
+    defaultMessage: 'Requested re-approval of <Expense>{expenseDescription}</Expense>',
   },
   COLLECTIVE_EXPENSE_INVITE_DRAFTED: {
     defaultMessage: 'Invited someone to submit expense <Expense>{expenseDescription}</Expense> to <Account></Account>',
@@ -265,7 +330,7 @@ export const ActivityDescriptionI18n = defineMessages({
   },
   ORDER_PENDING_CONTRIBUTION_REMINDER: {
     defaultMessage:
-      'Sent reminder to <FromAccount></FromAccount> about <Order>contribution</Order> to <Account></Account>',
+      'Sent reminder to <FromAccount></FromAccount> about pending <Order>contribution</Order> to <Account></Account>',
   },
   BACKYOURSTACK_DISPATCH_CONFIRMED: {
     defaultMessage: 'BackYourStack dispatch confirmed for <Account></Account>',
@@ -412,6 +477,10 @@ export const ActivityTypeI18n: ActivityTranslations = defineMessages({
   COLLECTIVE_EXPENSE_REJECTED: {
     id: 'Expense.Activity.Rejected',
     defaultMessage: 'Expense rejected',
+  },
+  COLLECTIVE_EXPENSE_RE_APPROVAL_REQUESTED: {
+    id: 'Expense.Activity.ReApprovalRequested',
+    defaultMessage: 'Re-approval requested',
   },
   COLLECTIVE_EXPENSE_APPROVED: {
     id: 'Expense.Activity.Approved',

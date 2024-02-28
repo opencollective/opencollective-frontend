@@ -8,6 +8,8 @@ import { isOCError } from '../lib/errors';
 import { formatFormErrorMessage } from '../lib/form-utils';
 
 import Container from './Container';
+import { getInputAttributesFromZodSchema, getSchemaFromFormik } from './FormikZod';
+import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';
 import { P } from './Text';
 
@@ -17,13 +19,14 @@ import { P } from './Text';
  */
 const StyledInputFormikField = ({
   name,
-  children,
+  children = null,
   validate = undefined,
   isFastField = false,
   flex = undefined,
   width = undefined,
   display = undefined,
   flexGrow = undefined,
+  placeholder = undefined,
   ...props
 }) => {
   const intl = useIntl();
@@ -33,28 +36,37 @@ const StyledInputFormikField = ({
     <FieldComponent name={name} validate={validate}>
       {({ field, form, meta }) => {
         const showError = Boolean(meta.error && (meta.touched || form.submitCount));
+        const zodSchema = getSchemaFromFormik(form);
+        const fieldAttributes = {
+          ...(zodSchema ? getInputAttributesFromZodSchema(zodSchema, name) : null),
+          ...pickBy(
+            {
+              ...field,
+              name: name || htmlFor,
+              id: htmlFor,
+              type: props.inputType,
+              disabled: props.disabled,
+              required: props.required,
+              error: showError,
+              placeholder,
+            },
+            value => value !== undefined,
+          ),
+        };
+
         return (
           <Container flex={flex} width={width} display={display} flexGrow={flexGrow}>
-            <StyledInputField error={Boolean(meta.error)} {...props} name={name} htmlFor={htmlFor}>
+            <StyledInputField
+              error={Boolean(meta.error)}
+              {...props}
+              htmlFor={htmlFor}
+              name={fieldAttributes.name}
+              required={fieldAttributes.required}
+            >
               <React.Fragment>
-                {children({
-                  form,
-                  meta,
-                  field: pickBy(
-                    {
-                      ...field,
-                      name: name || htmlFor,
-                      id: htmlFor,
-                      type: props.inputType,
-                      disabled: props.disabled,
-                      required: props.required,
-                      error: showError,
-                    },
-                    value => value !== undefined,
-                  ),
-                })}
+                {children ? children({ form, meta, field: fieldAttributes }) : <StyledInput {...fieldAttributes} />}
                 {showError && (
-                  <P display="block" color="red.500" pt={2} fontSize="10px">
+                  <P display="block" color="red.500" pt={2} fontSize="11px">
                     {isOCError(meta.error) ? formatFormErrorMessage(intl, meta.error) : meta.error}
                   </P>
                 )}
@@ -77,6 +89,7 @@ StyledInputFormikField.propTypes = {
   id: PropTypes.string,
   /** Passed to input as `type`. Adapts layout for checkboxes */
   inputType: PropTypes.string,
+  placeholder: PropTypes.string,
   /** Show disabled state for field */
   disabled: PropTypes.bool,
   /** If set to false, the field will be marked as optional */

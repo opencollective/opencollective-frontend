@@ -1,12 +1,12 @@
 import React from 'react';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { truncate, uniqBy } from 'lodash';
 import { useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { formatCurrency } from '../../lib/currency-utils';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { stripHTML } from '../../lib/html';
 
 import ConfirmationModal from '../ConfirmationModal';
@@ -24,7 +24,7 @@ import { useToast } from '../ui/useToast';
 import { banAccountsMutation } from './BanAccounts';
 import BanAccountsSummary from './BanAccountsSummary';
 
-export const searchQuery = gql`
+const searchQuery = gql`
   query BanAccountSearch($term: String!, $offset: Int) {
     accounts(
       searchTerm: $term
@@ -143,7 +143,9 @@ const BanAccountsWithSearch = () => {
 
   return (
     <div>
-      <SearchBar placeholder="Search accounts" onSubmit={setSearchTerm} disabled={loading || submitting} />
+      <Box width="276px">
+        <SearchBar placeholder="Search accounts" onSubmit={setSearchTerm} disabled={loading || submitting} />
+      </Box>
 
       {error ? (
         <MessageBoxGraphqlError error={error} />
@@ -262,7 +264,7 @@ const BanAccountsWithSearch = () => {
           isDanger
           continueLabel="Ban accounts"
           header="Ban accounts"
-          cancelHandler={() => setDryRunData(null)}
+          onClose={() => setDryRunData(null)}
           disableSubmit={!dryRunData.isAllowed}
           continueHandler={async () => {
             try {
