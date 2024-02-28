@@ -14,10 +14,10 @@ const Message = ({ params }) => (
       className="font-semibold"
       rel="noreferrer"
     >
-      please read the Open Collective official announcement
+      please read the official announcement from Open Collective
       <ArrowUpRight className="inline-block align-baseline" size={15} />
     </a>
-    . We will continue adding more information to this announcement as the situation unfolds. We want to help,{' '}
+    . We will continue to add more information to this announcement as the situation unfolds. We want to help;{' '}
     <a
       href={`https://coda.io/form/Transition-Support_dzhPGdiqXVw?${params}`}
       target="_blank"
