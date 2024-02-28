@@ -30,31 +30,31 @@ import Link from '../../../Link';
 import LinkCollective from '../../../LinkCollective';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
-import StyledButton from '../../../StyledButton';
 import StyledHr from '../../../StyledHr';
 import StyledInput from '../../../StyledInput';
 import StyledInputAmount from '../../../StyledInputAmount';
 import StyledInputFormikField from '../../../StyledInputFormikField';
 import StyledInputPercentage from '../../../StyledInputPercentage';
 import StyledLink from '../../../StyledLink';
-import StyledModal, { CollectiveModalHeader, ModalBody, ModalFooter } from '../../../StyledModal';
+import StyledModal, { CollectiveModalHeader, ModalBody } from '../../../StyledModal';
 import StyledSelect from '../../../StyledSelect';
 import StyledTooltip from '../../../StyledTooltip';
 import { TaxesFormikFields, validateTaxInput } from '../../../taxes/TaxesFormikFields';
 import { P, Span } from '../../../Text';
 import { TwoFactorAuthRequiredMessage } from '../../../TwoFactorAuthRequiredMessage';
+import { Button } from '../../../ui/Button';
 
 const AddFundsModalContainer = styled(StyledModal)`
   width: 100%;
   max-width: 576px;
-  padding: 24px 30px;
+  padding: 24px 24px 16px 32px;
   ${props =>
     props.showSuccessModal &&
     css`
       background-image: url('/static/images/platform-tip-background.svg');
       background-repeat: no-repeat;
       background-size: 100%;
-      background-position: left 0 bottom 95px;
+      background-position: left 0 bottom 56px;
       @media (max-width: 30em) {
         background-position: left 0 top 0;
       }
@@ -336,7 +336,7 @@ const AddFundsModal = ({ collective, ...props }) => {
   const host = account?.isHost && !account.host ? account : account?.host;
   const applicableTax = getApplicableTaxType(collective, host);
 
-  const [submitAddFunds, { error: fundError }] = useMutation(addFundsMutation, {
+  const [submitAddFunds, { error: fundError, loading: isLoading }] = useMutation(addFundsMutation, {
     context: API_V2_CONTEXT,
     refetchQueries: [
       {
@@ -392,8 +392,25 @@ const AddFundsModal = ({ collective, ...props }) => {
   };
 
   return (
-    <AddFundsModalContainer {...props} trapFocus showSuccessModal={fundDetails.showSuccessModal} onClose={handleClose}>
-      <CollectiveModalHeader collective={collective} onClick={handleClose} />
+    <AddFundsModalContainer
+      {...props}
+      trapFocus
+      showSuccessModal={fundDetails.showSuccessModal}
+      onClose={handleClose}
+      className="sm:max-h-[90vh]"
+    >
+      <CollectiveModalHeader
+        collective={collective}
+        customText={
+          <FormattedMessage
+            id="AddFundsModal.Header"
+            defaultMessage="Add Funds to {collectiveName}"
+            values={{ collectiveName: collective.name }}
+          />
+        }
+        className="mb-4"
+        onClose={handleClose}
+      />
       {loading ? (
         <LoadingPlaceholder mt={2} height={200} />
       ) : require2FAForAdmins(host) && !LoggedInUser.hasTwoFactorAuth ? (
@@ -457,19 +474,16 @@ const AddFundsModal = ({ collective, ...props }) => {
             const hostFeePercent = isNaN(values.hostFeePercent) ? defaultHostFeePercent : values.hostFeePercent;
             const taxAmount = !values.tax?.rate ? 0 : Math.round(values.amount - values.amount / (1 + values.tax.rate));
             const hostFee = Math.round((values.amount - taxAmount) * (hostFeePercent / 100));
+            const loading = isLoading || isSubmitting;
 
             if (!fundDetails.showSuccessModal) {
               return (
-                <Form data-cy="add-funds-form">
-                  <h3>
-                    <FormattedMessage id="AddFundsModal.SubHeading" defaultMessage="Add Funds to the Collective" />
-                  </h3>
-                  <ModalBody>
+                <Form data-cy="add-funds-form" className="flex h-full  flex-col overflow-y-hidden">
+                  <div className="w-full flex-grow overflow-y-auto pb-4">
                     <Field
                       name="fromAccount"
                       htmlFor="addFunds-fromAccount"
                       label={<FormattedMessage id="AddFundsModal.source" defaultMessage="Source" />}
-                      mt={3}
                     >
                       {({ form, field }) => (
                         <CollectivePickerAsync
@@ -521,19 +535,10 @@ const AddFundsModal = ({ collective, ...props }) => {
                       name="processedAt"
                       htmlFor="addFunds-processedAt"
                       inputType="date"
-                      label={
-                        <span>
-                          <FormattedMessage defaultMessage="Effective Date" />
-                          {` `}
-                          <StyledTooltip
-                            content={() => (
-                              <FormattedMessage defaultMessage="The date funds were cleared on your bank, Wise, PayPal, Stripe or any other external account holding these funds." />
-                            )}
-                          >
-                            <InfoCircle size={16} />
-                          </StyledTooltip>
-                        </span>
+                      hint={
+                        <FormattedMessage defaultMessage="The date funds were cleared on your bank, Wise, PayPal, Stripe or any other external account holding these funds." />
                       }
+                      label={<FormattedMessage defaultMessage="Effective Date" />}
                       mt={3}
                     >
                       {({ field }) => <StyledInput data-cy="add-funds-processedAt" {...field} />}
@@ -568,19 +573,10 @@ const AddFundsModal = ({ collective, ...props }) => {
                     <Field
                       name="memo"
                       htmlFor="addFunds-memo"
-                      label={
-                        <span>
-                          <FormattedMessage defaultMessage="Memo" />
-                          {` `}
-                          <StyledTooltip
-                            content={() => (
-                              <FormattedMessage defaultMessage="This is a private note that will only be visible to the host." />
-                            )}
-                          >
-                            <InfoCircle size={16} />
-                          </StyledTooltip>
-                        </span>
+                      hint={
+                        <FormattedMessage defaultMessage="This is a private note that will only be visible to the host." />
                       }
+                      label={<FormattedMessage defaultMessage="Memo" />}
                       required={false}
                       mt={3}
                     >
@@ -745,25 +741,23 @@ const AddFundsModal = ({ collective, ...props }) => {
                       />
                     </P>
                     {fundError && <MessageBoxGraphqlError error={fundError} mt={3} fontSize="13px" />}
-                  </ModalBody>
-                  <ModalFooter isFullWidth>
-                    <Flex justifyContent="center" flexWrap="wrap">
-                      <StyledButton
-                        type="submit"
-                        data-cy="add-funds-submit-btn"
-                        buttonStyle="primary"
-                        mx={2}
-                        mb={1}
-                        minWidth={120}
-                        loading={isSubmitting}
-                      >
-                        <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
-                      </StyledButton>
-                      <StyledButton mx={2} mb={1} minWidth={100} onClick={handleClose} type="button">
-                        <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-                      </StyledButton>
-                    </Flex>
-                  </ModalFooter>
+                  </div>
+                  <div className="border-t-1 flex justify-center gap-4 border-t border-solid border-t-slate-100 pt-4">
+                    <Button
+                      data-cy="add-funds-submit-btn"
+                      type="submit"
+                      buttonStyle="primary"
+                      mx={2}
+                      mb={1}
+                      minWidth={120}
+                      loading={loading}
+                    >
+                      <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
+                    </Button>
+                    <Button mx={2} mb={1} minWidth={100} onClick={handleClose} type="button" variant="outline">
+                      <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
+                    </Button>
+                  </div>
                 </Form>
               );
             } else {
@@ -869,26 +863,22 @@ const AddFundsModal = ({ collective, ...props }) => {
                       </Container>
                     </Container>
                   </ModalBody>
-                  <ModalFooter isFullWidth>
-                    <Flex justifyContent="center" flexWrap="wrap">
-                      <StyledButton
-                        type="submit"
-                        data-cy="add-platform-tip-btn"
-                        buttonStyle="primary"
-                        mx={2}
-                        mb={1}
-                        minWidth={120}
-                        loading={isSubmitting}
-                      >
-                        <FormattedMessage id="Finish" defaultMessage="Finish" />
-                      </StyledButton>
-                      {!fundDetails.showSuccessModal && (
-                        <StyledButton mx={2} mb={1} minWidth={100} onClick={handleClose} type="button">
-                          <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-                        </StyledButton>
-                      )}
-                    </Flex>
-                  </ModalFooter>
+                  <div className="flex justify-center gap-4">
+                    <Button
+                      type="submit"
+                      data-cy="add-platform-tip-btn"
+                      buttonStyle="primary"
+                      minWidth={120}
+                      loading={loading}
+                    >
+                      <FormattedMessage id="Finish" defaultMessage="Finish" />
+                    </Button>
+                    {!fundDetails.showSuccessModal && (
+                      <Button mx={2} mb={1} minWidth={100} onClick={handleClose} type="button">
+                        <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
+                      </Button>
+                    )}
+                  </div>
                 </Form>
               );
             }
@@ -904,6 +894,7 @@ AddFundsModal.propTypes = {
     id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     hostFeePercent: PropTypes.number,
     slug: PropTypes.string,
+    name: PropTypes.string,
     policies: PropTypes.object,
   }).isRequired,
   onClose: PropTypes.func,
