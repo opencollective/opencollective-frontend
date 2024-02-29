@@ -177,6 +177,9 @@
       'rlig' 1,
       'calt' 1;
   }
+  #__next {
+    @apply bg-background;
+  }
 }
 
 html {
