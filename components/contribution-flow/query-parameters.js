@@ -25,7 +25,7 @@ const ContributionFlowUrlParametersConfig = {
   quantity: { type: 'integer' },
   /**
    * The contribution interval (must be supported by the selected tier, if any)
-   * @example 'month'
+   * @example month
    */
   interval: { type: 'interval' },
   /**
@@ -58,7 +58,7 @@ const ContributionFlowUrlParametersConfig = {
   hideCreditCardPostalCode: { type: 'boolean', static: true },
   /**
    * To disable specific payment method types
-   * @example "MANUAL", "BANK_TRANSFER", "PAYMENT" (for PayPal)
+   * @example MANUAL,BANK_TRANSFER,PAYMENT
    */
   disabledPaymentMethodTypes: { type: 'stringArray', static: true },
   // -- Success
