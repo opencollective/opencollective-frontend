@@ -23,6 +23,7 @@ import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import { P } from '../Text';
+import { useToast } from '../ui/useToast';
 
 import { CommentMetadata } from './CommentMetadata';
 
@@ -169,6 +170,7 @@ const CommentActions = ({
 }) => {
   const intl = useIntl();
   const { copy } = useClipboard();
+  const { toast } = useToast();
   const [isDeleting, setDeleting] = React.useState(null);
   const [showAdminActions, setShowAdminActions] = React.useState(false);
   const [refElement, setRefElement] = React.useState(null);
@@ -183,6 +185,7 @@ const CommentActions = ({
     const [baseLink] = window.location.href.split('#');
     const linkWithAnchorHash = `${baseLink}#${anchorHash}`;
     copy(linkWithAnchorHash);
+    toast({ variant: 'success', message: intl.formatMessage({ id: 'Clipboard.Copied', defaultMessage: 'Copied!' }) });
   };
 
   useGlobalBlur(state?.elements.popper, outside => {
