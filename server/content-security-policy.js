@@ -64,6 +64,7 @@ const COMMON_DIRECTIVES = {
     'https://hcaptcha.com',
     'https://js.hcaptcha.com',
     'https://*.hcaptcha.com',
+    'https://challenges.cloudflare.com',
     'https://www.google.com',
     'https://plausible.io',
   ],

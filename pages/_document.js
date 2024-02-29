@@ -128,6 +128,7 @@ export default class IntlDocument extends Document {
       'WISE_ENVIRONMENT',
       'HCAPTCHA_SITEKEY',
       'OCF_DUPLICATE_FLOW',
+      'TURNSTILE_SITEKEY',
       'CAPTCHA_ENABLED',
       'CAPTCHA_PROVIDER',
       'DISABLE_MOCK_UPLOADS',
