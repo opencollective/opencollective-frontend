@@ -12,7 +12,7 @@ import { background, BackgroundProps, LayoutProps, margin, overflow, space, Spac
 
 import { Dialog, DialogContent } from './ui/Dialog';
 import Avatar from './Avatar';
-import Container from './Container';
+import Container, { ContainerProps } from './Container';
 import { Flex } from './Grid';
 import StyledLinkButton from './StyledLinkButton';
 import { P, Span } from './Text';
@@ -99,7 +99,7 @@ type ModalHeaderProps = {
   children?: React.ReactNode;
   onClose?: () => void;
   hideCloseIcon?: boolean;
-};
+} & Pick<ContainerProps, 'mb'>;
 
 export const ModalHeader = ({ children, onClose, hideCloseIcon, ...props }: ModalHeaderProps) => (
   <Header {...props}>

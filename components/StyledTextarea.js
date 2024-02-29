@@ -138,6 +138,7 @@ export default class StyledTextarea extends React.PureComponent {
         ref={this.textareaRef}
         as="textarea"
         resize={resize || (autoSize ? 'none' : 'vertical')}
+        width="100%"
         {...props}
         onChange={this.onChange}
       />
