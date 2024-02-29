@@ -10,7 +10,7 @@ import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 import { getWebsiteUrl } from '../../../../lib/utils';
 
 import ConfirmationModal from '../../../ConfirmationModal';
-import { Box, Flex } from '../../../Grid';
+import { Box } from '../../../Grid';
 import { I18nSupportLink } from '../../../I18nFormatters';
 import TransferwiseIcon from '../../../icons/TransferwiseIcon';
 import MessageBox from '../../../MessageBox';
@@ -87,6 +87,7 @@ const ScheduledExpensesBanner = ({ hostSlug, onSubmit, secondButton }) => {
           />
         ),
       });
+      await scheduledExpenses.refetch();
       onSubmit?.();
     } catch (e) {
       const message = e?.response
@@ -110,7 +111,7 @@ const ScheduledExpensesBanner = ({ hostSlug, onSubmit, secondButton }) => {
   return (
     <React.Fragment>
       <MessageBox type="success">
-        <Flex alignItems="baseline" flexDirection={['column', 'row']} gap="8px">
+        <div className="flex flex-col gap-2 align-baseline md:flex-row md:justify-between">
           <Box>
             <TransferwiseIcon size="1em" color="#25B869" mr={2} />
             <FormattedMessage
@@ -122,7 +123,7 @@ const ScheduledExpensesBanner = ({ hostSlug, onSubmit, secondButton }) => {
               }}
             />
           </Box>
-          <Flex gap="8px">
+          <div className="flex justify-between gap-2">
             {secondButton}
             <StyledButton
               buttonSize="tiny"
@@ -131,8 +132,8 @@ const ScheduledExpensesBanner = ({ hostSlug, onSubmit, secondButton }) => {
             >
               <FormattedMessage id="expenses.scheduled.paybatch" defaultMessage="Pay Batch" />
             </StyledButton>
-          </Flex>
-        </Flex>
+          </div>
+        </div>
       </MessageBox>
       {showConfirmationModal && (
         <ConfirmationModal
@@ -153,6 +154,7 @@ const ScheduledExpensesBanner = ({ hostSlug, onSubmit, secondButton }) => {
             />
           }
           continueHandler={handlePayBatch}
+          overlayClassName="z-[1000]"
         />
       )}
     </React.Fragment>
