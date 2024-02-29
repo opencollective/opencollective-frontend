@@ -2,7 +2,6 @@
  * A map of keys used for preview features.
  */
 export enum PREVIEW_FEATURE_KEYS {
-  EXPENSE_CATEGORIZATION = 'EXPENSE_CATEGORIZATION',
   DYNAMIC_TOP_BAR = 'DYNAMIC_TOP_BAR',
   COLLECTIVE_OVERVIEW = 'COLLECTIVE_OVERVIEW',
 }
@@ -27,14 +26,6 @@ export const previewFeatures: PreviewFeature[] = [
     key: PREVIEW_FEATURE_KEYS.DYNAMIC_TOP_BAR,
     title: 'Dynamic top bar',
     publicBeta: false,
-  },
-  {
-    key: PREVIEW_FEATURE_KEYS.EXPENSE_CATEGORIZATION,
-    title: 'Expense categorization',
-    description: 'Facilitate your accounting by categorizing your expenses according to a chart of accounts.',
-    publicBeta: false,
-    closedBetaAccessFor: ['foundation', 'opensource', 'europe'],
-    alwaysEnableInDev: true,
   },
   {
     key: PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW,
