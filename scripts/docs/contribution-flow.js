@@ -15,7 +15,10 @@ const data = jsdoc.explainSync({
 
 const CONFIGS = ['ContributionFlowUrlParametersConfig', 'EmbedContributionFlowUrlParametersConfig'];
 
-const TYPE_LABELS = { stringArray: 'comma-separated list' };
+const TYPE_LABELS = {
+  stringArray: 'comma-separated list',
+  interval: '"month" or "year"',
+};
 
 // Parse info
 let rows = [];
