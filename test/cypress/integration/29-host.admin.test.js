@@ -29,7 +29,6 @@ describe('host dashboard', () => {
       cy.wait(300);
       cy.get('button[type="submit"]').click();
       cy.contains('Cavies United has been created!');
-      cy.login({ redirect: '/brusselstogetherasbl/admin' });
       cy.login({ redirect: '/dashboard/brusselstogetherasbl/host-applications' });
       cy.get('[data-cy="menu-item-Collectives"]').click();
       cy.get('[data-cy="menu-item-host-applications"]').click();
