@@ -686,6 +686,10 @@ function CreatePayoutMethodForm(props: CreatePayoutMethodFormProps) {
     await formik.submitForm();
   }, [formik]);
 
+  const payoutMethod = React.useMemo(
+    () => ({ type: formik.values.type, data: formik.values.data }),
+    [formik.values.type, formik.values.data],
+  );
   return (
     <FormikProvider value={formik}>
       <div>
@@ -721,14 +725,7 @@ function CreatePayoutMethodForm(props: CreatePayoutMethodFormProps) {
           )}
         </StyledInputFormikField>
 
-        {formik.values.type && (
-          <PayoutMethodForm
-            required
-            alwaysSave
-            payoutMethod={{ type: formik.values.type, data: formik.values.data }}
-            host={props.host}
-          />
-        )}
+        {formik.values.type && <PayoutMethodForm required alwaysSave payoutMethod={payoutMethod} host={props.host} />}
       </div>
       <Button className="mt-2" onClick={onSubmit}>
         Save

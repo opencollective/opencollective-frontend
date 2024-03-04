@@ -182,6 +182,7 @@ function ExpenseDetailsForm(props: ExpenseDetailsFormProps) {
               <hr className="flex-grow border-neutral-300" />
             </div>
             <StyledCheckbox
+              name="hasTax"
               checked={props.form.values.hasTax}
               onChange={({ checked }) => props.form.setFieldValue('hasTax', checked)}
               label={

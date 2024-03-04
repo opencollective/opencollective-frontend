@@ -100,6 +100,7 @@ function PickExpenseTypeForm(props: PickExpenseTypeFormProps) {
         (props.form.options.hostExpensePolicy || props.form.options.collectiveExpensePolicy) && (
           <div className="mt-3">
             <StyledCheckbox
+              name="acknowledgedExpensePolicy"
               required
               checked={props.form.values.acknowledgedExpensePolicy}
               onChange={({ checked }) => props.form.setFieldValue('acknowledgedExpensePolicy', checked)}
