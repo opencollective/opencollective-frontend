@@ -163,7 +163,7 @@ describe('edit user collective', () => {
     const userSlug = randomSlug();
     cy.signup({
       user: { name: userSlug, settings: { features: { twoFactorAuth: true } } },
-      redirect: `/${userSlug}/admin`,
+      redirect: `/dashboard/${userSlug}/info`,
     });
 
     cy.getByDataCy('menu-item-Settings').click();

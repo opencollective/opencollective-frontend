@@ -136,7 +136,7 @@ const AccountSettings = ({ account, section }) => {
       const currentSlug = router.query.slug;
       if (currentSlug !== updatedCollective.slug) {
         router.replace({
-          pathname: `/${updatedCollective.slug}/admin`,
+          pathname: `/dashboard/${updatedCollective.slug}`,
           query: {
             ...router.query,
           },
