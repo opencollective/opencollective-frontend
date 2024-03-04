@@ -115,7 +115,7 @@ function ExpenseInfoForm(props: ExpenseInfoFormProps) {
               </h2>
 
               <div>
-                <HTMLContent content={selectedCategory.instructions} />
+                <HTMLContent openLinksInNewTab content={selectedCategory.instructions} />
               </div>
             </React.Fragment>
           )}

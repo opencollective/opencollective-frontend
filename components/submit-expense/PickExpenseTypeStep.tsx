@@ -80,7 +80,7 @@ function PickExpenseTypeForm(props: PickExpenseTypeFormProps) {
             <FormattedMessage defaultMessage="Host Instructions" />
           </h2>
           <div>
-            <HTMLContent content={props.form.options.hostExpensePolicy} />
+            <HTMLContent openLinksInNewTab content={props.form.options.hostExpensePolicy} />
           </div>
         </React.Fragment>
       )}
@@ -91,14 +91,14 @@ function PickExpenseTypeForm(props: PickExpenseTypeFormProps) {
             <FormattedMessage defaultMessage="Collective Instructions" />
           </h2>
           <div>
-            <HTMLContent content={props.form.options.collectiveExpensePolicy} />
+            <HTMLContent openLinksInNewTab content={props.form.options.collectiveExpensePolicy} />
           </div>
         </React.Fragment>
       )}
 
       {props.form.values.expenseTypeOption &&
         (props.form.options.hostExpensePolicy || props.form.options.collectiveExpensePolicy) && (
-          <div className="mt-3">
+          <div className="my-3">
             <StyledCheckbox
               name="acknowledgedExpensePolicy"
               required

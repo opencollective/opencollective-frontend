@@ -406,7 +406,7 @@ async function buildFormOptions(
       });
     }
 
-    if (payeeHost && payeeHost.id === host.id) {
+    if (payeeHost && host && payeeHost.id === host.id) {
       options.supportedPayoutMethods = [PayoutMethodType.ACCOUNT_BALANCE];
     } else {
       options.supportedPayoutMethods = options.supportedPayoutMethods.filter(
