@@ -46,6 +46,7 @@ interface BaseMetricProps {
   expanded?: boolean;
   currency?: Currency;
   isSnapshot?: boolean;
+  hide?: boolean;
 }
 
 type MetricDivProps = BaseMetricProps & Omit<React.ComponentPropsWithoutRef<'div'>, 'onClick'>;

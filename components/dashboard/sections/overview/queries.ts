@@ -261,6 +261,7 @@ export const overviewMetricsQuery = gql`
   ) {
     account(slug: $slug) {
       id
+      isActive
       ...AccountHoverCardFields
       balance: stats @include(if: $includeBalance) {
         id
