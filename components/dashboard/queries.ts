@@ -13,6 +13,7 @@ export const adminPanelQuery = gql`
       type
       settings
       isArchived
+      isActive
       isIncognito
       imageUrl(height: 256)
       pendingExpenses: expenses(status: PENDING, direction: RECEIVED, includeChildrenExpenses: true, limit: 0) {
