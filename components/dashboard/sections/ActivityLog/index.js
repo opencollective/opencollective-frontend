@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { isEmpty, omit, omitBy } from 'lodash';
@@ -207,7 +207,7 @@ const getChangesThatRequireUpdate = (account, queryParams) => {
 const ActivityLog = ({ accountSlug }) => {
   const router = useRouter();
   const [selectedActivity, setSelectedActivity] = React.useState(null);
-  const routerQuery = omit(router.query, ['slug', 'section']);
+  const routerQuery = useMemo(() => omit(router.query, ['slug', 'section']), [router.query]);
   const offset = parseInt(routerQuery.offset) || 0;
   const queryVariables = getQueryVariables(accountSlug, router);
   const { data, loading, error } = useQuery(activityLogQuery, {
@@ -216,13 +216,16 @@ const ActivityLog = ({ accountSlug }) => {
     fetchPolicy: 'network-only',
   });
 
-  const handleUpdateFilters = queryParams => {
-    const pathname = router.asPath.split('?')[0];
-    return router.push({
-      pathname,
-      query: omitBy({ ...routerQuery, ...queryParams }, value => !value),
-    });
-  };
+  const handleUpdateFilters = useCallback(
+    queryParams => {
+      const pathname = router.asPath.split('?')[0];
+      return router.push({
+        pathname,
+        query: omitBy({ ...routerQuery, ...queryParams }, value => !value),
+      });
+    },
+    [routerQuery, router],
+  );
 
   // Reset type if not supported by the account
   React.useEffect(() => {
@@ -230,7 +233,7 @@ const ActivityLog = ({ accountSlug }) => {
     if (!isEmpty(changesThatRequireUpdate)) {
       handleUpdateFilters({ ...routerQuery, ...changesThatRequireUpdate });
     }
-  }, [data?.account, routerQuery]);
+  }, [data?.account, routerQuery, handleUpdateFilters]);
 
   return (
     <Box mt={3} fontSize="13px">
