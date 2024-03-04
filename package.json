@@ -135,7 +135,7 @@
     "uuid": "9.0.1",
     "validator": "13.11.0",
     "webpack-manifest-plugin": "5.0.0",
-    "winston": "3.11.0",
+    "winston": "3.12.0",
     "zod": "3.22.4"
   },
   "resolutions": {
