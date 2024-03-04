@@ -28,19 +28,19 @@ import { Box, Flex } from '../../../Grid';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
-import StyledButton from '../../../StyledButton';
 import StyledHr from '../../../StyledHr';
 import StyledInput from '../../../StyledInput';
 import StyledInputAmount from '../../../StyledInputAmount';
 import StyledInputFormikField from '../../../StyledInputFormikField';
 import StyledInputPercentage from '../../../StyledInputPercentage';
-import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../../StyledModal';
+import StyledModal, { ModalHeader } from '../../../StyledModal';
 import StyledSelect from '../../../StyledSelect';
 import StyledTextarea from '../../../StyledTextarea';
 import StyledTooltip from '../../../StyledTooltip';
 import { TaxesFormikFields } from '../../../taxes/TaxesFormikFields';
 import { P, Span } from '../../../Text';
 import { TwoFactorAuthRequiredMessage } from '../../../TwoFactorAuthRequiredMessage';
+import { Button } from '../../../ui/Button';
 import { useToast } from '../../../ui/useToast';
 import { vendorFieldFragment } from '../../../vendors/queries';
 
@@ -383,8 +383,8 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
 
   const amounts = getAmountsFromValues(values);
   return (
-    <Form data-cy="create-pending-contribution-form">
-      <ModalBody mt="24px">
+    <Form data-cy="create-pending-contribution-form" className="flex h-full flex-col overflow-y-hidden">
+      <div className="w-full flex-grow overflow-y-auto py-4">
         <Field
           name="toAccount"
           htmlFor="CreatePendingContribution-toAccount"
@@ -794,29 +794,19 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
         )}
 
         {error && <MessageBoxGraphqlError error={error} mt={3} fontSize="13px" />}
-      </ModalBody>
-      <ModalFooter>
-        <Flex justifyContent="space-between" flexWrap="wrap">
-          <StyledButton mx={2} mb={1} minWidth={100} onClick={onClose} type="button">
-            <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-          </StyledButton>
-          <StyledButton
-            type="submit"
-            data-cy="create-pending-contribution-submit-btn"
-            buttonStyle="primary"
-            mx={2}
-            mb={1}
-            minWidth={120}
-            loading={isSubmitting}
-          >
-            {edit ? (
-              <FormattedMessage defaultMessage="Edit pending contribution" />
-            ) : (
-              <FormattedMessage defaultMessage="Create pending contribution" />
-            )}
-          </StyledButton>
-        </Flex>
-      </ModalFooter>
+      </div>
+      <div className="border-t-1 flex justify-center gap-4 border-t border-solid border-t-slate-100 pt-4">
+        <Button onClick={onClose} variant="outline" type="button">
+          <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
+        </Button>
+        <Button type="submit" data-cy="create-pending-contribution-submit-btn" loading={isSubmitting}>
+          {edit ? (
+            <FormattedMessage defaultMessage="Edit pending contribution" />
+          ) : (
+            <FormattedMessage defaultMessage="Create pending contribution" />
+          )}
+        </Button>
+      </div>
     </Form>
   );
 };
@@ -868,7 +858,12 @@ const CreatePendingContributionModal = ({ hostSlug, edit, ...props }: CreatePend
     : { hostFeePercent: host?.hostFeePercent || 0 };
 
   return (
-    <CreatePendingContributionModalContainer {...props} trapFocus onClose={handleClose}>
+    <CreatePendingContributionModalContainer
+      className="overflow-y-hidden sm:max-h-[90vh]"
+      {...props}
+      trapFocus
+      onClose={handleClose}
+    >
       <ModalHeader>
         {edit ? (
           <FormattedMessage defaultMessage="Edit Pending Contribution #{id}" values={{ id: edit.legacyId }} />
