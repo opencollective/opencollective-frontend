@@ -6,7 +6,7 @@ describe('Contribution Flow: Guest contributions', () => {
     cy.clearInbox();
   });
 
-  it('Fails to make a contribution as an existing VERIFIED user', () => {
+  it('Makes a contribution as an existing user', () => {
     cy.visit('/apex/donate');
     cy.contains('[data-cy="amount-picker"] button', 'Other').click();
     cy.get('input[name="custom-amount"]').type('{selectall}400.42');
@@ -21,7 +21,13 @@ describe('Contribution Flow: Guest contributions', () => {
     cy.useAnyPaymentMethod();
     cy.contains('button[data-cy="cf-next-step"]', 'Contribute $400.42').click();
 
-    cy.contains('There is already an account associated with this email, please sign in');
+    cy.contains('[data-cy="order-success"]', 'You are now supporting APEX.');
+    cy.contains('[data-cy="order-success"]', '$400.42 USD');
+
+    // Open email
+    const expectedEmailSubject = 'Thank you for your contribution to APEX';
+    cy.openEmail(({ subject }) => subject.includes(expectedEmailSubject));
+    cy.contains('If you need help, contact');
   });
 
   it('Joins after a single contribution', () => {
