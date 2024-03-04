@@ -1,11 +1,11 @@
 // @deprecated, use `components/ui/Dialog` instead
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Times } from '@styled-icons/fa-solid/Times';
 import propTypes from '@styled-system/prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import clsx from 'clsx';
 import { isNil, omitBy } from 'lodash';
+import { X } from 'lucide-react';
 import { useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { background, BackgroundProps, LayoutProps, margin, overflow, space, SpaceProps } from 'styled-system';
@@ -13,9 +13,7 @@ import { background, BackgroundProps, LayoutProps, margin, overflow, space, Spac
 import { Dialog, DialogContent } from './ui/Dialog';
 import Avatar from './Avatar';
 import Container from './Container';
-import { Flex } from './Grid';
 import StyledLinkButton from './StyledLinkButton';
-import { P, Span } from './Text';
 import WarnIfUnsavedChanges from './WarnIfUnsavedChanges';
 
 type ModalProps = SpaceProps & LayoutProps & BackgroundProps;
@@ -87,9 +85,9 @@ const Divider = styled.div<DividerProps>`
     `}
 `;
 
-export const CloseIcon = styled(Times)`
-  height: 12px;
-  width: 12px;
+export const CloseIcon = styled(X)`
+  height: 20px;
+  width: 20px;
   color: #76777a;
   vertical-align: middle;
   cursor: pointer;
@@ -105,11 +103,9 @@ export const ModalHeader = ({ children, onClose, hideCloseIcon, ...props }: Moda
   <Header {...props}>
     {children || <div />}
     {!hideCloseIcon && (
-      <Span style={{ alignItems: 'center', display: 'flex' }} ml={2}>
-        <StyledLinkButton type="button" onClick={onClose}>
-          <CloseIcon />
-        </StyledLinkButton>
-      </Span>
+      <StyledLinkButton className="h-7" type="button" onClick={onClose}>
+        <CloseIcon />
+      </StyledLinkButton>
     )}
   </Header>
 );
@@ -129,12 +125,10 @@ ModalHeader.displayName = 'Header';
  */
 export const CollectiveModalHeader = ({ collective, customText, ...props }) => (
   <ModalHeader {...props}>
-    <Flex alignItems="center">
-      <Avatar collective={collective} radius={40} />
-      <P fontSize="16px" lineHeight="24px" fontWeight="bold" ml={3}>
-        {customText || collective.name}
-      </P>
-    </Flex>
+    <div className="flex items-center">
+      <Avatar collective={collective} radius={32} />
+      <p className="ml-4 text-xl font-bold">{customText || collective.name}</p>
+    </div>
   </ModalHeader>
 );
 
