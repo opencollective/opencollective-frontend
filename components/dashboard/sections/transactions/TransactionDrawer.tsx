@@ -291,6 +291,14 @@ export function TransactionDrawer({
     refetchList?.();
   };
 
+  const handleDownloadInvoice = () => {
+    const params = transaction?.expense?.id
+      ? { expenseId: transaction?.expense?.id }
+      : { transactionUuid: transaction?.uuid, toCollectiveSlug: transaction?.toAccount?.slug };
+    const download = downloadInvoiceWith(params);
+    return download();
+  };
+
   const showActions =
     transaction?.kind === TransactionKind.EXPENSE ||
     (transaction?.order !== null &&
@@ -439,13 +447,7 @@ export function TransactionDrawer({
                         <FormattedMessage defaultMessage="View transactions in group" />
                       </DropdownMenuItem>
                       {showDownloadInvoiceButton && (
-                        <DropdownMenuItem
-                          onClick={downloadInvoiceWith({
-                            transactionUuid: transaction?.uuid,
-                            toCollectiveSlug: transaction?.toAccount?.slug,
-                          })}
-                          className="gap-1.5"
-                        >
+                        <DropdownMenuItem onClick={handleDownloadInvoice} className="gap-1.5">
                           <Download size={16} />
 
                           {transaction?.expense ? (
