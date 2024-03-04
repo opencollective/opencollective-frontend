@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import {
   CreateExpenseFromDashboardMutation,
@@ -17,6 +18,7 @@ import {
 import Link from '../Link';
 import { Button } from '../ui/Button';
 import { StepList } from '../ui/StepList';
+import { useToast } from '../ui/useToast';
 
 import { ExpenseFlowStep, ExpenseStepOrder, Steps } from './Steps';
 import { SubmittedExpense } from './SubmittedExpense';
@@ -33,6 +35,7 @@ const I18nMessages = defineMessages({
 });
 
 export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
+  const { toast } = useToast();
   const intl = useIntl();
   const router = useRouter();
   const formRef = React.useRef<HTMLFormElement>();
@@ -82,7 +85,11 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
               invoiceInfo: null,
               items: values.expenseItems.map(ei => ({
                 description: ei.description,
-                amountV2: { valueInCents: ei.amount.valueInCents, currency: ei.amount.currency as Currency, exchangeRate: ei.amount.exchangeRate as CurrencyExchangeRateInput },
+                amountV2: {
+                  valueInCents: ei.amount.valueInCents,
+                  currency: ei.amount.currency as Currency,
+                  exchangeRate: ei.amount.exchangeRate as CurrencyExchangeRateInput,
+                },
                 incurredAt: new Date(ei.date),
                 url: ei.url,
               })),
@@ -104,6 +111,8 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
         });
 
         setSubmittedExpenseId(result.data.createExpense.legacyId);
+      } catch (err) {
+        toast({ variant: 'error', message: i18nGraphqlException(intl, err) });
       } finally {
         h.setSubmitting(false);
       }
@@ -169,14 +178,9 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
           </Link>
         </Button>
       </header>
-      <main
-        className={clsx('mx-auto flex flex-grow justify-start gap-10 overflow-hidden pt-10', {
-          'w-[768px]': !submittedExpenseId,
-          'w-full px-16': submittedExpenseId,
-        })}
-      >
+      <main className="mx-auto flex w-[768px] flex-grow justify-start gap-10 overflow-hidden pt-10">
         {submittedExpenseId ? (
-          <SubmittedExpense expenseId={submittedExpenseId} />
+          <SubmittedExpense expenseId={submittedExpenseId} form={expenseForm} />
         ) : (
           <React.Fragment>
             <SubmitExpenseFlowSteps
@@ -185,27 +189,27 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
               currentStep={currentStep}
             />
             <div className="flex-grow overflow-auto">
-              <form ref={formRef} onSubmit={(e) => e.preventDefault()} >
+              <form ref={formRef} onSubmit={e => e.preventDefault()}>
                 <step.Form form={expenseForm} slug={props.slug} />
               </form>
             </div>
           </React.Fragment>
         )}
       </main>
-      <footer className="min-w-screen flex items-center justify-center gap-4 border-t border-slate-100 px-10 py-2">
-        <SubmitExpenseFlowFooter
-          expenseForm={expenseForm}
-          isLastStep={ExpenseStepOrder.indexOf(currentStep) === ExpenseStepOrder.length - 1}
-          isStepValid={!step.hasError(expenseForm)}
-          onNextStepClick={onNextStepClick}
-          readyToSubmit={!nextStep && isEmpty(expenseForm.errors)}
-          submitted={!!submittedExpenseId}
-          setCurrentStep={setCurrentStep}
-          nextStep={nextStep}
-          prevStep={prevStep}
-          slug={props.slug}
-        />
-      </footer>
+      {!submittedExpenseId && (
+        <footer className="min-w-screen flex items-center justify-center gap-4 border-t border-slate-100 px-10 py-2">
+          <SubmitExpenseFlowFooter
+            expenseForm={expenseForm}
+            isLastStep={ExpenseStepOrder.indexOf(currentStep) === ExpenseStepOrder.length - 1}
+            isStepValid={!step.hasError(expenseForm)}
+            onNextStepClick={onNextStepClick}
+            readyToSubmit={!nextStep && isEmpty(expenseForm.errors)}
+            setCurrentStep={setCurrentStep}
+            nextStep={nextStep}
+            prevStep={prevStep}
+          />
+        </footer>
+      )}
     </div>
   );
 }
@@ -243,33 +247,22 @@ type SubmitExpenseFlowFooterProps = {
   isStepValid: boolean;
   onNextStepClick: () => void;
   setCurrentStep: (s: ExpenseFlowStep) => void;
-  submitted: boolean;
-  slug: string;
 };
 
 function SubmitExpenseFlowFooter(props: SubmitExpenseFlowFooterProps) {
-  const router = useRouter();
   return (
     <React.Fragment>
       <Button
         variant="outline"
-        disabled={!props.prevStep || props.submitted}
-        className={clsx('flex gap-2', { invisible: !props.prevStep || props.submitted })}
+        disabled={!props.prevStep}
+        className={clsx('flex gap-2', { invisible: !props.prevStep })}
         onClick={props.prevStep ? () => props.setCurrentStep(props.prevStep) : undefined}
       >
         <ArrowLeft />
         <FormattedMessage defaultMessage="Go back" />
       </Button>
 
-      {props.submitted ? (
-        <Button
-          onClick={() => {
-            router.replace(`/dashboard/${props.slug}/submitted-expenses`);
-          }}
-        >
-          <FormattedMessage id="Finish" defaultMessage="Finish" />
-        </Button>
-      ) : props.isLastStep ? (
+      {props.isLastStep ? (
         <Button
           disabled={!props.readyToSubmit || props.expenseForm.isSubmitting || props.expenseForm.isValidating}
           onClick={props.expenseForm.submitForm}

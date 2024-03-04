@@ -20,8 +20,8 @@ export const enum ExpenseFlowStep {
 
 export const ExpenseStepOrder = [
   ExpenseFlowStep.COLLECTIVE,
-  ExpenseFlowStep.EXPENSE_TYPE,
   ExpenseFlowStep.PAYMENT_METHOD,
+  ExpenseFlowStep.EXPENSE_TYPE,
   ExpenseFlowStep.EXPENSE_INFO,
   ExpenseFlowStep.EXPENSE_DETAILS,
   ExpenseFlowStep.EXPENSE_SUMMARY,

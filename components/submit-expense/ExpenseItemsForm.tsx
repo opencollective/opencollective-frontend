@@ -3,13 +3,12 @@ import clsx from 'clsx';
 import { FormikProvider } from 'formik';
 import { get } from 'lodash';
 import { PlusIcon } from 'lucide-react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 
 import { isValidUrl } from '../../lib/utils';
 import { attachmentDropzoneParams } from '../expenses/lib/attachments';
 import { FX_RATE_ERROR_THRESHOLD } from '../expenses/lib/utils';
 
-import { ExchangeRate } from '../ExchangeRate';
 import StyledDropzone from '../StyledDropzone';
 import StyledInput from '../StyledInput';
 import StyledInputAmount from '../StyledInputAmount';
@@ -97,7 +96,6 @@ type ExpenseItemFormProps = {
 };
 
 function ExpenseItemForm(props: ExpenseItemFormProps) {
-  const intl = useIntl();
   return (
     <FormikProvider value={props.form}>
       <div className="flex gap-4">

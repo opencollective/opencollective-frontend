@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { gql, useApolloClient, useLazyQuery, useMutation } from '@apollo/client';
+import React from 'react';
+import { gql, useMutation } from '@apollo/client';
 import { isEmpty } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -11,15 +11,15 @@ import {
   CreatePrivateNoteMutationVariables,
 } from '../../lib/graphql/types/v2/graphql';
 
-import { getVariablesFromQuery } from '../../pages/expense';
-import Expense from '../expenses/Expense';
-import { expensePageQuery } from '../expenses/graphql/queries';
 import CreateExpenseFAQ from '../faqs/CreateExpenseFAQ';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import Image from '../Image';
+import MessageBox from '../MessageBox';
 import RichTextEditor from '../RichTextEditor';
 import { Button } from '../ui/Button';
 import { useToast } from '../ui/useToast';
+
+import { ExpenseForm } from './useExpenseForm';
 
 import invoiceIllustrationStatic from '../../public/static/images/invoice-animation-static.jpg';
 
@@ -28,19 +28,13 @@ const I18nMessages = defineMessages({
 });
 
 type SubmittedExpenseProps = {
+  form: ExpenseForm;
   expenseId: number;
 };
 
 export function SubmittedExpense(props: SubmittedExpenseProps) {
   const { toast } = useToast();
   const intl = useIntl();
-  const client = useApolloClient();
-  const [getExpense, { data, loading, error, startPolling, stopPolling, refetch, fetchMore }] = useLazyQuery(
-    expensePageQuery,
-    {
-      context: API_V2_CONTEXT,
-    },
-  );
 
   const [privateNote, setPrivateNote] = React.useState('');
   const [lastPrivateNoteId, setLastPrivateNoteId] = React.useState(null);
@@ -74,7 +68,6 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
           },
         },
       });
-      await refetch();
       setPrivateNote('');
       setLastPrivateNoteId(result.data.createComment.id);
       toast({
@@ -87,16 +80,10 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
         message: i18nGraphqlException(intl, e),
       });
     }
-  }, [createPrivateNote, privateNote, props.expenseId, refetch, intl, toast]);
-
-  useEffect(() => {
-    if (props.expenseId) {
-      getExpense({ variables: getVariablesFromQuery({ ExpenseId: props.expenseId }) });
-    }
-  }, [props.expenseId, getExpense]);
+  }, [createPrivateNote, privateNote, props.expenseId, intl, toast]);
 
   return (
-    <div className="grid grid-flow-col grid-cols-2 gap-4 overflow-scroll pb-2">
+    <div className="flex flex-col overflow-scroll overflow-x-hidden pb-2">
       <div>
         <div className="mb-8 flex items-center gap-2 text-xl font-bold">
           <Image
@@ -108,8 +95,33 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
           <FormattedMessage defaultMessage="Your expense has been submitted successfully!" />
         </div>
 
+        <h2 className="mb-3 font-bold">
+          <FormattedMessage defaultMessage="What's next?" />
+        </h2>
+        <ol className="mb-4 list-inside list-decimal text-sm text-slate-700">
+          <li>
+            <FormattedMessage
+              defaultMessage="This expense needs to be approved by an admin of {collective}"
+              values={{ collective: props.form.options.account.name }}
+            />
+          </li>
+          {props.form.options.host && (
+            <li>
+              <FormattedMessage
+                defaultMessage="This expense will then be reviewed by an administrator from {host}"
+                values={{ host: props.form.options.host.name }}
+              />
+            </li>
+          )}
+        </ol>
+
+        <MessageBox my={4} type="info">
+          <FormattedMessage defaultMessage="You can find and track your expense in your dashboard." />
+        </MessageBox>
+
         <div className="mb-3 font-bold">
-          <FormattedMessage defaultMessage="Attach a note (Optional)" /> <PrivateInfoIcon />
+          <FormattedMessage defaultMessage="Is there anything else you wish to communicate to the admins who will review this expense?" />{' '}
+          <PrivateInfoIcon />
         </div>
         <RichTextEditor
           key={lastPrivateNoteId}
@@ -133,19 +145,6 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
         <div className="mt-8">
           <CreateExpenseFAQ defaultOpen />
         </div>
-      </div>
-      <div>
-        <Expense
-          data={data}
-          loading={loading || (!data && !error)}
-          error={error}
-          refetch={refetch}
-          client={client}
-          fetchMore={fetchMore}
-          legacyExpenseId={props.expenseId}
-          startPolling={startPolling}
-          stopPolling={stopPolling}
-        />
       </div>
     </div>
   );

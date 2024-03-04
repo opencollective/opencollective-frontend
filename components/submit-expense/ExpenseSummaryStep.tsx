@@ -1,30 +1,23 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
 import { getPayoutProfiles } from '../../lib/expenses';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { ExpenseSummaryStepQuery, ExpenseSummaryStepQueryVariables } from '../../lib/graphql/types/v2/graphql';
 
 import { AccountHoverCard } from '../AccountHoverCard';
 import Avatar from '../Avatar';
 import DateTime from '../DateTime';
 import ExpenseAmountBreakdown from '../expenses/ExpenseAmountBreakdown';
 import ExpenseAttachedFiles from '../expenses/ExpenseAttachedFiles';
-import { loggedInAccountExpensePayoutFieldsFragment } from '../expenses/graphql/fragments';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import LinkCollective from '../LinkCollective';
-import Loading from '../Loading';
 import LocationAddress from '../LocationAddress';
-import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import { StepListItem } from '../ui/StepList';
 import UploadedFilePreview from '../UploadedFilePreview';
 
-import { ExpenseItem } from './ExpenseItemsForm';
 import { PaymentMethodDetails, PayoutMethodLabel } from './PickPaymentMethodStep';
 import { ExpenseStepDefinition } from './Steps';
-import { ExpenseForm } from './useExpenseForm';
+import { ExpenseForm, ExpenseItem } from './useExpenseForm';
 
 type ExpenseSummaryFormProps = {
   form: ExpenseForm;
@@ -40,108 +33,21 @@ export const ExpenseSummaryStep: ExpenseStepDefinition = {
 };
 
 function ExpenseSummaryForm(props: ExpenseSummaryFormProps) {
-  const query = useQuery<ExpenseSummaryStepQuery, ExpenseSummaryStepQueryVariables>(
-    gql`
-      query ExpenseSummaryStep($collectiveSlug: String!, $slug: String!, $payeeSlug: String!) {
-        account(slug: $collectiveSlug) {
-          id
-          name
-          imageUrl
-          slug
-          stats {
-            balance {
-              valueInCents
-              currency
-            }
-          }
-          ... on AccountWithHost {
-            host {
-              ...HostFields
-            }
-          }
-          ... on Organization {
-            host {
-              ...HostFields
-            }
-          }
-        }
-
-        submitter: account(slug: $slug) {
-          id
-          slug
-          name
-          imageUrl
-        }
-
-        payee: account(slug: $payeeSlug) {
-          id
-          slug
-          name
-          imageUrl
-          location {
-            address
-            country
-          }
-        }
-
-        loggedInAccount {
-          id
-          ...LoggedInAccountExpensePayoutFields
-        }
-      }
-
-      fragment HostFields on Host {
-        id
-        name
-        slug
-        expensePolicy
-        accountingCategories(kind: EXPENSE) {
-          nodes {
-            id
-            name
-            kind
-            expensesTypes
-            friendlyName
-            code
-            instructions
-          }
-        }
-      }
-
-      ${loggedInAccountExpensePayoutFieldsFragment}
-    `,
-    {
-      context: API_V2_CONTEXT,
-      variables: {
-        collectiveSlug: props.form.values.collectiveSlug,
-        slug: props.slug,
-        payeeSlug: props.form.values.payeeSlug,
-      },
-    },
-  );
-
-  const loggedInAccount = query.data?.loggedInAccount;
+  const loggedInAccount = props.form.options.loggedInAccount;
   const payoutMethod = React.useMemo(() => {
     const profiles = getPayoutProfiles(loggedInAccount);
     const selectedProfile = profiles.find(p => p.slug === props.form.values.payeeSlug);
     return selectedProfile?.payoutMethods?.find(p => p.id === props.form.values.payoutMethodId);
   }, [loggedInAccount, props.form.values.payoutMethodId, props.form.values.payeeSlug]);
 
-  if (query.loading) {
-    return <Loading />;
-  }
-
-  if (query.error) {
-    return <MessageBoxGraphqlError error={query.error} />;
-  }
-
-  const account = query.data?.account;
+  const account = props.form.options.account;
+  const payee = props.form.options.payee;
   const expenseCategory =
     account && 'host' in account && account.host
       ? account.host.accountingCategories.nodes.find(c => c.id === props.form.values.accountingCategoryId)
       : null;
 
-  const submitter = query.data?.submitter;
+  const submitter = props.form.options.submitter;
 
   return (
     <div>
@@ -253,8 +159,8 @@ function ExpenseSummaryForm(props: ExpenseSummaryFormProps) {
               <FormattedMessage id="Collective" defaultMessage="Collective" />
             </div>
             <span className="mb-3 flex items-center gap-2 text-sm font-medium leading-5 text-slate-800">
-              <Avatar collective={query.data?.account} radius={24} />
-              {query.data?.account?.name}
+              <Avatar collective={account} radius={24} />
+              {account?.name}
             </span>
             <div className="text-sm font-bold text-slate-700">
               <FormattedMessage defaultMessage="Collective balance" />
@@ -262,8 +168,8 @@ function ExpenseSummaryForm(props: ExpenseSummaryFormProps) {
             <div className="text-sm">
               <FormattedMoneyAmount
                 amountStyles={{ fontWeight: 'normal' }}
-                amount={query.data?.account.stats.balance.valueInCents}
-                currency={query.data?.account.stats.balance.currency}
+                amount={account?.stats?.balance?.valueInCents}
+                currency={account?.stats?.balance?.currency}
               />
             </div>
           </div>
@@ -273,8 +179,8 @@ function ExpenseSummaryForm(props: ExpenseSummaryFormProps) {
               <FormattedMessage id="Expense.PayTo" defaultMessage="Pay to" />
             </div>
             <div className="mb-3 flex items-center gap-2 text-sm font-medium leading-5 text-slate-800">
-              <Avatar collective={query.data?.payee} radius={24} />
-              {query.data?.payee?.name}
+              <Avatar collective={payee} radius={24} />
+              {payee?.name}
             </div>
             <div>
               <span className="mb-3 text-sm font-bold text-slate-700">
@@ -282,7 +188,7 @@ function ExpenseSummaryForm(props: ExpenseSummaryFormProps) {
               </span>
             </div>
             <div>
-              <LocationAddress location={query.data?.payee?.location} />
+              <LocationAddress location={payee?.location} />
             </div>
           </div>
 

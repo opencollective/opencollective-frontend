@@ -41,6 +41,7 @@ export const previewFeatures: PreviewFeature[] = [
     key: PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW,
     title: 'New expense submission flow',
     description: 'Improved expense submission flow in Dashboard',
+    alwaysEnableInDev: true,
     publicBeta: false,
     closedBetaAccessFor: ['opencollective', 'design', 'engineering'],
   },

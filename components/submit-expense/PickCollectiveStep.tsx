@@ -11,17 +11,14 @@ import {
   CollectiveOptionQueryVariables,
   PickCollectiveStepListItemQuery,
   PickCollectiveStepListItemQueryVariables,
-  PickCollectiveStepQuery,
-  PickCollectiveStepQueryVariables,
 } from '../../lib/graphql/types/v2/graphql';
 
 import Avatar from '../Avatar';
 import CollectivePickerAsync from '../CollectivePickerAsync';
-import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import Loading from '../Loading';
-import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import { StepListItem } from '../ui/StepList';
 
+import { RadioCardButton } from './RadioCardButton';
 import { ExpenseStepDefinition } from './Steps';
 import { ExpenseForm } from './useExpenseForm';
 
@@ -47,66 +44,25 @@ type PickCollectiveStepFormProps = {
 };
 
 function PickCollectiveStepForm(props: PickCollectiveStepFormProps) {
-  const [collectivePick, setCollectivePick] = React.useState(null);
-
+  const [isPickingOtherCollective, setIsPickingOtherCollective] = React.useState(false);
   const setFieldValue = props.form.setFieldValue;
-  const onCollectivePick = React.useCallback(
-    o => {
-      setCollectivePick(null);
-      setFieldValue('collectiveSlug', o.value.slug);
-    },
-    [setFieldValue],
-  );
 
-  const query = useQuery<PickCollectiveStepQuery, PickCollectiveStepQueryVariables>(
-    gql`
-      query PickCollectiveStep($slug: String!, $collectiveSlug: String, $pickedCollective: Boolean!) {
-        submitter: account(slug: $slug) {
-          expenses(direction: SUBMITTED, limit: 10) {
-            nodes {
-              account {
-                id
-                name
-                slug
-                type
-                imageUrl
-              }
-            }
-          }
-        }
-
-        collective: account(slug: $collectiveSlug) @include(if: $pickedCollective) {
-          id
-          slug
-          name
-          imageUrl
-        }
-      }
-    `,
-    {
-      context: API_V2_CONTEXT,
-      variables: {
-        slug: props.slug,
-        collectiveSlug: props.form.values.collectiveSlug,
-        pickedCollective: !!props.form.values.collectiveSlug,
-      },
-    },
-  );
-
-  const submitter = query.data?.submitter;
+  const recentlySubmittedExpenses = props.form.options.recentlySubmittedExpenses;
   const recentCollectives = React.useMemo(() => {
-    const uniqueCollectives = uniqBy(submitter?.expenses?.nodes || [], e => e.account.id).map(e => e.account);
+    const uniqueCollectives = uniqBy(recentlySubmittedExpenses?.nodes || [], e => e.account.id).map(e => e.account);
     return uniqueCollectives;
-  }, [submitter?.expenses?.nodes]);
+  }, [recentlySubmittedExpenses]);
 
   React.useEffect(() => {
-    if (!props.form.values.collectiveSlug && recentCollectives.length > 0) {
+    if (!isPickingOtherCollective && !props.form.values.collectiveSlug && recentCollectives.length > 0) {
       setFieldValue('collectiveSlug', recentCollectives[0].slug);
     }
-  }, [setFieldValue, props.form.values.collectiveSlug, recentCollectives]);
+  }, [setFieldValue, props.form.values.collectiveSlug, recentCollectives, isPickingOtherCollective]);
 
-  if (query.error) {
-    return <MessageBoxGraphqlError error={query.error} />;
+  const recentCollectivePicked = recentCollectives.some(({ slug }) => slug === props.form.values.collectiveSlug);
+
+  if (!props.form.options.recentlySubmittedExpenses) {
+    return <Loading />;
   }
 
   return (
@@ -115,39 +71,42 @@ function PickCollectiveStepForm(props: PickCollectiveStepFormProps) {
         <FormattedMessage defaultMessage="Who are you requesting money from?" />
       </h1>
       {recentCollectives.length > 0 && (
-        <React.Fragment>
-          <h2 className="mb-2 text-base font-bold leading-6 text-slate-800">
-            <FormattedMessage defaultMessage="Collectives to which you have recently submitted expenses" />
-          </h2>
-          <div className="flex flex-col gap-4">
-            {recentCollectives.map(c => (
-              <CollectiveOption
-                key={c.slug}
-                onClick={() => setFieldValue('collectiveSlug', c.slug)}
-                collectiveSlug={c.slug}
-                checked={props.form.values.collectiveSlug === c.slug}
-              />
-            ))}
-          </div>
+        <div className="flex flex-col gap-4">
+          {recentCollectives.map((c, i) => (
+            <CollectiveOption
+              key={c.slug}
+              isLastUsedCollective={i === 0}
+              onClick={() => {
+                setFieldValue('collectiveSlug', c.slug);
+                setIsPickingOtherCollective(false);
+              }}
+              collectiveSlug={c.slug}
+              checked={props.form.values.collectiveSlug === c.slug}
+            />
+          ))}
+        </div>
+      )}
 
-          <h2 className="mb-4 mt-8 text-base font-bold leading-6 text-slate-800">
-            <FormattedMessage defaultMessage="Choose a collective:" />
-          </h2>
-        </React.Fragment>
-      )}
-      {!collectivePick && (
-        <CollectivePickerAsync
-          className="mb-4"
-          inputId="collective-expense-picker"
-          types={allowedCollectiveTypes}
-          value={collectivePick}
-          onChange={onCollectivePick}
+      <div className={clsx({ 'mt-4': recentCollectives.length > 0 })}>
+        <CollectiveOptionPicker
+          label={
+            recentCollectives.length > 0 ? (
+              <FormattedMessage defaultMessage="Another collective" />
+            ) : (
+              <FormattedMessage defaultMessage="Search Collective" />
+            )
+          }
+          collectiveSlug={props.form.values.collectiveSlug}
+          checked={isPickingOtherCollective || !recentCollectivePicked}
+          onClick={() => {
+            if (!isPickingOtherCollective || recentCollectivePicked) {
+              setFieldValue('collectiveSlug', null);
+            }
+            setIsPickingOtherCollective(true);
+          }}
+          onChange={slug => setFieldValue('collectiveSlug', slug)}
         />
-      )}
-      {props.form.values.collectiveSlug &&
-        !recentCollectives.some(c => c.slug === props.form.values.collectiveSlug) && (
-          <CollectiveOption collectiveSlug={props.form.values.collectiveSlug} checked />
-        )}
+      </div>
     </div>
   );
 }
@@ -176,7 +135,7 @@ function PickCollectiveStepListItem(props: { className?: string; form: ExpenseFo
   return (
     <StepListItem
       className={props.className}
-      title={<FormattedMessage defaultMessage="Submit to" />}
+      title={<FormattedMessage defaultMessage="Who is paying?" />}
       subtitle={query.data?.account?.name ?? undefined}
       completed={!PickCollectiveStep.hasError(props.form)}
       current={props.current}
@@ -186,6 +145,7 @@ function PickCollectiveStepListItem(props: { className?: string; form: ExpenseFo
 
 type CollectiveOptionProps = {
   collectiveSlug: string;
+  isLastUsedCollective?: boolean;
   checked?: boolean;
   onClick?: () => void;
 };
@@ -199,19 +159,6 @@ function CollectiveOption(props: CollectiveOptionProps) {
           slug
           name
           imageUrl
-          stats {
-            balance {
-              valueInCents
-              currency
-            }
-          }
-          ... on AccountWithHost {
-            host {
-              id
-              slug
-              name
-            }
-          }
         }
       }
     `,
@@ -223,50 +170,76 @@ function CollectiveOption(props: CollectiveOptionProps) {
     },
   );
 
-  const account = query.data?.account;
-  const host = account && 'host' in account ? account.host : null;
-
   return (
-    <div>
-      <button
-        onClick={props.onClick}
-        className="group flex w-full cursor-pointer items-center gap-4 rounded-md border border-slate-300 p-4 hover:border-oc-blue-tints-500"
-      >
-        <span
-          className={clsx('h-[16px] w-[16px] rounded-full border group-hover:border-oc-blue-tints-500', {
-            'border-[5px] border-oc-blue-tints-500': props.checked,
-            'border-slate-300': !props.checked,
-          })}
-        ></span>
-        <span className="flex items-center gap-2 text-sm font-medium leading-5 text-slate-800">
+    <RadioCardButton
+      checked={props.checked}
+      onClick={props.onClick}
+      title={
+        <div className="flex items-center gap-4">
           <Avatar collective={query.data?.account} radius={24} />
-          {query.data?.account?.name}
-        </span>
-      </button>
-      {props.checked && !query.loading && (
-        <div className="mt-4 flex items-center gap-8 pl-4">
-          <div>
-            <div className="text-xs font-bold">
-              <FormattedMessage defaultMessage="Collective balance" />
-            </div>
-            <div>
-              <FormattedMoneyAmount
-                currency={query.data.account.stats.balance.currency}
-                amount={query.data.account.stats.balance.valueInCents}
-              />
-            </div>
-          </div>
-          {host && (
-            <div className="text-xs">
-              <div>
-                <FormattedMessage defaultMessage="Fiscal host:" />
-              </div>
-              <div className="font-bold">{host.name}</div>
-            </div>
+
+          {props.isLastUsedCollective ? (
+            <FormattedMessage
+              defaultMessage="{label} (Last used)"
+              values={{
+                label: query.data?.account?.name,
+              }}
+            />
+          ) : (
+            query.data?.account?.name
           )}
         </div>
-      )}
-      {props.checked && query.loading && <Loading />}
-    </div>
+      }
+    />
+  );
+}
+
+type CollectiveOptionPickerProps = {
+  label?: React.ReactNode;
+  onClick: () => void;
+  onChange: (slug: string) => void;
+  checked?: boolean;
+  collectiveSlug?: string;
+};
+
+function CollectiveOptionPicker(props: CollectiveOptionPickerProps) {
+  const query = useQuery<CollectiveOptionQuery, CollectiveOptionQueryVariables>(
+    gql`
+      query CollectiveOption($slug: String!) {
+        account(slug: $slug) {
+          id
+          slug
+          name
+          imageUrl
+        }
+      }
+    `,
+    {
+      context: API_V2_CONTEXT,
+      variables: {
+        slug: props.collectiveSlug,
+      },
+      skip: !props.collectiveSlug || !props.checked,
+    },
+  );
+
+  return (
+    <RadioCardButton
+      className="w-full"
+      onClick={props.onClick}
+      title={props.label}
+      checked={props.checked}
+      content={
+        props.checked && (
+          <CollectivePickerAsync
+            className="mt-4"
+            inputId="collective-expense-picker"
+            types={allowedCollectiveTypes}
+            value={{ value: query.data?.account, label: query.data?.account?.name }}
+            onChange={e => props.onChange(e.value.slug)}
+          />
+        )
+      }
+    />
   );
 }

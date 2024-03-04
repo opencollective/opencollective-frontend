@@ -4,10 +4,12 @@ import { accountHasGST, accountHasVAT, checkVATNumberFormat, TaxType } from '@op
 import dayjs from 'dayjs';
 import type { Path, PathValue } from 'dot-path-value';
 import { FormikErrors, FormikHelpers, useFormik } from 'formik';
-import { isEmpty, isEqual, map, partialRight, pick, set, uniqBy } from 'lodash';
+import { isEmpty, isEqual, pick, set, uniqBy } from 'lodash';
+import memoizeOne from 'memoize-one';
 import { IntlShape, useIntl } from 'react-intl';
 import z from 'zod';
 
+import { AccountTypesWithHost } from '../../lib/constants/collectives';
 import { LoggedInUser } from '../../lib/custom_typings/LoggedInUser';
 import { getPayoutProfiles } from '../../lib/expenses';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
@@ -19,6 +21,7 @@ import {
   ExpenseFormSchemaQuery,
   ExpenseFormSchemaQueryVariables,
   ExpenseType,
+  PayoutMethodType,
 } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { userMustSetAccountingCategory } from '../expenses/lib/accounting-categories';
@@ -32,8 +35,6 @@ export enum ExpenseTypeOption {
   REIMBURSEMENT = 'REIMBURSEMENT',
   INVITED_INVOICE = 'INVITED_INVOICE',
   INVITED_REIMBURSEMENT = 'INVITED_REIMBURSEMENT',
-  GRANT = 'GRANT',
-  VENDOR = 'VENDOR',
 }
 
 export function expenseTypeFromOption(opt: ExpenseTypeOption) {
@@ -43,10 +44,6 @@ export function expenseTypeFromOption(opt: ExpenseTypeOption) {
       return ExpenseType.INVOICE;
     case ExpenseTypeOption.REIMBURSEMENT:
     case ExpenseTypeOption.INVITED_REIMBURSEMENT:
-      return ExpenseType.RECEIPT;
-    case ExpenseTypeOption.GRANT:
-      return ExpenseType.GRANT;
-    case ExpenseTypeOption.VENDOR:
       return ExpenseType.RECEIPT;
   }
 }
@@ -85,6 +82,7 @@ export type ExpenseFormValues = {
     rate: number;
     idNumber: string;
   };
+  acknowledgedExpensePolicy?: boolean;
 };
 
 export type ExpenseFormik = Omit<ReturnType<typeof useFormik<ExpenseFormValues>>, 'setFieldValue'> & {
@@ -94,7 +92,7 @@ export type ExpenseFormik = Omit<ReturnType<typeof useFormik<ExpenseFormValues>>
   ) => Promise<void> | Promise<FormikErrors<ExpenseFormValues>>;
 };
 
-export type ExpenseForm = ExpenseFormik & { options: ExpenseFormOptions };
+export type ExpenseForm = ExpenseFormik & { options: ExpenseFormOptions; refresh: () => void };
 
 const minimumSchema = z.object({
   collectiveSlug: z.string(),
@@ -121,14 +119,30 @@ const minimumSchema = z.object({
 });
 
 const formSchemaQuery = gql`
-  query ExpenseFormSchema($collectiveSlug: String!, $payeeSlug: String, $hasPayeeSlug: Boolean!) {
-    account(slug: $collectiveSlug) {
+  query ExpenseFormSchema(
+    $collectiveSlug: String
+    $hasCollectiveSlug: Boolean!
+    $payeeSlug: String
+    $hasPayeeSlug: Boolean!
+    $submitterSlug: String
+    $hasSubmitterSlug: Boolean!
+  ) {
+    account(slug: $collectiveSlug) @include(if: $hasCollectiveSlug) {
       id
       name
       slug
       currency
       settings
       supportedExpenseTypes
+
+      expensePolicy
+
+      stats {
+        balance {
+          valueInCents
+          currency
+        }
+      }
 
       ...ExpenseFormSchemaFeatureFields
       ...ExpenseFormSchemaPolicyFields
@@ -147,6 +161,9 @@ const formSchemaQuery = gql`
 
     payee: account(slug: $payeeSlug) @include(if: $hasPayeeSlug) {
       id
+      slug
+      name
+      type
       payoutMethods {
         id
         type
@@ -154,11 +171,60 @@ const formSchemaQuery = gql`
         data
         isSaved
       }
+
+      location {
+        address
+        country
+      }
+
+      ... on AccountWithHost {
+        host {
+          ...ExpenseFormSchemaHostFields
+        }
+      }
+      ... on Organization {
+        host {
+          ...ExpenseFormSchemaHostFields
+        }
+      }
     }
 
     loggedInAccount {
       id
       ...LoggedInAccountExpensePayoutFields
+    }
+
+    submitter: account(slug: $submitterSlug) @include(if: $hasSubmitterSlug) {
+      id
+      slug
+      name
+      imageUrl
+    }
+
+    recentlySubmittedExpenses: expenses(
+      createdByAccount: { slug: $submitterSlug }
+      limit: 10
+      orderBy: { field: CREATED_AT, direction: DESC }
+    ) @include(if: $hasSubmitterSlug) {
+      nodes {
+        account {
+          id
+          name
+          type
+          slug
+          imageUrl
+        }
+        payee {
+          id
+          name
+          type
+          slug
+          imageUrl
+        }
+        payoutMethod {
+          id
+        }
+      }
     }
   }
 
@@ -232,44 +298,95 @@ type ExpenseFormOptions = {
   supportedCurrencies?: string[];
   supportedExpenseTypes?: ExpenseType[];
   payoutProfiles?: ExpenseFormSchemaQuery['loggedInAccount'][];
+  supportedPayoutMethods?: PayoutMethodType[];
   expenseTags?: ExpenseFormSchemaHostFieldsFragment['expensesTags'];
-  expensePolicy?: string;
+  hostExpensePolicy?: string;
+  collectiveExpensePolicy?: string;
   isAccountingCategoryRequired?: boolean;
   accountingCategories?: ExpenseFormSchemaHostFieldsFragment['accountingCategories']['nodes'];
   allowExpenseItemAttachment?: boolean;
   allowExpenseItemCurrencyChange?: boolean;
   taxType?: TaxType;
+  recentlySubmittedExpenses?: ExpenseFormSchemaQuery['recentlySubmittedExpenses'];
+  host?: ExpenseFormSchemaHostFieldsFragment;
+  account?: ExpenseFormSchemaQuery['account'];
+  payee?: ExpenseFormSchemaQuery['payee'];
+  submitter?: ExpenseFormSchemaQuery['submitter'];
+  loggedInAccount?: ExpenseFormSchemaQuery['loggedInAccount'];
 };
+
+const memoizedExpenseFormSchema = memoizeOne(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async (apolloClient: ApolloClient<any>, variables: ExpenseFormSchemaQueryVariables, refresh?: boolean) => {
+    return await apolloClient.query<ExpenseFormSchemaQuery, ExpenseFormSchemaQueryVariables>({
+      query: formSchemaQuery,
+      context: API_V2_CONTEXT,
+      variables: variables,
+      errorPolicy: 'all',
+      fetchPolicy: 'cache-first',
+    });
+  },
+  (newArgs, lastArgs) => {
+    const [, newVariables, refresh] = newArgs;
+    const [, lastVariables] = lastArgs;
+
+    return !refresh && isEqual(newVariables, lastVariables);
+  },
+);
 
 async function buildFormOptions(
   intl: IntlShape,
   apolloClient: ApolloClient<any>,
   loggedInUser: LoggedInUser,
   values: ExpenseFormValues,
+  refresh?: boolean,
 ): Promise<ExpenseFormOptions> {
   const options: ExpenseFormOptions = { schema: minimumSchema };
 
-  if (!values.collectiveSlug) {
-    return options;
-  }
-
   try {
-    // TODO: memo or enable cache for this.
-    const query = await apolloClient.query<ExpenseFormSchemaQuery, ExpenseFormSchemaQueryVariables>({
-      query: formSchemaQuery,
-      context: API_V2_CONTEXT,
-      variables: {
+    const query = await memoizedExpenseFormSchema(
+      apolloClient,
+      {
         collectiveSlug: values.collectiveSlug,
+        hasCollectiveSlug: !!values.collectiveSlug,
         payeeSlug: values.payeeSlug,
         hasPayeeSlug: !!values.payeeSlug,
+        hasSubmitterSlug: !!loggedInUser?.collective?.slug,
+        submitterSlug: loggedInUser?.collective?.slug,
       },
-    });
+      refresh,
+    );
+
+    if (query.data?.recentlySubmittedExpenses) {
+      options.recentlySubmittedExpenses = query.data.recentlySubmittedExpenses;
+    }
 
     const account = query.data?.account;
     const host = account && 'host' in account ? account.host : null;
+    const payee = query.data?.payee;
+    const payeeHost = payee && 'host' in payee ? payee.host : null;
+
+    if (payee) {
+      options.payee = payee;
+    }
+
+    if (query.data?.submitter) {
+      options.submitter = query.data.submitter;
+    }
+
+    if (query.data?.loggedInAccount) {
+      options.loggedInAccount = query.data.loggedInAccount;
+    }
+
+    if (account) {
+      options.account = account;
+      options.collectiveExpensePolicy = account.expensePolicy;
+    }
 
     if (host) {
-      options.expensePolicy = host.expensePolicy;
+      options.host = host;
+      options.supportedPayoutMethods = host.supportedPayoutMethods || [];
+      options.hostExpensePolicy = host.expensePolicy;
       options.expenseTags = host.expensesTags;
       options.isAccountingCategoryRequired = userMustSetAccountingCategory(loggedInUser, account, host);
       options.accountingCategories = host.accountingCategories.nodes;
@@ -279,9 +396,29 @@ async function buildFormOptions(
           accountingCategoryId: z.string(),
         });
       }
+    } else {
+      options.supportedPayoutMethods = [PayoutMethodType.OTHER, PayoutMethodType.BANK_ACCOUNT];
     }
 
-    if ((query.data?.account?.supportedExpenseTypes ?? []).length > 0) {
+    if (options.collectiveExpensePolicy || options.hostExpensePolicy) {
+      options.schema = options.schema.extend({
+        acknowledgedExpensePolicy: z.boolean().refine(v => v, { message: 'Required' }),
+      });
+    }
+
+    if (payeeHost && payeeHost.id === host.id) {
+      options.supportedPayoutMethods = [PayoutMethodType.ACCOUNT_BALANCE];
+    } else {
+      options.supportedPayoutMethods = options.supportedPayoutMethods.filter(
+        t => t !== PayoutMethodType.CREDIT_CARD && t !== PayoutMethodType.ACCOUNT_BALANCE,
+      );
+    }
+
+    if (payee && AccountTypesWithHost.includes(payee.type)) {
+      options.supportedPayoutMethods = options.supportedPayoutMethods.filter(t => t !== PayoutMethodType.OTHER);
+    }
+
+    if ((account?.supportedExpenseTypes ?? []).length > 0) {
       options.schema = options.schema.extend({
         expenseTypeOption: z
           .nativeEnum(ExpenseTypeOption)
@@ -395,6 +532,8 @@ async function buildFormOptions(
 
     return options;
   } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error(err);
     return options;
   }
 }
@@ -469,10 +608,10 @@ export function useExpenseForm(opts: {
 
   // reset fields that depend on payee
   React.useEffect(() => {
-    if (expenseForm.values.payeeSlug !== prevValues.payeeSlug) {
+    if (expenseForm.values.payeeSlug !== prevValues.payeeSlug && expenseForm.values.payoutMethodId) {
       setFieldValue('payoutMethodId', null);
     }
-  }, [setFieldValue, prevValues.payeeSlug, expenseForm.values.payeeSlug]);
+  }, [setFieldValue, prevValues.payeeSlug, expenseForm.values.payeeSlug, expenseForm.values.payoutMethodId]);
 
   // reset fields that depend on expense type
   React.useEffect(() => {
@@ -575,7 +714,6 @@ export function useExpenseForm(opts: {
           });
         }
       } catch (err) {
-        console.error(err);
         return;
       }
     }
@@ -599,6 +737,7 @@ export function useExpenseForm(opts: {
     async function refreshFormOptions() {
       setFormOptions(await buildFormOptions(intl, apolloClient, LoggedInUser, expenseForm.values));
     }
+
     refreshFormOptions();
   }, [apolloClient, LoggedInUser, expenseForm.values, intl]);
 
@@ -629,5 +768,7 @@ export function useExpenseForm(opts: {
 
   return Object.assign(expenseForm, {
     options: formOptions,
+    refresh: async () =>
+      setFormOptions(await buildFormOptions(intl, apolloClient, LoggedInUser, expenseForm.values, true)),
   });
 }

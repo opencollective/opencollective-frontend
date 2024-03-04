@@ -14,7 +14,7 @@ export function RadioCardButton(props: RadioCardButtonProps) {
   return (
     <button
       onClick={!props.disabled ? props.onClick : undefined}
-      className={clsx(props.className, 'group rounded border  p-4 text-start', {
+      className={clsx(props.className, 'group rounded-md border  p-4 text-start', {
         'cursor-pointer hover:border-oc-blue-tints-500': !props.disabled,
         'border-oc-blue-tints-500': props.checked,
         'border-slate-300': !props.checked,
