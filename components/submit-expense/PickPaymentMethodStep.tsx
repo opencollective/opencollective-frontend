@@ -131,7 +131,10 @@ function PayeePicker(props: PayeePickerProps) {
   );
 
   const profilesBySlug = React.useMemo(() => {
-    return (props.form.options.payoutProfiles ?? []).reduce((acc, profile) => ({ ...acc, [profile.slug]: profile }), {});
+    return (props.form.options.payoutProfiles ?? []).reduce(
+      (acc, profile) => ({ ...acc, [profile.slug]: profile }),
+      {},
+    );
   }, [props.form.options.payoutProfiles]);
 
   const recentlySubmittedExpenses = props.form.options.recentlySubmittedExpenses;
@@ -686,7 +689,11 @@ function CreatePayoutMethodForm(props: CreatePayoutMethodFormProps) {
   return (
     <FormikProvider value={formik}>
       <div>
-        <StyledInputFormikField name="name" label={<FormattedMessage id="Fields.name" defaultMessage="Name" />} labelFontSize="13px" />
+        <StyledInputFormikField
+          name="name"
+          label={<FormattedMessage id="Fields.name" defaultMessage="Name" />}
+          labelFontSize="13px"
+        />
 
         <StyledInputFormikField
           my={2}
