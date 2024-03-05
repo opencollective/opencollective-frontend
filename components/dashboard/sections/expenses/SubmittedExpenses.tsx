@@ -8,6 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
 
 import ExpensesList from '../../../expenses/ExpensesList';
 import Pagination from '../../../Pagination';
@@ -52,6 +53,8 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
     currency: data?.account?.currency,
   };
 
+  const hasNewSubmitExpenseFlow = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW);
+
   const pageRoute = `/dashboard/${accountSlug}/submitted-expenses`;
 
   return (
@@ -60,12 +63,14 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
         title={<FormattedMessage defaultMessage="Submitted Expenses" />}
         description={<FormattedMessage defaultMessage="Expenses that you have submitted to other Collectives." />}
         actions={
-          <Button size="sm" className="gap-1" onClick={() => router.push(`/dashboard/${accountSlug}/expenses/new`)}>
-            <span>
-              <FormattedMessage id="create" defaultMessage="Create" />
-            </span>
-            <PlusIcon size={20} />
-          </Button>
+          hasNewSubmitExpenseFlow ? (
+            <Button size="sm" className="gap-1" onClick={() => router.push(`/dashboard/${accountSlug}/expenses/new`)}>
+              <span>
+                <FormattedMessage id="create" defaultMessage="Create" />
+              </span>
+              <PlusIcon size={20} />
+            </Button>
+          ) : null
         }
       />
       <Filterbar {...queryFilter} meta={filterMeta} />
