@@ -1,5 +1,4 @@
 import React from 'react';
-import { FormikProps } from 'formik';
 import { uniqBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
@@ -12,16 +11,15 @@ import StyledDropzone from '../StyledDropzone';
 import StyledHr from '../StyledHr';
 import { P, Span } from '../Text';
 
-import { ExpenseFormValues } from './types/FormValues';
 import AddNewAttachedFilesButton from './AddNewAttachedFilesButton';
 import ExpenseAttachedFiles from './ExpenseAttachedFiles';
 
 const ExpenseAttachedFilesForm = ({
-  form,
   disabled,
   defaultValue,
   title,
   description,
+  onChange,
 }: ExpenseAttachedFilesFormProps) => {
   const [files, setFiles] = React.useState(uniqBy(defaultValue, 'url'));
 
@@ -50,7 +48,7 @@ const ExpenseAttachedFilesForm = ({
             onSuccess={newFiles => {
               const uploadedFiles = [...files, ...newFiles];
               setFiles(uploadedFiles);
-              form.setFieldValue('attachedFiles', uploadedFiles);
+              onChange(uploadedFiles);
             }}
           />
         )}
@@ -65,7 +63,7 @@ const ExpenseAttachedFilesForm = ({
             const updatedFiles = [...files];
             updatedFiles.splice(idx, 1);
             setFiles(updatedFiles);
-            form.setFieldValue('attachedFiles', updatedFiles);
+            onChange(updatedFiles);
           }}
         />
       ) : (
@@ -78,7 +76,7 @@ const ExpenseAttachedFilesForm = ({
           minHeight={72}
           onSuccess={uploadedFiles => {
             setFiles(uploadedFiles);
-            form.setFieldValue('attachedFiles', uploadedFiles);
+            onChange(uploadedFiles);
           }}
         />
       )}
@@ -91,9 +89,9 @@ type ExpenseAttachedFilesFormProps = {
   title: React.ReactNode;
   description: React.ReactNode;
   disabled?: boolean;
-  form: FormikProps<ExpenseFormValues>;
   hasOCRFeature?: boolean;
-  collective: Account;
+  collective?: Account;
+  onChange: (attachedFiles: Array<{ url: string }>) => void;
 };
 
 export default ExpenseAttachedFilesForm;

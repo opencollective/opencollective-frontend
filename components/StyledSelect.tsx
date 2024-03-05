@@ -196,6 +196,7 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
     noOptionsMessage = () => intl.formatMessage(Messages.noOptions),
     options,
     fontSize,
+    onBlur,
   }) => {
     isSearchable = isSearchable ?? options?.length > 8;
     return {
@@ -216,6 +217,8 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
         if (element && (element.tagName === 'A' || element.tagName === 'BUTTON' || element.tagName === 'INPUT')) {
           (element as HTMLElement).focus();
         }
+
+        onBlur?.();
       },
       styles: {
         valueContainer: baseStyles => {

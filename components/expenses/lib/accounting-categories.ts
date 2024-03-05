@@ -1,16 +1,25 @@
 import { get } from 'lodash';
 
 import { LoggedInUser } from '../../../lib/custom_typings/LoggedInUser';
-import { Account, AccountWithHost, Expense, Host } from '../../../lib/graphql/types/v2/graphql';
+import { Account, Expense, Host, Policies } from '../../../lib/graphql/types/v2/graphql';
 import { getPolicy } from '../../../lib/policies';
 
-const getExpenseCategorizationPolicy = (collective: Account | AccountWithHost | null, host = collective?.['host']) => {
+const getExpenseCategorizationPolicy = (
+  collective: {
+    policies: Pick<Policies, 'EXPENSE_CATEGORIZATION'>;
+    host?: { policies: Pick<Policies, 'EXPENSE_CATEGORIZATION'> };
+  },
+  host = collective?.['host'],
+) => {
   return getPolicy<'EXPENSE_CATEGORIZATION'>(host || collective, 'EXPENSE_CATEGORIZATION');
 };
 
 export const userMustSetAccountingCategory = (
   user: LoggedInUser | null,
-  collective: Account | AccountWithHost | null,
+  collective: {
+    policies: Pick<Policies, 'EXPENSE_CATEGORIZATION'>;
+    host?: { policies: Pick<Policies, 'EXPENSE_CATEGORIZATION'> };
+  },
   host = collective?.['host'],
 ) => {
   const policy = getExpenseCategorizationPolicy(collective, host);
@@ -26,7 +35,10 @@ export const userMustSetAccountingCategory = (
 };
 
 export const collectiveAdminsMustConfirmAccountingCategory = (
-  collective: Account | AccountWithHost | null,
+  collective: {
+    policies: Pick<Policies, 'EXPENSE_CATEGORIZATION'>;
+    host?: { policies: Pick<Policies, 'EXPENSE_CATEGORIZATION'> };
+  },
   host = collective?.['host'],
 ): boolean => {
   const policy = getExpenseCategorizationPolicy(collective, host);

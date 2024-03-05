@@ -24,6 +24,7 @@ const Page = ({
   canonicalURL,
   collective,
   menuItems,
+  withTopBar = true,
   showFooter = true,
   showProfileAndChangelogMenu = true,
   loading,
@@ -50,6 +51,7 @@ const Page = ({
         LoggedInUser={LoggedInUser}
         showProfileAndChangelogMenu={showProfileAndChangelogMenu}
         loading={loading}
+        withTopBar={withTopBar}
       />
       <Body>{typeof children === 'function' ? children(childProps) : children}</Body>
       {showFooter && <Footer />}
@@ -80,10 +82,12 @@ Page.propTypes = {
   showFooter: PropTypes.bool,
   showProfileAndChangelogMenu: PropTypes.bool,
   loading: PropTypes.bool,
+  withTopBar: PropTypes.bool,
 };
 
 Page.defaultProps = {
   showSearch: true,
+  withTopBar: true,
 };
 
 export default withUser(Page);
