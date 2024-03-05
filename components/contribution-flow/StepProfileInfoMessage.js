@@ -11,7 +11,7 @@ import MessageBox from '../MessageBox';
 import { P } from '../Text';
 
 const StepProfileInfoMessage = ({ hasLegalNameField, hasIncognito, isGuest }) => {
-  const nbItems = hasLegalNameField + hasIncognito + isGuest;
+  const nbItems = hasLegalNameField + isGuest + hasIncognito;
   const isList = nbItems > 1;
   const ItemContainer = isList ? 'li' : 'span';
   return (
@@ -28,7 +28,7 @@ const StepProfileInfoMessage = ({ hasLegalNameField, hasIncognito, isGuest }) =>
           )}
           {hasLegalNameField && (
             <ItemContainer>
-              <FormattedMessage defaultMessage="You can leave the name field empty if you want to keep your contribution anonymous, only the host admins and the platform will have access to your email." />
+              <FormattedMessage defaultMessage="You can leave the name field empty if you don't want your name to be publicly associated with the contribution. Only the Collective/Host admins and the platform will have access to your legal name." />
             </ItemContainer>
           )}
           {hasIncognito && (
