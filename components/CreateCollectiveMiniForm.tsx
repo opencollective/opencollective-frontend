@@ -62,7 +62,6 @@ const SaveButtonMessage = defineMessages({
     defaultMessage: 'Create organization',
   },
   [CollectiveType.VENDOR]: {
-    id: 'CreateVendor',
     defaultMessage: 'Create vendor',
   },
 });
