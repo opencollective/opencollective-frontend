@@ -30,6 +30,7 @@ export const ExpenseInfoStep: ExpenseStepDefinition = {
   hasError(form) {
     return !!form.errors.title || (form.options.isAccountingCategoryRequired && !!form.errors.accountingCategoryId);
   },
+  stepTitle: <FormattedMessage id="Title" defaultMessage="Title" />,
 };
 
 type ExpenseInfoFormProps = {

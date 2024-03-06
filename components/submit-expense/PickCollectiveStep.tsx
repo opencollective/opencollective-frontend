@@ -36,6 +36,7 @@ export const PickCollectiveStep: ExpenseStepDefinition = {
   hasError(form) {
     return !!form.errors.collectiveSlug;
   },
+  stepTitle: <FormattedMessage defaultMessage="Who is paying?" />,
 };
 
 type PickCollectiveStepFormProps = {
@@ -135,7 +136,7 @@ function PickCollectiveStepListItem(props: { className?: string; form: ExpenseFo
   return (
     <StepListItem
       className={props.className}
-      title={<FormattedMessage defaultMessage="Who is paying?" />}
+      title={PickCollectiveStep.stepTitle}
       subtitle={query.data?.account?.name ?? undefined}
       completed={!PickCollectiveStep.hasError(props.form)}
       current={props.current}

@@ -35,6 +35,7 @@ export type StepDefinition<
   Form: React.FC<{ form: Form } | ({ form: Form } & AddProps)>;
   hasError: (form: Form) => boolean;
   StepListItem: React.FC<{ form: Form; current: boolean; className?: string }>;
+  stepTitle: React.ReactNode;
 };
 
 export type ExpenseStepDefinition = StepDefinition<ExpenseFormValues, ExpenseForm, { slug: string }>;
