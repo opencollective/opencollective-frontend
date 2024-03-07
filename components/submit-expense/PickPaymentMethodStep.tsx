@@ -45,6 +45,7 @@ export const PickPaymentMethodStep: ExpenseStepDefinition = {
   hasError(form) {
     return !!form.errors.payeeSlug || !!form.errors.payoutMethodId;
   },
+  stepTitle: <FormattedMessage defaultMessage="Who is getting paid?" />,
 };
 
 function PickPaymentMethodForm(props: PickPaymentMethodFormProps) {
@@ -271,7 +272,7 @@ function PickPaymentMethodStepListItem(props: { className?: string; form: Expens
   return (
     <StepListItem
       className={props.className}
-      title={<FormattedMessage defaultMessage="Who is getting paid?" />}
+      title={PickPaymentMethodStep.stepTitle}
       subtitle={
         payee && payoutMethod ? (
           <span>
@@ -522,7 +523,7 @@ function PayoutMethodPicker(props: PayoutMethodPickerProps) {
       return null;
     }
 
-    return lastExpenseFromThisPayee.payoutMethod.id;
+    return lastExpenseFromThisPayee.payoutMethod?.id;
   }, [payeeProfile, props.form.options.recentlySubmittedExpenses]);
 
   const payeePaymentMethods = React.useMemo(() => {

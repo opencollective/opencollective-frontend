@@ -30,6 +30,7 @@ export const ExpenseSummaryStep: ExpenseStepDefinition = {
   hasError() {
     return false;
   },
+  stepTitle: <FormattedMessage id="Summary" defaultMessage="Summary" />,
 };
 
 function ExpenseSummaryForm(props: ExpenseSummaryFormProps) {
@@ -153,7 +154,7 @@ function ExpenseSummaryForm(props: ExpenseSummaryFormProps) {
           <hr className="flex-grow border-neutral-300" />
         </div>
 
-        <div className="grid grid-flow-col grid-cols-3 gap-1">
+        <div className="grid grid-flow-col grid-cols-1 grid-rows-3 gap-1 sm:grid-cols-3 sm:grid-rows-1">
           <div className="flex-1 rounded border border-slate-200 p-4">
             <div className="mb-3 text-xs font-medium uppercase text-slate-700">
               <FormattedMessage id="Collective" defaultMessage="Collective" />
@@ -218,7 +219,7 @@ function ExpenseSummaryStepListItem(props: { className?: string; form: ExpenseFo
   return (
     <StepListItem
       className={props.className}
-      title={<FormattedMessage id="Summary" defaultMessage="Summary" />}
+      title={ExpenseSummaryStep.stepTitle}
       completed={props.current}
       current={props.current}
     />

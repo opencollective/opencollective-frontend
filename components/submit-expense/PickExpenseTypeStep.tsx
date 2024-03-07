@@ -28,6 +28,7 @@ export const PickExpenseTypeStep: ExpenseStepDefinition = {
 
     return false;
   },
+  stepTitle: <FormattedMessage defaultMessage="Type of expense" />,
 };
 
 type PickExpenseTypeFormProps = {
@@ -117,7 +118,7 @@ function PickExpenseTypeStepListItem(props: { className?: string; form: ExpenseF
   return (
     <StepListItem
       className={props.className}
-      title={<FormattedMessage defaultMessage="Type of expense" />}
+      title={PickExpenseTypeStep.stepTitle}
       subtitle={
         props.form.values.expenseTypeOption === ExpenseTypeOption.INVOICE ? (
           <FormattedMessage id="Expense.Type.Invoice" defaultMessage="Invoice" />

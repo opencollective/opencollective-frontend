@@ -36,6 +36,7 @@ export const ExpenseDetailsStep: ExpenseStepDefinition = {
 
     return !!form.errors.expenseCurrency || !!form.errors.expenseItems;
   },
+  stepTitle: <FormattedMessage defaultMessage="Expense Details" />,
 };
 
 type ExpenseDetailsFormProps = {
@@ -325,7 +326,7 @@ function ExpenseDetailsStepListItem(props: { className?: string; form: ExpenseFo
   return (
     <StepListItem
       className="w-full"
-      title={<FormattedMessage defaultMessage="Expense Details" />}
+      title={ExpenseDetailsStep.stepTitle}
       subtitle={
         props.form.values.expenseItems?.length > 0 ? (
           <div>

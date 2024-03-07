@@ -83,7 +83,7 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
   }, [createPrivateNote, privateNote, props.expenseId, intl, toast]);
 
   return (
-    <div className="flex flex-col overflow-scroll overflow-x-hidden pb-2">
+    <div className="flex flex-col overflow-scroll overflow-x-hidden px-4 py-2">
       <div>
         <div className="mb-8 flex items-center gap-2 text-xl font-bold">
           <Image
