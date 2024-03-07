@@ -1,13 +1,12 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
-import { CheckCircle2Icon } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import ConfirmationModal from '../ConfirmationModal';
-import { Box, Flex } from '../Grid';
+import { Flex } from '../Grid';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
@@ -27,7 +26,7 @@ type RecoverySettingsProps = {
 export function RecoverySettings(props: RecoverySettingsProps) {
   const intl = useIntl();
   const { toast } = useToast();
-  const [isRegenetingRecoveryCodes, setIsRegenetingRecoveryCodes] = React.useState(false);
+  const [isRegeneratingRecoveryCodes, setIsRegeneratingRecoveryCodes] = React.useState(false);
 
   const [regenerateRecoveryCodes, { loading }] = useMutation<{ regenerateRecoveryCodes: string[] }>(
     regenerateRecoveryCodesMutation,
@@ -39,7 +38,7 @@ export function RecoverySettings(props: RecoverySettingsProps) {
   const onRegenerateConfirmation = React.useCallback(async () => {
     try {
       const res = await regenerateRecoveryCodes();
-      setIsRegenetingRecoveryCodes(false);
+      setIsRegeneratingRecoveryCodes(false);
       props.onRecoveryCodes(res.data.regenerateRecoveryCodes);
     } catch (err) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, err) });
@@ -50,7 +49,6 @@ export function RecoverySettings(props: RecoverySettingsProps) {
     <React.Fragment>
       <StyledCard px={3} py={2}>
         <Flex alignItems="center">
-          <Box mr={3}>{<CheckCircle2Icon color="#0EA755" />}</Box>
           <H3 fontSize="14px" fontWeight="700">
             <FormattedMessage defaultMessage="Recovery" />
           </H3>
@@ -61,7 +59,7 @@ export function RecoverySettings(props: RecoverySettingsProps) {
         <div className="mt-3 flex gap-2">
           <StyledButton
             loading={loading}
-            onClick={() => setIsRegenetingRecoveryCodes(true)}
+            onClick={() => setIsRegeneratingRecoveryCodes(true)}
             buttonSize="tiny"
             buttonStyle="secondary"
           >
@@ -69,10 +67,10 @@ export function RecoverySettings(props: RecoverySettingsProps) {
           </StyledButton>
         </div>
       </StyledCard>
-      {isRegenetingRecoveryCodes && (
+      {isRegeneratingRecoveryCodes && (
         <ConfirmationModal
           isDanger
-          onClose={() => setIsRegenetingRecoveryCodes(false)}
+          onClose={() => setIsRegeneratingRecoveryCodes(false)}
           header={<FormattedMessage defaultMessage="Are you sure you want to regenerate your recovery codes?" />}
           continueHandler={onRegenerateConfirmation}
         >

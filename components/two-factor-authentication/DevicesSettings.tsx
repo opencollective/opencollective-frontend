@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
 import * as webauthn from '@simplewebauthn/browser';
-import { CheckCircle2Icon, CircleIcon, PlusIcon } from 'lucide-react';
+import { PlusIcon } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
@@ -56,7 +56,6 @@ type DevicesSettingsProps = {
 export function DevicesSettings(props: DevicesSettingsProps) {
   const intl = useIntl();
   const twoFactorMethods = props.userTwoFactorAuthenticationMethods.filter(m => m.method === TwoFactorMethod.WEBAUTHN);
-  const hasTwoFactorMethod = twoFactorMethods.length > 0;
   const { toast } = useToast();
 
   const [createPublicKeyRequestOptions] = useMutation(CreateWebAuthnRegistrationOptionsMutation, {
@@ -105,7 +104,6 @@ export function DevicesSettings(props: DevicesSettingsProps) {
   return (
     <StyledCard px={3} py={2}>
       <Flex alignItems="center">
-        <Box mr={3}>{hasTwoFactorMethod ? <CheckCircle2Icon color="#0EA755" /> : <CircleIcon />}</Box>
         <H3 fontSize="14px" fontWeight="700">
           <FormattedMessage defaultMessage="U2F (Universal 2nd Factor)" />
         </H3>
@@ -113,15 +111,15 @@ export function DevicesSettings(props: DevicesSettingsProps) {
       <div className="mb-3 text-sm">
         <FormattedMessage defaultMessage="A device or platform authenticator that supports the U2F specification. This can be a hardware key (like a YubiKey) or other methods supported by your browser." />
       </div>
-      <Box>
+      <div>
         {twoFactorMethods.map(device => {
           return (
-            <Box className="border-b last:border-b-0" mx={4} key={device.id}>
+            <div className="border-b last:border-b-0" key={device.id}>
               <UserTwoFactorMethodItem individual={props.individual} userTwoFactorMethod={device} />
-            </Box>
+            </div>
           );
         })}
-      </Box>
+      </div>
       <Box mt={3}>
         <StyledButton
           onClick={startWebauthnDeviceRegistration}
