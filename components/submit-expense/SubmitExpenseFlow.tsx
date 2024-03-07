@@ -259,7 +259,7 @@ function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
         </div>
         <StepList
           className={clsx(
-            'w-full border-b border-slate-100 bg-white px-4 py-2 drop-shadow-lg sm:block sm:w-[145px] sm:min-w-[145px] sm:border-b-0 sm:px-0 sm:py-0 sm:drop-shadow-none',
+            'z-50 w-full border-b border-slate-100 bg-white px-4 py-2 drop-shadow-lg sm:block sm:w-[145px] sm:min-w-[145px] sm:border-b-0 sm:px-0 sm:py-0 sm:drop-shadow-none',
             {
               'hidden sm:block': collapsed,
               'absolute block': !collapsed,
