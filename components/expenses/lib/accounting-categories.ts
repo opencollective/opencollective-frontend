@@ -58,10 +58,11 @@ export const shouldDisplayExpenseCategoryPill = (
   account: Account,
   host: Host,
 ): boolean => {
-  return Boolean(
-    expense?.accountingCategory ||
-      (user &&
-        ACCOUNTING_CATEGORY_HOST_FIELDS.some(field => get(host, `${field}.nodes`)?.length > 0) &&
-        userMustSetAccountingCategory(user, account, host)),
-  );
+  if (expense?.accountingCategory) {
+    return true; // Always display the category if it's already set
+  } else if (user && ACCOUNTING_CATEGORY_HOST_FIELDS.some(field => get(host, `${field}.nodes`)?.length > 0)) {
+    return user.isAdminOfCollective(host) || userMustSetAccountingCategory(user, account, host);
+  } else {
+    return false;
+  }
 };
