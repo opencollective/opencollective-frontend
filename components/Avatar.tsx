@@ -159,6 +159,15 @@ export const ContributorAvatar = ({ contributor, radius, ...styleProps }) => {
     image = defaultImage.ANONYMOUS;
   } else if (contributor.isGuest && shouldUseDefaultGuestAvatar(contributor.name)) {
     image = defaultImage.GUEST;
+  } else if (contributor.type === 'VENDOR') {
+    image = undefined;
+    const iconSize = 2 * Math.round((radius * 0.6) / 2);
+    const padding = (radius - iconSize) / 2;
+    styleProps.children = (
+      <div className="rounded-sm bg-slate-100  text-slate-300" style={{ padding }}>
+        <Store size={iconSize} />
+      </div>
+    );
   } else {
     image = getCollectiveImage({ slug: contributor.collectiveSlug, imageUrl: contributor.image });
   }
