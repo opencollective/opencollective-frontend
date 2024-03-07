@@ -335,6 +335,10 @@ export const ActivityDescriptionI18n = defineMessages({
   BACKYOURSTACK_DISPATCH_CONFIRMED: {
     defaultMessage: 'BackYourStack dispatch confirmed for <Account></Account>',
   },
+  ORDER_PAYMENT_FAILED: {
+    defaultMessage:
+      'Payment from <FromAccount></FromAccount> to <Account></Account> for <Order>contribution</Order> failed',
+  },
   PAYMENT_FAILED: {
     defaultMessage:
       'Payment from <FromAccount></FromAccount> to <Account></Account> for <Order>contribution</Order> failed',
