@@ -523,7 +523,7 @@ function PayoutMethodPicker(props: PayoutMethodPickerProps) {
       return null;
     }
 
-    return lastExpenseFromThisPayee.payoutMethod.id;
+    return lastExpenseFromThisPayee.payoutMethod?.id;
   }, [payeeProfile, props.form.options.recentlySubmittedExpenses]);
 
   const payeePaymentMethods = React.useMemo(() => {
