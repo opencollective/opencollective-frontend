@@ -733,6 +733,7 @@ enum OrderStatus {
   EXPIRED
   DISPUTED
   REFUNDED
+  PAUSED
   IN_REVIEW
 }
 

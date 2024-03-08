@@ -34,6 +34,7 @@ const StyledInputField = ({
   name = undefined,
   error = undefined,
   hint = undefined,
+  hintPosition = 'below',
   success = undefined,
   disabled = undefined,
   required = undefined,
@@ -107,6 +108,7 @@ const StyledInputField = ({
             )}
           </P>
         )}
+        {hint && hintPosition === 'above' && <div className="mb-2 text-xs font-light text-gray-600">{hint}</div>}
         {typeof children === 'function'
           ? children({
               name: name || htmlFor,
@@ -128,7 +130,7 @@ const StyledInputField = ({
           </Span>
         </Box>
       )}
-      {hint && <div className="mt-1 text-xs font-light text-gray-600">{hint}</div>}
+      {hint && hintPosition === 'below' && <div className="mt-1 text-xs font-light text-gray-600">{hint}</div>}
     </Box>
   );
 };
