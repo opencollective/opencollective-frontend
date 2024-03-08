@@ -391,7 +391,7 @@
   "AyOLNN": "New comment on conversation <Conversation>{conversationTitle}</Conversation>",
   "AzGwgz": "The minimum amount for transferring to {selectedCurrency} is {minAmountForSelectedCurrency}",
   "AZmsFu": "<IndividualOrAccount></IndividualOrAccount> rejected contribution from <FromAccount></FromAccount>",
-  "AzyeWl": "Payment Method deleted successfully",
+  "AzyeWl": "",
   "b++lom": "Yes, cancel editing",
   "B+fVMt": "More than {amount}",
   "B+NQ+r": "<Individual></Individual> drafted an <Expense>{expenseDescription}</Expense> on <Account></Account>",
