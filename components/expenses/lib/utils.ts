@@ -155,5 +155,5 @@ export const getSupportedCurrencies = (collective, { payee, payoutMethod, type, 
 };
 
 export const expenseTypeSupportsItemCurrency = expenseType => {
-  return expenseType === expenseTypes.RECEIPT;
+  return [expenseTypes.RECEIPT, expenseTypes.INVOICE].includes(expenseType);
 };
