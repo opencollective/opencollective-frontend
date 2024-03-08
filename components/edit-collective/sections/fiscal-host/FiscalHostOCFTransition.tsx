@@ -1,8 +1,11 @@
 import React from 'react';
+import { gql, useQuery } from '@apollo/client';
 import { ChevronDown, ExternalLink } from 'lucide-react';
 
+import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { getCollectivePageRoute, getDashboardRoute } from '../../../../lib/url-helpers';
 
+import CollectivePicker from '../../../CollectivePicker';
 import Image from '../../../Image';
 import Link from '../../../Link';
 import MessageBox from '../../../MessageBox';
@@ -12,6 +15,36 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../../ui
 import { LeaveHostModal } from '../../LeaveHostModal';
 
 type Sections = 'recurringContributions' | 'balance' | 'moveHost' | 'externalHost' | 'moreOptions';
+
+const fiscalHostOCFTransitionQuery = gql`
+  query FiscalHostOCFTransition {
+    hosts(limit: 200, offset: 0) {
+      totalCount
+      limit
+      offset
+      nodes {
+        id
+        legacyId
+        createdAt
+        settings
+        type
+        name
+        slug
+        description
+        longDescription
+        currency
+        totalHostedAccounts
+        hostFeePercent
+        isTrustedHost
+        location {
+          id
+          country
+        }
+        tags
+      }
+    }
+  }
+`;
 
 const ChevronButton = () => (
   <div className="flex items-center gap-1.5">
@@ -30,7 +63,9 @@ const step1Label = 'Pause your Recurring Contributions';
  */
 export const FiscalHostOCFTransition = ({ collective }) => {
   const [openCollapsible, setOpenCollapsible] = React.useState<Sections>('recurringContributions');
-  const [modal, setOpenModal] = React.useState<'leaveHost'>(null);
+  const [modal, setOpenModal] = React.useState<'leaveHost' | 'applyFlow'>(null);
+  const [selectedHost, setSelectedHost] = React.useState(null);
+  const { data, loading } = useQuery(fiscalHostOCFTransitionQuery, { context: API_V2_CONTEXT });
   const getOpenProps = (section: Sections) => ({
     open: openCollapsible === section,
     onOpenChange: (open: boolean) => setOpenCollapsible(open ? section : null), // Collapse other sections when opening a new one
@@ -145,10 +180,26 @@ export const FiscalHostOCFTransition = ({ collective }) => {
                 </Button>
               </div>
             ) : (
-              <p className="mt-4">
-                In the coming days we will be releasing a tool to help you transition to a new Fiscal Host. Please check
-                back here to initiate the process.
-              </p>
+              <div className="mt-4">
+                <p>
+                  Your balance is not empty. In order to move to a new fiscal host, you will need to zero your balance
+                  with Open Collective Foundation or use the application flow below to duplicate your Collective and
+                  apply to a new Fiscal Host.
+                </p>
+                <div className="mt-3 flex gap-4">
+                  <div className="max-w-[300px]">
+                    <CollectivePicker
+                      collectives={(data?.hosts?.nodes || []).filter(host => ![host.slug].includes('foundation'))}
+                      isLoading={loading}
+                      placeholder="Select a new Fiscal Host"
+                      onChange={({ value }) => setSelectedHost(value)}
+                    />
+                  </div>
+                  <Button disabled={!selectedHost} variant="outline" onClick={() => setOpenModal('applyFlow')}>
+                    Open the application flow
+                  </Button>
+                </div>
+              </div>
             )}
           </CollapsibleContent>
         </Collapsible>
@@ -205,9 +256,16 @@ export const FiscalHostOCFTransition = ({ collective }) => {
           </CollapsibleContent>
         </Collapsible>
       </div>
-      {modal === 'leaveHost' && (
+      {modal === 'leaveHost' ? (
         <LeaveHostModal account={collective} host={collective.host} onClose={() => setOpenModal(null)} />
-      )}
+      ) : modal === 'applyFlow' ? (
+        <OCFDuplicateAndApplyToHostModal
+          collective={collective}
+          hostSlug={selectedHost.slug}
+          onClose={() => setOpenModal(null)}
+          onSuccess={console.log} // TODO update UI
+        />
+      ) : null}
     </div>
   );
 };
