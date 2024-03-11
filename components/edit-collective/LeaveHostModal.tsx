@@ -15,16 +15,20 @@ import { FormikZod } from '../FormikZod';
 import I18nFormatters from '../I18nFormatters';
 import Loading from '../Loading';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
+import RichTextEditor from '../RichTextEditor';
 import StyledButton from '../StyledButton';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
-import StyledTextarea from '../StyledTextarea';
 import { RadioGroup, RadioGroupItem } from '../ui/RadioGroup';
 import { useToast } from '../ui/useToast';
 
 const leaveHostMutation = gql`
   mutation LeaveHost($account: AccountReferenceInput!, $pauseContributions: Boolean!, $messageForContributors: String) {
-    removeHost(account: $account, pauseContributions: $pauseContributions, message: $messageForContributors) {
+    removeHost(
+      account: $account
+      pauseContributions: $pauseContributions
+      messageForContributors: $messageForContributors
+    ) {
       id
       ... on AccountWithHost {
         host {
@@ -230,11 +234,16 @@ export const LeaveHostModal = ({ account, host, onClose }) => {
                         }
                       >
                         {({ field }) => (
-                          <StyledTextarea
-                            {...field}
+                          <RichTextEditor
+                            id={field.id}
+                            inputName={field.name}
                             showCount
-                            minHeight={175}
+                            version="simplified"
                             disabled={!values.whatToDoWithRecurringContributions}
+                            onChange={field.onChange}
+                            editorMaxHeight={300}
+                            withBorders
+                            editorMinHeight={150}
                           />
                         )}
                       </StyledInputFormikField>

@@ -213,6 +213,7 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
             editorMaxHeight={500}
             onChange={e => props.formik.setFieldValue('instructions', e.target.value)}
             fontSize="14px"
+            maxLength={1000}
           />
         </StyledInputField>
       )}
