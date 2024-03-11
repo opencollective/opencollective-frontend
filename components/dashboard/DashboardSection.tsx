@@ -3,15 +3,13 @@ import PropTypes from 'prop-types';
 import { values } from 'lodash';
 import { useIntl } from 'react-intl';
 
-import { HostAdminAccountingSection } from '../admin-panel/sections/accounting';
-import AccountSettings from '../admin-panel/sections/AccountSettings';
-import InvoicesReceipts from '../admin-panel/sections/invoices-receipts/InvoicesReceipts';
-import NotificationsSettings from '../admin-panel/sections/NotificationsSettings';
-import Team from '../admin-panel/sections/Team';
 import Container from '../Container';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import NotFound from '../NotFound';
+import { OCFBanner } from '../OCFBanner';
 
+import { HostAdminAccountingSection } from './sections/accounting';
+import AccountSettings from './sections/AccountSettings';
 import HostApplications from './sections/collectives/HostApplications';
 import HostedCollectives from './sections/collectives/HostedCollectives';
 import HostFinancialContributions from './sections/contributions/HostFinancialContributions';
@@ -22,10 +20,13 @@ import HostExpenses from './sections/expenses/HostDashboardExpenses';
 import ReceivedExpenses from './sections/expenses/ReceivedExpenses';
 import SubmittedExpenses from './sections/expenses/SubmittedExpenses';
 import HostDashboardAgreements from './sections/HostDashboardAgreements';
-import HostDashboardReports from './sections/HostDashboardReports';
 import HostVirtualCardRequests from './sections/HostVirtualCardRequests';
 import HostVirtualCards from './sections/HostVirtualCards';
+import InvoicesReceipts from './sections/invoices-receipts/InvoicesReceipts';
+import NotificationsSettings from './sections/NotificationsSettings';
 import Overview from './sections/overview/Overview';
+import HostDashboardReports from './sections/reports/HostDashboardReports';
+import Team from './sections/Team';
 import AccountTransactions from './sections/transactions/AccountTransactions';
 import HostTransactions from './sections/transactions/HostTransactions';
 import Vendors from './sections/Vendors';
@@ -63,10 +64,14 @@ const SETTINGS_COMPONENTS = {
 
 const DashboardSection = ({ account, isLoading, section, subpath }) => {
   const { formatMessage } = useIntl();
+  const displayOCFBanner = account?.host?.slug === 'foundation' && account.parent?.slug !== 'foundation' && (
+    <OCFBanner collective={account} />
+  );
 
   if (isLoading) {
     return (
       <div className="w-full">
+        {displayOCFBanner}
         <LoadingPlaceholder height={26} mb={4} maxWidth={500} />
         <LoadingPlaceholder height={300} />
       </div>
@@ -77,6 +82,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
   if (DashboardComponent) {
     return (
       <div className="w-full">
+        {displayOCFBanner}
         <DashboardComponent accountSlug={account.slug} subpath={subpath} isDashboard />
       </div>
     );
@@ -85,6 +91,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
   if (values(LEGACY_SECTIONS).includes(section)) {
     return (
       <div className="w-full max-w-screen-lg">
+        {displayOCFBanner}
         {SECTION_LABELS[section] && <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />}
 
         <AccountSettings account={account} section={section} />
@@ -98,6 +105,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
     return (
       // <div className="flex max-w-screen-lg justify-center">
       <div className="max-w-screen-md flex-1">
+        {displayOCFBanner}
         <SettingsComponent account={account} accountSlug={account.slug} subpath={subpath} />
       </div>
       // </div>
@@ -108,6 +116,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
     return (
       // <div className="flex max-w-screen-lg justify-center">
       <div className="max-w-screen-md flex-1">
+        {displayOCFBanner}
         {SECTION_LABELS[section] && <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />}
 
         <AccountSettings account={account} section={section} />

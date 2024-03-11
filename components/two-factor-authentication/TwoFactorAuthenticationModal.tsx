@@ -14,7 +14,7 @@ import {
   setLocalStorage,
 } from '../../lib/local-storage';
 import { useTwoFactorAuthenticationPrompt } from '../../lib/two-factor-authentication/TwoFactorAuthenticationContext';
-import { getSettingsRoute } from '../../lib/url-helpers';
+import { getDashboardRoute } from '../../lib/url-helpers';
 
 import { getI18nLink } from '../I18nFormatters';
 import Image from '../Image';
@@ -168,7 +168,7 @@ export default function TwoFactorAuthenticationModal() {
                 defaultMessage="To enable Two-Factor Authentication (2FA), follow the steps <link>here</link>"
                 values={{
                   link: getI18nLink({
-                    href: getSettingsRoute(LoggedInUser.collective, 'user-security#two-factor-auth'),
+                    href: getDashboardRoute(LoggedInUser.collective, 'user-security#two-factor-auth'),
                     as: Link,
                   }),
                 }}

@@ -22,9 +22,20 @@ type MenuLinkProps = {
   Icon?: LucideIcon;
   subMenu?: PageMenuItem[];
   section?: string;
+  dataCy?: string;
 };
 
-export const MenuLink = ({ section, subMenu, Icon, label, href, isBeta, className, external }: MenuLinkProps) => {
+export const MenuLink = ({
+  section,
+  subMenu,
+  Icon,
+  label,
+  href,
+  isBeta,
+  className,
+  external,
+  dataCy,
+}: MenuLinkProps) => {
   const { formatMessage } = useIntl();
   const { selectedSection, account } = React.useContext(DashboardContext);
   const [selfExpanded, setSelfExpanded] = React.useState(false);
@@ -49,7 +60,7 @@ export const MenuLink = ({ section, subMenu, Icon, label, href, isBeta, classNam
     <div>
       <Link
         href={href || getDashboardRoute(account, section || subMenu?.[0].section)}
-        data-cy={`menu-item-${section || label}`}
+        data-cy={dataCy || `menu-item-${section || label}`}
         className={classNames}
       >
         <div className="flex w-full flex-1 items-center justify-between">

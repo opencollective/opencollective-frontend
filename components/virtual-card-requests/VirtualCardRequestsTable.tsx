@@ -7,6 +7,7 @@ import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { Account, VirtualCardRequest, VirtualCardRequestStatus } from '../../lib/graphql/types/v2/graphql';
 import { useWindowResize } from '../../lib/hooks/useWindowResize';
+import { i18nVirtualCardRequestStatus } from '../../lib/i18n/virtual-card-request';
 import { getSpendingLimitShortString } from '../../lib/i18n/virtual-card-spending-limit';
 
 import { AccountHoverCard } from '../AccountHoverCard';
@@ -206,9 +207,9 @@ const tableColumns: ColumnDef<VirtualCardRequest>[] = [
     accessorKey: 'status',
     meta: { className: 'w-28' },
     header: () => <FormattedMessage id="VirtualCards.Status" defaultMessage="Status" />,
-    cell: ({ cell }: CellContext<VirtualCardRequest, string>) => {
+    cell: ({ cell, table }: CellContext<VirtualCardRequest, string>) => {
       const status = cell.getValue();
-
+      const { intl } = table.options.meta as VirtualCardRequestsTableMeta;
       return (
         <StyledTag
           textTransform="uppercase"
@@ -222,7 +223,7 @@ const tableColumns: ColumnDef<VirtualCardRequest>[] = [
                 : 'error'
           }
         >
-          {status}
+          {i18nVirtualCardRequestStatus(intl, status)}
         </StyledTag>
       );
     },

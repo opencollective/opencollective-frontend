@@ -39,6 +39,7 @@ type AccountingCategorySelectProps = {
   selectedCategory: AccountingCategory | undefined | null;
   valuesByRole?: Expense['valuesByRole'];
   onChange: (category: AccountingCategory) => void;
+  onBlur?: () => void;
   allowNone?: boolean;
   showCode?: boolean;
   id?: string;
@@ -291,6 +292,7 @@ const AccountingCategorySelect = ({
   valuesByRole,
   predictionStyle,
   onChange,
+  onBlur,
   id,
   error,
   allowNone = false,
@@ -319,7 +321,7 @@ const AccountingCategorySelect = ({
   return (
     <div>
       <Popover open={isOpen} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
+        <PopoverTrigger asChild onBlur={onBlur}>
           {children || (
             <button
               id={id}

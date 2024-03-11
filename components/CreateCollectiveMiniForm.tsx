@@ -11,11 +11,9 @@ import { i18nGraphqlException } from '../lib/errors';
 import { gqlV1 } from '../lib/graphql/helpers';
 import { isValidEmail } from '../lib/utils';
 
-import Container from './Container';
-import { Box } from './Grid';
+import { Button } from './ui/Button';
 import InputTypeCountry from './InputTypeCountry';
 import MessageBox from './MessageBox';
-import StyledButton from './StyledButton';
 import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';
 import StyledInputFormikField from './StyledInputFormikField';
@@ -46,6 +44,28 @@ const CreateNewMessages = defineMessages({
   },
 });
 
+const SaveButtonMessage = defineMessages({
+  [CollectiveType.COLLECTIVE]: {
+    id: 'CreateCollective',
+    defaultMessage: 'Create collective',
+  },
+  [CollectiveType.USER]: {
+    id: 'InviteUser',
+    defaultMessage: 'Invite user',
+  },
+  [CollectiveType.EVENT]: {
+    id: 'CreateEvent',
+    defaultMessage: 'Create event',
+  },
+  [CollectiveType.ORGANIZATION]: {
+    id: 'CreateOrganization',
+    defaultMessage: 'Create organization',
+  },
+  [CollectiveType.VENDOR]: {
+    defaultMessage: 'Create vendor',
+  },
+});
+
 const msg = defineMessages({
   emailTitle: {
     id: 'User.EmailAddress',
@@ -71,6 +91,13 @@ const msg = defineMessages({
     id: 'Fields.website',
     defaultMessage: 'Website',
   },
+  contactName: {
+    id: 'ContactName',
+    defaultMessage: 'Contact name',
+  },
+  contactEmail: {
+    defaultMessage: "Contact's email",
+  },
   cancel: {
     id: 'actions.cancel',
     defaultMessage: 'Cancel',
@@ -78,10 +105,6 @@ const msg = defineMessages({
   save: {
     id: 'save',
     defaultMessage: 'Save',
-  },
-  saveUser: {
-    id: 'InviteUser',
-    defaultMessage: 'Invite user',
   },
   invalidEmail: {
     id: 'error.email.invalid',
@@ -124,7 +147,7 @@ const prepareMutationVariables = collective => {
     return { collective: pick(collective, ['name', 'legalName', 'type', 'website', 'members', ...locationFields]) };
   } else if (collective.type === CollectiveType.VENDOR) {
     return {
-      collective: pick(collective, ['name', 'legalName', 'type', 'website', 'ParentCollectiveId']),
+      collective: pick(collective, ['name', 'legalName', 'type', 'website', 'ParentCollectiveId', 'vendorInfo']),
     };
   } else {
     return { collective: pick(collective, ['name', 'type', 'website', ...locationFields]) };
@@ -272,9 +295,9 @@ const CreateCollectiveMiniForm = ({
         const { values, errors, touched, isSubmitting } = formik;
 
         return (
-          <Form data-cy="create-collective-mini-form">
+          <Form data-cy="create-collective-mini-form" className="flex h-full flex-col overflow-y-hidden">
             <H5 fontWeight={600}>{CreateNewMessages[type] ? formatMessage(CreateNewMessages[type]) : null}</H5>
-            <Box mt={3}>
+            <div className="w-full flex-grow overflow-y-auto pb-4">
               {(isUser || isOrganization) && !noAdminFields && (
                 <StyledInputField
                   name={isOrganization ? 'members[0].member.email' : 'email'}
@@ -369,6 +392,48 @@ const CreateCollectiveMiniForm = ({
                   )}
                 </StyledInputField>
               )}
+              {isVendor && (
+                <React.Fragment>
+                  <StyledInputField
+                    name="vendorInfo.contact.name"
+                    htmlFor="vendorInfo.contact.name"
+                    required={false}
+                    label={formatMessage(msg.contactName)}
+                    mt={3}
+                    value={values.vendorInfo?.contact?.name}
+                  >
+                    {inputProps => (
+                      <Field
+                        as={StyledInput}
+                        {...inputProps}
+                        placeholder={intl.formatMessage(msg.examples, {
+                          examples: 'Jane Mary Doe, Frank Vincent Zappa',
+                        })}
+                        width="100%"
+                      />
+                    )}
+                  </StyledInputField>
+                  <StyledInputField
+                    name="vendorInfo.contact.email"
+                    htmlFor="vendorInfo.contact.email"
+                    required={false}
+                    label={formatMessage(msg.contactEmail)}
+                    mt={3}
+                    value={values.vendorInfo?.contact?.email}
+                  >
+                    {inputProps => (
+                      <Field
+                        as={StyledInput}
+                        {...inputProps}
+                        placeholder={intl.formatMessage(msg.examples, {
+                          examples: 'steve@apple.com',
+                        })}
+                        width="100%"
+                      />
+                    )}
+                  </StyledInputField>
+                </React.Fragment>
+              )}
               {!(isUser || isVendor) && (
                 <StyledInputField
                   name="website"
@@ -417,33 +482,20 @@ const CreateCollectiveMiniForm = ({
                   }}
                 </StyledInputFormikField>
               ))}
-            </Box>
+            </div>
             {submitError && (
               <MessageBox type="error" withIcon mt={2}>
                 {i18nGraphqlException(intl, submitError)}
               </MessageBox>
             )}
-            <Container
-              display="flex"
-              flexWrap="wrap"
-              justifyContent="flex-end"
-              borderTop="1px solid #D7DBE0"
-              mt={4}
-              pt={3}
-            >
-              <StyledButton mr={2} minWidth={100} onClick={() => onCancel()} disabled={isSubmitting}>
+            <div className="flex w-full justify-stretch gap-4 pt-4">
+              <Button type="submit" loading={isSubmitting} data-cy="mini-form-save-button" size="sm" className="flex-1">
+                {formatMessage(SaveButtonMessage[type]) || formatMessage(msg.save)}
+              </Button>
+              <Button onClick={() => onCancel()} disabled={isSubmitting} variant="outline" size="sm" className="flex-1">
                 {formatMessage(msg.cancel)}
-              </StyledButton>
-              <StyledButton
-                type="submit"
-                buttonStyle="primary"
-                minWidth={100}
-                loading={isSubmitting}
-                data-cy="mini-form-save-button"
-              >
-                {isUser ? formatMessage(msg.saveUser) : formatMessage(msg.save)}
-              </StyledButton>
-            </Container>
+              </Button>
+            </div>
           </Form>
         );
       }}

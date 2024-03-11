@@ -83,9 +83,9 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
           default:
             return {
               includeReceived: true,
-              includeBalance: true,
+              includeBalance: account.isActive, // only showing Balance if account is active
               includeSpent: true,
-              includeBalanceTimeseries: true,
+              includeBalanceTimeseries: account.isActive, // only showing Balance if account is active
               includeContributionsCount: true,
               includeReceivedTimeseries: true,
             };
@@ -127,6 +127,7 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
       showCurrencyCode: true,
       isSnapshot: true,
       showTimeSeries: true,
+      hide: !account.isActive,
     },
     {
       id: 'received',
@@ -146,6 +147,7 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
       id: 'contributions',
       label: <FormattedMessage id="Contributions" defaultMessage="Contributions" />,
       count: data?.account.contributionsCount,
+      hide: !account.isActive,
     },
   ];
 
@@ -163,7 +165,7 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
           <Filterbar hideSeparator {...queryFilter} />
 
           <Metric {...metric} loading={loading} expanded showTimeSeries showCurrencyCode>
-            <AccountTable queryFilter={queryFilter} accountSlug={accountSlug} metric={metric} />
+            <AccountTable queryFilter={queryFilter} accountSlug={router.query?.as ?? accountSlug} metric={metric} />
           </Metric>
         </div>
       );
@@ -235,14 +237,16 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
         <Filterbar hideSeparator {...queryFilter} />
 
         <div className="grid grid-flow-dense grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3  ">
-          {metrics.map(metric => (
-            <Metric
-              key={metric.id}
-              {...metric}
-              loading={loading}
-              onClick={() => queryFilter.setFilter('subpath', metric.id)}
-            />
-          ))}
+          {metrics
+            .filter(metric => !metric.hide)
+            .map(metric => (
+              <Metric
+                key={metric.id}
+                {...metric}
+                loading={loading}
+                onClick={() => queryFilter.setFilter('subpath', metric.id)}
+              />
+            ))}
         </div>
       </div>
 
@@ -253,7 +257,7 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
           <TodoList />
           <Timeline accountSlug={router.query?.as ?? accountSlug} />
         </div>
-        {!account.parent && (
+        {!account.parent && account.isActive && (
           <div className="-order-1 space-y-6 lg:order-none">
             <Accounts accountSlug={router.query?.as ?? accountSlug} />
           </div>

@@ -7,6 +7,7 @@ import { CollectiveType } from '../../lib/constants/collectives';
 import { moneyCanMoveFromEvent } from '../../lib/events';
 
 import NotificationBar, { NotificationBarButton, NotificationBarLink } from '../NotificationBar';
+import { OCFCollectivePageBanner } from '../OCFBanner';
 import SendMoneyToCollectiveBtn from '../SendMoneyToCollectiveBtn';
 
 import PendingApplicationActions from './PendingApplicationActions';
@@ -185,7 +186,7 @@ const getNotification = (intl, status, collective, host, LoggedInUser, refetch) 
       }),
       type: 'warning',
       actions: (
-        <NotificationBarLink href={`/${collective.slug}/admin/team`}>
+        <NotificationBarLink href={`/dashboard/${collective.slug}/team`}>
           <FormattedMessage defaultMessage="Manage members" />
         </NotificationBarLink>
       ),
@@ -211,6 +212,11 @@ const getNotification = (intl, status, collective, host, LoggedInUser, refetch) 
         />
       ),
     };
+  } else if (collective.host?.slug === 'foundation' && collective.parentCollective?.slug !== 'foundation') {
+    if (!LoggedInUser || !LoggedInUser.isAdminOfCollective(collective)) {
+      return;
+    }
+    return OCFCollectivePageBanner({ collective, LoggedInUser });
   }
 };
 

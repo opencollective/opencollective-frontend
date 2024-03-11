@@ -13,7 +13,10 @@ import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { collectiveAdminsMustConfirmAccountingCategory } from './lib/accounting-categories';
 
-import { getScheduledExpensesQueryVariables, scheduledExpensesQuery } from '../host-dashboard/ScheduledExpensesBanner';
+import {
+  getScheduledExpensesQueryVariables,
+  scheduledExpensesQuery,
+} from '../dashboard/sections/expenses/ScheduledExpensesBanner';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledTooltip from '../StyledTooltip';
@@ -81,7 +84,7 @@ const getErrorContent = (intl, error, host) => {
         title: intl.formatMessage({ defaultMessage: 'Insufficient Paypal balance' }),
         message: (
           <React.Fragment>
-            <Link href={`/${host.slug}/admin`}>
+            <Link href={`/dashboard/${host.slug}/host-expenses`}>
               <FormattedMessage
                 id="PayExpenseModal.RefillBalanceError"
                 defaultMessage="Refill your balance from the Host dashboard"

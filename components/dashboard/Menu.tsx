@@ -273,7 +273,6 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
               },
               {
                 section: ALL_SECTIONS.CHART_OF_ACCOUNTS,
-                if: Boolean(LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.EXPENSE_CATEGORIZATION)),
               },
               {
                 section: ALL_SECTIONS.INVOICES_RECEIPTS,
@@ -400,6 +399,7 @@ const Menu = ({ onRoute, menuItems }) => {
         Icon={Globe2}
         label={intl.formatMessage({ id: 'PublicProfile', defaultMessage: 'Public profile' })}
         className="hover:bg-slate-50 hover:text-slate-700"
+        dataCy="public-profile-link"
         external
       />
       <div className="space-y-2">

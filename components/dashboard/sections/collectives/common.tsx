@@ -13,9 +13,7 @@ import AddAgreementModal from '../../../agreements/AddAgreementModal';
 import Avatar from '../../../Avatar';
 import ContactCollectiveModal from '../../../ContactCollectiveModal';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
-import AddFundsModal from '../../../host-dashboard/AddFundsModal';
-import FreezeAccountModal from '../../../host-dashboard/FreezeAccountModal';
-import UnhostAccountModal from '../../../host-dashboard/UnhostAccountModal';
+import { Badge } from '../../../ui/Badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,6 +22,10 @@ import {
   DropdownMenuTrigger,
 } from '../../../ui/DropdownMenu';
 import { TableActionsButton } from '../../../ui/Table';
+
+import AddFundsModal from './AddFundsModal';
+import FreezeAccountModal from './FreezeAccountModal';
+import UnhostAccountModal from './UnhostAccountModal';
 
 export const cols: Record<string, ColumnDef<any, any>> = {
   collective: {
@@ -35,9 +37,24 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       };
       const collective = row.original;
       const children = mapValues(groupBy(collective.childrenAccounts?.nodes, 'type'), 'length');
-      const secondLine = toPairs(children)
-        .map(([type, count]) => count && `${count} ${formatCollectiveType(intl, type, count)}`)
-        .join(', ');
+      const isChild = collective.parent;
+      const secondLine = isChild ? (
+        <FormattedMessage
+          defaultMessage="{childAccountType} by {parentAccount}"
+          values={{
+            childAccountType: (
+              <Badge size="xs" type="outline">
+                {formatCollectiveType(intl, collective.type)}
+              </Badge>
+            ),
+            parentAccount: collective.parent.name,
+          }}
+        />
+      ) : (
+        toPairs(children)
+          .map(([type, count]) => count && `${count} ${formatCollectiveType(intl, type, count)}`)
+          .join(', ')
+      );
       return (
         <div className="flex items-center">
           <Avatar collective={collective} radius={48} className="mr-4" />

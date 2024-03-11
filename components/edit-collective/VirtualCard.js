@@ -13,7 +13,6 @@ import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { VirtualCardLimitInterval } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getAvailableLimitString } from '../../lib/i18n/virtual-card-spending-limit';
-import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { getDashboardObjectIdURL } from '../../lib/stripe/dashboard';
 
 import Avatar from '../Avatar';
@@ -241,13 +240,7 @@ export const ActionsButton = props => {
           {!props.hideViewTransactions && (
             <React.Fragment>
               <DropdownMenuItem>
-                <Link
-                  href={
-                    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)
-                      ? `/dashboard/${virtualCard.account.slug}/transactions?virtualCard=${virtualCard?.id}`
-                      : `/${virtualCard.account.slug}/transactions?virtualCard=${virtualCard?.id}`
-                  }
-                >
+                <Link href={`/dashboard/${virtualCard.account.slug}/transactions?virtualCard=${virtualCard.id}`}>
                   <FormattedMessage defaultMessage="View transactions" />
                 </Link>
               </DropdownMenuItem>

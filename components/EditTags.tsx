@@ -54,7 +54,7 @@ type EditTagsProps = {
   value: string[];
   onChange: (value: { label: string; value: string }[]) => void;
   defaultValue?: string[];
-  disabled: boolean;
+  disabled?: boolean;
 };
 
 type AutocompleteEditTagsProps = EditTagsProps & {

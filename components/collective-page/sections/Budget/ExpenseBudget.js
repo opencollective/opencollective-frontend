@@ -231,7 +231,7 @@ const ExpenseBudget = ({ collective, defaultTimeInterval, ...props }) => {
         </React.Fragment>
       )}
       <P mt={3} textAlign="right">
-        <Link href={`${getCollectivePageRoute(collective)}/expenses`} data-cy="view-all-expenses-link">
+        <Link href={`${getCollectivePageRoute(collective)}/transactions?kind=EXPENSE`} data-cy="view-all-expenses-link">
           <FormattedMessage id="CollectivePage.SectionBudget.ViewAllExpenses" defaultMessage="View all expenses" />{' '}
           &rarr;
         </Link>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
-import { CheckCircle2Icon, CircleIcon, PlusIcon } from 'lucide-react';
+import { PlusIcon } from 'lucide-react';
 import QRCode from 'qrcode.react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import speakeasy from 'speakeasy';
@@ -102,7 +102,6 @@ export function AuthenticatorSettings(props: AuthenticatorSettingsProps) {
   return (
     <StyledCard px={3} py={2}>
       <Flex alignItems="center">
-        <Box mr={3}>{userTwoFactorMethods.length > 0 ? <CheckCircle2Icon color="#0EA755" /> : <CircleIcon />}</Box>
         <H3 fontSize="14px" fontWeight="700">
           <FormattedMessage defaultMessage="Authenticator App" />
         </H3>
@@ -110,15 +109,15 @@ export function AuthenticatorSettings(props: AuthenticatorSettingsProps) {
       <div className="mb-3 text-sm">
         <FormattedMessage defaultMessage="An application that supports TOTP (time-based one-time password). For example, Google Authenticator and 1Password." />
       </div>
-      <Box>
+      <div>
         {userTwoFactorMethods.map(device => {
           return (
-            <Box className="border-b last:border-b-0" mx={4} key={device.id} data-cy="authenticator-2fa-method">
+            <Box className="border-b last:border-b-0" key={device.id} data-cy="authenticator-2fa-method">
               <UserTwoFactorMethodItem individual={props.individual} userTwoFactorMethod={device} />
             </Box>
           );
         })}
-      </Box>
+      </div>
       {userTwoFactorMethods.length === 0 && (
         <Box mt={3}>
           <StyledButton

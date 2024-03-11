@@ -7,7 +7,6 @@ import { ChevronDown, ExternalLink, Mail } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { cn } from '../../lib/utils';
 
 import Image from '../Image';
@@ -58,7 +57,7 @@ const SocialLinks = ({ className }: { className?: string }) => {
 const Footer = () => {
   const { LoggedInUser } = useLoggedInUser();
 
-  if (LoggedInUser && LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)) {
+  if (LoggedInUser) {
     return (
       <footer className="flex justify-center border-t px-6 py-12 md:px-8">
         <div className="flex w-full max-w-screen-xl flex-1 flex-col items-start gap-6 sm:flex-row md:flex-col">

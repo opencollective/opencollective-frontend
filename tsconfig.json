@@ -17,17 +17,6 @@
     "jsx": "preserve",
     "resolveJsonModule": true
   },
-  "include": [
-    "next-env.d.ts",
-    "lib/graphql/types/v2/gql.d.ts",
-    "components",
-    "cypress",
-    "lib",
-    "pages",
-    "scripts",
-    "server",
-    "stories",
-    "test"
-  ],
+  "include": ["next-env.d.ts", "components", "cypress", "lib", "pages", "scripts", "server", "stories", "test"],
   "exclude": ["node_modules"]
 }

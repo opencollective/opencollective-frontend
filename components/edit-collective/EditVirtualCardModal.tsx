@@ -405,7 +405,7 @@ export default function EditVirtualCardModal({
                       />
                       <Box mt={3}>
                         <StyledLink
-                          href={`/${host.slug}/admin/host-virtual-cards?collective=${formik.values?.collective?.slug}`}
+                          href={`/dashboard/${host.slug}/host-virtual-cards?collective=${formik.values?.collective?.slug}`}
                         >
                           <FormattedMessage defaultMessage="View Assigned Cards" />
                         </StyledLink>

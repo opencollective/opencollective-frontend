@@ -4,6 +4,7 @@ import { toNumber } from 'lodash';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
+import { fetchCSVFileFromRESTService } from '../../../lib/api';
 import { FilterConfig } from '../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
@@ -17,6 +18,7 @@ import DateTime from '../../DateTime';
 import LinkCollective from '../../LinkCollective';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import { Span } from '../../Text';
+import { Button } from '../../ui/Button';
 import { Pagination } from '../../ui/Pagination';
 import DashboardHeader from '../DashboardHeader';
 import { EmptyResults } from '../EmptyResults';
@@ -283,9 +285,35 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
   const currentViewCount = views.find(v => v.id === queryFilter.activeViewId)?.count;
   const nbPlaceholders = currentViewCount < queryFilter.values.limit ? currentViewCount : queryFilter.values.limit;
 
+  const [isDownloadingCsv, setDownloadingCsv] = React.useState(false);
+
   return (
     <div className="flex max-w-screen-lg flex-col gap-4">
-      <DashboardHeader title={<FormattedMessage id="Contributors" defaultMessage="Contributors" />} />
+      <DashboardHeader
+        title={<FormattedMessage id="Contributors" defaultMessage="Contributors" />}
+        actions={
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              loading={isDownloadingCsv}
+              onClick={async () => {
+                try {
+                  setDownloadingCsv(true);
+                  const filename = `${accountSlug}-contributors.csv`;
+                  const url = `${process.env.REST_URL}/v2/${accountSlug}/contributors.csv?fetchAll=1`;
+                  await fetchCSVFileFromRESTService(url, filename);
+                } finally {
+                  setDownloadingCsv(false);
+                }
+              }}
+            >
+              <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
+            </Button>
+          </div>
+        }
+      />
+
       <Filterbar {...queryFilter} />
 
       {error ? (

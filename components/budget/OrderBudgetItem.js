@@ -109,7 +109,7 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign, ho
                   )}
                 </AutosizeText>
               </StyledLink>
-              {order.permissions.canUpdateAccountingCategory && (
+              {order.permissions?.canUpdateAccountingCategory && (
                 <OrderAdminAccountingCategoryPill order={order} account={order.toAccount} host={host} />
               )}
               <P mt="5px" fontSize="12px" color="black.600">

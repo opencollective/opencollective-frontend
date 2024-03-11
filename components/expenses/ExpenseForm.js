@@ -816,6 +816,7 @@ const ExpenseFormBody = ({
                           defaultMessage="If you already have an invoice document, you can upload it here."
                         />
                       }
+                      onChange={attachedFiles => formik.setFieldValue('attachedFiles', attachedFiles)}
                       form={formik}
                       defaultValue={values.attachedFiles}
                     />
@@ -857,7 +858,7 @@ const ExpenseFormBody = ({
                           defaultMessage="If you want to include any documentation, you can upload it here."
                         />
                       }
-                      form={formik}
+                      onChange={attachedFiles => formik.setFieldValue('attachedFiles', attachedFiles)}
                       defaultValue={values.attachedFiles}
                     />
                   </Box>

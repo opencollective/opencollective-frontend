@@ -27,6 +27,7 @@ import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import LinkCollective from '../../../LinkCollective';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import { H4 } from '../../../Text';
+import { Badge } from '../../../ui/Badge';
 import { Button } from '../../../ui/Button';
 import { InfoList, InfoListItem } from '../../../ui/InfoList';
 import { InputGroup } from '../../../ui/Input';
@@ -339,14 +340,36 @@ const CollectiveDetails = ({
       ) : (
         <React.Fragment>
           <SectionTitle>
-            <LinkCollective
-              collective={collective}
-              className="flex items-center gap-2 font-medium text-slate-700 hover:text-slate-700 hover:underline"
-            >
-              <Avatar collective={collective} radius={48} />
-              {collective.name}
-            </LinkCollective>
+            <Avatar collective={collective} radius={48} />
+            <div>
+              <LinkCollective
+                collective={collective}
+                className="flex items-center gap-2 font-medium text-slate-700 hover:text-slate-700 hover:underline"
+              >
+                {collective.name}
+              </LinkCollective>
+              {collective.parent && (
+                <div className="text-sm font-normal text-muted-foreground">
+                  <FormattedMessage
+                    defaultMessage="{childAccountType} by {parentAccount}"
+                    values={{
+                      childAccountType: (
+                        <Badge size="xs" type="outline">
+                          {formatCollectiveType(intl, collective.type)}
+                        </Badge>
+                      ),
+                      parentAccount: (
+                        <LinkCollective collective={collective.parent} withHoverCard>
+                          {collective.parent.name}
+                        </LinkCollective>
+                      ),
+                    }}
+                  />
+                </div>
+              )}
+            </div>
           </SectionTitle>
+
           <InfoList className="sm:grid-cols-2">
             <InfoListItem
               title={<FormattedMessage id="HostedSince" defaultMessage="Hosted since" />}

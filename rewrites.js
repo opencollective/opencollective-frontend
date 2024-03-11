@@ -127,6 +127,10 @@ exports.REWRITES = [
     destination: '/create-project',
   },
   {
+    source: '/dashboard/:slug/expenses/new',
+    destination: '/submit-expense',
+  },
+  {
     source: '/dashboard',
     destination: '/dashboard',
   },
@@ -138,10 +142,6 @@ exports.REWRITES = [
   {
     source: '/workspace/:slug/:section?/:subpath*',
     destination: '/dashboard',
-  },
-  {
-    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:slug/admin/:section?/:subpath*',
-    destination: '/admin-panel',
   },
   {
     source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/contact',

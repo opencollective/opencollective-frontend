@@ -25,8 +25,7 @@ import { isSupportedExpenseType } from '../../lib/expenses';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
-import { getCollectivePageRoute, getDashboardRoute, getSettingsRoute } from '../../lib/url-helpers';
+import { getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
 
 import ActionButton from '../ActionButton';
 import AddFundsBtn from '../AddFundsBtn';
@@ -321,24 +320,11 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
     return {
       type: NAVBAR_ACTION_TYPE.SETTINGS,
       component: (
-        <Link
-          href={
-            LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)
-              ? getDashboardRoute(collective)
-              : getSettingsRoute(collective)
-          }
-          data-cy="edit-collective-btn"
-        >
+        <Link href={getDashboardRoute(collective)} data-cy="edit-collective-btn">
           <ActionButton tabIndex="-1">
             <Settings size="1em" />
             <Span ml={2}>
-              {LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD) ? (
-                <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
-              ) : collective.isHost ? (
-                <FormattedMessage id="AdminPanel.button" defaultMessage="Admin" />
-              ) : (
-                <FormattedMessage id="Settings" defaultMessage="Settings" />
-              )}
+              <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
             </Span>
           </ActionButton>
         </Link>
@@ -395,13 +381,7 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
     return {
       type: NAVBAR_ACTION_TYPE.MANAGE_SUBSCRIPTIONS,
       component: (
-        <Link
-          href={
-            LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)
-              ? getDashboardRoute(collective, 'outgoing-contributions')
-              : `${getCollectivePageRoute(collective)}/manage-contributions`
-          }
-        >
+        <Link href={getDashboardRoute(collective, 'outgoing-contributions')}>
           <ActionButton tabIndex="-1">
             <Stack size="1em" />
             <Span ml={2}>

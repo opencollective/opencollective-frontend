@@ -117,7 +117,7 @@ const Welcome = () => {
           </WelcomeOptionContainer>
           <Flex justifyContent="space-between" width={['100%', '472px']} pl="13px" pr="13px" pb="32px" pt="40px">
             {LoggedInUser && (
-              <StyledLink href={`${LoggedInUser.collective?.slug}/admin`}>
+              <StyledLink href={`/dashboard/${LoggedInUser.collective?.slug}/info`}>
                 <FormattedMessage defaultMessage="Go to settings" />
               </StyledLink>
             )}

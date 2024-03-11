@@ -216,7 +216,7 @@ const Transactions = ({
         />
         <div className="flex justify-evenly">
           {canDownloadInvoices && (
-            <Link href={`/${account.slug}/admin/payment-receipts`}>
+            <Link href={`/dashboard/${account.slug}/payment-receipts`}>
               <StyledButton
                 buttonSize="small"
                 minWidth={140}

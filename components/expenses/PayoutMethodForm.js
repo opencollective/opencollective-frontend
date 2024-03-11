@@ -46,10 +46,10 @@ export const validatePayoutMethod = payoutMethod => {
       set(errors, 'data.email', createError(ERROR.FORM_FIELD_PATTERN));
     }
   } else if (payoutMethod.type === PayoutMethodType.BANK_ACCOUNT) {
-    if (!payoutMethod.data.currency) {
+    if (!payoutMethod.data?.currency) {
       set(errors, 'data.currency', createError(ERROR.FORM_FIELD_REQUIRED));
     }
-    if (!payoutMethod.data.accountHolderName) {
+    if (!payoutMethod.data?.accountHolderName) {
       set(errors, 'data.accountHolderName', createError(ERROR.FORM_FIELD_REQUIRED));
     }
   } else if (payoutMethod.type === PayoutMethodType.OTHER) {
@@ -67,7 +67,7 @@ export const validatePayoutMethod = payoutMethod => {
  * This component is **fully controlled**, you need to call `validatePayoutMethod`
  * to proceed with the validation and pass the result with the `errors` prop.
  */
-const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host, required }) => {
+const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host, required, alwaysSave = false }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
   const isNew = !payoutMethod.id;
@@ -118,7 +118,7 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host, required }) => {
           optional={required === false}
         />
       )}
-      {isNew && (
+      {isNew && !alwaysSave && (
         <Box mt={3}>
           <Field name={getFieldName('isSaved')}>
             {({ field }) => (
@@ -144,6 +144,7 @@ PayoutMethodForm.propTypes = {
   /** Base name of the field in the form */
   fieldsPrefix: PropTypes.string,
   required: PropTypes.bool,
+  alwaysSave: PropTypes.bool,
 };
 
 export default React.memo(PayoutMethodForm);

@@ -5,7 +5,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { FEATURES } from '../../lib/allowed-features';
 import { canContributeRecurring } from '../../lib/collective';
 import { isTierExpired } from '../../lib/tier-utils';
-import { getCollectivePageRoute } from '../../lib/url-helpers';
+import { getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
 
 import Container from '../Container';
 import { Flex } from '../Grid';
@@ -111,7 +111,7 @@ const paymentMethodUnavailableWarning = (loggedInUser, account, tier) => {
                 values={{
                   TiersLink: getI18nLink({
                     as: Link,
-                    href: `${getCollectivePageRoute(account)}/admin/tiers`,
+                    href: `${getDashboardRoute(account, 'tiers')}`,
                   }),
                 }}
               />

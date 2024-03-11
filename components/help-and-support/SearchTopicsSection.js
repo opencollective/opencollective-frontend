@@ -145,6 +145,7 @@ const SearchTopics = () => {
             showSearchButton
             searchButtonStyles={{ width: '32px', height: '32px' }}
             value={searchQuery}
+            onSubmit={e => e.preventDefault()}
             onChange={query => {
               if (!showSearchResults) {
                 setShowSearchResults(true);

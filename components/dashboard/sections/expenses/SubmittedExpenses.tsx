@@ -1,15 +1,18 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
 import { omit } from 'lodash';
+import { PlusIcon } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
 
 import ExpensesList from '../../../expenses/ExpensesList';
 import Pagination from '../../../Pagination';
+import { Button } from '../../../ui/Button';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import { Filterbar } from '../../filters/Filterbar';
@@ -50,6 +53,8 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
     currency: data?.account?.currency,
   };
 
+  const hasNewSubmitExpenseFlow = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW);
+
   const pageRoute = `/dashboard/${accountSlug}/submitted-expenses`;
 
   return (
@@ -57,6 +62,16 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
       <DashboardHeader
         title={<FormattedMessage defaultMessage="Submitted Expenses" />}
         description={<FormattedMessage defaultMessage="Expenses that you have submitted to other Collectives." />}
+        actions={
+          hasNewSubmitExpenseFlow ? (
+            <Button size="sm" className="gap-1" onClick={() => router.push(`/dashboard/${accountSlug}/expenses/new`)}>
+              <span>
+                <FormattedMessage id="create" defaultMessage="Create" />
+              </span>
+              <PlusIcon size={20} />
+            </Button>
+          ) : null
+        }
       />
       <Filterbar {...queryFilter} meta={filterMeta} />
 
@@ -95,7 +110,7 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
               route={pageRoute}
               total={data?.expenses?.totalCount}
               limit={queryFilter.values.limit}
-              offset={queryFilter.values.limit}
+              offset={queryFilter.values.offset}
               ignoredQueryParams={ROUTE_PARAMS}
             />
           </div>

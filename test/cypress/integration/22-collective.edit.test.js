@@ -15,7 +15,7 @@ describe('edit collective', () => {
   });
 
   beforeEach(() => {
-    cy.login({ redirect: `/${collectiveSlug}/admin` });
+    cy.login({ redirect: `/dashboard/${collectiveSlug}/info` });
   });
 
   it('edit members', () => {
@@ -56,7 +56,7 @@ describe('edit collective', () => {
     cy.url().should('eq', `${Cypress.config().baseUrl}/${collectiveSlug}`);
     cy.contains('#section-our-team', 'AmazingNewUser');
 
-    cy.visit(`/${collectiveSlug}/admin/team`);
+    cy.visit(`/dashboard/${collectiveSlug}/team`);
     cy.get('[data-cy="member-1"]').find('[data-cy="member-pending-tag"]').should('not.exist');
     cy.getByDataCy('resend-invite-btn').should('not.exist');
   });
@@ -149,7 +149,7 @@ describe('edit collective', () => {
     cy.contains('[data-cy="select-option"]', 'Use my own VAT number').click();
     cy.contains('button', 'Save').click();
     cy.contains('Saved');
-    cy.visit(`${collectiveSlug}/admin/tiers`);
+    cy.visit(`/dashboard/${collectiveSlug}/tiers`);
     cy.getByDataCy('contribute-card-tier').first().find('button').click();
     cy.getByDataCy('select-type').click();
     cy.contains('[data-cy=select-option]', 'product').click();
@@ -163,9 +163,10 @@ describe('edit user collective', () => {
     const userSlug = randomSlug();
     cy.signup({
       user: { name: userSlug, settings: { features: { twoFactorAuth: true } } },
-      redirect: `/${userSlug}/admin`,
+      redirect: `/dashboard/${userSlug}/info`,
     });
 
+    cy.getByDataCy('menu-item-Settings').click();
     cy.getByDataCy('menu-item-user-security').click();
     cy.contains('Add authenticator').click();
     cy.getByDataCy('qr-code').should('exist');

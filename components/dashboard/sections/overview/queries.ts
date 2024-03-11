@@ -18,7 +18,9 @@ export const timelineQuery = gql`
           slug
           type
           isIncognito
-          imageUrl(height: 48)
+          ...AccountHoverCardFields
+
+          imageUrl
           ... on Individual {
             isGuest
           }
@@ -35,7 +37,8 @@ export const timelineQuery = gql`
           slug
           type
           isIncognito
-          imageUrl(height: 48)
+          ...AccountHoverCardFields
+          imageUrl
           ... on Individual {
             isGuest
           }
@@ -61,12 +64,14 @@ export const timelineQuery = gql`
             name
             slug
             imageUrl
+            ...AccountHoverCardFields
           }
           account {
             id
             name
             type
             slug
+            ...AccountHoverCardFields
             ... on AccountWithParent {
               parent {
                 id
@@ -98,17 +103,25 @@ export const timelineQuery = gql`
           summary
           slug
         }
+        conversation {
+          id
+          title
+          summary
+          slug
+        }
         individual {
           id
           slug
           name
           type
-          imageUrl(height: 48)
+          imageUrl
           isIncognito
+          ...AccountHoverCardFields
         }
       }
     }
   }
+  ${accountHoverCardFields}
 `;
 
 export const collectiveBalanceQuery = gql`
@@ -197,7 +210,7 @@ export const metricsPerAccountQuery = gql`
     }
     spent: stats @include(if: $includeSpent) {
       id
-      current: totalAmountSpent(dateFrom: $dateFrom, dateTo: $dateTo, net: true) @include(if: $includeComparison) {
+      current: totalAmountSpent(dateFrom: $dateFrom, dateTo: $dateTo, net: true) {
         currency
         valueInCents
       }
@@ -209,7 +222,7 @@ export const metricsPerAccountQuery = gql`
     }
     received: stats @include(if: $includeReceived) {
       id
-      current: totalAmountReceived(dateFrom: $dateFrom, dateTo: $dateTo, net: true) @include(if: $includeReceived) {
+      current: totalAmountReceived(dateFrom: $dateFrom, dateTo: $dateTo, net: true) {
         currency
         valueInCents
       }
@@ -248,6 +261,7 @@ export const overviewMetricsQuery = gql`
   ) {
     account(slug: $slug) {
       id
+      isActive
       ...AccountHoverCardFields
       balance: stats @include(if: $includeBalance) {
         id
