@@ -3979,6 +3979,7 @@ type User implements CollectiveInterface {
   categories: [String]!
   policies: Policies!
   email: String
+  newsletterOptIn: Boolean
 }
 
 """
@@ -4756,6 +4757,7 @@ input CollectiveInputType {
   isIncognito: Boolean
   isActive: Boolean
   contributionPolicy: String
+  vendorInfo: JSON
 }
 
 input SocialLinkInput {
