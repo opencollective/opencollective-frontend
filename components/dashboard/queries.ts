@@ -23,6 +23,16 @@ export const adminPanelQuery = gql`
       pendingExpenses: expenses(status: PENDING, direction: RECEIVED, includeChildrenExpenses: true, limit: 0) {
         totalCount
       }
+      pausedIncomingContributions: orders(filter: INCOMING, status: PAUSED, includeIncognito: true) {
+        totalCount
+      }
+      pausedOutgoingContributions: orders(filter: OUTGOING, status: PAUSED, includeIncognito: true) {
+        totalCount
+      }
+      ... on AccountWithContributions {
+        canStartResumeContributionsProcess
+        hasResumeContributionsProcessStarted
+      }
       childrenAccounts {
         totalCount
         nodes {

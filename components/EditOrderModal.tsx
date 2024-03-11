@@ -102,14 +102,14 @@ const CancelModal = (props: Omit<EditOrderModalProps, 'action'>) => {
   });
 
   return (
-    <StyledModal onClose={props.onClose} maxWidth="420px">
+    <StyledModal onClose={props.onClose} maxWidth="420px" data-cy="cancel-order-modal">
       <ModalHeader onClose={props.onClose}>
         <H4 fontSize="20px" fontWeight="700">
           <FormattedMessage id="subscription.menu.cancelContribution" defaultMessage="Cancel contribution" />
         </H4>
       </ModalHeader>
       <ModalBody as="form" onSubmit={formik.handleSubmit as () => void} mb={0}>
-        <P fontSize="15px" mb="10" lineHeight="20px">
+        <P fontSize="15px" mb="10px" lineHeight="20px">
           <FormattedMessage
             id="subscription.cancel.question"
             defaultMessage="Why are you cancelling your subscription today? 🥺"
@@ -142,11 +142,18 @@ const CancelModal = (props: Omit<EditOrderModalProps, 'action'>) => {
             onChange={formik.handleChange}
             value={formik.values.reason}
             mt={2}
+            data-cy="cancellation-text-area"
           />
         )}
 
         <Flex flexWrap="wrap" justifyContent="space-evenly" mt={3}>
-          <StyledButton width="100%" m={1} type="submit" loading={formik.isSubmitting}>
+          <StyledButton
+            width="100%"
+            m={1}
+            type="submit"
+            loading={formik.isSubmitting}
+            data-cy="recurring-contribution-cancel-yes"
+          >
             <FormattedMessage id="submit" defaultMessage="Submit" />
           </StyledButton>
         </Flex>
@@ -300,6 +307,7 @@ const EditAmountModal = (props: Omit<EditOrderModalProps, 'action'>) => {
               interval={
                 selectedContributeOption?.interval || getIntervalFromContributionFrequency(props.order.frequency)
               }
+              order={props.order}
               host={props.order.toAccount.host}
               collective={props.order.toAccount}
               tier={selectedTier}
@@ -466,17 +474,21 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
       paymentMethodId = option.id;
     }
 
-    await updatePaymentMethod({ id: paymentMethodId });
-    props.onClose();
+    const success = await updatePaymentMethod({ id: paymentMethodId });
+    if (success) {
+      props.onClose();
+    }
   }, [option, props.onClose, intl]);
 
   const onPaypalSubscription = React.useCallback(
     async paypalSubscriptionId => {
-      await updatePaymentMethod({
+      const success = await updatePaymentMethod({
         service: PAYMENT_METHOD_SERVICE.PAYPAL,
         paypalInfo: { subscriptionId: paypalSubscriptionId },
       });
-      props.onClose();
+      if (success) {
+        props.onClose();
+      }
     },
     [props.onClose],
   );
@@ -521,15 +533,48 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
     <StyledModal onClose={props.onClose} maxWidth="480px" width="100%">
       <ModalHeader onClose={props.onClose}>
         <H4 fontSize="20px" fontWeight="700">
-          <FormattedMessage id="subscription.menu.editPaymentMethod" defaultMessage="Update payment method" />
+          {props.order.status === 'PAUSED' ? (
+            <FormattedMessage defaultMessage="Resume contribution" />
+          ) : (
+            <FormattedMessage id="subscription.menu.editPaymentMethod" defaultMessage="Update payment method" />
+          )}
         </H4>
       </ModalHeader>
       <ModalBody mb={0}>
         <P fontSize="15px" mb="10" lineHeight="20px">
-          <FormattedMessage
-            id="subscription.updatePaymentMethod.subheader"
-            defaultMessage="Pick an existing payment method or add a new one."
-          />
+          {props.order.status === 'PAUSED' ? (
+            <FormattedMessage
+              defaultMessage="To resume your {amountAndInterval} contribution to {collective}, pick an existing payment method or add a new one."
+              values={{
+                amountAndInterval: (
+                  <Span fontWeight="bold">
+                    <FormattedMoneyAmount
+                      amount={props.order.totalAmount.valueInCents}
+                      currency={props.order.totalAmount.currency}
+                      interval={getIntervalFromContributionFrequency(props.order.frequency)}
+                    />
+                  </Span>
+                ),
+                collective: <Span fontWeight="bold">{props.order.toAccount.name}</Span>,
+              }}
+            />
+          ) : (
+            <FormattedMessage
+              defaultMessage="Pick an existing payment method or add a new one for your {amountAndInterval} contribution to {collective}."
+              values={{
+                amountAndInterval: (
+                  <Span fontWeight="bold">
+                    <FormattedMoneyAmount
+                      amount={props.order.totalAmount.valueInCents}
+                      currency={props.order.totalAmount.currency}
+                      interval={getIntervalFromContributionFrequency(props.order.frequency)}
+                    />
+                  </Span>
+                ),
+                collective: <Span fontWeight="bold">{props.order.toAccount.slug}</Span>,
+              }}
+            />
+          )}
         </P>
         {!order ? (
           <Loading />
@@ -546,6 +591,7 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
         <Flex flexWrap="wrap" justifyContent="space-between" mt={4}>
           {option.id === 'pay-with-paypal' ? (
             <PayWithPaypalButton
+              order={props.order}
               totalAmount={props.order.totalAmount.valueInCents}
               currency={props.order.totalAmount.currency}
               interval={getIntervalFromContributionFrequency(props.order.frequency)}

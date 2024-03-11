@@ -2464,6 +2464,16 @@ type Host implements Account & AccountWithContributions {
   contributionPolicy: String
 
   """
+  Returns true if the remote user can start the process to resume contributions for account
+  """
+  canStartResumeContributionsProcess: Boolean!
+
+  """
+  Returns true if the account has started the process to resume contributions
+  """
+  hasResumeContributionsProcessStarted: Boolean!
+
+  """
   List of accounting categories for this host
   """
   accountingCategories(
@@ -2859,6 +2869,16 @@ interface AccountWithContributions {
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
+
+  """
+  Returns true if the remote user can start the process to resume contributions for account
+  """
+  canStartResumeContributionsProcess: Boolean!
+
+  """
+  Returns true if the account has started the process to resume contributions
+  """
+  hasResumeContributionsProcessStarted: Boolean!
 }
 
 """
@@ -5374,6 +5394,8 @@ enum ActivityType {
   SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CANCELED
   SUBSCRIPTION_PAUSED
+  SUBSCRIPTION_RESUMED
+  SUBSCRIPTION_READY_TO_BE_RESUMED
   TICKET_CONFIRMED
   ORDER_CANCELED_ARCHIVED_COLLECTIVE
   ORDER_PENDING
@@ -6430,6 +6452,11 @@ type OrderPermissions {
   Whether the current user can update the accounting category of this order
   """
   canUpdateAccountingCategory: Boolean!
+
+  """
+  If paused, whether the current user can resume this order
+  """
+  canResume: Boolean!
 }
 
 """
@@ -7997,6 +8024,16 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
+
+  """
+  Returns true if the remote user can start the process to resume contributions for account
+  """
+  canStartResumeContributionsProcess: Boolean!
+
+  """
+  Returns true if the account has started the process to resume contributions
+  """
+  hasResumeContributionsProcessStarted: Boolean!
 }
 
 """
@@ -9127,6 +9164,16 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
+
+  """
+  Returns true if the remote user can start the process to resume contributions for account
+  """
+  canStartResumeContributionsProcess: Boolean!
+
+  """
+  Returns true if the account has started the process to resume contributions
+  """
+  hasResumeContributionsProcessStarted: Boolean!
 
   """
   The Account parenting this account
@@ -10909,6 +10956,16 @@ type Organization implements Account & AccountWithContributions {
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
+
+  """
+  Returns true if the remote user can start the process to resume contributions for account
+  """
+  canStartResumeContributionsProcess: Boolean!
+
+  """
+  Returns true if the account has started the process to resume contributions
+  """
+  hasResumeContributionsProcessStarted: Boolean!
   email: String @deprecated(reason: "2022-07-18: This field is deprecated and will return null")
 
   """
@@ -11700,6 +11757,16 @@ type Vendor implements Account & AccountWithContributions {
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
+
+  """
+  Returns true if the remote user can start the process to resume contributions for account
+  """
+  canStartResumeContributionsProcess: Boolean!
+
+  """
+  Returns true if the account has started the process to resume contributions
+  """
+  hasResumeContributionsProcessStarted: Boolean!
   vendorInfo: VendorInfo
 
   """
@@ -12674,6 +12741,11 @@ type Query {
     """
     amount: AmountInput!
     frequency: ContributionFrequency!
+
+    """
+    The order for which the plan is created, if any
+    """
+    order: OrderReferenceInput
 
     """
     The tier you are contributing to
@@ -14052,6 +14124,8 @@ enum ActivityAndClassesType {
   SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CANCELED
   SUBSCRIPTION_PAUSED
+  SUBSCRIPTION_RESUMED
+  SUBSCRIPTION_READY_TO_BE_RESUMED
   TICKET_CONFIRMED
   ORDER_CANCELED_ARCHIVED_COLLECTIVE
   ORDER_PENDING
@@ -14926,6 +15000,16 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
+
+  """
+  Returns true if the remote user can start the process to resume contributions for account
+  """
+  canStartResumeContributionsProcess: Boolean!
+
+  """
+  Returns true if the account has started the process to resume contributions
+  """
+  hasResumeContributionsProcessStarted: Boolean!
 }
 
 """
@@ -15725,6 +15809,16 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   contributionPolicy: String
 
   """
+  Returns true if the remote user can start the process to resume contributions for account
+  """
+  canStartResumeContributionsProcess: Boolean!
+
+  """
+  Returns true if the account has started the process to resume contributions
+  """
+  hasResumeContributionsProcessStarted: Boolean!
+
+  """
   The Account parenting this account
   """
   parent: Account
@@ -16494,7 +16588,7 @@ type Mutation {
     account: AccountReferenceInput!
 
     """
-    An optional message to explain the reason for unhosting
+    An optional HTML message to provide additional context to the action
     """
     message: String
 
@@ -16834,6 +16928,21 @@ type Mutation {
   To edit a pending order. Scope: "orders".
   """
   editPendingOrder(order: PendingOrderEditInput!): Order!
+
+  """
+  Starts or resumes the process of notifying contributors for their PAUSED contributions
+  """
+  startResumeOrdersProcess(
+    """
+    The account to start/resume the process for
+    """
+    account: AccountReferenceInput!
+
+    """
+    An optional message to send to contributors
+    """
+    message: String
+  ): Account!
 
   """
   Add a new payment method to be used with an Order. Scope: "orders".

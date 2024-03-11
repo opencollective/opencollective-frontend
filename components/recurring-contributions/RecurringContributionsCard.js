@@ -48,7 +48,6 @@ const RecurringContributionsCard = ({
   const isError = status === ORDER_STATUS.ERROR;
   const isRejected = status === ORDER_STATUS.REJECTED;
   const isEditable = [ORDER_STATUS.ACTIVE, ORDER_STATUS.PROCESSING, ORDER_STATUS.NEW].includes(status) || isError;
-
   return (
     <StyledCollectiveCard
       {...props}

@@ -26,6 +26,7 @@ import StyledRoundButton from '../StyledRoundButton';
 import { P } from '../Text';
 import { useToast } from '../ui/useToast';
 
+import { managedOrderFragment, paymentMethodFragment } from './graphql/queries';
 import AddPaymentMethod from './AddPaymentMethod';
 
 const PaymentMethodBox = styled(Flex)`
@@ -43,24 +44,6 @@ const messages = defineMessages({
   },
 });
 
-const paymentMethodFragment = gql`
-  fragment UpdatePaymentMethodFragment on PaymentMethod {
-    id
-    name
-    data
-    service
-    type
-    balance {
-      value
-      valueInCents
-      currency
-    }
-    account {
-      id
-    }
-  }
-`;
-
 const paymentMethodsQuery = gql`
   query UpdatePaymentMethodPopUpPaymentMethod($accountSlug: String!, $orderId: String!) {
     account(slug: $accountSlug) {
@@ -71,13 +54,10 @@ const paymentMethodsQuery = gql`
       }
     }
     order(order: { id: $orderId }) {
-      id
-      paymentMethod {
-        id
-        ...UpdatePaymentMethodFragment
-      }
+      ...ManagedOrderFields
     }
   }
+  ${managedOrderFragment}
   ${paymentMethodFragment}
 `;
 
@@ -88,23 +68,10 @@ const updatePaymentMethodMutation = gql`
     $paypalSubscriptionId: String
   ) {
     updateOrder(order: $order, paymentMethod: $paymentMethod, paypalSubscriptionId: $paypalSubscriptionId) {
-      id
-      status
-      paymentMethod {
-        id
-        service
-        name
-        type
-        data
-        expiryDate
-        balance {
-          value
-          valueInCents
-          currency
-        }
-      }
+      ...ManagedOrderFields
     }
   }
+  ${managedOrderFragment}
 `;
 
 const paymentMethodResponseFragment = gql`
@@ -205,7 +172,10 @@ export const useUpdatePaymentMethod = contribution => {
   return {
     isSubmitting: loading,
     updatePaymentMethod: async paymentMethod => {
-      const hasUpdate = !contribution.paymentMethod || paymentMethod.id !== contribution.paymentMethod.id;
+      const hasUpdate =
+        contribution.status === 'PAUSED' ||
+        !contribution.paymentMethod ||
+        paymentMethod.id !== contribution.paymentMethod.id;
       try {
         if (hasUpdate) {
           const variables = { order: { id: contribution.id } };
@@ -226,6 +196,7 @@ export const useUpdatePaymentMethod = contribution => {
             />
           ),
         });
+        return true;
       } catch (error) {
         const errorMsg = getErrorFromGraphqlException(error).message;
         toast({ variant: 'error', message: errorMsg });
@@ -374,8 +345,10 @@ const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, accou
               setStripeElements(stripeElements);
             }}
             onPaypalSuccess={async paypalPaymentMethod => {
-              await updatePaymentMethod(paypalPaymentMethod);
-              onCloseEdit();
+              const success = await updatePaymentMethod(paypalPaymentMethod);
+              if (success) {
+                onCloseEdit();
+              }
             }}
           />
         </Box>
@@ -497,7 +470,12 @@ const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, accou
               buttonStyle="secondary"
               loading={isSubmitting}
               data-cy="recurring-contribution-update-pm-button"
-              onClick={() => updatePaymentMethod(selectedPaymentMethod).then(onCloseEdit)}
+              onClick={async () => {
+                const success = await updatePaymentMethod(selectedPaymentMethod);
+                if (success) {
+                  onCloseEdit();
+                }
+              }}
             >
               <FormattedMessage id="actions.update" defaultMessage="Update" />
             </StyledButton>
