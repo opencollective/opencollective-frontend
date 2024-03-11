@@ -199,7 +199,7 @@ const PeriodCompareFilter = ({
   const showRangeSelector = value.type !== PeriodFilterType.ALL_TIME;
   return (
     <React.Fragment>
-      <div className="flex items-center">
+      <div className="flex items-center overflow-hidden">
         <Select
           value={value.type}
           onValueChange={(type: PeriodFilterType) => value.type !== type && onChange({ type })}
@@ -209,7 +209,7 @@ const PeriodCompareFilter = ({
               size="sm"
               variant="outline"
               className={clsx(
-                'min-w-36 justify-between gap-0.5 rounded-full pl-3 text-left',
+                'min-w-36 justify-between gap-0.5 truncate rounded-full pl-3 text-left',
                 showRangeSelector && 'rounded-r-none',
               )}
             >
@@ -235,12 +235,18 @@ const PeriodCompareFilter = ({
         {showRangeSelector && (
           <Popover open={rangeSelectorOpen} onOpenChange={setRangeSelectorOpen}>
             <PopoverTrigger asChild>
-              <Button size="sm" variant="outline" className="gap-2 rounded-full rounded-l-none border-l-0 pr-3">
+              <Button
+                size="sm"
+                variant="outline"
+                className="gap-2 overflow-hidden rounded-full rounded-l-none border-l-0 pr-3"
+              >
                 <CalendarIcon size={16} className="text-muted-foreground" />{' '}
-                <span>{formatPeriod({ from: dateVariables.dateFrom, to: dateVariables.dateTo })}</span>
+                <span className="truncate">
+                  {formatPeriod({ from: dateVariables.dateFrom, to: dateVariables.dateTo })}
+                </span>
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto max-w-[280px] p-0 text-sm">
+            <PopoverContent className="w-auto max-w-80 p-0 text-sm">
               <RangeSelector
                 value={value}
                 onChange={val => {
@@ -342,7 +348,7 @@ function RangeSelector({
 
   return (
     <React.Fragment>
-      <div className="flex items-center justify-center gap-2 border-b p-3">
+      <div className="flex items-center justify-center gap-1 border-b p-3">
         <Input
           className="h-9 px-2 text-sm [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
           type="date"
