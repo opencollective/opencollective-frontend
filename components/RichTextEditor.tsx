@@ -711,7 +711,7 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
               disabled,
             })}
             <Container position="absolute" bottom="1em" right="1em">
-              {showCount && (
+              {showCount && !disabled && (
                 <StyledTag textTransform="uppercase">
                   <span>{this.state.text.length}</span>
                   {maxLength && <span> / {maxLength}</span>}
