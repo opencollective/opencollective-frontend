@@ -2,20 +2,28 @@ import React from 'react';
 import { gql, useMutation } from '@apollo/client';
 import clsx from 'clsx';
 import { isEmpty } from 'lodash';
-import { ArrowLeft, ArrowRight, ChevronDown, ChevronUp, X } from 'lucide-react';
+import { AlertOctagon, ArrowLeft, ArrowRight, ChevronDown, ChevronUp, X } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import { AnalyticsEvent } from '../../lib/analytics/events';
+import { track } from '../../lib/analytics/plausible';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import {
+  Amount,
   CreateExpenseFromDashboardMutation,
   CreateExpenseFromDashboardMutationVariables,
   Currency,
   CurrencyExchangeRateInput,
 } from '../../lib/graphql/types/v2/graphql';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { usePrevious } from '../../lib/hooks/usePrevious';
+import { computeExpenseAmounts } from '../expenses/lib/utils';
 
+import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import Link from '../Link';
+import { Survey, SURVEY_KEY } from '../Survey';
 import { Button } from '../ui/Button';
 import { StepList, StepListItemIcon } from '../ui/StepList';
 import { useToast } from '../ui/useToast';
@@ -40,6 +48,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
   const router = useRouter();
   const formRef = React.useRef<HTMLFormElement>();
   const [submittedExpenseId, setSubmittedExpenseId] = React.useState(null);
+  const { LoggedInUser } = useLoggedInUser();
   const [createExpense] = useMutation<CreateExpenseFromDashboardMutation, CreateExpenseFromDashboardMutationVariables>(
     gql`
       mutation CreateExpenseFromDashboard($expenseCreateInput: ExpenseCreateInput!, $account: AccountReferenceInput!) {
@@ -55,11 +64,50 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
   );
 
   const [currentStep, setCurrentStep] = React.useState<ExpenseFlowStep>(ExpenseFlowStep.COLLECTIVE);
+  const previousStep: ExpenseFlowStep = usePrevious(currentStep);
+  React.useEffect(() => {
+    if (!previousStep) {
+      track(AnalyticsEvent.EXPENSE_SUBMISSION_STARTED);
+      return;
+    }
+
+    if (currentStep === previousStep) {
+      return;
+    }
+
+    const previousStepIdx = ExpenseStepOrder.indexOf(previousStep) - 1;
+    const currentStepIdx = ExpenseStepOrder.indexOf(currentStep) - 1;
+
+    // going back
+    if (currentStepIdx < previousStepIdx) {
+      return;
+    }
+
+    switch (previousStep) {
+      case ExpenseFlowStep.COLLECTIVE:
+        track(AnalyticsEvent.EXPENSE_SUBMISSION_PICKED_COLLECTIVE);
+        return;
+      case ExpenseFlowStep.PAYMENT_METHOD:
+        track(AnalyticsEvent.EXPENSE_SUBMISSION_PICKED_PAYEE);
+        return;
+      case ExpenseFlowStep.EXPENSE_TYPE:
+        track(AnalyticsEvent.EXPENSE_SUBMISSION_PICKED_EXPENSE_TYPE);
+        return;
+      case ExpenseFlowStep.EXPENSE_INFO:
+        track(AnalyticsEvent.EXPENSE_SUBMISSION_PICKED_EXPENSE_TITLE);
+        return;
+      case ExpenseFlowStep.EXPENSE_DETAILS:
+        track(AnalyticsEvent.EXPENSE_SUBMISSION_FILLED_EXPENSE_DETAILS);
+        return;
+    }
+  }, [previousStep, currentStep]);
+
   const expenseForm = useExpenseForm({
     formRef,
     initialValues: {},
     async onSubmit(values, h, formOptions) {
       try {
+        track(AnalyticsEvent.EXPENSE_SUBMISSION_SUBMITTED);
         const result = await createExpense({
           variables: {
             account: {
@@ -109,9 +157,18 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
             },
           },
         });
+        track(AnalyticsEvent.EXPENSE_SUBMISSION_SUBMITTED_SUCCESS);
 
         setSubmittedExpenseId(result.data.createExpense.legacyId);
+
+        toast({
+          variant: 'success',
+          title: <FormattedMessage id="Expense.Submitted" defaultMessage="Expense submitted" />,
+          message: LoggedInUser ? <Survey hasParentTitle surveyKey={SURVEY_KEY.EXPENSE_SUBMITTED_NEW_FLOW} /> : null,
+          duration: 20000,
+        });
       } catch (err) {
+        track(AnalyticsEvent.EXPENSE_SUBMISSION_SUBMITTED_ERROR);
         toast({ variant: 'error', message: i18nGraphqlException(intl, err) });
       } finally {
         h.setSubmitting(false);
@@ -188,7 +245,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
         {submittedExpenseId ? (
           <SubmittedExpense expenseId={submittedExpenseId} form={expenseForm} />
         ) : (
-          <div className="flex w-full flex-col pb-4 sm:flex sm:flex-row sm:gap-4 sm:pb-0">
+          <div className="flex w-full flex-col pb-4 sm:flex sm:flex-row sm:gap-8 sm:pb-0">
             <SubmitExpenseFlowSteps expenseForm={expenseForm} currentStep={currentStep} />
 
             <div className="flex-grow overflow-auto px-4 pt-4 sm:px-0 sm:pt-0">
@@ -199,19 +256,18 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
           </div>
         )}
       </main>
+      <ExpenseWarnings form={expenseForm} />
       {!submittedExpenseId && (
-        <footer className="min-w-screen flex items-center justify-between gap-4 border-t border-slate-100 px-10 py-2 sm:justify-center">
-          <SubmitExpenseFlowFooter
-            expenseForm={expenseForm}
-            isLastStep={ExpenseStepOrder.indexOf(currentStep) === ExpenseStepOrder.length - 1}
-            isStepValid={!step.hasError(expenseForm)}
-            onNextStepClick={onNextStepClick}
-            readyToSubmit={!nextStep && isEmpty(expenseForm.errors)}
-            setCurrentStep={setCurrentStep}
-            nextStep={nextStep}
-            prevStep={prevStep}
-          />
-        </footer>
+        <SubmitExpenseFlowFooter
+          expenseForm={expenseForm}
+          isLastStep={ExpenseStepOrder.indexOf(currentStep) === ExpenseStepOrder.length - 1}
+          isStepValid={!step.hasError(expenseForm)}
+          onNextStepClick={onNextStepClick}
+          readyToSubmit={!nextStep && isEmpty(expenseForm.errors)}
+          setCurrentStep={setCurrentStep}
+          nextStep={nextStep}
+          prevStep={prevStep}
+        />
       )}
     </div>
   );
@@ -227,7 +283,7 @@ function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
 
   return (
     <React.Fragment>
-      <div className="w-full sm:w-[145px] sm:min-w-[145px]">
+      <div className="w-full sm:w-[165px] sm:min-w-[165px]">
         <div
           className={clsx(' flex items-center gap-2 px-4 py-2 text-sm sm:hidden', {
             'border-b border-slate-200': collapsed,
@@ -259,7 +315,7 @@ function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
         </div>
         <StepList
           className={clsx(
-            'z-50 w-full border-b border-slate-100 bg-white px-4 py-2 drop-shadow-lg sm:block sm:w-[145px] sm:min-w-[145px] sm:border-b-0 sm:px-0 sm:py-0 sm:drop-shadow-none',
+            'z-50 w-full border-b border-slate-100 bg-white px-4 py-2 drop-shadow-lg sm:block  sm:border-b-0 sm:px-0 sm:py-0 sm:drop-shadow-none',
             {
               'hidden sm:block': collapsed,
               'absolute block': !collapsed,
@@ -296,7 +352,7 @@ type SubmitExpenseFlowFooterProps = {
 
 function SubmitExpenseFlowFooter(props: SubmitExpenseFlowFooterProps) {
   return (
-    <React.Fragment>
+    <footer className="min-w-screen flex items-center justify-between gap-4 border-t border-slate-100 px-10 py-2 sm:justify-center">
       <Button
         variant="outline"
         disabled={!props.prevStep}
@@ -327,6 +383,62 @@ function SubmitExpenseFlowFooter(props: SubmitExpenseFlowFooterProps) {
           <ArrowRight />
         </Button>
       )}
-    </React.Fragment>
+    </footer>
+  );
+}
+
+type ExpenseWarningsProps = {
+  form: ExpenseForm;
+};
+
+function ExpenseWarnings(props: ExpenseWarningsProps) {
+  if (!props.form.options.account) {
+    return null;
+  }
+
+  const collectiveBalance = props.form.options.account.stats.balance.valueInCents;
+
+  const { totalInvoiced } = computeExpenseAmounts(
+    props.form.values.expenseCurrency,
+    (props.form.values.expenseItems || []).map(ei => ({
+      description: ei.description,
+      amountV2: ei.amount as Amount,
+      incurredAt: ei.date,
+    })),
+    props.form.values.tax ? [{ ...props.form.values.tax, type: props.form.options.taxType }] : [],
+  );
+
+  if (!totalInvoiced || totalInvoiced < collectiveBalance) {
+    return null;
+  }
+
+  return (
+    <div className="flex justify-center p-2" style={{ backgroundColor: '#FFFC89' }}>
+      <div className="flex items-center gap-4  text-xs">
+        <div>
+          <AlertOctagon />
+        </div>
+        <div>
+          <div className="font-bold">
+            <FormattedMessage defaultMessage="Expense alert" />:
+          </div>
+          <div>
+            <FormattedMessage
+              defaultMessage="The Collective's budget ({amount}) is insufficient to pay this expense."
+              values={{
+                amount: (
+                  <FormattedMoneyAmount
+                    abbreviate
+                    currencyCodeStyles={{ fontWeight: 'bold' }}
+                    amount={props.form.options.account.stats.balance.valueInCents}
+                    currency={props.form.options.account.stats.balance.currency}
+                  />
+                ),
+              }}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
