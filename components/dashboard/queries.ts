@@ -7,6 +7,7 @@ export const adminPanelQuery = gql`
     account(slug: $slug) {
       id
       legacyId
+      createdAt
       slug
       name
       isHost

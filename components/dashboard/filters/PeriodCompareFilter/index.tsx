@@ -1,12 +1,13 @@
 import React from 'react';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import clsx from 'clsx';
-import type { Dayjs, OpUnitType, UnitType } from 'dayjs';
+import type { Dayjs } from 'dayjs';
 import { isEqual, omit } from 'lodash';
 import { ArrowRight, CalendarIcon, ChevronDown } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
+import { getDayjsIsoUnit, getDayjsOpUnit } from '../../../../lib/date-utils';
 import dayjs from '../../../../lib/dayjs';
 import { FilterConfig } from '../../../../lib/filters/filter-types';
 import { TimeUnit } from '../../../../lib/graphql/types/v2/graphql';
@@ -25,19 +26,6 @@ import { Select, SelectContent, SelectItem, SelectValue } from '../../../ui/Sele
 import { PeriodFilterCompare, PeriodFilterType, schema } from './schema';
 
 export type PeriodCompareFilterValueType = z.infer<typeof schema>;
-
-export const getDayjsIsoUnit = (timeUnit: TimeUnit): OpUnitType | 'isoWeek' => {
-  // Use "isoWeek" to have the week start on Monday, in accordance with the behavior from the API returning time series data
-  // Note: "isoWeek" should only be used when finding the startOf or endOf a period, for regular adding and subtracting, "week" should be used.
-  if (timeUnit === TimeUnit.WEEK) {
-    return 'isoWeek';
-  }
-  return timeUnit.toLowerCase() as OpUnitType;
-};
-
-const getDayjsOpUnit = (timeUnit: TimeUnit): UnitType => {
-  return timeUnit.toLowerCase() as UnitType;
-};
 
 const getAvailableTimeUnits = (value: PeriodCompareFilterValueType): TimeUnit[] => {
   const { dateTo, dateFrom } = getPeriodDates(value);

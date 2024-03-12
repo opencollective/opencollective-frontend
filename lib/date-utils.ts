@@ -1,7 +1,9 @@
+import { OpUnitType, UnitType } from 'dayjs';
 import { padStart } from 'lodash';
 
 import INTERVALS from './constants/intervals';
 import { PAYMENT_METHOD_SERVICE } from './constants/payment-methods';
+import { TimeUnit } from './graphql/types/v2/graphql';
 import dayjs from './dayjs';
 
 /**
@@ -80,14 +82,14 @@ export const stripTime = date => {
  * - DayJS object
  * - null
  */
-export const getDateFromValue = value => {
+export const getDateFromValue = (value): Date | null => {
   if (!value) {
     return null;
   } else if (typeof value === 'string') {
     return new Date(value);
   } else if (value instanceof Date) {
     return value;
-  } else if (value instanceof dayjs) {
+  } else if (dayjs.isDayjs(value)) {
     return value.toDate();
   }
 };
@@ -147,4 +149,17 @@ export const convertDateToApiUtc = (date, timezone) => {
 
 export const convertDateFromApiUtc = (date, timezone) => {
   return dayjs(date).tz(timezone).format('YYYY-MM-DD HH:mm:ss');
+};
+
+export const getDayjsIsoUnit = (timeUnit: TimeUnit): OpUnitType | 'isoWeek' => {
+  // Use "isoWeek" to have the week start on Monday, in accordance with the behavior from the API returning time series data
+  // Note: "isoWeek" should only be used when finding the startOf or endOf a period, for regular adding and subtracting, "week" should be used.
+  if (timeUnit === TimeUnit.WEEK) {
+    return 'isoWeek';
+  }
+  return timeUnit.toLowerCase() as OpUnitType;
+};
+
+export const getDayjsOpUnit = (timeUnit: TimeUnit): UnitType => {
+  return timeUnit.toLowerCase() as UnitType;
 };
