@@ -5,7 +5,7 @@ import { z } from 'zod';
 
 import { PAYMENT_METHOD_TYPE } from '../../../../lib/constants/payment-methods';
 import { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
-import { integer, isMulti, isNullable, limit, offset } from '../../../../lib/filters/schemas';
+import { boolean, integer, isMulti, isNullable, limit, offset } from '../../../../lib/filters/schemas';
 import {
   Currency,
   ExpenseType,
@@ -15,6 +15,7 @@ import {
   TransactionType,
 } from '../../../../lib/graphql/types/v2/graphql';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
+import { i18nIsRefund } from '../../../../lib/i18n/is-refund';
 import { i18nPaymentMethodType } from '../../../../lib/i18n/payment-method-type';
 import { i18nTransactionKind, i18nTransactionType } from '../../../../lib/i18n/transaction';
 import { sortSelectOptions } from '../../../../lib/utils';
@@ -43,6 +44,7 @@ export const schema = z.object({
   contributionId: integer.optional(),
   openTransactionId: z.string().optional(),
   group: z.string().optional(),
+  isRefund: boolean.optional(),
 });
 
 type FilterValues = z.infer<typeof schema>;
@@ -168,6 +170,18 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
           />
         </div>
       );
+    },
+  },
+  isRefund: {
+    labelMsg: defineMessage({ defaultMessage: 'Is Refund' }),
+    Component: ({ intl, ...props }) => {
+      const options = React.useMemo(() => {
+        return [true, false].map(value => ({
+          label: i18nIsRefund(intl, value),
+          value,
+        }));
+      }, [intl]);
+      return <ComboSelectFilter options={options} {...props} />;
     },
   },
 };

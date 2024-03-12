@@ -3408,6 +3408,7 @@
   "vwq8lO": "{isRefund, select, true {Reembolso de la} other {}} Tarifa del Procesador de Pagos{hasPaymentProcessorCover, select, true { (cubierta por el Anfitrión)} false {} other {}}: {paymentProcessorFee}",
   "vwqEeH": "Pendientes",
   "vWYg/k": "<AccountType></AccountType> <Account></Account> creado{hasParent, select, true { en el marco de <AccountParent></AccountParent>} other {}}",
+  "VX6iYD": "Is not Refund",
   "vx8bv3": "Concesionario",
   "VXJpMP": "Finaliza el {date}",
   "VY4AcX": "Grupo de transacciones",
