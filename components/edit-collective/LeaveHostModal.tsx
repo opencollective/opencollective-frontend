@@ -9,16 +9,15 @@ import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { editCollectivePageQuery } from '../../lib/graphql/v1/queries';
 
-import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { FormikZod } from '../FormikZod';
 import I18nFormatters from '../I18nFormatters';
 import Loading from '../Loading';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import RichTextEditor from '../RichTextEditor';
-import StyledButton from '../StyledButton';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
+import { Button } from '../ui/Button';
 import { RadioGroup, RadioGroupItem } from '../ui/RadioGroup';
 import { useToast } from '../ui/useToast';
 
@@ -250,16 +249,16 @@ export const LeaveHostModal = ({ account, host, onClose }) => {
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Container display="flex" justifyContent="flex-end">
-                  <StyledButton type="reset" mx={20} onClick={onClose}>
+                <div className="flex w-full justify-end gap-3">
+                  <Button variant="outline" type="reset" onClick={onClose}>
                     <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-                  </StyledButton>
-                  <StyledButton
+                  </Button>
+                  <Button
                     type="submit"
-                    buttonStyle="danger"
+                    variant="destructive"
                     loading={submitting}
                     data-cy="continue"
-                    minWidth={100}
+                    className="min-w-[100px]"
                     disabled={portabilitySummary.totalCount && !values.messageForContributors}
                   >
                     <FormattedMessage
@@ -267,8 +266,8 @@ export const LeaveHostModal = ({ account, host, onClose }) => {
                       values={{ name: host.name }}
                       defaultMessage="Leave {name}"
                     />
-                  </StyledButton>
-                </Container>
+                  </Button>
+                </div>
               </ModalFooter>
             </Form>
           )}

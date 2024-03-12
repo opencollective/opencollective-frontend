@@ -54,6 +54,7 @@ export const adminPanelQuery = gql`
         hostFeePercent
         host {
           id
+          legacyId
           slug
           name
           settings
