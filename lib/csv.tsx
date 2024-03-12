@@ -225,12 +225,16 @@ export const FieldLabels: Record<CSVField, React.ReactNode> = {
 
 export enum FIELD_OPTIONS {
   DEFAULT = 'DEFAULT',
+  NEW_PRESET = 'NEW_PRESET',
+}
+
+export enum LEGACY_FIELD_OPTIONS {
+  DEFAULT = 'DEFAULT',
   CUSTOM = 'CUSTOM',
 }
 
-const FieldOptionsLabels = {
+export const FieldOptionsLabels = {
   [FIELD_OPTIONS.DEFAULT]: <FormattedMessage defaultMessage="Default" />,
-  [FIELD_OPTIONS.CUSTOM]: <FormattedMessage defaultMessage="Custom" />,
+  [FIELD_OPTIONS.NEW_PRESET]: <FormattedMessage defaultMessage="New Preset" />,
+  [LEGACY_FIELD_OPTIONS.CUSTOM]: <FormattedMessage defaultMessage="Custom" />,
 };
-
-export const FieldOptions = Object.keys(FIELD_OPTIONS).map(value => ({ value, label: FieldOptionsLabels[value] }));
