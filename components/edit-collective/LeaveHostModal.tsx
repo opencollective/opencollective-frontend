@@ -67,7 +67,7 @@ const LeaveHostFormSchema = z.object({
 const LeaveHostFormSchemaWithRecurringContributions = LeaveHostFormSchema.merge(
   z.object({
     messageForContributors: z.string().min(20).max(2000),
-    whatToDoWithRecurringContributions: z.enum(['pause', 'cancel']),
+    pauseContributions: z.boolean(),
   }),
 );
 
@@ -116,14 +116,14 @@ export const LeaveHostModal = ({ account, host, onClose }) => {
           initialValues={{
             accountId: data.account.id,
             messageForContributors: '',
-            whatToDoWithRecurringContributions: '',
+            pauseContributions: true,
           }}
           onSubmit={async values => {
             try {
               await removeHost({
                 variables: {
                   account: { id: values.accountId },
-                  pauseContributions: values.whatToDoWithRecurringContributions === 'pause',
+                  pauseContributions: values.pauseContributions,
                   messageForContributors: values.messageForContributors,
                 },
                 refetchQueries: [
@@ -178,9 +178,9 @@ export const LeaveHostModal = ({ account, host, onClose }) => {
                         <FormattedMessage defaultMessage="Select what you want to do:" />
                       </p>
                       <RadioGroup
-                        value={values.whatToDoWithRecurringContributions}
+                        value={values.pauseContributions ? 'pause' : 'cancel'}
                         className="space-y-3"
-                        onValueChange={value => setFieldValue('whatToDoWithRecurringContributions', value)}
+                        onValueChange={value => setFieldValue('pauseContributions', value === 'pause')}
                       >
                         <div className="flex items-center space-x-2">
                           <div className="self-baseline">
@@ -223,14 +223,12 @@ export const LeaveHostModal = ({ account, host, onClose }) => {
                         })}
                         hintPosition="above"
                         placeholder={
-                          !values.whatToDoWithRecurringContributions
-                            ? null
-                            : values.whatToDoWithRecurringContributions === 'pause'
-                              ? intl.formatMessage({ defaultMessage: 'We are transitioning to a new fiscal host.' })
-                              : intl.formatMessage({
-                                  defaultMessage:
-                                    'We are leaving Open Collective. You can continue supporting us through our website.',
-                                })
+                          values.pauseContributions
+                            ? intl.formatMessage({ defaultMessage: 'We are transitioning to a new fiscal host.' })
+                            : intl.formatMessage({
+                                defaultMessage:
+                                  'We are leaving Open Collective. You can continue supporting us through our website.',
+                              })
                         }
                       >
                         {({ field }) => (
@@ -239,7 +237,6 @@ export const LeaveHostModal = ({ account, host, onClose }) => {
                             inputName={field.name}
                             showCount
                             version="simplified"
-                            disabled={!values.whatToDoWithRecurringContributions}
                             onChange={field.onChange}
                             editorMaxHeight={300}
                             withBorders
@@ -263,10 +260,7 @@ export const LeaveHostModal = ({ account, host, onClose }) => {
                     loading={submitting}
                     data-cy="continue"
                     minWidth={100}
-                    disabled={
-                      portabilitySummary.totalCount &&
-                      (!values.whatToDoWithRecurringContributions || !values.messageForContributors)
-                    }
+                    disabled={portabilitySummary.totalCount && !values.messageForContributors}
                   >
                     <FormattedMessage
                       id="collective.editHost.leave"
