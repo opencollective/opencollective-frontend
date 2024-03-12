@@ -108,7 +108,7 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
       ...queryFilter.variables,
       ...(account.parent && { includeChildren: false }),
     },
-    fetchPolicy: 'cache-first',
+    fetchPolicy: 'cache-and-network',
     context: API_V2_CONTEXT,
   });
 
