@@ -17,6 +17,10 @@ type TrackOptions = {
 };
 
 export function track(event: AnalyticsEvent, options?: TrackOptions) {
+  if (process.env.NODE_ENV === 'development') {
+    // eslint-disable-next-line no-console
+    console.log('plausible event', event, JSON.stringify(options));
+  }
   if (window.plausible) {
     window.plausible(event, options);
   }
