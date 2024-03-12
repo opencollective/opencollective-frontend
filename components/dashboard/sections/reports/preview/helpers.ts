@@ -23,7 +23,6 @@ export const filterToTransactionsQuery = (hostSlug, groupFilter: GroupFilter, qu
       expenseType: groupFilter.expenseType,
     }),
     isRefund: groupFilter.isRefund,
-    primaryKind: groupFilter.primaryKind,
     'date[gte]': dayjs.utc(queryFilterValues.period.gt).format('YYYY-MM-DD'),
     'date[lte]': dayjs.utc(queryFilterValues.period.lt).format('YYYY-MM-DD'),
     'date[tz]': 'UTC',
@@ -50,11 +49,6 @@ const groups: Group[] = [
     section: ReportSection.CONTRIBUTIONS,
     label: 'Refunded contributions',
     filter: { kind: 'CONTRIBUTION', type: 'DEBIT', isRefund: true },
-  },
-  {
-    section: ReportSection.CONTRIBUTIONS,
-    label: 'Payment processor fees for contributions',
-    filter: { kind: 'PAYMENT_PROCESSOR_FEE', primaryKind: 'CONTRIBUTION' },
   },
   {
     section: ReportSection.CONTRIBUTIONS,
@@ -93,14 +87,13 @@ const groups: Group[] = [
   },
   {
     section: ReportSection.EXPENSES,
-    label: 'Payment processor fees for expenses',
-    filter: { kind: 'PAYMENT_PROCESSOR_FEE', primaryKind: 'EXPENSE' },
-  },
-
-  {
-    section: ReportSection.EXPENSES,
     label: 'Expenses marked as unpaid',
     filter: { kind: 'EXPENSE', type: 'CREDIT', isRefund: true },
+  },
+  {
+    section: ReportSection.FEES_TIPS,
+    label: 'Payment processor fees',
+    filter: { kind: 'PAYMENT_PROCESSOR_FEE' },
   },
   {
     section: ReportSection.FEES_TIPS,
@@ -140,13 +133,8 @@ const groups: Group[] = [
   },
   {
     section: ReportSection.FEES_TIPS,
-    label: 'Covered Payment Processor Fees for refunded expenses',
-    filter: { kind: 'PAYMENT_PROCESSOR_COVER', primaryKind: 'EXPENSE' },
-  },
-  {
-    section: ReportSection.FEES_TIPS,
-    label: 'Covered Payment Processor Fees for refunded contributions',
-    filter: { kind: 'PAYMENT_PROCESSOR_COVER', primaryKind: 'CONTRIBUTION' },
+    label: 'Covered Payment processor fees',
+    filter: { kind: 'PAYMENT_PROCESSOR_COVER' },
   },
   {
     section: ReportSection.OTHER,
@@ -211,10 +199,10 @@ export const buildReportGroups = (data, { showCreditDebit }) => {
     });
 
     const remainderGroups = remainingGroups.map(group => ({
-      label: JSON.stringify(pick(group, 'kind', 'type', 'expenseType', 'primaryKind', 'isRefund')),
+      label: JSON.stringify(pick(group, 'kind', 'type', 'expenseType', 'isRefund')),
       section: ReportSection.OTHER,
       amount: group.amount.valueInCents,
-      filter: pick(group, 'kind', 'type', 'expenseType', 'primaryKind', 'isRefund', 'isHost'),
+      filter: pick(group, 'kind', 'type', 'expenseType', 'isRefund', 'isHost'),
       groups: [group],
     }));
 

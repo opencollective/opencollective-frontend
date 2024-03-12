@@ -76,7 +76,6 @@ const hostReportQuery = gql`
           currency
         }
         kind
-        primaryKind
         isHost
         type
         expenseType
