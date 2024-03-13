@@ -153,7 +153,7 @@ const applyToHostWithAccountsQuery = gql`
 `;
 
 const applyToHostMutation = gql`
-  mutation ApplyToHost(
+  mutation ApplyToNewHost(
     $collective: AccountReferenceInput!
     $host: AccountReferenceInput!
     $message: String
