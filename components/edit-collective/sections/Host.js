@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { graphql } from '@apollo/client/react/hoc';
 import { get, groupBy } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedDate, FormattedMessage, injectIntl } from 'react-intl';
@@ -7,6 +8,7 @@ import styled from 'styled-components';
 
 import { OPENCOLLECTIVE_FOUNDATION_ID } from '../../../lib/constants/collectives';
 import { formatCurrency } from '../../../lib/currency-utils';
+import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import { getCollectivePageRoute, getDashboardRoute } from '../../../lib/url-helpers';
 import { formatDate, getWebsiteUrl } from '../../../lib/utils';
 
@@ -54,6 +56,7 @@ class Host extends React.Component {
     editCollectiveMutation: PropTypes.func.isRequired,
     router: PropTypes.object.isRequired, // from withRouter
     intl: PropTypes.object.isRequired, // from injectIntl
+    additionalInfo: PropTypes.object,
   };
 
   constructor(props) {
@@ -230,7 +233,11 @@ class Host extends React.Component {
                           defaultMessage="{item}:"
                           values={{ item: <FormattedMessage id="HostedSince" defaultMessage="Hosted since" /> }}
                         />{' '}
-                        <FormattedDate dateStyle="medium" value={collective.approvedAt} />
+                        {this.props.additionalInfo?.account?.approvedAt ? (
+                          <FormattedDate dateStyle="medium" value={this.props.additionalInfo?.account?.approvedAt} />
+                        ) : (
+                          <span>-</span>
+                        )}
                       </span>
                       .{' '}
                       <span>
@@ -540,4 +547,27 @@ class Host extends React.Component {
   }
 }
 
-export default withRouter(injectIntl(Host));
+const withAdditionalInfo = graphql(
+  gql`
+    query AdditionalHostInfo($slug: String!) {
+      account(slug: $slug) {
+        id
+        legacyId
+        ... on AccountWithHost {
+          approvedAt
+        }
+      }
+    }
+  `,
+  {
+    options: props => ({
+      context: API_V2_CONTEXT,
+      variables: {
+        slug: props.collective.slug,
+      },
+    }),
+    name: 'additionalInfo',
+  },
+);
+
+export default withRouter(injectIntl(withAdditionalInfo(Host)));
