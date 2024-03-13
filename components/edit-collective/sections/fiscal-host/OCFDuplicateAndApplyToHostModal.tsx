@@ -34,7 +34,7 @@ import { useToast } from '../../../ui/useToast';
 
 const duplicateAccountMutation = gql`
   mutation DuplicateAccount($account: AccountReferenceInput!, $include: DuplicateAccountDataTypeInput) {
-    duplicateAccount(account: $account, include: $include) {
+    duplicateAccount(account: $account, include: $include, connect: true) {
       id
       legacyId
       slug
@@ -256,7 +256,7 @@ const OCFDuplicateAndApplyToHostModal = ({ hostSlug, collective, onClose, onSucc
 
   const currentStep = STEPS[stepKey];
   return (
-    <StyledModal onClose={onClose} width="570px" {...props}>
+    <StyledModal onClose={() => onClose(successResult)} width="570px" {...props}>
       {loading ? (
         <React.Fragment>
           <ModalHeader hideCloseIcon>
@@ -313,7 +313,7 @@ const OCFDuplicateAndApplyToHostModal = ({ hostSlug, collective, onClose, onSucc
           </ModalBody>
           <ModalFooter>
             <div className="flex justify-center">
-              <Button onClick={onClose}>Finish</Button>
+              <Button onClick={() => onClose(successResult)}>Finish</Button>
             </div>
           </ModalFooter>
         </React.Fragment>

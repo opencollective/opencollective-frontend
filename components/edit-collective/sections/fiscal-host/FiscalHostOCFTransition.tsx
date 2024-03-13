@@ -1,8 +1,15 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { ChevronDown, ExternalLink } from 'lucide-react';
+import { useRouter } from 'next/router';
 
+import { OPENCOLLECTIVE_FOUNDATION_ID } from '../../../../lib/constants/collectives';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
+import {
+  FiscalHostOcfTransitionQuery,
+  FiscalHostOcfTransitionQueryVariables,
+} from '../../../../lib/graphql/types/v2/graphql';
+import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import { getCollectivePageRoute, getDashboardRoute } from '../../../../lib/url-helpers';
 
 import CollectivePicker from '../../../CollectivePicker';
@@ -12,12 +19,41 @@ import MessageBox from '../../../MessageBox';
 import StyledLink from '../../../StyledLink';
 import { Button } from '../../../ui/Button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../../ui/Collapsible';
+import { useToast } from '../../../ui/useToast';
 import { LeaveHostModal } from '../../LeaveHostModal';
+
+import OCFDuplicateAndApplyToHostModal from './OCFDuplicateAndApplyToHostModal';
 
 type Sections = 'recurringContributions' | 'balance' | 'moveHost' | 'externalHost' | 'moreOptions';
 
 const fiscalHostOCFTransitionQuery = gql`
-  query FiscalHostOCFTransition {
+  query FiscalHostOCFTransition($slug: String!) {
+    account(slug: $slug) {
+      id
+      legacyId
+
+      newAccount: memberOf(role: [CONNECTED_ACCOUNT], limit: 1) {
+        totalCount
+        nodes {
+          id
+          role
+          publicMessage
+          description
+          account {
+            id
+            name
+            slug
+            imageUrl
+            ... on AccountWithHost {
+              host {
+                id
+                legacyId
+              }
+            }
+          }
+        }
+      }
+    }
     hosts(limit: 200, offset: 0) {
       totalCount
       limit
@@ -62,14 +98,34 @@ const step1Label = 'Pause your Recurring Contributions';
  * A component to provide information and action for collectives to transition out of OCF.
  */
 export const FiscalHostOCFTransition = ({ collective }) => {
+  const { refetchLoggedInUser } = useLoggedInUser();
+  const { toast } = useToast();
+  const router = useRouter();
   const [openCollapsible, setOpenCollapsible] = React.useState<Sections>('recurringContributions');
   const [modal, setOpenModal] = React.useState<'leaveHost' | 'applyFlow'>(null);
   const [selectedHost, setSelectedHost] = React.useState(null);
-  const { data, loading } = useQuery(fiscalHostOCFTransitionQuery, { context: API_V2_CONTEXT });
+  const { data, loading } = useQuery<FiscalHostOcfTransitionQuery, FiscalHostOcfTransitionQueryVariables>(
+    fiscalHostOCFTransitionQuery,
+    {
+      context: API_V2_CONTEXT,
+      variables: {
+        slug: collective.slug,
+      },
+    },
+  );
   const getOpenProps = (section: Sections) => ({
     open: openCollapsible === section,
     onOpenChange: (open: boolean) => setOpenCollapsible(open ? section : null), // Collapse other sections when opening a new one
   });
+
+  const newAccount = React.useMemo(() => {
+    return (data?.account?.newAccount?.nodes || [])
+      .filter(member => {
+        return !('host' in member.account) || member.account.host.legacyId !== OPENCOLLECTIVE_FOUNDATION_ID;
+      })
+      .map(member => member.account)
+      .find(Boolean);
+  }, [data?.account?.newAccount]);
 
   return (
     <div>
@@ -158,51 +214,53 @@ export const FiscalHostOCFTransition = ({ collective }) => {
           </CollapsibleContent>
         </Collapsible>
         {/** Move Host */}
-        <Collapsible className="rounded-md border border-gray-300 p-4" {...getOpenProps('moveHost')}>
-          <CollapsibleTrigger className="group flex w-full flex-1 items-center justify-between text-sm [&_svg]:data-[state=open]:rotate-180">
-            <div className="font-medium">Join a new Fiscal Host on Open Collective</div>
-            <ChevronButton />
-          </CollapsibleTrigger>
-          <CollapsibleContent className="pt-4 text-sm">
-            <p>
-              To continue fundraising on the Open Collective platform you will need to either find a new Fiscal Host, or
-              become an independent collective. When your collective is again able to receive contributions we will send
-              automated email notifications to your paused contributors and invite them to resume their recurring
-              contributions.
-            </p>
-            {collective.stats.balance === 0 ? (
-              <div className="mt-4">
-                <p>
-                  Your current OCF balance is zero. Therefore, you can leave OCF and then apply to a new Fiscal Host.
-                </p>
-                <Button className="mt-4" variant="outline" onClick={() => setOpenModal('leaveHost')}>
-                  Leave Host
-                </Button>
-              </div>
-            ) : (
-              <div className="mt-4">
-                <p>
-                  Your balance is not empty. In order to move to a new fiscal host, you will need to zero your balance
-                  with Open Collective Foundation or use the application flow below to duplicate your Collective and
-                  apply to a new Fiscal Host.
-                </p>
-                <div className="mt-3 flex gap-4">
-                  <div className="max-w-[300px]">
-                    <CollectivePicker
-                      collectives={(data?.hosts?.nodes || []).filter(host => ![host.slug].includes('foundation'))}
-                      isLoading={loading}
-                      placeholder="Select a new Fiscal Host"
-                      onChange={({ value }) => setSelectedHost(value)}
-                    />
-                  </div>
-                  <Button disabled={!selectedHost} variant="outline" onClick={() => setOpenModal('applyFlow')}>
-                    Open the application flow
+        {!newAccount && (
+          <Collapsible className="rounded-md border border-gray-300 p-4" {...getOpenProps('moveHost')}>
+            <CollapsibleTrigger className="group flex w-full flex-1 items-center justify-between text-sm [&_svg]:data-[state=open]:rotate-180">
+              <div className="font-medium">Join a new Fiscal Host on Open Collective</div>
+              <ChevronButton />
+            </CollapsibleTrigger>
+            <CollapsibleContent className="pt-4 text-sm">
+              <p>
+                To continue fundraising on the Open Collective platform you will need to either find a new Fiscal Host,
+                or become an independent collective. When your collective is again able to receive contributions we will
+                send automated email notifications to your paused contributors and invite them to resume their recurring
+                contributions.
+              </p>
+              {collective.stats.balance === 0 ? (
+                <div className="mt-4">
+                  <p>
+                    Your current OCF balance is zero. Therefore, you can leave OCF and then apply to a new Fiscal Host.
+                  </p>
+                  <Button className="mt-4" variant="outline" onClick={() => setOpenModal('leaveHost')}>
+                    Leave Host
                   </Button>
                 </div>
-              </div>
-            )}
-          </CollapsibleContent>
-        </Collapsible>
+              ) : (
+                <div className="mt-4">
+                  <p>
+                    Your balance is not empty. In order to move to a new fiscal host, you will need to zero your balance
+                    with Open Collective Foundation or use the application flow below to duplicate your Collective and
+                    apply to a new Fiscal Host.
+                  </p>
+                  <div className="mt-3 flex gap-4">
+                    <div className="max-w-[300px]">
+                      <CollectivePicker
+                        collectives={(data?.hosts?.nodes || []).filter(host => ![host.slug].includes('foundation'))}
+                        isLoading={loading}
+                        placeholder="Select a new Fiscal Host"
+                        onChange={({ value }) => setSelectedHost(value)}
+                      />
+                    </div>
+                    <Button disabled={!selectedHost} variant="outline" onClick={() => setOpenModal('applyFlow')}>
+                      Open the application flow
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </CollapsibleContent>
+          </Collapsible>
+        )}
         {/** External Host */}
         <Collapsible className="rounded-md border border-gray-300 p-4" {...getOpenProps('externalHost')}>
           <CollapsibleTrigger className="group flex w-full flex-1 items-center justify-between text-sm [&_svg]:data-[state=open]:rotate-180">
@@ -262,8 +320,20 @@ export const FiscalHostOCFTransition = ({ collective }) => {
         <OCFDuplicateAndApplyToHostModal
           collective={collective}
           hostSlug={selectedHost.slug}
-          onClose={() => setOpenModal(null)}
-          onSuccess={console.log} // TODO update UI
+          onClose={async successResult => {
+            setOpenModal(null);
+            if (successResult) {
+              await refetchLoggedInUser();
+              router.push(`/dashboard/${successResult?.newCollective?.slug}/host`);
+              window.scrollTo(0, 0);
+            }
+          }}
+          onSuccess={async () => {
+            toast({
+              variant: 'success',
+              message: 'Collective created',
+            });
+          }}
         />
       ) : null}
     </div>
