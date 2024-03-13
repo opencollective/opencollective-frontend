@@ -15858,7 +15858,7 @@ type Mutation {
     newSlug: String
 
     """
-    The new slug for the duplicated account. Defaults to the same as the original account
+    The new name for the duplicated account. Defaults to the same as the original account
     """
     newName: String
 
