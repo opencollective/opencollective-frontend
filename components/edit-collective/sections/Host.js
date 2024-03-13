@@ -50,7 +50,6 @@ const EditCollectiveHostSection = styled.div`
 
 class Host extends React.Component {
   static propTypes = {
-    goals: PropTypes.arrayOf(PropTypes.object),
     collective: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object.isRequired,
     editCollectiveMutation: PropTypes.func.isRequired,

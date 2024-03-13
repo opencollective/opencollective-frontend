@@ -199,9 +199,8 @@ export function OCFBanner(props: OCFBannerProps) {
         <div className="flex flex-col gap-3">
           <p className="text-lg font-semibold">This is a limited account. Spend your pending balance.</p>
           <p className="text-sm">
-            This account now operates under{' '}
-            <a href={`/${newAccount.slug}`}>@{newAccount.slug}</a>. It is not able to receive
-            contributions, you should zero-out this account soon.
+            This account now operates under <a href={`/${newAccount.slug}`}>@{newAccount.slug}</a>. It is not able to
+            receive contributions, you should zero-out this account soon.
           </p>
           {!props.hideNextSteps && (
             <div className="mt-3 flex items-center gap-3">
@@ -225,8 +224,8 @@ export function OCFBanner(props: OCFBannerProps) {
           <p className="text-lg font-semibold">Reminder: You have an account pending to close.</p>
           <p className="text-sm">
             The remaining balance from your previous Fiscal Host is in this account:{' '}
-            <a href={`/${oldAccount.slug}`}>@{oldAccount.slug}</a> Is not able to receive
-            contributions, you should zero-out this account soon.
+            <a href={`/${oldAccount.slug}`}>@{oldAccount.slug}</a> Is not able to receive contributions, you should
+            zero-out this account soon.
           </p>
         </div>
       </MessageBox>
