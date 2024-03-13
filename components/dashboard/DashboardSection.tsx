@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { values } from 'lodash';
 import { useIntl } from 'react-intl';
 
+import { OPENCOLLECTIVE_FOUNDATION_ID } from '../../lib/constants/collectives';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 
@@ -69,9 +70,9 @@ const SETTINGS_COMPONENTS = {
 const DashboardSection = ({ account, isLoading, section, subpath }) => {
   const { LoggedInUser } = useLoggedInUser();
   const { formatMessage } = useIntl();
-  const displayOCFBanner = account?.host?.slug === 'foundation' && account.parent?.slug !== 'foundation' && (
-    <OCFBanner collective={account} />
-  );
+  const displayOCFBanner = (account?.host?.legacyId === OPENCOLLECTIVE_FOUNDATION_ID ||
+    account?.host?.slug === 'foundation') &&
+    account.parent?.slug !== 'foundation' && <OCFBanner collective={account} hideNextSteps={section === 'host'} />;
 
   if (isLoading) {
     return (

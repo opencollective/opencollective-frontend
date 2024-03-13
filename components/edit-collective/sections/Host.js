@@ -5,24 +5,29 @@ import { withRouter } from 'next/router';
 import { FormattedDate, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import { OPENCOLLECTIVE_FOUNDATION_ID } from '../../../lib/constants/collectives';
 import { formatCurrency } from '../../../lib/currency-utils';
 import { getCollectivePageRoute, getDashboardRoute } from '../../../lib/url-helpers';
 import { formatDate, getWebsiteUrl } from '../../../lib/utils';
 
-import CollectiveCard from '../../CollectiveCard';
+import Avatar from '../../Avatar';
 import Container from '../../Container';
+import FormattedMoneyAmount from '../../FormattedMoneyAmount';
 import { Box, Flex } from '../../Grid';
 import { getI18nLink } from '../../I18nFormatters';
 import Link from '../../Link';
+import LinkCollective from '../../LinkCollective';
 import MessageBox from '../../MessageBox';
-import StyledButton from '../../StyledButton';
 import StyledInput from '../../StyledInput';
 import StyledLink from '../../StyledLink';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import { H4, P } from '../../Text';
+import { Button } from '../../ui/Button';
 import CreateHostFormWithData from '../CreateHostFormWithData';
 import EditConnectedAccount from '../EditConnectedAccount';
 import { LeaveHostModal } from '../LeaveHostModal';
+
+import { FiscalHostOCFTransition } from './fiscal-host/FiscalHostOCFTransition';
 
 const OptionLabel = styled.label`
   display: block;
@@ -156,15 +161,9 @@ class Host extends React.Component {
           {collective.stats.balance === 0 && (
             <Fragment>
               <p>
-                <StyledButton
-                  buttonStyle="primary"
-                  type="submit"
-                  onClick={() => this.changeHost()}
-                  minWidth={200}
-                  loading={this.state.isSubmitting}
-                >
+                <Button onClick={() => this.changeHost()} minWidth={200} loading={this.state.isSubmitting}>
                   <FormattedMessage id="editCollective.selfHost.removeBtn" defaultMessage="Reset Fiscal Host" />
-                </StyledButton>
+                </Button>
               </p>
             </Fragment>
           )}
@@ -176,61 +175,89 @@ class Host extends React.Component {
       const name = collective.host.name;
       return (
         <Fragment>
-          <Flex flexDirection={['column', 'row']}>
-            <Box p={1} mr={3}>
-              <CollectiveCard
-                collective={collective.host}
-                membership={hostMembership}
-                hideRoles={!collective.isActive}
-              />
-            </Box>
-            <Box>
-              {!collective.isActive && (
-                <Fragment>
-                  <p>
-                    <FormattedMessage
-                      id="editCollective.host.pending"
-                      defaultMessage="You applied to be hosted by {host} on {date}. Your application is being reviewed."
-                      values={{
-                        host: get(collective, 'host.name'),
-                        date: formatDate(get(hostMembership, 'createdAt'), {
-                          day: 'numeric',
-                          month: 'long',
-                          year: 'numeric',
-                        }),
-                      }}
-                    />
-                  </p>
-                  <p>
-                    <StyledButton
-                      buttonStyle="primary"
-                      type="submit"
-                      onClick={() => this.setState({ showModal: true, action: 'Withdraw' })}
-                    >
-                      <FormattedMessage
-                        id="editCollective.host.cancelApplicationBtn"
-                        defaultMessage="Withdraw application"
-                      />
-                    </StyledButton>
-                  </p>
-                </Fragment>
-              )}
-              {collective.isActive && (
-                <Fragment>
-                  <p className="mb-2 text-base font-bold">
-                    <FormattedMessage
-                      defaultMessage="Hosted by {host} since {approvedAt}"
-                      values={{
-                        host: (
-                          <StyledLink as={Link} href={getCollectivePageRoute(collective.host)}>
-                            {collective.host.name}
-                          </StyledLink>
-                        ),
-                        approvedAt: <FormattedDate dateStyle="medium" value={collective.approvedAt} />,
-                      }}
-                    />
-                    .
-                  </p>
+          {!collective.isActive ? (
+            <div className="mt-4">
+              <p>
+                <FormattedMessage
+                  id="editCollective.host.pending"
+                  defaultMessage="You applied to be hosted by {host} on {date}. Your application is being reviewed."
+                  values={{
+                    host: (
+                      <StyledLink as={Link} href={getCollectivePageRoute(collective.host)}>
+                        {collective.host.name}
+                      </StyledLink>
+                    ),
+                    date: formatDate(get(hostMembership, 'createdAt'), {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                    }),
+                  }}
+                />
+              </p>
+              <div>
+                <Button
+                  variant="outline"
+                  onClick={() => this.setState({ showModal: true, action: 'Withdraw' })}
+                  className="mt-4"
+                >
+                  <FormattedMessage
+                    id="editCollective.host.cancelApplicationBtn"
+                    defaultMessage="Withdraw application"
+                  />
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <h2 className="mb-2 mt-8 text-base font-bold">
+                <FormattedMessage defaultMessage="Current fiscal host" />
+              </h2>
+              <div className="flex justify-between gap-4 rounded-lg border border-gray-300 p-4">
+                {/** Host info */}
+                <div className="flex gap-4">
+                  <LinkCollective collective={collective.host}>
+                    <Avatar collective={collective.host} radius={48} />
+                  </LinkCollective>
+                  <div className="flex flex-col justify-center">
+                    <p className="text-base font-bold">
+                      <LinkCollective collective={collective.host} />
+                    </p>
+                    <p className="text-sm">
+                      <span>
+                        <FormattedMessage
+                          id="withColon"
+                          defaultMessage="{item}:"
+                          values={{ item: <FormattedMessage id="HostedSince" defaultMessage="Hosted since" /> }}
+                        />{' '}
+                        <FormattedDate dateStyle="medium" value={collective.approvedAt} />
+                      </span>
+                      .{' '}
+                      <span>
+                        <FormattedMessage
+                          defaultMessage="Host currency: {currency}"
+                          values={{ currency: collective.host.currency }}
+                        />
+                      </span>
+                    </p>
+                  </div>
+                </div>
+                {/** Collective balance */}
+                <div>
+                  <FormattedMoneyAmount
+                    amount={collective.stats.balance}
+                    currency={collective.currency}
+                    amountStyles={{ fontSize: '20px', fontWeight: 'bold' }}
+                    precision={2}
+                  />
+                </div>
+              </div>
+              {collective.host.id === OPENCOLLECTIVE_FOUNDATION_ID && !collective.parentCollective ? (
+                <div className="mt-8">
+                  <FiscalHostOCFTransition collective={collective} />
+                </div>
+              ) : (
+                <div className="mt-6">
                   {collective.stats.balance > 0 && (
                     <p className="mb-2">
                       <FormattedMessage
@@ -267,22 +294,24 @@ class Host extends React.Component {
                   {collective.stats.balance === 0 && (
                     <div className="mt-2 flex">
                       <div>
-                        <StyledButton
-                          type="submit"
+                        <Button
+                          variant="outline"
+                          size="lg"
                           onClick={() => this.setState({ showModal: true, action: 'Remove' })}
                         >
                           <FormattedMessage id="editCollective.host.leave" defaultMessage="Leave Host" />
-                        </StyledButton>
+                        </Button>
                       </div>
                     </div>
                   )}
                   {showLegalNameInfoBox && (
                     <Container mt={4}>{this.renderLegalNameSetInfoMessage(collective)}</Container>
                   )}
-                </Fragment>
+                </div>
               )}
-            </Box>
-          </Flex>
+            </div>
+          )}
+
           {showModal &&
             (action === 'Remove' ? (
               <LeaveHostModal account={collective} host={collective.host} onClose={closeModal} />
@@ -292,10 +321,10 @@ class Host extends React.Component {
                   <FormattedMessage
                     id="collective.editHost.header"
                     values={{ name }}
-                    defaultMessage={'Withdraw application to {name}'}
+                    defaultMessage="Withdraw application to {name}"
                   />
                 </ModalHeader>
-                <ModalBody>
+                <ModalBody mb={0}>
                   <P>
                     <FormattedMessage
                       id="collective.editHost.withdrawApp"
@@ -305,9 +334,10 @@ class Host extends React.Component {
                   </P>
                 </ModalBody>
                 <ModalFooter>
-                  <Container display="flex" justifyContent="flex-end">
-                    <StyledButton
+                  <div className="flex justify-end gap-2">
+                    <Button
                       mx={20}
+                      variant="outline"
                       onClick={() =>
                         this.setState({
                           showModal: false,
@@ -316,9 +346,9 @@ class Host extends React.Component {
                       }
                     >
                       <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-                    </StyledButton>
-                    <StyledButton
-                      buttonStyle="primary"
+                    </Button>
+                    <Button
+                      variant="destructive"
                       loading={this.state.isSubmitting}
                       onClick={() => this.changeHost(null)}
                       data-cy="continue"
@@ -328,8 +358,8 @@ class Host extends React.Component {
                         values={{ name }}
                         defaultMessage="Withdraw application to {name}"
                       />
-                    </StyledButton>
-                  </Container>
+                    </Button>
+                  </div>
                 </ModalFooter>
               </StyledModal>
             ))}
@@ -403,10 +433,8 @@ class Host extends React.Component {
                   alignItems="flex-end"
                   mt={3}
                 >
-                  <Box mb={[3]}>
-                    <StyledButton
-                      buttonStyle="primary"
-                      type="submit"
+                  <Box mb={3}>
+                    <Button
                       onClick={() => this.changeHost({ id: collective.id })}
                       loading={this.state.isSubmitting}
                       minWidth={200}
@@ -415,7 +443,7 @@ class Host extends React.Component {
                         id="host.selfHost.confirm"
                         defaultMessage="Yes, Activate Independent Collective"
                       />
-                    </StyledButton>
+                    </Button>
                   </Box>
                   {!stripeAccount && (
                     <Box textAlign="right">
