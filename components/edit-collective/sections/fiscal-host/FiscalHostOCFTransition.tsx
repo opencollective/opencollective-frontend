@@ -11,7 +11,7 @@ import { Button } from '../../../ui/Button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../../ui/Collapsible';
 import { LeaveHostModal } from '../../LeaveHostModal';
 
-type Sections = 'recurringContributions' | 'balance' | 'moveHost' | 'moreOptions';
+type Sections = 'recurringContributions' | 'balance' | 'moveHost' | 'externalHost' | 'moreOptions';
 
 const ChevronButton = () => (
   <div className="flex items-center gap-1.5">
@@ -150,6 +150,24 @@ export const FiscalHostOCFTransition = ({ collective }) => {
                 back here to initiate the process.
               </p>
             )}
+          </CollapsibleContent>
+        </Collapsible>
+        {/** External Host */}
+        <Collapsible className="rounded-md border border-gray-300 p-4" {...getOpenProps('externalHost')}>
+          <CollapsibleTrigger className="group flex w-full flex-1 items-center justify-between text-sm [&_svg]:data-[state=open]:rotate-180">
+            <div className="font-medium">If you found a Fiscal Host that is not on Open Collective</div>
+            <ChevronButton />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="pt-4 text-sm">
+            <p>
+              If your host is not on the platform and you are interested in how our platform can support your collective
+              and new host, we are happy to start with a preliminary talk with you or connect with your host directly.
+              Our aim is to foster your growth and ease the transition to your new Fiscal Host. Fill out{' '}
+              <StyledLink href="https://coda.io/form/New-Hosts-to-Open-Collective_dHYnsICyU0b" openInNewTab>
+                this form
+              </StyledLink>{' '}
+              and we’ll reach out.
+            </p>
           </CollapsibleContent>
         </Collapsible>
         {/** More Options */}
