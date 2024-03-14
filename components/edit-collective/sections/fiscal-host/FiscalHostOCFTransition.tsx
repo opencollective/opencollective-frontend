@@ -2,6 +2,7 @@ import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { ChevronDown, ExternalLink } from 'lucide-react';
 
+import { FEATURES, isFeatureEnabled } from '../../../../lib/allowed-features';
 import { OPENCOLLECTIVE_FOUNDATION_ID } from '../../../../lib/constants/collectives';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import {
@@ -17,7 +18,6 @@ import MessageBox from '../../../MessageBox';
 import StyledLink from '../../../StyledLink';
 import { Button } from '../../../ui/Button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../../ui/Collapsible';
-import { useToast } from '../../../ui/useToast';
 import { LeaveHostModal } from '../../LeaveHostModal';
 
 import OCFDuplicateAndApplyToHostModal from './OCFDuplicateAndApplyToHostModal';
@@ -29,7 +29,9 @@ const fiscalHostOCFTransitionQuery = gql`
     account(slug: $slug) {
       id
       legacyId
-
+      features {
+        RECEIVE_FINANCIAL_CONTRIBUTIONS
+      }
       newAccount: memberOf(role: [CONNECTED_ACCOUNT], limit: 1) {
         totalCount
         nodes {
@@ -96,7 +98,6 @@ const step2Label = 'Zero out your Open Collective Foundation balance';
  * A component to provide information and action for collectives to transition out of OCF.
  */
 export const FiscalHostOCFTransition = ({ collective }) => {
-  const { toast } = useToast();
   const [openCollapsible, setOpenCollapsible] = React.useState<Sections>('recurringContributions');
   const [modal, setOpenModal] = React.useState<'leaveHost' | 'applyFlow'>(null);
   const [selectedHost, setSelectedHost] = React.useState(null);
@@ -134,28 +135,65 @@ export const FiscalHostOCFTransition = ({ collective }) => {
             <ChevronButton />
           </CollapsibleTrigger>
           <CollapsibleContent className="pt-4 text-sm">
-            <p>
-              Due to the dissolution of Open Collective Foundation, on March 15th we paused your recurring
-              contributions.
-            </p>
-            <MessageBox type="info" withIcon={false} className="mt-4">
-              <div className="flex items-center gap-4">
-                <Image priority src="/static/images/illustrations/eye.png" alt="" width={48} height={48} />
-
+            {isFeatureEnabled(data?.account, FEATURES.RECEIVE_FINANCIAL_CONTRIBUTIONS) ? (
+              <React.Fragment>
                 <p>
-                  We have sent an automated email to your contributors letting them know that their contributions have
-                  been paused and that they will be invited to reactivate them when your collective is once again able
-                  to receive contributions on the platform. If you haven’t already, we recommend publishing an update to
-                  inform your community of the circumstances so that they’re aware of why these changes are taking place
-                  and what your plans are.
+                  Your Fiscal Host (Open Collective Foundation) is unable to accept contributions from the 15th of
+                  March. On this date all of your active recurring contributions will be paused. Once you have
+                  successfully found a new Fiscal Host we will notify your contributors and invite them to renew their
+                  contributions. You can learn more about this{' '}
+                  <StyledLink href="https://blog.opencollective.com/fiscal-host-transition/" openInNewTab>
+                    here
+                  </StyledLink>
+                  .
                 </p>
-              </div>
-            </MessageBox>
-            <div className="mt-4">
-              <Link href={`${getCollectivePageRoute(collective)}/updates/new`}>
-                <Button variant="outline">Send an Update to your Contributors</Button>
-              </Link>
-            </div>
+                <MessageBox type="info" withIcon={false} className="mt-4">
+                  <div className="flex items-center gap-4">
+                    <Image priority src="/static/images/illustrations/eye.png" alt="" width={48} height={48} />
+                    <div>
+                      <p>
+                        We will send an automated email to inform your contributors that their contributions have been
+                        paused.
+                      </p>
+                      <p>
+                        We recommend publishing an update to inform your community of the circumstances so that they’re
+                        aware of why these changes are taking place and what your plans are.
+                      </p>
+                    </div>
+                  </div>
+                </MessageBox>
+                <div className="mt-4">
+                  <Link href={`${getCollectivePageRoute(collective)}/updates/new`}>
+                    <Button>Send an Update to your Contributors</Button>
+                  </Link>
+                </div>
+              </React.Fragment>
+            ) : (
+              <React.Fragment>
+                <p>
+                  Due to the dissolution of Open Collective Foundation, on March 15th we paused your recurring
+                  contributions.
+                </p>
+                <MessageBox type="info" withIcon={false} className="mt-4">
+                  <div className="flex items-center gap-4">
+                    <Image priority src="/static/images/illustrations/eye.png" alt="" width={48} height={48} />
+
+                    <p>
+                      We have sent an automated email to your contributors letting them know that their contributions
+                      have been paused and that they will be invited to reactivate them when your collective is once
+                      again able to receive contributions on the platform. If you haven’t already, we recommend
+                      publishing an update to inform your community of the circumstances so that they’re aware of why
+                      these changes are taking place and what your plans are.
+                    </p>
+                  </div>
+                </MessageBox>
+                <div className="mt-4">
+                  <Link href={`${getCollectivePageRoute(collective)}/updates/new`}>
+                    <Button variant="outline">Send an Update to your Contributors</Button>
+                  </Link>
+                </div>
+              </React.Fragment>
+            )}
           </CollapsibleContent>
         </Collapsible>
         {/** Balance */}
