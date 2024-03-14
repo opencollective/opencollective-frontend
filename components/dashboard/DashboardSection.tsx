@@ -9,7 +9,7 @@ import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import Container from '../Container';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import NotFound from '../NotFound';
-import { OCFBanner } from '../OCFBanner';
+import { OCFBannerWithData } from '../OCFBanner';
 
 import { HostAdminAccountingSection } from './sections/accounting';
 import AccountSettings from './sections/AccountSettings';
@@ -73,7 +73,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
   if (isLoading) {
     return (
       <div className="w-full">
-        <OCFBanner collective={account} hideNextSteps={section === 'host'} />
+        <OCFBannerWithData collective={account} hideNextSteps={section === 'host'} />
         <LoadingPlaceholder height={26} mb={4} maxWidth={500} />
         <LoadingPlaceholder height={300} />
       </div>
@@ -89,7 +89,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
     }
     return (
       <div className="w-full">
-        <OCFBanner collective={account} hideNextSteps={section === 'host'} />
+        <OCFBannerWithData collective={account} hideNextSteps={section === 'host'} />
         <DashboardComponent accountSlug={account.slug} subpath={subpath} isDashboard />
       </div>
     );
@@ -98,7 +98,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
   if (values(LEGACY_SECTIONS).includes(section)) {
     return (
       <div className="w-full max-w-screen-lg">
-        <OCFBanner collective={account} hideNextSteps={section === 'host'} />
+        <OCFBannerWithData collective={account} hideNextSteps={section === 'host'} />
         {SECTION_LABELS[section] && <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />}
 
         <AccountSettings account={account} section={section} />
@@ -112,7 +112,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
     return (
       // <div className="flex max-w-screen-lg justify-center">
       <div className="max-w-screen-md flex-1">
-        <OCFBanner collective={account} hideNextSteps={section === 'host'} />
+        <OCFBannerWithData collective={account} hideNextSteps={section === 'host'} />
         <SettingsComponent account={account} accountSlug={account.slug} subpath={subpath} />
       </div>
       // </div>
@@ -123,7 +123,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
     return (
       // <div className="flex max-w-screen-lg justify-center">
       <div className="max-w-screen-md flex-1">
-        <OCFBanner collective={account} hideNextSteps={section === 'host'} />
+        <OCFBannerWithData collective={account} hideNextSteps={section === 'host'} />
         {SECTION_LABELS[section] && <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />}
 
         <AccountSettings account={account} section={section} />

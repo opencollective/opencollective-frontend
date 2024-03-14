@@ -17,6 +17,9 @@ export const adminPanelQuery = gql`
       isActive
       isIncognito
       imageUrl(height: 256)
+      duplicatedAccounts {
+        totalCount
+      }
       pendingExpenses: expenses(status: PENDING, direction: RECEIVED, includeChildrenExpenses: true, limit: 0) {
         totalCount
       }

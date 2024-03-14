@@ -3,11 +3,12 @@ import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
+import { checkIfOCF } from '../../lib/collective';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { moneyCanMoveFromEvent } from '../../lib/events';
 
 import NotificationBar, { NotificationBarButton, NotificationBarLink } from '../NotificationBar';
-import { OCFCollectivePageBanner } from '../OCFBanner';
+import { getOCFBannerMessage } from '../OCFBanner';
 import SendMoneyToCollectiveBtn from '../SendMoneyToCollectiveBtn';
 
 import PendingApplicationActions from './PendingApplicationActions';
@@ -212,11 +213,22 @@ const getNotification = (intl, status, collective, host, LoggedInUser, refetch) 
         />
       ),
     };
-  } else if (collective.host?.slug === 'foundation' && collective.parentCollective?.slug !== 'foundation') {
-    if (!LoggedInUser || !LoggedInUser.isAdminOfCollective(collective)) {
-      return;
-    }
-    return OCFCollectivePageBanner({ collective, LoggedInUser });
+  } else if (checkIfOCF(collective.host) && collective.parentCollective?.slug !== 'foundation') {
+    const duplicateCollective = get(collective, 'duplicatedCollectives.collectives.0');
+    const isAdmin = LoggedInUser?.isAdminOfCollectiveOrHost(collective);
+    const { title, severity, message } = getOCFBannerMessage({
+      isAdmin,
+      account: collective,
+      newAccount: duplicateCollective,
+      isCentered: true,
+      hideNextSteps: true,
+    });
+    return {
+      type: severity,
+      title,
+      description: message,
+      isSticky: true,
+    };
   }
 };
 

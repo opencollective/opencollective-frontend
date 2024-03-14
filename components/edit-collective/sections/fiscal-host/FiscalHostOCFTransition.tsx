@@ -3,7 +3,6 @@ import { gql, useQuery } from '@apollo/client';
 import { ChevronDown, ExternalLink } from 'lucide-react';
 
 import { FEATURES, isFeatureEnabled } from '../../../../lib/allowed-features';
-import { OPENCOLLECTIVE_FOUNDATION_ID } from '../../../../lib/constants/collectives';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import {
   FiscalHostOcfTransitionQuery,
@@ -14,7 +13,9 @@ import { getCollectivePageRoute, getDashboardRoute } from '../../../../lib/url-h
 import CollectivePicker from '../../../CollectivePicker';
 import Image from '../../../Image';
 import Link from '../../../Link';
+import Loading from '../../../Loading';
 import MessageBox from '../../../MessageBox';
+import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import StyledLink from '../../../StyledLink';
 import { Button } from '../../../ui/Button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../../ui/Collapsible';
@@ -32,23 +33,17 @@ const fiscalHostOCFTransitionQuery = gql`
       features {
         RECEIVE_FINANCIAL_CONTRIBUTIONS
       }
-      newAccount: memberOf(role: [CONNECTED_ACCOUNT], limit: 1) {
+      newAccounts: duplicatedAccounts(limit: 1) {
         totalCount
         nodes {
           id
-          role
-          publicMessage
-          description
-          account {
-            id
-            name
-            slug
-            imageUrl
-            ... on AccountWithHost {
-              host {
-                id
-                legacyId
-              }
+          name
+          slug
+          imageUrl
+          ... on AccountWithHost {
+            host {
+              id
+              legacyId
             }
           }
         }
@@ -101,28 +96,25 @@ export const FiscalHostOCFTransition = ({ collective }) => {
   const [openCollapsible, setOpenCollapsible] = React.useState<Sections>('recurringContributions');
   const [modal, setOpenModal] = React.useState<'leaveHost' | 'applyFlow'>(null);
   const [selectedHost, setSelectedHost] = React.useState(null);
-  const { data, loading, refetch } = useQuery<FiscalHostOcfTransitionQuery, FiscalHostOcfTransitionQueryVariables>(
-    fiscalHostOCFTransitionQuery,
-    {
-      context: API_V2_CONTEXT,
-      variables: {
-        slug: collective.slug,
-      },
+  const { data, error, loading, refetch } = useQuery<
+    FiscalHostOcfTransitionQuery,
+    FiscalHostOcfTransitionQueryVariables
+  >(fiscalHostOCFTransitionQuery, {
+    context: API_V2_CONTEXT,
+    variables: {
+      slug: collective.slug,
     },
-  );
+  });
   const getOpenProps = (section: Sections) => ({
     open: openCollapsible === section,
     onOpenChange: (open: boolean) => setOpenCollapsible(open ? section : null), // Collapse other sections when opening a new one
   });
 
-  const newAccount = React.useMemo(() => {
-    return (data?.account?.newAccount?.nodes || [])
-      .filter(member => {
-        return !('host' in member.account) || member.account.host.legacyId !== OPENCOLLECTIVE_FOUNDATION_ID;
-      })
-      .map(member => member.account)
-      .find(Boolean);
-  }, [data?.account?.newAccount]);
+  if (loading) {
+    return <Loading />;
+  } else if (error) {
+    return <MessageBoxGraphqlError error={error} />;
+  }
 
   return (
     <div>
@@ -135,7 +127,7 @@ export const FiscalHostOCFTransition = ({ collective }) => {
             <ChevronButton />
           </CollapsibleTrigger>
           <CollapsibleContent className="pt-4 text-sm">
-            {isFeatureEnabled(data?.account, FEATURES.RECEIVE_FINANCIAL_CONTRIBUTIONS) ? (
+            {isFeatureEnabled(data.account, FEATURES.RECEIVE_FINANCIAL_CONTRIBUTIONS) ? (
               <React.Fragment>
                 <p>
                   Your Fiscal Host (Open Collective Foundation) is unable to accept contributions from the 15th of
@@ -240,7 +232,7 @@ export const FiscalHostOCFTransition = ({ collective }) => {
           </CollapsibleContent>
         </Collapsible>
         {/** Move Host */}
-        {!newAccount && (
+        {!data.account.newAccounts.totalCount && (
           <Collapsible className="rounded-md border border-gray-300 p-4" {...getOpenProps('moveHost')}>
             <CollapsibleTrigger className="group flex w-full flex-1 items-center justify-between text-sm [&_svg]:data-[state=open]:rotate-180">
               <div className="font-medium">Join a new Fiscal Host on Open Collective</div>
@@ -272,7 +264,7 @@ export const FiscalHostOCFTransition = ({ collective }) => {
                   <div className="mt-3 flex gap-4">
                     <div className="max-w-[300px]">
                       <CollectivePicker
-                        collectives={(data?.hosts?.nodes || []).filter(host => ![host.slug].includes('foundation'))}
+                        collectives={(data.hosts.nodes || []).filter(host => ![host.slug].includes('foundation'))}
                         isLoading={loading}
                         placeholder="Select a new Fiscal Host"
                         onChange={({ value }) => setSelectedHost(value)}

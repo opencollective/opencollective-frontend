@@ -832,6 +832,16 @@ interface Account {
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromAccount: Account
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
 }
 
 """
@@ -2382,6 +2392,16 @@ type Host implements Account & AccountWithContributions {
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromAccount: Account
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -7168,6 +7188,16 @@ type Bot implements Account {
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromAccount: Account
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -7857,6 +7887,16 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromAccount: Account
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -8977,6 +9017,16 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromAccount: Account
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -9884,6 +9934,16 @@ type Individual implements Account {
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromAccount: Account
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -10779,6 +10839,16 @@ type Organization implements Account & AccountWithContributions {
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromAccount: Account
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -11560,6 +11630,16 @@ type Vendor implements Account & AccountWithContributions {
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromAccount: Account
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -14736,6 +14816,16 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromAccount: Account
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -15523,6 +15613,16 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromAccount: Account
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)

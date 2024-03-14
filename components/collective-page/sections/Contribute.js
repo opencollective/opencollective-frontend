@@ -81,7 +81,7 @@ class SectionContribute extends React.PureComponent {
         tiersIds: PropTypes.arrayOf(PropTypes.number),
       }),
     ),
-    isAdmin: PropTypes.bool,
+    canEdit: PropTypes.bool,
     editAccountSettings: PropTypes.func.isRequired,
   };
 
@@ -146,9 +146,9 @@ class SectionContribute extends React.PureComponent {
   });
 
   getContributeCards = memoizeOne(tiers => {
-    const { collective, contributors, contributorsStats, isAdmin } = this.props;
+    const { collective, contributors, contributorsStats, canEdit } = this.props;
     const hasNoContributor = !this.hasContributors(contributors);
-    const canContribute = collective.isActive && (!isPastEvent(collective) || isAdmin);
+    const canContribute = collective.isActive && (!isPastEvent(collective) || canEdit);
     const hasCustomContribution = !get(collective, 'settings.disableCustomContributions', false);
 
     // Remove tickets
@@ -188,25 +188,25 @@ class SectionContribute extends React.PureComponent {
   });
 
   render() {
-    const { collective, tiers, events, connectedCollectives, contributors, isAdmin } = this.props;
+    const { collective, tiers, events, connectedCollectives, contributors, canEdit } = this.props;
     const { isSaving, showTiersAdmin } = this.state;
     const isEvent = collective.type === CollectiveType.EVENT;
     const isProject = collective.type === CollectiveType.PROJECT;
     const isFund = collective.type === CollectiveType.FUND;
     const hasOtherWaysToContribute =
-      !isEvent && !isProject && !isFund && (isAdmin || events.length > 0 || connectedCollectives.length > 0);
+      !isEvent && !isProject && !isFund && (canEdit || events.length > 0 || connectedCollectives.length > 0);
     const isActive = collective.isActive;
     const hasHost = collective.host;
     const isHost = collective.isHost;
     const orderKeys = getCollectiveContributionCardsOrder(collective);
     const contributeCards = this.getContributeCards(tiers);
     const sortedContributeCards = this.sortContributeCards(contributeCards, orderKeys);
-    const hasContribute = Boolean(isAdmin || (collective.isActive && contributeCards.length));
+    const hasContribute = Boolean(canEdit || (collective.isActive && contributeCards.length));
     const hasNoContributor = !this.hasContributors(contributors);
     const sortedTicketTiers = this.sortTicketTiers(this.filterTickets(tiers));
-    const hasTickets = isEvent && Boolean(isAdmin || (collective.isActive && sortedTicketTiers.length));
-    const hideTicketsFromNonAdmins = (sortedTicketTiers.length === 0 || !collective.isActive) && !isAdmin;
-    const cannotOrderTickets = (!hasTickets && !isAdmin) || isPastEvent(collective);
+    const hasTickets = isEvent && Boolean(canEdit || (collective.isActive && sortedTicketTiers.length));
+    const hideTicketsFromNonAdmins = (sortedTicketTiers.length === 0 || !collective.isActive) && !canEdit;
+    const cannotOrderTickets = (!hasTickets && !canEdit) || isPastEvent(collective);
 
     /*
     cases
@@ -224,7 +224,7 @@ class SectionContribute extends React.PureComponent {
     return (
       <Fragment>
         {/* "Start accepting financial contributions" for admins */}
-        {isAdmin && !hasHost && !isHost && (
+        {canEdit && !hasHost && !isHost && (
           <ContainerSectionContent py={4}>
             <Flex mb={4} justifyContent="space-between" alignItems="center" flexWrap="wrap">
               <P color="black.700" my={2} mr={2} css={{ flex: '1 0 50%', maxWidth: 780 }}>
@@ -244,7 +244,7 @@ class SectionContribute extends React.PureComponent {
           </ContainerSectionContent>
         )}
 
-        {((isAdmin && hasHost) || (isAdmin && isHost) || (!isAdmin && isActive)) && (
+        {((canEdit && hasHost) || (canEdit && isHost) || (!canEdit && isActive)) && (
           <Fragment>
             {/* Financial contributions tiers */}
             {hasContribute && (
@@ -269,13 +269,13 @@ class SectionContribute extends React.PureComponent {
                           </P>
                         </ContainerOverlay>
                       )}
-                      {!(isAdmin && showTiersAdmin) &&
+                      {!(canEdit && showTiersAdmin) &&
                         sortedContributeCards.map(({ key, Component, componentProps }) => (
                           <ContributeCardContainer key={key}>
                             <Component {...componentProps} />
                           </ContributeCardContainer>
                         ))}
-                      {isAdmin && (
+                      {canEdit && (
                         <Container display={showTiersAdmin ? 'block' : 'none'} data-cy="admin-contribute-cards">
                           <AdminContributeCardsContainer
                             collective={collective}
@@ -318,7 +318,7 @@ class SectionContribute extends React.PureComponent {
                       />
                     </ContributeCardContainer>
                   ))}
-                  {isAdmin && (
+                  {canEdit && (
                     <ContributeCardContainer minHeight={150}>
                       <CreateNew route={getDashboardRoute(collective, 'tickets')}>
                         <FormattedMessage id="SectionTickets.CreateTicket" defaultMessage="Create Ticket" />
