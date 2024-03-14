@@ -572,12 +572,7 @@ const OCFDuplicateAndApplyToHostModal = ({ hostSlug, collective, onClose, onSucc
                             required={false}
                             label={
                               <Span fontSize="13px" lineHeight="16px" fontWeight="600" color="black.700">
-                                {get(host, 'settings.applyMessage') || (
-                                  <FormattedMessage
-                                    id="ApplyToHost.WriteMessage"
-                                    defaultMessage="Message to the Fiscal Host"
-                                  />
-                                )}
+                                {get(host, 'settings.applyMessage') || `Message to ${host.name}, the new Fiscal Host`}
                               </Span>
                             }
                           >
