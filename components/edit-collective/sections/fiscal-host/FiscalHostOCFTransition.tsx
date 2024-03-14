@@ -249,9 +249,9 @@ export const FiscalHostOCFTransition = ({ collective }) => {
             <CollapsibleContent className="pt-4 text-sm">
               <p>
                 To continue fundraising on the Open Collective platform you will need to either find a new Fiscal Host,
-                or become an independent collective. When your collective is again able to receive contributions we will
-                send automated email notifications to your paused contributors and invite them to resume their recurring
-                contributions.
+                or become an independent collective. When your collective has found a new fiscal host on the Open
+                Collective platform we will send automated email notifications to your paused contributors and invite
+                them to resume their recurring contributions.
               </p>
               {collective.stats.balance === 0 ? (
                 <div className="mt-4">

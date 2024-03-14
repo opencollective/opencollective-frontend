@@ -206,7 +206,7 @@ const ConfirmButtons = ({ onClose, onBack, onSubmit, isSubmitting, canSubmit }) 
         data-cy="afc-host-submit-button"
         className="min-w-[150px]"
       >
-        <FormattedMessage defaultMessage="Duplicate Collective & Submit application" />
+        Duplicate Collective & Submit application
       </Button>
     </div>
   );
@@ -628,20 +628,10 @@ const OCFDuplicateAndApplyToHostModal = ({ hostSlug, collective, onClose, onSucc
                             </StyledInputFormikField>
                           )}
                           <MessageBox type="info" withIcon mt={3} fontSize="13px">
-                            <FormattedMessage
-                              defaultMessage="When you submit your application, we will:"
-                              values={{ hostName: host.name }}
-                            />
+                            When you submit your application, we will:
                             <ol className="list-inside list-decimal">
-                              <li>
-                                <FormattedMessage defaultMessage="Duplicate your collective and its active projects/events." />
-                              </li>
-                              <li>
-                                <FormattedMessage
-                                  defaultMessage="Apply to {hostName} from the new collective."
-                                  values={{ hostName: host.name }}
-                                />
-                              </li>
+                              <li>Duplicate your collective and its active projects/events.</li>
+                              <li>Apply to {host.name} from the new collective.</li>
                               <li>
                                 Once your balance has been zeroed, we will merge both profiles and transaction history.
                               </li>
