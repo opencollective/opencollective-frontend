@@ -643,7 +643,7 @@ const OCFDuplicateAndApplyToHostModal = ({ hostSlug, collective, onClose, onSucc
                                 />
                               </li>
                               <li>
-                                <FormattedMessage defaultMessage="Once your balance has been zeroed, we will merge both profiles and transaction history." />
+                                Once your balance has been zeroed, we will merge both profiles and transaction history.
                               </li>
                             </ol>
                           </MessageBox>
