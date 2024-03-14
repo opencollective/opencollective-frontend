@@ -18,7 +18,6 @@ import {
 import Link from 'next/link';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { TransactionKind } from '../../../../lib/constants/transactions';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { useAsyncCall } from '../../../../lib/hooks/useAsyncCall';
 import useClipboard from '../../../../lib/hooks/useClipboard';
@@ -40,8 +39,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 
 import TransactionRefundModal from './TransactionRefundModal';
 import TransactionRejectModal from './TransactionRejectModal';
-
-const { CONTRIBUTION, ADDED_FUNDS, PLATFORM_TIP } = TransactionKind;
 
 const transactionQuery = gql`
   query TransactionDetails($id: String!) {
@@ -292,13 +289,9 @@ export function TransactionDrawer({
     return download();
   };
 
-  const showActions =
-    transaction?.kind === TransactionKind.EXPENSE ||
-    (transaction?.order !== null && [CONTRIBUTION, ADDED_FUNDS, PLATFORM_TIP].includes(transaction?.kind));
-
-  const showRefundButton = showActions && transaction?.permissions.canRefund;
-  const showRejectButton = showActions && transaction?.permissions.canReject;
-  const showDownloadInvoiceButton = showActions && transaction?.permissions.canDownloadInvoice;
+  const showRefundButton = transaction?.permissions.canRefund;
+  const showRejectButton = transaction?.permissions.canReject;
+  const showDownloadInvoiceButton = transaction?.permissions.canDownloadInvoice;
 
   return (
     <React.Fragment>
