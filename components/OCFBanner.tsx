@@ -1,17 +1,18 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, ExternalLink } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import { OPENCOLLECTIVE_FOUNDATION_ID } from '../lib/constants/collectives';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { Account, OcfTransitionBannerQuery, OcfTransitionBannerQueryVariables } from '../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
-import { getDashboardRoute } from '../lib/url-helpers';
+import { getCollectivePageRoute, getDashboardRoute } from '../lib/url-helpers';
 import { cn } from '../lib/utils';
 
 import { Button } from './ui/Button';
 import Link from './Link';
+import LinkCollective from './LinkCollective';
 import MessageBox from './MessageBox';
 import MessageBoxGraphqlError from './MessageBoxGraphqlError';
 
@@ -197,11 +198,30 @@ export function OCFBanner(props: OCFBannerProps) {
     return (
       <MessageBox type="error" className="mb-4">
         <div className="flex flex-col gap-3">
-          <p className="text-lg font-semibold">This is a limited account. Spend your pending balance.</p>
-          <p className="text-sm">
-            This account now operates under <a href={`/${newAccount.slug}`}>@{newAccount.slug}</a>. It is not able to
-            receive contributions, you should zero-out this account soon.
-          </p>
+          <p className="text-lg font-semibold">This is a limited account. Spend your remaining balance.</p>
+          <div className="text-sm">
+            This account now operates under <LinkCollective collective={newAccount}>@{newAccount.slug}</LinkCollective>.
+            It is not able to receive contributions. You can zero-out this account by doing any of the following:
+            <ul className="list-outside list-disc pl-4">
+              <li className="mt-1 text-neutral-700">
+                <Link href={`${getCollectivePageRoute(oldAccount)}/expenses/new`}>
+                  <span className="underline">Submit expenses</span>{' '}
+                  <ExternalLink size={16} className="inline align-text-top" />
+                </Link>
+              </li>
+              <li className="mt-1">
+                <Link href={getDashboardRoute(oldAccount, 'advanced')}>
+                  <span className="underline">
+                    Transfer your balance to Open Collective Foundation (Your current host)
+                  </span>{' '}
+                  <ExternalLink size={16} className="inline align-text-top" />
+                </Link>
+                <p className="font-normal">
+                  Choose this option if you have an agreement with OCF to transfer your funds to your new Fiscal Host.
+                </p>
+              </li>
+            </ul>
+          </div>
           {!props.hideNextSteps && (
             <div className="mt-3 flex items-center gap-3">
               <div>Next Steps:</div>
