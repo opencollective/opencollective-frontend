@@ -41,13 +41,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 import TransactionRefundModal from './TransactionRefundModal';
 import TransactionRejectModal from './TransactionRejectModal';
 
-const isInternalTransfer = (fromAccount, toAccount) => {
-  if (!fromAccount || !toAccount) {
-    return false;
-  }
-  return fromAccount.parent?.id === toAccount.id || fromAccount.id === toAccount.host?.id;
-};
-
 const { CONTRIBUTION, ADDED_FUNDS, PLATFORM_TIP } = TransactionKind;
 
 const transactionQuery = gql`
@@ -291,18 +284,21 @@ export function TransactionDrawer({
     refetchList?.();
   };
 
+  const handleDownloadInvoice = () => {
+    const params = transaction?.expense?.id
+      ? { expenseId: transaction?.expense?.id }
+      : { transactionUuid: transaction?.uuid, toCollectiveSlug: transaction?.toAccount?.slug };
+    const download = downloadInvoiceWith(params);
+    return download();
+  };
+
   const showActions =
     transaction?.kind === TransactionKind.EXPENSE ||
-    (transaction?.order !== null &&
-      [CONTRIBUTION, ADDED_FUNDS, PLATFORM_TIP].includes(transaction?.kind) &&
-      transaction?.paymentMethod);
+    (transaction?.order !== null && [CONTRIBUTION, ADDED_FUNDS, PLATFORM_TIP].includes(transaction?.kind));
 
-  const showRefundButton = showActions && transaction?.permissions.canRefund && !transaction?.isRefunded;
-  const showRejectButton = showActions && transaction?.permissions.canReject && !transaction?.isOrderRejected;
-  const showDownloadInvoiceButton =
-    showActions &&
-    transaction?.permissions.canDownloadInvoice &&
-    !isInternalTransfer(transaction?.fromAccount, transaction?.toAccount);
+  const showRefundButton = showActions && transaction?.permissions.canRefund;
+  const showRejectButton = showActions && transaction?.permissions.canReject;
+  const showDownloadInvoiceButton = showActions && transaction?.permissions.canDownloadInvoice;
 
   return (
     <React.Fragment>
@@ -439,13 +435,7 @@ export function TransactionDrawer({
                         <FormattedMessage defaultMessage="View transactions in group" />
                       </DropdownMenuItem>
                       {showDownloadInvoiceButton && (
-                        <DropdownMenuItem
-                          onClick={downloadInvoiceWith({
-                            transactionUuid: transaction?.uuid,
-                            toCollectiveSlug: transaction?.toAccount?.slug,
-                          })}
-                          className="gap-1.5"
-                        >
+                        <DropdownMenuItem onClick={handleDownloadInvoice} className="gap-1.5">
                           <Download size={16} />
 
                           {transaction?.expense ? (
