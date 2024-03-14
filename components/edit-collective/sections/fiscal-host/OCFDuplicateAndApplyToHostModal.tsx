@@ -9,6 +9,7 @@ import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { requireFields } from '../../../../lib/form-utils';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
+import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 
 import Avatar from '../../../Avatar';
 import CollectivePicker from '../../../CollectivePicker';
@@ -225,15 +226,14 @@ ConfirmButtons.propTypes = {
 const OCFDuplicateAndApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, ...props }) => {
   const query = collective ? applyToHostQuery : applyToHostWithAccountsQuery;
   const [successResult, setSuccessResult] = React.useState(null);
+  const { refetchLoggedInUser } = useLoggedInUser();
   const { data, loading, error } = useQuery(query, {
     ...GQL_CONTEXT,
     variables: { hostSlug, collectiveSlug: collective?.slug },
     fetchPolicy: 'network-only',
   });
-  const [applyToHost, { loading: isApplying }] = useMutation(applyToHostMutation, GQL_CONTEXT);
-  const [duplicateAccount, { loading: isDuplicating }] = useMutation(duplicateAccountMutation, {
-    context: API_V2_CONTEXT,
-  });
+  const [applyToHost] = useMutation(applyToHostMutation, GQL_CONTEXT);
+  const [duplicateAccount] = useMutation(duplicateAccountMutation, { context: API_V2_CONTEXT });
   const intl = useIntl();
   const { toast } = useToast();
   const [stepKey, setStepKey] = React.useState<keyof typeof STEPS>('INFORMATION');
@@ -355,8 +355,19 @@ const OCFDuplicateAndApplyToHostModal = ({ hostSlug, collective, onClose, onSucc
                 },
               });
 
-              if (onSuccess) {
-                await onSuccess(result);
+              try {
+                // Refetch logged in user's data, to make sure permissions are ok and the new collective appears in the user menu
+                await refetchLoggedInUser();
+
+                if (onSuccess) {
+                  await onSuccess(result);
+                }
+              } catch (e) {
+                // Add a toast to make sure any failure in the following requests does not confuse the user
+                toast({
+                  variant: 'error',
+                  message: `${collective.name} has been duplicated and applied to ${host.name} but we couldn't refresh your data. Please refresh the page.`,
+                });
               }
 
               setSuccessResult({ newCollective });
@@ -365,7 +376,7 @@ const OCFDuplicateAndApplyToHostModal = ({ hostSlug, collective, onClose, onSucc
             }
           }}
         >
-          {({ handleSubmit, values, setFieldValue }) => (
+          {({ handleSubmit, values, setFieldValue, isSubmitting }) => (
             <React.Fragment>
               <ModalHeader hideCloseIcon>
                 {loading ? (
@@ -656,7 +667,7 @@ const OCFDuplicateAndApplyToHostModal = ({ hostSlug, collective, onClose, onSucc
                   <ConfirmButtons
                     onBack={() => setStepKey('INFORMATION')}
                     onSubmit={handleSubmit}
-                    isSubmitting={isDuplicating || isApplying}
+                    isSubmitting={isSubmitting}
                     canSubmit={canApply}
                   />
                 )}

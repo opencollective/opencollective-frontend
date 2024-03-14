@@ -1,7 +1,6 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { ChevronDown, ExternalLink } from 'lucide-react';
-import { useRouter } from 'next/router';
 
 import { OPENCOLLECTIVE_FOUNDATION_ID } from '../../../../lib/constants/collectives';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
@@ -9,7 +8,6 @@ import {
   FiscalHostOcfTransitionQuery,
   FiscalHostOcfTransitionQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import { getCollectivePageRoute, getDashboardRoute } from '../../../../lib/url-helpers';
 
 import CollectivePicker from '../../../CollectivePicker';
@@ -92,19 +90,17 @@ const ChevronButton = () => (
   </div>
 );
 
-const step1Label = 'Pause your Recurring Contributions';
+const step2Label = 'Zero out your Open Collective Foundation balance';
 
 /**
  * A component to provide information and action for collectives to transition out of OCF.
  */
 export const FiscalHostOCFTransition = ({ collective }) => {
-  const { refetchLoggedInUser } = useLoggedInUser();
   const { toast } = useToast();
-  const router = useRouter();
   const [openCollapsible, setOpenCollapsible] = React.useState<Sections>('recurringContributions');
   const [modal, setOpenModal] = React.useState<'leaveHost' | 'applyFlow'>(null);
   const [selectedHost, setSelectedHost] = React.useState(null);
-  const { data, loading } = useQuery<FiscalHostOcfTransitionQuery, FiscalHostOcfTransitionQueryVariables>(
+  const { data, loading, refetch } = useQuery<FiscalHostOcfTransitionQuery, FiscalHostOcfTransitionQueryVariables>(
     fiscalHostOCFTransitionQuery,
     {
       context: API_V2_CONTEXT,
@@ -134,38 +130,30 @@ export const FiscalHostOCFTransition = ({ collective }) => {
         {/** Recurring contributions */}
         <Collapsible className="rounded-md border border-gray-300 p-4" {...getOpenProps('recurringContributions')}>
           <CollapsibleTrigger className="group flex w-full flex-1 items-center justify-between text-sm [&_svg]:data-[state=open]:rotate-180">
-            <div className="font-medium">{step1Label}</div>
+            <div className="font-medium">Paused Recurring Contributions</div>
             <ChevronButton />
           </CollapsibleTrigger>
           <CollapsibleContent className="pt-4 text-sm">
             <p>
-              Your Fiscal Host (Open Collective Foundation) is unable to accept contributions from the 15th of March. On
-              this date all of your active recurring contributions will be paused. Once you have successfully found a
-              new Fiscal Host we will notify your contributors and invite them to renew their contributions. You can
-              learn more about this{' '}
-              <StyledLink href="https://blog.opencollective.com/fiscal-host-transition/" openInNewTab>
-                here
-              </StyledLink>
-              .
+              Due to the dissolution of Open Collective Foundation, on March 15th we paused your recurring
+              contributions.
             </p>
             <MessageBox type="info" withIcon={false} className="mt-4">
               <div className="flex items-center gap-4">
                 <Image priority src="/static/images/illustrations/eye.png" alt="" width={48} height={48} />
-                <div>
-                  <p>
-                    We will send an automated email to inform your contributors that their contributions have been
-                    paused.
-                  </p>
-                  <p>
-                    We recommend publishing an update to inform your community of the circumstances so that they’re
-                    aware of why these changes are taking place and what your plans are.
-                  </p>
-                </div>
+
+                <p>
+                  We have sent an automated email to your contributors letting them know that their contributions have
+                  been paused and that they will be invited to reactivate them when your collective is once again able
+                  to receive contributions on the platform. If you haven’t already, we recommend publishing an update to
+                  inform your community of the circumstances so that they’re aware of why these changes are taking place
+                  and what your plans are.
+                </p>
               </div>
             </MessageBox>
             <div className="mt-4">
               <Link href={`${getCollectivePageRoute(collective)}/updates/new`}>
-                <Button>Send an Update to your Contributors</Button>
+                <Button variant="outline">Send an Update to your Contributors</Button>
               </Link>
             </div>
           </CollapsibleContent>
@@ -173,7 +161,7 @@ export const FiscalHostOCFTransition = ({ collective }) => {
         {/** Balance */}
         <Collapsible className="rounded-md border border-gray-300 p-4" {...getOpenProps('balance')}>
           <CollapsibleTrigger className="group flex w-full flex-1 items-center justify-between text-sm [&_svg]:data-[state=open]:rotate-180">
-            <div className="font-medium">Zero out your Open Collective Foundation balance</div>
+            <div className="font-medium">{step2Label}</div>
             <ChevronButton />
           </CollapsibleTrigger>
           <CollapsibleContent className="pt-4 text-sm">
@@ -290,7 +278,7 @@ export const FiscalHostOCFTransition = ({ collective }) => {
             <ul className="mt-4 list-outside list-disc pl-4">
               <li>
                 You will still need to zero out your Collective’s balance to leave OCF and archive your collective (see
-                above: “{step1Label}”).
+                above: “{step2Label}”).
               </li>
               <li>
                 You can{' '}
@@ -320,19 +308,9 @@ export const FiscalHostOCFTransition = ({ collective }) => {
         <OCFDuplicateAndApplyToHostModal
           collective={collective}
           hostSlug={selectedHost.slug}
-          onClose={async successResult => {
-            setOpenModal(null);
-            if (successResult) {
-              await refetchLoggedInUser();
-              router.push(`/dashboard/${successResult?.newCollective?.slug}/host`);
-              window.scrollTo(0, 0);
-            }
-          }}
+          onClose={() => setOpenModal(null)}
           onSuccess={async () => {
-            toast({
-              variant: 'success',
-              message: 'Collective created',
-            });
+            await refetch();
           }}
         />
       ) : null}
