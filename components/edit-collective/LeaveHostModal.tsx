@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import { Form } from 'formik';
+import { Form, FormikProps } from 'formik';
 import { get, sum } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -112,12 +112,14 @@ export const LeaveHostModal = ({ account, host, onClose }) => {
       ) : (
         <FormikZod
           schema={portabilitySummary.totalCount ? LeaveHostFormSchemaWithRecurringContributions : LeaveHostFormSchema}
-          initialValues={{
-            accountId: data.account.id,
-            messageForContributors: '',
-            pauseContributions: true,
-          }}
-          onSubmit={async values => {
+          initialValues={
+            {
+              accountId: data.account.id,
+              messageForContributors: '',
+              pauseContributions: true,
+            } as z.infer<typeof LeaveHostFormSchemaWithRecurringContributions>
+          }
+          onSubmit={async (values: z.infer<typeof LeaveHostFormSchemaWithRecurringContributions>) => {
             try {
               await removeHost({
                 variables: {
@@ -145,7 +147,7 @@ export const LeaveHostModal = ({ account, host, onClose }) => {
             }
           }}
         >
-          {({ values, setFieldValue }) => (
+          {({ values, setFieldValue }: FormikProps<z.infer<typeof LeaveHostFormSchemaWithRecurringContributions>>) => (
             <Form>
               <ModalBody>
                 <div className="mt-3 ">

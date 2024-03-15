@@ -71,6 +71,7 @@ class EditCollectiveForm extends React.Component {
     router: PropTypes.object, // from withRouter
     intl: PropTypes.object.isRequired, // from injectIntl
     query: PropTypes.object, // passed from Page/Router through index/EditCollective
+    isLegacyOCFDuplicatedAccount: PropTypes.bool,
   };
 
   constructor(props) {
@@ -406,7 +407,7 @@ class EditCollectiveForm extends React.Component {
   }
 
   renderSection(section) {
-    const { collective, LoggedInUser } = this.props;
+    const { collective, LoggedInUser, isLegacyOCFDuplicatedAccount } = this.props;
 
     switch (section) {
       case ALL_SECTIONS.INFO:
@@ -436,10 +437,16 @@ class EditCollectiveForm extends React.Component {
         return <ManagePaymentMethods account={collective} />;
 
       case ALL_SECTIONS.TIERS:
-        return <Tiers collective={collective} types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']} />;
+        return (
+          <Tiers
+            isLegacyOCFDuplicatedAccount={isLegacyOCFDuplicatedAccount}
+            collective={collective}
+            types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']}
+          />
+        );
 
       case ALL_SECTIONS.TICKETS:
-        return <Tickets collective={collective} />;
+        return <Tickets collective={collective} isLegacyOCFDuplicatedAccount={isLegacyOCFDuplicatedAccount} />;
 
       case ALL_SECTIONS.GIFT_CARDS:
         return <GiftCards collectiveId={collective.id} collectiveSlug={collective.slug} />;

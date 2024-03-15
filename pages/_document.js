@@ -127,6 +127,7 @@ export default class IntlDocument extends Document {
       'RECAPTCHA_ENABLED',
       'WISE_ENVIRONMENT',
       'HCAPTCHA_SITEKEY',
+      'OCF_DUPLICATE_FLOW',
       'CAPTCHA_ENABLED',
       'CAPTCHA_PROVIDER',
       'DISABLE_MOCK_UPLOADS',
