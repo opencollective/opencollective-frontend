@@ -106,7 +106,7 @@ export default function useQueryFilter<
   }, [values, opts.toVariables, opts.meta]);
 
   const resetFilters = React.useCallback(
-    newFilters => {
+    (newFilters, newPath?: string) => {
       const result = opts.schema.safeParse(newFilters);
 
       if (result.success) {
@@ -126,7 +126,7 @@ export default function useQueryFilter<
 
         const desctructuredQueryValues = destructureFilterValues(queryWithReplacementsForDefaults);
         const query = omitBy(desctructuredQueryValues, isNil);
-        const basePath = router.asPath.split('?')[0];
+        const basePath = newPath || router.asPath.split('?')[0];
 
         router.push(
           {
@@ -151,7 +151,7 @@ export default function useQueryFilter<
   );
 
   const setFilters = React.useCallback(
-    newFilters => resetFilters({ ...values, ...newFilters }),
+    (newFilters, newPath) => resetFilters({ ...values, ...newFilters }, newPath),
     [values, resetFilters],
   );
 
