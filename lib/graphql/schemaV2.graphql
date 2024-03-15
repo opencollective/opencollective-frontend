@@ -15963,6 +15963,11 @@ type Mutation {
     newName: String
 
     """
+    Use this if you want to rename the original account
+    """
+    oldName: String
+
+    """
     Which data should be copied when duplicating the account
     """
     include: DuplicateAccountDataTypeInput

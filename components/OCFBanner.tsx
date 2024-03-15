@@ -47,7 +47,7 @@ const OCFCollectiveAdminsBannerMessage = ({ account, newAccount, isCentered, hid
         <div className="text-sm">
           {newAccount && (
             <React.Fragment>
-              @{account.slug} now operates under{' '}
+              {newAccount.name} now operates under{' '}
               <StyledLink as={LinkCollective} collective={newAccount}>
                 @{newAccount.slug}
               </StyledLink>
@@ -147,7 +147,7 @@ export function OCFBannerWithData(props: OCFBannerProps) {
               legacyId
             }
           }
-          oldAccount: duplicatedFromAccount {
+          duplicatedFromAccount {
             id
             name
             slug
@@ -191,7 +191,7 @@ export function OCFBannerWithData(props: OCFBannerProps) {
 
   const isOCFHostedAccount = checkIfOCF(host);
   const newAccount = get(query, 'data.account.newAccounts.nodes.[0]', null);
-  const oldAccount = get(query, 'data.account.oldAccount', null);
+  const oldAccount = get(query, 'data.account.duplicatedFromAccount', null);
 
   const params = new URLSearchParams();
   params.append('collectiveSlug', account?.slug);

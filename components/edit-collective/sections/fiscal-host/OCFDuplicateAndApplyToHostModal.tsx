@@ -34,11 +34,21 @@ import { Button } from '../../../ui/Button';
 import { useToast } from '../../../ui/useToast';
 
 const duplicateAccountMutation = gql`
-  mutation DuplicateAccount($account: AccountReferenceInput!, $include: DuplicateAccountDataTypeInput) {
-    duplicateAccount(account: $account, include: $include, connect: true) {
+  mutation DuplicateAccount(
+    $account: AccountReferenceInput!
+    $include: DuplicateAccountDataTypeInput
+    $oldName: String
+  ) {
+    duplicateAccount(account: $account, include: $include, connect: true, oldName: $oldName) {
       id
       legacyId
       slug
+      duplicatedFromAccount {
+        id
+        legacyId
+        slug
+        name
+      }
       projects: childrenAccounts(accountType: PROJECT) {
         totalCount
       }
@@ -332,6 +342,7 @@ const OCFDuplicateAndApplyToHostModal = ({ hostSlug, collective, onClose, onSucc
                   account: getAccountInput(values.collective),
                   newSlug: `${values.collective.slug}-new`,
                   newName: values.collective.name,
+                  oldName: `${values.collective.name} (OCF)`,
                   include: {
                     tiers: true,
                     admins: true,
