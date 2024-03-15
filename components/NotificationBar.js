@@ -48,7 +48,7 @@ const NotificationBarContainer = styled(Container)`
     css`
       position: sticky;
       top: 0;
-      z-index: 99999999;
+      z-index: 2999;
       border-bottom: 1px solid #ffc8c8;
       box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.25);
     `}
