@@ -104,7 +104,7 @@ export const getOCFBannerMessage = ({
 } => {
   if (!isAdmin) {
     return {
-      title: `${account.name} it transitioning to a new Fiscal Host`,
+      title: `${account.name} is transitioning to a new Fiscal Host`,
       severity: 'error',
       message: <OCFPublicBannerMessage collective={account} newAccount={newAccount} isSimplified={isSimplified} />,
     };
