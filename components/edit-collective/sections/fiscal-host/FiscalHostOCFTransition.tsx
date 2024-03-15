@@ -3,12 +3,14 @@ import { gql, useQuery } from '@apollo/client';
 import { ChevronDown, ExternalLink } from 'lucide-react';
 
 import { FEATURES, isFeatureEnabled } from '../../../../lib/allowed-features';
+import { getEnvVar } from '../../../../lib/env-utils';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import {
   FiscalHostOcfTransitionQuery,
   FiscalHostOcfTransitionQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
 import { getCollectivePageRoute, getDashboardRoute } from '../../../../lib/url-helpers';
+import { parseToBoolean } from '../../../../lib/utils';
 
 import CollectivePicker from '../../../CollectivePicker';
 import Image from '../../../Image';
@@ -96,6 +98,7 @@ export const FiscalHostOCFTransition = ({ collective }) => {
   const [openCollapsible, setOpenCollapsible] = React.useState<Sections>('recurringContributions');
   const [modal, setOpenModal] = React.useState<'leaveHost' | 'applyFlow'>(null);
   const [selectedHost, setSelectedHost] = React.useState(null);
+  const hasOCFDuplicateFlow = parseToBoolean(getEnvVar('OCF_DUPLICATE_FLOW'));
   const { data, error, loading, refetch } = useQuery<
     FiscalHostOcfTransitionQuery,
     FiscalHostOcfTransitionQueryVariables
@@ -254,7 +257,7 @@ export const FiscalHostOCFTransition = ({ collective }) => {
                     Leave Host
                   </Button>
                 </div>
-              ) : (
+              ) : hasOCFDuplicateFlow ? (
                 <div className="mt-4">
                   <p>
                     Your balance is not empty. In order to move to a new fiscal host, you will need to zero your balance
@@ -275,6 +278,11 @@ export const FiscalHostOCFTransition = ({ collective }) => {
                     </Button>
                   </div>
                 </div>
+              ) : (
+                <p className="mt-4">
+                  In the coming days we will be releasing a tool to help you transition to a new Fiscal Host. Please
+                  check back here to initiate the process.
+                </p>
               )}
             </CollapsibleContent>
           </Collapsible>
