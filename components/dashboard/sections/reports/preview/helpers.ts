@@ -3,8 +3,10 @@ import { isNil, pick } from 'lodash';
 import dayjs from '../../../../../lib/dayjs';
 
 import { Group, GroupFilter, ReportSection } from './types';
+import { TimeUnit, TransactionKind } from '../../../../../lib/graphql/types/v2/graphql';
+import { getDayjsIsoUnit } from '../../../../../lib/date-utils';
 
-export const filterToTransactionsQuery = (hostSlug, groupFilter: GroupFilter, queryFilterValues) => {
+export const filterToTransactionsQuery = (hostSlug, groupFilter: GroupFilter, variables) => {
   return {
     ...(groupFilter.isHost
       ? {
@@ -25,22 +27,21 @@ export const filterToTransactionsQuery = (hostSlug, groupFilter: GroupFilter, qu
     ...(!isNil(groupFilter.isRefund) && {
       isRefund: groupFilter.isRefund,
     }),
-    'date[gte]': dayjs.utc(queryFilterValues.period.gt).format('YYYY-MM-DD'),
-    'date[lte]': dayjs.utc(queryFilterValues.period.lt).format('YYYY-MM-DD'),
+    'date[gte]': dayjs.utc(variables.dateFrom).format('YYYY-MM-DD'),
+    'date[lte]': dayjs.utc(variables.dateTo).format('YYYY-MM-DD'),
     'date[tz]': 'UTC',
   };
 };
 
-// TODO: Internationalization before making preview feature public
-const reports: Group[] = [
-  {
-    label: 'Managed funds',
-    filter: { isHost: false },
-    helpLabel: `Funds going to and from Hosted Collective accounts`,
-  },
-  { label: 'Operational funds', filter: { isHost: true }, helpLabel: `Funds going to the Fiscal Host account` },
-];
+export const isCurrentPeriod = variables => {
+  // const variables = deserializeReportSlug(value);
+  const now = dayjs.utc();
+  const dateFrom = dayjs.utc(variables.dateFrom);
+  const dayjsIsoUnit = getDayjsIsoUnit(variables.timeUnit as TimeUnit);
+  return dateFrom.isSame(now.startOf(dayjsIsoUnit), dayjsIsoUnit);
+};
 
+// TODO: Internationalization before making preview feature public
 const groups: Group[] = [
   {
     section: ReportSection.CONTRIBUTIONS,
@@ -170,21 +171,108 @@ const groups: Group[] = [
   },
 ];
 
-export const buildReportGroups = (data, { showCreditDebit }) => {
-  const firstLevel = reports;
+const kinds = Object.values(TransactionKind);
+const kindGroups = kinds.flatMap(kind => {
+  return [
+    {
+      section: 'INCOMING',
+      // label: kind,
+      filter: { kind, type: 'CREDIT', isRefund: false },
+    },
+    {
+      section: 'INCOMING',
+      // label: `${kind} (Invoices)`,
+      filter: { kind, type: 'CREDIT', isRefund: false, expenseType: 'INVOICE' },
+    },
+    {
+      section: 'INCOMING',
+      // label: `${kind} (Settlements)`,
+      filter: { kind, type: 'CREDIT', isRefund: false, expenseType: 'SETTLEMENT' },
+    },
+    {
+      section: 'INCOMING',
+      // label: `${kind} (Virtual card charges)`,
+      filter: { kind, type: 'CREDIT', isRefund: false, expenseType: 'CHARGE' },
+    },
+    {
+      section: 'INCOMING',
+      // label: `${kind} (Reimbursements)`,
+      filter: { kind, type: 'CREDIT', isRefund: false, expenseType: 'RECEIPT' },
+    },
+    {
+      section: 'INCOMING',
+      // label: `${kind} (Unclassified)`,
+      filter: { kind, type: 'CREDIT', isRefund: false, expenseType: 'UNCLASSIFIED' },
+    },
+    {
+      section: 'INCOMING',
+      // label: `Refunded ${kind}`,
+      filter: { kind, type: 'CREDIT', isRefund: true },
+    },
+    {
+      section: 'OUTGOING',
+      // label: kind,
+      filter: { kind, type: 'DEBIT', isRefund: false },
+    },
+    {
+      section: 'OUTGOING',
+      // label: `Refunded ${kind}`,
+      filter: { kind, type: 'DEBIT', isRefund: true },
+    },
+  ];
+});
+export const buildReportGroups = (transactionsReportNodeGroups, { showCreditDebit, filter = {}, useSimpleLayout }) => {
+  if (!transactionsReportNodeGroups) {
+    return null;
+  }
+  let remainingGroups = transactionsReportNodeGroups;
+  let resultingGroups = [];
 
-  const sumTransactions = data?.host?.transactionsReport || [];
+  if (useSimpleLayout) {
+    console.log('kindGroups', kindGroups);
 
-  return firstLevel.map(firstLevelItem => {
-    const levelFilter = firstLevelItem.filter;
+    resultingGroups = kindGroups.map(kg => {
+      const groupFilter = { ...kg.filter, ...filter };
 
-    let remainingGroups = sumTransactions.filter(group => {
-      return Object.keys(levelFilter).every(key => {
-        return group[key] === levelFilter[key];
+      const transactionGroups = remainingGroups.filter(rg => {
+        return Object.keys(groupFilter).every(key => {
+          return rg[key] === groupFilter[key];
+        });
       });
+
+      remainingGroups = remainingGroups.filter(group => !transactionGroups.includes(group));
+
+      const amounts = transactionGroups.reduce(
+        (acc, g) => {
+          const { amount, netAmount, platformFee, paymentProcessorFee, hostFee, taxAmount } = g;
+          return {
+            amount: acc.amount + amount.valueInCents,
+            netAmount: acc.netAmount + netAmount.valueInCents,
+            platformFee: acc.platformFee + platformFee.valueInCents,
+            paymentProcessorFee: acc.paymentProcessorFee + paymentProcessorFee.valueInCents,
+            hostFee: acc.hostFee + hostFee.valueInCents,
+            taxAmount: acc.taxAmount + taxAmount.valueInCents,
+          };
+        },
+        {
+          amount: 0,
+          netAmount: 0,
+          platformFee: 0,
+          paymentProcessorFee: 0,
+          hostFee: 0,
+          taxAmount: 0,
+        },
+      );
+      return {
+        ...kg,
+        ...amounts,
+        filter: groupFilter,
+        groups: transactionGroups,
+      };
     });
-    const resultingGroups = groups.map(group => {
-      const groupFilter = { ...group.filter, ...firstLevelItem.filter };
+  } else {
+    resultingGroups = groups.map(group => {
+      const groupFilter = { ...group.filter, ...filter };
       const transactionGroups = remainingGroups.filter(group => {
         return Object.keys(groupFilter).every(key => {
           return group[key] === groupFilter[key];
@@ -192,50 +280,71 @@ export const buildReportGroups = (data, { showCreditDebit }) => {
       });
 
       remainingGroups = remainingGroups.filter(group => !transactionGroups.includes(group));
+
+      const amounts = transactionGroups.reduce(
+        (acc, g) => {
+          const { amount, netAmount, platformFee, paymentProcessorFee, hostFee, taxAmount } = g;
+          return {
+            amount: acc.amount + amount.valueInCents,
+            netAmount: acc.netAmount + netAmount.valueInCents,
+            platformFee: acc.platformFee + platformFee.valueInCents,
+            paymentProcessorFee: acc.paymentProcessorFee + paymentProcessorFee.valueInCents,
+            hostFee: acc.hostFee + hostFee.valueInCents,
+            taxAmount: acc.taxAmount + taxAmount.valueInCents,
+          };
+        },
+        {
+          amount: 0,
+          netAmount: 0,
+          platformFee: 0,
+          paymentProcessorFee: 0,
+          hostFee: 0,
+          taxAmount: 0,
+        },
+      );
       return {
         ...group,
-        amount: transactionGroups.reduce((total, t) => total + t.amount.valueInCents, 0),
+        ...amounts,
         filter: groupFilter,
         groups: transactionGroups,
       };
     });
+  }
 
-    const remainderGroups = remainingGroups.map(group => ({
-      label: JSON.stringify(pick(group, 'kind', 'type', 'expenseType', 'isRefund')),
-      section: ReportSection.OTHER,
-      amount: group.amount.valueInCents,
-      filter: pick(group, 'kind', 'type', 'expenseType', 'isRefund', 'isHost'),
-      groups: [group],
-    }));
+  const remainderGroups = remainingGroups.map(group => ({
+    label: JSON.stringify(pick(group, 'kind', 'type', 'expenseType', 'isRefund')),
+    section: ReportSection.OTHER,
+    amount: group.netAmount.valueInCents,
+    filter: pick(group, 'kind', 'type', 'expenseType', 'isRefund', 'isHost'),
+    groups: [group],
+  }));
 
-    const parts = [...resultingGroups, ...remainderGroups].filter(part =>
-      showCreditDebit ? part.groups?.length : part.amount !== 0,
-    );
+  const parts = [...resultingGroups, ...remainderGroups].filter(part =>
+    showCreditDebit ? part.groups?.length : part.amount !== 0,
+  );
 
-    // group by section
-    const groupsBySection = parts.reduce((acc, group) => {
-      const key = group.section;
-      if (!acc[key]) {
-        acc[key] = [];
-      }
-      acc[key].push(group);
-      return acc;
-    }, {});
+  // group by section
+  const groupsBySection = parts.reduce((acc, group) => {
+    const key = group.section;
+    if (!acc[key]) {
+      acc[key] = [];
+    }
+    acc[key].push(group);
+    return acc;
+  }, {});
 
-    const sections = Object.keys(groupsBySection).map(section => {
-      return {
-        label: section,
-        parts: groupsBySection[section],
-        total: groupsBySection[section].reduce((total, section) => total + section.amount, 0),
-      };
-    });
-
+  const sections = Object.keys(groupsBySection).map(section => {
     return {
-      ...firstLevelItem,
-      parts: sections,
-      total: parts.reduce((total, part) => total + part.amount, 0),
+      label: section,
+      parts: groupsBySection[section],
+      total: groupsBySection[section].reduce((total, section) => total + section.netAmount, 0),
     };
   });
+
+  return {
+    parts: sections,
+    total: parts.reduce((total, part) => total + part.netAmount, 0),
+  };
 };
 
 function filtersOverlap(filterI: GroupFilter, filterJ: GroupFilter): boolean {
