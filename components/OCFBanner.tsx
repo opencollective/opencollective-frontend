@@ -22,7 +22,7 @@ const OCFPublicBannerMessage = ({ collective, newAccount, isSimplified }) => {
   if (newAccount) {
     return (
       <React.Fragment>
-        To contribute, please visit the its new profile at{' '}
+        To contribute, please visit its new profile at{' '}
         <StyledLink as={LinkCollective} collective={newAccount}>
           @{newAccount.slug}
         </StyledLink>
