@@ -45,21 +45,16 @@ const OCFCollectiveAdminsBannerMessage = ({ account, newAccount, isCentered, hid
       <div className="flex flex-col gap-3">
         <p className="text-lg font-semibold"></p>
         <div className="text-sm">
-          {newAccount ? (
+          {newAccount && (
             <React.Fragment>
-              This account now operates under{' '}
+              @{account.slug} now operates under{' '}
               <StyledLink as={LinkCollective} collective={newAccount}>
                 @{newAccount.slug}
               </StyledLink>
-              .
+              {'. '}
             </React.Fragment>
-          ) : (
-            <React.Fragment>
-              This account is transitioning to a new Fiscal Host. You can still submit expenses and access the
-              transaction history of this account.
-            </React.Fragment>
-          )}{' '}
-          It is not able to receive contributions. You can zero-out this account by doing any of the following:
+          )}
+          This account is not able to receive contributions. You can zero-out its balance by doing any of the following:
           <ul className={cn('list-outside list-disc pl-4', isCentered && 'mx-auto max-w-[600px] text-left')}>
             <li className="mt-1 text-neutral-700">
               <Link href={`${getCollectivePageRoute(account)}/expenses/new`}>
