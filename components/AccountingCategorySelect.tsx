@@ -283,6 +283,8 @@ const useExpenseCategoryPredictionService = (
   return { loading, predictions: predictions || (showPreviousPredictions && previousPredictions.current) || [] };
 };
 
+const hostSupportsPredictions = (host: RequiredHostFields) => ['foundation', 'opensource'].includes(host?.slug);
+
 const AccountingCategorySelect = ({
   host,
   account,
@@ -305,7 +307,7 @@ const AccountingCategorySelect = ({
   const [isOpen, setOpen] = React.useState(false);
   const { LoggedInUser } = useLoggedInUser();
   const isHostAdmin = Boolean(LoggedInUser?.isAdminOfCollective(host));
-  const usePredictions = host.slug === 'foundation' && kind === 'EXPENSE' && (predictionStyle === 'full' || isOpen);
+  const usePredictions = hostSupportsPredictions(host) && kind === 'EXPENSE' && (predictionStyle === 'full' || isOpen);
   const { predictions } = useExpenseCategoryPredictionService(usePredictions, host, account, expenseValues);
   const hasPredictions = Boolean(predictions?.length);
   const triggerChange = newCategory => {
