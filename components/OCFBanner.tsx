@@ -39,7 +39,7 @@ const OCFPublicBannerMessage = ({ collective, newAccount, isSimplified }) => {
   }
 };
 
-const OCFCollectiveAdminsBannerMessage = ({ account, newAccount, isCentered, hideNextSteps }) => {
+const OCFCollectiveAdminsBannerMessage = ({ account, newAccount, isCentered, hideNextSteps, isDashboard }) => {
   return (
     <React.Fragment>
       <div className="flex flex-col gap-3">
@@ -48,7 +48,10 @@ const OCFCollectiveAdminsBannerMessage = ({ account, newAccount, isCentered, hid
           {newAccount && (
             <React.Fragment>
               {newAccount.name} now operates under{' '}
-              <StyledLink as={LinkCollective} collective={newAccount}>
+              <StyledLink
+                as={Link}
+                href={isDashboard ? getDashboardRoute(newAccount) : getCollectivePageRoute(newAccount)}
+              >
                 @{newAccount.slug}
               </StyledLink>
               {'. '}
@@ -97,6 +100,7 @@ export const getOCFBannerMessage = ({
   hideNextSteps,
   isCentered = false,
   isSimplified = false,
+  isDashboard = false,
 }): {
   title: string;
   severity: 'error' | 'warning';
@@ -120,6 +124,7 @@ export const getOCFBannerMessage = ({
           newAccount={newAccount}
           isCentered={isCentered}
           hideNextSteps={hideNextSteps}
+          isDashboard={isDashboard}
         />
       ),
     };
@@ -130,6 +135,7 @@ type OCFBannerProps = {
   collective: Pick<Account, 'slug'>;
   hideNextSteps?: boolean;
   isSimplified?: boolean;
+  isDashboard?: boolean;
 };
 
 export function OCFBannerWithData(props: OCFBannerProps) {
@@ -212,6 +218,7 @@ export function OCFBannerWithData(props: OCFBannerProps) {
       newAccount,
       hideNextSteps: props.hideNextSteps,
       isSimplified: props.isSimplified,
+      isDashboard: props.isDashboard,
     });
 
     return (
@@ -229,7 +236,11 @@ export function OCFBannerWithData(props: OCFBannerProps) {
           <p className="text-lg font-semibold">Reminder: You have an account pending to close.</p>
           <p className="text-sm">
             The remaining balance from your previous Fiscal Host is in this account:{' '}
-            <StyledLink as={LinkCollective} collective={oldAccount}>
+            <StyledLink
+              as={Link}
+              collective={oldAccount}
+              href={props.isDashboard ? getDashboardRoute(oldAccount) : getCollectivePageRoute(oldAccount)}
+            >
               @{oldAccount.slug}
             </StyledLink>
             . Is not able to receive contributions, you should zero-out this account soon.
