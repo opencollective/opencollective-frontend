@@ -10,12 +10,14 @@ import slugify from 'slugify';
 
 import {
   AVERAGE_TRANSACTIONS_PER_MINUTE,
+  CSVField,
   DEFAULT_FIELDS,
-  FIELD_GROUPS_2024 as fieldGroups,
   FIELD_OPTIONS,
-  FieldGroupLabels,
   FieldLabels,
   FieldOptionsLabels,
+  FIELDS,
+  GROUP_FIELDS,
+  GROUPS,
   HOST_OMITTED_FIELDS,
 } from '../../lib/csv';
 import { getEnvVar } from '../../lib/env-utils';
@@ -43,14 +45,12 @@ import { Switch } from '../ui/Switch';
 
 const env = process.env.OC_ENV;
 
-const TOTAL_AVAILABLE_FIELDS = Object.values(fieldGroups)
-  .map(f => f.length)
-  .reduce((acc, curr) => acc + curr, 0);
+const TOTAL_AVAILABLE_FIELDS = FIELDS.length;
 
-const TABS = Object.keys(fieldGroups).map(group => ({
+const TABS = Object.keys(GROUP_FIELDS).map(group => ({
   id: group,
-  label: FieldGroupLabels[group] || group,
-  count: fieldGroups[group].length,
+  label: GROUPS[group] || group,
+  count: GROUP_FIELDS[group].length,
 }));
 
 const makeUrl = ({ account, isHostReport, queryFilter, flattenTaxesAndPaymentProcessorFees, fields }) => {
@@ -107,7 +107,8 @@ const makeUrl = ({ account, isHostReport, queryFilter, flattenTaxesAndPaymentPro
   }
 
   if (!isEmpty(fields)) {
-    url.searchParams.set('fields', fields.join(','));
+    const selectedFields = fields.join(',').replace('debitAndCreditAmounts', 'debitAmount,creditAmount');
+    url.searchParams.set('fields', selectedFields);
   }
 
   return url.toString();
@@ -131,6 +132,7 @@ const FieldTag = ({ id, dragElement, canDrag }: { id: string; dragElement?: bool
   const style = {
     transform: CSS.Translate.toString(transform),
   };
+  const field = FIELDS.find(f => f.id === id) || FieldLabels[id];
 
   return (
     <button
@@ -146,7 +148,7 @@ const FieldTag = ({ id, dragElement, canDrag }: { id: string; dragElement?: bool
       {...attributes}
       {...listeners}
     >
-      {FieldLabels[id] || id}
+      {field?.label || id}
     </button>
   );
 };
@@ -191,7 +193,7 @@ const ExportTransactionsCSVModal = ({
   const [fields, setFields] = React.useState(DEFAULT_FIELDS);
   const [draggingTag, setDraggingTag] = React.useState<string | null>(null);
   const [flattenTaxesAndPaymentProcessorFees, setFlattenTaxesAndPaymentProcessorFees] = React.useState(false);
-  const [tab, setTab] = React.useState(Object.keys(fieldGroups)[0]);
+  const [tab, setTab] = React.useState(Object.keys(GROUPS)[0]);
   const [presetName, setPresetName] = React.useState('');
   const [isEditingPreset, setIsEditingPreset] = React.useState(false);
   const [isDeletingPreset, setIsDeletingPreset] = React.useState(false);
@@ -233,7 +235,7 @@ const ExportTransactionsCSVModal = ({
   const presetOptions: Array<{
     value: string;
     label: string;
-    fields?: Array<string>;
+    fields?: Array<CSVField>;
     flattenTaxesAndPaymentProcessorFees?: boolean;
   }> = React.useMemo(() => {
     return [
@@ -297,9 +299,9 @@ const ExportTransactionsCSVModal = ({
 
   const handleGroupSwitch = ({ name, checked }) => {
     if (checked) {
-      setFields(uniq([...fields, ...fieldGroups[name]]));
+      setFields(uniq([...fields, ...GROUP_FIELDS[name]]));
     } else {
-      setFields(fields.filter(f => !fieldGroups[name].includes(f as any)));
+      setFields(fields.filter(f => !GROUP_FIELDS[name].includes(f as any)));
     }
   };
 
@@ -369,7 +371,7 @@ const ExportTransactionsCSVModal = ({
   const isAboveRowLimit = exportedRows > 100e3;
   const expectedTimeInMinutes = Math.round((exportedRows * 1.1) / AVERAGE_TRANSACTIONS_PER_MINUTE);
   const disabled = isAboveRowLimit || isFetchingRows || isSavingSet || isEmpty(fields);
-  const isWholeTabSelected = fieldGroups[tab].every(f => fields.includes(f));
+  const isWholeTabSelected = GROUP_FIELDS[tab]?.every(f => fields.includes(f));
   const canEditFields = preset === FIELD_OPTIONS.NEW_PRESET || isEditingPreset;
 
   return (
@@ -446,7 +448,7 @@ const ExportTransactionsCSVModal = ({
                   <Tabs variant="vertical" tabs={TABS} selectedId={tab} onChange={setTab} />
                   <div className="flex flex-1 flex-col gap-3 rounded-lg border border-solid border-slate-100 px-6 py-4">
                     <div className="flex items-center justify-between">
-                      <div className="font-bold">{FieldGroupLabels[tab] || tab}</div>
+                      <div className="font-bold">{GROUPS[tab] || tab}</div>
                       <div className="flex items-center space-x-2">
                         <Checkbox
                           id={tab}
@@ -464,23 +466,27 @@ const ExportTransactionsCSVModal = ({
                     <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                       {React.useMemo(
                         () =>
-                          fieldGroups[tab]
-                            .filter(field => !(isHostReport && HOST_OMITTED_FIELDS.includes(field)))
-                            .map(field => (
-                              <div key={field} className="flex items-center space-x-2">
-                                <Checkbox
-                                  id={field}
-                                  checked={fields.includes(field)}
-                                  onCheckedChange={checked => handleFieldSwitch({ name: field, checked })}
-                                />
-                                <label
-                                  htmlFor={field}
-                                  className="cursor-pointer text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                >
-                                  {FieldLabels[field] || field}
-                                </label>
-                              </div>
-                            )),
+                          GROUP_FIELDS[tab]
+                            .filter(fieldId => !(isHostReport && HOST_OMITTED_FIELDS.includes(fieldId)))
+                            .map(fieldId => {
+                              const field = FIELDS.find(f => f.id === fieldId);
+                              return (
+                                <div key={fieldId} className="flex items-center gap-1">
+                                  <Checkbox
+                                    id={fieldId}
+                                    checked={fields.includes(fieldId)}
+                                    onCheckedChange={checked => handleFieldSwitch({ name: fieldId, checked })}
+                                  />
+                                  <label
+                                    htmlFor={fieldId}
+                                    className="ml-1 cursor-pointer text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                  >
+                                    {field?.label || fieldId}
+                                  </label>
+                                  {field?.tooltip && <InfoTooltipIcon>{field.tooltip}</InfoTooltipIcon>}
+                                </div>
+                              );
+                            }),
                         [fields, tab, isHostReport, handleFieldSwitch],
                       )}
                     </div>
