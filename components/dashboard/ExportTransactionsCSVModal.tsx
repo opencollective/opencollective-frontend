@@ -3,7 +3,7 @@ import { gql, useMutation } from '@apollo/client';
 import { DndContext, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { debounce, isEmpty, omit, uniq, without } from 'lodash';
+import { debounce, isEmpty, isNil, omit, uniq, without } from 'lodash';
 import { Eraser } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 import slugify from 'slugify';
@@ -230,12 +230,18 @@ const ExportTransactionsCSVModal = ({
     { defaultData: 1000000 },
   );
 
-  const presetOptions: Array<{ value: string; label: string; fields?: Array<string> }> = React.useMemo(() => {
+  const presetOptions: Array<{
+    value: string;
+    label: string;
+    fields?: Array<string>;
+    flattenTaxesAndPaymentProcessorFees?: boolean;
+  }> = React.useMemo(() => {
     return [
       ...Object.keys(customFields).map(key => ({
         value: key,
         label: customFields[key].name,
         fields: customFields[key].fields,
+        flattenTaxesAndPaymentProcessorFees: customFields[key]?.flattenTaxesAndPaymentProcessorFees ?? false,
       })),
       ...Object.keys(FIELD_OPTIONS).map(value => ({ value, label: FieldOptionsLabels[value] })),
     ];
@@ -246,9 +252,13 @@ const ExportTransactionsCSVModal = ({
     if (selectedSet && selectedSet.fields) {
       setFields(selectedSet.fields);
       setPresetName(selectedSet.label);
+      if (!isNil(selectedSet.flattenTaxesAndPaymentProcessorFees)) {
+        setFlattenTaxesAndPaymentProcessorFees(selectedSet.flattenTaxesAndPaymentProcessorFees);
+      }
     } else if (preset === FIELD_OPTIONS.DEFAULT) {
       setFields(DEFAULT_FIELDS);
       setIsEditingPreset(false);
+      setFlattenTaxesAndPaymentProcessorFees(false);
     } else {
       setIsEditingPreset(false);
       setPresetName('');
@@ -331,7 +341,7 @@ const ExportTransactionsCSVModal = ({
       variables: {
         account: { slug: account?.slug },
         key: `exportedTransactionsFieldSets.${key}`,
-        value: { name: presetName, fields },
+        value: { name: presetName, fields, flattenTaxesAndPaymentProcessorFees },
       },
     });
     setIsEditingPreset(false);
@@ -351,6 +361,7 @@ const ExportTransactionsCSVModal = ({
     setIsDeletingPreset(false);
     setPreset(FIELD_OPTIONS.DEFAULT);
   };
+
   const handleEditPreset = () => {
     setIsEditingPreset(true);
   };
