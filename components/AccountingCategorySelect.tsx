@@ -266,11 +266,12 @@ const useExpenseCategoryPredictionService = (
     }
 
     const filteredData = data.filter(prediction => prediction.confidence >= 0.1);
-    const hostCategories = get(host, 'accountingCategories.nodes', []);
+    const hostCategories =
+      get(host, 'accountingCategories.nodes') || get(host, 'expenseAccountingCategories.nodes') || [];
     const getHostCategoryFromCode = code => hostCategories.find(category => category.code === code);
     const mappedData = filteredData.map(prediction => getHostCategoryFromCode(prediction.code));
     return mappedData.filter(Boolean);
-  }, [hasValidParams, data]);
+  }, [host, hasValidParams, data]);
 
   // Store previous predictions to keep showing them while loading
   const previousPredictions = React.useRef(predictions);
