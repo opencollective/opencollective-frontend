@@ -76,6 +76,13 @@ const OCFCollectiveAdminsBannerMessage = ({ account, newAccount, isCentered, hid
                 Choose this option if you have an agreement with OCF to transfer your funds to your new Fiscal Host.
               </p>
             </li>
+            <li className="mt-1">
+              Please read and follow{' '}
+              <StyledLink openInNewTab href="https://docs.opencollective.foundation/leaving-ocf">
+                OCF’s guidance
+              </StyledLink>{' '}
+              on how to transition to a new Fiscal Host.
+            </li>
           </ul>
         </div>
         {!hideNextSteps && !newAccount && (
