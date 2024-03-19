@@ -278,12 +278,7 @@ export const FiscalHostOCFTransition = ({ collective }) => {
                     </Button>
                   </div>
                 </div>
-              ) : (
-                <p className="mt-4">
-                  In the coming days we will be releasing a tool to help you transition to a new Fiscal Host. Please
-                  check back here to initiate the process.
-                </p>
-              )}
+              ) : null}
             </CollapsibleContent>
           </Collapsible>
         )}
