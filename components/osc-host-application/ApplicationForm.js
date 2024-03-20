@@ -717,6 +717,7 @@ const ApplicationForm = ({
                               {...field}
                               rows={6}
                               fontSize="14px"
+                              maxLength={3000}
                               placeholder={intl.formatMessage(i18nLabels.tellUsMorePlaceholder)}
                             />
                           )}
