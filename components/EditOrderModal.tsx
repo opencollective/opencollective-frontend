@@ -339,6 +339,7 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
   const router = useRouter();
   const { toast } = useToast();
   const intl = useIntl();
+  const [isSubmitting, setSubmitting] = React.useState(false);
   const [option, setOption] = React.useState<PaymentMethodOption>({
     id: props.order?.paymentMethod?.id,
     name: props.order?.paymentMethod?.name,
@@ -420,74 +421,82 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
     },
   );
 
-  const { isSubmitting: isSubmittingUpdate, updatePaymentMethod } = useUpdatePaymentMethod(props.order);
-
-  const isUpdatingPaymentMethod = isSubmittingUpdate || loading;
+  const { updatePaymentMethod } = useUpdatePaymentMethod(props.order);
 
   const onSaveClick = React.useCallback(async () => {
     let paymentMethodId;
 
-    if (option.id === 'stripe-payment-element' && 'stripe' in option) {
-      const res = await option.elements.submit();
-      if (res.error) {
-        toast({ variant: 'error', message: res.error.message });
-        props.onClose();
-        return;
-      }
+    setSubmitting(true);
+    try {
+      if (option.id === 'stripe-payment-element' && 'stripe' in option) {
+        const res = await option.elements.submit();
+        if (res.error) {
+          toast({ variant: 'error', message: res.error.message });
+          props.onClose();
+          return;
+        }
 
-      const returnUrl = new URL(`${window.location.origin}/dashboard/${props.accountSlug}/outgoing-contributions`);
-      returnUrl.searchParams.set('orderId', props.order.id);
-      returnUrl.searchParams.set('stripeAccount', option.setupIntent.stripeAccount);
-      returnUrl.searchParams.set('action', 'editPaymentMethod');
+        const returnUrl = new URL(`${window.location.origin}/dashboard/${props.accountSlug}/outgoing-contributions`);
+        returnUrl.searchParams.set('orderId', props.order.id);
+        returnUrl.searchParams.set('stripeAccount', option.setupIntent.stripeAccount);
+        returnUrl.searchParams.set('action', 'editPaymentMethod');
 
-      const setupResponse = await option.stripe.confirmSetup({
-        clientSecret: option.setupIntent.client_secret,
-        elements: option.elements,
-        redirect: 'if_required',
-        confirmParams: {
-          expand: ['payment_method'],
-          // eslint-disable-next-line camelcase
-          return_url: returnUrl.href,
-        },
-      });
-      if (setupResponse.error) {
-        toast({ variant: 'error', message: setupResponse.error.message });
-        props.onClose();
-        return;
-      }
-
-      try {
-        const paymentMethodResponse = await addStripePaymentMethodFromSetupIntent({
-          variables: {
-            setupIntent: {
-              id: option.setupIntent.id,
-              stripeAccount: option.setupIntent.stripeAccount,
-            },
+        const setupResponse = await option.stripe.confirmSetup({
+          clientSecret: option.setupIntent.client_secret,
+          elements: option.elements,
+          redirect: 'if_required',
+          confirmParams: {
+            expand: ['payment_method'],
+            // eslint-disable-next-line camelcase
+            return_url: returnUrl.href,
           },
         });
-        paymentMethodId = paymentMethodResponse.data.addStripePaymentMethodFromSetupIntent.id;
-      } catch (e) {
-        toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
-        return;
-      }
-    } else {
-      paymentMethodId = option.id;
-    }
+        if (setupResponse.error) {
+          toast({ variant: 'error', message: setupResponse.error.message });
+          props.onClose();
+          return;
+        }
 
-    const success = await updatePaymentMethod({ id: paymentMethodId });
-    if (success) {
-      props.onClose();
+        try {
+          const paymentMethodResponse = await addStripePaymentMethodFromSetupIntent({
+            variables: {
+              setupIntent: {
+                id: option.setupIntent.id,
+                stripeAccount: option.setupIntent.stripeAccount,
+              },
+            },
+          });
+          paymentMethodId = paymentMethodResponse.data.addStripePaymentMethodFromSetupIntent.id;
+        } catch (e) {
+          toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+          return;
+        }
+      } else {
+        paymentMethodId = option.id;
+      }
+
+      const success = await updatePaymentMethod({ id: paymentMethodId });
+      if (success) {
+        props.onClose();
+      }
+    } finally {
+      setSubmitting(false);
     }
   }, [option, props.onClose, intl]);
 
   const onPaypalSubscription = React.useCallback(
     async paypalSubscriptionId => {
-      const success = await updatePaymentMethod({
-        service: PAYMENT_METHOD_SERVICE.PAYPAL,
-        paypalInfo: { subscriptionId: paypalSubscriptionId },
-      });
-      if (success) {
-        props.onClose();
+      setSubmitting(true);
+      try {
+        const success = await updatePaymentMethod({
+          service: PAYMENT_METHOD_SERVICE.PAYPAL,
+          paypalInfo: { subscriptionId: paypalSubscriptionId },
+        });
+        if (success) {
+          props.onClose();
+        }
+      } finally {
+        setSubmitting(false);
       }
     },
     [props.onClose],
@@ -516,7 +525,6 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
         toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
         return;
       }
-      // props.onClose();
     }
 
     if (
@@ -600,7 +608,7 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
               tier={props.order.tier}
               style={{ height: 45, size: 'small' }}
               subscriptionStartDate={getSubscriptionStartDate(props.order)}
-              isSubmitting={isUpdatingPaymentMethod}
+              isSubmitting={isSubmitting}
               onError={e => toast({ variant: 'error', title: e.message })}
               onSuccess={({ subscriptionId }) => {
                 onPaypalSubscription(subscriptionId);
@@ -613,7 +621,9 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
               type="submit"
               data-cy="recurring-contribution-submit-pm-button"
               onClick={onSaveClick}
-              loading={isUpdatingPaymentMethod}
+              loading={isSubmitting}
+              disabled={loading || query.loading}
+              minWidth={60}
             >
               <FormattedMessage id="save" defaultMessage="Save" />
             </StyledButton>
