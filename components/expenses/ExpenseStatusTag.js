@@ -67,7 +67,7 @@ BaseTag.propTypes = {
  *
  * Accepts all the props exposed by `StyledTag`.
  */
-const ExpenseStatusTag = ({ status, showTaxFormTag, showTaxFormMsg, ...props }) => {
+const ExpenseStatusTag = ({ status, showTaxFormTag = false, showTaxFormMsg = false, ...props }) => {
   const tagProps = {
     fontWeight: '600',
     fontSize: '10px',
