@@ -356,7 +356,7 @@ class Host extends React.Component {
                     <Button
                       variant="destructive"
                       loading={this.state.isSubmitting}
-                      onClick={() => this.changeHost(null)}
+                      onClick={() => this.changeHost()}
                       data-cy="continue"
                     >
                       <FormattedMessage
