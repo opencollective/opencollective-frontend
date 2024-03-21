@@ -102,12 +102,12 @@ const TableCaption = React.forwardRef<HTMLTableCaptionElement, React.HTMLAttribu
 );
 TableCaption.displayName = 'TableCaption';
 
-const TableActionsButton = React.forwardRef<HTMLButtonElement, React.HTMLAttributes<HTMLButtonElement>>(
+const TableActionsButton = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement>>(
   ({ className, ...props }, ref) => (
     <button
       ref={ref}
       className={cn(
-        'flex h-8 w-8 items-center justify-center rounded-lg border border-transparent bg-transparent text-slate-500 shadow-sm shadow-transparent ring-2 ring-transparent transition-colors hover:text-slate-950 hover:shadow-slate-200  focus:outline-none focus-visible:ring-black active:ring-black group-hover/row:border-slate-200 group-hover/row:bg-white data-[state=open]:ring-black',
+        'flex h-8 w-8 items-center justify-center rounded-lg border border-transparent bg-transparent text-slate-500 shadow-sm shadow-transparent ring-2 ring-transparent transition-colors hover:text-slate-950 hover:shadow-slate-200  focus:outline-none focus-visible:ring-black active:ring-black disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 group-hover/row:border-slate-200 group-hover/row:bg-white data-[state=open]:ring-black',
         className,
       )}
       {...props}

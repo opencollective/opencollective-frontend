@@ -223,14 +223,6 @@ export const LeaveHostModal = ({ account, host, onClose }) => {
                             'Use this to communicate with your contributors about the reason of this change. If leaving Open Collective, you can also provide instructions on how to continue supporting your collective.',
                         })}
                         hintPosition="above"
-                        placeholder={
-                          values.pauseContributions
-                            ? intl.formatMessage({ defaultMessage: 'We are transitioning to a new fiscal host.' })
-                            : intl.formatMessage({
-                                defaultMessage:
-                                  'We are leaving Open Collective. You can continue supporting us through our website.',
-                              })
-                        }
                       >
                         {({ field }) => (
                           <RichTextEditor
@@ -243,6 +235,14 @@ export const LeaveHostModal = ({ account, host, onClose }) => {
                             withBorders
                             editorMinHeight={150}
                             maxLength={2000}
+                            placeholder={
+                              values.pauseContributions
+                                ? intl.formatMessage({ defaultMessage: 'We are transitioning to a new fiscal host.' })
+                                : intl.formatMessage({
+                                    defaultMessage:
+                                      'We are leaving Open Collective. You can continue supporting us through our website.',
+                                  })
+                            }
                           />
                         )}
                       </StyledInputFormikField>

@@ -218,8 +218,9 @@ const paypalPlanQuery = gql`
     $tier: TierReferenceInput
     $amount: AmountInput!
     $frequency: ContributionFrequency!
+    $order: OrderReferenceInput
   ) {
-    paypalPlan(account: $account, tier: $tier, amount: $amount, frequency: $frequency) {
+    paypalPlan(account: $account, tier: $tier, amount: $amount, frequency: $frequency, order: $order) {
       id
     }
   }
@@ -233,6 +234,11 @@ const addPaypalPlan = graphql(paypalPlanQuery, {
     variables: {
       account: { id: props.collective.id },
       tier: props.tier ? { id: props.tier.id } : null,
+      order: !props.order?.id
+        ? null
+        : typeof props.order.id === 'string'
+          ? { id: props.order.id }
+          : { legacyId: props.order.id },
       frequency: getGQLV2FrequencyFromInterval(props.interval),
       amount: {
         valueInCents: props.totalAmount,

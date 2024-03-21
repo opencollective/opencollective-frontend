@@ -45,6 +45,8 @@ type MessageBoxProps = MessageProps & {
   withIcon?: boolean;
   className?: string;
   children: React.ReactNode;
+  icon?: React.ReactNode;
+  alignIcon?: 'start' | 'center';
 };
 
 const Message = styled.div<MessageProps>`
@@ -103,14 +105,22 @@ const icons = {
 /**
  * Display messages in a box contextualized for message type (error, success...etc)
  */
-const MessageBox = ({ type = 'white', withIcon = false, isLoading, children, ...props }: MessageBoxProps) => {
-  const icon = withIcon ? icons[type] : null;
+const MessageBox = ({
+  type = 'white',
+  withIcon = false,
+  icon = null,
+  isLoading,
+  children,
+  alignIcon = 'start',
+  ...props
+}: MessageBoxProps) => {
+  const finalIcon = icon || (withIcon ? icons[type] : null);
   return (
     <Message type={type} {...props}>
       <Flex gap="16px">
-        {(icon || isLoading) && (
-          <Box flexShrink={0} alignSelf="start" color={iconColors[type]}>
-            {isLoading ? <StyledSpinner size="1.2em" /> : icon}
+        {(finalIcon || isLoading) && (
+          <Box flexShrink={0} alignSelf={alignIcon} color={!icon && iconColors[type]}>
+            {isLoading ? <StyledSpinner size="1.2em" /> : finalIcon}
           </Box>
         )}
 

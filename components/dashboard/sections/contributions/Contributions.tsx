@@ -5,9 +5,10 @@ import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
+import { EMPTY_ARRAY } from '../../../../lib/constants/utils';
 import { Views } from '../../../../lib/filters/filter-types';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
-import { OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
+import { Order, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
 import Avatar from '../../../Avatar';
@@ -30,17 +31,20 @@ import {
 } from '../../../ui/DropdownMenu';
 import { Pagination } from '../../../ui/Pagination';
 import { TableActionsButton } from '../../../ui/Table';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import { Filterbar } from '../../filters/Filterbar';
 import { DashboardSectionProps } from '../../types';
 
 import { FilterMeta, filters, OrderTypeFilter, schema, toVariables } from './filters';
+import { PausedIncomingContributionsMessage } from './PausedIncomingContributionsMessage';
 
 enum ContributionsTab {
   ALL = 'ALL',
   RECURRING = 'RECURRING',
   ONETIME = 'ONETIME',
+  PAUSED = 'PAUSED',
   CANCELED = 'CANCELED',
 }
 
@@ -55,10 +59,15 @@ const dashboardContributionsMetadataQuery = gql`
       settings
       imageUrl
       currency
+      ... on AccountWithContributions {
+        canStartResumeContributionsProcess
+        hasResumeContributionsProcessStarted
+      }
       ... on AccountWithParent {
         parent {
           id
           slug
+          type
         }
       }
       ALL: orders(filter: $filter) {
@@ -71,6 +80,9 @@ const dashboardContributionsMetadataQuery = gql`
         totalCount
       }
       CANCELED: orders(filter: $filter, status: [CANCELLED], includeIncognito: true) {
+        totalCount
+      }
+      PAUSED: orders(filter: $filter, status: [PAUSED], includeIncognito: true) {
         totalCount
       }
     }
@@ -177,7 +189,7 @@ const getColumns = ({ tab, setEditOrder, intl, isIncoming }) => {
     cell: ({ cell }) => {
       const status = cell.getValue();
       return (
-        <div>
+        <div data-cy="contribution-status">
           <OrderStatusTag status={status} />
         </div>
       );
@@ -197,8 +209,68 @@ const getColumns = ({ tab, setEditOrder, intl, isIncoming }) => {
     },
   };
 
+  const actions = !isIncoming &&
+    ![ContributionsTab.CANCELED, ContributionsTab.ONETIME].includes(tab) && {
+      accessorKey: 'actions',
+      header: null,
+      meta: { className: 'flex justify-end' },
+      cell: ({ row }) => {
+        const order = row.original as Order;
+        const isResumePrevented = order.status === 'PAUSED' && !order.permissions.canResume;
+        if (
+          order.frequency === 'ONETIME' ||
+          ![OrderStatus.ACTIVE, OrderStatus.ERROR, OrderStatus.PAUSED].includes(order.status)
+        ) {
+          return null;
+        }
+
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <TableActionsButton data-cy="contribution-admin-menu-trigger" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" data-cy="recurring-contribution-menu">
+              <Tooltip>
+                <TooltipTrigger>
+                  <DropdownMenuItem
+                    disabled={isResumePrevented}
+                    onClick={() => setEditOrder({ order, action: 'editPaymentMethod' })}
+                  >
+                    {order.status === 'PAUSED' ? (
+                      <FormattedMessage defaultMessage="Resume contribution" />
+                    ) : (
+                      <FormattedMessage
+                        id="subscription.menu.editPaymentMethod"
+                        defaultMessage="Update payment method"
+                      />
+                    )}
+                  </DropdownMenuItem>
+                </TooltipTrigger>
+                {isResumePrevented && (
+                  <TooltipContent>
+                    <FormattedMessage defaultMessage="This contribution cannot be resumed yet. We'll send you an email when it's ready." />
+                  </TooltipContent>
+                )}
+              </Tooltip>{' '}
+              <DropdownMenuItem onClick={() => setEditOrder({ order, action: 'editAmount' })}>
+                <FormattedMessage id="subscription.menu.updateAmount" defaultMessage="Update amount" />
+              </DropdownMenuItem>{' '}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                className="text-red-600"
+                onClick={() => setEditOrder({ order, action: 'cancel' })}
+                data-cy="recurring-contribution-menu-cancel-option"
+              >
+                <FormattedMessage id="subscription.menu.cancelContribution" defaultMessage="Cancel contribution" />
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
+    };
+
   if (!tab || [ContributionsTab.ONETIME, ContributionsTab.ALL].includes(tab)) {
-    return [
+    return compact([
       isIncoming ? fromAccount : toAccount,
       orderId,
       paymentMethod,
@@ -216,8 +288,9 @@ const getColumns = ({ tab, setEditOrder, intl, isIncoming }) => {
         },
       },
       status,
-    ];
-  } else if ([ContributionsTab.RECURRING, ContributionsTab.CANCELED].includes(tab)) {
+      actions,
+    ]);
+  } else if ([ContributionsTab.RECURRING, ContributionsTab.CANCELED, ContributionsTab.PAUSED].includes(tab)) {
     const amount = {
       accessorKey: 'amount',
       header: intl.formatMessage({ id: 'Fields.amount', defaultMessage: 'Amount' }),
@@ -232,46 +305,15 @@ const getColumns = ({ tab, setEditOrder, intl, isIncoming }) => {
       },
     };
 
-    if (tab === ContributionsTab.RECURRING) {
-      const actions = {
-        accessorKey: 'actions',
-        header: null,
-        meta: { className: 'flex justify-end' },
-        cell: ({ row }) => {
-          const order = row.original;
-          return (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <TableActionsButton />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setEditOrder({ order, action: 'editPaymentMethod' })}>
-                  <FormattedMessage id="subscription.menu.editPaymentMethod" defaultMessage="Update payment method" />
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setEditOrder({ order, action: 'editAmount' })}>
-                  <FormattedMessage id="subscription.menu.updateAmount" defaultMessage="Update amount" />
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-red-600" onClick={() => setEditOrder({ order, action: 'cancel' })}>
-                  <FormattedMessage id="subscription.menu.cancelContribution" defaultMessage="Cancel contribution" />
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          );
-        },
-      };
-      return compact([
-        isIncoming ? fromAccount : toAccount,
-        orderId,
-        paymentMethod,
-        amount,
-        totalAmount,
-        status,
-        isIncoming ? null : actions,
-      ]);
-    } else {
-      return [isIncoming ? fromAccount : toAccount, orderId, paymentMethod, amount, totalAmount, status];
-    }
+    return compact([
+      isIncoming ? fromAccount : toAccount,
+      orderId,
+      paymentMethod,
+      amount,
+      totalAmount,
+      status,
+      actions,
+    ]);
   }
 };
 
@@ -329,6 +371,17 @@ const Contributions = ({ accountSlug, direction }: ContributionsProps) => {
     },
   ];
 
+  if (metadata?.account?.[ContributionsTab.PAUSED].totalCount) {
+    views.splice(3, 0, {
+      id: ContributionsTab.PAUSED,
+      label: intl.formatMessage({ id: 'order.paused', defaultMessage: 'Paused' }),
+      count: metadata?.account?.[ContributionsTab.PAUSED].totalCount,
+      filter: {
+        status: [OrderStatus.PAUSED],
+      },
+    });
+  }
+
   const filterMeta: FilterMeta = {
     currency: metadata?.account?.currency,
   };
@@ -361,7 +414,24 @@ const Contributions = ({ accountSlug, direction }: ContributionsProps) => {
     action: (router.query.action as EditOrderActions) ?? null,
   });
 
-  const selectedOrders = data?.account?.orders.nodes || [];
+  const selectedOrders = data?.account?.orders.nodes || EMPTY_ARRAY;
+
+  // If editOrderId is in URL, open it directly
+  React.useEffect(() => {
+    const rawResumeOrderId = router.query.resumeOrderId;
+    const resumeOrderId = Array.isArray(rawResumeOrderId) ? rawResumeOrderId[0] : rawResumeOrderId;
+    if (resumeOrderId) {
+      const order = selectedOrders.find(o => o.legacyId === parseInt(resumeOrderId));
+      if (order) {
+        setEditOrder({ order, action: 'editPaymentMethod' });
+        const [url, rawQuery] = router.asPath.split('?');
+        const queryParams = new URLSearchParams(rawQuery);
+        queryParams.delete('resumeOrderId');
+        const newUrl = `${url}${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+        router.replace(newUrl, undefined, { shallow: true });
+      }
+    }
+  }, [router, selectedOrders]);
 
   const { limit, offset } = queryFilter.values;
   const pages = Math.ceil(((data || previousData)?.account?.orders.totalCount || 1) / limit);
@@ -374,7 +444,6 @@ const Contributions = ({ accountSlug, direction }: ContributionsProps) => {
   const columns = getColumns({ tab: queryFilter.activeViewId, setEditOrder, intl, isIncoming }) || [];
   const currentViewCount = views.find(v => v.id === queryFilter.activeViewId)?.count;
   const nbPlaceholders = currentViewCount < queryFilter.values.limit ? currentViewCount : queryFilter.values.limit;
-
   return (
     <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader
@@ -397,6 +466,10 @@ const Contributions = ({ accountSlug, direction }: ContributionsProps) => {
         }
       />
       <Filterbar {...queryFilter} />
+
+      {isIncoming && metadata?.account?.[ContributionsTab.PAUSED].totalCount > 0 && (
+        <PausedIncomingContributionsMessage account={metadata.account} count={currentViewCount} />
+      )}
 
       {error ? (
         <MessageBoxGraphqlError error={error} />

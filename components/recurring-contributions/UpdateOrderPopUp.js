@@ -444,6 +444,7 @@ const UpdateOrderPopUp = ({ contribution, onCloseEdit }) => {
         </StyledButton>
         {isPaypal && selectedAmountOption ? (
           <PayWithPaypalButton
+            order={contribution}
             isLoading={!selectedAmountOption}
             isSubmitting={isSubmittingOrder}
             totalAmount={newTotalAmount}

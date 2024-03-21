@@ -151,15 +151,13 @@ describe('Recurring contributions', () => {
 
   it('Can cancel an active contribution with reasons displayed in modal, "other" displays text area', () => {
     cy.clearInbox();
-    cy.login({ email: user.email, redirect: `/${user.collective.slug}/manage-contributions` }).then(() => {
-      cy.getByDataCy('recurring-contribution-edit-activate-button').first().contains('Edit');
-      cy.getByDataCy('recurring-contribution-edit-activate-button').first().click();
+    cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/outgoing-contributions` }).then(() => {
+      cy.getByDataCy('contribution-admin-menu-trigger').first().click();
       cy.getByDataCy('recurring-contribution-menu').should('exist');
       cy.getByDataCy('recurring-contribution-menu-cancel-option').click();
-      cy.getByDataCy('recurring-contribution-cancel-menu').should('exist');
-      cy.getByDataCy('recurring-contribution-cancel-menu').contains(
-        'Why are you cancelling your subscription today? 🥺',
-      );
+      cy.getByDataCy('cancel-order-modal').should('exist');
+      cy.getByDataCy('cancel-order-modal').contains('Why are you cancelling your subscription today? 🥺');
+      cy.getByDataCy('cancel-reason').should('exist');
       cy.getByDataCy('NO_LONGER_WANT_TO_SUPPORT').contains('No longer want to back the collective');
       cy.getByDataCy('UPDATING_ORDER').contains('Changing payment method or amount');
       cy.getByDataCy('cancellation-text-area').should('not.exist');
@@ -169,9 +167,7 @@ describe('Recurring contributions', () => {
         .click()
         .then(() => {
           cy.getByDataCy('toast-notification').contains('Your recurring contribution has been cancelled');
-          cy.getByDataCy('recurring-contributions-interval').click();
-          cy.getByDataCy('recurring-contributions-interval').get('[data-cy="select-option"]:nth-child(4)').click();
-          cy.getByDataCy('recurring-contribution-card').should('have.length', 1);
+          cy.getByDataCy('contribution-status').contains('Canceled');
         });
       cy.openEmail(({ subject }) => subject.includes(`Contribution cancelled to Test Collective`));
       cy.contains('Because I want to');

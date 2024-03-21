@@ -14,6 +14,7 @@ import DashboardHeader from '../../DashboardHeader';
 import { DashboardSectionProps } from '../../types';
 
 import { Timeline } from './Timeline';
+import { TodoList } from './TodoList';
 
 const Home = ({ accountSlug }: DashboardSectionProps) => {
   const router = useRouter();
@@ -32,7 +33,10 @@ const Home = ({ accountSlug }: DashboardSectionProps) => {
             />
           }
         />
-        <Timeline accountSlug={slug} withFilter />
+        <div className="order-1 space-y-6 xl:order-none xl:col-span-2 ">
+          <TodoList />
+          <Timeline accountSlug={slug} withFilter />
+        </div>
       </div>
       <div className="xl:ml-8 xl:w-64">
         <DismissibleMessage messageId={HELP_MESSAGE.WELCOME_TO_DASHBOARD}>
