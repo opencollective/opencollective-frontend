@@ -1,8 +1,8 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { FetchResult, gql, useMutation } from '@apollo/client';
 import clsx from 'clsx';
-import { isEmpty } from 'lodash';
-import { AlertOctagon, ArrowLeft, ArrowRight, ChevronDown, ChevronUp, X } from 'lucide-react';
+import { isEmpty, pick } from 'lodash';
+import { ArrowLeft, ArrowRight, ChevronDown, ChevronUp, X } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -11,26 +11,29 @@ import { track } from '../../lib/analytics/plausible';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import {
-  Amount,
   CreateExpenseFromDashboardMutation,
   CreateExpenseFromDashboardMutationVariables,
   Currency,
   CurrencyExchangeRateInput,
+  EditExpenseFromDashboardMutation,
+  EditExpenseFromDashboardMutationVariables,
+  ExpenseStatus,
+  InviteExpenseFromDashboardMutation,
+  InviteExpenseFromDashboardMutationVariables,
 } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { usePrevious } from '../../lib/hooks/usePrevious';
-import { computeExpenseAmounts } from '../expenses/lib/utils';
 
-import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import Link from '../Link';
 import { Survey, SURVEY_KEY } from '../Survey';
 import { Button } from '../ui/Button';
-import { StepList, StepListItemIcon } from '../ui/StepList';
+import { StepList, StepListItem, StepListItemIcon } from '../ui/StepList';
 import { useToast } from '../ui/useToast';
 
+import { ExpenseWarnings } from './ExpenseWarnings';
+import { useNavigationWarning, useSteps } from './hooks';
 import { ExpenseFlowStep, ExpenseStepOrder, Steps } from './Steps';
 import { SubmittedExpense } from './SubmittedExpense';
-import { ExpenseForm, expenseTypeFromOption, useExpenseForm } from './useExpenseForm';
+import { ExpenseForm, useExpenseForm } from './useExpenseForm';
 
 type SubmitExpenseFlowProps = {
   slug: string;
@@ -46,13 +49,25 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
   const { toast } = useToast();
   const intl = useIntl();
   const router = useRouter();
+
+  const startOptions = React.useRef({
+    draftKey: router.query.key as string,
+    duplicateExpense: router.query.duplicate === 'true',
+    expenseId: router.query.expenseId ? parseInt(router.query.expenseId as string) : null,
+    preselectInvitePayee: router.query.invite === 'true',
+  });
+
+  React.useEffect(() => {
+    router.replace(`${router.asPath.split('?')[0]}`, undefined, { shallow: true });
+  }, [startOptions]);
+
   const formRef = React.useRef<HTMLFormElement>();
   const [submittedExpenseId, setSubmittedExpenseId] = React.useState(null);
   const { LoggedInUser } = useLoggedInUser();
   const [createExpense] = useMutation<CreateExpenseFromDashboardMutation, CreateExpenseFromDashboardMutationVariables>(
     gql`
       mutation CreateExpenseFromDashboard($expenseCreateInput: ExpenseCreateInput!, $account: AccountReferenceInput!) {
-        createExpense(expense: $expenseCreateInput, account: $account) {
+        expense: createExpense(expense: $expenseCreateInput, account: $account) {
           id
           legacyId
         }
@@ -63,110 +78,172 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
     },
   );
 
-  const [currentStep, setCurrentStep] = React.useState<ExpenseFlowStep>(ExpenseFlowStep.COLLECTIVE);
-  const previousStep: ExpenseFlowStep = usePrevious(currentStep);
-  React.useEffect(() => {
-    if (!previousStep) {
-      track(AnalyticsEvent.EXPENSE_SUBMISSION_STARTED);
-      return;
-    }
+  const [draftExpenseAndInviteUser] = useMutation<
+    InviteExpenseFromDashboardMutation,
+    InviteExpenseFromDashboardMutationVariables
+  >(
+    gql`
+      mutation InviteExpenseFromDashboard(
+        $expenseInviteInput: ExpenseInviteDraftInput!
+        $account: AccountReferenceInput!
+      ) {
+        expense: draftExpenseAndInviteUser(expense: $expenseInviteInput, account: $account) {
+          id
+          legacyId
+        }
+      }
+    `,
+    {
+      context: API_V2_CONTEXT,
+    },
+  );
 
-    if (currentStep === previousStep) {
-      return;
-    }
-
-    const previousStepIdx = ExpenseStepOrder.indexOf(previousStep) - 1;
-    const currentStepIdx = ExpenseStepOrder.indexOf(currentStep) - 1;
-
-    // going back
-    if (currentStepIdx < previousStepIdx) {
-      return;
-    }
-
-    switch (previousStep) {
-      case ExpenseFlowStep.COLLECTIVE:
-        track(AnalyticsEvent.EXPENSE_SUBMISSION_PICKED_COLLECTIVE);
-        return;
-      case ExpenseFlowStep.PAYMENT_METHOD:
-        track(AnalyticsEvent.EXPENSE_SUBMISSION_PICKED_PAYEE);
-        return;
-      case ExpenseFlowStep.EXPENSE_TYPE:
-        track(AnalyticsEvent.EXPENSE_SUBMISSION_PICKED_EXPENSE_TYPE);
-        return;
-      case ExpenseFlowStep.EXPENSE_INFO:
-        track(AnalyticsEvent.EXPENSE_SUBMISSION_PICKED_EXPENSE_TITLE);
-        return;
-      case ExpenseFlowStep.EXPENSE_DETAILS:
-        track(AnalyticsEvent.EXPENSE_SUBMISSION_FILLED_EXPENSE_DETAILS);
-        return;
-    }
-  }, [previousStep, currentStep]);
+  const [editExpense] = useMutation<EditExpenseFromDashboardMutation, EditExpenseFromDashboardMutationVariables>(
+    gql`
+      mutation EditExpenseFromDashboard($expenseEditInput: ExpenseUpdateInput!, $draftKey: String) {
+        expense: editExpense(expense: $expenseEditInput, draftKey: $draftKey) {
+          id
+          legacyId
+        }
+      }
+    `,
+    {
+      context: API_V2_CONTEXT,
+    },
+  );
 
   const expenseForm = useExpenseForm({
     formRef,
-    initialValues: {},
-    async onSubmit(values, h, formOptions) {
+    initialValues: {
+      title: '',
+      expenseCurrency: null,
+    },
+    startOptions: startOptions.current,
+    async onSubmit(values, h, formOptions, startOptions) {
+      let result:
+        | FetchResult<CreateExpenseFromDashboardMutation>
+        | FetchResult<InviteExpenseFromDashboardMutation>
+        | FetchResult<EditExpenseFromDashboardMutation>;
       try {
         track(AnalyticsEvent.EXPENSE_SUBMISSION_SUBMITTED);
-        const result = await createExpense({
-          variables: {
-            account: {
-              slug: values.collectiveSlug,
-            },
-            expenseCreateInput: {
-              description: values.title,
-              payee: {
-                slug: values.payeeSlug,
-              },
-              payoutMethod: {
-                id: values.payoutMethodId,
-              },
-              type: expenseTypeFromOption(values.expenseTypeOption),
-              accountingCategory: values.accountingCategoryId
-                ? {
-                    id: values.accountingCategoryId,
-                  }
-                : null,
-              attachedFiles: values.expenseAttachedFiles,
-              currency: values.expenseCurrency as Currency,
-              customData: null,
-              invoiceInfo: null,
-              items: values.expenseItems.map(ei => ({
-                description: ei.description,
-                amountV2: {
-                  valueInCents: ei.amount.valueInCents,
-                  currency: ei.amount.currency as Currency,
-                  exchangeRate: ei.amount.exchangeRate as CurrencyExchangeRateInput,
-                },
-                incurredAt: new Date(ei.date),
-                url: ei.url,
-              })),
-              longDescription: null,
-              payeeLocation: null,
-              privateMessage: null,
-              tags: values.tags,
-              tax: values.hasTax
-                ? [
-                    {
-                      rate: values.tax.rate,
-                      type: formOptions.taxType,
-                      idNumber: values.tax.idNumber,
-                    },
-                  ]
-                : null,
-            },
+
+        const expenseInput: CreateExpenseFromDashboardMutationVariables['expenseCreateInput'] = {
+          description: values.title,
+          payee: {
+            slug: values.payeeSlug,
           },
-        });
+          payoutMethod: {
+            id: values.payoutMethodId,
+          },
+          type: values.expenseTypeOption,
+          accountingCategory: values.accountingCategoryId
+            ? {
+                id: values.accountingCategoryId,
+              }
+            : null,
+          attachedFiles: values.expenseAttachedFiles,
+          currency: values.expenseCurrency as Currency,
+          customData: null,
+          invoiceInfo: null,
+          items: values.expenseItems.map(ei => ({
+            description: ei.description,
+            amountV2: {
+              valueInCents: ei.amount.valueInCents,
+              currency: ei.amount.currency as Currency,
+              exchangeRate: ei.amount.exchangeRate
+                ? ({
+                    ...pick(ei.amount.exchangeRate, ['source', 'rate', 'value', 'fromCurrency', 'toCurrency']),
+                    date: ei.amount.exchangeRate.date || ei.incurredAt,
+                  } as CurrencyExchangeRateInput)
+                : null,
+            },
+            incurredAt: ei.incurredAt,
+            url: ei.url,
+          })),
+          longDescription: null,
+          payeeLocation: null,
+          privateMessage: null,
+          tags: values.tags,
+          tax: values.hasTax
+            ? [
+                {
+                  rate: values.tax.rate,
+                  type: formOptions.taxType,
+                  idNumber: values.tax.idNumber,
+                },
+              ]
+            : null,
+        };
+
+        if (formOptions.expense?.id && !startOptions.duplicateExpense) {
+          const editInput: EditExpenseFromDashboardMutationVariables['expenseEditInput'] = {
+            ...expenseInput,
+            id: formOptions.expense.id,
+            payee:
+              formOptions.expense?.status === ExpenseStatus.DRAFT && !values.payeeSlug
+                ? null
+                : {
+                    slug: values.payeeSlug,
+                  },
+          };
+          result = await editExpense({
+            variables: {
+              expenseEditInput: editInput,
+            },
+          });
+          toast({
+            variant: 'success',
+            title: <FormattedMessage defaultMessage="Expense edited" />,
+            message: LoggedInUser ? <Survey hasParentTitle surveyKey={SURVEY_KEY.EXPENSE_SUBMITTED_NEW_FLOW} /> : null,
+            duration: 20000,
+          });
+        } else if (values.payeeSlug) {
+          result = await createExpense({
+            variables: {
+              account: {
+                slug: values.collectiveSlug,
+              },
+              expenseCreateInput: expenseInput,
+            },
+          });
+
+          toast({
+            variant: 'success',
+            title: <FormattedMessage id="Expense.Submitted" defaultMessage="Expense submitted" />,
+            message: LoggedInUser ? <Survey hasParentTitle surveyKey={SURVEY_KEY.EXPENSE_SUBMITTED_NEW_FLOW} /> : null,
+            duration: 20000,
+          });
+        } else {
+          const inviteInput: InviteExpenseFromDashboardMutationVariables['expenseInviteInput'] = {
+            ...expenseInput,
+            payee: {
+              ...pick(values.invitePayee, ['legacyId', 'slug', 'name', 'email', 'organization']),
+              isInvite: true,
+            },
+            recipientNote: values.inviteNote,
+            ...(!('legacyId' in values.invitePayee) && 'payoutMethod' in values.invitePayee
+              ? { payoutMethod: values.invitePayee.payoutMethod }
+              : {}),
+          };
+          result = await draftExpenseAndInviteUser({
+            variables: {
+              account: {
+                slug: values.collectiveSlug,
+              },
+              expenseInviteInput: inviteInput,
+            },
+          });
+
+          toast({
+            variant: 'success',
+            title: <FormattedMessage defaultMessage="Expense invite sent" />,
+            message: LoggedInUser ? <Survey hasParentTitle surveyKey={SURVEY_KEY.EXPENSE_SUBMITTED_NEW_FLOW} /> : null,
+            duration: 20000,
+          });
+        }
+
         track(AnalyticsEvent.EXPENSE_SUBMISSION_SUBMITTED_SUCCESS);
-
-        setSubmittedExpenseId(result.data.createExpense.legacyId);
-
-        toast({
-          variant: 'success',
-          title: <FormattedMessage id="Expense.Submitted" defaultMessage="Expense submitted" />,
-          message: LoggedInUser ? <Survey hasParentTitle surveyKey={SURVEY_KEY.EXPENSE_SUBMITTED_NEW_FLOW} /> : null,
-          duration: 20000,
-        });
+        setSubmittedExpenseId(result.data.expense.legacyId);
       } catch (err) {
         track(AnalyticsEvent.EXPENSE_SUBMISSION_SUBMITTED_ERROR);
         toast({ variant: 'error', message: i18nGraphqlException(intl, err) });
@@ -176,47 +253,15 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
     },
   });
 
-  React.useEffect(() => {
-    function warnAboutIncompleteExpenseOnUnload(e) {
-      if (!submittedExpenseId) {
-        e.preventDefault();
-        e.returnValue = intl.formatMessage(I18nMessages.ConfirmExit);
-      }
-      return true;
-    }
+  const { currentStep, setCurrentStep, prevStep, nextStep, onNextStepClick, step } = useSteps({
+    steps: ExpenseStepOrder,
+    form: expenseForm,
+  });
 
-    function warnAboutIncompleteExpenseOnRouteChangeStart() {
-      if (!submittedExpenseId) {
-        if (!confirm(intl.formatMessage(I18nMessages.ConfirmExit))) {
-          router.events.emit('routeChangeError');
-          throw 'not good';
-        }
-      }
-    }
-
-    window.addEventListener('beforeunload', warnAboutIncompleteExpenseOnUnload);
-    router.events.on('routeChangeStart', warnAboutIncompleteExpenseOnRouteChangeStart);
-    return () => {
-      window.removeEventListener('beforeunload', warnAboutIncompleteExpenseOnUnload);
-      router.events.off('routeChangeStart', warnAboutIncompleteExpenseOnRouteChangeStart);
-    };
-  }, [router, submittedExpenseId, intl]);
-
-  const prevStep = React.useMemo(() => {
-    const newStepIdx = ExpenseStepOrder.indexOf(currentStep) - 1;
-    return newStepIdx >= 0 ? ExpenseStepOrder[newStepIdx] : null;
-  }, [currentStep]);
-  const nextStep = React.useMemo(() => {
-    const newStepIdx = ExpenseStepOrder.indexOf(currentStep) + 1;
-    return newStepIdx < ExpenseStepOrder.length ? ExpenseStepOrder[newStepIdx] : null;
-  }, [currentStep]);
-
-  const onNextStepClick = React.useCallback(async () => {
-    await expenseForm.validateForm();
-    setCurrentStep(nextStep);
-  }, [nextStep, expenseForm]);
-
-  const step = Steps[currentStep];
+  useNavigationWarning({
+    enabled: !submittedExpenseId,
+    confirmationMessage: intl.formatMessage(I18nMessages.ConfirmExit),
+  });
 
   return (
     <div className="flex max-h-screen min-h-screen flex-col">
@@ -241,20 +286,26 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
           </Link>
         </Button>
       </header>
-      <main className="mx-auto flex w-full flex-grow justify-start gap-10 overflow-hidden sm:w-[768px] sm:pt-10">
-        {submittedExpenseId ? (
-          <SubmittedExpense expenseId={submittedExpenseId} form={expenseForm} />
-        ) : (
-          <div className="flex w-full flex-col pb-4 sm:flex sm:flex-row sm:gap-8 sm:pb-0">
-            <SubmitExpenseFlowSteps expenseForm={expenseForm} currentStep={currentStep} />
+      <main className="flex w-full flex-grow overflow-auto">
+        <div className="flex w-full flex-grow justify-center sm:px-8 sm:pt-10">
+          {submittedExpenseId ? (
+            <SubmittedExpense expenseId={submittedExpenseId} />
+          ) : (
+            <div className="flex w-full flex-col pb-4 sm:flex sm:w-[768px] sm:flex-row sm:gap-8 sm:pb-0">
+              <SubmitExpenseFlowSteps
+                onStepClick={newStepName => setCurrentStep(newStepName)}
+                expenseForm={expenseForm}
+                currentStep={currentStep}
+              />
 
-            <div className="flex-grow overflow-auto px-4 pt-4 sm:px-0 sm:pt-0">
-              <form ref={formRef} onSubmit={e => e.preventDefault()}>
-                <step.Form form={expenseForm} slug={props.slug} />
-              </form>
+              <div className="flex-grow px-4 pt-4 sm:px-0 sm:pt-0">
+                <form ref={formRef} onSubmit={e => e.preventDefault()}>
+                  <step.Form form={expenseForm} slug={props.slug} />
+                </form>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </main>
       <ExpenseWarnings form={expenseForm} />
       {!submittedExpenseId && (
@@ -276,21 +327,23 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
 type SubmitExpenseFlowStepsProps = {
   expenseForm: ExpenseForm;
   currentStep: ExpenseFlowStep;
+  onStepClick: (stepName: ExpenseFlowStep) => void;
 };
 
 function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
   const [collapsed, setCollapsed] = React.useState(true);
 
+  const currentStep = Steps[props.currentStep];
   return (
     <React.Fragment>
-      <div className="w-full sm:w-[165px] sm:min-w-[165px]">
+      <div className="sticky top-0 z-50 w-full bg-white drop-shadow-lg sm:top-10 sm:w-[165px] sm:min-w-[165px] sm:drop-shadow-none">
         <div
-          className={clsx(' flex items-center gap-2 px-4 py-2 text-sm sm:hidden', {
-            'border-b border-slate-200': collapsed,
+          className={clsx('flex items-center gap-2 px-4 py-2 text-sm sm:hidden', {
+            'border-b border-slate-200 ': collapsed,
           })}
         >
           <span className="inline-block max-w-[120px] overflow-hidden text-ellipsis whitespace-nowrap text-oc-blue-tints-800">
-            {Steps[props.currentStep].stepTitle}
+            <currentStep.Title form={props.expenseForm} />
           </span>
           <span className="text-oc-blue-tints-800">/</span>
           <div className="flex gap-3 text-xs">
@@ -300,9 +353,9 @@ function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
                 <StepListItemIcon
                   key={stepName}
                   completed={
-                    i === ExpenseStepOrder.length - 1
-                      ? props.currentStep === stepName
-                      : !step.hasError(props.expenseForm)
+                    (props.currentStep === stepName &&
+                      (!step.hasError(props.expenseForm) || i === ExpenseStepOrder.length - 1)) ||
+                    (!step.hasError(props.expenseForm) && i < ExpenseStepOrder.indexOf(props.currentStep))
                   }
                   current={props.currentStep === stepName}
                 />
@@ -322,14 +375,23 @@ function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
             },
           )}
         >
-          {ExpenseStepOrder.map(stepName => {
+          {ExpenseStepOrder.map((stepName, i) => {
             const step = Steps[stepName];
+            const completed =
+              (props.currentStep === stepName &&
+                (!step.hasError(props.expenseForm) || i === ExpenseStepOrder.length - 1)) ||
+              (!step.hasError(props.expenseForm) && i < ExpenseStepOrder.indexOf(props.currentStep));
+            const disabled = !completed || i > ExpenseStepOrder.indexOf(props.currentStep);
             return (
-              <step.StepListItem
+              <StepListItem
                 key={stepName}
+                onClick={() => props.onStepClick(stepName)}
                 className="w-full"
-                form={props.expenseForm}
                 current={props.currentStep === stepName}
+                disabled={disabled}
+                completed={completed}
+                title={<step.Title form={props.expenseForm} />}
+                subtitle={step.Subtitle ? <step.Subtitle form={props.expenseForm} /> : null}
               />
             );
           })}
@@ -369,7 +431,6 @@ function SubmitExpenseFlowFooter(props: SubmitExpenseFlowFooterProps) {
           onClick={props.expenseForm.submitForm}
         >
           <FormattedMessage id="submit" defaultMessage="Submit" />
-          <ArrowRight />
         </Button>
       ) : (
         <Button
@@ -384,61 +445,5 @@ function SubmitExpenseFlowFooter(props: SubmitExpenseFlowFooterProps) {
         </Button>
       )}
     </footer>
-  );
-}
-
-type ExpenseWarningsProps = {
-  form: ExpenseForm;
-};
-
-function ExpenseWarnings(props: ExpenseWarningsProps) {
-  if (!props.form.options.account) {
-    return null;
-  }
-
-  const collectiveBalance = props.form.options.account.stats.balance.valueInCents;
-
-  const { totalInvoiced } = computeExpenseAmounts(
-    props.form.values.expenseCurrency,
-    (props.form.values.expenseItems || []).map(ei => ({
-      description: ei.description,
-      amountV2: ei.amount as Amount,
-      incurredAt: ei.date,
-    })),
-    props.form.values.tax ? [{ ...props.form.values.tax, type: props.form.options.taxType }] : [],
-  );
-
-  if (!totalInvoiced || totalInvoiced < collectiveBalance) {
-    return null;
-  }
-
-  return (
-    <div className="flex justify-center p-2" style={{ backgroundColor: '#FFFC89' }}>
-      <div className="flex items-center gap-4  text-xs">
-        <div>
-          <AlertOctagon />
-        </div>
-        <div>
-          <div className="font-bold">
-            <FormattedMessage defaultMessage="Expense alert" />:
-          </div>
-          <div>
-            <FormattedMessage
-              defaultMessage="The Collective's budget ({amount}) is insufficient to pay this expense."
-              values={{
-                amount: (
-                  <FormattedMoneyAmount
-                    abbreviate
-                    currencyCodeStyles={{ fontWeight: 'bold' }}
-                    amount={props.form.options.account.stats.balance.valueInCents}
-                    currency={props.form.options.account.stats.balance.currency}
-                  />
-                ),
-              }}
-            />
-          </div>
-        </div>
-      </div>
-    </div>
   );
 }

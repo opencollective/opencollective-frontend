@@ -2,16 +2,12 @@ import React from 'react';
 import { FormikProvider } from 'formik';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { ExpenseType } from '../../lib/graphql/types/v2/graphql';
-
 import AccountingCategorySelect from '../AccountingCategorySelect';
 import HTMLContent from '../HTMLContent';
 import StyledInput from '../StyledInput';
 import StyledInputFormikField from '../StyledInputFormikField';
-import { StepListItem } from '../ui/StepList';
 
-import { ExpenseStepDefinition } from './Steps';
-import { ExpenseForm, ExpenseTypeOption } from './useExpenseForm';
+import { ExpenseForm } from './useExpenseForm';
 
 const I18nMessages = defineMessages({
   descriptionPlaceholder: {
@@ -24,20 +20,11 @@ const I18nMessages = defineMessages({
   },
 });
 
-export const ExpenseInfoStep: ExpenseStepDefinition = {
-  Form: ExpenseInfoForm,
-  StepListItem: ExpenseInfoStepListItem,
-  hasError(form) {
-    return !!form.errors.title || (form.options.isAccountingCategoryRequired && !!form.errors.accountingCategoryId);
-  },
-  stepTitle: <FormattedMessage id="Title" defaultMessage="Title" />,
-};
-
 type ExpenseInfoFormProps = {
   form: ExpenseForm;
 };
 
-function ExpenseInfoForm(props: ExpenseInfoFormProps) {
+export function ExpenseInfoForm(props: ExpenseInfoFormProps) {
   const intl = useIntl();
   const account = props.form.options.account;
   const host = account && 'host' in account ? account.host : null;
@@ -49,7 +36,7 @@ function ExpenseInfoForm(props: ExpenseInfoFormProps) {
   return (
     <div>
       <h1 className="mb-4 text-lg font-bold leading-[26px] text-dark-900">
-        <FormattedMessage defaultMessage="What kind of expense is this?" />
+        <FormattedMessage defaultMessage="Expense details" />
       </h1>
       <p className="text-xs text-slate-700">
         <FormattedMessage
@@ -94,13 +81,7 @@ function ExpenseInfoForm(props: ExpenseInfoFormProps) {
                   showCode
                   account={account as any}
                   host={host}
-                  expenseType={
-                    [ExpenseTypeOption.INVITED_INVOICE, ExpenseTypeOption.INVOICE].includes(
-                      props.form.values.expenseTypeOption,
-                    )
-                      ? ExpenseType.INVOICE
-                      : ExpenseType.RECEIPT
-                  }
+                  expenseType={props.form.values.expenseTypeOption}
                   selectedCategory={selectedCategory as any}
                   onChange={c => props.form.setFieldValue('accountingCategoryId', c.id)}
                   onBlur={() => props.form.setFieldTouched('accountingCategoryId', true)}
@@ -123,24 +104,5 @@ function ExpenseInfoForm(props: ExpenseInfoFormProps) {
         </React.Fragment>
       )}
     </div>
-  );
-}
-
-function ExpenseInfoStepListItem(props: { className?: string; form: ExpenseForm; current: boolean }) {
-  const hasAccountingCategory = props.form.options.accountingCategories?.length > 0;
-  return (
-    <StepListItem
-      className={props.className}
-      title={
-        hasAccountingCategory ? (
-          <FormattedMessage defaultMessage="Title and category" />
-        ) : (
-          <FormattedMessage id="Title" defaultMessage="Title" />
-        )
-      }
-      subtitle={props.form.values.title}
-      completed={!ExpenseInfoStep.hasError(props.form)}
-      current={props.current}
-    />
   );
 }

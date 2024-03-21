@@ -5,38 +5,16 @@ import { ExpenseType } from '../../lib/graphql/types/v2/graphql';
 
 import HTMLContent from '../HTMLContent';
 import StyledCheckbox from '../StyledCheckbox';
-import { StepListItem } from '../ui/StepList';
 
 import { RadioCardButton } from './RadioCardButton';
-import { ExpenseStepDefinition } from './Steps';
-import { ExpenseForm, ExpenseTypeOption } from './useExpenseForm';
-
-export const PickExpenseTypeStep: ExpenseStepDefinition = {
-  Form: PickExpenseTypeForm,
-  StepListItem: PickExpenseTypeStepListItem,
-  hasError(form) {
-    if (!form.values.expenseTypeOption || !!form.errors.expenseTypeOption) {
-      return true;
-    }
-
-    if (
-      (form.options.collectiveExpensePolicy || form.options.hostExpensePolicy) &&
-      !form.values.acknowledgedExpensePolicy
-    ) {
-      return true;
-    }
-
-    return false;
-  },
-  stepTitle: <FormattedMessage defaultMessage="Type of expense" />,
-};
+import { ExpenseForm } from './useExpenseForm';
 
 type PickExpenseTypeFormProps = {
   slug: string;
   form: ExpenseForm;
 };
 
-function PickExpenseTypeForm(props: PickExpenseTypeFormProps) {
+export function PickExpenseTypeForm(props: PickExpenseTypeFormProps) {
   const supportedExpenseTypes = props.form.options.supportedExpenseTypes || [];
 
   return (
@@ -52,8 +30,8 @@ function PickExpenseTypeForm(props: PickExpenseTypeFormProps) {
           <ExpenseTypeOptionButton
             title={<FormattedMessage id="Expense.Type.Invoice" defaultMessage="Invoice" />}
             subtitle={<FormattedMessage defaultMessage="I am submitting an invoice to get paid" />}
-            onClick={() => props.form.setFieldValue('expenseTypeOption', ExpenseTypeOption.INVOICE)}
-            checked={props.form.values.expenseTypeOption === ExpenseTypeOption.INVOICE}
+            onClick={() => props.form.setFieldValue('expenseTypeOption', ExpenseType.INVOICE)}
+            checked={props.form.values.expenseTypeOption === ExpenseType.INVOICE}
           />
         )}
         {supportedExpenseTypes.includes(ExpenseType.RECEIPT) && (
@@ -62,8 +40,8 @@ function PickExpenseTypeForm(props: PickExpenseTypeFormProps) {
             subtitle={
               <FormattedMessage defaultMessage="I am asking to be reimbursed for something I've already paid for" />
             }
-            onClick={() => props.form.setFieldValue('expenseTypeOption', ExpenseTypeOption.REIMBURSEMENT)}
-            checked={props.form.values.expenseTypeOption === ExpenseTypeOption.REIMBURSEMENT}
+            onClick={() => props.form.setFieldValue('expenseTypeOption', ExpenseType.RECEIPT)}
+            checked={props.form.values.expenseTypeOption === ExpenseType.RECEIPT}
           />
         )}
       </div>
@@ -111,24 +89,6 @@ function PickExpenseTypeForm(props: PickExpenseTypeFormProps) {
           </div>
         )}
     </div>
-  );
-}
-
-function PickExpenseTypeStepListItem(props: { className?: string; form: ExpenseForm; current: boolean }) {
-  return (
-    <StepListItem
-      className={props.className}
-      title={PickExpenseTypeStep.stepTitle}
-      subtitle={
-        props.form.values.expenseTypeOption === ExpenseTypeOption.INVOICE ? (
-          <FormattedMessage id="Expense.Type.Invoice" defaultMessage="Invoice" />
-        ) : props.form.values.expenseTypeOption === ExpenseTypeOption.REIMBURSEMENT ? (
-          <FormattedMessage id="ExpenseForm.ReceiptLabel" defaultMessage="Reimbursement" />
-        ) : null
-      }
-      completed={!PickExpenseTypeStep.hasError(props.form)}
-      current={props.current}
-    />
   );
 }
 

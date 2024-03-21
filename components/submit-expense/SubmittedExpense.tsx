@@ -1,6 +1,7 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { isEmpty } from 'lodash';
+import { ExternalLink } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
@@ -9,32 +10,68 @@ import {
   CommentType,
   CreatePrivateNoteMutation,
   CreatePrivateNoteMutationVariables,
+  ExpenseStatus,
+  SubmittedExpenseFromDashboardQuery,
+  SubmittedExpenseFromDashboardQueryVariables,
 } from '../../lib/graphql/types/v2/graphql';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
 import CreateExpenseFAQ from '../faqs/CreateExpenseFAQ';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import Image from '../Image';
+import Loading from '../Loading';
 import MessageBox from '../MessageBox';
+import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import RichTextEditor from '../RichTextEditor';
+import StyledLink from '../StyledLink';
 import { Button } from '../ui/Button';
 import { useToast } from '../ui/useToast';
-
-import { ExpenseForm } from './useExpenseForm';
-
-import invoiceIllustrationStatic from '../../public/static/images/invoice-animation-static.jpg';
 
 const I18nMessages = defineMessages({
   notePlaceholder: { defaultMessage: 'Add a note for the admins.' },
 });
 
 type SubmittedExpenseProps = {
-  form: ExpenseForm;
   expenseId: number;
 };
 
 export function SubmittedExpense(props: SubmittedExpenseProps) {
   const { toast } = useToast();
   const intl = useIntl();
+  const { LoggedInUser } = useLoggedInUser();
+
+  const query = useQuery<SubmittedExpenseFromDashboardQuery, SubmittedExpenseFromDashboardQueryVariables>(
+    gql`
+      query SubmittedExpenseFromDashboard($expenseLegacyId: Int!) {
+        expense(expense: { legacyId: $expenseLegacyId }) {
+          id
+          legacyId
+          status
+          recurringExpense {
+            id
+          }
+          draft
+          host {
+            id
+            legacyId
+            name
+          }
+          account {
+            id
+            legacyId
+            name
+          }
+        }
+      }
+    `,
+    {
+      context: API_V2_CONTEXT,
+      skip: !props.expenseId,
+      variables: {
+        expenseLegacyId: props.expenseId,
+      },
+    },
+  );
 
   const [privateNote, setPrivateNote] = React.useState('');
   const [lastPrivateNoteId, setLastPrivateNoteId] = React.useState(null);
@@ -82,18 +119,48 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
     }
   }, [createPrivateNote, privateNote, props.expenseId, intl, toast]);
 
+  if (query.loading) {
+    return <Loading />;
+  }
+
+  if (query.error) {
+    return <MessageBoxGraphqlError error={query.error} />;
+  }
+
+  const expense = query.data.expense;
+
+  const isInvite = expense.status === ExpenseStatus.DRAFT && !expense.recurringExpense;
+
   return (
-    <div className="flex flex-col overflow-scroll overflow-x-hidden px-4 py-2">
-      <div>
-        <div className="mb-8 flex items-center gap-2 text-xl font-bold">
-          <Image
-            alt={intl.formatMessage({ id: 'Expense.Type.Invoice', defaultMessage: 'Invoice' })}
-            src={invoiceIllustrationStatic}
-            width={48}
-            height={48}
-          />
-          <FormattedMessage defaultMessage="Your expense has been submitted successfully!" />
+    <div className="flex flex-col gap-8 overflow-scroll overflow-x-hidden px-6 py-4 sm:flex-row sm:px-16">
+      <div className="flex-1">
+        <div className="mb-8 text-xl font-bold">
+          {isInvite ? (
+            <FormattedMessage id="InviteOnItsWay" defaultMessage="Your invite is on its way" />
+          ) : (
+            <FormattedMessage defaultMessage="Your expense has been submitted successfully!" />
+          )}
         </div>
+
+        {isInvite ? (
+          <div className="mb-8 flex gap-2">
+            <Image
+              alt={intl.formatMessage({ id: 'Expense.Type.Invoice', defaultMessage: 'Invoice' })}
+              src="/static/images/pidgeon.png"
+              width={112}
+              height={112}
+            />
+            <div className="text-sm">
+              <FormattedMessage
+                id="Expense.InviteIsOnItsWay.Description"
+                defaultMessage="An invitation to submit this expense has been sent to {email}. Once they confirm and finish the process, it will appear on the expenses list."
+                values={{
+                  email: expense.draft?.payee?.email || expense.draft?.payee?.name,
+                }}
+              />
+            </div>
+          </div>
+        ) : null}
 
         <h2 className="mb-3 font-bold">
           <FormattedMessage defaultMessage="What's next?" />
@@ -102,22 +169,38 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
           <li>
             <FormattedMessage
               defaultMessage="This expense needs to be approved by an admin of {collective}"
-              values={{ collective: props.form.options.account.name }}
+              values={{ collective: expense.account?.name }}
             />
           </li>
-          {props.form.options.host && (
+          {expense.host && (
             <li>
               <FormattedMessage
-                defaultMessage="This expense will then be reviewed by an administrator from {host}"
-                values={{ host: props.form.options.host.name }}
+                defaultMessage="After that, this expense needs to be reviewed and paid by an admin of {host}"
+                values={{ host: expense.host?.name }}
               />
             </li>
           )}
         </ol>
 
-        <MessageBox my={4} type="info">
-          <FormattedMessage defaultMessage="You can find and track your expense in your dashboard." />
-        </MessageBox>
+        {!isInvite && (
+          <MessageBox my={4} type="info">
+            <FormattedMessage
+              defaultMessage="You can find and track your expense in your dashboard. <Link>Go to expense</Link>."
+              values={{
+                Link: chunks => (
+                  <StyledLink
+                    className="whitespace-nowrap"
+                    href={`/dashboard/${LoggedInUser.collective.slug}/submitted-expenses?openExpenseId=${expense.legacyId}`}
+                    openInNewTab
+                  >
+                    {chunks}
+                    <ExternalLink size={16} className="ml-1 inline align-text-top" />
+                  </StyledLink>
+                ),
+              }}
+            />
+          </MessageBox>
+        )}
 
         <div className="mb-3 font-bold">
           <FormattedMessage defaultMessage="Is there anything else you wish to communicate to the admins who will review this expense?" />{' '}
@@ -141,10 +224,10 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
         >
           <FormattedMessage defaultMessage="Add a note" />
         </Button>
+      </div>
 
-        <div className="mt-8">
-          <CreateExpenseFAQ defaultOpen />
-        </div>
+      <div className="flex-1">
+        <CreateExpenseFAQ defaultOpen />
       </div>
     </div>
   );

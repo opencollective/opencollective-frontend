@@ -4,46 +4,31 @@ import { FormikProvider } from 'formik';
 import { isEmpty, round } from 'lodash';
 import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
 
-import { Amount, ExpenseType } from '../../lib/graphql/types/v2/graphql';
+import { ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import { i18nTaxType } from '../../lib/i18n/taxes';
-import { computeExpenseAmounts, getTaxAmount, isTaxRateValid } from '../expenses/lib/utils';
 
 import { expenseTagsQuery } from '../dashboard/filters/ExpenseTagsFilter';
 import { AutocompleteEditTags } from '../EditTags';
 import ExpenseAmountBreakdown from '../expenses/ExpenseAmountBreakdown';
 import ExpenseAttachedFilesForm from '../expenses/ExpenseAttachedFilesForm';
 import ExpenseTypeTag from '../expenses/ExpenseTypeTag';
-import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import StyledCheckbox from '../StyledCheckbox';
 import { StyledCurrencyPicker } from '../StyledCurrencyPicker';
 import StyledInput from '../StyledInput';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledInputGroup from '../StyledInputGroup';
 import StyledSelect from '../StyledSelect';
-import { StepListItem } from '../ui/StepList';
 
 import { ExpenseItemsForm } from './ExpenseItemsForm';
-import { ExpenseStepDefinition } from './Steps';
-import { ExpenseForm, expenseTypeFromOption, ExpenseTypeOption } from './useExpenseForm';
+import { ExpenseForm } from './useExpenseForm';
 
-export const ExpenseDetailsStep: ExpenseStepDefinition = {
-  Form: ExpenseDetailsForm,
-  StepListItem: ExpenseDetailsStepListItem,
-  hasError(form) {
-    if (form.options.taxType && form.values.hasTax && !!form.errors.tax) {
-      return true;
-    }
-
-    return !!form.errors.expenseCurrency || !!form.errors.expenseItems;
-  },
-  stepTitle: <FormattedMessage defaultMessage="Expense Details" />,
-};
+const CURRENCY_PICKER_STYLE = { menu: { width: '280px' } } as const;
 
 type ExpenseDetailsFormProps = {
   form: ExpenseForm;
 };
 
-function ExpenseDetailsForm(props: ExpenseDetailsFormProps) {
+export function ExpenseDetailsForm(props: ExpenseDetailsFormProps) {
   const intl = useIntl();
   const availableCurrencies = props.form.options.supportedCurrencies;
 
@@ -52,7 +37,7 @@ function ExpenseDetailsForm(props: ExpenseDetailsFormProps) {
     if (isEmpty(props.form.values.expenseItems)) {
       setFieldValue('expenseItems', [
         {
-          date: new Date(),
+          incurredAt: new Date(),
           description: '',
           amount: {
             valueInCents: 0,
@@ -62,6 +47,35 @@ function ExpenseDetailsForm(props: ExpenseDetailsFormProps) {
       ]);
     }
   }, [props.form.values.expenseItems, props.form.values.expenseCurrency, setFieldValue]);
+
+  const currencyPickerOnChange = React.useCallback(
+    c => {
+      setFieldValue('expenseCurrency', c);
+    },
+    [setFieldValue],
+  );
+
+  const setFieldTouched = props.form.setFieldTouched;
+  const currencyPickerOnBlur = React.useCallback(() => {
+    setFieldTouched('expenseCurrency', true);
+  }, [setFieldTouched]);
+
+  const onHasTaxChange = React.useCallback(
+    ({ checked }) => {
+      setFieldValue('hasTax', checked);
+    },
+    [setFieldValue],
+  );
+
+  const onTagChange = React.useCallback(
+    (tags: { value: string }[]) => {
+      setFieldValue(
+        'tags',
+        tags.map(t => t.value.toLowerCase()),
+      );
+    },
+    [setFieldValue],
+  );
 
   return (
     <FormikProvider value={props.form}>
@@ -86,26 +100,11 @@ function ExpenseDetailsForm(props: ExpenseDetailsFormProps) {
         >
           {() => (
             <div className="flex items-center gap-1">
-              <ExpenseTypeTag
-                type={
-                  [ExpenseTypeOption.INVITED_INVOICE, ExpenseTypeOption.INVOICE].includes(
-                    props.form.values.expenseTypeOption,
-                  )
-                    ? ExpenseType.INVOICE
-                    : ExpenseType.RECEIPT
-                }
-                mb={0}
-                mr={0}
-              />
+              <ExpenseTypeTag type={props.form.values.expenseTypeOption} mb={0} mr={0} />
               <AutocompleteEditTags
                 query={expenseTagsQuery}
                 variables={{ account: { slug: props.form.values.collectiveSlug } }}
-                onChange={(tags: { value: string }[]) => {
-                  props.form.setFieldValue(
-                    'tags',
-                    tags.map(t => t.value.toLowerCase()),
-                  );
-                }}
+                onChange={onTagChange}
                 value={props.form.values.tags}
               />
             </div>
@@ -126,39 +125,24 @@ function ExpenseDetailsForm(props: ExpenseDetailsFormProps) {
               data-cy="expense-currency-picker"
               availableCurrencies={availableCurrencies}
               value={props.form.values.expenseCurrency}
-              onChange={c => props.form.setFieldValue('expenseCurrency', c)}
+              onChange={currencyPickerOnChange}
               width="100%"
               maxWidth="160px"
               disabled={availableCurrencies.length < 2}
-              styles={{ menu: { width: '280px' } }}
-              onBlur={() => props.form.setFieldTouched('expenseCurrency', true)}
+              styles={CURRENCY_PICKER_STYLE}
+              onBlur={currencyPickerOnBlur}
             />
           )}
         </StyledInputFormikField>
 
-        {[ExpenseType.GRANT, ExpenseType.INVOICE].includes(
-          expenseTypeFromOption(props.form.values.expenseTypeOption),
-        ) && (
+        {ExpenseType.INVOICE === props.form.values.expenseTypeOption && (
           <ExpenseAttachedFilesForm
-            title={
-              expenseTypeFromOption(props.form.values.expenseTypeOption) === ExpenseType.INVOICE ? (
-                <FormattedMessage id="UploadInvoice" defaultMessage="Upload invoice" />
-              ) : (
-                <FormattedMessage id="UploadDocumentation" defaultMessage="Upload documentation" />
-              )
-            }
+            title={<FormattedMessage id="UploadInvoice" defaultMessage="Upload invoice" />}
             description={
-              expenseTypeFromOption(props.form.values.expenseTypeOption) === ExpenseType.INVOICE ? (
-                <FormattedMessage
-                  id="UploadInvoiceDescription"
-                  defaultMessage="If you already have an invoice document, you can upload it here."
-                />
-              ) : (
-                <FormattedMessage
-                  id="UploadDocumentationDescription"
-                  defaultMessage="If you want to include any documentation, you can upload it here."
-                />
-              )
+              <FormattedMessage
+                id="UploadInvoiceDescription"
+                defaultMessage="If you already have an invoice document, you can upload it here."
+              />
             }
             defaultValue={props.form.values.expenseAttachedFiles}
             onChange={expenseAttachedFiles =>
@@ -185,7 +169,7 @@ function ExpenseDetailsForm(props: ExpenseDetailsFormProps) {
             <StyledCheckbox
               name="hasTax"
               checked={props.form.values.hasTax}
-              onChange={({ checked }) => props.form.setFieldValue('hasTax', checked)}
+              onChange={onHasTaxChange}
               label={
                 <FormattedMessage
                   defaultMessage="Apply {taxName}"
@@ -248,7 +232,7 @@ function ExpenseDetailsForm(props: ExpenseDetailsFormProps) {
                 {({ field }) => (
                   <StyledInputGroup
                     {...field}
-                    value={field.value ? round(field.value * 100, 2) : null}
+                    value={field.value ? round(field.value * 100, 2) : 0}
                     onChange={e =>
                       props.form.setFieldValue('tax.rate', e.target.value ? round(e.target.value / 100, 4) : null)
                     }
@@ -309,72 +293,3 @@ const i18nTaxRate = (intl: IntlShape, taxType: TaxType, rate: number) => {
     return intl.formatMessage({ defaultMessage: 'No {taxName}' }, { taxName: i18nTaxType(intl, taxType, 'short') });
   }
 };
-
-function ExpenseDetailsStepListItem(props: { className?: string; form: ExpenseForm; current: boolean }) {
-  const intl = useIntl();
-
-  const { totalInvoiced } = computeExpenseAmounts(
-    props.form.values.expenseCurrency,
-    (props.form.values.expenseItems || []).map(ei => ({
-      description: ei.description,
-      amountV2: ei.amount as Amount,
-      incurredAt: ei.date,
-    })),
-    props.form.values.tax ? [{ ...props.form.values.tax, type: props.form.options.taxType }] : [],
-  );
-
-  return (
-    <StepListItem
-      className="w-full"
-      title={ExpenseDetailsStep.stepTitle}
-      subtitle={
-        props.form.values.expenseItems?.length > 0 ? (
-          <div>
-            <div>
-              <span>
-                <FormattedMoneyAmount
-                  amountStyles={{
-                    fontWeight: 'normal',
-                  }}
-                  abbreviate
-                  showCurrencyCode={false}
-                  currency={props.form.values.expenseCurrency}
-                  amount={totalInvoiced}
-                />
-              </span>
-              &nbsp;
-              <span>
-                <FormattedMessage
-                  defaultMessage="({n} {n, plural, one {item} other {items}})"
-                  values={{ n: props.form.values.expenseItems?.length ?? 0 }}
-                />
-              </span>
-            </div>
-            {props.form.options.taxType && props.form.values.hasTax && (
-              <span>
-                <FormattedMoneyAmount
-                  amount={
-                    !isTaxRateValid(props.form.values.tax?.rate)
-                      ? null
-                      : getTaxAmount(totalInvoiced, props.form.values.tax)
-                  }
-                  precision={2}
-                  currency={props.form.values.expenseCurrency}
-                  showCurrencyCode={false}
-                  amountStyles={null}
-                />
-                &nbsp;
-                {i18nTaxType(intl, props.form.options.taxType, 'short')}
-                {isTaxRateValid(props.form.values.tax?.rate) && (
-                  <React.Fragment>&nbsp;{`(${round(props.form.values.tax?.rate * 100, 2)}%)`}</React.Fragment>
-                )}
-              </span>
-            )}
-          </div>
-        ) : null
-      }
-      completed={!ExpenseDetailsStep.hasError(props.form)}
-      current={props.current}
-    />
-  );
-}
