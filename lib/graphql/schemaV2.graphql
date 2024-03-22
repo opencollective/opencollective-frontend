@@ -582,6 +582,7 @@ interface Account {
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -2157,6 +2158,7 @@ type Host implements Account & AccountWithContributions {
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -6980,6 +6982,7 @@ type Bot implements Account {
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -7679,6 +7682,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -8819,6 +8823,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -9748,6 +9753,7 @@ type Individual implements Account {
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -10653,6 +10659,7 @@ type Organization implements Account & AccountWithContributions {
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -11452,6 +11459,7 @@ type Vendor implements Account & AccountWithContributions {
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -12143,6 +12151,7 @@ type Query {
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -14655,6 +14664,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -15462,6 +15472,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags

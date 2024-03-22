@@ -1,7 +1,6 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { get } from 'lodash';
-import { ExternalLink } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import { checkIfOCF } from '../lib/collective';
@@ -57,37 +56,19 @@ const OCFCollectiveAdminsBannerMessage = ({ account, newAccount, isCentered, hid
               {'. '}
             </React.Fragment>
           )}
-          This account is not able to receive contributions. You can zero-out its balance by doing any of the following:
-          <ul className={cn('list-outside list-disc pl-4', isCentered && 'mx-auto max-w-[600px] text-left')}>
-            <li className="mt-1 text-neutral-700">
-              <Link href={`${getCollectivePageRoute(account)}/expenses/new`}>
-                <span className="underline">Submit expenses</span>{' '}
-                <ExternalLink size={16} className="inline align-text-top" />
-              </Link>
-            </li>
-            <li className="mt-1">
-              <Link href={getDashboardRoute(account, 'advanced')}>
-                <span className="underline">
-                  Transfer your balance to Open Collective Foundation (Your current host)
-                </span>{' '}
-                <ExternalLink size={16} className="inline align-text-top" />
-              </Link>
-              <p className="font-normal">
-                Choose this option if you have an agreement with OCF to transfer your funds to your new Fiscal Host.
-              </p>
-            </li>
-            <li className="mt-1">
-              Please read and follow{' '}
-              <StyledLink openInNewTab href="https://docs.opencollective.foundation/leaving-ocf">
-                OCF’s guidance
-              </StyledLink>{' '}
-              on how to transition to a new Fiscal Host.
-            </li>
-          </ul>
+          This account is not able to receive contributions. You will need to spend your remaining funds or transfer to
+          another Fiscal Host by the 30th of September 2024.{' '}
+          <StyledLink
+            openInNewTab
+            href="https://blog.opencollective.com/open-collective-official-statement-ocf-dissolution/"
+          >
+            Read more about the dissolution of Open Collective Foundation
+          </StyledLink>
+          .
         </div>
         {!hideNextSteps && !newAccount && (
           <div className={cn('mt-3 flex items-center gap-3', isCentered && 'justify-center')}>
-            <div>Next Steps:</div>
+            <div>Review your options and next steps:</div>
             <Link href={getDashboardRoute(account, 'host')}>
               <Button variant="outline">
                 <FormattedMessage id="AdminPanel.FiscalHostSettings" defaultMessage="Fiscal Host Settings" />
