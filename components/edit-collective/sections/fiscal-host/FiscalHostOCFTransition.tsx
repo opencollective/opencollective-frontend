@@ -2,7 +2,6 @@ import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { ChevronDown, ExternalLink } from 'lucide-react';
 
-import { FEATURES, isFeatureEnabled } from '../../../../lib/allowed-features';
 import { getEnvVar } from '../../../../lib/env-utils';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import {
@@ -25,7 +24,15 @@ import { LeaveHostModal } from '../../LeaveHostModal';
 
 import OCFDuplicateAndApplyToHostModal from './OCFDuplicateAndApplyToHostModal';
 
-type Sections = 'recurringContributions' | 'balance' | 'moveHost' | 'externalHost' | 'moreOptions';
+type Sections =
+  | 'recurringContributions'
+  | 'balance'
+  | 'moveHost'
+  | 'externalHost'
+  | 'moreOptions'
+  | 'ownHost'
+  | 'leaveHost'
+  | 'reactivateContributions';
 
 const fiscalHostOCFTransitionQuery = gql`
   query FiscalHostOCFTransition($slug: String!) {
@@ -49,6 +56,9 @@ const fiscalHostOCFTransitionQuery = gql`
             }
           }
         }
+      }
+      pausedContributions: orders(filter: INCOMING, status: PAUSED, includeIncognito: true) {
+        totalCount
       }
     }
     hosts(limit: 200, offset: 0) {
@@ -89,7 +99,7 @@ const ChevronButton = () => (
   </div>
 );
 
-const step2Label = 'Zero out your Open Collective Foundation balance';
+const step2Label = 'Your funds hosted by Open Collective Foundation';
 
 /**
  * A component to provide information and action for collectives to transition out of OCF.
@@ -121,7 +131,14 @@ export const FiscalHostOCFTransition = ({ collective }) => {
 
   return (
     <div>
-      <h2 className="mb-4 text-base font-bold">Next Steps:</h2>
+      <h2 className="mb-4 text-base font-bold">Your Options and Next Steps:</h2>
+      <p className="text-sm">
+        Open Collective Foundation has{' '}
+        <StyledLink openInNewTab href="https://docs.opencollective.foundation/#what-are-our-options">
+          published guidance about your options over the coming months
+        </StyledLink>
+        ; the following next steps are designed to support you during your transition:
+      </p>
       <div className="mt-4 flex flex-col gap-3">
         {/** Recurring contributions */}
         <Collapsible className="rounded-md border border-gray-300 p-4" {...getOpenProps('recurringContributions')}>
@@ -130,65 +147,34 @@ export const FiscalHostOCFTransition = ({ collective }) => {
             <ChevronButton />
           </CollapsibleTrigger>
           <CollapsibleContent className="pt-4 text-sm">
-            {isFeatureEnabled(data.account, FEATURES.RECEIVE_FINANCIAL_CONTRIBUTIONS) ? (
-              <React.Fragment>
+            <p className="font-semibold">
+              On March 15th we paused{' '}
+              {data.account.pausedContributions.totalCount > 0 && data.account.pausedContributions.totalCount}
+              recurring contributions to your Collective.
+            </p>
+            <br />
+            <p>
+              We have emailed your contributors letting them know that their contributions have been paused and that
+              they may be invited to reactivate them later. You can learn more about this{' '}
+              <StyledLink openInNewTab href="https://blog.opencollective.com/fiscal-host-transition/">
+                here
+              </StyledLink>
+              .
+            </p>
+            <MessageBox type="info" withIcon={false} className="mt-4">
+              <div className="flex items-center gap-4">
+                <Image priority src="/static/images/illustrations/eye.png" alt="" width={48} height={48} />
                 <p>
-                  Your Fiscal Host (Open Collective Foundation) is unable to accept contributions from the 15th of
-                  March. On this date all of your active recurring contributions will be paused. Once you have
-                  successfully found a new Fiscal Host we will notify your contributors and invite them to renew their
-                  contributions. You can learn more about this{' '}
-                  <StyledLink href="https://blog.opencollective.com/fiscal-host-transition/" openInNewTab>
-                    here
-                  </StyledLink>
-                  .
+                  If you haven’t already, we recommend publishing an update to inform your community of the
+                  circumstances so that they’re aware of why these changes are taking place and what your plans are.
                 </p>
-                <MessageBox type="info" withIcon={false} className="mt-4">
-                  <div className="flex items-center gap-4">
-                    <Image priority src="/static/images/illustrations/eye.png" alt="" width={48} height={48} />
-                    <div>
-                      <p>
-                        We will send an automated email to inform your contributors that their contributions have been
-                        paused.
-                      </p>
-                      <p>
-                        We recommend publishing an update to inform your community of the circumstances so that they’re
-                        aware of why these changes are taking place and what your plans are.
-                      </p>
-                    </div>
-                  </div>
-                </MessageBox>
-                <div className="mt-4">
-                  <Link href={`${getCollectivePageRoute(collective)}/updates/new`}>
-                    <Button>Send an Update to your Contributors</Button>
-                  </Link>
-                </div>
-              </React.Fragment>
-            ) : (
-              <React.Fragment>
-                <p>
-                  Due to the dissolution of Open Collective Foundation, on March 15th we paused your recurring
-                  contributions.
-                </p>
-                <MessageBox type="info" withIcon={false} className="mt-4">
-                  <div className="flex items-center gap-4">
-                    <Image priority src="/static/images/illustrations/eye.png" alt="" width={48} height={48} />
-
-                    <p>
-                      We have sent an automated email to your contributors letting them know that their contributions
-                      have been paused and that they will be invited to reactivate them when your collective is once
-                      again able to receive contributions on the platform. If you haven’t already, we recommend
-                      publishing an update to inform your community of the circumstances so that they’re aware of why
-                      these changes are taking place and what your plans are.
-                    </p>
-                  </div>
-                </MessageBox>
-                <div className="mt-4">
-                  <Link href={`${getCollectivePageRoute(collective)}/updates/new`}>
-                    <Button variant="outline">Send an Update to your Contributors</Button>
-                  </Link>
-                </div>
-              </React.Fragment>
-            )}
+              </div>
+            </MessageBox>
+            <div className="mt-4">
+              <Link href={`${getCollectivePageRoute(collective)}/updates/new`}>
+                <Button variant="outline">Send an Update to your Contributors</Button>
+              </Link>
+            </div>
           </CollapsibleContent>
         </Collapsible>
         {/** Balance */}
@@ -198,55 +184,63 @@ export const FiscalHostOCFTransition = ({ collective }) => {
             <ChevronButton />
           </CollapsibleTrigger>
           <CollapsibleContent className="pt-4 text-sm">
-            <p>If you still have a balance hosted by Open Collective Foundation, you have two options:</p>
-            <ol className="mt-4 list-outside list-decimal pl-4">
-              <li className="font-bold">
-                Zero out your balance
-                <ul className="list-outside list-disc pl-4 font-normal">
-                  <li className="mt-4 text-neutral-700">
-                    <Link href={`${getCollectivePageRoute(collective)}/expenses/new`}>
-                      <span className="underline">Submit expenses</span>{' '}
-                      <ExternalLink size={16} className="inline align-text-top" />
-                    </Link>
-                  </li>
-                  <li className="mt-4">
-                    <Link href={getDashboardRoute(collective, 'advanced')}>
-                      <span className="underline">
-                        Transfer your balance to Open Collective Foundation (Your current host)
-                      </span>{' '}
-                      <ExternalLink size={16} className="inline align-text-top" />
-                    </Link>
-                    <p className="mt-2 font-normal">
-                      Choose this option if you have an agreement with OCF to transfer your funds to your new Fiscal
-                      Host.
-                    </p>
-                  </li>
-                </ul>
+            <p>
+              You can continue to submit expenses which will be paid out by Open Collective Foundation until the 30th of
+              September 2024.
+            </p>
+            <ul className="list-outside list-disc pl-4 font-normal">
+              <li className="mt-4 text-neutral-700">
+                <Link href={`${getCollectivePageRoute(collective)}/expenses/new`}>
+                  <span className="underline">Submit expenses</span>{' '}
+                  <ExternalLink size={16} className="inline align-text-top" />
+                </Link>
               </li>
-              <li className="mt-4 font-bold">
-                If you are not ready to zero your OCF balance but need to continue fundraising
-                <p className="mt-2 font-normal">
-                  Duplicate your collective and apply to a new Fiscal Host (see below: Join a new Fiscal Host on Open
-                  Collective) to continue fundraising whilst spending down your remaining balance with Open Collective
-                  Foundation.
-                </p>
+              <li className="mt-4">
+                <Link href={getDashboardRoute(collective, 'advanced')}>
+                  <span className="underline">
+                    Transfer your balance to Open Collective Foundation (Your current Fiscal Host)
+                  </span>{' '}
+                  <ExternalLink size={16} className="inline align-text-top" />
+                </Link>
               </li>
-            </ol>
+            </ul>
           </CollapsibleContent>
         </Collapsible>
         {/** Move Host */}
         {!data.account.newAccounts.totalCount && (
           <Collapsible className="rounded-md border border-gray-300 p-4" {...getOpenProps('moveHost')}>
             <CollapsibleTrigger className="group flex w-full flex-1 items-center justify-between text-sm [&_svg]:data-[state=open]:rotate-180">
-              <div className="font-medium">Join a new Fiscal Host on Open Collective</div>
+              <div className="font-medium">Find a new Fiscal Host on Open Collective</div>
               <ChevronButton />
             </CollapsibleTrigger>
             <CollapsibleContent className="pt-4 text-sm">
               <p>
-                To continue fundraising on the Open Collective platform you will need to either find a new Fiscal Host,
-                or become an independent collective. When your collective has found a new fiscal host on the Open
-                Collective platform we will send automated email notifications to your paused contributors and invite
-                them to resume their recurring contributions.
+                In order to transfer any remaining funds or assets by the 30th of September 2024 you will need to find a
+                new Fiscal Host. Open Collective Foundation has published{' '}
+                <StyledLink
+                  openInNewTab
+                  href="https://docs.opencollective.foundation/leaving-ocf#if-you-are-transitioning-to-another-501-c-3-or-fiscal-sponsor"
+                >
+                  guidance about entities that are eligible
+                </StyledLink>{' '}
+                and the information they require and directed Collectives to{' '}
+                <StyledLink
+                  openInNewTab
+                  href="https://docs.opencollective.foundation/#where-can-i-find-a-list-of-other-fiscal-sponsors"
+                >
+                  resources from other mission-aligned fiscal sponsor networks
+                </StyledLink>
+                . Open Collective Inc. has also published and is actively maintaining{' '}
+                <StyledLink openInNewTab href="https://blog.opencollective.com/fiscal-hosting-options/">
+                  a list of fiscal host organizations that may be willing to host your Collective
+                </StyledLink>
+                .
+              </p>
+              <br />
+              <p>
+                To re activate your recurring contributions you will need to find a new Fiscal Host on the Open
+                Collective platform. We will then email your contributors and invite them to reactivate their recurring
+                contributions.
               </p>
               {collective.stats.balance === 0 ? (
                 <div className="mt-4">
@@ -282,17 +276,103 @@ export const FiscalHostOCFTransition = ({ collective }) => {
             </CollapsibleContent>
           </Collapsible>
         )}
-        {/** External Host */}
-        <Collapsible className="rounded-md border border-gray-300 p-4" {...getOpenProps('externalHost')}>
+        {/** Starting your own Fiscal Host */}
+        <Collapsible className="rounded-md border border-gray-300 p-4" {...getOpenProps('ownHost')}>
           <CollapsibleTrigger className="group flex w-full flex-1 items-center justify-between text-sm [&_svg]:data-[state=open]:rotate-180">
-            <div className="font-medium">If you found a Fiscal Host that is not on Open Collective</div>
+            <div className="font-medium">Starting your own Fiscal Host</div>
+            <ChevronButton />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="pt-4 text-sm">
+            <p className="italic">
+              Please note this is a lengthy commitment and requires setting up your own legal status and financial
+              compliance i.e. bank accounts, accounting and taxes.
+            </p>
+            <br />
+            <p>
+              To transfer any remaining funds and assets from Open Collective Foundation, you will need to form a
+              non-profit corporation with 501(c)(3) status or an equivalency determination i.e. a charity.
+            </p>
+            <br />
+            <p>
+              If you do not need to transfer funds or assets, you are free to create a new entity to host your
+              Collective, including hosting your project yourself independently. Read more about{' '}
+              <StyledLink
+                openInNewTab
+                href="https://docs.opencollective.com/help/independent-collectives/about-independent-collectives"
+              >
+                independent collectives
+              </StyledLink>{' '}
+              and{' '}
+              <StyledLink openInNewTab href="https://docs.opencollective.com/help/fiscal-hosts/create-a-fiscal-host">
+                starting a fiscal host organization
+              </StyledLink>
+              .
+            </p>
+            <br />
+            <p>
+              Be aware that unless you have a 501(c)(3) or an equivalency determination i.e. your new Fiscal Host is a
+              charity, you will not be able to offer tax-deductible donations and will not be able to resume
+              contributions where this is a benefit. For example if you receive contributions from a Donor Advised Fund
+              (DAF).
+            </p>
+          </CollapsibleContent>
+        </Collapsible>
+        {/** Leave OCF */}
+        <Collapsible className="rounded-md border border-gray-300 p-4" {...getOpenProps('leaveHost')}>
+          <CollapsibleTrigger className="group flex w-full flex-1 items-center justify-between text-sm [&_svg]:data-[state=open]:rotate-180">
+            <div className="font-medium">Leaving Open Collective Foundation</div>
             <ChevronButton />
           </CollapsibleTrigger>
           <CollapsibleContent className="pt-4 text-sm">
             <p>
-              If your host is not on the platform and you are interested in how our platform can support your collective
-              and new host, we are happy to start with a preliminary talk with you or connect with your host directly.
-              Our aim is to foster your growth and ease the transition to your new Fiscal Host. Fill out{' '}
+              Open Collective Foundation have published guidance for their member collectives, beginning with an
+              offboarding process.{' '}
+              <StyledLink openInNewTab href="https://docs.opencollective.foundation/leaving-ocf">
+                Read more about leaving Open Collective Foundation
+              </StyledLink>
+              . If your new fiscal host is using the Open Collective platform, and the above has been completed you will
+              be able to unhost Open Collective Foundation and apply to your new fiscal host.
+            </p>
+            {collective.stats.balance === 0 && (
+              <div className="mt-4">
+                <Button className="mt-4" variant="outline" onClick={() => setOpenModal('leaveHost')}>
+                  Leave Host
+                </Button>
+              </div>
+            )}
+          </CollapsibleContent>
+        </Collapsible>
+        {/** Reactivating your recurring contributions */}
+        {data.account.pausedContributions.totalCount > 0 && (
+          <Collapsible className="rounded-md border border-gray-300 p-4" {...getOpenProps('reactivateContributions')}>
+            <CollapsibleTrigger className="group flex w-full flex-1 items-center justify-between text-sm [&_svg]:data-[state=open]:rotate-180">
+              <div className="font-medium">Reactivating your recurring contributions</div>
+              <ChevronButton />
+            </CollapsibleTrigger>
+            <CollapsibleContent className="pt-4 text-sm">
+              <p>
+                To resume your {data.account.pausedContributions.totalCount} recurring contributions you will need to
+                find or start a new Fiscal Host that is on the Open Collective platform.
+              </p>
+              <br />
+              <p>
+                Once your collective has successfully transferred to a new fiscal host on the Open Collective platform,
+                we will provide a feature to notify your contributors to reactivate their recurring contributions.
+              </p>
+            </CollapsibleContent>
+          </Collapsible>
+        )}
+        {/** External Host */}
+        <Collapsible className="rounded-md border border-gray-300 p-4" {...getOpenProps('externalHost')}>
+          <CollapsibleTrigger className="group flex w-full flex-1 items-center justify-between text-sm [&_svg]:data-[state=open]:rotate-180">
+            <div className="font-medium">Your new Fiscal Host isn’t on Open Collective</div>
+            <ChevronButton />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="pt-4 text-sm">
+            <p>
+              If you are interested in how our platform can support your collective and new Fiscal Host, we are happy to
+              start with a preliminary talk with you or connect with your new Fiscal Host directly. Our aim is to foster
+              growth and ease the transition to your new Fiscal Host. Fill out{' '}
               <StyledLink href="https://coda.io/form/New-Hosts-to-Open-Collective_dHYnsICyU0b" openInNewTab>
                 this form
               </StyledLink>{' '}
@@ -310,7 +390,7 @@ export const FiscalHostOCFTransition = ({ collective }) => {
             <p className="font-bold">If you haven’t found a Fiscal Host on the Open Collective Platform</p>
             <ul className="mt-4 list-outside list-disc pl-4">
               <li>
-                You will still need to zero out your Collective’s balance to leave OCF and archive your collective (see
+                You will still need to zero out your Collective’s balance to leave OCF and archive your Collective (see
                 above: “{step2Label}”).
               </li>
               <li>
@@ -320,7 +400,6 @@ export const FiscalHostOCFTransition = ({ collective }) => {
                 </StyledLink>{' '}
                 of your contributors and reach out to them personally
               </li>
-              <li>Your recurring contributions will be paused on the 15th of March.</li>
               <li>
                 When you leave Open Collective, an email will be sent to your contributors informing them of your exit.
               </li>
