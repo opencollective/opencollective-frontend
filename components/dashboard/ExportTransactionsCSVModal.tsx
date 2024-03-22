@@ -525,7 +525,7 @@ const ExportTransactionsCSVModal = ({
               <div className="mt-4 flex flex-wrap gap-2 rounded-lg bg-slate-100 p-2">
                 {React.useMemo(
                   () =>
-                    canEditFields ? (
+                    canEditFields && fields.length > 0 ? (
                       <DndContext
                         onDragStart={handleDragStart}
                         onDragOver={handleDragOver}
@@ -539,8 +539,12 @@ const ExportTransactionsCSVModal = ({
                         </SortableContext>
                         <DragOverlay>{draggingTag ? <FieldTag id={draggingTag} dragElement /> : null}</DragOverlay>
                       </DndContext>
-                    ) : (
+                    ) : fields.length ? (
                       fields.map(field => <FieldTag key={field} id={field} />)
+                    ) : (
+                      <p className="self-center text-xs">
+                        <FormattedMessage defaultMessage="You have not selected any fields for export." />
+                      </p>
                     ),
                   [canEditFields, fields, draggingTag, handleDragOver],
                 )}

@@ -1177,6 +1177,7 @@
   "eKwDAi": "This Expense is between different Hosts but the recipient Host doesn't have a suitable Payout Method available ({payoutMethodTypes}).",
   "elfKB7": "<Account></Account> application approved",
   "Email": "Email",
+  "EMjZZT": "You have not selected any fields for export.",
   "EmptyCollectivePage": "{collective} is still working on their public profile. In the meantime, check out some other Collectives!",
   "EndDate": "End Date",
   "eoPp92": "Authenticator App",
