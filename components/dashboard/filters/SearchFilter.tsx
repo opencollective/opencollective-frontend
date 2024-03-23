@@ -35,24 +35,23 @@ function SearchFilter({ value, labelMsg, onChange, isViewActive }: FilterCompone
   }, [value]);
 
   return (
-    <div className="relative">
-      <Search
-        size={16}
-        className={clsx(
-          'pointer-events-none absolute bottom-0 left-3 top-0 h-full text-muted-foreground',
-          !isViewActive && value && 'text-primary',
-        )}
-      />
-      <Input
-        className={clsx('h-9 w-[150px] rounded-full pl-8 lg:w-[200px]')}
-        ref={inputRef}
-        placeholder={intl.formatMessage(labelMsg)}
-        value={input || ''}
-        onChange={e => {
-          setInput(e.target.value);
-          debouncedOnChange(e.target.value);
-        }}
-      />
+    <div>
+      <div className="relative">
+        <div className="pointer-events-none absolute inset-y-0 left-3 flex h-full items-center">
+          <Search size={16} className={clsx('text-muted-foreground', !isViewActive && value && 'text-primary')} />
+        </div>
+
+        <Input
+          className={clsx('h-9 w-[150px] rounded-full pl-8 lg:w-[200px]')}
+          ref={inputRef}
+          placeholder={intl.formatMessage(labelMsg)}
+          value={input || ''}
+          onChange={e => {
+            setInput(e.target.value);
+            debouncedOnChange(e.target.value);
+          }}
+        />
+      </div>
     </div>
   );
 }
