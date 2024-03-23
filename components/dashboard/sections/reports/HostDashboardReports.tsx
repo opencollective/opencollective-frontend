@@ -56,7 +56,7 @@ const hostReportPageQuery = gql`
       settings
       stats {
         id
-        balance(dateTo: $dateTo) {
+        balance(dateTo: $dateTo, includeChildren: true) {
           valueInCents
           currency
         }
