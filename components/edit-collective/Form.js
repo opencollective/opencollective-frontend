@@ -33,6 +33,7 @@ import StyledLink from '../StyledLink';
 // Actions
 import Archive from './actions/Archive';
 import Delete from './actions/Delete';
+import { DuplicateAccount } from './actions/DuplicateAccount';
 import EmptyBalance from './actions/EmptyBalance';
 // Sections
 import CollectiveGoals from './sections/CollectiveGoals';
@@ -50,6 +51,7 @@ import Policies from './sections/Policies';
 import ReceivingMoney from './sections/ReceivingMoney';
 import Security from './sections/Security';
 import SendingMoney from './sections/SendingMoney';
+import SettingsSectionTitle from './sections/SettingsSectionTitle';
 import Tickets from './sections/Tickets';
 import Tiers from './sections/Tiers';
 import UserSecurity from './sections/UserSecurity';
@@ -511,6 +513,9 @@ class EditCollectiveForm extends React.Component {
             )}
             <Archive collective={collective} />
             <Delete collective={collective} />
+            {[COLLECTIVE, FUND, PROJECT, EVENT].includes(collective.type) && LoggedInUser.isRoot && (
+              <DuplicateAccount collective={collective} />
+            )}
           </Box>
         );
 
