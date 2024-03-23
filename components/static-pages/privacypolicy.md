@@ -1,6 +1,6 @@
 # Open Collective Privacy Policy
 
-**Last Updated: 7 January 2019**
+**Last Updated: 5 March 2024**
 
 <p class="lead">This Privacy Policy explains how information about you is collected, used, and disclosed by Open Collective, Inc. ("Open Collective" or “we”). This Privacy Policy applies to information we collect when you use our websites and online services (collectively, the “Services”) or when you otherwise interact with us.</p>
 
@@ -42,7 +42,7 @@ We may use information about you for various purposes, including to:
 
 We may share information about you as follows or as otherwise described in this Privacy Policy:
 
-- With hosts and organizers of a collective, if you are a contributor, or request reimbursement for expenses made in support, of that collective
+- With hosts and organizers of a collective, if you are a contributor, or request reimbursement for expenses made in support, of that collective. The collective may use your information for the same purposes and under the same conditions as those outlined in this Charter. However, it remains solely and exclusively responsible for complying with its legal and declarative obligations in processing your personal data that it carries out by itself, with its own means, and for its own needs. We are only responsible for our use of your personal data, excluding any other uses made by the collective.
 - We will share your name and image with GitHub if you participate in a collective that is also working on a software project through GitHub.
 - With vendors, consultants and other service providers who need access to such information to carry out work on our behalf. If you submit a request to us, we will provide you with a list of the third-party service providers with which we have shared information about you for the 12 months prior to your request;
 - In response to a request for information if we believe disclosure is in accordance with, or required by, any applicable law, regulation or legal process;
