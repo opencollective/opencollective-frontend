@@ -284,7 +284,7 @@
     "raf": "^3.4.1",
     "raw-loader": "^4.0.2",
     "react-test-renderer": "^18.2.0",
-    "rollup": "^3.20.7",
+    "rollup": "^4.0.0",
     "shx": "^0.3.4",
     "storybook": "7.6.17",
     "styled-jsx": "^5.1.2",
