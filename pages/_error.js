@@ -11,12 +11,12 @@ import ErrorPage from '../components/ErrorPage';
  * rendering, typically 404 errors.
  */
 class NextJSErrorPage extends React.Component {
-  static getInitialProps(context) {
+  static async getInitialProps(context) {
     const { res, err, req } = context;
 
     // In case this is running in a serverless function, await this in order to give Sentry
     // time to send the error before the lambda exits
-    Sentry.captureUnderscoreErrorException(context);
+    await Sentry.captureUnderscoreErrorException(context);
 
     const statusCode = res ? res.statusCode : err ? err.statusCode : null;
     return { statusCode, err, requestUrl: req && req.originalUrl };

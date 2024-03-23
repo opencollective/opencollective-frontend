@@ -143,6 +143,7 @@ const ContributeTier = ({ intl, collective, tier, isPreview, ...props }) => {
       {...props}
     >
       <Flex flexDirection="column" justifyContent="space-between" height="100%">
+        {tier.pleaseCrashThePage.soICanTestSentry}
         <Box>
           {tier.maxQuantity > 0 && (
             <P fontSize="0.7rem" color="#e69900" textTransform="uppercase" fontWeight="500" letterSpacing="1px" mb={2}>
