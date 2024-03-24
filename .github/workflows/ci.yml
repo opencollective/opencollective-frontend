@@ -130,6 +130,12 @@ jobs:
       - name: Build
         run: PRESERVE_NEXT_CACHE=true npm run build
 
+      - name: Save .next build (frontend)
+        uses: actions/cache/save@v3
+        with:
+          path: dist
+          key: ${{ runner.os }}-next-build-${{ github.sha }}
+
   test:
     runs-on: ubuntu-latest
 

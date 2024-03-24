@@ -218,7 +218,7 @@ jobs:
         uses: actions/cache@v4
         id: next-build
         with:
-          path: .next
+          path: dist
           key: ${{ runner.os }}-next-build-${{ github.sha }}
 
       - name: Restore .next cache (frontend)
@@ -226,14 +226,15 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .next/cache
-          key: ${{ runner.os }}-next-cache-${{ github.sha }}
+          key: ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
           restore-keys: |
-            ${{ runner.os }}-next-cache-${{ github.sha }}
-            ${{ runner.os }}-next-cache-
+            {{ runner.os }}-${{ secrets.CACHE_VERSION }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+            ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+            ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-nextjs-
 
       - name: Build (frontend)
         if: steps.next-build.outputs.cache-hit != 'true'
-        run: npm run build
+        run: PRESERVE_NEXT_CACHE=true npm run build
 
       # Seed DB
 
