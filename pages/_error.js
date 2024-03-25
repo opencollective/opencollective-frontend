@@ -15,7 +15,7 @@ class NextJSErrorPage extends React.Component {
     const { res, err, req } = context;
 
     // In case this is running in a serverless function, await this in order to give Sentry
-    // time to send the error before the lambda exits
+    // time to send the error before the lambda exit
     Sentry.captureUnderscoreErrorException(context);
 
     const statusCode = res ? res.statusCode : err ? err.statusCode : null;
