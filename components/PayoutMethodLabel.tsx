@@ -1,9 +1,12 @@
 import React from 'react';
+import { truncate } from 'lodash';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
 import { PayoutMethod, PayoutMethodType } from '../lib/graphql/types/v2/graphql';
 
 import { PayoutMethodIcon } from './PayoutMethodIcon';
+
+const MAX_PAYOUT_OPTION_DATA_LENGTH = 20;
 
 export const I18nPayoutMethodLabels = defineMessages({
   [PayoutMethodType.ACCOUNT_BALANCE]: {
@@ -60,7 +63,7 @@ export function PayoutMethodLabel(props: PayoutMethodLabelProps) {
         break;
       }
       case PayoutMethodType.OTHER: {
-        const content = pm.data?.content?.replace(/\n|\t/g, ' ');
+        const content = truncate(pm.data?.content, { length: MAX_PAYOUT_OPTION_DATA_LENGTH }).replace(/\n|\t/g, ' ');
         if (content) {
           label = (
             <span>
@@ -89,14 +92,3 @@ export function PayoutMethodLabel(props: PayoutMethodLabelProps) {
 
   return label;
 }
-
-// if (!payoutMethod) {
-//   return this.props.intl.formatMessage(payoutMethodLabels.none);
-// } else if (payoutMethod.id) {
-//   } else if (payoutMethod.type === PayoutMethodType.OTHER) {
-//     const content = payoutMethod.data?.content?.replace(/\n|\t/g, ' ');
-//     const i18nType = i18nPayoutMethodType(this.props.intl, payoutMethod.type);
-//     return content ? `${i18nType} - ${truncate(content, { length: MAX_PAYOUT_OPTION_DATA_LENGTH })}` : i18nType;
-//   } else {
-//     return i18nPayoutMethodType(this.props.intl, payoutMethod.type);
-//   }
