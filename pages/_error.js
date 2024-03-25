@@ -7,7 +7,7 @@ import { generateNotFoundError } from '../lib/errors';
 import ErrorPage from '../components/ErrorPage';
 
 /**
- * This page is shown when NextJS triggers a critical error during server-side
+ * This page is shown when NextJS triggers a critical error during server-sided
  * rendering, typically 404 errors.
  */
 class NextJSErrorPage extends React.Component {
