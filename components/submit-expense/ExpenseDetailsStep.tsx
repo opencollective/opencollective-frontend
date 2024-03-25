@@ -77,6 +77,11 @@ export function ExpenseDetailsForm(props: ExpenseDetailsFormProps) {
     [setFieldValue],
   );
 
+  const taxes = React.useMemo(
+    () => (props.form.values.tax ? [{ ...props.form.values.tax, type: props.form.options.taxType }] : []),
+    [props.form.values.tax, props.form.options.taxType],
+  );
+
   return (
     <FormikProvider value={props.form}>
       <div className="pb-10 pr-3">
@@ -278,7 +283,7 @@ export function ExpenseDetailsForm(props: ExpenseDetailsFormProps) {
           <ExpenseAmountBreakdown
             currency={props.form.values.expenseCurrency}
             items={(props.form.values.expenseItems || []).map(ei => ({ ...ei, amountV2: ei.amount }))}
-            taxes={props.form.values.tax ? [{ ...props.form.values.tax, type: props.form.options.taxType }] : []}
+            taxes={taxes}
           />
         </div>
       </div>

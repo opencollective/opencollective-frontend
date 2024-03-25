@@ -43,6 +43,11 @@ export function ExpenseSummaryForm(props: ExpenseSummaryFormProps) {
   const invitePayee = props.form.values.invitePayee;
   const invitePayoutMethod = invitePayee && 'payoutMethod' in invitePayee ? invitePayee.payoutMethod : null;
 
+  const taxes = React.useMemo(
+    () => (props.form.values.tax ? [{ ...props.form.values.tax, type: props.form.options.taxType }] : []),
+    [props.form.values.tax, props.form.options.taxType],
+  );
+
   return (
     <div>
       <h1 className="mb-4 text-lg font-bold leading-[26px] text-dark-900">
@@ -123,7 +128,7 @@ export function ExpenseSummaryForm(props: ExpenseSummaryFormProps) {
           <ExpenseAmountBreakdown
             currency={props.form.values.expenseCurrency}
             items={(props.form.values.expenseItems || []).map(ei => ({ ...ei, amountV2: ei.amount }))}
-            taxes={props.form.values.tax ? [{ ...props.form.values.tax, type: props.form.options.taxType }] : []}
+            taxes={taxes}
           />
         </div>
 

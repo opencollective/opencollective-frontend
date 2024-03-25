@@ -132,7 +132,7 @@ export const validateExpenseFormPayeeInviteNewStep = values => {
   return errors;
 };
 
-const ExpenseFormPayeeInviteNewStep = ({ formik, collective, onBack, onNext, hidePayoutDetails = false }) => {
+const ExpenseFormPayeeInviteNewStep = ({ formik, collective = null, onBack, onNext, hidePayoutDetails = false }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
   const { values, touched, errors } = formik;
@@ -458,15 +458,15 @@ ExpenseFormPayeeInviteNewStep.propTypes = {
   onNext: PropTypes.func,
   hidePayoutDetails: PropTypes.bool,
   collective: PropTypes.shape({
-    slug: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
+    slug: PropTypes.string,
+    type: PropTypes.string,
     host: PropTypes.shape({
       transferwise: PropTypes.shape({
         availableCurrencies: PropTypes.arrayOf(PropTypes.object),
       }),
     }),
     settings: PropTypes.object,
-  }).isRequired,
+  }),
 };
 
 export default ExpenseFormPayeeInviteNewStep;
