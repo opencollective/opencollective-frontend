@@ -3502,6 +3502,7 @@
   "WM71Ho": "发现集体并提供支持",
   "wNU66x": "Total expense payouts {currentYear}: {totalPaidExpenses}",
   "wQEy7N": "请使用个人令牌代替已废弃的应用程序",
+  "WR7z/n": "Including {eventsCount, plural, zero {} one {one event} other {# events}}{both, select, true { and } other {}}{projectsCount, plural, zero {} one {one project} other {# projects}}",
   "WRKLHX": "Copy refund transaction ID",
   "WS520d": "Expense period",
   "WSOB2K": "Code descending",
