@@ -206,7 +206,7 @@ const ExportTransactionsCSVModal = ({
     () =>
       updateSettingsData?.editAccountSetting?.settings?.exportedTransactionsFieldSets ||
       account?.settings?.exportedTransactionsFieldSets ||
-      [],
+      {},
     [updateSettingsData, account],
   );
 
@@ -356,7 +356,7 @@ const ExportTransactionsCSVModal = ({
       variables: {
         account: { slug: account?.slug },
         key: `exportedTransactionsFieldSets`,
-        value: omit(account?.settings.exportedTransactionsFieldSets, [key]),
+        value: omit(customFields, [key]),
       },
     });
     setIsEditingPreset(false);
