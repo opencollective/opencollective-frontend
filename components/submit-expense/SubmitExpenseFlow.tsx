@@ -59,7 +59,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
 
   React.useEffect(() => {
     router.replace(`${router.asPath.split('?')[0]}`, undefined, { shallow: true });
-  }, [startOptions]);
+  }, []);
 
   const formRef = React.useRef<HTMLFormElement>();
   const [submittedExpenseId, setSubmittedExpenseId] = React.useState(null);
@@ -291,7 +291,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
           {submittedExpenseId ? (
             <SubmittedExpense expenseId={submittedExpenseId} />
           ) : (
-            <div className="flex w-full flex-col pb-4 sm:flex sm:w-[768px] sm:flex-row sm:gap-8 sm:pb-0">
+            <div className="flex h-max w-full flex-col pb-4 sm:flex sm:w-[768px] sm:flex-row sm:gap-8 sm:pb-0">
               <SubmitExpenseFlowSteps
                 onStepClick={newStepName => setCurrentStep(newStepName)}
                 expenseForm={expenseForm}
@@ -336,7 +336,7 @@ function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
   const currentStep = Steps[props.currentStep];
   return (
     <React.Fragment>
-      <div className="sticky top-0 z-50 w-full bg-white drop-shadow-lg sm:top-10 sm:w-[165px] sm:min-w-[165px] sm:drop-shadow-none">
+      <div className="sticky top-0 z-50 w-full self-start bg-white drop-shadow-lg sm:top-10 sm:w-[165px] sm:min-w-[165px] sm:drop-shadow-none">
         <div
           className={clsx('flex items-center gap-2 px-4 py-2 text-sm sm:hidden', {
             'border-b border-slate-200 ': collapsed,
