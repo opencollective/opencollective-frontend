@@ -1,14 +1,21 @@
 import React from 'react';
 import clsx from 'clsx';
+import dayjs from 'dayjs';
 import { FormikProvider } from 'formik';
 import { get } from 'lodash';
 import { PlusIcon } from 'lucide-react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
+import {
+  Currency,
+  CurrencyExchangeRateInput,
+  CurrencyExchangeRateSourceType,
+} from '../../lib/graphql/types/v2/graphql';
 import { isValidUrl } from '../../lib/utils';
 import { attachmentDropzoneParams } from '../expenses/lib/attachments';
-import { FX_RATE_ERROR_THRESHOLD } from '../expenses/lib/utils';
+import { FX_RATE_ERROR_THRESHOLD, getExpenseExchangeRateWarningOrError } from '../expenses/lib/utils';
 
+import { ExchangeRate } from '../ExchangeRate';
 import StyledDropzone from '../StyledDropzone';
 import StyledInput from '../StyledInput';
 import StyledInputAmount from '../StyledInputAmount';
@@ -46,7 +53,7 @@ export function ExpenseItemsForm(props: ExpenseItemsFormProps) {
               ...(props.form.values.expenseItems ?? []),
               {
                 description: '',
-                date: new Date(),
+                incurredAt: new Date(),
                 amount: {
                   valueInCents: 0,
                   currency: props.form.values.expenseCurrency,
@@ -96,6 +103,37 @@ type ExpenseItemFormProps = {
 };
 
 function ExpenseItemForm(props: ExpenseItemFormProps) {
+  const intl = useIntl();
+
+  const expenseItem = get(props.form.values, props.fieldName);
+
+  const { setFieldValue, setFieldTouched } = props.form;
+  const onCurrencyChange = React.useCallback(
+    currency => {
+      setFieldValue(`${props.fieldName}.amount.currency`, currency);
+      setFieldTouched(`${props.fieldName}.amount.currency`, true);
+    },
+    [props.fieldName, setFieldValue, setFieldTouched],
+  );
+
+  const onAmountBlur = React.useCallback(() => {
+    setFieldTouched(`${props.fieldName}.amount.currency`, true);
+    setFieldTouched(`${props.fieldName}.amount.valueInCents`, true);
+    setFieldTouched(`${props.fieldName}.url`, true);
+  }, [props.fieldName, setFieldTouched]);
+
+  const onAmountExchangeRateChange = React.useCallback(
+    exchangeRate => {
+      setFieldValue(`${props.fieldName}.amount.exchangeRate`, exchangeRate);
+    },
+    [setFieldValue, props.fieldName],
+  );
+
+  const onAmountChange = React.useCallback(
+    e => setFieldValue(`${props.fieldName}.amount.valueInCents`, e),
+    [setFieldValue, props.fieldName],
+  );
+
   return (
     <FormikProvider value={props.form}>
       <div className="flex gap-4">
@@ -162,14 +200,26 @@ function ExpenseItemForm(props: ExpenseItemFormProps) {
           <div className="flex gap-4">
             <StyledInputFormikField
               flexGrow={1}
-              name={`${props.fieldName}.date`}
+              name={`${props.fieldName}.incurredAt`}
               labelFontWeight="bold"
               labelColor="slate.800"
               labelFontSize="16px"
               labelProps={{ my: 2, letterSpacing: 0 }}
               label={<FormattedMessage id="expense.incurredAt" defaultMessage="Date" />}
             >
-              {({ field }) => <StyledInput {...field} type="date" className="w-full" />}
+              {({ field }) => (
+                <StyledInput
+                  {...field}
+                  onChange={e => {
+                    props.form.setFieldTouched(field.name);
+                    props.form.setFieldValue(field.name, dayjs(e.target.value).utc().toDate());
+                    e.target.value;
+                  }}
+                  value={field.value ? dayjs.utc(field.value).toDate().toISOString().substring(0, 10) : null}
+                  type="date"
+                  className="w-full"
+                />
+              )}
             </StyledInputFormikField>
 
             <StyledInputFormikField
@@ -186,23 +236,14 @@ function ExpenseItemForm(props: ExpenseItemFormProps) {
                   {...field}
                   error={field.error || props.form.getFieldMeta(`${props.fieldName}.amount.currency`).error}
                   hasCurrencyPicker={props.form.options.allowExpenseItemCurrencyChange}
-                  onCurrencyChange={currency => {
-                    props.form.setFieldValue(`${props.fieldName}.amount.currency`, currency);
-                    props.form.setFieldTouched(`${props.fieldName}.amount.currency`, true);
-                  }}
+                  onCurrencyChange={onCurrencyChange}
                   value={field.value}
-                  defaultValue={field.value}
                   currency={get(props.form.values, `${props.fieldName}.amount.currency`, null)}
                   currencyDisplay="CODE"
                   maxWidth="100%"
                   placeholder="0.00"
-                  onBlur={() => {
-                    props.form.setFieldTouched(`${props.fieldName}.amount.currency`, true);
-                    props.form.setFieldTouched(`${props.fieldName}.amount.valueInCents`, true);
-                    props.form.setFieldTouched(`${props.fieldName}.url`, true);
-                  }}
-                  onChange={e => props.form.setFieldValue(`${props.fieldName}.amount.valueInCents`, e)}
-                  // loadingExchangeRate={loadingExchangeRate}
+                  onBlur={onAmountBlur}
+                  onChange={onAmountChange}
                   exchangeRate={get(props.form.values, `${props.fieldName}.amount.exchangeRate`, 0)}
                   minFxRate={
                     get(props.form.values, `${props.fieldName}.amount.referenceExchangeRate.value`, 0) *
@@ -213,32 +254,36 @@ function ExpenseItemForm(props: ExpenseItemFormProps) {
                       (1 + FX_RATE_ERROR_THRESHOLD) || undefined
                   }
                   showErrorIfEmpty={false} // Validation is already done in `ExpenseForm`
-                  onExchangeRateChange={exchangeRate => {
-                    props.form.setFieldValue(`${props.fieldName}.amount.exchangeRate`, exchangeRate);
-                  }}
+                  onExchangeRateChange={onAmountExchangeRateChange}
                 />
               )}
             </StyledInputFormikField>
           </div>
-          {/* <div>
-            {Boolean(itemCurrency && expenseCurrency !== itemCurrency) && (
+          <div className="self-end">
+            {Boolean(
+              expenseItem.amount?.currency && props.form.values.expenseCurrency !== expenseItem.amount?.currency,
+            ) && (
               <ExchangeRate
                 data-cy={`${props.fieldName}.amount.exchangeRate`}
                 className="mt-2 text-neutral-600"
-                // {...getExpenseExchangeRateWarningOrError(intl, exchangeRate, referenceExchangeRate)}
-                // exchangeRate={
-                // exchangeRate || {
-                // source: 'USER',
-                // fromCurrency: itemCurrency,
-                // toCurrency: expenseCurrency,
-                // }
-                // }
+                {...getExpenseExchangeRateWarningOrError(
+                  intl,
+                  expenseItem.amount.exchangeRate,
+                  expenseItem.amount.referenceExchangeRate,
+                )}
+                exchangeRate={
+                  (expenseItem.amount.exchangeRate || {
+                    source: CurrencyExchangeRateSourceType.USER,
+                    fromCurrency: expenseItem.amount.currency as Currency,
+                    toCurrency: props.form.values.expenseCurrency as Currency,
+                  }) as CurrencyExchangeRateInput
+                }
                 approximateCustomMessage={intl.formatMessage({
                   defaultMessage: 'This value is an estimate. Please set the exact amount received if known.',
                 })}
               />
             )}
-          </div> */}
+          </div>
         </div>
       </div>
     </FormikProvider>

@@ -67,7 +67,7 @@ type AccountHoverCardProps = {
     };
     approvedAt?: AccountWithHost['approvedAt'];
     hostAgreements?: {
-      totalCount: AccountWithHost['hostAgreements']['totalCount'];
+      totalCount?: AccountWithHost['hostAgreements']['totalCount'];
     };
     stats?: {
       balanceWithBlockedFunds?: Account['stats']['balanceWithBlockedFunds'];
@@ -271,10 +271,10 @@ export const AccountHoverCard = ({
   const hoverTimeoutRef = React.useRef(null);
   const [hasBeenHovered, setHasBeenHovered] = React.useState(false);
 
-  /*  
+  /*
       Query to fetch an individual accounts's contextual admin memberships
       It is triggered after the hover card trigger has been hovered for 100ms (or the hovercard has been opened, after a default delay of 700ms)
-      This aims to prevent unnecessary queries when the hover card is not intended to be opened, while still trying to fetch the data before the hover card is actually opened 
+      This aims to prevent unnecessary queries when the hover card is not intended to be opened, while still trying to fetch the data before the hover card is actually opened
   */
   const { data, loading } = useQuery(userContextualMembershipsQuery, {
     variables: {

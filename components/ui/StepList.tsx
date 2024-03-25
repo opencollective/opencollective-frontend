@@ -13,29 +13,66 @@ export function StepList(props: StepListProps) {
 type StepListItemProps = {
   completed?: boolean;
   current?: boolean;
+  disabled?: boolean;
   title: string | React.ReactNode;
   subtitle?: string | React.ReactNode;
   className?: string;
+  onClick?: () => void;
 };
 
 export function StepListItem(props: StepListItemProps) {
+  const { onClick, disabled } = props;
+  const onItemClick = React.useCallback(
+    (e?: React.MouseEvent) => {
+      if (disabled) {
+        e?.preventDefault?.();
+        return;
+      }
+      onClick?.();
+    },
+    [onClick, disabled],
+  );
+  const onKeyDown = React.useCallback(
+    (e: React.KeyboardEvent) => {
+      if (disabled) {
+        e.preventDefault();
+        return;
+      }
+
+      if (e.code === 'Enter' || e.code === 'Space') {
+        onClick?.();
+      }
+    },
+    [onClick, disabled],
+  );
+
   return (
-    <li className={clsx('mb-6 flex cursor-default items-start gap-3 last:mb-0', props.className)}>
-      <span>
-        <StepListItemIcon {...props} />
-      </span>
-      <div className="flex flex-col overflow-hidden">
-        <span
-          className={clsx('flex-wrap overflow-hidden text-ellipsis text-sm font-medium leading-5', {
-            'text-oc-blue-tints-800': props.current,
-            'text-slate-700': !props.current,
-          })}
-        >
-          {props.title}
+    <li className="mb-6 last:mb-0">
+      <div
+        tabIndex={0}
+        role="button"
+        onClick={onItemClick}
+        onKeyDown={onKeyDown}
+        className={clsx('flex cursor-default items-start gap-3', props.className, {
+          'cursor-pointer': !props.disabled,
+        })}
+      >
+        <span>
+          <StepListItemIcon {...props} />
         </span>
-        <span className="flex-wrap overflow-hidden text-ellipsis text-sm font-normal leading-[18px] text-oc-blue-tints-800">
-          {props.subtitle}
-        </span>
+        <div className="flex flex-col overflow-hidden">
+          <span
+            className={clsx('flex-wrap overflow-hidden text-ellipsis text-sm font-medium leading-5', {
+              'text-oc-blue-tints-800': props.current,
+              'text-slate-700': !props.current,
+            })}
+          >
+            {props.title}
+          </span>
+          <span className="flex-wrap overflow-hidden text-ellipsis text-sm font-normal leading-[18px] text-oc-blue-tints-800">
+            {props.subtitle}
+          </span>
+        </div>
       </div>
     </li>
   );

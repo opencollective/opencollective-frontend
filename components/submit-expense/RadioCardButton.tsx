@@ -12,8 +12,19 @@ type RadioCardButtonProps = {
 
 export function RadioCardButton(props: RadioCardButtonProps) {
   return (
-    <button
+    <div
+      role="button"
+      tabIndex={0}
       onClick={!props.disabled ? props.onClick : undefined}
+      onKeyDown={e => {
+        if (props.disabled) {
+          return;
+        }
+
+        if (e.code === 'Enter' || e.code === 'Space') {
+          props.onClick();
+        }
+      }}
       className={clsx(props.className, 'group rounded-md border  p-4 text-start', {
         'cursor-pointer hover:border-oc-blue-tints-500': !props.disabled,
         'border-oc-blue-tints-500': props.checked,
@@ -32,6 +43,6 @@ export function RadioCardButton(props: RadioCardButtonProps) {
         <div className="flex-grow">{props.title}</div>
       </div>
       {props.content && <div>{props.content}</div>}
-    </button>
+    </div>
   );
 }
