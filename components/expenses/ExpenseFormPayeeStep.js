@@ -253,7 +253,8 @@ const ExpenseFormPayeeStep = ({
   const { values, errors } = formik;
   const { data, loading } = useQuery(hostVendorsQuery, {
     context: API_V2_CONTEXT,
-    variables: { hostId: collective.host.id, collectiveSlug: collective.slug },
+    variables: { hostId: collective.host?.id, collectiveSlug: collective.slug },
+    skip: !collective.host?.id,
   });
   const isMissing2FA = require2FAForAdmins(values.payee) && !loggedInAccount?.hasTwoFactorAuth;
   const stepOneCompleted = checkStepOneCompleted(values, isOnBehalf, isMissing2FA);
