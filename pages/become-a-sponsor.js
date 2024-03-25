@@ -11,7 +11,7 @@ import Page from '../components/Page';
 const messages = defineMessages({
   defaultTitle: {
     id: 'OC.tagline',
-    defaultMessage: 'Make your community sustainable. Collect and spend money transparently.',
+    defaultMessage: 'Make your community sustainable now. Collect and spend money transparently.',
   },
 });
 
