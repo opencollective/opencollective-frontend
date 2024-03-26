@@ -62,8 +62,8 @@ export default class IntlDocument extends Document {
       domain: process.env.CLIENT_ANALYTICS_DOMAIN,
       scriptSrc:
         'development' === process.env.OC_ENV
-          ? 'https://plausible.io/js/script.tagged-events.exclusions.local.js'
-          : 'https://plausible.io/js/script.tagged-events.exclusions.js',
+          ? 'https://plausible.io/js/script.manual.tagged-events.exclusions.local.js'
+          : 'https://plausible.io/js/script.manual.tagged-events.exclusions.js',
       exclusions: process.env.CLIENT_ANALYTICS_EXCLUSIONS,
     };
 
