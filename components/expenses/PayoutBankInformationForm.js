@@ -529,7 +529,7 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
     // Only validate minimum amount if the form has items
     if (formik?.values?.items?.length > 0) {
       const invoiceTotalAmount = formik.values.items.reduce(
-        (amount, attachment) => amount + (attachment.amount || 0),
+        (amount, attachment) => amount + (attachment.amountV2?.valueInCents || attachment.amount || 0),
         0,
       );
       const minAmountForSelectedCurrency =
