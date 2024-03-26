@@ -102,8 +102,18 @@ const PrivateNoteLabel = () => {
 const PAGE_STATUS = { VIEW: 1, EDIT: 2, EDIT_SUMMARY: 3 };
 
 function Expense(props) {
-  const { data, loading, error, refetch, fetchMore, draftKey, client, isRefetchingDataForUser, legacyExpenseId } =
-    props;
+  const {
+    data,
+    loading,
+    error,
+    refetch,
+    fetchMore,
+    draftKey,
+    client,
+    isRefetchingDataForUser,
+    legacyExpenseId,
+    isDrawer,
+  } = props;
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const router = useRouter();
@@ -691,7 +701,7 @@ function Expense(props) {
 
       {state.showFilesViewerModal && (
         <FilesViewerModal
-          allowOutsideInteraction
+          allowOutsideInteraction={isDrawer}
           files={files}
           parentTitle={intl.formatMessage(
             {
@@ -723,6 +733,7 @@ Expense.propTypes = {
   stopPolling: PropTypes.func,
   isRefetchingDataForUser: PropTypes.bool,
   drawerActionsContainer: PropTypes.object,
+  isDrawer: PropTypes.bool,
 };
 
 export default Expense;
