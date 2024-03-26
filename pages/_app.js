@@ -8,6 +8,7 @@ import NProgress from 'nprogress';
 import { ThemeProvider } from 'styled-components';
 
 import '../lib/dayjs'; // Import first to make sure plugins are initialized
+import '../lib/analytics/plausible';
 import { getIntlProps } from '../lib/i18n/request';
 import theme from '../lib/theme';
 import defaultColors from '../lib/theme/colors';
