@@ -261,7 +261,6 @@ export default function AccountSwitcher({ activeSlug, defaultSlug, setDefaultSlu
   const router = useRouter();
   const { viewport } = useWindowResize();
   const isMobile = [VIEWPORTS.XSMALL, VIEWPORTS.SMALL].includes(viewport);
-
   const loggedInUserCollective = LoggedInUser?.collective;
   const { groupedAccounts, archivedAccounts } = getGroupedAdministratedAccounts(LoggedInUser);
   const rootAccounts = flatten(Object.values({ ...groupedAccounts, archived: archivedAccounts }));
@@ -321,7 +320,7 @@ export default function AccountSwitcher({ activeSlug, defaultSlug, setDefaultSlu
       }}
     >
       <PopoverAnchor asChild>
-        <div className="flex items-center gap-2.5">
+        <div className="flex w-full items-center gap-2.5">
           {parentAccount && (
             <div className="hidden items-center gap-2.5 md:flex">
               <Button

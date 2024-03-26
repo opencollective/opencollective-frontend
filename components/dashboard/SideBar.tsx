@@ -9,8 +9,10 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import { DrawerMenu } from '../navigation/DrawerMenu';
 import StyledRoundButton from '../StyledRoundButton';
 
-import AccountSwitcher from './AccountSwitcher';
+import AccountSwitcher from './preview/AccountSwitcher';
 import Menu, { MenuItem } from './Menu';
+import { DashboardContext } from './DashboardContext';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
 interface AdminPanelSideBarProps {
   isLoading?: boolean;
@@ -20,7 +22,7 @@ interface AdminPanelSideBarProps {
 }
 
 const AdminPanelSideBar = ({
-  activeSlug,
+  // activeSlug,
   menuItems,
   isLoading,
   onRoute: _onRoute,
@@ -30,7 +32,8 @@ const AdminPanelSideBar = ({
   const [isMenuOpen, setMenuOpen] = React.useState(false);
   const { viewport } = useWindowResize();
   const isMobile = [VIEWPORTS.XSMALL, VIEWPORTS.SMALL].includes(viewport);
-
+  const { activeSlug, defaultSlug, setDefaultSlug } = React.useContext(DashboardContext);
+  const { LoggedInUser } = useLoggedInUser();
   const onRoute = isMobile
     ? (...args) => {
         setMenuOpen(false);
@@ -66,7 +69,9 @@ const AdminPanelSideBar = ({
     >
       <div className="sticky top-8">
         <div className="flex flex-row-reverse gap-4 sm:flex-auto md:flex-col">
-          <AccountSwitcher activeSlug={activeSlug} />
+          {LoggedInUser && (
+            <AccountSwitcher activeSlug={activeSlug} defaultSlug={defaultSlug} setDefaultSlug={setDefaultSlug} />
+          )}
           {isMobile && (
             <React.Fragment>
               <StyledRoundButton size={50} onClick={() => setMenuOpen(true)} data-cy="mobile-menu-trigger">
