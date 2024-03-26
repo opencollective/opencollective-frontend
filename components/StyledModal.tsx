@@ -85,7 +85,7 @@ const Divider = styled.div<DividerProps>`
     `}
 `;
 
-export const CloseIcon = styled(X)`
+const CloseIcon = styled(X)`
   height: 20px;
   width: 20px;
   color: #76777a;
