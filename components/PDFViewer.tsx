@@ -5,6 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import { Document, Page, pdfjs } from 'react-pdf';
 import styled from 'styled-components';
 
+import { getI18nLink } from './I18nFormatters';
 import Loading from './Loading';
 import { Span } from './Text';
 
@@ -21,7 +22,7 @@ const options = {
   cMapPacked: true,
 };
 
-const PDFViewer = ({ pdfUrl, contentWrapperRef }) => {
+const PDFViewer = ({ pdfUrl, contentWrapperRef, errorTextColor = 'white.full', ...props }) => {
   const [numPages, setNumPages] = useState(null);
   const [wrapperWidth, setWrapperWidth] = useState(0);
   const [pageWidth, setPageWidth] = useState(0);
@@ -52,15 +53,22 @@ const PDFViewer = ({ pdfUrl, contentWrapperRef }) => {
       <Document
         file={pdfUrl}
         loading={<Loading />}
-        onLoadSuccess={({ numPages }) => {
-          setNumPages(numPages);
-        }}
         options={options}
         error={
-          <Span color="white.full" fontSize={'16px'}>
-            <FormattedMessage defaultMessage="Failed to load PDF file." id="PDFViewer.error" />
+          <Span color={errorTextColor} fontSize={'16px'}>
+            <FormattedMessage defaultMessage="Failed to load PDF file." id="PDFViewer.error" />{' '}
+            <FormattedMessage
+              defaultMessage="<Link>Click here</Link> to open the file in a new tab."
+              id="PDFViewer.errorLink"
+              values={{ Link: getI18nLink({ href: pdfUrl, openInNewTab: true }) }}
+            />
           </Span>
         }
+        {...props}
+        onLoadSuccess={pdfDetails => {
+          setNumPages(pdfDetails.numPages);
+          props.onLoadSuccess?.(pdfDetails);
+        }}
       >
         {Array.from(new Array(numPages), (el, index) => (
           <Page

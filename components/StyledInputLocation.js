@@ -30,12 +30,12 @@ const StyledInputLocation = ({
   errors,
   prefix,
   required,
+  disableCountryChange,
 }) => {
   const [useFallback, setUseFallback] = React.useState(false);
   const intl = useIntl();
   const forceLegacyFormat = Boolean(!location?.structured && location?.address);
   const hasCountry = Boolean(location?.country);
-
   return (
     <div>
       <StyledInputField
@@ -51,6 +51,7 @@ const StyledInputLocation = ({
           <InputTypeCountry
             {...inputProps}
             inputId={id}
+            disabled={disableCountryChange}
             value={location?.country}
             autoDetect={autoDetectCountry}
             onChange={country => {
@@ -108,6 +109,7 @@ StyledInputLocation.propTypes = {
   prefix: PropTypes.string,
   onChange: PropTypes.func,
   autoDetectCountry: PropTypes.bool,
+  disableCountryChange: PropTypes.bool,
   required: PropTypes.bool,
   labelFontWeight: PropTypes.any,
   labelFontSize: PropTypes.any,

@@ -245,6 +245,9 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           if: !isAccountantOnly,
         },
         {
+          section: ALL_SECTIONS.TAX_INFORMATION,
+        },
+        {
           section: ALL_SECTIONS.COLLECTIVE_PAGE,
           if: !isAccountantOnly,
         },

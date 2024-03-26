@@ -63,6 +63,7 @@ module.exports = {
       },
       fontFamily: {
         sans: ['var(--font-sans)', ...fontFamily.sans],
+        signature: ['JustMeAgainDownHere', 'cursive'],
         emoji: [
           'AppleColorEmoji',
           'Segoe UI Emoji',

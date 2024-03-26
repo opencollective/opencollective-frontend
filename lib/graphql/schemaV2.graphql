@@ -2409,6 +2409,16 @@ type Host implements Account & AccountWithContributions {
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -5466,6 +5476,79 @@ enum ActivityClassType {
 }
 
 """
+A legal document (e.g. W9, W8BEN, W8BEN-E)
+"""
+type LegalDocument {
+  """
+  Unique identifier for this legal document
+  """
+  id: String!
+
+  """
+  The year this legal document is for
+  """
+  year: Int!
+
+  """
+  The type of legal document
+  """
+  type: LegalDocumentType!
+
+  """
+  The status of the request for this legal document
+  """
+  status: LegalDocumentRequestStatus!
+
+  """
+  The service that provided this legal document
+  """
+  service: LegalDocumentService!
+
+  """
+  The date and time the request for this legal document was created
+  """
+  requestedAt: DateTime!
+
+  """
+  The date and time this legal document was last updated
+  """
+  updatedAt: DateTime!
+
+  """
+  The account this legal document is for
+  """
+  account: Account!
+}
+
+"""
+Type for a required legal document
+"""
+enum LegalDocumentType {
+  """
+  US tax form (W9, W8BEN, W8BEN-E)
+  """
+  US_TAX_FORM
+}
+
+"""
+Status for a legal document
+"""
+enum LegalDocumentRequestStatus {
+  NOT_REQUESTED
+  REQUESTED
+  RECEIVED
+  ERROR
+}
+
+"""
+Type for a required legal document
+"""
+enum LegalDocumentService {
+  DROPBOX_FORMS
+  OPENCOLLECTIVE
+}
+
+"""
 A collection of webhooks
 """
 type WebhookCollection implements Collection {
@@ -6244,16 +6327,6 @@ type ExpensePermissions {
   verifyDraftExpense: Permission!
   hold: Permission!
   release: Permission!
-}
-
-"""
-Type for a required legal document
-"""
-enum LegalDocumentType {
-  """
-  US tax form (W9)
-  """
-  US_TAX_FORM
 }
 
 """
@@ -7233,6 +7306,16 @@ type Bot implements Account {
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -7933,6 +8016,16 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -9074,6 +9167,16 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -10002,6 +10105,16 @@ type Individual implements Account {
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -10908,6 +11021,16 @@ type Organization implements Account & AccountWithContributions {
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -11710,6 +11833,16 @@ type Vendor implements Account & AccountWithContributions {
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -14915,6 +15048,16 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -15723,6 +15866,16 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -16643,6 +16796,26 @@ type Mutation {
     """
     currentPassword: String
   ): SetPasswordResponse!
+
+  """
+  Submit a legal document
+  """
+  submitLegalDocument(
+    """
+    The account the legal document is for
+    """
+    account: AccountReferenceInput!
+
+    """
+    The type of legal document
+    """
+    type: LegalDocumentType!
+
+    """
+    The form data for the legal document. Will be validated against the schema for the document type and encrypted.
+    """
+    formData: JSON!
+  ): LegalDocument!
 
   """
   Invite a new member to the Collective. Scope: "account".
