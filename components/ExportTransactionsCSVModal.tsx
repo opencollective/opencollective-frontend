@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 
 import {
   AVERAGE_TRANSACTIONS_PER_MINUTE,
-  DEFAULT_FIELDS,
+  DEFAULT_FIELDS_2023 as DEFAULT_FIELDS,
   FIELD_GROUPS_2024,
   FieldGroupLabels,
   FieldLabels,

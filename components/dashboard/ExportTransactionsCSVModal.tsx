@@ -11,7 +11,6 @@ import slugify from 'slugify';
 import {
   AVERAGE_TRANSACTIONS_PER_MINUTE,
   CSVField,
-  DEFAULT_FIELDS,
   FIELD_OPTIONS,
   FieldLabels,
   FieldOptionsLabels,
@@ -19,6 +18,7 @@ import {
   GROUP_FIELDS,
   GROUPS,
   HOST_OMITTED_FIELDS,
+  PLATFORM_PRESETS,
 } from '../../lib/csv';
 import { getEnvVar } from '../../lib/env-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
@@ -190,7 +190,7 @@ const ExportTransactionsCSVModal = ({
 }: ExportTransactionsCSVModalProps) => {
   const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');
   const [preset, setPreset] = React.useState<FIELD_OPTIONS | string>(FIELD_OPTIONS.DEFAULT);
-  const [fields, setFields] = React.useState(DEFAULT_FIELDS);
+  const [fields, setFields] = React.useState([]);
   const [draggingTag, setDraggingTag] = React.useState<string | null>(null);
   const [flattenTaxesAndPaymentProcessorFees, setFlattenTaxesAndPaymentProcessorFees] = React.useState(false);
   const [tab, setTab] = React.useState(Object.keys(GROUPS)[0]);
@@ -250,17 +250,15 @@ const ExportTransactionsCSVModal = ({
   }, [customFields]);
 
   React.useEffect(() => {
-    const selectedSet = presetOptions.find(option => option.value === preset);
+    const selectedSet = PLATFORM_PRESETS[preset] || presetOptions.find(option => option.value === preset);
     if (selectedSet && selectedSet.fields) {
       setFields(selectedSet.fields);
-      setPresetName(selectedSet.label);
+      if (!isNil(selectedSet.label)) {
+        setPresetName(selectedSet.label);
+      }
       if (!isNil(selectedSet.flattenTaxesAndPaymentProcessorFees)) {
         setFlattenTaxesAndPaymentProcessorFees(selectedSet.flattenTaxesAndPaymentProcessorFees);
       }
-    } else if (preset === FIELD_OPTIONS.DEFAULT) {
-      setFields(DEFAULT_FIELDS);
-      setIsEditingPreset(false);
-      setFlattenTaxesAndPaymentProcessorFees(false);
     } else {
       setIsEditingPreset(false);
       setPresetName('');

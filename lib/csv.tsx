@@ -142,38 +142,6 @@ export const FieldGroupLabels: Record<keyof typeof FIELD_GROUPS, React.ReactNode
   legacy: <FormattedMessage id="Legacy/Deprecated" defaultMessage="Legacy/Deprecated" />,
 };
 
-export const DEFAULT_FIELDS: Array<CSVField> = [
-  'datetime',
-  'shortId',
-  'shortGroup',
-  'description',
-  'type',
-  'kind',
-  'isRefund',
-  'isRefunded',
-  'shortRefundId',
-  'displayAmount',
-  'amount',
-  'paymentProcessorFee',
-  'netAmount',
-  'balance',
-  'currency',
-  'accountSlug',
-  'accountName',
-  'oppositeAccountSlug',
-  'oppositeAccountName',
-  // Payment Method (for orders)
-  'paymentMethodService',
-  'paymentMethodType',
-  // Type and Payout Method (for expenses)
-  'expenseType',
-  'expenseTags',
-  'payoutMethodType',
-  // Extra fields
-  'merchantId',
-  'orderMemo',
-];
-
 export const FieldLabels: Partial<Record<CSVField, React.ReactNode>> = {
   accountingCategoryCode: <FormattedMessage defaultMessage="Accounting Category Code" />,
   accountingCategoryName: <FormattedMessage defaultMessage="Accounting Category Name" />,
@@ -234,6 +202,7 @@ export const FieldLabels: Partial<Record<CSVField, React.ReactNode>> = {
 
 export enum FIELD_OPTIONS {
   DEFAULT = 'DEFAULT',
+  DEFAULT_2023 = 'DEFAULT_2023',
   NEW_PRESET = 'NEW_PRESET',
 }
 
@@ -243,8 +212,13 @@ export enum LEGACY_FIELD_OPTIONS {
 }
 
 export const FieldOptionsLabels = {
-  [FIELD_OPTIONS.DEFAULT]: <FormattedMessage defaultMessage="Default" />,
-  [FIELD_OPTIONS.NEW_PRESET]: <FormattedMessage defaultMessage="New Preset" />,
+  [FIELD_OPTIONS.DEFAULT]: <FormattedMessage defaultMessage="Platform Default" />,
+  [FIELD_OPTIONS.DEFAULT_2023]: <FormattedMessage defaultMessage="Platform Default (2023)" />,
+  [FIELD_OPTIONS.NEW_PRESET]: (
+    <span className="text-primary">
+      <FormattedMessage defaultMessage="New Preset" />
+    </span>
+  ),
   [LEGACY_FIELD_OPTIONS.CUSTOM]: <FormattedMessage defaultMessage="Custom" />,
 };
 
@@ -688,3 +662,67 @@ export const FIELDS: Array<{
 export const GROUP_FIELDS = Object.keys(GROUPS).reduce((dict, groupId) => {
   return { ...dict, [groupId]: FIELDS.filter(f => f.group === groupId).map(f => f.id) };
 }, {});
+
+export const DEFAULT_FIELDS_2023: Array<CSVField> = [
+  'datetime',
+  'shortId',
+  'shortGroup',
+  'description',
+  'type',
+  'kind',
+  'isRefund',
+  'isRefunded',
+  'shortRefundId',
+  'displayAmount',
+  'amount',
+  'paymentProcessorFee',
+  'netAmount',
+  'balance',
+  'currency',
+  'accountSlug',
+  'accountName',
+  'oppositeAccountSlug',
+  'oppositeAccountName',
+  // Payment Method (for orders)
+  'paymentMethodService',
+  'paymentMethodType',
+  // Type and Payout Method (for expenses)
+  'expenseType',
+  'expenseTags',
+  'payoutMethodType',
+  // Extra fields
+  'merchantId',
+  'orderMemo',
+];
+
+const DEFAULT_FIELDS: Array<CSVField> = [
+  'effectiveDate',
+  'legacyId',
+  'description',
+  'type',
+  'kind',
+  'group',
+  'amount',
+  'currency',
+  'isRefund',
+  'isRefunded',
+  'refundId',
+  'accountSlug',
+  'accountName',
+  'oppositeAccountSlug',
+  'oppositeAccountName',
+  'paymentMethodService',
+  'paymentMethodType',
+  'orderMemo',
+  'expenseType',
+  'expenseTags',
+  'payoutMethodType',
+  'accountingCategoryCode',
+  'accountingCategoryName',
+  'merchantId',
+];
+
+export const PLATFORM_PRESETS = {
+  DEFAULT: { fields: DEFAULT_FIELDS },
+  DEFAULT_2023: { fields: DEFAULT_FIELDS_2023 },
+};
