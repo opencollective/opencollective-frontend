@@ -3502,6 +3502,7 @@
   "WM71Ho": "Descubre Colectivos a Apoyar",
   "wNU66x": "Pago total de gastos {currentYear}: {totalPaidExpenses}",
   "wQEy7N": "Las aplicaciones han sido obsoletas a favor del token personal",
+  "WR7z/n": "Including {eventsCount, plural, zero {} one {one event} other {# events}}{both, select, true { and } other {}}{projectsCount, plural, zero {} one {one project} other {# projects}}",
   "WRKLHX": "Copiar ID de transacción de reembolso",
   "WS520d": "Periodo de gasto",
   "WSOB2K": "Código descendente",

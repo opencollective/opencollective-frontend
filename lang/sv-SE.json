@@ -3502,6 +3502,7 @@
   "WM71Ho": "Upptäck kollektiv att stödja",
   "wNU66x": "Total expense payouts {currentYear}: {totalPaidExpenses}",
   "wQEy7N": "Applications have been deprecated in favor of personal token",
+  "WR7z/n": "Including {eventsCount, plural, zero {} one {one event} other {# events}}{both, select, true { and } other {}}{projectsCount, plural, zero {} one {one project} other {# projects}}",
   "WRKLHX": "Copy refund transaction ID",
   "WS520d": "Expense period",
   "WSOB2K": "Code descending",

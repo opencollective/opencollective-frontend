@@ -3502,6 +3502,7 @@
   "WM71Ho": "Découvrez les Collectifs à soutenir",
   "wNU66x": "Total des dépenses payées {currentYear}: {totalPaidExpenses}",
   "wQEy7N": "Des applications ont été désapprouvées en faveur d'un jeton personnel",
+  "WR7z/n": "Including {eventsCount, plural, zero {} one {one event} other {# events}}{both, select, true { and } other {}}{projectsCount, plural, zero {} one {one project} other {# projects}}",
   "WRKLHX": "Copier l'ID de la transaction de remboursement",
   "WS520d": "Période de dépense",
   "WSOB2K": "Code décroissant",
