@@ -15,6 +15,7 @@ import LocationAddress from '../LocationAddress';
 import { PayoutMethodLabel } from '../PayoutMethodLabel';
 import UploadedFilePreview from '../UploadedFilePreview';
 
+import { InvitedPayeeLabel } from './InvitedPayeeLabel';
 import { PaymentMethodDetails } from './PickPaymentMethodStep';
 import { ExpenseForm, ExpenseItem } from './useExpenseForm';
 
@@ -155,7 +156,7 @@ export function ExpenseSummaryForm(props: ExpenseSummaryFormProps) {
         <div className="grid grid-flow-col grid-cols-1 grid-rows-3 gap-1 sm:grid-cols-3 sm:grid-rows-1">
           <div className="flex-1 rounded border border-slate-200 p-4">
             <div className="mb-3 text-xs font-medium uppercase text-slate-700">
-              <FormattedMessage id="Collective" defaultMessage="Collective" />
+              <FormattedMessage defaultMessage="Who is paying?" />
             </div>
             <span className="mb-3 flex items-center gap-2 text-sm font-medium leading-5 text-slate-800">
               <Avatar collective={account} radius={24} />
@@ -178,18 +179,16 @@ export function ExpenseSummaryForm(props: ExpenseSummaryFormProps) {
               <FormattedMessage id="Expense.PayTo" defaultMessage="Pay to" />
             </div>
             <div className="mb-3 flex items-center gap-2 text-sm font-medium leading-5 text-slate-800">
-              {invitePayee && 'legacyId' in invitePayee ? (
-                <span>{invitePayee.legacyId}</span>
-              ) : invitePayee && !('legacyId' in invitePayee) ? (
-                <span>{`${invitePayee.name} (${invitePayee.email})`}</span>
-              ) : (
+              {payee ? (
                 <React.Fragment>
                   <Avatar collective={payee} radius={24} />
                   {payee?.name}
                 </React.Fragment>
-              )}
+              ) : invitePayee ? (
+                <InvitedPayeeLabel invitePayee={invitePayee} />
+              ) : null}
             </div>
-            {payee && (
+            {payee?.location && (
               <React.Fragment>
                 <div>
                   <span className="mb-3 text-sm font-bold text-slate-700">

@@ -13,6 +13,7 @@ import { PayoutMethodLabel } from '../PayoutMethodLabel';
 import { ExpenseDetailsForm } from './ExpenseDetailsStep';
 import { ExpenseInfoForm } from './ExpenseInfoStep';
 import { ExpenseSummaryForm } from './ExpenseSummaryStep';
+import { InvitedPayeeLabel } from './InvitedPayeeLabel';
 import { PickCollectiveStepForm } from './PickCollectiveStep';
 import { PickExpenseTypeForm } from './PickExpenseTypeStep';
 import { PickPaymentMethodForm } from './PickPaymentMethodStep';
@@ -75,33 +76,33 @@ export const Steps: Record<ExpenseFlowStep, ExpenseStepDefinition> = {
   [ExpenseFlowStep.PAYMENT_METHOD]: {
     Title: () => <FormattedMessage defaultMessage="Who is getting paid?" />,
     Subtitle: function PickPaymentMethodStepSubtitle(props: { form: ExpenseForm }) {
-      const payee = React.useMemo(
-        () => props.form.options.payoutProfiles?.find(p => p.slug === props.form.values.payeeSlug),
-        [props.form.options.payoutProfiles, props.form.values.payeeSlug],
-      );
+      const payee = props.form.options.payee;
+
       const payoutMethod = React.useMemo(
         () => payee && payee.payoutMethods?.find(p => p.id === props.form.values.payoutMethodId),
         [payee, props.form.values.payoutMethodId],
       );
 
       const invitePayee = props.form.values.invitePayee;
-      const invitePayoutMethod = invitePayee && 'payoutMethod' in invitePayee ? invitePayee.payoutMethod : null;
+      const invitePayoutMethod = invitePayee?.['payoutMethod'];
 
-      const expensePayee = payee || invitePayee;
+      const hasPayee = payee || invitePayee;
       const expensePayoutMethod = payoutMethod || invitePayoutMethod;
 
-      return expensePayee && !isEmpty(expensePayoutMethod) ? (
-        <span>
-          {'legacyId' in expensePayee ? expensePayee.legacyId : expensePayee.name} (
-          <PayoutMethodLabel showIcon payoutMethod={expensePayoutMethod} />)
-        </span>
-      ) : expensePayee ? (
-        'legacyId' in expensePayee ? (
-          expensePayee?.legacyId
-        ) : (
-          expensePayee?.name
-        )
-      ) : null;
+      if (!hasPayee) {
+        return null;
+      }
+
+      if (!isEmpty(expensePayoutMethod)) {
+        return (
+          <span>
+            {invitePayee ? <InvitedPayeeLabel invitePayee={invitePayee} /> : payee.name}
+            <PayoutMethodLabel showIcon payoutMethod={expensePayoutMethod} />
+          </span>
+        );
+      }
+
+      return invitePayee ? <InvitedPayeeLabel invitePayee={invitePayee} /> : payee.name;
     },
     Form: PickPaymentMethodForm,
     hasError(form) {
