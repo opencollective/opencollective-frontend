@@ -53,6 +53,6 @@ export const previewFeatures: PreviewFeature[] = [
       'A new report that sums up all transactions to create a comprehensive overview of all activity, both for managed funds and operational funds.',
     publicBeta: false,
     alwaysEnableInDev: true,
-    closedBetaAccessFor: ['opencollective', 'opensource', 'europe', 'design', 'engineering'],
+    closedBetaAccessFor: ['opencollective', 'opensource', 'europe', 'design', 'engineering', 'giftcollective'],
   },
 ];
