@@ -261,6 +261,7 @@ const ExportTransactionsCSVModal = ({
       }
     } else {
       setIsEditingPreset(false);
+      setFlattenTaxesAndPaymentProcessorFees(false);
       setPresetName('');
     }
   }, [presetOptions, preset]);
@@ -461,7 +462,7 @@ const ExportTransactionsCSVModal = ({
                         </label>
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    <div className="gap-2 sm:columns-2">
                       {React.useMemo(
                         () =>
                           GROUP_FIELDS[tab]
@@ -469,7 +470,7 @@ const ExportTransactionsCSVModal = ({
                             .map(fieldId => {
                               const field = FIELDS.find(f => f.id === fieldId);
                               return (
-                                <div key={fieldId} className="flex items-center gap-1">
+                                <div key={fieldId} className="mb-2 flex items-center gap-1">
                                   <Checkbox
                                     id={fieldId}
                                     checked={fields.includes(fieldId)}

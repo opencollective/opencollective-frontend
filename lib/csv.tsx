@@ -213,7 +213,7 @@ export enum LEGACY_FIELD_OPTIONS {
 
 export const FieldOptionsLabels = {
   [FIELD_OPTIONS.DEFAULT]: <FormattedMessage defaultMessage="Platform Default" />,
-  [FIELD_OPTIONS.DEFAULT_2023]: <FormattedMessage defaultMessage="Platform Default (2023)" />,
+  [FIELD_OPTIONS.DEFAULT_2023]: <FormattedMessage defaultMessage="Legacy Platform Export Set (Pre-2024)" />,
   [FIELD_OPTIONS.NEW_PRESET]: (
     <span className="text-primary">
       <FormattedMessage defaultMessage="New Preset" />
@@ -702,7 +702,7 @@ const DEFAULT_FIELDS: Array<CSVField> = [
   'type',
   'kind',
   'group',
-  'amount',
+  'netAmount',
   'currency',
   'isRefund',
   'isRefunded',
@@ -723,6 +723,6 @@ const DEFAULT_FIELDS: Array<CSVField> = [
 ];
 
 export const PLATFORM_PRESETS = {
-  DEFAULT: { fields: DEFAULT_FIELDS },
-  DEFAULT_2023: { fields: DEFAULT_FIELDS_2023 },
+  DEFAULT: { fields: DEFAULT_FIELDS, flattenTaxesAndPaymentProcessorFees: false },
+  DEFAULT_2023: { fields: DEFAULT_FIELDS_2023, flattenTaxesAndPaymentProcessorFees: true },
 };
