@@ -3435,6 +3435,7 @@
   "vwq8lO": "{isRefund, select,true {הוחזרו}other {}} עמלות תשלום לצד ג' {hasPaymentProcessorCover, select,true {(מכוסה על-ידי ארגון הגג)} false {}other {}}:{paymentProcessorFee}",
   "vwqEeH": "To do",
   "vWYg/k": "<AccountType></AccountType> <Account></Account> created{hasParent, select, true { under <AccountParent></AccountParent>} other {}}",
+  "VX6iYD": "Is not Refund",
   "vx8bv3": "Assignee",
   "VXJpMP": "Ending on {date}",
   "VY4AcX": "Transaction group",

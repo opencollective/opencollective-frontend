@@ -3435,6 +3435,7 @@
   "vwq8lO": "{isRefund, select, true {Zwrócona} other {}} Opłata za płatność{hasPaymentProcessorCover, select, true { (pokryta przez Gospodarza)} false {} other {}}: {paymentProcessorFee}",
   "vwqEeH": "To do",
   "vWYg/k": "<AccountType></AccountType> <Account></Account> utworzone{hasParent, select, true { pod <AccountParent></AccountParent>} other {}}",
+  "VX6iYD": "Is not Refund",
   "vx8bv3": "Assignee",
   "VXJpMP": "Ending on {date}",
   "VY4AcX": "Transaction group",
