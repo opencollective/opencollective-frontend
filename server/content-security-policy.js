@@ -28,6 +28,7 @@ const COMMON_DIRECTIVES = {
     UNSAFE_INLINE, // For styled-components. TODO: Limit for nonce
     'https://hcaptcha.com',
     'https://*.hcaptcha.com',
+    'https://challenges.cloudflare.com',
   ],
   connectSrc: [
     SELF,
@@ -49,6 +50,7 @@ const COMMON_DIRECTIVES = {
     'https://sandbox.transferwise.tech',
     'https://hcaptcha.com',
     'https://*.hcaptcha.com',
+    'https://challenges.cloudflare.com',
     'https://www.google.com',
     'https://api.cryptonator.com',
     'https://plausible.io',
@@ -84,6 +86,7 @@ const COMMON_DIRECTIVES = {
     'https://sandbox.transferwise.tech',
     'https://hcaptcha.com',
     'https://*.hcaptcha.com',
+    'https://challenges.cloudflare.com',
     'https://www.google.com',
   ],
   objectSrc: ['opencollective.com'],
