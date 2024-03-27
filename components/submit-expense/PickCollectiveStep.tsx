@@ -46,7 +46,7 @@ export function PickCollectiveStepForm(props: PickCollectiveStepFormProps) {
 
   const recentCollectivePicked = recentCollectives.some(({ slug }) => slug === props.form.values.collectiveSlug);
 
-  const canChangeAccount = !props.form.options.expense?.account;
+  const canChangeAccount = !props.form.options.expense?.account || props.form.startOptions.duplicateExpense;
 
   if (props.form.options.loggedInAccount && !props.form.options.recentlySubmittedExpenses) {
     return <Loading />;

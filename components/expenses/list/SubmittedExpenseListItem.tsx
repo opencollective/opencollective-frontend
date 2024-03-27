@@ -1,5 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
+import { includes } from 'lodash';
 import { Check, Copy, Ellipsis, Link } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -70,7 +71,9 @@ export function SubmittedExpenseListItem(props: SubmittedExpenseListItemProps) {
       }}
     >
       <div>
-        <div className="bold mb-1 text-sm text-slate-800">{props.expense.description}</div>
+        <div className="mb-1 max-w-[250px] overflow-hidden text-ellipsis text-sm font-medium text-slate-800 sm:max-w-[400px]">
+          {props.expense.description}
+        </div>
         <div className="text-xs text-slate-700">
           <span>
             <FormattedMessage
@@ -126,7 +129,7 @@ export function SubmittedExpenseListItem(props: SubmittedExpenseListItemProps) {
         </div>
       </div>
       <div>
-        <div className="bold mb-1 flex flex-col items-end text-sm text-slate-800">
+        <div className="mb-1 flex flex-col items-end text-sm font-medium text-slate-800">
           <span>
             <FormattedMoneyAmount amount={props.expense.amount} currency={props.expense.currency} precision={2} />
           </span>
@@ -137,12 +140,17 @@ export function SubmittedExpenseListItem(props: SubmittedExpenseListItemProps) {
             </div>
           )}
         </div>
-        <div className="flex items-end justify-end gap-2">
+        <div className="flex flex-wrap items-end justify-end gap-2">
           <span className="rounded-xl rounded-ee-none rounded-se-none bg-slate-100 px-3 py-1 text-xs text-slate-800">
             {i18nExpenseType(intl, props.expense.type)} #{props.expense.legacyId}
           </span>
 
-          <ExpenseStatusTag type={getExpenseStatusMsgType(props.expense.status)} status={props.expense.status} />
+          <ExpenseStatusTag
+            type={getExpenseStatusMsgType(props.expense.status)}
+            status={props.expense.status}
+            showTaxFormTag={includes(props.expense.requiredLegalDocuments, 'US_TAX_FORM')}
+            showTaxFormMsg={props.expense.payee.isAdmin}
+          />
         </div>
       </div>
       <div className="flex items-center">

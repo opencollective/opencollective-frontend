@@ -1,8 +1,8 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import clsx from 'clsx';
 import { FormikProvider, useFormik } from 'formik';
-import { uniqBy } from 'lodash';
+import { debounce, uniqBy } from 'lodash';
 import { ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -34,6 +34,7 @@ import StyledSelect from '../StyledSelect';
 import { Button } from '../ui/Button';
 import { useToast } from '../ui/useToast';
 
+import { InvitedPayeeLabel } from './InvitedPayeeLabel';
 import { RadioCardButton } from './RadioCardButton';
 import { ExpenseForm } from './useExpenseForm';
 
@@ -45,10 +46,7 @@ export function PickPaymentMethodForm(props: PickPaymentMethodFormProps) {
   const { LoggedInUser } = useLoggedInUser();
   const [isChangingPayee, setIsChangingPayee] = React.useState(false);
 
-  const payeeProfile = React.useMemo(
-    () => props.form.options.payoutProfiles?.find(p => p.slug === props.form.values.payeeSlug),
-    [props.form.values.payeeSlug, props.form.options.payoutProfiles],
-  );
+  const payeeProfile = props.form.options.payee;
 
   const pickedLastSubmitedPayee = React.useMemo(
     () =>
@@ -62,6 +60,10 @@ export function PickPaymentMethodForm(props: PickPaymentMethodFormProps) {
 
   const invitePayee = props.form.values.invitePayee;
 
+  const pickedPayee = invitePayee || payeeProfile;
+  const hasPayoutPicker =
+    pickedPayee && !isChangingPayee && payeeProfile?.type !== CollectiveType.VENDOR && !invitePayee?.['legacyId'];
+
   return (
     <div className="flex-grow pr-2">
       <h1 className="mb-4 text-lg font-bold leading-[26px] text-dark-900">
@@ -69,7 +71,7 @@ export function PickPaymentMethodForm(props: PickPaymentMethodFormProps) {
       </h1>
 
       <React.Fragment>
-        {isChangingPayee || (!payeeProfile && !invitePayee) ? (
+        {isChangingPayee || !pickedPayee ? (
           <PayeePicker
             form={props.form}
             isChangingPayee={isChangingPayee}
@@ -93,13 +95,8 @@ export function PickPaymentMethodForm(props: PickPaymentMethodFormProps) {
                         label: payeeProfile.name,
                       }}
                     />
-                  ) : invitePayee && 'legacyId' in invitePayee ? (
-                    <FormattedMessage defaultMessage="Invite: {name}" values={{ name: invitePayee.legacyId }} />
-                  ) : invitePayee && !('legacyId' in invitePayee) ? (
-                    <FormattedMessage
-                      defaultMessage="Invite: {name} ({email})"
-                      values={{ name: invitePayee.name, email: invitePayee.email }}
-                    />
+                  ) : invitePayee ? (
+                    <InvitedPayeeLabel invitePayee={invitePayee} />
                   ) : (
                     payeeProfile.name
                   )}
@@ -122,9 +119,7 @@ export function PickPaymentMethodForm(props: PickPaymentMethodFormProps) {
           />
         )}
 
-        {(payeeProfile || (invitePayee && !('id' in invitePayee))) && !isChangingPayee && (
-          <PayoutMethodPicker form={props.form} />
-        )}
+        {hasPayoutPicker && <PayoutMethodPicker form={props.form} />}
       </React.Fragment>
     </div>
   );
@@ -137,6 +132,7 @@ type PayeePickerProps = {
 };
 
 function PayeePicker(props: PayeePickerProps) {
+  const [isPickingVendor, setIsPickingVendor] = React.useState(false);
   const [isPickingOtherPayee, setIsPickingOtherPayee] = React.useState(false);
   const [isInvitingOtherPayee, setIsInvitingOtherPayee] = React.useState(props.form.startOptions.preselectInvitePayee);
   const { LoggedInUser } = useLoggedInUser();
@@ -173,6 +169,7 @@ function PayeePicker(props: PayeePickerProps) {
     if (
       !props.isChangingPayee &&
       !isPickingOtherPayee &&
+      !isPickingVendor &&
       !isInvitingOtherPayee &&
       recentPayeesSlugs.length > 0 &&
       !props.form.values.payeeSlug &&
@@ -185,6 +182,7 @@ function PayeePicker(props: PayeePickerProps) {
     onPayeePicked,
     props.isChangingPayee,
     isPickingOtherPayee,
+    isPickingVendor,
     isInvitingOtherPayee,
     recentPayeesSlugs,
     loggedInAccount,
@@ -209,6 +207,7 @@ function PayeePicker(props: PayeePickerProps) {
               props.form.setFieldValue('payeeSlug', payeeSlug);
               onPayeePicked();
               setIsPickingOtherPayee(false);
+              setIsPickingVendor(false);
             }}
             title={
               <div className="flex gap-2">
@@ -233,10 +232,11 @@ function PayeePicker(props: PayeePickerProps) {
             className="order-2"
             checked={loggedInAccount.slug === props.form.values.payeeSlug}
             onClick={() => {
-              props.form.setFieldValue('payeeSlug', loggedInAccount.slug);
+              setFieldValue('payeeSlug', loggedInAccount.slug);
               onPayeePicked();
               setIsPickingOtherPayee(false);
               setIsInvitingOtherPayee(false);
+              setIsPickingVendor(false);
             }}
             title={
               <div className="flex gap-2">
@@ -253,6 +253,7 @@ function PayeePicker(props: PayeePickerProps) {
             onClick={() => {
               setIsPickingOtherPayee(true);
               setIsInvitingOtherPayee(false);
+              setIsPickingVendor(false);
             }}
             title={<FormattedMessage defaultMessage="A profile I administer" />}
             content={
@@ -265,6 +266,9 @@ function PayeePicker(props: PayeePickerProps) {
                       setIsPickingOtherPayee(true);
                       setFieldValue('payeeSlug', e.value.slug);
                       onPayeePicked();
+                      setIsPickingOtherPayee(false);
+                      setIsInvitingOtherPayee(false);
+                      setIsPickingVendor(false);
                     }}
                   />
                 </div>
@@ -272,6 +276,30 @@ function PayeePicker(props: PayeePickerProps) {
             }
           />
         )}
+        <RadioCardButton
+          className="order-2"
+          checked={isPickingVendor}
+          title={<FormattedMessage defaultMessage="A vendor" />}
+          content={
+            isPickingVendor && (
+              <div className="mt-2">
+                <VendorPicker
+                  collectiveSlug={props.form.values.collectiveSlug}
+                  hostSlug={props.form.options.host.slug}
+                  onChange={vendor => {
+                    setFieldValue('payeeSlug', vendor.slug);
+                    onPayeePicked();
+                  }}
+                />
+              </div>
+            )
+          }
+          onClick={() => {
+            setIsPickingVendor(true);
+            setIsPickingOtherPayee(false);
+            setIsInvitingOtherPayee(false);
+          }}
+        />
         <RadioCardButton
           className={clsx({
             'order-1': props.form.startOptions.preselectInvitePayee,
@@ -285,6 +313,7 @@ function PayeePicker(props: PayeePickerProps) {
           onClick={() => {
             setIsInvitingOtherPayee(true);
             setIsPickingOtherPayee(false);
+            setIsPickingVendor(false);
           }}
           title={
             <FormattedMessage
@@ -842,5 +871,62 @@ function CreatePayoutMethodForm(props: CreatePayoutMethodFormProps) {
         <FormattedMessage id="save" defaultMessage="Save" />
       </Button>
     </FormikProvider>
+  );
+}
+
+type VendorPickerProps = {
+  hostSlug: string;
+  collectiveSlug: string;
+  onChange: (vendor: { slug: string }) => void;
+};
+
+function VendorPicker(props: VendorPickerProps) {
+  const [term, setTerm] = React.useState(null);
+
+  const query = useQuery(
+    gql`
+      query VendorPickerSearch($searchTerm: String, $hostSlug: String!, $collectiveSlug: String!) {
+        host(slug: $hostSlug) {
+          vendors(forAccount: { slug: $collectiveSlug }, searchTerm: $searchTerm) {
+            nodes {
+              id
+              slug
+              name
+              imageUrl
+              type
+            }
+          }
+        }
+      }
+    `,
+    {
+      context: API_V2_CONTEXT,
+      variables: {
+        searchTerm: term,
+        collectiveSlug: props.collectiveSlug,
+        hostSlug: props.hostSlug,
+      },
+    },
+  );
+
+  const onSearch = React.useMemo(
+    () =>
+      debounce(newTerm => {
+        setTerm(newTerm);
+      }, 2000),
+    [],
+  );
+
+  return (
+    <CollectivePicker
+      isLoading={query.loading}
+      collectives={query.data?.host?.vendors?.nodes ?? []}
+      useSearchIcon={true}
+      isSearchable
+      onInputChange={onSearch}
+      onChange={e => {
+        props.onChange(e.value);
+      }}
+    />
   );
 }

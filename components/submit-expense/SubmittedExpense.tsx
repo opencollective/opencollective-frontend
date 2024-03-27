@@ -19,6 +19,7 @@ import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import CreateExpenseFAQ from '../faqs/CreateExpenseFAQ';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import Image from '../Image';
+import LinkCollective from '../LinkCollective';
 import Loading from '../Loading';
 import MessageBox from '../MessageBox';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
@@ -53,11 +54,13 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
           draft
           host {
             id
+            slug
             legacyId
             name
           }
           account {
             id
+            slug
             legacyId
             name
           }
@@ -169,14 +172,14 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
           <li>
             <FormattedMessage
               defaultMessage="This expense needs to be approved by an admin of {collective}"
-              values={{ collective: expense.account?.name }}
+              values={{ collective: <LinkCollective collective={expense.account} /> }}
             />
           </li>
           {expense.host && (
             <li>
               <FormattedMessage
                 defaultMessage="After that, this expense needs to be reviewed and paid by an admin of {host}"
-                values={{ host: expense.host?.name }}
+                values={{ host: <LinkCollective collective={expense.host} /> }}
               />
             </li>
           )}
