@@ -5,13 +5,13 @@ import { FormattedMessage } from 'react-intl';
 
 import {
   AVERAGE_TRANSACTIONS_PER_MINUTE,
-  DEFAULT_FIELDS,
+  DEFAULT_FIELDS_2023 as DEFAULT_FIELDS,
   FIELD_GROUPS_2024,
-  FIELD_OPTIONS,
   FieldGroupLabels,
   FieldLabels,
-  FieldOptions,
+  FieldOptionsLabels,
   HOST_OMITTED_FIELDS,
+  LEGACY_FIELD_OPTIONS as FIELD_OPTIONS,
 } from '../lib/csv';
 import { simpleDateToISOString } from '../lib/date-utils';
 import { getEnvVar } from '../lib/env-utils';
@@ -61,12 +61,13 @@ const ExportTransactionsCSVModal = ({
   const intervalFromValue = React.useMemo(() => getIntervalFromValue(dateInterval), [dateInterval]);
   const [tmpDateInterval, setTmpDateInterval] = React.useState(intervalFromValue);
   const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');
-  const [fieldOption, setFieldOption] = React.useState(FieldOptions[0].value);
+  const [fieldOption, setFieldOption] = React.useState(FIELD_OPTIONS.DEFAULT);
   const [fields, setFields] = React.useState(DEFAULT_FIELDS.reduce((obj, key) => ({ ...obj, [key]: true }), {}));
   const [isValidDateInterval, setIsValidDateInterval] = React.useState(true);
   const [flattenTaxesAndPaymentProcessorFees, setFlattenTaxesAndPaymentProcessorFees] = React.useState(false);
 
   const fieldGroups = FIELD_GROUPS_2024;
+  const fieldOptions = Object.keys(FIELD_OPTIONS).map(value => ({ value, label: FieldOptionsLabels[value] }));
 
   const {
     loading: isFetchingRows,
@@ -248,9 +249,9 @@ const ExportTransactionsCSVModal = ({
             {inputProps => (
               <StyledSelect
                 {...inputProps}
-                options={FieldOptions}
+                options={fieldOptions}
                 onChange={handleFieldOptionsChange}
-                defaultValue={FieldOptions.find(option => option.value === fieldOption)}
+                defaultValue={fieldOptions.find(option => option.value === fieldOption)}
                 width="100%"
               />
             )}
