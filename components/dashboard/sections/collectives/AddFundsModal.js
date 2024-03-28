@@ -4,7 +4,7 @@ import { useMutation, useQuery } from '@apollo/client';
 import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Form, Formik } from 'formik';
-import { get, groupBy, isEmpty, map } from 'lodash';
+import { get, isEmpty, pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -13,16 +13,14 @@ import { getCurrentLocalDateStr } from '../../../../lib/date-utils';
 import { requireFields } from '../../../../lib/form-utils';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
-import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nTaxType } from '../../../../lib/i18n/taxes';
 import { require2FAForAdmins } from '../../../../lib/policies';
 import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 
 import AccountingCategorySelect from '../../../AccountingCategorySelect';
+import AccountPicker, { makeLegacyCreateCollectiveMiniform } from '../../../AccountPicker';
 import { collectivePageQuery, getCollectivePageQueryVariables } from '../../../collective-page/graphql/queries';
 import { getBudgetSectionQuery, getBudgetSectionQueryVariables } from '../../../collective-page/sections/Budget';
-import { DefaultCollectiveLabel } from '../../../CollectivePicker';
-import CollectivePickerAsync from '../../../CollectivePickerAsync';
 import Container from '../../../Container';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { Box, Flex } from '../../../Grid';
@@ -180,7 +178,7 @@ const addFundsAccountQueryHostFieldsFragment = gql`
       REQUIRE_2FA_FOR_ADMINS
     }
     isTrustedHost
-    vendors(forAccount: { slug: $slug }) {
+    vendors(forAccount: { slug: $slug }, limit: 5) {
       nodes {
         id
         slug
@@ -283,7 +281,11 @@ const getApplicableTaxType = (collective, host) => {
 
 // Build an account reference. Compatible with accounts from V1 and V2.
 const buildAccountReference = input => {
-  return typeof input.id === 'string' ? { id: input.id } : { legacyId: input.id };
+  if (input.id) {
+    return typeof input.id === 'string' ? { id: input.id } : { legacyId: input.id };
+  } else {
+    return pick(input, ['slug', 'legacyId']);
+  }
 };
 
 const getTiersOptions = (intl, tiers) => {
@@ -365,15 +367,6 @@ const AddFundsModal = ({ collective, ...props }) => {
   const receiptTemplates = host?.settings?.invoice?.templates;
   const recommendedVendors = host?.vendors?.nodes || [];
   const defaultSources = [...recommendedVendors, host];
-  const defaultSourcesOptions = map(groupBy(defaultSources, 'type'), (accounts, type) => {
-    return {
-      label: formatCollectiveType(intl, type, accounts.length),
-      options: accounts.map(account => ({
-        value: account,
-        label: <DefaultCollectiveLabel value={account} />,
-      })),
-    };
-  });
 
   const receiptTemplateTitles = [];
   if (receiptTemplates?.default?.title?.length > 0) {
@@ -486,18 +479,20 @@ const AddFundsModal = ({ collective, ...props }) => {
                       label={<FormattedMessage id="AddFundsModal.source" defaultMessage="Source" />}
                     >
                       {({ form, field }) => (
-                        <CollectivePickerAsync
-                          inputId={field.id}
+                        <AccountPicker
+                          id={field.id}
                           data-cy="add-funds-source"
-                          types={['USER', 'ORGANIZATION', 'VENDOR']}
+                          types={['INDIVIDUAL', 'ORGANIZATION', 'VENDOR']}
                           error={field.error}
-                          onBlur={() => form.setFieldTouched(field.name, true)}
-                          customOptions={defaultSourcesOptions}
-                          onChange={({ value }) => form.setFieldValue(field.name, value)}
-                          menuPortalTarget={null}
-                          includeVendorsForHostId={host?.legacyId || undefined}
-                          creatable={['USER', 'VENDOR']}
-                          HostCollectiveId={host?.legacyId}
+                          accounts={defaultSources}
+                          groupped
+                          searchable
+                          onClose={() => form.setFieldTouched(field.name, true)}
+                          onChange={value => form.setFieldValue(field.name, value)}
+                          value={values.fromAccount}
+                          includeVendorsForHost={host}
+                          placeholder={<FormattedMessage defaultMessage="Select funds source" />}
+                          miniForms={makeLegacyCreateCollectiveMiniform(['USER', 'VENDOR'], { host })}
                         />
                       )}
                     </Field>

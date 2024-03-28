@@ -1,12 +1,4 @@
-import { Sections } from '../../../components/collective-page/_constants';
-
 import { randomSlug, randStr } from '../support/faker';
-
-const scrollToSection = section => {
-  // Wait for collective page to load before disabling smooth scroll
-  cy.get('[data-cy=collective-page-main]');
-  cy.get(`#section-${section}`).scrollIntoView();
-};
 
 describe('host dashboard', () => {
   let user;
@@ -100,7 +92,7 @@ describe('host dashboard', () => {
       cy.get('[data-cy="add-funds-amount"]').type('20');
       cy.get('[data-cy="add-funds-description"]').type('cypress test - add funds');
       cy.get('[data-cy="add-funds-source"]').type(collectiveSlug);
-      cy.contains(`@brusselstogetherasbl`).click();
+      cy.getByDataCy('account-picker-item-brusselstogetherasbl').click();
       cy.get('[data-cy="add-funds-submit-btn"]').click();
 
       cy.getByDataCy(`collective-${collectiveSlug}`).within(() => {
@@ -272,33 +264,25 @@ describe('host dashboard', () => {
       cy.contains('[data-cy="add-funds-form"]', 'This field is required');
     });
 
-    it.skip('Can add funds and platform tip as collective host', () => {
+    it('Can add funds to collective host', () => {
       cy.login({ redirect: '/dashboard/brusselstogetherasbl/hosted-collectives' });
-      cy.get('[data-cy="hosted-collective-add-funds-btn"]').first().click();
+      cy.getByDataCy(`collective-brusselstogether`).within(() => {
+        cy.getByDataCy('more-actions-btn').click();
+      });
+      cy.getByDataCy('actions-add-funds').click();
       cy.wait(300);
       cy.get('[data-cy="add-funds-amount"]').type('20');
       cy.get('[data-cy="add-funds-description"]').type('cypress test - add funds');
       cy.get('[data-cy="add-funds-source"]').click();
-      cy.get('[data-cy="collective-type-picker-USER"]').click();
+      cy.get('[data-cy="account-picker-create-user"]').click();
       cy.get('[data-cy="mini-form-email-field"]').type('cypress-test@funds.com');
       cy.get('[data-cy="mini-form-name-field"]').type('cypress user');
-      cy.get('[data-cy="collective-mini-form-scroll"]').scrollTo('bottom', { duration: 5000 });
       cy.get('[data-cy="mini-form-save-button"]').click();
       cy.wait(1000);
       cy.get('[data-cy="add-funds-submit-btn"]').click();
       cy.wait(300);
-      cy.get('[data-cy="funds-added"]').contains('Funds Added ✅');
-      cy.contains('[data-cy="donation-percentage"]', 'No thank you').click();
-      cy.contains('[data-cy="select-option"]', '€2.00').click();
-      cy.get('[data-cy="add-platform-tip-btn"]').contains('Tip and Finish');
-      cy.get('[data-cy="add-platform-tip-btn"]').click();
-      cy.wait(300);
-      cy.get('[data-cy="collective-avatar"]').first().click();
-      scrollToSection(Sections.BUDGET);
-      cy.get('[data-cy="section-budget"]').contains('cypress test - add funds');
-      cy.visit('opencollectivehost');
-      scrollToSection(Sections.TRANSACTIONS);
-      cy.get('[data-cy="section-transactions"]').contains('Financial contribution to Open Collective');
+      cy.visit('brusselstogether/transactions');
+      cy.get('[data-cy="transaction-item"]').contains('cypress test - add funds');
     });
   });
 });
