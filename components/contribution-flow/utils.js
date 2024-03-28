@@ -70,7 +70,7 @@ export const getContributeProfiles = (loggedInUser, collective, tier) => {
       }
       if (!isEmpty(member.collective.children)) {
         const childrenOfSameHost = member.collective.children.filter(
-          child => child.host.id === collective.host.legacyId,
+          child => child.host && child.host.id === collective.host.legacyId,
         );
         contributorProfiles.push(...childrenOfSameHost);
       }
