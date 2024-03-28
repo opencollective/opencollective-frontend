@@ -19,10 +19,6 @@ exports.REWRITES = [
     destination: '/staticPage',
   },
   {
-    source: '/foundation/apply/:step(intro|fees|form|success)',
-    destination: '/ocf-host-application',
-  },
-  {
     source: '/opensource/apply/:step(intro|pick-repo|fees|form|success)',
     destination: '/osc-host-application',
   },
