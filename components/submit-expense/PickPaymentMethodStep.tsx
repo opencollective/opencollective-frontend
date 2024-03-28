@@ -24,6 +24,7 @@ import CollectivePicker from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import ConfirmationModal, { CONFIRMATION_MODAL_TERMINATE } from '../ConfirmationModal';
 import ExpenseFormPayeeInviteNewStep from '../expenses/ExpenseFormPayeeInviteNewStep';
+import PayoutMethodData from '../expenses/PayoutMethodData';
 import PayoutMethodForm, { validatePayoutMethod } from '../expenses/PayoutMethodForm';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import Loading from '../Loading';
@@ -418,67 +419,6 @@ function InvitePayeePicker(props: InvitePayeePickerProps) {
   );
 }
 
-export function PaymentMethodDetails(props: { payoutMethod?: Omit<PayoutMethod, 'id'> }) {
-  if (!props.payoutMethod) {
-    return null;
-  }
-
-  return (
-    <React.Fragment>
-      {props.payoutMethod?.name && (
-        <div className="text-sm text-slate-700">
-          <div className="font-bold">
-            <FormattedMessage id="Fields.name" defaultMessage="Name" />
-          </div>
-          <div className="overflow-hidden text-ellipsis">{props.payoutMethod?.name}</div>
-        </div>
-      )}
-
-      {props.payoutMethod?.data?.currency && (
-        <div className="text-sm text-slate-700">
-          <div className="font-bold">
-            <FormattedMessage id="Currency" defaultMessage="Currency" />
-          </div>
-          <div className="overflow-hidden text-ellipsis">{props.payoutMethod?.data?.currency}</div>
-        </div>
-      )}
-
-      {props.payoutMethod?.data?.accountHolderName && (
-        <div className="text-sm text-slate-700">
-          <div className="font-bold">
-            <FormattedMessage defaultMessage="Account holder" />
-          </div>
-          <div className="overflow-hidden text-ellipsis">{props.payoutMethod?.data?.accountHolderName}</div>
-        </div>
-      )}
-
-      {props.payoutMethod?.data?.details?.accountNumber && (
-        <div className="text-sm text-slate-700">
-          <div className="font-bold">
-            <FormattedMessage defaultMessage="Account number" />
-          </div>
-          <div className="overflow-hidden text-ellipsis">{props.payoutMethod?.data?.details?.accountNumber}</div>
-        </div>
-      )}
-
-      {props.payoutMethod?.data?.email && (
-        <div className="text-sm text-slate-700">
-          <div className="font-bold">
-            <FormattedMessage id="Email" defaultMessage="Email" />
-          </div>
-          <div className="overflow-hidden text-ellipsis">{props.payoutMethod?.data?.email}</div>
-        </div>
-      )}
-
-      {props.payoutMethod?.data?.content && (
-        <div className="text-sm text-slate-700">
-          <div className="overflow-hidden text-ellipsis">{props.payoutMethod?.data?.content}</div>
-        </div>
-      )}
-    </React.Fragment>
-  );
-}
-
 type PayoutMethodOptionButtonProps = {
   payoutMethod: PayoutMethod | Omit<PayoutMethod, 'id'>;
   checked?: boolean;
@@ -511,6 +451,8 @@ function PayoutMethodOptionButton(props: PayoutMethodOptionButtonProps) {
     },
   );
 
+  const hasDetails = props.payoutMethod.type !== PayoutMethodType.PAYPAL;
+
   return (
     <React.Fragment>
       <RadioCardButton
@@ -538,39 +480,41 @@ function PayoutMethodOptionButton(props: PayoutMethodOptionButtonProps) {
                 </b>
               )}
             </div>
-            <div className="flex">
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={e => {
-                  e.stopPropagation();
-                  setIsOpen(!isOpen);
-                }}
-              >
-                {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-              </Button>
+            {hasDetails && (
+              <div className="flex">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={e => {
+                    e.stopPropagation();
+                    setIsOpen(!isOpen);
+                  }}
+                >
+                  {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                </Button>
 
-              <Button
-                onClick={e => {
-                  e.stopPropagation();
-                  if ('id' in props.payoutMethod) {
-                    setIsDeletingPayoutMethod(true);
-                  } else {
-                    props.onDelete();
-                  }
-                }}
-                size="icon"
-                variant="ghost"
-              >
-                <Trash2 size={16} />
-              </Button>
-            </div>
+                <Button
+                  onClick={e => {
+                    e.stopPropagation();
+                    if ('id' in props.payoutMethod) {
+                      setIsDeletingPayoutMethod(true);
+                    } else {
+                      props.onDelete();
+                    }
+                  }}
+                  size="icon"
+                  variant="ghost"
+                >
+                  <Trash2 size={16} />
+                </Button>
+              </div>
+            )}
           </div>
         }
         content={
-          isOpen ? (
+          isOpen && hasDetails ? (
             <div className="flex flex-col gap-1 *:first:mt-2">
-              <PaymentMethodDetails payoutMethod={props.payoutMethod} />
+              <PayoutMethodData showLabel={false} payoutMethod={props.payoutMethod} />
             </div>
           ) : null
         }

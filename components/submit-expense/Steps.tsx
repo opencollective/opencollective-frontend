@@ -181,7 +181,12 @@ export const Steps: Record<ExpenseFlowStep, ExpenseStepDefinition> = {
         return true;
       }
 
-      return !!form.errors.expenseCurrency || !!form.errors.expenseItems;
+      return (
+        !!form.errors.expenseCurrency ||
+        !!form.errors.expenseItems ||
+        !!form.errors.title ||
+        (form.options.isAccountingCategoryRequired && !!form.errors.accountingCategoryId)
+      );
     },
   },
   [ExpenseFlowStep.EXPENSE_SUMMARY]: {

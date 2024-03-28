@@ -265,7 +265,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
 
   return (
     <div className="flex max-h-screen min-h-screen flex-col">
-      <header className="min-w-screen flex items-center justify-between border-b border-slate-100 px-4 py-2 sm:px-10">
+      <header className="min-w-screen flex items-center justify-between border-b border-slate-100 px-4 py-3 sm:px-10">
         <span className="text-xl font-bold leading-7 text-slate-800">
           <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
         </span>
