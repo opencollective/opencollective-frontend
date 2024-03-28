@@ -7,13 +7,11 @@ import { get, isNil, map, pick } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
-import { OPENCOLLECTIVE_FOUNDATION_ID, OPENSOURCE_COLLECTIVE_ID } from '../lib/constants/collectives';
+import { OPENSOURCE_COLLECTIVE_ID } from '../lib/constants/collectives';
 import { i18nGraphqlException } from '../lib/errors';
 import { requireFields } from '../lib/form-utils';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 
-import ApplicationDescription from './ocf-host-application/ApplicationDescription';
-import OCFPrimaryButton from './ocf-host-application/OCFPrimaryButton';
 import OnboardingProfileCard from './onboarding-modal/OnboardingProfileCard';
 import { useToast } from './ui/useToast';
 import Avatar from './Avatar';
@@ -180,7 +178,7 @@ const getAccountInput = collective => {
   return typeof collective.id === 'number' ? { legacyId: collective.id } : { id: collective.id };
 };
 
-const ConfirmButtons = ({ onClose, onBack, onSubmit, isSubmitting, canSubmit, isOCFHost, isOSCHost }) => {
+const ConfirmButtons = ({ onClose, onBack, onSubmit, isSubmitting, canSubmit, isOSCHost }) => {
   return (
     <Flex justifyContent="flex-end" width="100%">
       <StyledButton
@@ -198,21 +196,7 @@ const ConfirmButtons = ({ onClose, onBack, onSubmit, isSubmitting, canSubmit, is
           <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
         )}
       </StyledButton>
-      {isOCFHost ? (
-        <OCFPrimaryButton
-          type="submit"
-          disabled={!canSubmit}
-          loading={isSubmitting}
-          onClick={onSubmit}
-          mt={[2, 3]}
-          mb={2}
-          ml={3}
-          px={3}
-          minWidth={153}
-        >
-          <FormattedMessage id="actions.continue" defaultMessage="Continue" />
-        </OCFPrimaryButton>
-      ) : isOSCHost ? (
+      {isOSCHost ? (
         <StyledButton
           type="submit"
           disabled={!canSubmit}
@@ -255,8 +239,6 @@ ConfirmButtons.propTypes = {
   onSubmit: PropTypes.func,
   isSubmitting: PropTypes.bool,
   canSubmit: PropTypes.bool,
-  canCancel: PropTypes.bool,
-  isOCFHost: PropTypes.bool,
   isOSCHost: PropTypes.bool,
 };
 
@@ -284,7 +266,6 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
       ? collectives[0]
       : undefined;
   const host = data?.host;
-  const isOCFHost = host?.legacyId === OPENCOLLECTIVE_FOUNDATION_ID;
   const isOSCHost = host?.legacyId === OPENSOURCE_COLLECTIVE_ID;
   const useTwoSteps = !isNil(data?.host?.longDescription);
 
@@ -323,11 +304,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
             return requireFields(values, host.termsUrl ? ['areTosChecked', 'collective'] : ['collective']);
           }}
           onSubmit={async values => {
-            if (isOCFHost) {
-              await router.push(`/foundation/apply/intro?collectiveSlug=${values.collective.slug}`);
-              window.scrollTo(0, 0);
-              return;
-            } else if (isOSCHost) {
+            if (isOSCHost) {
               await router.push(`/opensource/apply/intro?collectiveSlug=${values.collective.slug}`);
               window.scrollTo(0, 0);
               return;
@@ -462,13 +439,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                                   creatable
                                   renderNewCollectiveOption={() => (
                                     <Link
-                                      href={
-                                        isOCFHost
-                                          ? `/foundation/apply/intro`
-                                          : isOSCHost
-                                            ? '/opensource/apply/intro'
-                                            : `/${host.slug}/create`
-                                      }
+                                      href={isOSCHost ? '/opensource/apply/intro' : `/${host.slug}/create`}
                                       data-cy="host-apply-new-collective-link"
                                     >
                                       <StyledButton borderRadius="14px" width="100%">
@@ -596,37 +567,31 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                                 <StyledHr my="18px" width="100%" borderColor="black.300" />
                               </React.Fragment>
                             )}
-                            {isOCFHost ? (
-                              <ApplicationDescription />
-                            ) : (
-                              <React.Fragment>
-                                <StyledInputFormikField
-                                  name="message"
-                                  htmlFor="apply-host-modal-message"
-                                  label={
-                                    <Span fontSize="13px" lineHeight="16px" fontWeight="600" color="black.700">
-                                      {get(host, 'settings.applyMessage') || (
-                                        <FormattedMessage
-                                          id="ApplyToHost.WriteMessage"
-                                          defaultMessage="Message to the Fiscal Host"
-                                        />
-                                      )}
-                                    </Span>
-                                  }
-                                >
-                                  {({ field }) => (
-                                    <StyledTextarea
-                                      {...field}
-                                      width="100%"
-                                      minHeight={76}
-                                      maxLength={3000}
-                                      fontSize="14px"
-                                      showCount
+                            <StyledInputFormikField
+                              name="message"
+                              htmlFor="apply-host-modal-message"
+                              label={
+                                <Span fontSize="13px" lineHeight="16px" fontWeight="600" color="black.700">
+                                  {get(host, 'settings.applyMessage') || (
+                                    <FormattedMessage
+                                      id="ApplyToHost.WriteMessage"
+                                      defaultMessage="Message to the Fiscal Host"
                                     />
                                   )}
-                                </StyledInputFormikField>
-                              </React.Fragment>
-                            )}
+                                </Span>
+                              }
+                            >
+                              {({ field }) => (
+                                <StyledTextarea
+                                  {...field}
+                                  width="100%"
+                                  minHeight={76}
+                                  maxLength={3000}
+                                  fontSize="14px"
+                                  showCount
+                                />
+                              )}
+                            </StyledInputFormikField>
                             {host.termsUrl && (
                               <StyledInputFormikField name="areTosChecked">
                                 {({ form, field }) => (
@@ -642,7 +607,6 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                                             TOSLink: getI18nLink({
                                               href: host.termsUrl,
                                               openInNewTabNoFollow: true,
-                                              ...(isOCFHost && { color: '#396C6F' }),
                                               onClick: e => e.stopPropagation(), // don't check the checkbox when clicking on the link
                                             }),
                                           }}
@@ -688,7 +652,6 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                     onSubmit={handleSubmit}
                     isSubmitting={submitting}
                     canSubmit={canApply}
-                    isOCFHost={isOCFHost}
                     isOSCHost={isOSCHost}
                   />
                 )}

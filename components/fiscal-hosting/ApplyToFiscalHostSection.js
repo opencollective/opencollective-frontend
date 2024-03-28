@@ -24,11 +24,6 @@ const ApplyLink = styled(StyledLink)`
 `;
 
 const messages = defineMessages({
-  'fiscalHosting.hosts.OCF': {
-    id: 'fiscalHosting.hosts.OCF',
-    defaultMessage:
-      'A US 501(c)(3) nonprofit entity with a broad mission covering most charitable activities in the United States.',
-  },
   'fiscalHosting.hosts.OSC': {
     id: 'fiscalHosting.hosts.OSC',
     defaultMessage:

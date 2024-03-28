@@ -38,15 +38,6 @@ class CreateFund extends Component {
   }
 
   getHost() {
-    if (this.props.router.query.category === 'foundation') {
-      return {
-        slug: 'foundation',
-        name: 'Open Collective Foundation',
-        termsUrl:
-          'https://docs.google.com/document/u/2/d/e/2PACX-1vQ_fs7IOojAHaMBKYtaJetlTXJZLnJ7flIWkwxUSQtTkWUMtwFYC2ssb-ooBnT-Ldl6wbVhNQiCkSms/pub',
-        faqUrl: 'https://docs.opencollective.foundation/',
-      };
-    }
     if (this.props.router.query.category === 'opensource') {
       return {
         slug: 'opensource',
