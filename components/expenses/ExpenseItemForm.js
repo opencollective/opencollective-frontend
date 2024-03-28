@@ -438,6 +438,7 @@ const ExpenseItemForm = ({
                           width="100%"
                           minHeight="39px"
                           value={typeof field.value === 'string' ? field.value.split('T')[0] : field.value}
+                          placeholder="YYYY-MM-DD"
                         />
                       </WithOCRComparisonWarning>
                     )}
