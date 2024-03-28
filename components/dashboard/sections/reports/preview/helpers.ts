@@ -5,6 +5,42 @@ import dayjs from '../../../../../lib/dayjs';
 import { Group, GroupFilter, ReportSection } from './types';
 import { TimeUnit, TransactionKind } from '../../../../../lib/graphql/types/v2/graphql';
 import { getDayjsIsoUnit } from '../../../../../lib/date-utils';
+import { DateFilterType } from '../../../filters/DateFilter/schema';
+import { FilterValues } from '../../transactions/HostTransactions';
+
+export const filterToTransactionsFilterValues = (
+  hostSlug,
+  groupFilter: GroupFilter,
+  variables,
+): Partial<FilterValues> => {
+  return {
+    ...(groupFilter.isHost
+      ? {
+          account: hostSlug,
+        }
+      : {
+          excludeHost: true,
+        }),
+    ...(groupFilter.kind && {
+      kind: [groupFilter.kind],
+    }),
+    ...(groupFilter.type && {
+      type: groupFilter.type,
+    }),
+    ...(groupFilter.expenseType && {
+      expenseType: [groupFilter.expenseType],
+    }),
+    ...(!isNil(groupFilter.isRefund) && {
+      isRefund: groupFilter.isRefund,
+    }),
+    date: {
+      gte: dayjs.utc(variables.dateFrom).format('YYYY-MM-DD'),
+      lte: dayjs.utc(variables.dateTo).format('YYYY-MM-DD'),
+      type: DateFilterType.BETWEEN,
+      tz: 'UTC',
+    },
+  };
+};
 
 export const filterToTransactionsQuery = (hostSlug, groupFilter: GroupFilter, variables) => {
   return {

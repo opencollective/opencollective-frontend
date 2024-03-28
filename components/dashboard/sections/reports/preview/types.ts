@@ -1,3 +1,5 @@
+import { ExpenseType, TransactionKind, TransactionType } from '../../../../../lib/graphql/types/v2/graphql';
+
 export enum ReportSection {
   CONTRIBUTIONS = 'CONTRIBUTIONS',
   EXPENSES = 'EXPENSES',
@@ -6,11 +8,11 @@ export enum ReportSection {
 }
 
 export type GroupFilter = {
-  kind?: string; // TransactionKind;
+  kind?: TransactionKind;
   isHost?: boolean;
   isRefund?: boolean;
-  type?: string; // TransactionType;
-  expenseType?: string; // ExpenseType;
+  type?: TransactionType;
+  expenseType?: ExpenseType;
 };
 
 export type Group = {
