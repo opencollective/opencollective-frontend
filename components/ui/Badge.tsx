@@ -11,7 +11,7 @@ const badgeVariants = cva('inline-flex gap-0.5 align-middle items-center font-me
       warning: 'bg-yellow-100 text-yellow-800',
       error: 'bg-red-100 text-red-800',
       neutral: 'bg-slate-100 text-slate-700',
-      outline: 'bg-background text-muted-foreground ring-1 ring-slate-300 ring-inset',
+      outline: 'bg-transparent text-muted-foreground ring-1 ring-slate-300 ring-inset',
     },
     round: {
       true: 'rounded-full',

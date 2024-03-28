@@ -28,7 +28,7 @@ import {
   TransactionsPageQueryVariables,
 } from '../../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
-import { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
+import useQueryFilter, { useQueryFilterOptions, useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
 import { cn, parseToBoolean } from '../../lib/utils';
 
@@ -197,6 +197,7 @@ const ExportTransactionsCSVModal = ({
   const [presetName, setPresetName] = React.useState('');
   const [isEditingPreset, setIsEditingPreset] = React.useState(false);
   const [isDeletingPreset, setIsDeletingPreset] = React.useState(false);
+
   const [submitEditSettings, { loading: isSavingSet, data: updateSettingsData }] = useMutation(
     editAccountSettingsMutation,
     { context: API_V2_CONTEXT },
