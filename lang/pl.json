@@ -1744,6 +1744,7 @@
   "haTMSR": "Indicates “REFUND” if this transaction represents a refund (otherwise empty).",
   "HaWQNA": "<Individual></Individual> recurring <Expense>{expenseDescription}</Expense> expense drafted on <Account></Account>",
   "Hbj3Si": "Wpis na blogu",
+  "Hd2OAX": "Select funds source",
   "header.options": "Opcje",
   "HEJLVH": "Search by name, handle, tag, description...",
   "helpAndSupport.browseTopics": "Przeglądaj tematy",
