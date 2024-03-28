@@ -1,14 +1,14 @@
 import React from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { FormattedMessage } from 'react-intl';
 
 import dayjs from '../../../../../lib/dayjs';
 
 import { Button } from '../../../../ui/Button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../../../ui/Tooltip';
 
 import { isCurrentPeriod } from './helpers';
 import { serializeReportSlug } from './ReportPeriodSelector';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../../../../ui/Tooltip';
-import { FormattedMessage } from 'react-intl';
 
 export function ReportNavigationArrows({ variables, onChange }) {
   const dateFrom = dayjs.utc(variables.dateFrom);

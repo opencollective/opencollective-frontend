@@ -1514,6 +1514,11 @@ type Expense {
   approvedBy: [Account]!
 
   """
+  The account who paid this expense
+  """
+  paidBy: Account
+
+  """
   Whether this expense is on hold
   """
   onHold: Boolean
@@ -5617,13 +5622,13 @@ type TransactionsReport {
   startingBalance: Amount!
   endingBalance: Amount!
   totalChange: Amount!
-  groups: [TransactionGroup]!
+  groups: [TransactionsAmountGroup]!
 }
 
 """
 EXPERIMENTAL (this may change or be deleted): Transaction amounts grouped by type, kind, isRefund, isHost, expenseType
 """
-type TransactionGroup {
+type TransactionsAmountGroup {
   netAmount: Amount
   amount: Amount
   platformFee: Amount
@@ -11982,6 +11987,11 @@ type Query {
     includeArchived: Boolean
 
     """
+    Ignore individual accounts used to make contributions as guests
+    """
+    skipGuests: Boolean = true
+
+    """
     Only return "active" accounts with Financial Contributions enabled if true.
     """
     isActive: Boolean
@@ -12000,6 +12010,11 @@ type Query {
     Host hosting the account
     """
     host: [AccountReferenceInput]
+
+    """
+    Parent Collective hosting the account
+    """
+    parent: [AccountReferenceInput]
 
     """
     Only return accounts that match these account types (COLLECTIVE, FUND, EVENT, PROJECT, ORGANIZATION or INDIVIDUAL)
@@ -12364,6 +12379,11 @@ type Query {
     Included collectives which are archived
     """
     includeArchived: Boolean
+
+    """
+    Ignore individual accounts used to make contributions as guests
+    """
+    skipGuests: Boolean = true
 
     """
     Only return "active" accounts with Financial Contributions enabled if true.

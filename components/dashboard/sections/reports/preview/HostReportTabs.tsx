@@ -4,7 +4,6 @@ import { FormattedMessage } from 'react-intl';
 
 import FormattedMoneyAmount from '../../../../FormattedMoneyAmount';
 import { Badge } from '../../../../ui/Badge';
-import { DefinitionTooltip } from './DefinitionTooltip';
 
 const Tab = ({ title, description, totalChange, isActive, onClick }) => {
   return (

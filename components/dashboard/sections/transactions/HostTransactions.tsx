@@ -36,12 +36,12 @@ import { transactionsTableQuery } from './queries';
 import { TransactionDrawer } from './TransactionDrawer';
 import TransactionsTable from './TransactionsTable';
 
-const schema = commonSchema.extend({
+export const schema = commonSchema.extend({
   account: hostedAccountFilter.schema,
   excludeHost: boolean.default(false),
 });
 
-type FilterValues = z.infer<typeof schema>;
+export type FilterValues = z.infer<typeof schema>;
 
 type FilterMeta = CommonFilterMeta & {
   hostSlug: string;

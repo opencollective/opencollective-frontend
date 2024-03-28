@@ -1,9 +1,6 @@
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useQuery } from '@apollo/client';
 import { toNumber } from 'lodash';
-// Using Next.js Link directly, as components/Link currently does not handle refs
-// eslint-disable-next-line no-restricted-imports
-import Link from 'next/link';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
@@ -12,20 +9,18 @@ import { integer } from '../../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../../lib/graphql/helpers';
 import useQueryFilter from '../../../../../lib/hooks/useQueryFilter';
 
+import { DataTable } from '../../../../DataTable';
 import FormattedMoneyAmount from '../../../../FormattedMoneyAmount';
 import MessageBoxGraphqlError from '../../../../MessageBoxGraphqlError';
 import Tabs from '../../../../Tabs';
-import { Badge } from '../../../../ui/Badge';
 import { Pagination } from '../../../../ui/Pagination';
-import { Skeleton } from '../../../../ui/Skeleton';
 import { DashboardContext } from '../../../DashboardContext';
 import DashboardHeader from '../../../DashboardHeader';
 import { DashboardSectionProps } from '../../../types';
 
-import { hostReportQuery } from './queries';
-import { isCurrentPeriod, renderReportPeriodLabel, serializeReportSlug } from './ReportPeriodSelector';
 import { CurrentPeriodBadge } from './CurrentPeriodBadge';
-import { DataTable } from '../../../../DataTable';
+import { hostReportQuery } from './queries';
+import { renderReportPeriodLabel, serializeReportSlug } from './ReportPeriodSelector';
 
 const schema = z.object({
   timeUnit: z.enum(['MONTH', 'QUARTER', 'YEAR']).default('MONTH'),
@@ -36,7 +31,7 @@ const schema = z.object({
 const getColumns = intl => [
   {
     accessorKey: 'period',
-    header: intl.formatMessage({ defaultMessage: 'Period' }),
+    header: intl.formatMessage({ id: 'Period', defaultMessage: 'Period' }),
     cell: ({ cell }) => {
       const period = cell.getValue();
       return (
@@ -93,9 +88,6 @@ const HostTransactionReportList = ({ accountSlug: hostSlug }: DashboardSectionPr
   const queryFilter = useQueryFilter({
     filters: {},
     schema,
-    meta: {
-      hostCreatedAt: account.createdAt, // Remove the need for this?
-    },
   });
 
   const { loading, error, data } = useQuery(hostReportQuery, {
@@ -112,6 +104,22 @@ const HostTransactionReportList = ({ accountSlug: hostSlug }: DashboardSectionPr
   const pages = Math.ceil((data?.host?.hostTransactionsReports?.nodes.length || 1) / limit);
   const currentPage = toNumber(offset + limit) / limit;
 
+  const tabs = useMemo(
+    () => [
+      { id: 'MONTH', label: intl.formatMessage({ id: 'Frequency.Monthly', defaultMessage: 'Monthly' }) },
+      { id: 'QUARTER', label: intl.formatMessage({ id: 'quarter', defaultMessage: 'Quarterly' }) },
+      { id: 'YEAR', label: intl.formatMessage({ id: 'Frequency.Yearly', defaultMessage: 'Yearly' }) },
+    ],
+    [intl],
+  );
+
+  const onChange = useCallback(
+    id => {
+      queryFilter.setFilters({ timeUnit: id, offset: 0 });
+    },
+    [queryFilter],
+  );
+
   return (
     <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader
@@ -119,48 +127,20 @@ const HostTransactionReportList = ({ accountSlug: hostSlug }: DashboardSectionPr
         actions={<div className="flex items-center gap-2"></div>}
       />
 
-      <Tabs
-        selectedId={queryFilter.values.timeUnit}
-        onChange={id => queryFilter.setFilters({ timeUnit: id, offset: 0 })}
-        tabs={[
-          { id: 'MONTH', label: 'Monthly' },
-          { id: 'QUARTER', label: 'Quarterly' },
-          { id: 'YEAR', label: 'Yearly' },
-        ]}
-      />
+      <Tabs selectedId={queryFilter.values.timeUnit} onChange={onChange} tabs={tabs} />
 
       <div>
-        {true ? null : (
-          <div className="flex items-center justify-between p-4 text-sm font-medium text-muted-foreground">
-            <div>Period</div>
-            <div className="grid w-[400px] grid-cols-2 text-right">
-              <div>Managed funds</div>
-              <div>Operational funds</div>
-            </div>
-          </div>
-        )}
-        {/* <div className="mb-2 divide-y overflow-hidden rounded-xl border"> */}
-
         <div>
-          {false ? (
-            Array(10)
-              .fill(null)
-              .map((_, i) => (
-                // eslint-disable-next-line react/no-array-index-key
-                <div key={i} className="p-4">
-                  <Skeleton className="h-5 w-1/4" />
-                </div>
-              ))
-          ) : error ? (
+          {error ? (
             <MessageBoxGraphqlError error={error} />
-          ) : true ? (
+          ) : (
             <DataTable
               innerClassName="table-fixed"
               columns={columns}
               loading={loading}
+              mobileTableView
               nbPlaceholders={queryFilter.values.limit}
               onClickRow={row => {
-                console.log({ row });
                 queryFilter.resetFilters(
                   {},
                   `/dashboard/${account.slug}/reports/${serializeReportSlug(row.original.period)}`,
@@ -173,7 +153,6 @@ const HostTransactionReportList = ({ accountSlug: hostSlug }: DashboardSectionPr
                   dateTo: dayjs.utc(n.date).endOf(timeUnit).toISOString(),
                   timeUnit,
                 };
-                // const reportSlug = serializeReportSlug(period);
 
                 return {
                   period,
@@ -182,50 +161,6 @@ const HostTransactionReportList = ({ accountSlug: hostSlug }: DashboardSectionPr
                 };
               })}
             />
-          ) : (
-            data?.host?.hostTransactionsReports?.nodes.slice(offset, offset + limit).map(n => {
-              const timeUnit = data.host.hostTransactionsReports.timeUnit;
-              const period = {
-                dateFrom: dayjs.utc(n.date).startOf(timeUnit).toISOString(),
-                dateTo: dayjs.utc(n.date).endOf(timeUnit).toISOString(),
-                timeUnit,
-              };
-              const reportSlug = serializeReportSlug(period);
-
-              return (
-                <Link
-                  href={`/dashboard/${account.slug}/reports/${reportSlug}`}
-                  className="flex items-center justify-between gap-2 p-4 text-sm font-medium hover:bg-muted"
-                  key={reportSlug}
-                >
-                  <span className="flex items-center gap-2">
-                    {renderReportPeriodLabel(period)}
-                    <CurrentPeriodBadge variables={period} />
-                  </span>
-
-                  <div className="grid w-[400px] grid-cols-2 text-right font-normal text-muted-foreground">
-                    <div>
-                      {n.managedFunds.totalChange.valueInCents > 0 && '+'}
-                      <FormattedMoneyAmount
-                        amount={n.managedFunds.totalChange.valueInCents}
-                        currency={n.managedFunds.totalChange.currency}
-                        amountStyles={{ letterSpacing: 0 }}
-                        showCurrencyCode={false}
-                      />
-                    </div>
-                    <div>
-                      {n.operationalFunds.totalChange.valueInCents > 0 && '+'}
-                      <FormattedMoneyAmount
-                        amount={n.operationalFunds.totalChange.valueInCents}
-                        currency={n.operationalFunds.totalChange.currency}
-                        amountStyles={{ letterSpacing: 0 }}
-                        showCurrencyCode={false}
-                      />
-                    </div>
-                  </div>
-                </Link>
-              );
-            })
           )}
         </div>
       </div>

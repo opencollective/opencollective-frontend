@@ -1,11 +1,17 @@
 import React from 'react';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../../../../ui/Tooltip';
+
 import { cn } from '../../../../../lib/utils';
 
-export function DefinitionTooltip({ children, className, definition }) {
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../../../ui/Tooltip';
+
+interface Props extends React.ComponentPropsWithoutRef<'span'> {
+  definition: React.ReactNode;
+}
+
+export function DefinitionTooltip({ children, className, definition }: Props) {
   return (
     <Tooltip>
-      <TooltipTrigger className="cursor-help">
+      <TooltipTrigger className="inline cursor-help break-before-auto break-words text-left" asChild>
         <span
           className={cn(
             'underline decoration-slate-300 decoration-dashed underline-offset-2 transition-colors hover:decoration-slate-400',

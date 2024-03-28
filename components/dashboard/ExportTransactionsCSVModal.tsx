@@ -177,7 +177,7 @@ type ExportTransactionsCSVModalProps = {
   queryFilter: useQueryFilterReturnType<any, TransactionsPageQueryVariables | HostReportsPageQueryVariables>;
   account?: Pick<Account, 'slug' | 'settings'>;
   isHostReport?: boolean;
-  trigger: React.ReactNode;
+  trigger?: React.ReactNode;
 };
 
 const ExportTransactionsCSVModal = ({
@@ -197,6 +197,7 @@ const ExportTransactionsCSVModal = ({
   const [presetName, setPresetName] = React.useState('');
   const [isEditingPreset, setIsEditingPreset] = React.useState(false);
   const [isDeletingPreset, setIsDeletingPreset] = React.useState(false);
+
   const [submitEditSettings, { loading: isSavingSet, data: updateSettingsData }] = useMutation(
     editAccountSettingsMutation,
     { context: API_V2_CONTEXT },
@@ -392,7 +393,7 @@ const ExportTransactionsCSVModal = ({
   return (
     <React.Fragment>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>{trigger}</DialogTrigger>
+        {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
         <DialogContent className="gap-2 overflow-hidden p-0 md:max-w-4xl">
           <DialogHeader className="px-4  pt-6 sm:px-8">
             <DialogTitle className="text-xl font-bold">

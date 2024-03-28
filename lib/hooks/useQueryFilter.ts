@@ -36,7 +36,7 @@ export type useQueryFilterReturnType<S extends z.ZodObject<z.ZodRawShape, any, a
   defaultSchemaValues: Partial<z.infer<S>>;
 };
 
-export type useQueryFilterOptions<S extends z.ZodObject<z.ZodRawShape, any, any>, GQLQueryVars, FilterMeta = any> = {
+type useQueryFilterOptions<S extends z.ZodObject<z.ZodRawShape, any, any>, GQLQueryVars, FilterMeta = any> = {
   schema: S; // Schema for all query filters (both those which are available to the user in Query and those which are not)
   filters: FilterComponentConfigs<z.infer<S>, FilterMeta>; // Configuration of filters available to the user in the `Filter` component (used in this hook to determine `hasFilters` and `activeViewId`)
   toVariables?: Partial<FiltersToVariables<z.infer<S>, GQLQueryVars, FilterMeta>>;
