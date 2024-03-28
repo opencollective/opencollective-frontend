@@ -95,10 +95,12 @@ export const Steps: Record<ExpenseFlowStep, ExpenseStepDefinition> = {
 
       if (!isEmpty(expensePayoutMethod)) {
         return (
-          <span>
-            {invitePayee ? <InvitedPayeeLabel invitePayee={invitePayee} /> : payee.name}
-            <PayoutMethodLabel showIcon payoutMethod={expensePayoutMethod} />
-          </span>
+          <React.Fragment>
+            <div>{invitePayee ? <InvitedPayeeLabel invitePayee={invitePayee} /> : payee.name}</div>
+            <div className="overflow-hidden text-ellipsis">
+              <PayoutMethodLabel showIcon payoutMethod={expensePayoutMethod} />
+            </div>
+          </React.Fragment>
         );
       }
 
@@ -181,7 +183,12 @@ export const Steps: Record<ExpenseFlowStep, ExpenseStepDefinition> = {
         return true;
       }
 
-      return !!form.errors.expenseCurrency || !!form.errors.expenseItems;
+      return (
+        !!form.errors.expenseCurrency ||
+        !!form.errors.expenseItems ||
+        !!form.errors.title ||
+        (form.options.isAccountingCategoryRequired && !!form.errors.accountingCategoryId)
+      );
     },
   },
   [ExpenseFlowStep.EXPENSE_SUMMARY]: {

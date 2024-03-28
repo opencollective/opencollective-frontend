@@ -8,6 +8,7 @@ import Avatar from '../Avatar';
 import DateTime from '../DateTime';
 import ExpenseAmountBreakdown from '../expenses/ExpenseAmountBreakdown';
 import ExpenseAttachedFiles from '../expenses/ExpenseAttachedFiles';
+import PayoutMethodData from '../expenses/PayoutMethodData';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import LinkCollective from '../LinkCollective';
@@ -16,7 +17,6 @@ import { PayoutMethodLabel } from '../PayoutMethodLabel';
 import UploadedFilePreview from '../UploadedFilePreview';
 
 import { InvitedPayeeLabel } from './InvitedPayeeLabel';
-import { PaymentMethodDetails } from './PickPaymentMethodStep';
 import { ExpenseForm, ExpenseItem } from './useExpenseForm';
 
 type ExpenseSummaryFormProps = {
@@ -215,8 +215,8 @@ export function ExpenseSummaryForm(props: ExpenseSummaryFormProps) {
                   <FormattedMessage id="Details" defaultMessage="Details" /> <PrivateInfoIcon />
                 </span>
               </div>
-              <div className="flex flex-col gap-1">
-                <PaymentMethodDetails payoutMethod={payoutMethod || invitePayoutMethod} />
+              <div className="flex flex-col gap-1 overflow-hidden">
+                <PayoutMethodData showLabel={false} payoutMethod={payoutMethod || invitePayoutMethod} />
               </div>
             </div>
           )}

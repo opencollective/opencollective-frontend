@@ -498,7 +498,7 @@ function buildFormSchema(
       ),
     accountingCategoryId: z
       .string()
-      .nullable()
+      .nullish()
       .refine(
         v => {
           if (

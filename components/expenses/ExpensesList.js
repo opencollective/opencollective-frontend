@@ -113,7 +113,7 @@ const ExpensesList = ({
         <FlipMove enterAnimation="fade" leaveAnimation="fade" disableAllAnimations={DISABLE_ANIMATIONS}>
           {expenses.map((expense, idx) => (
             <ExpenseContainer key={expense.id} isFirst={!idx} data-cy={`expense-${expense.status}`}>
-              {view === 'submitter' ? (
+              {view === 'submitter-new' ? (
                 <SubmittedExpenseListItem
                   expense={expense}
                   onClick={() => {
