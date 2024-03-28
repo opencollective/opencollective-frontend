@@ -106,6 +106,7 @@ const Captcha = React.forwardRef(({ onVerify, provider, ...props }, captchaRef) 
         sitekey={TURNSTILE_SITE_KEY}
         onVerify={token => handleVerify({ token })}
         onError={handleError}
+        theme="light"
         {...props}
       />
     );
