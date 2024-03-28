@@ -101,7 +101,14 @@ const Captcha = React.forwardRef(({ onVerify, provider, ...props }, captchaRef) 
   } else if (provider === PROVIDERS.RECAPTCHA && RECAPTCHA_SITE_KEY) {
     captcha = <ReCaptcha onVerify={handleVerify} onError={handleError} {...props} />;
   } else if (provider === PROVIDERS.TURNSTILE) {
-    captcha = <Turnstile sitekey={TURNSTILE_SITE_KEY} onVerify={handleVerify} onError={handleError} {...props} />;
+    captcha = (
+      <Turnstile
+        sitekey={TURNSTILE_SITE_KEY}
+        onVerify={token => handleVerify({ token })}
+        onError={handleError}
+        {...props}
+      />
+    );
   }
 
   return <Box data-cy="captcha">{captcha}</Box>;
