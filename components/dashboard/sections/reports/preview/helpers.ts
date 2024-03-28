@@ -1,4 +1,4 @@
-import { pick } from 'lodash';
+import { isNil, pick } from 'lodash';
 
 import dayjs from '../../../../../lib/dayjs';
 
@@ -22,7 +22,9 @@ export const filterToTransactionsQuery = (hostSlug, groupFilter: GroupFilter, qu
     ...(groupFilter.expenseType && {
       expenseType: groupFilter.expenseType,
     }),
-    isRefund: groupFilter.isRefund,
+    ...(!isNil(groupFilter.isRefund) && {
+      isRefund: groupFilter.isRefund,
+    }),
     'date[gte]': dayjs.utc(queryFilterValues.period.gt).format('YYYY-MM-DD'),
     'date[lte]': dayjs.utc(queryFilterValues.period.lt).format('YYYY-MM-DD'),
     'date[tz]': 'UTC',
