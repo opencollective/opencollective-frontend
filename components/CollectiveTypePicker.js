@@ -9,7 +9,7 @@ import { Box, Flex, Grid } from './Grid';
 import StyledButton from './StyledButton';
 
 /** Return the caption associated to a given collective type */
-const getTypeCaption = type => {
+export const getTypeCaption = type => {
   if (type === CollectiveType.USER) {
     return <FormattedMessage id="User.InviteNew" defaultMessage="Invite new User" />;
   } else if (type === CollectiveType.ORGANIZATION) {
