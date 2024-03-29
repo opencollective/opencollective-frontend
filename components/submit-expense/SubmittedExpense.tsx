@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import { isEmpty } from 'lodash';
+import { includes, isEmpty } from 'lodash';
 import { ExternalLink } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -19,6 +19,7 @@ import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import CreateExpenseFAQ from '../faqs/CreateExpenseFAQ';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import Image from '../Image';
+import LinkCollective from '../LinkCollective';
 import Loading from '../Loading';
 import MessageBox from '../MessageBox';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
@@ -53,14 +54,18 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
           draft
           host {
             id
+            slug
             legacyId
             name
           }
           account {
             id
+            slug
             legacyId
             name
+            isAdmin
           }
+          requiredLegalDocuments
         }
       }
     `,
@@ -131,6 +136,8 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
 
   const isInvite = expense.status === ExpenseStatus.DRAFT && !expense.recurringExpense;
 
+  const requiresTaxDocuments = expense.account?.isAdmin && includes(expense.requiredLegalDocuments, 'US_TAX_FORM');
+
   return (
     <div className="flex flex-col gap-8 overflow-scroll overflow-x-hidden px-6 py-4 sm:flex-row sm:px-16">
       <div className="flex-1">
@@ -166,17 +173,32 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
           <FormattedMessage defaultMessage="What's next?" />
         </h2>
         <ol className="mb-4 list-inside list-decimal text-sm text-slate-700">
+          {requiresTaxDocuments && (
+            <li>
+              <FormattedMessage defaultMessage="Submit your tax form." />{' '}
+              <StyledLink
+                className="whitespace-nowrap"
+                href="https://docs.opencollective.com/help/expenses-and-getting-paid/tax-information"
+                openInNewTab
+              >
+                <FormattedMessage id="ContributeCard.SeeMore" defaultMessage="See More" />
+                <ExternalLink size={16} className="ml-1 inline align-text-top" />
+              </StyledLink>
+            </li>
+          )}
           <li>
             <FormattedMessage
               defaultMessage="This expense needs to be approved by an admin of {collective}"
-              values={{ collective: expense.account?.name }}
+              values={{
+                collective: <LinkCollective openInNewTab className="underline" collective={expense.account} />,
+              }}
             />
           </li>
           {expense.host && (
             <li>
               <FormattedMessage
                 defaultMessage="After that, this expense needs to be reviewed and paid by an admin of {host}"
-                values={{ host: expense.host?.name }}
+                values={{ host: <LinkCollective openInNewTab className="underline" collective={expense.host} /> }}
               />
             </li>
           )}

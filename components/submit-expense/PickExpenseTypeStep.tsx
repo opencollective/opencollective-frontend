@@ -20,11 +20,8 @@ export function PickExpenseTypeForm(props: PickExpenseTypeFormProps) {
   return (
     <div className="flex-grow pr-2">
       <h1 className="mb-4 text-lg font-bold leading-[26px] text-dark-900">
-        <FormattedMessage defaultMessage="What are you here for?" />
+        <FormattedMessage defaultMessage="Select the type of expense" />
       </h1>
-      <h2 className="mb-2 text-base font-bold leading-6 text-slate-800">
-        <FormattedMessage defaultMessage="Submitting an expense" />
-      </h2>
       <div className="flex gap-2">
         {supportedExpenseTypes.includes(ExpenseType.INVOICE) && (
           <ExpenseTypeOptionButton
@@ -55,7 +52,7 @@ export function PickExpenseTypeForm(props: PickExpenseTypeFormProps) {
 
       {props.form.options.hostExpensePolicy && props.form.values.expenseTypeOption && (
         <React.Fragment>
-          <h2 className="my-5 text-base font-bold leading-6 text-slate-800">
+          <h2 className="mb-2 mt-5 text-base font-bold leading-6 text-slate-800">
             <FormattedMessage defaultMessage="Host Instructions" />
           </h2>
           <div>
@@ -66,7 +63,7 @@ export function PickExpenseTypeForm(props: PickExpenseTypeFormProps) {
 
       {props.form.options.collectiveExpensePolicy && props.form.values.expenseTypeOption && (
         <React.Fragment>
-          <h2 className="my-5 text-base font-bold leading-6 text-slate-800">
+          <h2 className="mb-2 mt-8 text-base font-bold leading-6 text-slate-800">
             <FormattedMessage defaultMessage="Collective Instructions" />
           </h2>
           <div>
@@ -77,7 +74,7 @@ export function PickExpenseTypeForm(props: PickExpenseTypeFormProps) {
 
       {props.form.values.expenseTypeOption &&
         (props.form.options.hostExpensePolicy || props.form.options.collectiveExpensePolicy) && (
-          <div className="my-3">
+          <div className="mb-2 mt-5">
             <StyledCheckbox
               name="acknowledgedExpensePolicy"
               required

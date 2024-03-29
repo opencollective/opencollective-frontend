@@ -94,27 +94,6 @@ export function ExpenseDetailsForm(props: ExpenseDetailsFormProps) {
             defaultMessage="This information is public. Please do not add any personal information such as names or addresses in this field."
           />
         </p>
-        <StyledInputFormikField
-          name="tags"
-          labelFontWeight="bold"
-          labelColor="slate.800"
-          labelFontSize="16px"
-          labelProps={{ my: 3, letterSpacing: 0 }}
-          required={false}
-          label={<FormattedMessage defaultMessage="Tag your expense" />}
-        >
-          {() => (
-            <div className="flex items-center gap-1">
-              <ExpenseTypeTag type={props.form.values.expenseTypeOption} mb={0} mr={0} />
-              <AutocompleteEditTags
-                query={expenseTagsQuery}
-                variables={{ account: { slug: props.form.values.collectiveSlug } }}
-                onChange={onTagChange}
-                value={props.form.values.tags}
-              />
-            </div>
-          )}
-        </StyledInputFormikField>
 
         <StyledInputFormikField
           name="expenseCurrency"
@@ -139,27 +118,6 @@ export function ExpenseDetailsForm(props: ExpenseDetailsFormProps) {
             />
           )}
         </StyledInputFormikField>
-
-        {ExpenseType.INVOICE === props.form.values.expenseTypeOption && (
-          <ExpenseAttachedFilesForm
-            title={<FormattedMessage id="UploadInvoice" defaultMessage="Upload invoice" />}
-            description={
-              <FormattedMessage
-                id="UploadInvoiceDescription"
-                defaultMessage="If you already have an invoice document, you can upload it here."
-              />
-            }
-            defaultValue={props.form.values.expenseAttachedFiles}
-            onChange={expenseAttachedFiles =>
-              props.form.setFieldValue(
-                'expenseAttachedFiles',
-                expenseAttachedFiles.map(eaf => ({
-                  url: eaf.url,
-                })),
-              )
-            }
-          />
-        )}
 
         <ExpenseItemsForm form={props.form} className="mt-4" />
 
@@ -286,6 +244,49 @@ export function ExpenseDetailsForm(props: ExpenseDetailsFormProps) {
             taxes={taxes}
           />
         </div>
+
+        {ExpenseType.INVOICE === props.form.values.expenseTypeOption && (
+          <ExpenseAttachedFilesForm
+            title={<FormattedMessage id="UploadInvoice" defaultMessage="Upload invoice" />}
+            description={
+              <FormattedMessage
+                id="UploadInvoiceDescription"
+                defaultMessage="If you already have an invoice document, you can upload it here."
+              />
+            }
+            defaultValue={props.form.values.expenseAttachedFiles}
+            onChange={expenseAttachedFiles =>
+              props.form.setFieldValue(
+                'expenseAttachedFiles',
+                expenseAttachedFiles.map(eaf => ({
+                  url: eaf.url,
+                })),
+              )
+            }
+          />
+        )}
+
+        <StyledInputFormikField
+          name="tags"
+          labelFontWeight="bold"
+          labelColor="slate.800"
+          labelFontSize="16px"
+          labelProps={{ my: 3, letterSpacing: 0 }}
+          required={false}
+          label={<FormattedMessage defaultMessage="Tag your expense" />}
+        >
+          {() => (
+            <div className="flex items-center gap-1">
+              <ExpenseTypeTag type={props.form.values.expenseTypeOption} mb={0} mr={0} />
+              <AutocompleteEditTags
+                query={expenseTagsQuery}
+                variables={{ account: { slug: props.form.values.collectiveSlug } }}
+                onChange={onTagChange}
+                value={props.form.values.tags}
+              />
+            </div>
+          )}
+        </StyledInputFormikField>
       </div>
     </FormikProvider>
   );

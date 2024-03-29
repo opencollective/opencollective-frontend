@@ -9,7 +9,7 @@ import memoizeOne from 'memoize-one';
 import { IntlShape, useIntl } from 'react-intl';
 import z, { ZodObjectDef } from 'zod';
 
-import { AccountTypesWithHost } from '../../lib/constants/collectives';
+import { AccountTypesWithHost, CollectiveType } from '../../lib/constants/collectives';
 import { LoggedInUser } from '../../lib/custom_typings/LoggedInUser';
 import { getPayoutProfiles } from '../../lib/expenses';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
@@ -173,6 +173,7 @@ const formSchemaQuery = gql`
         rate
         idNumber
       }
+      requiredLegalDocuments
       accountingCategory {
         id
       }
@@ -344,6 +345,7 @@ const formSchemaQuery = gql`
     slug
     name
     type
+    isAdmin
     payoutMethods {
       id
       type
@@ -480,7 +482,11 @@ function buildFormSchema(
       .nullish()
       .refine(
         v => {
-          if (options.payee && !options.payee.payoutMethods?.some(pm => pm.id === v)) {
+          if (
+            options.payee &&
+            options.payee.type !== CollectiveType.VENDOR &&
+            !options.payee.payoutMethods?.some(pm => pm.id === v)
+          ) {
             return false;
           }
 
@@ -492,7 +498,7 @@ function buildFormSchema(
       ),
     accountingCategoryId: z
       .string()
-      .nullable()
+      .nullish()
       .refine(
         v => {
           if (

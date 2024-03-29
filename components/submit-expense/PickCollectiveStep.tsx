@@ -11,6 +11,7 @@ import { CollectiveOptionQuery, CollectiveOptionQueryVariables } from '../../lib
 import Avatar from '../Avatar';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import Loading from '../Loading';
+import { Button } from '../ui/Button';
 
 import { RadioCardButton } from './RadioCardButton';
 import { ExpenseForm } from './useExpenseForm';
@@ -46,7 +47,7 @@ export function PickCollectiveStepForm(props: PickCollectiveStepFormProps) {
 
   const recentCollectivePicked = recentCollectives.some(({ slug }) => slug === props.form.values.collectiveSlug);
 
-  const canChangeAccount = !props.form.options.expense?.account;
+  const canChangeAccount = !props.form.options.expense?.account || props.form.startOptions.duplicateExpense;
 
   if (props.form.options.loggedInAccount && !props.form.options.recentlySubmittedExpenses) {
     return <Loading />;
@@ -55,7 +56,7 @@ export function PickCollectiveStepForm(props: PickCollectiveStepFormProps) {
   return (
     <div className="flex-grow">
       <h1 className="mb-4 text-lg font-bold leading-[26px] text-dark-900">
-        <FormattedMessage defaultMessage="Who are you requesting money from?" />
+        <FormattedMessage defaultMessage="What profile are you requesting money from?" />
       </h1>
 
       {canChangeAccount ? (
@@ -115,6 +116,7 @@ type CollectiveOptionProps = {
   isLastUsedCollective?: boolean;
   checked?: boolean;
   onClick?: () => void;
+  onChange?: () => void;
 };
 
 function CollectiveOption(props: CollectiveOptionProps) {
@@ -155,6 +157,11 @@ function CollectiveOption(props: CollectiveOptionProps) {
           ) : (
             query.data?.account?.name
           )}
+          {props.onChange && (
+            <Button className="ml-auto" variant="link" onClick={props.onChange}>
+              <FormattedMessage defaultMessage="Change" />
+            </Button>
+          )}
         </div>
       }
     />
@@ -189,6 +196,10 @@ function CollectiveOptionPicker(props: CollectiveOptionPickerProps) {
       skip: !props.collectiveSlug || !props.checked,
     },
   );
+
+  if (props.checked && props.collectiveSlug) {
+    return <CollectiveOption collectiveSlug={props.collectiveSlug} checked onChange={() => props.onChange(null)} />;
+  }
 
   return (
     <RadioCardButton

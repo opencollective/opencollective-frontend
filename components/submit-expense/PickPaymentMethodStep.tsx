@@ -1,8 +1,8 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import clsx from 'clsx';
 import { FormikProvider, useFormik } from 'formik';
-import { uniqBy } from 'lodash';
+import { debounce, uniqBy } from 'lodash';
 import { ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -24,6 +24,7 @@ import CollectivePicker from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import ConfirmationModal, { CONFIRMATION_MODAL_TERMINATE } from '../ConfirmationModal';
 import ExpenseFormPayeeInviteNewStep from '../expenses/ExpenseFormPayeeInviteNewStep';
+import PayoutMethodData from '../expenses/PayoutMethodData';
 import PayoutMethodForm, { validatePayoutMethod } from '../expenses/PayoutMethodForm';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import Loading from '../Loading';
@@ -34,6 +35,7 @@ import StyledSelect from '../StyledSelect';
 import { Button } from '../ui/Button';
 import { useToast } from '../ui/useToast';
 
+import { InvitedPayeeLabel } from './InvitedPayeeLabel';
 import { RadioCardButton } from './RadioCardButton';
 import { ExpenseForm } from './useExpenseForm';
 
@@ -45,10 +47,7 @@ export function PickPaymentMethodForm(props: PickPaymentMethodFormProps) {
   const { LoggedInUser } = useLoggedInUser();
   const [isChangingPayee, setIsChangingPayee] = React.useState(false);
 
-  const payeeProfile = React.useMemo(
-    () => props.form.options.payoutProfiles?.find(p => p.slug === props.form.values.payeeSlug),
-    [props.form.values.payeeSlug, props.form.options.payoutProfiles],
-  );
+  const payeeProfile = props.form.options.payee;
 
   const pickedLastSubmitedPayee = React.useMemo(
     () =>
@@ -62,6 +61,10 @@ export function PickPaymentMethodForm(props: PickPaymentMethodFormProps) {
 
   const invitePayee = props.form.values.invitePayee;
 
+  const pickedPayee = invitePayee || payeeProfile;
+  const hasPayoutPicker =
+    pickedPayee && !isChangingPayee && payeeProfile?.type !== CollectiveType.VENDOR && !invitePayee?.['legacyId'];
+
   return (
     <div className="flex-grow pr-2">
       <h1 className="mb-4 text-lg font-bold leading-[26px] text-dark-900">
@@ -69,7 +72,7 @@ export function PickPaymentMethodForm(props: PickPaymentMethodFormProps) {
       </h1>
 
       <React.Fragment>
-        {isChangingPayee || (!payeeProfile && !invitePayee) ? (
+        {isChangingPayee || !pickedPayee ? (
           <PayeePicker
             form={props.form}
             isChangingPayee={isChangingPayee}
@@ -93,13 +96,8 @@ export function PickPaymentMethodForm(props: PickPaymentMethodFormProps) {
                         label: payeeProfile.name,
                       }}
                     />
-                  ) : invitePayee && 'legacyId' in invitePayee ? (
-                    <FormattedMessage defaultMessage="Invite: {name}" values={{ name: invitePayee.legacyId }} />
-                  ) : invitePayee && !('legacyId' in invitePayee) ? (
-                    <FormattedMessage
-                      defaultMessage="Invite: {name} ({email})"
-                      values={{ name: invitePayee.name, email: invitePayee.email }}
-                    />
+                  ) : invitePayee ? (
+                    <InvitedPayeeLabel invitePayee={invitePayee} />
                   ) : (
                     payeeProfile.name
                   )}
@@ -122,9 +120,7 @@ export function PickPaymentMethodForm(props: PickPaymentMethodFormProps) {
           />
         )}
 
-        {(payeeProfile || (invitePayee && !('id' in invitePayee))) && !isChangingPayee && (
-          <PayoutMethodPicker form={props.form} />
-        )}
+        {hasPayoutPicker && <PayoutMethodPicker form={props.form} />}
       </React.Fragment>
     </div>
   );
@@ -137,6 +133,7 @@ type PayeePickerProps = {
 };
 
 function PayeePicker(props: PayeePickerProps) {
+  const [isPickingVendor, setIsPickingVendor] = React.useState(false);
   const [isPickingOtherPayee, setIsPickingOtherPayee] = React.useState(false);
   const [isInvitingOtherPayee, setIsInvitingOtherPayee] = React.useState(props.form.startOptions.preselectInvitePayee);
   const { LoggedInUser } = useLoggedInUser();
@@ -173,6 +170,7 @@ function PayeePicker(props: PayeePickerProps) {
     if (
       !props.isChangingPayee &&
       !isPickingOtherPayee &&
+      !isPickingVendor &&
       !isInvitingOtherPayee &&
       recentPayeesSlugs.length > 0 &&
       !props.form.values.payeeSlug &&
@@ -185,6 +183,7 @@ function PayeePicker(props: PayeePickerProps) {
     onPayeePicked,
     props.isChangingPayee,
     isPickingOtherPayee,
+    isPickingVendor,
     isInvitingOtherPayee,
     recentPayeesSlugs,
     loggedInAccount,
@@ -209,6 +208,7 @@ function PayeePicker(props: PayeePickerProps) {
               props.form.setFieldValue('payeeSlug', payeeSlug);
               onPayeePicked();
               setIsPickingOtherPayee(false);
+              setIsPickingVendor(false);
             }}
             title={
               <div className="flex gap-2">
@@ -233,10 +233,11 @@ function PayeePicker(props: PayeePickerProps) {
             className="order-2"
             checked={loggedInAccount.slug === props.form.values.payeeSlug}
             onClick={() => {
-              props.form.setFieldValue('payeeSlug', loggedInAccount.slug);
+              setFieldValue('payeeSlug', loggedInAccount.slug);
               onPayeePicked();
               setIsPickingOtherPayee(false);
               setIsInvitingOtherPayee(false);
+              setIsPickingVendor(false);
             }}
             title={
               <div className="flex gap-2">
@@ -253,6 +254,7 @@ function PayeePicker(props: PayeePickerProps) {
             onClick={() => {
               setIsPickingOtherPayee(true);
               setIsInvitingOtherPayee(false);
+              setIsPickingVendor(false);
             }}
             title={<FormattedMessage defaultMessage="A profile I administer" />}
             content={
@@ -265,6 +267,9 @@ function PayeePicker(props: PayeePickerProps) {
                       setIsPickingOtherPayee(true);
                       setFieldValue('payeeSlug', e.value.slug);
                       onPayeePicked();
+                      setIsPickingOtherPayee(false);
+                      setIsInvitingOtherPayee(false);
+                      setIsPickingVendor(false);
                     }}
                   />
                 </div>
@@ -272,6 +277,30 @@ function PayeePicker(props: PayeePickerProps) {
             }
           />
         )}
+        <RadioCardButton
+          className="order-2"
+          checked={isPickingVendor}
+          title={<FormattedMessage defaultMessage="A vendor" />}
+          content={
+            isPickingVendor && (
+              <div className="mt-2">
+                <VendorPicker
+                  collectiveSlug={props.form.values.collectiveSlug}
+                  hostSlug={props.form.options.host.slug}
+                  onChange={vendor => {
+                    setFieldValue('payeeSlug', vendor.slug);
+                    onPayeePicked();
+                  }}
+                />
+              </div>
+            )
+          }
+          onClick={() => {
+            setIsPickingVendor(true);
+            setIsPickingOtherPayee(false);
+            setIsInvitingOtherPayee(false);
+          }}
+        />
         <RadioCardButton
           className={clsx({
             'order-1': props.form.startOptions.preselectInvitePayee,
@@ -285,6 +314,7 @@ function PayeePicker(props: PayeePickerProps) {
           onClick={() => {
             setIsInvitingOtherPayee(true);
             setIsPickingOtherPayee(false);
+            setIsPickingVendor(false);
           }}
           title={
             <FormattedMessage
@@ -389,67 +419,6 @@ function InvitePayeePicker(props: InvitePayeePickerProps) {
   );
 }
 
-export function PaymentMethodDetails(props: { payoutMethod?: Omit<PayoutMethod, 'id'> }) {
-  if (!props.payoutMethod) {
-    return null;
-  }
-
-  return (
-    <React.Fragment>
-      {props.payoutMethod?.name && (
-        <div className="text-sm text-slate-700">
-          <div className="font-bold">
-            <FormattedMessage id="Fields.name" defaultMessage="Name" />
-          </div>
-          <div className="overflow-hidden text-ellipsis">{props.payoutMethod?.name}</div>
-        </div>
-      )}
-
-      {props.payoutMethod?.data?.currency && (
-        <div className="text-sm text-slate-700">
-          <div className="font-bold">
-            <FormattedMessage id="Currency" defaultMessage="Currency" />
-          </div>
-          <div className="overflow-hidden text-ellipsis">{props.payoutMethod?.data?.currency}</div>
-        </div>
-      )}
-
-      {props.payoutMethod?.data?.accountHolderName && (
-        <div className="text-sm text-slate-700">
-          <div className="font-bold">
-            <FormattedMessage defaultMessage="Account holder" />
-          </div>
-          <div className="overflow-hidden text-ellipsis">{props.payoutMethod?.data?.accountHolderName}</div>
-        </div>
-      )}
-
-      {props.payoutMethod?.data?.details?.accountNumber && (
-        <div className="text-sm text-slate-700">
-          <div className="font-bold">
-            <FormattedMessage defaultMessage="Account number" />
-          </div>
-          <div className="overflow-hidden text-ellipsis">{props.payoutMethod?.data?.details?.accountNumber}</div>
-        </div>
-      )}
-
-      {props.payoutMethod?.data?.email && (
-        <div className="text-sm text-slate-700">
-          <div className="font-bold">
-            <FormattedMessage id="Email" defaultMessage="Email" />
-          </div>
-          <div className="overflow-hidden text-ellipsis">{props.payoutMethod?.data?.email}</div>
-        </div>
-      )}
-
-      {props.payoutMethod?.data?.content && (
-        <div className="text-sm text-slate-700">
-          <div className="overflow-hidden text-ellipsis">{props.payoutMethod?.data?.content}</div>
-        </div>
-      )}
-    </React.Fragment>
-  );
-}
-
 type PayoutMethodOptionButtonProps = {
   payoutMethod: PayoutMethod | Omit<PayoutMethod, 'id'>;
   checked?: boolean;
@@ -482,6 +451,8 @@ function PayoutMethodOptionButton(props: PayoutMethodOptionButtonProps) {
     },
   );
 
+  const hasDetails = props.payoutMethod.type !== PayoutMethodType.PAYPAL;
+
   return (
     <React.Fragment>
       <RadioCardButton
@@ -509,39 +480,41 @@ function PayoutMethodOptionButton(props: PayoutMethodOptionButtonProps) {
                 </b>
               )}
             </div>
-            <div className="flex">
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={e => {
-                  e.stopPropagation();
-                  setIsOpen(!isOpen);
-                }}
-              >
-                {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-              </Button>
+            {hasDetails && (
+              <div className="flex">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={e => {
+                    e.stopPropagation();
+                    setIsOpen(!isOpen);
+                  }}
+                >
+                  {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                </Button>
 
-              <Button
-                onClick={e => {
-                  e.stopPropagation();
-                  if ('id' in props.payoutMethod) {
-                    setIsDeletingPayoutMethod(true);
-                  } else {
-                    props.onDelete();
-                  }
-                }}
-                size="icon"
-                variant="ghost"
-              >
-                <Trash2 size={16} />
-              </Button>
-            </div>
+                <Button
+                  onClick={e => {
+                    e.stopPropagation();
+                    if ('id' in props.payoutMethod) {
+                      setIsDeletingPayoutMethod(true);
+                    } else {
+                      props.onDelete();
+                    }
+                  }}
+                  size="icon"
+                  variant="ghost"
+                >
+                  <Trash2 size={16} />
+                </Button>
+              </div>
+            )}
           </div>
         }
         content={
-          isOpen ? (
+          isOpen && hasDetails ? (
             <div className="flex flex-col gap-1 *:first:mt-2">
-              <PaymentMethodDetails payoutMethod={props.payoutMethod} />
+              <PayoutMethodData showLabel={false} payoutMethod={props.payoutMethod} />
             </div>
           ) : null
         }
@@ -842,5 +815,62 @@ function CreatePayoutMethodForm(props: CreatePayoutMethodFormProps) {
         <FormattedMessage id="save" defaultMessage="Save" />
       </Button>
     </FormikProvider>
+  );
+}
+
+type VendorPickerProps = {
+  hostSlug: string;
+  collectiveSlug: string;
+  onChange: (vendor: { slug: string }) => void;
+};
+
+function VendorPicker(props: VendorPickerProps) {
+  const [term, setTerm] = React.useState(null);
+
+  const query = useQuery(
+    gql`
+      query VendorPickerSearch($searchTerm: String, $hostSlug: String!, $collectiveSlug: String!) {
+        host(slug: $hostSlug) {
+          vendors(forAccount: { slug: $collectiveSlug }, searchTerm: $searchTerm) {
+            nodes {
+              id
+              slug
+              name
+              imageUrl
+              type
+            }
+          }
+        }
+      }
+    `,
+    {
+      context: API_V2_CONTEXT,
+      variables: {
+        searchTerm: term,
+        collectiveSlug: props.collectiveSlug,
+        hostSlug: props.hostSlug,
+      },
+    },
+  );
+
+  const onSearch = React.useMemo(
+    () =>
+      debounce(newTerm => {
+        setTerm(newTerm);
+      }, 2000),
+    [],
+  );
+
+  return (
+    <CollectivePicker
+      isLoading={query.loading}
+      collectives={query.data?.host?.vendors?.nodes ?? []}
+      useSearchIcon={true}
+      isSearchable
+      onInputChange={onSearch}
+      onChange={e => {
+        props.onChange(e.value);
+      }}
+    />
   );
 }
