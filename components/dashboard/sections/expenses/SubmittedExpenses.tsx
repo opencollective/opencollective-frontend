@@ -113,7 +113,7 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
             expenses={data?.expenses?.nodes}
             nbPlaceholders={queryFilter.values.limit}
             isInverted
-            view={'submitter'}
+            view={'submitter-new'}
             useDrawer
             openExpenseLegacyId={Number(router.query.openExpenseId)}
             expenseFieldForTotalAmount="amountInCreatedByAccountCurrency"
