@@ -8,7 +8,7 @@ import PaymentMethodTypeWithIcon from '../../components/PaymentMethodTypeWithIco
 <Canvas>
   <Story name="Prepaid">
     {() => {
-      return <PaymentMethodTypeWithIcon type="prepaid" />;
+      return <PaymentMethodTypeWithIcon type="PREPAID" />;
     }}
   </Story>
 </Canvas>
@@ -18,7 +18,7 @@ import PaymentMethodTypeWithIcon from '../../components/PaymentMethodTypeWithIco
 <Canvas>
   <Story name="Payment">
     {() => {
-      return <PaymentMethodTypeWithIcon type="payment" />;
+      return <PaymentMethodTypeWithIcon type="PAYMENT" />;
     }}
   </Story>
 </Canvas>
@@ -28,7 +28,7 @@ import PaymentMethodTypeWithIcon from '../../components/PaymentMethodTypeWithIco
 <Canvas>
   <Story name="Adaptive">
     {() => {
-      return <PaymentMethodTypeWithIcon type="adaptive" />;
+      return <PaymentMethodTypeWithIcon type="ADAPTIVE" />;
     }}
   </Story>
 </Canvas>
@@ -38,17 +38,7 @@ import PaymentMethodTypeWithIcon from '../../components/PaymentMethodTypeWithIco
 <Canvas>
   <Story name="Credit Card">
     {() => {
-      return <PaymentMethodTypeWithIcon type="creditcard" />;
-    }}
-  </Story>
-</Canvas>
-
-- Virtual Card
-
-<Canvas>
-  <Story name="Virtual Card">
-    {() => {
-      return <PaymentMethodTypeWithIcon type="virtualcard" />;
+      return <PaymentMethodTypeWithIcon type="CREDITCARD" />;
     }}
   </Story>
 </Canvas>
@@ -58,7 +48,15 @@ import PaymentMethodTypeWithIcon from '../../components/PaymentMethodTypeWithIco
 <Canvas>
   <Story name="Collective">
     {() => {
-      return <PaymentMethodTypeWithIcon type="collective" />;
+      return <PaymentMethodTypeWithIcon type="COLLECTIVE" />;
+    }}
+  </Story>
+</Canvas>
+
+<Canvas>
+  <Story name="Stripe intent">
+    {() => {
+      return <PaymentMethodTypeWithIcon type="PAYMENT_INTENT" />;
     }}
   </Story>
 </Canvas>

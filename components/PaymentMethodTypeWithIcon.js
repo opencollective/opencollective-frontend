@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Alipay } from '@styled-icons/fa-brands/Alipay';
 import { Paypal as PaypalIcon } from '@styled-icons/fa-brands/Paypal';
+import { StripeS as StripeIcon } from '@styled-icons/fa-brands/StripeS';
 import { CreditCard } from '@styled-icons/fa-solid/CreditCard';
 import { ExchangeAlt as OtherIcon } from '@styled-icons/fa-solid/ExchangeAlt';
 import { useIntl } from 'react-intl';
@@ -51,6 +52,13 @@ const PaymentMethodTypeWithIcon = ({ isLoading, type, iconSize }) => {
         <Flex alignItems="center">
           <PaypalIcon size={iconSize} color="#192f86" />
           <Span ml={2}>PayPal</Span>
+        </Flex>
+      );
+    case PAYMENT_METHOD_TYPE.PAYMENT_INTENT:
+      return (
+        <Flex alignItems="center">
+          <StripeIcon size={iconSize} color="#6772e5" />
+          <Span ml={2}>Stripe Payment Intent</Span>
         </Flex>
       );
     default:
