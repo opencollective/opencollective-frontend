@@ -167,9 +167,11 @@ export const prepareExpenseForSubmit = expenseData => {
     }
   }
 
-  const payeeLocation = checkRequiresAddress(expenseData)
-    ? pick(expenseData.payeeLocation, ['address', 'country', 'structured'])
-    : null;
+  const payeeLocation = expenseData.payee?.isInvite
+    ? expenseData.payeeLocation
+    : checkRequiresAddress(expenseData)
+      ? pick(expenseData.payeeLocation, ['address', 'country', 'structured'])
+      : null;
 
   const payoutMethod = pick(expenseData.payoutMethod, ['id', 'name', 'data', 'isSaved', 'type']);
   if (payoutMethod.id === 'new') {
