@@ -468,7 +468,10 @@ const Contributions = ({ accountSlug, direction }: ContributionsProps) => {
       <Filterbar {...queryFilter} />
 
       {isIncoming && metadata?.account?.[ContributionsTab.PAUSED].totalCount > 0 && (
-        <PausedIncomingContributionsMessage account={metadata.account} count={currentViewCount} />
+        <PausedIncomingContributionsMessage
+          account={metadata.account}
+          count={metadata.account[ContributionsTab.PAUSED].totalCount}
+        />
       )}
 
       {error ? (
