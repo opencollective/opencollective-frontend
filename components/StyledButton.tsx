@@ -19,6 +19,7 @@ import {
   TypographyProps,
 } from 'styled-system';
 
+import { mergeRefs } from '../lib/react-utils';
 import { textTransform, TextTransformProps, whiteSpace, WhiteSpaceProps } from '../lib/styled-system-custom-properties';
 import theme from '../lib/theme';
 import { ButtonSize, buttonSize, ButtonStyle, buttonStyle } from '../lib/theme/variants/button';
@@ -128,16 +129,34 @@ const StyledButtonContent = styled.button<StyledButtonProps>`
 const StyledButton: ForwardRefExoticComponent<StyledButtonProps> = React.forwardRef<
   HTMLButtonElement,
   StyledButtonProps
->(({ loading, as, ...props }, ref) =>
+>(({ loading, as, ...props }, ref) => {
+  const internalRef = React.useRef<HTMLButtonElement>(null);
+  const allRefs = mergeRefs([ref, internalRef]);
+  const baseSize = React.useMemo(() => {
+    if (loading) {
+      return {
+        width: internalRef.current?.offsetWidth,
+        height: internalRef.current?.offsetHeight,
+      };
+    }
+  }, [loading]);
+
   // TODO(Typescript): We have to hack the `as` prop because styled-components somehow types it as "never"
-  !loading ? (
-    <StyledButtonContent {...props} as={as as never} ref={ref} />
+  return !loading ? (
+    <StyledButtonContent {...props} as={as as never} ref={allRefs} />
   ) : (
-    <StyledButtonContent {...props} as={as as never} onClick={undefined} ref={ref}>
+    <StyledButtonContent
+      {...props}
+      as={as as never}
+      width={props.width ?? props.size ?? baseSize?.width}
+      height={props.height ?? props.size ?? baseSize?.height}
+      onClick={undefined}
+      ref={allRefs}
+    >
       <StyledSpinner size="0.9em" />
     </StyledButtonContent>
-  ),
-);
+  );
+});
 
 StyledButton.displayName = 'StyledButton';
 
