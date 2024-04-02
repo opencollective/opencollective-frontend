@@ -73,7 +73,7 @@ const dashboardContributionsMetadataQuery = gql`
       ALL: orders(filter: $filter) {
         totalCount
       }
-      RECURRING: orders(filter: $filter, onlyActiveSubscriptions: true, includeIncognito: true) {
+      RECURRING: orders(filter: $filter, onlySubscriptions: true, includeIncognito: true) {
         totalCount
       }
       ONETIME: orders(filter: $filter, frequency: ONETIME, status: [PAID], includeIncognito: true, minAmount: 1) {
@@ -98,7 +98,7 @@ const dashboardContributionsQuery = gql`
     $filter: AccountOrdersFilter!
     $frequency: ContributionFrequency
     $status: [OrderStatus!]
-    $onlyActiveSubscriptions: Boolean
+    $onlySubscriptions: Boolean
     $includeIncognito: Boolean
     $minAmount: Int
     $maxAmount: Int
@@ -110,7 +110,7 @@ const dashboardContributionsQuery = gql`
         filter: $filter
         frequency: $frequency
         status: $status
-        onlyActiveSubscriptions: $onlyActiveSubscriptions
+        onlySubscriptions: $onlySubscriptions
         includeIncognito: $includeIncognito
         minAmount: $minAmount
         maxAmount: $maxAmount
