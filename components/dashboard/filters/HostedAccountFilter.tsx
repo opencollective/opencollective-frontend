@@ -5,7 +5,7 @@ import { z } from 'zod';
 
 import { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
 import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
-import { Account, AccountHoverCardFieldsFragment } from '../../../lib/graphql/types/v2/graphql';
+import { Account, AccountHoverCardFieldsFragment, AccountQuery } from '../../../lib/graphql/types/v2/graphql';
 
 import { AccountHoverCard, accountHoverCardFields } from '../../AccountHoverCard';
 import Avatar from '../../Avatar';
@@ -43,13 +43,13 @@ export const AccountRenderer = ({
   };
   inOptionsList?: boolean; // For positioning the HoverCard to the right to prevent blocking options list
 }) => {
-  const { data } = useQuery(accountQuery, {
+  const { data } = useQuery<AccountQuery>(accountQuery, {
     variables: { slug: account.slug },
     fetchPolicy: 'cache-first',
     context: API_V2_CONTEXT,
     // skip query if there is already a field from the hover card data (such as description),
     // to prevent fetching all accounts when used in the combo select filter that already queries for these fields
-    skip: !!account.description,
+    skip: !!account.description && !!account.type,
   });
   account = data?.account || account;
 
