@@ -73,7 +73,7 @@ const dashboardContributionsMetadataQuery = gql`
       ALL: orders(filter: $filter) {
         totalCount
       }
-      RECURRING: orders(filter: $filter, onlySubscriptions: true, includeIncognito: true) {
+      RECURRING: orders(filter: $filter, onlyActiveSubscriptions: true, includeIncognito: true) {
         totalCount
       }
       ONETIME: orders(filter: $filter, frequency: ONETIME, status: [PAID], includeIncognito: true, minAmount: 1) {
