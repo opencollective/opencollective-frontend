@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 
+import { mergeRefs } from '../../lib/react-utils';
 import { cn } from '../../lib/utils';
 
 import StyledSpinner from '../StyledSpinner';
@@ -47,6 +48,16 @@ export interface ButtonProps
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, loading = false, onClick, children, ...props }, ref) => {
     const Comp = asChild ? Slot : 'button';
+    const internalRef = React.useRef<HTMLButtonElement>(null);
+    const allRefs = mergeRefs([ref, internalRef]);
+    const baseSize = React.useMemo(() => {
+      if (loading) {
+        return {
+          width: internalRef.current?.offsetWidth,
+          height: internalRef.current?.offsetHeight,
+        };
+      }
+    }, [loading]);
     const realChildren = loading ? (
       <span>
         <StyledSpinner size={16} />
@@ -57,10 +68,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
-        ref={ref}
+        ref={allRefs}
         type="button"
         {...props}
         onClick={loading ? null : onClick}
+        style={!loading ? undefined : { width: baseSize?.width, height: baseSize?.height }}
       >
         {realChildren}
       </Comp>
