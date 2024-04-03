@@ -190,33 +190,27 @@ const getPayeeOptions = (intl, payoutProfiles) => {
   return payeeOptions;
 };
 
-const expenseFormPayeeStepQuery = gql`
-  query ExpenseFormPayee($collectiveSlug: String!) {
-    account(slug: $collectiveSlug, throwIfMissing: false) {
+const hostVendorsQuery = gql`
+  query HostVendors($hostId: String!, $collectiveSlug: String!) {
+    host(id: $hostId, throwIfMissing: false) {
       id
       slug
-      ... on AccountWithHost {
-        host {
+      legacyId
+      vendors(forAccount: { slug: $collectiveSlug }, limit: 5) {
+        nodes {
           id
           slug
-          legacyId
-          vendors(forAccount: { slug: $collectiveSlug }, limit: 5) {
-            nodes {
-              id
-              slug
-              name
-              type
-              description
-              imageUrl(height: 64)
-              hasPayoutMethod
-              payoutMethods {
-                id
-                type
-                name
-                data
-                isSaved
-              }
-            }
+          name
+          type
+          description
+          imageUrl(height: 64)
+          hasPayoutMethod
+          payoutMethods {
+            id
+            type
+            name
+            data
+            isSaved
           }
         }
       }
@@ -257,9 +251,10 @@ const ExpenseFormPayeeStep = ({
   const intl = useIntl();
   const { formatMessage } = intl;
   const { values, errors } = formik;
-  const { data, loading } = useQuery(expenseFormPayeeStepQuery, {
+  const { data, loading } = useQuery(hostVendorsQuery, {
     context: API_V2_CONTEXT,
-    variables: { collectiveSlug: collective.slug },
+    variables: { hostId: collective.host?.id, collectiveSlug: collective.slug },
+    skip: !collective.host?.id,
   });
   const isMissing2FA = require2FAForAdmins(values.payee) && !loggedInAccount?.hasTwoFactorAuth;
   const stepOneCompleted = checkStepOneCompleted(values, isOnBehalf, isMissing2FA);
@@ -271,7 +266,7 @@ const ExpenseFormPayeeStep = ({
   const onPayoutMethodRemove = React.useCallback(() => refreshPayoutProfile(formik, payoutProfiles), [payoutProfiles]);
   const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue('payoutMethod', value), []);
 
-  const vendors = get(data, 'account.host.vendors.nodes', []).filter(v => v.hasPayoutMethod);
+  const vendors = get(data, 'host.vendors.nodes', []).filter(v => v.hasPayoutMethod);
   const payeeOptions = React.useMemo(
     () => getPayeeOptions(intl, [...payoutProfiles, ...vendors]),
     [payoutProfiles, vendors],
@@ -591,6 +586,7 @@ ExpenseFormPayeeStep.propTypes = {
     slug: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
     host: PropTypes.shape({
+      id: PropTypes.string,
       legacyId: PropTypes.number,
       transferwise: PropTypes.shape({
         availableCurrencies: PropTypes.arrayOf(PropTypes.object),

@@ -22,7 +22,6 @@ import { Drawer, DrawerActions, DrawerHeader } from '../../../Drawer';
 import { Flex } from '../../../Grid';
 import Link from '../../../Link';
 import LinkCollective from '../../../LinkCollective';
-import { APPLICATION_DATA_AMOUNT_FIELDS } from '../../../ocf-host-application/ApplicationForm';
 import StyledLink from '../../../StyledLink';
 import StyledRoundButton from '../../../StyledRoundButton';
 import StyledTag from '../../../StyledTag';
@@ -45,6 +44,8 @@ const msg = defineMessages({
     defaultMessage: '{name} has been rejected',
   },
 });
+
+const APPLICATION_DATA_AMOUNT_FIELDS = ['totalAmountRaised', 'totalAmountToBeRaised'];
 
 const ACTIONS = ProcessHostApplicationAction;
 

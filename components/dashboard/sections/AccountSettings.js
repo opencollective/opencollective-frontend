@@ -5,6 +5,7 @@ import { isArray, omit, pick } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
+import { checkIfOCF } from '../../../lib/collective';
 import { defaultBackgroundImage } from '../../../lib/constants/collectives';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
@@ -172,11 +173,12 @@ const AccountSettings = ({ account, section }) => {
   return (
     <SettingsForm
       collective={collective}
-      host={account?.host}
+      host={account.host}
       LoggedInUser={LoggedInUser}
       onSubmit={handleEditCollective}
       status={state.status}
       section={section}
+      isLegacyOCFDuplicatedAccount={checkIfOCF(account.host) && account.duplicatedAccounts?.totalCount > 0}
     />
   );
 };

@@ -102,8 +102,18 @@ const PrivateNoteLabel = () => {
 const PAGE_STATUS = { VIEW: 1, EDIT: 2, EDIT_SUMMARY: 3 };
 
 function Expense(props) {
-  const { data, loading, error, refetch, fetchMore, draftKey, client, isRefetchingDataForUser, legacyExpenseId } =
-    props;
+  const {
+    data,
+    loading,
+    error,
+    refetch,
+    fetchMore,
+    draftKey,
+    client,
+    isRefetchingDataForUser,
+    legacyExpenseId,
+    isDrawer,
+  } = props;
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const router = useRouter();
@@ -137,7 +147,6 @@ function Expense(props) {
         ...state,
         status: PAGE_STATUS.EDIT,
         editedExpense: data?.expense,
-        isPollingEnabled: false,
       }));
     }
 
@@ -151,6 +160,17 @@ function Expense(props) {
       document.removeEventListener('mousemove', handlePolling);
     };
   }, []);
+
+  // Disable polling while editing
+  React.useEffect(() => {
+    if ([PAGE_STATUS.EDIT, PAGE_STATUS.EDIT_SUMMARY].includes(state.status)) {
+      if (state.isPollingEnabled) {
+        setState(state => ({ ...state, isPollingEnabled: false }));
+      }
+    } else if (!state.isPollingEnabled) {
+      setState(state => ({ ...state, isPollingEnabled: true }));
+    }
+  }, [state.status, state.isPollingEnabled]);
 
   // Automatically edit expense if missing receipt
   useEffect(() => {
@@ -285,7 +305,7 @@ function Expense(props) {
       if (data?.expense?.type === expenseTypes.CHARGE) {
         await refetch();
       }
-      const createdUser = editedExpense?.payee;
+      const createdUser = editedExpense.payee;
       setState(state => ({
         ...state,
         status: PAGE_STATUS.VIEW,
@@ -691,7 +711,7 @@ function Expense(props) {
 
       {state.showFilesViewerModal && (
         <FilesViewerModal
-          allowOutsideInteraction
+          allowOutsideInteraction={isDrawer}
           files={files}
           parentTitle={intl.formatMessage(
             {
@@ -723,6 +743,7 @@ Expense.propTypes = {
   stopPolling: PropTypes.func,
   isRefetchingDataForUser: PropTypes.bool,
   drawerActionsContainer: PropTypes.object,
+  isDrawer: PropTypes.bool,
 };
 
 export default Expense;

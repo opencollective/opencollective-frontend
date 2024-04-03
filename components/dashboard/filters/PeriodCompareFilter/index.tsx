@@ -1,12 +1,13 @@
 import React from 'react';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import clsx from 'clsx';
-import type { Dayjs, OpUnitType, UnitType } from 'dayjs';
+import type { Dayjs } from 'dayjs';
 import { isEqual, omit } from 'lodash';
 import { ArrowRight, CalendarIcon, ChevronDown } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
+import { getDayjsIsoUnit, getDayjsOpUnit } from '../../../../lib/date-utils';
 import dayjs from '../../../../lib/dayjs';
 import { FilterConfig } from '../../../../lib/filters/filter-types';
 import { TimeUnit } from '../../../../lib/graphql/types/v2/graphql';
@@ -25,19 +26,6 @@ import { Select, SelectContent, SelectItem, SelectValue } from '../../../ui/Sele
 import { PeriodFilterCompare, PeriodFilterType, schema } from './schema';
 
 export type PeriodCompareFilterValueType = z.infer<typeof schema>;
-
-export const getDayjsIsoUnit = (timeUnit: TimeUnit): OpUnitType | 'isoWeek' => {
-  // Use "isoWeek" to have the week start on Monday, in accordance with the behavior from the API returning time series data
-  // Note: "isoWeek" should only be used when finding the startOf or endOf a period, for regular adding and subtracting, "week" should be used.
-  if (timeUnit === TimeUnit.WEEK) {
-    return 'isoWeek';
-  }
-  return timeUnit.toLowerCase() as OpUnitType;
-};
-
-const getDayjsOpUnit = (timeUnit: TimeUnit): UnitType => {
-  return timeUnit.toLowerCase() as UnitType;
-};
 
 const getAvailableTimeUnits = (value: PeriodCompareFilterValueType): TimeUnit[] => {
   const { dateTo, dateFrom } = getPeriodDates(value);
@@ -199,7 +187,7 @@ const PeriodCompareFilter = ({
   const showRangeSelector = value.type !== PeriodFilterType.ALL_TIME;
   return (
     <React.Fragment>
-      <div className="flex items-center">
+      <div className="flex items-center overflow-hidden">
         <Select
           value={value.type}
           onValueChange={(type: PeriodFilterType) => value.type !== type && onChange({ type })}
@@ -209,7 +197,7 @@ const PeriodCompareFilter = ({
               size="sm"
               variant="outline"
               className={clsx(
-                'min-w-36 justify-between gap-0.5 rounded-full pl-3 text-left',
+                'min-w-36 justify-between gap-0.5 truncate rounded-full pl-3 text-left',
                 showRangeSelector && 'rounded-r-none',
               )}
             >
@@ -235,12 +223,18 @@ const PeriodCompareFilter = ({
         {showRangeSelector && (
           <Popover open={rangeSelectorOpen} onOpenChange={setRangeSelectorOpen}>
             <PopoverTrigger asChild>
-              <Button size="sm" variant="outline" className="gap-2 rounded-full rounded-l-none border-l-0 pr-3">
+              <Button
+                size="sm"
+                variant="outline"
+                className="gap-2 overflow-hidden rounded-full rounded-l-none border-l-0 pr-3"
+              >
                 <CalendarIcon size={16} className="text-muted-foreground" />{' '}
-                <span>{formatPeriod({ from: dateVariables.dateFrom, to: dateVariables.dateTo })}</span>
+                <span className="truncate">
+                  {formatPeriod({ from: dateVariables.dateFrom, to: dateVariables.dateTo })}
+                </span>
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto max-w-[280px] p-0 text-sm">
+            <PopoverContent className="w-auto max-w-80 p-0 text-sm">
               <RangeSelector
                 value={value}
                 onChange={val => {
@@ -342,7 +336,7 @@ function RangeSelector({
 
   return (
     <React.Fragment>
-      <div className="flex items-center justify-center gap-2 border-b p-3">
+      <div className="flex items-center justify-center gap-1 border-b p-3">
         <Input
           className="h-9 px-2 text-sm [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
           type="date"

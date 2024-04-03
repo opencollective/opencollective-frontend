@@ -40,14 +40,6 @@ export const WHO_IS_FISCAL_HOSTING_FOR = {
 
 export const HOSTS = [
   {
-    id: 'OCF',
-    name: 'Open Collective Foundation',
-    location: '🇺🇸 United States',
-    collectivePath: '/foundation/apply',
-    bgImage: 'ocf',
-    logo: '/static/images/become-a-host/ocf-logo.png',
-  },
-  {
     id: 'OSC',
     name: 'Open Source Collective',
     location: '🇺🇸 United States',

@@ -317,15 +317,16 @@ export function FormikZod<Values extends FormikValues = FormikValues>({
   component,
   children,
   ...props
-}: Omit<React.ComponentProps<typeof Formik>, 'initialStatus' | 'validate' | 'render'> & {
+}: Omit<React.ComponentProps<typeof Formik<Values>>, 'initialStatus' | 'validate' | 'render'> & {
   schema: SupportedZodSchema<Values>;
 }) {
   const { validate, status } = useFormikZodState(schema);
+  const FormikWrapper = Formik<Values>;
   return (
-    <Formik {...props} initialStatus={status} validate={validate}>
+    <FormikWrapper {...props} initialStatus={status} validate={validate}>
       {/* eslint-disable-next-line react/no-children-prop */}
       {formik => <FormikZodStatusHandler formik={formik} status={status} component={component} children={children} />}
-    </Formik>
+    </FormikWrapper>
   );
 }
 

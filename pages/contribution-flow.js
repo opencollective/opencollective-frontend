@@ -5,6 +5,7 @@ import { get, omit } from 'lodash';
 import { withRouter } from 'next/router';
 import { injectIntl } from 'react-intl';
 
+import { checkIfOCF } from '../lib/collective';
 import { GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES } from '../lib/constants/payment-methods';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
@@ -20,6 +21,7 @@ import ContributionFlowContainer from '../components/contribution-flow/index';
 import { getContributionFlowMetadata } from '../components/contribution-flow/utils';
 import ErrorPage from '../components/ErrorPage';
 import Loading from '../components/Loading';
+import { OCFBannerWithData } from '../components/OCFBanner';
 import Page from '../components/Page';
 import Redirect from '../components/Redirect';
 import { withStripeLoader } from '../components/StripeProvider';
@@ -100,7 +102,19 @@ class NewContributionFlowPage extends React.Component {
       if (contributionBlocker.reason === CONTRIBUTION_BLOCKER.NO_CUSTOM_CONTRIBUTION) {
         return <Redirect to={`${getCollectivePageRoute(account)}/contribute`} />;
       }
-      return <ContributionBlocker blocker={contributionBlocker} account={account} />;
+
+      const isOCF = checkIfOCF(account.host);
+      return (
+        <React.Fragment>
+          {isOCF ? (
+            <div className="mx-auto max-w-[500px] py-16">
+              <OCFBannerWithData collective={account} isSimplified />
+            </div>
+          ) : (
+            <ContributionBlocker blocker={contributionBlocker} account={account} />
+          )}
+        </React.Fragment>
+      );
     } else {
       return <ContributionFlowContainer collective={account} host={account.host} tier={tier} error={error} />;
     }

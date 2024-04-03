@@ -8,7 +8,6 @@ import { PayoutMethodType } from '../../lib/constants/payout-method';
 import Container from '../Container';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import LoadingPlaceholder from '../LoadingPlaceholder';
-import { P } from '../Text';
 
 const renderObject = object =>
   Object.entries(object).reduce((acc, [key, value]) => {
@@ -17,9 +16,9 @@ const renderObject = object =>
     }
     return [
       ...acc,
-      <P key={key} fontSize="14px" lineHeight="18px">
+      <p className="text-ellipsis text-sm leading-5" key={key}>
         <FormattedMessage id="withColon" defaultMessage="{item}:" values={{ item: startCase(key) }} /> {value}
-      </P>,
+      </p>,
     ];
   }, []);
 
@@ -54,9 +53,9 @@ const PayoutMethodData = ({ payoutMethod, showLabel, isLoading }) => {
               <PrivateInfoIcon />
             </Container>
           )}
-          <Container fontSize="14px" color="black.700">
+          <div className="overflow-hidden text-ellipsis text-sm text-slate-700">
             {getPmData(payoutMethod, 'email', isLoading)}
-          </Container>
+          </div>
         </div>
       );
     case PayoutMethodType.OTHER:

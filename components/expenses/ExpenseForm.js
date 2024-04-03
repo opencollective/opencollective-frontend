@@ -167,9 +167,11 @@ export const prepareExpenseForSubmit = expenseData => {
     }
   }
 
-  const payeeLocation = checkRequiresAddress(expenseData)
-    ? pick(expenseData.payeeLocation, ['address', 'country', 'structured'])
-    : null;
+  const payeeLocation = expenseData.payee?.isInvite
+    ? expenseData.payeeLocation
+    : checkRequiresAddress(expenseData)
+      ? pick(expenseData.payeeLocation, ['address', 'country', 'structured'])
+      : null;
 
   const payoutMethod = pick(expenseData.payoutMethod, ['id', 'name', 'data', 'isSaved', 'type']);
   if (payoutMethod.id === 'new') {
@@ -747,7 +749,7 @@ const ExpenseFormBody = ({
                               onChange={value => formik.setFieldValue('currency', value)}
                               width="100%"
                               maxWidth="160px"
-                              disabled={availableCurrencies.length < 2}
+                              disabled={availableCurrencies.length < 2 && availableCurrencies[0] === values.currency}
                               styles={{ menu: { width: '280px' } }}
                             />
                           )}

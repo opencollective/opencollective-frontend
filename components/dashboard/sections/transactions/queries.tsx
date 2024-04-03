@@ -83,6 +83,7 @@ export const transactionsTableQuery = gql`
     $expenseType: [ExpenseType]
     $expense: ExpenseReferenceInput
     $order: OrderReferenceInput
+    $isRefund: Boolean
   ) {
     transactions(
       host: $hostAccount
@@ -108,6 +109,7 @@ export const transactionsTableQuery = gql`
       expenseType: $expenseType
       expense: $expense
       order: $order
+      isRefund: $isRefund
     ) {
       ...TransactionsTableQueryCollectionFragment
     }

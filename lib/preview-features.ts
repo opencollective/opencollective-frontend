@@ -5,6 +5,7 @@ export enum PREVIEW_FEATURE_KEYS {
   DYNAMIC_TOP_BAR = 'DYNAMIC_TOP_BAR',
   COLLECTIVE_OVERVIEW = 'COLLECTIVE_OVERVIEW',
   NEW_EXPENSE_FLOW = 'NEW_EXPENSE_FLOW',
+  HOST_REPORTS = 'HOST_REPORTS',
 }
 
 export type PreviewFeature = {
@@ -44,5 +45,14 @@ export const previewFeatures: PreviewFeature[] = [
     alwaysEnableInDev: true,
     publicBeta: false,
     closedBetaAccessFor: ['opencollective', 'design', 'engineering'],
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.HOST_REPORTS,
+    title: 'New Host Transactions Report',
+    description:
+      'A new report that sums up all transactions to create a comprehensive overview of all activity, both for managed funds and operational funds.',
+    publicBeta: false,
+    alwaysEnableInDev: true,
+    closedBetaAccessFor: ['opencollective', 'opensource', 'europe', 'design', 'engineering', 'giftcollective'],
   },
 ];

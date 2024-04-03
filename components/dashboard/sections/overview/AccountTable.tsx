@@ -252,7 +252,7 @@ export default function AccountTable({ accountSlug, queryFilter, metric }) {
       slug: accountSlug,
     },
     context: API_V2_CONTEXT,
-    fetchPolicy: 'cache-first',
+    fetchPolicy: 'cache-and-network',
   });
   const { account } = React.useContext(DashboardContext);
   const nbPlaceholders = account?.childrenAccounts?.nodes.length + 1;

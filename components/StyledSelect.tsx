@@ -218,7 +218,7 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
           (element as HTMLElement).focus();
         }
 
-        onBlur?.();
+        onBlur?.(event);
       },
       styles: {
         valueContainer: baseStyles => {

@@ -226,6 +226,16 @@ interface CollectiveInterface {
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
   """
   policies: Policies!
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromCollective: CollectiveInterface
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedCollectives(limit: Int! = 100, offset: Int! = 0): CollectiveSearchResults!
 }
 
 """
@@ -2363,6 +2373,16 @@ type Collective implements CollectiveInterface {
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromCollective: CollectiveInterface
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedCollectives(limit: Int! = 100, offset: Int! = 0): CollectiveSearchResults!
 }
 
 """
@@ -2627,6 +2647,16 @@ type Event implements CollectiveInterface {
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromCollective: CollectiveInterface
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedCollectives(limit: Int! = 100, offset: Int! = 0): CollectiveSearchResults!
 }
 
 """
@@ -2891,6 +2921,16 @@ type Fund implements CollectiveInterface {
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromCollective: CollectiveInterface
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedCollectives(limit: Int! = 100, offset: Int! = 0): CollectiveSearchResults!
 }
 
 """
@@ -3155,6 +3195,16 @@ type Organization implements CollectiveInterface {
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromCollective: CollectiveInterface
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedCollectives(limit: Int! = 100, offset: Int! = 0): CollectiveSearchResults!
 }
 
 """
@@ -3419,6 +3469,16 @@ type Project implements CollectiveInterface {
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromCollective: CollectiveInterface
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedCollectives(limit: Int! = 100, offset: Int! = 0): CollectiveSearchResults!
 }
 
 """
@@ -3978,7 +4038,18 @@ type User implements CollectiveInterface {
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromCollective: CollectiveInterface
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedCollectives(limit: Int! = 100, offset: Int! = 0): CollectiveSearchResults!
   email: String
+  newsletterOptIn: Boolean
 }
 
 """
@@ -4243,6 +4314,16 @@ type Vendor implements CollectiveInterface {
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromCollective: CollectiveInterface
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedCollectives(limit: Int! = 100, offset: Int! = 0): CollectiveSearchResults!
 
   """
   Returns whether this account has any payout methods saved
@@ -4756,6 +4837,7 @@ input CollectiveInputType {
   isIncognito: Boolean
   isActive: Boolean
   contributionPolicy: String
+  vendorInfo: JSON
 }
 
 input SocialLinkInput {

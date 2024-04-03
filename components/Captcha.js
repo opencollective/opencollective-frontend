@@ -4,6 +4,7 @@ import HCaptcha from '@hcaptcha/react-hcaptcha';
 import * as Sentry from '@sentry/browser';
 import { toUpper } from 'lodash';
 import { FormattedMessage } from 'react-intl';
+import Turnstile from 'react-turnstile';
 
 import { getEnvVar } from '../lib/env-utils';
 import useRecaptcha from '../lib/hooks/useRecaptcha';
@@ -16,6 +17,7 @@ import StyledCheckbox from './StyledCheckbox';
 const PROVIDERS = {
   HCAPTCHA: 'HCAPTCHA',
   RECAPTCHA: 'RECAPTCHA',
+  TURNSTILE: 'TURNSTILE',
 };
 
 const CAPTCHA_PROVIDER = PROVIDERS[toUpper(getEnvVar('CAPTCHA_PROVIDER'))] || PROVIDERS.HCAPTCHA;
@@ -70,6 +72,7 @@ ReCaptcha.propTypes = {
 const Captcha = React.forwardRef(({ onVerify, provider, ...props }, captchaRef) => {
   const HCAPTCHA_SITEKEY = getEnvVar('HCAPTCHA_SITEKEY');
   const RECAPTCHA_SITE_KEY = getEnvVar('RECAPTCHA_SITE_KEY');
+  const TURNSTILE_SITE_KEY = getEnvVar('TURNSTILE_SITEKEY');
   const handleVerify = obj => {
     onVerify({ ...obj, provider });
   };
@@ -97,7 +100,18 @@ const Captcha = React.forwardRef(({ onVerify, provider, ...props }, captchaRef) 
     );
   } else if (provider === PROVIDERS.RECAPTCHA && RECAPTCHA_SITE_KEY) {
     captcha = <ReCaptcha onVerify={handleVerify} onError={handleError} {...props} />;
+  } else if (provider === PROVIDERS.TURNSTILE) {
+    captcha = (
+      <Turnstile
+        sitekey={TURNSTILE_SITE_KEY}
+        onVerify={token => handleVerify({ token })}
+        onError={handleError}
+        theme="light"
+        {...props}
+      />
+    );
   }
+
   return <Box data-cy="captcha">{captcha}</Box>;
 });
 

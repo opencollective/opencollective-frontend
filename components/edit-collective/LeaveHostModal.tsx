@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import { Form } from 'formik';
+import { Form, FormikProps } from 'formik';
 import { get, sum } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -9,22 +9,25 @@ import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { editCollectivePageQuery } from '../../lib/graphql/v1/queries';
 
-import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { FormikZod } from '../FormikZod';
 import I18nFormatters from '../I18nFormatters';
 import Loading from '../Loading';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
-import StyledButton from '../StyledButton';
+import RichTextEditor from '../RichTextEditor';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
-import StyledTextarea from '../StyledTextarea';
+import { Button } from '../ui/Button';
 import { RadioGroup, RadioGroupItem } from '../ui/RadioGroup';
 import { useToast } from '../ui/useToast';
 
 const leaveHostMutation = gql`
   mutation LeaveHost($account: AccountReferenceInput!, $pauseContributions: Boolean!, $messageForContributors: String) {
-    removeHost(account: $account, pauseContributions: $pauseContributions, message: $messageForContributors) {
+    removeHost(
+      account: $account
+      pauseContributions: $pauseContributions
+      messageForContributors: $messageForContributors
+    ) {
       id
       ... on AccountWithHost {
         host {
@@ -63,7 +66,7 @@ const LeaveHostFormSchema = z.object({
 const LeaveHostFormSchemaWithRecurringContributions = LeaveHostFormSchema.merge(
   z.object({
     messageForContributors: z.string().min(20).max(2000),
-    whatToDoWithRecurringContributions: z.enum(['pause', 'cancel']),
+    pauseContributions: z.boolean(),
   }),
 );
 
@@ -109,17 +112,19 @@ export const LeaveHostModal = ({ account, host, onClose }) => {
       ) : (
         <FormikZod
           schema={portabilitySummary.totalCount ? LeaveHostFormSchemaWithRecurringContributions : LeaveHostFormSchema}
-          initialValues={{
-            accountId: data.account.id,
-            messageForContributors: '',
-            whatToDoWithRecurringContributions: '',
-          }}
-          onSubmit={async values => {
+          initialValues={
+            {
+              accountId: data.account.id,
+              messageForContributors: '',
+              pauseContributions: true,
+            } as z.infer<typeof LeaveHostFormSchemaWithRecurringContributions>
+          }
+          onSubmit={async (values: z.infer<typeof LeaveHostFormSchemaWithRecurringContributions>) => {
             try {
               await removeHost({
                 variables: {
                   account: { id: values.accountId },
-                  pauseContributions: values.whatToDoWithRecurringContributions === 'pause',
+                  pauseContributions: values.pauseContributions,
                   messageForContributors: values.messageForContributors,
                 },
                 refetchQueries: [
@@ -142,7 +147,7 @@ export const LeaveHostModal = ({ account, host, onClose }) => {
             }
           }}
         >
-          {({ values, setFieldValue }) => (
+          {({ values, setFieldValue }: FormikProps<z.infer<typeof LeaveHostFormSchemaWithRecurringContributions>>) => (
             <Form>
               <ModalBody>
                 <div className="mt-3 ">
@@ -174,9 +179,9 @@ export const LeaveHostModal = ({ account, host, onClose }) => {
                         <FormattedMessage defaultMessage="Select what you want to do:" />
                       </p>
                       <RadioGroup
-                        value={values.whatToDoWithRecurringContributions}
+                        value={values.pauseContributions ? 'pause' : 'cancel'}
                         className="space-y-3"
-                        onValueChange={value => setFieldValue('whatToDoWithRecurringContributions', value)}
+                        onValueChange={value => setFieldValue('pauseContributions', value === 'pause')}
                       >
                         <div className="flex items-center space-x-2">
                           <div className="self-baseline">
@@ -218,23 +223,26 @@ export const LeaveHostModal = ({ account, host, onClose }) => {
                             'Use this to communicate with your contributors about the reason of this change. If leaving Open Collective, you can also provide instructions on how to continue supporting your collective.',
                         })}
                         hintPosition="above"
-                        placeholder={
-                          !values.whatToDoWithRecurringContributions
-                            ? null
-                            : values.whatToDoWithRecurringContributions === 'pause'
-                              ? intl.formatMessage({ defaultMessage: 'We are transitioning to a new fiscal host.' })
-                              : intl.formatMessage({
-                                  defaultMessage:
-                                    'We are leaving Open Collective. You can continue supporting us through our website.',
-                                })
-                        }
                       >
                         {({ field }) => (
-                          <StyledTextarea
-                            {...field}
+                          <RichTextEditor
+                            id={field.id}
+                            inputName={field.name}
                             showCount
-                            minHeight={175}
-                            disabled={!values.whatToDoWithRecurringContributions}
+                            version="simplified"
+                            onChange={field.onChange}
+                            editorMaxHeight={300}
+                            withBorders
+                            editorMinHeight={150}
+                            maxLength={2000}
+                            placeholder={
+                              values.pauseContributions
+                                ? intl.formatMessage({ defaultMessage: 'We are transitioning to a new fiscal host.' })
+                                : intl.formatMessage({
+                                    defaultMessage:
+                                      'We are leaving Open Collective. You can continue supporting us through our website.',
+                                  })
+                            }
                           />
                         )}
                       </StyledInputFormikField>
@@ -243,28 +251,25 @@ export const LeaveHostModal = ({ account, host, onClose }) => {
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Container display="flex" justifyContent="flex-end">
-                  <StyledButton type="reset" mx={20} onClick={onClose}>
+                <div className="flex w-full justify-end gap-3">
+                  <Button variant="outline" type="reset" onClick={onClose}>
                     <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-                  </StyledButton>
-                  <StyledButton
+                  </Button>
+                  <Button
                     type="submit"
-                    buttonStyle="danger"
+                    variant="destructive"
                     loading={submitting}
                     data-cy="continue"
-                    minWidth={100}
-                    disabled={
-                      portabilitySummary.totalCount &&
-                      (!values.whatToDoWithRecurringContributions || !values.messageForContributors)
-                    }
+                    className="min-w-[100px]"
+                    disabled={portabilitySummary.totalCount && !values.messageForContributors}
                   >
                     <FormattedMessage
                       id="collective.editHost.leave"
                       values={{ name: host.name }}
                       defaultMessage="Leave {name}"
                     />
-                  </StyledButton>
-                </Container>
+                  </Button>
+                </div>
               </ModalFooter>
             </Form>
           )}

@@ -18,7 +18,6 @@ import {
 import Link from 'next/link';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { TransactionKind } from '../../../../lib/constants/transactions';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { useAsyncCall } from '../../../../lib/hooks/useAsyncCall';
 import useClipboard from '../../../../lib/hooks/useClipboard';
@@ -40,15 +39,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 
 import TransactionRefundModal from './TransactionRefundModal';
 import TransactionRejectModal from './TransactionRejectModal';
-
-const isInternalTransfer = (fromAccount, toAccount) => {
-  if (!fromAccount || !toAccount) {
-    return false;
-  }
-  return fromAccount.parent?.id === toAccount.id || fromAccount.id === toAccount.host?.id;
-};
-
-const { CONTRIBUTION, ADDED_FUNDS, PLATFORM_TIP } = TransactionKind;
 
 const transactionQuery = gql`
   query TransactionDetails($id: String!) {
@@ -291,18 +281,17 @@ export function TransactionDrawer({
     refetchList?.();
   };
 
-  const showActions =
-    transaction?.kind === TransactionKind.EXPENSE ||
-    (transaction?.order !== null &&
-      [CONTRIBUTION, ADDED_FUNDS, PLATFORM_TIP].includes(transaction?.kind) &&
-      transaction?.paymentMethod);
+  const handleDownloadInvoice = () => {
+    const params = transaction?.expense?.id
+      ? { expenseId: transaction?.expense?.id }
+      : { transactionUuid: transaction?.uuid, toCollectiveSlug: transaction?.toAccount?.slug };
+    const download = downloadInvoiceWith(params);
+    return download();
+  };
 
-  const showRefundButton = showActions && transaction?.permissions.canRefund && !transaction?.isRefunded;
-  const showRejectButton = showActions && transaction?.permissions.canReject && !transaction?.isOrderRejected;
-  const showDownloadInvoiceButton =
-    showActions &&
-    transaction?.permissions.canDownloadInvoice &&
-    !isInternalTransfer(transaction?.fromAccount, transaction?.toAccount);
+  const showRefundButton = transaction?.permissions.canRefund;
+  const showRejectButton = transaction?.permissions.canReject;
+  const showDownloadInvoiceButton = transaction?.permissions.canDownloadInvoice;
 
   return (
     <React.Fragment>
@@ -439,13 +428,7 @@ export function TransactionDrawer({
                         <FormattedMessage defaultMessage="View transactions in group" />
                       </DropdownMenuItem>
                       {showDownloadInvoiceButton && (
-                        <DropdownMenuItem
-                          onClick={downloadInvoiceWith({
-                            transactionUuid: transaction?.uuid,
-                            toCollectiveSlug: transaction?.toAccount?.slug,
-                          })}
-                          className="gap-1.5"
-                        >
+                        <DropdownMenuItem onClick={handleDownloadInvoice} className="gap-1.5">
                           <Download size={16} />
 
                           {transaction?.expense ? (

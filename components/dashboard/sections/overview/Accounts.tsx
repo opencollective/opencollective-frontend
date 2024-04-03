@@ -54,8 +54,6 @@ function CollapsibleAccountsList({ accounts, label }) {
               </div>
             </Button>
           </div>
-
-          {/* <ChevronDown size={24} /> */}
         </CollapsibleTrigger>
         <CollapsibleContent>
           <div className="flex flex-col gap-4 border-t p-3">
@@ -72,7 +70,7 @@ export function Accounts({ accountSlug }) {
   const { data, loading, error } = useQuery(collectiveBalanceQuery, {
     variables: { slug: accountSlug },
     context: API_V2_CONTEXT,
-    fetchPolicy: 'cache-first',
+    fetchPolicy: 'cache-and-network',
   });
 
   const activeChildAccounts = data?.account.childrenAccounts?.nodes.filter(child => !child.isArchived);

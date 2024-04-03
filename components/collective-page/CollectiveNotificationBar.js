@@ -3,11 +3,13 @@ import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
+import { checkIfOCF } from '../../lib/collective';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { moneyCanMoveFromEvent } from '../../lib/events';
 
+import Link from '../Link';
 import NotificationBar, { NotificationBarButton, NotificationBarLink } from '../NotificationBar';
-import { OCFCollectivePageBanner } from '../OCFBanner';
+import { getOCFBannerMessage } from '../OCFBanner';
 import SendMoneyToCollectiveBtn from '../SendMoneyToCollectiveBtn';
 
 import PendingApplicationActions from './PendingApplicationActions';
@@ -175,7 +177,7 @@ const getNotification = (intl, status, collective, host, LoggedInUser, refetch) 
     collective.isApproved &&
     host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.freeze &&
     host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins > numberOfAdmins &&
-    collective?.features?.RECEIVE_FINANCIAL_CONTRIBUTIONS === 'DISABLED'
+    collective.features?.RECEIVE_FINANCIAL_CONTRIBUTIONS === 'DISABLED'
   ) {
     return {
       title: intl.formatMessage(messages.tooFewAdmins, {
@@ -212,11 +214,36 @@ const getNotification = (intl, status, collective, host, LoggedInUser, refetch) 
         />
       ),
     };
-  } else if (collective.host?.slug === 'foundation' && collective.parentCollective?.slug !== 'foundation') {
-    if (!LoggedInUser || !LoggedInUser.isAdminOfCollective(collective)) {
-      return;
-    }
-    return OCFCollectivePageBanner({ collective, LoggedInUser });
+  } else if (checkIfOCF(collective) || checkIfOCF(collective.parentCollective)) {
+    return {
+      type: 'warning',
+      title: 'Open Collective Official Statement: OCF Dissolution',
+      description: (
+        <React.Fragment>
+          Find more information here:{' '}
+          <Link href="https://blog.opencollective.com/open-collective-official-statement-ocf-dissolution/" openInNewTab>
+            Open Collective official Statement
+          </Link>
+          .
+        </React.Fragment>
+      ),
+    };
+  } else if (checkIfOCF(collective.host)) {
+    const duplicateCollective = get(collective, 'duplicatedCollectives.collectives.0');
+    const isAdmin = LoggedInUser?.isAdminOfCollectiveOrHost(collective);
+    const { title, severity, message } = getOCFBannerMessage({
+      isAdmin,
+      account: collective,
+      newAccount: duplicateCollective,
+      isCentered: true,
+      hideNextSteps: true,
+    });
+    return {
+      type: severity,
+      title,
+      description: message,
+      isSticky: true,
+    };
   }
 };
 

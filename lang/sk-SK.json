@@ -1122,7 +1122,7 @@
   "EditCollective.GSTNumber": "Číslo GST",
   "editCollective.host.balance": "V súčasnosti drží {balance} v prospech {type, select, COLLECTIVE {vášho Kolektívu} FUND {vášho Fondu} other {vášho Účtu}}.",
   "editCollective.host.cancelApplicationBtn": "Žiadosť o výber",
-  "editCollective.host.change.balanceNotEmpty": "To change your Fiscal Host, you first need to empty {type, select, COLLECTIVE {your Collective's balance} FUND {your Fund's balance} other {your balance}}. You can do this by <SubmitExpenseLink>submitting expenses</SubmitExpenseLink>, making financial contributions, or sending the balance to your Fiscal Host using the <EmptyBalanceLink>Empty Balance</EmptyBalanceLink> feature.",
+  "editCollective.host.change.balanceNotEmpty": "Ak chcete zmeniť vášho fiškálneho hostiteľa, potrebujete najprv vyprázdniť {type, select, COLLECTIVE {zostatok vášho Kolektívu} FOND {zostatok vášho Fondu} other {váš zostatok}}. Môžete to urobiť tak, že predložíte výdavky, vložíte finančné príspevky alebo pošlete zostatok svojmu Fiškálnemu Hosťovi pomocou funkcie {emptyBalanceLink}.",
   "editCollective.host.change.removeFirst": "Bez Fiškálneho Hostiteľa {type, select, COLLECTIVE {váš Kolektív} FOND {váš Fond} other {}} nebude môcť prijímať finančné príspevky. Môžete sa však obrátiť na iného Fiškálneho Hostiteľa.",
   "editCollective.host.leave": "Leave Host",
   "editCollective.host.pending": "Podali ste žiadosť o hosťovanie u {host} dňa {date}. Vaša žiadosť sa preveruje.",

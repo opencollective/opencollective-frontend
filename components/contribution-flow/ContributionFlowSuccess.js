@@ -333,7 +333,7 @@ class ContributionFlowSuccess extends React.Component {
                 alignItems="center"
                 justifyContent="center"
                 width={['100%', null, null, '50%', '762px']}
-                mb={[4, null, 0]}
+                mb={[4, null, null, 0]}
                 flexShrink={0}
               >
                 <Flex flexDirection="column" alignItems="center" justifyContent="center" my={4} width={1}>
@@ -420,9 +420,17 @@ class ContributionFlowSuccess extends React.Component {
                   )}
                 </Flex>
               </ContainerWithImage>
-              <Flex flexDirection="column" alignItems="center" justifyContent="center" width={1}>
+              <Container
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                justifyContent="center"
+                width={1}
+                px={3}
+                boxShadow={['0 -35px 5px 0px #fff', '-15px 0 15px -15px #fff']}
+              >
                 {this.renderInfoByPaymentMethod()}
-              </Flex>
+              </Container>
             </Fragment>
           )}
         </Flex>

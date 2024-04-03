@@ -325,6 +325,7 @@ export const expensePageExpenseFieldsFragment = gql`
       ... on Organization {
         host {
           id
+          slug
         }
       }
     }

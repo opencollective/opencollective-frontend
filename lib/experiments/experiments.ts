@@ -11,11 +11,7 @@ type ExperimentConfig = {
 const experiments: Record<Experiment, ExperimentConfig> = {
   [Experiment.NEW_PLATFORM_TIP_FLOW]: {
     enabled(): boolean {
-      if (process.env.OC_ENV === 'production') {
-        return Math.random() >= 0.5;
-      } else {
-        return true;
-      }
+      return true;
     },
   },
 };

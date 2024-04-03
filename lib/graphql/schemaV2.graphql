@@ -452,6 +452,11 @@ interface Account {
     """
     group: String
     virtualCard: [VirtualCardReferenceInput]
+
+    """
+    Only return transactions that are refunds (or not refunds if false)
+    """
+    isRefund: Boolean
   ): TransactionCollection!
   orders(
     """
@@ -577,6 +582,7 @@ interface Account {
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -790,7 +796,12 @@ interface Account {
   Virtual Cards Merchants used by the account. Admin only. Scope: "virtualCards".
   """
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection
-  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
+  childrenAccounts(
+    limit: Int! = 100
+    offset: Int! = 0
+    isActive: Boolean
+    accountType: [AccountType]
+  ): AccountCollection!
 
   """
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
@@ -822,6 +833,16 @@ interface Account {
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromAccount: Account
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
 }
 
 """
@@ -1493,6 +1514,11 @@ type Expense {
   approvedBy: [Account]!
 
   """
+  The account who paid this expense
+  """
+  paidBy: Account
+
+  """
   Whether this expense is on hold
   """
   onHold: Boolean
@@ -2007,6 +2033,11 @@ type Host implements Account & AccountWithContributions {
     """
     group: String
     virtualCard: [VirtualCardReferenceInput]
+
+    """
+    Only return transactions that are refunds (or not refunds if false)
+    """
+    isRefund: Boolean
   ): TransactionCollection!
   orders(
     """
@@ -2132,6 +2163,7 @@ type Host implements Account & AccountWithContributions {
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -2330,7 +2362,12 @@ type Host implements Account & AccountWithContributions {
   Virtual Cards Merchants used by the account. Admin only. Scope: "virtualCards".
   """
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection
-  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
+  childrenAccounts(
+    limit: Int! = 100
+    offset: Int! = 0
+    isActive: Boolean
+    accountType: [AccountType]
+  ): AccountCollection!
 
   """
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
@@ -2362,6 +2399,16 @@ type Host implements Account & AccountWithContributions {
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromAccount: Account
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -2424,6 +2471,16 @@ type Host implements Account & AccountWithContributions {
   contributionPolicy: String
 
   """
+  Returns true if the remote user can start the process to resume contributions for account
+  """
+  canStartResumeContributionsProcess: Boolean!
+
+  """
+  Returns true if the account has started the process to resume contributions
+  """
+  hasResumeContributionsProcessStarted: Boolean!
+
+  """
   List of accounting categories for this host
   """
   accountingCategories(
@@ -2438,6 +2495,7 @@ type Host implements Account & AccountWithContributions {
   isOpenToApplications: Boolean
   termsUrl: URL
   plan: HostPlan!
+  transactionsReport(dateFrom: DateTime, dateTo: DateTime): [TransactionSum]
   hostMetrics(
     """
     A collection of accounts for which the metrics should be returned.
@@ -2818,6 +2876,16 @@ interface AccountWithContributions {
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
+
+  """
+  Returns true if the remote user can start the process to resume contributions for account
+  """
+  canStartResumeContributionsProcess: Boolean!
+
+  """
+  Returns true if the account has started the process to resume contributions
+  """
+  hasResumeContributionsProcessStarted: Boolean!
 }
 
 """
@@ -5333,6 +5401,8 @@ enum ActivityType {
   SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CANCELED
   SUBSCRIPTION_PAUSED
+  SUBSCRIPTION_RESUMED
+  SUBSCRIPTION_READY_TO_BE_RESUMED
   TICKET_CONFIRMED
   ORDER_CANCELED_ARCHIVED_COLLECTIVE
   ORDER_PENDING
@@ -5514,6 +5584,18 @@ type HostPlan {
   Ability to collect Platform Tips.
   """
   platformTips: Boolean
+}
+
+"""
+EXPERIMENTAL (this may change or be deleted): Transaction amounts grouped by type, kind, isRefund, isHost, expenseType
+"""
+type TransactionSum {
+  amount: Amount
+  type: TransactionType
+  kind: TransactionKind
+  isRefund: Boolean
+  isHost: Boolean
+  expenseType: ExpenseType
 }
 
 """
@@ -6377,6 +6459,11 @@ type OrderPermissions {
   Whether the current user can update the accounting category of this order
   """
   canUpdateAccountingCategory: Boolean!
+
+  """
+  If paused, whether the current user can resume this order
+  """
+  canResume: Boolean!
 }
 
 """
@@ -6770,6 +6857,11 @@ type Bot implements Account {
     """
     group: String
     virtualCard: [VirtualCardReferenceInput]
+
+    """
+    Only return transactions that are refunds (or not refunds if false)
+    """
+    isRefund: Boolean
   ): TransactionCollection!
   orders(
     """
@@ -6895,6 +6987,7 @@ type Bot implements Account {
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -7093,7 +7186,12 @@ type Bot implements Account {
   Virtual Cards Merchants used by the account. Admin only. Scope: "virtualCards".
   """
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection
-  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
+  childrenAccounts(
+    limit: Int! = 100
+    offset: Int! = 0
+    isActive: Boolean
+    accountType: [AccountType]
+  ): AccountCollection!
 
   """
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
@@ -7125,6 +7223,16 @@ type Bot implements Account {
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromAccount: Account
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -7449,6 +7557,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     group: String
     virtualCard: [VirtualCardReferenceInput]
+
+    """
+    Only return transactions that are refunds (or not refunds if false)
+    """
+    isRefund: Boolean
   ): TransactionCollection!
   orders(
     """
@@ -7574,6 +7687,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -7772,7 +7886,12 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Virtual Cards Merchants used by the account. Admin only. Scope: "virtualCards".
   """
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection
-  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
+  childrenAccounts(
+    limit: Int! = 100
+    offset: Int! = 0
+    isActive: Boolean
+    accountType: [AccountType]
+  ): AccountCollection!
 
   """
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
@@ -7804,6 +7923,16 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromAccount: Account
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -7904,6 +8033,16 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
+
+  """
+  Returns true if the remote user can start the process to resume contributions for account
+  """
+  canStartResumeContributionsProcess: Boolean!
+
+  """
+  Returns true if the account has started the process to resume contributions
+  """
+  hasResumeContributionsProcessStarted: Boolean!
 }
 
 """
@@ -8559,6 +8698,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     group: String
     virtualCard: [VirtualCardReferenceInput]
+
+    """
+    Only return transactions that are refunds (or not refunds if false)
+    """
+    isRefund: Boolean
   ): TransactionCollection!
   orders(
     """
@@ -8684,6 +8828,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -8882,7 +9027,12 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   Virtual Cards Merchants used by the account. Admin only. Scope: "virtualCards".
   """
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection
-  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
+  childrenAccounts(
+    limit: Int! = 100
+    offset: Int! = 0
+    isActive: Boolean
+    accountType: [AccountType]
+  ): AccountCollection!
 
   """
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
@@ -8914,6 +9064,16 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromAccount: Account
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -9014,6 +9174,16 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
+
+  """
+  Returns true if the remote user can start the process to resume contributions for account
+  """
+  canStartResumeContributionsProcess: Boolean!
+
+  """
+  Returns true if the account has started the process to resume contributions
+  """
+  hasResumeContributionsProcessStarted: Boolean!
 
   """
   The Account parenting this account
@@ -9458,6 +9628,11 @@ type Individual implements Account {
     """
     group: String
     virtualCard: [VirtualCardReferenceInput]
+
+    """
+    Only return transactions that are refunds (or not refunds if false)
+    """
+    isRefund: Boolean
   ): TransactionCollection!
   orders(
     """
@@ -9583,6 +9758,7 @@ type Individual implements Account {
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -9779,7 +9955,12 @@ type Individual implements Account {
   Virtual Cards Merchants used by the account. Admin only. Scope: "virtualCards".
   """
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection
-  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
+  childrenAccounts(
+    limit: Int! = 100
+    offset: Int! = 0
+    isActive: Boolean
+    accountType: [AccountType]
+  ): AccountCollection!
 
   """
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
@@ -9811,6 +9992,16 @@ type Individual implements Account {
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromAccount: Account
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -10343,6 +10534,11 @@ type Organization implements Account & AccountWithContributions {
     """
     group: String
     virtualCard: [VirtualCardReferenceInput]
+
+    """
+    Only return transactions that are refunds (or not refunds if false)
+    """
+    isRefund: Boolean
   ): TransactionCollection!
   orders(
     """
@@ -10468,6 +10664,7 @@ type Organization implements Account & AccountWithContributions {
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -10664,7 +10861,12 @@ type Organization implements Account & AccountWithContributions {
   Virtual Cards Merchants used by the account. Admin only. Scope: "virtualCards".
   """
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection
-  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
+  childrenAccounts(
+    limit: Int! = 100
+    offset: Int! = 0
+    isActive: Boolean
+    accountType: [AccountType]
+  ): AccountCollection!
 
   """
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
@@ -10696,6 +10898,16 @@ type Organization implements Account & AccountWithContributions {
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromAccount: Account
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -10756,6 +10968,16 @@ type Organization implements Account & AccountWithContributions {
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
+
+  """
+  Returns true if the remote user can start the process to resume contributions for account
+  """
+  canStartResumeContributionsProcess: Boolean!
+
+  """
+  Returns true if the account has started the process to resume contributions
+  """
+  hasResumeContributionsProcessStarted: Boolean!
   email: String @deprecated(reason: "2022-07-18: This field is deprecated and will return null")
 
   """
@@ -11112,6 +11334,11 @@ type Vendor implements Account & AccountWithContributions {
     """
     group: String
     virtualCard: [VirtualCardReferenceInput]
+
+    """
+    Only return transactions that are refunds (or not refunds if false)
+    """
+    isRefund: Boolean
   ): TransactionCollection!
   orders(
     """
@@ -11237,6 +11464,7 @@ type Vendor implements Account & AccountWithContributions {
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -11435,7 +11663,12 @@ type Vendor implements Account & AccountWithContributions {
   Virtual Cards Merchants used by the account. Admin only. Scope: "virtualCards".
   """
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection
-  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
+  childrenAccounts(
+    limit: Int! = 100
+    offset: Int! = 0
+    isActive: Boolean
+    accountType: [AccountType]
+  ): AccountCollection!
 
   """
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
@@ -11467,6 +11700,16 @@ type Vendor implements Account & AccountWithContributions {
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromAccount: Account
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -11527,6 +11770,16 @@ type Vendor implements Account & AccountWithContributions {
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
+
+  """
+  Returns true if the remote user can start the process to resume contributions for account
+  """
+  canStartResumeContributionsProcess: Boolean!
+
+  """
+  Returns true if the account has started the process to resume contributions
+  """
+  hasResumeContributionsProcessStarted: Boolean!
   vendorInfo: VendorInfo
 
   """
@@ -11903,6 +12156,7 @@ type Query {
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -12442,6 +12696,11 @@ type Query {
     """
     group: String
     virtualCard: [VirtualCardReferenceInput]
+
+    """
+    Only return transactions that are refunds (or not refunds if false)
+    """
+    isRefund: Boolean
   ): TransactionCollection!
   update(
     """
@@ -12496,6 +12755,11 @@ type Query {
     """
     amount: AmountInput!
     frequency: ContributionFrequency!
+
+    """
+    The order for which the plan is created, if any
+    """
+    order: OrderReferenceInput
 
     """
     The tier you are contributing to
@@ -13874,6 +14138,8 @@ enum ActivityAndClassesType {
   SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CANCELED
   SUBSCRIPTION_PAUSED
+  SUBSCRIPTION_RESUMED
+  SUBSCRIPTION_READY_TO_BE_RESUMED
   TICKET_CONFIRMED
   ORDER_CANCELED_ARCHIVED_COLLECTIVE
   ORDER_PENDING
@@ -14273,6 +14539,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     group: String
     virtualCard: [VirtualCardReferenceInput]
+
+    """
+    Only return transactions that are refunds (or not refunds if false)
+    """
+    isRefund: Boolean
   ): TransactionCollection!
   orders(
     """
@@ -14398,6 +14669,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -14596,7 +14868,12 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   Virtual Cards Merchants used by the account. Admin only. Scope: "virtualCards".
   """
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection
-  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
+  childrenAccounts(
+    limit: Int! = 100
+    offset: Int! = 0
+    isActive: Boolean
+    accountType: [AccountType]
+  ): AccountCollection!
 
   """
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
@@ -14628,6 +14905,16 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromAccount: Account
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -14728,6 +15015,16 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
+
+  """
+  Returns true if the remote user can start the process to resume contributions for account
+  """
+  canStartResumeContributionsProcess: Boolean!
+
+  """
+  Returns true if the account has started the process to resume contributions
+  """
+  hasResumeContributionsProcessStarted: Boolean!
 }
 
 """
@@ -15050,6 +15347,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     group: String
     virtualCard: [VirtualCardReferenceInput]
+
+    """
+    Only return transactions that are refunds (or not refunds if false)
+    """
+    isRefund: Boolean
   ): TransactionCollection!
   orders(
     """
@@ -15175,6 +15477,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -15373,7 +15676,12 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   Virtual Cards Merchants used by the account. Admin only. Scope: "virtualCards".
   """
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection
-  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
+  childrenAccounts(
+    limit: Int! = 100
+    offset: Int! = 0
+    isActive: Boolean
+    accountType: [AccountType]
+  ): AccountCollection!
 
   """
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
@@ -15405,6 +15713,16 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromAccount: Account
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -15505,6 +15823,16 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
+
+  """
+  Returns true if the remote user can start the process to resume contributions for account
+  """
+  canStartResumeContributionsProcess: Boolean!
+
+  """
+  Returns true if the account has started the process to resume contributions
+  """
+  hasResumeContributionsProcessStarted: Boolean!
 
   """
   The Account parenting this account
@@ -15724,6 +16052,41 @@ type Mutation {
     """
     parent: AccountReferenceInput
   ): Project
+
+  """
+  Duplicate an account. Scope: "account".
+  """
+  duplicateAccount(
+    """
+    Account to duplicate
+    """
+    account: AccountReferenceInput!
+
+    """
+    The new slug for the duplicated account. Defaults to an autogenerated slug
+    """
+    newSlug: String
+
+    """
+    The new name for the duplicated account. Defaults to the same as the original account
+    """
+    newName: String
+
+    """
+    Use this if you want to rename the original account
+    """
+    oldName: String
+
+    """
+    Which data should be copied when duplicating the account
+    """
+    include: DuplicateAccountDataTypeInput
+
+    """
+    Whether to mark both accounts as connected
+    """
+    connect: Boolean! = false
+  ): Account!
 
   """
   Edit the settings for the given account. Scope: "account" or "host".
@@ -16241,9 +16604,14 @@ type Mutation {
     account: AccountReferenceInput!
 
     """
-    An optional message to explain the reason for unhosting
+    An optional HTML message to provide additional context to the action
     """
     message: String
+
+    """
+    An optional HTML message to provide additional context for contributors
+    """
+    messageForContributors: String
 
     """
     If true, contributions will be paused rather than canceled
@@ -16576,6 +16944,21 @@ type Mutation {
   To edit a pending order. Scope: "orders".
   """
   editPendingOrder(order: PendingOrderEditInput!): Order!
+
+  """
+  Starts or resumes the process of notifying contributors for their PAUSED contributions
+  """
+  startResumeOrdersProcess(
+    """
+    The account to start/resume the process for
+    """
+    account: AccountReferenceInput!
+
+    """
+    An optional message to send to contributors
+    """
+    message: String
+  ): Account!
 
   """
   Add a new payment method to be used with an Order. Scope: "orders".
@@ -17361,6 +17744,16 @@ input ProjectCreateInput {
   description: String!
   tags: [String]
   settings: JSON
+}
+
+"""
+Which data should be copied when duplicating the account
+"""
+input DuplicateAccountDataTypeInput {
+  admins: Boolean! = false
+  tiers: Boolean! = false
+  projects: Boolean! = false
+  events: Boolean! = false
 }
 
 """
@@ -18438,6 +18831,7 @@ Implemented Captcha Providers
 enum CaptchaProvider {
   HCAPTCHA
   RECAPTCHA
+  TURNSTILE
 }
 
 """
