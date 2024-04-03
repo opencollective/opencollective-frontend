@@ -295,7 +295,7 @@ function Expense(props) {
       if (data?.expense?.type === expenseTypes.CHARGE) {
         await refetch();
       }
-      const createdUser = editedExpense?.payee;
+      const createdUser = editedExpense.payee;
       setState(state => ({
         ...state,
         status: PAGE_STATUS.VIEW,
