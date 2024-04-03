@@ -693,6 +693,7 @@ export const DEFAULT_FIELDS_2023: Array<CSVField> = [
   // Extra fields
   'merchantId',
   'orderMemo',
+  'taxAmount',
 ];
 
 const DEFAULT_FIELDS: Array<CSVField> = [

@@ -298,6 +298,20 @@ const ExportTransactionsCSVModal = ({
     [fields],
   );
 
+  /** Handle existing "Tax and PaymentProcessorFee" columns toggle.
+   * When setting it to true, we'll make sure that both columns are present in the selected fields, adding the missing ones if they're not.
+   * When setting it to false, we'll enforce whatever is set in the preset.
+   * */
+  const handleTaxAndPaymentProcessorFeeSwitch = checked => {
+    setFlattenTaxesAndPaymentProcessorFees(checked);
+    if (checked) {
+      setFields(uniq([...fields, 'paymentProcessorFee', 'taxAmount']));
+    } else {
+      const selectedSet = PLATFORM_PRESETS[preset] || presetOptions.find(option => option.value === preset);
+      setFields(selectedSet?.fields || []);
+    }
+  };
+
   const handleGroupSwitch = ({ name, checked }) => {
     if (checked) {
       setFields(uniq([...fields, ...GROUP_FIELDS[name]]));
@@ -555,7 +569,7 @@ const ExportTransactionsCSVModal = ({
               <div className="flex flex-row items-center gap-2">
                 <Switch
                   checked={flattenTaxesAndPaymentProcessorFees}
-                  onCheckedChange={setFlattenTaxesAndPaymentProcessorFees}
+                  onCheckedChange={handleTaxAndPaymentProcessorFeeSwitch}
                 />
                 <p className="text-sm">
                   <FormattedMessage defaultMessage="Export taxes and payment processor fees as columns" />
