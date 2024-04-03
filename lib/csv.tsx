@@ -213,7 +213,7 @@ export enum LEGACY_FIELD_OPTIONS {
 
 export const FieldOptionsLabels = {
   [FIELD_OPTIONS.DEFAULT]: <FormattedMessage defaultMessage="Platform Default" />,
-  [FIELD_OPTIONS.DEFAULT_2023]: <FormattedMessage defaultMessage="Legacy Platform Export Set (Pre-2024)" />,
+  [FIELD_OPTIONS.DEFAULT_2023]: <FormattedMessage defaultMessage="Legacy Platform Default (Pre-2024)" />,
   [FIELD_OPTIONS.NEW_PRESET]: (
     <span className="text-primary">
       <FormattedMessage defaultMessage="New Preset" />
