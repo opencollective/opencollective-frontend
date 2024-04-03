@@ -3,6 +3,7 @@ import { gql, useMutation } from '@apollo/client';
 import { ChevronDown } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { CollectiveType } from '../lib/constants/collectives';
 import { i18nGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import { Account, MemberRole } from '../lib/graphql/types/v2/graphql';
@@ -15,7 +16,7 @@ import { useToast } from './ui/useToast';
 
 type FollowButtonProps = {
   className?: string;
-  account: Pick<Account, 'slug'>;
+  account: Pick<Account, 'slug'> & { type?: Account['type'] };
   isHoverCard?: boolean;
 };
 
@@ -84,7 +85,12 @@ export default function FollowButton({ className, account, isHoverCard }: Follow
     }
   }, [isFollowingAccount, account, intl]);
 
-  if (!LoggedInUser || LoggedInUser.collective.slug === account.slug) {
+  if (
+    !LoggedInUser ||
+    LoggedInUser.collective.slug === account.slug ||
+    !account.type ||
+    [CollectiveType.INDIVIDUAL, CollectiveType.USER, CollectiveType.VENDOR, CollectiveType.BOT].includes(account.type)
+  ) {
     return null;
   }
 
