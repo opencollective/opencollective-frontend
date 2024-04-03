@@ -69,8 +69,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
         ref={allRefs}
-        type="button"
         {...props}
+        type={props.type === 'submit' && loading ? 'button' : props.type || 'button'}
         onClick={loading ? null : onClick}
         style={!loading ? undefined : { width: baseSize?.width, height: baseSize?.height }}
       >
