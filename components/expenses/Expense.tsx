@@ -147,7 +147,6 @@ function Expense(props) {
         ...state,
         status: PAGE_STATUS.EDIT,
         editedExpense: data?.expense,
-        isPollingEnabled: false,
       }));
     }
 
@@ -161,6 +160,17 @@ function Expense(props) {
       document.removeEventListener('mousemove', handlePolling);
     };
   }, []);
+
+  // Disable polling while editing
+  React.useEffect(() => {
+    if ([PAGE_STATUS.EDIT, PAGE_STATUS.EDIT_SUMMARY].includes(state.status)) {
+      if (state.isPollingEnabled) {
+        setState(state => ({ ...state, isPollingEnabled: false }));
+      }
+    } else if (!state.isPollingEnabled) {
+      setState(state => ({ ...state, isPollingEnabled: true }));
+    }
+  }, [state.status, state.isPollingEnabled]);
 
   // Automatically edit expense if missing receipt
   useEffect(() => {
@@ -295,7 +305,7 @@ function Expense(props) {
       if (data?.expense?.type === expenseTypes.CHARGE) {
         await refetch();
       }
-      const createdUser = editedExpense?.payee;
+      const createdUser = editedExpense.payee;
       setState(state => ({
         ...state,
         status: PAGE_STATUS.VIEW,
