@@ -749,7 +749,7 @@ const ExpenseFormBody = ({
                               onChange={value => formik.setFieldValue('currency', value)}
                               width="100%"
                               maxWidth="160px"
-                              disabled={availableCurrencies.length < 2}
+                              disabled={availableCurrencies.length < 2 && availableCurrencies[0] === values.currency}
                               styles={{ menu: { width: '280px' } }}
                             />
                           )}
