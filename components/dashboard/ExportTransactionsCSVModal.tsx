@@ -253,16 +253,18 @@ const ExportTransactionsCSVModal = ({
     const selectedSet = PLATFORM_PRESETS[preset] || presetOptions.find(option => option.value === preset);
     if (selectedSet && selectedSet.fields) {
       setFields(selectedSet.fields);
+      setIsEditingPreset(false);
       if (!isNil(selectedSet.label)) {
         setPresetName(selectedSet.label);
+      } else {
+        setPresetName('');
       }
+
       if (!isNil(selectedSet.flattenTaxesAndPaymentProcessorFees)) {
         setFlattenTaxesAndPaymentProcessorFees(selectedSet.flattenTaxesAndPaymentProcessorFees);
+      } else {
+        setFlattenTaxesAndPaymentProcessorFees(false);
       }
-    } else {
-      setIsEditingPreset(false);
-      setFlattenTaxesAndPaymentProcessorFees(false);
-      setPresetName('');
     }
   }, [presetOptions, preset]);
 
@@ -364,7 +366,7 @@ const ExportTransactionsCSVModal = ({
   };
 
   const handleEditPreset = () => {
-    setIsEditingPreset(true);
+    setIsEditingPreset(!isEditingPreset);
   };
 
   const isAboveRowLimit = exportedRows > 100e3;
