@@ -36,32 +36,32 @@ const TransactionsFilters = ({ collective, filters, kinds, paymentMethodTypes, o
 
   return (
     <React.Fragment>
-      <FilterContainer flexGrow={1}>
+      <FilterContainer>
         <FilterLabel htmlFor="transactions-filter-type">
           <FormattedMessage id="transactions.type" defaultMessage="Type" />
         </FilterLabel>
         <TransactionsTypeFilter {...getFilterProps('type')} />
       </FilterContainer>
-      <FilterContainer flexGrow={1}>
+      <FilterContainer>
         <FilterLabel htmlFor="transactions-filter-period">
           <FormattedMessage id="Period" defaultMessage="Period" />
         </FilterLabel>
         <PeriodFilter {...getFilterProps('period', encodeDateInterval)} minDate={collective.createdAt} />
       </FilterContainer>
-      <FilterContainer flexGrow={1}>
+      <FilterContainer>
         <FilterLabel htmlFor="transactions-filter-amount">
           <FormattedMessage id="Fields.amount" defaultMessage="Amount" />
         </FilterLabel>
         <AmountFilter currency={collective.currency} {...getFilterProps('amount')} />
       </FilterContainer>
-      <FilterContainer flexGrow={1}>
+      <FilterContainer>
         <FilterLabel htmlFor="transactions-filter-kind">
           <FormattedMessage id="Transaction.Kind" defaultMessage="Kind" />
         </FilterLabel>
         <TransactionsKindFilter kinds={kinds} {...getFilterProps('kind')} />
       </FilterContainer>
       {paymentMethodTypes?.length > 1 && (
-        <FilterContainer flexGrow={1}>
+        <FilterContainer>
           <FilterLabel htmlFor="transactions-filter-paymentMethod">
             <FormattedMessage id="paymentmethod.label" defaultMessage="Payment Method" />
           </FilterLabel>
