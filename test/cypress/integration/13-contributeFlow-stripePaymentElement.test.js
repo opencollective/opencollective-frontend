@@ -14,7 +14,7 @@ function contributeWithNewCard() {
   cy.get('button[data-cy="cf-next-step"]').click();
 }
 
-function contributeWithNewUsBankAccount({ name } = {}) {
+function contributeWithNewUsBankAccount({ name, hasStripeLink } = {}) {
   cy.contains('New payment method').click();
 
   cy.wait(2000);
@@ -36,6 +36,10 @@ function contributeWithNewUsBankAccount({ name } = {}) {
       cy.get('[data-testid="agree-button"]').click();
       cy.get('[data-testid="success"]').click(); // Bank account with name 'Success'
       cy.get('[data-testid="select-button"]').click();
+      if (hasStripeLink) {
+        cy.get('[data-testid="link-not-now-button"]').click();
+      }
+
       cy.get('[data-testid="done-button"]').click();
     });
 
@@ -234,7 +238,7 @@ describe('Contribute Flow: Stripe Payment Element', () => {
 
       cy.contains('Your info').click();
       cy.get('button[data-cy="cf-next-step"]').click();
-      contributeWithNewUsBankAccount();
+      contributeWithNewUsBankAccount({ hasStripeLink: true });
       cy.getByDataCy('order-success', { timeout: 60000 }).contains('Thank you!');
       waitOrderStatus('PROCESSING');
 
