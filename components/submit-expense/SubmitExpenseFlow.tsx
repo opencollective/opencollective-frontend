@@ -261,10 +261,17 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
     form: expenseForm,
   });
 
-  useNavigationWarning({
+  const [confirmNavigation] = useNavigationWarning({
     enabled: !submittedExpenseId,
     confirmationMessage: intl.formatMessage(I18nMessages.ConfirmExit),
   });
+
+  const { onClose } = props;
+  const handleOnClose = React.useCallback(() => {
+    if (confirmNavigation()) {
+      onClose();
+    }
+  }, [confirmNavigation, onClose]);
 
   if (submittedExpenseId) {
     return (
@@ -272,14 +279,14 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
         defaultOpen
         onOpenChange={open => {
           if (!open) {
-            props.onClose();
+            handleOnClose();
           }
         }}
       >
         <DialogContent>
           <SubmittedExpense expenseId={submittedExpenseId} />
           <DialogFooter className="flex justify-center sm:justify-center">
-            <Button onClick={props.onClose}>
+            <Button onClick={handleOnClose}>
               <FormattedMessage id="Finish" defaultMessage="Finish" />
             </Button>
           </DialogFooter>
@@ -293,15 +300,13 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
       defaultOpen
       onOpenChange={open => {
         if (!open) {
-          props.onClose();
+          handleOnClose();
         }
       }}
     >
       <DialogContent
         hideCloseButton
-        overlayClassName={clsx({
-          'p-0 sm:p-0': !submittedExpenseId,
-        })}
+        overlayClassName="p-0 sm:p-0"
         className={clsx({
           'sm:max-w-screen sm:min-w-screen rounded-none p-0 sm:rounded-none sm:p-0': !submittedExpenseId,
         })}
@@ -312,7 +317,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
               <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
             </span>
             <Button
-              onClick={props.onClose}
+              onClick={handleOnClose}
               variant="ghost"
               className="hidden cursor-pointer items-center gap-2 px-4 py-3 text-base font-medium leading-5 text-slate-800 sm:visible sm:flex"
               asChild
@@ -323,7 +328,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
               </span>
             </Button>
 
-            <Button onClick={props.onClose} variant="ghost" className="cursor-pointer sm:hidden" asChild>
+            <Button onClick={handleOnClose} variant="ghost" className="cursor-pointer sm:hidden" asChild>
               <X />
             </Button>
           </header>
@@ -345,18 +350,16 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
             </div>
           </main>
           <ExpenseWarnings form={expenseForm} />
-          {!submittedExpenseId && (
-            <SubmitExpenseFlowFooter
-              expenseForm={expenseForm}
-              isLastStep={ExpenseStepOrder.indexOf(currentStep) === ExpenseStepOrder.length - 1}
-              isStepValid={!step.hasError(expenseForm)}
-              onNextStepClick={onNextStepClick}
-              readyToSubmit={!nextStep && isEmpty(expenseForm.errors)}
-              setCurrentStep={setCurrentStep}
-              nextStep={nextStep}
-              prevStep={prevStep}
-            />
-          )}
+          <SubmitExpenseFlowFooter
+            expenseForm={expenseForm}
+            isLastStep={ExpenseStepOrder.indexOf(currentStep) === ExpenseStepOrder.length - 1}
+            isStepValid={!step.hasError(expenseForm)}
+            onNextStepClick={onNextStepClick}
+            readyToSubmit={!nextStep && isEmpty(expenseForm.errors)}
+            setCurrentStep={setCurrentStep}
+            nextStep={nextStep}
+            prevStep={prevStep}
+          />
         </div>
       </DialogContent>
     </Dialog>
