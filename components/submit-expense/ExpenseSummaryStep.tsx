@@ -21,7 +21,6 @@ import { ExpenseForm, ExpenseItem } from './useExpenseForm';
 
 type ExpenseSummaryFormProps = {
   form: ExpenseForm;
-  slug: string;
 };
 
 export function ExpenseSummaryForm(props: ExpenseSummaryFormProps) {

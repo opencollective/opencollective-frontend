@@ -10,7 +10,6 @@ import { RadioCardButton } from './RadioCardButton';
 import { ExpenseForm } from './useExpenseForm';
 
 type PickExpenseTypeFormProps = {
-  slug: string;
   form: ExpenseForm;
 };
 

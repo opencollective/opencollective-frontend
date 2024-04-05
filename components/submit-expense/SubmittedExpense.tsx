@@ -139,7 +139,7 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
   const requiresTaxDocuments = expense.account?.isAdmin && includes(expense.requiredLegalDocuments, 'US_TAX_FORM');
 
   return (
-    <div className="flex flex-col gap-8 overflow-scroll overflow-x-hidden px-6 py-4 sm:flex-row sm:px-16">
+    <div className="flex flex-col gap-8 overflow-scroll overflow-x-hidden">
       <div className="flex-1">
         <div className="mb-8 text-xl font-bold">
           {isInvite ? (

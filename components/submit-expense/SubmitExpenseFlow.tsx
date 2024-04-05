@@ -23,9 +23,9 @@ import {
 } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
-import Link from '../Link';
 import { Survey, SURVEY_KEY } from '../Survey';
 import { Button } from '../ui/Button';
+import { Dialog, DialogContent, DialogFooter } from '../ui/Dialog';
 import { StepList, StepListItem, StepListItemIcon } from '../ui/StepList';
 import { useToast } from '../ui/useToast';
 
@@ -36,7 +36,7 @@ import { SubmittedExpense } from './SubmittedExpense';
 import { ExpenseForm, useExpenseForm } from './useExpenseForm';
 
 type SubmitExpenseFlowProps = {
-  slug: string;
+  onClose: () => void;
 };
 
 const I18nMessages = defineMessages({
@@ -55,7 +55,6 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
     draftKey: router.query.key as string,
     duplicateExpense: router.query.duplicate === 'true',
     expenseId: router.query.expenseId ? parseInt(router.query.expenseId as string) : null,
-    preselectInvitePayee: router.query.invite === 'true',
   });
 
   React.useEffect(() => {
@@ -264,64 +263,100 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
     confirmationMessage: intl.formatMessage(I18nMessages.ConfirmExit),
   });
 
+  if (submittedExpenseId) {
+    return (
+      <Dialog
+        defaultOpen
+        onOpenChange={open => {
+          if (!open) {
+            props.onClose();
+          }
+        }}
+      >
+        <DialogContent>
+          <SubmittedExpense expenseId={submittedExpenseId} />
+          <DialogFooter className="flex justify-center sm:justify-center">
+            <Button onClick={props.onClose}>
+              <FormattedMessage id="Finish" defaultMessage="Finish" />
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
-    <div className="flex max-h-screen min-h-screen flex-col">
-      <header className="min-w-screen flex items-center justify-between border-b border-slate-100 px-4 py-3 sm:px-10">
-        <span className="text-xl font-bold leading-7 text-slate-800">
-          <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
-        </span>
-        <Button
-          variant="ghost"
-          className="hidden items-center gap-2 px-4 py-3 text-base font-medium leading-5 text-slate-800 sm:visible sm:flex"
-          asChild
-        >
-          <Link href={`/dashboard/${props.slug}/submitted-expenses`}>
-            <FormattedMessage id="Close" defaultMessage="Close" />
-            <X />
-          </Link>
-        </Button>
+    <Dialog
+      defaultOpen
+      onOpenChange={open => {
+        if (!open) {
+          props.onClose();
+        }
+      }}
+    >
+      <DialogContent
+        hideCloseButton
+        overlayClassName={clsx({
+          'p-0 sm:p-0': !submittedExpenseId,
+        })}
+        className={clsx({
+          'sm:max-w-screen sm:min-w-screen rounded-none p-0 sm:rounded-none sm:p-0': !submittedExpenseId,
+        })}
+      >
+        <div className="max-w-screen min-w-screen flex max-h-screen min-h-screen flex-col">
+          <header className="min-w-screen flex items-center justify-between border-b border-slate-100 px-4 py-3 sm:px-10">
+            <span className="text-xl font-bold leading-7 text-slate-800">
+              <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
+            </span>
+            <Button
+              onClick={props.onClose}
+              variant="ghost"
+              className="hidden cursor-pointer items-center gap-2 px-4 py-3 text-base font-medium leading-5 text-slate-800 sm:visible sm:flex"
+              asChild
+            >
+              <span>
+                <FormattedMessage id="Close" defaultMessage="Close" />
+                <X />
+              </span>
+            </Button>
 
-        <Button variant="ghost" className="sm:hidden" asChild>
-          <Link href={`/dashboard/${props.slug}/submitted-expenses`}>
-            <X />
-          </Link>
-        </Button>
-      </header>
-      <main className="flex w-full flex-grow overflow-auto">
-        <div className="flex w-full flex-grow justify-center sm:px-8 sm:pt-10">
-          {submittedExpenseId ? (
-            <SubmittedExpense expenseId={submittedExpenseId} />
-          ) : (
-            <div className="flex h-max w-full flex-col pb-4 sm:flex sm:w-[768px] sm:flex-row sm:gap-8 sm:pb-0">
-              <SubmitExpenseFlowSteps
-                onStepClick={newStepName => setCurrentStep(newStepName)}
-                expenseForm={expenseForm}
-                currentStep={currentStep}
-              />
+            <Button onClick={props.onClose} variant="ghost" className="cursor-pointer sm:hidden" asChild>
+              <X />
+            </Button>
+          </header>
+          <main className="flex w-full flex-grow overflow-auto">
+            <div className="flex w-full flex-grow justify-center sm:px-8 sm:pt-10">
+              <div className="flex h-max w-full flex-col pb-4 sm:flex sm:w-[768px] sm:flex-row sm:gap-8 sm:pb-0">
+                <SubmitExpenseFlowSteps
+                  onStepClick={newStepName => setCurrentStep(newStepName)}
+                  expenseForm={expenseForm}
+                  currentStep={currentStep}
+                />
 
-              <div className="flex-grow px-4 pt-4 sm:px-0 sm:pt-0">
-                <form ref={formRef} onSubmit={e => e.preventDefault()}>
-                  <step.Form form={expenseForm} slug={props.slug} />
-                </form>
+                <div className="flex-grow px-4 pt-4 sm:px-0 sm:pt-0">
+                  <form ref={formRef} onSubmit={e => e.preventDefault()}>
+                    <step.Form form={expenseForm} />
+                  </form>
+                </div>
               </div>
             </div>
+          </main>
+          <ExpenseWarnings form={expenseForm} />
+          {!submittedExpenseId && (
+            <SubmitExpenseFlowFooter
+              expenseForm={expenseForm}
+              isLastStep={ExpenseStepOrder.indexOf(currentStep) === ExpenseStepOrder.length - 1}
+              isStepValid={!step.hasError(expenseForm)}
+              onNextStepClick={onNextStepClick}
+              readyToSubmit={!nextStep && isEmpty(expenseForm.errors)}
+              setCurrentStep={setCurrentStep}
+              nextStep={nextStep}
+              prevStep={prevStep}
+            />
           )}
         </div>
-      </main>
-      <ExpenseWarnings form={expenseForm} />
-      {!submittedExpenseId && (
-        <SubmitExpenseFlowFooter
-          expenseForm={expenseForm}
-          isLastStep={ExpenseStepOrder.indexOf(currentStep) === ExpenseStepOrder.length - 1}
-          isStepValid={!step.hasError(expenseForm)}
-          onNextStepClick={onNextStepClick}
-          readyToSubmit={!nextStep && isEmpty(expenseForm.errors)}
-          setCurrentStep={setCurrentStep}
-          nextStep={nextStep}
-          prevStep={prevStep}
-        />
-      )}
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 

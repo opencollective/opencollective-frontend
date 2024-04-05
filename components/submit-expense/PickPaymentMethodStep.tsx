@@ -1,6 +1,5 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import clsx from 'clsx';
 import { FormikProvider, useFormik } from 'formik';
 import { debounce, uniqBy } from 'lodash';
 import { ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
@@ -136,7 +135,7 @@ type PayeePickerProps = {
 function PayeePicker(props: PayeePickerProps) {
   const [isPickingVendor, setIsPickingVendor] = React.useState(false);
   const [isPickingOtherPayee, setIsPickingOtherPayee] = React.useState(false);
-  const [isInvitingOtherPayee, setIsInvitingOtherPayee] = React.useState(props.form.startOptions.preselectInvitePayee);
+  const [isInvitingOtherPayee, setIsInvitingOtherPayee] = React.useState(false);
   const { LoggedInUser } = useLoggedInUser();
 
   const loggedInAccount = React.useMemo(
@@ -174,8 +173,7 @@ function PayeePicker(props: PayeePickerProps) {
       !isPickingVendor &&
       !isInvitingOtherPayee &&
       recentPayeesSlugs.length > 0 &&
-      !props.form.values.payeeSlug &&
-      !props.form.startOptions.preselectInvitePayee
+      !props.form.values.payeeSlug
     ) {
       setFieldValue('payeeSlug', recentPayeesSlugs[0]);
       onPayeePicked();
@@ -190,7 +188,6 @@ function PayeePicker(props: PayeePickerProps) {
     loggedInAccount,
     props.form.values.payeeSlug,
     setFieldValue,
-    props.form.startOptions.preselectInvitePayee,
   ]);
 
   if (LoggedInUser && !loggedInAccount) {
@@ -304,10 +301,7 @@ function PayeePicker(props: PayeePickerProps) {
           }}
         />
         <RadioCardButton
-          className={clsx({
-            'order-1': props.form.startOptions.preselectInvitePayee,
-            'order-2': !props.form.startOptions.preselectInvitePayee,
-          })}
+          className="order-2"
           checked={
             (isInvitingOtherPayee &&
               !(isPickingOtherPayee && otherPayees.some(p => p.slug === props.form.values.payeeSlug))) ||

@@ -26,7 +26,6 @@ const allowedCollectiveTypes = [
 
 type PickCollectiveStepFormProps = {
   form: ExpenseForm;
-  slug: string;
 };
 
 export function PickCollectiveStepForm(props: PickCollectiveStepFormProps) {

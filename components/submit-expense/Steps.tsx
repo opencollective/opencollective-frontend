@@ -48,7 +48,7 @@ export type StepDefinition<
   Subtitle?: React.FC<{ form: Form } | {}>;
 };
 
-export type ExpenseStepDefinition = StepDefinition<ExpenseFormValues, ExpenseForm, { slug: string }>;
+export type ExpenseStepDefinition = StepDefinition<ExpenseFormValues, ExpenseForm>;
 
 export const Steps: Record<ExpenseFlowStep, ExpenseStepDefinition> = {
   [ExpenseFlowStep.COLLECTIVE]: {

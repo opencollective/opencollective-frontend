@@ -819,7 +819,6 @@ const needExchangeRateFilter = (expectedCurrency: string) => (ei: ExpenseItem) =
       Math.abs(dayjs.utc(ei.amount.exchangeRate.date).diff(dayjs.utc(ei.incurredAt), 'days')) > 2));
 
 type ExpenseFormStartOptions = {
-  preselectInvitePayee?: boolean;
   duplicateExpense?: boolean;
   expenseId?: number;
   draftKey?: string;
