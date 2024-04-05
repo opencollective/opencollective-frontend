@@ -144,6 +144,36 @@ const formSchemaQuery = gql`
           type
           slug
           imageUrl
+
+          childrenAccounts(isActive: true) {
+            nodes {
+              id
+              name
+              type
+              slug
+              imageUrl
+            }
+          }
+
+          ... on AccountWithParent {
+            parent {
+              id
+              name
+              type
+              slug
+              imageUrl
+
+              childrenAccounts(isActive: true) {
+                nodes {
+                  id
+                  name
+                  type
+                  slug
+                  imageUrl
+                }
+              }
+            }
+          }
         }
         payee {
           id

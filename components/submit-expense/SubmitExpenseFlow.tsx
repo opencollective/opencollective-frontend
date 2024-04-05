@@ -37,6 +37,9 @@ import { ExpenseForm, useExpenseForm } from './useExpenseForm';
 
 type SubmitExpenseFlowProps = {
   onClose: () => void;
+  expenseId?: number;
+  draftKey?: string;
+  duplicateExpense?: boolean;
 };
 
 const I18nMessages = defineMessages({
@@ -52,9 +55,9 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
   const router = useRouter();
 
   const startOptions = React.useRef({
-    draftKey: router.query.key as string,
-    duplicateExpense: router.query.duplicate === 'true',
-    expenseId: router.query.expenseId ? parseInt(router.query.expenseId as string) : null,
+    draftKey: props.draftKey,
+    duplicateExpense: props.duplicateExpense,
+    expenseId: props.expenseId,
   });
 
   React.useEffect(() => {
