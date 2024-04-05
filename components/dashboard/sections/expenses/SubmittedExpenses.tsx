@@ -26,6 +26,7 @@ const ROUTE_PARAMS = ['slug', 'section', 'subpath'];
 
 const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
   const [isExpenseFlowOpen, setIsExpenseFlowOpen] = React.useState(false);
+  const [duplicateExpenseId, setDuplicateExpenseId] = React.useState(null);
   const router = useRouter();
   const { LoggedInUser } = useLoggedInUser();
 
@@ -73,7 +74,14 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
           }
           actions={
             hasNewSubmitExpenseFlow ? (
-              <Button onClick={() => setIsExpenseFlowOpen(true)} size="sm" className="gap-1">
+              <Button
+                onClick={() => {
+                  setDuplicateExpenseId(null);
+                  setIsExpenseFlowOpen(true);
+                }}
+                size="sm"
+                className="gap-1"
+              >
                 <FormattedMessage defaultMessage="New expense" id="pNn/g+" />
               </Button>
             ) : null
@@ -100,6 +108,10 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
               useDrawer
               openExpenseLegacyId={Number(router.query.openExpenseId)}
               expenseFieldForTotalAmount="amountInCreatedByAccountCurrency"
+              onDuplicateClick={expenseId => {
+                setDuplicateExpenseId(expenseId);
+                setIsExpenseFlowOpen(true);
+              }}
               setOpenExpenseLegacyId={legacyId => {
                 router.push(
                   {
@@ -123,7 +135,16 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
           </React.Fragment>
         )}
       </div>
-      {isExpenseFlowOpen && <SubmitExpenseFlow onClose={() => setIsExpenseFlowOpen(false)} />}
+      {isExpenseFlowOpen && (
+        <SubmitExpenseFlow
+          onClose={() => {
+            setDuplicateExpenseId(null);
+            setIsExpenseFlowOpen(false);
+          }}
+          expenseId={duplicateExpenseId}
+          duplicateExpense={!!duplicateExpenseId}
+        />
+      )}
     </React.Fragment>
   );
 };
