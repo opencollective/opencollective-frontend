@@ -51,8 +51,7 @@ export const previewFeatures: PreviewFeature[] = [
     title: 'New Host Transactions Report',
     description:
       'A new report that sums up all transactions to create a comprehensive overview of all activity, both for managed funds and operational funds.',
-    publicBeta: false,
+    publicBeta: true,
     alwaysEnableInDev: true,
-    closedBetaAccessFor: ['opencollective', 'opensource', 'europe', 'design', 'engineering', 'giftcollective'],
   },
 ];

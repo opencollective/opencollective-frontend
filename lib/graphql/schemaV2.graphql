@@ -2495,6 +2495,7 @@ type Host implements Account & AccountWithContributions {
   isOpenToApplications: Boolean
   termsUrl: URL
   plan: HostPlan!
+  hostTransactionsReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): HostTransactionReports
   transactionsReport(dateFrom: DateTime, dateTo: DateTime): [TransactionSum]
   hostMetrics(
     """
@@ -4882,6 +4883,7 @@ enum TimeUnit {
   DAY
   WEEK
   MONTH
+  QUARTER
   YEAR
 }
 
@@ -5584,6 +5586,60 @@ type HostPlan {
   Ability to collect Platform Tips.
   """
   platformTips: Boolean
+}
+
+"""
+EXPERIMENTAL (this may change or be deleted): Host transaction report
+"""
+type HostTransactionReports {
+  """
+  The start date of the time series
+  """
+  dateFrom: DateTime
+
+  """
+  The end date of the time series
+  """
+  dateTo: DateTime
+
+  """
+  The interval between two data points
+  """
+  timeUnit: TimeUnit!
+  nodes: [HostTransactionReportNode!]
+}
+
+type HostTransactionReportNode {
+  date: DateTime!
+  managedFunds: TransactionsReport!
+  operationalFunds: TransactionsReport!
+}
+
+"""
+Transactions report
+"""
+type TransactionsReport {
+  startingBalance: Amount!
+  endingBalance: Amount!
+  totalChange: Amount!
+  groups: [TransactionsAmountGroup]!
+}
+
+"""
+EXPERIMENTAL (this may change or be deleted): Transaction amounts grouped by type, kind, isRefund, isHost, expenseType
+"""
+type TransactionsAmountGroup {
+  netAmount: Amount
+  amount: Amount
+  platformFee: Amount
+  paymentProcessorFee: Amount
+  hostFee: Amount
+  taxAmount: Amount
+  type: TransactionType
+  kind: TransactionKind
+  isRefund: Boolean
+  isHost: Boolean
+  expenseType: ExpenseType
 }
 
 """
@@ -11931,6 +11987,11 @@ type Query {
     includeArchived: Boolean
 
     """
+    Ignore individual accounts used to make contributions as guests
+    """
+    skipGuests: Boolean = true
+
+    """
     Only return "active" accounts with Financial Contributions enabled if true.
     """
     isActive: Boolean
@@ -11949,6 +12010,11 @@ type Query {
     Host hosting the account
     """
     host: [AccountReferenceInput]
+
+    """
+    Parent Collective hosting the account
+    """
+    parent: [AccountReferenceInput]
 
     """
     Only return accounts that match these account types (COLLECTIVE, FUND, EVENT, PROJECT, ORGANIZATION or INDIVIDUAL)
@@ -12313,6 +12379,11 @@ type Query {
     Included collectives which are archived
     """
     includeArchived: Boolean
+
+    """
+    Ignore individual accounts used to make contributions as guests
+    """
+    skipGuests: Boolean = true
 
     """
     Only return "active" accounts with Financial Contributions enabled if true.
