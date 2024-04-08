@@ -193,6 +193,7 @@ const HostDashboardReports = ({ accountSlug: hostSlug }: DashboardSectionProps) 
     context: API_V2_CONTEXT,
   });
   const host = data?.host;
+  const [displayExportCSVModal, setDisplayExportCSVModal] = React.useState(false);
 
   if (!loading) {
     if (error) {
@@ -215,6 +216,8 @@ const HostDashboardReports = ({ accountSlug: hostSlug }: DashboardSectionProps) 
         title={<FormattedMessage id="Reports" defaultMessage="Reports" />}
         actions={
           <ExportTransactionsCSVModal
+            open={displayExportCSVModal}
+            setOpen={setDisplayExportCSVModal}
             account={host}
             isHostReport
             queryFilter={queryFilter}
