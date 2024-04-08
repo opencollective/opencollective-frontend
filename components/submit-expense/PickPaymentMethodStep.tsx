@@ -194,6 +194,8 @@ function PayeePicker(props: PayeePickerProps) {
     return <Loading />;
   }
 
+  const hasVendor = !!props.form.options.host;
+
   return (
     <React.Fragment>
       <div className="flex flex-col gap-4">
@@ -276,30 +278,32 @@ function PayeePicker(props: PayeePickerProps) {
             }
           />
         )}
-        <RadioCardButton
-          className="order-2"
-          checked={isPickingVendor}
-          title={<FormattedMessage defaultMessage="A vendor" id="rth3eX" />}
-          content={
-            isPickingVendor && (
-              <div className="mt-2">
-                <VendorPicker
-                  collectiveSlug={props.form.values.collectiveSlug}
-                  hostSlug={props.form.options.host.slug}
-                  onChange={vendor => {
-                    setFieldValue('payeeSlug', vendor.slug);
-                    onPayeePicked();
-                  }}
-                />
-              </div>
-            )
-          }
-          onClick={() => {
-            setIsPickingVendor(true);
-            setIsPickingOtherPayee(false);
-            setIsInvitingOtherPayee(false);
-          }}
-        />
+        {hasVendor && (
+          <RadioCardButton
+            className="order-2"
+            checked={isPickingVendor}
+            title={<FormattedMessage defaultMessage="A vendor" id="rth3eX" />}
+            content={
+              isPickingVendor && (
+                <div className="mt-2">
+                  <VendorPicker
+                    collectiveSlug={props.form.values.collectiveSlug}
+                    hostSlug={props.form.options.host.slug}
+                    onChange={vendor => {
+                      setFieldValue('payeeSlug', vendor.slug);
+                      onPayeePicked();
+                    }}
+                  />
+                </div>
+              )
+            }
+            onClick={() => {
+              setIsPickingVendor(true);
+              setIsPickingOtherPayee(false);
+              setIsInvitingOtherPayee(false);
+            }}
+          />
+        )}
         <RadioCardButton
           className="order-2"
           checked={

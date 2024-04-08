@@ -168,9 +168,7 @@ export function PickCollectiveStepForm(props: PickCollectiveStepFormProps) {
               collectiveSlug={props.form.values.collectiveSlug}
               checked={isPickingOtherCollective || !recentCollectivePicked}
               onClick={() => {
-                if (!isPickingOtherCollective || recentCollectivePicked) {
-                  setFieldValue('collectiveSlug', null);
-                }
+                setFieldValue('collectiveSlug', null);
                 setIsPickingOtherCollective(true);
               }}
               onChange={slug => setFieldValue('collectiveSlug', slug)}
@@ -372,13 +370,21 @@ function CollectiveOptionPicker(props: CollectiveOptionPickerProps) {
         content={
           props.checked &&
           !props.collectiveSlug && (
-            <CollectivePickerAsync
-              className="mt-4"
-              inputId="collective-expense-picker"
-              types={allowedCollectiveTypes}
-              value={{ value: query.data?.account, label: query.data?.account?.name }}
-              onChange={e => props.onChange(e.value.slug)}
-            />
+            <div role="searchbox" tabIndex={0} onKeyDown={e => e.stopPropagation()} onClick={e => e.stopPropagation()}>
+              <CollectivePickerAsync
+                autoFocus
+                menuIsOpen
+                filterResults={collectives =>
+                  collectives.filter(c => c.type !== CollectiveType.ORGANIZATION || c.isHost)
+                }
+                preload
+                className="mt-4"
+                inputId="collective-expense-picker"
+                types={allowedCollectiveTypes}
+                value={{ value: query.data?.account, label: query.data?.account?.name }}
+                onChange={e => props.onChange(e.value.slug)}
+              />
+            </div>
           )
         }
       />
