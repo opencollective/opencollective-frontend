@@ -215,23 +215,20 @@ const ExportTransactionsCSVModal = ({
     loading: isFetchingRows,
     call: fetchRows,
     data: exportedRows,
-  } = useAsyncCall(
-    async () => {
-      const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-      if (accessToken) {
-        const url = makeUrl({ account, isHostReport, queryFilter, flattenTaxesAndPaymentProcessorFees, fields });
-        const response = await fetch(url, {
-          method: 'HEAD',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-        const rows = parseInt(response.headers.get('x-exported-rows'), 10);
-        return rows;
-      }
-    },
-    { defaultData: 1000000 },
-  );
+  } = useAsyncCall(async () => {
+    const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+    if (accessToken) {
+      const url = makeUrl({ account, isHostReport, queryFilter, flattenTaxesAndPaymentProcessorFees, fields });
+      const response = await fetch(url, {
+        method: 'HEAD',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      const rows = parseInt(response.headers.get('x-exported-rows'), 10);
+      return rows;
+    }
+  });
 
   const presetOptions: Array<{
     value: string;
