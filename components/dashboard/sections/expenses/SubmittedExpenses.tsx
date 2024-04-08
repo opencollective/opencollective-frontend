@@ -47,7 +47,7 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
     ...queryFilter.variables,
   };
 
-  const { data, loading, error } = useQuery(accountExpensesQuery, {
+  const { data, loading, error, refetch: refetchExpenses } = useQuery(accountExpensesQuery, {
     variables,
     context: API_V2_CONTEXT,
   });
@@ -137,9 +137,12 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
       </div>
       {isExpenseFlowOpen && (
         <SubmitExpenseFlow
-          onClose={() => {
+          onClose={(submittedExpense) => {
             setDuplicateExpenseId(null);
             setIsExpenseFlowOpen(false);
+            if (submittedExpense) {
+              refetchExpenses();
+            }
           }}
           expenseId={duplicateExpenseId}
           duplicateExpense={!!duplicateExpenseId}

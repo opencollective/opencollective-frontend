@@ -36,7 +36,7 @@ import { SubmittedExpense } from './SubmittedExpense';
 import { ExpenseForm, useExpenseForm } from './useExpenseForm';
 
 type SubmitExpenseFlowProps = {
-  onClose: () => void;
+  onClose: (submittedExpense: boolean) => void;
   expenseId?: number;
   draftKey?: string;
   duplicateExpense?: boolean;
@@ -269,9 +269,9 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
   const { onClose } = props;
   const handleOnClose = React.useCallback(() => {
     if (confirmNavigation()) {
-      onClose();
+      onClose(!!submittedExpenseId);
     }
-  }, [confirmNavigation, onClose]);
+  }, [confirmNavigation, onClose, submittedExpenseId]);
 
   if (submittedExpenseId) {
     return (
