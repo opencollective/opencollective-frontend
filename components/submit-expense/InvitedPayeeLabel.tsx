@@ -33,7 +33,7 @@ export function InvitedPayeeLabel(props: InvitedPayeeLabelProps) {
     return null;
   }
 
-  const name = props.invitePayee['name'] ?? query.data.Collective.name;
+  const name = props.invitePayee['name'] ?? query.data?.Collective.name;
 
   return props.invitePayee['email'] ? `${name} (${props.invitePayee['email']})` : name;
 }

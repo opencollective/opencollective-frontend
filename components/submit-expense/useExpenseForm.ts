@@ -23,6 +23,7 @@ import {
   ExpenseFormSchemaQueryVariables,
   ExpenseStatus,
   ExpenseType,
+  LocationInput,
   PayoutMethodType,
 } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
@@ -55,6 +56,7 @@ export type ExpenseItem = {
 export type ExpenseFormValues = {
   collectiveSlug?: string;
   payeeSlug?: string;
+  payeeLocation?: LocationInput;
   expenseTypeOption?: ExpenseTypeOption;
   payoutMethodId?: string;
   title?: string;
@@ -335,6 +337,7 @@ const formSchemaQuery = gql`
     id
     name
     slug
+    type
     currency
     settings
     supportedExpenseTypes
@@ -434,7 +437,7 @@ const memoizedExpenseFormSchema = memoizeOne(
       context: API_V2_CONTEXT,
       variables: variables,
       errorPolicy: 'all',
-      fetchPolicy: 'cache-first',
+      fetchPolicy: refresh ? 'network-only' : 'cache-first',
     });
   },
   (newArgs, lastArgs) => {
@@ -464,18 +467,7 @@ function buildFormSchema(
 
   return z.object({
     expenseId: z.number().nullish(),
-    collectiveSlug: z.string().refine(
-      slug => {
-        if (!startOptions.expenseId || !options.expense) {
-          return true;
-        }
-
-        return slug === options.expense.account.slug;
-      },
-      {
-        message: 'Required',
-      },
-    ),
+    collectiveSlug: z.string(),
     payeeSlug: z
       .string()
       .nullish()
@@ -682,6 +674,16 @@ function buildFormSchema(
         }),
         z.object({
           legacyId: z.undefined(),
+          organization: z.undefined(),
+          name: z.string().min(1),
+          email: z.string().email().min(1),
+        }),
+        z.object({
+          legacyId: z.undefined(),
+          organization: z.object({
+            name: z.string().min(1),
+            slug: z.string().min(1),
+          }),
           name: z.string().min(1),
           email: z.string().email().min(1),
         }),
@@ -1014,6 +1016,12 @@ export function useExpenseForm(opts: {
       setFieldValue('tax', null);
     }
   }, [expenseForm.values.hasTax, setFieldValue]);
+
+  React.useEffect(() => {
+    if (expenseForm.values.accountingCategoryId && (formOptions.accountingCategories || []).length === 0) {
+      setFieldValue('accountingCategoryId', null);
+    }
+  }, [formOptions.accountingCategories, expenseForm.values.accountingCategoryId, setFieldValue]);
 
   React.useEffect(() => {
     if (isEmpty(expenseForm.values.expenseItems)) {

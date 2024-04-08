@@ -135,6 +135,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
           payee: {
             slug: values.payeeSlug,
           },
+          payeeLocation: values.payeeLocation,
           payoutMethod: {
             id: values.payoutMethodId,
           },
@@ -164,7 +165,6 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
             url: ei.url,
           })),
           longDescription: null,
-          payeeLocation: null,
           privateMessage: null,
           tags: values.tags,
           tax: values.hasTax

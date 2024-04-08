@@ -158,13 +158,7 @@ export function PickCollectiveStepForm(props: PickCollectiveStepFormProps) {
 
           <div className={clsx({ 'mt-4': recentCollectives.length > 0 })}>
             <CollectiveOptionPicker
-              label={
-                recentCollectives.length > 0 ? (
-                  <FormattedMessage defaultMessage="Chose another account" id="5+Fikl" />
-                ) : (
-                  <FormattedMessage defaultMessage="Search accounts" id="DgHeiI" />
-                )
-              }
+              label={<FormattedMessage defaultMessage="Another account" id="ckZZzj" />}
               collectiveSlug={props.form.values.collectiveSlug}
               checked={isPickingOtherCollective || !recentCollectivePicked}
               onClick={() => {
