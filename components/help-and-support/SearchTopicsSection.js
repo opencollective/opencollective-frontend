@@ -111,9 +111,7 @@ const SearchTopics = () => {
         message: (
           <p>
             <FormattedMessage
-              defaultMessage={
-                'Oops! There was an unexpected error.{lineBreak} <openDocsLink><u>Visit our docs page</u></openDocsLink>'
-              }
+              defaultMessage="Oops! There was an unexpected error.{lineBreak} <openDocsLink><u>Visit our docs page</u></openDocsLink>"
               values={{
                 openDocsLink: getI18nLink({
                   href: `${DOCS_BASE_URL}`,
@@ -186,14 +184,14 @@ const SearchTopics = () => {
                   <P fontSize="18px" lineHeight="26px" color="#4D4F51" fontWeight="400">
                     {searchQuery ? (
                       <FormattedMessage
-                        defaultMessage={'No results found for <b>{query}</b>. Please type another keyword.'}
+                        defaultMessage="No results found for <b>{query}</b>. Please type another keyword."
                         values={{
                           query: searchQuery,
                           b: I18nBold,
                         }}
                       />
                     ) : (
-                      <FormattedMessage defaultMessage={'Type something to search'} />
+                      <FormattedMessage defaultMessage="Type something to search" />
                     )}
                   </P>
                 </Container>
@@ -234,7 +232,7 @@ const SearchTopics = () => {
           >
             <FormattedMessage
               id="helpAndSupport.searchDescription"
-              defaultMessage={'You can also browse the topics below to find what you’re looking for.'}
+              defaultMessage="You can also browse the topics below to find what you’re looking for."
             />
           </P>
         </Box>

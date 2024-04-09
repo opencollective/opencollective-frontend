@@ -162,7 +162,7 @@ const HostTransactionReport = ({ accountSlug: hostSlug, subpath }: DashboardSect
                 <div className="flex flex-col gap-4 px-0">
                   {reportSections?.length === 0 && (
                     <p className="p-4 text-center text-muted-foreground">
-                      <FormattedMessage defaultMessage="No transactions this period " />
+                      <FormattedMessage defaultMessage="No transactions this period" />
                     </p>
                   )}
                   {reportSections?.map(section => (

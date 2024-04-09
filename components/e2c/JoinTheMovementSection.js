@@ -49,7 +49,7 @@ const JoinTheMovement = () => (
               defaultMessage="Be part of the new generation of communities."
             />
             <Span display={['none', 'inline-block']}>
-              <FormattedMessage defaultMessage={'There are a couple of ways for you to contribute:'} />
+              <FormattedMessage defaultMessage="There are a couple of ways for you to contribute:" />
             </Span>
           </SectionSubtitle>
         </Box>

@@ -116,9 +116,7 @@ const ContributeFAQ = ({ collective, ...props }) => (
       <Content>
         <FormattedMessage
           id="ContributeDetails.faq.isIncognito.content"
-          defaultMessage={
-            'Publicly, the contribution amount and date will be visible in the transparent budget, but your identity will be obscured, appearing only as "incognito". The contribution will not be linked to your public profile.'
-          }
+          defaultMessage={`Publicly, the contribution amount and date will be visible in the transparent budget, but your identity will be obscured, appearing only as "incognito". The contribution will not be linked to your public profile.`}
         />
       </Content>
     </Entry>

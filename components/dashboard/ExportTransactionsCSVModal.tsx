@@ -528,7 +528,7 @@ const ExportTransactionsCSVModal = ({
                     <small className="ml-1 text-base font-medium text-gray-700">
                       (
                       <FormattedMessage
-                        defaultMessage={'{n}  out of {m}'}
+                        defaultMessage="{n} out of {m}"
                         values={{ n: fields.length, m: TOTAL_AVAILABLE_FIELDS }}
                       />
                       )

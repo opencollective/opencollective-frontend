@@ -364,9 +364,7 @@ class BannerIframe extends React.Component {
                   n: backers.organizations + backers.collectives,
                   collective: collective.name,
                 }}
-                defaultMessage={
-                  '{n} {n, plural, one {organization is} other {organizations are}} supporting {collective}'
-                }
+                defaultMessage="{n} {n, plural, one {organization is} other {organizations are}} supporting {collective}"
               />
             </h2>
             <div className="actions">
@@ -399,7 +397,7 @@ class BannerIframe extends React.Component {
               <FormattedMessage
                 id="collective.section.backers.users.title"
                 values={{ n: backers.users, collective: collective.name }}
-                defaultMessage={'{n} {n, plural, one {individual is} other {individuals are}} supporting {collective}'}
+                defaultMessage="{n} {n, plural, one {individual is} other {individuals are}} supporting {collective}"
               />
             </h2>
 

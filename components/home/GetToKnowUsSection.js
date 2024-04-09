@@ -51,7 +51,7 @@ const GetToKnowUs = () => {
           <SectionDescription textAlign="center" color="black.800">
             <FormattedMessage
               id="home.getToKnowUs.description"
-              defaultMessage={'Browse stories, blog posts, resources, and get support from the community.'}
+              defaultMessage="Browse stories, blog posts, resources, and get support from the community."
             />
           </SectionDescription>
         </Box>
@@ -67,12 +67,10 @@ const GetToKnowUs = () => {
           mb={[3, 0]}
         >
           <H3 fontSize={['32px']} lineHeight={['40px']} letterSpacing={['-0.008em']} color="primary.900">
-            <FormattedMessage id="home.exploreAndLearn" defaultMessage={'Explore and learn'} />
+            <FormattedMessage id="home.exploreAndLearn" defaultMessage="Explore and learn" />
           </H3>
           <P my="24px" fontSize="20px" lineHeight="28px" letterSpacing="-0.008em" fontWeight="500" color="black.800">
-            <FormattedMessage
-              defaultMessage={'Read more about how we operate and what projects we have for the present and future.'}
-            />
+            <FormattedMessage defaultMessage="Read more about how we operate and what projects we have for the present and future." />
           </P>
           <ListContainer>
             <StyledListItem fontSize="20px" lineHeight="28px" letterSpacing="-0.008em" fontWeight="500" mb="24px">
@@ -82,7 +80,7 @@ const GetToKnowUs = () => {
                 openInNewTab
                 textDecoration="underline"
               >
-                <FormattedMessage defaultMessage={'Read our blog'} />
+                <FormattedMessage defaultMessage="Read our blog" />
               </StyledLink>
             </StyledListItem>
             <StyledListItem
@@ -94,12 +92,12 @@ const GetToKnowUs = () => {
               mb="24px"
             >
               <StyledLink color="black.800" href="/e2c" textDecoration="underline">
-                <FormattedMessage defaultMessage={'Our exit strategy'} />
+                <FormattedMessage defaultMessage="Our exit strategy" />
               </StyledLink>
             </StyledListItem>
             <StyledListItem fontSize="20px" lineHeight="28px" letterSpacing="-0.008em" fontWeight="500" mb="24px">
               <StyledLink color="black.800" href="/become-a-sponsor" textDecoration="underline">
-                <FormattedMessage defaultMessage={'Info for financial sponsors'} />
+                <FormattedMessage defaultMessage="Info for financial sponsors" />
               </StyledLink>
             </StyledListItem>
             <StyledListItem
@@ -115,7 +113,7 @@ const GetToKnowUs = () => {
                 textDecoration="underline"
                 openInNewTab
               >
-                <FormattedMessage defaultMessage={'Case studies'} />
+                <FormattedMessage defaultMessage="Case studies" />
               </StyledLink>
             </StyledListItem>
           </ListContainer>
@@ -130,12 +128,10 @@ const GetToKnowUs = () => {
           ml={[null, 3]}
         >
           <H3 fontSize={['32px']} lineHeight={['40px']} letterSpacing={['-0.008em']} color="primary.900">
-            <FormattedMessage id="home.helpAndSupport" defaultMessage={'Help and support'} />
+            <FormattedMessage id="home.helpAndSupport" defaultMessage="Help and support" />
           </H3>
           <P my="24px" fontSize="20px" lineHeight="28px" letterSpacing="-0.008em" fontWeight="500" color="black.800">
-            <FormattedMessage
-              defaultMessage={'Learn more about how it all works: our philosophy and business model.'}
-            />
+            <FormattedMessage defaultMessage="Learn more about how it all works: our philosophy and business model." />
           </P>
           <ListContainer>
             <StyledListItem
@@ -147,7 +143,7 @@ const GetToKnowUs = () => {
               mb="24px"
             >
               <StyledLink color="black.800" href="/help" textDecoration="underline">
-                <FormattedMessage defaultMessage={'Visit the support page'} />
+                <FormattedMessage defaultMessage="Visit the support page" />
               </StyledLink>
             </StyledListItem>
             <StyledListItem
@@ -164,7 +160,7 @@ const GetToKnowUs = () => {
                 textDecoration="underline"
                 openInNewTab
               >
-                <FormattedMessage defaultMessage={'Read through our documentation'} />
+                <FormattedMessage defaultMessage="Read through our documentation" />
               </StyledLink>
             </StyledListItem>
             <StyledListItem
@@ -181,7 +177,7 @@ const GetToKnowUs = () => {
                 textDecoration="underline"
                 openInNewTab
               >
-                <FormattedMessage defaultMessage={'Slack and email'} />
+                <FormattedMessage defaultMessage="Slack and email" />
               </StyledLink>
             </StyledListItem>
             <StyledListItem
@@ -192,7 +188,7 @@ const GetToKnowUs = () => {
               color="black.800"
             >
               <StyledLink color="black.800" href="/pricing" textDecoration="underline" openInNewTab>
-                <FormattedMessage defaultMessage={'Pricing and Business Model'} />
+                <FormattedMessage defaultMessage="Pricing and Business Model" />
               </StyledLink>
             </StyledListItem>
           </ListContainer>
@@ -232,7 +228,7 @@ const GetToKnowUs = () => {
             letterSpacing={['-0.008em', null, '-0.04em']}
             color="primary.900"
           >
-            <FormattedMessage defaultMessage={"Where we're heading..."} />
+            <FormattedMessage defaultMessage="Where we're heading..." />
           </H5>
           <P
             fontSize={['15px', '16px', '20px']}
@@ -243,9 +239,7 @@ const GetToKnowUs = () => {
           >
             <FormattedMessage
               id="e2c.description"
-              defaultMessage={
-                'Join us as we transition from a privately owned company to a structure that allows us to share power and revenue with you.'
-              }
+              defaultMessage="Join us as we transition from a privately owned company to a structure that allows us to share power and revenue with you."
             />
           </P>
           <Box display={['none', null, 'block']} mt="24px">
