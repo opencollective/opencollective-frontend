@@ -152,7 +152,7 @@ export function ExpenseSummaryForm(props: ExpenseSummaryFormProps) {
           <hr className="flex-grow border-neutral-300" />
         </div>
 
-        <div className="grid grid-flow-col grid-cols-1 grid-rows-3 gap-1 sm:grid-cols-3 sm:grid-rows-1">
+        <div className="grid grid-flow-col grid-cols-1 grid-rows-[repeat(3,auto)] gap-1 sm:grid-cols-3 sm:grid-rows-1">
           <div className="flex-1 rounded border border-slate-200 p-4">
             <div className="mb-3 text-xs font-medium uppercase text-slate-700">
               <FormattedMessage defaultMessage="Who is paying?" id="IdR7BG" />

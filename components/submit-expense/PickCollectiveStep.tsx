@@ -112,17 +112,15 @@ export function PickCollectiveStepForm(props: PickCollectiveStepFormProps) {
     recentCollectivePicked,
   ]);
 
-  if (props.form.options.loggedInAccount && !props.form.options.recentlySubmittedExpenses) {
-    return <LoadingPlaceholder />;
-  }
-
   return (
     <div className="flex-grow">
       <h1 className="mb-4 text-lg font-bold leading-[26px] text-dark-900">
         <FormattedMessage defaultMessage="Whom are you requesting money from?" id="7PYZFd" />
       </h1>
 
-      {canChangeAccount ? (
+      {props.form.initialLoading ? (
+        <LoadingPlaceholder height={60} />
+      ) : canChangeAccount ? (
         <React.Fragment>
           {recentCollectives.length > 0 && (
             <React.Fragment>
@@ -170,13 +168,7 @@ export function PickCollectiveStepForm(props: PickCollectiveStepFormProps) {
           </div>
         </React.Fragment>
       ) : (
-        <React.Fragment>
-          {props.form.options.account ? (
-            <CollectiveOption collectiveSlug={props.form.options.account.slug} checked />
-          ) : (
-            <LoadingPlaceholder />
-          )}
-        </React.Fragment>
+        <CollectiveOption collectiveSlug={props.form.options.account.slug} checked />
       )}
     </div>
   );
@@ -267,26 +259,29 @@ function CollectiveOption(props: CollectiveOptionProps) {
       checked={props.checked}
       onClick={props.onClick}
       title={
-        <div className="flex items-center gap-4">
-          <AvatarWithLink
-            account={mainAccount}
-            secondaryAccount={parent && !props.checked ? selectedAccount : null}
-            size={24}
-            withHoverCard
-          />
-
-          {props.isLastUsedCollective ? (
-            <FormattedMessage
-              defaultMessage="{label} (Last used)"
-              id="ieTRJZ"
-              values={{
-                label: title,
-              }}
+        !selectedAccount || !mainAccount ? (
+          <LoadingPlaceholder height={20} width={60} />
+        ) : (
+          <div className="flex items-center gap-4">
+            <AvatarWithLink
+              account={mainAccount}
+              secondaryAccount={parent && !props.checked ? selectedAccount : null}
+              size={24}
+              withHoverCard
             />
-          ) : (
-            title
-          )}
-        </div>
+
+            {props.isLastUsedCollective ? (
+              <FormattedMessage
+                defaultMessage="{label} (Last used)" id="ieTRJZ"
+                values={{
+                  label: title,
+                }}
+              />
+            ) : (
+              title
+            )}
+          </div>
+        )
       }
       content={
         props.checked ? (
@@ -435,13 +430,16 @@ function ChildAccountPicker(props: ChildAccountPickerProps) {
 
   return (
     <div className={props.className}>
-      <CollectivePicker
-        isDisabled={query.loading || !query.called}
-        collectives={options}
-        collective={selection}
-        isSearchable={options.length > 5}
-        onChange={({ value }) => props.onChange(value.slug)}
-      />
+      {query.loading || !query.called ? (
+        <LoadingPlaceholder height={20} />
+      ) : (
+        <CollectivePicker
+          collectives={options}
+          collective={selection}
+          isSearchable={options.length > 5}
+          onChange={({ value }) => props.onChange(value.slug)}
+        />
+      )}
     </div>
   );
 }

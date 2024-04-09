@@ -101,6 +101,7 @@ export type ExpenseFormik = Omit<ReturnType<typeof useFormik<ExpenseFormValues>>
 export type ExpenseForm = ExpenseFormik & {
   options: ExpenseFormOptions;
   startOptions: ExpenseFormStartOptions;
+  initialLoading: boolean;
   refresh: () => void;
 };
 
@@ -873,6 +874,7 @@ export function useExpenseForm(opts: {
   const [formOptions, setFormOptions] = React.useState<ExpenseFormOptions>({ schema: z.object({}) });
   const startOptions = React.useRef(opts.startOptions);
   const setInitialExpenseValues = React.useRef(false);
+  const initialLoading = React.useRef(true);
 
   const expenseForm: ExpenseFormik = useFormik<ExpenseFormValues>({
     initialValues: opts.initialValues,
@@ -1120,6 +1122,11 @@ export function useExpenseForm(opts: {
       setFormOptions(
         await buildFormOptions(intl, apolloClient, LoggedInUser, expenseForm.values, startOptions.current),
       );
+      if (!startOptions.current.expenseId) {
+        initialLoading.current = false;
+      } else if (setInitialExpenseValues.current) {
+        initialLoading.current = false;
+      }
     }
 
     refreshFormOptions();
@@ -1169,6 +1176,7 @@ export function useExpenseForm(opts: {
   return Object.assign(expenseForm, {
     options: formOptions,
     startOptions: startOptions.current,
+    initialLoading: initialLoading.current,
     refresh: async () =>
       setFormOptions(
         await buildFormOptions(intl, apolloClient, LoggedInUser, expenseForm.values, startOptions.current, true),

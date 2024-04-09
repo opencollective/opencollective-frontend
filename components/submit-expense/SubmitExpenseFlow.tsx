@@ -3,7 +3,6 @@ import { FetchResult, gql, useMutation } from '@apollo/client';
 import clsx from 'clsx';
 import { isEmpty, pick } from 'lodash';
 import { ArrowLeft, ArrowRight, ChevronDown, ChevronUp, X } from 'lucide-react';
-import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { AnalyticsEvent } from '../../lib/analytics/events';
@@ -23,6 +22,7 @@ import {
 } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
+import LoadingPlaceholder from '../LoadingPlaceholder';
 import { Survey, SURVEY_KEY } from '../Survey';
 import { Button } from '../ui/Button';
 import { Dialog, DialogContent, DialogFooter } from '../ui/Dialog';
@@ -52,17 +52,12 @@ const I18nMessages = defineMessages({
 export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
   const { toast } = useToast();
   const intl = useIntl();
-  const router = useRouter();
 
   const startOptions = React.useRef({
     draftKey: props.draftKey,
     duplicateExpense: props.duplicateExpense,
     expenseId: props.expenseId,
   });
-
-  React.useEffect(() => {
-    router.replace(`${router.asPath.split('?')[0]}`, undefined, { shallow: true });
-  }, []);
 
   const formRef = React.useRef<HTMLFormElement>();
   const [submittedExpenseId, setSubmittedExpenseId] = React.useState(null);
@@ -424,6 +419,7 @@ function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
                 (!step.hasError(props.expenseForm) || i === ExpenseStepOrder.length - 1)) ||
               (!step.hasError(props.expenseForm) && i < ExpenseStepOrder.indexOf(props.currentStep));
             const disabled = !completed || i > ExpenseStepOrder.indexOf(props.currentStep);
+            const isInitialLoadOfExpense = props.expenseForm.startOptions.expenseId && props.expenseForm.initialLoading;
             return (
               <StepListItem
                 key={stepName}
@@ -433,7 +429,13 @@ function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
                 disabled={disabled}
                 completed={completed}
                 title={<step.Title form={props.expenseForm} />}
-                subtitle={step.Subtitle ? <step.Subtitle form={props.expenseForm} /> : null}
+                subtitle={
+                  isInitialLoadOfExpense ? (
+                    <LoadingPlaceholder height={20} />
+                  ) : step.Subtitle ? (
+                    <step.Subtitle form={props.expenseForm} />
+                  ) : null
+                }
               />
             );
           })}

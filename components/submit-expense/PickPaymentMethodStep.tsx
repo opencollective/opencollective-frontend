@@ -2,7 +2,7 @@ import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { FormikProvider, useFormik } from 'formik';
 import { debounce } from 'lodash';
-import { Pencil, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
@@ -11,7 +11,6 @@ import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import {
   Account,
   Host,
-  PaymentMethodType,
   PayoutMethodType,
   SavePayoutMethodMutation,
   SavePayoutMethodMutationVariables,
@@ -21,15 +20,16 @@ import CollectivePicker from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import ConfirmationModal, { CONFIRMATION_MODAL_TERMINATE } from '../ConfirmationModal';
 import ExpenseFormPayeeInviteNewStep from '../expenses/ExpenseFormPayeeInviteNewStep';
-import PayoutMethodData from '../expenses/PayoutMethodData';
 import PayoutMethodForm, { validatePayoutMethod } from '../expenses/PayoutMethodForm';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
+import LoadingPlaceholder from '../LoadingPlaceholder';
 import { I18nPayoutMethodLabels, PayoutMethodLabel } from '../PayoutMethodLabel';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledSelect from '../StyledSelect';
 import { Button } from '../ui/Button';
 import { useToast } from '../ui/useToast';
 
+import { PayoutMethodDetails } from './PayoutMethodDetails';
 import { RadioCardButton } from './RadioCardButton';
 import { ExpenseForm } from './useExpenseForm';
 
@@ -92,16 +92,7 @@ export function PickPaymentMethodForm(props: PickPaymentMethodFormProps) {
             props.form.setFieldValue('inviteNote', null);
             props.form.setFieldValue('payeeLocation', null);
           }}
-          content={
-            isInvitingOtherPayee ? (
-              <InvitePayeePicker
-                form={props.form}
-                onPick={() => {
-                  // onPayeePicked();
-                }}
-              />
-            ) : null
-          }
+          content={isInvitingOtherPayee ? <InvitePayeePicker form={props.form} /> : null}
         />
 
         {hasVendor && (
@@ -144,7 +135,6 @@ export function PickPaymentMethodForm(props: PickPaymentMethodFormProps) {
 
 type InvitePayeePickerProps = {
   form: ExpenseForm;
-  onPick: () => void;
 };
 
 function InvitePayeePicker(props: InvitePayeePickerProps) {
@@ -182,7 +172,6 @@ function InvitePayeePicker(props: InvitePayeePickerProps) {
             setIsNewInvitePayee(false);
             props.form.setFieldValue('invitePayee', { ...option.value, legacyId: option.value.id });
             props.form.setFieldValue('inviteNote', '');
-            props.onPick();
           }
         }}
         onInvite={() => {
@@ -215,8 +204,8 @@ function InvitePayeePicker(props: InvitePayeePickerProps) {
 
 type CreatePayoutMethodFormProps = {
   supportedPayoutMethods?: PayoutMethodType[];
-  payeeSlug?: string;
-  onCreate: (paymentMethod: { id?: string } | { data: any; type: PaymentMethodType }) => void;
+  payeeSlug: string;
+  onCreate: (paymentMethod: { id: string }) => void;
   onCancel?: () => void;
   host: Pick<Host, 'transferwise'>;
 };
@@ -248,14 +237,6 @@ function CreatePayoutMethodForm(props: CreatePayoutMethodFormProps) {
       return payoutMethodErrors;
     },
     async onSubmit(values) {
-      if (!props.payeeSlug) {
-        props.onCreate({
-          type: values.type,
-          data: values.data,
-        });
-        return;
-      }
-
       try {
         const res = await createPayoutMethod({
           variables: {
@@ -457,6 +438,7 @@ type PayoutMethodPickerProps = {
 };
 
 function PayoutMethodPicker(props: PayoutMethodPickerProps) {
+  const [isLoading, setIsLoading] = React.useState(false);
   const [isCreatingNewPayoutMethod, setIsCreatingNewPayoutMethod] = React.useState(false);
   const intl = useIntl();
   const { toast } = useToast();
@@ -518,7 +500,7 @@ function PayoutMethodPicker(props: PayoutMethodPickerProps) {
 
   const setFieldValue = props.form.setFieldValue;
   React.useEffect(() => {
-    if (selectedPayoutMethodOption || !payeeProfile || isCreatingNewPayoutMethod) {
+    if (selectedPayoutMethodOption || !payeeProfile || isCreatingNewPayoutMethod || isLoading) {
       return;
     }
 
@@ -529,6 +511,7 @@ function PayoutMethodPicker(props: PayoutMethodPickerProps) {
     lastUsedPaymentMethodIdByPayee,
     isCreatingNewPayoutMethod,
     setFieldValue,
+    isLoading,
   ]);
 
   const [isDeletingPayoutMethod, setIsDeletingPayoutMethod] = React.useState(false);
@@ -568,13 +551,11 @@ function PayoutMethodPicker(props: PayoutMethodPickerProps) {
             payeeSlug={props.form.values.payeeSlug}
             host={props.form.options.host}
             onCreate={async paymentMethod => {
-              if ('id' in paymentMethod && paymentMethod.id) {
-                props.form.setFieldValue('payoutMethodId', paymentMethod.id);
-                await props.form.refresh();
-                setIsCreatingNewPayoutMethod(false);
-              } else {
-                props.form.setFieldValue('invitePayee.payoutMethod', paymentMethod);
-              }
+              setIsCreatingNewPayoutMethod(false);
+              setIsLoading(true);
+              await props.form.refresh();
+              setIsLoading(false);
+              props.form.setFieldValue('payoutMethodId', paymentMethod.id);
             }}
             onCancel={payeePayoutMethods.length > 0 ? () => setIsCreatingNewPayoutMethod(false) : null}
           />
@@ -589,60 +570,66 @@ function PayoutMethodPicker(props: PayoutMethodPickerProps) {
         <div className="my-2 flex gap-2">
           <FormattedMessage defaultMessage="Choose a payout method" id="SlAq2H" /> <PrivateInfoIcon />
         </div>
-        <div className="flex gap-3">
-          <div className="flex flex-grow flex-col">
-            <StyledSelect
-              disabled={!payeeProfile}
-              inputId="payout-method"
-              options={[newPayoutMethodOption, ...payeePayoutMethodOptions]}
-              value={selectedPayoutMethodOption}
-              onChange={e => {
-                if (e.value === newPayoutMethodOption.value) {
-                  setIsCreatingNewPayoutMethod(true);
-                  props.form.setFieldValue('payoutMethodId', null);
-                } else {
-                  props.form.setFieldValue('payoutMethodId', e.value);
-                }
-              }}
-            />
+        {isLoading || props.form.values.payeeSlug !== props.form.options.payee?.slug ? (
+          <LoadingPlaceholder height={60} />
+        ) : (
+          <div className="flex gap-3">
+            <div className="flex flex-grow flex-col">
+              <StyledSelect
+                disabled={!payeeProfile}
+                inputId="payout-method"
+                options={[newPayoutMethodOption, ...payeePayoutMethodOptions]}
+                value={selectedPayoutMethodOption}
+                onChange={e => {
+                  if (e.value === newPayoutMethodOption.value) {
+                    setIsCreatingNewPayoutMethod(true);
+                    props.form.setFieldValue('payoutMethodId', null);
+                  } else {
+                    props.form.setFieldValue('payoutMethodId', e.value);
+                  }
+                }}
+              />
 
-            <div className="mt-2 grid grid-cols-[1fr_auto]  grid-rows-1">
-              <span className="text-xs text-neutral-500">
-                {lastUsedPaymentMethodIdByPayee &&
-                  lastUsedPaymentMethodIdByPayee === props.form.values.payoutMethodId && (
-                    <FormattedMessage defaultMessage="Last used payout method for the selected profile" id="QxsFYY" />
-                  )}
-              </span>
-              {hasDetails && (
-                <Button
-                  className="h-5 items-start p-0 text-xs"
-                  variant="link"
-                  size="xs"
-                  onClick={() => setIsPayoutMethodDetailsOpen(!isPayoutMethodDetailsOpen)}
-                >
-                  {isPayoutMethodDetailsOpen ? (
-                    <FormattedMessage defaultMessage="Hide full details" id="Ohd6v0" />
-                  ) : (
-                    <FormattedMessage defaultMessage="Show full details" id="9WBas+" />
-                  )}
-                </Button>
+              <div className="mt-2 grid grid-cols-[1fr_auto]  grid-rows-1">
+                <span className="text-xs text-neutral-500">
+                  {lastUsedPaymentMethodIdByPayee &&
+                    lastUsedPaymentMethodIdByPayee === props.form.values.payoutMethodId && (
+                      <FormattedMessage defaultMessage="Last used payout method for the selected profile" id="QxsFYY" />
+                    )}
+                </span>
+                {hasDetails && (
+                  <Button
+                    className="h-5 items-start p-0 text-xs"
+                    variant="link"
+                    size="xs"
+                    onClick={() => setIsPayoutMethodDetailsOpen(!isPayoutMethodDetailsOpen)}
+                  >
+                    {isPayoutMethodDetailsOpen ? (
+                      <FormattedMessage defaultMessage="Hide full details" id="Ohd6v0" />
+                    ) : (
+                      <FormattedMessage defaultMessage="Show full details" id="9WBas+" />
+                    )}
+                  </Button>
+                )}
+              </div>
+
+              {isPayoutMethodDetailsOpen && hasDetails && (
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <PayoutMethodDetails payoutMethod={selectedPayoutMethod} />
+                </div>
               )}
             </div>
-          </div>
-          <Button className="hidden" size="icon" variant="ghost">
-            <Pencil size={16} />
-          </Button>
 
-          <Button
-            size="icon"
-            variant="ghost"
-            disabled={!selectedPayoutMethodOption}
-            onClick={() => setIsDeletingPayoutMethod(true)}
-          >
-            <Trash2 size={16} />
-          </Button>
-        </div>
-        {isPayoutMethodDetailsOpen && hasDetails && <PayoutMethodData payoutMethod={selectedPayoutMethod} />}
+            <Button
+              size="icon"
+              variant="ghost"
+              disabled={!selectedPayoutMethodOption}
+              onClick={() => setIsDeletingPayoutMethod(true)}
+            >
+              <Trash2 size={16} />
+            </Button>
+          </div>
+        )}
       </div>
       {isDeletingPayoutMethod && (
         <ConfirmationModal
@@ -660,7 +647,9 @@ function PayoutMethodPicker(props: PayoutMethodPickerProps) {
               });
               setIsDeletingPayoutMethod(false);
               props.form.setFieldValue('payoutMethodId', null);
-              props.form.refresh();
+              setIsLoading(true);
+              await props.form.refresh();
+              setIsLoading(false);
               return CONFIRMATION_MODAL_TERMINATE;
             } catch (e) {
               toast({
