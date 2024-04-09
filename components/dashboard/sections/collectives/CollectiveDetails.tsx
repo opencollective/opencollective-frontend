@@ -373,7 +373,13 @@ const CollectiveDetails = ({
           <InfoList className="sm:grid-cols-2">
             <InfoListItem
               title={<FormattedMessage id="HostedSince" defaultMessage="Hosted since" />}
-              value={<FormattedDate value={collective.approvedAt} day="numeric" month="long" year="numeric" />}
+              value={
+                collective.approvedAt ? (
+                  <FormattedDate value={collective.approvedAt} day="numeric" month="long" year="numeric" />
+                ) : (
+                  <FormattedMessage defaultMessage="Not Hosted" />
+                )
+              }
             />
             <InfoListItem
               title={<FormattedMessage id="Balance" defaultMessage="Balance" />}
@@ -386,14 +392,18 @@ const CollectiveDetails = ({
                 />
               }
             />
-            <InfoListItem
-              title={<FormattedMessage defaultMessage="Fee Structure" />}
-              value={<HostFeeStructurePicker host={host} collective={collective} />}
-            />
-            <InfoListItem
-              title={<FormattedMessage defaultMessage="Expense Types" />}
-              value={<ExpenseTypesPicker host={host} collective={collective} />}
-            />
+            {isHostedCollective && (
+              <React.Fragment>
+                <InfoListItem
+                  title={<FormattedMessage defaultMessage="Fee Structure" />}
+                  value={<HostFeeStructurePicker host={host} collective={collective} />}
+                />
+                <InfoListItem
+                  title={<FormattedMessage defaultMessage="Expense Types" />}
+                  value={<ExpenseTypesPicker host={host} collective={collective} />}
+                />
+              </React.Fragment>
+            )}
             <InfoListItem
               className="sm:col-span-2"
               title={<FormattedMessage id="Team" defaultMessage="Team" />}
@@ -414,7 +424,7 @@ const CollectiveDetails = ({
                 </div>
               }
             />
-            {collective.hostAgreements?.totalCount > 0 && (
+            {isHostedCollective && collective.hostAgreements?.totalCount > 0 && (
               <InfoListItem
                 className="sm:col-span-2"
                 title={<FormattedMessage id="Agreements" defaultMessage="Agreements" />}
