@@ -1,7 +1,7 @@
 import React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { groupBy, isNil, mapValues, toPairs } from 'lodash';
-import { Banknote, Eye, FilePlus2, Mail, MoreHorizontal, Pause, Unlink } from 'lucide-react';
+import { Banknote, Eye, FilePlus2, Mail, MoreHorizontal, Pause, Play, Unlink } from 'lucide-react';
 import { FormattedDate, FormattedMessage, IntlShape } from 'react-intl';
 
 import { HOST_FEE_STRUCTURE } from '../../../../lib/constants/host-fee-structure';
@@ -225,8 +225,17 @@ export const MoreActionsMenu = ({
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem className="cursor-pointer" data-cy="actions-freeze" onClick={() => setOpenModal('FREEZE')}>
-            <Pause className="mr-2" size="16" />
-            <FormattedMessage defaultMessage="Freeze Collective" />
+            {collective.isFrozen ? (
+              <React.Fragment>
+                <Play className="mr-2" size="16" />
+                <FormattedMessage defaultMessage="Unfreeze Collective" />
+              </React.Fragment>
+            ) : (
+              <React.Fragment>
+                <Pause className="mr-2" size="16" />
+                <FormattedMessage defaultMessage="Freeze Collective" />
+              </React.Fragment>
+            )}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem className="cursor-pointer" data-cy="actions-unhost" onClick={() => setOpenModal('UNHOST')}>
