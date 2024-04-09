@@ -58,9 +58,13 @@ export const buildReport = (
 
   // Add the remaining result groups not matched by the defined groups
   const remainderRows = remainingNodes.map(group => ({
-    label: JSON.stringify(pick(group, 'kind', 'type', 'expenseType', 'isRefund')),
     section: ReportSection.OTHER,
-    amount: group.netAmount.valueInCents,
+    amount: group.amount.valueInCents,
+    netAmount: group.netAmount.valueInCents,
+    platformFee: group.platformFee.valueInCents,
+    paymentProcessorFee: group.paymentProcessorFee.valueInCents,
+    hostFee: group.hostFee.valueInCents,
+    taxAmount: group.taxAmount.valueInCents,
     filter: pick(group, 'kind', 'type', 'expenseType', 'isRefund', 'isHost'),
     groups: [group],
   }));
