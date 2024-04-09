@@ -30,8 +30,10 @@ const AVATAR_SIZE = 128;
 const DropzoneLoadingPlaceholder = () => (
   <LoadingPlaceholder height={AVATAR_SIZE} width={AVATAR_SIZE} color="primary.500" borderRadius="25%" />
 );
-const dynamicParams = { loading: DropzoneLoadingPlaceholder, ssr: false };
-const Dropzone = dynamic(() => import(/* webpackChunkName: 'react-dropzone' */ 'react-dropzone'), dynamicParams);
+const Dropzone = dynamic(() => import(/* webpackChunkName: 'react-dropzone' */ 'react-dropzone'), {
+  loading: DropzoneLoadingPlaceholder,
+  ssr: false,
+});
 
 const EditOverlay = styled.div`
   position: absolute;

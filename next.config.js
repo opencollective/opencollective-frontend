@@ -16,6 +16,11 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  compiler: {
+    styledComponents: {
+      displayName: ['ci', 'test', 'development', 'e2e'].includes(process.env.OC_ENV),
+    },
+  },
   images: {
     disableStaticImages: true,
   },
@@ -128,7 +133,7 @@ const nextConfig = {
 
     config.module.rules.push({
       test: /\.md$/,
-      use: ['babel-loader', 'raw-loader', 'markdown-loader'],
+      use: ['raw-loader', 'markdown-loader'],
     });
 
     // Configuration for images

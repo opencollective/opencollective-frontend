@@ -59,8 +59,11 @@ const StepDetails = ({ onChange, stepDetails, collective, tier, showPlatformTip,
 
   const dispatchChange = (field, value) => {
     // Assumption: we only have restrictions related to payment method types on recurring contributions
-    const stepPayment = field === 'interval' && value !== INTERVALS.oneTime ? null : stepPayment;
-    onChange({ stepDetails: { ...stepDetails, [field]: value }, stepPayment, stepSummary: null });
+    onChange({
+      stepDetails: { ...stepDetails, [field]: value },
+      ...(field === 'interval' && value !== INTERVALS.oneTime && { stepPayment: null }),
+      stepSummary: null,
+    });
   };
 
   // If an interval has been set (either from the tier defaults, or form an URL param) and the
