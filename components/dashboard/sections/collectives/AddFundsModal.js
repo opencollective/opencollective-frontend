@@ -350,7 +350,7 @@ const AddFundsModal = ({ collective, ...props }) => {
   });
 
   const tiersNodes = get(data, 'account.tiers.nodes');
-  const tiersOptions = React.useMemo(() => getTiersOptions(intl, tiersNodes), [tiersNodes]);
+  const tiersOptions = React.useMemo(() => getTiersOptions(intl, tiersNodes), [intl, tiersNodes]);
 
   // No modal if logged-out
   if (!LoggedInUser) {

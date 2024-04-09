@@ -66,11 +66,13 @@ export function DevicesSettings(props: DevicesSettingsProps) {
     context: API_V2_CONTEXT,
   });
 
+  const individualId = props.individual.id;
+  const onRecoveryCodesCallback = props.onRecoveryCodes;
   const startWebauthnDeviceRegistration = React.useCallback(async () => {
     const response = await createPublicKeyRequestOptions({
       variables: {
         account: {
-          id: props.individual.id,
+          id: individualId,
         },
       },
     });
@@ -82,14 +84,14 @@ export function DevicesSettings(props: DevicesSettingsProps) {
       const result = await addWebauthnDevice({
         variables: {
           account: {
-            id: props.individual.id,
+            id: individualId,
           },
           token: registrationBase64,
         },
       });
 
       if (result.data.addTwoFactorAuthTokenToIndividual.recoveryCodes) {
-        props.onRecoveryCodes(result.data.addTwoFactorAuthTokenToIndividual.recoveryCodes);
+        onRecoveryCodesCallback(result.data.addTwoFactorAuthTokenToIndividual.recoveryCodes);
       }
 
       toast({
@@ -99,7 +101,7 @@ export function DevicesSettings(props: DevicesSettingsProps) {
     } catch (e) {
       toast({ variant: 'error', message: e.message });
     }
-  }, [props.individual.id, intl]);
+  }, [toast, individualId, intl, onRecoveryCodesCallback, addWebauthnDevice, createPublicKeyRequestOptions]);
 
   return (
     <StyledCard px={3} py={2}>

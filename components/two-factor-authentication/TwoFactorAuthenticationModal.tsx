@@ -51,12 +51,12 @@ export default function TwoFactorAuthenticationModal() {
   const { LoggedInUser } = useLoggedInUser();
 
   const prompt = useTwoFactorAuthenticationPrompt();
-  const isOpen = prompt?.isOpen ?? false;
+  const isOpen = prompt.isOpen ?? false;
   const supportedMethods = React.useMemo(() => {
     return (prompt?.supportedMethods ?? []).filter(method => {
       return method !== 'recovery_code' || prompt?.allowRecovery;
     });
-  }, [prompt?.supportedMethods, prompt.allowRecovery]);
+  }, [prompt.supportedMethods, prompt.allowRecovery]);
 
   const [selectedMethod, setSelectedMethod] = React.useState(initialMethod(supportedMethods));
   const [twoFactorCode, setTwoFactorCode] = React.useState('');
@@ -88,7 +88,7 @@ export default function TwoFactorAuthenticationModal() {
     } finally {
       setConfirming(false);
     }
-  }, [prompt]);
+  }, [prompt, toast]);
 
   const cancel = React.useCallback(() => {
     setTwoFactorCode('');
@@ -96,7 +96,7 @@ export default function TwoFactorAuthenticationModal() {
     setSelectedMethod(null);
     prompt.rejectAuth(createError(ERROR.TWO_FACTOR_AUTH_CANCELED));
     removeFromLocalStorage(LOCAL_STORAGE_KEYS.TWO_FACTOR_AUTH_TOKEN);
-  }, []);
+  }, [prompt]);
 
   const confirm = React.useCallback(() => {
     const code = twoFactorCode;
@@ -114,7 +114,7 @@ export default function TwoFactorAuthenticationModal() {
     });
 
     setConfirming(false);
-  }, [twoFactorCode, supportedMethods, selectedMethod]);
+  }, [prompt, twoFactorCode, selectedMethod]);
 
   const router = useRouter();
 
@@ -124,7 +124,7 @@ export default function TwoFactorAuthenticationModal() {
     };
     router.events.on('routeChangeStart', handleRouteChange);
     return () => router.events.off('routeChangeStart', handleRouteChange);
-  }, [cancel]);
+  }, [router, cancel]);
 
   const verifyBtnEnabled =
     supportedMethods.length > 0 &&

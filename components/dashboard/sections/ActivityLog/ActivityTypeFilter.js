@@ -161,7 +161,7 @@ const getOptions = (intl, account) => {
 
 const ActivityTypeFilter = ({ account, onChange, value, ...props }) => {
   const intl = useIntl();
-  const options = React.useMemo(() => getOptions(intl, account), [account]);
+  const options = React.useMemo(() => getOptions(intl, account), [intl, account]);
   return (
     <StyledSelectFilter
       inputId="activity-type-filter"

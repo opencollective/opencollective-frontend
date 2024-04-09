@@ -22,7 +22,7 @@ export default function TwoFactorAuthenticationPromptButton() {
       setError(e);
       setCode('');
     }
-  }, []);
+  }, [prompt]);
 
   return (
     <React.Fragment>

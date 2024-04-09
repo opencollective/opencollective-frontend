@@ -55,7 +55,7 @@ const decodeOption = (customOptions, value) => {
 
 const ActivityAccountFilter = ({ account, value, onChange }) => {
   const intl = useIntl();
-  const customOptions = React.useMemo(() => getCustomOptions(intl, account), [account]);
+  const customOptions = React.useMemo(() => getCustomOptions(intl, account), [intl, account]);
   const selectedOption = React.useMemo(() => decodeOption(customOptions, value), [customOptions, value]);
   const isMulti = Array.isArray(selectedOption);
   const dispatchOptionsChange = options => onChange(encodeOptions(options));

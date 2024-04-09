@@ -33,7 +33,7 @@ const ExpenseStatusFilter = ({
   }
   const sortedOptions = React.useMemo(
     () => getOptions(intl, ignoredExpenseStatus).sort(sortSelectOptions),
-    [ignoredExpenseStatus],
+    [intl, ignoredExpenseStatus],
   );
 
   return (

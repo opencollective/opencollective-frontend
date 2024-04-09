@@ -56,7 +56,7 @@ const ConfirmGuestPage = () => {
   const [callConfirmGuestAccount, { error, data }] = useMutation(confirmGuestAccountMutation, MUTATION_OPTS);
   const { token, email } = router.query;
 
-  const confirmGuestAccount = async () => {
+  const confirmGuestAccount = React.useCallback(async () => {
     try {
       const response = await callConfirmGuestAccount({ variables: { email, token } });
       const { accessToken, account } = response.data.confirmGuestAccount;
@@ -67,7 +67,7 @@ const ConfirmGuestPage = () => {
     } catch {
       setStatus(STATUS.ERROR);
     }
-  };
+  }, [callConfirmGuestAccount, email, token, login]);
 
   // Auto-submit on mount, or switch to "Pick profile"
   React.useEffect(() => {
@@ -78,7 +78,7 @@ const ConfirmGuestPage = () => {
       setStatus(STATUS.SUBMITTING);
       confirmGuestAccount();
     }
-  }, []);
+  }, [email, confirmGuestAccount]);
 
   return (
     <Page title={intl.formatMessage(MESSAGES.pageTitle)}>

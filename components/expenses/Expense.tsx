@@ -376,7 +376,7 @@ function Expense(props) {
     setState({ ...state, showFilesViewerModal: true });
   };
 
-  const files = React.useMemo(() => getFilesFromExpense(expense, intl), [expense]);
+  const files = React.useMemo(() => getFilesFromExpense(expense, intl), [intl, expense]);
 
   const confirmSaveButtons = (
     <Flex flex={1} flexWrap="wrap" gridGap={[2, 3]}>

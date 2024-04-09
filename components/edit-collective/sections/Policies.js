@@ -167,7 +167,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
       label: value,
     }));
     return optionsArray;
-  }, [MODERATION_CATEGORIES]);
+  }, []);
 
   // Form
   const formik = useFormik({

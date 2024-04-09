@@ -81,7 +81,7 @@ export const useGraphQLFileUploader = ({
         toast({ variant: 'error', message: errorMsg });
       }
     },
-    [onReject],
+    [onReject, toast, isMulti],
   );
 
   return {
@@ -122,7 +122,7 @@ export const useGraphQLFileUploader = ({
           setIsUploading(false);
         }
       },
-      [onSuccess, onReject, mockImageGenerator, isMulti],
+      [intl, onSuccess, mockImageGenerator, callUploadFile, reportErrorMessage],
     ),
   };
 };

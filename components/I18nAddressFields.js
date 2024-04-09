@@ -86,8 +86,7 @@ const buildZoneOption = zone => {
 };
 
 const ZoneSelect = ({ info, required, value, name, label, onChange, id, error, ...props }) => {
-  const zones = info || [];
-  const zoneOptions = React.useMemo(() => orderBy(zones.map(buildZoneOption), 'label'), [zones]);
+  const zoneOptions = React.useMemo(() => orderBy((info || []).map(buildZoneOption), 'label'), [info]);
 
   // Reset zone if not supported
   React.useEffect(() => {

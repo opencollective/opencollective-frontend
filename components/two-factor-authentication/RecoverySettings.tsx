@@ -35,15 +35,16 @@ export function RecoverySettings(props: RecoverySettingsProps) {
     },
   );
 
+  const onRecoveryCodesCallback = props.onRecoveryCodes;
   const onRegenerateConfirmation = React.useCallback(async () => {
     try {
       const res = await regenerateRecoveryCodes();
       setIsRegeneratingRecoveryCodes(false);
-      props.onRecoveryCodes(res.data.regenerateRecoveryCodes);
+      onRecoveryCodesCallback(res.data.regenerateRecoveryCodes);
     } catch (err) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, err) });
     }
-  }, [intl, props.onRecoveryCodes]);
+  }, [intl, toast, onRecoveryCodesCallback, regenerateRecoveryCodes]);
 
   return (
     <React.Fragment>

@@ -10,7 +10,7 @@ export default function useLocalStorage<T>(key: string, defaultValue?: T) {
     } else {
       return defaultValue;
     }
-  }, [key]);
+  }, [key, defaultValue]);
 
   const [value, setValue] = useState<T>(get);
 

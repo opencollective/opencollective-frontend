@@ -79,7 +79,7 @@ export function ResetTwoFactorButton(props: ResetTwoFactorButtonProps) {
     } finally {
       setIsRemovingTwoFactorAuthentication(false);
     }
-  }, [removeTwoFactorAuthentication, props.individual]);
+  }, [intl, prompt, toast, removeTwoFactorAuthentication, props.individual]);
 
   return (
     <React.Fragment>

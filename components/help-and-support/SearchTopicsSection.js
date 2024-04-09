@@ -94,45 +94,48 @@ const SearchTopics = () => {
   });
   const sections = React.useMemo(() => getAllSections(searchResults), [searchResults]);
 
-  const search = async query => {
-    if (!query) {
-      setSearchResults([]);
-      setIsLoading(false);
-      return;
-    }
+  const search = React.useCallback(
+    async query => {
+      if (!query) {
+        setSearchResults([]);
+        setIsLoading(false);
+        return;
+      }
 
-    try {
-      const results = await searchDocs(query);
-      setSearchResults(results.items);
-    } catch (error) {
-      toast({
-        variant: 'error',
-        title: intl.formatMessage({ defaultMessage: 'Error in fetching results' }),
-        message: (
-          <p>
-            <FormattedMessage
-              defaultMessage={
-                'Oops! There was an unexpected error.{lineBreak} <openDocsLink><u>Visit our docs page</u></openDocsLink>'
-              }
-              values={{
-                openDocsLink: getI18nLink({
-                  href: `${DOCS_BASE_URL}`,
-                  openInNewTab: true,
-                }),
-                u: I18nUnderline,
-                lineBreak: <br />,
-              }}
-            />
-          </p>
-        ),
-      });
-      setSearchResults([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      try {
+        const results = await searchDocs(query);
+        setSearchResults(results.items);
+      } catch (error) {
+        toast({
+          variant: 'error',
+          title: intl.formatMessage({ defaultMessage: 'Error in fetching results' }),
+          message: (
+            <p>
+              <FormattedMessage
+                defaultMessage={
+                  'Oops! There was an unexpected error.{lineBreak} <openDocsLink><u>Visit our docs page</u></openDocsLink>'
+                }
+                values={{
+                  openDocsLink: getI18nLink({
+                    href: `${DOCS_BASE_URL}`,
+                    openInNewTab: true,
+                  }),
+                  u: I18nUnderline,
+                  lineBreak: <br />,
+                }}
+              />
+            </p>
+          ),
+        });
+        setSearchResults([]);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [intl, toast],
+  );
 
-  const debouncedSearch = React.useCallback(debounce(search, 500), []);
+  const debouncedSearch = React.useMemo(() => debounce(search, 500), [search]);
 
   return (
     <Flex justifyContent="center" alignItems="center" px="16px">

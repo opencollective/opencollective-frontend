@@ -12,7 +12,6 @@ import { ExpenseItemFormValues } from './types/FormValues';
 export const ConfirmOCRValues = ({
   onConfirm,
   items,
-  currency,
 }: {
   onConfirm: (boolean) => void;
   items: ExpenseItemFormValues[];
@@ -20,7 +19,7 @@ export const ConfirmOCRValues = ({
 }) => {
   const hasMismatches = React.useMemo(() => {
     return items.some(item => some(compareItemOCRValues(item), { hasMismatch: true }));
-  }, [items, currency]);
+  }, [items]);
 
   return (
     <MessageBox type={hasMismatches ? 'warning' : 'info'}>

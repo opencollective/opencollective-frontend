@@ -115,8 +115,7 @@ const formatProfileOption = (option, _, intl) => {
 
 const ContributeProfilePicker = ({ profiles, tier, selectedProfile, onChange }) => {
   const intl = useIntl();
-  const getOptionsArgs = [intl, profiles, tier];
-  const options = React.useMemo(() => getProfileOptions(...getOptionsArgs), getOptionsArgs);
+  const options = React.useMemo(() => getProfileOptions(intl, profiles, tier), [intl, profiles, tier]);
   return (
     <CollectivePicker
       data-cy="contribute-profile-picker"

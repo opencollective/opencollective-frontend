@@ -48,20 +48,22 @@ export default function Pagination(props: PaginationProps) {
   const totalPages = Math.ceil(props.total / props.limit);
   const currentPage = Math.ceil(props.offset / props.limit) + 1;
 
+  const baseUrl = 'route' in props ? props.route : router.asPath.split('?')[0];
+  const ignoredQueryParams = 'ignoredQueryParams' in props ? props.ignoredQueryParams : null;
   const pageUrl = React.useMemo(() => {
     if (useCallback) {
       return null;
     }
 
-    const baseUrl = 'route' in props ? props.route : router.asPath.split('?')[0];
     return (page: number) => {
-      const query = new URLSearchParams(qs.encode(omit(router.query, props.ignoredQueryParams)));
+      const query = new URLSearchParams(qs.encode(omit(router.query, ignoredQueryParams)));
       query.set('offset', `${props.limit * (page - 1)}`);
       query.set('limit', `${props.limit}`);
       return `${baseUrl}?${query.toString()}`;
     };
-  }, [props.limit, !useCallback && props.route, !useCallback && props.ignoredQueryParams, !useCallback && router]);
+  }, [baseUrl, ignoredQueryParams, props.limit, useCallback, router.query]);
 
+  const onPageChangeCallback = 'onPageChange' in props ? props.onPageChange : null;
   const onPageChange = React.useCallback(
     (page: number) => {
       if (page <= 0 || page > totalPages) {
@@ -71,10 +73,10 @@ export default function Pagination(props: PaginationProps) {
       if (!useCallback) {
         router.push(pageUrl(page));
       } else {
-        props.onPageChange(page);
+        onPageChangeCallback(page);
       }
     },
-    [router, useCallback, pageUrl, totalPages],
+    [router, useCallback, pageUrl, totalPages, onPageChangeCallback],
   );
 
   const PageComponent = React.useMemo(() => {
@@ -87,7 +89,7 @@ export default function Pagination(props: PaginationProps) {
     return function PageComponent(props: PageComponentProps) {
       return <Link href={pageUrl(props.page)}>{props.children}</Link>;
     };
-  }, [useCallback, onPageChange]);
+  }, [useCallback, onPageChange, pageUrl]);
 
   const isDisabled = props.isDisabled || totalPages <= 1;
 
@@ -127,6 +129,7 @@ type PageComponentProps = React.PropsWithChildren<{ page: number }>;
 type InputPaginationProps = {};
 
 function InputPagination(props: InputPaginationProps & CommonVariantProps) {
+  const onPageChangeCallback = props.onPageChange;
   const changePage = React.useCallback(
     ({ target, key }) => {
       if (key && key !== 'Enter') {
@@ -138,9 +141,9 @@ function InputPagination(props: InputPaginationProps & CommonVariantProps) {
         return;
       }
 
-      props.onPageChange(value);
+      onPageChangeCallback(value);
     },
-    [props.currentPage, props.onPageChange],
+    [props.currentPage, onPageChangeCallback],
   );
 
   return (

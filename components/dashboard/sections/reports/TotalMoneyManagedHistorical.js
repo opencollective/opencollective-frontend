@@ -110,7 +110,7 @@ const getChartOptions = (intl, hostCurrency, isCompactNotation) => ({
 
 const TotalMoneyManagedHistorical = ({ host, collectives }) => {
   const intl = useIntl();
-  const yearsOptions = useMemo(() => getActiveYearsOptions(host), [null]);
+  const yearsOptions = useMemo(() => getActiveYearsOptions(host), [host]);
   const [selectedYear, setSelectedYear] = useState(() => new Date().getFullYear());
   const variables = getQueryVariables(host.slug, selectedYear, collectives);
   const { loading, data, previousData } = useQuery(totalMoneyManagedQuery, {
@@ -119,11 +119,14 @@ const TotalMoneyManagedHistorical = ({ host, collectives }) => {
   });
   const hostTimeSeriesData = loading && !data ? previousData?.host : data?.host;
   const timeSeries = hostTimeSeriesData?.hostMetricsTimeSeries;
-  const series = React.useMemo(() => getSeriesFromData(intl, timeSeries, selectedYear), [timeSeries]);
+  const series = React.useMemo(
+    () => getSeriesFromData(intl, timeSeries, selectedYear),
+    [intl, selectedYear, timeSeries],
+  );
   const isCompactNotation = getMinMaxDifference(series[0].data) >= 10000;
   const chartOptions = useMemo(
     () => getChartOptions(intl, host.currency, isCompactNotation),
-    [host.currency, isCompactNotation],
+    [intl, host.currency, isCompactNotation],
   );
   return (
     <Box py={3}>

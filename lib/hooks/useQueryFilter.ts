@@ -61,7 +61,7 @@ export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape, any,
     [opts.defaultFilterValues, opts.views],
   );
   // Default values defined by the schema
-  const defaultSchemaValues = opts.schema.parse({});
+  const defaultSchemaValues = React.useMemo(() => opts.schema.parse({}), [opts.schema]);
 
   const values = React.useMemo(() => {
     const structuredQuery = structureQueryValues(query);
@@ -170,7 +170,7 @@ export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape, any,
 
   const activeViewId = React.useMemo(
     () => getActiveViewId(values, { filters: opts.filters, views: opts.views, defaultSchemaValues }),
-    [values, opts.filters, opts.views],
+    [values, opts.filters, opts.views, defaultSchemaValues],
   );
 
   return {

@@ -68,7 +68,7 @@ const MarkExpenseAsUnpaidButton = ({ expense, ...props }: MarkExpenseAsUnpaidBut
     }
 
     setHasModal(false);
-  }, [processExpense, newExpenseStatusOption, refundPaymentProcessorFee, message]);
+  }, [intl, processExpense, newExpenseStatusOption, refundPaymentProcessorFee, message]);
 
   const button = (
     <StyledButton {...props} buttonStyle="dangerSecondary" onClick={() => setHasModal(true)}>

@@ -63,7 +63,7 @@ const getOptions = (amount, currency, intl) => {
 const PlatformTipInput = ({ currency, amount, quantity, value, onChange, isEmbed }) => {
   const intl = useIntl();
   const orderAmount = amount * quantity;
-  const options = React.useMemo(() => getOptions(orderAmount, currency, intl), [orderAmount, currency]);
+  const options = React.useMemo(() => getOptions(orderAmount, currency, intl), [intl, orderAmount, currency]);
   const formatOptionLabel = option => {
     if (option.currency) {
       return (

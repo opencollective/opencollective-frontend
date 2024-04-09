@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 
 import { stripTime } from '../lib/date-utils';
 import dayjs from '../lib/dayjs';
@@ -77,14 +77,13 @@ const PeriodFilterPresetsSelect = ({
   styles = PERIOD_FILTER_SELECT_STYLES,
   ...selectProps
 }) => {
-  const intl = useIntl();
   const selectedOption = React.useMemo(() => getSelectedPeriodOptionFromInterval(interval), [interval]);
   const options = React.useMemo(() => {
     return Object.keys(PERIOD_FILTER_PRESETS).map(presetKey => ({
       value: presetKey,
       label: PERIOD_FILTER_PRESETS[presetKey].label,
     }));
-  }, [intl]);
+  }, []);
 
   return (
     <SelectComponent

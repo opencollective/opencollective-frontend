@@ -258,7 +258,7 @@ const TransactionsOverviewSection = ({ host, isLoading }) => {
   const intl = useIntl();
   const { locale } = intl;
   const timeUnit = host?.hostMetricsTimeSeries?.timeUnit;
-  const series = React.useMemo(() => getSeries(host, intl), [host]);
+  const series = React.useMemo(() => getSeries(host, intl), [intl, host]);
   const areaChartData = React.useMemo(() => getTransactionsAreaChartData(host, locale), [host, locale]);
   const transactionBreakdownChart = React.useMemo(() => getTransactionsBreakdownChartData(host), [host]);
   return (

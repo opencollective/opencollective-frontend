@@ -780,7 +780,7 @@ const getRequiredFields = values => {
 
 function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }) {
   const intl = useIntl();
-  const isEditing = React.useMemo(() => !!tier?.id);
+  const isEditing = !!tier?.id;
   const initialValues = React.useMemo(() => {
     if (isEditing) {
       return {
@@ -805,7 +805,7 @@ function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }) {
         presets: [1000],
       };
     }
-  }, [isEditing, tier]);
+  }, [isEditing, tier, forcedType]);
 
   const formMutation = isEditing ? editTierMutation : createTierMutation;
 

@@ -21,8 +21,7 @@ export const useAsyncCall = <T extends (...args: any[]) => Promise<any>>(
   const { toast } = useToast();
   const intl = useIntl();
 
-  const callWith =
-    (...args) =>
+  const callWith = React.useCallback((...args) =>
     async () => {
       setLoading(true);
       setError(undefined);
@@ -41,9 +40,9 @@ export const useAsyncCall = <T extends (...args: any[]) => Promise<any>>(
       } finally {
         setLoading(false);
       }
-    };
+    }, [fn, intl, toast, useErrorToast]);
 
-  const call = (...args) => callWith(...args)();
+  const call = React.useCallback((...args) => callWith(...args)(), [callWith]);
 
   return { loading, call, callWith, data, error };
 };
