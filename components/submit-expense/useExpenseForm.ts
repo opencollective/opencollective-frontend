@@ -460,7 +460,6 @@ type RecursivePartial<T> = {
 function buildFormSchema(
   values: ExpenseFormValues,
   options: Omit<ExpenseFormOptions, 'schema'>,
-  startOptions: ExpenseFormStartOptions,
   intl: IntlShape,
 ): z.ZodType<RecursivePartial<ExpenseFormValues>, z.ZodObjectDef, RecursivePartial<ExpenseFormValues>> {
   const supportedCurrencies =
@@ -821,7 +820,7 @@ async function buildFormOptions(
       options.totalInvoicedInExpenseCurrency = totalInvoiced;
     }
 
-    options.schema = buildFormSchema(values, options, startOptions, intl);
+    options.schema = buildFormSchema(values, options, intl);
 
     return options;
   } catch (err) {
