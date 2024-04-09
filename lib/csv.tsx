@@ -247,7 +247,7 @@ export const FIELDS: Array<{
     id: 'effectiveDate',
     group: 'transaction',
     tooltip: (
-      <FormattedMessage defaultMessage="For transactions related to manually added funds this shows the date entered by the fiscal host admin, for all other transactions this is the same as the transaction date & time (also UTC). " />
+      <FormattedMessage defaultMessage="For transactions related to manually added funds this shows the date entered by the fiscal host admin, for all other transactions this is the same as the transaction date & time (also UTC)." />
     ),
     label: <FormattedMessage defaultMessage="Effective Date & Time" />,
   },
@@ -282,7 +282,7 @@ export const FIELDS: Array<{
   {
     id: 'kind',
     group: 'transaction',
-    tooltip: <FormattedMessage defaultMessage="See documentation for reference to transaction kinds. " />,
+    tooltip: <FormattedMessage defaultMessage="See documentation for reference to transaction kinds." />,
     label: <FormattedMessage id="Transaction.Kind" defaultMessage="Kind" />,
   },
   {
@@ -543,7 +543,7 @@ export const FIELDS: Array<{
     id: 'expenseId',
     group: 'legacy',
     tooltip: (
-      <FormattedMessage defaultMessage="A unique 32 character identifier (previously names as Contribution ID) " />
+      <FormattedMessage defaultMessage="A unique 32 character identifier (previously names as Contribution ID)" />
     ),
     label: <FormattedMessage defaultMessage="Expense GraphQL ID" />,
   },
@@ -575,7 +575,7 @@ export const FIELDS: Array<{
     id: 'orderId',
     group: 'legacy',
     tooltip: (
-      <FormattedMessage defaultMessage="A unique 32 character identifier (previously names as Contribution ID) " />
+      <FormattedMessage defaultMessage="A unique 32 character identifier (previously names as Contribution ID)" />
     ),
     label: <FormattedMessage defaultMessage="Contribution GraphQL ID" />,
   },

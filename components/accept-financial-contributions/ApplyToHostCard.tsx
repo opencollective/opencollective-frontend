@@ -53,7 +53,7 @@ export default function ApplyToHostCard(props: {
             </P>
             <P mt={2}>
               <FormattedMessage
-                defaultMessage="<b>{ currencyCode  }</b> Currency"
+                defaultMessage="<b>{ currencyCode }</b> Currency"
                 values={{
                   currencyCode: props.host.currency.toUpperCase(),
                   b: chunks => <strong>{chunks}</strong>,

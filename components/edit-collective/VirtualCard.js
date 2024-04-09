@@ -335,7 +335,7 @@ const getLimitString = ({
       {spendingLimitInterval === VirtualCardLimitInterval.PER_AUTHORIZATION ? (
         <FormattedMessage
           id="VirtualCards.LimitedToPerAuthorization"
-          defaultMessage={'Limited to {limit} per authorization'}
+          defaultMessage="Limited to {limit} per authorization"
           values={{
             limit: formatCurrency(spendingLimitAmount, currency, {
               locale: intl.locale,
@@ -354,7 +354,7 @@ const getLimitString = ({
             <Fragment>
               &nbsp;&bull;&nbsp;
               <FormattedMessage
-                defaultMessage={'Renews on {renewsOnDate, date, medium}'}
+                defaultMessage="Renews on {renewsOnDate, date, medium}"
                 values={{
                   renewsOnDate: new Date(spendingLimitRenewsOn),
                 }}

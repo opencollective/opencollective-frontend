@@ -113,7 +113,7 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
         </Box>
         <Box gridColumn={['1', '1', '2']} gridRow={['3', '3', '2']}>
           <P my={3} fontSize="16px" lineHeight="24px" fontWeight="500" color="black.700">
-            <FormattedMessage defaultMessage="A fiscal host is an organization that welcomes others to operate through their structure, so projects can use the host’s legal entity and bank account instead of setting up their own. The host provides administrative services, oversight, and support. " />
+            <FormattedMessage defaultMessage="A fiscal host is an organization that welcomes others to operate through their structure, so projects can use the host’s legal entity and bank account instead of setting up their own. The host provides administrative services, oversight, and support." />
           </P>
           <Box textAlign={['center', 'center', 'left']}>
             <StyledLink

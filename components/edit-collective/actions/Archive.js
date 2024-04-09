@@ -92,9 +92,7 @@ const ArchiveCollective = ({ collective }) => {
       <SettingsSectionTitle>
         <FormattedMessage
           id="collective.archive.title"
-          defaultMessage={
-            'Archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}'
-          }
+          defaultMessage="Archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}"
           values={{ type: collective.type }}
         />
       </SettingsSectionTitle>
@@ -102,9 +100,7 @@ const ArchiveCollective = ({ collective }) => {
         <P mb={3} lineHeight="16px" fontSize="14px">
           <FormattedMessage
             id="collective.archive.description"
-            defaultMessage={
-              'Archiving {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}} means it will visually appear inactive and no new activity will be allowed.'
-            }
+            defaultMessage="Archiving {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}} means it will visually appear inactive and no new activity will be allowed."
             values={{ type: collective.type }}
           />
           &nbsp;
@@ -130,9 +126,7 @@ const ArchiveCollective = ({ collective }) => {
         >
           <FormattedMessage
             id="collective.archive.title"
-            defaultMessage={
-              'Archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}'
-            }
+            defaultMessage="Archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}"
             values={{ type: collective.type }}
           />
         </StyledButton>
@@ -141,9 +135,7 @@ const ArchiveCollective = ({ collective }) => {
         <P color="rgb(224, 183, 0)" my={1}>
           <FormattedMessage
             id="collective.archive.availableBalance"
-            defaultMessage={
-              "Only {type, select, EVENT {Events} PROJECT {Projects} FUND {Funds} COLLECTIVE {Collectives} other {Accounts}} with a balance of zero can be archived. To pay out the funds, submit an expense, donate to another Collective, or send the funds to your Fiscal Host using the 'empty balance' option."
-            }
+            defaultMessage="Only {type, select, EVENT {Events} PROJECT {Projects} FUND {Funds} COLLECTIVE {Collectives} other {Accounts}} with a balance of zero can be archived. To pay out the funds, submit an expense, donate to another Collective, or send the funds to your Fiscal Host using the 'empty balance' option."
             values={{ type: collective.type }}
           />
         </P>
@@ -159,9 +151,7 @@ const ArchiveCollective = ({ collective }) => {
           ) : (
             <FormattedMessage
               id="collective.archive.isHost"
-              defaultMessage={
-                "You can't archive {type, select, ORGANIZATION {your Organization} other {your account}} while being a Host. Please deactivate as Host first (in your Fiscal Hosting settings)."
-              }
+              defaultMessage="You can't archive {type, select, ORGANIZATION {your Organization} other {your account}} while being a Host. Please deactivate as Host first (in your Fiscal Hosting settings)."
               values={{ type: collective.type }}
             />
           )}
@@ -177,9 +167,7 @@ const ArchiveCollective = ({ collective }) => {
         <StyledButton onClick={() => setModal({ type: 'Unarchive', show: true })} loading={processing}>
           <FormattedMessage
             id="collective.unarchive.button"
-            defaultMessage={
-              'Unarchive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}'
-            }
+            defaultMessage="Unarchive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}"
             values={{ type: collective.type }}
           />
         </StyledButton>
@@ -208,9 +196,7 @@ const ArchiveCollective = ({ collective }) => {
                 <React.Fragment>
                   <FormattedMessage
                     id="archive.account.confirmation"
-                    defaultMessage={
-                      'Are you sure you want to archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?'
-                    }
+                    defaultMessage="Are you sure you want to archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?"
                     values={{ type: collective.type }}
                   />
                   <MessageBox fontSize={13} type="warning" withIcon mt={3} mb={3}>
@@ -221,9 +207,7 @@ const ArchiveCollective = ({ collective }) => {
               {modal.type === 'Unarchive' && (
                 <FormattedMessage
                   id="unarchive.account.confirmation"
-                  defaultMessage={
-                    'Are you sure you want to unarchive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?'
-                  }
+                  defaultMessage="Are you sure you want to unarchive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?"
                   values={{ type: collective.type }}
                 />
               )}
@@ -232,7 +216,7 @@ const ArchiveCollective = ({ collective }) => {
           <ModalFooter>
             <Container display="flex" justifyContent="flex-end">
               <StyledButton mx={20} onClick={() => setModal({ ...modal, show: false })}>
-                <FormattedMessage id="actions.cancel" defaultMessage={'Cancel'} />
+                <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
               </StyledButton>
               <StyledButton
                 buttonStyle="primary"
@@ -246,9 +230,9 @@ const ArchiveCollective = ({ collective }) => {
                 }}
               >
                 {modal.type === 'Unarchive' ? (
-                  <FormattedMessage id="collective.unarchive.confirm.btn" defaultMessage={'Unarchive'} />
+                  <FormattedMessage id="collective.unarchive.confirm.btn" defaultMessage="Unarchive" />
                 ) : (
-                  <FormattedMessage id="collective.archive.confirm.btn" defaultMessage={'Archive'} />
+                  <FormattedMessage id="collective.archive.confirm.btn" defaultMessage="Archive" />
                 )}
               </StyledButton>
             </Container>

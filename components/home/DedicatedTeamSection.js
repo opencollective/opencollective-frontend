@@ -24,9 +24,7 @@ const DedicatedTeam = () => {
           <SectionDescription textAlign="center" fontWeight="500">
             <FormattedMessage
               id="home.weDedicatedTeam.description"
-              defaultMessage={
-                'Open Collective is made possible by an international team of people who are committed to community-control of technology. Connect with us.'
-              }
+              defaultMessage="Open Collective is made possible by an international team of people who are committed to community-control of technology. Connect with us."
             />
           </SectionDescription>
         </Box>
