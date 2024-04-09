@@ -274,8 +274,8 @@ function CreatePayoutMethodForm(props: CreatePayoutMethodFormProps) {
 
   const setFieldValue = formik.setFieldValue;
   React.useEffect(() => {
-    setFieldValue('data', {})
-  }, [formik.values.type, setFieldValue])
+    setFieldValue('data', {});
+  }, [formik.values.type, setFieldValue]);
   return (
     <FormikProvider value={formik}>
       <div>
