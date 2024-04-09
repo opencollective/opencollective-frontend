@@ -241,7 +241,7 @@ const useExpenseCategoryPredictionService = (
   const { call: fetchPredictionsCall, data, loading } = useAsyncCall(fetchExpenseCategoryPredictions);
   const throttledFetchPredictions = React.useMemo(() => throttle(fetchPredictionsCall, 500), [fetchPredictionsCall]);
   const [showPreviousPredictions, setShowPreviousPredictions] = React.useState(true);
-  const inputData = React.useMemo(() => !enabled ? null : getCleanInputData(expenseValues), [enabled, expenseValues]);
+  const inputData = React.useMemo(() => (!enabled ? null : getCleanInputData(expenseValues)), [enabled, expenseValues]);
   const hasValidParams = Boolean(
     account && inputData && inputData.type && (inputData.description.length > 3 || inputData.items.length > 3),
   );
@@ -258,7 +258,7 @@ const useExpenseCategoryPredictionService = (
         }
       });
     }
-    return () => clearTimeout(hidePredictionsTimeout)
+    return () => clearTimeout(hidePredictionsTimeout);
   }, [host.slug, account?.slug, hasValidParams, inputData, throttledFetchPredictions, showPreviousPredictions]);
 
   // Map returned categories with known ones to build `predictions`

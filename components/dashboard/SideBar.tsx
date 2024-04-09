@@ -29,12 +29,16 @@ const AdminPanelSideBar = ({
   const { viewport } = useWindowResize();
   const isMobile = [VIEWPORTS.XSMALL, VIEWPORTS.SMALL].includes(viewport);
 
-  const onRoute = React.useMemo(() => isMobile
-    ? (...args) => {
-        setMenuOpen(false);
-        _onRoute?.(...args);
-      }
-    : _onRoute, [_onRoute, isMobile]);
+  const onRoute = React.useMemo(
+    () =>
+      isMobile
+        ? (...args) => {
+            setMenuOpen(false);
+            _onRoute?.(...args);
+          }
+        : _onRoute,
+    [_onRoute, isMobile],
+  );
 
   const content = React.useMemo(
     () => (

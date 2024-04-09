@@ -21,26 +21,29 @@ export const useAsyncCall = <T extends (...args: any[]) => Promise<any>>(
   const { toast } = useToast();
   const intl = useIntl();
 
-  const callWith = React.useCallback((...args) =>
-    async () => {
-      setLoading(true);
-      setError(undefined);
-      setData(undefined);
+  const callWith = React.useCallback(
+    (...args) =>
+      async () => {
+        setLoading(true);
+        setError(undefined);
+        setData(undefined);
 
-      try {
-        const response = await fn(...args);
-        setData(response);
-      } catch (e) {
-        setError(e);
-        // eslint-disable-next-line no-console
-        console.error(e);
-        if (useErrorToast) {
-          toast({ variant: 'error', message: formatErrorMessage(intl, e) });
+        try {
+          const response = await fn(...args);
+          setData(response);
+        } catch (e) {
+          setError(e);
+          // eslint-disable-next-line no-console
+          console.error(e);
+          if (useErrorToast) {
+            toast({ variant: 'error', message: formatErrorMessage(intl, e) });
+          }
+        } finally {
+          setLoading(false);
         }
-      } finally {
-        setLoading(false);
-      }
-    }, [fn, intl, toast, useErrorToast]);
+      },
+    [fn, intl, toast, useErrorToast],
+  );
 
   const call = React.useCallback((...args) => callWith(...args)(), [callWith]);
 
