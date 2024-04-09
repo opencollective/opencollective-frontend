@@ -41,7 +41,7 @@ export const schema = z.object({
   virtualCard: isMulti(z.string()).optional(),
   expenseType: isMulti(z.nativeEnum(ExpenseType)).optional(),
   expenseId: integer.optional(),
-  contributionId: integer.optional(),
+  orderId: integer.optional(),
   openTransactionId: z.string().optional(),
   group: z.string().optional(),
   isRefund: boolean.optional(),
@@ -63,7 +63,7 @@ export const toVariables: FiltersToVariables<FilterValues, TransactionsTableQuer
   amount: amountFilter.toVariables,
   virtualCard: (virtualCardIds, key) => ({ [key]: virtualCardIds.map(id => ({ id })) }),
   expenseId: id => ({ expense: { legacyId: id } }),
-  contributionId: id => ({ order: { legacyId: id } }),
+  orderId: id => ({ order: { legacyId: id } }),
 };
 
 // The filters config is used to populate the Filters component.
@@ -141,7 +141,7 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     ),
     valueRenderer: ({ value, intl }) => i18nExpenseType(intl, value),
   },
-  contributionId: {
+  orderId: {
     labelMsg: defineMessage({ defaultMessage: 'Contribution ID' }),
     Component: ({ value, onChange }) => {
       return (

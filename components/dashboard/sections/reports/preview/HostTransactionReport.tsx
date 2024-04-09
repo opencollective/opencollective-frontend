@@ -25,7 +25,10 @@ import { DashboardContext } from '../../../DashboardContext';
 import DashboardHeader from '../../../DashboardHeader';
 import ExportTransactionsCSVModal from '../../../ExportTransactionsCSVModal';
 import { DashboardSectionProps } from '../../../types';
-import { schema as hostTransactionsSchema } from '../../transactions/HostTransactions';
+import {
+  schema as hostTransactionsSchema,
+  toVariables as hostTransactionsToVariables,
+} from '../../transactions/HostTransactions';
 
 import { buildReport } from './report-builder/build-report';
 import { DefinitionTooltip } from './DefinitionTooltip';
@@ -78,6 +81,7 @@ const HostTransactionReport = ({ accountSlug: hostSlug, subpath }: DashboardSect
   // Query filter for the export transactions modal and for linking to the host transactions page with filters applied
   const hostTransactionsQueryFilter = useQueryFilter({
     schema: hostTransactionsSchema,
+    toVariables: hostTransactionsToVariables,
     filters: {},
     skipRouter: true, // we don't want to update the URL (already done by the main query filter)
   });

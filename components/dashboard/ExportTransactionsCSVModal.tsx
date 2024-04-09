@@ -101,6 +101,18 @@ const makeUrl = ({ account, isHostReport, queryFilter, flattenTaxesAndPaymentPro
     }
   }
 
+  if (!isNil(queryFilter.values.isRefund)) {
+    url.searchParams.set('isRefund', queryFilter.values.isRefund ? '1' : '0');
+  }
+
+  if (queryFilter.values.orderId) {
+    url.searchParams.set('orderId', queryFilter.values.orderId);
+  }
+
+  if (queryFilter.values.expenseId) {
+    url.searchParams.set('expenseId', queryFilter.values.expenseId);
+  }
+
   if (flattenTaxesAndPaymentProcessorFees) {
     url.searchParams.set('flattenPaymentProcessorFee', '1');
     url.searchParams.set('flattenTax', '1');

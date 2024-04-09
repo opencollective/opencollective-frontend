@@ -49,7 +49,7 @@ type FilterMeta = CommonFilterMeta & {
 
 // Only needed when values and key of filters are different
 // to expected key and value of QueryVariables
-const toVariables: FiltersToVariables<FilterValues, TransactionsTableQueryVariables, FilterMeta> = {
+export const toVariables: FiltersToVariables<FilterValues, TransactionsTableQueryVariables, FilterMeta> = {
   ...commonToVariables,
   account: hostedAccountFilter.toVariables,
   excludeHost: excludeHost => ({ includeHost: !excludeHost }),
