@@ -140,7 +140,7 @@ class EditConnectedAccount extends React.Component {
       toast({
         variant: 'error',
         title: this.props.intl.formatMessage(
-          { defaultMessage: 'Error while connecting {service} account' },
+          { defaultMessage: 'Error while connecting {service} account', id: 'FWMal2' },
           { service },
         ),
         message: e.message,
@@ -162,7 +162,7 @@ class EditConnectedAccount extends React.Component {
       toast({
         variant: 'error',
         message: this.props.intl.formatMessage(
-          { defaultMessage: 'Error while disconnecting {service} account' },
+          { defaultMessage: 'Error while disconnecting {service} account', id: 'zaq5cs' },
           { service },
         ),
       });

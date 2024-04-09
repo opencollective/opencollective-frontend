@@ -369,6 +369,7 @@ class EditCollectiveForm extends React.Component {
             {
               defaultMessage:
                 'Changing the handle from @{previousHandle} to @{newHandle} will break all the links that you previously shared for this profile (i.e., {exampleUrl}). Do you really want to continue?',
+              id: 'F0ZA/r',
             },
             {
               previousHandle: this.props.collective.slug,
