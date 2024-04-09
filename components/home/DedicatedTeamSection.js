@@ -75,7 +75,7 @@ const DedicatedTeam = () => {
               fontSize="16px"
               lineHeight="20px"
             >
-              <FormattedMessage defaultMessage="Get in touch" />
+              <FormattedMessage defaultMessage="Get in touch" id="krEziQ" />
             </StyledButton>
           </Link>
         </Box>

@@ -119,7 +119,7 @@ const Tags = ({ expense, order, isLoading, limit, getTagProps, children, canEdit
             {showUntagged &&
               renderTag({
                 tag: 'untagged',
-                label: intl.formatMessage(defineMessage({ defaultMessage: 'Untagged' })),
+                label: intl.formatMessage(defineMessage({ defaultMessage: 'Untagged', id: '8/OT+O' })),
               })}
 
             {tagList.length > limit && (

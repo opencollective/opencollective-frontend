@@ -78,7 +78,7 @@ export const AutoCollapse = ({ children, maxCollapsedHeight }: AutoCollapseProps
             </React.Fragment>
           ) : (
             <React.Fragment>
-              <FormattedMessage defaultMessage="Collapse" />
+              <FormattedMessage defaultMessage="Collapse" id="W/V6+Y" />
               <CaretUp size="10px" />
             </React.Fragment>
           )}

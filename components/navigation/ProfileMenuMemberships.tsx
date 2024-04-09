@@ -100,7 +100,7 @@ const MembershipLine = ({ user, membership, closeDrawer }) => {
               </Link>
             </TooltipTrigger>
             <TooltipContent side="left">
-              <FormattedMessage defaultMessage="Go to Dashboard" />
+              <FormattedMessage defaultMessage="Go to Dashboard" id="LxSJOb" />
             </TooltipContent>
           </Tooltip>
         </div>
@@ -185,7 +185,10 @@ MembershipsList.propTypes = {
 const MENU_SECTIONS = {
   [CollectiveType.COLLECTIVE]: {
     title: defineMessage({ id: 'collective', defaultMessage: 'My Collectives' }),
-    emptyMessage: defineMessage({ defaultMessage: 'Create a collective to collect and spend money transparently' }),
+    emptyMessage: defineMessage({
+      defaultMessage: 'Create a collective to collect and spend money transparently',
+      id: 'MZB6HL',
+    }),
     plusButton: {
       text: defineMessage({ id: 'home.create', defaultMessage: 'Create a Collective' }),
       href: '/create',
@@ -205,6 +208,7 @@ const MENU_SECTIONS = {
     title: defineMessage({ id: 'organization', defaultMessage: 'My Organizations' }),
     emptyMessage: defineMessage({
       defaultMessage: 'A profile representing a company or organization instead of an individual',
+      id: 'CBITv6',
     }),
     plusButton: {
       text: defineMessage({ id: 'host.organization.create', defaultMessage: 'Create an Organization' }),

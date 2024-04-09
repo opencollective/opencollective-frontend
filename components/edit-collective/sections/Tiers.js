@@ -37,7 +37,10 @@ const getSortedContributeCards = (collective, tiers, intl) => {
             collective,
             hideContributors: true,
             hideCTA: true,
-            missingCTAMsg: intl.formatMessage({ defaultMessage: 'The default contribution tier cannot be edited.' }),
+            missingCTAMsg: intl.formatMessage({
+              defaultMessage: 'The default contribution tier cannot be edited.',
+              id: 'setJlw',
+            }),
           },
         }
       : {
@@ -84,12 +87,15 @@ const Tiers = ({ collective, isLegacyOCFDuplicatedAccount }) => {
         <Box ml={2}>
           <P>
             <Strong>
-              <FormattedMessage defaultMessage="About contribution tiers" />
+              <FormattedMessage defaultMessage="About contribution tiers" id="RHApk3" />
             </Strong>
             <br />
             <br />
             <Span>
-              <FormattedMessage defaultMessage="You can provide perks or rewards for your tiers, have a set membership fee, or create categories for your contributors. Tiers can be limited to an amount or frequency (one time, monthly, yearly), or allowed to be flexibly set by contributors." />
+              <FormattedMessage
+                defaultMessage="You can provide perks or rewards for your tiers, have a set membership fee, or create categories for your contributors. Tiers can be limited to an amount or frequency (one time, monthly, yearly), or allowed to be flexibly set by contributors."
+                id="LdgLV7"
+              />
             </Span>
           </P>
           <P mt={3}>
@@ -97,7 +103,7 @@ const Tiers = ({ collective, isLegacyOCFDuplicatedAccount }) => {
               href="https://docs.opencollective.com/help/collectives/collective-settings/tiers-goals"
               openInNewTab
             >
-              <FormattedMessage defaultMessage="Learn more about tiers" />.
+              <FormattedMessage defaultMessage="Learn more about tiers" id="108gPp" />.
             </StyledLink>
           </P>
         </Box>

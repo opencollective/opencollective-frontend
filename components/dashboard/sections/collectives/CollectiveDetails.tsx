@@ -96,7 +96,7 @@ const HostFeeStructurePicker = ({ collective, host }: Partial<CollectiveDetailsP
     setFeeStructure({ hostFeesStructure, hostFeePercent });
     try {
       await submitEditSettings({ variables });
-      toast({ variant: 'success', message: <FormattedMessage defaultMessage="Fee structure updated" /> });
+      toast({ variant: 'success', message: <FormattedMessage defaultMessage="Fee structure updated" id="oqXFC+" /> });
     } catch (e) {
       setFeeStructure(previousState);
       toast({ variant: 'error', message: e.message });
@@ -127,7 +127,7 @@ const HostFeeStructurePicker = ({ collective, host }: Partial<CollectiveDetailsP
               </label>
             </div>
             <div className="ml-6 text-xs text-slate-700">
-              <FormattedMessage defaultMessage="Use the global fee in your settings." />
+              <FormattedMessage defaultMessage="Use the global fee in your settings." id="ylzz79" />
             </div>
           </PopoverRadioWrapper>
           <PopoverRadioWrapper>
@@ -199,7 +199,7 @@ const ExpenseTypesPicker = ({ collective }: Partial<CollectiveDetailsProps>) => 
     };
     try {
       await submitEditSettings({ variables });
-      toast({ variant: 'success', message: <FormattedMessage defaultMessage="Expense types updated" /> });
+      toast({ variant: 'success', message: <FormattedMessage defaultMessage="Expense types updated" id="/ELnaY" /> });
     } catch (e) {
       setExpenseTypes(previousState);
       toast({ variant: 'error', message: e.message });
@@ -219,12 +219,12 @@ const ExpenseTypesPicker = ({ collective }: Partial<CollectiveDetailsProps>) => 
       <PopoverTrigger asChild>
         <Button variant="outline">
           {isUsingGlobalSetttings ? (
-            <FormattedMessage defaultMessage="Use global settings" />
+            <FormattedMessage defaultMessage="Use global settings" id="BXVJAo" />
           ) : (
             Object.keys(expenseTypes)
               .filter(expenseType => expenseTypes[expenseType])
               .map(expenseType => i18nExpenseType(intl, expenseType))
-              .join(', ') || <FormattedMessage defaultMessage="Custom" />
+              .join(', ') || <FormattedMessage defaultMessage="Custom" id="Sjo1P4" />
           )}
           <ChevronDown className="ml-4 h-4 w-4 flex-shrink-0 opacity-50" />
         </Button>
@@ -247,7 +247,7 @@ const ExpenseTypesPicker = ({ collective }: Partial<CollectiveDetailsProps>) => 
             <div className="flex items-center gap-2">
               <RadioGroupItem value={'DEFAULT'} />
               <label className="cursor-pointer text-sm font-medium" htmlFor={'DEFAULT'}>
-                <FormattedMessage defaultMessage="Use global settings" />
+                <FormattedMessage defaultMessage="Use global settings" id="BXVJAo" />
               </label>
             </div>
           </PopoverRadioWrapper>
@@ -255,7 +255,7 @@ const ExpenseTypesPicker = ({ collective }: Partial<CollectiveDetailsProps>) => 
             <div className="flex items-center gap-2">
               <RadioGroupItem value={'CUSTOM'} />
               <label className="cursor-pointer text-sm font-medium" htmlFor={'CUSTOM'}>
-                <FormattedMessage defaultMessage="Customize" />
+                <FormattedMessage defaultMessage="Customize" id="TXpOBi" />
               </label>
             </div>
             <div className="ml-6 mt-1 flex flex-col gap-1 text-slate-700">
@@ -306,7 +306,7 @@ const CollectiveDetails = ({
   return (
     <div>
       <H4 mb={32}>
-        <FormattedMessage defaultMessage="Collective's overview" />
+        <FormattedMessage defaultMessage="Collective's overview" id="28uZ0u" />
       </H4>
       {isLoading ? (
         <React.Fragment>
@@ -323,11 +323,11 @@ const CollectiveDetails = ({
               value={<LoadingPlaceholder height={24} width={256} />}
             />
             <InfoListItem
-              title={<FormattedMessage defaultMessage="Fee Structure" />}
+              title={<FormattedMessage defaultMessage="Fee Structure" id="CS88Lr" />}
               value={<LoadingPlaceholder height={24} width={256} />}
             />
             <InfoListItem
-              title={<FormattedMessage defaultMessage="Expense Types" />}
+              title={<FormattedMessage defaultMessage="Expense Types" id="D+aS5Z" />}
               value={<LoadingPlaceholder height={24} width={256} />}
             />
             <InfoListItem
@@ -352,6 +352,7 @@ const CollectiveDetails = ({
                 <div className="text-sm font-normal text-muted-foreground">
                   <FormattedMessage
                     defaultMessage="{childAccountType} by {parentAccount}"
+                    id="9f14iS"
                     values={{
                       childAccountType: (
                         <Badge size="xs" type="outline">
@@ -377,7 +378,7 @@ const CollectiveDetails = ({
                 collective.approvedAt ? (
                   <FormattedDate value={collective.approvedAt} day="numeric" month="long" year="numeric" />
                 ) : (
-                  <FormattedMessage defaultMessage="Not Hosted" />
+                  <FormattedMessage defaultMessage="Not Hosted" id="OARQHL" />
                 )
               }
             />
@@ -395,11 +396,11 @@ const CollectiveDetails = ({
             {isHostedCollective && (
               <React.Fragment>
                 <InfoListItem
-                  title={<FormattedMessage defaultMessage="Fee Structure" />}
+                  title={<FormattedMessage defaultMessage="Fee Structure" id="CS88Lr" />}
                   value={<HostFeeStructurePicker host={host} collective={collective} />}
                 />
                 <InfoListItem
-                  title={<FormattedMessage defaultMessage="Expense Types" />}
+                  title={<FormattedMessage defaultMessage="Expense Types" id="D+aS5Z" />}
                   value={<ExpenseTypesPicker host={host} collective={collective} />}
                 />
               </React.Fragment>
@@ -472,7 +473,7 @@ const CollectiveDetails = ({
               <div className="flex flex-grow justify-end gap-2">
                 <MoreActionsMenu collective={collective} onEdit={onEdit}>
                   <Button className="rounded-full" variant="outline">
-                    <FormattedMessage defaultMessage="More Actions" />
+                    <FormattedMessage defaultMessage="More Actions" id="A7ugfn" />
                   </Button>
                 </MoreActionsMenu>
               </div>,

@@ -104,7 +104,7 @@ const ResourcesSection = () => {
                   textTransform="uppercase"
                 >
                   <Span>
-                    <FormattedMessage defaultMessage="Blog Entry" />
+                    <FormattedMessage defaultMessage="Blog Entry" id="Hbj3Si" />
                   </Span>{' '}
                   • <Span>{blogEntry.date}</Span>
                 </P>

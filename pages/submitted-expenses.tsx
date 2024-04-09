@@ -177,7 +177,7 @@ class SubmittedExpensesPage extends React.Component<SubmittedExpensesPageProps> 
               <Box flex="1 1 500px" minWidth={300} maxWidth={'100%'} mr={0} mb={5}>
                 <Flex>
                   <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
-                    <FormattedMessage defaultMessage="Submitted Expenses" />
+                    <FormattedMessage defaultMessage="Submitted Expenses" id="NpGb+x" />
                   </H1>
                   <Box mx="auto" />
                   <SearchFormContainer p={2} width="276px">

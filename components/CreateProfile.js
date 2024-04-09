@@ -21,12 +21,15 @@ import { P, Span } from './Text';
 const messages = defineMessages({
   newsletter: {
     defaultMessage: 'Subscribe to our monthly newsletter',
+    id: 'cNkrNr',
   },
   nameLabel: {
     defaultMessage: 'Your name',
+    id: 'vlKhIl',
   },
   email: {
     defaultMessage: 'Your email',
+    id: 'nONnTw',
   },
 });
 
@@ -101,6 +104,7 @@ const TOSCheckBox = ({ onChange, checked }) => {
       label={
         <FormattedMessage
           defaultMessage="I agree with the <TOSLink>terms of service</TOSLink> of Open Collective"
+          id="SE0Wpk"
           values={{
             TOSLink: getI18nLink({
               href: '/tos',
@@ -213,16 +217,16 @@ const CreateProfile = ({
         )}
         <Box pt="48px" fontSize="32px" fontWeight="700" color="black.900" lineHeight="40px">
           {isOAuth ? (
-            <FormattedMessage defaultMessage="Create an account in Open Collective" />
+            <FormattedMessage defaultMessage="Create an account in Open Collective" id="sEP10P" />
           ) : (
-            <FormattedMessage defaultMessage="Create your personal account" />
+            <FormattedMessage defaultMessage="Create your personal account" id="OkoBON" />
           )}
         </Box>
         <Box fontSize="16px" fontWeight="500" color="black.700" lineHeight="24px" pt="14px">
           {isOAuth ? (
-            <FormattedMessage defaultMessage="and connect with {oAuthAppName}" values={{ oAuthAppName }} />
+            <FormattedMessage defaultMessage="and connect with {oAuthAppName}" id="boQlk1" values={{ oAuthAppName }} />
           ) : (
-            <FormattedMessage defaultMessage="Set up your personal details to continue" />
+            <FormattedMessage defaultMessage="Set up your personal details to continue" id="2cxNhl" />
           )}
         </Box>
       </Flex>
@@ -310,17 +314,20 @@ const CreateProfile = ({
         </StyledCard>
         <MessageBox type="info" mt="24px">
           <Box fontSize="13px" fontWeight={700}>
-            <FormattedMessage defaultMessage="Do you want to create an account for your organization?" />
+            <FormattedMessage defaultMessage="Do you want to create an account for your organization?" id="HM2YJg" />
           </Box>
           <Box mt="8px" fontSize="12px" fontWeight={400} lineHeight="18px">
-            <FormattedMessage defaultMessage="You are creating your personal account first, once inside, you will be able to create a profile for your company." />
+            <FormattedMessage
+              defaultMessage="You are creating your personal account first, once inside, you will be able to create a profile for your company."
+              id="OvoOan"
+            />
             <Box mt="8px">
               <a
                 target="_blank"
                 rel="noopener noreferrer"
                 href="https://docs.opencollective.com/help/financial-contributors/organizations#what-is-an-organization"
               >
-                <FormattedMessage defaultMessage="Read more about organization accounts" />
+                <FormattedMessage defaultMessage="Read more about organization accounts" id="OuFEXI" />
               </a>
             </Box>
           </Box>
@@ -330,11 +337,12 @@ const CreateProfile = ({
             <Box fontSize="14px" fontWeight={400} lineHeight="20px">
               <FormattedMessage
                 defaultMessage="{email} is already registered on {WebsiteName}. Would you like to Sign In instead?"
+                id="CZhiK4"
                 values={{ email: <strong>{email}</strong>, WebsiteName }}
               />
               <Box mt="8px">
                 <SecondaryAction onSecondaryAction={onSecondaryAction} loading={submitting} asLink>
-                  <FormattedMessage defaultMessage="Sign me in" />
+                  <FormattedMessage defaultMessage="Sign me in" id="Qmnl+F" />
                 </SecondaryAction>
               </Box>
             </Box>
@@ -345,7 +353,7 @@ const CreateProfile = ({
             <Span>
               &larr;{` `}
               <Span fontWeight="500" fontSize="14px">
-                <FormattedMessage defaultMessage="Go back" />
+                <FormattedMessage defaultMessage="Go back" id="orvpWh" />
               </Span>
             </Span>
           </SecondaryAction>
@@ -358,7 +366,7 @@ const CreateProfile = ({
             fontWeight="500"
             loading={submitting}
           >
-            <FormattedMessage defaultMessage="Create account and continue" />
+            <FormattedMessage defaultMessage="Create account and continue" id="v4Ew1a" />
           </StyledButton>
         </Flex>
       </Box>

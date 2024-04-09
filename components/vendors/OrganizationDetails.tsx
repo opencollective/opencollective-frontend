@@ -86,7 +86,10 @@ const OrganizationDetails = ({ organization, host, onCancel, editVendor }) => {
       const result = await convertOrganizationToVendor({
         variables: { organization: { id: organization.id }, host: { id: host.id } },
       });
-      toast({ variant: 'success', message: <FormattedMessage defaultMessage="Organization converted to vendor" /> });
+      toast({
+        variant: 'success',
+        message: <FormattedMessage defaultMessage="Organization converted to vendor" id="HwKF7/" />,
+      });
       editVendor(result.data.convertOrganizationToVendor);
     } catch (e) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
@@ -100,7 +103,7 @@ const OrganizationDetails = ({ organization, host, onCancel, editVendor }) => {
   return (
     <div>
       <H4 mb={32}>
-        <FormattedMessage defaultMessage="Organization's Detail" />
+        <FormattedMessage defaultMessage="Organization's Detail" id="0eCOkC" />
       </H4>
       <SectionTitle>
         <Avatar collective={organization} radius={40} />
@@ -132,7 +135,7 @@ const OrganizationDetails = ({ organization, host, onCancel, editVendor }) => {
         {activity && (
           <div className="mt-4 flex flex-1 flex-col gap-1">
             <SectionTitle>
-              <FormattedMessage defaultMessage="Activity" />
+              <FormattedMessage defaultMessage="Activity" id="ZmlNQ3" />
             </SectionTitle>
             <Link href={`${dashboardLink}/host-expenses?searchTerm=%40${organization.slug}`} className="text-sm">
               {activity.expenses.totalCount} <FormattedMessage id="Expenses" defaultMessage="Expenses" />
@@ -150,7 +153,7 @@ const OrganizationDetails = ({ organization, host, onCancel, editVendor }) => {
               <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
             </Button>
             <Button onClick={() => setDisplayConvertToVendor(true)} className="rounded-full">
-              <FormattedMessage defaultMessage="Convert to Vendor" />
+              <FormattedMessage defaultMessage="Convert to Vendor" id="JdiXW6" />
             </Button>
           </div>,
           drawerActionsContainer,
@@ -160,12 +163,13 @@ const OrganizationDetails = ({ organization, host, onCancel, editVendor }) => {
           width="100%"
           maxWidth="570px"
           onClose={() => setDisplayConvertToVendor(false)}
-          header={<FormattedMessage defaultMessage="Convert to vendor?" />}
+          header={<FormattedMessage defaultMessage="Convert to vendor?" id="yzk/qp" />}
           continueHandler={handleConvert}
         >
           <p>
             <FormattedMessage
               defaultMessage="I understand that this organization will be: {br}- Transformed into a vendor; {br}- No longer be accessible to its admins as an organization on the platform; and, {br}- Will no longer have a public profile."
+              id="njL0Ai"
               values={{ br: <br /> }}
             />
           </p>

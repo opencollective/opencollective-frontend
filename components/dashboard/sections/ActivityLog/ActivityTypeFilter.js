@@ -44,7 +44,7 @@ const ActivityCategories = {
     ],
   },
   ACCOUNTS: {
-    title: defineMessage({ defaultMessage: 'Accounts' }),
+    title: defineMessage({ defaultMessage: 'Accounts', id: 'FvanT6' }),
     activities: [
       'COLLECTIVE_CREATED',
       'COLLECTIVE_EDITED',
@@ -72,7 +72,7 @@ const ActivityCategories = {
     ],
   },
   UPDATES: {
-    title: defineMessage({ defaultMessage: 'Updates & Conversations' }),
+    title: defineMessage({ defaultMessage: 'Updates & Conversations', id: 'tCZ0vE' }),
     activities: [
       'COLLECTIVE_UPDATE_CREATED',
       'COLLECTIVE_UPDATE_PUBLISHED',
@@ -82,7 +82,7 @@ const ActivityCategories = {
     ],
   },
   MEMBERS: {
-    title: defineMessage({ defaultMessage: 'Members' }),
+    title: defineMessage({ defaultMessage: 'Members', id: '+a+2ug' }),
     activities: [
       'COLLECTIVE_MEMBER_INVITED',
       'COLLECTIVE_CORE_MEMBER_ADDED',
@@ -106,7 +106,7 @@ const ActivityCategories = {
     activities: ['USER_CARD_CLAIMED', 'USER_CARD_INVITED'],
   },
   USER: {
-    title: defineMessage({ defaultMessage: 'User Account' }),
+    title: defineMessage({ defaultMessage: 'User Account', id: 'jeJ/r2' }),
     activities: ['USER_CREATED', 'USER_NEW_TOKEN', 'USER_CHANGE_EMAIL'],
   },
 };

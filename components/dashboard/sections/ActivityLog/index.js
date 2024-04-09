@@ -257,7 +257,7 @@ const ActivityLog = ({ accountSlug }) => {
         <React.Fragment>
           {!data.activities.totalCount ? (
             <MessageBox type="info" withIcon>
-              <FormattedMessage defaultMessage="No activity yet" />
+              <FormattedMessage defaultMessage="No activity yet" id="aojEGT" />
             </MessageBox>
           ) : (
             <ActivitiesTable

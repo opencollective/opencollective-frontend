@@ -200,7 +200,10 @@ const ArchiveCollective = ({ collective }) => {
                     values={{ type: collective.type }}
                   />
                   <MessageBox fontSize={13} type="warning" withIcon mt={3} mb={3}>
-                    <FormattedMessage defaultMessage="Note that archiving will cancel all active recurring contributions." />
+                    <FormattedMessage
+                      defaultMessage="Note that archiving will cancel all active recurring contributions."
+                      id="kyC4C+"
+                    />
                   </MessageBox>
                 </React.Fragment>
               )}

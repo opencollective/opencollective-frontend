@@ -131,6 +131,7 @@ export function Metric({
               {isSnapshot ? (
                 <FormattedMessage
                   defaultMessage="{countOrAmount} at start of period"
+                  id="Pa4OAa"
                   values={{
                     countOrAmount: amount ? (
                       <FormattedMoneyAmount
@@ -148,6 +149,7 @@ export function Metric({
               ) : (
                 <FormattedMessage
                   defaultMessage="{countOrAmount} previous period"
+                  id="T5nXXx"
                   values={{
                     countOrAmount: amount ? (
                       <FormattedMoneyAmount

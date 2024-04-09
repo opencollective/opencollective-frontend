@@ -45,9 +45,11 @@ const CommunityTypes = Object.keys(CommunityTypesToTags);
 const I18nMessages = defineMessages({
   ALL_COUNTRIES: {
     defaultMessage: 'All countries',
+    id: 'n6WiTf',
   },
   ANY_CURRENCY: {
     defaultMessage: 'Any currency',
+    id: 'mwe0tx',
   },
   SEARCH_PLACEHOLDER: {
     id: 'findAFiscalHost.searchPlaceholder',
@@ -108,12 +110,15 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
             fontWeight="700"
             color="black.900"
           >
-            <FormattedMessage defaultMessage="Accept contributions through a Fiscal Host" />
+            <FormattedMessage defaultMessage="Accept contributions through a Fiscal Host" id="FEpInY" />
           </H1>
         </Box>
         <Box gridColumn={['1', '1', '2']} gridRow={['3', '3', '2']}>
           <P my={3} fontSize="16px" lineHeight="24px" fontWeight="500" color="black.700">
-            <FormattedMessage defaultMessage="A fiscal host is an organization that welcomes others to operate through their structure, so projects can use the host’s legal entity and bank account instead of setting up their own. The host provides administrative services, oversight, and support." />
+            <FormattedMessage
+              defaultMessage="A fiscal host is an organization that welcomes others to operate through their structure, so projects can use the host’s legal entity and bank account instead of setting up their own. The host provides administrative services, oversight, and support."
+              id="1/t8Wm"
+            />
           </P>
           <Box textAlign={['center', 'center', 'left']}>
             <StyledLink
@@ -122,7 +127,7 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
               href="https://opencollective.com/fiscal-hosting"
               openInNewTab
             >
-              <FormattedMessage defaultMessage="Learn more" />
+              <FormattedMessage defaultMessage="Learn more" id="TdTXXf" />
             </StyledLink>
           </Box>
         </Box>
@@ -133,7 +138,7 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
         padding="32px 24px"
       >
         <P mb={2} fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800">
-          <FormattedMessage defaultMessage="Search for a Fiscal Host" />
+          <FormattedMessage defaultMessage="Search for a Fiscal Host" id="hoj0zn" />
         </P>
 
         <Container position="relative">
@@ -150,7 +155,7 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
         </Container>
 
         <P mb={2} mt={4} fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800">
-          <FormattedMessage defaultMessage="What categories describe your work?" />
+          <FormattedMessage defaultMessage="What categories describe your work?" id="qtkFFq" />
         </P>
         <StyledFilters
           multiSelect
@@ -163,7 +168,7 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
         <Flex gap={'40px'} flexWrap="wrap" mt={4}>
           <Box flexGrow={1}>
             <P fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800" mb={2}>
-              <FormattedMessage defaultMessage="Where are your financial contributors based?" />
+              <FormattedMessage defaultMessage="Where are your financial contributors based?" id="UAwtXh" />
             </P>
             <InputTypeCountry
               value={selectedCountry}
@@ -171,12 +176,15 @@ export default function StartAcceptingFinancialContributionsPage(props: StartAcc
               customOptions={[allCountriesSelectOption]}
             />
             <P color="black.600" fontWeight="400" fontSize="11px" lineHeight="16px" mt={2}>
-              <FormattedMessage defaultMessage="If multiple areas, please select most prominent of them all." />
+              <FormattedMessage
+                defaultMessage="If multiple areas, please select most prominent of them all."
+                id="mKcWbZ"
+              />
             </P>
           </Box>
           <Box flexGrow={1}>
             <P fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800" mb={2}>
-              <FormattedMessage defaultMessage="What currency will your Collective use?" />
+              <FormattedMessage defaultMessage="What currency will your Collective use?" id="1zPqtA" />
             </P>
             <StyledSelect
               value={selectedCurrency}

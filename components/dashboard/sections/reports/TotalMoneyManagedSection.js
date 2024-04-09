@@ -99,7 +99,7 @@ const TotalMoneyManagedSection = ({ host, collectives, isLoading }) => {
         <Container px={2} textAlign="right">
           <StyledLinkButton asLink onClick={() => setShowMoneyManagedChart(!showMoneyManagedChart)}>
             <P fontSize="12px" fontWeight="400" mt="16px">
-              <FormattedMessage defaultMessage="See historic" />
+              <FormattedMessage defaultMessage="See historic" id="BWoXXL" />
               <Span pl="8px">
                 {showMoneyManagedChart ? <ChevronUp size={12} /> : <ChevronDown fontVariant="solid" size={12} />}
               </Span>

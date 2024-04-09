@@ -34,11 +34,12 @@ export default function FeaturedFiscalHostResults({
     <StyledCard padding={4} bg="#F1F6FF" borderRadius="24px" borderStyle="none">
       <Flex flexWrap="wrap">
         <P mr={3} fontSize="24px" lineHeight="32px" fontWeight="700" color="black.900">
-          <FormattedMessage defaultMessage="Recommended Hosts" />
+          <FormattedMessage defaultMessage="Recommended Hosts" id="NmfuHo" />
         </P>
         <P fontSize="14px" lineHeight="32px" fontWeight="400" color="black.900">
           <FormattedMessage
             defaultMessage="{ hostCount, plural, one {# host} other {# hosts} } found"
+            id="PB3Bh9"
             values={{
               hostCount: hosts.length,
             }}
@@ -46,7 +47,7 @@ export default function FeaturedFiscalHostResults({
         </P>
       </Flex>
       <P fontSize="14px" lineHeight="20px" fontWeight="500" color="black.900">
-        <FormattedMessage defaultMessage="Our most trusted hosts" />
+        <FormattedMessage defaultMessage="Our most trusted hosts" id="w4F3He" />
       </P>
       <HostCardContainer mt={3}>
         {hosts.map(host => {

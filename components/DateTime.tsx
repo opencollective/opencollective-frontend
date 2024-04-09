@@ -7,6 +7,7 @@ import { capitalize } from '../lib/utils';
 
 const TITLE_MESSAGE = defineMessage({
   defaultMessage: 'Local time: {localTime}{newLine}UTC time: {utcTime}',
+  id: '9kdoVP',
 });
 
 export const generateDateTitle = (intl, date) => {

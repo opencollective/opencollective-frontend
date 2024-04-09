@@ -45,6 +45,7 @@ export default function ApplyToHostCard(props: {
             <P>
               <FormattedMessage
                 defaultMessage="{ hostedCollectives, plural, one {<b>#</b> Collective} other {<b>#</b> Collectives} } hosted"
+                id="D5tV0Y"
                 values={{
                   hostedCollectives: props.host.totalHostedCollectives,
                   b: chunks => <strong>{chunks}</strong>,
@@ -54,6 +55,7 @@ export default function ApplyToHostCard(props: {
             <P mt={2}>
               <FormattedMessage
                 defaultMessage="<b>{ currencyCode }</b> Currency"
+                id="yQt2k/"
                 values={{
                   currencyCode: props.host.currency.toUpperCase(),
                   b: chunks => <strong>{chunks}</strong>,
@@ -64,6 +66,7 @@ export default function ApplyToHostCard(props: {
               <P mt={2}>
                 <FormattedMessage
                   defaultMessage="<b>{ hostFeePercent }%</b> Host fee"
+                  id="URR2Ki"
                   values={{
                     hostFeePercent: props.host.hostFeePercent,
                     b: chunks => <strong>{chunks}</strong>,
@@ -103,7 +106,7 @@ export default function ApplyToHostCard(props: {
             width="100%"
             textTransform="capitalize"
           >
-            <FormattedMessage defaultMessage="Learn more" />
+            <FormattedMessage defaultMessage="Learn more" id="TdTXXf" />
           </StyledButton>
         </Box>
       </StyledCollectiveCardWrapper>

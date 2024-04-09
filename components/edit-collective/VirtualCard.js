@@ -159,10 +159,10 @@ export const ActionsButton = props => {
     try {
       if (isActive) {
         await pauseCard({ variables: { virtualCard: { id: virtualCard.id } } });
-        handleActionSuccess(<FormattedMessage defaultMessage="Card paused" />);
+        handleActionSuccess(<FormattedMessage defaultMessage="Card paused" id="6cdzhs" />);
       } else {
         await resumeCard({ variables: { virtualCard: { id: virtualCard.id } } });
-        handleActionSuccess(<FormattedMessage defaultMessage="Card resumed" />);
+        handleActionSuccess(<FormattedMessage defaultMessage="Card resumed" id="3hR6A8" />);
       }
     } catch (e) {
       props.onError(e);
@@ -187,7 +187,7 @@ export const ActionsButton = props => {
           {props.openVirtualCardDrawer && (
             <React.Fragment>
               <DropdownMenuItem onClick={() => props.openVirtualCardDrawer(virtualCard)}>
-                <FormattedMessage defaultMessage="View details" />
+                <FormattedMessage defaultMessage="View details" id="MnpUD7" />
               </DropdownMenuItem>
               <DropdownMenuSeparator />
             </React.Fragment>
@@ -212,14 +212,14 @@ export const ActionsButton = props => {
           {canDeleteVirtualCard && (
             <React.Fragment>
               <DropdownMenuItem onClick={() => setIsDeletingVirtualCard(true)} disabled={isCanceled}>
-                <FormattedMessage defaultMessage="Delete Card" />
+                <FormattedMessage defaultMessage="Delete Card" id="mLx6pg" />
               </DropdownMenuItem>
             </React.Fragment>
           )}
           {canEditVirtualCard && (
             <React.Fragment>
               <DropdownMenuItem onClick={() => setIsEditingVirtualCard(true)}>
-                <FormattedMessage defaultMessage="Edit Card Details" />
+                <FormattedMessage defaultMessage="Edit Card Details" id="ILnhs8" />
               </DropdownMenuItem>
               <DropdownMenuSeparator />
             </React.Fragment>
@@ -232,7 +232,7 @@ export const ActionsButton = props => {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <FormattedMessage defaultMessage="View on Stripe" />
+                  <FormattedMessage defaultMessage="View on Stripe" id="zvz2Xk" />
                 </a>
               </DropdownMenuItem>
             </React.Fragment>
@@ -241,7 +241,7 @@ export const ActionsButton = props => {
             <React.Fragment>
               <DropdownMenuItem>
                 <Link href={`/dashboard/${virtualCard.account.slug}/transactions?virtualCard=${virtualCard.id}`}>
-                  <FormattedMessage defaultMessage="View transactions" />
+                  <FormattedMessage defaultMessage="View transactions" id="DfQJQ6" />
                 </Link>
               </DropdownMenuItem>
             </React.Fragment>
@@ -250,7 +250,7 @@ export const ActionsButton = props => {
             <React.Fragment>
               <DropdownMenuItem asChild>
                 <a href={`mailto:${virtualCard.assignee?.email}`} target="_blank" rel="noopener noreferrer">
-                  <FormattedMessage defaultMessage="Contact assignee" />
+                  <FormattedMessage defaultMessage="Contact assignee" id="EcwMPA" />
                 </a>
               </DropdownMenuItem>
             </React.Fragment>
@@ -262,7 +262,7 @@ export const ActionsButton = props => {
         <ConfirmationModal
           isDanger
           type="confirm"
-          header={<FormattedMessage defaultMessage="Pause Virtual Card" />}
+          header={<FormattedMessage defaultMessage="Pause Virtual Card" id="f9PwAQ" />}
           continueLabel={<FormattedMessage id="VirtualCards.PauseCard" defaultMessage="Pause Card" />}
           onClose={() => setShowConfirmationModal(false)}
           continueHandler={async () => {
@@ -270,7 +270,10 @@ export const ActionsButton = props => {
           }}
         >
           <P>
-            <FormattedMessage defaultMessage="This will pause the virtual card. To unpause, you will need to contact the host." />
+            <FormattedMessage
+              defaultMessage="This will pause the virtual card. To unpause, you will need to contact the host."
+              id="6VPa5L"
+            />
           </P>
         </ConfirmationModal>
       )}
@@ -355,6 +358,7 @@ const getLimitString = ({
               &nbsp;&bull;&nbsp;
               <FormattedMessage
                 defaultMessage="Renews on {renewsOnDate, date, medium}"
+                id="tARVTJ"
                 values={{
                   renewsOnDate: new Date(spendingLimitRenewsOn),
                 }}

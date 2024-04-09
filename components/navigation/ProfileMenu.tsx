@@ -157,7 +157,7 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
                   </Badge>
                 }
               >
-                <FormattedMessage defaultMessage="Member Invitations" />
+                <FormattedMessage defaultMessage="Member Invitations" id="iW16Sa" />
               </MenuItem>
             )}
 
@@ -167,7 +167,7 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
                 onClick={() => setShowPreviewFeaturesModal(true)}
                 appending={
                   <Badge type="info" round size="sm">
-                    <FormattedMessage defaultMessage="New!" />
+                    <FormattedMessage defaultMessage="New!" id="RlOKwP" />
                   </Badge>
                 }
               >
@@ -186,11 +186,11 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
             <Separator className="my-1" />
 
             <MenuItem Icon={Home} href="/home">
-              <FormattedMessage defaultMessage="Open Collective Home" />
+              <FormattedMessage defaultMessage="Open Collective Home" id="qFt6F7" />
             </MenuItem>
 
             <MenuItem Icon={LifeBuoy} href="/help">
-              <FormattedMessage defaultMessage="Help & Support" />
+              <FormattedMessage defaultMessage="Help & Support" id="Uf3+S6" />
             </MenuItem>
 
             <MenuItem Icon={BookOpen} href="https://docs.opencollective.com" external={true}>

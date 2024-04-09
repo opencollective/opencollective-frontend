@@ -98,7 +98,7 @@ export const GenericActivityDiffDataWithList = ({ activity }) => {
   if (!added?.length && !removed?.length && !edited?.length) {
     return (
       <i>
-        <FormattedMessage defaultMessage="No details to show" />
+        <FormattedMessage defaultMessage="No details to show" id="mr2kVW" />
       </i>
     );
   }

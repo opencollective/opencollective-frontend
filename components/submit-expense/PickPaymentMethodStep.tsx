@@ -68,7 +68,7 @@ export function PickPaymentMethodForm(props: PickPaymentMethodFormProps) {
   return (
     <div className="flex-grow pr-2">
       <h1 className="mb-4 text-lg font-bold leading-[26px] text-dark-900">
-        <FormattedMessage defaultMessage="Who is getting paid?" />
+        <FormattedMessage defaultMessage="Who is getting paid?" id="W5Z+Fm" />
       </h1>
 
       <React.Fragment>
@@ -85,13 +85,14 @@ export function PickPaymentMethodForm(props: PickPaymentMethodFormProps) {
             checked
             title={
               <div className="flex items-center gap-4">
-                {isPersonalProfile && <FormattedMessage defaultMessage="Myself" />}
+                {isPersonalProfile && <FormattedMessage defaultMessage="Myself" id="YjO/0+" />}
                 {!invitePayee && <Avatar collective={payeeProfile} radius={24} />}
 
                 <span className="flex-grow">
                   {pickedLastSubmitedPayee ? (
                     <FormattedMessage
                       defaultMessage="{label} (Last used)"
+                      id="ieTRJZ"
                       values={{
                         label: payeeProfile.name,
                       }}
@@ -113,7 +114,7 @@ export function PickPaymentMethodForm(props: PickPaymentMethodFormProps) {
                     setIsChangingPayee(true);
                   }}
                 >
-                  <FormattedMessage defaultMessage="Change" />
+                  <FormattedMessage defaultMessage="Change" id="BY343C" />
                 </Button>
               </div>
             }
@@ -212,11 +213,12 @@ function PayeePicker(props: PayeePickerProps) {
             }}
             title={
               <div className="flex gap-2">
-                {payeeSlug === loggedInAccount?.slug && <FormattedMessage defaultMessage="Myself" />}
+                {payeeSlug === loggedInAccount?.slug && <FormattedMessage defaultMessage="Myself" id="YjO/0+" />}
                 <Avatar radius={24} collective={profilesBySlug[payeeSlug]} displayTitle />
                 {i === 0 ? (
                   <FormattedMessage
                     defaultMessage="{label} (Last used)"
+                    id="ieTRJZ"
                     values={{
                       label: profilesBySlug[payeeSlug].name,
                     }}
@@ -256,7 +258,7 @@ function PayeePicker(props: PayeePickerProps) {
               setIsInvitingOtherPayee(false);
               setIsPickingVendor(false);
             }}
-            title={<FormattedMessage defaultMessage="A profile I administer" />}
+            title={<FormattedMessage defaultMessage="A profile I administer" id="vhmHzJ" />}
             content={
               (isPickingOtherPayee || otherPayees.find(p => p.slug === props.form.values.payeeSlug)) && (
                 <div className="mt-2">
@@ -280,7 +282,7 @@ function PayeePicker(props: PayeePickerProps) {
         <RadioCardButton
           className="order-2"
           checked={isPickingVendor}
-          title={<FormattedMessage defaultMessage="A vendor" />}
+          title={<FormattedMessage defaultMessage="A vendor" id="rth3eX" />}
           content={
             isPickingVendor && (
               <div className="mt-2">
@@ -411,7 +413,7 @@ function InvitePayeePicker(props: InvitePayeePickerProps) {
             </form>
           </FormikProvider>
           <Button className="mt-2" onClick={formik.submitForm}>
-            <FormattedMessage defaultMessage="Confirm" />
+            <FormattedMessage defaultMessage="Confirm" id="N2IrpM" />
           </Button>
         </div>
       )}
@@ -466,6 +468,7 @@ function PayoutMethodOptionButton(props: PayoutMethodOptionButtonProps) {
               {props.isLastUsedPaymentMethod ? (
                 <FormattedMessage
                   defaultMessage="{label} (Last used)"
+                  id="ieTRJZ"
                   values={{
                     label: (
                       <b>
@@ -524,14 +527,14 @@ function PayoutMethodOptionButton(props: PayoutMethodOptionButtonProps) {
           isDanger
           type="delete"
           onClose={() => setIsDeletingPayoutMethod(false)}
-          header={<FormattedMessage defaultMessage="Delete Payment Method?" />}
-          body={<FormattedMessage defaultMessage="Are you sure you want to delete this payment method?" />}
+          header={<FormattedMessage defaultMessage="Delete Payment Method?" id="tAJKFb" />}
+          body={<FormattedMessage defaultMessage="Are you sure you want to delete this payment method?" id="lCYRnz" />}
           continueHandler={async () => {
             try {
               await deletePayoutMethod();
               toast({
                 variant: 'success',
-                message: <FormattedMessage defaultMessage="Payment Method deleted successfully" />,
+                message: <FormattedMessage defaultMessage="Payment Method deleted successfully" id="AzyeWl" />,
               });
               setIsDeletingPayoutMethod(false);
               props.onDelete();
@@ -670,7 +673,7 @@ function PayoutMethodPicker(props: PayoutMethodPickerProps) {
           <RadioCardButton
             title={
               <b>
-                <FormattedMessage defaultMessage="New Payment Method" />
+                <FormattedMessage defaultMessage="New Payment Method" id="FHmMRE" />
               </b>
             }
             onClick={() => {
@@ -759,7 +762,7 @@ function CreatePayoutMethodForm(props: CreatePayoutMethodFormProps) {
         });
         toast({
           variant: 'success',
-          message: <FormattedMessage defaultMessage="Payout Method saved successfully" />,
+          message: <FormattedMessage defaultMessage="Payout Method saved successfully" id="Iuu83b" />,
         });
         props.onCreate({ id: res.data.createPayoutMethod.id });
       } catch (e) {
@@ -786,7 +789,7 @@ function CreatePayoutMethodForm(props: CreatePayoutMethodFormProps) {
         <StyledInputFormikField
           my={2}
           name="type"
-          label={<FormattedMessage defaultMessage="Method" />}
+          label={<FormattedMessage defaultMessage="Method" id="W+1MOm" />}
           labelFontSize="13px"
         >
           {() => (

@@ -29,6 +29,7 @@ export const CONTRIBUTION_BLOCKER = {
 const msg = defineMessages({
   [CONTRIBUTION_BLOCKER.DISABLED]: {
     defaultMessage: 'This account cannot receive financial contributions at this time',
+    id: 'ZN02TE',
   },
   [CONTRIBUTION_BLOCKER.NO_HOST]: {
     id: 'createOrder.missingHost',
@@ -108,6 +109,7 @@ const paymentMethodUnavailableWarning = (loggedInUser, account, tier) => {
             <P lineHeight="18px">
               <FormattedMessage
                 defaultMessage="None of the payment providers currently active on your account supports recurring contributions. You can enable them by connecting Stripe or PayPal. Alternatively, you can remove the ability to contribute recurringly from the <TiersLink>tiers settings</TiersLink>."
+                id="3RuqnL"
                 values={{
                   TiersLink: getI18nLink({
                     as: Link,

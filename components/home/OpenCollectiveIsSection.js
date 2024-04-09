@@ -76,7 +76,10 @@ const OpenCollectiveIs = () => {
               color="white.full"
               fontWeight="700"
             >
-              <FormattedMessage defaultMessage="And a network of fiscal hosts that enable over 15,000 collectives around the world to spend and raise $35M a year." />
+              <FormattedMessage
+                defaultMessage="And a network of fiscal hosts that enable over 15,000 collectives around the world to spend and raise $35M a year."
+                id="N5fOog"
+              />
             </P>
           </Box>
         </Container>

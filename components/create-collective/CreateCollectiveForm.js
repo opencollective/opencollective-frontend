@@ -351,6 +351,7 @@ class CreateCollectiveForm extends React.Component {
                             <MessageBox type="info" mt={3} fontSize="13px">
                               <FormattedMessage
                                 defaultMessage="Your selected Fiscal Host requires you to add a minimum of {numberOfAdmins, plural, one {# admin} other {# admins} }. You can manage your admins from the Collective Settings."
+                                id="GTK0Wf"
                                 values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
                               />
                             </MessageBox>

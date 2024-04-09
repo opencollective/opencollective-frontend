@@ -101,9 +101,9 @@ const ActionButtons = ({ formik, onCancel }) => (
       }}
     >
       {formik.values.id ? (
-        <FormattedMessage defaultMessage="Save Changes" />
+        <FormattedMessage defaultMessage="Save Changes" id="3VI9mt" />
       ) : (
-        <FormattedMessage defaultMessage="Create Agreement" />
+        <FormattedMessage defaultMessage="Create Agreement" id="LSsYSm" />
       )}
     </StyledButton>
   </Flex>
@@ -145,9 +145,9 @@ const AgreementForm = ({
     <div>
       <H4 mb={32}>
         {isEditing ? (
-          <FormattedMessage defaultMessage="Edit Agreement" />
+          <FormattedMessage defaultMessage="Edit Agreement" id="ZhrlbS" />
         ) : (
-          <FormattedMessage defaultMessage="Add Agreement" />
+          <FormattedMessage defaultMessage="Add Agreement" id="apnXKF" />
         )}
       </H4>
       <Formik
@@ -168,7 +168,7 @@ const AgreementForm = ({
               onEdit?.(result.data.editAgreement);
               toast({
                 variant: 'success',
-                message: intl.formatMessage({ defaultMessage: 'Agreement updated' }),
+                message: intl.formatMessage({ defaultMessage: 'Agreement updated', id: 'Jy2H0R' }),
               });
             } else {
               const account = getAccountReferenceInput(values.account);
@@ -177,7 +177,7 @@ const AgreementForm = ({
               onCreate?.(result.data.addAgreement);
               toast({
                 variant: 'success',
-                message: intl.formatMessage({ defaultMessage: 'Agreement created' }),
+                message: intl.formatMessage({ defaultMessage: 'Agreement created', id: 'Q/kLys' }),
               });
             }
           } catch (e) {
@@ -228,7 +228,7 @@ const AgreementForm = ({
                 )}
               </StyledInputFormikField>
               <AttachedFilesForm
-                title={<FormattedMessage defaultMessage="Agreement file" />}
+                title={<FormattedMessage defaultMessage="Agreement file" id="i22tK5" />}
                 name="attachment"
                 kind="AGREEMENT_ATTACHMENT"
                 isMulti={false}
@@ -238,7 +238,7 @@ const AgreementForm = ({
               />
               <StyledInputFormikField
                 name="expiresAt"
-                label={intl.formatMessage({ defaultMessage: 'Expiration date' })}
+                label={intl.formatMessage({ defaultMessage: 'Expiration date', id: 'CICBj0' })}
                 labelProps={FIELD_LABEL_PROPS}
                 mt={3}
                 required={false}
@@ -265,6 +265,7 @@ const AgreementForm = ({
                 labelProps={FIELD_LABEL_PROPS}
                 hint={intl.formatMessage({
                   defaultMessage: 'Private note for the host admins.',
+                  id: 'drjPaq',
                 })}
               >
                 {({ field }) => <StyledTextarea {...field} width="100%" minHeight={125} maxLength={3000} showCount />}

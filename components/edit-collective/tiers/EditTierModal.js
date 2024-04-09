@@ -421,7 +421,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
         <React.Fragment>
           <StyledInputFormikField
             name="singleTicket"
-            label={<FormattedMessage defaultMessage="Single Ticket" />}
+            label={<FormattedMessage defaultMessage="Single Ticket" id="WHXII/" />}
             labelFontWeight="bold"
             mt="3"
             flexDirection={'row'}
@@ -504,6 +504,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
             name="invoiceTemplate"
             label={intl.formatMessage({
               defaultMessage: 'Choose receipt',
+              id: 'cyMx/0',
             })}
             labelFontWeight="bold"
             mt="3"
@@ -525,6 +526,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
           <FieldDescription>
             {intl.formatMessage({
               defaultMessage: 'Choose between the receipts templates available.',
+              id: 'sn4ULW',
             })}
           </FieldDescription>
         </React.Fragment>
@@ -853,7 +855,7 @@ function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }) {
         toast({
           variant: 'success',
           message: intl.formatMessage(
-            { defaultMessage: '{type, select, TICKET {Ticket} other {Tier}} deleted.' },
+            { defaultMessage: '{type, select, TICKET {Ticket} other {Tier}} deleted.', id: 'r5PByj' },
             { type: tier.type },
           ),
         });
@@ -889,11 +891,11 @@ function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }) {
               variant: 'success',
               message: isEditing
                 ? intl.formatMessage(
-                    { defaultMessage: '{type, select, TICKET {Ticket} other {Tier}} updated.' },
+                    { defaultMessage: '{type, select, TICKET {Ticket} other {Tier}} updated.', id: 'SOhVsw' },
                     { type: values.type },
                   )
                 : intl.formatMessage(
-                    { defaultMessage: '{type, select, TICKET {Ticket} other {Tier}} created.' },
+                    { defaultMessage: '{type, select, TICKET {Ticket} other {Tier}} created.', id: 'deViVP' },
                     { type: values.type },
                   ),
             });
@@ -910,11 +912,13 @@ function EditTierForm({ tier, collective, onClose, onUpdate, forcedType }) {
                 {isEditing ? (
                   <FormattedMessage
                     defaultMessage="Edit {type, select, TICKET {Ticket} other {Tier}}"
+                    id="/CCt2w"
                     values={{ type: tier.type }}
                   />
                 ) : (
                   <FormattedMessage
                     defaultMessage="Create {type, select, TICKET {Ticket} other {Tier}}"
+                    id="/XDuMs"
                     values={{ type: forcedType }}
                   />
                 )}

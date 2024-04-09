@@ -49,7 +49,7 @@ const JoinTheMovement = () => (
               defaultMessage="Be part of the new generation of communities."
             />
             <Span display={['none', 'inline-block']}>
-              <FormattedMessage defaultMessage="There are a couple of ways for you to contribute:" />
+              <FormattedMessage defaultMessage="There are a couple of ways for you to contribute:" id="wESAjS" />
             </Span>
           </SectionSubtitle>
         </Box>
@@ -60,14 +60,19 @@ const JoinTheMovement = () => (
           <JoinUsActionContainer
             link="https://opencollective.com/comms-docs/projects/e2c"
             title={<FormattedMessage id="financialContributions" defaultMessage="Financial contributions" />}
-            description={<FormattedMessage defaultMessage="Get a tax-deductible receipt with your donation" />}
+            description={
+              <FormattedMessage defaultMessage="Get a tax-deductible receipt with your donation" id="vbFuLO" />
+            }
           />
         </Box>
         <JoinUsActionContainer
           link="mailto:pia@opencollective.com"
           title={<FormattedMessage id="helpResearch" defaultMessage="Help us with research" />}
           description={
-            <FormattedMessage defaultMessage="Email us and find how you can contribute with your time to add to the research about sharing ownership within organizations." />
+            <FormattedMessage
+              defaultMessage="Email us and find how you can contribute with your time to add to the research about sharing ownership within organizations."
+              id="E+4HIb"
+            />
           }
         />
       </Container>

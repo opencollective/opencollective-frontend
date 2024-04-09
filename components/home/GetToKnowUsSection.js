@@ -70,7 +70,10 @@ const GetToKnowUs = () => {
             <FormattedMessage id="home.exploreAndLearn" defaultMessage="Explore and learn" />
           </H3>
           <P my="24px" fontSize="20px" lineHeight="28px" letterSpacing="-0.008em" fontWeight="500" color="black.800">
-            <FormattedMessage defaultMessage="Read more about how we operate and what projects we have for the present and future." />
+            <FormattedMessage
+              defaultMessage="Read more about how we operate and what projects we have for the present and future."
+              id="3XixSl"
+            />
           </P>
           <ListContainer>
             <StyledListItem fontSize="20px" lineHeight="28px" letterSpacing="-0.008em" fontWeight="500" mb="24px">
@@ -80,7 +83,7 @@ const GetToKnowUs = () => {
                 openInNewTab
                 textDecoration="underline"
               >
-                <FormattedMessage defaultMessage="Read our blog" />
+                <FormattedMessage defaultMessage="Read our blog" id="AgyCr7" />
               </StyledLink>
             </StyledListItem>
             <StyledListItem
@@ -92,12 +95,12 @@ const GetToKnowUs = () => {
               mb="24px"
             >
               <StyledLink color="black.800" href="/e2c" textDecoration="underline">
-                <FormattedMessage defaultMessage="Our exit strategy" />
+                <FormattedMessage defaultMessage="Our exit strategy" id="WvqSvr" />
               </StyledLink>
             </StyledListItem>
             <StyledListItem fontSize="20px" lineHeight="28px" letterSpacing="-0.008em" fontWeight="500" mb="24px">
               <StyledLink color="black.800" href="/become-a-sponsor" textDecoration="underline">
-                <FormattedMessage defaultMessage="Info for financial sponsors" />
+                <FormattedMessage defaultMessage="Info for financial sponsors" id="oqqit/" />
               </StyledLink>
             </StyledListItem>
             <StyledListItem
@@ -113,7 +116,7 @@ const GetToKnowUs = () => {
                 textDecoration="underline"
                 openInNewTab
               >
-                <FormattedMessage defaultMessage="Case studies" />
+                <FormattedMessage defaultMessage="Case studies" id="POZqkv" />
               </StyledLink>
             </StyledListItem>
           </ListContainer>
@@ -131,7 +134,10 @@ const GetToKnowUs = () => {
             <FormattedMessage id="home.helpAndSupport" defaultMessage="Help and support" />
           </H3>
           <P my="24px" fontSize="20px" lineHeight="28px" letterSpacing="-0.008em" fontWeight="500" color="black.800">
-            <FormattedMessage defaultMessage="Learn more about how it all works: our philosophy and business model." />
+            <FormattedMessage
+              defaultMessage="Learn more about how it all works: our philosophy and business model."
+              id="cI3CsE"
+            />
           </P>
           <ListContainer>
             <StyledListItem
@@ -143,7 +149,7 @@ const GetToKnowUs = () => {
               mb="24px"
             >
               <StyledLink color="black.800" href="/help" textDecoration="underline">
-                <FormattedMessage defaultMessage="Visit the support page" />
+                <FormattedMessage defaultMessage="Visit the support page" id="t/HtIc" />
               </StyledLink>
             </StyledListItem>
             <StyledListItem
@@ -160,7 +166,7 @@ const GetToKnowUs = () => {
                 textDecoration="underline"
                 openInNewTab
               >
-                <FormattedMessage defaultMessage="Read through our documentation" />
+                <FormattedMessage defaultMessage="Read through our documentation" id="wdcTBA" />
               </StyledLink>
             </StyledListItem>
             <StyledListItem
@@ -177,7 +183,7 @@ const GetToKnowUs = () => {
                 textDecoration="underline"
                 openInNewTab
               >
-                <FormattedMessage defaultMessage="Slack and email" />
+                <FormattedMessage defaultMessage="Slack and email" id="ZelEql" />
               </StyledLink>
             </StyledListItem>
             <StyledListItem
@@ -188,7 +194,7 @@ const GetToKnowUs = () => {
               color="black.800"
             >
               <StyledLink color="black.800" href="/pricing" textDecoration="underline" openInNewTab>
-                <FormattedMessage defaultMessage="Pricing and Business Model" />
+                <FormattedMessage defaultMessage="Pricing and Business Model" id="70Nuf5" />
               </StyledLink>
             </StyledListItem>
           </ListContainer>
@@ -228,7 +234,7 @@ const GetToKnowUs = () => {
             letterSpacing={['-0.008em', null, '-0.04em']}
             color="primary.900"
           >
-            <FormattedMessage defaultMessage="Where we're heading..." />
+            <FormattedMessage defaultMessage="Where we're heading..." id="r96v2J" />
           </H5>
           <P
             fontSize={['15px', '16px', '20px']}
@@ -253,7 +259,7 @@ const GetToKnowUs = () => {
                 fontSize="16px"
                 lineHeight="20px"
               >
-                <FormattedMessage defaultMessage="Learn more" />
+                <FormattedMessage defaultMessage="Learn more" id="TdTXXf" />
               </StyledButton>
             </Link>
           </Box>

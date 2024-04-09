@@ -513,7 +513,11 @@ class CreateGiftCardsForm extends Component {
             />
           </InlineField>
 
-          <InlineField name="expiryDate" isLabelClickable label={<FormattedMessage defaultMessage="Expiry date" />}>
+          <InlineField
+            name="expiryDate"
+            isLabelClickable
+            label={<FormattedMessage defaultMessage="Expiry date" id="x/oJ17" />}
+          >
             <StyledInput
               id="giftcard-expiryDate"
               name="expiryDate"
@@ -609,6 +613,7 @@ class CreateGiftCardsForm extends Component {
             <MessageBox type="warning" fontSize="14px" lineHeight="20px" withIcon mb={4}>
               <FormattedMessage
                 defaultMessage="We strongly recommend limiting your gift cards to specific fiscal hosts - otherwise, malicious users could create fake Collectives to withdraw the funds. Collectives under trusted fiscal hosts have all been vetted and confirmed as legitimate."
+                id="f7yDbJ"
                 values={{ SupportLink: I18nSupportLink }}
               />
             </MessageBox>
@@ -617,6 +622,7 @@ class CreateGiftCardsForm extends Component {
             <MessageBox type="warning" fontSize="14px" lineHeight="20px" withIcon mb={4}>
               <FormattedMessage
                 defaultMessage="Credit card payments incur processor fees, which can add up on large campaigns. Banks may also flag the numerous transactions as suspicious. We strongly recommend adding a prepaid budget via bank transfer instead. <SupportLink>Contact us</SupportLink> to learn more."
+                id="wT94tD"
                 values={{ SupportLink: I18nSupportLink }}
               />
               <Box mt={2}>
@@ -624,7 +630,7 @@ class CreateGiftCardsForm extends Component {
                   name="accept-payment-method-warning"
                   checked={this.state.hasAcceptedWarning}
                   onChange={() => this.setState({ hasAcceptedWarning: !this.state.hasAcceptedWarning })}
-                  label={<FormattedMessage defaultMessage="I understand, let me continue" />}
+                  label={<FormattedMessage defaultMessage="I understand, let me continue" id="8jaG3F" />}
                 />
               </Box>
             </MessageBox>

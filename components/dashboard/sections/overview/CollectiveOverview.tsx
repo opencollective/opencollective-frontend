@@ -121,7 +121,9 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
       id: 'balance',
       className: 'col-span-1 row-span-2',
       label: <FormattedMessage id="TotalBalance" defaultMessage="Total Balance" />,
-      helpLabel: <FormattedMessage defaultMessage="Balance at end of this period, including starting balance" />,
+      helpLabel: (
+        <FormattedMessage defaultMessage="Balance at end of this period, including starting balance" id="hi/nhW" />
+      ),
       timeseries: { ...data?.account.balanceTimeseries, currency: data?.account.balance?.current?.currency },
       amount: data?.account.balance,
       showCurrencyCode: true,
@@ -131,15 +133,15 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
     },
     {
       id: 'received',
-      label: <FormattedMessage defaultMessage="Received" />,
-      helpLabel: <FormattedMessage defaultMessage="Total amount received this period" />,
+      label: <FormattedMessage defaultMessage="Received" id="z/wUXE" />,
+      helpLabel: <FormattedMessage defaultMessage="Total amount received this period" id="2kY5p5" />,
       amount: data?.account.received,
       timeseries: { ...data?.account.receivedTimeseries, currency: data?.account.received?.current?.currency },
     },
     {
       id: 'spent',
-      label: <FormattedMessage defaultMessage="Spent" />,
-      helpLabel: <FormattedMessage defaultMessage="Total amount spent this period" />,
+      label: <FormattedMessage defaultMessage="Spent" id="111qQK" />,
+      helpLabel: <FormattedMessage defaultMessage="Total amount spent this period" id="6ctWuQ" />,
       amount: data?.account.spent,
     },
 
@@ -267,7 +269,7 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
         open={showFeedbackModal}
         setOpen={setShowFeedbackModal}
         feedbackKey={FEEDBACK_KEY.COLLECTIVE_OVERVIEW}
-        title={<FormattedMessage defaultMessage="Give feedback on the Collective Overview" />}
+        title={<FormattedMessage defaultMessage="Give feedback on the Collective Overview" id="3eBgsu" />}
       />
     </div>
   );

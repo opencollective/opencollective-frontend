@@ -38,6 +38,7 @@ export function ReportNavigationArrows({ variables, onChange }) {
         <TooltipContent side="bottom">
           <FormattedMessage
             defaultMessage="Previous {timeUnit, select, MONTH {month} QUARTER {quarter} YEAR {year} other {period}}"
+            id="lPdsgW"
             values={{ timeUnit: variables.timeUnit }}
           />
         </TooltipContent>
@@ -56,6 +57,7 @@ export function ReportNavigationArrows({ variables, onChange }) {
         <TooltipContent side="bottom">
           <FormattedMessage
             defaultMessage="Next {timeUnit, select, MONTH {month} QUARTER {quarter} YEAR {year} other {period}}"
+            id="rahwJB"
             values={{ timeUnit: variables.timeUnit }}
           />
         </TooltipContent>

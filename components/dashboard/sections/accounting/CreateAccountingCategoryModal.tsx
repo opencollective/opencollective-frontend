@@ -40,7 +40,7 @@ export function CreateAccountingCategoryModal(props: CreateAccountingCategoryMod
       expensesTypes: null,
       hostOnly: {
         value: false,
-        label: intl.formatMessage({ defaultMessage: 'No' }),
+        label: intl.formatMessage({ defaultMessage: 'No', id: 'oUWADl' }),
       },
     },
     async onSubmit(values) {
@@ -57,7 +57,7 @@ export function CreateAccountingCategoryModal(props: CreateAccountingCategoryMod
   return (
     <StyledModal onClose={props.onClose} hasUnsavedChanges={formik.dirty}>
       <ModalHeader>
-        <FormattedMessage defaultMessage="Create accounting category" />
+        <FormattedMessage defaultMessage="Create accounting category" id="M+dnU9" />
       </ModalHeader>
       <ModalBody>
         <AccountingCategoryForm formik={formik} />
@@ -66,7 +66,7 @@ export function CreateAccountingCategoryModal(props: CreateAccountingCategoryMod
         <form onSubmit={e => formik.handleSubmit(e)}>
           <div className="flex justify-center gap-4">
             <StyledButton type="submit" buttonStyle="primary">
-              <FormattedMessage defaultMessage="Create category" />
+              <FormattedMessage defaultMessage="Create category" id="ZROXxK" />
             </StyledButton>
             <StyledButton onClick={props.onClose}>
               <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />

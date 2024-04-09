@@ -29,7 +29,7 @@ import { Button } from '../ui/Button';
 import { useToast } from '../ui/useToast';
 
 const I18nMessages = defineMessages({
-  notePlaceholder: { defaultMessage: 'Add a note for the admins.' },
+  notePlaceholder: { defaultMessage: 'Add a note for the admins.', id: '4rMvYo' },
 });
 
 type SubmittedExpenseProps = {
@@ -114,7 +114,7 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
       setLastPrivateNoteId(result.data.createComment.id);
       toast({
         variant: 'success',
-        message: <FormattedMessage defaultMessage="Note added!" />,
+        message: <FormattedMessage defaultMessage="Note added!" id="N6X6du" />,
       });
     } catch (e) {
       toast({
@@ -145,7 +145,7 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
           {isInvite ? (
             <FormattedMessage id="InviteOnItsWay" defaultMessage="Your invite is on its way" />
           ) : (
-            <FormattedMessage defaultMessage="Your expense has been submitted successfully!" />
+            <FormattedMessage defaultMessage="Your expense has been submitted successfully!" id="K2coI/" />
           )}
         </div>
 
@@ -170,12 +170,12 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
         ) : null}
 
         <h2 className="mb-3 font-bold">
-          <FormattedMessage defaultMessage="What's next?" />
+          <FormattedMessage defaultMessage="What's next?" id="1G5vLM" />
         </h2>
         <ol className="mb-4 list-inside list-decimal text-sm text-slate-700">
           {requiresTaxDocuments && (
             <li>
-              <FormattedMessage defaultMessage="Submit your tax form." />{' '}
+              <FormattedMessage defaultMessage="Submit your tax form." id="D5d2Bp" />{' '}
               <StyledLink
                 className="whitespace-nowrap"
                 href="https://docs.opencollective.com/help/expenses-and-getting-paid/tax-information"
@@ -189,6 +189,7 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
           <li>
             <FormattedMessage
               defaultMessage="This expense needs to be approved by an admin of {collective}"
+              id="6FQMA7"
               values={{
                 collective: <LinkCollective openInNewTab className="underline" collective={expense.account} />,
               }}
@@ -198,6 +199,7 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
             <li>
               <FormattedMessage
                 defaultMessage="After that, this expense needs to be reviewed and paid by an admin of {host}"
+                id="0BeZai"
                 values={{ host: <LinkCollective openInNewTab className="underline" collective={expense.host} /> }}
               />
             </li>
@@ -208,6 +210,7 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
           <MessageBox my={4} type="info">
             <FormattedMessage
               defaultMessage="You can find and track your expense in your dashboard. <Link>Go to expense</Link>."
+              id="8us97Y"
               values={{
                 Link: chunks => (
                   <StyledLink
@@ -225,7 +228,10 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
         )}
 
         <div className="mb-3 font-bold">
-          <FormattedMessage defaultMessage="Is there anything else you wish to communicate to the admins who will review this expense?" />{' '}
+          <FormattedMessage
+            defaultMessage="Is there anything else you wish to communicate to the admins who will review this expense?"
+            id="0FP/Ii"
+          />{' '}
           <PrivateInfoIcon />
         </div>
         <RichTextEditor
@@ -244,7 +250,7 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
           variant="default"
           onClick={onAddPrivateNoteClick}
         >
-          <FormattedMessage defaultMessage="Add a note" />
+          <FormattedMessage defaultMessage="Add a note" id="dTW4m3" />
         </Button>
       </div>
 

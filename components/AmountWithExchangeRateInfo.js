@@ -32,6 +32,7 @@ export const formatFxRateInfo = (intl, exchangeRate, { approximateCustomMessage,
     <Flex flexDirection="column" data-cy="exchange-rate-info">
       <FormattedMessage
         defaultMessage="Exchange rate: 1 {fromCurrency} = {rate} {toCurrency}"
+        id="PyjGft"
         values={{
           rate: round(value, 7) || <FormattedMessage id="exchangeRate.noneSet" defaultMessage="Not defined yet" />,
           fromCurrency,
@@ -42,6 +43,7 @@ export const formatFxRateInfo = (intl, exchangeRate, { approximateCustomMessage,
         <div>
           <FormattedMessage
             defaultMessage="Source: {source}"
+            id="/gUYR+"
             values={{
               source: I18N_FX_RATE_SOURCE_LABEL[source]
                 ? intl.formatMessage(I18N_FX_RATE_SOURCE_LABEL[source])
@@ -55,6 +57,7 @@ export const formatFxRateInfo = (intl, exchangeRate, { approximateCustomMessage,
         <div>
           <FormattedMessage
             defaultMessage="Acquired on: {date}"
+            id="dT6mUk"
             values={{ date: <DateTime value={date} timeStyle="short" /> }}
           />
         </div>
@@ -67,7 +70,7 @@ export const formatFxRateInfo = (intl, exchangeRate, { approximateCustomMessage,
             ⚠️
           </span>
           &nbsp;
-          {approximateCustomMessage || <FormattedMessage defaultMessage="This value is an estimate" />}
+          {approximateCustomMessage || <FormattedMessage defaultMessage="This value is an estimate" id="lpal5V" />}
         </div>
       )}
     </Flex>

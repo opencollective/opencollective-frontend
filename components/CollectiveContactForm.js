@@ -111,7 +111,7 @@ const CollectiveContactForm = ({ collective, isModal = false, onClose, onChange 
       </StyledInputField>
       {error && <MessageBoxGraphqlError error={error} mt={3} />}
       <p className="mt-2 text-sm">
-        <FormattedMessage defaultMessage="Message needs to be at least 10 characters long" />
+        <FormattedMessage defaultMessage="Message needs to be at least 10 characters long" id="322m9e" />
       </p>
       {isModal && <hr className="my-5" />}
       <Box textAlign={isModal ? 'right' : ''}>
@@ -144,7 +144,7 @@ const CollectiveContactForm = ({ collective, isModal = false, onClose, onChange 
             }
           }}
         >
-          <FormattedMessage defaultMessage="Contact Collective" />
+          <FormattedMessage defaultMessage="Contact Collective" id="FAYdqn" />
         </StyledButton>
       </Box>
     </Box>

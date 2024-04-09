@@ -55,7 +55,7 @@ export const DisputedContributionsWarning = ({ hostSlug }: DisputedContributions
                   defaultMessage="There are disputed charges that need review."
                 />{' '}
                 <Link href={`/dashboard/${hostSlug}/orders?status=DISPUTED`}>
-                  <FormattedMessage defaultMessage="Disputed Contributions" />
+                  <FormattedMessage defaultMessage="Disputed Contributions" id="3fVeCs" />
                 </Link>
               </P>
             )}
@@ -66,7 +66,7 @@ export const DisputedContributionsWarning = ({ hostSlug }: DisputedContributions
                   defaultMessage="There are charges under review that need attention."
                 />{' '}
                 <Link href={`/dashboard/${hostSlug}/orders?status=IN_REVIEW`}>
-                  <FormattedMessage defaultMessage="In Review Contributions" />
+                  <FormattedMessage defaultMessage="In Review Contributions" id="K0EEJy" />
                 </Link>
               </P>
             )}

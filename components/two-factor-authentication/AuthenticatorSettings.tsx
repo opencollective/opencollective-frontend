@@ -46,9 +46,11 @@ function generateNewAuthenticatorAppSecret(email: string) {
 const I18nMessages = defineMessages({
   INVALID_TOTP_CODE: {
     defaultMessage: 'Invalid code',
+    id: 'x2R8CB',
   },
   REQUIRED: {
     defaultMessage: 'Required',
+    id: 'Seanpx',
   },
 });
 
@@ -103,11 +105,14 @@ export function AuthenticatorSettings(props: AuthenticatorSettingsProps) {
     <StyledCard px={3} py={2}>
       <Flex alignItems="center">
         <H3 fontSize="14px" fontWeight="700">
-          <FormattedMessage defaultMessage="Authenticator App" />
+          <FormattedMessage defaultMessage="Authenticator App" id="eoPp92" />
         </H3>
       </Flex>
       <div className="mb-3 text-sm">
-        <FormattedMessage defaultMessage="An application that supports TOTP (time-based one-time password). For example, Google Authenticator and 1Password." />
+        <FormattedMessage
+          defaultMessage="An application that supports TOTP (time-based one-time password). For example, Google Authenticator and 1Password."
+          id="gL/uHv"
+        />
       </div>
       <div>
         {userTwoFactorMethods.map(device => {
@@ -126,7 +131,7 @@ export function AuthenticatorSettings(props: AuthenticatorSettingsProps) {
             buttonStyle="secondary"
             display="flex"
           >
-            <FormattedMessage defaultMessage="Add authenticator" /> <PlusIcon size="14px" />
+            <FormattedMessage defaultMessage="Add authenticator" id="cMa+0l" /> <PlusIcon size="14px" />
           </StyledButton>
         </Box>
       )}
@@ -179,7 +184,7 @@ function AddAuthenticatorModal(props: AddAuthenticatorModalProps) {
         const result = await addAuthenticatorAppMutation();
         toast({
           variant: 'success',
-          message: <FormattedMessage defaultMessage="Authenticator added" />,
+          message: <FormattedMessage defaultMessage="Authenticator added" id="sL33nT" />,
         });
 
         if (result.data.addTwoFactorAuthTokenToIndividual.recoveryCodes) {
@@ -225,7 +230,7 @@ function AddAuthenticatorModal(props: AddAuthenticatorModalProps) {
   return (
     <StyledModal onClose={props.onClose}>
       <ModalHeader>
-        <FormattedMessage defaultMessage="Add authenticator" />
+        <FormattedMessage defaultMessage="Add authenticator" id="cMa+0l" />
       </ModalHeader>
       <form onSubmit={formik.handleSubmit}>
         <ModalBody>
@@ -251,7 +256,7 @@ function AddAuthenticatorModal(props: AddAuthenticatorModalProps) {
                     required
                     mt={2}
                     mb={3}
-                    label={<FormattedMessage defaultMessage="Enter your code without any dashes" />}
+                    label={<FormattedMessage defaultMessage="Enter your code without any dashes" id="M+Txk3" />}
                     htmlFor="twoFactorAuthenticatorCode"
                     error={formik.touched.twoFactorAuthenticatorCode && formik.errors.twoFactorAuthenticatorCode}
                     {...formik.getFieldProps('twoFactorAuthenticatorCode')}

@@ -13,7 +13,7 @@ const CreateVirtualCardBtn = ({ children, host, collective }) => {
   const handleCreateCardSuccess = () => {
     toast({
       variant: 'success',
-      message: <FormattedMessage defaultMessage="Card successfully created" />,
+      message: <FormattedMessage defaultMessage="Card successfully created" id="YdC/Ok" />,
     });
     setShowModal(false);
   };
@@ -41,7 +41,7 @@ CreateVirtualCardBtn.propTypes = {
 
 const DefaultButton = props => (
   <StyledButton {...props}>
-    <FormattedMessage defaultMessage="Create a Card" />
+    <FormattedMessage defaultMessage="Create a Card" id="xLybrm" />
   </StyledButton>
 );
 

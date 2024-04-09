@@ -86,7 +86,7 @@ export function ExpenseDetailsForm(props: ExpenseDetailsFormProps) {
     <FormikProvider value={props.form}>
       <div className="pb-10 pr-3">
         <h1 className="mb-4 text-lg font-bold leading-[26px] text-dark-900">
-          <FormattedMessage defaultMessage="Expense details" />
+          <FormattedMessage defaultMessage="Expense details" id="AFIpJd" />
         </h1>
         <p className="text-xs text-slate-700">
           <FormattedMessage
@@ -101,7 +101,7 @@ export function ExpenseDetailsForm(props: ExpenseDetailsFormProps) {
           labelColor="slate.800"
           labelFontSize="16px"
           labelProps={{ my: 3, letterSpacing: 0 }}
-          label={<FormattedMessage defaultMessage="Expense currency" />}
+          label={<FormattedMessage defaultMessage="Expense currency" id="ZWfgDz" />}
         >
           {() => (
             <StyledCurrencyPicker
@@ -125,7 +125,7 @@ export function ExpenseDetailsForm(props: ExpenseDetailsFormProps) {
           <React.Fragment>
             <div className="my-4 flex items-center justify-between gap-2">
               <div className="text-slate-80 w-fit text-base font-bold leading-6">
-                <FormattedMessage defaultMessage="Tax and Total" />
+                <FormattedMessage defaultMessage="Tax and Total" id="9WIrrf" />
               </div>
               <hr className="flex-grow border-neutral-300" />
             </div>
@@ -136,6 +136,7 @@ export function ExpenseDetailsForm(props: ExpenseDetailsFormProps) {
               label={
                 <FormattedMessage
                   defaultMessage="Apply {taxName}"
+                  id="0JzeTD"
                   values={{
                     taxName: i18nTaxType(intl, props.form.options.taxType),
                   }}
@@ -152,7 +153,7 @@ export function ExpenseDetailsForm(props: ExpenseDetailsFormProps) {
                 name="tax.rate"
                 htmlFor={`input-${props.form.options.taxType}-rate`}
                 label={intl.formatMessage(
-                  { defaultMessage: '{taxName} rate' },
+                  { defaultMessage: '{taxName} rate', id: 'Gsyrfa' },
                   { taxName: i18nTaxType(intl, props.form.options.taxType, 'short') },
                 )}
                 labelFontWeight="bold"
@@ -183,7 +184,7 @@ export function ExpenseDetailsForm(props: ExpenseDetailsFormProps) {
                 name="tax.rate"
                 htmlFor={`input-${props.form.options.taxType}-rate`}
                 label={intl.formatMessage(
-                  { defaultMessage: '{taxName} rate' },
+                  { defaultMessage: '{taxName} rate', id: 'Gsyrfa' },
                   { taxName: i18nTaxType(intl, props.form.options.taxType, 'short') },
                 )}
                 labelFontWeight="bold"
@@ -215,7 +216,7 @@ export function ExpenseDetailsForm(props: ExpenseDetailsFormProps) {
               name="tax.idNumber"
               htmlFor={`input-${props.form.options.taxType}-idNumber`}
               label={intl.formatMessage(
-                { defaultMessage: '{taxName} identifier' },
+                { defaultMessage: '{taxName} identifier', id: 'Byg+S/' },
                 { taxName: i18nTaxType(intl, props.form.options.taxType, 'short') },
               )}
               labelFontWeight="bold"
@@ -273,7 +274,7 @@ export function ExpenseDetailsForm(props: ExpenseDetailsFormProps) {
           labelFontSize="16px"
           labelProps={{ my: 3, letterSpacing: 0 }}
           required={false}
-          label={<FormattedMessage defaultMessage="Tag your expense" />}
+          label={<FormattedMessage defaultMessage="Tag your expense" id="EosA8s" />}
         >
           {() => (
             <div className="flex items-center gap-1">
@@ -296,6 +297,9 @@ const i18nTaxRate = (intl: IntlShape, taxType: TaxType, rate: number) => {
   if (rate) {
     return `${rate * 100}%`;
   } else {
-    return intl.formatMessage({ defaultMessage: 'No {taxName}' }, { taxName: i18nTaxType(intl, taxType, 'short') });
+    return intl.formatMessage(
+      { defaultMessage: 'No {taxName}', id: 'lTGBvW' },
+      { taxName: i18nTaxType(intl, taxType, 'short') },
+    );
   }
 };

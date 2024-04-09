@@ -77,7 +77,7 @@ export const AgreementWithActions = ({ agreement, onEdit, onDelete, openFileView
               placement="bottom-start"
               Button={({ onClick }) => (
                 <StyledButton data-cy="more-actions" onClick={onClick} buttonSize="small" minWidth={140} flexGrow={1}>
-                  <FormattedMessage defaultMessage="More actions" />
+                  <FormattedMessage defaultMessage="More actions" id="S8/4ZI" />
                   &nbsp;
                   <ChevronDown size="20px" />
                 </StyledButton>
@@ -95,12 +95,12 @@ export const AgreementWithActions = ({ agreement, onEdit, onDelete, openFileView
                 <StyledHr borderColor="black.100" my={2} mx={2} />
                 <Action data-cy="more-actions-delete-expense-btn" onClick={() => setDeleteConfirm(true)}>
                   <IconTrash size="16px" />
-                  <FormattedMessage defaultMessage="Delete Agreement" />
+                  <FormattedMessage defaultMessage="Delete Agreement" id="iVzX67" />
                 </Action>
               </Flex>
             </PopupMenu>
             <StyledButton buttonStyle="secondary" onClick={onEdit} data-cy="btn-edit-agreement">
-              <FormattedMessage defaultMessage="Edit Agreement" />
+              <FormattedMessage defaultMessage="Edit Agreement" id="ZhrlbS" />
             </StyledButton>
           </Flex>,
           drawerActionsContainer,
@@ -110,13 +110,13 @@ export const AgreementWithActions = ({ agreement, onEdit, onDelete, openFileView
           isDanger
           type="delete"
           onClose={() => setDeleteConfirm(false)}
-          header={<FormattedMessage defaultMessage="Delete Agreement" />}
+          header={<FormattedMessage defaultMessage="Delete Agreement" id="iVzX67" />}
           continueHandler={async () => {
             try {
               await deleteAgreement({ variables: { id: agreement.id } });
               toast({
                 variant: 'success',
-                message: <FormattedMessage defaultMessage="Agreement deleted successfully" />,
+                message: <FormattedMessage defaultMessage="Agreement deleted successfully" id="RJt89q" />,
               });
               setDeleteConfirm(false);
               onDelete(agreement);
@@ -129,7 +129,10 @@ export const AgreementWithActions = ({ agreement, onEdit, onDelete, openFileView
             }
           }}
         >
-          <FormattedMessage defaultMessage="This will permanently delete the agreement and all its attachments." />
+          <FormattedMessage
+            defaultMessage="This will permanently delete the agreement and all its attachments."
+            id="SuVMZP"
+          />
         </ConfirmationModal>
       )}
     </React.Fragment>

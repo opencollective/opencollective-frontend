@@ -326,7 +326,7 @@ const RaiseMoney = () => {
               </P>
               <LearnMoreLink as={Link} textDecoration="underline" color="black.800" href="/fiscal-hosting">
                 <P mt="24px" fontSize="16px" lineHeight="24px" fontWeight="500">
-                  <FormattedMessage defaultMessage="Learn more about fiscal hosting" />
+                  <FormattedMessage defaultMessage="Learn more about fiscal hosting" id="yOzWJD" />
                 </P>
               </LearnMoreLink>
             </Box>
@@ -367,7 +367,7 @@ const RaiseMoney = () => {
               </P>
               <LearnMoreLink as={Link} textDecoration="underline" color="black.800" href="/collectives">
                 <P mt="24px" fontSize="16px" lineHeight="24px" fontWeight="500">
-                  <FormattedMessage defaultMessage="Learn more about creating a Collective" />
+                  <FormattedMessage defaultMessage="Learn more about creating a Collective" id="yKF8y5" />
                 </P>
               </LearnMoreLink>
             </Box>
@@ -408,7 +408,7 @@ const RaiseMoney = () => {
               </P>
               <LearnMoreLink as={Link} textDecoration="underline" color="black.800" href="/how-it-works">
                 <P mt="24px" fontSize="16px" lineHeight="24px" fontWeight="500">
-                  <FormattedMessage defaultMessage="Learn more about how the platform works" />
+                  <FormattedMessage defaultMessage="Learn more about how the platform works" id="sgLhGq" />
                 </P>
               </LearnMoreLink>
             </Box>

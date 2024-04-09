@@ -111,7 +111,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
             <AmountLine color="black.700">
               <Label>
                 {stepDetails.isNewPlatformTip ? (
-                  <FormattedMessage defaultMessage="Optional tip to the platform" />
+                  <FormattedMessage defaultMessage="Optional tip to the platform" id="JVRAzE" />
                 ) : (
                   <FormattedMessage
                     id="SupportProject"
@@ -207,7 +207,10 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
                   <StyledTooltip
                     verticalAlign="top"
                     content={
-                      <FormattedMessage defaultMessage="Net Amount = Today's charge - Payment processor fee - Support Open Collective" />
+                      <FormattedMessage
+                        defaultMessage="Net Amount = Today's charge - Payment processor fee - Support Open Collective"
+                        id="4oy6Z0"
+                      />
                     }
                   >
                     <InfoCircle size="16px" color="#76777A" />
@@ -247,7 +250,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
               <FormattedMessage
                 id="withColon"
                 defaultMessage="{item}:"
-                values={{ item: <FormattedMessage defaultMessage="Next charge date" /> }}
+                values={{ item: <FormattedMessage defaultMessage="Next charge date" id="1u4k2w" /> }}
               />{' '}
               <FormattedDate
                 value={getNextChargeDate(new Date(), stepDetails.interval, stepPayment?.paymentMethod?.service)}

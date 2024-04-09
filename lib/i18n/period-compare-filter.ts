@@ -29,33 +29,43 @@ export const i18nPeriodFilterCompare = defineMessages({
 export const i18nPeriodFilterType = defineMessages({
   [PeriodFilterType.TODAY]: {
     defaultMessage: 'Today',
+    id: 'zWgbGg',
   },
   [PeriodFilterType.LAST_7_DAYS]: {
     defaultMessage: 'Last 7 days',
+    id: 'irFBKn',
   },
   [PeriodFilterType.LAST_4_WEEKS]: {
     defaultMessage: 'Last 4 weeks',
+    id: 'QWcxnw',
   },
   [PeriodFilterType.LAST_3_MONTHS]: {
     defaultMessage: 'Last 3 months',
+    id: 'E0NcxQ',
   },
   [PeriodFilterType.LAST_12_MONTHS]: {
     defaultMessage: 'Last 12 months',
+    id: 'r5sWuC',
   },
   [PeriodFilterType.MONTH_TO_DATE]: {
     defaultMessage: 'Month to date',
+    id: 'rwUDGW',
   },
   [PeriodFilterType.QUARTER_TO_DATE]: {
     defaultMessage: 'Quarter to date',
+    id: 'a7RVBv',
   },
   [PeriodFilterType.YEAR_TO_DATE]: {
     defaultMessage: 'Year to date',
+    id: 'zvczgi',
   },
   [PeriodFilterType.ALL_TIME]: {
     defaultMessage: 'All time',
+    id: 's+lPP3',
   },
   [PeriodFilterType.CUSTOM]: {
     defaultMessage: 'Custom',
+    id: 'Sjo1P4',
   },
 });
 

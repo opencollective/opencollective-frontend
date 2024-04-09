@@ -15,7 +15,7 @@ const ResetPasswordCompleted = ({ LoggedInUser, loadingLoggedInUser }) => {
       <Container pt={[4, 5]} pb={6} px={3} textAlign="center" data-cy="reset-password-success-page">
         <Image src="/static/images/sign-in-illustration.png" width={624} height={372} />
         <P fontSize="32px" lineHeight="40px" color="black.900" fontWeight={700}>
-          <FormattedMessage defaultMessage="Your password was updated." />
+          <FormattedMessage defaultMessage="Your password was updated." id="GAFyW+" />
         </P>
 
         {!LoggedInUser && !loadingLoggedInUser && (
@@ -23,6 +23,7 @@ const ResetPasswordCompleted = ({ LoggedInUser, loadingLoggedInUser }) => {
             <P fontSize="20px" lineHeight="28px" color="black.800" fontWeight={500} mt={4}>
               <FormattedMessage
                 defaultMessage="You can now <Link>Sign In</Link> with it."
+                id="xXgpav"
                 values={{
                   Link: getI18nLink({
                     href: '/signin',

@@ -40,15 +40,17 @@ export function HostReportTabs({ queryFilter, report }) {
   return (
     <div className="grid grid-cols-2 divide-x rounded-t-xl border-b bg-muted">
       <Tab
-        title={<FormattedMessage defaultMessage="Managed funds" />}
-        description={<FormattedMessage defaultMessage="Funds going to and from Hosted Collective accounts" />}
+        title={<FormattedMessage defaultMessage="Managed funds" id="Jao4Ji" />}
+        description={
+          <FormattedMessage defaultMessage="Funds going to and from Hosted Collective accounts" id="kN43KR" />
+        }
         isActive={!queryFilter.values.isHost}
         onClick={() => queryFilter.setFilter('isHost', false)}
         totalChange={report.managedFunds.totalChange}
       />
       <Tab
-        title={<FormattedMessage defaultMessage="Operational funds" />}
-        description={<FormattedMessage defaultMessage="Funds going to and from the Fiscal Host account" />}
+        title={<FormattedMessage defaultMessage="Operational funds" id="JXgOp+" />}
+        description={<FormattedMessage defaultMessage="Funds going to and from the Fiscal Host account" id="sjX7by" />}
         isActive={queryFilter.values.isHost}
         onClick={() => queryFilter.setFilter('isHost', true)}
         totalChange={report.operationalFunds.totalChange}
