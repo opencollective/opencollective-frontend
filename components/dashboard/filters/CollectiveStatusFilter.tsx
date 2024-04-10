@@ -57,17 +57,14 @@ export const collectiveStatusFilter: FilterConfig<CollectiveStatusFilterValue> =
     },
     valueRenderer: ({ value, intl }) => intl.formatMessage(CollectiveStatusMessages[value]),
   },
-  toVariables: (value, key) => {
-    if (key === 'status') {
-      switch (value) {
-        case COLLECTIVE_STATUS.ACTIVE:
-          return { isFrozen: false, isUnhosted: false };
-        case COLLECTIVE_STATUS.FROZEN:
-          return { isFrozen: true, isUnhosted: false };
-        case COLLECTIVE_STATUS.UNHOSTED:
-          return { isUnhosted: true };
-      }
+  toVariables: value => {
+    switch (value) {
+      case COLLECTIVE_STATUS.ACTIVE:
+        return { isFrozen: false, isUnhosted: false };
+      case COLLECTIVE_STATUS.FROZEN:
+        return { isFrozen: true, isUnhosted: false };
+      case COLLECTIVE_STATUS.UNHOSTED:
+        return { isUnhosted: true };
     }
-    return {};
   },
 };
