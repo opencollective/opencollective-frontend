@@ -64,18 +64,14 @@ const DeleteCollective = ({ collective, ...props }) => {
       <SettingsSectionTitle>
         <FormattedMessage
           id="collective.delete.title"
-          defaultMessage={
-            'Delete {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}'
-          }
+          defaultMessage="Delete {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}"
           values={{ type: collective.type }}
         />
       </SettingsSectionTitle>
       <P mb={3}>
         <FormattedMessage
           id="collective.delete.description"
-          defaultMessage={
-            '{type, select, EVENT {This Event} PROJECT {This Project} FUND {This Fund} COLLECTIVE {This Collective} ORGANIZATION {This Organization} other {This account}} will be deleted, along with all related data.'
-          }
+          defaultMessage="{type, select, EVENT {This Event} PROJECT {This Project} FUND {This Fund} COLLECTIVE {This Collective} ORGANIZATION {This Organization} other {This account}} will be deleted, along with all related data."
           values={{ type: collective.type }}
         />
       </P>
@@ -92,9 +88,7 @@ const DeleteCollective = ({ collective, ...props }) => {
       >
         <FormattedMessage
           id="collective.delete.title"
-          defaultMessage={
-            'Delete {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}'
-          }
+          defaultMessage="Delete {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}"
           values={{ type: collective.type }}
         />
       </StyledButton>
@@ -109,9 +103,7 @@ const DeleteCollective = ({ collective, ...props }) => {
           ) : (
             <FormattedMessage
               id="collective.delete.isHost"
-              defaultMessage={
-                "You can't delete {type, select, ORGANIZATION {your Organization} other {your account}} while being a Host. Please deactivate as Host first (in your Fiscal Hosting settings)."
-              }
+              defaultMessage="You can't delete {type, select, ORGANIZATION {your Organization} other {your account}} while being a Host. Please deactivate as Host first (in your Fiscal Hosting settings)."
               values={{ type: collective.type }}
             />
           )}{' '}
@@ -123,9 +115,7 @@ const DeleteCollective = ({ collective, ...props }) => {
           <P color="rgb(224, 183, 0)" my={1}>
             <FormattedMessage
               id="collective.delete.isNotDeletable-message"
-              defaultMessage={
-                '{type, select, EVENT {Events} PROJECT {Projects} FUND {Funds} COLLECTIVE {Collectives} ORGANIZATION {Organizations} other {Accounts}} with transactions, contributions, events or paid expenses cannot be deleted. Please archive it instead.'
-              }
+              defaultMessage="{type, select, EVENT {Events} PROJECT {Projects} FUND {Funds} COLLECTIVE {Collectives} ORGANIZATION {Organizations} other {Accounts}} with transactions, contributions, events or paid expenses cannot be deleted. Please archive it instead."
               values={{ type: collective.type }}
             />{' '}
           </P>
@@ -135,9 +125,7 @@ const DeleteCollective = ({ collective, ...props }) => {
           <P color="rgb(224, 183, 0)" my={1}>
             <FormattedMessage
               id="collective.event.delete.isNotDeletable-message"
-              defaultMessage={
-                '{type, select, EVENT {Events} PROJECT {Projects} other {Accounts}} with transactions, contributions or paid expenses cannot be deleted. Please archive it instead.'
-              }
+              defaultMessage="{type, select, EVENT {Events} PROJECT {Projects} other {Accounts}} with transactions, contributions or paid expenses cannot be deleted. Please archive it instead."
               values={{ type: collective.type }}
             />
           </P>
@@ -147,7 +135,7 @@ const DeleteCollective = ({ collective, ...props }) => {
           <ModalHeader onClose={closeModal}>
             <FormattedMessage
               id="collective.delete.modal.header"
-              defaultMessage={'Delete {name}'}
+              defaultMessage="Delete {name}"
               values={{ name: collective.name }}
             />
           </ModalHeader>
@@ -155,9 +143,7 @@ const DeleteCollective = ({ collective, ...props }) => {
             <P>
               <FormattedMessage
                 id="collective.delete.modal.body"
-                defaultMessage={
-                  'Are you sure you want to delete {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?'
-                }
+                defaultMessage="Are you sure you want to delete {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?"
                 values={{ type: collective.type }}
               />
             </P>
@@ -165,7 +151,7 @@ const DeleteCollective = ({ collective, ...props }) => {
           <ModalFooter>
             <Container display="flex" justifyContent="flex-end">
               <StyledButton mx={20} onClick={() => setShowModal(false)}>
-                <FormattedMessage id="actions.cancel" defaultMessage={'Cancel'} />
+                <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
               </StyledButton>
               <StyledButton
                 buttonStyle="primary"

@@ -224,7 +224,7 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
           {order?.memo && (
             <React.Fragment>
               <DetailTitle>
-                <FormattedMessage defaultMessage="Memo" />
+                <FormattedMessage defaultMessage="Memo" id="D5NqQO" />
               </DetailTitle>
               <DetailDescription>{order.memo}</DetailDescription>
             </React.Fragment>
@@ -237,7 +237,9 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
                   <span>
                     <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />
                     {` `}
-                    <StyledTooltip content={() => <FormattedMessage defaultMessage="Date the funds were received." />}>
+                    <StyledTooltip
+                      content={() => <FormattedMessage defaultMessage="Date the funds were received." id="mqg/wj" />}
+                    >
                       <InfoCircle size={13} />
                     </StyledTooltip>
                   </span>

@@ -63,6 +63,7 @@ const SaveButtonMessage = defineMessages({
   },
   [CollectiveType.VENDOR]: {
     defaultMessage: 'Create vendor',
+    id: 'jrCJwo',
   },
 });
 
@@ -97,6 +98,7 @@ const msg = defineMessages({
   },
   contactEmail: {
     defaultMessage: "Contact's email",
+    id: '9W4YHR',
   },
   cancel: {
     id: 'actions.cancel',

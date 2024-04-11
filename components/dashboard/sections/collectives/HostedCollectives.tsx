@@ -123,7 +123,7 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
   const views = [
     {
       id: 'all',
-      label: intl.formatMessage({ defaultMessage: 'All' }),
+      label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
       filter: {
         type: [CollectiveType.COLLECTIVE, CollectiveType.FUND],
       },

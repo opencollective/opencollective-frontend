@@ -219,7 +219,7 @@ class Webhooks extends React.Component {
           </Box>
           <Box>
             <Label fontSize="14px" mb={1}>
-              <FormattedMessage defaultMessage="Activity" />
+              <FormattedMessage defaultMessage="Activity" id="ZmlNQ3" />
             </Label>
             <Flex alignItems="center">
               <StyledSelect
@@ -253,6 +253,7 @@ class Webhooks extends React.Component {
               <MessageBox type="warning" mt={2} withIcon>
                 <FormattedMessage
                   defaultMessage="This event will only be triggered when the activity occurs on {host}'s account, not on its hosted initiatives."
+                  id="XruSTn"
                   values={{ host: this.props.collectiveSlug }}
                 />
               </MessageBox>
@@ -282,6 +283,7 @@ class Webhooks extends React.Component {
         <P fontSize="14px" lineHeight="18px">
           <FormattedMessage
             defaultMessage="You can use Webhooks to build custom integrations with Open Collective. Slack and Discord webhooks are natively supported. You can also integrate them with tools like Zapier, IFTTT, or Huginn. Learn more about this from <DocLink>the documentation</DocLink> or see how you can go further using our <GraphqlAPILink>public GraphQL API</GraphqlAPILink>."
+            id="gN829M"
             values={{
               GraphqlAPILink: getI18nLink({
                 href: 'https://docs.opencollective.com/help/contributing/development/api#graphql-api',
@@ -313,6 +315,7 @@ class Webhooks extends React.Component {
             {'  '}
             <FormattedMessage
               defaultMessage="Add {existingWebhooksCount, select, 0 {your first} other {another}} webhook"
+              id="M3IHfl"
               values={{ existingWebhooksCount: webhooksCount }}
             />
           </StyledButton>

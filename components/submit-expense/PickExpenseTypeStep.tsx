@@ -20,13 +20,13 @@ export function PickExpenseTypeForm(props: PickExpenseTypeFormProps) {
   return (
     <div className="flex-grow pr-2">
       <h1 className="mb-4 text-lg font-bold leading-[26px] text-dark-900">
-        <FormattedMessage defaultMessage="Select the type of expense" />
+        <FormattedMessage defaultMessage="Select the type of expense" id="hT+uK/" />
       </h1>
       <div className="flex gap-2">
         {supportedExpenseTypes.includes(ExpenseType.INVOICE) && (
           <ExpenseTypeOptionButton
             title={<FormattedMessage id="Expense.Type.Invoice" defaultMessage="Invoice" />}
-            subtitle={<FormattedMessage defaultMessage="I am submitting an invoice to get paid" />}
+            subtitle={<FormattedMessage defaultMessage="I am submitting an invoice to get paid" id="plK07+" />}
             onClick={() => props.form.setFieldValue('expenseTypeOption', ExpenseType.INVOICE)}
             checked={props.form.values.expenseTypeOption === ExpenseType.INVOICE}
           />
@@ -35,7 +35,10 @@ export function PickExpenseTypeForm(props: PickExpenseTypeFormProps) {
           <ExpenseTypeOptionButton
             title={<FormattedMessage id="ExpenseForm.ReceiptLabel" defaultMessage="Reimbursement" />}
             subtitle={
-              <FormattedMessage defaultMessage="I am asking to be reimbursed for something I've already paid for" />
+              <FormattedMessage
+                defaultMessage="I am asking to be reimbursed for something I've already paid for"
+                id="DCHS89"
+              />
             }
             onClick={() => props.form.setFieldValue('expenseTypeOption', ExpenseType.RECEIPT)}
             checked={props.form.values.expenseTypeOption === ExpenseType.RECEIPT}
@@ -46,14 +49,14 @@ export function PickExpenseTypeForm(props: PickExpenseTypeFormProps) {
       {props.form.values.expenseTypeOption &&
         (props.form.options.hostExpensePolicy || props.form.options.collectiveExpensePolicy) && (
           <h1 className="mb-2 mt-5 text-lg font-bold leading-[26px] text-dark-900">
-            <FormattedMessage defaultMessage="General Instructions" />
+            <FormattedMessage defaultMessage="General Instructions" id="7Z2vuF" />
           </h1>
         )}
 
       {props.form.options.hostExpensePolicy && props.form.values.expenseTypeOption && (
         <React.Fragment>
           <h2 className="mb-2 mt-5 text-base font-bold leading-6 text-slate-800">
-            <FormattedMessage defaultMessage="Host Instructions" />
+            <FormattedMessage defaultMessage="Host Instructions" id="GqjXRb" />
           </h2>
           <div>
             <HTMLContent openLinksInNewTab content={props.form.options.hostExpensePolicy} />
@@ -64,7 +67,7 @@ export function PickExpenseTypeForm(props: PickExpenseTypeFormProps) {
       {props.form.options.collectiveExpensePolicy && props.form.values.expenseTypeOption && (
         <React.Fragment>
           <h2 className="mb-2 mt-8 text-base font-bold leading-6 text-slate-800">
-            <FormattedMessage defaultMessage="Collective Instructions" />
+            <FormattedMessage defaultMessage="Collective Instructions" id="dk3cJw" />
           </h2>
           <div>
             <HTMLContent openLinksInNewTab content={props.form.options.collectiveExpensePolicy} />
@@ -80,7 +83,7 @@ export function PickExpenseTypeForm(props: PickExpenseTypeFormProps) {
               required
               checked={props.form.values.acknowledgedExpensePolicy}
               onChange={({ checked }) => props.form.setFieldValue('acknowledgedExpensePolicy', checked)}
-              label={<FormattedMessage defaultMessage="I understand the instructions and conditions" />}
+              label={<FormattedMessage defaultMessage="I understand the instructions and conditions" id="i3aQ3Z" />}
               error={props.form.touched.acknowledgedExpensePolicy && props.form.errors.acknowledgedExpensePolicy}
             />
           </div>

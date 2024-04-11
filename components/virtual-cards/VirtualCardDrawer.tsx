@@ -142,7 +142,7 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
             <InfoList className="mt-8 sm:grid-cols-2">
               <InfoListItem
                 className="sm:col-span-2"
-                title={<FormattedMessage defaultMessage="Account" />}
+                title={<FormattedMessage defaultMessage="Account" id="TwyMau" />}
                 value={
                   <LinkCollective
                     collective={virtualCard.account}
@@ -155,7 +155,7 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
               />
 
               <InfoListItem
-                title={<FormattedMessage defaultMessage="Assigned to" />}
+                title={<FormattedMessage defaultMessage="Assigned to" id="ONVN5F" />}
                 value={
                   <LinkCollective
                     collective={virtualCard.assignee}
@@ -173,7 +173,7 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
                 value={<DateTime dateStyle="medium" value={virtualCard.createdAt} />}
               />
               <InfoListItem
-                title={<FormattedMessage defaultMessage="Available balance" />}
+                title={<FormattedMessage defaultMessage="Available balance" id="f1MZ8o" />}
                 value={getAvailableLimitShortString(
                   intl,
                   virtualCard.currency,
@@ -191,7 +191,7 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
 
               {virtualCard.spendingLimitRenewsOn && (
                 <InfoListItem
-                  title={<FormattedMessage defaultMessage="Renews on" />}
+                  title={<FormattedMessage defaultMessage="Renews on" id="vSfZde" />}
                   value={<DateTime dateStyle="medium" value={virtualCard.spendingLimitRenewsOn} />}
                 />
               )}
@@ -215,7 +215,7 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
               as={React.forwardRef((props, ref: React.ForwardedRef<HTMLButtonElement>) => {
                 return (
                   <StyledButton {...props} ref={ref}>
-                    <FormattedMessage defaultMessage="More actions" />
+                    <FormattedMessage defaultMessage="More actions" id="S8/4ZI" />
                   </StyledButton>
                 );
               })}
@@ -227,10 +227,10 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
                 href={`/${virtualCard.account.slug}/transactions?virtualCard=${virtualCard?.id}`}
                 buttonStyle="secondary"
               >
-                <FormattedMessage defaultMessage="View transactions" />
+                <FormattedMessage defaultMessage="View transactions" id="DfQJQ6" />
               </StyledButton>
               <StyledButton buttonStyle="primary" onClick={() => setIsEditingVirtualCard(true)}>
-                <FormattedMessage defaultMessage="Edit Card Details" />
+                <FormattedMessage defaultMessage="Edit Card Details" id="ILnhs8" />
               </StyledButton>
             </Flex>
           </Flex>

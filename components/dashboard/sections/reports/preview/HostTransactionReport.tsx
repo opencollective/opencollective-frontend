@@ -111,7 +111,7 @@ const HostTransactionReport = ({ accountSlug: hostSlug, subpath }: DashboardSect
   if (!variables) {
     return (
       <MessageBox withIcon type="error">
-        <FormattedMessage defaultMessage="Report can't be found." />
+        <FormattedMessage defaultMessage="Report can't be found." id="ab9Jm3" />
       </MessageBox>
     );
   }
@@ -140,7 +140,7 @@ const HostTransactionReport = ({ accountSlug: hostSlug, subpath }: DashboardSect
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   <DropdownMenuItem onClick={() => openExportTransactionsModal()}>
-                    <FormattedMessage defaultMessage="Export transactions" />
+                    <FormattedMessage defaultMessage="Export transactions" id="T72ceA" />
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -162,7 +162,7 @@ const HostTransactionReport = ({ accountSlug: hostSlug, subpath }: DashboardSect
                 <div className="flex flex-col gap-4 px-0">
                   {reportSections?.length === 0 && (
                     <p className="p-4 text-center text-muted-foreground">
-                      <FormattedMessage defaultMessage="No transactions this period " />
+                      <FormattedMessage defaultMessage="No transactions this period" id="7Dxdw8" />
                     </p>
                   )}
                   {reportSections?.map(section => (
@@ -253,10 +253,10 @@ const HostTransactionReport = ({ accountSlug: hostSlug, subpath }: DashboardSect
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
                                       <DropdownMenuItem onClick={() => viewTransactions(row.filter)}>
-                                        <FormattedMessage defaultMessage="View transactions" />
+                                        <FormattedMessage defaultMessage="View transactions" id="DfQJQ6" />
                                       </DropdownMenuItem>
                                       <DropdownMenuItem onClick={() => openExportTransactionsModal(row.filter)}>
-                                        <FormattedMessage defaultMessage="Export transactions" />
+                                        <FormattedMessage defaultMessage="Export transactions" id="T72ceA" />
                                       </DropdownMenuItem>
                                     </DropdownMenuContent>
                                   </DropdownMenu>
@@ -315,11 +315,15 @@ const HostTransactionReport = ({ accountSlug: hostSlug, subpath }: DashboardSect
                     <div>
                       <FormattedMessage
                         defaultMessage="Starting balance {date}"
+                        id="u3wVzh"
                         values={{
                           date: (
                             <DefinitionTooltip
                               definition={
-                                <FormattedMessage defaultMessage="This report is currently only available in UTC" />
+                                <FormattedMessage
+                                  defaultMessage="This report is currently only available in UTC"
+                                  id="/lQgi5"
+                                />
                               }
                             >
                               {dayjs(variables.dateFrom).utc().format('D MMM, YYYY')} (UTC)
@@ -338,7 +342,7 @@ const HostTransactionReport = ({ accountSlug: hostSlug, subpath }: DashboardSect
                   </div>
                   <div className="flex justify-between text-base font-medium">
                     <div>
-                      <FormattedMessage defaultMessage="Net change" />
+                      <FormattedMessage defaultMessage="Net change" id="StHpyn" />
                     </div>
 
                     <FormattedMoneyAmount
@@ -352,11 +356,15 @@ const HostTransactionReport = ({ accountSlug: hostSlug, subpath }: DashboardSect
                     <div>
                       <FormattedMessage
                         defaultMessage="Ending balance {date}"
+                        id="lVdOyh"
                         values={{
                           date: (
                             <DefinitionTooltip
                               definition={
-                                <FormattedMessage defaultMessage="This report is currently only available in UTC" />
+                                <FormattedMessage
+                                  defaultMessage="This report is currently only available in UTC"
+                                  id="/lQgi5"
+                                />
                               }
                             >
                               {dayjs(variables.dateTo).utc().format('D MMM, YYYY')} (UTC)
@@ -445,7 +453,7 @@ const PreviewFeatureConfigButton = ({ layout, setLayout }) => {
         </PopoverContent>
       </Popover>
       <FeedbackModal
-        title={<FormattedMessage defaultMessage="Give feedback on the new Host Transactions Report" />}
+        title={<FormattedMessage defaultMessage="Give feedback on the new Host Transactions Report" id="rKPVz/" />}
         feedbackKey={FEEDBACK_KEY.HOST_REPORTS}
         open={feedbackModalOpen}
         setOpen={setFeedbackModalOpen}

@@ -57,7 +57,7 @@ export default function SiteMenu() {
               </DrawerMenuItem>
               <DrawerMenuItem href="/help" onClick={onClose}>
                 <Flex alignItems="center" gridGap={2}>
-                  <LifeBuoy size={16} /> <FormattedMessage defaultMessage="Help & Support" />
+                  <LifeBuoy size={16} /> <FormattedMessage defaultMessage="Help & Support" id="Uf3+S6" />
                 </Flex>
               </DrawerMenuItem>
               <DrawerMenuItem href="https://docs.opencollective.com" onClick={onClose} openInNewTab>
@@ -68,7 +68,7 @@ export default function SiteMenu() {
               {LoggedInUser && (
                 <DrawerMenuItem href={'/home'} onClick={onClose}>
                   <Flex alignItems="center" gridGap={2}>
-                    <Home size={16} /> <FormattedMessage defaultMessage="Open Collective Home" />
+                    <Home size={16} /> <FormattedMessage defaultMessage="Open Collective Home" id="qFt6F7" />
                   </Flex>
                 </DrawerMenuItem>
               )}

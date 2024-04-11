@@ -133,7 +133,7 @@ const CollectiveSectionEntry = ({
       value: 'ADMIN',
     },
     {
-      label: <FormattedMessage defaultMessage="Disabled" />,
+      label: <FormattedMessage defaultMessage="Disabled" id="tthToS" />,
       value: 'DISABLED',
     },
   ];

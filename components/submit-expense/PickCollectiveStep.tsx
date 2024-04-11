@@ -56,7 +56,7 @@ export function PickCollectiveStepForm(props: PickCollectiveStepFormProps) {
   return (
     <div className="flex-grow">
       <h1 className="mb-4 text-lg font-bold leading-[26px] text-dark-900">
-        <FormattedMessage defaultMessage="What profile are you requesting money from?" />
+        <FormattedMessage defaultMessage="What profile are you requesting money from?" id="usOIbW" />
       </h1>
 
       {canChangeAccount ? (
@@ -82,9 +82,9 @@ export function PickCollectiveStepForm(props: PickCollectiveStepFormProps) {
             <CollectiveOptionPicker
               label={
                 recentCollectives.length > 0 ? (
-                  <FormattedMessage defaultMessage="Another collective" />
+                  <FormattedMessage defaultMessage="Another collective" id="ON7/OL" />
                 ) : (
-                  <FormattedMessage defaultMessage="Search Collective" />
+                  <FormattedMessage defaultMessage="Search Collective" id="RjvkLo" />
                 )
               }
               collectiveSlug={props.form.values.collectiveSlug}
@@ -150,6 +150,7 @@ function CollectiveOption(props: CollectiveOptionProps) {
           {props.isLastUsedCollective ? (
             <FormattedMessage
               defaultMessage="{label} (Last used)"
+              id="ieTRJZ"
               values={{
                 label: query.data?.account?.name,
               }}
@@ -159,7 +160,7 @@ function CollectiveOption(props: CollectiveOptionProps) {
           )}
           {props.onChange && (
             <Button className="ml-auto" variant="link" onClick={props.onChange}>
-              <FormattedMessage defaultMessage="Change" />
+              <FormattedMessage defaultMessage="Change" id="BY343C" />
             </Button>
           )}
         </div>

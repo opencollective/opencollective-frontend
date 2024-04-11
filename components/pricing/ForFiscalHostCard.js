@@ -77,6 +77,7 @@ const Card = styled(Container)`
 const messages = defineMessages({
   'pricing.dashboard': {
     defaultMessage: 'Host Admin Dashboard',
+    id: 'cpa6/N',
   },
   'pricing.dashboard.description': {
     id: 'HostDashboard.description',
@@ -90,6 +91,7 @@ const messages = defineMessages({
   'pricing.outsideFunds.description': {
     defaultMessage:
       'Manually credit Collective budgets with funds received outside the platform, such as other e-commerce or fundraising tools.',
+    id: 'wdqJMo',
   },
   'pricing.bankTransfer': {
     id: 'pricing.bankTransfer',
@@ -98,6 +100,7 @@ const messages = defineMessages({
   'pricing.bankTransfer.description': {
     defaultMessage:
       'Automatically provide wire instructions and a reference number for tracking. Confirm receipt of funds with one click.',
+    id: '2oHG9J',
   },
   'pricing.creditCard': {
     id: 'pricing.creditCard',
@@ -106,6 +109,7 @@ const messages = defineMessages({
   'pricing.creditCard.description': {
     defaultMessage:
       'Receive financial contributions via credit card, automatically updating each Collective budget. *Stripe fees apply',
+    id: 'nQw9Hb',
   },
   'pricing.plan.start': {
     id: 'table.head.start',
@@ -261,7 +265,7 @@ const ForFiscalHosts = () => {
         </Box>
         <ListWrapper as="ul" mt={['16px', 0]}>
           <ListItem>
-            <FormattedMessage defaultMessage="Each Collective gets its own fundraising page" />
+            <FormattedMessage defaultMessage="Each Collective gets its own fundraising page" id="hQGJj5" />
           </ListItem>
           <ListItem>
             <FormattedMessage
@@ -270,16 +274,25 @@ const ForFiscalHosts = () => {
             />
           </ListItem>
           <ListItem>
-            <FormattedMessage defaultMessage="Manually add funds from other channels, accurately tracking all budgets" />
+            <FormattedMessage
+              defaultMessage="Manually add funds from other channels, accurately tracking all budgets"
+              id="czGYFp"
+            />
           </ListItem>
           <ListItem>
-            <FormattedMessage defaultMessage="Community engagement features" />
+            <FormattedMessage defaultMessage="Community engagement features" id="CWdtPd" />
           </ListItem>
           <ListItem>
-            <FormattedMessage defaultMessage="Financial tracking and transparency means reporting writes itself" />
+            <FormattedMessage
+              defaultMessage="Financial tracking and transparency means reporting writes itself"
+              id="PJubm9"
+            />
           </ListItem>
           <ListItem>
-            <FormattedMessage defaultMessage="Expense management and one-click payouts via Paypal and Wise" />
+            <FormattedMessage
+              defaultMessage="Expense management and one-click payouts via Paypal and Wise"
+              id="whNhSE"
+            />
           </ListItem>
         </ListWrapper>
       </Flex>

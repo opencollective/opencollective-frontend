@@ -18,6 +18,7 @@ import { UserTwoFactorMethodItem } from './UserTwoFactorMethodItem';
 const I18nMessages = defineMessages({
   DEVICE_ADDED: {
     defaultMessage: 'Device added',
+    id: '9GxuH5',
   },
 });
 
@@ -105,11 +106,14 @@ export function DevicesSettings(props: DevicesSettingsProps) {
     <StyledCard px={3} py={2}>
       <Flex alignItems="center">
         <H3 fontSize="14px" fontWeight="700">
-          <FormattedMessage defaultMessage="U2F (Universal 2nd Factor)" />
+          <FormattedMessage defaultMessage="U2F (Universal 2nd Factor)" id="7I69Bp" />
         </H3>
       </Flex>
       <div className="mb-3 text-sm">
-        <FormattedMessage defaultMessage="A device or platform authenticator that supports the U2F specification. This can be a hardware key (like a YubiKey) or other methods supported by your browser." />
+        <FormattedMessage
+          defaultMessage="A device or platform authenticator that supports the U2F specification. This can be a hardware key (like a YubiKey) or other methods supported by your browser."
+          id="tE0Vtz"
+        />
       </div>
       <div>
         {twoFactorMethods.map(device => {
@@ -127,7 +131,7 @@ export function DevicesSettings(props: DevicesSettingsProps) {
           buttonStyle="secondary"
           display="flex"
         >
-          <FormattedMessage defaultMessage="Add device" /> <PlusIcon size="14px" />
+          <FormattedMessage defaultMessage="Add device" id="kFWJpj" /> <PlusIcon size="14px" />
         </StyledButton>
       </Box>
     </StyledCard>

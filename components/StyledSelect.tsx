@@ -110,6 +110,7 @@ const ValueContainer = ({ children, ...rest }: ValueContainerProps) => {
           <u>
             <FormattedMessage
               defaultMessage="and {selectedCount} others"
+              id="vpMxUJ"
               values={{ selectedCount: selectedCount - 1 }}
             />
           </u>

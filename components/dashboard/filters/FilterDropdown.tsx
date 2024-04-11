@@ -26,10 +26,10 @@ function ChooseFilterType<FV>({
   return (
     <React.Fragment>
       <Command>
-        <CommandInput placeholder={intl.formatMessage({ defaultMessage: 'Search filters...' })} />
+        <CommandInput placeholder={intl.formatMessage({ defaultMessage: 'Search filters...', id: '+JHk55' })} />
         <CommandList>
           <CommandEmpty>
-            <FormattedMessage defaultMessage="No filters found." />
+            <FormattedMessage defaultMessage="No filters found." id="LJgfxS" />
           </CommandEmpty>
           <CommandGroup>
             {filterOptions.map(option => {
@@ -135,7 +135,7 @@ const FilterButton = ({ filterKey, setFilter, filters, tmpValue, open, isViewAct
               filterKey
             )
           ) : (
-            <FormattedMessage defaultMessage="Add Filter" />
+            <FormattedMessage defaultMessage="Add Filter" id="Rqzsq/" />
           )}
           {arrayValue?.length > 0 && (
             <React.Fragment>

@@ -286,9 +286,15 @@ class PayoutMethodSelect extends React.Component<PayoutMethodSelectProps> {
       if (!collective?.host?.isTrustedHost) {
         return (
           <MessageBox type="error" mt={2} mb={3} fontSize="12px">
-            <FormattedMessage defaultMessage="This Expense is between different Hosts but the Payer Host is not allowed for this yet." />
+            <FormattedMessage
+              defaultMessage="This Expense is between different Hosts but the Payer Host is not allowed for this yet."
+              id="GiJCGt"
+            />
             &nbsp;
-            <FormattedMessage defaultMessage="If it's an issue, contact the Host or Open Collective support." />
+            <FormattedMessage
+              defaultMessage="If it's an issue, contact the Host or Open Collective support."
+              id="ZbcLMU"
+            />
           </MessageBox>
         );
       }
@@ -297,6 +303,7 @@ class PayoutMethodSelect extends React.Component<PayoutMethodSelectProps> {
           <MessageBox type="error" mt={2} mb={3} fontSize="12px">
             <FormattedMessage
               defaultMessage="This Expense is between different Hosts but the recipient Host doesn't have a suitable Payout Method available ({payoutMethodTypes})."
+              id="eKwDAi"
               values={{
                 payoutMethodTypes: Object.values(styledSelectOptions)
                   .map(option => option['label'])
@@ -304,7 +311,10 @@ class PayoutMethodSelect extends React.Component<PayoutMethodSelectProps> {
               }}
             />
             &nbsp;
-            <FormattedMessage defaultMessage="If it's an issue, contact the Host or Open Collective support." />
+            <FormattedMessage
+              defaultMessage="If it's an issue, contact the Host or Open Collective support."
+              id="ZbcLMU"
+            />
           </MessageBox>
         );
       }
@@ -314,7 +324,10 @@ class PayoutMethodSelect extends React.Component<PayoutMethodSelectProps> {
       <React.Fragment>
         {payeeIsCollectiveFamilyType && !payeeIsSameHost && (
           <MessageBox type="warning" mt={2} mb={3} fontSize="12px">
-            <FormattedMessage defaultMessage="This Expense is between different Hosts. Pick a Payout Method from the recipient Host." />
+            <FormattedMessage
+              defaultMessage="This Expense is between different Hosts. Pick a Payout Method from the recipient Host."
+              id="EgEmmA"
+            />
           </MessageBox>
         )}
 

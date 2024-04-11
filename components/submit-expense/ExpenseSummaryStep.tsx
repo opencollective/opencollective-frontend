@@ -52,7 +52,7 @@ export function ExpenseSummaryForm(props: ExpenseSummaryFormProps) {
   return (
     <div>
       <h1 className="mb-4 text-lg font-bold leading-[26px] text-dark-900">
-        <FormattedMessage defaultMessage="Expense details" />
+        <FormattedMessage defaultMessage="Expense details" id="AFIpJd" />
       </h1>
       <div className="rounded-lg border border-slate-200 p-8">
         <h1 className="mb-4 text-lg font-bold leading-[26px] text-dark-900">{props.form.values.title}</h1>
@@ -112,7 +112,7 @@ export function ExpenseSummaryForm(props: ExpenseSummaryFormProps) {
 
         <div className="mb-4 flex items-center gap-2">
           <span className="font-bold">
-            <FormattedMessage defaultMessage="Expense items" />
+            <FormattedMessage defaultMessage="Expense items" id="3ldWIL" />
           </span>
           <hr className="flex-grow border-neutral-300" />
         </div>
@@ -148,7 +148,7 @@ export function ExpenseSummaryForm(props: ExpenseSummaryFormProps) {
 
         <div className="mb-4 flex items-center gap-2">
           <span className="font-bold">
-            <FormattedMessage defaultMessage="Additional information" />
+            <FormattedMessage defaultMessage="Additional information" id="gh/lBJ" />
           </span>
           <hr className="flex-grow border-neutral-300" />
         </div>
@@ -156,14 +156,14 @@ export function ExpenseSummaryForm(props: ExpenseSummaryFormProps) {
         <div className="grid grid-flow-col grid-cols-1 grid-rows-3 gap-1 sm:grid-cols-3 sm:grid-rows-1">
           <div className="flex-1 rounded border border-slate-200 p-4">
             <div className="mb-3 text-xs font-medium uppercase text-slate-700">
-              <FormattedMessage defaultMessage="Who is paying?" />
+              <FormattedMessage defaultMessage="Who is paying?" id="IdR7BG" />
             </div>
             <span className="mb-3 flex items-center gap-2 text-sm font-medium leading-5 text-slate-800">
               <Avatar collective={account} radius={24} />
               {account?.name}
             </span>
             <div className="text-sm font-bold text-slate-700">
-              <FormattedMessage defaultMessage="Collective balance" />
+              <FormattedMessage defaultMessage="Collective balance" id="np7zcI" />
             </div>
             <div className="text-sm">
               <FormattedMoneyAmount
@@ -192,7 +192,7 @@ export function ExpenseSummaryForm(props: ExpenseSummaryFormProps) {
               <React.Fragment>
                 <div>
                   <span className="mb-3 text-sm font-bold text-slate-700">
-                    <FormattedMessage defaultMessage="Private address" /> <PrivateInfoIcon />
+                    <FormattedMessage defaultMessage="Private address" id="RmME7+" /> <PrivateInfoIcon />
                   </span>
                 </div>
                 <div>

@@ -189,7 +189,7 @@ const getNotification = (intl, status, collective, host, LoggedInUser, refetch) 
       type: 'warning',
       actions: (
         <NotificationBarLink href={`/dashboard/${collective.slug}/team`}>
-          <FormattedMessage defaultMessage="Manage members" />
+          <FormattedMessage defaultMessage="Manage members" id="XVzYBE" />
         </NotificationBarLink>
       ),
     };

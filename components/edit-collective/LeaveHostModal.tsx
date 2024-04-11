@@ -137,7 +137,7 @@ export const LeaveHostModal = ({ account, host, onClose }) => {
               toast({
                 variant: 'success',
                 message: intl.formatMessage(
-                  { defaultMessage: '{hostName} is no longer the Fiscal Host for {collectiveName}' },
+                  { defaultMessage: '{hostName} is no longer the Fiscal Host for {collectiveName}', id: 'lf0csJ' },
                   { hostName: host.name, collectiveName: account.name },
                 ),
               });
@@ -163,6 +163,7 @@ export const LeaveHostModal = ({ account, host, onClose }) => {
                       <p className="mb-3 text-sm">
                         <FormattedMessage
                           defaultMessage="{accountName} currently has {count, plural, one {# active recurring contribution} other {# active recurring contributions}} ({yearlyAmount})."
+                          id="PetJ0B"
                           values={{
                             accountName: <strong>{account.name}</strong>,
                             count: portabilitySummary.totalCount,
@@ -176,7 +177,7 @@ export const LeaveHostModal = ({ account, host, onClose }) => {
                             ),
                           }}
                         />{' '}
-                        <FormattedMessage defaultMessage="Select what you want to do:" />
+                        <FormattedMessage defaultMessage="Select what you want to do:" id="nAjivj" />
                       </p>
                       <RadioGroup
                         value={values.pauseContributions ? 'pause' : 'cancel'}
@@ -190,10 +191,14 @@ export const LeaveHostModal = ({ account, host, onClose }) => {
                           <label className="text-sm font-normal" htmlFor="pause">
                             <FormattedMessage
                               defaultMessage="I want to <strong>pause</strong> recurring contributions"
+                              id="QRU6tq"
                               values={I18nFormatters}
                             />
                             <p className="pt-1 text-sm text-gray-700">
-                              <FormattedMessage defaultMessage="Select this option if you intend to stay on Open Collective (either with another fiscal host or as an independent collective). We will pause all recurring contributions and notify your contributors that they can renew them as soon as you are ready." />
+                              <FormattedMessage
+                                defaultMessage="Select this option if you intend to stay on Open Collective (either with another fiscal host or as an independent collective). We will pause all recurring contributions and notify your contributors that they can renew them as soon as you are ready."
+                                id="93SSFY"
+                              />
                             </p>
                           </label>
                         </div>
@@ -204,10 +209,14 @@ export const LeaveHostModal = ({ account, host, onClose }) => {
                           <label className="text-sm font-normal" htmlFor="cancel">
                             <FormattedMessage
                               defaultMessage="I want to <strong>cancel</strong> all the recurring contributions"
+                              id="yvsZ12"
                               values={I18nFormatters}
                             />
                             <p className="pt-1 text-sm text-gray-700">
-                              <FormattedMessage defaultMessage="Select this option if you intend to leave Open Collective and you want to cancel all recurring contributions. We will notify your contributors that their recurring contributions have been canceled." />
+                              <FormattedMessage
+                                defaultMessage="Select this option if you intend to leave Open Collective and you want to cancel all recurring contributions. We will notify your contributors that their recurring contributions have been canceled."
+                                id="E8x93g"
+                              />
                             </p>
                           </label>
                         </div>
@@ -215,12 +224,16 @@ export const LeaveHostModal = ({ account, host, onClose }) => {
                       <StyledInputFormikField
                         name="messageForContributors"
                         labelProps={{ fontWeight: 'bold' }}
-                        label={intl.formatMessage({ defaultMessage: 'Additional message for contributors' })}
+                        label={intl.formatMessage({
+                          defaultMessage: 'Additional message for contributors',
+                          id: 'bjXbg/',
+                        })}
                         mt={4}
                         required
                         hint={intl.formatMessage({
                           defaultMessage:
                             'Use this to communicate with your contributors about the reason of this change. If leaving Open Collective, you can also provide instructions on how to continue supporting your collective.',
+                          id: 'PSWufs',
                         })}
                         hintPosition="above"
                       >
@@ -237,10 +250,14 @@ export const LeaveHostModal = ({ account, host, onClose }) => {
                             maxLength={2000}
                             placeholder={
                               values.pauseContributions
-                                ? intl.formatMessage({ defaultMessage: 'We are transitioning to a new fiscal host.' })
+                                ? intl.formatMessage({
+                                    defaultMessage: 'We are transitioning to a new fiscal host.',
+                                    id: '7l+n+e',
+                                  })
                                 : intl.formatMessage({
                                     defaultMessage:
                                       'We are leaving Open Collective. You can continue supporting us through our website.',
+                                    id: 'd6I3CS',
                                   })
                             }
                           />

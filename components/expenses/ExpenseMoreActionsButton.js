@@ -104,7 +104,7 @@ const ExpenseMoreActionsButton = ({
             flexGrow={1}
             {...props}
           >
-            <FormattedMessage defaultMessage="More actions" />
+            <FormattedMessage defaultMessage="More actions" id="S8/4ZI" />
             &nbsp;
             <ChevronDown size="20px" />
           </StyledButton>

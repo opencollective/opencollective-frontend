@@ -14,6 +14,7 @@ const Banner = () => (
       <P fontSize="14px" lineHeight="20px" color="primary.900">
         <FormattedMessage
           defaultMessage="We're hiring Senior Software Engineers! <link><strong>Learn more about open positions</strong></link>"
+          id="lEZrUV"
           values={{
             strong: I18nBold,
             link: getI18nLink({

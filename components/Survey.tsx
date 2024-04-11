@@ -37,8 +37,8 @@ export const sendSurveyResponseMutation = gql`
 
 export function Survey({
   surveyKey,
-  question = <FormattedMessage defaultMessage="How was your experience?" />,
-  followUpQuestion = <FormattedMessage defaultMessage="Thanks! How could it be improved?" />,
+  question = <FormattedMessage defaultMessage="How was your experience?" id="8Jj3NK" />,
+  followUpQuestion = <FormattedMessage defaultMessage="Thanks! How could it be improved?" id="A1c0qG" />,
   hasParentTitle = false,
 }: {
   surveyKey: SURVEY_KEY;
@@ -128,7 +128,7 @@ export function Survey({
                   htmlFor="okToContact"
                   className="text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
-                  <FormattedMessage defaultMessage="It's OK to contact me for follow up questions." />
+                  <FormattedMessage defaultMessage="It's OK to contact me for follow up questions." id="OSMRoO" />
                 </label>
               </div>
               <div className="flex gap-3">
@@ -150,7 +150,10 @@ export function Survey({
       <ReactAnimateHeight duration={150} height={completed ? 'auto' : 0}>
         {completed && (
           <p className="text-muted-foreground">
-            <FormattedMessage defaultMessage="Thank you for your feedback! It will help us improve Open Collective." />
+            <FormattedMessage
+              defaultMessage="Thank you for your feedback! It will help us improve Open Collective."
+              id="xSFQtA"
+            />
           </p>
         )}
       </ReactAnimateHeight>

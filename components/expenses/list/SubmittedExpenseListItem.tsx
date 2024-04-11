@@ -32,9 +32,11 @@ type SubmittedExpenseListItemProps = {
 const I18nMessages = defineMessages({
   DESCRIPTION_LINE: {
     defaultMessage: 'From {submitter} to {account} • {payoutMethod} • {submittedAt}',
+    id: 'pqeIM+',
   },
   DESCRIPTION_LINE_NO_PAYOUT_METHOD: {
     defaultMessage: 'From {submitter} to {account} • {submittedAt}',
+    id: 'XohPxN',
   },
 });
 
@@ -177,7 +179,7 @@ export function SubmittedExpenseListItem(props: SubmittedExpenseListItemProps) {
             {props.expense.status !== ExpenseStatus.DRAFT && hasNewSubmitExpenseFlow && (
               <DropdownMenuItem onClick={onDuplicateClick}>
                 <Copy className="h-4 w-4" />
-                <FormattedMessage defaultMessage="Duplicate Expense" />
+                <FormattedMessage defaultMessage="Duplicate Expense" id="MXaO+R" />
               </DropdownMenuItem>
             )}
           </DropdownMenuContent>

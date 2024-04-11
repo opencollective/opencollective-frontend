@@ -573,7 +573,7 @@ function buildFormSchema(
             return true;
           },
           {
-            message: intl.formatMessage({ defaultMessage: 'Missing exchange rate' }),
+            message: intl.formatMessage({ defaultMessage: 'Missing exchange rate', id: 'UXE8lX' }),
             path: ['amount', 'exchangeRate', 'value'],
           },
         ),
