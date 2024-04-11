@@ -22,11 +22,14 @@ class Apps extends React.Component {
         {LoggedInUser => (
           <Flex flexDirection="column" alignItems="center" justifyContent="center" width={1} my={5}>
             <MessageBox type="info" withIcon>
-              <FormattedMessage defaultMessage="Applications have been deprecated in favor of personal token" />
+              <FormattedMessage
+                defaultMessage="Applications have been deprecated in favor of personal token"
+                id="wQEy7N"
+              />
             </MessageBox>
             <StyledLink href={getDashboardRoute(LoggedInUser.collective, 'for-developers')}>
               <StyledButton buttonStyle="primary" buttonSize="medium" mt={3}>
-                <FormattedMessage defaultMessage="View personal tokens" />
+                <FormattedMessage defaultMessage="View personal tokens" id="vaSCOx" />
               </StyledButton>
             </StyledLink>
           </Flex>

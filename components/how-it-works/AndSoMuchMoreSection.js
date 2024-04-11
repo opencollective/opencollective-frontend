@@ -130,7 +130,7 @@ const MoreFeatures = () => (
         href="https://docs.opencollective.com/help/"
         fontWeight="500"
       >
-        <FormattedMessage defaultMessage="Learn more" />
+        <FormattedMessage defaultMessage="Learn more" id="TdTXXf" />
       </StyledLink>
     </Box>
   </Flex>

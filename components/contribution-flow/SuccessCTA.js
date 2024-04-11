@@ -40,6 +40,7 @@ const headerMessages = defineMessages({
   },
   [SUCCESS_CTA_TYPE.GO_TO_PROFILE]: {
     defaultMessage: "Go to {accountName}'s page",
+    id: 'iPy92R',
   },
 });
 
@@ -63,6 +64,7 @@ const contentMessages = defineMessages({
   },
   [SUCCESS_CTA_TYPE.GO_TO_PROFILE]: {
     defaultMessage: 'Go to the public page of {accountName} on Open Collective',
+    id: '/aBz/1',
   },
 });
 

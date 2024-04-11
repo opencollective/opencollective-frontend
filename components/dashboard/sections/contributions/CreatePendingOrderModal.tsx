@@ -239,7 +239,7 @@ const getTiersOptions = (intl, tiers) => {
   return [
     {
       value: null,
-      label: intl.formatMessage({ defaultMessage: 'No tier' }),
+      label: intl.formatMessage({ defaultMessage: 'No tier', id: 'ozkv/Y' }),
     },
     ...tiers.map(tier => ({
       value: tier,
@@ -351,19 +351,31 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
   const expectedAtOptions = [
     {
       value: dayjs().add(1, 'month'),
-      label: intl.formatMessage({ defaultMessage: 'Within {n} {n, plural, one {month} other {months}}' }, { n: 1 }),
+      label: intl.formatMessage(
+        { defaultMessage: 'Within {n} {n, plural, one {month} other {months}}', id: 'xjMZQI' },
+        { n: 1 },
+      ),
     },
     {
       value: dayjs().add(3, 'month'),
-      label: intl.formatMessage({ defaultMessage: 'Within {n} {n, plural, one {month} other {months}}' }, { n: 3 }),
+      label: intl.formatMessage(
+        { defaultMessage: 'Within {n} {n, plural, one {month} other {months}}', id: 'xjMZQI' },
+        { n: 3 },
+      ),
     },
     {
       value: dayjs().add(6, 'month'),
-      label: intl.formatMessage({ defaultMessage: 'Within {n} {n, plural, one {month} other {months}}' }, { n: 6 }),
+      label: intl.formatMessage(
+        { defaultMessage: 'Within {n} {n, plural, one {month} other {months}}', id: 'xjMZQI' },
+        { n: 6 },
+      ),
     },
     {
       value: dayjs().add(1, 'year'),
-      label: intl.formatMessage({ defaultMessage: 'Within {n} {n, plural, one {year} other {years}}' }, { n: 1 }),
+      label: intl.formatMessage(
+        { defaultMessage: 'Within {n} {n, plural, one {year} other {years}}', id: 'bBxR0J' },
+        { n: 1 },
+      ),
     },
   ];
   if (edit?.pendingContributionData?.expectedAt) {
@@ -377,7 +389,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
   }
   const paymentMethodOptions = [
     { value: 'UNKNOWN', label: intl.formatMessage({ id: 'Unknown', defaultMessage: 'Unknown' }) },
-    { value: 'BANK_TRANSFER', label: intl.formatMessage({ defaultMessage: 'Bank Transfer' }) },
+    { value: 'BANK_TRANSFER', label: intl.formatMessage({ defaultMessage: 'Bank Transfer', id: 'Aj4Xx4' }) },
     { value: 'CHECK', label: intl.formatMessage({ id: 'PaymentMethod.Check', defaultMessage: 'Check' }) },
   ];
 
@@ -388,7 +400,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
         <Field
           name="toAccount"
           htmlFor="CreatePendingContribution-toAccount"
-          label={<FormattedMessage defaultMessage="Create pending contribution for:" />}
+          label={<FormattedMessage defaultMessage="Create pending contribution for:" id="6HAoiZ" />}
           labelFontSize="16px"
           labelFontWeight="700"
         >
@@ -411,7 +423,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
           <Field
             name="childAccount"
             htmlFor="CreatePendingContribution-childAccount"
-            label={<FormattedMessage defaultMessage="Select event or project:" />}
+            label={<FormattedMessage defaultMessage="Select event or project:" id="9IRZG8" />}
             labelFontSize="16px"
             labelFontWeight="700"
             mt={3}
@@ -439,7 +451,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
         <Field
           name="tier"
           htmlFor="CreatePendingContribution-tier"
-          label={<FormattedMessage defaultMessage="Tier" />}
+          label={<FormattedMessage defaultMessage="Tier" id="b07w+D" />}
           mt={3}
           required={false}
         >
@@ -464,7 +476,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
         <Field
           name="fromAccount"
           htmlFor="CreatePendingContribution-fromAccount"
-          label={<FormattedMessage defaultMessage="Who is this contribution from?" />}
+          label={<FormattedMessage defaultMessage="Who is this contribution from?" id="8XrwYZ" />}
           mt={3}
           required
         >
@@ -547,7 +559,10 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
           label={<FormattedMessage id="Fields.PONumber" defaultMessage="PO Number" />}
           mt={3}
           hint={
-            <FormattedMessage defaultMessage="External reference code for this contribution. This is usually a reference number from the contributor accounting system." />
+            <FormattedMessage
+              defaultMessage="External reference code for this contribution. This is usually a reference number from the contributor accounting system."
+              id="LqD2Po"
+            />
           }
           required={false}
         >
@@ -618,7 +633,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
               htmlFor="CreatePendingContribution-hostFeePercent"
               label={
                 <span>
-                  <FormattedMessage defaultMessage="Host Fee" />
+                  <FormattedMessage defaultMessage="Host Fee" id="NJsELs" />
                   {` `}
                   <StyledTooltip
                     content={() => (
@@ -660,7 +675,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
               labelProps={{ fontSize: '16px', fontWeight: '700' }}
               idNumberLabelRenderer={shortTaxTypeLabel =>
                 intl.formatMessage(
-                  { defaultMessage: "Contributor's {taxName} identifier" },
+                  { defaultMessage: "Contributor's {taxName} identifier", id: 'qrc1oy' },
                   { taxName: shortTaxTypeLabel },
                 )
               }
@@ -742,7 +757,13 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
           <AmountDetailsLine
             value={-amounts.tip || 0}
             currency={currency}
-            label={<FormattedMessage defaultMessage="{service} platform tip" values={{ service: 'Open Collective' }} />}
+            label={
+              <FormattedMessage
+                defaultMessage="{service} platform tip"
+                id="t6u2MU"
+                values={{ service: 'Open Collective' }}
+              />
+            }
           />
         )}
         {Boolean(values.tax?.rate) && (
@@ -801,9 +822,9 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
         </Button>
         <Button type="submit" data-cy="create-pending-contribution-submit-btn" loading={isSubmitting}>
           {edit ? (
-            <FormattedMessage defaultMessage="Edit pending contribution" />
+            <FormattedMessage defaultMessage="Edit pending contribution" id="dIbvMd" />
           ) : (
-            <FormattedMessage defaultMessage="Create pending contribution" />
+            <FormattedMessage defaultMessage="Create pending contribution" id="qISY+c" />
           )}
         </Button>
       </div>
@@ -866,9 +887,13 @@ const CreatePendingContributionModal = ({ hostSlug, edit, ...props }: CreatePend
     >
       <ModalHeader>
         {edit ? (
-          <FormattedMessage defaultMessage="Edit Pending Contribution #{id}" values={{ id: edit.legacyId }} />
+          <FormattedMessage
+            defaultMessage="Edit Pending Contribution #{id}"
+            id="sMnp2d"
+            values={{ id: edit.legacyId }}
+          />
         ) : (
-          <FormattedMessage defaultMessage="Create Pending Contribution" />
+          <FormattedMessage defaultMessage="Create Pending Contribution" id="1i8Ufu" />
         )}
       </ModalHeader>
       {loading ? (
@@ -910,6 +935,7 @@ const CreatePendingContributionModal = ({ hostSlug, edit, ...props }: CreatePend
                 message: (
                   <FormattedMessage
                     defaultMessage="Pending contribution #{orderId} updated"
+                    id="fqxYbq"
                     values={{ orderId: result.data.editPendingOrder.legacyId }}
                   />
                 ),
@@ -936,6 +962,7 @@ const CreatePendingContributionModal = ({ hostSlug, edit, ...props }: CreatePend
                 message: (
                   <FormattedMessage
                     defaultMessage="Pending contribution created with reference #{orderId}"
+                    id="k8izBg"
                     values={{ orderId: result.data.createPendingOrder.legacyId }}
                   />
                 ),

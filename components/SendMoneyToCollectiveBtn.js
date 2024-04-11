@@ -50,7 +50,9 @@ class SendMoneyToCollectiveBtn extends React.Component {
     if (!paymentMethods || paymentMethods.length === 0) {
       toast({
         variant: 'error',
-        message: <FormattedMessage defaultMessage="We couldn't find a payment method to make this transaction" />,
+        message: (
+          <FormattedMessage defaultMessage="We couldn't find a payment method to make this transaction" id="+H8kCF" />
+        ),
       });
       return;
     }
@@ -82,6 +84,7 @@ class SendMoneyToCollectiveBtn extends React.Component {
         message: (
           <FormattedMessage
             defaultMessage="Balance sent to {toCollectiveName}"
+            id="TSybob"
             values={{ toCollectiveName: toCollective.name }}
           />
         ),

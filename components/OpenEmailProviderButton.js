@@ -34,7 +34,7 @@ const OpenEmailProviderButton = ({ email, children }) => {
     : children(
         <Container mt="24px" mb="24px">
           <StyledLink data-cy="open-inbox-link" href={provider.link}>
-            <FormattedMessage defaultMessage="Go to your mail" />
+            <FormattedMessage defaultMessage="Go to your mail" id="EDXxE/" />
           </StyledLink>
         </Container>,
       );

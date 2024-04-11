@@ -102,6 +102,13 @@ const baseConfig = {
     'formatjs/no-camel-case': ['off'],
     'formatjs/no-emoji': ['off'],
     'formatjs/no-multiple-plurals': ['off'],
+    'formatjs/enforce-id': [
+      'error',
+      {
+        idInterpolationPattern: '[sha512:contenthash:base64:6]',
+        idWhitelist: ['^.{1,}$'],
+      },
+    ],
     // styled-components-a11y
     'jsx-a11y/no-autofocus': ['off'],
     'jsx-a11y/label-has-associated-control': ['off'],

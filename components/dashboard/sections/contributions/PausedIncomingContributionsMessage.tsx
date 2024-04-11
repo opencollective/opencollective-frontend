@@ -73,17 +73,22 @@ export const PausedIncomingContributionsMessage = ({
       <strong>
         <FormattedMessage
           defaultMessage="{collective} holds {count, plural, one {an incoming recurring contribution that is currently paused} other {# incoming recurring contributions that are currently paused}}."
+          id="gpuYXj"
           values={{ count, collective: account.name }}
         />
       </strong>
       {account.hasResumeContributionsProcessStarted ? (
         <p>
-          <FormattedMessage defaultMessage="You have started the process to resume these contributions, contributors will receive a few reminders to resume their contributions. If they don't, these contributions will automatically expire after a few months." />
+          <FormattedMessage
+            defaultMessage="You have started the process to resume these contributions, contributors will receive a few reminders to resume their contributions. If they don't, these contributions will automatically expire after a few months."
+            id="dhOuoE"
+          />
         </p>
       ) : !account.canStartResumeContributionsProcess ? (
         <p>
           <FormattedMessage
             defaultMessage="These contributions can't be resumed yet. You need to either find a Fiscal Host or become an Independent Collective. <LearnMoreLink>Learn more</LearnMoreLink>"
+            id="BCdRHe"
             values={{ LearnMoreLink: getI18nLink({ as: Link, href: getDashboardRoute(account, 'host') }) }}
           />
         </p>
@@ -91,6 +96,7 @@ export const PausedIncomingContributionsMessage = ({
         <p>
           <FormattedMessage
             defaultMessage="The process to resume contributions can only be started from the <Link>Parent Collective</Link>."
+            id="Ss0Ux6"
             values={{
               Link: getI18nLink({ as: Link, href: getDashboardRoute(account.parent, 'incoming-contributions') }),
             }}
@@ -101,16 +107,20 @@ export const PausedIncomingContributionsMessage = ({
           <p>
             <FormattedMessage
               defaultMessage="These contributions are ready to be resumed. <ResumeLink>Click here</ResumeLink> to start this process."
+              id="wFubhx"
               values={{ ResumeLink: msg => <DialogTrigger className="underline">{msg}</DialogTrigger> }}
             />
           </p>
           <DialogContent>
             <DialogHeader>
               <DialogTitle className="mb-4">
-                <FormattedMessage defaultMessage="Ask your Contributors to resume their contributions" />
+                <FormattedMessage defaultMessage="Ask your Contributors to resume their contributions" id="f01/33" />
               </DialogTitle>
               <DialogDescription>
-                <FormattedMessage defaultMessage="Your contributors will be notified with a link to easily resume their contributions. We will also send a few periodic reminders, in case they miss the first email." />
+                <FormattedMessage
+                  defaultMessage="Your contributors will be notified with a link to easily resume their contributions. We will also send a few periodic reminders, in case they miss the first email."
+                  id="+5zXCv"
+                />
               </DialogDescription>
             </DialogHeader>
             <form
@@ -120,7 +130,10 @@ export const PausedIncomingContributionsMessage = ({
                   .then(() => {
                     toast({
                       variant: 'success',
-                      message: intl.formatMessage({ defaultMessage: 'Resume contributions process started.' }),
+                      message: intl.formatMessage({
+                        defaultMessage: 'Resume contributions process started.',
+                        id: 'CNjqsl',
+                      }),
                     });
                   })
                   .catch(e => {
@@ -135,7 +148,7 @@ export const PausedIncomingContributionsMessage = ({
                 <StyledInputField
                   name="messageForContributors"
                   labelProps={{ fontWeight: 'bold' }}
-                  label={intl.formatMessage({ defaultMessage: 'Additional message for contributors' })}
+                  label={intl.formatMessage({ defaultMessage: 'Additional message for contributors', id: 'bjXbg/' })}
                   required={false}
                 >
                   {field => (
@@ -152,6 +165,7 @@ export const PausedIncomingContributionsMessage = ({
                       maxLength={2000}
                       placeholder={intl.formatMessage({
                         defaultMessage: 'Hey Folks, we are back and ready to receive your contributions again!',
+                        id: 'n5Dv18',
                       })}
                     />
                   )}
@@ -164,7 +178,7 @@ export const PausedIncomingContributionsMessage = ({
                   </Button>
                 </DialogClose>
                 <Button type="submit" loading={loading}>
-                  <FormattedMessage defaultMessage="Start the Resuming Process" />
+                  <FormattedMessage defaultMessage="Start the Resuming Process" id="SJJHSI" />
                 </Button>
               </DialogFooter>
             </form>

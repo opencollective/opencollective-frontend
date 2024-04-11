@@ -86,6 +86,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           section: ALL_SECTIONS.EXPENSES,
           label: intl.formatMessage(
             {
+              id: 'hZhgoW',
               defaultMessage: 'To {accountName}',
             },
             { accountName: account.name },
@@ -95,6 +96,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           section: ALL_SECTIONS.SUBMITTED_EXPENSES,
           label: intl.formatMessage(
             {
+              id: 'PVqJoO',
               defaultMessage: 'From {accountName}',
             },
             { accountName: account.name },
@@ -128,6 +130,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         {
           label: intl.formatMessage(
             {
+              id: 'hZhgoW',
               defaultMessage: 'To {accountName}',
             },
             { accountName: account.name },
@@ -137,6 +140,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         {
           label: intl.formatMessage(
             {
+              id: 'PVqJoO',
               defaultMessage: 'From {accountName}',
             },
             { accountName: account.name },
@@ -155,7 +159,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           section: ALL_SECTIONS.HOSTED_COLLECTIVES,
         },
         {
-          label: intl.formatMessage({ defaultMessage: 'Applications' }),
+          label: intl.formatMessage({ id: 'DqD1yK', defaultMessage: 'Applications' }),
           section: ALL_SECTIONS.HOST_APPLICATIONS,
         },
       ],
@@ -195,13 +199,13 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     {
       if: isType(account, EVENT),
       section: ALL_SECTIONS.TICKETS,
-      label: intl.formatMessage({ defaultMessage: 'Ticket tiers' }),
+      label: intl.formatMessage({ defaultMessage: 'Ticket tiers', id: 'tG3saB' }),
       Icon: Ticket,
     },
     {
       if: isType(account, EVENT),
       section: ALL_SECTIONS.TIERS,
-      label: intl.formatMessage({ defaultMessage: 'Sponsorship tiers' }),
+      label: intl.formatMessage({ defaultMessage: 'Sponsorship tiers', id: '3Qx5eX' }),
       Icon: HeartHandshake,
     },
     {

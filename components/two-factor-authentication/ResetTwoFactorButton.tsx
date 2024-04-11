@@ -68,7 +68,7 @@ export function ResetTwoFactorButton(props: ResetTwoFactorButtonProps) {
       });
       toast({
         variant: 'success',
-        message: <FormattedMessage defaultMessage="Two factor authentication disabled." />,
+        message: <FormattedMessage defaultMessage="Two factor authentication disabled." id="8TdbVp" />,
       });
       return CONFIRMATION_MODAL_TERMINATE;
     } catch (e) {
@@ -88,7 +88,7 @@ export function ResetTwoFactorButton(props: ResetTwoFactorButtonProps) {
         buttonSize="tiny"
         buttonStyle="dangerSecondary"
       >
-        <FormattedMessage defaultMessage="Reset Two Factor Authentication" />
+        <FormattedMessage defaultMessage="Reset Two Factor Authentication" id="NCTAeh" />
       </StyledButton>
       {isRemovingTwoFactorAuthentication && (
         <ConfirmationModal
@@ -96,15 +96,21 @@ export function ResetTwoFactorButton(props: ResetTwoFactorButtonProps) {
           type="delete"
           onClose={() => setIsRemovingTwoFactorAuthentication(false)}
           header={
-            <FormattedMessage defaultMessage="Are you sure you want to remove two-factor authentication from your account?" />
+            <FormattedMessage
+              defaultMessage="Are you sure you want to remove two-factor authentication from your account?"
+              id="76Sds/"
+            />
           }
           continueHandler={onRemoveConfirmation}
         >
           <MessageBox type="warning" withIcon>
-            <FormattedMessage defaultMessage="Removing 2FA from your account can make it less secure." />
+            <FormattedMessage defaultMessage="Removing 2FA from your account can make it less secure." id="7w98pJ" />
           </MessageBox>
           <P mt={3}>
-            <FormattedMessage defaultMessage="If you would like to remove 2FA from your account, you will need to enter a recovery code" />
+            <FormattedMessage
+              defaultMessage="If you would like to remove 2FA from your account, you will need to enter a recovery code"
+              id="hpJFoW"
+            />
           </P>
         </ConfirmationModal>
       )}

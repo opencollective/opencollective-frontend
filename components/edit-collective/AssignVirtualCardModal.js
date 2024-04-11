@@ -207,7 +207,7 @@ const AssignVirtualCardModal = ({ collective = undefined, host, onSuccess, onClo
             <StyledInputField
               gridColumn="1/3"
               labelFontSize="13px"
-              label={<FormattedMessage defaultMessage="Which collective will be assigned to this card?" />}
+              label={<FormattedMessage defaultMessage="Which collective will be assigned to this card?" id="goAEwY" />}
               htmlFor="collective"
               error={formik.touched.collective && formik.errors.collective}
             >
@@ -243,6 +243,7 @@ const AssignVirtualCardModal = ({ collective = undefined, host, onSuccess, onClo
                   >
                     <FormattedMessage
                       defaultMessage="This collective already has {allCardsCount} other cards assigned to it. {missingReceiptsCardsCount, plural, =0 {} other {# of the {allCardsCount} cards have missing receipts.}}"
+                      id="Ox+jio"
                       values={{
                         allCardsCount: virtualCardsAssignedToCollectiveData.host.allCards.totalCount,
                         missingReceiptsCardsCount:
@@ -253,7 +254,7 @@ const AssignVirtualCardModal = ({ collective = undefined, host, onSuccess, onClo
                       <StyledLink
                         href={`/dashboard/${host.slug}/host-virtual-cards?collective=${formik.values?.collective?.slug}`}
                       >
-                        <FormattedMessage defaultMessage="View Assigned Cards" />
+                        <FormattedMessage defaultMessage="View Assigned Cards" id="PO4Kx4" />
                       </StyledLink>
                     </Box>
                   </MessageBox>
@@ -262,7 +263,7 @@ const AssignVirtualCardModal = ({ collective = undefined, host, onSuccess, onClo
             <StyledInputField
               gridColumn="1/3"
               labelFontSize="13px"
-              label={<FormattedMessage defaultMessage="Which user will be responsible for this card?" />}
+              label={<FormattedMessage defaultMessage="Which user will be responsible for this card?" id="vwk9m4" />}
               htmlFor="assignee"
               error={formik.touched.assignee && formik.errors.assignee}
             >
@@ -305,7 +306,7 @@ const AssignVirtualCardModal = ({ collective = undefined, host, onSuccess, onClo
             <StyledInputField
               gridColumn="1/3"
               labelFontSize="13px"
-              label={<FormattedMessage defaultMessage="Card name" />}
+              label={<FormattedMessage defaultMessage="Card name" id="8oufoc" />}
               htmlFor="cardName"
               error={formik.touched.cardName && formik.errors.cardName}
             >
@@ -325,7 +326,7 @@ const AssignVirtualCardModal = ({ collective = undefined, host, onSuccess, onClo
             <StyledInputField
               gridColumn="1/3"
               labelFontSize="13px"
-              label={<FormattedMessage defaultMessage="Card number" />}
+              label={<FormattedMessage defaultMessage="Card number" id="qBST+n" />}
               htmlFor="number"
               error={formik.touched.cardNumber && formik.errors.cardNumber}
             >
@@ -375,7 +376,7 @@ const AssignVirtualCardModal = ({ collective = undefined, host, onSuccess, onClo
             </StyledInputField>
             <StyledInputField
               labelFontSize="13px"
-              label={<FormattedMessage defaultMessage="Expiry date" />}
+              label={<FormattedMessage defaultMessage="Expiry date" id="x/oJ17" />}
               htmlFor="expiryDate"
               error={formik.touched.expiryDate && formik.errors.expiryDate}
             >
@@ -395,7 +396,7 @@ const AssignVirtualCardModal = ({ collective = undefined, host, onSuccess, onClo
             </StyledInputField>
             <StyledInputField
               labelFontSize="13px"
-              label={<FormattedMessage defaultMessage="CVV/CVC" />}
+              label={<FormattedMessage defaultMessage="CVV/CVC" id="Q0lxqm" />}
               htmlFor="cvv"
               error={formik.touched.cvv && formik.errors.cvv}
             >

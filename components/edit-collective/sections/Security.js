@@ -146,11 +146,15 @@ const Security = ({ collective }) => {
                 <P fontSize="16px" lineHeight="24px" fontWeight="700">
                   <FormattedMessage
                     defaultMessage="All {account} admins must have 2FA"
+                    id="/EO1Lu"
                     values={{ account: data.account.name }}
                   />
                 </P>
                 <P mt="5px" color="black.700" fontSize="14px" lineHeight="20px">
-                  <FormattedMessage defaultMessage="Checking this will require all admins of your team to activate a two-factor authentication to perform admin tasks like payouts." />
+                  <FormattedMessage
+                    defaultMessage="Checking this will require all admins of your team to activate a two-factor authentication to perform admin tasks like payouts."
+                    id="ixSLWY"
+                  />
                 </P>
               </Box>
             </CheckboxContainer>
@@ -172,10 +176,13 @@ const Security = ({ collective }) => {
                 </Box>
                 <Box flex="1 1">
                   <P fontSize="16px" lineHeight="24px" fontWeight="700">
-                    <FormattedMessage defaultMessage="Enable rolling limit 2FA for payouts" />
+                    <FormattedMessage defaultMessage="Enable rolling limit 2FA for payouts" id="2u8jmQ" />
                   </P>
                   <P mt="5px" color="black.700" fontSize="14px" lineHeight="20px">
-                    <FormattedMessage defaultMessage="Admins will be asked to authenticate with 2FA code when they make the first payment after turning it on, and again once they've hit the rolling limit." />
+                    <FormattedMessage
+                      defaultMessage="Admins will be asked to authenticate with 2FA code when they make the first payment after turning it on, and again once they've hit the rolling limit."
+                      id="S6+1h1"
+                    />
                   </P>
                 </Box>
               </CheckboxContainer>
@@ -212,7 +219,7 @@ const Security = ({ collective }) => {
               }
             >
               <span>
-                <FormattedMessage defaultMessage="Read the documentation about 2FA" />
+                <FormattedMessage defaultMessage="Read the documentation about 2FA" id="E+Bll1" />
               </span>
               <Span ml="6px">
                 <ExternalLink size="1.1em" strokeWidth={2} style={{ marginBottom: 3 }} />

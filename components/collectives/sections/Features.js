@@ -212,7 +212,7 @@ const FeatureDescription = ({ intl, id, learnMoreLink, ...props }) => (
         <React.Fragment>
           <LineBreak />
           <LearnMoreLink href={learnMoreLink} openInNewTab>
-            <FormattedMessage defaultMessage="Learn more" />
+            <FormattedMessage defaultMessage="Learn more" id="TdTXXf" />
             <Span display={[null, 'none']}>
               {' '}
               <ArrowRight size="24" />

@@ -53,11 +53,11 @@ const OAuthApplicationsList = ({ account, onApplicationCreated, offset = 0 }) =>
     <div data-cy="oauth-apps-list">
       <Flex width="100%" alignItems="center">
         <H3 fontSize="18px" fontWeight="700">
-          <FormattedMessage defaultMessage="OAuth Apps" />
+          <FormattedMessage defaultMessage="OAuth Apps" id="cGHrNj" />
         </H3>
         <StyledHr mx={2} flex="1" borderColor="black.400" />
         <StyledButton data-cy="create-app-btn" buttonSize="tiny" onClick={() => setShowCreateApplicationModal(true)}>
-          + <FormattedMessage defaultMessage="Create OAuth app" />
+          + <FormattedMessage defaultMessage="Create OAuth app" id="m6BfW0" />
         </StyledButton>
         {showCreateApplicationModal && (
           <CreateOauthApplicationModal
@@ -68,9 +68,13 @@ const OAuthApplicationsList = ({ account, onApplicationCreated, offset = 0 }) =>
         )}
       </Flex>
       <P my={2} color="black.700">
-        <FormattedMessage defaultMessage="You can register new apps that you developed using Open Collective's API." />{' '}
+        <FormattedMessage
+          defaultMessage="You can register new apps that you developed using Open Collective's API."
+          id="p4WWnt"
+        />{' '}
         <FormattedMessage
           defaultMessage="For more information about OAuth applications, check <link>our documentation</link>."
+          id="dG3sDf"
           values={{
             link: getI18nLink({
               href: 'https://docs.opencollective.com/help/developers/oauth',
@@ -89,11 +93,12 @@ const OAuthApplicationsList = ({ account, onApplicationCreated, offset = 0 }) =>
               </Flex>
               <Flex flexDirection="column" ml={3}>
                 <P fontSize="14px" fontWeight="700" lineHeight="20px" mb="12px">
-                  <FormattedMessage defaultMessage="You don't have any app yet" />
+                  <FormattedMessage defaultMessage="You don't have any app yet" id="v8bmup" />
                 </P>
                 <P fontSize="12px" lineHeight="18px" color="black.700">
                   <FormattedMessage
                     defaultMessage="You can create apps that integrate with the Open Collective platform. <CreateAppLink>Create an app</CreateAppLink> using the Open Collective's API."
+                    id="1lIftz"
                     values={{
                       CreateAppLink: children => (
                         <StyledLink

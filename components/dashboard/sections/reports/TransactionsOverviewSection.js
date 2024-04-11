@@ -104,6 +104,7 @@ const getTransactionsAreaChartData = (host, locale) => {
         <P fontSize="12px" lineHeight="18px">
           <FormattedMessage
             defaultMessage="{count, plural, one {# contribution} other {# contributions}}"
+            id="bBBcZ8"
             values={{ count: contributionsCount }}
           />
           <Span mx="6px" color="black.600">
@@ -111,6 +112,7 @@ const getTransactionsAreaChartData = (host, locale) => {
           </Span>
           <FormattedMessage
             defaultMessage="Daily average: {amount}"
+            id="tmShv9"
             values={{
               amount: <strong>{formatCurrency(dailyAverageIncomeAmount.valueInCents, currency, { locale })}</strong>,
             }}
@@ -126,6 +128,7 @@ const getTransactionsAreaChartData = (host, locale) => {
         <P fontSize="12px" lineHeight="18px">
           <FormattedMessage
             defaultMessage="{count, plural, one {# expense} other {# expenses}}"
+            id="kygWtR"
             values={{ count: expensesCount }}
           />
           <Span mx="6px" color="black.600">
@@ -133,6 +136,7 @@ const getTransactionsAreaChartData = (host, locale) => {
           </Span>
           <FormattedMessage
             defaultMessage="Daily average: {amount}"
+            id="tmShv9"
             values={{
               amount: <strong>{formatCurrency(dailyAverageAmount.valueInCents, currency, { locale })}</strong>,
             }}
@@ -161,6 +165,7 @@ const getTransactionsBreakdownChartData = host => {
       legend: (
         <FormattedMessage
           defaultMessage="{count, plural, one {# One-time} other {# One-time}}"
+          id="xKaQkm"
           values={{ count: oneTimeContributionsCount }}
         />
       ),
@@ -172,6 +177,7 @@ const getTransactionsBreakdownChartData = host => {
       legend: (
         <FormattedMessage
           defaultMessage="{count, plural, one {# Recurring} other {# Recurring}}"
+          id="9DioA1"
           values={{ count: recurringContributionsCount }}
         />
       ),
@@ -183,6 +189,7 @@ const getTransactionsBreakdownChartData = host => {
       legend: (
         <FormattedMessage
           defaultMessage="{count, plural, one {# Invoice} other {# Invoices}}"
+          id="U7psWO"
           values={{ count: invoicesCount }}
         />
       ),
@@ -194,6 +201,7 @@ const getTransactionsBreakdownChartData = host => {
       legend: (
         <FormattedMessage
           defaultMessage="{count, plural, one {# Reimbursement} other {# Reimbursements}}"
+          id="jo45s2"
           values={{ count: reimbursementsCount }}
         />
       ),
@@ -209,6 +217,7 @@ const getTransactionsBreakdownChartData = host => {
       legend: (
         <FormattedMessage
           defaultMessage="{count, plural, one {# Grant} other {# Grants}}"
+          id="ERs/eC"
           values={{ count: grantsCount }}
         />
       ),

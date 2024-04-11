@@ -50,11 +50,14 @@ export function RecoverySettings(props: RecoverySettingsProps) {
       <StyledCard px={3} py={2}>
         <Flex alignItems="center">
           <H3 fontSize="14px" fontWeight="700">
-            <FormattedMessage defaultMessage="Recovery" />
+            <FormattedMessage defaultMessage="Recovery" id="AAB4k2" />
           </H3>
         </Flex>
         <div className="border-b pb-3 text-sm">
-          <FormattedMessage defaultMessage="Recovery codes can be used to access you account in case you lose access to your other two factor methods." />
+          <FormattedMessage
+            defaultMessage="Recovery codes can be used to access you account in case you lose access to your other two factor methods."
+            id="VeGBBP"
+          />
         </div>
         <div className="mt-3 flex gap-2">
           <StyledButton
@@ -63,7 +66,7 @@ export function RecoverySettings(props: RecoverySettingsProps) {
             buttonSize="tiny"
             buttonStyle="secondary"
           >
-            <FormattedMessage defaultMessage="Regenerate" />
+            <FormattedMessage defaultMessage="Regenerate" id="6PgVSe" />
           </StyledButton>
         </div>
       </StyledCard>
@@ -71,11 +74,13 @@ export function RecoverySettings(props: RecoverySettingsProps) {
         <ConfirmationModal
           isDanger
           onClose={() => setIsRegeneratingRecoveryCodes(false)}
-          header={<FormattedMessage defaultMessage="Are you sure you want to regenerate your recovery codes?" />}
+          header={
+            <FormattedMessage defaultMessage="Are you sure you want to regenerate your recovery codes?" id="844sMC" />
+          }
           continueHandler={onRegenerateConfirmation}
         >
           <MessageBox type="warning" withIcon>
-            <FormattedMessage defaultMessage="This will inactive your previous recovery codes." />
+            <FormattedMessage defaultMessage="This will inactive your previous recovery codes." id="P4yOzi" />
           </MessageBox>
         </ConfirmationModal>
       )}

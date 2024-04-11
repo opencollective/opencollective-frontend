@@ -15,6 +15,7 @@ export const RICH_ERROR_MESSAGES = defineMessages({
   },
   notInRange: {
     defaultMessage: 'Value must be between {min} and {max}',
+    id: 'f5QMcL',
   },
   format: {
     id: 'FormError.pattern',

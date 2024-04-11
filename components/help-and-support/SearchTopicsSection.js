@@ -107,13 +107,12 @@ const SearchTopics = () => {
     } catch (error) {
       toast({
         variant: 'error',
-        title: intl.formatMessage({ defaultMessage: 'Error in fetching results' }),
+        title: intl.formatMessage({ defaultMessage: 'Error in fetching results', id: 'HqFOSM' }),
         message: (
           <p>
             <FormattedMessage
-              defaultMessage={
-                'Oops! There was an unexpected error.{lineBreak} <openDocsLink><u>Visit our docs page</u></openDocsLink>'
-              }
+              defaultMessage="Oops! There was an unexpected error.{lineBreak} <openDocsLink><u>Visit our docs page</u></openDocsLink>"
+              id="dgz/z/"
               values={{
                 openDocsLink: getI18nLink({
                   href: `${DOCS_BASE_URL}`,
@@ -141,7 +140,7 @@ const SearchTopics = () => {
           <SearchForm
             width={['1', '500px', '608px']}
             borderRadius="100px"
-            placeholder={intl.formatMessage({ defaultMessage: 'Type keywords to search for topics' })}
+            placeholder={intl.formatMessage({ defaultMessage: 'Type keywords to search for topics', id: 'yGxNSd' })}
             showSearchButton
             searchButtonStyles={{ width: '32px', height: '32px' }}
             value={searchQuery}
@@ -186,14 +185,15 @@ const SearchTopics = () => {
                   <P fontSize="18px" lineHeight="26px" color="#4D4F51" fontWeight="400">
                     {searchQuery ? (
                       <FormattedMessage
-                        defaultMessage={'No results found for <b>{query}</b>. Please type another keyword.'}
+                        defaultMessage="No results found for <b>{query}</b>. Please type another keyword."
+                        id="uleS3x"
                         values={{
                           query: searchQuery,
                           b: I18nBold,
                         }}
                       />
                     ) : (
-                      <FormattedMessage defaultMessage={'Type something to search'} />
+                      <FormattedMessage defaultMessage="Type something to search" id="2oyci4" />
                     )}
                   </P>
                 </Container>
@@ -234,7 +234,7 @@ const SearchTopics = () => {
           >
             <FormattedMessage
               id="helpAndSupport.searchDescription"
-              defaultMessage={'You can also browse the topics below to find what you’re looking for.'}
+              defaultMessage="You can also browse the topics below to find what you’re looking for."
             />
           </P>
         </Box>

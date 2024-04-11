@@ -59,7 +59,7 @@ export const toVariables: FiltersToVariables<FilterValues, TransactionsTableQuer
 const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   ...commonFilters,
   excludeHost: {
-    labelMsg: defineMessage({ defaultMessage: 'Exclude host account' }),
+    labelMsg: defineMessage({ defaultMessage: 'Exclude host account', id: 'yxffGP' }),
   },
   account: hostedAccountFilter.filter,
 };
@@ -101,7 +101,7 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
 
   const views = [
     {
-      label: intl.formatMessage({ defaultMessage: 'All' }),
+      label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
       filter: {},
       id: 'all',
     },

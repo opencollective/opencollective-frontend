@@ -233,7 +233,11 @@ const ContributeTier = ({ intl, collective, tier, isPreview, ...props }) => {
                   {taxes.length > 1 ? (
                     <FormattedMessage id="ContributeTier.Taxes" defaultMessage="Taxes may apply" />
                   ) : (
-                    <FormattedMessage defaultMessage="{taxName} may apply" values={{ taxName: taxes[0].type }} />
+                    <FormattedMessage
+                      defaultMessage="{taxName} may apply"
+                      id="N9TNT7"
+                      values={{ taxName: taxes[0].type }}
+                    />
                   )}
                 </Span>
               )}

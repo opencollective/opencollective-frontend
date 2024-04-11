@@ -37,7 +37,7 @@ type VirtualCardsTableMeta = {
 const tableColumns: ColumnDef<GraphQLVirtualCard>[] = [
   {
     accessorKey: 'account',
-    header: () => <FormattedMessage defaultMessage="Account" />,
+    header: () => <FormattedMessage defaultMessage="Account" id="TwyMau" />,
     cell: ({ cell }: CellContext<GraphQLVirtualCard, Account>) => {
       const account = cell.getValue();
       return (
@@ -200,7 +200,7 @@ export default function VirtualCardsTable(props: VirtualCardsTableProps) {
           emptyMessage={() => (
             <div>
               <P fontSize="16px">
-                <FormattedMessage defaultMessage="No virtual cards" />
+                <FormattedMessage defaultMessage="No virtual cards" id="Uqkhct" />
               </P>
             </div>
           )}

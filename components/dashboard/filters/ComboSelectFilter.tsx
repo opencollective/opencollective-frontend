@@ -124,6 +124,7 @@ function ComboSelectFilter({
             ? intl.formatMessage(
                 {
                   defaultMessage: 'Filter by {filterLabel}...',
+                  id: 'sB/JCB',
                 },
                 { filterLabel: intl.formatMessage(labelMsg) },
               )
@@ -136,7 +137,7 @@ function ComboSelectFilter({
           <CommandLoading />
         ) : (
           <CommandEmpty>
-            <FormattedMessage defaultMessage="No results found." />
+            <FormattedMessage defaultMessage="No results found." id="V5JQj+" />
           </CommandEmpty>
         )}
 

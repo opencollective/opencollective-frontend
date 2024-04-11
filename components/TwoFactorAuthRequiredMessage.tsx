@@ -29,7 +29,7 @@ export const TwoFactorAuthRequiredMessage = ({
       <StyledCard width="100%" maxWidth={496} py="16px" textAlign="center" borderWidth={borderWidth}>
         {!noTitle && (
           <Strong fontSize="28px" lineHeight="36px">
-            <FormattedMessage defaultMessage="2FA Required" />
+            <FormattedMessage defaultMessage="2FA Required" id="ScX/93" />
           </Strong>
         )}
         <StyledHr my="21px" borderColor="black.200" />
@@ -38,7 +38,10 @@ export const TwoFactorAuthRequiredMessage = ({
             <Image src="/static/images/lock-illustration.png" alt="" width={164} height={164} />
           </Box>
           <P textAlign="left" fontSize="20px" lineHeight="28px" fontWeight="500" color="black.700">
-            <FormattedMessage defaultMessage="Your organization requires you to have two-factor authentication activated to continue" />
+            <FormattedMessage
+              defaultMessage="Your organization requires you to have two-factor authentication activated to continue"
+              id="UoQDcG"
+            />
           </P>
         </Flex>
         <StyledHr my="16px" borderColor="black.400" />
@@ -46,7 +49,7 @@ export const TwoFactorAuthRequiredMessage = ({
           <Flex justifyContent="center">
             <Link href={getDashboardRoute(LoggedInUser.collective, 'user-security#two-factor-auth')}>
               <StyledButton buttonStyle="primary">
-                <FormattedMessage defaultMessage="Activate 2FA" />
+                <FormattedMessage defaultMessage="Activate 2FA" id="st/dW2" />
               </StyledButton>
             </Link>
           </Flex>

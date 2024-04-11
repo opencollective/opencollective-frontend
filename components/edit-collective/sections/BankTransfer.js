@@ -160,7 +160,7 @@ const BankTransfer = props => {
           {existingManualPaymentMethod && (
             <Box pt={2}>
               <Container fontSize="12px" mt={2} mb={2} color="black.600" textAlign="left">
-                <FormattedMessage defaultMessage="Preview of bank transfer instructions" />
+                <FormattedMessage defaultMessage="Preview of bank transfer instructions" id="13qBPb" />
               </Container>
               <pre style={{ whiteSpace: 'pre-wrap' }}>
                 {renderBankInstructions(instructions, latestBankAccount?.data)}
@@ -197,7 +197,7 @@ const BankTransfer = props => {
                   setShowRemoveBankConfirmationModal(true);
                 }}
               >
-                <FormattedMessage defaultMessage="Remove bank details" />
+                <FormattedMessage defaultMessage="Remove bank details" id="D0TAWz" />
               </StyledButton>
             )}
           </Box>
@@ -312,7 +312,7 @@ const BankTransfer = props => {
           onClose={() => {
             setShowRemoveBankConfirmationModal(false);
           }}
-          header={<FormattedMessage defaultMessage="Remove Bank Account" />}
+          header={<FormattedMessage defaultMessage="Remove Bank Account" id="GW8+0X" />}
           continueHandler={async () => {
             const paymentMethods = get(data.host, 'settings.paymentMethods');
             const modifiedPaymentMethods = omit(paymentMethods, 'manual');
@@ -338,7 +338,7 @@ const BankTransfer = props => {
           }}
         >
           <P fontSize="14px" lineHeight="18px" mt={2}>
-            <FormattedMessage defaultMessage="Are you sure you want to remove bank account details?" />
+            <FormattedMessage defaultMessage="Are you sure you want to remove bank account details?" id="kNxL0S" />
           </P>
         </ConfirmationModal>
       )}

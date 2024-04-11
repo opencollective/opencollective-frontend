@@ -423,8 +423,8 @@ function Expense(props) {
             setShowResetModal(false);
           }}
           {...(isEditingExistingExpense && {
-            continueLabel: intl.formatMessage({ defaultMessage: 'Yes, cancel editing' }),
-            cancelLabel: intl.formatMessage({ defaultMessage: 'No, continue editing' }),
+            continueLabel: intl.formatMessage({ defaultMessage: 'Yes, cancel editing', id: 'b++lom' }),
+            cancelLabel: intl.formatMessage({ defaultMessage: 'No, continue editing', id: 'fIsGOi' }),
           })}
         />
       ) : (
@@ -502,7 +502,7 @@ function Expense(props) {
                 buttonSize="tiny"
                 onClick={() => setState(state => ({ ...state, showTaxLinkModal: true }))}
               >
-                <FormattedMessage defaultMessage="Add tax form" />
+                <FormattedMessage defaultMessage="Add tax form" id="XozEmI" />
               </StyledButton>
             </Container>
           )}
@@ -588,7 +588,7 @@ function Expense(props) {
                       name="newsletterOptIn"
                       label={
                         <span>
-                          <FormattedMessage defaultMessage="Subscribe to our monthly newsletter" />.
+                          <FormattedMessage defaultMessage="Subscribe to our monthly newsletter" id="cNkrNr" />.
                         </span>
                       }
                       required
@@ -716,6 +716,7 @@ function Expense(props) {
           parentTitle={intl.formatMessage(
             {
               defaultMessage: 'Expense #{expenseId} attachment',
+              id: 'At2m8o',
             },
             { expenseId: expense.legacyId },
           )}

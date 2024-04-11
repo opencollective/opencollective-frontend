@@ -140,7 +140,7 @@ const OCUsers = () => {
   return (
     <Flex my={4} flexDirection="column" mx={[3, 4]} alignItems="center">
       <SectionTitle textAlign="center" mb={3}>
-        <FormattedMessage defaultMessage="Who is using Open Collective?" />
+        <FormattedMessage defaultMessage="Who is using Open Collective?" id="vnfbPl" />
       </SectionTitle>
       <Container width={['286px', '548px', null, '768px', '991px']} mb={4} textAlign="center">
         <SectionDescription textAlign="center" mb={4}>

@@ -45,7 +45,7 @@ const getColumns = intl => [
   {
     accessorKey: 'managedFundsTotalChange',
     meta: { className: 'w-44 text-right' },
-    header: intl.formatMessage({ defaultMessage: 'Managed funds net' }),
+    header: intl.formatMessage({ defaultMessage: 'Managed funds net', id: 'cnkgEs' }),
     cell: ({ cell }) => {
       const amount = cell.getValue();
       return (
@@ -64,7 +64,7 @@ const getColumns = intl => [
   {
     accessorKey: 'operationalFundsTotalChange',
     meta: { className: 'w-44 text-right' },
-    header: intl.formatMessage({ defaultMessage: 'Operational funds net' }),
+    header: intl.formatMessage({ defaultMessage: 'Operational funds net', id: 'VTkwSg' }),
     cell: ({ cell }) => {
       const amount = cell.getValue();
       return (

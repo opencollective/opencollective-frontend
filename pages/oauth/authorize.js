@@ -73,6 +73,7 @@ const OAuthAuthorizePage = () => {
           <MessageBox withIcon type="error">
             <FormattedMessage
               defaultMessage="Missing parameters: {parameters}"
+              id="evYyQx"
               values={{ parameters: missingParams.join(', ') }}
             />
           </MessageBox>
@@ -80,6 +81,7 @@ const OAuthAuthorizePage = () => {
           <MessageBox withIcon type="error">
             <FormattedMessage
               defaultMessage='{field} has invalid value "{value}". Expected: "{expected}"'
+              id="mGSAXe"
               values={{ field: 'response_type', value: query['response_type'], expected: 'code' }}
             />
           </MessageBox>

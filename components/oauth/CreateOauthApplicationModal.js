@@ -49,7 +49,7 @@ const CreateOauthApplicationModal = ({ account, onSuccess, onClose, ...props }) 
   return (
     <StyledModal width="576px" onClose={onClose} data-cy="create-oauth-app-modal" {...props}>
       <ModalHeader>
-        <FormattedMessage defaultMessage="Create OAuth app" />
+        <FormattedMessage defaultMessage="Create OAuth app" id="m6BfW0" />
       </ModalHeader>
       <Formik
         initialValues={INITIAL_VALUES}
@@ -61,7 +61,7 @@ const CreateOauthApplicationModal = ({ account, onSuccess, onClose, ...props }) 
             toast({
               variant: 'success',
               message: intl.formatMessage(
-                { defaultMessage: 'Application "{name}" created' },
+                { defaultMessage: 'Application "{name}" created', id: 'E8zg4M' },
                 { name: result.data.createApplication.name },
               ),
             });
@@ -79,7 +79,7 @@ const CreateOauthApplicationModal = ({ account, onSuccess, onClose, ...props }) 
             <ModalBody mt="36px">
               <StyledInputFormikField
                 name="name"
-                label={intl.formatMessage({ defaultMessage: 'Name of the app' })}
+                label={intl.formatMessage({ defaultMessage: 'Name of the app', id: 'J7xOu/' })}
                 labelProps={LABEL_STYLES}
                 required
               >
@@ -98,6 +98,7 @@ const CreateOauthApplicationModal = ({ account, onSuccess, onClose, ...props }) 
                 label={intl.formatMessage({ id: 'Fields.description', defaultMessage: 'Description' })}
                 hint={intl.formatMessage({
                   defaultMessage: 'A short description of your app so users know what it does.',
+                  id: 'sZy/sl',
                 })}
                 labelProps={LABEL_STYLES}
                 mt={20}
@@ -117,7 +118,7 @@ const CreateOauthApplicationModal = ({ account, onSuccess, onClose, ...props }) 
               </StyledInputFormikField>
               <StyledInputFormikField
                 name="redirectUri"
-                label={intl.formatMessage({ defaultMessage: 'Callback URL' })}
+                label={intl.formatMessage({ defaultMessage: 'Callback URL', id: '5nkU0l' })}
                 labelProps={LABEL_STYLES}
                 mt={20}
                 required
@@ -133,7 +134,7 @@ const CreateOauthApplicationModal = ({ account, onSuccess, onClose, ...props }) 
                   buttonSize="small"
                   loading={isSubmitting || isWaitingForOnSuccess}
                 >
-                  <FormattedMessage defaultMessage="Create app" />
+                  <FormattedMessage defaultMessage="Create app" id="r+ksJu" />
                 </StyledButton>
                 <StyledButton
                   type="button"

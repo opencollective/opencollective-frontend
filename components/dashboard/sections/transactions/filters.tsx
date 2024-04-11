@@ -124,11 +124,11 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     valueRenderer: ({ value }) => <VirtualCardRenderer id={value} />,
   },
   group: {
-    labelMsg: defineMessage({ defaultMessage: 'Transaction group' }),
+    labelMsg: defineMessage({ defaultMessage: 'Transaction group', id: 'VY4AcX' }),
     valueRenderer: ({ value }) => value.substring(0, 8),
   },
   expenseType: {
-    labelMsg: defineMessage({ defaultMessage: 'Expense type' }),
+    labelMsg: defineMessage({ defaultMessage: 'Expense type', id: '9cwufA' }),
 
     Component: ({ valueRenderer, intl, ...props }) => (
       <ComboSelectFilter
@@ -142,7 +142,7 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     valueRenderer: ({ value, intl }) => i18nExpenseType(intl, value),
   },
   orderId: {
-    labelMsg: defineMessage({ defaultMessage: 'Contribution ID' }),
+    labelMsg: defineMessage({ defaultMessage: 'Contribution ID', id: 'cVkF3C' }),
     Component: ({ value, onChange }) => {
       return (
         <div className="p-2">
@@ -157,7 +157,7 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     },
   },
   expenseId: {
-    labelMsg: defineMessage({ defaultMessage: 'Expense ID' }),
+    labelMsg: defineMessage({ defaultMessage: 'Expense ID', id: 'aJWAKv' }),
     Component: ({ value, onChange }) => {
       return (
         <div className="p-2">
@@ -173,7 +173,7 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     },
   },
   isRefund: {
-    labelMsg: defineMessage({ defaultMessage: 'Is Refund' }),
+    labelMsg: defineMessage({ defaultMessage: 'Is Refund', id: 'o+jEZR' }),
     Component: ({ intl, ...props }) => {
       const options = React.useMemo(() => {
         return [true, false].map(value => ({

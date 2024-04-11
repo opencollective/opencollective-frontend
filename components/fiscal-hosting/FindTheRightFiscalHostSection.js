@@ -46,6 +46,7 @@ const messages = defineMessages({
   'fiscalHosting.serviceOffered.description': {
     defaultMessage:
       'Some Fiscal Hosts are very light-touch, while others provide significant support or programming and options like employment and insurance. Fiscal Hosts with a specific focus, such as open source projects or climate movement groups, may offer services specifically tailored to that community.',
+    id: 'AeQQjn',
   },
   'fiscalHosting.fees': {
     id: 'fiscalHosting.fees',
