@@ -23,6 +23,7 @@ const SearchTrigger = ({ setShowSearchModal }) => {
       <span className="hidden whitespace-nowrap text-xs lg:block">
         <FormattedMessage
           defaultMessage="Type {slash} to search for Collectives..."
+          id="/Y9m/t"
           values={{ slash: <span className="rounded-sm border bg-slate-100 px-1">/</span> }}
         />
       </span>

@@ -89,7 +89,7 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
     <StyledModal onClose={onClose} ignoreEscapeKey>
       <ModalHeader mb={3}>
         <Span fontSize="20px" fontWeight="500">
-          <FormattedMessage defaultMessage="Add cover image" />
+          <FormattedMessage defaultMessage="Add cover image" id="b4iDeN" />
         </Span>
       </ModalHeader>
 
@@ -167,6 +167,7 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
                         <Container maxWidth={268}>
                           <FormattedMessage
                             defaultMessage="Drag and drop your image or <Link>click here</Link> to select it."
+                            id="IxEr/J"
                             values={{ Link: msg => <Span color="blue.500">{msg}</Span> }}
                           />
                         </Container>
@@ -246,9 +247,12 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
                           // Show a toast and close the modal
                           toast({
                             variant: 'success',
-                            title: <FormattedMessage defaultMessage="Cover updated" />,
+                            title: <FormattedMessage defaultMessage="Cover updated" id="+cQ6YM" />,
                             message: (
-                              <FormattedMessage defaultMessage="The page might take a few seconds to fully update" />
+                              <FormattedMessage
+                                defaultMessage="The page might take a few seconds to fully update"
+                                id="QaaW8s"
+                              />
                             ),
                           });
 
@@ -275,7 +279,7 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
                     </StyledButton>
                   </Flex>
                   <StyledButton {...BUTTONS_PROPS} onClick={open} disabled={isSubmitting}>
-                    <FormattedMessage defaultMessage="Upload new image" />
+                    <FormattedMessage defaultMessage="Upload new image" id="v4BgXt" />
                   </StyledButton>
                 </Flex>
               </ModalFooter>

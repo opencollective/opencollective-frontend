@@ -48,7 +48,7 @@ const StatusTag = ({ status }: { status: HostApplicationStatus }) => {
 const columns: ColumnDef<HostApplication>[] = [
   {
     accessorKey: 'account',
-    header: () => <FormattedMessage defaultMessage="Account" />,
+    header: () => <FormattedMessage defaultMessage="Account" id="TwyMau" />,
     meta: { className: 'w-56' },
     cell: ({ cell }) => {
       const account = cell.getValue() as HostApplication['account'];
@@ -121,7 +121,7 @@ const columns: ColumnDef<HostApplication>[] = [
   {
     accessorKey: 'status',
     meta: { className: 'w-28' },
-    header: () => <FormattedMessage defaultMessage="Status" />,
+    header: () => <FormattedMessage defaultMessage="Status" id="tzMNF3" />,
     cell: ({ cell }) => {
       const status = cell.getValue() as HostApplication['status'];
       return (
@@ -152,7 +152,7 @@ const columns: ColumnDef<HostApplication>[] = [
                 onClick={() => openApplication(application)}
                 data-cy={`${application.account.slug}-view-details`}
               >
-                <FormattedMessage defaultMessage="View details" />
+                <FormattedMessage defaultMessage="View details" id="MnpUD7" />
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -191,13 +191,13 @@ export default function HostApplicationsTable({
       emptyMessage={() => (
         <div>
           <p className="text-base">
-            <FormattedMessage defaultMessage="No applications" />
+            <FormattedMessage defaultMessage="No applications" id="4ySgUp" />
           </p>
           {resetFilters && (
             <div>
               <StyledHr maxWidth={300} m="16px auto" borderColor="black.100" />
               <StyledLinkButton onClick={resetFilters}>
-                <FormattedMessage defaultMessage="Reset filters" />
+                <FormattedMessage defaultMessage="Reset filters" id="jZ0o74" />
               </StyledLinkButton>
             </div>
           )}

@@ -119,7 +119,10 @@ const ProcessOrderButtons = ({ order, permissions, onSuccess }) => {
               if (selectedAction === 'MARK_AS_EXPIRED') {
                 toast({
                   variant: 'success',
-                  message: intl.formatMessage({ defaultMessage: 'The contribution has been marked as expired' }),
+                  message: intl.formatMessage({
+                    defaultMessage: 'The contribution has been marked as expired',
+                    id: '46L6cy',
+                  }),
                 });
               }
             })

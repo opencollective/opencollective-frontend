@@ -294,11 +294,14 @@ class ContributionFlowSuccess extends React.Component {
             flexDirection="column"
           >
             <P fontWeight="700" fontSize="14px" lineHeight="20px">
-              <FormattedMessage defaultMessage="Your Contribution is processing!" />
+              <FormattedMessage defaultMessage="Your Contribution is processing!" id="RTyy4V" />
             </P>
             <Box mt={1} maxWidth="672px">
               <P fontWeight="400" fontSize="14px" lineHeight="20px" textAlign="center">
-                <FormattedMessage defaultMessage="Your contribution will remain in processing state until it is completed from the payment processor's end. You will receive an email when it goes through successfully. No further action is required from your end." />
+                <FormattedMessage
+                  defaultMessage="Your contribution will remain in processing state until it is completed from the payment processor's end. You will receive an email when it goes through successfully. No further action is required from your end."
+                  id="R1RQBD"
+                />
               </P>
             </Box>
             <StyledLink
@@ -310,7 +313,7 @@ class ContributionFlowSuccess extends React.Component {
               color="#0C2D66"
               mt={1}
             >
-              <FormattedMessage defaultMessage="View Contribution!" />
+              <FormattedMessage defaultMessage="View Contribution!" id="zG2d9i" />
             </StyledLink>
           </Flex>
         )}

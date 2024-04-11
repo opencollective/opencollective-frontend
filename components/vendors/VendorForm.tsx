@@ -117,13 +117,13 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
         await editVendor({ variables: { vendor: { ...data, id: vendor.id } } });
         toast({
           variant: 'success',
-          message: <FormattedMessage defaultMessage="Vendor Updated" />,
+          message: <FormattedMessage defaultMessage="Vendor Updated" id="XqtbM9" />,
         });
       } else {
         await createVendor({ variables: { vendor: data, host: pick(host, ['id', 'slug']) } });
         toast({
           variant: 'success',
-          message: <FormattedMessage defaultMessage="Vendor Created" />,
+          message: <FormattedMessage defaultMessage="Vendor Created" id="4O9yQ3" />,
         });
       }
       onSuccess?.();
@@ -158,7 +158,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
         {vendor ? (
           <FormattedMessage id="vendor.edit" defaultMessage="Edit Vendor" />
         ) : (
-          <FormattedMessage defaultMessage="Create Vendor" />
+          <FormattedMessage defaultMessage="Create Vendor" id="I5p2+k" />
         )}
         {isModal && (
           <button
@@ -180,7 +180,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
                 {vendor ? (
                   <FormattedMessage id="Vendor.Update" defaultMessage="Update vendor" />
                 ) : (
-                  <FormattedMessage defaultMessage="Create vendor" />
+                  <FormattedMessage defaultMessage="Create vendor" id="jrCJwo" />
                 )}
               </Button>
             </div>
@@ -192,7 +192,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
                 <div className="flex-grow">
                   <StyledInputFormikField
                     name="name"
-                    label={intl.formatMessage({ defaultMessage: "Vendor's name" })}
+                    label={intl.formatMessage({ defaultMessage: "Vendor's name", id: 'iDPmhB' })}
                     labelProps={FIELD_LABEL_PROPS}
                     mt={3}
                     required
@@ -203,7 +203,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
               </div>
               <StyledInputFormikField
                 name="legalName"
-                label={intl.formatMessage({ defaultMessage: "Vendor's legal name" })}
+                label={intl.formatMessage({ defaultMessage: "Vendor's legal name", id: '+5Vgek' })}
                 labelProps={FIELD_LABEL_PROPS}
                 required={false}
                 mt={3}
@@ -232,7 +232,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
                       }}
                     />
                     <label htmlFor="taxRequired" className="font-normal">
-                      <FormattedMessage defaultMessage="Requires tax form" />
+                      <FormattedMessage defaultMessage="Requires tax form" id="oKmsSw" />
                     </label>
                   </div>
                 )}
@@ -240,7 +240,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
               {formik.values.vendorInfo?.taxFormRequired && (
                 <StyledInputFormikField
                   name="vendorInfo.taxFormUrl"
-                  label={intl.formatMessage({ defaultMessage: 'Tax form URL' })}
+                  label={intl.formatMessage({ defaultMessage: 'Tax form URL', id: '72Ve1d' })}
                   labelProps={FIELD_LABEL_PROPS}
                   required={false}
                   mt={3}
@@ -251,11 +251,11 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
                 </StyledInputFormikField>
               )}
               <p className="mb-3 mt-4 text-base font-bold">
-                <FormattedMessage defaultMessage="Tax identification" />
+                <FormattedMessage defaultMessage="Tax identification" id="YQKRUh" />
               </p>
               <StyledInputFormikField
                 name="vendorInfo.taxType"
-                label={intl.formatMessage({ defaultMessage: 'Identification system' })}
+                label={intl.formatMessage({ defaultMessage: 'Identification system', id: '6MC5jw' })}
                 labelProps={{ ...FIELD_LABEL_PROPS, fontWeight: 400 }}
                 required={false}
                 mt={3}
@@ -273,7 +273,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
               {formik.values?.vendorInfo?.taxType === 'OTHER' && (
                 <StyledInputFormikField
                   name="vendorInfo.otherTaxType"
-                  label={intl.formatMessage({ defaultMessage: 'Identification system' })}
+                  label={intl.formatMessage({ defaultMessage: 'Identification system', id: '6MC5jw' })}
                   labelProps={{ ...FIELD_LABEL_PROPS, fontWeight: 400 }}
                   required={true}
                   mt={3}
@@ -283,7 +283,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
               )}
               <StyledInputFormikField
                 name="vendorInfo.taxId"
-                label={intl.formatMessage({ defaultMessage: 'ID Number' })}
+                label={intl.formatMessage({ defaultMessage: 'ID Number', id: 'lSvafT' })}
                 labelProps={{ ...FIELD_LABEL_PROPS, fontWeight: 400 }}
                 required={formik.values?.vendorInfo?.taxType !== undefined}
                 mt={3}
@@ -292,7 +292,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
               </StyledInputFormikField>
 
               <p className="mb-3 mt-4 text-base font-bold">
-                <FormattedMessage defaultMessage="Mailing address" />
+                <FormattedMessage defaultMessage="Mailing address" id="yrKCq7" />
               </p>
               <StyledInputLocation
                 onChange={values => {
@@ -313,7 +313,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
               </StyledInputFormikField>
               <StyledInputFormikField
                 name="vendorInfo.contact.email"
-                label={intl.formatMessage({ defaultMessage: "Contact's email" })}
+                label={intl.formatMessage({ defaultMessage: "Contact's email", id: '9W4YHR' })}
                 labelProps={FIELD_LABEL_PROPS}
                 required={false}
                 mt={3}

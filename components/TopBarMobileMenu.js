@@ -86,7 +86,7 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
               <hr className="my-5" />
               <ListItem>
                 <Link href="/help" onClick={closeMenu}>
-                  <FormattedMessage defaultMessage="Help & Support" />
+                  <FormattedMessage defaultMessage="Help & Support" id="Uf3+S6" />
                 </Link>
               </ListItem>
             </Fragment>
@@ -97,7 +97,7 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
                   justifyContent="space-between"
                   onClick={() => setState({ ...state, viewSolutionsMenu: !state.viewSolutionsMenu })}
                 >
-                  <FormattedMessage defaultMessage="Solutions" />
+                  <FormattedMessage defaultMessage="Solutions" id="asqGnV" />
                   <ChevronDown size={20} />
                 </Flex>
                 {state.viewSolutionsMenu && (
@@ -109,7 +109,7 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
                     </SubListItem>
                     <SubListItem>
                       <Link href={'/become-a-sponsor'} onClick={closeMenu}>
-                        <FormattedMessage defaultMessage="For Contributors" />
+                        <FormattedMessage defaultMessage="For Contributors" id="CPlDGt" />
                       </Link>
                     </SubListItem>
                     <SubListItem>
@@ -176,7 +176,7 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
               <hr className="my-5" />
               <ListItem>
                 <Link href={'/help'} onClick={closeMenu}>
-                  <FormattedMessage defaultMessage="Help & Support" />
+                  <FormattedMessage defaultMessage="Help & Support" id="Uf3+S6" />
                 </Link>
               </ListItem>
               {useDashboard && (

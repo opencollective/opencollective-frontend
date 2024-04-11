@@ -24,7 +24,7 @@ interface AgreementMeta extends TableMeta<Agreement> {
 const columns: ColumnDef<Agreement>[] = [
   {
     accessorKey: 'account',
-    header: () => <FormattedMessage defaultMessage="Account" />,
+    header: () => <FormattedMessage defaultMessage="Account" id="TwyMau" />,
     meta: { className: 'w-40 sm:w-56' },
 
     cell: ({ cell }) => {
@@ -65,7 +65,7 @@ const columns: ColumnDef<Agreement>[] = [
         </span>
       ) : (
         <span className="italic text-slate-500">
-          <FormattedMessage defaultMessage="Never" />
+          <FormattedMessage defaultMessage="Never" id="du1laW" />
         </span>
       );
     },
@@ -114,7 +114,7 @@ const columns: ColumnDef<Agreement>[] = [
                 openAgreement(application);
               }}
             >
-              <FormattedMessage defaultMessage="View details" />
+              <FormattedMessage defaultMessage="View details" id="MnpUD7" />
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -154,13 +154,13 @@ export default function AgreementsTable({
       emptyMessage={() => (
         <div>
           <P fontSize="16px">
-            <FormattedMessage defaultMessage="No agreements" />
+            <FormattedMessage defaultMessage="No agreements" id="7eGjv6" />
           </P>
           {resetFilters && (
             <div>
               <StyledHr maxWidth={300} m="16px auto" borderColor="black.100" />
               <StyledLinkButton onClick={resetFilters}>
-                <FormattedMessage defaultMessage="Reset filters" />
+                <FormattedMessage defaultMessage="Reset filters" id="jZ0o74" />
               </StyledLinkButton>
             </div>
           )}

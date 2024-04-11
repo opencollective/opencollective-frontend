@@ -191,7 +191,12 @@ const StyledModal = ({
     }
     if (
       hasUnsavedChanges &&
-      !confirm(intl.formatMessage({ defaultMessage: 'You have unsaved changes. Are you sure you want to close this?' }))
+      !confirm(
+        intl.formatMessage({
+          defaultMessage: 'You have unsaved changes. Are you sure you want to close this?',
+          id: 'srNsR3',
+        }),
+      )
     ) {
       return;
     }

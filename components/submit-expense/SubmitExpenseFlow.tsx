@@ -42,6 +42,7 @@ type SubmitExpenseFlowProps = {
 const I18nMessages = defineMessages({
   ConfirmExit: {
     defaultMessage: 'Are you sure you want to discard this expense?',
+    id: 't0Uyqt',
   },
 });
 
@@ -193,7 +194,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
           });
           toast({
             variant: 'success',
-            title: <FormattedMessage defaultMessage="Expense edited" />,
+            title: <FormattedMessage defaultMessage="Expense edited" id="yTblGN" />,
             message: LoggedInUser ? <Survey hasParentTitle surveyKey={SURVEY_KEY.EXPENSE_SUBMITTED_NEW_FLOW} /> : null,
             duration: 20000,
           });
@@ -236,7 +237,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
 
           toast({
             variant: 'success',
-            title: <FormattedMessage defaultMessage="Expense invite sent" />,
+            title: <FormattedMessage defaultMessage="Expense invite sent" id="Fhue1N" />,
             message: LoggedInUser ? <Survey hasParentTitle surveyKey={SURVEY_KEY.EXPENSE_SUBMITTED_NEW_FLOW} /> : null,
             duration: 20000,
           });
@@ -422,7 +423,7 @@ function SubmitExpenseFlowFooter(props: SubmitExpenseFlowFooterProps) {
         onClick={props.prevStep ? () => props.setCurrentStep(props.prevStep) : undefined}
       >
         <ArrowLeft />
-        <FormattedMessage defaultMessage="Go back" />
+        <FormattedMessage defaultMessage="Go back" id="orvpWh" />
       </Button>
 
       {props.isLastStep ? (

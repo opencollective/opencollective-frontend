@@ -94,7 +94,7 @@ export default function SocialLinksFormField({ value = [], touched, onChange }: 
             >
               <Plus size="10px" />
               <Span ml={2}>
-                <FormattedMessage defaultMessage="Add social link" />
+                <FormattedMessage defaultMessage="Add social link" id="FH4TgN" />
               </Span>
             </StyledButton>
           </Flex>

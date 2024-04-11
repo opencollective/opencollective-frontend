@@ -102,7 +102,7 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
 
   const views: Views<FilterValues> = [
     {
-      label: intl.formatMessage({ defaultMessage: 'All' }),
+      label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
       filter: {},
       id: 'all',
       count: metaData?.all?.totalCount,
@@ -123,13 +123,13 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       count: metaData?.scheduled_for_payment?.totalCount,
     },
     {
-      label: intl.formatMessage({ defaultMessage: 'On hold' }),
+      label: intl.formatMessage({ defaultMessage: 'On hold', id: '0Hhe6f' }),
       filter: { status: ExpenseStatusFilter.ON_HOLD, orderBy: 'CREATED_AT,ASC' },
       id: 'on_hold',
       count: metaData?.on_hold?.totalCount,
     },
     {
-      label: intl.formatMessage({ defaultMessage: 'Incomplete' }),
+      label: intl.formatMessage({ defaultMessage: 'Incomplete', id: 'kHwKVg' }),
       filter: { status: ExpenseStatusFilter.INCOMPLETE, orderBy: 'CREATED_AT,ASC' },
       id: 'incomplete',
       count: metaData?.incomplete?.totalCount,
@@ -141,7 +141,7 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       count: metaData?.error?.totalCount,
     },
     {
-      label: intl.formatMessage({ defaultMessage: 'Paid' }),
+      label: intl.formatMessage({ defaultMessage: 'Paid', id: 'u/vOPu' }),
       filter: { status: ExpenseStatusFilter.PAID },
       id: 'paid',
       count: metaData?.paid?.totalCount,

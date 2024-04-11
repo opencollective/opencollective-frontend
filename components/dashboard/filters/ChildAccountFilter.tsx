@@ -18,7 +18,7 @@ function ChildAccountFilter({
   const groupedOptions = React.useMemo(
     () => [
       {
-        label: intl.formatMessage({ defaultMessage: 'Main account' }),
+        label: intl.formatMessage({ defaultMessage: 'Main account', id: 'pE0V//' }),
         options: [
           {
             value: meta.accountSlug,
@@ -65,7 +65,7 @@ export const childAccountFilter: FilterConfig<z.infer<typeof schema>> = {
   filter: {
     static: true,
     hide: ({ meta }) => !meta?.childrenAccounts || meta.childrenAccounts.length === 0,
-    labelMsg: defineMessage({ defaultMessage: 'Account' }),
+    labelMsg: defineMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
     Component: ChildAccountFilter,
     valueRenderer: ({ value }) => <AccountRenderer account={{ slug: value }} />,
   },

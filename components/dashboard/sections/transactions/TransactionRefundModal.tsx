@@ -55,10 +55,13 @@ const TransactionRefundModal = ({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
-            <FormattedMessage defaultMessage="Are you sure you want to refund this transaction?" />
+            <FormattedMessage defaultMessage="Are you sure you want to refund this transaction?" id="RL9ufl" />
           </AlertDialogTitle>
           <AlertDialogDescription>
-            <FormattedMessage defaultMessage="Refunding will reimburse the full amount back to your contributor. They can contribute again in the future." />
+            <FormattedMessage
+              defaultMessage="Refunding will reimburse the full amount back to your contributor. They can contribute again in the future."
+              id="Ntm6k6"
+            />
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

@@ -50,47 +50,47 @@ const TopAvatarsContainer = styled.div`
 
 const SCOPES_INFO = {
   email: {
-    label: <FormattedMessage defaultMessage="Access your email address." />,
+    label: <FormattedMessage defaultMessage="Access your email address." id="bU8NRa" />,
     icon: <Mail size={16} />,
   },
   incognito: {
-    label: <FormattedMessage defaultMessage="Access your incognito account." />,
+    label: <FormattedMessage defaultMessage="Access your incognito account." id="u1mbsP" />,
     icon: <IncognitoAvatar size={32} />,
   },
   account: {
-    label: <FormattedMessage defaultMessage="Manage your account, collectives and organizations." />,
+    label: <FormattedMessage defaultMessage="Manage your account, collectives and organizations." id="kIXYNi" />,
     icon: <Users size={16} />,
   },
   expenses: {
-    label: <FormattedMessage defaultMessage="Create and manage expenses, payout methods." />,
+    label: <FormattedMessage defaultMessage="Create and manage expenses, payout methods." id="SQT1u9" />,
     icon: <Receipt size={16} />,
   },
   orders: {
-    label: <FormattedMessage defaultMessage="Create and manage contributions, payment methods." />,
+    label: <FormattedMessage defaultMessage="Create and manage contributions, payment methods." id="Ny7kBI" />,
     icon: <Coins size={16} />,
   },
   transactions: {
-    label: <FormattedMessage defaultMessage="Refund and reject recorded transactions." />,
+    label: <FormattedMessage defaultMessage="Refund and reject recorded transactions." id="zu5ckP" />,
     icon: <ArrowRightLeft size={16} />,
   },
   virtualCards: {
-    label: <FormattedMessage defaultMessage="Create and manage virtual cards." />,
+    label: <FormattedMessage defaultMessage="Create and manage virtual cards." id="n8EhFC" />,
     icon: <CreditCard size={16} />,
   },
   updates: {
-    label: <FormattedMessage defaultMessage="Create and manage updates." />,
+    label: <FormattedMessage defaultMessage="Create and manage updates." id="USDg2A" />,
     icon: <Newspaper size={16} />,
   },
   conversations: {
-    label: <FormattedMessage defaultMessage="Create and manage conversations." />,
+    label: <FormattedMessage defaultMessage="Create and manage conversations." id="udDupO" />,
     icon: <MessagesSquare size={16} />,
   },
   webhooks: {
-    label: <FormattedMessage defaultMessage="Create and manage webhooks." />,
+    label: <FormattedMessage defaultMessage="Create and manage webhooks." id="m2cP6g" />,
     icon: <Webhook size={16} />,
   },
   host: {
-    label: <FormattedMessage defaultMessage="Administrate fiscal hosts." />,
+    label: <FormattedMessage defaultMessage="Administrate fiscal hosts." id="iHkkt+" />,
     icon: <Network size={16} />,
   },
   /* We disable those scopes for now */
@@ -201,7 +201,7 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
           {isRedirecting ? (
             <Flex flexDirection="column" justifyContent="center" alignItems="center" pb={3}>
               <P fontSize="16px" fontWeight="500" mb={4}>
-                <FormattedMessage defaultMessage="Redirecting…" />
+                <FormattedMessage defaultMessage="Redirecting…" id="ET/GW3" />
               </P>
               <Loading />
             </Flex>
@@ -210,6 +210,7 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
               <P fontWeight="700" fontSize="24px" textAlign="center" color="black.900" mb={32}>
                 <FormattedMessage
                   defaultMessage="{applicationName} wants permission to:"
+                  id="kP5Eb7"
                   values={{ applicationName: application.name }}
                 />
               </P>
@@ -218,6 +219,7 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
                 <P fontSize="16px" color="black.700" ml={3}>
                   <FormattedMessage
                     defaultMessage="Verify your identity on {service}"
+                    id="+cR4M7"
                     values={{ service: 'Open Collective' }}
                   />{' '}
                   <br />
@@ -229,6 +231,7 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
                     {'. '}
                     <FormattedMessage
                       defaultMessage="Not you? <SignOutLink>Sign out</SignOutLink> to switch profile."
+                      id="/GQXtd"
                       values={{
                         SignOutLink: msg => (
                           <StyledLinkButton onClick={logout} type="button">
@@ -246,7 +249,10 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
                     <AlertTriangle size={18} className="text-red-600" />
                   </div>
                   <P fontSize="16px" color="black.700" ml={3}>
-                    <FormattedMessage defaultMessage="Directly perform critical operations that would normally require 2FA." />
+                    <FormattedMessage
+                      defaultMessage="Directly perform critical operations that would normally require 2FA."
+                      id="jd6G18"
+                    />
                   </P>
                 </Flex>
               )}
@@ -266,7 +272,10 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
               ))}
               {difference(filteredScopes, ['email']).length > 0 && (
                 <MessageBox type="info" mt={40} fontSize="13px">
-                  <FormattedMessage defaultMessage="These permissions are granted to all the accounts you're administrating, including your personal profile." />
+                  <FormattedMessage
+                    defaultMessage="These permissions are granted to all the accounts you're administrating, including your personal profile."
+                    id="FmF1MA"
+                  />
                 </MessageBox>
               )}
               {error && (
@@ -295,7 +304,7 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
             <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
           </StyledButton>
           <StyledButton minWidth={175} buttonStyle="primary" loading={loading} onClick={callAuthorize}>
-            <FormattedMessage defaultMessage="Authorize" />
+            <FormattedMessage defaultMessage="Authorize" id="QwnGVY" />
           </StyledButton>
         </Flex>
       )}

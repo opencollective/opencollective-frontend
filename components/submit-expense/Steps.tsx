@@ -52,7 +52,7 @@ export type ExpenseStepDefinition = StepDefinition<ExpenseFormValues, ExpenseFor
 
 export const Steps: Record<ExpenseFlowStep, ExpenseStepDefinition> = {
   [ExpenseFlowStep.COLLECTIVE]: {
-    Title: () => <FormattedMessage defaultMessage="Who is paying?" />,
+    Title: () => <FormattedMessage defaultMessage="Who is paying?" id="IdR7BG" />,
     Subtitle: (props: { form: ExpenseForm }) => props.form.options.account?.name ?? '',
     Form: PickCollectiveStepForm,
     hasError(form) {
@@ -60,7 +60,7 @@ export const Steps: Record<ExpenseFlowStep, ExpenseStepDefinition> = {
     },
   },
   [ExpenseFlowStep.EXPENSE_TYPE]: {
-    Title: () => <FormattedMessage defaultMessage="Type of expense" />,
+    Title: () => <FormattedMessage defaultMessage="Type of expense" id="qftRxm" />,
     Subtitle: (props: { form: ExpenseForm }) => {
       return props.form.values.expenseTypeOption === ExpenseType.INVOICE ? (
         <FormattedMessage id="Expense.Type.Invoice" defaultMessage="Invoice" />
@@ -74,7 +74,7 @@ export const Steps: Record<ExpenseFlowStep, ExpenseStepDefinition> = {
     },
   },
   [ExpenseFlowStep.PAYMENT_METHOD]: {
-    Title: () => <FormattedMessage defaultMessage="Who is getting paid?" />,
+    Title: () => <FormattedMessage defaultMessage="Who is getting paid?" id="W5Z+Fm" />,
     Subtitle: function PickPaymentMethodStepSubtitle(props: { form: ExpenseForm }) {
       const payee = props.form.options.payee;
 
@@ -118,7 +118,7 @@ export const Steps: Record<ExpenseFlowStep, ExpenseStepDefinition> = {
     },
     Title: (props: { form: ExpenseForm }) => {
       return props.form.options.accountingCategories?.length > 0 ? (
-        <FormattedMessage defaultMessage="Title and category" />
+        <FormattedMessage defaultMessage="Title and category" id="F6nHtI" />
       ) : (
         <FormattedMessage id="Title" defaultMessage="Title" />
       );
@@ -128,7 +128,7 @@ export const Steps: Record<ExpenseFlowStep, ExpenseStepDefinition> = {
     },
   },
   [ExpenseFlowStep.EXPENSE_DETAILS]: {
-    Title: () => <FormattedMessage defaultMessage="Expense Details" />,
+    Title: () => <FormattedMessage defaultMessage="Expense Details" id="+5Kafe" />,
     Subtitle: function ExpenseDetailsStepSubtitle(props: { form: ExpenseForm }) {
       const intl = useIntl();
 
@@ -150,6 +150,7 @@ export const Steps: Record<ExpenseFlowStep, ExpenseStepDefinition> = {
             <span>
               <FormattedMessage
                 defaultMessage="({n} {n, plural, one {item} other {items}})"
+                id="+kuPOP"
                 values={{ n: props.form.values.expenseItems?.length ?? 0 }}
               />
             </span>

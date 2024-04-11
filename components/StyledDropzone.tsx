@@ -139,7 +139,10 @@ const StyledDropzone = ({
         toast({
           variant: 'error',
           message: intl.formatMessage(
-            { defaultMessage: 'You can only upload {count, plural, one {# file} other {# files}} at once' },
+            {
+              defaultMessage: 'You can only upload {count, plural, one {# file} other {# files}} at once',
+              id: 'KLENgi',
+            },
             { count: limit },
           ),
         });

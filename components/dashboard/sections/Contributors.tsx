@@ -137,7 +137,7 @@ const dashboardContributorsQuery = gql`
 const getColumns = ({ intl, activeViewId }) => {
   const account = {
     accessorKey: 'account',
-    header: intl.formatMessage({ defaultMessage: 'Account' }),
+    header: intl.formatMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
     cell: ({ cell }) => {
       const account = cell.getValue();
       return (
@@ -168,7 +168,7 @@ const getColumns = ({ intl, activeViewId }) => {
 
   const tier = {
     accessorKey: 'tier.name',
-    header: intl.formatMessage({ defaultMessage: 'Tier' }),
+    header: intl.formatMessage({ defaultMessage: 'Tier', id: 'b07w+D' }),
     cell: ({ cell }) => {
       const tierName = cell.getValue();
       return <span>{capitalize(tierName)}</span>;
@@ -213,7 +213,7 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
   const views = [
     {
       id: ContributorsTab.ALL,
-      label: intl.formatMessage({ defaultMessage: 'All' }),
+      label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
       count: metadata?.account?.ALL.totalCount,
       filter: {},
     },
@@ -227,7 +227,7 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
     },
     {
       id: ContributorsTab.FOLLOWERS,
-      label: intl.formatMessage({ defaultMessage: 'Followers' }),
+      label: intl.formatMessage({ defaultMessage: 'Followers', id: 'pzTOmv' }),
       count: metadata?.account?.[ContributorsTab.FOLLOWERS]?.totalCount,
       filter: {
         role: [FilterMemberRole.FOLLOWER],

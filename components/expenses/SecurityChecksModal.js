@@ -79,9 +79,9 @@ const SecurityCheck = check => {
             minWidth="max-content"
           >
             {isExpanded ? (
-              <FormattedMessage defaultMessage="Hide Details" />
+              <FormattedMessage defaultMessage="Hide Details" id="jBYmhn" />
             ) : (
-              <FormattedMessage defaultMessage="Show Details" />
+              <FormattedMessage defaultMessage="Show Details" id="kRqDOg" />
             )}
             {isExpanded ? <ChevronUp size="1em" /> : <ChevronDown size="1em" />}
           </StyledLink>

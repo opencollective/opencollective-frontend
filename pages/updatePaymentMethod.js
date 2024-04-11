@@ -264,7 +264,10 @@ class UpdatePaymentPage extends React.Component {
                           defaultMessage="Your new card info has been added"
                         />
                       ) : (
-                        <FormattedMessage defaultMessage="This payment method does not exist or has already been updated" />
+                        <FormattedMessage
+                          defaultMessage="This payment method does not exist or has already been updated"
+                          id="a3HMfz"
+                        />
                       )}
                     </ShadowBox>
                   </Container>

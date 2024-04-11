@@ -248,6 +248,7 @@ const ExpenseBudgetItem = ({
                 ) : (
                   <FormattedMessage
                     defaultMessage="from {payee} to {account}"
+                    id="B5z1AU"
                     values={{
                       payee: (
                         <AccountHoverCard
@@ -435,7 +436,7 @@ const ExpenseBudgetItem = ({
               {Boolean(expense?.account?.hostAgreements?.totalCount) && (
                 <Box mr={[3, 4]}>
                   <DetailColumnHeader>
-                    <FormattedMessage defaultMessage="Host Agreements" />
+                    <FormattedMessage defaultMessage="Host Agreements" id="kq2gKV" />
                   </DetailColumnHeader>
                   <P fontSize="11px" mt="6px">
                     <StyledLink
@@ -445,6 +446,7 @@ const ExpenseBudgetItem = ({
                     >
                       <FormattedMessage
                         defaultMessage="{count, plural, one {# agreement} other {# agreements}}"
+                        id="7FgO5b"
                         values={{ count: expense.account.hostAgreements.totalCount }}
                       />
                     </StyledLink>
@@ -476,6 +478,7 @@ const ExpenseBudgetItem = ({
           parentTitle={intl.formatMessage(
             {
               defaultMessage: 'Expense #{expenseId} attachment',
+              id: 'At2m8o',
             },
             { expenseId: expense.legacyId },
           )}

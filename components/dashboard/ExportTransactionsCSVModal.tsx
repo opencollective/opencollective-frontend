@@ -413,7 +413,7 @@ const ExportTransactionsCSVModal = ({
             <div className="flex flex-col gap-4 sm:flex-row">
               <div className="flex flex-1 flex-col gap-2">
                 <h1 className="font-bold">
-                  <FormattedMessage defaultMessage="Selected export set" />
+                  <FormattedMessage defaultMessage="Selected export set" id="1/2XlO" />
                 </h1>
                 <div className="flex flex-col justify-stretch gap-4 sm:flex-row sm:items-center">
                   <Select
@@ -451,7 +451,7 @@ const ExportTransactionsCSVModal = ({
               {preset === FIELD_OPTIONS.NEW_PRESET && (
                 <div className="flex flex-1 flex-col gap-2">
                   <h1 className="font-bold">
-                    <FormattedMessage defaultMessage="Set name" />
+                    <FormattedMessage defaultMessage="Set name" id="GUFh1k" />
                   </h1>
                   <Input value={presetName} onChange={e => setPresetName(e.target.value)} name="presetName" />
                   <p className="text-xs">
@@ -466,7 +466,7 @@ const ExportTransactionsCSVModal = ({
             <Collapsible open={canEditFields} className={cn(!canEditFields && 'hidden')}>
               <CollapsibleContent>
                 <h1 className="font-bold">
-                  <FormattedMessage defaultMessage="Available fields" />
+                  <FormattedMessage defaultMessage="Available fields" id="+Ct+Nd" />
                   <small className="ml-1 text-base font-medium text-gray-700">({TOTAL_AVAILABLE_FIELDS})</small>
                 </h1>
                 <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:gap-6">
@@ -524,18 +524,22 @@ const ExportTransactionsCSVModal = ({
               <div className="flex flex-col justify-stretch gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <h1 className="font-bold">
-                    <FormattedMessage defaultMessage="Selected fields for export" />
+                    <FormattedMessage defaultMessage="Selected fields for export" id="xnO1Gg" />
                     <small className="ml-1 text-base font-medium text-gray-700">
                       (
                       <FormattedMessage
-                        defaultMessage={'{n}  out of {m}'}
+                        defaultMessage="{n} out of {m}"
+                        id="3uinDX"
                         values={{ n: fields.length, m: TOTAL_AVAILABLE_FIELDS }}
                       />
                       )
                     </small>
                   </h1>
                   <p className="mt-1 text-xs text-gray-500">
-                    <FormattedMessage defaultMessage="Fields will be exported in the order they're displayed in below. Drag and drop them to reorder them." />
+                    <FormattedMessage
+                      defaultMessage="Fields will be exported in the order they're displayed in below. Drag and drop them to reorder them."
+                      id="rFP53b"
+                    />
                   </p>
                 </div>
 
@@ -568,7 +572,7 @@ const ExportTransactionsCSVModal = ({
                       fields.map(field => <FieldTag key={field} id={field} />)
                     ) : (
                       <p className="self-center text-xs">
-                        <FormattedMessage defaultMessage="You have not selected any fields for export." />
+                        <FormattedMessage defaultMessage="You have not selected any fields for export." id="EMjZZT" />
                       </p>
                     ),
                   [canEditFields, fields, draggingTag, handleDragOver],
@@ -582,10 +586,13 @@ const ExportTransactionsCSVModal = ({
                   onCheckedChange={handleTaxAndPaymentProcessorFeeSwitch}
                 />
                 <p className="text-sm">
-                  <FormattedMessage defaultMessage="Export taxes and payment processor fees as columns" />
+                  <FormattedMessage defaultMessage="Export taxes and payment processor fees as columns" id="ZNzyMo" />
                 </p>
                 <InfoTooltipIcon>
-                  <FormattedMessage defaultMessage="Before 2024 payment processor fees and taxes were columns in transaction records. Since January 2024 they are separate transactions. Enable this option to transform separate payment processor fees and tax transactions into columns in the export." />
+                  <FormattedMessage
+                    defaultMessage="Before 2024 payment processor fees and taxes were columns in transaction records. Since January 2024 they are separate transactions. Enable this option to transform separate payment processor fees and tax transactions into columns in the export."
+                    id="frVonU"
+                  />
                 </InfoTooltipIcon>
               </div>
             )}
@@ -594,10 +601,13 @@ const ExportTransactionsCSVModal = ({
             <div className="absolute left-0 top-0 flex h-full w-full  items-center justify-center bg-black/30">
               <div className="m-4 flex max-w-md flex-col gap-4 rounded-lg border border-solid border-red-600 bg-red-50 px-6 py-4 sm:m-0">
                 <p className="font-bold">
-                  <FormattedMessage defaultMessage="The size of the resulting export file is too large" />
+                  <FormattedMessage defaultMessage="The size of the resulting export file is too large" id="XX+VZK" />
                 </p>
                 <p className="text-sm">
-                  <FormattedMessage defaultMessage="Select different set of filters to enable the transactions export to work." />
+                  <FormattedMessage
+                    defaultMessage="Select different set of filters to enable the transactions export to work."
+                    id="8Q0YZb"
+                  />
                 </p>
               </div>
             </div>

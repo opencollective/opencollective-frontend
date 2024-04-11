@@ -18,7 +18,7 @@ export const I18nCode = chunks => <code>{chunks}</code>;
 export const I18nUnderline = chunks => <u>{chunks}</u>;
 export const I18nSupportLink = chunks => (
   <StyledLink as={Link} openInNewTab href="/contact">
-    {chunks.length ? chunks : <FormattedMessage defaultMessage="support" />}
+    {chunks.length ? chunks : <FormattedMessage defaultMessage="support" id="o42xrK" />}
   </StyledLink>
 );
 export const I18nSignInLink = chunks => (

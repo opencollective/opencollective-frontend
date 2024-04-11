@@ -67,7 +67,7 @@ function AccountingCategoryDrawerView(props: AccountingCategoryDrawerViewProps) 
     <React.Fragment>
       <div>
         <label className="mb-1 text-base">
-          <FormattedMessage defaultMessage="Applies to" />
+          <FormattedMessage defaultMessage="Applies to" id="6WqHWi" />
         </label>
         <p>
           {props.accountingCategory?.kind && (
@@ -75,17 +75,17 @@ function AccountingCategoryDrawerView(props: AccountingCategoryDrawerViewProps) 
           )}
         </p>
         <label className="mb-1 mt-4 text-base">
-          <FormattedMessage defaultMessage="Host only" />
+          <FormattedMessage defaultMessage="Host only" id="qj+AAT" />
         </label>
         <p>
           {props.accountingCategory?.hostOnly ? (
-            <FormattedMessage defaultMessage="Yes" />
+            <FormattedMessage defaultMessage="Yes" id="a5msuh" />
           ) : (
-            <FormattedMessage defaultMessage="No" />
+            <FormattedMessage defaultMessage="No" id="oUWADl" />
           )}
         </p>
         <label className="mb-1 mt-4 text-base">
-          <FormattedMessage defaultMessage="Category name" />
+          <FormattedMessage defaultMessage="Category name" id="kgVqk1" />
         </label>
         <p>{props.accountingCategory?.name}</p>
 
@@ -99,7 +99,7 @@ function AccountingCategoryDrawerView(props: AccountingCategoryDrawerViewProps) 
         )}
 
         <label className="mb-1 mt-4 text-base">
-          <FormattedMessage defaultMessage="Accounting code" />
+          <FormattedMessage defaultMessage="Accounting code" id="tvVFNA" />
         </label>
 
         <p>
@@ -111,7 +111,7 @@ function AccountingCategoryDrawerView(props: AccountingCategoryDrawerViewProps) 
         {props.accountingCategory?.kind === AccountingCategoryKind.EXPENSE && (
           <React.Fragment>
             <label className="mb-1 mt-4 text-base">
-              <FormattedMessage defaultMessage="Expense types" />
+              <FormattedMessage defaultMessage="Expense types" id="7oAuzt" />
             </label>
             <p>
               {props.accountingCategory?.expensesTypes ? (
@@ -126,7 +126,7 @@ function AccountingCategoryDrawerView(props: AccountingCategoryDrawerViewProps) 
         {!isEmptyHTMLValue(props.accountingCategory?.instructions) && (
           <React.Fragment>
             <label className="mb-1 mt-4 text-base">
-              <FormattedMessage defaultMessage="Instructions" />
+              <FormattedMessage defaultMessage="Instructions" id="sV2v5L" />
             </label>
             <div>
               <HTMLContent content={props.accountingCategory?.instructions} />
@@ -138,7 +138,7 @@ function AccountingCategoryDrawerView(props: AccountingCategoryDrawerViewProps) 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <StyledButton>
-              <FormattedMessage defaultMessage="More actions" />
+              <FormattedMessage defaultMessage="More actions" id="S8/4ZI" />
             </StyledButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
@@ -151,7 +151,7 @@ function AccountingCategoryDrawerView(props: AccountingCategoryDrawerViewProps) 
         </DropdownMenu>
 
         <StyledButton buttonStyle="secondary" onClick={props.onEditClick}>
-          <FormattedMessage defaultMessage="Edit category" />
+          <FormattedMessage defaultMessage="Edit category" id="1mQAJl" />
         </StyledButton>
       </DrawerActions>
     </React.Fragment>
@@ -181,8 +181,8 @@ function AccountingCategoryEditingDrawerView(props: AccountingCategoryEditingDra
       hostOnly: {
         value: props.accountingCategory?.hostOnly,
         label: props.accountingCategory?.hostOnly
-          ? intl.formatMessage({ defaultMessage: 'Yes' })
-          : intl.formatMessage({ defaultMessage: 'No' }),
+          ? intl.formatMessage({ defaultMessage: 'Yes', id: 'a5msuh' })
+          : intl.formatMessage({ defaultMessage: 'No', id: 'oUWADl' }),
       },
       instructions: props.accountingCategory?.instructions,
       expensesTypes: props.accountingCategory?.expensesTypes

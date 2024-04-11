@@ -148,7 +148,7 @@ const makeApexOptions = ({ currency, timeUnit, dateFrom, intl, compareFrom, expa
       show: expanded,
       formatter: value =>
         isNil(value)
-          ? intl.formatMessage({ defaultMessage: 'No data' })
+          ? intl.formatMessage({ defaultMessage: 'No data', id: 'UG5qoS' })
           : formatAmountForLegend(value, currency, intl.locale),
     },
   },

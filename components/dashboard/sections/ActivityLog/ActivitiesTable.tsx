@@ -90,7 +90,7 @@ const tableColumns: ColumnDef<Activity>[] = [
                 meta.openActivity(activity);
               }}
             >
-              <FormattedMessage defaultMessage="View details" />
+              <FormattedMessage defaultMessage="View details" id="MnpUD7" />
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -131,13 +131,13 @@ export default function ActivitiesTable({
       emptyMessage={() => (
         <div>
           <p className="text-base">
-            <FormattedMessage defaultMessage="No agreements" />
+            <FormattedMessage defaultMessage="No agreements" id="7eGjv6" />
           </p>
           {resetFilters && (
             <div>
               <StyledHr maxWidth={300} m="16px auto" borderColor="black.100" />
               <StyledLinkButton onClick={resetFilters}>
-                <FormattedMessage defaultMessage="Reset filters" />
+                <FormattedMessage defaultMessage="Reset filters" id="jZ0o74" />
               </StyledLinkButton>
             </div>
           )}

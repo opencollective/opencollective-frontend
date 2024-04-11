@@ -27,7 +27,7 @@ export const ConfirmOCRValues = ({
       <div className="flex items-center">
         <Checkbox id="confirm-expense-ocr-values" onCheckedChange={onConfirm} />
         <label htmlFor="confirm-expense-ocr-values" className="ml-2 text-xs font-medium leading-none">
-          <FormattedMessage defaultMessage="I have confirmed the date and amount." />
+          <FormattedMessage defaultMessage="I have confirmed the date and amount." id="wXQfoE" />
         </label>
       </div>
     </MessageBox>

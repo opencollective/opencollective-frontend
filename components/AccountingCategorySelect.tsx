@@ -129,7 +129,7 @@ const getCategoryLabel = (
   // Get category label
   let categoryStr;
   if (category === null) {
-    categoryStr = intl.formatMessage({ defaultMessage: "I don't know" });
+    categoryStr = intl.formatMessage({ defaultMessage: "I don't know", id: 'AkIyKO' });
   } else if (category) {
     categoryStr =
       category.friendlyName ||
@@ -200,7 +200,7 @@ const getOptions = (
     categoriesById[VALUE_NONE] = {
       value: null,
       label,
-      searchText: intl.formatMessage({ defaultMessage: "I don't know" }).toLocaleLowerCase(),
+      searchText: intl.formatMessage({ defaultMessage: "I don't know", id: 'AkIyKO' }).toLocaleLowerCase(),
     };
   }
 
@@ -339,7 +339,7 @@ const AccountingCategorySelect = ({
                 })}
               >
                 {getCategoryLabel(intl, selectedCategory, false, valuesByRole) ||
-                  intl.formatMessage({ defaultMessage: 'Select category' })}
+                  intl.formatMessage({ defaultMessage: 'Select category', id: 'RUJYth' })}
               </span>
               <ChevronDown size="1em" />
             </button>
@@ -351,7 +351,7 @@ const AccountingCategorySelect = ({
 
             <CommandList>
               <CommandEmpty>
-                <FormattedMessage defaultMessage="No category found" />
+                <FormattedMessage defaultMessage="No category found" id="bn5V11" />
               </CommandEmpty>
               <CommandGroup>
                 {Object.entries(options).map(([categoryId, { label }]) => {
@@ -383,7 +383,7 @@ const AccountingCategorySelect = ({
                             {isPrediction && (
                               <span
                                 className="text-right text-xs text-gray-500"
-                                title={intl.formatMessage({ defaultMessage: 'Suggested' })}
+                                title={intl.formatMessage({ defaultMessage: 'Suggested', id: 'a0lFbM' })}
                               >
                                 <Sparkles size={16} className="mr-1 inline-block text-yellow-500" strokeWidth={1.5} />
                               </span>
@@ -406,6 +406,7 @@ const AccountingCategorySelect = ({
               <Sparkles size={16} className=" mr-1 inline-block text-yellow-500" strokeWidth={1.5} />
               <FormattedMessage
                 defaultMessage="Suggested: {suggestions}"
+                id="XItXfz"
                 values={{
                   suggestions: predictions.slice(0, 3).map((prediction, index) => (
                     <React.Fragment key={prediction.code}>
@@ -415,7 +416,10 @@ const AccountingCategorySelect = ({
                         onKeyDown={e => e.key === 'Enter' && triggerChange(prediction)}
                         onClick={() => triggerChange(prediction)}
                         className="cursor-pointer text-[--primary-color-600] underline hover:opacity-80"
-                        aria-label={intl.formatMessage({ defaultMessage: 'Select {name}' }, { name: prediction.name })}
+                        aria-label={intl.formatMessage(
+                          { defaultMessage: 'Select {name}', id: 'G65XME' },
+                          { name: prediction.name },
+                        )}
                       >
                         {prediction.name}
                       </span>

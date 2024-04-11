@@ -194,19 +194,19 @@ const HostFinancialContributions = ({ accountSlug: hostSlug }: DashboardSectionP
 
   const views: Views<z.infer<typeof schema>> = [
     {
-      label: intl.formatMessage({ defaultMessage: 'All' }),
+      label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
       filter: {},
       id: 'all',
       count: metaData?.all?.totalCount,
     },
     {
-      label: intl.formatMessage({ defaultMessage: 'Pending' }),
+      label: intl.formatMessage({ defaultMessage: 'Pending', id: 'eKEL/g' }),
       filter: { status: [OrderStatus.PENDING] },
       count: metaData?.pending?.totalCount,
       id: 'pending',
     },
     {
-      label: intl.formatMessage({ defaultMessage: 'Disputed' }),
+      label: intl.formatMessage({ defaultMessage: 'Disputed', id: 'X1pwhF' }),
       filter: { status: [OrderStatus.DISPUTED] },
       count: metaData?.disputed?.totalCount,
       id: 'disputed',
@@ -248,7 +248,7 @@ const HostFinancialContributions = ({ accountSlug: hostSlug }: DashboardSectionP
     <div className="flex w-full max-w-screen-lg flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />}
-        description={<FormattedMessage defaultMessage="Contributions for Collectives you host." />}
+        description={<FormattedMessage defaultMessage="Contributions for Collectives you host." id="ZIZ7Ms" />}
         actions={
           <React.Fragment>
             <Button
@@ -258,7 +258,7 @@ const HostFinancialContributions = ({ accountSlug: hostSlug }: DashboardSectionP
               data-cy="create-pending-contribution"
             >
               <span>
-                <FormattedMessage defaultMessage="Create pending" />
+                <FormattedMessage defaultMessage="Create pending" id="clx/0D" />
               </span>
               <PlusIcon size={20} />
             </Button>

@@ -41,7 +41,7 @@ const HostFeesSection = ({ host, isLoading }) => {
             <Flex alignItems="center">
               <Image width={14} height={7} src="/static/images/host-fees-timeline.svg" />
               <Span ml="10px" fontSize="12px" fontWeight="500" textTransform="uppercase">
-                <FormattedMessage defaultMessage="Total Collected" />
+                <FormattedMessage defaultMessage="Total Collected" id="Kw8wV2" />
               </Span>
             </Flex>
           </Container>
@@ -49,7 +49,10 @@ const HostFeesSection = ({ host, isLoading }) => {
             {valuesToDisplay.fees}
           </Box>
           <P fontSize="12px" fontWeight="400" mt="10px">
-            <FormattedMessage defaultMessage="Host Fees charged to Collectives during this time period (these are added continuously to your budget)." />
+            <FormattedMessage
+              defaultMessage="Host Fees charged to Collectives during this time period (these are added continuously to your budget)."
+              id="suKNE1"
+            />
           </P>
         </Container>
         <Container
@@ -65,7 +68,7 @@ const HostFeesSection = ({ host, isLoading }) => {
             <Flex alignItems="center">
               <Image width={9.42} height={12} mr={10} src="/static/images/host-fees-oc.svg" />
               <Span ml="10px" fontSize="12px" fontWeight="500" textTransform="uppercase">
-                <FormattedMessage defaultMessage="Platform Share" />
+                <FormattedMessage defaultMessage="Platform Share" id="zMq41p" />
               </Span>
             </Flex>
           </Container>
@@ -73,7 +76,10 @@ const HostFeesSection = ({ host, isLoading }) => {
             {valuesToDisplay.sharedRevenue}
           </Box>
           <P fontSize="12px" fontWeight="400" mt="10px">
-            <FormattedMessage defaultMessage="Portion of Host Fees paid to Open Collective (which are either paid as you go, or charged monthly through settlement expenses, depending on the payment method.)" />
+            <FormattedMessage
+              defaultMessage="Portion of Host Fees paid to Open Collective (which are either paid as you go, or charged monthly through settlement expenses, depending on the payment method.)"
+              id="oEyZeo"
+            />
           </P>
         </Container>
         <Container
@@ -88,7 +94,7 @@ const HostFeesSection = ({ host, isLoading }) => {
             <Flex alignItems="center">
               <Image width={6.5} height={12} mr={10} src="/static/images/host-fees-money-sign.svg" />
               <Span ml="10px" fontSize="12px" fontWeight="500" textTransform="uppercase">
-                <FormattedMessage defaultMessage="Net Host Fees" />
+                <FormattedMessage defaultMessage="Net Host Fees" id="4kaWYR" />
               </Span>
             </Flex>
           </Container>
@@ -96,7 +102,10 @@ const HostFeesSection = ({ host, isLoading }) => {
             {valuesToDisplay.netHostFee}
           </Box>
           <P fontSize="12px" fontWeight="400" mt="10px">
-            <FormattedMessage defaultMessage="Net amount of Host Fees retained by your Organization after removing the Platform Share." />
+            <FormattedMessage
+              defaultMessage="Net amount of Host Fees retained by your Organization after removing the Platform Share."
+              id="fOMB1g"
+            />
           </P>
         </Container>
       </Flex>
@@ -105,7 +114,7 @@ const HostFeesSection = ({ host, isLoading }) => {
         <Container px={2} textAlign="right">
           <StyledLinkButton asLink onClick={() => setShowHostFeeChart(!showHostFeeChart)}>
             <P fontSize="12px" fontWeight="400" mt="16px">
-              <FormattedMessage defaultMessage="See historic" />
+              <FormattedMessage defaultMessage="See historic" id="BWoXXL" />
               <Span pl="8px">
                 {showHostFeeChart ? <ChevronUp size={12} /> : <ChevronDown fontVariant="solid" size={12} />}
               </Span>

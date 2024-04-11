@@ -135,7 +135,7 @@ const CancelModal = (props: Omit<EditOrderModalProps, 'action'>) => {
           <StyledTextarea
             name="reason"
             fontSize="12px"
-            placeholder={intl.formatMessage({ defaultMessage: 'Provide more details (optional)' })}
+            placeholder={intl.formatMessage({ defaultMessage: 'Provide more details (optional)', id: '41Cgcs' })}
             height={70}
             width="100%"
             resize="none"
@@ -542,7 +542,7 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
       <ModalHeader onClose={props.onClose}>
         <H4 fontSize="20px" fontWeight="700">
           {props.order.status === 'PAUSED' ? (
-            <FormattedMessage defaultMessage="Resume contribution" />
+            <FormattedMessage defaultMessage="Resume contribution" id="51nF6S" />
           ) : (
             <FormattedMessage id="subscription.menu.editPaymentMethod" defaultMessage="Update payment method" />
           )}
@@ -553,6 +553,7 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
           {props.order.status === 'PAUSED' ? (
             <FormattedMessage
               defaultMessage="To resume your {amountAndInterval} contribution to {collective}, pick an existing payment method or add a new one."
+              id="sEJpMg"
               values={{
                 amountAndInterval: (
                   <Span fontWeight="bold">
@@ -569,6 +570,7 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
           ) : (
             <FormattedMessage
               defaultMessage="Pick an existing payment method or add a new one for your {amountAndInterval} contribution to {collective}."
+              id="JYTV+i"
               values={{
                 amountAndInterval: (
                   <Span fontWeight="bold">

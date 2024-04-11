@@ -12,6 +12,7 @@ import { TransactionReportRowLabel } from './TransactionRowLabel';
 const legacyColumnHelpMessage = defineMessage({
   defaultMessage:
     'This amount is included in the originating transactions above. As of {date} {kind, select, HOST_FEE_SHARE {Platform fees} PAYMENT_PROCESSOR_FEE {Payment processor fees} HOST_FEE {Host fees} TAX {Taxes} other {these}} are split into their own transaction kind.',
+  id: 'YDaVYt',
 });
 
 const legacyColumns = [

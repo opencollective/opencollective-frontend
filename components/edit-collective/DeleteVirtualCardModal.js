@@ -48,6 +48,7 @@ const DeleteVirtualCardModal = ({ virtualCard, onSuccess, onClose, onDeleteRefet
           message: (
             <FormattedMessage
               defaultMessage="Error deleting virtual card: {error}"
+              id="qYxNsK"
               values={{
                 error: e.message,
               }}
@@ -56,7 +57,7 @@ const DeleteVirtualCardModal = ({ virtualCard, onSuccess, onClose, onDeleteRefet
         });
         return;
       }
-      onSuccess?.(<FormattedMessage defaultMessage="Card successfully deleted" />);
+      onSuccess?.(<FormattedMessage defaultMessage="Card successfully deleted" id="+RvjCt" />);
       handleClose();
     },
   });
@@ -69,11 +70,14 @@ const DeleteVirtualCardModal = ({ virtualCard, onSuccess, onClose, onDeleteRefet
     <StyledModal width="382px" onClose={handleClose} trapFocus {...modalProps}>
       <form onSubmit={formik.handleSubmit}>
         <ModalHeader onClose={handleClose}>
-          <FormattedMessage defaultMessage="Delete virtual card" />
+          <FormattedMessage defaultMessage="Delete virtual card" id="7nrRJ/" />
         </ModalHeader>
         <ModalBody pt={2}>
           <P>
-            <FormattedMessage defaultMessage="You are about to delete the virtual card, are you sure you want to continue ?" />
+            <FormattedMessage
+              defaultMessage="You are about to delete the virtual card, are you sure you want to continue ?"
+              id="TffQlZ"
+            />
           </P>
         </ModalBody>
         <ModalFooter isFullWidth>

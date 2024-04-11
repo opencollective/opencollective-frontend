@@ -48,7 +48,7 @@ const ExpenseRecurringEditModal = ({ onClose, expense }) => {
       await deleteExpense({ variables: { expense: pick(expense, ['id']) } });
       toast({
         variant: 'success',
-        message: intl.formatMessage({ defaultMessage: 'Expense deleted' }),
+        message: intl.formatMessage({ defaultMessage: 'Expense deleted', id: 'KYXMJ6' }),
       });
       router.push(getCollectivePageRoute(expense.account));
       onClose();

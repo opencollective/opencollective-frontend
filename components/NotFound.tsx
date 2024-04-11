@@ -19,10 +19,10 @@ const NotFound = ({ searchTerm, showAltLinks = true }: NotFoundProps) => {
     <Flex data-cy="not-found" flexDirection="column" alignItems="center" p={2}>
       <Image src="/static/images/not-found-illustration.png" alt="404" width={302} height={302} />
       <H1 textAlign="center" mt={3} fontSize="40px" fontWeight="700">
-        <FormattedMessage defaultMessage="Oops! Page not found" />
+        <FormattedMessage defaultMessage="Oops! Page not found" id="N7DKaT" />
       </H1>
       <P my="24px" fontSize="20px" fontWeight="500" color="black.800" textAlign="center">
-        <FormattedMessage defaultMessage="We can't seem to find the page you are looking for" />
+        <FormattedMessage defaultMessage="We can't seem to find the page you are looking for" id="BbiuM/" />
       </P>
 
       {searchTerm ? (
@@ -43,7 +43,7 @@ const NotFound = ({ searchTerm, showAltLinks = true }: NotFoundProps) => {
       ) : showAltLinks ? (
         <Box>
           <P fontSize="16px" fontWeight="500" color="black.800" mb="16px">
-            <FormattedMessage defaultMessage="Here are some helpful links instead:" />
+            <FormattedMessage defaultMessage="Here are some helpful links instead:" id="UTSapC" />
           </P>
           <ErrorFallbackLinks />
         </Box>

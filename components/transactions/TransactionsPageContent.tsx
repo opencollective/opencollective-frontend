@@ -199,7 +199,7 @@ const Transactions = ({
         </h1>
         <div className="w-[276px] flex-grow sm:flex-grow-0">
           <SearchBar
-            placeholder={intl.formatMessage({ defaultMessage: 'Search transactions…' })}
+            placeholder={intl.formatMessage({ defaultMessage: 'Search transactions…', id: 'tTmMmK' })}
             defaultValue={router.query.searchTerm}
             height="40px"
             onSubmit={searchTerm => updateFilters({ searchTerm, offset: null })}

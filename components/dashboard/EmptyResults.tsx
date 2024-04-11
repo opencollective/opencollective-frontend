@@ -69,7 +69,7 @@ export function EmptyResults({
             >
               <RotateCcw size={16} />
               <span>
-                <FormattedMessage defaultMessage="Reset filters" />
+                <FormattedMessage defaultMessage="Reset filters" id="jZ0o74" />
               </span>
             </Button>
           )}

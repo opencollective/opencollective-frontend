@@ -157,7 +157,11 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
       <CollectiveModalHeader
         collective={order.toAccount}
         customText={
-          <FormattedMessage defaultMessage="Confirm contribution to {payee}" values={{ payee: order.toAccount.name }} />
+          <FormattedMessage
+            defaultMessage="Confirm contribution to {payee}"
+            id="nvYvGO"
+            values={{ payee: order.toAccount.name }}
+          />
         }
       />
       <form
@@ -193,7 +197,7 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
             });
             toast({
               variant: 'success',
-              message: intl.formatMessage({ defaultMessage: 'Contribution confirmed successfully' }),
+              message: intl.formatMessage({ defaultMessage: 'Contribution confirmed successfully', id: 'Khmjkh' }),
             });
             onSuccess?.();
             onClose();
@@ -204,13 +208,17 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
       >
         <ModalBody>
           <P mt={3} fontSize="13px">
-            <FormattedMessage defaultMessage="Confirm the amount of funds you have received in your host account." />
+            <FormattedMessage
+              defaultMessage="Confirm the amount of funds you have received in your host account."
+              id="o9RoEi"
+            />
           </P>
           <Container mt={4}>
             <Flex justifyContent="space-between" alignItems={['left', 'center']} flexDirection={['column', 'row']}>
               <Span fontSize="14px" lineHeight="20px" fontWeight="700">
                 <FormattedMessage
                   defaultMessage="Amount initiated by {contributor}"
+                  id="aQgOGz"
                   values={{ contributor: order.fromAccount.name }}
                 />
               </Span>
@@ -223,7 +231,7 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
           <Container>
             <Flex justifyContent="space-between" alignItems={['left', 'center']} flexDirection={['column', 'row']}>
               <Label fontSize="14px" lineHeight="20px" fontWeight="400" htmlFor="confirmContribution-amountReceived">
-                <FormattedMessage defaultMessage="Amount received" />
+                <FormattedMessage defaultMessage="Amount received" id="u6JRVj" />
               </Label>
               {/* @ts-ignore StyledInputAmount not typed yet */}
               <StyledInputAmount
@@ -260,7 +268,7 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
           <Container>
             <Flex justifyContent="space-between" alignItems={['left', 'center']} flexDirection={['column', 'row']}>
               <Label fontSize="14px" lineHeight="20px" fontWeight="400" htmlFor="confirmContribution-platformTip">
-                <FormattedMessage defaultMessage="Platform tip amount" />
+                <FormattedMessage defaultMessage="Platform tip amount" id="Ng5BqM" />
               </Label>
               {/* @ts-ignore StyledInputAmount not typed yet */}
               <StyledInputAmount
@@ -284,6 +292,7 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
                   <Label fontSize="14px" lineHeight="20px" fontWeight="400" htmlFor="confirmContribution-taxRate">
                     <FormattedMessage
                       defaultMessage="{taxName} rate"
+                      id="Gsyrfa"
                       values={{ taxName: i18nTaxType(intl, order.tax?.type || applicableTax, 'full') }}
                     />
                   </Label>
@@ -322,11 +331,14 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
             <Flex justifyContent="space-between" alignItems={['left', 'center']} flexDirection={['column', 'row']}>
               <Label fontSize="14px" lineHeight="20px" fontWeight="400" htmlFor="confirmContribution-processedAt">
                 <span>
-                  <FormattedMessage defaultMessage="Effective Date" />
+                  <FormattedMessage defaultMessage="Effective Date" id="Gh3Obs" />
                   {` `}
                   <StyledTooltip
                     content={() => (
-                      <FormattedMessage defaultMessage="The date funds were cleared on your bank, Wise, PayPal, Stripe or any other external account holding these funds." />
+                      <FormattedMessage
+                        defaultMessage="The date funds were cleared on your bank, Wise, PayPal, Stripe or any other external account holding these funds."
+                        id="s3O6iq"
+                      />
                     )}
                   >
                     <InfoCircle size={16} />
@@ -354,6 +366,7 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
                     item: (
                       <FormattedMessage
                         defaultMessage="Amount for {collective}"
+                        id="z2toxf"
                         values={{ collective: order.toAccount.name }}
                       />
                     ),
@@ -381,6 +394,7 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
                       item: (
                         <FormattedMessage
                           defaultMessage="{service} platform tip"
+                          id="t6u2MU"
                           values={{ service: 'Open Collective' }}
                         />
                       ),
@@ -401,7 +415,7 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
                   <FormattedMessage
                     id="withColon"
                     defaultMessage="{item}:"
-                    values={{ item: <FormattedMessage defaultMessage="Payment Processor Fee" /> }}
+                    values={{ item: <FormattedMessage defaultMessage="Payment Processor Fee" id="pzs6YY" /> }}
                   />
                 </Span>
                 <Box fontSize="14px" lineHeight="24px" fontWeight="700" ml="16px">
@@ -430,7 +444,7 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
                   <FormattedMessage
                     id="withColon"
                     defaultMessage="{item}:"
-                    values={{ item: <FormattedMessage defaultMessage="Host Fee" /> }}
+                    values={{ item: <FormattedMessage defaultMessage="Host Fee" id="NJsELs" /> }}
                   />
                 </Span>
                 <Box fontSize="14px" lineHeight="24px" fontWeight="700" ml="16px">
@@ -447,6 +461,7 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
                     item: (
                       <FormattedMessage
                         defaultMessage="Net Amount for {collective}"
+                        id="DinF1w"
                         values={{ collective: order.toAccount.name }}
                       />
                     ),
@@ -478,7 +493,7 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
               type="submit"
               data-cy="order-confirmation-modal-submit"
             >
-              <FormattedMessage defaultMessage="Confirm contribution" />
+              <FormattedMessage defaultMessage="Confirm contribution" id="k/uy+b" />
             </StyledButton>
           </Container>
         </ModalFooter>

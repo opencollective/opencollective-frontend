@@ -294,7 +294,7 @@ const getTiersOptions = (intl, tiers) => {
   return [
     {
       value: null,
-      label: intl.formatMessage({ defaultMessage: 'No tier' }),
+      label: intl.formatMessage({ defaultMessage: 'No tier', id: 'ozkv/Y' }),
     },
     ...tiers.map(tier => ({
       value: tier,
@@ -504,7 +504,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                     <Field
                       name="tier"
                       htmlFor="addFunds-tier"
-                      label={<FormattedMessage defaultMessage="Tier" />}
+                      label={<FormattedMessage defaultMessage="Tier" id="b07w+D" />}
                       mt={3}
                     >
                       {({ form, field }) => (
@@ -536,9 +536,12 @@ const AddFundsModal = ({ collective, ...props }) => {
                       htmlFor="addFunds-processedAt"
                       inputType="date"
                       hint={
-                        <FormattedMessage defaultMessage="The date funds were cleared on your bank, Wise, PayPal, Stripe or any other external account holding these funds." />
+                        <FormattedMessage
+                          defaultMessage="The date funds were cleared on your bank, Wise, PayPal, Stripe or any other external account holding these funds."
+                          id="s3O6iq"
+                        />
                       }
-                      label={<FormattedMessage defaultMessage="Effective Date" />}
+                      label={<FormattedMessage defaultMessage="Effective Date" id="Gh3Obs" />}
                       mt={3}
                     >
                       {({ field }) => <StyledInput data-cy="add-funds-processedAt" {...field} />}
@@ -574,9 +577,12 @@ const AddFundsModal = ({ collective, ...props }) => {
                       name="memo"
                       htmlFor="addFunds-memo"
                       hint={
-                        <FormattedMessage defaultMessage="This is a private note that will only be visible to the host." />
+                        <FormattedMessage
+                          defaultMessage="This is a private note that will only be visible to the host."
+                          id="znqf9S"
+                        />
                       }
-                      label={<FormattedMessage defaultMessage="Memo" />}
+                      label={<FormattedMessage defaultMessage="Memo" id="D5NqQO" />}
                       required={false}
                       mt={3}
                     >
@@ -610,7 +616,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                           htmlFor="addFunds-hostFeePercent"
                           label={
                             <span>
-                              <FormattedMessage defaultMessage="Host Fee" />
+                              <FormattedMessage defaultMessage="Host Fee" id="NJsELs" />
                               {` `}
                               <StyledTooltip
                                 content={() => (
@@ -650,7 +656,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                           labelProps={{ fontSize: '16px', fontWeight: '700' }}
                           idNumberLabelRenderer={shortTaxTypeLabel =>
                             intl.formatMessage(
-                              { defaultMessage: "Source's {taxName} identifier" },
+                              { defaultMessage: "Source's {taxName} identifier", id: 'TNecsq' },
                               { taxName: shortTaxTypeLabel },
                             )
                           }
@@ -662,7 +668,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                         <Field
                           name="invoiceTemplate"
                           htmlFor="addFunds-invoiceTemplate"
-                          label={<FormattedMessage defaultMessage="Choose receipt" />}
+                          label={<FormattedMessage defaultMessage="Choose receipt" id="cyMx/0" />}
                           mt={3}
                         >
                           {({ form, field }) => (
@@ -701,6 +707,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                           label={
                             <FormattedMessage
                               defaultMessage="Gross amount without {taxName}"
+                              id="dcUpWf"
                               values={{ taxName: i18nTaxType(intl, values.tax.type, 'short') }}
                             />
                           }
@@ -778,6 +785,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                             <li>
                               <FormattedMessage
                                 defaultMessage="Including {amount} {feeType} ({feeRate})"
+                                id="9kR30C"
                                 values={{
                                   amount: (
                                     <FormattedMoneyAmount
@@ -796,6 +804,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                             <li>
                               <FormattedMessage
                                 defaultMessage="Including {amount} {feeType} ({feeRate})"
+                                id="9kR30C"
                                 values={{
                                   amount: (
                                     <FormattedMoneyAmount
@@ -825,7 +834,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                           </li>
                           {fundDetails.memo && (
                             <li>
-                              <FormattedMessage defaultMessage="Memo" />
+                              <FormattedMessage defaultMessage="Memo" id="D5NqQO" />
                               {': '}
                               <strong>{fundDetails.memo}</strong>
                             </li>
@@ -841,7 +850,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                           )}
                           {fundDetails.tier && (
                             <li>
-                              <FormattedMessage defaultMessage="For the tier" />{' '}
+                              <FormattedMessage defaultMessage="For the tier" id="h+1vQB" />{' '}
                               <StyledLink
                                 as={Link}
                                 openInNewTab

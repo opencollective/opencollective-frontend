@@ -65,7 +65,7 @@ const TransactionRejectModal = ({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
-            <FormattedMessage defaultMessage="Are you sure you want to reject this transaction?" />
+            <FormattedMessage defaultMessage="Are you sure you want to reject this transaction?" id="fbcrkY" />
           </AlertDialogTitle>
           <AlertDialogDescription>
             <FormattedMessage

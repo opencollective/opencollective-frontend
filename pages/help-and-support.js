@@ -19,6 +19,7 @@ import StyledLink from '../components/StyledLink';
 const messages = defineMessages({
   pageTitle: {
     defaultMessage: 'Help & Support',
+    id: 'Uf3+S6',
   },
   defaultTitle: {
     id: 'OC.helpAndSupport',

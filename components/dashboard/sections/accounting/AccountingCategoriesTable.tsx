@@ -30,7 +30,9 @@ const columns = [
   },
   {
     accessorKey: 'name',
-    header: () => <FormattedMessage defaultMessage="Name <i>· Friendly name</i>" values={{ i: I18nItalic }} />,
+    header: () => (
+      <FormattedMessage defaultMessage="Name <i>· Friendly name</i>" id="5xKiMX" values={{ i: I18nItalic }} />
+    ),
     meta: { input: { required: true, maxLength: 255 } },
     cell: ({ cell, row }) => {
       return (
@@ -45,21 +47,25 @@ const columns = [
   },
   {
     accessorKey: 'hostOnly',
-    header: () => <FormattedMessage defaultMessage="Host Only" />,
+    header: () => <FormattedMessage defaultMessage="Host Only" id="JyVOGj" />,
     cell: ({ cell }) => {
-      return cell.getValue() ? <FormattedMessage defaultMessage="Yes" /> : <FormattedMessage defaultMessage="No" />;
+      return cell.getValue() ? (
+        <FormattedMessage defaultMessage="Yes" id="a5msuh" />
+      ) : (
+        <FormattedMessage defaultMessage="No" id="oUWADl" />
+      );
     },
   },
   {
     accessorKey: 'kind',
-    header: () => <FormattedMessage defaultMessage="Applies to" />,
+    header: () => <FormattedMessage defaultMessage="Applies to" id="6WqHWi" />,
     cell: ({ cell }) => {
       return <FormattedMessage {...AccountingCategoryKindI18n[cell.getValue()]} />;
     },
   },
   {
     accessorKey: 'expensesTypes',
-    header: () => <FormattedMessage defaultMessage="Expense types" />,
+    header: () => <FormattedMessage defaultMessage="Expense types" id="7oAuzt" />,
     cell: ({ cell, row }) => {
       function CellContent() {
         const intl = useIntl();
@@ -131,8 +137,8 @@ export function AccountingCategoriesTable(props: AccountingCategoriesTableProps)
         data={props.accountingCategories}
         emptyMessage={
           props.isFiltered
-            ? () => <FormattedMessage defaultMessage="No chart of accounts found" />
-            : () => <FormattedMessage defaultMessage="No chart of accounts" />
+            ? () => <FormattedMessage defaultMessage="No chart of accounts found" id="9DNi/v" />
+            : () => <FormattedMessage defaultMessage="No chart of accounts" id="dSDEnR" />
         }
         meta={
           {

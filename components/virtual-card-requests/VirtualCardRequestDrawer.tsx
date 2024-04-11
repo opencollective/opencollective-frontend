@@ -194,7 +194,7 @@ export function VirtualCardRequestDrawer(props: VirtualCardRequestDrawerProps) {
 
             <InfoList className="sm:grid-cols-2">
               <InfoListItem
-                title={<FormattedMessage defaultMessage="Account" />}
+                title={<FormattedMessage defaultMessage="Account" id="TwyMau" />}
                 value={
                   <LinkCollective
                     collective={virtualCardRequest.account}
@@ -206,7 +206,7 @@ export function VirtualCardRequestDrawer(props: VirtualCardRequestDrawerProps) {
                 }
               />
               <InfoListItem
-                title={<FormattedMessage defaultMessage="Assigned to" />}
+                title={<FormattedMessage defaultMessage="Assigned to" id="ONVN5F" />}
                 value={
                   <LinkCollective
                     collective={virtualCardRequest.assignee}

@@ -68,15 +68,13 @@ class SendingMoney extends React.Component {
         {!services.includes('paypal') && (
           <Fragment>
             <SettingsSectionTitle>
-              <FormattedMessage id="PayoutMethod.Type.Paypal" defaultMessage={'PayPal'} />
+              <FormattedMessage id="PayoutMethod.Type.Paypal" defaultMessage="PayPal" />
             </SettingsSectionTitle>
             {!this.props.collective.settings?.disablePaypalPayouts && (
               <P mb={3}>
                 <FormattedMessage
                   id="collective.sendMoney.paypalEnabled.description"
-                  defaultMessage={
-                    'PayPal Payouts are active. Contributors can request Expenses to be paid with PayPal.'
-                  }
+                  defaultMessage="PayPal Payouts are active. Contributors can request Expenses to be paid with PayPal."
                 />
               </P>
             )}
@@ -84,9 +82,7 @@ class SendingMoney extends React.Component {
               <P mb={3}>
                 <FormattedMessage
                   id="collective.sendMoney.paypalDisabled.description"
-                  defaultMessage={
-                    'PayPal Payouts are disabled. Contributors are not able to request Expenses to be paid with PayPal.'
-                  }
+                  defaultMessage="PayPal Payouts are disabled. Contributors are not able to request Expenses to be paid with PayPal."
                 />
               </P>
             )}

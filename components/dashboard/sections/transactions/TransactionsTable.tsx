@@ -82,7 +82,7 @@ const cols = {
   },
   account: {
     accessorKey: 'account',
-    header: () => <FormattedMessage defaultMessage="Account" />,
+    header: () => <FormattedMessage defaultMessage="Account" id="TwyMau" />,
     meta: { className: 'w-32 2xl:w-48' },
     cell: ({ cell }) => {
       const account = cell.getValue() as Transaction['account'];
@@ -102,7 +102,7 @@ const cols = {
   },
   oppositeAccount: {
     accessorKey: 'oppositeAccount',
-    header: () => <FormattedMessage defaultMessage="Opposite account" />,
+    header: () => <FormattedMessage defaultMessage="Opposite account" id="rcVYFz" />,
     meta: { className: 'w-32 2xl:w-48' },
     cell: ({ cell }) => {
       const account = cell.getValue() as Transaction['oppositeAccount'];
@@ -121,7 +121,7 @@ const cols = {
   },
   toFromAccount: {
     accessorKey: 'oppositeAccount',
-    header: () => <FormattedMessage defaultMessage="Recipient/Sender" />,
+    header: () => <FormattedMessage defaultMessage="Recipient/Sender" id="YT2bNN" />,
     meta: { className: 'w-48' },
     cell: ({ cell, row }) => {
       const account = cell.getValue() as Transaction['oppositeAccount'];
@@ -165,7 +165,7 @@ const cols = {
             {isRefunded && !isOrderRejected && (
               <Badge size="xs" type={'warning'} className="items-center  gap-1">
                 <Undo size={12} />
-                <FormattedMessage defaultMessage="Refunded" />
+                <FormattedMessage defaultMessage="Refunded" id="Gs86nL" />
               </Badge>
             )}
             {isRefund && (
@@ -176,13 +176,13 @@ const cols = {
             {isDisputed && (
               <Badge size="xs" type={'error'} className="items-center gap-1">
                 <AlertTriangle size={12} />
-                <FormattedMessage defaultMessage="Disputed" />
+                <FormattedMessage defaultMessage="Disputed" id="X1pwhF" />
               </Badge>
             )}
             {isOrderRejected && isRefunded && (
               <Badge size="xs" type={'error'} className="items-center gap-1">
                 <AlertTriangle size={12} />
-                <FormattedMessage defaultMessage="Rejected" />
+                <FormattedMessage defaultMessage="Rejected" id="5qaD7s" />
               </Badge>
             )}
             {isInReview && (
@@ -198,7 +198,7 @@ const cols = {
   },
   netAmount: {
     accessorKey: 'netAmount',
-    header: () => <FormattedMessage defaultMessage="Net Amount" />,
+    header: () => <FormattedMessage defaultMessage="Net Amount" id="FxUka3" />,
     meta: { className: 'w-28 text-right' },
     cell: ({ cell, row }) => {
       const netAmount = cell.getValue() as Transaction['netAmount'];
@@ -249,7 +249,7 @@ const cols = {
 
             <DropdownMenuContent align="end">
               <DropdownMenuItem className="gap-2">
-                <FormattedMessage defaultMessage="View details" />
+                <FormattedMessage defaultMessage="View details" id="MnpUD7" />
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

@@ -209,7 +209,7 @@ const ExportTransactionsCSVModal = ({
         <Grid mt={3} gridGap={2} gridTemplateColumns={`1fr 1fr`} display={['block', 'grid']}>
           <Box>
             <StyledInputField
-              label={<FormattedMessage defaultMessage="Date range" />}
+              label={<FormattedMessage defaultMessage="Date range" id="tygEJX" />}
               labelFontWeight="700"
               labelProps={{ fontWeight: 'bold', fontSize: '16px' }}
               name="datePresets"
@@ -239,7 +239,7 @@ const ExportTransactionsCSVModal = ({
           />
 
           <StyledInputField
-            label={<FormattedMessage defaultMessage="Exported Fields" />}
+            label={<FormattedMessage defaultMessage="Exported Fields" id="Zeba/M" />}
             labelFontWeight="700"
             labelProps={{ fontWeight: 'bold', fontSize: '16px' }}
             name="fieldOptions"
@@ -310,10 +310,10 @@ const ExportTransactionsCSVModal = ({
           <div className="mt-4 flex flex-row items-center justify-between rounded-lg border p-4">
             <div className="space-y-0.5">
               <Label className="text-base">
-                <FormattedMessage defaultMessage="Separate transactions compatibility" />
+                <FormattedMessage defaultMessage="Separate transactions compatibility" id="XriXXG" />
               </Label>
               <p className="text-sm text-muted-foreground">
-                <FormattedMessage defaultMessage="Export taxes and payment processor fees as columns" />
+                <FormattedMessage defaultMessage="Export taxes and payment processor fees as columns" id="ZNzyMo" />
               </p>
             </div>
             <Switch

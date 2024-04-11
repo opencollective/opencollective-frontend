@@ -273,7 +273,7 @@ class EditCollectiveForm extends React.Component {
         id: 'event.privateInstructions.description',
         defaultMessage: 'These instructions will be provided by email to the participants.',
       },
-      inValidDateError: { defaultMessage: 'Please enter a valid date' },
+      inValidDateError: { defaultMessage: 'Please enter a valid date', id: '6DCLcI' },
     });
 
     collective.backgroundImage = collective.backgroundImage || defaultBackgroundImage[collective.type];
@@ -888,7 +888,7 @@ class EditCollectiveForm extends React.Component {
                       isEvent ? `/${collective.parentCollective.slug}/events/${collective.slug}` : `/${collective.slug}`
                     }
                   >
-                    <FormattedMessage defaultMessage="View profile page" />
+                    <FormattedMessage defaultMessage="View profile page" id="QxN1ZU" />
                   </Link>
                 </Container>
               </Container>

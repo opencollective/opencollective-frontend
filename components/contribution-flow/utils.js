@@ -203,6 +203,7 @@ export const generatePaymentMethodOptions = (
       const title = (
         <FormattedMessage
           defaultMessage="New payment method: {methods}"
+          id="jwtunf"
           values={{ methods: availableMethodLabels.join(', ') }}
         />
       );
@@ -271,7 +272,7 @@ export const generatePaymentMethodOptions = (
       uniquePMs.push({
         key: 'manual',
         title: get(collective, 'host.settings.paymentMethods.manual.title', null) || (
-          <FormattedMessage defaultMessage="Bank transfer (manual)" />
+          <FormattedMessage defaultMessage="Bank transfer (manual)" id="ycoJnS" />
         ),
         paymentMethod: {
           service: PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE,

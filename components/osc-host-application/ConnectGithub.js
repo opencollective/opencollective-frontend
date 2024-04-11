@@ -108,6 +108,7 @@ class ConnectGithub extends React.Component {
               <P fontSize="16px" lineHeight="24px" fontWeight="500" color="black.700">
                 <FormattedMessage
                   defaultMessage="Want to apply using an <AltVerificationLink>alternative verification criteria</AltVerificationLink>? <ApplyLink>Click here</ApplyLink>."
+                  id="kwIdJS"
                   values={{
                     ApplyLink: getI18nLink({
                       as: Link,

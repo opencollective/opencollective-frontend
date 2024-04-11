@@ -211,7 +211,7 @@ class RedeemedPage extends React.Component {
 
               <Link href="/search">
                 <StyledButton buttonStyle="primary" buttonSize="large" my={5}>
-                  <FormattedMessage defaultMessage="Discover Collectives to Support" />
+                  <FormattedMessage defaultMessage="Discover Collectives to Support" id="WM71Ho" />
                 </StyledButton>
               </Link>
             </Flex>

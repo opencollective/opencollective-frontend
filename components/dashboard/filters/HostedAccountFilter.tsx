@@ -75,7 +75,7 @@ export const hostedAccountFilter: FilterConfig<z.infer<typeof schema>> = {
   schema,
   toVariables: (value, key) => ({ [key]: { slug: value } }),
   filter: {
-    labelMsg: defineMessage({ defaultMessage: 'Account' }),
+    labelMsg: defineMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
     Component: HostedAccountFilter,
     valueRenderer: ({ value, ...props }) => <AccountRenderer account={{ slug: value }} {...props} />,
   },

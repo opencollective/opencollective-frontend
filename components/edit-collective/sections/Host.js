@@ -213,7 +213,7 @@ class Host extends React.Component {
           ) : (
             <div>
               <h2 className="mb-2 mt-8 text-base font-bold">
-                <FormattedMessage defaultMessage="Current fiscal host" />
+                <FormattedMessage defaultMessage="Current fiscal host" id="HPViRL" />
               </h2>
               <div className="flex justify-between gap-4 rounded-lg border border-gray-300 p-4">
                 {/** Host info */}
@@ -242,6 +242,7 @@ class Host extends React.Component {
                       <span>
                         <FormattedMessage
                           defaultMessage="Host currency: {currency}"
+                          id="fPQ9XL"
                           values={{ currency: collective.host.currency }}
                         />
                       </span>
@@ -261,6 +262,7 @@ class Host extends React.Component {
                       <p className="text-sm">
                         <FormattedMessage
                           defaultMessage="Including {eventsCount, plural, zero {} one {one event} other {# events}}{both, select, true { and } other {}}{projectsCount, plural, zero {} one {one project} other {# projects}}"
+                          id="WR7z/n"
                           values={{
                             eventsCount: additionalInfo.account.events.totalCount,
                             projectsCount: additionalInfo.account.projects.totalCount,
@@ -414,7 +416,7 @@ class Host extends React.Component {
             </Box>
             <Box mb={4}>
               <OptionLabel htmlFor="host-radio-noHost">
-                <FormattedMessage defaultMessage="No one" />
+                <FormattedMessage defaultMessage="No one" id="tcxpLX" />
               </OptionLabel>
               <FormattedMessage
                 id="collective.edit.host.noHost.description"
@@ -549,7 +551,7 @@ class Host extends React.Component {
                       fontSize="13px"
                       href={`${collective.slug}/accept-financial-contributions/host`}
                     >
-                      <FormattedMessage defaultMessage="Choose a Fiscal Host" />
+                      <FormattedMessage defaultMessage="Choose a Fiscal Host" id="j4X/+l" />
                     </StyledLink>
                   </Container>
                 </div>

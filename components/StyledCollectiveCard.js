@@ -205,7 +205,9 @@ const StyledCollectiveCard = ({
               )}
               {collective.isFrozen ? (
                 <StyledTag display="inline-block" variant="rounded-right">
-                  <I18nCollectiveTags tags={intl.formatMessage({ defaultMessage: 'This Collective is frozen' })} />
+                  <I18nCollectiveTags
+                    tags={intl.formatMessage({ defaultMessage: 'This Collective is frozen', id: 'gDbURz' })}
+                  />
                 </StyledTag>
               ) : tag === undefined ? (
                 <StyledTag display="inline-block" variant="rounded-right">

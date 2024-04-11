@@ -36,7 +36,7 @@ export function ExpenseInfoForm(props: ExpenseInfoFormProps) {
   return (
     <div>
       <h1 className="mb-4 text-lg font-bold leading-[26px] text-dark-900">
-        <FormattedMessage defaultMessage="Expense details" />
+        <FormattedMessage defaultMessage="Expense details" id="AFIpJd" />
       </h1>
       <p className="text-xs text-slate-700">
         <FormattedMessage
@@ -51,7 +51,7 @@ export function ExpenseInfoForm(props: ExpenseInfoFormProps) {
           labelColor="slate.800"
           labelFontSize="16px"
           labelProps={{ my: 2, letterSpacing: 0 }}
-          label={<FormattedMessage defaultMessage="Expense Title" />}
+          label={<FormattedMessage defaultMessage="Expense Title" id="E0WDTk" />}
         >
           {({ field }) => (
             <StyledInput
@@ -73,7 +73,7 @@ export function ExpenseInfoForm(props: ExpenseInfoFormProps) {
               labelColor="slate.800"
               labelFontSize="16px"
               labelProps={{ my: 2, letterSpacing: 0 }}
-              label={<FormattedMessage defaultMessage="Expense Category" />}
+              label={<FormattedMessage defaultMessage="Expense Category" id="38dzz9" />}
             >
               {() => (
                 <AccountingCategorySelect
@@ -93,7 +93,7 @@ export function ExpenseInfoForm(props: ExpenseInfoFormProps) {
           {selectedCategory?.instructions && (
             <React.Fragment>
               <h2 className="mb-2 mt-4 text-base font-bold leading-6 text-slate-800">
-                <FormattedMessage defaultMessage="Account Category Instructions" />
+                <FormattedMessage defaultMessage="Account Category Instructions" id="+t6c4i" />
               </h2>
 
               <div>

@@ -105,7 +105,10 @@ const i18nTaxRate = (intl: IntlShape, taxType: TaxType, rate: number) => {
   if (rate) {
     return `${rate * 100}%`;
   } else {
-    return intl.formatMessage({ defaultMessage: 'No {taxName}' }, { taxName: i18nTaxType(intl, taxType, 'short') });
+    return intl.formatMessage(
+      { defaultMessage: 'No {taxName}', id: 'lTGBvW' },
+      { taxName: i18nTaxType(intl, taxType, 'short') },
+    );
   }
 };
 
@@ -151,7 +154,7 @@ export const TaxesFormikFields = ({
       <StyledInputFormikField
         name={`${formikValuePath}.rate`}
         htmlFor={`input-${taxType}-rate`}
-        label={intl.formatMessage({ defaultMessage: '{taxName} rate' }, { taxName: shortTaxTypeLabel })}
+        label={intl.formatMessage({ defaultMessage: '{taxName} rate', id: 'Gsyrfa' }, { taxName: shortTaxTypeLabel })}
         labelProps={{ whiteSpace: 'nowrap', ...labelProps }}
         inputType="number"
         required={!isOptional}
@@ -188,7 +191,10 @@ export const TaxesFormikFields = ({
         label={
           idNumberLabelRenderer
             ? idNumberLabelRenderer(shortTaxTypeLabel)
-            : intl.formatMessage({ defaultMessage: '{taxName} identifier' }, { taxName: shortTaxTypeLabel })
+            : intl.formatMessage(
+                { defaultMessage: '{taxName} identifier', id: 'Byg+S/' },
+                { taxName: shortTaxTypeLabel },
+              )
         }
         labelProps={{ whiteSpace: 'nowrap', ...labelProps }}
         required={!isOptional && taxSpecificValues.requireIdNumber}

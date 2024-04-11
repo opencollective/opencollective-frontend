@@ -264,7 +264,7 @@ export default function FilesViewerModal({
             <StyledTooltip
               containerCursor="pointer"
               noArrow
-              content={intl.formatMessage({ defaultMessage: 'Open in new window' })}
+              content={intl.formatMessage({ defaultMessage: 'Open in new window', id: 'b2Wfwm' })}
               delayHide={0}
             >
               <ButtonLink href={selectedItem?.url} target="_blank">

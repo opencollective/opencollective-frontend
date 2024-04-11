@@ -85,7 +85,7 @@ const MoreFeatures = () => (
               defaultMessage="Discover your Open Source dependencies and support them."
             />
             <StyledLink href="https://backyourstack.com" color="rgb(220, 95, 125)">
-              <FormattedMessage defaultMessage="Learn more" /> <ArrowRight2 size="18" />
+              <FormattedMessage defaultMessage="Learn more" id="TdTXXf" /> <ArrowRight2 size="18" />
             </StyledLink>
           </P>
         </Box>

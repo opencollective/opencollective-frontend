@@ -254,6 +254,7 @@ export default function EditVirtualCardModal({
           message: (
             <FormattedMessage
               defaultMessage="Error submiting form: {error}"
+              id="FAV3Ng"
               values={{
                 error: e.message,
               }}
@@ -263,7 +264,7 @@ export default function EditVirtualCardModal({
         return;
       }
 
-      onSuccess?.(<FormattedMessage defaultMessage="Card successfully updated" />);
+      onSuccess?.(<FormattedMessage defaultMessage="Card successfully updated" id="Nd9ioQ" />);
       handleClose();
     },
     validate(values: any) {
@@ -337,17 +338,23 @@ export default function EditVirtualCardModal({
       <form onSubmit={formik.handleSubmit}>
         <ModalHeader onClose={handleClose} hideCloseIcon={false}>
           {isEditing ? (
-            <FormattedMessage defaultMessage="Edit virtual card" />
+            <FormattedMessage defaultMessage="Edit virtual card" id="TtzWuE" />
           ) : (
-            <FormattedMessage defaultMessage="Create virtual card" />
+            <FormattedMessage defaultMessage="Create virtual card" id="FRM4fb" />
           )}
         </ModalHeader>
         <ModalBody pt={2}>
           <P>
             {isEditing ? (
-              <FormattedMessage defaultMessage="Edit virtual card for a collective with the information below." />
+              <FormattedMessage
+                defaultMessage="Edit virtual card for a collective with the information below."
+                id="9nfFQ7"
+              />
             ) : (
-              <FormattedMessage defaultMessage="Create virtual card for a collective with the information below." />
+              <FormattedMessage
+                defaultMessage="Create virtual card for a collective with the information below."
+                id="NW8fj9"
+              />
             )}
           </P>
           <StyledHr borderColor="black.300" mt={3} />
@@ -358,7 +365,9 @@ export default function EditVirtualCardModal({
                   mb={3}
                   labelFontSize="13px"
                   labelFontWeight="bold"
-                  label={<FormattedMessage defaultMessage="Which collective will be assigned to this card?" />}
+                  label={
+                    <FormattedMessage defaultMessage="Which collective will be assigned to this card?" id="goAEwY" />
+                  }
                   htmlFor="collective"
                   error={formik.touched.collective && formik.errors.collective}
                 >
@@ -397,6 +406,7 @@ export default function EditVirtualCardModal({
                     >
                       <FormattedMessage
                         defaultMessage="This collective already has {allCardsCount} other cards assigned to it. {missingReceiptsCardsCount, plural, =0 {} other {# of the {allCardsCount} cards have missing receipts.}}"
+                        id="Ox+jio"
                         values={{
                           allCardsCount: virtualCardsAssignedToCollectiveData.host.allCards.totalCount,
                           missingReceiptsCardsCount:
@@ -407,7 +417,7 @@ export default function EditVirtualCardModal({
                         <StyledLink
                           href={`/dashboard/${host.slug}/host-virtual-cards?collective=${formik.values?.collective?.slug}`}
                         >
-                          <FormattedMessage defaultMessage="View Assigned Cards" />
+                          <FormattedMessage defaultMessage="View Assigned Cards" id="PO4Kx4" />
                         </StyledLink>
                       </Box>
                     </MessageBox>
@@ -418,7 +428,7 @@ export default function EditVirtualCardModal({
             <StyledInputField
               labelFontSize="13px"
               labelFontWeight="bold"
-              label={<FormattedMessage defaultMessage="Who is this card assigned to?" />}
+              label={<FormattedMessage defaultMessage="Who is this card assigned to?" id="agYvVC" />}
               htmlFor="assignee"
               error={formik.touched.assignee && formik.errors.assignee}
             >
@@ -440,7 +450,7 @@ export default function EditVirtualCardModal({
               mt={3}
               labelFontWeight="bold"
               labelFontSize="13px"
-              label={<FormattedMessage defaultMessage="Card name" />}
+              label={<FormattedMessage defaultMessage="Card name" id="8oufoc" />}
               htmlFor="cardName"
               error={formik.touched.cardName && formik.errors.cardName}
             >
@@ -449,7 +459,7 @@ export default function EditVirtualCardModal({
                   {...inputProps}
                   name="cardName"
                   id="cardName"
-                  placeholder={intl.formatMessage({ defaultMessage: 'e.g Card for Subscription' })}
+                  placeholder={intl.formatMessage({ defaultMessage: 'e.g Card for Subscription', id: 'vREsbj' })}
                   onChange={formik.handleChange}
                   value={formik.values.cardName}
                   disabled={isBusy}
@@ -468,6 +478,7 @@ export default function EditVirtualCardModal({
                     label={
                       <FormattedMessage
                         defaultMessage="Limit Interval <link>(Read More)</link>"
+                        id="vV7hmB"
                         values={{
                           link: getI18nLink({
                             as: Link,
@@ -497,7 +508,7 @@ export default function EditVirtualCardModal({
                     ml={3}
                     labelFontSize="13px"
                     labelFontWeight="bold"
-                    label={<FormattedMessage defaultMessage="Card Limit" />}
+                    label={<FormattedMessage defaultMessage="Card Limit" id="ehbxf1" />}
                     htmlFor="limitAmount"
                   >
                     {inputProps => (
@@ -550,7 +561,7 @@ export default function EditVirtualCardModal({
               {isEditing ? (
                 <FormattedMessage id="actions.update" defaultMessage="Update" />
               ) : (
-                <FormattedMessage defaultMessage="Create virtual card" />
+                <FormattedMessage defaultMessage="Create virtual card" id="FRM4fb" />
               )}
             </StyledButton>
           </Flex>

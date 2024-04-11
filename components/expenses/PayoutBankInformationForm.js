@@ -506,6 +506,7 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
       <MessageBox fontSize="12px" type="warning">
         <FormattedMessage
           defaultMessage="An error occurred while preparing the form for bank accounts. Please contact <I18nSupportLink>support</I18nSupportLink>"
+          id="fCWfnb"
           values={{ I18nSupportLink }}
         />
       </MessageBox>
@@ -539,6 +540,7 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
           {
             defaultMessage:
               'The minimum amount for transferring to {selectedCurrency} is {minAmountForSelectedCurrency}',
+            id: 'AzGwgz',
           },
           {
             selectedCurrency,

@@ -67,15 +67,17 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
   return (
     <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader
-        title={<FormattedMessage defaultMessage="Submitted Expenses" />}
-        description={<FormattedMessage defaultMessage="Expenses that you have submitted to other Collectives." />}
+        title={<FormattedMessage defaultMessage="Submitted Expenses" id="NpGb+x" />}
+        description={
+          <FormattedMessage defaultMessage="Expenses that you have submitted to other Collectives." id="aKfm6V" />
+        }
         actions={
           hasNewSubmitExpenseFlow ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button size="sm" className="gap-1">
                   <span>
-                    <FormattedMessage defaultMessage="New expense" />
+                    <FormattedMessage defaultMessage="New expense" id="pNn/g+" />
                   </span>
                   <ChevronDown size={20} />
                 </Button>
@@ -83,12 +85,12 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
               <DropdownMenuContent align="start">
                 <DropdownMenuItem>
                   <Link href={`/dashboard/${accountSlug}/expenses/new`}>
-                    <FormattedMessage defaultMessage="Submit invoice for myself" />
+                    <FormattedMessage defaultMessage="Submit invoice for myself" id="WXB0Cj" />
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <Link href={`/dashboard/${accountSlug}/expenses/new?invite=true`}>
-                    <FormattedMessage defaultMessage="Invite someone to submit an invoice" />
+                    <FormattedMessage defaultMessage="Invite someone to submit an invoice" id="LLRD45" />
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>

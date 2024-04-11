@@ -44,13 +44,18 @@ const TaxFormLinkModal = ({ account, year, onClose, refetchExpense }) => {
     <StyledModal role="alertdialog" width="578px" onClose={onClose} trapFocus>
       <ModalHeader>
         <H2 mb={2} fontSize={'28px'}>
-          <FormattedMessage defaultMessage="Tax Form for {accountName}" values={{ accountName: account.name }} />
+          <FormattedMessage
+            defaultMessage="Tax Form for {accountName}"
+            id="UtO/PJ"
+            values={{ accountName: account.name }}
+          />
         </H2>
       </ModalHeader>
       <ModalBody>
         <MessageBox type="info" withIcon>
           <FormattedMessage
             defaultMessage="Please upload the tax form to the <Link>Google Drive Folder</Link>. Copy the link to the file and paste it in the field below."
+            id="P3Tk9A"
             values={{
               Link: getI18nLink({
                 href: 'https://drive.google.com/drive/folders/1ga_-6tBTqADvngRr9nbxRKf7yoSne1n1?usp=share_link',
@@ -63,7 +68,7 @@ const TaxFormLinkModal = ({ account, year, onClose, refetchExpense }) => {
           <StyledInputField
             label={
               <Span fontWeight={700}>
-                <FormattedMessage defaultMessage="Year" />
+                <FormattedMessage defaultMessage="Year" id="IFo1oo" />
               </Span>
             }
             width="100%"
@@ -83,7 +88,7 @@ const TaxFormLinkModal = ({ account, year, onClose, refetchExpense }) => {
           <StyledInputField
             label={
               <Span fontWeight={700}>
-                <FormattedMessage defaultMessage="Tax Form Link" />
+                <FormattedMessage defaultMessage="Tax Form Link" id="Rzah+L" />
               </Span>
             }
             width="100%"
@@ -113,13 +118,13 @@ const TaxFormLinkModal = ({ account, year, onClose, refetchExpense }) => {
                 if (get(result, 'data.setTaxForm.success')) {
                   toast({
                     variant: 'success',
-                    message: <FormattedMessage defaultMessage="Tax form submitted" />,
+                    message: <FormattedMessage defaultMessage="Tax form submitted" id="pj+yxv" />,
                   });
                   await refetchExpense();
                 } else {
                   toast({
                     variant: 'error',
-                    message: <FormattedMessage defaultMessage="Failed to submit the tax form" />,
+                    message: <FormattedMessage defaultMessage="Failed to submit the tax form" id="aip+9Q" />,
                   });
                 }
                 onClose();
@@ -128,7 +133,7 @@ const TaxFormLinkModal = ({ account, year, onClose, refetchExpense }) => {
               }
             }}
           >
-            <FormattedMessage defaultMessage="Submit Tax Form" />
+            <FormattedMessage defaultMessage="Submit Tax Form" id="C3OBjO" />
           </StyledButton>
         </Box>
       </ModalBody>

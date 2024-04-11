@@ -136,6 +136,7 @@ const getInfoItems = (account): InfoItemProps[] => {
       info: (
         <FormattedMessage
           defaultMessage="{childAccountType, select, EVENT {Event} PROJECT {Project} other {Account}} by {parentAccount}"
+          id="bZC/zt"
           values={{
             childAccountType: account.type,
             parentAccount: <Link href={getCollectivePageRoute(account.parent)}>@{account.parent.slug}</Link>,
@@ -150,6 +151,7 @@ const getInfoItems = (account): InfoItemProps[] => {
         info: (
           <FormattedMessage
             defaultMessage="Hosted by {host} since {approvedAt}"
+            id="PAGBSx"
             values={{
               childAccountType: account.type,
               host: <Link href={getCollectivePageRoute(account.host)}>@{account.host.slug}</Link>,
@@ -163,6 +165,7 @@ const getInfoItems = (account): InfoItemProps[] => {
       info: (
         <FormattedMessage
           defaultMessage="Has <AgreementsLink>{hostAgreementsCount} host agreements</AgreementsLink>"
+          id="Zh9ojg"
           values={{
             hostAgreementsCount: account.hostAgreements?.totalCount,
             AgreementsLink: chunks => (
@@ -197,6 +200,7 @@ const getInfoItems = (account): InfoItemProps[] => {
       info: (
         <FormattedMessage
           defaultMessage="Total expense payouts {currentYear}: {totalPaidExpenses}"
+          id="wNU66x"
           values={{
             totalPaidExpenses: (
               <span className="text-foreground">
@@ -223,6 +227,7 @@ const getInfoItemsFromMembershipData = (data: UserContextualMembershipsQuery): I
       info: (
         <FormattedMessage
           defaultMessage="Admin of {account} since {date}"
+          id="M0vlyv"
           values={{
             account: <Link href={`/${membership.account.slug}`}>@{membership.account.slug}</Link>,
             date: <FormattedDate dateStyle="medium" value={membership.since} />,
@@ -235,6 +240,7 @@ const getInfoItemsFromMembershipData = (data: UserContextualMembershipsQuery): I
       info: (
         <FormattedMessage
           defaultMessage="Admin of {account} since {date}"
+          id="M0vlyv"
           values={{
             account: <Link href={`/${membership.account.slug}`}>@{membership.account.slug}</Link>,
             date: <FormattedDate dateStyle="medium" value={membership.since} />,

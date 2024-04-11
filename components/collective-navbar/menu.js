@@ -38,6 +38,7 @@ const titles = defineMessages({
     defaultMessage: 'Expenses',
   },
   SUBMITTED_EXPENSES: {
+    id: 'NpGb+x',
     defaultMessage: 'Submitted Expenses',
   },
   UPDATES: {

@@ -30,11 +30,12 @@ export function ExpenseWarnings(props: ExpenseWarningsProps) {
         </div>
         <div>
           <div className="font-bold">
-            <FormattedMessage defaultMessage="Expense alert" />:
+            <FormattedMessage defaultMessage="Expense alert" id="UJoCJd" />:
           </div>
           <div>
             <FormattedMessage
               defaultMessage="The Collective's budget ({amount}) is insufficient to pay this expense."
+              id="gt8gMS"
               values={{
                 amount: (
                   <FormattedMoneyAmount

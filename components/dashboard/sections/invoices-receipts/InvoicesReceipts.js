@@ -29,6 +29,7 @@ const BILL_TO_OPTIONS = [
     label: (
       <FormattedMessage
         defaultMessage="{value} (default)"
+        id="OgbGHX"
         values={{ value: <FormattedMessage id="Member.Role.HOST" defaultMessage="Host" /> }}
       />
     ),
@@ -102,10 +103,11 @@ const InvoicesReceipts = ({ account }) => {
         <StyledInputField
           name="expense-bill-to-select"
           labelProps={{ fontSize: '16px', fontWeight: '700', lineHeight: '24px', color: 'black.800' }}
-          label={intl.formatMessage({ defaultMessage: 'Bill To' })}
+          label={intl.formatMessage({ defaultMessage: 'Bill To', id: 'izhuHE' })}
           hint={intl.formatMessage({
             defaultMessage:
               'Set this to "Collective" to use the collective info for generated invoices\' "Bill To" section. You need to make sure that this pattern is legal under your jurisdiction.',
+            id: 'yMFA0e',
           })}
         >
           {({ id }) => (
@@ -137,10 +139,13 @@ const InvoicesReceipts = ({ account }) => {
       <Flex flexWrap="wrap" flexDirection="column" width="100%">
         <ReceiptTemplateForm receipt={defaultReceipt} onChange={onChangeField} />
         <SettingsSectionTitle>
-          <FormattedMessage defaultMessage="Alternative receipt template" />
+          <FormattedMessage defaultMessage="Alternative receipt template" id="CJtvlX" />
         </SettingsSectionTitle>
         <P>
-          <FormattedMessage defaultMessage="You can create an additional receipt for you to use as a non-tax-deductible payments for cases like event tickets, merch, or services." />
+          <FormattedMessage
+            defaultMessage="You can create an additional receipt for you to use as a non-tax-deductible payments for cases like event tickets, merch, or services."
+            id="MNi3fa"
+          />
         </P>
         {!showAlternativeReceiptsSection && (
           <StyledButton
@@ -158,7 +163,7 @@ const InvoicesReceipts = ({ account }) => {
               <Box pr="10px">
                 <Plus size={17} />
               </Box>
-              <FormattedMessage defaultMessage="Add alternative receipt" />
+              <FormattedMessage defaultMessage="Add alternative receipt" id="7It+w9" />
             </Flex>
           </StyledButton>
         )}
@@ -184,7 +189,7 @@ const InvoicesReceipts = ({ account }) => {
                 <Box pr="10px">
                   <Trash size={17} />
                 </Box>
-                <FormattedMessage defaultMessage="Delete alternative receipt" />
+                <FormattedMessage defaultMessage="Delete alternative receipt" id="aXAB2R" />
               </Span>
             </StyledButton>
           </Container>
@@ -193,7 +198,10 @@ const InvoicesReceipts = ({ account }) => {
         {showAlternativeReceiptsSection && (
           <MessageBox type="info" mt="24px">
             <Span fontSize="13px" fontWeight={400} lineHeight="20px">
-              <FormattedMessage defaultMessage="Please advise your Collectives to select the correct receipt setting for any tiers where the alternative receipt should be used, or manage related contributions through the Add Funds process, where you as the Host Admin can select the correct receipt." />
+              <FormattedMessage
+                defaultMessage="Please advise your Collectives to select the correct receipt setting for any tiers where the alternative receipt should be used, or manage related contributions through the Add Funds process, where you as the Host Admin can select the correct receipt."
+                id="nYrU4E"
+              />
             </Span>
           </MessageBox>
         )}
@@ -216,7 +224,7 @@ const InvoicesReceipts = ({ account }) => {
             setIsFieldChanged(false);
             toast({
               variant: 'success',
-              message: <FormattedMessage defaultMessage="Invoices updated successfully" />,
+              message: <FormattedMessage defaultMessage="Invoices updated successfully" id="6P4LG/" />,
             });
           }}
         >

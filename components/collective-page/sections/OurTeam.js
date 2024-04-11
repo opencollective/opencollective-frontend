@@ -48,7 +48,7 @@ const SectionOurTeam = ({ collective, coreContributors, LoggedInUser }) => {
                   <Span mr="8px">
                     <Mail size={16} />
                   </Span>
-                  <FormattedMessage defaultMessage="Contact Collective" />
+                  <FormattedMessage defaultMessage="Contact Collective" id="FAYdqn" />
                 </StyledButton>
               )}
             </ContactCollectiveBtn>

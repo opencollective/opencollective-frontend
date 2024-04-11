@@ -52,7 +52,7 @@ const toVariables: FiltersToVariables<z.infer<typeof schema>, HostVirtualCardReq
 const filters: FilterComponentConfigs<z.infer<typeof schema>, FilterMeta> = {
   account: hostedAccountFilter.filter,
   status: {
-    labelMsg: defineMessage({ defaultMessage: 'Status' }),
+    labelMsg: defineMessage({ defaultMessage: 'Status', id: 'tzMNF3' }),
     Component: ({ intl, ...props }) => (
       <ComboSelectFilter
         isMulti
@@ -157,7 +157,7 @@ export default function HostVirtualCardRequests({ accountSlug: hostSlug }: Dashb
   const views: Views<z.infer<typeof schema>> = [
     {
       id: 'pending',
-      label: intl.formatMessage({ defaultMessage: 'Pending' }),
+      label: intl.formatMessage({ defaultMessage: 'Pending', id: 'eKEL/g' }),
       filter: {
         status: [VirtualCardRequestStatus.PENDING],
       },
@@ -165,7 +165,7 @@ export default function HostVirtualCardRequests({ accountSlug: hostSlug }: Dashb
     },
     {
       id: 'approved',
-      label: intl.formatMessage({ defaultMessage: 'Approved' }),
+      label: intl.formatMessage({ defaultMessage: 'Approved', id: '6XFO/C' }),
       filter: {
         status: [VirtualCardRequestStatus.APPROVED],
       },
@@ -173,7 +173,7 @@ export default function HostVirtualCardRequests({ accountSlug: hostSlug }: Dashb
     },
     {
       id: 'rejected',
-      label: intl.formatMessage({ defaultMessage: 'Rejected' }),
+      label: intl.formatMessage({ defaultMessage: 'Rejected', id: '5qaD7s' }),
       filter: {
         status: [VirtualCardRequestStatus.REJECTED],
       },

@@ -225,7 +225,7 @@ const RecurringContributionsPopUp = ({ contribution, status, onCloseEdit, accoun
                   onChange={e => setCancelReasonMessage(e.target.value)}
                   value={cancelReasonMessage}
                   fontSize="12px"
-                  placeholder={intl.formatMessage({ defaultMessage: 'Provide more details (optional)' })}
+                  placeholder={intl.formatMessage({ defaultMessage: 'Provide more details (optional)', id: '41Cgcs' })}
                   height={70}
                   width="100%"
                   resize="none"

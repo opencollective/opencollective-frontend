@@ -16,10 +16,12 @@ import Page from '../components/Page';
 const messages = defineMessages({
   defaultTitle: {
     defaultMessage: 'Raise and spend money with full transparency.',
+    id: 'TZ9FXt',
   },
   defaultDescription: {
     defaultMessage:
       'Open Collective is a legal and financial toolbox for groups. It’s a fundraising + legal status + money management platform for your community. What do you want to do?',
+    id: 'LrBotK',
   },
 });
 

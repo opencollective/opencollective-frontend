@@ -41,7 +41,7 @@ const ExpenseAmountBreakdown = ({ items, currency, taxes, expenseTotalAmount }) 
         <Flex flexDirection="column" alignItems="flex-end">
           <AmountLine data-cy="expense-invoiced-amount">
             <Span textTransform="capitalize" mr={3}>
-              <FormattedMessage defaultMessage="Subtotal" />
+              <FormattedMessage defaultMessage="Subtotal" id="L8seEc" />
               {currency && ` (${currency})`}
             </Span>
             &nbsp;

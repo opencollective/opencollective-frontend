@@ -20,6 +20,7 @@ const getMessage = (from, to) => {
       <div>
         <FormattedMessage
           defaultMessage="{dateFrom} to {dateTo}"
+          id="76YT3Y"
           values={{
             dateFrom: <OneLineDate value={from} dateStyle="medium" />,
             dateTo: <OneLineDate value={to} dateStyle="medium" />,
@@ -31,6 +32,7 @@ const getMessage = (from, to) => {
     return (
       <FormattedMessage
         defaultMessage="Since {date}"
+        id="x9TypM"
         values={{ date: <OneLineDate value={from} dateStyle="medium" /> }}
       />
     );
@@ -38,6 +40,7 @@ const getMessage = (from, to) => {
     return (
       <FormattedMessage
         defaultMessage="Before {date}"
+        id="U5sjCv"
         values={{ date: <OneLineDate value={to} dateStyle="medium" /> }}
       />
     );

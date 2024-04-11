@@ -261,7 +261,7 @@ class CollectiveCard extends React.Component {
                     />
                   </ValueWrapper>
                   <LabelWrapper>
-                    <FormattedMessage id="collective.card.stats.yearlyBudget" defaultMessage={'yearly budget'} />
+                    <FormattedMessage id="collective.card.stats.yearlyBudget" defaultMessage="yearly budget" />
                   </LabelWrapper>
                 </div>
               </StatsWrapper>
@@ -338,7 +338,7 @@ class CollectiveCard extends React.Component {
                   >
                     <FormattedMessage
                       id="membership.since"
-                      defaultMessage={'since {date}'}
+                      defaultMessage="since {date}"
                       values={{
                         date: <FormattedDate value={oldestMembershipDate} month="long" year="numeric" />,
                       }}
@@ -358,7 +358,7 @@ class CollectiveCard extends React.Component {
                         currency={get(membership, 'collective.currency')}
                       />
                     </Container>
-                    <FormattedMessage id="membership.totalDonations.title" defaultMessage={'Amount contributed'} />
+                    <FormattedMessage id="membership.totalDonations.title" defaultMessage="Amount contributed" />
                   </MembershipWrapper>
                 ),
             )}

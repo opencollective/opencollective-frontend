@@ -29,7 +29,7 @@ export const ActivityUser = ({
 }) => {
   return activity.isSystem ? (
     <span>
-      <FormattedMessage defaultMessage="System Activity" />
+      <FormattedMessage defaultMessage="System Activity" id="95dooH" />
     </span>
   ) : showBy ? (
     <FormattedMessage

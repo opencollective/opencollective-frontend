@@ -352,7 +352,7 @@ function StripeSetupPaymentMethodOption(props: StripeSetupPaymentMethodOptionPro
         </div>
         <div>
           <p className="text-xs font-semibold leading-5 text-black">
-            <FormattedMessage defaultMessage="New payment method" />
+            <FormattedMessage defaultMessage="New payment method" id="L3WVIm" />
           </p>
           <p className="text-xs font-normal leading-4 text-gray-400">
             {availableMethodLabels && availableMethodLabels.length > 0 ? (

@@ -25,6 +25,7 @@ const getMessage = ({ filterValue, currency }: { filterValue: AmountFilterValueT
       return (
         <FormattedMessage
           defaultMessage="Exactly {amount}"
+          id="ZNBeE4"
           values={{
             amount: <Amount amount={filterValue.gte} currency={currency} />,
           }}
@@ -34,6 +35,7 @@ const getMessage = ({ filterValue, currency }: { filterValue: AmountFilterValueT
       return (
         <FormattedMessage
           defaultMessage="{amountFrom} to {amountTo}"
+          id="MOgYVM"
           values={{
             amountFrom: <Amount amount={filterValue.gte} currency={currency} />,
             amountTo: <Amount amount={filterValue.lte} currency={currency} />,
@@ -44,6 +46,7 @@ const getMessage = ({ filterValue, currency }: { filterValue: AmountFilterValueT
       return (
         <FormattedMessage
           defaultMessage="More than {amount}"
+          id="B+fVMt"
           values={{
             amount: <Amount amount={filterValue.gte} currency={currency} />,
           }}
@@ -53,6 +56,7 @@ const getMessage = ({ filterValue, currency }: { filterValue: AmountFilterValueT
       return (
         <FormattedMessage
           defaultMessage="Less than {amount}"
+          id="QRythI"
           values={{
             amount: <Amount amount={filterValue.lte} currency={currency} />,
           }}

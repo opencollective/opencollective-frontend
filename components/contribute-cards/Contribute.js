@@ -181,11 +181,11 @@ const getFooterMessage = type => {
   switch (type) {
     case ContributionTypes.TICKET:
     case ContributionTypes.EVENT_PARTICIPATE:
-      return <FormattedMessage defaultMessage="Be the first one to attend!" />;
+      return <FormattedMessage defaultMessage="Be the first one to attend!" id="9911qB" />;
     case ContributionTypes.EVENT_PASSED:
-      return <FormattedMessage defaultMessage="No attendees" />;
+      return <FormattedMessage defaultMessage="No attendees" id="CqlI1A" />;
     default:
-      return <FormattedMessage defaultMessage="Be the first one to contribute!" />;
+      return <FormattedMessage defaultMessage="Be the first one to contribute!" id="yaM7Qg" />;
   }
 };
 
@@ -317,6 +317,7 @@ const ContributeCard = ({
               <StyledButton buttonStyle="secondary" width={1} mb={2} mt={3} data-cy="edit-btn" onClick={onClickEdit}>
                 <FormattedMessage
                   defaultMessage="Edit {type, select, TICKET {Ticket} other {Tier}}"
+                  id="/CCt2w"
                   values={{ type: tier.type }}
                 />
               </StyledButton>

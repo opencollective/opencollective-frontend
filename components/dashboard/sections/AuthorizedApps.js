@@ -46,12 +46,13 @@ const AuthorizedAppsSection = () => {
     <div>
       {LoggedInUser.collective.settings.oauthBeta ? (
         <P>
-          <FormattedMessage defaultMessage="You haven't configured any application yet" />
+          <FormattedMessage defaultMessage="You haven't configured any application yet" id="7q8x3B" />
         </P>
       ) : (
         <MessageBox type="info" withIcon mt={3}>
           <FormattedMessage
             defaultMessage="No Authorized App yet. You can create your own OAuth application from the <ForDevelopersLink>For Developers</ForDevelopersLink> section."
+            id="XhMMHL"
             values={{
               ForDevelopersLink: getI18nLink({
                 as: Link,

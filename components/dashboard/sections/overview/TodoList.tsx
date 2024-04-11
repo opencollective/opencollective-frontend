@@ -23,7 +23,7 @@ export const TodoList = () => {
   return (
     <div className="space-y-3">
       <div className="text-lg font-bold">
-        <FormattedMessage defaultMessage="To do" />
+        <FormattedMessage defaultMessage="To do" id="vwqEeH" />
       </div>
 
       {pendingExpenseCount > 0 && (
@@ -33,6 +33,7 @@ export const TodoList = () => {
             <span>
               <FormattedMessage
                 defaultMessage="{pendingExpenseCount, plural, one {<Link>{pendingExpenseCount} expense</Link> has} other {<Link>{pendingExpenseCount} expenses</Link> have}} not been reviewed"
+                id="PcyeDN"
                 values={{
                   Link: chunks => (
                     <Link
@@ -57,6 +58,7 @@ export const TodoList = () => {
             <span>
               <FormattedMessage
                 defaultMessage="{pausedIncomingContributionsCount, plural, one {A recurring contribution to your Collective is paused} other {# recurring contributions to your Collective are paused}} and <Link>can be resumed</Link>."
+                id="qck/cA"
                 values={{
                   Link: chunks => (
                     <Link
@@ -81,6 +83,7 @@ export const TodoList = () => {
             <span>
               <FormattedMessage
                 defaultMessage="{pausedOutgoingContributions, plural, one {One of your recurring contributions is paused} other {# of your recurring contributions are paused}} and <Link>can be resumed</Link>."
+                id="4HaZeO"
                 values={{
                   Link: chunks => (
                     <Link

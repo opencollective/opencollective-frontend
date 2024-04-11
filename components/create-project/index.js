@@ -89,10 +89,14 @@ class CreateProject extends Component {
       return (
         <Flex flexDirection="column" alignItems="center" my={6}>
           <MessageBox withIcon type="warning">
-            <FormattedMessage defaultMessage="This account is frozen, you cannot create new projects at this time." />{' '}
+            <FormattedMessage
+              defaultMessage="This account is frozen, you cannot create new projects at this time."
+              id="vUYcYC"
+            />{' '}
             {isFeatureEnabled(parent.host, FEATURES.CONTACT_FORM) && (
               <FormattedMessage
                 defaultMessage="Please <ContactLink>contact</ContactLink> your fiscal host for more details."
+                id="KxBiJC"
                 values={{ ContactLink: getI18nLink({ href: `${getCollectivePageRoute(parent.host)}/contact` }) }}
               />
             )}

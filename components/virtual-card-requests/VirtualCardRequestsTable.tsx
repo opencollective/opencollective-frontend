@@ -81,7 +81,7 @@ function VirtualCardRequestTableActions({
               onSelectedVirtualCardRequest(virtualCardRequest);
             }}
           >
-            <FormattedMessage defaultMessage="View details" />
+            <FormattedMessage defaultMessage="View details" id="MnpUD7" />
           </DropdownMenuItem>
           {virtualCardRequest.status === VirtualCardRequestStatus.PENDING && (
             <React.Fragment>
@@ -130,7 +130,7 @@ type VirtualCardRequestsTableMeta = {
 const tableColumns: ColumnDef<VirtualCardRequest>[] = [
   {
     accessorKey: 'account',
-    header: () => <FormattedMessage defaultMessage="Account" />,
+    header: () => <FormattedMessage defaultMessage="Account" id="TwyMau" />,
     meta: { className: 'w-48' },
 
     cell: ({ cell }: CellContext<VirtualCardRequest, Account>) => {
@@ -152,7 +152,7 @@ const tableColumns: ColumnDef<VirtualCardRequest>[] = [
     accessorKey: 'assignee',
     meta: { className: 'w-36' },
 
-    header: () => <FormattedMessage defaultMessage="Assignee" />,
+    header: () => <FormattedMessage defaultMessage="Assignee" id="vx8bv3" />,
     cell: ({ cell, row }: CellContext<VirtualCardRequest, Account>) => {
       const assignee = cell.getValue();
       const virtualCardRequest = row.original;
@@ -280,7 +280,7 @@ export function VirtualCardRequestsTable(props: VirtualCardRequestsTableProps) {
           onClickRow={row => props?.onSelectedVirtualCardRequest(row.original)}
           emptyMessage={() => (
             <p className="font-base">
-              <FormattedMessage defaultMessage="No Virtual Card Requests" />
+              <FormattedMessage defaultMessage="No Virtual Card Requests" id="zUk+h9" />
             </p>
           )}
         />

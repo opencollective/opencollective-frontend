@@ -333,6 +333,7 @@ const getHandleSubmit = (intl, currency, onSubmit) => async values => {
         {
           defaultMessage:
             'You are about to record a payment for {totalAmount} that includes a {paymentProcessorFeeAmount} payment processor fee. This fee looks unusually high.{newLine}{newLine}Are you sure you want to do this?',
+          id: 'UW7XhX',
         },
         {
           totalAmount: formatCurrency(values.totalAmountPaidInHostCurrency, currency),
@@ -573,9 +574,12 @@ const PayExpenseModal = ({
                   error={formik.errors.clearedAt}
                   required={false}
                   mt={3}
-                  label={<FormattedMessage defaultMessage="Effective Date" />}
+                  label={<FormattedMessage defaultMessage="Effective Date" id="Gh3Obs" />}
                   hint={
-                    <FormattedMessage defaultMessage="The date funds were cleared on your bank, Wise, PayPal, Stripe or any other external account holding these funds." />
+                    <FormattedMessage
+                      defaultMessage="The date funds were cleared on your bank, Wise, PayPal, Stripe or any other external account holding these funds."
+                      id="s3O6iq"
+                    />
                   }
                 >
                   {inputProps => (
@@ -607,7 +611,10 @@ const PayExpenseModal = ({
               <Flex mt={16}>
                 <StyledTooltip
                   content={
-                    <FormattedMessage defaultMessage="Check this box to have the payee cover the cost of payment processor fees (useful to zero balance)" />
+                    <FormattedMessage
+                      defaultMessage="Check this box to have the payee cover the cost of payment processor fees (useful to zero balance)"
+                      id="ewvfiF"
+                    />
                   }
                 >
                   <StyledCheckbox
@@ -616,7 +623,7 @@ const PayExpenseModal = ({
                     onChange={({ checked }) => formik.setFieldValue('feesPayer', checked ? 'PAYEE' : 'COLLECTIVE')}
                     label={
                       <Span fontSize="12px">
-                        <FormattedMessage defaultMessage="The payee is covering the fees" />
+                        <FormattedMessage defaultMessage="The payee is covering the fees" id="zoC8Gb" />
                       </Span>
                     }
                   />
@@ -702,7 +709,7 @@ const PayExpenseModal = ({
               {amounts.effectiveRate ? (
                 <AmountLine py={0}>
                   <Label color="black.600" fontWeight="500">
-                    <FormattedMessage defaultMessage="Currency exchange rate" />
+                    <FormattedMessage defaultMessage="Currency exchange rate" id="jLTPuL" />
                   </Label>
                   <P fontSize="13px" color="black.600" whiteSpace="nowrap">
                     ~ {expense.currency} 1 = {amounts.totalAmount?.currency} {round(amounts.effectiveRate, 5)}

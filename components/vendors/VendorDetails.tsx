@@ -52,7 +52,7 @@ const VendorDetails = ({ vendor, host, onCancel, editVendor }: VendorDetailsProp
   return (
     <div>
       <H4 mb={32}>
-        <FormattedMessage defaultMessage="Vendor's Details" />
+        <FormattedMessage defaultMessage="Vendor's Details" id="Blf27o" />
       </H4>
       <SectionTitle>{vendor.name}</SectionTitle>
       <div className="mt-5 flex gap-8">
@@ -76,7 +76,7 @@ const VendorDetails = ({ vendor, host, onCancel, editVendor }: VendorDetailsProp
       {contact && (
         <div className="mt-5 flex flex-col">
           <SectionTitle>
-            <FormattedMessage defaultMessage="Vendor Contact" />
+            <FormattedMessage defaultMessage="Vendor Contact" id="p1twtU" />
           </SectionTitle>
           <VendorContactTag>
             {contact.name}
@@ -91,7 +91,7 @@ const VendorDetails = ({ vendor, host, onCancel, editVendor }: VendorDetailsProp
       <div className="grid grid-cols-3 gap-4">
         {taxType && (
           <VendorInfo>
-            <FormattedMessage defaultMessage="Company Identifier" />
+            <FormattedMessage defaultMessage="Company Identifier" id="K0kNyF" />
             <React.Fragment>
               {taxType}: {taxId}
             </React.Fragment>
@@ -99,7 +99,7 @@ const VendorDetails = ({ vendor, host, onCancel, editVendor }: VendorDetailsProp
         )}
         {vendor.location && (
           <VendorInfo>
-            <FormattedMessage defaultMessage="Mailing Address" />
+            <FormattedMessage defaultMessage="Mailing Address" id="yzLwTP" />
             <LocationAddress location={vendor.location} />
           </VendorInfo>
         )}
@@ -112,7 +112,7 @@ const VendorDetails = ({ vendor, host, onCancel, editVendor }: VendorDetailsProp
       </div>
       <div className="mt-5 flex flex-col">
         <SectionTitle>
-          <FormattedMessage defaultMessage="Activity" />
+          <FormattedMessage defaultMessage="Activity" id="ZmlNQ3" />
         </SectionTitle>
         <Link href={`${dashboardLink}/host-expenses?searchTerm=%40${vendor.slug}`} className="text-sm">
           {vendor.expenses.totalCount} <FormattedMessage id="Expenses" defaultMessage="Expenses" />

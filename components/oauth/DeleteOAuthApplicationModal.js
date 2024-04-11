@@ -41,7 +41,9 @@ const DeleteOAuthApplicationModal = ({ application, onDelete, ...props }) => {
     <ConfirmationModal
       isDanger
       type="delete"
-      header={<FormattedMessage defaultMessage="Delete application {name}" values={{ name: application.name }} />}
+      header={
+        <FormattedMessage defaultMessage="Delete application {name}" id="M5dGYy" values={{ name: application.name }} />
+      }
       {...props}
       continueHandler={async () => {
         try {
@@ -49,7 +51,10 @@ const DeleteOAuthApplicationModal = ({ application, onDelete, ...props }) => {
           await onDelete(application);
           toast({
             variant: 'success',
-            message: intl.formatMessage({ defaultMessage: 'Application {name} deleted' }, { name: application.name }),
+            message: intl.formatMessage(
+              { defaultMessage: 'Application {name} deleted', id: 'vAzArE' },
+              { name: application.name },
+            ),
           });
           return CONFIRMATION_MODAL_TERMINATE;
         } catch (e) {
@@ -58,7 +63,10 @@ const DeleteOAuthApplicationModal = ({ application, onDelete, ...props }) => {
       }}
     >
       <P>
-        <FormattedMessage defaultMessage="This will permanently delete the application, revoking all tokens associated with it. Are you sure you want to continue?" />
+        <FormattedMessage
+          defaultMessage="This will permanently delete the application, revoking all tokens associated with it. Are you sure you want to continue?"
+          id="pp/kVH"
+        />
       </P>
     </ConfirmationModal>
   );

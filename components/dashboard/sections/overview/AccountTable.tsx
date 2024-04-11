@@ -87,7 +87,7 @@ const columns: ColumnDef<AccountMetricsRow>[] = [
       <SortableHeader
         column={column}
         type="alphabetic"
-        label={<FormattedMessage defaultMessage="Account" />}
+        label={<FormattedMessage defaultMessage="Account" id="TwyMau" />}
         align="left"
       />
     ),

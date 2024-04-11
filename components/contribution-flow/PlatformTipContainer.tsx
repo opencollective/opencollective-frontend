@@ -159,7 +159,10 @@ export function PlatformTipContainer(props: PlatformTipContainerProps) {
   const message = React.useMemo(() => {
     if (percentage <= 0) {
       return (
-        <FormattedMessage defaultMessage="You can still support us by spreading the word and keeping in touch with us 💙" />
+        <FormattedMessage
+          defaultMessage="You can still support us by spreading the word and keeping in touch with us 💙"
+          id="E/OCaw"
+        />
       );
     }
 
@@ -168,6 +171,7 @@ export function PlatformTipContainer(props: PlatformTipContainerProps) {
     return (
       <FormattedMessage
         defaultMessage="Thank you for your contribution! <Emoji></Emoji>"
+        id="C8NetX"
         values={{ Emoji: () => <span className="mx-2">{tipEmoji}</span> }}
       />
     );
@@ -188,12 +192,13 @@ export function PlatformTipContainer(props: PlatformTipContainerProps) {
         <Flex alignItems="center" gap={10}>
           <Image alt="Platform Tip" src="/static/images/platform-tip-jar.png" height={64} width={64} />
           <Box flexGrow={1} fontWeight="500" fontSize="20px">
-            <FormattedMessage defaultMessage="Help us keep Open Collective sustainable" />
+            <FormattedMessage defaultMessage="Help us keep Open Collective sustainable" id="15EPUo" />
           </Box>
         </Flex>
         <P my="12px" fontWeight="400" fontSize="16px">
           <FormattedMessage
             defaultMessage="Adding a platform tip helps us to maintain the platform and introduce new features. <Link>Why?</Link>"
+            id="sKMOr5"
             values={{
               Link: chunk => {
                 return (
@@ -209,6 +214,7 @@ export function PlatformTipContainer(props: PlatformTipContainerProps) {
           <div>
             <FormattedMessage
               defaultMessage="Your tip: <bold>{amount}</bold> ({percentage}%)"
+              id="fWPqud"
               values={{
                 bold: I18nBold,
                 amount: formatCurrency(props.value, props.currency as Currency, { locale: intl.locale }),
@@ -248,7 +254,7 @@ export function PlatformTipContainer(props: PlatformTipContainerProps) {
                 }
                 label={
                   <span className="text-sm">
-                    <FormattedMessage defaultMessage="I don't want to contribute to Open Collective" />
+                    <FormattedMessage defaultMessage="I don't want to contribute to Open Collective" id="2fKAKF" />
                   </span>
                 }
               />

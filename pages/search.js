@@ -81,6 +81,7 @@ const I18nFilters = defineMessages({
   },
   [FILTERS.FUND]: {
     defaultMessage: 'Funds',
+    id: '59l1l8',
   },
 });
 
@@ -278,7 +279,7 @@ class SearchPage extends React.Component {
     copy(window.location.href);
     toast({
       variant: 'success',
-      message: <FormattedMessage defaultMessage="Search Result Copied!" />,
+      message: <FormattedMessage defaultMessage="Search Result Copied!" id="3x3DF3" />,
     });
   };
 
@@ -325,7 +326,10 @@ class SearchPage extends React.Component {
                 borderRadius="100px"
                 fontSize="16px"
                 height="58px"
-                placeholder={intl.formatMessage({ defaultMessage: 'Search by name, handle, tag, description...' })}
+                placeholder={intl.formatMessage({
+                  defaultMessage: 'Search by name, handle, tag, description...',
+                  id: 'HEJLVH',
+                })}
                 value={this.state.term}
                 onChange={value => this.setState({ term: value })}
                 onSubmit={this.refetch}
@@ -352,7 +356,7 @@ class SearchPage extends React.Component {
             </Hide>
             <Hide md lg>
               <FilterLabel htmlFor="collective-filter-type">
-                <FormattedMessage defaultMessage="Profile Type" />
+                <FormattedMessage defaultMessage="Profile Type" id="somORZ" />
               </FilterLabel>
               <StyledSelectFilter
                 inputId="collective-type-filter"
@@ -369,7 +373,7 @@ class SearchPage extends React.Component {
           <Flex flexDirection={['column', 'row']}>
             <Container pr={[0, '19px']}>
               <FilterLabel htmlFor="sort-filter-type">
-                <FormattedMessage defaultMessage="Sort" />
+                <FormattedMessage defaultMessage="Sort" id="25oM9Q" />
               </FilterLabel>
               <StyledSelectFilter
                 inputId="sort-filter"
@@ -387,7 +391,9 @@ class SearchPage extends React.Component {
                 inputId="search-country-filter"
                 as={StyledSelectFilter}
                 value={this.props.country || 'ALL'}
-                customOptions={[{ label: <FormattedMessage defaultMessage="All countries" />, value: 'ALL' }]}
+                customOptions={[
+                  { label: <FormattedMessage defaultMessage="All countries" id="n6WiTf" />, value: 'ALL' },
+                ]}
                 onChange={country => this.changeCountry(country)}
                 minWidth={[0, '200px']}
                 fontSize="12px"
@@ -455,29 +461,33 @@ class SearchPage extends React.Component {
             {accounts?.nodes?.length === 0 && (
               <Flex py={3} mt={4} width={1} justifyContent="center" flexDirection="column" alignItems="center">
                 <H1 fontSize="32px" lineHeight="40px" color="black.700" fontWeight={500}>
-                  <FormattedMessage defaultMessage="No results match your search" />
+                  <FormattedMessage defaultMessage="No results match your search" id="qqqV4d" />
                 </H1>
                 <Container py={32}>
                   <Image src="/static/images/empty-search.png" alt="No Search Results" width={101.98} height={87.47} />
                 </Container>
                 <Container color="black.800" fontWeight={400}>
                   <Container fontSize="18px" lineHeight="26px" textAlign="center">
-                    <FormattedMessage defaultMessage="Try refining your search, here are some tips:" />
+                    <FormattedMessage defaultMessage="Try refining your search, here are some tips:" id="8SQT+a" />
                   </Container>
                   <Container fontSize="15px" lineHeight="22px">
                     <ul className="list-inside list-disc">
                       <li>
-                        <FormattedMessage defaultMessage="Make sure your spelling is correct" />
+                        <FormattedMessage defaultMessage="Make sure your spelling is correct" id="7HOBG3" />
                       </li>
                       <li>
                         <Span pt="8px">
-                          <FormattedMessage defaultMessage="Broaden your search (e.g. search 'garden' instead of 'community garden')" />
+                          <FormattedMessage
+                            defaultMessage="Broaden your search (e.g. search 'garden' instead of 'community garden')"
+                            id="RdCCty"
+                          />
                         </Span>
                       </li>
                       <li>
                         <Span pt="8px">
                           <FormattedMessage
                             defaultMessage="Search our <Link>Docs</Link> for more info about using the Open Collective platform"
+                            id="mzfp0+"
                             values={{
                               Link: getI18nLink({
                                 openInNewTab: true,
@@ -492,6 +502,7 @@ class SearchPage extends React.Component {
                   <Container fontSize="18px" lineHeight="26px" pt={16} mt={4} textAlign="center">
                     <FormattedMessage
                       defaultMessage="Still no luck? Contact <SupportLink>support</SupportLink> or find us in <SlackLink>Slack</SlackLink>"
+                      id="+lM4fw"
                       values={{
                         SupportLink: I18nSupportLink,
                         SlackLink: getI18nLink({
@@ -515,7 +526,7 @@ class SearchPage extends React.Component {
             <Flex flexDirection="column" alignItems="center">
               <StyledButton onClick={this.handleCopy}>
                 <Span pr={1} fontSize="14px" fontWeight={500}>
-                  <FormattedMessage defaultMessage="Share results" />
+                  <FormattedMessage defaultMessage="Share results" id="Pkx+Wj" />
                 </Span>
                 <ShareAlt size="14px" />
               </StyledButton>
@@ -527,6 +538,7 @@ class SearchPage extends React.Component {
                 <em>
                   <FormattedMessage
                     defaultMessage="Can't find what you're looking for? Check our <Link>Docs & Help!</Link>"
+                    id="7ZWOtM"
                     values={{
                       Link: getI18nLink({
                         href: 'https://opencollective.com/help',

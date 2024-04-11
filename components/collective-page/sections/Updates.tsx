@@ -219,7 +219,7 @@ const SectionUpdates = ({ collective, isAdmin }) => {
                       ) : (
                         <FormattedMessage
                           id="update.createdAtBy"
-                          defaultMessage={'Created on {date} (draft) by {author}'}
+                          defaultMessage="Created on {date} (draft) by {author}"
                           values={{
                             date: formatDate(update.createdAt),
                             author: <LinkCollective collective={update.fromAccount} />,

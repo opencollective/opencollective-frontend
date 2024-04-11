@@ -72,7 +72,7 @@ const getSeriesFromData = (intl, timeSeries, year) => {
   const totalMoneyManagedProgressNodes = get(timeSeries, 'totalMoneyManaged.nodes', []);
   return [
     {
-      name: intl.formatMessage({ defaultMessage: 'Total Managed Amount' }),
+      name: intl.formatMessage({ defaultMessage: 'Total Managed Amount', id: 'MzXqKG' }),
       data: dataToSeries(totalMoneyManagedProgressNodes),
     },
   ];
@@ -129,7 +129,7 @@ const TotalMoneyManagedHistorical = ({ host, collectives }) => {
     <Box py={3}>
       <Flex alignItems="center" px={2} mb={2}>
         <P fontSize="11px" fontWeight="700" mr={3} textTransform="uppercase">
-          <FormattedMessage defaultMessage="Total money managed per year" />
+          <FormattedMessage defaultMessage="Total money managed per year" id="hx2hjA" />
         </P>
         <StyledSelectFilter
           inputId="host-report-money-managed-year-select"
