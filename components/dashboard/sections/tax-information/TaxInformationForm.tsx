@@ -115,12 +115,13 @@ export const TaxInformationForm = ({ account, setFormDirty }) => {
             variant: 'success',
             message: intl.formatMessage({
               defaultMessage: 'Your tax form has been submitted successfully',
+              id: '1aZaiR',
             }),
           });
         } catch (e) {
           toast({
             variant: 'error',
-            title: intl.formatMessage({ defaultMessage: 'Submission failed' }),
+            title: intl.formatMessage({ defaultMessage: 'Submission failed', id: 'vc0KiO' }),
             message: i18nGraphqlException(intl, e),
           });
         }
@@ -170,6 +171,7 @@ export const TaxInformationForm = ({ account, setFormDirty }) => {
                         hint={intl.formatMessage({
                           defaultMessage:
                             'The email address of the person who will sign the form. A copy of the form will be sent to this email address.',
+                          id: 'F8QPOI',
                         })}
                       />
                       <form.component formik={formik} />
@@ -186,7 +188,10 @@ export const TaxInformationForm = ({ account, setFormDirty }) => {
                           )}
                         </StyledInputFormikField>
                         <p className="mb-4 mt-3 text-sm text-neutral-700">
-                          <FormattedMessage defaultMessage='I agree to be legally bound by the document, and agree to the Open Collective Terms and Privacy Policy. Click on "I agree" to sign this document.' />
+                          <FormattedMessage
+                            defaultMessage='I agree to be legally bound by the document, and agree to the Open Collective Terms and Privacy Policy. Click on "I agree" to sign this document.'
+                            id="UY1nDu"
+                          />
                         </p>
                         <div className="mt-12 flex flex-wrap gap-4 text-nowrap">
                           <Button
@@ -198,7 +203,7 @@ export const TaxInformationForm = ({ account, setFormDirty }) => {
                             disabled={formik.isSubmitting}
                           >
                             <FileText className="mr-2 inline-block" size={16} />
-                            <FormattedMessage defaultMessage="Preview Document" />
+                            <FormattedMessage defaultMessage="Preview Document" id="PMhCU4" />
                           </Button>
                           <Button className="flex-1" size="lg" type="submit" loading={formik.isSubmitting}>
                             <FormattedMessage id="submit" defaultMessage="Submit" />

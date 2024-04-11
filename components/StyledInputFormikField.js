@@ -112,8 +112,8 @@ StyledInputFormikField.propTypes = {
   width: PropTypes.any,
   flexGrow: PropTypes.any,
   showError: PropTypes.bool,
-  min: PropTypes.any,
-  max: PropTypes.any,
+  min: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  max: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
 export default StyledInputFormikField;

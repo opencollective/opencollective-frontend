@@ -124,34 +124,47 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
     <div className="flex flex-col gap-y-4">
       <div>
         <p className="text-lg font-bold">
-          <FormattedMessage defaultMessage="Signer Full name" />
+          <FormattedMessage defaultMessage="Signer Full name" id="QQwwqC" />
         </p>
       </div>
-      <StyledInputFormikField name="signer.firstName" label={intl.formatMessage({ defaultMessage: 'First Name' })} />
-      <StyledInputFormikField name="signer.middleName" label={intl.formatMessage({ defaultMessage: 'Middle Name' })} />
-      <StyledInputFormikField name="signer.lastName" label={intl.formatMessage({ defaultMessage: 'Last Name' })} />
+      <StyledInputFormikField
+        name="signer.firstName"
+        label={intl.formatMessage({ defaultMessage: 'First Name', id: 'Q6wcZ5' })}
+      />
+      <StyledInputFormikField
+        name="signer.middleName"
+        label={intl.formatMessage({ defaultMessage: 'Middle Name', id: '9BrST0' })}
+      />
+      <StyledInputFormikField
+        name="signer.lastName"
+        label={intl.formatMessage({ defaultMessage: 'Last Name', id: 'aheQdn' })}
+      />
       <div>
         <p className="text-lg font-bold">
-          <FormattedMessage defaultMessage="Organization that is the beneficial owner" />
+          <FormattedMessage defaultMessage="Organization that is the beneficial owner" id="noJ6zJ" />
         </p>
       </div>
       <StyledInputFormikField
         name="businessName"
-        label={<FormattedMessage defaultMessage="Name of organization that is the beneficial owner" />}
+        label={<FormattedMessage defaultMessage="Name of organization that is the beneficial owner" id="fObLOz" />}
       />
       <StyledInputFormikField
         name="disregardedBusinessName"
-        label={<FormattedMessage defaultMessage="Name of disregarded entity" />}
+        label={<FormattedMessage defaultMessage="Name of disregarded entity" id="ybX19f" />}
         hint={
-          <FormattedMessage defaultMessage="If you: have registered with the IRS and been assigned a GIIN associated with the legal name of the disregarded entity; or are reporting Model 2 FFI; and are not an hybrid entity using this form to claim treaty benefits" />
+          <FormattedMessage
+            defaultMessage="If you: have registered with the IRS and been assigned a GIIN associated with the legal name of the disregarded entity; or are reporting Model 2 FFI; and are not an hybrid entity using this form to claim treaty benefits"
+            id="ef2qMD"
+          />
         }
       />
       <StyledInputFormikField
         name="nffeStatus"
-        label={<FormattedMessage defaultMessage="Non-financial foreign entity (NFFE) status" />}
+        label={<FormattedMessage defaultMessage="Non-financial foreign entity (NFFE) status" id="XD9lvt" />}
         hint={
           <FormattedMessage
             defaultMessage="This form may only be completed online if you are a non-financial foreign entity (NFFE) with a FATCA classification listed below. If your entity is a financial institution, government, in liquidation, publicly traded, or any classification not listed here, do not fill out this form and <SupportLink>contact us</SupportLink>."
+            id="wNjUNc"
             values={I18nFormatters}
           />
         }
@@ -176,7 +189,10 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
           <StyledInputFormikField
             name="entityHasNoUSOwners"
             label={
-              <FormattedMessage defaultMessage="I further certify that the entity identified has no substantial U.S. owners (or, if applicable, no controlling U.S. persons)" />
+              <FormattedMessage
+                defaultMessage="I further certify that the entity identified has no substantial U.S. owners (or, if applicable, no controlling U.S. persons)"
+                id="eR5bt2"
+              />
             }
           >
             {({ field }) => (
@@ -185,8 +201,8 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
                 onChange={value => setFieldValue(field.name, value)}
                 error={field.error}
                 options={[
-                  { label: <FormattedMessage defaultMessage="Yes" />, value: true },
-                  { label: <FormattedMessage defaultMessage="No" />, value: false },
+                  { label: <FormattedMessage defaultMessage="Yes" id="a5msuh" />, value: true },
+                  { label: <FormattedMessage defaultMessage="No" id="oUWADl" />, value: false },
                 ]}
               />
             )}
@@ -195,7 +211,10 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
             <StyledInputFormikField
               name="usOwners"
               label={
-                <FormattedMessage defaultMessage="Provide the name, address, and TIN of each substantial U.S. owner (or, if applicable, controlling U.S. person) of the NFFE" />
+                <FormattedMessage
+                  defaultMessage="Provide the name, address, and TIN of each substantial U.S. owner (or, if applicable, controlling U.S. person) of the NFFE"
+                  id="uxUYhl"
+                />
               }
             />
           )}
@@ -204,7 +223,7 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
 
       <StyledInputFormikField
         name="chapter3Status"
-        label={<FormattedMessage defaultMessage="Chapter 3 status (entity type)" />}
+        label={<FormattedMessage defaultMessage="Chapter 3 status (entity type)" id="vYjtwB" />}
       >
         {({ field }) => (
           <Select
@@ -236,7 +255,7 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
         <React.Fragment>
           <StyledInputFormikField
             name="isHybridEntity"
-            label={<FormattedMessage defaultMessage="Is this a hybrid entity making a treaty claim?" />}
+            label={<FormattedMessage defaultMessage="Is this a hybrid entity making a treaty claim?" id="F38HBo" />}
           >
             {({ field }) => (
               <ButtonSet
@@ -244,8 +263,8 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
                 onChange={value => setFieldValue(field.name, value)}
                 error={field.error}
                 options={[
-                  { label: <FormattedMessage defaultMessage="Yes" />, value: true },
-                  { label: <FormattedMessage defaultMessage="No" />, value: false },
+                  { label: <FormattedMessage defaultMessage="Yes" id="a5msuh" />, value: true },
+                  { label: <FormattedMessage defaultMessage="No" id="oUWADl" />, value: false },
                 ]}
               />
             )}
@@ -253,7 +272,7 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
           {values.isHybridEntity === true && (
             <React.Fragment>
               <p className="mb-2 text-sm font-bold text-neutral-800">
-                <FormattedMessage defaultMessage="I certify that (select all that apply):" />
+                <FormattedMessage defaultMessage="I certify that (select all that apply):" id="M+nqVc" />
               </p>
               <StyledInputFormikField name="certifyBeneficialOwnerCountry">
                 {({ field }) => (
@@ -265,7 +284,10 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
                       onCheckedChange={checked => formik.setFieldValue(field.name, checked === true)}
                     />
                     <div className="inline align-text-bottom">
-                      <FormattedMessage defaultMessage="The beneficial owner is a resident of the country listed in the residence address on this form, within the meaning of the income tax treaty between the United States and that country" />
+                      <FormattedMessage
+                        defaultMessage="The beneficial owner is a resident of the country listed in the residence address on this form, within the meaning of the income tax treaty between the United States and that country"
+                        id="fTIi+A"
+                      />
                     </div>
                   </label>
                 )}
@@ -280,7 +302,10 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
                       onCheckedChange={checked => formik.setFieldValue(field.name, checked === true)}
                     />
                     <div className="inline align-text-bottom">
-                      <FormattedMessage defaultMessage="The beneficial owner derives the item (or items) of income for which the treaty benefits are claimed, and, if applicable, meets the requirements of the treaty provision dealing with limitation on benefits." />
+                      <FormattedMessage
+                        defaultMessage="The beneficial owner derives the item (or items) of income for which the treaty benefits are claimed, and, if applicable, meets the requirements of the treaty provision dealing with limitation on benefits."
+                        id="LQ0CYi"
+                      />
                     </div>
                   </label>
                 )}
@@ -295,7 +320,10 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
                       onCheckedChange={checked => formik.setFieldValue(field.name, checked === true)}
                     />
                     <div className="inline align-text-bottom">
-                      <FormattedMessage defaultMessage="The beneficial owner is claiming treaty benefits for U.S. source dividends received from a foreign corporation or interest from a U.S. trade or business of a foreign corporation and meets qualified resident status." />
+                      <FormattedMessage
+                        defaultMessage="The beneficial owner is claiming treaty benefits for U.S. source dividends received from a foreign corporation or interest from a U.S. trade or business of a foreign corporation and meets qualified resident status."
+                        id="D2sBgs"
+                      />
                     </div>
                   </label>
                 )}
@@ -303,7 +331,7 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
               {values['certifyDerivesIncome'] && (
                 <StyledInputFormikField
                   name="typeOfLimitationOnBenefitsProvisions"
-                  label={<FormattedMessage defaultMessage="Type of limitation on benefits provisions" />}
+                  label={<FormattedMessage defaultMessage="Type of limitation on benefits provisions" id="nsXvv8" />}
                 >
                   {({ field }) => (
                     <Select
@@ -334,13 +362,16 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
                 <StyledInputFormikField
                   name="typeOfLimitationOnBenefitsProvisionsOther"
                   label={
-                    <FormattedMessage defaultMessage="Specify article and paragraph of 'other' type of limitation on benefits provisions" />
+                    <FormattedMessage
+                      defaultMessage="Specify article and paragraph of 'other' type of limitation on benefits provisions"
+                      id="0TaYLE"
+                    />
                   }
                 />
               )}
               <StyledInputFormikField
                 name="claimsSpecialRatesAndConditions"
-                label={<FormattedMessage defaultMessage="Are you claiming special rates and conditions?" />}
+                label={<FormattedMessage defaultMessage="Are you claiming special rates and conditions?" id="VOhp7H" />}
               >
                 {({ field }) => (
                   <ButtonSet
@@ -348,8 +379,8 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
                     onChange={value => setFieldValue(field.name, value)}
                     error={field.error}
                     options={[
-                      { label: <FormattedMessage defaultMessage="Yes" />, value: true },
-                      { label: <FormattedMessage defaultMessage="No" />, value: false },
+                      { label: <FormattedMessage defaultMessage="Yes" id="a5msuh" />, value: true },
+                      { label: <FormattedMessage defaultMessage="No" id="oUWADl" />, value: false },
                     ]}
                   />
                 )}
@@ -358,12 +389,12 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
                 <React.Fragment>
                   <StyledInputFormikField
                     name="claimsArticleAndParagraph"
-                    label={<FormattedMessage defaultMessage="Article and paragraph" />}
+                    label={<FormattedMessage defaultMessage="Article and paragraph" id="g5m2pl" />}
                   />
                   <StyledInputFormikField
                     inputType="number"
                     name="claimsRate"
-                    label={<FormattedMessage defaultMessage="Rate" />}
+                    label={<FormattedMessage defaultMessage="Rate" id="c0b5XV" />}
                   >
                     {({ field }) => (
                       <StyledInputPercentage
@@ -375,11 +406,11 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
                   </StyledInputFormikField>
                   <StyledInputFormikField
                     name="claimsIncomeType"
-                    label={<FormattedMessage defaultMessage="Type of income" />}
+                    label={<FormattedMessage defaultMessage="Type of income" id="1T23UJ" />}
                   />
                   <StyledInputFormikField
                     name="claimsExplanation"
-                    label={<FormattedMessage defaultMessage="Explanation" />}
+                    label={<FormattedMessage defaultMessage="Explanation" id="E1bF/X" />}
                   />
                 </React.Fragment>
               )}
@@ -390,7 +421,7 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
 
       <StyledInputFormikField
         name="businessCountryOfIncorporationOrOrganization"
-        label={<FormattedMessage defaultMessage="Country of incorporation or organization" />}
+        label={<FormattedMessage defaultMessage="Country of incorporation or organization" id="lFosPi" />}
       >
         {({ field }) => (
           <InputTypeCountry
@@ -403,7 +434,7 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
       </StyledInputFormikField>
       <StyledInputFormikField
         name="businessAddress"
-        label={<FormattedMessage defaultMessage="Company residence address" />}
+        label={<FormattedMessage defaultMessage="Company residence address" id="X8LRZW" />}
         showError={false}
       >
         {({ field, meta, form }) => (
@@ -420,7 +451,7 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
       </StyledInputFormikField>
       <StyledInputFormikField
         name="businessMailingAddress"
-        label={<FormattedMessage defaultMessage="Mailing address (if different from above)" />}
+        label={<FormattedMessage defaultMessage="Mailing address (if different from above)" id="9UGIQz" />}
         showError={false}
       >
         {({ field, meta, form }) => (
@@ -438,31 +469,31 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
 
       <div className="mt-2">
         <p className="text-lg font-bold">
-          <FormattedMessage defaultMessage="Taxpayer Identification Number (TIN)" />
+          <FormattedMessage defaultMessage="Taxpayer Identification Number (TIN)" id="UKedhg" />
         </p>
       </div>
 
       <StyledInputFormikField
         name="taxpayerIdentificationNumberForeign"
-        label={<FormattedMessage defaultMessage="Foreign Taxpayer ID Number" />}
-        placeholder={intl.formatMessage({ defaultMessage: 'The one you use in your country' })}
+        label={<FormattedMessage defaultMessage="Foreign Taxpayer ID Number" id="u5w9Ar" />}
+        placeholder={intl.formatMessage({ defaultMessage: 'The one you use in your country', id: 'hP6sfR' })}
       />
       <StyledInputFormikField
         name="taxpayerIdentificationNumberUS"
-        label={<FormattedMessage defaultMessage="U.S. taxpayer identification number (TIN), if required" />}
+        label={<FormattedMessage defaultMessage="U.S. taxpayer identification number (TIN), if required" id="scYqKB" />}
       />
-      <StyledInputFormikField name="giin" label={<FormattedMessage defaultMessage="GIIN" />} />
-      <StyledInputFormikField name="reference" label={<FormattedMessage defaultMessage="Reference" />} />
+      <StyledInputFormikField name="giin" label={<FormattedMessage defaultMessage="GIIN" id="8/QLDM" />} />
+      <StyledInputFormikField name="reference" label={<FormattedMessage defaultMessage="Reference" id="mcUhhf" />} />
 
       <div className="mt-2">
         <p className="text-lg font-bold">
-          <FormattedMessage defaultMessage="Tax treaty benefits" />
+          <FormattedMessage defaultMessage="Tax treaty benefits" id="ezCCHB" />
         </p>
       </div>
 
       <div className="mt-2">
         <p className="text-lg font-bold">
-          <FormattedMessage defaultMessage="Signature" />
+          <FormattedMessage defaultMessage="Signature" id="nQkv1D" />
         </p>
       </div>
 
@@ -476,7 +507,10 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
               onCheckedChange={checked => formik.setFieldValue(field.name, checked === true)}
             />
             <div className="inline align-text-bottom">
-              <FormattedMessage defaultMessage="I certify that I have the capacity to sign for the entity identified on this form." />
+              <FormattedMessage
+                defaultMessage="I certify that I have the capacity to sign for the entity identified on this form."
+                id="PenR2A"
+              />
             </div>
           </label>
         )}
@@ -493,11 +527,20 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
             />
             <div className="inline align-text-bottom">
               {values.nffeStatus === NFFEStatus.ActiveNFFE ? (
-                <FormattedMessage defaultMessage="[A-NFFE] I certify that the entity is a foreign (non-US) entity that is not a financial institution, that less than 50% of its gross income for the preceding calendar year is passive, and that less than 50% of assets produce passive income" />
+                <FormattedMessage
+                  defaultMessage="[A-NFFE] I certify that the entity is a foreign (non-US) entity that is not a financial institution, that less than 50% of its gross income for the preceding calendar year is passive, and that less than 50% of assets produce passive income"
+                  id="lUTk9J"
+                />
               ) : values.nffeStatus === NFFEStatus.PassiveNFFE ? (
-                <FormattedMessage defaultMessage="[P-NFFE] I certify that the entity is a foreign entity that is not a financial institution (other than an investment entity organized in a possession of the United States) and is not certifying its status as a publicly traded NFFE (or affiliate), excepted territory NFFE, active NFFE, direct reporting NFFE, or sponsored direct reporting NFFE." />
+                <FormattedMessage
+                  defaultMessage="[P-NFFE] I certify that the entity is a foreign entity that is not a financial institution (other than an investment entity organized in a possession of the United States) and is not certifying its status as a publicly traded NFFE (or affiliate), excepted territory NFFE, active NFFE, direct reporting NFFE, or sponsored direct reporting NFFE."
+                  id="YZLRBb"
+                />
               ) : (
-                <FormattedMessage defaultMessage="I certify that the entity is a nonprofit organization the meets the following requirements: The entity is established and maintained in its country of residence exclusively for religious, charitable, scientific, artistic, cultural or educational purposes; exempt from income tax in its country of residence; and has no shareholders or members who have a proprietary or beneficial interest in its income or assets. Neither the applicable laws of the entity's country of residence nor the entity's formation documents permit any income or assets of the entity to be distributed to, or applied for the benefit of, a private person or noncharitable entity other than pursuant to the conduct of the entity's charitable activities or as payment of reasonable compensation for services rendered or payment representing the fair market value of property which the entity has purchased; and upon the entity's liquidation or dissolution, all of its assets must be distributed to an entity that is a foreign government, an integral part of a foreign government, a controlled entity of a foreign government, or another organization that is described in this part or escheats to the government of the entity's country of residence or any political subdivision thereof." />
+                <FormattedMessage
+                  defaultMessage="I certify that the entity is a nonprofit organization the meets the following requirements: The entity is established and maintained in its country of residence exclusively for religious, charitable, scientific, artistic, cultural or educational purposes; exempt from income tax in its country of residence; and has no shareholders or members who have a proprietary or beneficial interest in its income or assets. Neither the applicable laws of the entity's country of residence nor the entity's formation documents permit any income or assets of the entity to be distributed to, or applied for the benefit of, a private person or noncharitable entity other than pursuant to the conduct of the entity's charitable activities or as payment of reasonable compensation for services rendered or payment representing the fair market value of property which the entity has purchased; and upon the entity's liquidation or dissolution, all of its assets must be distributed to an entity that is a foreign government, an integral part of a foreign government, a controlled entity of a foreign government, or another organization that is described in this part or escheats to the government of the entity's country of residence or any political subdivision thereof."
+                  id="fAik9y"
+                />
               )}
             </div>
           </label>
@@ -514,7 +557,10 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
               onCheckedChange={checked => formik.setFieldValue(field.name, checked === true)}
             />
             <div className="inline align-text-bottom">
-              <FormattedMessage defaultMessage="Under penalties of perjury, I declare that I have examined the information on this form and to the best of my knowledge and belief it is true, correct, and complete. I further certify under penalties of perjury that: The entity identified on this form is the beneficial owner of all the income to which this form relates, is using this form to certify its status for chapter 4 purposes, or is a merchant submitting this form for purposes of section 6050W; The entity identified on this form is not a U.S. person; The income to which this form relates is: (a) not effectively connected with the conduct of a trade or business in the United States, (b) effectively connected but is not subject to tax under an income tax treaty, or (c) the partner's share of a partnership's effectively connected income; and for broker transactions or barter exchanges, the beneficial owner is an exempt foreign person as defined in the instructions. Furthermore, I authorize this form to be provided to any withholding agent that has control, receipt, or custody of the income of which the entity on line 1 is the beneficial owner or any withholding agent that can disburse or make payments of the income of which the entity on line 1 is the beneficial owner. I agree that I will submit a new form within 30 days if any certification on this form becomes incorrect." />
+              <FormattedMessage
+                defaultMessage="Under penalties of perjury, I declare that I have examined the information on this form and to the best of my knowledge and belief it is true, correct, and complete. I further certify under penalties of perjury that: The entity identified on this form is the beneficial owner of all the income to which this form relates, is using this form to certify its status for chapter 4 purposes, or is a merchant submitting this form for purposes of section 6050W; The entity identified on this form is not a U.S. person; The income to which this form relates is: (a) not effectively connected with the conduct of a trade or business in the United States, (b) effectively connected but is not subject to tax under an income tax treaty, or (c) the partner's share of a partnership's effectively connected income; and for broker transactions or barter exchanges, the beneficial owner is an exempt foreign person as defined in the instructions. Furthermore, I authorize this form to be provided to any withholding agent that has control, receipt, or custody of the income of which the entity on line 1 is the beneficial owner or any withholding agent that can disburse or make payments of the income of which the entity on line 1 is the beneficial owner. I agree that I will submit a new form within 30 days if any certification on this form becomes incorrect."
+                id="+eVgNy"
+              />
             </div>
           </label>
         )}

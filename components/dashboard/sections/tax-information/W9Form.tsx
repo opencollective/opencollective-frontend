@@ -74,20 +74,27 @@ export const W9TaxFormFields = ({ formik }: { formik: FormikProps<W9TaxFormValue
     <div className="flex flex-col gap-y-4">
       <div className="mt-2">
         <p className="text-lg font-bold">
-          <FormattedMessage defaultMessage="Full name" />
+          <FormattedMessage defaultMessage="Full name" id="yk4PT9" />
         </p>
         <HintText>
-          <FormattedMessage defaultMessage="The name should match the name on your tax return." />
+          <FormattedMessage defaultMessage="The name should match the name on your tax return." id="YUN0DI" />
         </HintText>
       </div>
-      <StyledInputFormikField name="signer.firstName" label={intl.formatMessage({ defaultMessage: 'First Name' })} />
-      <StyledInputFormikField name="signer.middleName" label={intl.formatMessage({ defaultMessage: 'Middle Name' })} />
+      <StyledInputFormikField
+        name="signer.firstName"
+        label={intl.formatMessage({ defaultMessage: 'First Name', id: 'Q6wcZ5' })}
+      />
+      <StyledInputFormikField
+        name="signer.middleName"
+        label={intl.formatMessage({ defaultMessage: 'Middle Name', id: '9BrST0' })}
+      />
       <StyledInputFormikField
         name="signer.lastName"
-        label={intl.formatMessage({ defaultMessage: 'Last Name' })}
+        label={intl.formatMessage({ defaultMessage: 'Last Name', id: 'aheQdn' })}
         hint={intl.formatMessage({
           defaultMessage:
             'If you have changed your last name without informing the Social Security Administration (SSA) of the name change, enter your first name, the last name as shown on your social security card, and your new last name.',
+          id: 'gkXqIn',
         })}
       />
       <div className="mt-2">
@@ -95,7 +102,7 @@ export const W9TaxFormFields = ({ formik }: { formik: FormikProps<W9TaxFormValue
           <FormattedMessage id="collective.address.label" defaultMessage="Address" />
         </p>
         <HintText>
-          <FormattedMessage defaultMessage="This is where we will mail your information returns." />
+          <FormattedMessage defaultMessage="This is where we will mail your information returns." id="GqA9Im" />
         </HintText>
       </div>
       <StyledInputFormikField name="location" showError={false}>
@@ -116,12 +123,15 @@ export const W9TaxFormFields = ({ formik }: { formik: FormikProps<W9TaxFormValue
       {formik.values.submitterType === SubmitterType.Business && (
         <React.Fragment>
           <p className="mt-2 text-lg font-bold">
-            <FormattedMessage defaultMessage="Business information" />
+            <FormattedMessage defaultMessage="Business information" id="jMVWGg" />
           </p>
-          <StyledInputFormikField name="businessName" label={<FormattedMessage defaultMessage="Business name" />} />
+          <StyledInputFormikField
+            name="businessName"
+            label={<FormattedMessage defaultMessage="Business name" id="JlX9Hj" />}
+          />
           <StyledInputFormikField
             name="federalTaxClassification"
-            label={<FormattedMessage defaultMessage="Federal tax classification" />}
+            label={<FormattedMessage defaultMessage="Federal tax classification" id="nJHmJh" />}
           >
             {({ field }) => (
               <Select value={values.federalTaxClassification} onValueChange={value => setFieldValue(field.name, value)}>
@@ -141,40 +151,49 @@ export const W9TaxFormFields = ({ formik }: { formik: FormikProps<W9TaxFormValue
           {values.federalTaxClassification === 'Other' && (
             <StyledInputFormikField
               name="federalTaxClassificationDetails"
-              label={<FormattedMessage defaultMessage="Federal tax classification details" />}
+              label={<FormattedMessage defaultMessage="Federal tax classification details" id="xMwILS" />}
             />
           )}
           {/* From the reference PDF: Exemptions (codes apply only to certain entities, not individuals; see instructions on page 3) */}
           <div className="mt-2">
             <p className="text-lg font-bold">
-              <FormattedMessage defaultMessage="Exemptions" />
+              <FormattedMessage defaultMessage="Exemptions" id="HUu+ge" />
             </p>
             <HintText>
-              <FormattedMessage defaultMessage="If you are exempt from backup withholding and/or FATCA reporting, enter in the appropriate any code(s) that may apply to you" />
+              <FormattedMessage
+                defaultMessage="If you are exempt from backup withholding and/or FATCA reporting, enter in the appropriate any code(s) that may apply to you"
+                id="QkpEHv"
+              />
             </HintText>
           </div>
           <StyledInputFormikField
             name="exemptPayeeCode"
-            label={<FormattedMessage defaultMessage="Exempt payee code" />}
+            label={<FormattedMessage defaultMessage="Exempt payee code" id="8S5o1V" />}
             placeholder="Exempt payee code"
           />
           <StyledInputFormikField
             name="fatcaExemptionCode"
-            label={<FormattedMessage defaultMessage="Exemption from FATCA reporting code" />}
+            label={<FormattedMessage defaultMessage="Exemption from FATCA reporting code" id="fMrW9/" />}
           />
         </React.Fragment>
       )}
 
       <div className="mt-2">
         <p className="text-lg font-bold">
-          <FormattedMessage defaultMessage="Taxpayer Identification Number (TIN)" />
+          <FormattedMessage defaultMessage="Taxpayer Identification Number (TIN)" id="UKedhg" />
         </p>
         <HintText>
-          <FormattedMessage defaultMessage="The TIN provided must match the name given above to avoid backup withholding. For individuals, this is generally your social security number (SSN). However, for a resident alien, sole proprietor, or disregarded entity, see the instructions for Part I, later. For other entities, it is your employer identification number (EIN). If you do not have a number, see How to get a TIN, later." />
+          <FormattedMessage
+            defaultMessage="The TIN provided must match the name given above to avoid backup withholding. For individuals, this is generally your social security number (SSN). However, for a resident alien, sole proprietor, or disregarded entity, see the instructions for Part I, later. For other entities, it is your employer identification number (EIN). If you do not have a number, see How to get a TIN, later."
+            id="0wUJch"
+          />
         </HintText>
       </div>
 
-      <StyledInputFormikField name="taxIdNumberType" label={<FormattedMessage defaultMessage="Tax ID number type" />}>
+      <StyledInputFormikField
+        name="taxIdNumberType"
+        label={<FormattedMessage defaultMessage="Tax ID number type" id="yo5tZ7" />}
+      >
         {({ field }) => (
           <ButtonSet
             selected={field.value}
@@ -193,7 +212,13 @@ export const W9TaxFormFields = ({ formik }: { formik: FormikProps<W9TaxFormValue
 
       <StyledInputFormikField
         name="taxIdNumber"
-        label={<FormattedMessage defaultMessage="{tax} ID number" values={{ tax: values.taxIdNumberType || 'Tax' }} />}
+        label={
+          <FormattedMessage
+            defaultMessage="{tax} ID number"
+            id="eZpz5v"
+            values={{ tax: values.taxIdNumberType || 'Tax' }}
+          />
+        }
       >
         {({ field }) => (
           <StyledInput
@@ -227,6 +252,7 @@ export const W9TaxFormFields = ({ formik }: { formik: FormikProps<W9TaxFormValue
             <div className="inline align-text-bottom">
               <FormattedMessage
                 defaultMessage="Under penalties of perjury, I certify that: <ol><li>The number shown on this form is my correct taxpayer identification number (or I am waiting for a number to be issued to me);</li><li>I am not subject to backup withholding because: (a) I am exempt from backup withholding, or (b) I have not been notified by the Internal Revenue Service (IRS) that I am subject to backup withholding as a result of a failure to report all interest or dividends, or (c) the IRS has notified me that I am no longer subject to backup withholding;</li><li>I am a U.S. citizen or other U.S. person (defined above);</li><li>The FATCA code(s) entered on this form (if any) indicating that I am exempt from FATCA reporting is correct.</li></ol>"
+                id="B6UbSi"
                 values={I18nFormatters}
               />
             </div>

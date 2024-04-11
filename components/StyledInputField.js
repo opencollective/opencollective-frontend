@@ -157,7 +157,7 @@ StyledInputField.propTypes = {
   /** text to display below the input when there's no error */
   hint: PropTypes.any,
   /** Whether hints should appear above or below the input. Defaults to below. */
-  hintPosition: PropTypes.any,
+  hintPosition: PropTypes.oneOf(['above', 'below']),
   /** the label's 'for' attribute to be used as the 'name' and 'id' for the input */
   htmlFor: PropTypes.string,
   /** By default name is equal to htmlFor, but you can use this prop to override it */

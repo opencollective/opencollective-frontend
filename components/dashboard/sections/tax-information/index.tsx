@@ -40,6 +40,7 @@ const PendingTaxFormView = ({ account }) => {
     } else {
       const confirmMsg = intl.formatMessage({
         defaultMessage: 'You have unsaved changes. Are you sure you want to close this?',
+        id: 'srNsR3',
       });
       if (confirm(confirmMsg)) {
         setHasTaxInformationForm(false);
@@ -51,11 +52,12 @@ const PendingTaxFormView = ({ account }) => {
     <div>
       <MessageBox type="warning" withIcon>
         <strong>
-          <FormattedMessage defaultMessage="We need your tax information before we can pay you." />
+          <FormattedMessage defaultMessage="We need your tax information before we can pay you." id="a6tGTW" />
         </strong>
         <p>
           <FormattedMessage
             defaultMessage="If you experience any issues, please contact <SupportLink>our support</SupportLink>. Questions? See <HelpDocsLink>help docs</HelpDocsLink> about taxes."
+            id="A5CKz8"
             values={{
               SupportLink: I18nSupportLink,
               HelpDocsLink: getI18nLink({
@@ -69,12 +71,12 @@ const PendingTaxFormView = ({ account }) => {
       <hr className="my-8" />
       {requestService === 'DROPBOX_FORMS' ? (
         <p>
-          <FormattedMessage defaultMessage="You will receive an email with a link to fill out a form." />
+          <FormattedMessage defaultMessage="You will receive an email with a link to fill out a form." id="V2vf/v" />
         </p>
       ) : (
         <Button size="lg" onClick={onOpen}>
           <FilePenLine className="mr-1" size={16} />
-          <FormattedMessage defaultMessage="Fill Tax Information" />
+          <FormattedMessage defaultMessage="Fill Tax Information" id="TxJpk1" />
         </Button>
       )}
       <Dialog onOpenChange={isOpen => (isOpen ? onOpen() : onClose())} open={hasTaxInformationForm}>
@@ -82,11 +84,12 @@ const PendingTaxFormView = ({ account }) => {
           <div className="sticky top-0 z-50 flex items-center justify-between border-b border-gray-100 bg-white px-6 py-4 shadow-md">
             <div className="text-sm">
               <h2 className="text-xl font-bold">
-                <FormattedMessage defaultMessage="Update Tax Information" />
+                <FormattedMessage defaultMessage="Update Tax Information" id="sVea7o" />
               </h2>
               <div className="mt-1 flex items-center gap-1 text-sm text-gray-600">
                 <FormattedMessage
                   defaultMessage="for {account}"
+                  id="bKMsE/"
                   values={{
                     account: (
                       <LinkCollective openInNewTab collective={account} className="flex items-center gap-1">
@@ -120,11 +123,12 @@ const TaxFormSuccessView = () => {
     <div>
       <MessageBox type="info">
         <p className="mb-2 font-bold">
-          <FormattedMessage defaultMessage="Your tax information has been submitted successfully." />
+          <FormattedMessage defaultMessage="Your tax information has been submitted successfully." id="By+kN6" />
         </p>
         <p>
           <FormattedMessage
             defaultMessage="We also sent you a copy of the signed document by email. If you experience any issues, <SupportLink>contact support</SupportLink>. Questions? See <DocsLink>help docs</DocsLink> about taxes."
+            id="MR3j9g"
             values={{
               SupportLink: I18nSupportLink,
               DocsLink: getI18nLink({
@@ -139,7 +143,7 @@ const TaxFormSuccessView = () => {
       <div className="flex gap-4">
         <Link href={`/contact?topic=${encodeURIComponent('Update tax information')}`}>
           <Button variant="outline">
-            <FormattedMessage defaultMessage="Request to edit info" />
+            <FormattedMessage defaultMessage="Request to edit info" id="sTxTcl" />
           </Button>
         </Link>
       </div>
@@ -157,7 +161,7 @@ export const TaxInformationSettingsSection = ({ account }) => {
   return (
     <div>
       <h2 className="mb-8 text-3xl font-bold">
-        <FormattedMessage defaultMessage="Tax Information" />
+        <FormattedMessage defaultMessage="Tax Information" id="r/dTTe" />
       </h2>
 
       {loading ? (
@@ -167,7 +171,10 @@ export const TaxInformationSettingsSection = ({ account }) => {
       ) : !taxForms.length ? (
         <div className="flex items-center justify-between gap-5 text-xl">
           <Image src="/static/images/illustrations/plant.png" alt="" width={164} height={164} />
-          <FormattedMessage defaultMessage="You currently do not need to fill out any tax related information. Should this become necessary, you will be alerted and guided through the process." />
+          <FormattedMessage
+            defaultMessage="You currently do not need to fill out any tax related information. Should this become necessary, you will be alerted and guided through the process."
+            id="Mdn+cL"
+          />
         </div>
       ) : taxForms.find(form => form.status === 'RECEIVED') ? (
         <TaxFormSuccessView />

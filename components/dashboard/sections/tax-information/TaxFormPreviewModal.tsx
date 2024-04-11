@@ -15,7 +15,7 @@ export const TaxFormPreviewModal = ({ type, values, onOpenChange }) => {
       canOpenInNewWindow={false}
       files={[
         {
-          name: intl.formatMessage({ defaultMessage: '{type} Tax Form' }, { type }),
+          name: intl.formatMessage({ defaultMessage: '{type} Tax Form', id: 'oWNtKa' }, { type }),
           url: url.toString(),
         },
       ]}

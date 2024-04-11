@@ -85,6 +85,7 @@ const StyledInputLocation = ({
         <MessageBox type="error" withIcon mt={2}>
           <FormattedMessage
             defaultMessage="Failed to load the structured address fields. Please reload the page or <SupportLink>contact support</SupportLink>."
+            id="5A4zUi"
             values={I18nFormatters}
           />
         </MessageBox>

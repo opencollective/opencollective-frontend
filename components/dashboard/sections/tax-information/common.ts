@@ -69,7 +69,9 @@ export const TaxFormLocationFields = z.object({
   country: z.string(),
   structured: z.object({
     address1: z.string().optional(),
+    address2: z.string().optional(),
     city: z.string().optional(),
+    zone: z.string().optional(),
     postalCode: z.string().optional(),
   }),
 });

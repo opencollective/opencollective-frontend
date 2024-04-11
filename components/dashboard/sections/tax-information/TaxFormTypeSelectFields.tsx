@@ -44,31 +44,40 @@ export const TaxFormTypeSelectFields = ({
     <div>
       <div>
         <label htmlFor="isUSPersonOrEntity" className="mb-2 text-sm font-bold leading-none">
-          <FormattedMessage defaultMessage="Are you a US Person or Entity?" />
+          <FormattedMessage defaultMessage="Are you a US Person or Entity?" id="jLNMby" />
         </label>
         <HintText>
-          <FormattedMessage defaultMessage="US citizen, resident, green card holder, or US-incorporated entity." />
+          <FormattedMessage
+            defaultMessage="US citizen, resident, green card holder, or US-incorporated entity."
+            id="1sVvDY"
+          />
         </HintText>
         <ButtonSet
           selected={values.isUSPersonOrEntity}
           onChange={value => dispatchChanges({ isUSPersonOrEntity: value })}
           options={[
-            { label: <FormattedMessage defaultMessage="Yes" />, value: true },
-            { label: <FormattedMessage defaultMessage="No" />, value: false },
+            { label: <FormattedMessage defaultMessage="Yes" id="a5msuh" />, value: true },
+            { label: <FormattedMessage defaultMessage="No" id="oUWADl" />, value: false },
           ]}
         />
       </div>
       {values.isUSPersonOrEntity !== null && (
         <div className="mt-4">
           <label htmlFor="submitterType" className="text-sm font-bold leading-none">
-            <FormattedMessage defaultMessage="Are you submitting this form as…" />
+            <FormattedMessage defaultMessage="Are you submitting this form as…" id="y4Qz6r" />
           </label>
           <ButtonSet
             selected={values.submitterType}
             onChange={value => dispatchChanges({ submitterType: value })}
             options={[
-              { label: <FormattedMessage defaultMessage="An individual person" />, value: SubmitterType.Individual },
-              { label: <FormattedMessage defaultMessage="A business or entity" />, value: SubmitterType.Business },
+              {
+                label: <FormattedMessage defaultMessage="An individual person" id="t4DyLz" />,
+                value: SubmitterType.Individual,
+              },
+              {
+                label: <FormattedMessage defaultMessage="A business or entity" id="I84wlu" />,
+                value: SubmitterType.Business,
+              },
             ]}
           />
         </div>
