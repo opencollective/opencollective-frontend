@@ -5,7 +5,7 @@ import { ThemeProvider } from 'styled-components';
 
 import { initClient } from '../lib/apollo-client';
 import theme from '../lib/theme';
-import { RouterContext } from 'next/dist/shared/lib/router-context';
+import { RouterContext } from 'next/dist/shared/lib/router-context.shared-runtime';
 
 import { Toaster } from '../components/ui/Toaster';
 import { TooltipProvider } from '../components/ui/Tooltip';
