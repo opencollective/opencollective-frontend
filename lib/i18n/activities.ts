@@ -311,6 +311,7 @@ export const ActivityDescriptionI18n = defineMessages({
   },
   TAXFORM_RECEIVED: {
     defaultMessage: 'Tax form received for <Account></Account>',
+    id: 'DUPkdl',
   },
   // Members
   COLLECTIVE_MEMBER_CREATED: {
@@ -801,6 +802,7 @@ export const ActivityTypeI18n: ActivityTranslations = defineMessages({
   },
   TAXFORM_RECEIVED: {
     defaultMessage: 'Tax form received',
+    id: 'XbazB4',
   },
   COLLECTIVE_COMMENT_CREATED: {
     defaultMessage: 'Comment posted',
