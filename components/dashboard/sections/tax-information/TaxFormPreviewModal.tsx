@@ -1,13 +1,13 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
 
-import FilesViewerModal from '../../../FilesViewerModal';
+import { getTaxFormPDFServiceUrl } from '../../../../lib/url-helpers';
 
-import { getTaxFormPreviewUrl } from './TaxFormPreview';
+import FilesViewerModal from '../../../FilesViewerModal';
 
 export const TaxFormPreviewModal = ({ type, values, onOpenChange }) => {
   const intl = useIntl();
-  const url = getTaxFormPreviewUrl(type, values, true);
+  const url = getTaxFormPDFServiceUrl(type, values, { isFinal: true });
   return (
     <FilesViewerModal
       onClose={() => onOpenChange(false)}

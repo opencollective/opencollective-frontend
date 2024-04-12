@@ -34,6 +34,7 @@ const COMMON_DIRECTIVES = {
     SELF,
     process.env.API_URL,
     process.env.PDF_SERVICE_URL,
+    process.env.NEXT_PDF_SERVICE_URL,
     process.env.REST_URL,
     process.env.ML_SERVICE_URL,
     'wtfismyip.com',
@@ -54,7 +55,7 @@ const COMMON_DIRECTIVES = {
     'https://www.google.com',
     'https://api.cryptonator.com',
     'https://plausible.io',
-  ],
+  ].filter(Boolean),
   scriptSrc: [
     SELF,
     UNSAFE_INLINE, // Required by current PayPal integration. https://developer.paypal.com/docs/checkout/troubleshoot/support/#browser-features-and-polyfills provides a way to deal with that through nonces.

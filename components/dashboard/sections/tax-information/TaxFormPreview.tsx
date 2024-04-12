@@ -2,12 +2,10 @@ import React from 'react';
 import { debounce } from 'lodash';
 import dynamic from 'next/dynamic';
 
-import { PDF_SERVICE_URL } from '../../../../lib/url-helpers';
+import { getTaxFormPDFServiceUrl } from '../../../../lib/url-helpers';
 import { cn } from '../../../../lib/utils';
 
 import Image from '../../../Image';
-
-import { TaxFormType } from './common';
 
 const TaxFormLoadingPlaceholder = (
   <Image src="/static/images/tax-form-placeholder.jpg" priority alt="" width={761} height={984} />
@@ -87,20 +85,11 @@ const MemoizedTaxFormPreview = React.memo(({ url }: { url: string }) => {
 
 MemoizedTaxFormPreview.displayName = 'MemoizedTaxFormPreview';
 
-export const getTaxFormPreviewUrl = (type: TaxFormType, values, isFinal = false): string => {
-  const url = new URL(`${PDF_SERVICE_URL}/tax-form/${type}.pdf`);
-  const base64Values = Buffer.from(JSON.stringify(values)).toString('base64');
-  url.searchParams.set('formType', type);
-  url.searchParams.set('values', base64Values);
-  url.searchParams.set('isFinal', isFinal.toString());
-  return url.toString();
-};
-
 /**
  * An inline preview of the tax form that supports being re-rendered with new values as they get typed in a form.
  * Renders are debounced to avoid overloading the server, and the previous render is replaced with the new one.
  */
 export const TaxFormPreview = ({ type, values }) => {
-  const url = getTaxFormPreviewUrl(type, values);
+  const url = getTaxFormPDFServiceUrl(type, values, { useNext: true });
   return <MemoizedTaxFormPreview url={url} />;
 };
