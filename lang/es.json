@@ -2124,7 +2124,7 @@
   "IgNnY1": "Company that meets the ownership and base erosion test",
   "IgOygF": "Ver documentación",
   "iHkkt+": "Administrar los Anfitriones Fiscales.",
-  "iItDLM": "{childName} is an {parentName} {childType, select, EVENT {event} FUND {fund} PROJECT {project} other {account}}",
+  "iItDLM": "{childName} is {childType, select, EVENT {an event} FUND {a fund} PROJECT {a project} other {an account}} of {parentName}",
   "ijvoto": "{value} (Tarifa del Procesador de Pago)",
   "ILjcbM": "Congelar Colectivo",
   "ILnhs8": "Editar los Datos de la Tarjeta",

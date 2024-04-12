@@ -2124,7 +2124,7 @@
   "IgNnY1": "Company that meets the ownership and base erosion test",
   "IgOygF": "View documentation",
   "iHkkt+": "Administrate fiscal hosts.",
-  "iItDLM": "{childName} is an {parentName} {childType, select, EVENT {event} FUND {fund} PROJECT {project} other {account}}",
+  "iItDLM": "{childName} is {childType, select, EVENT {an event} FUND {a fund} PROJECT {a project} other {an account}} of {parentName}",
   "ijvoto": "{value} (Payment Processor Fee)",
   "ILjcbM": "Freeze Collective",
   "ILnhs8": "Edit Card Details",
