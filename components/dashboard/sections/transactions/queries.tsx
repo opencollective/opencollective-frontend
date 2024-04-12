@@ -78,7 +78,7 @@ export const transactionsTableQuery = gql`
     $includeChildrenTransactions: Boolean
     $virtualCard: [VirtualCardReferenceInput]
     $orderBy: ChronologicalOrderInput
-    $group: String
+    $group: [String]
     $includeHost: Boolean
     $expenseType: [ExpenseType]
     $expense: ExpenseReferenceInput

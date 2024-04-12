@@ -343,6 +343,16 @@ interface Account {
     paymentMethodType: [PaymentMethodType]
 
     """
+    The payment method services.
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Reference of the account(s) assigned to the main side of the transaction you want to EXCLUDE from the results
+    """
+    excludeAccount: [AccountReferenceInput]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -460,13 +470,23 @@ interface Account {
     """
     The transactions group to filter by
     """
-    group: String
+    group: [String]
     virtualCard: [VirtualCardReferenceInput]
 
     """
     Only return transactions that are refunds (or not refunds if false)
     """
     isRefund: Boolean
+
+    """
+    Only return transactions that are associated with these external merchant IDs
+    """
+    merchantId: [String]
+
+    """
+    Only return transactions that are associated with these accounting categories
+    """
+    accountingCategory: [String]
   ): TransactionCollection!
   orders(
     """
@@ -1934,6 +1954,16 @@ type Host implements Account & AccountWithContributions {
     paymentMethodType: [PaymentMethodType]
 
     """
+    The payment method services.
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Reference of the account(s) assigned to the main side of the transaction you want to EXCLUDE from the results
+    """
+    excludeAccount: [AccountReferenceInput]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -2051,13 +2081,23 @@ type Host implements Account & AccountWithContributions {
     """
     The transactions group to filter by
     """
-    group: String
+    group: [String]
     virtualCard: [VirtualCardReferenceInput]
 
     """
     Only return transactions that are refunds (or not refunds if false)
     """
     isRefund: Boolean
+
+    """
+    Only return transactions that are associated with these external merchant IDs
+    """
+    merchantId: [String]
+
+    """
+    Only return transactions that are associated with these accounting categories
+    """
+    accountingCategory: [String]
   ): TransactionCollection!
   orders(
     """
@@ -3064,7 +3104,7 @@ type LegalDocument {
   account: Account!
 
   """
-  URL to the actual file. Must be logged in. The final URL will be protected by 2FA, be prepared to pass the 2FA token in the headers.
+  URL to download the file. Must be logged in as an account admin. The returned URL will be protected by authentication + 2FA.
   """
   documentLink: URL
 }
@@ -3223,6 +3263,15 @@ enum PaymentMethodType {
   BANK_TRANSFER
   PAYOUT
   VIRTUAL_CARD
+}
+
+enum PaymentMethodService {
+  PAYPAL
+  STRIPE
+  OPENCOLLECTIVE
+  PREPAID
+  THEGIVINGBLOCK
+  WISE
 }
 
 input ExpenseReferenceInput {
@@ -4332,15 +4381,6 @@ type PaymentMethod {
     """
     onlyActiveSubscriptions: Boolean
   ): OrderCollection
-}
-
-enum PaymentMethodService {
-  PAYPAL
-  STRIPE
-  OPENCOLLECTIVE
-  PREPAID
-  THEGIVINGBLOCK
-  WISE
 }
 
 enum PaymentMethodLegacyType {
@@ -6893,6 +6933,16 @@ type Bot implements Account {
     paymentMethodType: [PaymentMethodType]
 
     """
+    The payment method services.
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Reference of the account(s) assigned to the main side of the transaction you want to EXCLUDE from the results
+    """
+    excludeAccount: [AccountReferenceInput]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -7010,13 +7060,23 @@ type Bot implements Account {
     """
     The transactions group to filter by
     """
-    group: String
+    group: [String]
     virtualCard: [VirtualCardReferenceInput]
 
     """
     Only return transactions that are refunds (or not refunds if false)
     """
     isRefund: Boolean
+
+    """
+    Only return transactions that are associated with these external merchant IDs
+    """
+    merchantId: [String]
+
+    """
+    Only return transactions that are associated with these accounting categories
+    """
+    accountingCategory: [String]
   ): TransactionCollection!
   orders(
     """
@@ -7603,6 +7663,16 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     paymentMethodType: [PaymentMethodType]
 
     """
+    The payment method services.
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Reference of the account(s) assigned to the main side of the transaction you want to EXCLUDE from the results
+    """
+    excludeAccount: [AccountReferenceInput]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -7720,13 +7790,23 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     The transactions group to filter by
     """
-    group: String
+    group: [String]
     virtualCard: [VirtualCardReferenceInput]
 
     """
     Only return transactions that are refunds (or not refunds if false)
     """
     isRefund: Boolean
+
+    """
+    Only return transactions that are associated with these external merchant IDs
+    """
+    merchantId: [String]
+
+    """
+    Only return transactions that are associated with these accounting categories
+    """
+    accountingCategory: [String]
   ): TransactionCollection!
   orders(
     """
@@ -8402,7 +8482,7 @@ type Credit implements Transaction {
   ): [Transaction]!
 
   """
-  Merchant id related to the Transaction (Stripe, PayPal, Wise, Privacy)
+  Merchant ID related to the Transaction (Stripe, PayPal, Wise, Privacy)
   """
   merchantId: String
   balanceInHostCurrency: Amount
@@ -8546,7 +8626,7 @@ type Debit implements Transaction {
   ): [Transaction]!
 
   """
-  Merchant id related to the Transaction (Stripe, PayPal, Wise, Privacy)
+  Merchant ID related to the Transaction (Stripe, PayPal, Wise, Privacy)
   """
   merchantId: String
   balanceInHostCurrency: Amount
@@ -8754,6 +8834,16 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     paymentMethodType: [PaymentMethodType]
 
     """
+    The payment method services.
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Reference of the account(s) assigned to the main side of the transaction you want to EXCLUDE from the results
+    """
+    excludeAccount: [AccountReferenceInput]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -8871,13 +8961,23 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     The transactions group to filter by
     """
-    group: String
+    group: [String]
     virtualCard: [VirtualCardReferenceInput]
 
     """
     Only return transactions that are refunds (or not refunds if false)
     """
     isRefund: Boolean
+
+    """
+    Only return transactions that are associated with these external merchant IDs
+    """
+    merchantId: [String]
+
+    """
+    Only return transactions that are associated with these accounting categories
+    """
+    accountingCategory: [String]
   ): TransactionCollection!
   orders(
     """
@@ -9694,6 +9794,16 @@ type Individual implements Account {
     paymentMethodType: [PaymentMethodType]
 
     """
+    The payment method services.
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Reference of the account(s) assigned to the main side of the transaction you want to EXCLUDE from the results
+    """
+    excludeAccount: [AccountReferenceInput]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -9811,13 +9921,23 @@ type Individual implements Account {
     """
     The transactions group to filter by
     """
-    group: String
+    group: [String]
     virtualCard: [VirtualCardReferenceInput]
 
     """
     Only return transactions that are refunds (or not refunds if false)
     """
     isRefund: Boolean
+
+    """
+    Only return transactions that are associated with these external merchant IDs
+    """
+    merchantId: [String]
+
+    """
+    Only return transactions that are associated with these accounting categories
+    """
+    accountingCategory: [String]
   ): TransactionCollection!
   orders(
     """
@@ -10610,6 +10730,16 @@ type Organization implements Account & AccountWithContributions {
     paymentMethodType: [PaymentMethodType]
 
     """
+    The payment method services.
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Reference of the account(s) assigned to the main side of the transaction you want to EXCLUDE from the results
+    """
+    excludeAccount: [AccountReferenceInput]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -10727,13 +10857,23 @@ type Organization implements Account & AccountWithContributions {
     """
     The transactions group to filter by
     """
-    group: String
+    group: [String]
     virtualCard: [VirtualCardReferenceInput]
 
     """
     Only return transactions that are refunds (or not refunds if false)
     """
     isRefund: Boolean
+
+    """
+    Only return transactions that are associated with these external merchant IDs
+    """
+    merchantId: [String]
+
+    """
+    Only return transactions that are associated with these accounting categories
+    """
+    accountingCategory: [String]
   ): TransactionCollection!
   orders(
     """
@@ -11420,6 +11560,16 @@ type Vendor implements Account & AccountWithContributions {
     paymentMethodType: [PaymentMethodType]
 
     """
+    The payment method services.
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Reference of the account(s) assigned to the main side of the transaction you want to EXCLUDE from the results
+    """
+    excludeAccount: [AccountReferenceInput]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -11537,13 +11687,23 @@ type Vendor implements Account & AccountWithContributions {
     """
     The transactions group to filter by
     """
-    group: String
+    group: [String]
     virtualCard: [VirtualCardReferenceInput]
 
     """
     Only return transactions that are refunds (or not refunds if false)
     """
     isRefund: Boolean
+
+    """
+    Only return transactions that are associated with these external merchant IDs
+    """
+    merchantId: [String]
+
+    """
+    Only return transactions that are associated with these accounting categories
+    """
+    accountingCategory: [String]
   ): TransactionCollection!
   orders(
     """
@@ -12797,6 +12957,16 @@ type Query {
     paymentMethodType: [PaymentMethodType]
 
     """
+    The payment method services.
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Reference of the account(s) assigned to the main side of the transaction you want to EXCLUDE from the results
+    """
+    excludeAccount: [AccountReferenceInput]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -12914,13 +13084,23 @@ type Query {
     """
     The transactions group to filter by
     """
-    group: String
+    group: [String]
     virtualCard: [VirtualCardReferenceInput]
 
     """
     Only return transactions that are refunds (or not refunds if false)
     """
     isRefund: Boolean
+
+    """
+    Only return transactions that are associated with these external merchant IDs
+    """
+    merchantId: [String]
+
+    """
+    Only return transactions that are associated with these accounting categories
+    """
+    accountingCategory: [String]
   ): TransactionCollection!
   update(
     """
@@ -14651,6 +14831,16 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     paymentMethodType: [PaymentMethodType]
 
     """
+    The payment method services.
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Reference of the account(s) assigned to the main side of the transaction you want to EXCLUDE from the results
+    """
+    excludeAccount: [AccountReferenceInput]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -14768,13 +14958,23 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     The transactions group to filter by
     """
-    group: String
+    group: [String]
     virtualCard: [VirtualCardReferenceInput]
 
     """
     Only return transactions that are refunds (or not refunds if false)
     """
     isRefund: Boolean
+
+    """
+    Only return transactions that are associated with these external merchant IDs
+    """
+    merchantId: [String]
+
+    """
+    Only return transactions that are associated with these accounting categories
+    """
+    accountingCategory: [String]
   ): TransactionCollection!
   orders(
     """
@@ -15469,6 +15669,16 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     paymentMethodType: [PaymentMethodType]
 
     """
+    The payment method services.
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Reference of the account(s) assigned to the main side of the transaction you want to EXCLUDE from the results
+    """
+    excludeAccount: [AccountReferenceInput]
+
+    """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
     """
     fromAccount: AccountReferenceInput
@@ -15586,13 +15796,23 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     The transactions group to filter by
     """
-    group: String
+    group: [String]
     virtualCard: [VirtualCardReferenceInput]
 
     """
     Only return transactions that are refunds (or not refunds if false)
     """
     isRefund: Boolean
+
+    """
+    Only return transactions that are associated with these external merchant IDs
+    """
+    merchantId: [String]
+
+    """
+    Only return transactions that are associated with these accounting categories
+    """
+    accountingCategory: [String]
   ): TransactionCollection!
   orders(
     """
