@@ -281,7 +281,7 @@ export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFor
             {({ field }) => (
               <label className="cursor-pointer text-sm font-normal leading-normal">
                 <Checkbox
-                  className={cn('mr-2', { 'border-red-500': field.error })}
+                  className={cn('mr-2 align-text-top', { 'border-red-500': field.error })}
                   name={field.name}
                   checked={field.value}
                   onCheckedChange={checked => formik.setFieldValue(field.name, checked === true)}
@@ -407,7 +407,7 @@ export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFor
         {({ field }) => (
           <label className="cursor-pointer text-sm font-normal leading-normal">
             <Checkbox
-              className={cn('mr-2', { 'border-red-500': field.error })}
+              className={cn('mr-2 align-text-top', { 'border-red-500': field.error })}
               name={field.name}
               checked={field.value}
               onCheckedChange={checked => formik.setFieldValue(field.name, checked === true)}
