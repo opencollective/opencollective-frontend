@@ -14,6 +14,7 @@ import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 
 import { FocusFirstFormikError } from '../../../FocusFirstFormikError';
 import { FormikZod, getAllFieldsFromZodSchema } from '../../../FormikZod';
+import { OnChange } from '../../../OnChange';
 import { SignatureInput } from '../../../SignatureInput';
 import StyledInputFormikField from '../../../StyledInputFormikField';
 import { Button } from '../../../ui/Button';
@@ -130,105 +131,103 @@ export const TaxInformationForm = ({ account, setFormDirty }) => {
       {(formik: FormikProps<BaseFormValues>) => {
         const form = FORMS[formik.values.formType];
         const hasCompletedBaseForm = !isNil(formik.values.isUSPersonOrEntity) && !isNil(formik.values.submitterType);
-        if (formik.dirty && setFormDirty) {
-          setFormDirty(true);
-        }
-
         return (
           <WarnIfUnsavedChanges hasUnsavedChanges={formik.dirty}>
             <FocusFirstFormikError>
-              <div className="flex gap-[5vw]">
-                {/** Form */}
-                <Form className="flex-1">
-                  <TaxFormTypeSelectFields
-                    values={formik.values}
-                    onChange={values => {
-                      const form = FORMS[values.formType];
-                      if (!form) {
-                        setSchema(BaseFormSchema);
-                        formik.resetForm({ values: { ...formik.values, ...values } });
-                      } else {
-                        const newSchema = form.getSchema(values);
-                        setSchema(newSchema);
+              <OnChange value={formik.dirty} onChange={setFormDirty}>
+                <div className="flex gap-[5vw]">
+                  {/** Form */}
+                  <Form className="flex-1">
+                    <TaxFormTypeSelectFields
+                      values={formik.values}
+                      onChange={values => {
+                        const form = FORMS[values.formType];
+                        if (!form) {
+                          setSchema(BaseFormSchema);
+                          formik.resetForm({ values: { ...formik.values, ...values } });
+                        } else {
+                          const newSchema = form.getSchema(values);
+                          setSchema(newSchema);
 
-                        const initialValues = form.getInitialValues(newSchema, LoggedInUser, account, values);
-                        const fieldsToKeep = getAllFieldsFromZodSchema(newSchema);
-                        if (form.valuesToResetOnBaseFormChange) {
-                          remove(fieldsToKeep, field => form.valuesToResetOnBaseFormChange.includes(field));
+                          const initialValues = form.getInitialValues(newSchema, LoggedInUser, account, values);
+                          const fieldsToKeep = getAllFieldsFromZodSchema(newSchema);
+                          if (form.valuesToResetOnBaseFormChange) {
+                            remove(fieldsToKeep, field => form.valuesToResetOnBaseFormChange.includes(field));
+                          }
+
+                          const valuesToKeep = pick(formik.values, fieldsToKeep);
+                          const formState = { ...initialValues, ...omitBy(valuesToKeep, isEmpty), ...values };
+                          formik.resetForm({ values: formState });
                         }
-
-                        const valuesToKeep = pick(formik.values, fieldsToKeep);
-                        const formState = { ...initialValues, ...omitBy(valuesToKeep, isEmpty), ...values };
-                        formik.resetForm({ values: formState });
-                      }
-                    }}
-                  />
-                  {form && hasCompletedBaseForm && (
-                    <div className="mt-6 flex flex-col gap-y-4">
-                      <StyledInputFormikField
-                        name="email"
-                        label={<FormattedMessage id="Email" defaultMessage="Email" />}
-                        hint={intl.formatMessage({
-                          defaultMessage:
-                            'The email address of the person who will sign the form. A copy of the form will be sent to this email address.',
-                          id: 'F8QPOI',
-                        })}
-                      />
-                      <form.component formik={formik} />
-                      <div className="mt-5">
-                        <StyledInputFormikField name="isSigned">
-                          {({ field }) => (
-                            <SignatureInput
-                              isSigned={field.value}
-                              error={field.error}
-                              onChange={isSigned => formik.setFieldValue('isSigned', isSigned)}
-                              signerName={mergeName(formik.values.signer)}
-                              values={omit(formik.values, ['isSigned'])}
-                            />
-                          )}
-                        </StyledInputFormikField>
-                        <p className="mb-4 mt-3 text-sm text-neutral-700">
-                          <FormattedMessage
-                            defaultMessage='I agree to be legally bound by the document, and agree to the Open Collective Terms and Privacy Policy. Click on "I agree" to sign this document.'
-                            id="UY1nDu"
-                          />
-                        </p>
-                        <div className="mt-12 flex flex-wrap gap-4 text-nowrap">
-                          <Button
-                            className="flex-1"
-                            type="button"
-                            variant="outline"
-                            size="lg"
-                            onClick={() => setHasPreviewModal(true)}
-                            disabled={formik.isSubmitting}
-                          >
-                            <FileText className="mr-2 inline-block" size={16} />
-                            <FormattedMessage defaultMessage="Preview Document" id="PMhCU4" />
-                          </Button>
-                          <Button className="flex-1" size="lg" type="submit" loading={formik.isSubmitting}>
-                            <FormattedMessage id="submit" defaultMessage="Submit" />
-                          </Button>
-                        </div>
-                      </div>
-                      {hasPreviewModal && (
-                        <TaxFormPreviewModal
-                          type={formik.values.formType}
-                          values={formik.values}
-                          onOpenChange={setHasPreviewModal}
+                      }}
+                    />
+                    {form && hasCompletedBaseForm && (
+                      <div className="mt-6 flex flex-col gap-y-4">
+                        <StyledInputFormikField
+                          name="email"
+                          label={<FormattedMessage id="Email" defaultMessage="Email" />}
+                          hint={intl.formatMessage({
+                            defaultMessage:
+                              'The email address of the person who will sign the form. A copy of the form will be sent to this email address.',
+                            id: 'F8QPOI',
+                          })}
                         />
-                      )}
+                        <form.component formik={formik} />
+                        <div className="mt-5">
+                          <StyledInputFormikField name="isSigned">
+                            {({ field }) => (
+                              <SignatureInput
+                                isSigned={field.value}
+                                error={field.error}
+                                onChange={isSigned => formik.setFieldValue('isSigned', isSigned)}
+                                signerName={mergeName(formik.values.signer)}
+                                values={omit(formik.values, ['isSigned'])}
+                              />
+                            )}
+                          </StyledInputFormikField>
+                          <p className="mb-4 mt-3 text-sm text-neutral-700">
+                            <FormattedMessage
+                              defaultMessage='I agree to be legally bound by the document, and agree to the Open Collective Terms and Privacy Policy. Click on "I agree" to sign this document.'
+                              id="UY1nDu"
+                            />
+                          </p>
+                          <div className="mt-12 flex flex-wrap gap-4 text-nowrap">
+                            <Button
+                              className="flex-1"
+                              type="button"
+                              variant="outline"
+                              size="lg"
+                              onClick={() => setHasPreviewModal(true)}
+                              disabled={formik.isSubmitting}
+                            >
+                              <FileText className="mr-2 inline-block" size={16} />
+                              <FormattedMessage defaultMessage="Preview Document" id="PMhCU4" />
+                            </Button>
+                            <Button className="flex-1" size="lg" type="submit" loading={formik.isSubmitting}>
+                              <FormattedMessage id="submit" defaultMessage="Submit" />
+                            </Button>
+                          </div>
+                        </div>
+                        {hasPreviewModal && (
+                          <TaxFormPreviewModal
+                            type={formik.values.formType}
+                            values={formik.values}
+                            onOpenChange={setHasPreviewModal}
+                          />
+                        )}
+                      </div>
+                    )}
+                  </Form>
+                  {/** PDF preview */}
+                  {form && hasCompletedBaseForm && (
+                    <div className="hidden max-w-[min(65%,1200px)] flex-1 flex-grow-[1.5] animate-in fade-in-0 md:block">
+                      <div className="sticky top-[90px] h-[calc(100vh-120px)] w-full overflow-y-scroll rounded-xl shadow-2xl">
+                        <TaxFormPreview type={formik.values.formType} values={formik.values} />
+                      </div>
                     </div>
                   )}
-                </Form>
-                {/** PDF preview */}
-                {form && hasCompletedBaseForm && (
-                  <div className="hidden max-w-[min(65%,1200px)] flex-1 flex-grow-[1.5] animate-in fade-in-0 md:block">
-                    <div className="sticky top-[90px] h-[calc(100vh-120px)] w-full overflow-y-scroll rounded-xl shadow-2xl">
-                      <TaxFormPreview type={formik.values.formType} values={formik.values} />
-                    </div>
-                  </div>
-                )}
-              </div>
+                </div>
+              </OnChange>
             </FocusFirstFormikError>
           </WarnIfUnsavedChanges>
         );

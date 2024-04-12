@@ -5,7 +5,7 @@ import { pickBy } from 'lodash';
 import { useIntl } from 'react-intl';
 
 import { isOCError } from '../lib/errors';
-import { formatFormErrorMessage } from '../lib/form-utils';
+import { formatFormErrorMessage, RICH_ERROR_MESSAGES } from '../lib/form-utils';
 import { cn } from '../lib/utils';
 
 import Container from './Container';
@@ -59,6 +59,14 @@ const StyledInputFormikField = ({
             value => value !== undefined,
           ),
         };
+
+        if (
+          !fieldAttributes.required &&
+          meta.error &&
+          meta.error === intl.formatMessage(RICH_ERROR_MESSAGES.requiredValue)
+        ) {
+          fieldAttributes.required = true;
+        }
 
         return (
           <Container

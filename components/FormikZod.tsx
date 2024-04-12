@@ -59,10 +59,17 @@ export const getCustomZodErrorMap =
           ? intl.formatMessage(RICH_ERROR_MESSAGES.max, { max: error.maximum as number })
           : intl.formatMessage(RICH_ERROR_MESSAGES.maxLength, { count: error.maximum as number });
     } else if (error.code === 'too_small') {
-      message =
-        error.type === 'number'
-          ? intl.formatMessage(RICH_ERROR_MESSAGES.min, { min: error.minimum as number })
-          : intl.formatMessage(RICH_ERROR_MESSAGES.minLength, { count: error.minimum as number });
+      if (error.exact) {
+        message =
+          error.type === 'number'
+            ? intl.formatMessage(RICH_ERROR_MESSAGES.minExact, { count: error.minimum as number })
+            : intl.formatMessage(RICH_ERROR_MESSAGES.minLengthExact, { count: error.minimum as number });
+      } else {
+        message =
+          error.type === 'number'
+            ? intl.formatMessage(RICH_ERROR_MESSAGES.min, { min: error.minimum as number })
+            : intl.formatMessage(RICH_ERROR_MESSAGES.minLength, { count: error.minimum as number });
+      }
     } else if (error.code === 'invalid_string') {
       message = intl.formatMessage(RICH_ERROR_MESSAGES.format);
     } else if (error.code === 'invalid_enum_value') {
@@ -126,12 +133,12 @@ export const getAllFieldsFromZodSchema = (schema): string[] => {
   }
 };
 
-const isOptionalField = (field: z.ZodTypeAny): field is ZodOptional<any> | ZodNullable<any> => {
+const isOptionalFieldType = (field: z.ZodTypeAny): field is ZodOptional<any> | ZodNullable<any> => {
   return ['ZodOptional', 'ZodNullable'].includes(field._def.typeName);
 };
 
 const getTypeFromOptionalField = (field: z.ZodTypeAny): z.ZodTypeAny => {
-  if (isOptionalField(field)) {
+  if (isOptionalFieldType(field)) {
     return getTypeFromOptionalField(field.unwrap());
   } else {
     return field;
@@ -150,41 +157,37 @@ const getStringOptionFromUnion = (field: z.ZodTypeAny): z.ZodString | undefined 
 /**
  * Retrieves the given nested field from a Zod schema.
  */
-const getNestedFieldFromSchema = (
-  schema: z.ZodTypeAny,
-  fullPath: string[],
-  isOptional = false,
-): { field: z.ZodTypeAny; isOptional: boolean } => {
+const getNestedFieldFromSchema = (schema: z.ZodTypeAny, fullPath: string[]): z.ZodTypeAny => {
   if (isZodType<z.ZodObject<any>>(schema, z.ZodFirstPartyTypeKind.ZodObject)) {
     const [path, ...subPath] = fullPath;
     const field = (schema as z.AnyZodObject).shape[path];
     if (!field || subPath.length === 0) {
-      return { field, isOptional };
-    } else if (isOptionalField(field)) {
-      const mainField = getTypeFromOptionalField(field); // Make sure we properly traverse optional parents
-      return getNestedFieldFromSchema(mainField, subPath, true);
+      return field;
+    } else if (isOptionalFieldType(field)) {
+      const mainField = getTypeFromOptionalField(field);
+      return getNestedFieldFromSchema(mainField, subPath);
     } else {
-      return getNestedFieldFromSchema(field, subPath, isOptional);
+      return getNestedFieldFromSchema(field, subPath);
     }
   } else if (isZodType<z.ZodEffects<any>>(schema, z.ZodFirstPartyTypeKind.ZodEffects)) {
-    return getNestedFieldFromSchema(schema._def.schema, fullPath, isOptional);
+    return getNestedFieldFromSchema(schema._def.schema, fullPath);
   } else if (isZodType<z.ZodIntersection<any, any>>(schema, z.ZodFirstPartyTypeKind.ZodIntersection)) {
     const { left, right } = schema._def;
-    const leftResult = getNestedFieldFromSchema(left, fullPath, isOptional);
-    if (leftResult.field) {
-      return leftResult;
+    const field = getNestedFieldFromSchema(left, fullPath);
+    if (field) {
+      return field;
+    } else {
+      return getNestedFieldFromSchema(right, fullPath);
     }
-
-    return getNestedFieldFromSchema(right, fullPath, isOptional);
   }
 
-  return { field: null, isOptional };
+  return null;
 };
 
 export const generateInitialValuesFromSchema = (schema: z.ZodTypeAny): any => {
   if (!schema) {
     return null;
-  } else if (isOptionalField(schema)) {
+  } else if (isOptionalFieldType(schema)) {
     const field = getTypeFromOptionalField(schema);
     return generateInitialValuesFromSchema(field);
   } else if (isZodType<z.ZodObject<any>>(schema, z.ZodFirstPartyTypeKind.ZodObject)) {
@@ -225,21 +228,20 @@ export const getInputAttributesFromZodSchema = (
     return {};
   }
 
-  const nestedFieldInfo = getNestedFieldFromSchema(schema, name.split('.'));
-  if (!nestedFieldInfo.field) {
+  let field = getNestedFieldFromSchema(schema, name.split('.'));
+  if (!field) {
     return {};
   }
 
-  let { field } = nestedFieldInfo;
   const attributes = { name, required: true };
 
   // Handle optional/required
-  if (nestedFieldInfo.isOptional || isOptionalField(field)) {
+  if (field.isOptional() || field.isNullable()) {
     attributes.required = false;
     field = getTypeFromOptionalField(field);
   } else if (field._def.typeName === 'ZodUnion') {
     // If any of the options is optional, the field is optional
-    attributes.required = !field._def.options.some(option => isOptionalField(option));
+    attributes.required = !field._def.options.some(option => option.isOptional() || option.isNullable());
 
     // It's common to have an union between a string and a literal(''), to allow empty strings while enforcing a minimum length.
     // In this case, we should use the string's attributes.

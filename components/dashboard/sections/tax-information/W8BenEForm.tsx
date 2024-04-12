@@ -36,6 +36,10 @@ const Chapter3StatusThatCanBeHybrid = [
   Chapter3Status.GrantorTrust,
 ] as const;
 
+const usOwnersSchema = z.array(
+  z.object({ name: z.string().min(1).max(255), address: TaxFormLocationFields, tin: z.string().max(11) }),
+);
+
 export const W8BenETaxFormValuesSchema = BaseFormSchema.merge(
   z.object({
     businessName: z.string().min(1).max(255),
@@ -53,6 +57,18 @@ export const W8BenETaxFormValuesSchema = BaseFormSchema.merge(
     hasConfirmedTOS: z.literal<boolean>(true),
     isHybridEntity: z.boolean().nullable(),
     claimsSpecialRatesAndConditions: z.boolean().nullable(),
+    nffeStatus: z.nativeEnum(NFFEStatus),
+    // Conditional fields (see discriminators below)
+    certifyDerivesIncome: z.boolean().optional().nullable(),
+    typeOfLimitationOnBenefitsProvisions: z.nativeEnum(TypeOfLimitationOnBenefitsProvisions).optional().nullable(),
+    typeOfLimitationOnBenefitsProvisionsOther: z.string().optional().nullable(),
+    certifyBeneficialOwnerCountry: z.boolean().optional().nullable(),
+    certifyForeignCorporation: z.boolean().optional().nullable(),
+    claimsArticleAndParagraph: z.string().optional().nullable(),
+    claimsRate: z.number().min(0).max(100).optional().nullable(),
+    claimsIncomeType: z.string().optional().nullable(),
+    claimsExplanation: z.string().optional().nullable(),
+    usOwners: usOwnersSchema.optional().nullable(),
   }),
 )
   .and(
@@ -62,15 +78,7 @@ export const W8BenETaxFormValuesSchema = BaseFormSchema.merge(
       z.object({
         nffeStatus: z.literal(NFFEStatus.PassiveNFFE),
         entityHasNoUSOwners: z.boolean().optional(),
-        usOwners: z
-          .array(
-            z.object({
-              name: z.string().min(1).max(255),
-              address: TaxFormLocationFields,
-              tin: z.string().max(11),
-            }),
-          )
-          .optional(),
+        usOwners: usOwnersSchema.optional().nullable(),
       }),
     ]),
   )
@@ -82,6 +90,16 @@ export const W8BenETaxFormValuesSchema = BaseFormSchema.merge(
         certifyBeneficialOwnerCountry: z.boolean().nullable(),
         certifyDerivesIncome: z.boolean().nullable(),
         certifyForeignCorporation: z.boolean().nullable(),
+        claimsSpecialRatesAndConditions: z.boolean(),
+      }),
+    ]),
+  )
+  .and(
+    z.discriminatedUnion('certifyDerivesIncome', [
+      z.object({ certifyDerivesIncome: z.literal<boolean>(null) }),
+      z.object({ certifyDerivesIncome: z.literal<boolean>(false) }),
+      z.object({
+        certifyDerivesIncome: z.literal<boolean>(true),
         typeOfLimitationOnBenefitsProvisions: z.nativeEnum(TypeOfLimitationOnBenefitsProvisions),
         typeOfLimitationOnBenefitsProvisionsOther: z.string(),
       }),
@@ -328,7 +346,7 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
                   </label>
                 )}
               </StyledInputFormikField>
-              {values['certifyDerivesIncome'] && (
+              {values.certifyDerivesIncome && (
                 <StyledInputFormikField
                   name="typeOfLimitationOnBenefitsProvisions"
                   label={<FormattedMessage defaultMessage="Type of limitation on benefits provisions" id="nsXvv8" />}
@@ -358,7 +376,7 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
                   )}
                 </StyledInputFormikField>
               )}
-              {values['typeOfLimitationOnBenefitsProvisions'] === TypeOfLimitationOnBenefitsProvisions.Other && (
+              {values.typeOfLimitationOnBenefitsProvisions === TypeOfLimitationOnBenefitsProvisions.Other && (
                 <StyledInputFormikField
                   name="typeOfLimitationOnBenefitsProvisionsOther"
                   label={

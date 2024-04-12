@@ -30,12 +30,21 @@ export const W8BenTaxFormValuesSchema = BaseFormSchema.merge(
     taxpayerIdentificationNumberTypeUS: z.enum(['SSN', 'ITIN']).nullable(),
     taxpayerIdentificationNumberUS: z.string().optional(),
     taxpayerIdentificationNumberForeign: z.string().max(255),
-    dateOfBirth: z.string(),
-    certifiesResidentCountry: z.literal<boolean>(true),
+    dateOfBirth: z.string().length(10),
     countryOfCitizenship: z.string(),
     residenceAddress: TaxFormLocationFields,
     mailingAddress: TaxFormLocationFields.optional(),
     hasConfirmedTOS: z.literal<boolean>(true),
+    claimsSpecialRatesAndConditions: z.boolean(),
+    isSignerTheBeneficialOwner: z.boolean(),
+    // Conditional fields (see discriminators below)
+    certifiesResidentCountry: z.boolean().nullable().optional(),
+    hasTaxTreatySpecialRatesAndConditions: z.boolean().nullable().optional(),
+    claimsArticleAndParagraph: z.string().nullable().optional(),
+    claimsRate: z.number().min(0).max(100).nullable().optional(),
+    claimsIncomeType: z.string().nullable().optional(),
+    claimsExplanation: z.string().nullable().optional(),
+    signerCapacity: z.string().nullable().optional(),
   }),
 )
   .and(
@@ -45,6 +54,7 @@ export const W8BenTaxFormValuesSchema = BaseFormSchema.merge(
         z.object({
           claimsSpecialRatesAndConditions: z.literal(true),
           hasTaxTreatySpecialRatesAndConditions: z.boolean(),
+          certifiesResidentCountry: z.literal<boolean>(true),
         }),
       ])
       .and(
@@ -65,7 +75,6 @@ export const W8BenTaxFormValuesSchema = BaseFormSchema.merge(
       z.object({ isSignerTheBeneficialOwner: z.literal(true) }),
       z.object({
         isSignerTheBeneficialOwner: z.literal(false),
-        signer: TaxFormNameFields,
         signerCapacity: z.string(),
       }),
     ]),
@@ -253,7 +262,12 @@ export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFor
           <ButtonSet
             selected={values.claimsSpecialRatesAndConditions}
             error={field.error}
-            onChange={value => setFieldValue(field.name, value)}
+            onChange={value => {
+              setFieldValue(field.name, value);
+              if (!value) {
+                setFieldValue('hasTaxTreatySpecialRatesAndConditions', null);
+              }
+            }}
             options={[
               { label: <FormattedMessage defaultMessage="Yes" id="a5msuh" />, value: true },
               { label: <FormattedMessage defaultMessage="No" id="oUWADl" />, value: false },
@@ -310,7 +324,7 @@ export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFor
               />
             )}
           </StyledInputFormikField>
-          {values.claimsSpecialRatesAndConditions === true && values.hasTaxTreatySpecialRatesAndConditions && (
+          {values.hasTaxTreatySpecialRatesAndConditions && (
             <React.Fragment>
               <StyledInputFormikField
                 name="claimsArticleAndParagraph"

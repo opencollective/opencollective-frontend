@@ -88,7 +88,7 @@ const MemoizedTaxFormPreview = React.memo(({ url }: { url: string }) => {
 MemoizedTaxFormPreview.displayName = 'MemoizedTaxFormPreview';
 
 export const getTaxFormPreviewUrl = (type: TaxFormType, values, isFinal = false): string => {
-  const url = new URL(`${PDF_SERVICE_URL}/api/tax-form/${type}.pdf`);
+  const url = new URL(`${PDF_SERVICE_URL}/tax-form/${type}.pdf`);
   const base64Values = Buffer.from(JSON.stringify(values)).toString('base64');
   url.searchParams.set('formType', type);
   url.searchParams.set('values', base64Values);
