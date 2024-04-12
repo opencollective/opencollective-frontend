@@ -251,7 +251,7 @@
     "cz-conventional-changelog": "^3.3.0",
     "dot-path-value": "^0.0.10",
     "esbuild": "0.20.2",
-    "eslint": "^8.54.0",
+    "eslint": "^9.0.0",
     "eslint-config-opencollective": "^3.0.3",
     "eslint-plugin-babel": "^5.3.1",
     "eslint-plugin-cypress": "^2.15.1",
