@@ -227,31 +227,35 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
           </MessageBox>
         )}
 
-        <div className="mb-3 font-bold">
-          <FormattedMessage
-            defaultMessage="Is there anything else you wish to communicate to the admins who will review this expense?"
-            id="0FP/Ii"
-          />{' '}
-          <PrivateInfoIcon />
-        </div>
-        <RichTextEditor
-          key={lastPrivateNoteId}
-          withBorders
-          version="simplified"
-          editorMinHeight={72}
-          fontSize="13px"
-          placeholder={intl.formatMessage(I18nMessages.notePlaceholder)}
-          onChange={e => setPrivateNote(e.target.value)}
-        />
-        <Button
-          loading={createPrivateNoteMutation.loading}
-          disabled={isEmpty(privateNote)}
-          className="mt-3"
-          variant="default"
-          onClick={onAddPrivateNoteClick}
-        >
-          <FormattedMessage defaultMessage="Add a note" id="dTW4m3" />
-        </Button>
+        {!isInvite && (
+          <React.Fragment>
+            <div className="mb-3 font-bold">
+              <FormattedMessage
+                defaultMessage="Is there anything else you wish to communicate to the admins who will review this expense?"
+                id="0FP/Ii"
+              />{' '}
+              <PrivateInfoIcon />
+            </div>
+            <RichTextEditor
+              key={lastPrivateNoteId}
+              withBorders
+              version="simplified"
+              editorMinHeight={72}
+              fontSize="13px"
+              placeholder={intl.formatMessage(I18nMessages.notePlaceholder)}
+              onChange={e => setPrivateNote(e.target.value)}
+            />
+            <Button
+              loading={createPrivateNoteMutation.loading}
+              disabled={isEmpty(privateNote)}
+              className="mt-3"
+              variant="default"
+              onClick={onAddPrivateNoteClick}
+            >
+              <FormattedMessage defaultMessage="Add a note" id="dTW4m3" />
+            </Button>
+          </React.Fragment>
+        )}
       </div>
 
       <div className="flex-1">

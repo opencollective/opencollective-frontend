@@ -39,6 +39,7 @@ export type ExpenseItem = {
   description?: string;
   incurredAt?: Date;
   amount?: {
+    value?: number;
     valueInCents?: number;
     currency?: string;
     exchangeRate?: {
