@@ -1,6 +1,6 @@
 import React from 'react';
 import { FormikProps } from 'formik';
-import { merge } from 'lodash';
+import { merge, pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
@@ -60,7 +60,8 @@ export const getInitialValuesForW9 = (
   return merge(generateInitialValuesFromSchema(schema), {
     signer,
     accountNumbers: `@${account.slug} (#${account.id})`,
-    location: account.location?.country === 'US' ? account.location : { country: 'US' },
+    location:
+      account.location?.country === 'US' ? pick(account.location, ['country', 'structured']) : { country: 'US' },
     ...(baseValues.submitterType === SubmitterType.Individual
       ? { federalTaxClassification: FederalTaxClassification.Individual }
       : { federalTaxClassification: null }),
@@ -115,7 +116,7 @@ export const W9TaxFormFields = ({ formik }: { formik: FormikProps<W9TaxFormValue
             autoDetectCountry={false}
             disableCountryChange
             errors={field.error}
-            noFallback={true}
+            useStructuredForFallback={true}
             required={field.required}
           />
         )}

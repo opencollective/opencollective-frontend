@@ -1,6 +1,6 @@
 import React from 'react';
 import { FormikProps } from 'formik';
-import { merge } from 'lodash';
+import { merge, pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
@@ -131,7 +131,7 @@ export const getInitialValuesForW8BenE = (
     signer: nameParts,
     businessName: account.legalName || account.name,
     businessCountryOfIncorporationOrOrganization: account.location?.country,
-    businessAddress: account.location,
+    businessAddress: pick(account.location, ['country', 'structured']),
   });
 };
 
@@ -462,7 +462,7 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
             onChange={value => setFieldValue(field.name, value)}
             labelFontWeight="normal"
             errors={meta.touched || form.submitCount ? meta.error : null}
-            noFallback={true}
+            useStructuredForFallback={true}
             required={field.required}
           />
         )}
@@ -479,7 +479,7 @@ export const W8BenETaxFormFields = ({ formik }: { formik: FormikProps<W8BenETaxF
             onChange={value => setFieldValue(field.name, value)}
             labelFontWeight="normal"
             errors={meta.touched || form.submitCount ? meta.error : null}
-            noFallback={true}
+            useStructuredForFallback={true}
             required={field.required}
           />
         )}
