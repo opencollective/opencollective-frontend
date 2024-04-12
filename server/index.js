@@ -24,6 +24,7 @@ const dev = process.env.NODE_ENV === 'development';
 const port = process.env.PORT;
 const hostname = process.env.HOSTNAME;
 const nextApp = next({ dev, hostname, port });
+const nextRequestHandler = nextApp.getRequestHandler();
 
 const workers = process.env.WEB_CONCURRENCY || 1;
 
@@ -75,7 +76,12 @@ const start = id =>
       );
     }
 
-    app.use(routes(app, nextApp));
+    routes(app);
+
+    app.all('*', (req, res) => {
+      return nextRequestHandler(req, res);
+    });
+
     app.use(loggerMiddleware.errorLogger);
 
     app.listen(port, err => {
