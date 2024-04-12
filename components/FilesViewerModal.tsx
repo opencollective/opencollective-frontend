@@ -132,6 +132,8 @@ type FilesViewerModalProps = {
   }[];
   openFileUrl?: string;
   allowOutsideInteraction?: boolean;
+  canDownload?: boolean;
+  canOpenInNewWindow?: boolean;
 };
 
 export default function FilesViewerModal({
@@ -140,6 +142,8 @@ export default function FilesViewerModal({
   parentTitle,
   files,
   openFileUrl,
+  canDownload = true,
+  canOpenInNewWindow = true,
 }: FilesViewerModalProps) {
   const intl = useIntl();
   const initialIndex = openFileUrl ? files?.findIndex(f => f.url === openFileUrl) : 0;
@@ -245,32 +249,36 @@ export default function FilesViewerModal({
             </Span>
           </Box>
           <Flex alignItems="center" gridGap={2}>
-            <StyledTooltip
-              containerCursor="pointer"
-              noArrow
-              content={intl.formatMessage({ id: 'Download', defaultMessage: 'Download' })}
-              delayHide={0}
-            >
-              <ButtonLink
-                /* To enable downloading files from S3 directly we're using a /api/download-file endpoint
-                  to stream the file and set the correct headers. */
-                href={`/api/download-file?url=${encodeURIComponent(selectedItem?.url)}`}
-                download
-                target="_blank"
+            {canDownload && (
+              <StyledTooltip
+                containerCursor="pointer"
+                noArrow
+                content={intl.formatMessage({ id: 'Download', defaultMessage: 'Download' })}
+                delayHide={0}
               >
-                <Download size={24} />
-              </ButtonLink>
-            </StyledTooltip>
-            <StyledTooltip
-              containerCursor="pointer"
-              noArrow
-              content={intl.formatMessage({ defaultMessage: 'Open in new window', id: 'b2Wfwm' })}
-              delayHide={0}
-            >
-              <ButtonLink href={selectedItem?.url} target="_blank">
-                <ExternalLink size={24} />
-              </ButtonLink>
-            </StyledTooltip>
+                <ButtonLink
+                  /* To enable downloading files from S3 directly we're using a /api/download-file endpoint
+                 to stream the file and set the correct headers. */
+                  href={`/api/download-file?url=${encodeURIComponent(selectedItem?.url)}`}
+                  download
+                  target="_blank"
+                >
+                  <Download size={24} />
+                </ButtonLink>
+              </StyledTooltip>
+            )}
+            {canOpenInNewWindow && (
+              <StyledTooltip
+                containerCursor="pointer"
+                noArrow
+                content={intl.formatMessage({ defaultMessage: 'Open in new window', id: 'b2Wfwm' })}
+                delayHide={0}
+              >
+                <ButtonLink href={selectedItem?.url} target="_blank">
+                  <ExternalLink size={24} />
+                </ButtonLink>
+              </StyledTooltip>
+            )}
             <StyledTooltip
               containerCursor="pointer"
               noArrow

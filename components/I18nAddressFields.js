@@ -20,13 +20,13 @@ import StyledSelect from './StyledSelect';
  */
 const missingCountries = ['AS', 'AQ', 'GU', 'MH', 'FM', 'MP', 'PW', 'PR', 'VI'];
 const addressFormatter = new AddressFormatter('EN');
+const necessaryFields = ['address1', 'address2', 'city', 'zip', 'province'];
 
 const wrangleAddressData = addressInfo => {
   if (typeof addressInfo !== 'object') {
     return addressInfo;
   }
   const formLayout = addressInfo.formatting.edit;
-  const necessaryFields = ['address1', 'address2', 'city', 'zip', 'province'];
 
   // Get form fields in correct order for the chosen country
   const matches = formLayout.match(/([A-Za-z])\w+/g).filter(match => necessaryFields.includes(match));
@@ -156,10 +156,20 @@ const FormikLocationFieldRenderer = ({ name, label, required, prefix, info }) =>
   );
 };
 
-export const SimpleLocationFieldRenderer = ({ name, label, required, prefix, value, info, onChange, fieldProps }) => {
+export const SimpleLocationFieldRenderer = ({
+  name,
+  label,
+  error,
+  required,
+  prefix,
+  value,
+  info,
+  onChange,
+  fieldProps,
+}) => {
   const [isTouched, setIsTouched] = React.useState(false);
-  const error = required && isTouched && isNil(value) ? `${label} is required` : undefined;
   const inputName = prefix ? `${prefix}.${name}` : name;
+  error = error || (required && isTouched && isNil(value) ? `${label} is required` : undefined);
   const dispatchOnChange = e => {
     onChange(e);
     if (!isTouched) {
@@ -197,7 +207,7 @@ export const SimpleLocationFieldRenderer = ({ name, label, required, prefix, val
             return (
               <StyledInput
                 {...inputProps}
-                value={value}
+                value={value || ''}
                 error={error}
                 onChange={dispatchOnChange}
                 data-cy={`address-${name}`}
@@ -218,6 +228,7 @@ const fieldRenderPropTypes = {
   prefix: PropTypes.string,
   required: PropTypes.bool,
   fieldProps: PropTypes.object,
+  error: PropTypes.any,
 };
 
 FormikLocationFieldRenderer.propTypes = fieldRenderPropTypes;
@@ -240,8 +251,10 @@ const I18nAddressFields = ({
   required,
   prefix,
   onLoadError,
+  onLoadSuccess,
   Component,
   fieldProps,
+  errors,
 }) => {
   const intl = useIntl();
   /** If country chosen from InputTypeCountry is one of missingCountries, use 'US' instead */
@@ -269,6 +282,12 @@ const I18nAddressFields = ({
         const addressFields = wrangleAddressData(countryInfo);
         setFields(addressFields);
         onCountryChange(getAddressFieldDifferences(value, addressFields));
+        try {
+          onLoadSuccess?.({ countryInfo, addressFields });
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.warn('Error calling onLoadSuccess: ', e.message);
+        }
       } catch (e) {
         onLoadError?.();
         // eslint-disable-next-line no-console
@@ -300,6 +319,7 @@ const I18nAddressFields = ({
           info={fieldInfo}
           value={value?.[fieldName]}
           required={required === false ? false : !Object.keys(data?.optionalLabels || {}).includes(fieldName)}
+          error={errors?.[fieldName]}
           fieldProps={fieldProps}
           onChange={({ target: { name, value: fieldValue } }) =>
             onCountryChange(set(cloneDeep(value || {}), name, fieldValue))
@@ -321,10 +341,12 @@ I18nAddressFields.propTypes = {
   onCountryChange: PropTypes.func.isRequired, // TODO Rename this prop, it's not doing what the name implies
   /** Called when the call to the Shopify API fails */
   onLoadError: PropTypes.func,
+  onLoadSuccess: PropTypes.func,
   /** A function used to render the field */
   Component: PropTypes.func,
   /** Additional props to be passed to `Component` */
   fieldProps: PropTypes.object,
+  errors: PropTypes.object,
 };
 
 I18nAddressFields.defaultProps = {

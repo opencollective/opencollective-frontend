@@ -34,11 +34,12 @@ const ContactForm = () => {
   const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const shouldDisplayCatcha = !LoggedInUser && isCaptchaEnabled();
-  const { getFieldProps, handleSubmit, errors, touched, setFieldValue } = useFormik({
+
+  const { getFieldProps, values, handleSubmit, errors, touched, setFieldValue } = useFormik({
     initialValues: {
       name: '',
       email: '',
-      topic: '',
+      topic: router.query.topic || '',
       message: '',
       link: '',
       captcha: null,
@@ -203,7 +204,14 @@ const ContactForm = () => {
                   />
                 }
               >
-                {inputProps => <StyledInput {...inputProps} placeholder="e.g. Transactions, profile" width="100%" />}
+                {inputProps => (
+                  <StyledInput
+                    {...inputProps}
+                    value={values.topic}
+                    placeholder="e.g. Transactions, profile"
+                    width="100%"
+                  />
+                )}
               </StyledInputField>
             </Box>
             <Box mb="28px">

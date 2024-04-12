@@ -116,6 +116,17 @@
     url('../fonts/inter/Inter-BlackItalic.woff') format('woff');
 }
 
+/*
+* A font for signatures. Imported as absolute to prevent NextJS from appending a hash to the URL and including it
+* on all pages.
+*/
+@font-face {
+  font-family: 'JustMeAgainDownHere';
+  src: url('/static/fonts/JustMeAgainDownHere-Regular.ttf');
+  font-weight: normal;
+  font-style: normal;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

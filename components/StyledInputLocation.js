@@ -6,7 +6,9 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { formatFormErrorMessage } from '../lib/form-utils';
 
 import I18nAddressFields, { SimpleLocationFieldRenderer } from './I18nAddressFields';
+import I18nFormatters from './I18nFormatters';
 import InputTypeCountry from './InputTypeCountry';
+import MessageBox from './MessageBox';
 import StyledInputField from './StyledInputField';
 import StyledTextarea from './StyledTextarea';
 
@@ -30,12 +32,14 @@ const StyledInputLocation = ({
   errors,
   prefix,
   required,
+  disableCountryChange,
+  noFallback,
+  onLoadSuccess,
 }) => {
   const [useFallback, setUseFallback] = React.useState(false);
   const intl = useIntl();
   const forceLegacyFormat = Boolean(!location?.structured && location?.address);
   const hasCountry = Boolean(location?.country);
-
   return (
     <div>
       <StyledInputField
@@ -51,6 +55,7 @@ const StyledInputLocation = ({
           <InputTypeCountry
             {...inputProps}
             inputId={id}
+            disabled={disableCountryChange}
             value={location?.country}
             autoDetect={autoDetectCountry}
             onChange={country => {
@@ -67,13 +72,23 @@ const StyledInputLocation = ({
           selectedCountry={location?.country}
           value={location?.structured || {}}
           onLoadError={() => setUseFallback(true)} // TODO convert from structured to raw
+          onLoadSuccess={onLoadSuccess}
           Component={SimpleLocationFieldRenderer}
           fieldProps={{ labelFontSize, labelFontWeight }}
           required={required}
+          errors={errors?.structured}
           onCountryChange={structured =>
             onChange(pick({ ...(location || DEFAULT_LOCATION), structured }, ['country', 'structured']))
           }
         />
+      ) : useFallback && noFallback ? (
+        <MessageBox type="error" withIcon mt={2}>
+          <FormattedMessage
+            defaultMessage="Failed to load the structured address fields. Please reload the page or <SupportLink>contact support</SupportLink>."
+            id="5A4zUi"
+            values={I18nFormatters}
+          />
+        </MessageBox>
       ) : (
         <StyledInputField
           name={`${prefix}${name}`}
@@ -107,10 +122,13 @@ StyledInputLocation.propTypes = {
   name: PropTypes.string,
   prefix: PropTypes.string,
   onChange: PropTypes.func,
+  onLoadSuccess: PropTypes.func,
   autoDetectCountry: PropTypes.bool,
+  disableCountryChange: PropTypes.bool,
   required: PropTypes.bool,
   labelFontWeight: PropTypes.any,
   labelFontSize: PropTypes.any,
+  noFallback: PropTypes.bool,
   location: PropTypes.shape({
     structured: PropTypes.object,
     address: PropTypes.string,

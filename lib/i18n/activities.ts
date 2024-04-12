@@ -309,6 +309,9 @@ export const ActivityDescriptionI18n = defineMessages({
     defaultMessage: 'Tax form request sent to <Account></Account>',
     id: 'p8x23o',
   },
+  TAXFORM_RECEIVED: {
+    defaultMessage: 'Tax form received for <Account></Account>',
+  },
   // Members
   COLLECTIVE_MEMBER_CREATED: {
     defaultMessage: '<FromAccount></FromAccount> joined <Account></Account> as <MemberRole></MemberRole>',
@@ -795,6 +798,9 @@ export const ActivityTypeI18n: ActivityTranslations = defineMessages({
   TAXFORM_REQUEST: {
     defaultMessage: 'Tax form request',
     id: 'w/zcEG',
+  },
+  TAXFORM_RECEIVED: {
+    defaultMessage: 'Tax form received',
   },
   COLLECTIVE_COMMENT_CREATED: {
     defaultMessage: 'Comment posted',
