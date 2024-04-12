@@ -23,7 +23,7 @@ import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import ExportTransactionsCSVModal from '../../ExportTransactionsCSVModal';
 import { Filterbar } from '../../filters/Filterbar';
-import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
+import { AccountRenderer, hostedAccountFilter } from '../../filters/HostedAccountFilter';
 import { DashboardSectionProps } from '../../types';
 
 import {
@@ -38,7 +38,7 @@ import TransactionsTable from './TransactionsTable';
 
 export const schema = commonSchema.extend({
   account: hostedAccountFilter.schema,
-  excludeHost: boolean.default(false),
+  excludeAccount: z.string().optional(),
 });
 
 export type FilterValues = z.infer<typeof schema>;
@@ -52,16 +52,17 @@ type FilterMeta = CommonFilterMeta & {
 export const toVariables: FiltersToVariables<FilterValues, TransactionsTableQueryVariables, FilterMeta> = {
   ...commonToVariables,
   account: hostedAccountFilter.toVariables,
-  excludeHost: excludeHost => ({ includeHost: !excludeHost }),
+  excludeAccount: (value, key) => ({ [key]: { slug: value } }),
 };
 
 // The filters config is used to populate the Filters component.
 const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   ...commonFilters,
-  excludeHost: {
-    labelMsg: defineMessage({ defaultMessage: 'Exclude host account', id: 'yxffGP' }),
-  },
   account: hostedAccountFilter.filter,
+  excludeAccount: {
+    labelMsg: defineMessage({ defaultMessage: 'Exclude account', id: 'NBPN5y' }),
+    valueRenderer: ({ value, ...props }) => <AccountRenderer account={{ slug: value }} {...props} />,
+  },
 };
 
 const hostTransactionsMetaDataQuery = gql`
@@ -96,7 +97,7 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const { data: metaData } = useQuery(hostTransactionsMetaDataQuery, {
     variables: { slug: hostSlug },
     context: API_V2_CONTEXT,
-    fetchPolicy: 'cache-first',
+    fetchPolicy: 'cache-and-network',
   });
 
   const views = [
@@ -107,13 +108,13 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     },
     {
       label: intl.formatMessage({ id: 'HostedCollectives', defaultMessage: 'Hosted Collectives' }),
-      filter: { excludeHost: true },
-      id: 'hosted_collectives',
+      filter: { excludeAccount: hostSlug },
+      id: 'hosted-collectives',
     },
     {
-      label: metaData?.host?.name,
+      label: intl.formatMessage({ defaultMessage: 'Fiscal Host', id: 'CbWgOO' }),
       filter: { account: hostSlug },
-      id: 'self',
+      id: 'fiscal-host',
     },
   ];
   const queryFilter = useQueryFilter({
