@@ -6,6 +6,7 @@ export type LoggedInUser = {
     id: number;
     slug: string;
     name: string;
+    legalName: string;
     type: string;
   };
   memberOf: Array<{

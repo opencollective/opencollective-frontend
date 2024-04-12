@@ -275,6 +275,16 @@ interface Account {
   Get pending member invitations for this account
   """
   memberInvitations(role: [MemberRole]): [MemberInvitation]
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   memberOf(
     limit: Int! = 100
     offset: Int! = 0
@@ -1840,6 +1850,16 @@ type Host implements Account & AccountWithContributions {
     """
     role: [MemberRole]
   ): [MemberInvitation]
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -2997,6 +3017,84 @@ input AccountReferenceInput {
   The slug identifying the account (ie: babel for https://opencollective.com/babel)
   """
   slug: String
+}
+
+"""
+A legal document (e.g. W9, W8BEN, W8BEN-E)
+"""
+type LegalDocument {
+  """
+  Unique identifier for this legal document
+  """
+  id: String!
+
+  """
+  The year this legal document is for
+  """
+  year: Int!
+
+  """
+  The type of legal document
+  """
+  type: LegalDocumentType!
+
+  """
+  The status of the request for this legal document
+  """
+  status: LegalDocumentRequestStatus!
+
+  """
+  The service that provided this legal document
+  """
+  service: LegalDocumentService!
+
+  """
+  The date and time the request for this legal document was created
+  """
+  requestedAt: DateTime!
+
+  """
+  The date and time this legal document was last updated
+  """
+  updatedAt: DateTime!
+
+  """
+  The account this legal document is for
+  """
+  account: Account!
+
+  """
+  URL to the actual file. Must be logged in. The final URL will be protected by 2FA, be prepared to pass the 2FA token in the headers.
+  """
+  documentLink: URL
+}
+
+"""
+Type for a required legal document
+"""
+enum LegalDocumentType {
+  """
+  US tax form (W9, W8BEN, W8BEN-E)
+  """
+  US_TAX_FORM
+}
+
+"""
+Status for a legal document
+"""
+enum LegalDocumentRequestStatus {
+  NOT_REQUESTED
+  REQUESTED
+  RECEIVED
+  ERROR
+}
+
+"""
+Type for a required legal document
+"""
+enum LegalDocumentService {
+  DROPBOX_FORMS
+  OPENCOLLECTIVE
 }
 
 """
@@ -5376,6 +5474,7 @@ enum ActivityType {
   COLLECTIVE_EXPENSE_RECURRING_DRAFTED
   COLLECTIVE_EXPENSE_MISSING_RECEIPT
   TAXFORM_REQUEST
+  TAXFORM_RECEIVED
   COLLECTIVE_VIRTUAL_CARD_ADDED
   COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS
   COLLECTIVE_VIRTUAL_CARD_RESUMED
@@ -6303,16 +6402,6 @@ type ExpensePermissions {
 }
 
 """
-Type for a required legal document
-"""
-enum LegalDocumentType {
-  """
-  US tax form (W9)
-  """
-  US_TAX_FORM
-}
-
-"""
 Fields for an expense quote
 """
 type ExpenseQuote {
@@ -6720,6 +6809,16 @@ type Bot implements Account {
     """
     role: [MemberRole]
   ): [MemberInvitation]
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -7420,6 +7519,16 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     role: [MemberRole]
   ): [MemberInvitation]
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -8561,6 +8670,16 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     role: [MemberRole]
   ): [MemberInvitation]
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -9491,6 +9610,16 @@ type Individual implements Account {
     """
     role: [MemberRole]
   ): [MemberInvitation]
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -10397,6 +10526,16 @@ type Organization implements Account & AccountWithContributions {
     """
     role: [MemberRole]
   ): [MemberInvitation]
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -11197,6 +11336,16 @@ type Vendor implements Account & AccountWithContributions {
     """
     role: [MemberRole]
   ): [MemberInvitation]
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -14182,6 +14331,7 @@ enum ActivityAndClassesType {
   COLLECTIVE_EXPENSE_RECURRING_DRAFTED
   COLLECTIVE_EXPENSE_MISSING_RECEIPT
   TAXFORM_REQUEST
+  TAXFORM_RECEIVED
   COLLECTIVE_VIRTUAL_CARD_ADDED
   COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS
   COLLECTIVE_VIRTUAL_CARD_RESUMED
@@ -14417,6 +14567,16 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     role: [MemberRole]
   ): [MemberInvitation]
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -15225,6 +15385,16 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     role: [MemberRole]
   ): [MemberInvitation]
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -16714,6 +16884,26 @@ type Mutation {
     """
     currentPassword: String
   ): SetPasswordResponse!
+
+  """
+  Submit a legal document
+  """
+  submitLegalDocument(
+    """
+    The account the legal document is for
+    """
+    account: AccountReferenceInput!
+
+    """
+    The type of legal document
+    """
+    type: LegalDocumentType!
+
+    """
+    The form data for the legal document. Will be validated against the schema for the document type and encrypted.
+    """
+    formData: JSON!
+  ): LegalDocument!
 
   """
   Invite a new member to the Collective. Scope: "account".
