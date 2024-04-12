@@ -33,8 +33,8 @@ const StyledInputLocation = ({
   prefix,
   required,
   disableCountryChange,
-  noFallback,
   onLoadSuccess,
+  useStructuredForFallback,
 }) => {
   const [useFallback, setUseFallback] = React.useState(false);
   const intl = useIntl();
@@ -81,7 +81,7 @@ const StyledInputLocation = ({
             onChange(pick({ ...(location || DEFAULT_LOCATION), structured }, ['country', 'structured']))
           }
         />
-      ) : useFallback && noFallback ? (
+      ) : useFallback ? (
         <MessageBox type="error" withIcon mt={2}>
           <FormattedMessage
             defaultMessage="Failed to load the structured address fields. Please reload the page or <SupportLink>contact support</SupportLink>."
@@ -108,7 +108,16 @@ const StyledInputLocation = ({
               defaultValue={location?.address || ''}
               onChange={e => {
                 const address = e.target.value;
-                onChange(pick({ ...(location || DEFAULT_LOCATION), address }, ['country', 'address']));
+                if (!useStructuredForFallback) {
+                  onChange(pick({ ...(location || DEFAULT_LOCATION), address }, ['country', 'address']));
+                } else {
+                  onChange(
+                    pick({ ...(location || DEFAULT_LOCATION), structured: { address1: address } }, [
+                      'country',
+                      'structured',
+                    ]),
+                  );
+                }
               }}
             />
           )}
@@ -128,7 +137,7 @@ StyledInputLocation.propTypes = {
   required: PropTypes.bool,
   labelFontWeight: PropTypes.any,
   labelFontSize: PropTypes.any,
-  noFallback: PropTypes.bool,
+  useStructuredForFallback: PropTypes.bool,
   location: PropTypes.shape({
     structured: PropTypes.object,
     address: PropTypes.string,
