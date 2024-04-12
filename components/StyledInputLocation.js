@@ -54,7 +54,6 @@ const StyledInputLocation = ({
         {({ id, ...inputProps }) => (
           <InputTypeCountry
             {...inputProps}
-            required={required}
             inputId={id}
             disabled={disableCountryChange}
             value={location?.country}

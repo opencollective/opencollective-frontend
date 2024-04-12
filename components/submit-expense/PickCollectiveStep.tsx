@@ -27,7 +27,7 @@ import { ExpenseForm } from './useExpenseForm';
 const I18nMessages = defineMessages({
   CHILD_DESCRIPTION: {
     defaultMessage:
-      '{childName} is an {parentName} {childType, select, EVENT {event} FUND {fund} PROJECT {project} other {account}}',
+      '{childName} is {childType, select, EVENT {an event} FUND {a fund} PROJECT {a project} other {an account}} of {parentName}',
     id: 'iItDLM',
   },
   TITLE: {
