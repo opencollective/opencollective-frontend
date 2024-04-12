@@ -25,7 +25,8 @@ export function ExpenseWarnings(props: ExpenseWarningsProps) {
       id: 'insuficient_balance',
       content: (
         <FormattedMessage
-          defaultMessage="The Collective's budget ({amount}) is insufficient to pay this expense." id="gt8gMS"
+          defaultMessage="The Collective's budget ({amount}) is insufficient to pay this expense."
+          id="gt8gMS"
           values={{
             amount: (
               <FormattedMoneyAmount
@@ -55,7 +56,8 @@ export function ExpenseWarnings(props: ExpenseWarningsProps) {
         id: 'mismatched_invited_account_holder',
         content: (
           <FormattedMessage
-            defaultMessage="The account holder name ({accountHolderName}) of the payout method does not match the invited name ({invitePayeeName})." id="3jC7kl"
+            defaultMessage="The account holder name ({accountHolderName}) of the payout method does not match the invited name ({invitePayeeName})."
+            id="3jC7kl"
             values={{
               accountHolderName,
               invitePayeeName,
@@ -72,7 +74,8 @@ export function ExpenseWarnings(props: ExpenseWarningsProps) {
         id: 'mismatched_invited_account_email',
         content: (
           <FormattedMessage
-            defaultMessage="The email ({payoutMethodEmail}) associated with the payout method does not match the invited email ({invitePayeeEmail})." id="cnQDle"
+            defaultMessage="The email ({payoutMethodEmail}) associated with the payout method does not match the invited email ({invitePayeeEmail})."
+            id="cnQDle"
             values={{
               payoutMethodEmail,
               invitePayeeEmail,

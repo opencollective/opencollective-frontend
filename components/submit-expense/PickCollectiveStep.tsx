@@ -272,7 +272,8 @@ function CollectiveOption(props: CollectiveOptionProps) {
 
             {props.isLastUsedCollective ? (
               <FormattedMessage
-                defaultMessage="{label} (Last used)" id="ieTRJZ"
+                defaultMessage="{label} (Last used)"
+                id="ieTRJZ"
                 values={{
                   label: title,
                 }}

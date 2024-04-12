@@ -70,7 +70,7 @@ export function PayoutMethodDetails(props: PayoutMethodDetailsProps) {
       if (props.payoutMethod.data.type) {
         items.push({
           field: 'type',
-          title: <FormattedMessage defaultMessage="Type" />,
+          title: <FormattedMessage defaultMessage="Type" id="+U6ozc" />,
           children: upperCase(props.payoutMethod.data.type),
         });
       }
@@ -80,7 +80,7 @@ export function PayoutMethodDetails(props: PayoutMethodDetailsProps) {
           field: 'accountHolderName',
           title: (
             <div className="flex gap-2">
-              <FormattedMessage defaultMessage="Account Holder" /> <PrivateInfoIcon />
+              <FormattedMessage defaultMessage="Account Holder" id="GEFifJ" /> <PrivateInfoIcon />
             </div>
           ),
           children: props.payoutMethod.data.accountHolderName,
