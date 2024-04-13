@@ -224,7 +224,7 @@
     "@storybook/theming": "7.6.17",
     "@types/apollo-upload-client": "17.0.5",
     "@types/cookie": "^0.6.0",
-    "@types/react": "18.2.75",
+    "@types/react": "18.2.78",
     "@types/styled-components": "^5.1.32",
     "@types/styled-system": "^5.1.22",
     "@types/webpack-env": "^1.18.4",
