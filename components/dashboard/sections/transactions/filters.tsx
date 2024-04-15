@@ -9,6 +9,7 @@ import { boolean, integer, isMulti, isNullable, limit, offset } from '../../../.
 import {
   Currency,
   ExpenseType,
+  PaymentMethodService,
   PaymentMethodType,
   TransactionKind,
   TransactionsTableQueryVariables,
@@ -16,13 +17,14 @@ import {
 } from '../../../../lib/graphql/types/v2/graphql';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { i18nIsRefund } from '../../../../lib/i18n/is-refund';
+import { i18nPaymentMethodServiceLabels } from '../../../../lib/i18n/payment-method-service';
 import { i18nPaymentMethodType } from '../../../../lib/i18n/payment-method-type';
 import { i18nTransactionKind, i18nTransactionType } from '../../../../lib/i18n/transaction';
 import { sortSelectOptions } from '../../../../lib/utils';
 
 import { Input } from '../../../ui/Input';
 import { amountFilter } from '../../filters/AmountFilter';
-import ComboSelectFilter from '../../filters/ComboSelectFilter';
+import ComboSelectFilter, { buildComboSelectFilter } from '../../filters/ComboSelectFilter';
 import { dateFilter } from '../../filters/DateFilter';
 import { dateToVariables } from '../../filters/DateFilter/schema';
 import { orderByFilter } from '../../filters/OrderFilter';
@@ -38,6 +40,12 @@ const clearedAtDateFilter = {
   },
 };
 
+const paymentMethodServiceFilter = buildComboSelectFilter(
+  z.array(z.enum(Object.values(PaymentMethodService) as [string, ...string[]])).optional(),
+  defineMessage({ defaultMessage: 'Payment method service', id: 'INt78u' }),
+  i18nPaymentMethodServiceLabels,
+);
+
 export const schema = z.object({
   limit: limit.default(20),
   offset,
@@ -49,12 +57,14 @@ export const schema = z.object({
   kind: isMulti(z.nativeEnum(TransactionKind)).optional(),
   type: z.nativeEnum(TransactionType).optional(),
   paymentMethodType: isMulti(isNullable(z.nativeEnum(PaymentMethodType))).optional(),
+  paymentMethodService: paymentMethodServiceFilter.schema,
   virtualCard: isMulti(z.string()).optional(),
   expenseType: isMulti(z.nativeEnum(ExpenseType)).optional(),
   expenseId: integer.optional(),
   orderId: integer.optional(),
+  merchantId: z.string().optional(),
   openTransactionId: z.string().optional(),
-  group: z.string().optional(),
+  group: isMulti(z.string()).optional(),
   isRefund: boolean.optional(),
 });
 
@@ -103,10 +113,14 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
         <ComboSelectFilter
           isMulti
           options={Object.values(kinds)
-            .map(value => ({
-              label: i18nTransactionKind(intl, value),
-              value,
-            }))
+            .map(value => {
+              const label = i18nTransactionKind(intl, value);
+              return {
+                label,
+                value,
+                keywords: [label],
+              };
+            })
             .sort(sortSelectOptions)}
           {...props}
         />
@@ -114,18 +128,28 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     },
     valueRenderer: ({ value, intl }) => i18nTransactionKind(intl, value),
   },
+  paymentMethodService: paymentMethodServiceFilter.filter,
   paymentMethodType: {
-    labelMsg: defineMessage({ id: 'Fields.paymentMethod', defaultMessage: 'Payment method' }),
+    labelMsg: defineMessage({ defaultMessage: 'Payment method type', id: '/t3cA4' }),
     Component: ({ value, meta, intl, ...props }) => {
       const paymentMethodTypes = meta?.paymentMethodTypes || PAYMENT_METHOD_TYPE;
+      const options = React.useMemo(
+        () =>
+          Object.values(paymentMethodTypes).map(value => {
+            const label = i18nPaymentMethodType(intl, value);
+            return {
+              label,
+              value: String(value),
+              keywords: [label],
+            };
+          }),
+        [intl, paymentMethodTypes],
+      );
       return (
         <ComboSelectFilter
           isMulti
           value={value?.map(v => String(v))} // Turn into string to make the `null` value work with the component
-          options={Object.values(paymentMethodTypes).map(value => ({
-            label: i18nPaymentMethodType(intl, value),
-            value: String(value),
-          }))}
+          options={options}
           {...props}
         />
       );
@@ -139,6 +163,18 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   group: {
     labelMsg: defineMessage({ defaultMessage: 'Transaction group', id: 'VY4AcX' }),
     valueRenderer: ({ value }) => value.substring(0, 8),
+  },
+  isRefund: {
+    labelMsg: defineMessage({ defaultMessage: 'Is Refund', id: 'o+jEZR' }),
+    Component: ({ intl, ...props }) => {
+      const options = React.useMemo(() => {
+        return [true, false].map(value => ({
+          label: i18nIsRefund(intl, value),
+          value,
+        }));
+      }, [intl]);
+      return <ComboSelectFilter options={options} {...props} />;
+    },
   },
   expenseType: {
     labelMsg: defineMessage({ defaultMessage: 'Expense type', id: '9cwufA' }),
@@ -185,16 +221,19 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
       );
     },
   },
-  isRefund: {
-    labelMsg: defineMessage({ defaultMessage: 'Is Refund', id: 'o+jEZR' }),
-    Component: ({ intl, ...props }) => {
-      const options = React.useMemo(() => {
-        return [true, false].map(value => ({
-          label: i18nIsRefund(intl, value),
-          value,
-        }));
-      }, [intl]);
-      return <ComboSelectFilter options={options} {...props} />;
+  merchantId: {
+    labelMsg: defineMessage({ defaultMessage: 'Merchant ID', id: 'EvIfQD' }),
+    Component: ({ value, intl, onChange }) => {
+      return (
+        <div className="p-2">
+          <Input
+            autoFocus
+            placeholder={intl.formatMessage({ defaultMessage: 'Merchant ID', id: 'EvIfQD' })}
+            value={value}
+            onChange={e => onChange(e.target.value)}
+          />
+        </div>
+      );
     },
   },
 };

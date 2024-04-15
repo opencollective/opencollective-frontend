@@ -5,7 +5,6 @@ import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
-import { boolean } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { TransactionsTableQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
@@ -22,6 +21,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import ExportTransactionsCSVModal from '../../ExportTransactionsCSVModal';
+import { accountingCategoryFilter } from '../../filters/AccountingCategoryFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
 import { DashboardSectionProps } from '../../types';
@@ -38,7 +38,8 @@ import TransactionsTable from './TransactionsTable';
 
 export const schema = commonSchema.extend({
   account: hostedAccountFilter.schema,
-  excludeHost: boolean.default(false),
+  excludeAccount: z.string().optional(),
+  accountingCategory: accountingCategoryFilter.schema,
 });
 
 export type FilterValues = z.infer<typeof schema>;
@@ -52,16 +53,18 @@ type FilterMeta = CommonFilterMeta & {
 export const toVariables: FiltersToVariables<FilterValues, TransactionsTableQueryVariables, FilterMeta> = {
   ...commonToVariables,
   account: hostedAccountFilter.toVariables,
-  excludeHost: excludeHost => ({ includeHost: !excludeHost }),
+  excludeAccount: value => ({ excludeAccount: { slug: value } }),
 };
 
 // The filters config is used to populate the Filters component.
 const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   ...commonFilters,
-  excludeHost: {
-    labelMsg: defineMessage({ defaultMessage: 'Exclude host account', id: 'yxffGP' }),
-  },
   account: hostedAccountFilter.filter,
+  excludeAccount: {
+    ...hostedAccountFilter.filter,
+    labelMsg: defineMessage({ defaultMessage: 'Exclude account', id: 'NBPN5y' }),
+  },
+  accountingCategory: accountingCategoryFilter.filter,
 };
 
 const hostTransactionsMetaDataQuery = gql`
@@ -77,6 +80,14 @@ const hostTransactionsMetaDataQuery = gql`
       slug
       currency
       settings
+      accountingCategories {
+        nodes {
+          id
+          code
+          name
+          kind
+        }
+      }
     }
   }
 `;
@@ -107,13 +118,13 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     },
     {
       label: intl.formatMessage({ id: 'HostedCollectives', defaultMessage: 'Hosted Collectives' }),
-      filter: { excludeHost: true },
+      filter: { excludeAccount: hostSlug },
       id: 'hosted_collectives',
     },
     {
-      label: metaData?.host?.name,
+      label: intl.formatMessage({ defaultMessage: 'Fiscal Host', id: 'Fiscalhost' }),
       filter: { account: hostSlug },
-      id: 'self',
+      id: 'fiscal_host',
     },
   ];
   const queryFilter = useQueryFilter({

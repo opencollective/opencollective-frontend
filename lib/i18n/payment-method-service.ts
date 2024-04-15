@@ -2,20 +2,34 @@ import { defineMessages } from 'react-intl';
 
 import { PAYMENT_METHOD_SERVICE } from '../constants/payment-methods';
 
-const messages = defineMessages({
-  [PAYMENT_METHOD_SERVICE.BANK]: {
-    id: 'paymentMethodService.bank',
-    defaultMessage: 'Bank Account',
+export const i18nPaymentMethodServiceLabels = defineMessages({
+  [PAYMENT_METHOD_SERVICE.STRIPE]: {
+    defaultMessage: 'Stripe',
+    id: 'iBmKeP',
+  },
+  [PAYMENT_METHOD_SERVICE.WISE]: {
+    defaultMessage: 'Wise',
+    id: 'cSAdoG',
+  },
+  [PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE]: {
+    defaultMessage: 'Open Collective',
+    id: 'D8SXQU',
+  },
+  [PAYMENT_METHOD_SERVICE.THEGIVINGBLOCK]: {
+    defaultMessage: 'The Giving Block',
+    id: 'pnE7R2',
+  },
+  [PAYMENT_METHOD_SERVICE.PAYPAL]: {
+    defaultMessage: 'PayPal',
+    id: 'PayoutMethod.Type.Paypal',
+  },
+  [PAYMENT_METHOD_SERVICE.PREPAID]: {
+    defaultMessage: 'Prepaid',
+    id: 'DLD6I0',
   },
 });
 
-export const i18nPaymentMethodService = (service, intl) => {
-  const PaymentMethodServiceI18n = {
-    [PAYMENT_METHOD_SERVICE.PAYPAL]: 'PayPal',
-    [PAYMENT_METHOD_SERVICE.WISE]: 'Wise',
-    [PAYMENT_METHOD_SERVICE.BANK]: intl.formatMessage(messages[PAYMENT_METHOD_SERVICE.BANK]),
-  };
-
-  const i18nMsg = PaymentMethodServiceI18n[service];
-  return i18nMsg || service;
+export const i18nPaymentMethodService = (intl, service) => {
+  const i18nMsg = i18nPaymentMethodServiceLabels[service];
+  return i18nMsg ? intl.formatMessage(i18nMsg) : service;
 };

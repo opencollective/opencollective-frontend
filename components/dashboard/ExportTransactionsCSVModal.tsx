@@ -62,6 +62,9 @@ const makeUrl = ({ account, isHostReport, queryFilter, flattenTaxesAndPaymentPro
     if (queryFilter.values.account) {
       url.searchParams.set('account', queryFilter.values.account);
     }
+    if (queryFilter.values.excludeAccount) {
+      url.searchParams.set('excludeAccount', queryFilter.values.excludeAccount);
+    }
     if (queryFilter.values.excludeHost) {
       url.searchParams.set('includeHost', '0');
     }
@@ -78,6 +81,10 @@ const makeUrl = ({ account, isHostReport, queryFilter, flattenTaxesAndPaymentPro
   if (queryFilter.values.amount) {
     const toAmountStr = ({ gte, lte }) => (lte ? `${gte}-${lte}` : `${gte}+`);
     url.searchParams.set('amount', toAmountStr(queryFilter.values.amount));
+  }
+
+  if (queryFilter.values.paymentMethodService) {
+    url.searchParams.set('paymentMethodService', queryFilter.values.paymentMethodService.join(','));
   }
 
   if (queryFilter.values.paymentMethodType) {
@@ -111,6 +118,18 @@ const makeUrl = ({ account, isHostReport, queryFilter, flattenTaxesAndPaymentPro
 
   if (queryFilter.values.expenseId) {
     url.searchParams.set('expenseId', queryFilter.values.expenseId);
+  }
+
+  if (queryFilter.values.merchantId) {
+    url.searchParams.set('merchantId', queryFilter.values.merchantId);
+  }
+
+  if (queryFilter.values.accountingCategory) {
+    url.searchParams.set('accountingCategory', queryFilter.values.accountingCategory.join(','));
+  }
+
+  if (queryFilter.values.group) {
+    url.searchParams.set('group', queryFilter.values.group.join(','));
   }
 
   if (flattenTaxesAndPaymentProcessorFees) {

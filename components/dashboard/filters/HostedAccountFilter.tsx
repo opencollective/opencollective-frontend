@@ -83,6 +83,7 @@ export const hostedAccountFilter: FilterConfig<z.infer<typeof schema>> = {
 
 const resultNodeToOption = account => ({
   label: <AccountRenderer account={account} inOptionsList />,
+  keywords: [account.name],
   value: account.slug,
 });
 

@@ -63,10 +63,12 @@ export const transactionsTableQuery = gql`
   query TransactionsTable(
     $hostAccount: AccountReferenceInput
     $account: [AccountReferenceInput!]
+    $excludeAccount: [AccountReferenceInput!]
     $limit: Int!
     $offset: Int!
     $type: TransactionType
     $paymentMethodType: [PaymentMethodType]
+    $paymentMethodService: [PaymentMethodService]
     $minAmount: Int
     $maxAmount: Int
     $dateFrom: DateTime
@@ -86,14 +88,18 @@ export const transactionsTableQuery = gql`
     $expense: ExpenseReferenceInput
     $order: OrderReferenceInput
     $isRefund: Boolean
+    $merchantId: [String]
+    $accountingCategory: [String]
   ) {
     transactions(
       host: $hostAccount
       account: $account
+      excludeAccount: $excludeAccount
       limit: $limit
       offset: $offset
       type: $type
       paymentMethodType: $paymentMethodType
+      paymentMethodService: $paymentMethodService
       minAmount: $minAmount
       maxAmount: $maxAmount
       dateFrom: $dateFrom
@@ -114,6 +120,8 @@ export const transactionsTableQuery = gql`
       expense: $expense
       order: $order
       isRefund: $isRefund
+      merchantId: $merchantId
+      accountingCategory: $accountingCategory
     ) {
       ...TransactionsTableQueryCollectionFragment
     }

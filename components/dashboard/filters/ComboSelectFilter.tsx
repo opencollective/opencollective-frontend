@@ -24,15 +24,23 @@ const SelectItem = ({
   label,
   onSelect,
   valueRenderer,
+  keywords,
 }: {
   isSelected: boolean;
   value: any;
   label?: React.ReactNode;
   onSelect: (value: any) => void;
   valueRenderer?: ({ value, withHoverCard }: { value: string; withHoverCard?: boolean }) => React.ReactNode;
+  keywords?: string[];
 }) => {
   return (
-    <CommandItem onSelect={() => onSelect(value)} className="h-8 py-0" value={value} data-cy={'combo-select-option'}>
+    <CommandItem
+      onSelect={() => onSelect(value)}
+      className="h-8 py-0"
+      value={value}
+      keywords={keywords}
+      data-cy={'combo-select-option'}
+    >
       <div
         className={clsx(
           'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
@@ -42,7 +50,9 @@ const SelectItem = ({
         <CheckIcon className={'h-4 w-4'} />
       </div>
 
-      {valueRenderer ? valueRenderer({ value, withHoverCard: true }) : label ?? String(value)}
+      <div className="truncate">
+        {valueRenderer ? valueRenderer({ value, withHoverCard: true }) : label ?? String(value)}
+      </div>
     </CommandItem>
   );
 };
@@ -87,7 +97,7 @@ function ComboSelectFilter({
   value: any;
   isMulti?: boolean;
   selected?: string[];
-  options?: { label: React.ReactNode; value: any }[];
+  options?: { label: React.ReactNode; value: any; keywords?: string[] }[];
   groupedOptions?: { label: string; options: { label: React.ReactNode; value: any }[] }[];
   onChange: (value: any) => void;
   labelMsg?: MessageDescriptor;
@@ -171,6 +181,7 @@ function ComboSelectFilter({
                     value={option.value}
                     label={option.label}
                     onSelect={onSelect}
+                    keywords={option.keywords}
                   />
                 );
               })}
@@ -225,10 +236,14 @@ export function buildComboSelectFilter<
         <ComboSelectFilter
           isMulti={isMulti}
           options={schemaEnum.options
-            .map(value => ({
-              value,
-              label: intl.formatMessage(i18nLabels[value]),
-            }))
+            .map(value => {
+              const label = intl.formatMessage(i18nLabels[value]);
+              return {
+                value,
+                label,
+                keywords: [label],
+              };
+            })
             .sort(sortSelectOptions)}
           {...props}
         />

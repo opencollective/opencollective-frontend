@@ -4,13 +4,8 @@
 
 import * as React from 'react';
 import { DialogProps } from '@radix-ui/react-dialog';
-/* The 'carloslfu-cmdk-internal' package above is a fork of `cmdk` but bundling the latest fixes
-  that are not published on npm yet. These fixes are needed for the AccountSwitcher to work properly.
-  When cmdk releases 0.2.1 or 0.3.0 we should switch over to that.
-  Reference: https://github.com/pacocoursey/cmdk/issues/129
-*/
-import { Command as CommandPrimitive } from 'carloslfu-cmdk-internal';
 import clsx from 'clsx';
+import { Command as CommandPrimitive } from 'cmdk';
 import { Loader2, LucideIcon, Search } from 'lucide-react';
 
 import { cn } from '../../lib/utils';
@@ -79,7 +74,7 @@ const CommandList = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.List
     ref={ref}
-    className={cn('max-h-[300px] overflow-y-auto overflow-x-hidden border-t [&::-webkit-scrollbar]:hidden', className)}
+    className={cn('max-h-[300px] overflow-y-auto overflow-x-hidden border-t', className)}
     cmdk-list-wrapper=""
     {...props}
   />
@@ -138,7 +133,7 @@ const CommandItem = React.forwardRef<
   <CommandPrimitive.Item
     ref={ref}
     className={cn(
-      'relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+      'relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50',
       className,
     )}
     {...props}
