@@ -1,9 +1,11 @@
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { getPayoutProfiles } from '../../lib/expenses';
+import { getExpenseExchangeRateWarningOrError } from '../expenses/lib/utils';
 
 import { AccountHoverCard } from '../AccountHoverCard';
+import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import Avatar from '../Avatar';
 import DateTime from '../DateTime';
 import ExpenseAmountBreakdown from '../expenses/ExpenseAmountBreakdown';
@@ -21,7 +23,6 @@ import { ExpenseForm, ExpenseItem } from './useExpenseForm';
 
 type ExpenseSummaryFormProps = {
   form: ExpenseForm;
-  slug: string;
 };
 
 export function ExpenseSummaryForm(props: ExpenseSummaryFormProps) {
@@ -117,11 +118,11 @@ export function ExpenseSummaryForm(props: ExpenseSummaryFormProps) {
           <hr className="flex-grow border-neutral-300" />
         </div>
 
-        <div className="mb-8 flex flex-col gap-2 text-sm">
+        <div className="mb-8 flex flex-col gap-4 text-sm">
           {(props.form.values.expenseItems || []).map((ei, i) => (
             // index is the only stable key available here
             // eslint-disable-next-line react/no-array-index-key
-            <ExpenseItemSummary key={i} expenseItem={ei} />
+            <ExpenseItemSummary key={i} currency={props.form.values.expenseCurrency} expenseItem={ei} />
           ))}
         </div>
 
@@ -153,7 +154,7 @@ export function ExpenseSummaryForm(props: ExpenseSummaryFormProps) {
           <hr className="flex-grow border-neutral-300" />
         </div>
 
-        <div className="grid grid-flow-col grid-cols-1 grid-rows-3 gap-1 sm:grid-cols-3 sm:grid-rows-1">
+        <div className="grid grid-flow-col grid-cols-1 grid-rows-[repeat(3,auto)] gap-1 sm:grid-cols-3 sm:grid-rows-1">
           <div className="flex-1 rounded border border-slate-200 p-4">
             <div className="mb-3 text-xs font-medium uppercase text-slate-700">
               <FormattedMessage defaultMessage="Who is paying?" id="IdR7BG" />
@@ -182,7 +183,7 @@ export function ExpenseSummaryForm(props: ExpenseSummaryFormProps) {
               {payee ? (
                 <React.Fragment>
                   <Avatar collective={payee} radius={24} />
-                  {payee?.name}
+                  <span className="overflow-hidden text-ellipsis">{payee?.name}</span>
                 </React.Fragment>
               ) : invitePayee ? (
                 <InvitedPayeeLabel invitePayee={invitePayee} />
@@ -226,7 +227,11 @@ export function ExpenseSummaryForm(props: ExpenseSummaryFormProps) {
   );
 }
 
-function ExpenseItemSummary(props: { expenseItem: ExpenseItem }) {
+function ExpenseItemSummary(props: { expenseItem: ExpenseItem; currency: string }) {
+  const intl = useIntl();
+
+  const isOtherCurrency = props.currency !== props.expenseItem.amount.currency;
+
   return (
     <div className="flex justify-between gap-4">
       {props.expenseItem.url && (
@@ -241,16 +246,34 @@ function ExpenseItemSummary(props: { expenseItem: ExpenseItem }) {
       )}
 
       <div className="flex flex-grow flex-col justify-between">
-        <div className="">{props.expenseItem.description}</div>
-        <div>
+        <div className="font-medium">{props.expenseItem.description}</div>
+        <div className="text-xs italic">
           <DateTime value={props.expenseItem.incurredAt} dateStyle="medium" />
         </div>
       </div>
-      <div className="self-center">
+      <div className="self-center text-right">
         <FormattedMoneyAmount
-          amount={props.expenseItem.amount.valueInCents}
-          currency={props.expenseItem.amount.currency}
+          amount={
+            isOtherCurrency
+              ? Math.round(props.expenseItem.amount.valueInCents * props.expenseItem.amount.exchangeRate.value)
+              : props.expenseItem.amount.valueInCents
+          }
+          currency={props.currency}
         />
+        {isOtherCurrency && (
+          <div className="mt-1 text-xs">
+            <AmountWithExchangeRateInfo
+              amount={props.expenseItem.amount as any}
+              invertIconPosition
+              amountStyles={{ letterSpacing: 0 }}
+              {...getExpenseExchangeRateWarningOrError(
+                intl,
+                props.expenseItem.amount.exchangeRate,
+                props.expenseItem.amount.referenceExchangeRate,
+              )}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

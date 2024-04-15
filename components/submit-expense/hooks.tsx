@@ -89,6 +89,13 @@ type useNavigationWarningOpts = {
 export function useNavigationWarning(opts: useNavigationWarningOpts) {
   const router = useRouter();
 
+  const confirmNavigation = React.useCallback(() => {
+    if (!opts.enabled) {
+      return true;
+    }
+    return confirm(opts.confirmationMessage);
+  }, [opts.enabled, opts.confirmationMessage]);
+
   React.useEffect(() => {
     function warnOnUnload(e) {
       if (opts.enabled) {
@@ -114,4 +121,6 @@ export function useNavigationWarning(opts: useNavigationWarningOpts) {
       router.events.off('routeChangeStart', warnOnRouteChangeStart);
     };
   }, [router, opts.enabled, opts.confirmationMessage]);
+
+  return [confirmNavigation];
 }

@@ -12,6 +12,7 @@ type AvatarWithLinkProps = {
   secondaryAccount?: Partial<Account> | null;
   /** The size in pixels */
   size: number;
+  withHoverCard?: boolean;
 };
 
 const DualAvatarContainer = styled.div`
@@ -40,9 +41,9 @@ const SecondaryAvatarContainer = styled.div<SecondaryAvatarContainerProps>`
  * [GraphQL V2 ONLY] A wrapper around `Avatar` that wraps it in a Link, with support for an optional second
  * profile to be displayed in the corner.
  */
-export const AvatarWithLink = ({ account, secondaryAccount, size }: AvatarWithLinkProps) => {
+export const AvatarWithLink = ({ account, secondaryAccount, size, withHoverCard }: AvatarWithLinkProps) => {
   const mainAvatar = (
-    <LinkCollective collective={account}>
+    <LinkCollective collective={account} withHoverCard={withHoverCard}>
       <Avatar collective={account} radius={size} />
     </LinkCollective>
   );
@@ -54,7 +55,7 @@ export const AvatarWithLink = ({ account, secondaryAccount, size }: AvatarWithLi
       <DualAvatarContainer>
         {mainAvatar}
         <SecondaryAvatarContainer borderRadius={getAvatarBorderRadius(secondaryAccount.type)}>
-          <LinkCollective collective={secondaryAccount}>
+          <LinkCollective collective={secondaryAccount} withHoverCard={withHoverCard}>
             <Avatar collective={secondaryAccount} radius={size / 2} />
           </LinkCollective>
         </SecondaryAvatarContainer>

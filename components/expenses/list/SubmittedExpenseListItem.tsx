@@ -2,7 +2,6 @@ import React from 'react';
 import clsx from 'clsx';
 import { includes } from 'lodash';
 import { Check, Copy, Ellipsis, Link } from 'lucide-react';
-import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { ExpensePageExpenseFieldsFragment, ExpenseStatus } from '../../../lib/graphql/types/v2/graphql';
@@ -27,6 +26,7 @@ type SubmittedExpenseListItemProps = {
   expense: ExpensePageExpenseFieldsFragment;
   className?: string;
   onClick: () => void;
+  onDuplicateClick: (expenseId: number) => void;
 };
 
 const I18nMessages = defineMessages({
@@ -44,7 +44,6 @@ export function SubmittedExpenseListItem(props: SubmittedExpenseListItemProps) {
   const { LoggedInUser } = useLoggedInUser();
   const hasNewSubmitExpenseFlow = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW);
 
-  const router = useRouter();
   const clipboard = useClipboard();
   const intl = useIntl();
   const hasExchangeRate =
@@ -52,12 +51,10 @@ export function SubmittedExpenseListItem(props: SubmittedExpenseListItemProps) {
 
   const onDuplicateClick = React.useCallback(
     (e: React.MouseEvent) => {
-      router.push(
-        `/dashboard/${LoggedInUser?.collective?.slug}/expenses/new?expenseId=${props.expense.legacyId}&duplicate=true`,
-      );
       e.stopPropagation();
+      props.onDuplicateClick?.(props.expense.legacyId);
     },
-    [router, props.expense.legacyId, LoggedInUser?.collective?.slug],
+    [props.expense.legacyId, props.onDuplicateClick],
   );
 
   return (

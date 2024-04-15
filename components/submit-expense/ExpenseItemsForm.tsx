@@ -53,7 +53,7 @@ export function ExpenseItemsForm(props: ExpenseItemsFormProps) {
               ...(props.form.values.expenseItems ?? []),
               {
                 description: '',
-                incurredAt: new Date(),
+                incurredAt: null,
                 amount: {
                   valueInCents: 0,
                   currency: props.form.values.expenseCurrency,

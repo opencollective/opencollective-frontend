@@ -8,6 +8,7 @@ import { i18nTaxType } from '../../lib/i18n/taxes';
 import { getTaxAmount, isTaxRateValid } from '../expenses/lib/utils';
 
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
+import LoadingPlaceholder from '../LoadingPlaceholder';
 import { PayoutMethodLabel } from '../PayoutMethodLabel';
 
 import { ExpenseDetailsForm } from './ExpenseDetailsStep';
@@ -48,15 +49,24 @@ export type StepDefinition<
   Subtitle?: React.FC<{ form: Form } | {}>;
 };
 
-export type ExpenseStepDefinition = StepDefinition<ExpenseFormValues, ExpenseForm, { slug: string }>;
+export type ExpenseStepDefinition = StepDefinition<ExpenseFormValues, ExpenseForm>;
 
 export const Steps: Record<ExpenseFlowStep, ExpenseStepDefinition> = {
   [ExpenseFlowStep.COLLECTIVE]: {
     Title: () => <FormattedMessage defaultMessage="Who is paying?" id="IdR7BG" />,
-    Subtitle: (props: { form: ExpenseForm }) => props.form.options.account?.name ?? '',
+    Subtitle: (props: { form: ExpenseForm }) => {
+      if (
+        props.form.values.collectiveSlug &&
+        (!props.form.options.account?.slug || props.form.options.account.slug !== props.form.values.collectiveSlug)
+      ) {
+        return <LoadingPlaceholder height={20} />;
+      }
+
+      return props.form.options.account?.name ?? '';
+    },
     Form: PickCollectiveStepForm,
     hasError(form) {
-      return !!form.errors.collectiveSlug;
+      return !!form.errors.collectiveSlug || form.initialLoading;
     },
   },
   [ExpenseFlowStep.EXPENSE_TYPE]: {
@@ -88,6 +98,10 @@ export const Steps: Record<ExpenseFlowStep, ExpenseStepDefinition> = {
 
       const hasPayee = payee || invitePayee;
       const expensePayoutMethod = payoutMethod || invitePayoutMethod;
+
+      if (props.form.values.payeeSlug && (!payee || payee.slug !== props.form.values.payeeSlug)) {
+        return <LoadingPlaceholder height={20} />;
+      }
 
       if (!hasPayee) {
         return null;

@@ -23,6 +23,7 @@ import {
   ExpenseFormSchemaQueryVariables,
   ExpenseStatus,
   ExpenseType,
+  LocationInput,
   PayoutMethodType,
 } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
@@ -38,6 +39,7 @@ export type ExpenseItem = {
   description?: string;
   incurredAt?: Date;
   amount?: {
+    value?: number;
     valueInCents?: number;
     currency?: string;
     exchangeRate?: {
@@ -55,6 +57,7 @@ export type ExpenseItem = {
 export type ExpenseFormValues = {
   collectiveSlug?: string;
   payeeSlug?: string;
+  payeeLocation?: LocationInput;
   expenseTypeOption?: ExpenseTypeOption;
   payoutMethodId?: string;
   title?: string;
@@ -99,6 +102,7 @@ export type ExpenseFormik = Omit<ReturnType<typeof useFormik<ExpenseFormValues>>
 export type ExpenseForm = ExpenseFormik & {
   options: ExpenseFormOptions;
   startOptions: ExpenseFormStartOptions;
+  initialLoading: boolean;
   refresh: () => void;
 };
 
@@ -144,6 +148,36 @@ const formSchemaQuery = gql`
           type
           slug
           imageUrl
+
+          childrenAccounts(isActive: true) {
+            nodes {
+              id
+              name
+              type
+              slug
+              imageUrl
+            }
+          }
+
+          ... on AccountWithParent {
+            parent {
+              id
+              name
+              type
+              slug
+              imageUrl
+
+              childrenAccounts(isActive: true) {
+                nodes {
+                  id
+                  name
+                  type
+                  slug
+                  imageUrl
+                }
+              }
+            }
+          }
         }
         payee {
           id
@@ -305,6 +339,7 @@ const formSchemaQuery = gql`
     id
     name
     slug
+    type
     currency
     settings
     supportedExpenseTypes
@@ -404,7 +439,7 @@ const memoizedExpenseFormSchema = memoizeOne(
       context: API_V2_CONTEXT,
       variables: variables,
       errorPolicy: 'all',
-      fetchPolicy: 'cache-first',
+      fetchPolicy: refresh ? 'network-only' : 'cache-first',
     });
   },
   (newArgs, lastArgs) => {
@@ -426,7 +461,6 @@ type RecursivePartial<T> = {
 function buildFormSchema(
   values: ExpenseFormValues,
   options: Omit<ExpenseFormOptions, 'schema'>,
-  startOptions: ExpenseFormStartOptions,
   intl: IntlShape,
 ): z.ZodType<RecursivePartial<ExpenseFormValues>, z.ZodObjectDef, RecursivePartial<ExpenseFormValues>> {
   const supportedCurrencies =
@@ -434,18 +468,7 @@ function buildFormSchema(
 
   return z.object({
     expenseId: z.number().nullish(),
-    collectiveSlug: z.string().refine(
-      slug => {
-        if (!startOptions.expenseId || !options.expense) {
-          return true;
-        }
-
-        return slug === options.expense.account.slug;
-      },
-      {
-        message: 'Required',
-      },
-    ),
+    collectiveSlug: z.string(),
     payeeSlug: z
       .string()
       .nullish()
@@ -652,6 +675,16 @@ function buildFormSchema(
         }),
         z.object({
           legacyId: z.undefined(),
+          organization: z.undefined(),
+          name: z.string().min(1),
+          email: z.string().email().min(1),
+        }),
+        z.object({
+          legacyId: z.undefined(),
+          organization: z.object({
+            name: z.string().min(1),
+            slug: z.string().min(1),
+          }),
           name: z.string().min(1),
           email: z.string().email().min(1),
         }),
@@ -788,7 +821,7 @@ async function buildFormOptions(
       options.totalInvoicedInExpenseCurrency = totalInvoiced;
     }
 
-    options.schema = buildFormSchema(values, options, startOptions, intl);
+    options.schema = buildFormSchema(values, options, intl);
 
     return options;
   } catch (err) {
@@ -819,7 +852,6 @@ const needExchangeRateFilter = (expectedCurrency: string) => (ei: ExpenseItem) =
       Math.abs(dayjs.utc(ei.amount.exchangeRate.date).diff(dayjs.utc(ei.incurredAt), 'days')) > 2));
 
 type ExpenseFormStartOptions = {
-  preselectInvitePayee?: boolean;
   duplicateExpense?: boolean;
   expenseId?: number;
   draftKey?: string;
@@ -842,6 +874,7 @@ export function useExpenseForm(opts: {
   const [formOptions, setFormOptions] = React.useState<ExpenseFormOptions>({ schema: z.object({}) });
   const startOptions = React.useRef(opts.startOptions);
   const setInitialExpenseValues = React.useRef(false);
+  const initialLoading = React.useRef(true);
 
   const expenseForm: ExpenseFormik = useFormik<ExpenseFormValues>({
     initialValues: opts.initialValues,
@@ -987,6 +1020,12 @@ export function useExpenseForm(opts: {
   }, [expenseForm.values.hasTax, setFieldValue]);
 
   React.useEffect(() => {
+    if (expenseForm.values.accountingCategoryId && (formOptions.accountingCategories || []).length === 0) {
+      setFieldValue('accountingCategoryId', null);
+    }
+  }, [formOptions.accountingCategories, expenseForm.values.accountingCategoryId, setFieldValue]);
+
+  React.useEffect(() => {
     if (isEmpty(expenseForm.values.expenseItems)) {
       return;
     }
@@ -1083,6 +1122,11 @@ export function useExpenseForm(opts: {
       setFormOptions(
         await buildFormOptions(intl, apolloClient, LoggedInUser, expenseForm.values, startOptions.current),
       );
+      if (!startOptions.current.expenseId) {
+        initialLoading.current = false;
+      } else if (setInitialExpenseValues.current) {
+        initialLoading.current = false;
+      }
     }
 
     refreshFormOptions();
@@ -1132,6 +1176,7 @@ export function useExpenseForm(opts: {
   return Object.assign(expenseForm, {
     options: formOptions,
     startOptions: startOptions.current,
+    initialLoading: initialLoading.current,
     refresh: async () =>
       setFormOptions(
         await buildFormOptions(intl, apolloClient, LoggedInUser, expenseForm.values, startOptions.current, true),
