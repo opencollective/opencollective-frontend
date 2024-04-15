@@ -93,21 +93,6 @@ const nextConfig = {
       }),
     );
 
-    // Copy pdfjs worker to public folder (used by PDFViewer component)
-    // (Workaround for working with react-pdf and CommonJS - if moving to ESM this can be removed)
-    // TODO(ESM): Move this to standard ESM
-    config.plugins.push(
-      new CopyPlugin({
-        patterns: [
-          {
-            // eslint-disable-next-line node/no-extraneous-require
-            from: require.resolve('pdfjs-dist/build/pdf.worker.min.js'),
-            to: path.join(__dirname, 'public/static/scripts'),
-          },
-        ],
-      }),
-    );
-
     // generates a manifest of languages and the respective webpack chunk url
     config.plugins.push(
       new WebpackManifestPlugin({
