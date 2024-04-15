@@ -10,7 +10,7 @@ import Image from '../../../Image';
 import { TaxFormType } from './common';
 
 const TaxFormLoadingPlaceholder = (
-  <Image src="/static/images/tax-form-placeholder.jpg" priority alt="" width={761} height={984} />
+  <Image src="/static/images/tax-form-placeholder.jpg" priority alt="" width={1200} height={1600} />
 );
 
 const PDFViewer = dynamic(() => import('../../../PDFViewer'), {
