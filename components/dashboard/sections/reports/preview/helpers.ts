@@ -27,7 +27,7 @@ export const filterToTransactionsFilterValues = (
           account: hostSlug,
         }
       : {
-          excludeHost: true,
+          excludeAccount: hostSlug,
         }),
     ...(groupFilter.kind && {
       kind: [groupFilter.kind],
