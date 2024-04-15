@@ -17,6 +17,7 @@ export const I18nFederalTaxClassification = defineMessages({
   },
   [FederalTaxClassification.Partnership]: {
     defaultMessage: 'Partnership',
+    id: 'yURinU',
   },
   [FederalTaxClassification.TrustEstate]: {
     id: 'FederalTaxClassification.TrustEstate',
