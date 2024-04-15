@@ -9,7 +9,7 @@ import Container from './Container';
 import { getI18nLink } from './I18nFormatters';
 import Loading from './Loading';
 
-pdfjs.GlobalWorkerOptions.workerSrc = '/static/scripts/pdf.worker.min.js';
+pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.js', import.meta.url).toString();
 
 const DocumentContainer = styled.div`
   .pdf-page {
