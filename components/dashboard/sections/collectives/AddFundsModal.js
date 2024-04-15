@@ -535,13 +535,22 @@ const AddFundsModal = ({ collective, ...props }) => {
                       name="processedAt"
                       htmlFor="addFunds-processedAt"
                       inputType="date"
-                      hint={
-                        <FormattedMessage
-                          defaultMessage="The date funds were cleared on your bank, Wise, PayPal, Stripe or any other external account holding these funds."
-                          id="s3O6iq"
-                        />
+                      label={
+                        <span>
+                          <FormattedMessage defaultMessage="Effective Date" id="Gh3Obs" />
+                          {` `}
+                          <StyledTooltip
+                            content={() => (
+                              <FormattedMessage
+                                defaultMessage="The date funds were cleared on your bank, Wise, PayPal, Stripe or any other external account holding these funds."
+                                id="s3O6iq"
+                              />
+                            )}
+                          >
+                            <InfoCircle size={16} />
+                          </StyledTooltip>
+                        </span>
                       }
-                      label={<FormattedMessage defaultMessage="Effective Date" id="Gh3Obs" />}
                       mt={3}
                     >
                       {({ field }) => <StyledInput data-cy="add-funds-processedAt" {...field} />}
