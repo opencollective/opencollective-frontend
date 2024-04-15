@@ -27,6 +27,7 @@ const defaults = {
   WEBSITE_URL: 'http://localhost:3000',
   REST_URL: 'https://rest-staging.opencollective.com',
   PDF_SERVICE_URL: 'https://pdf-staging.opencollective.com',
+  NEXT_PDF_SERVICE_URL: 'https://next-pdf.opencollective.com',
   ML_SERVICE_URL: 'https://ml.opencollective.com',
   DISABLE_MOCK_UPLOADS: false,
   PAYPAL_ENVIRONMENT: 'sandbox',

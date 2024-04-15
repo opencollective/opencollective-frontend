@@ -1,10 +1,13 @@
-import { isEmpty, isUndefined, omit, pickBy } from 'lodash';
+import { find, isEmpty, isUndefined, omit, pickBy } from 'lodash';
+
+import { TaxFormType } from '../components/dashboard/sections/tax-information/common';
 
 import { CollectiveType } from './constants/collectives';
 import { TransactionTypes } from './constants/transactions';
 import { getWebsiteUrl } from './utils';
 
 export const PDF_SERVICE_URL = process.env.PDF_SERVICE_URL;
+const NEXT_PDF_SERVICE_URL = process.env.NEXT_PDF_SERVICE_URL;
 
 // ---- Utils ----
 
@@ -24,7 +27,7 @@ const objectToQueryString = options => {
 
   const encodeValue = value => {
     if (Array.isArray(value)) {
-      return value.concat.map(encodeURIComponent).join(',');
+      return value.map(encodeURIComponent).join(',');
     }
     return encodeURIComponent(value);
   };
@@ -176,7 +179,7 @@ export const addParentToURLIfMissing = (router, account, url = '', queryParams =
   ) {
     const cleanUrl = url.split('?')[0];
     const urlWithParent = getCollectivePageRoute(account) + cleanUrl;
-    const prefix = options?.prefix || '';
+    const prefix = options?.['prefix'] || '';
     if (isUndefined(queryParams)) {
       queryParams = omit(router.query, ['parentCollectiveSlug', 'collectiveSlug', 'eventSlug']);
     }
@@ -190,7 +193,13 @@ export const isRelativeHref = href => {
   return !href || href.startsWith('#') || href === '/' || new RegExp('^/[^/\\\\]+').test(href);
 };
 
-export async function followOrderRedirectUrl(router, collective, order, redirectUrl, { shouldRedirectParent } = {}) {
+export async function followOrderRedirectUrl(
+  router,
+  collective,
+  order,
+  redirectUrl,
+  { shouldRedirectParent = false } = {},
+) {
   const url = new URL(redirectUrl);
   url.searchParams.set('orderId', order.legacyId);
   url.searchParams.set('orderIdV2', order.id);
@@ -230,4 +239,14 @@ export const getFileExtensionFromUrl = url => {
   } catch {
     return null;
   }
+};
+
+export const getTaxFormPDFServiceUrl = (type: TaxFormType, values, { isFinal = false, useNext = false }): string => {
+  const serviceUrl = (useNext && NEXT_PDF_SERVICE_URL) || PDF_SERVICE_URL;
+  const url = new URL(`${serviceUrl}/tax-form/${type}.pdf`);
+  const base64Values = Buffer.from(JSON.stringify(values)).toString('base64');
+  url.searchParams.set('formType', type);
+  url.searchParams.set('values', base64Values);
+  url.searchParams.set('isFinal', isFinal.toString());
+  return url.toString();
 };
