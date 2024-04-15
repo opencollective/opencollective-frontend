@@ -37,7 +37,7 @@ export function ExpenseDetailsForm(props: ExpenseDetailsFormProps) {
     if (isEmpty(props.form.values.expenseItems)) {
       setFieldValue('expenseItems', [
         {
-          incurredAt: new Date(),
+          incurredAt: null,
           description: '',
           amount: {
             valueInCents: 0,

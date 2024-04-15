@@ -139,7 +139,7 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
   const requiresTaxDocuments = expense.account?.isAdmin && includes(expense.requiredLegalDocuments, 'US_TAX_FORM');
 
   return (
-    <div className="flex flex-col gap-8 overflow-scroll overflow-x-hidden px-6 py-4 sm:flex-row sm:px-16">
+    <div className="flex flex-col gap-8 overflow-scroll overflow-x-hidden">
       <div className="flex-1">
         <div className="mb-8 text-xl font-bold">
           {isInvite ? (
@@ -227,31 +227,35 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
           </MessageBox>
         )}
 
-        <div className="mb-3 font-bold">
-          <FormattedMessage
-            defaultMessage="Is there anything else you wish to communicate to the admins who will review this expense?"
-            id="0FP/Ii"
-          />{' '}
-          <PrivateInfoIcon />
-        </div>
-        <RichTextEditor
-          key={lastPrivateNoteId}
-          withBorders
-          version="simplified"
-          editorMinHeight={72}
-          fontSize="13px"
-          placeholder={intl.formatMessage(I18nMessages.notePlaceholder)}
-          onChange={e => setPrivateNote(e.target.value)}
-        />
-        <Button
-          loading={createPrivateNoteMutation.loading}
-          disabled={isEmpty(privateNote)}
-          className="mt-3"
-          variant="default"
-          onClick={onAddPrivateNoteClick}
-        >
-          <FormattedMessage defaultMessage="Add a note" id="dTW4m3" />
-        </Button>
+        {!isInvite && (
+          <React.Fragment>
+            <div className="mb-3 font-bold">
+              <FormattedMessage
+                defaultMessage="Is there anything else you wish to communicate to the admins who will review this expense?"
+                id="0FP/Ii"
+              />{' '}
+              <PrivateInfoIcon />
+            </div>
+            <RichTextEditor
+              key={lastPrivateNoteId}
+              withBorders
+              version="simplified"
+              editorMinHeight={72}
+              fontSize="13px"
+              placeholder={intl.formatMessage(I18nMessages.notePlaceholder)}
+              onChange={e => setPrivateNote(e.target.value)}
+            />
+            <Button
+              loading={createPrivateNoteMutation.loading}
+              disabled={isEmpty(privateNote)}
+              className="mt-3"
+              variant="default"
+              onClick={onAddPrivateNoteClick}
+            >
+              <FormattedMessage defaultMessage="Add a note" id="dTW4m3" />
+            </Button>
+          </React.Fragment>
+        )}
       </div>
 
       <div className="flex-1">

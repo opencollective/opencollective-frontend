@@ -132,34 +132,44 @@ export const validateExpenseFormPayeeInviteNewStep = values => {
   return errors;
 };
 
-const ExpenseFormPayeeInviteNewStep = ({ formik, collective = null, onBack, onNext, hidePayoutDetails = false }) => {
+const ExpenseFormPayeeInviteNewStep = ({
+  payeeFieldName = 'payee',
+  recipientNoteFieldName = 'recipientNote',
+  payoutMethodFieldName = 'payoutMethod',
+  optionalPayoutMethod = false,
+  formik,
+  collective = null,
+  onBack,
+  onNext,
+  hidePayoutDetails = false,
+}) => {
   const intl = useIntl();
   const { formatMessage } = intl;
   const { values, touched, errors } = formik;
-  const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue('payoutMethod', value), []);
-  const [payeeType, setPayeeType] = React.useState(PAYEE_TYPE.USER);
+  const payeeValue = get(formik.values, payeeFieldName);
+  const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue(payoutMethodFieldName, value), []);
+  const payeeType = payeeValue?.organization ? PAYEE_TYPE.ORG : PAYEE_TYPE.USER;
   const [showAdditionalInfo, setAdditionalInfo] = React.useState(
-    !isEmpty(values.payeeLocation) || !isEmpty(values.payoutMethod),
+    !isEmpty(values.payeeLocation) || !isEmpty(get(values, payoutMethodFieldName)),
   );
 
   React.useEffect(() => {
-    if (values.payee?.organization?.name && !touched.payee?.organization?.slug) {
-      const slug = suggestSlug(values.payee.organization.name);
-      if (values.payee.organization.slug !== slug) {
-        formik.setFieldValue('payee.organization.slug', suggestSlug(values.payee.organization.name));
+    if (payeeValue?.organization?.name && !touched.payee?.organization?.slug) {
+      const slug = suggestSlug(payeeValue.organization.name);
+      if (payeeValue.organization.slug !== slug) {
+        formik.setFieldValue(`${payeeFieldName}.organization.slug`, suggestSlug(payeeValue.organization.name));
       }
     }
-  }, [values.payee?.organization?.name]);
-
-  React.useEffect(() => {
-    if (payeeType === PAYEE_TYPE.USER) {
-      formik.setFieldValue('payee', omit(values.payee, ['organization']));
-    }
-  }, [payeeType]);
+  }, [payeeValue?.organization?.name]);
 
   const changePayeeType = e => {
     e.stopPropagation();
-    setPayeeType(e.target.value);
+    const newPayeeType = e.target.value;
+    if (newPayeeType === PAYEE_TYPE.USER) {
+      formik.setFieldValue(payeeFieldName, omit(payeeValue, ['organization']));
+    } else {
+      formik.setFieldValue(payeeFieldName, { ...payeeValue, organization: { name: '' } });
+    }
   };
 
   return (
@@ -202,7 +212,7 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective = null, onBack, onNe
       {payeeType === PAYEE_TYPE.ORG && (
         <Fragment>
           <Grid gridTemplateColumns={['100%', 'calc(50% - 8px) calc(50% - 8px)']} gridColumnGap={[null, 2, null, 3]}>
-            <Field name="payee.organization.name">
+            <Field name={`${payeeFieldName}.organization.name`}>
               {({ field }) => (
                 <StyledInputField
                   name={field.name}
@@ -215,12 +225,12 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective = null, onBack, onNe
                 </StyledInputField>
               )}
             </Field>
-            <Field name="payee.organization.slug">
+            <Field name={`${payeeFieldName}.organization.slug`}>
               {({ field }) => (
                 <StyledInputField
                   mt={3}
                   labelFontSize="13px"
-                  error={errors.payee?.organization?.slug}
+                  error={get(errors, `${payeeFieldName}.organization.slug`)}
                   name={field.name}
                   label={formatMessage(msg.orgSlugLabel)}
                 >
@@ -228,7 +238,7 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective = null, onBack, onNe
                 </StyledInputField>
               )}
             </Field>
-            <Field name="payee.organization.website">
+            <Field name={`${payeeFieldName}.organization.website`}>
               {({ field }) => (
                 <StyledInputField
                   name={field.name}
@@ -242,7 +252,7 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective = null, onBack, onNe
               )}
             </Field>
 
-            <Field name="payee.organization.description">
+            <Field name={`${payeeFieldName}.organization.description`}>
               {({ field }) => (
                 <StyledInputField
                   name={field.name}
@@ -266,8 +276,8 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective = null, onBack, onNe
       >
         <Box>
           <StyledInputFormikField
-            name="payee.name"
-            htmlFor="payee.name"
+            name={`${payeeFieldName}.name`}
+            htmlFor={`${payeeFieldName}.name`}
             required
             label={formatMessage(msg.nameLabel)}
             labelFontSize="13px"
@@ -278,8 +288,8 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective = null, onBack, onNe
         </Box>
         <Box>
           <StyledInputFormikField
-            name="payee.email"
-            htmlFor="payee.email"
+            name={`${payeeFieldName}.email`}
+            htmlFor={`${payeeFieldName}.email`}
             label={formatMessage(msg.emailTitle)}
             required
             labelFontSize="13px"
@@ -313,7 +323,7 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective = null, onBack, onNe
               />
             </Box>
             <Box>
-              <Field name="payoutMethod">
+              <Field name={payoutMethodFieldName}>
                 {({ field }) => (
                   <StyledInputField
                     name={field.name}
@@ -324,8 +334,8 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective = null, onBack, onNe
                     label={formatMessage(msg.payoutOptionLabel)}
                     labelFontSize="13px"
                     error={
-                      isErrorType(errors.payoutMethod, ERROR.FORM_FIELD_REQUIRED)
-                        ? formatFormErrorMessage(intl, errors.payoutMethod)
+                      isErrorType(get(errors, payoutMethodFieldName), ERROR.FORM_FIELD_REQUIRED)
+                        ? formatFormErrorMessage(intl, get(errors, payoutMethodFieldName))
                         : null
                     }
                   >
@@ -334,22 +344,23 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective = null, onBack, onNe
                         inputId={id}
                         error={error}
                         onChange={setPayoutMethod}
-                        payoutMethod={values.payoutMethod}
+                        payoutMethod={get(values, payoutMethodFieldName)}
                         payoutMethods={EMPTY_ARRAY}
-                        payee={values.payee}
-                        disabled={!values.payee}
+                        payee={payeeValue}
+                        disabled={!payeeValue}
                         collective={collective}
+                        allowNull={optionalPayoutMethod}
                       />
                     )}
                   </StyledInputField>
                 )}
               </Field>
-              {values.payoutMethod && (
-                <Field name="payoutMethod">
+              {get(values, payoutMethodFieldName) && (
+                <Field name={payoutMethodFieldName}>
                   {({ field, meta }) => (
                     <Box mt={3} flex="1">
                       <PayoutMethodForm
-                        fieldsPrefix="payoutMethod"
+                        fieldsPrefix={payoutMethodFieldName}
                         payoutMethod={field.value}
                         host={collective.host}
                         errors={meta.error}
@@ -387,7 +398,7 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective = null, onBack, onNe
         )}
       </Grid>
       <Box>
-        <Field name="recipientNote">
+        <Field name={recipientNoteFieldName}>
           {({ field }) => (
             <StyledInputField
               name={field.name}
@@ -401,7 +412,7 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective = null, onBack, onNe
           )}
         </Field>
       </Box>
-      {values.payee && (onBack || onNext) && (
+      {payeeValue && (onBack || onNext) && (
         <Fragment>
           <StyledHr flex="1" mt={4} borderColor="black.300" />
           <Flex mt={3} flexWrap="wrap">
@@ -453,10 +464,14 @@ const ExpenseFormPayeeInviteNewStep = ({ formik, collective = null, onBack, onNe
 
 ExpenseFormPayeeInviteNewStep.propTypes = {
   formik: PropTypes.object,
+  payeeFieldName: PropTypes.string,
+  recipientNoteFieldName: PropTypes.string,
+  payoutMethodFieldName: PropTypes.string,
   payoutProfiles: PropTypes.array,
   onBack: PropTypes.func,
   onNext: PropTypes.func,
   hidePayoutDetails: PropTypes.bool,
+  optionalPayoutMethod: PropTypes.bool,
   collective: PropTypes.shape({
     slug: PropTypes.string,
     type: PropTypes.string,

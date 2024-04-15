@@ -1,41 +1,35 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import clsx from 'clsx';
 import { FormikProvider, useFormik } from 'formik';
-import { debounce, uniqBy } from 'lodash';
-import { ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
+import { debounce } from 'lodash';
+import { Trash2 } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import {
+  Account,
   Host,
-  PaymentMethodType,
-  PayoutMethod,
   PayoutMethodType,
   SavePayoutMethodMutation,
   SavePayoutMethodMutationVariables,
 } from '../../lib/graphql/types/v2/graphql';
-import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
-import Avatar from '../Avatar';
 import CollectivePicker from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import ConfirmationModal, { CONFIRMATION_MODAL_TERMINATE } from '../ConfirmationModal';
 import ExpenseFormPayeeInviteNewStep from '../expenses/ExpenseFormPayeeInviteNewStep';
-import PayoutMethodData from '../expenses/PayoutMethodData';
 import PayoutMethodForm, { validatePayoutMethod } from '../expenses/PayoutMethodForm';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
-import Loading from '../Loading';
-import { PayoutMethodIcon } from '../PayoutMethodIcon';
+import LoadingPlaceholder from '../LoadingPlaceholder';
 import { I18nPayoutMethodLabels, PayoutMethodLabel } from '../PayoutMethodLabel';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledSelect from '../StyledSelect';
 import { Button } from '../ui/Button';
 import { useToast } from '../ui/useToast';
 
-import { InvitedPayeeLabel } from './InvitedPayeeLabel';
+import { PayoutMethodDetails } from './PayoutMethodDetails';
 import { RadioCardButton } from './RadioCardButton';
 import { ExpenseForm } from './useExpenseForm';
 
@@ -44,26 +38,13 @@ type PickPaymentMethodFormProps = {
 };
 
 export function PickPaymentMethodForm(props: PickPaymentMethodFormProps) {
-  const { LoggedInUser } = useLoggedInUser();
-  const [isChangingPayee, setIsChangingPayee] = React.useState(false);
+  const payeeProfile = props.form.values.payeeSlug ? props.form.options.payee : null;
+  const hasVendor = !!props.form.options.host;
 
-  const payeeProfile = props.form.options.payee;
-
-  const pickedLastSubmitedPayee = React.useMemo(
-    () =>
-      payeeProfile &&
-      props.form.options.recentlySubmittedExpenses?.nodes?.length > 0 &&
-      props.form.options.recentlySubmittedExpenses.nodes[0].payee.slug === payeeProfile.slug,
-    [payeeProfile, props.form.options.recentlySubmittedExpenses],
+  const [isPickingVendor, setIsPickingVendor] = React.useState(
+    hasVendor && payeeProfile?.type === CollectiveType.VENDOR,
   );
-
-  const isPersonalProfile = payeeProfile && payeeProfile.slug === LoggedInUser?.collective?.slug;
-
-  const invitePayee = props.form.values.invitePayee;
-
-  const pickedPayee = invitePayee || payeeProfile;
-  const hasPayoutPicker =
-    pickedPayee && !isChangingPayee && payeeProfile?.type !== CollectiveType.VENDOR && !invitePayee?.['legacyId'];
+  const [isInvitingOtherPayee, setIsInvitingOtherPayee] = React.useState(!!props.form.values.invitePayee);
 
   return (
     <div className="flex-grow pr-2">
@@ -71,308 +52,104 @@ export function PickPaymentMethodForm(props: PickPaymentMethodFormProps) {
         <FormattedMessage defaultMessage="Who is getting paid?" id="W5Z+Fm" />
       </h1>
 
-      <React.Fragment>
-        {isChangingPayee || !pickedPayee ? (
-          <PayeePicker
-            form={props.form}
-            isChangingPayee={isChangingPayee}
-            onPayeePicked={() => setIsChangingPayee(false)}
-          />
-        ) : (
-          <RadioCardButton
-            className="w-full"
-            onClick={() => {}}
-            checked
-            title={
-              <div className="flex items-center gap-4">
-                {isPersonalProfile && <FormattedMessage defaultMessage="Myself" id="YjO/0+" />}
-                {!invitePayee && <Avatar collective={payeeProfile} radius={24} />}
-
-                <span className="flex-grow">
-                  {pickedLastSubmitedPayee ? (
-                    <FormattedMessage
-                      defaultMessage="{label} (Last used)"
-                      id="ieTRJZ"
-                      values={{
-                        label: payeeProfile.name,
-                      }}
-                    />
-                  ) : invitePayee ? (
-                    <InvitedPayeeLabel invitePayee={invitePayee} />
-                  ) : (
-                    payeeProfile.name
-                  )}
-                </span>
-
-                <Button
-                  size="xs"
-                  variant="link"
-                  onClick={() => {
-                    props.form.setFieldValue('payeeSlug', null);
-                    props.form.setFieldValue('invitePayee', null);
-                    props.form.setFieldValue('inviteNote', null);
-                    setIsChangingPayee(true);
-                  }}
-                >
-                  <FormattedMessage defaultMessage="Change" id="BY343C" />
-                </Button>
-              </div>
-            }
-          />
-        )}
-
-        {hasPayoutPicker && <PayoutMethodPicker form={props.form} />}
-      </React.Fragment>
-    </div>
-  );
-}
-
-type PayeePickerProps = {
-  form: ExpenseForm;
-  isChangingPayee?: boolean;
-  onPayeePicked: () => void;
-};
-
-function PayeePicker(props: PayeePickerProps) {
-  const [isPickingVendor, setIsPickingVendor] = React.useState(false);
-  const [isPickingOtherPayee, setIsPickingOtherPayee] = React.useState(false);
-  const [isInvitingOtherPayee, setIsInvitingOtherPayee] = React.useState(props.form.startOptions.preselectInvitePayee);
-  const { LoggedInUser } = useLoggedInUser();
-
-  const loggedInAccount = React.useMemo(
-    () => (props.form.options.payoutProfiles ?? []).find(p => p.slug === LoggedInUser?.collective?.slug),
-    [LoggedInUser?.collective?.slug, props.form.options.payoutProfiles],
-  );
-
-  const profilesBySlug = React.useMemo(() => {
-    return (props.form.options.payoutProfiles ?? []).reduce(
-      (acc, profile) => ({ ...acc, [profile.slug]: profile }),
-      {},
-    );
-  }, [props.form.options.payoutProfiles]);
-
-  const recentlySubmittedExpenses = props.form.options.recentlySubmittedExpenses;
-  const recentPayeesSlugs = React.useMemo(() => {
-    const uniquePayees = uniqBy(recentlySubmittedExpenses?.nodes || [], e => e.payee.slug)
-      .map(e => e.payee.slug)
-      .filter(recentSlug => profilesBySlug[recentSlug]);
-    return uniquePayees;
-  }, [recentlySubmittedExpenses, profilesBySlug]);
-
-  const otherPayees = React.useMemo(() => {
-    return (props.form.options.payoutProfiles ?? []).filter(
-      p => !recentPayeesSlugs.includes(p.slug) && p.slug !== loggedInAccount?.slug,
-    );
-  }, [props.form.options.payoutProfiles, recentPayeesSlugs, loggedInAccount]);
-
-  const setFieldValue = props.form.setFieldValue;
-  const onPayeePicked = props.onPayeePicked;
-  React.useEffect(() => {
-    if (
-      !props.isChangingPayee &&
-      !isPickingOtherPayee &&
-      !isPickingVendor &&
-      !isInvitingOtherPayee &&
-      recentPayeesSlugs.length > 0 &&
-      !props.form.values.payeeSlug &&
-      !props.form.startOptions.preselectInvitePayee
-    ) {
-      setFieldValue('payeeSlug', recentPayeesSlugs[0]);
-      onPayeePicked();
-    }
-  }, [
-    onPayeePicked,
-    props.isChangingPayee,
-    isPickingOtherPayee,
-    isPickingVendor,
-    isInvitingOtherPayee,
-    recentPayeesSlugs,
-    loggedInAccount,
-    props.form.values.payeeSlug,
-    setFieldValue,
-    props.form.startOptions.preselectInvitePayee,
-  ]);
-
-  if (LoggedInUser && !loggedInAccount) {
-    return <Loading />;
-  }
-
-  return (
-    <React.Fragment>
       <div className="flex flex-col gap-4">
-        {recentPayeesSlugs.map((payeeSlug, i) => (
-          <RadioCardButton
-            className="order-2"
-            checked={payeeSlug === props.form.values.payeeSlug}
-            key={payeeSlug}
-            onClick={() => {
-              props.form.setFieldValue('payeeSlug', payeeSlug);
-              onPayeePicked();
-              setIsPickingOtherPayee(false);
-              setIsPickingVendor(false);
-            }}
-            title={
-              <div className="flex gap-2">
-                {payeeSlug === loggedInAccount?.slug && <FormattedMessage defaultMessage="Myself" id="YjO/0+" />}
-                <Avatar radius={24} collective={profilesBySlug[payeeSlug]} displayTitle />
-                {i === 0 ? (
-                  <FormattedMessage
-                    defaultMessage="{label} (Last used)"
-                    id="ieTRJZ"
-                    values={{
-                      label: profilesBySlug[payeeSlug].name,
-                    }}
-                  />
-                ) : (
-                  <span>{profilesBySlug[payeeSlug].name}</span>
-                )}
-              </div>
-            }
-          />
-        ))}
-        {loggedInAccount && !recentPayeesSlugs.includes(loggedInAccount.slug) && (
-          <RadioCardButton
-            className="order-2"
-            checked={loggedInAccount.slug === props.form.values.payeeSlug}
-            onClick={() => {
-              setFieldValue('payeeSlug', loggedInAccount.slug);
-              onPayeePicked();
-              setIsPickingOtherPayee(false);
-              setIsInvitingOtherPayee(false);
-              setIsPickingVendor(false);
-            }}
-            title={
-              <div className="flex gap-2">
-                <Avatar radius={24} collective={loggedInAccount} displayTitle />
-                <span>{loggedInAccount.name}</span>
-              </div>
-            }
-          />
-        )}
-        {otherPayees.length > 0 && (
-          <RadioCardButton
-            className="order-2"
-            checked={isPickingOtherPayee || otherPayees.some(p => p.slug === props.form.values.payeeSlug)}
-            onClick={() => {
-              setIsPickingOtherPayee(true);
-              setIsInvitingOtherPayee(false);
-              setIsPickingVendor(false);
-            }}
-            title={<FormattedMessage defaultMessage="A profile I administer" id="vhmHzJ" />}
-            content={
-              (isPickingOtherPayee || otherPayees.find(p => p.slug === props.form.values.payeeSlug)) && (
-                <div className="mt-2">
-                  <CollectivePicker
-                    collectives={otherPayees}
-                    collective={otherPayees.find(p => p.slug === props.form.values.payeeSlug)}
-                    onChange={e => {
-                      setIsPickingOtherPayee(true);
-                      setFieldValue('payeeSlug', e.value.slug);
-                      onPayeePicked();
-                      setIsPickingOtherPayee(false);
-                      setIsInvitingOtherPayee(false);
-                      setIsPickingVendor(false);
-                    }}
-                  />
-                </div>
-              )
-            }
-          />
-        )}
         <RadioCardButton
-          className="order-2"
-          checked={isPickingVendor}
-          title={<FormattedMessage defaultMessage="A vendor" id="rth3eX" />}
-          content={
-            isPickingVendor && (
-              <div className="mt-2">
-                <VendorPicker
-                  collectiveSlug={props.form.values.collectiveSlug}
-                  hostSlug={props.form.options.host.slug}
-                  onChange={vendor => {
-                    setFieldValue('payeeSlug', vendor.slug);
-                    onPayeePicked();
-                  }}
-                />
-              </div>
-            )
-          }
+          title={<FormattedMessage defaultMessage="Profiles I administer" id="bRgWXW" />}
+          className="w-full"
           onClick={() => {
-            setIsPickingVendor(true);
-            setIsPickingOtherPayee(false);
+            props.form.setFieldValue('payeeSlug', null);
+            props.form.setFieldValue('payoutMethodId', null);
+            props.form.setFieldValue('invitePayee', null);
+            props.form.setFieldValue('inviteNote', null);
+            props.form.setFieldValue('payeeLocation', null);
             setIsInvitingOtherPayee(false);
-          }}
-        />
-        <RadioCardButton
-          className={clsx({
-            'order-1': props.form.startOptions.preselectInvitePayee,
-            'order-2': !props.form.startOptions.preselectInvitePayee,
-          })}
-          checked={
-            (isInvitingOtherPayee &&
-              !(isPickingOtherPayee && otherPayees.some(p => p.slug === props.form.values.payeeSlug))) ||
-            (!!props.form.values.invitePayee && !isPickingOtherPayee)
-          }
-          onClick={() => {
-            setIsInvitingOtherPayee(true);
-            setIsPickingOtherPayee(false);
             setIsPickingVendor(false);
           }}
+          checked={!isPickingVendor && !isInvitingOtherPayee}
+          content={
+            !isPickingVendor && !isInvitingOtherPayee ? (
+              <div className="mt-4">
+                <ProfilesIAdministerPicker form={props.form} />
+              </div>
+            ) : null
+          }
+        />
+
+        <RadioCardButton
           title={
             <FormattedMessage
               id="CollectivePicker.InviteMenu.ButtonLabel"
               defaultMessage="Invite someone to submit an expense"
             />
           }
-          content={
-            (isInvitingOtherPayee &&
-              !(isPickingOtherPayee && otherPayees.some(p => p.slug === props.form.values.payeeSlug))) ||
-            (props.form.values.invitePayee && !isPickingOtherPayee) ? (
-              <InvitePayeePicker
-                form={props.form}
-                onPick={() => {
-                  onPayeePicked();
-                }}
-              />
-            ) : null
-          }
+          checked={isInvitingOtherPayee}
+          onClick={() => {
+            setIsInvitingOtherPayee(true);
+            setIsPickingVendor(false);
+            props.form.setFieldValue('payeeSlug', null);
+            props.form.setFieldValue('payoutMethodId', null);
+            props.form.setFieldValue('invitePayee', null);
+            props.form.setFieldValue('inviteNote', null);
+            props.form.setFieldValue('payeeLocation', null);
+          }}
+          content={isInvitingOtherPayee ? <InvitePayeePicker form={props.form} /> : null}
         />
+
+        {hasVendor && (
+          <RadioCardButton
+            title={<FormattedMessage defaultMessage="A vendor" id="rth3eX" />}
+            className="order-2"
+            checked={isPickingVendor}
+            content={
+              isPickingVendor && (
+                <div className="mt-2">
+                  <VendorPicker
+                    collectiveSlug={props.form.values.collectiveSlug}
+                    hostSlug={props.form.options.host.slug}
+                    vendor={payeeProfile}
+                    onChange={vendor => {
+                      props.form.setFieldValue('payeeSlug', vendor.slug);
+                      props.form.setFieldValue('payoutMethodId', null);
+                      props.form.setFieldValue('invitePayee', null);
+                      props.form.setFieldValue('inviteNote', null);
+                      props.form.setFieldValue('payeeLocation', null);
+                    }}
+                  />
+                </div>
+              )
+            }
+            onClick={() => {
+              props.form.setFieldValue('payeeSlug', null);
+              props.form.setFieldValue('payoutMethodId', null);
+              props.form.setFieldValue('invitePayee', null);
+              props.form.setFieldValue('inviteNote', null);
+              setIsPickingVendor(true);
+              setIsInvitingOtherPayee(false);
+            }}
+          />
+        )}
       </div>
-    </React.Fragment>
+    </div>
   );
 }
 
 type InvitePayeePickerProps = {
   form: ExpenseForm;
-  onPick: () => void;
 };
 
 function InvitePayeePicker(props: InvitePayeePickerProps) {
-  const formRef = React.useRef<HTMLFormElement>(null);
   const [isNewInvitePayee, setIsNewInvitePayee] = React.useState(
     props.form.values.invitePayee && !('legacyId' in props.form.values.invitePayee) ? true : false,
   );
 
-  const formik = useFormik({
-    initialValues: {
-      payee: props.form.values.invitePayee,
-      recipientNote: props.form.values.inviteNote,
-    },
-    async onSubmit(values, formikHelpers) {
-      if (!formRef.current?.reportValidity()) {
-        return;
-      }
-      await formikHelpers.validateForm();
-      props.form.setFieldValue('invitePayee', values.payee);
-      props.form.setFieldValue('inviteNote', values.recipientNote);
-      props.onPick();
-    },
-    validateOnBlur: false,
-    validateOnMount: false,
-  });
-
   return (
-    <div className="mt-2">
+    <div
+      className="mt-2"
+      role="searchbox"
+      tabIndex={0}
+      onClick={e => e.stopPropagation()}
+      onKeyDown={e => e.stopPropagation()}
+    >
       <CollectivePickerAsync
         inputId="payee-invite-picker"
         onFocus={() => setIsNewInvitePayee(null)}
@@ -395,7 +172,6 @@ function InvitePayeePicker(props: InvitePayeePickerProps) {
             setIsNewInvitePayee(false);
             props.form.setFieldValue('invitePayee', { ...option.value, legacyId: option.value.id });
             props.form.setFieldValue('inviteNote', '');
-            props.onPick();
           }
         }}
         onInvite={() => {
@@ -407,310 +183,30 @@ function InvitePayeePicker(props: InvitePayeePickerProps) {
       />
       {isNewInvitePayee && (
         <div>
-          <FormikProvider value={formik}>
-            <form ref={formRef}>
-              <ExpenseFormPayeeInviteNewStep hidePayoutDetails formik={formik} />
-            </form>
+          <FormikProvider value={props.form}>
+            <ExpenseFormPayeeInviteNewStep
+              payeeFieldName="invitePayee"
+              recipientNoteFieldName="inviteNote"
+              payoutMethodFieldName="invitePayee.payoutMethod"
+              formik={props.form}
+              collective={{
+                ...props.form.options.account,
+                host: props.form.options.host,
+              }}
+              optionalPayoutMethod
+            />
           </FormikProvider>
-          <Button className="mt-2" onClick={formik.submitForm}>
-            <FormattedMessage defaultMessage="Confirm" id="N2IrpM" />
-          </Button>
         </div>
       )}
     </div>
   );
 }
 
-type PayoutMethodOptionButtonProps = {
-  payoutMethod: PayoutMethod | Omit<PayoutMethod, 'id'>;
-  checked?: boolean;
-  isLastUsedPaymentMethod?: boolean;
-  onClick: () => void;
-  onDelete: () => void;
-  onEdit: () => void;
-  disabled?: boolean;
-};
-
-function PayoutMethodOptionButton(props: PayoutMethodOptionButtonProps) {
-  const intl = useIntl();
-  const { toast } = useToast();
-  const [isOpen, setIsOpen] = React.useState(props.checked);
-  const [isDeletingPayoutMethod, setIsDeletingPayoutMethod] = React.useState(false);
-
-  const [deletePayoutMethod] = useMutation(
-    gql`
-      mutation DeletePayoutMethod($payoutMethodId: String!) {
-        removePayoutMethod(payoutMethodId: $payoutMethodId) {
-          id
-        }
-      }
-    `,
-    {
-      context: API_V2_CONTEXT,
-      variables: {
-        payoutMethodId: props.payoutMethod['id'],
-      },
-    },
-  );
-
-  const hasDetails = props.payoutMethod.type !== PayoutMethodType.PAYPAL;
-
-  return (
-    <React.Fragment>
-      <RadioCardButton
-        checked={props.checked}
-        onClick={props.onClick}
-        disabled={props.disabled}
-        title={
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <PayoutMethodIcon payoutMethod={props.payoutMethod} />
-              {props.isLastUsedPaymentMethod ? (
-                <FormattedMessage
-                  defaultMessage="{label} (Last used)"
-                  id="ieTRJZ"
-                  values={{
-                    label: (
-                      <b>
-                        <PayoutMethodLabel payoutMethod={props.payoutMethod} />
-                      </b>
-                    ),
-                  }}
-                />
-              ) : (
-                <b>
-                  <PayoutMethodLabel payoutMethod={props.payoutMethod} />
-                </b>
-              )}
-            </div>
-            {hasDetails && (
-              <div className="flex">
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={e => {
-                    e.stopPropagation();
-                    setIsOpen(!isOpen);
-                  }}
-                >
-                  {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                </Button>
-
-                <Button
-                  onClick={e => {
-                    e.stopPropagation();
-                    if ('id' in props.payoutMethod) {
-                      setIsDeletingPayoutMethod(true);
-                    } else {
-                      props.onDelete();
-                    }
-                  }}
-                  size="icon"
-                  variant="ghost"
-                >
-                  <Trash2 size={16} />
-                </Button>
-              </div>
-            )}
-          </div>
-        }
-        content={
-          isOpen && hasDetails ? (
-            <div className="flex flex-col gap-1 *:first:mt-2">
-              <PayoutMethodData showLabel={false} payoutMethod={props.payoutMethod} />
-            </div>
-          ) : null
-        }
-      />
-      {isDeletingPayoutMethod && (
-        <ConfirmationModal
-          isDanger
-          type="delete"
-          onClose={() => setIsDeletingPayoutMethod(false)}
-          header={<FormattedMessage defaultMessage="Delete Payment Method?" id="tAJKFb" />}
-          body={<FormattedMessage defaultMessage="Are you sure you want to delete this payment method?" id="lCYRnz" />}
-          continueHandler={async () => {
-            try {
-              await deletePayoutMethod();
-              toast({
-                variant: 'success',
-                message: <FormattedMessage defaultMessage="Payment Method deleted successfully" id="AzyeWl" />,
-              });
-              setIsDeletingPayoutMethod(false);
-              props.onDelete();
-              return CONFIRMATION_MODAL_TERMINATE;
-            } catch (e) {
-              toast({
-                variant: 'error',
-                message: i18nGraphqlException(intl, e),
-              });
-            }
-          }}
-        />
-      )}
-    </React.Fragment>
-  );
-}
-
-type PayoutMethodPickerProps = {
-  form: ExpenseForm;
-};
-
-function PayoutMethodPicker(props: PayoutMethodPickerProps) {
-  const [isCreatingNewPayoutMethod, setIsCreatingNewPayoutMethod] = React.useState(false);
-  const payeeProfile = React.useMemo(
-    () => props.form.options.payoutProfiles?.find(p => p.slug === props.form.values.payeeSlug),
-    [props.form.values.payeeSlug, props.form.options.payoutProfiles],
-  );
-
-  const lastUsedPaymentMethodIdByPayee = React.useMemo(() => {
-    if (!payeeProfile || (props.form.options.recentlySubmittedExpenses?.nodes ?? []).length === 0) {
-      return null;
-    }
-
-    const lastExpenseFromThisPayee = props.form.options.recentlySubmittedExpenses.nodes.find(
-      e => e.payee.slug === payeeProfile.slug,
-    );
-    if (!lastExpenseFromThisPayee) {
-      return null;
-    }
-
-    return lastExpenseFromThisPayee.payoutMethod?.id;
-  }, [payeeProfile, props.form.options.recentlySubmittedExpenses]);
-
-  const payeePaymentMethods = React.useMemo(() => {
-    if (!payeeProfile || !payeeProfile.payoutMethods) {
-      return [];
-    }
-
-    return [
-      payeeProfile.payoutMethods.find(p => p.id === lastUsedPaymentMethodIdByPayee),
-      ...payeeProfile.payoutMethods.filter(p => p.id !== lastUsedPaymentMethodIdByPayee),
-    ].filter(Boolean);
-  }, [payeeProfile, lastUsedPaymentMethodIdByPayee]);
-
-  const setFieldValue = props.form.setFieldValue;
-  React.useEffect(() => {
-    if (
-      !isCreatingNewPayoutMethod &&
-      lastUsedPaymentMethodIdByPayee &&
-      payeePaymentMethods.length > 0 &&
-      props.form.values.payeeSlug &&
-      !props.form.values.payoutMethodId &&
-      (!props.form.options.supportedPayoutMethods ||
-        props.form.options.supportedPayoutMethods.includes(
-          payeePaymentMethods.find(pm => pm.id === lastUsedPaymentMethodIdByPayee)?.type,
-        ))
-    ) {
-      setFieldValue('payoutMethodId', lastUsedPaymentMethodIdByPayee);
-    }
-  }, [
-    isCreatingNewPayoutMethod,
-    lastUsedPaymentMethodIdByPayee,
-    payeePaymentMethods,
-    setFieldValue,
-    props.form.values.payoutMethodId,
-    props.form.values.payeeSlug,
-    props.form.options.supportedPayoutMethods,
-  ]);
-
-  const isInvite = !!props.form.values.invitePayee;
-  const invitePayoutMethod =
-    isInvite && 'payoutMethod' in props.form.values.invitePayee ? props.form.values.invitePayee.payoutMethod : null;
-
-  return (
-    <React.Fragment>
-      <h1 className="mb-4 mt-8 text-lg font-bold leading-[26px] text-dark-900">
-        <FormattedMessage id="Fields.paymentMethod" defaultMessage="Payment method" /> <PrivateInfoIcon />
-        {isInvite ? (
-          <span className="text-sm font-normal italic">
-            &nbsp;
-            <FormattedMessage id="tier.order.organization.twitterHandle.description" defaultMessage="optional" />
-          </span>
-        ) : null}
-      </h1>
-      {invitePayoutMethod ? (
-        <div className="flex flex-col gap-4">
-          <PayoutMethodOptionButton
-            payoutMethod={invitePayoutMethod}
-            checked
-            onClick={() => {}}
-            onDelete={() => {
-              props.form.setFieldValue('invitePayee.payoutMethod', null);
-            }}
-            onEdit={() => {}}
-          />
-        </div>
-      ) : (
-        <div className="flex flex-col gap-4">
-          {payeePaymentMethods.map(payoutMethod => (
-            <PayoutMethodOptionButton
-              disabled={
-                props.form.options.supportedPayoutMethods &&
-                !props.form.options.supportedPayoutMethods.includes(payoutMethod.type)
-              }
-              isLastUsedPaymentMethod={lastUsedPaymentMethodIdByPayee === payoutMethod.id}
-              payoutMethod={payoutMethod}
-              checked={payoutMethod.id === props.form.values.payoutMethodId}
-              onClick={() => {
-                props.form.setFieldValue('payeeSlug', payeeProfile.slug);
-                props.form.setFieldValue('payoutMethodId', payoutMethod.id);
-                setIsCreatingNewPayoutMethod(false);
-              }}
-              onDelete={() => {
-                if (props.form.values.payoutMethodId === payoutMethod.id) {
-                  props.form.setFieldValue('payoutMethodId', null);
-                }
-                props.form.refresh();
-              }}
-              onEdit={() => {
-                props.form.refresh();
-              }}
-              key={payoutMethod.id}
-            />
-          ))}
-
-          <RadioCardButton
-            title={
-              <b>
-                <FormattedMessage defaultMessage="New Payment Method" id="FHmMRE" />
-              </b>
-            }
-            onClick={() => {
-              props.form.setFieldValue('payoutMethodId', null);
-              setIsCreatingNewPayoutMethod(true);
-            }}
-            checked={!props.form.values.payoutMethodId}
-            content={
-              !props.form.values.payoutMethodId ? (
-                <div className="mt-2">
-                  <CreatePayoutMethodForm
-                    supportedPayoutMethods={props.form.options.supportedPayoutMethods}
-                    payeeSlug={props.form.values.payeeSlug}
-                    host={props.form.options.host}
-                    onCreate={async paymentMethod => {
-                      if ('id' in paymentMethod && paymentMethod.id) {
-                        props.form.setFieldValue('payoutMethodId', paymentMethod.id);
-                        await props.form.refresh();
-                      } else {
-                        props.form.setFieldValue('invitePayee.payoutMethod', paymentMethod);
-                      }
-                    }}
-                  />
-                </div>
-              ) : null
-            }
-          />
-        </div>
-      )}
-    </React.Fragment>
-  );
-}
-
 type CreatePayoutMethodFormProps = {
   supportedPayoutMethods?: PayoutMethodType[];
-  payeeSlug?: string;
-  onCreate: (paymentMethod: { id?: string } | { data: any; type: PaymentMethodType }) => void;
+  payeeSlug: string;
+  onCreate: (paymentMethod: { id: string }) => void;
+  onCancel?: () => void;
   host: Pick<Host, 'transferwise'>;
 };
 
@@ -741,14 +237,6 @@ function CreatePayoutMethodForm(props: CreatePayoutMethodFormProps) {
       return payoutMethodErrors;
     },
     async onSubmit(values) {
-      if (!props.payeeSlug) {
-        props.onCreate({
-          type: values.type,
-          data: values.data,
-        });
-        return;
-      }
-
       try {
         const res = await createPayoutMethod({
           variables: {
@@ -783,6 +271,11 @@ function CreatePayoutMethodForm(props: CreatePayoutMethodFormProps) {
     () => ({ type: formik.values.type, data: formik.values.data }),
     [formik.values.type, formik.values.data],
   );
+
+  const setFieldValue = formik.setFieldValue;
+  React.useEffect(() => {
+    setFieldValue('data', {});
+  }, [formik.values.type, setFieldValue]);
   return (
     <FormikProvider value={formik}>
       <div>
@@ -814,9 +307,16 @@ function CreatePayoutMethodForm(props: CreatePayoutMethodFormProps) {
 
         {formik.values.type && <PayoutMethodForm required alwaysSave payoutMethod={payoutMethod} host={props.host} />}
       </div>
-      <Button className="mt-2" onClick={onSubmit}>
-        <FormattedMessage id="save" defaultMessage="Save" />
-      </Button>
+      <div className="mt-4 flex gap-4">
+        {props.onCancel && (
+          <Button variant="outline" onClick={props.onCancel} disabled={formik.isSubmitting}>
+            <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
+          </Button>
+        )}
+        <Button onClick={onSubmit} disabled={!formik.isValid || !formik.values.type} loading={formik.isSubmitting}>
+          <FormattedMessage id="save" defaultMessage="Save" />
+        </Button>
+      </div>
     </FormikProvider>
   );
 }
@@ -824,11 +324,13 @@ function CreatePayoutMethodForm(props: CreatePayoutMethodFormProps) {
 type VendorPickerProps = {
   hostSlug: string;
   collectiveSlug: string;
+  vendor: Partial<Account>;
   onChange: (vendor: { slug: string }) => void;
 };
 
 function VendorPicker(props: VendorPickerProps) {
   const [term, setTerm] = React.useState(null);
+  const [value, setValue] = React.useState(props.vendor);
 
   const query = useQuery(
     gql`
@@ -865,15 +367,304 @@ function VendorPicker(props: VendorPickerProps) {
   );
 
   return (
-    <CollectivePicker
-      isLoading={query.loading}
-      collectives={query.data?.host?.vendors?.nodes ?? []}
-      useSearchIcon={true}
-      isSearchable
-      onInputChange={onSearch}
-      onChange={e => {
-        props.onChange(e.value);
-      }}
-    />
+    <div tabIndex={0} role="searchbox" onClick={e => e.stopPropagation()} onKeyDown={e => e.stopPropagation()}>
+      <CollectivePicker
+        autoFocus
+        isLoading={query.loading}
+        collectives={query.data?.host?.vendors?.nodes ?? []}
+        useSearchIcon={true}
+        isSearchable
+        onInputChange={onSearch}
+        collective={value || props.vendor}
+        onChange={e => {
+          setValue(e.value);
+          props.onChange(e.value);
+        }}
+      />
+    </div>
+  );
+}
+
+type ProfilesIAdministerPickerProps = {
+  form: ExpenseForm;
+};
+
+function ProfilesIAdministerPicker(props: ProfilesIAdministerPickerProps) {
+  const payeeProfile = (props.form.options.payoutProfiles ?? []).find(p => p.slug === props.form.values.payeeSlug);
+
+  const pickedLastSubmitedPayee = React.useMemo(
+    () =>
+      payeeProfile &&
+      props.form.options.recentlySubmittedExpenses?.nodes?.length > 0 &&
+      props.form.options.recentlySubmittedExpenses.nodes[0].payee.slug === payeeProfile.slug,
+    [payeeProfile, props.form.options.recentlySubmittedExpenses],
+  );
+
+  const setFieldValue = props.form.setFieldValue;
+  React.useEffect(() => {
+    const lastUsedPayee = props.form.options.recentlySubmittedExpenses?.nodes?.[0]?.payee?.slug;
+    if (payeeProfile || !lastUsedPayee) {
+      return;
+    }
+
+    setFieldValue('payeeSlug', lastUsedPayee);
+  }, [payeeProfile, props.form.options.recentlySubmittedExpenses, setFieldValue]);
+
+  return (
+    <div
+      className="flex flex-col gap-2"
+      tabIndex={0}
+      role="button"
+      onClick={e => e.stopPropagation()}
+      onKeyDown={e => e.stopPropagation()}
+    >
+      <div>
+        <FormattedMessage defaultMessage="Choose a profile" id="BT5QRL" />
+      </div>
+      <CollectivePicker
+        collectives={props.form.options.payoutProfiles || []}
+        collective={payeeProfile ?? null}
+        onChange={e => {
+          props.form.setFieldValue('payeeSlug', e.value.slug);
+        }}
+      />
+      {pickedLastSubmitedPayee && (
+        <div className="text-xs text-neutral-500">
+          <FormattedMessage defaultMessage="Last used profile" id="GEi+9y" />
+        </div>
+      )}
+      <PayoutMethodPicker form={props.form} />
+    </div>
+  );
+}
+
+type PayoutMethodPickerProps = {
+  form: ExpenseForm;
+};
+
+function PayoutMethodPicker(props: PayoutMethodPickerProps) {
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [isCreatingNewPayoutMethod, setIsCreatingNewPayoutMethod] = React.useState(false);
+  const intl = useIntl();
+  const { toast } = useToast();
+  const payeeProfile = (props.form.options.payoutProfiles ?? []).find(p => p.slug === props.form.values.payeeSlug);
+
+  const [isPayoutMethodDetailsOpen, setIsPayoutMethodDetailsOpen] = React.useState(false);
+
+  const lastUsedPaymentMethodIdByPayee = React.useMemo(() => {
+    if (!payeeProfile || (props.form.options.recentlySubmittedExpenses?.nodes ?? []).length === 0) {
+      return null;
+    }
+
+    const lastExpenseFromThisPayee = props.form.options.recentlySubmittedExpenses.nodes.find(
+      e => e.payee.slug === payeeProfile.slug,
+    );
+    if (!lastExpenseFromThisPayee) {
+      return null;
+    }
+
+    return lastExpenseFromThisPayee.payoutMethod?.id;
+  }, [payeeProfile, props.form.options.recentlySubmittedExpenses]);
+
+  const payeePayoutMethods = React.useMemo(() => {
+    if (!payeeProfile || !payeeProfile.payoutMethods) {
+      return [];
+    }
+
+    return [
+      payeeProfile.payoutMethods.find(p => p.id === lastUsedPaymentMethodIdByPayee),
+      ...payeeProfile.payoutMethods.filter(p => p.id !== lastUsedPaymentMethodIdByPayee),
+    ].filter(Boolean);
+  }, [payeeProfile, lastUsedPaymentMethodIdByPayee]);
+
+  const payeePayoutMethodOptions = React.useMemo(
+    () =>
+      payeePayoutMethods.map(pm => ({
+        value: pm.id,
+        label: <PayoutMethodLabel showIcon payoutMethod={pm} />,
+      })),
+    [payeePayoutMethods],
+  );
+
+  React.useEffect(() => {
+    if (payeePayoutMethods.length === 0) {
+      setIsCreatingNewPayoutMethod(true);
+    } else {
+      setIsCreatingNewPayoutMethod(false);
+    }
+  }, [payeePayoutMethods]);
+
+  const selectedPayoutMethodOption =
+    payeePayoutMethodOptions.find(pm => pm.value === props.form.values.payoutMethodId) ?? null;
+
+  const selectedPayoutMethod = payeePayoutMethods.find(pm => pm.id === props.form.values.payoutMethodId);
+
+  React.useEffect(() => {
+    setIsPayoutMethodDetailsOpen(false);
+  }, [selectedPayoutMethodOption]);
+
+  const setFieldValue = props.form.setFieldValue;
+  React.useEffect(() => {
+    if (selectedPayoutMethodOption || !payeeProfile || isCreatingNewPayoutMethod || isLoading) {
+      return;
+    }
+
+    setFieldValue('payoutMethodId', lastUsedPaymentMethodIdByPayee);
+  }, [
+    selectedPayoutMethodOption,
+    payeeProfile,
+    lastUsedPaymentMethodIdByPayee,
+    isCreatingNewPayoutMethod,
+    setFieldValue,
+    isLoading,
+  ]);
+
+  const [isDeletingPayoutMethod, setIsDeletingPayoutMethod] = React.useState(false);
+
+  const [deletePayoutMethod] = useMutation(
+    gql`
+      mutation DeletePayoutMethod($payoutMethodId: String!) {
+        removePayoutMethod(payoutMethodId: $payoutMethodId) {
+          id
+        }
+      }
+    `,
+    {
+      context: API_V2_CONTEXT,
+      variables: {
+        payoutMethodId: selectedPayoutMethod?.id,
+      },
+    },
+  );
+
+  const hasDetails = selectedPayoutMethod && selectedPayoutMethod.type !== PayoutMethodType.PAYPAL;
+
+  const newPayoutMethodOption = {
+    value: '__new__',
+    label: <FormattedMessage defaultMessage="New payout method..." id="DjKENH" />,
+  };
+
+  if (isCreatingNewPayoutMethod) {
+    return (
+      <div>
+        <div className="my-2 flex gap-2">
+          <FormattedMessage defaultMessage="Create a new payout method" id="z/88i0" /> <PrivateInfoIcon />
+        </div>
+        <div className="rounded-md border p-3">
+          <CreatePayoutMethodForm
+            supportedPayoutMethods={props.form.options.supportedPayoutMethods}
+            payeeSlug={props.form.values.payeeSlug}
+            host={props.form.options.host}
+            onCreate={async paymentMethod => {
+              setIsCreatingNewPayoutMethod(false);
+              setIsLoading(true);
+              await props.form.refresh();
+              setIsLoading(false);
+              props.form.setFieldValue('payoutMethodId', paymentMethod.id);
+            }}
+            onCancel={payeePayoutMethods.length > 0 ? () => setIsCreatingNewPayoutMethod(false) : null}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <React.Fragment>
+      <div>
+        <div className="my-2 flex gap-2">
+          <FormattedMessage defaultMessage="Choose a payout method" id="SlAq2H" /> <PrivateInfoIcon />
+        </div>
+        {isLoading || props.form.values.payeeSlug !== props.form.options.payee?.slug ? (
+          <LoadingPlaceholder height={60} />
+        ) : (
+          <div className="flex gap-3">
+            <div className="flex flex-grow flex-col">
+              <StyledSelect
+                disabled={!payeeProfile}
+                inputId="payout-method"
+                options={[newPayoutMethodOption, ...payeePayoutMethodOptions]}
+                value={selectedPayoutMethodOption}
+                onChange={e => {
+                  if (e.value === newPayoutMethodOption.value) {
+                    setIsCreatingNewPayoutMethod(true);
+                    props.form.setFieldValue('payoutMethodId', null);
+                  } else {
+                    props.form.setFieldValue('payoutMethodId', e.value);
+                  }
+                }}
+              />
+
+              <div className="mt-2 grid grid-cols-[1fr_auto]  grid-rows-1">
+                <span className="text-xs text-neutral-500">
+                  {lastUsedPaymentMethodIdByPayee &&
+                    lastUsedPaymentMethodIdByPayee === props.form.values.payoutMethodId && (
+                      <FormattedMessage defaultMessage="Last used payout method for the selected profile" id="QxsFYY" />
+                    )}
+                </span>
+                {hasDetails && (
+                  <Button
+                    className="h-5 items-start p-0 text-xs"
+                    variant="link"
+                    size="xs"
+                    onClick={() => setIsPayoutMethodDetailsOpen(!isPayoutMethodDetailsOpen)}
+                  >
+                    {isPayoutMethodDetailsOpen ? (
+                      <FormattedMessage defaultMessage="Hide full details" id="Ohd6v0" />
+                    ) : (
+                      <FormattedMessage defaultMessage="Show full details" id="9WBas+" />
+                    )}
+                  </Button>
+                )}
+              </div>
+
+              {isPayoutMethodDetailsOpen && hasDetails && (
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <PayoutMethodDetails payoutMethod={selectedPayoutMethod} />
+                </div>
+              )}
+            </div>
+
+            <Button
+              size="icon"
+              variant="ghost"
+              disabled={!selectedPayoutMethodOption}
+              onClick={() => setIsDeletingPayoutMethod(true)}
+            >
+              <Trash2 size={16} />
+            </Button>
+          </div>
+        )}
+      </div>
+      {isDeletingPayoutMethod && (
+        <ConfirmationModal
+          isDanger
+          type="delete"
+          onClose={() => setIsDeletingPayoutMethod(false)}
+          header={<FormattedMessage defaultMessage="Delete Payout Method?" id="weGvmF" />}
+          body={<FormattedMessage defaultMessage="Are you sure you want to delete this payout method?" id="uR+TjD" />}
+          continueHandler={async () => {
+            try {
+              await deletePayoutMethod();
+              toast({
+                variant: 'success',
+                message: <FormattedMessage defaultMessage="Payout Method deleted successfully" id="2sVunP" />,
+              });
+              setIsDeletingPayoutMethod(false);
+              props.form.setFieldValue('payoutMethodId', null);
+              setIsLoading(true);
+              await props.form.refresh();
+              setIsLoading(false);
+              return CONFIRMATION_MODAL_TERMINATE;
+            } catch (e) {
+              toast({
+                variant: 'error',
+                message: i18nGraphqlException(intl, e),
+              });
+            }
+          }}
+        />
+      )}
+    </React.Fragment>
   );
 }
