@@ -1,6 +1,7 @@
 .next
 .env
 .env.*
+.envrc
 node_modules
 npm-debug.log.*
 ./report.*.json
