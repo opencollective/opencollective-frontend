@@ -80,7 +80,7 @@ const selectOptions = [
     value: 'COLLECTIVE_ADMINS',
   },
   {
-    label: <FormattedMessage defaultMessage="No one" />,
+    label: <FormattedMessage defaultMessage="No one" id="tcxpLX" />,
     value: 'NO_ONE',
   },
 ];

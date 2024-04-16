@@ -80,3 +80,18 @@ To inspect tests, you can open the Cypress application with the following comman
 
 - To launch with Chrome, use `npm run cypress:open -- --browser chrome` (double check Chrome is selected in the UI before running)
 - On Mac OS, to force Chrome to use the English language: `defaults write com.google.Chrome AppleLanguages '(en, en-US)'`
+
+## Testing Stripe payment elements
+
+To run `test/cypress/integration/13-contributeFlow-stripePaymentElement.test.js`, you'll need to run some additional setup steps:
+
+1. Login to https://dashboard.stripe.com/test/apikeys and create a new restricted key with "Debugging tools
+   " permission set to "Write". Copy the key to your `STRIPE_WEBHOOK_KEY` env variable.
+2. Run the local Stripe cli to redirect webhook events to your local server:
+
+```
+docker run --network host --rm -it stripe/stripe-cli:latest --api-key $STRIPE_WEBHOOK_KEY listen --forward-connect-to localhost:3060/webhooks/stripe
+```
+
+3. When the command starts, it says something like "Your webhook signing secret is whsec\_...". Copy this value to your `STRIPE_WEBHOOK_SIGNING_SECRET` env variable in the API and restart it.
+4. You're good to go!

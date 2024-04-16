@@ -1,7 +1,7 @@
 import React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { groupBy, isNil, mapValues, toPairs } from 'lodash';
-import { Banknote, Eye, FilePlus2, Mail, MoreHorizontal, Pause, Unlink } from 'lucide-react';
+import { Banknote, Eye, FilePlus2, Mail, MoreHorizontal, Pause, Play, Unlink } from 'lucide-react';
 import { FormattedDate, FormattedMessage, IntlShape } from 'react-intl';
 
 import { HOST_FEE_STRUCTURE } from '../../../../lib/constants/host-fee-structure';
@@ -41,6 +41,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       const secondLine = isChild ? (
         <FormattedMessage
           defaultMessage="{childAccountType} by {parentAccount}"
+          id="9f14iS"
           values={{
             childAccountType: (
               <Badge size="xs" type="outline">
@@ -100,7 +101,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
   },
   fee: {
     accessorKey: 'fee',
-    header: () => <FormattedMessage defaultMessage="Fee" />,
+    header: () => <FormattedMessage defaultMessage="Fee" id="uT4OlP" />,
     cell: ({ row }) => {
       const collective = row.original;
       return isNil(collective.hostFeePercent) ? (
@@ -212,7 +213,7 @@ export const MoreActionsMenu = ({
             onClick={() => setOpenModal('ADD_AGREEMENT')}
           >
             <FilePlus2 className="mr-2" size="16" />
-            <FormattedMessage defaultMessage="Add Agreement" />
+            <FormattedMessage defaultMessage="Add Agreement" id="apnXKF" />
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
@@ -225,13 +226,22 @@ export const MoreActionsMenu = ({
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem className="cursor-pointer" data-cy="actions-freeze" onClick={() => setOpenModal('FREEZE')}>
-            <Pause className="mr-2" size="16" />
-            <FormattedMessage defaultMessage="Freeze Collective" />
+            {collective.isFrozen ? (
+              <React.Fragment>
+                <Play className="mr-2" size="16" />
+                <FormattedMessage defaultMessage="Unfreeze Collective" id="gX79wf" />
+              </React.Fragment>
+            ) : (
+              <React.Fragment>
+                <Pause className="mr-2" size="16" />
+                <FormattedMessage defaultMessage="Freeze Collective" id="ILjcbM" />
+              </React.Fragment>
+            )}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem className="cursor-pointer" data-cy="actions-unhost" onClick={() => setOpenModal('UNHOST')}>
             <Unlink className="mr-2" size="16" />
-            <FormattedMessage defaultMessage="Unhost" />
+            <FormattedMessage defaultMessage="Unhost" id="2KTLpo" />
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

@@ -83,7 +83,7 @@ export function Accounts({ accountSlug }) {
     <div>
       <div className="mb-2 flex items-center justify-between">
         <div className="text-lg font-bold">
-          <FormattedMessage defaultMessage="Accounts" />
+          <FormattedMessage defaultMessage="Accounts" id="FvanT6" />
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -95,12 +95,12 @@ export function Accounts({ accountSlug }) {
           <DropdownMenuContent align="end">
             <DropdownMenuItem asChild>
               <Link href={`/${accountSlug}/projects/create`}>
-                <FormattedMessage defaultMessage="New project" />
+                <FormattedMessage defaultMessage="New project" id="lJMkin" />
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link href={`/${accountSlug}/events/create`}>
-                <FormattedMessage defaultMessage="New event" />
+                <FormattedMessage defaultMessage="New event" id="C+Npdp" />
               </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -110,7 +110,7 @@ export function Accounts({ accountSlug }) {
         <div className="space-y-2 rounded-xl border bg-background p-3">
           <div className="flex items-center justify-between text-sm">
             <span className="font-medium">
-              <FormattedMessage defaultMessage="Main account" />
+              <FormattedMessage defaultMessage="Main account" id="pE0V//" />
             </span>
           </div>
           {loading ? (

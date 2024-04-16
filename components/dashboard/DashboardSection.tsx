@@ -30,6 +30,7 @@ import NotificationsSettings from './sections/NotificationsSettings';
 import Overview from './sections/overview/Overview';
 import HostDashboardReports from './sections/reports/HostDashboardReports';
 import PreviewHostReports from './sections/reports/preview/HostReports';
+import { TaxInformationSettingsSection } from './sections/tax-information';
 import Team from './sections/Team';
 import AccountTransactions from './sections/transactions/AccountTransactions';
 import HostTransactions from './sections/transactions/HostTransactions';
@@ -64,6 +65,7 @@ const DASHBOARD_COMPONENTS = {
 const SETTINGS_COMPONENTS = {
   [SETTINGS_SECTIONS.INVOICES_RECEIPTS]: InvoicesReceipts,
   [SETTINGS_SECTIONS.NOTIFICATIONS]: NotificationsSettings,
+  [SETTINGS_SECTIONS.TAX_INFORMATION]: TaxInformationSettingsSection,
 };
 
 const DashboardSection = ({ account, isLoading, section, subpath }) => {
@@ -115,7 +117,6 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
         <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
         <SettingsComponent account={account} accountSlug={account.slug} subpath={subpath} />
       </div>
-      // </div>
     );
   }
 

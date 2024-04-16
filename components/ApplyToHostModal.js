@@ -170,7 +170,7 @@ const applyToHostMutation = gql`
 const GQL_CONTEXT = { context: API_V2_CONTEXT };
 const INITIAL_FORM_VALUES = { message: '', areTosChecked: false, collective: null, inviteMembers: [] };
 const STEPS = {
-  INFORMATION: { name: 'Information', label: <FormattedMessage defaultMessage="Information" /> },
+  INFORMATION: { name: 'Information', label: <FormattedMessage defaultMessage="Information" id="E80WrK" /> },
   APPLY: { name: 'Apply', label: <FormattedMessage id="Apply" defaultMessage="Apply" /> },
 };
 
@@ -467,7 +467,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                               <React.Fragment>
                                 <Box>
                                   <P fontSize="13px" lineHeight="16px" fontWeight="600" color="black.700">
-                                    <FormattedMessage defaultMessage="Minimum Administrators Required" />
+                                    <FormattedMessage defaultMessage="Minimum Administrators Required" id="ceGKEG" />
                                   </P>
                                   <Flex mt={1} width="100%">
                                     <P
@@ -559,6 +559,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                                     <MessageBox type="info" mt={3} fontSize="13px">
                                       <FormattedMessage
                                         defaultMessage="Your selected Fiscal Host requires you to add a minimum of {numberOfAdmins, plural, one {# admin} other {# admins} }. You can manage your admins from the Collective Settings."
+                                        id="GTK0Wf"
                                         values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
                                       />
                                     </MessageBox>

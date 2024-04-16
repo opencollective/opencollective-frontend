@@ -64,7 +64,10 @@ class ResetPasswordPage extends React.Component {
     if (passwordScore <= 1) {
       this.setState({
         passwordError: (
-          <FormattedMessage defaultMessage="Password is too weak. Try to use more characters or use a password manager to generate a strong one." />
+          <FormattedMessage
+            defaultMessage="Password is too weak. Try to use more characters or use a password manager to generate a strong one."
+            id="C2rcD0"
+          />
         ),
         showError: true,
       });
@@ -106,7 +109,7 @@ class ResetPasswordPage extends React.Component {
                 </Flex>
 
                 <H1 fontWeight={700} fontSize="32px" mb={12} mt={3} textAlign="center">
-                  <FormattedMessage defaultMessage="Reset Password" />
+                  <FormattedMessage defaultMessage="Reset Password" id="xl27nc" />
                 </H1>
 
                 {!this.props.data?.loggedInAccount && (
@@ -116,6 +119,7 @@ class ResetPasswordPage extends React.Component {
                     ) : (
                       <FormattedMessage
                         defaultMessage="Something went wrong while trying to reset your password. Please try again or <SupportLink>contact support</SupportLink> if the problem persists."
+                        id="LeOcpF"
                         values={I18nFormatters}
                       />
                     )}
@@ -167,12 +171,13 @@ class ResetPasswordPage extends React.Component {
                       labelFontSize="13px"
                       alignItems="left"
                       width="100%"
-                      label={<FormattedMessage defaultMessage="New Password" />}
+                      label={<FormattedMessage defaultMessage="New Password" id="Ev6SEF" />}
                       htmlFor="new-password"
                       my={2}
                       helpText={
                         <FormattedMessage
                           defaultMessage="Strong password recommended. Short or weak one restricted. <link>The strength of a password is a function of length, complexity, and unpredictability.</link>"
+                          id="qaIW32"
                           values={{
                             link: getI18nLink({
                               href: 'https://en.wikipedia.org/wiki/Password_strength',

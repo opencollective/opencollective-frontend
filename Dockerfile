@@ -1,4 +1,4 @@
-FROM node:20.11
+FROM node:20.12
 
 WORKDIR /usr/src/frontend
 
@@ -28,6 +28,9 @@ ENV IMAGES_URL $IMAGES_URL
 
 ARG PDF_SERVICE_URL=https://pdf-staging.opencollective.com
 ENV PDF_SERVICE_URL $PDF_SERVICE_URL
+
+ARG NEXT_PDF_SERVICE_URL=https://next-pdf.opencollective.com
+ENV NEXT_PDF_SERVICE_URL $NEXT_PDF_SERVICE_URL
 
 ARG ML_SERVICE_URL=https://ml.opencollective.com
 ENV ML_SERVICE_URL $ML_SERVICE_URL

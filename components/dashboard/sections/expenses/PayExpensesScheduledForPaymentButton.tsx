@@ -71,13 +71,14 @@ export default function PayExpensesScheduledForPaymentButton(props: PayExpensesS
             {
               defaultMessage:
                 'There was an error trying to process this batch, please <SupportLink>contact support</SupportLink>',
+              id: 'MEB9ET',
             },
             { SupportLink: I18nSupportLink },
           );
 
       toast({
         variant: 'error',
-        title: intl.formatMessage({ defaultMessage: 'Batch payment failed' }),
+        title: intl.formatMessage({ defaultMessage: 'Batch payment failed', id: 'HYFu3j' }),
         message,
       });
     }

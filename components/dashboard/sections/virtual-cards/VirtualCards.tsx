@@ -48,10 +48,10 @@ const toVariables: FiltersToVariables<FilterValues, AccountVirtualCardsQueryVari
 };
 
 const filters: FilterComponentConfigs<FilterValues> = {
-  date: { ...dateFilter.filter, labelMsg: defineMessage({ defaultMessage: 'Created at' }) },
+  date: { ...dateFilter.filter, labelMsg: defineMessage({ defaultMessage: 'Created at', id: 'AbXVP4' }) },
   orderBy: orderByFilter.filter,
   status: {
-    labelMsg: defineMessage({ defaultMessage: 'Status' }),
+    labelMsg: defineMessage({ defaultMessage: 'Status', id: 'tzMNF3' }),
     Component: ({ intl, ...props }) => (
       <ComboSelectFilter
         isMulti

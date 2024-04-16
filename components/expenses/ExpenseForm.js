@@ -716,7 +716,7 @@ const ExpenseFormBody = ({
                   {/* Tags */}
                   <div>
                     <Span color="black.900" fontSize="18px" lineHeight="26px" fontWeight="bold">
-                      <FormattedMessage defaultMessage="Tag you expense" />
+                      <FormattedMessage defaultMessage="Tag you expense" id="uEcPHj" />
                     </Span>
                     <Flex alignItems="flex-start" mt={2}>
                       <ExpenseTypeTag type={values.type} mr="4px" />
@@ -736,7 +736,7 @@ const ExpenseFormBody = ({
                   {/* Currency */}
                   <div>
                     <Span color="black.900" fontSize="18px" lineHeight="26px" fontWeight="bold" mr={2}>
-                      <FormattedMessage defaultMessage="Expense Currency" />
+                      <FormattedMessage defaultMessage="Expense Currency" id="3135/i" />
                     </Span>
                     <div className="mt-2 flex">
                       <div className="basis-[300px]">
@@ -767,7 +767,7 @@ const ExpenseFormBody = ({
                       lineHeight="26px"
                       fontWeight="bold"
                     >
-                      <FormattedMessage defaultMessage="Expense Category" />
+                      <FormattedMessage defaultMessage="Expense Category" id="38dzz9" />
                     </Label>
                     <div className="mt-2 flex">
                       <div className="basis-[300px]">
@@ -799,7 +799,10 @@ const ExpenseFormBody = ({
                       </div>
                     </div>
                     <MessageBox type="info" fontSize="12px" mt="24px">
-                      <FormattedMessage defaultMessage="Please make sure that all the expense items in this expense belong to the selected expense category. If needed, you may submit additional items in separate expenses with different expense categories." />
+                      <FormattedMessage
+                        defaultMessage="Please make sure that all the expense items in this expense belong to the selected expense category. If needed, you may submit additional items in separate expenses with different expense categories."
+                        id="Pkq+ZR"
+                      />
                     </MessageBox>
                     {formik.values.accountingCategory?.instructions && (
                       <MessageBox type="info" fontSize="12px" mt="24px">
@@ -905,8 +908,8 @@ const ExpenseFormBody = ({
             setShowResetModal(false);
           }}
           {...(editingExpense && {
-            continueLabel: formatMessage({ defaultMessage: 'Yes, cancel editing' }),
-            cancelLabel: formatMessage({ defaultMessage: 'No, continue editing' }),
+            continueLabel: formatMessage({ defaultMessage: 'Yes, cancel editing', id: 'b++lom' }),
+            cancelLabel: formatMessage({ defaultMessage: 'No, continue editing', id: 'fIsGOi' }),
           })}
         />
       )}

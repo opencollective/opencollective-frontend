@@ -47,6 +47,7 @@ export const getExpenseExchangeRateWarningOrError = (intl, exchangeRate, referen
         {
           defaultMessage:
             "This exchange rate is too different from the one in our records ({value}) for that date and won't be accepted.",
+          id: 'cEI/zq',
         },
         { value: round(referenceExchangeRate.value, 7) },
       ),
@@ -57,6 +58,7 @@ export const getExpenseExchangeRateWarningOrError = (intl, exchangeRate, referen
         {
           defaultMessage:
             'This exchange rate looks very different from the one in our records ({value}) for this date.',
+          id: 'mLRswr',
         },
         { value: round(referenceExchangeRate.value, 7) },
       ),

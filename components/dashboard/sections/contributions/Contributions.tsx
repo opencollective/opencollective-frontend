@@ -198,7 +198,7 @@ const getColumns = ({ tab, setEditOrder, intl, isIncoming }) => {
 
   const totalAmount = {
     accessorKey: 'totalAmount',
-    header: intl.formatMessage({ defaultMessage: 'Total Amount' }),
+    header: intl.formatMessage({ defaultMessage: 'Total Amount', id: 'CDTMW3' }),
     cell: ({ cell }) => {
       const amount = cell.getValue();
       return (
@@ -237,7 +237,7 @@ const getColumns = ({ tab, setEditOrder, intl, isIncoming }) => {
                     onClick={() => setEditOrder({ order, action: 'editPaymentMethod' })}
                   >
                     {order.status === 'PAUSED' ? (
-                      <FormattedMessage defaultMessage="Resume contribution" />
+                      <FormattedMessage defaultMessage="Resume contribution" id="51nF6S" />
                     ) : (
                       <FormattedMessage
                         id="subscription.menu.editPaymentMethod"
@@ -248,7 +248,10 @@ const getColumns = ({ tab, setEditOrder, intl, isIncoming }) => {
                 </TooltipTrigger>
                 {isResumePrevented && (
                   <TooltipContent>
-                    <FormattedMessage defaultMessage="This contribution cannot be resumed yet. We'll send you an email when it's ready." />
+                    <FormattedMessage
+                      defaultMessage="This contribution cannot be resumed yet. We'll send you an email when it's ready."
+                      id="bwgZQe"
+                    />
                   </TooltipContent>
                 )}
               </Tooltip>{' '}
@@ -339,13 +342,13 @@ const Contributions = ({ accountSlug, direction }: ContributionsProps) => {
   const views: Views<z.infer<typeof schema>> = [
     {
       id: ContributionsTab.ALL,
-      label: intl.formatMessage({ defaultMessage: 'All' }),
+      label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
       count: metadata?.account?.ALL.totalCount,
       filter: {},
     },
     {
       id: ContributionsTab.RECURRING,
-      label: intl.formatMessage({ defaultMessage: 'Recurring' }),
+      label: intl.formatMessage({ defaultMessage: 'Recurring', id: 'v84fNv' }),
       count: metadata?.account?.[ContributionsTab.RECURRING].totalCount,
       filter: {
         type: OrderTypeFilter.RECURRING,
@@ -354,7 +357,7 @@ const Contributions = ({ accountSlug, direction }: ContributionsProps) => {
     },
     {
       id: ContributionsTab.ONETIME,
-      label: intl.formatMessage({ defaultMessage: 'One-Time' }),
+      label: intl.formatMessage({ defaultMessage: 'One-Time', id: 'jX0G5O' }),
       count: metadata?.account?.[ContributionsTab.ONETIME].totalCount,
       filter: {
         type: OrderTypeFilter.ONETIME,
@@ -363,7 +366,7 @@ const Contributions = ({ accountSlug, direction }: ContributionsProps) => {
     },
     {
       id: ContributionsTab.CANCELED,
-      label: intl.formatMessage({ defaultMessage: 'Cancelled' }),
+      label: intl.formatMessage({ defaultMessage: 'Cancelled', id: '3wsVWF' }),
       count: metadata?.account?.[ContributionsTab.CANCELED].totalCount,
       filter: {
         status: [OrderStatus.CANCELLED],

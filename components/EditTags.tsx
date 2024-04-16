@@ -136,7 +136,7 @@ const EditTags = ({ suggestedTags, loading, searchFunc, value, onChange, default
           >
             <Tags size={16} />
             <span>
-              <FormattedMessage defaultMessage="Add tag" />
+              <FormattedMessage defaultMessage="Add tag" id="Un1mxZ" />
             </span>
           </Button>
         </PopoverTrigger>
@@ -144,7 +144,7 @@ const EditTags = ({ suggestedTags, loading, searchFunc, value, onChange, default
           <Command>
             <CommandInput
               customIcon={!hasSearch ? TagsIcon : Search}
-              placeholder={intl.formatMessage({ defaultMessage: 'Add tag' })}
+              placeholder={intl.formatMessage({ defaultMessage: 'Add tag', id: 'Un1mxZ' })}
               value={inputValue}
               onValueChange={setInputValue}
               loading={isLoading}
@@ -155,7 +155,11 @@ const EditTags = ({ suggestedTags, loading, searchFunc, value, onChange, default
               <CommandList>
                 {(filteredOptions.length > 0 || inputValue) && (
                   <CommandGroup
-                    heading={!inputValue.length ? intl.formatMessage({ defaultMessage: 'Suggestions' }) : undefined}
+                    heading={
+                      !inputValue.length
+                        ? intl.formatMessage({ defaultMessage: 'Suggestions', id: 'Hv0XJn' })
+                        : undefined
+                    }
                   >
                     {inputValue && (
                       <CommandItem value={inputValue} onSelect={onSelect} disabled={disabled}>

@@ -95,14 +95,22 @@ export function DataTable<TData, TValue>({
           [...new Array(nbPlaceholders)].map((_, rowIdx) => (
             // eslint-disable-next-line react/no-array-index-key
             <TableRow key={rowIdx}>
-              {table.getAllFlatColumns().map(column => (
-                // eslint-disable-next-line react/no-array-index-key
-                <TableCell key={column.id} fullWidth={tableProps.fullWidth} compact={compact}>
-                  <div className="w-1/2">
-                    <Skeleton className="h-4 rounded-lg" />
-                  </div>
-                </TableCell>
-              ))}
+              {table.getAllFlatColumns().map(column => {
+                const columnMeta = column.columnDef.meta || {};
+                return (
+                  // eslint-disable-next-line react/no-array-index-key
+                  <TableCell
+                    key={column.id}
+                    fullWidth={tableProps.fullWidth}
+                    compact={compact}
+                    className={columnMeta['className']}
+                  >
+                    <div className="inline-block w-1/2">
+                      <Skeleton className="h-4 rounded-lg" />
+                    </div>
+                  </TableCell>
+                );
+              })}
             </TableRow>
           ))
         ) : table.getRowModel().rows?.length ? (
@@ -143,7 +151,7 @@ export function DataTable<TData, TValue>({
           <TableRow highlightOnHover={false}>
             <TableCell colSpan={columns.length} compact={compact}>
               <p className="p-4 text-center text-slate-500">
-                {emptyMessage ? emptyMessage() : <FormattedMessage defaultMessage="No data" />}
+                {emptyMessage ? emptyMessage() : <FormattedMessage defaultMessage="No data" id="UG5qoS" />}
               </p>
             </TableCell>
           </TableRow>

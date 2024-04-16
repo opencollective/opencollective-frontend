@@ -16,6 +16,7 @@ import { sendSurveyResponseMutation } from './Survey';
 
 export enum FEEDBACK_KEY {
   HOST_TRANSACTIONS = 'HOST_TRANSACTIONS',
+  HOST_REPORTS = 'HOST_REPORTS',
   GENERAL_FEEDBACK = 'GENERAL_FEEDBACK',
   DASHBOARD = 'DASHBOARD',
   COLLECTIVE_OVERVIEW = 'COLLECTIVE_OVERVIEW',
@@ -23,8 +24,8 @@ export enum FEEDBACK_KEY {
 
 export function FeedbackModal({
   feedbackKey = FEEDBACK_KEY.GENERAL_FEEDBACK,
-  title = <FormattedMessage defaultMessage="Provide feedback" />,
-  description = <FormattedMessage defaultMessage="How is your experience? What can be improved?" />,
+  title = <FormattedMessage defaultMessage="Provide feedback" id="GdjHV6" />,
+  description = <FormattedMessage defaultMessage="How is your experience? What can be improved?" id="YFnrx/" />,
   placeholder = '',
   open,
   setOpen,
@@ -92,7 +93,7 @@ export function FeedbackModal({
                       htmlFor="okToContact"
                       className="text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                     >
-                      <FormattedMessage defaultMessage="It's OK to contact me for follow up questions." />
+                      <FormattedMessage defaultMessage="It's OK to contact me for follow up questions." id="OSMRoO" />
                     </label>
                   </div>
 

@@ -54,6 +54,7 @@ const CollectiveSettings = ({ account, advancedSettings, big, roleLabel, ...boxP
                   ({account.host.totalHostedCollectives}{' '}
                   <FormattedMessage
                     defaultMessage="{count, plural, one {collective} other {collectives}}"
+                    id="PEfD6k"
                     values={{ count: account.host.totalHostedCollectives }}
                   />
                   )

@@ -21,14 +21,14 @@ export default function Agreement({ agreement, openFileViewer = undefined }: Agr
       <InfoList className="sm:grid-cols-2">
         {agreement.attachment && (
           <InfoListItem
-            title={<FormattedMessage defaultMessage="Agreement file" />}
+            title={<FormattedMessage defaultMessage="Agreement file" id="i22tK5" />}
             value={<AttachedFiles files={[agreement.attachment]} size={128} openFileViewer={openFileViewer} />}
             className="sm:col-span-2"
           />
         )}
 
         <InfoListItem
-          title={<FormattedMessage defaultMessage="Account" />}
+          title={<FormattedMessage defaultMessage="Account" id="TwyMau" />}
           value={
             <LinkCollective
               collective={agreement.account}
@@ -66,7 +66,7 @@ export default function Agreement({ agreement, openFileViewer = undefined }: Agr
               <DateTime value={agreement.expiresAt} />
             ) : (
               <span className="italic text-slate-500">
-                <FormattedMessage defaultMessage="Never" />
+                <FormattedMessage defaultMessage="Never" id="du1laW" />
               </span>
             )
           }

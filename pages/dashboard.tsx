@@ -89,19 +89,24 @@ function getBlocker(LoggedInUser, account, section) {
   if (!LoggedInUser) {
     return <FormattedMessage id="mustBeLoggedIn" defaultMessage="You must be logged in to see this page" />;
   } else if (!account) {
-    return <FormattedMessage defaultMessage="This account doesn't exist" />;
+    return <FormattedMessage defaultMessage="This account doesn't exist" id="3ABdi3" />;
   } else if (account.isIncognito) {
-    return <FormattedMessage defaultMessage="You cannot edit this collective" />;
+    return <FormattedMessage defaultMessage="You cannot edit this collective" id="ZonfjV" />;
   }
 
   // Check permissions
   const isAdmin = LoggedInUser.isAdminOfCollective(account);
   if (SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS.includes(section)) {
     if (!isAdmin && !LoggedInUser.hasRole(roles.ACCOUNTANT, account)) {
-      return <FormattedMessage defaultMessage="You need to be logged in as an admin or accountant to view this page" />;
+      return (
+        <FormattedMessage
+          defaultMessage="You need to be logged in as an admin or accountant to view this page"
+          id="9FWGOh"
+        />
+      );
     }
   } else if (!isAdmin) {
-    return <FormattedMessage defaultMessage="You need to be logged in as an admin" />;
+    return <FormattedMessage defaultMessage="You need to be logged in as an admin" id="AQNF/n" />;
   }
 }
 
@@ -209,7 +214,7 @@ const DashboardPage = () => {
                 <p>{blocker}</p>
                 {LoggedInUser && (
                   <Link className="mt-2 block" href={`/dashboard/${LoggedInUser.collective.slug}`}>
-                    <FormattedMessage defaultMessage="Go to your Dashboard" />
+                    <FormattedMessage defaultMessage="Go to your Dashboard" id="cLaG6g" />
                   </Link>
                 )}
               </MessageBox>

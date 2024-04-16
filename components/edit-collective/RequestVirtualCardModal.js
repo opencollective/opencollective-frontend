@@ -195,6 +195,7 @@ const RequestVirtualCardModal = props => {
               label={
                 <FormattedMessage
                   defaultMessage="Limit Interval <link>(Read More)</link>"
+                  id="vV7hmB"
                   values={{
                     link: getI18nLink({
                       as: Link,
@@ -224,7 +225,7 @@ const RequestVirtualCardModal = props => {
               ml={3}
               labelFontSize="13px"
               labelFontWeight="bold"
-              label={<FormattedMessage defaultMessage="Card Limit" />}
+              label={<FormattedMessage defaultMessage="Card Limit" id="ehbxf1" />}
               htmlFor="spendingLimitAmount"
             >
               {inputProps => (

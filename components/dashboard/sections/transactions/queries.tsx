@@ -71,6 +71,8 @@ export const transactionsTableQuery = gql`
     $maxAmount: Int
     $dateFrom: DateTime
     $dateTo: DateTime
+    $clearedFrom: DateTime
+    $clearedTo: DateTime
     $searchTerm: String
     $kind: [TransactionKind]
     $includeIncognitoTransactions: Boolean
@@ -78,7 +80,7 @@ export const transactionsTableQuery = gql`
     $includeChildrenTransactions: Boolean
     $virtualCard: [VirtualCardReferenceInput]
     $orderBy: ChronologicalOrderInput
-    $group: String
+    $group: [String]
     $includeHost: Boolean
     $expenseType: [ExpenseType]
     $expense: ExpenseReferenceInput
@@ -96,6 +98,8 @@ export const transactionsTableQuery = gql`
       maxAmount: $maxAmount
       dateFrom: $dateFrom
       dateTo: $dateTo
+      clearedFrom: $clearedFrom
+      clearedTo: $clearedTo
       searchTerm: $searchTerm
       kind: $kind
       includeIncognitoTransactions: $includeIncognitoTransactions

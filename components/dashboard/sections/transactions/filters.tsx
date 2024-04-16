@@ -24,14 +24,25 @@ import { Input } from '../../../ui/Input';
 import { amountFilter } from '../../filters/AmountFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { dateFilter } from '../../filters/DateFilter';
+import { dateToVariables } from '../../filters/DateFilter/schema';
 import { orderByFilter } from '../../filters/OrderFilter';
 import { searchFilter } from '../../filters/SearchFilter';
 import { VirtualCardRenderer } from '../../filters/VirtualCardsFilter';
+
+const clearedAtDateFilter = {
+  ...dateFilter,
+  toVariables: value => dateToVariables(value, 'cleared'),
+  filter: {
+    ...dateFilter.filter,
+    labelMsg: defineMessage({ id: 'Gh3Obs', defaultMessage: 'Effective Date' }),
+  },
+};
 
 export const schema = z.object({
   limit: limit.default(20),
   offset,
   date: dateFilter.schema,
+  clearedAt: clearedAtDateFilter.schema,
   amount: amountFilter.schema,
   orderBy: orderByFilter.schema,
   searchTerm: searchFilter.schema,
@@ -41,7 +52,7 @@ export const schema = z.object({
   virtualCard: isMulti(z.string()).optional(),
   expenseType: isMulti(z.nativeEnum(ExpenseType)).optional(),
   expenseId: integer.optional(),
-  contributionId: integer.optional(),
+  orderId: integer.optional(),
   openTransactionId: z.string().optional(),
   group: z.string().optional(),
   isRefund: boolean.optional(),
@@ -60,16 +71,18 @@ export type FilterMeta = {
 export const toVariables: FiltersToVariables<FilterValues, TransactionsTableQueryVariables, FilterMeta> = {
   orderBy: orderByFilter.toVariables,
   date: dateFilter.toVariables,
+  clearedAt: clearedAtDateFilter.toVariables,
   amount: amountFilter.toVariables,
   virtualCard: (virtualCardIds, key) => ({ [key]: virtualCardIds.map(id => ({ id })) }),
   expenseId: id => ({ expense: { legacyId: id } }),
-  contributionId: id => ({ order: { legacyId: id } }),
+  orderId: id => ({ order: { legacyId: id } }),
 };
 
 // The filters config is used to populate the Filters component.
 export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   searchTerm: searchFilter.filter,
   date: dateFilter.filter,
+  clearedAt: clearedAtDateFilter.filter,
   amount: amountFilter.filter,
   orderBy: orderByFilter.filter,
   type: {
@@ -124,11 +137,11 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     valueRenderer: ({ value }) => <VirtualCardRenderer id={value} />,
   },
   group: {
-    labelMsg: defineMessage({ defaultMessage: 'Transaction group' }),
+    labelMsg: defineMessage({ defaultMessage: 'Transaction group', id: 'VY4AcX' }),
     valueRenderer: ({ value }) => value.substring(0, 8),
   },
   expenseType: {
-    labelMsg: defineMessage({ defaultMessage: 'Expense type' }),
+    labelMsg: defineMessage({ defaultMessage: 'Expense type', id: '9cwufA' }),
 
     Component: ({ valueRenderer, intl, ...props }) => (
       <ComboSelectFilter
@@ -141,8 +154,8 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     ),
     valueRenderer: ({ value, intl }) => i18nExpenseType(intl, value),
   },
-  contributionId: {
-    labelMsg: defineMessage({ defaultMessage: 'Contribution ID' }),
+  orderId: {
+    labelMsg: defineMessage({ defaultMessage: 'Contribution ID', id: 'cVkF3C' }),
     Component: ({ value, onChange }) => {
       return (
         <div className="p-2">
@@ -157,7 +170,7 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     },
   },
   expenseId: {
-    labelMsg: defineMessage({ defaultMessage: 'Expense ID' }),
+    labelMsg: defineMessage({ defaultMessage: 'Expense ID', id: 'aJWAKv' }),
     Component: ({ value, onChange }) => {
       return (
         <div className="p-2">
@@ -173,7 +186,7 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     },
   },
   isRefund: {
-    labelMsg: defineMessage({ defaultMessage: 'Is Refund' }),
+    labelMsg: defineMessage({ defaultMessage: 'Is Refund', id: 'o+jEZR' }),
     Component: ({ intl, ...props }) => {
       const options = React.useMemo(() => {
         return [true, false].map(value => ({

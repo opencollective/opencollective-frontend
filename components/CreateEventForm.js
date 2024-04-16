@@ -70,7 +70,7 @@ class CreateEventForm extends React.Component {
         id: 'event.privateInstructions.description',
         defaultMessage: 'These instructions will be provided by email to the participants.',
       },
-      inValidDateError: { defaultMessage: 'Please enter a valid date' },
+      inValidDateError: { defaultMessage: 'Please enter a valid date', id: '6DCLcI' },
     });
   }
 

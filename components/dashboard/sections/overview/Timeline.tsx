@@ -96,7 +96,7 @@ export function Timeline({ accountSlug, withFilter = false }) {
           <React.Fragment>
             {isTimelineBeingGenerated && (
               <MessageBox type="info" withIcon mb="24px">
-                <FormattedMessage defaultMessage="Generating activity timeline..." />
+                <FormattedMessage defaultMessage="Generating activity timeline..." id="Uf2NLT" />
               </MessageBox>
             )}
             <TimelineItem />
@@ -107,7 +107,7 @@ export function Timeline({ accountSlug, withFilter = false }) {
           </React.Fragment>
         ) : !activities.length ? (
           <MessageBox type="info" withIcon>
-            <FormattedMessage defaultMessage="No activity yet" />
+            <FormattedMessage defaultMessage="No activity yet" id="aojEGT" />
           </MessageBox>
         ) : (
           activities.map(activity => (
@@ -131,7 +131,7 @@ export function Timeline({ accountSlug, withFilter = false }) {
               })
             }
           >
-            <FormattedMessage defaultMessage="View more" />
+            <FormattedMessage defaultMessage="View more" id="34Up+l" />
           </Button>
         )}
       </div>

@@ -100,12 +100,17 @@ const CREATE_NEW_LINKS = {
 
 const EMPTY_GROUP_STATE = {
   [CollectiveType.COLLECTIVE]: {
-    emptyMessage: <FormattedMessage defaultMessage="Create a collective to collect and spend money transparently" />,
+    emptyMessage: (
+      <FormattedMessage defaultMessage="Create a collective to collect and spend money transparently" id="MZB6HL" />
+    ),
     linkLabel: <FormattedMessage id="home.create" defaultMessage="Create a Collective" />,
   },
   [CollectiveType.ORGANIZATION]: {
     emptyMessage: (
-      <FormattedMessage defaultMessage="A profile representing a company or organization instead of an individual" />
+      <FormattedMessage
+        defaultMessage="A profile representing a company or organization instead of an individual"
+        id="CBITv6"
+      />
     ),
     linkLabel: <FormattedMessage id="host.organization.create" defaultMessage="Create an Organization" />,
   },

@@ -36,20 +36,24 @@ export type useQueryFilterReturnType<S extends z.ZodObject<z.ZodRawShape, any, a
   defaultSchemaValues: Partial<z.infer<S>>;
 };
 
-export default function useQueryFilter<
-  S extends z.ZodObject<z.ZodRawShape, any, any>,
-  GQLQueryVars,
-  FilterMeta = any,
->(opts: {
+type useQueryFilterOptions<S extends z.ZodObject<z.ZodRawShape, any, any>, GQLQueryVars, FilterMeta = any> = {
   schema: S; // Schema for all query filters (both those which are available to the user in Query and those which are not)
   filters: FilterComponentConfigs<z.infer<S>, FilterMeta>; // Configuration of filters available to the user in the `Filter` component (used in this hook to determine `hasFilters` and `activeViewId`)
   toVariables?: Partial<FiltersToVariables<z.infer<S>, GQLQueryVars, FilterMeta>>;
   defaultFilterValues?: Partial<z.infer<S>>; // Default valuFes for filters, views[0].filter will be used if not set
   meta?: FilterMeta;
   views?: Views<z.infer<S>>;
-}): useQueryFilterReturnType<S, GQLQueryVars> {
-  const router = useRouter();
+  skipRouter?: boolean; // Used when not updating the URL query is desired, this will instead use internal state.
+};
+
+export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape, any, any>, GQLQueryVars, FilterMeta = any>(
+  opts: useQueryFilterOptions<S, GQLQueryVars, FilterMeta>,
+): useQueryFilterReturnType<S, GQLQueryVars> {
   const intl = useIntl();
+  const router = useRouter();
+  const [stateQuery, setStateQuery] = React.useState({}); // Only used together with skipRouter
+
+  const query = opts.skipRouter ? stateQuery : router.query;
 
   // Default values set by the page, views, or the user (eventually)
   const defaultFilterValues = React.useMemo(
@@ -60,16 +64,16 @@ export default function useQueryFilter<
   const defaultSchemaValues = opts.schema.parse({});
 
   const values = React.useMemo(() => {
-    const query = structureQueryValues(router.query);
+    const structuredQuery = structureQueryValues(query);
 
     // Add defaultFilterValues (which are not part of the URL query)
     // and remove default value fallback "ALL" before parsing the query
     const queryWithDefaultFilterValues = Object.keys(defaultFilterValues).reduce(
       (acc, filterName) => ({
         ...acc,
-        [filterName]: getFilterValueFromQueryValue(query[filterName], defaultFilterValues[filterName]),
+        [filterName]: getFilterValueFromQueryValue(structuredQuery[filterName], defaultFilterValues[filterName]),
       }),
-      query,
+      structuredQuery,
     );
 
     // This will validate the query values against the schema (and add the default schema values if those fields are not set))
@@ -81,7 +85,7 @@ export default function useQueryFilter<
       addFilterValidationErrorToast(result.error, intl);
     }
     return opts.schema.parse(defaultFilterValues);
-  }, [intl, opts.schema, router.query, defaultFilterValues]);
+  }, [intl, opts.schema, query, defaultFilterValues]);
 
   const variables = React.useMemo(() => {
     let apiVariables: Partial<GQLQueryVars> = {};
@@ -106,7 +110,7 @@ export default function useQueryFilter<
   }, [values, opts.toVariables, opts.meta]);
 
   const resetFilters = React.useCallback(
-    newFilters => {
+    (newFilters, newPath?: string) => {
       const result = opts.schema.safeParse(newFilters);
 
       if (result.success) {
@@ -123,19 +127,23 @@ export default function useQueryFilter<
           }),
           filterValues,
         );
-
         const desctructuredQueryValues = destructureFilterValues(queryWithReplacementsForDefaults);
-        const query = omitBy(desctructuredQueryValues, isNil);
-        const basePath = router.asPath.split('?')[0];
 
-        router.push(
-          {
-            pathname: basePath,
-            query,
-          },
-          null,
-          { scroll: false },
-        );
+        if (opts.skipRouter && !newPath) {
+          setStateQuery(desctructuredQueryValues);
+        } else {
+          const query = omitBy(desctructuredQueryValues, isNil);
+          const basePath = newPath || router.asPath.split('?')[0];
+
+          router.push(
+            {
+              pathname: basePath,
+              query,
+            },
+            null,
+            { scroll: false },
+          );
+        }
       }
 
       if (result.success === false) {
@@ -151,7 +159,7 @@ export default function useQueryFilter<
   );
 
   const setFilters = React.useCallback(
-    newFilters => resetFilters({ ...values, ...newFilters }),
+    (newFilters, newPath) => resetFilters({ ...values, ...newFilters }, newPath),
     [values, resetFilters],
   );
 
@@ -190,7 +198,7 @@ function addFilterValidationErrorToast(error, intl) {
   setImmediate(() => {
     toast({
       variant: 'error',
-      title: intl.formatMessage({ defaultMessage: 'Filter validation error' }),
+      title: intl.formatMessage({ defaultMessage: 'Filter validation error', id: 'thZrl7' }),
       message: errorMessage,
     });
   });

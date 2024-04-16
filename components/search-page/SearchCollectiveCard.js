@@ -30,6 +30,7 @@ const SearchCollectiveCard = ({ collective, ...props }) => {
                   <Span fontSize="12px" fontWeight={400} color="black.700">
                     <FormattedMessage
                       defaultMessage="{ count, plural, one {Collective} other {Collectives}} hosted"
+                      id="X8Pa2K"
                       values={{ count: collective.host.totalHostedCollectives }}
                     />
                   </Span>
@@ -48,7 +49,7 @@ const SearchCollectiveCard = ({ collective, ...props }) => {
                 <Span fontSize="14px" fontWeight={700} color="black.900">{`${collective.host.hostFeePercent}%`}</Span>
                 {` `}
                 <Span fontSize="12px" fontWeight={400} color="black.700">
-                  <FormattedMessage defaultMessage="Host Fee" />
+                  <FormattedMessage defaultMessage="Host Fee" id="NJsELs" />
                 </Span>
               </Box>
             </React.Fragment>
@@ -64,6 +65,7 @@ const SearchCollectiveCard = ({ collective, ...props }) => {
                     <Span fontSize="12px" fontWeight={400} color="black.700">
                       <FormattedMessage
                         defaultMessage="Financial {count, plural, one {Contributor} other {Contributors}}"
+                        id="MspQpE"
                         values={{ count: collective.stats.contributorsCount }}
                       />
                     </Span>
@@ -83,7 +85,7 @@ const SearchCollectiveCard = ({ collective, ...props }) => {
                     </Span>
                     {` `}
                     <Span fontSize="12px" fontWeight={400} color="black.700">
-                      <FormattedMessage defaultMessage="Money raised" />
+                      <FormattedMessage defaultMessage="Money raised" id="ooRGC9" />
                     </Span>
                   </Box>
                 )}
@@ -110,7 +112,7 @@ const SearchCollectiveCard = ({ collective, ...props }) => {
             <div className="text-xs">
               <div className="mb-1 mt-2 flex items-center justify-between gap-2">
                 <span className="font-medium uppercase text-slate-700">
-                  <FormattedMessage defaultMessage="About Us" />
+                  <FormattedMessage defaultMessage="About Us" id="ZjDH42" />
                 </span>
                 <hr className="flex-1" />
               </div>

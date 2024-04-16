@@ -55,6 +55,7 @@ export default function VirtualCardRequestCard(props: VirtualCardRequestCardProp
         <Box>
           <FormattedMessage
             defaultMessage="from {collective}"
+            id="QnEc+x"
             values={{
               collective: <LinkCollective collective={virtualCardRequest.account} />,
             }}

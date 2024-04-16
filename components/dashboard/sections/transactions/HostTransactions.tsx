@@ -36,12 +36,12 @@ import { transactionsTableQuery } from './queries';
 import { TransactionDrawer } from './TransactionDrawer';
 import TransactionsTable from './TransactionsTable';
 
-const schema = commonSchema.extend({
+export const schema = commonSchema.extend({
   account: hostedAccountFilter.schema,
   excludeHost: boolean.default(false),
 });
 
-type FilterValues = z.infer<typeof schema>;
+export type FilterValues = z.infer<typeof schema>;
 
 type FilterMeta = CommonFilterMeta & {
   hostSlug: string;
@@ -49,7 +49,7 @@ type FilterMeta = CommonFilterMeta & {
 
 // Only needed when values and key of filters are different
 // to expected key and value of QueryVariables
-const toVariables: FiltersToVariables<FilterValues, TransactionsTableQueryVariables, FilterMeta> = {
+export const toVariables: FiltersToVariables<FilterValues, TransactionsTableQueryVariables, FilterMeta> = {
   ...commonToVariables,
   account: hostedAccountFilter.toVariables,
   excludeHost: excludeHost => ({ includeHost: !excludeHost }),
@@ -59,7 +59,7 @@ const toVariables: FiltersToVariables<FilterValues, TransactionsTableQueryVariab
 const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   ...commonFilters,
   excludeHost: {
-    labelMsg: defineMessage({ defaultMessage: 'Exclude host account' }),
+    labelMsg: defineMessage({ defaultMessage: 'Exclude host account', id: 'yxffGP' }),
   },
   account: hostedAccountFilter.filter,
 };
@@ -101,7 +101,7 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
 
   const views = [
     {
-      label: intl.formatMessage({ defaultMessage: 'All' }),
+      label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
       filter: {},
       id: 'all',
     },

@@ -53,7 +53,7 @@ export function ExpenseItemsForm(props: ExpenseItemsFormProps) {
               ...(props.form.values.expenseItems ?? []),
               {
                 description: '',
-                incurredAt: new Date(),
+                incurredAt: null,
                 amount: {
                   valueInCents: 0,
                   currency: props.form.values.expenseCurrency,
@@ -183,6 +183,7 @@ function ExpenseItemForm(props: ExpenseItemFormProps) {
             hint={
               <FormattedMessage
                 defaultMessage={`Specify item or activity and timeframe, e.g. "Volunteer Training, April 2023"`}
+                id="rpqkOE"
               />
             }
           >
@@ -280,6 +281,7 @@ function ExpenseItemForm(props: ExpenseItemFormProps) {
                 }
                 approximateCustomMessage={intl.formatMessage({
                   defaultMessage: 'This value is an estimate. Please set the exact amount received if known.',
+                  id: 'zNBAqh',
                 })}
               />
             )}

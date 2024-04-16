@@ -151,6 +151,7 @@ const StyledButton: ForwardRefExoticComponent<StyledButtonProps> = React.forward
       width={props.width ?? props.size ?? baseSize?.width}
       height={props.height ?? props.size ?? baseSize?.height}
       onClick={undefined}
+      type="button"
       ref={allRefs}
     >
       <StyledSpinner size="0.9em" />

@@ -11,6 +11,10 @@ exports.REWRITES = [
     destination: '/fiscal-hosting',
   },
   {
+    source: '/tax-form',
+    destination: '/tax-form',
+  },
+  {
     source: '/welcome',
     destination: '/welcome',
   },
@@ -121,10 +125,6 @@ exports.REWRITES = [
   {
     source: '/:parentCollectiveSlug/projects/(new|create)',
     destination: '/create-project',
-  },
-  {
-    source: '/dashboard/:slug/expenses/new',
-    destination: '/submit-expense',
   },
   {
     source: '/dashboard',
