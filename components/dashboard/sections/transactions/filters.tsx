@@ -3,13 +3,11 @@ import { omit } from 'lodash';
 import { defineMessage } from 'react-intl';
 import { z } from 'zod';
 
-import { PAYMENT_METHOD_TYPE } from '../../../../lib/constants/payment-methods';
 import { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
-import { boolean, integer, isMulti, isNullable, limit, offset } from '../../../../lib/filters/schemas';
+import { boolean, integer, isMulti, limit, offset } from '../../../../lib/filters/schemas';
 import {
   Currency,
   ExpenseType,
-  PaymentMethodService,
   PaymentMethodType,
   TransactionKind,
   TransactionsTableQueryVariables,
@@ -17,17 +15,16 @@ import {
 } from '../../../../lib/graphql/types/v2/graphql';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { i18nIsRefund } from '../../../../lib/i18n/is-refund';
-import { i18nPaymentMethodServiceLabels } from '../../../../lib/i18n/payment-method-service';
-import { i18nPaymentMethodType } from '../../../../lib/i18n/payment-method-type';
 import { i18nTransactionKind, i18nTransactionType } from '../../../../lib/i18n/transaction';
 import { sortSelectOptions } from '../../../../lib/utils';
 
 import { Input } from '../../../ui/Input';
 import { amountFilter } from '../../filters/AmountFilter';
-import ComboSelectFilter, { buildComboSelectFilter } from '../../filters/ComboSelectFilter';
+import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { dateFilter } from '../../filters/DateFilter';
 import { dateToVariables } from '../../filters/DateFilter/schema';
 import { orderByFilter } from '../../filters/OrderFilter';
+import { paymentMethodFilter } from '../../filters/PaymentMethodFilter';
 import { searchFilter } from '../../filters/SearchFilter';
 import { VirtualCardRenderer } from '../../filters/VirtualCardsFilter';
 
@@ -40,12 +37,6 @@ const clearedAtDateFilter = {
   },
 };
 
-const paymentMethodServiceFilter = buildComboSelectFilter(
-  z.array(z.enum(Object.values(PaymentMethodService) as [string, ...string[]])).optional(),
-  defineMessage({ defaultMessage: 'Payment method service', id: 'INt78u' }),
-  i18nPaymentMethodServiceLabels,
-);
-
 export const schema = z.object({
   limit: limit.default(20),
   offset,
@@ -56,8 +47,7 @@ export const schema = z.object({
   searchTerm: searchFilter.schema,
   kind: isMulti(z.nativeEnum(TransactionKind)).optional(),
   type: z.nativeEnum(TransactionType).optional(),
-  paymentMethodType: isMulti(isNullable(z.nativeEnum(PaymentMethodType))).optional(),
-  paymentMethodService: paymentMethodServiceFilter.schema,
+  paymentMethod: paymentMethodFilter.schema,
   virtualCard: isMulti(z.string()).optional(),
   expenseType: isMulti(z.nativeEnum(ExpenseType)).optional(),
   expenseId: integer.optional(),
@@ -86,6 +76,7 @@ export const toVariables: FiltersToVariables<FilterValues, TransactionsTableQuer
   virtualCard: (virtualCardIds, key) => ({ [key]: virtualCardIds.map(id => ({ id })) }),
   expenseId: id => ({ expense: { legacyId: id } }),
   orderId: id => ({ order: { legacyId: id } }),
+  paymentMethod: paymentMethodFilter.toVariables,
 };
 
 // The filters config is used to populate the Filters component.
@@ -128,34 +119,7 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     },
     valueRenderer: ({ value, intl }) => i18nTransactionKind(intl, value),
   },
-  paymentMethodService: paymentMethodServiceFilter.filter,
-  paymentMethodType: {
-    labelMsg: defineMessage({ defaultMessage: 'Payment method type', id: '/t3cA4' }),
-    Component: ({ value, meta, intl, ...props }) => {
-      const paymentMethodTypes = meta?.paymentMethodTypes || PAYMENT_METHOD_TYPE;
-      const options = React.useMemo(
-        () =>
-          Object.values(paymentMethodTypes).map(value => {
-            const label = i18nPaymentMethodType(intl, value);
-            return {
-              label,
-              value: String(value),
-              keywords: [label],
-            };
-          }),
-        [intl, paymentMethodTypes],
-      );
-      return (
-        <ComboSelectFilter
-          isMulti
-          value={value?.map(v => String(v))} // Turn into string to make the `null` value work with the component
-          options={options}
-          {...props}
-        />
-      );
-    },
-    valueRenderer: ({ value, intl }) => i18nPaymentMethodType(intl, value),
-  },
+  paymentMethod: paymentMethodFilter.filter,
   virtualCard: {
     labelMsg: defineMessage({ id: 'PayoutMethod.Type.VirtualCard', defaultMessage: 'Virtual Card' }),
     valueRenderer: ({ value }) => <VirtualCardRenderer id={value} />,

@@ -70,7 +70,6 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
 const hostTransactionsMetaDataQuery = gql`
   query HostTransactionsMetaData($slug: String!) {
     transactions(host: { slug: $slug }, limit: 0) {
-      paymentMethodTypes
       kinds
     }
     host(slug: $slug) {
@@ -133,7 +132,6 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     filters,
     meta: {
       currency: metaData?.host?.currency,
-      paymentMethodTypes: metaData?.transactions?.paymentMethodTypes,
       kinds: metaData?.transactions?.kinds,
       hostSlug: hostSlug,
     },

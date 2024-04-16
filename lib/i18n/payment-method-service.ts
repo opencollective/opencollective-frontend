@@ -2,7 +2,7 @@ import { defineMessages } from 'react-intl';
 
 import { PAYMENT_METHOD_SERVICE } from '../constants/payment-methods';
 
-export const i18nPaymentMethodServiceLabels = defineMessages({
+const i18nPaymentMethodServiceLabels = defineMessages({
   [PAYMENT_METHOD_SERVICE.STRIPE]: {
     defaultMessage: 'Stripe',
     id: 'iBmKeP',
