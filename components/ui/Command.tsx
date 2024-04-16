@@ -47,13 +47,14 @@ const CommandInput = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input> & {
     loading?: boolean;
     customIcon?: LucideIcon;
+    hideIcon?: boolean;
   }
->(({ className, loading, customIcon, ...props }, ref) => {
+>(({ className, loading, customIcon, hideIcon, ...props }, ref) => {
   const Icon = loading ? Loader2 : customIcon ?? Search;
   return (
     // eslint-disable-next-line react/no-unknown-property
     <div className="flex items-center px-3" cmdk-input-wrapper="">
-      <Icon className={clsx('mr-2 h-4 w-4 shrink-0 opacity-50', loading && 'animate-spin')} />
+      {!hideIcon && <Icon className={clsx('mr-2 h-4 w-4 shrink-0 opacity-50', loading && 'animate-spin')} />}
       <CommandPrimitive.Input
         ref={ref}
         className={cn(
@@ -86,7 +87,7 @@ const CommandEmpty = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Empty>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Empty>
 >((props, ref) => (
-  <CommandPrimitive.Empty ref={ref} className="py-4 text-center text-sm text-muted-foreground" {...props} />
+  <CommandPrimitive.Empty ref={ref} className="py-2.5 text-center text-sm text-muted-foreground" {...props} />
 ));
 
 CommandEmpty.displayName = CommandPrimitive.Empty.displayName;

@@ -2,14 +2,14 @@ import { defineMessages } from 'react-intl';
 
 import { PAYMENT_METHOD_SERVICE } from '../constants/payment-methods';
 
-export const i18nPaymentMethodServiceLabels = defineMessages({
+const i18nPaymentMethodServiceLabels = defineMessages({
   [PAYMENT_METHOD_SERVICE.STRIPE]: {
     defaultMessage: 'Stripe',
-    id: 'iBmKeP',
+    id: 'PaymentMethod.Stripe',
   },
   [PAYMENT_METHOD_SERVICE.WISE]: {
     defaultMessage: 'Wise',
-    id: 'cSAdoG',
+    id: 'PaymentMethod.Wise',
   },
   [PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE]: {
     defaultMessage: 'Open Collective',
@@ -17,15 +17,11 @@ export const i18nPaymentMethodServiceLabels = defineMessages({
   },
   [PAYMENT_METHOD_SERVICE.THEGIVINGBLOCK]: {
     defaultMessage: 'The Giving Block',
-    id: 'pnE7R2',
+    id: 'PaymentMethod.TheGivingBlock',
   },
   [PAYMENT_METHOD_SERVICE.PAYPAL]: {
     defaultMessage: 'PayPal',
     id: 'PayoutMethod.Type.Paypal',
-  },
-  [PAYMENT_METHOD_SERVICE.PREPAID]: {
-    defaultMessage: 'Prepaid',
-    id: 'DLD6I0',
   },
 });
 
