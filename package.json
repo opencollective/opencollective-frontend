@@ -280,7 +280,7 @@
     "pdf-parse": "^1.1.1",
     "postcss": "8.4.38",
     "prettier": "3.2.5",
-    "prettier-plugin-tailwindcss": "0.5.13",
+    "prettier-plugin-tailwindcss": "0.5.14",
     "raf": "^3.4.1",
     "raw-loader": "^4.0.2",
     "react-test-renderer": "^18.2.0",
