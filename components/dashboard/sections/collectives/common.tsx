@@ -80,11 +80,14 @@ export const cols: Record<string, ColumnDef<any, any>> = {
     accessorKey: 'team',
     header: () => <FormattedMessage id="Team" defaultMessage="Team" />,
     cell: ({ row }) => {
+      const DISPLAYED_TEAM_MEMBERS = 3;
       const account = row.original;
       const admins = account.members?.nodes || [];
+      const displayed = admins.length > DISPLAYED_TEAM_MEMBERS ? admins.slice(0, DISPLAYED_TEAM_MEMBERS - 1) : admins;
+      const left = admins.length - displayed.length;
       return (
         <div className="flex gap-[-4px]">
-          {admins.map(admin => (
+          {displayed.map(admin => (
             <AccountHoverCard
               key={admin.id}
               account={admin.account}
@@ -96,6 +99,11 @@ export const cols: Record<string, ColumnDef<any, any>> = {
               }
             />
           ))}
+          {left ? (
+            <div className="ml-[-8px] flex h-6 w-6 items-center justify-center rounded-full bg-blue-50 text-[11px] font-semibold text-blue-400 first:ml-0">
+              +{left}
+            </div>
+          ) : null}
         </div>
       );
     },
