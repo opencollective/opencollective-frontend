@@ -15,6 +15,7 @@ class Link extends React.Component {
     openInNewTab: PropTypes.bool,
     children: PropTypes.node.isRequired,
     'data-cy': PropTypes.string,
+    innerRef: PropTypes.func,
   };
 
   constructor(props) {
@@ -38,7 +39,7 @@ class Link extends React.Component {
   }
 
   render() {
-    const { href, children, className, openInNewTab } = this.props;
+    const { href, children, className, openInNewTab, innerRef, ...restProps } = this.props;
     if (this.isHash) {
       const route = this.constructRoutePath(href);
       const afterAnimate = () => {
@@ -61,7 +62,9 @@ class Link extends React.Component {
       return (
         <NextLink
           {...pick(this.props, ['href', 'scroll', 'title', 'onClick'])}
+          ref={innerRef}
           className={className}
+          {...restProps}
           data-cy={this.props['data-cy']}
           {...(openInNewTab || this.state.isIframe ? { target: '_blank', rel: 'noopener noreferrer' } : null)}
         >
@@ -72,4 +75,8 @@ class Link extends React.Component {
   }
 }
 
-export default Link;
+/**
+ * @typedef {{ target?: string, href?: string | Record<string, any>, animate?: any, className?: string, title?: string, onClick?: () => void, openInNewTab?: boolean, className?: string, children?: any, 'data-cy'?: string  } & React.HTMLAnchorElement} LinkProps
+ * @type React.ForwardRefRenderFunction<HTMLAnchorElement, LinkProps>
+ */
+export default React.forwardRef((props, ref) => <Link innerRef={ref} {...props} />);
