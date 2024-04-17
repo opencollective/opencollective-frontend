@@ -1,7 +1,7 @@
 import React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { groupBy, isNil, mapValues, toPairs } from 'lodash';
-import { Banknote, Eye, FilePlus2, Mail, MoreHorizontal, Pause, Play, Unlink } from 'lucide-react';
+import { Banknote, Eye, FilePlus2, Mail, MoreHorizontal, Pause, Play, SquareSigma, Unlink } from 'lucide-react';
 import { FormattedDate, FormattedMessage, IntlShape } from 'react-intl';
 
 import { HOST_FEE_STRUCTURE } from '../../../../lib/constants/host-fee-structure';
@@ -22,6 +22,7 @@ import {
   DropdownMenuTrigger,
 } from '../../../ui/DropdownMenu';
 import { TableActionsButton } from '../../../ui/Table';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 
 import AddFundsModal from './AddFundsModal';
 import FreezeAccountModal from './FreezeAccountModal';
@@ -130,7 +131,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
     },
   },
   balance: {
-    accessorKey: 'balence',
+    accessorKey: 'balance',
     header: () => <FormattedMessage id="Balance" defaultMessage="Balance" />,
     cell: ({ row }) => {
       const balance = row.original.stats.balance;
@@ -142,6 +143,38 @@ export const cols: Record<string, ColumnDef<any, any>> = {
             showCurrencyCode={false}
             amountStyles={{}}
           />
+        </div>
+      );
+    },
+  },
+  consolidatedBalance: {
+    accessorKey: 'consolidatedBalence',
+    header: () => <FormattedMessage id="Balance" defaultMessage="Balance" />,
+    cell: ({ row }) => {
+      const balance = row.original.stats.balance;
+      const consolidatedBalance = row.original.stats.consolidatedBalance;
+      return (
+        <div className="flex items-center font-medium text-foreground">
+          <FormattedMoneyAmount
+            amount={consolidatedBalance.valueInCents}
+            currency={consolidatedBalance.currency}
+            showCurrencyCode={false}
+            amountStyles={{}}
+          />
+
+          {balance.valueInCents !== consolidatedBalance.valueInCents && (
+            <Tooltip>
+              <TooltipTrigger className="cursor-help align-middle">
+                <SquareSigma className="ml-1" size="16" />
+              </TooltipTrigger>
+              <TooltipContent className="font-normal">
+                <FormattedMessage
+                  id="Tooltip.ConsolidatedBalance"
+                  defaultMessage="Includes the balance of all events and projects"
+                />
+              </TooltipContent>
+            </Tooltip>
+          )}
         </div>
       );
     },
