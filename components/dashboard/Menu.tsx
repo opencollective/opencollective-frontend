@@ -187,7 +187,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
-      if: isHost,
+      if: isHost || (!isIndividual && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.HOST_REPORTS)),
       section: ALL_SECTIONS.REPORTS,
       Icon: BarChart2,
     },
