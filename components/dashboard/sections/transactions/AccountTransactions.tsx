@@ -108,6 +108,7 @@ const AccountTransactions = ({ accountSlug }: DashboardSectionProps) => {
               setTransactionInDrawer(row);
               queryFilter.setFilter('openTransactionId', row.id);
             }}
+            queryFilter={queryFilter}
           />
           <Flex mt={5} justifyContent="center">
             <Pagination

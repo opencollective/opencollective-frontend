@@ -194,6 +194,7 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
               setTransactionInDrawer(row);
               queryFilter.setFilter('openTransactionId', row.id);
             }}
+            queryFilter={queryFilter}
             useAltTestLayout={layout === TestLayout.DEBITCREDIT}
           />
           <Flex mt={5} justifyContent="center">

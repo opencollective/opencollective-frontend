@@ -198,6 +198,7 @@ const transactionQuery = gql`
       }
       refundTransaction {
         id
+        group
         createdAt
       }
     }
@@ -422,12 +423,14 @@ export function TransactionDrawer({
                       <DropdownMenuItem
                         onClick={() => {
                           setOpen(false);
-                          resetFilters({ group: transaction?.group });
+                          resetFilters({
+                            group: [transaction?.group, transaction?.refundTransaction?.group].filter(Boolean),
+                          });
                         }}
                         className="gap-1.5"
                       >
                         <Eye size={16} />
-                        <FormattedMessage defaultMessage="View transactions in group" id="SrMzSx" />
+                        <FormattedMessage defaultMessage="View related transactions" id="+9+Ty6" />
                       </DropdownMenuItem>
                       {showDownloadInvoiceButton && (
                         <DropdownMenuItem onClick={handleDownloadInvoice} className="gap-1.5">

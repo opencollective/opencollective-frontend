@@ -26,6 +26,10 @@ const transactionsTableQueryCollectionFragment = gql`
       isRefunded
       isRefund
       isOrderRejected
+      refundTransaction {
+        id
+        group
+      }
       account {
         id
         name
