@@ -159,18 +159,20 @@ export const cols: Record<string, ColumnDef<any, any>> = {
     accessorKey: 'consolidatedBalence',
     header: () => <FormattedMessage id="Balance" defaultMessage="Balance" />,
     cell: ({ row }) => {
-      const balance = row.original.stats.balance;
-      const consolidatedBalance = row.original.stats.consolidatedBalance;
+      const isChild = !!row.original.parent?.id;
+      const stats = row.original.stats;
+      const hasDifferentBalances = stats.balance?.valueInCents !== stats.consolidatedBalance?.valueInCents;
+      const displayBalance = isChild ? stats.balance : stats.consolidatedBalance;
       return (
         <div className="flex items-center font-medium text-foreground">
           <FormattedMoneyAmount
-            amount={consolidatedBalance.valueInCents}
-            currency={consolidatedBalance.currency}
+            amount={displayBalance.valueInCents}
+            currency={displayBalance.currency}
             showCurrencyCode={false}
             amountStyles={{}}
           />
 
-          {balance.valueInCents !== consolidatedBalance.valueInCents && (
+          {!isChild && hasDifferentBalances && (
             <Tooltip>
               <TooltipTrigger className="cursor-help align-middle">
                 <SquareSigma className="ml-1" size="16" />

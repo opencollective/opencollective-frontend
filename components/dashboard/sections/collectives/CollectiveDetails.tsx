@@ -301,12 +301,13 @@ const CollectiveDetails = ({
   const collective = c || data?.account;
   const isHostedCollective = collective?.host?.id === host?.id;
   const isLoading = loading || loadingCollectiveInfo;
+  const isChild = !!collective?.parent?.id;
 
   const children = groupBy(collective?.childrenAccounts?.nodes, 'type');
   const balance = collective?.stats?.balance;
   const consolidatedBalance = collective?.stats?.consolidatedBalance;
   const displayBalance =
-    balance?.valueInCents !== consolidatedBalance?.valueInCents ? (
+    !isChild && balance?.valueInCents !== consolidatedBalance?.valueInCents ? (
       <React.Fragment>
         <FormattedMoneyAmount amount={balance?.valueInCents} currency={balance?.currency} />
         <span className="ml-2">
