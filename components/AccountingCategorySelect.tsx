@@ -116,7 +116,7 @@ const getSelectionInfoForLabel = (
   }
 };
 
-const getCategoryLabel = (
+export const getCategoryLabel = (
   intl: IntlShape,
   category: AccountingCategory,
   showCode: boolean,

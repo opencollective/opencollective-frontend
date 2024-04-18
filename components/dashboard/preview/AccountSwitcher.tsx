@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { PopoverAnchor } from '@radix-ui/react-popover';
-import { useCommandState } from 'carloslfu-cmdk-internal';
 import { cx } from 'class-variance-authority';
 import clsx from 'clsx';
+import { useCommandState } from 'cmdk';
 import { flatten, groupBy, uniqBy } from 'lodash';
 import { Check, ChevronsUpDown, PlusCircle, Star } from 'lucide-react';
 import memoizeOne from 'memoize-one';

@@ -405,7 +405,7 @@ const PayExpenseModal = ({
       { value: null, label: <FormattedMessage id="Other" defaultMessage="Other" /> },
       ...EXPENSE_PAYMENT_METHOD_SERVICES.map(service => ({
         value: service,
-        label: i18nPaymentMethodService(service, intl),
+        label: i18nPaymentMethodService(intl, service),
       })),
     ],
     [intl],

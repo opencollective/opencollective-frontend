@@ -32,6 +32,7 @@ function ChildAccountFilter({
           .filter(a => a.type === 'PROJECT')
           .map(account => ({
             value: account.slug,
+            keywords: [account.name],
             label: <AccountRenderer account={account} inOptionsList />,
           })),
       },
@@ -41,6 +42,7 @@ function ChildAccountFilter({
           .filter(a => a.type === 'EVENT')
           .map(account => ({
             value: account.slug,
+            keywords: [account.name],
             label: <AccountRenderer account={account} inOptionsList />,
           })),
       },
