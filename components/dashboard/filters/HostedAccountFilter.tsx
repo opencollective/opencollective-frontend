@@ -77,12 +77,15 @@ export const hostedAccountFilter: FilterConfig<z.infer<typeof schema>> = {
   filter: {
     labelMsg: defineMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
     Component: HostedAccountFilter,
-    valueRenderer: ({ value, ...props }) => <AccountRenderer account={{ slug: value }} {...props} />,
+    valueRenderer: ({ value, meta, ...props }) => (
+      <AccountRenderer account={{ slug: value }} inOptionsList={meta.inOptionsList} {...props} />
+    ),
   },
 };
 
 const resultNodeToOption = account => ({
   label: <AccountRenderer account={account} inOptionsList />,
+  keywords: [account.name],
   value: account.slug,
 });
 
@@ -93,7 +96,7 @@ function HostedAccountFilter({
   z.infer<typeof schema>,
   { hostSlug: string; hostedAccounts?: Partial<AccountHoverCardFieldsFragment>[] }
 >) {
-  const defaultAccounts = hostedAccounts?.map(resultNodeToOption) || [];
+  const defaultAccounts = React.useMemo(() => hostedAccounts?.map(resultNodeToOption) || [], [hostedAccounts]);
   const [options, setOptions] = React.useState<{ label: React.ReactNode; value: string }[]>(defaultAccounts);
 
   const [search, { loading, data }] = useLazyQuery(hostedAccountFilterSearchQuery, {
@@ -103,24 +106,27 @@ function HostedAccountFilter({
     context: API_V2_CONTEXT,
   });
 
-  const searchFunc = searchTerm => {
-    if (!searchTerm && defaultAccounts.length) {
-      setOptions(defaultAccounts);
-    } else {
-      search({
-        variables: {
-          searchTerm,
-          ...(!searchTerm && { orderBy: { field: 'ACTIVITY', direction: 'DESC' } }),
-        },
-      });
-    }
-  };
+  const searchFunc = React.useCallback(
+    (searchTerm: string) => {
+      if (!searchTerm && defaultAccounts.length) {
+        setOptions(defaultAccounts);
+      } else {
+        search({
+          variables: {
+            searchTerm,
+            ...(!searchTerm && { orderBy: { field: 'ACTIVITY', direction: 'DESC' } }),
+          },
+        });
+      }
+    },
+    [defaultAccounts, search],
+  );
 
   React.useEffect(() => {
     if (!loading) {
       setOptions(data?.accounts?.nodes.map(resultNodeToOption) || defaultAccounts);
     }
-  }, [loading, data]);
+  }, [loading, data, defaultAccounts]);
 
   return <ComboSelectFilter options={options} loading={loading} searchFunc={searchFunc} {...props} />;
 }
