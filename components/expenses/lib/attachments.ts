@@ -4,8 +4,8 @@ import { DROPZONE_ACCEPT_ALL } from '../../StyledDropzone';
 
 export const attachmentDropzoneParams = {
   accept: DROPZONE_ACCEPT_ALL,
-  minSize: 1024, // in bytes, =1ko
-  maxSize: 10000 * 1024, // in bytes, =10mo
+  minSize: 10e2, // in bytes, =1kB
+  maxSize: 10e6, // in bytes, =10MB
   limit: 15, // Max 15 files per upload
 };
 
