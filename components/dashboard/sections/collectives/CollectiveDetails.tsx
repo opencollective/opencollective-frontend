@@ -303,6 +303,20 @@ const CollectiveDetails = ({
   const isLoading = loading || loadingCollectiveInfo;
 
   const children = groupBy(collective?.childrenAccounts?.nodes, 'type');
+  const balance = collective?.stats?.balance;
+  const consolidatedBalance = collective?.stats?.consolidatedBalance;
+  const displayBalance =
+    balance?.valueInCents !== consolidatedBalance?.valueInCents ? (
+      <React.Fragment>
+        <FormattedMoneyAmount amount={balance?.valueInCents} currency={balance?.currency} />
+        <span className="ml-2">
+          (<FormattedMoneyAmount amount={consolidatedBalance?.valueInCents} currency={consolidatedBalance?.currency} />{' '}
+          <FormattedMessage defaultMessage="total" id="total" />)
+        </span>
+      </React.Fragment>
+    ) : (
+      <FormattedMoneyAmount amount={balance?.valueInCents} currency={balance?.currency} />
+    );
   return (
     <div>
       <H4 mb={32}>
@@ -382,17 +396,7 @@ const CollectiveDetails = ({
                 )
               }
             />
-            <InfoListItem
-              title={<FormattedMessage id="Balance" defaultMessage="Balance" />}
-              value={
-                <FormattedMoneyAmount
-                  amount={collective.stats.balance.valueInCents}
-                  currency={collective.stats.balance.currency}
-                  showCurrencyCode={false}
-                  amountStyles={{}}
-                />
-              }
-            />
+            <InfoListItem title={<FormattedMessage id="Balance" defaultMessage="Balance" />} value={displayBalance} />
             {isHostedCollective && (
               <React.Fragment>
                 <InfoListItem
