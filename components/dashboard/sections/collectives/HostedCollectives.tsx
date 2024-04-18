@@ -25,6 +25,7 @@ import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import Pagination from '../../../Pagination';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
+import { consolidatedBalanceFilter } from '../../filters/BalanceFilter';
 import {
   COLLECTIVE_STATUS,
   collectiveStatusFilter,
@@ -50,11 +51,13 @@ const schema = z.object({
   hostFeesStructure: z.nativeEnum(HostFeeStructure).optional(),
   type: isMulti(z.nativeEnum(HostedCollectiveTypes)).optional(),
   status: collectiveStatusFilter.schema,
+  consolidatedBalance: consolidatedBalanceFilter.schema,
 });
 
 const toVariables: FiltersToVariables<z.infer<typeof schema>, HostedCollectivesQueryVariables> = {
   orderBy: orderByFilter.toVariables,
   status: collectiveStatusFilter.toVariables,
+  consolidatedBalance: consolidatedBalanceFilter.toVariables,
 };
 
 const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
@@ -91,6 +94,7 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
     valueRenderer: ({ value, intl }) => formatCollectiveType(intl, value),
   },
   status: collectiveStatusFilter.filter,
+  consolidatedBalance: consolidatedBalanceFilter.filter,
 };
 
 const ROUTE_PARAMS = ['slug', 'section', 'view'];
@@ -154,6 +158,7 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
     schema,
     toVariables,
     views,
+    meta: { currency: metadata?.host?.currency },
   });
 
   const { data, error, loading, variables, refetch } = useQuery(hostedCollectivesQuery, {
@@ -205,7 +210,7 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
               cols.team,
               !isUnhosted && cols.fee,
               !isUnhosted && cols.hostedSince,
-              cols.balance,
+              cols.consolidatedBalance,
               cols.actions,
             ])}
             data={hostedAccounts?.nodes || []}
