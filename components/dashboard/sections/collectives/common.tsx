@@ -1,12 +1,24 @@
 import React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { groupBy, isNil, mapValues, toPairs } from 'lodash';
-import { Banknote, Eye, FilePlus2, Mail, MoreHorizontal, Pause, Play, SquareSigma, Unlink } from 'lucide-react';
+import {
+  Banknote,
+  Eye,
+  FilePlus2,
+  Mail,
+  MoreHorizontal,
+  Pause,
+  Play,
+  Snowflake,
+  SquareSigma,
+  Unlink,
+} from 'lucide-react';
 import { FormattedDate, FormattedMessage, IntlShape } from 'react-intl';
 
 import { HOST_FEE_STRUCTURE } from '../../../../lib/constants/host-fee-structure';
 import type { AccountWithHost, HostedCollectiveFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
+import { cn } from '../../../../lib/utils';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import AddAgreementModal from '../../../agreements/AddAgreementModal';
@@ -59,9 +71,14 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       );
       return (
         <div className="flex items-center">
-          <Avatar collective={collective} radius={48} className="mr-4" />
-          <div className="flex flex-col items-start">
-            <div className="text-sm text-foreground">{collective.name}</div>
+          <Avatar collective={collective} className="mr-4" radius={48} />
+          {collective.isFrozen && (
+            <div className="mr-2 rounded-full bg-white/90 p-[3px] shadow-md">
+              <Snowflake className="text-blue-500" size="20" />
+            </div>
+          )}
+          <div className={cn('flex flex-col items-start', collective.isFrozen && 'opacity-50')}>
+            <div className="flex items-center text-sm">{collective.name}</div>
             <div className="text-xs">{secondLine}</div>
           </div>
         </div>
@@ -86,7 +103,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       const displayed = admins.length > DISPLAYED_TEAM_MEMBERS ? admins.slice(0, DISPLAYED_TEAM_MEMBERS - 1) : admins;
       const left = admins.length - displayed.length;
       return (
-        <div className="flex gap-[-4px]">
+        <div className={cn('flex gap-[-4px]', account.isFrozen && 'opacity-50')}>
           {displayed.map(admin => (
             <AccountHoverCard
               key={admin.id}
@@ -116,7 +133,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       return isNil(collective.hostFeePercent) ? (
         ''
       ) : (
-        <div className="whitespace-nowrap">
+        <div className={cn('whitespace-nowrap', collective.isFrozen && 'opacity-50')}>
           {collective.hostFeesStructure === HOST_FEE_STRUCTURE.DEFAULT
             ? `(${collective.hostFeePercent}%)`
             : `${collective.hostFeePercent}%`}
@@ -128,11 +145,12 @@ export const cols: Record<string, ColumnDef<any, any>> = {
     accessorKey: 'hostedSince',
     header: () => <FormattedMessage id="HostedSince" defaultMessage="Hosted since" />,
     cell: ({ row }) => {
-      const since = row.original.approvedAt;
+      const collective = row.original;
+      const since = collective.approvedAt;
       return isNil(since) ? (
         ''
       ) : (
-        <div className="whitespace-nowrap">
+        <div className={cn('whitespace-nowrap', collective.isFrozen && 'opacity-50')}>
           <FormattedDate value={since} day="numeric" month="long" year="numeric" />
         </div>
       );
@@ -142,9 +160,10 @@ export const cols: Record<string, ColumnDef<any, any>> = {
     accessorKey: 'balance',
     header: () => <FormattedMessage id="Balance" defaultMessage="Balance" />,
     cell: ({ row }) => {
-      const balance = row.original.stats.balance;
+      const collective = row.original;
+      const balance = collective.stats.balance;
       return (
-        <div className="font-medium text-foreground">
+        <div className={cn('font-medium text-foreground', collective.isFrozen && 'opacity-50')}>
           <FormattedMoneyAmount
             amount={balance.valueInCents}
             currency={balance.currency}
@@ -159,12 +178,13 @@ export const cols: Record<string, ColumnDef<any, any>> = {
     accessorKey: 'consolidatedBalence',
     header: () => <FormattedMessage id="Balance" defaultMessage="Balance" />,
     cell: ({ row }) => {
-      const isChild = !!row.original.parent?.id;
-      const stats = row.original.stats;
+      const collective = row.original;
+      const isChild = !!collective.parent?.id;
+      const stats = collective.stats;
       const hasDifferentBalances = stats.balance?.valueInCents !== stats.consolidatedBalance?.valueInCents;
       const displayBalance = isChild ? stats.balance : stats.consolidatedBalance;
       return (
-        <div className="flex items-center font-medium text-foreground">
+        <div className={cn('flex items-center font-medium text-foreground', collective.isFrozen && 'opacity-50')}>
           <FormattedMoneyAmount
             amount={displayBalance.valueInCents}
             currency={displayBalance.currency}
