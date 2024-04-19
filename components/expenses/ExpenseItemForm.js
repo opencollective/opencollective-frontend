@@ -156,16 +156,19 @@ const WithOCRComparisonWarning = ({ comparison, formatValue, children, mrClass =
             {comparison.hasCurrencyMismatch ? (
               <FormattedMessage
                 defaultMessage="This currency does not match the one scanned from the document ({value})"
+                id="mNqW2+"
                 values={{ value: comparison.ocrValue?.currency }}
               />
             ) : comparison.hasAmountMismatch ? (
               <FormattedMessage
                 defaultMessage="The amount does not match the one scanned from the document ({value})"
+                id="PlRIcN"
                 values={{ value: formatValue ? formatValue(comparison.ocrValue) : comparison.ocrValue.toString() }}
               />
             ) : (
               <FormattedMessage
                 defaultMessage="This value does not match the one scanned from the document ({value})"
+                id="uMuuUg"
                 values={{ value: formatValue ? formatValue(comparison.ocrValue) : comparison.ocrValue.toString() }}
               />
             )}
@@ -527,6 +530,7 @@ const ExpenseItemForm = ({
                   }
                   approximateCustomMessage={intl.formatMessage({
                     defaultMessage: 'This value is an estimate. Please set the exact amount received if known.',
+                    id: 'zNBAqh',
                   })}
                 />
               )}
@@ -534,7 +538,7 @@ const ExpenseItemForm = ({
             {hasAccountingCategory && (
               <Container display="flex" flexDirection="column" fontSize="12px" flex="1 1 33%" mt={3}>
                 <P fontSize="13px" lineHeight="1.15em" fontWeight="normal" mr="8px" mb="8px">
-                  <FormattedMessage defaultMessage="Expense category" />
+                  <FormattedMessage defaultMessage="Expense category" id="I4c3ke" />
                 </P>
                 <div className="flex max-h-[38px] grow items-center">
                   <ExpenseAccountingCategoryPill

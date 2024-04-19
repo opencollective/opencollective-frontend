@@ -21,15 +21,15 @@ const ValueContainer = styled.div`
 
 const ActivityDetailComponents = {
   ACCOUNTING_CATEGORIES_EDITED: {
-    title: defineMessage({ defaultMessage: 'Changes' }),
+    title: defineMessage({ defaultMessage: 'Changes', id: 'dgqhUM' }),
     Component: GenericActivityDiffDataWithList,
   },
   COLLECTIVE_EDITED: {
-    title: defineMessage({ defaultMessage: 'Changes' }),
+    title: defineMessage({ defaultMessage: 'Changes', id: 'dgqhUM' }),
     Component: CollectiveEditedDetails,
   },
   VENDOR_EDITED: {
-    title: defineMessage({ defaultMessage: 'Changes' }),
+    title: defineMessage({ defaultMessage: 'Changes', id: 'dgqhUM' }),
     Component: CollectiveEditedDetails,
   },
   DEFAULT: {

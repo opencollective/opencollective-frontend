@@ -198,7 +198,7 @@ function addFilterValidationErrorToast(error, intl) {
   setImmediate(() => {
     toast({
       variant: 'error',
-      title: intl.formatMessage({ defaultMessage: 'Filter validation error' }),
+      title: intl.formatMessage({ defaultMessage: 'Filter validation error', id: 'thZrl7' }),
       message: errorMessage,
     });
   });

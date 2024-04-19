@@ -102,7 +102,7 @@ export const getActivityVariables = (
   Expense: msg =>
     !activity.expense ? (
       <ResourceTag disabled>
-        <FormattedMessage defaultMessage="Deleted expense" />
+        <FormattedMessage defaultMessage="Deleted expense" id="tt1zRa" />
       </ResourceTag>
     ) : (
       <ResourceTag>

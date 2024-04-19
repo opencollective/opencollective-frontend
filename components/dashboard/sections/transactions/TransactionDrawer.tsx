@@ -198,6 +198,7 @@ const transactionQuery = gql`
       }
       refundTransaction {
         id
+        group
         createdAt
       }
     }
@@ -214,7 +215,7 @@ const DataList = ({ title, value }) => {
   );
 };
 
-const CopyID = ({ children, tooltipLabel = <FormattedMessage defaultMessage="Copy ID" /> }) => {
+const CopyID = ({ children, tooltipLabel = <FormattedMessage defaultMessage="Copy ID" id="wtLjP6" /> }) => {
   const { isCopied, copy } = useClipboard();
 
   return (
@@ -302,11 +303,11 @@ export function TransactionDrawer({
               <div className="flex items-center justify-between">
                 <div className="flex shrink grow items-center gap-1 text-sm text-muted-foreground">
                   <span className="whitespace-nowrap">
-                    <FormattedMessage defaultMessage="Transaction" />
+                    <FormattedMessage defaultMessage="Transaction" id="1+ROfp" />
                   </span>
 
                   <div className="w-0 max-w-fit flex-1">
-                    <CopyID tooltipLabel={<FormattedMessage defaultMessage="Copy transaction ID" />}>
+                    <CopyID tooltipLabel={<FormattedMessage defaultMessage="Copy transaction ID" id="zzd7ZI" />}>
                       {transaction?.id ?? transactionId}
                     </CopyID>
                   </div>
@@ -341,7 +342,7 @@ export function TransactionDrawer({
                         <button onClick={() => setFilter('openTransactionId', transaction?.refundTransaction.id)}>
                           <Badge size="sm" type="warning" className="gap-1">
                             <Undo size={16} />
-                            <FormattedMessage defaultMessage="Refunded" />
+                            <FormattedMessage defaultMessage="Refunded" id="Gs86nL" />
                           </Badge>
                         </button>
                       </TooltipTrigger>
@@ -349,6 +350,7 @@ export function TransactionDrawer({
                       <TooltipContent>
                         <FormattedMessage
                           defaultMessage="Refunded on {date}"
+                          id="CE7lQu"
                           values={{
                             date: (
                               <DateTime
@@ -368,7 +370,7 @@ export function TransactionDrawer({
                         <button onClick={() => setFilter('openTransactionId', transaction?.refundTransaction.id)}>
                           <Badge size="sm" type="error" className="gap-1">
                             <AlertTriangle size={16} />
-                            <FormattedMessage defaultMessage="Rejected" />
+                            <FormattedMessage defaultMessage="Rejected" id="5qaD7s" />
                           </Badge>
                         </button>
                       </TooltipTrigger>
@@ -376,6 +378,7 @@ export function TransactionDrawer({
                       <TooltipContent>
                         <FormattedMessage
                           defaultMessage="Rejected and refunded on {date}"
+                          id="4n+cMX"
                           values={{
                             date: (
                               <DateTime
@@ -420,21 +423,23 @@ export function TransactionDrawer({
                       <DropdownMenuItem
                         onClick={() => {
                           setOpen(false);
-                          resetFilters({ group: transaction?.group });
+                          resetFilters({
+                            group: [transaction?.group, transaction?.refundTransaction?.group].filter(Boolean),
+                          });
                         }}
                         className="gap-1.5"
                       >
                         <Eye size={16} />
-                        <FormattedMessage defaultMessage="View transactions in group" />
+                        <FormattedMessage defaultMessage="View related transactions" id="+9+Ty6" />
                       </DropdownMenuItem>
                       {showDownloadInvoiceButton && (
                         <DropdownMenuItem onClick={handleDownloadInvoice} className="gap-1.5">
                           <Download size={16} />
 
                           {transaction?.expense ? (
-                            <FormattedMessage defaultMessage="Download Invoice" />
+                            <FormattedMessage defaultMessage="Download Invoice" id="+j9z3T" />
                           ) : (
-                            <FormattedMessage defaultMessage="Download Receipt" />
+                            <FormattedMessage defaultMessage="Download Receipt" id="Mwh/vo" />
                           )}
                         </DropdownMenuItem>
                       )}
@@ -458,6 +463,7 @@ export function TransactionDrawer({
               <div className="flex  flex-wrap items-center gap-1 text-muted-foreground">
                 <FormattedMessage
                   defaultMessage="{transactionType, select, CREDIT {Credited to} DEBIT {Debited from} other {}} {account} on {date}"
+                  id="1hktbf"
                   values={{
                     transactionType: transaction?.type,
                     account: (
@@ -484,15 +490,15 @@ export function TransactionDrawer({
             <div className="py-6">
               <div className="mb-4 flex items-center gap-3">
                 <h4 className="whitespace-nowrap text-base font-semibold">
-                  <FormattedMessage defaultMessage="Transaction details" />
+                  <FormattedMessage defaultMessage="Transaction details" id="vZO4p4" />
                 </h4>
               </div>
 
               <div className="flex flex-col gap-3 sm:gap-2">
                 <DataList
-                  title={<FormattedMessage defaultMessage="Group ID" />}
+                  title={<FormattedMessage defaultMessage="Group ID" id="nBKj/i" />}
                   value={
-                    <CopyID tooltipLabel={<FormattedMessage defaultMessage="Copy transaction group ID" />}>
+                    <CopyID tooltipLabel={<FormattedMessage defaultMessage="Copy transaction group ID" id="IFjSNc" />}>
                       {transaction?.group}
                     </CopyID>
                   }
@@ -509,13 +515,16 @@ export function TransactionDrawer({
                   <DataList
                     title={
                       <div className="flex items-center gap-1">
-                        <FormattedMessage defaultMessage="Effective Date" />
+                        <FormattedMessage defaultMessage="Effective Date" id="Gh3Obs" />
                         <Tooltip>
                           <TooltipTrigger className="cursor-help" onClick={e => e.preventDefault()}>
                             <InfoIcon size={16} />
                           </TooltipTrigger>
                           <TooltipContent onPointerDownOutside={e => e.preventDefault()}>
-                            <FormattedMessage defaultMessage="The date funds were cleared on your bank, Wise, PayPal, Stripe or any other external account holding these funds." />
+                            <FormattedMessage
+                              defaultMessage="The date funds were cleared on your bank, Wise, PayPal, Stripe or any other external account holding these funds."
+                              id="s3O6iq"
+                            />
                           </TooltipContent>
                         </Tooltip>
                       </div>
@@ -528,7 +537,7 @@ export function TransactionDrawer({
                   />
                 )}
                 <DataList
-                  title={<FormattedMessage defaultMessage="Type" />}
+                  title={<FormattedMessage defaultMessage="Type" id="+U6ozc" />}
                   value={i18nTransactionType(intl, transaction?.type)}
                 />
                 <DataList
@@ -547,7 +556,7 @@ export function TransactionDrawer({
                           </TooltipTrigger>
 
                           <TooltipContent>
-                            <FormattedMessage defaultMessage="View transaction that was refunded" />
+                            <FormattedMessage defaultMessage="View transaction that was refunded" id="cnpnd+" />
                           </TooltipContent>
                         </Tooltip>
                       )}
@@ -555,7 +564,7 @@ export function TransactionDrawer({
                   }
                 />
                 <DataList
-                  title={<FormattedMessage defaultMessage="Account" />}
+                  title={<FormattedMessage defaultMessage="Account" id="TwyMau" />}
                   value={
                     <AccountHoverCard
                       account={transaction?.account}
@@ -614,7 +623,7 @@ export function TransactionDrawer({
                 )}
                 {!isNil(transaction?.taxAmount?.valueInCents) && transaction?.taxAmount?.valueInCents !== 0 && (
                   <DataList
-                    title={<FormattedMessage defaultMessage="Taxes" />}
+                    title={<FormattedMessage defaultMessage="Taxes" id="r+dgiv" />}
                     value={
                       <FormattedMoneyAmount
                         amount={transaction?.taxAmount.valueInCents}
@@ -628,7 +637,7 @@ export function TransactionDrawer({
                 )}
                 {transaction?.netAmount?.valueInCents !== transaction?.amount.valueInCents && (
                   <DataList
-                    title={<FormattedMessage defaultMessage="Net Amount" />}
+                    title={<FormattedMessage defaultMessage="Net Amount" id="FxUka3" />}
                     value={
                       <FormattedMoneyAmount
                         amount={transaction?.netAmount.valueInCents}
@@ -641,7 +650,7 @@ export function TransactionDrawer({
                   />
                 )}
                 <DataList
-                  title={<FormattedMessage defaultMessage="Opposite account" />}
+                  title={<FormattedMessage defaultMessage="Opposite account" id="rcVYFz" />}
                   value={
                     <AccountHoverCard
                       account={transaction?.oppositeAccount}
@@ -661,20 +670,25 @@ export function TransactionDrawer({
                 <DataList
                   title={
                     <div className="flex items-center gap-1">
-                      <FormattedMessage defaultMessage="Opposite transaction ID" />
+                      <FormattedMessage defaultMessage="Opposite transaction ID" id="Cqy0IH" />
 
                       <Tooltip>
                         <TooltipTrigger className="cursor-help" onClick={e => e.preventDefault()}>
                           <InfoIcon size={16} />
                         </TooltipTrigger>
                         <TooltipContent onPointerDownOutside={e => e.preventDefault()}>
-                          <FormattedMessage defaultMessage="All transactions have an opposite debit or credit transaction" />
+                          <FormattedMessage
+                            defaultMessage="All transactions have an opposite debit or credit transaction"
+                            id="Evzo/s"
+                          />
                         </TooltipContent>
                       </Tooltip>
                     </div>
                   }
                   value={
-                    <CopyID tooltipLabel={<FormattedMessage defaultMessage="Copy opposite transaction ID" />}>
+                    <CopyID
+                      tooltipLabel={<FormattedMessage defaultMessage="Copy opposite transaction ID" id="WgAGHq" />}
+                    >
                       {transaction?.oppositeTransaction?.id}
                     </CopyID>
                   }
@@ -682,9 +696,11 @@ export function TransactionDrawer({
 
                 {transaction?.isRefund && transaction?.refundTransaction && (
                   <DataList
-                    title={<FormattedMessage defaultMessage="Refund of transaction" />}
+                    title={<FormattedMessage defaultMessage="Refund of transaction" id="OwAzRN" />}
                     value={
-                      <CopyID tooltipLabel={<FormattedMessage defaultMessage="Copy refund transaction ID" />}>
+                      <CopyID
+                        tooltipLabel={<FormattedMessage defaultMessage="Copy refund transaction ID" id="WRKLHX" />}
+                      >
                         {transaction?.refundTransaction?.id}
                       </CopyID>
                     }
@@ -693,7 +709,7 @@ export function TransactionDrawer({
 
                 {transaction?.expense?.account?.slug && (
                   <DataList
-                    title={<FormattedMessage defaultMessage="Related expense" />}
+                    title={<FormattedMessage defaultMessage="Related expense" id="iuxiAF" />}
                     value={
                       <HoverCard>
                         <HoverCardTrigger asChild>
@@ -713,7 +729,7 @@ export function TransactionDrawer({
                 )}
                 {transaction?.order && (
                   <DataList
-                    title={<FormattedMessage defaultMessage="Related contribution" />}
+                    title={<FormattedMessage defaultMessage="Related contribution" id="ySzqZN" />}
                     value={
                       <HoverCard>
                         <HoverCardTrigger asChild>

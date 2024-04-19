@@ -33,6 +33,7 @@ const ConnectedAccounts = props => {
       <P mb={4}>
         <FormattedMessage
           defaultMessage="See <Link>the documentation</Link> to learn more about Connected Accounts."
+          id="5thSOv"
           values={{
             Link: getI18nLink({
               href: 'https://docs.opencollective.com/help/fiscal-hosts/fiscal-host-settings/connected-accounts',

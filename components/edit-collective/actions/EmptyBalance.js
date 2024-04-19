@@ -19,18 +19,14 @@ const EmptyBalance = ({ collective, LoggedInUser }) => {
       <SettingsSectionTitle>
         <FormattedMessage
           id="collective.balance.title"
-          defaultMessage={
-            'Empty {type, select, EVENT {Event} PROJECT {Project} FUND {Fund} COLLECTIVE {Collective} other {account}} balance'
-          }
+          defaultMessage="Empty {type, select, EVENT {Event} PROJECT {Project} FUND {Fund} COLLECTIVE {Collective} other {account}} balance"
           values={{ type: collective.type }}
         />
       </SettingsSectionTitle>
       <P mb={2} lineHeight="16px" fontSize="14px">
         <FormattedMessage
           id="collective.balance.description"
-          defaultMessage={
-            'Transfer remaining balance to {type, select, PROJECT {the Collective} EVENT {the Collective} other {the Fiscal Host}}. {type, select, EVENT {Event} PROJECT {Project} FUND {Fund} COLLECTIVE {Collective} other {account}} balance must be zero to archive {type, select, EVENT {the Event} PROJECT {the Project} other {or change Hosts}}. {type, select, EVENT {} PROJECT {} other {Alternatively, you can submit an expense or donate to another Collective to zero the balance.}}'
-          }
+          defaultMessage="Transfer remaining balance to {type, select, PROJECT {the Collective} EVENT {the Collective} other {the Fiscal Host}}. {type, select, EVENT {Event} PROJECT {Project} FUND {Fund} COLLECTIVE {Collective} other {account}} balance must be zero to archive {type, select, EVENT {the Event} PROJECT {the Project} other {or change Hosts}}. {type, select, EVENT {} PROJECT {} other {Alternatively, you can submit an expense or donate to another Collective to zero the balance.}}"
           values={{ type: collective.type }}
         />
       </P>
@@ -39,9 +35,7 @@ const EmptyBalance = ({ collective, LoggedInUser }) => {
           <P color="rgb(224, 183, 0)" my={2}>
             <FormattedMessage
               id="collective.balance.notAvailable"
-              defaultMessage={
-                "The Host doesn't support this feature. Submit an expense, donate to another Collective, or contact support if you're blocked."
-              }
+              defaultMessage="The Host doesn't support this feature. Submit an expense, donate to another Collective, or contact support if you're blocked."
             />
           </P>
         )}

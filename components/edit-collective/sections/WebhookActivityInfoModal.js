@@ -179,6 +179,7 @@ const WebhookActivityInfoModal = ({ activity, ...props }) => {
       <ModalHeader>
         <FormattedMessage
           defaultMessage='Details for the "{event}" webhook event'
+          id="NSE1N3"
           values={{
             event: i18nWebhookEventType(intl, activity),
           }}
@@ -186,7 +187,7 @@ const WebhookActivityInfoModal = ({ activity, ...props }) => {
       </ModalHeader>
       <ModalBody mt={4}>
         <P mb={2}>
-          <FormattedMessage defaultMessage="Sample payload:" />
+          <FormattedMessage defaultMessage="Sample payload:" id="dwABvu" />
         </P>
         <CodeContainer>{JSON.stringify(WebhookEventInfo[activity](), null, 2)}</CodeContainer>
       </ModalBody>

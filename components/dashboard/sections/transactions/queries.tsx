@@ -26,6 +26,10 @@ const transactionsTableQueryCollectionFragment = gql`
       isRefunded
       isRefund
       isOrderRejected
+      refundTransaction {
+        id
+        group
+      }
       account {
         id
         name
@@ -63,14 +67,18 @@ export const transactionsTableQuery = gql`
   query TransactionsTable(
     $hostAccount: AccountReferenceInput
     $account: [AccountReferenceInput!]
+    $excludeAccount: [AccountReferenceInput!]
     $limit: Int!
     $offset: Int!
     $type: TransactionType
     $paymentMethodType: [PaymentMethodType]
+    $paymentMethodService: [PaymentMethodService]
     $minAmount: Int
     $maxAmount: Int
     $dateFrom: DateTime
     $dateTo: DateTime
+    $clearedFrom: DateTime
+    $clearedTo: DateTime
     $searchTerm: String
     $kind: [TransactionKind]
     $includeIncognitoTransactions: Boolean
@@ -78,24 +86,30 @@ export const transactionsTableQuery = gql`
     $includeChildrenTransactions: Boolean
     $virtualCard: [VirtualCardReferenceInput]
     $orderBy: ChronologicalOrderInput
-    $group: String
+    $group: [String]
     $includeHost: Boolean
     $expenseType: [ExpenseType]
     $expense: ExpenseReferenceInput
     $order: OrderReferenceInput
     $isRefund: Boolean
+    $merchantId: [String]
+    $accountingCategory: [String]
   ) {
     transactions(
       host: $hostAccount
       account: $account
+      excludeAccount: $excludeAccount
       limit: $limit
       offset: $offset
       type: $type
       paymentMethodType: $paymentMethodType
+      paymentMethodService: $paymentMethodService
       minAmount: $minAmount
       maxAmount: $maxAmount
       dateFrom: $dateFrom
       dateTo: $dateTo
+      clearedFrom: $clearedFrom
+      clearedTo: $clearedTo
       searchTerm: $searchTerm
       kind: $kind
       includeIncognitoTransactions: $includeIncognitoTransactions
@@ -110,6 +124,8 @@ export const transactionsTableQuery = gql`
       expense: $expense
       order: $order
       isRefund: $isRefund
+      merchantId: $merchantId
+      accountingCategory: $accountingCategory
     ) {
       ...TransactionsTableQueryCollectionFragment
     }

@@ -84,7 +84,10 @@ class EditConnectedAccount extends React.Component {
       // Success!
       toast({
         variant: 'success',
-        message: intl.formatMessage({ defaultMessage: 'Successfully connected {service} account' }, { service }),
+        message: intl.formatMessage(
+          { defaultMessage: 'Successfully connected {service} account', id: 'p63wXt' },
+          { service },
+        ),
       });
 
       // Refetch connected accounts
@@ -95,7 +98,10 @@ class EditConnectedAccount extends React.Component {
       // Not showing the exact error message to users as raw fetch messages are not user friendly
       toast({
         variant: 'error',
-        message: intl.formatMessage({ defaultMessage: 'Error while connecting {service} account' }, { service }),
+        message: intl.formatMessage(
+          { defaultMessage: 'Error while connecting {service} account', id: 'FWMal2' },
+          { service },
+        ),
       });
     } finally {
       // Update URL to remove callback params
@@ -202,7 +208,7 @@ class EditConnectedAccount extends React.Component {
           <Flex flexDirection="column" alignItems="center" my={4}>
             <StyledSpinner size={32} />
             <P mt={2} fontSize="12px" color="black.600" fontWeight="normal">
-              <FormattedMessage defaultMessage="Connecting..." />
+              <FormattedMessage defaultMessage="Connecting..." id="5y2qWO" />
             </P>
           </Flex>
         ) : (
@@ -216,12 +222,16 @@ class EditConnectedAccount extends React.Component {
               <Flex flexDirection="column" width="100%">
                 {Boolean(connectedAccount.settings?.needsReconnect) && (
                   <MessageBox type="warning" withIcon mb={3}>
-                    <FormattedMessage defaultMessage="This account is currently inactive. Please reconnect it to continue using it." />
+                    <FormattedMessage
+                      defaultMessage="This account is currently inactive. Please reconnect it to continue using it."
+                      id="8n8mAu"
+                    />
                   </MessageBox>
                 )}
                 <P mb={2}>
                   <FormattedMessage
                     defaultMessage="{service} account {username} connected on {date}"
+                    id="ur9IXI"
                     values={{
                       service: capitalize(connectedAccount.service),
                       username: !connectedAccount.username ? '' : <strong>@{connectedAccount.username}</strong>,
@@ -265,7 +275,10 @@ class EditConnectedAccount extends React.Component {
                   minWidth={120}
                   mb={2}
                 >
-                  {intl.formatMessage({ defaultMessage: 'Connect {service}' }, { service: capitalize(service) })}
+                  {intl.formatMessage(
+                    { defaultMessage: 'Connect {service}', id: 'C9HmCs' },
+                    { service: capitalize(service) },
+                  )}
                 </StyledButton>
               </Box>
             )}

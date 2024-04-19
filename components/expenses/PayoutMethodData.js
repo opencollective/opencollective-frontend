@@ -68,7 +68,7 @@ const PayoutMethodData = ({ payoutMethod, showLabel, isLoading }) => {
               <PrivateInfoIcon />
             </Container>
           )}
-          <Container fontSize="14px" color="black.700">
+          <Container className="overflow-hidden text-ellipsis" fontSize="14px" color="black.700">
             {getPmData(payoutMethod, 'content', isLoading)}
           </Container>
         </div>

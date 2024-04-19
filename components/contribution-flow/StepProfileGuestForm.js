@@ -56,7 +56,7 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInCl
     <Container border="none" width={1} pb={3}>
       <StyledInputField
         htmlFor="email"
-        label={<FormattedMessage defaultMessage="Your email" />}
+        label={<FormattedMessage defaultMessage="Your email" id="nONnTw" />}
         labelFontSize="16px"
         labelFontWeight="700"
         maxLength="254"
@@ -65,6 +65,7 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInCl
           !isEmbed && (
             <FormattedMessage
               defaultMessage="If you already have an account or want to contribute as an organization, <SignInLink>Sign in</SignInLink>."
+              id="ucWzrM"
               values={{
                 SignInLink: getI18nLink({
                   as: Link,
@@ -94,12 +95,15 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInCl
       <StyledHr my="18px" borderColor="black.300" />
       <StyledInputField
         htmlFor="name"
-        label={<FormattedMessage defaultMessage="Your name" />}
+        label={<FormattedMessage defaultMessage="Your name" id="vlKhIl" />}
         labelFontSize="16px"
         labelFontWeight="700"
         required={false}
         hint={
-          <FormattedMessage defaultMessage="This is your display name or alias. Leave it in blank to appear as guest." />
+          <FormattedMessage
+            defaultMessage="This is your display name or alias. Leave it in blank to appear as guest."
+            id="h1BHRl"
+          />
         }
       >
         {inputProps => (
@@ -114,14 +118,17 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInCl
       </StyledInputField>
       <StyledInputField
         htmlFor="legalName"
-        label={<FormattedMessage defaultMessage="Legal name" />}
+        label={<FormattedMessage defaultMessage="Legal name" id="OozR1Y" />}
         labelFontSize="16px"
         labelFontWeight="700"
         isPrivate
         required={contributionRequiresLegalName(stepDetails, tier) && !data?.name}
         mt={20}
         hint={
-          <FormattedMessage defaultMessage="If different from your display name. Not public. Important for receipts, invoices, payments, and official documentation." />
+          <FormattedMessage
+            defaultMessage="If different from your display name. Not public. Important for receipts, invoices, payments, and official documentation."
+            id="QLBxEF"
+          />
         }
       >
         {inputProps => (
@@ -163,6 +170,7 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInCl
       <P color="black.500" fontSize="12px" mt={4} data-cy="join-conditions">
         <FormattedMessage
           defaultMessage="By contributing, you agree to our <TOSLink>Terms of Service</TOSLink> and <PrivacyPolicyLink>Privacy Policy</PrivacyPolicyLink>."
+          id="Amj+Gh"
           values={I18nFormatters}
         />
       </P>

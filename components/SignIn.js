@@ -101,19 +101,21 @@ export default class SignIn extends React.Component {
 
   getSignInPageHeading(unknownEmail) {
     if (this.props.isOAuth && unknownEmail) {
-      return <FormattedMessage defaultMessage="Sign in to your Open Collective account" />;
+      return <FormattedMessage defaultMessage="Sign in to your Open Collective account" id="sAWx+H" />;
     } else if (this.props.isOAuth) {
-      return <FormattedMessage defaultMessage="Continue with your Open Collective account" />;
+      return <FormattedMessage defaultMessage="Continue with your Open Collective account" id="07Y/8I" />;
     } else {
-      return this.props.label || <FormattedMessage defaultMessage="Continue with your email" />;
+      return this.props.label || <FormattedMessage defaultMessage="Continue with your email" id="6zdt+y" />;
     }
   }
 
   getSignInPageSubHeading(oAuthAppName) {
     if (this.props.isOAuth) {
-      return <FormattedMessage defaultMessage="and connect with {oAuthAppName}" values={{ oAuthAppName }} />;
+      return (
+        <FormattedMessage defaultMessage="and connect with {oAuthAppName}" id="boQlk1" values={{ oAuthAppName }} />
+      );
     } else {
-      return <FormattedMessage defaultMessage="Sign in or create a personal account to continue" />;
+      return <FormattedMessage defaultMessage="Sign in or create a personal account to continue" id="qxlyPu" />;
     }
   }
 
@@ -292,10 +294,10 @@ export default class SignIn extends React.Component {
               {this.props.showSecondaryAction && !this.props.passwordRequired && (
                 <Box>
                   <Flex color="black.800" mr={1} fontSize="14px" justifyContent="center">
-                    <FormattedMessage defaultMessage="Don't have one?" />
+                    <FormattedMessage defaultMessage="Don't have one?" id="1KQrEf" />
                   </Flex>
                   <Flex fontSize="14px" justifyContent="center" mt={2}>
-                    {this.renderSecondaryAction(<FormattedMessage defaultMessage="Create an account" />)}
+                    {this.renderSecondaryAction(<FormattedMessage defaultMessage="Create an account" id="0vL5u1" />)}
                   </Flex>
                 </Box>
               )}
@@ -303,7 +305,7 @@ export default class SignIn extends React.Component {
               {this.props.passwordRequired && (
                 <Box>
                   <Flex color="black.800" mr={1} fontSize="14px" justifyContent="center">
-                    <FormattedMessage defaultMessage="Want to receive a login link?" />
+                    <FormattedMessage defaultMessage="Want to receive a login link?" id="4WXVC+" />
                     &nbsp;
                     <StyledLinkButton
                       fontSize="14px"
@@ -312,12 +314,12 @@ export default class SignIn extends React.Component {
                       data-cy="signin-secondary-action-btn"
                       underlineOnHover
                     >
-                      <FormattedMessage defaultMessage="Send me an email" />
+                      <FormattedMessage defaultMessage="Send me an email" id="bDtPKE" />
                     </StyledLinkButton>
                   </Flex>
 
                   <Flex color="black.800" mr={1} mt={2} fontSize="14px" justifyContent="center">
-                    <FormattedMessage defaultMessage="Lost your password?" />
+                    <FormattedMessage defaultMessage="Lost your password?" id="I54CU/" />
                     &nbsp;
                     <StyledLinkButton
                       fontSize="14px"
@@ -326,7 +328,7 @@ export default class SignIn extends React.Component {
                       data-cy="signin-secondary-action-btn"
                       underlineOnHover
                     >
-                      <FormattedMessage defaultMessage="Reset my password" />
+                      <FormattedMessage defaultMessage="Reset my password" id="OXLLjP" />
                     </StyledLinkButton>
                   </Flex>
                 </Box>
@@ -344,14 +346,15 @@ export default class SignIn extends React.Component {
             >
               <FormattedMessage
                 defaultMessage="{email} does not exist on {WebsiteName}. Would you like to create an account with this email?"
+                id="uuvv0g"
                 values={{ email: <strong>{email}</strong>, WebsiteName }}
               />{' '}
               <Box mt="24px">
                 <Span mr="40px">
-                  {this.renderSecondaryAction(<FormattedMessage defaultMessage="Yes, create an account" />)}
+                  {this.renderSecondaryAction(<FormattedMessage defaultMessage="Yes, create an account" id="axw0EY" />)}
                 </Span>
                 <StyledLink onClick={() => this.setState({ unknownEmail: false })} underlineOnHover={true}>
-                  <FormattedMessage defaultMessage="No, use a different email" />
+                  <FormattedMessage defaultMessage="No, use a different email" id="uxL7Ai" />
                 </StyledLink>
               </Box>
             </Container>

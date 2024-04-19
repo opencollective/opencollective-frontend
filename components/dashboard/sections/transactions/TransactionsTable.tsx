@@ -4,8 +4,9 @@ import clsx from 'clsx';
 import { AlertTriangle, ArrowLeft, ArrowRight, MoreHorizontal, Undo } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { Transaction } from '../../../../lib/graphql/types/v2/graphql';
+import { Transaction, TransactionsTableQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
+import { useQueryFilterReturnType } from '../../../../lib/hooks/useQueryFilter';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { i18nTransactionKind } from '../../../../lib/i18n/transaction';
 import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
@@ -18,6 +19,8 @@ import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { Badge } from '../../../ui/Badge';
 import { Button } from '../../../ui/Button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/DropdownMenu';
+
+import { schema } from './filters';
 
 const cols = {
   createdAt: {
@@ -82,7 +85,7 @@ const cols = {
   },
   account: {
     accessorKey: 'account',
-    header: () => <FormattedMessage defaultMessage="Account" />,
+    header: () => <FormattedMessage defaultMessage="Account" id="TwyMau" />,
     meta: { className: 'w-32 2xl:w-48' },
     cell: ({ cell }) => {
       const account = cell.getValue() as Transaction['account'];
@@ -102,7 +105,7 @@ const cols = {
   },
   oppositeAccount: {
     accessorKey: 'oppositeAccount',
-    header: () => <FormattedMessage defaultMessage="Opposite account" />,
+    header: () => <FormattedMessage defaultMessage="Opposite account" id="rcVYFz" />,
     meta: { className: 'w-32 2xl:w-48' },
     cell: ({ cell }) => {
       const account = cell.getValue() as Transaction['oppositeAccount'];
@@ -121,7 +124,7 @@ const cols = {
   },
   toFromAccount: {
     accessorKey: 'oppositeAccount',
-    header: () => <FormattedMessage defaultMessage="Recipient/Sender" />,
+    header: () => <FormattedMessage defaultMessage="Recipient/Sender" id="YT2bNN" />,
     meta: { className: 'w-48' },
     cell: ({ cell, row }) => {
       const account = cell.getValue() as Transaction['oppositeAccount'];
@@ -165,7 +168,7 @@ const cols = {
             {isRefunded && !isOrderRejected && (
               <Badge size="xs" type={'warning'} className="items-center  gap-1">
                 <Undo size={12} />
-                <FormattedMessage defaultMessage="Refunded" />
+                <FormattedMessage defaultMessage="Refunded" id="Gs86nL" />
               </Badge>
             )}
             {isRefund && (
@@ -176,13 +179,13 @@ const cols = {
             {isDisputed && (
               <Badge size="xs" type={'error'} className="items-center gap-1">
                 <AlertTriangle size={12} />
-                <FormattedMessage defaultMessage="Disputed" />
+                <FormattedMessage defaultMessage="Disputed" id="X1pwhF" />
               </Badge>
             )}
             {isOrderRejected && isRefunded && (
               <Badge size="xs" type={'error'} className="items-center gap-1">
                 <AlertTriangle size={12} />
-                <FormattedMessage defaultMessage="Rejected" />
+                <FormattedMessage defaultMessage="Rejected" id="5qaD7s" />
               </Badge>
             )}
             {isInReview && (
@@ -198,7 +201,7 @@ const cols = {
   },
   netAmount: {
     accessorKey: 'netAmount',
-    header: () => <FormattedMessage defaultMessage="Net Amount" />,
+    header: () => <FormattedMessage defaultMessage="Net Amount" id="FxUka3" />,
     meta: { className: 'w-28 text-right' },
     cell: ({ cell, row }) => {
       const netAmount = cell.getValue() as Transaction['netAmount'];
@@ -237,9 +240,13 @@ const cols = {
     header: null,
     meta: { className: 'w-16' },
     enableHiding: false,
-    cell: () => {
+    cell: ({ table, row }) => {
+      const transaction = row.original;
+      const { onClickRow, queryFilter } = table.options.meta;
+
       return (
-        <div className="flex items-center justify-end">
+        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+        <div onClick={e => e.stopPropagation()} className="flex items-center justify-end">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button size="icon" variant="outline" className="h-7 w-7 border-transparent group-hover:border-border">
@@ -248,8 +255,18 @@ const cols = {
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end">
-              <DropdownMenuItem className="gap-2">
-                <FormattedMessage defaultMessage="View details" />
+              <DropdownMenuItem onClick={() => onClickRow(transaction)} className="gap-2">
+                <FormattedMessage defaultMessage="View details" id="MnpUD7" />
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() =>
+                  queryFilter.resetFilters({
+                    group: [transaction.group, transaction.refundTransaction?.group].filter(Boolean),
+                  })
+                }
+                className="gap-2"
+              >
+                <FormattedMessage defaultMessage="View related transactions" id="+9+Ty6" />
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -280,6 +297,7 @@ type TransactionsTableProps = {
   nbPlaceholders?: number;
   onClickRow: (transaction: Transaction) => void;
   useAltTestLayout?: boolean;
+  queryFilter: useQueryFilterReturnType<typeof schema, TransactionsTableQueryVariables>;
 };
 
 export default function TransactionsTable({
@@ -288,6 +306,7 @@ export default function TransactionsTable({
   nbPlaceholders,
   onClickRow,
   useAltTestLayout,
+  queryFilter,
 }: TransactionsTableProps) {
   const intl = useIntl();
   const [hoveredGroup, setHoveredGroup] = React.useState<string | null>(null);
@@ -308,7 +327,7 @@ export default function TransactionsTable({
       fullWidth={hasDynamicTopBar}
       mobileTableView
       compact
-      meta={{ intl }}
+      meta={{ intl, onClickRow, queryFilter }}
     />
   );
 }

@@ -9,13 +9,13 @@ type Item = {
 
 export const landingPageItems: Item[] = [
   {
-    label: <FormattedMessage defaultMessage="Solutions" />,
+    label: <FormattedMessage defaultMessage="Solutions" id="asqGnV" />,
     items: [
       {
         label: <FormattedMessage id="pricing.forCollective" defaultMessage="For Collectives" />,
         href: '/collectives',
       },
-      { label: <FormattedMessage defaultMessage="For Sponsors" />, href: '/become-a-sponsor' },
+      { label: <FormattedMessage defaultMessage="For Sponsors" id="1rESHf" />, href: '/become-a-sponsor' },
       {
         label: <FormattedMessage id="pricing.fiscalHost" defaultMessage="For Fiscal Hosts" />,
         href: '/become-a-host',
@@ -59,7 +59,7 @@ export const dashboardFooterItems: Item[] = [
   },
   ...landingPageItems,
   {
-    label: <FormattedMessage defaultMessage="Help & Support" />,
+    label: <FormattedMessage defaultMessage="Help & Support" id="Uf3+S6" />,
     href: '/help',
   },
   {

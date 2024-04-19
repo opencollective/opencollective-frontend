@@ -43,7 +43,7 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
   orderBy: orderByFilter.filter,
   searchTerm: searchFilter.filter,
   status: {
-    labelMsg: defineMessage({ defaultMessage: 'Status' }),
+    labelMsg: defineMessage({ defaultMessage: 'Status', id: 'tzMNF3' }),
     Component: ({ intl, ...props }) => (
       <ComboSelectFilter
         options={Object.values(HostApplicationStatus)
@@ -76,7 +76,7 @@ const HostApplications = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const views: Views<z.infer<typeof schema>> = [
     {
       id: 'pending',
-      label: intl.formatMessage({ defaultMessage: 'Pending' }),
+      label: intl.formatMessage({ defaultMessage: 'Pending', id: 'eKEL/g' }),
       filter: {
         status: HostApplicationStatus.PENDING,
       },
@@ -84,13 +84,13 @@ const HostApplications = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     },
     {
       id: 'approved',
-      label: intl.formatMessage({ defaultMessage: 'Approved' }),
+      label: intl.formatMessage({ defaultMessage: 'Approved', id: '6XFO/C' }),
       filter: { status: HostApplicationStatus.APPROVED },
       count: metadata?.host?.approved?.totalCount,
     },
     {
       id: 'rejected',
-      label: intl.formatMessage({ defaultMessage: 'Rejected' }),
+      label: intl.formatMessage({ defaultMessage: 'Rejected', id: '5qaD7s' }),
       filter: { status: HostApplicationStatus.REJECTED },
       count: metadata?.host?.rejected?.totalCount,
     },

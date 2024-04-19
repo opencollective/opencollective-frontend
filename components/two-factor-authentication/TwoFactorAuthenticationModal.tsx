@@ -157,15 +157,16 @@ export default function TwoFactorAuthenticationModal() {
           </Button>
           <AlertDialogTitle>
             {supportedMethods.length === 0 ? (
-              <FormattedMessage defaultMessage="You must configure 2FA to access this feature" />
+              <FormattedMessage defaultMessage="You must configure 2FA to access this feature" id="CMlTK9" />
             ) : (
-              <FormattedMessage defaultMessage="Two Factor Authentication" />
+              <FormattedMessage defaultMessage="Two Factor Authentication" id="28LyaX" />
             )}
           </AlertDialogTitle>
           {LoggedInUser && supportedMethods.length === 0 && (
             <AlertDialogDescription>
               <FormattedMessage
                 defaultMessage="To enable Two-Factor Authentication (2FA), follow the steps <link>here</link>"
+                id="j8E0VG"
                 values={{
                   link: getI18nLink({
                     href: getDashboardRoute(LoggedInUser.collective, 'user-security#two-factor-auth'),
@@ -196,17 +197,17 @@ export default function TwoFactorAuthenticationModal() {
             <React.Fragment>
               {alternativeMethods.includes('totp') && (
                 <Button onClick={() => setSelectedMethod('totp')} variant="ghost">
-                  <FormattedMessage defaultMessage="Use Authenticator code" />
+                  <FormattedMessage defaultMessage="Use Authenticator code" id="HrgUjv" />
                 </Button>
               )}
               {alternativeMethods.includes('webauthn') && (
                 <Button onClick={() => setSelectedMethod('webauthn')} variant="ghost">
-                  <FormattedMessage defaultMessage="Use Security key (U2F)" />
+                  <FormattedMessage defaultMessage="Use Security key (U2F)" id="lnTinh" />
                 </Button>
               )}
               {alternativeMethods.includes('recovery_code') && (
                 <Button onClick={() => setSelectedMethod('recovery_code')} variant="ghost">
-                  <FormattedMessage defaultMessage="Use Recovery code" />
+                  <FormattedMessage defaultMessage="Use Recovery code" id="ESuayB" />
                 </Button>
               )}
             </React.Fragment>
@@ -288,7 +289,7 @@ function RecoveryCodeOptions(props: { value: string; onChange: (string) => void;
 function WebauthnOption() {
   return (
     <p className="text-sm text-muted-foreground">
-      <FormattedMessage defaultMessage="Use your device for two factor authentication" />
+      <FormattedMessage defaultMessage="Use your device for two factor authentication" id="NSlRTY" />
     </p>
   );
 }

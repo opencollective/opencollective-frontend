@@ -75,7 +75,11 @@ const ObfuscatedClientSecret = ({ secret }) => {
     <P>
       {show && <CodeContainer data-cy="unhidden-secret">{secret}</CodeContainer>}
       <StyledLink data-cy="show-secret-btn" as="button" color="blue.600" onClick={() => setShow(!show)}>
-        {show ? <FormattedMessage id="Hide" defaultMessage="Hide" /> : <FormattedMessage defaultMessage="Show" />}
+        {show ? (
+          <FormattedMessage id="Hide" defaultMessage="Hide" />
+        ) : (
+          <FormattedMessage defaultMessage="Show" id="K7AkdL" />
+        )}
       </StyledLink>
     </P>
   );
@@ -99,7 +103,7 @@ const PersonalTokenSettings = ({ backPath, id }) => {
     <div data-cy="personal-token-settings">
       <P mt={3} mb={4}>
         <StyledLink data-cy="go-back-link" as={Link} color="black.800" href={backPath}>
-          &larr; <FormattedMessage defaultMessage="Go back to all your tokens" />
+          &larr; <FormattedMessage defaultMessage="Go back to all your tokens" id="3Sl9Fc" />
         </StyledLink>
       </P>
       {loading ? (
@@ -116,7 +120,7 @@ const PersonalTokenSettings = ({ backPath, id }) => {
           </Flex>
           <StyledCard maxWidth="600px" p={3} mt={4}>
             <H4 fontSize="16px" lineHeight="24px" fontWeight="700" color="black.800" mb="20px">
-              <FormattedMessage defaultMessage="Personal Token" />
+              <FormattedMessage defaultMessage="Personal Token" id="hAcvJ3" />
             </H4>
             <Flex flexWrap="wrap" justifyContent="space-between">
               <Flex flexDirection="column" width="100%" data-cy="personalToken-token">
@@ -160,7 +164,7 @@ const PersonalTokenSettings = ({ backPath, id }) => {
                 toast({
                   variant: 'success',
                   message: intl.formatMessage(
-                    { defaultMessage: 'Personal token "{name}" updated' },
+                    { defaultMessage: 'Personal token "{name}" updated', id: 'aS9iWV' },
                     { name: result.data.updatePersonalToken.name },
                   ),
                 });
@@ -181,7 +185,7 @@ const PersonalTokenSettings = ({ backPath, id }) => {
                 <WarnIfUnsavedChanges hasUnsavedChanges={dirty && !showDeleteModal} />
                 <StyledInputFormikField
                   name="name"
-                  label={intl.formatMessage({ defaultMessage: 'Token name' })}
+                  label={intl.formatMessage({ defaultMessage: 'Token name', id: 'xQXSru' })}
                   labelProps={LABEL_STYLES}
                   required
                 >
@@ -204,6 +208,7 @@ const PersonalTokenSettings = ({ backPath, id }) => {
                   hint={intl.formatMessage(
                     {
                       defaultMessage: 'Scopes define the access for personal tokens. <Link>More info</Link>.',
+                      id: 'OL9S0O',
                     },
                     {
                       Link: getI18nLink({
@@ -250,7 +255,10 @@ const PersonalTokenSettings = ({ backPath, id }) => {
                           onCheckedChange={value => form.setFieldValue(field.name, value)}
                         />
                         <label htmlFor="preAuthorize2FA-checkbox" className="ml-2 text-xs font-normal leading-none">
-                          <FormattedMessage defaultMessage="Allow this token to directly use operations that would normally require 2FA" />
+                          <FormattedMessage
+                            defaultMessage="Allow this token to directly use operations that would normally require 2FA"
+                            id="JClbMN"
+                          />
                         </label>
                       </div>
                     );
@@ -259,11 +267,12 @@ const PersonalTokenSettings = ({ backPath, id }) => {
 
                 <StyledInputFormikField
                   name="expiresAt"
-                  label={intl.formatMessage({ defaultMessage: 'Expiration date' })}
+                  label={intl.formatMessage({ defaultMessage: 'Expiration date', id: 'CICBj0' })}
                   labelProps={LABEL_STYLES}
                   mt={20}
                   hint={intl.formatMessage({
                     defaultMessage: 'Personal tokens can expire after a certain date.',
+                    id: 'Slkvpr',
                   })}
                 >
                   {({ field }) => {
@@ -279,7 +288,7 @@ const PersonalTokenSettings = ({ backPath, id }) => {
                     disabled={!dirty}
                     minWidth="125px"
                   >
-                    <FormattedMessage defaultMessage="Update token" />
+                    <FormattedMessage defaultMessage="Update token" id="FoRCrl" />
                   </StyledButton>
                   <StyledButton
                     type="button"
@@ -289,7 +298,7 @@ const PersonalTokenSettings = ({ backPath, id }) => {
                     onClick={() => setShowDeleteModal(true)}
                     data-cy="personalToken-delete"
                   >
-                    <FormattedMessage defaultMessage="Delete token" />
+                    <FormattedMessage defaultMessage="Delete token" id="+5KHJy" />
                   </StyledButton>
                 </Flex>
               </Form>

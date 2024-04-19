@@ -191,11 +191,11 @@ const toVariables: FiltersToVariables<z.infer<typeof schema>, HostedVirtualCards
 
 const filters: FilterComponentConfigs<z.infer<typeof schema>, FilterMeta> = {
   searchTerm: searchFilter.filter,
-  date: { ...dateFilter.filter, labelMsg: defineMessage({ defaultMessage: 'Expense period' }) },
-  amount: { ...amountFilter.filter, labelMsg: defineMessage({ defaultMessage: 'Total spent' }) },
+  date: { ...dateFilter.filter, labelMsg: defineMessage({ defaultMessage: 'Expense period', id: 'WS520d' }) },
+  amount: { ...amountFilter.filter, labelMsg: defineMessage({ defaultMessage: 'Total spent', id: '9vPzIO' }) },
   orderBy: orderByFilter.filter,
   account: {
-    labelMsg: defineMessage({ defaultMessage: 'Account' }),
+    labelMsg: defineMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
     Component: ({ meta, ...props }) => {
       const { data, loading } = useQuery(hostedVirtualCardAccountsQuery, {
         variables: { slug: meta.hostSlug },
@@ -218,7 +218,7 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>, FilterMeta> = {
     valueRenderer: ({ value }) => <AccountRenderer account={{ slug: value }} />,
   },
   status: {
-    labelMsg: defineMessage({ defaultMessage: 'Status' }),
+    labelMsg: defineMessage({ defaultMessage: 'Status', id: 'tzMNF3' }),
     Component: ({ intl, ...props }) => (
       <ComboSelectFilter
         isMulti
@@ -306,7 +306,7 @@ const HostVirtualCards = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const handleCreateVirtualCardSuccess = message => {
     toast({
       variant: 'success',
-      message: message || <FormattedMessage defaultMessage="Virtual card successfully created" />,
+      message: message || <FormattedMessage defaultMessage="Virtual card successfully created" id="5O/mlD" />,
     });
     setCreateVirtualCardModalDisplay(false);
     refetch();
@@ -340,7 +340,7 @@ const HostVirtualCards = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
               onClick={() => setCreateVirtualCardModalDisplay(true)}
             >
               <span>
-                <FormattedMessage defaultMessage="Create virtual card" />
+                <FormattedMessage defaultMessage="Create virtual card" id="FRM4fb" />
               </span>
               <PlusIcon size={20} />
             </Button>

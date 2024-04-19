@@ -129,10 +129,14 @@ class CreateEvent extends React.Component {
               </Container>
             ) : collective.isFrozen ? (
               <MessageBox withIcon type="warning" my={5}>
-                <FormattedMessage defaultMessage="This account is currently frozen and cannot be used to create events." />{' '}
+                <FormattedMessage
+                  defaultMessage="This account is currently frozen and cannot be used to create events."
+                  id="10vwJU"
+                />{' '}
                 {isFeatureEnabled(collective.host, FEATURES.CONTACT_FORM) && (
                   <FormattedMessage
                     defaultMessage="Please <ContactLink>contact</ContactLink> your fiscal host for more details."
+                    id="KxBiJC"
                     values={{
                       ContactLink: getI18nLink({ href: `${getCollectivePageRoute(collective.host)}/contact` }),
                     }}

@@ -48,14 +48,14 @@ const ActivityFilters = ({ filters, onChange, account }) => {
         </FilterContainer>
         <FilterContainer width={[1, 1 / 3, 1 / 3]} pl={[0, '19px']}>
           <FilterLabel htmlFor="activity-filter-type">
-            <FormattedMessage defaultMessage="Activity" />
+            <FormattedMessage defaultMessage="Activity" id="ZmlNQ3" />
           </FilterLabel>
           <ActivityTypeFilter account={account} {...getFilterProps('type')} />
         </FilterContainer>
         {(account?.isHost || account?.childrenAccounts?.totalCount > 0) && (
           <FilterContainer width={[1, 1 / 3, 1 / 3]} pl={[0, '19px']}>
             <FilterLabel htmlFor="activity-filter-account">
-              <FormattedMessage defaultMessage="Account" />
+              <FormattedMessage defaultMessage="Account" id="TwyMau" />
             </FilterLabel>
             <ActivityAccountFilter account={account} {...getFilterProps('account')} />
           </FilterContainer>

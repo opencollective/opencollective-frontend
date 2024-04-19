@@ -16,6 +16,7 @@ const getMessage = (intl, dateRange: DateFilterValueType) => {
       return (
         <FormattedMessage
           defaultMessage="Last {number} {period}"
+          id="GsX5Fk"
           values={{ number: dateRange.number, period: i18nDateFilterLabel(intl, dateRange.period) }}
         />
       );
@@ -23,6 +24,7 @@ const getMessage = (intl, dateRange: DateFilterValueType) => {
       return (
         <FormattedMessage
           defaultMessage="On {date}"
+          id="KGXk/j"
           values={{ date: <OneLineDate value={dateRange.gte} dateStyle="medium" /> }}
         />
       );
@@ -30,6 +32,7 @@ const getMessage = (intl, dateRange: DateFilterValueType) => {
       return (
         <FormattedMessage
           defaultMessage="{dateFrom} to {dateTo}"
+          id="76YT3Y"
           values={{
             dateFrom: <OneLineDate value={dateRange.gte} dateStyle="medium" />,
             dateTo: <OneLineDate value={dateRange.lte} dateStyle="medium" />,
@@ -40,6 +43,7 @@ const getMessage = (intl, dateRange: DateFilterValueType) => {
       return (
         <FormattedMessage
           defaultMessage="After {date}"
+          id="Bl8xZP"
           values={{ date: <OneLineDate value={dateRange.gt} dateStyle="medium" /> }}
         />
       );
@@ -47,6 +51,7 @@ const getMessage = (intl, dateRange: DateFilterValueType) => {
       return (
         <FormattedMessage
           defaultMessage="Starting from {date}"
+          id="iCd6C/"
           values={{ date: <OneLineDate value={dateRange.gte} dateStyle="medium" /> }}
         />
       );
@@ -54,6 +59,7 @@ const getMessage = (intl, dateRange: DateFilterValueType) => {
       return (
         <FormattedMessage
           defaultMessage="Before {date}"
+          id="U5sjCv"
           values={{ date: <OneLineDate value={dateRange.lt} dateStyle="medium" /> }}
         />
       );
@@ -61,6 +67,7 @@ const getMessage = (intl, dateRange: DateFilterValueType) => {
       return (
         <FormattedMessage
           defaultMessage="Ending on {date}"
+          id="VXJpMP"
           values={{ date: <OneLineDate value={dateRange.lte} dateStyle="medium" /> }}
         />
       );

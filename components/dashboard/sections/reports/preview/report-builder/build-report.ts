@@ -1,14 +1,14 @@
 import { pick } from 'lodash';
 
+import { TransactionReport } from '../../../../../../lib/graphql/types/v2/graphql';
+
 import { ReportSection } from '../types';
 
 import { computationalGroups } from './computational-groups';
 import { predefinedGroups } from './predefined-groups';
 
-export const buildReport = (
-  transactionsReportResultGroups,
-  { showCreditDebit, filter = {}, useComputationalLayout },
-) => {
+export const buildReport = (report: TransactionReport, { showCreditDebit, filter = {}, useComputationalLayout }) => {
+  const transactionsReportResultGroups = report?.groups;
   if (!transactionsReportResultGroups) {
     return null;
   }
@@ -58,9 +58,13 @@ export const buildReport = (
 
   // Add the remaining result groups not matched by the defined groups
   const remainderRows = remainingNodes.map(group => ({
-    label: JSON.stringify(pick(group, 'kind', 'type', 'expenseType', 'isRefund')),
     section: ReportSection.OTHER,
-    amount: group.netAmount.valueInCents,
+    amount: group.amount.valueInCents,
+    netAmount: group.netAmount.valueInCents,
+    platformFee: group.platformFee.valueInCents,
+    paymentProcessorFee: group.paymentProcessorFee.valueInCents,
+    hostFee: group.hostFee.valueInCents,
+    taxAmount: group.taxAmount.valueInCents,
     filter: pick(group, 'kind', 'type', 'expenseType', 'isRefund', 'isHost'),
     groups: [group],
   }));
@@ -80,11 +84,16 @@ export const buildReport = (
     return acc;
   }, {});
 
-  return Object.keys(rowsBySection).map(section => {
-    return {
-      label: section,
-      rows: rowsBySection[section],
-      total: rowsBySection[section].reduce((total, section) => total + section.netAmount, 0),
-    };
-  });
+  return {
+    startingBalance: report.startingBalance,
+    endingBalance: report.endingBalance,
+    totalChange: report.totalChange,
+    sections: Object.keys(rowsBySection).map(section => {
+      return {
+        label: section,
+        rows: rowsBySection[section],
+        total: rowsBySection[section].reduce((total, section) => total + section.netAmount, 0),
+      };
+    }),
+  };
 };

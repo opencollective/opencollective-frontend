@@ -321,7 +321,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                             <StyledButton borderRadius={0} p={ITEM_PADDING} isBorderless {...btnProps}>
                               <CreditCard size="20px" />
                               <Span>
-                                <FormattedMessage defaultMessage="Create a Card" />
+                                <FormattedMessage defaultMessage="Create a Card" id="xLybrm" />
                               </Span>
                             </StyledButton>
                           </MenuItem>

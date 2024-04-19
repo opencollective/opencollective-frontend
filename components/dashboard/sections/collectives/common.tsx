@@ -1,7 +1,7 @@
 import React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { groupBy, isNil, mapValues, toPairs } from 'lodash';
-import { Banknote, Eye, FilePlus2, Mail, MoreHorizontal, Pause, Unlink } from 'lucide-react';
+import { Banknote, Eye, FilePlus2, Mail, MoreHorizontal, Pause, Play, SquareSigma, Unlink } from 'lucide-react';
 import { FormattedDate, FormattedMessage, IntlShape } from 'react-intl';
 
 import { HOST_FEE_STRUCTURE } from '../../../../lib/constants/host-fee-structure';
@@ -22,6 +22,7 @@ import {
   DropdownMenuTrigger,
 } from '../../../ui/DropdownMenu';
 import { TableActionsButton } from '../../../ui/Table';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 
 import AddFundsModal from './AddFundsModal';
 import FreezeAccountModal from './FreezeAccountModal';
@@ -41,6 +42,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       const secondLine = isChild ? (
         <FormattedMessage
           defaultMessage="{childAccountType} by {parentAccount}"
+          id="9f14iS"
           values={{
             childAccountType: (
               <Badge size="xs" type="outline">
@@ -78,11 +80,14 @@ export const cols: Record<string, ColumnDef<any, any>> = {
     accessorKey: 'team',
     header: () => <FormattedMessage id="Team" defaultMessage="Team" />,
     cell: ({ row }) => {
+      const DISPLAYED_TEAM_MEMBERS = 3;
       const account = row.original;
       const admins = account.members?.nodes || [];
+      const displayed = admins.length > DISPLAYED_TEAM_MEMBERS ? admins.slice(0, DISPLAYED_TEAM_MEMBERS - 1) : admins;
+      const left = admins.length - displayed.length;
       return (
         <div className="flex gap-[-4px]">
-          {admins.map(admin => (
+          {displayed.map(admin => (
             <AccountHoverCard
               key={admin.id}
               account={admin.account}
@@ -94,13 +99,18 @@ export const cols: Record<string, ColumnDef<any, any>> = {
               }
             />
           ))}
+          {left ? (
+            <div className="ml-[-8px] flex h-6 w-6 items-center justify-center rounded-full bg-blue-50 text-[11px] font-semibold text-blue-400 first:ml-0">
+              +{left}
+            </div>
+          ) : null}
         </div>
       );
     },
   },
   fee: {
     accessorKey: 'fee',
-    header: () => <FormattedMessage defaultMessage="Fee" />,
+    header: () => <FormattedMessage defaultMessage="Fee" id="uT4OlP" />,
     cell: ({ row }) => {
       const collective = row.original;
       return isNil(collective.hostFeePercent) ? (
@@ -129,7 +139,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
     },
   },
   balance: {
-    accessorKey: 'balence',
+    accessorKey: 'balance',
     header: () => <FormattedMessage id="Balance" defaultMessage="Balance" />,
     cell: ({ row }) => {
       const balance = row.original.stats.balance;
@@ -141,6 +151,40 @@ export const cols: Record<string, ColumnDef<any, any>> = {
             showCurrencyCode={false}
             amountStyles={{}}
           />
+        </div>
+      );
+    },
+  },
+  consolidatedBalance: {
+    accessorKey: 'consolidatedBalence',
+    header: () => <FormattedMessage id="Balance" defaultMessage="Balance" />,
+    cell: ({ row }) => {
+      const isChild = !!row.original.parent?.id;
+      const stats = row.original.stats;
+      const hasDifferentBalances = stats.balance?.valueInCents !== stats.consolidatedBalance?.valueInCents;
+      const displayBalance = isChild ? stats.balance : stats.consolidatedBalance;
+      return (
+        <div className="flex items-center font-medium text-foreground">
+          <FormattedMoneyAmount
+            amount={displayBalance.valueInCents}
+            currency={displayBalance.currency}
+            showCurrencyCode={false}
+            amountStyles={{}}
+          />
+
+          {!isChild && hasDifferentBalances && (
+            <Tooltip>
+              <TooltipTrigger className="cursor-help align-middle">
+                <SquareSigma className="ml-1" size="16" />
+              </TooltipTrigger>
+              <TooltipContent className="font-normal">
+                <FormattedMessage
+                  id="Tooltip.ConsolidatedBalance"
+                  defaultMessage="Includes the balance of all events and projects"
+                />
+              </TooltipContent>
+            </Tooltip>
+          )}
         </div>
       );
     },
@@ -212,7 +256,7 @@ export const MoreActionsMenu = ({
             onClick={() => setOpenModal('ADD_AGREEMENT')}
           >
             <FilePlus2 className="mr-2" size="16" />
-            <FormattedMessage defaultMessage="Add Agreement" />
+            <FormattedMessage defaultMessage="Add Agreement" id="apnXKF" />
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
@@ -225,13 +269,22 @@ export const MoreActionsMenu = ({
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem className="cursor-pointer" data-cy="actions-freeze" onClick={() => setOpenModal('FREEZE')}>
-            <Pause className="mr-2" size="16" />
-            <FormattedMessage defaultMessage="Freeze Collective" />
+            {collective.isFrozen ? (
+              <React.Fragment>
+                <Play className="mr-2" size="16" />
+                <FormattedMessage defaultMessage="Unfreeze Collective" id="gX79wf" />
+              </React.Fragment>
+            ) : (
+              <React.Fragment>
+                <Pause className="mr-2" size="16" />
+                <FormattedMessage defaultMessage="Freeze Collective" id="ILjcbM" />
+              </React.Fragment>
+            )}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem className="cursor-pointer" data-cy="actions-unhost" onClick={() => setOpenModal('UNHOST')}>
             <Unlink className="mr-2" size="16" />
-            <FormattedMessage defaultMessage="Unhost" />
+            <FormattedMessage defaultMessage="Unhost" id="2KTLpo" />
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

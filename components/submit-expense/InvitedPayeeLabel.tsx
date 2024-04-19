@@ -1,3 +1,4 @@
+import React from 'react';
 import { useQuery } from '@apollo/client';
 
 import { gqlV1 } from '../../lib/graphql/helpers';
@@ -33,7 +34,18 @@ export function InvitedPayeeLabel(props: InvitedPayeeLabelProps) {
     return null;
   }
 
-  const name = props.invitePayee['name'] ?? query.data.Collective.name;
+  const name = props.invitePayee['name'] ?? query.data?.Collective.name;
 
-  return props.invitePayee['email'] ? `${name} (${props.invitePayee['email']})` : name;
+  return (
+    <div className="overflow-hidden">
+      <div title={name} className="overflow-hidden text-ellipsis">
+        {name}
+      </div>
+      {props.invitePayee['email'] && (
+        <div title={props.invitePayee['email']} className="overflow-hidden text-ellipsis text-nowrap">
+          {props.invitePayee['email']}
+        </div>
+      )}
+    </div>
+  );
 }

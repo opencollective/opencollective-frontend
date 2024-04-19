@@ -163,6 +163,7 @@ class StyledUpdate extends Component<StyledUpdateProps, { mode: string; modified
                   update.makePublicOn && !update.publishedAt ? (
                     <FormattedMessage
                       defaultMessage="Will be made public on {date, date, short}"
+                      id="3/51OL"
                       values={{ date: new Date(update.makePublicOn) }}
                     />
                   ) : (
@@ -177,13 +178,13 @@ class StyledUpdate extends Component<StyledUpdateProps, { mode: string; modified
                   <Box mr={2}>
                     <Lock data-tip data-for="privateLockText" data-cy="privateIcon" size={10} cursor="pointer" />
                   </Box>
-                  <FormattedMessage defaultMessage="Private update" />
+                  <FormattedMessage defaultMessage="Private update" id="yYP4Lw" />
                 </Flex>{' '}
               </StyledTooltip>
             ) : update.isChangelog ? (
-              <FormattedMessage defaultMessage="Changelog" />
+              <FormattedMessage defaultMessage="Changelog" id="MQcAql" />
             ) : (
-              <FormattedMessage defaultMessage="Public update" />
+              <FormattedMessage defaultMessage="Public update" id="BSPPvm" />
             )}
           </StyledTag>
         )}
@@ -312,10 +313,14 @@ class StyledUpdate extends Component<StyledUpdateProps, { mode: string; modified
         ) : null}
         {collective.isFrozen ? (
           <MessageBox withIcon type="warning" mt={3}>
-            <FormattedMessage defaultMessage="This account is currently frozen and cannot be used to publish updates." />{' '}
+            <FormattedMessage
+              defaultMessage="This account is currently frozen and cannot be used to publish updates."
+              id="qstjb6"
+            />{' '}
             {isFeatureEnabled(collective.host, FEATURES.CONTACT_FORM) && (
               <FormattedMessage
                 defaultMessage="Please <ContactLink>contact</ContactLink> your fiscal host for more details."
+                id="KxBiJC"
                 values={{ ContactLink: getI18nLink({ href: `${getCollectivePageRoute(collective.host)}/contact` }) }}
               />
             )}

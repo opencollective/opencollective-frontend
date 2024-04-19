@@ -91,17 +91,22 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
   const hostOnlyOptions = [
     {
       value: false,
-      label: intl.formatMessage({ defaultMessage: 'No' }),
+      label: intl.formatMessage({ defaultMessage: 'No', id: 'oUWADl' }),
     },
     {
       value: true,
-      label: intl.formatMessage({ defaultMessage: 'Yes' }),
+      label: intl.formatMessage({ defaultMessage: 'Yes', id: 'a5msuh' }),
     },
   ];
 
   return (
     <React.Fragment>
-      <StyledInputField name="kind" required label={intl.formatMessage({ defaultMessage: 'Category kind' })} mt={3}>
+      <StyledInputField
+        name="kind"
+        required
+        label={intl.formatMessage({ defaultMessage: 'Category kind', id: 'pEw+x/' })}
+        mt={3}
+      >
         <StyledSelect
           {...props.formik.getFieldProps('kind')}
           inputId="kind"
@@ -120,7 +125,12 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
         />
       </StyledInputField>
       {props.formik.values.kind.value === AccountingCategoryKind.EXPENSE && (
-        <StyledInputField name="hostOnly" required label={intl.formatMessage({ defaultMessage: 'Host only' })} mt={3}>
+        <StyledInputField
+          name="hostOnly"
+          required
+          label={intl.formatMessage({ defaultMessage: 'Host only', id: 'qj+AAT' })}
+          mt={3}
+        >
           <StyledSelect
             {...props.formik.getFieldProps('hostOnly')}
             inputId="hostOnly"
@@ -141,7 +151,7 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
         <StyledInputField
           name="expensesTypes"
           required
-          label={intl.formatMessage({ defaultMessage: 'Expense Types' })}
+          label={intl.formatMessage({ defaultMessage: 'Expense Types', id: 'D+aS5Z' })}
           mt={3}
         >
           <StyledSelect
@@ -161,7 +171,12 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
           />
         </StyledInputField>
       )}
-      <StyledInputField name="name" required label={intl.formatMessage({ defaultMessage: 'Category name' })} mt={3}>
+      <StyledInputField
+        name="name"
+        required
+        label={intl.formatMessage({ defaultMessage: 'Category name', id: 'kgVqk1' })}
+        mt={3}
+      >
         <StyledInput
           {...props.formik.getFieldProps('name')}
           required
@@ -186,7 +201,12 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
           onChange={e => props.formik.setFieldValue('friendlyName', e.target.value)}
         />
       </StyledInputField>
-      <StyledInputField required name="code" label={intl.formatMessage({ defaultMessage: 'Accounting code' })} mt={3}>
+      <StyledInputField
+        required
+        name="code"
+        label={intl.formatMessage({ defaultMessage: 'Accounting code', id: 'tvVFNA' })}
+        mt={3}
+      >
         <StyledInput
           {...props.formik.getFieldProps('code')}
           required
@@ -200,7 +220,7 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
         <StyledInputField
           name="instructions"
           required
-          label={intl.formatMessage({ defaultMessage: 'Instructions' })}
+          label={intl.formatMessage({ defaultMessage: 'Instructions', id: 'sV2v5L' })}
           mt={3}
         >
           <RichTextEditor

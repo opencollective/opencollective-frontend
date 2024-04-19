@@ -21,7 +21,11 @@ const nextConfig = {
   },
   experimental: {
     outputFileTracingExcludes: {
-      '*': ['node_modules/@swc/core-linux-x64-gnu', 'node_modules/@swc/core-linux-x64-musl'],
+      '*': [
+        'node_modules/@swc/core-linux-x64-gnu',
+        'node_modules/@swc/core-linux-x64-musl',
+        'node_modules/canvas/build', // https://github.com/wojtekmaj/react-pdf/issues/1504#issuecomment-2007090872
+      ],
     },
     outputFileTracingIncludes: {
       '/_document': ['./.next/language-manifest.json'],
@@ -29,6 +33,7 @@ const nextConfig = {
   },
   webpack: (config, { webpack, isServer, dev }) => {
     config.resolve.alias['@sentry/replay'] = false;
+    config.resolve.alias['canvas'] = false; // https://github.com/wojtekmaj/react-pdf?tab=readme-ov-file#nextjs
 
     config.plugins.push(
       // Ignore __tests__
@@ -42,6 +47,7 @@ const nextConfig = {
         API_KEY: null,
         API_URL: null,
         PDF_SERVICE_URL: null,
+        NEXT_PDF_SERVICE_URL: null,
         ML_SERVICE_URL: null,
         DISABLE_MOCK_UPLOADS: false,
         DYNAMIC_IMPORT: true,
@@ -79,22 +85,9 @@ const nextConfig = {
       new CopyPlugin({
         patterns: [
           {
+            // eslint-disable-next-line node/no-extraneous-require
             from: path.join(path.dirname(require.resolve('pdfjs-dist/package.json')), 'cmaps'),
             to: path.join(__dirname, 'public/static/cmaps'),
-          },
-        ],
-      }),
-    );
-
-    // Copy pdfjs worker to public folder (used by PDFViewer component)
-    // (Workaround for working with react-pdf and CommonJS - if moving to ESM this can be removed)
-    // TODO(ESM): Move this to standard ESM
-    config.plugins.push(
-      new CopyPlugin({
-        patterns: [
-          {
-            from: require.resolve('pdfjs-dist/build/pdf.worker.min.js'),
-            to: path.join(__dirname, 'public/static/scripts'),
           },
         ],
       }),

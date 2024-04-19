@@ -421,7 +421,7 @@ class InputField extends React.Component {
         this.input = (
           <Box p={1}>
             <Box my="5px" fontWeight={700}>
-              <FormattedMessage defaultMessage="Social Links" />
+              <FormattedMessage defaultMessage="Social Links" id="3bLmoU" />
             </Box>
             <SocialLinksFormField
               value={this.state.value || field.defaultValue}

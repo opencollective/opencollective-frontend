@@ -26,6 +26,7 @@ export const SECTIONS = {
 export const SETTINGS_SECTIONS = {
   NOTIFICATIONS: 'notifications',
   INVOICES_RECEIPTS: 'invoices-receipts',
+  TAX_INFORMATION: 'tax-information',
 };
 
 // Sections using the AccountSettings component in /dashboard/DashboardSection
@@ -93,6 +94,7 @@ export const SECTION_LABELS = defineMessages({
     defaultMessage: 'Transactions',
   },
   [ALL_SECTIONS.ACTIVITY_LOG]: {
+    id: 't0lUqz',
     defaultMessage: 'Activity log',
   },
   [ALL_SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS]: {
@@ -124,6 +126,7 @@ export const SECTION_LABELS = defineMessages({
     defaultMessage: 'Profile Sections',
   },
   [ALL_SECTIONS.CONNECTED_ACCOUNTS]: {
+    id: 'H/VkpN',
     defaultMessage: 'Social Accounts',
   },
   [ALL_SECTIONS.EXPORT]: {
@@ -135,6 +138,7 @@ export const SECTION_LABELS = defineMessages({
     defaultMessage: 'Policies',
   },
   [ALL_SECTIONS.CUSTOM_EMAIL]: {
+    id: 'aw01NT',
     defaultMessage: 'Custom Email',
   },
   [ALL_SECTIONS.HOST]: {
@@ -162,6 +166,7 @@ export const SECTION_LABELS = defineMessages({
     defaultMessage: 'Fiscal Hosting',
   },
   [ALL_SECTIONS.CHART_OF_ACCOUNTS]: {
+    id: 'IzFWHI',
     defaultMessage: 'Chart of Accounts',
   },
   [ALL_SECTIONS.TEAM]: {
@@ -185,9 +190,11 @@ export const SECTION_LABELS = defineMessages({
     defaultMessage: 'Webhooks',
   },
   [ALL_SECTIONS.AUTHORIZED_APPS]: {
+    id: '+o/Xal',
     defaultMessage: 'Authorized Apps',
   },
   [ALL_SECTIONS.FOR_DEVELOPERS]: {
+    id: 'o0kPeK',
     defaultMessage: 'For developers',
   },
   [ALL_SECTIONS.TICKETS]: {
@@ -243,6 +250,11 @@ export const SECTION_LABELS = defineMessages({
     defaultMessage: 'Incoming Contributions',
   },
   [ALL_SECTIONS.VENDORS]: {
+    id: 'RilevA',
     defaultMessage: 'Vendors',
+  },
+  [ALL_SECTIONS.TAX_INFORMATION]: {
+    defaultMessage: 'Tax Information',
+    id: 'r/dTTe',
   },
 });

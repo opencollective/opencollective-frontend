@@ -29,7 +29,7 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
                 values={{
                   contributorType:
                     role === roles.HOST
-                      ? intl.formatMessage({ defaultMessage: 'Hosted' })
+                      ? intl.formatMessage({ defaultMessage: 'Hosted', id: 'yVPYIH' })
                       : formatMemberRole(intl, role),
                 }}
               />{' '}

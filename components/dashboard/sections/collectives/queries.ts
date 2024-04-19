@@ -147,6 +147,10 @@ const hostedCollectiveFields = gql`
         valueInCents
         currency
       }
+      consolidatedBalance: balance(includeChildren: true) {
+        valueInCents
+        currency
+      }
     }
     ... on AccountWithHost {
       hostFeesStructure
@@ -230,6 +234,7 @@ export const hostedCollectivesMetadataQuery = gql`
   query HostedCollectivesMetadata($hostSlug: String!) {
     host(slug: $hostSlug) {
       id
+      currency
       all: hostedAccounts(limit: 1, accountType: [COLLECTIVE, FUND]) {
         totalCount
       }
@@ -260,6 +265,8 @@ export const hostedCollectivesQuery = gql`
     $isApproved: Boolean
     $isFrozen: Boolean
     $isUnhosted: Boolean
+    $balance: AmountRangeInput
+    $consolidatedBalance: AmountRangeInput
   ) {
     host(slug: $hostSlug) {
       id
@@ -286,6 +293,8 @@ export const hostedCollectivesQuery = gql`
         isApproved: $isApproved
         isFrozen: $isFrozen
         isUnhosted: $isUnhosted
+        balance: $balance
+        consolidatedBalance: $consolidatedBalance
       ) {
         offset
         limit
