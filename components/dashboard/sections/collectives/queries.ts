@@ -258,7 +258,7 @@ export const hostedCollectivesQuery = gql`
     $hostSlug: String!
     $limit: Int!
     $offset: Int!
-    $orderBy: OrderByInput
+    $orderBy: AccountOrderByInput
     $hostFeesStructure: HostFeeStructure
     $searchTerm: String
     $type: [AccountType]
