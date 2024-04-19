@@ -176,7 +176,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
   },
   consolidatedBalance: {
     accessorKey: 'consolidatedBalence',
-    header: () => <FormattedMessage id="Balance" defaultMessage="Balance" />,
+    header: () => <FormattedMessage id="TotalBalance" defaultMessage="Total Balance" />,
     cell: ({ row }) => {
       const collective = row.original;
       const isChild = !!collective.parent?.id;
