@@ -43,7 +43,7 @@ export const accountOrderByFilter = buildAccountOrderBy(
 );
 
 type OrderFilterKey = `${string},DESC` | `${string},ASC`;
-export function buildAccountOrderBy<T extends [OrderFilterKey, ...OrderFilterKey[]]>(
+function buildAccountOrderBy<T extends [OrderFilterKey, ...OrderFilterKey[]]>(
   schema: z.ZodDefault<z.ZodEnum<T>>,
   i18nLabels: Record<z.infer<z.ZodEnum<T>>, MessageDescriptor>,
 ): FilterConfig<z.infer<z.ZodEnum<T>>> {
