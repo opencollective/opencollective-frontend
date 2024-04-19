@@ -29,7 +29,7 @@ import InvoicesReceipts from './sections/invoices-receipts/InvoicesReceipts';
 import NotificationsSettings from './sections/NotificationsSettings';
 import Overview from './sections/overview/Overview';
 import HostDashboardReports from './sections/reports/HostDashboardReports';
-import PreviewHostReports from './sections/reports/preview/HostReports';
+import PreviewReports from './sections/reports/preview/Reports';
 import { TaxInformationSettingsSection } from './sections/tax-information';
 import Team from './sections/Team';
 import AccountTransactions from './sections/transactions/AccountTransactions';
@@ -86,7 +86,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
   if (DashboardComponent) {
     if (section === SECTIONS.REPORTS) {
       if (LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.HOST_REPORTS)) {
-        DashboardComponent = PreviewHostReports;
+        DashboardComponent = PreviewReports;
       }
     }
     return (

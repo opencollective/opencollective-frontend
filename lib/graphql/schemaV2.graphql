@@ -878,6 +878,11 @@ interface Account {
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
 }
 
 """
@@ -1002,6 +1007,11 @@ enum DateTimeField {
   The creation time of a resource
   """
   CREATED_AT
+
+  """
+  Transactions only: The date when a transaction was cleared by the payment processor
+  """
+  EFFECTIVE_DATE
 }
 
 """
@@ -2479,6 +2489,11 @@ type Host implements Account & AccountWithContributions {
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -2565,8 +2580,11 @@ type Host implements Account & AccountWithContributions {
   isOpenToApplications: Boolean
   termsUrl: URL
   plan: HostPlan!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
   hostTransactionsReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): HostTransactionReports
-  transactionsReport(dateFrom: DateTime, dateTo: DateTime): [TransactionSum]
   hostMetrics(
     """
     A collection of accounts for which the metrics should be returned.
@@ -4860,11 +4878,6 @@ type AccountStats {
     frequency: ContributionFrequency
 
     """
-    Filter contributions on whether they can be ported to another fiscal host directly
-    """
-    hasPortability: Boolean
-
-    """
     Include contributions to children accounts (Projects and Events)
     """
     includeChildren: Boolean = false
@@ -5631,6 +5644,55 @@ enum ActivityClassType {
 }
 
 """
+EXPERIMENTAL (this may change or be deleted): Host transaction report
+"""
+type TransactionReports {
+  """
+  The start date of the time series
+  """
+  dateFrom: DateTime
+
+  """
+  The end date of the time series
+  """
+  dateTo: DateTime
+
+  """
+  The interval between two data points
+  """
+  timeUnit: TimeUnit!
+  nodes: [TransactionReport!]
+}
+
+"""
+EXPERIMENTAL (this may change or be deleted)
+"""
+type TransactionReport {
+  date: DateTime
+  startingBalance: Amount!
+  endingBalance: Amount!
+  totalChange: Amount!
+  groups: [TransactionsAmountGroup]!
+}
+
+"""
+EXPERIMENTAL (this may change or be deleted): Transaction amounts grouped by type, kind, isRefund, isHost, expenseType
+"""
+type TransactionsAmountGroup {
+  netAmount: Amount
+  amount: Amount
+  platformFee: Amount
+  paymentProcessorFee: Amount
+  hostFee: Amount
+  taxAmount: Amount
+  type: TransactionType
+  kind: TransactionKind
+  isRefund: Boolean
+  isHost: Boolean
+  expenseType: ExpenseType
+}
+
+"""
 A collection of webhooks
 """
 type WebhookCollection implements Collection {
@@ -5774,47 +5836,8 @@ type HostTransactionReports {
 
 type HostTransactionReportNode {
   date: DateTime!
-  managedFunds: TransactionsReport!
-  operationalFunds: TransactionsReport!
-}
-
-"""
-Transactions report
-"""
-type TransactionsReport {
-  startingBalance: Amount!
-  endingBalance: Amount!
-  totalChange: Amount!
-  groups: [TransactionsAmountGroup]!
-}
-
-"""
-EXPERIMENTAL (this may change or be deleted): Transaction amounts grouped by type, kind, isRefund, isHost, expenseType
-"""
-type TransactionsAmountGroup {
-  netAmount: Amount
-  amount: Amount
-  platformFee: Amount
-  paymentProcessorFee: Amount
-  hostFee: Amount
-  taxAmount: Amount
-  type: TransactionType
-  kind: TransactionKind
-  isRefund: Boolean
-  isHost: Boolean
-  expenseType: ExpenseType
-}
-
-"""
-EXPERIMENTAL (this may change or be deleted): Transaction amounts grouped by type, kind, isRefund, isHost, expenseType
-"""
-type TransactionSum {
-  amount: Amount
-  type: TransactionType
-  kind: TransactionKind
-  isRefund: Boolean
-  isHost: Boolean
-  expenseType: ExpenseType
+  managedFunds: TransactionReport!
+  operationalFunds: TransactionReport!
 }
 
 """
@@ -7492,6 +7515,11 @@ type Bot implements Account {
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -8227,6 +8255,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -9403,6 +9436,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -10366,6 +10404,11 @@ type Individual implements Account {
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -11307,6 +11350,11 @@ type Organization implements Account & AccountWithContributions {
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -12144,6 +12192,11 @@ type Vendor implements Account & AccountWithContributions {
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -15425,6 +15478,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -16268,6 +16326,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)

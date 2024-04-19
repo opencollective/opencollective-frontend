@@ -49,9 +49,9 @@ export const previewFeatures: PreviewFeature[] = [
   },
   {
     key: PREVIEW_FEATURE_KEYS.HOST_REPORTS,
-    title: 'New Host Transactions Report',
+    title: 'New Transactions Report',
     description:
-      'A new report that sums up all transactions to create a comprehensive overview of all activity, both for managed funds and operational funds.',
+      'A new report that sums up all transactions to create a comprehensive overview of all activity in your account.',
     publicBeta: true,
     alwaysEnableInDev: true,
   },
