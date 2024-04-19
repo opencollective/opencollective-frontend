@@ -47,6 +47,7 @@ const defaults = {
   OC_ENV: process.env.NODE_ENV || 'development',
   OC_SECRET: crypto.randomBytes(16).toString('hex'),
   WISE_ENVIRONMENT: 'sandbox',
+  TAX_FORMS_USE_LEGACY: false,
   API_PROXY: true,
   SENTRY_TRACES_SAMPLE_RATE: null,
   LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES: false,

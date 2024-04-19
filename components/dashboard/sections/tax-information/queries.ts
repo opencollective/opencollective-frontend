@@ -3,8 +3,8 @@ import { gql, QueryResult } from '@apollo/client';
 import { AccountTaxInformationQuery } from '../../../../lib/graphql/types/v2/graphql';
 
 export const accountTaxInformationQuery = gql`
-  query AccountTaxInformation($slug: String!) {
-    account(slug: $slug) {
+  query AccountTaxInformation($id: String!) {
+    account(id: $id) {
       id
       slug
       name
