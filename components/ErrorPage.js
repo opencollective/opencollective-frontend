@@ -16,7 +16,6 @@ import { ErrorFallbackLinks } from './ErrorFallbackLinks';
 import { Box, Flex } from './Grid';
 import Header from './Header';
 import Image from './Image';
-import Link from './Link';
 import Loading from './Loading';
 import MessageBox from './MessageBox';
 import NotFound from './NotFound';
@@ -147,7 +146,7 @@ class ErrorPage extends React.Component {
         </P>
         <Box>
           <Flex mt={5} flexWrap="wrap" alignItems="center" justifyContent="center">
-            <StyledLink my={2} as={Link} href="/contact" mx={2} buttonStyle="standard" buttonSize="large">
+            <StyledLink my={2} href="/contact" mx={2} buttonStyle="standard" buttonSize="large">
               <Support size="1em" /> <FormattedMessage id="error.contactSupport" defaultMessage="Contact support" />
             </StyledLink>
             <StyledButton my={2} mx={2} buttonSize="large" onClick={() => location.reload()}>

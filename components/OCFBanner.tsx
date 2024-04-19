@@ -47,10 +47,7 @@ const OCFCollectiveAdminsBannerMessage = ({ account, newAccount, isCentered, hid
           {newAccount && (
             <React.Fragment>
               {newAccount.name} now operates under{' '}
-              <StyledLink
-                as={Link}
-                href={isDashboard ? getDashboardRoute(newAccount) : getCollectivePageRoute(newAccount)}
-              >
+              <StyledLink href={isDashboard ? getDashboardRoute(newAccount) : getCollectivePageRoute(newAccount)}>
                 @{newAccount.slug}
               </StyledLink>
               {'. '}
@@ -224,11 +221,7 @@ export function OCFBannerWithData(props: OCFBannerProps) {
           <p className="text-lg font-semibold">Reminder: You have an account pending to close.</p>
           <p className="text-sm">
             The remaining balance from your previous Fiscal Host is in this account:{' '}
-            <StyledLink
-              as={Link}
-              collective={oldAccount}
-              href={props.isDashboard ? getDashboardRoute(oldAccount) : getCollectivePageRoute(oldAccount)}
-            >
+            <StyledLink href={props.isDashboard ? getDashboardRoute(oldAccount) : getCollectivePageRoute(oldAccount)}>
               @{oldAccount.slug}
             </StyledLink>
             . Is not able to receive contributions, you should zero-out this account soon.

@@ -185,9 +185,7 @@ class Host extends React.Component {
                   defaultMessage="You applied to be hosted by {host} on {date}. Your application is being reviewed."
                   values={{
                     host: (
-                      <StyledLink as={Link} href={getCollectivePageRoute(collective.host)}>
-                        {collective.host.name}
-                      </StyledLink>
+                      <StyledLink href={getCollectivePageRoute(collective.host)}>{collective.host.name}</StyledLink>
                     ),
                     date: formatDate(get(hostMembership, 'createdAt'), {
                       day: 'numeric',
@@ -547,7 +545,6 @@ class Host extends React.Component {
                     <StyledLink
                       buttonStyle="primary"
                       buttonSize="medium"
-                      as={Link}
                       fontSize="13px"
                       href={`${collective.slug}/accept-financial-contributions/host`}
                     >

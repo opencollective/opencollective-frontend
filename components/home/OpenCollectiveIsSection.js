@@ -6,7 +6,6 @@ import NextIllustration from '../collectives/HomeNextIllustration';
 import Container from '../Container';
 import { ApplyToHostGrid, ApplyToHostMobileCarousel } from '../fiscal-hosting/ApplyToFiscalHostSection';
 import { Box, Flex } from '../Grid';
-import Link from '../Link';
 import { SectionDescription, SectionTitle } from '../marketing/Text';
 import StyledLink from '../StyledLink';
 import { H3, P } from '../Text';
@@ -110,14 +109,7 @@ const OpenCollectiveIs = () => {
           <Box display={['none', 'block']} width="100%">
             <ApplyToHostGrid color="white.full" />
           </Box>
-          <StyledLink
-            as={Link}
-            buttonStyle="standard"
-            mt="48px"
-            mb="64px"
-            buttonSize="medium"
-            href="/search?isHost=true"
-          >
+          <StyledLink buttonStyle="standard" mt="48px" mb="64px" buttonSize="medium" href="/search?isHost=true">
             <FormattedMessage id="home.discoverMoreHome" defaultMessage="Discover More Hosts" />
           </StyledLink>
         </Flex>

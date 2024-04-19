@@ -59,7 +59,7 @@ const groupHostsIntoSections = hosts =>
 const Host = ({ id, name, logo, bgImage, location, color, collectivePath }) => {
   const intl = useIntl();
   return (
-    <ApplyLink as={Link} href={collectivePath}>
+    <ApplyLink href={collectivePath}>
       <Container
         textAlign="center"
         display="flex"

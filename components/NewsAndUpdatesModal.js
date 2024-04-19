@@ -9,7 +9,6 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Separator } from './ui/Separator';
 import HTMLContent from './HTMLContent';
 import Image from './Image';
-import Link from './Link';
 import Loading from './Loading';
 import MessageBox from './MessageBox';
 import StyledCarousel from './StyledCarousel';
@@ -64,7 +63,6 @@ const renderStyledCarousel = (data, loading, error, onClose) => {
             <div className="flex pb-4 pt-2">
               <StyledLink
                 onClick={onClose}
-                as={Link}
                 href={`/opencollective/updates/${update.slug}`}
                 className="text-blue-800"
                 fontSize="14px"
@@ -89,7 +87,6 @@ const renderStyledCarousel = (data, loading, error, onClose) => {
             <div className="flex pb-4 pt-1">
               <StyledLink
                 onClick={onClose}
-                as={Link}
                 href={`/opencollective/updates/${update.slug}`}
                 fontSize="14px"
                 display="flex"

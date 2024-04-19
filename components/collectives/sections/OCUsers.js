@@ -165,7 +165,7 @@ const OCUsers = () => {
         </Container>
       </Flex>
       <Box mt={4}>
-        <StyledLink as={Link} buttonStyle="standard" buttonSize="medium" href="/search">
+        <StyledLink buttonStyle="standard" buttonSize="medium" href="/search">
           <FormattedMessage id="home.discover" defaultMessage="Discover more" />
         </StyledLink>
       </Box>

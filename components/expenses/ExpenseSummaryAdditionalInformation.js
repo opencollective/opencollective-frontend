@@ -18,7 +18,6 @@ import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
-import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import LocationAddress from '../LocationAddress';
@@ -180,7 +179,6 @@ const ExpenseSummaryAdditionalInformation = ({
           {Boolean(collective?.hostAgreements?.totalCount) && (
             <Container mt={3}>
               <StyledLink
-                as={Link}
                 fontWeight="700"
                 color="black.700"
                 textDecoration="underline"

@@ -20,7 +20,6 @@ import { i18nCustomApplicationFormLabel } from '../../../../lib/i18n/custom-appl
 import Avatar from '../../../Avatar';
 import { Drawer, DrawerActions, DrawerHeader } from '../../../Drawer';
 import { Flex } from '../../../Grid';
-import Link from '../../../Link';
 import LinkCollective from '../../../LinkCollective';
 import StyledLink from '../../../StyledLink';
 import StyledRoundButton from '../../../StyledRoundButton';
@@ -97,11 +96,7 @@ const getSuccessToast = (intl, action, collective, result): Toast => {
         <FormattedMessage id="MessageSent" defaultMessage="Message sent" />
       ),
       message: conversation && (
-        <StyledLink
-          as={Link}
-          openInNewTab
-          href={`/${collective.slug}/conversations/${conversation.slug}-${conversation.id}`}
-        >
+        <StyledLink openInNewTab href={`/${collective.slug}/conversations/${conversation.slug}-${conversation.id}`}>
           <FormattedMessage id="Conversation.view" defaultMessage="View Conversation" />
           &nbsp;
           <ExternalLink size="1em" style={{ verticalAlign: 'middle' }} />

@@ -34,7 +34,7 @@ const ContributeEvent = ({ collective, event, ...props }) => {
       stats={event.stats.backers}
       image={event.backgroundImageUrl}
       title={
-        <StyledLink as={Link} color="black.800" href={`/${collective.slug}/events/${event.slug}`}>
+        <StyledLink color="black.800" href={`/${collective.slug}/events/${event.slug}`}>
           {event.name}
         </StyledLink>
       }

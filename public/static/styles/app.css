@@ -203,6 +203,8 @@ html {
   --gunmetal: #505559;
   --fade-blue: #97b7f3;
 
+  scroll-behavior: smooth;
+
   height: 100%;
   width: 100%;
 }

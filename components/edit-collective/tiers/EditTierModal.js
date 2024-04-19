@@ -21,7 +21,6 @@ import { getCollectivePageRoute } from '../../../lib/url-helpers';
 import ContributeTier from '../../contribute-cards/ContributeTier';
 import { Box, Flex } from '../../Grid';
 import InputFieldPresets from '../../InputFieldPresets';
-import Link from '../../Link';
 import MessageBox from '../../MessageBox';
 import StyledButton from '../../StyledButton';
 import StyledInput from '../../StyledInput';
@@ -480,7 +479,6 @@ function FormFields({ collective, values, hideTypeSelect }) {
                   } else {
                     return (
                       <StyledLink
-                        as={Link}
                         openInNewTab
                         href={{
                           pathname: `${getCollectivePageRoute(collective)}/contribute/${values.slug}-${

@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import { useIntl } from 'react-intl';
-import { Scrollchor } from 'react-scrollchor';
 import styled, { css } from 'styled-components';
 
 import { getSectionsCategoryDetails, SECTIONS_CATEGORY_ICON } from '../../lib/collective-sections';
@@ -171,7 +170,7 @@ NavBarCategory.propTypes = {
 };
 
 const NavBarScrollContainer = ({ useAnchor, category, children }) =>
-  useAnchor ? <Scrollchor to={`#category-${category}`}>{children}</Scrollchor> : children;
+  useAnchor ? <Link href={`#category-${category}`}>{children}</Link> : children;
 
 NavBarScrollContainer.propTypes = {
   category: PropTypes.oneOf(Object.values(NAVBAR_CATEGORIES)).isRequired,
@@ -208,9 +207,7 @@ const NavBarCategoryDropdown = ({ useAnchor, collective, category, isSelected, l
             <Box as="ul" p={0} m={0} minWidth={184}>
               {displayedLinks.map(({ route, title }) => (
                 <MenuItem key={route}>
-                  <StyledLink as={Link} href={route}>
-                    {title}
-                  </StyledLink>
+                  <StyledLink href={route}>{title}</StyledLink>
                 </MenuItem>
               ))}
             </Box>

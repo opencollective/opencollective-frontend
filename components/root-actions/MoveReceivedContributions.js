@@ -11,7 +11,6 @@ import CollectivePickerAsync from '../CollectivePickerAsync';
 import ConfirmationModal from '../ConfirmationModal';
 import Container from '../Container';
 import { Flex } from '../Grid';
-import Link from '../Link';
 import OrdersPickerAsync from '../OrdersPickerAsync';
 import StyledButton from '../StyledButton';
 import StyledInputField from '../StyledInputField';
@@ -212,11 +211,7 @@ const MoveReceivedContributions = () => {
             {newTier === 'custom' ? (
               'the custom contribution tier'
             ) : (
-              <StyledLink
-                as={Link}
-                href={`/${receiverAccount.slug}/contribute/${newTier.slug}-${newTier.legacyId}`}
-                openInNewTab
-              >
+              <StyledLink href={`/${receiverAccount.slug}/contribute/${newTier.slug}-${newTier.legacyId}`} openInNewTab>
                 {newTier.name} (#{newTier.legacyId})
               </StyledLink>
             )}
@@ -248,7 +243,6 @@ const MoveReceivedContributions = () => {
                       Current tier:{' '}
                       {order.tier ? (
                         <StyledLink
-                          as={Link}
                           href={`/${order.toAccount.slug}/contribute/${order.tier.slug}-${order.tier.legacyId}`}
                           openInNewTab
                         >

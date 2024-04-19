@@ -11,7 +11,6 @@ import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 import { AvatarWithLink } from '../../../AvatarWithLink';
 import DateTime from '../../../DateTime';
 import HTMLContent from '../../../HTMLContent';
-import Link from '../../../Link';
 import StyledLink from '../../../StyledLink';
 import { Skeleton } from '../../../ui/Skeleton';
 import { getActivityVariables } from '../ActivityLog/ActivityDescription';
@@ -50,7 +49,6 @@ const ActivityContent = ({
       {summary && (
         <div>
           <StyledLink
-            as={Link}
             fontSize="14px"
             lineHeight="16px"
             href={href}
