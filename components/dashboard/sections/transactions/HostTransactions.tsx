@@ -103,6 +103,7 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const [transactionInDrawer, setTransactionInDrawer] = React.useState(null);
 
   const [layout, setLayout] = React.useState(TestLayout.AMOUNT);
+  const [dateField, setDateField] = React.useState('createdAt');
 
   const { data: metaData } = useQuery(hostTransactionsMetaDataQuery, {
     variables: { slug: hostSlug },
@@ -136,6 +137,7 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       kinds: metaData?.transactions?.kinds,
       hostSlug: hostSlug,
       paymentMethodTypes: metaData?.transactions?.paymentMethodTypes,
+      dateField: dateField,
     },
     views,
   });
@@ -196,6 +198,11 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
             }}
             queryFilter={queryFilter}
             useAltTestLayout={layout === TestLayout.DEBITCREDIT}
+            dateField={queryFilter.values.dateField}
+            setDateField={field => {
+              setDateField(field);
+              queryFilter.setFilter('dateField', field);
+            }}
           />
           <Flex mt={5} justifyContent="center">
             <Pagination

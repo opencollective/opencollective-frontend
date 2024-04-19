@@ -40,6 +40,7 @@ const accountTransactionsMetaDataQuery = gql`
 const AccountTransactions = ({ accountSlug }: DashboardSectionProps) => {
   const [displayExportCSVModal, setDisplayExportCSVModal] = React.useState(false);
   const [transactionInDrawer, setTransactionInDrawer] = React.useState(null);
+  const [dateField, setDateField] = React.useState('createdAt');
 
   const { data: metaData } = useQuery(accountTransactionsMetaDataQuery, {
     variables: { slug: accountSlug },
@@ -55,6 +56,7 @@ const AccountTransactions = ({ accountSlug }: DashboardSectionProps) => {
       currency: metaData?.account?.currency,
       paymentMethodTypes: metaData?.transactions?.paymentMethodTypes,
       kinds: metaData?.transactions?.kinds,
+      dateField: dateField,
     },
   });
 
@@ -69,7 +71,7 @@ const AccountTransactions = ({ accountSlug }: DashboardSectionProps) => {
     context: API_V2_CONTEXT,
   });
   const { transactions } = data || {};
-
+  console.log({ queryFilter });
   return (
     <div className="flex flex-col gap-4">
       <DashboardHeader
@@ -109,6 +111,11 @@ const AccountTransactions = ({ accountSlug }: DashboardSectionProps) => {
               queryFilter.setFilter('openTransactionId', row.id);
             }}
             queryFilter={queryFilter}
+            dateField={queryFilter.values.dateField}
+            setDateField={field => {
+              setDateField(field);
+              queryFilter.setFilter('dateField', field);
+            }}
           />
           <Flex mt={5} justifyContent="center">
             <Pagination

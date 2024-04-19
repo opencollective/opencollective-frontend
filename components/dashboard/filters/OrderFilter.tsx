@@ -28,7 +28,12 @@ export function buildOrderByFilter<T extends [OrderFilterKey, ...OrderFilterKey[
 ): FilterConfig<z.infer<z.ZodEnum<T>>> {
   return {
     schema,
-    toVariables: (value, key) => ({ [key]: parseChronologicalOrderInput(value) }),
+    toVariables: (value, key, meta) => {
+      if (meta?.dateField === 'clearedAt') {
+        return { [key]: { ...parseChronologicalOrderInput(value), field: 'EFFECTIVE_DATE' } };
+      }
+      return { [key]: parseChronologicalOrderInput(value) };
+    },
     filter: {
       labelMsg: defineMessage({ id: 'OrderBy', defaultMessage: 'Order by' }),
       static: true,

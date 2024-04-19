@@ -1,7 +1,8 @@
 import React from 'react';
+import * as SelectPrimitive from '@radix-ui/react-select';
 import { ColumnDef } from '@tanstack/react-table';
 import clsx from 'clsx';
-import { AlertTriangle, ArrowLeft, ArrowRight, MoreHorizontal, Undo } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, ArrowRight, ChevronDown, MoreHorizontal, Undo } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { Transaction, TransactionsTableQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
@@ -19,14 +20,36 @@ import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { Badge } from '../../../ui/Badge';
 import { Button } from '../../../ui/Button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/DropdownMenu';
+import { Select, SelectContent, SelectItem, SelectValue } from '../../../ui/Select';
 
 import { schema } from './filters';
 
 const cols = {
-  createdAt: {
-    accessorKey: 'createdAt',
+  date: {
+    accessorKey: 'date',
     meta: { className: 'w-48' },
-    header: () => <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />,
+    header: ({ table }) => {
+      const { dateField, setDateField } = table.options.meta;
+
+      return (
+        <Select value={dateField} onValueChange={setDateField}>
+          <SelectPrimitive.Trigger asChild>
+            <Button size="xs" className="-mx-2 h-6 px-2" variant="ghost">
+              <SelectValue />
+              <ChevronDown size={16} />
+            </Button>
+          </SelectPrimitive.Trigger>
+          <SelectContent>
+            <SelectItem value={'createdAt'}>
+              <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />
+            </SelectItem>
+            <SelectItem value={'clearedAt'}>
+              <FormattedMessage defaultMessage="Effective Date" id="Gh3Obs" />
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      );
+    },
     cell: ({ cell }) => {
       const createdAt = cell.getValue() as Transaction['createdAt'];
 
@@ -278,17 +301,8 @@ const cols = {
 
 const getColumns = (useAltLayout?: boolean): ColumnDef<Transaction>[] => {
   return useAltLayout
-    ? [
-        cols.createdAt,
-        cols.kind,
-        cols.debit,
-        cols.credit,
-        cols.currency,
-        cols.account,
-        cols.oppositeAccount,
-        cols.actions,
-      ]
-    : [cols.createdAt, cols.account, cols.toFromAccount, cols.kind, cols.netAmount, cols.currency, cols.actions];
+    ? [cols.date, cols.kind, cols.debit, cols.credit, cols.currency, cols.account, cols.oppositeAccount, cols.actions]
+    : [cols.date, cols.account, cols.toFromAccount, cols.kind, cols.netAmount, cols.currency, cols.actions];
 };
 
 type TransactionsTableProps = {
@@ -307,18 +321,31 @@ export default function TransactionsTable({
   onClickRow,
   useAltTestLayout,
   queryFilter,
+  dateField,
+  setDateField,
 }: TransactionsTableProps) {
   const intl = useIntl();
   const [hoveredGroup, setHoveredGroup] = React.useState<string | null>(null);
   const { LoggedInUser } = useLoggedInUser();
   const hasDynamicTopBar = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DYNAMIC_TOP_BAR);
   const columns = getColumns(useAltTestLayout);
+
+  const data = React.useMemo(
+    () =>
+      (transactions?.nodes || []).map(n => {
+        const clearedAt = n.clearedAt;
+        const createdAt = n.createdAt;
+        return { ...n, date: dateField === 'clearedAt' ? clearedAt ?? createdAt : createdAt };
+      }),
+    [transactions, dateField],
+  );
+
   return (
     <DataTable
       data-cy="transactions-table"
       innerClassName="table-fixed text-muted-foreground"
       columns={columns}
-      data={transactions?.nodes || []}
+      data={data}
       loading={loading}
       nbPlaceholders={nbPlaceholders}
       onClickRow={row => onClickRow(row.original)}
@@ -327,7 +354,7 @@ export default function TransactionsTable({
       fullWidth={hasDynamicTopBar}
       mobileTableView
       compact
-      meta={{ intl, onClickRow, queryFilter }}
+      meta={{ intl, onClickRow, queryFilter, dateField, setDateField }}
     />
   );
 }

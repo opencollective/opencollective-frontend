@@ -23,7 +23,7 @@ import { amountFilter } from '../../filters/AmountFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { dateFilter } from '../../filters/DateFilter';
 import { dateToVariables } from '../../filters/DateFilter/schema';
-import { orderByFilter } from '../../filters/OrderFilter';
+import { buildOrderByFilter, orderByFilter } from '../../filters/OrderFilter';
 import { paymentMethodFilter } from '../../filters/PaymentMethodFilter';
 import { searchFilter } from '../../filters/SearchFilter';
 import { VirtualCardRenderer } from '../../filters/VirtualCardsFilter';
@@ -56,6 +56,7 @@ export const schema = z.object({
   openTransactionId: z.string().optional(),
   group: isMulti(z.string().uuid()).optional(),
   isRefund: boolean.optional(),
+  dateField: z.enum(['createdAt', 'clearedAt']).default('createdAt'),
 });
 
 type FilterValues = z.infer<typeof schema>;
@@ -78,6 +79,14 @@ export const toVariables: FiltersToVariables<FilterValues, TransactionsTableQuer
   orderId: id => ({ order: { legacyId: id } }),
   paymentMethod: paymentMethodFilter.toVariables,
 };
+
+// export const orderByFilter = buildOrderByFilter(
+//   z.enum(['CREATED_AT,DESC', 'CREATED_AT,ASC', 'EFFECTIVE_DATE,DESC', 'EFFECTIVE_DATE,ASC']).default('CREATED_AT,DESC'),
+//   {
+//     'CREATED_AT,DESC': defineMessage({ id: 'ExpensesOrder.NewestFirst', defaultMessage: 'Newest First' }),
+//     'CREATED_AT,ASC': defineMessage({ id: 'ExpensesOrder.OldestFirst', defaultMessage: 'Oldest First' }),
+//   },
+// );
 
 // The filters config is used to populate the Filters component.
 export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {

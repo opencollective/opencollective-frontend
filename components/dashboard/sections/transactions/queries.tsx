@@ -23,6 +23,7 @@ const transactionsTableQueryCollectionFragment = gql`
       type
       description
       createdAt
+      clearedAt
       isRefunded
       isRefund
       isOrderRejected
