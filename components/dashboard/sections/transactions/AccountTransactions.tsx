@@ -17,7 +17,6 @@ import { DashboardSectionProps } from '../../types';
 
 import { filters, schema, toVariables } from './filters';
 import { transactionsTableQuery } from './queries';
-import { TransactionDrawer } from './TransactionDrawer';
 import TransactionsTable from './TransactionsTable';
 
 const accountTransactionsMetaDataQuery = gql`
@@ -39,8 +38,6 @@ const accountTransactionsMetaDataQuery = gql`
 
 const AccountTransactions = ({ accountSlug }: DashboardSectionProps) => {
   const [displayExportCSVModal, setDisplayExportCSVModal] = React.useState(false);
-  const [transactionInDrawer, setTransactionInDrawer] = React.useState(null);
-
   const { data: metaData } = useQuery(accountTransactionsMetaDataQuery, {
     variables: { slug: accountSlug },
     context: API_V2_CONTEXT,
@@ -68,6 +65,7 @@ const AccountTransactions = ({ accountSlug }: DashboardSectionProps) => {
     notifyOnNetworkStatusChange: true,
     context: API_V2_CONTEXT,
   });
+
   const { transactions } = data || {};
 
   return (
@@ -103,12 +101,9 @@ const AccountTransactions = ({ accountSlug }: DashboardSectionProps) => {
           <TransactionsTable
             transactions={transactions}
             loading={loading}
-            nbPlaceholders={20}
-            onClickRow={row => {
-              setTransactionInDrawer(row);
-              queryFilter.setFilter('openTransactionId', row.id);
-            }}
+            nbPlaceholders={queryFilter.values.limit}
             queryFilter={queryFilter}
+            refetchList={refetch}
           />
           <Flex mt={5} justifyContent="center">
             <Pagination
@@ -121,19 +116,6 @@ const AccountTransactions = ({ accountSlug }: DashboardSectionProps) => {
           </Flex>
         </React.Fragment>
       )}
-      <TransactionDrawer
-        open={!!queryFilter.values.openTransactionId}
-        transaction={transactionInDrawer}
-        setFilter={queryFilter.setFilter}
-        resetFilters={queryFilter.resetFilters}
-        setOpen={open => {
-          if (!open) {
-            queryFilter.setFilter('openTransactionId', undefined);
-          }
-        }}
-        transactionId={queryFilter.values.openTransactionId}
-        refetchList={refetch}
-      />
     </div>
   );
 };

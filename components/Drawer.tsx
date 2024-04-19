@@ -25,6 +25,7 @@ export function Drawer({
   showActionsContainer,
   showCloseButton = false,
   'data-cy': dataCy,
+  onCloseAutoFocus,
 }: {
   open: boolean;
   onClose: () => void;
@@ -34,6 +35,7 @@ export function Drawer({
   showCloseButton?: boolean;
   'data-cy'?: string;
   className?: string;
+  onCloseAutoFocus?: (e: Event) => void;
 }) {
   const [drawerActionsContainer, setDrawerActionsContainer] = useState(null);
 
@@ -63,7 +65,12 @@ export function Drawer({
           }
         }}
       >
-        <SheetContent className={clsx('flex flex-col gap-0 p-0', className)} ref={drawerRef} data-cy={dataCy}>
+        <SheetContent
+          className={clsx('flex flex-col gap-0 p-0', className)}
+          ref={drawerRef}
+          data-cy={dataCy}
+          onCloseAutoFocus={onCloseAutoFocus}
+        >
           <div className="relative flex-1 overflow-y-scroll px-4 py-6 sm:px-6">
             {showCloseButton && (
               <StyledRoundButton

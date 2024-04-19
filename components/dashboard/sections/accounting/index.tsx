@@ -298,30 +298,29 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
       {isCreateCategoryModalOpen && (
         <CreateAccountingCategoryModal onClose={() => setIsCreateCategoryModalOpen(false)} onCreate={onCreate} />
       )}
-      {deleteCategoryConfirmation && (
-        <ConfirmationModal
-          isDanger
-          type="delete"
-          onClose={() => setDeleteCategoryConfirmation(null)}
-          header={
-            <FormattedMessage defaultMessage="Are you sure you want to delete this accounting category?" id="zbCUar" />
-          }
-          continueHandler={async () => {
-            await onConfirmDelete();
-            setDeleteCategoryConfirmation(null);
-            return CONFIRMATION_MODAL_TERMINATE;
-          }}
-        >
-          <div className="inline-block rounded-xl bg-slate-50 px-2 py-1 font-bold text-slate-800">
-            {deleteCategoryConfirmation.name}
-            {deleteCategoryConfirmation.friendlyName && (
-              <span className="font-normal italic text-slate-700">
-                &nbsp;·&nbsp;{deleteCategoryConfirmation.friendlyName}
-              </span>
-            )}
-          </div>
-        </ConfirmationModal>
-      )}
+      <ConfirmationModal
+        open={deleteCategoryConfirmation}
+        setOpen={setDeleteCategoryConfirmation}
+        variant="destructive"
+        type="delete"
+        title={
+          <FormattedMessage defaultMessage="Are you sure you want to delete this accounting category?" id="zbCUar" />
+        }
+        continueHandler={async () => {
+          await onConfirmDelete();
+          setDeleteCategoryConfirmation(null);
+          return CONFIRMATION_MODAL_TERMINATE;
+        }}
+      >
+        <div className="inline-block rounded-xl bg-slate-50 px-2 py-1 font-bold text-slate-800">
+          {deleteCategoryConfirmation.name}
+          {deleteCategoryConfirmation.friendlyName && (
+            <span className="font-normal italic text-slate-700">
+              &nbsp;·&nbsp;{deleteCategoryConfirmation.friendlyName}
+            </span>
+          )}
+        </div>
+      </ConfirmationModal>
     </React.Fragment>
   );
 };

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
 import { omitBy } from 'lodash';
-import { PlusIcon } from 'lucide-react';
+import { MoreHorizontal, PlusIcon } from 'lucide-react';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
@@ -34,7 +34,9 @@ import { AccountRenderer } from '../filters/HostedAccountFilter';
 import { orderByFilter } from '../filters/OrderFilter';
 import { searchFilter } from '../filters/SearchFilter';
 import { DashboardSectionProps } from '../types';
-
+import { Dialog, DialogContent, DialogTrigger } from '../../ui/Dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../ui/DropdownMenu';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
 const hostedVirtualCardAccountsQuery = gql`
   query HostedVirtualCardAccounts($slug: String) {
     host(slug: $slug) {
@@ -242,6 +244,35 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>, FilterMeta> = {
   },
 };
 
+export function useDialog() {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const returnTriggerRef = React.useRef();
+
+  function trigger() {
+    setIsOpen(true);
+  }
+
+  function dismiss() {
+    setIsOpen(false);
+    // console.log('returnTriggerRef', returnTriggerRef.current);
+    // returnTriggerRef?.current?.focus();
+    // console.log(document.activeElement);
+  }
+
+  return {
+    returnTriggerRef: returnTriggerRef,
+    dialogProps: {
+      open: isOpen,
+      onOpenChange: open => {
+        if (open) trigger();
+        else dismiss();
+      },
+    },
+    trigger,
+    dismiss,
+  };
+}
+
 const ROUTE_PARAMS = ['slug', 'section'];
 
 const HostVirtualCards = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
@@ -252,6 +283,12 @@ const HostVirtualCards = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     variables: { slug: hostSlug },
   });
 
+  const { returnTriggerRef, dialogProps, trigger } = useDialog();
+
+  React.useEffect(() => {
+    console.log('active element');
+    console.log(document.activeElement);
+  }, [document.activeElement]);
   const views: Views<z.infer<typeof schema>> = [
     {
       id: 'active',
@@ -361,6 +398,39 @@ const HostVirtualCards = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
         />
       ) : (
         <React.Fragment>
+          <div>
+            <DropdownMenu>
+              <DropdownMenuTrigger ref={returnTriggerRef} className="focus:border">
+                <MoreHorizontal /> helo
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={trigger}>Open modal</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <button className="size-24 focus:bg-red-500" onClick={trigger}>
+              open modal
+            </button>
+            <Dialog {...dialogProps}>
+              <DialogContent
+                onCloseAutoFocus={e => {
+                  e.preventDefault();
+
+                  returnTriggerRef?.current?.focus();
+                }}
+              >
+                <p>Modal content</p>
+              </DialogContent>
+            </Dialog>
+            <button
+              onClick={() => {
+                console.log(returnTriggerRef.current);
+                returnTriggerRef?.current?.focus();
+              }}
+            >
+              Focus buddy
+            </button>
+          </div>
+
           <VirtualCardsTable
             canEditVirtualCard
             canDeleteVirtualCard

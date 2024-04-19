@@ -14,7 +14,7 @@ import { getAvailableLimitShortString } from '../../lib/i18n/virtual-card-spendi
 
 import { AccountHoverCard } from '../AccountHoverCard';
 import Avatar from '../Avatar';
-import { DataTable } from '../DataTable';
+import { contextColumn, DataTable } from '../DataTable';
 import DateTime from '../DateTime';
 import VirtualCard, { ActionsButton } from '../edit-collective/VirtualCard';
 import { Grid } from '../Grid';
@@ -24,6 +24,14 @@ import { TableActionsButton } from '../ui/Table';
 import { toast } from '../ui/useToast';
 
 import VirtualCardDrawer from './VirtualCardDrawer';
+import { ActionConfig, getActions } from '../../lib/actions/types';
+import { useMutation } from '@apollo/client';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import EditVirtualCardModal from '../edit-collective/EditVirtualCardModal';
+import { useModal } from '../ModalContext';
+import { useVirtualCardActions } from '../../lib/actions/useVirtualCardActions';
+import { ActionsContextMenu, RowActionsMenu } from '../RowActionsMenu';
+import { useDrawer } from '../../lib/hooks/useDrawer';
 
 type VirtualCardsTableMeta = {
   intl: IntlShape;
@@ -135,6 +143,20 @@ const tableColumns: ColumnDef<GraphQLVirtualCard>[] = [
   },
   {
     accessorKey: 'actions',
+    header: null,
+    meta: { className: 'w-16' },
+    enableHiding: false,
+    cell: ({ table, row, actionsRef }) => {
+      return (
+        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+        <div onClick={e => e.stopPropagation()} className="flex items-center justify-end">
+          <RowActionsMenu row={row} table={table} actionsRef={actionsRef} />
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: 'actions-old',
     meta: { className: 'w-14' },
     header: () => '',
     cell: ({ row, table }: CellContext<GraphQLVirtualCard, string>) => {
@@ -173,8 +195,19 @@ export default function VirtualCardsTable(props: VirtualCardsTableProps) {
   const [isTableView, setIsTableView] = React.useState(true);
   const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
   const [selectedVirtualCard, setSelectedVirtualCard] = React.useState<GraphQLVirtualCard>(null);
+  const [openVirtualCardId, setOpenVirtualCardId] = React.useState<string>(null);
+
   useWindowResize(() => setIsTableView(window.innerWidth > 1024));
-  const openVirtualCardDrawer = virtualCard => {
+
+  const { getActions } = useVirtualCardActions({ host: props.host });
+
+  const { openDrawer, drawerProps } = useDrawer({
+    open: Boolean(openVirtualCardId),
+    onOpen: ({ id }) => setOpenVirtualCardId(id),
+    onClose: () => setOpenVirtualCardId(null),
+  });
+
+  const openVirtualCardDrawer = (virtualCard, onCloseFocusRef) => {
     setIsDrawerOpen(true);
     setSelectedVirtualCard(virtualCard);
   };
@@ -186,6 +219,8 @@ export default function VirtualCardsTable(props: VirtualCardsTableProps) {
       onDeleteRefetchQuery: props.onDeleteRefetchQuery,
       host: props.host,
       intl,
+      getActions,
+      onClickRow: openVirtualCardDrawer,
     };
     return (
       <React.Fragment>
@@ -206,9 +241,8 @@ export default function VirtualCardsTable(props: VirtualCardsTableProps) {
           )}
         />
         <VirtualCardDrawer
-          open={isDrawerOpen}
-          onClose={() => setIsDrawerOpen(false)}
-          virtualCardId={selectedVirtualCard?.id}
+          {...drawerProps}
+          virtualCardId={openVirtualCardId}
           canEditVirtualCard
           canDeleteVirtualCard
           onDeleteRefetchQuery="HostedVirtualCards"

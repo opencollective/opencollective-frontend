@@ -27,9 +27,11 @@ import StyledInput from '../StyledInput';
 import StyledInputAmount from '../StyledInputAmount';
 import StyledInputField from '../StyledInputField';
 import StyledLink from '../StyledLink';
-import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import StyledSelect from '../StyledSelect';
-import { P, Span } from '../Text';
+import { Span } from '../Text';
+import { Button } from '../ui/Button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/Dialog';
+import { Separator } from '../ui/Separator';
 import { useToast } from '../ui/useToast';
 import { StripeVirtualCardComplianceStatement } from '../virtual-cards/StripeVirtualCardComplianceStatement';
 
@@ -164,14 +166,17 @@ const throttledCall = debounce((searchFunc, variables) => {
   return searchFunc({ variables });
 }, 750);
 
-export type EditVirtualCardModalProps = {
+type ModalProps = {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  onCloseAutoFocus?: (e: Event) => void;
+};
+export type EditVirtualCardModalProps = ModalProps & {
   host: Account;
   collective?: Account;
   virtualCard?: VirtualCard;
   virtualCardRequest?: VirtualCardRequest;
   onSuccess: (el: React.ReactNode) => void;
-  onClose: () => void;
-  modalProps?: any;
 };
 
 export default function EditVirtualCardModal({
@@ -179,8 +184,9 @@ export default function EditVirtualCardModal({
   collective,
   virtualCard,
   onSuccess,
-  onClose,
-  modalProps,
+  open,
+  setOpen,
+  onCloseAutoFocus,
   virtualCardRequest,
 }: EditVirtualCardModalProps) {
   const { toast } = useToast();
@@ -323,7 +329,7 @@ export default function EditVirtualCardModal({
   const intl = useIntl();
 
   const handleClose = () => {
-    onClose?.();
+    setOpen(false);
   };
 
   const virtualCardLimitOptions = Object.keys(VirtualCardLimitInterval).map(interval => ({
@@ -334,31 +340,34 @@ export default function EditVirtualCardModal({
   const collectiveUsers = users?.account?.members.nodes.map(node => node.account);
 
   return (
-    <StyledModal width="420px" onClose={handleClose} trapFocus {...modalProps}>
-      <form onSubmit={formik.handleSubmit}>
-        <ModalHeader onClose={handleClose} hideCloseIcon={false}>
-          {isEditing ? (
-            <FormattedMessage defaultMessage="Edit virtual card" id="TtzWuE" />
-          ) : (
-            <FormattedMessage defaultMessage="Create virtual card" id="FRM4fb" />
-          )}
-        </ModalHeader>
-        <ModalBody pt={2}>
-          <P>
-            {isEditing ? (
-              <FormattedMessage
-                defaultMessage="Edit virtual card for a collective with the information below."
-                id="9nfFQ7"
-              />
-            ) : (
-              <FormattedMessage
-                defaultMessage="Create virtual card for a collective with the information below."
-                id="NW8fj9"
-              />
-            )}
-          </P>
-          <StyledHr borderColor="black.300" mt={3} />
-          <Flex flexDirection="column" mt={3}>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent onCloseAutoFocus={onCloseAutoFocus}>
+        <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
+          <DialogHeader>
+            <DialogTitle>
+              {isEditing ? (
+                <FormattedMessage defaultMessage="Edit virtual card" id="TtzWuE" />
+              ) : (
+                <FormattedMessage defaultMessage="Create virtual card" id="FRM4fb" />
+              )}
+            </DialogTitle>
+            <DialogDescription>
+              {isEditing ? (
+                <FormattedMessage
+                  defaultMessage="Edit virtual card for a collective with the information below."
+                  id="9nfFQ7"
+                />
+              ) : (
+                <FormattedMessage
+                  defaultMessage="Create virtual card for a collective with the information below."
+                  id="NW8fj9"
+                />
+              )}
+            </DialogDescription>
+          </DialogHeader>
+
+          <Separator />
+          <div>
             {!isEditing && (
               <React.Fragment>
                 <StyledInputField
@@ -527,9 +536,9 @@ export default function EditVirtualCardModal({
                   </StyledInputField>
                 </Flex>
                 <Box pt={2}>
-                  <Span ml={1}>
+                  <span>
                     {intl.formatMessage(VirtualCardLimitIntervalDescriptionsI18n[formik.values.limitInterval])}
-                  </Span>
+                  </span>
                 </Box>
                 {formik.touched.limitAmount && formik.errors.limitAmount && (
                   <Box pt={2}>
@@ -541,32 +550,29 @@ export default function EditVirtualCardModal({
                 )}
               </React.Fragment>
             )}
-          </Flex>
-          <Box mt={3}>
-            <StripeVirtualCardComplianceStatement />
-          </Box>
-        </ModalBody>
-        <ModalFooter isFullWidth>
-          <Flex justifyContent="flex-end" flexWrap="wrap">
-            <StyledButton
-              my={1}
-              minWidth={140}
-              buttonStyle="primary"
+          </div>
+
+          <StripeVirtualCardComplianceStatement />
+
+          <DialogFooter>
+            <Button variant="outline" onClick={handleClose}>
+              <FormattedMessage defaultMessage="Cancel" id="actions.cancel" />
+            </Button>
+            <Button
               data-cy="confirmation-modal-continue"
               loading={isBusy}
               disabled={isLoadingPolicy || isLoadingVirtualCardsAssignedToCollective}
               type="submit"
-              textTransform="capitalize"
             >
               {isEditing ? (
                 <FormattedMessage id="actions.update" defaultMessage="Update" />
               ) : (
                 <FormattedMessage defaultMessage="Create virtual card" id="FRM4fb" />
               )}
-            </StyledButton>
-          </Flex>
-        </ModalFooter>
-      </form>
-    </StyledModal>
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

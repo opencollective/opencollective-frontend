@@ -125,6 +125,12 @@ const resumeCardMutation = gql`
   }
 `;
 
+const deleteVirtualCardMutation = gql`
+  mutation DeleteVirtualCard($virtualCard: VirtualCardReferenceInput!) {
+    deleteVirtualCard(virtualCard: $virtualCard)
+  }
+`;
+
 export const ActionsButton = props => {
   const [showConfirmationModal, setShowConfirmationModal] = React.useState(false);
   const [isEditingVirtualCard, setIsEditingVirtualCard] = React.useState(false);
@@ -151,6 +157,15 @@ export const ActionsButton = props => {
   const [resumeCard, { loading: resumeLoading }] = useMutation(resumeCardMutation, {
     context: API_V2_CONTEXT,
   });
+  const [deleteVirtualCard, { loading: deleteLoading }] = useMutation(deleteVirtualCardMutation, {
+    context: API_V2_CONTEXT,
+    ...(props.onDeleteRefetchQuery
+      ? {
+          refetchQueries: [props.onDeleteRefetchQuery],
+          awaitRefetchQueries: true,
+        }
+      : {}),
+  });
 
   const isActive = virtualCard.data.status === 'active' || virtualCard.data.state === 'OPEN';
   const isCanceled = virtualCard.data.status === 'canceled';
@@ -167,6 +182,31 @@ export const ActionsButton = props => {
     } catch (e) {
       props.onError(e);
     }
+  };
+
+  const handleDelete = async () => {
+    try {
+      await deleteVirtualCard({
+        variables: {
+          virtualCard: { id: virtualCard.id },
+        },
+      });
+    } catch (e) {
+      toast({
+        variant: 'error',
+        message: (
+          <FormattedMessage
+            defaultMessage="Error deleting virtual card: {error}"
+            id="qYxNsK"
+            values={{
+              error: e.message,
+            }}
+          />
+        ),
+      });
+      return;
+    }
+    handleActionSuccess(<FormattedMessage defaultMessage="Card successfully deleted" id="+RvjCt" />);
   };
 
   const isLoading = pauseLoading || resumeLoading;
@@ -258,25 +298,25 @@ export const ActionsButton = props => {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {showConfirmationModal && (
-        <ConfirmationModal
-          isDanger
-          type="confirm"
-          header={<FormattedMessage defaultMessage="Pause Virtual Card" id="f9PwAQ" />}
-          continueLabel={<FormattedMessage id="VirtualCards.PauseCard" defaultMessage="Pause Card" />}
-          onClose={() => setShowConfirmationModal(false)}
-          continueHandler={async () => {
-            await handlePauseUnpause();
-          }}
-        >
-          <P>
-            <FormattedMessage
-              defaultMessage="This will pause the virtual card. To unpause, you will need to contact the host."
-              id="6VPa5L"
-            />
-          </P>
-        </ConfirmationModal>
-      )}
+      <ConfirmationModal
+        variant="destructive"
+        open={showConfirmationModal}
+        setOpen={setShowConfirmationModal}
+        type="confirm"
+        header={<FormattedMessage defaultMessage="Pause Virtual Card" id="f9PwAQ" />}
+        description={
+          <FormattedMessage
+            defaultMessage="This will pause the virtual card. To unpause, you will need to contact the host."
+            id="6VPa5L"
+          />
+        }
+        continueLabel={<FormattedMessage id="VirtualCards.PauseCard" defaultMessage="Pause Card" />}
+        // onClose={() => setShowConfirmationModal(false)}
+        continueHandler={async () => {
+          await handlePauseUnpause();
+        }}
+      />
+
       {isEditingVirtualCard && (
         <EditVirtualCardModal
           host={host}
@@ -285,15 +325,20 @@ export const ActionsButton = props => {
           virtualCard={virtualCard}
         />
       )}
-      {isDeletingVirtualCard && (
-        <DeleteVirtualCardModal
-          host={host}
-          onSuccess={handleActionSuccess}
-          onDeleteRefetchQuery={props.onDeleteRefetchQuery}
-          onClose={() => setIsDeletingVirtualCard(false)}
-          virtualCard={virtualCard}
-        />
-      )}
+      <ConfirmationModal
+        variant="destructive"
+        open={isDeletingVirtualCard}
+        setOpen={setIsDeletingVirtualCard}
+        type="delete"
+        header={<FormattedMessage defaultMessage="Delete virtual card" id="7nrRJ/" />}
+        description={
+          <FormattedMessage
+            defaultMessage="You are about to delete the virtual card, are you sure you want to continue ?"
+            id="TffQlZ"
+          />
+        }
+        continueHandler={handleDelete}
+      />
     </React.Fragment>
   );
 };
@@ -381,7 +426,9 @@ export function CardDetails({ virtualCard }) {
       message: <FormattedMessage id="Clipboard.Copied" defaultMessage="Copied!" />,
     });
   };
-
+  if (!virtualCard.privateData) {
+    return null;
+  }
   return (
     <React.Fragment>
       <P mt="27px" fontSize="18px" fontWeight="700" lineHeight="26px">

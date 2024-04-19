@@ -136,18 +136,18 @@ class OpenCollectiveFrontendApp extends App {
           <ThemeProvider theme={theme}>
             <StripeProviderSSR>
               <IntlProvider locale={locale}>
-                <ModalProvider>
-                  <TooltipProvider delayDuration={500} skipDelayDuration={100}>
-                    <UserProvider>
+                <TooltipProvider delayDuration={500} skipDelayDuration={100}>
+                  <UserProvider>
+                    <ModalProvider>
                       <NewsAndUpdatesProvider>
                         <Component {...pageProps} />
                         <Toaster />
                         <GlobalNewsAndUpdates />
                         <TwoFactorAuthenticationModal />
                       </NewsAndUpdatesProvider>
-                    </UserProvider>
-                  </TooltipProvider>
-                </ModalProvider>
+                    </ModalProvider>
+                  </UserProvider>
+                </TooltipProvider>
               </IntlProvider>
             </StripeProviderSSR>
           </ThemeProvider>

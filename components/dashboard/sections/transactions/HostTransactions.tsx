@@ -101,6 +101,7 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const intl = useIntl();
   const [displayExportCSVModal, setDisplayExportCSVModal] = React.useState(false);
   const [transactionInDrawer, setTransactionInDrawer] = React.useState(null);
+  const [returnRef, setReturnRef] = React.useState(null);
 
   const [layout, setLayout] = React.useState(TestLayout.AMOUNT);
 
@@ -190,8 +191,11 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
             transactions={transactions}
             loading={loading}
             nbPlaceholders={20}
-            onClickRow={row => {
+            onClickRow={(row, triggerRef) => {
               setTransactionInDrawer(row);
+              if (triggerRef) {
+                setReturnRef(triggerRef);
+              }
               queryFilter.setFilter('openTransactionId', row.id);
             }}
             queryFilter={queryFilter}
@@ -220,6 +224,12 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
         }}
         transactionId={queryFilter.values.openTransactionId}
         refetchList={refetch}
+        onCloseAutoFocus={e => {
+          e.preventDefault();
+          if (returnRef) {
+            returnRef.current.focus();
+          }
+        }}
       />
     </div>
   );

@@ -32,6 +32,7 @@ type VirtualCardDrawerProps = {
   canEditVirtualCard?: boolean;
   canDeleteVirtualCard?: boolean;
   onDeleteRefetchQuery?: string;
+  onCloseAutoFocus?: (e: Event) => void;
 };
 
 const virtualCardQuery = gql`
@@ -112,6 +113,7 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
       maxWidth="512px"
       open={props.open}
       onClose={props.onClose}
+      onCloseAutoFocus={props.onCloseAutoFocus}
       showActionsContainer
       data-cy="virtual-card-drawer"
     >

@@ -50,8 +50,8 @@ const TableRow = React.forwardRef<
   <tr
     ref={ref}
     className={cn(
-      'group/row border-b ring-inset ring-ring data-[state=selected]:bg-slate-100',
-      highlightOnHover && 'hover:bg-slate-100',
+      'group/row border-b ring-inset ring-ring data-[state=selected]:bg-muted',
+      highlightOnHover && 'hover:bg-muted has-[[data-state=open]]:bg-muted',
       className,
     )}
     {...props}

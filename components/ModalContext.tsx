@@ -1,11 +1,22 @@
 import React, { useReducer, createContext, useContext } from 'react';
 import { Dialog, DialogContent } from './ui/Dialog';
-import { AlertDialog, AlertDialogContent } from './ui/AlertDialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from './ui/AlertDialog';
+import ConfirmationModal from './ConfirmationModal';
 
 interface ModalContextValues {
   component: React.FC;
   modalProps: any;
   showModal: (component: React.ComponentType<any>, modalProps?: any) => void;
+  showConfirmationModal: (modalProps?: any) => void;
   hideModal: () => void;
 }
 
@@ -20,6 +31,7 @@ const ModalContext = createContext<ModalContextValues>({
   component: () => <div>No modal component supplied</div>,
   modalProps: {},
   showModal: () => undefined,
+  showConfirmationModal: () => undefined,
   hideModal: () => undefined,
 });
 
@@ -27,13 +39,33 @@ const { Provider, Consumer: ModalConsumer } = ModalContext;
 
 const reducer = (
   state,
-  { type, component, modalProps, modalType }: { type: string; component?: React.FC; modalProps?: any },
+  {
+    type,
+    component,
+    modalProps,
+    modalType,
+    id,
+    onCloseFocusRef,
+  }: { type: string; component?: React.FC; modalProps?: any },
 ) => {
   switch (type) {
     case 'openModal':
-      return { ...state, openModals: [...state.openModals, { component, modalProps, id: genId(), modalType }] };
+      console.log('openModal', component, modalProps, modalType);
+      return {
+        ...state,
+        openModals: [
+          ...state.openModals,
+          { open: true, component, modalProps, id: genId(), modalType, onCloseFocusRef },
+        ],
+      };
     case 'hideModal':
-      return { ...state, openModals: state.openModals.slice(0, -1) };
+      return {
+        ...state,
+        openModals: state.openModals.map(m => ({
+          ...m,
+          open: m.id === id ? false : m.open,
+        })),
+      };
     default:
       throw new Error('Unspecified reducer action');
   }
@@ -56,23 +88,41 @@ export type ModalProviderProps = {
 
 const ModalRoot = () => {
   const { openModals, component: Component, modalProps, hideModal, showModal } = useModal();
-
-  return openModals.map(({ component: Component, modalProps, modalType, id }) => {
-    if (modalType === 'ALERT') {
+  console.log('openModals', openModals);
+  return openModals.map(({ component: Component, modalProps, modalType, id, open, onCloseFocusRef }) => {
+    const onCloseAutoFocus = e => {
+      console.log('in onCloseAutoFocus');
+      if (onCloseFocusRef) {
+        console.log('focusing onCloseFocusRef', onCloseFocusRef.current);
+        e.preventDefault();
+        onCloseFocusRef.current.focus();
+      }
+    };
+    console.log('onCloseAutoFocus', onCloseAutoFocus);
+    if (modalType === 'CONFIRMATION') {
       return (
-        <AlertDialog key={id} open={true} onOpenChange={open => (!open ? hideModal() : null)}>
-          <AlertDialogContent className={modalProps.className}>
-            <Component {...modalProps} hideModal={hideModal} showModal={showModal} />
-          </AlertDialogContent>
-        </AlertDialog>
+        <ConfirmationModal
+          key={id}
+          open={open}
+          setOpen={open => (!open ? hideModal(id) : null)}
+          onCloseAutoFocus={onCloseAutoFocus}
+          {...modalProps}
+        />
       );
     }
     return (
-      <Dialog key={id} open={true} onOpenChange={open => (!open ? hideModal() : null)}>
-        <DialogContent className={modalProps.className}>
-          <Component {...modalProps} hideModal={hideModal} showModal={showModal} />
-        </DialogContent>
-      </Dialog>
+      <Component
+        key={id}
+        {...modalProps}
+        open={open}
+        setOpen={open => {
+          if (!open) {
+            hideModal(id);
+            modalProps.onClose?.();
+          }
+        }}
+        onCloseAutoFocus={onCloseAutoFocus}
+      />
     );
   });
 };
@@ -82,11 +132,15 @@ const ModalProvider = ({ children }: ModalProviderProps) => {
     // component: null,
     // modalProps: {},
     openModals: [],
-    showModal: (component, modalProps = {}, modalType = 'DIALOG') => {
-      dispatch({ type: 'openModal', component, modalProps, modalType });
+    showModal: (component, modalProps = {}, onCloseFocusRef) => {
+      dispatch({ type: 'openModal', component, modalProps, onCloseFocusRef });
     },
-    hideModal: () => {
-      dispatch({ type: 'hideModal' });
+    showConfirmationModal: (modalProps = {}, onCloseFocusRef) => {
+      console.log('showConfirmationModal');
+      dispatch({ type: 'openModal', modalProps, modalType: 'CONFIRMATION' });
+    },
+    hideModal: id => {
+      dispatch({ type: 'hideModal', id });
     },
   };
 

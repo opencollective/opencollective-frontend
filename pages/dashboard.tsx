@@ -28,6 +28,7 @@ import NotificationBar from '../components/NotificationBar';
 import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { TwoFactorAuthRequiredMessage } from '../components/TwoFactorAuthRequiredMessage';
+import { useModal } from '../components/ModalContext';
 
 const messages = defineMessages({
   collectiveIsArchived: {
@@ -126,6 +127,34 @@ const parseQuery = query => {
   };
 };
 
+const NestedModal = ({ message }) => {
+  return (
+    <div>
+      <div>this is a nested modal, with a message passed via props: {message}</div>
+    </div>
+  );
+};
+
+const BasicModal = ({ message }) => {
+  const { showModal, hideModal } = useModal();
+
+  return (
+    <div>
+      <div>this is a very basic modal, with a message passed via props: {message}</div>
+      <button
+        onClick={() =>
+          showModal(NestedModal, {
+            message: 'This message will be passed to the nested modal component',
+          })
+        }
+        className="h-20 bg-blue-500"
+      >
+        Show modal
+      </button>
+    </div>
+  );
+};
+
 const DashboardPage = () => {
   const intl = useIntl();
   const router = useRouter();
@@ -134,6 +163,7 @@ const DashboardPage = () => {
   const [lastWorkspaceVisit, setLastWorkspaceVisit] = useLocalStorage(LOCAL_STORAGE_KEYS.DASHBOARD_NAVIGATION_STATE, {
     slug: LoggedInUser?.collective.slug,
   });
+  const { showModal, hideModal } = useModal();
 
   const defaultSlug = lastWorkspaceVisit.slug || LoggedInUser?.collective.slug;
   const activeSlug = slug || defaultSlug;

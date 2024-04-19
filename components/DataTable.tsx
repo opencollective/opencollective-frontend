@@ -9,10 +9,22 @@ import {
   TableMeta,
   useReactTable,
 } from '@tanstack/react-table';
+import { MoreHorizontal, PanelRightOpen } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
+import { Button } from './ui/Button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from './ui/DropdownMenu';
 import { Skeleton } from './ui/Skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/Table';
+import { ActionType } from '../lib/actions/types';
+import { ActionsContextMenu } from './RowActionsMenu';
+import { Dialog, DialogContent, DialogTrigger } from './ui/Dialog';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -22,7 +34,7 @@ interface DataTableProps<TData, TValue> {
   hideHeader?: boolean;
   emptyMessage?: () => React.ReactNode;
   nbPlaceholders?: number;
-  onClickRow?: (row: Row<TData>) => void;
+  onClickRow?: (original: TData, actionsMenuTriggerRef?: React.RefObject<HTMLElement>) => void;
   onHoverRow?: (row: Row<TData>) => void;
   rowHasIndicator?: (row: Row<TData>) => boolean;
   className?: string;
@@ -114,39 +126,20 @@ export function DataTable<TData, TValue>({
             </TableRow>
           ))
         ) : table.getRowModel().rows?.length ? (
-          table.getRowModel().rows.map(row => (
-            <TableRow
-              key={row.id}
-              data-cy={getRowDataCy?.(row) || `datatable-row-${row.id}`}
-              data-state={row.getIsSelected() && 'selected'}
-              {...(onClickRow && {
-                onClick: () => onClickRow(row),
-                className: 'cursor-pointer',
-              })}
-              {...(onHoverRow && {
-                onMouseEnter: () => onHoverRow(row),
-                onMouseLeave: () => onHoverRow(null),
-              })}
-            >
-              {row.getVisibleCells().map(cell => {
-                const columnMeta = cell.column.columnDef.meta || {};
-                return (
-                  <TableCell
-                    key={cell.id}
-                    className={columnMeta['className']}
-                    fullWidth={tableProps.fullWidth}
-                    compact={compact}
-                    {...(rowHasIndicator && {
-                      withIndicator: true,
-                      'data-state': rowHasIndicator(row) && 'indicated',
-                    })}
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                );
-              })}
-            </TableRow>
-          ))
+          table
+            .getRowModel()
+            .rows.map(row => (
+              <DataTableRow
+                key={row.id}
+                row={row}
+                onClickRow={onClickRow}
+                getRowDataCy={getRowDataCy}
+                rowHasIndicator={rowHasIndicator}
+                tableProps={tableProps}
+                compact={compact}
+                onHoverRow={onHoverRow}
+              />
+            ))
         ) : (
           <TableRow highlightOnHover={false}>
             <TableCell colSpan={columns.length} compact={compact}>
@@ -168,3 +161,66 @@ export function DataTable<TData, TValue>({
     </Table>
   );
 }
+
+function DataTableRow({ row, onClickRow, getRowDataCy, rowHasIndicator, tableProps, compact, onHoverRow }) {
+  // Reference that can be picked up by the actions column, to enable returning focus when closing a drawer or modal opened from actions menu
+  const actionsMenuTriggerRef = React.useRef(null);
+  return (
+    <TableRow
+      data-cy={getRowDataCy?.(row) || `datatable-row-${row.id}`}
+      data-state={row.getIsSelected() && 'selected'}
+      {...(onClickRow && {
+        onClick: () => onClickRow(row.original, actionsMenuTriggerRef),
+        className: 'cursor-pointer',
+      })}
+      {...(onHoverRow && {
+        onMouseEnter: () => onHoverRow(row),
+        onMouseLeave: () => onHoverRow(null),
+      })}
+    >
+      {row.getVisibleCells().map(cell => {
+        const columnMeta = cell.column.columnDef.meta || {};
+        return (
+          <TableCell
+            key={cell.id}
+            className={columnMeta['className']}
+            fullWidth={tableProps.fullWidth}
+            compact={compact}
+            {...(rowHasIndicator && {
+              withIndicator: true,
+              'data-state': rowHasIndicator(row) && 'indicated',
+            })}
+          >
+            {flexRender(cell.column.columnDef.cell, {
+              ...cell.getContext(),
+              actionsMenuTriggerRef,
+              // ...(cell.column.id === 'actions' ? actionsMenuTriggerRef : {}),
+            })}
+          </TableCell>
+        );
+      })}
+    </TableRow>
+  );
+}
+
+export const contextColumn = {
+  accessorKey: 'context',
+  header: null,
+  meta: { className: 'w-16' },
+  enableHiding: false,
+  cell: ({ table, row }) => {
+    const value = row.original;
+    const { onClickRow, getActions } = table.options.meta;
+    if (!getActions) {
+      return null;
+    }
+    const actions = getActions(value);
+
+    return (
+      // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+      <div onClick={e => e.stopPropagation()} className="flex items-center justify-end">
+        <ActionsContextMenu actions={actions} openDetails={() => onClickRow(value)} />
+      </div>
+    );
+  },
+};
