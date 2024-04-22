@@ -211,8 +211,8 @@ class SearchPage extends React.Component {
 
   changeTags = tag => {
     const { router, term } = this.props;
-    let tags = router.query?.tag?.split(',');
-    if (!tags || router.query?.tag?.length === 0) {
+    let tags = router.query.tag?.split(',');
+    if (!tags || router.query.tag?.length === 0) {
       tags = [tag];
     } else if (tags.includes(tag)) {
       tags = tags.filter(value => value !== tag);
@@ -562,7 +562,7 @@ const searchPageQuery = gql`
     $type: [AccountType]
     $country: [CountryISO]
     $tag: [String]
-    $sortBy: OrderByInput
+    $sortBy: AccountOrderByInput
     $isHost: Boolean
     $limit: Int
     $offset: Int
