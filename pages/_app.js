@@ -46,6 +46,7 @@ import GlobalNewsAndUpdates from '../components/GlobalNewsAndUpdates';
 import IntlProvider from '../components/intl/IntlProvider';
 import NewsAndUpdatesProvider from '../components/NewsAndUpdatesProvider';
 import { TooltipProvider } from '../components/ui/Tooltip';
+import { ModalProvider } from '../components/ModalContext';
 
 PolyfillInterweaveSSR();
 
@@ -135,16 +136,18 @@ class OpenCollectiveFrontendApp extends App {
           <ThemeProvider theme={theme}>
             <StripeProviderSSR>
               <IntlProvider locale={locale}>
-                <TooltipProvider delayDuration={500} skipDelayDuration={100}>
-                  <UserProvider>
-                    <NewsAndUpdatesProvider>
-                      <Component {...pageProps} />
-                      <Toaster />
-                      <GlobalNewsAndUpdates />
-                      <TwoFactorAuthenticationModal />
-                    </NewsAndUpdatesProvider>
-                  </UserProvider>
-                </TooltipProvider>
+                <ModalProvider>
+                  <TooltipProvider delayDuration={500} skipDelayDuration={100}>
+                    <UserProvider>
+                      <NewsAndUpdatesProvider>
+                        <Component {...pageProps} />
+                        <Toaster />
+                        <GlobalNewsAndUpdates />
+                        <TwoFactorAuthenticationModal />
+                      </NewsAndUpdatesProvider>
+                    </UserProvider>
+                  </TooltipProvider>
+                </ModalProvider>
               </IntlProvider>
             </StripeProviderSSR>
           </ThemeProvider>
