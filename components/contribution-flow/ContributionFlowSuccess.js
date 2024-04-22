@@ -12,6 +12,7 @@ import styled from 'styled-components';
 
 import { AnalyticsEvent } from '../../lib/analytics/events';
 import { track } from '../../lib/analytics/plausible';
+import { getTwitterHandleFromCollective } from '../../lib/collective';
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { formatCurrency } from '../../lib/currency-utils';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
@@ -282,6 +283,7 @@ class ContributionFlowSuccess extends React.Component {
       );
     }
 
+    const toAccountTwitterHandle = getTwitterHandleFromCollective(order?.toAccount);
     return (
       <React.Fragment>
         {!isEmbed && isProcessing && (
@@ -384,7 +386,10 @@ class ContributionFlowSuccess extends React.Component {
                         url: shareURL,
                         text: intl.formatMessage(
                           order.toAccount.type === 'EVENT' ? successMsgs.event : successMsgs.default,
-                          { collective: order.toAccount.name, event: order.toAccount.name },
+                          {
+                            collective: toAccountTwitterHandle ? `@${toAccountTwitterHandle}` : order.toAccount.name,
+                            event: order.toAccount.name,
+                          },
                         ),
                       })}
                     >
