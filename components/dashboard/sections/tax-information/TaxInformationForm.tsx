@@ -3,7 +3,7 @@ import { gql, useMutation } from '@apollo/client';
 import { Form, FormikProps } from 'formik';
 import { isEmpty, isNil, omit, omitBy, pick, remove } from 'lodash';
 import { FileText } from 'lucide-react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { mergeName } from '../../../../lib/collective';
@@ -79,6 +79,11 @@ const FORM_CONFIG = {
   hintPosition: 'above',
 } as const;
 
+/**
+ * This Form is not internationalized on purpose, because:
+ * 1. It's meant to interact with a US government form, which is in English.
+ * 2. The IRS requires us to use the exact wording they provide, we can't guarantee that (community based) translations are accurate.
+ */
 export const TaxInformationForm = ({ account, setFormDirty }) => {
   const intl = useIntl();
   const { toast } = useToast();
@@ -114,15 +119,12 @@ export const TaxInformationForm = ({ account, setFormDirty }) => {
 
           toast({
             variant: 'success',
-            message: intl.formatMessage({
-              defaultMessage: 'Your tax form has been submitted successfully',
-              id: '1aZaiR',
-            }),
+            message: 'Your tax form has been submitted successfully',
           });
         } catch (e) {
           toast({
             variant: 'error',
-            title: intl.formatMessage({ defaultMessage: 'Submission failed', id: 'vc0KiO' }),
+            title: 'Submission failed',
             message: i18nGraphqlException(intl, e),
           });
         }
@@ -165,12 +167,10 @@ export const TaxInformationForm = ({ account, setFormDirty }) => {
                       <div className="mt-6 flex flex-col gap-y-4">
                         <StyledInputFormikField
                           name="email"
-                          label={<FormattedMessage id="Email" defaultMessage="Email" />}
-                          hint={intl.formatMessage({
-                            defaultMessage:
-                              'The email address of the person who will sign the form. A copy of the form will be sent to this email address.',
-                            id: 'F8QPOI',
-                          })}
+                          label="Email"
+                          hint={
+                            'The email address of the person who will sign the form. A copy of the form will be sent to this email address.'
+                          }
                         />
                         <form.component formik={formik} />
                         <div className="mt-5">
@@ -186,10 +186,9 @@ export const TaxInformationForm = ({ account, setFormDirty }) => {
                             )}
                           </StyledInputFormikField>
                           <p className="mb-4 mt-3 text-sm text-neutral-700">
-                            <FormattedMessage
-                              defaultMessage='I agree to be legally bound by the document, and agree to the Open Collective Terms and Privacy Policy. Click on "I agree" to sign this document.'
-                              id="UY1nDu"
-                            />
+                            {
+                              'I agree to be legally bound by the document, and agree to the Open Collective Terms and Privacy Policy. Click on "I agree" to sign this document.'
+                            }
                           </p>
                           <div className="mt-12 flex flex-wrap gap-4 text-nowrap">
                             <Button
@@ -201,10 +200,10 @@ export const TaxInformationForm = ({ account, setFormDirty }) => {
                               disabled={formik.isSubmitting}
                             >
                               <FileText className="mr-2 inline-block" size={16} />
-                              <FormattedMessage defaultMessage="Preview Document" id="PMhCU4" />
+                              Preview Document
                             </Button>
                             <Button className="flex-1" size="lg" type="submit" loading={formik.isSubmitting}>
-                              <FormattedMessage id="submit" defaultMessage="Submit" />
+                              Submit
                             </Button>
                           </div>
                         </div>

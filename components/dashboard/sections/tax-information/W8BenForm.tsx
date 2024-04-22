@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormikProps } from 'formik';
 import { merge, pick } from 'lodash';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { splitName } from '../../../../lib/collective';
@@ -101,37 +101,16 @@ export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFor
   return (
     <div className="flex flex-col gap-y-4">
       <div className="mt-2">
-        <p className="text-lg font-bold">
-          <FormattedMessage defaultMessage="Full name of the beneficial owner" id="5Ti6KA" />
-        </p>
-        <HintText>
-          <FormattedMessage
-            defaultMessage="The beneficial owner is the person ultimately paid, not an intermediary."
-            id="vkl1Ej"
-          />
-        </HintText>
+        <p className="text-lg font-bold">Full name of the beneficial owner</p>
+        <HintText>The beneficial owner is the person ultimately paid, not an intermediary.</HintText>
       </div>
-      <StyledInputFormikField
-        name="beneficialOwner.firstName"
-        label={intl.formatMessage({ defaultMessage: 'First Name', id: 'Q6wcZ5' })}
-      />
-      <StyledInputFormikField
-        name="beneficialOwner.middleName"
-        label={intl.formatMessage({ defaultMessage: 'Middle Name', id: '9BrST0' })}
-      />
-      <StyledInputFormikField
-        name="beneficialOwner.lastName"
-        label={intl.formatMessage({ defaultMessage: 'Last Name', id: 'aheQdn' })}
-      />
+      <StyledInputFormikField name="beneficialOwner.firstName" First Name />
+      <StyledInputFormikField name="beneficialOwner.middleName" label="Middle Name" />
+      <StyledInputFormikField name="beneficialOwner.lastName" label="Last Name" />
       <div className="mt-2">
-        <p className="text-lg font-bold">
-          <FormattedMessage id="collective.address.label" defaultMessage="Address" />
-        </p>
+        <p className="text-lg font-bold">Address</p>
       </div>
-      <StyledInputFormikField
-        name="countryOfCitizenship"
-        label={<FormattedMessage defaultMessage="Country of citizenship" id="DufF8V" />}
-      >
+      <StyledInputFormikField name="countryOfCitizenship" label="Country of citizenship">
         {({ field }) => (
           <InputTypeCountry
             inputId={field.id}
@@ -143,11 +122,7 @@ export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFor
           />
         )}
       </StyledInputFormikField>
-      <StyledInputFormikField
-        name="residenceAddress"
-        label={<FormattedMessage defaultMessage="Permanent residence address" id="kPE2n3" />}
-        showError={false}
-      >
+      <StyledInputFormikField name="residenceAddress" label="Permanent residence address" showError={false}>
         {({ field, meta }) => (
           <StyledInputLocation
             name={field.name}
@@ -160,11 +135,7 @@ export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFor
           />
         )}
       </StyledInputFormikField>
-      <StyledInputFormikField
-        name="mailingAddress"
-        label={<FormattedMessage defaultMessage="Mailing address (if different from above)" id="9UGIQz" />}
-        showError={false}
-      >
+      <StyledInputFormikField name="mailingAddress" label="Mailing address (if different from above)" showError={false}>
         {({ field, meta }) => (
           <StyledInputLocation
             name={field.name}
@@ -180,24 +151,19 @@ export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFor
       <StyledInputFormikField
         inputType="date"
         name="dateOfBirth"
-        label={<FormattedMessage defaultMessage="Date of birth" id="GFTdXw" />}
+        label="Date of birth"
         max={dayjs().format('YYYY-MM-DD')}
       />
       <div className="mt-2">
-        <p className="text-lg font-bold">
-          <FormattedMessage defaultMessage="Taxpayer Identification Number (TIN)" id="UKedhg" />
-        </p>
+        <p className="text-lg font-bold">Taxpayer Identification Number (TIN)</p>
       </div>
 
       <StyledInputFormikField
         name="taxpayerIdentificationNumberForeign"
-        label={<FormattedMessage defaultMessage="Non-U.S. tax ID number" id="edVE6y" />}
-        placeholder={intl.formatMessage({ defaultMessage: 'The one you use in your country', id: 'hP6sfR' })}
+        label="Non-U.S. tax ID number"
+        placeholder="The one you use in your country"
       />
-      <StyledInputFormikField
-        name="taxpayerIdentificationNumberTypeUS"
-        label={<FormattedMessage defaultMessage="US Tax ID number type" id="bX2VYs" />}
-      >
+      <StyledInputFormikField name="taxpayerIdentificationNumberTypeUS" label="US Tax ID number type">
         {({ field }) => (
           <ButtonSet
             selected={field.value}
@@ -216,13 +182,7 @@ export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFor
       {values.taxpayerIdentificationNumberTypeUS && (
         <StyledInputFormikField
           name="taxpayerIdentificationNumberUS"
-          label={
-            <FormattedMessage
-              defaultMessage="{tax} ID number"
-              id="eZpz5v"
-              values={{ tax: values.taxpayerIdentificationNumberTypeUS }}
-            />
-          }
+          label={`${values.taxpayerIdentificationNumberTypeUS} ID number`}
         >
           {({ field }) => (
             <StyledInput
@@ -248,15 +208,11 @@ export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFor
         </StyledInputFormikField>
       )}
       <div className="mt-2">
-        <p className="text-lg font-bold">
-          <FormattedMessage defaultMessage="Tax treaty benefits" id="ezCCHB" />
-        </p>
+        <p className="text-lg font-bold">Tax treaty benefits</p>
       </div>
       <StyledInputFormikField
         name="claimsSpecialRatesAndConditions"
-        label={
-          <FormattedMessage defaultMessage="Do you claim tax treaty benefits for chapter 3 purposes?" id="c0Nerg" />
-        }
+        label="Do you claim tax treaty benefits for chapter 3 purposes?"
       >
         {({ field }) => (
           <ButtonSet
@@ -269,8 +225,8 @@ export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFor
               }
             }}
             options={[
-              { label: <FormattedMessage defaultMessage="Yes" id="a5msuh" />, value: true },
-              { label: <FormattedMessage defaultMessage="No" id="oUWADl" />, value: false },
+              { label: 'Yes', value: true },
+              { label: 'No', value: false },
             ]}
           />
         )}
@@ -288,15 +244,13 @@ export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFor
                   disabled={!values.countryOfCitizenship}
                 />
                 <div className="inline align-text-bottom">
-                  <FormattedMessage
-                    defaultMessage="Within the meaning of the income tax treaty between the United States and this country, I certify that the beneficial owner is a resident of the country defined above"
-                    id="6F8a3v"
-                  />
+                  Within the meaning of the income tax treaty between the United States and this country, I certify that
+                  the beneficial owner is a resident of the country defined above
                   <span className="italic">
                     {' ('}
                     {values.countryOfCitizenship
                       ? i18nCountryName(intl, values.countryOfCitizenship)
-                      : intl.formatMessage({ defaultMessage: 'please select one', id: 'FVfO+d' })}
+                      : 'please select one'}
                     {').'}
                   </span>
                 </div>
@@ -305,12 +259,7 @@ export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFor
           </StyledInputFormikField>
           <StyledInputFormikField
             name="hasTaxTreatySpecialRatesAndConditions"
-            label={
-              <FormattedMessage
-                defaultMessage="For tax treaty benefits (chapter 3), do special rates and conditions apply?"
-                id="1rVRaB"
-              />
-            }
+            label="For tax treaty benefits (chapter 3), do special rates and conditions apply?"
           >
             {({ field }) => (
               <ButtonSet
@@ -318,23 +267,16 @@ export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFor
                 error={field.error}
                 onChange={value => setFieldValue(field.name, value)}
                 options={[
-                  { label: <FormattedMessage defaultMessage="Yes" id="a5msuh" />, value: true },
-                  { label: <FormattedMessage defaultMessage="No" id="oUWADl" />, value: false },
+                  { label: 'Yes', value: true },
+                  { label: 'No', value: false },
                 ]}
               />
             )}
           </StyledInputFormikField>
           {values.hasTaxTreatySpecialRatesAndConditions && (
             <React.Fragment>
-              <StyledInputFormikField
-                name="claimsArticleAndParagraph"
-                label={<FormattedMessage defaultMessage="Article and paragraph" id="g5m2pl" />}
-              />
-              <StyledInputFormikField
-                inputType="number"
-                name="claimsRate"
-                label={<FormattedMessage defaultMessage="Rate" id="c0b5XV" />}
-              >
+              <StyledInputFormikField name="claimsArticleAndParagraph" label="Article and paragraph" />
+              <StyledInputFormikField inputType="number" name="claimsRate" label="Rate">
                 {({ field }) => (
                   <StyledInputPercentage
                     {...field}
@@ -343,36 +285,25 @@ export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFor
                   />
                 )}
               </StyledInputFormikField>
-              <StyledInputFormikField
-                name="claimsIncomeType"
-                label={<FormattedMessage defaultMessage="Type of income" id="1T23UJ" />}
-              />
-              <StyledInputFormikField
-                name="claimsExplanation"
-                label={<FormattedMessage defaultMessage="Explanation" id="E1bF/X" />}
-              />
+              <StyledInputFormikField name="claimsIncomeType" label="Type of income" />
+              <StyledInputFormikField name="claimsExplanation" label="Explanation" />
             </React.Fragment>
           )}
         </React.Fragment>
       )}
 
       <div className="mt-2">
-        <p className="text-lg font-bold">
-          <FormattedMessage defaultMessage="Signature" id="nQkv1D" />
-        </p>
+        <p className="text-lg font-bold">Signature</p>
       </div>
-      <StyledInputFormikField
-        name="isSignerTheBeneficialOwner"
-        label={<FormattedMessage defaultMessage="Is signer the beneficial owner?" id="C0z1ZX" />}
-      >
+      <StyledInputFormikField name="isSignerTheBeneficialOwner" label="Is signer the beneficial owner?">
         {({ field }) => (
           <ButtonSet
             selected={values.isSignerTheBeneficialOwner}
             error={field.error}
             onChange={value => setFieldValue(field.name, value)}
             options={[
-              { label: <FormattedMessage defaultMessage="Yes" id="a5msuh" />, value: true },
-              { label: <FormattedMessage defaultMessage="No" id="oUWADl" />, value: false },
+              { label: 'Yes', value: true },
+              { label: 'No', value: false },
             ]}
           />
         )}
@@ -381,25 +312,11 @@ export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFor
         <React.Fragment>
           <StyledInputFormikField
             name="signerCapacity"
-            label={
-              <FormattedMessage
-                defaultMessage="If the signer is not the beneficial owner, in what capacity are they acting?"
-                id="LCINly"
-              />
-            }
+            label="If the signer is not the beneficial owner, in what capacity are they acting?"
           />
-          <StyledInputFormikField
-            name="signer.firstName"
-            label={intl.formatMessage({ defaultMessage: 'First Name', id: 'Q6wcZ5' })}
-          />
-          <StyledInputFormikField
-            name="signer.middleName"
-            label={intl.formatMessage({ defaultMessage: 'Middle Name', id: '9BrST0' })}
-          />
-          <StyledInputFormikField
-            name="signer.lastName"
-            label={intl.formatMessage({ defaultMessage: 'Last Name', id: 'aheQdn' })}
-          />
+          <StyledInputFormikField name="signer.firstName" label="First Name" />
+          <StyledInputFormikField name="signer.middleName" label="Middle Name" />
+          <StyledInputFormikField name="signer.lastName" label="Last Name" />
         </React.Fragment>
       )}
 
@@ -413,10 +330,21 @@ export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFor
               onCheckedChange={checked => formik.setFieldValue(field.name, checked === true)}
             />
             <div className="inline align-text-bottom">
-              <FormattedMessage
-                defaultMessage="Under penalties of perjury, I declare that I have examined the information on this form and to the best of my knowledge and belief it is true, correct, and complete. I further certify under penalties of perjury that: I am the individual that is the beneficial owner (or am authorized to sign for the individual that is the beneficial owner) of all the income to which this form relates or am using this form to document myself for chapter 4 purposes; The person named on this form is not a U.S. person; The income to which this form relates is: (a) not effectively connected with the conduct of a trade or business in the United States, (b) effectively connected but is not subject to tax under an applicable income tax treaty, or (c) the partner’s share of a partnership's effectively connected income; The person named on this form is a resident of the treaty country listed (if any) within the meaning of the income tax treaty between the United States and that country; and for broker transactions or barter exchanges, the beneficial owner is an exempt foreign person as defined in the instructions. Furthermore, I authorize this form to be provided to any withholding agent that has control, receipt, or custody of the income of which I am the beneficial owner or any withholding agent that can disburse or make payments of the income of which I am the beneficial owner. I agree that I will submit a new form within 30 days if any certification made on this form becomes incorrect."
-                id="TpH5rD"
-              />
+              {`Under penalties of perjury, I declare that I have examined the information on this form and to the best of
+              my knowledge and belief it is true, correct, and complete. I further certify under penalties of perjury
+              that: I am the individual that is the beneficial owner (or am authorized to sign for the individual that
+              is the beneficial owner) of all the income to which this form relates or am using this form to document
+              myself for chapter 4 purposes; The person named on this form is not a U.S. person; The income to which
+              this form relates is: (a) not effectively connected with the conduct of a trade or business in the United
+              States, (b) effectively connected but is not subject to tax under an applicable income tax treaty, or (c)
+              the partner’s share of a partnership's effectively connected income; The person named on this form is a
+              resident of the treaty country listed (if any) within the meaning of the income tax treaty between the
+              United States and that country; and for broker transactions or barter exchanges, the beneficial owner is
+              an exempt foreign person as defined in the instructions. Furthermore, I authorize this form to be provided
+              to any withholding agent that has control, receipt, or custody of the income of which I am the beneficial
+              owner or any withholding agent that can disburse or make payments of the income of which I am the
+              beneficial owner. I agree that I will submit a new form within 30 days if any certification made on this
+              form becomes incorrect.`}
             </div>
           </label>
         )}
