@@ -562,7 +562,7 @@ const searchPageQuery = gql`
     $type: [AccountType]
     $country: [CountryISO]
     $tag: [String]
-    $sortBy: AccountOrderByInput
+    $sortBy: OrderByInput
     $isHost: Boolean
     $limit: Int
     $offset: Int

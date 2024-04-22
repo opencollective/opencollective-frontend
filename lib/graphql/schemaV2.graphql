@@ -309,7 +309,7 @@ interface Account {
     Specific account to query the membership of.
     """
     account: AccountReferenceInput
-    orderBy: MemberOrderByInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
 
     """
     Order the query by requested role order
@@ -1935,7 +1935,7 @@ type Host implements Account & AccountWithContributions {
     """
     Order of the results
     """
-    orderBy: MemberOrderByInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
 
     """
     Order the query by requested role order
@@ -2910,7 +2910,7 @@ type Host implements Account & AccountWithContributions {
     """
     Order of the results
     """
-    orderBy: AccountOrderByInput
+    orderBy: OrderByInput
 
     """
     Filter by the balance of the account
@@ -3215,13 +3215,13 @@ enum HostFeeStructure {
 }
 
 """
-Input to order Member collection
+Input to order collection
 """
-input MemberOrderByInput {
+input OrderByInput {
   """
   Field to order by.
   """
-  field: MemberOrderByFieldType!
+  field: OrderByFieldType!
 
   """
   Ordering direction.
@@ -3230,12 +3230,22 @@ input MemberOrderByInput {
 }
 
 """
-Possible fields you can use to order members by
+Possible fields you can use to order by
 """
-enum MemberOrderByFieldType {
+enum OrderByFieldType {
   CREATED_AT
+
+  """
+  The financial activity of the collective (number of transactions)
+  """
+  ACTIVITY
+  HOST_RANK
+  HOSTED_COLLECTIVES_COUNT
+  RANK
+  BALANCE
   MEMBER_COUNT
   TOTAL_CONTRIBUTED
+  NAME
 }
 
 """
@@ -6220,36 +6230,6 @@ type VendorCollection implements Collection {
 }
 
 """
-Input to order Account collection
-"""
-input AccountOrderByInput {
-  """
-  Field to order by.
-  """
-  field: AccountOrderByFieldType!
-
-  """
-  Ordering direction.
-  """
-  direction: OrderDirection!
-}
-
-"""
-Possible fields you can use to order accounts by
-"""
-enum AccountOrderByFieldType {
-  CREATED_AT
-
-  """
-  The financial activity of the collective (number of transactions)
-  """
-  ACTIVITY
-  RANK
-  BALANCE
-  NAME
-}
-
-"""
 Input type for an amount range with the value and currency
 """
 input AmountRangeInput {
@@ -6985,7 +6965,7 @@ type Bot implements Account {
     """
     Order of the results
     """
-    orderBy: MemberOrderByInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
 
     """
     Order the query by requested role order
@@ -7725,7 +7705,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     Order of the results
     """
-    orderBy: MemberOrderByInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
 
     """
     Order the query by requested role order
@@ -8906,7 +8886,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     Order of the results
     """
-    orderBy: MemberOrderByInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
 
     """
     Order the query by requested role order
@@ -9876,7 +9856,7 @@ type Individual implements Account {
     """
     Order of the results
     """
-    orderBy: MemberOrderByInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
 
     """
     Order the query by requested role order
@@ -10822,7 +10802,7 @@ type Organization implements Account & AccountWithContributions {
     """
     Order of the results
     """
-    orderBy: MemberOrderByInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
 
     """
     Order the query by requested role order
@@ -11662,7 +11642,7 @@ type Vendor implements Account & AccountWithContributions {
     """
     Order of the results
     """
-    orderBy: MemberOrderByInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
 
     """
     Order the query by requested role order
@@ -12489,7 +12469,7 @@ type Query {
     """
     The order of results. Defaults to [RANK, DESC] (or [CREATED_AT, DESC] if `supportedPaymentMethodService` is provided)
     """
-    orderBy: AccountOrderByInput
+    orderBy: OrderByInput
 
     """
     Include vendors for this host
@@ -14948,7 +14928,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     Order of the results
     """
-    orderBy: MemberOrderByInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
 
     """
     Order the query by requested role order
@@ -15796,7 +15776,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     Order of the results
     """
-    orderBy: MemberOrderByInput! = { field: CREATED_AT, direction: DESC }
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
 
     """
     Order the query by requested role order

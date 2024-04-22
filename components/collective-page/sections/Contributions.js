@@ -201,7 +201,7 @@ const contributionsSectionQuery = gql`
     $offset: Int
     $role: [MemberRole]
     $accountType: [AccountType]
-    $orderBy: MemberOrderByInput
+    $orderBy: OrderByInput
   ) {
     account(slug: $slug) {
       id

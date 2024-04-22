@@ -23,7 +23,7 @@ const accountQuery = gql`
 `;
 
 const hostedAccountFilterSearchQuery = gql`
-  query HostedAccountFilterSearch($searchTerm: String, $hostSlug: String, $orderBy: AccountOrderByInput) {
+  query HostedAccountFilterSearch($searchTerm: String, $hostSlug: String, $orderBy: OrderByInput) {
     accounts(searchTerm: $searchTerm, host: { slug: $hostSlug }, orderBy: $orderBy) {
       nodes {
         id
