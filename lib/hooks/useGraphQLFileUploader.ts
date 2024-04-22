@@ -1,5 +1,6 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
+import { Accept, FileRejection } from 'react-dropzone';
 import { useIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
@@ -9,6 +10,8 @@ import { canUseMockImageUpload, mockImageUpload } from '../api';
 import { i18nGraphqlException } from '../errors';
 import { API_V2_CONTEXT, gql } from '../graphql/helpers';
 import { UploadedFileKind, UploadFileResult } from '../graphql/types/v2/graphql';
+
+import { getMessageForRejectedDropzoneFiles } from './useImageUploader';
 
 const uploadFileMutation = gql`
   mutation UploadFile($files: [UploadFileInput!]!) {
@@ -59,6 +62,9 @@ type useGraphQLFileUploaderProps = {
   onReject?: (message: string | string[]) => void;
   mockImageGenerator?: () => string;
   isMulti?: boolean;
+  accept?: Accept;
+  minSize?: number;
+  maxSize?: number;
 };
 
 export const useGraphQLFileUploader = ({
@@ -66,6 +72,9 @@ export const useGraphQLFileUploader = ({
   onReject = undefined,
   mockImageGenerator = undefined,
   isMulti = true,
+  accept = undefined,
+  minSize = undefined,
+  maxSize = undefined,
 }: useGraphQLFileUploaderProps) => {
   const [isUploading, setIsUploading] = React.useState(false);
   const [callUploadFile] = useMutation(uploadFileMutation, { context: API_V2_CONTEXT });
@@ -87,7 +96,12 @@ export const useGraphQLFileUploader = ({
   return {
     isUploading,
     uploadFile: React.useCallback(
-      async (input: UploadFileInput | UploadFileInput[]) => {
+      async (input: UploadFileInput | UploadFileInput[], rejections: FileRejection[] = []) => {
+        if (rejections?.length > 0) {
+          reportErrorMessage(getMessageForRejectedDropzoneFiles(intl, rejections, accept, { minSize, maxSize }));
+          return;
+        }
+
         const allInputs = Array.isArray(input) ? input : [input];
         if (allInputs.length === 0) {
           return;
