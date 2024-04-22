@@ -12,7 +12,7 @@ const SearchModal = ({ open, setOpen }) => {
   const onClose = () => setOpen(false);
   return (
     <Dialog open={open} onOpenChange={open => setOpen(open)}>
-      <DialogContent className="overflow-hidden px-0 py-12 sm:rounded-full sm:py-0 sm:pr-8">
+      <DialogContent className="overflow-hidden px-0 py-12 sm:rounded-full sm:py-0 sm:pr-8" hideCloseButton>
         <SearchForm
           autoFocus
           borderColor="transparent"
