@@ -117,13 +117,16 @@ const StyledDropzone = ({
 }: StyledDropzoneProps) => {
   const { toast } = useToast();
   const intl = useIntl();
-  const imgUploaderParams = { isMulti, mockImageGenerator, onSuccess, onReject, kind, accept };
+  const imgUploaderParams = { isMulti, mockImageGenerator, onSuccess, onReject, kind, accept, minSize, maxSize };
   const { uploadFiles, isUploading, uploadProgress } = useImageUploader(imgUploaderParams);
   const { isUploading: isUploadingWithGraphQL, uploadFile: uploadFileWithGraphQL } = useGraphQLFileUploader({
     mockImageGenerator,
     onSuccess: onGraphQLSuccess,
     onReject,
     isMulti,
+    accept,
+    minSize,
+    maxSize,
   });
 
   // Sanity checks
@@ -153,7 +156,10 @@ const StyledDropzone = ({
       if (collectFilesOnly) {
         onSuccess?.(acceptedFiles, fileRejections);
       } else if (useGraphQL) {
-        uploadFileWithGraphQL(acceptedFiles.map(file => ({ file, kind, parseDocument, parsingOptions })));
+        uploadFileWithGraphQL(
+          acceptedFiles.map(file => ({ file, kind, parseDocument, parsingOptions })),
+          fileRejections,
+        );
       } else {
         uploadFiles(acceptedFiles, fileRejections);
       }
@@ -298,9 +304,9 @@ type StyledDropzoneProps = {
   mockImageGenerator?: () => string;
   /** Filetypes to accept */
   accept: Accept;
-  /** Min file size */
+  /** Min file size, in bytes */
   minSize: number;
-  /** Max file size */
+  /** Max file size, in bytes */
   maxSize: number;
   /** A truthy/falsy value defining if the field has an error (ie. if it's required) */
   error?: any;
