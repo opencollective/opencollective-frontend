@@ -1,5 +1,5 @@
 import React from 'react';
-import { forEach, isEmpty, isNil, isUndefined, omitBy } from 'lodash';
+import { forEach, isEmpty, isNil, isUndefined, omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -154,12 +154,12 @@ export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape, any,
   );
 
   const setFilter = React.useCallback(
-    (filterName, filterValue) => resetFilters({ ...values, [filterName]: filterValue }),
+    (filterName, filterValue) => resetFilters({ ...omit(values, 'offset'), [filterName]: filterValue }),
     [values, resetFilters],
   );
 
   const setFilters = React.useCallback(
-    (newFilters, newPath) => resetFilters({ ...values, ...newFilters }, newPath),
+    (newFilters, newPath) => resetFilters({ ...omit(values, 'offset'), ...newFilters }, newPath),
     [values, resetFilters],
   );
 
