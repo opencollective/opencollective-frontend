@@ -10,7 +10,6 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { AccountTypesWithHost, CollectiveType, defaultBackgroundImage } from '../../lib/constants/collectives';
 import { Currency } from '../../lib/constants/currency';
-import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { TierTypes } from '../../lib/constants/tiers-types';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
 import { convertDateFromApiUtc, convertDateToApiUtc } from '../../lib/date-utils';
@@ -26,7 +25,6 @@ import { Box, Flex } from '../Grid';
 import { I18nSupportLink } from '../I18nFormatters';
 import InputField from '../InputField';
 import Link from '../Link';
-import OrdersWithData from '../orders/OrdersWithData';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 
@@ -53,7 +51,6 @@ import SendingMoney from './sections/SendingMoney';
 import Tickets from './sections/Tickets';
 import Tiers from './sections/Tiers';
 import UserSecurity from './sections/UserSecurity';
-import VirtualCards from './sections/virtual-cards/VirtualCards';
 import Webhooks from './sections/Webhooks';
 // Other Components
 import EditUserEmailForm from './EditUserEmailForm';
@@ -422,9 +419,6 @@ class EditCollectiveForm extends React.Component {
       case ALL_SECTIONS.CONNECTED_ACCOUNTS:
         return <ConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />;
 
-      case ALL_SECTIONS.EXPENSES:
-        return null;
-
       case ALL_SECTIONS.EXPORT:
         return <Export collective={collective} />;
 
@@ -522,16 +516,6 @@ class EditCollectiveForm extends React.Component {
       case ALL_SECTIONS.RECEIVING_MONEY:
         return <ReceivingMoney collective={collective} />;
 
-      case ALL_SECTIONS.PENDING_ORDERS:
-        return (
-          <OrdersWithData
-            accountSlug={collective.slug}
-            status={ORDER_STATUS.PENDING}
-            title={<FormattedMessage id="PendingBankTransfers" defaultMessage="Pending bank transfers" />}
-            showPlatformTip
-          />
-        );
-
       case ALL_SECTIONS.SENDING_MONEY:
         return <SendingMoney collective={collective} />;
 
@@ -556,9 +540,6 @@ class EditCollectiveForm extends React.Component {
 
       case ALL_SECTIONS.HOST_VIRTUAL_CARDS_SETTINGS:
         return <HostVirtualCardsSettings collective={collective} />;
-
-      case ALL_SECTIONS.VIRTUAL_CARDS:
-        return <VirtualCards collective={collective} accountSlug={collective.slug} />;
 
       default:
         return null;

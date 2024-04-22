@@ -2736,7 +2736,6 @@
   "PendingApplication.RepoInfo.OrgAccount": "Konto organizacji",
   "PendingApplication.RepoInfo.PersonalAccount": "Konto osobiste",
   "PendingApplication.RepoInfo.StarsCount": "{count} gwiazdek",
-  "PendingBankTransfers": "Oczekujące przelewy bankowe",
   "PendingContributionSummary": "{status, select, PENDING {Wkład oczekujący} other {Wkład}} do {account}",
   "PEp9t9": "Expected Total Amount",
   "Period": "Okres",
