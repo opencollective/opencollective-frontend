@@ -1,24 +1,12 @@
 import React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { groupBy, isNil, mapValues, toPairs } from 'lodash';
-import {
-  Banknote,
-  Eye,
-  FilePlus2,
-  Mail,
-  MoreHorizontal,
-  Pause,
-  Play,
-  Snowflake,
-  SquareSigma,
-  Unlink,
-} from 'lucide-react';
+import { Banknote, Eye, FilePlus2, Mail, MoreHorizontal, Pause, Play, SquareSigma, Unlink } from 'lucide-react';
 import { FormattedDate, FormattedMessage, IntlShape } from 'react-intl';
 
 import { HOST_FEE_STRUCTURE } from '../../../../lib/constants/host-fee-structure';
 import type { AccountWithHost, HostedCollectiveFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
-import { cn } from '../../../../lib/utils';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import AddAgreementModal from '../../../agreements/AddAgreementModal';
@@ -73,11 +61,11 @@ export const cols: Record<string, ColumnDef<any, any>> = {
         <div className="flex items-center">
           <Avatar collective={collective} className="mr-4" radius={48} />
           {collective.isFrozen && (
-            <div className="mr-2 rounded-full bg-white/90 p-[3px] shadow-md">
-              <Snowflake className="text-blue-500" size="20" />
-            </div>
+            <Badge type="info" size="xs" className="mr-2">
+              <FormattedMessage id="CollectiveStatus.Frozen" defaultMessage="Frozen" />
+            </Badge>
           )}
-          <div className={cn('flex flex-col items-start', collective.isFrozen && 'opacity-50')}>
+          <div className="flex flex-col items-start">
             <div className="flex items-center text-sm">{collective.name}</div>
             <div className="text-xs">{secondLine}</div>
           </div>
@@ -103,7 +91,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       const displayed = admins.length > DISPLAYED_TEAM_MEMBERS ? admins.slice(0, DISPLAYED_TEAM_MEMBERS - 1) : admins;
       const left = admins.length - displayed.length;
       return (
-        <div className={cn('flex gap-[-4px]', account.isFrozen && 'opacity-50')}>
+        <div className="flex gap-[-4px]">
           {displayed.map(admin => (
             <AccountHoverCard
               key={admin.id}
@@ -133,7 +121,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       return isNil(collective.hostFeePercent) ? (
         ''
       ) : (
-        <div className={cn('whitespace-nowrap', collective.isFrozen && 'opacity-50')}>
+        <div className="whitespace-nowrap">
           {collective.hostFeesStructure === HOST_FEE_STRUCTURE.DEFAULT
             ? `(${collective.hostFeePercent}%)`
             : `${collective.hostFeePercent}%`}
@@ -150,7 +138,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       return isNil(since) ? (
         ''
       ) : (
-        <div className={cn('whitespace-nowrap', collective.isFrozen && 'opacity-50')}>
+        <div className="whitespace-nowrap">
           <FormattedDate value={since} day="numeric" month="long" year="numeric" />
         </div>
       );
@@ -163,7 +151,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       const collective = row.original;
       const balance = collective.stats.balance;
       return (
-        <div className={cn('font-medium text-foreground', collective.isFrozen && 'opacity-50')}>
+        <div className="font-medium text-foreground">
           <FormattedMoneyAmount
             amount={balance.valueInCents}
             currency={balance.currency}
@@ -184,7 +172,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       const hasDifferentBalances = stats.balance?.valueInCents !== stats.consolidatedBalance?.valueInCents;
       const displayBalance = isChild ? stats.balance : stats.consolidatedBalance;
       return (
-        <div className={cn('flex items-center font-medium text-foreground', collective.isFrozen && 'opacity-50')}>
+        <div className="flex items-center font-medium text-foreground">
           <FormattedMoneyAmount
             amount={displayBalance.valueInCents}
             currency={displayBalance.currency}
