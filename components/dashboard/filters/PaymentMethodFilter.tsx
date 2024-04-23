@@ -56,13 +56,7 @@ export const paymentMethodFilter: FilterConfig<PaymentMethodFilterValue> = {
     valueRenderer: ({ value, intl }) => {
       const serviceLabel = i18nPaymentMethodService(intl, value.service);
       if (value.type) {
-        return intl.formatMessage(
-          { defaultMessage: '{paymentMethodService}: {paymentMethodType}', id: '8NsYR8' },
-          {
-            paymentMethodService: serviceLabel,
-            paymentMethodType: i18nPaymentMethodType(intl, value.type),
-          },
-        );
+        return `${intl.formatMessage({ id: 'withColon', defaultMessage: '{item}:' }, { item: serviceLabel })} ${i18nPaymentMethodType(intl, value.type)}`;
       }
       return serviceLabel;
     },

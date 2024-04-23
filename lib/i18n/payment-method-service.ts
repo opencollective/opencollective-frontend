@@ -1,5 +1,7 @@
 import { defineMessages } from 'react-intl';
 
+import { WebsiteName } from '../../components/I18nFormatters';
+
 import { PAYMENT_METHOD_SERVICE } from '../constants/payment-methods';
 
 const i18nPaymentMethodServiceLabels = defineMessages({
@@ -10,10 +12,6 @@ const i18nPaymentMethodServiceLabels = defineMessages({
   [PAYMENT_METHOD_SERVICE.WISE]: {
     defaultMessage: 'Wise',
     id: 'PaymentMethod.Wise',
-  },
-  [PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE]: {
-    defaultMessage: 'Open Collective',
-    id: 'D8SXQU',
   },
   [PAYMENT_METHOD_SERVICE.THEGIVINGBLOCK]: {
     defaultMessage: 'The Giving Block',
@@ -26,6 +24,10 @@ const i18nPaymentMethodServiceLabels = defineMessages({
 });
 
 export const i18nPaymentMethodService = (intl, service) => {
-  const i18nMsg = i18nPaymentMethodServiceLabels[service];
-  return i18nMsg ? intl.formatMessage(i18nMsg) : service;
+  if (service === PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE) {
+    return WebsiteName;
+  } else {
+    const i18nMsg = i18nPaymentMethodServiceLabels[service];
+    return i18nMsg ? intl.formatMessage(i18nMsg) : service;
+  }
 };
