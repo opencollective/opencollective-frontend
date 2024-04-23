@@ -3521,6 +3521,7 @@
   "VirtualCardSpendingLimit.Frequency.Week.Short": "semaine",
   "VirtualCardSpendingLimit.Frequency.Yearly.Short": "année",
   "VJNKy6": "<Individual></Individual> a approuvé la demande de carte virtuelle à <Account></Account>",
+  "vK8Lti": "Including {amount} {feeType}",
   "VL8DTm": "Vous avez invité quelqu'un à soumettre une dépense <Expense>{expenseDescription}</Expense> à <Account></Account>",
   "VLk78/": "Type de taxe",
   "vlKhIl": "Votre nom",
