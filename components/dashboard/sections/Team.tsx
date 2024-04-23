@@ -248,7 +248,7 @@ const Team = ({ accountSlug }: DashboardSectionProps) => {
                     id="XW00me"
                     values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
                   />
-                  {host?.policies?.COLLECTIVE_MINIMUM_ADMINS.freeze && (
+                  {host.policies.COLLECTIVE_MINIMUM_ADMINS.freeze && (
                     <React.Fragment>
                       &nbsp;
                       <FormattedMessage

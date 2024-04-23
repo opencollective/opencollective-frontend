@@ -357,12 +357,20 @@ const CollectiveDetails = ({
           <SectionTitle>
             <Avatar collective={collective} radius={48} />
             <div>
-              <LinkCollective
-                collective={collective}
-                className="flex items-center gap-2 font-medium text-slate-700 hover:text-slate-700 hover:underline"
-              >
-                {collective.name}
-              </LinkCollective>
+              <div className="flex flex-row">
+                <LinkCollective
+                  collective={collective}
+                  className="flex items-center gap-2 font-medium text-slate-700 hover:text-slate-700 hover:underline"
+                >
+                  {collective.name}
+                </LinkCollective>
+                {collective.isFrozen && (
+                  <Badge type="info" size="xs" className="ml-2">
+                    <FormattedMessage id="CollectiveStatus.Frozen" defaultMessage="Frozen" />
+                  </Badge>
+                )}
+              </div>
+
               {collective.parent && (
                 <div className="text-sm font-normal text-muted-foreground">
                   <FormattedMessage

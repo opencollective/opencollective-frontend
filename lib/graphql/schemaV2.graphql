@@ -3215,7 +3215,7 @@ enum HostFeeStructure {
 }
 
 """
-Input to order results
+Input to order collection
 """
 input OrderByInput {
   """
@@ -3234,14 +3234,18 @@ Possible fields you can use to order by
 """
 enum OrderByFieldType {
   CREATED_AT
-  MEMBER_COUNT
-  TOTAL_CONTRIBUTED
 
   """
   The financial activity of the collective (number of transactions)
   """
   ACTIVITY
+  HOST_RANK
+  HOSTED_COLLECTIVES_COUNT
   RANK
+  BALANCE
+  MEMBER_COUNT
+  TOTAL_CONTRIBUTED
+  NAME
 }
 
 """
