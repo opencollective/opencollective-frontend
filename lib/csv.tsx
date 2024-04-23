@@ -478,10 +478,7 @@ export const FIELDS: Array<{
     id: 'oppositeAccountEmail',
     group: 'account',
     tooltip: (
-      <FormattedMessage
-        defaultMessage="A contact email for the opposite account (for individuals only).."
-        id="fG5bjt"
-      />
+      <FormattedMessage defaultMessage="A contact email for the opposite account (for individuals only)." id="fG5bjt" />
     ),
     label: <FormattedMessage defaultMessage="Opposite Account Email" id="E98WbS" />,
   },
