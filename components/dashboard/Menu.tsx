@@ -27,6 +27,7 @@ import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
+import { parseToBoolean } from '../../lib/utils';
 
 import { ALL_SECTIONS, SECTION_LABELS } from './constants';
 import { DashboardContext } from './DashboardContext';
@@ -250,7 +251,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         },
         {
           section: ALL_SECTIONS.TAX_INFORMATION,
-          if: LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.TAX_FORMS) && !isAccountantOnly,
+          if: !parseToBoolean(process.env.TAX_FORMS_USE_LEGACY) && !isAccountantOnly,
         },
         {
           section: ALL_SECTIONS.COLLECTIVE_PAGE,

@@ -190,7 +190,7 @@ const ExpenseSummary = ({
                 fontWeight="bold"
                 fontSize="12px"
                 showTaxFormTag={includes(expense.requiredLegalDocuments, 'US_TAX_FORM')}
-                showTaxFormMsg={expense.payee.isAdmin}
+                payee={expense.payee}
               />
             </Box>
           )}

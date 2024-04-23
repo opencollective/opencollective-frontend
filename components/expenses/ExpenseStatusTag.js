@@ -4,9 +4,12 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import { i18nExpenseStatus } from '../../lib/i18n/expense';
+import { getDashboardRoute } from '../../lib/url-helpers';
+import { parseToBoolean } from '../../lib/utils';
 
 import { Flex } from '../Grid';
-import I18nFormatters from '../I18nFormatters';
+import I18nFormatters, { getI18nLink } from '../I18nFormatters';
+import Link from '../Link';
 import StyledTag from '../StyledTag';
 import StyledTooltip from '../StyledTooltip';
 
@@ -67,7 +70,7 @@ BaseTag.propTypes = {
  *
  * Accepts all the props exposed by `StyledTag`.
  */
-const ExpenseStatusTag = ({ status, showTaxFormTag = false, showTaxFormMsg = false, ...props }) => {
+const ExpenseStatusTag = ({ status, showTaxFormTag = false, payee = null, ...props }) => {
   const tagProps = {
     fontWeight: '600',
     fontSize: '10px',
@@ -87,12 +90,12 @@ const ExpenseStatusTag = ({ status, showTaxFormTag = false, showTaxFormMsg = fal
     );
   } else if (!showTaxFormTag) {
     return <BaseTag status={status} {...tagProps} />;
-  } else if (!showTaxFormMsg) {
+  } else if (!payee?.isAdmin) {
     return (
       <Flex alignItems="center">
         <BaseTag status={status} {...tagProps} />
-        <ExtendedTag>
-          <FormattedMessage id="TaxForm" defaultMessage="Tax form" />
+        <ExtendedTag fontSize="10px">
+          <FormattedMessage defaultMessage="Tax Form" id="7TBksX" />
         </ExtendedTag>
       </Flex>
     );
@@ -101,16 +104,26 @@ const ExpenseStatusTag = ({ status, showTaxFormTag = false, showTaxFormMsg = fal
       <Flex alignItems="center">
         <BaseTag status={status} {...tagProps} />
         <StyledTooltip
-          content={() => (
-            <FormattedMessage
-              id="expenseNeedsTaxForm.hover"
-              defaultMessage="We can't pay until we receive your tax info. Check your inbox for an email from HelloWorks. Need help? Contact <SupportLink>support</SupportLink>"
-              values={I18nFormatters}
-            />
-          )}
+          content={() =>
+            parseToBoolean(process.env.TAX_FORMS_USE_LEGACY) ? (
+              <FormattedMessage
+                id="expenseNeedsTaxForm.hover"
+                defaultMessage="We can't pay until we receive your tax info. Check your inbox for an email from HelloWorks. Need help? Contact <SupportLink>support</SupportLink>"
+                values={I18nFormatters}
+              />
+            ) : (
+              <FormattedMessage
+                id="expenseNeedsTaxForm.new.hover"
+                defaultMessage="We can't pay until we receive your tax info. <Link>Click here</Link> to complete your tax form."
+                values={{
+                  Link: getI18nLink({ as: Link, href: getDashboardRoute(payee, 'tax-information') }),
+                }}
+              />
+            )
+          }
         >
-          <ExtendedTag>
-            <FormattedMessage id="TaxForm" defaultMessage="Tax form" />
+          <ExtendedTag fontSize="10px">
+            <FormattedMessage defaultMessage="Tax Form" id="7TBksX" />
           </ExtendedTag>
         </StyledTooltip>
       </Flex>
@@ -120,7 +133,7 @@ const ExpenseStatusTag = ({ status, showTaxFormTag = false, showTaxFormMsg = fal
 
 ExpenseStatusTag.propTypes = {
   status: PropTypes.oneOf([...Object.values(ExpenseStatus), 'COMPLETED', 'REFUNDED']),
-  showTaxFormMsg: PropTypes.bool,
+  payee: PropTypes.shape({ isAdmin: PropTypes.bool }),
   showTaxFormTag: PropTypes.bool,
 };
 
