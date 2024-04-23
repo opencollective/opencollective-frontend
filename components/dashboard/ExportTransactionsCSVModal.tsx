@@ -624,7 +624,7 @@ const ExportTransactionsCSVModal = ({
                 </p>
                 <p className="text-sm">
                   <FormattedMessage
-                    defaultMessage="Select different set of filters to enable the transactions export to work."
+                    defaultMessage="Select a different set of filters to enable the transactions export to work."
                     id="8Q0YZb"
                   />
                 </p>
