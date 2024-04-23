@@ -59,6 +59,7 @@ export const W8BenTaxFormValuesSchema = BaseFormSchema.merge(
       ])
       .and(
         z.discriminatedUnion('hasTaxTreatySpecialRatesAndConditions', [
+          z.object({ hasTaxTreatySpecialRatesAndConditions: z.literal(null) }),
           z.object({ hasTaxTreatySpecialRatesAndConditions: z.literal(false) }),
           z.object({
             hasTaxTreatySpecialRatesAndConditions: z.literal(true),
@@ -172,7 +173,9 @@ export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFor
               setFieldValue(field.name, value);
               setFieldValue('taxpayerIdentificationNumberUS', '');
             }}
+            getKey={value => value || 'null'}
             options={[
+              { label: 'None', value: null },
               { label: 'SSN', value: 'SSN' },
               { label: 'EIN', value: 'EIN' },
             ]}
