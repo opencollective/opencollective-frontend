@@ -59,6 +59,7 @@ export const W8BenTaxFormValuesSchema = BaseFormSchema.merge(
       ])
       .and(
         z.discriminatedUnion('hasTaxTreatySpecialRatesAndConditions', [
+          z.object({ hasTaxTreatySpecialRatesAndConditions: z.literal(null) }),
           z.object({ hasTaxTreatySpecialRatesAndConditions: z.literal(false) }),
           z.object({
             hasTaxTreatySpecialRatesAndConditions: z.literal(true),
