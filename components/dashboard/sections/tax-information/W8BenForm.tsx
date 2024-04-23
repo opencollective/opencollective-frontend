@@ -173,7 +173,9 @@ export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFor
               setFieldValue(field.name, value);
               setFieldValue('taxpayerIdentificationNumberUS', '');
             }}
+            getKey={value => value || 'null'}
             options={[
+              { label: 'None', value: null },
               { label: 'SSN', value: 'SSN' },
               { label: 'EIN', value: 'EIN' },
             ]}
