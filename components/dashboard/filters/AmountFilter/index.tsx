@@ -41,7 +41,7 @@ const NumberInput = ({ value, onChangeValue, ...props }) => {
   );
 };
 
-const renderOptions = (value: AmountFilterValueType, onChange: (tmpValue: AmountFilterValueType) => void) => {
+export const renderOptions = (value: AmountFilterValueType, onChange: (tmpValue: AmountFilterValueType) => void) => {
   switch (value.type) {
     case AmountFilterType.IS_EQUAL_TO:
       return (

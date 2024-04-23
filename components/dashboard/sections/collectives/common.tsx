@@ -59,9 +59,14 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       );
       return (
         <div className="flex items-center">
-          <Avatar collective={collective} radius={48} className="mr-4" />
+          <Avatar collective={collective} className="mr-4" radius={48} />
+          {collective.isFrozen && (
+            <Badge type="info" size="xs" className="mr-2">
+              <FormattedMessage id="CollectiveStatus.Frozen" defaultMessage="Frozen" />
+            </Badge>
+          )}
           <div className="flex flex-col items-start">
-            <div className="text-sm text-foreground">{collective.name}</div>
+            <div className="flex items-center text-sm">{collective.name}</div>
             <div className="text-xs">{secondLine}</div>
           </div>
         </div>
@@ -128,7 +133,8 @@ export const cols: Record<string, ColumnDef<any, any>> = {
     accessorKey: 'hostedSince',
     header: () => <FormattedMessage id="HostedSince" defaultMessage="Hosted since" />,
     cell: ({ row }) => {
-      const since = row.original.approvedAt;
+      const collective = row.original;
+      const since = collective.approvedAt;
       return isNil(since) ? (
         ''
       ) : (
@@ -142,7 +148,8 @@ export const cols: Record<string, ColumnDef<any, any>> = {
     accessorKey: 'balance',
     header: () => <FormattedMessage id="Balance" defaultMessage="Balance" />,
     cell: ({ row }) => {
-      const balance = row.original.stats.balance;
+      const collective = row.original;
+      const balance = collective.stats.balance;
       return (
         <div className="font-medium text-foreground">
           <FormattedMoneyAmount
@@ -157,10 +164,11 @@ export const cols: Record<string, ColumnDef<any, any>> = {
   },
   consolidatedBalance: {
     accessorKey: 'consolidatedBalence',
-    header: () => <FormattedMessage id="Balance" defaultMessage="Balance" />,
+    header: () => <FormattedMessage id="TotalBalance" defaultMessage="Total Balance" />,
     cell: ({ row }) => {
-      const isChild = !!row.original.parent?.id;
-      const stats = row.original.stats;
+      const collective = row.original;
+      const isChild = !!collective.parent?.id;
+      const stats = collective.stats;
       const hasDifferentBalances = stats.balance?.valueInCents !== stats.consolidatedBalance?.valueInCents;
       const displayBalance = isChild ? stats.balance : stats.consolidatedBalance;
       return (

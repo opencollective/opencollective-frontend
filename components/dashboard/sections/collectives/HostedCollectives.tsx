@@ -25,6 +25,7 @@ import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import Pagination from '../../../Pagination';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
+import { accountOrderByFilter } from '../../filters/AccountsOrderBy';
 import { consolidatedBalanceFilter } from '../../filters/BalanceFilter';
 import {
   COLLECTIVE_STATUS,
@@ -33,7 +34,6 @@ import {
 } from '../../filters/CollectiveStatusFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { Filterbar } from '../../filters/Filterbar';
-import { orderByFilter } from '../../filters/OrderFilter';
 import { searchFilter } from '../../filters/SearchFilter';
 import { DashboardSectionProps } from '../../types';
 
@@ -47,7 +47,7 @@ const schema = z.object({
   limit: integer.default(COLLECTIVES_PER_PAGE),
   offset: integer.default(0),
   searchTerm: searchFilter.schema,
-  orderBy: orderByFilter.schema,
+  orderBy: accountOrderByFilter.schema,
   hostFeesStructure: z.nativeEnum(HostFeeStructure).optional(),
   type: isMulti(z.nativeEnum(HostedCollectiveTypes)).optional(),
   status: collectiveStatusFilter.schema,
@@ -55,13 +55,13 @@ const schema = z.object({
 });
 
 const toVariables: FiltersToVariables<z.infer<typeof schema>, HostedCollectivesQueryVariables> = {
-  orderBy: orderByFilter.toVariables,
+  orderBy: accountOrderByFilter.toVariables,
   status: collectiveStatusFilter.toVariables,
   consolidatedBalance: consolidatedBalanceFilter.toVariables,
 };
 
 const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
-  orderBy: orderByFilter.filter,
+  orderBy: accountOrderByFilter.filter,
   searchTerm: searchFilter.filter,
   hostFeesStructure: {
     labelMsg: defineMessage({ id: 'FeeStructure', defaultMessage: 'Fee structure' }),
