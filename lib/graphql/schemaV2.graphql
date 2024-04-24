@@ -2945,7 +2945,7 @@ type Host implements Account & AccountWithContributions {
     """
     Filter by type of legal document
     """
-    type: LegalDocumentType
+    type: [LegalDocumentType]
 
     """
     Filter by status of legal document
@@ -3197,7 +3197,7 @@ type LegalDocument {
   account: Account!
 
   """
-  URL to download the file. Must be logged in as an account admin. The returned URL will be protected by authentication + 2FA.
+  URL to download the file. Must be logged in as a host with access to the document. The returned URL will be protected by authentication + 2FA.
   """
   documentLink: URL
 }
@@ -3220,6 +3220,7 @@ enum LegalDocumentRequestStatus {
   REQUESTED
   RECEIVED
   ERROR
+  INVALID
 }
 
 """
@@ -5611,6 +5612,7 @@ enum ActivityType {
   COLLECTIVE_EXPENSE_MISSING_RECEIPT
   TAXFORM_REQUEST
   TAXFORM_RECEIVED
+  TAXFORM_INVALIDATED
   COLLECTIVE_VIRTUAL_CARD_ADDED
   COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS
   COLLECTIVE_VIRTUAL_CARD_RESUMED
@@ -14708,6 +14710,7 @@ enum ActivityAndClassesType {
   COLLECTIVE_EXPENSE_MISSING_RECEIPT
   TAXFORM_REQUEST
   TAXFORM_RECEIVED
+  TAXFORM_INVALIDATED
   COLLECTIVE_VIRTUAL_CARD_ADDED
   COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS
   COLLECTIVE_VIRTUAL_CARD_RESUMED
@@ -17344,6 +17347,31 @@ type Mutation {
     The form data for the legal document. Will be validated against the schema for the document type and encrypted.
     """
     formData: JSON!
+  ): LegalDocument!
+
+  """
+  Edit the status of a legal document
+  """
+  editLegalDocumentStatus(
+    """
+    The ID of the legal document
+    """
+    id: String!
+
+    """
+    The new status of the legal document
+    """
+    status: LegalDocumentRequestStatus!
+
+    """
+    The host of the legal document
+    """
+    host: AccountReferenceInput!
+
+    """
+    A message to explain the change in status. Will be sent to the legal document submitter
+    """
+    message: String
   ): LegalDocument!
 
   """

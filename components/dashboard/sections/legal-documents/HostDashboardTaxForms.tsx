@@ -144,7 +144,7 @@ const HostDashboardTaxForms = ({ accountSlug: hostSlug }: DashboardSectionProps)
     meta: { hostSlug },
   });
 
-  const { data, previousData, error, variables, loading } = useQuery(hostDashboardTaxFormsQuery, {
+  const { data, previousData, error, variables, loading, refetch } = useQuery(hostDashboardTaxFormsQuery, {
     variables: { hostSlug, ...queryFilter.variables },
     context: API_V2_CONTEXT,
   });
@@ -166,10 +166,12 @@ const HostDashboardTaxForms = ({ accountSlug: hostSlug }: DashboardSectionProps)
       ) : (
         <React.Fragment>
           <LegalDocumentsTable
+            host={data?.host}
             documents={data?.host.taxForms}
             loading={loading}
             nbPlaceholders={NB_LEGAL_DOCUMENTS_DISPLAYED}
             resetFilters={() => queryFilter.resetFilters({})}
+            onInvalidateSuccess={refetch}
             onOpen={document => {
               setIsDrawerOpen(true);
               setFocusedLegalDocument(document);
@@ -194,6 +196,10 @@ const HostDashboardTaxForms = ({ accountSlug: hostSlug }: DashboardSectionProps)
               host={data.host}
               document={focusedLegalDocument}
               onClose={() => setIsDrawerOpen(false)}
+              onInvalidateSuccess={async () => {
+                await refetch();
+                setIsDrawerOpen(false);
+              }}
             />
           )}
         </React.Fragment>

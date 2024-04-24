@@ -61,7 +61,9 @@ const ConfirmationModal = ({
   return (
     <StyledModal role="alertdialog" onClose={onClose} {...props}>
       <ModalHeader onClose={onClose}>{header}</ModalHeader>
-      <ModalBody pt={2}>{children || <P>{body}</P>}</ModalBody>
+      <ModalBody pt={2} mb="20px">
+        {children || <P>{body}</P>}
+      </ModalBody>
       <ModalFooter>
         <Container display="flex" justifyContent={['center', 'flex-end']} flexWrap="Wrap">
           <StyledButton

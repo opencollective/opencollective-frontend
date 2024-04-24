@@ -1,6 +1,5 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
-import { Download } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
@@ -11,6 +10,7 @@ import { getCollectivePageRoute, getDashboardRoute } from '../../../../lib/url-h
 
 import { AccountHoverCard, accountHoverCardFields } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
+import { CopyID } from '../../../CopyId';
 import DateTime from '../../../DateTime';
 import { Drawer, DrawerHeader } from '../../../Drawer';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
@@ -19,7 +19,7 @@ import Link from '../../../Link';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import { Button } from '../../../ui/Button';
 
-import { DownloadLegalDocument } from './DownloadLegalDocument';
+import { LegalDocumentActions } from './LegalDocumentActions';
 import { LegalDocumentServiceBadge } from './LegalDocumentServiceBadge';
 import { LegalDocumentStatusBadge } from './LegalDocumentStatusBadge';
 
@@ -28,6 +28,7 @@ type LegalDocumentDrawerProps = {
   onClose: () => void;
   document?: LegalDocument;
   host: Account;
+  onInvalidateSuccess?: () => void;
 };
 
 const legalDocumentDrawerQuery = gql`
@@ -61,13 +62,19 @@ const legalDocumentDrawerQuery = gql`
 const DataList = ({ title, value }) => {
   return (
     <div className="relative flex w-full flex-col gap-1 sm:flex-row">
-      <div className="min-w-[180px] max-w-[240px] shrink-0 grow-0 basis-1/4 text-muted-foreground">{title}</div>
+      <div className="min-w-[120px] max-w-[240px] shrink-0 grow-0 basis-1/4 text-muted-foreground">{title}</div>
       <div className="max-w-fit overflow-hidden">{value}</div>
     </div>
   );
 };
 
-export default function LegalDocumentDrawer({ open, onClose, host, document }: LegalDocumentDrawerProps) {
+export default function LegalDocumentDrawer({
+  open,
+  onInvalidateSuccess,
+  onClose,
+  host,
+  document,
+}: LegalDocumentDrawerProps) {
   const intl = useIntl();
   const { data, loading } = useQuery(legalDocumentDrawerQuery, {
     context: API_V2_CONTEXT,
@@ -86,21 +93,24 @@ export default function LegalDocumentDrawer({ open, onClose, host, document }: L
         }
       />
       <div className="flex gap-2">
-        {Boolean(document?.documentLink) && (
-          <DownloadLegalDocument legalDocument={document}>
-            {({ download, isDownloading }) => (
-              <Button variant="outline" size="xs" loading={isDownloading} onClick={download}>
-                <Download size={16} />
-                <FormattedMessage id="n+rgej" defaultMessage="Download {format}" values={{ format: 'PDF' }} />
+        {document && (
+          <LegalDocumentActions legalDocument={document} host={host} onInvalidateSuccess={onInvalidateSuccess}>
+            {({ onClick, loading, children }) => (
+              <Button variant="outline" size="xs" onClick={onClick} loading={loading}>
+                {children}
               </Button>
             )}
-          </DownloadLegalDocument>
+          </LegalDocumentActions>
         )}
       </div>
       <hr className="my-4 border-t border-slate-300" />
       {document && (
         <div className="text-sm">
           <div className="flex flex-col gap-3 sm:gap-2">
+            <DataList
+              title={<FormattedMessage defaultMessage="Request ID" id="LegalDocument.RequestID" />}
+              value={<CopyID>{document.id}</CopyID>}
+            />
             <DataList
               title={intl.formatMessage({ defaultMessage: 'Account', id: 'TwyMau' })}
               value={
