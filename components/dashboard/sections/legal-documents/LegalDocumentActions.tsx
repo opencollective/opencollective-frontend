@@ -1,5 +1,5 @@
 import React from 'react';
-import { Download, FileX } from 'lucide-react';
+import { Download, FileX, Upload } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { downloadLegalDocument } from '../../../../lib/api';
@@ -10,22 +10,25 @@ import { useTwoFactorAuthenticationPrompt } from '../../../../lib/two-factor-aut
 import { useToast } from '../../../ui/useToast';
 
 import { InvalidateTaxFormModal } from './InvalidateTaxFormModal';
+import { UploadTaxFormModal } from './UploadTaxFormModal';
 
 export const LegalDocumentActions = ({
   legalDocument,
   host,
   children,
   onInvalidateSuccess,
+  onUploadSuccess,
 }: {
   legalDocument: LegalDocument;
   host: Host | Account;
   onInvalidateSuccess?: () => void;
+  onUploadSuccess?: () => void;
   children: (props: { loading?: boolean; onClick: () => void; children: React.ReactNode }) => React.ReactNode;
 }) => {
   const intl = useIntl();
   const prompt2fa = useTwoFactorAuthenticationPrompt();
   const [isDownloading, setIsDownloading] = React.useState(false);
-  const [confirmationModal, setConfirmationModal] = React.useState<'invalidate' | null>(null);
+  const [confirmationModal, setConfirmationModal] = React.useState<'invalidate' | 'manual-upload' | null>(null);
   const { toast } = useToast();
 
   // Callbacks
@@ -46,6 +49,10 @@ export const LegalDocumentActions = ({
 
   const onInvalidateClick = React.useCallback(() => {
     setConfirmationModal('invalidate');
+  }, []);
+
+  const onManualUploadClick = React.useCallback(() => {
+    setConfirmationModal('manual-upload');
   }, []);
 
   return (
@@ -71,7 +78,17 @@ export const LegalDocumentActions = ({
             </React.Fragment>
           ),
         })}
-      {confirmationModal && (
+      {[LegalDocumentRequestStatus.REQUESTED, LegalDocumentRequestStatus.ERROR].includes(legalDocument.status) &&
+        children({
+          onClick: onManualUploadClick,
+          children: (
+            <React.Fragment>
+              <Upload size={16} />
+              <FormattedMessage defaultMessage="Manual upload" id="TaxForm.ManualUpload" />
+            </React.Fragment>
+          ),
+        })}
+      {confirmationModal === 'invalidate' ? (
         <InvalidateTaxFormModal
           open
           legalDocument={legalDocument}
@@ -79,7 +96,15 @@ export const LegalDocumentActions = ({
           host={host}
           onSuccess={onInvalidateSuccess}
         />
-      )}
+      ) : confirmationModal === 'manual-upload' ? (
+        <UploadTaxFormModal
+          open
+          legalDocument={legalDocument}
+          onOpenChange={() => setConfirmationModal(null)}
+          host={host}
+          onSuccess={onUploadSuccess}
+        />
+      ) : null}
     </React.Fragment>
   );
 };

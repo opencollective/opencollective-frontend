@@ -3321,6 +3321,7 @@ type TransactionCollection implements Collection {
 }
 
 enum PaymentMethodType {
+  default @deprecated(reason: "Please use uppercase values")
   alipay @deprecated(reason: "Please use uppercase values")
   creditcard @deprecated(reason: "Please use uppercase values")
   prepaid @deprecated(reason: "Please use uppercase values")
@@ -3341,6 +3342,7 @@ enum PaymentMethodType {
   bank_transfer @deprecated(reason: "Please use uppercase values")
   payout @deprecated(reason: "Please use uppercase values")
   virtual_card @deprecated(reason: "Please use uppercase values")
+  DEFAULT
   ALIPAY
   CREDITCARD
   PREPAID
@@ -17372,6 +17374,11 @@ type Mutation {
     A message to explain the change in status. Will be sent to the legal document submitter
     """
     message: String
+
+    """
+    The new document link for the legal document. Must pass status=RECEIVED.
+    """
+    file: Upload
   ): LegalDocument!
 
   """
@@ -19362,6 +19369,11 @@ type SetPasswordResponse {
   token: String
 }
 
+"""
+The `Upload` scalar type represents a file upload.
+"""
+scalar Upload
+
 input MemberInvitationReferenceInput {
   """
   The public id identifying the member invitation (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
@@ -20067,11 +20079,6 @@ input UploadFileInput {
   """
   parsingOptions: OCRParsingOptionsInput = null
 }
-
-"""
-The `Upload` scalar type represents a file upload.
-"""
-scalar Upload
 
 """
 The kind of file that was uploaded
