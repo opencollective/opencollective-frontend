@@ -2927,6 +2927,56 @@ type Host implements Account & AccountWithContributions {
   Returns the legal documents required by this host
   """
   requiredLegalDocuments: [LegalDocumentType!]!
+
+  """
+  Returns legal documents hosted by this host
+  """
+  hostedLegalDocuments(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Filter by type of legal document
+    """
+    type: LegalDocumentType
+
+    """
+    Filter by status of legal document
+    """
+    status: [LegalDocumentRequestStatus]
+
+    """
+    Filter by accounts
+    """
+    account: [AccountReferenceInput]
+
+    """
+    Search term (name, description, ...)
+    """
+    searchTerm: String
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Filter by requested date from
+    """
+    requestedAtFrom: DateTime
+
+    """
+    Filter by requested date to
+    """
+    requestedAtTo: DateTime
+  ): LegalDocumentCollection!
 }
 
 """
@@ -6247,6 +6297,16 @@ input AmountRangeInput {
   The maximum amount (inclusive)
   """
   lte: AmountInput
+}
+
+"""
+A collection of "LegalDocument"
+"""
+type LegalDocumentCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [LegalDocument]
 }
 
 type ExpenseValuesByRole {

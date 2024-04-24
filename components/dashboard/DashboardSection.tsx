@@ -26,6 +26,7 @@ import HostDashboardAgreements from './sections/HostDashboardAgreements';
 import HostVirtualCardRequests from './sections/HostVirtualCardRequests';
 import HostVirtualCards from './sections/HostVirtualCards';
 import InvoicesReceipts from './sections/invoices-receipts/InvoicesReceipts';
+import HostDashboardTaxForms from './sections/legal-documents/HostDashboardTaxForms';
 import NotificationsSettings from './sections/NotificationsSettings';
 import Overview from './sections/overview/Overview';
 import HostDashboardReports from './sections/reports/HostDashboardReports';
@@ -45,6 +46,7 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS]: HostFinancialContributions,
   [SECTIONS.HOST_EXPENSES]: HostExpenses,
   [SECTIONS.HOST_AGREEMENTS]: HostDashboardAgreements,
+  [SECTIONS.HOST_TAX_FORMS]: HostDashboardTaxForms,
   [SECTIONS.HOST_APPLICATIONS]: HostApplications,
   [SECTIONS.REPORTS]: HostDashboardReports,
   [SECTIONS.HOST_VIRTUAL_CARDS]: HostVirtualCards,
