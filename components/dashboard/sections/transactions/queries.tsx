@@ -48,6 +48,10 @@ const transactionsTableQueryCollectionFragment = gql`
         type
         ...AccountHoverCardFields
       }
+      toAccount {
+        id
+        slug
+      }
       expense {
         id
         type
