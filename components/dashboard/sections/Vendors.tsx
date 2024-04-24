@@ -67,6 +67,7 @@ const dashboardVendorsQuery = gql`
           expensePolicy
           settings
           currency
+          requiredLegalDocuments
           features {
             id
             MULTI_CURRENCY_EXPENSES
@@ -404,6 +405,7 @@ const Vendors = ({ accountSlug }: DashboardSectionProps) => {
         <StyledModal onClose={closeDrawer} width="570px">
           <VendorForm
             host={host}
+            supportsTaxForm={host.requiredLegalDocuments.includes('US_TAX_FORM')}
             onSuccess={() => {
               setCreateEditVendor(false);
               refetch();
@@ -423,6 +425,7 @@ const Vendors = ({ accountSlug }: DashboardSectionProps) => {
         {createEditVendor && (
           <VendorForm
             host={host}
+            supportsTaxForm={host.requiredLegalDocuments.includes('US_TAX_FORM')}
             vendor={typeof createEditVendor === 'boolean' ? undefined : createEditVendor}
             onSuccess={() => {
               setCreateEditVendor(false);
