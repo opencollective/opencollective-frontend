@@ -106,7 +106,7 @@ const AccountTransactions = ({ accountSlug }: DashboardSectionProps) => {
             nbPlaceholders={20}
             onClickRow={row => {
               setTransactionInDrawer(row);
-              queryFilter.setFilter('openTransactionId', row.id);
+              queryFilter.setFilter('openTransactionId', row.id, false);
             }}
             queryFilter={queryFilter}
           />
@@ -128,7 +128,7 @@ const AccountTransactions = ({ accountSlug }: DashboardSectionProps) => {
         resetFilters={queryFilter.resetFilters}
         setOpen={open => {
           if (!open) {
-            queryFilter.setFilter('openTransactionId', undefined);
+            queryFilter.setFilter('openTransactionId', undefined, false);
           }
         }}
         transactionId={queryFilter.values.openTransactionId}

@@ -192,7 +192,7 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
             nbPlaceholders={20}
             onClickRow={row => {
               setTransactionInDrawer(row);
-              queryFilter.setFilter('openTransactionId', row.id);
+              queryFilter.setFilter('openTransactionId', row.id, false);
             }}
             queryFilter={queryFilter}
             useAltTestLayout={layout === TestLayout.DEBITCREDIT}
@@ -215,7 +215,7 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
         resetFilters={queryFilter.resetFilters}
         setOpen={open => {
           if (!open) {
-            queryFilter.setFilter('openTransactionId', undefined);
+            queryFilter.setFilter('openTransactionId', undefined, false);
           }
         }}
         transactionId={queryFilter.values.openTransactionId}

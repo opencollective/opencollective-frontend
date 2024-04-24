@@ -154,7 +154,8 @@ export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape, any,
   );
 
   const setFilter = React.useCallback(
-    (filterName, filterValue) => resetFilters({ ...omit(values, 'offset'), [filterName]: filterValue }),
+    (filterName, filterValue, resetPagination = true) =>
+      resetFilters({ ...(resetPagination ? omit(values, 'offset') : values), [filterName]: filterValue }),
     [values, resetFilters],
   );
 
