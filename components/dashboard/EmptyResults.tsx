@@ -20,6 +20,7 @@ export function EmptyResults({
     | 'HOST_APPLICATIONS'
     | 'VIRTUAL_CARDS'
     | 'VIRTUAL_CARD_REQUESTS'
+    | 'TAX_FORM'
     | 'TRANSACTIONS';
 }) {
   return (
@@ -38,13 +39,13 @@ export function EmptyResults({
         {hasFilters ? (
           <FormattedMessage
             id="filter.NoMatchingResults"
-            defaultMessage="No matching {type, select, EXPENSES {expenses} CONTRIBUTIONS {contributions} VIRTUAL_CARDS {virtual cards} VIRTUAL_CARD_REQUESTS {virtual card requests} TRANSACTIONS {transactions} AGREEMENTS {agreements} COLLECTIVES {collectives} HOST_APPLICATIONS {host applications} other {results}}"
+            defaultMessage="No matching {type, select, EXPENSES {expenses} CONTRIBUTIONS {contributions} VIRTUAL_CARDS {virtual cards} VIRTUAL_CARD_REQUESTS {virtual card requests} TRANSACTIONS {transactions} AGREEMENTS {agreements} COLLECTIVES {collectives} HOST_APPLICATIONS {host applications} TAX_FORM {tax forms} other {results}}"
             values={{ type: entityType }}
           />
         ) : (
           <FormattedMessage
             id="filter.NoResults"
-            defaultMessage="No {type, select, EXPENSES {expenses} CONTRIBUTIONS {contributions} VIRTUAL_CARDS {virtual cards} VIRTUAL_CARD_REQUESTS {virtual card requests} TRANSACTIONS {transactions} AGREEMENTS {agreements} COLLECTIVES {collectives} HOST_APPLICATIONS {host applications} other {results}}"
+            defaultMessage="No {type, select, EXPENSES {expenses} CONTRIBUTIONS {contributions} VIRTUAL_CARDS {virtual cards} VIRTUAL_CARD_REQUESTS {virtual card requests} TRANSACTIONS {transactions} AGREEMENTS {agreements} COLLECTIVES {collectives} HOST_APPLICATIONS {host applications} TAX_FORM {tax forms} other {results}}"
             values={{ type: entityType }}
           />
         )}
