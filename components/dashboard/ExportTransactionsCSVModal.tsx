@@ -645,7 +645,7 @@ const ExportTransactionsCSVModal = ({
                   <div className="text-sm font-normal">
                     <FormattedMessage
                       id="ExportTransactionsCSVModal.ExportTime"
-                      defaultMessage="Estimated time: {expectedTimeInMinutes} {expectedTimeInMinutes, plural, one {minute} other {minutes}}"
+                      defaultMessage="Estimated time: {expectedTimeInMinutes, plural, one {# minute} other {# minutes}}"
                       values={{
                         expectedTimeInMinutes,
                       }}
