@@ -2922,6 +2922,11 @@ type Host implements Account & AccountWithContributions {
     """
     consolidatedBalance: AmountRangeInput
   ): AccountCollection!
+
+  """
+  Returns the legal documents required by this host
+  """
+  requiredLegalDocuments: [LegalDocumentType!]!
 }
 
 """
@@ -16515,9 +16520,14 @@ type Mutation {
     tier: TierReferenceInput
 
     """
-    The total amount of the order, including taxes
+    The total amount of the order, including fees and taxes
     """
     amount: AmountInput!
+
+    """
+    The payment processor fee amount
+    """
+    paymentProcessorFee: AmountInput
 
     """
     The host fee percent to apply to the order, as a float between 0 and 100
