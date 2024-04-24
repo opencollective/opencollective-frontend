@@ -1,6 +1,6 @@
 import React from 'react';
 import { ColumnDef, TableMeta } from '@tanstack/react-table';
-import { Download, Eye, Pencil } from 'lucide-react';
+import { Download, Eye } from 'lucide-react';
 import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
 
 import { LegalDocument } from '../../../../lib/graphql/types/v2/graphql';
@@ -127,10 +127,6 @@ const columns: ColumnDef<LegalDocument>[] = [
                 )}
               </DownloadLegalDocument>
             )}
-            <DropdownMenuItem onClick={e => e.stopPropagation()}>
-              <Pencil size={16} />
-              <FormattedMessage defaultMessage="Update status" id="LegalDocument.ChangeStatus" />
-            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );

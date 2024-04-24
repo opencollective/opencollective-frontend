@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
-import { Download, Pencil } from 'lucide-react';
+import { Download } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
@@ -96,10 +96,6 @@ export default function LegalDocumentDrawer({ open, onClose, host, document }: L
             )}
           </DownloadLegalDocument>
         )}
-        <Button variant="outline" size="xs">
-          <Pencil size={16} />
-          <FormattedMessage defaultMessage="Update status" id="LegalDocument.ChangeStatus" />
-        </Button>
       </div>
       <hr className="my-4 border-t border-slate-300" />
       {document && (
@@ -200,7 +196,7 @@ export default function LegalDocumentDrawer({ open, onClose, host, document }: L
                       <Link
                         className="text-primary underline"
                         href={getDashboardRoute(
-                          host.slug,
+                          host,
                           `host-expenses?searchTerm=@${document.account.slug}&status=ALL&types=INVOICE,GRANT,UNCLASSIFIED`,
                         )}
                       >
