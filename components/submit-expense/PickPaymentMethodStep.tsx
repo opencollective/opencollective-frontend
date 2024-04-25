@@ -300,7 +300,7 @@ function CreatePayoutMethodForm(props: CreatePayoutMethodFormProps) {
                 value: m,
                 label: intl.formatMessage(I18nPayoutMethodLabels[m]),
               }))}
-              onChange={option => formik.setFieldValue('type', option.value)}
+              onChange={(option: { value: string }) => formik.setFieldValue('type', option.value)}
             />
           )}
         </StyledInputFormikField>
@@ -585,7 +585,7 @@ function PayoutMethodPicker(props: PayoutMethodPickerProps) {
                 inputId="payout-method"
                 options={[newPayoutMethodOption, ...payeePayoutMethodOptions]}
                 value={selectedPayoutMethodOption}
-                onChange={e => {
+                onChange={(e: { value: string }) => {
                   if (e.value === newPayoutMethodOption.value) {
                     setIsCreatingNewPayoutMethod(true);
                     props.form.setFieldValue('payoutMethodId', null);
