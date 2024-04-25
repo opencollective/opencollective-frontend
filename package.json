@@ -83,7 +83,7 @@
     "express-winston": "4.2.0",
     "express-ws": "5.0.2",
     "file-saver": "2.0.5",
-    "formik": "2.4.5",
+    "formik": "2.4.6",
     "glob": "10.3.12",
     "graphql": "16.8.1",
     "helmet": "7.1.0",
