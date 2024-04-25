@@ -20,7 +20,7 @@ export function useDrawer({ open, onOpen, onClose }) {
   }, []);
 
   const openDrawer = React.useCallback(
-    (value, ref: React.RefObject<HTMLElement>) => {
+    (value, ref: React.MutableRefObject<HTMLElement>) => {
       onOpen(value);
       onCloseFocusRef.current = ref.current;
     },

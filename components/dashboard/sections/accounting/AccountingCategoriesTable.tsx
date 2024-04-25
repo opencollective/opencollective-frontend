@@ -4,8 +4,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { AccountingCategory, AccountingCategoryKind } from '../../../../lib/graphql/types/v2/graphql';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 
-import { DataTable } from '../../../DataTable';
 import { I18nItalic } from '../../../I18nFormatters';
+import { DataTable } from '../../../table/DataTable';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/DropdownMenu';
 import { TableActionsButton } from '../../../ui/Table';
 

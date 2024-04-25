@@ -90,6 +90,7 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   searchTerm: searchFilter.filter,
   date: dateFilter.filter,
   clearedAt: clearedAtDateFilter.filter,
+  sort: sortFilter.filter,
   amount: amountFilter.filter,
   type: {
     labelMsg: defineMessage({ id: 'Type', defaultMessage: 'Type' }),

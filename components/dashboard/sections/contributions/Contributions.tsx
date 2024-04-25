@@ -12,7 +12,6 @@ import { Order, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
 import Avatar from '../../../Avatar';
-import { DataTable } from '../../../DataTable';
 import DateTime from '../../../DateTime';
 import EditOrderModal, { EditOrderActions } from '../../../EditOrderModal';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
@@ -21,6 +20,7 @@ import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import OrderStatusTag from '../../../orders/OrderStatusTag';
 import PaymentMethodTypeWithIcon from '../../../PaymentMethodTypeWithIcon';
 import { managedOrderFragment } from '../../../recurring-contributions/graphql/queries';
+import { DataTable } from '../../../table/DataTable';
 import { Span } from '../../../Text';
 import {
   DropdownMenu,

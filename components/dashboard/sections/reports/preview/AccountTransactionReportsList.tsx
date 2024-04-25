@@ -9,9 +9,9 @@ import { integer } from '../../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../../lib/graphql/helpers';
 import useQueryFilter from '../../../../../lib/hooks/useQueryFilter';
 
-import { DataTable } from '../../../../DataTable';
 import FormattedMoneyAmount from '../../../../FormattedMoneyAmount';
 import MessageBoxGraphqlError from '../../../../MessageBoxGraphqlError';
+import { DataTable } from '../../../../table/DataTable';
 import Tabs from '../../../../Tabs';
 import { Pagination } from '../../../../ui/Pagination';
 import { DashboardContext } from '../../../DashboardContext';
