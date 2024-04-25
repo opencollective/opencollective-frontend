@@ -439,17 +439,35 @@ const ExpenseFormBody = ({
     }
   }, [values.payeeLocation]);
 
+  // Handle currency updates
   React.useEffect(() => {
+    // Do nothing while loading
+    if (loading) {
+      return;
+    }
+
+    const payoutMethodCurrency = values.payoutMethod?.currency || values.payoutMethod?.data?.currency;
+    const hasValidPayoutMethodCurrency = payoutMethodCurrency && availableCurrencies.includes(payoutMethodCurrency);
+    const hasItemsWithAmounts = values.items.some(item => Boolean(item.amountV2?.valueInCents));
+
     // If the currency is not supported anymore, we need to do something
-    if (!loading && (!values.currency || !availableCurrencies.includes(values.currency))) {
-      const hasItemsWithAmounts = values.items.some(item => Boolean(item.amountV2?.valueInCents));
+    if (!values.currency || !availableCurrencies.includes(values.currency)) {
       if (!hasItemsWithAmounts) {
         // If no items have amounts yet, we can safely set the default currency
-        formik.setFieldValue('currency', availableCurrencies[0]);
+        const defaultCurrency = hasValidPayoutMethodCurrency ? payoutMethodCurrency : availableCurrencies[0];
+        formik.setFieldValue('currency', defaultCurrency);
       } else if (values.currency) {
         // If there are items with amounts, we need to reset the currency
         formik.setFieldValue('currency', null);
       }
+    } else if (
+      payoutMethodCurrency &&
+      hasValidPayoutMethodCurrency &&
+      !hasItemsWithAmounts &&
+      values.currency !== payoutMethodCurrency
+    ) {
+      // When the payout method changes, if there's no items yet, we set the default currency to the payout method's currency
+      formik.setFieldValue('currency', payoutMethodCurrency);
     }
   }, [loading, values.payoutMethod]);
 
