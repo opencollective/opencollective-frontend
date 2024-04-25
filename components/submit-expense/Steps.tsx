@@ -45,8 +45,8 @@ type StepDefinition<
 > = {
   Form: React.FC<{ form: Form } | ({ form: Form } & AddProps)>;
   hasError: (form: Form) => boolean;
-  Title: React.FC<{ form: Form } | {}>;
-  Subtitle?: React.FC<{ form: Form } | {}>;
+  Title: React.FC<{ form: Form } | Record<string, never>>;
+  Subtitle?: React.FC<{ form: Form } | Record<string, never>>;
 };
 
 type ExpenseStepDefinition = StepDefinition<ExpenseFormValues, ExpenseForm>;

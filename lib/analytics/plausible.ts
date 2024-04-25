@@ -70,8 +70,8 @@ export function normalizeLocation(href: string): string {
   if (typeof window !== 'undefined') {
     window.plausible =
       window.plausible ||
-      function () {
-        (window.plausible.q = window.plausible.q || []).push(arguments);
+      function (...args) {
+        (window.plausible.q = window.plausible.q || []).push(args);
       };
   }
 
@@ -87,8 +87,8 @@ export function normalizeLocation(href: string): string {
 
   if (typeof window !== 'undefined' && window.history.pushState) {
     const originalPushState = window.history['pushState'];
-    window.history.pushState = function () {
-      originalPushState.apply(this, arguments);
+    window.history.pushState = function (...args) {
+      originalPushState.apply(this, args);
       trackPageView();
     };
     window.addEventListener('popstate', trackPageView);

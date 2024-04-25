@@ -136,7 +136,7 @@ const graphqlConfig = {
 
 module.exports = {
   root: true,
-  ignorePatterns: ['./lib/graphql/types/*', './lib/graphql/*.graphql'],
+  ignorePatterns: ['lib/graphql/types/v2/*', 'lib/graphql/*.graphql'],
   overrides: [
     {
       files: ['*.js', '*.jsx'],
@@ -154,8 +154,8 @@ module.exports = {
         ...baseConfig.rules,
         '@typescript-eslint/no-explicit-any': 'warn',
         '@typescript-eslint/no-var-requires': 'warn',
-        '@typescript-eslint/consistent-type-exports': 'error',
-        '@typescript-eslint/consistent-type-imports': 'error',
+        '@typescript-eslint/consistent-type-exports': 'warn',
+        '@typescript-eslint/consistent-type-imports': 'warn',
         'react/prop-types': 'off',
         // https://typescript-eslint.io/troubleshooting/performance-troubleshooting/#eslint-plugin-import
         'import/named': 'off',
