@@ -9,6 +9,7 @@ import { Badge } from '../../../ui/Badge';
 const getBadgeType = (status: LegalDocumentRequestStatus) => {
   switch (status) {
     case LegalDocumentRequestStatus.ERROR:
+    case LegalDocumentRequestStatus.INVALID:
       return 'error';
     case LegalDocumentRequestStatus.REQUESTED:
       return 'info';

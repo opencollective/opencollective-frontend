@@ -19,6 +19,10 @@ const LEGAL_DOCUMENT_STATUSES = defineMessages({
     id: 'LegalDocument.Received',
     defaultMessage: 'Received',
   },
+  [LegalDocumentRequestStatus.INVALID]: {
+    id: 'LegalDocument.Invalid',
+    defaultMessage: 'Invalid',
+  },
 });
 
 export const i18nLegalDocumentStatus = (intl, status) => {

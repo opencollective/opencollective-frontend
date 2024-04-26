@@ -313,6 +313,10 @@ export const ActivityDescriptionI18n = defineMessages({
     defaultMessage: 'Tax form received for <Account></Account>',
     id: 'DUPkdl',
   },
+  TAXFORM_INVALIDATED: {
+    defaultMessage: 'Tax form invalidated for <Account></Account>',
+    id: 'ActivityLog.TaxForm.Invalidated',
+  },
   // Members
   COLLECTIVE_MEMBER_CREATED: {
     defaultMessage: '<FromAccount></FromAccount> joined <Account></Account> as <MemberRole></MemberRole>',
@@ -803,6 +807,10 @@ export const ActivityTypeI18n: ActivityTranslations = defineMessages({
   TAXFORM_RECEIVED: {
     defaultMessage: 'Tax form received',
     id: 'XbazB4',
+  },
+  TAXFORM_INVALIDATED: {
+    defaultMessage: 'Tax form invalidated for <Account></Account>',
+    id: 'ActivityLog.TaxForm.Invalidated',
   },
   COLLECTIVE_COMMENT_CREATED: {
     defaultMessage: 'Comment posted',

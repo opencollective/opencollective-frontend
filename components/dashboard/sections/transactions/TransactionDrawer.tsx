@@ -1,26 +1,13 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { isNil } from 'lodash';
-import {
-  AlertTriangle,
-  Check,
-  Copy,
-  Download,
-  Eye,
-  InfoIcon,
-  MinusCircle,
-  MoreHorizontal,
-  Undo,
-  Undo2,
-  X,
-} from 'lucide-react';
+import { AlertTriangle, Download, Eye, InfoIcon, MinusCircle, MoreHorizontal, Undo, Undo2, X } from 'lucide-react';
 // eslint-disable-next-line no-restricted-imports -- components/Link does not currently accept a ref, which is required when used 'asChild' of HoverCardTrigger
 import Link from 'next/link';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { useAsyncCall } from '../../../../lib/hooks/useAsyncCall';
-import useClipboard from '../../../../lib/hooks/useClipboard';
 import { i18nTransactionKind, i18nTransactionType } from '../../../../lib/i18n/transaction';
 import { saveInvoice } from '../../../../lib/transactions';
 
@@ -28,6 +15,7 @@ import { AccountHoverCard, accountHoverCardFields } from '../../../AccountHoverC
 import Avatar from '../../../Avatar';
 import ExpenseBudgetItem from '../../../budget/ExpenseBudgetItem';
 import OrderBudgetItem from '../../../budget/OrderBudgetItem';
+import { CopyID } from '../../../CopyId';
 import DateTime from '../../../DateTime';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { Badge } from '../../../ui/Badge';
@@ -212,41 +200,6 @@ const DataList = ({ title, value }) => {
       <div className="min-w-[180px] max-w-[240px] shrink-0 grow-0 basis-1/4 text-muted-foreground">{title}</div>
       <div className="max-w-fit overflow-hidden">{value}</div>
     </div>
-  );
-};
-
-const CopyID = ({ children, tooltipLabel = <FormattedMessage defaultMessage="Copy ID" id="wtLjP6" /> }) => {
-  const { isCopied, copy } = useClipboard();
-
-  return (
-    <Tooltip delayDuration={100}>
-      <TooltipTrigger asChild>
-        <button
-          tabIndex={-1}
-          onClick={e => {
-            e.preventDefault(); // Prevent tooltip from closing when copying
-            copy(children);
-          }}
-          className="inline-flex w-full cursor-pointer select-text items-center gap-1 rounded-sm bg-slate-50 px-1 text-left font-mono text-muted-foreground transition-colors hover:bg-slate-100 hover:text-foreground"
-        >
-          <div className="shrink truncate">{children}</div> <Copy className="shrink-0 select-none" size={12} />
-        </button>
-      </TooltipTrigger>
-      <TooltipContent
-        onPointerDownOutside={e => {
-          e.preventDefault(); // Prevent tooltip from closing when copying
-        }}
-      >
-        {isCopied ? (
-          <div className="flex items-center gap-1">
-            <Check size={16} />
-            <FormattedMessage id="Clipboard.Copied" defaultMessage="Copied!" />
-          </div>
-        ) : (
-          tooltipLabel
-        )}
-      </TooltipContent>
-    </Tooltip>
   );
 };
 
