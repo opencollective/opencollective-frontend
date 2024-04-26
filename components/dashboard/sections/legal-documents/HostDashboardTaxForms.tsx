@@ -1,6 +1,5 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { PlusIcon } from 'lucide-react';
 import { defineMessage, FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
@@ -8,7 +7,6 @@ import { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filt
 import { integer, isMulti } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 import { HostTaxFormsQueryVariables, LegalDocumentRequestStatus } from '../../../../lib/graphql/types/v2/graphql';
-import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nLegalDocumentStatus } from '../../../../lib/i18n/legal-document';
 import { sortSelectOptions } from '../../../../lib/utils';
@@ -16,7 +14,6 @@ import { sortSelectOptions } from '../../../../lib/utils';
 import { Flex } from '../../../Grid';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import Pagination from '../../../Pagination';
-import { Button } from '../../../ui/Button';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import { accountFilter } from '../../filters/AccountFilter';
