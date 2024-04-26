@@ -3192,7 +3192,6 @@
   "tax.vatShort": "Taxas",
   "TaxForm": "Formulário de impostos",
   "TaxForm.DisabledPayment": "Impossível pagar porque o formulário de imposto não foi enviado.",
-  "TaxForm.New": "Add New",
   "taxType.Other": "Other",
   "tbPgmU": "Expense <Expense>{expenseDescription}</Expense> created from <FromAccount></FromAccount> to <Account></Account>",
   "tcxpLX": "Ninguém",

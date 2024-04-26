@@ -3192,7 +3192,6 @@
   "tax.vatShort": "VAT",
   "TaxForm": "Formularz podatkowy",
   "TaxForm.DisabledPayment": "Nie można zapłacić, ponieważ formularz podatkowy nie został przesłany.",
-  "TaxForm.New": "Add New",
   "taxType.Other": "Other",
   "tbPgmU": "Expense <Expense>{expenseDescription}</Expense> created from <FromAccount></FromAccount> to <Account></Account>",
   "tcxpLX": "Nikt",

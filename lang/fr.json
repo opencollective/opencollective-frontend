@@ -3192,7 +3192,6 @@
   "tax.vatShort": "TVA",
   "TaxForm": "Formulaire de taxe",
   "TaxForm.DisabledPayment": "Impossible de payer car le formulaire fiscal n'a pas été transmis.",
-  "TaxForm.New": "Add New",
   "taxType.Other": "Autres",
   "tbPgmU": "Dépense <Expense>{expenseDescription}</Expense> créée de <FromAccount></FromAccount> à <Account></Account>",
   "tcxpLX": "Personne",

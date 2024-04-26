@@ -1,6 +1,5 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { PlusIcon } from 'lucide-react';
 import { defineMessage, FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
@@ -8,7 +7,6 @@ import { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filt
 import { integer, isMulti } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 import { HostTaxFormsQueryVariables, LegalDocumentRequestStatus } from '../../../../lib/graphql/types/v2/graphql';
-import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nLegalDocumentStatus } from '../../../../lib/i18n/legal-document';
 import { sortSelectOptions } from '../../../../lib/utils';
@@ -16,7 +14,6 @@ import { sortSelectOptions } from '../../../../lib/utils';
 import { Flex } from '../../../Grid';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import Pagination from '../../../Pagination';
-import { Button } from '../../../ui/Button';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import { accountFilter } from '../../filters/AccountFilter';
@@ -137,8 +134,7 @@ const hasPagination = (data, queryVariables): boolean => {
 };
 
 const HostDashboardTaxForms = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
-  const { LoggedInUser } = useLoggedInUser();
-  const [isDrawerOpen, setDrawerOpen] = React.useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
   const [focusedLegalDocument, setFocusedLegalDocument] = React.useState(null);
 
   const queryFilter = useQueryFilter({
@@ -153,32 +149,9 @@ const HostDashboardTaxForms = ({ accountSlug: hostSlug }: DashboardSectionProps)
     context: API_V2_CONTEXT,
   });
 
-  const canEdit = Boolean(LoggedInUser && !LoggedInUser.isAccountantOnly(data?.host));
   return (
     <div className="flex max-w-screen-lg flex-col gap-4">
-      <DashboardHeader
-        title={<FormattedMessage defaultMessage="Tax Forms" id="skSw4d" />}
-        actions={
-          canEdit && (
-            <Button
-              data-cy="btn-new-tax-form"
-              className="gap-1"
-              size="sm"
-              disabled
-              // disabled={loading || loadingLoggedInUser}
-              // onClick={() => {
-              //   setFocusedLegalDocument(null);
-              //   setDrawerOpen(true);
-              // }}
-            >
-              <span>
-                <FormattedMessage id="TaxForm.New" defaultMessage="Add New" />
-              </span>
-              <PlusIcon size={20} />
-            </Button>
-          )
-        }
-      />
+      <DashboardHeader title={<FormattedMessage defaultMessage="Tax Forms" id="skSw4d" />} />
 
       <Filterbar {...queryFilter} />
 
@@ -198,7 +171,7 @@ const HostDashboardTaxForms = ({ accountSlug: hostSlug }: DashboardSectionProps)
             nbPlaceholders={NB_LEGAL_DOCUMENTS_DISPLAYED}
             resetFilters={() => queryFilter.resetFilters({})}
             onOpen={document => {
-              setDrawerOpen(true);
+              setIsDrawerOpen(true);
               setFocusedLegalDocument(document);
             }}
           />
@@ -220,7 +193,7 @@ const HostDashboardTaxForms = ({ accountSlug: hostSlug }: DashboardSectionProps)
               open={isDrawerOpen}
               host={data.host}
               document={focusedLegalDocument}
-              onClose={() => setDrawerOpen(false)}
+              onClose={() => setIsDrawerOpen(false)}
             />
           )}
         </React.Fragment>
