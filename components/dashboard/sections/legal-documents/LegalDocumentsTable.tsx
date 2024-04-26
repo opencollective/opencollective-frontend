@@ -1,9 +1,9 @@
 import React from 'react';
 import { ColumnDef, TableMeta } from '@tanstack/react-table';
-import { Download, Eye } from 'lucide-react';
+import { Eye } from 'lucide-react';
 import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
 
-import { LegalDocument } from '../../../../lib/graphql/types/v2/graphql';
+import { Account, Host, LegalDocument } from '../../../../lib/graphql/types/v2/graphql';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
@@ -16,13 +16,15 @@ import { P } from '../../../Text';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/DropdownMenu';
 import { TableActionsButton } from '../../../ui/Table';
 
-import { DownloadLegalDocument } from './DownloadLegalDocument';
+import { LegalDocumentActions } from './LegalDocumentActions';
 import { LegalDocumentServiceBadge } from './LegalDocumentServiceBadge';
 import { LegalDocumentStatusBadge } from './LegalDocumentStatusBadge';
 
 interface LegalDocumentTableMeta extends TableMeta<LegalDocument> {
   onOpen: (document: LegalDocument) => void;
   intl: IntlShape;
+  host: Host | Account;
+  onInvalidateSuccess?: () => void;
 }
 
 const columns: ColumnDef<LegalDocument>[] = [
@@ -95,14 +97,14 @@ const columns: ColumnDef<LegalDocument>[] = [
     header: null,
     meta: { className: 'w-14' },
     cell: ({ table, row }) => {
-      const { onOpen } = table.options.meta as LegalDocumentTableMeta;
+      const { onOpen, host, onInvalidateSuccess } = table.options.meta as LegalDocumentTableMeta;
       const document = row.original as LegalDocument;
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <TableActionsButton />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="end" onClick={e => e.stopPropagation()}>
             <DropdownMenuItem
               onClick={e => {
                 e.stopPropagation();
@@ -112,21 +114,19 @@ const columns: ColumnDef<LegalDocument>[] = [
               <Eye size={16} />
               <FormattedMessage defaultMessage="View details" id="MnpUD7" />
             </DropdownMenuItem>
-            {document.documentLink && (
-              <DownloadLegalDocument legalDocument={document}>
-                {({ download }) => (
-                  <DropdownMenuItem
-                    onClick={e => {
-                      e.stopPropagation();
-                      return download();
-                    }}
-                  >
-                    <Download size={16} />
-                    <FormattedMessage id="n+rgej" defaultMessage="Download {format}" values={{ format: 'PDF' }} />
-                  </DropdownMenuItem>
-                )}
-              </DownloadLegalDocument>
-            )}
+            <LegalDocumentActions legalDocument={document} host={host} onInvalidateSuccess={onInvalidateSuccess}>
+              {({ onClick, children, loading }) => (
+                <DropdownMenuItem
+                  disabled={loading}
+                  onClick={e => {
+                    e.preventDefault();
+                    onClick();
+                  }}
+                >
+                  {children}
+                </DropdownMenuItem>
+              )}
+            </LegalDocumentActions>
           </DropdownMenuContent>
         </DropdownMenu>
       );
@@ -135,19 +135,23 @@ const columns: ColumnDef<LegalDocument>[] = [
 ];
 
 type LegalDocumentsTableProps = {
+  host: Host | Account;
   documents: { nodes: LegalDocument[] };
   onOpen: (document: LegalDocument) => void;
   resetFilters?: () => void;
   loading?: boolean;
   nbPlaceholders?: number;
+  onInvalidateSuccess?: () => void;
 };
 
 export default function LegalDocumentsTable({
+  host,
   documents,
   onOpen,
   loading,
   nbPlaceholders,
   resetFilters,
+  onInvalidateSuccess,
 }: LegalDocumentsTableProps) {
   const intl = useIntl();
   return (
@@ -157,7 +161,7 @@ export default function LegalDocumentsTable({
       mobileTableView
       columns={columns}
       data={documents?.nodes || []}
-      meta={{ onOpen, intl } as LegalDocumentTableMeta}
+      meta={{ onOpen, intl, host, onInvalidateSuccess } as LegalDocumentTableMeta}
       loading={loading}
       nbPlaceholders={nbPlaceholders}
       onClickRow={row => onOpen(row.original)}
