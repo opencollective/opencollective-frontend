@@ -5,7 +5,7 @@ import { getTaxFormPDFServiceUrl } from '../../../../lib/url-helpers';
 import FilesViewerModal from '../../../FilesViewerModal';
 
 export const TaxFormPreviewModal = ({ type, values, onOpenChange }) => {
-  const url = getTaxFormPDFServiceUrl(type, values, { isFinal: true });
+  const url = getTaxFormPDFServiceUrl(type, values, { isFinal: false });
   return (
     <FilesViewerModal
       onClose={() => onOpenChange(false)}
