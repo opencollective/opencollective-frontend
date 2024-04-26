@@ -3192,7 +3192,6 @@
   "tax.vatShort": "DPH",
   "TaxForm": "Daňové priznanie",
   "TaxForm.DisabledPayment": "Nie je možné zaplatiť, pretože nebolo predložené daňové priznanie.",
-  "TaxForm.New": "Add New",
   "taxType.Other": "Other",
   "tbPgmU": "Expense <Expense>{expenseDescription}</Expense> created from <FromAccount></FromAccount> to <Account></Account>",
   "tcxpLX": "Nikto",

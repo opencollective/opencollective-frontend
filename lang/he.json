@@ -3192,7 +3192,6 @@
   "tax.vatShort": "מע״מ",
   "TaxForm": "טופס מס",
   "TaxForm.DisabledPayment": "אין אפשרות לשלם כי לא עודכנו אישורי מס.",
-  "TaxForm.New": "Add New",
   "taxType.Other": "Other",
   "tbPgmU": "Expense <Expense>{expenseDescription}</Expense> created from <FromAccount></FromAccount> to <Account></Account>",
   "tcxpLX": "אף אחת",

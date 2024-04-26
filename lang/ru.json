@@ -3192,7 +3192,6 @@
   "tax.vatShort": "НДС",
   "TaxForm": "Налоговая форма",
   "TaxForm.DisabledPayment": "Unable to pay because tax form has not been submitted.",
-  "TaxForm.New": "Add New",
   "taxType.Other": "Other",
   "tbPgmU": "Expense <Expense>{expenseDescription}</Expense> created from <FromAccount></FromAccount> to <Account></Account>",
   "tcxpLX": "No one",

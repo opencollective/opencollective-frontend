@@ -3192,7 +3192,6 @@
   "tax.vatShort": "Moms",
   "TaxForm": "Formulär för moms",
   "TaxForm.DisabledPayment": "Det gick inte att betala eftersom momsformuläret inte har skickats in.",
-  "TaxForm.New": "Add New",
   "taxType.Other": "Other",
   "tbPgmU": "Expense <Expense>{expenseDescription}</Expense> created from <FromAccount></FromAccount> to <Account></Account>",
   "tcxpLX": "Ingen",

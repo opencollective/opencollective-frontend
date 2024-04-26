@@ -3192,7 +3192,6 @@
   "tax.vatShort": "IVA",
   "TaxForm": "Forma de impuesto",
   "TaxForm.DisabledPayment": "No se puede pagar porque no se ha presentado el formulario de impuestos.",
-  "TaxForm.New": "Add New",
   "taxType.Other": "Otro",
   "tbPgmU": "Gasto <Expense>{expenseDescription}</Expense> creado de <FromAccount></FromAccount> a <Account></Account>",
   "tcxpLX": "Nadie",
