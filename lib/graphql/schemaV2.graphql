@@ -1658,6 +1658,36 @@ type Expense {
   requiredLegalDocuments: [LegalDocumentType]
 
   """
+  Returns the list of legal documents attached to this expense. Must be logged in as a host admin.
+  """
+  legalDocuments(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Filter by type of legal document
+    """
+    type: [LegalDocumentType]
+
+    """
+    Filter by status of legal document
+    """
+    status: [LegalDocumentRequestStatus]
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+  ): LegalDocumentCollection
+
+  """
   Drafted field values that were still not persisted
   """
   draft: JSON
@@ -3321,6 +3351,7 @@ type TransactionCollection implements Collection {
 }
 
 enum PaymentMethodType {
+  default @deprecated(reason: "Please use uppercase values")
   alipay @deprecated(reason: "Please use uppercase values")
   creditcard @deprecated(reason: "Please use uppercase values")
   prepaid @deprecated(reason: "Please use uppercase values")
@@ -3341,6 +3372,7 @@ enum PaymentMethodType {
   bank_transfer @deprecated(reason: "Please use uppercase values")
   payout @deprecated(reason: "Please use uppercase values")
   virtual_card @deprecated(reason: "Please use uppercase values")
+  DEFAULT
   ALIPAY
   CREDITCARD
   PREPAID
@@ -6551,6 +6583,7 @@ type ExpensePermissions {
   canUsePrivateNote: Boolean!
   canHold: Boolean!
   canRelease: Boolean!
+  canDownloadTaxForm: Boolean!
   edit: Permission!
 
   """
@@ -6572,6 +6605,7 @@ type ExpensePermissions {
   verifyDraftExpense: Permission!
   hold: Permission!
   release: Permission!
+  downloadTaxForm: Permission!
 }
 
 """
