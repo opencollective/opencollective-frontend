@@ -2574,7 +2574,6 @@
   "order.status": "状态",
   "Order.Status.Completed": "已完成",
   "Order.Status.Pending": "请按照确认电子邮件中的付款说明完成交易。",
-  "Order.Status.Processing": "我们正在等待第三方服务确认交易完成。",
   "Order.Status.Refunded": "已退款",
   "OrderBudgetItem.Tip": "（包括 {amount} 平台费）",
   "OrderBy": "Order by",

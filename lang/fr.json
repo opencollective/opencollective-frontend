@@ -2574,7 +2574,6 @@
   "order.status": "Statut",
   "Order.Status.Completed": "Completé",
   "Order.Status.Pending": "Veuillez suivre les instructions de paiement dans l'email de confirmation pour finaliser votre transaction.",
-  "Order.Status.Processing": "Nous attendons qu'un service tiers confirme que la transaction a été effectuée.",
   "Order.Status.Refunded": "Remboursé",
   "OrderBudgetItem.Tip": "(comprend {amount} de pourboire pour la plateforme)",
   "OrderBy": "Trier par",

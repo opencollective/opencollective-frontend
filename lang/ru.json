@@ -2574,7 +2574,6 @@
   "order.status": "Состояние",
   "Order.Status.Completed": "Завершено",
   "Order.Status.Pending": "Please follow the payment instructions in the confirmation email to complete your transaction.",
-  "Order.Status.Processing": "We're waiting for a third-party service to confirm the transaction was completed.",
   "Order.Status.Refunded": "Возвращено",
   "OrderBudgetItem.Tip": "(includes {amount} platform tip)",
   "OrderBy": "Order by",

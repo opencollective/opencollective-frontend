@@ -2574,7 +2574,6 @@
   "order.status": "Стан",
   "Order.Status.Completed": "Завершені",
   "Order.Status.Pending": "Дотримуйтесь настанов щодо оплати в електронному листі, щоб завершити транзакцію.",
-  "Order.Status.Processing": "We're waiting for a third-party service to confirm the transaction was completed.",
   "Order.Status.Refunded": "Повернено",
   "OrderBudgetItem.Tip": "(includes {amount} platform tip)",
   "OrderBy": "Order by",
