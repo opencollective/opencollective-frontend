@@ -58,7 +58,8 @@ export function Filterbar<FV extends Record<string, any>, FM>({
 }) {
   const intl = useIntl();
   const { displayedFilters, remainingFilters } = useGetFilterbarOptions(filters, values, defaultSchemaValues, meta);
-
+  const sortFilterKey = filters.sort ? 'sort' : filters.orderBy ? 'orderBy' : null;
+  const sortFilter = filters.sort || filters.orderBy;
   return (
     <div className={cn('flex flex-col gap-4', className)}>
       {views ? (
@@ -119,11 +120,11 @@ export function Filterbar<FV extends Record<string, any>, FM>({
             />
           )}
         </div>
-        {filters.orderBy && (
+        {sortFilterKey && (
           <div className="flex w-full flex-1 justify-end">
-            <filters.orderBy.StandaloneComponent
-              onChange={value => setFilter('orderBy', value)}
-              value={values.orderBy}
+            <sortFilter.StandaloneComponent
+              onChange={value => setFilter(sortFilterKey, value)}
+              value={values[sortFilterKey]}
               intl={intl}
             />
           </div>
