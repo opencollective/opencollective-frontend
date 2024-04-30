@@ -39,7 +39,7 @@
     "@radix-ui/react-tooltip": "1.0.7",
     "@sentry/browser": "^7.84.0",
     "@sentry/nextjs": "^7.84.0",
-    "@shopify/address": "4.2.0",
+    "@shopify/address": "4.2.1",
     "@simplewebauthn/browser": "9.0.1",
     "@stripe/react-stripe-js": "2.7.0",
     "@stripe/stripe-js": "2.4.0",
