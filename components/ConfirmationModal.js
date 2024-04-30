@@ -1,3 +1,5 @@
+// @deprecated: Use `NewConfirmationModal` instead
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, useIntl } from 'react-intl';
