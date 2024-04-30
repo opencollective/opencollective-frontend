@@ -136,7 +136,7 @@
     "validator": "13.11.0",
     "webpack-manifest-plugin": "5.0.0",
     "winston": "3.13.0",
-    "zod": "3.23.4"
+    "zod": "3.23.5"
   },
   "resolutions": {
     "@radix-ui/react-dismissable-layer": "^1.0.5",
