@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  CellContext as TanCellContext,
   ColumnDef,
   flexRender,
   getCoreRowModel,
@@ -13,6 +14,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { Skeleton } from './ui/Skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/Table';
+import { RowActionsMenu } from './RowActionsMenu';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -22,7 +24,7 @@ interface DataTableProps<TData, TValue> {
   hideHeader?: boolean;
   emptyMessage?: () => React.ReactNode;
   nbPlaceholders?: number;
-  onClickRow?: (row: Row<TData>) => void;
+  onClickRow?: (row: Row<TData>, actionsMenuTriggerRef?: React.RefObject<HTMLElement>) => void;
   onHoverRow?: (row: Row<TData>) => void;
   rowHasIndicator?: (row: Row<TData>) => boolean;
   className?: string;
@@ -34,7 +36,10 @@ interface DataTableProps<TData, TValue> {
   compact?: boolean;
   initialSort?: SortingState;
   getRowDataCy?: (row: Row<TData>) => string;
+  getRowId?: (data: TData) => string;
 }
+
+const defaultGetRowId = (data: any) => data.id;
 
 export function DataTable<TData, TValue>({
   columns,
@@ -52,6 +57,7 @@ export function DataTable<TData, TValue>({
   compact,
   initialSort,
   getRowDataCy,
+  getRowId = defaultGetRowId,
   ...tableProps
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>(initialSort ?? []);
@@ -65,6 +71,7 @@ export function DataTable<TData, TValue>({
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
     onRowSelectionChange: setRowSelection,
+    getRowId,
     state: {
       sorting,
       rowSelection,
@@ -114,39 +121,20 @@ export function DataTable<TData, TValue>({
             </TableRow>
           ))
         ) : table.getRowModel().rows?.length ? (
-          table.getRowModel().rows.map(row => (
-            <TableRow
-              key={row.id}
-              data-cy={getRowDataCy?.(row) || `datatable-row-${row.id}`}
-              data-state={row.getIsSelected() && 'selected'}
-              {...(onClickRow && {
-                onClick: () => onClickRow(row),
-                className: 'cursor-pointer',
-              })}
-              {...(onHoverRow && {
-                onMouseEnter: () => onHoverRow(row),
-                onMouseLeave: () => onHoverRow(null),
-              })}
-            >
-              {row.getVisibleCells().map(cell => {
-                const columnMeta = cell.column.columnDef.meta || {};
-                return (
-                  <TableCell
-                    key={cell.id}
-                    className={columnMeta['className']}
-                    fullWidth={tableProps.fullWidth}
-                    compact={compact}
-                    {...(rowHasIndicator && {
-                      withIndicator: true,
-                      'data-state': rowHasIndicator(row) && 'indicated',
-                    })}
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                );
-              })}
-            </TableRow>
-          ))
+          table
+            .getRowModel()
+            .rows.map(row => (
+              <DataTableRow
+                key={row.id}
+                row={row}
+                onClickRow={onClickRow}
+                getRowDataCy={getRowDataCy}
+                rowHasIndicator={rowHasIndicator}
+                tableProps={tableProps}
+                compact={compact}
+                onHoverRow={onHoverRow}
+              />
+            ))
         ) : (
           <TableRow highlightOnHover={false}>
             <TableCell colSpan={columns.length} compact={compact}>
@@ -168,3 +156,63 @@ export function DataTable<TData, TValue>({
     </Table>
   );
 }
+
+function DataTableRow({ row, onClickRow, getRowDataCy, rowHasIndicator, tableProps, compact, onHoverRow }) {
+  // Reference that can be picked up by the actions column, to enable returning focus when closing a drawer or modal opened from actions menu
+  const actionsMenuTriggerRef = React.useRef(null);
+  return (
+    <TableRow
+      data-cy={getRowDataCy?.(row) || `datatable-row-${row.id}`}
+      data-state={row.getIsSelected() && 'selected'}
+      {...(onClickRow && {
+        onClick: () => onClickRow(row, actionsMenuTriggerRef),
+        className: 'cursor-pointer',
+      })}
+      {...(onHoverRow && {
+        onMouseEnter: () => onHoverRow(row),
+        onMouseLeave: () => onHoverRow(null),
+      })}
+    >
+      {row.getVisibleCells().map(cell => {
+        const columnMeta = cell.column.columnDef.meta || {};
+        return (
+          <TableCell
+            key={cell.id}
+            className={columnMeta['className']}
+            fullWidth={tableProps.fullWidth}
+            compact={compact}
+            {...(rowHasIndicator && {
+              withIndicator: true,
+              'data-state': rowHasIndicator(row) && 'indicated',
+            })}
+          >
+            {flexRender(cell.column.columnDef.cell, {
+              ...cell.getContext(),
+              actionsMenuTriggerRef,
+            })}
+          </TableCell>
+        );
+      })}
+    </TableRow>
+  );
+}
+
+type CellContext<TData, TValue> = TanCellContext<TData, TValue> & {
+  actionsMenuTriggerRef?: React.MutableRefObject<any>;
+};
+
+export const actionsColumn = {
+  accessorKey: 'actions',
+  header: null,
+  meta: { className: 'w-16' },
+  enableHiding: false,
+  cell: (ctx: unknown) => {
+    const { table, row, actionsMenuTriggerRef } = ctx as CellContext<any, any>;
+    return (
+      // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+      <div onClick={e => e.stopPropagation()} className="flex items-center justify-end">
+        <RowActionsMenu table={table} row={row} actionsMenuTriggerRef={actionsMenuTriggerRef} />
+      </div>
+    );
+  },
+};

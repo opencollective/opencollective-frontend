@@ -1,10 +1,11 @@
 import React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import clsx from 'clsx';
-import { AlertTriangle, ArrowLeft, ArrowRight, MoreHorizontal, Undo } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, ArrowRight, Undo } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { Transaction, TransactionsTableQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import { useDrawer } from '../../../../lib/hooks/useDrawer';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import { useQueryFilterReturnType } from '../../../../lib/hooks/useQueryFilter';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
@@ -13,14 +14,14 @@ import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
-import { DataTable } from '../../../DataTable';
+import { actionsColumn, DataTable } from '../../../DataTable';
 import DateTime from '../../../DateTime';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { Badge } from '../../../ui/Badge';
-import { Button } from '../../../ui/Button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/DropdownMenu';
 
+import { useTransactionActions } from './actions';
 import { schema } from './filters';
+import { TransactionDrawer } from './TransactionDrawer';
 
 const cols = {
   createdAt: {
@@ -235,45 +236,7 @@ const cols = {
       return <div className="antialiased">{amount.currency}</div>;
     },
   },
-  actions: {
-    accessorKey: 'actions',
-    header: null,
-    meta: { className: 'w-16' },
-    enableHiding: false,
-    cell: ({ table, row }) => {
-      const transaction = row.original;
-      const { onClickRow, queryFilter } = table.options.meta;
-
-      return (
-        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
-        <div onClick={e => e.stopPropagation()} className="flex items-center justify-end">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button size="icon" variant="outline" className="h-7 w-7 border-transparent group-hover:border-border">
-                <MoreHorizontal size={16} />
-              </Button>
-            </DropdownMenuTrigger>
-
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => onClickRow(transaction)} className="gap-2">
-                <FormattedMessage defaultMessage="View details" id="MnpUD7" />
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() =>
-                  queryFilter.resetFilters({
-                    group: [transaction.group, transaction.refundTransaction?.group].filter(Boolean),
-                  })
-                }
-                className="gap-2"
-              >
-                <FormattedMessage defaultMessage="View related transactions" id="+9+Ty6" />
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      );
-    },
-  },
+  actions: actionsColumn,
 };
 
 const getColumns = (useAltLayout?: boolean): ColumnDef<Transaction>[] => {
@@ -295,39 +258,60 @@ type TransactionsTableProps = {
   transactions: { nodes: Transaction[] };
   loading?: boolean;
   nbPlaceholders?: number;
-  onClickRow: (transaction: Transaction) => void;
   useAltTestLayout?: boolean;
   queryFilter: useQueryFilterReturnType<typeof schema, TransactionsTableQueryVariables>;
+  refetchList?: () => void;
 };
 
 export default function TransactionsTable({
   transactions,
   loading,
   nbPlaceholders,
-  onClickRow,
   useAltTestLayout,
   queryFilter,
+  refetchList,
 }: TransactionsTableProps) {
   const intl = useIntl();
   const [hoveredGroup, setHoveredGroup] = React.useState<string | null>(null);
   const { LoggedInUser } = useLoggedInUser();
   const hasDynamicTopBar = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DYNAMIC_TOP_BAR);
   const columns = getColumns(useAltTestLayout);
+
+  const getActions = useTransactionActions({ resetFilters: queryFilter.resetFilters, refetchList });
+
+  const { openDrawer, drawerProps } = useDrawer({
+    open: Boolean(queryFilter.values.openTransactionId),
+    onOpen: id => queryFilter.setFilter('openTransactionId', id, false),
+    onClose: () => queryFilter.setFilter('openTransactionId', undefined, false),
+  });
+
   return (
-    <DataTable
-      data-cy="transactions-table"
-      innerClassName="table-fixed text-muted-foreground"
-      columns={columns}
-      data={transactions?.nodes || []}
-      loading={loading}
-      nbPlaceholders={nbPlaceholders}
-      onClickRow={row => onClickRow(row.original)}
-      onHoverRow={row => setHoveredGroup(row?.original?.group ?? null)}
-      rowHasIndicator={row => row.original.group === hoveredGroup}
-      fullWidth={hasDynamicTopBar}
-      mobileTableView
-      compact
-      meta={{ intl, onClickRow, queryFilter }}
-    />
+    <React.Fragment>
+      <DataTable
+        data-cy="transactions-table"
+        innerClassName="table-fixed text-muted-foreground"
+        columns={columns}
+        data={transactions?.nodes || []}
+        loading={loading}
+        nbPlaceholders={nbPlaceholders}
+        onClickRow={(row, menuRef) => openDrawer(row.id, menuRef)}
+        onHoverRow={row => setHoveredGroup(row?.original?.group ?? null)}
+        rowHasIndicator={row => row.original.group === hoveredGroup}
+        fullWidth={hasDynamicTopBar}
+        mobileTableView
+        compact
+        meta={{
+          intl,
+          openDrawer,
+          queryFilter,
+          getActions,
+        }}
+      />
+      <TransactionDrawer
+        {...drawerProps}
+        transactionId={queryFilter.values.openTransactionId}
+        getActions={getActions}
+      />
+    </React.Fragment>
   );
 }

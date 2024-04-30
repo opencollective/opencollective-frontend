@@ -33,7 +33,6 @@ import {
   toVariables as commonToVariables,
 } from './filters';
 import { transactionsTableQuery } from './queries';
-import { TransactionDrawer } from './TransactionDrawer';
 import TransactionsTable from './TransactionsTable';
 
 export const schema = commonSchema.extend({
@@ -100,7 +99,6 @@ enum TestLayout {
 const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const intl = useIntl();
   const [displayExportCSVModal, setDisplayExportCSVModal] = React.useState(false);
-  const [transactionInDrawer, setTransactionInDrawer] = React.useState(null);
 
   const [layout, setLayout] = React.useState(TestLayout.AMOUNT);
 
@@ -147,7 +145,6 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       includeChildrenTransactions: true,
       ...queryFilter.variables,
     },
-    notifyOnNetworkStatusChange: true,
     context: API_V2_CONTEXT,
   });
   const { transactions } = data || {};
@@ -190,12 +187,9 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
             transactions={transactions}
             loading={loading}
             nbPlaceholders={20}
-            onClickRow={row => {
-              setTransactionInDrawer(row);
-              queryFilter.setFilter('openTransactionId', row.id, false);
-            }}
             queryFilter={queryFilter}
             useAltTestLayout={layout === TestLayout.DEBITCREDIT}
+            refetchList={refetch}
           />
           <Flex mt={5} justifyContent="center">
             <Pagination
@@ -208,19 +202,6 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
           </Flex>
         </React.Fragment>
       )}
-      <TransactionDrawer
-        open={!!queryFilter.values.openTransactionId}
-        transaction={transactionInDrawer}
-        setFilter={queryFilter.setFilter}
-        resetFilters={queryFilter.resetFilters}
-        setOpen={open => {
-          if (!open) {
-            queryFilter.setFilter('openTransactionId', undefined, false);
-          }
-        }}
-        transactionId={queryFilter.values.openTransactionId}
-        refetchList={refetch}
-      />
     </div>
   );
 };
