@@ -5,10 +5,10 @@ import { FormattedMessage } from 'react-intl';
 
 import { useWindowResize, VIEWPORTS } from '../lib/hooks/useWindowResize';
 
+import { DropdownActionItem } from './table/RowActionsMenu';
 import { Button } from './ui/Button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/DropdownMenu';
 import { SheetClose } from './ui/Sheet';
-import { DropdownActionItem } from './RowActionsMenu';
 
 export default function DrawerHeader({ actions, entityName, entityIdentifier, entityLabel, dropdownTriggerRef }) {
   const { viewport } = useWindowResize();

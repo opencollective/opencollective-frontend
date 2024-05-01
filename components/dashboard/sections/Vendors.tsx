@@ -13,13 +13,13 @@ import { DashboardVendorsQuery } from '../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 
 import Avatar from '../../Avatar';
-import { DataTable } from '../../DataTable';
 import DismissibleMessage from '../../DismissibleMessage';
 import { Drawer } from '../../Drawer';
 import { I18nWithColumn } from '../../I18nFormatters';
 import MessageBox from '../../MessageBox';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import StyledModal from '../../StyledModal';
+import { DataTable } from '../../table/DataTable';
 import { Button } from '../../ui/Button';
 import {
   DropdownMenu,

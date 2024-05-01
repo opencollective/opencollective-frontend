@@ -18,11 +18,11 @@ import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { formatHostFeeStructure } from '../../../../lib/i18n/host-fee-structure';
 
-import { DataTable } from '../../../DataTable';
 import { Drawer } from '../../../Drawer';
 import { Flex } from '../../../Grid';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import Pagination from '../../../Pagination';
+import { DataTable } from '../../../table/DataTable';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import { consolidatedBalanceFilter } from '../../filters/BalanceFilter';
@@ -201,7 +201,7 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
   };
   const isUnhosted = queryFilter.values?.status === COLLECTIVE_STATUS.UNHOSTED;
   const hostedAccounts = data?.host?.hostedAccounts;
-
+  const onClickRow = row => handleDrawer(row.original);
   return (
     <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader title={<FormattedMessage id="HostedCollectives" defaultMessage="Hosted Collectives" />} />
@@ -230,8 +230,8 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
             loading={loading}
             mobileTableView
             compact
-            meta={{ intl, openCollectiveDetails: handleDrawer, onEdit: handleEdit, host: data?.host }}
-            onClickRow={row => handleDrawer(row.original)}
+            meta={{ intl, onClickRow, onEdit: handleEdit, host: data?.host }}
+            onClickRow={onClickRow}
             getRowDataCy={row => `collective-${row.original.slug}`}
           />
           <Flex mt={5} justifyContent="center">

@@ -6,11 +6,11 @@ import { HostApplication, HostApplicationStatus } from '../../../../lib/graphql/
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
-import { DataTable } from '../../../DataTable';
 import DateTime from '../../../DateTime';
 import StyledHr from '../../../StyledHr';
 import StyledLinkButton from '../../../StyledLinkButton';
 import StyledTag from '../../../StyledTag';
+import { DataTable } from '../../../table/DataTable';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/DropdownMenu';
 import { TableActionsButton } from '../../../ui/Table';
 

@@ -12,12 +12,12 @@ import { getSpendingLimitShortString } from '../../lib/i18n/virtual-card-spendin
 
 import { AccountHoverCard } from '../AccountHoverCard';
 import Avatar from '../Avatar';
-import { DataTable } from '../DataTable';
 import DateTime from '../DateTime';
 import EditVirtualCardModal from '../edit-collective/EditVirtualCardModal';
 import { Box, Flex } from '../Grid';
 import Loading from '../Loading';
 import StyledTag from '../StyledTag';
+import { DataTable } from '../table/DataTable';
 import {
   DropdownMenu,
   DropdownMenuContent,

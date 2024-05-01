@@ -51,7 +51,7 @@ function ChooseFilterType<FV>({
   );
 }
 
-function SetFilter({ tmpValue, setTmpValue, filterKey, filters, setFilter, setOpen, values, meta }) {
+export function SetFilter({ tmpValue, setTmpValue, filterKey, filters, setFilter, setOpen, values, meta }) {
   const intl = useIntl();
   const filterConfig = filters[filterKey];
   if (!filterConfig.Component) {

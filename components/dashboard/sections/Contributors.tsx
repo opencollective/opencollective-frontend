@@ -13,10 +13,10 @@ import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 import { capitalize, sortSelectOptions } from '../../../lib/utils';
 
 import Avatar from '../../Avatar';
-import { DataTable } from '../../DataTable';
 import DateTime from '../../DateTime';
 import LinkCollective from '../../LinkCollective';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
+import { DataTable } from '../../table/DataTable';
 import { Span } from '../../Text';
 import { Button } from '../../ui/Button';
 import { Pagination } from '../../ui/Pagination';

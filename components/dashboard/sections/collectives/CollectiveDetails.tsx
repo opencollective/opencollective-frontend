@@ -21,11 +21,11 @@ import { formatHostFeeStructure } from '../../../../lib/i18n/host-fee-structure'
 import { elementFromClass } from '../../../../lib/react-utils';
 
 import Avatar from '../../../Avatar';
-import { DataTable } from '../../../DataTable';
 import { useDrawerActionsContainer } from '../../../Drawer';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import LinkCollective from '../../../LinkCollective';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
+import { DataTable } from '../../../table/DataTable';
 import { H4 } from '../../../Text';
 import { Badge } from '../../../ui/Badge';
 import { Button } from '../../../ui/Button';
@@ -471,7 +471,7 @@ const CollectiveDetails = ({
                         data={children[type] || []}
                         mobileTableView
                         compact
-                        meta={{ intl, openCollectiveDetails }}
+                        meta={{ intl, onClickRow: row => openCollectiveDetails(row.original) }}
                         onClickRow={row => openCollectiveDetails(row.original)}
                         className="border-none"
                       />
