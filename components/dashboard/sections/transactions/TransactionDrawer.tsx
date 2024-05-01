@@ -6,6 +6,7 @@ import { AlertTriangle, InfoIcon, Undo } from 'lucide-react';
 import Link from 'next/link';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { GetActions } from '../../../../lib/actions/types';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { usePrevious } from '../../../../lib/hooks/usePrevious';
 import { i18nTransactionKind, i18nTransactionType } from '../../../../lib/i18n/transaction';
@@ -23,6 +24,8 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from '../../../ui/Hover
 import { Sheet, SheetBody, SheetContent } from '../../../ui/Sheet';
 import { Skeleton } from '../../../ui/Skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
+
+import { TransactionDetailsQueryNode } from './types';
 
 const transactionQuery = gql`
   query TransactionDetails($id: String!) {
@@ -143,10 +146,6 @@ const transactionQuery = gql`
           id
           slug
         }
-        paymentMethod {
-          service
-          type
-        }
       }
       expense {
         id
@@ -213,7 +212,12 @@ export function TransactionDrawer({ open, onOpenChange, onCloseAutoFocus, transa
   );
 }
 
-function TransactionDetails({ transactionId, getActions }) {
+interface TransactionDetailsProps {
+  transactionId: string;
+  getActions: GetActions<TransactionDetailsQueryNode>;
+}
+
+function TransactionDetails({ transactionId, getActions }: TransactionDetailsProps) {
   const intl = useIntl();
   const prevTransactionId = usePrevious(transactionId);
   const { data, refetch, loading } = useQuery(transactionQuery, {

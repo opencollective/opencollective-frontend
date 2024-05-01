@@ -17,10 +17,10 @@ import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
-import { DataTable } from '../../../DataTable';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import Link from '../../../Link';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
+import { DataTable } from '../../../table/DataTable';
 import { Badge } from '../../../ui/Badge';
 import { Button } from '../../../ui/Button';
 import { Checkbox } from '../../../ui/Checkbox';
@@ -260,7 +260,6 @@ export default function AccountTable({ accountSlug, queryFilter, metric }) {
   const currency = data?.account?.[metric.id]?.current?.currency;
 
   const meta = {
-    selectAccount: slug => queryFilter.setFilter('account', slug),
     queryFilter,
     currency: currency,
     isAmount: !!metric.amount,
