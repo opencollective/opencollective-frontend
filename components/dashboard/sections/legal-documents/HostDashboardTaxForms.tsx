@@ -25,6 +25,7 @@ import { orderByFilter } from '../../filters/OrderFilter';
 import { searchFilter } from '../../filters/SearchFilter';
 import { DashboardSectionProps } from '../../types';
 
+import { useLegalDocumentActions } from './actions';
 import LegalDocumentDrawer from './LegalDocumentDrawer';
 import LegalDocumentsTable from './LegalDocumentsTable';
 
@@ -134,20 +135,18 @@ const hasPagination = (data, queryVariables): boolean => {
 };
 
 const HostDashboardTaxForms = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
-  const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
-  const [focusedLegalDocument, setFocusedLegalDocument] = React.useState(null);
-
+  const [focusedLegalDocumentId, setFocusedLegalDocumentId] = React.useState(null);
   const queryFilter = useQueryFilter({
     filters,
     schema,
     toVariables,
     meta: { hostSlug },
   });
-
   const { data, previousData, error, variables, loading, refetch } = useQuery(hostDashboardTaxFormsQuery, {
     variables: { hostSlug, ...queryFilter.variables },
     context: API_V2_CONTEXT,
   });
+  const getActions = useLegalDocumentActions(data?.host, refetch);
 
   return (
     <div className="flex max-w-screen-lg flex-col gap-4">
@@ -171,11 +170,8 @@ const HostDashboardTaxForms = ({ accountSlug: hostSlug }: DashboardSectionProps)
             loading={loading}
             nbPlaceholders={NB_LEGAL_DOCUMENTS_DISPLAYED}
             resetFilters={() => queryFilter.resetFilters({})}
-            onInvalidateSuccess={refetch}
-            onOpen={document => {
-              setIsDrawerOpen(true);
-              setFocusedLegalDocument(document);
-            }}
+            getActions={getActions}
+            onOpen={document => setFocusedLegalDocumentId(document.id)}
           />
 
           <Flex my={4} justifyContent="center">
@@ -192,14 +188,11 @@ const HostDashboardTaxForms = ({ accountSlug: hostSlug }: DashboardSectionProps)
           </Flex>
           {data?.host && (
             <LegalDocumentDrawer
-              open={isDrawerOpen}
+              open={Boolean(focusedLegalDocumentId)}
               host={data.host}
-              document={focusedLegalDocument}
-              onClose={() => setIsDrawerOpen(false)}
-              onInvalidateSuccess={async () => {
-                await refetch();
-                setIsDrawerOpen(false);
-              }}
+              document={data.host.taxForms.nodes.find(d => d.id === focusedLegalDocumentId)}
+              onClose={() => setFocusedLegalDocumentId(null)}
+              getActions={getActions}
             />
           )}
         </React.Fragment>
