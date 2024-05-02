@@ -17374,6 +17374,11 @@ type Mutation {
     A message to explain the change in status. Will be sent to the legal document submitter
     """
     message: String
+
+    """
+    The new document link for the legal document. Must pass status=RECEIVED.
+    """
+    file: Upload
   ): LegalDocument!
 
   """
@@ -19364,6 +19369,11 @@ type SetPasswordResponse {
   token: String
 }
 
+"""
+The `Upload` scalar type represents a file upload.
+"""
+scalar Upload
+
 input MemberInvitationReferenceInput {
   """
   The public id identifying the member invitation (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
@@ -20069,11 +20079,6 @@ input UploadFileInput {
   """
   parsingOptions: OCRParsingOptionsInput = null
 }
-
-"""
-The `Upload` scalar type represents a file upload.
-"""
-scalar Upload
 
 """
 The kind of file that was uploaded
