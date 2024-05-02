@@ -1,37 +1,26 @@
 {
   "compilerOptions": {
-    "target": "es5",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
-    "checkJs": false,
     "skipLibCheck": true,
-    "strict": false,
-    "forceConsistentCasingInFileNames": true,
+    "strict": true,
     "noEmit": true,
-    "incremental": true,
     "esModuleInterop": true,
     "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
     "isolatedModules": true,
-    "moduleResolution": "node",
-    "typeRoots": ["node_modules/@types", "lib/custom_typings"],
     "jsx": "preserve",
-    "resolveJsonModule": true
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./*"]
+    }
   },
-  "include": [
-    ".eslintrc.js",
-    ".storybook/*.js",
-    "components",
-    "cypress",
-    "*.config.*",
-    "lib",
-    "middleware.ts",
-    "next-env.d.ts",
-    "pages",
-    "rewrites.js",
-    "scripts",
-    "server",
-    "stories",
-    "test"
-  ],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
 }

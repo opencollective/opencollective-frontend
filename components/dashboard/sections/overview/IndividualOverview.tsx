@@ -25,6 +25,7 @@ const Home = ({ accountSlug }: DashboardSectionProps) => {
     <div className="flex max-w-screen-lg flex-col-reverse xl:flex-row">
       <div className="flex flex-1 flex-col gap-4">
         <DashboardHeader
+          dashboardSlug={accountSlug}
           title={<FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />}
           description={
             <FormattedMessage

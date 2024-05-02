@@ -69,6 +69,7 @@ const AccountTransactions = ({ accountSlug }: DashboardSectionProps) => {
   return (
     <div className="flex flex-col gap-4">
       <DashboardHeader
+        dashboardSlug={accountSlug}
         title={<FormattedMessage id="menu.transactions" defaultMessage="Transactions" />}
         actions={
           <ExportTransactionsCSVModal

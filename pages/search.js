@@ -34,7 +34,7 @@ import { StyledSelectFilter } from '../components/StyledSelectFilter';
 import StyledTag from '../components/StyledTag';
 import { H1, P, Span } from '../components/Text';
 import { toast } from '../components/ui/useToast';
-
+import RegisterPage from '@/components/RegisterPage';
 const CollectiveCardContainer = styled.div`
   animation: ${fadeIn} 0.2s;
 `;
@@ -307,6 +307,8 @@ class SearchPage extends React.Component {
 
     return (
       <Page navTitle={intl.formatMessage({ defaultMessage: 'Explore', id: 'Explore' })} showSearch={false}>
+        <RegisterPage />
+
         <Container
           backgroundImage="url(/static/images/home/fiscalhost-blue-bg-lg.png)"
           style={{ transform: 'rotate(180deg)' }}

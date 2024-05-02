@@ -20,7 +20,7 @@ const abbreviateNumber = number => {
 };
 
 const Count = ({ count, selected }: { count?: number; selected?: boolean }) => {
-  if (isNil(count)) {
+  if (isNil(count) || count === 0) {
     return null;
   }
   return (

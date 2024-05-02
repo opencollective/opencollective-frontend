@@ -18,7 +18,8 @@ import StripeProviderSSR from '../components/StripeProvider';
 import TwoFactorAuthenticationModal from '../components/two-factor-authentication/TwoFactorAuthenticationModal';
 import { Toaster } from '../components/ui/Toaster';
 import UserProvider from '../components/UserProvider';
-
+import { SidebarProvider } from '@/components/SidebarContext';
+import { Sidebar } from '@/components/Sidebar';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'nprogress/nprogress.css';
@@ -26,6 +27,9 @@ import '@opencollective/trix/dist/trix.css';
 import '../public/static/styles/app.css';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css';
 
+import { useSidebar, LayoutOption } from '../components/SidebarContext';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '../components/ui/Select';
+import { Label } from '../components/ui/Label';
 Router.onRouteChangeStart = (url, { shallow }) => {
   if (!shallow) {
     NProgress.start();
@@ -57,6 +61,9 @@ import { TooltipProvider } from '../components/ui/Tooltip';
 if (typeof window === 'undefined') {
   PolyfillInterweaveSSR();
 }
+import useLoggedInUser from '../lib/hooks/useLoggedInUser';
+import TopBar from '../components/navigation/preview/TopBar';
+PolyfillInterweaveSSR();
 
 class OpenCollectiveFrontendApp extends App {
   static propTypes = {
@@ -192,18 +199,28 @@ class OpenCollectiveFrontendApp extends App {
           <ThemeProvider theme={theme}>
             <StripeProviderSSR>
               <IntlProvider locale={locale}>
-                <TooltipProvider delayDuration={500} skipDelayDuration={100}>
-                  <UserProvider initialLoggedInUser={LoggedInUserData ? new LoggedInUser(LoggedInUserData) : null}>
-                    <ModalProvider>
-                      <NewsAndUpdatesProvider>
-                        <Component {...pageProps} />
-                        <Toaster />
-                        <GlobalNewsAndUpdates />
-                        <TwoFactorAuthenticationModal />
-                      </NewsAndUpdatesProvider>
-                    </ModalProvider>
-                  </UserProvider>
-                </TooltipProvider>
+                <UserProvider>
+                  <SidebarProvider>
+                    <TooltipProvider delayDuration={500} skipDelayDuration={100}>
+                      <ModalProvider>
+                        <NewsAndUpdatesProvider>
+                          <div className="mx-auto flex min-h-screen bg-background font-sans antialiased">
+                            <Sidebar />
+                            <div className="w-full min-w-0">
+                              <TopBar />
+                              <Component {...pageProps} />
+                            </div>
+                          </div>
+
+                          <Toaster />
+                          <GlobalNewsAndUpdates />
+                          <TwoFactorAuthenticationModal />
+                          <SidebarManager />
+                        </NewsAndUpdatesProvider>
+                      </ModalProvider>
+                    </TooltipProvider>
+                  </SidebarProvider>
+                </UserProvider>
               </IntlProvider>
             </StripeProviderSSR>
           </ThemeProvider>
@@ -221,3 +238,26 @@ class OpenCollectiveFrontendApp extends App {
 // ts-unused-exports:disable-next-line
 // ts-unused-exports:disable-next-line
 export default withTwoFactorAuthentication(OpenCollectiveFrontendApp);
+
+const SidebarManager = () => {
+  const { LoggedInUser } = useLoggedInUser();
+  const { layout, setLayout } = useSidebar();
+  const sidebarOptions = Object.values(LayoutOption);
+  return (
+    <div className="fixed bottom-4 right-4 rounded-xl border bg-white p-6 shadow-xl">
+      <Label>Layout options</Label>
+      <Select value={layout} onValueChange={v => setLayout(v)}>
+        <SelectTrigger>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {sidebarOptions.map(option => (
+            <SelectItem key={option} onClick={() => setLayout(option)} value={option}>
+              {option}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+};

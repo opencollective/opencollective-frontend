@@ -9,6 +9,7 @@ import Tabs from '../../Tabs';
 import { Separator } from '../../ui/Separator';
 
 import FilterDropdown from './FilterDropdown';
+import { Button } from '@/components/ui/Button';
 
 function useGetFilterbarOptions(filters, values, defaultSchemaValues, meta) {
   const filterKeys = Object.keys(filters);
@@ -121,7 +122,10 @@ export function Filterbar<FV extends Record<string, any>, FM>({
           )}
         </div>
         {sortFilterKey && (
-          <div className="flex w-full flex-1 justify-end">
+          <div className="flex w-full flex-1 justify-end gap-2">
+            {/* <Button variant="outline" size="sm" className="rounded-full">
+              Save as bookmark
+            </Button> */}
             <sortFilter.StandaloneComponent
               onChange={value => setFilter(sortFilterKey, value)}
               value={values[sortFilterKey]}

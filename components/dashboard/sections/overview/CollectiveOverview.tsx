@@ -160,9 +160,10 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
       return (
         <div className="flex max-w-screen-lg flex-col gap-3">
           <DashboardHeader
+            dashboardSlug={accountSlug}
             title={<FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />}
             subpathTitle={metric.label}
-            titleRoute={getDashboardRoute(account, 'overview')}
+            titleRoute={getDashboardRoute(account, '')}
           />
 
           <Filterbar hideSeparator {...queryFilter} />
@@ -179,6 +180,7 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
     <div className="max-w-screen-lg space-y-6">
       <div className="flex flex-col gap-3">
         <DashboardHeader
+          dashboardSlug={accountSlug}
           title={<FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />}
           titleRoute={getDashboardRoute(account, 'overview')}
           actions={

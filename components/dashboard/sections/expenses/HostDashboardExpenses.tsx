@@ -201,7 +201,7 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
 
   return (
     <div className="flex max-w-screen-lg flex-col gap-4">
-      <DashboardHeader title={<FormattedMessage id="Expenses" defaultMessage="Expenses" />} />
+      <DashboardHeader dashboardSlug={hostSlug} title={<FormattedMessage id="Expenses" defaultMessage="Expenses" />} />
       {paypalPreApprovalError && (
         <MessageBox type="warning" mb={3} withIcon>
           {paypalPreApprovalError === 'PRE_APPROVAL_EMAIL_CHANGED' ? (
@@ -229,7 +229,7 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       ) : errorMetaData ? (
         <MessageBoxGraphqlError error={errorMetaData} />
       ) : (
-        <ExpensePipelineOverview className="pt-4" host={metaData.host} />
+        <ExpensePipelineOverview className="" host={metaData.host} />
       )}
       <ScheduledExpensesBanner
         hostSlug={hostSlug}

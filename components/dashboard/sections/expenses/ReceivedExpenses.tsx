@@ -119,6 +119,7 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
   return (
     <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader
+        dashboardSlug={accountSlug}
         title={<FormattedMessage defaultMessage="Received Expenses" id="1c0Y31" />}
         description={<FormattedMessage defaultMessage="Expenses submitted to your account." id="0I3Lbj" />}
       />

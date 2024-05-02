@@ -14,7 +14,7 @@ const searchFilterSchema = z.string().min(1).optional().catch(undefined);
 export const searchFilter: FilterConfig<z.infer<typeof searchFilterSchema>> = {
   schema: searchFilterSchema,
   filter: {
-    labelMsg: defineMessage({ id: 'Search', defaultMessage: 'Search' }),
+    labelMsg: defineMessage({ id: 'FreetextFilter', defaultMessage: 'Filter' }),
     StandaloneComponent: SearchFilter,
     static: true,
   },
@@ -35,15 +35,15 @@ function SearchFilter({ value, labelMsg, onChange, isViewActive }: FilterCompone
 
   return (
     <div className="relative">
-      <Search
+      {/* <Search
         size={16}
         className={clsx(
           'pointer-events-none absolute bottom-0 left-3 top-0 h-full text-muted-foreground',
           !isViewActive && value && 'text-primary',
         )}
-      />
+      /> */}
       <Input
-        className={clsx('h-9 w-[150px] rounded-full pl-8 lg:w-[200px]')}
+        className={clsx('h-9 w-[150px] rounded-full lg:w-[200px]')}
         ref={inputRef}
         placeholder={intl.formatMessage(labelMsg)}
         value={input || ''}

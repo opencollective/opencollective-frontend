@@ -796,6 +796,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
     <React.Fragment>
       <div className="flex max-w-screen-lg flex-col gap-4">
         <DashboardHeader
+          dashboardSlug={accountSlug}
           title={
             isIncoming ? (
               onlyExpectedFunds ? (

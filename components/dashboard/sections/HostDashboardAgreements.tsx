@@ -84,6 +84,7 @@ const HostDashboardAgreements = ({ accountSlug: hostSlug }: DashboardSectionProp
   return (
     <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader
+        dashboardSlug={hostSlug}
         title={<FormattedMessage id="Agreements" defaultMessage="Agreements" />}
         actions={
           canEdit && (

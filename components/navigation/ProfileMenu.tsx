@@ -199,12 +199,12 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
             </MenuItem>
           </div>
         </div>
-        <Separator className="sm:hidden" />
+        {/* <Separator className="sm:hidden" />
         <div className="flex flex-col sm:w-[256px]">
           <div className="flex-grow border-l text-sm sm:basis-0 sm:overflow-y-auto">
             <ProfileMenuMemberships user={LoggedInUser} closeDrawer={() => setMenuOpen(false)} />
           </div>
-        </div>
+        </div> */}
       </div>
       <PreviewFeaturesModal open={showPreviewFeaturesModal} setOpen={setShowPreviewFeaturesModal} />
     </React.Fragment>

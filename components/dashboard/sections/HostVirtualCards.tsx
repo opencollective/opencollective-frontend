@@ -314,6 +314,7 @@ const HostVirtualCards = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   return (
     <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader
+        dashboardSlug={hostSlug}
         title={<FormattedMessage id="VirtualCards.Title" defaultMessage="Virtual Cards" />}
         description={
           <FormattedMessage
