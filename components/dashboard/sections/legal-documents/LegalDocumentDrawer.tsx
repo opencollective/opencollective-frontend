@@ -43,6 +43,7 @@ const legalDocumentDrawerQuery = gql`
       totalCount
       nodes {
         id
+        legacyId
         type
         description
         createdAt
@@ -176,7 +177,7 @@ export default function LegalDocumentDrawer({
                         values={{
                           date: <DateTime dateStyle="medium" value={expense.createdAt} />,
                           ExpenseLink: getI18nLink({
-                            href: `${getCollectivePageRoute(expense.account)}/expenses/${expense.id}`,
+                            href: `${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`,
                             title: expense.description,
                             textDecoration: 'underline',
                             color: 'black.900',
