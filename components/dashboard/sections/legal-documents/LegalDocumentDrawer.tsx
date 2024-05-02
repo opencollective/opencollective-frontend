@@ -74,7 +74,7 @@ export default function LegalDocumentDrawer({
   onClose,
   host,
   document,
-}: LegalDocumentDrawerProps) {
+}: Readonly<LegalDocumentDrawerProps>) {
   const intl = useIntl();
   const { data, loading } = useQuery(legalDocumentDrawerQuery, {
     context: API_V2_CONTEXT,
@@ -94,7 +94,12 @@ export default function LegalDocumentDrawer({
       />
       <div className="flex gap-2">
         {document && (
-          <LegalDocumentActions legalDocument={document} host={host} onInvalidateSuccess={onInvalidateSuccess}>
+          <LegalDocumentActions
+            legalDocument={document}
+            host={host}
+            onInvalidateSuccess={onInvalidateSuccess}
+            onUploadSuccess={onClose}
+          >
             {({ onClick, loading, children }) => (
               <Button variant="outline" size="xs" onClick={onClick} loading={loading}>
                 {children}
