@@ -214,7 +214,7 @@
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-image": "^3.0.3",
     "@rollup/plugin-json": "^6.0.1",
-    "@rollup/plugin-typescript": "^10.0.1",
+    "@rollup/plugin-typescript": "^11.0.0",
     "@storybook/addon-designs": "8.0.1",
     "@storybook/addon-docs": "7.6.18",
     "@storybook/addon-essentials": "7.6.18",
