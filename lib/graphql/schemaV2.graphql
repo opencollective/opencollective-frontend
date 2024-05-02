@@ -1658,6 +1658,36 @@ type Expense {
   requiredLegalDocuments: [LegalDocumentType]
 
   """
+  Returns the list of legal documents attached to this expense. Must be logged in as a host admin.
+  """
+  legalDocuments(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Filter by type of legal document
+    """
+    type: [LegalDocumentType]
+
+    """
+    Filter by status of legal document
+    """
+    status: [LegalDocumentRequestStatus]
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+  ): LegalDocumentCollection
+
+  """
   Drafted field values that were still not persisted
   """
   draft: JSON
@@ -6103,9 +6133,19 @@ type HostApplication {
   account: Account!
 
   """
+  The host the collective applied to
+  """
+  host: Host!
+
+  """
   The date on which the item was created
   """
   createdAt: DateTime!
+
+  """
+  The date on which the item was updated
+  """
+  updatedAt: DateTime!
   status: HostApplicationStatus
   message: String
   customData: JSON
@@ -6553,6 +6593,7 @@ type ExpensePermissions {
   canUsePrivateNote: Boolean!
   canHold: Boolean!
   canRelease: Boolean!
+  canDownloadTaxForm: Boolean!
   edit: Permission!
 
   """
@@ -6574,6 +6615,7 @@ type ExpensePermissions {
   verifyDraftExpense: Permission!
   hold: Permission!
   release: Permission!
+  downloadTaxForm: Permission!
 }
 
 """
@@ -8362,6 +8404,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
 
   """
+  Returns the Fiscal Host application
+  """
+  hostApplication: HostApplication
+
+  """
   How much platform fees are charged for this account
   """
   platformFeePercent: Float!
@@ -8463,6 +8510,11 @@ interface AccountWithHost {
   Fees percentage that the host takes for this collective
   """
   hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
+
+  """
+  Returns the Fiscal Host application
+  """
+  hostApplication: HostApplication
 
   """
   Fees percentage that the platform takes for this collective
@@ -9541,6 +9593,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   Fees percentage that the host takes for this collective
   """
   hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
+
+  """
+  Returns the Fiscal Host application
+  """
+  hostApplication: HostApplication
 
   """
   How much platform fees are charged for this account
@@ -15586,6 +15643,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
 
   """
+  Returns the Fiscal Host application
+  """
+  hostApplication: HostApplication
+
+  """
   How much platform fees are charged for this account
   """
   platformFeePercent: Float!
@@ -16432,6 +16494,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   Fees percentage that the host takes for this collective
   """
   hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
+
+  """
+  Returns the Fiscal Host application
+  """
+  hostApplication: HostApplication
 
   """
   How much platform fees are charged for this account
@@ -17861,26 +17928,6 @@ type Mutation {
     """
     destinationAccount: AccountReferenceInput!
   ): [Expense]!
-
-  """
-  [Root only] A mutation to set the tax from for an account.
-  """
-  setTaxForm(
-    """
-    Reference to the Account the tax form should be set.
-    """
-    account: AccountReferenceInput!
-
-    """
-    The tax from link.
-    """
-    taxFormLink: URL!
-
-    """
-    The tax form year.
-    """
-    year: Int!
-  ): SetTaxFormResult
 
   """
   Refunds a transaction. Scope: "transactions".
@@ -19967,10 +20014,6 @@ type BanAccountResponse {
   The accounts impacted by the mutation
   """
   accounts: [Account!]!
-}
-
-type SetTaxFormResult {
-  success: Boolean!
 }
 
 input TransactionReferenceInput {

@@ -10,6 +10,8 @@ import { MinusCircle } from '@styled-icons/feather/MinusCircle';
 import { Pause as PauseIcon } from '@styled-icons/feather/Pause';
 import { Play as PlayIcon } from '@styled-icons/feather/Play';
 import { Trash2 as IconTrash } from '@styled-icons/feather/Trash2';
+import { get } from 'lodash';
+import { FileText } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -20,6 +22,7 @@ import useProcessExpense from '../../lib/expenses/useProcessExpense';
 import useClipboard from '../../lib/hooks/useClipboard';
 import { getCollectivePageCanonicalURL, getCollectivePageRoute } from '../../lib/url-helpers';
 
+import { DownloadLegalDocument } from '../legal-documents/DownloadLegalDocument';
 import PopupMenu from '../PopupMenu';
 import StyledButton from '../StyledButton';
 
@@ -91,6 +94,10 @@ const ExpenseMoreActionsButton = ({
     onModalToggle?.(isOpen);
   };
 
+  if (!permissions) {
+    return null;
+  }
+
   return (
     <React.Fragment>
       <PopupMenu
@@ -126,7 +133,7 @@ const ExpenseMoreActionsButton = ({
                 <FormattedMessage id="actions.spam" defaultMessage="Mark as Spam" />
               </Action>
             )}
-            {permissions?.canApprove && props.isViewingExpenseInHostContext && (
+            {permissions.canApprove && props.isViewingExpenseInHostContext && (
               <Action
                 loading={processExpense.loading && processExpense.currentAction === 'APPROVE'}
                 disabled={processExpense.loading || isDisabled}
@@ -139,7 +146,7 @@ const ExpenseMoreActionsButton = ({
                 <FormattedMessage id="actions.approve" defaultMessage="Approve" />
               </Action>
             )}
-            {permissions?.canReject && props.isViewingExpenseInHostContext && (
+            {permissions.canReject && props.isViewingExpenseInHostContext && (
               <Action
                 loading={processExpense.loading && processExpense.currentAction === 'REJECT'}
                 disabled={processExpense.loading || isDisabled}
@@ -152,7 +159,7 @@ const ExpenseMoreActionsButton = ({
                 <FormattedMessage id="actions.reject" defaultMessage="Reject" />
               </Action>
             )}
-            {permissions?.canMarkAsIncomplete && (
+            {permissions.canMarkAsIncomplete && (
               <Action
                 disabled={processExpense.loading || isDisabled}
                 onClick={() => {
@@ -164,7 +171,7 @@ const ExpenseMoreActionsButton = ({
                 <FormattedMessage id="actions.markAsIncomplete" defaultMessage="Mark as Incomplete" />
               </Action>
             )}
-            {permissions?.canHold && (
+            {permissions.canHold && (
               <Action
                 disabled={processExpense.loading || isDisabled}
                 onClick={() => {
@@ -176,7 +183,7 @@ const ExpenseMoreActionsButton = ({
                 <FormattedMessage id="actions.hold" defaultMessage="Put On Hold" />
               </Action>
             )}
-            {permissions?.canRelease && (
+            {permissions.canRelease && (
               <Action
                 disabled={processExpense.loading || isDisabled}
                 onClick={() => {
@@ -188,7 +195,7 @@ const ExpenseMoreActionsButton = ({
                 <FormattedMessage id="actions.release" defaultMessage="Release Hold" />
               </Action>
             )}
-            {permissions?.canDelete && (
+            {permissions.canDelete && (
               <Action
                 data-cy="more-actions-delete-expense-btn"
                 onClick={() => showDeleteConfirmMoreActions(true)}
@@ -198,13 +205,13 @@ const ExpenseMoreActionsButton = ({
                 <FormattedMessage id="actions.delete" defaultMessage="Delete" />
               </Action>
             )}
-            {permissions?.canEdit && (
+            {permissions.canEdit && (
               <Action data-cy="edit-expense-btn" onClick={onEdit} disabled={processExpense.loading || isDisabled}>
                 <IconEdit size="16px" />
                 <FormattedMessage id="Edit" defaultMessage="Edit" />
               </Action>
             )}
-            {permissions?.canSeeInvoiceInfo &&
+            {permissions.canSeeInvoiceInfo &&
               [expenseTypes.INVOICE, expenseTypes.SETTLEMENT].includes(expense?.type) && (
                 <ExpenseInvoiceDownloadHelper expense={expense} collective={expense.account} onError={onError}>
                   {({ isLoading, downloadInvoice }) => (
@@ -224,6 +231,27 @@ const ExpenseMoreActionsButton = ({
                   )}
                 </ExpenseInvoiceDownloadHelper>
               )}
+            {permissions.canDownloadTaxForm &&
+              get(expense, 'receivedTaxForms.nodes', [])
+                .filter(doc => Boolean(doc.documentLink))
+                .map(taxForm => (
+                  <DownloadLegalDocument key={taxForm.id} legalDocument={taxForm} account={expense.payee}>
+                    {({ isDownloading, download }) => (
+                      <Action
+                        key={taxForm.id}
+                        onClick={download}
+                        disabled={isDownloading || processExpense.loading || isDisabled}
+                      >
+                        <FileText size="16px" color="#888" />
+                        <FormattedMessage
+                          defaultMessage="Tax Form ({year})"
+                          id="+ylmVo"
+                          values={{ year: taxForm.year }}
+                        />
+                      </Action>
+                    )}
+                  </DownloadLegalDocument>
+                ))}
             <Action
               onClick={() =>
                 linkAction === 'link'
@@ -262,6 +290,8 @@ ExpenseMoreActionsButton.propTypes = {
     id: PropTypes.string.isRequired,
     legacyId: PropTypes.number.isRequired,
     type: PropTypes.oneOf(Object.values(expenseTypes)),
+    payee: PropTypes.shape({ id: PropTypes.string.isRequired }),
+    receivedTaxForms: PropTypes.shape({ nodes: PropTypes.array }),
     permissions: PropTypes.shape({
       canEdit: PropTypes.bool,
       canSeeInvoiceInfo: PropTypes.bool,

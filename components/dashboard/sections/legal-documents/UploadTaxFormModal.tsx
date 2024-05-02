@@ -77,7 +77,7 @@ export const UploadTaxFormModal = ({
             <p className="mb-3">
               <FormattedMessage
                 defaultMessage="Use the box below to manually upload the {year} tax form for {account}."
-                id="/SbDdx"
+                id="s2HV1E"
                 values={{
                   year: legalDocument.year,
                   account: legalDocument.account.name,
