@@ -229,6 +229,14 @@ export const expensePageExpenseFieldsFragment = gql`
     invoiceInfo
     merchantId
     requiredLegalDocuments
+    receivedTaxForms: legalDocuments(type: US_TAX_FORM, status: RECEIVED) {
+      nodes {
+        id
+        type
+        documentLink
+        year
+      }
+    }
     feesPayer
     draft
     items {
@@ -500,6 +508,7 @@ export const expensePageExpenseFieldsFragment = gql`
       canUsePrivateNote
       canHold
       canRelease
+      canDownloadTaxForm
       approve {
         allowed
         reason

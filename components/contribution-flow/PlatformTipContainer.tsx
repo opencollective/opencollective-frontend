@@ -81,7 +81,7 @@ function PlatformTipInput(props: PlatformTipInputProps) {
         return;
       }
 
-      props.onChange(value, options[value].percent * props.amount);
+      props.onChange(value, Math.round(options[value].percent * props.amount));
     },
     [props.onChange, props.selectedOption, props.amount, options],
   );
@@ -97,7 +97,7 @@ function PlatformTipInput(props: PlatformTipInputProps) {
     const newTipAmount =
       props.selectedOption === PlatformTipOption.OTHER
         ? props.value
-        : options[props.selectedOption].percent * props.amount;
+        : Math.round(options[props.selectedOption].percent * props.amount);
 
     props.onChange(props.selectedOption, newTipAmount);
   }, [options, props.amount, props.value, props.selectedOption]);
@@ -250,7 +250,7 @@ export function PlatformTipContainer(props: PlatformTipContainerProps) {
                 onChange={({ checked }) =>
                   checked
                     ? props.onChange(PlatformTipOption.NONE, 0)
-                    : props.onChange(PlatformTipOption.FIFTEEN_PERCENT, 0.15 * props.amount)
+                    : props.onChange(PlatformTipOption.FIFTEEN_PERCENT, Math.round(0.15 * props.amount))
                 }
                 label={
                   <span className="text-sm">

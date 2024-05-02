@@ -44,6 +44,7 @@ import sentryLib from '../server/sentry';
 
 import GlobalNewsAndUpdates from '../components/GlobalNewsAndUpdates';
 import IntlProvider from '../components/intl/IntlProvider';
+import { ModalProvider } from '../components/ModalContext';
 import NewsAndUpdatesProvider from '../components/NewsAndUpdatesProvider';
 import { TooltipProvider } from '../components/ui/Tooltip';
 
@@ -137,12 +138,14 @@ class OpenCollectiveFrontendApp extends App {
               <IntlProvider locale={locale}>
                 <TooltipProvider delayDuration={500} skipDelayDuration={100}>
                   <UserProvider>
-                    <NewsAndUpdatesProvider>
-                      <Component {...pageProps} />
-                      <Toaster />
-                      <GlobalNewsAndUpdates />
-                      <TwoFactorAuthenticationModal />
-                    </NewsAndUpdatesProvider>
+                    <ModalProvider>
+                      <NewsAndUpdatesProvider>
+                        <Component {...pageProps} />
+                        <Toaster />
+                        <GlobalNewsAndUpdates />
+                        <TwoFactorAuthenticationModal />
+                      </NewsAndUpdatesProvider>
+                    </ModalProvider>
                   </UserProvider>
                 </TooltipProvider>
               </IntlProvider>

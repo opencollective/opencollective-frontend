@@ -22,7 +22,7 @@ export const accountExpensesQuery = gql`
     $dateFrom: DateTime
     $dateTo: DateTime
     $searchTerm: String
-    $orderBy: ChronologicalOrderInput
+    $sort: ChronologicalOrderInput
     $chargeHasReceipts: Boolean
     $virtualCards: [VirtualCardReferenceInput]
     $createdByAccount: AccountReferenceInput
@@ -44,7 +44,7 @@ export const accountExpensesQuery = gql`
       dateFrom: $dateFrom
       dateTo: $dateTo
       searchTerm: $searchTerm
-      orderBy: $orderBy
+      orderBy: $sort
       chargeHasReceipts: $chargeHasReceipts
       virtualCards: $virtualCards
       createdByAccount: $createdByAccount
@@ -145,7 +145,7 @@ export const hostDashboardExpensesQuery = gql`
     $dateFrom: DateTime
     $dateTo: DateTime
     $searchTerm: String
-    $orderBy: ChronologicalOrderInput
+    $sort: ChronologicalOrderInput
     $chargeHasReceipts: Boolean
     $virtualCards: [VirtualCardReferenceInput]
     $account: AccountReferenceInput
@@ -164,7 +164,7 @@ export const hostDashboardExpensesQuery = gql`
       dateFrom: $dateFrom
       dateTo: $dateTo
       searchTerm: $searchTerm
-      orderBy: $orderBy
+      orderBy: $sort
       chargeHasReceipts: $chargeHasReceipts
       virtualCards: $virtualCards
     ) {
