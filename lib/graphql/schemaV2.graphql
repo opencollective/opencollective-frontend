@@ -6133,9 +6133,19 @@ type HostApplication {
   account: Account!
 
   """
+  The host the collective applied to
+  """
+  host: Host!
+
+  """
   The date on which the item was created
   """
   createdAt: DateTime!
+
+  """
+  The date on which the item was updated
+  """
+  updatedAt: DateTime!
   status: HostApplicationStatus
   message: String
   customData: JSON
@@ -8394,6 +8404,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
 
   """
+  Returns the Fiscal Host application
+  """
+  hostApplication: HostApplication
+
+  """
   How much platform fees are charged for this account
   """
   platformFeePercent: Float!
@@ -8495,6 +8510,11 @@ interface AccountWithHost {
   Fees percentage that the host takes for this collective
   """
   hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
+
+  """
+  Returns the Fiscal Host application
+  """
+  hostApplication: HostApplication
 
   """
   Fees percentage that the platform takes for this collective
@@ -9573,6 +9593,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   Fees percentage that the host takes for this collective
   """
   hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
+
+  """
+  Returns the Fiscal Host application
+  """
+  hostApplication: HostApplication
 
   """
   How much platform fees are charged for this account
@@ -15618,6 +15643,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
 
   """
+  Returns the Fiscal Host application
+  """
+  hostApplication: HostApplication
+
+  """
   How much platform fees are charged for this account
   """
   platformFeePercent: Float!
@@ -16464,6 +16494,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   Fees percentage that the host takes for this collective
   """
   hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
+
+  """
+  Returns the Fiscal Host application
+  """
+  hostApplication: HostApplication
 
   """
   How much platform fees are charged for this account
@@ -17406,6 +17441,11 @@ type Mutation {
     A message to explain the change in status. Will be sent to the legal document submitter
     """
     message: String
+
+    """
+    The new document link for the legal document. Must pass status=RECEIVED.
+    """
+    file: Upload
   ): LegalDocument!
 
   """
@@ -17888,26 +17928,6 @@ type Mutation {
     """
     destinationAccount: AccountReferenceInput!
   ): [Expense]!
-
-  """
-  [Root only] A mutation to set the tax from for an account.
-  """
-  setTaxForm(
-    """
-    Reference to the Account the tax form should be set.
-    """
-    account: AccountReferenceInput!
-
-    """
-    The tax from link.
-    """
-    taxFormLink: URL!
-
-    """
-    The tax form year.
-    """
-    year: Int!
-  ): SetTaxFormResult
 
   """
   Refunds a transaction. Scope: "transactions".
@@ -19396,6 +19416,11 @@ type SetPasswordResponse {
   token: String
 }
 
+"""
+The `Upload` scalar type represents a file upload.
+"""
+scalar Upload
+
 input MemberInvitationReferenceInput {
   """
   The public id identifying the member invitation (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
@@ -19991,10 +20016,6 @@ type BanAccountResponse {
   accounts: [Account!]!
 }
 
-type SetTaxFormResult {
-  success: Boolean!
-}
-
 input TransactionReferenceInput {
   """
   The public id identifying the transaction (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
@@ -20101,11 +20122,6 @@ input UploadFileInput {
   """
   parsingOptions: OCRParsingOptionsInput = null
 }
-
-"""
-The `Upload` scalar type represents a file upload.
-"""
-scalar Upload
 
 """
 The kind of file that was uploaded
