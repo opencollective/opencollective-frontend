@@ -54,7 +54,6 @@ import ExpenseNotesForm from './ExpenseNotesForm';
 import ExpenseRecurringBanner from './ExpenseRecurringBanner';
 import ExpenseSummary from './ExpenseSummary';
 import PrivateCommentsMessage from './PrivateCommentsMessage';
-import TaxFormLinkModal from './TaxFormLinkModal';
 
 const getVariableFromProps = props => {
   const firstOfCurrentYear = dayjs(new Date(new Date().getFullYear(), 0, 1))
@@ -129,7 +128,6 @@ function Expense(props) {
     tos: false,
     newsletterOptIn: false,
     createdUser: null,
-    showTaxLinkModal: false,
     showFilesViewerModal: false,
   });
   const [openUrl, setOpenUrl] = useState(null);
@@ -554,17 +552,6 @@ function Expense(props) {
               </div>
             )}
           </div>
-          {LoggedInUser?.isRoot && (
-            <Container pt={3} textAlign="right">
-              <StyledButton
-                buttonStyle="secondary"
-                buttonSize="tiny"
-                onClick={() => setState(state => ({ ...state, showTaxLinkModal: true }))}
-              >
-                <FormattedMessage defaultMessage="Add tax form" id="XozEmI" />
-              </StyledButton>
-            </Container>
-          )}
         </MessageBox>
       )}
       {status === PAGE_STATUS.VIEW &&
@@ -757,15 +744,6 @@ function Expense(props) {
             </Flex>
           )}
         </Fragment>
-      )}
-
-      {state.showTaxLinkModal && (
-        <TaxFormLinkModal
-          account={expense.payee}
-          year={new Date(expense.createdAt).getFullYear()}
-          onClose={() => setState(state => ({ ...state, showTaxLinkModal: false }))}
-          refetchExpense={refetch}
-        />
       )}
 
       {state.showFilesViewerModal && (
