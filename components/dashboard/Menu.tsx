@@ -177,10 +177,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         {
           section: ALL_SECTIONS.HOST_TAX_FORMS,
           label: intl.formatMessage({ defaultMessage: 'Tax Forms', id: 'skSw4d' }),
-          if: Boolean(
-            LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.TAX_FORMS) &&
-              account.host?.requiredLegalDocuments?.includes('US_TAX_FORM'),
-          ),
+          if: Boolean(account.host?.requiredLegalDocuments?.includes('US_TAX_FORM')),
         },
       ],
     },
