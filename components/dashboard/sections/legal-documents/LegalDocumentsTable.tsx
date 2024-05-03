@@ -1,8 +1,8 @@
 import React from 'react';
 import { ColumnDef, TableMeta } from '@tanstack/react-table';
-import { Eye } from 'lucide-react';
 import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
 
+import { GetActions } from '../../../../lib/actions/types';
 import { Account, Host, LegalDocument } from '../../../../lib/graphql/types/v2/graphql';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 
@@ -11,12 +11,9 @@ import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';
 import StyledHr from '../../../StyledHr';
 import StyledLinkButton from '../../../StyledLinkButton';
-import { DataTable } from '../../../table/DataTable';
+import { actionsColumn, DataTable } from '../../../table/DataTable';
 import { P } from '../../../Text';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/DropdownMenu';
-import { TableActionsButton } from '../../../ui/Table';
 
-import { LegalDocumentActions } from './LegalDocumentActions';
 import { LegalDocumentServiceBadge } from './LegalDocumentServiceBadge';
 import { LegalDocumentStatusBadge } from './LegalDocumentStatusBadge';
 
@@ -24,7 +21,6 @@ interface LegalDocumentTableMeta extends TableMeta<LegalDocument> {
   onOpen: (document: LegalDocument) => void;
   intl: IntlShape;
   host: Host | Account;
-  onInvalidateSuccess?: () => void;
 }
 
 const columns: ColumnDef<LegalDocument>[] = [
@@ -92,46 +88,7 @@ const columns: ColumnDef<LegalDocument>[] = [
       return <LegalDocumentStatusBadge status={status} />;
     },
   },
-  {
-    accessorKey: 'actions',
-    header: null,
-    meta: { className: 'w-14' },
-    cell: ({ table, row }) => {
-      const { onOpen, host, onInvalidateSuccess } = table.options.meta as LegalDocumentTableMeta;
-      const document = row.original as LegalDocument;
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <TableActionsButton />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" onClick={e => e.stopPropagation()}>
-            <DropdownMenuItem
-              onClick={e => {
-                e.stopPropagation();
-                onOpen(document);
-              }}
-            >
-              <Eye size={16} />
-              <FormattedMessage defaultMessage="View details" id="MnpUD7" />
-            </DropdownMenuItem>
-            <LegalDocumentActions legalDocument={document} host={host} onInvalidateSuccess={onInvalidateSuccess}>
-              {({ onClick, children, loading }) => (
-                <DropdownMenuItem
-                  disabled={loading}
-                  onClick={e => {
-                    e.preventDefault();
-                    onClick();
-                  }}
-                >
-                  {children}
-                </DropdownMenuItem>
-              )}
-            </LegalDocumentActions>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
-  },
+  actionsColumn,
 ];
 
 type LegalDocumentsTableProps = {
@@ -141,7 +98,8 @@ type LegalDocumentsTableProps = {
   resetFilters?: () => void;
   loading?: boolean;
   nbPlaceholders?: number;
-  onInvalidateSuccess?: () => void;
+  refetch?: () => void;
+  getActions: GetActions<LegalDocument>;
 };
 
 export default function LegalDocumentsTable({
@@ -151,8 +109,8 @@ export default function LegalDocumentsTable({
   loading,
   nbPlaceholders,
   resetFilters,
-  onInvalidateSuccess,
-}: LegalDocumentsTableProps) {
+  getActions,
+}: Readonly<LegalDocumentsTableProps>) {
   const intl = useIntl();
   return (
     <DataTable
@@ -161,10 +119,11 @@ export default function LegalDocumentsTable({
       mobileTableView
       columns={columns}
       data={documents?.nodes || []}
-      meta={{ onOpen, intl, host, onInvalidateSuccess } as LegalDocumentTableMeta}
+      meta={{ onOpen, intl, host } as LegalDocumentTableMeta}
       loading={loading}
       nbPlaceholders={nbPlaceholders}
       onClickRow={row => onOpen(row.original)}
+      getActions={getActions}
       emptyMessage={() => (
         <div>
           <P fontSize="16px">

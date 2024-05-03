@@ -7,6 +7,7 @@ import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { Account, Host, LegalDocument } from '../../../../lib/graphql/types/v2/graphql';
 
 import LinkCollective from '../../../LinkCollective';
+import { BaseModalProps } from '../../../ModalContext';
 import StyledLink from '../../../StyledLink';
 import StyledTextarea from '../../../StyledTextarea';
 import { Button } from '../../../ui/Button';
@@ -36,7 +37,7 @@ export const InvalidateTaxFormModal = ({
   legalDocument: LegalDocument;
   host: Account | Host;
   onSuccess?: () => void;
-} & React.ComponentProps<typeof Dialog>) => {
+} & BaseModalProps) => {
   const intl = useIntl();
   const [message, setMessage] = React.useState('');
   const { toast } = useToast();
@@ -49,7 +50,7 @@ export const InvalidateTaxFormModal = ({
   );
 
   return (
-    <Dialog {...props} onOpenChange={loading ? null : props.onOpenChange}>
+    <Dialog {...props} onOpenChange={props.setOpen}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
@@ -68,7 +69,7 @@ export const InvalidateTaxFormModal = ({
                   message,
                 },
               });
-              props.onOpenChange(false);
+              props.setOpen(false);
               onSuccess?.();
               toast({
                 variant: 'success',
@@ -126,7 +127,7 @@ export const InvalidateTaxFormModal = ({
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" type="button" onClick={() => props.onOpenChange(false)} disabled={loading}>
+            <Button variant="outline" type="button" onClick={() => props.setOpen(false)} disabled={loading}>
               <FormattedMessage defaultMessage="Cancel" id="actions.cancel" />
             </Button>
             <Button type="submit" loading={loading}>

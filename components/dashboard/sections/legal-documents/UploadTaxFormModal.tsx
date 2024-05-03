@@ -7,6 +7,7 @@ import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { Account, Host, LegalDocument } from '../../../../lib/graphql/types/v2/graphql';
 import { getMessageForRejectedDropzoneFiles } from '../../../../lib/hooks/useImageUploader';
 
+import { BaseModalProps } from '../../../ModalContext';
 import StyledDropzone, { DROPZONE_ACCEPT_PDF } from '../../../StyledDropzone';
 import { Button } from '../../../ui/Button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../../../ui/Dialog';
@@ -34,13 +35,13 @@ export const UploadTaxFormModal = ({
   legalDocument: LegalDocument;
   host: Account | Host;
   onSuccess?: () => void;
-} & React.ComponentProps<typeof Dialog>) => {
+} & BaseModalProps) => {
   const intl = useIntl();
   const [file, setFile] = React.useState<File | null>(null);
   const { toast } = useToast();
   const [uploadTaxForm, { loading }] = useMutation(uploadTaxFormMutation, { context: API_V2_CONTEXT });
   return (
-    <Dialog {...props} onOpenChange={loading ? null : props.onOpenChange}>
+    <Dialog {...props} onOpenChange={loading ? null : props.setOpen}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
@@ -58,7 +59,7 @@ export const UploadTaxFormModal = ({
                   file,
                 },
               });
-              props.onOpenChange(false);
+              props.setOpen(false);
               onSuccess?.();
               toast({
                 variant: 'success',
@@ -114,7 +115,7 @@ export const UploadTaxFormModal = ({
             />
           </div>
           <DialogFooter className="gap-2">
-            <Button variant="outline" type="button" onClick={() => props.onOpenChange(false)} disabled={loading}>
+            <Button variant="outline" type="button" onClick={() => props.setOpen(false)} disabled={loading}>
               <FormattedMessage defaultMessage="Cancel" id="actions.cancel" />
             </Button>
             <Button type="submit" loading={loading} disabled={!file}>

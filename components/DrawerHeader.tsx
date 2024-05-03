@@ -13,7 +13,7 @@ import { SheetClose } from './ui/Sheet';
 export default function DrawerHeader({ actions, entityName, entityIdentifier, entityLabel, dropdownTriggerRef }) {
   const { viewport } = useWindowResize();
   const isMobile = viewport === VIEWPORTS.XSMALL;
-  const { primary, secondary } = actions;
+  const { primary, secondary } = actions || {};
   const hasMoreActions = (isMobile && Boolean(primary?.length)) || Boolean(secondary?.length);
 
   return (
