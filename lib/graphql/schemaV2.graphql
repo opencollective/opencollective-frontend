@@ -17926,6 +17926,16 @@ type Mutation {
   ): SetPasswordResponse!
 
   """
+  Confirm email for Individual. Scope: "account".
+  """
+  confirmEmail(
+    """
+    The token to confirm the email.
+    """
+    token: String!
+  ): IndividualConfirmEmailResponse!
+
+  """
   Submit a legal document
   """
   submitLegalDocument(
@@ -20023,6 +20033,18 @@ enum ProcessHostApplicationAction {
 type SetPasswordResponse {
   individual: Individual!
   token: String
+}
+
+type IndividualConfirmEmailResponse {
+  """
+  The account that was confirmed
+  """
+  individual: Individual!
+
+  """
+  A new session token to use for the account. Only returned if user is signed in already.
+  """
+  sessionToken: String
 }
 
 """
