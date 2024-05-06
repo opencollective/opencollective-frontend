@@ -7,6 +7,7 @@ import styled, { css } from 'styled-components';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { TransactionKind, TransactionTypes } from '../../lib/constants/transactions';
+import { ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import { renderDetailsString, saveInvoice } from '../../lib/transactions';
 
@@ -116,7 +117,10 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
   // permissions
   const showRefundButton = permissions?.canRefund && !isRefunded;
   const showRejectButton = permissions?.canReject && !isOrderRejected;
-  const showDownloadInvoiceButton = permissions?.canDownloadInvoice && !isInternalTransfer(fromAccount, toAccount);
+  const showDownloadInvoiceButton =
+    permissions?.canDownloadInvoice &&
+    !isInternalTransfer(fromAccount, toAccount) &&
+    (!expense || expense.type === ExpenseType.INVOICE);
   const hostFeeTransaction = transaction.relatedTransactions?.find(
     t => t.kind === TransactionKind.HOST_FEE && t.type === TransactionTypes.CREDIT,
   );
@@ -325,6 +329,7 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
                 data-loading={loadingInvoice}
                 loading={loadingInvoice}
                 onClick={downloadInvoiceWith({
+                  expenseId: expense?.id,
                   transactionUuid: uuid,
                   toCollectiveSlug: toAccount.slug,
                   createdAt: transaction.createdAt,
