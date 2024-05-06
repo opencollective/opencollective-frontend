@@ -21,11 +21,11 @@ import { formatHostFeeStructure } from '../../../../lib/i18n/host-fee-structure'
 import { elementFromClass } from '../../../../lib/react-utils';
 
 import Avatar from '../../../Avatar';
-import { DataTable } from '../../../DataTable';
 import { useDrawerActionsContainer } from '../../../Drawer';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import LinkCollective from '../../../LinkCollective';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
+import { DataTable } from '../../../table/DataTable';
 import { H4 } from '../../../Text';
 import { Badge } from '../../../ui/Badge';
 import { Button } from '../../../ui/Button';
@@ -301,8 +301,23 @@ const CollectiveDetails = ({
   const collective = c || data?.account;
   const isHostedCollective = collective?.host?.id === host?.id;
   const isLoading = loading || loadingCollectiveInfo;
+  const isChild = !!collective?.parent?.id;
 
   const children = groupBy(collective?.childrenAccounts?.nodes, 'type');
+  const balance = collective?.stats?.balance;
+  const consolidatedBalance = collective?.stats?.consolidatedBalance;
+  const displayBalance =
+    !isChild && balance?.valueInCents !== consolidatedBalance?.valueInCents ? (
+      <React.Fragment>
+        <FormattedMoneyAmount amount={balance?.valueInCents} currency={balance?.currency} />
+        <span className="ml-2">
+          (<FormattedMoneyAmount amount={consolidatedBalance?.valueInCents} currency={consolidatedBalance?.currency} />{' '}
+          <FormattedMessage defaultMessage="total" id="total" />)
+        </span>
+      </React.Fragment>
+    ) : (
+      <FormattedMoneyAmount amount={balance?.valueInCents} currency={balance?.currency} />
+    );
   return (
     <div>
       <H4 mb={32}>
@@ -342,12 +357,20 @@ const CollectiveDetails = ({
           <SectionTitle>
             <Avatar collective={collective} radius={48} />
             <div>
-              <LinkCollective
-                collective={collective}
-                className="flex items-center gap-2 font-medium text-slate-700 hover:text-slate-700 hover:underline"
-              >
-                {collective.name}
-              </LinkCollective>
+              <div className="flex flex-row">
+                <LinkCollective
+                  collective={collective}
+                  className="flex items-center gap-2 font-medium text-slate-700 hover:text-slate-700 hover:underline"
+                >
+                  {collective.name}
+                </LinkCollective>
+                {collective.isFrozen && (
+                  <Badge type="info" size="xs" className="ml-2">
+                    <FormattedMessage id="CollectiveStatus.Frozen" defaultMessage="Frozen" />
+                  </Badge>
+                )}
+              </div>
+
               {collective.parent && (
                 <div className="text-sm font-normal text-muted-foreground">
                   <FormattedMessage
@@ -382,17 +405,7 @@ const CollectiveDetails = ({
                 )
               }
             />
-            <InfoListItem
-              title={<FormattedMessage id="Balance" defaultMessage="Balance" />}
-              value={
-                <FormattedMoneyAmount
-                  amount={collective.stats.balance.valueInCents}
-                  currency={collective.stats.balance.currency}
-                  showCurrencyCode={false}
-                  amountStyles={{}}
-                />
-              }
-            />
+            <InfoListItem title={<FormattedMessage id="Balance" defaultMessage="Balance" />} value={displayBalance} />
             {isHostedCollective && (
               <React.Fragment>
                 <InfoListItem
@@ -458,7 +471,7 @@ const CollectiveDetails = ({
                         data={children[type] || []}
                         mobileTableView
                         compact
-                        meta={{ intl, openCollectiveDetails }}
+                        meta={{ intl, onClickRow: row => openCollectiveDetails(row.original) }}
                         onClickRow={row => openCollectiveDetails(row.original)}
                         className="border-none"
                       />

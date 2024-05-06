@@ -126,6 +126,7 @@ export default class IntlDocument extends Document {
       'RECAPTCHA_SITE_KEY',
       'RECAPTCHA_ENABLED',
       'WISE_ENVIRONMENT',
+      'TAX_FORMS_USE_LEGACY',
       'HCAPTCHA_SITEKEY',
       'OCF_DUPLICATE_FLOW',
       'TURNSTILE_SITEKEY',

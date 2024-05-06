@@ -5,10 +5,10 @@ import { FormattedMessage } from 'react-intl';
 import { Activity } from '../../../../lib/graphql/types/v2/graphql';
 import { BREAKPOINTS, useWindowResize } from '../../../../lib/hooks/useWindowResize';
 
-import { DataTable } from '../../../DataTable';
 import DateTime from '../../../DateTime';
 import StyledHr from '../../../StyledHr';
 import StyledLinkButton from '../../../StyledLinkButton';
+import { DataTable } from '../../../table/DataTable';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/DropdownMenu';
 import { TableActionsButton } from '../../../ui/Table';
 

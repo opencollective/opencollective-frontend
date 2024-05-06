@@ -80,7 +80,7 @@ export const PausedIncomingContributionsMessage = ({
       {account.hasResumeContributionsProcessStarted ? (
         <p>
           <FormattedMessage
-            defaultMessage="You have started the process to resume these contributions, contributors will receive a few reminders to resume their contributions. If they don't, these contributions will automatically expire after a few months."
+            defaultMessage="You have started the process to resume these contributions, contributors will receive a few reminders to resume them. If they don't, these contributions will automatically expire after a few months."
             id="dhOuoE"
           />
         </p>

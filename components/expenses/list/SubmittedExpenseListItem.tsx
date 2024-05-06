@@ -148,7 +148,7 @@ export function SubmittedExpenseListItem(props: SubmittedExpenseListItemProps) {
             type={getExpenseStatusMsgType(props.expense.status)}
             status={props.expense.status}
             showTaxFormTag={includes(props.expense.requiredLegalDocuments, 'US_TAX_FORM')}
-            showTaxFormMsg={props.expense.payee.isAdmin}
+            payee={props.expense.payee}
           />
         </div>
       </div>

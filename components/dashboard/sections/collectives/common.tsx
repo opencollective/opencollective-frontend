@@ -1,7 +1,7 @@
 import React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { groupBy, isNil, mapValues, toPairs } from 'lodash';
-import { Banknote, Eye, FilePlus2, Mail, MoreHorizontal, Pause, Play, Unlink } from 'lucide-react';
+import { Banknote, Eye, FilePlus2, Mail, MoreHorizontal, Pause, Play, SquareSigma, Unlink } from 'lucide-react';
 import { FormattedDate, FormattedMessage, IntlShape } from 'react-intl';
 
 import { HOST_FEE_STRUCTURE } from '../../../../lib/constants/host-fee-structure';
@@ -22,6 +22,7 @@ import {
   DropdownMenuTrigger,
 } from '../../../ui/DropdownMenu';
 import { TableActionsButton } from '../../../ui/Table';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 
 import AddFundsModal from './AddFundsModal';
 import FreezeAccountModal from './FreezeAccountModal';
@@ -58,9 +59,14 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       );
       return (
         <div className="flex items-center">
-          <Avatar collective={collective} radius={48} className="mr-4" />
+          <Avatar collective={collective} className="mr-4" radius={48} />
+          {collective.isFrozen && (
+            <Badge type="info" size="xs" className="mr-2">
+              <FormattedMessage id="CollectiveStatus.Frozen" defaultMessage="Frozen" />
+            </Badge>
+          )}
           <div className="flex flex-col items-start">
-            <div className="text-sm text-foreground">{collective.name}</div>
+            <div className="flex items-center text-sm">{collective.name}</div>
             <div className="text-xs">{secondLine}</div>
           </div>
         </div>
@@ -79,11 +85,14 @@ export const cols: Record<string, ColumnDef<any, any>> = {
     accessorKey: 'team',
     header: () => <FormattedMessage id="Team" defaultMessage="Team" />,
     cell: ({ row }) => {
+      const DISPLAYED_TEAM_MEMBERS = 3;
       const account = row.original;
       const admins = account.members?.nodes || [];
+      const displayed = admins.length > DISPLAYED_TEAM_MEMBERS ? admins.slice(0, DISPLAYED_TEAM_MEMBERS - 1) : admins;
+      const left = admins.length - displayed.length;
       return (
         <div className="flex gap-[-4px]">
-          {admins.map(admin => (
+          {displayed.map(admin => (
             <AccountHoverCard
               key={admin.id}
               account={admin.account}
@@ -95,6 +104,11 @@ export const cols: Record<string, ColumnDef<any, any>> = {
               }
             />
           ))}
+          {left ? (
+            <div className="ml-[-8px] flex h-6 w-6 items-center justify-center rounded-full bg-blue-50 text-[11px] font-semibold text-blue-400 first:ml-0">
+              +{left}
+            </div>
+          ) : null}
         </div>
       );
     },
@@ -119,7 +133,8 @@ export const cols: Record<string, ColumnDef<any, any>> = {
     accessorKey: 'hostedSince',
     header: () => <FormattedMessage id="HostedSince" defaultMessage="Hosted since" />,
     cell: ({ row }) => {
-      const since = row.original.approvedAt;
+      const collective = row.original;
+      const since = collective.approvedAt;
       return isNil(since) ? (
         ''
       ) : (
@@ -130,10 +145,11 @@ export const cols: Record<string, ColumnDef<any, any>> = {
     },
   },
   balance: {
-    accessorKey: 'balence',
+    accessorKey: 'balance',
     header: () => <FormattedMessage id="Balance" defaultMessage="Balance" />,
     cell: ({ row }) => {
-      const balance = row.original.stats.balance;
+      const collective = row.original;
+      const balance = collective.stats.balance;
       return (
         <div className="font-medium text-foreground">
           <FormattedMoneyAmount
@@ -142,6 +158,41 @@ export const cols: Record<string, ColumnDef<any, any>> = {
             showCurrencyCode={false}
             amountStyles={{}}
           />
+        </div>
+      );
+    },
+  },
+  consolidatedBalance: {
+    accessorKey: 'consolidatedBalence',
+    header: () => <FormattedMessage id="TotalBalance" defaultMessage="Total Balance" />,
+    cell: ({ row }) => {
+      const collective = row.original;
+      const isChild = !!collective.parent?.id;
+      const stats = collective.stats;
+      const hasDifferentBalances = stats.balance?.valueInCents !== stats.consolidatedBalance?.valueInCents;
+      const displayBalance = isChild ? stats.balance : stats.consolidatedBalance;
+      return (
+        <div className="flex items-center font-medium text-foreground">
+          <FormattedMoneyAmount
+            amount={displayBalance.valueInCents}
+            currency={displayBalance.currency}
+            showCurrencyCode={false}
+            amountStyles={{}}
+          />
+
+          {!isChild && hasDifferentBalances && (
+            <Tooltip>
+              <TooltipTrigger className="cursor-help align-middle">
+                <SquareSigma className="ml-1" size="16" />
+              </TooltipTrigger>
+              <TooltipContent className="font-normal">
+                <FormattedMessage
+                  id="Tooltip.ConsolidatedBalance"
+                  defaultMessage="Includes the balance of all events and projects"
+                />
+              </TooltipContent>
+            </Tooltip>
+          )}
         </div>
       );
     },

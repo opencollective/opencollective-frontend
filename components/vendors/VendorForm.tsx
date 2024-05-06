@@ -70,6 +70,7 @@ type VendorFormProps = {
   onSuccess?: Function;
   onCancel: () => void;
   isModal?: boolean;
+  supportsTaxForm: boolean;
 };
 
 const validateVendorForm = values => {
@@ -92,7 +93,7 @@ const validateVendorForm = values => {
   return errors;
 };
 
-const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormProps) => {
+const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxForm }: VendorFormProps) => {
   const intl = useIntl();
   const { toast } = useToast();
   const [createVendor, { loading: isCreating }] = useMutation(createVendorMutation, { context: API_V2_CONTEXT });
@@ -212,43 +213,47 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
                   <StyledInput {...field} width="100%" maxWidth={500} maxLength={60} placeholder={formik.values.name} />
                 )}
               </StyledInputFormikField>
-              <StyledInputFormikField
-                name="vendorInfo.taxFormRequired"
-                label={intl.formatMessage({ id: 'TaxForm', defaultMessage: 'Tax form' })}
-                labelProps={FIELD_LABEL_PROPS}
-                required={false}
-                mt={3}
-              >
-                {({ field, form }) => (
-                  <div className="flex items-center gap-2">
-                    <Switch
-                      {...field}
-                      checked={field.value}
-                      onCheckedChange={checked => {
-                        form.setFieldValue(field.name, checked);
-                        if (!checked) {
-                          form.setFieldValue(field.name, null);
-                        }
-                      }}
-                    />
-                    <label htmlFor="taxRequired" className="font-normal">
-                      <FormattedMessage defaultMessage="Requires tax form" id="oKmsSw" />
-                    </label>
-                  </div>
-                )}
-              </StyledInputFormikField>
-              {formik.values.vendorInfo?.taxFormRequired && (
-                <StyledInputFormikField
-                  name="vendorInfo.taxFormUrl"
-                  label={intl.formatMessage({ defaultMessage: 'Tax form URL', id: '72Ve1d' })}
-                  labelProps={FIELD_LABEL_PROPS}
-                  required={false}
-                  mt={3}
-                >
-                  {({ field }) => (
-                    <StyledInputGroup {...field} prepend="https://" width="100%" maxWidth={500} maxLength={60} />
+              {supportsTaxForm && (
+                <React.Fragment>
+                  <StyledInputFormikField
+                    name="vendorInfo.taxFormRequired"
+                    label={intl.formatMessage({ id: 'TaxForm', defaultMessage: 'Tax form' })}
+                    labelProps={FIELD_LABEL_PROPS}
+                    required={false}
+                    mt={3}
+                  >
+                    {({ field, form }) => (
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          {...field}
+                          checked={field.value}
+                          onCheckedChange={checked => {
+                            form.setFieldValue(field.name, checked);
+                            if (!checked) {
+                              form.setFieldValue(field.name, null);
+                            }
+                          }}
+                        />
+                        <label htmlFor="taxRequired" className="font-normal">
+                          <FormattedMessage defaultMessage="Requires tax form" id="oKmsSw" />
+                        </label>
+                      </div>
+                    )}
+                  </StyledInputFormikField>
+                  {formik.values.vendorInfo?.taxFormRequired && (
+                    <StyledInputFormikField
+                      name="vendorInfo.taxFormUrl"
+                      label={intl.formatMessage({ defaultMessage: 'Tax form URL', id: '72Ve1d' })}
+                      labelProps={FIELD_LABEL_PROPS}
+                      required={false}
+                      mt={3}
+                    >
+                      {({ field }) => (
+                        <StyledInputGroup {...field} prepend="https://" width="100%" maxWidth={500} maxLength={60} />
+                      )}
+                    </StyledInputFormikField>
                   )}
-                </StyledInputFormikField>
+                </React.Fragment>
               )}
               <p className="mb-3 mt-4 text-base font-bold">
                 <FormattedMessage defaultMessage="Tax identification" id="YQKRUh" />

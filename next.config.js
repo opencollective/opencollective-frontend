@@ -57,6 +57,7 @@ const nextConfig = {
         SENTRY_DSN: null,
         WISE_PLATFORM_COLLECTIVE_SLUG: null,
         WISE_ENVIRONMENT: 'sandbox',
+        TAX_FORMS_USE_LEGACY: false,
         HCAPTCHA_SITEKEY: false,
         OCF_DUPLICATE_FLOW: false,
         TURNSTILE_SITEKEY: false,

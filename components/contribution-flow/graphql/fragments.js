@@ -165,6 +165,7 @@ export const orderSuccessFragment = gql`
       settings
       socialLinks {
         type
+        url
       }
       stats {
         id

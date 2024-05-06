@@ -367,7 +367,7 @@ const SectionContributions = ({ collective }) => {
             {(!loading || (isLoadingMore && loading)) &&
               uniqWith(
                 memberOf?.nodes,
-                (member1, member2) => member1.role === member2.role && member1?.account.id === member2?.account.id,
+                (member1, member2) => member1?.role === member2?.role && member1?.account?.id === member2?.account?.id,
               ).map(membership => (
                 <MembershipCardContainer data-cy="collective-contribution" key={membership.id}>
                   <StyledMembershipCard membership={membership} />

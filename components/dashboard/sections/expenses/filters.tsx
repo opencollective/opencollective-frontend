@@ -22,14 +22,22 @@ import { amountFilter } from '../../filters/AmountFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { dateFilter } from '../../filters/DateFilter';
 import { expenseTagFilter } from '../../filters/ExpenseTagsFilter';
-import { orderByFilter } from '../../filters/OrderFilter';
 import { searchFilter } from '../../filters/SearchFilter';
+import { buildSortFilter } from '../../filters/SortFilter';
 import { VirtualCardRenderer } from '../../filters/VirtualCardsFilter';
+
+const sortFilter = buildSortFilter({
+  fieldSchema: z.enum(['CREATED_AT']),
+  defaultValue: {
+    field: 'CREATED_AT',
+    direction: 'DESC',
+  },
+});
 
 export const schema = z.object({
   limit: limit.default(10),
   offset,
-  orderBy: orderByFilter.schema,
+  sort: sortFilter.schema,
   searchTerm: searchFilter.schema,
   date: dateFilter.schema,
   amount: amountFilter.schema,
@@ -52,7 +60,6 @@ export const toVariables: FiltersToVariables<
   FilterValues,
   HostDashboardExpensesQueryVariables & AccountExpensesQueryVariables
 > = {
-  orderBy: orderByFilter.toVariables,
   date: dateFilter.toVariables,
   amount: amountFilter.toVariables,
   payout: value => ({ payoutMethodType: value }),
@@ -62,7 +69,7 @@ export const toVariables: FiltersToVariables<
 
 // The filters config is used to populate the Filters component.
 export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
-  orderBy: orderByFilter.filter,
+  sort: sortFilter.filter,
   searchTerm: searchFilter.filter,
   date: dateFilter.filter,
   amount: amountFilter.filter,

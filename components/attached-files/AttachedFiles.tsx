@@ -35,7 +35,7 @@ const AttachedFiles = ({ files, onRemove, openFileViewer, size = 88 }: AttachedF
             />
           )}
           {onRemove && (
-            <Box ml="4px" mt="2px">
+            <Box mt="2px">
               <StyledLinkButton variant="danger" fontSize="12px" onClick={() => onRemove(idx)}>
                 <FormattedMessage id="Remove" defaultMessage="Remove" />
               </StyledLinkButton>

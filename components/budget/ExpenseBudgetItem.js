@@ -378,7 +378,7 @@ const ExpenseBudgetItem = ({
                   lineHeight="16px"
                   p="3px 8px"
                   showTaxFormTag={includes(expense.requiredLegalDocuments, 'US_TAX_FORM')}
-                  showTaxFormMsg={expense.payee.isAdmin}
+                  payee={expense.payee}
                 />
               )}
             </Flex>

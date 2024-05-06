@@ -18,13 +18,14 @@ import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { formatHostFeeStructure } from '../../../../lib/i18n/host-fee-structure';
 
-import { DataTable } from '../../../DataTable';
 import { Drawer } from '../../../Drawer';
 import { Flex } from '../../../Grid';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import Pagination from '../../../Pagination';
+import { DataTable } from '../../../table/DataTable';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
+import { consolidatedBalanceFilter } from '../../filters/BalanceFilter';
 import {
   COLLECTIVE_STATUS,
   collectiveStatusFilter,
@@ -32,13 +33,27 @@ import {
 } from '../../filters/CollectiveStatusFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { Filterbar } from '../../filters/Filterbar';
-import { orderByFilter } from '../../filters/OrderFilter';
 import { searchFilter } from '../../filters/SearchFilter';
+import { buildSortFilter } from '../../filters/SortFilter';
 import { DashboardSectionProps } from '../../types';
 
 import CollectiveDetails from './CollectiveDetails';
 import { cols } from './common';
 import { hostedCollectivesMetadataQuery, hostedCollectivesQuery } from './queries';
+
+const sortFilter = buildSortFilter({
+  fieldSchema: z.enum(['CREATED_AT', 'BALANCE', 'NAME']),
+  defaultValue: {
+    field: 'CREATED_AT',
+    direction: 'DESC',
+  },
+  i18nCustomLabels: {
+    CREATED_AT: defineMessage({
+      defaultMessage: 'Hosted since',
+      id: 'HostedSince',
+    }),
+  },
+});
 
 const COLLECTIVES_PER_PAGE = 20;
 
@@ -46,19 +61,20 @@ const schema = z.object({
   limit: integer.default(COLLECTIVES_PER_PAGE),
   offset: integer.default(0),
   searchTerm: searchFilter.schema,
-  orderBy: orderByFilter.schema,
+  sort: sortFilter.schema,
   hostFeesStructure: z.nativeEnum(HostFeeStructure).optional(),
   type: isMulti(z.nativeEnum(HostedCollectiveTypes)).optional(),
   status: collectiveStatusFilter.schema,
+  consolidatedBalance: consolidatedBalanceFilter.schema,
 });
 
 const toVariables: FiltersToVariables<z.infer<typeof schema>, HostedCollectivesQueryVariables> = {
-  orderBy: orderByFilter.toVariables,
   status: collectiveStatusFilter.toVariables,
+  consolidatedBalance: consolidatedBalanceFilter.toVariables,
 };
 
 const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
-  orderBy: orderByFilter.filter,
+  sort: sortFilter.filter,
   searchTerm: searchFilter.filter,
   hostFeesStructure: {
     labelMsg: defineMessage({ id: 'FeeStructure', defaultMessage: 'Fee structure' }),
@@ -91,6 +107,7 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
     valueRenderer: ({ value, intl }) => formatCollectiveType(intl, value),
   },
   status: collectiveStatusFilter.filter,
+  consolidatedBalance: consolidatedBalanceFilter.filter,
 };
 
 const ROUTE_PARAMS = ['slug', 'section', 'view'];
@@ -154,6 +171,7 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
     schema,
     toVariables,
     views,
+    meta: { currency: metadata?.host?.currency },
   });
 
   const { data, error, loading, variables, refetch } = useQuery(hostedCollectivesQuery, {
@@ -183,7 +201,7 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
   };
   const isUnhosted = queryFilter.values?.status === COLLECTIVE_STATUS.UNHOSTED;
   const hostedAccounts = data?.host?.hostedAccounts;
-
+  const onClickRow = row => handleDrawer(row.original);
   return (
     <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader title={<FormattedMessage id="HostedCollectives" defaultMessage="Hosted Collectives" />} />
@@ -205,15 +223,15 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
               cols.team,
               !isUnhosted && cols.fee,
               !isUnhosted && cols.hostedSince,
-              cols.balance,
+              cols.consolidatedBalance,
               cols.actions,
             ])}
             data={hostedAccounts?.nodes || []}
             loading={loading}
             mobileTableView
             compact
-            meta={{ intl, openCollectiveDetails: handleDrawer, onEdit: handleEdit, host: data?.host }}
-            onClickRow={row => handleDrawer(row.original)}
+            meta={{ intl, onClickRow, onEdit: handleEdit, host: data?.host }}
+            onClickRow={onClickRow}
             getRowDataCy={row => `collective-${row.original.slug}`}
           />
           <Flex mt={5} justifyContent="center">

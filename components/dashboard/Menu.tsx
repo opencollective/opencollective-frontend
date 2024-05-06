@@ -1,5 +1,4 @@
 import React from 'react';
-import { get } from 'lodash';
 import {
   ArrowRightLeft,
   BarChart2,
@@ -22,11 +21,12 @@ import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
-import { isHostAccount, isIndividualAccount, isInternalHost, isSelfHostedAccount } from '../../lib/collective';
+import { isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective';
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
+import { parseToBoolean } from '../../lib/utils';
 
 import { ALL_SECTIONS, SECTION_LABELS } from './constants';
 import { DashboardContext } from './DashboardContext';
@@ -165,10 +165,21 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
-      if: isInternalHost(account) || Boolean(get(account, 'settings.beta.HOST_AGREEMENTS')),
-      section: ALL_SECTIONS.HOST_AGREEMENTS,
+      if: isHost,
+      type: 'group',
       Icon: FileText,
-      label: intl.formatMessage({ id: 'Agreements', defaultMessage: 'Agreements' }),
+      label: intl.formatMessage({ defaultMessage: 'Legal Documents', id: 'lSFdN4' }),
+      subMenu: [
+        {
+          section: ALL_SECTIONS.HOST_AGREEMENTS,
+          label: intl.formatMessage({ id: 'Agreements', defaultMessage: 'Agreements' }),
+        },
+        {
+          section: ALL_SECTIONS.HOST_TAX_FORMS,
+          label: intl.formatMessage({ defaultMessage: 'Tax Forms', id: 'skSw4d' }),
+          if: Boolean(account.host?.requiredLegalDocuments?.includes('US_TAX_FORM')),
+        },
+      ],
     },
     {
       if: isHost && hasFeature(account, FEATURES.VIRTUAL_CARDS) && !isAccountantOnly,
@@ -187,7 +198,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
-      if: isHost,
+      if: isHost || (!isIndividual && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.HOST_REPORTS)),
       section: ALL_SECTIONS.REPORTS,
       Icon: BarChart2,
     },
@@ -250,7 +261,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         },
         {
           section: ALL_SECTIONS.TAX_INFORMATION,
-          if: LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.TAX_FORMS) && !isAccountantOnly,
+          if: !parseToBoolean(process.env.TAX_FORMS_USE_LEGACY) && !isAccountantOnly,
         },
         {
           section: ALL_SECTIONS.COLLECTIVE_PAGE,

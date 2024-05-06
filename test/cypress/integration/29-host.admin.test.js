@@ -207,8 +207,7 @@ describe('host dashboard', () => {
       cy.contains('More actions').click();
       cy.contains('Approve').click();
       cy.getByDataCy('expense-status-msg').contains('Approved');
-
-      cy.visit('/dashboard/brusselstogetherasbl/host-expenses?orderBy=CREATED_AT%2CDESC&status=ALL');
+      cy.visit('/dashboard/brusselstogetherasbl/host-expenses?sort[field]=CREATED_AT&sort[direction]=DESC&status=ALL');
       cy.get('@expense').then(expense => {
         cy.getByDataCy(`expense-container-${expense.legacyId}`).as('currentExpense');
       });
@@ -229,7 +228,7 @@ describe('host dashboard', () => {
       cy.contains('Approve').click();
       cy.getByDataCy('expense-status-msg').contains('Approved');
 
-      cy.visit('/dashboard/brusselstogetherasbl/host-expenses?orderBy=CREATED_AT%2CDESC&status=ALL');
+      cy.visit('/dashboard/brusselstogetherasbl/host-expenses?sort[field]=CREATED_AT&sort[direction]=DESC&status=ALL');
       cy.get('@expense').then(expense => {
         cy.getByDataCy(`expense-container-${expense.legacyId}`).as('currentExpense');
       });

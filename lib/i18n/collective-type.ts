@@ -11,6 +11,10 @@ const TypesI18n = defineMessages({
     id: 'CollectiveType.User',
     defaultMessage: '{count, plural, one {User} other {Users}}',
   },
+  [CollectiveType.INDIVIDUAL]: {
+    id: 'AccountType.Individual',
+    defaultMessage: 'Individual',
+  },
   [CollectiveType.COLLECTIVE]: {
     id: 'CollectiveType.Collective',
     defaultMessage: '{count, plural, one {Collective} other {Collectives}}',
@@ -39,7 +43,7 @@ const TypesI18n = defineMessages({
  * @param {object} `intl` - see `injectIntl`
  * @param {string} `type`
  */
-const formatCollectiveType = (intl, type, count = 1) => {
+const formatCollectiveType = (intl, type, count = 1): string => {
   const i18nMsg = TypesI18n[type];
   return i18nMsg ? intl.formatMessage(i18nMsg, { count }) : type;
 };

@@ -1,31 +1,40 @@
 import React from 'react';
-import { ColumnDef } from '@tanstack/react-table';
+import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
 import clsx from 'clsx';
-import { AlertTriangle, ArrowLeft, ArrowRight, MoreHorizontal, Undo } from 'lucide-react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { AlertTriangle, ArrowLeft, ArrowRight, Undo } from 'lucide-react';
+import { defineMessage, FormattedMessage } from 'react-intl';
 
-import { Transaction } from '../../../../lib/graphql/types/v2/graphql';
+import { DateTimeField, TransactionsTableQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import { useDrawer } from '../../../../lib/hooks/useDrawer';
+import useLocalStorage from '../../../../lib/hooks/useLocalStorage';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
+import { useQueryFilterReturnType } from '../../../../lib/hooks/useQueryFilter';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { i18nTransactionKind } from '../../../../lib/i18n/transaction';
 import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
-import { DataTable } from '../../../DataTable';
 import DateTime from '../../../DateTime';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
+import { ColumnHeader } from '../../../table/ColumnHeader';
+import { actionsColumn, DataTable } from '../../../table/DataTable';
 import { Badge } from '../../../ui/Badge';
-import { Button } from '../../../ui/Button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/DropdownMenu';
 
-const cols = {
-  createdAt: {
-    accessorKey: 'createdAt',
-    meta: { className: 'w-48' },
-    header: () => <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />,
+import { useTransactionActions } from './actions';
+import { schema } from './filters';
+import { TransactionDrawer } from './TransactionDrawer';
+import type { TransactionsTableQueryNode } from './types';
+
+const columnHelper = createColumnHelper<TransactionsTableQueryNode>();
+
+const columns: ColumnDef<TransactionsTableQueryNode>[] = [
+  columnHelper.accessor('createdAt', {
+    id: 'date',
+    meta: { className: 'w-48', labelMsg: defineMessage({ defaultMessage: 'Date', id: 'expense.incurredAt' }) },
+    header: ctx => <ColumnHeader {...ctx} sortField={DateTimeField.CREATED_AT} />,
     cell: ({ cell }) => {
-      const createdAt = cell.getValue() as Transaction['createdAt'];
+      const createdAt = cell.getValue() as TransactionsTableQueryNode['createdAt'];
 
       return (
         <div className="whitespace-nowrap">
@@ -33,59 +42,31 @@ const cols = {
         </div>
       );
     },
-  },
-  credit: {
-    accessorKey: 'credit',
-    header: () => <FormattedMessage id="Transaction.Type.Credit" defaultMessage="Credit" />,
-    meta: { className: 'w-28 text-right' },
-    cell: ({ row }) => {
-      const netAmount = row.original.netAmount;
-      const type = row.original.type;
-      if (type === 'CREDIT') {
+  }),
+  columnHelper.accessor('clearedAt', {
+    meta: { className: 'w-48', labelMsg: defineMessage({ defaultMessage: 'Effective Date', id: 'Gh3Obs' }) },
+    header: ctx => <ColumnHeader {...ctx} sortField={DateTimeField.EFFECTIVE_DATE} />,
+    cell: ({ cell, row }) => {
+      const clearedAt = cell.getValue() as TransactionsTableQueryNode['clearedAt'];
+      if (!clearedAt) {
         return (
-          <div className="flex items-center justify-end gap-2 truncate font-semibold text-slate-700 antialiased">
-            <FormattedMoneyAmount
-              amount={Math.abs(netAmount.valueInCents)}
-              currency={netAmount.currency}
-              precision={2}
-              amountStyles={{}}
-              showCurrencyCode={false}
-            />
+          <div className="whitespace-nowrap text-green-500">
+            <DateTime dateStyle="medium" timeStyle="short" value={row.original.createdAt} />
           </div>
         );
       }
-      return null;
+      return (
+        <div className="whitespace-nowrap">
+          <DateTime dateStyle="medium" timeStyle="short" value={clearedAt} />
+        </div>
+      );
     },
-  },
-  debit: {
-    accessorKey: 'debit',
-    header: () => <FormattedMessage id="Expense.Type.Debit" defaultMessage="Debit" />,
-    meta: { className: 'w-28 text-right' },
-    cell: ({ row }) => {
-      const netAmount = row.original.netAmount;
-      const type = row.original.type;
-      if (type === 'DEBIT') {
-        return (
-          <div className="flex items-center justify-end gap-2 truncate font-semibold text-slate-700 antialiased">
-            <FormattedMoneyAmount
-              amount={Math.abs(netAmount.valueInCents)}
-              currency={netAmount.currency}
-              precision={2}
-              amountStyles={{}}
-              showCurrencyCode={false}
-            />
-          </div>
-        );
-      }
-      return null;
-    },
-  },
-  account: {
-    accessorKey: 'account',
-    header: () => <FormattedMessage defaultMessage="Account" id="TwyMau" />,
-    meta: { className: 'w-32 2xl:w-48' },
+  }),
+  columnHelper.accessor('account', {
+    meta: { className: 'w-32 2xl:w-48', labelMsg: defineMessage({ defaultMessage: 'Account', id: 'TwyMau' }) },
+    header: ctx => <ColumnHeader {...ctx} />,
     cell: ({ cell }) => {
-      const account = cell.getValue() as Transaction['account'];
+      const account = cell.getValue();
 
       return (
         <AccountHoverCard
@@ -99,32 +80,12 @@ const cols = {
         />
       );
     },
-  },
-  oppositeAccount: {
-    accessorKey: 'oppositeAccount',
-    header: () => <FormattedMessage defaultMessage="Opposite account" id="rcVYFz" />,
-    meta: { className: 'w-32 2xl:w-48' },
-    cell: ({ cell }) => {
-      const account = cell.getValue() as Transaction['oppositeAccount'];
-      return (
-        <AccountHoverCard
-          account={account}
-          trigger={
-            <div className="flex items-center gap-1 truncate">
-              <Avatar collective={account} radius={20} />
-              <span className="truncate">{account?.name}</span>
-            </div>
-          }
-        />
-      );
-    },
-  },
-  toFromAccount: {
-    accessorKey: 'oppositeAccount',
-    header: () => <FormattedMessage defaultMessage="Recipient/Sender" id="YT2bNN" />,
-    meta: { className: 'w-48' },
+  }),
+  columnHelper.accessor('oppositeAccount', {
+    meta: { className: 'w-48', labelMsg: defineMessage({ defaultMessage: 'Recipient/Sender', id: 'YT2bNN' }) },
+    header: ctx => <ColumnHeader {...ctx} />,
     cell: ({ cell, row }) => {
-      const account = cell.getValue() as Transaction['oppositeAccount'];
+      const account = cell.getValue();
       const transaction = row.original;
       return (
         <AccountHoverCard
@@ -143,14 +104,14 @@ const cols = {
         />
       );
     },
-  },
-  kind: {
-    accessorKey: 'kind',
-    meta: { className: 'w-32 2xl:w-auto' },
-    header: () => <FormattedMessage id="Transaction.Kind" defaultMessage="Kind" />,
+  }),
+
+  columnHelper.accessor('kind', {
+    meta: { className: 'w-32 2xl:w-auto', labelMsg: defineMessage({ defaultMessage: 'Kind', id: 'Transaction.Kind' }) },
+    header: ctx => <ColumnHeader {...ctx} />,
     cell: ({ cell, table, row }) => {
-      const { intl } = table.options.meta as { intl: any };
-      const kind = cell.getValue() as Transaction['kind'];
+      const { intl } = table.options.meta;
+      const kind = cell.getValue();
       const kindLabel = i18nTransactionKind(intl, kind);
       const isExpense = kind === 'EXPENSE';
       const { isRefund, isRefunded, isInReview, isDisputed, expense, isOrderRejected } = row.original;
@@ -195,19 +156,74 @@ const cols = {
         </div>
       );
     },
-  },
-  netAmount: {
-    accessorKey: 'netAmount',
-    header: () => <FormattedMessage defaultMessage="Net Amount" id="FxUka3" />,
-    meta: { className: 'w-28 text-right' },
+  }),
+  columnHelper.accessor(({ netAmount, type }) => (type === 'DEBIT' ? netAmount : null), {
+    id: 'debit',
+    header: ctx => <ColumnHeader {...ctx} />,
+    meta: {
+      className: 'w-28',
+      labelMsg: defineMessage({ defaultMessage: 'Debit', id: 'Expense.Type.Debit' }),
+      align: 'right',
+    },
+    cell: ({ cell }) => {
+      const amount = cell.getValue() as TransactionsTableQueryNode['netAmount'];
+      if (amount) {
+        return (
+          <div className="flex items-center justify-end gap-2 truncate font-semibold text-slate-700 antialiased">
+            <FormattedMoneyAmount
+              amount={Math.abs(amount.valueInCents)}
+              currency={amount.currency}
+              precision={2}
+              amountStyles={{}}
+              showCurrencyCode={false}
+            />
+          </div>
+        );
+      }
+      return null;
+    },
+  }),
+  columnHelper.accessor(({ netAmount, type }) => (type === 'CREDIT' ? netAmount : null), {
+    id: 'credit',
+    header: ctx => <ColumnHeader {...ctx} />,
+    meta: {
+      className: 'w-28',
+      labelMsg: defineMessage({ defaultMessage: 'Credit', id: 'Transaction.Type.Credit' }),
+      align: 'right',
+    },
+    cell: ({ cell }) => {
+      const amount = cell.getValue() as TransactionsTableQueryNode['netAmount'];
+      if (amount) {
+        return (
+          <div className="truncate font-semibold text-slate-700 antialiased">
+            <FormattedMoneyAmount
+              amount={Math.abs(amount.valueInCents)}
+              currency={amount.currency}
+              precision={2}
+              amountStyles={{}}
+              showCurrencyCode={false}
+            />
+          </div>
+        );
+      }
+      return null;
+    },
+  }),
+  columnHelper.accessor('netAmount', {
+    meta: {
+      className: 'w-28',
+      align: 'right',
+      labelMsg: defineMessage({ defaultMessage: 'Amount', id: 'Fields.amount' }),
+    },
+    header: ctx => <ColumnHeader {...ctx} />,
     cell: ({ cell, row }) => {
-      const netAmount = cell.getValue() as Transaction['netAmount'];
+      const netAmount = cell.getValue() as TransactionsTableQueryNode['netAmount'];
       const transaction = row.original;
 
       return (
         <div
           className={clsx(
-            'flex items-center justify-end gap-2 truncate font-semibold antialiased',
+            'truncate font-semibold antialiased',
             transaction.type === 'CREDIT' ? 'text-green-600' : 'text-slate-700',
           )}
         >
@@ -221,94 +237,85 @@ const cols = {
         </div>
       );
     },
-  },
-  currency: {
-    accessorKey: 'currency',
-    header: () => null,
-    meta: { className: 'w-12 text-left' },
-    cell: ({ row }) => {
-      const amount = row.original.amount;
+  }),
 
-      return <div className="antialiased">{amount.currency}</div>;
-    },
-  },
-  actions: {
-    accessorKey: 'actions',
+  columnHelper.accessor('netAmount.currency', {
+    id: 'currency',
     header: null,
-    meta: { className: 'w-16' },
-    enableHiding: false,
-    cell: () => {
-      return (
-        <div className="flex items-center justify-end">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button size="icon" variant="outline" className="h-7 w-7 border-transparent group-hover:border-border">
-                <MoreHorizontal size={16} />
-              </Button>
-            </DropdownMenuTrigger>
+    meta: { className: 'w-12', labelMsg: defineMessage({ defaultMessage: 'Currency', id: 'Currency' }) },
+    cell: ({ cell }) => {
+      const value = cell.getValue();
 
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem className="gap-2">
-                <FormattedMessage defaultMessage="View details" id="MnpUD7" />
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      );
+      return <div className="antialiased">{value}</div>;
     },
-  },
-};
-
-const getColumns = (useAltLayout?: boolean): ColumnDef<Transaction>[] => {
-  return useAltLayout
-    ? [
-        cols.createdAt,
-        cols.kind,
-        cols.debit,
-        cols.credit,
-        cols.currency,
-        cols.account,
-        cols.oppositeAccount,
-        cols.actions,
-      ]
-    : [cols.createdAt, cols.account, cols.toFromAccount, cols.kind, cols.netAmount, cols.currency, cols.actions];
-};
+  }),
+  actionsColumn,
+];
 
 type TransactionsTableProps = {
-  transactions: { nodes: Transaction[] };
+  transactions: { nodes: TransactionsTableQueryNode[] };
   loading?: boolean;
   nbPlaceholders?: number;
-  onClickRow: (transaction: Transaction) => void;
   useAltTestLayout?: boolean;
+  queryFilter: useQueryFilterReturnType<typeof schema, TransactionsTableQueryVariables>;
+  refetchList?: () => void;
 };
 
 export default function TransactionsTable({
   transactions,
   loading,
   nbPlaceholders,
-  onClickRow,
-  useAltTestLayout,
+  queryFilter,
+  refetchList,
 }: TransactionsTableProps) {
-  const intl = useIntl();
   const [hoveredGroup, setHoveredGroup] = React.useState<string | null>(null);
   const { LoggedInUser } = useLoggedInUser();
   const hasDynamicTopBar = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DYNAMIC_TOP_BAR);
-  const columns = getColumns(useAltTestLayout);
+
+  const defaultColumnVisibility = {
+    clearedAt: false,
+    debit: false,
+    credit: false,
+  };
+  const [columnVisibility, setColumnVisibility] = useLocalStorage('transactions-cols', defaultColumnVisibility);
+
+  const getActions = useTransactionActions<TransactionsTableQueryNode>({
+    resetFilters: queryFilter.resetFilters,
+    refetchList,
+  });
+
+  const { openDrawer, drawerProps } = useDrawer({
+    open: Boolean(queryFilter.values.openTransactionId),
+    onOpen: id => queryFilter.setFilter('openTransactionId', id, false),
+    onClose: () => queryFilter.setFilter('openTransactionId', undefined, false),
+  });
+
   return (
-    <DataTable
-      data-cy="transactions-table"
-      innerClassName="table-fixed text-muted-foreground"
-      columns={columns}
-      data={transactions?.nodes || []}
-      loading={loading}
-      nbPlaceholders={nbPlaceholders}
-      onClickRow={row => onClickRow(row.original)}
-      onHoverRow={row => setHoveredGroup(row?.original?.group ?? null)}
-      rowHasIndicator={row => row.original.group === hoveredGroup}
-      fullWidth={hasDynamicTopBar}
-      mobileTableView
-      compact
-      meta={{ intl }}
-    />
+    <React.Fragment>
+      <DataTable
+        data-cy="transactions-table"
+        innerClassName="table-fixed text-muted-foreground"
+        columns={columns}
+        data={transactions?.nodes || []}
+        loading={loading}
+        nbPlaceholders={nbPlaceholders}
+        onClickRow={(row, menuRef) => openDrawer(row.id, menuRef)}
+        onHoverRow={row => setHoveredGroup(row?.original?.group ?? null)}
+        rowHasIndicator={row => row.original.group === hoveredGroup}
+        fullWidth={hasDynamicTopBar}
+        mobileTableView
+        columnVisibility={columnVisibility}
+        setColumnVisibility={setColumnVisibility}
+        defaultColumnVisibility={defaultColumnVisibility}
+        getActions={getActions}
+        queryFilter={queryFilter}
+        compact
+      />
+      <TransactionDrawer
+        {...drawerProps}
+        transactionId={queryFilter.values.openTransactionId}
+        getActions={getActions}
+      />
+    </React.Fragment>
   );
 }

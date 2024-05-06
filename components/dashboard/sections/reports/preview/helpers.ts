@@ -16,7 +16,7 @@ export const isCurrentPeriod = variables => {
   return dateFrom.isSame(now.startOf(dayjsIsoUnit), dayjsIsoUnit);
 };
 
-export const filterToTransactionsFilterValues = (
+export const filterToHostTransactionsFilterValues = (
   hostSlug,
   groupFilter: GroupFilter,
   variables,
@@ -27,8 +27,34 @@ export const filterToTransactionsFilterValues = (
           account: hostSlug,
         }
       : {
-          excludeHost: true,
+          excludeAccount: hostSlug,
         }),
+    ...(groupFilter.kind && {
+      kind: [groupFilter.kind],
+    }),
+    ...(groupFilter.type && {
+      type: groupFilter.type,
+    }),
+    ...(groupFilter.expenseType && {
+      expenseType: [groupFilter.expenseType],
+    }),
+    ...(!isNil(groupFilter.isRefund) && {
+      isRefund: groupFilter.isRefund,
+    }),
+    date: {
+      gte: dayjs.utc(variables.dateFrom).format('YYYY-MM-DD'),
+      lte: dayjs.utc(variables.dateTo).format('YYYY-MM-DD'),
+      type: DateFilterType.BETWEEN,
+      tz: 'UTC',
+    },
+  };
+};
+
+export const filterToTransactionsFilterValues = (
+  groupFilter: GroupFilter,
+  variables,
+): Partial<HostTransactionsFilterValues> => {
+  return {
     ...(groupFilter.kind && {
       kind: [groupFilter.kind],
     }),
