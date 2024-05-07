@@ -18,6 +18,7 @@ export const accountTaxInformationQuery = gql`
         service
         type
         documentLink
+        isExpired
       }
       location {
         address

@@ -83,9 +83,9 @@ const columns: ColumnDef<LegalDocument>[] = [
     accessorKey: 'status',
     header: () => <FormattedMessage defaultMessage="Status" id="LegalDocument.Status" />,
     meta: { className: 'w-32' },
-    cell: ({ cell }) => {
-      const status = cell.getValue() as LegalDocument['status'];
-      return <LegalDocumentStatusBadge status={status} />;
+    cell: ({ row }) => {
+      const legalDocument = row.original;
+      return <LegalDocumentStatusBadge status={legalDocument.status} isExpired={legalDocument.isExpired} />;
     },
   },
   actionsColumn,

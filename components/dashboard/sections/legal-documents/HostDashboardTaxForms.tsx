@@ -66,6 +66,7 @@ const hostDashboardTaxFormsQuery = gql`
           requestedAt
           updatedAt
           documentLink
+          isExpired
           account {
             id
             name

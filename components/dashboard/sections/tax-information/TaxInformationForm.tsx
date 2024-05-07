@@ -38,6 +38,7 @@ const submitLegalDocumentMutation = gql`
       id
       type
       status
+      isExpired
     }
   }
 `;
@@ -89,9 +90,11 @@ const FORM_CONFIG = {
 export const TaxInformationForm = ({
   accountId,
   setFormDirty,
+  onSuccess,
 }: {
   accountId: string;
   setFormDirty: (isDirty: boolean) => void;
+  onSuccess?: () => void;
 }) => {
   const intl = useIntl();
   const { toast } = useToast();
@@ -137,6 +140,8 @@ export const TaxInformationForm = ({
             variant: 'success',
             message: 'Your tax form has been submitted successfully',
           });
+
+          onSuccess?.();
         } catch (e) {
           toast({
             variant: 'error',
