@@ -10,7 +10,7 @@ import { Dialog } from '../../../ui/Dialog';
 
 import { TaxInformationForm } from './TaxInformationForm';
 
-export const TaxInformationFormDialog = ({ account, open, onOpenChange }) => {
+export const TaxInformationFormDialog = ({ account, open, onOpenChange, onSuccess }) => {
   const intl = useIntl();
   const [isFormDirty, setIsFormDirty] = React.useState(false);
 
@@ -66,7 +66,14 @@ export const TaxInformationFormDialog = ({ account, open, onOpenChange }) => {
           </Button>
         </div>
         <div className="px-6 py-8 md:px-10">
-          <TaxInformationForm accountId={account.id} setFormDirty={setIsFormDirty} />
+          <TaxInformationForm
+            accountId={account.id}
+            setFormDirty={setIsFormDirty}
+            onSuccess={() => {
+              onOpenChange(false);
+              onSuccess?.();
+            }}
+          />
         </div>
       </Overlay>
     </Dialog>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
+import { max } from 'lodash';
 import { FilePenLine } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
@@ -13,13 +14,21 @@ import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { Button } from '../../../ui/Button';
 
-import { accountTaxInformationQuery } from './queries';
+import { AccountFromTaxInformationQuery, accountTaxInformationQuery } from './queries';
 import { TaxInformationFormDialog } from './TaxInformationFormDialog';
 
 /**
  * UI for the pending state of the tax form submission, with a button to fill the form.
  */
-const PendingTaxFormView = ({ account }) => {
+const PendingTaxFormView = ({
+  account,
+  expiredForms,
+  refetch,
+}: {
+  account: AccountFromTaxInformationQuery;
+  expiredForms: AccountFromTaxInformationQuery['usTaxForms'];
+  refetch: () => void;
+}) => {
   const [hasTaxInformationForm, setHasTaxInformationForm] = React.useState(false);
   const requestService = account.usTaxForms[0]?.service;
 
@@ -29,6 +38,15 @@ const PendingTaxFormView = ({ account }) => {
         <strong>
           <FormattedMessage defaultMessage="We need your tax information before we can pay you." id="a6tGTW" />
         </strong>
+        {expiredForms.length > 0 && (
+          <p className="my-2">
+            <FormattedMessage
+              values={{ maxExpiredYear: max(expiredForms.map(form => form.year)) }}
+              defaultMessage="The tax information you provided for {maxExpiredYear} has expired. Please fill out the form again."
+              id="WEDTW5"
+            />
+          </p>
+        )}
         <p className="my-2">
           <FormattedMessage
             defaultMessage="United States regulations require US entities to collect certain information from payees for tax reporting purposes, even if the payee is outside the US."
@@ -64,6 +82,7 @@ const PendingTaxFormView = ({ account }) => {
         account={account}
         open={hasTaxInformationForm}
         onOpenChange={setHasTaxInformationForm}
+        onSuccess={refetch}
       />
     </div>
   );
@@ -110,7 +129,7 @@ const TaxFormSuccessView = () => {
  */
 export const TaxInformationSettingsSection = ({ account }) => {
   const queryParams = { variables: { id: account.id }, context: API_V2_CONTEXT };
-  const { data, error, loading } = useQuery(accountTaxInformationQuery, queryParams);
+  const { data, error, loading, refetch } = useQuery(accountTaxInformationQuery, queryParams);
   const taxForms = data?.account?.usTaxForms || [];
   return (
     <div>
@@ -130,10 +149,14 @@ export const TaxInformationSettingsSection = ({ account }) => {
             id="Mdn+cL"
           />
         </div>
-      ) : taxForms.find(form => form.status === 'RECEIVED') ? (
+      ) : taxForms.find(form => form.status === 'RECEIVED' && !form.isExpired) ? (
         <TaxFormSuccessView />
       ) : (
-        <PendingTaxFormView account={data.account} />
+        <PendingTaxFormView
+          account={data.account}
+          expiredForms={taxForms.filter(form => form.isExpired)}
+          refetch={refetch}
+        />
       )}
     </div>
   );

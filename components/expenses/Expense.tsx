@@ -523,6 +523,7 @@ function Expense(props) {
                   account={expense.payee}
                   open={hasTaxInformationForm}
                   onOpenChange={setHasTaxInformationForm}
+                  onSuccess={refetch}
                 />
               </div>
             ) : (

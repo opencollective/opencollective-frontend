@@ -3212,6 +3212,11 @@ type LegalDocument {
   service: LegalDocumentService!
 
   """
+  Whether this legal document is expired
+  """
+  isExpired: Boolean!
+
+  """
   The date and time the request for this legal document was created
   """
   requestedAt: DateTime!
