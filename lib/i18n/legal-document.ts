@@ -25,8 +25,10 @@ const LEGAL_DOCUMENT_STATUSES = defineMessages({
   },
 });
 
-export const i18nLegalDocumentStatus = (intl, status) => {
-  if (LEGAL_DOCUMENT_STATUSES[status]) {
+export const i18nLegalDocumentStatus = (intl, status, isExpired = undefined) => {
+  if (isExpired) {
+    return intl.formatMessage({ defaultMessage: 'Expired', id: 'LegalDocument.Expired' });
+  } else if (LEGAL_DOCUMENT_STATUSES[status]) {
     return intl.formatMessage(LEGAL_DOCUMENT_STATUSES[status]);
   } else {
     return status;

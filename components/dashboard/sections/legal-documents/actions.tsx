@@ -42,7 +42,7 @@ export function useLegalDocumentActions(host: Host, refetch: () => void): GetAct
       });
     }
 
-    if (legalDocument.status === 'RECEIVED') {
+    if (legalDocument.status === 'RECEIVED' && !legalDocument.isExpired) {
       actions.primary.push({
         label: intl.formatMessage({ defaultMessage: 'Invalidate', id: 'TaxForm.Invalidate' }),
         Icon: FileX,

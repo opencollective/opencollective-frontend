@@ -121,7 +121,7 @@ export default function LegalDocumentDrawer({
               />{' '}
               <DataList
                 title={intl.formatMessage({ defaultMessage: 'Status', id: 'LegalDocument.Status' })}
-                value={<LegalDocumentStatusBadge status={document.status} />}
+                value={<LegalDocumentStatusBadge status={document.status} isExpired={document.isExpired} />}
               />
               <DataList title={intl.formatMessage({ defaultMessage: 'Year', id: 'IFo1oo' })} value={document.year} />
               <DataList

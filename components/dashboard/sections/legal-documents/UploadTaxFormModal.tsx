@@ -19,6 +19,8 @@ const uploadTaxFormMutation = gql`
       id
       status
       documentLink
+      year
+      isExpired
     }
   }
 `;
