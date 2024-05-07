@@ -98,10 +98,7 @@ const OpenCollectiveIs = () => {
               color="white.full"
               mb={4}
             >
-              <FormattedMessage
-                id="fiscalHosting.applyToFiscalHost"
-                defaultMessage="Apply to one of our Fiscal Hosts"
-              />
+              <FormattedMessage id="collective.edit.host.findHost.title" defaultMessage="Apply to a Fiscal Host" />
             </H3>
           </Box>
           <Box display={[null, 'none']} width="300px">

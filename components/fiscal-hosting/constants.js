@@ -64,6 +64,14 @@ export const HOSTS = [
     logo: '/static/images/fiscal-hosting/ocn.png',
   },
   {
+    id: 'giftcollective',
+    name: 'Gift Collective',
+    location: '🇳🇿 New Zealand',
+    collectivePath: '/giftcollective/apply',
+    bgImage: 'giftcollective-bg',
+    logo: '/static/images/fiscal-hosting/giftcollective.png',
+  },
+  {
     id: 'socialchangenestcollective',
     name: 'Social Change Nest',
     location: '🇬🇧 United Kingdom',
