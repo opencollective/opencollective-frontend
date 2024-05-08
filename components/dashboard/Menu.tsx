@@ -152,7 +152,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     },
     {
       if: isHost || isSelfHosted,
-      label: intl.formatMessage({ defaultMessage: 'Expected Funds', id: 'Vb5FM1' }),
+      label: intl.formatMessage({ defaultMessage: 'Expected Funds', id: 'ExpectedFunds' }),
       Icon: Coins,
       section: ALL_SECTIONS.HOST_EXPECTED_FUNDS,
     },

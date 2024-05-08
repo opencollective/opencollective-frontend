@@ -396,14 +396,14 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                       {query.data.order.pendingContributionData.ponumber && (
                         <div className="col-span-3">
                           <div>
-                            <FormattedMessage defaultMessage="PO Number" id="EWmDSr" />
+                            <FormattedMessage defaultMessage="PO Number" id="Fields.PONumber" />
                           </div>
                           <div>{query.data.order.pendingContributionData.ponumber}</div>
                         </div>
                       )}
                       <div className="col-span-3">
                         <div>
-                          <FormattedMessage defaultMessage="Contact" id="zFegDD" />
+                          <FormattedMessage defaultMessage="Contact" id="Contact" />
                         </div>
                         <div>
                           {`${query.data.order.pendingContributionData.fromAccountInfo.name} (${query.data.order.pendingContributionData.fromAccountInfo.email})`}
