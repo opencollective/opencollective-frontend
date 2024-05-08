@@ -2737,7 +2737,6 @@
   "PendingApplication.RepoInfo.OrgAccount": "חשבון הארגון",
   "PendingApplication.RepoInfo.PersonalAccount": "חשבון אישי",
   "PendingApplication.RepoInfo.StarsCount": "{count} כוכבים",
-  "PendingBankTransfers": "העברות בנקאיות ממתינות לאישור",
   "PendingContributionSummary": "{status, select, PENDING {Pending Contribution} other {Contribution}} to {account}",
   "PEp9t9": "Expected Total Amount",
   "Period": "תקופה",
