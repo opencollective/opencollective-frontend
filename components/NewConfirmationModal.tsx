@@ -40,7 +40,7 @@ const confirmBtnMsgs = defineMessages({
 });
 
 export interface ConfirmationModalProps extends BaseModalProps {
-  title: string;
+  title: React.ReactNode;
   description?: React.ReactNode;
   children?: React.ReactNode;
   variant?: 'default' | 'destructive';

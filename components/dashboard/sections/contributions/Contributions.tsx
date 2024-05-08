@@ -1,6 +1,7 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
+import { useMutation,useQuery  } from '@apollo/client';
 import { compact } from 'lodash';
+import { PlusIcon } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -8,35 +9,36 @@ import { z } from 'zod';
 import { EMPTY_ARRAY } from '../../../../lib/constants/utils';
 import { Views } from '../../../../lib/filters/filter-types';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
-import { Order, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
+import { OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
+import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
 
 import Avatar from '../../../Avatar';
+import ContributionConfirmationModal from '../../../ContributionConfirmationModal';
+import { ContributionContextualMenu } from '../../../contributions/ContributionContextualMenu';
+import { ContributionDrawer } from '../../../contributions/ContributionDrawer';
 import DateTime from '../../../DateTime';
 import EditOrderModal, { EditOrderActions } from '../../../EditOrderModal';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import LinkCollective from '../../../LinkCollective';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
+import { useModal } from '../../../ModalContext';
 import OrderStatusTag from '../../../orders/OrderStatusTag';
 import PaymentMethodTypeWithIcon from '../../../PaymentMethodTypeWithIcon';
 import { managedOrderFragment } from '../../../recurring-contributions/graphql/queries';
 import { DataTable } from '../../../table/DataTable';
 import { Span } from '../../../Text';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '../../../ui/DropdownMenu';
+import { Button } from '../../../ui/Button';
 import { TableActionsButton } from '../../../ui/Table';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
+import { useToast } from '../../../ui/useToast';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import { Filterbar } from '../../filters/Filterbar';
 import { Pagination } from '../../filters/Pagination';
 import { DashboardSectionProps } from '../../types';
 
+import CreatePendingContributionModal from './CreatePendingOrderModal';
 import { FilterMeta, filters, OrderTypeFilter, schema, toVariables } from './filters';
 import { PausedIncomingContributionsMessage } from './PausedIncomingContributionsMessage';
 
@@ -46,10 +48,20 @@ enum ContributionsTab {
   ONETIME = 'ONETIME',
   PAUSED = 'PAUSED',
   CANCELED = 'CANCELED',
+  PENDING = 'PENDING',
+  PAID = 'PAID',
+  EXPIRED = 'EXPIRED',
+  DISPUTED = 'DISPUTED',
+  IN_REVIEW = 'IN_REVIEW',
 }
 
 const dashboardContributionsMetadataQuery = gql`
-  query DashboardContributionsMetadata($slug: String!, $filter: AccountOrdersFilter!) {
+  query DashboardContributionsMetadata(
+    $slug: String!
+    $filter: AccountOrdersFilter!
+    $onlyExpectedFunds: Boolean!
+    $includeHostedAccounts: Boolean!
+  ) {
     account(slug: $slug) {
       id
       legacyId
@@ -70,19 +82,88 @@ const dashboardContributionsMetadataQuery = gql`
           type
         }
       }
-      ALL: orders(filter: $filter) {
+      ALL: orders(
+        filter: $filter
+        onlyExpectedFunds: $onlyExpectedFunds
+        includeHostedAccounts: $includeHostedAccounts
+      ) {
         totalCount
       }
-      RECURRING: orders(filter: $filter, onlyActiveSubscriptions: true, includeIncognito: true) {
+      PENDING: orders(
+        filter: $filter
+        onlyExpectedFunds: $onlyExpectedFunds
+        status: [PENDING]
+        includeHostedAccounts: $includeHostedAccounts
+      ) @include(if: $onlyExpectedFunds) {
         totalCount
       }
-      ONETIME: orders(filter: $filter, frequency: ONETIME, status: [PAID], includeIncognito: true, minAmount: 1) {
+      EXPIRED: orders(
+        filter: $filter
+        onlyExpectedFunds: $onlyExpectedFunds
+        status: [EXPIRED]
+        includeHostedAccounts: $includeHostedAccounts
+      ) @include(if: $onlyExpectedFunds) {
         totalCount
       }
-      CANCELED: orders(filter: $filter, status: [CANCELLED], includeIncognito: true) {
+      RECURRING: orders(
+        filter: $filter
+        onlyActiveSubscriptions: true
+        includeIncognito: true
+        includeHostedAccounts: $includeHostedAccounts
+      ) @skip(if: $onlyExpectedFunds) {
         totalCount
       }
-      PAUSED: orders(filter: $filter, status: [PAUSED], includeIncognito: true) {
+      PAID: orders(
+        filter: $filter
+        onlyActiveSubscriptions: true
+        includeIncognito: true
+        status: [PAID]
+        includeHostedAccounts: $includeHostedAccounts
+        onlyExpectedFunds: $onlyExpectedFunds
+      ) @include(if: $onlyExpectedFunds) {
+        totalCount
+      }
+      ONETIME: orders(
+        filter: $filter
+        frequency: ONETIME
+        status: [PAID, PROCESSING]
+        includeIncognito: true
+        minAmount: 1
+        includeHostedAccounts: $includeHostedAccounts
+      ) @skip(if: $onlyExpectedFunds) {
+        totalCount
+      }
+      CANCELED: orders(
+        filter: $filter
+        status: [CANCELLED]
+        includeIncognito: true
+        onlyExpectedFunds: $onlyExpectedFunds
+        includeHostedAccounts: $includeHostedAccounts
+      ) {
+        totalCount
+      }
+      PAUSED: orders(
+        filter: $filter
+        status: [PAUSED]
+        includeIncognito: true
+        includeHostedAccounts: $includeHostedAccounts
+      ) @skip(if: $onlyExpectedFunds) {
+        totalCount
+      }
+      DISPUTED: orders(
+        filter: $filter
+        status: [DISPUTED]
+        includeIncognito: true
+        includeHostedAccounts: $includeHostedAccounts
+      ) @skip(if: $onlyExpectedFunds) {
+        totalCount
+      }
+      IN_REVIEW: orders(
+        filter: $filter
+        status: [IN_REVIEW]
+        includeIncognito: true
+        includeHostedAccounts: $includeHostedAccounts
+      ) @skip(if: $onlyExpectedFunds) {
         totalCount
       }
     }
@@ -103,6 +184,8 @@ const dashboardContributionsQuery = gql`
     $minAmount: Int
     $maxAmount: Int
     $paymentMethod: PaymentMethodReferenceInput
+    $onlyExpectedFunds: Boolean!
+    $includeHostedAccounts: Boolean!
   ) {
     account(slug: $slug) {
       id
@@ -118,6 +201,8 @@ const dashboardContributionsQuery = gql`
         offset: $offset
         limit: $limit
         paymentMethod: $paymentMethod
+        onlyExpectedFunds: $onlyExpectedFunds
+        includeHostedAccounts: $includeHostedAccounts
       ) {
         totalCount
         nodes {
@@ -130,7 +215,7 @@ const dashboardContributionsQuery = gql`
   ${managedOrderFragment}
 `;
 
-const getColumns = ({ tab, setEditOrder, intl, isIncoming }) => {
+const getColumns = ({ tab, contextualMenuProps, intl, isIncoming }) => {
   const toAccount = {
     accessorKey: 'toAccount',
     header: intl.formatMessage({ id: 'Collective', defaultMessage: 'Collective' }),
@@ -168,6 +253,7 @@ const getColumns = ({ tab, setEditOrder, intl, isIncoming }) => {
   const orderId = {
     accessorKey: 'legacyId',
     header: intl.formatMessage({ id: 'order.id', defaultMessage: 'Contribution #' }),
+    meta: { className: 'text-center' },
   };
   const paymentMethod = {
     accessorKey: 'paymentMethod',
@@ -209,68 +295,20 @@ const getColumns = ({ tab, setEditOrder, intl, isIncoming }) => {
     },
   };
 
-  const actions = !isIncoming &&
-    ![ContributionsTab.CANCELED, ContributionsTab.ONETIME].includes(tab) && {
-      accessorKey: 'actions',
-      header: null,
-      meta: { className: 'flex justify-end' },
-      cell: ({ row }) => {
-        const order = row.original as Order;
-        const isResumePrevented = order.status === 'PAUSED' && !order.permissions.canResume;
-        if (
-          order.frequency === 'ONETIME' ||
-          ![OrderStatus.ACTIVE, OrderStatus.ERROR, OrderStatus.PAUSED].includes(order.status)
-        ) {
-          return null;
-        }
+  const actions = {
+    accessorKey: 'actions',
+    header: null,
+    meta: { className: 'flex justify-end items-center' },
+    cell: ({ row }) => {
+      const order = row.original;
 
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <TableActionsButton data-cy="contribution-admin-menu-trigger" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" data-cy="recurring-contribution-menu">
-              <Tooltip>
-                <TooltipTrigger>
-                  <DropdownMenuItem
-                    disabled={isResumePrevented}
-                    onClick={() => setEditOrder({ order, action: 'editPaymentMethod' })}
-                  >
-                    {order.status === 'PAUSED' ? (
-                      <FormattedMessage defaultMessage="Resume contribution" id="51nF6S" />
-                    ) : (
-                      <FormattedMessage
-                        id="subscription.menu.editPaymentMethod"
-                        defaultMessage="Update payment method"
-                      />
-                    )}
-                  </DropdownMenuItem>
-                </TooltipTrigger>
-                {isResumePrevented && (
-                  <TooltipContent>
-                    <FormattedMessage
-                      defaultMessage="This contribution cannot be resumed yet. We'll send you an email when it's ready."
-                      id="bwgZQe"
-                    />
-                  </TooltipContent>
-                )}
-              </Tooltip>{' '}
-              <DropdownMenuItem onClick={() => setEditOrder({ order, action: 'editAmount' })}>
-                <FormattedMessage id="subscription.menu.updateAmount" defaultMessage="Update amount" />
-              </DropdownMenuItem>{' '}
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="text-red-600"
-                onClick={() => setEditOrder({ order, action: 'cancel' })}
-                data-cy="recurring-contribution-menu-cancel-option"
-              >
-                <FormattedMessage id="subscription.menu.cancelContribution" defaultMessage="Cancel contribution" />
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        );
-      },
-    };
+      return (
+        <ContributionContextualMenu order={order} {...contextualMenuProps}>
+          <TableActionsButton data-cy="contribution-admin-menu-trigger" />
+        </ContributionContextualMenu>
+      );
+    },
+  };
 
   if (!tab || [ContributionsTab.ONETIME, ContributionsTab.ALL].includes(tab)) {
     return compact([
@@ -322,22 +360,87 @@ const getColumns = ({ tab, setEditOrder, intl, isIncoming }) => {
 
 type ContributionsProps = DashboardSectionProps & {
   direction?: 'INCOMING' | 'OUTGOING';
+  onlyExpectedFunds?: boolean;
+  includeHostedAccounts?: boolean;
 };
 
-const Contributions = ({ accountSlug, direction }: ContributionsProps) => {
+const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHostedAccounts }: ContributionsProps) => {
+  const { toast } = useToast();
+
+  const [expireOrder] = useMutation(
+    gql`
+      mutation ContributionsExpireOrder($orderId: Int) {
+        processPendingOrder(order: { legacyId: $orderId }, action: MARK_AS_EXPIRED) {
+          id
+          status
+          permissions {
+            id
+            canMarkAsPaid
+            canMarkAsExpired
+          }
+        }
+      }
+    `,
+    {
+      context: API_V2_CONTEXT,
+    },
+  );
+
+  const [confirmCompletedOrder, setConfirmCompletedOrder] = React.useState(null);
+  const { showConfirmationModal } = useModal();
+  const [showCreatePendingOrderModal, setShowCreatePendingOrderModal] = React.useState(false);
+
+  const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const router = useRouter();
   const {
     data: metadata,
     loading: metadataLoading,
     error: metadataError,
+    refetch: refetchMetadata,
   } = useQuery(dashboardContributionsMetadataQuery, {
     variables: {
       slug: accountSlug,
       filter: direction || 'OUTGOING',
+      onlyExpectedFunds: !!onlyExpectedFunds,
+      includeHostedAccounts: !!includeHostedAccounts,
     },
     context: API_V2_CONTEXT,
+    fetchPolicy: 'cache-and-network',
   });
+
+  const selectedContributionId = router.query.orderId ? parseInt(router.query.orderId as string) : null;
+
+  const onToogleOrderDrawer = React.useCallback(
+    orderId => {
+      const newUrl = new URL(router.asPath, window.location.origin);
+
+      if (orderId) {
+        newUrl.searchParams.set('orderId', orderId);
+      } else {
+        newUrl.searchParams.delete('orderId');
+      }
+
+      router.push(newUrl.toString(), undefined, { shallow: true });
+    },
+    [router],
+  );
+
+  const orderUrl = React.useMemo(() => {
+    if (!selectedContributionId) {
+      return null;
+    }
+
+    const url = new URL(router.asPath, window.location.origin);
+    const keys = [];
+    url.searchParams.forEach((value, key) => {
+      keys.push(key);
+    });
+    keys.forEach(k => url.searchParams.delete(k));
+    url.searchParams.set('orderId', selectedContributionId.toString());
+
+    return url.toString();
+  }, [selectedContributionId, router.asPath]);
 
   const views: Views<z.infer<typeof schema>> = [
     {
@@ -346,44 +449,99 @@ const Contributions = ({ accountSlug, direction }: ContributionsProps) => {
       count: metadata?.account?.ALL.totalCount,
       filter: {},
     },
-    {
-      id: ContributionsTab.RECURRING,
-      label: intl.formatMessage({ defaultMessage: 'Recurring', id: 'v84fNv' }),
-      count: metadata?.account?.[ContributionsTab.RECURRING].totalCount,
-      filter: {
-        type: OrderTypeFilter.RECURRING,
-        status: [OrderStatus.ACTIVE, OrderStatus.ERROR],
-      },
-    },
-    {
-      id: ContributionsTab.ONETIME,
-      label: intl.formatMessage({ defaultMessage: 'One-Time', id: 'jX0G5O' }),
-      count: metadata?.account?.[ContributionsTab.ONETIME].totalCount,
-      filter: {
-        type: OrderTypeFilter.ONETIME,
-        status: [OrderStatus.PAID],
-      },
-    },
-    {
-      id: ContributionsTab.CANCELED,
-      label: intl.formatMessage({ defaultMessage: 'Cancelled', id: '3wsVWF' }),
-      count: metadata?.account?.[ContributionsTab.CANCELED].totalCount,
-      filter: {
-        status: [OrderStatus.CANCELLED],
-      },
-    },
-  ];
-
-  if (metadata?.account?.[ContributionsTab.PAUSED].totalCount) {
-    views.splice(3, 0, {
-      id: ContributionsTab.PAUSED,
-      label: intl.formatMessage({ id: 'order.paused', defaultMessage: 'Paused' }),
-      count: metadata?.account?.[ContributionsTab.PAUSED].totalCount,
-      filter: {
-        status: [OrderStatus.PAUSED],
-      },
-    });
-  }
+    !onlyExpectedFunds && includeHostedAccounts
+      ? {
+          id: ContributionsTab.DISPUTED,
+          label: intl.formatMessage({ defaultMessage: 'Disputed', id: 'X1pwhF' }),
+          count: metadata?.account?.[ContributionsTab.DISPUTED].totalCount,
+          filter: {
+            status: [OrderStatus.DISPUTED],
+          },
+        }
+      : null,
+    !onlyExpectedFunds && includeHostedAccounts
+      ? {
+          id: ContributionsTab.IN_REVIEW,
+          label: intl.formatMessage({ id: 'order.in_review', defaultMessage: 'In Review' }),
+          count: metadata?.account?.[ContributionsTab.IN_REVIEW].totalCount,
+          filter: {
+            status: [OrderStatus.IN_REVIEW],
+          },
+        }
+      : null,
+    !onlyExpectedFunds && !includeHostedAccounts
+      ? {
+          id: ContributionsTab.RECURRING,
+          label: intl.formatMessage({ defaultMessage: 'Recurring', id: 'v84fNv' }),
+          count: metadata?.account?.[ContributionsTab.RECURRING].totalCount,
+          filter: {
+            type: OrderTypeFilter.RECURRING,
+            status: [OrderStatus.ACTIVE, OrderStatus.ERROR],
+          },
+        }
+      : null,
+    !onlyExpectedFunds && !includeHostedAccounts
+      ? {
+          id: ContributionsTab.ONETIME,
+          label: intl.formatMessage({ defaultMessage: 'One-Time', id: 'jX0G5O' }),
+          count: metadata?.account?.[ContributionsTab.ONETIME].totalCount,
+          filter: {
+            type: OrderTypeFilter.ONETIME,
+            status: [OrderStatus.PAID, OrderStatus.PROCESSING],
+          },
+        }
+      : null,
+    !onlyExpectedFunds && metadata?.account?.[ContributionsTab.PAUSED].totalCount
+      ? {
+          id: ContributionsTab.PAUSED,
+          label: intl.formatMessage({ id: 'order.paused', defaultMessage: 'Paused' }),
+          count: metadata?.account?.[ContributionsTab.PAUSED].totalCount,
+          filter: {
+            status: [OrderStatus.PAUSED],
+          },
+        }
+      : null,
+    onlyExpectedFunds
+      ? {
+          id: ContributionsTab.PENDING,
+          label: intl.formatMessage({ defaultMessage: 'Pending', id: 'eKEL/g' }),
+          count: metadata?.account?.[ContributionsTab.PENDING].totalCount,
+          filter: {
+            status: [OrderStatus.PENDING],
+          },
+        }
+      : null,
+    onlyExpectedFunds
+      ? {
+          id: ContributionsTab.PAID,
+          label: intl.formatMessage({ defaultMessage: 'Paid', id: 'u/vOPu' }),
+          count: metadata?.account?.[ContributionsTab.PAID].totalCount,
+          filter: {
+            status: [OrderStatus.PAID],
+          },
+        }
+      : null,
+    onlyExpectedFunds
+      ? {
+          id: ContributionsTab.EXPIRED,
+          label: intl.formatMessage({ defaultMessage: 'Expired', id: 'RahCRH' }),
+          count: metadata?.account?.[ContributionsTab.EXPIRED].totalCount,
+          filter: {
+            status: [OrderStatus.PAID],
+          },
+        }
+      : null,
+    !includeHostedAccounts || onlyExpectedFunds
+      ? {
+          id: ContributionsTab.CANCELED,
+          label: intl.formatMessage({ defaultMessage: 'Cancelled', id: '3wsVWF' }),
+          count: metadata?.account?.[ContributionsTab.CANCELED].totalCount,
+          filter: {
+            status: [OrderStatus.CANCELLED],
+          },
+        }
+      : null,
+  ].filter(Boolean);
 
   const filterMeta: FilterMeta = {
     currency: metadata?.account?.currency,
@@ -401,17 +559,21 @@ const Contributions = ({ accountSlug, direction }: ContributionsProps) => {
     data,
     loading: queryLoading,
     error: queryError,
+    refetch,
   } = useQuery(dashboardContributionsQuery, {
     variables: {
       slug: accountSlug,
       filter: direction || 'OUTGOING',
       includeIncognito: true,
+      onlyExpectedFunds: !!onlyExpectedFunds,
+      includeHostedAccounts: !!includeHostedAccounts,
       ...queryFilter.variables,
     },
     context: API_V2_CONTEXT,
+    fetchPolicy: 'cache-and-network',
   });
 
-  const [editOrder, setEditOrder] = React.useState<{ order?: { id: string }; action: EditOrderActions }>({
+  const [editOrder, setEditOrder] = React.useState<{ order?: { id: string | number }; action: EditOrderActions }>({
     order: router.query.orderId ? { id: router.query.orderId as string } : null,
     action: (router.query.action as EditOrderActions) ?? null,
   });
@@ -439,68 +601,184 @@ const Contributions = ({ accountSlug, direction }: ContributionsProps) => {
   const loading = metadataLoading || queryLoading;
   const error = metadataError || queryError;
 
-  const columns = getColumns({ tab: queryFilter.activeViewId, setEditOrder, intl, isIncoming }) || [];
+  const contextualMenuProps = {
+    onCancelClick: order => {
+      setEditOrder({ order, action: 'cancel' });
+    },
+    onEditAmountClick: order => {
+      setEditOrder({ order, action: 'editAmount' });
+    },
+    onResumeClick: order => {
+      setEditOrder({ order, action: 'editPaymentMethod' });
+    },
+    onUpdatePaymentMethodClick: order => {
+      setEditOrder({ order, action: 'editPaymentMethod' });
+    },
+    onMarkAsCompletedClick: order => {
+      setConfirmCompletedOrder(order);
+    },
+    onMarkAsExpiredClick: order => {
+      showConfirmationModal({
+        title: <FormattedMessage id="Order.MarkExpiredConfirm" defaultMessage="Mark this contribution as expired?" />,
+        description: (
+          <FormattedMessage
+            id="Order.MarkPaidExpiredDetails"
+            defaultMessage="This contribution will be marked as expired removed from Pending Contributions. You can find this page by searching for its ID in the search bar or through the status filter in the Financial Contributions page."
+          />
+        ),
+        onConfirm: async () => {
+          await expireOrder({
+            variables: {
+              orderId: order.legacyId,
+            },
+          });
+          toast({
+            variant: 'success',
+            message: intl.formatMessage({
+              defaultMessage: 'The contribution has been marked as expired',
+              id: '46L6cy',
+            }),
+          });
+        },
+        confirmLabel: <FormattedMessage id="order.markAsExpired" defaultMessage="Mark as expired" />,
+      });
+    },
+  };
+
+  const columns = getColumns({ tab: queryFilter.activeViewId, contextualMenuProps, intl, isIncoming }) || [];
   const currentViewCount = views.find(v => v.id === queryFilter.activeViewId)?.count;
   const nbPlaceholders = currentViewCount < queryFilter.values.limit ? currentViewCount : queryFilter.values.limit;
   return (
-    <div className="flex max-w-screen-lg flex-col gap-4">
-      <DashboardHeader
-        title={
-          isIncoming ? (
-            <FormattedMessage id="IncomingContributions" defaultMessage="Incoming Contributions" />
-          ) : (
-            <FormattedMessage id="OutgoingContributions" defaultMessage="Outgoing Contributions" />
-          )
-        }
-        description={
-          isIncoming ? (
-            <FormattedMessage id="IncomingContributions.description" defaultMessage="Contributions to your account." />
-          ) : (
-            <FormattedMessage
-              id="OutgoingContributions.description"
-              defaultMessage="Manage your contributions to other Collectives."
-            />
-          )
-        }
-      />
-      <Filterbar {...queryFilter} />
-
-      {isIncoming && metadata?.account?.[ContributionsTab.PAUSED].totalCount > 0 && (
-        <PausedIncomingContributionsMessage
-          account={metadata.account}
-          count={metadata.account[ContributionsTab.PAUSED].totalCount}
+    <React.Fragment>
+      <div className="flex max-w-screen-lg flex-col gap-4">
+        <DashboardHeader
+          title={
+            isIncoming ? (
+              onlyExpectedFunds ? (
+                <FormattedMessage id="ExpectedFunds" defaultMessage="Expected Funds" />
+              ) : includeHostedAccounts ? (
+                <FormattedMessage id="FinancialContributions" defaultMessage="Financial Contributions" />
+              ) : (
+                <FormattedMessage id="IncomingContributions" defaultMessage="Incoming Contributions" />
+              )
+            ) : onlyExpectedFunds ? (
+              <FormattedMessage id="ExpectedFunds.Outgoing" defaultMessage="Pending Contributions" />
+            ) : (
+              <FormattedMessage id="OutgoingContributions" defaultMessage="Outgoing Contributions" />
+            )
+          }
+          description={
+            isIncoming ? (
+              onlyExpectedFunds ? (
+                includeHostedAccounts ? (
+                  <FormattedMessage defaultMessage="Expected funds for Collectives you host." id="tNEw2N" />
+                ) : (
+                  <FormattedMessage id="ExpectedFunds.description" defaultMessage="Expected funds to your account" />
+                )
+              ) : includeHostedAccounts ? (
+                <FormattedMessage defaultMessage="Contributions for Collectives you host." id="ZIZ7Ms" />
+              ) : (
+                <FormattedMessage
+                  id="IncomingContributions.description"
+                  defaultMessage="Contributions to your account."
+                />
+              )
+            ) : onlyExpectedFunds ? (
+              <FormattedMessage
+                id="ExpectedFunds.Outgoing"
+                defaultMessage="Pending Contributions to other Collectives"
+              />
+            ) : (
+              <FormattedMessage
+                id="OutgoingContributions.description"
+                defaultMessage="Manage your contributions to other Collectives."
+              />
+            )
+          }
+          actions={
+            onlyExpectedFunds && includeHostedAccounts ? (
+              <React.Fragment>
+                <Button
+                  size="sm"
+                  onClick={() => setShowCreatePendingOrderModal(true)}
+                  className="gap-1 "
+                  data-cy="create-pending-contribution"
+                >
+                  <span>
+                    <FormattedMessage defaultMessage="Create pending" id="clx/0D" />
+                  </span>
+                  <PlusIcon size={20} />
+                </Button>
+                {showCreatePendingOrderModal && (
+                  <CreatePendingContributionModal
+                    hostSlug={accountSlug}
+                    onClose={() => setShowCreatePendingOrderModal(false)}
+                    onSuccess={() => {
+                      refetch();
+                      refetchMetadata();
+                    }}
+                  />
+                )}
+              </React.Fragment>
+            ) : null
+          }
         />
-      )}
+        <Filterbar {...queryFilter} />
 
-      {error ? (
-        <MessageBoxGraphqlError error={error} />
-      ) : !loading && selectedOrders.length === 0 ? (
-        <EmptyResults
-          entityType="CONTRIBUTIONS"
-          hasFilters={queryFilter.hasFilters}
-          onResetFilters={() => queryFilter.resetFilters({})}
-        />
-      ) : (
-        <div className="flex flex-col gap-4">
-          <DataTable
-            loading={loading}
-            columns={columns}
-            data={selectedOrders}
-            mobileTableView
-            nbPlaceholders={nbPlaceholders}
+        {isIncoming && !onlyExpectedFunds && metadata?.account?.[ContributionsTab.PAUSED].totalCount > 0 && (
+          <PausedIncomingContributionsMessage
+            account={metadata.account}
+            count={metadata.account[ContributionsTab.PAUSED].totalCount}
           />
-          <Pagination queryFilter={queryFilter} total={data?.account?.orders.totalCount} />
-        </div>
-      )}
-      {editOrder.order && (
-        <EditOrderModal
-          accountSlug={accountSlug}
-          order={editOrder.order}
-          action={editOrder.action}
-          onClose={() => setEditOrder({ order: null, action: null })}
+        )}
+
+        {error ? (
+          <MessageBoxGraphqlError error={error} />
+        ) : !loading && selectedOrders.length === 0 ? (
+          <EmptyResults
+            entityType="CONTRIBUTIONS"
+            hasFilters={queryFilter.hasFilters}
+            onResetFilters={() => queryFilter.resetFilters({})}
+          />
+        ) : (
+          <div className="flex flex-col gap-4">
+            <DataTable
+              loading={loading}
+              columns={columns}
+              data={selectedOrders}
+              mobileTableView
+              nbPlaceholders={nbPlaceholders}
+              onClickRow={row => onToogleOrderDrawer(row.original.legacyId)}
+            />
+          </div>
+        )}
+        {editOrder.order && (
+          <EditOrderModal
+            accountSlug={accountSlug}
+            order={editOrder.order}
+            action={editOrder.action}
+            onClose={() => setEditOrder({ order: null, action: null })}
+          />
+        )}
+        <Pagination queryFilter={queryFilter} total={data?.account?.orders.totalCount} />
+      </div>
+      {LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD_CONTRIBUTION_DETAILS) && (
+        <ContributionDrawer
+          open={!!selectedContributionId}
+          onClose={() => onToogleOrderDrawer(null)}
+          orderId={selectedContributionId}
+          orderUrl={orderUrl}
+          {...contextualMenuProps}
         />
       )}
-    </div>
+      {confirmCompletedOrder && (
+        <ContributionConfirmationModal
+          order={confirmCompletedOrder}
+          onClose={() => setConfirmCompletedOrder(false)}
+          onSuccess={() => {}}
+        />
+      )}
+    </React.Fragment>
   );
 };
 
