@@ -2737,7 +2737,6 @@
   "PendingApplication.RepoInfo.OrgAccount": "Organisationskonto",
   "PendingApplication.RepoInfo.PersonalAccount": "Personligt konto",
   "PendingApplication.RepoInfo.StarsCount": "{count} stjärnor",
-  "PendingBankTransfers": "Väntande banköverföringar",
   "PendingContributionSummary": "{status, select, PENDING {Pending Contribution} other {Contribution}} to {account}",
   "PEp9t9": "Expected Total Amount",
   "Period": "Period",

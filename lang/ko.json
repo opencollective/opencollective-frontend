@@ -2737,7 +2737,6 @@
   "PendingApplication.RepoInfo.OrgAccount": "Organization account",
   "PendingApplication.RepoInfo.PersonalAccount": "Personal account",
   "PendingApplication.RepoInfo.StarsCount": "{count} stars",
-  "PendingBankTransfers": "Pending bank transfers",
   "PendingContributionSummary": "{account}로 {status, select, PENDING {대기중인 기여} other {기여}}",
   "PEp9t9": "Expected Total Amount",
   "Period": "기간",

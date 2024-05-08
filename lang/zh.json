@@ -2737,7 +2737,6 @@
   "PendingApplication.RepoInfo.OrgAccount": "组织账号",
   "PendingApplication.RepoInfo.PersonalAccount": "个人账号",
   "PendingApplication.RepoInfo.StarsCount": "{count} 个 star",
-  "PendingBankTransfers": "有待银行转账",
   "PendingContributionSummary": "给 {account} 的 {status, select, PENDING {待定贡献} other {贡献}}",
   "PEp9t9": "预计总金额",
   "Period": "时期",
