@@ -178,7 +178,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
   const legacyCollectiveId = collective.legacyId || collective.id;
   const isOwnUserProfile = LoggedInUser && LoggedInUser.CollectiveId === legacyCollectiveId;
   const avatarCollective = isCredit ? fromAccount : toAccount;
-  const isProcessingOrPending = hasOrder && [ORDER_STATUS.PROCESSING, ORDER_STATUS.PENDING].includes(order?.status);
+  const isPending = hasOrder && [ORDER_STATUS.PENDING].includes(order?.status);
 
   const displayedAmount = getDisplayedAmount(transaction, collective);
 
@@ -338,7 +338,7 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
               {i18nTransactionKind(intl, transaction.kind)}
               {Boolean(order?.legacyId) && ` #${order.legacyId}`}
             </KindTag>
-            {(!isProcessingOrPending || transaction.paymentMethod) && transactionDetailsLink()}
+            {(!isPending || transaction.paymentMethod) && transactionDetailsLink()}
           </Container>
         )}
         {isExpense && (

@@ -2572,7 +2572,6 @@
   "order.status": "Status",
   "Order.Status.Completed": "Completed",
   "Order.Status.Pending": "Please follow the payment instructions in the confirmation email to complete your transaction.",
-  "Order.Status.Processing": "We're waiting for a third-party service to confirm the transaction was completed.",
   "Order.Status.Refunded": "Refunded",
   "OrderBudgetItem.Tip": "(includes {amount} platform tip)",
   "OrderBy": "Order by",

@@ -2572,7 +2572,6 @@
   "order.status": "Situação",
   "Order.Status.Completed": "Completo",
   "Order.Status.Pending": "Please follow the payment instructions in the confirmation email to complete your transaction.",
-  "Order.Status.Processing": "We're waiting for a third-party service to confirm the transaction was completed.",
   "Order.Status.Refunded": "Reembolsado",
   "OrderBudgetItem.Tip": "(inclui {amount} dica da plataforma)",
   "OrderBy": "Order by",
