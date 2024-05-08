@@ -2572,7 +2572,6 @@
   "order.status": "Estado",
   "Order.Status.Completed": "Completado",
   "Order.Status.Pending": "Por favor siga las instrucciones de pago en el correo de confirmación para completar su transacción.",
-  "Order.Status.Processing": "Estamos esperando a que un servicio de terceros confirme que la transacción fue completada.",
   "Order.Status.Refunded": "Reembolsado",
   "OrderBudgetItem.Tip": "(incluye {amount} para propina de plataforma)",
   "OrderBy": "Ordenar por",

@@ -2572,7 +2572,6 @@
   "order.status": "상태",
   "Order.Status.Completed": "완료",
   "Order.Status.Pending": "확인 이메일로 보내드린 방법을 참고하여 이를 완료해 주세요.",
-  "Order.Status.Processing": "We're waiting for a third-party service to confirm the transaction was completed.",
   "Order.Status.Refunded": "환불됨",
   "OrderBudgetItem.Tip": "(includes {amount} platform tip)",
   "OrderBy": "Order by",

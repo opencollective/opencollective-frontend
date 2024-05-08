@@ -2572,7 +2572,6 @@
   "order.status": "Status",
   "Order.Status.Completed": "Abgeschlossen",
   "Order.Status.Pending": "Bitte befolge die Zahlungsanweisungen in der Bestätigungs-E-Mail, um deine Transaktion abzuschließen.",
-  "Order.Status.Processing": "Wir warten auf die Bestätigung der Transaktion durch einen Drittanbieter.",
   "Order.Status.Refunded": "Erstattet",
   "OrderBudgetItem.Tip": "(beinhaltet {amount} Plattform-Trinkgeld)",
   "OrderBy": "Sortieren nach",
