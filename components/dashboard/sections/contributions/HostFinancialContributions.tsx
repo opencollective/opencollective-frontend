@@ -1,7 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
 import { PlusIcon } from 'lucide-react';
-import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
@@ -177,22 +176,6 @@ const hostOrdersMetaDataQuery = gql`
 
 const HostFinancialContributionsToDeprecate = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const intl = useIntl();
-  const router = useRouter();
-
-  const onToogleOrderDrawer = React.useCallback(
-    orderId => {
-      const newUrl = new URL(router.asPath, window.location.origin);
-
-      if (orderId) {
-        newUrl.searchParams.set('orderId', orderId);
-      } else {
-        newUrl.searchParams.delete('orderId');
-      }
-
-      router.push(newUrl.toString(), undefined, { shallow: true });
-    },
-    [router],
-  );
 
   const [showCreatePendingOrderModal, setShowCreatePendingOrderModal] = React.useState(false);
 
@@ -298,7 +281,6 @@ const HostFinancialContributionsToDeprecate = ({ accountSlug: hostSlug }: Dashbo
               nbPlaceholders={variables.limit}
               showPlatformTip
               host={data?.host}
-              onClickRow={orderId => onToogleOrderDrawer(orderId)}
             />
             <Flex mt={5} justifyContent="center">
               <Pagination queryFilter={queryFilter} total={data?.orders?.totalCount} />
