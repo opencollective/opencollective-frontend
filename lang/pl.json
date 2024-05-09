@@ -2572,7 +2572,6 @@
   "order.status": "Status",
   "Order.Status.Completed": "Zakończono",
   "Order.Status.Pending": "Proszę postępować zgodnie z instrukcjami dotyczącymi płatności zawartymi w e-mailu potwierdzającym, aby zakończyć transakcję.",
-  "Order.Status.Processing": "Czekamy na potwierdzenie transakcji przez serwis zewnętrzny.",
   "Order.Status.Refunded": "Zwrócono",
   "OrderBudgetItem.Tip": "(obejmuje {amount} napiwku na platformę)",
   "OrderBy": "Order by",
