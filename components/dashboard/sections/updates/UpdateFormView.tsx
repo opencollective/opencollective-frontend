@@ -468,7 +468,7 @@ const UpdateFormView = ({ updateId }) => {
     <div className="flex max-w-screen-lg flex-col-reverse xl:flex-row">
       <div className="flex flex-1 flex-col gap-6">
         <Link
-          className="flex items-center text-sm text-gray-500"
+          className="flex w-fit items-center text-sm text-gray-500"
           href={isEditing ? getDashboardRoute(account, `updates/${updateId}`) : getDashboardRoute(account, `updates`)}
         >
           <ArrowLeft size="14px" className="mr-1" />
