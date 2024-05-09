@@ -129,12 +129,9 @@ describe('Collective page', () => {
       scrollToSection(Sections.UPDATES);
       cy.get('[data-cy=create-new-update-btn]').click();
       cy.wait(3000);
-      cy.get('[data-cy=edit-update-form]').within(() => {
-        cy.get('[data-cy=titleInput]').type('Sample Update');
-        cy.get('[data-cy="update-content-editor"] trix-editor').type('Hello World');
-        cy.get('[data-cy=edit-update-submit-btn]').click();
-      });
-      cy.get('[data-cy=PublishUpdateBtn] button').click();
+      cy.get('[data-cy=update-title]').type('Sample Update');
+      cy.get('[data-cy="update-content-editor"] trix-editor').type('Hello World');
+      cy.get('[data-cy=update-publish-btn]').click();
       cy.visit(`/${collectiveSlug}`);
       scrollToSection(Sections.UPDATES);
       cy.get('[data-cy=view-all-updates-btn]').should('be.visible');
