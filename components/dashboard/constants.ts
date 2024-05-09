@@ -18,6 +18,7 @@ export const SECTIONS = {
   EXPENSES: 'expenses',
   SUBMITTED_EXPENSES: 'submitted-expenses',
   TRANSACTIONS: 'transactions',
+  UPDATES: 'updates',
   HOST_TRANSACTIONS: 'host-transactions',
   VIRTUAL_CARDS: 'virtual-cards',
   TEAM: 'team',
@@ -258,5 +259,9 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.TAX_INFORMATION]: {
     defaultMessage: 'Tax Information',
     id: 'r/dTTe',
+  },
+  [ALL_SECTIONS.UPDATES]: {
+    id: 'updates',
+    defaultMessage: 'Updates',
   },
 });

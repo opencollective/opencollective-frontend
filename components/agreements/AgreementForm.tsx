@@ -101,7 +101,7 @@ const ActionButtons = ({ formik, onCancel }) => (
       }}
     >
       {formik.values.id ? (
-        <FormattedMessage defaultMessage="Save Changes" id="3VI9mt" />
+        <FormattedMessage defaultMessage="Save Changes" id="SaveChanges" />
       ) : (
         <FormattedMessage defaultMessage="Create Agreement" id="LSsYSm" />
       )}

@@ -11,6 +11,7 @@ import {
   HeartHandshake,
   LayoutDashboard,
   LucideIcon,
+  Megaphone,
   Receipt,
   Settings,
   Store,
@@ -229,6 +230,11 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       section: ALL_SECTIONS.HOST_TRANSACTIONS,
       Icon: ArrowRightLeft,
       label: intl.formatMessage({ id: 'menu.transactions', defaultMessage: 'Transactions' }),
+    },
+    {
+      if: !isIndividual,
+      section: ALL_SECTIONS.UPDATES,
+      Icon: Megaphone,
     },
     {
       if:

@@ -35,6 +35,7 @@ import { TaxInformationSettingsSection } from './sections/tax-information';
 import Team from './sections/Team';
 import AccountTransactions from './sections/transactions/AccountTransactions';
 import HostTransactions from './sections/transactions/HostTransactions';
+import Updates from './sections/updates';
 import Vendors from './sections/Vendors';
 import VirtualCards from './sections/virtual-cards/VirtualCards';
 import { LEGACY_SECTIONS, LEGACY_SETTINGS_SECTIONS, SECTION_LABELS, SECTIONS, SETTINGS_SECTIONS } from './constants';
@@ -59,6 +60,7 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.OUTGOING_CONTRIBUTIONS]: OutgoingContributions,
   [SECTIONS.TRANSACTIONS]: AccountTransactions,
   [SECTIONS.HOST_TRANSACTIONS]: HostTransactions,
+  [SECTIONS.UPDATES]: Updates,
   [SECTIONS.VIRTUAL_CARDS]: VirtualCards,
   [SECTIONS.TEAM]: Team,
   [SECTIONS.VENDORS]: Vendors,

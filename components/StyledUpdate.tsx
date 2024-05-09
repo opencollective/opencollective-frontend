@@ -157,7 +157,7 @@ class StyledUpdate extends Component<StyledUpdateProps, { mode: string; modified
                 </Flex>{' '}
               </StyledTooltip>
             ) : update.isChangelog ? (
-              <FormattedMessage defaultMessage="Changelog" id="MQcAql" />
+              <FormattedMessage defaultMessage="Changelog" id="Changelog" />
             ) : (
               <FormattedMessage defaultMessage="Public update" id="BSPPvm" />
             )}
