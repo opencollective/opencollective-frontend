@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { Lock } from '@styled-icons/fa-solid/Lock';
 import { Markup } from 'interweave';
-import { get } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -11,14 +10,13 @@ import { borders } from 'styled-system';
 
 import { FEATURES, isFeatureEnabled } from '../lib/allowed-features';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
-import { getCollectivePageRoute } from '../lib/url-helpers';
+import { getCollectivePageRoute, getDashboardRoute } from '../lib/url-helpers';
 import { compose, formatDate } from '../lib/utils';
 
 import EmojiReactionPicker from './conversations/EmojiReactionPicker';
 import CommentReactions from './conversations/EmojiReactions';
 import Avatar from './Avatar';
 import Container from './Container';
-import EditUpdateForm from './EditUpdateForm';
 import { Box, Flex } from './Grid';
 import HTMLContent from './HTMLContent';
 import { getI18nLink } from './I18nFormatters';
@@ -26,7 +24,6 @@ import Link from './Link';
 import LinkCollective from './LinkCollective';
 import LoadingPlaceholder from './LoadingPlaceholder';
 import MessageBox from './MessageBox';
-import PublishUpdateBtnWithData from './PublishUpdateBtnWithData';
 import StyledButton from './StyledButton';
 import StyledHr from './StyledHr';
 import StyledTag from './StyledTag';
@@ -67,10 +64,8 @@ type StyledUpdateProps = {
   collective: any;
   update: any;
   compact?: boolean;
-  editable?: boolean;
   LoggedInUser?: any;
   isReloadingData?: boolean;
-  editUpdate?: Function;
   deleteUpdate?: Function;
   intl: any;
   router: any;
@@ -83,10 +78,8 @@ class StyledUpdate extends Component<StyledUpdateProps, { mode: string; modified
     collective: PropTypes.object.isRequired,
     update: PropTypes.object.isRequired,
     compact: PropTypes.bool, // if compact true, only show the summary
-    editable: PropTypes.bool,
     LoggedInUser: PropTypes.object,
     isReloadingData: PropTypes.bool,
-    editUpdate: PropTypes.func.isRequired,
     deleteUpdate: PropTypes.func.isRequired,
     intl: PropTypes.object.isRequired,
     router: PropTypes.object,
@@ -114,18 +107,6 @@ class StyledUpdate extends Component<StyledUpdateProps, { mode: string; modified
 
   private messages: any;
 
-  cancelEdit = () => {
-    this.setState({ modified: false, mode: 'details' });
-  };
-
-  edit = () => {
-    this.setState({ modified: false, mode: 'edit' });
-  };
-
-  toggleEdit = () => {
-    this.state.mode === 'edit' ? this.cancelEdit() : this.edit();
-  };
-
   deleteUpdate = async () => {
     if (!confirm('😱 Are you really sure you want to delete this update?')) {
       return;
@@ -141,20 +122,14 @@ class StyledUpdate extends Component<StyledUpdateProps, { mode: string; modified
     }
   };
 
-  save = async update => {
-    update.id = get(this.props, 'update.id');
-    await this.props.editUpdate({ variables: { update } });
-    this.setState({ modified: false, mode: 'details' });
-  };
-
-  renderUpdateMeta(update, isAdmin, editable, isEditing?) {
-    const { intl } = this.props;
+  renderUpdateMeta(update, isAdmin, editable) {
+    const { intl, collective } = this.props;
     const { mode } = this.state;
     const fromAccount = update.fromCollective || update.fromAccount;
 
     return (
       <Container display="flex" alignItems="Baseline" color="black.700" data-cy="meta" flexWrap="wrap">
-        {!isEditing && isAdmin && (
+        {isAdmin && (
           <StyledTag fontSize="11px" mr={2}>
             {update.isPrivate ? (
               <StyledTooltip
@@ -227,17 +202,18 @@ class StyledUpdate extends Component<StyledUpdateProps, { mode: string; modified
         {editable && (
           <React.Fragment>
             <Box ml={2} mr={2} fontSize="12px">
-              <StyledButton buttonSize="tiny" onClick={this.toggleEdit} data-cy="toggleEditUpdate">
-                {intl.formatMessage(this.messages[`${mode === 'edit' ? 'cancelEdit' : 'edit'}`])}
+              <Link href={getDashboardRoute(collective, `updates/edit/${update.id}`)}>
+                <StyledButton buttonSize="tiny" data-cy="toggleEditUpdate">
+                  {intl.formatMessage(this.messages[`${mode === 'edit' ? 'cancelEdit' : 'edit'}`])}
+                </StyledButton>
+              </Link>
+            </Box>
+
+            <Box mr={2} fontSize="12px">
+              <StyledButton buttonSize="tiny" onClick={this.deleteUpdate}>
+                <FormattedMessage id="actions.delete" defaultMessage="Delete" />
               </StyledButton>
             </Box>
-            {!isEditing && (
-              <Box mr={2} fontSize="12px">
-                <StyledButton buttonSize="tiny" onClick={this.deleteUpdate}>
-                  <FormattedMessage id="actions.delete" defaultMessage="Delete" />
-                </StyledButton>
-              </Box>
-            )}
           </React.Fragment>
         )}
       </Container>
@@ -325,24 +301,7 @@ class StyledUpdate extends Component<StyledUpdateProps, { mode: string; modified
               />
             )}
           </MessageBox>
-        ) : update.userCanPublishUpdate ? (
-          <PublishUpdateBtnWithData
-            id={update.id}
-            isHost={Boolean(update.account?.isHost)}
-            isChangelog={update.isChangelog}
-          />
         ) : null}
-      </Container>
-    );
-  }
-
-  renderEditUpdateForm() {
-    const { collective, update } = this.props;
-
-    return (
-      <Container display="flex" flexDirection="column" flex="1 1" maxWidth={700} flexWrap="wrap">
-        {this.renderUpdateMeta(update, true, true, true)}
-        <EditUpdateForm collective={collective} update={update} onSubmit={this.save} isChangelog={update.isChangelog} />
       </Container>
     );
   }
@@ -351,7 +310,7 @@ class StyledUpdate extends Component<StyledUpdateProps, { mode: string; modified
     const { update, intl, collective, compact, LoggedInUser, ...props } = this.props;
     const { mode } = this.state;
     const canEditUpdate = LoggedInUser && LoggedInUser.canEditUpdate(update);
-    const editable = !compact && props.editable && canEditUpdate;
+    const editable = !compact && canEditUpdate;
     const fromAccount = update.fromCollective || update.fromAccount;
 
     return (
@@ -374,8 +333,6 @@ class StyledUpdate extends Component<StyledUpdateProps, { mode: string; modified
               {mode === 'details' && this.renderFullContent()}
             </Container>
           )}
-
-          {mode === 'edit' && this.renderEditUpdateForm()}
         </UpdateWrapper>
         {update.publishedAt && mode === 'details' && (
           <Flex my={3} justifyContent={['center', 'flex-start']}>
@@ -389,21 +346,6 @@ class StyledUpdate extends Component<StyledUpdateProps, { mode: string; modified
   }
 }
 
-const editUpdateMutation = gql`
-  mutation EditUpdate($update: UpdateUpdateInput!) {
-    editUpdate(update: $update) {
-      id
-      updatedAt
-      title
-      html
-      isPrivate
-      isChangelog
-      makePublicOn
-      userCanPublishUpdate
-    }
-  }
-`;
-
 const deleteUpdateMutation = gql`
   mutation DeleteUpdate($id: String!) {
     deleteUpdate(id: $id) {
@@ -412,13 +354,6 @@ const deleteUpdateMutation = gql`
   }
 `;
 
-const addEditUpdateMutation = graphql(editUpdateMutation, {
-  name: 'editUpdate',
-  options: {
-    context: API_V2_CONTEXT,
-  },
-});
-
 const addDeleteUpdateMutation = graphql(deleteUpdateMutation, {
   name: 'deleteUpdate',
   options: {
@@ -426,6 +361,6 @@ const addDeleteUpdateMutation = graphql(deleteUpdateMutation, {
   },
 });
 
-const addGraphql = compose(addEditUpdateMutation, addDeleteUpdateMutation);
+const addGraphql = compose(addDeleteUpdateMutation);
 
 export default injectIntl<'intl', Omit<StyledUpdateProps, 'router'>>(addGraphql(withRouter(StyledUpdate)));

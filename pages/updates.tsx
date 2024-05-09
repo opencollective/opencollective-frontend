@@ -10,7 +10,7 @@ import { shouldIndexAccountOnSearchEngines } from '../lib/collective';
 import { ERROR } from '../lib/errors';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
-import { addParentToURLIfMissing, getCollectivePageCanonicalURL, getCollectivePageRoute } from '../lib/url-helpers';
+import { addParentToURLIfMissing, getCollectivePageCanonicalURL, getDashboardRoute } from '../lib/url-helpers';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 
 import Body from '../components/Body';
@@ -201,7 +201,7 @@ export default function UpdatesPage(props: InferGetServerSidePropsType<typeof ge
               </P>
             </Container>
             {LoggedInUser?.isAdminOfCollective(collective) && (
-              <Link href={`${getCollectivePageRoute(collective)}/updates/new`}>
+              <Link href={getDashboardRoute(collective, 'updates/new')}>
                 <StyledButton buttonStyle="primary" m={2}>
                   <FormattedMessage id="sections.update.new" defaultMessage="Create an Update" />
                 </StyledButton>

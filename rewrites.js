@@ -59,10 +59,6 @@ exports.REWRITES = [
     destination: '/updates',
   },
   {
-    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/updates/new',
-    destination: '/createUpdate',
-  },
-  {
     source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/updates/:updateSlug',
     destination: '/update',
   },

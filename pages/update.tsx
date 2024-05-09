@@ -199,7 +199,6 @@ export default function UpdatePage(props: InferGetServerSidePropsType<typeof get
           collective={account}
           update={update}
           reactions={update.reactions}
-          editable={Boolean(LoggedInUser?.isAdminOfCollective(account))}
           LoggedInUser={LoggedInUser}
           compact={false}
           isReloadingData={queryResult.loading}
