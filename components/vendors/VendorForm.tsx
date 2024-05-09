@@ -2,24 +2,30 @@ import React from 'react';
 import { useMutation } from '@apollo/client';
 import { Field, Form, Formik } from 'formik';
 import { cloneDeep, pick } from 'lodash';
-import { X } from 'lucide-react';
+import { Download, Pencil, Trash, Upload, X } from 'lucide-react';
 import { createPortal } from 'react-dom';
+import { FileRejection, useDropzone } from 'react-dropzone';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { requireFields, verifyEmailPattern, verifyURLPattern } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import { DashboardVendorsQuery } from '../../lib/graphql/types/v2/graphql';
-import { omitDeep } from '../../lib/utils';
+import { DashboardVendorsQuery, UploadedFileKind } from '../../lib/graphql/types/v2/graphql';
+import { useImageUploader } from '../../lib/hooks/useImageUploader';
+import { elementFromClass } from '../../lib/react-utils';
+import { cn, omitDeep } from '../../lib/utils';
 
+import Avatar from '../Avatar';
 import { useDrawerActionsContainer } from '../Drawer';
 import PayoutMethodForm from '../expenses/PayoutMethodForm';
 import PayoutMethodSelect from '../expenses/PayoutMethodSelect';
+import { DROPZONE_ACCEPT_IMAGES } from '../StyledDropzone';
 import StyledInput from '../StyledInput';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledInputGroup from '../StyledInputGroup';
 import StyledInputLocation from '../StyledInputLocation';
 import StyledSelect from '../StyledSelect';
+import StyledSpinner from '../StyledSpinner';
 import StyledTextarea from '../StyledTextarea';
 import { Button } from '../ui/Button';
 import { Switch } from '../ui/Switch';
@@ -53,6 +59,7 @@ const EDITABLE_FIELDS = [
   'name',
   'legalName',
   'location',
+  'imageUrl',
   'vendorInfo',
   'vendorInfo.taxFormUrl',
   'vendorInfo.taxFormRequired',
@@ -71,6 +78,95 @@ type VendorFormProps = {
   onCancel: () => void;
   isModal?: boolean;
   supportsTaxForm: boolean;
+};
+
+const AvatarContainer = elementFromClass(
+  'div',
+  'flex items-center justify-center border border-solid border-slate-200 rounded-md relative',
+);
+
+const EditAvatarButton = elementFromClass(
+  'button',
+  'flex items-center justify-center rounded-full bg-slate-200 hover:bg-slate-100 hover:text-slate-500 text-slate-600 w-6 h-6 p-1',
+);
+
+const VendorAvatar = ({ value, name, radius, minSize, maxSize, onSuccess, onReject }) => {
+  const intl = useIntl();
+  const { uploadFiles, isUploading } = useImageUploader({
+    isMulti: false,
+    mockImageGenerator: () => `https://loremflickr.com/120/120/logo`,
+    onSuccess,
+    onReject,
+    kind: UploadedFileKind.ACCOUNT_AVATAR,
+    accept: DROPZONE_ACCEPT_IMAGES,
+  });
+  const onDropCallback = React.useCallback(
+    (acceptedFiles: File[], fileRejections: FileRejection[]) => {
+      uploadFiles(acceptedFiles, fileRejections);
+    },
+    [onSuccess, uploadFiles],
+  );
+  const dropzoneParams = { accept: DROPZONE_ACCEPT_IMAGES, minSize, maxSize, multiple: false, onDrop: onDropCallback };
+  const { getRootProps, getInputProps, isDragActive } = useDropzone(dropzoneParams);
+  const { onClick, ...dropProps } = getRootProps();
+
+  return (
+    <AvatarContainer
+      data-cy={`avatar-dropzone`}
+      className={cn('group', !value && 'cursor-pointer')}
+      style={{ height: radius, width: radius }}
+      {...dropProps}
+      onClick={!value ? onClick : undefined}
+      role={!value ? 'button' : undefined}
+    >
+      <input name={name} {...getInputProps()} />
+      {isDragActive ? (
+        <div className="text-slate-700">
+          <Download size="20" />
+        </div>
+      ) : isUploading ? (
+        <StyledSpinner size={32} />
+      ) : (
+        <Avatar src={value} type="VENDOR" radius={radius}>
+          {value ? (
+            <div className="flex gap-2">
+              <EditAvatarButton
+                type="button"
+                className="hidden group-focus-within:block group-hover:block"
+                onClick={onClick}
+                title={intl.formatMessage(
+                  {
+                    id: 'HeroAvatar.Edit',
+                    defaultMessage: 'Edit {imgType, select, AVATAR {avatar} other {logo}}',
+                  },
+                  { imgType: 'LOGO' },
+                )}
+              >
+                <Pencil size={16} />
+              </EditAvatarButton>
+
+              <EditAvatarButton
+                type="button"
+                className="hidden group-focus-within:block group-hover:block"
+                onClick={() => onSuccess({ url: null })}
+                title={intl.formatMessage(
+                  {
+                    id: 'HeroAvatar.Remove',
+                    defaultMessage: 'Remove {imgType, select, AVATAR {avatar} other {logo}}',
+                  },
+                  { imgType: 'LOGO' },
+                )}
+              >
+                <Trash size={16} />
+              </EditAvatarButton>
+            </div>
+          ) : (
+            <Upload size={24} />
+          )}
+        </Avatar>
+      )}
+    </AvatarContainer>
+  );
 };
 
 const validateVendorForm = values => {
@@ -188,8 +284,21 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
           );
 
           return (
-            <Form data-cy="vendor-form">
+            <Form data-cy="vendor-form" className="mt-7">
               <div className="flex justify-stretch gap-4">
+                <Field name="imageUrl">
+                  {({ field, form }) => (
+                    <VendorAvatar
+                      radius={80}
+                      name={field.name}
+                      value={field.value}
+                      onSuccess={({ url }) => form.setFieldValue(field.name, url)}
+                      onReject={() => form.setFieldValue(field.name, vendor?.imageUrl)}
+                      minSize={1024}
+                      maxSize={2e3 * 1024}
+                    />
+                  )}
+                </Field>
                 <div className="flex-grow">
                   <StyledInputFormikField
                     name="name"
@@ -275,7 +384,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
                   />
                 )}
               </StyledInputFormikField>
-              {formik.values?.vendorInfo?.taxType === 'OTHER' && (
+              {formik.values.vendorInfo?.taxType === 'OTHER' && (
                 <StyledInputFormikField
                   name="vendorInfo.otherTaxType"
                   label={intl.formatMessage({ defaultMessage: 'Identification system', id: '6MC5jw' })}
@@ -290,7 +399,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
                 name="vendorInfo.taxId"
                 label={intl.formatMessage({ defaultMessage: 'ID Number', id: 'lSvafT' })}
                 labelProps={{ ...FIELD_LABEL_PROPS, fontWeight: 400 }}
-                required={formik.values?.vendorInfo?.taxType !== undefined}
+                required={formik.values.vendorInfo?.taxType !== undefined}
                 mt={3}
               >
                 {({ field }) => <StyledInput {...field} width="100%" maxWidth={500} maxLength={60} />}
