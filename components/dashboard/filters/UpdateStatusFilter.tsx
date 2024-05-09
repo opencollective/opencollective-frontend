@@ -11,7 +11,7 @@ export enum UPDATE_STATUS {
   DRAFTED = 'DRAFTED',
 }
 
-export const UpdateStatusMessages = defineMessages({
+const UpdateStatusMessages = defineMessages({
   [UPDATE_STATUS.PUBLISHED]: {
     id: 'update.status.published',
     defaultMessage: 'Published',

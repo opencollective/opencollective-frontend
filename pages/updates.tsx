@@ -33,7 +33,7 @@ const ROUTE_PARAMS = ['collectiveSlug'];
 
 const UPDATES_PER_PAGE = 10;
 
-export const updatesPageQuery = gql`
+const updatesPageQuery = gql`
   query UpdatesPage(
     $collectiveSlug: String!
     $limit: Int
@@ -107,7 +107,7 @@ const getPropsFromQuery = (query: NextParsedUrlQuery) => ({
   limit: Number(query?.limit) || UPDATES_PER_PAGE,
 });
 
-export const getUpdatesVariables = props => {
+const getUpdatesVariables = props => {
   return {
     collectiveSlug: props.slug,
     offset: props.offset,
