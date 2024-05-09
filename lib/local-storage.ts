@@ -9,6 +9,7 @@ export const LOCAL_STORAGE_KEYS = {
   LAST_DASHBOARD_SLUG: 'lastDashboardSlug',
   DASHBOARD_NAVIGATION_STATE: 'DashboardNavigationState',
   PREFERRED_TWO_FACTOR_METHOD: 'preferredTwoFactorMethod',
+  UPDATES_FORM_STATE: 'updatesFormState',
 };
 
 // The below helpers use a try-catch to gracefully fallback in these scenarios:
@@ -55,5 +56,39 @@ export const removeFromLocalStorage = (key: string): void => {
     window.localStorage.removeItem(key);
   } catch (e) {
     // Ignore errors
+  }
+};
+
+/**
+ * Store a value in localStorage with a time-to-live (TTL).
+ */
+export const setLocalStorageWithTTL = (key: string, value: Object | string | number, ttl = 1000 * 60 * 60) => {
+  if (!value) {
+    return removeFromLocalStorage(key);
+  }
+  const expire = new Date(Date.now() + ttl).getTime();
+  setLocalStorage(key, JSON.stringify({ timestamp: new Date().getTime(), expire, value }));
+};
+
+/**
+ * Retrieve a value from localStorage with a time-to-live (TTL).
+ */
+export const getFromLocalStorageWithTTL = (key: string) => {
+  const entry = getFromLocalStorage(key);
+  if (!entry) {
+    return;
+  }
+  try {
+    const obj = JSON.parse(entry);
+    if (Number(obj.expire) < Date.now()) {
+      // eslint-disable-next-line no-console
+      console.error('>>> entry for ', key, 'has expired');
+      return;
+    }
+    return obj.value;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error('>>> unable to parse entry for ', key, 'entry: ', entry);
+    return;
   }
 };

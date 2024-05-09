@@ -11,6 +11,12 @@ import { UPDATE_NOTIFICATION_AUDIENCE, UpdateNotificationAudienceLabels } from '
 import { toIsoDateStr } from '../../../../lib/date-utils';
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
+import {
+  getFromLocalStorageWithTTL,
+  LOCAL_STORAGE_KEYS,
+  removeFromLocalStorage,
+  setLocalStorageWithTTL,
+} from '../../../../lib/local-storage';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 import { cn, formatDate } from '../../../../lib/utils';
 
@@ -101,17 +107,25 @@ const updateAudienceQuery = gql`
 `;
 
 const FormBody = ({ update }) => {
+  const locallyPersistedState = React.useMemo(
+    () => getFromLocalStorageWithTTL(LOCAL_STORAGE_KEYS.UPDATES_FORM_STATE),
+    [],
+  );
   const isEditing = !!update?.id;
   const isDraft = !update?.publishedAt;
-  const initialValues = pick(
-    update || CREATE_UPDATE_DEFAULT_VALUES,
-    'id',
-    'title',
-    'html',
-    'isPrivate',
-    'makePublicOn',
-    'isChangelog',
-    'notificationAudience',
+  const initialValues = React.useMemo(
+    () =>
+      pick(
+        update || { ...CREATE_UPDATE_DEFAULT_VALUES, ...locallyPersistedState },
+        'id',
+        'title',
+        'html',
+        'isPrivate',
+        'makePublicOn',
+        'isChangelog',
+        'notificationAudience',
+      ),
+    [update, locallyPersistedState],
   );
 
   const intl = useIntl();
@@ -133,14 +147,18 @@ const FormBody = ({ update }) => {
     context: API_V2_CONTEXT,
   });
 
-  const refetchQueries = compact([
-    ...getRefetchQueries(account),
-    update && {
-      query: updatesViewQuery,
-      variables: { id: update.id },
-      context: API_V2_CONTEXT,
-    },
-  ]);
+  const refetchQueries = React.useMemo(
+    () =>
+      compact([
+        ...getRefetchQueries(account),
+        update && {
+          query: updatesViewQuery,
+          variables: { id: update.id },
+          context: API_V2_CONTEXT,
+        },
+      ]),
+    [account, update],
+  );
 
   const handleSubmit = async (values, formik, redirect = true) => {
     const action = isEditing ? editUpdate : createUpdate;
@@ -160,6 +178,7 @@ const FormBody = ({ update }) => {
           <FormattedMessage defaultMessage="Update saved" id="update.saved" />
         ),
       });
+      removeFromLocalStorage(LOCAL_STORAGE_KEYS.UPDATES_FORM_STATE);
       const id = response.data.createUpdate?.id || response.data.editUpdate?.id;
       if (redirect) {
         router.push(getDashboardRoute(account, `updates/${id}`));
@@ -192,6 +211,7 @@ const FormBody = ({ update }) => {
             variant: 'success',
             message: <FormattedMessage defaultMessage="Update published" id="update.published" />,
           });
+          removeFromLocalStorage(LOCAL_STORAGE_KEYS.UPDATES_FORM_STATE);
           router.push(getDashboardRoute(account, `updates/${id}`));
         } catch (e) {
           toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
@@ -226,8 +246,15 @@ const FormBody = ({ update }) => {
       confirmLabel: intl.formatMessage({ defaultMessage: 'Unpublish Update', id: 'Update.Unpublish.Title' }),
     });
 
+  const handleStatePersistence = React.useMemo(
+    () => values => {
+      setLocalStorageWithTTL(LOCAL_STORAGE_KEYS.UPDATES_FORM_STATE, values, 60 * 60 * 24 * 1000);
+    },
+    [],
+  );
+
   return (
-    <Formik initialValues={initialValues} onSubmit={handleSubmit}>
+    <Formik initialValues={initialValues} onSubmit={handleSubmit} validate={handleStatePersistence}>
       {formik => (
         <Form>
           <TwoColumnContainer>
