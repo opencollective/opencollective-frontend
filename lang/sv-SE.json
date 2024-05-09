@@ -2572,7 +2572,6 @@
   "order.status": "Status",
   "Order.Status.Completed": "Slutförd",
   "Order.Status.Pending": "Följ betalningsinstruktionerna i bekräftelsemailet för att slutföra din transaktion.",
-  "Order.Status.Processing": "Vi väntar på en tredjepartstjänst för att bekräfta att transaktionen slutfördes.",
   "Order.Status.Refunded": "Återbetald",
   "OrderBudgetItem.Tip": "(inkluderar {amount} för bidrag till plattformen)",
   "OrderBy": "Order by",
