@@ -73,7 +73,7 @@ const ConfirmationModal = ({
   const handleClose = () => setOpen(false);
 
   const onCloseAutoFocus = e => {
-    if (onCloseFocusRef.current) {
+    if (onCloseFocusRef?.current) {
       e.preventDefault();
       onCloseFocusRef.current.focus();
     }

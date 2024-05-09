@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { border, BorderProps, color, layout, space } from 'styled-system';
 
 import { CollectiveType, defaultImage } from '../lib/constants/collectives';
+import { Account } from '../lib/graphql/types/v2/graphql';
 import { getAvatarBorderRadius, getCollectiveImage } from '../lib/image-utils';
 
 import { Flex, FlexProps } from './Grid';
@@ -179,6 +180,43 @@ export const IncognitoAvatar = avatarProps => {
 /** A simple avatar for guest users */
 export const GuestAvatar = avatarProps => {
   return <StyledAvatar {...avatarProps} type={CollectiveType.USER} src={defaultImage.GUEST} />;
+};
+
+export const StackedAvatars = ({
+  accounts = [],
+  imageSize,
+  maxDisplayedAvatars = 3,
+}: {
+  accounts: Partial<Account>[];
+  imageSize: number;
+  maxDisplayedAvatars?: number;
+}) => {
+  const width = `${imageSize}px`;
+  const marginLeft = `-${imageSize / 3}px`;
+  const displayed = accounts.length > maxDisplayedAvatars ? accounts.slice(0, maxDisplayedAvatars - 1) : accounts;
+  const left = accounts.length - displayed.length;
+  return (
+    <div className="flex gap-[-4px]">
+      {displayed.map(account => (
+        <div key={account.id || account.slug} className="flex items-center  first:ml-0" style={{ marginLeft }}>
+          <Avatar
+            collective={account}
+            radius={imageSize}
+            displayTitle={true}
+            className="border border-solid border-white"
+          />
+        </div>
+      ))}
+      {left ? (
+        <div
+          className="flex items-center justify-center rounded-full bg-blue-50 text-[11px] font-semibold text-blue-400 first:ml-0"
+          style={{ width, height: width, marginLeft }}
+        >
+          +{left}
+        </div>
+      ) : null}
+    </div>
+  );
 };
 
 /** @component */

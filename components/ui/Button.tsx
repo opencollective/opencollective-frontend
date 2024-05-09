@@ -71,7 +71,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={allRefs}
         {...props}
         type={props.type === 'submit' && loading ? 'button' : props.type || 'button'}
-        onClick={loading ? null : onClick}
+        onClick={loading || props.disabled ? null : onClick}
         style={!loading ? undefined : { width: baseSize?.width, height: baseSize?.height }}
       >
         {realChildren}
