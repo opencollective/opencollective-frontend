@@ -615,10 +615,8 @@ const ExportTransactionsCSVModal = ({
                 </InfoTooltipIcon>
               </div>
             )}
-          </div>
-          {isAboveRowLimit && (
-            <div className="absolute left-0 top-0 flex h-full w-full  items-center justify-center bg-black/30">
-              <div className="m-4 flex max-w-md flex-col gap-4 rounded-lg border border-solid border-red-600 bg-red-50 px-6 py-4 sm:m-0">
+            {isAboveRowLimit && (
+              <div className="flex flex-col gap-4 rounded-lg border border-solid border-red-600 bg-red-50 px-6 py-4">
                 <p className="font-bold">
                   <FormattedMessage defaultMessage="The size of the resulting export file is too large" id="XX+VZK" />
                 </p>
@@ -629,8 +627,9 @@ const ExportTransactionsCSVModal = ({
                   />
                 </p>
               </div>
-            </div>
-          )}
+            )}
+          </div>
+
           <DialogFooter className="flex flex-col gap-4 border-t border-solid border-slate-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
             <div>
               <div className="flex flex-col gap-3 font-bold text-slate-700 sm:flex-row sm:text-sm">
