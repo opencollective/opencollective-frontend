@@ -12,6 +12,7 @@ import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 import { OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import { i18nPaymentMethodProviderType } from '../../../../lib/i18n/payment-method-provider-type';
 import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
 
 import Avatar from '../../../Avatar';
@@ -115,7 +116,6 @@ const dashboardContributionsMetadataQuery = gql`
       }
       PAID: orders(
         filter: $filter
-        onlyActiveSubscriptions: true
         includeIncognito: true
         status: [PAID]
         includeHostedAccounts: $includeHostedAccounts
@@ -734,7 +734,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
             onResetFilters={() => queryFilter.resetFilters({})}
           />
         ) : (
-          <div className="flex flex-col gap-4">
+          <div id="ops" className="flex flex-col gap-4">
             <DataTable
               loading={loading}
               columns={columns}

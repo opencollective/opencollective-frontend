@@ -17,6 +17,7 @@ import {
   Plus,
   RefreshCcw,
   TriangleAlert,
+  Undo2,
   Wallet,
   X,
 } from 'lucide-react';
@@ -667,6 +668,9 @@ function OrderTimeline(props: OrderTimelineProps) {
           ActivityType.ORDER_PAYMENT_FAILED,
           ActivityType.PAYMENT_FAILED,
           ActivityType.ORDER_PENDING_EXPIRED,
+          ActivityType.ORDER_DISPUTE_CREATED,
+          ActivityType.ORDER_DISPUTE_CLOSED,
+          ActivityType.CONTRIBUTION_REJECTED,
         ].includes(a.type) ? (
           <TriangleAlert size={16} />
         ) : a.type === ActivityType.SUBSCRIPTION_CANCELED ? (
@@ -678,23 +682,30 @@ function OrderTimeline(props: OrderTimelineProps) {
         ),
         date: a.createdAt,
         type: [
+          // TODO: add disputed, in review
           ActivityType.ORDER_PAYMENT_FAILED,
           ActivityType.SUBSCRIPTION_CANCELED,
           ActivityType.PAYMENT_FAILED,
           ActivityType.ORDER_PENDING_EXPIRED,
+          ActivityType.CONTRIBUTION_REJECTED,
         ].includes(a.type)
           ? 'error'
-          : [ActivityType.PAYMENT_CREDITCARD_CONFIRMATION, ActivityType.ORDER_PENDING_CONTRIBUTION_REMINDER].includes(
-                a.type,
-              )
+          : [
+                ActivityType.PAYMENT_CREDITCARD_CONFIRMATION,
+                ActivityType.ORDER_PENDING_CONTRIBUTION_REMINDER,
+                ActivityType.ORDER_DISPUTE_CREATED,
+                ActivityType.ORDER_DISPUTE_CLOSED,
+              ].includes(a.type)
             ? 'warning'
             : 'info',
         menu: a.data?.paymentProcessorUrl ? (
           <React.Fragment>
-            <DropdownMenuItem>
-              <Link href={a.data?.paymentProcessorUrl}>
-                <FormattedMessage defaultMessage="View in payment processor" id="NgSLbI" />
-              </Link>
+            <DropdownMenuItem asChild>
+              <Button size="xs" variant="ghost" asChild className="w-full">
+                <Link href={a.data?.paymentProcessorUrl}>
+                  <FormattedMessage defaultMessage="View in payment processor" id="NgSLbI" />
+                </Link>
+              </Button>
             </DropdownMenuItem>
           </React.Fragment>
         ) : null,
@@ -707,28 +718,43 @@ function OrderTimeline(props: OrderTimelineProps) {
   )
     .reverse()
     .map((txn, i) => {
+      const primaryTxn = txn.transactions.at(0);
+      const actions = getTransactionActions(primaryTxn);
+
       return {
         id: txn.group,
-        title: txn.transactions.at(0).description,
-        icon: <CircleCheckBig size={16} />,
-        date: txn.transactions.at(0).createdAt,
+        title: primaryTxn.description,
+        icon: primaryTxn.isRefund ? <Undo2 size={16} /> : <CircleCheckBig size={16} />,
+        date: primaryTxn.createdAt,
         collapsable: true,
-        type: 'success',
+        type: primaryTxn.isRefund ? 'warning' : 'success',
         normallyOpen: i === 0,
         menu: (
           <React.Fragment>
-            <DropdownMenuItem>
-              <Link href={getTransactionGroupLink(LoggedInUser, props.order, txn.group)}>
-                <FormattedMessage defaultMessage="View transaction" id="1kZ3H0" />
-              </Link>
-            </DropdownMenuItem>
-            {txn.transactions.at(0).paymentProcessorUrl && (
-              <DropdownMenuItem>
-                <Link href={txn.transactions.at(0).paymentProcessorUrl}>
-                  <FormattedMessage defaultMessage="View in payment processor" id="NgSLbI" />
+            <DropdownMenuItem asChild>
+              <Button size="xs" variant="ghost" asChild className="w-full">
+                <Link href={getTransactionGroupLink(LoggedInUser, props.order, txn.group)}>
+                  <FormattedMessage defaultMessage="View transaction" id="1kZ3H0" />
                 </Link>
+              </Button>
+            </DropdownMenuItem>
+            {primaryTxn.paymentProcessorUrl && (
+              <DropdownMenuItem asChild>
+                <Button size="xs" variant="ghost" asChild className="w-full">
+                  <Link href={primaryTxn.paymentProcessorUrl}>
+                    <FormattedMessage defaultMessage="View in payment processor" id="NgSLbI" />
+                  </Link>
+                </Button>
               </DropdownMenuItem>
             )}
+            {actions.primary?.map((action, i) => (
+              // eslint-disable-next-line react/no-array-index-key
+              <DropdownMenuItem key={i} asChild className="w-full">
+                <Button size="xs" variant="ghost" onClick={action.onClick}>
+                  {action.label}
+                </Button>
+              </DropdownMenuItem>
+            ))}
           </React.Fragment>
         ),
       };

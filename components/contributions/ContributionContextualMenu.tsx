@@ -40,13 +40,14 @@ export function ContributionContextualMenu(props: ContributionContextualMenuProp
       OrderStatus.PENDING,
       OrderStatus.CANCELLED,
       OrderStatus.REFUNDED,
+      OrderStatus.REJECTED,
     ].includes(order.status) &&
     isAdminOfOrder;
 
   const canResume = order.status === OrderStatus.PAUSED && order.permissions.canResume;
   const canCancel =
     isAdminOfOrder &&
-    ![OrderStatus.CANCELLED, OrderStatus.PAID, OrderStatus.REFUNDED].includes(order.status) &&
+    ![OrderStatus.CANCELLED, OrderStatus.PAID, OrderStatus.REFUNDED, OrderStatus.REJECTED].includes(order.status) &&
     order.frequency !== ContributionFrequency.ONETIME;
   const canMarkAsCompleted = order.status === OrderStatus.PENDING && order.permissions.canMarkAsPaid;
   const canMarkAsExpired = order.status === OrderStatus.PENDING && order.permissions.canMarkAsExpired;

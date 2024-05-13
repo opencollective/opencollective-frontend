@@ -108,6 +108,10 @@ export const managedOrderFragment = gql`
       value
       valueInCents
     }
+    pendingContributionData {
+      expectedAt
+      paymentMethod
+    }
   }
   ${accountHoverCardFields}
   ${paymentMethodFragment}
