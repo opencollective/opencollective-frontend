@@ -104,13 +104,19 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   expectedDate: expectedDateFilter.filter,
   expectedFundsFilter: {
     labelMsg: defineMessage({ defaultMessage: 'Expected Funds', id: 'ExpectedFunds' }),
-    Component: ({ valueRenderer, intl, ...props }) => (
-      <ComboSelectFilter
-        isMulti={false}
-        options={Object.values(ExpectedFundsFilter).map(value => ({ label: valueRenderer({ intl, value }), value }))}
-        {...props}
-      />
-    ),
+    Component: ({ valueRenderer, intl, ...props }) => {
+      const options = React.useMemo(
+        () => Object.values(ExpectedFundsFilter).map(value => ({ label: valueRenderer({ intl, value }), value })),
+        [intl, valueRenderer],
+      );
+      return (
+        <ComboSelectFilter
+          isMulti={false}
+          options={options}
+          {...props}
+        />
+      );
+    },
     valueRenderer: ({ value }) =>
       value === ExpectedFundsFilter.MANUAL ? (
         <FormattedMessage defaultMessage="Created by contributors" id="wa5frV" />
