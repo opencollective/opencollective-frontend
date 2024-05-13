@@ -80,7 +80,7 @@ const renderOptions = (value: DateFilterValueType, setValue: (val: DateFilterVal
   }
 };
 
-function DateFilter({
+export function DateFilter({
   value,
   onChange,
 }: {

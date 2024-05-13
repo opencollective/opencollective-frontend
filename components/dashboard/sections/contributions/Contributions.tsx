@@ -186,10 +186,19 @@ const dashboardContributionsQuery = gql`
     $paymentMethod: PaymentMethodReferenceInput
     $onlyExpectedFunds: Boolean!
     $includeHostedAccounts: Boolean!
+    $dateFrom: DateTime
+    $dateTo: DateTime
+    $expectedDateFrom: DateTime
+    $expectedDateTo: DateTime
+    $expectedFundsFilter: ExpectedFundsFilter
   ) {
     account(slug: $slug) {
       id
       orders(
+        dateFrom: $dateFrom
+        dateTo: $dateTo
+        expectedDateFrom: $expectedDateFrom
+        expectedDateTo: $expectedDateTo
         filter: $filter
         frequency: $frequency
         status: $status
@@ -203,6 +212,7 @@ const dashboardContributionsQuery = gql`
         paymentMethod: $paymentMethod
         onlyExpectedFunds: $onlyExpectedFunds
         includeHostedAccounts: $includeHostedAccounts
+        expectedFundsFilter: $expectedFundsFilter
       ) {
         totalCount
         nodes {
