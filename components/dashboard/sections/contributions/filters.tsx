@@ -109,13 +109,7 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
         () => Object.values(ExpectedFundsFilter).map(value => ({ label: valueRenderer({ intl, value }), value })),
         [intl, valueRenderer],
       );
-      return (
-        <ComboSelectFilter
-          isMulti={false}
-          options={options}
-          {...props}
-        />
-      );
+      return <ComboSelectFilter isMulti={false} options={options} {...props} />;
     },
     valueRenderer: ({ value }) =>
       value === ExpectedFundsFilter.MANUAL ? (
