@@ -632,26 +632,28 @@ const ExportTransactionsCSVModal = ({
 
           <DialogFooter className="flex flex-col gap-4 border-t border-solid border-slate-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
             <div>
-              <div className="flex flex-col gap-3 font-bold text-slate-700 sm:flex-row sm:text-sm">
-                <FormattedMessage
-                  id="ExportTransactionsCSVModal.ExportRows"
-                  defaultMessage="Exporting {rows} {rows, plural, one {row} other {rows}}"
-                  values={{
-                    rows: exportedRows,
-                  }}
-                />
-                {expectedTimeInMinutes > 0 && (
-                  <div className="text-sm font-normal">
-                    <FormattedMessage
-                      id="ExportTransactionsCSVModal.ExportTime"
-                      defaultMessage="Estimated time: {expectedTimeInMinutes, plural, one {# minute} other {# minutes}}"
-                      values={{
-                        expectedTimeInMinutes,
-                      }}
-                    />
-                  </div>
-                )}
-              </div>
+              {!isAboveRowLimit && (
+                <div className="flex flex-col gap-3 font-bold text-slate-700 sm:flex-row sm:text-sm">
+                  <FormattedMessage
+                    id="ExportTransactionsCSVModal.ExportRows"
+                    defaultMessage="Exporting {rows} {rows, plural, one {row} other {rows}}"
+                    values={{
+                      rows: exportedRows,
+                    }}
+                  />
+                  {expectedTimeInMinutes > 0 && (
+                    <div className="text-sm font-normal">
+                      <FormattedMessage
+                        id="ExportTransactionsCSVModal.ExportTime"
+                        defaultMessage="Estimated time: {expectedTimeInMinutes, plural, one {# minute} other {# minutes}}"
+                        values={{
+                          expectedTimeInMinutes,
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
             <div className="flex flex-col justify-stretch gap-2 sm:flex-row sm:justify-normal">
               {canEditFields && (
