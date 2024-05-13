@@ -42,6 +42,7 @@ import { getDashboardRoute } from '../../lib/url-helpers';
 import { AccountHoverCard } from '../AccountHoverCard';
 import Avatar from '../Avatar';
 import ActivityDescription from '../dashboard/sections/ActivityLog/ActivityDescription';
+import { useTransactionActions } from '../dashboard/sections/transactions/actions';
 import DateTime from '../DateTime';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import Link from '../Link';
@@ -231,6 +232,7 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
 
       fragment ContributionDrawerTransactionFields on Transaction {
         id
+        uuid
         kind
         amount {
           currency
@@ -606,7 +608,7 @@ function getTransactionGroupLink(
 
 function getTransactionOrderLink(LoggedInUser: LoggedInUserType, order: ContributionDrawerQuery['order']): string {
   const url = getTransactionsUrl(LoggedInUser, order);
-  url.searchParams.set('order', order.legacyId.toString());
+  url.searchParams.set('orderId', order.legacyId.toString());
   return url.toString();
 }
 
@@ -630,6 +632,7 @@ type OrderTimelineItem = {
 function OrderTimeline(props: OrderTimelineProps) {
   const { LoggedInUser } = useLoggedInUser();
   const [collapseGroupsToggle, setCollapseGroupsToggle] = useState({});
+  const getTransactionActions = useTransactionActions();
 
   const toggleGroup = React.useCallback((group: string) => {
     setCollapseGroupsToggle(cur => {

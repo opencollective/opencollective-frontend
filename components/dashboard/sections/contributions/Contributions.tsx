@@ -215,7 +215,7 @@ const dashboardContributionsQuery = gql`
   ${managedOrderFragment}
 `;
 
-const getColumns = ({ tab, contextualMenuProps, intl, isIncoming }) => {
+const getColumns = ({ tab, contextualMenuProps, intl, isIncoming, includeHostedAccounts, onlyExpectedFunds }) => {
   const toAccount = {
     accessorKey: 'toAccount',
     header: intl.formatMessage({ id: 'Collective', defaultMessage: 'Collective' }),
@@ -258,7 +258,7 @@ const getColumns = ({ tab, contextualMenuProps, intl, isIncoming }) => {
   const paymentMethod = {
     accessorKey: 'paymentMethod',
     header: intl.formatMessage({ id: 'paymentmethod.label', defaultMessage: 'Payment Method' }),
-    cell: ({ cell }) => {
+    cell: ({ cell, row }) => {
       const pm = cell.getValue();
       if (pm) {
         return (
@@ -266,6 +266,8 @@ const getColumns = ({ tab, contextualMenuProps, intl, isIncoming }) => {
             <PaymentMethodTypeWithIcon iconSize={18} type={pm.type} />
           </div>
         );
+      } else if (row.original?.pendingContributionData?.paymentMethod) {
+        return i18nPaymentMethodProviderType(intl, row.original?.pendingContributionData?.paymentMethod);
       }
     },
   };
@@ -312,7 +314,7 @@ const getColumns = ({ tab, contextualMenuProps, intl, isIncoming }) => {
 
   if (!tab || [ContributionsTab.ONETIME, ContributionsTab.ALL].includes(tab)) {
     return compact([
-      isIncoming ? fromAccount : toAccount,
+      includeHostedAccounts ? toAccount : isIncoming ? fromAccount : toAccount,
       orderId,
       paymentMethod,
       totalAmount,
@@ -328,10 +330,26 @@ const getColumns = ({ tab, contextualMenuProps, intl, isIncoming }) => {
           );
         },
       },
+      onlyExpectedFunds
+        ? {
+            accessorKey: 'pendingContributionData.expectedAt',
+            header: intl.formatMessage({ defaultMessage: 'Expected Date', id: 'vNC2dX' }),
+            cell: ({ cell }) => {
+              const date = cell.getValue();
+              return (
+                date && (
+                  <div className="flex items-center gap-2 truncate">
+                    <DateTime value={date} dateStyle="medium" timeStyle={undefined} />
+                  </div>
+                )
+              );
+            },
+          }
+        : null,
       status,
       actions,
     ]);
-  } else if ([ContributionsTab.RECURRING, ContributionsTab.CANCELED, ContributionsTab.PAUSED].includes(tab)) {
+  } else {
     const amount = {
       accessorKey: 'amount',
       header: intl.formatMessage({ id: 'Fields.amount', defaultMessage: 'Amount' }),
@@ -347,7 +365,7 @@ const getColumns = ({ tab, contextualMenuProps, intl, isIncoming }) => {
     };
 
     return compact([
-      isIncoming ? fromAccount : toAccount,
+      includeHostedAccounts ? toAccount : isIncoming ? fromAccount : toAccount,
       orderId,
       paymentMethod,
       amount,
@@ -527,7 +545,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
           label: intl.formatMessage({ defaultMessage: 'Expired', id: 'RahCRH' }),
           count: metadata?.account?.[ContributionsTab.EXPIRED].totalCount,
           filter: {
-            status: [OrderStatus.PAID],
+            status: [OrderStatus.EXPIRED],
           },
         }
       : null,
@@ -645,7 +663,14 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
     },
   };
 
-  const columns = getColumns({ tab: queryFilter.activeViewId, contextualMenuProps, intl, isIncoming }) || [];
+  const columns = getColumns({
+    tab: queryFilter.activeViewId,
+    contextualMenuProps,
+    intl,
+    isIncoming,
+    includeHostedAccounts,
+    onlyExpectedFunds,
+  });
   const currentViewCount = views.find(v => v.id === queryFilter.activeViewId)?.count;
   const nbPlaceholders = currentViewCount < queryFilter.values.limit ? currentViewCount : queryFilter.values.limit;
   return (
@@ -734,7 +759,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
             onResetFilters={() => queryFilter.resetFilters({})}
           />
         ) : (
-          <div id="ops" className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4">
             <DataTable
               loading={loading}
               columns={columns}

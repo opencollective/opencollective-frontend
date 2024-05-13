@@ -23,6 +23,21 @@ const rejectTransactionMutation = gql`
   mutation RejectTransaction($transaction: TransactionReferenceInput!, $message: String) {
     rejectTransaction(transaction: $transaction, message: $message) {
       id
+      order {
+        id
+        status
+        activities {
+          nodes {
+            id
+            type
+            createdAt
+          }
+        }
+        transactions {
+          id
+          createdAt
+        }
+      }
     }
   }
 `;
