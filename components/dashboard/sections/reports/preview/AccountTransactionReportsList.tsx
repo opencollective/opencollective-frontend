@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
 import { useQuery } from '@apollo/client';
-import { toNumber } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
@@ -13,9 +12,9 @@ import FormattedMoneyAmount from '../../../../FormattedMoneyAmount';
 import MessageBoxGraphqlError from '../../../../MessageBoxGraphqlError';
 import { DataTable } from '../../../../table/DataTable';
 import Tabs from '../../../../Tabs';
-import { Pagination } from '../../../../ui/Pagination';
 import { DashboardContext } from '../../../DashboardContext';
 import DashboardHeader from '../../../DashboardHeader';
+import { Pagination } from '../../../filters/Pagination';
 import { DashboardSectionProps } from '../../../types';
 
 import { CurrentPeriodBadge } from './CurrentPeriodBadge';
@@ -82,8 +81,6 @@ const AccountTransactionReportList = ({ accountSlug }: DashboardSectionProps) =>
   });
   const columns = getColumns(intl);
   const { limit, offset } = queryFilter.values;
-  const pages = Math.ceil((data?.account?.transactionReports?.nodes.length || 1) / limit);
-  const currentPage = toNumber(offset + limit) / limit;
 
   const tabs = useMemo(
     () => [
@@ -144,14 +141,7 @@ const AccountTransactionReportList = ({ accountSlug }: DashboardSectionProps) =>
           )}
         </div>
       </div>
-
-      {pages > 1 && (
-        <Pagination
-          totalPages={pages}
-          page={currentPage}
-          onChange={page => queryFilter.setFilter('offset', (page - 1) * limit)}
-        />
-      )}
+      <Pagination queryFilter={queryFilter} total={data?.account?.transactionReports?.nodes.length} />
     </div>
   );
 };

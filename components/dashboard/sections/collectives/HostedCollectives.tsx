@@ -19,9 +19,7 @@ import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { formatHostFeeStructure } from '../../../../lib/i18n/host-fee-structure';
 
 import { Drawer } from '../../../Drawer';
-import { Flex } from '../../../Grid';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
-import Pagination from '../../../Pagination';
 import { DataTable } from '../../../table/DataTable';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
@@ -33,6 +31,7 @@ import {
 } from '../../filters/CollectiveStatusFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { Filterbar } from '../../filters/Filterbar';
+import { Pagination } from '../../filters/Pagination';
 import { searchFilter } from '../../filters/SearchFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
 import { DashboardSectionProps } from '../../types';
@@ -110,8 +109,6 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
   consolidatedBalance: consolidatedBalanceFilter.filter,
 };
 
-const ROUTE_PARAMS = ['slug', 'section', 'view'];
-
 const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionProps) => {
   const intl = useIntl();
   const router = useRouter();
@@ -174,7 +171,7 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
     meta: { currency: metadata?.host?.currency },
   });
 
-  const { data, error, loading, variables, refetch } = useQuery(hostedCollectivesQuery, {
+  const { data, error, loading, refetch } = useQuery(hostedCollectivesQuery, {
     variables: { hostSlug, ...queryFilter.variables },
     context: API_V2_CONTEXT,
     fetchPolicy: 'cache-and-network',
@@ -234,14 +231,7 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
             onClickRow={onClickRow}
             getRowDataCy={row => `collective-${row.original.slug}`}
           />
-          <Flex mt={5} justifyContent="center">
-            <Pagination
-              total={hostedAccounts?.totalCount}
-              limit={variables.limit}
-              offset={variables.offset}
-              ignoredQueryParams={ROUTE_PARAMS}
-            />
-          </Flex>
+          <Pagination queryFilter={queryFilter} total={hostedAccounts?.totalCount} />
         </React.Fragment>
       )}
 

@@ -76,7 +76,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
 
   if (isLoading) {
     return (
-      <div className="w-full">
+      <div className="w-full pb-6">
         <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
         <LoadingPlaceholder height={26} mb={4} maxWidth={500} />
         <LoadingPlaceholder height={300} />
@@ -92,7 +92,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
       }
     }
     return (
-      <div className="w-full">
+      <div className="w-full pb-6">
         <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
         <DashboardComponent accountSlug={account.slug} subpath={subpath} isDashboard />
       </div>
@@ -101,7 +101,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
 
   if (values(LEGACY_SECTIONS).includes(section)) {
     return (
-      <div className="w-full max-w-screen-lg">
+      <div className="w-full max-w-screen-lg pb-6">
         <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
         {SECTION_LABELS[section] && <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />}
 
@@ -115,7 +115,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
   if (SettingsComponent) {
     return (
       // <div className="flex max-w-screen-lg justify-center">
-      <div className="max-w-screen-md flex-1">
+      <div className="max-w-screen-md flex-1 pb-6">
         <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
         <SettingsComponent account={account} accountSlug={account.slug} subpath={subpath} />
       </div>
@@ -125,7 +125,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
   if (values(LEGACY_SETTINGS_SECTIONS).includes(section)) {
     return (
       // <div className="flex max-w-screen-lg justify-center">
-      <div className="max-w-screen-md flex-1">
+      <div className="max-w-screen-md flex-1 pb-6">
         <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
         {SECTION_LABELS[section] && <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />}
 

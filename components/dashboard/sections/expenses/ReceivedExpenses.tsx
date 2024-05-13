@@ -11,13 +11,13 @@ import { Account, ExpensesPageQueryVariables } from '../../../../lib/graphql/typ
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
 import ExpensesList from '../../../expenses/ExpensesList';
-import Pagination from '../../../Pagination';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { expenseTagFilter } from '../../filters/ExpenseTagsFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { AccountRenderer } from '../../filters/HostedAccountFilter';
+import { Pagination } from '../../filters/Pagination';
 import { DashboardSectionProps } from '../../types';
 
 import {
@@ -145,15 +145,7 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
               );
             }}
           />
-          <div className="mt-12 flex justify-center">
-            <Pagination
-              route={pageRoute}
-              total={data?.expenses?.totalCount}
-              limit={queryFilter.values.limit}
-              offset={queryFilter.values.offset}
-              ignoredQueryParams={ROUTE_PARAMS}
-            />
-          </div>
+          <Pagination queryFilter={queryFilter} total={data?.expenses?.totalCount} />
         </React.Fragment>
       )}
     </div>
