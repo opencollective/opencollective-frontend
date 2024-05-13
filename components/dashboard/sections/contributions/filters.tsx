@@ -103,7 +103,7 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   date: dateFilter.filter,
   expectedDate: expectedDateFilter.filter,
   expectedFundsFilter: {
-    labelMsg: defineMessage({ defaultMessage: 'Expected Funds', id: 'Vb5FM1' }),
+    labelMsg: defineMessage({ defaultMessage: 'Expected Funds', id: 'ExpectedFunds' }),
     Component: ({ valueRenderer, intl, ...props }) => (
       <ComboSelectFilter
         isMulti={false}
