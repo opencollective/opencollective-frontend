@@ -1,7 +1,7 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { isNil } from 'lodash';
-import { AlertTriangle, InfoIcon, Undo } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, ArrowRight, InfoIcon, Undo } from 'lucide-react';
 // eslint-disable-next-line no-restricted-imports -- components/Link does not currently accept a ref, which is required when used 'asChild' of HoverCardTrigger
 import Link from 'next/link';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -12,6 +12,7 @@ import { usePrevious } from '../../../../lib/hooks/usePrevious';
 import { i18nTransactionKind, i18nTransactionType } from '../../../../lib/i18n/transaction';
 
 import { AccountHoverCard, accountHoverCardFields } from '../../../AccountHoverCard';
+import { getCategoryLabel } from '../../../AccountingCategorySelect';
 import Avatar from '../../../Avatar';
 import ExpenseBudgetItem from '../../../budget/ExpenseBudgetItem';
 import OrderBudgetItem from '../../../budget/OrderBudgetItem';
@@ -19,8 +20,12 @@ import { CopyID } from '../../../CopyId';
 import DateTime from '../../../DateTime';
 import DrawerHeader from '../../../DrawerHeader';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
+import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
+import { PaymentMethodLabel } from '../../../PaymentMethodLabel';
 import { Badge } from '../../../ui/Badge';
+import { DataList, DataListItem, DataListItemLabel, DataListItemValue } from '../../../ui/DataList';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '../../../ui/HoverCard';
+import { InfoList, InfoListItem } from '../../../ui/InfoList';
 import { Sheet, SheetBody, SheetContent } from '../../../ui/Sheet';
 import { Skeleton } from '../../../ui/Skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
@@ -28,11 +33,10 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 import { TransactionDetailsQueryNode } from './types';
 
 const transactionQuery = gql`
-  query TransactionDetails($id: String!) {
-    transaction(id: $id) {
+  query TransactionDetails($transaction: TransactionReferenceInput!) {
+    transaction(transaction: $transaction) {
       id
       legacyId
-      uuid
       group
       amount {
         valueInCents
@@ -56,11 +60,12 @@ const transactionQuery = gql`
       }
       oppositeTransaction {
         id
-        uuid
+        legacyId
       }
       paymentMethod {
         id
         type
+        service
       }
       type
       kind
@@ -72,6 +77,7 @@ const transactionQuery = gql`
       isInReview
       isDisputed
       isOrderRejected
+      merchantId
       account {
         id
         name
@@ -146,6 +152,12 @@ const transactionQuery = gql`
           id
           slug
         }
+        accountingCategory {
+          id
+          code
+          name
+          friendlyName
+        }
       }
       expense {
         id
@@ -182,6 +194,12 @@ const transactionQuery = gql`
           slug
           imageUrl
         }
+        accountingCategory {
+          id
+          code
+          name
+          friendlyName
+        }
       }
       refundTransaction {
         id
@@ -192,15 +210,6 @@ const transactionQuery = gql`
   }
   ${accountHoverCardFields}
 `;
-
-const DataList = ({ title, value }) => {
-  return (
-    <div className="relative flex w-full flex-col gap-1 sm:flex-row">
-      <div className="min-w-[180px] max-w-[240px] shrink-0 grow-0 basis-1/4 text-muted-foreground">{title}</div>
-      <div className="max-w-fit overflow-hidden">{value}</div>
-    </div>
-  );
-};
 
 export function TransactionDrawer({ open, onOpenChange, onCloseAutoFocus, transactionId, getActions }) {
   return (
@@ -213,21 +222,22 @@ export function TransactionDrawer({ open, onOpenChange, onCloseAutoFocus, transa
 }
 
 interface TransactionDetailsProps {
-  transactionId: string;
+  transactionId: number;
   getActions: GetActions<TransactionDetailsQueryNode>;
 }
 
 function TransactionDetails({ transactionId, getActions }: TransactionDetailsProps) {
   const intl = useIntl();
   const prevTransactionId = usePrevious(transactionId);
-  const { data, refetch, loading } = useQuery(transactionQuery, {
-    variables: { id: transactionId || prevTransactionId },
+  const id = transactionId || prevTransactionId;
+  const { data, refetch, loading, error } = useQuery(transactionQuery, {
+    variables: { transaction: { legacyId: Number(id) } },
     context: API_V2_CONTEXT,
   });
   const { transaction } = data || { transaction: null };
   const dropdownTriggerRef = React.useRef();
   const actions = getActions(transaction, dropdownTriggerRef, refetch);
-
+  const accountingCategory = transaction?.expense?.accountingCategory || transaction?.order?.accountingCategory;
   return (
     <React.Fragment>
       <DrawerHeader
@@ -235,8 +245,8 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
         dropdownTriggerRef={dropdownTriggerRef}
         entityName={<FormattedMessage defaultMessage="Transaction" id="1+ROfp" />}
         entityIdentifier={
-          <CopyID tooltipLabel={<FormattedMessage defaultMessage="Copy transaction ID" id="zzd7ZI" />}>
-            {transaction?.id ?? transactionId}
+          <CopyID value={id} tooltipLabel={<FormattedMessage defaultMessage="Copy transaction ID" id="zzd7ZI" />}>
+            #{id}
           </CopyID>
         }
         entityLabel={
@@ -315,269 +325,318 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
           </React.Fragment>
         }
       />
-      <SheetBody>
+      <SheetBody className="pt-0">
         <div className="text-sm">
-          <div className="mb-4 flex items-center gap-3">
-            <h4 className="whitespace-nowrap text-base font-semibold">
-              <FormattedMessage defaultMessage="Transaction details" id="vZO4p4" />
-            </h4>
-          </div>
-
           <div className="flex flex-col gap-3 sm:gap-2">
-            <DataList
-              title={<FormattedMessage defaultMessage="Group ID" id="nBKj/i" />}
-              value={
-                <CopyID tooltipLabel={<FormattedMessage defaultMessage="Copy transaction group ID" id="IFjSNc" />}>
-                  {transaction?.group}
-                </CopyID>
-              }
-            />
-            <DataList
-              title={<FormattedMessage id="expense.incurredAt" defaultMessage="Date" />}
-              value={
-                transaction?.createdAt && (
-                  <DateTime dateStyle="medium" timeStyle="short" value={transaction?.createdAt} />
-                )
-              }
-            />
-            {transaction?.clearedAt && (
-              <DataList
-                title={
-                  <div className="flex items-center gap-1">
-                    <FormattedMessage defaultMessage="Effective Date" id="Gh3Obs" />
-                    <Tooltip>
-                      <TooltipTrigger className="cursor-help" onClick={e => e.preventDefault()}>
-                        <InfoIcon size={16} />
-                      </TooltipTrigger>
-                      <TooltipContent onPointerDownOutside={e => e.preventDefault()}>
-                        <FormattedMessage
-                          defaultMessage="The date funds were cleared on your bank, Wise, PayPal, Stripe or any other external account holding these funds."
-                          id="s3O6iq"
-                        />
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
-                }
-                value={
-                  transaction.clearedAt && (
-                    <DateTime dateStyle="medium" timeStyle="short" value={transaction.clearedAt} />
-                  )
-                }
-              />
-            )}
-            <DataList
-              title={<FormattedMessage defaultMessage="Type" id="+U6ozc" />}
-              value={i18nTransactionType(intl, transaction?.type)}
-            />
-            <DataList
-              title={<FormattedMessage id="Transaction.Kind" defaultMessage="Kind" />}
-              value={
-                <div className="flex items-center gap-1">
-                  {i18nTransactionKind(intl, transaction?.kind)}{' '}
-                  {transaction?.isRefund && (
-                    <Badge size="xs" type="success" className="gap-1">
-                      <FormattedMessage id="Refund" defaultMessage="Refund" />
-                    </Badge>
-                  )}
-                </div>
-              }
-            />
-            <DataList
-              title={<FormattedMessage defaultMessage="Account" id="TwyMau" />}
-              value={
-                loading ? (
-                  <Skeleton className="h-5 w-20" />
-                ) : (
-                  <AccountHoverCard
-                    account={transaction?.account}
-                    trigger={
-                      <Link
-                        className="flex items-center gap-1 font-medium hover:text-primary hover:underline"
-                        href={`/${transaction?.account.slug}`}
-                      >
-                        <Avatar radius={20} collective={transaction?.account} />
-                        {transaction?.account.name}
-                      </Link>
-                    }
-                  />
-                )
-              }
-            />
-            <DataList
-              title={<FormattedMessage id="Fields.amount" defaultMessage="Amount" />}
-              value={
-                loading ? (
-                  <Skeleton className="h-5 w-20" />
-                ) : (
-                  <FormattedMoneyAmount
-                    amount={transaction?.amount.valueInCents}
-                    currency={transaction?.amount.currency}
-                    precision={2}
-                    amountStyles={{ letterSpacing: 0 }}
-                    showCurrencyCode={false}
-                  />
-                )
-              }
-            />
-            {!isNil(transaction?.paymentProcessorFee?.valueInCents) &&
-              transaction?.paymentProcessorFee?.valueInCents !== 0 && (
-                <DataList
-                  title={<FormattedMessage id="contribution.paymentFee" defaultMessage="Payment processor fee" />}
-                  value={
-                    <FormattedMoneyAmount
-                      amount={transaction?.paymentProcessorFee.valueInCents}
-                      currency={transaction?.paymentProcessorFee.currency}
-                      precision={2}
-                      amountStyles={{ letterSpacing: 0 }}
-                      showCurrencyCode={false}
-                    />
-                  }
-                />
-              )}
-            {!isNil(transaction?.hostFee?.valueInCents) && transaction?.hostFee?.valueInCents !== 0 && (
-              <DataList
-                title={<FormattedMessage id="HostFee" defaultMessage="Host fee" />}
-                value={
-                  <FormattedMoneyAmount
-                    amount={transaction?.hostFee.valueInCents}
-                    currency={transaction?.hostFee.currency}
-                    precision={2}
-                    amountStyles={{ letterSpacing: 0 }}
-                    showCurrencyCode={false}
-                  />
-                }
-              />
-            )}
-            {!isNil(transaction?.taxAmount?.valueInCents) && transaction?.taxAmount?.valueInCents !== 0 && (
-              <DataList
-                title={<FormattedMessage defaultMessage="Taxes" id="r+dgiv" />}
-                value={
-                  <FormattedMoneyAmount
-                    amount={transaction?.taxAmount.valueInCents}
-                    currency={transaction?.taxAmount.currency}
-                    precision={2}
-                    amountStyles={{ letterSpacing: 0 }}
-                    showCurrencyCode={false}
-                  />
-                }
-              />
-            )}
-            {transaction?.netAmount?.valueInCents !== transaction?.amount.valueInCents && (
-              <DataList
-                title={<FormattedMessage defaultMessage="Net Amount" id="FxUka3" />}
-                value={
-                  <FormattedMoneyAmount
-                    amount={transaction?.netAmount.valueInCents}
-                    currency={transaction?.netAmount.currency}
-                    precision={2}
-                    amountStyles={{ letterSpacing: 0 }}
-                    showCurrencyCode={false}
-                  />
-                }
-              />
-            )}
-            <DataList
-              title={<FormattedMessage defaultMessage="Opposite account" id="rcVYFz" />}
-              value={
-                loading ? (
-                  <Skeleton className="h-5 w-20" />
-                ) : (
-                  <AccountHoverCard
-                    account={transaction?.oppositeAccount}
-                    trigger={
-                      <Link
-                        className="flex items-center gap-1 font-medium hover:text-primary hover:underline"
-                        href={`/${transaction?.oppositeAccount?.slug}`}
-                      >
-                        <Avatar radius={20} collective={transaction?.oppositeAccount} />
-                        {transaction?.oppositeAccount?.name}
-                      </Link>
-                    }
-                  />
-                )
-              }
-            />
-
-            <DataList
-              title={
-                <div className="flex items-center gap-1">
-                  <FormattedMessage defaultMessage="Opposite transaction ID" id="Cqy0IH" />
-
-                  <Tooltip>
-                    <TooltipTrigger className="cursor-help" onClick={e => e.preventDefault()}>
-                      <InfoIcon size={16} />
-                    </TooltipTrigger>
-                    <TooltipContent onPointerDownOutside={e => e.preventDefault()}>
-                      <FormattedMessage
-                        defaultMessage="All transactions have an opposite debit or credit transaction"
-                        id="Evzo/s"
+            {loading ? (
+              <Skeleton className="mt-6 h-8 w-1/2" />
+            ) : error ? (
+              <MessageBoxGraphqlError error={error} />
+            ) : transaction ? (
+              <React.Fragment>
+                <InfoList className="mb-6 sm:grid-cols-2">
+                  <InfoListItem
+                    className="border-b border-t-0"
+                    title={<FormattedMessage defaultMessage="Account" id="TwyMau" />}
+                    value={
+                      <AccountHoverCard
+                        account={transaction?.account}
+                        trigger={
+                          <Link
+                            className="flex items-center gap-1 font-medium hover:text-primary hover:underline"
+                            href={`/${transaction?.account.slug}`}
+                          >
+                            <Avatar radius={20} collective={transaction?.account} />
+                            {transaction?.account.name}
+                          </Link>
+                        }
                       />
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-              }
-              value={
-                loading ? (
-                  <Skeleton className="h-5 w-20" />
-                ) : (
-                  <CopyID tooltipLabel={<FormattedMessage defaultMessage="Copy opposite transaction ID" id="WgAGHq" />}>
-                    {transaction?.oppositeTransaction?.id}
-                  </CopyID>
-                )
-              }
-            />
+                    }
+                  />
 
-            {transaction?.isRefund && transaction?.refundTransaction && (
-              <DataList
-                title={<FormattedMessage defaultMessage="Refund of transaction" id="OwAzRN" />}
-                value={
-                  <CopyID tooltipLabel={<FormattedMessage defaultMessage="Copy refund transaction ID" id="WRKLHX" />}>
-                    {transaction?.refundTransaction?.id}
-                  </CopyID>
-                }
-              />
-            )}
+                  <InfoListItem
+                    className="border-b border-t-0"
+                    title={
+                      transaction.type === 'CREDIT' ? (
+                        <FormattedMessage defaultMessage="Sender" id="nbwXXN" />
+                      ) : (
+                        <FormattedMessage defaultMessage="Recipient" id="8Rkoyb" />
+                      )
+                    }
+                    value={
+                      <AccountHoverCard
+                        account={transaction?.oppositeAccount}
+                        trigger={
+                          <Link
+                            className="flex items-center gap-1 font-medium hover:text-primary hover:underline"
+                            href={`/${transaction?.oppositeAccount?.slug}`}
+                          >
+                            {transaction.type === 'CREDIT' ? (
+                              <ArrowLeft className="inline-block shrink-0 text-green-600" size={16} />
+                            ) : (
+                              <ArrowRight className="inline-block shrink-0" size={16} />
+                            )}
+                            <Avatar radius={20} collective={transaction?.oppositeAccount} />
+                            {transaction?.oppositeAccount?.name}
+                          </Link>
+                        }
+                      />
+                    }
+                  />
+                </InfoList>
 
-            {transaction?.expense?.account?.slug && (
-              <DataList
-                title={<FormattedMessage defaultMessage="Related expense" id="iuxiAF" />}
-                value={
-                  <HoverCard>
-                    <HoverCardTrigger asChild>
-                      <Link
-                        href={`/${transaction?.expense.account.slug}/expenses/${transaction?.expense.legacyId}`}
-                        className="underline hover:text-primary"
+                <DataList>
+                  <DataListItem>
+                    <DataListItemLabel>
+                      <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />
+                    </DataListItemLabel>
+                    <DataListItemValue>
+                      <DateTime dateStyle="medium" timeStyle="short" value={transaction.createdAt} />
+                    </DataListItemValue>
+                  </DataListItem>
+
+                  <DataListItem>
+                    <DataListItemLabel>
+                      <div className="flex items-center gap-1">
+                        <FormattedMessage defaultMessage="Effective Date" id="Gh3Obs" />
+                        <Tooltip>
+                          <TooltipTrigger className="cursor-help" onClick={e => e.preventDefault()}>
+                            <InfoIcon size={16} />
+                          </TooltipTrigger>
+                          <TooltipContent onPointerDownOutside={e => e.preventDefault()}>
+                            <FormattedMessage
+                              defaultMessage="The date funds were cleared on your bank, Wise, PayPal, Stripe or any other external account holding these funds."
+                              id="s3O6iq"
+                            />
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                    </DataListItemLabel>
+                    <DataListItemValue>
+                      <DateTime dateStyle="medium" timeStyle="short" value={transaction.clearedAt} />
+                    </DataListItemValue>
+                  </DataListItem>
+
+                  <DataListItem
+                    label={<FormattedMessage defaultMessage="Type" id="+U6ozc" />}
+                    value={i18nTransactionType(intl, transaction?.type)}
+                  />
+
+                  <DataListItem
+                    label={<FormattedMessage id="Transaction.Kind" defaultMessage="Kind" />}
+                    value={
+                      <div className="flex items-center gap-1">
+                        {i18nTransactionKind(intl, transaction?.kind)}{' '}
+                        {transaction?.isRefund && (
+                          <Badge size="xs" type="success" className="gap-1">
+                            <FormattedMessage id="Refund" defaultMessage="Refund" />
+                          </Badge>
+                        )}
+                      </div>
+                    }
+                  />
+                  <DataListItem
+                    label={<FormattedMessage id="Fields.amount" defaultMessage="Amount" />}
+                    value={
+                      <FormattedMoneyAmount
+                        amount={transaction.amount.valueInCents}
+                        currency={transaction.amount.currency}
+                        precision={2}
+                        amountStyles={{ letterSpacing: 0 }}
+                        showCurrencyCode={false}
+                      />
+                    }
+                  />
+                  {!isNil(transaction?.paymentProcessorFee?.valueInCents) &&
+                    transaction?.paymentProcessorFee?.valueInCents !== 0 && (
+                      <DataListItem
+                        label={<FormattedMessage id="contribution.paymentFee" defaultMessage="Payment processor fee" />}
+                        value={
+                          <FormattedMoneyAmount
+                            amount={transaction?.paymentProcessorFee.valueInCents}
+                            currency={transaction?.paymentProcessorFee.currency}
+                            precision={2}
+                            amountStyles={{ letterSpacing: 0 }}
+                            showCurrencyCode={false}
+                          />
+                        }
+                      />
+                    )}
+                  {!isNil(transaction?.hostFee?.valueInCents) && transaction?.hostFee?.valueInCents !== 0 && (
+                    <DataListItem
+                      label={<FormattedMessage id="HostFee" defaultMessage="Host fee" />}
+                      value={
+                        <FormattedMoneyAmount
+                          amount={transaction?.hostFee.valueInCents}
+                          currency={transaction?.hostFee.currency}
+                          precision={2}
+                          amountStyles={{ letterSpacing: 0 }}
+                          showCurrencyCode={false}
+                        />
+                      }
+                    />
+                  )}
+                  {!isNil(transaction?.taxAmount?.valueInCents) && transaction?.taxAmount?.valueInCents !== 0 && (
+                    <DataListItem
+                      label={<FormattedMessage defaultMessage="Taxes" id="r+dgiv" />}
+                      value={
+                        <FormattedMoneyAmount
+                          amount={transaction?.taxAmount.valueInCents}
+                          currency={transaction?.taxAmount.currency}
+                          precision={2}
+                          amountStyles={{ letterSpacing: 0 }}
+                          showCurrencyCode={false}
+                        />
+                      }
+                    />
+                  )}
+                  {transaction?.netAmount?.valueInCents !== transaction?.amount.valueInCents && (
+                    <DataListItem
+                      label={<FormattedMessage defaultMessage="Net Amount" id="FxUka3" />}
+                      value={
+                        <FormattedMoneyAmount
+                          amount={transaction?.netAmount.valueInCents}
+                          currency={transaction?.netAmount.currency}
+                          precision={2}
+                          amountStyles={{ letterSpacing: 0 }}
+                          showCurrencyCode={false}
+                        />
+                      }
+                    />
+                  )}
+                  <DataListItem
+                    label={<FormattedMessage defaultMessage="Payment method" id="Fields.paymentMethod" />}
+                    value={
+                      transaction.paymentMethod ? (
+                        <PaymentMethodLabel {...transaction.paymentMethod} />
+                      ) : (
+                        <span className="text-muted-foreground">
+                          <FormattedMessage defaultMessage="None" id="450Fty" />
+                        </span>
+                      )
+                    }
+                  />
+                  <DataListItem
+                    label={<FormattedMessage defaultMessage="Merchant ID" id="EvIfQD" />}
+                    value={
+                      transaction.merchantId ? (
+                        <CopyID value={transaction.merchantId}>{transaction.merchantId}</CopyID>
+                      ) : (
+                        <span className="text-muted-foreground">
+                          <FormattedMessage defaultMessage="None" id="450Fty" />
+                        </span>
+                      )
+                    }
+                  />
+                  <DataListItem
+                    label={<FormattedMessage defaultMessage="Accounting Category" id="ckcrQ7" />}
+                    value={
+                      accountingCategory ? (
+                        getCategoryLabel(intl, accountingCategory, true)
+                      ) : (
+                        <span className="text-muted-foreground">
+                          <FormattedMessage defaultMessage="Not set" id="p5LNtB" />
+                        </span>
+                      )
+                    }
+                  />
+                  <DataListItem
+                    label={<FormattedMessage defaultMessage="Group ID" id="nBKj/i" />}
+                    value={
+                      <CopyID
+                        value={transaction?.group}
+                        tooltipLabel={<FormattedMessage defaultMessage="Copy transaction group ID" id="IFjSNc" />}
                       >
-                        {transaction?.expense.description}
-                      </Link>
-                    </HoverCardTrigger>
-                    <HoverCardContent className="w-[420px] overflow-hidden p-0">
-                      <ExpenseBudgetItem isInverted expense={transaction?.expense} showAmountSign />
-                    </HoverCardContent>
-                  </HoverCard>
-                }
-              />
-            )}
-            {transaction?.order && (
-              <DataList
-                title={<FormattedMessage defaultMessage="Related contribution" id="ySzqZN" />}
-                value={
-                  <HoverCard>
-                    <HoverCardTrigger asChild>
-                      <Link
-                        href={`/${transaction?.order.toAccount.slug}/contributions/${transaction?.order.legacyId}`}
-                        className="underline hover:text-primary"
+                        {transaction?.group}
+                      </CopyID>
+                    }
+                  />
+
+                  <DataListItem
+                    label={
+                      <div className="flex items-center gap-1">
+                        <FormattedMessage defaultMessage="Opposite transaction ID" id="Cqy0IH" />
+
+                        <Tooltip>
+                          <TooltipTrigger className="cursor-help" onClick={e => e.preventDefault()}>
+                            <InfoIcon size={16} />
+                          </TooltipTrigger>
+                          <TooltipContent onPointerDownOutside={e => e.preventDefault()}>
+                            <FormattedMessage
+                              defaultMessage="All transactions have an opposite debit or credit transaction"
+                              id="Evzo/s"
+                            />
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                    }
+                    value={
+                      <CopyID
+                        value={transaction?.oppositeTransaction?.legacyId}
+                        tooltipLabel={<FormattedMessage defaultMessage="Copy opposite transaction ID" id="WgAGHq" />}
                       >
-                        {transaction?.order.description}
-                      </Link>
-                    </HoverCardTrigger>
-                    <HoverCardContent className="w-[420px] p-0">
-                      <OrderBudgetItem order={transaction?.order} showPlatformTip showAmountSign />
-                    </HoverCardContent>
-                  </HoverCard>
-                }
-              />
-            )}
+                        #{transaction?.oppositeTransaction?.legacyId}
+                      </CopyID>
+                    }
+                  />
+
+                  {transaction?.isRefund && transaction?.refundTransaction && (
+                    <DataListItem
+                      label={<FormattedMessage defaultMessage="Refund of transaction" id="OwAzRN" />}
+                      value={
+                        <CopyID
+                          value={transaction?.refundTransaction?.id}
+                          tooltipLabel={<FormattedMessage defaultMessage="Copy refund transaction ID" id="WRKLHX" />}
+                        >
+                          {transaction?.refundTransaction?.id}
+                        </CopyID>
+                      }
+                    />
+                  )}
+
+                  {transaction?.expense?.account?.slug && (
+                    <DataListItem
+                      label={<FormattedMessage defaultMessage="Related expense" id="iuxiAF" />}
+                      value={
+                        <HoverCard>
+                          <HoverCardTrigger asChild>
+                            <Link
+                              href={`/${transaction?.expense.account.slug}/expenses/${transaction?.expense.legacyId}`}
+                              className="underline hover:text-primary"
+                            >
+                              {transaction?.expense.description}
+                            </Link>
+                          </HoverCardTrigger>
+                          <HoverCardContent className="w-[420px] overflow-hidden p-0">
+                            <ExpenseBudgetItem isInverted expense={transaction?.expense} showAmountSign />
+                          </HoverCardContent>
+                        </HoverCard>
+                      }
+                    />
+                  )}
+                  {transaction?.order && (
+                    <DataListItem
+                      label={<FormattedMessage defaultMessage="Related contribution" id="ySzqZN" />}
+                      value={
+                        <HoverCard>
+                          <HoverCardTrigger asChild>
+                            <Link
+                              href={`/${transaction?.order.toAccount.slug}/contributions/${transaction?.order.legacyId}`}
+                              className="underline hover:text-primary"
+                            >
+                              {transaction?.order.description}
+                            </Link>
+                          </HoverCardTrigger>
+                          <HoverCardContent className="w-[420px] p-0">
+                            <OrderBudgetItem order={transaction?.order} showPlatformTip showAmountSign />
+                          </HoverCardContent>
+                        </HoverCard>
+                      }
+                    />
+                  )}
+                </DataList>
+              </React.Fragment>
+            ) : null}
           </div>
         </div>
       </SheetBody>

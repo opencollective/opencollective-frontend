@@ -19,6 +19,7 @@ import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { getI18nLink } from '../../../I18nFormatters';
 import Link from '../../../Link';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
+import { DataList, DataListItem } from '../../../ui/DataList';
 import { Sheet, SheetBody, SheetContent } from '../../../ui/Sheet';
 
 import { LegalDocumentServiceBadge } from './LegalDocumentServiceBadge';
@@ -61,15 +62,6 @@ const legalDocumentDrawerQuery = gql`
   ${accountHoverCardFields}
 `;
 
-const DataList = ({ title, value }) => {
-  return (
-    <div className="relative flex w-full flex-col gap-1 sm:flex-row">
-      <div className="min-w-[120px] max-w-[240px] shrink-0 grow-0 basis-1/4 text-muted-foreground">{title}</div>
-      <div className="max-w-fit overflow-hidden">{value}</div>
-    </div>
-  );
-};
-
 export default function LegalDocumentDrawer({
   open,
   onClose,
@@ -93,7 +85,7 @@ export default function LegalDocumentDrawer({
             dropdownTriggerRef={dropdownTriggerRef}
             actions={getActions(document, dropdownTriggerRef)}
             entityName={intl.formatMessage({ defaultMessage: 'Tax form', id: 'TaxForm' })}
-            entityIdentifier={<CopyID>{document.id}</CopyID>}
+            entityIdentifier={<CopyID value={document.id}>{document.id}</CopyID>}
             entityLabel={
               <AccountHoverCard
                 account={document.account}
@@ -110,29 +102,33 @@ export default function LegalDocumentDrawer({
             }
           />
           <SheetBody>
-            <div className="flex flex-col gap-3 sm:gap-2">
-              <DataList
-                title={intl.formatMessage({ defaultMessage: 'Account Type', id: 'K1uUiB' })}
+            <DataList>
+              <DataListItem
+                label={intl.formatMessage({ defaultMessage: 'Account Type', id: 'K1uUiB' })}
                 value={formatCollectiveType(intl, document.account.type)}
               />
-              <DataList
-                title={intl.formatMessage({ defaultMessage: 'Service', id: 'n7yYXG' })}
+              <DataListItem
+                label={intl.formatMessage({ defaultMessage: 'Service', id: 'n7yYXG' })}
                 value={<LegalDocumentServiceBadge service={document.service} />}
-              />{' '}
-              <DataList
-                title={intl.formatMessage({ defaultMessage: 'Status', id: 'LegalDocument.Status' })}
+              />
+              <DataListItem
+                label={intl.formatMessage({ defaultMessage: 'Status', id: 'LegalDocument.Status' })}
                 value={<LegalDocumentStatusBadge status={document.status} isExpired={document.isExpired} />}
               />
-              <DataList title={intl.formatMessage({ defaultMessage: 'Year', id: 'IFo1oo' })} value={document.year} />
-              <DataList
-                title={intl.formatMessage({ defaultMessage: 'Requested at', id: 'LegalDocument.RequestedAt' })}
+              <DataListItem
+                label={intl.formatMessage({ defaultMessage: 'Year', id: 'IFo1oo' })}
+                value={document.year}
+              />
+              <DataListItem
+                label={intl.formatMessage({ defaultMessage: 'Requested at', id: 'LegalDocument.RequestedAt' })}
                 value={<DateTime dateStyle="medium" timeStyle="short" value={document.requestedAt} />}
               />
-              <DataList
-                title={intl.formatMessage({ defaultMessage: 'Updated at', id: 'LegalDocument.UpdatedAt' })}
+              <DataListItem
+                label={intl.formatMessage({ defaultMessage: 'Updated at', id: 'LegalDocument.UpdatedAt' })}
                 value={<DateTime dateStyle="medium" timeStyle="short" value={document.updatedAt} />}
               />
-            </div>
+            </DataList>
+
             <hr className="my-4 border-t border-slate-300" />
             <div className="flex flex-col gap-2">
               <div className="text-base font-medium">

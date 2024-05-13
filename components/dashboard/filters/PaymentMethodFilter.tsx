@@ -7,13 +7,16 @@ import { PaymentMethodService, PaymentMethodType } from '../../../lib/graphql/ty
 import { i18nPaymentMethodService } from '../../../lib/i18n/payment-method-service';
 import { i18nPaymentMethodType } from '../../../lib/i18n/payment-method-type';
 
+import { PaymentMethodLabel, PaymentMethodServiceLabel } from '../../PaymentMethodLabel';
 import { Label } from '../../ui/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/Select';
 
 const schema = z
-  .object({ service: z.nativeEnum(PaymentMethodService), type: z.nativeEnum(PaymentMethodType).optional() })
+  .object({
+    service: z.nativeEnum(PaymentMethodService),
+    type: z.nativeEnum(PaymentMethodType).optional(),
+  })
   .optional();
-
 type PaymentMethodFilterValue = z.infer<typeof schema>;
 
 const options: Partial<Record<PaymentMethodService, PaymentMethodType[]>> = {
@@ -53,12 +56,8 @@ export const paymentMethodFilter: FilterConfig<PaymentMethodFilterValue> = {
   },
   filter: {
     labelMsg: defineMessage({ defaultMessage: 'Payment method', id: 'Fields.paymentMethod' }),
-    valueRenderer: ({ value, intl }) => {
-      const serviceLabel = i18nPaymentMethodService(intl, value.service);
-      if (value.type) {
-        return `${intl.formatMessage({ id: 'withColon', defaultMessage: '{item}:' }, { item: serviceLabel })} ${i18nPaymentMethodType(intl, value.type)}`;
-      }
-      return serviceLabel;
+    valueRenderer: ({ value }) => {
+      return <PaymentMethodLabel {...value} />;
     },
     Component: ({ value, intl, onChange, meta }) => {
       let filteredOptions = options;
@@ -102,8 +101,8 @@ export const paymentMethodFilter: FilterConfig<PaymentMethodFilterValue> = {
               </SelectTrigger>
               <SelectContent>
                 {serviceOptions.map(option => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
+                  <SelectItem key={option.value} value={option.value} asChild>
+                    <PaymentMethodServiceLabel service={option.value as PaymentMethodService} />
                   </SelectItem>
                 ))}
               </SelectContent>

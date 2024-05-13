@@ -60,7 +60,7 @@ export const schema = z.object({
   expenseId: integer.optional(),
   orderId: integer.optional(),
   merchantId: z.string().optional(),
-  openTransactionId: z.string().optional(),
+  openTransactionId: z.coerce.string().optional(),
   group: isMulti(z.string().uuid()).optional(),
   isRefund: boolean.optional(),
 });

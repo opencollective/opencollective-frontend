@@ -13190,7 +13190,12 @@ type Query {
     """
     The public id identifying the transaction (ie: rvelja97-pkzqbgq7-bbzyx6wd-50o8n4rm)
     """
-    id: String
+    id: String @deprecated(reason: "2024-05-07: Please use the `transaction` field.")
+
+    """
+    Identifiers to retrieve the transaction.
+    """
+    transaction: TransactionReferenceInput
   ): Transaction
   transactions(
     """
@@ -16611,6 +16616,18 @@ input TierReferenceInput {
   isCustom: Boolean
 }
 
+input TransactionReferenceInput {
+  """
+  The public id identifying the transaction (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The internal id of the transaction (ie: 580)
+  """
+  legacyId: Int
+}
+
 """
 A PayPal plan to associate with a contribution
 """
@@ -20019,18 +20036,6 @@ type BanAccountResponse {
   The accounts impacted by the mutation
   """
   accounts: [Account!]!
-}
-
-input TransactionReferenceInput {
-  """
-  The public id identifying the transaction (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
-  """
-  id: String
-
-  """
-  The internal id of the transaction (ie: 580)
-  """
-  legacyId: Int
 }
 
 """

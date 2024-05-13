@@ -299,7 +299,9 @@ export default function TransactionsTable({
         data={transactions?.nodes || []}
         loading={loading}
         nbPlaceholders={nbPlaceholders}
-        onClickRow={(row, menuRef) => openDrawer(row.id, menuRef)}
+        onClickRow={(row, menuRef) => {
+          openDrawer(row.id, menuRef);
+        }}
         onHoverRow={row => setHoveredGroup(row?.original?.group ?? null)}
         rowHasIndicator={row => row.original.group === hoveredGroup}
         fullWidth={hasDynamicTopBar}
@@ -307,6 +309,7 @@ export default function TransactionsTable({
         columnVisibility={columnVisibility}
         setColumnVisibility={setColumnVisibility}
         defaultColumnVisibility={defaultColumnVisibility}
+        getRowId={row => String(row.legacyId)}
         getActions={getActions}
         queryFilter={queryFilter}
         compact
