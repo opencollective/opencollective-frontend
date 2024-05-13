@@ -9,6 +9,7 @@ const transactionsTableQueryCollectionFragment = gql`
     limit
     nodes {
       id
+      legacyId
       uuid
       kind
       amount {
