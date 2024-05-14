@@ -163,16 +163,16 @@ const SingleUpdateView = ({ updateId }) => {
                             hasMore={comments?.nodes?.length < comments?.totalCount}
                             fetchMore={handleFetchMoreComments}
                             items={comments?.nodes}
-                            onCommentDeleted={refetch}
+                            onCommentDeleted={() => refetch({ id: updateId })}
                             getClickedComment={setReplyingToComment}
                           />
                         )}
                         {!isDraft && (
-                          <div className="flex">
+                          <div className="flex justify-center">
                             <CommentForm
                               id="new-update"
                               UpdateId={update.id}
-                              onSuccess={refetch}
+                              onSuccess={() => refetch({ id: updateId })}
                               replyingToComment={replyingToComment}
                             />
                           </div>
