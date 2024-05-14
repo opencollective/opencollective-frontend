@@ -163,10 +163,11 @@ const DEFAULT_PAYMENT_METHOD_SERVICE = {
 
 const getPayoutOptionValue = (payoutMethod, isAuto, host) => {
   const payoutMethodType = payoutMethod?.type;
+  const canAddTransferDetails = host.settings?.transferwise?.transferDetails === true;
   if (payoutMethodType === PayoutMethodType.OTHER) {
     return { forceManual: true, action: 'PAY', paymentMethodService: null };
-  } else if (payoutMethod?.data?.type === 'brazil') {
-    // TODO: remove this when we implement the missing Brazilian TRANSFER NATURE field.
+  } else if (payoutMethod?.data?.type === 'brazil' && !canAddTransferDetails) {
+    // TODO: remove this when we release transfer details for everyone.
     return { forceManual: true, action: 'PAY' };
   } else if (payoutMethodType === PayoutMethodType.BANK_ACCOUNT && !host.transferwise) {
     return { forceManual: true, action: 'PAY', paymentMethodService: 'WISE' };
