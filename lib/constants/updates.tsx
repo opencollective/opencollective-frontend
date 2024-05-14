@@ -9,7 +9,7 @@ export enum UPDATE_NOTIFICATION_AUDIENCE {
 }
 
 export const UpdateNotificationAudienceLabels = {
-  ALL: <FormattedMessage id="Update.notify.everyone" defaultMessage="Everyone" />,
+  ALL: <FormattedMessage id="Update.notify.all" defaultMessage="Admins and Contributors" />,
   COLLECTIVE_ADMINS: (
     <FormattedMessage id="Update.notify.hostedCollectiveAdmins" defaultMessage="Hosted collective's admins" />
   ),

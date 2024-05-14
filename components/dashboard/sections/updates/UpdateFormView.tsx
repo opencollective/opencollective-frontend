@@ -9,7 +9,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { UPDATE_NOTIFICATION_AUDIENCE, UpdateNotificationAudienceLabels } from '../../../../lib/constants/updates';
 import { toIsoDateStr } from '../../../../lib/date-utils';
-import { i18nGraphqlException } from '../../../../lib/errors';
+import { i18nGraphqlException, isOCError } from '../../../../lib/errors';
+import { formatFormErrorMessage, requireFields } from '../../../../lib/form-utils';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import {
   getFromLocalStorageWithTTL,
@@ -187,6 +188,9 @@ const FormBody = ({ update }) => {
       }
     } catch (e) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+      if (!redirect) {
+        throw e;
+      }
     }
   };
 
@@ -249,6 +253,8 @@ const FormBody = ({ update }) => {
   const handleStatePersistence = React.useMemo(
     () => values => {
       setLocalStorageWithTTL(LOCAL_STORAGE_KEYS.UPDATES_FORM_STATE, values, 60 * 60 * 24 * 1000);
+      const errors = requireFields(values, ['title', 'html']);
+      return errors;
     },
     [],
   );
@@ -267,7 +273,7 @@ const FormBody = ({ update }) => {
                 {({ field }) => <Input {...field} data-cy="update-title" className="flex-grow" maxLength={255} />}
               </StyledInputFormikField>
               <Field name="html">
-                {({ field }) => (
+                {({ field, meta }) => (
                   <div>
                     <label htmlFor={field.id} className="mb-2 font-bold">
                       <FormattedMessage id="Update.Body" defaultMessage="Body" />
@@ -290,6 +296,11 @@ const FormBody = ({ update }) => {
                         <FormattedMessage id="uploadImage.isUploading" defaultMessage="Uploading image..." />
                       </div>
                     )}
+                    {meta.error && (
+                      <div className="mt-2 text-xs text-red-500">
+                        {isOCError(meta.error) ? formatFormErrorMessage(intl, meta.error) : meta.error}
+                      </div>
+                    )}
                   </div>
                 )}
               </Field>
@@ -304,6 +315,7 @@ const FormBody = ({ update }) => {
                       onClick={() => handlePublish(formik)}
                       loading={audienceLoading}
                       data-cy="update-publish-btn"
+                      disabled={!formik.isValid}
                     >
                       <BookCheck size="16px" />
                       <FormattedMessage defaultMessage="Publish" id="update.publish.btn" />
@@ -314,6 +326,7 @@ const FormBody = ({ update }) => {
                       variant="outline"
                       className="w-full gap-1.5"
                       data-cy="update-save-draft-btn"
+                      disabled={!formik.isValid}
                     >
                       <BookDashed size="16px" />
                       <FormattedMessage defaultMessage="Save Draft" id="YH2E7O" />
