@@ -12,7 +12,7 @@ import { Badge } from '../../../ui/Badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 
 export const TwoColumnContainer = elementFromClass('div', 'flex flex-col gap-6 lg:flex-row lg:gap-10');
-export const MainColumn = elementFromClass('div', 'flex w-full max-w-2xl flex-col gap-6');
+export const MainColumn = elementFromClass('div', 'flex w-full max-w-3xl flex-col gap-6');
 const SideColumnWrapper = elementFromClass('div', 'w-full lg:max-w-56');
 export const SideColumn = ({ children }) => (
   <SideColumnWrapper>
