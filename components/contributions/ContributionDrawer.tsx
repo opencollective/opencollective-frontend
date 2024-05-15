@@ -359,9 +359,11 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                 <div>{isLoading ? <LoadingPlaceholder height={20} /> : query.data.order.description}</div>
               </div>
               <div className="text-sm">
-                <div className="mb-4 grid grid-cols-3 gap-4 gap-y-6 text-sm [&>*>*:first-child]:mb-2 [&>*>*:first-child]:font-bold">
+                <div className="mb-4 grid grid-cols-3 gap-4 gap-y-6 text-sm [&>*>*:first-child]:mb-2 [&>*>*:first-child]:font-bold [&>*>*:first-child]:text-[#344256]">
                   <div>
-                    <div>Contributor</div>
+                    <div>
+                      <FormattedMessage defaultMessage="Contributor" id="+k5t/y" />
+                    </div>
                     <div>
                       {isLoading ? (
                         <LoadingPlaceholder height={20} />
@@ -382,7 +384,9 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                     </div>
                   </div>
                   <div>
-                    <div>Collective</div>
+                    <div>
+                      <FormattedMessage defaultMessage="Collective" id="mujy1w" />
+                    </div>
                     <div>
                       {isLoading ? (
                         <LoadingPlaceholder height={20} />
@@ -403,7 +407,9 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                     </div>
                   </div>
                   <div>
-                    <div>Payment Method</div>
+                    <div>
+                      <FormattedMessage defaultMessage="Payment Method" id="nFQbxh" />
+                    </div>
                     <div>
                       {isLoading ? (
                         <LoadingPlaceholder height={20} />
@@ -425,19 +431,25 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                           <div>{query.data.order.pendingContributionData.ponumber}</div>
                         </div>
                       )}
-                      <div className="col-span-3">
-                        <div>
-                          <FormattedMessage defaultMessage="Contact" id="Contact" />
+                      {query.data.order.pendingContributionData?.fromAccountInfo && (
+                        <div className="col-span-3">
+                          <div>
+                            <FormattedMessage defaultMessage="Contact" id="Contact" />
+                          </div>
+                          <div>
+                            {query.data.order.pendingContributionData?.fromAccountInfo?.email
+                              ? `${query.data.order.pendingContributionData.fromAccountInfo.name} (${query.data.order.pendingContributionData.fromAccountInfo.email})`
+                              : query.data.order.pendingContributionData.fromAccountInfo.name}
+                          </div>
                         </div>
-                        <div>
-                          {`${query.data.order.pendingContributionData.fromAccountInfo.name} (${query.data.order.pendingContributionData.fromAccountInfo.email})`}
-                        </div>
-                      </div>
+                      )}
                     </React.Fragment>
                   )}
 
                   <div className="col-span-3">
-                    <div>Frequency</div>
+                    <div>
+                      <FormattedMessage defaultMessage="Frequency" id="vAW30j" />
+                    </div>
                     <div>
                       {isLoading ? (
                         <LoadingPlaceholder height={20} />
@@ -450,67 +462,47 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                   </div>
 
                   <div className="col-span-3">
-                    <div>Amount</div>
+                    <div>
+                      <FormattedMessage defaultMessage="Amount" id="/0TOL5" />
+                    </div>
                     <div>
                       {isLoading ? (
                         <LoadingPlaceholder height={20} />
                       ) : (
-                        <div className="grid grid-cols-[1fr_auto] gap-1 text-sm">
+                        <React.Fragment>
                           <div>
-                            <FormattedMessage defaultMessage="Contribution" id="0LK5eg" />
-                          </div>
-                          <div className="text-right">
-                            <FormattedMoneyAmount
-                              amountStyles={{ letterSpacing: 0 }}
-                              showCurrencyCode
-                              currency={query.data.order.amount.currency}
-                              amount={query.data.order.amount.valueInCents}
+                            <FormattedMessage
+                              defaultMessage="Contribution amount: {amount}"
+                              id="y8CXGa"
+                              values={{
+                                amount: (
+                                  <FormattedMoneyAmount
+                                    showCurrencyCode={false}
+                                    amountStyles={{ letterSpacing: 0 }}
+                                    currency={query.data.order.totalAmount.currency}
+                                    amount={query.data.order.totalAmount.valueInCents}
+                                  />
+                                ),
+                              }}
                             />
                           </div>
-                          {query.data.order.platformTipAmount?.valueInCents ? (
-                            <React.Fragment>
-                              <div>
-                                <FormattedMessage defaultMessage="Platform Tip" id="Mwxcaq" />
-                              </div>
-                              <div className="text-right">
-                                <FormattedMoneyAmount
-                                  amountStyles={{ letterSpacing: 0 }}
-                                  showCurrencyCode
-                                  currency={query.data.order.platformTipAmount.currency}
-                                  amount={query.data.order.platformTipAmount.valueInCents}
-                                />
-                              </div>
-                            </React.Fragment>
-                          ) : null}
-                          {query.data.order.tax && (
-                            <React.Fragment>
-                              <div>
-                                <FormattedMessage defaultMessage="Taxes" id="r+dgiv" />
-                              </div>
-                              <div className="text-right">
-                                <FormattedMoneyAmount
-                                  amountStyles={{ letterSpacing: 0 }}
-                                  showCurrencyCode={false}
-                                  currency={query.data.order.amount.currency}
-                                  amount={(query.data.order.tax?.rate ?? 0) * query.data.order.amount.valueInCents}
-                                />
-                              </div>
-                            </React.Fragment>
-                          )}
-                          <div className="contents [&>div]:mt-2 [&>div]:border-t [&>div]:pt-2 [&>div]:font-semibold">
-                            <div>
-                              <FormattedMessage defaultMessage="Total" id="MJ2jZQ" />
-                            </div>
-                            <div className="text-right">
-                              <FormattedMoneyAmount
-                                amountStyles={{ letterSpacing: 0 }}
-                                showCurrencyCode
-                                currency={query.data.order.totalAmount.currency}
-                                amount={query.data.order.totalAmount.valueInCents}
-                              />
-                            </div>
+                          <div>
+                            <FormattedMessage
+                              defaultMessage="(Net received by collective: {amount})"
+                              id="qxLWOL"
+                              values={{
+                                amount: (
+                                  <FormattedMoneyAmount
+                                    showCurrencyCode={false}
+                                    amountStyles={{ letterSpacing: 0 }}
+                                    currency={query.data.order.amount.currency}
+                                    amount={query.data.order.amount.valueInCents}
+                                  />
+                                ),
+                              }}
+                            />
                           </div>
-                        </div>
+                        </React.Fragment>
                       )}
                     </div>
                   </div>
@@ -518,13 +510,17 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                   {query.data?.order?.memo ||
                     (query.data?.order?.pendingContributionData?.memo && (
                       <div>
-                        <div>Memo</div>
+                        <div>
+                          <FormattedMessage defaultMessage="Memo" id="D5NqQO" />
+                        </div>
                         <div>{query.data.order.memo || query.data.order.pendingContributionData.memo}</div>
                       </div>
                     ))}
                   {!isEmpty(query.data?.order?.customData) && (
                     <div>
-                      <div>Custom Data</div>
+                      <div>
+                        <FormattedMessage defaultMessage="Custom Data" id="DRPEis" />
+                      </div>
                       <div>{JSON.stringify(query.data.order.customData)}</div>
                     </div>
                   )}

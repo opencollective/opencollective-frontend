@@ -15,6 +15,7 @@ import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nPaymentMethodProviderType } from '../../../../lib/i18n/payment-method-provider-type';
 import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
 
+import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
 import ContributionConfirmationModal from '../../../ContributionConfirmationModal';
 import { ContributionContextualMenu } from '../../../contributions/ContributionContextualMenu';
@@ -22,14 +23,12 @@ import { ContributionDrawer } from '../../../contributions/ContributionDrawer';
 import DateTime from '../../../DateTime';
 import EditOrderModal, { EditOrderActions } from '../../../EditOrderModal';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
-import LinkCollective from '../../../LinkCollective';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { useModal } from '../../../ModalContext';
 import OrderStatusTag from '../../../orders/OrderStatusTag';
 import PaymentMethodTypeWithIcon from '../../../PaymentMethodTypeWithIcon';
 import { managedOrderFragment } from '../../../recurring-contributions/graphql/queries';
 import { DataTable } from '../../../table/DataTable';
-import { Span } from '../../../Text';
 import { Button } from '../../../ui/Button';
 import { TableActionsButton } from '../../../ui/Table';
 import { useToast } from '../../../ui/useToast';
@@ -226,20 +225,69 @@ const dashboardContributionsQuery = gql`
 `;
 
 const getColumns = ({ tab, contextualMenuProps, intl, isIncoming, includeHostedAccounts, onlyExpectedFunds }) => {
+  const accounts = {
+    accessorKey: 'toAccount',
+    header: intl.formatMessage({ defaultMessage: 'Collective & Contributors', id: 'kklCrk' }),
+    meta: { className: 'max-w-[200px] overflow-hidden' },
+    cell: ({ cell, row }) => {
+      const toAccount = cell.getValue();
+      const fromAccount = row.original.fromAccount;
+      return (
+        <div className="flex items-center gap-5">
+          <div className="relative">
+            <div>
+              <AccountHoverCard
+                account={toAccount}
+                trigger={
+                  <span>
+                    <Avatar size={32} collective={toAccount} displayTitle={false} />
+                  </span>
+                }
+              />
+            </div>
+            <div className="absolute -bottom-[6px] -right-[6px] rounded-full">
+              <AccountHoverCard
+                account={fromAccount}
+                trigger={
+                  <span>
+                    <Avatar size={16} collective={fromAccount} displayTitle={false} />
+                  </span>
+                }
+              />
+            </div>
+          </div>
+          <div className="overflow-hidden">
+            <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sm font-medium leading-5">
+              {toAccount.slug || toAccount.name}
+            </div>
+            <div className="overflow-hidden text-ellipsis whitespace-nowrap text-xs leading-4">
+              {fromAccount.slug || fromAccount.name}
+            </div>
+          </div>
+        </div>
+      );
+    },
+  };
+
   const toAccount = {
     accessorKey: 'toAccount',
     header: intl.formatMessage({ id: 'Collective', defaultMessage: 'Collective' }),
     cell: ({ cell }) => {
       const toAccount = cell.getValue();
       return (
-        <LinkCollective collective={toAccount} className="hover:underline" withHoverCard>
-          <div className="flex max-w-[200px] items-center">
-            <Avatar size={24} collective={toAccount} mr={2} />
-            <Span as="span" truncateOverflow>
-              {toAccount.name}
-            </Span>
-          </div>
-        </LinkCollective>
+        <AccountHoverCard
+          account={toAccount}
+          trigger={
+            <div className="flex items-center gap-2">
+              <div>
+                <Avatar size={32} collective={toAccount} displayTitle={false} />
+              </div>
+              <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sm leading-5">
+                {toAccount.slug || toAccount.name}
+              </div>
+            </div>
+          }
+        />
       );
     },
   };
@@ -249,21 +297,21 @@ const getColumns = ({ tab, contextualMenuProps, intl, isIncoming, includeHostedA
     cell: ({ cell }) => {
       const fromAccount = cell.getValue();
       return (
-        <LinkCollective collective={fromAccount} className="hover:underline" withHoverCard>
-          <div className="flex max-w-[200px] items-center">
-            <Avatar size={24} collective={fromAccount} mr={2} />
-            <Span as="span" truncateOverflow>
-              {fromAccount.name}
-            </Span>
-          </div>
-        </LinkCollective>
+        <AccountHoverCard
+          account={fromAccount}
+          trigger={
+            <div className="flex items-center gap-2">
+              <div>
+                <Avatar size={32} collective={fromAccount} displayTitle={false} />
+              </div>
+              <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sm leading-5">
+                {fromAccount.slug || fromAccount.name}
+              </div>
+            </div>
+          }
+        />
       );
     },
-  };
-  const orderId = {
-    accessorKey: 'legacyId',
-    header: intl.formatMessage({ id: 'order.id', defaultMessage: 'Contribution #' }),
-    meta: { className: 'text-center' },
   };
   const paymentMethod = {
     accessorKey: 'paymentMethod',
@@ -324,8 +372,7 @@ const getColumns = ({ tab, contextualMenuProps, intl, isIncoming, includeHostedA
 
   if (!tab || [ContributionsTab.ONETIME, ContributionsTab.ALL].includes(tab)) {
     return compact([
-      includeHostedAccounts ? toAccount : isIncoming ? fromAccount : toAccount,
-      orderId,
+      includeHostedAccounts ? accounts : isIncoming ? fromAccount : toAccount,
       paymentMethod,
       totalAmount,
       {
@@ -375,8 +422,7 @@ const getColumns = ({ tab, contextualMenuProps, intl, isIncoming, includeHostedA
     };
 
     return compact([
-      includeHostedAccounts ? toAccount : isIncoming ? fromAccount : toAccount,
-      orderId,
+      includeHostedAccounts ? accounts : isIncoming ? fromAccount : toAccount,
       paymentMethod,
       amount,
       totalAmount,
