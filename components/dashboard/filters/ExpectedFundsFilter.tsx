@@ -1,13 +1,13 @@
-import React from "react";
-import { defineMessage, FormattedMessage } from "react-intl";
-import { z } from "zod";
+import React from 'react';
+import { defineMessage, FormattedMessage } from 'react-intl';
+import { z } from 'zod';
 
-import { FilterConfig } from "../../../lib/filters/filter-types";
-import { ExpectedFundsFilter } from "../../../lib/graphql/types/v2/graphql";
+import { FilterConfig } from '../../../lib/filters/filter-types';
+import { ExpectedFundsFilter } from '../../../lib/graphql/types/v2/graphql';
 
-import ComboSelectFilter from "./ComboSelectFilter";
+import ComboSelectFilter from './ComboSelectFilter';
 
-const schema = z.nativeEnum(ExpectedFundsFilter).optional()
+const schema = z.nativeEnum(ExpectedFundsFilter).optional();
 
 export const expectedFundsFilter: FilterConfig<z.infer<typeof schema>> = {
   schema: schema,

@@ -3,13 +3,15 @@ import { useMutation,useQuery  } from '@apollo/client';
 import { compact } from 'lodash';
 import { PlusIcon } from 'lucide-react';
 import { useRouter } from 'next/router';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
 import { z } from 'zod';
 
+import { GetActions } from '../../../../lib/actions/types';
 import { EMPTY_ARRAY } from '../../../../lib/constants/utils';
+import { LoggedInUser as LoggedInUserType } from '../../../../lib/custom_typings/LoggedInUser';
 import { Views } from '../../../../lib/filters/filter-types';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
-import { OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
+import { ContributionDrawerQuery, ContributionFrequency, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nPaymentMethodProviderType } from '../../../../lib/i18n/payment-method-provider-type';
@@ -18,7 +20,6 @@ import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
 import ContributionConfirmationModal from '../../../ContributionConfirmationModal';
-import { ContributionContextualMenu } from '../../../contributions/ContributionContextualMenu';
 import { ContributionDrawer } from '../../../contributions/ContributionDrawer';
 import DateTime from '../../../DateTime';
 import EditOrderModal, { EditOrderActions } from '../../../EditOrderModal';
@@ -28,9 +29,8 @@ import { useModal } from '../../../ModalContext';
 import OrderStatusTag from '../../../orders/OrderStatusTag';
 import PaymentMethodTypeWithIcon from '../../../PaymentMethodTypeWithIcon';
 import { managedOrderFragment } from '../../../recurring-contributions/graphql/queries';
-import { DataTable } from '../../../table/DataTable';
+import { actionsColumn, DataTable } from '../../../table/DataTable';
 import { Button } from '../../../ui/Button';
-import { TableActionsButton } from '../../../ui/Table';
 import { useToast } from '../../../ui/useToast';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
@@ -224,7 +224,7 @@ const dashboardContributionsQuery = gql`
   ${managedOrderFragment}
 `;
 
-const getColumns = ({ tab, contextualMenuProps, intl, isIncoming, includeHostedAccounts, onlyExpectedFunds }) => {
+const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpectedFunds }) => {
   const accounts = {
     accessorKey: 'toAccount',
     header: intl.formatMessage({ defaultMessage: 'Collective & Contributors', id: 'kklCrk' }),
@@ -355,21 +355,6 @@ const getColumns = ({ tab, contextualMenuProps, intl, isIncoming, includeHostedA
     },
   };
 
-  const actions = {
-    accessorKey: 'actions',
-    header: null,
-    meta: { className: 'flex justify-end items-center' },
-    cell: ({ row }) => {
-      const order = row.original;
-
-      return (
-        <ContributionContextualMenu order={order} {...contextualMenuProps}>
-          <TableActionsButton data-cy="contribution-admin-menu-trigger" />
-        </ContributionContextualMenu>
-      );
-    },
-  };
-
   if (!tab || [ContributionsTab.ONETIME, ContributionsTab.ALL].includes(tab)) {
     return compact([
       includeHostedAccounts ? accounts : isIncoming ? fromAccount : toAccount,
@@ -404,7 +389,7 @@ const getColumns = ({ tab, contextualMenuProps, intl, isIncoming, includeHostedA
           }
         : null,
       status,
-      actions,
+      actionsColumn,
     ]);
   } else {
     const amount = {
@@ -427,7 +412,7 @@ const getColumns = ({ tab, contextualMenuProps, intl, isIncoming, includeHostedA
       amount,
       totalAmount,
       status,
-      actions,
+      actionsColumn,
     ]);
   }
 };
@@ -675,7 +660,19 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
   const loading = metadataLoading || queryLoading;
   const error = metadataError || queryError;
 
-  const contextualMenuProps = {
+  const columns = getColumns({
+    tab: queryFilter.activeViewId,
+    intl,
+    isIncoming,
+    includeHostedAccounts,
+    onlyExpectedFunds,
+  });
+  const currentViewCount = views.find(v => v.id === queryFilter.activeViewId)?.count;
+  const nbPlaceholders = currentViewCount < queryFilter.values.limit ? currentViewCount : queryFilter.values.limit;
+
+  const getActions = getContributionActions({
+    intl,
+    LoggedInUser,
     onCancelClick: order => {
       setEditOrder({ order, action: 'cancel' });
     },
@@ -717,18 +714,8 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
         confirmLabel: <FormattedMessage id="order.markAsExpired" defaultMessage="Mark as expired" />,
       });
     },
-  };
-
-  const columns = getColumns({
-    tab: queryFilter.activeViewId,
-    contextualMenuProps,
-    intl,
-    isIncoming,
-    includeHostedAccounts,
-    onlyExpectedFunds,
   });
-  const currentViewCount = views.find(v => v.id === queryFilter.activeViewId)?.count;
-  const nbPlaceholders = currentViewCount < queryFilter.values.limit ? currentViewCount : queryFilter.values.limit;
+
   return (
     <React.Fragment>
       <div className="flex max-w-screen-lg flex-col gap-4">
@@ -823,6 +810,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
               mobileTableView
               nbPlaceholders={nbPlaceholders}
               onClickRow={row => onToogleOrderDrawer(row.original.legacyId)}
+              getActions={getActions}
             />
           </div>
         )}
@@ -842,7 +830,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
           onClose={() => onToogleOrderDrawer(null)}
           orderId={selectedContributionId}
           orderUrl={orderUrl}
-          {...contextualMenuProps}
+          getActions={getActions}
         />
       )}
       {confirmCompletedOrder && (
@@ -855,5 +843,103 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
     </React.Fragment>
   );
 };
+
+type GetContributionActionsOptions = {
+  LoggedInUser: LoggedInUserType;
+  intl: IntlShape;
+  onUpdatePaymentMethodClick: (order: ContributionDrawerQuery['order']) => void;
+  onResumeClick: (order: ContributionDrawerQuery['order']) => void;
+  onEditAmountClick: (order: ContributionDrawerQuery['order']) => void;
+  onMarkAsCompletedClick: (order: ContributionDrawerQuery['order']) => void;
+  onMarkAsExpiredClick: (order: ContributionDrawerQuery['order']) => void;
+  onCancelClick: (order: ContributionDrawerQuery['order']) => void;
+};
+
+const getContributionActions: (opts: GetContributionActionsOptions) => GetActions<ContributionDrawerQuery['order']> =
+  opts => order => {
+    if (!order) {
+      return null;
+    }
+
+    const actions: ReturnType<GetActions<any>> = {
+      primary: [],
+      secondary: [],
+    };
+
+    const isAdminOfOrder = opts.LoggedInUser.isAdminOfCollective(order.fromAccount);
+    const canUpdateActiveOrder =
+      order.frequency !== ContributionFrequency.ONETIME &&
+      ![
+        OrderStatus.PAUSED,
+        OrderStatus.PROCESSING,
+        OrderStatus.PENDING,
+        OrderStatus.CANCELLED,
+        OrderStatus.REFUNDED,
+        OrderStatus.REJECTED,
+      ].includes(order.status) &&
+      isAdminOfOrder;
+
+    const canResume = order.status === OrderStatus.PAUSED && order.permissions.canResume;
+    const canCancel =
+      isAdminOfOrder &&
+      ![OrderStatus.CANCELLED, OrderStatus.PAID, OrderStatus.REFUNDED, OrderStatus.REJECTED].includes(order.status) &&
+      order.frequency !== ContributionFrequency.ONETIME;
+    const canMarkAsCompleted = order.status === OrderStatus.PENDING && order.permissions.canMarkAsPaid;
+    const canMarkAsExpired = order.status === OrderStatus.PENDING && order.permissions.canMarkAsExpired;
+
+    const canDoActions = [canUpdateActiveOrder, canResume, canCancel, canMarkAsCompleted, canMarkAsExpired];
+
+    if (!canDoActions.some(Boolean)) {
+      return null;
+    }
+
+    if (canUpdateActiveOrder) {
+      actions.primary.push({
+        label: opts.intl.formatMessage({ defaultMessage: 'Update payment method', id: 'iIM9E+' }),
+        onClick: () => opts.onUpdatePaymentMethodClick(order),
+      });
+    }
+
+    if (canResume) {
+      actions.primary.push({
+        label: opts.intl.formatMessage({ defaultMessage: 'Resume contribution', id: 'iIM9E+' }),
+        onClick: () => opts.onResumeClick(order),
+      });
+    }
+
+    if (canUpdateActiveOrder) {
+      actions.primary.push({
+        label: opts.intl.formatMessage({ defaultMessage: 'Update amount', id: 'subscription.menu.updateAmount' }),
+        onClick: () => opts.onEditAmountClick(order),
+      });
+    }
+
+    if (canMarkAsCompleted) {
+      actions.primary.push({
+        label: opts.intl.formatMessage({ defaultMessage: 'Mark as completed', id: 'order.markAsCompleted' }),
+        onClick: () => opts.onMarkAsCompletedClick(order),
+      });
+    }
+
+    if (canMarkAsExpired) {
+      actions.primary.push({
+        label: opts.intl.formatMessage({ defaultMessage: 'Mark as expired', id: 'order.markAsExpired' }),
+        onClick: () => opts.onMarkAsExpiredClick(order),
+      });
+    }
+
+    if (canCancel) {
+      actions.secondary.push({
+        label: opts.intl.formatMessage({
+          defaultMessage: 'Cancel contribution',
+          id: 'subscription.menu.cancelContribution',
+        }),
+        onClick: () => opts.onCancelClick(order),
+        'data-cy': 'recurring-contribution-menu-cancel-option',
+      });
+    }
+
+    return actions;
+  };
 
 export default Contributions;

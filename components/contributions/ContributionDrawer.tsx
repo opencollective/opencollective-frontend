@@ -13,6 +13,7 @@ import {
   Hourglass,
   Info,
   Link as LinkIcon,
+  MoreHorizontal,
   MoreHorizontalIcon,
   Plus,
   RefreshCcw,
@@ -23,6 +24,7 @@ import {
 } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import { GetActions } from '../../lib/actions/types';
 import type { LoggedInUser as LoggedInUserType } from '../../lib/custom_typings/LoggedInUser';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import {
@@ -51,20 +53,26 @@ import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import { OrderAdminAccountingCategoryPill } from '../orders/OrderAccountingCategoryPill';
 import OrderStatusTag from '../orders/OrderStatusTag';
 import PaymentMethodTypeWithIcon from '../PaymentMethodTypeWithIcon';
+import { DropdownActionItem } from '../table/RowActionsMenu';
 import Tags from '../Tags';
 import { Button } from '../ui/Button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/DropdownMenu';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../ui/DropdownMenu';
 import { Sheet, SheetContent, SheetFooter } from '../ui/Sheet';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
-
-import { ContributionContextualMenu, ContributionContextualMenuProps } from './ContributionContextualMenu';
 
 type ContributionDrawerProps = {
   open: boolean;
   onClose: () => void;
   orderId?: number;
   orderUrl: string;
-} & ContributionContextualMenuProps;
+  getActions: GetActions<ContributionDrawerQuery['order']>;
+};
 
 const I18nFrequencyMessages = defineMessages({
   [ContributionFrequency.ONETIME]: {
@@ -242,6 +250,7 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
 
       fragment ContributionDrawerTransactionFields on Transaction {
         id
+        legacyId
         uuid
         kind
         amount {
@@ -289,6 +298,8 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
 
   const isLoading = !query.called || query.loading || !query.data || query.data.order?.legacyId !== props.orderId;
 
+  const actions = query.data?.order ? props.getActions(query.data.order) : null;
+
   return (
     <Sheet open={props.open} onOpenChange={isOpen => !isOpen && props.onClose()}>
       <SheetContent className="flex max-w-xl flex-col overflow-hidden">
@@ -316,7 +327,7 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                           clipboard.copy(props.orderUrl);
                         }}
                       >
-                        <div className='cursor-pointer'>
+                        <div className="cursor-pointer">
                           <LinkIcon size={16} />
                         </div>
                       </Button>
@@ -557,19 +568,20 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
           )}
         </div>
         <SheetFooter className="flex px-8 py-2">
-          <ContributionContextualMenu
-            order={query.data?.order}
-            onCancelClick={props.onCancelClick}
-            onEditAmountClick={props.onEditAmountClick}
-            onResumeClick={props.onResumeClick}
-            onUpdatePaymentMethodClick={props.onUpdatePaymentMethodClick}
-            onMarkAsCompletedClick={props.onMarkAsCompletedClick}
-            onMarkAsExpiredClick={props.onMarkAsExpiredClick}
-          >
-            <Button variant="outline" size="sm">
-              <FormattedMessage defaultMessage="More actions" id="S8/4ZI" />
-            </Button>
-          </ContributionContextualMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="xs">
+                <FormattedMessage defaultMessage="More actions" id="S8/4ZI" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {actions?.primary?.map(action => <DropdownActionItem key={action.label} action={action} />)}
+
+              {actions?.primary.length > 0 && actions?.secondary.length > 0 && <DropdownMenuSeparator />}
+
+              {actions?.secondary?.map(action => <DropdownActionItem key={action.label} action={action} />)}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </SheetFooter>
       </SheetContent>
     </Sheet>
