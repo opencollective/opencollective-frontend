@@ -237,9 +237,6 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
     { label: <FormattedMessage id="taxType.Other" defaultMessage="Other" />, value: 'OTHER' },
   ];
   const initialValues = cloneDeep(pick(vendor, EDITABLE_FIELDS));
-  if (vendor?.hasImage !== true) {
-    initialValues.imageUrl = null;
-  }
   if (initialValues.vendorInfo?.taxType && !['EIN', 'VAT', 'GST'].includes(initialValues.vendorInfo?.taxType)) {
     initialValues.vendorInfo['otherTaxType'] = initialValues.vendorInfo?.taxType;
     initialValues.vendorInfo.taxType = 'OTHER';
