@@ -824,15 +824,13 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
         )}
         <Pagination queryFilter={queryFilter} total={data?.account?.orders.totalCount} />
       </div>
-      {LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD_CONTRIBUTION_DETAILS) && (
-        <ContributionDrawer
-          open={!!selectedContributionId}
-          onClose={() => onToogleOrderDrawer(null)}
-          orderId={selectedContributionId}
-          orderUrl={orderUrl}
-          getActions={getActions}
-        />
-      )}
+      <ContributionDrawer
+        open={!!selectedContributionId}
+        onClose={() => onToogleOrderDrawer(null)}
+        orderId={selectedContributionId}
+        orderUrl={orderUrl}
+        getActions={getActions}
+      />
       {confirmCompletedOrder && (
         <ContributionConfirmationModal
           order={confirmCompletedOrder}
