@@ -46,7 +46,6 @@ export const confirmContributionFieldsFragment = gql`
       name
       type
       imageUrl
-      hasImage
       isIncognito
       ... on Individual {
         isGuest
@@ -58,7 +57,6 @@ export const confirmContributionFieldsFragment = gql`
       name
       type
       imageUrl
-      hasImage
       ... on AccountWithHost {
         bankTransfersHostFeePercent: hostFeePercent(paymentMethodType: MANUAL)
         host {
