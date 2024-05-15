@@ -302,8 +302,9 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                   <FormattedMessage defaultMessage="Contribution" id="0LK5eg" />
                   <div>{isLoading ? <LoadingPlaceholder height={20} /> : `# ${query.data.order.legacyId}`}</div>
                   <Tooltip delayDuration={100}>
-                    <TooltipTrigger>
+                    <TooltipTrigger asChild>
                       <Button
+                        asChild
                         variant="ghost"
                         size="icon-sm"
                         onPointerDown={e => {
@@ -315,7 +316,9 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                           clipboard.copy(props.orderUrl);
                         }}
                       >
-                        <LinkIcon size={16} />
+                        <div className='cursor-pointer'>
+                          <LinkIcon size={16} />
+                        </div>
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -724,7 +727,7 @@ function OrderTimeline(props: OrderTimelineProps) {
           <React.Fragment>
             <DropdownMenuItem asChild>
               <Button size="xs" variant="ghost" asChild className="w-full">
-                <Link href={a.data?.paymentProcessorUrl}>
+                <Link href={a.data?.paymentProcessorUrl} className="justify-start">
                   <FormattedMessage defaultMessage="View in payment processor" id="NgSLbI" />
                 </Link>
               </Button>
@@ -754,7 +757,7 @@ function OrderTimeline(props: OrderTimelineProps) {
         menu: (
           <React.Fragment>
             <DropdownMenuItem asChild>
-              <Button size="xs" variant="ghost" asChild className="w-full">
+              <Button size="xs" variant="ghost" asChild className="w-full justify-start">
                 <Link href={getTransactionGroupLink(LoggedInUser, props.order, txn.group)}>
                   <FormattedMessage defaultMessage="View transaction" id="1kZ3H0" />
                 </Link>
@@ -762,7 +765,7 @@ function OrderTimeline(props: OrderTimelineProps) {
             </DropdownMenuItem>
             {primaryTxn.paymentProcessorUrl && (
               <DropdownMenuItem asChild>
-                <Button size="xs" variant="ghost" asChild className="w-full">
+                <Button size="xs" variant="ghost" asChild className="w-full justify-start">
                   <Link href={primaryTxn.paymentProcessorUrl}>
                     <FormattedMessage defaultMessage="View in payment processor" id="NgSLbI" />
                   </Link>
@@ -772,7 +775,7 @@ function OrderTimeline(props: OrderTimelineProps) {
             {actions.primary?.map((action, i) => (
               // eslint-disable-next-line react/no-array-index-key
               <DropdownMenuItem key={i} asChild className="w-full">
-                <Button size="xs" variant="ghost" onClick={action.onClick}>
+                <Button size="xs" variant="ghost" onClick={action.onClick} className="justify-start">
                   {action.label}
                 </Button>
               </DropdownMenuItem>
