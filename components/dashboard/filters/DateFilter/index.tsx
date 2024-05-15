@@ -25,6 +25,16 @@ export const dateFilter: FilterConfig<z.infer<typeof dateFilterSchema>> = {
   },
 };
 
+export const expectedDateFilter: FilterConfig<z.infer<typeof dateFilterSchema>> = {
+  schema: dateFilterSchema,
+  toVariables: value => dateToVariables(value, 'expectedDate'),
+  filter: {
+    labelMsg: defineMessage({ defaultMessage: 'Expected Date', id: 'vNC2dX' }),
+    Component: DateFilter,
+    valueRenderer: DateFilterValue,
+  },
+};
+
 const renderOptions = (value: DateFilterValueType, setValue: (val: DateFilterValueType) => void, intl) => {
   switch (value.type) {
     case DateFilterType.IN_LAST_PERIOD:
@@ -80,7 +90,7 @@ const renderOptions = (value: DateFilterValueType, setValue: (val: DateFilterVal
   }
 };
 
-export function DateFilter({
+function DateFilter({
   value,
   onChange,
 }: {
