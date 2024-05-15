@@ -28,10 +28,12 @@ const updateOrderAccountingCategoryMutation = gql/* GraphQL */ `
 `;
 
 type AccountingCategoryPillProps = {
-  order: Order;
+  order: Pick<Order, 'id'> & { accountingCategory?: Pick<AccountingCategory, 'friendlyName' | 'name' | 'code' | 'id'> };
   canEdit: boolean;
-  account: Account;
-  host: Host;
+  account: Pick<Account, 'slug'>;
+  host: Pick<Host, 'slug'> & {
+    accountingCategories?: { nodes: Array<Pick<AccountingCategory, 'friendlyName' | 'name' | 'code' | 'id'>> };
+  };
   /** Whether to allow the user to select "I don't know" */
   allowNone?: boolean;
   /** Whether to show the category code in the select */
@@ -40,7 +42,7 @@ type AccountingCategoryPillProps = {
 
 const BADGE_CLASS = cn('red rounded-lg bg-neutral-100 px-3 py-1  text-xs font-medium text-neutral-800');
 
-const getCategoryLabel = (category: AccountingCategory) => {
+const getCategoryLabel = (category: Pick<AccountingCategory, 'friendlyName' | 'name'>) => {
   if (!category) {
     return <FormattedMessage id="accountingCategory.doNotKnow" defaultMessage="Unknown category" />;
   } else if (category) {
