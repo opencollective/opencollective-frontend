@@ -48,6 +48,7 @@ import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
+import { OrderAdminAccountingCategoryPill } from '../orders/OrderAccountingCategoryPill';
 import OrderStatusTag from '../orders/OrderStatusTag';
 import PaymentMethodTypeWithIcon from '../PaymentMethodTypeWithIcon';
 import Tags from '../Tags';
@@ -218,6 +219,15 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
           host {
             id
             slug
+            accountingCategories {
+              nodes {
+                id
+                code
+                name
+                friendlyName
+                kind
+              }
+            }
           }
           approvedAt
         }
@@ -327,6 +337,17 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                   </Button>
                 </div>
               </div>
+              {query.data?.order?.permissions?.canUpdateAccountingCategory &&
+                query.data.order.toAccount &&
+                'host' in query.data.order.toAccount && (
+                  <div className="mb-4">
+                    <OrderAdminAccountingCategoryPill
+                      order={query.data?.order}
+                      account={query.data?.order.toAccount}
+                      host={query.data.order.toAccount.host}
+                    />
+                  </div>
+                )}
               <div className="mb-4">
                 {isLoading ? (
                   <LoadingPlaceholder height={20} />
@@ -396,7 +417,7 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
 
                   {query.data?.order?.status === OrderStatus.PENDING && (
                     <React.Fragment>
-                      {query.data.order.pendingContributionData.ponumber && (
+                      {query.data.order.pendingContributionData?.ponumber && (
                         <div className="col-span-3">
                           <div>
                             <FormattedMessage defaultMessage="PO Number" id="Fields.PONumber" />
@@ -546,7 +567,9 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
             onMarkAsCompletedClick={props.onMarkAsCompletedClick}
             onMarkAsExpiredClick={props.onMarkAsExpiredClick}
           >
-            <Button>More actions</Button>
+            <Button variant="outline" size="sm">
+              <FormattedMessage defaultMessage="More actions" id="S8/4ZI" />
+            </Button>
           </ContributionContextualMenu>
         </SheetFooter>
       </SheetContent>
@@ -873,63 +896,47 @@ function OrderTimeline(props: OrderTimelineProps) {
         return (
           <React.Fragment key={t.id}>
             <li
-              className={clsx('relative border-l pl-6 last:border-none last:pb-0', {
+              className={clsx('relative border-l border-[#E1E7EF] pb-10 pl-9 last:border-none last:pb-0', {
                 'border-dashed': t.expected,
-                'border-slate-500': t.type !== 'error',
-                'border-red-500': t.type === 'error',
-                'pb-20': t.expected && !isCollapsed,
-                'pb-0': isCollapsed,
-                'pb-10': !isCollapsed,
               })}
             >
               <div
-                className={clsx('absolute -left-3 flex h-6 w-6 items-center justify-center rounded-full ring-4', {
-                  'bg-red-100 text-red-500 ring-red-100': t.type === 'error',
-                  'bg-yellow-100 text-yellow-500 ring-yellow-100': t.type === 'warning',
-                  'bg-green-100 text-green-500 ring-green-100': t.type === 'success',
-                  'bg-blue-100 text-blue-500 ring-blue-100': t.type === 'info',
+                className={clsx('absolute -left-3 flex h-6 w-6 items-center justify-center rounded-full ring-8', {
+                  'bg-[#FFF0F1] text-[#FF3053] ring-[#FFF0F1]': t.type === 'error',
+                  'bg-[#FEFEE8] text-[#A27006] ring-[#FEFEE8]': t.type === 'warning',
+                  'bg-[#EAFFE9] text-[#098605] ring-[#EAFFE9]': t.type === 'success',
+                  'bg-[#EEF7FF] text-[#308EFF] ring-[#EEF7FF]': t.type === 'info',
                 })}
               >
                 {t.icon}
               </div>
-              <div
-                className={clsx({
-                  'border-t pt-4': t.collapsable && itemIndex !== 0,
-                })}
-              >
-                <div className="text-xs">
-                  <DateTime value={t.date} timeStyle="short" />
-                </div>
-                <div className="flex items-center">
+              <div className="relative flex items-center">
+                {itemIndex !== 0 && <div className="absolute -top-5 w-full border-t border-[#E1E7EF]"></div>}
+                <div>
                   <div>{t.title}</div>
-                  <div className="ml-auto flex gap-2">
-                    {t.menu && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon-xs">
-                            <MoreHorizontalIcon size={16} />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>{t.menu}</DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
-                    {t.collapsable && hasChild && (
-                      <Button variant="ghost" size="icon-xs" onClick={() => toggleGroup(t.id)}>
-                        {isCollapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
-                      </Button>
-                    )}
+                  <div className="text-xs leading-5 text-[#75777A]">
+                    <DateTime value={t.date} timeStyle="short" />
                   </div>
+                </div>
+                <div className="ml-auto flex gap-2">
+                  {t.menu && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon-xs">
+                          <MoreHorizontalIcon size={16} />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>{t.menu}</DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
+                  {t.collapsable && hasChild && (
+                    <Button variant="ghost" size="icon-xs" onClick={() => toggleGroup(t.id)}>
+                      {isCollapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
+                    </Button>
+                  )}
                 </div>
               </div>
             </li>
-
-            {isCollapsed && (
-              <li
-                className={clsx(
-                  'relative border-l border-dotted border-slate-500 pb-10 pl-6 last:border-none last:pb-0',
-                )}
-              ></li>
-            )}
           </React.Fragment>
         );
       })}
