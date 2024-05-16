@@ -13,7 +13,6 @@ import {
   Hourglass,
   Info,
   Link as LinkIcon,
-  MoreHorizontal,
   MoreHorizontalIcon,
   Plus,
   RefreshCcw,
@@ -376,7 +375,7 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                 <div className="mb-4 grid grid-cols-3 gap-4 gap-y-6 text-sm [&>*>*:first-child]:mb-2 [&>*>*:first-child]:font-bold [&>*>*:first-child]:text-[#344256]">
                   <div>
                     <div>
-                      <FormattedMessage defaultMessage="Contributor" id="+k5t/y" />
+                      <FormattedMessage defaultMessage="Contributor" id="Contributor" />
                     </div>
                     <div>
                       {isLoading ? (
@@ -399,7 +398,7 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                   </div>
                   <div>
                     <div>
-                      <FormattedMessage defaultMessage="Collective" id="mujy1w" />
+                      <FormattedMessage defaultMessage="Collective" id="Collective" />
                     </div>
                     <div>
                       {isLoading ? (
@@ -422,7 +421,7 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                   </div>
                   <div>
                     <div>
-                      <FormattedMessage defaultMessage="Payment Method" id="nFQbxh" />
+                      <FormattedMessage defaultMessage="Payment Method" id="paymentmethod.label" />
                     </div>
                     <div>
                       {isLoading ? (
@@ -462,7 +461,7 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
 
                   <div className="col-span-3">
                     <div>
-                      <FormattedMessage defaultMessage="Frequency" id="vAW30j" />
+                      <FormattedMessage defaultMessage="Frequency" id="Frequency" />
                     </div>
                     <div>
                       {isLoading ? (
@@ -477,7 +476,7 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
 
                   <div className="col-span-3">
                     <div>
-                      <FormattedMessage defaultMessage="Amount" id="/0TOL5" />
+                      <FormattedMessage defaultMessage="Amount" id="Fields.amount" />
                     </div>
                     <div>
                       {isLoading ? (

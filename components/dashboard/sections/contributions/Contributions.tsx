@@ -15,7 +15,6 @@ import { ContributionDrawerQuery, ContributionFrequency, OrderStatus } from '../
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nPaymentMethodProviderType } from '../../../../lib/i18n/payment-method-provider-type';
-import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
@@ -893,14 +892,14 @@ const getContributionActions: (opts: GetContributionActionsOptions) => GetAction
 
     if (canUpdateActiveOrder) {
       actions.primary.push({
-        label: opts.intl.formatMessage({ defaultMessage: 'Update payment method', id: 'iIM9E+' }),
+        label: opts.intl.formatMessage({ defaultMessage: 'Update payment method', id: 'subscription.menu.editPaymentMethod' }),
         onClick: () => opts.onUpdatePaymentMethodClick(order),
       });
     }
 
     if (canResume) {
       actions.primary.push({
-        label: opts.intl.formatMessage({ defaultMessage: 'Resume contribution', id: 'iIM9E+' }),
+        label: opts.intl.formatMessage({ defaultMessage: 'Resume contribution', id: '51nF6S', }),
         onClick: () => opts.onResumeClick(order),
       });
     }
