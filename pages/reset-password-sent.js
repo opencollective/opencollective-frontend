@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
 
-import Container from '../components/Container';
 import { Box } from '../components/Grid';
 import { getI18nLink } from '../components/I18nFormatters';
 import Image from '../components/Image';
@@ -32,7 +31,7 @@ class ResetPasswordSent extends Component {
     const isValidEmail = email && isEmail(email);
     return (
       <Page noRobots showFooter={false}>
-        <Container pt={[4, 5]} pb={6} px={3} textAlign="center">
+        <div className="flex flex-col items-center px-4 pb-32 pt-8 text-center sm:pt-16">
           <Image src="/static/images/sign-in-illustration.png" width={624} height={372} />
           <P fontSize="32px" lineHeight="40px" color="black.900" fontWeight={700}>
             <FormattedMessage defaultMessage="Your reset password email is on its way." id="tSQ2Fc" />
@@ -59,7 +58,7 @@ class ResetPasswordSent extends Component {
               }}
             />
           </P>
-        </Container>
+        </div>
       </Page>
     );
   }
