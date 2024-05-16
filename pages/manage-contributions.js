@@ -210,7 +210,6 @@ const addManageContributionsPageData = graphql(manageContributionsQuery, {
   }),
 });
 
-// ignore unused exports default
 // next.js export
 // ts-unused-exports:disable-next-line
 export default withRouter(withUser(injectIntl(addManageContributionsPageData(ManageContributionsPage))));

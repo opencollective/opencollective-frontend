@@ -33,7 +33,7 @@ const cache = createIntlCache();
 
 // The document (which is SSR-only) needs to be customized to expose the locale
 // data for the user's locale for React Intl to work in the browser.
-// ignore unused exports default
+
 // next.js export
 // ts-unused-exports:disable-next-line
 export default class IntlDocument extends Document {

@@ -1,5 +1,3 @@
-// ignore unused exports
-
 import * as React from 'react';
 import { MoreHorizontal } from 'lucide-react';
 

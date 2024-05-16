@@ -96,7 +96,6 @@ const AlertDialogCancel = React.forwardRef<
 ));
 AlertDialogCancel.displayName = AlertDialogPrimitive.Cancel.displayName;
 
-// ignore unused exports
 // ui library
 // ts-unused-exports:disable-next-line
 export {

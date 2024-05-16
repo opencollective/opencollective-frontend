@@ -3,7 +3,6 @@ import path from 'path';
 
 import { template } from 'lodash';
 
-// ignore unused exports default
 // next.js export
 // ts-unused-exports:disable-next-line
 export default function handler(req, res) {

@@ -7,10 +7,8 @@ export function isMulti<T>(value: z.ZodType<T, any, any>) {
   return z.union([singleValueToArray, enumArray]);
 }
 
-// ignore unused exports isNullable
-// filter schema helper
-
 // Use isNullable to allow setting null values in the query filter
+// filter schema helper
 // ts-unused-exports:disable-next-line
 export function isNullable(value: z.ZodType<any, any>) {
   return z.union([

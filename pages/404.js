@@ -4,7 +4,6 @@ import Container from '../components/Container';
 import NotFound from '../components/NotFound';
 import Page from '../components/Page';
 
-// ignore unused exports default
 // next.js export
 // ts-unused-exports:disable-next-line
 export default function Custom404() {

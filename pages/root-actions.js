@@ -201,7 +201,6 @@ const RootActionsPage = () => {
 
 RootActionsPage.propTypes = {};
 
-// ignore unused exports default
 // next.js export
 // ts-unused-exports:disable-next-line
 export default RootActionsPage;

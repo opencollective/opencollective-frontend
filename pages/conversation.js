@@ -518,7 +518,6 @@ const getData = graphql(conversationPageQuery, {
   },
 });
 
-// ignore unused exports default
 // next.js export
 // ts-unused-exports:disable-next-line
 export default withUser(getData(withRouter(withApollo(ConversationPage))));

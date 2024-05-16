@@ -29,7 +29,6 @@ const INTERNAL_API_V2_URL = process.env.INTERNAL_API_V2_URL;
 const INTERNAL_API_V1_OPERATION_NAMES = process.env.INTERNAL_API_V1_OPERATION_NAMES;
 const INTERNAL_API_V2_OPERATION_NAMES = process.env.INTERNAL_API_V2_OPERATION_NAMES;
 
-// ignore unused exports APOLLO_ERROR_PROP_NAME
 export const APOLLO_STATE_PROP_NAME = '__APOLLO_STATE__' as const;
 // ts-unused-exports:disable-next-line
 export const APOLLO_ERROR_PROP_NAME = '__APOLLO_ERROR__' as const;

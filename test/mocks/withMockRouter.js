@@ -1,10 +1,8 @@
-// ignore unused exports mockedRouter, withMockRouterContext
-// keep for future use?
-
 import React from 'react';
 import PropTypes from 'prop-types';
 import Router from 'next/router';
 
+// keep for future use?
 // ts-unused-exports:disable-next-line
 export const mockedRouter = {
   push: () => {},
@@ -16,6 +14,7 @@ export const mockedRouter = {
 
 Router.router = mockedRouter;
 
+// keep for future use?
 // ts-unused-exports:disable-next-line
 export const withMockRouterContext = mockRouter => {
   class MockRouterContext extends React.Component {

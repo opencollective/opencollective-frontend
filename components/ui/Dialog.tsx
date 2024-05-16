@@ -85,7 +85,6 @@ const DialogDescription = React.forwardRef<
 ));
 DialogDescription.displayName = DialogPrimitive.Description.displayName;
 
-// ignore unused exports
 // ui library
 // ts-unused-exports:disable-next-line
 export {

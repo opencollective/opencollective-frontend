@@ -162,7 +162,6 @@ const DropdownMenuShortcut = ({ className, ...props }: React.HTMLAttributes<HTML
 };
 DropdownMenuShortcut.displayName = 'DropdownMenuShortcut';
 
-// ignore unused exports
 // ui library
 // ts-unused-exports:disable-next-line
 export {
