@@ -11,7 +11,7 @@ import { Pause as PauseIcon } from '@styled-icons/feather/Pause';
 import { Play as PlayIcon } from '@styled-icons/feather/Play';
 import { Trash2 as IconTrash } from '@styled-icons/feather/Trash2';
 import { get } from 'lodash';
-import { FileText } from 'lucide-react';
+import { ArrowRightLeft, FileText } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -20,8 +20,9 @@ import { margin } from 'styled-system';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import useProcessExpense from '../../lib/expenses/useProcessExpense';
 import useClipboard from '../../lib/hooks/useClipboard';
-import { getCollectivePageCanonicalURL, getCollectivePageRoute } from '../../lib/url-helpers';
+import { getCollectivePageCanonicalURL, getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
 
+import { DashboardContext } from '../dashboard/DashboardContext';
 import { DownloadLegalDocument } from '../legal-documents/DownloadLegalDocument';
 import PopupMenu from '../PopupMenu';
 import StyledButton from '../StyledButton';
@@ -29,7 +30,6 @@ import StyledButton from '../StyledButton';
 import ConfirmProcessExpenseModal from './ConfirmProcessExpenseModal';
 import ExpenseConfirmDeletion from './ExpenseConfirmDeletionModal';
 import ExpenseInvoiceDownloadHelper from './ExpenseInvoiceDownloadHelper';
-
 const Action = styled.button`
   ${margin}
   padding: 16px;
@@ -64,6 +64,15 @@ const Action = styled.button`
   }
 `;
 
+const getTransactionsUrl = (dashboardAccount, expense) => {
+  if (dashboardAccount?.isHost && expense?.host?.id === dashboardAccount.id) {
+    return getDashboardRoute(expense.host, `host-transactions?expenseId=${expense.legacyId}`);
+  } else if (dashboardAccount?.slug === expense?.account.slug) {
+    return getDashboardRoute(expense.account, `transactions?expenseId=${expense.legacyId}`);
+  }
+  return null;
+};
+
 /**
  * Admin buttons for the expense, displayed in a React fragment to let parent
  * in control of the layout.
@@ -81,7 +90,7 @@ const ExpenseMoreActionsButton = ({
   const [processModal, setProcessModal] = React.useState(false);
   const [hasDeleteConfirm, setDeleteConfirm] = React.useState(false);
   const { isCopied, copy } = useClipboard();
-
+  const { account } = React.useContext(DashboardContext);
   const router = useRouter();
   const permissions = expense?.permissions;
 
@@ -93,6 +102,8 @@ const ExpenseMoreActionsButton = ({
     setDeleteConfirm(isOpen);
     onModalToggle?.(isOpen);
   };
+
+  const viewTransactionsUrl = getTransactionsUrl(account, expense);
 
   if (!permissions) {
     return null;
@@ -267,6 +278,12 @@ const ExpenseMoreActionsButton = ({
                 <FormattedMessage id="CopyLink" defaultMessage="Copy link" />
               )}
             </Action>
+            {viewTransactionsUrl && (
+              <Action onClick={() => router.push(viewTransactionsUrl)} disabled={processExpense.loading || isDisabled}>
+                <ArrowRightLeft size="16" color="#888" />
+                <FormattedMessage defaultMessage="View Transactions" id="viewTransactions" />
+              </Action>
+            )}
           </div>
         )}
       </PopupMenu>
