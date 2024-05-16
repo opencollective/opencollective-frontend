@@ -8,9 +8,7 @@ import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { TransactionsTableQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
-import { Flex } from '../../../Grid';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
-import Pagination from '../../../Pagination';
 import { Button } from '../../../ui/Button';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
@@ -124,7 +122,7 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     views,
   });
 
-  const { data, previousData, error, loading, refetch } = useQuery(transactionsTableQuery, {
+  const { data, error, loading, refetch } = useQuery(transactionsTableQuery, {
     variables: {
       hostAccount: { slug: hostSlug },
       includeIncognitoTransactions: true,
@@ -173,15 +171,6 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
             queryFilter={queryFilter}
             refetchList={refetch}
           />
-          <Flex mt={5} justifyContent="center">
-            <Pagination
-              route={`/dashboard/${hostSlug}/host-transactions`}
-              total={(data || previousData)?.transactions?.totalCount}
-              limit={queryFilter.values.limit}
-              offset={queryFilter.values.offset}
-              ignoredQueryParams={['collectiveSlug']}
-            />
-          </Flex>
         </React.Fragment>
       )}
     </div>

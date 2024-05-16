@@ -17,7 +17,6 @@ import VirtualCard from '../../../edit-collective/VirtualCard';
 import HTMLContent from '../../../HTMLContent';
 import { getI18nLink } from '../../../I18nFormatters';
 import Loading from '../../../Loading';
-import Pagination from '../../../Pagination';
 import RequestVirtualCardBtn from '../../../RequestVirtualCardBtn';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../../../ui/Accordion';
 import { Button } from '../../../ui/Button';
@@ -27,6 +26,7 @@ import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { dateFilter } from '../../filters/DateFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { orderByFilter } from '../../filters/OrderFilter';
+import { Pagination } from '../../filters/Pagination';
 import { DashboardSectionProps } from '../../types';
 
 import { accountVirtualCardsQuery } from './queries';
@@ -143,7 +143,7 @@ const VitualCards = ({ accountSlug }: DashboardSectionProps) => {
       ) : loading ? (
         <Loading />
       ) : (
-        <div className="flex flex-col gap-12">
+        <React.Fragment>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {data?.account?.virtualCards.nodes.map(virtualCard => (
               <VirtualCard
@@ -158,17 +158,8 @@ const VitualCards = ({ accountSlug }: DashboardSectionProps) => {
               />
             ))}
           </div>
-
-          <div className="flex justify-center">
-            <Pagination
-              onPageChange={page => queryFilter.setFilter('offset', (page - 1) * queryFilter.values.limit)}
-              total={data?.account?.virtualCards.totalCount}
-              limit={queryFilter.values.limit}
-              offset={queryFilter.values.offset}
-              ignoredQueryParams={['slug', 'section']}
-            />
-          </div>
-        </div>
+          <Pagination queryFilter={queryFilter} total={data?.account?.virtualCards.totalCount} />
+        </React.Fragment>
       )}
     </div>
   );

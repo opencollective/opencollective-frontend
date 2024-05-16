@@ -20,6 +20,7 @@ import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { ColumnHeader } from '../../../table/ColumnHeader';
 import { actionsColumn, DataTable } from '../../../table/DataTable';
 import { Badge } from '../../../ui/Badge';
+import { Pagination } from '../../filters/Pagination';
 
 import { useTransactionActions } from './actions';
 import { schema } from './filters';
@@ -253,7 +254,7 @@ const columns: ColumnDef<TransactionsTableQueryNode>[] = [
 ];
 
 type TransactionsTableProps = {
-  transactions: { nodes: TransactionsTableQueryNode[] };
+  transactions: { nodes: TransactionsTableQueryNode[]; totalCount: number };
   loading?: boolean;
   nbPlaceholders?: number;
   useAltTestLayout?: boolean;
@@ -314,6 +315,8 @@ export default function TransactionsTable({
         queryFilter={queryFilter}
         compact
       />
+
+      <Pagination queryFilter={queryFilter} total={transactions?.totalCount} />
       <TransactionDrawer
         {...drawerProps}
         transactionId={queryFilter.values.openTransactionId}

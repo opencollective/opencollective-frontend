@@ -11,12 +11,12 @@ import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
 
 import ExpensesList from '../../../expenses/ExpensesList';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
-import Pagination from '../../../Pagination';
 import { SubmitExpenseFlow } from '../../../submit-expense/SubmitExpenseFlow';
 import { Button } from '../../../ui/Button';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import { Filterbar } from '../../filters/Filterbar';
+import { Pagination } from '../../filters/Pagination';
 import { DashboardSectionProps } from '../../types';
 
 import { FilterMeta, filters, schema, toVariables } from './filters';
@@ -128,15 +128,7 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
                 );
               }}
             />
-            <div className="mt-12 flex justify-center">
-              <Pagination
-                route={pageRoute}
-                total={data?.expenses?.totalCount}
-                limit={queryFilter.values.limit}
-                offset={queryFilter.values.offset}
-                ignoredQueryParams={ROUTE_PARAMS}
-              />
-            </div>
+            <Pagination queryFilter={queryFilter} total={data?.expenses?.totalCount} />
           </React.Fragment>
         )}
       </div>

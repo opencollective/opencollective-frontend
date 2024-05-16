@@ -1,73 +1,94 @@
-import React from 'react';
+import * as React from 'react';
+import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import { elementFromClass } from '../../lib/react-utils';
+import { cn } from '../../lib/utils';
 
-const PaginationButton = elementFromClass(
-  'button',
-  'inline-flex h-8 items-center justify-center rounded-full border bg-white px-4 py-2 text-sm leading-none outline-none hover:bg-gray-50 data-[disabled]:bg-white data-[disabled]:opacity-50 cursor-pointer',
+import { Button, ButtonProps } from './Button';
+
+const Pagination = ({ className, ...props }: React.ComponentProps<'nav'>) => (
+  <nav
+    role="navigation"
+    aria-label="pagination"
+    className={cn('mx-auto flex w-full justify-center', className)}
+    {...props}
+  />
 );
+Pagination.displayName = 'Pagination';
 
-type PaginationProps = {
-  onChange: (page: number) => void;
-  totalPages: number;
-  page: number;
-};
+const PaginationContent = React.forwardRef<HTMLUListElement, React.ComponentProps<'ul'>>(
+  ({ className, ...props }, ref) => (
+    <ul ref={ref} className={cn('flex flex-row items-center gap-1', className)} {...props} />
+  ),
+);
+PaginationContent.displayName = 'PaginationContent';
 
-export const Pagination = ({ onChange, totalPages, page }: PaginationProps) => {
-  const handlePageJump = React.useCallback(
-    (event: React.FocusEvent | React.KeyboardEvent) => {
-      const key = 'key' in event ? event.key : null;
-      const target = event.target;
-      const value = 'value' in target ? parseInt(target.value as string) : null;
+const PaginationItem = React.forwardRef<HTMLLIElement, React.ComponentProps<'li'>>(({ className, ...props }, ref) => (
+  <li ref={ref} className={cn('', className)} {...props} />
+));
+PaginationItem.displayName = 'PaginationItem';
 
-      if (key && key !== 'Enter') {
-        return;
-      }
+type PaginationButtonProps = {
+  isActive?: boolean;
+} & Pick<ButtonProps, 'size'> &
+  React.ComponentProps<typeof Button>;
 
-      if (!value || value === page || value > totalPages || value <= 0) {
-        return;
-      }
+const PaginationButton = ({ className, isActive, size = 'icon', ...props }: PaginationButtonProps) => (
+  <Button
+    aria-current={isActive ? 'page' : undefined}
+    variant={isActive ? 'outline' : 'ghost'}
+    size={size}
+    className={className}
+    {...props}
+  />
+);
+PaginationButton.displayName = 'PaginationButton';
 
-      onChange(value);
-    },
-    [onChange, page],
-  );
+const PaginationPrevious = ({ className, ...props }: React.ComponentProps<typeof PaginationButton>) => (
+  <PaginationButton
+    aria-label="Go to previous page"
+    size="default"
+    className={cn('gap-1 pl-2.5', className)}
+    {...props}
+  >
+    <ChevronLeft className="h-4 w-4" />
+    <span>
+      <FormattedMessage id="Pagination.Prev" defaultMessage="Previous" />
+    </span>
+  </PaginationButton>
+);
+PaginationPrevious.displayName = 'PaginationPrevious';
 
-  return (
-    <div className="flex content-center justify-center gap-3 text-sm">
-      {page > 1 && (
-        <PaginationButton onClick={() => onChange(page - 1)}>
-          <FormattedMessage id="Pagination.Prev" defaultMessage="Previous" />
-        </PaginationButton>
-      )}
-      <div className="inline-flex items-center">
-        <FormattedMessage
-          id="Pagination.Count"
-          defaultMessage="Page {current} of {total}"
-          values={{
-            current: (
-              <input
-                key={page}
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]+"
-                className="mx-1 w-8 justify-center rounded-md border px-2 py-1"
-                defaultValue={page}
-                onBlur={handlePageJump}
-                onKeyPress={handlePageJump}
-                size={totalPages.toString().length}
-              />
-            ),
-            total: totalPages,
-          }}
-        />
-      </div>
-      {page < totalPages && (
-        <PaginationButton onClick={() => onChange(page + 1)}>
-          <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
-        </PaginationButton>
-      )}
-    </div>
-  );
+const PaginationNext = ({ className, ...props }: React.ComponentProps<typeof PaginationButton>) => (
+  <PaginationButton aria-label="Go to next page" size="default" className={cn('gap-1 pr-2.5', className)} {...props}>
+    <span>
+      <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
+    </span>
+    <ChevronRight className="h-4 w-4" />
+  </PaginationButton>
+);
+PaginationNext.displayName = 'PaginationNext';
+
+const PaginationEllipsis = ({ className, ...props }: React.ComponentProps<'span'>) => (
+  <span
+    aria-hidden
+    className={cn('flex h-9 w-9 items-center justify-center text-muted-foreground', className)}
+    {...props}
+  >
+    <MoreHorizontal className="h-4 w-4" />
+    <span className="sr-only">
+      <FormattedMessage id="Pagination.MorePages" defaultMessage="More pages" />
+    </span>
+  </span>
+);
+PaginationEllipsis.displayName = 'PaginationEllipsis';
+
+export {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationButton,
+  PaginationNext,
+  PaginationPrevious,
 };

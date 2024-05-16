@@ -18,11 +18,8 @@ import { i18nVirtualCardRequestStatus } from '../../../lib/i18n/virtual-card-req
 import { sortSelectOptions } from '../../../lib/utils';
 
 import { accountHoverCardFields } from '../../AccountHoverCard';
-import { Flex } from '../../Grid';
 import { getI18nLink } from '../../I18nFormatters';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
-import Pagination from '../../Pagination';
-import { P } from '../../Text';
 import { VirtualCardRequestDrawer } from '../../virtual-card-requests/VirtualCardRequestDrawer';
 import { VirtualCardRequestsTable } from '../../virtual-card-requests/VirtualCardRequestsTable';
 import { StripeVirtualCardComplianceStatement } from '../../virtual-cards/StripeVirtualCardComplianceStatement';
@@ -31,6 +28,7 @@ import { EmptyResults } from '../EmptyResults';
 import ComboSelectFilter from '../filters/ComboSelectFilter';
 import { Filterbar } from '../filters/Filterbar';
 import { hostedAccountFilter } from '../filters/HostedAccountFilter';
+import { Pagination } from '../filters/Pagination';
 import { DashboardSectionProps } from '../types';
 
 const schema = z.object({
@@ -241,22 +239,7 @@ export default function HostVirtualCardRequests({ accountSlug: hostSlug }: Dashb
             loading={query.loading}
             virtualCardRequests={query.data?.virtualCardRequests.nodes}
           />
-          <Flex mt={5} alignItems="center" flexDirection="column" justifyContent="center">
-            <Pagination
-              total={query.data?.virtualCardRequests.totalCount}
-              limit={queryFilter.values.limit}
-              offset={queryFilter.values.offset}
-              onPageChange={page => queryFilter.setFilter('offset', (page - 1) * queryFilter.values.limit)}
-            />
-            <P mt={1} fontSize="12px">
-              <FormattedMessage
-                id="withColon"
-                defaultMessage="{item}:"
-                values={{ item: <FormattedMessage id="TotalItems" defaultMessage="Total Items" /> }}
-              />{' '}
-              {query.data?.virtualCardRequests.totalCount}
-            </P>
-          </Flex>
+          <Pagination queryFilter={queryFilter} total={query.data?.virtualCardRequests.totalCount} />
 
           <VirtualCardRequestDrawer
             open={!!queryFilter.values.virtualCardRequest}
