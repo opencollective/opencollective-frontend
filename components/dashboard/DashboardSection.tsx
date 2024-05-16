@@ -39,6 +39,7 @@ import Vendors from './sections/Vendors';
 import VirtualCards from './sections/virtual-cards/VirtualCards';
 import { LEGACY_SECTIONS, LEGACY_SETTINGS_SECTIONS, SECTION_LABELS, SECTIONS, SETTINGS_SECTIONS } from './constants';
 import DashboardHeader from './DashboardHeader';
+import RegisterPage from '../RegisterPage';
 
 const DASHBOARD_COMPONENTS = {
   [SECTIONS.HOSTED_COLLECTIVES]: HostedCollectives,
@@ -70,13 +71,15 @@ const SETTINGS_COMPONENTS = {
   [SETTINGS_SECTIONS.TAX_INFORMATION]: TaxInformationSettingsSection,
 };
 
-const DashboardSection = ({ account, isLoading, section, subpath }) => {
+const DashboardSection = ({ slug, account, isLoading, section, subpath }) => {
   const { LoggedInUser } = useLoggedInUser();
   const { formatMessage } = useIntl();
 
   if (isLoading) {
     return (
       <div className="w-full">
+        <RegisterPage dashboardSlug={slug} />
+
         <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
         <LoadingPlaceholder height={26} mb={4} maxWidth={500} />
         <LoadingPlaceholder height={300} />
@@ -93,8 +96,10 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
     }
     return (
       <div className="w-full">
+        <RegisterPage dashboardSlug={slug} />
+
         <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
-        <DashboardComponent accountSlug={account.slug} subpath={subpath} isDashboard />
+        <DashboardComponent accountSlug={slug} subpath={subpath} isDashboard />
       </div>
     );
   }
@@ -102,6 +107,8 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
   if (values(LEGACY_SECTIONS).includes(section)) {
     return (
       <div className="w-full max-w-screen-lg">
+        <RegisterPage dashboardSlug={slug} />
+
         <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
         {SECTION_LABELS[section] && <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />}
 
@@ -116,8 +123,10 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
     return (
       // <div className="flex max-w-screen-lg justify-center">
       <div className="max-w-screen-md flex-1">
+        <RegisterPage dashboardSlug={slug} />
+
         <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
-        <SettingsComponent account={account} accountSlug={account.slug} subpath={subpath} />
+        <SettingsComponent account={account} accountSlug={slug} subpath={subpath} />
       </div>
     );
   }
@@ -126,6 +135,8 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
     return (
       // <div className="flex max-w-screen-lg justify-center">
       <div className="max-w-screen-md flex-1">
+        <RegisterPage dashboardSlug={slug} />
+
         <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
         {SECTION_LABELS[section] && <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />}
 

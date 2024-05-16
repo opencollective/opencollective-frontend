@@ -15,6 +15,7 @@ import Link from '../components/Link';
 import Page from '../components/Page';
 import StyledButton from '../components/StyledButton';
 import StyledLink from '../components/StyledLink';
+import RegisterPage from '@/components/RegisterPage';
 
 const messages = defineMessages({
   pageTitle: {
@@ -77,6 +78,8 @@ const HelpAndSupport = ({ action, formConfirmation }) => {
 
   return (
     <Page navTitle={formatMessage(messages.pageTitle)} description={formatMessage(messages.defaultTitle)}>
+      <RegisterPage />
+
       {action === 'contact' ? (
         renderFormContent(formConfirmation)
       ) : (

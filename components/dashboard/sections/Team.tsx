@@ -215,7 +215,7 @@ const Team = ({ accountSlug }: DashboardSectionProps) => {
 
   return (
     <div className="max-w-screen-lg">
-      <DashboardHeader title={<FormattedMessage id="Team" defaultMessage="Team" />} />
+      <DashboardHeader dashboardSlug={accountSlug} title={<FormattedMessage id="Team" defaultMessage="Team" />} />
 
       {loading ? (
         <Loading />

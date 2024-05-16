@@ -125,6 +125,7 @@ const HostTransactionReportList = ({ accountSlug: hostSlug }: DashboardSectionPr
       <DashboardHeader
         title={<FormattedMessage id="Reports" defaultMessage="Reports" />}
         actions={<div className="flex items-center gap-2"></div>}
+        dashboardSlug={hostSlug}
       />
 
       <Tabs selectedId={queryFilter.values.timeUnit} onChange={onChange} tabs={tabs} />

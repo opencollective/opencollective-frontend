@@ -7,6 +7,7 @@ import Header from '../components/Header';
 import Footer from '../components/navigation/Footer';
 
 import { withUser } from './UserProvider';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
 const Page = ({
   children,
@@ -36,23 +37,26 @@ const Page = ({
   const childProps = { LoggedInUser, loadingLoggedInUser };
   return (
     <div>
-      <Header
-        showSearch={showSearch}
-        title={title}
-        navTitle={navTitle}
-        noRobots={noRobots}
-        twitterHandle={twitterHandle}
-        description={description}
-        image={image}
-        metaTitle={metaTitle}
-        canonicalURL={canonicalURL}
-        collective={collective}
-        menuItems={menuItems}
-        LoggedInUser={LoggedInUser}
-        showProfileAndChangelogMenu={showProfileAndChangelogMenu}
-        loading={loading}
-        withTopBar={withTopBar}
-      />
+      {!LoggedInUser && !loadingLoggedInUser && (
+        <Header
+          showSearch={showSearch}
+          title={title}
+          navTitle={navTitle}
+          noRobots={noRobots}
+          twitterHandle={twitterHandle}
+          description={description}
+          image={image}
+          metaTitle={metaTitle}
+          canonicalURL={canonicalURL}
+          collective={collective}
+          menuItems={menuItems}
+          LoggedInUser={LoggedInUser}
+          showProfileAndChangelogMenu={showProfileAndChangelogMenu}
+          loading={loading}
+          withTopBar={withTopBar}
+        />
+      )}
+
       <Body>{typeof children === 'function' ? children(childProps) : children}</Body>
       {showFooter && <Footer />}
     </div>

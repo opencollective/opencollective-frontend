@@ -450,6 +450,7 @@ const Contributions = ({ accountSlug, direction }: ContributionsProps) => {
   return (
     <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader
+        dashboardSlug={accountSlug}
         title={
           isIncoming ? (
             <FormattedMessage id="IncomingContributions" defaultMessage="Incoming Contributions" />
