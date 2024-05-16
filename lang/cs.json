@@ -961,6 +961,7 @@
   "createCollective.form.nameLabel": "Název kolektivu",
   "createCollective.form.slugLabel": "Nastavte URL profilu",
   "createCollective.form.suggestedLabel": "Navrhované",
+  "createcollective.opensource.LogInAndVerifyGithub": "Sign in and verify using GitHub",
   "createcollective.opensource.ManualVerification": "Požádat o ruční ověření",
   "createcollective.opensource.p1": "Vytváříte software. Nechcete se zabývat vytvářením právnické osoby nebo bankovního účtu, daní, faktur a spousty jiných správců. Nechte to vše na nás, abyste se mohli nadále soustředit na svůj projekt.",
   "createcollective.opensource.p2": "Vytvořili jsme neziskovou zastřešující organizaci {osclink} pro podporu komunit s otevřeným zdrojovým kódem. Chcete-li se připojit, musíte být v souladu s naší {criterialink}.",

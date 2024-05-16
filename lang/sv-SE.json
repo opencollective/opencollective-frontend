@@ -961,6 +961,7 @@
   "createCollective.form.nameLabel": "Kollektivets namn",
   "createCollective.form.slugLabel": "Set your profile URL",
   "createCollective.form.suggestedLabel": "Förslag",
+  "createcollective.opensource.LogInAndVerifyGithub": "Sign in and verify using GitHub",
   "createcollective.opensource.ManualVerification": "Begär manuell verifiering",
   "createcollective.opensource.p1": "Du skapar programvara. Du vill inte oroa dig för att starta en juridisk person eller underhålla bankkonto, skatter och fakturor. Låt oss ta hand om allt detta, så att du kan vara fokuserad på ditt projekt.",
   "createcollective.opensource.p2": "Vi har skapat {osclink}, en ideell paraplyorganisation för att hjälpa medlemmar med öppen källkod. För att gå med måste du möta våra {criterialink}.",
