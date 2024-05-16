@@ -64,6 +64,7 @@ const expensePageQueryHelper = getSSRQueryHelpers<
 
 // ignore unused exports getServerSideProps
 // next.js export
+// ts-unused-exports:disable-next-line
 export const getServerSideProps = expensePageQueryHelper.getServerSideProps;
 
 const getPageMetadata = (intl, legacyExpenseId, expense) => {
@@ -80,6 +81,7 @@ const getPageMetadata = (intl, legacyExpenseId, expense) => {
 
 // ignore unused exports default
 // next.js export
+// ts-unused-exports:disable-next-line
 export default function ExpensePage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();

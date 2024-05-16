@@ -35,6 +35,7 @@ const cache = createIntlCache();
 // data for the user's locale for React Intl to work in the browser.
 // ignore unused exports default
 // next.js export
+// ts-unused-exports:disable-next-line
 export default class IntlDocument extends Document {
   static async getInitialProps(ctx) {
     // Get the `locale` and `messages` from the request object on the server.

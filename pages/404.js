@@ -6,6 +6,7 @@ import Page from '../components/Page';
 
 // ignore unused exports default
 // next.js export
+// ts-unused-exports:disable-next-line
 export default function Custom404() {
   return (
     <Page data-cy="error-page">

@@ -128,7 +128,7 @@ type ToastActionElement = React.ReactElement<typeof ToastAction>;
 
 // ignore unused exports
 // ui library
-
+// ts-unused-exports:disable-next-line
 export {
   type ToastProps,
   type ToastActionElement,

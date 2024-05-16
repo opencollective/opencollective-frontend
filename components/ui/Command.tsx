@@ -148,6 +148,7 @@ const CommandShortcut = ({ className, ...props }: React.HTMLAttributes<HTMLSpanE
 };
 CommandShortcut.displayName = 'CommandShortcut';
 
+// ts-unused-exports:disable-next-line
 export {
   Command,
   CommandDialog,

@@ -74,5 +74,5 @@ CreditItem.propTypes = { children: PropTypes.node };
 
 // ignore unused exports default
 // used in Stories mdx
-
+// ts-unused-exports:disable-next-line
 export default DebitCreditList;

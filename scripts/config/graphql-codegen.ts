@@ -31,5 +31,5 @@ const config: CodegenConfig = {
 
 // ignore unused exports default
 // config file
-
+// ts-unused-exports:disable-next-line
 export default config;

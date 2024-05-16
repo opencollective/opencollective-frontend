@@ -33,7 +33,7 @@ import { computeExpenseAmounts, expenseTypeSupportsItemCurrency, getSupportedCur
 import { loggedInAccountExpensePayoutFieldsFragment } from '../expenses/graphql/fragments';
 import { getCustomZodErrorMap } from '../FormikZod';
 
-export type ExpenseTypeOption = ExpenseType.INVOICE | ExpenseType.RECEIPT;
+type ExpenseTypeOption = ExpenseType.INVOICE | ExpenseType.RECEIPT;
 
 export type ExpenseItem = {
   description?: string;
@@ -92,7 +92,7 @@ export type ExpenseFormValues = {
       };
 };
 
-export type ExpenseFormik = Omit<ReturnType<typeof useFormik<ExpenseFormValues>>, 'setFieldValue'> & {
+type ExpenseFormik = Omit<ReturnType<typeof useFormik<ExpenseFormValues>>, 'setFieldValue'> & {
   setFieldValue: <F extends Path<ExpenseFormValues>>(
     field: F,
     value: PathValue<ExpenseFormValues, F>,

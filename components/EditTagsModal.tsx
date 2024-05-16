@@ -27,7 +27,7 @@ const tagStatsQuery = gql`
   }
 `;
 
-export type EditTagsModalProps = {
+type EditTagsModalProps = {
   collective: Collective;
   onClose: () => void;
 };

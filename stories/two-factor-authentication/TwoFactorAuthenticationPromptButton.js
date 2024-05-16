@@ -7,6 +7,9 @@ import { useTwoFactorAuthenticationPrompt } from '../../lib/two-factor-authentic
 import StyledButton from '../../components/StyledButton';
 import TwoFactorAuthPrompt from '../../components/two-factor-authentication/TwoFactorAuthenticationModal';
 
+// ignore unused exports default
+// used in Stories mdx
+// ts-unused-exports:disable-next-line
 export default function TwoFactorAuthenticationPromptButton() {
   const intl = useIntl();
   const prompt = useTwoFactorAuthenticationPrompt();

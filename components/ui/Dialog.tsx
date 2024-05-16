@@ -87,7 +87,7 @@ DialogDescription.displayName = DialogPrimitive.Description.displayName;
 
 // ignore unused exports
 // ui library
-
+// ts-unused-exports:disable-next-line
 export {
   Dialog,
   DialogTrigger,

@@ -6,6 +6,7 @@ import Pricing from '../components/pricing';
 
 // ignore unused exports default
 // next.js export
+// ts-unused-exports:disable-next-line
 export default class PricingPage extends Component {
   static getInitialProps({ query }) {
     return {

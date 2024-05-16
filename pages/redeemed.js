@@ -243,4 +243,5 @@ const addRedeemedPageData = graphql(redeemedPageQuery, {
 
 // ignore unused exports default
 // next.js export
+// ts-unused-exports:disable-next-line
 export default withUser(withData(addRedeemedPageData(RedeemedPage)));

@@ -1,5 +1,6 @@
 // ignore unused exports default
 // next.js export
+// ts-unused-exports:disable-next-line
 export default async function handle(req, res) {
   const { query } = req.query;
   const apiUrl = new URL(`${process.env.API_URL}/docs/search?api_key=${process.env.API_KEY}`);

@@ -17,7 +17,7 @@ import StyledInput from '../StyledInput';
 import StyledSelect from '../StyledSelect';
 import { Span } from '../Text';
 
-export type SocialLinksFormFieldProps = {
+type SocialLinksFormFieldProps = {
   value?: SocialLink[];
   touched?: boolean;
   onChange: (value: SocialLinkInput[]) => void;

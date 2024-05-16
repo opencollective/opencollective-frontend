@@ -31,6 +31,7 @@ const INTERNAL_API_V2_OPERATION_NAMES = process.env.INTERNAL_API_V2_OPERATION_NA
 
 // ignore unused exports APOLLO_ERROR_PROP_NAME
 export const APOLLO_STATE_PROP_NAME = '__APOLLO_STATE__' as const;
+// ts-unused-exports:disable-next-line
 export const APOLLO_ERROR_PROP_NAME = '__APOLLO_ERROR__' as const;
 export const APOLLO_VARIABLES_PROP_NAME = '__APOLLO_VARIABLES__' as const;
 

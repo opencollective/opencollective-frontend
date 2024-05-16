@@ -29,6 +29,7 @@ const tosQueryHelper = getSSRQueryHelpers<ReturnType<typeof getVariablesFromCont
 
 // ignore unused exports getServerSideProps
 // next.js export
+// ts-unused-exports:disable-next-line
 export const getServerSideProps = tosQueryHelper.getServerSideProps;
 
 const TermsOfFiscalSponsorship = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -60,4 +61,5 @@ TermsOfFiscalSponsorship.propTypes = {
 
 // ignore unused exports default
 // next.js export
+// ts-unused-exports:disable-next-line
 export default TermsOfFiscalSponsorship;

@@ -5,6 +5,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Router from 'next/router';
 
+// ts-unused-exports:disable-next-line
 export const mockedRouter = {
   push: () => {},
   replace: () => {},
@@ -15,6 +16,7 @@ export const mockedRouter = {
 
 Router.router = mockedRouter;
 
+// ts-unused-exports:disable-next-line
 export const withMockRouterContext = mockRouter => {
   class MockRouterContext extends React.Component {
     getChildContext() {

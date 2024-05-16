@@ -25,7 +25,7 @@ import { Select, SelectContent, SelectItem, SelectValue } from '../../../ui/Sele
 
 import { PeriodFilterCompare, PeriodFilterType, schema } from './schema';
 
-export type PeriodCompareFilterValueType = z.infer<typeof schema>;
+type PeriodCompareFilterValueType = z.infer<typeof schema>;
 
 const getAvailableTimeUnits = (value: PeriodCompareFilterValueType): TimeUnit[] => {
   const { dateTo, dateFrom } = getPeriodDates(value);

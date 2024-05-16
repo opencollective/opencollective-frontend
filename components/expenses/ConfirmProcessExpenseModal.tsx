@@ -161,7 +161,7 @@ const MessagesPerType: Record<
   },
 };
 
-export type ConfirmProcessExpenseModalType =
+type ConfirmProcessExpenseModalType =
   | 'REQUEST_RE_APPROVAL'
   | 'MARK_AS_INCOMPLETE'
   | 'MARK_AS_SPAM'
@@ -171,7 +171,7 @@ export type ConfirmProcessExpenseModalType =
   | 'HOLD'
   | 'RELEASE';
 
-export type ConfirmProcessExpenseModalProps = {
+type ConfirmProcessExpenseModalProps = {
   type: ConfirmProcessExpenseModalType;
   onClose: () => void;
   expense: Pick<Expense, 'id' | 'legacyId' | 'permissions'>;

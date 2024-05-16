@@ -11,6 +11,7 @@ export function isMulti<T>(value: z.ZodType<T, any, any>) {
 // filter schema helper
 
 // Use isNullable to allow setting null values in the query filter
+// ts-unused-exports:disable-next-line
 export function isNullable(value: z.ZodType<any, any>) {
   return z.union([
     z

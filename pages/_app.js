@@ -163,4 +163,6 @@ class OpenCollectiveFrontendApp extends App {
 
 // ignore unused exports default
 // next.js export
+// ts-unused-exports:disable-next-line
+// ts-unused-exports:disable-next-line
 export default withTwoFactorAuthentication(OpenCollectiveFrontendApp);

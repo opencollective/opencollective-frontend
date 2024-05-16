@@ -164,7 +164,7 @@ DropdownMenuShortcut.displayName = 'DropdownMenuShortcut';
 
 // ignore unused exports
 // ui library
-
+// ts-unused-exports:disable-next-line
 export {
   DropdownMenu,
   DropdownMenuTrigger,

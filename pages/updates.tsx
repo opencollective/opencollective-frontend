@@ -130,10 +130,12 @@ const updatesPageQueryHelper = getSSRQueryHelpers<
 
 // ignore unused exports getServerSideProps
 // next.js export
+// ts-unused-exports:disable-next-line
 export const getServerSideProps = updatesPageQueryHelper.getServerSideProps;
 
 // ignore unused exports default
 // next.js export
+// ts-unused-exports:disable-next-line
 export default function UpdatesPage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
   const { LoggedInUser } = useLoggedInUser();

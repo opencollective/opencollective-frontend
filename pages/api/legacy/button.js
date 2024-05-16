@@ -5,6 +5,7 @@ import { template } from 'lodash';
 
 // ignore unused exports default
 // next.js export
+// ts-unused-exports:disable-next-line
 export default function handler(req, res) {
   const content = fs.readFileSync(path.join(process.cwd(), 'server/templates/button.js'), 'utf8');
   const compiled = template(content, { interpolate: /{{([\s\S]+?)}}/g });

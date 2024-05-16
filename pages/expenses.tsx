@@ -256,10 +256,12 @@ const expensePageQueryHelpers = getSSRQueryHelpers<ReturnType<typeof getVariable
 
 // ignore unused exports getServerSideProps
 // next.js export
+// ts-unused-exports:disable-next-line
 export const getServerSideProps = expensePageQueryHelpers.getServerSideProps;
 
 // ignore unused exports default
 // next.js export
+// ts-unused-exports:disable-next-line
 export default function ExpensesPage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const intl = useIntl();
   const router = useRouter();

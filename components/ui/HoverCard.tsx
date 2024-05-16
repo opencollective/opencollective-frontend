@@ -26,5 +26,7 @@ const HoverCardContent = React.forwardRef<
 ));
 HoverCardContent.displayName = HoverCardPrimitive.Content.displayName;
 
-export type HoverCardContentProps = React.ComponentProps<typeof HoverCardPrimitive.Content>;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+type HoverCardContentProps = React.ComponentProps<typeof HoverCardPrimitive.Content>;
+
 export { HoverCard, HoverCardTrigger, HoverCardContent };

@@ -24,13 +24,6 @@ import { Button } from '../ui/Button';
 
 import { ExpenseForm } from './useExpenseForm';
 
-export type ExpenseItem = {
-  description: string;
-  date: string;
-  amount: { valueInCents: number; currency: string };
-  url?: string;
-};
-
 type ExpenseItemsFormProps = {
   className?: string;
   form: ExpenseForm;
