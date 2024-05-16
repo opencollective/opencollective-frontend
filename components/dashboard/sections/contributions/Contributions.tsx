@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { compact, toNumber } from 'lodash';
+import { compact } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -29,12 +29,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../../../ui/DropdownMenu';
-import { Pagination } from '../../../ui/Pagination';
 import { TableActionsButton } from '../../../ui/Table';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import { Filterbar } from '../../filters/Filterbar';
+import { Pagination } from '../../filters/Pagination';
 import { DashboardSectionProps } from '../../types';
 
 import { FilterMeta, filters, OrderTypeFilter, schema, toVariables } from './filters';
@@ -399,7 +399,6 @@ const Contributions = ({ accountSlug, direction }: ContributionsProps) => {
 
   const {
     data,
-    previousData,
     loading: queryLoading,
     error: queryError,
   } = useQuery(dashboardContributionsQuery, {
@@ -435,10 +434,6 @@ const Contributions = ({ accountSlug, direction }: ContributionsProps) => {
       }
     }
   }, [router, selectedOrders]);
-
-  const { limit, offset } = queryFilter.values;
-  const pages = Math.ceil(((data || previousData)?.account?.orders.totalCount || 1) / limit);
-  const currentPage = toNumber(offset + limit) / limit;
 
   const isIncoming = direction === 'INCOMING';
   const loading = metadataLoading || queryLoading;
@@ -494,11 +489,7 @@ const Contributions = ({ accountSlug, direction }: ContributionsProps) => {
             mobileTableView
             nbPlaceholders={nbPlaceholders}
           />
-          <Pagination
-            totalPages={pages}
-            page={currentPage}
-            onChange={page => queryFilter.setFilter('offset', (page - 1) * limit)}
-          />
+          <Pagination queryFilter={queryFilter} total={data?.account?.orders.totalCount} />
         </div>
       )}
       {editOrder.order && (

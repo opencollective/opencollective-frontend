@@ -14,12 +14,12 @@ import i18nHostApplicationStatus from '../../../../lib/i18n/host-application-sta
 import { sortSelectOptions } from '../../../../lib/utils';
 
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
-import Pagination from '../../../Pagination';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { orderByFilter } from '../../filters/OrderFilter';
+import { Pagination } from '../../filters/Pagination';
 import { searchFilter } from '../../filters/SearchFilter';
 import { DashboardSectionProps } from '../../types';
 
@@ -102,7 +102,7 @@ const HostApplications = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     views,
   });
 
-  const { data, error, loading, variables } = useQuery(hostApplicationsQuery, {
+  const { data, error, loading } = useQuery(hostApplicationsQuery, {
     variables: { hostSlug, ...queryFilter.variables },
     fetchPolicy: 'cache-and-network',
     context: API_V2_CONTEXT,
@@ -149,14 +149,7 @@ const HostApplications = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
             loading={loading}
             openApplication={application => updateQuery(router, { accountId: application.account.legacyId })}
           />
-          <div className="mt-16 flex justify-center">
-            <Pagination
-              total={hostApplications?.totalCount}
-              limit={variables.limit}
-              offset={variables.offset}
-              ignoredQueryParams={ROUTE_PARAMS}
-            />
-          </div>
+          <Pagination queryFilter={queryFilter} total={hostApplications?.totalCount} />
         </React.Fragment>
       )}
 

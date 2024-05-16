@@ -28,7 +28,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../../ui/DropdownMenu';
-import { Pagination } from '../../ui/Pagination';
 import { TableActionsButton } from '../../ui/Table';
 import OrganizationDetails from '../../vendors/OrganizationDetails';
 import { setVendorArchiveMutation, vendorFieldFragment, VendorFieldsFragment } from '../../vendors/queries';
@@ -37,6 +36,7 @@ import VendorForm from '../../vendors/VendorForm';
 import DashboardHeader from '../DashboardHeader';
 import { EmptyResults } from '../EmptyResults';
 import { Filterbar } from '../filters/Filterbar';
+import { Pagination } from '../filters/Pagination';
 import { searchFilter } from '../filters/SearchFilter';
 import { DashboardSectionProps } from '../types';
 
@@ -326,9 +326,6 @@ const Vendors = ({ accountSlug }: DashboardSectionProps) => {
 
   const host = (data || previousData)?.account?.['host'];
 
-  const pages = Math.ceil((host?.vendors?.totalCount || 1) / PAGE_SIZE);
-  const currentPage = ((queryFilter.values.offset || 0) + PAGE_SIZE) / PAGE_SIZE;
-
   const isDrawerOpen = Boolean(vendorDetail || createEditVendor?.['id'] || orgDetail);
   const loading = queryLoading;
   const error = queryError;
@@ -392,11 +389,7 @@ const Vendors = ({ accountSlug }: DashboardSectionProps) => {
               openVendor={setVendorDetail}
               handleSetArchive={handleSetArchive}
             />
-            <Pagination
-              totalPages={pages}
-              page={currentPage}
-              onChange={page => queryFilter.setFilter('offset', (page - 1) * PAGE_SIZE)}
-            />
+            <Pagination queryFilter={queryFilter} total={host?.vendors?.totalCount} />
           </React.Fragment>
         )}
       </div>

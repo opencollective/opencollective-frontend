@@ -23,9 +23,9 @@ import { Box, Flex } from '../components/Grid';
 import Header from '../components/Header';
 import Link from '../components/Link';
 import Footer from '../components/navigation/Footer';
+import Pagination from '../components/Pagination';
 import StyledButton from '../components/StyledButton';
 import { H1, P } from '../components/Text';
-import { Pagination } from '../components/ui/Pagination';
 import Updates from '../components/Updates';
 import UpdateFilters from '../components/updates/UpdateFilters';
 
@@ -225,13 +225,14 @@ export default function UpdatesPage(props: InferGetServerSidePropsType<typeof ge
               nbLoadingPlaceholders={UPDATES_PER_PAGE}
             />
             {updates && (
-              <Box mt={4}>
+              <div className="mt-4 flex justify-center">
                 <Pagination
-                  totalPages={Math.ceil(updates.totalCount / UPDATES_PER_PAGE)}
-                  page={updates.offset / updates.limit + 1}
-                  onChange={page => updateQuery(router, { offset: (page - 1) * updates.limit })}
+                  total={updates.totalCount}
+                  limit={updates.limit}
+                  offset={updates.offset}
+                  onPageChange={page => updateQuery(router, { offset: (page - 1) * updates.limit })}
                 />
-              </Box>
+              </div>
             )}
           </Box>
         </div>

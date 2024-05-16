@@ -13,14 +13,13 @@ import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
 import { accountHoverCardFields } from '../../../AccountHoverCard';
 import { confirmContributionFieldsFragment } from '../../../ContributionConfirmationModal';
-import { Flex } from '../../../Grid';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import OrdersList from '../../../orders/OrdersList';
-import Pagination from '../../../Pagination';
 import { Button } from '../../../ui/Button';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import { Filterbar } from '../../filters/Filterbar';
+import { Pagination } from '../../filters/Pagination';
 import { DashboardSectionProps } from '../../types';
 
 import CreatePendingOrderModal from './CreatePendingOrderModal';
@@ -181,8 +180,6 @@ const hostOrdersMetaDataQuery = gql`
   }
 `;
 
-const ROUTE_PARAMS = ['hostCollectiveSlug', 'collectiveSlug', 'view', 'slug', 'section'];
-
 const HostFinancialContributions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const intl = useIntl();
   const [showCreatePendingOrderModal, setShowCreatePendingOrderModal] = React.useState(false);
@@ -233,7 +230,6 @@ const HostFinancialContributions = ({ accountSlug: hostSlug }: DashboardSectionP
     variables: { hostSlug, ...queryFilter.variables },
     context: API_V2_CONTEXT,
   });
-
   const { LoggedInUser } = useLoggedInUser();
   const prevLoggedInUser = usePrevious(LoggedInUser);
 
@@ -294,14 +290,7 @@ const HostFinancialContributions = ({ accountSlug: hostSlug }: DashboardSectionP
             showPlatformTip
             host={data?.host}
           />
-          <Flex mt={5} justifyContent="center">
-            <Pagination
-              total={data?.orders?.totalCount}
-              limit={variables.limit}
-              offset={variables.offset}
-              ignoredQueryParams={ROUTE_PARAMS}
-            />
-          </Flex>
+          <Pagination queryFilter={queryFilter} total={data?.orders?.totalCount} />
         </React.Fragment>
       )}
     </div>

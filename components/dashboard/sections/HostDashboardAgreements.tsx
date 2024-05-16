@@ -15,14 +15,13 @@ import AgreementDrawer from '../../agreements/AgreementDrawer';
 import AgreementsTable from '../../agreements/AgreementsTable';
 import { AGREEMENT_VIEW_FIELDS_FRAGMENT } from '../../agreements/fragments';
 import FilesViewerModal from '../../FilesViewerModal';
-import { Flex } from '../../Grid';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
-import Pagination from '../../Pagination';
 import { Button } from '../../ui/Button';
 import DashboardHeader from '../DashboardHeader';
 import { EmptyResults } from '../EmptyResults';
 import { Filterbar } from '../filters/Filterbar';
 import { hostedAccountFilter } from '../filters/HostedAccountFilter';
+import { Pagination } from '../filters/Pagination';
 import { DashboardSectionProps } from '../types';
 
 const hostDashboardAgreementsQuery = gql`
@@ -63,13 +62,6 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>, FilterMeta> = {
   account: hostedAccountFilter.filter,
 };
 
-const IGNORED_QUERY_PARAMS = ['slug', 'section'];
-
-const hasPagination = (data, queryVariables): boolean => {
-  const totalCount = data?.host?.hostedAccountAgreements?.totalCount;
-  return Boolean(queryVariables.offset || (totalCount && totalCount > NB_AGREEMENTS_DISPLAYED));
-};
-
 const HostDashboardAgreements = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const [agreementDrawerOpen, setAgreementDrawerOpen] = React.useState(false);
@@ -83,7 +75,7 @@ const HostDashboardAgreements = ({ accountSlug: hostSlug }: DashboardSectionProp
     meta: { hostSlug },
   });
 
-  const { data, previousData, error, variables, loading, refetch } = useQuery(hostDashboardAgreementsQuery, {
+  const { data, error, variables, loading, refetch } = useQuery(hostDashboardAgreementsQuery, {
     variables: { hostSlug, ...queryFilter.variables },
     context: API_V2_CONTEXT,
   });
@@ -137,19 +129,7 @@ const HostDashboardAgreements = ({ accountSlug: hostSlug }: DashboardSectionProp
               setAgreementInDrawer(agreement);
             }}
           />
-
-          <Flex my={4} justifyContent="center">
-            {hasPagination(data || previousData, variables) && (
-              <Pagination
-                variant="input"
-                offset={variables.offset}
-                limit={variables.limit}
-                total={(data || previousData)?.host?.hostedAccountAgreements?.totalCount || 0}
-                ignoredQueryParams={IGNORED_QUERY_PARAMS}
-                isDisabled={loading}
-              />
-            )}
-          </Flex>
+          <Pagination queryFilter={queryFilter} total={data?.host?.hostedAccountAgreements?.totalCount} />
         </React.Fragment>
       )}
       <AgreementDrawer
