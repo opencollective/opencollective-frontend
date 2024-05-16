@@ -134,6 +134,7 @@ class PayWithPaypalButton extends Component<PayWithPaypalButtonProps, { isLoadin
         this.props.onError?.({
           message: this.props.intl.formatMessage({
             defaultMessage: 'There was an error while initializing the PayPal checkout',
+            id: 'PyJNQd',
           }),
         }),
       intent: null,

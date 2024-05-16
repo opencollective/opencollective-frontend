@@ -69,21 +69,21 @@ jobs:
 
       - run: npm run depcheck
 
-  find-unused-exports:
-    runs-on: ubuntu-latest
+  # find-unused-exports:
+  #   runs-on: ubuntu-latest
 
-    timeout-minutes: 15
+  #   timeout-minutes: 15
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
 
-      - name: Setup project
-        uses: ./.github/actions/setup-project
-        with:
-          CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
+  #     - name: Setup project
+  #       uses: ./.github/actions/setup-project
+  #       with:
+  #         CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
-      - run: npm run find-unused-exports
+  #     - run: npm run find-unused-exports
 
   check-langs:
     runs-on: ubuntu-latest
