@@ -961,6 +961,7 @@
   "createCollective.form.nameLabel": "Nazwa zbiórki",
   "createCollective.form.slugLabel": "Set your profile URL",
   "createCollective.form.suggestedLabel": "Polecane",
+  "createcollective.opensource.LogInAndVerifyGithub": "Sign in and verify using GitHub",
   "createcollective.opensource.ManualVerification": "Poproś o ręczną weryfikację",
   "createcollective.opensource.p1": "Tworzysz oprogramowanie. Nie chcesz się martwić o tworzenie osoby prawnej lub konta bankowego, podatków, faktur i kilku innych administratorów. Zajmijmy się tym wszystkim, abyście mogli się skupić na swoim projekcie.",
   "createcollective.opensource.p2": "Stworzyliśmy {osclink} organizację ochronną nienastawioną na zysk (non-profit), aby służyć społeczności open source. Aby dołączyć, musisz spełnić nasze {criterialink}.",
