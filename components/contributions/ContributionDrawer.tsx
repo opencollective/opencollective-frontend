@@ -499,22 +499,24 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                               }}
                             />
                           </div>
-                          <div>
-                            <FormattedMessage
-                              defaultMessage="(Net received by collective: {amount})"
-                              id="qxLWOL"
-                              values={{
-                                amount: (
-                                  <FormattedMoneyAmount
-                                    showCurrencyCode={false}
-                                    amountStyles={{ letterSpacing: 0 }}
-                                    currency={query.data.order.amount.currency}
-                                    amount={query.data.order.amount.valueInCents}
-                                  />
-                                ),
-                              }}
-                            />
-                          </div>
+                          {query.data.order.platformTipAmount?.valueInCents > 0 && (
+                            <div>
+                              <FormattedMessage
+                                defaultMessage="Includes Platform Tip: {amount}"
+                                id="g1BbRX"
+                                values={{
+                                  amount: (
+                                    <FormattedMoneyAmount
+                                      showCurrencyCode={false}
+                                      amountStyles={{ letterSpacing: 0 }}
+                                      currency={query.data.order.platformTipAmount.currency}
+                                      amount={query.data.order.platformTipAmount.valueInCents}
+                                    />
+                                  ),
+                                }}
+                              />
+                            </div>
+                          )}
                         </React.Fragment>
                       )}
                     </div>
@@ -567,20 +569,22 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
           )}
         </div>
         <SheetFooter className="flex px-8 py-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="xs">
-                <FormattedMessage defaultMessage="More actions" id="S8/4ZI" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {actions?.primary?.map(action => <DropdownActionItem key={action.label} action={action} />)}
+          {actions?.primary.length > 0 && actions?.secondary.length > 0 && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="xs">
+                  <FormattedMessage defaultMessage="More actions" id="S8/4ZI" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {actions?.primary?.map(action => <DropdownActionItem key={action.label} action={action} />)}
 
-              {actions?.primary.length > 0 && actions?.secondary.length > 0 && <DropdownMenuSeparator />}
+                {actions?.primary.length > 0 && actions?.secondary.length > 0 && <DropdownMenuSeparator />}
 
-              {actions?.secondary?.map(action => <DropdownActionItem key={action.label} action={action} />)}
-            </DropdownMenuContent>
-          </DropdownMenu>
+                {actions?.secondary?.map(action => <DropdownActionItem key={action.label} action={action} />)}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </SheetFooter>
       </SheetContent>
     </Sheet>
