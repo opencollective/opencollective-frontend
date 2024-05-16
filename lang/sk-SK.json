@@ -961,6 +961,7 @@
   "createCollective.form.nameLabel": "Názov Kolektívu",
   "createCollective.form.slugLabel": "Set your profile URL",
   "createCollective.form.suggestedLabel": "Navrhované",
+  "createcollective.opensource.LogInAndVerifyGithub": "Sign in and verify using GitHub",
   "createcollective.opensource.ManualVerification": "Žiadosť o manuálne overenie",
   "createcollective.opensource.p1": "Vytvárate softvér. Nechcete sa starať o vytvorenie právnickej osoby alebo bankového účtu, dane, faktúry a množstvo ďalších administratívnych úkonov. Nechajte to všetko na nás, aby ste sa mohli sústrediť na váš projekt.",
   "createcollective.opensource.p2": "Vytvorili sme {osclink}, neziskovú zastrešujúcu organizáciu, ktorá slúži komunite open source. Ak by ste sa chceli stať jej členom, potrebujete spĺňať naše {criterialink}.",

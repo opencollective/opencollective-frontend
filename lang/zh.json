@@ -961,6 +961,7 @@
   "createCollective.form.nameLabel": "Collective 名称",
   "createCollective.form.slugLabel": "设置你的资料链接",
   "createCollective.form.suggestedLabel": "已建议",
+  "createcollective.opensource.LogInAndVerifyGithub": "Sign in and verify using GitHub",
   "createcollective.opensource.ManualVerification": "请求手动验证",
   "createcollective.opensource.p1": "你正在创建软件。但不想为创建法人实体或银行账户、税务、发票和其他一系列行政事务操心。让我们来处理所有这些事务，这样你就可以专注于项目。",
   "createcollective.opensource.p2": "We have created the {osclink}, a non-profit umbrella organization, to serve the open source community. To join, you need to meet our {criterialink}.",

@@ -961,6 +961,7 @@
   "createCollective.form.nameLabel": "Название коллектива",
   "createCollective.form.slugLabel": "Установите ссылку на свой профиль",
   "createCollective.form.suggestedLabel": "Рекомендуется",
+  "createcollective.opensource.LogInAndVerifyGithub": "Sign in and verify using GitHub",
   "createcollective.opensource.ManualVerification": "Запросить ручную проверку",
   "createcollective.opensource.p1": "Вы создаете программное обеспечение. Вы не хотите беспокоиться о создании юридического лица или банковского счета, налогах, счетах и куче других административных вопросов. Позвольте нам позаботиться обо всем этом, чтобы вы могли сосредоточиться на своем проекте.",
   "createcollective.opensource.p2": "We have created the {osclink}, a non-profit umbrella organization, to serve the open source community. To join, you need to meet our {criterialink}.",

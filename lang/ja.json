@@ -961,6 +961,7 @@
   "createCollective.form.nameLabel": "コレクティブ名",
   "createCollective.form.slugLabel": "Set your profile URL",
   "createCollective.form.suggestedLabel": "提案",
+  "createcollective.opensource.LogInAndVerifyGithub": "Sign in and verify using GitHub",
   "createcollective.opensource.ManualVerification": "Request manual verification",
   "createcollective.opensource.p1": "あなたはソフトウェアを開発しています。 法人や銀行口座、税金、請求書などの作成、その他さまざまな運営業務について頭を悩ませたくはありません。 それらはすべて私たちにお任せください。そうすれば、あなたはご自身のプロジェクトに集中することができます。",
   "createcollective.opensource.p2": "私たちは、オープンソースコミュニティにサービスを提供するために、非営利の包括的な組織である{osclink}を設立しました。この組織に参加するには、{criterialink}を満たしている必要があります。",

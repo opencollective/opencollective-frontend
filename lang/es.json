@@ -961,6 +961,7 @@
   "createCollective.form.nameLabel": "Nombre del Colectivo",
   "createCollective.form.slugLabel": "Establece tu URL de perfil",
   "createCollective.form.suggestedLabel": "Sugerido",
+  "createcollective.opensource.LogInAndVerifyGithub": "Sign in and verify using GitHub",
   "createcollective.opensource.ManualVerification": "Solicitar verificación manual",
   "createcollective.opensource.p1": "Estás creando un software. No te preocupes por crear una entidad legal o una cuenta bancaria, impuestos, facturas y configuraciones. Déjanos encargarnos de eso para que puedas concentrarte en tu proyecto.",
   "createcollective.opensource.p2": "Hemos creado {osclink}, una organización sin ánimo de lucro, para servir a la comunidad del código abierto. Para unirte, tienes que cumplir nuestros {criterialink}.",
