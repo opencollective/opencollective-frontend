@@ -1,33 +1,33 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import { MutationFunction } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { Email } from '@styled-icons/material/Email';
 import { get } from 'lodash';
+import { ArrowLeft } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import { gqlV1 } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import { Mutation, MutationConfirmEmailArgs } from '../lib/graphql/types/v2/graphql';
+import { UserContextProps } from '../lib/hooks/useLoggedInUser';
 
 import Container from '../components/Container';
 import { Box } from '../components/Grid';
+import Link from '../components/Link';
 import MessageBox from '../components/MessageBox';
 import Page from '../components/Page';
+import { Button } from '../components/ui/Button';
 import { withUser } from '../components/UserProvider';
 
-class ConfirmEmailPage extends React.Component {
+class ConfirmEmailPage extends React.Component<{
+  token: string;
+  loadingLoggedInUser: boolean;
+  confirmEmail: MutationFunction<Mutation['confirmEmail'], MutationConfirmEmailArgs>;
+  refetchLoggedInUser: UserContextProps['refetchLoggedInUser'];
+  login: UserContextProps['login'];
+}> {
   static getInitialProps({ query }) {
     return { token: query.token };
   }
-
-  static propTypes = {
-    /** Token to validate, given in URL */
-    token: PropTypes.string.isRequired,
-    // from graphql
-    confirmUserEmail: PropTypes.func.isRequired,
-    // from withUser
-    loadingLoggedInUser: PropTypes.bool.isRequired,
-    // from withUser
-    refetchLoggedInUser: PropTypes.func.isRequired,
-  };
 
   state = { status: 'submitting', error: null, validationTriggered: false };
 
@@ -50,8 +50,13 @@ class ConfirmEmailPage extends React.Component {
   async triggerEmailValidation() {
     try {
       this.setState({ validationTriggered: true });
-      await this.props.confirmUserEmail({ variables: { token: this.props.token } });
-      setTimeout(this.props.refetchLoggedInUser, 3000);
+      const result = await this.props.confirmEmail({ variables: { token: this.props.token } });
+      if (result.data.sessionToken) {
+        await this.props.login(result.data.sessionToken);
+      } else {
+        await this.props.refetchLoggedInUser();
+      }
+
       this.setState({ status: 'success' });
     } catch (e) {
       const error = get(e, 'graphQLErrors.0') || e;
@@ -86,17 +91,25 @@ class ConfirmEmailPage extends React.Component {
             <Email size={42} color={this.getIconColor(status)} />
           </Box>
           {status === 'submitting' && (
-            <MessageBox type="info" isLoading>
+            <MessageBox fontSize="16px" type="info" isLoading>
               <FormattedMessage id="confirmEmail.validating" defaultMessage="Validating your email address..." />
             </MessageBox>
           )}
           {status === 'success' && (
-            <MessageBox mb={3} type="success" withIcon>
-              <FormattedMessage id="confirmEmail.sucess" defaultMessage="Your email has been changed" />
-            </MessageBox>
+            <React.Fragment>
+              <MessageBox fontSize="16px" mb={4} type="success" withIcon>
+                <FormattedMessage id="confirmEmail.sucess" defaultMessage="Your email has been changed" />
+              </MessageBox>
+              <Link href="/dashboard">
+                <Button variant="outline">
+                  <ArrowLeft size={16} />
+                  <FormattedMessage defaultMessage="Go back to your Dashboard" id="ReeYyf" />
+                </Button>
+              </Link>
+            </React.Fragment>
           )}
           {status === 'error' && (
-            <MessageBox type="error" withIcon>
+            <MessageBox fontSize="16px" type="error" withIcon>
               {error.extensions?.code === 'INVALID_TOKEN' ? (
                 <FormattedMessage
                   id="confirmEmail.error.InvalidToken"
@@ -113,20 +126,25 @@ class ConfirmEmailPage extends React.Component {
   }
 }
 
-const confirmUserEmailMutation = gqlV1/* GraphQL */ `
-  mutation ConfirmUserEmail($token: String!) {
-    confirmUserEmail(token: $token) {
-      id
-      email
-      emailWaitingForValidation
+const confirmUserEmailMutation = gql`
+  mutation ConfirmEmail($token: String!) {
+    confirmEmail(token: $token) {
+      sessionToken
+      individual {
+        id
+        email
+      }
     }
   }
 `;
 
 const addConfirmUserEmailMutation = graphql(confirmUserEmailMutation, {
-  name: 'confirmUserEmail',
+  name: 'confirmEmail',
+  options: {
+    context: API_V2_CONTEXT,
+  },
 });
 
 // ignore unused exports default
 // next.js export
-export default withUser(addConfirmUserEmailMutation(ConfirmEmailPage));
+export default addConfirmUserEmailMutation(withUser(ConfirmEmailPage));
