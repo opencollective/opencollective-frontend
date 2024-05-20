@@ -152,8 +152,7 @@ describe('Recurring contributions', () => {
   it('Can cancel an active contribution with reasons displayed in modal, "other" displays text area', () => {
     cy.clearInbox();
     cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/outgoing-contributions` }).then(() => {
-      cy.getByDataCy('contribution-admin-menu-trigger').first().click();
-      cy.getByDataCy('recurring-contribution-menu').should('exist');
+      cy.get('tbody tr td button').first().click();
       cy.getByDataCy('recurring-contribution-menu-cancel-option').click();
       cy.getByDataCy('cancel-order-modal').should('exist');
       cy.getByDataCy('cancel-order-modal').contains('Why are you cancelling your subscription today? 🥺');

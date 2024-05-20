@@ -442,6 +442,11 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
             canMarkAsPaid
             canMarkAsExpired
           }
+          activities {
+            nodes {
+              id
+            }
+          }
         }
       }
     `,
@@ -899,7 +904,8 @@ const getContributionActions: (opts: GetContributionActionsOptions) => GetAction
       isAdminOfOrder &&
       ![OrderStatus.CANCELLED, OrderStatus.PAID, OrderStatus.REFUNDED, OrderStatus.REJECTED].includes(order.status) &&
       order.frequency !== ContributionFrequency.ONETIME;
-    const canMarkAsCompleted = order.status === OrderStatus.PENDING && order.permissions.canMarkAsPaid;
+    const canMarkAsCompleted =
+      [OrderStatus.PENDING, OrderStatus.EXPIRED].includes(order.status) && order.permissions.canMarkAsPaid;
     const canMarkAsExpired = order.status === OrderStatus.PENDING && order.permissions.canMarkAsExpired;
 
     const canDoActions = [canUpdateActiveOrder, canResume, canCancel, canMarkAsCompleted, canMarkAsExpired];
@@ -936,6 +942,7 @@ const getContributionActions: (opts: GetContributionActionsOptions) => GetAction
       actions.primary.push({
         label: opts.intl.formatMessage({ defaultMessage: 'Mark as completed', id: 'order.markAsCompleted' }),
         onClick: () => opts.onMarkAsCompletedClick(order),
+        'data-cy': 'MARK_AS_PAID-button',
       });
     }
 
@@ -943,6 +950,7 @@ const getContributionActions: (opts: GetContributionActionsOptions) => GetAction
       actions.primary.push({
         label: opts.intl.formatMessage({ defaultMessage: 'Mark as expired', id: 'order.markAsExpired' }),
         onClick: () => opts.onMarkAsExpiredClick(order),
+        'data-cy': 'MARK_AS_EXPIRED-button',
       });
     }
 

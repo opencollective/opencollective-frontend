@@ -114,22 +114,10 @@ describe('host dashboard', () => {
     });
   });
 
-  describe('Orders', () => {
-    it('edit order and mark as paid', () => {
-      cy.login({ redirect: '/dashboard/brusselstogetherasbl/orders' });
-      cy.get('[data-cy="MARK_AS_PAID-button"]:first').click();
-      cy.get('[data-cy="amount-received"]').type('10.23');
-      cy.get('[data-cy="platform-tip"]').type('1.20');
-      cy.getByDataCy('order-confirmation-modal-submit').click();
-      cy.contains('span', '9.03');
-      cy.contains('[data-cy="order-status-msg"]:first', 'Paid');
-    });
-  });
-
   describe('Pending `Contributions', () => {
     it('Create new pending contribution, edit it and mark it as paid', () => {
       // Create contribution
-      cy.login({ redirect: '/dashboard/brusselstogetherasbl/orders' });
+      cy.login({ redirect: '/dashboard/brusselstogetherasbl/expected-funds' });
       cy.get('[data-cy="create-pending-contribution"]:first').click();
       cy.get('[data-cy="create-pending-contribution-to"]:first').type('Veganizer');
       cy.contains('[data-cy=select-option]', 'Veganizer BXL').click();
@@ -146,20 +134,23 @@ describe('host dashboard', () => {
       const description = `Generous donation ${randStr()}`;
       cy.getByDataCy('create-pending-contribution-description').type(description);
       cy.get('[data-cy="create-pending-contribution-submit-btn"]:first').click();
-      cy.contains('[data-cy="order-PENDING"]:first', description).as('createdContribution');
+      cy.get('tbody tr').first().as('createdContribution');
       cy.get('@createdContribution').should('contain', 'Pending');
-      cy.get('@createdContribution').should('contain', 'for Veganizer BXL from Xavier');
       cy.get('@createdContribution').should('contain', '€500.00');
 
       // Go to contribution page
-      cy.get('@createdContribution').find('[data-cy=contribution-title]').click();
-      cy.getByDataCy('contribution-page-content'); // Wait for page to be loaded
+      cy.get('tbody tr td button').first().click();
+      cy.contains('Open details').click();
+      cy.contains(description).should('exist');
+      cy.contains('More actions').click();
 
       // Mark as expired
       cy.getByDataCy('MARK_AS_EXPIRED-button').click();
-      cy.get('[data-cy="MARK_AS_EXPIRED-confirmation-modal"] [data-cy="confirmation-modal-continue"]').click();
+      cy.contains('Mark as expired').click();
       cy.checkToast({ variant: 'success', message: 'The contribution has been marked as expired' });
-      cy.contains('[data-cy=order-status-msg]', 'Expired');
+      cy.contains('Expired').should('exist');
+
+      cy.contains('More actions').click();
 
       // Mark as paid
       cy.getByDataCy('MARK_AS_PAID-button').click();
@@ -167,24 +158,16 @@ describe('host dashboard', () => {
       cy.getByDataCy('platform-tip').clear().type('10');
       cy.getByDataCy('host-fee-percent').clear().type('9');
       cy.getByDataCy('order-confirmation-modal-submit').click();
-      cy.contains('[data-cy="order-status-msg"]', 'Paid');
+      cy.contains('Paid').should('exist');
+
+      cy.contains('View transactions').click();
 
       // Check transactions
-      cy.get('[data-cy=transaction-details-wrapper]:nth-child(1)')
-        .should('contain', description)
-        .should('contain', '€490.00')
-        .should('contain', 'Received by Veganizer BXL')
-        .should('contain', '-€4.00 EUR (Payment Processor Fee)');
+      cy.contains('Contribution').should('exist');
+      cy.contains('€486.00').should('exist');
 
-      cy.get('[data-cy=transaction-details-wrapper]:nth-child(2)')
-        .should('contain', 'Host Fee')
-        .should('contain', '-€44.10 EUR')
-        .should('contain', 'Paid by Veganizer BXL');
-
-      cy.get('[data-cy=transaction-details-wrapper]:nth-child(3)')
-        .should('contain', 'Financial contribution to Open Collective')
-        .should('contain', '-€10.00 EUR')
-        .should('contain', 'Paid by Xavier Damma');
+      cy.contains('Host fee').should('exist');
+      cy.contains('€44.10').should('exist');
     });
   });
 

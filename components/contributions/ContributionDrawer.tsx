@@ -568,7 +568,7 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
           )}
         </div>
         <SheetFooter className="flex px-8 py-2">
-          {actions?.primary.length > 0 && actions?.secondary.length > 0 && (
+          {(actions?.primary.length > 0 || actions?.secondary.length > 0) && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="xs">
@@ -624,7 +624,7 @@ function getTransactionsUrl(LoggedInUser: LoggedInUserType, order: ContributionD
   if (LoggedInUser.isSelf(order.fromAccount)) {
     route = getDashboardRoute(order.fromAccount, 'transactions');
   } else if ('host' in order.toAccount && LoggedInUser.canSeeAdminPanel(order.toAccount.host)) {
-    route = getDashboardRoute(order.toAccount.host, 'transactions');
+    route = getDashboardRoute(order.toAccount.host, 'host-transactions');
   } else if (LoggedInUser.canSeeAdminPanel(order.toAccount)) {
     route = getDashboardRoute(order.toAccount, 'transactions');
   }
