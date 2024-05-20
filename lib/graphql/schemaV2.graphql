@@ -574,11 +574,6 @@ interface Account {
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
-
-    """
-    Only return orders that are or were expected funds.
-    """
-    onlyExpectedFunds: Boolean
     expectedFundsFilter: ExpectedFundsFilter
 
     """
@@ -2244,11 +2239,6 @@ type Host implements Account & AccountWithContributions {
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
-
-    """
-    Only return orders that are or were expected funds.
-    """
-    onlyExpectedFunds: Boolean
     expectedFundsFilter: ExpectedFundsFilter
 
     """
@@ -3518,11 +3508,12 @@ enum AccountOrdersFilter {
 }
 
 """
-Expected funds filter (MANUAL or PENDING)
+Expected funds filter (ALL_EXPECTED_FUNDS, ONLY_PENDING, ONLY_MANUAL)
 """
 enum ExpectedFundsFilter {
-  PENDING
-  MANUAL
+  ALL_EXPECTED_FUNDS
+  ONLY_PENDING
+  ONLY_MANUAL
 }
 
 """
@@ -4558,11 +4549,6 @@ type PaymentMethod {
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
-
-    """
-    Only return orders that are or were expected funds.
-    """
-    onlyExpectedFunds: Boolean
     expectedFundsFilter: ExpectedFundsFilter
 
     """
@@ -7401,11 +7387,6 @@ type Bot implements Account {
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
-
-    """
-    Only return orders that are or were expected funds.
-    """
-    onlyExpectedFunds: Boolean
     expectedFundsFilter: ExpectedFundsFilter
 
     """
@@ -8153,11 +8134,6 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
-
-    """
-    Only return orders that are or were expected funds.
-    """
-    onlyExpectedFunds: Boolean
     expectedFundsFilter: ExpectedFundsFilter
 
     """
@@ -9358,11 +9334,6 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
-
-    """
-    Only return orders that are or were expected funds.
-    """
-    onlyExpectedFunds: Boolean
     expectedFundsFilter: ExpectedFundsFilter
 
     """
@@ -10345,11 +10316,6 @@ type Individual implements Account {
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
-
-    """
-    Only return orders that are or were expected funds.
-    """
-    onlyExpectedFunds: Boolean
     expectedFundsFilter: ExpectedFundsFilter
 
     """
@@ -11303,11 +11269,6 @@ type Organization implements Account & AccountWithContributions {
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
-
-    """
-    Only return orders that are or were expected funds.
-    """
-    onlyExpectedFunds: Boolean
     expectedFundsFilter: ExpectedFundsFilter
 
     """
@@ -12155,11 +12116,6 @@ type Vendor implements Account & AccountWithContributions {
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
-
-    """
-    Only return orders that are or were expected funds.
-    """
-    onlyExpectedFunds: Boolean
     expectedFundsFilter: ExpectedFundsFilter
 
     """
@@ -13244,11 +13200,6 @@ type Query {
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
-
-    """
-    Only return orders that are or were expected funds.
-    """
-    onlyExpectedFunds: Boolean
     expectedFundsFilter: ExpectedFundsFilter
 
     """
@@ -15480,11 +15431,6 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
-
-    """
-    Only return orders that are or were expected funds.
-    """
-    onlyExpectedFunds: Boolean
     expectedFundsFilter: ExpectedFundsFilter
 
     """
@@ -16345,11 +16291,6 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
-
-    """
-    Only return orders that are or were expected funds.
-    """
-    onlyExpectedFunds: Boolean
     expectedFundsFilter: ExpectedFundsFilter
 
     """
