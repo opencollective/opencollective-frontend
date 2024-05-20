@@ -68,10 +68,6 @@ exports.REWRITES = [
     destination: '/dashboard',
   },
   {
-    source: '/dashboard/:slug/expenses/new',
-    destination: '/submit-expense',
-  },
-  {
     source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/updates',
     destination: '/updates',
   },
