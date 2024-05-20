@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { toNumber, uniqBy } from 'lodash';
+import { uniqBy } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
@@ -17,13 +17,13 @@ import HTMLContent from '../../../HTMLContent';
 import Link from '../../../Link';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { Button } from '../../../ui/Button';
-import { Pagination } from '../../../ui/Pagination';
 import { Skeleton } from '../../../ui/Skeleton';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import { Filterbar } from '../../filters/Filterbar';
 import { orderByFilter } from '../../filters/OrderFilter';
+import { Pagination } from '../../filters/Pagination';
 import { searchFilter } from '../../filters/SearchFilter';
 import { UPDATE_STATUS, updateStatusFilter } from '../../filters/UpdateStatusFilter';
 import { DashboardSectionProps } from '../../types';
@@ -148,11 +148,7 @@ const UpdatesList = () => {
 
   const loading = metadataLoading || queryLoading;
   const error = metadataError || queryError;
-
   const updates = data?.account?.updates;
-  const { limit, offset } = queryFilter.values;
-  const pages = Math.ceil(((data || previousData)?.account?.updates?.totalCount || 1) / limit);
-  const currentPage = toNumber(offset + limit) / limit;
 
   return (
     <div className="flex max-w-screen-lg flex-col-reverse xl:flex-row">
@@ -190,11 +186,7 @@ const UpdatesList = () => {
           ) : (
             <React.Fragment>
               {updates?.nodes?.map(update => <UpdatePost key={update.id} update={update} account={account} />)}
-              <Pagination
-                totalPages={pages}
-                page={currentPage}
-                onChange={page => queryFilter.setFilter('offset', (page - 1) * limit)}
-              />
+              <Pagination total={(data || previousData)?.account?.updates?.totalCount} queryFilter={queryFilter} />
             </React.Fragment>
           )}
         </div>

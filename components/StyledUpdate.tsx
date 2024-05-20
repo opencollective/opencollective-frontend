@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { Lock } from '@styled-icons/fa-solid/Lock';
 import { Markup } from 'interweave';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
@@ -15,6 +14,7 @@ import { compose, formatDate } from '../lib/utils';
 
 import EmojiReactionPicker from './conversations/EmojiReactionPicker';
 import CommentReactions from './conversations/EmojiReactions';
+import { UpdateStatus } from './dashboard/sections/updates/common';
 import Avatar from './Avatar';
 import Container from './Container';
 import { Box, Flex } from './Grid';
@@ -26,8 +26,6 @@ import LoadingPlaceholder from './LoadingPlaceholder';
 import MessageBox from './MessageBox';
 import StyledButton from './StyledButton';
 import StyledHr from './StyledHr';
-import StyledTag from './StyledTag';
-import StyledTooltip from './StyledTooltip';
 import { H5 } from './Text';
 
 const UpdateWrapper = styled(Flex)`
@@ -128,44 +126,10 @@ class StyledUpdate extends Component<StyledUpdateProps, { mode: string; modified
     const fromAccount = update.fromCollective || update.fromAccount;
 
     return (
-      <Container display="flex" alignItems="Baseline" color="black.700" data-cy="meta" flexWrap="wrap">
-        {isAdmin && (
-          <StyledTag fontSize="11px" mr={2}>
-            {update.isPrivate ? (
-              <StyledTooltip
-                id="privateLockText"
-                content={() =>
-                  update.makePublicOn && !update.publishedAt ? (
-                    <FormattedMessage
-                      defaultMessage="Will be made public on {date, date, short}"
-                      id="3/51OL"
-                      values={{ date: new Date(update.makePublicOn) }}
-                    />
-                  ) : (
-                    <FormattedMessage
-                      id="update.private.lock_text"
-                      defaultMessage="This update is for contributors only"
-                    />
-                  )
-                }
-              >
-                <Flex alignItems="center">
-                  <Box mr={2}>
-                    <Lock data-tip data-for="privateLockText" data-cy="privateIcon" size={10} cursor="pointer" />
-                  </Box>
-                  <FormattedMessage defaultMessage="Private update" id="yYP4Lw" />
-                </Flex>{' '}
-              </StyledTooltip>
-            ) : update.isChangelog ? (
-              <FormattedMessage defaultMessage="Changelog" id="Changelog" />
-            ) : (
-              <FormattedMessage defaultMessage="Public update" id="BSPPvm" />
-            )}
-          </StyledTag>
-        )}
-
+      <div data-cy="meta" className="flex items-baseline gap-2">
+        {isAdmin && <UpdateStatus update={update} />}
         {update.publishedAt ? (
-          <Box as="span" mr={1} fontSize="12px">
+          <Box as="span" fontSize="12px">
             <FormattedMessage
               id="update.publishedAtBy"
               defaultMessage="Published on {date} by {author}"
@@ -184,7 +148,7 @@ class StyledUpdate extends Component<StyledUpdateProps, { mode: string; modified
             />
           </Box>
         ) : (
-          <Box as="span" mr={1} fontSize="12px">
+          <Box as="span" fontSize="12px">
             <FormattedMessage
               id="update.createdAtBy"
               defaultMessage="Created on {date} (draft) by {author}"
@@ -200,23 +164,22 @@ class StyledUpdate extends Component<StyledUpdateProps, { mode: string; modified
           </Box>
         )}
         {editable && (
-          <React.Fragment>
-            <Box ml={2} mr={2} fontSize="12px">
+          <div className="flex gap-1">
+            <Box fontSize="12px">
               <Link href={getDashboardRoute(collective, `updates/edit/${update.id}`)}>
                 <StyledButton buttonSize="tiny" data-cy="toggleEditUpdate">
                   {intl.formatMessage(this.messages[`${mode === 'edit' ? 'cancelEdit' : 'edit'}`])}
                 </StyledButton>
               </Link>
             </Box>
-
-            <Box mr={2} fontSize="12px">
+            <Box fontSize="12px">
               <StyledButton buttonSize="tiny" onClick={this.deleteUpdate}>
                 <FormattedMessage id="actions.delete" defaultMessage="Delete" />
               </StyledButton>
             </Box>
-          </React.Fragment>
+          </div>
         )}
-      </Container>
+      </div>
     );
   }
 

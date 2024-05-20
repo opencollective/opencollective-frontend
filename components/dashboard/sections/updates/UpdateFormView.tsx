@@ -36,7 +36,7 @@ import { MainColumn, SideColumn, SideColumnItem, TwoColumnContainer } from './co
 import { getRefetchQueries, updateFieldsFragment, updatesViewQuery } from './queries';
 
 const CREATE_UPDATE_DEFAULT_VALUES = {
-  notificationAudience: UPDATE_NOTIFICATION_AUDIENCE.ALL,
+  notificationAudience: UPDATE_NOTIFICATION_AUDIENCE.NO_ONE,
   isPrivate: false,
   isChangelog: false,
   publish: false,
@@ -181,7 +181,7 @@ const FormBody = ({ update }) => {
       });
       removeFromLocalStorage(LOCAL_STORAGE_KEYS.UPDATES_FORM_STATE);
       const id = response.data.createUpdate?.id || response.data.editUpdate?.id;
-      if (redirect) {
+      if (redirect === true) {
         router.push(getDashboardRoute(account, `updates/${id}`));
       } else {
         return id;
@@ -220,6 +220,9 @@ const FormBody = ({ update }) => {
         } catch (e) {
           toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
         }
+      },
+      onCancel: () => {
+        router.push(getDashboardRoute(account, `updates/edit/${id}`));
       },
       confirmLabel: intl.formatMessage({ defaultMessage: 'Publish Update', id: 'Update.Publish.Title' }),
     });
@@ -261,207 +264,221 @@ const FormBody = ({ update }) => {
 
   return (
     <Formik initialValues={initialValues} onSubmit={handleSubmit} validate={handleStatePersistence}>
-      {formik => (
-        <Form>
-          <TwoColumnContainer>
-            <MainColumn>
-              <StyledInputFormikField
-                name="title"
-                label={<FormattedMessage id="Title" defaultMessage="Title" />}
-                required
-              >
-                {({ field }) => <Input {...field} data-cy="update-title" className="flex-grow" maxLength={255} />}
-              </StyledInputFormikField>
-              <Field name="html">
-                {({ field, meta }) => (
-                  <div>
-                    <label htmlFor={field.id} className="mb-2 font-bold">
-                      <FormattedMessage id="Update.Body" defaultMessage="Body" />
-                    </label>
-                    <RichTextEditor
-                      kind="UPDATE"
-                      {...field}
-                      inputName={field.name}
-                      editorMinHeight={300}
-                      editorMaxHeight={'100%'}
-                      defaultValue={field.value}
-                      withBorders
-                      data-cy="update-content-editor"
-                      videoEmbedEnabled
-                      setUploading={setUploading}
-                      onChange={e => formik.setFieldValue(field.name, e.target.value)}
-                    />
-                    {uploading && (
-                      <div className="mt-2 text-sm text-gray-500">
-                        <FormattedMessage id="uploadImage.isUploading" defaultMessage="Uploading image..." />
-                      </div>
-                    )}
-                    {meta.error && (
-                      <div className="mt-2 text-xs text-red-500">
-                        {isOCError(meta.error) ? formatFormErrorMessage(intl, meta.error) : meta.error}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </Field>
-            </MainColumn>
-            <SideColumn>
-              <div className="flex gap-2 lg:flex-col lg:justify-stretch">
-                {isDraft ? (
-                  <React.Fragment>
-                    <Button
-                      size="sm"
-                      className="gap-1.5"
-                      onClick={() => handlePublish(formik)}
-                      loading={audienceLoading}
-                      data-cy="update-publish-btn"
-                      disabled={!formik.isValid}
-                    >
-                      <BookCheck size="16px" />
-                      <FormattedMessage defaultMessage="Publish" id="update.publish.btn" />
-                    </Button>
-                    <Button
-                      type="submit"
-                      size="sm"
-                      variant="outline"
-                      className="w-full gap-1.5"
-                      data-cy="update-save-draft-btn"
-                      disabled={!formik.isValid}
-                    >
-                      <BookDashed size="16px" />
-                      <FormattedMessage defaultMessage="Save Draft" id="YH2E7O" />
-                    </Button>
-                  </React.Fragment>
-                ) : (
-                  <React.Fragment>
-                    <Button type="submit" size="sm" className="w-full gap-1.5" data-cy="update-save-btn">
-                      <BookCheck size="16px" />
-                      <FormattedMessage defaultMessage="Save Changes" id="SaveChanges" />
-                    </Button>
-                    <Button size="sm" variant="outline" className="w-full gap-1.5" onClick={handleUnpublish}>
-                      <BookDashed size="16px" />
-                      <FormattedMessage defaultMessage="Move to Drafts" id="uRbxVi" />
-                    </Button>
-                  </React.Fragment>
-                )}
-              </div>
-              <hr />
-              <div className="flex flex-col gap-8 ">
-                {isEditing && (
-                  <SideColumnItem>
-                    {update.publishedAt ? (
-                      <FormattedMessage id="PublishedOn" defaultMessage="Published on" />
-                    ) : (
-                      <FormattedMessage id="DraftedOn" defaultMessage="Drafted on" />
-                    )}
-                    {formatDate(update.publishedAt || update.updatedAt, {
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric',
-                    })}
-                  </SideColumnItem>
-                )}
-                <SideColumnItem>
-                  <FormattedMessage defaultMessage="Update type" id="jJmze4" />
-                  <StyledInputFormikField name="isPrivate" labelFontSize="12px">
-                    {({ field }) => (
-                      <Select
-                        value={formik.values.isChangelog ? 'changelog' : toString(field.value)}
-                        onValueChange={value => {
-                          if (value === 'changelog') {
-                            formik.setFieldValue(field.name, false);
-                            formik.setFieldValue('isChangelog', true);
-                          } else {
-                            const isPrivate = value === 'true';
-                            formik.setFieldValue('isChangelog', false);
-                            formik.setFieldValue(field.name, isPrivate);
-                            if (isPrivate) {
-                              formik.setFieldValue('makePublicOn', null);
-                            }
-                          }
-                        }}
-                      >
-                        <SelectTriggerMini
-                          id={field.name}
-                          className={cn('truncate', { 'border-red-500': field.error })}
-                          data-cy="update-type-select"
-                        >
-                          <SelectValue />
-                        </SelectTriggerMini>
-                        <SelectContent>
-                          <SelectItem data-cy="update-type-public" value="false">
-                            <FormattedMessage defaultMessage="Public" id="Public" />
-                          </SelectItem>
-                          <SelectItem data-cy="update-type-private" value="true">
-                            <FormattedMessage defaultMessage="Private" id="Private" />
-                          </SelectItem>
-                          {account.slug === 'opencollective' && (
-                            <SelectItem value="changelog">
-                              <FormattedMessage id="update.type.changelog" defaultMessage="Changelog Entry" />
-                            </SelectItem>
-                          )}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  </StyledInputFormikField>
-                </SideColumnItem>
-                {formik.values.isPrivate && (
-                  <SideColumnItem>
-                    <FormattedMessage id="Update.MakePublicOn" defaultMessage="Automatically make public on" />
-                    <StyledInputFormikField name="makePublicOn" labelFontSize="12px" flexGrow={1} required={false}>
-                      {({ field }) => (
-                        <Input
-                          {...field}
-                          onChange={e => {
-                            const value = isEmpty(e.target.value) ? null : dayjs(e.target.value).toISOString();
-                            formik.setFieldValue(field.name, value);
-                          }}
-                          value={formik.values.makePublicOn ? toIsoDateStr(new Date(formik.values.makePublicOn)) : ''}
-                          type="date"
-                          width="100%"
-                          maxWidth="40em"
-                          min={toIsoDateStr(new Date())}
-                        />
+      {formik => {
+        let audienceOptions = account.isHost
+          ? Object.keys(UPDATE_NOTIFICATION_AUDIENCE)
+          : [UPDATE_NOTIFICATION_AUDIENCE.FINANCIAL_CONTRIBUTORS, UPDATE_NOTIFICATION_AUDIENCE.NO_ONE];
+        if (formik.values.isPrivate) {
+          audienceOptions = audienceOptions.filter(audience => audience !== UPDATE_NOTIFICATION_AUDIENCE.NO_ONE);
+        }
+        return (
+          <Form>
+            <TwoColumnContainer>
+              <MainColumn>
+                <StyledInputFormikField
+                  name="title"
+                  label={<FormattedMessage id="Title" defaultMessage="Title" />}
+                  required
+                >
+                  {({ field }) => <Input {...field} data-cy="update-title" className="flex-grow" maxLength={255} />}
+                </StyledInputFormikField>
+                <Field name="html">
+                  {({ field, meta }) => (
+                    <div>
+                      <label htmlFor={field.id} className="mb-2 font-bold">
+                        <FormattedMessage id="Update.Body" defaultMessage="Body" />
+                      </label>
+                      <RichTextEditor
+                        kind="UPDATE"
+                        {...field}
+                        inputName={field.name}
+                        editorMinHeight={300}
+                        editorMaxHeight={'100%'}
+                        defaultValue={field.value}
+                        withBorders
+                        data-cy="update-content-editor"
+                        videoEmbedEnabled
+                        setUploading={setUploading}
+                        onChange={e => formik.setFieldValue(field.name, e.target.value)}
+                      />
+                      {uploading && (
+                        <div className="mt-2 text-sm text-gray-500">
+                          <FormattedMessage id="uploadImage.isUploading" defaultMessage="Uploading image..." />
+                        </div>
                       )}
-                    </StyledInputFormikField>
-                  </SideColumnItem>
-                )}
-                {!formik.values.isChangelog && (
+                      {meta.error && (
+                        <div className="mt-2 text-xs text-red-500">
+                          {isOCError(meta.error) ? formatFormErrorMessage(intl, meta.error) : meta.error}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </Field>
+              </MainColumn>
+              <SideColumn>
+                <div className="flex gap-2 lg:flex-col lg:justify-stretch">
+                  {isDraft ? (
+                    <React.Fragment>
+                      <Button
+                        size="sm"
+                        className="gap-1.5"
+                        onClick={() => handlePublish(formik)}
+                        loading={audienceLoading}
+                        data-cy="update-publish-btn"
+                        disabled={!formik.isValid}
+                      >
+                        <BookCheck size="16px" />
+                        <FormattedMessage defaultMessage="Publish" id="update.publish.btn" />
+                      </Button>
+                      <Button
+                        type="submit"
+                        size="sm"
+                        variant="outline"
+                        className="w-full gap-1.5"
+                        data-cy="update-save-draft-btn"
+                        disabled={!formik.isValid}
+                      >
+                        <BookDashed size="16px" />
+                        <FormattedMessage defaultMessage="Save Draft" id="YH2E7O" />
+                      </Button>
+                    </React.Fragment>
+                  ) : (
+                    <React.Fragment>
+                      <Button type="submit" size="sm" className="w-full gap-1.5" data-cy="update-save-btn">
+                        <BookCheck size="16px" />
+                        <FormattedMessage defaultMessage="Save Changes" id="SaveChanges" />
+                      </Button>
+                      <Button size="sm" variant="outline" className="w-full gap-1.5" onClick={handleUnpublish}>
+                        <BookDashed size="16px" />
+                        <FormattedMessage defaultMessage="Move to Drafts" id="uRbxVi" />
+                      </Button>
+                    </React.Fragment>
+                  )}
+                </div>
+                <hr />
+                <div className="flex flex-col gap-8 ">
+                  {isEditing && (
+                    <SideColumnItem>
+                      {update.publishedAt ? (
+                        <FormattedMessage id="PublishedOn" defaultMessage="Published on" />
+                      ) : (
+                        <FormattedMessage id="DraftedOn" defaultMessage="Drafted on" />
+                      )}
+                      {formatDate(update.publishedAt || update.updatedAt, {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                      })}
+                    </SideColumnItem>
+                  )}
                   <SideColumnItem>
-                    {formik.values.isPrivate ? (
-                      <FormattedMessage defaultMessage="Who can read this update?" id="/N24Lt" />
-                    ) : (
-                      <FormattedMessage defaultMessage="Who should be notified?" id="+JC301" />
-                    )}
-
-                    <StyledInputFormikField name="notificationAudience" labelFontSize="12px">
+                    <FormattedMessage defaultMessage="Update type" id="jJmze4" />
+                    <StyledInputFormikField name="isPrivate" labelFontSize="12px">
                       {({ field }) => (
                         <Select
-                          {...field}
-                          value={field.value}
-                          onValueChange={value => formik.setFieldValue(field.name, value)}
-                          disabled={!isDraft}
+                          value={formik.values.isChangelog ? 'changelog' : toString(field.value)}
+                          onValueChange={value => {
+                            if (value === 'changelog') {
+                              formik.setFieldValue(field.name, false);
+                              formik.setFieldValue('isChangelog', true);
+                            } else {
+                              const isPrivate = value === 'true';
+                              formik.setFieldValue('isChangelog', false);
+                              formik.setFieldValue(field.name, isPrivate);
+                              if (isPrivate) {
+                                if (formik.values.notificationAudience === UPDATE_NOTIFICATION_AUDIENCE.NO_ONE) {
+                                  formik.setFieldValue('notificationAudience', audienceOptions[0]);
+                                }
+                                formik.setFieldValue('makePublicOn', null);
+                              }
+                            }
+                          }}
                         >
-                          <SelectTriggerMini>
+                          <SelectTriggerMini
+                            id={field.name}
+                            className={cn('truncate', { 'border-red-500': field.error })}
+                            data-cy="update-type-select"
+                          >
                             <SelectValue />
                           </SelectTriggerMini>
                           <SelectContent>
-                            {Object.keys(UPDATE_NOTIFICATION_AUDIENCE).map(audience => (
-                              <SelectItem value={audience} key={audience}>
-                                {UpdateNotificationAudienceLabels[audience]}
+                            <SelectItem data-cy="update-type-public" value="false">
+                              <FormattedMessage defaultMessage="Public" id="Public" />
+                            </SelectItem>
+                            <SelectItem data-cy="update-type-private" value="true">
+                              <FormattedMessage defaultMessage="Restricted" id="Restricted" />
+                            </SelectItem>
+                            {account.slug === 'opencollective' && (
+                              <SelectItem value="changelog">
+                                <FormattedMessage id="update.type.changelog" defaultMessage="Changelog Entry" />
                               </SelectItem>
-                            ))}
+                            )}
                           </SelectContent>
                         </Select>
                       )}
                     </StyledInputFormikField>
                   </SideColumnItem>
-                )}
-              </div>
-            </SideColumn>
-          </TwoColumnContainer>
-        </Form>
-      )}
+                  {formik.values.isPrivate && (
+                    <SideColumnItem>
+                      <FormattedMessage id="Update.MakePublicOn" defaultMessage="Automatically make public on" />
+                      <StyledInputFormikField name="makePublicOn" labelFontSize="12px" flexGrow={1} required={false}>
+                        {({ field }) => (
+                          <Input
+                            {...field}
+                            onChange={e => {
+                              const value = isEmpty(e.target.value) ? null : dayjs(e.target.value).toISOString();
+                              formik.setFieldValue(field.name, value);
+                            }}
+                            value={formik.values.makePublicOn ? toIsoDateStr(new Date(formik.values.makePublicOn)) : ''}
+                            type="date"
+                            width="100%"
+                            maxWidth="40em"
+                            min={toIsoDateStr(new Date())}
+                          />
+                        )}
+                      </StyledInputFormikField>
+                    </SideColumnItem>
+                  )}
+                  {!formik.values.isChangelog && (
+                    <SideColumnItem>
+                      {formik.values.isPrivate ? (
+                        <FormattedMessage
+                          defaultMessage="Who should have access and be notified about this update?"
+                          id="YdUvAv"
+                        />
+                      ) : (
+                        <FormattedMessage defaultMessage="Who should be notified?" id="+JC301" />
+                      )}
+
+                      <StyledInputFormikField name="notificationAudience" labelFontSize="12px">
+                        {({ field }) => (
+                          <Select
+                            {...field}
+                            value={field.value}
+                            onValueChange={value => formik.setFieldValue(field.name, value)}
+                            disabled={!isDraft}
+                          >
+                            <SelectTriggerMini>
+                              <SelectValue />
+                            </SelectTriggerMini>
+                            <SelectContent>
+                              {audienceOptions.map(audience => (
+                                <SelectItem value={audience} key={audience}>
+                                  {UpdateNotificationAudienceLabels[audience]}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      </StyledInputFormikField>
+                    </SideColumnItem>
+                  )}
+                </div>
+              </SideColumn>
+            </TwoColumnContainer>
+          </Form>
+        );
+      }}
     </Formik>
   );
 };

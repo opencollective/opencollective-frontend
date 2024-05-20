@@ -55,7 +55,7 @@ export const UpdateStatus = ({ update }: { update: Partial<Update> }) => {
       message = (
         <React.Fragment>
           {message}&nbsp;(
-          <FormattedMessage id="Private" defaultMessage="Private" />)
+          <FormattedMessage id="Restricted" defaultMessage="Restricted" />)
         </React.Fragment>
       );
       if (update.notificationAudience === UpdateAudience.COLLECTIVE_ADMINS) {

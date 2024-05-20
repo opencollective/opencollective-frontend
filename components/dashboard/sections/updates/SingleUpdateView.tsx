@@ -65,6 +65,8 @@ const SingleUpdateView = ({ updateId }) => {
   const isDraft = !update?.publishedAt;
   const comments = update?.comments;
 
+  const refetchUpdate = useCallback(() => refetch({ id: updateId }), [refetch, updateId]);
+
   const handleDelete = useCallback(
     async () =>
       showConfirmationModal({
@@ -163,7 +165,7 @@ const SingleUpdateView = ({ updateId }) => {
                             hasMore={comments?.nodes?.length < comments?.totalCount}
                             fetchMore={handleFetchMoreComments}
                             items={comments?.nodes}
-                            onCommentDeleted={() => refetch({ id: updateId })}
+                            onCommentDeleted={refetchUpdate}
                             getClickedComment={setReplyingToComment}
                           />
                         )}
@@ -172,7 +174,7 @@ const SingleUpdateView = ({ updateId }) => {
                             <CommentForm
                               id="new-update"
                               UpdateId={update.id}
-                              onSuccess={() => refetch({ id: updateId })}
+                              onSuccess={refetchUpdate}
                               replyingToComment={replyingToComment}
                             />
                           </div>

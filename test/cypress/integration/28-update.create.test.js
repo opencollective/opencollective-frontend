@@ -13,6 +13,8 @@ describe('create an update', () => {
     cy.get('[data-cy=update] header h1', { timeout: 10000 }).contains('New update');
     cy.get('[data-cy=update] header').contains('Draft');
     cy.getByDataCy('update-edit-btn').click();
+    cy.getByDataCy('update-type-select').click();
+    cy.getByDataCy('update-type-private').click();
     cy.getByDataCy('update-publish-btn').click();
     cy.get('[data-cy=update-audience-breakdown]').contains('Your Update will be sent to a total of 1 emails');
     cy.get('[data-cy=update-audience-breakdown]').contains('1 core contributor');
@@ -26,7 +28,7 @@ describe('create an update', () => {
     cy.get('[data-cy="update-type-private"').click(); // Make private
     cy.getByDataCy('update-save-btn').click();
     cy.wait(1000);
-    cy.get('[data-cy=update] header').contains('Private');
+    cy.get('[data-cy=update] header').contains('Restricted');
   });
 });
 

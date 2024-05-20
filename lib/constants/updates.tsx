@@ -9,12 +9,8 @@ export enum UPDATE_NOTIFICATION_AUDIENCE {
 }
 
 export const UpdateNotificationAudienceLabels = {
-  ALL: <FormattedMessage id="Update.notify.all" defaultMessage="Admins and Contributors" />,
-  COLLECTIVE_ADMINS: (
-    <FormattedMessage id="Update.notify.hostedCollectiveAdmins" defaultMessage="Hosted collective's admins" />
-  ),
-  FINANCIAL_CONTRIBUTORS: (
-    <FormattedMessage id="ContributorsFilter.Financial" defaultMessage="Financial contributors" />
-  ),
+  ALL: <FormattedMessage id="Update.notify.all" defaultMessage="Collective Admins & Contributors" />,
+  COLLECTIVE_ADMINS: <FormattedMessage id="Update.notify.hostedCollectiveAdmins" defaultMessage="Collective Admins" />,
+  FINANCIAL_CONTRIBUTORS: <FormattedMessage id="Contributors" defaultMessage="Contributors" />,
   NO_ONE: <FormattedMessage id="tcxpLX" defaultMessage="No one" />,
 };
