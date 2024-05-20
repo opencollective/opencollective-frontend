@@ -8,7 +8,6 @@ import {
   ContributionFrequency,
   Currency,
   DashboardRecurringContributionsQueryVariables,
-  HostContributionsQueryVariables,
   OrderStatus,
 } from '../../../../lib/graphql/types/v2/graphql';
 import i18nOrderStatus from '../../../../lib/i18n/order-status';
@@ -56,7 +55,7 @@ export type FilterMeta = {
   currency?: Currency;
 };
 
-type GraphQLQueryVariables = HostContributionsQueryVariables & DashboardRecurringContributionsQueryVariables;
+type GraphQLQueryVariables = DashboardRecurringContributionsQueryVariables;
 
 // Only needed when either the values or key of filters are different
 // to expected key or value of QueryVariables

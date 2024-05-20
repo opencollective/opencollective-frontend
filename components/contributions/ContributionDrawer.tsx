@@ -216,7 +216,6 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
         isIncognito
         type
         imageUrl
-        hasImage
         isHost
         isArchived
         ... on Individual {

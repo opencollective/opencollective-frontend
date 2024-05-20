@@ -1,6 +1,6 @@
 import React from 'react';
-import { useMutation,useQuery  } from '@apollo/client';
-import { compact } from 'lodash';
+import { useMutation, useQuery } from '@apollo/client';
+import { compact, omit } from 'lodash';
 import { PlusIcon } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
@@ -11,7 +11,12 @@ import { EMPTY_ARRAY } from '../../../../lib/constants/utils';
 import { LoggedInUser as LoggedInUserType } from '../../../../lib/custom_typings/LoggedInUser';
 import { Views } from '../../../../lib/filters/filter-types';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
-import { ContributionDrawerQuery, ContributionFrequency, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
+import {
+  ContributionDrawerQuery,
+  ContributionFrequency,
+  ExpectedFundsFilter,
+  OrderStatus,
+} from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nPaymentMethodProviderType } from '../../../../lib/i18n/payment-method-provider-type';
@@ -59,6 +64,7 @@ const dashboardContributionsMetadataQuery = gql`
     $slug: String!
     $filter: AccountOrdersFilter!
     $onlyExpectedFunds: Boolean!
+    $expectedFundsFilter: ExpectedFundsFilter
     $includeHostedAccounts: Boolean!
   ) {
     account(slug: $slug) {
@@ -83,14 +89,14 @@ const dashboardContributionsMetadataQuery = gql`
       }
       ALL: orders(
         filter: $filter
-        onlyExpectedFunds: $onlyExpectedFunds
+        expectedFundsFilter: $expectedFundsFilter
         includeHostedAccounts: $includeHostedAccounts
       ) {
         totalCount
       }
       PENDING: orders(
         filter: $filter
-        onlyExpectedFunds: $onlyExpectedFunds
+        expectedFundsFilter: $expectedFundsFilter
         status: [PENDING]
         includeHostedAccounts: $includeHostedAccounts
       ) @include(if: $onlyExpectedFunds) {
@@ -98,7 +104,7 @@ const dashboardContributionsMetadataQuery = gql`
       }
       EXPIRED: orders(
         filter: $filter
-        onlyExpectedFunds: $onlyExpectedFunds
+        expectedFundsFilter: $expectedFundsFilter
         status: [EXPIRED]
         includeHostedAccounts: $includeHostedAccounts
       ) @include(if: $onlyExpectedFunds) {
@@ -117,7 +123,7 @@ const dashboardContributionsMetadataQuery = gql`
         includeIncognito: true
         status: [PAID]
         includeHostedAccounts: $includeHostedAccounts
-        onlyExpectedFunds: $onlyExpectedFunds
+        expectedFundsFilter: $expectedFundsFilter
       ) @include(if: $onlyExpectedFunds) {
         totalCount
       }
@@ -135,7 +141,7 @@ const dashboardContributionsMetadataQuery = gql`
         filter: $filter
         status: [CANCELLED]
         includeIncognito: true
-        onlyExpectedFunds: $onlyExpectedFunds
+        expectedFundsFilter: $expectedFundsFilter
         includeHostedAccounts: $includeHostedAccounts
       ) {
         totalCount
@@ -182,7 +188,6 @@ const dashboardContributionsQuery = gql`
     $minAmount: Int
     $maxAmount: Int
     $paymentMethod: PaymentMethodReferenceInput
-    $onlyExpectedFunds: Boolean!
     $includeHostedAccounts: Boolean!
     $dateFrom: DateTime
     $dateTo: DateTime
@@ -208,7 +213,6 @@ const dashboardContributionsQuery = gql`
         offset: $offset
         limit: $limit
         paymentMethod: $paymentMethod
-        onlyExpectedFunds: $onlyExpectedFunds
         includeHostedAccounts: $includeHostedAccounts
         expectedFundsFilter: $expectedFundsFilter
       ) {
@@ -416,6 +420,8 @@ const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpected
   }
 };
 
+const filtersWithoutExpectedFunds = omit(filters, ['expectedFundsFilter', 'expectedDate']);
+
 type ContributionsProps = DashboardSectionProps & {
   direction?: 'INCOMING' | 'OUTGOING';
   onlyExpectedFunds?: boolean;
@@ -461,6 +467,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
       slug: accountSlug,
       filter: direction || 'OUTGOING',
       onlyExpectedFunds: !!onlyExpectedFunds,
+      expectedFundsFilter: onlyExpectedFunds ? ExpectedFundsFilter.ALL_EXPECTED_FUNDS : null,
       includeHostedAccounts: !!includeHostedAccounts,
     },
     context: API_V2_CONTEXT,
@@ -505,7 +512,9 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
       id: ContributionsTab.ALL,
       label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
       count: metadata?.account?.ALL.totalCount,
-      filter: {},
+      filter: {
+        ...(onlyExpectedFunds ? { expectedFundsFilter: ExpectedFundsFilter.ALL_EXPECTED_FUNDS } : {}),
+      },
     },
     !onlyExpectedFunds && includeHostedAccounts
       ? {
@@ -566,6 +575,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
           count: metadata?.account?.[ContributionsTab.PENDING].totalCount,
           filter: {
             status: [OrderStatus.PENDING],
+            expectedFundsFilter: ExpectedFundsFilter.ALL_EXPECTED_FUNDS,
           },
         }
       : null,
@@ -576,6 +586,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
           count: metadata?.account?.[ContributionsTab.PAID].totalCount,
           filter: {
             status: [OrderStatus.PAID],
+            expectedFundsFilter: ExpectedFundsFilter.ALL_EXPECTED_FUNDS,
           },
         }
       : null,
@@ -586,6 +597,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
           count: metadata?.account?.[ContributionsTab.EXPIRED].totalCount,
           filter: {
             status: [OrderStatus.EXPIRED],
+            expectedFundsFilter: ExpectedFundsFilter.ALL_EXPECTED_FUNDS,
           },
         }
       : null,
@@ -596,6 +608,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
           count: metadata?.account?.[ContributionsTab.CANCELED].totalCount,
           filter: {
             status: [OrderStatus.CANCELLED],
+            ...(onlyExpectedFunds ? { expectedFundsFilter: ExpectedFundsFilter.ALL_EXPECTED_FUNDS } : {}),
           },
         }
       : null,
@@ -610,7 +623,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
     toVariables,
     meta: filterMeta,
     views,
-    filters,
+    filters: onlyExpectedFunds ? filters : filtersWithoutExpectedFunds,
   });
 
   const {
@@ -623,9 +636,14 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
       slug: accountSlug,
       filter: direction || 'OUTGOING',
       includeIncognito: true,
-      onlyExpectedFunds: !!onlyExpectedFunds,
       includeHostedAccounts: !!includeHostedAccounts,
       ...queryFilter.variables,
+      ...(onlyExpectedFunds
+        ? {
+            expectedFundsFilter:
+              (queryFilter.variables as any).expectedFundsFilter || ExpectedFundsFilter.ALL_EXPECTED_FUNDS,
+          }
+        : { expectedFundsFilter: null }),
     },
     context: API_V2_CONTEXT,
     fetchPolicy: 'cache-and-network',
@@ -892,14 +910,17 @@ const getContributionActions: (opts: GetContributionActionsOptions) => GetAction
 
     if (canUpdateActiveOrder) {
       actions.primary.push({
-        label: opts.intl.formatMessage({ defaultMessage: 'Update payment method', id: 'subscription.menu.editPaymentMethod' }),
+        label: opts.intl.formatMessage({
+          defaultMessage: 'Update payment method',
+          id: 'subscription.menu.editPaymentMethod',
+        }),
         onClick: () => opts.onUpdatePaymentMethodClick(order),
       });
     }
 
     if (canResume) {
       actions.primary.push({
-        label: opts.intl.formatMessage({ defaultMessage: 'Resume contribution', id: '51nF6S', }),
+        label: opts.intl.formatMessage({ defaultMessage: 'Resume contribution', id: '51nF6S' }),
         onClick: () => opts.onResumeClick(order),
       });
     }

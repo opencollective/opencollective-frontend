@@ -7,7 +7,7 @@ import { ExpectedFundsFilter } from '../../../lib/graphql/types/v2/graphql';
 
 import ComboSelectFilter from './ComboSelectFilter';
 
-const schema = z.nativeEnum(ExpectedFundsFilter).optional();
+const schema = z.nativeEnum(ExpectedFundsFilter).optional().nullish().default(ExpectedFundsFilter.ALL_EXPECTED_FUNDS);
 
 export const expectedFundsFilter: FilterConfig<z.infer<typeof schema>> = {
   schema: schema,
@@ -21,10 +21,12 @@ export const expectedFundsFilter: FilterConfig<z.infer<typeof schema>> = {
       return <ComboSelectFilter isMulti={false} options={options} {...props} />;
     },
     valueRenderer: ({ value }) =>
-      value === ExpectedFundsFilter.MANUAL ? (
-        <FormattedMessage defaultMessage="Created by contributors" id="wa5frV" />
-      ) : (
+      value === ExpectedFundsFilter.ALL_EXPECTED_FUNDS ? (
+        <FormattedMessage defaultMessage="All" id="zQvVDJ" />
+      ) : value === ExpectedFundsFilter.ONLY_PENDING ? (
         <FormattedMessage defaultMessage="Created by host admin" id="See4A8" />
+      ) : (
+        <FormattedMessage defaultMessage="Created by contributors" id="wa5frV" />
       ),
   },
 };
