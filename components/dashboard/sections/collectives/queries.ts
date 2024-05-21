@@ -315,6 +315,62 @@ export const hostedCollectiveDetailQuery = gql`
     account(id: $id) {
       id
       ...HostedCollectiveFields
+      transactions(limit: 10, offset: 0, kind: [ADDED_FUNDS, CONTRIBUTION, EXPENSE]) {
+        nodes {
+          id
+          clearedAt
+          createdAt
+          type
+          kind
+          description
+          isRefund
+          isRefunded
+          isInReview
+          isDisputed
+          isOrderRejected
+          amount {
+            valueInCents
+            currency
+          }
+          netAmount {
+            valueInCents
+            currency
+          }
+          oppositeAccount {
+            id
+            slug
+            name
+            imageUrl
+          }
+        }
+      }
+    }
+    activities(account: { id: $id }, limit: 5, offset: 0, type: [COLLECTIVE]) {
+      nodes {
+        id
+        type
+        createdAt
+        data
+        isSystem
+        account {
+          id
+          slug
+          name
+          imageUrl
+        }
+        fromAccount {
+          id
+          slug
+          name
+          imageUrl
+        }
+        individual {
+          id
+          slug
+          name
+          imageUrl
+        }
+      }
     }
   }
 
