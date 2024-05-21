@@ -261,10 +261,10 @@ const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpected
           </div>
           <div className="overflow-hidden">
             <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sm font-medium leading-5">
-              {toAccount.slug || toAccount.name}
+              {toAccount.name || toAccount.slug}
             </div>
             <div className="overflow-hidden text-ellipsis whitespace-nowrap text-xs leading-4">
-              {fromAccount.slug || fromAccount.name}
+              {fromAccount.name || fromAccount.slug}
             </div>
           </div>
         </div>
