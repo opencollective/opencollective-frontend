@@ -286,7 +286,7 @@ const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpected
                 <Avatar size={32} collective={toAccount} displayTitle={false} />
               </div>
               <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sm leading-5">
-                {toAccount.slug || toAccount.name}
+                {toAccount.name || toAccount.slug}
               </div>
             </div>
           }
