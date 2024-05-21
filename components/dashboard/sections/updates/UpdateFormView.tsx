@@ -117,7 +117,7 @@ const FormBody = ({ update }) => {
   const initialValues = React.useMemo(
     () =>
       pick(
-        update || { ...CREATE_UPDATE_DEFAULT_VALUES, ...locallyPersistedState },
+        update || locallyPersistedState || CREATE_UPDATE_DEFAULT_VALUES,
         'id',
         'title',
         'html',
@@ -379,12 +379,13 @@ const FormBody = ({ update }) => {
                           value={formik.values.isChangelog ? 'changelog' : toString(field.value)}
                           onValueChange={value => {
                             if (value === 'changelog') {
-                              formik.setFieldValue(field.name, false);
+                              formik.setFieldValue('isPrivate', false);
                               formik.setFieldValue('isChangelog', true);
+                              formik.setFieldValue('notificationAudience', UPDATE_NOTIFICATION_AUDIENCE.NO_ONE);
                             } else {
                               const isPrivate = value === 'true';
                               formik.setFieldValue('isChangelog', false);
-                              formik.setFieldValue(field.name, isPrivate);
+                              formik.setFieldValue('isPrivate', isPrivate);
                               if (isPrivate) {
                                 if (formik.values.notificationAudience === UPDATE_NOTIFICATION_AUDIENCE.NO_ONE) {
                                   formik.setFieldValue('notificationAudience', audienceOptions[0]);
