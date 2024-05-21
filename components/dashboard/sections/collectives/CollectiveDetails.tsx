@@ -35,7 +35,7 @@ import { Popover, PopoverContent } from '../../../ui/Popover';
 import { RadioGroup, RadioGroupItem } from '../../../ui/RadioGroup';
 import { useToast } from '../../../ui/useToast';
 
-import { cols, MoreActionsMenu } from './common';
+import { cols, HostedCollectivesDataTableMeta, MoreActionsMenu } from './common';
 import { hostedCollectiveDetailQuery } from './queries';
 
 const editAccountHostFee = gql`
@@ -471,7 +471,13 @@ const CollectiveDetails = ({
                         data={children[type] || []}
                         mobileTableView
                         compact
-                        meta={{ intl, onClickRow: row => openCollectiveDetails(row.original) }}
+                        meta={
+                          {
+                            intl,
+                            onClickRow: row => openCollectiveDetails(row.original),
+                            openCollectiveDetails,
+                          } as HostedCollectivesDataTableMeta
+                        }
                         onClickRow={row => openCollectiveDetails(row.original)}
                         className="border-none"
                       />

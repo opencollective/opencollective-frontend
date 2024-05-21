@@ -1,5 +1,5 @@
 import React from 'react';
-import { ColumnDef } from '@tanstack/react-table';
+import { ColumnDef, TableMeta } from '@tanstack/react-table';
 import { groupBy, isNil, mapValues, toPairs } from 'lodash';
 import {
   Banknote,
@@ -41,6 +41,10 @@ import { DashboardContext } from '../../DashboardContext';
 import AddFundsModal from './AddFundsModal';
 import FreezeAccountModal from './FreezeAccountModal';
 import UnhostAccountModal from './UnhostAccountModal';
+
+export interface HostedCollectivesDataTableMeta extends TableMeta<any> {
+  openCollectiveDetails?: (c: HostedCollectiveFieldsFragment) => void;
+}
 
 export const cols: Record<string, ColumnDef<any, any>> = {
   collective: {
