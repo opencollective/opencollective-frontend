@@ -37,7 +37,7 @@ import { buildSortFilter } from '../../filters/SortFilter';
 import { DashboardSectionProps } from '../../types';
 
 import CollectiveDetails from './CollectiveDetails';
-import { cols } from './common';
+import { cols, HostedCollectivesDataTableMeta } from './common';
 import { hostedCollectivesMetadataQuery, hostedCollectivesQuery } from './queries';
 
 const sortFilter = buildSortFilter({
@@ -227,7 +227,15 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
             loading={loading}
             mobileTableView
             compact
-            meta={{ intl, onClickRow, onEdit: handleEdit, host: data?.host }}
+            meta={
+              {
+                intl,
+                onClickRow,
+                onEdit: handleEdit,
+                host: data?.host,
+                openCollectiveDetails: handleDrawer,
+              } as HostedCollectivesDataTableMeta
+            }
             onClickRow={onClickRow}
             getRowDataCy={row => `collective-${row.original.slug}`}
           />

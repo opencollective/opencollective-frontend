@@ -1,12 +1,25 @@
 import React from 'react';
-import { ColumnDef } from '@tanstack/react-table';
+import { ColumnDef, TableMeta } from '@tanstack/react-table';
 import { groupBy, isNil, mapValues, toPairs } from 'lodash';
-import { Banknote, Eye, FilePlus2, Mail, MoreHorizontal, Pause, Play, SquareSigma, Unlink } from 'lucide-react';
+import {
+  Banknote,
+  Eye,
+  FilePlus2,
+  Mail,
+  MoreHorizontal,
+  Pause,
+  Play,
+  ReceiptText,
+  SquareSigma,
+  Unlink,
+} from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { FormattedDate, FormattedMessage, IntlShape } from 'react-intl';
 
 import { HOST_FEE_STRUCTURE } from '../../../../lib/constants/host-fee-structure';
 import type { AccountWithHost, HostedCollectiveFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
+import { getDashboardRoute } from '../../../../lib/url-helpers';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import AddAgreementModal from '../../../agreements/AddAgreementModal';
@@ -23,10 +36,15 @@ import {
 } from '../../../ui/DropdownMenu';
 import { TableActionsButton } from '../../../ui/Table';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
+import { DashboardContext } from '../../DashboardContext';
 
 import AddFundsModal from './AddFundsModal';
 import FreezeAccountModal from './FreezeAccountModal';
 import UnhostAccountModal from './UnhostAccountModal';
+
+export interface HostedCollectivesDataTableMeta extends TableMeta<any> {
+  openCollectiveDetails?: (c: HostedCollectiveFieldsFragment) => void;
+}
 
 export const cols: Record<string, ColumnDef<any, any>> = {
   collective: {
@@ -122,9 +140,15 @@ export const cols: Record<string, ColumnDef<any, any>> = {
         ''
       ) : (
         <div className="whitespace-nowrap">
-          {collective.hostFeesStructure === HOST_FEE_STRUCTURE.DEFAULT
-            ? `(${collective.hostFeePercent}%)`
-            : `${collective.hostFeePercent}%`}
+          {collective.hostFeesStructure === HOST_FEE_STRUCTURE.DEFAULT ? (
+            <FormattedMessage
+              id="DefaultFee"
+              defaultMessage="Default (%{hostFeePercent})"
+              values={{ hostFeePercent: collective.hostFeePercent }}
+            />
+          ) : (
+            `${collective.hostFeePercent}%`
+          )}
         </div>
       );
     },
@@ -231,6 +255,8 @@ export const MoreActionsMenu = ({
   onEdit?: () => void;
   openCollectiveDetails?: (c: HostedCollectiveFieldsFragment) => void;
 }) => {
+  const router = useRouter();
+  const { account } = React.useContext(DashboardContext);
   const [openModal, setOpenModal] = React.useState<
     null | 'ADD_FUNDS' | 'FREEZE' | 'UNHOST' | 'ADD_AGREEMENT' | 'CONTACT'
   >(null);
@@ -249,6 +275,15 @@ export const MoreActionsMenu = ({
               <DropdownMenuSeparator />
             </React.Fragment>
           )}
+          <DropdownMenuItem
+            className="cursor-pointer"
+            data-cy="actions-view-transactions"
+            onClick={() => router.push(getDashboardRoute(account, `host-transactions?account=${collective.slug}`))}
+          >
+            <ReceiptText className="mr-2" size="16" />
+            <FormattedMessage id="viewTransactions" defaultMessage="View Transactions" />
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           <DropdownMenuItem
             className="cursor-pointer"
             data-cy="actions-add-funds"
