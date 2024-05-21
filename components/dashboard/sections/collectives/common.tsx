@@ -122,9 +122,15 @@ export const cols: Record<string, ColumnDef<any, any>> = {
         ''
       ) : (
         <div className="whitespace-nowrap">
-          {collective.hostFeesStructure === HOST_FEE_STRUCTURE.DEFAULT
-            ? `(${collective.hostFeePercent}%)`
-            : `${collective.hostFeePercent}%`}
+          {collective.hostFeesStructure === HOST_FEE_STRUCTURE.DEFAULT ? (
+            <FormattedMessage
+              id="DefaultFee"
+              defaultMessage="Default (%{hostFeePercent})"
+              values={{ hostFeePercent: collective.hostFeePercent }}
+            />
+          ) : (
+            `${collective.hostFeePercent}%`
+          )}
         </div>
       );
     },
