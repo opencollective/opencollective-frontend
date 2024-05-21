@@ -7,7 +7,7 @@ import styled from 'styled-components';
 
 import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import { Account, Update } from '../../../lib/graphql/types/v2/graphql';
-import { getCollectivePageRoute } from '../../../lib/url-helpers';
+import { getCollectivePageRoute, getDashboardRoute } from '../../../lib/url-helpers';
 import { formatDate } from '../../../lib/utils';
 
 import Avatar from '../../Avatar';
@@ -112,7 +112,7 @@ const SectionUpdates = ({ collective, isAdmin }) => {
           <FormattedMessage id="section.updates.subtitle" defaultMessage="Updates on our activities and progress." />
         </P>
         {isAdmin && (
-          <Link href={`${getCollectivePageRoute(collective)}/updates/new`}>
+          <Link href={`${getDashboardRoute(collective)}/updates/new`}>
             <StyledButton data-cy="create-new-update-btn" buttonStyle="primary" my={[2, 0]}>
               <Span fontSize="16px" fontWeight="bold" mr={2}>
                 +

@@ -4,6 +4,7 @@ import * as React from 'react';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import { Check, ChevronDown } from 'lucide-react';
 
+import { elementFromClass } from '../../lib/react-utils';
 import { cn } from '../../lib/utils';
 
 const Select = SelectPrimitive.Root;
@@ -31,6 +32,11 @@ const SelectTrigger = React.forwardRef<
   </SelectPrimitive.Trigger>
 ));
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName;
+
+const SelectTriggerMini = elementFromClass(
+  SelectTrigger,
+  'flex w-fit h-fit text-sm px-0 py-0 text-nowrap rounded-none items-center border-none justify-start gap-1 text-sm text-blue-600 ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+);
 
 const SelectContent = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Content>,
@@ -104,4 +110,14 @@ SelectSeparator.displayName = SelectPrimitive.Separator.displayName;
 // ignore unused exports
 // ui library
 
-export { Select, SelectGroup, SelectValue, SelectTrigger, SelectContent, SelectLabel, SelectItem, SelectSeparator };
+export {
+  Select,
+  SelectGroup,
+  SelectValue,
+  SelectTrigger,
+  SelectTriggerMini,
+  SelectContent,
+  SelectLabel,
+  SelectItem,
+  SelectSeparator,
+};
