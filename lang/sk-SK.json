@@ -984,6 +984,7 @@
   "CreateConversationFAQ.target.content": "Všetky Konverzácie sú verejné. Ktokoľvek ich môže vidieť a reagovať na ne.",
   "CreateConversationForm.Submit": "Vytvoriť Konverzáciu",
   "createCustomTiers": "Vytvorte si vaše vlastné úrovne",
+  "created": "Created",
   "CreatedBy": "podľa používateľa {name}",
   "CreateEvent": "Create event",
   "CreateExpense.HelpCreateInfo": "Žiadosť o platbu od Kolektívu {collective}. Výdavky budú spracované po schválení správcom Kolektívu. Suma, popis a vaše meno z profilu sú verejné, ale prílohy, údaje o platbe a ďalšie osobné údaje sú súkromné.",
