@@ -984,6 +984,7 @@
   "CreateConversationFAQ.target.content": "Все обсуждения открыты. Каждый может видеть их и отвечать на них.",
   "CreateConversationForm.Submit": "Создать обсуждение",
   "createCustomTiers": "Создать свои уровни",
+  "created": "Created",
   "CreatedBy": "{name}",
   "CreateEvent": "Create event",
   "CreateExpense.HelpCreateInfo": "Запрос платежа от {collective}. Средства будут обработаны после утверждения администратором коллектива. Сумма, описание и имя вашего профиля являются общедоступными, но вложения, платежные реквизиты и другая личная информация останутся конфиденциальными.",
