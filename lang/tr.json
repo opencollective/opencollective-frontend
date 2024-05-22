@@ -984,6 +984,7 @@
   "CreateConversationFAQ.target.content": "Tüm Konuşmalar herkese açıktır. Herkes bunları görebilir ve yanıtlayabilir.",
   "CreateConversationForm.Submit": "Konuşma başlat",
   "createCustomTiers": "Kendi kademelerinizi oluşturun",
+  "created": "Created",
   "CreatedBy": "{name} tarafından",
   "CreateEvent": "Etkinlik oluştur",
   "CreateExpense.HelpCreateInfo": "Request payment from {collective}. Expenses will be processed once approved by a Collective admin. The amount, description, and your profile name are public, but attachments, payment details, and other personal info is kept private.",
