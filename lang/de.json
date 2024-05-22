@@ -984,6 +984,7 @@
   "CreateConversationFAQ.target.content": "Alle Unterhaltungen sind öffentlich. Jeder kann sie sehen und darauf antworten.",
   "CreateConversationForm.Submit": "Unterhaltung beginnen",
   "createCustomTiers": "Eigene Stufen erstellen",
+  "created": "Created",
   "CreatedBy": "von {name}",
   "CreateEvent": "Create event",
   "CreateExpense.HelpCreateInfo": "Zahlung von {collective} erfragen. Ausgaben werden abgearbeitet, nachdem ein Administrator des Kollektivs sie genehmigt. Die Menge, die Beschreibung und Ihr Profilname werden veröffentlicht aber die Anhänge, Zahlungsdetails und andere persönliche Daten bleiben geheim.",
