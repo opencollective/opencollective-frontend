@@ -163,6 +163,11 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           label: intl.formatMessage({ id: 'DqD1yK', defaultMessage: 'Applications' }),
           section: ALL_SECTIONS.HOST_APPLICATIONS,
         },
+        {
+          section: ALL_SECTIONS.ALL_COLLECTIVES,
+          label: intl.formatMessage({ defaultMessage: 'All Collectives', id: 'uQguR/' }),
+          if: account.slug === 'opencollective',
+        },
       ],
     },
     {

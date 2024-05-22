@@ -138,6 +138,7 @@ const hostedCollectiveFields = gql`
     currency
     imageUrl(height: 96)
     isFrozen
+    isHost
     tags
     settings
     createdAt
@@ -173,6 +174,8 @@ const hostedCollectiveFields = gql`
         id
         legacyId
         name
+        slug
+        imageUrl(height: 96)
       }
     }
     ... on AccountWithContributions {
@@ -370,6 +373,40 @@ export const hostedCollectiveDetailQuery = gql`
           name
           imageUrl
         }
+      }
+    }
+  }
+
+  ${hostedCollectiveFields}
+`;
+
+export const allCollectivesQuery = gql`
+  query AllCollectives(
+    $limit: Int!
+    $offset: Int!
+    $sort: OrderByInput
+    $searchTerm: String
+    $type: [AccountType]
+    $isHost: Boolean
+    $host: [AccountReferenceInput]
+    $isActive: Boolean
+  ) {
+    accounts(
+      limit: $limit
+      offset: $offset
+      searchTerm: $searchTerm
+      type: $type
+      orderBy: $sort
+      isHost: $isHost
+      isActive: $isActive
+      host: $host
+    ) {
+      offset
+      limit
+      totalCount
+      nodes {
+        id
+        ...HostedCollectiveFields
       }
     }
   }

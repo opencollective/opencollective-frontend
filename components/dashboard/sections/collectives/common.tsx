@@ -91,6 +91,24 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       );
     },
   },
+  host: {
+    accessorKey: 'host',
+    header: () => <FormattedMessage id="Member.Role.HOST" defaultMessage="Host" />,
+    cell: ({ row }) => {
+      const host = row.original.isHost ? row.original : row.original.host;
+      if (!host) {
+        return null;
+      }
+      return (
+        <div className="flex items-center">
+          <Avatar collective={host} className="mr-4" radius={24} />
+          <div className="flex flex-col items-start">
+            <div className="flex items-center text-sm">{host.name}</div>
+          </div>
+        </div>
+      );
+    },
+  },
   childCollective: {
     accessorKey: 'collective',
     header: () => <FormattedMessage id="Fields.name" defaultMessage="Name" />,

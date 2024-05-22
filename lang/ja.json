@@ -984,6 +984,7 @@
   "CreateConversationFAQ.target.content": "すべての会話は公開されます。誰もが会話を見たり、返信したりできます。",
   "CreateConversationForm.Submit": "会話を開始",
   "createCustomTiers": "Create your own tiers",
+  "created": "Created",
   "CreatedBy": "{name}",
   "CreateEvent": "Create event",
   "CreateExpense.HelpCreateInfo": "{collective} に支払いをリクエストします。コレクティブの管理者がその支払いを承認すると、経費として処理されます。金額、説明、プロフィールに登録した表示名は公開されますが、添付ファイル、支払いの詳細、およびその他の個人情報は公開されません。",
