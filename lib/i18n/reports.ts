@@ -13,9 +13,11 @@ const MESSAGES = defineMessages({
   },
   [ReportSection.FEES_TIPS]: {
     defaultMessage: 'Fees & Tips',
+    id: 'P3537s',
   },
   [ReportSection.OTHER]: {
     defaultMessage: 'Other',
+    id: '/VnDMl',
   },
 });
 

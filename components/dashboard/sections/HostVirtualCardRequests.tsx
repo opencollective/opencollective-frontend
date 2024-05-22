@@ -18,11 +18,8 @@ import { i18nVirtualCardRequestStatus } from '../../../lib/i18n/virtual-card-req
 import { sortSelectOptions } from '../../../lib/utils';
 
 import { accountHoverCardFields } from '../../AccountHoverCard';
-import { Flex } from '../../Grid';
 import { getI18nLink } from '../../I18nFormatters';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
-import Pagination from '../../Pagination';
-import { P } from '../../Text';
 import { VirtualCardRequestDrawer } from '../../virtual-card-requests/VirtualCardRequestDrawer';
 import { VirtualCardRequestsTable } from '../../virtual-card-requests/VirtualCardRequestsTable';
 import { StripeVirtualCardComplianceStatement } from '../../virtual-cards/StripeVirtualCardComplianceStatement';
@@ -31,6 +28,7 @@ import { EmptyResults } from '../EmptyResults';
 import ComboSelectFilter from '../filters/ComboSelectFilter';
 import { Filterbar } from '../filters/Filterbar';
 import { hostedAccountFilter } from '../filters/HostedAccountFilter';
+import { Pagination } from '../filters/Pagination';
 import { DashboardSectionProps } from '../types';
 
 const schema = z.object({
@@ -52,7 +50,7 @@ const toVariables: FiltersToVariables<z.infer<typeof schema>, HostVirtualCardReq
 const filters: FilterComponentConfigs<z.infer<typeof schema>, FilterMeta> = {
   account: hostedAccountFilter.filter,
   status: {
-    labelMsg: defineMessage({ defaultMessage: 'Status' }),
+    labelMsg: defineMessage({ defaultMessage: 'Status', id: 'tzMNF3' }),
     Component: ({ intl, ...props }) => (
       <ComboSelectFilter
         isMulti
@@ -157,7 +155,7 @@ export default function HostVirtualCardRequests({ accountSlug: hostSlug }: Dashb
   const views: Views<z.infer<typeof schema>> = [
     {
       id: 'pending',
-      label: intl.formatMessage({ defaultMessage: 'Pending' }),
+      label: intl.formatMessage({ defaultMessage: 'Pending', id: 'eKEL/g' }),
       filter: {
         status: [VirtualCardRequestStatus.PENDING],
       },
@@ -165,7 +163,7 @@ export default function HostVirtualCardRequests({ accountSlug: hostSlug }: Dashb
     },
     {
       id: 'approved',
-      label: intl.formatMessage({ defaultMessage: 'Approved' }),
+      label: intl.formatMessage({ defaultMessage: 'Approved', id: '6XFO/C' }),
       filter: {
         status: [VirtualCardRequestStatus.APPROVED],
       },
@@ -173,7 +171,7 @@ export default function HostVirtualCardRequests({ accountSlug: hostSlug }: Dashb
     },
     {
       id: 'rejected',
-      label: intl.formatMessage({ defaultMessage: 'Rejected' }),
+      label: intl.formatMessage({ defaultMessage: 'Rejected', id: '5qaD7s' }),
       filter: {
         status: [VirtualCardRequestStatus.REJECTED],
       },
@@ -241,22 +239,7 @@ export default function HostVirtualCardRequests({ accountSlug: hostSlug }: Dashb
             loading={query.loading}
             virtualCardRequests={query.data?.virtualCardRequests.nodes}
           />
-          <Flex mt={5} alignItems="center" flexDirection="column" justifyContent="center">
-            <Pagination
-              total={query.data?.virtualCardRequests.totalCount}
-              limit={queryFilter.values.limit}
-              offset={queryFilter.values.offset}
-              onPageChange={page => queryFilter.setFilter('offset', (page - 1) * queryFilter.values.limit)}
-            />
-            <P mt={1} fontSize="12px">
-              <FormattedMessage
-                id="withColon"
-                defaultMessage="{item}:"
-                values={{ item: <FormattedMessage id="TotalItems" defaultMessage="Total Items" /> }}
-              />{' '}
-              {query.data?.virtualCardRequests.totalCount}
-            </P>
-          </Flex>
+          <Pagination queryFilter={queryFilter} total={query.data?.virtualCardRequests.totalCount} />
 
           <VirtualCardRequestDrawer
             open={!!queryFilter.values.virtualCardRequest}

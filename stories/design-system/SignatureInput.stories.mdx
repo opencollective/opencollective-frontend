@@ -1,0 +1,27 @@
+import { ArgsTable, Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
+import { SignatureInput } from '../../components/SignatureInput';
+import theme from '../../lib/theme';
+
+<Meta
+  title="Design system/SignatureInput"
+  component={SignatureInput}
+  argTypes={{
+    onChange: { action: 'onChange' },
+    isSigned: { control: 'boolean' },
+    signerName: { control: 'text' },
+  }}
+/>
+
+# SignatureInput
+
+## Default
+
+export const DefaultStory = props => (
+  <div style={{ maxWidth: 440, height: 160 }}>
+    <SignatureInput {...props} />
+  </div>
+);
+
+<Story name="Default">{DefaultStory.bind({})}</Story>
+
+<ArgsTable story="Default" />

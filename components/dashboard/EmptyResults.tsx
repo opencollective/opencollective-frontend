@@ -20,6 +20,8 @@ export function EmptyResults({
     | 'HOST_APPLICATIONS'
     | 'VIRTUAL_CARDS'
     | 'VIRTUAL_CARD_REQUESTS'
+    | 'TAX_FORM'
+    | 'UPDATES'
     | 'TRANSACTIONS';
 }) {
   return (
@@ -38,13 +40,13 @@ export function EmptyResults({
         {hasFilters ? (
           <FormattedMessage
             id="filter.NoMatchingResults"
-            defaultMessage="No matching {type, select, EXPENSES {expenses} CONTRIBUTIONS {contributions} VIRTUAL_CARDS {virtual cards} VIRTUAL_CARD_REQUESTS {virtual card requests} TRANSACTIONS {transactions} AGREEMENTS {agreements} COLLECTIVES {collectives} HOST_APPLICATIONS {host applications} other {results}}"
+            defaultMessage="No matching {type, select, EXPENSES {expenses} CONTRIBUTIONS {contributions} VIRTUAL_CARDS {virtual cards} VIRTUAL_CARD_REQUESTS {virtual card requests} TRANSACTIONS {transactions} AGREEMENTS {agreements} COLLECTIVES {collectives} HOST_APPLICATIONS {host applications} TAX_FORM {tax forms} UPDATES {updates} other {results}}"
             values={{ type: entityType }}
           />
         ) : (
           <FormattedMessage
             id="filter.NoResults"
-            defaultMessage="No {type, select, EXPENSES {expenses} CONTRIBUTIONS {contributions} VIRTUAL_CARDS {virtual cards} VIRTUAL_CARD_REQUESTS {virtual card requests} TRANSACTIONS {transactions} AGREEMENTS {agreements} COLLECTIVES {collectives} HOST_APPLICATIONS {host applications} other {results}}"
+            defaultMessage="No {type, select, EXPENSES {expenses} CONTRIBUTIONS {contributions} VIRTUAL_CARDS {virtual cards} VIRTUAL_CARD_REQUESTS {virtual card requests} TRANSACTIONS {transactions} AGREEMENTS {agreements} COLLECTIVES {collectives} HOST_APPLICATIONS {host applications} TAX_FORM {tax forms} UPDATES {updates} other {results}}"
             values={{ type: entityType }}
           />
         )}
@@ -55,7 +57,7 @@ export function EmptyResults({
           <p className="text-balance text-center text-muted-foreground">
             <FormattedMessage
               id="filter.NoMatchingResults.subtitle"
-              defaultMessage="We can't find any {type, select, EXPENSES {expenses} CONTRIBUTIONS {contributions} VIRTUAL_CARDS {virtual cards} VIRTUAL_CARD_REQUESTS {virtual card requests} TRANSACTIONS {transactions} AGREEMENTS {agreements} COLLECTIVES {collectives} HOST_APPLICATIONS {host applications} other {results}} matching the given filters."
+              defaultMessage="We can't find any {type, select, EXPENSES {expenses} CONTRIBUTIONS {contributions} VIRTUAL_CARDS {virtual cards} VIRTUAL_CARD_REQUESTS {virtual card requests} TRANSACTIONS {transactions} AGREEMENTS {agreements} COLLECTIVES {collectives} HOST_APPLICATIONS {host applications} UPDATES {updates} other {results}} matching the given filters."
               values={{ type: entityType }}
             />
           </p>
@@ -69,7 +71,7 @@ export function EmptyResults({
             >
               <RotateCcw size={16} />
               <span>
-                <FormattedMessage defaultMessage="Reset filters" />
+                <FormattedMessage defaultMessage="Reset filters" id="jZ0o74" />
               </span>
             </Button>
           )}

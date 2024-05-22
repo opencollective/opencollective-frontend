@@ -426,7 +426,7 @@ export default function OrderPage(props) {
                     textTransform="uppercase"
                     closeButtonProps={undefined}
                   >
-                    <FormattedMessage defaultMessage="Contribution" /> #{order.legacyId}
+                    <FormattedMessage defaultMessage="Contribution" id="0LK5eg" /> #{order.legacyId}
                   </StyledTag>
                   <Tags order={order} canEdit={order.permissions.canSetTags} />
                 </Flex>
@@ -434,6 +434,7 @@ export default function OrderPage(props) {
                   <P mt="5px" fontSize="12px" color="black.600">
                     <FormattedMessage
                       defaultMessage="From {contributor} to {account}"
+                      id="nqRBcp"
                       values={{
                         contributor: <LinkCollective collective={order.fromAccount} />,
                         account: <LinkCollective collective={order.toAccount} />,
@@ -452,7 +453,10 @@ export default function OrderPage(props) {
                     <OrderDetails>
                       <StyledTooltip
                         content={
-                          <FormattedMessage defaultMessage="External reference code for this contribution. This is usually a reference number from the contributor accounting system." />
+                          <FormattedMessage
+                            defaultMessage="External reference code for this contribution. This is usually a reference number from the contributor accounting system."
+                            id="LqD2Po"
+                          />
                         }
                         containerCursor="default"
                       >
@@ -463,7 +467,7 @@ export default function OrderPage(props) {
                   )}
                   {order.pendingContributionData?.expectedAt && (
                     <OrderDetails>
-                      <FormattedMessage defaultMessage="Expected" />
+                      <FormattedMessage defaultMessage="Expected" id="6srLb2" />
                       {isOverdue ? (
                         <OverdueTag>
                           <DateTime
@@ -473,7 +477,7 @@ export default function OrderPage(props) {
                           />
                           <Span textTransform="uppercase" fontWeight="bold" letterSpacing="0.06em">
                             &nbsp;
-                            <FormattedMessage defaultMessage="Overdue" />
+                            <FormattedMessage defaultMessage="Overdue" id="M0vCGv" />
                           </Span>
                         </OverdueTag>
                       ) : (
@@ -526,9 +530,9 @@ export default function OrderPage(props) {
                 <Box mt={4}>
                   <P fontWeight="700" fontSize="16px" lineHeight="24px" color="black.900">
                     {isPending ? (
-                      <FormattedMessage defaultMessage="Contribution Details" />
+                      <FormattedMessage defaultMessage="Contribution Details" id="tijsiA" />
                     ) : (
-                      <FormattedMessage defaultMessage="Related Transactions" />
+                      <FormattedMessage defaultMessage="Related Transactions" id="Sz+Qhv" />
                     )}
                   </P>
                 </Box>
@@ -537,14 +541,14 @@ export default function OrderPage(props) {
                   {isPending ? (
                     <React.Fragment>
                       <TransactionDetails>
-                        <FormattedMessage defaultMessage="Expected Total Amount" />
+                        <FormattedMessage defaultMessage="Expected Total Amount" id="PEp9t9" />
                         <FormattedMoneyAmount
                           currency={order.totalAmount.currency}
                           precision={2}
                           amount={order.totalAmount.valueInCents}
                         />
 
-                        <FormattedMessage defaultMessage="Payment Fees not Considered" />
+                        <FormattedMessage defaultMessage="Payment Fees not Considered" id="ysc4k/" />
                         <FormattedMessage
                           id="contribution.createdAt"
                           defaultMessage="Created on {date}"
@@ -557,6 +561,7 @@ export default function OrderPage(props) {
                         <TransactionDetails>
                           <FormattedMessage
                             defaultMessage="Expected {taxType} ({rate}%)"
+                            id="U5Xeen"
                             values={{
                               taxType: i18nTaxType(intl, order.tax?.type || 'Tax', 'long'),
                               rate: order.tax?.rate * 100,
@@ -571,7 +576,7 @@ export default function OrderPage(props) {
                       )}
                       {Boolean(order.hostFeePercent) && (
                         <TransactionDetails>
-                          <FormattedMessage defaultMessage="Expected Host Fees" />
+                          <FormattedMessage defaultMessage="Expected Host Fees" id="+UwJxq" />
                           <FormattedMoneyAmount
                             currency={order.amount.currency}
                             precision={2}
@@ -580,12 +585,15 @@ export default function OrderPage(props) {
                               (order.hostFeePercent / -100)
                             }
                           />
-                          <FormattedMessage defaultMessage="Based on default host fees, can be changed at settling time" />
+                          <FormattedMessage
+                            defaultMessage="Based on default host fees, can be changed at settling time"
+                            id="b8rZxx"
+                          />
                         </TransactionDetails>
                       )}
                       {Boolean(order.platformTipAmount?.valueInCents) && (
                         <TransactionDetails>
-                          <FormattedMessage defaultMessage="Expected Platform Tip" />
+                          <FormattedMessage defaultMessage="Expected Platform Tip" id="20RyRD" />
                           <FormattedMoneyAmount
                             currency={order.platformTipAmount.currency}
                             amount={-order.platformTipAmount.valueInCents}
@@ -626,6 +634,7 @@ export default function OrderPage(props) {
                               <Span display="block">
                                 <FormattedMessage
                                   defaultMessage="{value} (Payment Processor Fee)"
+                                  id="ijvoto"
                                   values={{
                                     value: (
                                       <FormattedMoneyAmount
@@ -642,6 +651,7 @@ export default function OrderPage(props) {
                           <span>
                             <FormattedMessage
                               defaultMessage="{type, select, CREDIT {Received by} DEBIT {Paid by} other {}} {account} on {date}"
+                              id="XhoJIl"
                               values={{
                                 type: transaction.type,
                                 date: <DateTime value={transaction.createdAt} dateStyle={'short'} timeStyle="short" />,
@@ -703,7 +713,7 @@ export default function OrderPage(props) {
               {order?.memo && (
                 <Box mt={4}>
                   <P fontWeight="700" fontSize="16px" lineHeight="24px" color="black.900">
-                    <FormattedMessage defaultMessage="Additional Details" />
+                    <FormattedMessage defaultMessage="Additional Details" id="DgTPfL" />
                   </P>
 
                   <Span fontSize="12px" color="black.700" fontWeight="bold">

@@ -101,6 +101,7 @@ export function getFilterValueFromQueryValue(queryValue, defaultFilterValue) {
 export const filterShouldDisplay = (key, { values, filters, defaultSchemaValues, meta }) => {
   return (
     key !== 'orderBy' && // orderBy is handled separately
+    key !== 'sort' && // sort is handled separately
     filters[key].hide?.({ meta }) !== true && // hide function should return false if it exists
     (filters[key].static || // static filters should always be displayed
       values[key] !== defaultSchemaValues[key]) // don't show default schema values (will either be undefined or a value that can't be removed)
@@ -120,6 +121,7 @@ const omitForViewMatching = (values, { filters, defaultSchemaValues }) => {
     (value, key) =>
       !filters[key] || // only match values that are part of the `filters` config
       key === 'orderBy' || // don't match orderBy (to keep the view active regardless of sorting)
+      key === 'sort' || // don't match sort (to keep the view active regardless of sorting)
       value === defaultSchemaValues[key], // remove value from view matching if it is the default schema value
   );
 };

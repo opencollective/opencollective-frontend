@@ -207,11 +207,6 @@ interface Account {
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
-
-  """
-  Returns whether this account has a custom image
-  """
-  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -275,6 +270,16 @@ interface Account {
   Get pending member invitations for this account
   """
   memberInvitations(role: [MemberRole]): [MemberInvitation]
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   memberOf(
     limit: Int! = 100
     offset: Int! = 0
@@ -331,6 +336,16 @@ interface Account {
     The payment method types. Can include `null` for transactions without a payment method
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    The payment method services.
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Reference of the account(s) assigned to the main side of the transaction you want to EXCLUDE from the results
+    """
+    excludeAccount: [AccountReferenceInput]
 
     """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
@@ -450,13 +465,23 @@ interface Account {
     """
     The transactions group to filter by
     """
-    group: String
+    group: [String]
     virtualCard: [VirtualCardReferenceInput]
 
     """
     Only return transactions that are refunds (or not refunds if false)
     """
     isRefund: Boolean
+
+    """
+    Only return transactions that are associated with these external merchant IDs
+    """
+    merchantId: [String]
+
+    """
+    Only return transactions that are associated with these accounting categories
+    """
+    accountingCategory: [String]
   ): TransactionCollection!
   orders(
     """
@@ -539,6 +564,11 @@ interface Account {
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
+
+    """
+    Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
+    """
+    oppositeAccount: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -760,6 +790,7 @@ interface Account {
     Only return published updates.
     """
     onlyPublishedUpdates: Boolean = false
+    isDraft: Boolean
     onlyChangelogUpdates: Boolean
     orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
@@ -843,6 +874,11 @@ interface Account {
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
 }
 
 """
@@ -967,6 +1003,11 @@ enum DateTimeField {
   The creation time of a resource
   """
   CREATED_AT
+
+  """
+  Transactions only: The date when a transaction was cleared by the payment processor
+  """
+  EFFECTIVE_DATE
 }
 
 """
@@ -1613,6 +1654,36 @@ type Expense {
   requiredLegalDocuments: [LegalDocumentType]
 
   """
+  Returns the list of legal documents attached to this expense. Must be logged in as a host admin.
+  """
+  legalDocuments(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Filter by type of legal document
+    """
+    type: [LegalDocumentType]
+
+    """
+    Filter by status of legal document
+    """
+    status: [LegalDocumentRequestStatus]
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+  ): LegalDocumentCollection
+
+  """
   Drafted field values that were still not persisted
   """
   draft: JSON
@@ -1761,11 +1832,6 @@ type Host implements Account & AccountWithContributions {
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
-
-  """
-  Returns whether this account has a custom image
-  """
-  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -1840,6 +1906,16 @@ type Host implements Account & AccountWithContributions {
     """
     role: [MemberRole]
   ): [MemberInvitation]
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -1912,6 +1988,16 @@ type Host implements Account & AccountWithContributions {
     The payment method types. Can include `null` for transactions without a payment method
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    The payment method services.
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Reference of the account(s) assigned to the main side of the transaction you want to EXCLUDE from the results
+    """
+    excludeAccount: [AccountReferenceInput]
 
     """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
@@ -2031,13 +2117,23 @@ type Host implements Account & AccountWithContributions {
     """
     The transactions group to filter by
     """
-    group: String
+    group: [String]
     virtualCard: [VirtualCardReferenceInput]
 
     """
     Only return transactions that are refunds (or not refunds if false)
     """
     isRefund: Boolean
+
+    """
+    Only return transactions that are associated with these external merchant IDs
+    """
+    merchantId: [String]
+
+    """
+    Only return transactions that are associated with these accounting categories
+    """
+    accountingCategory: [String]
   ): TransactionCollection!
   orders(
     """
@@ -2120,6 +2216,11 @@ type Host implements Account & AccountWithContributions {
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
+
+    """
+    Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
+    """
+    oppositeAccount: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -2326,6 +2427,7 @@ type Host implements Account & AccountWithContributions {
     Only return published updates.
     """
     onlyPublishedUpdates: Boolean = false
+    isDraft: Boolean
     onlyChangelogUpdates: Boolean
     orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
@@ -2409,6 +2511,11 @@ type Host implements Account & AccountWithContributions {
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -2495,8 +2602,11 @@ type Host implements Account & AccountWithContributions {
   isOpenToApplications: Boolean
   termsUrl: URL
   plan: HostPlan!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
   hostTransactionsReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): HostTransactionReports
-  transactionsReport(dateFrom: DateTime, dateTo: DateTime): [TransactionSum]
   hostMetrics(
     """
     A collection of accounts for which the metrics should be returned.
@@ -2823,7 +2933,72 @@ type Host implements Account & AccountWithContributions {
     Order of the results
     """
     orderBy: OrderByInput
+
+    """
+    Filter by the balance of the account
+    """
+    balance: AmountRangeInput
+
+    """
+    Filter by the balance of the account and its children accounts (events and projects)
+    """
+    consolidatedBalance: AmountRangeInput
   ): AccountCollection!
+
+  """
+  Returns the legal documents required by this host
+  """
+  requiredLegalDocuments: [LegalDocumentType!]!
+
+  """
+  Returns legal documents hosted by this host
+  """
+  hostedLegalDocuments(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Filter by type of legal document
+    """
+    type: [LegalDocumentType]
+
+    """
+    Filter by status of legal document
+    """
+    status: [LegalDocumentRequestStatus]
+
+    """
+    Filter by accounts
+    """
+    account: [AccountReferenceInput]
+
+    """
+    Search term (name, description, ...)
+    """
+    searchTerm: String
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Filter by requested date from
+    """
+    requestedAtFrom: DateTime
+
+    """
+    Filter by requested date to
+    """
+    requestedAtTo: DateTime
+  ): LegalDocumentCollection!
 }
 
 """
@@ -3000,6 +3175,90 @@ input AccountReferenceInput {
 }
 
 """
+A legal document (e.g. W9, W8BEN, W8BEN-E)
+"""
+type LegalDocument {
+  """
+  Unique identifier for this legal document
+  """
+  id: String!
+
+  """
+  The year this legal document is for
+  """
+  year: Int!
+
+  """
+  The type of legal document
+  """
+  type: LegalDocumentType!
+
+  """
+  The status of the request for this legal document
+  """
+  status: LegalDocumentRequestStatus!
+
+  """
+  The service that provided this legal document
+  """
+  service: LegalDocumentService!
+
+  """
+  Whether this legal document is expired
+  """
+  isExpired: Boolean!
+
+  """
+  The date and time the request for this legal document was created
+  """
+  requestedAt: DateTime!
+
+  """
+  The date and time this legal document was last updated
+  """
+  updatedAt: DateTime!
+
+  """
+  The account this legal document is for
+  """
+  account: Account!
+
+  """
+  URL to download the file. Must be logged in as a host with access to the document. The returned URL will be protected by authentication + 2FA.
+  """
+  documentLink: URL
+}
+
+"""
+Type for a required legal document
+"""
+enum LegalDocumentType {
+  """
+  US tax form (W9, W8BEN, W8BEN-E)
+  """
+  US_TAX_FORM
+}
+
+"""
+Status for a legal document
+"""
+enum LegalDocumentRequestStatus {
+  NOT_REQUESTED
+  REQUESTED
+  RECEIVED
+  ERROR
+  INVALID
+}
+
+"""
+Type for a required legal document
+"""
+enum LegalDocumentService {
+  DROPBOX_FORMS
+  OPENCOLLECTIVE
+}
+
+"""
 A collection of "MemberOf" (ie: Collective backed by an Organization)
 """
 type MemberOfCollection implements Collection {
@@ -3039,7 +3298,7 @@ enum HostFeeStructure {
 }
 
 """
-Input to order results
+Input to order collection
 """
 input OrderByInput {
   """
@@ -3058,14 +3317,18 @@ Possible fields you can use to order by
 """
 enum OrderByFieldType {
   CREATED_AT
-  MEMBER_COUNT
-  TOTAL_CONTRIBUTED
 
   """
   The financial activity of the collective (number of transactions)
   """
   ACTIVITY
+  HOST_RANK
+  HOSTED_COLLECTIVES_COUNT
   RANK
+  BALANCE
+  MEMBER_COUNT
+  TOTAL_CONTRIBUTED
+  NAME
 }
 
 """
@@ -3085,6 +3348,7 @@ type TransactionCollection implements Collection {
 }
 
 enum PaymentMethodType {
+  default @deprecated(reason: "Please use uppercase values")
   alipay @deprecated(reason: "Please use uppercase values")
   creditcard @deprecated(reason: "Please use uppercase values")
   prepaid @deprecated(reason: "Please use uppercase values")
@@ -3105,6 +3369,7 @@ enum PaymentMethodType {
   bank_transfer @deprecated(reason: "Please use uppercase values")
   payout @deprecated(reason: "Please use uppercase values")
   virtual_card @deprecated(reason: "Please use uppercase values")
+  DEFAULT
   ALIPAY
   CREDITCARD
   PREPAID
@@ -3125,6 +3390,14 @@ enum PaymentMethodType {
   BANK_TRANSFER
   PAYOUT
   VIRTUAL_CARD
+}
+
+enum PaymentMethodService {
+  PAYPAL
+  STRIPE
+  OPENCOLLECTIVE
+  THEGIVINGBLOCK
+  WISE
 }
 
 input ExpenseReferenceInput {
@@ -4233,16 +4506,12 @@ type PaymentMethod {
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
-  ): OrderCollection
-}
 
-enum PaymentMethodService {
-  PAYPAL
-  STRIPE
-  OPENCOLLECTIVE
-  PREPAID
-  THEGIVINGBLOCK
-  WISE
+    """
+    Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
+    """
+    oppositeAccount: AccountReferenceInput
+  ): OrderCollection
 }
 
 enum PaymentMethodLegacyType {
@@ -4696,11 +4965,6 @@ type AccountStats {
     Return only the stats for this frequency
     """
     frequency: ContributionFrequency
-
-    """
-    Filter contributions on whether they can be ported to another fiscal host directly
-    """
-    hasPortability: Boolean
 
     """
     Include contributions to children accounts (Projects and Events)
@@ -5376,6 +5640,8 @@ enum ActivityType {
   COLLECTIVE_EXPENSE_RECURRING_DRAFTED
   COLLECTIVE_EXPENSE_MISSING_RECEIPT
   TAXFORM_REQUEST
+  TAXFORM_RECEIVED
+  TAXFORM_INVALIDATED
   COLLECTIVE_VIRTUAL_CARD_ADDED
   COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS
   COLLECTIVE_VIRTUAL_CARD_RESUMED
@@ -5465,6 +5731,55 @@ enum ActivityClassType {
   VIRTUAL_CARDS
   FUND_EVENTS
   REPORTS
+}
+
+"""
+EXPERIMENTAL (this may change or be deleted): Host transaction report
+"""
+type TransactionReports {
+  """
+  The start date of the time series
+  """
+  dateFrom: DateTime
+
+  """
+  The end date of the time series
+  """
+  dateTo: DateTime
+
+  """
+  The interval between two data points
+  """
+  timeUnit: TimeUnit!
+  nodes: [TransactionReport!]
+}
+
+"""
+EXPERIMENTAL (this may change or be deleted)
+"""
+type TransactionReport {
+  date: DateTime
+  startingBalance: Amount!
+  endingBalance: Amount!
+  totalChange: Amount!
+  groups: [TransactionsAmountGroup]!
+}
+
+"""
+EXPERIMENTAL (this may change or be deleted): Transaction amounts grouped by type, kind, isRefund, isHost, expenseType
+"""
+type TransactionsAmountGroup {
+  netAmount: Amount
+  amount: Amount
+  platformFee: Amount
+  paymentProcessorFee: Amount
+  hostFee: Amount
+  taxAmount: Amount
+  type: TransactionType
+  kind: TransactionKind
+  isRefund: Boolean
+  isHost: Boolean
+  expenseType: ExpenseType
 }
 
 """
@@ -5611,47 +5926,8 @@ type HostTransactionReports {
 
 type HostTransactionReportNode {
   date: DateTime!
-  managedFunds: TransactionsReport!
-  operationalFunds: TransactionsReport!
-}
-
-"""
-Transactions report
-"""
-type TransactionsReport {
-  startingBalance: Amount!
-  endingBalance: Amount!
-  totalChange: Amount!
-  groups: [TransactionsAmountGroup]!
-}
-
-"""
-EXPERIMENTAL (this may change or be deleted): Transaction amounts grouped by type, kind, isRefund, isHost, expenseType
-"""
-type TransactionsAmountGroup {
-  netAmount: Amount
-  amount: Amount
-  platformFee: Amount
-  paymentProcessorFee: Amount
-  hostFee: Amount
-  taxAmount: Amount
-  type: TransactionType
-  kind: TransactionKind
-  isRefund: Boolean
-  isHost: Boolean
-  expenseType: ExpenseType
-}
-
-"""
-EXPERIMENTAL (this may change or be deleted): Transaction amounts grouped by type, kind, isRefund, isHost, expenseType
-"""
-type TransactionSum {
-  amount: Amount
-  type: TransactionType
-  kind: TransactionKind
-  isRefund: Boolean
-  isHost: Boolean
-  expenseType: ExpenseType
+  managedFunds: TransactionReport!
+  operationalFunds: TransactionReport!
 }
 
 """
@@ -5854,9 +6130,19 @@ type HostApplication {
   account: Account!
 
   """
+  The host the collective applied to
+  """
+  host: Host!
+
+  """
   The date on which the item was created
   """
   createdAt: DateTime!
+
+  """
+  The date on which the item was updated
+  """
+  updatedAt: DateTime!
   status: HostApplicationStatus
   message: String
   customData: JSON
@@ -6037,6 +6323,31 @@ type VendorCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [Vendor!]
+}
+
+"""
+Input type for an amount range with the value and currency
+"""
+input AmountRangeInput {
+  """
+  The minimum amount (inclusive)
+  """
+  gte: AmountInput
+
+  """
+  The maximum amount (inclusive)
+  """
+  lte: AmountInput
+}
+
+"""
+A collection of "LegalDocument"
+"""
+type LegalDocumentCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [LegalDocument]
 }
 
 type ExpenseValuesByRole {
@@ -6279,6 +6590,7 @@ type ExpensePermissions {
   canUsePrivateNote: Boolean!
   canHold: Boolean!
   canRelease: Boolean!
+  canDownloadTaxForm: Boolean!
   edit: Permission!
 
   """
@@ -6300,16 +6612,7 @@ type ExpensePermissions {
   verifyDraftExpense: Permission!
   hold: Permission!
   release: Permission!
-}
-
-"""
-Type for a required legal document
-"""
-enum LegalDocumentType {
-  """
-  US tax form (W9)
-  """
-  US_TAX_FORM
+  downloadTaxForm: Permission!
 }
 
 """
@@ -6641,11 +6944,6 @@ type Bot implements Account {
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
-
-  """
-  Returns whether this account has a custom image
-  """
-  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -6720,6 +7018,16 @@ type Bot implements Account {
     """
     role: [MemberRole]
   ): [MemberInvitation]
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -6792,6 +7100,16 @@ type Bot implements Account {
     The payment method types. Can include `null` for transactions without a payment method
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    The payment method services.
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Reference of the account(s) assigned to the main side of the transaction you want to EXCLUDE from the results
+    """
+    excludeAccount: [AccountReferenceInput]
 
     """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
@@ -6911,13 +7229,23 @@ type Bot implements Account {
     """
     The transactions group to filter by
     """
-    group: String
+    group: [String]
     virtualCard: [VirtualCardReferenceInput]
 
     """
     Only return transactions that are refunds (or not refunds if false)
     """
     isRefund: Boolean
+
+    """
+    Only return transactions that are associated with these external merchant IDs
+    """
+    merchantId: [String]
+
+    """
+    Only return transactions that are associated with these accounting categories
+    """
+    accountingCategory: [String]
   ): TransactionCollection!
   orders(
     """
@@ -7000,6 +7328,11 @@ type Bot implements Account {
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
+
+    """
+    Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
+    """
+    oppositeAccount: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -7206,6 +7539,7 @@ type Bot implements Account {
     Only return published updates.
     """
     onlyPublishedUpdates: Boolean = false
+    isDraft: Boolean
     onlyChangelogUpdates: Boolean
     orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
@@ -7289,6 +7623,11 @@ type Bot implements Account {
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -7341,11 +7680,6 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
-
-  """
-  Returns whether this account has a custom image
-  """
-  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -7420,6 +7754,16 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     role: [MemberRole]
   ): [MemberInvitation]
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -7492,6 +7836,16 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     The payment method types. Can include `null` for transactions without a payment method
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    The payment method services.
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Reference of the account(s) assigned to the main side of the transaction you want to EXCLUDE from the results
+    """
+    excludeAccount: [AccountReferenceInput]
 
     """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
@@ -7611,13 +7965,23 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     The transactions group to filter by
     """
-    group: String
+    group: [String]
     virtualCard: [VirtualCardReferenceInput]
 
     """
     Only return transactions that are refunds (or not refunds if false)
     """
     isRefund: Boolean
+
+    """
+    Only return transactions that are associated with these external merchant IDs
+    """
+    merchantId: [String]
+
+    """
+    Only return transactions that are associated with these accounting categories
+    """
+    accountingCategory: [String]
   ): TransactionCollection!
   orders(
     """
@@ -7700,6 +8064,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
+
+    """
+    Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
+    """
+    oppositeAccount: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -7906,6 +8275,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Only return published updates.
     """
     onlyPublishedUpdates: Boolean = false
+    isDraft: Boolean
     onlyChangelogUpdates: Boolean
     orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
@@ -7989,6 +8359,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -8016,6 +8391,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Fees percentage that the host takes for this collective
   """
   hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
+
+  """
+  Returns the Fiscal Host application
+  """
+  hostApplication: HostApplication
 
   """
   How much platform fees are charged for this account
@@ -8119,6 +8499,11 @@ interface AccountWithHost {
   Fees percentage that the host takes for this collective
   """
   hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
+
+  """
+  Returns the Fiscal Host application
+  """
+  hostApplication: HostApplication
 
   """
   Fees percentage that the platform takes for this collective
@@ -8293,7 +8678,7 @@ type Credit implements Transaction {
   ): [Transaction]!
 
   """
-  Merchant id related to the Transaction (Stripe, PayPal, Wise, Privacy)
+  Merchant ID related to the Transaction (Stripe, PayPal, Wise, Privacy)
   """
   merchantId: String
   balanceInHostCurrency: Amount
@@ -8437,7 +8822,7 @@ type Debit implements Transaction {
   ): [Transaction]!
 
   """
-  Merchant id related to the Transaction (Stripe, PayPal, Wise, Privacy)
+  Merchant ID related to the Transaction (Stripe, PayPal, Wise, Privacy)
   """
   merchantId: String
   balanceInHostCurrency: Amount
@@ -8482,11 +8867,6 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
-
-  """
-  Returns whether this account has a custom image
-  """
-  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -8561,6 +8941,16 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     role: [MemberRole]
   ): [MemberInvitation]
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -8633,6 +9023,16 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     The payment method types. Can include `null` for transactions without a payment method
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    The payment method services.
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Reference of the account(s) assigned to the main side of the transaction you want to EXCLUDE from the results
+    """
+    excludeAccount: [AccountReferenceInput]
 
     """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
@@ -8752,13 +9152,23 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     The transactions group to filter by
     """
-    group: String
+    group: [String]
     virtualCard: [VirtualCardReferenceInput]
 
     """
     Only return transactions that are refunds (or not refunds if false)
     """
     isRefund: Boolean
+
+    """
+    Only return transactions that are associated with these external merchant IDs
+    """
+    merchantId: [String]
+
+    """
+    Only return transactions that are associated with these accounting categories
+    """
+    accountingCategory: [String]
   ): TransactionCollection!
   orders(
     """
@@ -8841,6 +9251,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
+
+    """
+    Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
+    """
+    oppositeAccount: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -9047,6 +9462,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Only return published updates.
     """
     onlyPublishedUpdates: Boolean = false
+    isDraft: Boolean
     onlyChangelogUpdates: Boolean
     orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
@@ -9130,6 +9546,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -9157,6 +9578,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   Fees percentage that the host takes for this collective
   """
   hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
+
+  """
+  Returns the Fiscal Host application
+  """
+  hostApplication: HostApplication
 
   """
   How much platform fees are charged for this account
@@ -9412,11 +9838,6 @@ type Individual implements Account {
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
-
-  """
-  Returns whether this account has a custom image
-  """
-  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -9491,6 +9912,16 @@ type Individual implements Account {
     """
     role: [MemberRole]
   ): [MemberInvitation]
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -9563,6 +9994,16 @@ type Individual implements Account {
     The payment method types. Can include `null` for transactions without a payment method
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    The payment method services.
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Reference of the account(s) assigned to the main side of the transaction you want to EXCLUDE from the results
+    """
+    excludeAccount: [AccountReferenceInput]
 
     """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
@@ -9682,13 +10123,23 @@ type Individual implements Account {
     """
     The transactions group to filter by
     """
-    group: String
+    group: [String]
     virtualCard: [VirtualCardReferenceInput]
 
     """
     Only return transactions that are refunds (or not refunds if false)
     """
     isRefund: Boolean
+
+    """
+    Only return transactions that are associated with these external merchant IDs
+    """
+    merchantId: [String]
+
+    """
+    Only return transactions that are associated with these accounting categories
+    """
+    accountingCategory: [String]
   ): TransactionCollection!
   orders(
     """
@@ -9771,6 +10222,11 @@ type Individual implements Account {
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
+
+    """
+    Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
+    """
+    oppositeAccount: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -9975,6 +10431,7 @@ type Individual implements Account {
     Only return published updates.
     """
     onlyPublishedUpdates: Boolean = false
+    isDraft: Boolean
     onlyChangelogUpdates: Boolean
     orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
@@ -10058,6 +10515,11 @@ type Individual implements Account {
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -10318,11 +10780,6 @@ type Organization implements Account & AccountWithContributions {
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
-
-  """
-  Returns whether this account has a custom image
-  """
-  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -10397,6 +10854,16 @@ type Organization implements Account & AccountWithContributions {
     """
     role: [MemberRole]
   ): [MemberInvitation]
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -10469,6 +10936,16 @@ type Organization implements Account & AccountWithContributions {
     The payment method types. Can include `null` for transactions without a payment method
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    The payment method services.
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Reference of the account(s) assigned to the main side of the transaction you want to EXCLUDE from the results
+    """
+    excludeAccount: [AccountReferenceInput]
 
     """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
@@ -10588,13 +11065,23 @@ type Organization implements Account & AccountWithContributions {
     """
     The transactions group to filter by
     """
-    group: String
+    group: [String]
     virtualCard: [VirtualCardReferenceInput]
 
     """
     Only return transactions that are refunds (or not refunds if false)
     """
     isRefund: Boolean
+
+    """
+    Only return transactions that are associated with these external merchant IDs
+    """
+    merchantId: [String]
+
+    """
+    Only return transactions that are associated with these accounting categories
+    """
+    accountingCategory: [String]
   ): TransactionCollection!
   orders(
     """
@@ -10677,6 +11164,11 @@ type Organization implements Account & AccountWithContributions {
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
+
+    """
+    Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
+    """
+    oppositeAccount: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -10881,6 +11373,7 @@ type Organization implements Account & AccountWithContributions {
     Only return published updates.
     """
     onlyPublishedUpdates: Boolean = false
+    isDraft: Boolean
     onlyChangelogUpdates: Boolean
     orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
@@ -10964,6 +11457,11 @@ type Organization implements Account & AccountWithContributions {
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -11118,11 +11616,6 @@ type Vendor implements Account & AccountWithContributions {
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
-
-  """
-  Returns whether this account has a custom image
-  """
-  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -11197,6 +11690,16 @@ type Vendor implements Account & AccountWithContributions {
     """
     role: [MemberRole]
   ): [MemberInvitation]
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -11269,6 +11772,16 @@ type Vendor implements Account & AccountWithContributions {
     The payment method types. Can include `null` for transactions without a payment method
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    The payment method services.
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Reference of the account(s) assigned to the main side of the transaction you want to EXCLUDE from the results
+    """
+    excludeAccount: [AccountReferenceInput]
 
     """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
@@ -11388,13 +11901,23 @@ type Vendor implements Account & AccountWithContributions {
     """
     The transactions group to filter by
     """
-    group: String
+    group: [String]
     virtualCard: [VirtualCardReferenceInput]
 
     """
     Only return transactions that are refunds (or not refunds if false)
     """
     isRefund: Boolean
+
+    """
+    Only return transactions that are associated with these external merchant IDs
+    """
+    merchantId: [String]
+
+    """
+    Only return transactions that are associated with these accounting categories
+    """
+    accountingCategory: [String]
   ): TransactionCollection!
   orders(
     """
@@ -11477,6 +12000,11 @@ type Vendor implements Account & AccountWithContributions {
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
+
+    """
+    Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
+    """
+    oppositeAccount: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -11683,6 +12211,7 @@ type Vendor implements Account & AccountWithContributions {
     Only return published updates.
     """
     onlyPublishedUpdates: Boolean = false
+    isDraft: Boolean
     onlyChangelogUpdates: Boolean
     orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
@@ -11766,6 +12295,11 @@ type Vendor implements Account & AccountWithContributions {
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -12539,6 +13073,11 @@ type Query {
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
+
+    """
+    Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
+    """
+    oppositeAccount: AccountReferenceInput
   ): OrderCollection!
   organization(
     """
@@ -12619,7 +13158,12 @@ type Query {
     """
     The public id identifying the transaction (ie: rvelja97-pkzqbgq7-bbzyx6wd-50o8n4rm)
     """
-    id: String
+    id: String @deprecated(reason: "2024-05-07: Please use the `transaction` field.")
+
+    """
+    Identifiers to retrieve the transaction.
+    """
+    transaction: TransactionReferenceInput
   ): Transaction
   transactions(
     """
@@ -12646,6 +13190,16 @@ type Query {
     The payment method types. Can include `null` for transactions without a payment method
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    The payment method services.
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Reference of the account(s) assigned to the main side of the transaction you want to EXCLUDE from the results
+    """
+    excludeAccount: [AccountReferenceInput]
 
     """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
@@ -12765,13 +13319,23 @@ type Query {
     """
     The transactions group to filter by
     """
-    group: String
+    group: [String]
     virtualCard: [VirtualCardReferenceInput]
 
     """
     Only return transactions that are refunds (or not refunds if false)
     """
     isRefund: Boolean
+
+    """
+    Only return transactions that are associated with these external merchant IDs
+    """
+    merchantId: [String]
+
+    """
+    Only return transactions that are associated with these accounting categories
+    """
+    accountingCategory: [String]
   ): TransactionCollection!
   update(
     """
@@ -14182,6 +14746,8 @@ enum ActivityAndClassesType {
   COLLECTIVE_EXPENSE_RECURRING_DRAFTED
   COLLECTIVE_EXPENSE_MISSING_RECEIPT
   TAXFORM_REQUEST
+  TAXFORM_RECEIVED
+  TAXFORM_INVALIDATED
   COLLECTIVE_VIRTUAL_CARD_ADDED
   COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS
   COLLECTIVE_VIRTUAL_CARD_RESUMED
@@ -14338,11 +14904,6 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
-
-  """
-  Returns whether this account has a custom image
-  """
-  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -14417,6 +14978,16 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     role: [MemberRole]
   ): [MemberInvitation]
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -14489,6 +15060,16 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     The payment method types. Can include `null` for transactions without a payment method
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    The payment method services.
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Reference of the account(s) assigned to the main side of the transaction you want to EXCLUDE from the results
+    """
+    excludeAccount: [AccountReferenceInput]
 
     """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
@@ -14608,13 +15189,23 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     The transactions group to filter by
     """
-    group: String
+    group: [String]
     virtualCard: [VirtualCardReferenceInput]
 
     """
     Only return transactions that are refunds (or not refunds if false)
     """
     isRefund: Boolean
+
+    """
+    Only return transactions that are associated with these external merchant IDs
+    """
+    merchantId: [String]
+
+    """
+    Only return transactions that are associated with these accounting categories
+    """
+    accountingCategory: [String]
   ): TransactionCollection!
   orders(
     """
@@ -14697,6 +15288,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
+
+    """
+    Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
+    """
+    oppositeAccount: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -14903,6 +15499,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Only return published updates.
     """
     onlyPublishedUpdates: Boolean = false
+    isDraft: Boolean
     onlyChangelogUpdates: Boolean
     orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
@@ -14986,6 +15583,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -15013,6 +15615,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   Fees percentage that the host takes for this collective
   """
   hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
+
+  """
+  Returns the Fiscal Host application
+  """
+  hostApplication: HostApplication
 
   """
   How much platform fees are charged for this account
@@ -15146,11 +15753,6 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
-
-  """
-  Returns whether this account has a custom image
-  """
-  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -15225,6 +15827,16 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     role: [MemberRole]
   ): [MemberInvitation]
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -15297,6 +15909,16 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     The payment method types. Can include `null` for transactions without a payment method
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    The payment method services.
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Reference of the account(s) assigned to the main side of the transaction you want to EXCLUDE from the results
+    """
+    excludeAccount: [AccountReferenceInput]
 
     """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
@@ -15416,13 +16038,23 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     The transactions group to filter by
     """
-    group: String
+    group: [String]
     virtualCard: [VirtualCardReferenceInput]
 
     """
     Only return transactions that are refunds (or not refunds if false)
     """
     isRefund: Boolean
+
+    """
+    Only return transactions that are associated with these external merchant IDs
+    """
+    merchantId: [String]
+
+    """
+    Only return transactions that are associated with these accounting categories
+    """
+    accountingCategory: [String]
   ): TransactionCollection!
   orders(
     """
@@ -15505,6 +16137,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
+
+    """
+    Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
+    """
+    oppositeAccount: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -15711,6 +16348,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Only return published updates.
     """
     onlyPublishedUpdates: Boolean = false
+    isDraft: Boolean
     onlyChangelogUpdates: Boolean
     orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
@@ -15794,6 +16432,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -15821,6 +16464,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   Fees percentage that the host takes for this collective
   """
   hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
+
+  """
+  Returns the Fiscal Host application
+  """
+  hostApplication: HostApplication
 
   """
   How much platform fees are charged for this account
@@ -15928,6 +16576,18 @@ input TierReferenceInput {
   isCustom: Boolean
 }
 
+input TransactionReferenceInput {
+  """
+  The public id identifying the transaction (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The internal id of the transaction (ie: 580)
+  """
+  legacyId: Int
+}
+
 """
 A PayPal plan to associate with a contribution
 """
@@ -15974,9 +16634,14 @@ type Mutation {
     tier: TierReferenceInput
 
     """
-    The total amount of the order, including taxes
+    The total amount of the order, including fees and taxes
     """
     amount: AmountInput!
+
+    """
+    The payment processor fee amount
+    """
+    paymentProcessorFee: AmountInput
 
     """
     The host fee percent to apply to the order, as a float between 0 and 100
@@ -16716,6 +17381,56 @@ type Mutation {
   ): SetPasswordResponse!
 
   """
+  Submit a legal document
+  """
+  submitLegalDocument(
+    """
+    The account the legal document is for
+    """
+    account: AccountReferenceInput!
+
+    """
+    The type of legal document
+    """
+    type: LegalDocumentType!
+
+    """
+    The form data for the legal document. Will be validated against the schema for the document type and encrypted.
+    """
+    formData: JSON!
+  ): LegalDocument!
+
+  """
+  Edit the status of a legal document
+  """
+  editLegalDocumentStatus(
+    """
+    The ID of the legal document
+    """
+    id: String!
+
+    """
+    The new status of the legal document
+    """
+    status: LegalDocumentRequestStatus!
+
+    """
+    The host of the legal document
+    """
+    host: AccountReferenceInput!
+
+    """
+    A message to explain the change in status. Will be sent to the legal document submitter
+    """
+    message: String
+
+    """
+    The new document link for the legal document. Must pass status=RECEIVED.
+    """
+    file: Upload
+  ): LegalDocument!
+
+  """
   Invite a new member to the Collective. Scope: "account".
   """
   inviteMember(
@@ -17195,26 +17910,6 @@ type Mutation {
     """
     destinationAccount: AccountReferenceInput!
   ): [Expense]!
-
-  """
-  [Root only] A mutation to set the tax from for an account.
-  """
-  setTaxForm(
-    """
-    Reference to the Account the tax form should be set.
-    """
-    account: AccountReferenceInput!
-
-    """
-    The tax from link.
-    """
-    taxFormLink: URL!
-
-    """
-    The tax form year.
-    """
-    year: Int!
-  ): SetTaxFormResult
 
   """
   Refunds a transaction. Scope: "transactions".
@@ -18703,6 +19398,11 @@ type SetPasswordResponse {
   token: String
 }
 
+"""
+The `Upload` scalar type represents a file upload.
+"""
+scalar Upload
+
 input MemberInvitationReferenceInput {
   """
   The public id identifying the member invitation (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
@@ -19298,22 +19998,6 @@ type BanAccountResponse {
   accounts: [Account!]!
 }
 
-type SetTaxFormResult {
-  success: Boolean!
-}
-
-input TransactionReferenceInput {
-  """
-  The public id identifying the transaction (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
-  """
-  id: String
-
-  """
-  The internal id of the transaction (ie: 580)
-  """
-  legacyId: Int
-}
-
 """
 Input type for UpdateType
 """
@@ -19325,6 +20009,7 @@ input UpdateCreateInput {
   html: String!
   fromAccount: AccountReferenceInput
   account: AccountReferenceInput!
+  notificationAudience: UpdateAudience
 }
 
 """
@@ -19335,9 +20020,11 @@ input UpdateUpdateInput {
   slug: String
   title: String
   isPrivate: Boolean
+  isChangelog: Boolean
   makePublicOn: DateTime
   html: String
   fromAccount: AccountReferenceInput
+  notificationAudience: UpdateAudience
 }
 
 type UploadFileResult {
@@ -19408,11 +20095,6 @@ input UploadFileInput {
   """
   parsingOptions: OCRParsingOptionsInput = null
 }
-
-"""
-The `Upload` scalar type represents a file upload.
-"""
-scalar Upload
 
 """
 The kind of file that was uploaded

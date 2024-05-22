@@ -91,10 +91,10 @@ function categoryToEditableFields(category: AccountingCategory) {
 const orderByCodeFilter = buildOrderByFilter(
   z.enum(['CODE,DESC', 'CODE,ASC', 'NAME,DESC', 'NAME,ASC']).default('CODE,ASC'),
   {
-    'CODE,DESC': defineMessage({ defaultMessage: 'Code descending' }),
-    'CODE,ASC': defineMessage({ defaultMessage: 'Code ascending' }),
-    'NAME,DESC': defineMessage({ defaultMessage: 'Name descending' }),
-    'NAME,ASC': defineMessage({ defaultMessage: 'Name ascending' }),
+    'CODE,DESC': defineMessage({ defaultMessage: 'Code descending', id: 'WSOB2K' }),
+    'CODE,ASC': defineMessage({ defaultMessage: 'Code ascending', id: 'XeM7ah' }),
+    'NAME,DESC': defineMessage({ defaultMessage: 'Name descending', id: 'mKpwVr' }),
+    'NAME,ASC': defineMessage({ defaultMessage: 'Name ascending', id: 'M5aWJU' }),
   },
 );
 
@@ -104,16 +104,16 @@ const appliesToFilter = buildComboSelectFilter(
       z.enum([AccountingCategoryKind.ADDED_FUNDS, AccountingCategoryKind.CONTRIBUTION, AccountingCategoryKind.EXPENSE]),
     )
     .optional(),
-  defineMessage({ defaultMessage: 'Applies to' }),
+  defineMessage({ defaultMessage: 'Applies to', id: '6WqHWi' }),
   AccountingCategoryKindI18n,
 );
 
 const hostOnlyFilter = buildComboSelectFilter(
   z.enum(['yes', 'no']).optional(),
-  defineMessage({ defaultMessage: 'Host only' }),
+  defineMessage({ defaultMessage: 'Host only', id: 'qj+AAT' }),
   {
-    ['yes']: defineMessage({ defaultMessage: 'Yes' }),
-    ['no']: defineMessage({ defaultMessage: 'No' }),
+    ['yes']: defineMessage({ defaultMessage: 'Yes', id: 'a5msuh' }),
+    ['no']: defineMessage({ defaultMessage: 'No', id: 'oUWADl' }),
   },
 );
 
@@ -264,14 +264,17 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
     <React.Fragment>
       <div className="flex max-w-screen-lg flex-col gap-4">
         <DashboardHeader
-          title={<FormattedMessage defaultMessage="Chart of Accounts" />}
+          title={<FormattedMessage defaultMessage="Chart of Accounts" id="IzFWHI" />}
           description={
-            <FormattedMessage defaultMessage="Manage your accounting categories, and use these categories to keep your Collectives’ expenses organized." />
+            <FormattedMessage
+              defaultMessage="Manage your accounting categories, and use these categories to keep your Collectives’ expenses organized."
+              id="5j8RQd"
+            />
           }
           actions={
             <Button size="sm" className="gap-1" onClick={() => setIsCreateCategoryModalOpen(true)}>
               <span>
-                <FormattedMessage defaultMessage="Create category" />
+                <FormattedMessage defaultMessage="Create category" id="ZROXxK" />
               </span>
               <PlusIcon size={20} />
             </Button>
@@ -300,7 +303,9 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
           isDanger
           type="delete"
           onClose={() => setDeleteCategoryConfirmation(null)}
-          header={<FormattedMessage defaultMessage="Are you sure you want to delete this accounting category?" />}
+          header={
+            <FormattedMessage defaultMessage="Are you sure you want to delete this accounting category?" id="zbCUar" />
+          }
           continueHandler={async () => {
             await onConfirmDelete();
             setDeleteCategoryConfirmation(null);

@@ -79,6 +79,7 @@ const ExpensesList = ({
   useDrawer,
   setOpenExpenseLegacyId,
   openExpenseLegacyId,
+  onDuplicateClick,
 }) => {
   // Initial values for expense in drawer
   const expenseInDrawer = React.useMemo(() => {
@@ -116,6 +117,7 @@ const ExpensesList = ({
               {view === 'submitter-new' ? (
                 <SubmittedExpenseListItem
                   expense={expense}
+                  onDuplicateClick={onDuplicateClick}
                   onClick={() => {
                     setOpenExpenseLegacyId(expense.legacyId);
                   }}
@@ -202,6 +204,7 @@ ExpensesList.propTypes = {
   useDrawer: PropTypes.bool,
   setOpenExpenseLegacyId: PropTypes.func,
   openExpenseLegacyId: PropTypes.number,
+  onDuplicateClick: PropTypes.func,
 };
 
 ExpensesList.defaultProps = {

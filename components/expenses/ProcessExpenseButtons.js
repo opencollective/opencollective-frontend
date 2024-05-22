@@ -81,7 +81,7 @@ const getErrorContent = (intl, error, host) => {
   if (message) {
     if (message.startsWith('Insufficient Paypal balance')) {
       return {
-        title: intl.formatMessage({ defaultMessage: 'Insufficient Paypal balance' }),
+        title: intl.formatMessage({ defaultMessage: 'Insufficient Paypal balance', id: 'BmZrOu' }),
         message: (
           <React.Fragment>
             <Link href={`/dashboard/${host.slug}/host-expenses`}>

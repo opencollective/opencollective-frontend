@@ -11,13 +11,13 @@ import { Account, ExpensesPageQueryVariables } from '../../../../lib/graphql/typ
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
 import ExpensesList from '../../../expenses/ExpensesList';
-import Pagination from '../../../Pagination';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { expenseTagFilter } from '../../filters/ExpenseTagsFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { AccountRenderer } from '../../filters/HostedAccountFilter';
+import { Pagination } from '../../filters/Pagination';
 import { DashboardSectionProps } from '../../types';
 
 import {
@@ -56,7 +56,7 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   ...commonFilters,
   tag: expenseTagFilter.filter,
   account: {
-    labelMsg: defineMessage({ defaultMessage: 'Account' }),
+    labelMsg: defineMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
     Component: ({ meta, ...props }) => {
       return (
         <ComboSelectFilter
@@ -113,8 +113,8 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
   return (
     <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader
-        title={<FormattedMessage defaultMessage="Received Expenses" />}
-        description={<FormattedMessage defaultMessage="Expenses submitted to your account." />}
+        title={<FormattedMessage defaultMessage="Received Expenses" id="1c0Y31" />}
+        description={<FormattedMessage defaultMessage="Expenses submitted to your account." id="0I3Lbj" />}
       />
       <Filterbar {...queryFilter} />
 
@@ -145,15 +145,7 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
               );
             }}
           />
-          <div className="mt-12 flex justify-center">
-            <Pagination
-              route={pageRoute}
-              total={data?.expenses?.totalCount}
-              limit={queryFilter.values.limit}
-              offset={queryFilter.values.offset}
-              ignoredQueryParams={ROUTE_PARAMS}
-            />
-          </div>
+          <Pagination queryFilter={queryFilter} total={data?.expenses?.totalCount} />
         </React.Fragment>
       )}
     </div>

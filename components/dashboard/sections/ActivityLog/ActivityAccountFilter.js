@@ -15,7 +15,7 @@ const getCustomOptions = (intl, account) => {
     {
       value: account,
       isCustomOption: true,
-      label: intl.formatMessage(defineMessage({ defaultMessage: 'Own account' })),
+      label: intl.formatMessage(defineMessage({ defaultMessage: 'Own account', id: 'ev5iix' })),
     },
   ];
 
@@ -23,14 +23,14 @@ const getCustomOptions = (intl, account) => {
     options.push({
       id: '__CHILDREN_ACCOUNTS__',
       isCustomOption: true,
-      label: intl.formatMessage(defineMessage({ defaultMessage: 'All children accounts' })),
+      label: intl.formatMessage(defineMessage({ defaultMessage: 'All children accounts', id: 'tHJuXX' })),
     });
   }
   if (account?.isHost) {
     options.push({
       id: '__HOSTED_ACCOUNTS__',
       isCustomOption: true,
-      label: intl.formatMessage(defineMessage({ defaultMessage: 'All hosted accounts' })),
+      label: intl.formatMessage(defineMessage({ defaultMessage: 'All hosted accounts', id: 'M7USSD' })),
     });
   }
 

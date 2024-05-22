@@ -52,7 +52,7 @@ const getProfileOptions = (intl, profiles, tier) => {
   });
 
   const options = [
-    { options: myself, label: intl.formatMessage({ defaultMessage: 'Myself' }) },
+    { options: myself, label: intl.formatMessage({ defaultMessage: 'Myself', id: 'YjO/0+' }) },
     { options: myOrganizations, label: intl.formatMessage({ id: 'organization', defaultMessage: 'My Organizations' }) },
   ];
 
@@ -71,7 +71,7 @@ const getProfileOptions = (intl, profiles, tier) => {
   if (profilesByType[PROJECT]?.length) {
     options.push({
       options: sortOptions(profilesByType[PROJECT]),
-      label: intl.formatMessage({ defaultMessage: 'My Projects' }),
+      label: intl.formatMessage({ defaultMessage: 'My Projects', id: 'FVO2wx' }),
     });
   }
   if (profilesByType[EVENT]?.length) {
@@ -95,7 +95,7 @@ const formatProfileOption = (option, _, intl) => {
         </Span>
         {account.isIncognito ? (
           <Span fontSize="12px" lineHeight="18px" color="black.700">
-            <FormattedMessage defaultMessage="Private contribution - Check privacy box for info" />
+            <FormattedMessage defaultMessage="Private contribution - Check privacy box for info" id="104ECN" />
           </Span>
         ) : (
           <Span fontSize="12px" lineHeight="18px" color="black.700">

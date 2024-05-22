@@ -55,10 +55,13 @@ const CreateExpenseFAQ = ({ defaultOpen, ...props }) => (
     </Entry>
     <Entry open={defaultOpen}>
       <Title>
-        <FormattedMessage defaultMessage="Why do you need my legal name?" />
+        <FormattedMessage defaultMessage="Why do you need my legal name?" id="FpmEYP" />
       </Title>
       <Content>
-        <FormattedMessage defaultMessage="The display name is public and the legal name is private, appearing on receipts, invoices, and other official documentation used for tax and accounting purposes." />
+        <FormattedMessage
+          defaultMessage="The display name is public and the legal name is private, appearing on receipts, invoices, and other official documentation used for tax and accounting purposes."
+          id="ntqqkx"
+        />
       </Content>
     </Entry>
     <Box mt={2} pl={2}>

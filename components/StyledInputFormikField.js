@@ -1,17 +1,20 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { FastField, Field } from 'formik';
 import { pickBy } from 'lodash';
 import { useIntl } from 'react-intl';
 
 import { isOCError } from '../lib/errors';
-import { formatFormErrorMessage } from '../lib/form-utils';
+import { formatFormErrorMessage, RICH_ERROR_MESSAGES } from '../lib/form-utils';
+import { cn } from '../lib/utils';
 
 import Container from './Container';
-import { getInputAttributesFromZodSchema, getSchemaFromFormik } from './FormikZod';
+import { FormikZodContext, getInputAttributesFromZodSchema } from './FormikZod';
 import StyledInput from './StyledInput';
 import StyledInputField from './StyledInputField';
 import { P } from './Text';
+
+export const ERROR_CLASS_NAME = 'formik-field-with-error';
 
 /**
  * A special wrapper around `StyledInputField` + Formik's `Field` component.
@@ -27,18 +30,19 @@ const StyledInputFormikField = ({
   display = undefined,
   flexGrow = undefined,
   placeholder = undefined,
+  showError = true,
   ...props
 }) => {
   const intl = useIntl();
   const FieldComponent = isFastField ? FastField : Field;
   const htmlFor = props.htmlFor || `input-${name}`;
+  const { schema, config } = useContext(FormikZodContext);
   return (
     <FieldComponent name={name} validate={validate}>
       {({ field, form, meta }) => {
-        const showError = Boolean(meta.error && (meta.touched || form.submitCount));
-        const zodSchema = getSchemaFromFormik(form);
+        const hasError = Boolean(meta.error && (meta.touched || form.submitCount));
         const fieldAttributes = {
-          ...(zodSchema ? getInputAttributesFromZodSchema(zodSchema, name) : null),
+          ...(schema ? getInputAttributesFromZodSchema(schema, name) : null),
           ...pickBy(
             {
               ...field,
@@ -46,18 +50,35 @@ const StyledInputFormikField = ({
               id: htmlFor,
               type: props.inputType,
               disabled: props.disabled,
+              min: props.min,
+              max: props.max,
               required: props.required,
-              error: showError,
+              error: hasError,
               placeholder,
             },
             value => value !== undefined,
           ),
         };
 
+        if (
+          !fieldAttributes.required &&
+          meta.error &&
+          meta.error === intl.formatMessage(RICH_ERROR_MESSAGES.requiredValue)
+        ) {
+          fieldAttributes.required = true;
+        }
+
         return (
-          <Container flex={flex} width={width} display={display} flexGrow={flexGrow}>
+          <Container
+            flex={flex}
+            width={width}
+            display={display}
+            flexGrow={flexGrow}
+            className={cn({ [ERROR_CLASS_NAME]: hasError })}
+          >
             <StyledInputField
               error={Boolean(meta.error)}
+              {...(config || null)}
               {...props}
               htmlFor={htmlFor}
               name={fieldAttributes.name}
@@ -65,7 +86,7 @@ const StyledInputFormikField = ({
             >
               <React.Fragment>
                 {children ? children({ form, meta, field: fieldAttributes }) : <StyledInput {...fieldAttributes} />}
-                {showError && (
+                {hasError && showError && (
                   <P display="block" color="red.500" pt={2} fontSize="11px">
                     {isOCError(meta.error) ? formatFormErrorMessage(intl, meta.error) : meta.error}
                   </P>
@@ -98,6 +119,9 @@ StyledInputFormikField.propTypes = {
   display: PropTypes.any,
   width: PropTypes.any,
   flexGrow: PropTypes.any,
+  showError: PropTypes.bool,
+  min: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  max: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
 export default StyledInputFormikField;

@@ -88,35 +88,35 @@ export const dateFilterSchema = z
 
 export type DateFilterValueType = z.infer<typeof dateFilterSchema>;
 
-export function dateToVariables(value: z.infer<typeof dateFilterSchema>) {
+export function dateToVariables(value: z.infer<typeof dateFilterSchema>, fieldPrefix = 'date') {
   const dayjsWithTz = value.tz === 'UTC' ? dayjs.utc : dayjs;
 
   switch (value.type) {
     case DateFilterType.IN_LAST_PERIOD:
       return {
-        dateFrom: dayjsWithTz().startOf('day').subtract(value.number, value.period).toISOString(),
+        [`${fieldPrefix}From`]: dayjsWithTz().startOf('day').subtract(value.number, value.period).toISOString(),
       };
     case DateFilterType.EQUAL_TO:
     case DateFilterType.BETWEEN:
       return {
-        dateFrom: dayjsWithTz(value.gte).startOf('day').toISOString(),
-        dateTo: dayjsWithTz(value.lte).endOf('day').toISOString(),
+        [`${fieldPrefix}From`]: dayjsWithTz(value.gte).startOf('day').toISOString(),
+        [`${fieldPrefix}To`]: dayjsWithTz(value.lte).endOf('day').toISOString(),
       };
     case DateFilterType.AFTER:
       return {
-        dateFrom: dayjsWithTz(value.gt).endOf('day').toISOString(),
+        [`${fieldPrefix}From`]: dayjsWithTz(value.gt).endOf('day').toISOString(),
       };
     case DateFilterType.ON_OR_AFTER:
       return {
-        dateFrom: dayjsWithTz(value.gte).startOf('day').toISOString(),
+        [`${fieldPrefix}From`]: dayjsWithTz(value.gte).startOf('day').toISOString(),
       };
     case DateFilterType.BEFORE:
       return {
-        dateTo: dayjsWithTz(value.lt).startOf('day').toISOString(),
+        [`${fieldPrefix}To`]: dayjsWithTz(value.lt).startOf('day').toISOString(),
       };
     case DateFilterType.BEFORE_OR_ON:
       return {
-        dateTo: dayjsWithTz(value.lte).endOf('day').toISOString(),
+        [`${fieldPrefix}To`]: dayjsWithTz(value.lte).endOf('day').toISOString(),
       };
   }
 }

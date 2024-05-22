@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
 import { useQuery } from '@apollo/client';
-import { toNumber } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
@@ -9,13 +8,13 @@ import { integer } from '../../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../../lib/graphql/helpers';
 import useQueryFilter from '../../../../../lib/hooks/useQueryFilter';
 
-import { DataTable } from '../../../../DataTable';
 import FormattedMoneyAmount from '../../../../FormattedMoneyAmount';
 import MessageBoxGraphqlError from '../../../../MessageBoxGraphqlError';
+import { DataTable } from '../../../../table/DataTable';
 import Tabs from '../../../../Tabs';
-import { Pagination } from '../../../../ui/Pagination';
 import { DashboardContext } from '../../../DashboardContext';
 import DashboardHeader from '../../../DashboardHeader';
+import { Pagination } from '../../../filters/Pagination';
 import { DashboardSectionProps } from '../../../types';
 
 import { CurrentPeriodBadge } from './CurrentPeriodBadge';
@@ -45,7 +44,7 @@ const getColumns = intl => [
   {
     accessorKey: 'managedFundsTotalChange',
     meta: { className: 'w-44 text-right' },
-    header: intl.formatMessage({ defaultMessage: 'Managed funds net' }),
+    header: intl.formatMessage({ defaultMessage: 'Managed funds net', id: 'cnkgEs' }),
     cell: ({ cell }) => {
       const amount = cell.getValue();
       return (
@@ -64,7 +63,7 @@ const getColumns = intl => [
   {
     accessorKey: 'operationalFundsTotalChange',
     meta: { className: 'w-44 text-right' },
-    header: intl.formatMessage({ defaultMessage: 'Operational funds net' }),
+    header: intl.formatMessage({ defaultMessage: 'Operational funds net', id: 'VTkwSg' }),
     cell: ({ cell }) => {
       const amount = cell.getValue();
       return (
@@ -101,8 +100,6 @@ const HostTransactionReportList = ({ accountSlug: hostSlug }: DashboardSectionPr
   });
   const columns = getColumns(intl);
   const { limit, offset } = queryFilter.values;
-  const pages = Math.ceil((data?.host?.hostTransactionsReports?.nodes.length || 1) / limit);
-  const currentPage = toNumber(offset + limit) / limit;
 
   const tabs = useMemo(
     () => [
@@ -164,14 +161,7 @@ const HostTransactionReportList = ({ accountSlug: hostSlug }: DashboardSectionPr
           )}
         </div>
       </div>
-
-      {pages > 1 && (
-        <Pagination
-          totalPages={pages}
-          page={currentPage}
-          onChange={page => queryFilter.setFilter('offset', (page - 1) * limit)}
-        />
-      )}
+      <Pagination queryFilter={queryFilter} total={data?.host?.hostTransactionsReports?.nodes.length} />
     </div>
   );
 };

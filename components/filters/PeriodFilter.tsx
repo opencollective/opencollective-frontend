@@ -67,7 +67,7 @@ const parseDateForDateRange = (dateStr, isEndOfDay) => {
   }
 };
 
-const UTC_LABEL = defineMessage({ defaultMessage: 'Coordinated Universal Time' });
+const UTC_LABEL = defineMessage({ defaultMessage: 'Coordinated Universal Time', id: '94IjMb' });
 
 const getTimeZoneTypeName = (intl, timezone) => {
   if (timezone === 'local') {
@@ -137,11 +137,14 @@ export const PeriodFilterForm = ({
         label={
           <Flex alignItems="center">
             <Span mr={1}>
-              <FormattedMessage defaultMessage="Timezone" />
+              <FormattedMessage defaultMessage="Timezone" id="7nUCu9" />
             </Span>
             <StyledTooltip
               content={
-                <FormattedMessage defaultMessage="By default, all dates are filtered and displayed using your local timezone. You can switch to UTC to indicate that the dates provided above use the Coordinated Universal Time format, which matches how email reports are generated" />
+                <FormattedMessage
+                  defaultMessage="By default, all dates are filtered and displayed using your local timezone. You can switch to UTC to indicate that the dates provided above use the Coordinated Universal Time format, which matches how email reports are generated"
+                  id="9sbPks"
+                />
               }
             >
               <InfoCircle size={16} />
@@ -174,7 +177,7 @@ export const PeriodFilterForm = ({
         )}
       </StyledInputField>
       <StyledInputField
-        label={<FormattedMessage defaultMessage="Start date" />}
+        label={<FormattedMessage defaultMessage="Start date" id="n5QvJy" />}
         labelFontWeight="700"
         labelProps={{ fontWeight: 'bold', fontSize: '16px' }}
         name="dateFrom"
@@ -197,7 +200,7 @@ export const PeriodFilterForm = ({
         )}
       </StyledInputField>
       <StyledInputField
-        label={<FormattedMessage defaultMessage="End date" />}
+        label={<FormattedMessage defaultMessage="End date" id="Humfno" />}
         labelFontWeight="700"
         labelProps={{ fontWeight: 'bold', fontSize: '16px' }}
         name="dateTo"
@@ -222,7 +225,7 @@ export const PeriodFilterForm = ({
       </StyledInputField>
       {!isValidDateInterval && (
         <Span display="block" color="red.500" pt={2} fontSize="10px" lineHeight="14px" aria-live="assertive">
-          <FormattedMessage defaultMessage="Start Date should be before the End Date" />
+          <FormattedMessage defaultMessage="Start Date should be before the End Date" id="P6fesn" />
         </Span>
       )}
     </React.Fragment>

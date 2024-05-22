@@ -114,7 +114,7 @@ export const CollectiveEditedDetails = ({ activity }) => {
   if (!fullDiff.length || (isEmpty(newData) && isEmpty(previousData))) {
     return (
       <i>
-        <FormattedMessage defaultMessage="No details to show" />
+        <FormattedMessage defaultMessage="No details to show" id="mr2kVW" />
       </i>
     );
   }

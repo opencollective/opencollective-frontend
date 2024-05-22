@@ -229,6 +229,14 @@ export const expensePageExpenseFieldsFragment = gql`
     invoiceInfo
     merchantId
     requiredLegalDocuments
+    receivedTaxForms: legalDocuments(type: US_TAX_FORM, status: RECEIVED) {
+      nodes {
+        id
+        type
+        documentLink
+        year
+      }
+    }
     feesPayer
     draft
     items {
@@ -285,7 +293,6 @@ export const expensePageExpenseFieldsFragment = gql`
       name
       legalName
       imageUrl
-      hasImage
       type
       isAdmin
       isActive
@@ -379,7 +386,6 @@ export const expensePageExpenseFieldsFragment = gql`
       name
       type
       imageUrl
-      hasImage
       backgroundImageUrl
       isActive
       description
@@ -500,6 +506,7 @@ export const expensePageExpenseFieldsFragment = gql`
       canUsePrivateNote
       canHold
       canRelease
+      canDownloadTaxForm
       approve {
         allowed
         reason
@@ -715,7 +722,6 @@ export const expensesListFieldsFragment = gql`
       slug
       name
       imageUrl
-      hasImage
       isAdmin
       # For Collectives, Funds, Events and Projects
       ... on AccountWithHost {

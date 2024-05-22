@@ -153,7 +153,7 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, account, n
                     onClick={onClick}
                     whiteSpace="nowrap"
                   >
-                    <FormattedMessage defaultMessage="Solutions" />
+                    <FormattedMessage defaultMessage="Solutions" id="asqGnV" />
                     {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                   </NavButton>
                 )}
@@ -168,7 +168,7 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, account, n
                   </Link>
                   <Link href="/become-a-sponsor">
                     <NavItem as={Container} mt={16} mb={16}>
-                      <FormattedMessage defaultMessage="For Sponsors" />
+                      <FormattedMessage defaultMessage="For Sponsors" id="1rESHf" />
                     </NavItem>
                   </Link>
                   <Link href="/become-a-host">
@@ -260,7 +260,7 @@ const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, account, n
             {menuItems.docs && (
               <Link href="/help">
                 <NavButton as={Container} whiteSpace="nowrap">
-                  <FormattedMessage defaultMessage="Help & Support" />
+                  <FormattedMessage defaultMessage="Help & Support" id="Uf3+S6" />
                 </NavButton>
               </Link>
             )}

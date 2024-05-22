@@ -72,6 +72,7 @@ const ACTIVITIES_INFO = {
     icon: MoveIcon,
     message: defineMessage({
       defaultMessage: 'Expense moved from {movedFromCollective}',
+      id: '6EnwoZ',
     }),
   },
   COLLECTIVE_EXPENSE_UNAPPROVED: {
@@ -143,6 +144,7 @@ const ACTIVITIES_INFO = {
       reference && (
         <FormattedMessage
           defaultMessage="Estimated delivery: {estimatedDelivery, date, medium} {estimatedDelivery, time, short}. Reference: {reference}."
+          id="xqDu0y"
           values={{ estimatedDelivery: new Date(estimatedDelivery), reference }}
         />
       ),
@@ -276,7 +278,11 @@ const ThreadActivity = ({ activity }) => {
               />
             </Span>
             <Span color="black.600" fontSize="12px">
-              <FormattedMessage defaultMessage="on {date}" values={{ date: <DateTime value={activity.createdAt} /> }} />
+              <FormattedMessage
+                defaultMessage="on {date}"
+                id="mzGohi"
+                values={{ date: <DateTime value={activity.createdAt} /> }}
+              />
             </Span>
           </Flex>
         </Flex>

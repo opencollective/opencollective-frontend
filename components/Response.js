@@ -59,7 +59,7 @@ class Response extends React.Component {
             </Container>
             {count > 1 && (
               <Container pt={1} fontSize="0.75rem" color="black.600">
-                <FormattedMessage defaultMessage="{count} tickets" values={{ count }} />
+                <FormattedMessage defaultMessage="{count} tickets" id="1qa6YU" values={{ count }} />
               </Container>
             )}
           </Container>

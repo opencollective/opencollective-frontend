@@ -122,7 +122,7 @@ const EditPayPalAccount = props => {
         </StyledInputField>
 
         <StyledButton type="submit" mt={2} minWidth={150} loading={isCreating}>
-          <FormattedMessage defaultMessage="Connect {service}" values={{ service: 'PayPal' }} />
+          <FormattedMessage defaultMessage="Connect {service}" id="C9HmCs" values={{ service: 'PayPal' }} />
         </StyledButton>
       </form>
     );
@@ -141,6 +141,7 @@ const EditPayPalAccount = props => {
         <P mt={3} fontStyle="italic">
           <FormattedMessage
             defaultMessage="Please contact <SupportLink>support</SupportLink> to disconnect PayPal."
+            id="ivhAav"
             values={{ SupportLink: I18nSignInLink }}
           />
         </P>

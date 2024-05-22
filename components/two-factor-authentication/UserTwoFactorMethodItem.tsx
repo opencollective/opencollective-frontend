@@ -109,7 +109,7 @@ export function UserTwoFactorMethodItem(props: UserTwoFactorMethodItemProps) {
           >
             <PencilIcon size="18px" />
             &nbsp;
-            <FormattedMessage defaultMessage="Rename" />
+            <FormattedMessage defaultMessage="Rename" id="iXNbPf" />
           </StyledButton>
 
           <StyledButton
@@ -132,7 +132,7 @@ export function UserTwoFactorMethodItem(props: UserTwoFactorMethodItemProps) {
         <ConfirmationModal
           type="confirm"
           onClose={() => setIsEditingMethodName(false)}
-          header={<FormattedMessage defaultMessage="Edit Two Factor Method" />}
+          header={<FormattedMessage defaultMessage="Edit Two Factor Method" id="UiRkiD" />}
           cancelHandler={() => {
             setNewMethodName(props.userTwoFactorMethod.name);
             setIsEditingMethodName(false);
@@ -173,7 +173,7 @@ export function UserTwoFactorMethodItem(props: UserTwoFactorMethodItemProps) {
               await removeTwoFactorMethod();
               toast({
                 variant: 'success',
-                message: <FormattedMessage defaultMessage="Two factor method removed successfully" />,
+                message: <FormattedMessage defaultMessage="Two factor method removed successfully" id="GQh4z0" />,
               });
               setIsConfirmingRemove(false);
               return CONFIRMATION_MODAL_TERMINATE;
@@ -185,7 +185,7 @@ export function UserTwoFactorMethodItem(props: UserTwoFactorMethodItemProps) {
             }
           }}
         >
-          <FormattedMessage defaultMessage="This will permanently remove this two factor method" />
+          <FormattedMessage defaultMessage="This will permanently remove this two factor method" id="xr1raH" />
         </ConfirmationModal>
       )}
     </React.Fragment>

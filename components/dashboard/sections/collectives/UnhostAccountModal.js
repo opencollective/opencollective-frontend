@@ -55,12 +55,14 @@ const UnhostAccountModal = ({ collective, host, ...props }) => {
           <P fontSize="16px" fontWeight="700" lineHeight="24px" color="red.900" mb={2}>
             <FormattedMessage
               defaultMessage="Are you sure you want to un-host {collectiveName}?"
+              id="JYMdjW"
               values={{ collectiveName: collective.name }}
             />
           </P>
           <P fontSize="14px" lineHeight="20px" color="black.700" mb={2}>
             <FormattedMessage
               defaultMessage="{fiscalHostName} will no longer be the Fiscal Host for this Collective. Un-hosting this Collective means no longer holding funds for them, neither managing tax compliance and accounting."
+              id="E0P87E"
               values={{ fiscalHostName: host.name }}
             />
           </P>
@@ -68,6 +70,7 @@ const UnhostAccountModal = ({ collective, host, ...props }) => {
             <MessageBox type="warning" mb={2}>
               <FormattedMessage
                 defaultMessage="The Collective's balance must be zero to un-host, including its Events or Projects. There is a remaining balance of {collectiveBalanceAmount}. You can pay out these funds by <Link>processing expenses.</Link>"
+                id="J2/jVu"
                 values={{
                   collectiveBalanceAmount: formatCurrency(
                     collective.stats.balance.valueInCents,
@@ -96,7 +99,7 @@ const UnhostAccountModal = ({ collective, host, ...props }) => {
             color="black.800.900"
             mb="6px"
           >
-            <FormattedMessage defaultMessage="Include a message to the Collective admins (Optional)" />
+            <FormattedMessage defaultMessage="Include a message to the Collective admins (Optional)" id="GLo1nw" />
           </Label>
           <StyledTextarea
             id="unhost-account-message"
@@ -123,7 +126,7 @@ const UnhostAccountModal = ({ collective, host, ...props }) => {
                 toast({
                   variant: 'success',
                   message: intl.formatMessage(
-                    { defaultMessage: '{accountName} (@{accountSlug}) has been un-hosted' },
+                    { defaultMessage: '{accountName} (@{accountSlug}) has been un-hosted', id: 'hOzNmK' },
                     successMsgArgs,
                   ),
                 });
@@ -134,7 +137,7 @@ const UnhostAccountModal = ({ collective, host, ...props }) => {
               }
             }}
           >
-            <FormattedMessage defaultMessage="Un-host Collective" />
+            <FormattedMessage defaultMessage="Un-host Collective" id="w5thcm" />
           </StyledButton>
           <StyledButton ml={3} minWidth={120} onClick={props.onClose} disabled={loading}>
             <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />

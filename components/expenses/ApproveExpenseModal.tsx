@@ -34,7 +34,7 @@ export default function ApproveExpenseModal({
   return (
     <ConfirmationModal
       onClose={onClose}
-      header={<FormattedMessage defaultMessage="Approve Expense" />}
+      header={<FormattedMessage defaultMessage="Approve Expense" id="PJNkaW" />}
       maxWidth={384}
       disableSubmit={!selectedCategory}
       continueHandler={async () => {
@@ -59,7 +59,7 @@ export default function ApproveExpenseModal({
     >
       <div className="my-4">
         <label htmlFor="confirm-expense-category" className="mb-2 text-base font-bold">
-          <FormattedMessage defaultMessage="Confirm Expense Category" />
+          <FormattedMessage defaultMessage="Confirm Expense Category" id="X5FRNX" />
         </label>
         <AccountingCategorySelect
           id="confirm-expense-category"

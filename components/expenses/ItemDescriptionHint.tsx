@@ -28,7 +28,7 @@ export const ExpenseItemDescriptionHint = ({ item, isInvoice, form, field }: Exp
             description: (
               <StyledLinkButton
                 data-cy="btn-use-suggested-description"
-                title={intl.formatMessage({ defaultMessage: 'Use suggested description' })}
+                title={intl.formatMessage({ defaultMessage: 'Use suggested description', id: 'u6SWXO' })}
                 onClick={() => {
                   form.setFieldValue(field.name, suggested);
                   setHideHint(true);
@@ -45,9 +45,11 @@ export const ExpenseItemDescriptionHint = ({ item, isInvoice, form, field }: Exp
     return isInvoice
       ? intl.formatMessage({
           defaultMessage: 'Specify item or activity and timeframe, e.g. "Volunteer Training, April 2023"',
+          id: 'rpqkOE',
         })
       : intl.formatMessage({
           defaultMessage: 'Describe the expense, e.g. "Dinner with the team"',
+          id: 'cX1UXz',
         });
   } else {
     return null;

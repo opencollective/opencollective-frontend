@@ -20,13 +20,13 @@ import ExpensesList from '../../../expenses/ExpensesList';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
-import Pagination from '../../../Pagination';
 import StyledButton from '../../../StyledButton';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import { expenseTagFilter } from '../../filters/ExpenseTagsFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
+import { Pagination } from '../../filters/Pagination';
 import { DashboardSectionProps } from '../../types';
 
 import ExpensePipelineOverview from './ExpensePipelineOverview';
@@ -102,14 +102,14 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
 
   const views: Views<FilterValues> = [
     {
-      label: intl.formatMessage({ defaultMessage: 'All' }),
+      label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
       filter: {},
       id: 'all',
       count: metaData?.all?.totalCount,
     },
     {
       label: intl.formatMessage({ id: 'expenses.ready', defaultMessage: 'Ready to pay' }),
-      filter: { status: ExpenseStatusFilter.READY_TO_PAY, orderBy: 'CREATED_AT,ASC' },
+      filter: { status: ExpenseStatusFilter.READY_TO_PAY, sort: { field: 'CREATED_AT', direction: 'ASC' } },
       id: 'ready_to_pay',
       count: metaData?.ready_to_pay?.totalCount,
     },
@@ -117,31 +117,31 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       label: intl.formatMessage({ id: 'expense.scheduledForPayment', defaultMessage: 'Scheduled for payment' }),
       filter: {
         status: ExpenseStatusFilter.SCHEDULED_FOR_PAYMENT,
-        orderBy: 'CREATED_AT,ASC',
+        sort: { field: 'CREATED_AT', direction: 'ASC' },
       },
       id: 'scheduled_for_payment',
       count: metaData?.scheduled_for_payment?.totalCount,
     },
     {
-      label: intl.formatMessage({ defaultMessage: 'On hold' }),
-      filter: { status: ExpenseStatusFilter.ON_HOLD, orderBy: 'CREATED_AT,ASC' },
+      label: intl.formatMessage({ defaultMessage: 'On hold', id: '0Hhe6f' }),
+      filter: { status: ExpenseStatusFilter.ON_HOLD, sort: { field: 'CREATED_AT', direction: 'ASC' } },
       id: 'on_hold',
       count: metaData?.on_hold?.totalCount,
     },
     {
-      label: intl.formatMessage({ defaultMessage: 'Incomplete' }),
-      filter: { status: ExpenseStatusFilter.INCOMPLETE, orderBy: 'CREATED_AT,ASC' },
+      label: intl.formatMessage({ defaultMessage: 'Incomplete', id: 'kHwKVg' }),
+      filter: { status: ExpenseStatusFilter.INCOMPLETE, sort: { field: 'CREATED_AT', direction: 'ASC' } },
       id: 'incomplete',
       count: metaData?.incomplete?.totalCount,
     },
     {
       label: intl.formatMessage({ id: 'Error', defaultMessage: 'Error' }),
-      filter: { status: ExpenseStatusFilter.ERROR, orderBy: 'CREATED_AT,ASC' },
+      filter: { status: ExpenseStatusFilter.ERROR, sort: { field: 'CREATED_AT', direction: 'ASC' } },
       id: 'error',
       count: metaData?.error?.totalCount,
     },
     {
-      label: intl.formatMessage({ defaultMessage: 'Paid' }),
+      label: intl.formatMessage({ defaultMessage: 'Paid', id: 'u/vOPu' }),
       filter: { status: ExpenseStatusFilter.PAID },
       id: 'paid',
       count: metaData?.paid?.totalCount,
@@ -280,15 +280,7 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
               );
             }}
           />
-          <div className="mt-12 flex justify-center">
-            <Pagination
-              route={pageRoute}
-              total={paginatedExpenses.totalCount}
-              limit={queryFilter.values.limit}
-              offset={queryFilter.values.offset}
-              ignoredQueryParams={ROUTE_PARAMS}
-            />
-          </div>
+          <Pagination queryFilter={queryFilter} total={data?.expenses?.totalCount} />
         </React.Fragment>
       )}
     </div>

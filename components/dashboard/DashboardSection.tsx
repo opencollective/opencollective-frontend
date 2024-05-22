@@ -13,6 +13,7 @@ import { OCFBannerWithData } from '../OCFBanner';
 
 import { HostAdminAccountingSection } from './sections/accounting';
 import AccountSettings from './sections/AccountSettings';
+import AllCollectives from './sections/collectives/AllCollectives';
 import HostApplications from './sections/collectives/HostApplications';
 import HostedCollectives from './sections/collectives/HostedCollectives';
 import HostFinancialContributions from './sections/contributions/HostFinancialContributions';
@@ -26,13 +27,16 @@ import HostDashboardAgreements from './sections/HostDashboardAgreements';
 import HostVirtualCardRequests from './sections/HostVirtualCardRequests';
 import HostVirtualCards from './sections/HostVirtualCards';
 import InvoicesReceipts from './sections/invoices-receipts/InvoicesReceipts';
+import HostDashboardTaxForms from './sections/legal-documents/HostDashboardTaxForms';
 import NotificationsSettings from './sections/NotificationsSettings';
 import Overview from './sections/overview/Overview';
 import HostDashboardReports from './sections/reports/HostDashboardReports';
-import PreviewHostReports from './sections/reports/preview/HostReports';
+import PreviewReports from './sections/reports/preview/Reports';
+import { TaxInformationSettingsSection } from './sections/tax-information';
 import Team from './sections/Team';
 import AccountTransactions from './sections/transactions/AccountTransactions';
 import HostTransactions from './sections/transactions/HostTransactions';
+import Updates from './sections/updates';
 import Vendors from './sections/Vendors';
 import VirtualCards from './sections/virtual-cards/VirtualCards';
 import { LEGACY_SECTIONS, LEGACY_SETTINGS_SECTIONS, SECTION_LABELS, SECTIONS, SETTINGS_SECTIONS } from './constants';
@@ -44,6 +48,7 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS]: HostFinancialContributions,
   [SECTIONS.HOST_EXPENSES]: HostExpenses,
   [SECTIONS.HOST_AGREEMENTS]: HostDashboardAgreements,
+  [SECTIONS.HOST_TAX_FORMS]: HostDashboardTaxForms,
   [SECTIONS.HOST_APPLICATIONS]: HostApplications,
   [SECTIONS.REPORTS]: HostDashboardReports,
   [SECTIONS.HOST_VIRTUAL_CARDS]: HostVirtualCards,
@@ -56,14 +61,17 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.OUTGOING_CONTRIBUTIONS]: OutgoingContributions,
   [SECTIONS.TRANSACTIONS]: AccountTransactions,
   [SECTIONS.HOST_TRANSACTIONS]: HostTransactions,
+  [SECTIONS.UPDATES]: Updates,
   [SECTIONS.VIRTUAL_CARDS]: VirtualCards,
   [SECTIONS.TEAM]: Team,
   [SECTIONS.VENDORS]: Vendors,
+  [SECTIONS.ALL_COLLECTIVES]: AllCollectives,
 };
 
 const SETTINGS_COMPONENTS = {
   [SETTINGS_SECTIONS.INVOICES_RECEIPTS]: InvoicesReceipts,
   [SETTINGS_SECTIONS.NOTIFICATIONS]: NotificationsSettings,
+  [SETTINGS_SECTIONS.TAX_INFORMATION]: TaxInformationSettingsSection,
 };
 
 const DashboardSection = ({ account, isLoading, section, subpath }) => {
@@ -72,7 +80,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
 
   if (isLoading) {
     return (
-      <div className="w-full">
+      <div className="w-full pb-6">
         <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
         <LoadingPlaceholder height={26} mb={4} maxWidth={500} />
         <LoadingPlaceholder height={300} />
@@ -84,11 +92,11 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
   if (DashboardComponent) {
     if (section === SECTIONS.REPORTS) {
       if (LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.HOST_REPORTS)) {
-        DashboardComponent = PreviewHostReports;
+        DashboardComponent = PreviewReports;
       }
     }
     return (
-      <div className="w-full">
+      <div className="w-full pb-6">
         <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
         <DashboardComponent accountSlug={account.slug} subpath={subpath} isDashboard />
       </div>
@@ -97,7 +105,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
 
   if (values(LEGACY_SECTIONS).includes(section)) {
     return (
-      <div className="w-full max-w-screen-lg">
+      <div className="w-full max-w-screen-lg pb-6">
         <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
         {SECTION_LABELS[section] && <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />}
 
@@ -111,18 +119,17 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
   if (SettingsComponent) {
     return (
       // <div className="flex max-w-screen-lg justify-center">
-      <div className="max-w-screen-md flex-1">
+      <div className="max-w-screen-md flex-1 pb-6">
         <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
         <SettingsComponent account={account} accountSlug={account.slug} subpath={subpath} />
       </div>
-      // </div>
     );
   }
 
   if (values(LEGACY_SETTINGS_SECTIONS).includes(section)) {
     return (
       // <div className="flex max-w-screen-lg justify-center">
-      <div className="max-w-screen-md flex-1">
+      <div className="max-w-screen-md flex-1 pb-6">
         <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
         {SECTION_LABELS[section] && <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />}
 

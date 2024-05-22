@@ -72,33 +72,3 @@ function buildOrderByFilterComponent<T extends [string, ...string[]]>(
     );
   };
 }
-
-// function OrderFilter({ onChange, value }) {
-//   const intl = useIntl();
-//   const options = ['CREATED_AT,DESC', 'CREATED_AT,ASC'].map(value => ({
-//     value,
-//     label: i18nOrderByLabel(intl, value),
-//   }));
-//   const option = options.find(o => o.value === value) || options[0];
-//   return (
-//     <Select onValueChange={value => onChange(value)} value={value}>
-//       <SelectTrigger className="h-9 max-w-[160px] rounded-full">
-//         <Button size="sm" variant="outline">
-
-//         <div className="flex items-center gap-2 font-medium">
-//           <ArrowDownNarrowWide className="-ml-0.5 h-5 w-5 text-gray-400" aria-hidden="true" />
-
-//           <span className="block truncate">{option.label}</span>
-//         </div>
-//         </Button>
-//       </SelectTrigger>
-//       <SelectContent>
-//         {options.map(option => (
-//           <SelectItem value={option.value} key={option.value}>
-//             {option.label}
-//           </SelectItem>
-//         ))}
-//       </SelectContent>
-//     </Select>
-//   );
-// }

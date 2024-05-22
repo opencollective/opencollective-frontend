@@ -35,11 +35,12 @@ export default function OtherFiscalHostResults({
     <Box>
       <Flex>
         <P mr={3} fontSize="24px" lineHeight="32px" fontWeight="700" color="black.900">
-          <FormattedMessage defaultMessage="Other Hosts" />
+          <FormattedMessage defaultMessage="Other Hosts" id="8DxsHx" />
         </P>
         <P fontSize="14px" lineHeight="32px" fontWeight="400" color="black.900">
           <FormattedMessage
             defaultMessage="{ hostCount, plural, one {# host} other {# hosts} } found"
+            id="PB3Bh9"
             values={{
               hostCount: totalCount,
             }}

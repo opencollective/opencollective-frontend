@@ -24,7 +24,7 @@ export function SaveRecoveryCodesModal(props: SaveRecoveryCodesModalProps) {
         <Box width="500px">
           <Flex alignItems="center">
             <H3 fontSize="18px" fontWeight="700" mr={1}>
-              <FormattedMessage defaultMessage="Save your recovery codes" />
+              <FormattedMessage defaultMessage="Save your recovery codes" id="n0fdpg" />
             </H3>
           </Flex>
           <P>
@@ -64,7 +64,7 @@ export function SaveRecoveryCodesModal(props: SaveRecoveryCodesModalProps) {
                   )
                 }
               >
-                <FormattedMessage defaultMessage="Download codes" />
+                <FormattedMessage defaultMessage="Download codes" id="TvWROv" />
                 &nbsp;
                 <DownloadIcon size="1em" />
               </StyledButton>

@@ -153,14 +153,14 @@ const CaseStudies = () => {
     >
       <Box width={['288px', '648px', null, null, '1152px']} mb="8px">
         <SectionTitle textAlign="center">
-          <FormattedMessage defaultMessage="Who is using Open Collective?" />
+          <FormattedMessage defaultMessage="Who is using Open Collective?" id="vnfbPl" />
         </SectionTitle>
       </Box>
       <Box mb={[4, 3]} width={['288px', '648px']}>
         <SectionDescription textAlign="center">
           <FormattedMessage
             id="home.OCUsersSection.subtitle"
-            defaultMessage={'Communities around the world are using Open Collective. Find out more about them!'}
+            defaultMessage="Communities around the world are using Open Collective. Find out more about them!"
           />
         </SectionDescription>
       </Box>

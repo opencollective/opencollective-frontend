@@ -14,7 +14,7 @@ const maxAge = (maxAge = 60) => {
   };
 };
 
-module.exports = (expressApp, nextApp) => {
+module.exports = expressApp => {
   const app = expressApp;
 
   // Support older assets from website
@@ -82,6 +82,4 @@ module.exports = (expressApp, nextApp) => {
     }
     next();
   });
-
-  return nextApp.getRequestHandler();
 };

@@ -154,7 +154,7 @@ const HTMLContent = styled(
               }
             }}
           >
-            <FormattedMessage defaultMessage="Collapse" />
+            <FormattedMessage defaultMessage="Collapse" id="W/V6+Y" />
             <CaretUp size="10px" />
           </ReadFullLink>
         )}

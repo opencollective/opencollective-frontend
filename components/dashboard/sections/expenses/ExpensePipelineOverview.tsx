@@ -181,6 +181,7 @@ function WiseStatus(props: WiseStatusProps) {
         <div>
           <FormattedMessage
             defaultMessage="{service} balance ({currency})"
+            id="ArU2Ih"
             values={{ service: 'Wise', currency: props.host?.currency }}
           />
         </div>
@@ -197,7 +198,11 @@ function WiseStatus(props: WiseStatusProps) {
       </div>
       <div className="mt-3 flex justify-between text-xs text-slate-700">
         <div>
-          <FormattedMessage defaultMessage="Ready to Pay ({count})" values={{ count: props.readyToPayCount ?? 0 }} />
+          <FormattedMessage
+            defaultMessage="Ready to Pay ({count})"
+            id="xiSbsL"
+            values={{ count: props.readyToPayCount ?? 0 }}
+          />
           <div className="mt-2 flex gap-2 text-base text-slate-900">
             <FormattedMoneyAmount
               showCurrencyCode={false}
@@ -216,6 +221,7 @@ function WiseStatus(props: WiseStatusProps) {
         <div>
           <FormattedMessage
             defaultMessage="Total Batched ({count})"
+            id="Ey7Kn+"
             values={{ count: props.scheduledForPaymentCount ?? 0 }}
           />
           <div className="mt-2 flex gap-2 text-base text-slate-900">
@@ -246,9 +252,9 @@ function WiseStatus(props: WiseStatusProps) {
         >
           <StyledButton buttonSize="tiny" width="100%">
             {isConnected ? (
-              <FormattedMessage defaultMessage="Refill Balance" />
+              <FormattedMessage defaultMessage="Refill Balance" id="dqYT8G" />
             ) : (
-              <FormattedMessage defaultMessage="Connect {service}" values={{ service: 'Wise' }} />
+              <FormattedMessage defaultMessage="Connect {service}" id="C9HmCs" values={{ service: 'Wise' }} />
             )}
           </StyledButton>
         </StyledLink>
@@ -296,6 +302,7 @@ function PayPalStatus(props: PayPalStatusProps) {
       <div className="flex items-center justify-between text-xs text-slate-700">
         <FormattedMessage
           defaultMessage="{service} balance ({currency})"
+          id="ArU2Ih"
           values={{ service: 'PayPal', currency: props.host?.paypalPreApproval?.balance?.currency }}
         />
         <Paypal size={16} />
@@ -310,7 +317,11 @@ function PayPalStatus(props: PayPalStatusProps) {
       </div>
       <div className="mt-3 flex justify-between text-xs text-slate-700">
         <div>
-          <FormattedMessage defaultMessage="Ready to Pay ({count})" values={{ count: props.readyToPayCount ?? 0 }} />
+          <FormattedMessage
+            defaultMessage="Ready to Pay ({count})"
+            id="xiSbsL"
+            values={{ count: props.readyToPayCount ?? 0 }}
+          />
           <div className="mt-2 flex gap-2 text-base text-slate-900">
             <FormattedMoneyAmount
               showCurrencyCode={false}
@@ -329,6 +340,7 @@ function PayPalStatus(props: PayPalStatusProps) {
         <div>
           <FormattedMessage
             defaultMessage="Total Batched ({count})"
+            id="Ey7Kn+"
             values={{ count: props.scheduledForPaymentCount ?? 0 }}
           />
           <div className="mt-2 flex gap-2 text-base  text-slate-900">
@@ -349,7 +361,7 @@ function PayPalStatus(props: PayPalStatusProps) {
       </div>
       <div className="mt-2 flex justify-items-stretch gap-3">
         <StyledButton loading={loading} onClick={connect} width="100%" buttonSize="tiny">
-          <FormattedMessage defaultMessage="Refill Balance" />
+          <FormattedMessage defaultMessage="Refill Balance" id="dqYT8G" />
         </StyledButton>
       </div>
     </StyledCard>
@@ -367,6 +379,7 @@ function StripeIssuingStatus(props: StripeIssuingStatusProps) {
       <div className="flex items-center justify-between text-xs text-slate-700">
         <FormattedMessage
           defaultMessage="{service} balance ({currency})"
+          id="ArU2Ih"
           values={{ service: 'Stripe Issuing', currency: props.host?.stripe?.issuingBalance?.currency }}
         />
         <CcStripe />
@@ -381,7 +394,7 @@ function StripeIssuingStatus(props: StripeIssuingStatusProps) {
       <div className="mt-2 flex justify-items-stretch gap-3">
         <StyledLink width="100%" openInNewTab href={getDashboardUrl('topups', props.host?.stripe?.username)}>
           <StyledButton buttonSize="tiny" width="100%">
-            <FormattedMessage defaultMessage="Refill Balance" />
+            <FormattedMessage defaultMessage="Refill Balance" id="dqYT8G" />
           </StyledButton>
         </StyledLink>
       </div>

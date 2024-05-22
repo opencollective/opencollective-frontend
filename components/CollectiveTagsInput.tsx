@@ -247,7 +247,7 @@ function CollectiveTagsInput({ defaultValue = [], onChange, suggestedTags = [] }
         <Flex mt={2} gap={'6px'} flexWrap="wrap" alignItems={'center'}>
           {suggestedTags && (
             <Span color="black.600" mr={1} fontSize="12px">
-              <FormattedMessage defaultMessage="Popular tags:" />
+              <FormattedMessage defaultMessage="Popular tags:" id="W4zXqr" />
             </Span>
           )}
 

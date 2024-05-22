@@ -61,6 +61,7 @@ export default function EditTagsModal({ collective, onClose }: EditTagsModalProp
         message: (
           <FormattedMessage
             defaultMessage="Error submiting form: {error}"
+            id="FAV3Ng"
             values={{
               error: e.message,
             }}
@@ -71,7 +72,7 @@ export default function EditTagsModal({ collective, onClose }: EditTagsModalProp
     }
     toast({
       variant: 'success',
-      message: <FormattedMessage defaultMessage="Successfully updated tags" />,
+      message: <FormattedMessage defaultMessage="Successfully updated tags" id="8CJ2DZ" />,
     });
     handleClose();
   };
@@ -89,7 +90,7 @@ export default function EditTagsModal({ collective, onClose }: EditTagsModalProp
             {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
             <div tabIndex={0} />
             <ModalHeader onClose={handleClose} hideCloseIcon={true}>
-              <FormattedMessage defaultMessage="Edit tags" />
+              <FormattedMessage defaultMessage="Edit tags" id="ulp3g5" />
             </ModalHeader>
             <ModalBody mb={0}>
               <StyledInputFormikField

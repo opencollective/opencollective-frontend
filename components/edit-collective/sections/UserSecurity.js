@@ -74,7 +74,7 @@ class UserSecurity extends React.Component {
 
     if (password === currentPassword) {
       this.setState({
-        passwordError: <FormattedMessage defaultMessage="Password can't be the same as current password" />,
+        passwordError: <FormattedMessage defaultMessage="Password can't be the same as current password" id="HhwRys" />,
       });
       return;
     }
@@ -82,7 +82,10 @@ class UserSecurity extends React.Component {
     if (passwordScore <= 1) {
       this.setState({
         passwordError: (
-          <FormattedMessage defaultMessage="Password is too weak. Try to use more characters or use a password manager to generate a strong one." />
+          <FormattedMessage
+            defaultMessage="Password is too weak. Try to use more characters or use a password manager to generate a strong one."
+            id="C2rcD0"
+          />
         ),
       });
       return;
@@ -107,9 +110,9 @@ class UserSecurity extends React.Component {
       toast({
         variant: 'success',
         message: hadPassword ? (
-          <FormattedMessage defaultMessage="Password successfully updated" />
+          <FormattedMessage defaultMessage="Password successfully updated" id="6oGOC9" />
         ) : (
-          <FormattedMessage defaultMessage="Password successfully set" />
+          <FormattedMessage defaultMessage="Password successfully set" id="cLP25w" />
         ),
       });
     } catch (e) {
@@ -158,7 +161,7 @@ class UserSecurity extends React.Component {
 
           {LoggedInUser.hasPassword && (
             <StyledInputField
-              label={<FormattedMessage defaultMessage="Current Password" />}
+              label={<FormattedMessage defaultMessage="Current Password" id="GretYf" />}
               labelFontWeight="bold"
               htmlFor="current-password"
               mb={2}
@@ -180,7 +183,7 @@ class UserSecurity extends React.Component {
           )}
 
           <StyledInputField
-            label={<FormattedMessage defaultMessage="New Password" />}
+            label={<FormattedMessage defaultMessage="New Password" id="Ev6SEF" />}
             labelFontWeight="bold"
             htmlFor="new-password"
             mt={2}
@@ -189,6 +192,7 @@ class UserSecurity extends React.Component {
             hint={
               <FormattedMessage
                 defaultMessage="Strong password recommended. Short or weak one restricted. <link>The strength of a password is a function of length, complexity, and unpredictability.</link>"
+                id="qaIW32"
                 values={{
                   link: getI18nLink({
                     href: 'https://en.wikipedia.org/wiki/Password_strength',

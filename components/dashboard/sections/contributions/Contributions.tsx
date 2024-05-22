@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { compact, toNumber } from 'lodash';
+import { compact } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -12,7 +12,6 @@ import { Order, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
 import Avatar from '../../../Avatar';
-import { DataTable } from '../../../DataTable';
 import DateTime from '../../../DateTime';
 import EditOrderModal, { EditOrderActions } from '../../../EditOrderModal';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
@@ -21,6 +20,7 @@ import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import OrderStatusTag from '../../../orders/OrderStatusTag';
 import PaymentMethodTypeWithIcon from '../../../PaymentMethodTypeWithIcon';
 import { managedOrderFragment } from '../../../recurring-contributions/graphql/queries';
+import { DataTable } from '../../../table/DataTable';
 import { Span } from '../../../Text';
 import {
   DropdownMenu,
@@ -29,12 +29,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../../../ui/DropdownMenu';
-import { Pagination } from '../../../ui/Pagination';
 import { TableActionsButton } from '../../../ui/Table';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import { Filterbar } from '../../filters/Filterbar';
+import { Pagination } from '../../filters/Pagination';
 import { DashboardSectionProps } from '../../types';
 
 import { FilterMeta, filters, OrderTypeFilter, schema, toVariables } from './filters';
@@ -198,7 +198,7 @@ const getColumns = ({ tab, setEditOrder, intl, isIncoming }) => {
 
   const totalAmount = {
     accessorKey: 'totalAmount',
-    header: intl.formatMessage({ defaultMessage: 'Total Amount' }),
+    header: intl.formatMessage({ defaultMessage: 'Total Amount', id: 'CDTMW3' }),
     cell: ({ cell }) => {
       const amount = cell.getValue();
       return (
@@ -237,7 +237,7 @@ const getColumns = ({ tab, setEditOrder, intl, isIncoming }) => {
                     onClick={() => setEditOrder({ order, action: 'editPaymentMethod' })}
                   >
                     {order.status === 'PAUSED' ? (
-                      <FormattedMessage defaultMessage="Resume contribution" />
+                      <FormattedMessage defaultMessage="Resume contribution" id="51nF6S" />
                     ) : (
                       <FormattedMessage
                         id="subscription.menu.editPaymentMethod"
@@ -248,7 +248,10 @@ const getColumns = ({ tab, setEditOrder, intl, isIncoming }) => {
                 </TooltipTrigger>
                 {isResumePrevented && (
                   <TooltipContent>
-                    <FormattedMessage defaultMessage="This contribution cannot be resumed yet. We'll send you an email when it's ready." />
+                    <FormattedMessage
+                      defaultMessage="This contribution cannot be resumed yet. We'll send you an email when it's ready."
+                      id="bwgZQe"
+                    />
                   </TooltipContent>
                 )}
               </Tooltip>{' '}
@@ -339,13 +342,13 @@ const Contributions = ({ accountSlug, direction }: ContributionsProps) => {
   const views: Views<z.infer<typeof schema>> = [
     {
       id: ContributionsTab.ALL,
-      label: intl.formatMessage({ defaultMessage: 'All' }),
+      label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
       count: metadata?.account?.ALL.totalCount,
       filter: {},
     },
     {
       id: ContributionsTab.RECURRING,
-      label: intl.formatMessage({ defaultMessage: 'Recurring' }),
+      label: intl.formatMessage({ defaultMessage: 'Recurring', id: 'v84fNv' }),
       count: metadata?.account?.[ContributionsTab.RECURRING].totalCount,
       filter: {
         type: OrderTypeFilter.RECURRING,
@@ -354,7 +357,7 @@ const Contributions = ({ accountSlug, direction }: ContributionsProps) => {
     },
     {
       id: ContributionsTab.ONETIME,
-      label: intl.formatMessage({ defaultMessage: 'One-Time' }),
+      label: intl.formatMessage({ defaultMessage: 'One-Time', id: 'jX0G5O' }),
       count: metadata?.account?.[ContributionsTab.ONETIME].totalCount,
       filter: {
         type: OrderTypeFilter.ONETIME,
@@ -363,7 +366,7 @@ const Contributions = ({ accountSlug, direction }: ContributionsProps) => {
     },
     {
       id: ContributionsTab.CANCELED,
-      label: intl.formatMessage({ defaultMessage: 'Cancelled' }),
+      label: intl.formatMessage({ defaultMessage: 'Cancelled', id: '3wsVWF' }),
       count: metadata?.account?.[ContributionsTab.CANCELED].totalCount,
       filter: {
         status: [OrderStatus.CANCELLED],
@@ -396,7 +399,6 @@ const Contributions = ({ accountSlug, direction }: ContributionsProps) => {
 
   const {
     data,
-    previousData,
     loading: queryLoading,
     error: queryError,
   } = useQuery(dashboardContributionsQuery, {
@@ -432,10 +434,6 @@ const Contributions = ({ accountSlug, direction }: ContributionsProps) => {
       }
     }
   }, [router, selectedOrders]);
-
-  const { limit, offset } = queryFilter.values;
-  const pages = Math.ceil(((data || previousData)?.account?.orders.totalCount || 1) / limit);
-  const currentPage = toNumber(offset + limit) / limit;
 
   const isIncoming = direction === 'INCOMING';
   const loading = metadataLoading || queryLoading;
@@ -491,11 +489,7 @@ const Contributions = ({ accountSlug, direction }: ContributionsProps) => {
             mobileTableView
             nbPlaceholders={nbPlaceholders}
           />
-          <Pagination
-            totalPages={pages}
-            page={currentPage}
-            onChange={page => queryFilter.setFilter('offset', (page - 1) * limit)}
-          />
+          <Pagination queryFilter={queryFilter} total={data?.account?.orders.totalCount} />
         </div>
       )}
       {editOrder.order && (

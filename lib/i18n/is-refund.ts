@@ -1,8 +1,8 @@
 import { defineMessages } from 'react-intl';
 
 const MESSAGES = defineMessages({
-  IS_REFUND: { defaultMessage: 'Is Refund' },
-  IS_NOT_REFUND: { defaultMessage: 'Is not Refund' },
+  IS_REFUND: { defaultMessage: 'Is Refund', id: 'o+jEZR' },
+  IS_NOT_REFUND: { defaultMessage: 'Is not Refund', id: 'VX6iYD' },
 });
 
 export const i18nIsRefund = (intl, value) => {

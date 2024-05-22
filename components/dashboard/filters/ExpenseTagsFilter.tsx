@@ -16,7 +16,7 @@ type ExpenseTagFilterValue = z.infer<typeof expenseTagFilterSchema>;
 export const expenseTagFilter: FilterConfig<ExpenseTagFilterValue> = {
   schema: expenseTagFilterSchema,
   filter: {
-    labelMsg: defineMessage({ defaultMessage: 'Tag' }),
+    labelMsg: defineMessage({ defaultMessage: 'Tag', id: '18HJlm' }),
     Component: ExpenseTagsFilter,
   },
 };

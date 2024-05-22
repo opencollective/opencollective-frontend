@@ -37,7 +37,7 @@ const ResendMemberInviteBtn = ({ member, collective }) => {
         } catch (e) {
           toast({
             variant: 'error',
-            title: intl.formatMessage({ defaultMessage: 'Cannot send member invitation' }),
+            title: intl.formatMessage({ defaultMessage: 'Cannot send member invitation', id: 'mGnvLd' }),
             message: i18nGraphqlException(intl, e),
           });
         }

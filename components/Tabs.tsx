@@ -49,7 +49,10 @@ const Tabs = ({ tabs, selectedId, onChange, ...props }: TabsProps) => {
     return (
       <Select onValueChange={val => onChange(val)} value={selectedId ?? ''}>
         <SelectTrigger data-cy={`view-${selectedId}`} className={selectedId && 'font-medium text-primary'}>
-          <SelectValue className="font-bold" placeholder={intl.formatMessage({ defaultMessage: 'Select a view' })} />
+          <SelectValue
+            className="font-bold"
+            placeholder={intl.formatMessage({ defaultMessage: 'Select a view', id: 'n8TgCC' })}
+          />
         </SelectTrigger>
         <SelectContent>
           {tabs.map(tab => {

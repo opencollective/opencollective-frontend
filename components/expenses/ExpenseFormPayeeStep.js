@@ -149,11 +149,11 @@ const getPayeeOptions = (intl, payoutProfiles) => {
 
   const payeeOptions = [
     {
-      label: intl.formatMessage({ defaultMessage: 'Myself' }),
+      label: intl.formatMessage({ defaultMessage: 'Myself', id: 'YjO/0+' }),
       options: getProfileOptions(INDIVIDUAL),
     },
     {
-      label: intl.formatMessage({ defaultMessage: 'Vendors' }),
+      label: intl.formatMessage({ defaultMessage: 'Vendors', id: 'RilevA' }),
       options: getProfileOptions(VENDOR),
     },
     {
@@ -177,7 +177,7 @@ const getPayeeOptions = (intl, payoutProfiles) => {
   if (profilesByType[PROJECT]?.length) {
     payeeOptions.push({
       options: getProfileOptions(PROJECT),
-      label: intl.formatMessage({ defaultMessage: 'My Projects' }),
+      label: intl.formatMessage({ defaultMessage: 'My Projects', id: 'FVO2wx' }),
     });
   }
   if (profilesByType[EVENT]?.length) {

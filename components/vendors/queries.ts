@@ -14,7 +14,6 @@ export const vendorFieldFragment = gql`
     description
     tags
     imageUrl(height: 96)
-    hasImage
     isArchived
     createdAt
 

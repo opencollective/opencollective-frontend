@@ -40,7 +40,7 @@ const EditTransferWiseAccount = ({ collective, ...props }) => {
         )}
 
         <StyledButton mt={2} type="submit" onClick={handleConnect}>
-          <FormattedMessage defaultMessage="Connect {service}" values={{ service: 'Wise' }} />
+          <FormattedMessage defaultMessage="Connect {service}" id="C9HmCs" values={{ service: 'Wise' }} />
         </StyledButton>
       </React.Fragment>
     );

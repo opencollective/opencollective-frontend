@@ -138,12 +138,17 @@ const hostedCollectiveFields = gql`
     currency
     imageUrl(height: 96)
     isFrozen
+    isHost
     tags
     settings
     createdAt
     stats {
       id
       balance {
+        valueInCents
+        currency
+      }
+      consolidatedBalance: balance(includeChildren: true) {
         valueInCents
         currency
       }
@@ -169,6 +174,8 @@ const hostedCollectiveFields = gql`
         id
         legacyId
         name
+        slug
+        imageUrl(height: 96)
       }
     }
     ... on AccountWithContributions {
@@ -230,6 +237,7 @@ export const hostedCollectivesMetadataQuery = gql`
   query HostedCollectivesMetadata($hostSlug: String!) {
     host(slug: $hostSlug) {
       id
+      currency
       all: hostedAccounts(limit: 1, accountType: [COLLECTIVE, FUND]) {
         totalCount
       }
@@ -253,13 +261,15 @@ export const hostedCollectivesQuery = gql`
     $hostSlug: String!
     $limit: Int!
     $offset: Int!
-    $orderBy: OrderByInput
+    $sort: OrderByInput
     $hostFeesStructure: HostFeeStructure
     $searchTerm: String
     $type: [AccountType]
     $isApproved: Boolean
     $isFrozen: Boolean
     $isUnhosted: Boolean
+    $balance: AmountRangeInput
+    $consolidatedBalance: AmountRangeInput
   ) {
     host(slug: $hostSlug) {
       id
@@ -282,10 +292,12 @@ export const hostedCollectivesQuery = gql`
         searchTerm: $searchTerm
         hostFeesStructure: $hostFeesStructure
         accountType: $type
-        orderBy: $orderBy
+        orderBy: $sort
         isApproved: $isApproved
         isFrozen: $isFrozen
         isUnhosted: $isUnhosted
+        balance: $balance
+        consolidatedBalance: $consolidatedBalance
       ) {
         offset
         limit
@@ -306,6 +318,96 @@ export const hostedCollectiveDetailQuery = gql`
     account(id: $id) {
       id
       ...HostedCollectiveFields
+      transactions(limit: 10, offset: 0, kind: [ADDED_FUNDS, CONTRIBUTION, EXPENSE]) {
+        nodes {
+          id
+          clearedAt
+          createdAt
+          type
+          kind
+          description
+          isRefund
+          isRefunded
+          isInReview
+          isDisputed
+          isOrderRejected
+          amount {
+            valueInCents
+            currency
+          }
+          netAmount {
+            valueInCents
+            currency
+          }
+          oppositeAccount {
+            id
+            slug
+            name
+            imageUrl
+          }
+        }
+      }
+    }
+    activities(account: { id: $id }, limit: 5, offset: 0, type: [COLLECTIVE]) {
+      nodes {
+        id
+        type
+        createdAt
+        data
+        isSystem
+        account {
+          id
+          slug
+          name
+          imageUrl
+        }
+        fromAccount {
+          id
+          slug
+          name
+          imageUrl
+        }
+        individual {
+          id
+          slug
+          name
+          imageUrl
+        }
+      }
+    }
+  }
+
+  ${hostedCollectiveFields}
+`;
+
+export const allCollectivesQuery = gql`
+  query AllCollectives(
+    $limit: Int!
+    $offset: Int!
+    $sort: OrderByInput
+    $searchTerm: String
+    $type: [AccountType]
+    $isHost: Boolean
+    $host: [AccountReferenceInput]
+    $isActive: Boolean
+  ) {
+    accounts(
+      limit: $limit
+      offset: $offset
+      searchTerm: $searchTerm
+      type: $type
+      orderBy: $sort
+      isHost: $isHost
+      isActive: $isActive
+      host: $host
+    ) {
+      offset
+      limit
+      totalCount
+      nodes {
+        id
+        ...HostedCollectiveFields
+      }
     }
   }
 

@@ -19,7 +19,6 @@ import AssignVirtualCardModal from '../../edit-collective/AssignVirtualCardModal
 import EditVirtualCardModal from '../../edit-collective/EditVirtualCardModal';
 import { getI18nLink } from '../../I18nFormatters';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
-import Pagination from '../../Pagination';
 import { Button } from '../../ui/Button';
 import { useToast } from '../../ui/useToast';
 import { StripeVirtualCardComplianceStatement } from '../../virtual-cards/StripeVirtualCardComplianceStatement';
@@ -32,6 +31,7 @@ import { dateFilter } from '../filters/DateFilter';
 import { Filterbar } from '../filters/Filterbar';
 import { AccountRenderer } from '../filters/HostedAccountFilter';
 import { orderByFilter } from '../filters/OrderFilter';
+import { Pagination } from '../filters/Pagination';
 import { searchFilter } from '../filters/SearchFilter';
 import { DashboardSectionProps } from '../types';
 
@@ -191,11 +191,11 @@ const toVariables: FiltersToVariables<z.infer<typeof schema>, HostedVirtualCards
 
 const filters: FilterComponentConfigs<z.infer<typeof schema>, FilterMeta> = {
   searchTerm: searchFilter.filter,
-  date: { ...dateFilter.filter, labelMsg: defineMessage({ defaultMessage: 'Expense period' }) },
-  amount: { ...amountFilter.filter, labelMsg: defineMessage({ defaultMessage: 'Total spent' }) },
+  date: { ...dateFilter.filter, labelMsg: defineMessage({ defaultMessage: 'Expense period', id: 'WS520d' }) },
+  amount: { ...amountFilter.filter, labelMsg: defineMessage({ defaultMessage: 'Total spent', id: '9vPzIO' }) },
   orderBy: orderByFilter.filter,
   account: {
-    labelMsg: defineMessage({ defaultMessage: 'Account' }),
+    labelMsg: defineMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
     Component: ({ meta, ...props }) => {
       const { data, loading } = useQuery(hostedVirtualCardAccountsQuery, {
         variables: { slug: meta.hostSlug },
@@ -218,7 +218,7 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>, FilterMeta> = {
     valueRenderer: ({ value }) => <AccountRenderer account={{ slug: value }} />,
   },
   status: {
-    labelMsg: defineMessage({ defaultMessage: 'Status' }),
+    labelMsg: defineMessage({ defaultMessage: 'Status', id: 'tzMNF3' }),
     Component: ({ intl, ...props }) => (
       <ComboSelectFilter
         isMulti
@@ -241,8 +241,6 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>, FilterMeta> = {
     valueRenderer: ({ value, intl }) => i18nHasMissingReceipts(intl, value),
   },
 };
-
-const ROUTE_PARAMS = ['slug', 'section'];
 
 const HostVirtualCards = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const { toast } = useToast();
@@ -281,7 +279,7 @@ const HostVirtualCards = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     views,
   });
 
-  const { error, loading, data, refetch, variables } = useQuery(hostVirtualCardsQuery, {
+  const { error, loading, data, refetch } = useQuery(hostVirtualCardsQuery, {
     context: API_V2_CONTEXT,
     variables: {
       slug: hostSlug,
@@ -306,7 +304,7 @@ const HostVirtualCards = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const handleCreateVirtualCardSuccess = message => {
     toast({
       variant: 'success',
-      message: message || <FormattedMessage defaultMessage="Virtual card successfully created" />,
+      message: message || <FormattedMessage defaultMessage="Virtual card successfully created" id="5O/mlD" />,
     });
     setCreateVirtualCardModalDisplay(false);
     refetch();
@@ -340,7 +338,7 @@ const HostVirtualCards = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
               onClick={() => setCreateVirtualCardModalDisplay(true)}
             >
               <span>
-                <FormattedMessage defaultMessage="Create virtual card" />
+                <FormattedMessage defaultMessage="Create virtual card" id="FRM4fb" />
               </span>
               <PlusIcon size={20} />
             </Button>
@@ -369,19 +367,7 @@ const HostVirtualCards = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
             host={data?.host}
             loading={loading}
           />
-          <div className="mt-12 flex flex-col items-center justify-center gap-1">
-            <Pagination
-              route={`/dashboard/${data?.host.slug}/host-virtual-cards`}
-              total={data?.host?.hostedVirtualCards.totalCount}
-              limit={variables.limit}
-              offset={variables.offset}
-              ignoredQueryParams={ROUTE_PARAMS}
-            />
-            <p className="text-sm">
-              <FormattedMessage id="TotalItems" defaultMessage="Total Items" />:{' '}
-              {data?.host?.hostedVirtualCards.totalCount}
-            </p>
-          </div>
+          <Pagination queryFilter={queryFilter} total={data?.host?.hostedVirtualCards.totalCount} />
         </React.Fragment>
       )}
 

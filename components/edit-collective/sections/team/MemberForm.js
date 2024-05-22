@@ -30,7 +30,7 @@ const memberFormMessages = defineMessages({
   roleLabel: { id: 'members.role.label', defaultMessage: 'Role' },
   sinceLabel: { id: 'user.since.label', defaultMessage: 'Since' },
   descriptionLabel: { id: 'Fields.description', defaultMessage: 'Description' },
-  inValidDateError: { defaultMessage: 'Please enter a valid date' },
+  inValidDateError: { defaultMessage: 'Please enter a valid date', id: '6DCLcI' },
 });
 
 const MemberForm = props => {

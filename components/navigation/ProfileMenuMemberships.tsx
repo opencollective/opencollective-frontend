@@ -7,7 +7,6 @@ import styled from 'styled-components';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { LoggedInUser } from '../../lib/custom_typings/LoggedInUser';
-import { isPastEvent } from '../../lib/events';
 import { getDashboardRoute } from '../../lib/url-helpers';
 
 import Avatar from '../Avatar';
@@ -100,7 +99,7 @@ const MembershipLine = ({ user, membership, closeDrawer }) => {
               </Link>
             </TooltipTrigger>
             <TooltipContent side="left">
-              <FormattedMessage defaultMessage="Go to Dashboard" />
+              <FormattedMessage defaultMessage="Go to Dashboard" id="LxSJOb" />
             </TooltipContent>
           </Tooltip>
         </div>
@@ -126,18 +125,7 @@ const sortMemberships = (memberships: LoggedInUser['memberOf']) => {
 };
 
 const filterArchivedMemberships = (memberships: LoggedInUser['memberOf']) => {
-  const archivedMemberships = memberships.filter(m => {
-    if (
-      m.role !== 'BACKER' &&
-      m.collective.isArchived &&
-      !(m.collective.type === 'EVENT' && isPastEvent(m.collective))
-    ) {
-      return true;
-    } else {
-      return false;
-    }
-  });
-
+  const archivedMemberships = memberships.filter(m => Boolean(m.collective.isArchived));
   return uniqBy(archivedMemberships, m => m.collective.id);
 };
 
@@ -145,7 +133,7 @@ const filterMemberships = (memberships: LoggedInUser['memberOf']) => {
   const filteredMemberships = memberships.filter(m => {
     if (!['ADMIN', 'ACCOUNTANT', 'HOST'].includes(m.role) || m.collective.isArchived) {
       return false;
-    } else if (m.collective.type === 'EVENT' && isPastEvent(m.collective)) {
+    } else if (['EVENT', 'PROJECT'].includes(m.collective.type)) {
       return false;
     } else {
       return Boolean(m.collective);
@@ -185,14 +173,14 @@ MembershipsList.propTypes = {
 const MENU_SECTIONS = {
   [CollectiveType.COLLECTIVE]: {
     title: defineMessage({ id: 'collective', defaultMessage: 'My Collectives' }),
-    emptyMessage: defineMessage({ defaultMessage: 'Create a collective to collect and spend money transparently' }),
+    emptyMessage: defineMessage({
+      defaultMessage: 'Create a collective to collect and spend money transparently',
+      id: 'MZB6HL',
+    }),
     plusButton: {
       text: defineMessage({ id: 'home.create', defaultMessage: 'Create a Collective' }),
       href: '/create',
     },
-  },
-  [CollectiveType.EVENT]: {
-    title: defineMessage({ id: 'events', defaultMessage: 'My Events' }),
   },
   [CollectiveType.FUND]: {
     title: defineMessage({ id: 'funds', defaultMessage: 'My Funds' }),
@@ -205,6 +193,7 @@ const MENU_SECTIONS = {
     title: defineMessage({ id: 'organization', defaultMessage: 'My Organizations' }),
     emptyMessage: defineMessage({
       defaultMessage: 'A profile representing a company or organization instead of an individual',
+      id: 'CBITv6',
     }),
     plusButton: {
       text: defineMessage({ id: 'host.organization.create', defaultMessage: 'Create an Organization' }),

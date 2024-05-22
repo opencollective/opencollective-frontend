@@ -11,6 +11,10 @@ exports.REWRITES = [
     destination: '/fiscal-hosting',
   },
   {
+    source: '/tax-form',
+    destination: '/tax-form',
+  },
+  {
     source: '/welcome',
     destination: '/welcome',
   },
@@ -51,12 +55,21 @@ exports.REWRITES = [
     destination: '/createOrganization',
   },
   {
-    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/updates',
-    destination: '/updates',
+    source: '/dashboard',
+    destination: '/dashboard',
+  },
+  { source: '/workspace', destination: '/dashboard' },
+  {
+    source: '/dashboard/:slug/:section?/:subpath*',
+    destination: '/dashboard',
   },
   {
-    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/updates/new',
-    destination: '/createUpdate',
+    source: '/workspace/:slug/:section?/:subpath*',
+    destination: '/dashboard',
+  },
+  {
+    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/updates',
+    destination: '/updates',
   },
   {
     source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/updates/:updateSlug',
@@ -123,23 +136,6 @@ exports.REWRITES = [
     destination: '/create-project',
   },
   {
-    source: '/dashboard/:slug/expenses/new',
-    destination: '/submit-expense',
-  },
-  {
-    source: '/dashboard',
-    destination: '/dashboard',
-  },
-  { source: '/workspace', destination: '/dashboard' },
-  {
-    source: '/dashboard/:slug/:section?/:subpath*',
-    destination: '/dashboard',
-  },
-  {
-    source: '/workspace/:slug/:section?/:subpath*',
-    destination: '/dashboard',
-  },
-  {
     source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/contact',
     destination: '/collective-contact',
   },
@@ -180,7 +176,6 @@ exports.REWRITES = [
     source: '/fund/:verb(apply|create)/:step(form)?',
     destination: '/create-fund',
   },
-
   // New Create Collective Flow
   {
     source: '/:hostCollectiveSlug?/:verb(create)/:version(v2)?/:category(community|climate)?/:step(form)?',

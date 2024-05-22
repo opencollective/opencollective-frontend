@@ -213,7 +213,7 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
           <StatContainer data-cy="budgetSection-total-contributed">
             <StatTitle>
               ↑&nbsp;
-              <FormattedMessage defaultMessage="Total contributed" />
+              <FormattedMessage defaultMessage="Total contributed" id="RogA5E" />
             </StatTitle>
             <StatAmount
               amount={Math.abs(stats.totalAmountSpent.valueInCents)}
@@ -223,7 +223,7 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
           <StatContainer data-cy="budgetSection-total-paid-expenses" borderTop={borderTop}>
             <StatTitle>
               ↓&nbsp;
-              <FormattedMessage defaultMessage="Total received with expenses" />
+              <FormattedMessage defaultMessage="Total received with expenses" id="Nqhan+" />
             </StatTitle>
             <StatAmount amount={stats.totalPaidExpenses.valueInCents} currency={stats.totalPaidExpenses.currency} />
           </StatContainer>

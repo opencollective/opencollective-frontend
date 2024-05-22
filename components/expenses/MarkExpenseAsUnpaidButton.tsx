@@ -34,6 +34,7 @@ const generateNewExpenseStatusOptions = intl => [
 const messages = defineMessages({
   reasonPlaceholder: {
     defaultMessage: 'e.g. Failed transfer',
+    id: 'mOdpl+',
   },
 });
 

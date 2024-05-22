@@ -1,6 +1,5 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
-import { toNumber } from 'lodash';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
@@ -13,19 +12,19 @@ import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 import { capitalize, sortSelectOptions } from '../../../lib/utils';
 
 import Avatar from '../../Avatar';
-import { DataTable } from '../../DataTable';
 import DateTime from '../../DateTime';
 import LinkCollective from '../../LinkCollective';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
+import { DataTable } from '../../table/DataTable';
 import { Span } from '../../Text';
 import { Button } from '../../ui/Button';
-import { Pagination } from '../../ui/Pagination';
 import DashboardHeader from '../DashboardHeader';
 import { EmptyResults } from '../EmptyResults';
 import ComboSelectFilter from '../filters/ComboSelectFilter';
 import { emailFilter } from '../filters/EmailFilter';
 import { Filterbar } from '../filters/Filterbar';
 import { orderByFilter } from '../filters/OrderFilter';
+import { Pagination } from '../filters/Pagination';
 import { DashboardSectionProps } from '../types';
 
 // type FilterMemberRole = MemberRole.FOLLOWER | MemberRole.BACKER | MemberRole.CONTRIBUTOR
@@ -137,7 +136,7 @@ const dashboardContributorsQuery = gql`
 const getColumns = ({ intl, activeViewId }) => {
   const account = {
     accessorKey: 'account',
-    header: intl.formatMessage({ defaultMessage: 'Account' }),
+    header: intl.formatMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
     cell: ({ cell }) => {
       const account = cell.getValue();
       return (
@@ -168,7 +167,7 @@ const getColumns = ({ intl, activeViewId }) => {
 
   const tier = {
     accessorKey: 'tier.name',
-    header: intl.formatMessage({ defaultMessage: 'Tier' }),
+    header: intl.formatMessage({ defaultMessage: 'Tier', id: 'b07w+D' }),
     cell: ({ cell }) => {
       const tierName = cell.getValue();
       return <span>{capitalize(tierName)}</span>;
@@ -213,7 +212,7 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
   const views = [
     {
       id: ContributorsTab.ALL,
-      label: intl.formatMessage({ defaultMessage: 'All' }),
+      label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
       count: metadata?.account?.ALL.totalCount,
       filter: {},
     },
@@ -227,7 +226,7 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
     },
     {
       id: ContributorsTab.FOLLOWERS,
-      label: intl.formatMessage({ defaultMessage: 'Followers' }),
+      label: intl.formatMessage({ defaultMessage: 'Followers', id: 'pzTOmv' }),
       count: metadata?.account?.[ContributorsTab.FOLLOWERS]?.totalCount,
       filter: {
         role: [FilterMemberRole.FOLLOWER],
@@ -257,7 +256,6 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
 
   const {
     data,
-    previousData,
     loading: queryLoading,
     error: queryError,
   } = useQuery(dashboardContributorsQuery, {
@@ -268,10 +266,6 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
     },
     context: API_V2_CONTEXT,
   });
-
-  const { limit, offset } = queryFilter.values;
-  const pages = Math.ceil(((data || previousData)?.account?.members.totalCount || 1) / limit);
-  const currentPage = toNumber(offset + limit) / limit;
 
   const contributors = data?.account?.members.nodes || [];
 
@@ -329,11 +323,7 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
             mobileTableView
             nbPlaceholders={nbPlaceholders}
           />
-          <Pagination
-            totalPages={pages}
-            page={currentPage}
-            onChange={page => queryFilter.setFilter('offset', (page - 1) * limit)}
-          />
+          <Pagination queryFilter={queryFilter} total={data?.account?.members.totalCount} />
         </div>
       )}
     </div>

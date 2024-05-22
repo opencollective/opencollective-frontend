@@ -24,7 +24,7 @@ export const TransactionReportRowLabel = ({ filter }) => {
   }
 
   if (filter.isRefund) {
-    return intl.formatMessage({ defaultMessage: 'Refunded {kind}' }, { kind: label });
+    return intl.formatMessage({ defaultMessage: 'Refunded {kind}', id: 'XGGPfz' }, { kind: label });
   } else {
     return label;
   }

@@ -51,7 +51,7 @@ const SendFundsToCollectiveSection = ({ collective, toCollective, LoggedInUser }
             <FormattedMessage
               id="collective.emptyBalance.header"
               values={{ action: modal.type }}
-              defaultMessage={'{action} Balance'}
+              defaultMessage="{action} Balance"
             />
           </ModalHeader>
           <ModalBody>
@@ -59,21 +59,21 @@ const SendFundsToCollectiveSection = ({ collective, toCollective, LoggedInUser }
               <FormattedMessage
                 id="collective.emptyBalance.body"
                 values={{ collective: toCollective.name, action: modal.type.toLowerCase() }}
-                defaultMessage={'Are you sure you want to {action} to {collective}?'}
+                defaultMessage="Are you sure you want to {action} to {collective}?"
               />
             </P>
           </ModalBody>
           <ModalFooter>
             <Container display="flex" justifyContent="flex-end">
               <StyledButton mx={20} onClick={() => setModal({ ...modal, show: false, isApproved: false })}>
-                <FormattedMessage id="actions.cancel" defaultMessage={'Cancel'} />
+                <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
               </StyledButton>
               <StyledButton
                 buttonStyle="primary"
                 data-cy="action"
                 onClick={() => setModal({ ...modal, show: false, isApproved: true })}
               >
-                <FormattedMessage id="confirm" defaultMessage={'Confirm'} />
+                <FormattedMessage id="confirm" defaultMessage="Confirm" />
               </StyledButton>
             </Container>
           </ModalFooter>

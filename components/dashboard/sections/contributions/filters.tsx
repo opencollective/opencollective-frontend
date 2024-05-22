@@ -27,8 +27,8 @@ export enum OrderTypeFilter {
 }
 const i18nOrderType = (intl, value) => {
   const langs = {
-    [OrderTypeFilter.RECURRING]: intl.formatMessage({ defaultMessage: 'Recurring' }),
-    [OrderTypeFilter.ONETIME]: intl.formatMessage({ defaultMessage: 'One-time' }),
+    [OrderTypeFilter.RECURRING]: intl.formatMessage({ defaultMessage: 'Recurring', id: 'v84fNv' }),
+    [OrderTypeFilter.ONETIME]: intl.formatMessage({ defaultMessage: 'One-time', id: '/Zj5Ed' }),
   };
   return langs[value] ?? value;
 };
@@ -88,7 +88,7 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   amount: { ...amountFilter.filter, labelMsg: defineMessage({ id: 'TotalAmount', defaultMessage: 'Total amount' }) },
   orderBy: orderByFilter.filter,
   status: {
-    labelMsg: defineMessage({ defaultMessage: 'Status' }),
+    labelMsg: defineMessage({ defaultMessage: 'Status', id: 'tzMNF3' }),
     Component: ({ valueRenderer, intl, ...props }) => (
       <ComboSelectFilter
         options={Object.values(OrderStatus)

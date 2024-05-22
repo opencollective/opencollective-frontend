@@ -69,6 +69,7 @@ class StripeOrBankAccountPicker extends React.Component {
       },
       connectService: {
         defaultMessage: 'Connect {service}',
+        id: 'C9HmCs',
       },
     });
   }
@@ -149,7 +150,7 @@ class StripeOrBankAccountPicker extends React.Component {
                       }
                     }}
                   >
-                    <FormattedMessage defaultMessage="Connect {service}" values={{ service: 'Stripe' }} />
+                    <FormattedMessage defaultMessage="Connect {service}" id="C9HmCs" values={{ service: 'Stripe' }} />
                   </StyledButton>
                 )}
                 <Box minHeight={50} px={3}>

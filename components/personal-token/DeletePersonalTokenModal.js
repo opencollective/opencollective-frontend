@@ -40,7 +40,13 @@ const DeletePersonalTokenModal = ({ personalToken, onDelete, ...props }) => {
     <ConfirmationModal
       isDanger
       type="delete"
-      header={<FormattedMessage defaultMessage="Delete token {name}" values={{ name: personalToken.name || '' }} />}
+      header={
+        <FormattedMessage
+          defaultMessage="Delete token {name}"
+          id="WzSLvB"
+          values={{ name: personalToken.name || '' }}
+        />
+      }
       {...props}
       continueHandler={async () => {
         try {
@@ -49,7 +55,7 @@ const DeletePersonalTokenModal = ({ personalToken, onDelete, ...props }) => {
           toast({
             variant: 'success',
             message: intl.formatMessage(
-              { defaultMessage: 'Personal token "{name}" deleted' },
+              { defaultMessage: 'Personal token "{name}" deleted', id: 'Ix3kXB' },
               { name: personalToken.name || '' },
             ),
           });
@@ -60,7 +66,10 @@ const DeletePersonalTokenModal = ({ personalToken, onDelete, ...props }) => {
       }}
     >
       <P>
-        <FormattedMessage defaultMessage="This will permanently delete the token, revoking all access associated with it. Are you sure you want to continue?" />
+        <FormattedMessage
+          defaultMessage="This will permanently delete the token, revoking all access associated with it. Are you sure you want to continue?"
+          id="7YAGj2"
+        />
       </P>
     </ConfirmationModal>
   );

@@ -85,6 +85,7 @@ const Messages = defineMessages({
   },
   searchForUsers: {
     defaultMessage: 'Search for Users by name or email',
+    id: 'xLF0/9',
   },
 });
 

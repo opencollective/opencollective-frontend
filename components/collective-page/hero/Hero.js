@@ -308,7 +308,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                       <StyledButton buttonSize="tiny" color="black.700" height={32}>
                         <CodeRepositoryIcon size={12} repositoryUrl={collective.repositoryUrl} />
                         <Span ml={2}>
-                          <FormattedMessage defaultMessage="Code repository" />
+                          <FormattedMessage defaultMessage="Code repository" id="E2brjR" />
                         </Span>
                       </StyledButton>
                     </StyledLink>

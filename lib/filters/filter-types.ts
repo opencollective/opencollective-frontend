@@ -38,7 +38,7 @@ type DropdownFilter<FilterValue, Meta> = {
   valueRenderer?: ValueRenderer<FilterValue, Meta>;
 };
 
-export type SetFilter<FV> = <K extends keyof FV>(filter: K, value: FV[K]) => void;
+export type SetFilter<FV> = <K extends keyof FV>(filter: K, value: FV[K], resetPagination?: boolean) => void;
 export type SetFilters<FV> = (filters: Partial<FV>, newPath?: string) => void;
 export type resetFilters<FV> = (filters: Partial<FV>, newPath?: string) => void;
 

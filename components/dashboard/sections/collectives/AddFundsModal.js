@@ -85,6 +85,7 @@ const addFundsMutation = gql`
     $account: AccountReferenceInput!
     $tier: TierReferenceInput
     $amount: AmountInput!
+    $paymentProcessorFee: AmountInput
     $description: String!
     $memo: String
     $processedAt: DateTime
@@ -97,6 +98,7 @@ const addFundsMutation = gql`
       account: $account
       fromAccount: $fromAccount
       amount: $amount
+      paymentProcessorFee: $paymentProcessorFee
       description: $description
       memo: $memo
       processedAt: $processedAt
@@ -121,6 +123,10 @@ const addFundsMutation = gql`
       transactions {
         id
         type
+        kind
+        amount {
+          valueInCents
+        }
       }
       fromAccount {
         id
@@ -253,6 +259,7 @@ const addFundsAccountQuery = gql`
 
 const getInitialValues = values => ({
   amount: null,
+  paymentProcessorFee: null,
   hostFeePercent: null,
   description: '',
   memo: null,
@@ -294,7 +301,7 @@ const getTiersOptions = (intl, tiers) => {
   return [
     {
       value: null,
-      label: intl.formatMessage({ defaultMessage: 'No tier' }),
+      label: intl.formatMessage({ defaultMessage: 'No tier', id: 'ozkv/Y' }),
     },
     ...tiers.map(tier => ({
       value: tier,
@@ -392,13 +399,7 @@ const AddFundsModal = ({ collective, ...props }) => {
   };
 
   return (
-    <AddFundsModalContainer
-      {...props}
-      trapFocus
-      showSuccessModal={fundDetails.showSuccessModal}
-      onClose={handleClose}
-      className="sm:max-h-[90vh]"
-    >
+    <AddFundsModalContainer {...props} trapFocus showSuccessModal={fundDetails.showSuccessModal} onClose={handleClose}>
       <CollectiveModalHeader
         collective={collective}
         customText={
@@ -426,7 +427,10 @@ const AddFundsModal = ({ collective, ...props }) => {
               const result = await submitAddFunds({
                 variables: {
                   ...values,
-                  amount: { valueInCents: values.amount },
+                  amount: { valueInCents: values.amount, currency },
+                  paymentProcessorFee: values.paymentProcessorFee
+                    ? { valueInCents: values.paymentProcessorFee, currency }
+                    : null,
                   platformTip: { valueInCents: 0 },
                   fromAccount: buildAccountReference(values.fromAccount),
                   account: buildAccountReference(values.account),
@@ -444,6 +448,9 @@ const AddFundsModal = ({ collective, ...props }) => {
                 fundAmount: values.amount,
                 taxAmount: resultOrder.taxAmount,
                 hostFeePercent: resultOrder.hostFeePercent,
+                paymentProcessorFee: resultOrder.transactions.find(
+                  t => t.kind === 'PAYMENT_PROCESSOR_FEE' && t.type === 'DEBIT',
+                )?.amount,
                 taxes: resultOrder.taxes,
                 description: resultOrder.description,
                 memo: resultOrder.memo,
@@ -473,6 +480,7 @@ const AddFundsModal = ({ collective, ...props }) => {
             const { values, isSubmitting } = formik;
             const hostFeePercent = isNaN(values.hostFeePercent) ? defaultHostFeePercent : values.hostFeePercent;
             const taxAmount = !values.tax?.rate ? 0 : Math.round(values.amount - values.amount / (1 + values.tax.rate));
+            const paymentProcessorFee = values.paymentProcessorFee || 0;
             const hostFee = Math.round((values.amount - taxAmount) * (hostFeePercent / 100));
             const loading = isLoading || isSubmitting;
 
@@ -504,7 +512,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                     <Field
                       name="tier"
                       htmlFor="addFunds-tier"
-                      label={<FormattedMessage defaultMessage="Tier" />}
+                      label={<FormattedMessage defaultMessage="Tier" id="b07w+D" />}
                       mt={3}
                     >
                       {({ form, field }) => (
@@ -535,10 +543,22 @@ const AddFundsModal = ({ collective, ...props }) => {
                       name="processedAt"
                       htmlFor="addFunds-processedAt"
                       inputType="date"
-                      hint={
-                        <FormattedMessage defaultMessage="The date funds were cleared on your bank, Wise, PayPal, Stripe or any other external account holding these funds." />
+                      label={
+                        <span>
+                          <FormattedMessage defaultMessage="Effective Date" id="Gh3Obs" />
+                          {` `}
+                          <StyledTooltip
+                            content={() => (
+                              <FormattedMessage
+                                defaultMessage="The date funds were cleared on your bank, Wise, PayPal, Stripe or any other external account holding these funds."
+                                id="s3O6iq"
+                              />
+                            )}
+                          >
+                            <InfoCircle size={16} />
+                          </StyledTooltip>
+                        </span>
                       }
-                      label={<FormattedMessage defaultMessage="Effective Date" />}
                       mt={3}
                     >
                       {({ field }) => <StyledInput data-cy="add-funds-processedAt" {...field} />}
@@ -574,9 +594,12 @@ const AddFundsModal = ({ collective, ...props }) => {
                       name="memo"
                       htmlFor="addFunds-memo"
                       hint={
-                        <FormattedMessage defaultMessage="This is a private note that will only be visible to the host." />
+                        <FormattedMessage
+                          defaultMessage="This is a private note that will only be visible to the host."
+                          id="znqf9S"
+                        />
                       }
-                      label={<FormattedMessage defaultMessage="Memo" />}
+                      label={<FormattedMessage defaultMessage="Memo" id="D5NqQO" />}
                       required={false}
                       mt={3}
                     >
@@ -586,7 +609,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                       <Field
                         name="amount"
                         htmlFor="addFunds-amount"
-                        label={<FormattedMessage id="Fields.amount" defaultMessage="Amount" />}
+                        label={<FormattedMessage defaultMessage="Gross Amount" id="bwZInO" />}
                         required
                         flex="1 1"
                       >
@@ -610,7 +633,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                           htmlFor="addFunds-hostFeePercent"
                           label={
                             <span>
-                              <FormattedMessage defaultMessage="Host Fee" />
+                              <FormattedMessage defaultMessage="Host Fee" id="NJsELs" />
                               {` `}
                               <StyledTooltip
                                 content={() => (
@@ -639,6 +662,29 @@ const AddFundsModal = ({ collective, ...props }) => {
                         </Field>
                       )}
                     </Flex>
+                    <Box mt={3}>
+                      <Field
+                        name="paymentProcessorFee"
+                        htmlFor="addFunds-paymentProcessorFee"
+                        flex="1 1"
+                        required={false}
+                        label={<FormattedMessage defaultMessage="Payment Processor Fee" id="pzs6YY" />}
+                      >
+                        {({ form, field }) => (
+                          <StyledInputAmount
+                            id={field.id}
+                            data-cy="add-funds-paymentProcessorFee"
+                            currency={currency}
+                            placeholder="0.00"
+                            error={field.error}
+                            value={field.value}
+                            maxWidth="100%"
+                            onChange={value => form.setFieldValue(field.name, value)}
+                            onBlur={() => form.setFieldTouched(field.name, true)}
+                          />
+                        )}
+                      </Field>
+                    </Box>
                     {applicableTax && (
                       <Box mt={3}>
                         <TaxesFormikFields
@@ -650,7 +696,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                           labelProps={{ fontSize: '16px', fontWeight: '700' }}
                           idNumberLabelRenderer={shortTaxTypeLabel =>
                             intl.formatMessage(
-                              { defaultMessage: "Source's {taxName} identifier" },
+                              { defaultMessage: "Source's {taxName} identifier", id: 'TNecsq' },
                               { taxName: shortTaxTypeLabel },
                             )
                           }
@@ -662,7 +708,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                         <Field
                           name="invoiceTemplate"
                           htmlFor="addFunds-invoiceTemplate"
-                          label={<FormattedMessage defaultMessage="Choose receipt" />}
+                          label={<FormattedMessage defaultMessage="Choose receipt" id="cyMx/0" />}
                           mt={3}
                         >
                           {({ form, field }) => (
@@ -701,6 +747,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                           label={
                             <FormattedMessage
                               defaultMessage="Gross amount without {taxName}"
+                              id="dcUpWf"
                               values={{ taxName: i18nTaxType(intl, values.tax.type, 'short') }}
                             />
                           }
@@ -721,9 +768,16 @@ const AddFundsModal = ({ collective, ...props }) => {
                         }
                       />
                     )}
+                    {Boolean(paymentProcessorFee) && (
+                      <AmountDetailsLine
+                        value={-paymentProcessorFee}
+                        currency={currency}
+                        label={<FormattedMessage defaultMessage="Payment Processor Fee" id="pzs6YY" />}
+                      />
+                    )}
                     <StyledHr my={2} borderColor="black.300" />
                     <AmountDetailsLine
-                      value={values.amount - hostFee - taxAmount}
+                      value={values.amount - hostFee - taxAmount - (values.paymentProcessorFee || 0)}
                       currency={currency}
                       label={
                         <FormattedMessage
@@ -778,6 +832,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                             <li>
                               <FormattedMessage
                                 defaultMessage="Including {amount} {feeType} ({feeRate})"
+                                id="9kR30C"
                                 values={{
                                   amount: (
                                     <FormattedMoneyAmount
@@ -796,6 +851,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                             <li>
                               <FormattedMessage
                                 defaultMessage="Including {amount} {feeType} ({feeRate})"
+                                id="9kR30C"
                                 values={{
                                   amount: (
                                     <FormattedMoneyAmount
@@ -813,6 +869,29 @@ const AddFundsModal = ({ collective, ...props }) => {
                               />
                             </li>
                           )}
+                          {Boolean(fundDetails.paymentProcessorFee?.valueInCents) && (
+                            <li>
+                              <FormattedMessage
+                                defaultMessage="Including {amount} {feeType}"
+                                id="vK8Lti"
+                                values={{
+                                  amount: (
+                                    <FormattedMoneyAmount
+                                      currency={currency}
+                                      showCurrencyCode={false}
+                                      amount={-fundDetails.paymentProcessorFee.valueInCents}
+                                    />
+                                  ),
+                                  feeType: (
+                                    <FormattedMessage
+                                      id="contribution.paymentFee"
+                                      defaultMessage="Payment processor fee"
+                                    />
+                                  ),
+                                }}
+                              />
+                            </li>
+                          )}
                           <li>
                             <FormattedMessage id="AddFundsModal.FromTheSource" defaultMessage="From the source" />{' '}
                             <strong>
@@ -825,7 +904,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                           </li>
                           {fundDetails.memo && (
                             <li>
-                              <FormattedMessage defaultMessage="Memo" />
+                              <FormattedMessage defaultMessage="Memo" id="D5NqQO" />
                               {': '}
                               <strong>{fundDetails.memo}</strong>
                             </li>
@@ -841,7 +920,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                           )}
                           {fundDetails.tier && (
                             <li>
-                              <FormattedMessage defaultMessage="For the tier" />{' '}
+                              <FormattedMessage defaultMessage="For the tier" id="h+1vQB" />{' '}
                               <StyledLink
                                 as={Link}
                                 openInNewTab

@@ -57,7 +57,7 @@ const FiscalSponsorship = () => {
         </Box>
         <Link href="/organizations/new">
           <StyledButton minWidth={[283, 165, null, null, 183]} buttonStyle="marketing" whiteSpace="nowrap">
-            <FormattedMessage defaultMessage="Join as a Fiscal Host" />
+            <FormattedMessage defaultMessage="Join as a Fiscal Host" id="Y0G9KM" />
           </StyledButton>
         </Link>
       </Container>

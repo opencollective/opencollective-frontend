@@ -95,7 +95,7 @@ const Expenses = props => {
         <React.Fragment>
           <h1 className={'mb-6 text-[32px] leading-10'}>
             {onlySubmittedExpenses ? (
-              <FormattedMessage defaultMessage="Submitted Expenses" />
+              <FormattedMessage defaultMessage="Submitted Expenses" id="NpGb+x" />
             ) : (
               <FormattedMessage id="Expenses" defaultMessage="Expenses" />
             )}

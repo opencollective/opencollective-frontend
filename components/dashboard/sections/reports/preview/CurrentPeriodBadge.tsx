@@ -23,6 +23,7 @@ export function CurrentPeriodBadge({
     <Badge type="warning" size={size} className="tracking-normal">
       <FormattedMessage
         defaultMessage="{timeUnit, select, MONTH {Month} QUARTER {Quarter} YEAR {Year} other {Current period}} to date"
+        id="JtDPrj"
         values={{ timeUnit: variables.timeUnit }}
       />
     </Badge>
