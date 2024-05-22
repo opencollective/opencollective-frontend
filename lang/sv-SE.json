@@ -984,6 +984,7 @@
   "CreateConversationFAQ.target.content": "Alla forumtrådar är offentliga. Vem som helst kan se och svara på dem.",
   "CreateConversationForm.Submit": "Skapa konversation",
   "createCustomTiers": "Skapa dina egna nivåer",
+  "created": "Created",
   "CreatedBy": "av {name}",
   "CreateEvent": "Create event",
   "CreateExpense.HelpCreateInfo": "Begär betalning från {collective}. Utgifter kommer att behandlas när de har godkänts av administratören för det kollektivet. Beloppet, beskrivningen och ditt profilnamn är offentliga, men bilagor, betalningsdetaljer och annan personlig information hålls privat.",

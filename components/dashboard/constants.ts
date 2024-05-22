@@ -23,6 +23,7 @@ export const SECTIONS = {
   VIRTUAL_CARDS: 'virtual-cards',
   TEAM: 'team',
   VENDORS: 'vendors',
+  ALL_COLLECTIVES: 'all-collectives',
 };
 
 export const SETTINGS_SECTIONS = {

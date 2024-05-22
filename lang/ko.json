@@ -984,6 +984,7 @@
   "CreateConversationFAQ.target.content": "All Conversations are public. Anyone can see and respond to them.",
   "CreateConversationForm.Submit": "대화 만들기",
   "createCustomTiers": "Create your own tiers",
+  "created": "Created",
   "CreatedBy": "by {name}",
   "CreateEvent": "Create event",
   "CreateExpense.HelpCreateInfo": "Request payment from {collective}. Expenses will be processed once approved by a Collective admin. The amount, description, and your profile name are public, but attachments, payment details, and other personal info is kept private.",

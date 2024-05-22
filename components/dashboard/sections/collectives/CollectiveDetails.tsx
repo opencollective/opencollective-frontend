@@ -72,7 +72,7 @@ type CollectiveDetailsProps = {
   collective?: HostedCollectiveFieldsFragment & Partial<AccountWithHost>;
   collectiveId?: string;
   loading?: boolean;
-  host: HostedCollectivesQuery['host'];
+  host?: HostedCollectivesQuery['host'];
   onCancel: () => void;
   onEdit?: () => void;
   openCollectiveDetails: (HostedCollectiveFieldsFragment) => void;
@@ -458,7 +458,7 @@ const CollectiveDetails = ({
   });
   const collective = data?.account || c;
   const activities = data?.activities?.nodes;
-  const isHostedCollective = collective?.host?.id === host?.id;
+  const isHostedCollective = host && collective?.host?.id === host?.id;
   const isLoading = loading || loadingCollectiveInfo;
   const isChild = !!collective?.parent?.id;
 
