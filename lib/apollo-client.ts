@@ -336,6 +336,7 @@ export function getSSRQueryHelpers<TVariables, TProps = {}>({
       };
     },
     useQuery: (pageProps: ServerSideProps) => {
+      console.log({ pageProps });
       const variables = pageProps[APOLLO_VARIABLES_PROP_NAME] as TVariables;
       let skip = false;
       if (skipClientIfSSRThrows404) {
