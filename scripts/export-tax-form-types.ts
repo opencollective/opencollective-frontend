@@ -6,7 +6,7 @@
 
 import path from 'path';
 
-import ts from 'typescript'; // eslint-disable-line node/no-unpublished-import
+import ts from 'typescript'; // eslint-disable-line n/no-unpublished-import
 
 const basePath = 'components/dashboard/sections/tax-information';
 
