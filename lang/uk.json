@@ -984,6 +984,7 @@
   "CreateConversationFAQ.target.content": "Всі обговорення загальнодоступні. Кожен може побачити та відповісти на них.",
   "CreateConversationForm.Submit": "Створити розмову",
   "createCustomTiers": "Створіть свої власні рівні",
+  "created": "Created",
   "CreatedBy": "від {name}",
   "CreateEvent": "Create event",
   "CreateExpense.HelpCreateInfo": "Request payment from {collective}. Expenses will be processed once approved by a Collective admin. The amount, description, and your profile name are public, but attachments, payment details, and other personal info is kept private.",
