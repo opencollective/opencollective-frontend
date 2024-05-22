@@ -24,6 +24,10 @@ const PaymentMethodTypeWithIcon = ({ isLoading, type, iconSize }) => {
     return <LoadingPlaceholder height={15} width={90} />;
   }
 
+  if (!type) {
+    return null;
+  }
+
   switch (type) {
     case PAYMENT_METHOD_TYPE.GIFTCARD:
       return (

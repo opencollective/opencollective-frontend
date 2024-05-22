@@ -54,12 +54,14 @@ const FormattedMoneyAmount = ({
 
   const currencyCode = showCurrencyCode ? <Span {...currencyCodeStyles}>{currency}</Span> : '';
   if (!interval || interval === INTERVALS.flexible || interval === INTERVALS.oneTime) {
-    return (
+    return showCurrencyCode ? (
       <FormattedMessage
         id="Amount"
         defaultMessage="{amount} {currencyCode}"
         values={{ amount: formattedAmount, currencyCode }}
       />
+    ) : (
+      formattedAmount
     );
   } else if (abbreviateInterval) {
     return (

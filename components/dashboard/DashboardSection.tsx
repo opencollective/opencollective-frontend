@@ -16,6 +16,7 @@ import AccountSettings from './sections/AccountSettings';
 import AllCollectives from './sections/collectives/AllCollectives';
 import HostApplications from './sections/collectives/HostApplications';
 import HostedCollectives from './sections/collectives/HostedCollectives';
+import HostExpectedFunds from './sections/contributions/HostExpectedFunds';
 import HostFinancialContributions from './sections/contributions/HostFinancialContributions';
 import IncomingContributions from './sections/contributions/IncomingContributions';
 import OutgoingContributions from './sections/contributions/OutgoingContributions';
@@ -59,6 +60,7 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.CONTRIBUTORS]: Contributors,
   [SECTIONS.INCOMING_CONTRIBUTIONS]: IncomingContributions,
   [SECTIONS.OUTGOING_CONTRIBUTIONS]: OutgoingContributions,
+  [SECTIONS.HOST_EXPECTED_FUNDS]: HostExpectedFunds,
   [SECTIONS.TRANSACTIONS]: AccountTransactions,
   [SECTIONS.HOST_TRANSACTIONS]: HostTransactions,
   [SECTIONS.UPDATES]: Updates,

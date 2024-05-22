@@ -15,6 +15,7 @@ export const SECTIONS = {
   CONTRIBUTORS: 'contributors',
   INCOMING_CONTRIBUTIONS: 'incoming-contributions',
   OUTGOING_CONTRIBUTIONS: 'outgoing-contributions',
+  HOST_EXPECTED_FUNDS: 'expected-funds',
   EXPENSES: 'expenses',
   SUBMITTED_EXPENSES: 'submitted-expenses',
   TRANSACTIONS: 'transactions',

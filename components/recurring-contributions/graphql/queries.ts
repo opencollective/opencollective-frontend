@@ -50,7 +50,15 @@ export const managedOrderFragment = gql`
       name
     }
     permissions {
+      id
       canResume
+      canMarkAsExpired
+      canMarkAsPaid
+      canEdit
+      canComment
+      canSeePrivateActivities
+      canSetTags
+      canUpdateAccountingCategory
     }
     totalDonations {
       value
@@ -99,6 +107,10 @@ export const managedOrderFragment = gql`
     platformTipAmount {
       value
       valueInCents
+    }
+    pendingContributionData {
+      expectedAt
+      paymentMethod
     }
   }
   ${accountHoverCardFields}

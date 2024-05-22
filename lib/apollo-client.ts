@@ -219,7 +219,7 @@ function createInMemoryCache() {
     // Documentation:
     // https://www.apollographql.com/docs/react/data/fragments/#using-fragments-with-unions-and-interfaces
     possibleTypes: {
-      Transaction: ['Expense', 'Order'],
+      Transaction: ['Expense', 'Order', 'Debit', 'Credit'],
       CollectiveInterface: ['Collective', 'Event', 'Project', 'Fund', 'Organization', 'User', 'Vendor'],
       Account: ['Collective', 'Host', 'Individual', 'Fund', 'Project', 'Bot', 'Event', 'Organization', 'Vendor'],
       AccountWithHost: ['Collective', 'Event', 'Fund', 'Project'],

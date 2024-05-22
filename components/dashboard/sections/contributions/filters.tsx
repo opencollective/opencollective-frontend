@@ -8,7 +8,6 @@ import {
   ContributionFrequency,
   Currency,
   DashboardRecurringContributionsQueryVariables,
-  HostContributionsQueryVariables,
   OrderStatus,
 } from '../../../../lib/graphql/types/v2/graphql';
 import i18nOrderStatus from '../../../../lib/i18n/order-status';
@@ -16,7 +15,8 @@ import { sortSelectOptions } from '../../../../lib/utils';
 
 import { amountFilter } from '../../filters/AmountFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
-import { dateFilter } from '../../filters/DateFilter';
+import { dateFilter, expectedDateFilter } from '../../filters/DateFilter';
+import { expectedFundsFilter } from '../../filters/ExpectedFundsFilter';
 import { orderByFilter } from '../../filters/OrderFilter';
 import { searchFilter } from '../../filters/SearchFilter';
 
@@ -41,6 +41,8 @@ export const schema = z.object({
   orderBy: orderByFilter.schema,
   searchTerm: searchFilter.schema,
   date: dateFilter.schema,
+  expectedDate: expectedDateFilter.schema,
+  expectedFundsFilter: expectedFundsFilter.schema,
   amount: amountFilter.schema,
   status: isMulti(z.nativeEnum(OrderStatus)).optional(),
   type: z.nativeEnum(OrderTypeFilter).optional(),
@@ -53,13 +55,14 @@ export type FilterMeta = {
   currency?: Currency;
 };
 
-type GraphQLQueryVariables = HostContributionsQueryVariables & DashboardRecurringContributionsQueryVariables;
+type GraphQLQueryVariables = DashboardRecurringContributionsQueryVariables;
 
 // Only needed when either the values or key of filters are different
 // to expected key or value of QueryVariables
 export const toVariables: FiltersToVariables<FilterValues, GraphQLQueryVariables, FilterMeta> = {
   orderBy: orderByFilter.toVariables,
   date: dateFilter.toVariables,
+  expectedDate: expectedDateFilter.toVariables,
   amount: amountFilter.toVariables,
   type: (value: OrderTypeFilter) => {
     switch (value) {
@@ -85,6 +88,8 @@ export const toVariables: FiltersToVariables<FilterValues, GraphQLQueryVariables
 export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   searchTerm: searchFilter.filter,
   date: dateFilter.filter,
+  expectedDate: expectedDateFilter.filter,
+  expectedFundsFilter: expectedFundsFilter.filter,
   amount: { ...amountFilter.filter, labelMsg: defineMessage({ id: 'TotalAmount', defaultMessage: 'Total amount' }) },
   orderBy: orderByFilter.filter,
   status: {
