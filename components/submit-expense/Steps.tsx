@@ -38,7 +38,7 @@ export const ExpenseStepOrder = [
   ExpenseFlowStep.EXPENSE_SUMMARY,
 ];
 
-export type StepDefinition<
+type StepDefinition<
   FormValues extends Record<string, any>,
   Form extends ReturnType<typeof useFormik<FormValues>>,
   AddProps = never,
@@ -49,7 +49,7 @@ export type StepDefinition<
   Subtitle?: React.FC<{ form: Form } | {}>;
 };
 
-export type ExpenseStepDefinition = StepDefinition<ExpenseFormValues, ExpenseForm>;
+type ExpenseStepDefinition = StepDefinition<ExpenseFormValues, ExpenseForm>;
 
 export const Steps: Record<ExpenseFlowStep, ExpenseStepDefinition> = {
   [ExpenseFlowStep.COLLECTIVE]: {

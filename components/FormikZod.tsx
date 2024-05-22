@@ -296,6 +296,7 @@ export const FormikZodContext = React.createContext<{
  * component will not work out of the box with `StyledInputFormikField` and other components that rely on Formik context such as `Field` or `FastField`.
  * If you are trying to access Formik state via context, use `useFormikContext`. Only use this hook if you are NOT using <Formik> or withFormik.
  */
+// ts-unused-exports:disable-next-line
 export function useFormikZod<Values extends FormikValues = FormikValues>({
   schema,
   ...props
@@ -338,5 +339,3 @@ export function FormikZod<Values extends FormikValues = FormikValues>({
     </FormikZodContext.Provider>
   );
 }
-
-// ignore unused exports useFormikZod, FormikZod, getInputAttributesFromZodSchema

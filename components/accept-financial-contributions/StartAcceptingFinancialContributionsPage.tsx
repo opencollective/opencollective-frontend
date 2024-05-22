@@ -20,7 +20,7 @@ import { H1, P } from '../Text';
 
 import FindAHostSearch from './FindAHostSearch';
 
-export type StartAcceptingFinancialContributionsPageProps = {
+type StartAcceptingFinancialContributionsPageProps = {
   collective: Collective;
   onChange: (field: string, value: unknown) => void;
 };

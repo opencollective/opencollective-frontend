@@ -49,7 +49,7 @@ export const schema = z.object({
   virtualCard: isMulti(z.string()).optional(),
 });
 
-export type FilterValues = z.infer<typeof schema>;
+type FilterValues = z.infer<typeof schema>;
 
 export type FilterMeta = {
   currency?: Currency;

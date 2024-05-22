@@ -201,8 +201,8 @@ const contributionPageQueryHelper = getSSRQueryHelpers<{ legacyId: number; colle
   }),
 });
 
-// ignore unused exports getServerSideProps
 // next.js export
+// ts-unused-exports:disable-next-line
 export const getServerSideProps: GetServerSideProps = contributionPageQueryHelper.getServerSideProps;
 
 const messages = defineMessages({
@@ -322,8 +322,8 @@ const getTransactionsToDisplay = (account, transactions) => {
   return [...accountTransactions, ...tipTransactionsToDisplay];
 };
 
-// ignore unused exports default
 // next.js export
+// ts-unused-exports:disable-next-line
 export default function OrderPage(props) {
   const { LoggedInUser } = useLoggedInUser();
   const prevLoggedInUser = usePrevious(LoggedInUser);

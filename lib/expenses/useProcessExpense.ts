@@ -10,7 +10,7 @@ type ProcessExpenseAction = (params?: {
   paymentParams?: ProcessExpensePaymentParams;
   message?: string;
 }) => Promise<void>;
-export type ProcessExpenseActionName =
+type ProcessExpenseActionName =
   | 'APPROVE'
   | 'REJECT'
   | 'PAY'

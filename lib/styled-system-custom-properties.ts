@@ -29,6 +29,7 @@ export const overflow = style({ prop: 'overflow' });
 export type OverflowProps = { overflow?: 'visible' | 'hidden' | 'scroll' | 'auto' | 'initial' | 'inherit' };
 
 export const resize = style({ prop: 'resize' });
+// ts-unused-exports:disable-next-line
 export type ResizeProps = { resize?: 'none' | 'both' | 'horizontal' | 'vertical' | 'initial' | 'inherit' };
 
 export const pointerEvents = style({ prop: 'pointerEvents' });
@@ -41,4 +42,5 @@ export const clear = style({ prop: 'clear' });
 export type ClearProps = { clear?: 'left' | 'right' | 'both' | 'none' | 'initial' | 'inherit' };
 
 export const listStyle = style({ prop: 'listStyle' });
+// ts-unused-exports:disable-next-line
 export type ListStyleProps = { listStyle?: string };

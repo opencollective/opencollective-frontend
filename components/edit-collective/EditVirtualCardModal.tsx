@@ -164,7 +164,7 @@ const throttledCall = debounce((searchFunc, variables) => {
   return searchFunc({ variables });
 }, 750);
 
-export type EditVirtualCardModalProps = {
+type EditVirtualCardModalProps = {
   host: Account;
   collective?: Account;
   virtualCard?: VirtualCard;

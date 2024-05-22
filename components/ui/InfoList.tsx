@@ -2,7 +2,6 @@ import React from 'react';
 
 import { cn } from '../../lib/utils';
 
-// ignore unused exports
 // ui library
 
 export function InfoList({ children, className }: { children: React.ReactNode; className?: string }) {
@@ -13,6 +12,7 @@ export function InfoListItemTitle({ children }: { children: React.ReactNode }) {
   return <dt className="font-medium leading-6 text-slate-900">{children}</dt>;
 }
 
+// ts-unused-exports:disable-next-line
 export function InfoListItemValue({ children }: { children: React.ReactNode }) {
   return <dd className="mt-1 leading-6 text-slate-700 sm:mt-2">{children}</dd>;
 }

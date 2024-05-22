@@ -1,5 +1,3 @@
-// ignore unused exports
-
 import * as React from 'react';
 import { MoreHorizontal } from 'lucide-react';
 
@@ -118,4 +116,5 @@ const TableActionsButton = React.forwardRef<HTMLButtonElement, React.ButtonHTMLA
 );
 TableActionsButton.displayName = 'TableActionsButton';
 
+// ts-unused-exports:disable-next-line
 export { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption, TableActionsButton };

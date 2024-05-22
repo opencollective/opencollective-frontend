@@ -107,7 +107,6 @@ const SelectSeparator = React.forwardRef<
 ));
 SelectSeparator.displayName = SelectPrimitive.Separator.displayName;
 
-// ignore unused exports
 // ui library
 
 export {

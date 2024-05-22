@@ -34,7 +34,7 @@ const hostsFilterSearchQuery = gql`
   ${accountHoverCardFields}
 `;
 
-export const AccountRenderer = ({
+const AccountRenderer = ({
   account,
   inOptionsList,
 }: {

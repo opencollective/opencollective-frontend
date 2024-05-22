@@ -1,6 +1,6 @@
 import lodashRange from 'lodash/range';
 
-export type PaginationElement = number | 'right_elipsis' | 'left_elipsis';
+type PaginationElement = number | 'right_elipsis' | 'left_elipsis';
 
 function range(start: number, end: number): number[] {
   if (end <= start) {

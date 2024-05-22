@@ -12,7 +12,7 @@ import { useToast } from '../ui/useToast';
 
 import { editExpenseCategoryMutation } from './graphql/mutations';
 
-export type ConfirmProcessExpenseModalProps = {
+type ConfirmProcessExpenseModalProps = {
   onClose: () => void;
   expense: Expense;
   host: Host;

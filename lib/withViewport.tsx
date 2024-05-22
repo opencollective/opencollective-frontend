@@ -4,8 +4,6 @@ import { debounce, findIndex, isEqual, zipObject } from 'lodash';
 import breakpoints from './theme/breakpoints';
 import { emToPx } from './theme/helpers';
 
-// ignore unused exports BREAKPOINTS_NAMES, BREAKPOINTS_WIDTHS, viewportIsAbove, isDesktopOrAbove
-
 /**
  * Defines all the breakpoints names as passed by `withViewport`
  */
@@ -18,7 +16,9 @@ export enum VIEWPORTS {
 }
 
 // Please keep the same length for these two arrays
+// ts-unused-exports:disable-next-line
 export const BREAKPOINTS_NAMES = [VIEWPORTS.XSMALL, VIEWPORTS.SMALL, VIEWPORTS.MEDIUM, VIEWPORTS.LARGE];
+// ts-unused-exports:disable-next-line
 export const BREAKPOINTS_WIDTHS = BREAKPOINTS_NAMES.map((_, idx) => emToPx(breakpoints[idx]));
 export const BREAKPOINTS = zipObject(BREAKPOINTS_NAMES, BREAKPOINTS_WIDTHS) as Record<
   (typeof BREAKPOINTS_NAMES)[number],
@@ -32,6 +32,7 @@ export const BREAKPOINTS = zipObject(BREAKPOINTS_NAMES, BREAKPOINTS_WIDTHS) as R
  * @param {VIEWPORTS} viewport
  * @param {VIEWPORTS} breakpointName
  */
+// ts-unused-exports:disable-next-line
 export const viewportIsAbove = (viewport, breakpointName) => {
   return BREAKPOINTS_NAMES.indexOf(viewport) >= BREAKPOINTS_NAMES.indexOf(breakpointName);
 };
@@ -41,6 +42,7 @@ export const viewportIsAbove = (viewport, breakpointName) => {
  *
  * @param {VIEWPORTS} viewport
  */
+// ts-unused-exports:disable-next-line
 export const isDesktopOrAbove = viewport => {
   return BREAKPOINTS_NAMES.indexOf(viewport) >= BREAKPOINTS_NAMES.indexOf(VIEWPORTS.MEDIUM);
 };

@@ -94,9 +94,8 @@ const SheetBody = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>
 );
 SheetBody.displayName = 'SheetBody';
 
-// ignore unused exports
 // ui library
-
+// ts-unused-exports:disable-next-line
 export {
   Sheet,
   SheetPortal,

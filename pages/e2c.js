@@ -34,6 +34,6 @@ const E2C = () => {
   );
 };
 
-// ignore unused exports default
 // next.js export
+// ts-unused-exports:disable-next-line
 export default E2C;

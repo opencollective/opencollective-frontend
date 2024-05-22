@@ -50,7 +50,7 @@ function iconForSocialLinkType(type: SocialLinkType) {
   return SocialLinkIcon[type] || Globe;
 }
 
-export type HeroSocialLinksProps = {
+type HeroSocialLinksProps = {
   socialLinks: SocialLink[];
   relMe?: boolean;
 };
