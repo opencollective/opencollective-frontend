@@ -1,4 +1,8 @@
 const baseConfig = {
+  parser: '@typescript-eslint/parser',
+  parserOptions: {
+    project: ['tsconfig.json'],
+  },
   processor: '@graphql-eslint/graphql',
   env: {
     jest: true,
@@ -144,10 +148,6 @@ module.exports = {
     },
     {
       files: ['*.ts', '*.tsx'],
-      parser: '@typescript-eslint/parser',
-      parserOptions: {
-        project: ['tsconfig.json'],
-      },
       ...baseConfig,
       extends: [...baseConfig.extends, 'plugin:@typescript-eslint/recommended'],
       rules: {

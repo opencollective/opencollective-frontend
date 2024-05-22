@@ -2,7 +2,7 @@
 import { CustomProjectConfig } from 'lost-pixel';
 
 // config file
-
+// ts-unused-exports:disable-next-line
 export const config: Partial<CustomProjectConfig> = {
   storybookShots: {
     storybookUrl: './storybook-static',

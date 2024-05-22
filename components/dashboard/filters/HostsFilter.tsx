@@ -89,7 +89,7 @@ const resultNodeToOption = account => ({
   value: account.slug,
 });
 
-function HostsFilter({ ...props }: FilterComponentProps<z.infer<typeof schema>, {}>) {
+function HostsFilter({ ...props }: FilterComponentProps<z.infer<typeof schema>, object>) {
   const [options, setOptions] = React.useState<{ label: React.ReactNode; value: string }[]>([]);
 
   const [search, { loading, data }] = useLazyQuery(hostsFilterSearchQuery, {

@@ -17,6 +17,8 @@ import 'nprogress/nprogress.css';
 import 'trix/dist/trix.css';
 import '../public/static/styles/app.css';
 
+// config file
+// ts-unused-exports:disable-next-line
 export const parameters = {
   actions: { argTypesRegex: '^on[A-Z].*' },
   nextRouter: {
@@ -24,6 +26,8 @@ export const parameters = {
   },
 };
 
+// config file
+// ts-unused-exports:disable-next-line
 export const decorators = [
   Story => (
     <ApolloProvider client={initClient()}>
