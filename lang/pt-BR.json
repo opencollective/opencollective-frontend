@@ -984,6 +984,7 @@
   "CreateConversationFAQ.target.content": "Todas as conversas são públicas. Qualquer pessoa pode ver e respondê-las.",
   "CreateConversationForm.Submit": "Criar uma conversa",
   "createCustomTiers": "Crie seus próprios níveis",
+  "created": "Created",
   "CreatedBy": "por {name}",
   "CreateEvent": "Create event",
   "CreateExpense.HelpCreateInfo": "Solicitar pagamento de {collective}. As despesas serão processadas assim que forem aprovadas por um administrador do coletivo. A quantia, a descrição e o seu nome de perfil são públicos, mas os anexos, dados de pagamento e outras informações pessoais são mantidos como privados.",
