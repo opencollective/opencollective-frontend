@@ -430,7 +430,7 @@ const OCFDuplicateAndApplyToHostModal = ({ hostSlug, collective, onClose, onSucc
                     </Flex>
                     <Box my={3}>
                       {useTwoSteps && (
-                        // @ts-ignore
+                        // @ts-expect-error StepsProgress is not typed
                         <StepsProgress
                           steps={Object.values(STEPS)}
                           focus={currentStep}

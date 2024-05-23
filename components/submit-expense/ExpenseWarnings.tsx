@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 
-import { ExpenseForm } from './useExpenseForm';
+import type { ExpenseForm } from './useExpenseForm';
 
 type ExpenseWarningsProps = {
   form: ExpenseForm;

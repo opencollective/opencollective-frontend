@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { DashboardContext } from '../../../DashboardContext';
-import { DashboardSectionProps } from '../../../types';
+import type { DashboardSectionProps } from '../../../types';
 
 import AccountReports from './AccountReports';
 import HostReports from './HostReports';

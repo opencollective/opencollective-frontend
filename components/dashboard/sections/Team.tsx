@@ -40,7 +40,7 @@ import StyledTag from '../../StyledTag';
 import StyledTooltip from '../../StyledTooltip';
 import { P } from '../../Text';
 import DashboardHeader from '../DashboardHeader';
-import { DashboardSectionProps } from '../types';
+import type { DashboardSectionProps } from '../types';
 
 const MemberContainer = styled(Container)`
   display: block;

@@ -9,7 +9,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { getCurrentLocalDateStr } from '../lib/date-utils';
 import { i18nGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
-import { TaxInput } from '../lib/graphql/types/v2/graphql';
+import type { TaxInput } from '../lib/graphql/types/v2/graphql';
 import { i18nTaxType } from '../lib/i18n/taxes';
 
 import { useToast } from './ui/useToast';
@@ -231,7 +231,6 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
               <Label fontSize="14px" lineHeight="20px" fontWeight="400" htmlFor="confirmContribution-amountReceived">
                 <FormattedMessage defaultMessage="Amount received" id="u6JRVj" />
               </Label>
-              {/* @ts-ignore StyledInputAmount not typed yet */}
               <StyledInputAmount
                 id="confirmContribution-amountReceived"
                 name="amountReceived"
@@ -250,7 +249,6 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
               <Label fontSize="14px" lineHeight="20px" fontWeight="400" htmlFor="confirmContribution-processorFee">
                 <FormattedMessage id="contribution.paymentFee" defaultMessage="Payment processor fee" />
               </Label>
-              {/* @ts-ignore StyledInputAmount not typed yet */}
               <StyledInputAmount
                 id="confirmContribution-processorFee"
                 name="paymentProcessorFee"
@@ -268,7 +266,6 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
               <Label fontSize="14px" lineHeight="20px" fontWeight="400" htmlFor="confirmContribution-platformTip">
                 <FormattedMessage defaultMessage="Platform tip amount" id="Ng5BqM" />
               </Label>
-              {/* @ts-ignore StyledInputAmount not typed yet */}
               <StyledInputAmount
                 id="confirmContribution-platformTip"
                 name="platformTip"

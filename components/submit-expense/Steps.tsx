@@ -1,5 +1,5 @@
 import React from 'react';
-import { useFormik } from 'formik';
+import type { useFormik } from 'formik';
 import { isEmpty, round } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -18,7 +18,7 @@ import { InvitedPayeeLabel } from './InvitedPayeeLabel';
 import { PickCollectiveStepForm } from './PickCollectiveStep';
 import { PickExpenseTypeForm } from './PickExpenseTypeStep';
 import { PickPaymentMethodForm } from './PickPaymentMethodStep';
-import { ExpenseForm, ExpenseFormValues } from './useExpenseForm';
+import type { ExpenseForm, ExpenseFormValues } from './useExpenseForm';
 
 export const enum ExpenseFlowStep {
   COLLECTIVE = 'collective',
@@ -45,8 +45,8 @@ type StepDefinition<
 > = {
   Form: React.FC<{ form: Form } | ({ form: Form } & AddProps)>;
   hasError: (form: Form) => boolean;
-  Title: React.FC<{ form: Form } | {}>;
-  Subtitle?: React.FC<{ form: Form } | {}>;
+  Title: React.FC<{ form: Form } | Record<string, never>>;
+  Subtitle?: React.FC<{ form: Form } | Record<string, never>>;
 };
 
 type ExpenseStepDefinition = StepDefinition<ExpenseFormValues, ExpenseForm>;

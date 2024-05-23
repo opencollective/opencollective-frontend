@@ -44,7 +44,8 @@ import { DashboardContext } from '../../DashboardContext';
 import ActivityDescription from '../ActivityLog/ActivityDescription';
 import { ActivityUser } from '../ActivityLog/ActivityUser';
 
-import { cols, HostedCollectivesDataTableMeta, MoreActionsMenu } from './common';
+import type { HostedCollectivesDataTableMeta } from './common';
+import { cols, MoreActionsMenu } from './common';
 import { hostedCollectiveDetailQuery } from './queries';
 
 const editAccountHostFee = gql`

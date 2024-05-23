@@ -4,7 +4,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import { VirtualCard as GraphQLVirtualCard, VirtualCardStatus } from '../../lib/graphql/types/v2/graphql';
+import type { VirtualCard as GraphQLVirtualCard } from '../../lib/graphql/types/v2/graphql';
+import { VirtualCardStatus } from '../../lib/graphql/types/v2/graphql';
 import { getAvailableLimitShortString } from '../../lib/i18n/virtual-card-spending-limit';
 
 import { accountHoverCardFields } from '../AccountHoverCard';
@@ -130,7 +131,7 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
               <Box flexGrow={1} m="24px 24px 0 24px">
                 <Flex fontSize="16px" lineHeight="24px" fontWeight="500" justifyContent="space-between">
                   <Box>{virtualCard.name}</Box>
-                  {/* @ts-ignore */}
+                  {/* @ts-expect-error StateLabel is not typed */}
                   <StateLabel isActive={virtualCard.status === VirtualCardStatus.ACTIVE}>
                     {virtualCard.status}
                   </StateLabel>

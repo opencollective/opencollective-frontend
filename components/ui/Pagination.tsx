@@ -4,7 +4,8 @@ import { FormattedMessage } from 'react-intl';
 
 import { cn } from '../../lib/utils';
 
-import { Button, ButtonProps } from './Button';
+import type { ButtonProps } from './Button';
+import { Button } from './Button';
 
 const Pagination = ({ className, ...props }: React.ComponentProps<'nav'>) => (
   <nav

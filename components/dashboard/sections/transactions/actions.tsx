@@ -1,9 +1,9 @@
-import React from 'react';
 import { gql, useMutation } from '@apollo/client';
 import { Download, Filter, MinusCircle, Undo2 } from 'lucide-react';
+import type React from 'react';
 import { useIntl } from 'react-intl';
 
-import { GetActions } from '../../../../lib/actions/types';
+import type { GetActions } from '../../../../lib/actions/types';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { useAsyncCall } from '../../../../lib/hooks/useAsyncCall';
 import { saveInvoice } from '../../../../lib/transactions';
@@ -12,7 +12,7 @@ import { useModal } from '../../../ModalContext';
 import { toast } from '../../../ui/useToast';
 
 import TransactionRejectModal from './TransactionRejectModal';
-import { TransactionsTableQueryNode } from './types';
+import type { TransactionsTableQueryNode } from './types';
 
 const refundTransactionMutation = gql`
   mutation RefundTransaction($transaction: TransactionReferenceInput!) {

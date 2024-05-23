@@ -1,6 +1,7 @@
-import { defineMessages, MessageDescriptor } from 'react-intl';
+import type { MessageDescriptor } from 'react-intl';
+import { defineMessages } from 'react-intl';
 
-import { ActivityTypes } from '../constants/activities';
+import type { ActivityTypes } from '../constants/activities';
 
 interface TimelineMessageDescriptor extends MessageDescriptor {
   avatar?: 'fromAccount' | 'account' | 'individual'; // Used to determine which avatar to display (default is Individual)

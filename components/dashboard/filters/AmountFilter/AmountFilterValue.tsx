@@ -1,11 +1,12 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import { Currency } from '../../../../lib/graphql/types/v2/graphql';
+import type { Currency } from '../../../../lib/graphql/types/v2/graphql';
 
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 
-import { AmountFilterType, AmountFilterValueType } from './schema';
+import type { AmountFilterValueType } from './schema';
+import { AmountFilterType } from './schema';
 
 const Amount = ({ amount, currency }: { amount: number; currency: Currency }) => {
   return (

@@ -8,7 +8,8 @@ import StyledInput from '../../../StyledInput';
 import StyledTextarea from '../../../StyledTextarea';
 import { Label, P, Span } from '../../../Text';
 
-import { ReceiptField, ReceiptTemplate, UseReceipt } from './hooks/useReceipt';
+import type { UseReceipt } from './hooks/useReceipt';
+import { ReceiptField, ReceiptTemplate } from './hooks/useReceipt';
 
 type ReceiptTemplateFormProps = {
   receipt: UseReceipt;

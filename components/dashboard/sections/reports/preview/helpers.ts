@@ -2,12 +2,12 @@ import { isNil } from 'lodash';
 
 import { getDayjsIsoUnit } from '../../../../../lib/date-utils';
 import dayjs from '../../../../../lib/dayjs';
-import { TimeUnit } from '../../../../../lib/graphql/types/v2/graphql';
+import type { TimeUnit } from '../../../../../lib/graphql/types/v2/graphql';
 
 import { DateFilterType } from '../../../filters/DateFilter/schema';
-import { FilterValues as HostTransactionsFilterValues } from '../../transactions/HostTransactions';
+import type { FilterValues as HostTransactionsFilterValues } from '../../transactions/HostTransactions';
 
-import { GroupFilter } from './types';
+import type { GroupFilter } from './types';
 
 export const isCurrentPeriod = variables => {
   const now = dayjs.utc();

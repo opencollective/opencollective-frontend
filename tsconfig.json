@@ -17,6 +17,21 @@
     "jsx": "preserve",
     "resolveJsonModule": true
   },
-  "include": ["next-env.d.ts", "components", "cypress", "lib", "pages", "scripts", "server", "stories", "test"],
+  "include": [
+    ".eslintrc.js",
+    ".storybook/*.js",
+    "components",
+    "cypress",
+    "*.config.*",
+    "lib",
+    "middleware.ts",
+    "next-env.d.ts",
+    "pages",
+    "rewrites.js",
+    "scripts",
+    "server",
+    "stories",
+    "test"
+  ],
   "exclude": ["node_modules"]
 }

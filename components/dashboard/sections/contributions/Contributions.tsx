@@ -3,20 +3,17 @@ import { useMutation, useQuery } from '@apollo/client';
 import { compact, omit } from 'lodash';
 import { PlusIcon } from 'lucide-react';
 import { useRouter } from 'next/router';
-import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
-import { z } from 'zod';
+import type { IntlShape } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
+import type { z } from 'zod';
 
-import { GetActions } from '../../../../lib/actions/types';
+import type { GetActions } from '../../../../lib/actions/types';
 import { EMPTY_ARRAY } from '../../../../lib/constants/utils';
-import { LoggedInUser as LoggedInUserType } from '../../../../lib/custom_typings/LoggedInUser';
-import { Views } from '../../../../lib/filters/filter-types';
+import type { LoggedInUser as LoggedInUserType } from '../../../../lib/custom_typings/LoggedInUser';
+import type { Views } from '../../../../lib/filters/filter-types';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
-import {
-  ContributionDrawerQuery,
-  ContributionFrequency,
-  ExpectedFundsFilter,
-  OrderStatus,
-} from '../../../../lib/graphql/types/v2/graphql';
+import type { ContributionDrawerQuery } from '../../../../lib/graphql/types/v2/graphql';
+import { ContributionFrequency, ExpectedFundsFilter, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nPaymentMethodProviderType } from '../../../../lib/i18n/payment-method-provider-type';
@@ -26,7 +23,8 @@ import Avatar from '../../../Avatar';
 import ContributionConfirmationModal from '../../../ContributionConfirmationModal';
 import { ContributionDrawer } from '../../../contributions/ContributionDrawer';
 import DateTime from '../../../DateTime';
-import EditOrderModal, { EditOrderActions } from '../../../EditOrderModal';
+import type { EditOrderActions } from '../../../EditOrderModal';
+import EditOrderModal from '../../../EditOrderModal';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { useModal } from '../../../ModalContext';
@@ -40,10 +38,11 @@ import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import { Filterbar } from '../../filters/Filterbar';
 import { Pagination } from '../../filters/Pagination';
-import { DashboardSectionProps } from '../../types';
+import type { DashboardSectionProps } from '../../types';
 
 import CreatePendingContributionModal from './CreatePendingOrderModal';
-import { FilterMeta, filters, OrderTypeFilter, schema, toVariables } from './filters';
+import type { FilterMeta } from './filters';
+import { filters, OrderTypeFilter, schema, toVariables } from './filters';
 import { PausedIncomingContributionsMessage } from './PausedIncomingContributionsMessage';
 
 enum ContributionsTab {

@@ -1,18 +1,18 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { Column, ColumnDef, Row, TableMeta } from '@tanstack/react-table';
+import type { Column, ColumnDef, Row, TableMeta } from '@tanstack/react-table';
 import clsx from 'clsx';
 import { isNil, omit } from 'lodash';
 import { ArrowDown10, ArrowDownZA, ArrowUp10, ArrowUpZA } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import {
+import type {
   AccountMetricsFragment,
   Currency,
   OverviewMetricsQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import { useQueryFilterReturnType } from '../../../../lib/hooks/useQueryFilter';
+import type { useQueryFilterReturnType } from '../../../../lib/hooks/useQueryFilter';
 import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
@@ -26,8 +26,9 @@ import { Button } from '../../../ui/Button';
 import { Checkbox } from '../../../ui/Checkbox';
 import { DashboardContext } from '../../DashboardContext';
 
-import { schema } from './CollectiveOverview';
-import { ChangeBadge, getPercentageDifference, MetricProps } from './Metric';
+import type { schema } from './CollectiveOverview';
+import type { MetricProps } from './Metric';
+import { ChangeBadge, getPercentageDifference } from './Metric';
 import { metricsPerAccountQuery } from './queries';
 
 const SortableHeader = ({

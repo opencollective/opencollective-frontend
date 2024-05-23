@@ -6,14 +6,11 @@ import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { CollectiveType } from '../../../../lib/constants/collectives';
-import { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
+import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import {
-  Collective,
-  HostedCollectivesQueryVariables,
-  HostFeeStructure,
-} from '../../../../lib/graphql/types/v2/graphql';
+import type { Collective, HostedCollectivesQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import { HostFeeStructure } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 
@@ -30,10 +27,11 @@ import { hostsFilter } from '../../filters/HostsFilter';
 import { Pagination } from '../../filters/Pagination';
 import { searchFilter } from '../../filters/SearchFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
-import { DashboardSectionProps } from '../../types';
+import type { DashboardSectionProps } from '../../types';
 
 import CollectiveDetails from './CollectiveDetails';
-import { cols, HostedCollectivesDataTableMeta } from './common';
+import type { HostedCollectivesDataTableMeta } from './common';
+import { cols } from './common';
 import { allCollectivesQuery } from './queries';
 
 const sortFilter = buildSortFilter({

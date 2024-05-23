@@ -2,7 +2,7 @@ import React from 'react';
 import { defineMessage, FormattedDate, useIntl } from 'react-intl';
 
 import { getDateFromValue } from '../lib/date-utils';
-import dayjs from '../lib/dayjs';
+import type dayjs from '../lib/dayjs';
 import { capitalize } from '../lib/utils';
 
 const TITLE_MESSAGE = defineMessage({

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
-import { Accept, FileRejection } from 'react-dropzone';
+import type { Accept, FileRejection } from 'react-dropzone';
 import { useIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
@@ -9,7 +9,7 @@ import { useToast } from '../../components/ui/useToast';
 import { canUseMockImageUpload, mockImageUpload } from '../api';
 import { i18nGraphqlException } from '../errors';
 import { API_V2_CONTEXT, gql } from '../graphql/helpers';
-import { UploadedFileKind, UploadFileResult } from '../graphql/types/v2/graphql';
+import type { UploadedFileKind, UploadFileResult } from '../graphql/types/v2/graphql';
 
 import { getMessageForRejectedDropzoneFiles } from './useImageUploader';
 

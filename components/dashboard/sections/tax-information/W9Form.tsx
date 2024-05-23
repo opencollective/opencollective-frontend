@@ -1,10 +1,10 @@
 import React from 'react';
-import { FormikProps } from 'formik';
+import type { FormikProps } from 'formik';
 import { merge, pick } from 'lodash';
 import { z } from 'zod';
 
 import { splitName } from '../../../../lib/collective';
-import { LoggedInUser } from '../../../../lib/custom_typings/LoggedInUser';
+import type { LoggedInUser } from '../../../../lib/custom_typings/LoggedInUser';
 import { cn } from '../../../../lib/utils';
 
 import { generateInitialValuesFromSchema } from '../../../FormikZod';
@@ -15,15 +15,10 @@ import { ButtonSet } from '../../../ui/ButtonSet';
 import { Checkbox } from '../../../ui/Checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../ui/Select';
 
-import {
-  BaseFormSchema,
-  BaseFormValues,
-  FederalTaxClassification,
-  SubmitterType,
-  TaxFormLocationFields,
-} from './common';
+import type { BaseFormValues } from './common';
+import { BaseFormSchema, FederalTaxClassification, SubmitterType, TaxFormLocationFields } from './common';
 import { HintText } from './HintText';
-import { AccountFromTaxInformationQuery } from './queries';
+import type { AccountFromTaxInformationQuery } from './queries';
 
 const FederalTaxClassificationLabels = {
   [FederalTaxClassification.Individual]: 'Individual/sole proprietor or single-member LLC',

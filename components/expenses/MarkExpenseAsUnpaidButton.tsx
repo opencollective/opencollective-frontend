@@ -4,7 +4,8 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import useProcessExpense from '../../lib/expenses/useProcessExpense';
-import { Expense, ExpenseStatus, MarkAsUnPaidExpenseStatus } from '../../lib/graphql/types/v2/graphql';
+import type { Expense } from '../../lib/graphql/types/v2/graphql';
+import { ExpenseStatus, MarkAsUnPaidExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import { i18nExpenseStatus } from '../../lib/i18n/expense';
 
 import ConfirmationModal from '../ConfirmationModal';
@@ -103,7 +104,9 @@ const MarkExpenseAsUnpaidButton = ({ expense, ...props }: MarkExpenseAsUnpaidBut
           <StyledSelect
             inputId="new-expense-status"
             options={expenseStatusOptions}
-            onChange={value => setNewExpenseStatusOption(value)}
+            onChange={(newValue: { value: MarkAsUnPaidExpenseStatus; label: string }) =>
+              setNewExpenseStatusOption(newValue)
+            }
             value={newExpenseStatusOption}
             width="100%"
           />

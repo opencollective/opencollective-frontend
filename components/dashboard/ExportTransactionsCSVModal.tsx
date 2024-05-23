@@ -1,16 +1,17 @@
-import React, { MouseEventHandler } from 'react';
+import React from 'react';
 import { gql, useMutation } from '@apollo/client';
 import { DndContext, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { debounce, isEmpty, isNil, omit, uniq, without } from 'lodash';
 import { Eraser } from 'lucide-react';
+import type { MouseEventHandler } from 'react';
 import { FormattedMessage } from 'react-intl';
 import slugify from 'slugify';
 
+import type { CSVField } from '../../lib/csv';
 import {
   AVERAGE_TRANSACTIONS_PER_MINUTE,
-  CSVField,
   FIELD_OPTIONS,
   FieldLabels,
   FieldOptionsLabels,
@@ -22,13 +23,13 @@ import {
 } from '../../lib/csv';
 import { getEnvVar } from '../../lib/env-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import {
+import type {
   Account,
   HostReportsPageQueryVariables,
   TransactionsPageQueryVariables,
 } from '../../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
-import { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
+import type { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
 import { cn, parseToBoolean } from '../../lib/utils';
 

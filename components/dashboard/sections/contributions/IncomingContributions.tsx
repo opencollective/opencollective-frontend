@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { DashboardSectionProps } from '../../types';
+import type { DashboardSectionProps } from '../../types';
 
 import Contributions from './Contributions';
 

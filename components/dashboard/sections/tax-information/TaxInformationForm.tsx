@@ -1,13 +1,14 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import { Form, FormikProps } from 'formik';
+import type { FormikProps } from 'formik';
+import { Form } from 'formik';
 import { isEmpty, isNil, omit, omitBy, pick, remove } from 'lodash';
 import { FileText } from 'lucide-react';
 import { useIntl } from 'react-intl';
-import { z } from 'zod';
+import type { z } from 'zod';
 
 import { mergeName } from '../../../../lib/collective';
-import { LoggedInUser } from '../../../../lib/custom_typings/LoggedInUser';
+import type { LoggedInUser } from '../../../../lib/custom_typings/LoggedInUser';
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
@@ -23,8 +24,10 @@ import { Button } from '../../../ui/Button';
 import { useToast } from '../../../ui/useToast';
 import WarnIfUnsavedChanges from '../../../WarnIfUnsavedChanges';
 
-import { BaseFormSchema, BaseFormValues, TaxFormType } from './common';
-import { AccountFromTaxInformationQuery, accountTaxInformationQuery } from './queries';
+import type { BaseFormValues, TaxFormType } from './common';
+import { BaseFormSchema } from './common';
+import type { AccountFromTaxInformationQuery } from './queries';
+import { accountTaxInformationQuery } from './queries';
 import { TaxFormPreview } from './TaxFormPreview';
 import { TaxFormPreviewModal } from './TaxFormPreviewModal';
 import { TaxFormTypeSelectFields } from './TaxFormTypeSelectFields';

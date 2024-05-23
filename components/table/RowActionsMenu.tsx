@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Table } from '@tanstack/react-table';
+import type { Row, Table } from '@tanstack/react-table';
 import { MoreHorizontal, PanelRightOpen } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 

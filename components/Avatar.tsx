@@ -3,13 +3,15 @@ import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import { Calendar, TestTube2 } from 'lucide-react';
 import styled from 'styled-components';
-import { border, BorderProps, color, layout, space } from 'styled-system';
+import type { BorderProps } from 'styled-system';
+import { border, color, layout, space } from 'styled-system';
 
 import { CollectiveType, defaultImage } from '../lib/constants/collectives';
-import { Account } from '../lib/graphql/types/v2/graphql';
+import type { Account } from '../lib/graphql/types/v2/graphql';
 import { getAvatarBorderRadius, getCollectiveImage } from '../lib/image-utils';
 
-import { Flex, FlexProps } from './Grid';
+import type { FlexProps } from './Grid';
+import { Flex } from './Grid';
 
 const getInitials = name => name.split(' ').reduce((result, value) => (result += value.slice(0, 1).toUpperCase()), '');
 

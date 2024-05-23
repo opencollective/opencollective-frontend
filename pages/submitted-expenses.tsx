@@ -1,9 +1,12 @@
 import React from 'react';
-import { DataValue, graphql } from '@apollo/client/react/hoc';
+import type { DataValue } from '@apollo/client/react/hoc';
+import { graphql } from '@apollo/client/react/hoc';
 import { has, omit, omitBy } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { NextRouter, withRouter } from 'next/router';
-import { defineMessages, FormattedMessage, injectIntl, IntlShape } from 'react-intl';
+import type { NextRouter } from 'next/router';
+import { withRouter } from 'next/router';
+import type { IntlShape } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { getCollectivePageMetadata, isIndividualAccount } from '../lib/collective';
@@ -12,12 +15,9 @@ import { PayoutMethodType } from '../lib/constants/payout-method';
 import { parseDateInterval } from '../lib/date-utils';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
-import {
-  ExpenseStatus,
-  SubmittedExpensesPageQuery,
-  SubmittedExpensesPageQueryVariables,
-} from '../lib/graphql/types/v2/graphql';
-import LoggedInUser from '../lib/LoggedInUser';
+import type { SubmittedExpensesPageQuery, SubmittedExpensesPageQueryVariables } from '../lib/graphql/types/v2/graphql';
+import { ExpenseStatus } from '../lib/graphql/types/v2/graphql';
+import type LoggedInUser from '../lib/LoggedInUser';
 import { getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
 import { parseAmountRange } from '../components/budget/filters/AmountFilter';

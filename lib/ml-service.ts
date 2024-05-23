@@ -1,4 +1,4 @@
-import { ExpenseType } from './graphql/types/v2/graphql';
+import type { ExpenseType } from './graphql/types/v2/graphql';
 
 const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:8000';
 

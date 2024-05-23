@@ -5,7 +5,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import { Account, AccountWithContributions, AccountWithParent } from '../../../../lib/graphql/types/v2/graphql';
+import type { Account, AccountWithContributions, AccountWithParent } from '../../../../lib/graphql/types/v2/graphql';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 
 import { getI18nLink } from '../../../I18nFormatters';

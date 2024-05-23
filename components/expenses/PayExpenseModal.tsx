@@ -5,7 +5,8 @@ import { FormikProvider, useFormik, useFormikContext } from 'formik';
 import { cloneDeep, get, kebabCase, omit, round } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
-import { border, BorderProps, color, space, SpaceProps, typography } from 'styled-system';
+import type { BorderProps, SpaceProps } from 'styled-system';
+import { border, color, space, typography } from 'styled-system';
 
 import { default as hasFeature, FEATURES } from '../../lib/allowed-features';
 import { EXPENSE_PAYMENT_METHOD_SERVICES } from '../../lib/constants/payment-methods';

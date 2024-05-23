@@ -23,13 +23,12 @@ import {
 } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { GetActions } from '../../lib/actions/types';
+import type { GetActions } from '../../lib/actions/types';
 import type { LoggedInUser as LoggedInUserType } from '../../lib/custom_typings/LoggedInUser';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import type { ContributionDrawerQuery, ContributionDrawerQueryVariables } from '../../lib/graphql/types/v2/graphql';
 import {
   ActivityType,
-  ContributionDrawerQuery,
-  ContributionDrawerQueryVariables,
   ContributionFrequency,
   OrderStatus,
   TransactionKind,

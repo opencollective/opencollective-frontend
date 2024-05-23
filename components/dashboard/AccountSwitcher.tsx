@@ -1,8 +1,9 @@
-import React, { ReactElement } from 'react';
+import React from 'react';
 import { css } from '@styled-system/css';
 import { flatten, groupBy, uniqBy } from 'lodash';
 import { ChevronDown, ChevronsUpDown, ChevronUp, Plus } from 'lucide-react';
 import memoizeOne from 'memoize-one';
+import type { ReactElement } from 'react';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { space } from 'styled-system';

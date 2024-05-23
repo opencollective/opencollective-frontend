@@ -3,7 +3,7 @@ import { useQuery } from '@apollo/client';
 
 import { gqlV1 } from '../../lib/graphql/helpers';
 
-import { ExpenseFormValues } from './useExpenseForm';
+import type { ExpenseFormValues } from './useExpenseForm';
 
 type InvitedPayeeLabelProps = {
   invitePayee: ExpenseFormValues['invitePayee'];

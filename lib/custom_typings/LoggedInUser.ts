@@ -1,4 +1,4 @@
-import { PREVIEW_FEATURE_KEYS, PreviewFeature } from '../preview-features';
+import type { PREVIEW_FEATURE_KEYS, PreviewFeature } from '../preview-features';
 
 export type LoggedInUser = {
   id: number;

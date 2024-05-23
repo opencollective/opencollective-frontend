@@ -62,7 +62,7 @@ export const removeFromLocalStorage = (key: string): void => {
 /**
  * Store a value in localStorage with a time-to-live (TTL).
  */
-export const setLocalStorageWithTTL = (key: string, value: Object | string | number, ttl = 1000 * 60 * 60) => {
+export const setLocalStorageWithTTL = (key: string, value: object | string | number, ttl = 1000 * 60 * 60) => {
   if (!value) {
     return removeFromLocalStorage(key);
   }

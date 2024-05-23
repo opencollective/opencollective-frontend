@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table } from '@tanstack/react-table';
+import type { Table } from '@tanstack/react-table';
 import clsx from 'clsx';
 import { RotateCcw, Settings2 } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';

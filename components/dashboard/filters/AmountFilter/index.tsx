@@ -3,14 +3,15 @@ import { CornerDownRight } from 'lucide-react';
 import { defineMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
-import { FilterConfig } from '../../../../lib/filters/filter-types';
+import type { FilterConfig } from '../../../../lib/filters/filter-types';
 import { i18nAmountFilterLabel } from '../../../../lib/i18n/amount-filter';
 
 import { Input } from '../../../ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../ui/Select';
 
 import { AmountFilterValue } from './AmountFilterValue';
-import { amountFilterSchema, AmountFilterType, AmountFilterValueType } from './schema';
+import type { AmountFilterValueType } from './schema';
+import { amountFilterSchema, AmountFilterType } from './schema';
 
 function amountToVariables(value: z.infer<typeof amountFilterSchema>): {
   minAmount: undefined | number;

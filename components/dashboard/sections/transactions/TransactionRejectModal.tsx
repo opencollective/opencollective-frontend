@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 
-import { BaseModalProps } from '../../../ModalContext';
+import type { BaseModalProps } from '../../../ModalContext';
 import TransactionRejectMessageForm from '../../../transactions/TransactionRejectMessageForm';
 import {
   AlertDialog,

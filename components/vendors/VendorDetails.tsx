@@ -1,8 +1,9 @@
-import React, { PropsWithChildren } from 'react';
+import React from 'react';
+import type { PropsWithChildren } from 'react';
 import { createPortal } from 'react-dom';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
-import { Host } from '../../lib/graphql/types/v2/graphql';
+import type { Host } from '../../lib/graphql/types/v2/graphql';
 import { elementFromClass } from '../../lib/react-utils';
 
 import Avatar from '../Avatar';
@@ -14,7 +15,7 @@ import LocationAddress from '../LocationAddress';
 import { H4 } from '../Text';
 import { Button } from '../ui/Button';
 
-import { VendorFieldsFragment } from './queries';
+import type { VendorFieldsFragment } from './queries';
 
 type VendorDetailsProps = {
   vendor: VendorFieldsFragment;

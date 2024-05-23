@@ -5,7 +5,7 @@ import type { RefObject } from 'react';
 import type { IntlShape, MessageDescriptor } from 'react-intl';
 
 import type { GetActions } from '../../lib/actions/types';
-import { Account } from '../../lib/graphql/types/v2/graphql';
+import type { Account } from '../../lib/graphql/types/v2/graphql';
 import type { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
 declare module '@tanstack/react-table' {
   interface ColumnMeta {

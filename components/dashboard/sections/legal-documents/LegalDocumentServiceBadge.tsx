@@ -1,7 +1,7 @@
 import React from 'react';
 import { startCase } from 'lodash';
 
-import { LegalDocumentService } from '../../../../lib/graphql/types/v2/graphql';
+import type { LegalDocumentService } from '../../../../lib/graphql/types/v2/graphql';
 
 import { WebsiteName } from '../../../I18nFormatters';
 import { Badge } from '../../../ui/Badge';

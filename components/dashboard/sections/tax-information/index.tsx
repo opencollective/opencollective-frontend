@@ -14,7 +14,8 @@ import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { Button } from '../../../ui/Button';
 
-import { AccountFromTaxInformationQuery, accountTaxInformationQuery } from './queries';
+import type { AccountFromTaxInformationQuery } from './queries';
+import { accountTaxInformationQuery } from './queries';
 import { TaxInformationFormDialog } from './TaxInformationFormDialog';
 
 /**

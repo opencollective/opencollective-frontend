@@ -3,7 +3,8 @@ import { SiOpencollective, SiPaypal, SiStripe, SiWise } from '@icons-pack/react-
 import clsx from 'clsx';
 import { useIntl } from 'react-intl';
 
-import { PaymentMethodService, PaymentMethodType } from '../lib/graphql/types/v2/graphql';
+import type { PaymentMethodType } from '../lib/graphql/types/v2/graphql';
+import { PaymentMethodService } from '../lib/graphql/types/v2/graphql';
 import { i18nPaymentMethodService } from '../lib/i18n/payment-method-service';
 import { i18nPaymentMethodType } from '../lib/i18n/payment-method-type';
 

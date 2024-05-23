@@ -1,8 +1,8 @@
 import React from 'react';
-import { ColumnDef, TableMeta } from '@tanstack/react-table';
+import type { ColumnDef, TableMeta } from '@tanstack/react-table';
 import { FormattedMessage } from 'react-intl';
 
-import { HostApplication, HostApplicationStatus } from '../../../../lib/graphql/types/v2/graphql';
+import type { HostApplication, HostApplicationStatus } from '../../../../lib/graphql/types/v2/graphql';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';

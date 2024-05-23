@@ -3,12 +3,13 @@ import { useQuery } from '@apollo/client';
 import type { Content } from '@radix-ui/react-hover-card';
 import clsx from 'clsx';
 import { get } from 'lodash';
-import { Banknote, Building, Calendar, FileText, LucideIcon, Mail, PencilRuler, Receipt, Users } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { Banknote, Building, Calendar, FileText, Mail, PencilRuler, Receipt, Users } from 'lucide-react';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { isIndividualAccount } from '../lib/collective';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
-import { Account, AccountWithHost, UserContextualMembershipsQuery } from '../lib/graphql/types/v2/graphql';
+import type { Account, AccountWithHost, UserContextualMembershipsQuery } from '../lib/graphql/types/v2/graphql';
 import { getCollectivePageRoute } from '../lib/url-helpers';
 
 import PrivateInfoIcon from './icons/PrivateInfoIcon';
