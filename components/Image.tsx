@@ -1,5 +1,6 @@
 import React from 'react';
-import NextImage, { ImageProps } from 'next/image';
+import type { ImageProps } from 'next/image';
+import NextImage from 'next/image';
 
 // Default to no custom loader, will use Squoosh in dev
 let loader;

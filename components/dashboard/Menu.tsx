@@ -1,4 +1,5 @@
 import React from 'react';
+import type { LucideIcon } from 'lucide-react';
 import {
   ArrowRightLeft,
   BarChart2,
@@ -10,7 +11,6 @@ import {
   Globe2,
   HeartHandshake,
   LayoutDashboard,
-  LucideIcon,
   Megaphone,
   Receipt,
   Settings,

@@ -8,7 +8,7 @@ import { useIntl } from 'react-intl';
 import { formatAmountForLegend } from '../../../../lib/charts';
 import { getDayjsIsoUnit } from '../../../../lib/date-utils';
 import dayjs from '../../../../lib/dayjs';
-import { Currency, TimeSeriesAmount } from '../../../../lib/graphql/types/v2/graphql';
+import type { Currency, TimeSeriesAmount } from '../../../../lib/graphql/types/v2/graphql';
 
 import MessageBox from '../../../MessageBox';
 import { formatPeriod } from '../../filters/PeriodCompareFilter';

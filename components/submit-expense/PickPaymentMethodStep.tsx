@@ -8,13 +8,13 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import {
+import type {
   Account,
   Host,
-  PayoutMethodType,
   SavePayoutMethodMutation,
   SavePayoutMethodMutationVariables,
 } from '../../lib/graphql/types/v2/graphql';
+import { PayoutMethodType } from '../../lib/graphql/types/v2/graphql';
 
 import CollectivePicker from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
@@ -31,7 +31,7 @@ import { useToast } from '../ui/useToast';
 
 import { PayoutMethodDetails } from './PayoutMethodDetails';
 import { RadioCardButton } from './RadioCardButton';
-import { ExpenseForm } from './useExpenseForm';
+import type { ExpenseForm } from './useExpenseForm';
 
 type PickPaymentMethodFormProps = {
   form: ExpenseForm;

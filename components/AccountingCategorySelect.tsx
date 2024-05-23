@@ -1,16 +1,11 @@
 import React from 'react';
 import { get, isUndefined, pick, remove, size, throttle, uniq } from 'lodash';
 import { Check, ChevronDown, Sparkles } from 'lucide-react';
-import { defineMessages, FormattedMessage, IntlShape, useIntl } from 'react-intl';
+import type { IntlShape } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import {
-  Account,
-  AccountingCategory,
-  AccountingCategoryKind,
-  Expense,
-  ExpenseType,
-  Host,
-} from '../lib/graphql/types/v2/graphql';
+import type { Account, AccountingCategory, Expense, ExpenseType, Host } from '../lib/graphql/types/v2/graphql';
+import { AccountingCategoryKind } from '../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../lib/hooks/useAsyncCall';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { fetchExpenseCategoryPredictions } from '../lib/ml-service';

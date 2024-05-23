@@ -3,7 +3,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ApolloClient } from '@apollo/client';
+import type { ApolloClient } from '@apollo/client';
 import { getDataFromTree } from '@apollo/client/react/ssr';
 
 import { withTwoFactorAuthentication } from './two-factor-authentication/TwoFactorAuthenticationContext';

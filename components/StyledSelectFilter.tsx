@@ -6,7 +6,8 @@ import styled from 'styled-components';
 import { maxWidth } from 'styled-system';
 
 import { Flex } from './Grid';
-import StyledSelect, { StyledSelectProps } from './StyledSelect';
+import type { StyledSelectProps } from './StyledSelect';
+import StyledSelect from './StyledSelect';
 import { Span } from './Text';
 
 const TruncatedItemsList = styled(Span).attrs({

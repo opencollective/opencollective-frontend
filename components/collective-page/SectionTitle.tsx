@@ -1,16 +1,8 @@
-import React from 'react';
 import propTypes from '@styled-system/prop-types';
+import type React from 'react';
 import styled from 'styled-components';
-import {
-  color,
-  ColorProps,
-  display,
-  DisplayProps,
-  space,
-  SpaceProps,
-  typography,
-  TypographyProps,
-} from 'styled-system';
+import type { ColorProps, DisplayProps, SpaceProps, TypographyProps } from 'styled-system';
+import { color, display, space, typography } from 'styled-system';
 
 type SectionTitleProps = ColorProps &
   DisplayProps &

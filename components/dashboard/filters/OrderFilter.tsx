@@ -1,9 +1,10 @@
 import React from 'react';
 import { ArrowDownNarrowWide, ArrowDownWideNarrow } from 'lucide-react';
-import { defineMessage, MessageDescriptor, useIntl } from 'react-intl';
+import type { MessageDescriptor } from 'react-intl';
+import { defineMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
-import { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
+import type { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
 
 import { Button } from '../../ui/Button';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '../../ui/Select';

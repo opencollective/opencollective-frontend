@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { Account } from '../lib/graphql/types/v2/graphql';
+import type { Account } from '../lib/graphql/types/v2/graphql';
 import { getAvatarBorderRadius } from '../lib/image-utils';
 
 import Avatar from './Avatar';

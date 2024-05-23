@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useReducer } from 'react';
 
-import ConfirmationModal, { ConfirmationModalProps } from './NewConfirmationModal';
+import type { ConfirmationModalProps } from './NewConfirmationModal';
+import ConfirmationModal from './NewConfirmationModal';
 
 export interface BaseModalProps {
   open: boolean;

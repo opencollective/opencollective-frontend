@@ -1,7 +1,7 @@
-import { FormikProps } from 'formik';
+import type { FormikProps } from 'formik';
 import { cloneDeep, get, isNil, set } from 'lodash';
 
-import { Account, ExpenseType, UploadFileResult } from '../../../lib/graphql/types/v2/graphql';
+import type { Account, ExpenseType, UploadFileResult } from '../../../lib/graphql/types/v2/graphql';
 
 import type { ExpenseFormValues, ExpenseItemFormValues } from '../types/FormValues';
 

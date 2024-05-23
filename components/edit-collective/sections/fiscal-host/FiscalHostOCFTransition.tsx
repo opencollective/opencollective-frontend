@@ -4,7 +4,7 @@ import { ChevronDown, ExternalLink } from 'lucide-react';
 
 import { getEnvVar } from '../../../../lib/env-utils';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import {
+import type {
   FiscalHostOcfTransitionQuery,
   FiscalHostOcfTransitionQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';

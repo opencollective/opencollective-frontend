@@ -1,14 +1,16 @@
 import React from 'react';
-import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
+import type { ColumnDef } from '@tanstack/react-table';
+import { createColumnHelper } from '@tanstack/react-table';
 import clsx from 'clsx';
 import { AlertTriangle, ArrowLeft, ArrowRight, Undo } from 'lucide-react';
 import { defineMessage, FormattedMessage } from 'react-intl';
 
-import { DateTimeField, TransactionsTableQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import type { TransactionsTableQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import { DateTimeField } from '../../../../lib/graphql/types/v2/graphql';
 import { useDrawer } from '../../../../lib/hooks/useDrawer';
 import useLocalStorage from '../../../../lib/hooks/useLocalStorage';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
-import { useQueryFilterReturnType } from '../../../../lib/hooks/useQueryFilter';
+import type { useQueryFilterReturnType } from '../../../../lib/hooks/useQueryFilter';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { i18nTransactionKind } from '../../../../lib/i18n/transaction';
 import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
@@ -23,7 +25,7 @@ import { Badge } from '../../../ui/Badge';
 import { Pagination } from '../../filters/Pagination';
 
 import { useTransactionActions } from './actions';
-import { schema } from './filters';
+import type { schema } from './filters';
 import { TransactionDrawer } from './TransactionDrawer';
 import type { TransactionsTableQueryNode } from './types';
 

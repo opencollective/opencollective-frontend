@@ -4,13 +4,15 @@ import { Field, Form, Formik } from 'formik';
 import { cloneDeep, pick } from 'lodash';
 import { Download, Pencil, Trash, Upload, X } from 'lucide-react';
 import { createPortal } from 'react-dom';
-import { FileRejection, useDropzone } from 'react-dropzone';
+import type { FileRejection } from 'react-dropzone';
+import { useDropzone } from 'react-dropzone';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { requireFields, verifyEmailPattern, verifyURLPattern } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import { DashboardVendorsQuery, UploadedFileKind } from '../../lib/graphql/types/v2/graphql';
+import type { DashboardVendorsQuery } from '../../lib/graphql/types/v2/graphql';
+import { UploadedFileKind } from '../../lib/graphql/types/v2/graphql';
 import { useImageUploader } from '../../lib/hooks/useImageUploader';
 import { elementFromClass } from '../../lib/react-utils';
 import { cn, omitDeep } from '../../lib/utils';
@@ -31,7 +33,8 @@ import { Button } from '../ui/Button';
 import { Switch } from '../ui/Switch';
 import { useToast } from '../ui/useToast';
 
-import { vendorFieldFragment, VendorFieldsFragment } from './queries';
+import type { VendorFieldsFragment } from './queries';
+import { vendorFieldFragment } from './queries';
 
 const FIELD_LABEL_PROPS = { fontSize: 16, fontWeight: 700 };
 

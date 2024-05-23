@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { IGNORED_TAGS } from '../lib/constants/collectives';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
-import { Collective } from '../lib/graphql/types/v2/graphql';
+import type { Collective } from '../lib/graphql/types/v2/graphql';
 import { editTagsMutation } from '../lib/graphql/v1/mutations';
 
 import { toast } from './ui/useToast';

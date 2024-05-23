@@ -1,10 +1,11 @@
 'use client';
 
 import * as React from 'react';
-import { DialogProps } from '@radix-ui/react-dialog';
+import type { DialogProps } from '@radix-ui/react-dialog';
 import clsx from 'clsx';
 import { Command as CommandPrimitive } from 'cmdk';
-import { Loader2, LucideIcon, Search } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { Loader2, Search } from 'lucide-react';
 
 import { cn } from '../../lib/utils';
 

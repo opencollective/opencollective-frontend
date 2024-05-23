@@ -2,26 +2,19 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import propTypes from '@styled-system/prop-types';
 import { isNil, omitBy, truncate } from 'lodash';
-import { defineMessages, FormattedMessage, injectIntl, IntlShape } from 'react-intl';
-import Select, {
-  components as ReactSelectComponents,
+import type { IntlShape } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import type {
   ContainerProps,
   GroupHeadingProps,
   OptionProps,
   Props as ReactSelectProps,
   ValueContainerProps,
 } from 'react-select';
+import Select, { components as ReactSelectComponents } from 'react-select';
 import styled from 'styled-components';
-import {
-  BorderProps,
-  BorderRadiusProps,
-  layout,
-  LayoutProps,
-  space,
-  SpaceProps,
-  typography,
-  TypographyProps,
-} from 'styled-system';
+import type { BorderProps, BorderRadiusProps, LayoutProps, SpaceProps, TypographyProps } from 'styled-system';
+import { layout, space, typography } from 'styled-system';
 
 import Container from './Container';
 import { Flex } from './Grid';

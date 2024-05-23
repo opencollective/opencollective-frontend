@@ -1,11 +1,11 @@
 import React from 'react';
-import { FormikProps } from 'formik';
+import type { FormikProps } from 'formik';
 import { merge, pick } from 'lodash';
 import { z } from 'zod';
 
 import { splitName } from '../../../../lib/collective';
-import { LoggedInUser } from '../../../../lib/custom_typings/LoggedInUser';
-import { CountryIso } from '../../../../lib/graphql/types/v2/graphql';
+import type { LoggedInUser } from '../../../../lib/custom_typings/LoggedInUser';
+import type { CountryIso } from '../../../../lib/graphql/types/v2/graphql';
 import { cn } from '../../../../lib/utils';
 
 import { generateInitialValuesFromSchema } from '../../../FormikZod';
@@ -25,7 +25,7 @@ import {
   TaxFormLocationFields,
   TypeOfLimitationOnBenefitsProvisions,
 } from './common';
-import { AccountFromTaxInformationQuery } from './queries';
+import type { AccountFromTaxInformationQuery } from './queries';
 
 const Chapter3StatusThatCanBeHybrid = [
   Chapter3Status.DisregardedEntity,

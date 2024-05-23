@@ -1,6 +1,7 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import { Form, FormikProps } from 'formik';
+import type { FormikProps } from 'formik';
+import { Form } from 'formik';
 import { get, sum } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';

@@ -1,9 +1,10 @@
 import React from 'react';
-import { ColumnDef, TableMeta } from '@tanstack/react-table';
-import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
+import type { ColumnDef, TableMeta } from '@tanstack/react-table';
+import type { IntlShape } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
-import { GetActions } from '../../../../lib/actions/types';
-import { Account, Host, LegalDocument } from '../../../../lib/graphql/types/v2/graphql';
+import type { GetActions } from '../../../../lib/actions/types';
+import type { Account, Host, LegalDocument } from '../../../../lib/graphql/types/v2/graphql';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';

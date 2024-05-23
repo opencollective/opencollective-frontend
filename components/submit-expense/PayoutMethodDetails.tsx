@@ -3,7 +3,8 @@ import clsx from 'clsx';
 import { startCase, upperCase } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { PayoutMethod, PayoutMethodType } from '../../lib/graphql/types/v2/graphql';
+import type { PayoutMethod } from '../../lib/graphql/types/v2/graphql';
+import { PayoutMethodType } from '../../lib/graphql/types/v2/graphql';
 
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import LoadingPlaceholder from '../LoadingPlaceholder';

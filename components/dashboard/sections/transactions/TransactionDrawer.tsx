@@ -6,7 +6,7 @@ import { AlertTriangle, ArrowLeft, ArrowRight, InfoIcon, Undo } from 'lucide-rea
 import Link from 'next/link';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { GetActions } from '../../../../lib/actions/types';
+import type { GetActions } from '../../../../lib/actions/types';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { usePrevious } from '../../../../lib/hooks/usePrevious';
 import { i18nTransactionKind, i18nTransactionType } from '../../../../lib/i18n/transaction';
@@ -30,7 +30,7 @@ import { Sheet, SheetBody, SheetContent } from '../../../ui/Sheet';
 import { Skeleton } from '../../../ui/Skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 
-import { TransactionDetailsQueryNode } from './types';
+import type { TransactionDetailsQueryNode } from './types';
 
 const transactionQuery = gql`
   query TransactionDetails($transaction: TransactionReferenceInput!) {

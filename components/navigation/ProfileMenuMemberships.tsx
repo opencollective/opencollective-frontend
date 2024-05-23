@@ -6,7 +6,7 @@ import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { CollectiveType } from '../../lib/constants/collectives';
-import { LoggedInUser } from '../../lib/custom_typings/LoggedInUser';
+import type { LoggedInUser } from '../../lib/custom_typings/LoggedInUser';
 import { getDashboardRoute } from '../../lib/url-helpers';
 
 import Avatar from '../Avatar';

@@ -1,7 +1,8 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import { Update, UpdateAudience } from '../../../../lib/graphql/types/v2/graphql';
+import type { Update } from '../../../../lib/graphql/types/v2/graphql';
+import { UpdateAudience } from '../../../../lib/graphql/types/v2/graphql';
 import { elementFromClass } from '../../../../lib/react-utils';
 import { formatDate } from '../../../../lib/utils';
 

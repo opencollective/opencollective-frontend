@@ -2,7 +2,8 @@ import React from 'react';
 
 import StyledModal, { ModalBody } from '../StyledModal';
 
-import AgreementForm, { AgreementFormProps } from './AgreementForm';
+import type { AgreementFormProps } from './AgreementForm';
+import AgreementForm from './AgreementForm';
 
 type AddAgreementModalProps = {
   account?: AgreementFormProps['account'];

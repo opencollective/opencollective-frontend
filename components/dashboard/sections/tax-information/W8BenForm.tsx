@@ -1,13 +1,13 @@
 import React from 'react';
-import { FormikProps } from 'formik';
+import type { FormikProps } from 'formik';
 import { merge, pick } from 'lodash';
 import { useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { splitName } from '../../../../lib/collective';
-import { LoggedInUser } from '../../../../lib/custom_typings/LoggedInUser';
+import type { LoggedInUser } from '../../../../lib/custom_typings/LoggedInUser';
 import dayjs from '../../../../lib/dayjs';
-import { CountryIso } from '../../../../lib/graphql/types/v2/graphql';
+import type { CountryIso } from '../../../../lib/graphql/types/v2/graphql';
 import { i18nCountryName } from '../../../../lib/i18n';
 import { cn } from '../../../../lib/utils';
 
@@ -22,7 +22,7 @@ import { Checkbox } from '../../../ui/Checkbox';
 
 import { BaseFormSchema, TaxFormLocationFields, TaxFormNameFields } from './common';
 import { HintText } from './HintText';
-import { AccountFromTaxInformationQuery } from './queries';
+import type { AccountFromTaxInformationQuery } from './queries';
 
 export const W8BenTaxFormValuesSchema = BaseFormSchema.merge(
   z.object({

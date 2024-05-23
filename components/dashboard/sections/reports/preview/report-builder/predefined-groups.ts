@@ -1,6 +1,7 @@
 import { ExpenseType, TransactionKind, TransactionType } from '../../../../../../lib/graphql/types/v2/graphql';
 
-import { Group, ReportSection } from '../types';
+import type { Group } from '../types';
+import { ReportSection } from '../types';
 
 import { checkGroupsMutualExclusivity } from './check-groups';
 

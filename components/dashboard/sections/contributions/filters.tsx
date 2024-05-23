@@ -4,12 +4,8 @@ import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../../lib/filters/schemas';
-import {
-  ContributionFrequency,
-  Currency,
-  DashboardRecurringContributionsQueryVariables,
-  OrderStatus,
-} from '../../../../lib/graphql/types/v2/graphql';
+import type { Currency, DashboardRecurringContributionsQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import { ContributionFrequency, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
 import i18nOrderStatus from '../../../../lib/i18n/order-status';
 import { sortSelectOptions } from '../../../../lib/utils';
 

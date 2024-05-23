@@ -3,16 +3,14 @@ import { omit } from 'lodash';
 import { defineMessage } from 'react-intl';
 import { z } from 'zod';
 
-import { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
+import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { boolean, integer, isMulti, limit, offset } from '../../../../lib/filters/schemas';
-import {
+import type {
   Currency,
-  ExpenseType,
   PaymentMethodType,
-  TransactionKind,
   TransactionsTableQueryVariables,
-  TransactionType,
 } from '../../../../lib/graphql/types/v2/graphql';
+import { ExpenseType, TransactionKind, TransactionType } from '../../../../lib/graphql/types/v2/graphql';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { i18nIsRefund } from '../../../../lib/i18n/is-refund';
 import { i18nTransactionKind, i18nTransactionType } from '../../../../lib/i18n/transaction';

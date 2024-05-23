@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import { Agreement as GraphQLAgreement } from '../../lib/graphql/types/v2/graphql';
+import type { Agreement as GraphQLAgreement } from '../../lib/graphql/types/v2/graphql';
 
 import AttachedFiles from '../attached-files/AttachedFiles';
 import Avatar from '../Avatar';

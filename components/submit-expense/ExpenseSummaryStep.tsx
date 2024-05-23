@@ -19,7 +19,7 @@ import { PayoutMethodLabel } from '../PayoutMethodLabel';
 import UploadedFilePreview from '../UploadedFilePreview';
 
 import { InvitedPayeeLabel } from './InvitedPayeeLabel';
-import { ExpenseForm, ExpenseItem } from './useExpenseForm';
+import type { ExpenseForm, ExpenseItem } from './useExpenseForm';
 
 type ExpenseSummaryFormProps = {
   form: ExpenseForm;

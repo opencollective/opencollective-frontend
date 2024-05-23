@@ -21,7 +21,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../../../../ui/Tooltip'
 import { DashboardContext } from '../../../DashboardContext';
 import DashboardHeader from '../../../DashboardHeader';
 import ExportTransactionsCSVModal from '../../../ExportTransactionsCSVModal';
-import { DashboardSectionProps } from '../../../types';
+import type { DashboardSectionProps } from '../../../types';
 import {
   schema as hostTransactionsSchema,
   toVariables as hostTransactionsToVariables,
@@ -34,7 +34,7 @@ import { ReportNavigationArrows } from './NavigationArrows';
 import { hostReportQuery } from './queries';
 import { ReportContent } from './ReportContent';
 import { deserializeReportSlug, ReportPeriodSelector } from './ReportPeriodSelector';
-import { GroupFilter } from './types';
+import type { GroupFilter } from './types';
 
 const schema = z.object({
   isHost: boolean.default(false),

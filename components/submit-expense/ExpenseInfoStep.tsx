@@ -7,7 +7,7 @@ import HTMLContent from '../HTMLContent';
 import StyledInput from '../StyledInput';
 import StyledInputFormikField from '../StyledInputFormikField';
 
-import { ExpenseForm } from './useExpenseForm';
+import type { ExpenseForm } from './useExpenseForm';
 
 const I18nMessages = defineMessages({
   descriptionPlaceholder: {

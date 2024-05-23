@@ -9,7 +9,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { getCurrentLocalDateStr } from '../lib/date-utils';
 import { i18nGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
-import { TaxInput } from '../lib/graphql/types/v2/graphql';
+import type { TaxInput } from '../lib/graphql/types/v2/graphql';
 import { i18nTaxType } from '../lib/i18n/taxes';
 
 import { useToast } from './ui/useToast';

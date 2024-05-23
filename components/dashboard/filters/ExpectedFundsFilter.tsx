@@ -2,7 +2,7 @@ import React from 'react';
 import { defineMessage, FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
-import { FilterConfig } from '../../../lib/filters/filter-types';
+import type { FilterConfig } from '../../../lib/filters/filter-types';
 import { ExpectedFundsFilter } from '../../../lib/graphql/types/v2/graphql';
 
 import ComboSelectFilter from './ComboSelectFilter';

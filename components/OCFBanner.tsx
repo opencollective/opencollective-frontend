@@ -5,7 +5,11 @@ import { FormattedMessage } from 'react-intl';
 
 import { checkIfOCF } from '../lib/collective';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
-import { Account, OcfTransitionBannerQuery, OcfTransitionBannerQueryVariables } from '../lib/graphql/types/v2/graphql';
+import type {
+  Account,
+  OcfTransitionBannerQuery,
+  OcfTransitionBannerQueryVariables,
+} from '../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { getCollectivePageRoute, getDashboardRoute } from '../lib/url-helpers';
 import { cn } from '../lib/utils';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useFormik } from 'formik';
+import type { useFormik } from 'formik';
 import { isEmpty, round } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -18,7 +18,7 @@ import { InvitedPayeeLabel } from './InvitedPayeeLabel';
 import { PickCollectiveStepForm } from './PickCollectiveStep';
 import { PickExpenseTypeForm } from './PickExpenseTypeStep';
 import { PickPaymentMethodForm } from './PickPaymentMethodStep';
-import { ExpenseForm, ExpenseFormValues } from './useExpenseForm';
+import type { ExpenseForm, ExpenseFormValues } from './useExpenseForm';
 
 export const enum ExpenseFlowStep {
   COLLECTIVE = 'collective',

@@ -1,21 +1,14 @@
 // This file is mostly adapted from:
 // https://github.com/zeit/next.js/blob/3949c82bdfe268f841178979800aa8e71bbf412c/examples/with-apollo/lib/initApollo.js
 
-import {
-  ApolloClient,
-  ApolloLink,
-  HttpLink,
-  InMemoryCache,
-  NormalizedCacheObject,
-  QueryOptions,
-  useQuery,
-} from '@apollo/client';
+import type { NormalizedCacheObject, QueryOptions } from '@apollo/client';
+import { ApolloClient, ApolloLink, HttpLink, InMemoryCache, useQuery } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
 import { mergeDeep } from '@apollo/client/utilities';
 import { createUploadLink } from 'apollo-upload-client';
 import { isUndefined, omitBy, pick } from 'lodash';
-import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
+import type { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
 import TwoFactorAuthenticationApolloLink from './two-factor-authentication/TwoFactorAuthenticationApolloLink';
 import { getErrorFromGraphqlException, isNotFoundGraphQLException } from './errors';

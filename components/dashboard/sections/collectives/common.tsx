@@ -1,5 +1,5 @@
 import React from 'react';
-import { ColumnDef, TableMeta } from '@tanstack/react-table';
+import type { ColumnDef, TableMeta } from '@tanstack/react-table';
 import { groupBy, isNil, mapValues, toPairs } from 'lodash';
 import {
   Banknote,
@@ -14,7 +14,8 @@ import {
   Unlink,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { FormattedDate, FormattedMessage, IntlShape } from 'react-intl';
+import type { IntlShape } from 'react-intl';
+import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { HOST_FEE_STRUCTURE } from '../../../../lib/constants/host-fee-structure';
 import type { AccountWithHost, HostedCollectiveFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';

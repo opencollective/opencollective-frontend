@@ -4,10 +4,10 @@ import { uniqBy } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
-import { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
+import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
 import { integer } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import { Account, UpdatesDashboardQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import type { Account, UpdatesDashboardQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 
@@ -26,7 +26,7 @@ import { orderByFilter } from '../../filters/OrderFilter';
 import { Pagination } from '../../filters/Pagination';
 import { searchFilter } from '../../filters/SearchFilter';
 import { UPDATE_STATUS, updateStatusFilter } from '../../filters/UpdateStatusFilter';
-import { DashboardSectionProps } from '../../types';
+import type { DashboardSectionProps } from '../../types';
 
 import { UpdateDate, UpdateStatus } from './common';
 import { updatesDashboardMetadataQuery, updatesDashboardQuery } from './queries';
