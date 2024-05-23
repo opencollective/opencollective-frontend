@@ -214,7 +214,7 @@
     "@rollup/plugin-json": "^6.0.1",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-swc": "^0.3.0",
-    "@storybook/addon-designs": "8.0.1",
+    "@storybook/addon-designs": "8.0.2",
     "@storybook/addon-docs": "7.6.19",
     "@storybook/addon-essentials": "7.6.19",
     "@storybook/addon-links": "7.6.19",
