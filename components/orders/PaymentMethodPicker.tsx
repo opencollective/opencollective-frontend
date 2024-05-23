@@ -313,7 +313,7 @@ function StripeSetupPaymentMethodOption(props: StripeSetupPaymentMethodOptionPro
     let types = setupIntent.payment_method_types
       .filter(t => isStripePaymentMethodEnabledForCurrency(t, props.currency))
       .map(method => {
-        return intl.formatMessage(StripePaymentMethodsLabels[method]);
+        return StripePaymentMethodsLabels[method] ? intl.formatMessage(StripePaymentMethodsLabels[method]) : method;
       });
 
     if (types.length > 3) {

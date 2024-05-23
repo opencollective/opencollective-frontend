@@ -3,7 +3,7 @@ import { ApolloError, useApolloClient } from '@apollo/client';
 import type { PaymentIntent, Stripe } from '@stripe/stripe-js';
 
 import { API_V2_CONTEXT, gql } from '../graphql/helpers';
-import type { AccountReferenceInput, GuestInfoInput } from '../graphql/types/v2/graphql';
+import type { AccountReferenceInput, ContributionFrequency, GuestInfoInput } from '../graphql/types/v2/graphql';
 import { loadScriptAsync } from '../utils';
 
 const createPaymentIntentMutation = gql`
@@ -23,6 +23,7 @@ type UsePaymentIntentOptions = {
   guestInfo?: GuestInfoInput;
   toAccount: AccountReferenceInput;
   skip?: boolean;
+  frequency?: ContributionFrequency;
 };
 
 type StripePaymentIntent = PaymentIntent & { stripeAccount: string };
@@ -33,6 +34,7 @@ export default function usePaymentIntent({
   guestInfo,
   toAccount,
   skip,
+  frequency,
 }: UsePaymentIntentOptions): [StripePaymentIntent, Stripe, boolean, Error] {
   const apolloClient = useApolloClient();
   const [error, setError] = React.useState<Error | null>(null);
@@ -54,6 +56,7 @@ export default function usePaymentIntent({
             amount,
             fromAccount,
             toAccount,
+            frequency,
           },
           guestInfo,
         },
