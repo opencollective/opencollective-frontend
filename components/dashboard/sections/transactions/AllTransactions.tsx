@@ -22,13 +22,13 @@ import { filters as commonFilters, schema as commonSchema, toVariables as common
 import { transactionsTableQuery } from './queries';
 import TransactionsTable from './TransactionsTable';
 
-export const schema = commonSchema.extend({
+const schema = commonSchema.extend({
   account: hostedAccountFilter.schema,
   excludeAccount: z.string().optional(),
   accountingCategory: accountingCategoryFilter.schema,
 });
 
-export type FilterValues = z.infer<typeof schema>;
+type FilterValues = z.infer<typeof schema>;
 
 type FilterMeta = CommonFilterMeta & {
   hostSlug: string;
@@ -36,7 +36,7 @@ type FilterMeta = CommonFilterMeta & {
 
 // Only needed when values and key of filters are different
 // to expected key and value of QueryVariables
-export const toVariables: FiltersToVariables<FilterValues, TransactionsTableQueryVariables, FilterMeta> = {
+const toVariables: FiltersToVariables<FilterValues, TransactionsTableQueryVariables, FilterMeta> = {
   ...commonToVariables,
   account: hostedAccountFilter.toVariables,
   excludeAccount: value => ({ excludeAccount: { slug: value } }),
