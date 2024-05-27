@@ -13,7 +13,12 @@ import { LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { require2FAForAdmins } from '../lib/policies';
 import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 
-import { ALL_SECTIONS, SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS } from '../components/dashboard/constants';
+import {
+  ALL_SECTIONS,
+  ROOT_PROFILE_ACCOUNT,
+  ROOT_PROFILE_KEY,
+  SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS,
+} from '../components/dashboard/constants';
 import { DashboardContext } from '../components/dashboard/DashboardContext';
 import DashboardSection from '../components/dashboard/DashboardSection';
 import { getMenuItems } from '../components/dashboard/Menu';
@@ -51,6 +56,8 @@ const messages = defineMessages({
 const getDefaultSectionForAccount = (account, loggedInUser) => {
   if (!account) {
     return null;
+  } else if (account.type === 'ROOT') {
+    return ALL_SECTIONS.ALL_COLLECTIVES;
   } else if (
     isIndividualAccount(account) ||
     (!isHostAccount(account) && loggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW))
@@ -92,6 +99,8 @@ function getBlocker(LoggedInUser, account, section) {
     return <FormattedMessage defaultMessage="This account doesn't exist" id="3ABdi3" />;
   } else if (account.isIncognito) {
     return <FormattedMessage defaultMessage="You cannot edit this collective" id="ZonfjV" />;
+  } else if (account.type === 'ROOT' && LoggedInUser.isRoot) {
+    return;
   }
 
   // Check permissions
@@ -134,16 +143,17 @@ const DashboardPage = () => {
   const [lastWorkspaceVisit, setLastWorkspaceVisit] = useLocalStorage(LOCAL_STORAGE_KEYS.DASHBOARD_NAVIGATION_STATE, {
     slug: LoggedInUser?.collective.slug,
   });
-
+  const isRootUser = LoggedInUser?.isRoot;
   const defaultSlug = lastWorkspaceVisit.slug || LoggedInUser?.collective.slug;
   const activeSlug = slug || defaultSlug;
+  const isRootProfile = activeSlug === ROOT_PROFILE_KEY;
 
   const { data, loading } = useQuery(adminPanelQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: activeSlug },
-    skip: !activeSlug || !LoggedInUser,
+    skip: !activeSlug || !LoggedInUser || isRootProfile,
   });
-  const account = data?.account;
+  const account = isRootProfile && isRootUser ? ROOT_PROFILE_ACCOUNT : data?.account;
   const selectedSection = section || getDefaultSectionForAccount(account, LoggedInUser);
 
   const useDynamicTopBar = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DYNAMIC_TOP_BAR);

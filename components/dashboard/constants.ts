@@ -1,5 +1,8 @@
 import { defineMessages } from 'react-intl';
 
+export const ROOT_PROFILE_KEY = 'root-actions';
+export const ROOT_PROFILE_ACCOUNT = { slug: ROOT_PROFILE_KEY, type: 'ROOT', name: 'Profile Admin' };
+
 export const SECTIONS = {
   OVERVIEW: 'overview',
   REPORTS: 'reports',
