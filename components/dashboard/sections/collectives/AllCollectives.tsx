@@ -35,7 +35,7 @@ import { cols } from './common';
 import { allCollectivesQuery } from './queries';
 
 const sortFilter = buildSortFilter({
-  fieldSchema: z.enum(['CREATED_AT', 'NAME']),
+  fieldSchema: z.enum(['CREATED_AT', 'BALANCE', 'NAME']),
   defaultValue: {
     field: 'CREATED_AT',
     direction: 'DESC',
@@ -88,9 +88,10 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
   },
   status: collectiveStatusFilter.filter,
   host: hostsFilter.filter,
+  consolidatedBalance: consolidatedBalanceFilter.filter,
 };
 
-const HostedCollectives = ({ subpath }: DashboardSectionProps) => {
+const AllCollectives = ({ subpath }: Omit<DashboardSectionProps, 'accountSlug'>) => {
   const intl = useIntl();
   const router = useRouter();
   const [showCollectiveOverview, setShowCollectiveOverview] = React.useState<Collective | undefined | string>(
@@ -117,6 +118,7 @@ const HostedCollectives = ({ subpath }: DashboardSectionProps) => {
     defaultFilterValues: {
       host: 'opencollective',
     },
+    meta: { currency: 'USD' },
   });
 
   const { data, error, loading, refetch } = useQuery(allCollectivesQuery, {
@@ -205,4 +207,4 @@ const HostedCollectives = ({ subpath }: DashboardSectionProps) => {
   );
 };
 
-export default HostedCollectives;
+export default AllCollectives;

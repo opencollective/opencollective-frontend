@@ -390,6 +390,7 @@ export const allCollectivesQuery = gql`
     $isHost: Boolean
     $host: [AccountReferenceInput]
     $isActive: Boolean
+    $consolidatedBalance: AmountRangeInput
   ) {
     accounts(
       limit: $limit
@@ -400,6 +401,7 @@ export const allCollectivesQuery = gql`
       isHost: $isHost
       isActive: $isActive
       host: $host
+      consolidatedBalance: $consolidatedBalance
     ) {
       offset
       limit
