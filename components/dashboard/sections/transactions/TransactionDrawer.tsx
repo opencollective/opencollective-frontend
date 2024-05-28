@@ -10,6 +10,7 @@ import type { GetActions } from '../../../../lib/actions/types';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { usePrevious } from '../../../../lib/hooks/usePrevious';
 import { i18nTransactionKind, i18nTransactionType } from '../../../../lib/i18n/transaction';
+import { getDashboardRoute } from '../../../../lib/url-helpers';
 
 import { AccountHoverCard, accountHoverCardFields } from '../../../AccountHoverCard';
 import { getCategoryLabel } from '../../../AccountingCategorySelect';
@@ -29,6 +30,7 @@ import { InfoList, InfoListItem } from '../../../ui/InfoList';
 import { Sheet, SheetBody, SheetContent } from '../../../ui/Sheet';
 import { Skeleton } from '../../../ui/Skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
+import { DashboardContext } from '../../DashboardContext';
 
 import type { TransactionDetailsQueryNode } from './types';
 
@@ -200,6 +202,10 @@ const transactionQuery = gql`
           name
           friendlyName
         }
+        host {
+          id
+          slug
+        }
       }
       refundTransaction {
         id
@@ -226,6 +232,15 @@ interface TransactionDetailsProps {
   getActions: GetActions<TransactionDetailsQueryNode>;
 }
 
+const getExpenseUrl = (dashboardAccount, expense) => {
+  if (dashboardAccount?.isHost && expense.host?.id === dashboardAccount.id) {
+    return getDashboardRoute(expense.host, `host-expenses?openExpenseId=${expense.legacyId}`);
+  } else if (dashboardAccount?.id === expense.account.id) {
+    return getDashboardRoute(expense.account, `expenses?openExpenseId=${expense.legacyId}`);
+  }
+  return `/${expense.account.slug}/expenses/${expense.legacyId}`;
+};
+
 function TransactionDetails({ transactionId, getActions }: TransactionDetailsProps) {
   const intl = useIntl();
   const prevTransactionId = usePrevious(transactionId);
@@ -234,10 +249,17 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
     variables: { transaction: { legacyId: Number(id) } },
     context: API_V2_CONTEXT,
   });
+  const { account } = React.useContext(DashboardContext);
   const { transaction } = data || { transaction: null };
   const dropdownTriggerRef = React.useRef();
   const actions = getActions(transaction, dropdownTriggerRef, refetch);
   const accountingCategory = transaction?.expense?.accountingCategory || transaction?.order?.accountingCategory;
+
+  let expenseUrl;
+
+  if (transaction?.expense) {
+    expenseUrl = getExpenseUrl(account, transaction.expense);
+  }
   return (
     <React.Fragment>
       <DrawerHeader
@@ -600,10 +622,7 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
                       value={
                         <HoverCard>
                           <HoverCardTrigger asChild>
-                            <Link
-                              href={`/${transaction?.expense.account.slug}/expenses/${transaction?.expense.legacyId}`}
-                              className="underline hover:text-primary"
-                            >
+                            <Link href={expenseUrl} className="underline hover:text-primary">
                               {transaction?.expense.description}
                             </Link>
                           </HoverCardTrigger>
