@@ -68,7 +68,6 @@ type ContributionDrawerProps = {
   open: boolean;
   onClose: () => void;
   orderId?: number;
-  orderUrl: string;
   getActions: GetActions<ContributionDrawerQuery['order']>;
 };
 
@@ -309,37 +308,44 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                 <div className="flex items-center gap-2 text-lg font-bold">
                   <FormattedMessage defaultMessage="Contribution" id="0LK5eg" />
                   <div>{isLoading ? <LoadingPlaceholder height={20} /> : `# ${query.data.order.legacyId}`}</div>
-                  <Tooltip delayDuration={100}>
-                    <TooltipTrigger asChild>
-                      <Button
-                        asChild
-                        variant="ghost"
-                        size="icon-sm"
-                        onPointerDown={e => {
-                          e.stopPropagation();
-                        }}
-                        onClick={e => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          clipboard.copy(props.orderUrl);
-                        }}
-                      >
-                        <div className="cursor-pointer">
-                          <LinkIcon size={16} />
-                        </div>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      {clipboard.isCopied ? (
-                        <div className="flex items-center gap-1">
-                          <Check size={16} />
-                          <FormattedMessage id="Clipboard.Copied" defaultMessage="Copied!" />
-                        </div>
-                      ) : (
-                        <FormattedMessage id="Clipboard.CopyShort" defaultMessage="Copy" />
-                      )}
-                    </TooltipContent>
-                  </Tooltip>
+                  {isLoading ? null : (
+                    <Tooltip delayDuration={100}>
+                      <TooltipTrigger asChild>
+                        <Button
+                          asChild
+                          variant="ghost"
+                          size="icon-sm"
+                          onPointerDown={e => {
+                            e.stopPropagation();
+                          }}
+                          onClick={e => {
+                            const orderUrl = new URL(
+                              `${query.data.order.toAccount.slug}/orders/${query.data.order.legacyId}`,
+                              window.location.origin,
+                            );
+
+                            e.preventDefault();
+                            e.stopPropagation();
+                            clipboard.copy(orderUrl.toString());
+                          }}
+                        >
+                          <div className="cursor-pointer">
+                            <LinkIcon size={16} />
+                          </div>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        {clipboard.isCopied ? (
+                          <div className="flex items-center gap-1">
+                            <Check size={16} />
+                            <FormattedMessage id="Clipboard.Copied" defaultMessage="Copied!" />
+                          </div>
+                        ) : (
+                          <FormattedMessage id="Clipboard.CopyShort" defaultMessage="Copy" />
+                        )}
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
                 </div>
                 <div className="ml-auto flex items-center gap-2">
                   {query.data?.order?.status && <OrderStatusTag status={query.data.order.status} />}

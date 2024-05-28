@@ -495,22 +495,6 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
     [router],
   );
 
-  const orderUrl = React.useMemo(() => {
-    if (!selectedContributionId) {
-      return null;
-    }
-
-    const url = new URL(router.asPath, window.location.origin);
-    const keys = [];
-    url.searchParams.forEach((value, key) => {
-      keys.push(key);
-    });
-    keys.forEach(k => url.searchParams.delete(k));
-    url.searchParams.set('orderId', selectedContributionId.toString());
-
-    return url.toString();
-  }, [selectedContributionId, router.asPath]);
-
   const views: Views<z.infer<typeof schema>> = [
     {
       id: ContributionsTab.ALL,
@@ -849,7 +833,6 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
         open={!!selectedContributionId}
         onClose={() => onToogleOrderDrawer(null)}
         orderId={selectedContributionId}
-        orderUrl={orderUrl}
         getActions={getActions}
       />
       {confirmCompletedOrder && (

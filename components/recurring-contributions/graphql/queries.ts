@@ -44,6 +44,7 @@ export const managedOrderFragment = gql`
     description
     createdAt
     processedAt
+    hostFeePercent
     frequency
     tier {
       id
