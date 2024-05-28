@@ -10,6 +10,7 @@ import Container from '../Container';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import NotFound from '../NotFound';
 import { OCFBannerWithData } from '../OCFBanner';
+import RootActivityLog from '../root-actions/RootActivityLog';
 
 import { HostAdminAccountingSection } from './sections/accounting';
 import AccountSettings from './sections/AccountSettings';
@@ -36,11 +37,19 @@ import PreviewReports from './sections/reports/preview/Reports';
 import { TaxInformationSettingsSection } from './sections/tax-information';
 import Team from './sections/Team';
 import AccountTransactions from './sections/transactions/AccountTransactions';
+import AllTransactions from './sections/transactions/AllTransactions';
 import HostTransactions from './sections/transactions/HostTransactions';
 import Updates from './sections/updates';
 import Vendors from './sections/Vendors';
 import VirtualCards from './sections/virtual-cards/VirtualCards';
-import { LEGACY_SECTIONS, LEGACY_SETTINGS_SECTIONS, SECTION_LABELS, SECTIONS, SETTINGS_SECTIONS } from './constants';
+import {
+  ALL_SECTIONS,
+  LEGACY_SECTIONS,
+  LEGACY_SETTINGS_SECTIONS,
+  SECTION_LABELS,
+  SECTIONS,
+  SETTINGS_SECTIONS,
+} from './constants';
 import DashboardHeader from './DashboardHeader';
 
 const DASHBOARD_COMPONENTS = {
@@ -67,13 +76,18 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.VIRTUAL_CARDS]: VirtualCards,
   [SECTIONS.TEAM]: Team,
   [SECTIONS.VENDORS]: Vendors,
-  [SECTIONS.ALL_COLLECTIVES]: AllCollectives,
 };
 
 const SETTINGS_COMPONENTS = {
   [SETTINGS_SECTIONS.INVOICES_RECEIPTS]: InvoicesReceipts,
   [SETTINGS_SECTIONS.NOTIFICATIONS]: NotificationsSettings,
   [SETTINGS_SECTIONS.TAX_INFORMATION]: TaxInformationSettingsSection,
+};
+
+const ROOT_COMPONENTS = {
+  [SECTIONS.ALL_COLLECTIVES]: AllCollectives,
+  [SECTIONS.HOST_TRANSACTIONS]: AllTransactions,
+  [ALL_SECTIONS.ACTIVITY_LOG]: RootActivityLog,
 };
 
 const DashboardSection = ({ account, isLoading, section, subpath }) => {
@@ -86,6 +100,15 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
         <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
         <LoadingPlaceholder height={26} mb={4} maxWidth={500} />
         <LoadingPlaceholder height={300} />
+      </div>
+    );
+  }
+
+  const RootComponent = ROOT_COMPONENTS[section];
+  if (RootComponent && LoggedInUser.isRoot) {
+    return (
+      <div className="w-full pb-6">
+        <RootComponent subpath={subpath} isDashboard />
       </div>
     );
   }
