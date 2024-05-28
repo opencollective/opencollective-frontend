@@ -19,7 +19,7 @@ type MenuLinkProps = {
   href?: string;
   className?: string;
   external?: boolean;
-  label?: string;
+  label?: string | React.JSX.Element;
   Icon?: LucideIcon;
   subMenu?: PageMenuItem[];
   section?: string;

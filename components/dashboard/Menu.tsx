@@ -13,13 +13,14 @@ import {
   LayoutDashboard,
   Megaphone,
   Receipt,
+  ScrollText,
   Settings,
   Store,
   Ticket,
   Users2,
 } from 'lucide-react';
 import { useRouter } from 'next/router';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
 import { isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective';
@@ -38,21 +39,43 @@ const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT, INDIVIDUAL } = Col
 export type PageMenuItem = {
   type?: 'page';
   Icon?: LucideIcon;
-  label?: string;
+  label?: string | React.JSX.Element;
   section: string;
   if?: boolean;
 };
 type GroupMenuItem = {
   type: 'group';
-  label: string;
+  label: string | React.JSX.Element;
   Icon: LucideIcon;
   subMenu: PageMenuItem[];
   if?: boolean;
 };
 
+const ROOT_MENU = [
+  {
+    Icon: Building,
+    section: ALL_SECTIONS.ALL_COLLECTIVES,
+    label: <FormattedMessage defaultMessage="All Collectives" id="uQguR/" />,
+  },
+  {
+    section: ALL_SECTIONS.HOST_TRANSACTIONS,
+    Icon: ArrowRightLeft,
+    label: <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />,
+  },
+  {
+    section: ALL_SECTIONS.ACTIVITY_LOG,
+    Icon: ScrollText,
+  },
+];
+
 export type MenuItem = PageMenuItem | GroupMenuItem;
 
 export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
+  const isRootProfile = account.type === 'ROOT' && LoggedInUser?.isRoot;
+  if (isRootProfile) {
+    return ROOT_MENU;
+  }
+
   const isIndividual = isIndividualAccount(account);
   const isHost = isHostAccount(account);
   const isSelfHosted = isSelfHostedAccount(account);
@@ -168,11 +191,6 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         {
           label: intl.formatMessage({ id: 'DqD1yK', defaultMessage: 'Applications' }),
           section: ALL_SECTIONS.HOST_APPLICATIONS,
-        },
-        {
-          section: ALL_SECTIONS.ALL_COLLECTIVES,
-          label: intl.formatMessage({ defaultMessage: 'All Collectives', id: 'uQguR/' }),
-          if: account.slug === 'opencollective',
         },
       ],
     },
@@ -430,14 +448,16 @@ const Menu = ({ onRoute, menuItems }) => {
 
   return (
     <div className="space-y-4">
-      <MenuLink
-        href={getCollectivePageRoute(account)}
-        Icon={Globe2}
-        label={intl.formatMessage({ id: 'PublicProfile', defaultMessage: 'Public profile' })}
-        className="hover:bg-slate-50 hover:text-slate-700"
-        dataCy="public-profile-link"
-        external
-      />
+      {account.type !== 'ROOT' && (
+        <MenuLink
+          href={getCollectivePageRoute(account)}
+          Icon={Globe2}
+          label={intl.formatMessage({ id: 'PublicProfile', defaultMessage: 'Public profile' })}
+          className="hover:bg-slate-50 hover:text-slate-700"
+          dataCy="public-profile-link"
+          external
+        />
+      )}
       <div className="space-y-2">
         {menuItems.map(item => {
           const key = item.type === 'group' ? item.label : item.section;
