@@ -273,7 +273,7 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
                 {LoggedInUser?.isRoot && (
                   <StyledMenuEntry
                     key={ROOT_PROFILE_KEY}
-                    href={`/dashboard/${ROOT_PROFILE_KEY}`}
+                    href={`/dashboard/${ROOT_PROFILE_KEY}/all-collectives`}
                     title={'Platform Admin'}
                     $isActive={activeSlug === ROOT_PROFILE_KEY}
                     className="-mt-4"
