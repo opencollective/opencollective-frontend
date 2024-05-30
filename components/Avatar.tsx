@@ -202,9 +202,9 @@ export const StackedAvatars = ({
   const displayed = accounts.length > maxDisplayedAvatars ? accounts.slice(0, maxDisplayedAvatars - 1) : accounts;
   const left = accounts.length - displayed.length;
   return (
-    <div className="flex gap-[-4px]">
+    <div className="flex items-center">
       {displayed.map(account => (
-        <div key={account.id || account.slug} className="flex items-center first:ml-0" style={{ marginLeft }}>
+        <div key={account.id || account.slug} className="flex items-center first:!ml-0" style={{ marginLeft }}>
           <Avatar
             collective={account}
             radius={imageSize}

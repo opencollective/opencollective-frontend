@@ -57,10 +57,11 @@ export const previewFeatures: PreviewFeature[] = [
   },
   {
     key: PREVIEW_FEATURE_KEYS.CROWDFUNDING_REDESIGN,
-    title: 'New Crowdfunding Page',
-    description: 'Use new Collective and Accounts pages to create a crowdfunding campaign.',
+    title: 'Crowdfunding Redesign',
+    description:
+      'Be part of the crowdfunding redesign effort and get access to previews of new crowdfunding and profile pages',
     alwaysEnableInDev: true,
-    publicBeta: false,
+    publicBeta: true,
     closedBetaAccessFor: ['opencollective', 'design', 'engineering'],
   },
 ];
