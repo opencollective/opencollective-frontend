@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { values } from 'lodash';
 import { useIntl } from 'react-intl';
@@ -46,10 +46,12 @@ import {
   ALL_SECTIONS,
   LEGACY_SECTIONS,
   LEGACY_SETTINGS_SECTIONS,
+  ROOT_PROFILE_KEY,
   SECTION_LABELS,
   SECTIONS,
   SETTINGS_SECTIONS,
 } from './constants';
+import { DashboardContext } from './DashboardContext';
 import DashboardHeader from './DashboardHeader';
 
 const DASHBOARD_COMPONENTS = {
@@ -92,6 +94,8 @@ const ROOT_COMPONENTS = {
 
 const DashboardSection = ({ account, isLoading, section, subpath }) => {
   const { LoggedInUser } = useLoggedInUser();
+  const { activeSlug } = useContext(DashboardContext);
+
   const { formatMessage } = useIntl();
 
   if (isLoading) {
@@ -105,7 +109,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
   }
 
   const RootComponent = ROOT_COMPONENTS[section];
-  if (RootComponent && LoggedInUser.isRoot) {
+  if (RootComponent && LoggedInUser.isRoot && activeSlug === ROOT_PROFILE_KEY) {
     return (
       <div className="w-full pb-6">
         <RootComponent subpath={subpath} isDashboard />
