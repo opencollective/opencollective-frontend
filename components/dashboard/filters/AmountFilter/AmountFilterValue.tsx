@@ -8,7 +8,10 @@ import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import type { AmountFilterValueType } from './schema';
 import { AmountFilterType } from './schema';
 
-const Amount = ({ amount, currency }: { amount: number; currency: Currency }) => {
+const Amount = ({ amount, currency }: { amount: number; currency?: Currency }) => {
+  if (!currency) {
+    return amount ? amount / 100 : '';
+  }
   return (
     <FormattedMoneyAmount
       amount={amount}
