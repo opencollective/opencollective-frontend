@@ -1,9 +1,9 @@
 {
   "++1FQ+": "Kirim pengingat tentang kartu kredit yang telah kedaluwarsa ke <Account></Account>",
-  "+5Kafe": "Expense Details",
+  "+5Kafe": "Rincian Pengeluaran",
   "+5KHJy": "Hapus token",
-  "+5TQLy": "<Individual></Individual> requested re-approval of <Expense>{expenseDescription}</Expense>",
-  "+5Vgek": "Vendor's legal name",
+  "+5TQLy": "<Individual></Individual> mengajukan re-approval untuk <Expense>{expenseDescription}</Expense>",
+  "+5Vgek": "Nama Legal Vendor",
   "+5zXCv": "Your contributors will be notified with a link to easily resume their contributions. We will also send a few periodic reminders, in case they miss the first email.",
   "+9+Ty6": "View related transactions",
   "+a+2ug": "Anggota",
