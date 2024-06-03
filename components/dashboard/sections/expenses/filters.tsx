@@ -129,16 +129,17 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   },
   lastCommentBy: {
     labelMsg: defineMessage({ id: 'expenses.lastCommentByFilter', defaultMessage: 'Last Comment By' }),
-    Component: ({ valueRenderer, intl, ...props }) => (
-      <ComboSelectFilter
-        options={Object.values(LastCommentBy).map(value => ({
-          value,
-          label: valueRenderer({ value, intl }),
-        }))}
-        isMulti
-        {...props}
-      />
-    ),
+    Component: ({ valueRenderer, intl, ...props }) => {
+      const options = React.useMemo(
+        () =>
+          Object.values(LastCommentBy).map(value => ({
+            value,
+            label: valueRenderer({ value, intl }),
+          })),
+        [valueRenderer, intl],
+      );
+      return <ComboSelectFilter options={options} isMulti {...props} />;
+    },
     valueRenderer: ({ value, intl }) => intl.formatMessage(LastCommentByFilterLabels[value]),
   },
   virtualCard: {
