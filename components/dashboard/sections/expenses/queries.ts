@@ -15,7 +15,7 @@ export const accountExpensesQuery = gql`
     $offset: Int!
     $type: ExpenseType
     $tags: [String]
-    $status: ExpenseStatusFilter
+    $status: [ExpenseStatusFilter]
     $minAmount: Int
     $maxAmount: Int
     $payoutMethodType: PayoutMethodType
@@ -138,7 +138,7 @@ export const hostDashboardExpensesQuery = gql`
     $offset: Int!
     $type: ExpenseType
     $tags: [String]
-    $status: ExpenseStatusFilter
+    $status: [ExpenseStatusFilter]
     $minAmount: Int
     $maxAmount: Int
     $payoutMethodType: PayoutMethodType
@@ -247,22 +247,22 @@ export const hostDashboardMetadataQuery = gql`
     all: expenses(host: { slug: $hostSlug }) {
       totalCount
     }
-    ready_to_pay: expenses(host: { slug: $hostSlug }, status: READY_TO_PAY) {
+    ready_to_pay: expenses(host: { slug: $hostSlug }, status: [READY_TO_PAY]) {
       totalCount
     }
-    scheduled_for_payment: expenses(host: { slug: $hostSlug }, status: SCHEDULED_FOR_PAYMENT) {
+    scheduled_for_payment: expenses(host: { slug: $hostSlug }, status: [SCHEDULED_FOR_PAYMENT]) {
       totalCount
     }
-    on_hold: expenses(host: { slug: $hostSlug }, status: ON_HOLD) {
+    on_hold: expenses(host: { slug: $hostSlug }, status: [ON_HOLD]) {
       totalCount
     }
-    incomplete: expenses(host: { slug: $hostSlug }, status: INCOMPLETE) {
+    incomplete: expenses(host: { slug: $hostSlug }, status: [INCOMPLETE]) {
       totalCount
     }
-    error: expenses(host: { slug: $hostSlug }, status: ERROR) {
+    error: expenses(host: { slug: $hostSlug }, status: [ERROR]) {
       totalCount
     }
-    paid: expenses(host: { slug: $hostSlug }, status: PAID) {
+    paid: expenses(host: { slug: $hostSlug }, status: [PAID]) {
       totalCount
     }
 
