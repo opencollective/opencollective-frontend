@@ -3438,6 +3438,7 @@
   "uM2WZi": "Recevoir des contributions financières par carte de crédit et mettre à jour automatiquement votre budget pour un suivi transparent. *Des frais Stripe s'appliquent",
   "umr49S": "Are you sure you want to publish this update?",
   "uMuuUg": "Cette valeur ne correspond pas à celle numérisée depuis le document ({value})",
+  "umVJL7": "View all paid expenses",
   "Un1mxZ": "Ajouter un tag",
   "unarchive.account.confirmation": "Êtes-vous sûr de vouloir désarchiver {type, select, EVENT {cet événement} PROJECT {ce projet} FUND {ce fond} COLLECTIVE {ce collectif} ORGANIZATION {cette organisation} other {ce compte}} ?",
   "unarchive.modal.header": "Désarchiver {name}",

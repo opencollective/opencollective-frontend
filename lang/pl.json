@@ -3438,6 +3438,7 @@
   "uM2WZi": "Otrzymuj wkłady finansowe za pomocą karty kredytowej, automatycznie aktualizując swój budżet w celu przejrzystego śledzenia. *Opłaty Stripe obowiązują",
   "umr49S": "Are you sure you want to publish this update?",
   "uMuuUg": "This value does not match the one scanned from the document ({value})",
+  "umVJL7": "View all paid expenses",
   "Un1mxZ": "Add tag",
   "unarchive.account.confirmation": "Czy na pewno chcesz odarchiwizować {type, select, EVENT {te Wydarzenie} PROJECT {ten Projekt} FUND {ten Fundusz} COLLECTIVE {tę Zbiorkę} ORGANIZATION {tę Organizację} other {to konto}}?",
   "unarchive.modal.header": "Zdezarchiwizuj {name}",

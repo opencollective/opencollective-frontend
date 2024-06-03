@@ -3438,6 +3438,7 @@
   "uM2WZi": "Recibe contribuciones financieras a través de una tarjeta de crédito, actualizando automáticamente tu presupuesto para un seguimiento transparente. *Se aplican tarifas de Stripe",
   "umr49S": "Are you sure you want to publish this update?",
   "uMuuUg": "Este valor no coincide con el escaneado del documento ({value})",
+  "umVJL7": "View all paid expenses",
   "Un1mxZ": "Añadir etiqueta",
   "unarchive.account.confirmation": "¿Estás seguro de que quieres desarchivar {type, select, EVENT {este Evento} PROJECT {este Proyecto} FUND {este Fondo} COLLECTIVE {este Colectivo} ORGANIZATION {esta Organización} other {esta cuenta}}?",
   "unarchive.modal.header": "Desarchivar {name}",

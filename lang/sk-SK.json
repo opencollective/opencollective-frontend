@@ -3438,6 +3438,7 @@
   "uM2WZi": "Prijímajte finančné príspevky prostredníctvom kreditnej karty a automaticky aktualizujte svoj rozpočet pre transparentné sledovanie. *spoplatnené používanie služby Stripe",
   "umr49S": "Are you sure you want to publish this update?",
   "uMuuUg": "This value does not match the one scanned from the document ({value})",
+  "umVJL7": "View all paid expenses",
   "Un1mxZ": "Add tag",
   "unarchive.account.confirmation": "Ste si istí, že chcete zrušiť archiváciu {type, select, EVENT {tohto Podujatia} PROJECT {tohto Projektu} FUND {tohto Fondu} COLLECTIVE {tohto Kolektívu} ORGANIZATION {tejto Organizácie} other {tohto účtu}}?",
   "unarchive.modal.header": "Zrušiť archiváciu {name}",
