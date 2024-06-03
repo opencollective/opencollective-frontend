@@ -617,7 +617,7 @@ interface Account {
     """
     Use this field to filter expenses on their statuses
     """
-    status: ExpenseStatusFilter
+    status: [ExpenseStatusFilter]
 
     """
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
@@ -689,6 +689,11 @@ interface Account {
     Filter expenses of type charges using these virtual cards
     """
     virtualCards: [VirtualCardReferenceInput]
+
+    """
+    Filter expenses by the last user-role who replied to them
+    """
+    lastCommentBy: [LastCommentBy]
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -2282,7 +2287,7 @@ type Host implements Account & AccountWithContributions {
     """
     Use this field to filter expenses on their statuses
     """
-    status: ExpenseStatusFilter
+    status: [ExpenseStatusFilter]
 
     """
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
@@ -2354,6 +2359,11 @@ type Host implements Account & AccountWithContributions {
     Filter expenses of type charges using these virtual cards
     """
     virtualCards: [VirtualCardReferenceInput]
+
+    """
+    Filter expenses by the last user-role who replied to them
+    """
+    lastCommentBy: [LastCommentBy]
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -4262,6 +4272,26 @@ enum PayoutMethodType {
 The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
 scalar JSON
+
+"""
+Defines role of the last comment author
+"""
+enum LastCommentBy {
+  """
+  Expense Submitter
+  """
+  USER
+
+  """
+  Fiscal Host Admin
+  """
+  HOST_ADMIN
+
+  """
+  Collective Admin
+  """
+  COLLECTIVE_ADMIN
+}
 
 """
 A collection of "Conversations"
@@ -7430,7 +7460,7 @@ type Bot implements Account {
     """
     Use this field to filter expenses on their statuses
     """
-    status: ExpenseStatusFilter
+    status: [ExpenseStatusFilter]
 
     """
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
@@ -7502,6 +7532,11 @@ type Bot implements Account {
     Filter expenses of type charges using these virtual cards
     """
     virtualCards: [VirtualCardReferenceInput]
+
+    """
+    Filter expenses by the last user-role who replied to them
+    """
+    lastCommentBy: [LastCommentBy]
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -8177,7 +8212,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     Use this field to filter expenses on their statuses
     """
-    status: ExpenseStatusFilter
+    status: [ExpenseStatusFilter]
 
     """
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
@@ -8249,6 +8284,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Filter expenses of type charges using these virtual cards
     """
     virtualCards: [VirtualCardReferenceInput]
+
+    """
+    Filter expenses by the last user-role who replied to them
+    """
+    lastCommentBy: [LastCommentBy]
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -9377,7 +9417,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     Use this field to filter expenses on their statuses
     """
-    status: ExpenseStatusFilter
+    status: [ExpenseStatusFilter]
 
     """
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
@@ -9449,6 +9489,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Filter expenses of type charges using these virtual cards
     """
     virtualCards: [VirtualCardReferenceInput]
+
+    """
+    Filter expenses by the last user-role who replied to them
+    """
+    lastCommentBy: [LastCommentBy]
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -10359,7 +10404,7 @@ type Individual implements Account {
     """
     Use this field to filter expenses on their statuses
     """
-    status: ExpenseStatusFilter
+    status: [ExpenseStatusFilter]
 
     """
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
@@ -10431,6 +10476,11 @@ type Individual implements Account {
     Filter expenses of type charges using these virtual cards
     """
     virtualCards: [VirtualCardReferenceInput]
+
+    """
+    Filter expenses by the last user-role who replied to them
+    """
+    lastCommentBy: [LastCommentBy]
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -11312,7 +11362,7 @@ type Organization implements Account & AccountWithContributions {
     """
     Use this field to filter expenses on their statuses
     """
-    status: ExpenseStatusFilter
+    status: [ExpenseStatusFilter]
 
     """
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
@@ -11384,6 +11434,11 @@ type Organization implements Account & AccountWithContributions {
     Filter expenses of type charges using these virtual cards
     """
     virtualCards: [VirtualCardReferenceInput]
+
+    """
+    Filter expenses by the last user-role who replied to them
+    """
+    lastCommentBy: [LastCommentBy]
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -12159,7 +12214,7 @@ type Vendor implements Account & AccountWithContributions {
     """
     Use this field to filter expenses on their statuses
     """
-    status: ExpenseStatusFilter
+    status: [ExpenseStatusFilter]
 
     """
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
@@ -12231,6 +12286,11 @@ type Vendor implements Account & AccountWithContributions {
     Filter expenses of type charges using these virtual cards
     """
     virtualCards: [VirtualCardReferenceInput]
+
+    """
+    Filter expenses by the last user-role who replied to them
+    """
+    lastCommentBy: [LastCommentBy]
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -12691,6 +12751,11 @@ type Query {
     Include vendors for this host
     """
     includeVendorsForHost: AccountReferenceInput
+
+    """
+    Filter by the balance of the account and its children accounts (events and projects)
+    """
+    consolidatedBalance: AmountRangeInput
   ): AccountCollection!
   activities(
     """
@@ -12867,7 +12932,7 @@ type Query {
     """
     Use this field to filter expenses on their statuses
     """
-    status: ExpenseStatusFilter
+    status: [ExpenseStatusFilter]
 
     """
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
@@ -12939,6 +13004,11 @@ type Query {
     Filter expenses of type charges using these virtual cards
     """
     virtualCards: [VirtualCardReferenceInput]
+
+    """
+    Filter expenses by the last user-role who replied to them
+    """
+    lastCommentBy: [LastCommentBy]
   ): ExpenseCollection!
   expenseTagStats(
     """
@@ -15474,7 +15544,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     Use this field to filter expenses on their statuses
     """
-    status: ExpenseStatusFilter
+    status: [ExpenseStatusFilter]
 
     """
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
@@ -15546,6 +15616,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Filter expenses of type charges using these virtual cards
     """
     virtualCards: [VirtualCardReferenceInput]
+
+    """
+    Filter expenses by the last user-role who replied to them
+    """
+    lastCommentBy: [LastCommentBy]
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -16334,7 +16409,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     Use this field to filter expenses on their statuses
     """
-    status: ExpenseStatusFilter
+    status: [ExpenseStatusFilter]
 
     """
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
@@ -16406,6 +16481,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Filter expenses of type charges using these virtual cards
     """
     virtualCards: [VirtualCardReferenceInput]
+
+    """
+    Filter expenses by the last user-role who replied to them
+    """
+    lastCommentBy: [LastCommentBy]
   ): ExpenseCollection!
   settings: JSON!
   conversations(
