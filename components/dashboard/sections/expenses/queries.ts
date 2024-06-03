@@ -149,6 +149,7 @@ export const hostDashboardExpensesQuery = gql`
     $chargeHasReceipts: Boolean
     $virtualCards: [VirtualCardReferenceInput]
     $account: AccountReferenceInput
+    $lastCommentBy: [LastCommentBy]
   ) {
     expenses(
       host: { slug: $hostSlug }
@@ -167,6 +168,7 @@ export const hostDashboardExpensesQuery = gql`
       orderBy: $sort
       chargeHasReceipts: $chargeHasReceipts
       virtualCards: $virtualCards
+      lastCommentBy: $lastCommentBy
     ) {
       totalCount
       offset
@@ -245,6 +247,9 @@ export const hostDashboardMetadataQuery = gql`
       }
     }
     all: expenses(host: { slug: $hostSlug }) {
+      totalCount
+    }
+    unreplied: expenses(host: { slug: $hostSlug }, status: [APPROVED, ERROR, INCOMPLETE], lastCommentBy: [USER]) {
       totalCount
     }
     ready_to_pay: expenses(host: { slug: $hostSlug }, status: [READY_TO_PAY]) {
