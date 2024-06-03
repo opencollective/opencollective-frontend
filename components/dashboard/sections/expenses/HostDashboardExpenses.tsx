@@ -167,7 +167,7 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const queryFilter = useQueryFilter({
     schema: filterSchema,
     toVariables,
-    defaultFilterValues: views[1].filter,
+    defaultFilterValues: views[2].filter,
     filters,
     meta,
     views,
