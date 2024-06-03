@@ -56,20 +56,20 @@ export const HOSTS = [
     logo: '/static/images/fiscal-hosting/oce.png',
   },
   {
-    id: 'OCN',
-    name: 'Open Collective NZ',
-    location: '🇳🇿 New Zealand',
-    collectivePath: '/ocnz/apply',
-    bgImage: 'ocn-bg',
-    logo: '/static/images/fiscal-hosting/ocn.png',
-  },
-  {
     id: 'giftcollective',
     name: 'Gift Collective',
     location: '🇳🇿 New Zealand',
     collectivePath: '/giftcollective/apply',
     bgImage: 'giftcollective-bg',
     logo: '/static/images/fiscal-hosting/giftcollective.png',
+  },
+  {
+    id: 'allForClimate',
+    name: 'All for climate',
+    location: ' 🇪🇺 Europe',
+    collectivePath: '/allforclimate/apply',
+    bgImage: 'allforclimate-collective-bg',
+    logo: '/static/images/fiscal-hosting/allforclimate-collective-logo.png',
   },
   {
     id: 'socialchangenestcollective',
@@ -80,12 +80,12 @@ export const HOSTS = [
     logo: '/static/images/become-a-host/socialchangenest-logo.png',
   },
   {
-    id: 'allForClimate',
-    name: 'All for climate',
-    location: ' 🇪🇺 Europe',
-    collectivePath: '/allforclimate/apply',
-    bgImage: 'allforclimate-collective-bg',
-    logo: '/static/images/fiscal-hosting/allforclimate-collective-logo.png',
+    id: 'platform6',
+    name: 'Platform 6 Coop',
+    location: ' 🇬🇧 United Kingdom',
+    collectivePath: '/platform6-coop/apply',
+    bgImage: 'platform6-bg',
+    logo: '/static/images/fiscal-hosting/platform6.png',
   },
 ];
 

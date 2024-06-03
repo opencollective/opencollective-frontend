@@ -44,13 +44,14 @@ const messages = defineMessages({
     defaultMessage:
       'A Brussels-based nonprofit hosting groups across Europe, including open source projects and community social action.',
   },
-  'fiscalHosting.hosts.OCN': {
-    id: 'fiscalHosting.hosts.OCN',
-    defaultMessage: 'Offering kiwi impact projects fundholding options through a charity or a company structure.',
-  },
   'fiscalHosting.hosts.giftcollective': {
     id: 'fiscalHosting.hosts.giftcollective',
     defaultMessage: 'A NZ-based charitable entity hosting grassroots/community groups with a charitable focus.',
+  },
+  'fiscalHosting.hosts.platform6': {
+    id: 'fiscalHosting.hosts.platform6',
+    defaultMessage:
+      'Using tech and platform/ecosystem thinking to grow the cooperative economy through P2P mutual support and collaborative crowdfunding.',
   },
 });
 

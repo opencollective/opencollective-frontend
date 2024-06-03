@@ -122,13 +122,13 @@ const collectives = [
     ),
   },
   {
-    id: 'ocnz',
-    path: '/ocnz',
+    id: 'giftcollective',
+    path: '/giftcollective',
     image: {
       width: 330,
       height: 316,
       transform: 'translate(-0.0218706) scale(0.00316285)',
-      xlinkHref: '/static/images/new-home/oc-nz-logo.png',
+      xlinkHref: '/static/images/fiscal-hosting/giftcollective.png',
     },
     render: id => (
       <React.Fragment>
