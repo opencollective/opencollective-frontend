@@ -43,7 +43,7 @@
     "@shopify/address": "4.2.2",
     "@simplewebauthn/browser": "9.0.1",
     "@stripe/react-stripe-js": "2.7.1",
-    "@stripe/stripe-js": "2.4.0",
+    "@stripe/stripe-js": "3.5.0",
     "@styled-icons/boxicons-regular": "10.47.0",
     "@styled-icons/boxicons-solid": "10.47.0",
     "@styled-icons/fa-brands": "10.47.0",
