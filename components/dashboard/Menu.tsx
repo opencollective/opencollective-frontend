@@ -65,6 +65,7 @@ const ROOT_MENU = [
   {
     section: ALL_SECTIONS.ACTIVITY_LOG,
     Icon: ScrollText,
+    label: <FormattedMessage id="t0lUqz" defaultMessage="Activity log" />,
   },
 ];
 

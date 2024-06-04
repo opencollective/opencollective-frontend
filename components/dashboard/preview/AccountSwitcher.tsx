@@ -3,7 +3,7 @@ import { PopoverAnchor } from '@radix-ui/react-popover';
 import { cx } from 'class-variance-authority';
 import clsx from 'clsx';
 import { useCommandState } from 'cmdk';
-import { flatten, groupBy, uniqBy } from 'lodash';
+import { compact, flatten, groupBy, uniqBy } from 'lodash';
 import { Check, ChevronsUpDown, PlusCircle, Star } from 'lucide-react';
 import memoizeOne from 'memoize-one';
 // eslint-disable-next-line no-restricted-imports -- components/Link does not currently accept a ref, whichis required when used 'asChild' of Button
@@ -25,6 +25,7 @@ import { Button } from '../../ui/Button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '../../ui/Command';
 import { Popover, PopoverContent, PopoverTrigger } from '../../ui/Popover';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../ui/Tooltip';
+import { ROOT_PROFILE_ACCOUNT } from '../constants';
 
 const CREATE_NEW_BUTTONS = {
   [CollectiveType.COLLECTIVE]: {
@@ -219,7 +220,7 @@ const AccountsCommand = ({
 
 const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
   let administratedAccounts =
-    loggedInUser?.memberOf.filter(m => m.role === 'ADMIN' && !m.collective.isIncognito).map(m => m.collective) || [];
+    loggedInUser.memberOf.filter(m => m.role === 'ADMIN' && !m.collective.isIncognito).map(m => m.collective) || [];
 
   // Filter out accounts if the user is also an admin of the parent of that account (since we already show the parent)
   const childAccountIds = flatten(administratedAccounts.map(a => a.children)).map((a: { id: number }) => a.id);
@@ -231,7 +232,7 @@ const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
   const activeAccounts = administratedAccounts.filter(a => !a.isArchived);
 
   const groupedAccounts = {
-    [CollectiveType.INDIVIDUAL]: [loggedInUser.collective],
+    [CollectiveType.INDIVIDUAL]: compact([loggedInUser.collective, loggedInUser.isRoot && ROOT_PROFILE_ACCOUNT]),
     [CollectiveType.ORGANIZATION]: [],
     [CollectiveType.COLLECTIVE]: [],
     ...groupBy(activeAccounts, a => a.type),
