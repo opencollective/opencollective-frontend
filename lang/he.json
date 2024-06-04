@@ -3438,6 +3438,7 @@
   "uM2WZi": "קבלת כספים באמצעות כרטיסי אשראי, עדכון אוטומטי של התקציב למעקב שקוף. *ייתכנו עמלות Stripe",
   "umr49S": "Are you sure you want to publish this update?",
   "uMuuUg": "This value does not match the one scanned from the document ({value})",
+  "umVJL7": "View all paid expenses",
   "Un1mxZ": "Add tag",
   "unarchive.account.confirmation": "האם ברצונך לשחזר מהארכיון {type, select,EVENT {אירוע זה}PROJECT {פרויקט זה}FUND {קופה זו}COLLECTIVE {קבוצה זו}ORGANIZATION {ארגון זה} other {חשבון זה}}?",
   "unarchive.modal.header": "הוצאת {name} מהארכיון",
