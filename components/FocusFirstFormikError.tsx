@@ -1,5 +1,8 @@
 import React from 'react';
 import { useFormikContext } from 'formik';
+import { pick } from 'lodash';
+
+import { captureMessage } from '../server/sentry';
 
 import { ERROR_CLASS_NAME } from './StyledInputFormikField';
 
@@ -14,8 +17,12 @@ export const FocusFirstFormikError = ({ children }: { children: React.ReactNode 
       return;
     }
 
-    const errorField = document.querySelector(`.${ERROR_CLASS_NAME}`) as HTMLElement;
+    const errorField = document.querySelector(`.${ERROR_CLASS_NAME}`);
     if (!errorField) {
+      captureMessage('FocusFirstFormikError: No error field found', {
+        extra: { formik: pick(formik, ['errors', 'values', 'touched', 'submitCount']) },
+      });
+
       return;
     }
 
