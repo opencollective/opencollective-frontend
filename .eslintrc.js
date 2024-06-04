@@ -1,4 +1,8 @@
 const baseConfig = {
+  parser: '@typescript-eslint/parser',
+  parserOptions: {
+    project: ['tsconfig.json'],
+  },
   processor: '@graphql-eslint/graphql',
   env: {
     jest: true,
@@ -9,7 +13,6 @@ const baseConfig = {
     'no-console': 'error',
     'require-atomic-updates': 'off',
     'lines-between-class-members': ['error', 'always', { exceptAfterSingleLine: true }],
-    'node/no-missing-import': ['error', { tryExtensions: ['.js', '.ts', '.tsx'] }],
     'no-restricted-imports': [
       'error',
       {
@@ -144,7 +147,6 @@ module.exports = {
     {
       files: ['*.ts', '*.tsx'],
       ...baseConfig,
-      extends: [...baseConfig.extends, 'plugin:@typescript-eslint/recommended'],
       rules: {
         ...baseConfig.rules,
         '@typescript-eslint/no-explicit-any': 'warn',
