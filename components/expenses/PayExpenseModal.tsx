@@ -285,6 +285,11 @@ const getInitialValues = (expense, host) => {
 };
 
 const calculateAmounts = ({ values, expense, quote, host, feesPayer }) => {
+  const expenseAmountInHostCurrency = {
+    valueInCents: values.expenseAmountInHostCurrency,
+    currency: host.currency,
+  };
+
   if (values.forceManual) {
     const totalAmount = {
       valueInCents: values.expenseAmountInHostCurrency + (values.paymentProcessorFeeInHostCurrency || 0),
@@ -292,10 +297,6 @@ const calculateAmounts = ({ values, expense, quote, host, feesPayer }) => {
     };
     const paymentProcessorFee = {
       valueInCents: values.paymentProcessorFeeInHostCurrency,
-      currency: host.currency,
-    };
-    const expenseAmountInHostCurrency = {
-      valueInCents: values.expenseAmountInHostCurrency,
       currency: host.currency,
     };
     const grossAmount = totalAmount.valueInCents - (paymentProcessorFee.valueInCents || 0);
@@ -318,7 +319,7 @@ const calculateAmounts = ({ values, expense, quote, host, feesPayer }) => {
       expenseAmountInHostCurrency,
     };
   } else {
-    return {};
+    return { expenseAmountInHostCurrency, totalAmount: expenseAmountInHostCurrency, paymentProcessorFee: null };
   }
 };
 
