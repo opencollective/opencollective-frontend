@@ -21,9 +21,7 @@ const ContributorCardWithTier = ({ contribution, ...props }) => {
   const pendingOrder = contribution.status === ORDER_STATUS.PENDING;
 
   const tagMessages = {
-    [ORDER_STATUS.PENDING]: (
-      <FormattedMessage id="NewContributionFlow.PendingContribution" defaultMessage="Pending contribution" />
-    ),
+    [ORDER_STATUS.PENDING]: <FormattedMessage id="ExpectedFunds" defaultMessage="Expected Funds" />,
     [ORDER_STATUS.PROCESSING]: (
       <FormattedMessage id="NewContributionFlow.ProcessingContribution" defaultMessage="Processing Payment" />
     ),

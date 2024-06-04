@@ -248,7 +248,7 @@ const Transactions = ({
             label={
               <FormattedMessage
                 id="transactions.displayPendingContributions"
-                defaultMessage="Display pending contributions"
+                defaultMessage="Display expected funds"
               />
             }
           />

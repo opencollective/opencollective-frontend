@@ -699,7 +699,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
         description: (
           <FormattedMessage
             id="Order.MarkPaidExpiredDetails"
-            defaultMessage="This contribution will be marked as expired removed from Pending Contributions. You can find this page by searching for its ID in the search bar or through the status filter in the Financial Contributions page."
+            defaultMessage="This contribution will be marked as expired removed from Expected Funds. You can find this page by searching for its ID in the search bar or through the status filter in the Financial Contributions page."
           />
         ),
         onConfirm: async () => {
@@ -771,7 +771,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
                   data-cy="create-pending-contribution"
                 >
                   <span>
-                    <FormattedMessage defaultMessage="Create pending" id="clx/0D" />
+                    <FormattedMessage defaultMessage="Create" id="create" />
                   </span>
                   <PlusIcon size={20} />
                 </Button>
