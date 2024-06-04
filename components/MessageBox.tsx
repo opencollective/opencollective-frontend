@@ -5,26 +5,21 @@ import { ExclamationTriangle } from '@styled-icons/fa-solid/ExclamationTriangle'
 import { InfoCircle } from '@styled-icons/fa-solid/InfoCircle';
 import { themeGet } from '@styled-system/theme-get';
 import styled from 'styled-components';
-import {
-  borders,
+import type {
   BordersProps,
-  color,
-  display,
   DisplayProps,
-  flexbox,
   FlexboxProps,
-  layout,
   LayoutProps,
-  shadow,
   ShadowProps,
-  space,
   SpaceProps,
-  typography,
   TypographyProps,
 } from 'styled-system';
+import { borders, color, display, flexbox, layout, shadow, space, typography } from 'styled-system';
 
-import { whiteSpace, WhiteSpaceProps } from '../lib/styled-system-custom-properties';
-import { MessageType, messageType } from '../lib/theme/variants/message';
+import type { WhiteSpaceProps } from '../lib/styled-system-custom-properties';
+import { whiteSpace } from '../lib/styled-system-custom-properties';
+import type { MessageType } from '../lib/theme/variants/message';
+import { messageType } from '../lib/theme/variants/message';
 
 import { Box, Flex } from './Grid';
 import StyledSpinner from './StyledSpinner';

@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 
-import { BaseModalProps } from '../../../ModalContext';
+import type { BaseModalProps } from '../../../ModalContext';
 import TransactionRejectMessageForm from '../../../transactions/TransactionRejectMessageForm';
 import {
   AlertDialog,
@@ -23,6 +23,21 @@ const rejectTransactionMutation = gql`
   mutation RejectTransaction($transaction: TransactionReferenceInput!, $message: String) {
     rejectTransaction(transaction: $transaction, message: $message) {
       id
+      order {
+        id
+        status
+        activities {
+          nodes {
+            id
+            type
+            createdAt
+          }
+        }
+        transactions {
+          id
+          createdAt
+        }
+      }
     }
   }
 `;

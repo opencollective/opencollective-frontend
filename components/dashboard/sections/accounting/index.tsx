@@ -7,12 +7,12 @@ import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import {
+import type {
   AccountingCategory,
-  AccountingCategoryKind,
   AdminAccountingCategoriesQuery,
   AdminAccountingCategoriesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
+import { AccountingCategoryKind } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
@@ -25,10 +25,11 @@ import { buildComboSelectFilter } from '../../filters/ComboSelectFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { buildOrderByFilter } from '../../filters/OrderFilter';
 import { searchFilter } from '../../filters/SearchFilter';
-import { DashboardSectionProps } from '../../types';
+import type { DashboardSectionProps } from '../../types';
 
 import { AccountingCategoriesTable } from './AccountingCategoriesTable';
-import { AccountingCategoryKindI18n, EditableAccountingCategoryFields } from './AccountingCategoryForm';
+import type { EditableAccountingCategoryFields } from './AccountingCategoryForm';
+import { AccountingCategoryKindI18n } from './AccountingCategoryForm';
 import { CreateAccountingCategoryModal } from './CreateAccountingCategoryModal';
 
 const accountingCategoriesQuery = gql`

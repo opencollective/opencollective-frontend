@@ -5,27 +5,23 @@ import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
-import { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
+import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import { Account, ExpensesPageQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import type { Account, ExpensesPageQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
 import ExpensesList from '../../../expenses/ExpensesList';
-import Pagination from '../../../Pagination';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { expenseTagFilter } from '../../filters/ExpenseTagsFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { AccountRenderer } from '../../filters/HostedAccountFilter';
-import { DashboardSectionProps } from '../../types';
+import { Pagination } from '../../filters/Pagination';
+import type { DashboardSectionProps } from '../../types';
 
-import {
-  FilterMeta as CommonFilterMeta,
-  filters as commonFilters,
-  schema as commonSchema,
-  toVariables as commonToVariables,
-} from './filters';
+import type { FilterMeta as CommonFilterMeta } from './filters';
+import { filters as commonFilters, schema as commonSchema, toVariables as commonToVariables } from './filters';
 import { accountExpensesMetadataQuery, accountExpensesQuery } from './queries';
 
 const schema = commonSchema.extend({
@@ -145,15 +141,7 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
               );
             }}
           />
-          <div className="mt-12 flex justify-center">
-            <Pagination
-              route={pageRoute}
-              total={data?.expenses?.totalCount}
-              limit={queryFilter.values.limit}
-              offset={queryFilter.values.offset}
-              ignoredQueryParams={ROUTE_PARAMS}
-            />
-          </div>
+          <Pagination queryFilter={queryFilter} total={data?.expenses?.totalCount} />
         </React.Fragment>
       )}
     </div>

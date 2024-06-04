@@ -8,10 +8,10 @@ import { PayoutMethodType } from '../../../lib/constants/payout-method';
 import { diffExchangeRates } from '../../../lib/currency-utils';
 
 import { validateTaxInput } from '../../taxes/TaxesFormikFields';
-import { ExpenseItemFormValues } from '../types/FormValues';
+import type { ExpenseItemFormValues } from '../types/FormValues';
 
 // Please adjust the values below based on `prepareItems` from `api/server/graphql/common/expenses.ts`
-// ignore unused exports FX_RATE_WARNING_THRESHOLD
+// ts-unused-exports:disable-next-line
 export const FX_RATE_WARNING_THRESHOLD = 0.02;
 export const FX_RATE_ERROR_THRESHOLD = 0.1;
 

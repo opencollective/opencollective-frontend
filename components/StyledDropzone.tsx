@@ -3,18 +3,20 @@ import { ExclamationCircle } from '@styled-icons/fa-solid/ExclamationCircle';
 import { Download as DownloadIcon } from '@styled-icons/feather/Download';
 import { isNil, omit } from 'lodash';
 import { Upload } from 'lucide-react';
-import { Accept, FileRejection, useDropzone } from 'react-dropzone';
+import type { Accept, FileRejection } from 'react-dropzone';
+import { useDropzone } from 'react-dropzone';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { v4 as uuid } from 'uuid';
 
-import { OcrParsingOptionsInput, UploadedFileKind, UploadFileResult } from '../lib/graphql/types/v2/graphql';
+import type { OcrParsingOptionsInput, UploadedFileKind, UploadFileResult } from '../lib/graphql/types/v2/graphql';
 import { useGraphQLFileUploader } from '../lib/hooks/useGraphQLFileUploader';
 import { useImageUploader } from '../lib/hooks/useImageUploader';
 
 import { Button } from './ui/Button';
 import { useToast } from './ui/useToast';
-import Container, { ContainerProps } from './Container';
+import type { ContainerProps } from './Container';
+import Container from './Container';
 import { Box } from './Grid';
 import { getI18nLink } from './I18nFormatters';
 import LocalFilePreview from './LocalFilePreview';
@@ -22,7 +24,6 @@ import StyledSpinner from './StyledSpinner';
 import { P, Span } from './Text';
 import UploadedFilePreview from './UploadedFilePreview';
 
-// ignore unused exports DROPZONE_ACCEPT_PDF
 export const DROPZONE_ACCEPT_IMAGES = { 'image/*': ['.jpeg', '.png'] };
 export const DROPZONE_ACCEPT_PDF = { 'application/pdf': ['.pdf'] };
 export const DROPZONE_ACCEPT_ALL = { ...DROPZONE_ACCEPT_IMAGES, ...DROPZONE_ACCEPT_PDF };

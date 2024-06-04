@@ -3,7 +3,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { Currency } from '../../lib/constants/currency';
-import { Collective } from '../../lib/graphql/types/v2/graphql';
+import type { Collective } from '../../lib/graphql/types/v2/graphql';
 import useDebounced from '../../lib/hooks/useDebounced';
 
 import Container from '../Container';
@@ -20,7 +20,7 @@ import { H1, P } from '../Text';
 
 import FindAHostSearch from './FindAHostSearch';
 
-export type StartAcceptingFinancialContributionsPageProps = {
+type StartAcceptingFinancialContributionsPageProps = {
   collective: Collective;
   onChange: (field: string, value: unknown) => void;
 };

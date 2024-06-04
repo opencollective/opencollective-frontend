@@ -10,7 +10,7 @@ import { stripTime } from '../../lib/date-utils';
 import { i18nGraphqlException } from '../../lib/errors';
 import { requireFields } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import { Account, Agreement } from '../../lib/graphql/types/v2/graphql';
+import type { Account, Agreement } from '../../lib/graphql/types/v2/graphql';
 
 import AttachedFilesForm from '../attached-files/AttachedFilesForm';
 import CollectivePickerAsync from '../CollectivePickerAsync';
@@ -101,7 +101,7 @@ const ActionButtons = ({ formik, onCancel }) => (
       }}
     >
       {formik.values.id ? (
-        <FormattedMessage defaultMessage="Save Changes" id="3VI9mt" />
+        <FormattedMessage defaultMessage="Save Changes" id="SaveChanges" />
       ) : (
         <FormattedMessage defaultMessage="Create Agreement" id="LSsYSm" />
       )}

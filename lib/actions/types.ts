@@ -1,7 +1,7 @@
-import { LucideIcon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import type React from 'react';
 
-export type Action = {
+type Action = {
   label: string;
   onClick: () => void;
   Icon?: LucideIcon;

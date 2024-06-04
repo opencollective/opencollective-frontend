@@ -1,11 +1,12 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-import { z } from 'zod';
+import type { z } from 'zod';
 
-import { Badge, BadgeProps } from '../../../../ui/Badge';
+import type { BadgeProps } from '../../../../ui/Badge';
+import { Badge } from '../../../../ui/Badge';
 
 import { isCurrentPeriod } from './helpers';
-import { variablesSchema } from './ReportPeriodSelector';
+import type { variablesSchema } from './ReportPeriodSelector';
 
 export function CurrentPeriodBadge({
   variables,

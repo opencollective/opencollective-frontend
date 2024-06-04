@@ -5,7 +5,8 @@ import { FormikProvider, useFormik, useFormikContext } from 'formik';
 import { cloneDeep, get, kebabCase, omit, round } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
-import { border, BorderProps, color, space, SpaceProps, typography } from 'styled-system';
+import type { BorderProps, SpaceProps } from 'styled-system';
+import { border, color, space, typography } from 'styled-system';
 
 import { default as hasFeature, FEATURES } from '../../lib/allowed-features';
 import { EXPENSE_PAYMENT_METHOD_SERVICES } from '../../lib/constants/payment-methods';
@@ -163,10 +164,11 @@ const DEFAULT_PAYMENT_METHOD_SERVICE = {
 
 const getPayoutOptionValue = (payoutMethod, isAuto, host) => {
   const payoutMethodType = payoutMethod?.type;
+  const canAddTransferDetails = host.settings?.transferwise?.transferDetails === true;
   if (payoutMethodType === PayoutMethodType.OTHER) {
     return { forceManual: true, action: 'PAY', paymentMethodService: null };
-  } else if (payoutMethod?.data?.type === 'brazil') {
-    // TODO: remove this when we implement the missing Brazilian TRANSFER NATURE field.
+  } else if (payoutMethod?.data?.type === 'brazil' && !canAddTransferDetails) {
+    // TODO: remove this when we release transfer details for everyone.
     return { forceManual: true, action: 'PAY' };
   } else if (payoutMethodType === PayoutMethodType.BANK_ACCOUNT && !host.transferwise) {
     return { forceManual: true, action: 'PAY', paymentMethodService: 'WISE' };

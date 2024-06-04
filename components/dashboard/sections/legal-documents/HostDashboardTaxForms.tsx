@@ -3,17 +3,16 @@ import { useQuery } from '@apollo/client';
 import { defineMessage, FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
-import { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
+import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
-import { HostTaxFormsQueryVariables, LegalDocumentRequestStatus } from '../../../../lib/graphql/types/v2/graphql';
+import type { HostTaxFormsQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import { LegalDocumentRequestStatus } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nLegalDocumentStatus } from '../../../../lib/i18n/legal-document';
 import { sortSelectOptions } from '../../../../lib/utils';
 
-import { Flex } from '../../../Grid';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
-import Pagination from '../../../Pagination';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import { accountFilter } from '../../filters/AccountFilter';
@@ -22,8 +21,9 @@ import { dateFilter } from '../../filters/DateFilter';
 import { dateToVariables } from '../../filters/DateFilter/schema';
 import { Filterbar } from '../../filters/Filterbar';
 import { orderByFilter } from '../../filters/OrderFilter';
+import { Pagination } from '../../filters/Pagination';
 import { searchFilter } from '../../filters/SearchFilter';
-import { DashboardSectionProps } from '../../types';
+import type { DashboardSectionProps } from '../../types';
 
 import { useLegalDocumentActions } from './actions';
 import LegalDocumentDrawer from './LegalDocumentDrawer';
@@ -66,6 +66,7 @@ const hostDashboardTaxFormsQuery = gql`
           requestedAt
           updatedAt
           documentLink
+          isExpired
           account {
             id
             name
@@ -127,13 +128,6 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
   },
 };
 
-const IGNORED_QUERY_PARAMS = ['slug', 'section'];
-
-const hasPagination = (data, queryVariables): boolean => {
-  const totalCount = data?.host?.taxForms?.totalCount;
-  return Boolean(queryVariables.offset || (totalCount && totalCount > NB_LEGAL_DOCUMENTS_DISPLAYED));
-};
-
 const HostDashboardTaxForms = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const [focusedLegalDocumentId, setFocusedLegalDocumentId] = React.useState(null);
   const queryFilter = useQueryFilter({
@@ -142,7 +136,7 @@ const HostDashboardTaxForms = ({ accountSlug: hostSlug }: DashboardSectionProps)
     toVariables,
     meta: { hostSlug },
   });
-  const { data, previousData, error, variables, loading, refetch } = useQuery(hostDashboardTaxFormsQuery, {
+  const { data, error, loading, refetch } = useQuery(hostDashboardTaxFormsQuery, {
     variables: { hostSlug, ...queryFilter.variables },
     context: API_V2_CONTEXT,
   });
@@ -173,19 +167,7 @@ const HostDashboardTaxForms = ({ accountSlug: hostSlug }: DashboardSectionProps)
             getActions={getActions}
             onOpen={document => setFocusedLegalDocumentId(document.id)}
           />
-
-          <Flex my={4} justifyContent="center">
-            {hasPagination(data || previousData, variables) && (
-              <Pagination
-                variant="input"
-                offset={variables.offset}
-                limit={variables.limit}
-                total={(data || previousData)?.host?.taxForms?.totalCount || 0}
-                ignoredQueryParams={IGNORED_QUERY_PARAMS}
-                isDisabled={loading}
-              />
-            )}
-          </Flex>
+          <Pagination queryFilter={queryFilter} total={data?.host?.taxForms?.totalCount} />
           {data?.host && (
             <LegalDocumentDrawer
               open={Boolean(focusedLegalDocumentId)}

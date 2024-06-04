@@ -1,8 +1,11 @@
 import React from 'react';
-import { Formik, FormikConfig, FormikErrors, FormikValues, useFormik } from 'formik';
+import type { FormikConfig, FormikErrors, FormikValues } from 'formik';
+import { Formik, useFormik } from 'formik';
 import { get, isNil, mapValues, max, merge, set, xor } from 'lodash';
-import { IntlShape, useIntl } from 'react-intl';
-import { z, ZodEffects, ZodIssue, ZodNullable, ZodOptional, ZodTypeAny } from 'zod';
+import type { IntlShape } from 'react-intl';
+import { useIntl } from 'react-intl';
+import type { ZodEffects, ZodIssue, ZodNullable, ZodOptional, ZodTypeAny } from 'zod';
+import { z } from 'zod';
 
 import { RICH_ERROR_MESSAGES } from '../lib/form-utils';
 
@@ -296,6 +299,7 @@ export const FormikZodContext = React.createContext<{
  * component will not work out of the box with `StyledInputFormikField` and other components that rely on Formik context such as `Field` or `FastField`.
  * If you are trying to access Formik state via context, use `useFormikContext`. Only use this hook if you are NOT using <Formik> or withFormik.
  */
+// ts-unused-exports:disable-next-line
 export function useFormikZod<Values extends FormikValues = FormikValues>({
   schema,
   ...props
@@ -338,5 +342,3 @@ export function FormikZod<Values extends FormikValues = FormikValues>({
     </FormikZodContext.Provider>
   );
 }
-
-// ignore unused exports useFormikZod, FormikZod, getInputAttributesFromZodSchema

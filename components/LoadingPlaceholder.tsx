@@ -1,7 +1,8 @@
-import React from 'react';
 import PropTypes from 'prop-types';
+import type React from 'react';
 import styled, { keyframes } from 'styled-components';
-import { border, BorderProps, layout, LayoutProps, space, SpaceProps } from 'styled-system';
+import type { BorderProps, LayoutProps, SpaceProps } from 'styled-system';
+import { border, layout, space } from 'styled-system';
 
 import { flicker } from './StyledKeyframes';
 

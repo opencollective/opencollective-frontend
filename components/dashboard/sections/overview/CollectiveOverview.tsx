@@ -22,11 +22,12 @@ import DashboardHeader from '../../DashboardHeader';
 import { childAccountFilter } from '../../filters/ChildAccountFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { periodCompareFilter } from '../../filters/PeriodCompareFilter';
-import { DashboardSectionProps } from '../../types';
+import type { DashboardSectionProps } from '../../types';
 
 import { Accounts } from './Accounts';
 import AccountTable from './AccountTable';
-import { Metric, MetricProps } from './Metric';
+import type { MetricProps } from './Metric';
+import { Metric } from './Metric';
 import { overviewMetricsQuery } from './queries';
 import { Timeline } from './Timeline';
 import { TodoList } from './TodoList';

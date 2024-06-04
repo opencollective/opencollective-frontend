@@ -1,14 +1,16 @@
 import React from 'react';
-import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
+import type { ColumnDef } from '@tanstack/react-table';
+import { createColumnHelper } from '@tanstack/react-table';
 import clsx from 'clsx';
 import { AlertTriangle, ArrowLeft, ArrowRight, Undo } from 'lucide-react';
 import { defineMessage, FormattedMessage } from 'react-intl';
 
-import { DateTimeField, TransactionsTableQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import type { TransactionsTableQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import { DateTimeField } from '../../../../lib/graphql/types/v2/graphql';
 import { useDrawer } from '../../../../lib/hooks/useDrawer';
 import useLocalStorage from '../../../../lib/hooks/useLocalStorage';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
-import { useQueryFilterReturnType } from '../../../../lib/hooks/useQueryFilter';
+import type { useQueryFilterReturnType } from '../../../../lib/hooks/useQueryFilter';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { i18nTransactionKind } from '../../../../lib/i18n/transaction';
 import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
@@ -20,9 +22,10 @@ import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { ColumnHeader } from '../../../table/ColumnHeader';
 import { actionsColumn, DataTable } from '../../../table/DataTable';
 import { Badge } from '../../../ui/Badge';
+import { Pagination } from '../../filters/Pagination';
 
 import { useTransactionActions } from './actions';
-import { schema } from './filters';
+import type { schema } from './filters';
 import { TransactionDrawer } from './TransactionDrawer';
 import type { TransactionsTableQueryNode } from './types';
 
@@ -253,7 +256,7 @@ const columns: ColumnDef<TransactionsTableQueryNode>[] = [
 ];
 
 type TransactionsTableProps = {
-  transactions: { nodes: TransactionsTableQueryNode[] };
+  transactions: { nodes: TransactionsTableQueryNode[]; totalCount: number };
   loading?: boolean;
   nbPlaceholders?: number;
   useAltTestLayout?: boolean;
@@ -299,7 +302,9 @@ export default function TransactionsTable({
         data={transactions?.nodes || []}
         loading={loading}
         nbPlaceholders={nbPlaceholders}
-        onClickRow={(row, menuRef) => openDrawer(row.id, menuRef)}
+        onClickRow={(row, menuRef) => {
+          openDrawer(row.id, menuRef);
+        }}
         onHoverRow={row => setHoveredGroup(row?.original?.group ?? null)}
         rowHasIndicator={row => row.original.group === hoveredGroup}
         fullWidth={hasDynamicTopBar}
@@ -307,10 +312,13 @@ export default function TransactionsTable({
         columnVisibility={columnVisibility}
         setColumnVisibility={setColumnVisibility}
         defaultColumnVisibility={defaultColumnVisibility}
+        getRowId={row => String(row.legacyId)}
         getActions={getActions}
         queryFilter={queryFilter}
         compact
       />
+
+      <Pagination queryFilter={queryFilter} total={transactions?.totalCount} />
       <TransactionDrawer
         {...drawerProps}
         transactionId={queryFilter.values.openTransactionId}

@@ -5,7 +5,8 @@ import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog';
 
 import { cn } from '../../lib/utils';
 
-import { Button, ButtonProps, buttonVariants } from './Button';
+import type { ButtonProps } from './Button';
+import { Button, buttonVariants } from './Button';
 
 const AlertDialog = AlertDialogPrimitive.Root;
 
@@ -96,9 +97,8 @@ const AlertDialogCancel = React.forwardRef<
 ));
 AlertDialogCancel.displayName = AlertDialogPrimitive.Cancel.displayName;
 
-// ignore unused exports
 // ui library
-
+// ts-unused-exports:disable-next-line
 export {
   AlertDialog,
   AlertDialogPortal,

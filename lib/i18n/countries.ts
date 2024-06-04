@@ -1,5 +1,5 @@
 import { getEmojiByCountryCode } from 'country-currency-emoji-flags';
-import { IntlShape } from 'react-intl';
+import type { IntlShape } from 'react-intl';
 
 import { getIntlDisplayNames } from '.';
 

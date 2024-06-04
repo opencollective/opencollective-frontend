@@ -5,11 +5,11 @@ import type { Dayjs } from 'dayjs';
 import { isEqual, omit } from 'lodash';
 import { ArrowRight, CalendarIcon, ChevronDown } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { z } from 'zod';
+import type { z } from 'zod';
 
 import { getDayjsIsoUnit, getDayjsOpUnit } from '../../../../lib/date-utils';
 import dayjs from '../../../../lib/dayjs';
-import { FilterConfig } from '../../../../lib/filters/filter-types';
+import type { FilterConfig } from '../../../../lib/filters/filter-types';
 import { TimeUnit } from '../../../../lib/graphql/types/v2/graphql';
 import {
   i18nPeriodFilterCompare,
@@ -25,7 +25,7 @@ import { Select, SelectContent, SelectItem, SelectValue } from '../../../ui/Sele
 
 import { PeriodFilterCompare, PeriodFilterType, schema } from './schema';
 
-export type PeriodCompareFilterValueType = z.infer<typeof schema>;
+type PeriodCompareFilterValueType = z.infer<typeof schema>;
 
 const getAvailableTimeUnits = (value: PeriodCompareFilterValueType): TimeUnit[] => {
   const { dateTo, dateFrom } = getPeriodDates(value);

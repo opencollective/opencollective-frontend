@@ -1,7 +1,7 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import { CalendarIcon, CornerDownRight } from 'lucide-react';
-import { DateRange } from 'react-day-picker';
+import type { DateRange } from 'react-day-picker';
 
 import { stripTime } from '../../../../lib/date-utils';
 import { useWindowResize, VIEWPORTS } from '../../../../lib/hooks/useWindowResize';

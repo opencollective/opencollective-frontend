@@ -5,14 +5,13 @@ import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
-import { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
+import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import {
+import type {
   AccountHoverCardFieldsFragment,
-  ExpenseStatusFilter,
   HostDashboardExpensesQueryVariables,
-  PayoutMethodType,
 } from '../../../../lib/graphql/types/v2/graphql';
+import { ExpenseStatusFilter, PayoutMethodType } from '../../../../lib/graphql/types/v2/graphql';
 import { useLazyGraphQLPaginatedResults } from '../../../../lib/hooks/useLazyGraphQLPaginatedResults';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
@@ -20,22 +19,18 @@ import ExpensesList from '../../../expenses/ExpensesList';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
-import Pagination from '../../../Pagination';
 import StyledButton from '../../../StyledButton';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import { expenseTagFilter } from '../../filters/ExpenseTagsFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
-import { DashboardSectionProps } from '../../types';
+import { Pagination } from '../../filters/Pagination';
+import type { DashboardSectionProps } from '../../types';
 
 import ExpensePipelineOverview from './ExpensePipelineOverview';
-import {
-  FilterMeta as CommonFilterMeta,
-  filters as commonFilters,
-  schema as commonSchema,
-  toVariables as commonToVariables,
-} from './filters';
+import type { FilterMeta as CommonFilterMeta } from './filters';
+import { filters as commonFilters, schema as commonSchema, toVariables as commonToVariables } from './filters';
 import { hostDashboardExpensesQuery, hostDashboardMetadataQuery } from './queries';
 import ScheduledExpensesBanner from './ScheduledExpensesBanner';
 
@@ -280,15 +275,7 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
               );
             }}
           />
-          <div className="mt-12 flex justify-center">
-            <Pagination
-              route={pageRoute}
-              total={paginatedExpenses.totalCount}
-              limit={queryFilter.values.limit}
-              offset={queryFilter.values.offset}
-              ignoredQueryParams={ROUTE_PARAMS}
-            />
-          </div>
+          <Pagination queryFilter={queryFilter} total={data?.expenses?.totalCount} />
         </React.Fragment>
       )}
     </div>

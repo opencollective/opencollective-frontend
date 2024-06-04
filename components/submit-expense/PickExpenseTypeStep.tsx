@@ -7,7 +7,7 @@ import HTMLContent from '../HTMLContent';
 import StyledCheckbox from '../StyledCheckbox';
 
 import { RadioCardButton } from './RadioCardButton';
-import { ExpenseForm } from './useExpenseForm';
+import type { ExpenseForm } from './useExpenseForm';
 
 type PickExpenseTypeFormProps = {
   form: ExpenseForm;

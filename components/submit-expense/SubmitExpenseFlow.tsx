@@ -1,5 +1,6 @@
 import React from 'react';
-import { FetchResult, gql, useMutation } from '@apollo/client';
+import type { FetchResult } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import clsx from 'clsx';
 import { isEmpty, pick } from 'lodash';
 import { ArrowLeft, ArrowRight, ChevronDown, ChevronUp, X } from 'lucide-react';
@@ -9,17 +10,17 @@ import { AnalyticsEvent } from '../../lib/analytics/events';
 import { track } from '../../lib/analytics/plausible';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import {
+import type {
   CreateExpenseFromDashboardMutation,
   CreateExpenseFromDashboardMutationVariables,
   Currency,
   CurrencyExchangeRateInput,
   EditExpenseFromDashboardMutation,
   EditExpenseFromDashboardMutationVariables,
-  ExpenseStatus,
   InviteExpenseFromDashboardMutation,
   InviteExpenseFromDashboardMutationVariables,
 } from '../../lib/graphql/types/v2/graphql';
+import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -31,9 +32,11 @@ import { useToast } from '../ui/useToast';
 
 import { ExpenseWarnings } from './ExpenseWarnings';
 import { useNavigationWarning, useSteps } from './hooks';
-import { ExpenseFlowStep, ExpenseStepOrder, Steps } from './Steps';
+import type { ExpenseFlowStep } from './Steps';
+import { ExpenseStepOrder, Steps } from './Steps';
 import { SubmittedExpense } from './SubmittedExpense';
-import { ExpenseForm, useExpenseForm } from './useExpenseForm';
+import type { ExpenseForm } from './useExpenseForm';
+import { useExpenseForm } from './useExpenseForm';
 
 type SubmitExpenseFlowProps = {
   onClose: (submittedExpense: boolean) => void;

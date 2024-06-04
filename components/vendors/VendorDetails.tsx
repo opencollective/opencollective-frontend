@@ -1,10 +1,12 @@
-import React, { PropsWithChildren } from 'react';
+import React from 'react';
+import type { PropsWithChildren } from 'react';
 import { createPortal } from 'react-dom';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
-import { Host } from '../../lib/graphql/types/v2/graphql';
+import type { Host } from '../../lib/graphql/types/v2/graphql';
 import { elementFromClass } from '../../lib/react-utils';
 
+import Avatar from '../Avatar';
 import { useDrawerActionsContainer } from '../Drawer';
 import PayoutMethodData from '../expenses/PayoutMethodData';
 import Link from '../Link';
@@ -13,7 +15,7 @@ import LocationAddress from '../LocationAddress';
 import { H4 } from '../Text';
 import { Button } from '../ui/Button';
 
-import { VendorFieldsFragment } from './queries';
+import type { VendorFieldsFragment } from './queries';
 
 type VendorDetailsProps = {
   vendor: VendorFieldsFragment;
@@ -54,7 +56,10 @@ const VendorDetails = ({ vendor, host, onCancel, editVendor }: VendorDetailsProp
       <H4 mb={32}>
         <FormattedMessage defaultMessage="Vendor's Details" id="Blf27o" />
       </H4>
-      <SectionTitle>{vendor.name}</SectionTitle>
+      <SectionTitle>
+        <Avatar collective={vendor} radius={40} />
+        {vendor.name}
+      </SectionTitle>
       <div className="mt-5 flex gap-8">
         <HeaderInfo>
           <FormattedMessage id="agreement.createdOn" defaultMessage="Created on" />
@@ -126,7 +131,7 @@ const VendorDetails = ({ vendor, host, onCancel, editVendor }: VendorDetailsProp
           <SectionTitle>
             <FormattedMessage id="expense.notes" defaultMessage="Notes" />
           </SectionTitle>
-          <div className="text-sm">{notes}</div>
+          <div>{notes}</div>
         </div>
       )}
       {drawerActionsContainer &&

@@ -5,15 +5,13 @@ import { FormattedMessage } from 'react-intl';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
-import { Flex } from '../../../Grid';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
-import Pagination from '../../../Pagination';
 import { Button } from '../../../ui/Button';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import ExportTransactionsCSVModal from '../../ExportTransactionsCSVModal';
 import { Filterbar } from '../../filters/Filterbar';
-import { DashboardSectionProps } from '../../types';
+import type { DashboardSectionProps } from '../../types';
 
 import { filters, schema, toVariables } from './filters';
 import { transactionsTableQuery } from './queries';
@@ -55,7 +53,7 @@ const AccountTransactions = ({ accountSlug }: DashboardSectionProps) => {
     },
   });
 
-  const { data, previousData, error, loading, refetch } = useQuery(transactionsTableQuery, {
+  const { data, error, loading, refetch } = useQuery(transactionsTableQuery, {
     variables: {
       account: { slug: accountSlug },
       includeIncognitoTransactions: true,
@@ -105,15 +103,6 @@ const AccountTransactions = ({ accountSlug }: DashboardSectionProps) => {
             queryFilter={queryFilter}
             refetchList={refetch}
           />
-          <Flex mt={5} justifyContent="center">
-            <Pagination
-              route={`/dashboard/${accountSlug}/transactions`}
-              total={(data || previousData)?.transactions?.totalCount}
-              limit={queryFilter.values.limit}
-              offset={queryFilter.values.offset}
-              ignoredQueryParams={['collectiveSlug']}
-            />
-          </Flex>
         </React.Fragment>
       )}
     </div>

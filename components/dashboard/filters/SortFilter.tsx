@@ -9,10 +9,11 @@ import {
   ArrowUpNarrowWide,
   ChevronDown,
 } from 'lucide-react';
-import { defineMessages, FormattedMessage, MessageDescriptor, useIntl } from 'react-intl';
+import type { MessageDescriptor } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
-import { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
+import type { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
 import { DateTimeField, OrderByFieldType, OrderDirection } from '../../../lib/graphql/types/v2/graphql';
 
 import { parseChronologicalOrderInput } from '../../expenses/filters/ExpensesOrder';

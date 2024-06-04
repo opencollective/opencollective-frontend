@@ -1,22 +1,19 @@
 import React from 'react';
-import {
+import type {
   CellContext as TanCellContext,
   ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
   OnChangeFn,
   Row,
   SortingState,
   TableMeta,
-  useReactTable,
   VisibilityState,
 } from '@tanstack/react-table';
+import { flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
 import clsx from 'clsx';
 import { isEqual, omitBy } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { GetActions } from '../../lib/actions/types';
+import type { GetActions } from '../../lib/actions/types';
 import type { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
 
 import { Skeleton } from '../ui/Skeleton';

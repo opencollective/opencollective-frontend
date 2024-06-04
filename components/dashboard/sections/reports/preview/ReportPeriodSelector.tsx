@@ -6,8 +6,8 @@ import { z } from 'zod';
 
 import { getDayjsIsoUnit } from '../../../../../lib/date-utils';
 import dayjs from '../../../../../lib/dayjs';
-import { FilterComponentProps } from '../../../../../lib/filters/filter-types';
-import { Host, TimeUnit } from '../../../../../lib/graphql/types/v2/graphql';
+import type { FilterComponentProps } from '../../../../../lib/filters/filter-types';
+import type { Host, TimeUnit } from '../../../../../lib/graphql/types/v2/graphql';
 
 import { Button } from '../../../../ui/Button';
 import { Label } from '../../../../ui/Label';

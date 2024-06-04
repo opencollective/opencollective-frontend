@@ -1,7 +1,7 @@
 // TODO: Replace uses of `components/ConfirmationModal.js` with this file
 
 import React from 'react';
-import { LucideIcon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { defineMessages, useIntl } from 'react-intl';
 
 import {
@@ -40,7 +40,7 @@ const confirmBtnMsgs = defineMessages({
 });
 
 export interface ConfirmationModalProps extends BaseModalProps {
-  title: string;
+  title: React.ReactNode;
   description?: React.ReactNode;
   children?: React.ReactNode;
   variant?: 'default' | 'destructive';
@@ -73,7 +73,7 @@ const ConfirmationModal = ({
   const handleClose = () => setOpen(false);
 
   const onCloseAutoFocus = e => {
-    if (onCloseFocusRef.current) {
+    if (onCloseFocusRef?.current) {
       e.preventDefault();
       onCloseFocusRef.current.focus();
     }

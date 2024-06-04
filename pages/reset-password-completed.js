@@ -2,7 +2,6 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import Container from '../components/Container';
 import { getI18nLink } from '../components/I18nFormatters';
 import Image from '../components/Image';
 import Page from '../components/Page';
@@ -12,7 +11,10 @@ import { withUser } from '../components/UserProvider';
 const ResetPasswordCompleted = ({ LoggedInUser, loadingLoggedInUser }) => {
   return (
     <Page noRobots showFooter={false}>
-      <Container pt={[4, 5]} pb={6} px={3} textAlign="center" data-cy="reset-password-success-page">
+      <div
+        className="flex flex-col items-center px-4 pb-32 pt-8 text-center sm:pt-16"
+        data-cy="reset-password-success-page"
+      >
         <Image src="/static/images/sign-in-illustration.png" width={624} height={372} />
         <P fontSize="32px" lineHeight="40px" color="black.900" fontWeight={700}>
           <FormattedMessage defaultMessage="Your password was updated." id="GAFyW+" />
@@ -45,7 +47,7 @@ const ResetPasswordCompleted = ({ LoggedInUser, loadingLoggedInUser }) => {
             </P>
           </Fragment>
         )}
-      </Container>
+      </div>
     </Page>
   );
 };
@@ -55,6 +57,6 @@ ResetPasswordCompleted.propTypes = {
   LoggedInUser: PropTypes.object,
 };
 
-// ignore unused exports default
 // next.js export
+// ts-unused-exports:disable-next-line
 export default withUser(ResetPasswordCompleted);

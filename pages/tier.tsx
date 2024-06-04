@@ -1,6 +1,6 @@
 import React from 'react';
 import { get } from 'lodash';
-import { InferGetServerSidePropsType } from 'next';
+import type { InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 
 import { getSSRQueryHelpers } from '../lib/apollo-client';
@@ -69,8 +69,8 @@ const tierPageQueryHelpers = getSSRQueryHelpers<{ tierId: number }, TierPageProp
   }),
 });
 
-// ignore unused exports getServerSideProps
 // next.js export
+// ts-unused-exports:disable-next-line
 export const getServerSideProps = tierPageQueryHelpers.getServerSideProps;
 
 /**
@@ -120,6 +120,6 @@ const TierPage = (pageProps: InferGetServerSidePropsType<typeof getServerSidePro
   );
 };
 
-// ignore unused exports default
 // next.js export
+// ts-unused-exports:disable-next-line
 export default TierPage;

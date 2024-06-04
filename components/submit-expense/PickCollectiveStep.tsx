@@ -6,7 +6,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../lib/constants/collectives';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import {
+import type {
   ChildAccountPickerQuery,
   ChildAccountPickerQueryVariables,
   CollectiveOptionPickerQuery,
@@ -22,7 +22,7 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 
 import { RadioCardButton } from './RadioCardButton';
-import { ExpenseForm } from './useExpenseForm';
+import type { ExpenseForm } from './useExpenseForm';
 
 const I18nMessages = defineMessages({
   CHILD_DESCRIPTION: {

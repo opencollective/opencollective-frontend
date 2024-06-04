@@ -2,8 +2,8 @@ import { URL } from 'url';
 
 import { pick } from 'lodash';
 
-// ignore unused exports default
 // next.js export
+// ts-unused-exports:disable-next-line
 export default async function handle(req, res) {
   const { service } = req.query;
   const apiUrl = new URL(

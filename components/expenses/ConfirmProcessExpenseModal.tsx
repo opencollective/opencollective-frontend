@@ -1,9 +1,10 @@
 import React from 'react';
-import { defineMessages, FormattedMessage, MessageDescriptor, useIntl } from 'react-intl';
+import type { MessageDescriptor } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import useProcessExpense from '../../lib/expenses/useProcessExpense';
-import { Expense } from '../../lib/graphql/types/v2/graphql';
+import type { Expense } from '../../lib/graphql/types/v2/graphql';
 
 import { Flex } from '../Grid';
 import RichTextEditor from '../RichTextEditor';
@@ -161,7 +162,7 @@ const MessagesPerType: Record<
   },
 };
 
-export type ConfirmProcessExpenseModalType =
+type ConfirmProcessExpenseModalType =
   | 'REQUEST_RE_APPROVAL'
   | 'MARK_AS_INCOMPLETE'
   | 'MARK_AS_SPAM'
@@ -171,7 +172,7 @@ export type ConfirmProcessExpenseModalType =
   | 'HOLD'
   | 'RELEASE';
 
-export type ConfirmProcessExpenseModalProps = {
+type ConfirmProcessExpenseModalProps = {
   type: ConfirmProcessExpenseModalType;
   onClose: () => void;
   expense: Pick<Expense, 'id' | 'legacyId' | 'permissions'>;

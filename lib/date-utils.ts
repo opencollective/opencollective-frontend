@@ -1,4 +1,4 @@
-import { OpUnitType, UnitType } from 'dayjs';
+import type { OpUnitType, UnitType } from 'dayjs';
 import { padStart } from 'lodash';
 
 import INTERVALS from './constants/intervals';

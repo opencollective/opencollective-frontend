@@ -1,5 +1,5 @@
 import React from 'react';
-import { useFormik } from 'formik';
+import type { useFormik } from 'formik';
 import { isEmpty, round } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -18,7 +18,7 @@ import { InvitedPayeeLabel } from './InvitedPayeeLabel';
 import { PickCollectiveStepForm } from './PickCollectiveStep';
 import { PickExpenseTypeForm } from './PickExpenseTypeStep';
 import { PickPaymentMethodForm } from './PickPaymentMethodStep';
-import { ExpenseForm, ExpenseFormValues } from './useExpenseForm';
+import type { ExpenseForm, ExpenseFormValues } from './useExpenseForm';
 
 export const enum ExpenseFlowStep {
   COLLECTIVE = 'collective',
@@ -38,18 +38,18 @@ export const ExpenseStepOrder = [
   ExpenseFlowStep.EXPENSE_SUMMARY,
 ];
 
-export type StepDefinition<
+type StepDefinition<
   FormValues extends Record<string, any>,
   Form extends ReturnType<typeof useFormik<FormValues>>,
   AddProps = never,
 > = {
   Form: React.FC<{ form: Form } | ({ form: Form } & AddProps)>;
   hasError: (form: Form) => boolean;
-  Title: React.FC<{ form: Form } | {}>;
-  Subtitle?: React.FC<{ form: Form } | {}>;
+  Title: React.FC<{ form: Form } | Record<string, never>>;
+  Subtitle?: React.FC<{ form: Form } | Record<string, never>>;
 };
 
-export type ExpenseStepDefinition = StepDefinition<ExpenseFormValues, ExpenseForm>;
+type ExpenseStepDefinition = StepDefinition<ExpenseFormValues, ExpenseForm>;
 
 export const Steps: Record<ExpenseFlowStep, ExpenseStepDefinition> = {
   [ExpenseFlowStep.COLLECTIVE]: {

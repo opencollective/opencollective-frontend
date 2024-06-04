@@ -3,14 +3,12 @@ import { gql, useQuery } from '@apollo/client';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
-import { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
+import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import { TransactionsTableQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import type { TransactionsTableQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
-import { Flex } from '../../../Grid';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
-import Pagination from '../../../Pagination';
 import { Button } from '../../../ui/Button';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
@@ -18,14 +16,10 @@ import ExportTransactionsCSVModal from '../../ExportTransactionsCSVModal';
 import { accountingCategoryFilter } from '../../filters/AccountingCategoryFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
-import { DashboardSectionProps } from '../../types';
+import type { DashboardSectionProps } from '../../types';
 
-import {
-  FilterMeta as CommonFilterMeta,
-  filters as commonFilters,
-  schema as commonSchema,
-  toVariables as commonToVariables,
-} from './filters';
+import type { FilterMeta as CommonFilterMeta } from './filters';
+import { filters as commonFilters, schema as commonSchema, toVariables as commonToVariables } from './filters';
 import { transactionsTableQuery } from './queries';
 import TransactionsTable from './TransactionsTable';
 
@@ -124,7 +118,7 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     views,
   });
 
-  const { data, previousData, error, loading, refetch } = useQuery(transactionsTableQuery, {
+  const { data, error, loading, refetch } = useQuery(transactionsTableQuery, {
     variables: {
       hostAccount: { slug: hostSlug },
       includeIncognitoTransactions: true,
@@ -173,15 +167,6 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
             queryFilter={queryFilter}
             refetchList={refetch}
           />
-          <Flex mt={5} justifyContent="center">
-            <Pagination
-              route={`/dashboard/${hostSlug}/host-transactions`}
-              total={(data || previousData)?.transactions?.totalCount}
-              limit={queryFilter.values.limit}
-              offset={queryFilter.values.offset}
-              ignoredQueryParams={['collectiveSlug']}
-            />
-          </Flex>
         </React.Fragment>
       )}
     </div>

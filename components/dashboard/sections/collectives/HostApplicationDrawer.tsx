@@ -7,14 +7,13 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import {
+import type {
   Account,
   Host,
   HostApplication as GraphQLHostApplication,
-  HostApplicationStatus,
   MemberCollection,
-  ProcessHostApplicationAction,
 } from '../../../../lib/graphql/types/v2/graphql';
+import { HostApplicationStatus, ProcessHostApplicationAction } from '../../../../lib/graphql/types/v2/graphql';
 import { i18nCustomApplicationFormLabel } from '../../../../lib/i18n/custom-application-form';
 
 import Avatar from '../../../Avatar';

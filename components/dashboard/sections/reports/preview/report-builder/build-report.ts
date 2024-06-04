@@ -1,6 +1,6 @@
 import { pick } from 'lodash';
 
-import { TransactionReport } from '../../../../../../lib/graphql/types/v2/graphql';
+import type { TransactionReport } from '../../../../../../lib/graphql/types/v2/graphql';
 
 import { ReportSection } from '../types';
 

@@ -6,22 +6,17 @@ import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { CollectiveType, HostedCollectiveTypes } from '../../../../lib/constants/collectives';
-import { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
+import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import {
-  Collective,
-  HostedCollectivesQueryVariables,
-  HostFeeStructure,
-} from '../../../../lib/graphql/types/v2/graphql';
+import type { Collective, HostedCollectivesQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import { HostFeeStructure } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { formatHostFeeStructure } from '../../../../lib/i18n/host-fee-structure';
 
 import { Drawer } from '../../../Drawer';
-import { Flex } from '../../../Grid';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
-import Pagination from '../../../Pagination';
 import { DataTable } from '../../../table/DataTable';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
@@ -33,11 +28,13 @@ import {
 } from '../../filters/CollectiveStatusFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { Filterbar } from '../../filters/Filterbar';
+import { Pagination } from '../../filters/Pagination';
 import { searchFilter } from '../../filters/SearchFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
-import { DashboardSectionProps } from '../../types';
+import type { DashboardSectionProps } from '../../types';
 
 import CollectiveDetails from './CollectiveDetails';
+import type { HostedCollectivesDataTableMeta } from './common';
 import { cols } from './common';
 import { hostedCollectivesMetadataQuery, hostedCollectivesQuery } from './queries';
 
@@ -110,8 +107,6 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
   consolidatedBalance: consolidatedBalanceFilter.filter,
 };
 
-const ROUTE_PARAMS = ['slug', 'section', 'view'];
-
 const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionProps) => {
   const intl = useIntl();
   const router = useRouter();
@@ -174,7 +169,7 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
     meta: { currency: metadata?.host?.currency },
   });
 
-  const { data, error, loading, variables, refetch } = useQuery(hostedCollectivesQuery, {
+  const { data, error, loading, refetch } = useQuery(hostedCollectivesQuery, {
     variables: { hostSlug, ...queryFilter.variables },
     context: API_V2_CONTEXT,
     fetchPolicy: 'cache-and-network',
@@ -230,18 +225,19 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
             loading={loading}
             mobileTableView
             compact
-            meta={{ intl, onClickRow, onEdit: handleEdit, host: data?.host }}
+            meta={
+              {
+                intl,
+                onClickRow,
+                onEdit: handleEdit,
+                host: data?.host,
+                openCollectiveDetails: handleDrawer,
+              } as HostedCollectivesDataTableMeta
+            }
             onClickRow={onClickRow}
             getRowDataCy={row => `collective-${row.original.slug}`}
           />
-          <Flex mt={5} justifyContent="center">
-            <Pagination
-              total={hostedAccounts?.totalCount}
-              limit={variables.limit}
-              offset={variables.offset}
-              ignoredQueryParams={ROUTE_PARAMS}
-            />
-          </Flex>
+          <Pagination queryFilter={queryFilter} total={hostedAccounts?.totalCount} />
         </React.Fragment>
       )}
 

@@ -10,7 +10,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { PAYMENT_METHOD_TYPE } from '../../../lib/constants/payment-methods';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT, gql, gqlV1 } from '../../../lib/graphql/helpers';
-import {
+import type {
   Account,
   ConfirmOrderMutation,
   ManagePaymentMethodsQuery,

@@ -1,12 +1,14 @@
 import React from 'react';
 import { checkVATNumberFormat, GST_RATE_PERCENT, TaxType } from '@opencollective/taxes';
-import { FormikProps } from 'formik';
+import type { FormikProps } from 'formik';
 import { get, isNil, round } from 'lodash';
-import { IntlShape, useIntl } from 'react-intl';
+import type { IntlShape } from 'react-intl';
+import { useIntl } from 'react-intl';
 
-import { createError, ERROR, OCError } from '../../lib/errors';
+import type { OCError } from '../../lib/errors';
+import { createError, ERROR } from '../../lib/errors';
 import { verifyValueInRange } from '../../lib/form-utils';
-import { ExpenseTaxInput, TaxInput } from '../../lib/graphql/types/v2/graphql';
+import type { ExpenseTaxInput, TaxInput } from '../../lib/graphql/types/v2/graphql';
 import { i18nTaxType } from '../../lib/i18n/taxes';
 
 import { Flex } from '../Grid';

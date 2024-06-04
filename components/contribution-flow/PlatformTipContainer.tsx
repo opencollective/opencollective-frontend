@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../lib/currency-utils';
-import { Currency } from '../../lib/graphql/types/v2/graphql';
+import type { Currency } from '../../lib/graphql/types/v2/graphql';
 import theme from '../../lib/theme';
 
 import { Box, Flex } from '../Grid';

@@ -1,7 +1,9 @@
-import { defineMessage, defineMessages, IntlShape } from 'react-intl';
+import type { IntlShape } from 'react-intl';
+import { defineMessage, defineMessages } from 'react-intl';
 
 import { formatCurrency, type Options as FormatCurrencyOptions } from '../currency-utils';
-import { Amount, Currency, VirtualCardLimitInterval } from '../graphql/types/v2/graphql';
+import type { Amount, Currency } from '../graphql/types/v2/graphql';
+import { VirtualCardLimitInterval } from '../graphql/types/v2/graphql';
 
 const VirtualCardSpendingLimitShortI18n = defineMessages({
   [VirtualCardLimitInterval.DAILY]: {

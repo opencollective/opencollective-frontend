@@ -138,6 +138,7 @@ const hostedCollectiveFields = gql`
     currency
     imageUrl(height: 96)
     isFrozen
+    isHost
     tags
     settings
     createdAt
@@ -173,6 +174,8 @@ const hostedCollectiveFields = gql`
         id
         legacyId
         name
+        slug
+        imageUrl(height: 96)
       }
     }
     ... on AccountWithContributions {
@@ -315,6 +318,98 @@ export const hostedCollectiveDetailQuery = gql`
     account(id: $id) {
       id
       ...HostedCollectiveFields
+      transactions(limit: 10, offset: 0, kind: [ADDED_FUNDS, CONTRIBUTION, EXPENSE]) {
+        nodes {
+          id
+          clearedAt
+          createdAt
+          type
+          kind
+          description
+          isRefund
+          isRefunded
+          isInReview
+          isDisputed
+          isOrderRejected
+          amount {
+            valueInCents
+            currency
+          }
+          netAmount {
+            valueInCents
+            currency
+          }
+          oppositeAccount {
+            id
+            slug
+            name
+            imageUrl
+          }
+        }
+      }
+    }
+    activities(account: { id: $id }, limit: 5, offset: 0, type: [COLLECTIVE]) {
+      nodes {
+        id
+        type
+        createdAt
+        data
+        isSystem
+        account {
+          id
+          slug
+          name
+          imageUrl
+        }
+        fromAccount {
+          id
+          slug
+          name
+          imageUrl
+        }
+        individual {
+          id
+          slug
+          name
+          imageUrl
+        }
+      }
+    }
+  }
+
+  ${hostedCollectiveFields}
+`;
+
+export const allCollectivesQuery = gql`
+  query AllCollectives(
+    $limit: Int!
+    $offset: Int!
+    $sort: OrderByInput
+    $searchTerm: String
+    $type: [AccountType]
+    $isHost: Boolean
+    $host: [AccountReferenceInput]
+    $isActive: Boolean
+    $consolidatedBalance: AmountRangeInput
+  ) {
+    accounts(
+      limit: $limit
+      offset: $offset
+      searchTerm: $searchTerm
+      type: $type
+      orderBy: $sort
+      isHost: $isHost
+      isActive: $isActive
+      host: $host
+      consolidatedBalance: $consolidatedBalance
+    ) {
+      offset
+      limit
+      totalCount
+      nodes {
+        id
+        ...HostedCollectiveFields
+      }
     }
   }
 

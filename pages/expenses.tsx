@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { has, isNil, omitBy } from 'lodash';
-import { InferGetServerSidePropsType } from 'next';
+import type { InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
 
@@ -12,7 +12,8 @@ import { PayoutMethodType } from '../lib/constants/payout-method';
 import { parseDateInterval } from '../lib/date-utils';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
-import { ExpensesPageQuery, ExpenseStatus } from '../lib/graphql/types/v2/graphql';
+import type { ExpensesPageQuery } from '../lib/graphql/types/v2/graphql';
+import { ExpenseStatus } from '../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
@@ -254,12 +255,12 @@ const expensePageQueryHelpers = getSSRQueryHelpers<ReturnType<typeof getVariable
   skipClientIfSSRThrows404: true,
 });
 
-// ignore unused exports getServerSideProps
 // next.js export
+// ts-unused-exports:disable-next-line
 export const getServerSideProps = expensePageQueryHelpers.getServerSideProps;
 
-// ignore unused exports default
 // next.js export
+// ts-unused-exports:disable-next-line
 export default function ExpensesPage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const intl = useIntl();
   const router = useRouter();

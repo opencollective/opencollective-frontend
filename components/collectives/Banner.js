@@ -1,4 +1,3 @@
-// ignore unused exports default
 // keeping the file in case we want to use it in the future
 
 import React from 'react';
@@ -29,4 +28,5 @@ const Banner = () => (
   </Flex>
 );
 
+// ts-unused-exports:disable-next-line
 export default Banner;

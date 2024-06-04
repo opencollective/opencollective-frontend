@@ -1,16 +1,11 @@
 import React from 'react';
 import { get, isUndefined, pick, remove, size, throttle, uniq } from 'lodash';
 import { Check, ChevronDown, Sparkles } from 'lucide-react';
-import { defineMessages, FormattedMessage, IntlShape, useIntl } from 'react-intl';
+import type { IntlShape } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import {
-  Account,
-  AccountingCategory,
-  AccountingCategoryKind,
-  Expense,
-  ExpenseType,
-  Host,
-} from '../lib/graphql/types/v2/graphql';
+import type { Account, AccountingCategory, Expense, ExpenseType, Host } from '../lib/graphql/types/v2/graphql';
+import { AccountingCategoryKind } from '../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../lib/hooks/useAsyncCall';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { fetchExpenseCategoryPredictions } from '../lib/ml-service';
@@ -29,14 +24,14 @@ type RequiredAccountingCategoryFields = Pick<AccountingCategory, 'id' | 'name' |
 type AccountingCategorySelectProps = {
   host: RequiredHostFields;
   /** The account holding the expense. Only used when using the prediction service */
-  account?: Account;
+  account?: Pick<Account, 'slug'>;
   kind: AccountingCategoryKind | `${AccountingCategoryKind}`;
   /** If `kind` is `EXPENSE`, the (optional) expense type is used to filter the categories */
   expenseType?: ExpenseType;
   /** If provided, these values (descriptions, items, etc...) will be used to call the prediction service */
   expenseValues?: Partial<Expense>;
   predictionStyle?: 'full' | 'inline';
-  selectedCategory: AccountingCategory | undefined | null;
+  selectedCategory: Pick<AccountingCategory, 'friendlyName' | 'name' | 'code' | 'id'> | undefined | null;
   valuesByRole?: Expense['valuesByRole'];
   onChange: (category: AccountingCategory) => void;
   onBlur?: () => void;
@@ -70,7 +65,10 @@ const getSearchTextFromCategory = (category: AccountingCategory) => {
  * - Or they have the same id
  * - Or they have the same code
  */
-const isSameCategory = (category1: AccountingCategory | null, category2: AccountingCategory | null): boolean => {
+const isSameCategory = (
+  category1: Pick<AccountingCategory, 'code' | 'id'> | null,
+  category2: Pick<AccountingCategory, 'code' | 'id'> | null,
+): boolean => {
   return category1 === category2 || category1?.id === category2?.id || category1?.code === category2?.code;
 };
 
@@ -85,7 +83,7 @@ const SelectionRoleLabels = defineMessages({
  */
 const getSelectionInfoForLabel = (
   intl: IntlShape,
-  category: AccountingCategory | null,
+  category: Pick<AccountingCategory, 'friendlyName' | 'name' | 'code' | 'id'> | null,
   valuesByRole: Expense['valuesByRole'] = null,
 ): React.ReactNode | null => {
   const roles = ['submitter', 'accountAdmin', 'hostAdmin'];
@@ -118,7 +116,7 @@ const getSelectionInfoForLabel = (
 
 export const getCategoryLabel = (
   intl: IntlShape,
-  category: AccountingCategory,
+  category: Pick<AccountingCategory, 'friendlyName' | 'name' | 'code' | 'id'>,
   showCode: boolean,
   valuesByRole: Expense['valuesByRole'] = null,
 ): React.ReactNode | null => {
@@ -235,7 +233,7 @@ const getCleanInputData = (
 const useExpenseCategoryPredictionService = (
   enabled: boolean,
   host: RequiredHostFields,
-  account: Account,
+  account: Pick<Account, 'slug'>,
   expenseValues?: Partial<Expense>,
 ) => {
   const { call: fetchPredictionsCall, data, loading } = useAsyncCall(fetchExpenseCategoryPredictions);

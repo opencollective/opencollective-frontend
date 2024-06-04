@@ -1,8 +1,9 @@
-import React, { ReactElement } from 'react';
+import React from 'react';
 import { css } from '@styled-system/css';
 import { flatten, groupBy, uniqBy } from 'lodash';
-import { ChevronDown, ChevronsUpDown, ChevronUp, Plus } from 'lucide-react';
+import { ChevronDown, ChevronsUpDown, ChevronUp, Plus, UserCog } from 'lucide-react';
 import memoizeOne from 'memoize-one';
+import type { ReactElement } from 'react';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { space } from 'styled-system';
@@ -18,6 +19,8 @@ import { Dropdown, DropdownContent } from '../StyledDropdown';
 import StyledHr from '../StyledHr';
 import StyledRoundButton from '../StyledRoundButton';
 import { P, Span } from '../Text';
+
+import { ROOT_PROFILE_KEY } from './constants';
 
 const StyledMenuEntry = styled(Link)`
   display: flex;
@@ -172,6 +175,20 @@ const Option = ({
   );
 };
 
+const RootOption = () => (
+  <Flex alignItems="center" gridGap="12px" overflow="hidden">
+    <UserCog size={32} className="text-slate-600" />
+    <Flex flexDirection="column" overflow="hidden">
+      <P color="black.800" fontSize="14px" letterSpacing="0" fontWeight="500" truncateOverflow>
+        Platform Admin
+      </P>
+      <P color="black.700" fontSize="12px" letterSpacing="0" fontWeight="400" truncateOverflow>
+        Management profile
+      </P>
+    </Flex>
+  </Flex>
+);
+
 const MenuEntry = ({ account, activeSlug }: { account: any; activeSlug: string }) => {
   const [expanded, setExpanded] = React.useState(false);
 
@@ -204,12 +221,12 @@ const MenuEntry = ({ account, activeSlug }: { account: any; activeSlug: string }
         )}
       </StyledMenuEntry>
       {expanded &&
-        account?.children
+        account.children
           ?.slice() // Create a copy to that we can sort the otherwise immutable array
           .sort((a, b) => a.name.localeCompare(b.name))
           .map(child => (
             <StyledMenuEntry
-              key={child?.id}
+              key={child.id}
               href={`/dashboard/${child.slug}`}
               title={child.name}
               $isActive={activeSlug === child.slug}
@@ -238,7 +255,7 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
         <React.Fragment>
           <Flex alignItems="center" flex={0}>
             <DropdownButton {...triggerProps}>
-              <Option collective={activeAccount} />
+              {activeSlug === ROOT_PROFILE_KEY ? <RootOption /> : <Option collective={activeAccount} />}
               <ChevronsUpDown size={18} />
             </DropdownButton>
           </Flex>
@@ -253,6 +270,17 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
                 >
                   <Option collective={loggedInUserCollective} />
                 </StyledMenuEntry>
+                {LoggedInUser?.isRoot && (
+                  <StyledMenuEntry
+                    key={ROOT_PROFILE_KEY}
+                    href={`/dashboard/${ROOT_PROFILE_KEY}/all-collectives`}
+                    title={'Platform Admin'}
+                    $isActive={activeSlug === ROOT_PROFILE_KEY}
+                    className="-mt-4"
+                  >
+                    <RootOption />
+                  </StyledMenuEntry>
+                )}
                 {Object.entries(groupedAccounts).map(([collectiveType, accounts]) => {
                   return (
                     <div key={collectiveType}>

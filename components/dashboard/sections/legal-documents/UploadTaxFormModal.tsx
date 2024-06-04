@@ -4,10 +4,10 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import { Account, Host, LegalDocument } from '../../../../lib/graphql/types/v2/graphql';
+import type { Account, Host, LegalDocument } from '../../../../lib/graphql/types/v2/graphql';
 import { getMessageForRejectedDropzoneFiles } from '../../../../lib/hooks/useImageUploader';
 
-import { BaseModalProps } from '../../../ModalContext';
+import type { BaseModalProps } from '../../../ModalContext';
 import StyledDropzone, { DROPZONE_ACCEPT_PDF } from '../../../StyledDropzone';
 import { Button } from '../../../ui/Button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../../../ui/Dialog';
@@ -19,6 +19,8 @@ const uploadTaxFormMutation = gql`
       id
       status
       documentLink
+      year
+      isExpired
     }
   }
 `;

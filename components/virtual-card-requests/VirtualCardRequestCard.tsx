@@ -1,7 +1,8 @@
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { VirtualCardRequest, VirtualCardRequestStatus } from '../../lib/graphql/types/v2/graphql';
+import type { VirtualCardRequest } from '../../lib/graphql/types/v2/graphql';
+import { VirtualCardRequestStatus } from '../../lib/graphql/types/v2/graphql';
 import { getSpendingLimitShortString } from '../../lib/i18n/virtual-card-spending-limit';
 
 import DateTime from '../DateTime';

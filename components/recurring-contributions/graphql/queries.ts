@@ -44,13 +44,22 @@ export const managedOrderFragment = gql`
     description
     createdAt
     processedAt
+    hostFeePercent
     frequency
     tier {
       id
       name
     }
     permissions {
+      id
       canResume
+      canMarkAsExpired
+      canMarkAsPaid
+      canEdit
+      canComment
+      canSeePrivateActivities
+      canSetTags
+      canUpdateAccountingCategory
     }
     totalDonations {
       value
@@ -76,7 +85,6 @@ export const managedOrderFragment = gql`
       description
       tags
       imageUrl
-      hasImage
       backgroundImageUrl(height: 256)
       settings
       ... on AccountWithHost {
@@ -100,6 +108,10 @@ export const managedOrderFragment = gql`
     platformTipAmount {
       value
       valueInCents
+    }
+    pendingContributionData {
+      expectedAt
+      paymentMethod
     }
   }
   ${accountHoverCardFields}

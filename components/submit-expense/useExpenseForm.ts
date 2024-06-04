@@ -1,31 +1,32 @@
 import React from 'react';
-import { ApolloClient, gql, useApolloClient } from '@apollo/client';
+import type { ApolloClient } from '@apollo/client';
+import { gql, useApolloClient } from '@apollo/client';
 import { accountHasGST, accountHasVAT, checkVATNumberFormat, TaxType } from '@opencollective/taxes';
 import dayjs from 'dayjs';
 import type { Path, PathValue } from 'dot-path-value';
-import { FormikErrors, FormikHelpers, useFormik } from 'formik';
+import type { FormikErrors, FormikHelpers } from 'formik';
+import { useFormik } from 'formik';
 import { isEmpty, isEqual, pick, set, uniqBy } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { IntlShape, useIntl } from 'react-intl';
-import z, { ZodObjectDef } from 'zod';
+import type { IntlShape } from 'react-intl';
+import { useIntl } from 'react-intl';
+import type { ZodObjectDef } from 'zod';
+import z from 'zod';
 
 import { AccountTypesWithHost, CollectiveType } from '../../lib/constants/collectives';
-import { LoggedInUser } from '../../lib/custom_typings/LoggedInUser';
+import type { LoggedInUser } from '../../lib/custom_typings/LoggedInUser';
 import { getPayoutProfiles } from '../../lib/expenses';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import {
+import type {
   Amount,
-  Currency,
   ExpenseFormExchangeRatesQuery,
   ExpenseFormExchangeRatesQueryVariables,
   ExpenseFormSchemaHostFieldsFragment,
   ExpenseFormSchemaQuery,
   ExpenseFormSchemaQueryVariables,
-  ExpenseStatus,
-  ExpenseType,
   LocationInput,
-  PayoutMethodType,
 } from '../../lib/graphql/types/v2/graphql';
+import { Currency, ExpenseStatus, ExpenseType, PayoutMethodType } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { userMustSetAccountingCategory } from '../expenses/lib/accounting-categories';
 import { computeExpenseAmounts, expenseTypeSupportsItemCurrency, getSupportedCurrencies } from '../expenses/lib/utils';
@@ -33,7 +34,7 @@ import { computeExpenseAmounts, expenseTypeSupportsItemCurrency, getSupportedCur
 import { loggedInAccountExpensePayoutFieldsFragment } from '../expenses/graphql/fragments';
 import { getCustomZodErrorMap } from '../FormikZod';
 
-export type ExpenseTypeOption = ExpenseType.INVOICE | ExpenseType.RECEIPT;
+type ExpenseTypeOption = ExpenseType.INVOICE | ExpenseType.RECEIPT;
 
 export type ExpenseItem = {
   description?: string;
@@ -92,7 +93,7 @@ export type ExpenseFormValues = {
       };
 };
 
-export type ExpenseFormik = Omit<ReturnType<typeof useFormik<ExpenseFormValues>>, 'setFieldValue'> & {
+type ExpenseFormik = Omit<ReturnType<typeof useFormik<ExpenseFormValues>>, 'setFieldValue'> & {
   setFieldValue: <F extends Path<ExpenseFormValues>>(
     field: F,
     value: PathValue<ExpenseFormValues, F>,

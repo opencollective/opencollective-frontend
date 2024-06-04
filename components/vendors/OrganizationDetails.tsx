@@ -1,5 +1,6 @@
-import React, { PropsWithChildren } from 'react';
+import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
+import type { PropsWithChildren } from 'react';
 import { createPortal } from 'react-dom';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 

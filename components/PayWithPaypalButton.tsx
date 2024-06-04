@@ -30,13 +30,13 @@ type PayWithPaypalButtonProps = {
   interval?: string;
   isSubmitting?: boolean;
   /** Called when user authorize the payment with a payment method generated from PayPal data */
-  onSuccess: Function;
+  onSuccess: ({ orderId, subscriptionId }: { orderId?: string; subscriptionId?: string }) => void;
   /** Called when user cancel paypal flow */
-  onCancel?: Function;
+  onCancel?: () => void;
   /** Called when an error is thrown during paypal flow */
-  onError?: Function;
+  onError?: ({ message }: { message: string }) => void;
   /** Called when the button is clicked */
-  onClick?: Function;
+  onClick?: () => void;
   /** Styles to apply to the button. See https://developer.paypal.com/docs/checkout/how-to/customize-button/#button-styles */
   style?: {
     color?: 'gold' | 'blue' | 'silver' | 'white' | 'black';
@@ -134,6 +134,7 @@ class PayWithPaypalButton extends Component<PayWithPaypalButtonProps, { isLoadin
         this.props.onError?.({
           message: this.props.intl.formatMessage({
             defaultMessage: 'There was an error while initializing the PayPal checkout',
+            id: 'PyJNQd',
           }),
         }),
       intent: null,

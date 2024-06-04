@@ -38,7 +38,7 @@ const Count = ({ count, selected }: { count?: number; selected?: boolean }) => {
 type TabsProps = {
   tabs: Array<{ id: string; label: React.ReactNode | string; count?: number }>;
   selectedId?: string;
-  onChange?: Function;
+  onChange?: (value: string) => void;
   variant?: 'horizontal' | 'vertical';
 };
 

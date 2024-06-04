@@ -8,7 +8,8 @@ import { DragIndicator } from '@styled-icons/material/DragIndicator';
 import { sortBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { SocialLink, SocialLinkInput, SocialLinkType } from '../../lib/graphql/types/v2/graphql';
+import type { SocialLink, SocialLinkInput } from '../../lib/graphql/types/v2/graphql';
+import { SocialLinkType } from '../../lib/graphql/types/v2/graphql';
 import { isValidUrl } from '../../lib/utils';
 
 import { Box, Flex } from '../Grid';
@@ -17,7 +18,7 @@ import StyledInput from '../StyledInput';
 import StyledSelect from '../StyledSelect';
 import { Span } from '../Text';
 
-export type SocialLinksFormFieldProps = {
+type SocialLinksFormFieldProps = {
   value?: SocialLink[];
   touched?: boolean;
   onChange: (value: SocialLinkInput[]) => void;

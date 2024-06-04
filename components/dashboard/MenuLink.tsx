@@ -1,6 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
-import { ArrowRight, ChevronDown, ChevronUp, LucideIcon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
 import ReactAnimateHeight from 'react-animate-height';
 import { useIntl } from 'react-intl';
 
@@ -18,7 +19,7 @@ type MenuLinkProps = {
   href?: string;
   className?: string;
   external?: boolean;
-  label?: string;
+  label?: string | React.JSX.Element;
   Icon?: LucideIcon;
   subMenu?: PageMenuItem[];
   section?: string;

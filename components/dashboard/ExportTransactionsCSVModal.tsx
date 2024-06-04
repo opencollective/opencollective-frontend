@@ -1,16 +1,17 @@
-import React, { MouseEventHandler } from 'react';
+import React from 'react';
 import { gql, useMutation } from '@apollo/client';
 import { DndContext, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { debounce, isEmpty, isNil, omit, uniq, without } from 'lodash';
 import { Eraser } from 'lucide-react';
+import type { MouseEventHandler } from 'react';
 import { FormattedMessage } from 'react-intl';
 import slugify from 'slugify';
 
+import type { CSVField } from '../../lib/csv';
 import {
   AVERAGE_TRANSACTIONS_PER_MINUTE,
-  CSVField,
   FIELD_OPTIONS,
   FieldLabels,
   FieldOptionsLabels,
@@ -22,13 +23,13 @@ import {
 } from '../../lib/csv';
 import { getEnvVar } from '../../lib/env-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import {
+import type {
   Account,
   HostReportsPageQueryVariables,
   TransactionsPageQueryVariables,
 } from '../../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
-import { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
+import type { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
 import { cn, parseToBoolean } from '../../lib/utils';
 
@@ -615,10 +616,8 @@ const ExportTransactionsCSVModal = ({
                 </InfoTooltipIcon>
               </div>
             )}
-          </div>
-          {isAboveRowLimit && (
-            <div className="absolute left-0 top-0 flex h-full w-full  items-center justify-center bg-black/30">
-              <div className="m-4 flex max-w-md flex-col gap-4 rounded-lg border border-solid border-red-600 bg-red-50 px-6 py-4 sm:m-0">
+            {isAboveRowLimit && (
+              <div className="flex flex-col gap-4 rounded-lg border border-solid border-red-600 bg-red-50 px-6 py-4">
                 <p className="font-bold">
                   <FormattedMessage defaultMessage="The size of the resulting export file is too large" id="XX+VZK" />
                 </p>
@@ -629,30 +628,33 @@ const ExportTransactionsCSVModal = ({
                   />
                 </p>
               </div>
-            </div>
-          )}
+            )}
+          </div>
+
           <DialogFooter className="flex flex-col gap-4 border-t border-solid border-slate-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
             <div>
-              <div className="flex flex-col gap-3 font-bold text-slate-700 sm:flex-row sm:text-sm">
-                <FormattedMessage
-                  id="ExportTransactionsCSVModal.ExportRows"
-                  defaultMessage="Exporting {rows} {rows, plural, one {row} other {rows}}"
-                  values={{
-                    rows: exportedRows,
-                  }}
-                />
-                {expectedTimeInMinutes > 0 && (
-                  <div className="text-sm font-normal">
-                    <FormattedMessage
-                      id="ExportTransactionsCSVModal.ExportTime"
-                      defaultMessage="Estimated time: {expectedTimeInMinutes, plural, one {# minute} other {# minutes}}"
-                      values={{
-                        expectedTimeInMinutes,
-                      }}
-                    />
-                  </div>
-                )}
-              </div>
+              {!isAboveRowLimit && (
+                <div className="flex flex-col gap-3 font-bold text-slate-700 sm:flex-row sm:text-sm">
+                  <FormattedMessage
+                    id="ExportTransactionsCSVModal.ExportRows"
+                    defaultMessage="Exporting {rows} {rows, plural, one {row} other {rows}}"
+                    values={{
+                      rows: exportedRows,
+                    }}
+                  />
+                  {expectedTimeInMinutes > 0 && (
+                    <div className="text-sm font-normal">
+                      <FormattedMessage
+                        id="ExportTransactionsCSVModal.ExportTime"
+                        defaultMessage="Estimated time: {expectedTimeInMinutes, plural, one {# minute} other {# minutes}}"
+                        values={{
+                          expectedTimeInMinutes,
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
             <div className="flex flex-col justify-stretch gap-2 sm:flex-row sm:justify-normal">
               {canEditFields && (

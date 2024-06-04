@@ -44,9 +44,14 @@ const messages = defineMessages({
     defaultMessage:
       'A Brussels-based nonprofit hosting groups across Europe, including open source projects and community social action.',
   },
-  'fiscalHosting.hosts.OCN': {
-    id: 'fiscalHosting.hosts.OCN',
-    defaultMessage: 'Offering kiwi impact projects fundholding options through a charity or a company structure.',
+  'fiscalHosting.hosts.giftcollective': {
+    id: 'fiscalHosting.hosts.giftcollective',
+    defaultMessage: 'A NZ-based charitable entity hosting grassroots/community groups with a charitable focus.',
+  },
+  'fiscalHosting.hosts.platform6': {
+    id: 'fiscalHosting.hosts.platform6',
+    defaultMessage:
+      'Using tech and platform/ecosystem thinking to grow the cooperative economy through P2P mutual support and collaborative crowdfunding.',
   },
 });
 
@@ -186,7 +191,7 @@ ApplyToHostGrid.propTypes = {
 const ApplyToFiscalHosts = () => (
   <Flex my={4} flexDirection="column" mx={[3, 4]} alignItems="center">
     <SectionTitle textAlign="center" mb="8px">
-      <FormattedMessage id="fiscalHosting.applyToFiscalHost" defaultMessage="Apply to one of our Fiscal Hosts" />
+      <FormattedMessage id="collective.edit.host.findHost.title" defaultMessage="Apply to a Fiscal Host" />
     </SectionTitle>
     <Container width={['286px', '648px', '705px', null, '936px']} textAlign="center" mb={4}>
       <SectionDescription textAlign="center" my="0">

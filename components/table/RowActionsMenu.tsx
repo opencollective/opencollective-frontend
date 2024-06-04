@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Table } from '@tanstack/react-table';
+import type { Row, Table } from '@tanstack/react-table';
 import { MoreHorizontal, PanelRightOpen } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
@@ -40,7 +40,11 @@ export function RowActionsMenu<TData>({ row, actionsMenuTriggerRef, table }: Row
   }
   const { getActions, onClickRow } = table.options.meta;
 
-  const { primary, secondary } = getActions(row.original, actionsMenuTriggerRef);
+  if (!getActions) {
+    return null;
+  }
+
+  const { primary, secondary } = getActions(row.original, actionsMenuTriggerRef) ?? {};
   const openDetails = () => {
     onClickRow?.(row, actionsMenuTriggerRef);
   };

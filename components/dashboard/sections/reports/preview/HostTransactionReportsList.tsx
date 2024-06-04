@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
 import { useQuery } from '@apollo/client';
-import { toNumber } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
@@ -13,10 +12,10 @@ import FormattedMoneyAmount from '../../../../FormattedMoneyAmount';
 import MessageBoxGraphqlError from '../../../../MessageBoxGraphqlError';
 import { DataTable } from '../../../../table/DataTable';
 import Tabs from '../../../../Tabs';
-import { Pagination } from '../../../../ui/Pagination';
 import { DashboardContext } from '../../../DashboardContext';
 import DashboardHeader from '../../../DashboardHeader';
-import { DashboardSectionProps } from '../../../types';
+import { Pagination } from '../../../filters/Pagination';
+import type { DashboardSectionProps } from '../../../types';
 
 import { CurrentPeriodBadge } from './CurrentPeriodBadge';
 import { hostReportQuery } from './queries';
@@ -101,8 +100,6 @@ const HostTransactionReportList = ({ accountSlug: hostSlug }: DashboardSectionPr
   });
   const columns = getColumns(intl);
   const { limit, offset } = queryFilter.values;
-  const pages = Math.ceil((data?.host?.hostTransactionsReports?.nodes.length || 1) / limit);
-  const currentPage = toNumber(offset + limit) / limit;
 
   const tabs = useMemo(
     () => [
@@ -164,14 +161,7 @@ const HostTransactionReportList = ({ accountSlug: hostSlug }: DashboardSectionPr
           )}
         </div>
       </div>
-
-      {pages > 1 && (
-        <Pagination
-          totalPages={pages}
-          page={currentPage}
-          onChange={page => queryFilter.setFilter('offset', (page - 1) * limit)}
-        />
-      )}
+      <Pagination queryFilter={queryFilter} total={data?.host?.hostTransactionsReports?.nodes.length} />
     </div>
   );
 };

@@ -6,7 +6,7 @@ import { track } from '../../lib/analytics/plausible';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 
 import { ExpenseFlowStep, Steps } from './Steps';
-import { ExpenseForm } from './useExpenseForm';
+import type { ExpenseForm } from './useExpenseForm';
 
 type UseStepsOptions = {
   steps: ExpenseFlowStep[];

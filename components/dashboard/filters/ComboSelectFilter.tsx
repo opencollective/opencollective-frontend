@@ -2,10 +2,11 @@ import React from 'react';
 import clsx from 'clsx';
 import { isUndefined, uniqBy } from 'lodash';
 import { CheckIcon, PlusIcon } from 'lucide-react';
-import { FormattedMessage, IntlShape, MessageDescriptor, useIntl } from 'react-intl';
-import { z } from 'zod';
+import type { IntlShape, MessageDescriptor } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
+import type { z } from 'zod';
 
-import { FilterConfig } from '../../../lib/filters/filter-types';
+import type { FilterConfig } from '../../../lib/filters/filter-types';
 import useDebouncedSearch from '../../../lib/hooks/useDebouncedSearch';
 import { sortSelectOptions } from '../../../lib/utils';
 

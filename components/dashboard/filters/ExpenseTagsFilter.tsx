@@ -3,7 +3,7 @@ import { gql, useLazyQuery } from '@apollo/client';
 import { defineMessage } from 'react-intl';
 import { z } from 'zod';
 
-import { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
+import type { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
 import { isMulti } from '../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 

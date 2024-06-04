@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useReducer } from 'react';
 
-import ConfirmationModal, { ConfirmationModalProps } from './NewConfirmationModal';
+import type { ConfirmationModalProps } from './NewConfirmationModal';
+import ConfirmationModal from './NewConfirmationModal';
 
 export interface BaseModalProps {
   open: boolean;
@@ -117,15 +118,6 @@ const reducer = (state: ModalContextValues, action: ModalAction) => {
   }
 };
 
-export type CloseComponentType = React.ComponentType<{
-  onClick: React.MouseEventHandler<any>;
-}>;
-
-export type ContentComponentType = React.ComponentType<{
-  className?: string;
-  children: React.ReactNode;
-}>;
-
 const ModalRoot = () => {
   const { modals, hideModal } = useModal();
   return modals.map(({ component: Component, modalProps, type, id, open }) => {
@@ -150,7 +142,7 @@ const ModalRoot = () => {
   });
 };
 
-const ModalProvider = ({ children }) => {
+export const ModalProvider = ({ children }) => {
   const initialState = {
     modals: [],
     showModal: (component, modalProps = {}, modalId) => {
@@ -178,8 +170,4 @@ const ModalProvider = ({ children }) => {
   );
 };
 
-const useModal = () => useContext(ModalContext);
-
-// ignore unused exports
-
-export { ModalProvider, useModal };
+export const useModal = () => useContext(ModalContext);

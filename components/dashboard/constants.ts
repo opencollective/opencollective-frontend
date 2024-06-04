@@ -1,5 +1,8 @@
 import { defineMessages } from 'react-intl';
 
+export const ROOT_PROFILE_KEY = 'root-actions';
+export const ROOT_PROFILE_ACCOUNT = { slug: ROOT_PROFILE_KEY, type: 'ROOT', name: 'Profile Admin' };
+
 export const SECTIONS = {
   OVERVIEW: 'overview',
   REPORTS: 'reports',
@@ -15,13 +18,16 @@ export const SECTIONS = {
   CONTRIBUTORS: 'contributors',
   INCOMING_CONTRIBUTIONS: 'incoming-contributions',
   OUTGOING_CONTRIBUTIONS: 'outgoing-contributions',
+  HOST_EXPECTED_FUNDS: 'expected-funds',
   EXPENSES: 'expenses',
   SUBMITTED_EXPENSES: 'submitted-expenses',
   TRANSACTIONS: 'transactions',
+  UPDATES: 'updates',
   HOST_TRANSACTIONS: 'host-transactions',
   VIRTUAL_CARDS: 'virtual-cards',
   TEAM: 'team',
   VENDORS: 'vendors',
+  ALL_COLLECTIVES: 'all-collectives',
 };
 
 export const SETTINGS_SECTIONS = {
@@ -258,5 +264,9 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.TAX_INFORMATION]: {
     defaultMessage: 'Tax Information',
     id: 'r/dTTe',
+  },
+  [ALL_SECTIONS.UPDATES]: {
+    id: 'updates',
+    defaultMessage: 'Updates',
   },
 });

@@ -1,10 +1,10 @@
 import { Download, FileX, Upload } from 'lucide-react';
 import { useIntl } from 'react-intl';
 
-import { GetActions } from '../../../../lib/actions/types';
+import type { GetActions } from '../../../../lib/actions/types';
 import { downloadLegalDocument } from '../../../../lib/api';
 import { formatErrorMessage } from '../../../../lib/errors';
-import { Host, LegalDocument } from '../../../../lib/graphql/types/v2/graphql';
+import type { Host, LegalDocument } from '../../../../lib/graphql/types/v2/graphql';
 import { useTwoFactorAuthenticationPrompt } from '../../../../lib/two-factor-authentication/TwoFactorAuthenticationContext';
 import { Sentry } from '../../../../server/sentry';
 
@@ -42,7 +42,7 @@ export function useLegalDocumentActions(host: Host, refetch: () => void): GetAct
       });
     }
 
-    if (legalDocument.status === 'RECEIVED') {
+    if (legalDocument.status === 'RECEIVED' && !legalDocument.isExpired) {
       actions.primary.push({
         label: intl.formatMessage({ defaultMessage: 'Invalidate', id: 'TaxForm.Invalidate' }),
         Icon: FileX,
