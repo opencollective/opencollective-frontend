@@ -25,6 +25,7 @@ import OutgoingContributions from './sections/contributions/OutgoingContribution
 import Contributors from './sections/Contributors';
 import HostExpenses from './sections/expenses/HostDashboardExpenses';
 import ReceivedExpenses from './sections/expenses/ReceivedExpenses';
+import { HostExpensesReport } from './sections/expenses/reports/HostExpensesReport';
 import SubmittedExpenses from './sections/expenses/SubmittedExpenses';
 import HostDashboardAgreements from './sections/HostDashboardAgreements';
 import HostVirtualCardRequests from './sections/HostVirtualCardRequests';
@@ -60,6 +61,7 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.CHART_OF_ACCOUNTS]: HostAdminAccountingSection,
   [SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS]: HostFinancialContributions,
   [SECTIONS.HOST_EXPENSES]: HostExpenses,
+  [SECTIONS.HOST_EXPENSES_REPORT]: HostExpensesReport,
   [SECTIONS.HOST_AGREEMENTS]: HostDashboardAgreements,
   [SECTIONS.HOST_TAX_FORMS]: HostDashboardTaxForms,
   [SECTIONS.HOST_APPLICATIONS]: HostApplications,

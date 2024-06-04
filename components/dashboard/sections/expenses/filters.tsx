@@ -29,6 +29,7 @@ import { expenseTagFilter } from '../../filters/ExpenseTagsFilter';
 import { searchFilter } from '../../filters/SearchFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
 import { VirtualCardRenderer } from '../../filters/VirtualCardsFilter';
+import { accountingCategoryFilter } from '../../filters/AccountingCategoryFilter';
 
 const sortFilter = buildSortFilter({
   fieldSchema: z.enum(['CREATED_AT']),
@@ -52,6 +53,7 @@ export const schema = z.object({
   tag: expenseTagFilter.schema,
   chargeHasReceipts: boolean.optional(),
   virtualCard: isMulti(z.string()).optional(),
+  accountingCategory: accountingCategoryFilter.schema,
 });
 
 type FilterValues = z.infer<typeof schema>;
@@ -78,6 +80,7 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   searchTerm: searchFilter.filter,
   date: dateFilter.filter,
   amount: amountFilter.filter,
+  accountingCategory: accountingCategoryFilter.filter,
   status: {
     static: true,
     labelMsg: defineMessage({ id: 'expense.status', defaultMessage: 'Status' }),

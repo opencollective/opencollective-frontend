@@ -44,6 +44,7 @@ type FilterMeta = CommonFilterMeta & {
   hostSlug: string;
   hostedAccounts?: Array<AccountHoverCardFieldsFragment>;
   expenseTags?: string[];
+  includeUncategorized?: boolean;
 };
 
 const toVariables: FiltersToVariables<FilterValues, HostDashboardExpensesQueryVariables, FilterMeta> = {
@@ -162,6 +163,7 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     hostSlug: hostSlug,
     hostedAccounts: metaData?.hostedAccounts.nodes,
     expenseTags: metaData?.expenseTags.nodes?.map(t => t.tag),
+    includeUncategorized: true,
   };
 
   const queryFilter = useQueryFilter({
