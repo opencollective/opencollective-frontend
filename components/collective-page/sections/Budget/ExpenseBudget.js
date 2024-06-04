@@ -232,8 +232,7 @@ const ExpenseBudget = ({ collective, defaultTimeInterval, ...props }) => {
       )}
       <P mt={3} textAlign="right">
         <Link href={`${getCollectivePageRoute(collective)}/transactions?kind=EXPENSE`} data-cy="view-all-expenses-link">
-          <FormattedMessage id="CollectivePage.SectionBudget.ViewAllExpenses" defaultMessage="View all expenses" />{' '}
-          &rarr;
+          <FormattedMessage id="umVJL7" defaultMessage="View all paid expenses" /> &rarr;
         </Link>
       </P>
     </Flex>
