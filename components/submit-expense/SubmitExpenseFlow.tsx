@@ -379,7 +379,7 @@ function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
       <div className="sticky top-0 z-50 w-full self-start bg-white drop-shadow-lg sm:top-10 sm:w-[165px] sm:min-w-[165px] sm:drop-shadow-none">
         <div
           className={clsx('flex items-center gap-2 px-4 py-2 text-sm sm:hidden', {
-            'border-b border-slate-200 ': collapsed,
+            'border-b border-slate-200': collapsed,
           })}
         >
           <span className="inline-block max-w-[120px] overflow-hidden text-ellipsis whitespace-nowrap text-oc-blue-tints-800">
@@ -408,7 +408,7 @@ function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
         </div>
         <StepList
           className={clsx(
-            'z-50 w-full border-b border-slate-100 bg-white px-4 py-2 drop-shadow-lg sm:block  sm:border-b-0 sm:px-0 sm:py-0 sm:drop-shadow-none',
+            'z-50 w-full border-b border-slate-100 bg-white px-4 py-2 drop-shadow-lg sm:block sm:border-b-0 sm:px-0 sm:py-0 sm:drop-shadow-none',
             {
               'hidden sm:block': collapsed,
               'absolute block': !collapsed,

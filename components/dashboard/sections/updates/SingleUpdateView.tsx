@@ -203,7 +203,7 @@ const SingleUpdateView = ({ updateId }) => {
                     </Button>
                   </div>
                   <hr />
-                  <div className="flex flex-col gap-8 ">
+                  <div className="flex flex-col gap-8">
                     <SideColumnItem>
                       <FormattedMessage defaultMessage="Update type" id="jJmze4" />
                       {update.isChangelog ? (

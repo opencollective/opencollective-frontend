@@ -595,7 +595,7 @@ function PayoutMethodPicker(props: PayoutMethodPickerProps) {
                 }}
               />
 
-              <div className="mt-2 grid grid-cols-[1fr_auto]  grid-rows-1">
+              <div className="mt-2 grid grid-cols-[1fr_auto] grid-rows-1">
                 <span className="text-xs text-neutral-500">
                   {lastUsedPaymentMethodIdByPayee &&
                     lastUsedPaymentMethodIdByPayee === props.form.values.payoutMethodId && (

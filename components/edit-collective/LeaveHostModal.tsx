@@ -151,7 +151,7 @@ export const LeaveHostModal = ({ account, host, onClose }) => {
           {({ values, setFieldValue }: FormikProps<z.infer<typeof LeaveHostFormSchemaWithRecurringContributions>>) => (
             <Form>
               <ModalBody>
-                <div className="mt-3 ">
+                <div className="mt-3">
                   <p className="mb-3 text-sm">
                     <FormattedMessage
                       id="editCollective.host.change.removeFirst"

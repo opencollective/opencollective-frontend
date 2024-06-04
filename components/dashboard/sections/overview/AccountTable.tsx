@@ -103,7 +103,7 @@ const columns: ColumnDef<AccountMetricsRow>[] = [
         <div className="flex items-center gap-3">
           <div className="relative">
             <Avatar
-              className={clsx('transition-opacity', isSelected ? 'opacity-0' : ' group-hover/row:opacity-0')}
+              className={clsx('transition-opacity', isSelected ? 'opacity-0' : 'group-hover/row:opacity-0')}
               collective={account}
               radius={24}
             />
@@ -131,7 +131,7 @@ const columns: ColumnDef<AccountMetricsRow>[] = [
                     href={getCollectivePageRoute(account)}
                     className={clsx(
                       'truncate hover:underline group-hover/row:text-foreground',
-                      isSelected ? 'text-foreground' : 'text-muted-foreground ',
+                      isSelected ? 'text-foreground' : 'text-muted-foreground',
                     )}
                   >
                     {account.name}
