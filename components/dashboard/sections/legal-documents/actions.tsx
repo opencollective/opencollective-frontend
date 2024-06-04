@@ -25,6 +25,7 @@ export function useLegalDocumentActions(host: Host, refetch: () => void): GetAct
 
     if (legalDocument.documentLink) {
       actions.primary.push({
+        key: 'download-pdf',
         label: intl.formatMessage({ defaultMessage: 'Download {format}', id: 'n+rgej' }, { format: 'PDF' }),
         Icon: Download,
         onClick: async () => {
@@ -44,6 +45,7 @@ export function useLegalDocumentActions(host: Host, refetch: () => void): GetAct
 
     if (legalDocument.status === 'RECEIVED' && !legalDocument.isExpired) {
       actions.primary.push({
+        key: 'invalidate',
         label: intl.formatMessage({ defaultMessage: 'Invalidate', id: 'TaxForm.Invalidate' }),
         Icon: FileX,
         onClick: () => {
@@ -56,6 +58,7 @@ export function useLegalDocumentActions(host: Host, refetch: () => void): GetAct
       });
     } else if (['REQUESTED', 'ERROR'].includes(legalDocument.status)) {
       actions.primary.push({
+        key: 'manual-upload',
         label: intl.formatMessage({ defaultMessage: 'Manual upload', id: 'TaxForm.ManualUpload' }),
         Icon: Upload,
         onClick: () => {

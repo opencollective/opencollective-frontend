@@ -88,6 +88,7 @@ export function useTransactionActions<T extends TransactionsTableQueryNode>({
     return {
       primary: [
         {
+          key: 'refund',
           label: intl.formatMessage({ defaultMessage: 'Refund', id: 'Refund' }),
           if: transaction?.permissions.canRefund && !transaction.isRefunded,
           onClick: () => {
@@ -110,6 +111,7 @@ export function useTransactionActions<T extends TransactionsTableQueryNode>({
           Icon: Undo2,
         },
         {
+          key: 'reject',
           label: intl.formatMessage({ defaultMessage: 'Reject', id: 'actions.reject' }),
           if: transaction?.permissions.canReject,
           onClick: () => {
@@ -129,6 +131,7 @@ export function useTransactionActions<T extends TransactionsTableQueryNode>({
       ].filter(a => a.if ?? true),
       secondary: [
         {
+          key: 'view-transactions',
           label: intl.formatMessage({ defaultMessage: 'View related transactions', id: '+9+Ty6' }),
           onClick: () =>
             resetFilters?.({
@@ -138,6 +141,7 @@ export function useTransactionActions<T extends TransactionsTableQueryNode>({
           if: Boolean(transaction.group),
         },
         {
+          key: 'download',
           label: transaction?.expense
             ? intl.formatMessage({ defaultMessage: 'Download Invoice', id: '+j9z3T' })
             : intl.formatMessage({ defaultMessage: 'Download Receipt', id: 'Mwh/vo' }),

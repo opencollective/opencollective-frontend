@@ -1,10 +1,10 @@
 import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { compact, omit } from 'lodash';
-import { PlusIcon } from 'lucide-react';
+import { LinkIcon, PlusIcon } from 'lucide-react';
 import { useRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import type { z } from 'zod';
 
 import type { GetActions } from '../../../../lib/actions/types';
@@ -16,12 +16,15 @@ import type { ContributionDrawerQuery } from '../../../../lib/graphql/types/v2/g
 import { ContributionFrequency, ExpectedFundsFilter, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import i18nOrderStatus from '../../../../lib/i18n/order-status';
 import { i18nPaymentMethodProviderType } from '../../../../lib/i18n/payment-method-provider-type';
+import { sortSelectOptions } from '../../../../lib/utils';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
 import ContributionConfirmationModal from '../../../ContributionConfirmationModal';
 import { ContributionDrawer } from '../../../contributions/ContributionDrawer';
+import { CopyID } from '../../../CopyId';
 import DateTime from '../../../DateTime';
 import type { EditOrderActions } from '../../../EditOrderModal';
 import EditOrderModal from '../../../EditOrderModal';
@@ -36,6 +39,7 @@ import { Button } from '../../../ui/Button';
 import { useToast } from '../../../ui/useToast';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
+import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { Pagination } from '../../filters/Pagination';
 import type { DashboardSectionProps } from '../../types';
@@ -357,8 +361,39 @@ const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpected
     },
   };
 
+  const expectedAt = {
+    accessorKey: 'pendingContributionData.expectedAt',
+    header: intl.formatMessage({ defaultMessage: 'Expected Date', id: 'vNC2dX' }),
+    cell: ({ cell }) => {
+      const date = cell.getValue();
+      return (
+        date && (
+          <div className="flex items-center gap-2 truncate">
+            <DateTime value={date} dateStyle="medium" timeStyle={undefined} />
+          </div>
+        )
+      );
+    },
+  };
+
+  const contributionId = {
+    accessorKey: 'legacyId',
+    header: '#',
+    cell: ({ cell }) => {
+      const legacyId = cell.getValue();
+
+      return (
+        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+        <div className="cursor-default" onClick={e => e.stopPropagation()}>
+          <CopyID value={legacyId}>{legacyId}</CopyID>
+        </div>
+      );
+    },
+  };
+
   if (!tab || [ContributionsTab.ONETIME, ContributionsTab.ALL].includes(tab)) {
     return compact([
+      onlyExpectedFunds ? contributionId : null,
       includeHostedAccounts ? accounts : isIncoming ? fromAccount : toAccount,
       paymentMethod,
       totalAmount,
@@ -374,22 +409,7 @@ const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpected
           );
         },
       },
-      onlyExpectedFunds
-        ? {
-            accessorKey: 'pendingContributionData.expectedAt',
-            header: intl.formatMessage({ defaultMessage: 'Expected Date', id: 'vNC2dX' }),
-            cell: ({ cell }) => {
-              const date = cell.getValue();
-              return (
-                date && (
-                  <div className="flex items-center gap-2 truncate">
-                    <DateTime value={date} dateStyle="medium" timeStyle={undefined} />
-                  </div>
-                )
-              );
-            },
-          }
-        : null,
+      onlyExpectedFunds ? expectedAt : null,
       status,
       actionsColumn,
     ]);
@@ -409,17 +429,36 @@ const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpected
     };
 
     return compact([
+      onlyExpectedFunds ? contributionId : null,
       includeHostedAccounts ? accounts : isIncoming ? fromAccount : toAccount,
       paymentMethod,
       amount,
       totalAmount,
+      onlyExpectedFunds ? expectedAt : null,
       status,
       actionsColumn,
     ]);
   }
 };
 
-const filtersWithoutExpectedFunds = omit(filters, ['expectedFundsFilter', 'expectedDate']);
+const filtersWithoutExpectedFunds = {
+  ...omit(filters, ['expectedFundsFilter', 'expectedDate', 'status']),
+  status: {
+    labelMsg: defineMessage({ defaultMessage: 'Status', id: 'tzMNF3' }),
+    Component: ({ valueRenderer, intl, value, onChange, ...props }) => (
+      <ComboSelectFilter
+        value={value}
+        onChange={onChange}
+        options={Object.values(OrderStatus)
+          .filter(s => s !== OrderStatus.PENDING)
+          .map(value => ({ label: valueRenderer({ intl, value }), value }))
+          .sort(sortSelectOptions)}
+        {...props}
+      />
+    ),
+    valueRenderer: ({ intl, value }) => i18nOrderStatus(intl, value),
+  },
+};
 
 type ContributionsProps = DashboardSectionProps & {
   direction?: 'INCOMING' | 'OUTGOING';
@@ -457,6 +496,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
   const [confirmCompletedOrder, setConfirmCompletedOrder] = React.useState(null);
   const { showConfirmationModal } = useModal();
   const [showCreatePendingOrderModal, setShowCreatePendingOrderModal] = React.useState(false);
+  const [editingExpectedFunds, setEditingExpectedFunds] = React.useState(null);
 
   const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
@@ -699,7 +739,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
         description: (
           <FormattedMessage
             id="Order.MarkPaidExpiredDetails"
-            defaultMessage="This contribution will be marked as expired removed from Pending Contributions. You can find this page by searching for its ID in the search bar or through the status filter in the Financial Contributions page."
+            defaultMessage="This contribution will be marked as expired removed from Expected Funds. You can find this page by searching for its ID in the search bar or through the status filter in the Financial Contributions page."
           />
         ),
         onConfirm: async () => {
@@ -718,6 +758,9 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
         },
         confirmLabel: <FormattedMessage id="order.markAsExpired" defaultMessage="Mark as expired" />,
       });
+    },
+    onEditExpectedFundsClick(order) {
+      setEditingExpectedFunds(order);
     },
   });
 
@@ -771,7 +814,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
                   data-cy="create-pending-contribution"
                 >
                   <span>
-                    <FormattedMessage defaultMessage="Create pending" id="clx/0D" />
+                    <FormattedMessage defaultMessage="Create" id="create" />
                   </span>
                   <PlusIcon size={20} />
                 </Button>
@@ -842,6 +885,17 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
           onSuccess={() => {}}
         />
       )}
+      {editingExpectedFunds && (
+        <CreatePendingContributionModal
+          hostSlug={accountSlug}
+          edit={editingExpectedFunds}
+          onClose={() => setEditingExpectedFunds(null)}
+          onSuccess={() => {
+            refetch();
+            refetchMetadata();
+          }}
+        />
+      )}
     </React.Fragment>
   );
 };
@@ -855,6 +909,7 @@ type GetContributionActionsOptions = {
   onMarkAsCompletedClick: (order: ContributionDrawerQuery['order']) => void;
   onMarkAsExpiredClick: (order: ContributionDrawerQuery['order']) => void;
   onCancelClick: (order: ContributionDrawerQuery['order']) => void;
+  onEditExpectedFundsClick: (order: ContributionDrawerQuery['order']) => void;
 };
 
 const getContributionActions: (opts: GetContributionActionsOptions) => GetActions<ContributionDrawerQuery['order']> =
@@ -889,6 +944,7 @@ const getContributionActions: (opts: GetContributionActionsOptions) => GetAction
     const canMarkAsCompleted =
       [OrderStatus.PENDING, OrderStatus.EXPIRED].includes(order.status) && order.permissions.canMarkAsPaid;
     const canMarkAsExpired = order.status === OrderStatus.PENDING && order.permissions.canMarkAsExpired;
+    const isExpectedFunds = !!order.pendingContributionData?.expectedAt;
 
     const canDoActions = [canUpdateActiveOrder, canResume, canCancel, canMarkAsCompleted, canMarkAsExpired];
 
@@ -903,6 +959,7 @@ const getContributionActions: (opts: GetContributionActionsOptions) => GetAction
           id: 'subscription.menu.editPaymentMethod',
         }),
         onClick: () => opts.onUpdatePaymentMethodClick(order),
+        key: 'update-payment-method',
       });
     }
 
@@ -910,6 +967,7 @@ const getContributionActions: (opts: GetContributionActionsOptions) => GetAction
       actions.primary.push({
         label: opts.intl.formatMessage({ defaultMessage: 'Resume contribution', id: '51nF6S' }),
         onClick: () => opts.onResumeClick(order),
+        key: 'resume-contribution',
       });
     }
 
@@ -917,6 +975,15 @@ const getContributionActions: (opts: GetContributionActionsOptions) => GetAction
       actions.primary.push({
         label: opts.intl.formatMessage({ defaultMessage: 'Update amount', id: 'subscription.menu.updateAmount' }),
         onClick: () => opts.onEditAmountClick(order),
+        key: 'update-amount',
+      });
+    }
+
+    if (isExpectedFunds && (canMarkAsExpired || canMarkAsCompleted)) {
+      actions.primary.push({
+        label: opts.intl.formatMessage({ defaultMessage: 'Edit expected funds', id: 'hQAJH9' }),
+        onClick: () => opts.onEditExpectedFundsClick(order),
+        key: 'edit',
       });
     }
 
@@ -925,6 +992,7 @@ const getContributionActions: (opts: GetContributionActionsOptions) => GetAction
         label: opts.intl.formatMessage({ defaultMessage: 'Mark as completed', id: 'order.markAsCompleted' }),
         onClick: () => opts.onMarkAsCompletedClick(order),
         'data-cy': 'MARK_AS_PAID-button',
+        key: 'mark-as-paid',
       });
     }
 
@@ -933,11 +1001,13 @@ const getContributionActions: (opts: GetContributionActionsOptions) => GetAction
         label: opts.intl.formatMessage({ defaultMessage: 'Mark as expired', id: 'order.markAsExpired' }),
         onClick: () => opts.onMarkAsExpiredClick(order),
         'data-cy': 'MARK_AS_EXPIRED-button',
+        key: 'mark-as-expired',
       });
     }
 
     if (canCancel) {
       actions.secondary.push({
+        key: 'cancel-contribution',
         label: opts.intl.formatMessage({
           defaultMessage: 'Cancel contribution',
           id: 'subscription.menu.cancelContribution',
@@ -946,6 +1016,25 @@ const getContributionActions: (opts: GetContributionActionsOptions) => GetAction
         'data-cy': 'recurring-contribution-menu-cancel-option',
       });
     }
+
+    const toAccount = order.toAccount;
+    const legacyId = order.legacyId;
+    const orderUrl = new URL(`${toAccount.slug}/orders/${legacyId}`, window.location.origin);
+
+    actions.secondary.push({
+      key: 'copy-link',
+      label: (
+        <CopyID
+          Icon={<LinkIcon size={12} />}
+          value={orderUrl}
+          tooltipLabel={<FormattedMessage defaultMessage="Copy link" id="CopyLink" />}
+          className="inline-flex items-center gap-1"
+        >
+          <FormattedMessage defaultMessage="Copy link" id="CopyLink" />
+        </CopyID>
+      ),
+      onClick: () => {},
+    });
 
     return actions;
   };

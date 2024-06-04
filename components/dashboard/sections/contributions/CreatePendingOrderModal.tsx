@@ -400,7 +400,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
         <Field
           name="toAccount"
           htmlFor="CreatePendingContribution-toAccount"
-          label={<FormattedMessage defaultMessage="Create pending contribution for:" id="6HAoiZ" />}
+          label={<FormattedMessage defaultMessage="Create expected funds for:" id="S5zrpB" />}
           labelFontSize="16px"
           labelFontWeight="700"
         >
@@ -822,9 +822,9 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
         </Button>
         <Button type="submit" data-cy="create-pending-contribution-submit-btn" loading={isSubmitting}>
           {edit ? (
-            <FormattedMessage defaultMessage="Edit pending contribution" id="dIbvMd" />
+            <FormattedMessage defaultMessage="Edit expected funds" id="hQAJH9" />
           ) : (
-            <FormattedMessage defaultMessage="Create pending contribution" id="qISY+c" />
+            <FormattedMessage defaultMessage="Create expected funds" id="OKMbES" />
           )}
         </Button>
       </div>
@@ -887,13 +887,9 @@ const CreatePendingContributionModal = ({ hostSlug, edit, ...props }: CreatePend
     >
       <ModalHeader>
         {edit ? (
-          <FormattedMessage
-            defaultMessage="Edit Pending Contribution #{id}"
-            id="sMnp2d"
-            values={{ id: edit.legacyId }}
-          />
+          <FormattedMessage defaultMessage="Edit Expected Funds #{id}" id="/QMYYS" values={{ id: edit.legacyId }} />
         ) : (
-          <FormattedMessage defaultMessage="Create Pending Contribution" id="1i8Ufu" />
+          <FormattedMessage defaultMessage="Create Expected Funds" id="8zsN7i" />
         )}
       </ModalHeader>
       {loading ? (
@@ -934,8 +930,8 @@ const CreatePendingContributionModal = ({ hostSlug, edit, ...props }: CreatePend
                 variant: 'success',
                 message: (
                   <FormattedMessage
-                    defaultMessage="Pending contribution #{orderId} updated"
-                    id="fqxYbq"
+                    defaultMessage="Expected Funds #{orderId} updated"
+                    id="6mXKXi"
                     values={{ orderId: result.data.editPendingOrder.legacyId }}
                   />
                 ),
@@ -961,7 +957,7 @@ const CreatePendingContributionModal = ({ hostSlug, edit, ...props }: CreatePend
                 variant: 'success',
                 message: (
                   <FormattedMessage
-                    defaultMessage="Pending contribution created with reference #{orderId}"
+                    defaultMessage="Expected Funds created with reference #{orderId}"
                     id="k8izBg"
                     values={{ orderId: result.data.createPendingOrder.legacyId }}
                   />
