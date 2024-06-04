@@ -486,7 +486,7 @@ const AddFundsModal = ({ collective, ...props }) => {
 
             if (!fundDetails.showSuccessModal) {
               return (
-                <Form data-cy="add-funds-form" className="flex h-full  flex-col overflow-y-hidden">
+                <Form data-cy="add-funds-form" className="flex h-full flex-col overflow-y-hidden">
                   <div className="w-full flex-grow overflow-y-auto pb-4">
                     <Field
                       name="fromAccount"
@@ -819,7 +819,7 @@ const AddFundsModal = ({ collective, ...props }) => {
                 <Form>
                   <ModalBody data-cy="funds-added">
                     <Container>
-                      <h3 className="mt-4 text-xl  text-black">
+                      <h3 className="mt-4 text-xl text-black">
                         <FormattedMessage id="AddFundsModal.FundsAdded" defaultMessage="Funds Added ✅" />
                       </h3>
                       <Container pb={2} mt={3}>

@@ -307,7 +307,7 @@ function PayPalStatus(props: PayPalStatusProps) {
         />
         <Paypal size={16} />
       </div>
-      <div className="mt-2 flex-grow text-2xl font-bold  text-slate-900">
+      <div className="mt-2 flex-grow text-2xl font-bold text-slate-900">
         <FormattedMoneyAmount
           showCurrencyCode={false}
           currency={props.host?.paypalPreApproval?.balance?.currency}
@@ -343,7 +343,7 @@ function PayPalStatus(props: PayPalStatusProps) {
             id="Ey7Kn+"
             values={{ count: props.scheduledForPaymentCount ?? 0 }}
           />
-          <div className="mt-2 flex gap-2 text-base  text-slate-900">
+          <div className="mt-2 flex gap-2 text-base text-slate-900">
             <FormattedMoneyAmount
               showCurrencyCode={false}
               currency={props.host?.currency}

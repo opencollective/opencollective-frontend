@@ -216,7 +216,7 @@ const OrgsTable = ({ orgs, loading, openOrg }) => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <TableActionsButton>
-                  <MoreHorizontal className="relative h-3 w-3  " aria-hidden="true" />
+                  <MoreHorizontal className="relative h-3 w-3" aria-hidden="true" />
                 </TableActionsButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent>

@@ -171,7 +171,7 @@ const UpdatesList = () => {
         />
 
         <Filterbar {...queryFilter} />
-        <div className="order-1 space-y-6 xl:order-none xl:col-span-2 ">
+        <div className="order-1 space-y-6 xl:order-none xl:col-span-2">
           {error ? (
             <MessageBoxGraphqlError error={error} />
           ) : loading ? (

@@ -767,7 +767,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
                 <Button
                   size="sm"
                   onClick={() => setShowCreatePendingOrderModal(true)}
-                  className="gap-1 "
+                  className="gap-1"
                   data-cy="create-pending-contribution"
                 >
                   <span>

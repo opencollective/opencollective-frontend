@@ -260,7 +260,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
         {isModal && (
           <button
             onClick={onCancel}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-transparent bg-transparent text-slate-500 ring-2 ring-transparent transition-colors hover:text-slate-950  focus:outline-none focus-visible:ring-black active:ring-black group-hover:border-slate-200 group-hover:bg-white data-[state=open]:ring-black"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-transparent bg-transparent text-slate-500 ring-2 ring-transparent transition-colors hover:text-slate-950 focus:outline-none focus-visible:ring-black active:ring-black group-hover:border-slate-200 group-hover:bg-white data-[state=open]:ring-black"
           >
             <X size="20px" />
           </button>
@@ -468,7 +468,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
               {formik.values.payoutMethod && (
                 <Field name="payoutMethod">
                   {({ field }) => (
-                    <div className="mt-3  flex-grow">
+                    <div className="mt-3 flex-grow">
                       <PayoutMethodForm
                         fieldsPrefix="payoutMethod"
                         payoutMethod={field.value}

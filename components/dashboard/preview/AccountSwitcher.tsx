@@ -331,7 +331,7 @@ export default function AccountSwitcher({ activeSlug, defaultSlug, setDefaultSlu
                 onClick={() => router.push(`/dashboard/${parentAccount.slug}`)}
                 aria-expanded={open}
                 className={clsx(
-                  'group h-8 justify-between gap-1.5 whitespace-nowrap rounded-full border-transparent px-2 ',
+                  'group h-8 justify-between gap-1.5 whitespace-nowrap rounded-full border-transparent px-2',
                   'max-w-[14rem]',
                 )}
               >

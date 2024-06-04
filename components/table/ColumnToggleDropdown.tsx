@@ -58,7 +58,7 @@ export function ColumnToggleDropdown<TData>({ table }: { table: Table<TData> }) 
           })}
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          className={'gap-2 '}
+          className={'gap-2'}
           onSelect={e => {
             e.preventDefault();
             setColumnVisibility(defaultColumnVisibility);

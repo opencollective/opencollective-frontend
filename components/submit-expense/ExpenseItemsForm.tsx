@@ -35,7 +35,7 @@ export function ExpenseItemsForm(props: ExpenseItemsFormProps) {
         </div>
         <hr className="flex-grow border-neutral-300" />
         <Button
-          className="flex w-fit  gap-1 rounded-full px-3 py-1"
+          className="flex w-fit gap-1 rounded-full px-3 py-1"
           variant="outline"
           size="icon-xs"
           onClick={() => {

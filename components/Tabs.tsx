@@ -98,7 +98,7 @@ const Tabs = ({ tabs, selectedId, onChange, ...props }: TabsProps) => {
               key={tab.id}
               onClick={() => onChange?.(tab.id)}
               className={clsx(
-                'flex gap-3 whitespace-nowrap border-b-2 px-1 pb-4 pt-2 text-sm font-medium ring-inset ring-ring	transition-colors focus:outline-none focus-visible:ring-2',
+                'flex gap-3 whitespace-nowrap border-b-2 px-1 pb-4 pt-2 text-sm font-medium ring-inset ring-ring transition-colors focus:outline-none focus-visible:ring-2',
                 selected
                   ? 'border-primary text-primary'
                   : 'border-transparent text-muted-foreground hover:border-border hover:text-foreground/80',

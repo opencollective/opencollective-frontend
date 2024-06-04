@@ -65,7 +65,7 @@ const TableHead = React.forwardRef<
     <th
       ref={ref}
       className={cn(
-        'h-12 px-2 text-left align-middle font-medium tracking-tight text-muted-foreground first:pl-4  last:pr-4 [&:has([role=checkbox])]:pr-0',
+        'h-12 px-2 text-left align-middle font-medium tracking-tight text-muted-foreground first:pl-4 last:pr-4 [&:has([role=checkbox])]:pr-0',
         fullWidth && 'sm:first:pl-6 sm:last:pr-6 2xl:first:pl-4 2xl:last:pr-4',
         className,
       )}
@@ -82,7 +82,7 @@ const TableCell = React.forwardRef<
   <td
     ref={ref}
     className={cn(
-      'relative  px-2 py-2 align-middle  first:pl-4 last:pr-4  [&:has([role=checkbox])]:pr-0',
+      'relative px-2 py-2 align-middle first:pl-4 last:pr-4 [&:has([role=checkbox])]:pr-0',
       withIndicator && 'first:border-l-2 first:border-transparent first:data-[state=indicated]:border-primary',
       fullWidth && 'sm:first:pl-6 sm:last:pr-6 2xl:first:pl-4 2xl:last:pr-4',
       compact ? 'h-[49px] min-h-[49px]' : 'h-[56px] min-h-[56px]',
@@ -95,7 +95,7 @@ TableCell.displayName = 'TableCell';
 
 const TableCaption = React.forwardRef<HTMLTableCaptionElement, React.HTMLAttributes<HTMLTableCaptionElement>>(
   ({ className, ...props }, ref) => (
-    <caption ref={ref} className={cn('mt-4 text-sm text-slate-500 ', className)} {...props} />
+    <caption ref={ref} className={cn('mt-4 text-sm text-slate-500', className)} {...props} />
   ),
 );
 TableCaption.displayName = 'TableCaption';
@@ -105,7 +105,7 @@ const TableActionsButton = React.forwardRef<HTMLButtonElement, React.ButtonHTMLA
     <button
       ref={ref}
       className={cn(
-        'flex h-8 w-8 items-center justify-center rounded-lg border border-transparent bg-transparent text-slate-500 shadow-sm shadow-transparent ring-2 ring-transparent transition-colors hover:text-slate-950 hover:shadow-slate-200  focus:outline-none focus-visible:ring-black active:ring-black disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 group-hover/row:border-slate-200 group-hover/row:bg-white data-[state=open]:ring-black',
+        'flex h-8 w-8 items-center justify-center rounded-lg border border-transparent bg-transparent text-slate-500 shadow-sm shadow-transparent ring-2 ring-transparent transition-colors hover:text-slate-950 hover:shadow-slate-200 focus:outline-none focus-visible:ring-black active:ring-black disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 group-hover/row:border-slate-200 group-hover/row:bg-white data-[state=open]:ring-black',
         className,
       )}
       {...props}
