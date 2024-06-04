@@ -70,7 +70,7 @@ export function RowActionsMenu<TData>({ row, actionsMenuTriggerRef, table }: Row
           <React.Fragment>
             <DropdownMenuSeparator />
             {primary.map(action => (
-              <DropdownActionItem key={action.label} action={action} />
+              <DropdownActionItem key={action.key} action={action} />
             ))}
           </React.Fragment>
         )}
@@ -79,7 +79,7 @@ export function RowActionsMenu<TData>({ row, actionsMenuTriggerRef, table }: Row
           <React.Fragment>
             <DropdownMenuSeparator />
             {secondary.map(action => {
-              return <DropdownActionItem key={action.label} action={action} />;
+              return <DropdownActionItem key={action.key} action={action} />;
             })}
           </React.Fragment>
         )}

@@ -391,31 +391,9 @@ const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpected
     },
   };
 
-  const link = {
-    accessorKey: 'legacyId',
-    header: <LinkIcon size={16} />,
-    cell: ({ row, cell }) => {
-      const legacyId = cell.getValue();
-      const toAccount = row.original.toAccount;
-      const orderUrl = new URL(`${toAccount.slug}/orders/${legacyId}`, window.location.origin);
-
-      return (
-        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
-        <div className="cursor-default" onClick={e => e.stopPropagation()}>
-          <CopyID
-            Icon={<LinkIcon size={12} />}
-            value={orderUrl}
-            tooltipLabel={<FormattedMessage defaultMessage="Copy link" id="CopyLink" />}
-          />
-        </div>
-      );
-    },
-  };
-
   if (!tab || [ContributionsTab.ONETIME, ContributionsTab.ALL].includes(tab)) {
     return compact([
       onlyExpectedFunds ? contributionId : null,
-      onlyExpectedFunds ? link : null,
       includeHostedAccounts ? accounts : isIncoming ? fromAccount : toAccount,
       paymentMethod,
       totalAmount,
@@ -452,7 +430,6 @@ const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpected
 
     return compact([
       onlyExpectedFunds ? contributionId : null,
-      onlyExpectedFunds ? link : null,
       includeHostedAccounts ? accounts : isIncoming ? fromAccount : toAccount,
       paymentMethod,
       amount,
@@ -982,6 +959,7 @@ const getContributionActions: (opts: GetContributionActionsOptions) => GetAction
           id: 'subscription.menu.editPaymentMethod',
         }),
         onClick: () => opts.onUpdatePaymentMethodClick(order),
+        key: 'update-payment-method',
       });
     }
 
@@ -989,6 +967,7 @@ const getContributionActions: (opts: GetContributionActionsOptions) => GetAction
       actions.primary.push({
         label: opts.intl.formatMessage({ defaultMessage: 'Resume contribution', id: '51nF6S' }),
         onClick: () => opts.onResumeClick(order),
+        key: 'resume-contribution',
       });
     }
 
@@ -996,6 +975,7 @@ const getContributionActions: (opts: GetContributionActionsOptions) => GetAction
       actions.primary.push({
         label: opts.intl.formatMessage({ defaultMessage: 'Update amount', id: 'subscription.menu.updateAmount' }),
         onClick: () => opts.onEditAmountClick(order),
+        key: 'update-amount',
       });
     }
 
@@ -1003,6 +983,7 @@ const getContributionActions: (opts: GetContributionActionsOptions) => GetAction
       actions.primary.push({
         label: opts.intl.formatMessage({ defaultMessage: 'Edit expected funds', id: 'hQAJH9' }),
         onClick: () => opts.onEditExpectedFundsClick(order),
+        key: 'edit',
       });
     }
 
@@ -1011,6 +992,7 @@ const getContributionActions: (opts: GetContributionActionsOptions) => GetAction
         label: opts.intl.formatMessage({ defaultMessage: 'Mark as completed', id: 'order.markAsCompleted' }),
         onClick: () => opts.onMarkAsCompletedClick(order),
         'data-cy': 'MARK_AS_PAID-button',
+        key: 'mark-as-paid',
       });
     }
 
@@ -1019,11 +1001,13 @@ const getContributionActions: (opts: GetContributionActionsOptions) => GetAction
         label: opts.intl.formatMessage({ defaultMessage: 'Mark as expired', id: 'order.markAsExpired' }),
         onClick: () => opts.onMarkAsExpiredClick(order),
         'data-cy': 'MARK_AS_EXPIRED-button',
+        key: 'mark-as-expired',
       });
     }
 
     if (canCancel) {
       actions.secondary.push({
+        key: 'cancel-contribution',
         label: opts.intl.formatMessage({
           defaultMessage: 'Cancel contribution',
           id: 'subscription.menu.cancelContribution',
@@ -1032,6 +1016,25 @@ const getContributionActions: (opts: GetContributionActionsOptions) => GetAction
         'data-cy': 'recurring-contribution-menu-cancel-option',
       });
     }
+
+    const toAccount = order.toAccount;
+    const legacyId = order.legacyId;
+    const orderUrl = new URL(`${toAccount.slug}/orders/${legacyId}`, window.location.origin);
+
+    actions.secondary.push({
+      key: 'copy-link',
+      label: (
+        <CopyID
+          Icon={<LinkIcon size={12} />}
+          value={orderUrl}
+          tooltipLabel={<FormattedMessage defaultMessage="Copy link" id="CopyLink" />}
+          className="inline-flex items-center gap-1"
+        >
+          <FormattedMessage defaultMessage="Copy link" id="CopyLink" />
+        </CopyID>
+      ),
+      onClick: () => {},
+    });
 
     return actions;
   };

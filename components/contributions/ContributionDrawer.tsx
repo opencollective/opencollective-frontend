@@ -581,11 +581,11 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                {actions?.primary?.map(action => <DropdownActionItem key={action.label} action={action} />)}
+                {actions?.primary?.map(action => <DropdownActionItem key={action.key} action={action} />)}
 
                 {actions?.primary.length > 0 && actions?.secondary.length > 0 && <DropdownMenuSeparator />}
 
-                {actions?.secondary?.map(action => <DropdownActionItem key={action.label} action={action} />)}
+                {actions?.secondary?.map(action => <DropdownActionItem key={action.key} action={action} />)}
               </DropdownMenuContent>
             </DropdownMenu>
           )}

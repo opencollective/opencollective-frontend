@@ -139,7 +139,7 @@ describe('host dashboard', () => {
       cy.get('@createdContribution').should('contain', '€500.00');
 
       // Go to contribution page
-      cy.get('tbody tr td button').first().click();
+      cy.get('tbody tr:first td button:last').first().click();
       cy.contains('Open details').click();
       cy.contains(description).should('exist');
       cy.contains('More actions').click();

@@ -11,6 +11,7 @@ export const CopyID = ({
   value,
   tooltipLabel = <FormattedMessage defaultMessage="Copy ID" id="wtLjP6" />,
   Icon = <Copy className="shrink-0 select-none" size={12} />,
+  className = 'inline-flex min-h-5 w-full cursor-pointer select-text items-center gap-1 rounded-sm bg-slate-50 px-1 text-left font-mono text-muted-foreground transition-colors hover:bg-slate-100 hover:text-foreground',
 }) => {
   const { isCopied, copy } = useClipboard();
 
@@ -23,7 +24,7 @@ export const CopyID = ({
             e.preventDefault(); // Prevent tooltip from closing when copying
             copy(value ?? children);
           }}
-          className="inline-flex min-h-5 w-full cursor-pointer select-text items-center gap-1 rounded-sm bg-slate-50 px-1 text-left font-mono text-muted-foreground transition-colors hover:bg-slate-100 hover:text-foreground"
+          className={className}
         >
           {children && <div className="shrink truncate">{children}</div>}
           {Icon}
