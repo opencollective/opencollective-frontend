@@ -887,10 +887,7 @@ const CreatePendingContributionModal = ({ hostSlug, edit, ...props }: CreatePend
     >
       <ModalHeader>
         {edit ? (
-          <FormattedMessage
-            defaultMessage="Edit Expected Funds #{id}" id="/QMYYS"
-            values={{ id: edit.legacyId }}
-          />
+          <FormattedMessage defaultMessage="Edit Expected Funds #{id}" id="/QMYYS" values={{ id: edit.legacyId }} />
         ) : (
           <FormattedMessage defaultMessage="Create Expected Funds" id="8zsN7i" />
         )}
@@ -933,7 +930,8 @@ const CreatePendingContributionModal = ({ hostSlug, edit, ...props }: CreatePend
                 variant: 'success',
                 message: (
                   <FormattedMessage
-                    defaultMessage="Expected Funds #{orderId} updated" id="6mXKXi"
+                    defaultMessage="Expected Funds #{orderId} updated"
+                    id="6mXKXi"
                     values={{ orderId: result.data.editPendingOrder.legacyId }}
                   />
                 ),

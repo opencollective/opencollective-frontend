@@ -4,7 +4,7 @@ import { compact, omit } from 'lodash';
 import { PlusIcon } from 'lucide-react';
 import { useRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import type { z } from 'zod';
 
 import type { GetActions } from '../../../../lib/actions/types';
@@ -16,7 +16,9 @@ import type { ContributionDrawerQuery } from '../../../../lib/graphql/types/v2/g
 import { ContributionFrequency, ExpectedFundsFilter, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import i18nOrderStatus from '../../../../lib/i18n/order-status';
 import { i18nPaymentMethodProviderType } from '../../../../lib/i18n/payment-method-provider-type';
+import { sortSelectOptions } from '../../../../lib/utils';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
@@ -36,6 +38,7 @@ import { Button } from '../../../ui/Button';
 import { useToast } from '../../../ui/useToast';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
+import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { Pagination } from '../../filters/Pagination';
 import type { DashboardSectionProps } from '../../types';
@@ -419,7 +422,24 @@ const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpected
   }
 };
 
-const filtersWithoutExpectedFunds = omit(filters, ['expectedFundsFilter', 'expectedDate']);
+const filtersWithoutExpectedFunds = {
+  ...omit(filters, ['expectedFundsFilter', 'expectedDate', 'status']),
+  status: {
+    labelMsg: defineMessage({ defaultMessage: 'Status', id: 'tzMNF3' }),
+    Component: ({ valueRenderer, intl, value, onChange, ...props }) => (
+      <ComboSelectFilter
+        value={value}
+        onChange={onChange}
+        options={Object.values(OrderStatus)
+          .filter(s => s !== OrderStatus.PENDING)
+          .map(value => ({ label: valueRenderer({ intl, value }), value }))
+          .sort(sortSelectOptions)}
+        {...props}
+      />
+    ),
+    valueRenderer: ({ intl, value }) => i18nOrderStatus(intl, value),
+  },
+};
 
 type ContributionsProps = DashboardSectionProps & {
   direction?: 'INCOMING' | 'OUTGOING';
@@ -457,6 +477,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
   const [confirmCompletedOrder, setConfirmCompletedOrder] = React.useState(null);
   const { showConfirmationModal } = useModal();
   const [showCreatePendingOrderModal, setShowCreatePendingOrderModal] = React.useState(false);
+  const [editingExpectedFunds, setEditingExpectedFunds] = React.useState(null);
 
   const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
@@ -719,6 +740,9 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
         confirmLabel: <FormattedMessage id="order.markAsExpired" defaultMessage="Mark as expired" />,
       });
     },
+    onEditExpectedFundsClick(order) {
+      setEditingExpectedFunds(order);
+    },
   });
 
   return (
@@ -842,6 +866,17 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
           onSuccess={() => {}}
         />
       )}
+      {editingExpectedFunds && (
+        <CreatePendingContributionModal
+          hostSlug={accountSlug}
+          edit={editingExpectedFunds}
+          onClose={() => setEditingExpectedFunds(null)}
+          onSuccess={() => {
+            refetch();
+            refetchMetadata();
+          }}
+        />
+      )}
     </React.Fragment>
   );
 };
@@ -855,6 +890,7 @@ type GetContributionActionsOptions = {
   onMarkAsCompletedClick: (order: ContributionDrawerQuery['order']) => void;
   onMarkAsExpiredClick: (order: ContributionDrawerQuery['order']) => void;
   onCancelClick: (order: ContributionDrawerQuery['order']) => void;
+  onEditExpectedFundsClick: (order: ContributionDrawerQuery['order']) => void;
 };
 
 const getContributionActions: (opts: GetContributionActionsOptions) => GetActions<ContributionDrawerQuery['order']> =
@@ -889,6 +925,7 @@ const getContributionActions: (opts: GetContributionActionsOptions) => GetAction
     const canMarkAsCompleted =
       [OrderStatus.PENDING, OrderStatus.EXPIRED].includes(order.status) && order.permissions.canMarkAsPaid;
     const canMarkAsExpired = order.status === OrderStatus.PENDING && order.permissions.canMarkAsExpired;
+    const isExpectedFunds = !!order.pendingContributionData?.expectedAt;
 
     const canDoActions = [canUpdateActiveOrder, canResume, canCancel, canMarkAsCompleted, canMarkAsExpired];
 
@@ -917,6 +954,13 @@ const getContributionActions: (opts: GetContributionActionsOptions) => GetAction
       actions.primary.push({
         label: opts.intl.formatMessage({ defaultMessage: 'Update amount', id: 'subscription.menu.updateAmount' }),
         onClick: () => opts.onEditAmountClick(order),
+      });
+    }
+
+    if (isExpectedFunds && (canMarkAsExpired || canMarkAsCompleted)) {
+      actions.primary.push({
+        label: opts.intl.formatMessage({ defaultMessage: 'Edit expected funds', id: 'hQAJH9' }),
+        onClick: () => opts.onEditExpectedFundsClick(order),
       });
     }
 

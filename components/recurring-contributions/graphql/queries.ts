@@ -112,6 +112,12 @@ export const managedOrderFragment = gql`
     pendingContributionData {
       expectedAt
       paymentMethod
+      ponumber
+      memo
+      fromAccountInfo {
+        name
+        email
+      }
     }
   }
   ${accountHoverCardFields}

@@ -246,10 +246,7 @@ const Transactions = ({
             checked={router.query.displayPendingContributions !== 'false' ? true : false}
             onChange={({ checked }) => updateFilters({ displayPendingContributions: checked })}
             label={
-              <FormattedMessage
-                id="transactions.displayPendingContributions"
-                defaultMessage="Display expected funds"
-              />
+              <FormattedMessage id="transactions.displayPendingContributions" defaultMessage="Display expected funds" />
             }
           />
         )}
