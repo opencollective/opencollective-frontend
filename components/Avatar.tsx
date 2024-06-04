@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
-import { Calendar, TestTube2 } from 'lucide-react';
+import { Calendar, TestTube2, UserCog } from 'lucide-react';
 import styled from 'styled-components';
 import type { BorderProps } from 'styled-system';
 import { border, color, layout, space } from 'styled-system';
@@ -18,6 +18,7 @@ const getInitials = name => name.split(' ').reduce((result, value) => (result +=
 const COLLECTIVE_TYPE_ICON = {
   [CollectiveType.EVENT]: Calendar,
   [CollectiveType.PROJECT]: TestTube2,
+  ROOT: UserCog,
 };
 
 type StyledAvatarProps = FlexProps &
@@ -79,6 +80,9 @@ const Avatar = ({
   ...styleProps
 }) => {
   let child = children;
+  if (collective?.type === 'ROOT') {
+    useIcon = true;
+  }
   // Use collective object instead of props
   if (collective) {
     type = collective.type;
