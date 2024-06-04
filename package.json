@@ -74,7 +74,7 @@
     "currency-symbol-map": "5.1.0",
     "date-fns": "3.6.0",
     "dayjs": "1.11.11",
-    "debug": "4.3.4",
+    "debug": "4.3.5",
     "diff": "5.2.0",
     "dotenv": "16.4.5",
     "draft-js": "0.11.7",
