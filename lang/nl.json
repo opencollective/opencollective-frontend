@@ -3438,6 +3438,7 @@
   "uM2WZi": "Receive financial contributions via credit card, automatically updating your budget for transparent tracking. *Stripe fees apply",
   "umr49S": "Are you sure you want to publish this update?",
   "uMuuUg": "This value does not match the one scanned from the document ({value})",
+  "umVJL7": "View all paid expenses",
   "Un1mxZ": "Add tag",
   "unarchive.account.confirmation": "Are you sure you want to unarchive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?",
   "unarchive.modal.header": "Unarchive {name}",
