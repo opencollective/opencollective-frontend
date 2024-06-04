@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { compact, omit } from 'lodash';
-import { PlusIcon } from 'lucide-react';
+import { LinkIcon, PlusIcon } from 'lucide-react';
 import { useRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
@@ -24,6 +24,7 @@ import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
 import ContributionConfirmationModal from '../../../ContributionConfirmationModal';
 import { ContributionDrawer } from '../../../contributions/ContributionDrawer';
+import { CopyID } from '../../../CopyId';
 import DateTime from '../../../DateTime';
 import type { EditOrderActions } from '../../../EditOrderModal';
 import EditOrderModal from '../../../EditOrderModal';
@@ -360,8 +361,61 @@ const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpected
     },
   };
 
+  const expectedAt = {
+    accessorKey: 'pendingContributionData.expectedAt',
+    header: intl.formatMessage({ defaultMessage: 'Expected Date', id: 'vNC2dX' }),
+    cell: ({ cell }) => {
+      const date = cell.getValue();
+      return (
+        date && (
+          <div className="flex items-center gap-2 truncate">
+            <DateTime value={date} dateStyle="medium" timeStyle={undefined} />
+          </div>
+        )
+      );
+    },
+  };
+
+  const contributionId = {
+    accessorKey: 'legacyId',
+    header: '#',
+    cell: ({ cell }) => {
+      const legacyId = cell.getValue();
+
+      return (
+        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+        <div className="cursor-default" onClick={e => e.stopPropagation()}>
+          <CopyID value={legacyId}>{legacyId}</CopyID>
+        </div>
+      );
+    },
+  };
+
+  const link = {
+    accessorKey: 'legacyId',
+    header: <LinkIcon size={16} />,
+    cell: ({ row, cell }) => {
+      const legacyId = cell.getValue();
+      const toAccount = row.original.toAccount;
+      const orderUrl = new URL(`${toAccount.slug}/orders/${legacyId}`, window.location.origin);
+
+      return (
+        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+        <div className="cursor-default" onClick={e => e.stopPropagation()}>
+          <CopyID
+            Icon={<LinkIcon size={12} />}
+            value={orderUrl}
+            tooltipLabel={<FormattedMessage defaultMessage="Copy link" id="CopyLink" />}
+          />
+        </div>
+      );
+    },
+  };
+
   if (!tab || [ContributionsTab.ONETIME, ContributionsTab.ALL].includes(tab)) {
     return compact([
+      onlyExpectedFunds ? contributionId : null,
+      onlyExpectedFunds ? link : null,
       includeHostedAccounts ? accounts : isIncoming ? fromAccount : toAccount,
       paymentMethod,
       totalAmount,
@@ -377,22 +431,7 @@ const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpected
           );
         },
       },
-      onlyExpectedFunds
-        ? {
-            accessorKey: 'pendingContributionData.expectedAt',
-            header: intl.formatMessage({ defaultMessage: 'Expected Date', id: 'vNC2dX' }),
-            cell: ({ cell }) => {
-              const date = cell.getValue();
-              return (
-                date && (
-                  <div className="flex items-center gap-2 truncate">
-                    <DateTime value={date} dateStyle="medium" timeStyle={undefined} />
-                  </div>
-                )
-              );
-            },
-          }
-        : null,
+      onlyExpectedFunds ? expectedAt : null,
       status,
       actionsColumn,
     ]);
@@ -412,10 +451,13 @@ const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpected
     };
 
     return compact([
+      onlyExpectedFunds ? contributionId : null,
+      onlyExpectedFunds ? link : null,
       includeHostedAccounts ? accounts : isIncoming ? fromAccount : toAccount,
       paymentMethod,
       amount,
       totalAmount,
+      onlyExpectedFunds ? expectedAt : null,
       status,
       actionsColumn,
     ]);
