@@ -625,6 +625,7 @@ function Expense(props) {
                         />
                       }
                       required
+                      value={Boolean(state.tos)}
                       onChange={({ checked }) => {
                         setState({ ...state, tos: checked });
                       }}
@@ -639,6 +640,7 @@ function Expense(props) {
                         </span>
                       }
                       required
+                      value={Boolean(state.newsletterOptIn)}
                       onChange={({ checked }) => {
                         setState(state => ({ ...state, newsletterOptIn: checked }));
                       }}
