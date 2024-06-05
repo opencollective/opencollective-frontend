@@ -253,6 +253,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           label: intl.formatMessage({ defaultMessage: 'Transactions', id: 'menu.transactions' }),
         },
         {
+          if: isHost,
           section: ALL_SECTIONS.EXPENSE_REPORTS,
           label: intl.formatMessage({ defaultMessage: 'Expenses', id: 'Expenses' }),
         },
