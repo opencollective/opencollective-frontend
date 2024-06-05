@@ -3048,6 +3048,31 @@ type Host implements Account & AccountWithContributions {
     """
     requestedAtTo: DateTime
   ): LegalDocumentCollection!
+
+  """
+  Returns a list of transactions imports for this host
+  """
+  transactionsImports(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+  ): TransactionsImportsCollection!
+
+  """
+  Returns a list of transactions imports sources for this host
+  """
+  transactionsImportsSources: [NonEmptyString]!
 }
 
 """
@@ -5750,6 +5775,7 @@ enum ActivityType {
   COLLECTIVE_CORE_MEMBER_REMOVED
   COLLECTIVE_CORE_MEMBER_EDITED
   COLLECTIVE_TRANSACTION_CREATED
+  TRANSACTIONS_IMPORT_CREATED
   COLLECTIVE_UPDATE_CREATED
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
@@ -6473,6 +6499,164 @@ type LegalDocumentCollection implements Collection {
   nodes: [LegalDocument]
 }
 
+"""
+A collection of "TransactionsImports"
+"""
+type TransactionsImportsCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [TransactionsImport!]
+}
+
+type TransactionsImport {
+  """
+  The public id of the import
+  """
+  id: String!
+
+  """
+  Account that holds the import
+  """
+  account: Account!
+
+  """
+  URL of the import (e.g. link to the CSV file)
+  """
+  file: FileInfo
+
+  """
+  Source of the import (e.g. "Bank of America", "Eventbrite", etc...)
+  """
+  source: NonEmptyString!
+
+  """
+  Name of the import (e.g. "Contributions May 2021", "Tickets for Mautic COnference 2024")
+  """
+  name: NonEmptyString!
+
+  """
+  Type of the import
+  """
+  type: TransactionsImportType!
+
+  """
+  Configuration for the CSV import
+  """
+  csvConfig: JSON
+
+  """
+  When the import was created
+  """
+  createdAt: DateTime!
+
+  """
+  When the import was last updated
+  """
+  updatedAt: DateTime!
+
+  """
+  List of rows in the import
+  """
+  rows: TransactionsImportRowCollection!
+  stats: TransactionsImportStats
+}
+
+"""
+A string that cannot be passed as an empty value
+"""
+scalar NonEmptyString
+
+"""
+Type of the import
+"""
+enum TransactionsImportType {
+  CSV
+  MANUAL
+}
+
+"""
+A collection of "TransactionsImportRow"
+"""
+type TransactionsImportRowCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [TransactionsImportRow!]
+}
+
+"""
+A row in a transactions import
+"""
+type TransactionsImportRow {
+  """
+  The public id of the imported row
+  """
+  id: String!
+
+  """
+  The source id of the row
+  """
+  sourceId: NonEmptyString!
+
+  """
+  Whether the row has been dismissed
+  """
+  isDismissed: Boolean!
+
+  """
+  The description of the row
+  """
+  description: String!
+
+  """
+  The date of the row
+  """
+  date: DateTime!
+
+  """
+  The amount of the row
+  """
+  amount: Amount!
+
+  """
+  The expense associated with the row
+  """
+  expense: Expense
+
+  """
+  The order associated with the row
+  """
+  order: Order
+}
+
+type TransactionsImportStats {
+  """
+  Total number of rows in the import
+  """
+  total: Int!
+
+  """
+  Number of rows that have been ignored
+  """
+  ignored: Int!
+
+  """
+  Number of rows that have been converted to expenses
+  """
+  expenses: Int!
+
+  """
+  Number of rows that have been converted to orders
+  """
+  orders: Int!
+
+  """
+  Number of rows that have been processed (either dismissed or converted to expenses or orders)
+  """
+  processed: Int!
+}
+
 type ExpenseValuesByRole {
   id: NonEmptyString!
 
@@ -6491,11 +6675,6 @@ type ExpenseValuesByRole {
   """
   hostAdmin: ExpenseValuesRoleDetails
 }
-
-"""
-A string that cannot be passed as an empty value
-"""
-scalar NonEmptyString
 
 type ExpenseValuesRoleDetails {
   accountingCategory: AccountingCategory
@@ -13614,6 +13793,16 @@ type Query {
     """
     accountingCategory: [String]
   ): TransactionCollection!
+
+  """
+  Fetch a transactions import
+  """
+  transactionsImport(
+    """
+    The public id identifying the import (ie: rvelja97-pkzqbgq7-bbzyx6wd-50o8n4rm)
+    """
+    id: String!
+  ): TransactionsImport
   update(
     """
     Public identifier
@@ -15044,6 +15233,7 @@ enum ActivityAndClassesType {
   COLLECTIVE_CORE_MEMBER_REMOVED
   COLLECTIVE_CORE_MEMBER_EDITED
   COLLECTIVE_TRANSACTION_CREATED
+  TRANSACTIONS_IMPORT_CREATED
   COLLECTIVE_UPDATE_CREATED
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
@@ -18259,6 +18449,59 @@ type Mutation {
     """
     message: String
   ): Transaction!
+  createTransactionsImport(
+    """
+    Account that will hold the import (usually the host)
+    """
+    account: AccountReferenceInput!
+
+    """
+    Source of the import (e.g. "Bank of America", "Eventbrite", etc...)
+    """
+    source: NonEmptyString!
+
+    """
+    Name of the import (e.g. "Contributions May 2021", "Tickets for Mautic COnference 2024")
+    """
+    name: NonEmptyString!
+
+    """
+    Type of the import
+    """
+    type: TransactionsImportType!
+  ): TransactionsImport!
+  importTransactions(
+    """
+    ID of the import to add transactions to
+    """
+    id: NonEmptyString!
+
+    """
+    Raw file from which the data was extracted
+    """
+    file: Upload
+
+    """
+    Configuration of the CSV file
+    """
+    csvConfig: JSONObject
+
+    """
+    Data to import
+    """
+    data: [TransactionsImportRowCreateInput!]!
+  ): TransactionsImport!
+  updateTransactionsImportRows(
+    """
+    ID of the import to add transactions to
+    """
+    id: NonEmptyString!
+
+    """
+    Rows to update
+    """
+    rows: [TransactionsImportRowUpdateInput!]!
+  ): TransactionsImport!
 
   """
   Create update. Scope: "updates".
@@ -20322,6 +20565,70 @@ type BanAccountResponse {
   accounts: [Account!]!
 }
 
+input TransactionsImportRowCreateInput {
+  """
+  The source id of the row
+  """
+  sourceId: NonEmptyString!
+
+  """
+  The description of the row
+  """
+  description: String
+
+  """
+  The date of the row
+  """
+  date: DateTime!
+
+  """
+  The amount of the row
+  """
+  amount: AmountInput!
+
+  """
+  The raw value of the row
+  """
+  rawValue: JSONObject
+
+  """
+  Whether the row is dismissed
+  """
+  isDismissed: Boolean! = false
+}
+
+input TransactionsImportRowUpdateInput {
+  """
+  The id of the row
+  """
+  id: NonEmptyString!
+
+  """
+  The source id of the row
+  """
+  sourceId: NonEmptyString
+
+  """
+  The description of the row
+  """
+  description: String
+
+  """
+  The date of the row
+  """
+  date: DateTime
+
+  """
+  The amount of the row
+  """
+  amount: AmountInput
+
+  """
+  Whether the row is dismissed
+  """
+  isDismissed: Boolean = false
+}
+
 """
 Input type for UpdateType
 """
@@ -20428,6 +20735,7 @@ enum UploadedFileKind {
   ACCOUNT_BANNER
   EXPENSE_ATTACHED_FILE
   EXPENSE_ITEM
+  TRANSACTIONS_IMPORT
   ACCOUNT_LONG_DESCRIPTION
   UPDATE
   COMMENT

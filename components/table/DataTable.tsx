@@ -42,6 +42,7 @@ interface DataTableProps<TData, TValue> {
   compact?: boolean;
   initialSort?: SortingState;
   getRowDataCy?: (row: Row<TData>) => string;
+  getRowClassName?: (row: Row<TData>) => string;
   getRowId?: (data: TData) => string;
   columnVisibility?: VisibilityState;
   setColumnVisibility?: OnChangeFn<VisibilityState>;
@@ -67,6 +68,7 @@ export function DataTable<TData, TValue>({
   compact,
   initialSort,
   getRowDataCy,
+  getRowClassName,
   getRowId = defaultGetRowId,
   columnVisibility,
   defaultColumnVisibility,
@@ -173,6 +175,7 @@ export function DataTable<TData, TValue>({
                 tableProps={tableProps}
                 compact={compact}
                 onHoverRow={onHoverRow}
+                getRowClassName={getRowClassName}
               />
             ))
         ) : (
@@ -197,13 +200,23 @@ export function DataTable<TData, TValue>({
   );
 }
 
-function DataTableRow({ row, onClickRow, getRowDataCy, rowHasIndicator, tableProps, compact, onHoverRow }) {
+function DataTableRow({
+  row,
+  getRowClassName,
+  onClickRow,
+  getRowDataCy,
+  rowHasIndicator,
+  tableProps,
+  compact,
+  onHoverRow,
+}) {
   // Reference that can be picked up by the actions column, to enable returning focus when closing a drawer or modal opened from actions menu
   const actionsMenuTriggerRef = React.useRef(null);
   return (
     <TableRow
       data-cy={getRowDataCy?.(row) || `datatable-row-${row.id}`}
       data-state={row.getIsSelected() && 'selected'}
+      className={getRowClassName?.(row)}
       {...(onClickRow && {
         onClick: () => onClickRow(row, actionsMenuTriggerRef),
         className: 'cursor-pointer',

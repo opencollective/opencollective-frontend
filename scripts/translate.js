@@ -27,6 +27,7 @@ const DUPLICATED_IGNORED_MESSAGES = new Set([
   'code', // Can have different translations based on the context (accounting code, program code, etc.)
   'none', // Can have different masculine/feminine for some languages based on the context
   'add new', // Can have different masculine/feminine for some languages based on the context
+  'created on', // Can have different masculine/feminine for some languages based on the context
 ]);
 
 /**
