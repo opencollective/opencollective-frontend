@@ -170,7 +170,7 @@ const getComponents = (components, useSearchIcon) => {
  * Binds our custom theme and wordings to a regular `react-select`'s `Select`.
  * See https://react-select.com for more documentation.
  */
-export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs(
+export const makeStyledSelect = (SelectComponent, { alwaysSearchable = false } = {}) => styled(SelectComponent).attrs(
   ({
     theme,
     intl,
@@ -193,7 +193,7 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
     fontSize,
     onBlur,
   }) => {
-    isSearchable = isSearchable ?? options?.length > 8;
+    isSearchable = alwaysSearchable || (isSearchable ?? options?.length > 8);
     return {
       isSearchable,
       menuPortalTarget:

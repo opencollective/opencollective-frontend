@@ -1,5 +1,6 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
+import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
@@ -8,6 +9,7 @@ import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { TransactionsTableQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
+import Link from '../../../Link';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { Button } from '../../../ui/Button';
 import DashboardHeader from '../../DashboardHeader';
@@ -21,6 +23,7 @@ import type { DashboardSectionProps } from '../../types';
 import type { FilterMeta as CommonFilterMeta } from './filters';
 import { filters as commonFilters, schema as commonSchema, toVariables as commonToVariables } from './filters';
 import { transactionsTableQuery } from './queries';
+import { ImportTransactions } from './TransactionsImports';
 import TransactionsTable from './TransactionsTable';
 
 export const schema = commonSchema.extend({
@@ -79,7 +82,7 @@ const hostTransactionsMetaDataQuery = gql`
   }
 `;
 
-const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
+const HostTransactionsBase = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const intl = useIntl();
   const [displayExportCSVModal, setDisplayExportCSVModal] = React.useState(false);
   const { data: metaData } = useQuery(hostTransactionsMetaDataQuery, {
@@ -134,18 +137,25 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       <DashboardHeader
         title={<FormattedMessage id="menu.transactions" defaultMessage="Transactions" />}
         actions={
-          <ExportTransactionsCSVModal
-            open={displayExportCSVModal}
-            setOpen={setDisplayExportCSVModal}
-            queryFilter={queryFilter}
-            account={metaData?.host}
-            isHostReport
-            trigger={
-              <Button size="sm" variant="outline" onClick={() => setDisplayExportCSVModal(true)}>
-                <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
+          <React.Fragment>
+            <Link href={`/dashboard/${hostSlug}/host-transactions/import`}>
+              <Button size="sm" variant="outline">
+                <FormattedMessage defaultMessage="Imports" id="ofHC1Q" />
               </Button>
-            }
-          />
+            </Link>
+            <ExportTransactionsCSVModal
+              open={displayExportCSVModal}
+              setOpen={setDisplayExportCSVModal}
+              queryFilter={queryFilter}
+              account={metaData?.host}
+              isHostReport
+              trigger={
+                <Button size="sm" variant="outline" onClick={() => setDisplayExportCSVModal(true)}>
+                  <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
+                </Button>
+              }
+            />
+          </React.Fragment>
         }
       />
 
@@ -171,6 +181,15 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       )}
     </div>
   );
+};
+
+const HostTransactions = props => {
+  const router = useRouter();
+  if (router.query.subpath?.[0] === 'import') {
+    return <ImportTransactions {...props} />;
+  } else {
+    return <HostTransactionsBase {...props} />;
+  }
 };
 
 export default HostTransactions;

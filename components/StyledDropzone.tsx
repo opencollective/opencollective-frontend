@@ -25,6 +25,7 @@ import { P, Span } from './Text';
 import UploadedFilePreview from './UploadedFilePreview';
 
 export const DROPZONE_ACCEPT_IMAGES = { 'image/*': ['.jpeg', '.png'] };
+export const DROPZONE_ACCEPT_CSV = { 'text/csv': ['.csv'] };
 export const DROPZONE_ACCEPT_PDF = { 'application/pdf': ['.pdf'] };
 export const DROPZONE_ACCEPT_ALL = { ...DROPZONE_ACCEPT_IMAGES, ...DROPZONE_ACCEPT_PDF };
 
