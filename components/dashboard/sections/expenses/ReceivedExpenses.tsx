@@ -7,12 +7,7 @@ import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import type {
-  Account,
-  AccountExpensesMetadataQuery,
-  AccountExpensesMetadataQueryVariables,
-  ExpensesPageQueryVariables,
-} from '../../../../lib/graphql/types/v2/graphql';
+import type { Account, ExpensesPageQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
 import ExpensesList from '../../../expenses/ExpensesList';

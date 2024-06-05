@@ -15,18 +15,18 @@ import {
 import useQueryFilter from '../../../../../lib/hooks/useQueryFilter';
 
 import FormattedMoneyAmount from '../../../../FormattedMoneyAmount';
+import Link from '../../../../Link';
 import Loading from '../../../../Loading';
 import MessageBoxGraphqlError from '../../../../MessageBoxGraphqlError';
 import { Button } from '../../../../ui/Button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../../ui/DropdownMenu';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../../../ui/Tooltip';
 import DashboardHeader from '../../../DashboardHeader';
+import { UNCATEGORIZED_VALUE } from '../../../filters/AccountingCategoryFilter';
 import type { DashboardSectionProps } from '../../../types';
 import { HostExpensesReportTabs } from '../../reports/preview/HostReportTabs';
 import { ReportNavigationArrows } from '../../reports/preview/NavigationArrows';
 import { deserializeReportSlug, ReportPeriodSelector } from '../../reports/preview/ReportPeriodSelector';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../../../../ui/Tooltip';
-import { UNCATEGORIZED_VALUE } from '../../../filters/AccountingCategoryFilter';
-import Link from '../../../../Link';
 
 const schema = z.object({
   isHost: boolean.default(false),
@@ -81,7 +81,7 @@ export function HostExpensesReportView(props: DashboardSectionProps) {
   });
 
   const navigateToReport = reportSlug => {
-    queryFilter.setFilters({}, `/dashboard/${props.accountSlug}/host-expenses-report/${reportSlug}`);
+    queryFilter.setFilters({}, `/dashboard/${props.accountSlug}/reports/expenses/${reportSlug}`);
   };
 
   const { loading, error } = query;
@@ -107,7 +107,7 @@ export function HostExpensesReportView(props: DashboardSectionProps) {
       <div className="flex max-w-screen-lg flex-col gap-4">
         <DashboardHeader
           title={<FormattedMessage defaultMessage="Expense Reports" id="qC0ZXX" />}
-          titleRoute={`/dashboard/${props.accountSlug}/host-expenses-report`}
+          titleRoute={`/dashboard/${props.accountSlug}/reports/expenses`}
           subpathTitle={
             <ReportPeriodSelector
               value={props.subpath[0]}
@@ -207,7 +207,7 @@ export function HostExpensesReportView(props: DashboardSectionProps) {
                       );
                     })}
                   </tbody>
-                  <tfoot className='py-4'>
+                  <tfoot className="py-4">
                     <tr>
                       <td className="flex min-h-8 flex-1 items-center gap-1 overflow-hidden truncate text-wrap py-1 pl-6 text-left sm:pl-10">
                         <FormattedMessage defaultMessage="Total" id="MJ2jZQ" />

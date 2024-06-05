@@ -136,11 +136,10 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         },
         {
           section: ALL_SECTIONS.HOST_EXPENSES_REPORT,
-          label: intl.formatMessage(
-            {
-              defaultMessage: 'Reports', id: 'Ppx673',
-            },
-          ),
+          label: intl.formatMessage({
+            defaultMessage: 'Reports',
+            id: 'Reports',
+          }),
         },
       ],
     },
@@ -245,8 +244,19 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     },
     {
       if: isHost || (!isIndividual && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.HOST_REPORTS)),
-      section: ALL_SECTIONS.REPORTS,
+      type: 'group',
+      label: intl.formatMessage({ id: 'Reports', defaultMessage: 'Reports' }),
       Icon: BarChart2,
+      subMenu: [
+        {
+          section: ALL_SECTIONS.TRANSACTION_REPORTS,
+          label: intl.formatMessage({ defaultMessage: 'Transactions', id: 'menu.transactions' }),
+        },
+        {
+          section: ALL_SECTIONS.EXPENSE_REPORTS,
+          label: intl.formatMessage({ defaultMessage: 'Expenses', id: 'Expenses' }),
+        },
+      ],
     },
     {
       if: isHost && !isAccountantOnly,

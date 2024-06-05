@@ -48,14 +48,12 @@ export function HostExpensesReportTabs({ queryFilter }) {
     <div className="grid grid-cols-2 divide-x rounded-t-xl border-b bg-muted">
       <Tab
         title={<FormattedMessage defaultMessage="Managed expenses" id="nUoOoO" />}
-        description={
-          <FormattedMessage defaultMessage="Expenses from Hosted Collective accounts" id="K2C2LL" />
-        }
+        description={<FormattedMessage defaultMessage="Expenses from Hosted Collective accounts" id="K2C2LL" />}
         isActive={!queryFilter.values.isHost}
         onClick={() => queryFilter.setFilter('isHost', false)}
       />
       <Tab
-        title={<FormattedMessage defaultMessage="Operational expenses" id="SMApM2"/>}
+        title={<FormattedMessage defaultMessage="Operational expenses" id="SMApM2" />}
         description={<FormattedMessage defaultMessage="Expenses from the Fiscal Host account" id="scuVEJ" />}
         isActive={queryFilter.values.isHost}
         onClick={() => queryFilter.setFilter('isHost', true)}

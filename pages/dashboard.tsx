@@ -201,6 +201,7 @@ const DashboardPage = () => {
     <DashboardContext.Provider
       value={{
         selectedSection,
+        subpath: subpath || [],
         expandedSection,
         setExpandedSection,
         account,

@@ -4,6 +4,7 @@ import { ALL_SECTIONS } from './constants';
 
 type DashboardContextType = {
   selectedSection: string;
+  subpath: string[];
   expandedSection: string | null;
   setExpandedSection: (section: string | null) => void;
   account: any;
@@ -13,6 +14,7 @@ type DashboardContextType = {
 };
 
 export const DashboardContext = React.createContext<DashboardContextType>({
+  subpath: [],
   selectedSection: ALL_SECTIONS.EXPENSES,
   expandedSection: null,
   setExpandedSection: () => {},

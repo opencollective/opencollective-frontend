@@ -18,12 +18,12 @@ import Loading from '../../../../Loading';
 import MessageBoxGraphqlError from '../../../../MessageBoxGraphqlError';
 import { DataTable } from '../../../../table/DataTable';
 import Tabs from '../../../../Tabs';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../../../ui/Tooltip';
 import DashboardHeader from '../../../DashboardHeader';
 import { Pagination } from '../../../filters/Pagination';
 import type { DashboardSectionProps } from '../../../types';
 import { CurrentPeriodBadge } from '../../reports/preview/CurrentPeriodBadge';
 import { renderReportPeriodLabel, serializeReportSlug } from '../../reports/preview/ReportPeriodSelector';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../../../../ui/Tooltip';
 
 const schema = z.object({
   timeUnit: z.enum(['MONTH', 'QUARTER', 'YEAR']).default('MONTH'),
@@ -66,7 +66,7 @@ const getColumns = intl => [
             </TooltipTrigger>
             <TooltipContent>
               <FormattedMessage
-                defaultMessage="{n, plural, one {one expense} other {{n} expenses}}"
+                defaultMessage="{n, plural, one {1 expense} other {{n} expenses}}"
                 id="xyYeS2"
                 values={{ n: count }}
               />
@@ -226,7 +226,7 @@ export function HostExpensesReportList(props: DashboardSectionProps) {
       <div className="flex max-w-screen-lg flex-col gap-4">
         <DashboardHeader
           title={<FormattedMessage defaultMessage="Expense Reports" id="qC0ZXX" />}
-          titleRoute={`/dashboard/${props.accountSlug}/host-expense-report`}
+          titleRoute={`/dashboard/${props.accountSlug}/reports/expenses`}
         />
 
         <div className="space-y-6">
@@ -248,7 +248,7 @@ export function HostExpensesReportList(props: DashboardSectionProps) {
                   onClickRow={row => {
                     queryFilter.resetFilters(
                       {},
-                      `/dashboard/${props.accountSlug}/host-expenses-report/${serializeReportSlug(row.original.period)}`,
+                      `/dashboard/${props.accountSlug}/reports/expenses/${serializeReportSlug(row.original.period)}`,
                     );
                   }}
                 />
@@ -259,14 +259,5 @@ export function HostExpensesReportList(props: DashboardSectionProps) {
         </div>
       </div>
     </React.Fragment>
-  );
-}
-
-function CountWithTooltip() {
-  return (
-    <Tooltip delayDuration={100}>
-      <TooltipTrigger asChild></TooltipTrigger>
-      <TooltipContent></TooltipContent>
-    </Tooltip>
   );
 }

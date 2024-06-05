@@ -38,14 +38,17 @@ export const MenuLink = ({
   dataCy,
 }: MenuLinkProps) => {
   const { formatMessage } = useIntl();
-  const { selectedSection, account } = React.useContext(DashboardContext);
+  const { selectedSection, account, subpath } = React.useContext(DashboardContext);
   const [selfExpanded, setSelfExpanded] = React.useState(false);
 
   const sections = subMenu?.map(item => item.section);
 
   const sectionExpanded = sections?.includes(selectedSection);
   const subMenuExpanded = sectionExpanded || selfExpanded;
-  const isSelected = !subMenu && section && selectedSection === section;
+
+  // also check if the route (section/subpath[0], e.g. 'reports/transactions') match the menu link
+  const sectionAndSubpath = subpath?.length > 0 ? `${selectedSection}/${subpath[0]}` : selectedSection;
+  const isSelected = !subMenu && section && sectionAndSubpath === section;
 
   if (!label && SECTION_LABELS[section]) {
     label = formatMessage(SECTION_LABELS[section]);

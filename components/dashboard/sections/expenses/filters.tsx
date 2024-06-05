@@ -22,6 +22,7 @@ import i18nPayoutMethodType from '../../../../lib/i18n/payout-method-type';
 import { i18nChargeHasReceipts } from '../../../../lib/i18n/receipts-filter';
 import { sortSelectOptions } from '../../../../lib/utils';
 
+import { accountingCategoryFilter } from '../../filters/AccountingCategoryFilter';
 import { amountFilter } from '../../filters/AmountFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { dateFilter } from '../../filters/DateFilter';
@@ -29,7 +30,6 @@ import { expenseTagFilter } from '../../filters/ExpenseTagsFilter';
 import { searchFilter } from '../../filters/SearchFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
 import { VirtualCardRenderer } from '../../filters/VirtualCardsFilter';
-import { accountingCategoryFilter } from '../../filters/AccountingCategoryFilter';
 
 const sortFilter = buildSortFilter({
   fieldSchema: z.enum(['CREATED_AT']),
