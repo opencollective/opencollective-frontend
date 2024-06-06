@@ -103,6 +103,12 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       count: metaData?.all?.totalCount,
     },
     {
+      label: intl.formatMessage({ id: 'expenses.ready', defaultMessage: 'Ready to pay' }),
+      filter: { status: [ExpenseStatusFilter.READY_TO_PAY], sort: { field: 'CREATED_AT', direction: 'ASC' } },
+      id: 'ready_to_pay',
+      count: metaData?.ready_to_pay?.totalCount,
+    },
+    {
       label: intl.formatMessage({ defaultMessage: 'Unreplied', id: 'k9Y5So' }),
       filter: {
         lastCommentBy: [LastCommentBy.USER],
@@ -115,12 +121,6 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       },
       id: 'unreplied',
       count: metaData?.unreplied?.totalCount,
-    },
-    {
-      label: intl.formatMessage({ id: 'expenses.ready', defaultMessage: 'Ready to pay' }),
-      filter: { status: [ExpenseStatusFilter.READY_TO_PAY], sort: { field: 'CREATED_AT', direction: 'ASC' } },
-      id: 'ready_to_pay',
-      count: metaData?.ready_to_pay?.totalCount,
     },
     {
       label: intl.formatMessage({ id: 'expense.batched', defaultMessage: 'Batched' }),
@@ -167,7 +167,7 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const queryFilter = useQueryFilter({
     schema: filterSchema,
     toVariables,
-    defaultFilterValues: views[2].filter,
+    defaultFilterValues: views[1].filter,
     filters,
     meta,
     views,
