@@ -105,7 +105,7 @@ export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFor
         <p className="text-lg font-bold">Full name of the beneficial owner</p>
         <HintText>The beneficial owner is the person ultimately paid, not an intermediary.</HintText>
       </div>
-      <StyledInputFormikField name="beneficialOwner.firstName" First Name />
+      <StyledInputFormikField name="beneficialOwner.firstName" label="First Name" />
       <StyledInputFormikField name="beneficialOwner.middleName" label="Middle Name" />
       <StyledInputFormikField name="beneficialOwner.lastName" label="Last Name" />
       <div className="mt-2">
@@ -303,7 +303,14 @@ export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFor
           <ButtonSet
             selected={values.isSignerTheBeneficialOwner}
             error={field.error}
-            onChange={value => setFieldValue(field.name, value)}
+            onChange={isSignerTheBeneficialOwner => {
+              setFieldValue(field.name, isSignerTheBeneficialOwner);
+              if (isSignerTheBeneficialOwner) {
+                setFieldValue('signer', values.beneficialOwner);
+              } else {
+                setFieldValue('signer', { firstName: '', middleName: '', lastName: '' });
+              }
+            }}
             options={[
               { label: 'Yes', value: true },
               { label: 'No', value: false },

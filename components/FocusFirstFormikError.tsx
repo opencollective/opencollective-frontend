@@ -20,7 +20,7 @@ export const FocusFirstFormikError = ({ children }: { children: React.ReactNode 
     const errorField = document.querySelector(`.${ERROR_CLASS_NAME}`);
     if (!errorField) {
       captureMessage('FocusFirstFormikError: No error field found', {
-        extra: { formik: pick(formik, ['errors', 'values', 'touched', 'submitCount']) },
+        extra: { formik: JSON.stringify(pick(formik, ['errors', 'values', 'touched', 'submitCount'])) },
       });
 
       return;
