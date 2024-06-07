@@ -9,7 +9,13 @@ import styled, { css } from 'styled-components';
 
 import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import type { Account, CaptchaInput, Host, Individual } from '../../lib/graphql/types/v2/graphql';
+import type {
+  Account,
+  CaptchaInput,
+  ContributionFrequency,
+  Host,
+  Individual,
+} from '../../lib/graphql/types/v2/graphql';
 import { PaymentMethodLegacyType } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getStripe } from '../../lib/stripe';
