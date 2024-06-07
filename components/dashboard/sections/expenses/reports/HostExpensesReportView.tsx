@@ -160,6 +160,18 @@ export function HostExpensesReportView(props: DashboardSectionProps) {
                         <tr key={i} className="group border-b text-sm hover:bg-muted has-[[data-state=open]]:bg-muted">
                           <td className="flex min-h-8 flex-1 items-center gap-1 overflow-hidden truncate text-wrap py-1 pl-6 text-left sm:pl-10">
                             <AccountingCategoryLabel accountingCategory={item.accountingCategory} />
+                            <Tooltip delayDuration={100}>
+                              <TooltipTrigger asChild>
+                                <div className="text-xs text-slate-400">({item.count})</div>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <FormattedMessage
+                                  defaultMessage="{n, plural, one {1 expense} other {{n} expenses}}"
+                                  id="xyYeS2"
+                                  values={{ n: item.count }}
+                                />
+                              </TooltipContent>
+                            </Tooltip>
                           </td>
                           <td className="pr-6 text-right font-medium">
                             <div className="inline-flex gap-1">
@@ -169,18 +181,6 @@ export function HostExpensesReportView(props: DashboardSectionProps) {
                                 showCurrencyCode={false}
                                 amountStyles={{ letterSpacing: 0 }}
                               />
-                              <Tooltip delayDuration={100}>
-                                <TooltipTrigger asChild>
-                                  <div className="text-xs text-slate-400">({item.count})</div>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <FormattedMessage
-                                    defaultMessage="{n, plural, one {1 expense} other {{n} expenses}}"
-                                    id="xyYeS2"
-                                    values={{ n: item.count }}
-                                  />
-                                </TooltipContent>
-                              </Tooltip>
                             </div>
                           </td>
                           <td className="pr-1 text-right sm:pr-2">
@@ -211,28 +211,26 @@ export function HostExpensesReportView(props: DashboardSectionProps) {
                     <tr>
                       <td className="flex min-h-8 flex-1 items-center gap-1 overflow-hidden truncate text-wrap py-1 pl-6 text-left sm:pl-10">
                         <FormattedMessage defaultMessage="Total" id="MJ2jZQ" />
+                        <Tooltip delayDuration={100}>
+                          <TooltipTrigger asChild>
+                            <div className="text-xs text-slate-400">({totalCount})</div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <FormattedMessage
+                              defaultMessage="{n, plural, one {1 expense} other {{n} expenses}}"
+                              id="xyYeS2"
+                              values={{ n: totalCount }}
+                            />
+                          </TooltipContent>
+                        </Tooltip>
                       </td>
                       <td className="pr-6 text-right font-medium">
-                        <div className="inline-flex gap-1">
-                          <FormattedMoneyAmount
-                            amount={totalAmount}
-                            currency={currency}
-                            showCurrencyCode={false}
-                            amountStyles={{ letterSpacing: 0 }}
-                          />
-                          <Tooltip delayDuration={100}>
-                            <TooltipTrigger asChild>
-                              <div className="text-xs text-slate-400">({totalCount})</div>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <FormattedMessage
-                                defaultMessage="{n, plural, one {1 expense} other {{n} expenses}}"
-                                id="xyYeS2"
-                                values={{ n: totalCount }}
-                              />
-                            </TooltipContent>
-                          </Tooltip>
-                        </div>
+                        <FormattedMoneyAmount
+                          amount={totalAmount}
+                          currency={currency}
+                          showCurrencyCode={false}
+                          amountStyles={{ letterSpacing: 0 }}
+                        />
                       </td>
                     </tr>
                   </tfoot>

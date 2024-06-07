@@ -53,7 +53,7 @@ const getColumns = intl => [
       const amount = cell.getValue();
       const count = row.original.managedExpensesCount;
       return (
-        <div className="inline-flex gap-1 font-normal text-muted-foreground">
+        <div className="inline-flex items-center gap-1 font-normal text-muted-foreground">
           <FormattedMoneyAmount
             amount={amount.valueInCents}
             currency={amount.currency}
@@ -84,7 +84,7 @@ const getColumns = intl => [
       const amount = cell.getValue();
       const count = row.original.operationalExpensesCount;
       return (
-        <div className="inline-flex gap-1 font-normal text-muted-foreground">
+        <div className="inline-flex items-center gap-1 font-normal text-muted-foreground">
           <FormattedMoneyAmount
             amount={amount.valueInCents}
             currency={amount.currency}
