@@ -1020,7 +1020,7 @@ const ExpenseForm = ({
     initialValues.items = expense.draft.items?.map(newExpenseItem) || [];
     initialValues.taxes = expense.draft.taxes;
     initialValues.attachedFiles = expense.draft.attachedFiles;
-    initialValues.payoutMethod = expense.draft.payoutMethod;
+    initialValues.payoutMethod = expense.draft.payoutMethod || expense.payoutMethod;
     initialValues.payeeLocation = expense.draft.payeeLocation;
     initialValues.payee = expense.recurringExpense ? expense.payee : expense.draft.payee;
   }
@@ -1095,6 +1095,7 @@ ExpenseForm.propTypes = {
     status: PropTypes.string,
     payee: PropTypes.object,
     draft: PropTypes.object,
+    payoutMethod: PropTypes.object,
     recurringExpense: PropTypes.object,
     items: PropTypes.arrayOf(
       PropTypes.shape({
