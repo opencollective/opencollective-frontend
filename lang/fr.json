@@ -2357,7 +2357,7 @@
   "mGSAXe": "{field} a une valeur invalide \"{value}\". Requis: \"{expected}\"",
   "mKcWbZ": "Si plusieurs zones, veuillez sélectionner la principale.",
   "mKpwVr": "Nom décroissant",
-  "mLRswr": "Ce taux de change semble très différent de celui enregistré ({value}) pour cette date.",
+  "mLRswr": "This exchange rate is notably different from the one in our records ({value}) for this date.",
   "mLx6pg": "Supprimer la Carte",
   "MMUT6d": "Activité <ActivityId></ActivityId>",
   "MMyZfL": "Créer un jeton personnel",

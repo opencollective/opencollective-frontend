@@ -2357,7 +2357,7 @@
   "mGSAXe": "{field} 的值“{value}”无效。预期：“{expected}”",
   "mKcWbZ": "If multiple areas, please select most prominent of them all.",
   "mKpwVr": "Name descending",
-  "mLRswr": "This exchange rate looks very different from the one in our records ({value}) for this date.",
+  "mLRswr": "This exchange rate is notably different from the one in our records ({value}) for this date.",
   "mLx6pg": "删除银行卡",
   "MMUT6d": "Activity <ActivityId></ActivityId>",
   "MMyZfL": "创建个人令牌",

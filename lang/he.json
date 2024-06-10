@@ -2357,7 +2357,7 @@
   "mGSAXe": "ב{field} יש משהו לא תקין \"{value}\". צריך להיות: \"{expected}\"",
   "mKcWbZ": "If multiple areas, please select most prominent of them all.",
   "mKpwVr": "Name descending",
-  "mLRswr": "This exchange rate looks very different from the one in our records ({value}) for this date.",
+  "mLRswr": "This exchange rate is notably different from the one in our records ({value}) for this date.",
   "mLx6pg": "מחיקת כרטיס",
   "MMUT6d": "Activity <ActivityId></ActivityId>",
   "MMyZfL": "Create Personal token",

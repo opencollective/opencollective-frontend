@@ -2357,7 +2357,7 @@
   "mGSAXe": "{field} hat einen ungültigen Wert \"{value}\". Erwartet: \"{expected}\"",
   "mKcWbZ": "Falls mehrere Bereiche vorhanden sind, wähle bitte die prominentesten davon aus.",
   "mKpwVr": "Name descending",
-  "mLRswr": "This exchange rate looks very different from the one in our records ({value}) for this date.",
+  "mLRswr": "This exchange rate is notably different from the one in our records ({value}) for this date.",
   "mLx6pg": "Karte löschen",
   "MMUT6d": "Aktivität <ActivityId></ActivityId>",
   "MMyZfL": "Persönliches Token erstellen",
