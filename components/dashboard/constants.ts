@@ -28,6 +28,7 @@ export const SECTIONS = {
   TEAM: 'team',
   VENDORS: 'vendors',
   ALL_COLLECTIVES: 'all-collectives',
+  ACCOUNTS: 'accounts',
 };
 
 export const SETTINGS_SECTIONS = {
@@ -268,5 +269,9 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.UPDATES]: {
     id: 'updates',
     defaultMessage: 'Updates',
+  },
+  [ALL_SECTIONS.ACCOUNTS]: {
+    defaultMessage: 'Accounts',
+    id: 'FvanT6',
   },
 });

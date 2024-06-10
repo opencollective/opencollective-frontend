@@ -18,6 +18,7 @@ import {
   Store,
   Ticket,
   Users2,
+  Wallet,
 } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -95,6 +96,12 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       section: ALL_SECTIONS.SUBMITTED_EXPENSES,
       Icon: Receipt,
       label: intl.formatMessage({ id: 'Expenses', defaultMessage: 'Expenses' }),
+    },
+    {
+      if: !isIndividual && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.CROWDFUNDING_REDESIGN),
+      section: ALL_SECTIONS.ACCOUNTS,
+      Icon: Wallet,
+      label: intl.formatMessage({ defaultMessage: 'Accounts', id: 'FvanT6' }),
     },
     {
       if: !isIndividual,
