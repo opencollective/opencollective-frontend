@@ -143,8 +143,8 @@ export const ActivityTimelineMessageI18n = defineMessages<string, TimelineMessag
     avatar: 'fromAccount',
   },
   ORDER_PENDING_CONTRIBUTION_NEW: {
-    defaultMessage: '<Individual></Individual> created new pending <Order>contribution</Order> to <Account></Account>',
-    id: 'MapeUk',
+    defaultMessage: '<Individual></Individual> created new <Order>expected funds</Order> to <Account></Account>',
+    id: 'NvYiK0',
   },
 });
 
@@ -435,13 +435,13 @@ export const ActivityDescriptionI18n = defineMessages({
     id: '6QW6MJ',
   },
   ORDER_PENDING_CONTRIBUTION_NEW: {
-    defaultMessage: 'New pending <Order>contribution</Order> from <FromAccount></FromAccount> to <Account></Account>',
-    id: 'xrcsxW',
+    defaultMessage: 'New <Order>expected funds</Order> from <FromAccount></FromAccount> to <Account></Account>',
+    id: 'kh8yZm',
   },
   ORDER_PENDING_CONTRIBUTION_REMINDER: {
     defaultMessage:
-      'Sent reminder to <FromAccount></FromAccount> about pending <Order>contribution</Order> to <Account></Account>',
-    id: 'PPUTPf',
+      'Sent reminder to <FromAccount></FromAccount> about <Order>expected funds</Order> to <Account></Account>',
+    id: '76qdIc',
   },
   BACKYOURSTACK_DISPATCH_CONFIRMED: {
     defaultMessage: 'BackYourStack dispatch confirmed for <Account></Account>',
@@ -774,8 +774,8 @@ export const ActivityTypeI18n: ActivityTranslations = defineMessages({
     id: 'oisSUu',
   },
   ORDER_PENDING_CONTRIBUTION_NEW: {
-    defaultMessage: 'New pending contribution',
-    id: 'PRfgGt',
+    defaultMessage: 'New expected funds',
+    id: 'kzIWOG',
   },
   ORDER_THANKYOU: {
     defaultMessage: 'New contribution',
