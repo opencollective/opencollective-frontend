@@ -134,13 +134,6 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
             { accountName: account.name },
           ),
         },
-        {
-          section: ALL_SECTIONS.HOST_EXPENSES_REPORT,
-          label: intl.formatMessage({
-            defaultMessage: 'Reports',
-            id: 'Reports',
-          }),
-        },
       ],
     },
     {
