@@ -20,7 +20,7 @@ const StepPayment = ({
   onChange,
   isSubmitting,
   isEmbed,
-  hideCreditCardPostalCode,
+  hideCreditCardPostalCode = false,
   onNewCardFormReady,
   disabledPaymentMethodTypes,
 }) => {
@@ -66,10 +66,6 @@ StepPayment.propTypes = {
   isSubmitting: PropTypes.bool,
   isEmbed: PropTypes.bool,
   disabledPaymentMethodTypes: PropTypes.arrayOf(PropTypes.string),
-};
-
-StepPayment.defaultProps = {
-  hideCreditCardPostalCode: false,
 };
 
 export default StepPayment;

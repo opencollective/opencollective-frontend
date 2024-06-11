@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Times } from '@styled-icons/fa-solid/Times';
 import styled from 'styled-components';
 import { background, border, color, layout, position, space, typography, variant } from 'styled-system';
@@ -55,7 +54,9 @@ const TAG_TYPE_VARIANTS = {
   },
 };
 
-const StyledTagBase = styled.div`
+const StyledTagBase = styled.div<{
+  variant: 'squared' | 'rounded-right' | 'rounded-left' | 'rounded';
+}>`
   text-align: center;
   white-space: nowrap;
   letter-spacing: 0.06em;
@@ -110,7 +111,9 @@ const StyledTagBase = styled.div`
 const CloseButton = styled.button.attrs({
   type: 'button',
   'data-cy': 'remove-btn',
-})`
+})<{
+  isFocused?: boolean;
+}>`
   cursor: pointer;
   text-align: center;
   padding: 0 2px 0 0;
@@ -139,34 +142,33 @@ const CloseButton = styled.button.attrs({
   }
 `;
 
+export interface StyledTagProps extends React.ComponentProps<typeof StyledTagBase> {
+  closeButtonProps?: React.ComponentProps<typeof CloseButton> | boolean;
+  /** If defined, a close button will be displayed on the tag */
+  onClose?: (...args: unknown[]) => unknown;
+  backgroundColor?: string;
+  variant?: 'squared' | 'rounded-right' | 'rounded-left' | 'rounded';
+  children?: React.ReactNode;
+  type?: 'white' | 'dark' | 'grey' | 'info' | 'success' | 'warning' | 'error';
+  htmlType?: 'button' | 'submit' | 'reset';
+}
+
 /** Simple tag to display a short string */
-const StyledTag = ({ closeButtonProps = null, children, ...props }) => {
+const StyledTag = ({ closeButtonProps = null, children, variant = 'squared', htmlType, ...props }: StyledTagProps) => {
   return !closeButtonProps ? (
-    <StyledTagBase {...props}>{children}</StyledTagBase>
+    <StyledTagBase variant={variant} type={htmlType} {...props}>
+      {children}
+    </StyledTagBase>
   ) : (
-    <StyledTagBase {...props}>
+    <StyledTagBase type={htmlType} variant={variant} {...props}>
       <Span mr="12px" letterSpacing="inherit">
         {children}
       </Span>
-      <CloseButton {...closeButtonProps}>
+      <CloseButton {...(closeButtonProps === true ? null : closeButtonProps)}>
         <Times size="12px" />
       </CloseButton>
     </StyledTagBase>
   );
-};
-
-StyledTag.propTypes = {
-  closeButtonProps: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
-  /** If defined, a close button will be displayed on the tag */
-  onClose: PropTypes.func,
-  backgroundColor: PropTypes.string,
-  variant: PropTypes.oneOf(['squared', 'rounded-right', 'rounded-left', 'rounded']),
-  children: PropTypes.node,
-  type: PropTypes.oneOf(Object.keys(TAG_TYPE_VARIANTS)),
-};
-
-StyledTag.defaultProps = {
-  variant: 'squared',
 };
 
 export default StyledTag;

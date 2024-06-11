@@ -126,7 +126,7 @@ const StyledButtonContent = styled.button<StyledButtonProps>`
 const StyledButton: ForwardRefExoticComponent<StyledButtonProps> = React.forwardRef<
   HTMLButtonElement,
   StyledButtonProps
->(({ loading, as, ...props }, ref) => {
+>(({ loading = false, as = null, buttonSize = 'medium', buttonStyle = 'standard', ...props }, ref) => {
   const internalRef = React.useRef<HTMLButtonElement>(null);
   const allRefs = mergeRefs([ref, internalRef]);
   const baseSize = React.useMemo(() => {
@@ -140,11 +140,13 @@ const StyledButton: ForwardRefExoticComponent<StyledButtonProps> = React.forward
 
   // TODO(Typescript): We have to hack the `as` prop because styled-components somehow types it as "never"
   return !loading ? (
-    <StyledButtonContent {...props} as={as as never} ref={allRefs} />
+    <StyledButtonContent buttonSize={buttonSize} buttonStyle={buttonStyle} {...props} as={as as never} ref={allRefs} />
   ) : (
     <StyledButtonContent
       {...props}
       as={as as never}
+      buttonSize={buttonSize}
+      buttonStyle={buttonStyle}
       width={props.width ?? props.size ?? baseSize?.width}
       height={props.height ?? props.size ?? baseSize?.height}
       onClick={undefined}
@@ -195,12 +197,6 @@ StyledButton.propTypes = {
   isBorderless: PropTypes.bool,
   truncateOverflow: PropTypes.bool,
   children: PropTypes.node,
-};
-
-StyledButton.defaultProps = {
-  buttonSize: 'medium',
-  buttonStyle: 'standard',
-  loading: false,
 };
 
 /** @component */

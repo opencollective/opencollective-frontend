@@ -76,7 +76,13 @@ const NavItem = styled(StyledLink)`
   }
 `;
 
-const TopBar = ({ showSearch, menuItems, showProfileAndChangelogMenu, account, navTitle }) => {
+const TopBar = ({
+  showSearch = true,
+  menuItems = { solutions: true, product: true, company: true, docs: true },
+  showProfileAndChangelogMenu = true,
+  account,
+  navTitle,
+}) => {
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const ref = useRef();
@@ -308,12 +314,6 @@ TopBar.propTypes = {
   menuItems: PropTypes.object,
   account: PropTypes.object,
   navTitle: PropTypes.string,
-};
-
-TopBar.defaultProps = {
-  showSearch: true,
-  showProfileAndChangelogMenu: true,
-  menuItems: { solutions: true, product: true, company: true, docs: true },
 };
 
 export default TopBar;

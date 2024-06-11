@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { keyframes } from 'styled-components';
 
 const DotPulseAnimation = keyframes`
@@ -42,7 +41,7 @@ const LoadingGridSVGContainer = styled.svg`
   }
 `;
 
-const LoadingGrid = ({ color, size }) => (
+const LoadingGrid = ({ color = '#3385FF', size = 100 }) => (
   <LoadingGridSVGContainer
     width={size}
     height={size}
@@ -61,15 +60,5 @@ const LoadingGrid = ({ color, size }) => (
     <circle cx="92.5" cy="92.5" r="12.5" />
   </LoadingGridSVGContainer>
 );
-
-LoadingGrid.propTypes = {
-  color: PropTypes.string,
-  size: PropTypes.number,
-};
-
-LoadingGrid.defaultProps = {
-  color: '#3385FF',
-  size: 100,
-};
 
 export default LoadingGrid;

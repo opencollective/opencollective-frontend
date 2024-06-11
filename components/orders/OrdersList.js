@@ -13,7 +13,7 @@ const OrderContainer = styled.div`
     `}
 `;
 
-const OrdersList = ({ orders, isLoading, nbPlaceholders, showPlatformTip, showAmountSign, host }) => {
+const OrdersList = ({ orders, isLoading, nbPlaceholders = 10, showPlatformTip, showAmountSign, host }) => {
   orders = !isLoading ? orders : [...new Array(nbPlaceholders)];
   if (!orders?.length) {
     return null;
@@ -49,10 +49,6 @@ OrdersList.propTypes = {
   ),
   showPlatformTip: PropTypes.bool,
   showAmountSign: PropTypes.bool,
-};
-
-OrdersList.defaultProps = {
-  nbPlaceholders: 10,
 };
 
 export default OrdersList;

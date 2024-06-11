@@ -935,7 +935,6 @@
   "Contributors": "Contributors",
   "ContributorsFilter.All": "すべてのコントリビューター",
   "ContributorsFilter.Financial": "財政コントリビューター",
-  "ContributorsFilter.Github": "GitHubコントリビューター",
   "Conversation.created": "会話を作成しました",
   "conversation.deleteMessage": "The message and all its replies will be permanently deleted.",
   "conversation.deleteModalTitle": "この会話を削除しますか？",

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Paypal as PaypalIcon } from '@styled-icons/fa-brands/Paypal';
 import { CreditCard } from '@styled-icons/fa-solid/CreditCard';
 import { ExchangeAlt as OtherIcon } from '@styled-icons/fa-solid/ExchangeAlt';
@@ -13,10 +12,28 @@ import { Flex } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import { Span } from '../Text';
 
+interface PayoutMethodTypeWithIconProps {
+  isLoading?: boolean;
+  type?: unknown | unknown;
+  fontSize?: string | number;
+  fontWeight?: string;
+  color?: string;
+  iconSize?: string | number;
+  name?: string;
+}
+
 /**
  * Shows the data of the given payout method
  */
-const PayoutMethodTypeWithIcon = ({ isLoading, type, fontSize, fontWeight, color, iconSize, name }) => {
+const PayoutMethodTypeWithIcon = ({
+  isLoading = false,
+  type,
+  fontSize = '13px',
+  fontWeight = 'bold',
+  color = 'black.900',
+  iconSize = 24,
+  name,
+}: PayoutMethodTypeWithIconProps) => {
   if (isLoading) {
     return <LoadingPlaceholder height={15} width={90} />;
   }
@@ -78,23 +95,6 @@ const PayoutMethodTypeWithIcon = ({ isLoading, type, fontSize, fontWeight, color
         </Flex>
       );
   }
-};
-
-PayoutMethodTypeWithIcon.propTypes = {
-  isLoading: PropTypes.bool,
-  type: PropTypes.oneOf([...Object.values(PayoutMethodType), INVITE]),
-  fontSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  fontWeight: PropTypes.string,
-  color: PropTypes.string,
-  iconSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  name: PropTypes.string,
-};
-
-PayoutMethodTypeWithIcon.defaultProps = {
-  fontSize: '13px',
-  fontWeight: 'bold',
-  color: 'black.900',
-  iconSize: 24,
 };
 
 // @component

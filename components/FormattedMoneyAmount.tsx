@@ -1,19 +1,47 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { isNil } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { CurrencyPrecision } from '../lib/constants/currency-precision';
 import INTERVALS from '../lib/constants/intervals';
 import { getIntervalFromContributionFrequency } from '../lib/date-utils';
+import type { Currency as GraphQLCurrency, TierFrequency } from '../lib/graphql/types/v2/graphql';
 
 import Currency from './Currency';
+import type { TextProps } from './Text';
 import { Span } from './Text';
 
 /** Default styles for the amount (not including currency) */
-export const DEFAULT_AMOUNT_STYLES = { letterSpacing: 0, fontWeight: 'bold', color: 'black.900' };
+export const DEFAULT_AMOUNT_STYLES: Omit<TextProps, 'color'> & {
+  color?: string;
+} = {
+  letterSpacing: 0,
+  fontWeight: 'bold',
+  color: 'black.900',
+};
 
 const EMPTY_AMOUNT_PLACEHOLDER = '--.--';
+
+interface FormattedMoneyAmountProps {
+  /** The amount to display, in cents */
+  amount?: number;
+  /** The currency (eg. `USD`, `EUR`...etc) */
+  currency?: GraphQLCurrency | string;
+  /** Abbreviate the interval (eg. year => yr.) */
+  abbreviateInterval?: boolean;
+  /** Whether to show the full currency code (ie. USD) */
+  showCurrencyCode?: boolean;
+  /** How many numbers should we display after the comma */
+  precision?: number | 'auto';
+  /** An interval that goes with the amount */
+  interval?: (typeof INTERVALS)[keyof typeof INTERVALS];
+  /** ContributionFrequency from GQLV2 */
+  frequency?: TierFrequency;
+  /** Style for the amount (eg. `$10`). Doesn't apply on interval */
+  amountStyles?: object;
+  currencyCodeStyles?: object;
+  formatWithSeparators?: boolean;
+}
 
 /**
  * A practical component to format amounts and their intervals with proper
@@ -21,16 +49,16 @@ const EMPTY_AMOUNT_PLACEHOLDER = '--.--';
  */
 const FormattedMoneyAmount = ({
   formatWithSeparators,
-  abbreviateInterval,
+  abbreviateInterval = false,
   currency,
-  precision,
+  precision = CurrencyPrecision.DEFAULT,
   amount,
   interval,
   frequency,
-  amountStyles,
-  showCurrencyCode,
+  amountStyles = DEFAULT_AMOUNT_STYLES,
+  showCurrencyCode = true,
   currencyCodeStyles,
-}) => {
+}: FormattedMoneyAmountProps) => {
   if (!currency) {
     return <Span {...amountStyles}>{EMPTY_AMOUNT_PLACEHOLDER}</Span>;
   }
@@ -41,7 +69,7 @@ const FormattedMoneyAmount = ({
     ) : (
       <Currency
         value={amount}
-        currency={currency}
+        currency={currency as GraphQLCurrency}
         precision={precision}
         formatWithSeparators={formatWithSeparators}
         {...amountStyles}
@@ -80,35 +108,6 @@ const FormattedMoneyAmount = ({
       />
     );
   }
-};
-
-FormattedMoneyAmount.propTypes = {
-  /** The amount to display, in cents */
-  amount: PropTypes.number,
-  /** The currency (eg. `USD`, `EUR`...etc) */
-  currency: PropTypes.string,
-  /** Abbreviate the interval (eg. year => yr.) */
-  abbreviateInterval: PropTypes.bool,
-  /** Whether to show the full currency code (ie. USD) */
-  showCurrencyCode: PropTypes.bool,
-  /** How many numbers should we display after the comma */
-  precision: PropTypes.oneOfType([PropTypes.number, PropTypes.oneOf(['auto'])]),
-  /** An interval that goes with the amount */
-  interval: PropTypes.oneOf(['month', 'year', 'oneTime']),
-  /** ContributionFrequency from GQLV2 */
-  frequency: PropTypes.oneOf(['MONTHLY', 'YEARLY', 'ONETIME']),
-  /** Style for the amount (eg. `$10`). Doesn't apply on interval */
-  amountStyles: PropTypes.object,
-  currencyCodeStyles: PropTypes.object,
-  formatWithSeparators: PropTypes.bool,
-};
-
-FormattedMoneyAmount.defaultProps = {
-  abbreviate: false,
-  abbreviateInterval: false,
-  precision: CurrencyPrecision.DEFAULT,
-  amountStyles: DEFAULT_AMOUNT_STYLES,
-  showCurrencyCode: true,
 };
 
 export default FormattedMoneyAmount;

@@ -935,7 +935,6 @@
   "Contributors": "Contributors",
   "ContributorsFilter.All": "All contributors",
   "ContributorsFilter.Financial": "Financial contributors",
-  "ContributorsFilter.Github": "Github contributors",
   "Conversation.created": "Conversation created",
   "conversation.deleteMessage": "The message and all its replies will be permanently deleted.",
   "conversation.deleteModalTitle": "Delete this Conversation?",

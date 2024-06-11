@@ -153,6 +153,4 @@ OrdersPickerAsync.propTypes = {
   account: PropTypes.object,
 };
 
-OrdersPickerAsync.defaultProps = {};
-
 export default OrdersPickerAsync;

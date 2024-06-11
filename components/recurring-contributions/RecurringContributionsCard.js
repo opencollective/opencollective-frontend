@@ -41,7 +41,7 @@ const RecurringContributionsCard = ({
   isAdmin,
   onCloseEdit,
   onEdit,
-  showPaymentMethod,
+  showPaymentMethod = true,
   ...props
 }) => {
   const { formatMessage } = useIntl();
@@ -204,10 +204,6 @@ RecurringContributionsCard.propTypes = {
   LoggedInUser: PropTypes.object,
   account: PropTypes.object.isRequired,
   showPaymentMethod: PropTypes.bool,
-};
-
-RecurringContributionsCard.defaultProps = {
-  showPaymentMethod: true,
 };
 
 export default RecurringContributionsCard;

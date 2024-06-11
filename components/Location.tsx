@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { isURL } from 'validator';
@@ -14,17 +13,27 @@ const LocationSection = styled.section`
   text-align: center;
 `;
 
-function Location({ location, showTitle }) {
-  const { name, address, lat, long, country } = location || {};
+interface LocationProps {
+  showTitle?: boolean;
+  location?: {
+    name?: string;
+    address?: string;
+    lat?: number;
+    long?: number;
+    country?: string;
+  };
+}
 
+function Location({ location, showTitle = true }: Readonly<LocationProps>) {
   if (!location) {
     return null;
   }
 
+  const { name, address, lat, long, country } = location;
   if (name === 'Online') {
     if (address && isURL(address)) {
       return (
-        <Flex flexDirection="Column" alignItems="center">
+        <Flex flexDirection="column" alignItems="center">
           <P textAlign="center">
             <StyledLink openInNewTabNoFollow href={address}>
               {address}
@@ -69,14 +78,5 @@ function Location({ location, showTitle }) {
     </LocationSection>
   );
 }
-
-Location.propTypes = {
-  location: PropTypes.object,
-  showTitle: PropTypes.bool,
-};
-
-Location.defaultProps = {
-  showTitle: true,
-};
 
 export default Location;

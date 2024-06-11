@@ -1,12 +1,25 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
+
+import type { Account } from '../lib/graphql/types/v2/graphql';
 
 import EditVirtualCardModal from './edit-collective/EditVirtualCardModal';
 import { useToast } from './ui/useToast';
 import StyledButton from './StyledButton';
 
-const CreateVirtualCardBtn = ({ children, host, collective }) => {
+interface CreateVirtualCardBtnProps {
+  children: (props: { onClick: () => void }) => React.ReactNode;
+  host: Account;
+  collective: Account;
+}
+
+const DefaultButton = props => (
+  <StyledButton {...props}>
+    <FormattedMessage defaultMessage="Create a Card" id="xLybrm" />
+  </StyledButton>
+);
+
+const CreateVirtualCardBtn = ({ children = DefaultButton, host, collective }: CreateVirtualCardBtnProps) => {
   const [showModal, setShowModal] = React.useState(false);
   const { toast } = useToast();
 
@@ -31,22 +44,6 @@ const CreateVirtualCardBtn = ({ children, host, collective }) => {
       )}
     </Fragment>
   );
-};
-
-CreateVirtualCardBtn.propTypes = {
-  children: PropTypes.func.isRequired,
-  host: PropTypes.object.isRequired,
-  collective: PropTypes.object.isRequired,
-};
-
-const DefaultButton = props => (
-  <StyledButton {...props}>
-    <FormattedMessage defaultMessage="Create a Card" id="xLybrm" />
-  </StyledButton>
-);
-
-CreateVirtualCardBtn.defaultProps = {
-  children: DefaultButton,
 };
 
 export default CreateVirtualCardBtn;
