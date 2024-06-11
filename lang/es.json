@@ -2359,7 +2359,7 @@
   "mGSAXe": "{field} tiene un valor inválido \"{value}\". Previsto: \"{expected}\"",
   "mKcWbZ": "Si tiene varias áreas, selecciona la más destacada de todas.",
   "mKpwVr": "Nombre en orden descendente",
-  "mLRswr": "Este tipo de cambio es muy diferente del que figura en nuestros registros ({value}) para esta fecha.",
+  "mLRswr": "This exchange rate is notably different from the one in our records ({value}) for this date.",
   "mLx6pg": "Eliminar Tarjeta",
   "MMUT6d": "Actividad <ActivityId></ActivityId>",
   "MMyZfL": "Crear Token Personal",

@@ -57,7 +57,7 @@ export const getExpenseExchangeRateWarningOrError = (intl, exchangeRate, referen
       warning: intl.formatMessage(
         {
           defaultMessage:
-            'This exchange rate looks very different from the one in our records ({value}) for this date.',
+            'This exchange rate is notably different from the one in our records ({value}) for this date.',
           id: 'mLRswr',
         },
         { value: round(referenceExchangeRate.value, 7) },
