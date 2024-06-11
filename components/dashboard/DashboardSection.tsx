@@ -13,6 +13,7 @@ import { OCFBannerWithData } from '../OCFBanner';
 import RootActivityLog from '../root-actions/RootActivityLog';
 
 import { HostAdminAccountingSection } from './sections/accounting';
+import Accounts from './sections/accounts';
 import AccountSettings from './sections/AccountSettings';
 import AllCollectives from './sections/collectives/AllCollectives';
 import HostApplications from './sections/collectives/HostApplications';
@@ -78,6 +79,7 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.VIRTUAL_CARDS]: VirtualCards,
   [SECTIONS.TEAM]: Team,
   [SECTIONS.VENDORS]: Vendors,
+  [SECTIONS.ACCOUNTS]: Accounts,
 };
 
 const SETTINGS_COMPONENTS = {
