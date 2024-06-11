@@ -91,6 +91,7 @@ export const accountsQuery = gql`
 export const accountDetailQuery = gql`
   query HostedCollectiveDetail($id: String!) {
     account(id: $id) {
+      ...AccountFields
       id
       legacyId
       slug
@@ -99,7 +100,11 @@ export const accountDetailQuery = gql`
       isHost
       type
       settings
-      ...AccountFields
+      ... on AccountWithParent {
+        parent {
+          id
+        }
+      }
       stats {
         id
         consolidatedBalance {
