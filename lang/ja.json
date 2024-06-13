@@ -195,6 +195,7 @@
   "6ZJG0I": "Net Amount for {collectiveName}: {netExpenseAmount}",
   "70Nuf5": "料金体系",
   "72Ve1d": "Tax form URL",
+  "734IeW": "This will only be visible to you, the Collective admins and its Fiscal Host",
   "76qdIc": "Sent reminder to <FromAccount></FromAccount> about <Order>expected funds</Order> to <Account></Account>",
   "76Sds/": "Are you sure you want to remove two-factor authentication from your account?",
   "76YT3Y": "{dateFrom} to {dateTo}",
