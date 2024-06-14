@@ -195,6 +195,7 @@
   "6ZJG0I": "Montant net pour {collectiveName} : {netExpenseAmount}",
   "70Nuf5": "Tarification et modèle d'affaires",
   "72Ve1d": "URL du formulaire fiscal",
+  "734IeW": "This will only be visible to you, the Collective admins and its Fiscal Host",
   "76qdIc": "Sent reminder to <FromAccount></FromAccount> about <Order>expected funds</Order> to <Account></Account>",
   "76Sds/": "Êtes-vous sûr de vouloir supprimer l'authentification à deux facteurs de votre compte ?",
   "76YT3Y": "{dateFrom} à {dateTo}",
