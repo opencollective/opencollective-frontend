@@ -2,8 +2,8 @@ import { gql } from '../../../../lib/graphql/helpers';
 
 import { accountHoverCardFields } from '../../../AccountHoverCard';
 
-const accountFields = gql`
-  fragment AccountFields on Account {
+const dashboardAccountsQueryFields = gql`
+  fragment DashboardAccountsQueryFields on Account {
     id
     legacyId
     name
@@ -67,7 +67,7 @@ export const accountsQuery = gql`
       isHost
       type
       settings
-      ...AccountFields
+      ...DashboardAccountsQueryFields
       stats {
         id
         consolidatedBalance {
@@ -79,19 +79,19 @@ export const accountsQuery = gql`
         totalCount
         nodes {
           id
-          ...AccountFields
+          ...DashboardAccountsQueryFields
         }
       }
     }
   }
 
-  ${accountFields}
+  ${dashboardAccountsQueryFields}
 `;
 
 export const accountDetailQuery = gql`
-  query HostedCollectiveDetail($id: String!) {
+  query HostedAccountDetail($id: String!) {
     account(id: $id) {
-      ...AccountFields
+      ...DashboardAccountsQueryFields
       id
       legacyId
       slug
@@ -182,5 +182,5 @@ export const accountDetailQuery = gql`
   }
 
   ${accountHoverCardFields}
-  ${accountFields}
+  ${dashboardAccountsQueryFields}
 `;
