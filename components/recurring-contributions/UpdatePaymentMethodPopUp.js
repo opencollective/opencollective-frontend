@@ -293,10 +293,9 @@ const UpdatePaymentMethodPopUp = ({ contribution, onCloseEdit, loadStripe, accou
   // data handling
   const paymentMethods = get(data, 'account.paymentMethods', null);
   const existingPaymentMethod = get(data, 'order.paymentMethod', null);
-  const filterPaymentMethodsParams = [paymentMethods, contribution, addedPaymentMethod, existingPaymentMethod];
   const paymentOptions = React.useMemo(
-    () => sortAndFilterPaymentMethods(...filterPaymentMethodsParams),
-    filterPaymentMethodsParams,
+    () => sortAndFilterPaymentMethods(paymentMethods, contribution, addedPaymentMethod, existingPaymentMethod),
+    [paymentMethods, contribution, addedPaymentMethod, existingPaymentMethod],
   );
 
   useEffect(() => {

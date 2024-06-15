@@ -66,8 +66,10 @@ const TotalMoneyManagedSection = ({ host, collectives, isLoading }) => {
   }
 
   // Generate graph data (memoized for performances)
-  const chartArgs = [hostBalance, collectivesBalance, host?.currency, isLoading, locale];
-  const chartAreas = React.useMemo(() => getMoneyManagedChartAreas(...chartArgs), chartArgs);
+  const chartAreas = React.useMemo(
+    () => getMoneyManagedChartAreas(hostBalance, collectivesBalance, host?.currency, isLoading, locale),
+    [hostBalance, collectivesBalance, host?.currency, isLoading, locale],
+  );
 
   return (
     <div>

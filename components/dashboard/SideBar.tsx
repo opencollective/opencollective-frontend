@@ -1,7 +1,6 @@
 import React from 'react';
 import { MenuIcon } from 'lucide-react';
 
-import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { cn } from '../../lib/utils';
 
@@ -27,17 +26,20 @@ const AdminPanelSideBar = ({
   onRoute: _onRoute,
   ...props
 }: AdminPanelSideBarProps) => {
-  const { LoggedInUser } = useLoggedInUser();
   const [isMenuOpen, setMenuOpen] = React.useState(false);
   const { viewport } = useWindowResize();
   const isMobile = [VIEWPORTS.XSMALL, VIEWPORTS.SMALL].includes(viewport);
 
-  const onRoute = isMobile
-    ? (...args) => {
-        setMenuOpen(false);
-        _onRoute?.(...args);
-      }
-    : _onRoute;
+  const onRoute = React.useMemo(
+    () =>
+      isMobile
+        ? (...args) => {
+            setMenuOpen(false);
+            _onRoute?.(...args);
+          }
+        : _onRoute,
+    [_onRoute, isMobile],
+  );
 
   const content = React.useMemo(
     () => (
@@ -54,7 +56,7 @@ const AdminPanelSideBar = ({
         )}
       </div>
     ),
-    [isLoading, activeSlug, viewport, LoggedInUser],
+    [isLoading, menuItems, onRoute],
   );
 
   return (

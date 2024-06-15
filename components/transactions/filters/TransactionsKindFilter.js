@@ -47,12 +47,15 @@ const REACT_SELECT_COMPONENT_OVERRIDE = {
 
 const TransactionsKindFilter = ({ onChange, value, kinds, ...props }) => {
   const intl = useIntl();
-  const getOption = (value, idx) => ({ label: i18nTransactionKind(intl, value), value, idx });
-  const displayedKinds = kinds && kinds.length ? kinds : getDefaultKinds();
+  const getOption = React.useCallback(
+    (value, idx) => ({ label: i18nTransactionKind(intl, value), value, idx }),
+    [intl],
+  );
+  const displayedKinds = React.useMemo(() => (kinds && kinds.length ? kinds : getDefaultKinds()), [kinds]);
   const options = displayedKinds.map(getOption);
   const selectedOptions = React.useMemo(
     () => (!value ? intersection(getDefaultKinds(), displayedKinds) : parseTransactionKinds(value)).map(getOption),
-    [value],
+    [value, getOption, displayedKinds],
   );
   return (
     <StyledSelectFilter

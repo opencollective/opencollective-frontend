@@ -345,11 +345,12 @@ export default function OrderPage(props) {
   const intl = useIntl();
 
   // Refetch when users logs in
+  const { refetch } = queryResult;
   React.useEffect(() => {
     if (!prevLoggedInUser && LoggedInUser) {
-      queryResult.refetch();
+      refetch();
     }
-  }, [LoggedInUser, prevLoggedInUser]);
+  }, [LoggedInUser, prevLoggedInUser, refetch]);
 
   if (!order && error) {
     return <ErrorPage loading={queryResult.loading} data={queryResult.data} error={error} />;

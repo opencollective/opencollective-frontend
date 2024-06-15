@@ -88,11 +88,12 @@ export default function ExpensePage(props: InferGetServerSidePropsType<typeof ge
   const client = useApolloClient();
 
   // Refetch data when logging in
+  const { refetch } = queryResult;
   useEffect(() => {
     if (LoggedInUser) {
-      queryResult.refetch();
+      refetch();
     }
-  }, [LoggedInUser]);
+  }, [LoggedInUser, refetch]);
 
   useEffect(() => {
     addParentToURLIfMissing(router, queryResult.data?.expense?.account, `/expenses/${props.legacyExpenseId}`);
@@ -101,7 +102,7 @@ export default function ExpensePage(props: InferGetServerSidePropsType<typeof ge
   const { collectiveSlug, edit, draftKey } = props;
   const data = queryResult.data;
   const error = queryResult.error;
-  const { refetch, fetchMore, startPolling, stopPolling } = queryResult;
+  const { fetchMore, startPolling, stopPolling } = queryResult;
   if (!queryResult.loading) {
     if (!data || error) {
       return <ErrorPage data={data} />;

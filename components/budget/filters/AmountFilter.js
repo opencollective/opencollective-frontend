@@ -45,10 +45,13 @@ const getOption = (intl, currency, minAmount, maxAmount) => {
 
 const AmountFilter = ({ currency, onChange, value, steps, ...props }) => {
   const intl = useIntl();
-  const allExpensesOption = { label: intl.formatMessage(OPTION_LABELS.ALL), value: 'ALL' };
+  const allExpensesOption = React.useMemo(
+    () => ({ label: intl.formatMessage(OPTION_LABELS.ALL), value: 'ALL' }),
+    [intl],
+  );
   const options = React.useMemo(() => {
     return [allExpensesOption, ...steps.map((step, idx) => getOption(intl, currency, step, steps[idx + 1]))];
-  }, [steps]);
+  }, [steps, currency, intl, allExpensesOption]);
 
   return (
     <StyledSelectFilter

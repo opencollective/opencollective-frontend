@@ -145,11 +145,12 @@ export default function UpdatesPage(props: InferGetServerSidePropsType<typeof ge
     addParentToURLIfMissing(router, collective, '/updates');
   });
 
+  const { refetch } = queryResult;
   useEffect(() => {
     if (LoggedInUser?.isAdminOfCollective?.(collective)) {
-      queryResult.refetch();
+      refetch();
     }
-  }, [LoggedInUser]);
+  }, [LoggedInUser, collective, refetch]);
 
   const updateQuery = (router, newParams) => {
     const query = omitBy({ ...router.query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));

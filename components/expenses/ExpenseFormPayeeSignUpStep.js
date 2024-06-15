@@ -136,7 +136,8 @@ const ExpenseFormPayeeSignUpStep = ({ formik, collective, onCancel, onNext }) =>
     (values.type === expenseTypes.RECEIPT ||
       (values.payoutMethod && values.payeeLocation?.country && values.payeeLocation?.address));
 
-  const setPayoutMethod = React.useCallback(({ value }) => formik.setFieldValue('payoutMethod', value), []);
+  const setFieldValue = formik.setFieldValue;
+  const setPayoutMethod = React.useCallback(({ value }) => setFieldValue('payoutMethod', value), [setFieldValue]);
   const [payeeType, setPayeeType] = React.useState(values.payee?.organization ? PAYEE_TYPE.ORG : PAYEE_TYPE.USER);
   const [validateSlug, { data: existingSlugAccount }] = useLazyQuery(validateSlugQuery, {
     context: API_V2_CONTEXT,

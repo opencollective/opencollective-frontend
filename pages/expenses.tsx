@@ -268,11 +268,12 @@ export default function ExpensesPage(props: InferGetServerSidePropsType<typeof g
   const query = expensePageQueryHelpers.useQuery(props);
 
   // Refetch data when logging in/out
+  const { refetch } = query;
   useEffect(() => {
     if (LoggedInUser) {
-      query.refetch();
+      refetch();
     }
-  }, [LoggedInUser]);
+  }, [LoggedInUser, refetch]);
 
   const error = query.error || expensePageQueryHelpers.getSSRErrorFromPageProps(props);
   const data: ExpensesPageQuery = query.data;

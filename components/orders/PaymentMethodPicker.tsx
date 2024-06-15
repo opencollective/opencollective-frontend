@@ -128,7 +128,7 @@ export default function PaymentMethodPicker(props: PaymentMethodPickerProps) {
         currency: props.order?.totalAmount?.currency,
       }),
     );
-  }, [query?.data?.host, query?.data?.account?.paymentMethods]);
+  }, [query.data?.host, query.data?.account?.paymentMethods, props.order?.totalAmount?.currency]);
 
   const onChange = React.useCallback(
     (option: PaymentMethodOption) => {
@@ -230,9 +230,10 @@ function StripeSetupPaymentMethodOption(props: StripeSetupPaymentMethodOptionPro
     },
   });
 
+  const onError = props.onError;
   React.useEffect(() => {
-    props?.onError?.(error);
-  }, [error, props?.onError]);
+    onError?.(error);
+  }, [error, onError]);
 
   const [elements, paymentElement] = React.useMemo(() => {
     if (!stripe || !setupIntent) {
@@ -261,7 +262,7 @@ function StripeSetupPaymentMethodOption(props: StripeSetupPaymentMethodOptionPro
     });
 
     return [elements, paymentElement];
-  }, [stripe, setupIntent]);
+  }, [stripe, setupIntent, props.currency]);
 
   React.useEffect(() => {
     paymentElement?.update({

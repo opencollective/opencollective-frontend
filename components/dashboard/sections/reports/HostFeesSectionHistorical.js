@@ -159,9 +159,9 @@ export const HostFeesSectionHistorical = ({ hostSlug }) => {
   const { loading, data } = useQuery(hostFeeSectionTimeSeriesQuery, { variables, context: API_V2_CONTEXT });
   const host = data?.host;
   const timeSeries = data?.host?.hostMetricsTimeSeries;
-  const series = useMemo(() => getSeriesFromData(intl, timeSeries), [timeSeries]);
+  const series = useMemo(() => getSeriesFromData(intl, timeSeries), [intl, timeSeries]);
   const yearsOptions = useMemo(() => getActiveYearsOptions(host), [host]);
-  const chartOptions = useMemo(() => getChartOptions(intl, host?.currency), [host?.currency]);
+  const chartOptions = useMemo(() => getChartOptions(intl, host?.currency), [intl, host?.currency]);
   return (
     <Box py={3}>
       <Flex alignItems="center" px={2} mb={2}>
