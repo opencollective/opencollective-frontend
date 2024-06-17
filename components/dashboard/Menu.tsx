@@ -236,7 +236,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
-      if: isHost || (!isIndividual && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.HOST_REPORTS)),
+      if: isHost,
       type: 'group',
       label: intl.formatMessage({ id: 'Reports', defaultMessage: 'Reports' }),
       Icon: BarChart2,
@@ -246,11 +246,16 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           label: intl.formatMessage({ defaultMessage: 'Transactions', id: 'menu.transactions' }),
         },
         {
-          if: isHost,
           section: ALL_SECTIONS.EXPENSE_REPORTS,
           label: intl.formatMessage({ defaultMessage: 'Expenses', id: 'Expenses' }),
         },
       ],
+    },
+    {
+      if: !isHost && !isIndividual && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.HOST_REPORTS),
+      label: intl.formatMessage({ id: 'Reports', defaultMessage: 'Reports' }),
+      Icon: BarChart2,
+      section: ALL_SECTIONS.TRANSACTION_REPORTS,
     },
     {
       if: isHost && !isAccountantOnly,
