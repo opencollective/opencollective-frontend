@@ -86,7 +86,7 @@
     "file-saver": "2.0.5",
     "formik": "2.4.6",
     "glob": "10.4.1",
-    "graphql": "16.8.1",
+    "graphql": "16.8.2",
     "helmet": "7.1.0",
     "interweave": "13.1.0",
     "interweave-ssr": "2.0.0",
