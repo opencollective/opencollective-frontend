@@ -8,6 +8,7 @@ import {
   Coins,
   CreditCard,
   FileText,
+  FlaskConical,
   Globe2,
   HeartHandshake,
   LayoutDashboard,
@@ -27,6 +28,7 @@ import hasFeature, { FEATURES } from '../../lib/allowed-features';
 import { isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective';
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 import { parseToBoolean } from '../../lib/utils';
@@ -442,7 +444,7 @@ const Menu = ({ onRoute, menuItems }) => {
   const router = useRouter();
   const intl = useIntl();
   const { account } = React.useContext(DashboardContext);
-
+  const { LoggedInUser } = useLoggedInUser();
   React.useEffect(() => {
     if (onRoute) {
       router.events.on('routeChangeStart', onRoute);
@@ -454,17 +456,32 @@ const Menu = ({ onRoute, menuItems }) => {
     };
   }, [router, onRoute]);
 
+  const showLinkToProfilePrototype =
+    !['ROOT', 'ORGANIZATION', 'FUND', 'INDIVIDUAL'].includes(account.type) &&
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW);
+
   return (
     <div className="space-y-4">
       {account.type !== 'ROOT' && (
-        <MenuLink
-          href={getCollectivePageRoute(account)}
-          Icon={Globe2}
-          label={intl.formatMessage({ id: 'PublicProfile', defaultMessage: 'Public profile' })}
-          className="hover:bg-slate-50 hover:text-slate-700"
-          dataCy="public-profile-link"
-          external
-        />
+        <div className="flex flex-col gap-2">
+          <MenuLink
+            href={getCollectivePageRoute(account)}
+            Icon={Globe2}
+            label={intl.formatMessage({ id: 'PublicProfile', defaultMessage: 'Public profile' })}
+            className="hover:bg-slate-50 hover:text-slate-700"
+            dataCy="public-profile-link"
+            external
+          />
+          {showLinkToProfilePrototype && (
+            <MenuLink
+              href={`/preview/${account.slug}`}
+              Icon={FlaskConical}
+              label={intl.formatMessage({ defaultMessage: 'Preview new profile page', id: 'ob6Sw2' })}
+              className="hover:bg-slate-50 hover:text-slate-700"
+              external
+            />
+          )}
+        </div>
       )}
       <div className="space-y-2">
         {menuItems.map(item => {
