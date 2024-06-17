@@ -131,7 +131,7 @@ const parseQuery = query => {
   return {
     slug: getSingleParam(query.slug),
     section: getSingleParam(query.section),
-    subpath: getAsArray(query.subpath).filter(Boolean),
+    subpath: getAsArray(query.subpath)?.filter(Boolean),
   };
 };
 
