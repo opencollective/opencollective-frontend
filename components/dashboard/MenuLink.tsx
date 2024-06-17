@@ -46,7 +46,7 @@ export const MenuLink = ({
 
   const sections = subMenu?.map(item => item.section);
 
-  const sectionExpanded = sections?.find(section => {
+  const sectionExpanded = sections?.some(section => {
     return sectionAndSubpath === section;
   });
   const subMenuExpanded = sectionExpanded || selfExpanded;
