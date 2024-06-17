@@ -6,6 +6,8 @@ export const ROOT_PROFILE_ACCOUNT = { slug: ROOT_PROFILE_KEY, type: 'ROOT', name
 export const SECTIONS = {
   OVERVIEW: 'overview',
   REPORTS: 'reports',
+  EXPENSE_REPORTS: 'reports/expenses',
+  TRANSACTION_REPORTS: 'reports/transactions',
   CHART_OF_ACCOUNTS: 'chart-of-accounts',
   HOST_EXPENSES: 'host-expenses',
   HOST_AGREEMENTS: 'host-agreements',
@@ -78,6 +80,8 @@ export const ALL_SECTIONS = {
 
 export const SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS = [
   ALL_SECTIONS.REPORTS,
+  ALL_SECTIONS.TRANSACTION_REPORTS,
+  ALL_SECTIONS.EXPENSE_REPORTS,
   ALL_SECTIONS.PAYMENT_RECEIPTS,
   ALL_SECTIONS.HOST_EXPENSES,
   ALL_SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS,
@@ -119,8 +123,8 @@ export const SECTION_LABELS = defineMessages({
     defaultMessage: 'Overview',
   },
   [ALL_SECTIONS.REPORTS]: {
-    id: 'Reports',
-    defaultMessage: 'Reports',
+    defaultMessage: 'Transactions',
+    id: 'menu.transactions',
   },
   [ALL_SECTIONS.ADVANCED]: {
     id: 'editCollective.menu.advanced',

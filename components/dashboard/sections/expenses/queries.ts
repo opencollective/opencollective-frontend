@@ -29,6 +29,7 @@ export const accountExpensesQuery = gql`
     $includeChildrenExpenses: Boolean
     $fetchHostForExpenses: Boolean!
     $hasAmountInCreatedByAccountCurrency: Boolean!
+    $accountingCategory: [String]
   ) {
     expenses(
       account: $account
@@ -49,6 +50,7 @@ export const accountExpensesQuery = gql`
       virtualCards: $virtualCards
       createdByAccount: $createdByAccount
       includeChildrenExpenses: $includeChildrenExpenses
+      accountingCategory: $accountingCategory
     ) {
       totalCount
       offset
@@ -150,6 +152,7 @@ export const hostDashboardExpensesQuery = gql`
     $virtualCards: [VirtualCardReferenceInput]
     $account: AccountReferenceInput
     $lastCommentBy: [LastCommentBy]
+    $accountingCategory: [String]
   ) {
     expenses(
       host: { slug: $hostSlug }
@@ -169,6 +172,7 @@ export const hostDashboardExpensesQuery = gql`
       chargeHasReceipts: $chargeHasReceipts
       virtualCards: $virtualCards
       lastCommentBy: $lastCommentBy
+      accountingCategory: $accountingCategory
     ) {
       totalCount
       offset

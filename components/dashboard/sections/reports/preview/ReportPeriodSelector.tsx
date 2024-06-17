@@ -7,7 +7,8 @@ import { z } from 'zod';
 import { getDayjsIsoUnit } from '../../../../../lib/date-utils';
 import dayjs from '../../../../../lib/dayjs';
 import type { FilterComponentProps } from '../../../../../lib/filters/filter-types';
-import type { Host, TimeUnit } from '../../../../../lib/graphql/types/v2/graphql';
+import type { Host } from '../../../../../lib/graphql/types/v2/graphql';
+import { TimeUnit } from '../../../../../lib/graphql/types/v2/graphql';
 
 import { Button } from '../../../../ui/Button';
 import { Label } from '../../../../ui/Label';
@@ -15,7 +16,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '../../../../ui/Popover'
 
 import { CurrentPeriodBadge } from './CurrentPeriodBadge';
 
-const timeUnitSchema = z.enum(['MONTH', 'QUARTER', 'YEAR']);
+const timeUnitSchema = z.enum([TimeUnit.MONTH, TimeUnit.QUARTER, TimeUnit.YEAR]);
 
 const reportSlugSchema = z.union([
   z.string().regex(/^\d{4}$/), // Years: "2023", "2022", etc.
@@ -164,7 +165,7 @@ export const ReportPeriodSelector = ({
                     ? 'bg-white text-foreground shadow-sm'
                     : 'bg-transparent text-muted-foreground',
                 )}
-                onClick={() => setSelectedTimeUnit('MONTH')}
+                onClick={() => setSelectedTimeUnit(TimeUnit.MONTH)}
               >
                 <FormattedMessage id="Frequency.Monthly" defaultMessage="Monthly" />
               </button>
@@ -176,7 +177,7 @@ export const ReportPeriodSelector = ({
                     ? 'bg-white text-foreground shadow-sm'
                     : 'bg-transparent text-muted-foreground',
                 )}
-                onClick={() => setSelectedTimeUnit('QUARTER')}
+                onClick={() => setSelectedTimeUnit(TimeUnit.QUARTER)}
               >
                 <FormattedMessage id="quarter" defaultMessage="Quarterly" />
               </button>
@@ -188,7 +189,7 @@ export const ReportPeriodSelector = ({
                     ? 'bg-white text-foreground shadow-sm'
                     : 'bg-transparent text-muted-foreground',
                 )}
-                onClick={() => setSelectedTimeUnit('YEAR')}
+                onClick={() => setSelectedTimeUnit(TimeUnit.YEAR)}
               >
                 <FormattedMessage id="Frequency.Yearly" defaultMessage="Yearly" />
               </button>

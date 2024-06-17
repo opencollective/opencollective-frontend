@@ -22,6 +22,7 @@ import i18nPayoutMethodType from '../../../../lib/i18n/payout-method-type';
 import { i18nChargeHasReceipts } from '../../../../lib/i18n/receipts-filter';
 import { sortSelectOptions } from '../../../../lib/utils';
 
+import { accountingCategoryFilter } from '../../filters/AccountingCategoryFilter';
 import { amountFilter } from '../../filters/AmountFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { dateFilter } from '../../filters/DateFilter';
@@ -52,6 +53,7 @@ export const schema = z.object({
   tag: expenseTagFilter.schema,
   chargeHasReceipts: boolean.optional(),
   virtualCard: isMulti(z.string()).optional(),
+  accountingCategory: accountingCategoryFilter.schema,
 });
 
 type FilterValues = z.infer<typeof schema>;
@@ -78,6 +80,7 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   searchTerm: searchFilter.filter,
   date: dateFilter.filter,
   amount: amountFilter.filter,
+  accountingCategory: accountingCategoryFilter.filter,
   status: {
     static: true,
     labelMsg: defineMessage({ id: 'expense.status', defaultMessage: 'Status' }),

@@ -104,14 +104,14 @@ const TransactionReport = ({ accountSlug, subpath }: DashboardSectionProps) => {
   }
   const navigateToReport = reportSlug => {
     // Updating the URL without changing any filters (e.g. isHost that controls selected tab)
-    queryFilter.setFilters({}, `/dashboard/${accountSlug}/reports/${reportSlug}`);
+    queryFilter.setFilters({}, `/dashboard/${accountSlug}/reports/transactions/${reportSlug}`);
   };
   return (
     <Fragment>
       <div className="flex max-w-screen-lg flex-col gap-4">
         <DashboardHeader
-          title={<FormattedMessage id="Reports" defaultMessage="Reports" />}
-          titleRoute={`/dashboard/${accountSlug}/reports`}
+          title={<FormattedMessage id="TransactionReports" defaultMessage="Transaction Reports" />}
+          titleRoute={`/dashboard/${accountSlug}/reports/transactions`}
           subpathTitle={
             <ReportPeriodSelector value={subpath[0]} onChange={navigateToReport} meta={queryFilter.meta} intl={intl} />
           }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { omit } from 'lodash';
+import { get, omit } from 'lodash';
 import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage } from 'react-intl';
 import { z } from 'zod';
@@ -28,12 +28,16 @@ const schema = commonSchema.extend({
   account: z.string().nullable().default(null),
 });
 
+const schemaWithoutHost = schema.omit({ accountingCategory: true });
+
 type FilterValues = z.infer<typeof schema>;
 
 type FilterMeta = CommonFilterMeta & {
   accountSlug: string;
   childrenAccounts?: Array<Account>;
   expenseTags?: string[];
+  hostSlug?: string;
+  includeUncategorized: boolean;
 };
 const toVariables: FiltersToVariables<FilterValues, ExpensesPageQueryVariables, FilterMeta> = {
   ...commonToVariables,
@@ -68,6 +72,8 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   },
 };
 
+const filtersWithoutHost = omit(filters, 'accountingCategory');
+
 const ROUTE_PARAMS = ['slug', 'section', 'subpath'];
 
 const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
@@ -78,6 +84,8 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
     context: API_V2_CONTEXT,
   });
 
+  const hostSlug = get(metadata, 'account.host.slug');
+
   const filterMeta: FilterMeta = {
     currency: metadata?.account?.currency,
     childrenAccounts: metadata?.account?.childrenAccounts?.nodes.length
@@ -85,13 +93,15 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
       : undefined,
     accountSlug,
     expenseTags: metadata?.expenseTagStats?.nodes?.map(({ tag }) => tag),
+    hostSlug: hostSlug,
+    includeUncategorized: true,
   };
 
   const queryFilter = useQueryFilter({
-    schema,
+    schema: hostSlug ? schema : schemaWithoutHost,
     toVariables,
     meta: filterMeta,
-    filters,
+    filters: hostSlug ? filters : filtersWithoutHost,
   });
 
   const { data, loading } = useQuery(accountExpensesQuery, {
