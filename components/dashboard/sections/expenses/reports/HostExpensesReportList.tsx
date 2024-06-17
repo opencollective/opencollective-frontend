@@ -237,7 +237,7 @@ export function HostExpensesReportList(props: DashboardSectionProps) {
             <MessageBoxGraphqlError error={error} />
           ) : (
             <React.Fragment>
-              <div className="space-y-10 overflow-hidden rounded-xl border pb-4">
+              <div className="space-y-10 overflow-hidden pb-4">
                 <DataTable
                   innerClassName="table-fixed"
                   columns={columns}
