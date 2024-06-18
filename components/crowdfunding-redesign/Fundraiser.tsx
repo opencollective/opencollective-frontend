@@ -108,16 +108,16 @@ const Goals = ({ account }) => {
   const hasYearlyGoal = goals?.find(g => g.type === 'yearlyBudget');
   const hasMonthlyGoal = goals?.find(g => g.type === 'monthlyBudget');
   const currentAmount = hasYearlyGoal
-    ? stats.yearlyBudget
+    ? stats.yearlyBudget.valueInCents
     : hasMonthlyGoal
-      ? stats.monthlyBudget
-      : stats.totalAmountReceived;
+      ? stats.yearlyBudget.valueInCents / 12
+      : stats.totalAmountReceived.valueInCents;
 
   let goalTarget;
   if (hasYearlyGoal || hasMonthlyGoal) {
     goalTarget = aggregateGoalAmounts(goals);
   }
-  const percentage = Math.round(goalTarget ? (currentAmount.valueInCents / goalTarget.amount) * 100 : 0);
+  const percentage = Math.round(goalTarget ? (currentAmount / goalTarget.amount) * 100 : 0);
 
   return (
     <div className="flex flex-col gap-4 text-muted-foreground">
