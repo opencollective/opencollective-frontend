@@ -7,6 +7,7 @@ export enum PREVIEW_FEATURE_KEYS {
   NEW_EXPENSE_FLOW = 'NEW_EXPENSE_FLOW',
   HOST_REPORTS = 'HOST_REPORTS',
   CROWDFUNDING_REDESIGN = 'CROWDFUNDING_REDESIGN',
+  TRANSACTIONS_IMPORTS = 'TRANSACTIONS_IMPORTS',
 }
 
 export type PreviewFeature = {
@@ -63,5 +64,12 @@ export const previewFeatures: PreviewFeature[] = [
     alwaysEnableInDev: true,
     publicBeta: true,
     closedBetaAccessFor: ['opencollective', 'design', 'engineering'],
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.TRANSACTIONS_IMPORTS,
+    title: 'Transactions Imports',
+    description: 'A new tool to import batches of transactions.',
+    publicBeta: false,
+    closedBetaAccessFor: ['opencollective', 'europe', 'opensource'],
   },
 ];

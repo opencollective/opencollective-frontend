@@ -1,13 +1,17 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
+import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { TransactionsTableQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
 
+import Link from '../../../Link';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { Button } from '../../../ui/Button';
 import DashboardHeader from '../../DashboardHeader';
@@ -17,6 +21,7 @@ import { accountingCategoryFilter } from '../../filters/AccountingCategoryFilter
 import { Filterbar } from '../../filters/Filterbar';
 import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
 import type { DashboardSectionProps } from '../../types';
+import { ImportTransactions } from '../transactions-imports';
 
 import type { FilterMeta as CommonFilterMeta } from './filters';
 import { filters as commonFilters, schema as commonSchema, toVariables as commonToVariables } from './filters';
@@ -79,9 +84,10 @@ const hostTransactionsMetaDataQuery = gql`
   }
 `;
 
-const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
+const HostTransactionsBase = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const intl = useIntl();
   const [displayExportCSVModal, setDisplayExportCSVModal] = React.useState(false);
+  const { LoggedInUser } = useLoggedInUser();
   const { data: metaData } = useQuery(hostTransactionsMetaDataQuery, {
     variables: { slug: hostSlug },
     context: API_V2_CONTEXT,
@@ -134,18 +140,27 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       <DashboardHeader
         title={<FormattedMessage id="menu.transactions" defaultMessage="Transactions" />}
         actions={
-          <ExportTransactionsCSVModal
-            open={displayExportCSVModal}
-            setOpen={setDisplayExportCSVModal}
-            queryFilter={queryFilter}
-            account={metaData?.host}
-            isHostReport
-            trigger={
-              <Button size="sm" variant="outline" onClick={() => setDisplayExportCSVModal(true)}>
-                <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
-              </Button>
-            }
-          />
+          <React.Fragment>
+            {LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.TRANSACTIONS_IMPORTS) && (
+              <Link href={`/dashboard/${hostSlug}/host-transactions/import`}>
+                <Button size="sm" variant="outline">
+                  <FormattedMessage defaultMessage="Imports" id="ofHC1Q" />
+                </Button>
+              </Link>
+            )}
+            <ExportTransactionsCSVModal
+              open={displayExportCSVModal}
+              setOpen={setDisplayExportCSVModal}
+              queryFilter={queryFilter}
+              account={metaData?.host}
+              isHostReport
+              trigger={
+                <Button size="sm" variant="outline" onClick={() => setDisplayExportCSVModal(true)}>
+                  <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
+                </Button>
+              }
+            />
+          </React.Fragment>
         }
       />
 
@@ -171,6 +186,15 @@ const HostTransactions = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       )}
     </div>
   );
+};
+
+const HostTransactions = props => {
+  const router = useRouter();
+  if (router.query.subpath?.[0] === 'import') {
+    return <ImportTransactions {...props} />;
+  } else {
+    return <HostTransactionsBase {...props} />;
+  }
 };
 
 export default HostTransactions;
