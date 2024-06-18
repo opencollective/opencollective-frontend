@@ -8,7 +8,6 @@ import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import Page from '../Page';
 
 import { Banner } from './Banner';
-import { CollectivePrimaryColor } from './CollectivePrimaryColor';
 import { Footer } from './Footer';
 import Fundraiser from './Fundraiser';
 import Profile from './Profile';
@@ -40,9 +39,8 @@ export function CrowdfundingPrototypePage({ isFundraiser }: { isFundraiser?: boo
     <Page withTopBar={false} showFooter={false} title={`[PREVIEW] ${account.name} | Open Collective`}>
       <div className="flex min-h-screen flex-col justify-between bg-primary/5 antialiased">
         <div className="flex flex-1 flex-col">
-          <Banner account={account} />
+          <Banner account={account} isFundraiser={isFundraiser || isProjectOrEvent} />
           {isFundraiser || isProjectOrEvent ? <Fundraiser account={account} /> : <Profile account={account} />}
-          <CollectivePrimaryColor account={account} />
         </div>
 
         <Footer account={account} />

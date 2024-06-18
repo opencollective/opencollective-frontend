@@ -54,6 +54,7 @@ class Link extends React.Component {
           className={className}
           disableHistory={true}
           afterAnimate={afterAnimate}
+          onClick={this.props.onClick}
         >
           {children}
         </Scrollchor>

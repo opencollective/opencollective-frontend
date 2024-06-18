@@ -24,6 +24,7 @@ import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'nprogress/nprogress.css';
 import 'trix/dist/trix.css';
 import '../public/static/styles/app.css';
+import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css';
 
 Router.onRouteChangeStart = (url, { shallow }) => {
   if (!shallow) {

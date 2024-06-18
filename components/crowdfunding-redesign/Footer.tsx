@@ -7,7 +7,7 @@ import { Separator } from '../ui/Separator';
 export const Footer = ({ account }) => {
   const mainAccount = account.parent ?? account;
   return (
-    <footer className="border-t py-12">
+    <footer className="border-t px-6 py-12">
       <div className="mx-auto max-w-screen-xl space-y-8">
         <div className="flex justify-between text-sm">
           <Link href={`/preview/${mainAccount.slug}`} className="flex items-center gap-2">

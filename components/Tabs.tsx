@@ -96,6 +96,7 @@ const Tabs = ({ tabs, selectedId, onChange, ...props }: TabsProps) => {
           return (
             <button
               key={tab.id}
+              type="button"
               onClick={() => onChange?.(tab.id)}
               className={clsx(
                 'flex gap-3 whitespace-nowrap border-b-2 px-1 pb-4 pt-2 text-sm font-medium ring-inset ring-ring transition-colors focus:outline-none focus-visible:ring-2',

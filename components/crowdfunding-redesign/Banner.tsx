@@ -8,7 +8,10 @@ import { getI18nLink } from '../I18nFormatters';
 import Link from '../Link';
 import { Button } from '../ui/Button';
 
-export function Banner({ account }) {
+import { EditFundraiser } from './edit/EditFundraiser';
+import { EditProfile } from './edit/EditProfile';
+
+export function Banner({ account, isFundraiser }) {
   return (
     <div className="h-14 w-full bg-yellow-100">
       <div className="flex items-center justify-center gap-4 px-4 py-2 text-sm text-gray-700 dark:bg-gray-800 dark:text-gray-300">
@@ -39,6 +42,7 @@ export function Banner({ account }) {
               <FormattedMessage defaultMessage="Go to current profile" id="VboEiK" />
             </Link>
           </Button>
+          {isFundraiser ? <EditFundraiser account={account} /> : <EditProfile account={account} />}
         </div>
       </div>
     </div>
