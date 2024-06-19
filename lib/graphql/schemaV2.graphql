@@ -3443,6 +3443,7 @@ enum PaymentMethodType {
   bank_transfer @deprecated(reason: "Please use uppercase values")
   payout @deprecated(reason: "Please use uppercase values")
   virtual_card @deprecated(reason: "Please use uppercase values")
+  swish @deprecated(reason: "Please use uppercase values")
   DEFAULT
   ALIPAY
   CREDITCARD
@@ -3464,6 +3465,7 @@ enum PaymentMethodType {
   BANK_TRANSFER
   PAYOUT
   VIRTUAL_CARD
+  SWISH
 }
 
 enum PaymentMethodService {
@@ -20392,6 +20394,7 @@ input PaymentIntentInput {
   amount: AmountInput!
   fromAccount: AccountReferenceInput
   toAccount: AccountReferenceInput!
+  frequency: ContributionFrequency
 }
 
 """
