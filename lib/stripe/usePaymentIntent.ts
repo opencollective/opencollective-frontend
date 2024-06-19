@@ -73,6 +73,8 @@ export default function usePaymentIntent({
         createPaymentIntentResp.data?.createPaymentIntent ?? {};
 
       const stripe = window.Stripe(stripeAccountPublishableSecret, stripeAccount ? { stripeAccount } : {});
+      stripe['stripeAccount'] = stripeAccount;
+      stripe['stripeAccountPublishableSecret'] = stripeAccountPublishableSecret;
       setStripe(stripe);
 
       try {

@@ -17,6 +17,7 @@ import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { formatCurrency } from '../../lib/currency-utils';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { formatManualInstructions } from '../../lib/payment-method-utils';
+import { getStripe } from '../../lib/stripe';
 import {
   facebookShareURL,
   followOrderRedirectUrl,
@@ -134,7 +135,7 @@ class ContributionFlowSuccess extends React.Component {
     data: PropTypes.object,
   };
 
-  componentDidMount() {
+  async componentDidMount() {
     track(AnalyticsEvent.CONTRIBUTION_SUCCESS);
     if (this.props.LoggedInUser) {
       toast({
@@ -142,6 +143,22 @@ class ContributionFlowSuccess extends React.Component {
         duration: 20000,
       });
     }
+
+    const isStripeRedirect = this.props.router.query.payment_intent_client_secret;
+
+    if (isStripeRedirect) {
+      const stripe = await getStripe(null, this.props.router.query.stripeAccount);
+      const paymentIntentResult = await stripe.retrievePaymentIntent(
+        this.props.router.query.payment_intent_client_secret,
+      );
+      this.setState({
+        paymentIntentResult,
+      });
+    }
+
+    this.setState({
+      loaded: true,
+    });
   }
 
   componentDidUpdate() {
@@ -272,6 +289,9 @@ class ContributionFlowSuccess extends React.Component {
     const shareURL = `${getWebsiteUrl()}/${collective.slug}`;
     const isProcessing = order?.status === ORDER_STATUS.PROCESSING;
     const isFediverse = order && (isAccountFediverse(order.toAccount) || isAccountFediverse(order.toAccount.parent));
+    const paymentIntentResult = this.state?.paymentIntentResult;
+
+    const loading = data.loading || !this.state?.loaded;
 
     if (!data.loading && !order) {
       return (
@@ -282,6 +302,14 @@ class ContributionFlowSuccess extends React.Component {
         </Flex>
       );
     }
+
+    const stripeErrorMessage = paymentIntentResult?.error
+      ? paymentIntentResult.error.message
+      : !['succeeded', 'processing'].includes(paymentIntentResult?.paymentIntent.status)
+        ? paymentIntentResult?.paymentIntent.last_payment_error?.message ?? (
+            <FormattedMessage defaultMessage="An unknown error has ocurred" id="TGDa6P" />
+          )
+        : null;
 
     const toAccountTwitterHandle = getTwitterHandleFromCollective(order?.toAccount);
     return (
@@ -327,10 +355,27 @@ class ContributionFlowSuccess extends React.Component {
           css={{ height: '100%' }}
           data-cy="order-success"
         >
-          {data.loading ? (
+          {loading ? (
             <Container display="flex" alignItems="center" justifyContent="center">
               <Loading />
             </Container>
+          ) : stripeErrorMessage ? (
+            <div className="mt-4 flex flex-col items-center gap-4">
+              <h1 className="text-lg font-bold">
+                <FormattedMessage defaultMessage="There was an error processing your contribution" id="DIfPHC" />
+              </h1>
+              <MessageBox type="error">{stripeErrorMessage}</MessageBox>
+              <P fontSize="20px" color="black.700" fontWeight={500} textAlign="center">
+                <FormattedMessage
+                  defaultMessage="You can try contributing again on <link>{collective}</link>."
+                  id="ro/ST+"
+                  values={{
+                    collective: order.toAccount.name,
+                    link: isEmbed ? I18nBold : getI18nLink({ href: getCollectivePageRoute(order.toAccount), as: Link }),
+                  }}
+                />
+              </P>
+            </div>
           ) : (
             <Fragment>
               <ContainerWithImage
