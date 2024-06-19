@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import { fromPairs, omit } from 'lodash';
+import { fromPairs, omit, omitBy } from 'lodash';
 import {
   ArchiveRestore,
   Banknote,
@@ -24,6 +24,7 @@ import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { Amount, TransactionsImportRow } from '../../../../lib/graphql/types/v2/graphql';
 import { TransactionsImportRowFieldsFragment } from './lib/graphql';
 
+import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
@@ -39,6 +40,7 @@ import { Step, Stepper } from '../../../ui/Stepper';
 import { useToast } from '../../../ui/useToast';
 import DashboardHeader from '../../DashboardHeader';
 
+import { AddFundsModalFromImportRow } from './AddFundsModalFromTransactionsImportRow';
 import { StepMapCSVColumns } from './StepMapCSVColumns';
 import { StepSelectCSV } from './StepSelectCSV';
 
@@ -82,6 +84,10 @@ const transactionsImportQuery = gql`
       updatedAt
       account {
         id
+        name
+        legalName
+        imageUrl
+        legacyId
         slug
         currency
       }
@@ -120,7 +126,8 @@ const updateTransactionsImportRows = gql`
   ${TransactionsImportRowFieldsFragment}
 `;
 
-type RowsOperationsState = Record<string, 'ignore'>;
+type OperationType = 'ignore' | 'add-funds';
+type RowsOperationsState = Record<string, OperationType>;
 
 export const TransactionsImport = ({ accountSlug, importId }) => {
   const intl = useIntl();
@@ -136,7 +143,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
   const importData = data?.transactionsImport;
   const importType = importData?.type;
   const hasStepper = importType === 'CSV' && !importData?.rows?.totalCount;
-  const transactions = importData?.rows?.nodes;
+  const importRows = importData?.rows?.nodes;
 
   const setRowsDismissed = async (rowIds: string[], isDismissed: boolean) => {
     const newOperations: RowsOperationsState = fromPairs(rowIds.map(id => [id, 'ignore']));
@@ -243,12 +250,12 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                     </div>
                   )
                 }
-                data={transactions}
+                data={importRows}
                 columns={[
                   {
                     id: 'select',
                     header: ({ table }) =>
-                      !transactions.length ? null : (
+                      !importRows.length ? null : (
                         <Checkbox
                           onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
                           aria-label="Select all"
@@ -308,8 +315,10 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                       } else if (row.original.order) {
                         return (
                           <StyledLink
+                            className="flex items-center gap-1"
                             href={`${row.original.order.toAccount.slug}/orders/${row.original.order.legacyId}`}
                           >
+                            <Avatar collective={row.original.order.toAccount} size={24} />
                             <FormattedMessage
                               id="Siv4wU"
                               defaultMessage="Contribution #{id}"
@@ -334,13 +343,13 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                       } else if (row.original.expense || row.original.order) {
                         return (
                           <Badge type="success" size="sm">
-                            Imported
+                            <FormattedMessage defaultMessage="Imported" id="transaction.imported" />
                           </Badge>
                         );
                       } else {
                         return (
                           <Badge type="info" size="sm">
-                            Pending
+                            <FormattedMessage defaultMessage="Pending" id="transaction.pending" />
                           </Badge>
                         );
                       }
@@ -438,8 +447,9 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                                     variant="outline"
                                     size="xs"
                                     className="whitespace-nowrap text-xs"
-                                    disabled
-                                    onClick={() => {}}
+                                    onClick={() =>
+                                      setCurrentOperations({ ...currentOperations, [item.id]: 'add-funds' })
+                                    }
                                   >
                                     <Banknote size="14" />
                                     <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
@@ -482,6 +492,13 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
             </div>
           )}
         </React.Fragment>
+      )}
+      {Object.values(currentOperations).some(op => op === 'add-funds') && (
+        <AddFundsModalFromImportRow
+          transactionsImport={importData}
+          row={importRows.find(t => currentOperations[t.id] === 'add-funds')}
+          onClose={() => setCurrentOperations(omitBy(currentOperations, op => op === 'add-funds'))}
+        />
       )}
     </div>
   );

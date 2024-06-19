@@ -31,6 +31,7 @@ export const TransactionsImportRowFieldsFragment = gql`
     isDismissed
     description
     date
+    rawValue
     amount {
       valueInCents
       currency
@@ -42,6 +43,12 @@ export const TransactionsImportRowFieldsFragment = gql`
     order {
       id
       legacyId
+      toAccount {
+        id
+        slug
+        name
+        imageUrl(height: 48)
+      }
     }
   }
 `;
