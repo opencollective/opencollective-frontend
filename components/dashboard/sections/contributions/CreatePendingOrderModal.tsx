@@ -15,6 +15,7 @@ import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 import type { CreatePendingContributionModalQuery, OrderPageQuery } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
+import { i18nPendingOrderPaymentMethodTypes } from '../../../../lib/i18n/pending-order-payment-method-type';
 import { i18nTaxType } from '../../../../lib/i18n/taxes';
 import { require2FAForAdmins } from '../../../../lib/policies';
 import { omitDeep } from '../../../../lib/utils';
@@ -22,7 +23,7 @@ import { omitDeep } from '../../../../lib/utils';
 import AccountingCategorySelect from '../../../AccountingCategorySelect';
 import CollectivePicker, { DefaultCollectiveLabel } from '../../../CollectivePicker';
 import CollectivePickerAsync from '../../../CollectivePickerAsync';
-import { confirmContributionFieldsFragment } from '../../../ContributionConfirmationModal';
+import { confirmContributionFieldsFragment } from '../../../contributions/ConfirmContributionForm';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { Box, Flex } from '../../../Grid';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
@@ -387,11 +388,10 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
       ),
     });
   }
-  const paymentMethodOptions = [
-    { value: 'UNKNOWN', label: intl.formatMessage({ id: 'Unknown', defaultMessage: 'Unknown' }) },
-    { value: 'BANK_TRANSFER', label: intl.formatMessage({ defaultMessage: 'Bank Transfer', id: 'Aj4Xx4' }) },
-    { value: 'CHECK', label: intl.formatMessage({ id: 'PaymentMethod.Check', defaultMessage: 'Check' }) },
-  ];
+  const paymentMethodOptions = Object.keys(i18nPendingOrderPaymentMethodTypes).map(key => ({
+    label: intl.formatMessage(i18nPendingOrderPaymentMethodTypes[key]),
+    value: key,
+  }));
 
   const amounts = getAmountsFromValues(values);
   return (

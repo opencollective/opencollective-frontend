@@ -15,6 +15,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../lib/actions/types';
 import type { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
+import { cn } from '../../lib/utils';
 
 import { Skeleton } from '../ui/Skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/Table';
@@ -216,10 +217,9 @@ function DataTableRow({
     <TableRow
       data-cy={getRowDataCy?.(row) || `datatable-row-${row.id}`}
       data-state={row.getIsSelected() && 'selected'}
-      className={getRowClassName?.(row)}
+      className={cn(getRowClassName?.(row), onClickRow && 'cursor-pointer')}
       {...(onClickRow && {
         onClick: () => onClickRow(row, actionsMenuTriggerRef),
-        className: 'cursor-pointer',
       })}
       {...(onHoverRow && {
         onMouseEnter: () => onHoverRow(row),

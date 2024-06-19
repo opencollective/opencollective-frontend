@@ -13,7 +13,7 @@ import { usePrevious } from '../../lib/hooks/usePrevious';
 
 import { accountHoverCardFields } from '../AccountHoverCard';
 import { parseAmountRange } from '../budget/filters/AmountFilter';
-import { confirmContributionFieldsFragment } from '../ContributionConfirmationModal';
+import { confirmContributionFieldsFragment } from '../contributions/ConfirmContributionForm';
 import { DisputedContributionsWarning } from '../dashboard/sections/collectives/DisputedContributionsWarning';
 import CreatePendingOrderModal from '../dashboard/sections/contributions/CreatePendingOrderModal';
 import { Box, Flex } from '../Grid';

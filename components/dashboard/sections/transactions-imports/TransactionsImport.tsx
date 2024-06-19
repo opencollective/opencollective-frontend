@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import { fromPairs, omit, omitBy } from 'lodash';
+import { fromPairs, omit, partition } from 'lodash';
 import {
   ArchiveRestore,
   Banknote,
@@ -10,7 +10,6 @@ import {
   FilePenLine,
   FileSliders,
   Merge,
-  Plus,
   Receipt,
   SquareSlashIcon,
   Upload,
@@ -22,7 +21,7 @@ import { i18nGraphqlException } from '../../../../lib/errors';
 import { formatFileSize } from '../../../../lib/file-utils';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { Amount, TransactionsImportRow } from '../../../../lib/graphql/types/v2/graphql';
-import { TransactionsImportRowFieldsFragment } from './lib/graphql';
+import { TransactionsImportRowFieldsFragment, updateTransactionsImportRows } from './lib/graphql';
 
 import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';
@@ -41,6 +40,7 @@ import { useToast } from '../../../ui/useToast';
 import DashboardHeader from '../../DashboardHeader';
 
 import { AddFundsModalFromImportRow } from './AddFundsModalFromTransactionsImportRow';
+import { MatchContributionDialog } from './MatchContributionDialog';
 import { StepMapCSVColumns } from './StepMapCSVColumns';
 import { StepSelectCSV } from './StepSelectCSV';
 
@@ -104,30 +104,27 @@ const transactionsImportQuery = gql`
   ${TransactionsImportRowFieldsFragment}
 `;
 
-const updateTransactionsImportRows = gql`
-  mutation UpdateTransactionsImportRow($importId: NonEmptyString!, $rows: [TransactionsImportRowUpdateInput!]!) {
-    updateTransactionsImportRows(id: $importId, rows: $rows) {
-      id
-      stats {
-        total
-        ignored
-        expenses
-        orders
-        processed
-      }
-      rows {
-        nodes {
-          id
-          ...TransactionsImportRowFields
-        }
-      }
-    }
-  }
-  ${TransactionsImportRowFieldsFragment}
-`;
-
-type OperationType = 'ignore' | 'add-funds';
+type OperationType = 'ignore' | 'add-funds' | 'match';
 type RowsOperationsState = Record<string, OperationType>;
+
+const isOperationWithModal = (operation: OperationType): operation is 'add-funds' | 'match' => {
+  return ['add-funds', 'match'].includes(operation);
+};
+
+const getModalToDisplay = (operations: RowsOperationsState, importRows: TransactionsImportRow[] | undefined) => {
+  const entry = Object.entries(operations).find(([, op]) => isOperationWithModal(op));
+  if (!entry) {
+    return null;
+  }
+
+  const [rowId, operation] = entry;
+  const row = importRows?.find(r => r.id === rowId);
+  if (!row) {
+    return null;
+  }
+
+  return { row, operation };
+};
 
 export const TransactionsImport = ({ accountSlug, importId }) => {
   const intl = useIntl();
@@ -144,7 +141,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
   const importType = importData?.type;
   const hasStepper = importType === 'CSV' && !importData?.rows?.totalCount;
   const importRows = importData?.rows?.nodes;
-
+  const modalInfo = getModalToDisplay(currentOperations, importRows);
   const setRowsDismissed = async (rowIds: string[], isDismissed: boolean) => {
     const newOperations: RowsOperationsState = fromPairs(rowIds.map(id => [id, 'ignore']));
     setCurrentOperations(operations => ({ ...operations, ...newOperations }));
@@ -240,16 +237,6 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                 getRowClassName={row =>
                   row.original.isDismissed ? '[&>td:nth-child(n+2):nth-last-child(n+3)]:opacity-30' : ''
                 }
-                footer={
-                  importType === 'MANUAL' && (
-                    <div className="flex justify-center border-t border-neutral-200 p-3">
-                      <Button size="sm" variant="outline" className="min-w-28 text-xs" disabled>
-                        <Plus size={12} />
-                        Add Transaction
-                      </Button>
-                    </div>
-                  )
-                }
                 data={importRows}
                 columns={[
                   {
@@ -316,7 +303,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                         return (
                           <StyledLink
                             className="flex items-center gap-1"
-                            href={`${row.original.order.toAccount.slug}/orders/${row.original.order.legacyId}`}
+                            href={`/${row.original.order.toAccount.slug}/contributions/${row.original.order.legacyId}`}
                           >
                             <Avatar collective={row.original.order.toAccount} size={24} />
                             <FormattedMessage
@@ -359,16 +346,24 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                     id: 'actions',
                     header: ({ table }) => {
                       if (table.getIsSomePageRowsSelected() || table.getIsAllPageRowsSelected()) {
-                        const selectedCount = table.getSelectedRowModel().rows.length;
-                        const areAllDismissed = table.getSelectedRowModel().rows.every(row => row.original.isDismissed);
-                        if (areAllDismissed) {
+                        const selectedRows = table.getSelectedRowModel().rows;
+                        const unprocessedRows = selectedRows.filter(
+                          ({ original }) => !original.expense && !original.order,
+                        );
+                        const [ignoredRows, nonIgnoredRows] = partition(
+                          unprocessedRows,
+                          row => row.original.isDismissed,
+                        );
+
+                        if (ignoredRows.length && !nonIgnoredRows.length) {
+                          // If all non-processed rows are dismissed, show restore button
                           return (
                             <Button
                               variant="outline"
                               size="xs"
-                              className="text-xs"
+                              className="whitespace-nowrap text-xs"
                               onClick={async () => {
-                                const ignoredIds = table.getSelectedRowModel().rows.map(row => row.original.id);
+                                const ignoredIds = ignoredRows.map(row => row.original.id);
                                 await setRowsDismissed(ignoredIds, false);
                                 table.setRowSelection({});
                               }}
@@ -377,18 +372,19 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                               <FormattedMessage
                                 defaultMessage="Restore {selectedCount}"
                                 id="restore"
-                                values={{ selectedCount }}
+                                values={{ selectedCount: ignoredRows.length }}
                               />
                             </Button>
                           );
-                        } else {
+                        } else if (nonIgnoredRows.length) {
+                          // Otherwise, show ignore button
                           return (
                             <Button
                               variant="outline"
                               size="xs"
-                              className="text-xs"
+                              className="whitespace-nowrap text-xs"
                               onClick={() => {
-                                const ignoredIds = table.getSelectedRowModel().rows.map(row => row.original.id);
+                                const ignoredIds = nonIgnoredRows.map(row => row.original.id);
                                 setRowsDismissed(ignoredIds, true);
                                 table.setRowSelection({});
                               }}
@@ -397,7 +393,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                               <FormattedMessage
                                 defaultMessage="Ignore {selectedCount}"
                                 id="ignore"
-                                values={{ selectedCount }}
+                                values={{ selectedCount: nonIgnoredRows.length }}
                               />
                             </Button>
                           );
@@ -417,17 +413,12 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                       return (
                         <div className="flex justify-end gap-2">
                           {/** Create/Match */}
-                          {isImported ? (
-                            <Button variant="outline" size="xs" className="text-xs" disabled>
-                              <SquareSlashIcon size={12} />
-                              <FormattedMessage defaultMessage="Revert" id="amT0Gh" />
-                            </Button>
-                          ) : item.isDismissed ? (
+                          {isImported ? null : item.isDismissed ? ( // We don't support reverting imported rows yet
                             <Button
                               variant="outline"
                               size="xs"
                               className="text-xs"
-                              disabled={currentOperations[item.id] && currentOperations[item.id] !== 'ignore'}
+                              disabled={Boolean(currentOperations[item.id] || modalInfo)}
                               loading={currentOperations[item.id] === 'ignore'}
                               onClick={() => setRowsDismissed([item.id], false)}
                             >
@@ -439,7 +430,13 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                               {/** Contributions */}
                               {item.amount.valueInCents > 0 && (
                                 <React.Fragment>
-                                  <Button variant="outline" size="xs" className="text-xs" disabled onClick={() => {}}>
+                                  <Button
+                                    variant="outline"
+                                    size="xs"
+                                    className="text-xs"
+                                    onClick={() => setCurrentOperations({ ...currentOperations, [item.id]: 'match' })}
+                                    disabled={Boolean(modalInfo)}
+                                  >
                                     <Merge size={12} />
                                     <FormattedMessage defaultMessage="Match" id="contribution.match" />
                                   </Button>
@@ -447,6 +444,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                                     variant="outline"
                                     size="xs"
                                     className="whitespace-nowrap text-xs"
+                                    disabled={Boolean(modalInfo)}
                                     onClick={() =>
                                       setCurrentOperations({ ...currentOperations, [item.id]: 'add-funds' })
                                     }
@@ -474,7 +472,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                                 variant="outline"
                                 size="xs"
                                 className="min-w-20 text-xs"
-                                disabled={currentOperations[item.id] && currentOperations[item.id] !== 'ignore'}
+                                disabled={Boolean(currentOperations[item.id] || modalInfo)}
                                 loading={currentOperations[item.id] === 'ignore'}
                                 onClick={() => setRowsDismissed([item.id], !item.isDismissed)}
                               >
@@ -493,13 +491,21 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
           )}
         </React.Fragment>
       )}
-      {Object.values(currentOperations).some(op => op === 'add-funds') && (
-        <AddFundsModalFromImportRow
-          transactionsImport={importData}
-          row={importRows.find(t => currentOperations[t.id] === 'add-funds')}
-          onClose={() => setCurrentOperations(omitBy(currentOperations, op => op === 'add-funds'))}
-        />
-      )}
+      {modalInfo &&
+        (modalInfo.operation === 'add-funds' ? (
+          <AddFundsModalFromImportRow
+            transactionsImport={importData}
+            row={modalInfo.row}
+            onClose={() => setCurrentOperations(omit(currentOperations, modalInfo.row.id))}
+          />
+        ) : modalInfo.operation === 'match' ? (
+          <MatchContributionDialog
+            transactionsImport={importData}
+            host={importData.account}
+            row={modalInfo.row}
+            onClose={() => setCurrentOperations(omit(currentOperations, modalInfo.row.id))}
+          />
+        ) : null)}
     </div>
   );
 };

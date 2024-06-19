@@ -52,3 +52,25 @@ export const TransactionsImportRowFieldsFragment = gql`
     }
   }
 `;
+
+export const updateTransactionsImportRows = gql`
+  mutation UpdateTransactionsImportRow($importId: NonEmptyString!, $rows: [TransactionsImportRowUpdateInput!]!) {
+    updateTransactionsImportRows(id: $importId, rows: $rows) {
+      id
+      stats {
+        total
+        ignored
+        expenses
+        orders
+        processed
+      }
+      rows {
+        nodes {
+          id
+          ...TransactionsImportRowFields
+        }
+      }
+    }
+  }
+  ${TransactionsImportRowFieldsFragment}
+`;
