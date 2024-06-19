@@ -1,5 +1,5 @@
 import { parse as parseCSV } from 'csv-parse/sync';
-import { deburr } from 'lodash';
+import { deburr, uniq } from 'lodash';
 import type { IntlShape } from 'react-intl';
 
 import dayjs from '../../../../../lib/dayjs';
@@ -191,17 +191,30 @@ export const getDefaultCSVConfig = (currency: Currency): CSVConfig => ({
 
 export const applyCSVConfig = (row: Record<string, string>, csvConfig: CSVConfig): TransactionsImportRowCreateInput => {
   const columnsConfig = csvConfig.columns;
+  const amountColumns = uniq([columnsConfig.credit.target, columnsConfig.debit.target]).filter(Boolean);
 
+  // Parse amount
   let amount;
-  if (row[columnsConfig.credit.target]) {
-    amount = parseAmount(row[columnsConfig.credit.target], columnsConfig.credit.format, columnsConfig.credit.currency);
-    if (amount) {
-      amount.valueInCents = Math.abs(amount.valueInCents);
-    }
-  } else if (row[columnsConfig.debit.target]) {
-    amount = parseAmount(row[columnsConfig.debit.target], columnsConfig.debit.format, columnsConfig.debit.currency);
-    if (amount) {
-      amount.valueInCents = toNegative(amount.valueInCents);
+  if (amountColumns.length === 1) {
+    // Credit/debit point to the same column, we'll use the sign to determine the amount
+    const rawValue = row[amountColumns[0]].trim();
+    const isNegative = rawValue.startsWith('-');
+    const amountConfig = isNegative ? columnsConfig.debit : columnsConfig.credit;
+    amount = parseAmount(rawValue, amountConfig.format, amountConfig.currency);
+  } else {
+    // Split Debit/Credit columns
+    const rawCredit = row[columnsConfig.credit.target]?.trim();
+    if (row[columnsConfig.credit.target]) {
+      amount = parseAmount(rawCredit, columnsConfig.credit.format, columnsConfig.credit.currency);
+      if (amount) {
+        amount.valueInCents = Math.abs(amount.valueInCents);
+      }
+    } else if (row[columnsConfig.debit.target]) {
+      const rawDebit = row[columnsConfig.debit.target].trim();
+      amount = parseAmount(rawDebit, columnsConfig.debit.format, columnsConfig.debit.currency);
+      if (amount) {
+        amount.valueInCents = toNegative(amount.valueInCents);
+      }
     }
   }
 

@@ -6531,7 +6531,7 @@ type TransactionsImport {
   source: NonEmptyString!
 
   """
-  Name of the import (e.g. "Contributions May 2021", "Tickets for Mautic COnference 2024")
+  Name of the import (e.g. "Contributions May 2021", "Tickets for Mautic Conference 2024")
   """
   name: NonEmptyString!
 
@@ -6625,10 +6625,20 @@ type TransactionsImportRow {
   expense: Expense
 
   """
+  The raw data of the row
+  """
+  rawValue: JSONObject
+
+  """
   The order associated with the row
   """
   order: Order
 }
+
+"""
+The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSONObject
 
 type TransactionsImportStats {
   """
@@ -11983,11 +11993,6 @@ type TransferWise {
 }
 
 """
-The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
-"""
-scalar JSONObject
-
-"""
 This represents a Vendor account
 """
 type Vendor implements Account & AccountWithContributions {
@@ -17191,6 +17196,11 @@ type Mutation {
     The accounting category of this order
     """
     accountingCategory: AccountingCategoryReferenceInput
+
+    """
+    The transaction import row to associate with this order
+    """
+    transactionsImportRow: TransactionsImportRowReferenceInput
   ): Order!
 
   """
@@ -18449,6 +18459,10 @@ type Mutation {
     """
     message: String
   ): Transaction!
+
+  """
+  Create a new import. To manually add transactions to it, use `importTransactions`.
+  """
   createTransactionsImport(
     """
     Account that will hold the import (usually the host)
@@ -18461,7 +18475,7 @@ type Mutation {
     source: NonEmptyString!
 
     """
-    Name of the import (e.g. "Contributions May 2021", "Tickets for Mautic COnference 2024")
+    Name of the import (e.g. "Contributions May 2021", "Tickets for Mautic Conference 2024")
     """
     name: NonEmptyString!
 
@@ -18470,6 +18484,10 @@ type Mutation {
     """
     type: TransactionsImportType!
   ): TransactionsImport!
+
+  """
+  Import transactions, manually or from a CSV file
+  """
   importTransactions(
     """
     ID of the import to add transactions to
@@ -18491,6 +18509,10 @@ type Mutation {
     """
     data: [TransactionsImportRowCreateInput!]!
   ): TransactionsImport!
+
+  """
+  Update transactions import rows to set new values or mark them as dismissed
+  """
   updateTransactionsImportRows(
     """
     ID of the import to add transactions to
@@ -18957,6 +18979,13 @@ Reference to an accounting category
 input AccountingCategoryReferenceInput {
   """
   The ID of the accounting category
+  """
+  id: NonEmptyString!
+}
+
+input TransactionsImportRowReferenceInput {
+  """
+  The id of the row
   """
   id: NonEmptyString!
 }
