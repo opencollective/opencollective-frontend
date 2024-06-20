@@ -851,7 +851,6 @@
   "ContactName": "联系人姓名",
   "ContactSupportForDetails": "请联系<SupportLink>支持</SupportLink>获取更多细节。",
   "contactUs": "联系我们",
-  "continue": "actions.continue",
   "Contribute": "贡献",
   "contribute.amount": "赞助 {amount}",
   "contribute.changeFrequency.warning": "如果你改变频率，你将不会为特定的 {tierName} 级做出贡献",

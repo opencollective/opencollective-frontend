@@ -851,7 +851,6 @@
   "ContactName": "Contact name",
   "ContactSupportForDetails": "Kontakta <SupportLink>supporten</SupportLink> för mer information.",
   "contactUs": "Kontakta oss",
-  "continue": "actions.continue",
   "Contribute": "Bidrag",
   "contribute.amount": "Bidra {amount}",
   "contribute.changeFrequency.warning": "Om du ändrar frekvensen kommer du inte längre att bidra till denna specifika {tierName} -nivån",

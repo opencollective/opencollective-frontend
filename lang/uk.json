@@ -851,7 +851,6 @@
   "ContactName": "Контактне ім'я",
   "ContactSupportForDetails": "Будь ласка, зв'яжіться зі <SupportLink>службою підтримки</SupportLink>, щоб отримати докладні відомості.",
   "contactUs": "Зв'язатися з нами",
-  "continue": "actions.continue",
   "Contribute": "Зробити внесок",
   "contribute.amount": "Зробити внесок {amount}",
   "contribute.changeFrequency.warning": "Якщо ви зміните частоту, ви не будете робити внесок у цей {tierName} рівень",

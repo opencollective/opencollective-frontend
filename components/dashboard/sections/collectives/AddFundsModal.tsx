@@ -1079,7 +1079,7 @@ const AddFundsModal = ({ collective = null, host = null, initialValues = null, .
               <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
             </Button>
             <Button onClick={() => setHasConfirmedCollective(true)}>
-              <FormattedMessage defaultMessage="actions.continue" id="continue" />
+              <FormattedMessage defaultMessage="Continue" id="actions.continue" />
             </Button>
           </div>
         </div>
