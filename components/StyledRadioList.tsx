@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { find, isUndefined } from 'lodash';
 import styled from 'styled-components';
 import { size } from 'styled-system';
@@ -115,11 +114,25 @@ type RadioListProps = {
   'data-cy'?: string;
 };
 
+interface DefaultChildProps {
+  value?: string;
+  radio?: React.ReactNode;
+}
+
+const DefaultChild = ({ value, radio }: DefaultChildProps) => (
+  <Box mb={2}>
+    <Box as="span" mr={2}>
+      {radio}
+    </Box>
+    {value}
+  </Box>
+);
+
 const StyledRadioList = ({
-  children,
+  children = DefaultChild,
   id,
   name,
-  onChange,
+  onChange = () => {},
   options,
   keyGetter,
   disabled,
@@ -181,25 +194,6 @@ const StyledRadioList = ({
       })}
     </RadioListContainer>
   );
-};
-
-const defaultChild = ({ value, radio }) => (
-  <Box mb={2}>
-    <Box as="span" mr={2}>
-      {radio}
-    </Box>
-    {value}
-  </Box>
-);
-
-defaultChild.propTypes = {
-  value: PropTypes.string,
-  radio: PropTypes.func,
-};
-
-StyledRadioList.defaultProps = {
-  children: defaultChild,
-  onChange: () => {}, // noop
 };
 
 StyledRadioList.displayName = 'StyledRadioList';

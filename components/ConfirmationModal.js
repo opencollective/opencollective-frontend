@@ -131,9 +131,5 @@ ConfirmationModal.propTypes = {
   cancelLabel: PropTypes.node,
 };
 
-ConfirmationModal.defaultProps = {
-  type: 'confirm',
-};
-
 /** @component */
 export default ConfirmationModal;

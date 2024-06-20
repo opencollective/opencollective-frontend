@@ -11,4 +11,4 @@ const CustomStyledSelectCreatable: StyledSelectCustomComponent = makeStyledSelec
   alwaysSearchable: true,
 });
 
-export default injectIntl(CustomStyledSelectCreatable);
+export default injectIntl(CustomStyledSelectCreatable) as unknown as StyledSelectCustomComponent;

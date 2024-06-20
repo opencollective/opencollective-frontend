@@ -154,7 +154,6 @@ export const Steps: Record<ExpenseFlowStep, ExpenseStepDefinition> = {
                 amountStyles={{
                   fontWeight: 'normal',
                 }}
-                abbreviate
                 showCurrencyCode={false}
                 currency={props.form.values.expenseCurrency}
                 amount={props.form.options.totalInvoicedInExpenseCurrency}

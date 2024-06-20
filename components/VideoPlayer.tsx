@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 // A map of provider name => regex
@@ -42,12 +41,19 @@ const ResponsiveIframe = styled(({ src, ...props }) => (
   }
 `;
 
+interface VideoPlayerProps {
+  /** URL of the video */
+  url?: string;
+  /** Rendered when the video is not supported. */
+  placeholder?: React.ReactNode;
+}
+
 /**
  * A video player that supports YouTube and Vimeo.
  * Implemented as a pure component to avoid re-checking the URL and re-rendering
  * the iframe on each update.
  */
-const VideoPlayer = React.memo(({ url, placeholder }) => {
+const VideoPlayer = React.memo(({ url, placeholder = null }: VideoPlayerProps) => {
   const provider = getProvider(url);
 
   if (provider === 'YouTube') {
@@ -70,16 +76,5 @@ const VideoPlayer = React.memo(({ url, placeholder }) => {
 });
 
 VideoPlayer.displayName = 'VideoPlayer';
-
-VideoPlayer.propTypes = {
-  /** URL of the video */
-  url: PropTypes.string,
-  /** Rendered when the video is not supported. */
-  placeholder: PropTypes.node,
-};
-
-VideoPlayer.defaultProps = {
-  placeholder: null,
-};
 
 export default VideoPlayer;

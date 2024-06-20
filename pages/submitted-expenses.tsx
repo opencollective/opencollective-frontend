@@ -337,7 +337,7 @@ const submittedExpensesPageQuery = gql`
 
 const addExpensesPageData = graphql<SubmittedExpensesPageProps>(submittedExpensesPageQuery, {
   options: props => {
-    const amountRange = parseAmountRange(props.query.amount);
+    const amountRange = parseAmountRange(props.query.amount as string);
     const { from: dateFrom, to: dateTo } = parseDateInterval(props.query.period);
     const orderBy = props.query.orderBy && parseChronologicalOrderInput(props.query.orderBy);
     return {

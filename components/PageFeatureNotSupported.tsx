@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { Flex } from './Grid';
@@ -7,11 +6,15 @@ import { I18nSupportLink } from './I18nFormatters';
 import Page from './Page';
 import { H1, P } from './Text';
 
+interface PageFeatureNotSupportedProps {
+  showContactSupportLink?: boolean;
+}
+
 /**
  * A page to show when the feature is not supported by the collective.
  * Ensures the page is not referenced by robots.
  */
-const PageFeatureNotSupported = ({ showContactSupportLink, ...props }) => {
+const PageFeatureNotSupported = ({ showContactSupportLink = true, ...props }: PageFeatureNotSupportedProps) => {
   const { formatMessage } = useIntl();
   const title = formatMessage({ id: 'FeatureNotSupported.title', defaultMessage: 'Page inaccessible' });
   return (
@@ -44,14 +47,6 @@ const PageFeatureNotSupported = ({ showContactSupportLink, ...props }) => {
       </Flex>
     </Page>
   );
-};
-
-PageFeatureNotSupported.propTypes = {
-  showContactSupportLink: PropTypes.bool,
-};
-
-PageFeatureNotSupported.defaultProps = {
-  showContactSupportLink: true,
 };
 
 export default PageFeatureNotSupported;

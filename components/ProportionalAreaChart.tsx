@@ -1,13 +1,13 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { round } from 'lodash';
 import styled from 'styled-components';
+import type { BorderRadiusProps, ColorProps } from 'styled-system';
 import { borderRadius, color } from 'styled-system';
 
 import { Box, Flex } from './Grid';
 import { P } from './Text';
 
-const ChartContainer = styled.div`
+const ChartContainer = styled.div<BorderRadiusProps>`
   display: flex;
   flex-wrap: wrap;
   overflow: hidden; /** To force children to obey the border-radius of the parent */
@@ -30,7 +30,7 @@ const Label = styled.div`
   white-space: nowrap;
 `;
 
-const Area = styled.div`
+const Area = styled.div<{ percentage: string } & ColorProps>`
   padding: 12px 8px;
   flex-shrink: 0;
   flex-grow: 1;
@@ -38,7 +38,7 @@ const Area = styled.div`
   ${color}
 `;
 
-const Square = styled.div`
+const Square = styled.div<ColorProps>`
   width: 8px;
   height: 8px;
   border-radius: 1.2px;
@@ -46,7 +46,12 @@ const Square = styled.div`
   ${color}
 `;
 
-const Legend = ({ color, label }) => {
+interface LegendProps {
+  color?: string;
+  label?: React.ReactNode;
+}
+
+const Legend = ({ color, label }: LegendProps) => {
   return (
     <Flex alignItems="center" mr={2}>
       <Square backgroundColor={color} />
@@ -57,11 +62,6 @@ const Legend = ({ color, label }) => {
   );
 };
 
-Legend.propTypes = {
-  color: PropTypes.string,
-  label: PropTypes.node,
-};
-
 const getPreparedAreaPercentage = (areas, area) => {
   if (area.percentage) {
     return `${round(area.percentage * 100, 2)}%`;
@@ -70,7 +70,20 @@ const getPreparedAreaPercentage = (areas, area) => {
   }
 };
 
-const ProportionalAreaChart = ({ areas, borderRadius }) => {
+interface ProportionalAreaChartProps {
+  borderRadius?: string;
+  /** The series to represent */
+  areas: {
+    key: string;
+    label?: React.ReactNode;
+    /** How much space should be taken by this area. Defaults to proportional (100 / numberOfAreas)% */
+    percentage?: number;
+    color?: string;
+    legend?: React.ReactNode;
+  }[];
+}
+
+const ProportionalAreaChart = ({ areas, borderRadius = '6px' }: ProportionalAreaChartProps) => {
   const hasLegend = areas.some(area => area.legend);
   return (
     <React.Fragment>
@@ -94,25 +107,6 @@ const ProportionalAreaChart = ({ areas, borderRadius }) => {
       )}
     </React.Fragment>
   );
-};
-
-ProportionalAreaChart.propTypes = {
-  borderRadius: PropTypes.string,
-  /** The series to represent */
-  areas: PropTypes.arrayOf(
-    PropTypes.shape({
-      key: PropTypes.string.isRequired,
-      label: PropTypes.node,
-      /** How much space should be taken by this area. Defaults to proportional (100 / numberOfAreas)% */
-      percentage: PropTypes.number,
-      color: PropTypes.string,
-      legend: PropTypes.node,
-    }),
-  ).isRequired,
-};
-
-ProportionalAreaChart.defaultProps = {
-  borderRadius: '6px',
 };
 
 export default React.memo(ProportionalAreaChart);

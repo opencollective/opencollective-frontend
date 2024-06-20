@@ -1,12 +1,41 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
-import Body from '../components/Body';
-import ErrorPage from '../components/ErrorPage';
-import Header from '../components/Header';
-import Footer from '../components/navigation/Footer';
+import type LoggedInUser from '../lib/LoggedInUser';
 
+import Footer from './navigation/Footer';
+import Body from './Body';
+import ErrorPage from './ErrorPage';
+import Header from './Header';
 import { withUser } from './UserProvider';
+
+type LoggedInUserInfo = {
+  loadingLoggedInUser: boolean;
+  LoggedInUser: typeof LoggedInUser;
+};
+
+interface PageProps {
+  data?: {
+    error?: {};
+  };
+  children?: React.ReactNode | ((info: LoggedInUserInfo) => React.ReactNode);
+  description?: string;
+  canonicalURL?: string;
+  image?: string;
+  loadingLoggedInUser?: boolean;
+  LoggedInUser?: typeof LoggedInUser;
+  showSearch?: boolean;
+  noRobots?: boolean;
+  title?: string;
+  navTitle?: string;
+  metaTitle?: string;
+  twitterHandle?: string;
+  collective?: object;
+  menuItems?: object;
+  showFooter?: boolean;
+  showProfileAndChangelogMenu?: boolean;
+  loading?: boolean;
+  withTopBar?: boolean;
+}
 
 const Page = ({
   children,
@@ -20,7 +49,7 @@ const Page = ({
   metaTitle,
   noRobots,
   twitterHandle,
-  showSearch,
+  showSearch = true,
   canonicalURL,
   collective,
   menuItems,
@@ -28,7 +57,7 @@ const Page = ({
   showFooter = true,
   showProfileAndChangelogMenu = true,
   loading,
-}) => {
+}: PageProps) => {
   if (data.error) {
     return <ErrorPage data={data} LoggedInUser={LoggedInUser} />;
   }
@@ -60,34 +89,5 @@ const Page = ({
 };
 
 Page.displayName = 'Page';
-
-Page.propTypes = {
-  data: PropTypes.shape({
-    error: PropTypes.shape({}),
-  }),
-  children: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
-  description: PropTypes.string,
-  canonicalURL: PropTypes.string,
-  image: PropTypes.string,
-  loadingLoggedInUser: PropTypes.bool,
-  LoggedInUser: PropTypes.shape({}),
-  showSearch: PropTypes.bool,
-  noRobots: PropTypes.bool,
-  title: PropTypes.string,
-  navTitle: PropTypes.string,
-  metaTitle: PropTypes.string,
-  twitterHandle: PropTypes.string,
-  collective: PropTypes.object,
-  menuItems: PropTypes.object,
-  showFooter: PropTypes.bool,
-  showProfileAndChangelogMenu: PropTypes.bool,
-  loading: PropTypes.bool,
-  withTopBar: PropTypes.bool,
-};
-
-Page.defaultProps = {
-  showSearch: true,
-  withTopBar: true,
-};
 
 export default withUser(Page);

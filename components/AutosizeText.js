@@ -27,6 +27,15 @@ const formatResult = (result, valueFormatter) => {
   }
 };
 
+const AutosizedSpan = ({ value, fontSize }) => {
+  return <Span fontSize={`${fontSize}px`}>{value}</Span>;
+};
+
+AutosizedSpan.propTypes = {
+  value: PropTypes.string,
+  fontSize: PropTypes.number,
+};
+
 /**
  * A magic text component whose size adapts based on string length.
  * By default the `maxFontSizeInPx` will be used, until the breakpoint defined by `lengthThreshold`
@@ -37,7 +46,7 @@ const formatResult = (result, valueFormatter) => {
  * `12.5px` are not supported.
  */
 const AutosizeText = ({
-  children,
+  children = AutosizedSpan,
   value,
   minFontSizeInPx,
   maxFontSizeInPx,
@@ -71,19 +80,6 @@ AutosizeText.propTypes = {
   valueFormatter: PropTypes.func,
   /** Reduction percentage on mobile */
   mobileRatio: PropTypes.number,
-};
-
-const AutosizedSpan = ({ value, fontSize }) => {
-  return <Span fontSize={`${fontSize}px`}>{value}</Span>;
-};
-
-AutosizedSpan.propTypes = {
-  value: PropTypes.string,
-  fontSize: PropTypes.number,
-};
-
-AutosizeText.defaultProps = {
-  children: AutosizedSpan,
 };
 
 export default AutosizeText;

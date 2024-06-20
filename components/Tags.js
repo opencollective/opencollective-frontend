@@ -91,7 +91,17 @@ const Tag = styled(StyledTag).attrs({
   variant: 'rounded-right',
 })``;
 
-const Tags = ({ expense, order, isLoading, limit, getTagProps, children, canEdit, suggestedTags, showUntagged }) => {
+const Tags = ({
+  expense,
+  order,
+  isLoading,
+  limit = 4,
+  getTagProps,
+  children,
+  canEdit,
+  suggestedTags,
+  showUntagged,
+}) => {
   const intl = useIntl();
   const tagList = expense?.tags || order?.tags;
 
@@ -166,10 +176,6 @@ Tags.propTypes = {
   }),
   /** Whether to show an "Untagged" tag (when used for filtering) */
   showUntagged: PropTypes.bool,
-};
-
-Tags.defaultProps = {
-  limit: 4,
 };
 
 export default Tags;

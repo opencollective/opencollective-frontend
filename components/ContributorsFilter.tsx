@@ -1,6 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, useIntl } from 'react-intl';
 
 import StyledFilters from './StyledFilters';
 
@@ -8,7 +7,9 @@ export const CONTRIBUTOR_FILTERS = {
   ALL: 'ALL',
   CORE: 'CORE',
   FINANCIAL: 'FINANCIAL',
-};
+} as const;
+
+type ContributorsFilter = (typeof CONTRIBUTOR_FILTERS)[keyof typeof CONTRIBUTOR_FILTERS];
 
 export const FILTERS_LIST = Object.values(CONTRIBUTOR_FILTERS);
 
@@ -25,10 +26,6 @@ const Translations = defineMessages({
     id: 'ContributorsFilter.Financial',
     defaultMessage: 'Financial contributors',
   },
-  [CONTRIBUTOR_FILTERS.GITHUB]: {
-    id: 'ContributorsFilter.Github',
-    defaultMessage: 'Github contributors',
-  },
 });
 
 /**
@@ -42,7 +39,7 @@ export const getContributorsFilters = contributors => {
   // no need to traverse the entire list if we already registered all the types
   const addFilter = filter => {
     filters.add(filter);
-    return filters.length === FILTERS_LIST.length - 1;
+    return filters.size === FILTERS_LIST.length;
   };
 
   // Add filters to the set based on contributors roles
@@ -85,37 +82,35 @@ export const filterContributors = (contributors, filter) => {
   }
 };
 
+interface ContributorsFilterProps {
+  /** Selected filter. Defaults to `ALL` */
+  selected?: ContributorsFilter;
+  /** Called when another filter is selected */
+  onChange: (filter: ContributorsFilter) => void;
+  /** An optional list of active filters */
+  filters?: ContributorsFilter[];
+  /** @ignore from injectIntl */
+  intl?: object;
+}
+
 /**
  * A set of filters for contributors types. This file also exports helper functions
  * to deal with the filters, including:
  * - `getContributorsFilters`: For a given list of Contributors, returns all the filters that can be applied to the list.
  * - `filterContributors`: A helper to filter a Contributors list by contributor roles.
  */
-const ContributorsFilter = ({ intl, selected, onChange, filters, ...props }) => {
+const ContributorsFilter = ({ selected, onChange, filters = FILTERS_LIST, ...props }: ContributorsFilterProps) => {
+  const intl = useIntl();
   return (
     <StyledFilters
       filters={filters}
       getLabel={filter => intl.formatMessage(Translations[filter])}
       onChange={onChange}
       selected={selected || CONTRIBUTOR_FILTERS.ALL}
+      multiSelect={false}
       {...props}
     />
   );
 };
 
-ContributorsFilter.propTypes = {
-  /** Selected filter. Defaults to `ALL` */
-  selected: PropTypes.oneOf(FILTERS_LIST),
-  /** Called when another filter is selected */
-  onChange: PropTypes.func.isRequired,
-  /** An optional list of active filters */
-  filters: PropTypes.arrayOf(PropTypes.oneOf(FILTERS_LIST)),
-  /** @ignore from injectIntl */
-  intl: PropTypes.object,
-};
-
-ContributorsFilter.defaultProps = {
-  filters: FILTERS_LIST,
-};
-
-export default injectIntl(ContributorsFilter);
+export default ContributorsFilter;

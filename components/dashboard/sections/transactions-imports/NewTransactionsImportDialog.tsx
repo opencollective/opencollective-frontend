@@ -108,7 +108,9 @@ export const NewTransactionsImportDialog = ({ accountSlug, onSuccess, ...props }
                     <StyledSelectCreatable
                       inputId={field.id}
                       error={field.error}
-                      onChange={({ value }) => formik.setFieldValue('source', truncate(value.trim(), { length: 200 }))}
+                      onChange={option =>
+                        formik.setFieldValue('source', truncate(option?.value?.trim(), { length: 200 }))
+                      }
                       fontSize="14px"
                       disabled={formik.isSubmitting}
                       placeholder="Select or type a source"

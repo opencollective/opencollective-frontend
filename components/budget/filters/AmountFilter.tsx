@@ -1,8 +1,9 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import type { IntlShape } from 'react-intl';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../../lib/currency-utils';
+import type { Currency } from '../../../lib/graphql/types/v2/graphql';
 
 import { StyledSelectFilter } from '../../StyledSelectFilter';
 
@@ -21,7 +22,7 @@ const OPTION_LABELS = defineMessages({
   },
 });
 
-export const parseAmountRange = strValue => {
+export const parseAmountRange = (strValue: string): [] | [number] | [number, number] => {
   if (!strValue) {
     return [];
   } else if (strValue.endsWith('+')) {
@@ -32,7 +33,12 @@ export const parseAmountRange = strValue => {
   }
 };
 
-const getOption = (intl, currency, minAmount, maxAmount) => {
+const getOption = (
+  intl: IntlShape,
+  currency: Currency,
+  minAmount: number = undefined,
+  maxAmount: number = undefined,
+) => {
   const { locale } = intl;
   return {
     value: maxAmount ? `${minAmount}-${maxAmount}` : `${minAmount}+`,
@@ -43,34 +49,31 @@ const getOption = (intl, currency, minAmount, maxAmount) => {
   };
 };
 
-const AmountFilter = ({ currency, onChange, value, steps, ...props }) => {
+interface AmountFilterProps {
+  steps: number[];
+  currency?: Currency;
+  onChange: (...args: unknown[]) => unknown;
+  value?: string;
+}
+
+const AmountFilter = ({ currency, onChange, value, steps = [0, 50, 500, 5000], ...props }: AmountFilterProps) => {
   const intl = useIntl();
   const allExpensesOption = { label: intl.formatMessage(OPTION_LABELS.ALL), value: 'ALL' };
   const options = React.useMemo(() => {
     return [allExpensesOption, ...steps.map((step, idx) => getOption(intl, currency, step, steps[idx + 1]))];
   }, [steps]);
+  const [min, max] = parseAmountRange(value);
 
   return (
     <StyledSelectFilter
       inputId="expenses-amount-filter"
       data-cy="expenses-filter-amount"
-      value={value ? getOption(intl, currency, ...parseAmountRange(value)) : allExpensesOption}
+      value={value ? getOption(intl, currency, min, max) : allExpensesOption}
       onChange={({ value }) => onChange(value)}
       options={options}
       {...props}
     />
   );
-};
-
-AmountFilter.propTypes = {
-  steps: PropTypes.arrayOf(PropTypes.number).isRequired,
-  currency: PropTypes.string,
-  onChange: PropTypes.func.isRequired,
-  value: PropTypes.string,
-};
-
-AmountFilter.defaultProps = {
-  steps: [0, 50, 500, 5000],
 };
 
 export default AmountFilter;

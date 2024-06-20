@@ -104,7 +104,7 @@ const ExpenseBudgetItem = ({
   showAmountSign,
   expense,
   showProcessActions,
-  view,
+  view = 'public',
   onProcess,
   selected,
   expandExpense,
@@ -593,10 +593,6 @@ ExpenseBudgetItem.propTypes = {
   selected: PropTypes.bool,
   expandExpense: PropTypes.func,
   useDrawer: PropTypes.bool,
-};
-
-ExpenseBudgetItem.defaultProps = {
-  view: 'public',
 };
 
 export default ExpenseBudgetItem;

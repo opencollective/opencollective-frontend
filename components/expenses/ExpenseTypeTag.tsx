@@ -1,14 +1,20 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 
-import expenseTypes from '../../lib/constants/expenseTypes';
+import type { ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import { i18nExpenseType } from '../../lib/i18n/expense';
 
 import LoadingPlaceholder from '../LoadingPlaceholder';
+import type { StyledTagProps } from '../StyledTag';
 import StyledTag from '../StyledTag';
 
-const ExpenseTypeTag = ({ type, legacyId = undefined, isLoading = false, ...props }) => {
+interface ExpenseTypeTagProps extends Omit<StyledTagProps, 'type'> {
+  type: ExpenseType;
+  legacyId?: number;
+  isLoading?: boolean;
+}
+
+const ExpenseTypeTag = ({ type, legacyId = undefined, isLoading = false, ...props }: ExpenseTypeTagProps) => {
   const intl = useIntl();
   return !type && !legacyId && isLoading ? (
     <LoadingPlaceholder height={24} width={73} borderRadius="12px 2px 2px 12px" />
@@ -26,16 +32,6 @@ const ExpenseTypeTag = ({ type, legacyId = undefined, isLoading = false, ...prop
       {i18nExpenseType(intl, type, legacyId)}
     </StyledTag>
   );
-};
-
-ExpenseTypeTag.propTypes = {
-  type: PropTypes.oneOf(Object.values(expenseTypes)).isRequired,
-  legacyId: PropTypes.number,
-  isLoading: PropTypes.bool,
-};
-
-ExpenseTypeTag.defaultProps = {
-  isLoading: false,
 };
 
 export default ExpenseTypeTag;
