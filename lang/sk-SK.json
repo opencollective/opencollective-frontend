@@ -851,7 +851,6 @@
   "ContactName": "Kontaktná osoba",
   "ContactSupportForDetails": "Pre viac detailov prosím kontaktujte <SupportLink>podporu</SupportLink>.",
   "contactUs": "Kontaktovať nás",
-  "continue": "actions.continue",
   "Contribute": "Prispieť",
   "contribute.amount": "Prispieť čiastkou {amount}",
   "contribute.changeFrequency.warning": "Ak zmeníte frekvenciu, neprispejete v tejto špecifickej úrovni {tierName}",

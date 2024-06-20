@@ -851,7 +851,6 @@
   "ContactName": "Имя контакта",
   "ContactSupportForDetails": "Please contact <SupportLink>support</SupportLink> for more details.",
   "contactUs": "Напишите нам",
-  "continue": "actions.continue",
   "Contribute": "Внести вклад",
   "contribute.amount": "Поддержать {amount}",
   "contribute.changeFrequency.warning": "If you change the frequency, you will not contribute to this specific {tierName} tier",

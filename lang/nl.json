@@ -851,7 +851,6 @@
   "ContactName": "Contact naam",
   "ContactSupportForDetails": "Neem contact op met <SupportLink>support</SupportLink> voor meer informatie.",
   "contactUs": "Contacteer ons",
-  "continue": "actions.continue",
   "Contribute": "Bijdragen",
   "contribute.amount": "Bijdragen {amount}",
   "contribute.changeFrequency.warning": "If you change the frequency, you will not contribute to this specific {tierName} tier",

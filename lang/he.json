@@ -851,7 +851,6 @@
   "ContactName": "Contact name",
   "ContactSupportForDetails": "נא ליצור קשר עם <SupportLink>התמיכה</SupportLink> לפרטים נוספים.",
   "contactUs": "יצירת קשר",
-  "continue": "actions.continue",
   "Contribute": "תרומה",
   "contribute.amount": "תרומה של {amount}",
   "contribute.changeFrequency.warning": "אם תשנו את משך התקופה, זתרומה לא תגיע לשכבה זו יותר {tierName}",

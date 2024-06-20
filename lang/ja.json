@@ -851,7 +851,6 @@
   "ContactName": "Contact name",
   "ContactSupportForDetails": "Please contact <SupportLink>support</SupportLink> for more details.",
   "contactUs": "問い合わせる",
-  "continue": "actions.continue",
   "Contribute": "貢献",
   "contribute.amount": "コントリビュート {amount}",
   "contribute.changeFrequency.warning": "頻度を変更した場合、この特定の{tierName} 階層には貢献しません。",

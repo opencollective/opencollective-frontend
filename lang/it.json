@@ -851,7 +851,6 @@
   "ContactName": "Contact name",
   "ContactSupportForDetails": "Please contact <SupportLink>support</SupportLink> for more details.",
   "contactUs": "Contattaci",
-  "continue": "actions.continue",
   "Contribute": "Contribuisci",
   "contribute.amount": "Contribuisci {amount}",
   "contribute.changeFrequency.warning": "Se stai cambiando la frequenza, non contribuirai a questo specifico livello \"{tierName}\"",

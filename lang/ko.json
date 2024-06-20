@@ -851,7 +851,6 @@
   "ContactName": "Contact name",
   "ContactSupportForDetails": "Please contact <SupportLink>support</SupportLink> for more details.",
   "contactUs": "Contact us",
-  "continue": "actions.continue",
   "Contribute": "기여",
   "contribute.amount": "{amount} 기여하기",
   "contribute.changeFrequency.warning": "If you change the frequency, you will not contribute to this specific {tierName} tier",
