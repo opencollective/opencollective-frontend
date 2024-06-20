@@ -179,11 +179,11 @@ const GetToKnowUs = () => {
             >
               <StyledLink
                 color="black.800"
-                href="https://slack.opencollective.com/"
+                href="https://discord.opencollective.com/"
                 textDecoration="underline"
                 openInNewTab
               >
-                <FormattedMessage defaultMessage="Slack and email" id="ZelEql" />
+                Discord
               </StyledLink>
             </StyledListItem>
             <StyledListItem
