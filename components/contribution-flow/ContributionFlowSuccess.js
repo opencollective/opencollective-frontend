@@ -13,6 +13,7 @@ import styled from 'styled-components';
 import { AnalyticsEvent } from '../../lib/analytics/events';
 import { track } from '../../lib/analytics/plausible';
 import { getTwitterHandleFromCollective } from '../../lib/collective';
+import { getIntervalFromGQLV2Frequency } from '../../lib/constants/intervals';
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { formatCurrency } from '../../lib/currency-utils';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
@@ -165,7 +166,41 @@ class ContributionFlowSuccess extends React.Component {
     const {
       router: { query: queryParams },
       data: { order },
+      intl,
     } = this.props;
+
+    const paymentIntentResult = this.state?.paymentIntentResult;
+    if (order && paymentIntentResult) {
+      const stripeErrorMessage = paymentIntentResult.error
+        ? paymentIntentResult.error.message
+        : !['succeeded', 'processing'].includes(paymentIntentResult.paymentIntent.status)
+          ? paymentIntentResult.paymentIntent.last_payment_error?.message ??
+            intl.formatMessage({ defaultMessage: 'An unknown error has ocurred', id: 'TGDa6P' })
+          : null;
+
+      if (stripeErrorMessage) {
+        const tierSlug = order.tier?.slug;
+
+        const path = tierSlug
+          ? `/${order.toAccount.slug}/contribute/${tierSlug}-${order.tier.legacyId}/checkout/payment`
+          : `/${order.toAccount.slug}/donate/payment`;
+
+        const url = new URL(path, window.location.origin);
+        url.searchParams.set('error', stripeErrorMessage);
+        url.searchParams.set('interval', getIntervalFromGQLV2Frequency(order.frequency));
+        url.searchParams.set('amount', order.amount.value);
+        url.searchParams.set('contributeAs', order.fromAccount.slug);
+
+        if (queryParams.redirect) {
+          url.searchParams.set('redirect', queryParams.redirect);
+          url.searchParams.set('shouldRedirectParent', queryParams.shouldRedirectParent);
+        }
+
+        this.props.router.push(url.toString());
+        return;
+      }
+    }
+
     if (order && queryParams.redirect) {
       if (isValidExternalRedirect(queryParams.redirect)) {
         followOrderRedirectUrl(this.props.router, this.props.collective, order, queryParams.redirect, {
@@ -289,7 +324,6 @@ class ContributionFlowSuccess extends React.Component {
     const shareURL = `${getWebsiteUrl()}/${collective.slug}`;
     const isProcessing = order?.status === ORDER_STATUS.PROCESSING;
     const isFediverse = order && (isAccountFediverse(order.toAccount) || isAccountFediverse(order.toAccount.parent));
-    const paymentIntentResult = this.state?.paymentIntentResult;
 
     const loading = data.loading || !this.state?.loaded;
 
@@ -302,14 +336,6 @@ class ContributionFlowSuccess extends React.Component {
         </Flex>
       );
     }
-
-    const stripeErrorMessage = paymentIntentResult?.error
-      ? paymentIntentResult.error.message
-      : !['succeeded', 'processing'].includes(paymentIntentResult?.paymentIntent.status)
-        ? paymentIntentResult?.paymentIntent.last_payment_error?.message ?? (
-            <FormattedMessage defaultMessage="An unknown error has ocurred" id="TGDa6P" />
-          )
-        : null;
 
     const toAccountTwitterHandle = getTwitterHandleFromCollective(order?.toAccount);
     return (
@@ -359,23 +385,6 @@ class ContributionFlowSuccess extends React.Component {
             <Container display="flex" alignItems="center" justifyContent="center">
               <Loading />
             </Container>
-          ) : stripeErrorMessage ? (
-            <div className="mt-4 flex flex-col items-center gap-4">
-              <h1 className="text-lg font-bold">
-                <FormattedMessage defaultMessage="There was an error processing your contribution" id="DIfPHC" />
-              </h1>
-              <MessageBox type="error">{stripeErrorMessage}</MessageBox>
-              <P fontSize="20px" color="black.700" fontWeight={500} textAlign="center">
-                <FormattedMessage
-                  defaultMessage="You can try contributing again on <link>{collective}</link>."
-                  id="ro/ST+"
-                  values={{
-                    collective: order.toAccount.name,
-                    link: isEmbed ? I18nBold : getI18nLink({ href: getCollectivePageRoute(order.toAccount), as: Link }),
-                  }}
-                />
-              </P>
-            </div>
           ) : (
             <Fragment>
               <ContainerWithImage
