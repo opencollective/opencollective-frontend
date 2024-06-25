@@ -8,6 +8,7 @@ import type {
   TransactionsImportStats,
 } from '../../../../lib/graphql/types/v2/graphql';
 
+import type { BaseModalProps } from '../../../ModalContext';
 import AddFundsModal from '../collectives/AddFundsModal';
 
 const prettyPrintRawValues = (rawValue: Record<string, string>) => {
@@ -20,16 +21,21 @@ const prettyPrintRawValues = (rawValue: Record<string, string>) => {
 export const AddFundsModalFromImportRow = ({
   transactionsImport,
   row,
-  onClose,
+  open,
+  setOpen,
 }: {
   transactionsImport: TransactionsImport;
   row: TransactionsImportRow;
-  onClose: () => void;
-}) => {
+} & BaseModalProps) => {
   const client = useApolloClient();
+  if (!open) {
+    return null;
+  }
+
   return (
     <AddFundsModal
-      onClose={onClose}
+      open={open}
+      onClose={() => setOpen(false)}
       host={transactionsImport.account}
       initialValues={{
         amount: row.amount.valueInCents,

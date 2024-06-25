@@ -38,7 +38,7 @@ export function RowActionsMenu<TData>({ row, actionsMenuTriggerRef, table }: Row
   if (!row.original) {
     return null;
   }
-  const { getActions, onClickRow } = table.options.meta;
+  const { getActions, openDrawer } = table.options.meta;
 
   if (!getActions) {
     return null;
@@ -46,7 +46,7 @@ export function RowActionsMenu<TData>({ row, actionsMenuTriggerRef, table }: Row
 
   const { primary, secondary } = getActions(row.original, actionsMenuTriggerRef) ?? {};
   const openDetails = () => {
-    onClickRow?.(row, actionsMenuTriggerRef);
+    openDrawer?.(row, actionsMenuTriggerRef);
   };
 
   return (
