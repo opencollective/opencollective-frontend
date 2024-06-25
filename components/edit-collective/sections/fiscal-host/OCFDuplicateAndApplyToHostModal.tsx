@@ -194,7 +194,7 @@ const STEPS = {
     name: 'Information',
     label: <FormattedMessage defaultMessage="Information" id="E80WrK" />,
   },
-  APPLY: { key: 'APPLY', name: 'Apply', label: <FormattedMessage id="Apply" defaultMessage="Apply" /> },
+  APPLY: { key: 'APPLY', name: 'Apply', label: <FormattedMessage id="ApplyToHost" defaultMessage="Apply" /> },
 } as const;
 
 const getAccountInput = collective => {

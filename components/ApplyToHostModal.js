@@ -171,7 +171,7 @@ const GQL_CONTEXT = { context: API_V2_CONTEXT };
 const INITIAL_FORM_VALUES = { message: '', areTosChecked: false, collective: null, inviteMembers: [] };
 const STEPS = {
   INFORMATION: { name: 'Information', label: <FormattedMessage defaultMessage="Information" id="E80WrK" /> },
-  APPLY: { name: 'Apply', label: <FormattedMessage id="Apply" defaultMessage="Apply" /> },
+  APPLY: { name: 'Apply', label: <FormattedMessage id="ApplyToHost" defaultMessage="Apply" /> },
 };
 
 const getAccountInput = collective => {
