@@ -2316,7 +2316,7 @@
   "lpal5V": "Cette valeur est une estimation",
   "lPdsgW": "{timeUnit, select, MONTH {Mois précédent} QUARTER {Trimestre précédent} YEAR {Année précédente} other {Période précédente}} ",
   "LqD2Po": "Code de référence externe pour cette contribution. Il s'agit généralement d'un numéro de référence du système de comptabilité du contributeur.",
-  "lRbFqE": "Dépense rejetée <Expense>{expenseDescription}</Expense> de <FromAccount></FromAccount> à <Account></Account>",
+  "lRbFqE": "Dépense désapprouvée <Expense>{expenseDescription}</Expense> de <FromAccount></FromAccount> à <Account></Account>",
   "LrBotK": "Open Collective est une boîte à outils légale et financière pour les groupes communautaires. C'est une plateforme de collecte de fonds + statut juridique + gestion de l'argent pour votre communauté. Que voulez-vous faire ?",
   "LseLoM": "Spam",
   "lSFdN4": "Documents légaux",
