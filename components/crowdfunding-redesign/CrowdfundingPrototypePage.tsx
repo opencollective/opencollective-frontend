@@ -15,9 +15,8 @@ import { profilePageQuery } from './queries';
 
 export function CrowdfundingPrototypePage({ isFundraiser }: { isFundraiser?: boolean }) {
   const router = useRouter();
-
   const { data, error, loading } = useQuery(profilePageQuery, {
-    variables: { slug: router.query.accountSlug },
+    variables: { slug: router.query.accountSlug, includeChildren: !isFundraiser },
     context: API_V2_CONTEXT,
   });
   const account = data?.account;
@@ -37,7 +36,7 @@ export function CrowdfundingPrototypePage({ isFundraiser }: { isFundraiser?: boo
 
   return (
     <Page withTopBar={false} showFooter={false} title={`[PREVIEW] ${account.name} | Open Collective`}>
-      <div className="flex min-h-screen flex-col justify-between bg-primary/5 antialiased">
+      <div className="flex min-h-screen flex-col justify-between bg-primary-foreground/75 antialiased">
         <div className="flex flex-1 flex-col">
           <Banner account={account} isFundraiser={isFundraiser || isProjectOrEvent} />
           {isFundraiser || isProjectOrEvent ? <Fundraiser account={account} /> : <Profile account={account} />}
