@@ -55,8 +55,8 @@ export function RecoverySettings(props: RecoverySettingsProps) {
         </Flex>
         <div className="border-b pb-3 text-sm">
           <FormattedMessage
-            defaultMessage="Recovery codes can be used to access you account in case you lose access to your other two factor methods."
-            id="VeGBBP"
+            defaultMessage="Recovery codes can be used to access your account in case you lose access to your other two factor methods."
+            id="Pw3c53"
           />
         </div>
         <div className="mt-3 flex gap-2">
@@ -80,7 +80,7 @@ export function RecoverySettings(props: RecoverySettingsProps) {
           continueHandler={onRegenerateConfirmation}
         >
           <MessageBox type="warning" withIcon>
-            <FormattedMessage defaultMessage="This will inactive your previous recovery codes." id="P4yOzi" />
+            <FormattedMessage defaultMessage="This will inactivate your previous recovery codes." id="bHcyqz" />
           </MessageBox>
         </ConfirmationModal>
       )}

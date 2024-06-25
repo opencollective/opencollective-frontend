@@ -734,7 +734,7 @@ const ExpenseFormBody = ({
                   {/* Tags */}
                   <div>
                     <Span color="black.900" fontSize="18px" lineHeight="26px" fontWeight="bold">
-                      <FormattedMessage defaultMessage="Tag you expense" id="uEcPHj" />
+                      <FormattedMessage defaultMessage="Tag your expense" id="EosA8s" />
                     </Span>
                     <Flex alignItems="flex-start" mt={2}>
                       <ExpenseTypeTag type={values.type} mr="4px" />
