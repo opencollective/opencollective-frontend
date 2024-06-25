@@ -412,6 +412,14 @@ export const ActivityDescriptionI18n = defineMessages({
     defaultMessage: "<FromAccount></FromAccount>'s <Order>recurring contribution</Order> paused",
     id: 'XEZlSZ',
   },
+  SUBSCRIPTION_READY_TO_BE_RESUMED: {
+    defaultMessage: '<Order>Recurring contribution</Order> ready to be resumed',
+    id: 'nUWffQ',
+  },
+  SUBSCRIPTION_RESUMED: {
+    defaultMessage: '<Order>Recurring contribution</Order> resumed',
+    id: 'wxbjAz',
+  },
   TICKET_CONFIRMED: {
     id: 'WebhookEvents.TICKET_CONFIRMED',
     defaultMessage: 'Ticket confirmed',
