@@ -3,11 +3,10 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import type { ApolloClient } from '@apollo/client';
 import { getDataFromTree } from '@apollo/client/react/ssr';
 
 import { withTwoFactorAuthentication } from './two-factor-authentication/TwoFactorAuthenticationContext';
-import { initClient } from './apollo-client';
+import { APOLLO_STATE_PROP_NAME, initClient } from './apollo-client';
 import { compose } from './utils';
 
 // Gets the display name of a JSX component for dev tools
@@ -15,22 +14,21 @@ function getComponentDisplayName(Component) {
   return Component.displayName || Component.name || 'Unknown';
 }
 
-type WithDataProps = {
-  serverState: any;
-  twoFactorAuthContext: any;
-};
-
 const withData = ComposedComponent => {
-  return class WithData extends React.Component<WithDataProps> {
+  return class WithData extends React.Component {
     static async getInitialProps(context) {
       const { Component } = context;
 
-      const client = initClient();
+      const client =
+        context.req?.apolloClient ||
+        initClient({
+          initialState: window?.__NEXT_DATA__?.props?.[APOLLO_STATE_PROP_NAME],
+        });
 
       // Evaluate the composed component's getInitialProps()
       let composedInitialProps = {};
       if (ComposedComponent.getInitialProps) {
-        composedInitialProps = await ComposedComponent.getInitialProps({ ...context, client });
+        composedInitialProps = await ComposedComponent.getInitialProps({ ...context });
       }
 
       try {
@@ -49,15 +47,7 @@ const withData = ComposedComponent => {
         }
       }
 
-      // Extract query data from the Apollo store
-      const serverState = {
-        apollo: {
-          data: client.cache.extract(),
-        },
-      };
-
       return {
-        serverState,
         ...composedInitialProps,
       };
     }
@@ -80,14 +70,10 @@ const withData = ComposedComponent => {
 
     constructor(props) {
       super(props);
-      const { serverState, twoFactorAuthContext } = this.props;
-      this.client = initClient({ initialState: serverState.apollo.data, twoFactorAuthContext });
     }
 
-    client: ApolloClient<object> | null;
-
     render() {
-      return <ComposedComponent {...this.props} client={this.client} />;
+      return <ComposedComponent {...this.props} />;
     }
   };
 };
