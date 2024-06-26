@@ -12,6 +12,7 @@ import { ServerStyleSheet } from 'styled-components';
 import { v4 as uuid } from 'uuid';
 
 import { APOLLO_STATE_PROP_NAME } from '../lib/apollo-client';
+import { getTokenFromCookie } from '../lib/auth';
 import { getIntlProps, getLocaleMessages } from '../lib/i18n/request';
 import { parseToBoolean } from '../lib/utils';
 import { getCSPHeader } from '../server/content-security-policy';
@@ -45,7 +46,9 @@ export default class IntlDocument extends Document {
     const intl = createIntl({ locale: intlProps.locale, defaultLocale: 'en', messages }, cache);
 
     if (ctx.req && ctx.res) {
-      if (intlProps.locale !== 'en') {
+      if (getTokenFromCookie(ctx.req)) {
+        ctx.res.setHeader('Cache-Control', 'no-store, no-cache, private, max-age=0');
+      } else if (intlProps.locale !== 'en') {
         // Prevent server side caching of non english content
         ctx.res.setHeader('Cache-Control', 'no-store, no-cache, max-age=0');
       } else {
