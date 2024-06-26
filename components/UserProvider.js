@@ -6,6 +6,7 @@ import { get, isEqual } from 'lodash';
 import Router, { withRouter } from 'next/router';
 import { injectIntl } from 'react-intl';
 
+import * as auth from '../lib/auth';
 import { createError, ERROR, formatErrorMessage } from '../lib/errors';
 import { loggedInUserQuery } from '../lib/graphql/v1/queries';
 import withLoggedInUser from '../lib/hooks/withLoggedInUser';
@@ -27,12 +28,9 @@ export const UserContext = React.createContext({
 class UserProvider extends React.Component {
   static propTypes = {
     getLoggedInUser: PropTypes.func.isRequired,
-    toast: PropTypes.func,
     twoFactorAuthPrompt: PropTypes.object,
     router: PropTypes.object,
-    token: PropTypes.string,
     client: PropTypes.object,
-    loadingLoggedInUser: PropTypes.bool,
     children: PropTypes.node,
     intl: PropTypes.object,
     /**
@@ -40,11 +38,13 @@ class UserProvider extends React.Component {
      * on `/signin` that uses `Router` will crash. Setting this prop bypass this behavior.
      */
     skipRouteCheck: PropTypes.bool,
+
+    initialLoggedInUser: PropTypes.object,
   };
 
   state = {
-    loadingLoggedInUser: true,
-    LoggedInUser: null,
+    loadingLoggedInUser: this.props.initialLoggedInUser ? false : true,
+    LoggedInUser: this.props.initialLoggedInUser,
     errorLoggedInUser: null,
   };
 
@@ -81,10 +81,8 @@ class UserProvider extends React.Component {
   };
 
   logout = async ({ redirect, skipQueryRefetch } = {}) => {
-    removeFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-    removeFromLocalStorage(LOCAL_STORAGE_KEYS.TWO_FACTOR_AUTH_TOKEN);
-    removeFromLocalStorage(LOCAL_STORAGE_KEYS.LAST_DASHBOARD_SLUG);
-    removeFromLocalStorage(LOCAL_STORAGE_KEYS.DASHBOARD_NAVIGATION_STATE);
+    auth.logout();
+
     this.setState({ LoggedInUser: null, errorLoggedInUser: null });
     // Clear the Apollo store without automatically refetching queries
     await this.props.client.clearStore();

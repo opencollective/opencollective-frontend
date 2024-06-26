@@ -123,9 +123,9 @@ const serverSideFetch = async (url, options: { headers?: any; agent?: any; body?
   }
 };
 
-function createLink({ twoFactorAuthContext }) {
+function createLink({ twoFactorAuthContext, accessToken = null }) {
   const authLink = setContext((_, { headers }) => {
-    const token = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+    const token = accessToken || getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
     if (token) {
       return {
         headers: {
@@ -237,13 +237,13 @@ function createInMemoryCache() {
   return inMemoryCache;
 }
 
-function createClient({ initialState, twoFactorAuthContext }: any = {}) {
+function createClient({ initialState, twoFactorAuthContext, accessToken }: any = {}) {
   const cache = createInMemoryCache();
   if (initialState) {
     cache.restore(initialState);
   }
 
-  const link = createLink({ twoFactorAuthContext });
+  const link = createLink({ twoFactorAuthContext, accessToken });
 
   return new ApolloClient({
     cache,
@@ -254,11 +254,13 @@ function createClient({ initialState, twoFactorAuthContext }: any = {}) {
   });
 }
 
-export function initClient({ initialState, twoFactorAuthContext }: any = {}): ReturnType<typeof createClient> {
+export function initClient({ initialState, twoFactorAuthContext, accessToken }: any = {}): ReturnType<
+  typeof createClient
+> {
   // Make sure to create a new client for every server-side request so that data
   // isn't shared between connections (which would be bad)
   if (!process.browser) {
-    return createClient({ initialState });
+    return createClient({ initialState, accessToken });
   }
 
   // Reuse client on the client-side
@@ -306,11 +308,13 @@ export function getSSRQueryHelpers<TVariables, TProps = Record<string, unknown>>
   type ServerSideProps = TProps & SSRQueryHelperProps<TVariables>;
   return {
     getServerSideProps: async (
-      context: GetServerSidePropsContext,
+      context: GetServerSidePropsContext & {
+        req: GetServerSidePropsContext['res'] & { apolloClient: ApolloClient<unknown> };
+      },
     ): Promise<GetServerSidePropsResult<ServerSideProps>> => {
       const props = (getPropsFromContext && getPropsFromContext(context)) || {};
       const variables = (getVariablesFromContext && getVariablesFromContext(context, props)) || {};
-      const client = initClient();
+      const client = context.req.apolloClient;
       let error;
 
       try {
@@ -322,7 +326,6 @@ export function getSSRQueryHelpers<TVariables, TProps = Record<string, unknown>>
       return {
         props: {
           ...omitBy<TProps>(props, isUndefined),
-          [APOLLO_STATE_PROP_NAME]: client.cache.extract(),
           [APOLLO_VARIABLES_PROP_NAME]: omitBy<TVariables>(variables, isUndefined) as Partial<TVariables>,
           [APOLLO_ERROR_PROP_NAME]: !error ? null : JSON.parse(JSON.stringify(error)),
         } as ServerSideProps,

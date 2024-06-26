@@ -26,7 +26,11 @@ export const ssrGraphQLQuery = ({
   return ComposedComponent => {
     return class WithSSRQuery extends React.Component {
       static async getInitialProps(context) {
-        const client = initClient();
+        const client =
+          context.req?.apolloClient ||
+          initClient({
+            initialState: window?.__NEXT_DATA__?.props?.[APOLLO_STATE_PROP_NAME],
+          });
         let composedInitialProps = {};
         if (ComposedComponent.getInitialProps) {
           composedInitialProps = await ComposedComponent.getInitialProps(context);
@@ -60,7 +64,6 @@ export const ssrGraphQLQuery = ({
 
         return {
           ...composedInitialProps,
-          [APOLLO_STATE_PROP_NAME]: client.cache.extract(), // This will be used in `_app` to initialize the Apollo client
           [APOLLO_VARIABLES_PROP_NAME]: omitBy(variables, isUndefined),
         };
       }
