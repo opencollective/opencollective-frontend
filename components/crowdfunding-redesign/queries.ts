@@ -58,7 +58,6 @@ export const profilePageQuery = gql`
             }
             endsAt
             amountType
-            interval
             frequency
             availableQuantity
           }
@@ -91,6 +90,28 @@ export const profilePageQuery = gql`
           description
           type
           slug
+          settings
+          currency
+          stats {
+            totalAmountReceived {
+              valueInCents
+              currency
+            }
+            yearlyBudget {
+              valueInCents
+              currency
+            }
+            activeRecurringContributionsBreakdown {
+              label
+              amount {
+                valueInCents
+                currency
+              }
+              count
+            }
+
+            contributorsCount
+          }
         }
       }
 

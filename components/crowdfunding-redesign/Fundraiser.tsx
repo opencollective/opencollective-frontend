@@ -5,6 +5,7 @@ import { Markup } from 'interweave';
 import { merge, pick } from 'lodash';
 import { ArrowRight } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
+import LiteYouTubeEmbed from 'react-lite-youtube-embed';
 
 import { getPrecisionFromAmount, graphqlAmountValueInCents } from '../../lib/currency-utils';
 import { isPastEvent } from '../../lib/events';
@@ -18,7 +19,14 @@ import Link from '../Link';
 import { Button } from '../ui/Button';
 import { Progress } from '../ui/Progress';
 
+import {
+  aggregateGoalAmounts,
+  getDefaultFundraiserValues,
+  getYouTubeIDFromUrl,
+  triggerPrototypeToast,
+} from './helpers';
 import { Tabs } from './Tabs';
+import { ThemeColor } from './ThemeColor';
 
 const canContribute = (collective, LoggedInUser) => {
   if (!collective.isActive) {
@@ -28,10 +36,6 @@ const canContribute = (collective, LoggedInUser) => {
   } else {
     return true;
   }
-};
-const aggregateGoalAmounts = goals => {
-  const totalAmount = goals.reduce((acc, goal) => acc + goal.amount, 0);
-  return { amount: totalAmount };
 };
 
 const Tiers = ({ account }) => {
@@ -89,7 +93,9 @@ const Tiers = ({ account }) => {
                 </div>
               </div>
             )}
-            <Button>{tier.button || <FormattedMessage defaultMessage="Contribute" id="Contribute" />}</Button>
+            <Button onClick={triggerPrototypeToast}>
+              {tier.button || <FormattedMessage defaultMessage="Contribute" id="Contribute" />}
+            </Button>
           </div>
         );
       })}
@@ -108,17 +114,16 @@ const Goals = ({ account }) => {
   const hasYearlyGoal = goals?.find(g => g.type === 'yearlyBudget');
   const hasMonthlyGoal = goals?.find(g => g.type === 'monthlyBudget');
   const currentAmount = hasYearlyGoal
-    ? stats.yearlyBudget
+    ? stats.yearlyBudget.valueInCents
     : hasMonthlyGoal
-      ? stats.monthlyBudget
-      : stats.totalAmountReceived;
+      ? stats.yearlyBudget.valueInCents / 12
+      : stats.totalAmountReceived.valueInCents;
 
   let goalTarget;
   if (hasYearlyGoal || hasMonthlyGoal) {
     goalTarget = aggregateGoalAmounts(goals);
   }
-  const percentage = Math.round(goalTarget ? (currentAmount.valueInCents / goalTarget.amount) * 100 : 0);
-
+  const percentage = Math.round(goalTarget ? (currentAmount / goalTarget.amount) * 100 : 0);
   return (
     <div className="flex flex-col gap-4 text-muted-foreground">
       {goalTarget && <Progress value={percentage} />}
@@ -131,8 +136,8 @@ const Goals = ({ account }) => {
               <div>
                 <span className="text-3xl font-bold text-primary">
                   <FormattedMoneyAmount
-                    amount={currentAmount.valueInCents}
-                    currency={currentAmount.currency}
+                    amount={currentAmount}
+                    currency={currency}
                     showCurrencyCode={true}
                     amountStyles={{ letterSpacing: 0 }}
                     precision={0}
@@ -190,7 +195,7 @@ const ContentOverview = ({ content }) => {
         About
       </Link>
       {headingTexts.map(heading => (
-        <Link href="#" key={heading} className={linkClasses()}>
+        <Link href="#" key={heading} className={linkClasses()} onClick={triggerPrototypeToast}>
           {heading}
         </Link>
       ))}
@@ -198,38 +203,42 @@ const ContentOverview = ({ content }) => {
   );
 };
 
-export default function Fundraiser(props) {
-  const account = props.account;
-
-  const title = account.parent ? account.name : `Support ${account.name}`;
+export default function Fundraiser({ account }) {
+  const fundraiser = getDefaultFundraiserValues(account);
   const mainAccount = account.parent || account;
   return (
     <React.Fragment>
       <div className="border-b bg-background">
-        <div className="mx-auto flex h-16 max-w-screen-xl items-center justify-between">
+        <div className="mx-auto flex h-16 max-w-screen-xl items-center justify-between px-6">
           <Link href={`/preview/${account.parent?.slug || account.slug}`}>
             <Avatar className="" collective={account.parent || account} />
           </Link>
         </div>
       </div>
       <div className="">
-        <div className="mx-auto max-w-screen-xl space-y-8 py-12">
+        <div className="mx-auto max-w-screen-xl space-y-8 px-6 py-12">
           <div className="space-y-4 text-center">
-            <h1 className="text-balance text-4xl font-semibold">{title}</h1>
-            <p className="text-lg">{account.description}</p>
+            <h1 className="text-balance text-4xl font-semibold">{fundraiser.name}</h1>
+            <p className="text-lg">{fundraiser.description}</p>
           </div>
 
           <div className="flex grow gap-8">
             {/* main */}
             <div className="w-full max-w-[900px] grow space-y-4">
-              <div className="relative h-96 w-full overflow-hidden rounded-lg bg-primary/20">
-                {account.backgroundImageUrl && (
-                  <img src={account.backgroundImageUrl} alt="background" className="h-full w-full object-cover" />
-                )}
+              <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-primary/20">
+                {fundraiser.cover?.type === 'IMAGE' ? (
+                  <img alt="" src={fundraiser.cover.url} className="h-full w-full object-cover" />
+                ) : fundraiser.cover?.type === 'VIDEO' ? (
+                  <div className="h-full w-full">
+                    <LiteYouTubeEmbed
+                      id={getYouTubeIDFromUrl(fundraiser.cover.videoUrl)}
+                      title={`Cover Video for ${fundraiser.name}`}
+                    />
+                  </div>
+                ) : null}
               </div>
 
               <p>
-                {' '}
                 {account.type === 'EVENT' ? 'Event' : 'Fundraiser'} by{' '}
                 <Link className="font-semibold text-primary hover:underline" href={`/preview/${mainAccount.slug}`}>
                   {mainAccount.name} <ArrowRight className="inline align-middle" size={16} />
@@ -241,7 +250,7 @@ export default function Fundraiser(props) {
             <div className="w-full max-w-[420px] space-y-4">
               <Goals account={account} />
 
-              <Button className="w-full" size="xl">
+              <Button className="w-full" size="xl" onClick={triggerPrototypeToast}>
                 <FormattedMessage defaultMessage="Contribute" id="Contribute" />
               </Button>
             </div>
@@ -250,23 +259,25 @@ export default function Fundraiser(props) {
       </div>
 
       <div className="sticky top-0 z-10 border-b border-t bg-background">
-        <div className="relative mx-auto -mb-px h-16 max-w-screen-xl">
+        <div className="relative mx-auto -mb-px h-16 max-w-screen-xl px-6">
           <Tabs centered={false} tabs={['Fundraiser', 'Updates', 'Expenses']} />
         </div>
       </div>
       <div className="flex-1 bg-background">
-        <div className="relative mx-auto grid max-w-screen-xl grid-cols-12 gap-8 py-12">
+        <div className="relative mx-auto grid max-w-screen-xl grid-cols-12 gap-8 px-6 py-12">
           <div className="col-span-2">
             <div className="sticky top-28 space-y-4">
-              <ContentOverview content={account.longDescription} />
+              <ContentOverview content={fundraiser.longDescription} />
             </div>
           </div>
 
           <div className="prose prose-slate col-span-7">
-            <h2>About</h2>
+            <h2>
+              <FormattedMessage defaultMessage="About" id="collective.about.title" />
+            </h2>
             <Markup
               noWrap
-              content={account.longDescription}
+              content={fundraiser.longDescription ?? ''}
               allowAttributes
               transform={node => {
                 // Allow some iframes
@@ -296,6 +307,7 @@ export default function Fundraiser(props) {
           <div className="col-span-3">{account.tiers && <Tiers account={account} />}</div>
         </div>
       </div>
+      <ThemeColor color={fundraiser.primaryColor} />
     </React.Fragment>
   );
 }

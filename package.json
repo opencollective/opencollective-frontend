@@ -115,6 +115,7 @@
     "react-intersection-observer": "9.10.3",
     "react-intl": "6.6.8",
     "react-is": "18.3.1",
+    "react-lite-youtube-embed": "^2.4.0",
     "react-password-strength-bar": "0.4.1",
     "react-pdf": "7.7.3",
     "react-popper": "2.3.0",
