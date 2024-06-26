@@ -3,6 +3,7 @@ import { cva } from 'class-variance-authority';
 import clsx from 'clsx';
 
 import Link from '../Link';
+
 import { triggerPrototypeToast } from './helpers';
 
 export const Tabs = ({ tabs, centered }) => {
