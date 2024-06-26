@@ -23,7 +23,7 @@ const STRIPE_REUSABLE_PAYMENT_METHODS_TYPES = [
 ];
 
 function isReusableStripePaymentMethodType(type) {
-  return STRIPE_REUSABLE_PAYMENT_METHODS_TYPES.includes(type);
+  return STRIPE_REUSABLE_PAYMENT_METHODS_TYPES.map(pmType => pmType.toLowerCase()).includes(type);
 }
 
 export function PayWithStripeForm({
