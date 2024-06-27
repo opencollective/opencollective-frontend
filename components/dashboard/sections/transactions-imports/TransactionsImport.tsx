@@ -83,6 +83,7 @@ const transactionsImportQuery = gql`
         legacyId
         slug
         currency
+        type
       }
       rows {
         totalCount
@@ -259,8 +260,10 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                       if (row.original.expense) {
                         return (
                           <StyledLink
-                            href={`${row.original.expense.account.slug}/expenses/${row.original.expense.legacyId}`}
+                            className="flex items-center gap-1"
+                            href={`/${row.original.expense.account.slug}/expenses/${row.original.expense.legacyId}`}
                           >
+                            <Avatar collective={row.original.expense.account} size={24} />
                             <FormattedMessage
                               id="E9pJQz"
                               defaultMessage="Expense #{id}"
