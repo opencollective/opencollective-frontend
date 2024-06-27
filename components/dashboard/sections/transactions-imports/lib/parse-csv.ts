@@ -189,6 +189,14 @@ export const getDefaultCSVConfig = (currency: Currency): CSVConfig => ({
   columns: guessCSVColumnsConfig([], currency),
 });
 
+const cleanDescription = str => {
+  if (!str) {
+    return '';
+  } else {
+    return str.replace(/[\n\t\r\s]+/g, ' ').trim();
+  }
+};
+
 export const applyCSVConfig = (row: Record<string, string>, csvConfig: CSVConfig): TransactionsImportRowCreateInput => {
   const columnsConfig = csvConfig.columns;
   const amountColumns = uniq([columnsConfig.credit.target, columnsConfig.debit.target]).filter(Boolean);
@@ -221,7 +229,7 @@ export const applyCSVConfig = (row: Record<string, string>, csvConfig: CSVConfig
   return {
     rawValue: row,
     sourceId: `${row[columnsConfig.date.target]}|${amount?.valueInCents}|${amount?.currency}`,
-    description: row[columnsConfig.description.target],
+    description: cleanDescription(row[columnsConfig.description.target]),
     date: dayjs(row[columnsConfig.date.target], columnsConfig.date.format),
     amount,
   };
