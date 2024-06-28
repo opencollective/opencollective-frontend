@@ -109,6 +109,7 @@ const ExpenseBudgetItem = ({
   selected,
   expandExpense,
   useDrawer,
+  llmPredictions,
 }) => {
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
@@ -233,6 +234,7 @@ const ExpenseBudgetItem = ({
                     canEdit={get(expense, 'permissions.canEditAccountingCategory', false)}
                     allowNone={!isLoggedInUserExpenseHostAdmin}
                     showCodeInSelect={isLoggedInUserExpenseHostAdmin}
+                    llmPredictions={llmPredictions}
                   />
                 </div>
               )}

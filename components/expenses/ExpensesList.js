@@ -80,6 +80,7 @@ const ExpensesList = ({
   setOpenExpenseLegacyId,
   openExpenseLegacyId,
   onDuplicateClick,
+  llmPredictions,
 }) => {
   // Initial values for expense in drawer
   const expenseInDrawer = React.useMemo(() => {
@@ -132,6 +133,7 @@ const ExpensesList = ({
                   onDelete={onDelete}
                   onProcess={onProcess}
                   selected={openExpenseLegacyId === expense.legacyId}
+                  llmPredictions={llmPredictions && llmPredictions[expense.legacyId.toString()]}
                   expandExpense={e => {
                     e.preventDefault();
                     setOpenExpenseLegacyId(expense.legacyId);

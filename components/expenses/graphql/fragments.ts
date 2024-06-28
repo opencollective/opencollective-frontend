@@ -739,6 +739,10 @@ export const expensesListFieldsFragment = gql`
       }
       ...AccountHoverCardFields
     }
+    items {
+      id
+      description
+    }
     createdByAccount {
       id
       type
