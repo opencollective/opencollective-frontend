@@ -248,20 +248,20 @@ jobs:
           CYPRESS_TEST_FILES: ${{ matrix.files }}
 
       - name: Archive test recordings
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: cypress-recordings
+          name: cypress-recordings-${{ matrix.files//\*/_ }}
           path: |
             test/cypress/screenshots
             test/cypress/videos
-        if: ${{ failure() }}
+        # if: ${{ failure() }}
 
       - name: Archive download folder
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: downloads
+          name: downloads-${{ matrix.files//\*/_ }}
           path: test/cypress/downloads
-        if: ${{ failure() }}
+        # if: ${{ failure() }}
 
       - name: Report coverage
         uses: codecov/codecov-action@v4
