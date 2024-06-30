@@ -332,6 +332,7 @@ const formSchemaQuery = gql`
         friendlyName
         code
         instructions
+        appliesTo
       }
     }
   }
@@ -403,6 +404,12 @@ const formSchemaQuery = gql`
     ... on Organization {
       host {
         ...ExpenseFormSchemaHostFields
+      }
+    }
+    ... on AccountWithParent {
+      parent {
+        id
+        slug
       }
     }
   }

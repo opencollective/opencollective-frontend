@@ -30,8 +30,8 @@ const updateOrderAccountingCategoryMutation = gql/* GraphQL */ `
 type AccountingCategoryPillProps = {
   order: Pick<Order, 'id'> & { accountingCategory?: Pick<AccountingCategory, 'friendlyName' | 'name' | 'code' | 'id'> };
   canEdit: boolean;
-  account: Pick<Account, 'slug'>;
-  host: Pick<Host, 'slug'> & {
+  account: Pick<Account, 'id' | 'slug'>;
+  host: Pick<Host, 'id' | 'slug'> & {
     accountingCategories?: { nodes: Array<Pick<AccountingCategory, 'friendlyName' | 'name' | 'code' | 'id'>> };
   };
   /** Whether to allow the user to select "I don't know" */

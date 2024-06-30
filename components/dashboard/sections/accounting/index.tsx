@@ -5,6 +5,7 @@ import { PlusIcon } from 'lucide-react';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
+import { CollectiveType } from '../../../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type {
@@ -36,6 +37,7 @@ const accountingCategoriesQuery = gql`
   query AdminAccountingCategories($hostSlug: String!) {
     host(slug: $hostSlug) {
       id
+      type
       slug
       accountingCategories {
         totalCount
@@ -49,6 +51,7 @@ const accountingCategoriesQuery = gql`
           friendlyName
           expensesTypes
           createdAt
+          appliesTo
         }
       }
     }
@@ -76,6 +79,7 @@ const editAccountingCategoryMutation = gql`
               friendlyName
               expensesTypes
               createdAt
+              appliesTo
             }
           }
         }
@@ -85,7 +89,16 @@ const editAccountingCategoryMutation = gql`
 `;
 
 function categoryToEditableFields(category: AccountingCategory) {
-  const editableFields = ['kind', 'code', 'name', 'friendlyName', 'expensesTypes', 'hostOnly', 'instructions'];
+  const editableFields = [
+    'kind',
+    'code',
+    'name',
+    'friendlyName',
+    'expensesTypes',
+    'hostOnly',
+    'instructions',
+    'appliesTo',
+  ];
   return pick(category, ['id', ...editableFields]);
 }
 
@@ -99,19 +112,19 @@ const orderByCodeFilter = buildOrderByFilter(
   },
 );
 
-const appliesToFilter = buildComboSelectFilter(
+const kindFilter = buildComboSelectFilter(
   z
     .array(
       z.enum([AccountingCategoryKind.ADDED_FUNDS, AccountingCategoryKind.CONTRIBUTION, AccountingCategoryKind.EXPENSE]),
     )
     .optional(),
-  defineMessage({ defaultMessage: 'Applies to', id: '6WqHWi' }),
+  defineMessage({ defaultMessage: 'Kind', id: 'Transaction.Kind' }),
   AccountingCategoryKindI18n,
 );
 
 const hostOnlyFilter = buildComboSelectFilter(
   z.enum(['yes', 'no']).optional(),
-  defineMessage({ defaultMessage: 'Host only', id: 'qj+AAT' }),
+  defineMessage({ defaultMessage: 'Visible only to host admins', id: 'NvBPFR' }),
   {
     ['yes']: defineMessage({ defaultMessage: 'Yes', id: 'a5msuh' }),
     ['no']: defineMessage({ defaultMessage: 'No', id: 'oUWADl' }),
@@ -135,7 +148,7 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
         z.object({
           searchTerm: searchFilter.schema,
           orderBy: orderByCodeFilter.schema,
-          appliesTo: appliesToFilter.schema,
+          kind: kindFilter.schema,
           hostOnly: hostOnlyFilter.schema,
         }),
       [],
@@ -143,13 +156,13 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
     filters: {
       searchTerm: searchFilter.filter,
       orderBy: orderByCodeFilter.filter,
-      appliesTo: appliesToFilter.filter,
+      kind: kindFilter.filter,
       hostOnly: hostOnlyFilter.filter,
     },
     toVariables: {
       searchTerm: searchFilter.toVariables,
       orderBy: orderByCodeFilter.toVariables,
-      appliesTo: appliesToFilter.toVariables,
+      kind: kindFilter.toVariables,
       hostOnly: v => v === 'yes',
     },
   });
@@ -164,13 +177,15 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
     },
   );
 
+  const isIndependentCollective = query.data?.host?.type === CollectiveType.COLLECTIVE;
+
   const categories = React.useMemo(
     () => query.data?.host?.accountingCategories?.nodes || [],
     [query.data?.host?.accountingCategories?.nodes],
   );
 
   const filterFn: (c: (typeof categories)[number]) => boolean = React.useMemo(() => {
-    if (!queryFilter.values.searchTerm && !queryFilter.values.appliesTo && !queryFilter.values.hostOnly) {
+    if (!queryFilter.values.searchTerm && !queryFilter.values.kind && !queryFilter.values.hostOnly) {
       return null;
     }
 
@@ -178,7 +193,7 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
     return c => {
       return (
         (!termRegExp || termRegExp.test(c.code) || termRegExp.test(c.name) || termRegExp.test(c.friendlyName)) &&
-        (!queryFilter.values.appliesTo || queryFilter.values.appliesTo.includes(c.kind)) &&
+        (!queryFilter.values.kind || queryFilter.values.kind.includes(c.kind)) &&
         (!queryFilter.values.hostOnly || (queryFilter.values.hostOnly === 'yes') === c.hostOnly)
       );
     };
@@ -297,7 +312,11 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
         />
       </div>
       {isCreateCategoryModalOpen && (
-        <CreateAccountingCategoryModal onClose={() => setIsCreateCategoryModalOpen(false)} onCreate={onCreate} />
+        <CreateAccountingCategoryModal
+          isIndependentCollective={isIndependentCollective}
+          onClose={() => setIsCreateCategoryModalOpen(false)}
+          onCreate={onCreate}
+        />
       )}
       {deleteCategoryConfirmation && (
         <ConfirmationModal

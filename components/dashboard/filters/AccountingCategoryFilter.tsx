@@ -21,6 +21,7 @@ const accountingCategoriesQuery = gql`
           code
           name
           kind
+          appliesTo
         }
       }
     }

@@ -2,13 +2,14 @@ import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { AccountingCategory } from '../../../../lib/graphql/types/v2/graphql';
-import { AccountingCategoryKind } from '../../../../lib/graphql/types/v2/graphql';
+import { AccountingCategoryAppliesTo, AccountingCategoryKind } from '../../../../lib/graphql/types/v2/graphql';
 
 import StyledButton from '../../../StyledButton';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../../StyledModal';
 
 import type { EditableAccountingCategoryFields } from './AccountingCategoryForm';
 import {
+  AccountingCategoryAppliesToI18n,
   AccountingCategoryForm,
   AccountingCategoryKindI18n,
   useAccountingCategoryFormik,
@@ -17,6 +18,7 @@ import {
 type CreateAccountingCategoryModalProps = {
   onClose: () => void;
   onCreate: (category: Pick<AccountingCategory, EditableAccountingCategoryFields>) => Promise<void>;
+  isIndependentCollective: boolean;
 };
 
 export function CreateAccountingCategoryModal(props: CreateAccountingCategoryModalProps) {
@@ -43,6 +45,18 @@ export function CreateAccountingCategoryModal(props: CreateAccountingCategoryMod
         value: false,
         label: intl.formatMessage({ defaultMessage: 'No', id: 'oUWADl' }),
       },
+      appliesTo: {
+        value: props.isIndependentCollective
+          ? AccountingCategoryAppliesTo.HOST
+          : AccountingCategoryAppliesTo.HOSTED_COLLECTIVES,
+        label: intl.formatMessage(
+          AccountingCategoryAppliesToI18n[
+            props.isIndependentCollective
+              ? AccountingCategoryAppliesTo.HOST
+              : AccountingCategoryAppliesTo.HOSTED_COLLECTIVES
+          ],
+        ),
+      },
     },
     async onSubmit(values) {
       await createAccountingCategory({
@@ -51,6 +65,11 @@ export function CreateAccountingCategoryModal(props: CreateAccountingCategoryMod
         kind: values.kind ? values.kind.value : null,
         expensesTypes:
           values.expensesTypes && values.expensesTypes.length > 0 ? values.expensesTypes.map(t => t.value) : null,
+        appliesTo: values.appliesTo
+          ? values.appliesTo.value
+          : props.isIndependentCollective
+            ? AccountingCategoryAppliesTo.HOST
+            : AccountingCategoryAppliesTo.HOSTED_COLLECTIVES,
       });
     },
   });
@@ -61,7 +80,7 @@ export function CreateAccountingCategoryModal(props: CreateAccountingCategoryMod
         <FormattedMessage defaultMessage="Create accounting category" id="M+dnU9" />
       </ModalHeader>
       <ModalBody>
-        <AccountingCategoryForm formik={formik} />
+        <AccountingCategoryForm formik={formik} isIndependentCollective={props.isIndependentCollective} />
       </ModalBody>
       <ModalFooter showDivider={false}>
         <form onSubmit={e => formik.handleSubmit(e)}>
