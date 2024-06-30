@@ -224,6 +224,7 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                 name
                 friendlyName
                 kind
+                appliesTo
               }
             }
           }

@@ -3,7 +3,11 @@ import { useFormik } from 'formik';
 import { omit } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
 
-import { AccountingCategoryKind, ExpenseType } from '../../../../lib/graphql/types/v2/graphql';
+import {
+  AccountingCategoryAppliesTo,
+  AccountingCategoryKind,
+  ExpenseType,
+} from '../../../../lib/graphql/types/v2/graphql';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 
 import RichTextEditor from '../../../RichTextEditor';
@@ -15,6 +19,7 @@ type FormValues = {
   name: string;
   friendlyName?: string;
   code: string;
+  appliesTo?: { value: AccountingCategoryAppliesTo; label: string };
   kind: { value: AccountingCategoryKind; label: string };
   expensesTypes?: { value: ExpenseType; label: string }[];
   hostOnly?: { value: boolean; label: string };
@@ -28,7 +33,8 @@ export type EditableAccountingCategoryFields =
   | 'name'
   | 'friendlyName'
   | 'code'
-  | 'expensesTypes';
+  | 'expensesTypes'
+  | 'appliesTo';
 
 type useAccountingCategoryFormikOptions = {
   onSubmit: (values: FormValues) => void | Promise<void>;
@@ -65,8 +71,20 @@ export const AccountingCategoryKindI18n = defineMessages({
   },
 });
 
+export const AccountingCategoryAppliesToI18n = defineMessages({
+  [AccountingCategoryAppliesTo.HOST]: {
+    id: 'AccountingCategory.AppliesTo.HOST',
+    defaultMessage: 'Operational Funds',
+  },
+  [AccountingCategoryAppliesTo.HOSTED_COLLECTIVES]: {
+    id: 'AccountingCategory.AppliesTo.HOSTED_COLLECTIVES',
+    defaultMessage: 'Managed Funds',
+  },
+});
+
 type AccountingCategoryFormProps = {
   formik: ReturnType<typeof useFormik<FormValues>>;
+  isIndependentCollective: boolean;
 };
 
 export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
@@ -80,6 +98,17 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
     {
       value: AccountingCategoryKind.CONTRIBUTION,
       label: intl.formatMessage(AccountingCategoryKindI18n[AccountingCategoryKind.CONTRIBUTION]),
+    },
+  ];
+
+  const accountingCategoryAppliesToOptions = [
+    {
+      value: AccountingCategoryAppliesTo.HOSTED_COLLECTIVES,
+      label: intl.formatMessage(AccountingCategoryAppliesToI18n[AccountingCategoryAppliesTo.HOSTED_COLLECTIVES]),
+    },
+    {
+      value: AccountingCategoryAppliesTo.HOST,
+      label: intl.formatMessage(AccountingCategoryAppliesToI18n[AccountingCategoryAppliesTo.HOST]),
     },
   ];
 
@@ -102,75 +131,20 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
   return (
     <React.Fragment>
       <StyledInputField
-        name="kind"
         required
-        label={intl.formatMessage({ defaultMessage: 'Category kind', id: 'pEw+x/' })}
+        name="code"
+        label={intl.formatMessage({ defaultMessage: 'Accounting code', id: 'tvVFNA' })}
         mt={3}
       >
-        <StyledSelect
-          {...props.formik.getFieldProps('kind')}
-          inputId="kind"
-          options={accountingCategoryKindOptions}
+        <StyledInput
+          {...props.formik.getFieldProps('code')}
           required
           width="100%"
           maxWidth={500}
-          onChange={({ value }) => {
-            const defaultHostOnly = value !== AccountingCategoryKind.EXPENSE;
-            props.formik.setValues({
-              ...props.formik.values,
-              hostOnly: hostOnlyOptions.find(c => c.value === defaultHostOnly),
-              kind: accountingCategoryKindOptions.find(c => c.value === value),
-            });
-          }}
+          maxLength={60}
+          onChange={e => props.formik.setFieldValue('code', e.target.value)}
         />
       </StyledInputField>
-      {props.formik.values.kind.value === AccountingCategoryKind.EXPENSE && (
-        <StyledInputField
-          name="hostOnly"
-          required
-          label={intl.formatMessage({ defaultMessage: 'Host only', id: 'qj+AAT' })}
-          mt={3}
-        >
-          <StyledSelect
-            {...props.formik.getFieldProps('hostOnly')}
-            inputId="hostOnly"
-            options={hostOnlyOptions}
-            required
-            width="100%"
-            maxWidth={500}
-            onChange={({ value }) =>
-              props.formik.setFieldValue(
-                'hostOnly',
-                hostOnlyOptions.find(c => c.value === value),
-              )
-            }
-          />
-        </StyledInputField>
-      )}
-      {props.formik.values.kind.value === AccountingCategoryKind.EXPENSE && (
-        <StyledInputField
-          name="expensesTypes"
-          required
-          label={intl.formatMessage({ defaultMessage: 'Expense Types', id: 'D+aS5Z' })}
-          mt={3}
-        >
-          <StyledSelect
-            {...props.formik.getFieldProps('expensesTypes')}
-            inputId="expensesTypes"
-            options={expenseTypeOptions}
-            placeholder={intl.formatMessage({ id: 'AllExpenses', defaultMessage: 'All expenses' })}
-            isMulti
-            width="100%"
-            maxWidth={500}
-            onChange={(options: { value: ExpenseType }[]) =>
-              props.formik.setFieldValue(
-                'expensesTypes',
-                options.map(({ value }) => expenseTypeOptions.find(c => c.value === value)),
-              )
-            }
-          />
-        </StyledInputField>
-      )}
       <StyledInputField
         name="name"
         required
@@ -201,21 +175,99 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
           onChange={e => props.formik.setFieldValue('friendlyName', e.target.value)}
         />
       </StyledInputField>
+      {!props.isIndependentCollective && (
+        <StyledInputField
+          name="appliesTo"
+          required
+          label={intl.formatMessage({ defaultMessage: 'Applies To', id: 'M+BG8u' })}
+          mt={3}
+        >
+          <StyledSelect
+            {...props.formik.getFieldProps('appliesTo')}
+            inputId="kind"
+            options={accountingCategoryAppliesToOptions}
+            required
+            width="100%"
+            maxWidth={500}
+            onChange={({ value }) => {
+              props.formik.setValues({
+                ...props.formik.values,
+                appliesTo: accountingCategoryAppliesToOptions.find(c => c.value === value),
+              });
+            }}
+          />
+        </StyledInputField>
+      )}
       <StyledInputField
+        name="kind"
         required
-        name="code"
-        label={intl.formatMessage({ defaultMessage: 'Accounting code', id: 'tvVFNA' })}
+        label={intl.formatMessage({ defaultMessage: 'Kind', id: 'Transaction.Kind' })}
         mt={3}
       >
-        <StyledInput
-          {...props.formik.getFieldProps('code')}
+        <StyledSelect
+          {...props.formik.getFieldProps('kind')}
+          inputId="kind"
+          options={accountingCategoryKindOptions}
           required
           width="100%"
           maxWidth={500}
-          maxLength={60}
-          onChange={e => props.formik.setFieldValue('code', e.target.value)}
+          onChange={({ value }) => {
+            const defaultHostOnly = value !== AccountingCategoryKind.EXPENSE;
+            props.formik.setValues({
+              ...props.formik.values,
+              hostOnly: hostOnlyOptions.find(c => c.value === defaultHostOnly),
+              kind: accountingCategoryKindOptions.find(c => c.value === value),
+            });
+          }}
         />
       </StyledInputField>
+      <StyledInputField
+        name="hostOnly"
+        required
+        label={intl.formatMessage({ defaultMessage: 'Visible only to host admins', id: 'NvBPFR' })}
+        mt={3}
+      >
+        <StyledSelect
+          {...props.formik.getFieldProps('hostOnly')}
+          inputId="hostOnly"
+          disabled={props.formik.values.kind.value !== AccountingCategoryKind.EXPENSE}
+          options={hostOnlyOptions}
+          required
+          width="100%"
+          maxWidth={500}
+          onChange={({ value }) =>
+            props.formik.setFieldValue(
+              'hostOnly',
+              hostOnlyOptions.find(c => c.value === value),
+            )
+          }
+        />
+      </StyledInputField>
+      {props.formik.values.kind.value === AccountingCategoryKind.EXPENSE && (
+        <StyledInputField
+          name="expensesTypes"
+          required
+          label={intl.formatMessage({ defaultMessage: 'Expense Types', id: 'D+aS5Z' })}
+          mt={3}
+        >
+          <StyledSelect
+            {...props.formik.getFieldProps('expensesTypes')}
+            inputId="expensesTypes"
+            options={expenseTypeOptions}
+            placeholder={intl.formatMessage({ id: 'AllExpenses', defaultMessage: 'All expenses' })}
+            isMulti
+            width="100%"
+            maxWidth={500}
+            onChange={(options: { value: ExpenseType }[]) =>
+              props.formik.setFieldValue(
+                'expensesTypes',
+                options.map(({ value }) => expenseTypeOptions.find(c => c.value === value)),
+              )
+            }
+          />
+        </StyledInputField>
+      )}
+
       {props.formik.values.kind.value === AccountingCategoryKind.EXPENSE && (
         <StyledInputField
           name="instructions"
