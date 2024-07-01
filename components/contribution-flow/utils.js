@@ -193,7 +193,7 @@ export const generatePaymentMethodOptions = (
   if (!balanceOnlyCollectiveTypes.includes(stepProfile.type)) {
     if (paymentIntent) {
       let availableMethodLabels = paymentIntent.payment_method_types.map(method => {
-        return intl.formatMessage(StripePaymentMethodsLabels[method]);
+        return StripePaymentMethodsLabels[method] ? intl.formatMessage(StripePaymentMethodsLabels[method]) : method;
       });
 
       if (availableMethodLabels.length > 3) {

@@ -375,6 +375,7 @@ class ContributionFlow extends React.Component {
 
       const returnUrl = new URL(`${baseRoute}/donate/success`);
       returnUrl.searchParams.set('OrderId', order.id);
+      returnUrl.searchParams.set('stripeAccount', stripeData?.stripe?.stripeAccount);
 
       const queryParams = this.getQueryParams();
       if (queryParams.redirect) {

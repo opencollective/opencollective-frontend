@@ -138,7 +138,9 @@ export const orderSuccessFragment = gql`
     }
     tier {
       id
+      legacyId
       name
+      slug
     }
     membership {
       id

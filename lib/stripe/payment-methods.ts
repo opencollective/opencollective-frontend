@@ -31,6 +31,7 @@ enum StripePaymentMethod {
   sofort = 'sofort',
   us_bank_account = 'us_bank_account',
   wechat_pay = 'wechat_pay',
+  swish = 'swish',
 }
 
 const RestrictedCurrencyByStripePaymentMethod: Partial<Record<StripePaymentMethod, string[]>> = {
@@ -97,4 +98,5 @@ export const StripePaymentMethodsLabels = defineMessages<StripePaymentMethod>({
     defaultMessage: 'ACH Direct Debit',
   },
   [StripePaymentMethod.wechat_pay]: { id: 'Stripe.PaymentMethod.Label.wechat_pay', defaultMessage: 'WeChat Pay' },
+  [StripePaymentMethod.swish]: { id: 'Stripe.PaymentMethod.Label.swish', defaultMessage: 'Swish' },
 });

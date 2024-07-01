@@ -7,6 +7,7 @@ import { get, isEmpty, pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
+import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import type { Account, CaptchaInput, Host, Individual } from '../../lib/graphql/types/v2/graphql';
 import { PaymentMethodLegacyType } from '../../lib/graphql/types/v2/graphql';
@@ -140,6 +141,7 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
         : { legacyId: props.stepProfile.id },
     guestInfo: props.stepProfile.isGuest ? getGuestInfoFromStepProfile(props.stepProfile) : undefined,
     toAccount: pick(props.toAccount, 'id'),
+    frequency: getGQLV2FrequencyFromInterval(props.stepDetails.interval as any) as any,
   });
 
   const paymentMethodOptions = React.useMemo(() => {
