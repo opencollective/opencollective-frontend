@@ -2,7 +2,7 @@ import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { AccountingCategory } from '../../../../lib/graphql/types/v2/graphql';
-import { AccountingCategoryKind } from '../../../../lib/graphql/types/v2/graphql';
+import { AccountingCategoryAppliesTo, AccountingCategoryKind } from '../../../../lib/graphql/types/v2/graphql';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 
 import { Drawer, DrawerActions, DrawerHeader } from '../../../Drawer';
@@ -12,6 +12,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 
 import type { EditableAccountingCategoryFields } from './AccountingCategoryForm';
 import {
+  AccountingCategoryAppliesToI18n,
   AccountingCategoryForm,
   AccountingCategoryKindI18n,
   useAccountingCategoryFormik,
@@ -23,6 +24,7 @@ type AccountingCategoryDrawerProps = {
   onEdit: (category: Pick<AccountingCategory, 'id' | EditableAccountingCategoryFields>) => void;
   onDelete: (category: Pick<AccountingCategory, 'id'>) => void;
   accountingCategory?: Pick<AccountingCategory, 'id' | EditableAccountingCategoryFields>;
+  isIndependentCollective: boolean;
 };
 
 export function AccountingCategoryDrawer(props: AccountingCategoryDrawerProps) {
@@ -40,6 +42,7 @@ export function AccountingCategoryDrawer(props: AccountingCategoryDrawerProps) {
 
       {!isEditing && (
         <AccountingCategoryDrawerView
+          isIndependentCollective={props.isIndependentCollective}
           onEditClick={() => setIsEditing(true)}
           onDeleteClick={() => props.onDelete(props.accountingCategory)}
           accountingCategory={props.accountingCategory}
@@ -47,6 +50,7 @@ export function AccountingCategoryDrawer(props: AccountingCategoryDrawerProps) {
       )}
       {isEditing && (
         <AccountingCategoryEditingDrawerView
+          isIndependentCollective={props.isIndependentCollective}
           accountingCategory={props.accountingCategory}
           onEdit={props.onEdit}
           onExitEdit={() => setIsEditing(false)}
@@ -60,31 +64,25 @@ type AccountingCategoryDrawerViewProps = {
   accountingCategory?: Pick<AccountingCategory, 'id' | EditableAccountingCategoryFields>;
   onEditClick: () => void;
   onDeleteClick: () => void;
+  isIndependentCollective: boolean;
 };
 
 function AccountingCategoryDrawerView(props: AccountingCategoryDrawerViewProps) {
   const intl = useIntl();
+
   return (
     <React.Fragment>
       <div>
-        <label className="mb-1 text-base">
-          <FormattedMessage defaultMessage="Applies to" id="6WqHWi" />
-        </label>
-        <p>
-          {props.accountingCategory?.kind && (
-            <FormattedMessage {...AccountingCategoryKindI18n[props.accountingCategory?.kind]} />
-          )}
-        </p>
         <label className="mb-1 mt-4 text-base">
-          <FormattedMessage defaultMessage="Host only" id="qj+AAT" />
+          <FormattedMessage defaultMessage="Accounting code" id="tvVFNA" />
         </label>
+
         <p>
-          {props.accountingCategory?.hostOnly ? (
-            <FormattedMessage defaultMessage="Yes" id="a5msuh" />
-          ) : (
-            <FormattedMessage defaultMessage="No" id="oUWADl" />
-          )}
+          <span className="inline-block rounded-xl bg-slate-50 px-2 py-1 font-bold text-slate-800">
+            {props.accountingCategory?.code}
+          </span>
         </p>
+
         <label className="mb-1 mt-4 text-base">
           <FormattedMessage defaultMessage="Category name" id="kgVqk1" />
         </label>
@@ -99,14 +97,38 @@ function AccountingCategoryDrawerView(props: AccountingCategoryDrawerViewProps) 
           </React.Fragment>
         )}
 
-        <label className="mb-1 mt-4 text-base">
-          <FormattedMessage defaultMessage="Accounting code" id="tvVFNA" />
-        </label>
+        {!props.isIndependentCollective && (
+          <React.Fragment>
+            {' '}
+            <label className="mb-1 mt-4 text-base">
+              <FormattedMessage defaultMessage="Applies to" id="6WqHWi" />
+            </label>
+            <p>
+              {props.accountingCategory?.appliesTo && (
+                <FormattedMessage {...AccountingCategoryAppliesToI18n[props.accountingCategory?.appliesTo]} />
+              )}
+            </p>
+          </React.Fragment>
+        )}
 
+        <label className="mb-1 mt-4 text-base">
+          <FormattedMessage defaultMessage="Kind" id="Transaction.Kind" />
+        </label>
         <p>
-          <span className="inline-block rounded-xl bg-slate-50 px-2 py-1 font-bold text-slate-800">
-            {props.accountingCategory?.code}
-          </span>
+          {props.accountingCategory?.kind && (
+            <FormattedMessage {...AccountingCategoryKindI18n[props.accountingCategory?.kind]} />
+          )}
+        </p>
+
+        <label className="mb-1 mt-4 text-base">
+          <FormattedMessage defaultMessage="Visible only to host admins" id="NvBPFR" />
+        </label>
+        <p>
+          {props.accountingCategory?.hostOnly ? (
+            <FormattedMessage defaultMessage="Yes" id="a5msuh" />
+          ) : (
+            <FormattedMessage defaultMessage="No" id="oUWADl" />
+          )}
         </p>
 
         {props.accountingCategory?.kind === AccountingCategoryKind.EXPENSE && (
@@ -163,11 +185,11 @@ type AccountingCategoryEditingDrawerViewProps = {
   accountingCategory?: Pick<AccountingCategory, 'id' | EditableAccountingCategoryFields>;
   onEdit: (category: Pick<AccountingCategory, 'id' | EditableAccountingCategoryFields>) => void;
   onExitEdit: () => void;
+  isIndependentCollective: boolean;
 };
 
 function AccountingCategoryEditingDrawerView(props: AccountingCategoryEditingDrawerViewProps) {
   const intl = useIntl();
-
   const initialValues = React.useMemo(() => {
     return {
       name: props.accountingCategory?.name,
@@ -179,6 +201,12 @@ function AccountingCategoryEditingDrawerView(props: AccountingCategoryEditingDra
           AccountingCategoryKindI18n[props.accountingCategory?.kind || AccountingCategoryKind.EXPENSE],
         ),
       },
+      appliesTo: props.accountingCategory?.appliesTo
+        ? {
+            value: props.accountingCategory?.appliesTo,
+            label: intl.formatMessage(AccountingCategoryAppliesToI18n[props.accountingCategory?.appliesTo]),
+          }
+        : null,
       hostOnly: {
         value: props.accountingCategory?.hostOnly,
         label: props.accountingCategory?.hostOnly
@@ -204,6 +232,11 @@ function AccountingCategoryEditingDrawerView(props: AccountingCategoryEditingDra
           instructions: values.instructions,
           expensesTypes:
             values.expensesTypes && values.expensesTypes.length > 0 ? values.expensesTypes.map(t => t.value) : null,
+          appliesTo: values.appliesTo
+            ? values.appliesTo.value
+            : props.isIndependentCollective
+              ? AccountingCategoryAppliesTo.HOST
+              : AccountingCategoryAppliesTo.HOSTED_COLLECTIVES,
         });
         props.onExitEdit();
       } catch (e) {
@@ -213,7 +246,7 @@ function AccountingCategoryEditingDrawerView(props: AccountingCategoryEditingDra
   });
   return (
     <React.Fragment>
-      <AccountingCategoryForm formik={formik} />
+      <AccountingCategoryForm isIndependentCollective={props.isIndependentCollective} formik={formik} />
       <DrawerActions>
         <StyledButton onClick={props.onExitEdit}>
           <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />

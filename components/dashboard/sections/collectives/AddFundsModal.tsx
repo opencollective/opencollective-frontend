@@ -215,6 +215,7 @@ const addFundsAccountQueryHostFieldsFragment = gql`
         code
         name
         kind
+        appliesTo
       }
     }
   }
