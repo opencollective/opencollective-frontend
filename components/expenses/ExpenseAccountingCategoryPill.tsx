@@ -42,6 +42,7 @@ const ExpenseAdminAccountingCategoryPill = ({
   host,
   allowNone,
   showCodeInSelect,
+  llmPredictions,
 }: Omit<ExpenseAccountingCategoryPillProps, 'canEdit'>) => {
   const intl = useIntl();
   const [editExpense, { loading }] = useMutation(editExpenseCategoryMutation, { context: API_V2_CONTEXT });
@@ -59,6 +60,7 @@ const ExpenseAdminAccountingCategoryPill = ({
       valuesByRole={expense.valuesByRole}
       showCode={showCodeInSelect}
       predictionStyle="inline"
+      llmPredictions={llmPredictions}
       onChange={async selectedCategory => {
         try {
           await editExpense({
@@ -87,6 +89,7 @@ export const ExpenseAccountingCategoryPill = ({
   canEdit,
   allowNone,
   showCodeInSelect = false,
+  llmPredictions = null,
 }: ExpenseAccountingCategoryPillProps) => {
   if (!canEdit || !host) {
     return <div className={BADGE_CLASS}>{getCategoryLabel(expense.accountingCategory)}</div>;
@@ -98,6 +101,7 @@ export const ExpenseAccountingCategoryPill = ({
         host={host}
         allowNone={allowNone}
         showCodeInSelect={showCodeInSelect}
+        llmPredictions={llmPredictions}
       />
     );
   }

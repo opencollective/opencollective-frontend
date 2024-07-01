@@ -1,5 +1,5 @@
 import React from 'react';
-import { get, isUndefined, pick, remove, size, throttle, uniq } from 'lodash';
+import { get, isUndefined, orderBy, pick, remove, size, throttle, uniq } from 'lodash';
 import { Check, ChevronDown, Sparkles } from 'lucide-react';
 import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -50,6 +50,7 @@ type OptionsMap = {
     value: AccountingCategory | null;
     searchText: string;
     label: React.ReactNode;
+    isPrediction: boolean;
   };
 };
 
@@ -172,6 +173,8 @@ const getOptions = (
   allowNone: boolean,
   valuesByRole: Expense['valuesByRole'],
   isHostAdmin: boolean,
+  predictions,
+  llmPredictions,
 ): OptionsMap => {
   const contributionCategories = ['CONTRIBUTION', 'ADDED_FUNDS'];
   const possibleFields = ACCOUNTING_CATEGORY_HOST_FIELDS;
@@ -190,6 +193,9 @@ const getOptions = (
       value: category,
       label: getCategoryLabel(intl, category, showCode, valuesByRole),
       searchText: getSearchTextFromCategory(category),
+      isPrediction:
+        predictions?.some(prediction => prediction.id === category.id) ||
+        llmPredictions?.some(prediction => prediction.code === category.code),
     };
   });
 
@@ -199,10 +205,11 @@ const getOptions = (
       value: null,
       label,
       searchText: intl.formatMessage({ defaultMessage: "I don't know", id: 'AkIyKO' }).toLocaleLowerCase(),
+      isPrediction: false,
     };
   }
 
-  return categoriesById;
+  return orderBy(categoriesById, ['isPrediction', 'code'], ['desc', 'asc']);
 };
 
 const getCleanInputData = (
@@ -301,12 +308,17 @@ const AccountingCategorySelect = ({
   expenseValues = undefined,
   borderRadiusClass = 'rounded-lg',
   children = null,
+  llmPredictions = null,
 }: AccountingCategorySelectProps) => {
   const intl = useIntl();
   const [isOpen, setOpen] = React.useState(false);
   const { LoggedInUser } = useLoggedInUser();
   const isHostAdmin = Boolean(LoggedInUser?.isAdminOfCollective(host));
-  const usePredictions = hostSupportsPredictions(host) && kind === 'EXPENSE' && (predictionStyle === 'full' || isOpen);
+  const usePredictions =
+    hostSupportsPredictions(host) &&
+    kind === 'EXPENSE' &&
+    (predictionStyle === 'full' || isOpen) &&
+    !llmPredictions?.length;
   const { predictions } = useExpenseCategoryPredictionService(usePredictions, host, account, expenseValues);
   const hasPredictions = Boolean(predictions?.length);
   const triggerChange = newCategory => {
@@ -315,8 +327,20 @@ const AccountingCategorySelect = ({
     }
   };
   const options = React.useMemo(
-    () => getOptions(intl, host, kind, expenseType, showCode, allowNone, valuesByRole, isHostAdmin),
-    [intl, host, kind, expenseType, allowNone, showCode, valuesByRole, isHostAdmin],
+    () =>
+      getOptions(
+        intl,
+        host,
+        kind,
+        expenseType,
+        showCode,
+        allowNone,
+        valuesByRole,
+        isHostAdmin,
+        predictions,
+        llmPredictions,
+      ),
+    [intl, host, kind, expenseType, allowNone, showCode, valuesByRole, isHostAdmin, predictions, llmPredictions],
   );
 
   return (
@@ -352,9 +376,8 @@ const AccountingCategorySelect = ({
                 <FormattedMessage defaultMessage="No category found" id="bn5V11" />
               </CommandEmpty>
               <CommandGroup>
-                {Object.entries(options).map(([categoryId, { label }]) => {
+                {Object.entries(options).map(([categoryId, { label, isPrediction }]) => {
                   const isSelected = selectedCategory?.id === categoryId;
-                  const isPrediction = predictions?.some(prediction => prediction.id === categoryId);
                   return (
                     <React.Fragment key={categoryId}>
                       <CommandItem

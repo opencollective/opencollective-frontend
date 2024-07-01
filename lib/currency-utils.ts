@@ -105,7 +105,7 @@ export function formatCurrency(
   }
 }
 
-export const formatValueAsCurrency = (value: Amount, options: Options): string => {
+export const formatValueAsCurrency = (value: Amount, options: Options = {}): string => {
   if (!value) {
     return '--.--';
   }

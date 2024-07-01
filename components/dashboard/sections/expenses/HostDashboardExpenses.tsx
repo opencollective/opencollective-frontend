@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { omit, omitBy } from 'lodash';
+import { groupBy, mapValues, omit, omitBy, throttle } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -12,8 +12,10 @@ import type {
   HostDashboardExpensesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
 import { ExpenseStatusFilter, LastCommentBy, PayoutMethodType } from '../../../../lib/graphql/types/v2/graphql';
+import { useAsyncCall } from '../../../../lib/hooks/useAsyncCall';
 import { useLazyGraphQLPaginatedResults } from '../../../../lib/hooks/useLazyGraphQLPaginatedResults';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import { fetchExpensesCategoriesLLMPredictions } from '../../../../lib/ml-service';
 
 import ExpensesList from '../../../expenses/ExpensesList';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
@@ -79,6 +81,30 @@ const onExpenseUpdate = ({ updatedExpense, cache, variables, refetchMetaData }) 
 };
 
 const ROUTE_PARAMS = ['slug', 'section'];
+
+/**
+ * A hook that retrieves the categories predictions for a given expense, while making sure:
+ * - The requests are debounced (to avoid making too many requests when typing)
+ * - The requests are deduplicated (do not re-query if the parameters don't change)
+ * - Errors are ignored (the UI should not break if the prediction service is down)
+ */
+const useExpensesCategoriesLLMPredictionService = ({ enabled, hostSlug, expenses }) => {
+  const [predictions, setPredictions] = React.useState({});
+
+  React.useEffect(() => {
+    if (!enabled || !hostSlug || !expenses.length) {
+      return;
+    }
+
+    const appliesTo = 'HOSTED_ACCOUNTS'; // TODO
+    const filteredExpenses = expenses.filter(e => !e.accountingCategory);
+    fetchExpensesCategoriesLLMPredictions({ hostSlug, appliesTo, expenses: filteredExpenses }).then(result => {
+      setPredictions(result);
+    });
+  }, [enabled, hostSlug, expenses]);
+
+  return { predictions };
+};
 
 const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const router = useRouter();
@@ -199,6 +225,12 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     return omitBy({ ...query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
   };
 
+  const { predictions } = useExpensesCategoriesLLMPredictionService({
+    enabled: hostSlug === 'opensource',
+    hostSlug: hostSlug,
+    expenses: data?.expenses?.nodes || [],
+  });
+
   return (
     <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader title={<FormattedMessage id="Expenses" defaultMessage="Expenses" />} />
@@ -281,6 +313,7 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
             }}
             useDrawer
             openExpenseLegacyId={Number(router.query.openExpenseId)}
+            llmPredictions={predictions}
             setOpenExpenseLegacyId={legacyId => {
               router.push(
                 {
