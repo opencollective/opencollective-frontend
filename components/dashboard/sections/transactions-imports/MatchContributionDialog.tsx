@@ -30,6 +30,7 @@ import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import Link from '../../../Link';
 import LinkCollective from '../../../LinkCollective';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
+import type { BaseModalProps } from '../../../ModalContext';
 import { Button } from '../../../ui/Button';
 import { Dialog, DialogContent, DialogHeader } from '../../../ui/Dialog';
 import { useToast } from '../../../ui/useToast';
@@ -187,15 +188,14 @@ const getAmountRangeFilter = (valueInCents: number) => {
 export const MatchContributionDialog = ({
   host,
   row,
-  onClose,
   transactionsImport,
+  setOpen,
   ...props
 }: {
   host: Account;
   row: TransactionsImportRow;
   transactionsImport: TransactionsImport;
-  onClose: () => void;
-} & React.ComponentProps<typeof Dialog>) => {
+} & BaseModalProps) => {
   const client = useApolloClient();
   const { toast } = useToast();
   const [selectedContribution, setSelectedContribution] = React.useState(null);
@@ -217,7 +217,7 @@ export const MatchContributionDialog = ({
   });
 
   return (
-    <Dialog open onOpenChange={onClose} {...props}>
+    <Dialog {...props} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-4xl">
         <DialogHeader>
           <h2 className="text-xl font-bold">
@@ -247,7 +247,7 @@ export const MatchContributionDialog = ({
               });
 
               // Close modal
-              onClose();
+              setOpen(false);
             }}
             initialValues={{
               amountReceived: row.amount.valueInCents,
@@ -476,7 +476,7 @@ export const MatchContributionDialog = ({
               )}
             </div>
             <div className="mt-5 flex justify-end gap-2">
-              <Button variant="outline" onClick={onClose}>
+              <Button variant="outline" onClick={() => setOpen(false)}>
                 <Ban size={16} className="mr-2" />
                 <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
               </Button>
@@ -498,10 +498,15 @@ export const MatchContributionDialog = ({
                           rows: [{ id: row.id, order: { id: selectedContribution.id } }],
                         },
                       });
+                      setOpen(false);
+                      toast({
+                        variant: 'success',
+                        message: intl.formatMessage({ defaultMessage: 'Contribution linked', id: '7OXZmC' }),
+                      });
                     } catch (error) {
                       toast({ variant: 'error', message: i18nGraphqlException(intl, error) });
                     } finally {
-                      onClose();
+                      setIsSubmitting(false);
                     }
                   }}
                 >

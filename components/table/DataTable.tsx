@@ -32,6 +32,7 @@ interface DataTableProps<TData, TValue> {
   emptyMessage?: () => React.ReactNode;
   nbPlaceholders?: number;
   onClickRow?: (row: Row<TData>, actionsMenuTriggerRef?: React.RefObject<HTMLElement>) => void;
+  openDrawer?: (row: Row<TData>, actionsMenuTriggerRef?: React.RefObject<HTMLElement>) => void;
   onHoverRow?: (row: Row<TData>) => void;
   rowHasIndicator?: (row: Row<TData>) => boolean;
   className?: string;
@@ -62,6 +63,7 @@ export function DataTable<TData, TValue>({
   hideHeader,
   nbPlaceholders = 10,
   onClickRow,
+  openDrawer = onClickRow,
   onHoverRow,
   rowHasIndicator,
   footer,
@@ -104,7 +106,7 @@ export function DataTable<TData, TValue>({
     },
     meta: {
       intl,
-      onClickRow,
+      openDrawer,
       queryFilter,
       getActions,
       hasDefaultColumnVisibility,
