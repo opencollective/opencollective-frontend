@@ -20,7 +20,7 @@ declare module '@tanstack/react-table' {
     columnVisibility?: VisibilityState;
     defaultColumnVisibility?: VisibilityState;
     hasDefaultColumnVisibility?: boolean;
-    onClickRow?: (row: Row<TData>, actionsMenuTriggerRef?: RefObject<HTMLElement>) => void;
+    openDrawer?: (row: Row<TData>, actionsMenuTriggerRef?: RefObject<HTMLElement>) => void;
     getActions?: GetActions<TData>;
 
     // TODO: remove types below when all tables use getActions

@@ -12,6 +12,7 @@ import { isURL } from 'validator';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { formatValueAsCurrency } from '../../lib/currency-utils';
 import { createError, ERROR } from '../../lib/errors';
+import { standardizeExpenseItemIncurredAt } from '../../lib/expenses';
 import { formatFormErrorMessage, requireFields } from '../../lib/form-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { cn } from '../../lib/utils';
@@ -106,20 +107,10 @@ export const validateExpenseItem = (expense, item) => {
   return errors;
 };
 
-const standardizeIncurredAt = incurredAt => {
-  if (!incurredAt) {
-    return null;
-  } else if (typeof incurredAt === 'string') {
-    return incurredAt.match(/^\d{4}-\d{2}-\d{2}$/) ? `${incurredAt}T00:00:00Z` : incurredAt;
-  } else if (incurredAt instanceof Date) {
-    return incurredAt.toISOString();
-  }
-};
-
 export const prepareExpenseItemForSubmit = (expenseData, item) => {
   // The frontend currently ignores the time part of the date, we default to midnight UTC
   const incurredAtFullDate = item.incurredAt || new Date().toISOString().split('T')[0];
-  const incurredAt = standardizeIncurredAt(incurredAtFullDate);
+  const incurredAt = standardizeExpenseItemIncurredAt(incurredAtFullDate);
   return {
     id: item.__isNew ? undefined : item.id, // Omit item's ids that were created for keying purposes
     incurredAt,
@@ -211,7 +202,7 @@ const useExpenseItemExchangeRate = (form, itemPath) => {
   const expenseCurrency = get(form.values, 'currency');
   const itemValues = get(form.values, itemPath);
   const itemCurrency = itemValues?.amountV2?.currency || expenseCurrency;
-  const incurredAt = standardizeIncurredAt(get(itemValues, 'incurredAt'));
+  const incurredAt = standardizeExpenseItemIncurredAt(get(itemValues, 'incurredAt'));
   const existingExchangeRate = get(itemValues, 'amountV2.exchangeRate');
   const defaultExchangeRate = {
     value: null,

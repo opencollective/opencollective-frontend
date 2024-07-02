@@ -39,6 +39,13 @@ export const TransactionsImportRowFieldsFragment = gql`
     expense {
       id
       legacyId
+      account {
+        id
+        slug
+        name
+        type
+        imageUrl(height: 48)
+      }
     }
     order {
       id
@@ -47,6 +54,7 @@ export const TransactionsImportRowFieldsFragment = gql`
         id
         slug
         name
+        type
         imageUrl(height: 48)
       }
     }
@@ -65,6 +73,9 @@ export const updateTransactionsImportRows = gql`
         processed
       }
       rows {
+        totalCount
+        offset
+        limit
         nodes {
           id
           ...TransactionsImportRowFields
