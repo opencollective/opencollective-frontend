@@ -3,6 +3,7 @@ import { omit } from 'lodash';
 import { useRouter } from 'next/router';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
+import DashboardHeader from '../dashboard/DashboardHeader';
 import ActivityLog from '../dashboard/sections/ActivityLog';
 import { Box } from '../Grid';
 import StyledInputField from '../StyledInputField';
@@ -24,7 +25,8 @@ const RootActivityLog = () => {
   };
 
   return (
-    <Box my={4}>
+    <Box>
+      <DashboardHeader title="Activity Log" className="mb-10" />
       <StyledInputField htmlFor="activity-log-account" label="Account" flex="1 1">
         {({ id }) => (
           <CollectivePickerAsync

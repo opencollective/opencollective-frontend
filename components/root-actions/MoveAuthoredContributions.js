@@ -12,6 +12,7 @@ import { FLAG_COLLECTIVE_PICKER_COLLECTIVE } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import ConfirmationModal from '../ConfirmationModal';
 import Container from '../Container';
+import DashboardHeader from '../dashboard/DashboardHeader';
 import { Box, Flex } from '../Grid';
 import LinkCollective from '../LinkCollective';
 import MessageBox from '../MessageBox';
@@ -198,6 +199,7 @@ const MoveAuthoredContributions = () => {
 
   return (
     <div>
+      <DashboardHeader title="Move Authored Contributions" className="mb-10" />
       <StyledInputField htmlFor="fromAccount" label="Account that authored the contribution" flex="1 1">
         {({ id }) => (
           <CollectivePickerAsync

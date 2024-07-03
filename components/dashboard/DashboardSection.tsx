@@ -10,7 +10,19 @@ import Container from '../Container';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import NotFound from '../NotFound';
 import { OCFBannerWithData } from '../OCFBanner';
+import AccountSettingsForm from '../root-actions/AccountSettings';
+import AccountType from '../root-actions/AccountType';
+import BanAccount from '../root-actions/BanAccounts';
+import BanAccountsWithSearch from '../root-actions/BanAccountsWithSearch';
+import ClearCacheForAccountForm from '../root-actions/ClearCacheForAccountForm';
+import ConnectAccountsForm from '../root-actions/ConnectAccountsForm';
+import MergeAccountsForm from '../root-actions/MergeAccountsForm';
+import MoveAuthoredContributions from '../root-actions/MoveAuthoredContributions';
+import MoveExpenses from '../root-actions/MoveExpenses';
+import MoveReceivedContributions from '../root-actions/MoveReceivedContributions';
+import RecurringContributions from '../root-actions/RecurringContributions';
 import RootActivityLog from '../root-actions/RootActivityLog';
+import UnhostAccountForm from '../root-actions/UnhostAccountForm';
 
 import { HostAdminAccountingSection } from './sections/accounting';
 import Accounts from './sections/accounts';
@@ -48,6 +60,7 @@ import {
   LEGACY_SECTIONS,
   LEGACY_SETTINGS_SECTIONS,
   ROOT_PROFILE_KEY,
+  ROOT_SECTIONS,
   SECTION_LABELS,
   SECTIONS,
   SETTINGS_SECTIONS,
@@ -89,9 +102,21 @@ const SETTINGS_COMPONENTS = {
 };
 
 const ROOT_COMPONENTS = {
-  [SECTIONS.ALL_COLLECTIVES]: AllCollectives,
   [SECTIONS.HOST_TRANSACTIONS]: AllTransactions,
   [ALL_SECTIONS.ACTIVITY_LOG]: RootActivityLog,
+  [ROOT_SECTIONS.ALL_COLLECTIVES]: AllCollectives,
+  [ROOT_SECTIONS.BAN_ACCOUNTS]: BanAccount,
+  [ROOT_SECTIONS.SEARCH_AND_BAN]: BanAccountsWithSearch,
+  [ROOT_SECTIONS.MOVE_AUTHORED_CONTRIBUTIONS]: MoveAuthoredContributions,
+  [ROOT_SECTIONS.MOVE_RECEIVED_CONTRIBUTIONS]: MoveReceivedContributions,
+  [ROOT_SECTIONS.MOVE_EXPENSES]: MoveExpenses,
+  [ROOT_SECTIONS.CLEAR_CACHE]: ClearCacheForAccountForm,
+  [ROOT_SECTIONS.CONNECT_ACCOUNTS]: ConnectAccountsForm,
+  [ROOT_SECTIONS.MERGE_ACCOUNTS]: MergeAccountsForm,
+  [ROOT_SECTIONS.UNHOST_ACCOUNTS]: UnhostAccountForm,
+  [ROOT_SECTIONS.ACCOUNT_SETTINGS]: AccountSettingsForm,
+  [ROOT_SECTIONS.ACCOUNT_TYPE]: AccountType,
+  [ROOT_SECTIONS.RECURRING_CONTRIBUTIONS]: RecurringContributions,
 };
 
 const DashboardSection = ({ account, isLoading, section, subpath }) => {

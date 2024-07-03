@@ -3,6 +3,7 @@ import type { LucideIcon } from 'lucide-react';
 import {
   ArrowRightLeft,
   BarChart2,
+  BookOpenCheck,
   BookUserIcon,
   Building,
   Coins,
@@ -14,15 +15,16 @@ import {
   LayoutDashboard,
   Megaphone,
   Receipt,
-  ScrollText,
   Settings,
   Store,
   Ticket,
+  Users,
   Users2,
+  UserX,
   Wallet,
 } from 'lucide-react';
 import { useRouter } from 'next/router';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
 import { isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective';
@@ -33,7 +35,7 @@ import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 import { parseToBoolean } from '../../lib/utils';
 
-import { ALL_SECTIONS, SECTION_LABELS } from './constants';
+import { ALL_SECTIONS, ROOT_SECTIONS, SECTION_LABELS } from './constants';
 import { DashboardContext } from './DashboardContext';
 import { MenuLink } from './MenuLink';
 
@@ -56,21 +58,42 @@ type GroupMenuItem = {
 
 const ROOT_MENU = [
   {
-    Icon: Building,
-    section: ALL_SECTIONS.ALL_COLLECTIVES,
-    label: <FormattedMessage defaultMessage="All Collectives" id="uQguR/" />,
+    type: 'group',
+    label: 'Accounts',
+    Icon: Users,
+    subMenu: [
+      { label: 'Search Accounts', section: ROOT_SECTIONS.ALL_COLLECTIVES },
+      { label: 'Connect Accounts', section: ROOT_SECTIONS.CONNECT_ACCOUNTS },
+      { label: 'Merge Accounts', section: ROOT_SECTIONS.MERGE_ACCOUNTS },
+      { label: 'Unhost Account', section: ROOT_SECTIONS.UNHOST_ACCOUNTS },
+      { label: 'Account Settings', section: ROOT_SECTIONS.ACCOUNT_SETTINGS },
+      { label: 'Account Type', section: ROOT_SECTIONS.ACCOUNT_TYPE },
+      { label: 'Recurring Contributions', section: ROOT_SECTIONS.RECURRING_CONTRIBUTIONS },
+      { label: 'Activity Log', section: ALL_SECTIONS.ACTIVITY_LOG },
+      { label: 'Clear Cache', section: ROOT_SECTIONS.CLEAR_CACHE },
+    ],
   },
   {
-    section: ALL_SECTIONS.HOST_TRANSACTIONS,
-    Icon: ArrowRightLeft,
-    label: <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />,
+    type: 'group',
+    label: 'Ledger',
+    Icon: BookOpenCheck,
+    subMenu: [
+      { label: 'Search Transactions', section: ALL_SECTIONS.HOST_TRANSACTIONS },
+      { label: 'Move Authored Contributions', section: ROOT_SECTIONS.MOVE_AUTHORED_CONTRIBUTIONS },
+      { label: 'Move Received Contributions', section: ROOT_SECTIONS.MOVE_RECEIVED_CONTRIBUTIONS },
+      { label: 'Move Expenses', section: ROOT_SECTIONS.MOVE_EXPENSES },
+    ],
   },
   {
-    section: ALL_SECTIONS.ACTIVITY_LOG,
-    Icon: ScrollText,
-    label: <FormattedMessage id="t0lUqz" defaultMessage="Activity log" />,
+    type: 'group',
+    label: 'Moderation',
+    Icon: UserX,
+    subMenu: [
+      { label: 'Search & Ban', section: ROOT_SECTIONS.SEARCH_AND_BAN },
+      { label: 'Ban Account', section: ROOT_SECTIONS.BAN_ACCOUNTS },
+    ],
   },
-];
+] as GroupMenuItem[];
 
 export type MenuItem = PageMenuItem | GroupMenuItem;
 
