@@ -1,5 +1,5 @@
 import React from 'react';
-import type { MessageDescriptor} from 'react-intl';
+import type { MessageDescriptor } from 'react-intl';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
