@@ -65,6 +65,9 @@ export const updateTransactionsImportRows = gql`
         processed
       }
       rows {
+        totalCount
+        offset
+        limit
         nodes {
           id
           ...TransactionsImportRowFields

@@ -996,7 +996,7 @@ const AddFundsModalContentWithCollective = ({
   );
 };
 
-const AddFundsModal = ({ collective = null, host = null, initialValues = null, ...props }) => {
+const AddFundsModal = ({ collective = null, host = null, initialValues = null, onSuccess = null, ...props }) => {
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
   const [selectedCollective, setSelectedCollective] = useState(collective);
@@ -1048,6 +1048,7 @@ const AddFundsModal = ({ collective = null, host = null, initialValues = null, .
           handleClose={handleClose}
           initialValues={initialValues}
           onSelectOtherAccount={!collective && (() => setHasConfirmedCollective(false))}
+          onSuccess={onSuccess}
           {...props}
         />
       ) : !host ? (
