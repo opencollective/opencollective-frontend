@@ -84,6 +84,7 @@ const suggestExpectedFundsQuery = gql`
     $expectedFundsFilter: ExpectedFundsFilter
   ) {
     account(id: $hostId) {
+      id
       orders(
         filter: INCOMING
         includeIncognito: true
