@@ -33,8 +33,8 @@ export const TransactionsImportRowDrawer = ({
           <React.Fragment>
             <DrawerHeader
               actions={getActions(row, dropdownTriggerRef)}
-              entityName={<FormattedMessage defaultMessage="Transaction import row" id="qqPBY/" />}
-              entityLabel={
+              entity={<FormattedMessage defaultMessage="Transaction import row" id="qqPBY/" />}
+              label={
                 <div className="text-2xl">
                   <span className={'font-bold text-foreground'}>
                     <FormattedMoneyAmount
@@ -50,7 +50,7 @@ export const TransactionsImportRowDrawer = ({
                 </div>
               }
               dropdownTriggerRef={dropdownTriggerRef}
-              entityIdentifier={
+              identifier={
                 <FormattedMessage defaultMessage="No. {number}" id="rowNumber" values={{ number: rowIndex + 1 }} />
               }
             />

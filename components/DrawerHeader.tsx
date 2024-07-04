@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import { MoreHorizontal, X } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
+import type { Action } from '../lib/actions/types';
 import { useWindowResize, VIEWPORTS } from '../lib/hooks/useWindowResize';
 
 import { DropdownActionItem } from './table/RowActionsMenu';
@@ -10,7 +11,18 @@ import { Button } from './ui/Button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuSeparator, DropdownMenuTrigger } from './ui/DropdownMenu';
 import { SheetClose } from './ui/Sheet';
 
-export default function DrawerHeader({ actions, entityName, entityIdentifier, entityLabel, dropdownTriggerRef }) {
+type DrawerHeaderProps = {
+  actions?: {
+    primary?: Action[];
+    secondary?: Action[];
+  };
+  entity: React.ReactNode;
+  identifier: React.ReactNode;
+  label: React.ReactNode;
+  dropdownTriggerRef?: React.RefObject<HTMLButtonElement>;
+};
+
+export default function DrawerHeader({ actions, entity, identifier, label, dropdownTriggerRef }: DrawerHeaderProps) {
   const { viewport } = useWindowResize();
   const isMobile = viewport === VIEWPORTS.XSMALL;
   const { primary, secondary } = actions || {};
@@ -20,9 +32,9 @@ export default function DrawerHeader({ actions, entityName, entityIdentifier, en
     <div className="flex flex-col gap-1 border-b px-6 py-4">
       <div className={clsx('flex items-center justify-between gap-4')}>
         <div className="flex shrink grow items-center gap-1 text-sm text-muted-foreground">
-          <span className="whitespace-nowrap">{entityName}</span>
+          <span className="whitespace-nowrap">{entity}</span>
 
-          <div className="w-0 max-w-fit flex-1">{entityIdentifier}</div>
+          <div className="w-0 max-w-fit flex-1">{identifier}</div>
         </div>
 
         <div className="flex items-center gap-1">
@@ -37,14 +49,14 @@ export default function DrawerHeader({ actions, entityName, entityIdentifier, en
         </div>
       </div>
       <div className="flex justify-between">
-        <div className="flex items-center gap-2">{entityLabel}</div>
+        <div className="flex items-center gap-2 text-xl font-semibold">{label}</div>
 
         <div className="flex items-center gap-1">
           <div className="hidden items-center gap-1 sm:flex">
             {primary?.map(action => (
               <Button
-                key={action.label}
-                variant="outline"
+                key={action.key}
+                variant={action.variant || 'outline'}
                 size="xs"
                 className="gap-1.5"
                 onClick={action.onClick}
@@ -67,11 +79,11 @@ export default function DrawerHeader({ actions, entityName, entityIdentifier, en
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                {isMobile && primary?.map(action => <DropdownActionItem key={action.label} action={action} />)}
+                {isMobile && primary?.map(action => <DropdownActionItem key={action.key} action={action} />)}
 
                 {isMobile && primary.length > 0 && secondary.length > 0 && <DropdownMenuSeparator />}
 
-                {secondary?.map(action => <DropdownActionItem key={action.label} action={action} />)}
+                {secondary?.map(action => <DropdownActionItem key={action.key} action={action} />)}
               </DropdownMenuContent>
             </DropdownMenu>
           )}

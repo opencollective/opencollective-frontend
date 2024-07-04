@@ -84,9 +84,9 @@ export default function LegalDocumentDrawer({
           <DrawerHeader
             dropdownTriggerRef={dropdownTriggerRef}
             actions={getActions(document, dropdownTriggerRef)}
-            entityName={intl.formatMessage({ defaultMessage: 'Tax form', id: 'TaxForm' })}
-            entityIdentifier={<CopyID value={document.id}>{document.id}</CopyID>}
-            entityLabel={
+            entity={intl.formatMessage({ defaultMessage: 'Tax form', id: 'TaxForm' })}
+            identifier={<CopyID value={document.id}>{document.id}</CopyID>}
+            label={
               <AccountHoverCard
                 account={document.account}
                 trigger={
