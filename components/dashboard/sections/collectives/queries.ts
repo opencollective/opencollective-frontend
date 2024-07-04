@@ -240,6 +240,7 @@ export const hostedCollectivesMetadataQuery = gql`
       currency
       all: hostedAccounts(limit: 1, accountType: [COLLECTIVE, FUND]) {
         totalCount
+        currencies
       }
       active: hostedAccounts(limit: 1, accountType: [COLLECTIVE, FUND], isFrozen: false) {
         totalCount
@@ -270,6 +271,7 @@ export const hostedCollectivesQuery = gql`
     $isUnhosted: Boolean
     $balance: AmountRangeInput
     $consolidatedBalance: AmountRangeInput
+    $currencies: [String]
   ) {
     host(slug: $hostSlug) {
       id
@@ -298,6 +300,7 @@ export const hostedCollectivesQuery = gql`
         isUnhosted: $isUnhosted
         balance: $balance
         consolidatedBalance: $consolidatedBalance
+        currencies: $currencies
       ) {
         offset
         limit
