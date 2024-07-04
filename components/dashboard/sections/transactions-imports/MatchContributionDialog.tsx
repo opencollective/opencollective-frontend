@@ -177,7 +177,7 @@ const suggestExpectedFundsQuery = gql`
  * of decimals in the value: 123 would be rounded to -2 (=100), 123456 would be rounded to -5 (=100000).
  */
 const getAmountRangeFilter = (valueInCents: number) => {
-  const precision = -Math.floor(Math.log10(valueInCents));
+  const precision = Math.min(1 - Math.floor(Math.log10(valueInCents)), -2);
   return {
     type: AmountFilterType.IS_BETWEEN,
     gte: floor(valueInCents * 0.8, precision),
