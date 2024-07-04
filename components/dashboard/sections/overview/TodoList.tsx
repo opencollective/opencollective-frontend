@@ -28,7 +28,7 @@ export const TodoList = () => {
 
       {pendingExpenseCount > 0 && (
         <div className="rounded-xl border bg-slate-50 p-3 text-sm">
-          <div className="flex items-center gap-2 text-muted-foreground ">
+          <div className="flex items-center gap-2 text-muted-foreground">
             <Receipt size={16} />
             <span>
               <FormattedMessage
@@ -53,7 +53,7 @@ export const TodoList = () => {
 
       {canActOnPausedIncomingContributions && (
         <div className="rounded-xl border bg-slate-50 p-3 text-sm">
-          <div className="flex items-center gap-2 text-muted-foreground ">
+          <div className="flex items-center gap-2 text-muted-foreground">
             <Coins size={16} />
             <span>
               <FormattedMessage
@@ -78,7 +78,7 @@ export const TodoList = () => {
 
       {pausedOutgoingContributions > 0 && (
         <div className="rounded-xl border bg-slate-50 p-3 text-sm">
-          <div className="flex items-center gap-2 text-muted-foreground ">
+          <div className="flex items-center gap-2 text-muted-foreground">
             <Coins size={16} />
             <span>
               <FormattedMessage

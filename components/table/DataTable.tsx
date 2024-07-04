@@ -15,6 +15,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../lib/actions/types';
 import type { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
+import { cn } from '../../lib/utils';
 
 import { Skeleton } from '../ui/Skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/Table';
@@ -31,6 +32,7 @@ interface DataTableProps<TData, TValue> {
   emptyMessage?: () => React.ReactNode;
   nbPlaceholders?: number;
   onClickRow?: (row: Row<TData>, actionsMenuTriggerRef?: React.RefObject<HTMLElement>) => void;
+  openDrawer?: (row: Row<TData>, actionsMenuTriggerRef?: React.RefObject<HTMLElement>) => void;
   onHoverRow?: (row: Row<TData>) => void;
   rowHasIndicator?: (row: Row<TData>) => boolean;
   className?: string;
@@ -42,6 +44,7 @@ interface DataTableProps<TData, TValue> {
   compact?: boolean;
   initialSort?: SortingState;
   getRowDataCy?: (row: Row<TData>) => string;
+  getRowClassName?: (row: Row<TData>) => string;
   getRowId?: (data: TData) => string;
   columnVisibility?: VisibilityState;
   setColumnVisibility?: OnChangeFn<VisibilityState>;
@@ -60,6 +63,7 @@ export function DataTable<TData, TValue>({
   hideHeader,
   nbPlaceholders = 10,
   onClickRow,
+  openDrawer = onClickRow,
   onHoverRow,
   rowHasIndicator,
   footer,
@@ -67,6 +71,7 @@ export function DataTable<TData, TValue>({
   compact,
   initialSort,
   getRowDataCy,
+  getRowClassName,
   getRowId = defaultGetRowId,
   columnVisibility,
   defaultColumnVisibility,
@@ -101,7 +106,7 @@ export function DataTable<TData, TValue>({
     },
     meta: {
       intl,
-      onClickRow,
+      openDrawer,
       queryFilter,
       getActions,
       hasDefaultColumnVisibility,
@@ -173,6 +178,7 @@ export function DataTable<TData, TValue>({
                 tableProps={tableProps}
                 compact={compact}
                 onHoverRow={onHoverRow}
+                getRowClassName={getRowClassName}
               />
             ))
         ) : (
@@ -197,16 +203,25 @@ export function DataTable<TData, TValue>({
   );
 }
 
-function DataTableRow({ row, onClickRow, getRowDataCy, rowHasIndicator, tableProps, compact, onHoverRow }) {
+function DataTableRow({
+  row,
+  getRowClassName,
+  onClickRow,
+  getRowDataCy,
+  rowHasIndicator,
+  tableProps,
+  compact,
+  onHoverRow,
+}) {
   // Reference that can be picked up by the actions column, to enable returning focus when closing a drawer or modal opened from actions menu
   const actionsMenuTriggerRef = React.useRef(null);
   return (
     <TableRow
       data-cy={getRowDataCy?.(row) || `datatable-row-${row.id}`}
       data-state={row.getIsSelected() && 'selected'}
+      className={cn(getRowClassName?.(row), onClickRow && 'cursor-pointer')}
       {...(onClickRow && {
         onClick: () => onClickRow(row, actionsMenuTriggerRef),
-        className: 'cursor-pointer',
       })}
       {...(onHoverRow && {
         onMouseEnter: () => onHoverRow(row),

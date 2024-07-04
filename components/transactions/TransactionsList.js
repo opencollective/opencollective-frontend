@@ -54,8 +54,4 @@ TransactionsList.propTypes = {
   onMutationSuccess: PropTypes.func,
 };
 
-TransactionsList.defaultProps = {
-  view: 'public',
-};
-
 export default TransactionsList;

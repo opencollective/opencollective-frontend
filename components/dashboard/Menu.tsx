@@ -8,6 +8,7 @@ import {
   Coins,
   CreditCard,
   FileText,
+  FlaskConical,
   Globe2,
   HeartHandshake,
   LayoutDashboard,
@@ -18,6 +19,7 @@ import {
   Store,
   Ticket,
   Users2,
+  Wallet,
 } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -26,6 +28,7 @@ import hasFeature, { FEATURES } from '../../lib/allowed-features';
 import { isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective';
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 import { parseToBoolean } from '../../lib/utils';
@@ -65,6 +68,7 @@ const ROOT_MENU = [
   {
     section: ALL_SECTIONS.ACTIVITY_LOG,
     Icon: ScrollText,
+    label: <FormattedMessage id="t0lUqz" defaultMessage="Activity log" />,
   },
 ];
 
@@ -94,6 +98,12 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       section: ALL_SECTIONS.SUBMITTED_EXPENSES,
       Icon: Receipt,
       label: intl.formatMessage({ id: 'Expenses', defaultMessage: 'Expenses' }),
+    },
+    {
+      if: !isIndividual && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.CROWDFUNDING_REDESIGN),
+      section: ALL_SECTIONS.ACCOUNTS,
+      Icon: Wallet,
+      label: intl.formatMessage({ defaultMessage: 'Accounts', id: 'FvanT6' }),
     },
     {
       if: !isIndividual,
@@ -228,9 +238,26 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
-      if: isHost || (!isIndividual && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.HOST_REPORTS)),
-      section: ALL_SECTIONS.REPORTS,
+      if: isHost,
+      type: 'group',
+      label: intl.formatMessage({ id: 'Reports', defaultMessage: 'Reports' }),
       Icon: BarChart2,
+      subMenu: [
+        {
+          section: ALL_SECTIONS.TRANSACTION_REPORTS,
+          label: intl.formatMessage({ defaultMessage: 'Transactions', id: 'menu.transactions' }),
+        },
+        {
+          section: ALL_SECTIONS.EXPENSE_REPORTS,
+          label: intl.formatMessage({ defaultMessage: 'Expenses', id: 'Expenses' }),
+        },
+      ],
+    },
+    {
+      if: !isHost && !isIndividual && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.HOST_REPORTS),
+      label: intl.formatMessage({ id: 'Reports', defaultMessage: 'Reports' }),
+      Icon: BarChart2,
+      section: ALL_SECTIONS.TRANSACTION_REPORTS,
     },
     {
       if: isHost && !isAccountantOnly,
@@ -434,7 +461,7 @@ const Menu = ({ onRoute, menuItems }) => {
   const router = useRouter();
   const intl = useIntl();
   const { account } = React.useContext(DashboardContext);
-
+  const { LoggedInUser } = useLoggedInUser();
   React.useEffect(() => {
     if (onRoute) {
       router.events.on('routeChangeStart', onRoute);
@@ -446,17 +473,32 @@ const Menu = ({ onRoute, menuItems }) => {
     };
   }, [router, onRoute]);
 
+  const showLinkToProfilePrototype =
+    !['ROOT', 'ORGANIZATION', 'FUND', 'INDIVIDUAL'].includes(account.type) &&
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW);
+
   return (
     <div className="space-y-4">
       {account.type !== 'ROOT' && (
-        <MenuLink
-          href={getCollectivePageRoute(account)}
-          Icon={Globe2}
-          label={intl.formatMessage({ id: 'PublicProfile', defaultMessage: 'Public profile' })}
-          className="hover:bg-slate-50 hover:text-slate-700"
-          dataCy="public-profile-link"
-          external
-        />
+        <div className="flex flex-col gap-2">
+          <MenuLink
+            href={getCollectivePageRoute(account)}
+            Icon={Globe2}
+            label={intl.formatMessage({ id: 'PublicProfile', defaultMessage: 'Public profile' })}
+            className="hover:bg-slate-50 hover:text-slate-700"
+            dataCy="public-profile-link"
+            external
+          />
+          {showLinkToProfilePrototype && (
+            <MenuLink
+              href={`/preview/${account.slug}`}
+              Icon={FlaskConical}
+              label={intl.formatMessage({ defaultMessage: 'Preview new profile page', id: 'ob6Sw2' })}
+              className="hover:bg-slate-50 hover:text-slate-700"
+              external
+            />
+          )}
+        </div>
       )}
       <div className="space-y-2">
         {menuItems.map(item => {

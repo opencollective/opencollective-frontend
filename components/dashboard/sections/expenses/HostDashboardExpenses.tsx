@@ -11,7 +11,7 @@ import type {
   AccountHoverCardFieldsFragment,
   HostDashboardExpensesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import { ExpenseStatusFilter, PayoutMethodType } from '../../../../lib/graphql/types/v2/graphql';
+import { ExpenseStatusFilter, LastCommentBy, PayoutMethodType } from '../../../../lib/graphql/types/v2/graphql';
 import { useLazyGraphQLPaginatedResults } from '../../../../lib/hooks/useLazyGraphQLPaginatedResults';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
@@ -44,6 +44,7 @@ type FilterMeta = CommonFilterMeta & {
   hostSlug: string;
   hostedAccounts?: Array<AccountHoverCardFieldsFragment>;
   expenseTags?: string[];
+  includeUncategorized?: boolean;
 };
 
 const toVariables: FiltersToVariables<FilterValues, HostDashboardExpensesQueryVariables, FilterMeta> = {
@@ -104,14 +105,28 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     },
     {
       label: intl.formatMessage({ id: 'expenses.ready', defaultMessage: 'Ready to pay' }),
-      filter: { status: ExpenseStatusFilter.READY_TO_PAY, sort: { field: 'CREATED_AT', direction: 'ASC' } },
+      filter: { status: [ExpenseStatusFilter.READY_TO_PAY], sort: { field: 'CREATED_AT', direction: 'ASC' } },
       id: 'ready_to_pay',
       count: metaData?.ready_to_pay?.totalCount,
     },
     {
-      label: intl.formatMessage({ id: 'expense.scheduledForPayment', defaultMessage: 'Scheduled for payment' }),
+      label: intl.formatMessage({ defaultMessage: 'Unreplied', id: 'k9Y5So' }),
       filter: {
-        status: ExpenseStatusFilter.SCHEDULED_FOR_PAYMENT,
+        lastCommentBy: [LastCommentBy.USER],
+        status: [
+          ExpenseStatusFilter.APPROVED,
+          ExpenseStatusFilter.ERROR,
+          ExpenseStatusFilter.INCOMPLETE,
+          ExpenseStatusFilter.ON_HOLD,
+        ],
+      },
+      id: 'unreplied',
+      count: metaData?.unreplied?.totalCount,
+    },
+    {
+      label: intl.formatMessage({ id: 'expense.batched', defaultMessage: 'Batched' }),
+      filter: {
+        status: [ExpenseStatusFilter.SCHEDULED_FOR_PAYMENT],
         sort: { field: 'CREATED_AT', direction: 'ASC' },
       },
       id: 'scheduled_for_payment',
@@ -119,25 +134,25 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     },
     {
       label: intl.formatMessage({ defaultMessage: 'On hold', id: '0Hhe6f' }),
-      filter: { status: ExpenseStatusFilter.ON_HOLD, sort: { field: 'CREATED_AT', direction: 'ASC' } },
+      filter: { status: [ExpenseStatusFilter.ON_HOLD], sort: { field: 'CREATED_AT', direction: 'ASC' } },
       id: 'on_hold',
       count: metaData?.on_hold?.totalCount,
     },
     {
       label: intl.formatMessage({ defaultMessage: 'Incomplete', id: 'kHwKVg' }),
-      filter: { status: ExpenseStatusFilter.INCOMPLETE, sort: { field: 'CREATED_AT', direction: 'ASC' } },
+      filter: { status: [ExpenseStatusFilter.INCOMPLETE], sort: { field: 'CREATED_AT', direction: 'ASC' } },
       id: 'incomplete',
       count: metaData?.incomplete?.totalCount,
     },
     {
       label: intl.formatMessage({ id: 'Error', defaultMessage: 'Error' }),
-      filter: { status: ExpenseStatusFilter.ERROR, sort: { field: 'CREATED_AT', direction: 'ASC' } },
+      filter: { status: [ExpenseStatusFilter.ERROR], sort: { field: 'CREATED_AT', direction: 'ASC' } },
       id: 'error',
       count: metaData?.error?.totalCount,
     },
     {
       label: intl.formatMessage({ defaultMessage: 'Paid', id: 'u/vOPu' }),
-      filter: { status: ExpenseStatusFilter.PAID },
+      filter: { status: [ExpenseStatusFilter.PAID] },
       id: 'paid',
       count: metaData?.paid?.totalCount,
     },
@@ -148,6 +163,7 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     hostSlug: hostSlug,
     hostedAccounts: metaData?.hostedAccounts.nodes,
     expenseTags: metaData?.expenseTags.nodes?.map(t => t.tag),
+    includeUncategorized: true,
   };
 
   const queryFilter = useQueryFilter({
@@ -223,7 +239,8 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
         }}
         secondButton={
           !(
-            queryFilter.values.status === ExpenseStatusFilter.SCHEDULED_FOR_PAYMENT &&
+            queryFilter.values.status?.includes(ExpenseStatusFilter.SCHEDULED_FOR_PAYMENT) &&
+            queryFilter.values.status?.length === 1 &&
             queryFilter.values.payout === PayoutMethodType.BANK_ACCOUNT
           ) ? (
             <StyledButton
@@ -231,7 +248,7 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
               buttonStyle="successSecondary"
               onClick={() =>
                 queryFilter.resetFilters({
-                  status: ExpenseStatusFilter.SCHEDULED_FOR_PAYMENT,
+                  status: [ExpenseStatusFilter.SCHEDULED_FOR_PAYMENT],
                   payout: PayoutMethodType.BANK_ACCOUNT,
                 })
               }

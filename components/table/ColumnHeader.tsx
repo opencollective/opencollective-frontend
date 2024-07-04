@@ -112,7 +112,7 @@ export function ColumnHeader<TData, TValue>({
                         size={16}
                         className={clsx(
                           'h-4 w-4 transition-colors',
-                          isSortedAsc ? 'text-foreground' : 'text-muted-foreground ',
+                          isSortedAsc ? 'text-foreground' : 'text-muted-foreground',
                         )}
                       />
                       <FormattedMessage defaultMessage="Sort ascending" id="GuZfUM" />
@@ -129,7 +129,7 @@ export function ColumnHeader<TData, TValue>({
                         size={16}
                         className={clsx(
                           'h-4 w-4 transition-colors',
-                          isSortedDesc ? 'text-foreground' : 'text-muted-foreground ',
+                          isSortedDesc ? 'text-foreground' : 'text-muted-foreground',
                         )}
                       />
                       <span>

@@ -239,7 +239,7 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
         />
         <Filterbar hideSeparator {...queryFilter} />
 
-        <div className="grid grid-flow-dense grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3  ">
+        <div className="grid grid-flow-dense grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3">
           {metrics
             .filter(metric => !metric.hide)
             .map(metric => (
@@ -256,7 +256,7 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
       <hr />
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3 2xl:grid-cols-3">
-        <div className="order-1 space-y-6 xl:order-none xl:col-span-2 ">
+        <div className="order-1 space-y-6 xl:order-none xl:col-span-2">
           <TodoList />
           <Timeline accountSlug={router.query?.as ?? accountSlug} />
         </div>

@@ -816,5 +816,18 @@ export const expensesListAdminFieldsFragment = gql`
       scope
       details
     }
+    lastComment: comments(limit: 1, orderBy: { field: CREATED_AT, direction: DESC }) {
+      nodes {
+        id
+        createdAt
+        fromAccount {
+          id
+          type
+          slug
+          name
+          imageUrl
+        }
+      }
+    }
   }
 `;

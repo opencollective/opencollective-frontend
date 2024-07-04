@@ -40,7 +40,7 @@ type AccountingCategoryPillProps = {
   showCodeInSelect?: boolean;
 };
 
-const BADGE_CLASS = cn('red rounded-lg bg-neutral-100 px-3 py-1  text-xs font-medium text-neutral-800');
+const BADGE_CLASS = cn('red rounded-lg bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-800');
 
 const getCategoryLabel = (category: Pick<AccountingCategory, 'friendlyName' | 'name'>) => {
   if (!category) {

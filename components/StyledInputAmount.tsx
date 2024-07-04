@@ -10,6 +10,7 @@ import { cn } from '../lib/utils';
 import { Separator } from './ui/Separator';
 import { StyledCurrencyPicker } from './StyledCurrencyPicker';
 import StyledInput from './StyledInput';
+import StyledSpinner from './StyledSpinner';
 
 const formatCurrencyName = (currency, currencyDisplay) => {
   if (currencyDisplay === 'SYMBOL') {
@@ -206,7 +207,7 @@ const StyledInputAmount = ({
   return (
     <div
       className={cn(
-        'flex flex-wrap items-center overflow-hidden rounded border border-neutral-200 focus-within:border-blue-500 focus-within:bg-blue-100 hover:border-blue-300 ',
+        'flex flex-wrap items-center overflow-hidden rounded border border-neutral-200 focus-within:border-blue-500 focus-within:bg-blue-100 hover:border-blue-300',
         className,
         {
           'border-red-500': props.error,
@@ -234,6 +235,7 @@ const StyledInputAmount = ({
         )}
         <StyledInput
           {...props}
+          disabled={disabled}
           width="100%"
           type="number"
           flex="auto"
@@ -291,6 +293,7 @@ const StyledInputAmount = ({
           />
         </div>
       )}
+      {loadingExchangeRate && <StyledSpinner size={16} color="black.700" className="absolute right-8" />}
     </div>
   );
 };

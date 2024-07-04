@@ -1,4 +1,4 @@
-/* eslint-disable no-process-exit */
+/* eslint-disable n/no-process-exit */
 /* eslint-disable no-console */
 
 import { execSync } from 'child_process';
@@ -32,7 +32,7 @@ const tmpDir = path.join(__dirname, '.tmp');
 const staticFilesDir = path.join(__dirname, 'static');
 const projectRoot = path.join(__dirname, '../..');
 const projectNodeModules = path.join(projectRoot, 'node_modules');
-const basePackageJSON = require(path.join(projectRoot, 'package.json'));
+const basePackageJSON = require(path.join(projectRoot, 'package.json')); // eslint-disable-line @typescript-eslint/no-var-requires
 const extensions = ['.js', '.jsx', '.ts', '.tsx'];
 
 const main = async () => {

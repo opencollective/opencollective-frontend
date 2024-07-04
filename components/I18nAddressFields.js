@@ -252,7 +252,7 @@ const I18nAddressFields = ({
   prefix,
   onLoadError,
   onLoadSuccess,
-  Component,
+  Component = FormikLocationFieldRenderer, // For legacy compatibility
   fieldProps,
   errors,
 }) => {
@@ -347,10 +347,6 @@ I18nAddressFields.propTypes = {
   /** Additional props to be passed to `Component` */
   fieldProps: PropTypes.object,
   errors: PropTypes.object,
-};
-
-I18nAddressFields.defaultProps = {
-  Component: FormikLocationFieldRenderer, // For legacy compatibility
 };
 
 export default I18nAddressFields;

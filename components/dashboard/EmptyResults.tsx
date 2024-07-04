@@ -26,7 +26,7 @@ export function EmptyResults({
 }) {
   return (
     <div className="flex flex-col items-center gap-6 py-6 sm:py-12" data-cy="zero-results-message">
-      <div className="relative flex items-center justify-center rounded-full ">
+      <div className="relative flex items-center justify-center rounded-full">
         <div className={'absolute inset-0 m-2 rounded-full bg-slate-50'} />
         <Image
           alt="No results found illustration with a magnifying glass."

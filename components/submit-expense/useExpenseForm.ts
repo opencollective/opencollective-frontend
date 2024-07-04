@@ -120,11 +120,11 @@ const formSchemaQuery = gql`
     $expenseKey: String
   ) {
     account(slug: $collectiveSlug) @include(if: $hasCollectiveSlug) {
-      ...AccountFields
+      ...ExpenseFormAccountFields
     }
 
     payee: account(slug: $payeeSlug) @include(if: $hasPayeeSlug) {
-      ...PayeeFields
+      ...ExpenseFormPayeeFields
     }
 
     loggedInAccount {
@@ -133,7 +133,7 @@ const formSchemaQuery = gql`
     }
 
     submitter: account(slug: $submitterSlug) @include(if: $hasSubmitterSlug) {
-      ...SubmitterFields
+      ...ExpenseFormSubmitterFields
     }
 
     recentlySubmittedExpenses: expenses(
@@ -216,10 +216,10 @@ const formSchemaQuery = gql`
       type
       status
       account {
-        ...AccountFields
+        ...ExpenseFormAccountFields
       }
       payee {
-        ...PayeeFields
+        ...ExpenseFormPayeeFields
       }
       payoutMethod {
         id
@@ -267,7 +267,7 @@ const formSchemaQuery = gql`
       }
       draft
       submitter: createdByAccount {
-        ...SubmitterFields
+        ...ExpenseFormSubmitterFields
       }
     }
   }
@@ -336,7 +336,7 @@ const formSchemaQuery = gql`
     }
   }
 
-  fragment AccountFields on Account {
+  fragment ExpenseFormAccountFields on Account {
     id
     name
     slug
@@ -369,14 +369,14 @@ const formSchemaQuery = gql`
     }
   }
 
-  fragment SubmitterFields on Account {
+  fragment ExpenseFormSubmitterFields on Account {
     id
     slug
     name
     imageUrl
   }
 
-  fragment PayeeFields on Account {
+  fragment ExpenseFormPayeeFields on Account {
     id
     slug
     name

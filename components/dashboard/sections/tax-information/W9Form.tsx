@@ -43,7 +43,7 @@ export const getW9TaxFormValuesSchema = ({ submitterType }: BaseFormValues) =>
         ? {}
         : {
             businessName: z.string().min(1).max(255),
-            federalTaxClassificationDetails: z.string(),
+            federalTaxClassificationDetails: z.string().max(255).or(z.literal('')).optional(),
             exemptPayeeCode: z.string().max(5).or(z.literal('')).optional(),
             fatcaExemptionCode: z.string().max(14).or(z.literal('')).optional(),
           }),

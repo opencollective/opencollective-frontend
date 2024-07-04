@@ -25,6 +25,7 @@ import { P, Span } from './Text';
 import UploadedFilePreview from './UploadedFilePreview';
 
 export const DROPZONE_ACCEPT_IMAGES = { 'image/*': ['.jpeg', '.png'] };
+export const DROPZONE_ACCEPT_CSV = { 'text/csv': ['.csv'] };
 export const DROPZONE_ACCEPT_PDF = { 'application/pdf': ['.pdf'] };
 export const DROPZONE_ACCEPT_ALL = { ...DROPZONE_ACCEPT_IMAGES, ...DROPZONE_ACCEPT_PDF };
 
@@ -284,12 +285,21 @@ const StyledDropzone = ({
                         </div>
                       )}
                       <div>
-                        <FormattedMessage
-                          id="DragAndDropOrClickToUpload"
-                          defaultMessage="Drag & drop or <i18n-link>click to upload</i18n-link>"
-                          values={{ 'i18n-link': getI18nLink() }}
-                          tagName="span"
-                        />
+                        {collectFilesOnly ? (
+                          <FormattedMessage
+                            id="DragAndDropOrClickToSelect"
+                            defaultMessage="Drag & drop or <i18n-link>click to select</i18n-link>"
+                            values={{ 'i18n-link': getI18nLink() }}
+                            tagName="span"
+                          />
+                        ) : (
+                          <FormattedMessage
+                            id="DragAndDropOrClickToUpload"
+                            defaultMessage="Drag & drop or <i18n-link>click to upload</i18n-link>"
+                            values={{ 'i18n-link': getI18nLink() }}
+                            tagName="span"
+                          />
+                        )}
                       </div>
                       {showInstructions && (
                         <P fontSize="12px" color="black.500" mt={1}>
@@ -357,7 +367,7 @@ type UploadedFile = {
 
 type StyledDropzoneProps = Omit<ContainerProps, 'accept' | 'children' | 'ref' | 'onClick' | 'as'> & {
   /** Called back with the rejected files */
-  onReject?: () => void;
+  onReject?: (msg: string) => void;
   /** Called when the user drops files */
   onDrop?: (acceptedFiles, rejectedFiles) => void;
   /** Name for the input */

@@ -49,7 +49,7 @@ export const UpdateStatus = ({ update }: { update: Partial<Update> }) => {
       tooltip = (
         <FormattedMessage
           id="update.status.published.tooltip.changelog"
-          defaultMessage="This update is public visible and displayed in the What's New section"
+          defaultMessage="This update is publicly visible and displayed in the What's New section"
         />
       );
     } else if (update.isPrivate) {

@@ -127,7 +127,7 @@ const columns: ColumnDef<TransactionsTableQueryNode>[] = [
           </div>
           <div>
             {isRefunded && !isOrderRejected && (
-              <Badge size="xs" type={'warning'} className="items-center  gap-1">
+              <Badge size="xs" type={'warning'} className="items-center gap-1">
                 <Undo size={12} />
                 <FormattedMessage defaultMessage="Refunded" id="Gs86nL" />
               </Badge>

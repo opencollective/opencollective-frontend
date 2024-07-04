@@ -27,13 +27,7 @@ import type { GetActions } from '../../lib/actions/types';
 import type { LoggedInUser as LoggedInUserType } from '../../lib/custom_typings/LoggedInUser';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type { ContributionDrawerQuery, ContributionDrawerQueryVariables } from '../../lib/graphql/types/v2/graphql';
-import {
-  ActivityType,
-  ContributionFrequency,
-  OrderStatus,
-  TransactionKind,
-  TransactionType,
-} from '../../lib/graphql/types/v2/graphql';
+import { ActivityType, ContributionFrequency, OrderStatus, TransactionKind } from '../../lib/graphql/types/v2/graphql';
 import useClipboard from '../../lib/hooks/useClipboard';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { i18nPaymentMethodProviderType } from '../../lib/i18n/payment-method-provider-type';
@@ -581,11 +575,11 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                {actions?.primary?.map(action => <DropdownActionItem key={action.label} action={action} />)}
+                {actions?.primary?.map(action => <DropdownActionItem key={action.key} action={action} />)}
 
                 {actions?.primary.length > 0 && actions?.secondary.length > 0 && <DropdownMenuSeparator />}
 
-                {actions?.secondary?.map(action => <DropdownActionItem key={action.label} action={action} />)}
+                {actions?.secondary?.map(action => <DropdownActionItem key={action.key} action={action} />)}
               </DropdownMenuContent>
             </DropdownMenu>
           )}
@@ -611,16 +605,14 @@ function buildTransactionGroups(order: ContributionDrawerQuery['order']): Transa
 
   return groups.map(group => ({
     group,
-    transactions: byGroup[group]
-      .filter(txn => txn.type === TransactionType.CREDIT)
-      .sort((a, b) => {
-        if (a.kind === TransactionKind.CONTRIBUTION && b.kind !== TransactionKind.CONTRIBUTION) {
-          return -1;
-        } else if (a.kind !== TransactionKind.CONTRIBUTION && b.kind === TransactionKind.CONTRIBUTION) {
-          return 1;
-        }
-        return a.createdAt - b.createdAt;
-      }),
+    transactions: byGroup[group].sort((a, b) => {
+      if (a.kind === TransactionKind.CONTRIBUTION && b.kind !== TransactionKind.CONTRIBUTION) {
+        return -1;
+      } else if (a.kind !== TransactionKind.CONTRIBUTION && b.kind === TransactionKind.CONTRIBUTION) {
+        return 1;
+      }
+      return a.createdAt - b.createdAt;
+    }),
   }));
 }
 

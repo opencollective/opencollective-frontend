@@ -1,7 +1,7 @@
 import React from 'react';
+import { Discord } from '@styled-icons/fa-brands/Discord';
 import { Github } from '@styled-icons/fa-brands/Github';
 import { Mastodon } from '@styled-icons/fa-brands/Mastodon';
-import { Slack } from '@styled-icons/fa-brands/Slack';
 import { Twitter } from '@styled-icons/fa-brands/Twitter';
 import { ChevronDown, ExternalLink, Mail } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
@@ -44,8 +44,8 @@ const SocialLinks = ({ className }: { className?: string }) => {
       <SocialLink href="https://github.com/opencollective" rel="me" aria-label="Open Collective Github link">
         <Github size={16} />
       </SocialLink>
-      <SocialLink href="https://slack.opencollective.com" aria-label="Open Collective Slack link">
-        <Slack size={16} />
+      <SocialLink href="https://discord.opencollective.com" aria-label="Open Collective Discord link">
+        <Discord size={16} />
       </SocialLink>
       <SocialLink href="/contact" aria-label="Contact Open Collective">
         <Mail size={16} />
@@ -159,9 +159,7 @@ const Footer = () => {
                   !LoggedInUser || (LoggedInUser && !(item.href === '/create-account' || item.href === '/signin')) ? (
                     <li className="text-muted-foreground hover:text-foreground" key={item.href}>
                       {item.href[0] === '/' ? (
-                        <Link href={item.href} passHref legacyBehavior>
-                          {item.label}
-                        </Link>
+                        <Link href={item.href}>{item.label}</Link>
                       ) : (
                         <a href={item.href}>
                           {item.label} <ExternalLink className="inline-block" size={12} />

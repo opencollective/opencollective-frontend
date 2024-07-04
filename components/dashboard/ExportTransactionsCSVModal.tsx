@@ -169,7 +169,7 @@ const FieldTag = ({ id, dragElement, canDrag }: { id: string; dragElement?: bool
   return (
     <button
       className={cn(
-        'rounded-lg bg-white px-2 py-1 text-xs transition-all ',
+        'rounded-lg bg-white px-2 py-1 text-xs transition-all',
         isBeingDrag && 'opacity-40',
         dragElement && 'cursor-grabbing',
         canDrag ? 'cursor-grab' : 'cursor-default',
@@ -424,7 +424,7 @@ const ExportTransactionsCSVModal = ({
       <Dialog open={open} onOpenChange={setOpen}>
         {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
         <DialogContent className="gap-2 overflow-hidden p-0 md:max-w-4xl">
-          <DialogHeader className="px-4  pt-6 sm:px-8">
+          <DialogHeader className="px-4 pt-6 sm:px-8">
             <DialogTitle className="text-xl font-bold">
               <FormattedMessage id="ExportTransactionsCSVModal.Title" defaultMessage="Export Transactions" />
             </DialogTitle>

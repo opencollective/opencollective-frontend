@@ -29,6 +29,7 @@ import StyledButton from '../components/StyledButton';
 import StyledFilters from '../components/StyledFilters';
 import StyledHr from '../components/StyledHr';
 import { fadeIn } from '../components/StyledKeyframes';
+import StyledLink from '../components/StyledLink';
 import { StyledSelectFilter } from '../components/StyledSelectFilter';
 import StyledTag from '../components/StyledTag';
 import { H1, P, Span } from '../components/Text';
@@ -501,14 +502,15 @@ class SearchPage extends React.Component {
                   </Container>
                   <Container fontSize="18px" lineHeight="26px" pt={16} mt={4} textAlign="center">
                     <FormattedMessage
-                      defaultMessage="Still no luck? Contact <SupportLink>support</SupportLink> or find us in <SlackLink>Slack</SlackLink>"
+                      defaultMessage="Still no luck? Contact <SupportLink>support</SupportLink> or find us on {chatLink}."
                       id="+lM4fw"
                       values={{
                         SupportLink: I18nSupportLink,
-                        SlackLink: getI18nLink({
-                          openInNewTab: true,
-                          href: 'https://slack.opencollective.com/',
-                        }),
+                        chatLink: (
+                          <StyledLink href="https://discord.opencollective.com/" openInNewTab>
+                            Discord
+                          </StyledLink>
+                        ),
                       }}
                     />
                   </Container>

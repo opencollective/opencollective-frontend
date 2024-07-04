@@ -75,7 +75,7 @@ const nextConfig = {
     );
 
     if (['ci', 'test', 'development'].includes(process.env.OC_ENV)) {
-      // eslint-disable-next-line node/no-unpublished-require
+      // eslint-disable-next-line n/no-unpublished-require
       const CircularDependencyPlugin = require('circular-dependency-plugin');
       config.plugins.push(
         new CircularDependencyPlugin({
@@ -91,7 +91,7 @@ const nextConfig = {
       new CopyPlugin({
         patterns: [
           {
-            // eslint-disable-next-line node/no-extraneous-require
+            // eslint-disable-next-line n/no-extraneous-require
             from: path.join(path.dirname(require.resolve('pdfjs-dist/package.json')), 'cmaps'),
             to: path.join(__dirname, 'public/static/cmaps'),
           },
@@ -311,7 +311,7 @@ let exportedConfig = withSentryConfig(
 );
 
 if (process.env.ANALYZE) {
-  // eslint-disable-next-line node/no-unpublished-require
+  // eslint-disable-next-line n/no-unpublished-require
   const withBundleAnalyzer = require('@next/bundle-analyzer')({
     enabled: true,
   });

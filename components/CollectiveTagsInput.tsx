@@ -1,5 +1,4 @@
 import React, { Fragment, useCallback, useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { useLazyQuery } from '@apollo/client';
 import { DndContext, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable } from '@dnd-kit/sortable';
@@ -99,7 +98,15 @@ const debouncedSearch = debounce((searchFunc, variables) => {
   return searchFunc({ variables });
 }, 500);
 
-function CollectiveTagsInput({ defaultValue = [], onChange, suggestedTags = [] }) {
+function CollectiveTagsInput({
+  defaultValue = [],
+  onChange,
+  suggestedTags = [],
+}: {
+  defaultValue?: string[];
+  onChange: (tags: TagOption[]) => void;
+  suggestedTags?: string[];
+}) {
   const intl = useIntl();
   const [searchTags, { loading: fetching, data }] = useLazyQuery(searchTagsQuery, {
     context: API_V2_CONTEXT,
@@ -252,10 +259,9 @@ function CollectiveTagsInput({ defaultValue = [], onChange, suggestedTags = [] }
             return (
               <StyledTag
                 variant="rounded-right"
-                type="button"
+                htmlType="button"
                 tabIndex={-1}
                 key={tag}
-                closeButtonProps={false}
                 style={{ opacity: isSelected ? 0.5 : 1, cursor: 'pointer' }}
                 onClick={() =>
                   isSelected
@@ -272,12 +278,5 @@ function CollectiveTagsInput({ defaultValue = [], onChange, suggestedTags = [] }
     </Fragment>
   );
 }
-
-CollectiveTagsInput.propTypes = {
-  defaultValue: PropTypes.arrayOf(PropTypes.string),
-  suggestedTags: PropTypes.arrayOf(PropTypes.string),
-  onChange: PropTypes.func,
-  preload: PropTypes.bool,
-};
 
 export default CollectiveTagsInput;

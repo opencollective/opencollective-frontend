@@ -260,7 +260,7 @@ const submittedExpensesPageQuery = gql`
     $offset: Int!
     $type: ExpenseType
     $tags: [String]
-    $status: ExpenseStatusFilter
+    $status: [ExpenseStatusFilter]
     $minAmount: Int
     $maxAmount: Int
     $payoutMethodType: PayoutMethodType
@@ -337,7 +337,7 @@ const submittedExpensesPageQuery = gql`
 
 const addExpensesPageData = graphql<SubmittedExpensesPageProps>(submittedExpensesPageQuery, {
   options: props => {
-    const amountRange = parseAmountRange(props.query.amount);
+    const amountRange = parseAmountRange(props.query.amount as string);
     const { from: dateFrom, to: dateTo } = parseDateInterval(props.query.period);
     const orderBy = props.query.orderBy && parseChronologicalOrderInput(props.query.orderBy);
     return {

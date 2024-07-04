@@ -1,11 +1,10 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import propTypes from '@styled-system/prop-types';
 import { isNil, omitBy, truncate } from 'lodash';
 import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import type {
   ContainerProps,
+  DropdownIndicatorProps,
   GroupHeadingProps,
   OptionProps,
   Props as ReactSelectProps,
@@ -120,16 +119,12 @@ const STYLES_DISPLAY_NONE = { display: 'none' };
 /**
  * Override the default "Caret Down" indicator to use a search icon instead
  */
-const DropdownSearchIndicator = props => {
+const DropdownSearchIndicator = (props: DropdownIndicatorProps) => {
   return props.isDisabled ? null : (
     <ReactSelectComponents.DropdownIndicator {...props}>
       <SearchIcon size={16} fill="#aaaaaa" />
     </ReactSelectComponents.DropdownIndicator>
   );
-};
-
-DropdownSearchIndicator.propTypes = {
-  isDisabled: PropTypes.bool,
 };
 
 const GroupHeading = ({ children, ...props }: GroupHeadingProps) => (
@@ -170,7 +165,7 @@ const getComponents = (components, useSearchIcon) => {
  * Binds our custom theme and wordings to a regular `react-select`'s `Select`.
  * See https://react-select.com for more documentation.
  */
-export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs(
+export const makeStyledSelect = (SelectComponent, { alwaysSearchable = false } = {}) => styled(SelectComponent).attrs(
   ({
     theme,
     intl,
@@ -183,17 +178,17 @@ export const makeStyledSelect = SelectComponent => styled(SelectComponent).attrs
     hideDropdownIndicator,
     hideMenu,
     error,
-    styles,
+    styles = {},
     components,
     isSearchable,
     menuPortalTarget,
     selectTheme,
     noOptionsMessage = () => intl.formatMessage(Messages.noOptions),
     options,
-    fontSize,
+    fontSize = '14px',
     onBlur,
   }) => {
-    isSearchable = isSearchable ?? options?.length > 8;
+    isSearchable = alwaysSearchable || (isSearchable ?? options?.length > 8);
     return {
       isSearchable,
       menuPortalTarget:
@@ -340,59 +335,14 @@ export type StyledSelectProps = LayoutProps &
   Omit<ReactSelectProps, 'styles' | 'components'> & {
     styles?: Record<string, unknown>;
     components?: Record<string, React.ReactNode | React.Component | React.FunctionComponent>;
-    intl: IntlShape;
+    intl?: IntlShape;
     disabled?: boolean;
     error?: boolean;
+    inputId?: string;
   };
 
-type StyledSelectCustomComponent = Select & React.ExoticComponent<StyledSelectProps>;
+export type StyledSelectCustomComponent = Select & React.ExoticComponent<StyledSelectProps>;
 
 const StyledSelect: StyledSelectCustomComponent = makeStyledSelect(Select);
 
-StyledSelect['propTypes'] = {
-  // Styled-system
-  ...propTypes.typography,
-  ...propTypes.layout,
-  ...propTypes.space,
-  /** The id of the search input */
-  inputId: PropTypes.string.isRequired,
-  /** Define an id prefix for the select components e.g., {your-id}-value */
-  instanceId: PropTypes.string,
-  /** Placeholder for the select value */
-  placeholder: PropTypes.node,
-  /** Whether the component is disabled */
-  disabled: PropTypes.bool,
-  required: PropTypes.bool,
-  /** Alias for `disabled` */
-  isDisabled: PropTypes.bool,
-  /** Rendered when there's no option to show */
-  noOptionsMessage: PropTypes.func,
-  /** If true, a search icon will be used instead of the default caret down */
-  useSearchIcon: PropTypes.bool,
-  /** If true, DropDown indicator (caret) will not be displayed */
-  hideDropdownIndicator: PropTypes.bool,
-  /** If true, options list will not be displayed */
-  hideMenu: PropTypes.bool,
-  /** Default placement of the menu in relation to the control */
-  menuPlacement: PropTypes.oneOf(['bottom', 'top', 'auto']),
-  /** Displays a red border when truthy */
-  error: PropTypes.any,
-  /** @ignore from injectIntl */
-  intl: PropTypes.object,
-  /** Default option */
-  defaultValue: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
-  styles: PropTypes.object,
-  /** To render menu in a portal */
-  menuPortalTarget: PropTypes.any,
-  /** Compact mode for rending multiple selections correctly **/
-  useCompactMode: PropTypes.bool,
-  name: PropTypes.string,
-};
-
-StyledSelect['defaultProps'] = {
-  fontSize: '14px',
-  styles: {},
-  useCompactMode: false,
-};
-
-export default injectIntl(StyledSelect);
+export default injectIntl(StyledSelect) as undefined as StyledSelectCustomComponent;

@@ -7,18 +7,12 @@ const baseConfig = {
   env: {
     jest: true,
   },
-  extends: [
-    'opencollective',
-    'plugin:styled-components-a11y/recommended',
-    'plugin:import/typescript',
-    'plugin:react-hooks/recommended',
-  ],
-  plugins: ['simple-import-sort', 'formatjs'],
+  extends: ['opencollective', 'plugin:styled-components-a11y/recommended', 'plugin:react-hooks/recommended'],
+  plugins: ['formatjs'],
   rules: {
     'no-console': 'error',
     'require-atomic-updates': 'off',
     'lines-between-class-members': ['error', 'always', { exceptAfterSingleLine: true }],
-    'node/no-missing-import': ['error', { tryExtensions: ['.js', '.ts', '.tsx'] }],
     'no-restricted-imports': [
       'error',
       {
@@ -71,9 +65,8 @@ const baseConfig = {
           ['^\\u0000'],
           // Node.js builtins. You could also generate this regex if you use a `.js` config.
           // For example: `^(${require("module").builtinModules.join("|")})(/|$)`
-          [
-            '^(_http_agent|_http_client|_http_common|_http_incoming|_http_outgoing|_http_server|_stream_duplex|_stream_passthrough|_stream_readable|_stream_transform|_stream_wrap|_stream_writable|_tls_common|_tls_wrap|assert|async_hooks|buffer|child_process|cluster|console|constants|crypto|dgram|dns|domain|events|fs|http|http2|https|inspector|module|net|os|path|perf_hooks|process|punycode|querystring|readline|repl|stream|string_decoder|sys|timers|tls|trace_events|tty|url|util|v8|vm|worker_threads|zlib)(/|$)',
-          ],
+          // eslint-disable-next-line
+          [`^(${require('module').builtinModules.join('|')})(/|$)`],
           // Packages.
           // Things that start with a letter (or digit or underscore), or `@` followed by a letter.
           ['^react$', '^prop-types$', '^@?\\w'],
@@ -114,6 +107,11 @@ const baseConfig = {
     'styled-components-a11y/html-has-lang': ['off'],
     'styled-components-a11y/iframe-has-title': ['off'],
     'styled-components-a11y/label-has-associated-control': ['off'],
+
+    // disallow unsupported Node.js built-in APIs on the specified version
+    // https://github.com/eslint-community/eslint-plugin-n/blob/master/docs/rules/no-unsupported-features/node-builtins.md
+    // fetch, navigator, crypto and URL are experimental in Node 20
+    'n/no-unsupported-features/node-builtins': 'off',
   },
 };
 
@@ -149,7 +147,6 @@ module.exports = {
     {
       files: ['*.ts', '*.tsx'],
       ...baseConfig,
-      extends: [...baseConfig.extends, 'plugin:@typescript-eslint/recommended'],
       rules: {
         ...baseConfig.rules,
         '@typescript-eslint/no-explicit-any': 'warn',
@@ -173,6 +170,18 @@ module.exports = {
       files: ['scripts/*.js'],
       rules: {
         'no-console': 'off',
+      },
+    },
+    {
+      files: ['server/*.js', '*.config.js', '.storybook/main.js', 'env.js'],
+      rules: {
+        '@typescript-eslint/no-var-requires': 'off',
+      },
+    },
+    {
+      files: ['*.tsx'],
+      rules: {
+        'react/prop-types': 'off',
       },
     },
   ],

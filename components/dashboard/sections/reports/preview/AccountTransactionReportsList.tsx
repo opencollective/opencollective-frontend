@@ -101,7 +101,7 @@ const AccountTransactionReportList = ({ accountSlug }: DashboardSectionProps) =>
   return (
     <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader
-        title={<FormattedMessage id="Reports" defaultMessage="Reports" />}
+        title={<FormattedMessage id="TransactionReports" defaultMessage="Transaction Reports" />}
         actions={<div className="flex items-center gap-2"></div>}
       />
 
@@ -121,7 +121,7 @@ const AccountTransactionReportList = ({ accountSlug }: DashboardSectionProps) =>
               onClickRow={row => {
                 queryFilter.resetFilters(
                   {},
-                  `/dashboard/${account.slug}/reports/${serializeReportSlug(row.original.period)}`,
+                  `/dashboard/${account.slug}/reports/transactions/${serializeReportSlug(row.original.period)}`,
                 );
               }}
               data={data?.account?.transactionReports?.nodes.slice(offset, offset + limit).map(n => {

@@ -6,6 +6,8 @@ export enum PREVIEW_FEATURE_KEYS {
   COLLECTIVE_OVERVIEW = 'COLLECTIVE_OVERVIEW',
   NEW_EXPENSE_FLOW = 'NEW_EXPENSE_FLOW',
   HOST_REPORTS = 'HOST_REPORTS',
+  CROWDFUNDING_REDESIGN = 'CROWDFUNDING_REDESIGN',
+  TRANSACTIONS_IMPORTS = 'TRANSACTIONS_IMPORTS',
 }
 
 export type PreviewFeature = {
@@ -53,5 +55,21 @@ export const previewFeatures: PreviewFeature[] = [
       'A new report that sums up all transactions to create a comprehensive overview of all activity in your account.',
     publicBeta: true,
     alwaysEnableInDev: true,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.CROWDFUNDING_REDESIGN,
+    title: 'Crowdfunding Redesign',
+    description:
+      'Be part of the crowdfunding redesign effort and get access to previews of new crowdfunding and profile pages',
+    alwaysEnableInDev: true,
+    publicBeta: true,
+    closedBetaAccessFor: ['opencollective', 'design', 'engineering'],
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.TRANSACTIONS_IMPORTS,
+    title: 'Transactions Imports',
+    description: 'A new tool to import batches of transactions.',
+    publicBeta: false,
+    closedBetaAccessFor: ['opencollective', 'europe', 'opensource'],
   },
 ];

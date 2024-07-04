@@ -44,7 +44,7 @@ const ActivityContent = ({
   const summary = activity[contentKey]?.summary;
   const href = `${getCollectivePageRoute(activity?.account)}/${activity.update ? 'updates' : 'conversations'}/${activity.update?.slug || `${activity.conversation?.slug}-${activity.conversation?.id}`}`;
   return (
-    <div className="mt-4 space-y-2 rounded-xl bg-slate-50  p-4">
+    <div className="mt-4 space-y-2 rounded-xl bg-slate-50 p-4">
       {title && <p className="text-base font-medium">{title}</p>}
       <HTMLContent fontSize="14px" lineHeight="20px" content={content} />
       {summary && (

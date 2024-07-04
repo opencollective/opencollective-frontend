@@ -40,7 +40,7 @@ export function ReportContent({
                 </th>
                 {showCreditDebit ? (
                   <React.Fragment>
-                    <th className="w-40  text-right text-sm font-medium text-muted-foreground">
+                    <th className="w-40 text-right text-sm font-medium text-muted-foreground">
                       <FormattedMessage id="Expense.Type.Debit" defaultMessage="Debit" />
                     </th>
                     <th className="w-40 text-right text-sm font-medium text-muted-foreground">
@@ -66,7 +66,7 @@ export function ReportContent({
 
                 return (
                   <React.Fragment key={JSON.stringify(row.filter)}>
-                    <tr className="group text-sm hover:bg-muted has-[[data-state=open]]:bg-muted ">
+                    <tr className="group text-sm hover:bg-muted has-[[data-state=open]]:bg-muted">
                       <td className="flex min-h-8 flex-1 items-center gap-1 overflow-hidden truncate text-wrap py-1 pl-6 text-left sm:pl-10">
                         <span className="underline-offset-2 transition-colors hover:decoration-slate-400">
                           {row.label || <TransactionReportRowLabel filter={row.filter} />}
@@ -132,7 +132,7 @@ export function ReportContent({
                   </React.Fragment>
                 );
               })}
-              <tr className="border-t text-right text-base  font-medium">
+              <tr className="border-t text-right text-base font-medium">
                 <td className="min-h-8"></td>
                 {showCreditDebit ? (
                   <React.Fragment>

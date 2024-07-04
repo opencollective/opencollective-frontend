@@ -131,7 +131,7 @@ const parseQuery = query => {
   return {
     slug: getSingleParam(query.slug),
     section: getSingleParam(query.section),
-    subpath: getAsArray(query.subpath),
+    subpath: getAsArray(query.subpath)?.filter(Boolean),
   };
 };
 
@@ -201,6 +201,7 @@ const DashboardPage = () => {
     <DashboardContext.Provider
       value={{
         selectedSection,
+        subpath: subpath || [],
         expandedSection,
         setExpandedSection,
         account,

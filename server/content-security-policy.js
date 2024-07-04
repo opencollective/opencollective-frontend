@@ -18,6 +18,7 @@ const COMMON_DIRECTIVES = {
     'opencollective.com', // for widgets on /admin/export
     'blog.opencollective.com', // used to easily link images in static pages
     'blob:', // For upload images previews
+    'i.ytimg.com', // For youtube embeds
   ].filter(Boolean),
   workerSrc: [
     SELF,

@@ -99,7 +99,7 @@ class PayWithPaypalButton extends Component<PayWithPaypalButtonProps, { isLoadin
   };
 
   isRecurring = () => {
-    return [INTERVALS.month, INTERVALS.year].includes(this.props.interval);
+    return ([INTERVALS.month, INTERVALS.year] as string[]).includes(this.props.interval);
   };
 
   async initialize() {

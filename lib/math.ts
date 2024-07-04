@@ -17,3 +17,5 @@ export function scaleValue(
   const result = ((value - initialMin) * (targetMax - targetMin)) / (initialMax - initialMin) + targetMin;
   return shouldClamp ? clamp(result, targetMin, targetMax) : result;
 }
+
+export const toNegative = n => (n > 0 ? -n : n);

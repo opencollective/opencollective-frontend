@@ -356,7 +356,7 @@ const FormBody = ({ update }) => {
                   )}
                 </div>
                 <hr />
-                <div className="flex flex-col gap-8 ">
+                <div className="flex flex-col gap-8">
                   {isEditing && (
                     <SideColumnItem>
                       {update.publishedAt ? (

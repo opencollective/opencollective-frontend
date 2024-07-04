@@ -20,7 +20,7 @@ import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
 import { accountNavbarFieldsFragment } from '../components/collective-navbar/fragments';
 import Container from '../components/Container';
-import { confirmContributionFieldsFragment } from '../components/ContributionConfirmationModal';
+import { confirmContributionFieldsFragment } from '../components/contributions/ConfirmContributionForm';
 import CreatePendingOrderModal from '../components/dashboard/sections/contributions/CreatePendingOrderModal';
 import DateTime from '../components/DateTime';
 import ErrorPage from '../components/ErrorPage';

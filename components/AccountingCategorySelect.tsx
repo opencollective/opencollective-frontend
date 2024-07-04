@@ -401,7 +401,7 @@ const AccountingCategorySelect = ({
         <div className="mt-2 min-h-[33px] text-xs text-gray-700">
           {hasPredictions && (
             <div>
-              <Sparkles size={16} className=" mr-1 inline-block text-yellow-500" strokeWidth={1.5} />
+              <Sparkles size={16} className="mr-1 inline-block text-yellow-500" strokeWidth={1.5} />
               <FormattedMessage
                 defaultMessage="Suggested: {suggestions}"
                 id="XItXfz"

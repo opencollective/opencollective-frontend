@@ -734,7 +734,7 @@ const ExpenseFormBody = ({
                   {/* Tags */}
                   <div>
                     <Span color="black.900" fontSize="18px" lineHeight="26px" fontWeight="bold">
-                      <FormattedMessage defaultMessage="Tag you expense" id="uEcPHj" />
+                      <FormattedMessage defaultMessage="Tag your expense" id="EosA8s" />
                     </Span>
                     <Flex alignItems="flex-start" mt={2}>
                       <ExpenseTypeTag type={values.type} mr="4px" />
@@ -1020,7 +1020,7 @@ const ExpenseForm = ({
     initialValues.items = expense.draft.items?.map(newExpenseItem) || [];
     initialValues.taxes = expense.draft.taxes;
     initialValues.attachedFiles = expense.draft.attachedFiles;
-    initialValues.payoutMethod = expense.draft.payoutMethod;
+    initialValues.payoutMethod = expense.draft.payoutMethod || expense.payoutMethod;
     initialValues.payeeLocation = expense.draft.payeeLocation;
     initialValues.payee = expense.recurringExpense ? expense.payee : expense.draft.payee;
   }
@@ -1095,6 +1095,7 @@ ExpenseForm.propTypes = {
     status: PropTypes.string,
     payee: PropTypes.object,
     draft: PropTypes.object,
+    payoutMethod: PropTypes.object,
     recurringExpense: PropTypes.object,
     items: PropTypes.arrayOf(
       PropTypes.shape({

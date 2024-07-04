@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useQuery } from '@apollo/client';
 import { Check } from '@styled-icons/boxicons-regular/Check';
 import { FormikProvider, useFormik, useFormikContext } from 'formik';
-import { cloneDeep, get, kebabCase, omit, round } from 'lodash';
+import { cloneDeep, kebabCase, omit, round } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import type { BorderProps, SpaceProps } from 'styled-system';
@@ -34,7 +34,6 @@ import StyledModal, { ModalBody, ModalHeader } from '../StyledModal';
 import StyledSelect from '../StyledSelect';
 import StyledTooltip from '../StyledTooltip';
 import { H4, P, Span } from '../Text';
-import { withUser } from '../UserProvider';
 
 import { FieldGroup } from './PayoutBankInformationForm';
 import PayoutMethodData from './PayoutMethodData';
@@ -210,17 +209,16 @@ const validate = values => {
   return errors;
 };
 
-const getCanCustomizeFeesPayer = (expense, collective, isManualPayment, feeAmount, isRoot) => {
+const getCanCustomizeFeesPayer = (expense, collective, isManualPayment, feeAmount) => {
   const supportedPayoutMethods = [PayoutMethodType.BANK_ACCOUNT, PayoutMethodType.OTHER];
   const isSupportedPayoutMethod = supportedPayoutMethods.includes(expense.payoutMethod?.type);
-  const isFullBalance = expense.amount === get(collective, 'stats.balanceWithBlockedFunds.valueInCents');
   const isSameCurrency = expense.currency === collective?.currency;
 
   // Current limitations:
   // - Only for transferwise and manual payouts
   // - Only when emptying the account balance (unless root user)
   // - Only with expenses submitted in the same currency as the collective
-  if (!(isSupportedPayoutMethod && isSameCurrency && (isFullBalance || isRoot))) {
+  if (!(isSupportedPayoutMethod && isSameCurrency)) {
     return false;
   }
 
@@ -285,6 +283,11 @@ const getInitialValues = (expense, host) => {
 };
 
 const calculateAmounts = ({ values, expense, quote, host, feesPayer }) => {
+  const expenseAmountInHostCurrency = {
+    valueInCents: values.expenseAmountInHostCurrency,
+    currency: host.currency,
+  };
+
   if (values.forceManual) {
     const totalAmount = {
       valueInCents: values.expenseAmountInHostCurrency + (values.paymentProcessorFeeInHostCurrency || 0),
@@ -292,10 +295,6 @@ const calculateAmounts = ({ values, expense, quote, host, feesPayer }) => {
     };
     const paymentProcessorFee = {
       valueInCents: values.paymentProcessorFeeInHostCurrency,
-      currency: host.currency,
-    };
-    const expenseAmountInHostCurrency = {
-      valueInCents: values.expenseAmountInHostCurrency,
       currency: host.currency,
     };
     const grossAmount = totalAmount.valueInCents - (paymentProcessorFee.valueInCents || 0);
@@ -318,7 +317,7 @@ const calculateAmounts = ({ values, expense, quote, host, feesPayer }) => {
       expenseAmountInHostCurrency,
     };
   } else {
-    return {};
+    return { expenseAmountInHostCurrency, totalAmount: expenseAmountInHostCurrency, paymentProcessorFee: null };
   }
 };
 
@@ -364,15 +363,7 @@ type PayExpenseModalProps = {
 /**
  * Modal displayed by `PayExpenseButton` to trigger the actual payment of an expense
  */
-const PayExpenseModal = ({
-  onClose,
-  onSubmit,
-  expense,
-  collective,
-  host,
-  error,
-  LoggedInUser,
-}: PayExpenseModalProps) => {
+const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }: PayExpenseModalProps) => {
   const intl = useIntl();
   const payoutMethodType = expense.payoutMethod?.type || PayoutMethodType.OTHER;
   const initialValues = getInitialValues(expense, host);
@@ -454,13 +445,7 @@ const PayExpenseModal = ({
                     ...getPayoutOptionValue(payoutMethodType, item === 'AUTO', host),
                     paymentProcessorFeeInHostCurrency: null,
                     expenseAmountInHostCurrency: expense.currency === host.currency ? expense.amount : null,
-                    feesPayer: !getCanCustomizeFeesPayer(
-                      expense,
-                      collective,
-                      hasManualPayment,
-                      null,
-                      LoggedInUser.isRoot,
-                    )
+                    feesPayer: !getCanCustomizeFeesPayer(expense, collective, hasManualPayment, null)
                       ? DEFAULT_VALUES.feesPayer // Reset fees payer if can't customize
                       : formik.values.feesPayer,
                   });
@@ -608,7 +593,6 @@ const PayExpenseModal = ({
               collective,
               hasManualPayment,
               formik.values.paymentProcessorFeeInHostCurrency,
-              LoggedInUser.isRoot,
             ) && (
               <Flex mt={16}>
                 <StyledTooltip
@@ -795,4 +779,4 @@ Please add funds to your Wise {currency} account."
   );
 };
 
-export default withUser(PayExpenseModal);
+export default PayExpenseModal;
