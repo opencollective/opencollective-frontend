@@ -127,12 +127,12 @@ export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape, any,
           }),
           filterValues,
         );
-        const desctructuredQueryValues = destructureFilterValues(queryWithReplacementsForDefaults);
+        const destructuredQueryValues = destructureFilterValues(queryWithReplacementsForDefaults);
 
         if (opts.skipRouter && !newPath) {
-          setStateQuery(desctructuredQueryValues);
+          setStateQuery(destructuredQueryValues);
         } else {
-          const query = omitBy(desctructuredQueryValues, isNil);
+          const query = omitBy(destructuredQueryValues, isNil);
           const basePath = newPath || router.asPath.split('?')[0];
 
           router.push(
