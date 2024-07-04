@@ -228,12 +228,6 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                       ),
                   },
                   {
-                    header: 'Status',
-                    cell: ({ row }) => {
-                      return <TransactionsImportRowStatus row={row.original} />;
-                    },
-                  },
-                  {
                     header: 'Date',
                     accessorKey: 'date',
                     cell: ({ cell }) => {
@@ -288,6 +282,12 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                       } else {
                         return '-';
                       }
+                    },
+                  },
+                  {
+                    header: 'Status',
+                    cell: ({ row }) => {
+                      return <TransactionsImportRowStatus row={row.original} />;
                     },
                   },
                   {
