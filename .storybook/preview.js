@@ -10,6 +10,7 @@ import { RouterContext } from 'next/dist/shared/lib/router-context.shared-runtim
 import { Toaster } from '../components/ui/Toaster';
 import { TooltipProvider } from '../components/ui/Tooltip';
 import UserProvider from '../components/UserProvider';
+import { ModalProvider } from '../components/ModalContext';
 
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
@@ -33,12 +34,14 @@ export const decorators = [
     <ApolloProvider client={initClient()}>
       <ThemeProvider theme={theme}>
         <IntlProvider locale="en">
-          <UserProvider>
-            <TooltipProvider>
-              <Story />
-              <Toaster />
-            </TooltipProvider>
-          </UserProvider>
+          <ModalProvider>
+            <UserProvider>
+              <TooltipProvider>
+                <Story />
+                <Toaster />
+              </TooltipProvider>
+            </UserProvider>
+          </ModalProvider>
         </IntlProvider>
       </ThemeProvider>
     </ApolloProvider>

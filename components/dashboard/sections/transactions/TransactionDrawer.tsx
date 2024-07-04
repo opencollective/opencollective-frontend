@@ -265,13 +265,13 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
       <DrawerHeader
         actions={actions}
         dropdownTriggerRef={dropdownTriggerRef}
-        entityName={<FormattedMessage defaultMessage="Transaction" id="1+ROfp" />}
-        entityIdentifier={
+        entity={<FormattedMessage defaultMessage="Transaction" id="1+ROfp" />}
+        identifier={
           <CopyID value={id} tooltipLabel={<FormattedMessage defaultMessage="Copy transaction ID" id="zzd7ZI" />}>
             #{id}
           </CopyID>
         }
-        entityLabel={
+        label={
           <React.Fragment>
             {loading ? (
               <Skeleton className="h-8 w-48" />
@@ -286,8 +286,7 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
                       amountStyles={{ letterSpacing: 0 }}
                       showCurrencyCode={false}
                     />
-                  </span>
-
+                  </span>{' '}
                   <span className="text-muted-foreground">{transaction?.netAmount.currency}</span>
                 </div>
               )
