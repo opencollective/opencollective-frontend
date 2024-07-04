@@ -127,8 +127,8 @@ export const TransactionsImportsTable = ({ accountSlug }) => {
                       intl.formatMessage(
                         {
                           defaultMessage:
-                            'Imported {expensesCount, plural, =0 {} one {# expense} other {# expenses}}{both, plural, =0 {} other { and }}{ordersCount, plural, =0 {} one {# order} other {# orders}}',
-                          id: 'Iode3e',
+                            'Imported {expensesCount, plural, =0 {} one {# expense} other {# expenses}}{both, plural, =0 {} other { and }}{ordersCount, plural, =0 {} one {# contribution} other {# contributions}}',
+                          id: 'ImportTransactionsCount',
                         },
                         {
                           expensesCount: stats.expenses,
