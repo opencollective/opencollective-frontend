@@ -204,7 +204,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                   {
                     id: 'select',
                     header: ({ table }) =>
-                      !importRows.length ? null : (
+                      importRows.some(row => !row.expense && !row.order) ? (
                         <Checkbox
                           onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
                           aria-label="Select all"
@@ -215,7 +215,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                             false
                           }
                         />
-                      ),
+                      ) : null,
                     cell: ({ row }) =>
                       !row.original.expense &&
                       !row.original.order && (
