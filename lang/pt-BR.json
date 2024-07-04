@@ -3453,6 +3453,7 @@
   "transactions.openCollectiveFee": "Taxa da Open Collective",
   "transactions.type": "Tipo",
   "transactions.viewAll": "Ver Todas as Transações",
+  "TransactionsImport.processed": "Processed",
   "TransactionsList.Empty": "Sem transações encontradas. <ResetLink>Redefinir filtros</ResetLink> para ver todas as transações.",
   "TransactionsOverview": "Contributions and Expenses",
   "transferwise.error.balance.payment-option-unavailable": "Incapaz de financiar a transferência. Verifique seu saldo e tente novamente.",

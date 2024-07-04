@@ -3453,6 +3453,7 @@
   "transactions.openCollectiveFee": "Open Collective fee",
   "transactions.type": "Type",
   "transactions.viewAll": "View All Transactions",
+  "TransactionsImport.processed": "Processed",
   "TransactionsList.Empty": "No transactions found. <ResetLink>Reset filters</ResetLink> to see all transactions.",
   "TransactionsOverview": "Contributions and Expenses",
   "transferwise.error.balance.payment-option-unavailable": "Unable to fund transfer. Please check your balance and try again.",

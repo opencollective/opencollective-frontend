@@ -3453,6 +3453,7 @@
   "transactions.openCollectiveFee": "Avgift till Open Collective",
   "transactions.type": "Typ",
   "transactions.viewAll": "Visa alla transaktioner",
+  "TransactionsImport.processed": "Processed",
   "TransactionsList.Empty": "Inga transaktioner hittades. <ResetLink>Återställ filter</ResetLink> för att se alla transaktioner.",
   "TransactionsOverview": "Bidrag och utgifter",
   "transferwise.error.balance.payment-option-unavailable": "Det fanns inte teckning för överföringen. Kontrollera ditt saldo och försök igen.",

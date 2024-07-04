@@ -3453,6 +3453,7 @@
   "transactions.openCollectiveFee": "Poplatok Open Collective",
   "transactions.type": "Typ",
   "transactions.viewAll": "Zobraziť všetky transakcie",
+  "TransactionsImport.processed": "Processed",
   "TransactionsList.Empty": "Nenašli sa žiadne transakcie. <ResetLink>Resetujte filtre</ResetLink>, aby ste videli všetky transakcie.",
   "TransactionsOverview": "Príspevky a výdavky",
   "transferwise.error.balance.payment-option-unavailable": "Nie je možné uskutočniť prevod. Skontrolujte, prosím, váš zostatok a skúste to znova.",

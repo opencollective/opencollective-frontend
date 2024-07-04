@@ -3453,6 +3453,7 @@
   "transactions.openCollectiveFee": "opłata Open Collective",
   "transactions.type": "Typ",
   "transactions.viewAll": "Pokaż wszystkie transakcje",
+  "TransactionsImport.processed": "Processed",
   "TransactionsList.Empty": "Nie znaleziono transakcji. <ResetLink>Zresetuj filtry</ResetLink>, aby zobaczyć wszystkie transakcje.",
   "TransactionsOverview": "Składki i Wydatki",
   "transferwise.error.balance.payment-option-unavailable": "Nie można dokonać transferu środków. Sprawdź stan swojego konta i spróbuj ponownie.",

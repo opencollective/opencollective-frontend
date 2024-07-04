@@ -3453,6 +3453,7 @@
   "transactions.openCollectiveFee": "Open Collective 费",
   "transactions.type": "类型",
   "transactions.viewAll": "查看所有交易",
+  "TransactionsImport.processed": "Processed",
   "TransactionsList.Empty": "No transactions found. <ResetLink>Reset filters</ResetLink> to see all transactions.",
   "TransactionsOverview": "捐款和支出",
   "transferwise.error.balance.payment-option-unavailable": "Unable to fund transfer. Please check your balance and try again.",

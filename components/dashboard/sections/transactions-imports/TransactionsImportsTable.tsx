@@ -88,15 +88,12 @@ export const TransactionsImportsTable = ({ accountSlug }) => {
                 accessorKey: 'source',
               },
               {
-                header: 'Type',
-                accessorKey: 'type',
-              },
-              {
-                header: 'Name',
+                header: intl.formatMessage({ defaultMessage: 'Name', id: 'Fields.name' }),
                 accessorKey: 'name',
               },
               {
-                header: 'Processed',
+                id: 'stats',
+                header: intl.formatMessage({ defaultMessage: 'Processed', id: 'TransactionsImport.processed' }),
                 accessorKey: 'stats',
                 cell: ({ cell }) => {
                   const stats = cell.getValue() as TransactionsImport['stats'];
@@ -113,7 +110,8 @@ export const TransactionsImportsTable = ({ accountSlug }) => {
                 },
               },
               {
-                header: 'Summary',
+                id: 'summary',
+                header: intl.formatMessage({ defaultMessage: 'Summary', id: 'Summary' }),
                 accessorKey: 'stats',
                 cell: ({ cell }) => {
                   const stats = cell.getValue() as TransactionsImport['stats'];

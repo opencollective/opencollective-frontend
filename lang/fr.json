@@ -3453,6 +3453,7 @@
   "transactions.openCollectiveFee": "Frais Open Collective",
   "transactions.type": "Type",
   "transactions.viewAll": "Voir toutes les transactions",
+  "TransactionsImport.processed": "Processed",
   "TransactionsList.Empty": "Aucune transaction trouvée. <ResetLink>Réinitialiser les filtres</ResetLink> pour voir toutes les transactions.",
   "TransactionsOverview": "Contributions et dépenses",
   "transferwise.error.balance.payment-option-unavailable": "Impossible de transférer les fonds. Veuillez vérifier votre solde et réessayer.",

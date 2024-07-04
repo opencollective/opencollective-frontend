@@ -3453,6 +3453,7 @@
   "transactions.openCollectiveFee": "עמלות Open Collective",
   "transactions.type": "סוג",
   "transactions.viewAll": "הצגת כל העסקאות",
+  "TransactionsImport.processed": "Processed",
   "TransactionsList.Empty": "לא נמצאו תנועות. <ResetLink>איפוס פילטרים</ResetLink> לצפיה בכל התנועות.",
   "TransactionsOverview": "תרומות ותשלומים",
   "transferwise.error.balance.payment-option-unavailable": "לא נמצאו תנוהות. נא לבדוק את המאזן ולנסות שוב.",

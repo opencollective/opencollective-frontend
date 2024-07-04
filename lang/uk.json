@@ -3453,6 +3453,7 @@
   "transactions.openCollectiveFee": "Комісія Open Collective",
   "transactions.type": "Тип",
   "transactions.viewAll": "Показати всі транзакції",
+  "TransactionsImport.processed": "Processed",
   "TransactionsList.Empty": "No transactions found. <ResetLink>Reset filters</ResetLink> to see all transactions.",
   "TransactionsOverview": "Внески та витрати",
   "transferwise.error.balance.payment-option-unavailable": "Unable to fund transfer. Please check your balance and try again.",
