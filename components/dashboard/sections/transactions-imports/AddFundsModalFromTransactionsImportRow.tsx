@@ -37,6 +37,7 @@ export const AddFundsModalFromImportRow = ({
       open={open}
       onClose={() => setOpen(false)}
       host={transactionsImport.account}
+      transactionsImportRow={row}
       initialValues={{
         amount: row.amount.valueInCents,
         currency: row.amount.currency,

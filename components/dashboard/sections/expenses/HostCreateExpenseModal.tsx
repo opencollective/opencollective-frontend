@@ -36,6 +36,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '..
 import { Button } from '../../../ui/Button';
 import { Dialog, DialogContent, DialogHeader } from '../../../ui/Dialog';
 import { useToast } from '../../../ui/useToast';
+import { TransactionsImportRowDetailsAccordion } from '../transactions-imports/TransactionsImportRowDetailsAccordion';
 
 const hostCreateExpenseModalQuery = gql`
   query HostCreateExpenseModal($hostId: String!, $forAccount: AccountReferenceInput) {
@@ -190,38 +191,7 @@ export const HostCreateExpenseModal = ({
           </h2>
         </DialogHeader>
         {transactionsImportRow && (
-          <Accordion type="single" collapsible className="mb-4">
-            <AccordionItem value="item-1">
-              <AccordionTrigger>
-                <div className="text-base font-medium text-slate-700">
-                  <FormattedMessage
-                    defaultMessage="Based on a {amount} debit from {date}"
-                    id="D6n6+U"
-                    values={{
-                      amount: (
-                        <FormattedMoneyAmount
-                          amount={Math.abs(transactionsImportRow.amount.valueInCents)}
-                          currency={transactionsImportRow.amount.currency}
-                        />
-                      ),
-                      date: <DateTime value={transactionsImportRow.date} />,
-                    }}
-                  />
-                </div>
-              </AccordionTrigger>
-              <AccordionContent>
-                <ul className="list-inside list-disc pl-1 text-xs">
-                  {Object.entries(transactionsImportRow.rawValue as Record<string, string>)
-                    .filter(entry => !isEmpty(entry[1]))
-                    .map(([key, value]) => (
-                      <li key={key}>
-                        <strong>{startCase(key)}</strong>: {value.toString()}{' '}
-                      </li>
-                    ))}
-                </ul>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+          <TransactionsImportRowDetailsAccordion transactionsImportRow={transactionsImportRow} className="mb-4" />
         )}
         <FormikZod<z.infer<typeof hostExpenseFormValuesSchema>>
           schema={hostExpenseFormValuesSchema}
