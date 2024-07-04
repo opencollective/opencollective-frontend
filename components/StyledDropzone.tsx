@@ -367,7 +367,7 @@ type UploadedFile = {
 
 type StyledDropzoneProps = Omit<ContainerProps, 'accept' | 'children' | 'ref' | 'onClick' | 'as'> & {
   /** Called back with the rejected files */
-  onReject?: () => void;
+  onReject?: (msg: string) => void;
   /** Called when the user drops files */
   onDrop?: (acceptedFiles, rejectedFiles) => void;
   /** Name for the input */

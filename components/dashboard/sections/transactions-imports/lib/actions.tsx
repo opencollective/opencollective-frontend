@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
 import { cloneDeep, uniq, update } from 'lodash';
-import { ArchiveRestore, Banknote, Merge, SquareSlashIcon } from 'lucide-react';
+import { ArchiveRestore, Banknote, Merge, Receipt, SquareSlashIcon } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../../../../lib/actions/types';
@@ -12,6 +12,7 @@ import type { TransactionsImportRow } from '../../../../../lib/graphql/types/v2/
 import { useModal } from '../../../../ModalContext';
 import StyledSpinner from '../../../../StyledSpinner';
 import { useToast } from '../../../../ui/useToast';
+import { HostCreateExpenseModal } from '../../expenses/HostCreateExpenseModal';
 import { AddFundsModalFromImportRow } from '../AddFundsModalFromTransactionsImportRow';
 import { MatchContributionDialog } from '../MatchContributionDialog';
 
@@ -95,7 +96,19 @@ export function useTransactionsImportActions({ transactionsImport, host }): {
             ),
         });
       } else if (row.amount.valueInCents < 0) {
-        // TODO create expense
+        actions.primary.push({
+          key: 'create-expense',
+          Icon: Receipt,
+          label: <FormattedMessage defaultMessage="Add expense" id="6/UjBO" />,
+          disabled: isUpdatingRow,
+          onClick: () => {
+            showModal(
+              HostCreateExpenseModal,
+              { host, onCloseFocusRef, transactionsImport, transactionsImportRow: row },
+              'host-create-expense-modal',
+            );
+          },
+        });
       }
     }
 
