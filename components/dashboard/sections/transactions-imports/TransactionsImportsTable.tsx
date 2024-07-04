@@ -84,7 +84,7 @@ export const TransactionsImportsTable = ({ accountSlug }) => {
                 cell: ({ cell }) => <DateTime value={cell.getValue() as Date} />,
               },
               {
-                header: 'Source',
+                header: intl.formatMessage({ defaultMessage: 'Source', id: 'AddFundsModal.source' }),
                 accessorKey: 'source',
               },
               {
