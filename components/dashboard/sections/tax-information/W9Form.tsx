@@ -62,8 +62,7 @@ export const getInitialValuesForW9 = (
   return merge(generateInitialValuesFromSchema(schema), {
     signer,
     accountNumbers: `@${account.slug} (#${account.id})`,
-    location:
-      account.location?.country === 'US' ? pick(account.location, ['country', 'structured']) : { country: 'US' },
+    location: { country: 'US', ...pick(account.location, ['country', 'structured']) },
     ...(baseValues.submitterType === SubmitterType.Individual
       ? { federalTaxClassification: FederalTaxClassification.Individual }
       : { federalTaxClassification: null }),
@@ -97,7 +96,6 @@ export const W9TaxFormFields = ({ formik }: { formik: FormikProps<W9TaxFormValue
             onChange={value => setFieldValue(field.name, value)}
             labelFontWeight="normal"
             autoDetectCountry={false}
-            disableCountryChange
             errors={field.error}
             useStructuredForFallback={true}
             required={field.required}
