@@ -137,12 +137,17 @@ const hostExpenseFormValuesSchema = z
     account: z.object({}),
     incurredAt: z.string(),
     amount: z.object({ valueInCents: z.number(), currency: z.nativeEnum(Currency) }),
+    attachedFile: z.object({ url: z.string() }).optional().nullable(),
   })
   .and(
     z.discriminatedUnion('type', [
-      z.object({ type: z.literal(ExpenseType.RECEIPT), receiptFile: z.object({ url: z.string() }) }),
       z.object({
-        type: z.enum(Object.values(omit(SUPPORTED_EXPENSE_TYPES, [ExpenseType.RECEIPT])) as [string, ...string[]]),
+        type: z.literal(ExpenseType.RECEIPT),
+        attachedFile: z.object({ url: z.string() }),
+      }),
+      z.object({
+        type: z.enum(Object.values(omit(SUPPORTED_EXPENSE_TYPES, ExpenseType.RECEIPT)) as [string, ...string[]]),
+        attachedFile: z.object({ url: z.string() }).optional().nullable(),
       }),
     ]),
   );
@@ -218,9 +223,13 @@ export const HostCreateExpenseModal = ({
                         amountV2: omit(values.amount, ['exchangeRate.__typename', 'exchangeRate.isApproximate']),
                         description: values.description,
                         incurredAt: values.incurredAt,
-                        url: values.type === ExpenseType.RECEIPT ? values['receiptFile']?.url : null,
+                        url: values.type === ExpenseType.RECEIPT ? values['attachedFile']?.url : null,
                       },
                     ],
+                    attachedFiles:
+                      values.type === ExpenseType.RECEIPT || !values['attachedFile']
+                        ? []
+                        : [pick(values['attachedFile'], ['url'])],
                   },
                 },
               });
@@ -302,7 +311,10 @@ export const HostCreateExpenseModal = ({
                       <StyledSelect
                         inputId={field.id}
                         error={field.error}
-                        onChange={option => setFieldValue('type', option?.['value'])}
+                        onChange={option => {
+                          setFieldValue('attachedFile', null);
+                          setFieldValue('type', option?.['value']);
+                        }}
                         fontSize="14px"
                         isDisabled={field.disabled}
                         placeholder="Select a type"
@@ -312,35 +324,6 @@ export const HostCreateExpenseModal = ({
                       />
                     )}
                   </StyledInputFormikField>
-                  {values.type === ExpenseType.RECEIPT && (
-                    <StyledInputFormikField
-                      name="receiptFile"
-                      label={<FormattedMessage defaultMessage="Receipt" id="Expense.Receipt" />}
-                    >
-                      {({ field, meta }) => (
-                        <StyledDropzone
-                          {...attachmentDropzoneParams}
-                          kind="EXPENSE_ITEM"
-                          data-cy={`${field.name}-dropzone`}
-                          name={field.name}
-                          isMulti={false}
-                          error={meta.error}
-                          mockImageGenerator={() => `https://loremflickr.com/120/120/invoice?lock=0`}
-                          fontSize="13px"
-                          value={field.value && isValidUrl(field.value?.url) && field.value.url}
-                          useGraphQL={true}
-                          parseDocument={false}
-                          onGraphQLSuccess={uploadResults => {
-                            const uploadedFile = uploadResults[0].file;
-                            setFieldValue(field.name, uploadedFile);
-                          }}
-                          onReject={msg => {
-                            toast({ variant: 'error', message: msg });
-                          }}
-                        />
-                      )}
-                    </StyledInputFormikField>
-                  )}
                   <StyledInputFormikField
                     name="account"
                     label={<FormattedMessage defaultMessage="Account" id="TwyMau" />}
@@ -372,6 +355,40 @@ export const HostCreateExpenseModal = ({
                         forAccount={values.account as Account}
                         disabled={field.disabled}
                         collective={field.value}
+                      />
+                    )}
+                  </StyledInputFormikField>
+                  <StyledInputFormikField
+                    required={values.type === ExpenseType.RECEIPT}
+                    name="attachedFile"
+                    label={
+                      values.type === ExpenseType.RECEIPT ? (
+                        <FormattedMessage defaultMessage="Receipt" id="Expense.Receipt" />
+                      ) : (
+                        <FormattedMessage defaultMessage="Attachment" id="Expense.Attachment" />
+                      )
+                    }
+                  >
+                    {({ form, field, meta }) => (
+                      <StyledDropzone
+                        {...attachmentDropzoneParams}
+                        kind="EXPENSE_ITEM"
+                        data-cy={`${field.name}-dropzone`}
+                        name={field.name}
+                        isMulti={false}
+                        error={(meta.touched || form.submitCount) && meta.error}
+                        mockImageGenerator={() => `https://loremflickr.com/120/120/invoice?lock=0`}
+                        fontSize="13px"
+                        value={field.value && isValidUrl(field.value?.url) && field.value.url}
+                        useGraphQL={true}
+                        parseDocument={false}
+                        onGraphQLSuccess={uploadResults => {
+                          const uploadedFile = uploadResults[0].file;
+                          setFieldValue(field.name, uploadedFile);
+                        }}
+                        onReject={msg => {
+                          toast({ variant: 'error', message: msg });
+                        }}
                       />
                     )}
                   </StyledInputFormikField>
