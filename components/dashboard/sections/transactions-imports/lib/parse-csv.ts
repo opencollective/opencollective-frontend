@@ -1,5 +1,5 @@
 import { parse as parseCSV } from 'csv-parse/sync';
-import { deburr, uniq } from 'lodash';
+import { deburr, uniq, words } from 'lodash';
 import type { IntlShape } from 'react-intl';
 
 import dayjs from '../../../../../lib/dayjs';
@@ -162,20 +162,21 @@ export const guessCSVColumnsConfig = (
 
   if (data[0]) {
     for (const column of Object.keys(data[0])) {
-      const lowerColumn = deburr(column).toLowerCase().replace(/\s/g, '');
-      if (!config.date.target && DATE_ALIASES.some(alias => lowerColumn === alias)) {
+      const columnWords = words(deburr(column).toLowerCase());
+      const matchAlias = (aliases: string[]) => aliases.some(alias => columnWords.includes(alias));
+      if (!config.date.target && matchAlias(DATE_ALIASES)) {
         config.date.target = column;
         config.date.format = guessDateFormat(data[0][column]);
       }
-      if (!config.credit.target && CREDIT_ALIASES.some(alias => lowerColumn === alias)) {
+      if (!config.credit.target && matchAlias(CREDIT_ALIASES)) {
         config.credit.target = column;
         config.credit.format = guessNumberFormat(data[0][column]);
       }
-      if (!config.debit.target && DEBIT_ALIASES.some(alias => lowerColumn === alias)) {
+      if (!config.debit.target && matchAlias(DEBIT_ALIASES)) {
         config.debit.target = column;
         config.debit.format = guessNumberFormat(data[0][column]);
       }
-      if (!config.description.target && DESCRIPTION_ALIASES.some(alias => lowerColumn === alias)) {
+      if (!config.description.target && matchAlias(DESCRIPTION_ALIASES)) {
         config.description.target = column;
       }
     }
