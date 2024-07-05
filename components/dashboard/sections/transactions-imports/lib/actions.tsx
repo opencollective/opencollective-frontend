@@ -80,16 +80,9 @@ export function useTransactionsImportActions({ transactionsImport, host }): {
     } else if (!row.isDismissed) {
       if (row.amount.valueInCents > 0) {
         actions.primary.push({
-          key: 'add-funds',
-          Icon: Banknote,
-          label: <FormattedMessage defaultMessage="Add funds" id="h9vJHn" />,
-          disabled: isUpdatingRow,
-          onClick: showAddFundsModal,
-        });
-        actions.primary.push({
           key: 'match',
           Icon: Merge,
-          label: <FormattedMessage defaultMessage="Match" id="contribution.match" />,
+          label: <FormattedMessage defaultMessage="Match expected funds" id="J/7TIn" />,
           disabled: isUpdatingRow,
           onClick: () =>
             showModal(
@@ -106,6 +99,13 @@ export function useTransactionsImportActions({ transactionsImport, host }): {
               },
               'match-contribution-modal',
             ),
+        });
+        actions.primary.push({
+          key: 'add-funds',
+          Icon: Banknote,
+          label: <FormattedMessage defaultMessage="Add funds" id="h9vJHn" />,
+          disabled: isUpdatingRow,
+          onClick: showAddFundsModal,
         });
       } else if (row.amount.valueInCents < 0) {
         actions.primary.push({

@@ -78,6 +78,9 @@ const uploadTransactionsImportMutation = gql`
     importTransactions(id: $importId, csvConfig: $csvConfig, data: $data, file: $file) {
       id
       rows {
+        totalCount
+        offset
+        limit
         nodes {
           ...TransactionsImportRowFields
         }

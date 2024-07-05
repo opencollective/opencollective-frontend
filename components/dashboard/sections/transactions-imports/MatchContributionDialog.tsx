@@ -245,7 +245,7 @@ export const MatchContributionDialog = ({
       <DialogContent className="sm:max-w-4xl">
         <DialogHeader>
           <h2 className="text-xl font-bold">
-            <FormattedMessage defaultMessage="Match contribution" id="c7INEq" />
+            <FormattedMessage defaultMessage="Match expected funds" id="J/7TIn" />
           </h2>
         </DialogHeader>
         {isConfirming ? (

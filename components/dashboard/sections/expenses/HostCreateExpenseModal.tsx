@@ -1,7 +1,7 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { Form } from 'formik';
-import { groupBy, isEmpty, map, omit, pick, startCase } from 'lodash';
+import { groupBy, map, omit, pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
@@ -23,16 +23,13 @@ import { attachmentDropzoneParams } from '../../../expenses/lib/attachments';
 
 import { DefaultCollectiveLabel } from '../../../CollectivePicker';
 import CollectivePickerAsync from '../../../CollectivePickerAsync';
-import DateTime from '../../../DateTime';
 import { ExchangeRate } from '../../../ExchangeRate';
-import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { FormikZod } from '../../../FormikZod';
 import type { BaseModalProps } from '../../../ModalContext';
 import StyledDropzone from '../../../StyledDropzone';
 import { StyledInputAmountWithDynamicFxRate } from '../../../StyledInputAmountWithDynamicFxRate';
 import StyledInputFormikField from '../../../StyledInputFormikField';
 import StyledSelect from '../../../StyledSelect';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../../../ui/Accordion';
 import { Button } from '../../../ui/Button';
 import { Dialog, DialogContent, DialogHeader } from '../../../ui/Dialog';
 import { useToast } from '../../../ui/useToast';
