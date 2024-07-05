@@ -34,6 +34,7 @@ export const TransactionsImportRowDrawer = ({
             <DrawerHeader
               actions={getActions(row, dropdownTriggerRef)}
               entityName={<FormattedMessage defaultMessage="Transaction import row" id="qqPBY/" />}
+              forceMoreActions
               entityLabel={
                 <div className="text-2xl">
                   <span className={'font-bold text-foreground'}>
@@ -147,8 +148,9 @@ export const TransactionsImportRowDrawer = ({
                 </li>
                 {Object.entries(row.rawValue as Record<string, string>)
                   .filter(entry => !isEmpty(entry[1]))
-                  .map(([key, value]) => (
-                    <li key={key}>
+                  .map(([key, value], index) => (
+                    // eslint-disable-next-line react/no-array-index-key
+                    <li key={index}>
                       <strong>{startCase(key)}</strong>: {value.toString()}{' '}
                     </li>
                   ))}

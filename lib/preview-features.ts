@@ -69,7 +69,6 @@ export const previewFeatures: PreviewFeature[] = [
     key: PREVIEW_FEATURE_KEYS.TRANSACTIONS_IMPORTS,
     title: 'Transactions Imports',
     description: 'A new tool to import batches of transactions.',
-    publicBeta: false,
-    closedBetaAccessFor: ['opencollective', 'europe', 'opensource'],
+    publicBeta: true,
   },
 ];

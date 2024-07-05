@@ -1,4 +1,5 @@
 import React from 'react';
+import { Banknote } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import type { Account, Amount, Order, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
@@ -8,7 +9,9 @@ import DateTime from '../../../DateTime';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import OrderStatusTag from '../../../orders/OrderStatusTag';
 import { DataTable } from '../../../table/DataTable';
+import { Button } from '../../../ui/Button';
 import { RadioGroup, RadioGroupItem } from '../../../ui/RadioGroup';
+import { EmptyResults } from '../../EmptyResults';
 
 export const SuggestedContributionsTable = ({
   loading,
@@ -16,6 +19,8 @@ export const SuggestedContributionsTable = ({
   setSelectedContribution,
   contributions,
   totalContributions,
+  queryFilter,
+  onAddFundsClick,
 }) => {
   return (
     <RadioGroup value={selectedContribution?.id}>
@@ -30,7 +35,25 @@ export const SuggestedContributionsTable = ({
             : ''
         }
         emptyMessage={() => (
-          <FormattedMessage defaultMessage="No contributions found. Try changing the filters." id="nxUjeq" />
+          <EmptyResults
+            hasFilters={queryFilter.hasFilters}
+            entityType="CONTRIBUTIONS"
+            onResetFilters={() => queryFilter.resetFilters({})}
+            otherActions={
+              <Button
+                data-cy="reset-filters"
+                size="lg"
+                variant="outline"
+                className="gap-2 rounded-full"
+                onClick={onAddFundsClick}
+              >
+                <Banknote size={16} />
+                <span>
+                  <FormattedMessage defaultMessage="Manually add funds" id="OrmUye" />
+                </span>
+              </Button>
+            }
+          />
         )}
         columns={[
           {

@@ -184,9 +184,9 @@ export function DataTable<TData, TValue>({
         ) : (
           <TableRow highlightOnHover={false}>
             <TableCell colSpan={columns.length} compact={compact}>
-              <p className="p-4 text-center text-slate-500">
+              <div className="p-4 text-center text-slate-500">
                 {emptyMessage ? emptyMessage() : <FormattedMessage defaultMessage="No data" id="UG5qoS" />}
-              </p>
+              </div>
             </TableCell>
           </TableRow>
         )}
