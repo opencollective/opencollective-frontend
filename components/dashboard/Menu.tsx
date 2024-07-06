@@ -1,34 +1,41 @@
 import React from 'react';
-import { get } from 'lodash';
+import type { LucideIcon } from 'lucide-react';
 import {
   ArrowRightLeft,
   BarChart2,
+  BookOpenCheck,
   BookUserIcon,
   Building,
   Coins,
   CreditCard,
   FileText,
+  FlaskConical,
   Globe2,
   HeartHandshake,
   LayoutDashboard,
-  LucideIcon,
+  Megaphone,
   Receipt,
   Settings,
   Store,
   Ticket,
+  Users,
   Users2,
+  UserX,
+  Wallet,
 } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
-import { isHostAccount, isIndividualAccount, isInternalHost, isSelfHostedAccount } from '../../lib/collective';
+import { isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective';
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
+import { parseToBoolean } from '../../lib/utils';
 
-import { ALL_SECTIONS, SECTION_LABELS } from './constants';
+import { ALL_SECTIONS, ROOT_SECTIONS, SECTION_LABELS } from './constants';
 import { DashboardContext } from './DashboardContext';
 import { MenuLink } from './MenuLink';
 
@@ -37,21 +44,65 @@ const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT, INDIVIDUAL } = Col
 export type PageMenuItem = {
   type?: 'page';
   Icon?: LucideIcon;
-  label?: string;
+  label?: string | React.JSX.Element;
   section: string;
   if?: boolean;
 };
 type GroupMenuItem = {
   type: 'group';
-  label: string;
+  label: string | React.JSX.Element;
   Icon: LucideIcon;
   subMenu: PageMenuItem[];
   if?: boolean;
 };
 
+const ROOT_MENU = [
+  {
+    type: 'group',
+    label: 'Accounts',
+    Icon: Users,
+    subMenu: [
+      { label: 'Search Accounts', section: ROOT_SECTIONS.ALL_COLLECTIVES },
+      { label: 'Connect Accounts', section: ROOT_SECTIONS.CONNECT_ACCOUNTS },
+      { label: 'Merge Accounts', section: ROOT_SECTIONS.MERGE_ACCOUNTS },
+      { label: 'Unhost Account', section: ROOT_SECTIONS.UNHOST_ACCOUNTS },
+      { label: 'Account Settings', section: ROOT_SECTIONS.ACCOUNT_SETTINGS },
+      { label: 'Account Type', section: ROOT_SECTIONS.ACCOUNT_TYPE },
+      { label: 'Recurring Contributions', section: ROOT_SECTIONS.RECURRING_CONTRIBUTIONS },
+      { label: 'Activity Log', section: ALL_SECTIONS.ACTIVITY_LOG },
+      { label: 'Clear Cache', section: ROOT_SECTIONS.CLEAR_CACHE },
+    ],
+  },
+  {
+    type: 'group',
+    label: 'Ledger',
+    Icon: BookOpenCheck,
+    subMenu: [
+      { label: 'Search Transactions', section: ALL_SECTIONS.HOST_TRANSACTIONS },
+      { label: 'Move Authored Contributions', section: ROOT_SECTIONS.MOVE_AUTHORED_CONTRIBUTIONS },
+      { label: 'Move Received Contributions', section: ROOT_SECTIONS.MOVE_RECEIVED_CONTRIBUTIONS },
+      { label: 'Move Expenses', section: ROOT_SECTIONS.MOVE_EXPENSES },
+    ],
+  },
+  {
+    type: 'group',
+    label: 'Moderation',
+    Icon: UserX,
+    subMenu: [
+      { label: 'Search & Ban', section: ROOT_SECTIONS.SEARCH_AND_BAN },
+      { label: 'Ban Account', section: ROOT_SECTIONS.BAN_ACCOUNTS },
+    ],
+  },
+] as GroupMenuItem[];
+
 export type MenuItem = PageMenuItem | GroupMenuItem;
 
 export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
+  const isRootProfile = account.type === 'ROOT' && LoggedInUser?.isRoot;
+  if (isRootProfile) {
+    return ROOT_MENU;
+  }
+
   const isIndividual = isIndividualAccount(account);
   const isHost = isHostAccount(account);
   const isSelfHosted = isSelfHostedAccount(account);
@@ -70,6 +121,12 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       section: ALL_SECTIONS.SUBMITTED_EXPENSES,
       Icon: Receipt,
       label: intl.formatMessage({ id: 'Expenses', defaultMessage: 'Expenses' }),
+    },
+    {
+      if: !isIndividual && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.CROWDFUNDING_REDESIGN),
+      section: ALL_SECTIONS.ACCOUNTS,
+      Icon: Wallet,
+      label: intl.formatMessage({ defaultMessage: 'Accounts', id: 'FvanT6' }),
     },
     {
       if: !isIndividual,
@@ -150,6 +207,12 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
+      if: isHost || isSelfHosted,
+      label: intl.formatMessage({ defaultMessage: 'Expected Funds', id: 'ExpectedFunds' }),
+      Icon: Coins,
+      section: ALL_SECTIONS.HOST_EXPECTED_FUNDS,
+    },
+    {
       if: isHost && !isAccountantOnly,
       type: 'group',
       Icon: Building,
@@ -165,10 +228,21 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
-      if: isInternalHost(account) || Boolean(get(account, 'settings.beta.HOST_AGREEMENTS')),
-      section: ALL_SECTIONS.HOST_AGREEMENTS,
+      if: isHost,
+      type: 'group',
       Icon: FileText,
-      label: intl.formatMessage({ id: 'Agreements', defaultMessage: 'Agreements' }),
+      label: intl.formatMessage({ defaultMessage: 'Legal Documents', id: 'lSFdN4' }),
+      subMenu: [
+        {
+          section: ALL_SECTIONS.HOST_AGREEMENTS,
+          label: intl.formatMessage({ id: 'Agreements', defaultMessage: 'Agreements' }),
+        },
+        {
+          section: ALL_SECTIONS.HOST_TAX_FORMS,
+          label: intl.formatMessage({ defaultMessage: 'Tax Forms', id: 'skSw4d' }),
+          if: Boolean(account.host?.requiredLegalDocuments?.includes('US_TAX_FORM')),
+        },
+      ],
     },
     {
       if: isHost && hasFeature(account, FEATURES.VIRTUAL_CARDS) && !isAccountantOnly,
@@ -187,9 +261,26 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
-      if: isHost || (!isIndividual && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.HOST_REPORTS)),
-      section: ALL_SECTIONS.REPORTS,
+      if: isHost,
+      type: 'group',
+      label: intl.formatMessage({ id: 'Reports', defaultMessage: 'Reports' }),
       Icon: BarChart2,
+      subMenu: [
+        {
+          section: ALL_SECTIONS.TRANSACTION_REPORTS,
+          label: intl.formatMessage({ defaultMessage: 'Transactions', id: 'menu.transactions' }),
+        },
+        {
+          section: ALL_SECTIONS.EXPENSE_REPORTS,
+          label: intl.formatMessage({ defaultMessage: 'Expenses', id: 'Expenses' }),
+        },
+      ],
+    },
+    {
+      if: !isHost && !isIndividual && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.HOST_REPORTS),
+      label: intl.formatMessage({ id: 'Reports', defaultMessage: 'Reports' }),
+      Icon: BarChart2,
+      section: ALL_SECTIONS.TRANSACTION_REPORTS,
     },
     {
       if: isHost && !isAccountantOnly,
@@ -218,6 +309,11 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       section: ALL_SECTIONS.HOST_TRANSACTIONS,
       Icon: ArrowRightLeft,
       label: intl.formatMessage({ id: 'menu.transactions', defaultMessage: 'Transactions' }),
+    },
+    {
+      if: !isIndividual,
+      section: ALL_SECTIONS.UPDATES,
+      Icon: Megaphone,
     },
     {
       if:
@@ -250,7 +346,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         },
         {
           section: ALL_SECTIONS.TAX_INFORMATION,
-          if: LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.TAX_FORMS) && !isAccountantOnly,
+          if: !parseToBoolean(process.env.TAX_FORMS_USE_LEGACY) && !isAccountantOnly,
         },
         {
           section: ALL_SECTIONS.COLLECTIVE_PAGE,
@@ -388,7 +484,7 @@ const Menu = ({ onRoute, menuItems }) => {
   const router = useRouter();
   const intl = useIntl();
   const { account } = React.useContext(DashboardContext);
-
+  const { LoggedInUser } = useLoggedInUser();
   React.useEffect(() => {
     if (onRoute) {
       router.events.on('routeChangeStart', onRoute);
@@ -400,16 +496,33 @@ const Menu = ({ onRoute, menuItems }) => {
     };
   }, [router, onRoute]);
 
+  const showLinkToProfilePrototype =
+    !['ROOT', 'ORGANIZATION', 'FUND', 'INDIVIDUAL'].includes(account.type) &&
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW);
+
   return (
     <div className="space-y-4">
-      <MenuLink
-        href={getCollectivePageRoute(account)}
-        Icon={Globe2}
-        label={intl.formatMessage({ id: 'PublicProfile', defaultMessage: 'Public profile' })}
-        className="hover:bg-slate-50 hover:text-slate-700"
-        dataCy="public-profile-link"
-        external
-      />
+      {account.type !== 'ROOT' && (
+        <div className="flex flex-col gap-2">
+          <MenuLink
+            href={getCollectivePageRoute(account)}
+            Icon={Globe2}
+            label={intl.formatMessage({ id: 'PublicProfile', defaultMessage: 'Public profile' })}
+            className="hover:bg-slate-50 hover:text-slate-700"
+            dataCy="public-profile-link"
+            external
+          />
+          {showLinkToProfilePrototype && (
+            <MenuLink
+              href={`/preview/${account.slug}`}
+              Icon={FlaskConical}
+              label={intl.formatMessage({ defaultMessage: 'Preview new profile page', id: 'ob6Sw2' })}
+              className="hover:bg-slate-50 hover:text-slate-700"
+              external
+            />
+          )}
+        </div>
+      )}
       <div className="space-y-2">
         {menuItems.map(item => {
           const key = item.type === 'group' ? item.label : item.section;

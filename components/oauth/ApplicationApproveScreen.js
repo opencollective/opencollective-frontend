@@ -245,7 +245,7 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
               </Flex>
               {Boolean(application.preAuthorize2FA) && (
                 <Flex alignItems="center" mt={26}>
-                  <div className="flex h-[32px] w-[32px] flex-none items-center justify-center rounded-full bg-neutral-100 ">
+                  <div className="flex h-[32px] w-[32px] flex-none items-center justify-center rounded-full bg-neutral-100">
                     <AlertTriangle size={18} className="text-red-600" />
                   </div>
                   <P fontSize="16px" color="black.700" ml={3}>
@@ -259,7 +259,7 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
               {filteredScopes.map(scope => (
                 <Flex key={scope} alignItems="center" mt={26}>
                   {SCOPES_INFO[scope].icon ? (
-                    <div className="flex h-[32px] w-[32px] flex-none items-center justify-center rounded-full bg-neutral-100 ">
+                    <div className="flex h-[32px] w-[32px] flex-none items-center justify-center rounded-full bg-neutral-100">
                       {SCOPES_INFO[scope].icon}
                     </div>
                   ) : (

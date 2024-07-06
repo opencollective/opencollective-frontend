@@ -48,8 +48,8 @@ export const HomePage = () => {
   );
 };
 
-// ignore unused exports getServerSideProps
 // next.js export
+// ts-unused-exports:disable-next-line
 export const getServerSideProps = async ({ req, res }) => {
   if (res && req) {
     const { locale } = getRequestIntl(req);
@@ -67,6 +67,6 @@ export const getServerSideProps = async ({ req, res }) => {
   return { props: { skipDataFromTree } };
 };
 
-// ignore unused exports default
 // next.js export
+// ts-unused-exports:disable-next-line
 export default HomePage;

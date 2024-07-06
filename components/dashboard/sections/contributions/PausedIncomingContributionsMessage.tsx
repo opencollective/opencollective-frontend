@@ -5,7 +5,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import { Account, AccountWithContributions, AccountWithParent } from '../../../../lib/graphql/types/v2/graphql';
+import type { Account, AccountWithContributions, AccountWithParent } from '../../../../lib/graphql/types/v2/graphql';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 
 import { getI18nLink } from '../../../I18nFormatters';
@@ -80,7 +80,7 @@ export const PausedIncomingContributionsMessage = ({
       {account.hasResumeContributionsProcessStarted ? (
         <p>
           <FormattedMessage
-            defaultMessage="You have started the process to resume these contributions, contributors will receive a few reminders to resume their contributions. If they don't, these contributions will automatically expire after a few months."
+            defaultMessage="You have started the process to resume these contributions, contributors will receive a few reminders to resume them. If they don't, these contributions will automatically expire after a few months."
             id="dhOuoE"
           />
         </p>

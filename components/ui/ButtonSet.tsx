@@ -1,5 +1,5 @@
 import React from 'react';
-import { ClassValue } from 'clsx';
+import type { ClassValue } from 'clsx';
 
 import { cn } from '../../lib/utils';
 

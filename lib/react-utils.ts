@@ -18,6 +18,10 @@ export const mergeRefs = refs => {
   };
 };
 
+/**
+ * Create a Tailwind React element from an HTML tag and a Tailwind CSS class.
+ * @example elementFromClass('div', 'text-md font-bold text-slate-800 mb-2 flex gap-4 items-center')
+ */
 export function elementFromClass<K extends keyof React.JSX.IntrinsicElements>(
   type: K,
   className: string,

@@ -5,10 +5,11 @@ import { PlusIcon } from 'lucide-react';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
-import { FilterComponentConfigs, FiltersToVariables, Views } from '../../../lib/filters/filter-types';
+import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../lib/filters/filter-types';
 import { boolean, isMulti, limit, offset } from '../../../lib/filters/schemas';
 import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
-import { Currency, HostedVirtualCardsQueryVariables, VirtualCardStatus } from '../../../lib/graphql/types/v2/graphql';
+import type { Currency, HostedVirtualCardsQueryVariables } from '../../../lib/graphql/types/v2/graphql';
+import { VirtualCardStatus } from '../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 import { i18nHasMissingReceipts } from '../../../lib/i18n/receipts-filter';
 import { sortSelectOptions } from '../../../lib/utils';
@@ -19,7 +20,6 @@ import AssignVirtualCardModal from '../../edit-collective/AssignVirtualCardModal
 import EditVirtualCardModal from '../../edit-collective/EditVirtualCardModal';
 import { getI18nLink } from '../../I18nFormatters';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
-import Pagination from '../../Pagination';
 import { Button } from '../../ui/Button';
 import { useToast } from '../../ui/useToast';
 import { StripeVirtualCardComplianceStatement } from '../../virtual-cards/StripeVirtualCardComplianceStatement';
@@ -32,8 +32,9 @@ import { dateFilter } from '../filters/DateFilter';
 import { Filterbar } from '../filters/Filterbar';
 import { AccountRenderer } from '../filters/HostedAccountFilter';
 import { orderByFilter } from '../filters/OrderFilter';
+import { Pagination } from '../filters/Pagination';
 import { searchFilter } from '../filters/SearchFilter';
-import { DashboardSectionProps } from '../types';
+import type { DashboardSectionProps } from '../types';
 
 const hostedVirtualCardAccountsQuery = gql`
   query HostedVirtualCardAccounts($slug: String) {
@@ -242,8 +243,6 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>, FilterMeta> = {
   },
 };
 
-const ROUTE_PARAMS = ['slug', 'section'];
-
 const HostVirtualCards = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const { toast } = useToast();
   const intl = useIntl();
@@ -281,7 +280,7 @@ const HostVirtualCards = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     views,
   });
 
-  const { error, loading, data, refetch, variables } = useQuery(hostVirtualCardsQuery, {
+  const { error, loading, data, refetch } = useQuery(hostVirtualCardsQuery, {
     context: API_V2_CONTEXT,
     variables: {
       slug: hostSlug,
@@ -369,19 +368,7 @@ const HostVirtualCards = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
             host={data?.host}
             loading={loading}
           />
-          <div className="mt-12 flex flex-col items-center justify-center gap-1">
-            <Pagination
-              route={`/dashboard/${data?.host.slug}/host-virtual-cards`}
-              total={data?.host?.hostedVirtualCards.totalCount}
-              limit={variables.limit}
-              offset={variables.offset}
-              ignoredQueryParams={ROUTE_PARAMS}
-            />
-            <p className="text-sm">
-              <FormattedMessage id="TotalItems" defaultMessage="Total Items" />:{' '}
-              {data?.host?.hostedVirtualCards.totalCount}
-            </p>
-          </div>
+          <Pagination queryFilter={queryFilter} total={data?.host?.hostedVirtualCards.totalCount} />
         </React.Fragment>
       )}
 

@@ -57,7 +57,7 @@ export function LegacyColumnRows({ parentRow, currency, showCreditDebit }) {
         return (
           <tr
             key={`legacy-${legacyColumn.amountKey}`}
-            className="group  text-sm hover:bg-muted has-[[data-state=open]]:bg-muted"
+            className="group text-sm hover:bg-muted has-[[data-state=open]]:bg-muted"
           >
             <td className="flex min-h-8 items-center gap-1 py-1 pl-8 text-left text-muted-foreground sm:pl-12">
               <CornerDownRight size={14} className="inline-block shrink-0" />

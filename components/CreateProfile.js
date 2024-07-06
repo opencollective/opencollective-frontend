@@ -171,8 +171,8 @@ const CreateProfile = ({
   name,
   newsletterOptIn,
   tosOptIn,
-  submitting,
-  errors,
+  submitting = false,
+  errors = {},
   onEmailChange,
   onFieldChange,
   onSubmit,
@@ -404,11 +404,6 @@ CreateProfile.propTypes = {
   /** Oauth App Image URL **/
   oAuthAppImage: PropTypes.string,
   data: PropTypes.object,
-};
-
-CreateProfile.defaultProps = {
-  errors: {},
-  submitting: false,
 };
 
 export default CreateProfile;

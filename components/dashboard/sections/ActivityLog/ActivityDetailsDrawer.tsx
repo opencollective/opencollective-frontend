@@ -1,7 +1,7 @@
 import React from 'react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { Activity } from '../../../../lib/graphql/types/v2/graphql';
+import type { Activity } from '../../../../lib/graphql/types/v2/graphql';
 
 import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';

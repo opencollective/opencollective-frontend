@@ -289,7 +289,7 @@ describe('Expense flow', () => {
       cy.getByDataCy('items[0].amountV2-exchange-rate-tooltip')
         .should('contain', '1 USD = 0.9981539 EUR')
         .should('contain', 'Source: User')
-        .should('contain', 'This exchange rate looks very different from the one in our records (1.1) for this date.');
+        .should('contain', 'This exchange rate is notably different from the one in our records (1.1) for this date.');
 
       // Add another item with custom values
       cy.getByDataCy('expense-add-item-btn').click();
@@ -339,7 +339,7 @@ describe('Expense flow', () => {
       cy.getByDataCy('tooltip-content')
         .should('contain', '1 USD = 0.9981539 EUR')
         .should('contain', 'Source: User')
-        .should('contain', 'This exchange rate looks very different from the one in our records (1.1) for this date.');
+        .should('contain', 'This exchange rate is notably different from the one in our records (1.1) for this date.');
 
       // Edit
       cy.getByDataCy('more-actions').click();

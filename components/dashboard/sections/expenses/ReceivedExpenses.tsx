@@ -1,36 +1,34 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { omit } from 'lodash';
+import { get, omit } from 'lodash';
 import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
-import { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
+import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import { Account, ExpensesPageQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import type { Account, ExpensesPageQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
 import ExpensesList from '../../../expenses/ExpensesList';
-import Pagination from '../../../Pagination';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { expenseTagFilter } from '../../filters/ExpenseTagsFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { AccountRenderer } from '../../filters/HostedAccountFilter';
-import { DashboardSectionProps } from '../../types';
+import { Pagination } from '../../filters/Pagination';
+import type { DashboardSectionProps } from '../../types';
 
-import {
-  FilterMeta as CommonFilterMeta,
-  filters as commonFilters,
-  schema as commonSchema,
-  toVariables as commonToVariables,
-} from './filters';
+import type { FilterMeta as CommonFilterMeta } from './filters';
+import { filters as commonFilters, schema as commonSchema, toVariables as commonToVariables } from './filters';
 import { accountExpensesMetadataQuery, accountExpensesQuery } from './queries';
 
 const schema = commonSchema.extend({
   account: z.string().nullable().default(null),
 });
+
+const schemaWithoutHost = schema.omit({ accountingCategory: true });
 
 type FilterValues = z.infer<typeof schema>;
 
@@ -38,6 +36,8 @@ type FilterMeta = CommonFilterMeta & {
   accountSlug: string;
   childrenAccounts?: Array<Account>;
   expenseTags?: string[];
+  hostSlug?: string;
+  includeUncategorized: boolean;
 };
 const toVariables: FiltersToVariables<FilterValues, ExpensesPageQueryVariables, FilterMeta> = {
   ...commonToVariables,
@@ -72,6 +72,8 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   },
 };
 
+const filtersWithoutHost = omit(filters, 'accountingCategory');
+
 const ROUTE_PARAMS = ['slug', 'section', 'subpath'];
 
 const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
@@ -82,6 +84,8 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
     context: API_V2_CONTEXT,
   });
 
+  const hostSlug = get(metadata, 'account.host.slug');
+
   const filterMeta: FilterMeta = {
     currency: metadata?.account?.currency,
     childrenAccounts: metadata?.account?.childrenAccounts?.nodes.length
@@ -89,13 +93,15 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
       : undefined,
     accountSlug,
     expenseTags: metadata?.expenseTagStats?.nodes?.map(({ tag }) => tag),
+    hostSlug: hostSlug,
+    includeUncategorized: true,
   };
 
   const queryFilter = useQueryFilter({
-    schema,
+    schema: hostSlug ? schema : schemaWithoutHost,
     toVariables,
     meta: filterMeta,
-    filters,
+    filters: hostSlug ? filters : filtersWithoutHost,
   });
 
   const { data, loading } = useQuery(accountExpensesQuery, {
@@ -145,15 +151,7 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
               );
             }}
           />
-          <div className="mt-12 flex justify-center">
-            <Pagination
-              route={pageRoute}
-              total={data?.expenses?.totalCount}
-              limit={queryFilter.values.limit}
-              offset={queryFilter.values.offset}
-              ignoredQueryParams={ROUTE_PARAMS}
-            />
-          </div>
+          <Pagination queryFilter={queryFilter} total={data?.expenses?.totalCount} />
         </React.Fragment>
       )}
     </div>

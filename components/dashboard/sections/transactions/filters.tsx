@@ -3,16 +3,14 @@ import { omit } from 'lodash';
 import { defineMessage } from 'react-intl';
 import { z } from 'zod';
 
-import { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
+import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { boolean, integer, isMulti, limit, offset } from '../../../../lib/filters/schemas';
-import {
+import type {
   Currency,
-  ExpenseType,
   PaymentMethodType,
-  TransactionKind,
   TransactionsTableQueryVariables,
-  TransactionType,
 } from '../../../../lib/graphql/types/v2/graphql';
+import { ExpenseType, TransactionKind, TransactionType } from '../../../../lib/graphql/types/v2/graphql';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { i18nIsRefund } from '../../../../lib/i18n/is-refund';
 import { i18nTransactionKind, i18nTransactionType } from '../../../../lib/i18n/transaction';
@@ -23,11 +21,18 @@ import { amountFilter } from '../../filters/AmountFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { dateFilter } from '../../filters/DateFilter';
 import { dateToVariables } from '../../filters/DateFilter/schema';
-import { orderByFilter } from '../../filters/OrderFilter';
 import { paymentMethodFilter } from '../../filters/PaymentMethodFilter';
 import { searchFilter } from '../../filters/SearchFilter';
+import { buildSortFilter } from '../../filters/SortFilter';
 import { VirtualCardRenderer } from '../../filters/VirtualCardsFilter';
 
+const sortFilter = buildSortFilter({
+  fieldSchema: z.enum(['CREATED_AT', 'EFFECTIVE_DATE']),
+  defaultValue: {
+    field: 'CREATED_AT',
+    direction: 'DESC',
+  },
+});
 const clearedAtDateFilter = {
   ...dateFilter,
   toVariables: value => dateToVariables(value, 'cleared'),
@@ -43,7 +48,7 @@ export const schema = z.object({
   date: dateFilter.schema,
   clearedAt: clearedAtDateFilter.schema,
   amount: amountFilter.schema,
-  orderBy: orderByFilter.schema,
+  sort: sortFilter.schema,
   searchTerm: searchFilter.schema,
   kind: isMulti(z.nativeEnum(TransactionKind)).optional(),
   type: z.nativeEnum(TransactionType).optional(),
@@ -53,7 +58,7 @@ export const schema = z.object({
   expenseId: integer.optional(),
   orderId: integer.optional(),
   merchantId: z.string().optional(),
-  openTransactionId: z.string().optional(),
+  openTransactionId: z.coerce.string().optional(),
   group: isMulti(z.string().uuid()).optional(),
   isRefund: boolean.optional(),
 });
@@ -69,7 +74,6 @@ export type FilterMeta = {
 // Only needed when values and key of filters are different
 // to expected key and value of QueryVariables
 export const toVariables: FiltersToVariables<FilterValues, TransactionsTableQueryVariables, FilterMeta> = {
-  orderBy: orderByFilter.toVariables,
   date: dateFilter.toVariables,
   clearedAt: clearedAtDateFilter.toVariables,
   amount: amountFilter.toVariables,
@@ -84,8 +88,8 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   searchTerm: searchFilter.filter,
   date: dateFilter.filter,
   clearedAt: clearedAtDateFilter.filter,
+  sort: sortFilter.filter,
   amount: amountFilter.filter,
-  orderBy: orderByFilter.filter,
   type: {
     labelMsg: defineMessage({ id: 'Type', defaultMessage: 'Type' }),
     Component: ({ intl, ...props }) => (

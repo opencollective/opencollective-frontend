@@ -4,7 +4,7 @@ import { cn } from '../../lib/utils';
 
 import { Badge } from './Badge';
 
-export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   showCount?: boolean;
 }
 

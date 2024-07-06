@@ -63,7 +63,7 @@ export const TaxFormNameFields = z.object({
   lastName: z.string().min(1).max(50),
 });
 
-export type TaxFormNameValues = z.infer<typeof TaxFormNameFields>;
+// type TaxFormNameValues = z.infer<typeof TaxFormNameFields>;
 
 export const TaxFormLocationFields = z.object({
   country: z.string(),
@@ -76,7 +76,7 @@ export const TaxFormLocationFields = z.object({
   }),
 });
 
-export type TaxFormLocationValues = z.infer<typeof TaxFormLocationFields>;
+// type TaxFormLocationValues = z.infer<typeof TaxFormLocationFields>;
 
 export const BaseFormSchema = z.object({
   isUSPersonOrEntity: z.boolean(),

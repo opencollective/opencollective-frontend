@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 
-import { ExpenseForm } from './useExpenseForm';
+import type { ExpenseForm } from './useExpenseForm';
 
 type ExpenseWarningsProps = {
   form: ExpenseForm;
@@ -30,7 +30,6 @@ export function ExpenseWarnings(props: ExpenseWarningsProps) {
           values={{
             amount: (
               <FormattedMoneyAmount
-                abbreviate
                 currencyCodeStyles={{ fontWeight: 'bold' }}
                 amount={props.form.options.account.stats.balance.valueInCents}
                 currency={props.form.options.account.stats.balance.currency}

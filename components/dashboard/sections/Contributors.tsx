@@ -1,11 +1,10 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
-import { toNumber } from 'lodash';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { fetchCSVFileFromRESTService } from '../../../lib/api';
-import { FilterConfig } from '../../../lib/filters/filter-types';
+import type { FilterConfig } from '../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { MemberRole } from '../../../lib/graphql/types/v2/graphql';
@@ -13,20 +12,20 @@ import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 import { capitalize, sortSelectOptions } from '../../../lib/utils';
 
 import Avatar from '../../Avatar';
-import { DataTable } from '../../DataTable';
 import DateTime from '../../DateTime';
 import LinkCollective from '../../LinkCollective';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
+import { DataTable } from '../../table/DataTable';
 import { Span } from '../../Text';
 import { Button } from '../../ui/Button';
-import { Pagination } from '../../ui/Pagination';
 import DashboardHeader from '../DashboardHeader';
 import { EmptyResults } from '../EmptyResults';
 import ComboSelectFilter from '../filters/ComboSelectFilter';
 import { emailFilter } from '../filters/EmailFilter';
 import { Filterbar } from '../filters/Filterbar';
 import { orderByFilter } from '../filters/OrderFilter';
-import { DashboardSectionProps } from '../types';
+import { Pagination } from '../filters/Pagination';
+import type { DashboardSectionProps } from '../types';
 
 // type FilterMemberRole = MemberRole.FOLLOWER | MemberRole.BACKER | MemberRole.CONTRIBUTOR
 
@@ -257,7 +256,6 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
 
   const {
     data,
-    previousData,
     loading: queryLoading,
     error: queryError,
   } = useQuery(dashboardContributorsQuery, {
@@ -268,10 +266,6 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
     },
     context: API_V2_CONTEXT,
   });
-
-  const { limit, offset } = queryFilter.values;
-  const pages = Math.ceil(((data || previousData)?.account?.members.totalCount || 1) / limit);
-  const currentPage = toNumber(offset + limit) / limit;
 
   const contributors = data?.account?.members.nodes || [];
 
@@ -329,11 +323,7 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
             mobileTableView
             nbPlaceholders={nbPlaceholders}
           />
-          <Pagination
-            totalPages={pages}
-            page={currentPage}
-            onChange={page => queryFilter.setFilter('offset', (page - 1) * limit)}
-          />
+          <Pagination queryFilter={queryFilter} total={data?.account?.members.totalCount} />
         </div>
       )}
     </div>

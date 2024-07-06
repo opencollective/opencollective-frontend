@@ -1,8 +1,8 @@
 import React from 'react';
-import { forEach, isEmpty, isNil, isUndefined, omitBy } from 'lodash';
+import { forEach, isEmpty, isNil, isUndefined, omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
-import { z } from 'zod';
+import type { z } from 'zod';
 
 import { toast } from '../../components/ui/useToast';
 
@@ -127,12 +127,12 @@ export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape, any,
           }),
           filterValues,
         );
-        const desctructuredQueryValues = destructureFilterValues(queryWithReplacementsForDefaults);
+        const destructuredQueryValues = destructureFilterValues(queryWithReplacementsForDefaults);
 
         if (opts.skipRouter && !newPath) {
-          setStateQuery(desctructuredQueryValues);
+          setStateQuery(destructuredQueryValues);
         } else {
-          const query = omitBy(desctructuredQueryValues, isNil);
+          const query = omitBy(destructuredQueryValues, isNil);
           const basePath = newPath || router.asPath.split('?')[0];
 
           router.push(
@@ -154,12 +154,13 @@ export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape, any,
   );
 
   const setFilter = React.useCallback(
-    (filterName, filterValue) => resetFilters({ ...values, [filterName]: filterValue }),
+    (filterName, filterValue, resetPagination = true) =>
+      resetFilters({ ...(resetPagination ? omit(values, 'offset') : values), [filterName]: filterValue }),
     [values, resetFilters],
   );
 
   const setFilters = React.useCallback(
-    (newFilters, newPath) => resetFilters({ ...values, ...newFilters }, newPath),
+    (newFilters, newPath) => resetFilters({ ...omit(values, 'offset'), ...newFilters }, newPath),
     [values, resetFilters],
   );
 

@@ -119,6 +119,4 @@ ExpensesPickerAsync.propTypes = {
   status: PropTypes.string,
 };
 
-ExpensesPickerAsync.defaultProps = {};
-
 export default ExpensesPickerAsync;

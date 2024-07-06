@@ -1,6 +1,7 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
 import { get } from 'lodash';
+import type { LucideIcon } from 'lucide-react';
 import {
   BookOpen,
   ExternalLink,
@@ -9,9 +10,7 @@ import {
   LayoutDashboard,
   LifeBuoy,
   LogOut,
-  LucideIcon,
   Mailbox,
-  PocketKnife,
   Settings,
   User,
 } from 'lucide-react';
@@ -19,7 +18,8 @@ import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import useLoggedInUser, { UserContextProps } from '../../lib/hooks/useLoggedInUser';
+import type { UserContextProps } from '../../lib/hooks/useLoggedInUser';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { cn } from '../../lib/utils';
 
@@ -172,11 +172,6 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
                 }
               >
                 <FormattedMessage id="PreviewFeatures" defaultMessage="Preview Features" />
-              </MenuItem>
-            )}
-            {LoggedInUser.isRoot && (
-              <MenuItem Icon={PocketKnife} href="/opencollective/root-actions">
-                <FormattedMessage id="RootActions" defaultMessage="Root Actions" />
               </MenuItem>
             )}
             <MenuItem Icon={Settings} href={`/dashboard/${LoggedInUser.collective.slug}/info`}>

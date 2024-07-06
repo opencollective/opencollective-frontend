@@ -52,8 +52,4 @@ EmbeddedPage.propTypes = {
   collective: PropTypes.object,
 };
 
-EmbeddedPage.defaultProps = {
-  background: 'white',
-};
-
 export default withUser(EmbeddedPage);

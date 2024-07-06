@@ -1,23 +1,25 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
-import { CellContext, ColumnDef } from '@tanstack/react-table';
-import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
+import type { CellContext, ColumnDef } from '@tanstack/react-table';
+import type { IntlShape } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import { Account, VirtualCardRequest, VirtualCardRequestStatus } from '../../lib/graphql/types/v2/graphql';
+import type { Account, VirtualCardRequest } from '../../lib/graphql/types/v2/graphql';
+import { VirtualCardRequestStatus } from '../../lib/graphql/types/v2/graphql';
 import { useWindowResize } from '../../lib/hooks/useWindowResize';
 import { i18nVirtualCardRequestStatus } from '../../lib/i18n/virtual-card-request';
 import { getSpendingLimitShortString } from '../../lib/i18n/virtual-card-spending-limit';
 
 import { AccountHoverCard } from '../AccountHoverCard';
 import Avatar from '../Avatar';
-import { DataTable } from '../DataTable';
 import DateTime from '../DateTime';
 import EditVirtualCardModal from '../edit-collective/EditVirtualCardModal';
 import { Box, Flex } from '../Grid';
 import Loading from '../Loading';
 import StyledTag from '../StyledTag';
+import { DataTable } from '../table/DataTable';
 import {
   DropdownMenu,
   DropdownMenuContent,

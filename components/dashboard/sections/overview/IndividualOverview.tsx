@@ -11,7 +11,7 @@ import Image from '../../../Image';
 import { Alert, AlertDescription, AlertTitle } from '../../../ui/Alert';
 import { Button } from '../../../ui/Button';
 import DashboardHeader from '../../DashboardHeader';
-import { DashboardSectionProps } from '../../types';
+import type { DashboardSectionProps } from '../../types';
 
 import { Timeline } from './Timeline';
 import { TodoList } from './TodoList';
@@ -33,7 +33,7 @@ const Home = ({ accountSlug }: DashboardSectionProps) => {
             />
           }
         />
-        <div className="order-1 space-y-6 xl:order-none xl:col-span-2 ">
+        <div className="order-1 space-y-6 xl:order-none xl:col-span-2">
           <TodoList />
           <Timeline accountSlug={slug} withFilter />
         </div>
@@ -71,7 +71,7 @@ const Home = ({ accountSlug }: DashboardSectionProps) => {
                     />
                   </p>
                 </AlertDescription>
-                <Button variant="outline" className="mt-2 gap-2  xl:w-full" onClick={() => setShowFeedbackModal(true)}>
+                <Button variant="outline" className="mt-2 gap-2 xl:w-full" onClick={() => setShowFeedbackModal(true)}>
                   <Megaphone size={16} />
                   <FormattedMessage id="GiveFeedback" defaultMessage="Give feedback" />
                 </Button>

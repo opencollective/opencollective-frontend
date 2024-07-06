@@ -6,20 +6,20 @@ import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { HELP_MESSAGE } from '../../../lib/constants/dismissable-help-message';
-import { FilterComponentConfigs, Views } from '../../../lib/filters/filter-types';
+import type { FilterComponentConfigs, Views } from '../../../lib/filters/filter-types';
 import { boolean, limit, offset } from '../../../lib/filters/schemas';
 import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
-import { DashboardVendorsQuery } from '../../../lib/graphql/types/v2/graphql';
+import type { DashboardVendorsQuery } from '../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 
 import Avatar from '../../Avatar';
-import { DataTable } from '../../DataTable';
 import DismissibleMessage from '../../DismissibleMessage';
 import { Drawer } from '../../Drawer';
 import { I18nWithColumn } from '../../I18nFormatters';
 import MessageBox from '../../MessageBox';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import StyledModal from '../../StyledModal';
+import { DataTable } from '../../table/DataTable';
 import { Button } from '../../ui/Button';
 import {
   DropdownMenu,
@@ -28,17 +28,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../../ui/DropdownMenu';
-import { Pagination } from '../../ui/Pagination';
 import { TableActionsButton } from '../../ui/Table';
 import OrganizationDetails from '../../vendors/OrganizationDetails';
-import { setVendorArchiveMutation, vendorFieldFragment, VendorFieldsFragment } from '../../vendors/queries';
+import type { VendorFieldsFragment } from '../../vendors/queries';
+import { setVendorArchiveMutation, vendorFieldFragment } from '../../vendors/queries';
 import VendorDetails, { VendorContactTag } from '../../vendors/VendorDetails';
 import VendorForm from '../../vendors/VendorForm';
 import DashboardHeader from '../DashboardHeader';
 import { EmptyResults } from '../EmptyResults';
 import { Filterbar } from '../filters/Filterbar';
+import { Pagination } from '../filters/Pagination';
 import { searchFilter } from '../filters/SearchFilter';
-import { DashboardSectionProps } from '../types';
+import type { DashboardSectionProps } from '../types';
 
 enum VendorsTab {
   ALL = 'ALL',
@@ -67,6 +68,7 @@ const dashboardVendorsQuery = gql`
           expensePolicy
           settings
           currency
+          requiredLegalDocuments
           features {
             id
             MULTI_CURRENCY_EXPENSES
@@ -214,7 +216,7 @@ const OrgsTable = ({ orgs, loading, openOrg }) => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <TableActionsButton>
-                  <MoreHorizontal className="relative h-3 w-3  " aria-hidden="true" />
+                  <MoreHorizontal className="relative h-3 w-3" aria-hidden="true" />
                 </TableActionsButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
@@ -325,9 +327,6 @@ const Vendors = ({ accountSlug }: DashboardSectionProps) => {
 
   const host = (data || previousData)?.account?.['host'];
 
-  const pages = Math.ceil((host?.vendors?.totalCount || 1) / PAGE_SIZE);
-  const currentPage = ((queryFilter.values.offset || 0) + PAGE_SIZE) / PAGE_SIZE;
-
   const isDrawerOpen = Boolean(vendorDetail || createEditVendor?.['id'] || orgDetail);
   const loading = queryLoading;
   const error = queryError;
@@ -391,11 +390,7 @@ const Vendors = ({ accountSlug }: DashboardSectionProps) => {
               openVendor={setVendorDetail}
               handleSetArchive={handleSetArchive}
             />
-            <Pagination
-              totalPages={pages}
-              page={currentPage}
-              onChange={page => queryFilter.setFilter('offset', (page - 1) * PAGE_SIZE)}
-            />
+            <Pagination queryFilter={queryFilter} total={host?.vendors?.totalCount} />
           </React.Fragment>
         )}
       </div>
@@ -404,6 +399,7 @@ const Vendors = ({ accountSlug }: DashboardSectionProps) => {
         <StyledModal onClose={closeDrawer} width="570px">
           <VendorForm
             host={host}
+            supportsTaxForm={host.requiredLegalDocuments.includes('US_TAX_FORM')}
             onSuccess={() => {
               setCreateEditVendor(false);
               refetch();
@@ -423,6 +419,7 @@ const Vendors = ({ accountSlug }: DashboardSectionProps) => {
         {createEditVendor && (
           <VendorForm
             host={host}
+            supportsTaxForm={host.requiredLegalDocuments.includes('US_TAX_FORM')}
             vendor={typeof createEditVendor === 'boolean' ? undefined : createEditVendor}
             onSuccess={() => {
               setCreateEditVendor(false);

@@ -1,3 +1,4 @@
+// use `components/dashboard/filters/Pagination` when `useQueryFilter` is used
 import qs from 'querystring';
 
 import React from 'react';
@@ -124,7 +125,7 @@ type CommonVariantProps = {
 };
 type PageComponentProps = React.PropsWithChildren<{ page: number }>;
 
-type InputPaginationProps = {};
+type InputPaginationProps = object;
 
 function InputPagination(props: InputPaginationProps & CommonVariantProps) {
   const changePage = React.useCallback(
@@ -152,6 +153,7 @@ function InputPagination(props: InputPaginationProps & CommonVariantProps) {
           </StyledButton>
         </props.PageComponent>
       )}
+
       <Container display="inline-block" mx={2}>
         <FormattedMessage
           id="Pagination.Count"

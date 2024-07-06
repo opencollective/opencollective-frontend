@@ -4,7 +4,8 @@ import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
 import { ChevronUp } from '@styled-icons/feather/ChevronUp/ChevronUp';
 import { themeGet } from '@styled-system/theme-get';
 import styled from 'styled-components';
-import { size, SizeProps, space, SpaceProps } from 'styled-system';
+import type { SizeProps, SpaceProps } from 'styled-system';
+import { size, space } from 'styled-system';
 
 import Container from './Container';
 
@@ -93,7 +94,7 @@ const CollapseBtn = styled.div<CollapseBtnProps>`
 /**
  * A stylized version of the `details` HTML element to hide & show content when clicked.
  */
-const Collapse = ({ children, title, buttonSize, defaultIsOpen, ...props }) => {
+const Collapse = ({ children, title, buttonSize = 18, defaultIsOpen, ...props }) => {
   return (
     <Details open={defaultIsOpen} {...props}>
       {title && (
@@ -117,10 +118,6 @@ Collapse.propTypes = {
   children: PropTypes.node,
   defaultIsOpen: PropTypes.bool,
   buttonSize: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-};
-
-Collapse.defaultProps = {
-  buttonSize: 18,
 };
 
 export default Collapse;

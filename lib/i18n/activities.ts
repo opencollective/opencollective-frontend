@@ -1,6 +1,7 @@
-import { defineMessages, MessageDescriptor } from 'react-intl';
+import type { MessageDescriptor } from 'react-intl';
+import { defineMessages } from 'react-intl';
 
-import { ActivityTypes } from '../constants/activities';
+import type { ActivityTypes } from '../constants/activities';
 
 interface TimelineMessageDescriptor extends MessageDescriptor {
   avatar?: 'fromAccount' | 'account' | 'individual'; // Used to determine which avatar to display (default is Individual)
@@ -142,8 +143,8 @@ export const ActivityTimelineMessageI18n = defineMessages<string, TimelineMessag
     avatar: 'fromAccount',
   },
   ORDER_PENDING_CONTRIBUTION_NEW: {
-    defaultMessage: '<Individual></Individual> created new pending <Order>contribution</Order> to <Account></Account>',
-    id: 'MapeUk',
+    defaultMessage: '<Individual></Individual> created new <Order>expected funds</Order> to <Account></Account>',
+    id: 'NvYiK0',
   },
 });
 
@@ -313,6 +314,10 @@ export const ActivityDescriptionI18n = defineMessages({
     defaultMessage: 'Tax form received for <Account></Account>',
     id: 'DUPkdl',
   },
+  TAXFORM_INVALIDATED: {
+    defaultMessage: 'Tax form invalidated for <Account></Account>',
+    id: 'ActivityLog.TaxForm.Invalidated',
+  },
   // Members
   COLLECTIVE_MEMBER_CREATED: {
     defaultMessage: '<FromAccount></FromAccount> joined <Account></Account> as <MemberRole></MemberRole>',
@@ -407,6 +412,14 @@ export const ActivityDescriptionI18n = defineMessages({
     defaultMessage: "<FromAccount></FromAccount>'s <Order>recurring contribution</Order> paused",
     id: 'XEZlSZ',
   },
+  SUBSCRIPTION_READY_TO_BE_RESUMED: {
+    defaultMessage: '<Order>Recurring contribution</Order> ready to be resumed',
+    id: 'nUWffQ',
+  },
+  SUBSCRIPTION_RESUMED: {
+    defaultMessage: '<Order>Recurring contribution</Order> resumed',
+    id: 'wxbjAz',
+  },
   TICKET_CONFIRMED: {
     id: 'WebhookEvents.TICKET_CONFIRMED',
     defaultMessage: 'Ticket confirmed',
@@ -430,13 +443,13 @@ export const ActivityDescriptionI18n = defineMessages({
     id: '6QW6MJ',
   },
   ORDER_PENDING_CONTRIBUTION_NEW: {
-    defaultMessage: 'New pending <Order>contribution</Order> from <FromAccount></FromAccount> to <Account></Account>',
-    id: 'xrcsxW',
+    defaultMessage: 'New <Order>expected funds</Order> from <FromAccount></FromAccount> to <Account></Account>',
+    id: 'kh8yZm',
   },
   ORDER_PENDING_CONTRIBUTION_REMINDER: {
     defaultMessage:
-      'Sent reminder to <FromAccount></FromAccount> about pending <Order>contribution</Order> to <Account></Account>',
-    id: 'PPUTPf',
+      'Sent reminder to <FromAccount></FromAccount> about <Order>expected funds</Order> to <Account></Account>',
+    id: '76qdIc',
   },
   BACKYOURSTACK_DISPATCH_CONFIRMED: {
     defaultMessage: 'BackYourStack dispatch confirmed for <Account></Account>',
@@ -769,8 +782,8 @@ export const ActivityTypeI18n: ActivityTranslations = defineMessages({
     id: 'oisSUu',
   },
   ORDER_PENDING_CONTRIBUTION_NEW: {
-    defaultMessage: 'New pending contribution',
-    id: 'PRfgGt',
+    defaultMessage: 'New expected funds',
+    id: 'kzIWOG',
   },
   ORDER_THANKYOU: {
     defaultMessage: 'New contribution',
@@ -803,6 +816,10 @@ export const ActivityTypeI18n: ActivityTranslations = defineMessages({
   TAXFORM_RECEIVED: {
     defaultMessage: 'Tax form received',
     id: 'XbazB4',
+  },
+  TAXFORM_INVALIDATED: {
+    defaultMessage: 'Tax form invalidated for <Account></Account>',
+    id: 'ActivityLog.TaxForm.Invalidated',
   },
   COLLECTIVE_COMMENT_CREATED: {
     defaultMessage: 'Comment posted',

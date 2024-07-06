@@ -1,7 +1,7 @@
 import React from 'react';
 import { themeGet } from '@styled-system/theme-get';
 import { isEmpty, orderBy, partition, round, toNumber } from 'lodash';
-import { GetServerSideProps } from 'next';
+import type { GetServerSideProps } from 'next';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -9,7 +9,7 @@ import { getSSRQueryHelpers } from '../lib/apollo-client';
 import { getCollectivePageMetadata } from '../lib/collective';
 import dayjs from '../lib/dayjs';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
-import { Account, AccountWithHost } from '../lib/graphql/types/v2/graphql';
+import type { Account, AccountWithHost } from '../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../lib/hooks/usePrevious';
 import { i18nPaymentMethodProviderType } from '../lib/i18n/payment-method-provider-type';
@@ -20,7 +20,7 @@ import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
 import { accountNavbarFieldsFragment } from '../components/collective-navbar/fragments';
 import Container from '../components/Container';
-import { confirmContributionFieldsFragment } from '../components/ContributionConfirmationModal';
+import { confirmContributionFieldsFragment } from '../components/contributions/ConfirmContributionForm';
 import CreatePendingOrderModal from '../components/dashboard/sections/contributions/CreatePendingOrderModal';
 import DateTime from '../components/DateTime';
 import ErrorPage from '../components/ErrorPage';
@@ -201,8 +201,8 @@ const contributionPageQueryHelper = getSSRQueryHelpers<{ legacyId: number; colle
   }),
 });
 
-// ignore unused exports getServerSideProps
 // next.js export
+// ts-unused-exports:disable-next-line
 export const getServerSideProps: GetServerSideProps = contributionPageQueryHelper.getServerSideProps;
 
 const messages = defineMessages({
@@ -322,8 +322,8 @@ const getTransactionsToDisplay = (account, transactions) => {
   return [...accountTransactions, ...tipTransactionsToDisplay];
 };
 
-// ignore unused exports default
 // next.js export
+// ts-unused-exports:disable-next-line
 export default function OrderPage(props) {
   const { LoggedInUser } = useLoggedInUser();
   const prevLoggedInUser = usePrevious(LoggedInUser);

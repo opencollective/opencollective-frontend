@@ -1,19 +1,22 @@
 import React from 'react';
-import { Formik, FormikConfig, FormikErrors, FormikValues, useFormik } from 'formik';
+import type { FormikConfig, FormikErrors, FormikValues } from 'formik';
+import { Formik, useFormik } from 'formik';
 import { get, isNil, mapValues, max, merge, set, xor } from 'lodash';
-import { IntlShape, useIntl } from 'react-intl';
-import { z, ZodEffects, ZodIssue, ZodNullable, ZodOptional, ZodTypeAny } from 'zod';
+import type { IntlShape } from 'react-intl';
+import { useIntl } from 'react-intl';
+import type { ZodEffects, ZodIssue, ZodNullable, ZodOptional, ZodTypeAny } from 'zod';
+import { z } from 'zod';
 
 import { RICH_ERROR_MESSAGES } from '../lib/form-utils';
 
 /**
  * Attributes that can be set on an input element, inferred from a Zod schema.
  */
-type InputAttributesFromZodSchema = {
-  name?: string;
-  required?: boolean;
-} & (
-  | {}
+type InputAttributesFromZodSchema =
+  | {
+      name?: string;
+      required?: boolean;
+    }
   | {
       type: 'text';
       minLength?: number;
@@ -23,8 +26,7 @@ type InputAttributesFromZodSchema = {
       type: 'number';
       min?: number;
       max?: number;
-    }
-);
+    };
 
 /**
  * A Zod schema that can be used in a Formik form. It can be a plain Zod object or a Zod effect that wraps a Zod object.
@@ -297,6 +299,7 @@ export const FormikZodContext = React.createContext<{
  * component will not work out of the box with `StyledInputFormikField` and other components that rely on Formik context such as `Field` or `FastField`.
  * If you are trying to access Formik state via context, use `useFormikContext`. Only use this hook if you are NOT using <Formik> or withFormik.
  */
+// ts-unused-exports:disable-next-line
 export function useFormikZod<Values extends FormikValues = FormikValues>({
   schema,
   ...props
@@ -326,7 +329,6 @@ export function FormikZod<Values extends FormikValues = FormikValues>({
   schema: SupportedZodSchema<Values>;
   config?: FormikZodConfig;
 }) {
-  const FormikWrapper = Formik<Values>;
   const intl = useIntl();
   const context = React.useMemo(() => ({ schema, config }), [schema, config]);
   const validate = React.useCallback(
@@ -335,9 +337,7 @@ export function FormikZod<Values extends FormikValues = FormikValues>({
   );
   return (
     <FormikZodContext.Provider value={context}>
-      <FormikWrapper {...props} validate={validate} />
+      <Formik<Values> {...props} validate={validate} />
     </FormikZodContext.Provider>
   );
 }
-
-// ignore unused exports useFormikZod, FormikZod, getInputAttributesFromZodSchema

@@ -1,6 +1,6 @@
 import { find, isEmpty, isUndefined, omit, pickBy } from 'lodash';
 
-import { TaxFormType } from '../components/dashboard/sections/tax-information/common';
+import type { TaxFormType } from '../components/dashboard/sections/tax-information/common';
 
 import { CollectiveType } from './constants/collectives';
 import { TransactionTypes } from './constants/transactions';

@@ -26,7 +26,10 @@ const getTypeCaption = type => {
 /**
  * A component showing big buttons to pick between collective types (user, org...etc)
  */
-const CollectiveTypePicker = ({ types, onChange }) => {
+const CollectiveTypePicker = ({
+  types = [CollectiveType.USER, CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION],
+  onChange,
+}) => {
   const isSingleType = types.length === 1;
   return (
     <Grid gridGap={1} gridTemplateColumns={`repeat(${types.length}, 1fr)`}>
@@ -54,10 +57,6 @@ CollectiveTypePicker.propTypes = {
   types: PropTypes.arrayOf(PropTypes.oneOf(Object.values(CollectiveType))).isRequired,
   /** Called when user pick a button */
   onChange: PropTypes.func.isRequired,
-};
-
-CollectiveTypePicker.defaultProps = {
-  types: [CollectiveType.USER, CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION],
 };
 
 export default CollectiveTypePicker;

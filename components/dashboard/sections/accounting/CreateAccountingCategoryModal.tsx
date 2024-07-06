@@ -1,15 +1,16 @@
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { AccountingCategory, AccountingCategoryKind } from '../../../../lib/graphql/types/v2/graphql';
+import type { AccountingCategory } from '../../../../lib/graphql/types/v2/graphql';
+import { AccountingCategoryKind } from '../../../../lib/graphql/types/v2/graphql';
 
 import StyledButton from '../../../StyledButton';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../../StyledModal';
 
+import type { EditableAccountingCategoryFields } from './AccountingCategoryForm';
 import {
   AccountingCategoryForm,
   AccountingCategoryKindI18n,
-  EditableAccountingCategoryFields,
   useAccountingCategoryFormik,
 } from './AccountingCategoryForm';
 

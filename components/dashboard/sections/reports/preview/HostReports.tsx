@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { DashboardSectionProps } from '../../../types';
+import type { DashboardSectionProps } from '../../../types';
 
 import HostTransactionReport from './HostTransactionReport';
 import HostTransactionReportList from './HostTransactionReportsList';

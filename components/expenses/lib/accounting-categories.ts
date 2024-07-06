@@ -1,7 +1,7 @@
 import { get } from 'lodash';
 
-import { LoggedInUser } from '../../../lib/custom_typings/LoggedInUser';
-import { Account, Expense, Host, Policies } from '../../../lib/graphql/types/v2/graphql';
+import type { LoggedInUser } from '../../../lib/custom_typings/LoggedInUser';
+import type { Account, Expense, Host, Policies } from '../../../lib/graphql/types/v2/graphql';
 import { getPolicy } from '../../../lib/policies';
 
 const getExpenseCategorizationPolicy = (

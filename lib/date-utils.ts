@@ -1,8 +1,9 @@
-import { OpUnitType, UnitType } from 'dayjs';
+import type { OpUnitType, UnitType } from 'dayjs';
 import { padStart } from 'lodash';
 
 import INTERVALS from './constants/intervals';
 import { PAYMENT_METHOD_SERVICE } from './constants/payment-methods';
+import type { TierFrequency } from './graphql/types/v2/graphql';
 import { TimeUnit } from './graphql/types/v2/graphql';
 import dayjs from './dayjs';
 
@@ -50,7 +51,9 @@ export const getCurrentLocalDateStr = () => {
  * From an order frequency provided as `ContributionFrequency` GQLV2 enum, returns an interval
  * as we use it in the DB (ie. MONTHLY => month)
  */
-export const getIntervalFromContributionFrequency = input => {
+export const getIntervalFromContributionFrequency = (
+  input: TierFrequency | `${TierFrequency}`,
+): (typeof INTERVALS)[keyof typeof INTERVALS] => {
   switch (input) {
     case 'MONTHLY':
       return INTERVALS.month;

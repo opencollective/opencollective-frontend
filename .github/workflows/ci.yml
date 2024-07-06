@@ -69,7 +69,7 @@ jobs:
 
       - run: npm run depcheck
 
-  find-unused-exports:
+  ts-unused-exports:
     runs-on: ubuntu-latest
 
     timeout-minutes: 15
@@ -83,7 +83,7 @@ jobs:
         with:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
-      - run: npm run find-unused-exports
+      - run: npm run ts-unused-exports
 
   check-langs:
     runs-on: ubuntu-latest

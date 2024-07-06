@@ -1,20 +1,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
-import { Calendar, Store, TestTube2 } from 'lucide-react';
+import { Calendar, TestTube2, UserCog } from 'lucide-react';
 import styled from 'styled-components';
-import { border, BorderProps, color, layout, space } from 'styled-system';
+import type { BorderProps } from 'styled-system';
+import { border, color, layout, space } from 'styled-system';
 
 import { CollectiveType, defaultImage } from '../lib/constants/collectives';
+import type { Account } from '../lib/graphql/types/v2/graphql';
 import { getAvatarBorderRadius, getCollectiveImage } from '../lib/image-utils';
 
-import { Flex, FlexProps } from './Grid';
+import type { FlexProps } from './Grid';
+import { Flex } from './Grid';
 
 const getInitials = name => name.split(' ').reduce((result, value) => (result += value.slice(0, 1).toUpperCase()), '');
 
 const COLLECTIVE_TYPE_ICON = {
   [CollectiveType.EVENT]: Calendar,
   [CollectiveType.PROJECT]: TestTube2,
+  ROOT: UserCog,
 };
 
 type StyledAvatarProps = FlexProps &
@@ -76,6 +80,9 @@ const Avatar = ({
   ...styleProps
 }) => {
   let child = children;
+  if (collective?.type === 'ROOT') {
+    useIcon = true;
+  }
   // Use collective object instead of props
   if (collective) {
     type = collective.type;
@@ -84,14 +91,6 @@ const Avatar = ({
       src = defaultImage.ANONYMOUS;
     } else if (collective.isGuest && shouldUseDefaultGuestAvatar(collective.name)) {
       src = defaultImage.GUEST;
-    } else if (type === 'VENDOR' && collective.hasImage !== true) {
-      const iconSize = 2 * Math.round((radius * 0.6) / 2);
-      const padding = (radius - iconSize) / 2;
-      child = (
-        <div className="rounded-sm bg-slate-100  text-slate-300" style={{ padding }}>
-          <Store size={iconSize} />
-        </div>
-      );
     } else if (useIcon) {
       const Icon = COLLECTIVE_TYPE_ICON[type];
       if (Icon) {
@@ -159,15 +158,6 @@ export const ContributorAvatar = ({ contributor, radius, ...styleProps }) => {
     image = defaultImage.ANONYMOUS;
   } else if (contributor.isGuest && shouldUseDefaultGuestAvatar(contributor.name)) {
     image = defaultImage.GUEST;
-  } else if (contributor.type === 'VENDOR') {
-    image = undefined;
-    const iconSize = 2 * Math.round((radius * 0.6) / 2);
-    const padding = (radius - iconSize) / 2;
-    styleProps.children = (
-      <div className="rounded-sm bg-slate-100  text-slate-300" style={{ padding }}>
-        <Store size={iconSize} />
-      </div>
-    );
   } else {
     image = getCollectiveImage({ slug: contributor.collectiveSlug, imageUrl: contributor.image });
   }
@@ -196,6 +186,43 @@ export const IncognitoAvatar = avatarProps => {
 /** A simple avatar for guest users */
 export const GuestAvatar = avatarProps => {
   return <StyledAvatar {...avatarProps} type={CollectiveType.USER} src={defaultImage.GUEST} />;
+};
+
+export const StackedAvatars = ({
+  accounts = [],
+  imageSize,
+  maxDisplayedAvatars = 3,
+}: {
+  accounts: Partial<Account>[];
+  imageSize: number;
+  maxDisplayedAvatars?: number;
+}) => {
+  const width = `${imageSize}px`;
+  const marginLeft = `-${imageSize / 3}px`;
+  const displayed = accounts.length > maxDisplayedAvatars ? accounts.slice(0, maxDisplayedAvatars - 1) : accounts;
+  const left = accounts.length - displayed.length;
+  return (
+    <div className="flex items-center">
+      {displayed.map(account => (
+        <div key={account.id || account.slug} className="flex items-center first:!ml-0" style={{ marginLeft }}>
+          <Avatar
+            collective={account}
+            radius={imageSize}
+            displayTitle={true}
+            className="border border-solid border-white"
+          />
+        </div>
+      ))}
+      {left ? (
+        <div
+          className="flex items-center justify-center rounded-full bg-blue-50 text-[11px] font-semibold text-blue-400 first:ml-0"
+          style={{ width, height: width, marginLeft }}
+        >
+          +{left}
+        </div>
+      ) : null}
+    </div>
+  );
 };
 
 /** @component */

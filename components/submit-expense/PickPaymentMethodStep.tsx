@@ -8,13 +8,13 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import {
+import type {
   Account,
   Host,
-  PayoutMethodType,
   SavePayoutMethodMutation,
   SavePayoutMethodMutationVariables,
 } from '../../lib/graphql/types/v2/graphql';
+import { PayoutMethodType } from '../../lib/graphql/types/v2/graphql';
 
 import CollectivePicker from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
@@ -31,7 +31,7 @@ import { useToast } from '../ui/useToast';
 
 import { PayoutMethodDetails } from './PayoutMethodDetails';
 import { RadioCardButton } from './RadioCardButton';
-import { ExpenseForm } from './useExpenseForm';
+import type { ExpenseForm } from './useExpenseForm';
 
 type PickPaymentMethodFormProps = {
   form: ExpenseForm;
@@ -300,7 +300,7 @@ function CreatePayoutMethodForm(props: CreatePayoutMethodFormProps) {
                 value: m,
                 label: intl.formatMessage(I18nPayoutMethodLabels[m]),
               }))}
-              onChange={option => formik.setFieldValue('type', option.value)}
+              onChange={(option: { value: string }) => formik.setFieldValue('type', option.value)}
             />
           )}
         </StyledInputFormikField>
@@ -585,7 +585,7 @@ function PayoutMethodPicker(props: PayoutMethodPickerProps) {
                 inputId="payout-method"
                 options={[newPayoutMethodOption, ...payeePayoutMethodOptions]}
                 value={selectedPayoutMethodOption}
-                onChange={e => {
+                onChange={(e: { value: string }) => {
                   if (e.value === newPayoutMethodOption.value) {
                     setIsCreatingNewPayoutMethod(true);
                     props.form.setFieldValue('payoutMethodId', null);
@@ -595,7 +595,7 @@ function PayoutMethodPicker(props: PayoutMethodPickerProps) {
                 }}
               />
 
-              <div className="mt-2 grid grid-cols-[1fr_auto]  grid-rows-1">
+              <div className="mt-2 grid grid-cols-[1fr_auto] grid-rows-1">
                 <span className="text-xs text-neutral-500">
                   {lastUsedPaymentMethodIdByPayee &&
                     lastUsedPaymentMethodIdByPayee === props.form.values.payoutMethodId && (

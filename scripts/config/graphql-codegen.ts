@@ -1,4 +1,4 @@
-import { CodegenConfig } from '@graphql-codegen/cli';
+import type { CodegenConfig } from '@graphql-codegen/cli';
 
 const config: CodegenConfig = {
   documents: ['pages/**/*.(ts|tsx)', 'components/**/*.(ts|tsx)', '!src/gql/**/*'],
@@ -14,13 +14,6 @@ const config: CodegenConfig = {
         fragmentMasking: false,
       },
       schema: './lib/graphql/schemaV2.graphql',
-      plugins: [
-        {
-          add: {
-            content: '/* ignore unused exports */',
-          },
-        },
-      ],
     },
   },
   pluckConfig: {
@@ -29,7 +22,6 @@ const config: CodegenConfig = {
   },
 };
 
-// ignore unused exports default
 // config file
-
+// ts-unused-exports:disable-next-line
 export default config;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { TooltipContentProps } from '@radix-ui/react-tooltip';
+import type { TooltipContentProps } from '@radix-ui/react-tooltip';
 import { InfoIcon } from 'lucide-react';
 
 import { cn } from '../lib/utils';

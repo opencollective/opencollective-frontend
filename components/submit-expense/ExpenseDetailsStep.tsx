@@ -2,7 +2,8 @@ import React from 'react';
 import { TaxType } from '@opencollective/taxes';
 import { FormikProvider } from 'formik';
 import { isEmpty, round } from 'lodash';
-import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
+import type { IntlShape } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import { i18nTaxType } from '../../lib/i18n/taxes';
@@ -20,7 +21,7 @@ import StyledInputGroup from '../StyledInputGroup';
 import StyledSelect from '../StyledSelect';
 
 import { ExpenseItemsForm } from './ExpenseItemsForm';
-import { ExpenseForm } from './useExpenseForm';
+import type { ExpenseForm } from './useExpenseForm';
 
 const CURRENCY_PICKER_STYLE = { menu: { width: '280px' } } as const;
 

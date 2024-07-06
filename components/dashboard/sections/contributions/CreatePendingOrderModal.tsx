@@ -12,9 +12,10 @@ import styled from 'styled-components';
 import { formatCurrency } from '../../../../lib/currency-utils';
 import { requireFields, verifyEmailPattern } from '../../../../lib/form-utils';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
-import { CreatePendingContributionModalQuery, OrderPageQuery } from '../../../../lib/graphql/types/v2/graphql';
+import type { CreatePendingContributionModalQuery, OrderPageQuery } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
+import { i18nPendingOrderPaymentMethodTypes } from '../../../../lib/i18n/pending-order-payment-method-type';
 import { i18nTaxType } from '../../../../lib/i18n/taxes';
 import { require2FAForAdmins } from '../../../../lib/policies';
 import { omitDeep } from '../../../../lib/utils';
@@ -22,7 +23,7 @@ import { omitDeep } from '../../../../lib/utils';
 import AccountingCategorySelect from '../../../AccountingCategorySelect';
 import CollectivePicker, { DefaultCollectiveLabel } from '../../../CollectivePicker';
 import CollectivePickerAsync from '../../../CollectivePickerAsync';
-import { confirmContributionFieldsFragment } from '../../../ContributionConfirmationModal';
+import { confirmContributionFieldsFragment } from '../../../contributions/ConfirmContributionForm';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { Box, Flex } from '../../../Grid';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
@@ -387,11 +388,10 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
       ),
     });
   }
-  const paymentMethodOptions = [
-    { value: 'UNKNOWN', label: intl.formatMessage({ id: 'Unknown', defaultMessage: 'Unknown' }) },
-    { value: 'BANK_TRANSFER', label: intl.formatMessage({ defaultMessage: 'Bank Transfer', id: 'Aj4Xx4' }) },
-    { value: 'CHECK', label: intl.formatMessage({ id: 'PaymentMethod.Check', defaultMessage: 'Check' }) },
-  ];
+  const paymentMethodOptions = Object.keys(i18nPendingOrderPaymentMethodTypes).map(key => ({
+    label: intl.formatMessage(i18nPendingOrderPaymentMethodTypes[key]),
+    value: key,
+  }));
 
   const amounts = getAmountsFromValues(values);
   return (
@@ -400,7 +400,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
         <Field
           name="toAccount"
           htmlFor="CreatePendingContribution-toAccount"
-          label={<FormattedMessage defaultMessage="Create pending contribution for:" id="6HAoiZ" />}
+          label={<FormattedMessage defaultMessage="Create expected funds for:" id="S5zrpB" />}
           labelFontSize="16px"
           labelFontWeight="700"
         >
@@ -822,9 +822,9 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
         </Button>
         <Button type="submit" data-cy="create-pending-contribution-submit-btn" loading={isSubmitting}>
           {edit ? (
-            <FormattedMessage defaultMessage="Edit pending contribution" id="dIbvMd" />
+            <FormattedMessage defaultMessage="Edit expected funds" id="hQAJH9" />
           ) : (
-            <FormattedMessage defaultMessage="Create pending contribution" id="qISY+c" />
+            <FormattedMessage defaultMessage="Create expected funds" id="OKMbES" />
           )}
         </Button>
       </div>
@@ -887,13 +887,9 @@ const CreatePendingContributionModal = ({ hostSlug, edit, ...props }: CreatePend
     >
       <ModalHeader>
         {edit ? (
-          <FormattedMessage
-            defaultMessage="Edit Pending Contribution #{id}"
-            id="sMnp2d"
-            values={{ id: edit.legacyId }}
-          />
+          <FormattedMessage defaultMessage="Edit Expected Funds #{id}" id="/QMYYS" values={{ id: edit.legacyId }} />
         ) : (
-          <FormattedMessage defaultMessage="Create Pending Contribution" id="1i8Ufu" />
+          <FormattedMessage defaultMessage="Create Expected Funds" id="8zsN7i" />
         )}
       </ModalHeader>
       {loading ? (
@@ -934,8 +930,8 @@ const CreatePendingContributionModal = ({ hostSlug, edit, ...props }: CreatePend
                 variant: 'success',
                 message: (
                   <FormattedMessage
-                    defaultMessage="Pending contribution #{orderId} updated"
-                    id="fqxYbq"
+                    defaultMessage="Expected Funds #{orderId} updated"
+                    id="6mXKXi"
                     values={{ orderId: result.data.editPendingOrder.legacyId }}
                   />
                 ),
@@ -961,7 +957,7 @@ const CreatePendingContributionModal = ({ hostSlug, edit, ...props }: CreatePend
                 variant: 'success',
                 message: (
                   <FormattedMessage
-                    defaultMessage="Pending contribution created with reference #{orderId}"
+                    defaultMessage="Expected Funds created with reference #{orderId}"
                     id="k8izBg"
                     values={{ orderId: result.data.createPendingOrder.legacyId }}
                   />

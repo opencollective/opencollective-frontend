@@ -5,9 +5,11 @@ import { useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import { AccountCacheType, ClearCacheMutation, ClearCacheMutationVariables } from '../../lib/graphql/types/v2/graphql';
+import type { ClearCacheMutation, ClearCacheMutationVariables } from '../../lib/graphql/types/v2/graphql';
+import { AccountCacheType } from '../../lib/graphql/types/v2/graphql';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
+import DashboardHeader from '../dashboard/DashboardHeader';
 import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
@@ -38,6 +40,7 @@ const ClearCacheForAccountForm = () => {
   const intl = useIntl();
   return (
     <div>
+      <DashboardHeader title="Clear Cache" description="Clear cache for account" className="mb-10" />
       <StyledInputField htmlFor="clear-cache-account" label="Account" flex="1 1">
         {({ id }) => (
           <CollectivePickerAsync inputId={id} onChange={({ value }) => setAccount(value)} skipGuests={false} />

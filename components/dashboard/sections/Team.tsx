@@ -29,6 +29,7 @@ import ResendMemberInviteBtn from '../../edit-collective/sections/team/ResendMem
 import { Box, Flex, Grid } from '../../Grid';
 import { getI18nLink } from '../../I18nFormatters';
 import Link from '../../Link';
+import LinkCollective from '../../LinkCollective';
 import Loading from '../../Loading';
 import MemberRoleDescription from '../../MemberRoleDescription';
 import MessageBox from '../../MessageBox';
@@ -39,7 +40,7 @@ import StyledTag from '../../StyledTag';
 import StyledTooltip from '../../StyledTooltip';
 import { P } from '../../Text';
 import DashboardHeader from '../DashboardHeader';
-import { DashboardSectionProps } from '../types';
+import type { DashboardSectionProps } from '../types';
 
 const MemberContainer = styled(Container)`
   display: block;
@@ -121,7 +122,7 @@ const MemberCard = ({ member, account, index, nbAdmins, refetch }: MemberCardPro
           <Avatar mt={-28} src={get(memberCollective, 'imageUrl')} radius={56} />
         </MemberLogoContainer>
         <P fontSize="14px" lineHeight="20px" m={2} textAlign="center">
-          {get(memberCollective, 'name')}
+          <LinkCollective collective={memberCollective} />
         </P>
         <StyledTag textTransform="uppercase" display="block" mb={2} closeButtonProps={false}>
           {formatMemberRole(intl, get(member, 'role'))}
@@ -247,7 +248,7 @@ const Team = ({ accountSlug }: DashboardSectionProps) => {
                     id="XW00me"
                     values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
                   />
-                  {host?.policies?.COLLECTIVE_MINIMUM_ADMINS.freeze && (
+                  {host.policies.COLLECTIVE_MINIMUM_ADMINS.freeze && (
                     <React.Fragment>
                       &nbsp;
                       <FormattedMessage

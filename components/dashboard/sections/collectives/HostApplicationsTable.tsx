@@ -1,16 +1,16 @@
 import React from 'react';
-import { ColumnDef, TableMeta } from '@tanstack/react-table';
+import type { ColumnDef, TableMeta } from '@tanstack/react-table';
 import { FormattedMessage } from 'react-intl';
 
-import { HostApplication, HostApplicationStatus } from '../../../../lib/graphql/types/v2/graphql';
+import type { HostApplication, HostApplicationStatus } from '../../../../lib/graphql/types/v2/graphql';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
-import { DataTable } from '../../../DataTable';
 import DateTime from '../../../DateTime';
 import StyledHr from '../../../StyledHr';
 import StyledLinkButton from '../../../StyledLinkButton';
 import StyledTag from '../../../StyledTag';
+import { DataTable } from '../../../table/DataTable';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/DropdownMenu';
 import { TableActionsButton } from '../../../ui/Table';
 

@@ -2,7 +2,8 @@ import React from 'react';
 import { truncate } from 'lodash';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
-import { PayoutMethod, PayoutMethodType } from '../lib/graphql/types/v2/graphql';
+import type { PayoutMethod } from '../lib/graphql/types/v2/graphql';
+import { PayoutMethodType } from '../lib/graphql/types/v2/graphql';
 
 import { PayoutMethodIcon } from './PayoutMethodIcon';
 

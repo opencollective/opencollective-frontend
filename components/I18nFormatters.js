@@ -4,7 +4,6 @@ import { FormattedMessage } from 'react-intl';
 import Link from './Link';
 import StyledLink from './StyledLink';
 
-// ignore unused exports
 // utility library
 
 // eslint-disable-next-line react/display-name
@@ -13,9 +12,13 @@ export const getI18nLink = linkProps => chunks => (
 );
 export const I18nBold = chunks => <strong>{chunks}</strong>;
 export const I18nItalic = chunks => <i>{chunks}</i>;
+// ts-unused-exports:disable-next-line
 export const I18nCode = chunks => <code>{chunks}</code>;
+// ts-unused-exports:disable-next-line
 export const I18nOrderedList = chunks => <ol className="list-inside list-decimal">{chunks}</ol>;
+// ts-unused-exports:disable-next-line
 export const I18nUnorderedList = chunks => <ul className="list-inside list-disc">{chunks}</ul>;
+// ts-unused-exports:disable-next-line
 export const I18nListItem = chunks => <li>{chunks}</li>;
 
 export const I18nUnderline = chunks => <u>{chunks}</u>;
@@ -33,11 +36,14 @@ export const I18nSignInLink = chunks => (
   </StyledLink>
 );
 
+// ts-unused-exports:disable-next-line
 export const I18nTOSLink = msg => (
   <StyledLink as={Link} href="/tos">
     <span>{msg}</span>
   </StyledLink>
 );
+
+// ts-unused-exports:disable-next-line
 export const I18nPrivacyLink = msg => (
   <StyledLink as={Link} href="/privacypolicy">
     <span>{msg}</span>

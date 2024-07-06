@@ -1,24 +1,17 @@
 const baseConfig = {
   parser: '@typescript-eslint/parser',
+  parserOptions: {
+    project: ['tsconfig.json'],
+  },
   processor: '@graphql-eslint/graphql',
   env: {
     jest: true,
   },
-  extends: [
-    'opencollective',
-    'plugin:styled-components-a11y/recommended',
-    'plugin:import/typescript',
-    'plugin:react-hooks/recommended',
-  ],
-  plugins: ['@typescript-eslint/eslint-plugin', 'simple-import-sort', 'formatjs'],
+  extends: ['opencollective', 'plugin:styled-components-a11y/recommended', 'plugin:react-hooks/recommended'],
+  plugins: ['formatjs'],
   rules: {
     'no-console': 'error',
     'require-atomic-updates': 'off',
-    // Typescript
-    'node/no-missing-import': ['error', { tryExtensions: ['.js', '.ts', '.tsx'] }],
-    'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': ['error'],
-    // -- End of typescript-specific config
     'lines-between-class-members': ['error', 'always', { exceptAfterSingleLine: true }],
     'no-restricted-imports': [
       'error',
@@ -72,9 +65,8 @@ const baseConfig = {
           ['^\\u0000'],
           // Node.js builtins. You could also generate this regex if you use a `.js` config.
           // For example: `^(${require("module").builtinModules.join("|")})(/|$)`
-          [
-            '^(_http_agent|_http_client|_http_common|_http_incoming|_http_outgoing|_http_server|_stream_duplex|_stream_passthrough|_stream_readable|_stream_transform|_stream_wrap|_stream_writable|_tls_common|_tls_wrap|assert|async_hooks|buffer|child_process|cluster|console|constants|crypto|dgram|dns|domain|events|fs|http|http2|https|inspector|module|net|os|path|perf_hooks|process|punycode|querystring|readline|repl|stream|string_decoder|sys|timers|tls|trace_events|tty|url|util|v8|vm|worker_threads|zlib)(/|$)',
-          ],
+          // eslint-disable-next-line
+          [`^(${require('module').builtinModules.join('|')})(/|$)`],
           // Packages.
           // Things that start with a letter (or digit or underscore), or `@` followed by a letter.
           ['^react$', '^prop-types$', '^@?\\w'],
@@ -115,6 +107,11 @@ const baseConfig = {
     'styled-components-a11y/html-has-lang': ['off'],
     'styled-components-a11y/iframe-has-title': ['off'],
     'styled-components-a11y/label-has-associated-control': ['off'],
+
+    // disallow unsupported Node.js built-in APIs on the specified version
+    // https://github.com/eslint-community/eslint-plugin-n/blob/master/docs/rules/no-unsupported-features/node-builtins.md
+    // fetch, navigator, crypto and URL are experimental in Node 20
+    'n/no-unsupported-features/node-builtins': 'off',
   },
 };
 
@@ -141,11 +138,29 @@ const graphqlConfig = {
 
 module.exports = {
   root: true,
-  ignorePatterns: ['./lib/graphql/types/*', './lib/graphql/*.graphql'],
+  ignorePatterns: ['lib/graphql/types/v2/*', 'lib/graphql/*.graphql'],
   overrides: [
     {
-      files: ['*.js', '*.jsx', '*.ts', '*.tsx'],
+      files: ['*.js', '*.jsx'],
       ...baseConfig,
+    },
+    {
+      files: ['*.ts', '*.tsx'],
+      ...baseConfig,
+      rules: {
+        ...baseConfig.rules,
+        '@typescript-eslint/no-explicit-any': 'warn',
+        '@typescript-eslint/no-var-requires': 'warn',
+        '@typescript-eslint/consistent-type-exports': 'warn',
+        '@typescript-eslint/consistent-type-imports': 'warn',
+        'react/prop-types': 'off',
+        // https://typescript-eslint.io/troubleshooting/performance-troubleshooting/#eslint-plugin-import
+        'import/named': 'off',
+        'import/namespace': 'off',
+        'import/default': 'off',
+        'import/no-named-as-default-member': 'off',
+        'import/no-unresolved': 'off',
+      },
     },
     {
       files: ['*.graphql'],
@@ -155,6 +170,12 @@ module.exports = {
       files: ['scripts/*.js'],
       rules: {
         'no-console': 'off',
+      },
+    },
+    {
+      files: ['server/*.js', '*.config.js', '.storybook/main.js', 'env.js'],
+      rules: {
+        '@typescript-eslint/no-var-requires': 'off',
       },
     },
     {

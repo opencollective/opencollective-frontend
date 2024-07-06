@@ -19,6 +19,7 @@ import { shouldDisplayExpenseCategoryPill } from '../expenses/lib/accounting-cat
 import { AccountHoverCard } from '../AccountHoverCard';
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import AutosizeText from '../AutosizeText';
+import Avatar from '../Avatar';
 import { AvatarWithLink } from '../AvatarWithLink';
 import Container from '../Container';
 import DateTime from '../DateTime';
@@ -41,7 +42,7 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 import Tags from '../Tags';
-import { H3, P, Span } from '../Text';
+import { H3, Span } from '../Text';
 import TransactionSign from '../TransactionSign';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
@@ -103,7 +104,7 @@ const ExpenseBudgetItem = ({
   showAmountSign,
   expense,
   showProcessActions,
-  view,
+  view = 'public',
   onProcess,
   selected,
   expandExpense,
@@ -129,6 +130,7 @@ const ExpenseBudgetItem = ({
   const isLoggedInUserExpenseHostAdmin = LoggedInUser?.isAdminOfCollective(host);
   const isLoggedInUserExpenseAdmin = LoggedInUser?.isAdminOfCollective(expense?.account);
   const isViewingExpenseInHostContext = isLoggedInUserExpenseHostAdmin && !isLoggedInUserExpenseAdmin;
+  const lastComment = expense?.lastComment?.nodes?.[0];
 
   return (
     <ExpenseContainer
@@ -307,10 +309,10 @@ const ExpenseBudgetItem = ({
                         ),
                       }}
                     />
-                    {Boolean(expense?.comments?.totalCount) && (
+                    {Boolean(expense.comments?.totalCount) && (
                       <React.Fragment>
                         {' • '}
-                        {expense?.comments.totalCount}
+                        {expense.comments?.totalCount}
                         &nbsp;
                         <CommentIcon size={14} color="#4D4F51" />
                       </React.Fragment>
@@ -378,7 +380,7 @@ const ExpenseBudgetItem = ({
                   lineHeight="16px"
                   p="3px 8px"
                   showTaxFormTag={includes(expense.requiredLegalDocuments, 'US_TAX_FORM')}
-                  showTaxFormMsg={expense.payee.isAdmin}
+                  payee={expense.payee}
                 />
               )}
             </Flex>
@@ -438,7 +440,7 @@ const ExpenseBudgetItem = ({
                   <DetailColumnHeader>
                     <FormattedMessage defaultMessage="Host Agreements" id="kq2gKV" />
                   </DetailColumnHeader>
-                  <P fontSize="11px" mt="6px">
+                  <div className="mt-[7px] text-[11px]">
                     <StyledLink
                       as={Link}
                       color="black.700"
@@ -450,7 +452,24 @@ const ExpenseBudgetItem = ({
                         values={{ count: expense.account.hostAgreements.totalCount }}
                       />
                     </StyledLink>
-                  </P>
+                  </div>
+                </Box>
+              )}
+              {lastComment && (
+                <Box mr={[3, 4]}>
+                  <DetailColumnHeader>
+                    <FormattedMessage defaultMessage="Last Comment" id="gSNApa" />
+                  </DetailColumnHeader>
+                  <div className="pt-[2px] text-[11px]">
+                    <LinkCollective
+                      collective={lastComment.fromAccount}
+                      className="flex items-center gap-2 font-medium text-slate-700 hover:text-slate-700 hover:underline"
+                      withHoverCard
+                      hoverCardProps={{ includeAdminMembership: { accountSlug: lastComment.fromAccount.slug } }}
+                    >
+                      <Avatar collective={lastComment.fromAccount} radius={24} /> {lastComment.fromAccount.name}
+                    </LinkCollective>
+                  </div>
                 </Box>
               )}
             </Flex>
@@ -555,14 +574,25 @@ ExpenseBudgetItem.propTypes = {
         id: PropTypes.string.isRequired,
       }),
     }),
+    lastComment: PropTypes.shape({
+      nodes: PropTypes.arrayOf(
+        PropTypes.shape({
+          id: PropTypes.string.isRequired,
+          createdAt: PropTypes.string.isRequired,
+          fromAccount: PropTypes.shape({
+            id: PropTypes.string.isRequired,
+            slug: PropTypes.string.isRequired,
+            type: PropTypes.string.isRequired,
+            name: PropTypes.string.isRequired,
+            imageUrl: PropTypes.string.isRequired,
+          }),
+        }),
+      ),
+    }),
   }),
   selected: PropTypes.bool,
   expandExpense: PropTypes.func,
   useDrawer: PropTypes.bool,
-};
-
-ExpenseBudgetItem.defaultProps = {
-  view: 'public',
 };
 
 export default ExpenseBudgetItem;

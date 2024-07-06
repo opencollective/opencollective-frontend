@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { PaymentIntentConfirmParams, PaymentIntentResult, Stripe, StripeElements } from '@stripe/stripe-js';
+import type { PaymentIntentConfirmParams, PaymentIntentResult, Stripe, StripeElements } from '@stripe/stripe-js';
 
 import { PAYMENT_METHOD_TYPE } from '../constants/payment-methods';
 

@@ -1,9 +1,8 @@
-// ignore unused exports repeatIt, repeatDescribe
-// keep for future use?
-
 import { flatten } from 'lodash';
 
 /** Helper to loop on specific test */
+// keep for future use?
+// ts-unused-exports:disable-next-line
 export const repeatIt = (testName, count, func) => {
   const range = Array(count).fill();
   const tests = range.map((_, testNum) => it(`${testName} - ${testNum}`, func));
@@ -11,6 +10,8 @@ export const repeatIt = (testName, count, func) => {
 };
 
 /** Helper to loop on specific describe */
+// keep for future use?
+// ts-unused-exports:disable-next-line
 export const repeatDescribe = (describeName, count, func) => {
   const range = Array(count).fill();
   const describes = range.map((_, testNum) => describe(`${describeName} - ${testNum}`, func));

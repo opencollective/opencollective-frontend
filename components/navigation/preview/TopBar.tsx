@@ -67,7 +67,7 @@ const DashboardProfileQuickLink = ({ slug, toProfile }) => {
     >
       <Icon className="block text-muted-foreground group-hover:text-foreground sm:hidden" size={16} />
 
-      <span className="  hidden items-center gap-x-1.5 sm:flex">
+      <span className="hidden items-center gap-x-1.5 sm:flex">
         {toProfile ? (
           <FormattedMessage id="PublicProfile" defaultMessage="Public profile" />
         ) : (

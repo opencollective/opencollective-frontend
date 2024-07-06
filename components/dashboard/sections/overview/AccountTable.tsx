@@ -1,33 +1,34 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { Column, ColumnDef, Row, TableMeta } from '@tanstack/react-table';
+import type { Column, ColumnDef, Row, TableMeta } from '@tanstack/react-table';
 import clsx from 'clsx';
 import { isNil, omit } from 'lodash';
 import { ArrowDown10, ArrowDownZA, ArrowUp10, ArrowUpZA } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import {
+import type {
   AccountMetricsFragment,
   Currency,
   OverviewMetricsQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import { useQueryFilterReturnType } from '../../../../lib/hooks/useQueryFilter';
+import type { useQueryFilterReturnType } from '../../../../lib/hooks/useQueryFilter';
 import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
-import { DataTable } from '../../../DataTable';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import Link from '../../../Link';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
+import { DataTable } from '../../../table/DataTable';
 import { Badge } from '../../../ui/Badge';
 import { Button } from '../../../ui/Button';
 import { Checkbox } from '../../../ui/Checkbox';
 import { DashboardContext } from '../../DashboardContext';
 
-import { schema } from './CollectiveOverview';
-import { ChangeBadge, getPercentageDifference, MetricProps } from './Metric';
+import type { schema } from './CollectiveOverview';
+import type { MetricProps } from './Metric';
+import { ChangeBadge, getPercentageDifference } from './Metric';
 import { metricsPerAccountQuery } from './queries';
 
 const SortableHeader = ({
@@ -102,7 +103,7 @@ const columns: ColumnDef<AccountMetricsRow>[] = [
         <div className="flex items-center gap-3">
           <div className="relative">
             <Avatar
-              className={clsx('transition-opacity', isSelected ? 'opacity-0' : ' group-hover/row:opacity-0')}
+              className={clsx('transition-opacity', isSelected ? 'opacity-0' : 'group-hover/row:opacity-0')}
               collective={account}
               radius={24}
             />
@@ -130,7 +131,7 @@ const columns: ColumnDef<AccountMetricsRow>[] = [
                     href={getCollectivePageRoute(account)}
                     className={clsx(
                       'truncate hover:underline group-hover/row:text-foreground',
-                      isSelected ? 'text-foreground' : 'text-muted-foreground ',
+                      isSelected ? 'text-foreground' : 'text-muted-foreground',
                     )}
                   >
                     {account.name}
@@ -260,7 +261,6 @@ export default function AccountTable({ accountSlug, queryFilter, metric }) {
   const currency = data?.account?.[metric.id]?.current?.currency;
 
   const meta = {
-    selectAccount: slug => queryFilter.setFilter('account', slug),
     queryFilter,
     currency: currency,
     isAmount: !!metric.amount,

@@ -3,9 +3,10 @@ import { useIntl } from 'react-intl';
 
 import { ZERO_DECIMAL_CURRENCIES } from '../lib/constants/currency';
 import { formatCurrency, getCurrencySymbol } from '../lib/currency-utils';
-import { Currency as CurrencyEnum } from '../lib/graphql/types/v2/graphql';
+import type { Currency as CurrencyEnum } from '../lib/graphql/types/v2/graphql';
 
-import { Span, TextProps } from './Text';
+import type { TextProps } from './Text';
+import { Span } from './Text';
 
 type CurrencyProps = TextProps & {
   /** The amount to display, in cents */

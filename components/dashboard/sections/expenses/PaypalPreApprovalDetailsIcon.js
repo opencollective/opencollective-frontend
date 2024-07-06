@@ -82,7 +82,6 @@ PaypalPreApprovalDetailsIcon.propTypes = {
   }),
 };
 
-// ignore unused exports default
 // keep for future use?
-
+// ts-unused-exports:disable-next-line
 export default PaypalPreApprovalDetailsIcon;

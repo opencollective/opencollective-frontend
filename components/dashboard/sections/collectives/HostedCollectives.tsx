@@ -6,23 +6,18 @@ import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { CollectiveType, HostedCollectiveTypes } from '../../../../lib/constants/collectives';
-import { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
+import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import {
-  Collective,
-  HostedCollectivesQueryVariables,
-  HostFeeStructure,
-} from '../../../../lib/graphql/types/v2/graphql';
+import type { Collective, HostedCollectivesQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import { HostFeeStructure } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { formatHostFeeStructure } from '../../../../lib/i18n/host-fee-structure';
 
-import { DataTable } from '../../../DataTable';
 import { Drawer } from '../../../Drawer';
-import { Flex } from '../../../Grid';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
-import Pagination from '../../../Pagination';
+import { DataTable } from '../../../table/DataTable';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import { consolidatedBalanceFilter } from '../../filters/BalanceFilter';
@@ -32,14 +27,31 @@ import {
   CollectiveStatusMessages,
 } from '../../filters/CollectiveStatusFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
+import { currencyFilter } from '../../filters/CurrencyFilter';
 import { Filterbar } from '../../filters/Filterbar';
-import { orderByFilter } from '../../filters/OrderFilter';
+import { Pagination } from '../../filters/Pagination';
 import { searchFilter } from '../../filters/SearchFilter';
-import { DashboardSectionProps } from '../../types';
+import { buildSortFilter } from '../../filters/SortFilter';
+import type { DashboardSectionProps } from '../../types';
 
 import CollectiveDetails from './CollectiveDetails';
+import type { HostedCollectivesDataTableMeta } from './common';
 import { cols } from './common';
 import { hostedCollectivesMetadataQuery, hostedCollectivesQuery } from './queries';
+
+const sortFilter = buildSortFilter({
+  fieldSchema: z.enum(['CREATED_AT', 'BALANCE', 'NAME']),
+  defaultValue: {
+    field: 'CREATED_AT',
+    direction: 'DESC',
+  },
+  i18nCustomLabels: {
+    CREATED_AT: defineMessage({
+      defaultMessage: 'Hosted since',
+      id: 'HostedSince',
+    }),
+  },
+});
 
 const COLLECTIVES_PER_PAGE = 20;
 
@@ -47,21 +59,21 @@ const schema = z.object({
   limit: integer.default(COLLECTIVES_PER_PAGE),
   offset: integer.default(0),
   searchTerm: searchFilter.schema,
-  orderBy: orderByFilter.schema,
+  sort: sortFilter.schema,
   hostFeesStructure: z.nativeEnum(HostFeeStructure).optional(),
   type: isMulti(z.nativeEnum(HostedCollectiveTypes)).optional(),
   status: collectiveStatusFilter.schema,
   consolidatedBalance: consolidatedBalanceFilter.schema,
+  currencies: currencyFilter.schema,
 });
 
 const toVariables: FiltersToVariables<z.infer<typeof schema>, HostedCollectivesQueryVariables> = {
-  orderBy: orderByFilter.toVariables,
   status: collectiveStatusFilter.toVariables,
   consolidatedBalance: consolidatedBalanceFilter.toVariables,
 };
 
 const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
-  orderBy: orderByFilter.filter,
+  sort: sortFilter.filter,
   searchTerm: searchFilter.filter,
   hostFeesStructure: {
     labelMsg: defineMessage({ id: 'FeeStructure', defaultMessage: 'Fee structure' }),
@@ -93,11 +105,10 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
     },
     valueRenderer: ({ value, intl }) => formatCollectiveType(intl, value),
   },
+  currencies: currencyFilter.filter,
   status: collectiveStatusFilter.filter,
   consolidatedBalance: consolidatedBalanceFilter.filter,
 };
-
-const ROUTE_PARAMS = ['slug', 'section', 'view'];
 
 const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionProps) => {
   const intl = useIntl();
@@ -158,10 +169,10 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
     schema,
     toVariables,
     views,
-    meta: { currency: metadata?.host?.currency },
+    meta: { currency: metadata?.host?.currency, currencies: metadata?.host?.all?.currencies },
   });
 
-  const { data, error, loading, variables, refetch } = useQuery(hostedCollectivesQuery, {
+  const { data, error, loading, refetch } = useQuery(hostedCollectivesQuery, {
     variables: { hostSlug, ...queryFilter.variables },
     context: API_V2_CONTEXT,
     fetchPolicy: 'cache-and-network',
@@ -188,7 +199,7 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
   };
   const isUnhosted = queryFilter.values?.status === COLLECTIVE_STATUS.UNHOSTED;
   const hostedAccounts = data?.host?.hostedAccounts;
-
+  const onClickRow = row => handleDrawer(row.original);
   return (
     <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader title={<FormattedMessage id="HostedCollectives" defaultMessage="Hosted Collectives" />} />
@@ -217,18 +228,19 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
             loading={loading}
             mobileTableView
             compact
-            meta={{ intl, openCollectiveDetails: handleDrawer, onEdit: handleEdit, host: data?.host }}
-            onClickRow={row => handleDrawer(row.original)}
+            meta={
+              {
+                intl,
+                onClickRow,
+                onEdit: handleEdit,
+                host: data?.host,
+                openCollectiveDetails: handleDrawer,
+              } as HostedCollectivesDataTableMeta
+            }
+            onClickRow={onClickRow}
             getRowDataCy={row => `collective-${row.original.slug}`}
           />
-          <Flex mt={5} justifyContent="center">
-            <Pagination
-              total={hostedAccounts?.totalCount}
-              limit={variables.limit}
-              offset={variables.offset}
-              ignoredQueryParams={ROUTE_PARAMS}
-            />
-          </Flex>
+          <Pagination queryFilter={queryFilter} total={hostedAccounts?.totalCount} />
         </React.Fragment>
       )}
 

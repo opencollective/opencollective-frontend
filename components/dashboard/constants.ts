@@ -1,8 +1,13 @@
 import { defineMessages } from 'react-intl';
 
+export const ROOT_PROFILE_KEY = 'root-actions';
+export const ROOT_PROFILE_ACCOUNT = { slug: ROOT_PROFILE_KEY, type: 'ROOT', name: 'Platform Admin' };
+
 export const SECTIONS = {
   OVERVIEW: 'overview',
   REPORTS: 'reports',
+  EXPENSE_REPORTS: 'reports/expenses',
+  TRANSACTION_REPORTS: 'reports/transactions',
   CHART_OF_ACCOUNTS: 'chart-of-accounts',
   HOST_EXPENSES: 'host-expenses',
   HOST_AGREEMENTS: 'host-agreements',
@@ -11,16 +16,36 @@ export const SECTIONS = {
   HOST_VIRTUAL_CARDS: 'host-virtual-cards',
   HOST_VIRTUAL_CARD_REQUESTS: 'host-virtual-card-requests',
   HOST_APPLICATIONS: 'host-applications',
+  HOST_TAX_FORMS: 'host-tax-forms',
   CONTRIBUTORS: 'contributors',
   INCOMING_CONTRIBUTIONS: 'incoming-contributions',
   OUTGOING_CONTRIBUTIONS: 'outgoing-contributions',
+  HOST_EXPECTED_FUNDS: 'expected-funds',
   EXPENSES: 'expenses',
   SUBMITTED_EXPENSES: 'submitted-expenses',
   TRANSACTIONS: 'transactions',
+  UPDATES: 'updates',
   HOST_TRANSACTIONS: 'host-transactions',
   VIRTUAL_CARDS: 'virtual-cards',
   TEAM: 'team',
   VENDORS: 'vendors',
+  ACCOUNTS: 'accounts',
+};
+
+export const ROOT_SECTIONS = {
+  ALL_COLLECTIVES: 'all-collectives',
+  BAN_ACCOUNTS: 'ban-account',
+  SEARCH_AND_BAN: 'search-and-ban',
+  MOVE_AUTHORED_CONTRIBUTIONS: 'move-authored-contributions',
+  MOVE_RECEIVED_CONTRIBUTIONS: 'move-received-contributions',
+  MOVE_EXPENSES: 'move-expenses',
+  CLEAR_CACHE: 'clear-cache',
+  CONNECT_ACCOUNTS: 'connect-accounts',
+  MERGE_ACCOUNTS: 'merge-accounts',
+  UNHOST_ACCOUNTS: 'unhost-accounts',
+  ACCOUNT_SETTINGS: 'account-settings',
+  ACCOUNT_TYPE: 'account-type',
+  RECURRING_CONTRIBUTIONS: 'recurring-contributions',
 };
 
 export const SETTINGS_SECTIONS = {
@@ -70,12 +95,15 @@ export const ALL_SECTIONS = {
 
 export const SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS = [
   ALL_SECTIONS.REPORTS,
+  ALL_SECTIONS.TRANSACTION_REPORTS,
+  ALL_SECTIONS.EXPENSE_REPORTS,
   ALL_SECTIONS.PAYMENT_RECEIPTS,
   ALL_SECTIONS.HOST_EXPENSES,
   ALL_SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS,
   ALL_SECTIONS.TRANSACTIONS,
   ALL_SECTIONS.EXPENSES,
   ALL_SECTIONS.HOST_AGREEMENTS,
+  ALL_SECTIONS.HOST_TAX_FORMS,
   ALL_SECTIONS.SUBMITTED_EXPENSES,
   ALL_SECTIONS.CHART_OF_ACCOUNTS,
   ALL_SECTIONS.HOST_TRANSACTIONS,
@@ -110,8 +138,8 @@ export const SECTION_LABELS = defineMessages({
     defaultMessage: 'Overview',
   },
   [ALL_SECTIONS.REPORTS]: {
-    id: 'Reports',
-    defaultMessage: 'Reports',
+    defaultMessage: 'Transactions',
+    id: 'menu.transactions',
   },
   [ALL_SECTIONS.ADVANCED]: {
     id: 'editCollective.menu.advanced',
@@ -256,5 +284,13 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.TAX_INFORMATION]: {
     defaultMessage: 'Tax Information',
     id: 'r/dTTe',
+  },
+  [ALL_SECTIONS.UPDATES]: {
+    id: 'updates',
+    defaultMessage: 'Updates',
+  },
+  [ALL_SECTIONS.ACCOUNTS]: {
+    defaultMessage: 'Accounts',
+    id: 'FvanT6',
   },
 });

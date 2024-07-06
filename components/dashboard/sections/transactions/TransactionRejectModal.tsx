@@ -5,6 +5,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 
+import type { BaseModalProps } from '../../../ModalContext';
 import TransactionRejectMessageForm from '../../../transactions/TransactionRejectMessageForm';
 import {
   AlertDialog,
@@ -22,23 +23,38 @@ const rejectTransactionMutation = gql`
   mutation RejectTransaction($transaction: TransactionReferenceInput!, $message: String) {
     rejectTransaction(transaction: $transaction, message: $message) {
       id
+      order {
+        id
+        status
+        activities {
+          nodes {
+            id
+            type
+            createdAt
+          }
+        }
+        transactions {
+          id
+          createdAt
+        }
+      }
     }
   }
 `;
 
+interface TransactionRejectModalProps extends BaseModalProps {
+  id: string;
+  onMutationSuccess?: () => void;
+  canRefund?: boolean;
+}
 const TransactionRejectModal = ({
   id,
   onMutationSuccess,
   canRefund,
   open,
   setOpen,
-}: {
-  id: string;
-  onMutationSuccess?: () => void;
-  canRefund?: boolean;
-  open: boolean;
-  setOpen: (open: boolean) => void;
-}) => {
+  onCloseFocusRef,
+}: TransactionRejectModalProps) => {
   const [rejectTransaction, { loading }] = useMutation(rejectTransactionMutation, {
     context: API_V2_CONTEXT,
   });
@@ -62,7 +78,14 @@ const TransactionRejectModal = ({
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogContent>
+      <AlertDialogContent
+        onCloseAutoFocus={e => {
+          if (onCloseFocusRef?.current) {
+            e.preventDefault();
+            onCloseFocusRef.current.focus();
+          }
+        }}
+      >
         <AlertDialogHeader>
           <AlertDialogTitle>
             <FormattedMessage defaultMessage="Are you sure you want to reject this transaction?" id="fbcrkY" />

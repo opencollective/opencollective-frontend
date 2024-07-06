@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { omitBy } from 'lodash';
-import { InferGetServerSidePropsType } from 'next';
+import type { InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -10,8 +10,8 @@ import { shouldIndexAccountOnSearchEngines } from '../lib/collective';
 import { ERROR } from '../lib/errors';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
-import { addParentToURLIfMissing, getCollectivePageCanonicalURL, getCollectivePageRoute } from '../lib/url-helpers';
-import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
+import { addParentToURLIfMissing, getCollectivePageCanonicalURL, getDashboardRoute } from '../lib/url-helpers';
+import type { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 
 import Body from '../components/Body';
 import CollectiveNavbar from '../components/collective-navbar';
@@ -23,9 +23,9 @@ import { Box, Flex } from '../components/Grid';
 import Header from '../components/Header';
 import Link from '../components/Link';
 import Footer from '../components/navigation/Footer';
+import Pagination from '../components/Pagination';
 import StyledButton from '../components/StyledButton';
 import { H1, P } from '../components/Text';
-import { Pagination } from '../components/ui/Pagination';
 import Updates from '../components/Updates';
 import UpdateFilters from '../components/updates/UpdateFilters';
 
@@ -33,7 +33,7 @@ const ROUTE_PARAMS = ['collectiveSlug'];
 
 const UPDATES_PER_PAGE = 10;
 
-export const updatesPageQuery = gql`
+const updatesPageQuery = gql`
   query UpdatesPage(
     $collectiveSlug: String!
     $limit: Int
@@ -107,7 +107,7 @@ const getPropsFromQuery = (query: NextParsedUrlQuery) => ({
   limit: Number(query?.limit) || UPDATES_PER_PAGE,
 });
 
-export const getUpdatesVariables = props => {
+const getUpdatesVariables = props => {
   return {
     collectiveSlug: props.slug,
     offset: props.offset,
@@ -128,12 +128,12 @@ const updatesPageQueryHelper = getSSRQueryHelpers<
   skipClientIfSSRThrows404: true,
 });
 
-// ignore unused exports getServerSideProps
 // next.js export
+// ts-unused-exports:disable-next-line
 export const getServerSideProps = updatesPageQueryHelper.getServerSideProps;
 
-// ignore unused exports default
 // next.js export
+// ts-unused-exports:disable-next-line
 export default function UpdatesPage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
   const { LoggedInUser } = useLoggedInUser();
@@ -201,7 +201,7 @@ export default function UpdatesPage(props: InferGetServerSidePropsType<typeof ge
               </P>
             </Container>
             {LoggedInUser?.isAdminOfCollective(collective) && (
-              <Link href={`${getCollectivePageRoute(collective)}/updates/new`}>
+              <Link href={getDashboardRoute(collective, 'updates/new')}>
                 <StyledButton buttonStyle="primary" m={2}>
                   <FormattedMessage id="sections.update.new" defaultMessage="Create an Update" />
                 </StyledButton>
@@ -225,13 +225,14 @@ export default function UpdatesPage(props: InferGetServerSidePropsType<typeof ge
               nbLoadingPlaceholders={UPDATES_PER_PAGE}
             />
             {updates && (
-              <Box mt={4}>
+              <div className="mt-4 flex justify-center">
                 <Pagination
-                  totalPages={Math.ceil(updates.totalCount / UPDATES_PER_PAGE)}
-                  page={updates.offset / updates.limit + 1}
-                  onChange={page => updateQuery(router, { offset: (page - 1) * updates.limit })}
+                  total={updates.totalCount}
+                  limit={updates.limit}
+                  offset={updates.offset}
+                  onPageChange={page => updateQuery(router, { offset: (page - 1) * updates.limit })}
                 />
-              </Box>
+              </div>
             )}
           </Box>
         </div>

@@ -21,7 +21,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../../../../ui/Tooltip'
 import { DashboardContext } from '../../../DashboardContext';
 import DashboardHeader from '../../../DashboardHeader';
 import ExportTransactionsCSVModal from '../../../ExportTransactionsCSVModal';
-import { DashboardSectionProps } from '../../../types';
+import type { DashboardSectionProps } from '../../../types';
 import { schema as transactionsSchema, toVariables as transactionsToVariables } from '../../transactions/filters';
 
 import { buildReport } from './report-builder/build-report';
@@ -30,7 +30,7 @@ import { ReportNavigationArrows } from './NavigationArrows';
 import { reportQuery } from './queries';
 import { ReportContent } from './ReportContent';
 import { deserializeReportSlug, ReportPeriodSelector } from './ReportPeriodSelector';
-import { GroupFilter } from './types';
+import type { GroupFilter } from './types';
 
 const schema = z.object({
   computational: boolean.default(false),
@@ -104,14 +104,14 @@ const TransactionReport = ({ accountSlug, subpath }: DashboardSectionProps) => {
   }
   const navigateToReport = reportSlug => {
     // Updating the URL without changing any filters (e.g. isHost that controls selected tab)
-    queryFilter.setFilters({}, `/dashboard/${accountSlug}/reports/${reportSlug}`);
+    queryFilter.setFilters({}, `/dashboard/${accountSlug}/reports/transactions/${reportSlug}`);
   };
   return (
     <Fragment>
       <div className="flex max-w-screen-lg flex-col gap-4">
         <DashboardHeader
-          title={<FormattedMessage id="Reports" defaultMessage="Reports" />}
-          titleRoute={`/dashboard/${accountSlug}/reports`}
+          title={<FormattedMessage id="TransactionReports" defaultMessage="Transaction Reports" />}
+          titleRoute={`/dashboard/${accountSlug}/reports/transactions`}
           subpathTitle={
             <ReportPeriodSelector value={subpath[0]} onChange={navigateToReport} meta={queryFilter.meta} intl={intl} />
           }

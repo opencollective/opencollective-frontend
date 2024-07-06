@@ -1,52 +1,37 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { Overlay } from '@radix-ui/react-dialog';
-import { FilePenLine, X } from 'lucide-react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { max } from 'lodash';
+import { FilePenLine } from 'lucide-react';
+import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 
-import Avatar from '../../../Avatar';
 import { getI18nLink, I18nSupportLink } from '../../../I18nFormatters';
 import Image from '../../../Image';
 import Link from '../../../Link';
-import LinkCollective from '../../../LinkCollective';
 import Loading from '../../../Loading';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { Button } from '../../../ui/Button';
-import { Dialog } from '../../../ui/Dialog';
 
+import type { AccountFromTaxInformationQuery } from './queries';
 import { accountTaxInformationQuery } from './queries';
-import { TaxInformationForm } from './TaxInformationForm';
+import { TaxInformationFormDialog } from './TaxInformationFormDialog';
 
 /**
  * UI for the pending state of the tax form submission, with a button to fill the form.
  */
-const PendingTaxFormView = ({ account }) => {
-  const intl = useIntl();
-  const [isFormDirty, setIsFormDirty] = React.useState(false);
+const PendingTaxFormView = ({
+  account,
+  expiredForms,
+  refetch,
+}: {
+  account: AccountFromTaxInformationQuery;
+  expiredForms: AccountFromTaxInformationQuery['usTaxForms'];
+  refetch: () => void;
+}) => {
   const [hasTaxInformationForm, setHasTaxInformationForm] = React.useState(false);
   const requestService = account.usTaxForms[0]?.service;
-
-  const onOpen = () => {
-    setIsFormDirty(false);
-    setHasTaxInformationForm(true);
-  };
-
-  const onClose = () => {
-    if (!isFormDirty) {
-      setHasTaxInformationForm(false);
-    } else {
-      const confirmMsg = intl.formatMessage({
-        defaultMessage: 'You have unsaved changes. Are you sure you want to close this?',
-        id: 'srNsR3',
-      });
-      if (confirm(confirmMsg)) {
-        setHasTaxInformationForm(false);
-      }
-    }
-  };
 
   return (
     <div>
@@ -54,6 +39,21 @@ const PendingTaxFormView = ({ account }) => {
         <strong>
           <FormattedMessage defaultMessage="We need your tax information before we can pay you." id="a6tGTW" />
         </strong>
+        {expiredForms.length > 0 && (
+          <p className="my-2">
+            <FormattedMessage
+              values={{ maxExpiredYear: max(expiredForms.map(form => form.year)) }}
+              defaultMessage="The tax information you provided for {maxExpiredYear} has expired. Please fill out the form again."
+              id="WEDTW5"
+            />
+          </p>
+        )}
+        <p className="my-2">
+          <FormattedMessage
+            defaultMessage="United States regulations require US entities to collect certain information from payees for tax reporting purposes, even if the payee is outside the US."
+            id="H/ROIG"
+          />
+        </p>
         <p>
           <FormattedMessage
             defaultMessage="If you experience any issues, please contact <SupportLink>our support</SupportLink>. Questions? See <HelpDocsLink>help docs</HelpDocsLink> about taxes."
@@ -74,43 +74,17 @@ const PendingTaxFormView = ({ account }) => {
           <FormattedMessage defaultMessage="You will receive an email with a link to fill out a form." id="V2vf/v" />
         </p>
       ) : (
-        <Button size="lg" onClick={onOpen}>
+        <Button onClick={() => setHasTaxInformationForm(true)}>
           <FilePenLine className="mr-1" size={16} />
           <FormattedMessage defaultMessage="Fill Tax Information" id="TxJpk1" />
         </Button>
       )}
-      <Dialog onOpenChange={isOpen => (isOpen ? onOpen() : onClose())} open={hasTaxInformationForm}>
-        <Overlay className="fixed inset-0 z-[3000] max-h-screen min-h-full overflow-y-auto bg-white px-0 py-0 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out data-[state=open]:zoom-in">
-          <div className="sticky top-0 z-50 flex items-center justify-between border-b border-gray-100 bg-white px-6 py-4 shadow-md">
-            <div className="text-sm">
-              <h2 className="text-xl font-bold">
-                <FormattedMessage defaultMessage="Update Tax Information" id="sVea7o" />
-              </h2>
-              <div className="mt-1 flex items-center gap-1 text-sm text-gray-600">
-                <FormattedMessage
-                  defaultMessage="for {account}"
-                  id="bKMsE/"
-                  values={{
-                    account: (
-                      <LinkCollective openInNewTab collective={account} className="flex items-center gap-1">
-                        <Avatar collective={account} size={18} />
-                        {account.legalName || account.name}
-                      </LinkCollective>
-                    ),
-                  }}
-                />
-              </div>
-            </div>
-            <Button variant="secondary" className="text-base" onClick={onClose}>
-              <FormattedMessage id="Close" defaultMessage="Close" />
-              <X className="ml-2" size={16} />
-            </Button>
-          </div>
-          <div className="px-6 py-8 md:px-10">
-            <TaxInformationForm account={account} setFormDirty={setIsFormDirty} />
-          </div>
-        </Overlay>
-      </Dialog>
+      <TaxInformationFormDialog
+        account={account}
+        open={hasTaxInformationForm}
+        onOpenChange={setHasTaxInformationForm}
+        onSuccess={refetch}
+      />
     </div>
   );
 };
@@ -155,8 +129,8 @@ const TaxFormSuccessView = () => {
  * A page for users to fill their info for W9/W8 tax forms.
  */
 export const TaxInformationSettingsSection = ({ account }) => {
-  const queryParams = { variables: { slug: account.slug }, context: API_V2_CONTEXT };
-  const { data, error, loading } = useQuery(accountTaxInformationQuery, queryParams);
+  const queryParams = { variables: { id: account.id }, context: API_V2_CONTEXT };
+  const { data, error, loading, refetch } = useQuery(accountTaxInformationQuery, queryParams);
   const taxForms = data?.account?.usTaxForms || [];
   return (
     <div>
@@ -176,10 +150,14 @@ export const TaxInformationSettingsSection = ({ account }) => {
             id="Mdn+cL"
           />
         </div>
-      ) : taxForms.find(form => form.status === 'RECEIVED') ? (
+      ) : taxForms.find(form => form.status === 'RECEIVED' && !form.isExpired) ? (
         <TaxFormSuccessView />
       ) : (
-        <PendingTaxFormView account={data.account} />
+        <PendingTaxFormView
+          account={data.account}
+          expiredForms={taxForms.filter(form => form.isExpired)}
+          refetch={refetch}
+        />
       )}
     </div>
   );

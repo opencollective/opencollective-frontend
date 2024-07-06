@@ -24,6 +24,7 @@ import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'nprogress/nprogress.css';
 import 'trix/dist/trix.css';
 import '../public/static/styles/app.css';
+import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css';
 
 Router.onRouteChangeStart = (url, { shallow }) => {
   if (!shallow) {
@@ -44,6 +45,7 @@ import sentryLib from '../server/sentry';
 
 import GlobalNewsAndUpdates from '../components/GlobalNewsAndUpdates';
 import IntlProvider from '../components/intl/IntlProvider';
+import { ModalProvider } from '../components/ModalContext';
 import NewsAndUpdatesProvider from '../components/NewsAndUpdatesProvider';
 import { TooltipProvider } from '../components/ui/Tooltip';
 
@@ -104,7 +106,7 @@ class OpenCollectiveFrontendApp extends App {
   componentDidCatch(error, errorInfo) {
     const errorEventId = sentryLib.captureException(error, { errorInfo });
     this.setState({ hasError: true, errorEventId });
-    super.componentDidCatch(error, errorInfo);
+    sentryLib.captureException(error, { extra: { errorInfo } });
   }
 
   componentDidMount() {
@@ -137,12 +139,14 @@ class OpenCollectiveFrontendApp extends App {
               <IntlProvider locale={locale}>
                 <TooltipProvider delayDuration={500} skipDelayDuration={100}>
                   <UserProvider>
-                    <NewsAndUpdatesProvider>
-                      <Component {...pageProps} />
-                      <Toaster />
-                      <GlobalNewsAndUpdates />
-                      <TwoFactorAuthenticationModal />
-                    </NewsAndUpdatesProvider>
+                    <ModalProvider>
+                      <NewsAndUpdatesProvider>
+                        <Component {...pageProps} />
+                        <Toaster />
+                        <GlobalNewsAndUpdates />
+                        <TwoFactorAuthenticationModal />
+                      </NewsAndUpdatesProvider>
+                    </ModalProvider>
                   </UserProvider>
                 </TooltipProvider>
               </IntlProvider>
@@ -158,6 +162,7 @@ class OpenCollectiveFrontendApp extends App {
   }
 }
 
-// ignore unused exports default
 // next.js export
+// ts-unused-exports:disable-next-line
+// ts-unused-exports:disable-next-line
 export default withTwoFactorAuthentication(OpenCollectiveFrontendApp);

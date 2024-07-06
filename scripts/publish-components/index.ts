@@ -1,15 +1,15 @@
-/* eslint-disable no-process-exit */
+/* eslint-disable n/no-process-exit */
 /* eslint-disable no-console */
 
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
-import RollupPluginBabel from '@rollup/plugin-babel';
 import RollupPluginCommonJS from '@rollup/plugin-commonjs';
 import RollupPluginImages from '@rollup/plugin-image';
 import RollupPluginJSON from '@rollup/plugin-json';
-import RollupPluginTypescript from '@rollup/plugin-typescript';
+import RollupPluginNodeResolve from '@rollup/plugin-node-resolve';
+import RollupPluginSWC from '@rollup/plugin-swc';
 import { Command } from 'commander';
 import fsExtra from 'fs-extra';
 import { glob } from 'glob';
@@ -32,7 +32,7 @@ const tmpDir = path.join(__dirname, '.tmp');
 const staticFilesDir = path.join(__dirname, 'static');
 const projectRoot = path.join(__dirname, '../..');
 const projectNodeModules = path.join(projectRoot, 'node_modules');
-const basePackageJSON = require(path.join(projectRoot, 'package.json'));
+const basePackageJSON = require(path.join(projectRoot, 'package.json')); // eslint-disable-line @typescript-eslint/no-var-requires
 const extensions = ['.js', '.jsx', '.ts', '.tsx'];
 
 const main = async () => {
@@ -81,28 +81,33 @@ const main = async () => {
     input: filesToInclude,
     external: filterExternal,
     plugins: [
-      // RollupPluginResolve({ extensions }),
+      RollupPluginNodeResolve({ extensions }),
       RollupPluginCommonJS({ include: /node_modules/ }),
       RollupPluginJSON(),
       RollupPluginImages(), // Not ideal as images will be base-64 encoded and thus bigger than optimized PNG
-      RollupPluginTypescript({
-        include: filesToInclude,
-        noForceEmit: true,
-        compilerOptions: {
-          declaration: true,
-          noEmit: false,
-          emitDeclarationOnly: true,
-          declarationDir: tmpDir,
-          outDir: tmpDir,
-          sourceMap: false,
-          allowJs: false,
-          jsx: 'react',
+      RollupPluginSWC({
+        swc: {
+          jsc: {
+            parser: {
+              syntax: 'typescript',
+              tsx: true,
+              dynamicImport: true,
+            },
+            target: 'es2020',
+            transform: {
+              react: {
+                pragma: 'React.createElement',
+                pragmaFrag: 'React.Fragment',
+                throwIfNamespace: true,
+                development: false,
+                useBuiltins: false,
+              },
+            },
+          },
+          module: {
+            type: 'es6',
+          },
         },
-      }),
-      RollupPluginBabel({
-        extensions,
-        babelHelpers: 'runtime',
-        exclude: 'node_modules/**',
       }),
     ],
   });

@@ -8,11 +8,13 @@ import { isNil, omitBy } from 'lodash';
 import { X } from 'lucide-react';
 import { useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
-import { background, BackgroundProps, LayoutProps, margin, overflow, space, SpaceProps } from 'styled-system';
+import type { BackgroundProps, LayoutProps, SpaceProps } from 'styled-system';
+import { background, margin, overflow, space } from 'styled-system';
 
 import { Dialog, DialogContent } from './ui/Dialog';
 import Avatar from './Avatar';
-import Container, { ContainerProps } from './Container';
+import type { ContainerProps } from './Container';
+import Container from './Container';
 import StyledLinkButton from './StyledLinkButton';
 import WarnIfUnsavedChanges from './WarnIfUnsavedChanges';
 

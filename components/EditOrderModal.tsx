@@ -10,7 +10,7 @@ import { formatCurrency } from '../lib/currency-utils';
 import { getIntervalFromContributionFrequency } from '../lib/date-utils';
 import { getErrorFromGraphqlException, i18nGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
-import {
+import type {
   AccountReferenceInput,
   EditPaymentMethodModalQuery,
   PaymentMethod,
@@ -18,7 +18,8 @@ import {
 } from '../lib/graphql/types/v2/graphql';
 import { DEFAULT_MINIMUM_AMOUNT } from '../lib/tier-utils';
 
-import PaymentMethodPicker, { PaymentMethodOption } from './orders/PaymentMethodPicker';
+import type { PaymentMethodOption } from './orders/PaymentMethodPicker';
+import PaymentMethodPicker from './orders/PaymentMethodPicker';
 import { getSubscriptionStartDate } from './recurring-contributions/AddPaymentMethod';
 import {
   ContributionInterval,

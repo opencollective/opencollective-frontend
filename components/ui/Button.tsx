@@ -25,7 +25,8 @@ const buttonVariants = cva(
         default: 'h-10 px-4 py-2',
         xs: 'h-8 px-2.5 tracking-tight',
         sm: 'h-9 rounded-md px-3',
-        lg: 'h-11 rounded-md px-8',
+        lg: 'h-11 rounded-md text-lg px-8',
+        xl: 'h-14 rounded-lg text-xl px-8',
         icon: 'h-10 w-10',
         'icon-sm': 'h-9 w-9',
         'icon-xs': 'h-8 w-8',
@@ -71,7 +72,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={allRefs}
         {...props}
         type={props.type === 'submit' && loading ? 'button' : props.type || 'button'}
-        onClick={loading ? null : onClick}
+        onClick={loading || props.disabled ? null : onClick}
         style={!loading ? undefined : { width: baseSize?.width, height: baseSize?.height }}
       >
         {realChildren}

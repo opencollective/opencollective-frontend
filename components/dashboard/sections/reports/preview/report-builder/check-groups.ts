@@ -1,4 +1,4 @@
-import { Group, GroupFilter } from '../types';
+import type { Group, GroupFilter } from '../types';
 
 function filtersOverlap(filterI: GroupFilter, filterJ: GroupFilter): boolean {
   for (const key of Object.keys(filterI) as (keyof GroupFilter)[]) {

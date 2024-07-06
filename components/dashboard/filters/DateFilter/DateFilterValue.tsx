@@ -5,7 +5,8 @@ import { i18nDateFilterLabel } from '../../../../lib/i18n/date-filter';
 
 import DateTime from '../../../DateTime';
 
-import { DateFilterType, DateFilterValueType } from './schema';
+import type { DateFilterValueType } from './schema';
+import { DateFilterType } from './schema';
 
 const OneLineDate = ({ value, ...props }) =>
   value ? <DateTime className="inline-block whitespace-nowrap" value={value} {...props} /> : null;

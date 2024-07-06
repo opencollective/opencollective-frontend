@@ -22,11 +22,12 @@ import DashboardHeader from '../../DashboardHeader';
 import { childAccountFilter } from '../../filters/ChildAccountFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { periodCompareFilter } from '../../filters/PeriodCompareFilter';
-import { DashboardSectionProps } from '../../types';
+import type { DashboardSectionProps } from '../../types';
 
 import { Accounts } from './Accounts';
 import AccountTable from './AccountTable';
-import { Metric, MetricProps } from './Metric';
+import type { MetricProps } from './Metric';
+import { Metric } from './Metric';
 import { overviewMetricsQuery } from './queries';
 import { Timeline } from './Timeline';
 import { TodoList } from './TodoList';
@@ -238,7 +239,7 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
         />
         <Filterbar hideSeparator {...queryFilter} />
 
-        <div className="grid grid-flow-dense grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3  ">
+        <div className="grid grid-flow-dense grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3">
           {metrics
             .filter(metric => !metric.hide)
             .map(metric => (
@@ -255,7 +256,7 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
       <hr />
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3 2xl:grid-cols-3">
-        <div className="order-1 space-y-6 xl:order-none xl:col-span-2 ">
+        <div className="order-1 space-y-6 xl:order-none xl:col-span-2">
           <TodoList />
           <Timeline accountSlug={router.query?.as ?? accountSlug} />
         </div>

@@ -1,12 +1,26 @@
 import React from 'react';
-import { ColumnDef } from '@tanstack/react-table';
+import type { ColumnDef, TableMeta } from '@tanstack/react-table';
 import { groupBy, isNil, mapValues, toPairs } from 'lodash';
-import { Banknote, Eye, FilePlus2, Mail, MoreHorizontal, Pause, Play, SquareSigma, Unlink } from 'lucide-react';
-import { FormattedDate, FormattedMessage, IntlShape } from 'react-intl';
+import {
+  Banknote,
+  Eye,
+  FilePlus2,
+  Mail,
+  MoreHorizontal,
+  Pause,
+  Play,
+  ReceiptText,
+  SquareSigma,
+  Unlink,
+} from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import type { IntlShape } from 'react-intl';
+import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { HOST_FEE_STRUCTURE } from '../../../../lib/constants/host-fee-structure';
 import type { AccountWithHost, HostedCollectiveFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
+import { getDashboardRoute } from '../../../../lib/url-helpers';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import AddAgreementModal from '../../../agreements/AddAgreementModal';
@@ -23,10 +37,15 @@ import {
 } from '../../../ui/DropdownMenu';
 import { TableActionsButton } from '../../../ui/Table';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
+import { DashboardContext } from '../../DashboardContext';
 
 import AddFundsModal from './AddFundsModal';
 import FreezeAccountModal from './FreezeAccountModal';
 import UnhostAccountModal from './UnhostAccountModal';
+
+export interface HostedCollectivesDataTableMeta extends TableMeta<any> {
+  openCollectiveDetails?: (c: HostedCollectiveFieldsFragment) => void;
+}
 
 export const cols: Record<string, ColumnDef<any, any>> = {
   collective: {
@@ -59,10 +78,33 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       );
       return (
         <div className="flex items-center">
-          <Avatar collective={collective} radius={48} className="mr-4" />
+          <Avatar collective={collective} className="mr-4" radius={48} />
+          {collective.isFrozen && (
+            <Badge type="info" size="xs" className="mr-2">
+              <FormattedMessage id="CollectiveStatus.Frozen" defaultMessage="Frozen" />
+            </Badge>
+          )}
           <div className="flex flex-col items-start">
-            <div className="text-sm text-foreground">{collective.name}</div>
+            <div className="flex items-center text-sm">{collective.name}</div>
             <div className="text-xs">{secondLine}</div>
+          </div>
+        </div>
+      );
+    },
+  },
+  host: {
+    accessorKey: 'host',
+    header: () => <FormattedMessage id="Member.Role.HOST" defaultMessage="Host" />,
+    cell: ({ row }) => {
+      const host = row.original.isHost ? row.original : row.original.host;
+      if (!host) {
+        return null;
+      }
+      return (
+        <div className="flex items-center">
+          <Avatar collective={host} className="mr-4" radius={24} />
+          <div className="flex flex-col items-start">
+            <div className="flex items-center text-sm">{host.name}</div>
           </div>
         </div>
       );
@@ -117,9 +159,15 @@ export const cols: Record<string, ColumnDef<any, any>> = {
         ''
       ) : (
         <div className="whitespace-nowrap">
-          {collective.hostFeesStructure === HOST_FEE_STRUCTURE.DEFAULT
-            ? `(${collective.hostFeePercent}%)`
-            : `${collective.hostFeePercent}%`}
+          {collective.hostFeesStructure === HOST_FEE_STRUCTURE.DEFAULT ? (
+            <FormattedMessage
+              id="DefaultFee"
+              defaultMessage="Default (%{hostFeePercent})"
+              values={{ hostFeePercent: collective.hostFeePercent }}
+            />
+          ) : (
+            `${collective.hostFeePercent}%`
+          )}
         </div>
       );
     },
@@ -128,7 +176,8 @@ export const cols: Record<string, ColumnDef<any, any>> = {
     accessorKey: 'hostedSince',
     header: () => <FormattedMessage id="HostedSince" defaultMessage="Hosted since" />,
     cell: ({ row }) => {
-      const since = row.original.approvedAt;
+      const collective = row.original;
+      const since = collective.approvedAt;
       return isNil(since) ? (
         ''
       ) : (
@@ -142,13 +191,14 @@ export const cols: Record<string, ColumnDef<any, any>> = {
     accessorKey: 'balance',
     header: () => <FormattedMessage id="Balance" defaultMessage="Balance" />,
     cell: ({ row }) => {
-      const balance = row.original.stats.balance;
+      const collective = row.original;
+      const balance = collective.stats.balance;
       return (
         <div className="font-medium text-foreground">
           <FormattedMoneyAmount
             amount={balance.valueInCents}
             currency={balance.currency}
-            showCurrencyCode={false}
+            showCurrencyCode={true}
             amountStyles={{}}
           />
         </div>
@@ -157,10 +207,11 @@ export const cols: Record<string, ColumnDef<any, any>> = {
   },
   consolidatedBalance: {
     accessorKey: 'consolidatedBalence',
-    header: () => <FormattedMessage id="Balance" defaultMessage="Balance" />,
+    header: () => <FormattedMessage id="TotalBalance" defaultMessage="Total Balance" />,
     cell: ({ row }) => {
-      const isChild = !!row.original.parent?.id;
-      const stats = row.original.stats;
+      const collective = row.original;
+      const isChild = !!collective.parent?.id;
+      const stats = collective.stats;
       const hasDifferentBalances = stats.balance?.valueInCents !== stats.consolidatedBalance?.valueInCents;
       const displayBalance = isChild ? stats.balance : stats.consolidatedBalance;
       return (
@@ -168,7 +219,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
           <FormattedMoneyAmount
             amount={displayBalance.valueInCents}
             currency={displayBalance.currency}
-            showCurrencyCode={false}
+            showCurrencyCode={true}
             amountStyles={{}}
           />
 
@@ -223,6 +274,8 @@ export const MoreActionsMenu = ({
   onEdit?: () => void;
   openCollectiveDetails?: (c: HostedCollectiveFieldsFragment) => void;
 }) => {
+  const router = useRouter();
+  const { account } = React.useContext(DashboardContext);
   const [openModal, setOpenModal] = React.useState<
     null | 'ADD_FUNDS' | 'FREEZE' | 'UNHOST' | 'ADD_AGREEMENT' | 'CONTACT'
   >(null);
@@ -241,6 +294,15 @@ export const MoreActionsMenu = ({
               <DropdownMenuSeparator />
             </React.Fragment>
           )}
+          <DropdownMenuItem
+            className="cursor-pointer"
+            data-cy="actions-view-transactions"
+            onClick={() => router.push(getDashboardRoute(account, `host-transactions?account=${collective.slug}`))}
+          >
+            <ReceiptText className="mr-2" size="16" />
+            <FormattedMessage id="viewTransactions" defaultMessage="View Transactions" />
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           <DropdownMenuItem
             className="cursor-pointer"
             data-cy="actions-add-funds"
