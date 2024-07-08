@@ -67,8 +67,9 @@ class ContributionFlowButtons extends React.Component {
   render() {
     const { goBack, isValidating, nextStep, paypalButtonProps, currency, tier, stepDetails, disabled } = this.props;
     const totalAmount = getTotalAmount(stepDetails, this.props.stepSummary);
+    const showPayPalButton = paypalButtonProps && !nextStep;
     return (
-      <Flex flexWrap="wrap" justifyContent="center">
+      <Flex flexWrap="wrap" justifyContent="center" flexDirection={showPayPalButton ? 'column' : 'row'}>
         <Fragment>
           {goBack && (
             <StyledButton
@@ -87,7 +88,7 @@ class ContributionFlowButtons extends React.Component {
               )}
             </StyledButton>
           )}
-          {!paypalButtonProps || nextStep ? (
+          {!showPayPalButton ? (
             <ButtonWithTextCentered
               mt={2}
               mx={[1, null, 2]}
@@ -126,7 +127,11 @@ class ContributionFlowButtons extends React.Component {
             </ButtonWithTextCentered>
           ) : (
             <Box mx={[1, null, 2]} minWidth={200} mt={2}>
-              <PayWithPaypalButton {...paypalButtonProps} isSubmitting={isValidating || this.state.isLoadingNext} />
+              <PayWithPaypalButton
+                {...paypalButtonProps}
+                isSubmitting={isValidating || this.state.isLoadingNext}
+                style={{ ...paypalButtonProps.style, layout: 'vertical' }}
+              />
             </Box>
           )}
         </Fragment>

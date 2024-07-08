@@ -95,7 +95,7 @@ class PayWithPaypalButton extends Component<PayWithPaypalButtonProps, { isLoadin
     tagline: false,
     label: 'pay',
     shape: 'pill',
-    layout: 'horizontal',
+    layout: 'vertical',
   };
 
   isRecurring = () => {
