@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import { useQuery } from '@apollo/client';
-import { compact, isString, omit } from 'lodash';
+import { compact, isEmpty, isString, omit } from 'lodash';
 import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -97,12 +97,13 @@ const AllCollectives = ({ subpath }: Omit<DashboardSectionProps, 'accountSlug'>)
   const [showCollectiveOverview, setShowCollectiveOverview] = React.useState<Collective | undefined | string>(
     subpath[0],
   );
+  const query = useMemo(() => omit(router.query, ['slug', 'section', 'subpath']), [router.query]);
 
   const pushSubpath = subpath => {
     router.push(
       {
         pathname: compact([router.pathname, router.query.slug, router.query.section, subpath]).join('/'),
-        query: omit(router.query, ['slug', 'section', 'subpath']),
+        query,
       },
       undefined,
       {
@@ -115,9 +116,6 @@ const AllCollectives = ({ subpath }: Omit<DashboardSectionProps, 'accountSlug'>)
     filters,
     schema,
     toVariables,
-    defaultFilterValues: {
-      host: 'opencollective',
-    },
     meta: { currency: 'USD' },
   });
 
@@ -125,6 +123,7 @@ const AllCollectives = ({ subpath }: Omit<DashboardSectionProps, 'accountSlug'>)
     variables: queryFilter.variables,
     context: API_V2_CONTEXT,
     fetchPolicy: 'cache-and-network',
+    skip: isEmpty(query),
   });
 
   useEffect(() => {
@@ -153,7 +152,7 @@ const AllCollectives = ({ subpath }: Omit<DashboardSectionProps, 'accountSlug'>)
       <DashboardHeader title={<FormattedMessage defaultMessage="All Collectives" id="uQguR/" />} />
       <Filterbar {...queryFilter} />
       {error && <MessageBoxGraphqlError error={error} mb={2} />}
-      {!error && !loading && !hostedAccounts?.nodes.length ? (
+      {!error && !loading && !hostedAccounts?.nodes.length && !isEmpty(query) ? (
         <EmptyResults
           hasFilters={queryFilter.hasFilters}
           entityType="COLLECTIVES"
