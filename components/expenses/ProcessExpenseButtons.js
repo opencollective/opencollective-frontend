@@ -12,6 +12,7 @@ import PERMISSION_CODES, { ReasonMessage } from '../../lib/constants/permissions
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { collectiveAdminsMustConfirmAccountingCategory } from './lib/accounting-categories';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
 import {
   getScheduledExpensesQueryVariables,
@@ -143,7 +144,6 @@ const ProcessExpenseButtons = ({
   displaySecurityChecks,
   isViewingExpenseInHostContext,
   disabled,
-  LoggedInUser,
 }) => {
   const [confirmProcessExpenseAction, setConfirmProcessExpenseAction] = React.useState();
   const [showApproveExpenseModal, setShowApproveExpenseModal] = React.useState(false);
@@ -153,6 +153,7 @@ const ProcessExpenseButtons = ({
   const [processExpense, { loading, error }] = useMutation(processExpenseMutation, mutationOptions);
   const intl = useIntl();
   const { toast } = useToast();
+  const { LoggedInUser } = useLoggedInUser();
 
   React.useEffect(() => {
     onModalToggle?.(!!confirmProcessExpenseAction);
@@ -421,4 +422,4 @@ ProcessExpenseButtons.defaultProps = {
   isViewingExpenseInHostContext: false,
 };
 
-export default withUser(ProcessExpenseButtons);
+export default ProcessExpenseButtons;
