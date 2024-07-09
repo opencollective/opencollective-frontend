@@ -11,8 +11,8 @@ import styled from 'styled-components';
 import PERMISSION_CODES, { ReasonMessage } from '../../lib/constants/permissions';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import { collectiveAdminsMustConfirmAccountingCategory } from './lib/accounting-categories';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { collectiveAdminsMustConfirmAccountingCategory } from './lib/accounting-categories';
 
 import {
   getScheduledExpensesQueryVariables,
@@ -22,7 +22,6 @@ import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledTooltip from '../StyledTooltip';
 import { useToast } from '../ui/useToast';
-import { withUser } from '../UserProvider';
 
 import { expensePageExpenseFieldsFragment } from './graphql/fragments';
 import ApproveExpenseModal from './ApproveExpenseModal';
