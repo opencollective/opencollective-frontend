@@ -365,7 +365,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
               },
               {
                 section: ALL_SECTIONS.POLICIES,
-                if: isOneOfTypes(account, [USER, ORGANIZATION]) && !isAccountantOnly,
+                if: isOneOfTypes(account, [USER, ORGANIZATION, COLLECTIVE]) && !isAccountantOnly,
               },
               {
                 section: ALL_SECTIONS.RECEIVING_MONEY,
