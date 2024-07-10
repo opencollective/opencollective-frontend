@@ -405,6 +405,7 @@ export const allCollectivesQuery = gql`
       isActive: $isActive
       host: $host
       consolidatedBalance: $consolidatedBalance
+      skipGuests: false
     ) {
       offset
       limit

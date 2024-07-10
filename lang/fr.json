@@ -2306,6 +2306,7 @@
   "lf0csJ": "{hostName} n'est plus l'Hôte fiscal de {collectiveName}",
   "LfwUBd": "Lorsque vous contribuez à un Collectif, nous partageons votre adresse e-mail avec les administrateurs. Si vous souhaitez garder votre contribution privée, choisissez le profil « incognito ». Lisez notre <PrivacyPolicyLink>politique de confidentialité</PrivacyPolicyLink>.",
   "Lg6nmh": "Ce Collectif ne répond pas aux exigences minimum d'administration car les invitations d'administrateurs sont toujours en attente.",
+  "LGPYM7": "by {parentAccount}",
   "lhiC+5": "Contribution rejetée",
   "li7Ez6": "La semaine dernière",
   "lihKZ1": "Dernière utilisation {timeElapsed}",

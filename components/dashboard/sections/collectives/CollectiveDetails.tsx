@@ -530,18 +530,15 @@ const CollectiveDetails = ({
                   </Badge>
                 )}
               </div>
-
-              {collective.parent && (
-                <div className="text-sm font-normal text-muted-foreground">
+              <div className="text-sm font-normal text-muted-foreground">
+                <Badge size="xs" type="outline">
+                  {formatCollectiveType(intl, collective.type)}
+                </Badge>
+                {collective.parent && (
                   <FormattedMessage
-                    defaultMessage="{childAccountType} by {parentAccount}"
-                    id="9f14iS"
+                    defaultMessage=" by {parentAccount}"
+                    id="LGPYM7"
                     values={{
-                      childAccountType: (
-                        <Badge size="xs" type="outline">
-                          {formatCollectiveType(intl, collective.type)}
-                        </Badge>
-                      ),
                       parentAccount: (
                         <LinkCollective collective={collective.parent} withHoverCard>
                           {collective.parent.name}
@@ -549,8 +546,8 @@ const CollectiveDetails = ({
                       ),
                     }}
                   />
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </SectionTitle>
 
