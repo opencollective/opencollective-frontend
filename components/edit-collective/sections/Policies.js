@@ -515,7 +515,7 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
               }
             />
           </Flex>
-          {collective.isHost && (
+          {collective.isHost && !isSelfHosted && (
             <React.Fragment>
               <P
                 ml="1.4rem"
