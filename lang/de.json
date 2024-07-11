@@ -3378,6 +3378,7 @@
   "Payouts": "Auszahlungen",
   "PayPal.ConnectSuccess": "Dein PayPal-Konto wurde verbunden.",
   "Paypal.Email": "PayPal E-Mail",
+  "Paypal.Payment": "PayPal Payment",
   "PayPal.Unverified.Tooltip": "Dieses PayPal-Konto wurde nicht über „Mit PayPal anmelden“ verifiziert.{canEdit, select, true { Bearbeite diese Auszahlungsmethode, um sie zu verbinden und zu verifizieren.} other {}}",
   "PaypalConnectButton.popupOverlay.cta": "Zum Fortfahren klicken",
   "pB1jn6": "Für diesen Beitrag werden keine weiteren Abbuchungen vorgenommen.",
