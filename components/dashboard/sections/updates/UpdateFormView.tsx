@@ -325,7 +325,7 @@ const FormBody = ({ update }) => {
                         onClick={() => handlePublish(formik)}
                         loading={audienceLoading}
                         data-cy="update-publish-btn"
-                        disabled={!formik.isValid}
+                        disabled={!formik.isValid || formik.isSubmitting}
                       >
                         <BookCheck size="16px" />
                         <FormattedMessage defaultMessage="Publish" id="update.publish.btn" />
@@ -337,6 +337,7 @@ const FormBody = ({ update }) => {
                         className="w-full gap-1.5"
                         data-cy="update-save-draft-btn"
                         disabled={!formik.isValid}
+                        loading={formik.isSubmitting}
                       >
                         <BookDashed size="16px" />
                         <FormattedMessage defaultMessage="Save Draft" id="YH2E7O" />
@@ -344,11 +345,23 @@ const FormBody = ({ update }) => {
                     </React.Fragment>
                   ) : (
                     <React.Fragment>
-                      <Button type="submit" size="sm" className="w-full gap-1.5" data-cy="update-save-btn">
+                      <Button
+                        type="submit"
+                        size="sm"
+                        className="w-full gap-1.5"
+                        data-cy="update-save-btn"
+                        loading={formik.isSubmitting}
+                      >
                         <BookCheck size="16px" />
                         <FormattedMessage defaultMessage="Save Changes" id="SaveChanges" />
                       </Button>
-                      <Button size="sm" variant="outline" className="w-full gap-1.5" onClick={handleUnpublish}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="w-full gap-1.5"
+                        onClick={handleUnpublish}
+                        disabled={formik.isSubmitting}
+                      >
                         <BookDashed size="16px" />
                         <FormattedMessage defaultMessage="Move to Drafts" id="uRbxVi" />
                       </Button>
