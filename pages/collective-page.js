@@ -163,7 +163,7 @@ class CollectivePage extends React.Component {
 
     const showCrowdfundingPreviewBanner =
       !['ORGANIZATION', 'FUND', 'INDIVIDUAL', 'USER'].includes(collective?.type) &&
-      LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW) &&
+      LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.CROWDFUNDING_REDESIGN) &&
       LoggedInUser?.isAdminOfCollective(collective);
 
     return (
