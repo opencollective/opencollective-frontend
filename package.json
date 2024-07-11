@@ -88,7 +88,7 @@
     "express-ws": "5.0.2",
     "file-saver": "2.0.5",
     "formik": "2.4.6",
-    "glob": "10.4.2",
+    "glob": "10.4.5",
     "graphql": "16.9.0",
     "helmet": "7.1.0",
     "interweave": "13.1.0",
