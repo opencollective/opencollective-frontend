@@ -140,7 +140,7 @@
     "uuid": "9.0.1",
     "validator": "13.12.0",
     "webpack-manifest-plugin": "5.0.0",
-    "winston": "3.13.0",
+    "winston": "3.13.1",
     "zod": "3.23.8"
   },
   "resolutions": {
