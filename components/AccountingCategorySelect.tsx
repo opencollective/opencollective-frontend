@@ -208,13 +208,14 @@ const getOptions = (
 const getCleanInputData = (
   expenseValues: Partial<Expense>,
 ): {
+  id: string;
   description: string;
   items: string;
   type: ExpenseType;
 } => {
   const cleanStr = (str: string) => (!str ? '' : str.trim().toLocaleLowerCase());
-
   return {
+    id: get(expenseValues, 'id') || 'none',
     type: get(expenseValues, 'type'),
     description: cleanStr(get(expenseValues, 'description', '')),
     items: get(expenseValues, 'items', [])
@@ -239,14 +240,14 @@ const useExpenseCategoryPredictionService = (
   const { call: fetchPredictionsCall, data, loading } = useAsyncCall(fetchExpenseCategoryPredictions);
   const throttledFetchPredictions = React.useMemo(() => throttle(fetchPredictionsCall, 500), []);
   const [showPreviousPredictions, setShowPreviousPredictions] = React.useState(true);
-  const inputData = !enabled ? null : getCleanInputData(expenseValues);
+  const inputData = getCleanInputData(expenseValues);
   const hasValidParams = Boolean(
-    account && inputData && inputData.type && (inputData.description.length > 3 || inputData.items.length > 3),
+    enabled && account && inputData.type && (inputData.description.length > 3 || inputData.items.length > 3),
   );
 
   // Trigger new fetch predictions, and hide the current ones if we don't get a response within 1s (to avoid flickering)
   React.useEffect(() => {
-    if (hasValidParams) {
+    if (enabled && hasValidParams) {
       const hidePredictionsTimeout = setTimeout(() => setShowPreviousPredictions(false), 1000);
       throttledFetchPredictions({ hostSlug: host.slug, accountSlug: account.slug, ...inputData }).then(() => {
         clearTimeout(hidePredictionsTimeout);
@@ -255,7 +256,7 @@ const useExpenseCategoryPredictionService = (
         }
       });
     }
-  }, [host.slug, account?.slug, hasValidParams, ...Object.values(inputData || {})]);
+  }, [enabled, host.slug, account?.slug, hasValidParams, ...Object.values(inputData || {})]);
 
   // Map returned categories with known ones to build `predictions`
   const predictions = React.useMemo(() => {

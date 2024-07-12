@@ -14,22 +14,41 @@ export const fetchExpenseCategoryPredictions = async ({
   type,
   description,
   items,
+  id,
 }: {
   hostSlug: string;
   accountSlug: string;
   type: ExpenseType;
   description: string;
   items: string;
+  id: string;
 }) => {
-  const urlParams = new URLSearchParams();
-  urlParams.append('host_slug', hostSlug);
-  urlParams.append('collective_slug', accountSlug);
-  urlParams.append('type', type);
-  urlParams.append('description', description);
-  urlParams.append('items', items);
+  if (hostSlug === 'opensource') {
+    const response = await fetch(`${ML_SERVICE_URL}/models/expense-category/embeddings/predict`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        host_slug: hostSlug,
+        applies_to: 'HOSTED_ACCOUNTS',
+        inputs: [{ id, description, items }],
+      }),
+    });
 
-  const response = await fetch(`${ML_SERVICE_URL}/models/expense-category?${urlParams}`);
-  const data = await response.json();
+    const data = await response.json();
+    return data.expenses[0].predictions as ExpenseCategoryPrediction[];
+  } else {
+    const urlParams = new URLSearchParams();
+    urlParams.append('host_slug', hostSlug);
+    urlParams.append('collective_slug', accountSlug);
+    urlParams.append('type', type);
+    urlParams.append('description', description);
+    urlParams.append('items', items);
 
-  return data.predictions as ExpenseCategoryPrediction[];
+    const response = await fetch(`${ML_SERVICE_URL}/models/expense-category?${urlParams}`);
+    const data = await response.json();
+
+    return data.predictions as ExpenseCategoryPrediction[];
+  }
 };
