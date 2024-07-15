@@ -7,6 +7,7 @@ import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { unhostAccountCollectivePickerSearchQuery } from '../../lib/graphql/v1/queries';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
+import DashboardHeader from '../dashboard/DashboardHeader';
 import StyledButton from '../StyledButton';
 import StyledInputField from '../StyledInputField';
 import { useToast } from '../ui/useToast';
@@ -33,6 +34,7 @@ const UnhostAccountForm = () => {
   const intl = useIntl();
   return (
     <div>
+      <DashboardHeader title="Unhost Account" className="mb-10" />
       <StyledInputField htmlFor="clear-cache-account" label="Account to unhost" flex="1 1">
         {({ id }) => (
           <CollectivePickerAsync

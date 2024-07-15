@@ -74,7 +74,7 @@ const PendingTaxFormView = ({
           <FormattedMessage defaultMessage="You will receive an email with a link to fill out a form." id="V2vf/v" />
         </p>
       ) : (
-        <Button size="lg" onClick={() => setHasTaxInformationForm(true)}>
+        <Button onClick={() => setHasTaxInformationForm(true)}>
           <FilePenLine className="mr-1" size={16} />
           <FormattedMessage defaultMessage="Fill Tax Information" id="TxJpk1" />
         </Button>

@@ -17,6 +17,7 @@ import {
   ALL_SECTIONS,
   ROOT_PROFILE_ACCOUNT,
   ROOT_PROFILE_KEY,
+  ROOT_SECTIONS,
   SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS,
 } from '../components/dashboard/constants';
 import { DashboardContext } from '../components/dashboard/DashboardContext';
@@ -57,7 +58,7 @@ const getDefaultSectionForAccount = (account, loggedInUser) => {
   if (!account) {
     return null;
   } else if (account.type === 'ROOT') {
-    return ALL_SECTIONS.ALL_COLLECTIVES;
+    return ROOT_SECTIONS.ALL_COLLECTIVES;
   } else if (
     isIndividualAccount(account) ||
     (!isHostAccount(account) && loggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW))

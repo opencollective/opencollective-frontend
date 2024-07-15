@@ -2992,7 +2992,12 @@ type Host implements Account & AccountWithContributions {
     Filter by the balance of the account and its children accounts (events and projects)
     """
     consolidatedBalance: AmountRangeInput
-  ): AccountCollection!
+
+    """
+    Filter by specific Account currencies
+    """
+    currencies: [String]
+  ): HostedAccountCollection!
 
   """
   Returns the legal documents required by this host
@@ -6474,6 +6479,17 @@ type VendorCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [Vendor!]
+}
+
+"""
+A collection of hosted "Accounts"
+"""
+type HostedAccountCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Account]
+  currencies: [String]
 }
 
 """
@@ -17699,6 +17715,11 @@ type Mutation {
     Recurring Expense information
     """
     recurring: RecurringExpenseInput
+
+    """
+    If the expense was imported, this is the reference to the row
+    """
+    transactionsImportRow: TransactionsImportRowReferenceInput
   ): Expense!
 
   """

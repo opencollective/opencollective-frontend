@@ -7,6 +7,7 @@ import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import ConfirmationModal from '../ConfirmationModal';
+import DashboardHeader from '../dashboard/DashboardHeader';
 import StyledButton from '../StyledButton';
 import StyledInputField from '../StyledInputField';
 import { P } from '../Text';
@@ -51,6 +52,11 @@ const AccountType = () => {
 
   return (
     <React.Fragment>
+      <DashboardHeader
+        title="Account Type"
+        description="This tool is meant to convert a User account to an Organization type. The organization account will have the fields copied from the initial user account. Please notify the user to go through and update the organization account details after this is done. The location data for the user (if exists) will become public for the organization."
+        className="mb-10"
+      />
       <StyledInputField htmlFor="accounts-picker" label="Account" flex="1 1">
         {({ id }) => (
           <CollectivePickerAsync
@@ -68,7 +74,7 @@ const AccountType = () => {
         width="100%"
         buttonStyle="danger"
         loading={loading}
-        disabled={selectedAccountOption.length === 0}
+        disabled={selectedAccountOption?.length === 0}
         onClick={async () => {
           setIsConfirmationModelOpen(true);
         }}

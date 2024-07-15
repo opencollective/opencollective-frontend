@@ -49,7 +49,7 @@ const CommandInput = React.forwardRef<
     hideIcon?: boolean;
   }
 >(({ className, loading, customIcon, hideIcon, ...props }, ref) => {
-  const Icon = loading ? Loader2 : customIcon ?? Search;
+  const Icon = loading ? Loader2 : (customIcon ?? Search);
   return (
     // eslint-disable-next-line react/no-unknown-property
     <div className="flex items-center px-3" cmdk-input-wrapper="">

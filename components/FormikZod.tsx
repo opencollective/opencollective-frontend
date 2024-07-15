@@ -329,7 +329,6 @@ export function FormikZod<Values extends FormikValues = FormikValues>({
   schema: SupportedZodSchema<Values>;
   config?: FormikZodConfig;
 }) {
-  const FormikWrapper = Formik<Values>;
   const intl = useIntl();
   const context = React.useMemo(() => ({ schema, config }), [schema, config]);
   const validate = React.useCallback(
@@ -338,7 +337,7 @@ export function FormikZod<Values extends FormikValues = FormikValues>({
   );
   return (
     <FormikZodContext.Provider value={context}>
-      <FormikWrapper {...props} validate={validate} />
+      <Formik<Values> {...props} validate={validate} />
     </FormikZodContext.Provider>
   );
 }

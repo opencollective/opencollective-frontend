@@ -106,7 +106,7 @@ class OpenCollectiveFrontendApp extends App {
   componentDidCatch(error, errorInfo) {
     const errorEventId = sentryLib.captureException(error, { errorInfo });
     this.setState({ hasError: true, errorEventId });
-    super.componentDidCatch(error, errorInfo);
+    sentryLib.captureException(error, { extra: { errorInfo } });
   }
 
   componentDidMount() {

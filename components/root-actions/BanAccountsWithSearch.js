@@ -10,6 +10,7 @@ import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { stripHTML } from '../../lib/html';
 
 import ConfirmationModal from '../ConfirmationModal';
+import DashboardHeader from '../dashboard/DashboardHeader';
 import { Box, Flex } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
@@ -19,6 +20,7 @@ import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledLink from '../StyledLink';
 import { P } from '../Text';
+import { Alert, AlertDescription, AlertTitle } from '../ui/Alert';
 import { useToast } from '../ui/useToast';
 
 import { banAccountsMutation } from './BanAccounts';
@@ -143,6 +145,13 @@ const BanAccountsWithSearch = () => {
 
   return (
     <div>
+      <DashboardHeader title="Search & Ban Accounts" className="mb-10" />
+      <Alert className="relative mb-8 flex items-center gap-2 bg-destructive/5 fade-in" variant="destructive">
+        <AlertTitle className="flex items-center">Dangerous Action</AlertTitle>
+        <AlertDescription>
+          Please be super careful with the action below, and double check everything you do.
+        </AlertDescription>
+      </Alert>
       <Box width="276px">
         <SearchBar placeholder="Search accounts" onSubmit={setSearchTerm} disabled={loading || submitting} />
       </Box>

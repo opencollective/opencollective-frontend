@@ -1,27 +1,15 @@
 import React from 'react';
-import { gql, useMutation, useQuery } from '@apollo/client';
-import { fromPairs, omit, partition } from 'lodash';
-import {
-  ArchiveRestore,
-  Banknote,
-  Calendar,
-  CalendarClock,
-  Download,
-  FilePenLine,
-  FileSliders,
-  Merge,
-  Receipt,
-  SquareSlashIcon,
-  Upload,
-} from 'lucide-react';
+import { gql, useQuery } from '@apollo/client';
+import { partition } from 'lodash';
+import { Calendar, CalendarClock, Download, FilePenLine, FileSliders, SquareSlashIcon, Upload } from 'lucide-react';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { i18nGraphqlException } from '../../../../lib/errors';
 import { formatFileSize } from '../../../../lib/file-utils';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { Amount, TransactionsImportRow } from '../../../../lib/graphql/types/v2/graphql';
-import { TransactionsImportRowFieldsFragment, updateTransactionsImportRows } from './lib/graphql';
+import { useTransactionsImportActions } from './lib/actions';
+import { TransactionsImportRowFieldsFragment } from './lib/graphql';
 
 import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';
@@ -30,19 +18,17 @@ import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import NotFound from '../../../NotFound';
 import StyledLink from '../../../StyledLink';
-import { DataTable } from '../../../table/DataTable';
-import { Badge } from '../../../ui/Badge';
+import { actionsColumn, DataTable } from '../../../table/DataTable';
 import { Button } from '../../../ui/Button';
 import { Checkbox } from '../../../ui/Checkbox';
 import type { StepItem } from '../../../ui/Stepper';
 import { Step, Stepper } from '../../../ui/Stepper';
-import { useToast } from '../../../ui/useToast';
 import DashboardHeader from '../../DashboardHeader';
 
-import { AddFundsModalFromImportRow } from './AddFundsModalFromTransactionsImportRow';
-import { MatchContributionDialog } from './MatchContributionDialog';
 import { StepMapCSVColumns } from './StepMapCSVColumns';
 import { StepSelectCSV } from './StepSelectCSV';
+import { TransactionsImportRowDrawer } from './TransactionsImportRowDrawer';
+import { TransactionsImportRowStatus } from './TransactionsImportRowStatus';
 
 const getSteps = (intl: IntlShape): StepItem[] => {
   const getPrefix = stepNum => intl.formatMessage({ defaultMessage: 'Step {stepNum}:', id: 'Z9Dody' }, { stepNum });
@@ -78,6 +64,13 @@ const transactionsImportQuery = gql`
         type
         size
       }
+      stats {
+        total
+        ignored
+        expenses
+        orders
+        processed
+      }
       type
       csvConfig
       createdAt
@@ -90,6 +83,7 @@ const transactionsImportQuery = gql`
         legacyId
         slug
         currency
+        type
       }
       rows {
         totalCount
@@ -104,60 +98,26 @@ const transactionsImportQuery = gql`
   ${TransactionsImportRowFieldsFragment}
 `;
 
-type OperationType = 'ignore' | 'add-funds' | 'match';
-type RowsOperationsState = Record<string, OperationType>;
-
-const isOperationWithModal = (operation: OperationType): operation is 'add-funds' | 'match' => {
-  return ['add-funds', 'match'].includes(operation);
-};
-
-const getModalToDisplay = (operations: RowsOperationsState, importRows: TransactionsImportRow[] | undefined) => {
-  const entry = Object.entries(operations).find(([, op]) => isOperationWithModal(op));
-  if (!entry) {
-    return null;
-  }
-
-  const [rowId, operation] = entry;
-  const row = importRows?.find(r => r.id === rowId);
-  if (!row) {
-    return null;
-  }
-
-  return { row, operation };
-};
-
 export const TransactionsImport = ({ accountSlug, importId }) => {
   const intl = useIntl();
-  const { toast } = useToast();
   const steps = React.useMemo(() => getSteps(intl), [intl]);
   const [csvFile, setCsvFile] = React.useState<File | null>(null);
-  const [currentOperations, setCurrentOperations] = React.useState<RowsOperationsState>({});
-  const [updateRows] = useMutation(updateTransactionsImportRows, { context: API_V2_CONTEXT });
+  const [drawerRowId, setDrawerRowId] = React.useState<string | null>(null);
   const { data, loading, error } = useQuery(transactionsImportQuery, {
     context: API_V2_CONTEXT,
     variables: { importId },
   });
+
   const importData = data?.transactionsImport;
   const importType = importData?.type;
   const hasStepper = importType === 'CSV' && !importData?.rows?.totalCount;
-  const importRows = importData?.rows?.nodes;
-  const modalInfo = getModalToDisplay(currentOperations, importRows);
-  const setRowsDismissed = async (rowIds: string[], isDismissed: boolean) => {
-    const newOperations: RowsOperationsState = fromPairs(rowIds.map(id => [id, 'ignore']));
-    setCurrentOperations(operations => ({ ...operations, ...newOperations }));
-    try {
-      await updateRows({
-        variables: {
-          importId,
-          rows: rowIds.map(id => ({ id, isDismissed })),
-        },
-      });
-    } catch (error) {
-      toast({ variant: 'error', message: i18nGraphqlException(intl, error) });
-    } finally {
-      setCurrentOperations(operations => omit(operations, rowIds));
-    }
-  };
+  const importRows = importData?.rows?.nodes ?? [];
+  const selectedRowIdx = importRows.findIndex(row => row.id === drawerRowId);
+
+  const { getActions, setRowsDismissed } = useTransactionsImportActions({
+    transactionsImport: importData,
+    host: importData?.account,
+  });
 
   return (
     <div>
@@ -238,11 +198,13 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                   row.original.isDismissed ? '[&>td:nth-child(n+2):nth-last-child(n+3)]:opacity-30' : ''
                 }
                 data={importRows}
+                getActions={getActions}
+                openDrawer={row => setDrawerRowId(row.original.id)}
                 columns={[
                   {
                     id: 'select',
                     header: ({ table }) =>
-                      !importRows.length ? null : (
+                      importRows.some(row => !row.expense && !row.order) ? (
                         <Checkbox
                           onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
                           aria-label="Select all"
@@ -253,15 +215,17 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                             false
                           }
                         />
+                      ) : null,
+                    cell: ({ row }) =>
+                      !row.original.expense &&
+                      !row.original.order && (
+                        <Checkbox
+                          checked={row.getIsSelected()}
+                          onCheckedChange={value => row.toggleSelected(!!value)}
+                          aria-label="Select row"
+                          className="translate-y-[2px] border-neutral-500"
+                        />
                       ),
-                    cell: ({ row }) => (
-                      <Checkbox
-                        checked={row.getIsSelected()}
-                        onCheckedChange={value => row.toggleSelected(!!value)}
-                        aria-label="Select row"
-                        className="translate-y-[2px] border-neutral-500"
-                      />
-                    ),
                   },
                   {
                     header: 'Date',
@@ -290,8 +254,10 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                       if (row.original.expense) {
                         return (
                           <StyledLink
-                            href={`${row.original.expense.account.slug}/expenses/${row.original.expense.legacyId}`}
+                            className="flex items-center gap-1"
+                            href={`/${row.original.expense.account.slug}/expenses/${row.original.expense.legacyId}`}
                           >
+                            <Avatar collective={row.original.expense.account} size={24} />
                             <FormattedMessage
                               id="E9pJQz"
                               defaultMessage="Expense #{id}"
@@ -321,43 +287,22 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                   {
                     header: 'Status',
                     cell: ({ row }) => {
-                      if (row.original.isDismissed) {
-                        return (
-                          <Badge size="sm">
-                            <FormattedMessage defaultMessage="Ignored" id="transaction.ignored" />
-                          </Badge>
-                        );
-                      } else if (row.original.expense || row.original.order) {
-                        return (
-                          <Badge type="success" size="sm">
-                            <FormattedMessage defaultMessage="Imported" id="transaction.imported" />
-                          </Badge>
-                        );
-                      } else {
-                        return (
-                          <Badge type="info" size="sm">
-                            <FormattedMessage defaultMessage="Pending" id="transaction.pending" />
-                          </Badge>
-                        );
-                      }
+                      return <TransactionsImportRowStatus row={row.original} />;
                     },
                   },
                   {
                     id: 'actions',
+                    ...actionsColumn,
                     header: ({ table }) => {
-                      if (table.getIsSomePageRowsSelected() || table.getIsAllPageRowsSelected()) {
-                        const selectedRows = table.getSelectedRowModel().rows;
-                        const unprocessedRows = selectedRows.filter(
-                          ({ original }) => !original.expense && !original.order,
-                        );
-                        const [ignoredRows, nonIgnoredRows] = partition(
-                          unprocessedRows,
-                          row => row.original.isDismissed,
-                        );
-
-                        if (ignoredRows.length && !nonIgnoredRows.length) {
-                          // If all non-processed rows are dismissed, show restore button
-                          return (
+                      const selectedRows = table.getSelectedRowModel().rows;
+                      const unprocessedRows = selectedRows.filter(
+                        ({ original }) => !original.expense && !original.order,
+                      );
+                      const [ignoredRows, nonIgnoredRows] = partition(unprocessedRows, row => row.original.isDismissed);
+                      return (
+                        <div className="flex min-w-36 justify-end">
+                          {ignoredRows.length && !nonIgnoredRows.length ? (
+                            //  If all non-processed rows are dismissed, show restore button
                             <Button
                               variant="outline"
                               size="xs"
@@ -375,10 +320,8 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                                 values={{ selectedCount: ignoredRows.length }}
                               />
                             </Button>
-                          );
-                        } else if (nonIgnoredRows.length) {
-                          // Otherwise, show ignore button
-                          return (
+                          ) : nonIgnoredRows.length ? (
+                            // Otherwise, show ignore button
                             <Button
                               variant="outline"
                               size="xs"
@@ -396,90 +339,13 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                                 values={{ selectedCount: nonIgnoredRows.length }}
                               />
                             </Button>
-                          );
-                        }
-                      } else {
-                        return (
-                          <div>
-                            <FormattedMessage defaultMessage="Actions" id="CollectivePage.NavBar.ActionMenu.Actions" />
-                          </div>
-                        );
-                      }
-                    },
-                    meta: { className: 'text-right' },
-                    cell: ({ row }) => {
-                      const item = row.original;
-                      const isImported = Boolean(item.expense || item.order);
-                      return (
-                        <div className="flex justify-end gap-2">
-                          {/** Create/Match */}
-                          {isImported ? null : item.isDismissed ? ( // We don't support reverting imported rows yet
-                            <Button
-                              variant="outline"
-                              size="xs"
-                              className="text-xs"
-                              disabled={Boolean(currentOperations[item.id] || modalInfo)}
-                              loading={currentOperations[item.id] === 'ignore'}
-                              onClick={() => setRowsDismissed([item.id], false)}
-                            >
-                              <ArchiveRestore size={12} />
-                              <FormattedMessage defaultMessage="Revert" id="amT0Gh" />
-                            </Button>
                           ) : (
-                            <React.Fragment>
-                              {/** Contributions */}
-                              {item.amount.valueInCents > 0 && (
-                                <React.Fragment>
-                                  <Button
-                                    variant="outline"
-                                    size="xs"
-                                    className="text-xs"
-                                    onClick={() => setCurrentOperations({ ...currentOperations, [item.id]: 'match' })}
-                                    disabled={Boolean(modalInfo)}
-                                  >
-                                    <Merge size={12} />
-                                    <FormattedMessage defaultMessage="Match" id="contribution.match" />
-                                  </Button>
-                                  <Button
-                                    variant="outline"
-                                    size="xs"
-                                    className="whitespace-nowrap text-xs"
-                                    disabled={Boolean(modalInfo)}
-                                    onClick={() =>
-                                      setCurrentOperations({ ...currentOperations, [item.id]: 'add-funds' })
-                                    }
-                                  >
-                                    <Banknote size="14" />
-                                    <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
-                                  </Button>
-                                </React.Fragment>
-                              )}
-                              {/** Expenses */}
-                              {item.amount.valueInCents < 0 && (
-                                <Button
-                                  variant="outline"
-                                  size="xs"
-                                  className="whitespace-nowrap text-xs"
-                                  disabled
-                                  onClick={() => {}}
-                                >
-                                  <Receipt size={12} />
-                                  <FormattedMessage defaultMessage="Create Expense" id="IqqndK" />
-                                </Button>
-                              )}
-                              {/** Ignore */}
-                              <Button
-                                variant="outline"
-                                size="xs"
-                                className="min-w-20 text-xs"
-                                disabled={Boolean(currentOperations[item.id] || modalInfo)}
-                                loading={currentOperations[item.id] === 'ignore'}
-                                onClick={() => setRowsDismissed([item.id], !item.isDismissed)}
-                              >
-                                <SquareSlashIcon size={12} />
-                                <FormattedMessage defaultMessage="Ignore" id="paBpxN" />
-                              </Button>
-                            </React.Fragment>
+                            <div>
+                              <FormattedMessage
+                                defaultMessage="Actions"
+                                id="CollectivePage.NavBar.ActionMenu.Actions"
+                              />
+                            </div>
                           )}
                         </div>
                       );
@@ -491,21 +357,13 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
           )}
         </React.Fragment>
       )}
-      {modalInfo &&
-        (modalInfo.operation === 'add-funds' ? (
-          <AddFundsModalFromImportRow
-            transactionsImport={importData}
-            row={modalInfo.row}
-            onClose={() => setCurrentOperations(omit(currentOperations, modalInfo.row.id))}
-          />
-        ) : modalInfo.operation === 'match' ? (
-          <MatchContributionDialog
-            transactionsImport={importData}
-            host={importData.account}
-            row={modalInfo.row}
-            onClose={() => setCurrentOperations(omit(currentOperations, modalInfo.row.id))}
-          />
-        ) : null)}
+      <TransactionsImportRowDrawer
+        row={importRows?.[selectedRowIdx]}
+        open={Boolean(selectedRowIdx !== -1)}
+        onOpenChange={() => setDrawerRowId(null)}
+        getActions={getActions}
+        rowIndex={selectedRowIdx}
+      />
     </div>
   );
 };

@@ -17,7 +17,7 @@ import LinkExpense from '../../../LinkExpense';
 const ResourceTag = ({ children, disabled }: { children: React.ReactNode; disabled?: boolean }) => (
   <div
     className={clsx(
-      'inline-block rounded-full bg-muted px-2 py-0.5 text-sm',
+      'inline-block truncate rounded-full bg-muted px-2 py-0.5 text-sm',
       disabled ? 'text-muted-foreground' : 'hover:underline',
     )}
   >

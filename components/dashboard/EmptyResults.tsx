@@ -9,9 +9,11 @@ export function EmptyResults({
   onResetFilters,
   hasFilters,
   entityType,
+  otherActions,
 }: {
   onResetFilters: (e) => void;
   hasFilters: boolean;
+  otherActions?: React.ReactNode;
   entityType?:
     | 'EXPENSES'
     | 'CONTRIBUTIONS'
@@ -61,20 +63,23 @@ export function EmptyResults({
               values={{ type: entityType }}
             />
           </p>
-          {onResetFilters && (
-            <Button
-              data-cy="reset-filters"
-              size="lg"
-              variant="outline"
-              className="gap-2 rounded-full"
-              onClick={onResetFilters}
-            >
-              <RotateCcw size={16} />
-              <span>
-                <FormattedMessage defaultMessage="Reset filters" id="jZ0o74" />
-              </span>
-            </Button>
-          )}
+          <div className="flex flex-wrap gap-2">
+            {otherActions}
+            {onResetFilters && (
+              <Button
+                data-cy="reset-filters"
+                size="lg"
+                variant="outline"
+                className="gap-2 rounded-full"
+                onClick={onResetFilters}
+              >
+                <RotateCcw size={16} />
+                <span>
+                  <FormattedMessage defaultMessage="Reset filters" id="jZ0o74" />
+                </span>
+              </Button>
+            )}
+          </div>
         </React.Fragment>
       )}
     </div>

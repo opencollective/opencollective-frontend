@@ -65,7 +65,7 @@ const tableColumns: ColumnDef<Activity>[] = [
     cell: ({ cell }) => {
       const activity = cell.row.original;
       return (
-        <div className="truncate">
+        <div className="flex items-center gap-1 truncate">
           <ActivityDescription activity={activity} />
         </div>
       );

@@ -198,7 +198,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
           <FormattedMoneyAmount
             amount={balance.valueInCents}
             currency={balance.currency}
-            showCurrencyCode={false}
+            showCurrencyCode={true}
             amountStyles={{}}
           />
         </div>
@@ -219,7 +219,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
           <FormattedMoneyAmount
             amount={displayBalance.valueInCents}
             currency={displayBalance.currency}
-            showCurrencyCode={false}
+            showCurrencyCode={true}
             amountStyles={{}}
           />
 

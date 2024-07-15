@@ -27,6 +27,7 @@ import {
   CollectiveStatusMessages,
 } from '../../filters/CollectiveStatusFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
+import { currencyFilter } from '../../filters/CurrencyFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { Pagination } from '../../filters/Pagination';
 import { searchFilter } from '../../filters/SearchFilter';
@@ -63,6 +64,7 @@ const schema = z.object({
   type: isMulti(z.nativeEnum(HostedCollectiveTypes)).optional(),
   status: collectiveStatusFilter.schema,
   consolidatedBalance: consolidatedBalanceFilter.schema,
+  currencies: currencyFilter.schema,
 });
 
 const toVariables: FiltersToVariables<z.infer<typeof schema>, HostedCollectivesQueryVariables> = {
@@ -103,6 +105,7 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
     },
     valueRenderer: ({ value, intl }) => formatCollectiveType(intl, value),
   },
+  currencies: currencyFilter.filter,
   status: collectiveStatusFilter.filter,
   consolidatedBalance: consolidatedBalanceFilter.filter,
 };
@@ -166,7 +169,7 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
     schema,
     toVariables,
     views,
-    meta: { currency: metadata?.host?.currency },
+    meta: { currency: metadata?.host?.currency, currencies: metadata?.host?.all?.currencies },
   });
 
   const { data, error, loading, refetch } = useQuery(hostedCollectivesQuery, {

@@ -54,6 +54,7 @@ import { TaxesFormikFields, validateTaxInput } from '../../../taxes/TaxesFormikF
 import { P, Span } from '../../../Text';
 import { TwoFactorAuthRequiredMessage } from '../../../TwoFactorAuthRequiredMessage';
 import { Button } from '../../../ui/Button';
+import { TransactionsImportRowDetailsAccordion } from '../transactions-imports/TransactionsImportRowDetailsAccordion';
 
 const AddFundsModalContainer = styled(StyledModal)`
   width: 100%;
@@ -996,7 +997,14 @@ const AddFundsModalContentWithCollective = ({
   );
 };
 
-const AddFundsModal = ({ collective = null, host = null, initialValues = null, ...props }) => {
+const AddFundsModal = ({
+  collective = null,
+  host = null,
+  initialValues = null,
+  onSuccess = null,
+  transactionsImportRow = null,
+  ...props
+}) => {
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
   const [selectedCollective, setSelectedCollective] = useState(collective);
@@ -1034,6 +1042,10 @@ const AddFundsModal = ({ collective = null, host = null, initialValues = null, .
         </ModalHeader>
       )}
 
+      {transactionsImportRow && (
+        <TransactionsImportRowDetailsAccordion transactionsImportRow={transactionsImportRow} className="mb-4" />
+      )}
+
       {!LoggedInUser ? (
         <MessageBox type="error" withIcon>
           <FormattedMessage defaultMessage="You need to be logged in to add funds" id="J37Qbv" />
@@ -1048,6 +1060,7 @@ const AddFundsModal = ({ collective = null, host = null, initialValues = null, .
           handleClose={handleClose}
           initialValues={initialValues}
           onSelectOtherAccount={!collective && (() => setHasConfirmedCollective(false))}
+          onSuccess={onSuccess}
           {...props}
         />
       ) : !host ? (
@@ -1056,7 +1069,7 @@ const AddFundsModal = ({ collective = null, host = null, initialValues = null, .
         </MessageBox>
       ) : (
         <div>
-          <label htmlFor="add-funds-collective-picker" className="mb-2 text-sm font-normal">
+          <label htmlFor="add-funds-collective-picker" className="my-2 text-sm font-normal">
             <FormattedMessage defaultMessage="Select an account to add funds to:" id="addFunds.selectCollective" />
           </label>
           <CollectivePickerAsync
@@ -1074,7 +1087,7 @@ const AddFundsModal = ({ collective = null, host = null, initialValues = null, .
               setSelectedCollective(value);
             }}
           />
-          <div className="mt-4 flex justify-center gap-4">
+          <div className="mt-8 flex justify-center gap-4">
             <Button onClick={handleClose} variant="outline" type="button">
               <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
             </Button>

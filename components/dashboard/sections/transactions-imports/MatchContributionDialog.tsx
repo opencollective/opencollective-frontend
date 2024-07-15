@@ -30,6 +30,7 @@ import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import Link from '../../../Link';
 import LinkCollective from '../../../LinkCollective';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
+import type { BaseModalProps } from '../../../ModalContext';
 import { Button } from '../../../ui/Button';
 import { Dialog, DialogContent, DialogHeader } from '../../../ui/Dialog';
 import { useToast } from '../../../ui/useToast';
@@ -83,6 +84,7 @@ const suggestExpectedFundsQuery = gql`
     $expectedFundsFilter: ExpectedFundsFilter
   ) {
     account(id: $hostId) {
+      id
       orders(
         filter: INCOMING
         includeIncognito: true
@@ -176,7 +178,7 @@ const suggestExpectedFundsQuery = gql`
  * of decimals in the value: 123 would be rounded to -2 (=100), 123456 would be rounded to -5 (=100000).
  */
 const getAmountRangeFilter = (valueInCents: number) => {
-  const precision = -Math.floor(Math.log10(valueInCents));
+  const precision = Math.min(1 - Math.floor(Math.log10(valueInCents)), -2);
   return {
     type: AmountFilterType.IS_BETWEEN,
     gte: floor(valueInCents * 0.8, precision),
@@ -187,28 +189,33 @@ const getAmountRangeFilter = (valueInCents: number) => {
 export const MatchContributionDialog = ({
   host,
   row,
-  onClose,
   transactionsImport,
+  setOpen,
+  onAddFundsClick,
   ...props
 }: {
   host: Account;
   row: TransactionsImportRow;
   transactionsImport: TransactionsImport;
-  onClose: () => void;
-} & React.ComponentProps<typeof Dialog>) => {
+  onAddFundsClick: () => void;
+} & BaseModalProps) => {
   const client = useApolloClient();
   const { toast } = useToast();
   const [selectedContribution, setSelectedContribution] = React.useState(null);
   const [isConfirming, setIsConfirming] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const intl = useIntl();
-  const queryFilter = useQueryFilter({
+  const defaultFilterValues = React.useMemo(
+    () => ({ amount: getAmountRangeFilter(row.amount.valueInCents), status: [OrderStatus.PENDING] }),
+    [row],
+  );
+  const { resetFilters, ...queryFilter } = useQueryFilter({
     schema: filtersSchema,
     skipRouter: true,
     toVariables: ContributionFilters.toVariables,
     filters: ContributionFilters.filters,
     meta: { currency: row.amount.currency },
-    defaultFilterValues: { amount: getAmountRangeFilter(row.amount.valueInCents), status: [OrderStatus.PENDING] },
+    defaultFilterValues,
   });
   const [updateRows] = useMutation(updateTransactionsImportRows, { context: API_V2_CONTEXT });
   const { data, loading, error } = useQuery(suggestExpectedFundsQuery, {
@@ -216,12 +223,29 @@ export const MatchContributionDialog = ({
     variables: { ...queryFilter.variables, hostId: host.id },
   });
 
+  // Re-load default filters when changing row
+  React.useEffect(() => {
+    resetFilters(defaultFilterValues);
+  }, [defaultFilterValues, resetFilters]);
+
   return (
-    <Dialog open onOpenChange={onClose} {...props}>
+    <Dialog
+      {...props}
+      onOpenChange={() => {
+        if (isSubmitting) {
+          return;
+        }
+
+        setSelectedContribution(null);
+        setIsConfirming(false);
+        setOpen(false);
+        resetFilters(defaultFilterValues);
+      }}
+    >
       <DialogContent className="sm:max-w-4xl">
         <DialogHeader>
           <h2 className="text-xl font-bold">
-            <FormattedMessage defaultMessage="Match contribution" id="c7INEq" />
+            <FormattedMessage defaultMessage="Match expected funds" id="J/7TIn" />
           </h2>
         </DialogHeader>
         {isConfirming ? (
@@ -247,7 +271,7 @@ export const MatchContributionDialog = ({
               });
 
               // Close modal
-              onClose();
+              setOpen(false);
             }}
             initialValues={{
               amountReceived: row.amount.valueInCents,
@@ -280,6 +304,8 @@ export const MatchContributionDialog = ({
                   loading={loading}
                   contributions={data?.account?.orders?.nodes ?? []}
                   totalContributions={data?.account?.orders?.totalCount ?? 0}
+                  queryFilter={queryFilter}
+                  onAddFundsClick={onAddFundsClick}
                 />
               )}
             </div>
@@ -476,7 +502,7 @@ export const MatchContributionDialog = ({
               )}
             </div>
             <div className="mt-5 flex justify-end gap-2">
-              <Button variant="outline" onClick={onClose}>
+              <Button variant="outline" onClick={() => setOpen(false)}>
                 <Ban size={16} className="mr-2" />
                 <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
               </Button>
@@ -498,10 +524,15 @@ export const MatchContributionDialog = ({
                           rows: [{ id: row.id, order: { id: selectedContribution.id } }],
                         },
                       });
+                      setOpen(false);
+                      toast({
+                        variant: 'success',
+                        message: intl.formatMessage({ defaultMessage: 'Contribution linked', id: '7OXZmC' }),
+                      });
                     } catch (error) {
                       toast({ variant: 'error', message: i18nGraphqlException(intl, error) });
                     } finally {
-                      onClose();
+                      setIsSubmitting(false);
                     }
                   }}
                 >
