@@ -174,8 +174,8 @@ class ContributionFlowSuccess extends React.Component {
       const stripeErrorMessage = paymentIntentResult.error
         ? paymentIntentResult.error.message
         : !['succeeded', 'processing'].includes(paymentIntentResult.paymentIntent.status)
-          ? paymentIntentResult.paymentIntent.last_payment_error?.message ??
-            intl.formatMessage({ defaultMessage: 'An unknown error has ocurred', id: 'TGDa6P' })
+          ? (paymentIntentResult.paymentIntent.last_payment_error?.message ??
+            intl.formatMessage({ defaultMessage: 'An unknown error has ocurred', id: 'TGDa6P' }))
           : null;
 
       if (stripeErrorMessage) {
