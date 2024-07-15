@@ -17,6 +17,7 @@ import type {
   HostedCollectiveFieldsFragment,
   HostedCollectivesQuery,
 } from '../../../../lib/graphql/types/v2/graphql';
+import { useNavigationHistory } from '../../../../lib/hooks/useNavigationHistory';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { formatHostFeeStructure } from '../../../../lib/i18n/host-fee-structure';
@@ -29,10 +30,10 @@ import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';
 import { useDrawerActionsContainer } from '../../../Drawer';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
+import Link from '../../../Link';
 import LinkCollective from '../../../LinkCollective';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import { DataTable } from '../../../table/DataTable';
-import { H4 } from '../../../Text';
 import { Badge } from '../../../ui/Badge';
 import { Button } from '../../../ui/Button';
 import { InfoList, InfoListItem } from '../../../ui/InfoList';
@@ -450,6 +451,7 @@ const CollectiveDetails = ({
 }: CollectiveDetailsProps) => {
   const intl = useIntl();
   const router = useRouter();
+  const history = useNavigationHistory();
   const { account } = React.useContext(DashboardContext);
   const drawerActionsContainer = useDrawerActionsContainer();
   const { data, loading: loadingCollectiveInfo } = useQuery(hostedCollectiveDetailQuery, {
@@ -462,6 +464,8 @@ const CollectiveDetails = ({
   const isHostedCollective = host && collective?.host?.id === host?.id;
   const isLoading = loading || loadingCollectiveInfo;
   const isChild = !!collective?.parent?.id;
+  const lastUrl = history[history.length - 2];
+  const backToUrl = /\/dashboard\/[\w\d-]+\/(hosted|all)-collectives\/[\w\d-]{35}/i.test(lastUrl) ? lastUrl : null;
 
   const children = groupBy(collective?.childrenAccounts?.nodes, 'type');
   const balance = collective?.stats?.balance;
@@ -480,9 +484,16 @@ const CollectiveDetails = ({
     );
   return (
     <div>
-      <H4 mb={32}>
-        <FormattedMessage defaultMessage="Collective's overview" id="28uZ0u" />
-      </H4>
+      <div className={backToUrl ? 'mb-4' : 'mb-10'}>
+        <h1 className="text-2xl font-bold">
+          <FormattedMessage defaultMessage="Collective's overview" id="28uZ0u" />
+        </h1>
+        {backToUrl && (
+          <Link href={backToUrl} className="text-xs text-blue-700 hover:underline">
+            &larr; <FormattedMessage id="Back" defaultMessage="Back" />
+          </Link>
+        )}
+      </div>
       {isLoading ? (
         <React.Fragment>
           <SectionTitle>
@@ -530,14 +541,14 @@ const CollectiveDetails = ({
                   </Badge>
                 )}
               </div>
-              <div className="text-sm font-normal text-muted-foreground">
+              <div className="flex gap-1 text-sm font-normal text-muted-foreground">
                 <Badge size="xs" type="outline">
                   {formatCollectiveType(intl, collective.type)}
                 </Badge>
                 {collective.parent && (
                   <FormattedMessage
-                    defaultMessage=" by {parentAccount}"
-                    id="LGPYM7"
+                    defaultMessage="by {parentAccount}"
+                    id="mLYnFh"
                     values={{
                       parentAccount: (
                         <LinkCollective collective={collective.parent} withHoverCard>

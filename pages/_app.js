@@ -40,6 +40,7 @@ import memoizeOne from 'memoize-one';
 
 import { APOLLO_STATE_PROP_NAME, initClient } from '../lib/apollo-client';
 import { getGoogleMapsScriptUrl, loadGoogleMaps } from '../lib/google-maps';
+import { NavigationHistoryContext } from '../lib/hooks/useNavigationHistory';
 import { withTwoFactorAuthentication } from '../lib/two-factor-authentication/TwoFactorAuthenticationContext';
 import sentryLib from '../server/sentry';
 
@@ -62,7 +63,7 @@ class OpenCollectiveFrontendApp extends App {
 
   constructor() {
     super(...arguments);
-    this.state = { hasError: false, errorEventId: undefined };
+    this.state = { hasError: false, errorEventId: undefined, history: [] };
   }
 
   static async getInitialProps({ Component, ctx, client }) {
@@ -119,6 +120,18 @@ class OpenCollectiveFrontendApp extends App {
         }
         window._paq.push(['trackPageView']);
       }
+      this.setState(state => {
+        const history =
+          url === state.history.slice(-1)[0]
+            ? // Do not repeat the same URL
+              state.history
+            : url === state.history.slice(-2)[0]
+              ? // If returning, pop the last URL
+                state.history.slice(0, -1)
+              : // Else, keep the last 10 URLs visited
+                [...state.history, url].slice(-10);
+        return { history };
+      });
     });
   }
 
@@ -141,10 +154,12 @@ class OpenCollectiveFrontendApp extends App {
                   <UserProvider>
                     <ModalProvider>
                       <NewsAndUpdatesProvider>
-                        <Component {...pageProps} />
-                        <Toaster />
-                        <GlobalNewsAndUpdates />
-                        <TwoFactorAuthenticationModal />
+                        <NavigationHistoryContext.Provider value={this.state.history}>
+                          <Component {...pageProps} />
+                          <Toaster />
+                          <GlobalNewsAndUpdates />
+                          <TwoFactorAuthenticationModal />
+                        </NavigationHistoryContext.Provider>
                       </NewsAndUpdatesProvider>
                     </ModalProvider>
                   </UserProvider>
