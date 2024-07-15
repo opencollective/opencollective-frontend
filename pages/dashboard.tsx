@@ -189,6 +189,7 @@ const DashboardPage = () => {
   const blocker = !isLoading && getBlocker(LoggedInUser, account, selectedSection);
   const titleBase = intl.formatMessage({ id: 'Dashboard', defaultMessage: 'Dashboard' });
   const menuItems = account ? getMenuItems({ intl, account, LoggedInUser }) : [];
+  const accountIdentifier = account && (account.name || `@${account.slug}`);
 
   let subMenu = null;
   const parentMenuItem = menuItems.find(
@@ -215,7 +216,7 @@ const DashboardPage = () => {
         <Page
           noRobots
           collective={account}
-          title={account ? `${account.name} - ${titleBase}` : titleBase}
+          title={[accountIdentifier, titleBase].filter(Boolean).join(' - ')}
           pageTitle={titleBase}
           showFooter={false}
         >
