@@ -171,7 +171,7 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser, refetchLoggedIn
               collective: {
                 ...initialValues.collective,
                 name: handle ? formatNameFromSlug(repo ?? owner) : '',
-                slug: handle ? repo ?? owner : '',
+                slug: handle ? (repo ?? owner) : '',
               },
               applicationData: {
                 ...initialValues.applicationData,
