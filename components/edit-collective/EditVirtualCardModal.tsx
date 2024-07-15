@@ -218,7 +218,9 @@ export default function EditVirtualCardModal({
       cardName: virtualCard?.name,
       assignee: virtualCard?.assignee,
       limitAmount: canEditLimit ? virtualCard?.spendingLimitAmount : undefined,
-      limitInterval: canEditLimit ? virtualCard?.spendingLimitInterval ?? VirtualCardLimitInterval.MONTHLY : undefined,
+      limitInterval: canEditLimit
+        ? (virtualCard?.spendingLimitInterval ?? VirtualCardLimitInterval.MONTHLY)
+        : undefined,
     },
     async onSubmit(values) {
       const { assignee, cardName, limitAmount, limitInterval, collective } = values;
