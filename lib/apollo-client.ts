@@ -326,6 +326,7 @@ export function getSSRQueryHelpers<TVariables, TProps = Record<string, unknown>>
       return {
         props: {
           ...omitBy<TProps>(props, isUndefined),
+          [APOLLO_STATE_PROP_NAME]: client.cache.extract(),
           [APOLLO_VARIABLES_PROP_NAME]: omitBy<TVariables>(variables, isUndefined) as Partial<TVariables>,
           [APOLLO_ERROR_PROP_NAME]: !error ? null : JSON.parse(JSON.stringify(error)),
         } as ServerSideProps,

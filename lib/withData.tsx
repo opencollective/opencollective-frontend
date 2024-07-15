@@ -48,6 +48,7 @@ const withData = ComposedComponent => {
       }
 
       return {
+        [APOLLO_STATE_PROP_NAME]: client.cache.extract(),
         ...composedInitialProps,
       };
     }
@@ -55,17 +56,8 @@ const withData = ComposedComponent => {
     static displayName = `WithData(${getComponentDisplayName(ComposedComponent)})`;
 
     static propTypes = {
-      serverState: PropTypes.object.isRequired,
       options: PropTypes.object,
       twoFactorAuthContext: PropTypes.object,
-    };
-
-    static defaultProps = {
-      serverState: {
-        apollo: {
-          data: {},
-        },
-      },
     };
 
     constructor(props) {

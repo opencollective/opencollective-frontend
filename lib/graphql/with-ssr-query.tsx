@@ -64,6 +64,7 @@ export const ssrGraphQLQuery = ({
 
         return {
           ...composedInitialProps,
+          [APOLLO_STATE_PROP_NAME]: client.cache.extract(),
           [APOLLO_VARIABLES_PROP_NAME]: omitBy(variables, isUndefined),
         };
       }

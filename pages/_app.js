@@ -37,6 +37,7 @@ Router.onRouteChangeComplete = () => NProgress.done();
 Router.onRouteChangeError = () => NProgress.done();
 
 import { getDataFromTree } from '@apollo/client/react/ssr';
+import { mergeDeep } from '@apollo/client/utilities';
 import memoizeOne from 'memoize-one';
 
 import { APOLLO_STATE_PROP_NAME, initClient } from '../lib/apollo-client';
@@ -103,7 +104,7 @@ class OpenCollectiveFrontendApp extends App {
       return { ...props, hasError: true, errorEventId: sentryLib.captureException(error, ctx) };
     }
 
-    if (typeof window === 'undefined' && (process.env.NODE_ENV === 'development' || ctx.req.cookies.enableAuthSsr)) {
+    if (typeof window === 'undefined' && ctx.req.cookies.enableAuthSsr) {
       if (getTokenFromCookie(ctx.req)) {
         try {
           const result = await apolloClient.query({ query: loggedInUserQuery, fetchPolicy: 'network-only' });
@@ -156,21 +157,34 @@ class OpenCollectiveFrontendApp extends App {
     }
   }
 
-  getApolloClient = memoizeOne(initialState => {
+  getApolloClient = memoizeOne((ssrCache, pageServerSidePropsCache) => {
     return initClient({
-      initialState,
+      initialState: mergeDeep(ssrCache, pageServerSidePropsCache),
       twoFactorAuthContext: this.props.twoFactorAuthContext,
     });
   });
 
   render() {
     const { Component, pageProps, scripts, locale, LoggedInUserData } = this.props;
+
+    if (
+      typeof window !== 'undefined' &&
+      process.env.NODE_ENV === 'development' &&
+      pageProps?.[APOLLO_STATE_PROP_NAME]
+    ) {
+      // eslint-disable-next-line no-console
+      console.log('pageProps apollo cache', pageProps?.[APOLLO_STATE_PROP_NAME]);
+    }
+
     return (
       <Fragment>
         <ApolloProvider
           client={
             this.props.apolloClient ||
-            this.getApolloClient(window?.__NEXT_DATA__?.props?.[APOLLO_STATE_PROP_NAME] ?? {})
+            this.getApolloClient(
+              typeof window !== 'undefined' ? window?.__NEXT_DATA__?.props?.[APOLLO_STATE_PROP_NAME] : {},
+              pageProps?.[APOLLO_STATE_PROP_NAME],
+            )
           }
         >
           <ThemeProvider theme={theme}>
