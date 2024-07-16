@@ -8,9 +8,9 @@ export type UserContextProps = {
   errorLoggedInUser?: Error;
   loadingLoggedInUser: boolean;
   LoggedInUser: LoggedInUserType | null;
-  login: () => void;
-  logout: (arg?: { redirect?: string; skipQueryRefetch?: boolean }) => void;
-  refetchLoggedInUser: () => void;
+  login: (token?: string) => Promise<LoggedInUserType>;
+  logout: (arg?: { redirect?: string; skipQueryRefetch?: boolean }) => Promise<void>;
+  refetchLoggedInUser: () => Promise<void>;
 };
 
 const useLoggedInUser = (): UserContextProps => React.useContext(UserContext);
