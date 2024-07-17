@@ -108,7 +108,8 @@ const HTMLContent = styled(
                   const attributes = merge({}, ...node.attributes.map(({ name, value }) => ({ [name]: value })));
                   return (
                     <iframe
-                      {...pick(attributes, ['width', 'height', 'frameborder', 'allowfullscreen'])}
+                      {...pick(attributes, ['width', 'height'])}
+                      allowFullScreen
                       title={attributes.title || 'Embed content'}
                       src={src}
                     />

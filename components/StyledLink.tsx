@@ -20,8 +20,8 @@ type StyledLinkProps = BorderProps &
     openInNewTabNoFollow?: boolean;
     openInNewTabNoFollowRelMe?: boolean;
     truncateOverflow?: boolean;
-    underlineOnHover?: boolean;
-    hoverColor?: string;
+    $underlineOnHover?: boolean;
+    $hoverColor?: string;
   };
 
 /**
@@ -108,10 +108,10 @@ const StyledLink = styled.a.attrs<StyledLinkProps>(props => {
     `}
 
   &:hover {
-    ${system({ hoverColor: { property: 'color', scale: 'colors' } })}
+    ${system({ $hoverColor: { property: 'color', scale: 'colors' } })}
 
     ${props =>
-      props.underlineOnHover &&
+      props.$underlineOnHover &&
       css`
         text-decoration: underline;
       `}
@@ -120,7 +120,7 @@ const StyledLink = styled.a.attrs<StyledLinkProps>(props => {
 
 StyledLink.defaultProps = {
   color: 'primary.500',
-  hoverColor: 'primary.400',
+  $hoverColor: 'primary.400',
 };
 
 export default StyledLink;
