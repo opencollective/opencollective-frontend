@@ -295,7 +295,7 @@ const ExpenseItemForm = ({
   requireDate,
   isRichText,
   itemIdx,
-  isOptional,
+  isOptional = false,
   editOnlyDescriptiveInfo,
   isInvoice,
   hasOCRFeature,
@@ -598,10 +598,6 @@ ExpenseItemForm.propTypes = {
   itemIdx: PropTypes.number.isRequired,
   ocrComparison: PropTypes.object,
   hasCurrencyPicker: PropTypes.bool,
-};
-
-ExpenseItemForm.defaultProps = {
-  isOptional: false,
 };
 
 ExpenseItemForm.whyDidYouRender = true;

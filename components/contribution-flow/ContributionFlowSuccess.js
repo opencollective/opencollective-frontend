@@ -65,7 +65,14 @@ const ContainerWithImage = styled(Container)`
   }
 `;
 
-const ShareLink = styled(StyledLink)`
+const ShareLink = styled(StyledLink).attrs({
+  buttonStyle: 'standard',
+  buttonSize: 'medium',
+  minWidth: 130,
+  mx: 2,
+  mb: 2,
+  target: '_blank',
+})`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -73,15 +80,6 @@ const ShareLink = styled(StyledLink)`
     margin-right: 8px;
   }
 `;
-
-ShareLink.defaultProps = {
-  buttonStyle: 'standard',
-  buttonSize: 'medium',
-  minWidth: 130,
-  mx: 2,
-  mb: 2,
-  target: '_blank',
-};
 
 const BankTransferInfoContainer = styled(Container)`
   border: 1px solid ${themeGet('colors.black.400')};

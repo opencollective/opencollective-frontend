@@ -18,7 +18,7 @@ import { Span } from './Text';
 /**
  * Shows the data of the given payout method
  */
-const PaymentMethodTypeWithIcon = ({ isLoading, type, iconSize }) => {
+const PaymentMethodTypeWithIcon = ({ isLoading, type, iconSize = 24 }) => {
   const intl = useIntl();
   if (isLoading) {
     return <LoadingPlaceholder height={15} width={90} />;
@@ -79,10 +79,6 @@ PaymentMethodTypeWithIcon.propTypes = {
   isLoading: PropTypes.bool,
   type: PropTypes.oneOf(Object.values(PAYMENT_METHOD_TYPE)),
   iconSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-};
-
-PaymentMethodTypeWithIcon.defaultProps = {
-  iconSize: 24,
 };
 
 // @component

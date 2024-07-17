@@ -1001,7 +1001,7 @@ const ExpenseForm = ({
   payoutProfiles,
   autoFocusTitle,
   onCancel,
-  validateOnChange,
+  validateOnChange = false,
   formPersister,
   loggedInAccount,
   loading,
@@ -1139,10 +1139,6 @@ ExpenseForm.propTypes = {
     }),
   ),
   drawerActionsContainer: PropTypes.object,
-};
-
-ExpenseForm.defaultProps = {
-  validateOnChange: false,
 };
 
 export default React.memo(ExpenseForm);

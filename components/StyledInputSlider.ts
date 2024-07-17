@@ -1,11 +1,16 @@
 import { get } from 'lodash';
 import styled, { css } from 'styled-components';
 
+import type { StyledInputProps } from './StyledInput';
 import StyledInput from './StyledInput';
 
-const StyledInputSlider = styled(StyledInput).attrs({
+type StyledInputSliderProps = React.InputHTMLAttributes<HTMLInputElement> & StyledInputProps;
+
+const StyledInputSlider = styled(StyledInput).attrs<StyledInputSliderProps>(props => ({
   type: 'range',
-})`
+  color: props.color ?? 'primary.600',
+  backgroundColor: props.backgroundColor ?? 'black.200',
+}))<StyledInputSliderProps>`
   /** Reset styles */
   -webkit-appearance: none;
   padding: 0;
@@ -67,10 +72,5 @@ const StyledInputSlider = styled(StyledInput).attrs({
     `;
   }}
 `;
-
-StyledInputSlider.defaultProps = {
-  color: 'primary.600',
-  backgroundColor: 'black.200',
-};
 
 export default StyledInputSlider;

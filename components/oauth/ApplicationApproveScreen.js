@@ -31,7 +31,6 @@ import Image from '../Image';
 import LinkCollective from '../LinkCollective';
 import Loading from '../Loading';
 import MessageBox from '../MessageBox';
-import RadialIconContainer from '../RadialIconContainer';
 import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import StyledLinkButton from '../StyledLinkButton';
@@ -190,9 +189,9 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
               <Avatar size={96} collective={application.account} />
             </LinkCollective>
           </Container>
-          <RadialIconContainer flex="0 0 40px" height="40px" bg="#29cc75">
-            <Check width="18px" height="15px" />
-          </RadialIconContainer>
+          <div className="flex h-[40px] w-[40px] flex-none items-center justify-center rounded-full bg-green-500">
+            <Check size={18} className="text-white" />
+          </div>
           <Container flex="0 0 96px">
             <Image src="/static/images/oc-oauth-connect-logo.png" height={96} width={96} />
           </Container>

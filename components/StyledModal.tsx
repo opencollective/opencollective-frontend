@@ -2,14 +2,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import propTypes from '@styled-system/prop-types';
-import { themeGet } from '@styled-system/theme-get';
 import clsx from 'clsx';
 import { isNil, omitBy } from 'lodash';
 import { X } from 'lucide-react';
 import { useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
-import type { BackgroundProps, LayoutProps, SpaceProps } from 'styled-system';
-import { background, margin, overflow, space } from 'styled-system';
+import type { LayoutProps, SpaceProps } from 'styled-system';
+import { margin } from 'styled-system';
 
 import { Dialog, DialogContent } from './ui/Dialog';
 import Avatar from './Avatar';
@@ -17,31 +16,6 @@ import type { ContainerProps } from './Container';
 import Container from './Container';
 import StyledLinkButton from './StyledLinkButton';
 import WarnIfUnsavedChanges from './WarnIfUnsavedChanges';
-
-type ModalProps = SpaceProps & LayoutProps & BackgroundProps;
-
-const Modal = styled(Container).attrs((props: ModalProps) => ({
-  maxWidth: props.maxWidth || '95%',
-  maxHeight: props.maxHeight || '97%',
-}))<ModalProps>`
-  border: 1px solid rgba(9, 10, 10, 0.12);
-  border-radius: 8px;
-  overflow-y: auto;
-  z-index: 3000;
-
-  ${space};
-  ${background};
-  ${overflow};
-
-  @media (max-width: ${themeGet('breakpoints.0')}) {
-    max-height: 90vh;
-  }
-`;
-
-Modal.defaultProps = {
-  background: 'white',
-  padding: '24px',
-};
 
 const Header = styled(Container)`
   font-size: 20px;
@@ -55,12 +29,10 @@ const Header = styled(Container)`
 
 type ModalBodyProps = LayoutProps & SpaceProps;
 
-export const ModalBody = styled(Container)<ModalBodyProps>``;
-
-ModalBody.defaultProps = {
-  mt: '10px',
-  mb: '30px',
-};
+export const ModalBody = styled(Container).attrs<ModalBodyProps>(props => ({
+  mt: props.mt ?? '10px',
+  mb: props.mb ?? '30px',
+}))<ModalBodyProps>``;
 
 ModalBody.propTypes = {
   /** width of the modal component */
@@ -150,24 +122,18 @@ type ModalFooterProps = {
   showDivider?: boolean;
 };
 
-export const ModalFooter = ({ children, isFullWidth, showDivider, dividerMargin, ...props }: ModalFooterProps) => (
+export const ModalFooter = ({
+  children,
+  isFullWidth,
+  showDivider = true,
+  dividerMargin = '1.25rem 0',
+  ...props
+}: ModalFooterProps) => (
   <Container {...props}>
     {showDivider && <Divider margin={dividerMargin} isFullWidth={isFullWidth} />}
     {children}
   </Container>
 );
-
-ModalFooter.propTypes = {
-  children: PropTypes.node,
-  isFullWidth: PropTypes.bool,
-  showDivider: PropTypes.bool,
-  dividerMargin: PropTypes.string,
-};
-
-ModalFooter.defaultProps = {
-  dividerMargin: '1.25rem 0',
-  showDivider: true,
-};
 
 /**
  * Modal component. Will pass down additional props to `ModalWrapper`, which is
@@ -176,7 +142,7 @@ ModalFooter.defaultProps = {
 const StyledModal = ({
   children,
   onClose,
-  hasUnsavedChanges = undefined,
+  hasUnsavedChanges = false,
   ignoreEscapeKey = false,
   preventClose = false,
   width = undefined,
@@ -262,10 +228,6 @@ StyledModal.propTypes = {
   ignoreEscapeKey: PropTypes.bool,
   /** children */
   children: PropTypes.node,
-};
-
-StyledModal.defaultProps = {
-  hasUnsavedChanges: false,
 };
 
 /** @component */

@@ -18,19 +18,6 @@ import StyledLink from './StyledLink';
 import StyledSpinner from './StyledSpinner';
 import { P } from './Text';
 
-const ImageLink = styled(StyledLink)`
-  cursor: pointer;
-  overflow: hidden;
-  display: block;
-  width: 100%;
-  height: 100%;
-  text-align: center;
-`;
-
-ImageLink.defaultProps = {
-  openInNewTab: true,
-};
-
 const FileTextIcon = styled(FileText)`
   opacity: 1;
 `;

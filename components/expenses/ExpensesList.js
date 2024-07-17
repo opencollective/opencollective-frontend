@@ -70,12 +70,12 @@ const ExpensesList = ({
   host,
   expenses,
   isLoading,
-  nbPlaceholders,
+  nbPlaceholders = 10,
   isInverted,
-  view,
+  view = 'public',
   onDelete,
   onProcess,
-  expenseFieldForTotalAmount,
+  expenseFieldForTotalAmount = 'amountInAccountCurrency',
   useDrawer,
   setOpenExpenseLegacyId,
   openExpenseLegacyId,
@@ -205,12 +205,6 @@ ExpensesList.propTypes = {
   setOpenExpenseLegacyId: PropTypes.func,
   openExpenseLegacyId: PropTypes.number,
   onDuplicateClick: PropTypes.func,
-};
-
-ExpensesList.defaultProps = {
-  nbPlaceholders: 10,
-  view: 'public',
-  expenseFieldForTotalAmount: 'amountInAccountCurrency',
 };
 
 export default ExpensesList;

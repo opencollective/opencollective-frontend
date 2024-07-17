@@ -162,7 +162,9 @@ const HTMLContent = styled(
       </div>
     );
   },
-)`
+).attrs(props => ({
+  fontSize: props.fontSize ?? '14px',
+}))`
   /** Override global styles to match what we have in the editor */
   width: 100%;
   line-height: 1.75em;
@@ -305,10 +307,6 @@ HTMLContent.propTypes = {
   /* Hides the "Read full description/collapse" link */
   hideViewMoreLink: PropTypes.bool,
   openLinksInNewTab: PropTypes.bool,
-};
-
-HTMLContent.defaultProps = {
-  fontSize: '14px',
 };
 
 export default HTMLContent;

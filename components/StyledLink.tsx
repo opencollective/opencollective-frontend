@@ -30,23 +30,31 @@ type StyledLinkProps = BorderProps &
  * @see See [styled-system docs](https://github.com/jxnblk/styled-system/blob/master/docs/api.md) for usage of those props
  */
 const StyledLink = styled.a.attrs<StyledLinkProps>(props => {
+  const base = {
+    color: props.color ?? 'primary.500',
+    $hoverColor: props.$hoverColor ?? 'primary.400',
+  };
+
   if (props.openInNewTab) {
     return {
+      ...base,
       target: '_blank',
       rel: 'noopener noreferrer',
     };
-  }
-  if (props.openInNewTabNoFollow) {
+  } else if (props.openInNewTabNoFollow) {
     return {
+      ...base,
       target: '_blank',
       rel: 'noopener noreferrer nofollow',
     };
-  }
-  if (props.openInNewTabNoFollowRelMe) {
+  } else if (props.openInNewTabNoFollowRelMe) {
     return {
+      ...base,
       target: '_blank',
       rel: 'noopener noreferrer nofollow me',
     };
+  } else {
+    return base;
   }
 })<StyledLinkProps>`
   cursor: pointer;
@@ -117,10 +125,5 @@ const StyledLink = styled.a.attrs<StyledLinkProps>(props => {
       `}
   }
 `;
-
-StyledLink.defaultProps = {
-  color: 'primary.500',
-  $hoverColor: 'primary.400',
-};
 
 export default StyledLink;
