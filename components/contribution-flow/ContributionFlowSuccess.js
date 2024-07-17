@@ -13,10 +13,12 @@ import styled from 'styled-components';
 import { AnalyticsEvent } from '../../lib/analytics/events';
 import { track } from '../../lib/analytics/plausible';
 import { getTwitterHandleFromCollective } from '../../lib/collective';
+import { getIntervalFromGQLV2Frequency } from '../../lib/constants/intervals';
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { formatCurrency } from '../../lib/currency-utils';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { formatManualInstructions } from '../../lib/payment-method-utils';
+import { getStripe } from '../../lib/stripe';
 import {
   facebookShareURL,
   followOrderRedirectUrl,
@@ -134,7 +136,7 @@ class ContributionFlowSuccess extends React.Component {
     data: PropTypes.object,
   };
 
-  componentDidMount() {
+  async componentDidMount() {
     track(AnalyticsEvent.CONTRIBUTION_SUCCESS);
     if (this.props.LoggedInUser) {
       toast({
@@ -142,13 +144,63 @@ class ContributionFlowSuccess extends React.Component {
         duration: 20000,
       });
     }
+
+    const isStripeRedirect = this.props.router.query.payment_intent_client_secret;
+
+    if (isStripeRedirect) {
+      const stripe = await getStripe(null, this.props.router.query.stripeAccount);
+      const paymentIntentResult = await stripe.retrievePaymentIntent(
+        this.props.router.query.payment_intent_client_secret,
+      );
+      this.setState({
+        paymentIntentResult,
+      });
+    }
+
+    this.setState({
+      loaded: true,
+    });
   }
 
   componentDidUpdate() {
     const {
       router: { query: queryParams },
       data: { order },
+      intl,
     } = this.props;
+
+    const paymentIntentResult = this.state?.paymentIntentResult;
+    if (order && paymentIntentResult) {
+      const stripeErrorMessage = paymentIntentResult.error
+        ? paymentIntentResult.error.message
+        : !['succeeded', 'processing'].includes(paymentIntentResult.paymentIntent.status)
+          ? (paymentIntentResult.paymentIntent.last_payment_error?.message ??
+            intl.formatMessage({ defaultMessage: 'An unknown error has ocurred', id: 'TGDa6P' }))
+          : null;
+
+      if (stripeErrorMessage) {
+        const tierSlug = order.tier?.slug;
+
+        const path = tierSlug
+          ? `/${order.toAccount.slug}/contribute/${tierSlug}-${order.tier.legacyId}/checkout/payment`
+          : `/${order.toAccount.slug}/donate/payment`;
+
+        const url = new URL(path, window.location.origin);
+        url.searchParams.set('error', stripeErrorMessage);
+        url.searchParams.set('interval', getIntervalFromGQLV2Frequency(order.frequency));
+        url.searchParams.set('amount', order.amount.value);
+        url.searchParams.set('contributeAs', order.fromAccount.slug);
+
+        if (queryParams.redirect) {
+          url.searchParams.set('redirect', queryParams.redirect);
+          url.searchParams.set('shouldRedirectParent', queryParams.shouldRedirectParent);
+        }
+
+        this.props.router.push(url.toString());
+        return;
+      }
+    }
+
     if (order && queryParams.redirect) {
       if (isValidExternalRedirect(queryParams.redirect)) {
         followOrderRedirectUrl(this.props.router, this.props.collective, order, queryParams.redirect, {
@@ -273,6 +325,8 @@ class ContributionFlowSuccess extends React.Component {
     const isProcessing = order?.status === ORDER_STATUS.PROCESSING;
     const isFediverse = order && (isAccountFediverse(order.toAccount) || isAccountFediverse(order.toAccount.parent));
 
+    const loading = data.loading || !this.state?.loaded;
+
     if (!data.loading && !order) {
       return (
         <Flex justifyContent="center" py={[5, 6]}>
@@ -327,7 +381,7 @@ class ContributionFlowSuccess extends React.Component {
           css={{ height: '100%' }}
           data-cy="order-success"
         >
-          {data.loading ? (
+          {loading ? (
             <Container display="flex" alignItems="center" justifyContent="center">
               <Loading />
             </Container>
