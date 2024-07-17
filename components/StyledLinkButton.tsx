@@ -10,9 +10,9 @@ type StyledLinkButtonProps = ColorProps &
   TypographyProps &
   TextDecorationProps &
   React.ButtonHTMLAttributes<HTMLButtonElement> & {
-    hoverColor?: string;
+    $hoverColor?: string;
     variant?: 'danger';
-    underlineOnHover?: boolean;
+    $underlineOnHover?: boolean;
   };
 
 /**
@@ -29,8 +29,8 @@ const StyledLinkButton = styled.button<StyledLinkButtonProps>`
   ${textDecoration}
 
   :hover {
-    color: ${props => props.hoverColor};
-    text-decoration: ${props => (props.underlineOnHover ? 'underline' : undefined)};
+    color: ${props => props.$hoverColor};
+    text-decoration: ${props => (props.$underlineOnHover ? 'underline' : undefined)};
   }
 
   ${variant({
@@ -48,7 +48,7 @@ const StyledLinkButton = styled.button<StyledLinkButtonProps>`
 
 StyledLinkButton.defaultProps = {
   color: '#3385FF',
-  hoverColor: '#797d80',
+  $hoverColor: '#797d80',
 };
 
 export default StyledLinkButton;

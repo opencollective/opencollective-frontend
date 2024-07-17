@@ -82,7 +82,7 @@ export default class SignIn extends React.Component {
         disabled={loading}
         fontSize="14px"
         data-cy="signin-secondary-action-btn"
-        underlineOnHover
+        $underlineOnHover
       >
         {message}
       </StyledLink>
@@ -92,7 +92,7 @@ export default class SignIn extends React.Component {
         onClick={onSecondaryAction}
         disabled={loading}
         data-cy="signin-secondary-action-btn"
-        underlineOnHover
+        $underlineOnHover
       >
         {message}
       </StyledLinkButton>
@@ -312,7 +312,7 @@ export default class SignIn extends React.Component {
                       onClick={() => onSubmit({ sendLink: true })}
                       disabled={loading}
                       data-cy="signin-secondary-action-btn"
-                      underlineOnHover
+                      $underlineOnHover
                     >
                       <FormattedMessage defaultMessage="Send me an email" id="bDtPKE" />
                     </StyledLinkButton>
@@ -326,7 +326,7 @@ export default class SignIn extends React.Component {
                       onClick={() => onSubmit({ resetPassword: true })}
                       disabled={loading}
                       data-cy="signin-secondary-action-btn"
-                      underlineOnHover
+                      $underlineOnHover
                     >
                       <FormattedMessage defaultMessage="Reset my password" id="OXLLjP" />
                     </StyledLinkButton>
@@ -353,7 +353,7 @@ export default class SignIn extends React.Component {
                 <Span mr="40px">
                   {this.renderSecondaryAction(<FormattedMessage defaultMessage="Yes, create an account" id="axw0EY" />)}
                 </Span>
-                <StyledLink onClick={() => this.setState({ unknownEmail: false })} underlineOnHover={true}>
+                <StyledLink onClick={() => this.setState({ unknownEmail: false })} $underlineOnHover={true}>
                   <FormattedMessage defaultMessage="No, use a different email" id="uxL7Ai" />
                 </StyledLink>
               </Box>

@@ -182,7 +182,7 @@ const ExpenseBudgetItem = ({
                 <TooltipTrigger asChild>
                   <span>
                     <StyledLink
-                      underlineOnHover
+                      $underlineOnHover
                       {...(useDrawer
                         ? {
                             as: Link,

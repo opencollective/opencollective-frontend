@@ -77,7 +77,7 @@ const ItemTitleWrapper = ({ expense, order, children }) => {
       >
         <StyledLink
           as={Link}
-          underlineOnHover
+          $underlineOnHover
           href={`${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`}
         >
           {children}
@@ -92,7 +92,7 @@ const ItemTitleWrapper = ({ expense, order, children }) => {
       >
         <StyledLink
           as={Link}
-          underlineOnHover
+          $underlineOnHover
           href={`${getCollectivePageRoute(order.toAccount)}/contributions/${order.legacyId}`}
         >
           {children}
