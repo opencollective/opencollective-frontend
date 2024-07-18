@@ -122,7 +122,7 @@ function ColorPicker({ value, onChange }) {
   return (
     <div>
       <Popover>
-        <PopoverTrigger>
+        <PopoverTrigger asChild>
           <Button variant="outline" className="gap-2">
             <div className="size-4 rounded bg-primary" style={{ backgroundColor: value }} />
             {value}
