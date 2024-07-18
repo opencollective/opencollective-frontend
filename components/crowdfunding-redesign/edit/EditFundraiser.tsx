@@ -52,13 +52,13 @@ const CoverImageForm = ({ schema, initialValues, onSubmit }) => {
                     />
                   </div>
                   {formik.values.cover.type === 'IMAGE' ? (
-                    <FormField name="cover">
+                    <FormField name="cover.url">
                       {({ field }) => {
-                        const hasValidUrl = field.value && isValidUrl(field.value.url);
+                        const hasValidUrl = field.value && isValidUrl(field.value);
 
                         return (
                           <StyledDropzone
-                            name="cover.url"
+                            name={field.name}
                             kind="ACCOUNT_BANNER"
                             accept={DROPZONE_ACCEPT_IMAGES}
                             minSize={10e2} // in bytes, =1kB
@@ -67,9 +67,13 @@ const CoverImageForm = ({ schema, initialValues, onSubmit }) => {
                             showActions
                             size={196}
                             onSuccess={data => {
-                              formik.setFieldValue('cover.url', data.url);
+                              if (data) {
+                                formik.setFieldValue(field.name, data.url);
+                              } else {
+                                formik.setFieldValue('cover', null);
+                              }
                             }}
-                            value={hasValidUrl && field.value.url}
+                            value={hasValidUrl && field.value}
                           />
                         );
                       }}
