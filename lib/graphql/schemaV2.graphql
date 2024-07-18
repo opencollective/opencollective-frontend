@@ -1815,6 +1815,11 @@ type AccountingCategory {
   The time of creation of this accounting category
   """
   createdAt: DateTime!
+
+  """
+  If the category is applicable to the Host or Hosted Collectives
+  """
+  appliesTo: AccountingCategoryAppliesTo
 }
 
 """
@@ -2639,6 +2644,11 @@ type Host implements Account & AccountWithContributions {
     Filter accounting categories by kind
     """
     kind: [AccountingCategoryKind!]
+
+    """
+    Filter by accounting category applicable to this account
+    """
+    account: AccountReferenceInput
   ): AccountingCategoryCollection!
   hostFeePercent: Float
   totalHostedCollectives: Int @deprecated(reason: "2023-03-20: Renamed to totalHostedAccounts")
@@ -6683,6 +6693,11 @@ type TransactionsImportStats {
   Number of rows that have been processed (either dismissed or converted to expenses or orders)
   """
   processed: Int!
+}
+
+enum AccountingCategoryAppliesTo {
+  HOST
+  HOSTED_COLLECTIVES
 }
 
 type ExpenseValuesByRole {
@@ -17934,7 +17949,7 @@ type Mutation {
     """
     The token to confirm the email.
     """
-    token: String!
+    token: NonEmptyString!
   ): IndividualConfirmEmailResponse!
 
   """
@@ -19265,6 +19280,11 @@ input AccountingCategoryInput {
   If meant for expenses, the types of expenses this category applies to
   """
   expensesTypes: [ExpenseType]
+
+  """
+  If the category is applicable to the Host or Hosted Collectives
+  """
+  appliesTo: AccountingCategoryAppliesTo! = HOSTED_COLLECTIVES
 }
 
 """

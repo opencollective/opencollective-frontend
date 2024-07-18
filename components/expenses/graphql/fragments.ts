@@ -112,6 +112,7 @@ export const accountingCategoryFields = gql`
     friendlyName
     code
     expensesTypes
+    appliesTo
   }
 `;
 
