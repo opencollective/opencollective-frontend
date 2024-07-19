@@ -1,5 +1,5 @@
 import React from 'react';
-import { get, isUndefined, pick, remove, size, throttle, uniq } from 'lodash';
+import { get, isUndefined, pick, pickBy, remove, size, throttle, uniq } from 'lodash';
 import { Check, ChevronDown, Sparkles } from 'lucide-react';
 import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -30,7 +30,7 @@ type AccountingCategorySelectProps = {
   expenseType?: ExpenseType;
   /** If provided, these values (descriptions, items, etc...) will be used to call the prediction service */
   expenseValues?: Partial<Expense>;
-  predictionStyle?: 'full' | 'inline';
+  predictionStyle?: 'full' | 'inline' | 'inline-preload';
   selectedCategory: Pick<AccountingCategory, 'friendlyName' | 'name' | 'code' | 'id'> | undefined | null;
   valuesByRole?: Expense['valuesByRole'];
   onChange: (category: AccountingCategory) => void;
@@ -293,6 +293,24 @@ const useExpenseCategoryPredictionService = (
 
 const hostSupportsPredictions = (host: RequiredHostFields) => ['foundation', 'opensource'].includes(host?.slug);
 
+const shouldUsePredictions = (
+  host: RequiredHostFields,
+  kind: string,
+  predictionStyle: AccountingCategorySelectProps['predictionStyle'],
+  isOpen: boolean,
+  selectedCategory?: AccountingCategorySelectProps['selectedCategory'],
+) => {
+  if (!hostSupportsPredictions(host) || kind !== 'EXPENSE') {
+    return false;
+  } else if (predictionStyle === 'full') {
+    return true;
+  } else if (predictionStyle === 'inline-preload') {
+    return !selectedCategory; // Only preload suggestions if no category is selected
+  } else if (predictionStyle === 'inline') {
+    return isOpen;
+  }
+};
+
 const AccountingCategorySelect = ({
   host,
   account,
@@ -316,9 +334,11 @@ const AccountingCategorySelect = ({
   const [isOpen, setOpen] = React.useState(false);
   const { LoggedInUser } = useLoggedInUser();
   const isHostAdmin = Boolean(LoggedInUser?.isAdminOfCollective(host));
-  const usePredictions = hostSupportsPredictions(host) && kind === 'EXPENSE' && (predictionStyle === 'full' || isOpen);
+  const usePredictions = shouldUsePredictions(host, kind, predictionStyle, isOpen, selectedCategory);
   const { predictions } = useExpenseCategoryPredictionService(usePredictions, host, account, expenseValues);
   const hasPredictions = Boolean(predictions?.length);
+  const [suggestedOptions, setSuggestedOptions] = React.useState<OptionsMap>(null);
+
   const triggerChange = newCategory => {
     if (selectedCategory?.id !== newCategory?.id) {
       onChange(newCategory);
@@ -328,6 +348,20 @@ const AccountingCategorySelect = ({
     () => getOptions(intl, host, kind, expenseType, showCode, allowNone, valuesByRole, isHostAdmin, account),
     [intl, host, kind, expenseType, allowNone, showCode, valuesByRole, isHostAdmin, account],
   );
+
+  // If predictions arrive and menu is not open, re-order them to be displayed first
+  React.useEffect(() => {
+    if (hasPredictions && !isOpen) {
+      setSuggestedOptions(pickBy(options, (value, key) => predictions.some(prediction => prediction.id === key)));
+    }
+  }, [hasPredictions, isOpen, options, predictions]);
+
+  // Reset suggestions when there are no predictions
+  React.useEffect(() => {
+    if (!hasPredictions && suggestedOptions) {
+      setSuggestedOptions(null);
+    }
+  }, [hasPredictions, suggestedOptions]);
 
   return (
     <div>
@@ -363,7 +397,35 @@ const AccountingCategorySelect = ({
               <CommandEmpty>
                 <FormattedMessage defaultMessage="No category found" id="bn5V11" />
               </CommandEmpty>
-              <CommandGroup>
+              {suggestedOptions && (
+                <CommandGroup heading={intl.formatMessage({ defaultMessage: 'Suggested categories', id: 'ydZSPT' })}>
+                  {Object.entries(suggestedOptions).map(([categoryId, { label }]) => (
+                    <CommandItem
+                      key={categoryId}
+                      value={categoryId}
+                      onSelect={categoryId => {
+                        triggerChange(options[categoryId].value);
+                        setOpen(false);
+                      }}
+                    >
+                      <div className="flex flex-1 items-center justify-between">
+                        <span>{label}</span>
+                        <span
+                          className="text-right text-xs text-gray-500"
+                          title={intl.formatMessage({ defaultMessage: 'Suggested', id: 'a0lFbM' })}
+                        >
+                          <Sparkles size={16} className="mr-1 inline-block text-yellow-500" strokeWidth={1.5} />
+                        </span>
+                      </div>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              )}
+              <CommandGroup
+                heading={
+                  !suggestedOptions ? null : intl.formatMessage({ defaultMessage: 'All Categories', id: '1X6HtI' })
+                }
+              >
                 {Object.entries(options).map(([categoryId, { label }]) => {
                   const isSelected = selectedCategory?.id === categoryId;
                   const isPrediction = predictions?.some(prediction => prediction.id === categoryId);
@@ -376,11 +438,11 @@ const AccountingCategorySelect = ({
                           setOpen(false);
                         }}
                       >
-                        <div className="flex flex-1 items-start justify-between" data-cy="xxx">
+                        <div className="flex flex-1 items-center justify-between">
                           <span
                             className={
                               // If there are predictions, grey out the categories that are not selected or predicted
-                              isSelected || isPrediction || !hasPredictions
+                              isSelected || isPrediction || !hasPredictions || predictionStyle === 'inline-preload'
                                 ? 'text-foreground'
                                 : 'text-muted-foreground'
                             }
