@@ -376,6 +376,12 @@ export const hostedCollectiveDetailQuery = gql`
           name
           imageUrl
         }
+        host {
+          id
+          name
+          slug
+          type
+        }
       }
     }
   }
