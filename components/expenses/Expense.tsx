@@ -235,6 +235,7 @@ function Expense(props) {
   const skipSummary = isMissingReceipt && status === PAGE_STATUS.EDIT;
   const [showResetModal, setShowResetModal] = useState(false);
   const payoutProfiles = getPayoutProfiles(loggedInAccount);
+  const canEditPayoutMethod = !expense || isDraft || expense.permissions.canSeePayoutMethodPrivateDetails;
 
   const threadItems = React.useMemo(() => {
     const comments = expense?.comments?.nodes || [];
@@ -298,9 +299,13 @@ function Expense(props) {
       if (!editedExpense.payee.id && state.newsletterOptIn) {
         editedExpense.payee.newsletterOptIn = state.newsletterOptIn;
       }
+      const preparedValues = prepareExpenseForSubmit(editedExpense);
+      if (!canEditPayoutMethod) {
+        delete preparedValues.payoutMethod;
+      }
       await editExpense({
         variables: {
-          expense: prepareExpenseForSubmit(editedExpense),
+          expense: preparedValues,
           draftKey: data?.expense?.status === ExpenseStatus.DRAFT ? draftKey : null,
         },
       });
@@ -680,6 +685,7 @@ function Expense(props) {
               payoutProfiles={payoutProfiles}
               loggedInAccount={loggedInAccount}
               onCancel={() => setState(state => ({ ...state, status: PAGE_STATUS.VIEW, editedExpense: null }))}
+              canEditPayoutMethod={canEditPayoutMethod}
               onSubmit={editedExpense => {
                 if (skipSummary) {
                   setState(state => ({

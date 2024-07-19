@@ -18,6 +18,7 @@ import { requireFields } from '../../lib/form-utils';
 import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
+import { require2FAForAdmins } from '../../lib/policies';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 import { flattenObjectDeep, parseToBoolean } from '../../lib/utils';
 import { userMustSetAccountingCategory } from './lib/accounting-categories';
@@ -53,7 +54,7 @@ import ExpenseAttachedFilesForm from './ExpenseAttachedFilesForm';
 import ExpenseFormItems from './ExpenseFormItems';
 import ExpenseFormPayeeInviteNewStep, { validateExpenseFormPayeeInviteNewStep } from './ExpenseFormPayeeInviteNewStep';
 import ExpenseFormPayeeSignUpStep from './ExpenseFormPayeeSignUpStep';
-import ExpenseFormPayeeStep from './ExpenseFormPayeeStep';
+import ExpenseFormPayeeStep, { checkStepOneCompleted } from './ExpenseFormPayeeStep';
 import { prepareExpenseItemForSubmit, validateExpenseItem } from './ExpenseItemForm';
 import ExpenseRecurringBanner from './ExpenseRecurringBanner';
 import ExpenseSummaryAdditionalInformation from './ExpenseSummaryAdditionalInformation';
@@ -202,7 +203,7 @@ export const prepareExpenseForSubmit = expenseData => {
 /**
  * Validate the expense
  */
-const validateExpense = (intl, expense, collective, host, LoggedInUser) => {
+const validateExpense = (intl, expense, collective, host, LoggedInUser, canEditPayoutMethod) => {
   const isCardCharge = expense.type === expenseTypes.CHARGE;
   if (expense.payee?.isInvite) {
     return expense.payee.id
@@ -232,6 +233,7 @@ const validateExpense = (intl, expense, collective, host, LoggedInUser) => {
   }
 
   if (
+    canEditPayoutMethod &&
     expense.payoutMethod &&
     // CHARGE expenses have VirtualCard and do not have PayoutMethod
     isCardCharge
@@ -268,13 +270,6 @@ export const EXPENSE_FORM_STEPS = {
   EXPENSE: 'EXPENSE',
 };
 
-const checkAddressValuesAreCompleted = values => {
-  if (checkRequiresAddress(values)) {
-    return values.payeeLocation?.country && values.payeeLocation?.address;
-  }
-  return true;
-};
-
 const getDefaultStep = (defaultStep, stepOneCompleted, isCreditCardCharge) => {
   // Card Charges take priority here because they are technically incomplete.
   if (isCreditCardCharge) {
@@ -307,6 +302,7 @@ const ExpenseFormBody = ({
   defaultStep,
   drawerActionsContainer,
   supportedExpenseTypes,
+  canEditPayoutMethod,
 }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
@@ -324,11 +320,11 @@ const ExpenseFormBody = ({
   const isGrant = values.type === expenseTypes.GRANT;
   const isCreditCardCharge = values.type === expenseTypes.CHARGE;
   const isRecurring = expense && expense.recurringExpense !== null;
+  const [isOnBehalf, setOnBehalf] = React.useState(false);
+  const isMissing2FA = require2FAForAdmins(values.payee) && !loggedInAccount?.hasTwoFactorAuth;
   const stepOneCompleted =
-    values.payee?.type === CollectiveType.VENDOR ||
-    (values.payoutMethod &&
-      isEmpty(flattenObjectDeep(omit(errors, 'payoutMethod.data.currency'))) &&
-      checkAddressValuesAreCompleted(values));
+    checkStepOneCompleted(values, isOnBehalf, isMissing2FA, canEditPayoutMethod) &&
+    isEmpty(flattenObjectDeep(omit(errors, 'payoutMethod.data.currency')));
   const stepTwoCompleted = isInvite
     ? true
     : (stepOneCompleted || isCreditCardCharge) && hasBaseFormFieldsCompleted && values.items.length > 0;
@@ -337,7 +333,6 @@ const ExpenseFormBody = ({
   const [initWithOCR, setInitWithOCR] = React.useState(null);
 
   // Only true when logged in and drafting the expense
-  const [isOnBehalf, setOnBehalf] = React.useState(false);
   const [showResetModal, setShowResetModal] = React.useState(false);
   const editingExpense = expense !== undefined;
 
@@ -545,12 +540,14 @@ const ExpenseFormBody = ({
         payoutProfiles={payoutProfiles}
         loggedInAccount={loggedInAccount}
         disablePayee={isDraft && isOnBehalf}
+        canEditPayoutMethod={canEditPayoutMethod}
         onChange={payee => {
           setOnBehalf(payee.isInvite);
         }}
         onNext={values => {
           const shouldSkipPayoutMethodValidation =
-            (isOnBehalf || values.payee?.type === CollectiveType.VENDOR) && isEmpty(values.payoutMethod);
+            !canEditPayoutMethod ||
+            ((isOnBehalf || values.payee?.type === CollectiveType.VENDOR) && isEmpty(values.payoutMethod));
           const validation = !shouldSkipPayoutMethodValidation && validatePayoutMethod(values.payoutMethod);
           if (isEmpty(validation)) {
             setStep(EXPENSE_FORM_STEPS.EXPENSE);
@@ -944,8 +941,9 @@ const ExpenseFormBody = ({
 
 ExpenseFormBody.propTypes = {
   formik: PropTypes.object,
-  payoutProfiles: PropTypes.array,
+  payoutProfiles: PropTypes.array, // Can be null when loading
   autoFocusTitle: PropTypes.bool,
+  canEditPayoutMethod: PropTypes.bool,
   shouldLoadValuesFromPersister: PropTypes.bool,
   onCancel: PropTypes.func,
   formPersister: PropTypes.object,
@@ -1015,6 +1013,7 @@ const ExpenseForm = ({
   shouldLoadValuesFromPersister,
   defaultStep,
   drawerActionsContainer,
+  canEditPayoutMethod,
 }) => {
   const isDraft = expense?.status === ExpenseStatus.DRAFT;
   const [hasValidate, setValidate] = React.useState(validateOnChange && !isDraft);
@@ -1022,7 +1021,9 @@ const ExpenseForm = ({
   const { LoggedInUser } = useLoggedInUser();
   const supportedExpenseTypes = React.useMemo(() => getSupportedExpenseTypes(collective), [collective]);
   const initialValues = { ...getDefaultExpense(collective, supportedExpenseTypes), ...expense };
-  const validate = expenseData => validateExpense(intl, expenseData, collective, host, LoggedInUser);
+  const validate = expenseData =>
+    validateExpense(intl, expenseData, collective, host, LoggedInUser, canEditPayoutMethod);
+
   if (isDraft) {
     initialValues.items = expense.draft.items?.map(newExpenseItem) || [];
     initialValues.taxes = expense.draft.taxes;
@@ -1065,6 +1066,7 @@ const ExpenseForm = ({
           defaultStep={defaultStep}
           drawerActionsContainer={drawerActionsContainer}
           supportedExpenseTypes={supportedExpenseTypes}
+          canEditPayoutMethod={canEditPayoutMethod}
         />
       )}
     </Formik>
@@ -1075,6 +1077,7 @@ ExpenseForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   autoFocusTitle: PropTypes.bool,
   validateOnChange: PropTypes.bool,
+  canEditPayoutMethod: PropTypes.bool,
   shouldLoadValuesFromPersister: PropTypes.bool,
   onCancel: PropTypes.func,
   /** To save draft of form values */

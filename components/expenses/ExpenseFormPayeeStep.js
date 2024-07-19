@@ -24,6 +24,7 @@ import { checkRequiresAddress } from './lib/utils';
 import CollectivePicker, { CUSTOM_OPTIONS_POSITION, FLAG_COLLECTIVE_PICKER_COLLECTIVE } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import { Box, Flex } from '../Grid';
+import Image from '../Image';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
@@ -218,19 +219,21 @@ const hostVendorsQuery = gql`
   }
 `;
 
-const checkStepOneCompleted = (values, isOnBehalf, isMissing2FA) => {
+export const checkStepOneCompleted = (values, isOnBehalf, isMissing2FA, canEditPayoutMethod) => {
   if (isMissing2FA) {
     return false;
   } else if (isOnBehalf || values.payee?.type === VENDOR) {
     return Boolean(values.payee);
-  } else if (!isEmpty(flattenObjectDeep(validatePayoutMethod(values.payoutMethod)))) {
-    return false; // There are some errors in the form
-  } else if (checkRequiresAddress(values)) {
-    // Require an address for non-receipt expenses
-    return Boolean(values.payoutMethod && values.payeeLocation?.country && values.payeeLocation?.address);
-  } else {
-    return true;
+  } else if (canEditPayoutMethod) {
+    if (!isEmpty(flattenObjectDeep(validatePayoutMethod(values.payoutMethod)))) {
+      return false; // There are some errors in the form
+    } else if (checkRequiresAddress(values)) {
+      // Require an address for non-receipt expenses
+      return Boolean(values.payoutMethod && values.payeeLocation?.country && values.payeeLocation?.address);
+    }
   }
+
+  return true;
 };
 
 const ExpenseFormPayeeStep = ({
@@ -242,6 +245,7 @@ const ExpenseFormPayeeStep = ({
   onInvite,
   onChange,
   isOnBehalf,
+  canEditPayoutMethod,
   loggedInAccount,
   editingExpense,
   handleClearPayeeStep,
@@ -257,7 +261,7 @@ const ExpenseFormPayeeStep = ({
     skip: !collective.host?.id,
   });
   const isMissing2FA = require2FAForAdmins(values.payee) && !loggedInAccount?.hasTwoFactorAuth;
-  const stepOneCompleted = checkStepOneCompleted(values, isOnBehalf, isMissing2FA);
+  const stepOneCompleted = checkStepOneCompleted(values, isOnBehalf, isMissing2FA, canEditPayoutMethod);
   const allPayoutMethods = React.useMemo(
     () => getPayoutMethodsFromPayee(values.payee),
     [values.payee, loggedInAccount],
@@ -504,51 +508,82 @@ const ExpenseFormPayeeStep = ({
         </Box>
         {requiresPayoutMethod && (
           <Box flexGrow="1" flexBasis="50%" display={values.payee ? 'block' : 'none'}>
-            <Field name="payoutMethod">
-              {({ field }) => (
-                <StyledInputField
-                  name={field.name}
-                  htmlFor="payout-method"
-                  flex="1"
-                  mt={3}
-                  label={formatMessage(msg.payoutOptionLabel)}
-                  labelFontSize="13px"
-                  error={
-                    isErrorType(errors.payoutMethod, ERROR.FORM_FIELD_REQUIRED)
-                      ? formatFormErrorMessage(intl, errors.payoutMethod)
-                      : null
-                  }
-                >
-                  {({ id, error }) => (
-                    <PayoutMethodSelect
-                      inputId={id}
-                      error={error}
-                      onChange={setPayoutMethod}
-                      onRemove={onPayoutMethodRemove}
-                      payoutMethod={values.payoutMethod}
-                      payoutMethods={allPayoutMethods}
-                      payee={values.payee}
-                      disabled={!values.payee || isMissing2FA}
-                      collective={collective}
-                    />
+            {canEditPayoutMethod ? (
+              <React.Fragment>
+                <Field name="payoutMethod">
+                  {({ field }) => (
+                    <StyledInputField
+                      name={field.name}
+                      htmlFor="payout-method"
+                      flex="1"
+                      mt={3}
+                      label={formatMessage(msg.payoutOptionLabel)}
+                      labelFontSize="13px"
+                      error={
+                        isErrorType(errors.payoutMethod, ERROR.FORM_FIELD_REQUIRED)
+                          ? formatFormErrorMessage(intl, errors.payoutMethod)
+                          : null
+                      }
+                    >
+                      {({ id, error }) => (
+                        <PayoutMethodSelect
+                          inputId={id}
+                          error={error}
+                          onChange={setPayoutMethod}
+                          onRemove={onPayoutMethodRemove}
+                          payoutMethod={values.payoutMethod}
+                          payoutMethods={allPayoutMethods}
+                          payee={values.payee}
+                          disabled={!values.payee || isMissing2FA}
+                          collective={collective}
+                        />
+                      )}
+                    </StyledInputField>
                   )}
-                </StyledInputField>
-              )}
-            </Field>
+                </Field>
 
-            {values.payoutMethod && (
-              <Field name="payoutMethod">
-                {({ field, meta }) => (
-                  <Box mt={3} flex="1">
-                    <PayoutMethodForm
-                      fieldsPrefix="payoutMethod"
-                      payoutMethod={field.value}
-                      host={collective.host}
-                      errors={meta.error}
-                    />
-                  </Box>
+                {values.payoutMethod && (
+                  <Field name="payoutMethod">
+                    {({ field, meta }) => (
+                      <Box mt={3} flex="1">
+                        <PayoutMethodForm
+                          fieldsPrefix="payoutMethod"
+                          payoutMethod={field.value}
+                          host={collective.host}
+                          errors={meta.error}
+                        />
+                      </Box>
+                    )}
+                  </Field>
                 )}
-              </Field>
+              </React.Fragment>
+            ) : (
+              <div className="mt-3">
+                <p className="mb-2 text-xs font-bold">
+                  <FormattedMessage id="ExpenseForm.PayoutOptionLabel" defaultMessage="Payout method" />
+                </p>
+                <MessageBox type="info">
+                  <Flex>
+                    <div className="mr-2 min-w-[32px] pt-1">
+                      <Image alt="" src="/static/images/PrivateLockIcon.png" width={32} height={32} />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold">
+                        <FormattedMessage
+                          defaultMessage="This information is private"
+                          id="ExpenseFormPayeeStep.PrivateInfo"
+                        />
+                      </p>
+                      <p className="mt-2 text-xs">
+                        <FormattedMessage
+                          defaultMessage="The payout method details are private and can only be viewed by the Payee and the Host admins."
+                          id="ExpenseFormPayeeStep.PrivateInfoDetails"
+                        />
+                      </p>
+                    </div>
+                  </Flex>
+                </MessageBox>
+              </div>
             )}
           </Box>
         )}
@@ -573,6 +608,7 @@ const ExpenseFormPayeeStep = ({
 ExpenseFormPayeeStep.propTypes = {
   formik: PropTypes.object,
   editingExpense: PropTypes.bool,
+  canEditPayoutMethod: PropTypes.bool,
   payoutProfiles: PropTypes.array,
   onCancel: PropTypes.func,
   handleClearPayeeStep: PropTypes.func,

@@ -39,6 +39,7 @@ import { InfoList, InfoListItem } from '../../../ui/InfoList';
 import { InputGroup } from '../../../ui/Input';
 import { Popover, PopoverContent } from '../../../ui/Popover';
 import { RadioGroup, RadioGroupItem } from '../../../ui/RadioGroup';
+import { Switch } from '../../../ui/Switch';
 import { useToast } from '../../../ui/useToast';
 import { DashboardContext } from '../../DashboardContext';
 import ActivityDescription from '../ActivityLog/ActivityDescription';
@@ -182,6 +183,43 @@ const HostFeeStructurePicker = ({ collective, host }: Partial<CollectiveDetailsP
   );
 };
 
+const AdminsCanSeePayoutMethodsSwitch = ({ collective }: Partial<CollectiveDetailsProps>) => {
+  const { toast } = useToast();
+  const [submitSetPolicy, { loading }] = useMutation(
+    gql`
+      mutation UpdateCollectiveAdminsCanSeePayoutMethodPolicy($account: AccountReferenceInput!, $value: Boolean!) {
+        setPolicies(account: $account, policies: { COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS: $value }) {
+          id
+          policies {
+            id
+            COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS
+          }
+        }
+      }
+    `,
+    { context: API_V2_CONTEXT },
+  );
+  const handleUpdate = async value => {
+    try {
+      await submitSetPolicy({ variables: { account: { id: collective.id }, value } });
+      toast({
+        variant: 'success',
+        message: <FormattedMessage defaultMessage="Payout method policy updated" id="payoutMethodPolicyUpdated" />,
+      });
+    } catch (e) {
+      toast({ variant: 'error', message: e.message });
+    }
+  };
+
+  return (
+    <Switch
+      checked={Boolean(collective.policies.COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS)}
+      disabled={loading}
+      onCheckedChange={handleUpdate}
+    />
+  );
+};
+
 const editAccountSettingsMutation = gql`
   mutation EditAccountSettings($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
     editAccountSetting(account: $account, key: $key, value: $value) {
@@ -190,6 +228,7 @@ const editAccountSettingsMutation = gql`
     }
   }
 `;
+
 const DISPLAYED_EXPENSE_TYPES = [EXPENSE_TYPE.INVOICE, EXPENSE_TYPE.RECEIPT, EXPENSE_TYPE.GRANT];
 
 const ExpenseTypesPicker = ({ collective }: Partial<CollectiveDetailsProps>) => {
@@ -572,6 +611,15 @@ const CollectiveDetails = ({
                 <InfoListItem
                   title={<FormattedMessage defaultMessage="Expense Types" id="D+aS5Z" />}
                   value={<ExpenseTypesPicker host={host} collective={collective} />}
+                />
+                <InfoListItem
+                  title={
+                    <FormattedMessage
+                      defaultMessage="Allow admins to see payout methods"
+                      id="collectiveAdminsPayoutMethodPolicy"
+                    />
+                  }
+                  value={<AdminsCanSeePayoutMethodsSwitch collective={collective} />}
                 />
               </React.Fragment>
             )}

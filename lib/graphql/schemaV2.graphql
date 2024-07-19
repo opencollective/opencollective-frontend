@@ -1819,7 +1819,7 @@ type AccountingCategory {
   """
   If the category is applicable to the Host or Hosted Collectives
   """
-  appliesTo: AccountingCategoryAppliesTo
+  appliesTo: AccountingCategoryAppliesTo!
 }
 
 """
@@ -5540,6 +5540,7 @@ type Policies {
   MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL: MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL
   EXPENSE_CATEGORIZATION: EXPENSE_CATEGORIZATION
   EXPENSE_PUBLIC_VENDORS: Boolean
+  COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS: Boolean
 }
 
 type EXPENSE_AUTHOR_CANNOT_APPROVE {
@@ -6936,6 +6937,11 @@ type ExpensePermissions {
   canHold: Boolean!
   canRelease: Boolean!
   canDownloadTaxForm: Boolean!
+
+  """
+  Whether the current user can see the private details of the payout method of this expense
+  """
+  canSeePayoutMethodPrivateDetails: Boolean!
   edit: Permission!
 
   """
@@ -19221,6 +19227,7 @@ input PoliciesInput {
   COLLECTIVE_MINIMUM_ADMINS: PoliciesCollectiveMinimumAdminsInput
   EXPENSE_CATEGORIZATION: PoliciesExpenseCategorizationInput
   EXPENSE_PUBLIC_VENDORS: Boolean
+  COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS: Boolean
 }
 
 input PoliciesCollectiveExpenseAuthorCannotApprove {
