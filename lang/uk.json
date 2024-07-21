@@ -16,7 +16,7 @@
   "+JC301": "Who should be notified?",
   "+jDZdn": "Власне повідомлення",
   "+JHk55": "Фільтр пошуку",
-  "+kuPOP": "({n}{n, plural, one {елемент} other {елементів}})",
+  "+kuPOP": "({n} {n, plural, one {елемент} few {елемента} other {елементів}})",
   "+lM4fw": "Still no luck? Contact <SupportLink>support</SupportLink> or find us on {chatLink}.",
   "+n7iNv": "За місяць",
   "+o/Xal": "Авторизовані застосунки",
