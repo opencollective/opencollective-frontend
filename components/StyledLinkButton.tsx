@@ -18,7 +18,10 @@ type StyledLinkButtonProps = ColorProps &
 /**
  * A button element but with the styles of a anchor element (https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a).
  */
-const StyledLinkButton = styled.button<StyledLinkButtonProps>`
+const StyledLinkButton = styled.button.attrs<StyledLinkButtonProps>(props => ({
+  color: props.color ?? '#3385FF',
+  $hoverColor: props.$hoverColor ?? '#797d80',
+}))<StyledLinkButtonProps>`
   background: none;
   border: none;
   padding: 0;
@@ -45,10 +48,5 @@ const StyledLinkButton = styled.button<StyledLinkButtonProps>`
     },
   })}
 `;
-
-StyledLinkButton.defaultProps = {
-  color: '#3385FF',
-  $hoverColor: '#797d80',
-};
 
 export default StyledLinkButton;

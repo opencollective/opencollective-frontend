@@ -22,9 +22,9 @@ const AdminContributeCardsContainer = ({
   draggingId,
   setDraggingId,
   onMount,
-  CardsContainer,
+  CardsContainer = ContributeCardsContainer,
   useTierModals,
-  enableReordering,
+  enableReordering = true,
   createNewType,
   onTierUpdate,
 }) => {
@@ -165,11 +165,6 @@ AdminContributeCardsContainer.propTypes = {
   createNewType: PropTypes.string,
   enableReordering: PropTypes.bool,
   onTierUpdate: PropTypes.func,
-};
-
-AdminContributeCardsContainer.defaultProps = {
-  CardsContainer: ContributeCardsContainer,
-  enableReordering: true,
 };
 
 export default AdminContributeCardsContainer;

@@ -1,7 +1,14 @@
 import styled from 'styled-components';
 import { color, display, space, typography } from 'styled-system';
 
-const SectionTitle = styled.p`
+const SectionTitle = styled.p.attrs(props => ({
+  fontSize: props.fontSize ?? '16px',
+  fontWeight: props.fontWeight ?? 700,
+  lineHeight: props.lineHeight ?? '24px',
+  color: props.color ?? 'black.700',
+  mb: props.mb ?? 3,
+  mt: props.mt ?? 0,
+}))`
   word-break: break-word;
   letter-spacing: -0.016px;
   ${color}
@@ -15,14 +22,5 @@ const SectionTitle = styled.p`
     letter-spacing: -0.8px;
   }
 `;
-
-SectionTitle.defaultProps = {
-  fontSize: '16px',
-  fontWeight: 500,
-  lineHeight: '24px',
-  color: 'black.700',
-  mb: 3,
-  mt: 0,
-};
 
 export default SectionTitle;

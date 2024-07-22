@@ -82,9 +82,10 @@ const ExpenseMoreActionsButton = ({
   onError,
   onEdit,
   isDisabled,
-  linkAction,
+  linkAction = 'copy',
   onModalToggle,
   onDelete,
+  isViewingExpenseInHostContext = false,
   ...props
 }) => {
   const [processModal, setProcessModal] = React.useState(false);
@@ -144,7 +145,7 @@ const ExpenseMoreActionsButton = ({
                 <FormattedMessage id="actions.spam" defaultMessage="Mark as Spam" />
               </Action>
             )}
-            {permissions.canApprove && props.isViewingExpenseInHostContext && (
+            {permissions.canApprove && isViewingExpenseInHostContext && (
               <Action
                 loading={processExpense.loading && processExpense.currentAction === 'APPROVE'}
                 disabled={processExpense.loading || isDisabled}
@@ -157,7 +158,7 @@ const ExpenseMoreActionsButton = ({
                 <FormattedMessage id="actions.approve" defaultMessage="Approve" />
               </Action>
             )}
-            {permissions.canReject && props.isViewingExpenseInHostContext && (
+            {permissions.canReject && isViewingExpenseInHostContext && (
               <Action
                 loading={processExpense.loading && processExpense.currentAction === 'REJECT'}
                 disabled={processExpense.loading || isDisabled}
@@ -329,11 +330,6 @@ ExpenseMoreActionsButton.propTypes = {
   onEdit: PropTypes.func,
   linkAction: PropTypes.oneOf(['link', 'copy']),
   isViewingExpenseInHostContext: PropTypes.bool,
-};
-
-ExpenseMoreActionsButton.defaultProps = {
-  linkAction: 'copy',
-  isViewingExpenseInHostContext: false,
 };
 
 export default ExpenseMoreActionsButton;

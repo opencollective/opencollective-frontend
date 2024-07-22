@@ -129,7 +129,7 @@ type InputPaginationProps = object;
 
 function InputPagination(props: InputPaginationProps & CommonVariantProps) {
   const changePage = React.useCallback(
-    ({ target, key }) => {
+    ({ target, key = undefined }) => {
       if (key && key !== 'Enter') {
         return;
       }
