@@ -7,7 +7,7 @@ import Container from '../Container';
 import { Flex } from '../Grid';
 import LinkCollective from '../LinkCollective';
 
-const CollectiveCard = ({ collective, children, size, avatarSize, p, ...props }) => {
+const CollectiveCard = ({ collective, children, size = 300, avatarSize = 75, p = 3, ...props }) => {
   const hasCustomColor = has(collective, 'settings.collectivePage.primaryColor');
   return (
     <Container
@@ -40,12 +40,6 @@ CollectiveCard.propTypes = {
   fontSize: PropTypes.string,
   p: PropTypes.number,
   avatarSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
-};
-
-CollectiveCard.defaultProps = {
-  size: 300,
-  avatarSize: 75,
-  p: 3,
 };
 
 export default CollectiveCard;

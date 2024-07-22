@@ -182,7 +182,7 @@ const ExpenseBudgetItem = ({
                 <TooltipTrigger asChild>
                   <span>
                     <StyledLink
-                      underlineOnHover
+                      $underlineOnHover
                       {...(useDrawer
                         ? {
                             as: Link,
@@ -231,7 +231,7 @@ const ExpenseBudgetItem = ({
                     host={host}
                     account={expense.account}
                     canEdit={get(expense, 'permissions.canEditAccountingCategory', false)}
-                    allowNone={!isLoggedInUserExpenseHostAdmin}
+                    allowNone
                     showCodeInSelect={isLoggedInUserExpenseHostAdmin}
                   />
                 </div>

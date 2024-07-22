@@ -10,6 +10,7 @@ import Avatar from '../Avatar';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import ConfirmationModal from '../ConfirmationModal';
 import Container from '../Container';
+import DashboardHeader from '../dashboard/DashboardHeader';
 import { Flex } from '../Grid';
 import Link from '../Link';
 import OrdersPickerAsync from '../OrdersPickerAsync';
@@ -146,6 +147,7 @@ const MoveReceivedContributions = () => {
 
   return (
     <div>
+      <DashboardHeader title="Move Received Contributions" className="mb-10" />
       <StyledInputField htmlFor="receiverAccount" label="Account that received the contributions" flex="1 1">
         {({ id }) => (
           <CollectivePickerAsync

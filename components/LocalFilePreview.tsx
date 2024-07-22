@@ -50,9 +50,9 @@ export default function LocalFilePreview({ file, size, alignItems = 'flex-start'
           linkProps={{
             ...linkProps,
             fontWeight: 'bold',
-            hoverColor: 'black.800',
+            $hoverColor: 'black.800',
             color: 'black.800',
-            underlineOnHover: true,
+            $underlineOnHover: true,
           }}
         >
           <span className="font-bold text-gray-800">{file.name}</span>

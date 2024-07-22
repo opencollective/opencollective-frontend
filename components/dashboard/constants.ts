@@ -29,8 +29,23 @@ export const SECTIONS = {
   VIRTUAL_CARDS: 'virtual-cards',
   TEAM: 'team',
   VENDORS: 'vendors',
-  ALL_COLLECTIVES: 'all-collectives',
   ACCOUNTS: 'accounts',
+};
+
+export const ROOT_SECTIONS = {
+  ALL_COLLECTIVES: 'all-collectives',
+  BAN_ACCOUNTS: 'ban-account',
+  SEARCH_AND_BAN: 'search-and-ban',
+  MOVE_AUTHORED_CONTRIBUTIONS: 'move-authored-contributions',
+  MOVE_RECEIVED_CONTRIBUTIONS: 'move-received-contributions',
+  MOVE_EXPENSES: 'move-expenses',
+  CLEAR_CACHE: 'clear-cache',
+  CONNECT_ACCOUNTS: 'connect-accounts',
+  MERGE_ACCOUNTS: 'merge-accounts',
+  UNHOST_ACCOUNTS: 'unhost-accounts',
+  ACCOUNT_SETTINGS: 'account-settings',
+  ACCOUNT_TYPE: 'account-type',
+  RECURRING_CONTRIBUTIONS: 'recurring-contributions',
 };
 
 export const SETTINGS_SECTIONS = {

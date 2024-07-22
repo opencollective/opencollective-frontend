@@ -7,10 +7,12 @@ import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import ConfirmationModal from '../ConfirmationModal';
+import DashboardHeader from '../dashboard/DashboardHeader';
 import { Flex } from '../Grid';
 import StyledButton from '../StyledButton';
 import StyledInputField from '../StyledInputField';
 import { P } from '../Text';
+import { Alert, AlertDescription, AlertTitle } from '../ui/Alert';
 import { useToast } from '../ui/useToast';
 
 const mergeAccountsMutation = gql`
@@ -75,6 +77,17 @@ const MergeAccountsForm = () => {
 
   return (
     <div>
+      <DashboardHeader
+        title="Merge Accounts"
+        description="Before merging user accounts, you must always make sure that the person who requested it own both emails. Merging means payment methods are merged too, so if we just merge 2 accounts because someones ask for it without verifying we could end up in a very bad situation. A simple way to do that is to send a unique random code to the other account they want to claim and ask them to share this code."
+        className="mb-10"
+      />
+      <Alert className="relative mb-8 flex items-center gap-2 bg-destructive/5 fade-in" variant="destructive">
+        <AlertTitle className="flex items-center">Dangerous Action</AlertTitle>
+        <AlertDescription>
+          Please be super careful with the action below, and double check everything you do.
+        </AlertDescription>
+      </Alert>
       <Flex alignItems="flex-end">
         <StyledInputField htmlFor="merge-account-1" label="Merge Account..." flex="1 1">
           {({ id }) => (

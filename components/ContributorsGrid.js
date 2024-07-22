@@ -123,13 +123,21 @@ const computePaddingLeft = (width, rowWidth, nbRows, maxWidthWhenNotFull) => {
   }
 };
 
+const DEFAULT_MAX_NB_ROWS_FOR_VIEWPORTS = {
+  [VIEWPORTS.UNKNOWN]: 1,
+  [VIEWPORTS.XSMALL]: 1,
+  [VIEWPORTS.SMALL]: 2,
+  [VIEWPORTS.MEDIUM]: 3,
+  [VIEWPORTS.LARGE]: 3,
+};
+
 /**
  * A grid to show contributors, with horizontal scroll to search them.
  */
 const ContributorsGrid = ({
   contributors,
   width,
-  maxNbRowsForViewports,
+  maxNbRowsForViewports = DEFAULT_MAX_NB_ROWS_FOR_VIEWPORTS,
   viewport,
   maxWidthWhenNotFull,
   currency,
@@ -195,14 +203,14 @@ ContributorsGrid.propTypes = {
     }),
   ),
 
-  /** Maximum number of rows for different viewports. Will fallback on `defaultNbRows` if not provided */
+  /** Maximum number of rows for different viewports */
   maxNbRowsForViewports: PropTypes.shape({
     [VIEWPORTS.UNKNOWN]: PropTypes.number,
     [VIEWPORTS.XSMALL]: PropTypes.number,
     [VIEWPORTS.SMALL]: PropTypes.number,
     [VIEWPORTS.MEDIUM]: PropTypes.number,
     [VIEWPORTS.LARGE]: PropTypes.number,
-  }).isRequired,
+  }),
 
   /** Currency used for contributions */
   currency: PropTypes.string,
@@ -226,18 +234,6 @@ ContributorsGrid.propTypes = {
 
   /* Reference to the FixedSizedGrid */
   gridRef: PropTypes.oneOfType([PropTypes.func, PropTypes.shape({ current: PropTypes.any })]),
-};
-
-ContributorsGrid.defaultProps = {
-  limit: 30,
-  defaultNbRows: 1,
-  maxNbRowsForViewports: {
-    [VIEWPORTS.UNKNOWN]: 1,
-    [VIEWPORTS.XSMALL]: 1,
-    [VIEWPORTS.SMALL]: 2,
-    [VIEWPORTS.MEDIUM]: 3,
-    [VIEWPORTS.LARGE]: 3,
-  },
 };
 
 export default withViewport(withUser(ContributorsGrid), { withWidth: true });

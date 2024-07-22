@@ -1815,6 +1815,11 @@ type AccountingCategory {
   The time of creation of this accounting category
   """
   createdAt: DateTime!
+
+  """
+  If the category is applicable to the Host or Hosted Collectives
+  """
+  appliesTo: AccountingCategoryAppliesTo
 }
 
 """
@@ -2639,6 +2644,11 @@ type Host implements Account & AccountWithContributions {
     Filter accounting categories by kind
     """
     kind: [AccountingCategoryKind!]
+
+    """
+    Filter by accounting category applicable to this account
+    """
+    account: AccountReferenceInput
   ): AccountingCategoryCollection!
   hostFeePercent: Float
   totalHostedCollectives: Int @deprecated(reason: "2023-03-20: Renamed to totalHostedAccounts")
@@ -2992,7 +3002,12 @@ type Host implements Account & AccountWithContributions {
     Filter by the balance of the account and its children accounts (events and projects)
     """
     consolidatedBalance: AmountRangeInput
-  ): AccountCollection!
+
+    """
+    Filter by specific Account currencies
+    """
+    currencies: [String]
+  ): HostedAccountCollection!
 
   """
   Returns the legal documents required by this host
@@ -3443,6 +3458,7 @@ enum PaymentMethodType {
   bank_transfer @deprecated(reason: "Please use uppercase values")
   payout @deprecated(reason: "Please use uppercase values")
   virtual_card @deprecated(reason: "Please use uppercase values")
+  swish @deprecated(reason: "Please use uppercase values")
   DEFAULT
   ALIPAY
   CREDITCARD
@@ -3464,6 +3480,7 @@ enum PaymentMethodType {
   BANK_TRANSFER
   PAYOUT
   VIRTUAL_CARD
+  SWISH
 }
 
 enum PaymentMethodService {
@@ -6475,6 +6492,17 @@ type VendorCollection implements Collection {
 }
 
 """
+A collection of hosted "Accounts"
+"""
+type HostedAccountCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Account]
+  currencies: [String]
+}
+
+"""
 Input type for an amount range with the value and currency
 """
 input AmountRangeInput {
@@ -6665,6 +6693,11 @@ type TransactionsImportStats {
   Number of rows that have been processed (either dismissed or converted to expenses or orders)
   """
   processed: Int!
+}
+
+enum AccountingCategoryAppliesTo {
+  HOST
+  HOSTED_COLLECTIVES
 }
 
 type ExpenseValuesByRole {
@@ -17910,6 +17943,16 @@ type Mutation {
   ): SetPasswordResponse!
 
   """
+  Confirm email for Individual. Scope: "account".
+  """
+  confirmEmail(
+    """
+    The token to confirm the email.
+    """
+    token: NonEmptyString!
+  ): IndividualConfirmEmailResponse!
+
+  """
   Submit a legal document
   """
   submitLegalDocument(
@@ -19237,6 +19280,11 @@ input AccountingCategoryInput {
   If meant for expenses, the types of expenses this category applies to
   """
   expensesTypes: [ExpenseType]
+
+  """
+  If the category is applicable to the Host or Hosted Collectives
+  """
+  appliesTo: AccountingCategoryAppliesTo! = HOSTED_COLLECTIVES
 }
 
 """
@@ -20009,6 +20057,18 @@ type SetPasswordResponse {
   token: String
 }
 
+type IndividualConfirmEmailResponse {
+  """
+  The account that was confirmed
+  """
+  individual: Individual!
+
+  """
+  A new session token to use for the account. Only returned if user is signed in already.
+  """
+  sessionToken: String
+}
+
 """
 The `Upload` scalar type represents a file upload.
 """
@@ -20397,6 +20457,7 @@ input PaymentIntentInput {
   amount: AmountInput!
   fromAccount: AccountReferenceInput
   toAccount: AccountReferenceInput!
+  frequency: ContributionFrequency
 }
 
 """

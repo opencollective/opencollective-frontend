@@ -78,6 +78,7 @@ const hostTransactionsMetaDataQuery = gql`
           code
           name
           kind
+          appliesTo
         }
       }
     }

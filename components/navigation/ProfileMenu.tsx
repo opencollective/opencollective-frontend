@@ -11,7 +11,6 @@ import {
   LifeBuoy,
   LogOut,
   Mailbox,
-  PocketKnife,
   Settings,
   User,
 } from 'lucide-react';
@@ -173,11 +172,6 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
                 }
               >
                 <FormattedMessage id="PreviewFeatures" defaultMessage="Preview Features" />
-              </MenuItem>
-            )}
-            {LoggedInUser.isRoot && (
-              <MenuItem Icon={PocketKnife} href="/opencollective/root-actions">
-                <FormattedMessage id="RootActions" defaultMessage="Root Actions" />
               </MenuItem>
             )}
             <MenuItem Icon={Settings} href={`/dashboard/${LoggedInUser.collective.slug}/info`}>

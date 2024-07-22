@@ -192,7 +192,7 @@ export const PeriodFilterForm = ({
             closeOnSelect
             lineHeight={1}
             fontSize="13px"
-            value={value.from}
+            value={value.from || ''}
             min={formattedMin}
             onChange={e => setDate('from', e.target.value)}
             disabled={disabled}
@@ -215,7 +215,7 @@ export const PeriodFilterForm = ({
             closeOnSelect
             lineHeight={1}
             fontSize="13px"
-            value={value.to}
+            value={value.to || ''}
             min={formattedMin}
             max={stripTime(new Date())}
             onChange={e => setDate('to', e.target.value)}

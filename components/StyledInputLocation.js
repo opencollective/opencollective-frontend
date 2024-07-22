@@ -30,9 +30,8 @@ const StyledInputLocation = ({
   labelFontWeight,
   onChange,
   errors,
-  prefix,
-  required,
-  disableCountryChange,
+  prefix = '',
+  required = true,
   onLoadSuccess,
   useStructuredForFallback,
 }) => {
@@ -55,7 +54,6 @@ const StyledInputLocation = ({
           <InputTypeCountry
             {...inputProps}
             inputId={id}
-            disabled={disableCountryChange}
             value={location?.country}
             autoDetect={autoDetectCountry}
             onChange={country => {
@@ -133,7 +131,6 @@ StyledInputLocation.propTypes = {
   onChange: PropTypes.func,
   onLoadSuccess: PropTypes.func,
   autoDetectCountry: PropTypes.bool,
-  disableCountryChange: PropTypes.bool,
   required: PropTypes.bool,
   labelFontWeight: PropTypes.any,
   labelFontSize: PropTypes.any,
@@ -144,11 +141,6 @@ StyledInputLocation.propTypes = {
     country: PropTypes.string,
   }),
   errors: PropTypes.object,
-};
-
-StyledInputLocation.defaultProps = {
-  required: true,
-  prefix: '',
 };
 
 export default StyledInputLocation;

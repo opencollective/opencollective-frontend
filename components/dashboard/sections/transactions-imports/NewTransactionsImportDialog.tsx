@@ -12,7 +12,6 @@ import { TransactionImportListFieldsFragment } from './lib/graphql';
 
 import { FormikZod } from '../../../FormikZod';
 import StyledInputFormikField from '../../../StyledInputFormikField';
-import StyledSelect from '../../../StyledSelect';
 import StyledSelectCreatable from '../../../StyledSelectCreatable';
 import { Button } from '../../../ui/Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../ui/Dialog';
@@ -119,24 +118,6 @@ export const NewTransactionsImportDialog = ({ accountSlug, onSuccess, ...props }
                       value={
                         !formik.values.source ? null : { label: formik.values.source, value: formik.values.source }
                       }
-                    />
-                  )}
-                </StyledInputFormikField>
-                <StyledInputFormikField name="type" required label="Type">
-                  {({ field }) => (
-                    <StyledSelect
-                      inputId={field.id}
-                      error={field.error}
-                      onChange={option => formik.setFieldValue('type', option?.['value'])}
-                      fontSize="14px"
-                      disabled={formik.isSubmitting}
-                      placeholder="Select a type"
-                      value={!formik.values.type ? null : { label: formik.values.type, value: formik.values.type }}
-                      isDisabled
-                      options={[
-                        { label: 'CSV', value: 'CSV' },
-                        { label: 'Manual', value: 'MANUAL' },
-                      ]}
                     />
                   )}
                 </StyledInputFormikField>

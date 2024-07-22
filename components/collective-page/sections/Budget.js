@@ -45,6 +45,7 @@ const budgetSectionAccountFieldsFragment = gql`
             code
             name
             kind
+            appliesTo
           }
         }
       }
@@ -60,6 +61,7 @@ const budgetSectionAccountFieldsFragment = gql`
             code
             name
             kind
+            appliesTo
           }
         }
       }

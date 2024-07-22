@@ -84,6 +84,7 @@ const suggestExpectedFundsQuery = gql`
     $expectedFundsFilter: ExpectedFundsFilter
   ) {
     account(id: $hostId) {
+      id
       orders(
         filter: INCOMING
         includeIncognito: true
@@ -177,7 +178,7 @@ const suggestExpectedFundsQuery = gql`
  * of decimals in the value: 123 would be rounded to -2 (=100), 123456 would be rounded to -5 (=100000).
  */
 const getAmountRangeFilter = (valueInCents: number) => {
-  const precision = -Math.floor(Math.log10(valueInCents));
+  const precision = Math.min(1 - Math.floor(Math.log10(valueInCents)), -2);
   return {
     type: AmountFilterType.IS_BETWEEN,
     gte: floor(valueInCents * 0.8, precision),
@@ -190,11 +191,13 @@ export const MatchContributionDialog = ({
   row,
   transactionsImport,
   setOpen,
+  onAddFundsClick,
   ...props
 }: {
   host: Account;
   row: TransactionsImportRow;
   transactionsImport: TransactionsImport;
+  onAddFundsClick: () => void;
 } & BaseModalProps) => {
   const client = useApolloClient();
   const { toast } = useToast();
@@ -202,13 +205,17 @@ export const MatchContributionDialog = ({
   const [isConfirming, setIsConfirming] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const intl = useIntl();
-  const queryFilter = useQueryFilter({
+  const defaultFilterValues = React.useMemo(
+    () => ({ amount: getAmountRangeFilter(row.amount.valueInCents), status: [OrderStatus.PENDING] }),
+    [row],
+  );
+  const { resetFilters, ...queryFilter } = useQueryFilter({
     schema: filtersSchema,
     skipRouter: true,
     toVariables: ContributionFilters.toVariables,
     filters: ContributionFilters.filters,
     meta: { currency: row.amount.currency },
-    defaultFilterValues: { amount: getAmountRangeFilter(row.amount.valueInCents), status: [OrderStatus.PENDING] },
+    defaultFilterValues,
   });
   const [updateRows] = useMutation(updateTransactionsImportRows, { context: API_V2_CONTEXT });
   const { data, loading, error } = useQuery(suggestExpectedFundsQuery, {
@@ -216,12 +223,29 @@ export const MatchContributionDialog = ({
     variables: { ...queryFilter.variables, hostId: host.id },
   });
 
+  // Re-load default filters when changing row
+  React.useEffect(() => {
+    resetFilters(defaultFilterValues);
+  }, [defaultFilterValues, resetFilters]);
+
   return (
-    <Dialog {...props} onOpenChange={setOpen}>
+    <Dialog
+      {...props}
+      onOpenChange={() => {
+        if (isSubmitting) {
+          return;
+        }
+
+        setSelectedContribution(null);
+        setIsConfirming(false);
+        setOpen(false);
+        resetFilters(defaultFilterValues);
+      }}
+    >
       <DialogContent className="sm:max-w-4xl">
         <DialogHeader>
           <h2 className="text-xl font-bold">
-            <FormattedMessage defaultMessage="Match contribution" id="c7INEq" />
+            <FormattedMessage defaultMessage="Match expected funds" id="J/7TIn" />
           </h2>
         </DialogHeader>
         {isConfirming ? (
@@ -280,6 +304,8 @@ export const MatchContributionDialog = ({
                   loading={loading}
                   contributions={data?.account?.orders?.nodes ?? []}
                   totalContributions={data?.account?.orders?.totalCount ?? 0}
+                  queryFilter={queryFilter}
+                  onAddFundsClick={onAddFundsClick}
                 />
               )}
             </div>

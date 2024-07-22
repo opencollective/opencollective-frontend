@@ -224,7 +224,7 @@ function Expense(props) {
   }
   const loggedInAccount = data?.loggedInAccount;
   const collective = expense?.account;
-  const host = collective?.host;
+  const host = expense?.host ?? collective?.host;
   const isDraft = expense?.status === ExpenseStatus.DRAFT;
   const isMissingReceipt =
     [ExpenseStatus.PAID, ExpenseStatus.PROCESSING].includes(expense?.status) &&

@@ -468,7 +468,7 @@ const VirtualCard = props => {
               {cardNumber}
             </P>
             <Box mt="8px" fontSize="13px" fontWeight="500" lineHeight="20px" letterSpacing="0">
-              <StyledLink href={`/${virtualCard.account.slug}`} color="white.full" hoverColor="white.transparent.72">
+              <StyledLink href={`/${virtualCard.account.slug}`} color="white.full" $hoverColor="white.transparent.72">
                 <Avatar
                   collective={virtualCard.account}
                   radius="20px"
@@ -495,7 +495,7 @@ const VirtualCard = props => {
                     <StyledLink
                       href={`/${virtualCard.assignee.slug}`}
                       color="white.full"
-                      hoverColor="white.transparent.72"
+                      $hoverColor="white.transparent.72"
                       fontWeight="700"
                     >
                       {virtualCard.assignee.name}

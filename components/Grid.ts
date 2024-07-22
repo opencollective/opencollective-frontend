@@ -20,7 +20,11 @@ type BoxProps = SpaceProps &
     css?: string | object;
   };
 
-export const Box = styled.div<BoxProps>(
+const FILTERED_PROPS = new Set(['display', 'width', 'height']);
+
+export const Box = styled.div.withConfig({
+  shouldForwardProp: (prop, validate) => validate(prop) && !FILTERED_PROPS.has(prop),
+})<BoxProps>(
   {
     boxSizing: 'border-box',
   },

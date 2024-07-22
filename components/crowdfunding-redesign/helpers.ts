@@ -35,7 +35,7 @@ export const profileSchema = z.object({
   name: z.string().min(1).max(255),
   description: z.string().max(255).optional(),
   primaryColor: primaryColorSchema.optional(),
-  cover: coverImageSchema.optional(),
+  cover: coverImageSchema.optional().nullable(),
   longDescription: z.string().max(30000).optional(),
 });
 

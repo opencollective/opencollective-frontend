@@ -35,7 +35,9 @@ const AmountLine = styled.div.attrs({
   ${typography}
 `;
 
-const Label = styled(Span)`
+const Label = styled(Span).attrs(props => ({
+  fontWeight: props.fontWeight ?? 400,
+}))`
   margin-right: 4px;
   color: inherit;
   flex: 0 1 70%;
@@ -43,10 +45,6 @@ const Label = styled(Span)`
   word-break: break-word;
   ${flex}
 `;
-
-Label.defaultProps = {
-  fontWeight: 400,
-};
 
 const Amount = styled(Span)`
   flex: 1 1 30%;

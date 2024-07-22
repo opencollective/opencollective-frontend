@@ -284,6 +284,7 @@ class ExpenseFormItems extends React.PureComponent {
                 formik={this.props.form}
                 formikValuePath="taxes.0"
                 isOptional={Boolean(values.payee?.isInvite)}
+                requireIdNumber={taxType === TaxType.GST ? values.type === expenseTypes.INVOICE : undefined}
               />
             )}
           </Box>

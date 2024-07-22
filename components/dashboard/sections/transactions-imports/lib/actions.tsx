@@ -46,7 +46,7 @@ export function useTransactionsImportActions({ transactionsImport, host }): {
   const intl = useIntl();
   const [updatingRows, setUpdatingRows] = React.useState<Array<string>>([]);
   const [updateRows] = useMutation(updateTransactionsImportRows, { context: API_V2_CONTEXT });
-  const { showModal } = useModal();
+  const { showModal, hideModal } = useModal();
   const setRowsDismissed = async (rowIds: string[], isDismissed: boolean) => {
     setUpdatingRows(uniq([...updatingRows, ...rowIds]));
     try {
@@ -71,29 +71,41 @@ export function useTransactionsImportActions({ transactionsImport, host }): {
     const actions: ReturnType<GetActions<TransactionsImportRow>> = { primary: [], secondary: [] };
     const isImported = Boolean(row.expense || row.order);
     const isUpdatingRow = updatingRows.includes(row.id);
+    const showAddFundsModal = () => {
+      showModal(AddFundsModalFromImportRow, { transactionsImport, row, onCloseFocusRef }, 'add-funds-modal');
+    };
+
     if (isImported) {
       return actions;
     } else if (!row.isDismissed) {
       if (row.amount.valueInCents > 0) {
         actions.primary.push({
-          key: 'add-funds',
-          Icon: Banknote,
-          label: <FormattedMessage defaultMessage="Add funds" id="h9vJHn" />,
-          disabled: isUpdatingRow,
-          onClick: () =>
-            showModal(AddFundsModalFromImportRow, { transactionsImport, row, onCloseFocusRef }, 'add-funds-modal'),
-        });
-        actions.primary.push({
           key: 'match',
           Icon: Merge,
-          label: <FormattedMessage defaultMessage="Match" id="contribution.match" />,
+          label: <FormattedMessage defaultMessage="Match expected funds" id="J/7TIn" />,
           disabled: isUpdatingRow,
           onClick: () =>
             showModal(
               MatchContributionDialog,
-              { transactionsImport, row, host, onCloseFocusRef },
+              {
+                transactionsImport,
+                row,
+                host,
+                onCloseFocusRef,
+                onAddFundsClick: () => {
+                  hideModal('match-contribution-modal');
+                  showAddFundsModal();
+                },
+              },
               'match-contribution-modal',
             ),
+        });
+        actions.primary.push({
+          key: 'add-funds',
+          Icon: Banknote,
+          label: <FormattedMessage defaultMessage="Add funds" id="h9vJHn" />,
+          disabled: isUpdatingRow,
+          onClick: showAddFundsModal,
         });
       } else if (row.amount.valueInCents < 0) {
         actions.primary.push({

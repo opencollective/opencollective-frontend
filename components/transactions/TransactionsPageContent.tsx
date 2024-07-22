@@ -252,6 +252,7 @@ const Transactions = ({
         )}
         {state.hasChildren && (
           <StyledCheckbox
+            name="ignoreChildrenTransactions"
             checked={router.query.ignoreChildrenTransactions ? true : false}
             onChange={({ checked }) => updateFilters({ ignoreChildrenTransactions: checked })}
             label={
@@ -264,6 +265,7 @@ const Transactions = ({
         )}
         {state.hasGiftCards && (
           <StyledCheckbox
+            name="ignoreGiftCardsTransactions"
             checked={router.query.ignoreGiftCardsTransactions ? true : false}
             onChange={({ checked }) => updateFilters({ ignoreGiftCardsTransactions: checked })}
             label={
@@ -273,6 +275,7 @@ const Transactions = ({
         )}
         {state.hasIncognito && (
           <StyledCheckbox
+            name="ignoreIncognitoTransactions"
             checked={router.query.ignoreIncognitoTransactions ? true : false}
             onChange={({ checked }) => updateFilters({ ignoreIncognitoTransactions: checked })}
             label={

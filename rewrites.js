@@ -371,11 +371,6 @@ exports.REWRITES = [
     source: '/:slug/:action(apply)?/:mode(onboarding)?/:step(administrators|contact-info|success)?',
     destination: '/collective-page',
   },
-  // Root actions
-  {
-    source: '/opencollective/root-actions/:section?',
-    destination: '/root-actions',
-  },
   // Terms of services for the host
   {
     source: '/:hostCollectiveSlug/terms',

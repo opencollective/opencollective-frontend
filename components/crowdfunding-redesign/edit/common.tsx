@@ -122,7 +122,7 @@ function ColorPicker({ value, onChange }) {
   return (
     <div>
       <Popover>
-        <PopoverTrigger>
+        <PopoverTrigger asChild>
           <Button variant="outline" className="gap-2">
             <div className="size-4 rounded bg-primary" style={{ backgroundColor: value }} />
             {value}
@@ -151,7 +151,7 @@ function ColorPicker({ value, onChange }) {
                   '[&::-webkit-color-swatch-wrapper]:p-0 [&::-webkit-color-swatch]:rounded [&::-webkit-color-swatch]:border-none',
                 )}
               />
-              <InputGroup prepend="#" value={value.replace('#', '')} onChange={e => onChange(`#${e.target.value}`)} />
+              <InputGroup prepend="#" value={value?.replace('#', '')} onChange={e => onChange(`#${e.target.value}`)} />
             </div>
           </div>
         </PopoverContent>

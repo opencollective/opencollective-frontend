@@ -9,6 +9,7 @@ import type { ClearCacheMutation, ClearCacheMutationVariables } from '../../lib/
 import { AccountCacheType } from '../../lib/graphql/types/v2/graphql';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
+import DashboardHeader from '../dashboard/DashboardHeader';
 import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
@@ -39,6 +40,7 @@ const ClearCacheForAccountForm = () => {
   const intl = useIntl();
   return (
     <div>
+      <DashboardHeader title="Clear Cache" description="Clear cache for account" className="mb-10" />
       <StyledInputField htmlFor="clear-cache-account" label="Account" flex="1 1">
         {({ id }) => (
           <CollectivePickerAsync inputId={id} onChange={({ value }) => setAccount(value)} skipGuests={false} />

@@ -10,6 +10,7 @@ import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import ConfirmationModal from '../ConfirmationModal';
 import Container from '../Container';
+import DashboardHeader from '../dashboard/DashboardHeader';
 import ExpensesPickerAsync from '../ExpensesPickerAsync';
 import { Flex } from '../Grid';
 import Link from '../Link';
@@ -68,6 +69,7 @@ export default function MoveExpenses() {
 
   return (
     <div>
+      <DashboardHeader title="Move Expenses" className="mb-10" />
       <StyledInputField htmlFor="sourceAccount" label="Source account for the expenses" flex="1 1">
         {({ id }) => (
           <CollectivePickerAsync

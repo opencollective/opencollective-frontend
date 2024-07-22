@@ -84,19 +84,16 @@ export const TransactionsImportsTable = ({ accountSlug }) => {
                 cell: ({ cell }) => <DateTime value={cell.getValue() as Date} />,
               },
               {
-                header: 'Source',
+                header: intl.formatMessage({ defaultMessage: 'Source', id: 'AddFundsModal.source' }),
                 accessorKey: 'source',
               },
               {
-                header: 'Type',
-                accessorKey: 'type',
-              },
-              {
-                header: 'Name',
+                header: intl.formatMessage({ defaultMessage: 'Name', id: 'Fields.name' }),
                 accessorKey: 'name',
               },
               {
-                header: 'Processed',
+                id: 'stats',
+                header: intl.formatMessage({ defaultMessage: 'Processed', id: 'TransactionsImport.processed' }),
                 accessorKey: 'stats',
                 cell: ({ cell }) => {
                   const stats = cell.getValue() as TransactionsImport['stats'];
@@ -113,7 +110,8 @@ export const TransactionsImportsTable = ({ accountSlug }) => {
                 },
               },
               {
-                header: 'Summary',
+                id: 'summary',
+                header: intl.formatMessage({ defaultMessage: 'Summary', id: 'Summary' }),
                 accessorKey: 'stats',
                 cell: ({ cell }) => {
                   const stats = cell.getValue() as TransactionsImport['stats'];
@@ -127,8 +125,8 @@ export const TransactionsImportsTable = ({ accountSlug }) => {
                       intl.formatMessage(
                         {
                           defaultMessage:
-                            'Imported {expensesCount, plural, =0 {} one {# expense} other {# expenses}}{both, plural, =0 {} other { and }}{ordersCount, plural, =0 {} one {# order} other {# orders}}',
-                          id: 'Iode3e',
+                            'Imported {expensesCount, plural, =0 {} one {# expense} other {# expenses}}{both, plural, =0 {} other { and }}{ordersCount, plural, =0 {} one {# contribution} other {# contributions}}',
+                          id: 'ImportTransactionsCount',
                         },
                         {
                           expensesCount: stats.expenses,
