@@ -30,7 +30,7 @@ const SheetOverlay = React.forwardRef<
 SheetOverlay.displayName = SheetPrimitive.Overlay.displayName;
 
 const sheetVariants = cva(
-  'fixed z-[3000] focus:outline-none overflow-y-auto gap-4 bg-background max-w-lg p-6 shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500',
+  'fixed z-[3000] flex flex-col focus:outline-none overflow-y-auto bg-background max-w-lg shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500',
   {
     variants: {
       side: {
@@ -89,9 +89,13 @@ const SheetDescription = React.forwardRef<
 ));
 SheetDescription.displayName = SheetPrimitive.Description.displayName;
 
-// ignore unused exports
-// ui library
+const SheetBody = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div className={cn('flex-1 overflow-y-auto p-6', className)} {...props} />
+);
+SheetBody.displayName = 'SheetBody';
 
+// ui library
+// ts-unused-exports:disable-next-line
 export {
   Sheet,
   SheetPortal,
@@ -102,5 +106,6 @@ export {
   SheetHeader,
   SheetFooter,
   SheetTitle,
+  SheetBody,
   SheetDescription,
 };

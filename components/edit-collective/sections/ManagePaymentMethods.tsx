@@ -10,7 +10,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { PAYMENT_METHOD_TYPE } from '../../../lib/constants/payment-methods';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT, gql, gqlV1 } from '../../../lib/graphql/helpers';
-import {
+import type {
   Account,
   ConfirmOrderMutation,
   ManagePaymentMethodsQuery,
@@ -156,14 +156,14 @@ export default function ManagePaymentMethods(props: ManagePaymentMethodsProps) {
               defaultMessage="Your payment method has now been confirmed and the payment successfully went through."
             />
             <StyledButton buttonSize="tiny" onClick={dismissOrderConfirmationMessage}>
-              <FormattedMessage defaultMessage="Dismiss" />
+              <FormattedMessage defaultMessage="Dismiss" id="TDaF6J" />
             </StyledButton>
           </div>
         </MessageBox>
       )}
       {hasPaymentMethodsToConfirm && (
         <MessageBox type="warning" withIcon mb={3}>
-          <FormattedMessage defaultMessage="You need to confirm at least one of your payment methods." />
+          <FormattedMessage defaultMessage="You need to confirm at least one of your payment methods." id="bHYOPb" />
         </MessageBox>
       )}
       {orderedPaymentMethods.map(pm => {
@@ -426,7 +426,7 @@ function AddCreditCardButton(props: AddCreditCardButtonProps) {
       }
       toast({
         variant: 'success',
-        message: <FormattedMessage defaultMessage="Your payment method has been successfully added." />,
+        message: <FormattedMessage defaultMessage="Your payment method has been successfully added." id="hqJi3D" />,
       });
     } catch (e) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, e) });

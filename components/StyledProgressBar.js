@@ -23,7 +23,13 @@ const ProgressBar = styled.div`
 /**
  * A progress bar that displays the current advancement.
  */
-const StyledProgressBar = ({ percentage, color, backgroundColor, height, borderRadius }) => {
+const StyledProgressBar = ({
+  percentage,
+  color = 'green.500',
+  backgroundColor = 'rgba(9, 10, 10, 0.04)',
+  height = 4,
+  borderRadius = 16,
+}) => {
   return (
     <BackgroundBar bg={backgroundColor} height={height} borderRadius={borderRadius}>
       <ProgressBar width={`${clamp(percentage, 0, 1) * 100}%`} bg={color} height={height} borderRadius={borderRadius} />
@@ -42,13 +48,6 @@ StyledProgressBar.propTypes = {
   height: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   /** Border-radius */
   borderRadius: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-};
-
-StyledProgressBar.defaultProps = {
-  height: 4,
-  backgroundColor: 'rgba(9, 10, 10, 0.04)',
-  color: 'green.500',
-  borderRadius: 16,
 };
 
 export default StyledProgressBar;

@@ -178,7 +178,10 @@ const WhoAreFiscalHosts = () => {
                 {` `}
                 {feature.id === 'fiscalSponsorshipService' &&
                   intl.formatMessage(
-                    { defaultMessage: 'Learn more about <fiscalHostingLink>fiscal hosting</fiscalHostingLink>.' },
+                    {
+                      defaultMessage: 'Learn more about <fiscalHostingLink>fiscal hosting</fiscalHostingLink>.',
+                      id: 'Wd/w9L',
+                    },
                     {
                       fiscalHostingLink: getI18nLink({
                         as: Link,

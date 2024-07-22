@@ -4,7 +4,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { Account, Expense, Host } from '../../lib/graphql/types/v2/graphql';
+import type { Account, Expense, Host } from '../../lib/graphql/types/v2/graphql';
 
 import AccountingCategorySelect from '../AccountingCategorySelect';
 import ConfirmationModal from '../ConfirmationModal';
@@ -12,7 +12,7 @@ import { useToast } from '../ui/useToast';
 
 import { editExpenseCategoryMutation } from './graphql/mutations';
 
-export type ConfirmProcessExpenseModalProps = {
+type ConfirmProcessExpenseModalProps = {
   onClose: () => void;
   expense: Expense;
   host: Host;
@@ -34,7 +34,7 @@ export default function ApproveExpenseModal({
   return (
     <ConfirmationModal
       onClose={onClose}
-      header={<FormattedMessage defaultMessage="Approve Expense" />}
+      header={<FormattedMessage defaultMessage="Approve Expense" id="PJNkaW" />}
       maxWidth={384}
       disableSubmit={!selectedCategory}
       continueHandler={async () => {
@@ -59,7 +59,7 @@ export default function ApproveExpenseModal({
     >
       <div className="my-4">
         <label htmlFor="confirm-expense-category" className="mb-2 text-base font-bold">
-          <FormattedMessage defaultMessage="Confirm Expense Category" />
+          <FormattedMessage defaultMessage="Confirm Expense Category" id="X5FRNX" />
         </label>
         <AccountingCategorySelect
           id="confirm-expense-category"

@@ -2,10 +2,11 @@ import React, { useEffect } from 'react';
 import { useQuery } from '@apollo/client';
 import { Check } from '@styled-icons/boxicons-regular/Check';
 import { FormikProvider, useFormik, useFormikContext } from 'formik';
-import { cloneDeep, get, kebabCase, omit, round } from 'lodash';
+import { cloneDeep, kebabCase, omit, round } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
-import { border, BorderProps, color, space, SpaceProps, typography } from 'styled-system';
+import type { BorderProps, SpaceProps } from 'styled-system';
+import { border, color, space, typography } from 'styled-system';
 
 import { default as hasFeature, FEATURES } from '../../lib/allowed-features';
 import { EXPENSE_PAYMENT_METHOD_SERVICES } from '../../lib/constants/payment-methods';
@@ -33,7 +34,6 @@ import StyledModal, { ModalBody, ModalHeader } from '../StyledModal';
 import StyledSelect from '../StyledSelect';
 import StyledTooltip from '../StyledTooltip';
 import { H4, P, Span } from '../Text';
-import { withUser } from '../UserProvider';
 
 import { FieldGroup } from './PayoutBankInformationForm';
 import PayoutMethodData from './PayoutMethodData';
@@ -163,10 +163,11 @@ const DEFAULT_PAYMENT_METHOD_SERVICE = {
 
 const getPayoutOptionValue = (payoutMethod, isAuto, host) => {
   const payoutMethodType = payoutMethod?.type;
+  const canAddTransferDetails = host.settings?.transferwise?.transferDetails === true;
   if (payoutMethodType === PayoutMethodType.OTHER) {
     return { forceManual: true, action: 'PAY', paymentMethodService: null };
-  } else if (payoutMethod?.data?.type === 'brazil') {
-    // TODO: remove this when we implement the missing Brazilian TRANSFER NATURE field.
+  } else if (payoutMethod?.data?.type === 'brazil' && !canAddTransferDetails) {
+    // TODO: remove this when we release transfer details for everyone.
     return { forceManual: true, action: 'PAY' };
   } else if (payoutMethodType === PayoutMethodType.BANK_ACCOUNT && !host.transferwise) {
     return { forceManual: true, action: 'PAY', paymentMethodService: 'WISE' };
@@ -208,17 +209,16 @@ const validate = values => {
   return errors;
 };
 
-const getCanCustomizeFeesPayer = (expense, collective, isManualPayment, feeAmount, isRoot) => {
+const getCanCustomizeFeesPayer = (expense, collective, isManualPayment, feeAmount) => {
   const supportedPayoutMethods = [PayoutMethodType.BANK_ACCOUNT, PayoutMethodType.OTHER];
   const isSupportedPayoutMethod = supportedPayoutMethods.includes(expense.payoutMethod?.type);
-  const isFullBalance = expense.amount === get(collective, 'stats.balanceWithBlockedFunds.valueInCents');
   const isSameCurrency = expense.currency === collective?.currency;
 
   // Current limitations:
   // - Only for transferwise and manual payouts
   // - Only when emptying the account balance (unless root user)
   // - Only with expenses submitted in the same currency as the collective
-  if (!(isSupportedPayoutMethod && isSameCurrency && (isFullBalance || isRoot))) {
+  if (!(isSupportedPayoutMethod && isSameCurrency)) {
     return false;
   }
 
@@ -283,6 +283,11 @@ const getInitialValues = (expense, host) => {
 };
 
 const calculateAmounts = ({ values, expense, quote, host, feesPayer }) => {
+  const expenseAmountInHostCurrency = {
+    valueInCents: values.expenseAmountInHostCurrency,
+    currency: host.currency,
+  };
+
   if (values.forceManual) {
     const totalAmount = {
       valueInCents: values.expenseAmountInHostCurrency + (values.paymentProcessorFeeInHostCurrency || 0),
@@ -290,10 +295,6 @@ const calculateAmounts = ({ values, expense, quote, host, feesPayer }) => {
     };
     const paymentProcessorFee = {
       valueInCents: values.paymentProcessorFeeInHostCurrency,
-      currency: host.currency,
-    };
-    const expenseAmountInHostCurrency = {
-      valueInCents: values.expenseAmountInHostCurrency,
       currency: host.currency,
     };
     const grossAmount = totalAmount.valueInCents - (paymentProcessorFee.valueInCents || 0);
@@ -316,7 +317,7 @@ const calculateAmounts = ({ values, expense, quote, host, feesPayer }) => {
       expenseAmountInHostCurrency,
     };
   } else {
-    return {};
+    return { expenseAmountInHostCurrency, totalAmount: expenseAmountInHostCurrency, paymentProcessorFee: null };
   }
 };
 
@@ -333,6 +334,7 @@ const getHandleSubmit = (intl, currency, onSubmit) => async values => {
         {
           defaultMessage:
             'You are about to record a payment for {totalAmount} that includes a {paymentProcessorFeeAmount} payment processor fee. This fee looks unusually high.{newLine}{newLine}Are you sure you want to do this?',
+          id: 'UW7XhX',
         },
         {
           totalAmount: formatCurrency(values.totalAmountPaidInHostCurrency, currency),
@@ -361,15 +363,7 @@ type PayExpenseModalProps = {
 /**
  * Modal displayed by `PayExpenseButton` to trigger the actual payment of an expense
  */
-const PayExpenseModal = ({
-  onClose,
-  onSubmit,
-  expense,
-  collective,
-  host,
-  error,
-  LoggedInUser,
-}: PayExpenseModalProps) => {
+const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }: PayExpenseModalProps) => {
   const intl = useIntl();
   const payoutMethodType = expense.payoutMethod?.type || PayoutMethodType.OTHER;
   const initialValues = getInitialValues(expense, host);
@@ -404,7 +398,7 @@ const PayExpenseModal = ({
       { value: null, label: <FormattedMessage id="Other" defaultMessage="Other" /> },
       ...EXPENSE_PAYMENT_METHOD_SERVICES.map(service => ({
         value: service,
-        label: i18nPaymentMethodService(service, intl),
+        label: i18nPaymentMethodService(intl, service),
       })),
     ],
     [intl],
@@ -451,13 +445,7 @@ const PayExpenseModal = ({
                     ...getPayoutOptionValue(payoutMethodType, item === 'AUTO', host),
                     paymentProcessorFeeInHostCurrency: null,
                     expenseAmountInHostCurrency: expense.currency === host.currency ? expense.amount : null,
-                    feesPayer: !getCanCustomizeFeesPayer(
-                      expense,
-                      collective,
-                      hasManualPayment,
-                      null,
-                      LoggedInUser.isRoot,
-                    )
+                    feesPayer: !getCanCustomizeFeesPayer(expense, collective, hasManualPayment, null)
                       ? DEFAULT_VALUES.feesPayer // Reset fees payer if can't customize
                       : formik.values.feesPayer,
                   });
@@ -573,9 +561,12 @@ const PayExpenseModal = ({
                   error={formik.errors.clearedAt}
                   required={false}
                   mt={3}
-                  label={<FormattedMessage defaultMessage="Effective Date" />}
+                  label={<FormattedMessage defaultMessage="Effective Date" id="Gh3Obs" />}
                   hint={
-                    <FormattedMessage defaultMessage="The date funds were cleared on your bank, Wise, PayPal, Stripe or any other external account holding these funds." />
+                    <FormattedMessage
+                      defaultMessage="The date funds were cleared on your bank, Wise, PayPal, Stripe or any other external account holding these funds."
+                      id="s3O6iq"
+                    />
                   }
                 >
                   {inputProps => (
@@ -602,12 +593,14 @@ const PayExpenseModal = ({
               collective,
               hasManualPayment,
               formik.values.paymentProcessorFeeInHostCurrency,
-              LoggedInUser.isRoot,
             ) && (
               <Flex mt={16}>
                 <StyledTooltip
                   content={
-                    <FormattedMessage defaultMessage="Check this box to have the payee cover the cost of payment processor fees (useful to zero balance)" />
+                    <FormattedMessage
+                      defaultMessage="Check this box to have the payee cover the cost of payment processor fees (useful to zero balance)"
+                      id="ewvfiF"
+                    />
                   }
                 >
                   <StyledCheckbox
@@ -616,7 +609,7 @@ const PayExpenseModal = ({
                     onChange={({ checked }) => formik.setFieldValue('feesPayer', checked ? 'PAYEE' : 'COLLECTIVE')}
                     label={
                       <Span fontSize="12px">
-                        <FormattedMessage defaultMessage="The payee is covering the fees" />
+                        <FormattedMessage defaultMessage="The payee is covering the fees" id="zoC8Gb" />
                       </Span>
                     }
                   />
@@ -702,7 +695,7 @@ const PayExpenseModal = ({
               {amounts.effectiveRate ? (
                 <AmountLine py={0}>
                   <Label color="black.600" fontWeight="500">
-                    <FormattedMessage defaultMessage="Currency exchange rate" />
+                    <FormattedMessage defaultMessage="Currency exchange rate" id="jLTPuL" />
                   </Label>
                   <P fontSize="13px" color="black.600" whiteSpace="nowrap">
                     ~ {expense.currency} 1 = {amounts.totalAmount?.currency} {round(amounts.effectiveRate, 5)}
@@ -786,4 +779,4 @@ Please add funds to your Wise {currency} account."
   );
 };
 
-export default withUser(PayExpenseModal);
+export default PayExpenseModal;

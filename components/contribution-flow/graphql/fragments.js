@@ -138,7 +138,9 @@ export const orderSuccessFragment = gql`
     }
     tier {
       id
+      legacyId
       name
+      slug
     }
     membership {
       id
@@ -165,6 +167,7 @@ export const orderSuccessFragment = gql`
       settings
       socialLinks {
         type
+        url
       }
       stats {
         id

@@ -144,11 +144,11 @@ CollectiveContainer.propTypes = {
 const StyledCollectiveCard = ({
   collective,
   tag,
-  bodyHeight,
+  bodyHeight = 336,
   children,
-  borderRadius,
+  borderRadius = 16,
   showWebsite,
-  useLink,
+  useLink = true,
   ...props
 }) => {
   const intl = useIntl();
@@ -256,12 +256,6 @@ StyledCollectiveCard.propTypes = {
   borderRadius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   showWebsite: PropTypes.bool,
   useLink: PropTypes.bool,
-};
-
-StyledCollectiveCard.defaultProps = {
-  bodyHeight: 336,
-  borderRadius: 16,
-  useLink: true,
 };
 
 export default StyledCollectiveCard;

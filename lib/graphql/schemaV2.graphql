@@ -207,11 +207,6 @@ interface Account {
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
-
-  """
-  Returns whether this account has a custom image
-  """
-  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -275,6 +270,16 @@ interface Account {
   Get pending member invitations for this account
   """
   memberInvitations(role: [MemberRole]): [MemberInvitation]
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   memberOf(
     limit: Int! = 100
     offset: Int! = 0
@@ -331,6 +336,16 @@ interface Account {
     The payment method types. Can include `null` for transactions without a payment method
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    The payment method services.
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Reference of the account(s) assigned to the main side of the transaction you want to EXCLUDE from the results
+    """
+    excludeAccount: [AccountReferenceInput]
 
     """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
@@ -450,8 +465,23 @@ interface Account {
     """
     The transactions group to filter by
     """
-    group: String
+    group: [String]
     virtualCard: [VirtualCardReferenceInput]
+
+    """
+    Only return transactions that are refunds (or not refunds if false)
+    """
+    isRefund: Boolean
+
+    """
+    Only return transactions that are associated with these external merchant IDs
+    """
+    merchantId: [String]
+
+    """
+    Only return transactions that are associated with these accounting categories
+    """
+    accountingCategory: [String]
   ): TransactionCollection!
   orders(
     """
@@ -520,6 +550,16 @@ interface Account {
     dateTo: DateTime
 
     """
+    Only return pending orders that were expected after this date
+    """
+    expectedDateFrom: DateTime
+
+    """
+    Only return pending orders that were expected before this date
+    """
+    expectedDateTo: DateTime
+
+    """
     The term to search
     """
     searchTerm: String
@@ -534,6 +574,12 @@ interface Account {
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
+    expectedFundsFilter: ExpectedFundsFilter
+
+    """
+    Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
+    """
+    oppositeAccount: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -571,12 +617,13 @@ interface Account {
     """
     Use this field to filter expenses on their statuses
     """
-    status: ExpenseStatusFilter
+    status: [ExpenseStatusFilter]
 
     """
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -642,6 +689,16 @@ interface Account {
     Filter expenses of type charges using these virtual cards
     """
     virtualCards: [VirtualCardReferenceInput]
+
+    """
+    Filter expenses by the last user-role who replied to them
+    """
+    lastCommentBy: [LastCommentBy]
+
+    """
+    Only return expenses that match these accounting categories
+    """
+    accountingCategory: [String]
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -754,6 +811,7 @@ interface Account {
     Only return published updates.
     """
     onlyPublishedUpdates: Boolean = false
+    isDraft: Boolean
     onlyChangelogUpdates: Boolean
     orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
@@ -790,7 +848,12 @@ interface Account {
   Virtual Cards Merchants used by the account. Admin only. Scope: "virtualCards".
   """
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection
-  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
+  childrenAccounts(
+    limit: Int! = 100
+    offset: Int! = 0
+    isActive: Boolean
+    accountType: [AccountType]
+  ): AccountCollection!
 
   """
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
@@ -822,6 +885,21 @@ interface Account {
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromAccount: Account
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
 }
 
 """
@@ -946,6 +1024,11 @@ enum DateTimeField {
   The creation time of a resource
   """
   CREATED_AT
+
+  """
+  Transactions only: The date when a transaction was cleared by the payment processor
+  """
+  EFFECTIVE_DATE
 }
 
 """
@@ -1091,6 +1174,7 @@ type Order {
   """
   totalDonations: Amount!
   paymentMethod: PaymentMethod
+  paymentProcessorUrl: String
 
   """
   Host fee percent attached to the Order.
@@ -1194,6 +1278,7 @@ enum OrderStatus {
   EXPIRED
   DISPUTED
   REFUNDED
+  PAUSED
   IN_REVIEW
 }
 
@@ -1287,6 +1372,7 @@ interface Transaction {
     """
     fetchPaymentProcessorFee: Boolean = false
   ): Amount
+  paymentProcessorUrl: String
   host: Account
   account: Account
   oppositeAccount: Account
@@ -1492,6 +1578,11 @@ type Expense {
   approvedBy: [Account]!
 
   """
+  The account who paid this expense
+  """
+  paidBy: Account
+
+  """
   Whether this expense is on hold
   """
   onHold: Boolean
@@ -1584,6 +1675,36 @@ type Expense {
   Returns the list of legal documents required from the payee before the expense can be payed. Must be logged in.
   """
   requiredLegalDocuments: [LegalDocumentType]
+
+  """
+  Returns the list of legal documents attached to this expense. Must be logged in as a host admin.
+  """
+  legalDocuments(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Filter by type of legal document
+    """
+    type: [LegalDocumentType]
+
+    """
+    Filter by status of legal document
+    """
+    status: [LegalDocumentRequestStatus]
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+  ): LegalDocumentCollection
 
   """
   Drafted field values that were still not persisted
@@ -1694,6 +1815,11 @@ type AccountingCategory {
   The time of creation of this accounting category
   """
   createdAt: DateTime!
+
+  """
+  If the category is applicable to the Host or Hosted Collectives
+  """
+  appliesTo: AccountingCategoryAppliesTo
 }
 
 """
@@ -1734,11 +1860,6 @@ type Host implements Account & AccountWithContributions {
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
-
-  """
-  Returns whether this account has a custom image
-  """
-  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -1813,6 +1934,16 @@ type Host implements Account & AccountWithContributions {
     """
     role: [MemberRole]
   ): [MemberInvitation]
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -1885,6 +2016,16 @@ type Host implements Account & AccountWithContributions {
     The payment method types. Can include `null` for transactions without a payment method
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    The payment method services.
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Reference of the account(s) assigned to the main side of the transaction you want to EXCLUDE from the results
+    """
+    excludeAccount: [AccountReferenceInput]
 
     """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
@@ -2004,8 +2145,23 @@ type Host implements Account & AccountWithContributions {
     """
     The transactions group to filter by
     """
-    group: String
+    group: [String]
     virtualCard: [VirtualCardReferenceInput]
+
+    """
+    Only return transactions that are refunds (or not refunds if false)
+    """
+    isRefund: Boolean
+
+    """
+    Only return transactions that are associated with these external merchant IDs
+    """
+    merchantId: [String]
+
+    """
+    Only return transactions that are associated with these accounting categories
+    """
+    accountingCategory: [String]
   ): TransactionCollection!
   orders(
     """
@@ -2074,6 +2230,16 @@ type Host implements Account & AccountWithContributions {
     dateTo: DateTime
 
     """
+    Only return pending orders that were expected after this date
+    """
+    expectedDateFrom: DateTime
+
+    """
+    Only return pending orders that were expected before this date
+    """
+    expectedDateTo: DateTime
+
+    """
     The term to search
     """
     searchTerm: String
@@ -2088,6 +2254,12 @@ type Host implements Account & AccountWithContributions {
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
+    expectedFundsFilter: ExpectedFundsFilter
+
+    """
+    Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
+    """
+    oppositeAccount: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -2125,12 +2297,13 @@ type Host implements Account & AccountWithContributions {
     """
     Use this field to filter expenses on their statuses
     """
-    status: ExpenseStatusFilter
+    status: [ExpenseStatusFilter]
 
     """
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -2196,6 +2369,16 @@ type Host implements Account & AccountWithContributions {
     Filter expenses of type charges using these virtual cards
     """
     virtualCards: [VirtualCardReferenceInput]
+
+    """
+    Filter expenses by the last user-role who replied to them
+    """
+    lastCommentBy: [LastCommentBy]
+
+    """
+    Only return expenses that match these accounting categories
+    """
+    accountingCategory: [String]
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -2293,6 +2476,7 @@ type Host implements Account & AccountWithContributions {
     Only return published updates.
     """
     onlyPublishedUpdates: Boolean = false
+    isDraft: Boolean
     onlyChangelogUpdates: Boolean
     orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
@@ -2329,7 +2513,12 @@ type Host implements Account & AccountWithContributions {
   Virtual Cards Merchants used by the account. Admin only. Scope: "virtualCards".
   """
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection
-  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
+  childrenAccounts(
+    limit: Int! = 100
+    offset: Int! = 0
+    isActive: Boolean
+    accountType: [AccountType]
+  ): AccountCollection!
 
   """
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
@@ -2361,6 +2550,21 @@ type Host implements Account & AccountWithContributions {
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromAccount: Account
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -2423,6 +2627,16 @@ type Host implements Account & AccountWithContributions {
   contributionPolicy: String
 
   """
+  Returns true if the remote user can start the process to resume contributions for account
+  """
+  canStartResumeContributionsProcess: Boolean!
+
+  """
+  Returns true if the account has started the process to resume contributions
+  """
+  hasResumeContributionsProcessStarted: Boolean!
+
+  """
   List of accounting categories for this host
   """
   accountingCategories(
@@ -2430,6 +2644,11 @@ type Host implements Account & AccountWithContributions {
     Filter accounting categories by kind
     """
     kind: [AccountingCategoryKind!]
+
+    """
+    Filter by accounting category applicable to this account
+    """
+    account: AccountReferenceInput
   ): AccountingCategoryCollection!
   hostFeePercent: Float
   totalHostedCollectives: Int @deprecated(reason: "2023-03-20: Renamed to totalHostedAccounts")
@@ -2437,6 +2656,11 @@ type Host implements Account & AccountWithContributions {
   isOpenToApplications: Boolean
   termsUrl: URL
   plan: HostPlan!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  hostTransactionsReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): HostTransactionReports
   hostMetrics(
     """
     A collection of accounts for which the metrics should be returned.
@@ -2474,6 +2698,11 @@ type Host implements Account & AccountWithContributions {
     """
     timeUnit: TimeUnit
   ): HostMetricsTimeSeries!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  hostExpensesReport(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): HostExpensesReports
 
   """
   The list of payment methods (Stripe, Paypal, manual bank transfer, etc ...) the Host can accept for its Collectives
@@ -2763,7 +2992,102 @@ type Host implements Account & AccountWithContributions {
     Order of the results
     """
     orderBy: OrderByInput
-  ): AccountCollection!
+
+    """
+    Filter by the balance of the account
+    """
+    balance: AmountRangeInput
+
+    """
+    Filter by the balance of the account and its children accounts (events and projects)
+    """
+    consolidatedBalance: AmountRangeInput
+
+    """
+    Filter by specific Account currencies
+    """
+    currencies: [String]
+  ): HostedAccountCollection!
+
+  """
+  Returns the legal documents required by this host
+  """
+  requiredLegalDocuments: [LegalDocumentType!]!
+
+  """
+  Returns legal documents hosted by this host
+  """
+  hostedLegalDocuments(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Filter by type of legal document
+    """
+    type: [LegalDocumentType]
+
+    """
+    Filter by status of legal document
+    """
+    status: [LegalDocumentRequestStatus]
+
+    """
+    Filter by accounts
+    """
+    account: [AccountReferenceInput]
+
+    """
+    Search term (name, description, ...)
+    """
+    searchTerm: String
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Filter by requested date from
+    """
+    requestedAtFrom: DateTime
+
+    """
+    Filter by requested date to
+    """
+    requestedAtTo: DateTime
+  ): LegalDocumentCollection!
+
+  """
+  Returns a list of transactions imports for this host
+  """
+  transactionsImports(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    The order of results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+  ): TransactionsImportsCollection!
+
+  """
+  Returns a list of transactions imports sources for this host
+  """
+  transactionsImportsSources: [NonEmptyString]!
 }
 
 """
@@ -2817,6 +3141,16 @@ interface AccountWithContributions {
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
+
+  """
+  Returns true if the remote user can start the process to resume contributions for account
+  """
+  canStartResumeContributionsProcess: Boolean!
+
+  """
+  Returns true if the account has started the process to resume contributions
+  """
+  hasResumeContributionsProcessStarted: Boolean!
 }
 
 """
@@ -2930,6 +3264,90 @@ input AccountReferenceInput {
 }
 
 """
+A legal document (e.g. W9, W8BEN, W8BEN-E)
+"""
+type LegalDocument {
+  """
+  Unique identifier for this legal document
+  """
+  id: String!
+
+  """
+  The year this legal document is for
+  """
+  year: Int!
+
+  """
+  The type of legal document
+  """
+  type: LegalDocumentType!
+
+  """
+  The status of the request for this legal document
+  """
+  status: LegalDocumentRequestStatus!
+
+  """
+  The service that provided this legal document
+  """
+  service: LegalDocumentService!
+
+  """
+  Whether this legal document is expired
+  """
+  isExpired: Boolean!
+
+  """
+  The date and time the request for this legal document was created
+  """
+  requestedAt: DateTime!
+
+  """
+  The date and time this legal document was last updated
+  """
+  updatedAt: DateTime!
+
+  """
+  The account this legal document is for
+  """
+  account: Account!
+
+  """
+  URL to download the file. Must be logged in as a host with access to the document. The returned URL will be protected by authentication + 2FA.
+  """
+  documentLink: URL
+}
+
+"""
+Type for a required legal document
+"""
+enum LegalDocumentType {
+  """
+  US tax form (W9, W8BEN, W8BEN-E)
+  """
+  US_TAX_FORM
+}
+
+"""
+Status for a legal document
+"""
+enum LegalDocumentRequestStatus {
+  NOT_REQUESTED
+  REQUESTED
+  RECEIVED
+  ERROR
+  INVALID
+}
+
+"""
+Type for a required legal document
+"""
+enum LegalDocumentService {
+  DROPBOX_FORMS
+  OPENCOLLECTIVE
+}
+
+"""
 A collection of "MemberOf" (ie: Collective backed by an Organization)
 """
 type MemberOfCollection implements Collection {
@@ -2969,7 +3387,7 @@ enum HostFeeStructure {
 }
 
 """
-Input to order results
+Input to order collection
 """
 input OrderByInput {
   """
@@ -2988,14 +3406,18 @@ Possible fields you can use to order by
 """
 enum OrderByFieldType {
   CREATED_AT
-  MEMBER_COUNT
-  TOTAL_CONTRIBUTED
 
   """
   The financial activity of the collective (number of transactions)
   """
   ACTIVITY
+  HOST_RANK
+  HOSTED_COLLECTIVES_COUNT
   RANK
+  BALANCE
+  MEMBER_COUNT
+  TOTAL_CONTRIBUTED
+  NAME
 }
 
 """
@@ -3015,6 +3437,7 @@ type TransactionCollection implements Collection {
 }
 
 enum PaymentMethodType {
+  default @deprecated(reason: "Please use uppercase values")
   alipay @deprecated(reason: "Please use uppercase values")
   creditcard @deprecated(reason: "Please use uppercase values")
   prepaid @deprecated(reason: "Please use uppercase values")
@@ -3035,6 +3458,8 @@ enum PaymentMethodType {
   bank_transfer @deprecated(reason: "Please use uppercase values")
   payout @deprecated(reason: "Please use uppercase values")
   virtual_card @deprecated(reason: "Please use uppercase values")
+  swish @deprecated(reason: "Please use uppercase values")
+  DEFAULT
   ALIPAY
   CREDITCARD
   PREPAID
@@ -3055,6 +3480,15 @@ enum PaymentMethodType {
   BANK_TRANSFER
   PAYOUT
   VIRTUAL_CARD
+  SWISH
+}
+
+enum PaymentMethodService {
+  PAYPAL
+  STRIPE
+  OPENCOLLECTIVE
+  THEGIVINGBLOCK
+  WISE
 }
 
 input ExpenseReferenceInput {
@@ -3138,6 +3572,15 @@ Account orders filter (INCOMING or OUTGOING)
 enum AccountOrdersFilter {
   INCOMING
   OUTGOING
+}
+
+"""
+Expected funds filter (ALL_EXPECTED_FUNDS, ONLY_PENDING, ONLY_MANUAL)
+"""
+enum ExpectedFundsFilter {
+  ALL_EXPECTED_FUNDS
+  ONLY_PENDING
+  ONLY_MANUAL
 }
 
 """
@@ -3888,6 +4331,26 @@ The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://
 scalar JSON
 
 """
+Defines role of the last comment author
+"""
+enum LastCommentBy {
+  """
+  Expense Submitter
+  """
+  USER
+
+  """
+  Fiscal Host Admin
+  """
+  HOST_ADMIN
+
+  """
+  Collective Admin
+  """
+  COLLECTIVE_ADMIN
+}
+
+"""
 A collection of "Conversations"
 """
 type ConversationCollection implements Collection {
@@ -4149,6 +4612,16 @@ type PaymentMethod {
     dateTo: DateTime
 
     """
+    Only return pending orders that were expected after this date
+    """
+    expectedDateFrom: DateTime
+
+    """
+    Only return pending orders that were expected before this date
+    """
+    expectedDateTo: DateTime
+
+    """
     The term to search
     """
     searchTerm: String
@@ -4163,16 +4636,13 @@ type PaymentMethod {
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
-  ): OrderCollection
-}
+    expectedFundsFilter: ExpectedFundsFilter
 
-enum PaymentMethodService {
-  PAYPAL
-  STRIPE
-  OPENCOLLECTIVE
-  PREPAID
-  THEGIVINGBLOCK
-  WISE
+    """
+    Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
+    """
+    oppositeAccount: AccountReferenceInput
+  ): OrderCollection
 }
 
 enum PaymentMethodLegacyType {
@@ -4616,6 +5086,22 @@ type AccountStats {
     """
     frequency: ContributionFrequency! = MONTHLY
   ): Amount
+    @deprecated(reason: "2024-03-04: Use activeRecurringContributionsBreakdown while we migrate to better semantics.")
+
+  """
+  Returns some statistics about active recurring contributions, broken down by frequency
+  """
+  activeRecurringContributionsBreakdown(
+    """
+    Return only the stats for this frequency
+    """
+    frequency: ContributionFrequency
+
+    """
+    Include contributions to children accounts (Projects and Events)
+    """
+    includeChildren: Boolean = false
+  ): [AmountStats!]!
 
   """
   Returns expense tags for collective sorted by popularity
@@ -4792,6 +5278,7 @@ enum TimeUnit {
   DAY
   WEEK
   MONTH
+  QUARTER
   YEAR
 }
 
@@ -5153,6 +5640,11 @@ type AccountPermissions {
   Whether the current user can contact this account
   """
   contact: Permission!
+
+  """
+  Whether the current user can download this account's payment receipts
+  """
+  canDownloadPaymentReceipts: Permission!
 }
 
 type Permission {
@@ -5279,6 +5771,8 @@ enum ActivityType {
   COLLECTIVE_EXPENSE_RECURRING_DRAFTED
   COLLECTIVE_EXPENSE_MISSING_RECEIPT
   TAXFORM_REQUEST
+  TAXFORM_RECEIVED
+  TAXFORM_INVALIDATED
   COLLECTIVE_VIRTUAL_CARD_ADDED
   COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS
   COLLECTIVE_VIRTUAL_CARD_RESUMED
@@ -5298,6 +5792,7 @@ enum ActivityType {
   COLLECTIVE_CORE_MEMBER_REMOVED
   COLLECTIVE_CORE_MEMBER_EDITED
   COLLECTIVE_TRANSACTION_CREATED
+  TRANSACTIONS_IMPORT_CREATED
   COLLECTIVE_UPDATE_CREATED
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
@@ -5305,6 +5800,9 @@ enum ActivityType {
   CONTRIBUTION_REJECTED
   SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CANCELED
+  SUBSCRIPTION_PAUSED
+  SUBSCRIPTION_RESUMED
+  SUBSCRIPTION_READY_TO_BE_RESUMED
   TICKET_CONFIRMED
   ORDER_CANCELED_ARCHIVED_COLLECTIVE
   ORDER_PENDING
@@ -5312,6 +5810,10 @@ enum ActivityType {
   ORDER_PENDING_CONTRIBUTION_REMINDER
   ORDER_PROCESSING
   ORDER_PAYMENT_FAILED
+  ORDER_REVIEW_OPENED
+  ORDER_REVIEW_CLOSED
+  ORDER_DISPUTE_CREATED
+  ORDER_DISPUTE_CLOSED
   ORDER_THANKYOU
   ORDER_UPDATED
   VENDOR_CREATED
@@ -5320,6 +5822,7 @@ enum ActivityType {
   ORDER_PENDING_CREATED
   ORDER_PENDING_FOLLOWUP
   ORDER_PENDING_RECEIVED
+  ORDER_PENDING_EXPIRED
   ORDERS_SUSPICIOUS
   PAYMENT_FAILED
   PAYMENT_CREDITCARD_CONFIRMATION
@@ -5365,6 +5868,55 @@ enum ActivityClassType {
   VIRTUAL_CARDS
   FUND_EVENTS
   REPORTS
+}
+
+"""
+EXPERIMENTAL (this may change or be deleted): Host transaction report
+"""
+type TransactionReports {
+  """
+  The start date of the time series
+  """
+  dateFrom: DateTime
+
+  """
+  The end date of the time series
+  """
+  dateTo: DateTime
+
+  """
+  The interval between two data points
+  """
+  timeUnit: TimeUnit!
+  nodes: [TransactionReport!]
+}
+
+"""
+EXPERIMENTAL (this may change or be deleted)
+"""
+type TransactionReport {
+  date: DateTime
+  startingBalance: Amount!
+  endingBalance: Amount!
+  totalChange: Amount!
+  groups: [TransactionsAmountGroup]!
+}
+
+"""
+EXPERIMENTAL (this may change or be deleted): Transaction amounts grouped by type, kind, isRefund, isHost, expenseType
+"""
+type TransactionsAmountGroup {
+  netAmount: Amount
+  amount: Amount
+  platformFee: Amount
+  paymentProcessorFee: Amount
+  hostFee: Amount
+  taxAmount: Amount
+  type: TransactionType
+  kind: TransactionKind
+  isRefund: Boolean
+  isHost: Boolean
+  expenseType: ExpenseType
 }
 
 """
@@ -5486,6 +6038,33 @@ type HostPlan {
   Ability to collect Platform Tips.
   """
   platformTips: Boolean
+}
+
+"""
+EXPERIMENTAL (this may change or be deleted): Host transaction report
+"""
+type HostTransactionReports {
+  """
+  The start date of the time series
+  """
+  dateFrom: DateTime
+
+  """
+  The end date of the time series
+  """
+  dateTo: DateTime
+
+  """
+  The interval between two data points
+  """
+  timeUnit: TimeUnit!
+  nodes: [HostTransactionReportNode!]
+}
+
+type HostTransactionReportNode {
+  date: DateTime!
+  managedFunds: TransactionReport!
+  operationalFunds: TransactionReport!
 }
 
 """
@@ -5662,6 +6241,35 @@ type TimeSeriesAmountWithKindNode {
 }
 
 """
+EXPERIMENTAL (this may change or be deleted): Host expenses report
+"""
+type HostExpensesReports {
+  """
+  The start date of the time series
+  """
+  dateFrom: DateTime
+
+  """
+  The end date of the time series
+  """
+  dateTo: DateTime
+
+  """
+  The interval between two data points
+  """
+  timeUnit: TimeUnit!
+  nodes: [HostExpensesReportNode!]
+}
+
+type HostExpensesReportNode {
+  date: DateTime!
+  isHost: Boolean!
+  accountingCategory: AccountingCategory
+  amount: Amount!
+  count: Int!
+}
+
+"""
 Stripe connected account properties
 """
 type StripeConnectedAccount {
@@ -5688,9 +6296,19 @@ type HostApplication {
   account: Account!
 
   """
+  The host the collective applied to
+  """
+  host: Host!
+
+  """
   The date on which the item was created
   """
   createdAt: DateTime!
+
+  """
+  The date on which the item was updated
+  """
+  updatedAt: DateTime!
   status: HostApplicationStatus
   message: String
   customData: JSON
@@ -5873,6 +6491,215 @@ type VendorCollection implements Collection {
   nodes: [Vendor!]
 }
 
+"""
+A collection of hosted "Accounts"
+"""
+type HostedAccountCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Account]
+  currencies: [String]
+}
+
+"""
+Input type for an amount range with the value and currency
+"""
+input AmountRangeInput {
+  """
+  The minimum amount (inclusive)
+  """
+  gte: AmountInput
+
+  """
+  The maximum amount (inclusive)
+  """
+  lte: AmountInput
+}
+
+"""
+A collection of "LegalDocument"
+"""
+type LegalDocumentCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [LegalDocument]
+}
+
+"""
+A collection of "TransactionsImports"
+"""
+type TransactionsImportsCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [TransactionsImport!]
+}
+
+type TransactionsImport {
+  """
+  The public id of the import
+  """
+  id: String!
+
+  """
+  Account that holds the import
+  """
+  account: Account!
+
+  """
+  URL of the import (e.g. link to the CSV file)
+  """
+  file: FileInfo
+
+  """
+  Source of the import (e.g. "Bank of America", "Eventbrite", etc...)
+  """
+  source: NonEmptyString!
+
+  """
+  Name of the import (e.g. "Contributions May 2021", "Tickets for Mautic Conference 2024")
+  """
+  name: NonEmptyString!
+
+  """
+  Type of the import
+  """
+  type: TransactionsImportType!
+
+  """
+  Configuration for the CSV import
+  """
+  csvConfig: JSON
+
+  """
+  When the import was created
+  """
+  createdAt: DateTime!
+
+  """
+  When the import was last updated
+  """
+  updatedAt: DateTime!
+
+  """
+  List of rows in the import
+  """
+  rows: TransactionsImportRowCollection!
+  stats: TransactionsImportStats
+}
+
+"""
+A string that cannot be passed as an empty value
+"""
+scalar NonEmptyString
+
+"""
+Type of the import
+"""
+enum TransactionsImportType {
+  CSV
+  MANUAL
+}
+
+"""
+A collection of "TransactionsImportRow"
+"""
+type TransactionsImportRowCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [TransactionsImportRow!]
+}
+
+"""
+A row in a transactions import
+"""
+type TransactionsImportRow {
+  """
+  The public id of the imported row
+  """
+  id: String!
+
+  """
+  The source id of the row
+  """
+  sourceId: NonEmptyString!
+
+  """
+  Whether the row has been dismissed
+  """
+  isDismissed: Boolean!
+
+  """
+  The description of the row
+  """
+  description: String!
+
+  """
+  The date of the row
+  """
+  date: DateTime!
+
+  """
+  The amount of the row
+  """
+  amount: Amount!
+
+  """
+  The expense associated with the row
+  """
+  expense: Expense
+
+  """
+  The raw data of the row
+  """
+  rawValue: JSONObject
+
+  """
+  The order associated with the row
+  """
+  order: Order
+}
+
+"""
+The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSONObject
+
+type TransactionsImportStats {
+  """
+  Total number of rows in the import
+  """
+  total: Int!
+
+  """
+  Number of rows that have been ignored
+  """
+  ignored: Int!
+
+  """
+  Number of rows that have been converted to expenses
+  """
+  expenses: Int!
+
+  """
+  Number of rows that have been converted to orders
+  """
+  orders: Int!
+
+  """
+  Number of rows that have been processed (either dismissed or converted to expenses or orders)
+  """
+  processed: Int!
+}
+
+enum AccountingCategoryAppliesTo {
+  HOST
+  HOSTED_COLLECTIVES
+}
+
 type ExpenseValuesByRole {
   id: NonEmptyString!
 
@@ -5891,11 +6718,6 @@ type ExpenseValuesByRole {
   """
   hostAdmin: ExpenseValuesRoleDetails
 }
-
-"""
-A string that cannot be passed as an empty value
-"""
-scalar NonEmptyString
 
 type ExpenseValuesRoleDetails {
   accountingCategory: AccountingCategory
@@ -6113,6 +6935,7 @@ type ExpensePermissions {
   canUsePrivateNote: Boolean!
   canHold: Boolean!
   canRelease: Boolean!
+  canDownloadTaxForm: Boolean!
   edit: Permission!
 
   """
@@ -6134,16 +6957,7 @@ type ExpensePermissions {
   verifyDraftExpense: Permission!
   hold: Permission!
   release: Permission!
-}
-
-"""
-Type for a required legal document
-"""
-enum LegalDocumentType {
-  """
-  US tax form (W9)
-  """
-  US_TAX_FORM
+  downloadTaxForm: Permission!
 }
 
 """
@@ -6349,6 +7163,11 @@ type OrderPermissions {
   Whether the current user can update the accounting category of this order
   """
   canUpdateAccountingCategory: Boolean!
+
+  """
+  If paused, whether the current user can resume this order
+  """
+  canResume: Boolean!
 }
 
 """
@@ -6470,11 +7289,6 @@ type Bot implements Account {
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
-
-  """
-  Returns whether this account has a custom image
-  """
-  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -6549,6 +7363,16 @@ type Bot implements Account {
     """
     role: [MemberRole]
   ): [MemberInvitation]
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -6621,6 +7445,16 @@ type Bot implements Account {
     The payment method types. Can include `null` for transactions without a payment method
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    The payment method services.
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Reference of the account(s) assigned to the main side of the transaction you want to EXCLUDE from the results
+    """
+    excludeAccount: [AccountReferenceInput]
 
     """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
@@ -6740,8 +7574,23 @@ type Bot implements Account {
     """
     The transactions group to filter by
     """
-    group: String
+    group: [String]
     virtualCard: [VirtualCardReferenceInput]
+
+    """
+    Only return transactions that are refunds (or not refunds if false)
+    """
+    isRefund: Boolean
+
+    """
+    Only return transactions that are associated with these external merchant IDs
+    """
+    merchantId: [String]
+
+    """
+    Only return transactions that are associated with these accounting categories
+    """
+    accountingCategory: [String]
   ): TransactionCollection!
   orders(
     """
@@ -6810,6 +7659,16 @@ type Bot implements Account {
     dateTo: DateTime
 
     """
+    Only return pending orders that were expected after this date
+    """
+    expectedDateFrom: DateTime
+
+    """
+    Only return pending orders that were expected before this date
+    """
+    expectedDateTo: DateTime
+
+    """
     The term to search
     """
     searchTerm: String
@@ -6824,6 +7683,12 @@ type Bot implements Account {
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
+    expectedFundsFilter: ExpectedFundsFilter
+
+    """
+    Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
+    """
+    oppositeAccount: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -6861,12 +7726,13 @@ type Bot implements Account {
     """
     Use this field to filter expenses on their statuses
     """
-    status: ExpenseStatusFilter
+    status: [ExpenseStatusFilter]
 
     """
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -6932,6 +7798,16 @@ type Bot implements Account {
     Filter expenses of type charges using these virtual cards
     """
     virtualCards: [VirtualCardReferenceInput]
+
+    """
+    Filter expenses by the last user-role who replied to them
+    """
+    lastCommentBy: [LastCommentBy]
+
+    """
+    Only return expenses that match these accounting categories
+    """
+    accountingCategory: [String]
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -7029,6 +7905,7 @@ type Bot implements Account {
     Only return published updates.
     """
     onlyPublishedUpdates: Boolean = false
+    isDraft: Boolean
     onlyChangelogUpdates: Boolean
     orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
@@ -7065,7 +7942,12 @@ type Bot implements Account {
   Virtual Cards Merchants used by the account. Admin only. Scope: "virtualCards".
   """
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection
-  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
+  childrenAccounts(
+    limit: Int! = 100
+    offset: Int! = 0
+    isActive: Boolean
+    accountType: [AccountType]
+  ): AccountCollection!
 
   """
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
@@ -7097,6 +7979,21 @@ type Bot implements Account {
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromAccount: Account
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -7149,11 +8046,6 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
-
-  """
-  Returns whether this account has a custom image
-  """
-  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -7228,6 +8120,16 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     role: [MemberRole]
   ): [MemberInvitation]
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -7300,6 +8202,16 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     The payment method types. Can include `null` for transactions without a payment method
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    The payment method services.
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Reference of the account(s) assigned to the main side of the transaction you want to EXCLUDE from the results
+    """
+    excludeAccount: [AccountReferenceInput]
 
     """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
@@ -7419,8 +8331,23 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     The transactions group to filter by
     """
-    group: String
+    group: [String]
     virtualCard: [VirtualCardReferenceInput]
+
+    """
+    Only return transactions that are refunds (or not refunds if false)
+    """
+    isRefund: Boolean
+
+    """
+    Only return transactions that are associated with these external merchant IDs
+    """
+    merchantId: [String]
+
+    """
+    Only return transactions that are associated with these accounting categories
+    """
+    accountingCategory: [String]
   ): TransactionCollection!
   orders(
     """
@@ -7489,6 +8416,16 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     dateTo: DateTime
 
     """
+    Only return pending orders that were expected after this date
+    """
+    expectedDateFrom: DateTime
+
+    """
+    Only return pending orders that were expected before this date
+    """
+    expectedDateTo: DateTime
+
+    """
     The term to search
     """
     searchTerm: String
@@ -7503,6 +8440,12 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
+    expectedFundsFilter: ExpectedFundsFilter
+
+    """
+    Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
+    """
+    oppositeAccount: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -7540,12 +8483,13 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     Use this field to filter expenses on their statuses
     """
-    status: ExpenseStatusFilter
+    status: [ExpenseStatusFilter]
 
     """
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -7611,6 +8555,16 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Filter expenses of type charges using these virtual cards
     """
     virtualCards: [VirtualCardReferenceInput]
+
+    """
+    Filter expenses by the last user-role who replied to them
+    """
+    lastCommentBy: [LastCommentBy]
+
+    """
+    Only return expenses that match these accounting categories
+    """
+    accountingCategory: [String]
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -7708,6 +8662,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Only return published updates.
     """
     onlyPublishedUpdates: Boolean = false
+    isDraft: Boolean
     onlyChangelogUpdates: Boolean
     orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
@@ -7744,7 +8699,12 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Virtual Cards Merchants used by the account. Admin only. Scope: "virtualCards".
   """
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection
-  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
+  childrenAccounts(
+    limit: Int! = 100
+    offset: Int! = 0
+    isActive: Boolean
+    accountType: [AccountType]
+  ): AccountCollection!
 
   """
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
@@ -7776,6 +8736,21 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromAccount: Account
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -7803,6 +8778,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Fees percentage that the host takes for this collective
   """
   hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
+
+  """
+  Returns the Fiscal Host application
+  """
+  hostApplication: HostApplication
 
   """
   How much platform fees are charged for this account
@@ -7876,6 +8856,16 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
+
+  """
+  Returns true if the remote user can start the process to resume contributions for account
+  """
+  canStartResumeContributionsProcess: Boolean!
+
+  """
+  Returns true if the account has started the process to resume contributions
+  """
+  hasResumeContributionsProcessStarted: Boolean!
 }
 
 """
@@ -7896,6 +8886,11 @@ interface AccountWithHost {
   Fees percentage that the host takes for this collective
   """
   hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
+
+  """
+  Returns the Fiscal Host application
+  """
+  hostApplication: HostApplication
 
   """
   Fees percentage that the platform takes for this collective
@@ -8021,6 +9016,7 @@ type Credit implements Transaction {
     """
     fetchPaymentProcessorFee: Boolean = false
   ): Amount!
+  paymentProcessorUrl: String
   host: Account
 
   """
@@ -8070,7 +9066,7 @@ type Credit implements Transaction {
   ): [Transaction]!
 
   """
-  Merchant id related to the Transaction (Stripe, PayPal, Wise, Privacy)
+  Merchant ID related to the Transaction (Stripe, PayPal, Wise, Privacy)
   """
   merchantId: String
   balanceInHostCurrency: Amount
@@ -8165,6 +9161,7 @@ type Debit implements Transaction {
     """
     fetchPaymentProcessorFee: Boolean = false
   ): Amount!
+  paymentProcessorUrl: String
   host: Account
 
   """
@@ -8214,7 +9211,7 @@ type Debit implements Transaction {
   ): [Transaction]!
 
   """
-  Merchant id related to the Transaction (Stripe, PayPal, Wise, Privacy)
+  Merchant ID related to the Transaction (Stripe, PayPal, Wise, Privacy)
   """
   merchantId: String
   balanceInHostCurrency: Amount
@@ -8259,11 +9256,6 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
-
-  """
-  Returns whether this account has a custom image
-  """
-  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -8338,6 +9330,16 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     role: [MemberRole]
   ): [MemberInvitation]
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -8410,6 +9412,16 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     The payment method types. Can include `null` for transactions without a payment method
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    The payment method services.
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Reference of the account(s) assigned to the main side of the transaction you want to EXCLUDE from the results
+    """
+    excludeAccount: [AccountReferenceInput]
 
     """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
@@ -8529,8 +9541,23 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     The transactions group to filter by
     """
-    group: String
+    group: [String]
     virtualCard: [VirtualCardReferenceInput]
+
+    """
+    Only return transactions that are refunds (or not refunds if false)
+    """
+    isRefund: Boolean
+
+    """
+    Only return transactions that are associated with these external merchant IDs
+    """
+    merchantId: [String]
+
+    """
+    Only return transactions that are associated with these accounting categories
+    """
+    accountingCategory: [String]
   ): TransactionCollection!
   orders(
     """
@@ -8599,6 +9626,16 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     dateTo: DateTime
 
     """
+    Only return pending orders that were expected after this date
+    """
+    expectedDateFrom: DateTime
+
+    """
+    Only return pending orders that were expected before this date
+    """
+    expectedDateTo: DateTime
+
+    """
     The term to search
     """
     searchTerm: String
@@ -8613,6 +9650,12 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
+    expectedFundsFilter: ExpectedFundsFilter
+
+    """
+    Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
+    """
+    oppositeAccount: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -8650,12 +9693,13 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     Use this field to filter expenses on their statuses
     """
-    status: ExpenseStatusFilter
+    status: [ExpenseStatusFilter]
 
     """
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -8721,6 +9765,16 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Filter expenses of type charges using these virtual cards
     """
     virtualCards: [VirtualCardReferenceInput]
+
+    """
+    Filter expenses by the last user-role who replied to them
+    """
+    lastCommentBy: [LastCommentBy]
+
+    """
+    Only return expenses that match these accounting categories
+    """
+    accountingCategory: [String]
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -8818,6 +9872,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Only return published updates.
     """
     onlyPublishedUpdates: Boolean = false
+    isDraft: Boolean
     onlyChangelogUpdates: Boolean
     orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
@@ -8854,7 +9909,12 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   Virtual Cards Merchants used by the account. Admin only. Scope: "virtualCards".
   """
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection
-  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
+  childrenAccounts(
+    limit: Int! = 100
+    offset: Int! = 0
+    isActive: Boolean
+    accountType: [AccountType]
+  ): AccountCollection!
 
   """
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
@@ -8886,6 +9946,21 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromAccount: Account
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -8913,6 +9988,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   Fees percentage that the host takes for this collective
   """
   hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
+
+  """
+  Returns the Fiscal Host application
+  """
+  hostApplication: HostApplication
 
   """
   How much platform fees are charged for this account
@@ -8986,6 +10066,16 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
+
+  """
+  Returns true if the remote user can start the process to resume contributions for account
+  """
+  canStartResumeContributionsProcess: Boolean!
+
+  """
+  Returns true if the account has started the process to resume contributions
+  """
+  hasResumeContributionsProcessStarted: Boolean!
 
   """
   The Account parenting this account
@@ -9158,11 +10248,6 @@ type Individual implements Account {
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
-
-  """
-  Returns whether this account has a custom image
-  """
-  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -9237,6 +10322,16 @@ type Individual implements Account {
     """
     role: [MemberRole]
   ): [MemberInvitation]
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -9309,6 +10404,16 @@ type Individual implements Account {
     The payment method types. Can include `null` for transactions without a payment method
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    The payment method services.
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Reference of the account(s) assigned to the main side of the transaction you want to EXCLUDE from the results
+    """
+    excludeAccount: [AccountReferenceInput]
 
     """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
@@ -9428,8 +10533,23 @@ type Individual implements Account {
     """
     The transactions group to filter by
     """
-    group: String
+    group: [String]
     virtualCard: [VirtualCardReferenceInput]
+
+    """
+    Only return transactions that are refunds (or not refunds if false)
+    """
+    isRefund: Boolean
+
+    """
+    Only return transactions that are associated with these external merchant IDs
+    """
+    merchantId: [String]
+
+    """
+    Only return transactions that are associated with these accounting categories
+    """
+    accountingCategory: [String]
   ): TransactionCollection!
   orders(
     """
@@ -9498,6 +10618,16 @@ type Individual implements Account {
     dateTo: DateTime
 
     """
+    Only return pending orders that were expected after this date
+    """
+    expectedDateFrom: DateTime
+
+    """
+    Only return pending orders that were expected before this date
+    """
+    expectedDateTo: DateTime
+
+    """
     The term to search
     """
     searchTerm: String
@@ -9512,6 +10642,12 @@ type Individual implements Account {
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
+    expectedFundsFilter: ExpectedFundsFilter
+
+    """
+    Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
+    """
+    oppositeAccount: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -9549,12 +10685,13 @@ type Individual implements Account {
     """
     Use this field to filter expenses on their statuses
     """
-    status: ExpenseStatusFilter
+    status: [ExpenseStatusFilter]
 
     """
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -9620,6 +10757,16 @@ type Individual implements Account {
     Filter expenses of type charges using these virtual cards
     """
     virtualCards: [VirtualCardReferenceInput]
+
+    """
+    Filter expenses by the last user-role who replied to them
+    """
+    lastCommentBy: [LastCommentBy]
+
+    """
+    Only return expenses that match these accounting categories
+    """
+    accountingCategory: [String]
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -9715,6 +10862,7 @@ type Individual implements Account {
     Only return published updates.
     """
     onlyPublishedUpdates: Boolean = false
+    isDraft: Boolean
     onlyChangelogUpdates: Boolean
     orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
@@ -9751,7 +10899,12 @@ type Individual implements Account {
   Virtual Cards Merchants used by the account. Admin only. Scope: "virtualCards".
   """
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection
-  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
+  childrenAccounts(
+    limit: Int! = 100
+    offset: Int! = 0
+    isActive: Boolean
+    accountType: [AccountType]
+  ): AccountCollection!
 
   """
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
@@ -9783,6 +10936,21 @@ type Individual implements Account {
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromAccount: Account
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -10043,11 +11211,6 @@ type Organization implements Account & AccountWithContributions {
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
-
-  """
-  Returns whether this account has a custom image
-  """
-  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -10122,6 +11285,16 @@ type Organization implements Account & AccountWithContributions {
     """
     role: [MemberRole]
   ): [MemberInvitation]
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -10194,6 +11367,16 @@ type Organization implements Account & AccountWithContributions {
     The payment method types. Can include `null` for transactions without a payment method
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    The payment method services.
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Reference of the account(s) assigned to the main side of the transaction you want to EXCLUDE from the results
+    """
+    excludeAccount: [AccountReferenceInput]
 
     """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
@@ -10313,8 +11496,23 @@ type Organization implements Account & AccountWithContributions {
     """
     The transactions group to filter by
     """
-    group: String
+    group: [String]
     virtualCard: [VirtualCardReferenceInput]
+
+    """
+    Only return transactions that are refunds (or not refunds if false)
+    """
+    isRefund: Boolean
+
+    """
+    Only return transactions that are associated with these external merchant IDs
+    """
+    merchantId: [String]
+
+    """
+    Only return transactions that are associated with these accounting categories
+    """
+    accountingCategory: [String]
   ): TransactionCollection!
   orders(
     """
@@ -10383,6 +11581,16 @@ type Organization implements Account & AccountWithContributions {
     dateTo: DateTime
 
     """
+    Only return pending orders that were expected after this date
+    """
+    expectedDateFrom: DateTime
+
+    """
+    Only return pending orders that were expected before this date
+    """
+    expectedDateTo: DateTime
+
+    """
     The term to search
     """
     searchTerm: String
@@ -10397,6 +11605,12 @@ type Organization implements Account & AccountWithContributions {
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
+    expectedFundsFilter: ExpectedFundsFilter
+
+    """
+    Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
+    """
+    oppositeAccount: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -10434,12 +11648,13 @@ type Organization implements Account & AccountWithContributions {
     """
     Use this field to filter expenses on their statuses
     """
-    status: ExpenseStatusFilter
+    status: [ExpenseStatusFilter]
 
     """
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -10505,6 +11720,16 @@ type Organization implements Account & AccountWithContributions {
     Filter expenses of type charges using these virtual cards
     """
     virtualCards: [VirtualCardReferenceInput]
+
+    """
+    Filter expenses by the last user-role who replied to them
+    """
+    lastCommentBy: [LastCommentBy]
+
+    """
+    Only return expenses that match these accounting categories
+    """
+    accountingCategory: [String]
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -10600,6 +11825,7 @@ type Organization implements Account & AccountWithContributions {
     Only return published updates.
     """
     onlyPublishedUpdates: Boolean = false
+    isDraft: Boolean
     onlyChangelogUpdates: Boolean
     orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
@@ -10636,7 +11862,12 @@ type Organization implements Account & AccountWithContributions {
   Virtual Cards Merchants used by the account. Admin only. Scope: "virtualCards".
   """
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection
-  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
+  childrenAccounts(
+    limit: Int! = 100
+    offset: Int! = 0
+    isActive: Boolean
+    accountType: [AccountType]
+  ): AccountCollection!
 
   """
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
@@ -10668,6 +11899,21 @@ type Organization implements Account & AccountWithContributions {
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromAccount: Account
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -10728,6 +11974,16 @@ type Organization implements Account & AccountWithContributions {
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
+
+  """
+  Returns true if the remote user can start the process to resume contributions for account
+  """
+  canStartResumeContributionsProcess: Boolean!
+
+  """
+  Returns true if the account has started the process to resume contributions
+  """
+  hasResumeContributionsProcessStarted: Boolean!
   email: String @deprecated(reason: "2022-07-18: This field is deprecated and will return null")
 
   """
@@ -10770,11 +12026,6 @@ type TransferWise {
 }
 
 """
-The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
-"""
-scalar JSONObject
-
-"""
 This represents a Vendor account
 """
 type Vendor implements Account & AccountWithContributions {
@@ -10812,11 +12063,6 @@ type Vendor implements Account & AccountWithContributions {
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
-
-  """
-  Returns whether this account has a custom image
-  """
-  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -10891,6 +12137,16 @@ type Vendor implements Account & AccountWithContributions {
     """
     role: [MemberRole]
   ): [MemberInvitation]
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -10963,6 +12219,16 @@ type Vendor implements Account & AccountWithContributions {
     The payment method types. Can include `null` for transactions without a payment method
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    The payment method services.
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Reference of the account(s) assigned to the main side of the transaction you want to EXCLUDE from the results
+    """
+    excludeAccount: [AccountReferenceInput]
 
     """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
@@ -11082,8 +12348,23 @@ type Vendor implements Account & AccountWithContributions {
     """
     The transactions group to filter by
     """
-    group: String
+    group: [String]
     virtualCard: [VirtualCardReferenceInput]
+
+    """
+    Only return transactions that are refunds (or not refunds if false)
+    """
+    isRefund: Boolean
+
+    """
+    Only return transactions that are associated with these external merchant IDs
+    """
+    merchantId: [String]
+
+    """
+    Only return transactions that are associated with these accounting categories
+    """
+    accountingCategory: [String]
   ): TransactionCollection!
   orders(
     """
@@ -11152,6 +12433,16 @@ type Vendor implements Account & AccountWithContributions {
     dateTo: DateTime
 
     """
+    Only return pending orders that were expected after this date
+    """
+    expectedDateFrom: DateTime
+
+    """
+    Only return pending orders that were expected before this date
+    """
+    expectedDateTo: DateTime
+
+    """
     The term to search
     """
     searchTerm: String
@@ -11166,6 +12457,12 @@ type Vendor implements Account & AccountWithContributions {
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
+    expectedFundsFilter: ExpectedFundsFilter
+
+    """
+    Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
+    """
+    oppositeAccount: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -11203,12 +12500,13 @@ type Vendor implements Account & AccountWithContributions {
     """
     Use this field to filter expenses on their statuses
     """
-    status: ExpenseStatusFilter
+    status: [ExpenseStatusFilter]
 
     """
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -11274,6 +12572,16 @@ type Vendor implements Account & AccountWithContributions {
     Filter expenses of type charges using these virtual cards
     """
     virtualCards: [VirtualCardReferenceInput]
+
+    """
+    Filter expenses by the last user-role who replied to them
+    """
+    lastCommentBy: [LastCommentBy]
+
+    """
+    Only return expenses that match these accounting categories
+    """
+    accountingCategory: [String]
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -11371,6 +12679,7 @@ type Vendor implements Account & AccountWithContributions {
     Only return published updates.
     """
     onlyPublishedUpdates: Boolean = false
+    isDraft: Boolean
     onlyChangelogUpdates: Boolean
     orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
@@ -11407,7 +12716,12 @@ type Vendor implements Account & AccountWithContributions {
   Virtual Cards Merchants used by the account. Admin only. Scope: "virtualCards".
   """
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection
-  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
+  childrenAccounts(
+    limit: Int! = 100
+    offset: Int! = 0
+    isActive: Boolean
+    accountType: [AccountType]
+  ): AccountCollection!
 
   """
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
@@ -11439,6 +12753,21 @@ type Vendor implements Account & AccountWithContributions {
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromAccount: Account
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -11499,6 +12828,16 @@ type Vendor implements Account & AccountWithContributions {
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
+
+  """
+  Returns true if the remote user can start the process to resume contributions for account
+  """
+  canStartResumeContributionsProcess: Boolean!
+
+  """
+  Returns true if the account has started the process to resume contributions
+  """
+  hasResumeContributionsProcessStarted: Boolean!
   vendorInfo: VendorInfo
 
   """
@@ -11650,6 +12989,11 @@ type Query {
     includeArchived: Boolean
 
     """
+    Ignore individual accounts used to make contributions as guests
+    """
+    skipGuests: Boolean = true
+
+    """
     Only return "active" accounts with Financial Contributions enabled if true.
     """
     isActive: Boolean
@@ -11668,6 +13012,11 @@ type Query {
     Host hosting the account
     """
     host: [AccountReferenceInput]
+
+    """
+    Parent Collective hosting the account
+    """
+    parent: [AccountReferenceInput]
 
     """
     Only return accounts that match these account types (COLLECTIVE, FUND, EVENT, PROJECT, ORGANIZATION or INDIVIDUAL)
@@ -11693,6 +13042,11 @@ type Query {
     Include vendors for this host
     """
     includeVendorsForHost: AccountReferenceInput
+
+    """
+    Filter by the balance of the account and its children accounts (events and projects)
+    """
+    consolidatedBalance: AmountRangeInput
   ): AccountCollection!
   activities(
     """
@@ -11869,12 +13223,13 @@ type Query {
     """
     Use this field to filter expenses on their statuses
     """
-    status: ExpenseStatusFilter
+    status: [ExpenseStatusFilter]
 
     """
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -11940,6 +13295,16 @@ type Query {
     Filter expenses of type charges using these virtual cards
     """
     virtualCards: [VirtualCardReferenceInput]
+
+    """
+    Filter expenses by the last user-role who replied to them
+    """
+    lastCommentBy: [LastCommentBy]
+
+    """
+    Only return expenses that match these accounting categories
+    """
+    accountingCategory: [String]
   ): ExpenseCollection!
   expenseTagStats(
     """
@@ -12031,6 +13396,11 @@ type Query {
     Included collectives which are archived
     """
     includeArchived: Boolean
+
+    """
+    Ignore individual accounts used to make contributions as guests
+    """
+    skipGuests: Boolean = true
 
     """
     Only return "active" accounts with Financial Contributions enabled if true.
@@ -12172,6 +13542,16 @@ type Query {
     dateTo: DateTime
 
     """
+    Only return pending orders that were expected after this date
+    """
+    expectedDateFrom: DateTime
+
+    """
+    Only return pending orders that were expected before this date
+    """
+    expectedDateTo: DateTime
+
+    """
     The term to search
     """
     searchTerm: String
@@ -12186,6 +13566,12 @@ type Query {
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
+    expectedFundsFilter: ExpectedFundsFilter
+
+    """
+    Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
+    """
+    oppositeAccount: AccountReferenceInput
   ): OrderCollection!
   organization(
     """
@@ -12266,7 +13652,12 @@ type Query {
     """
     The public id identifying the transaction (ie: rvelja97-pkzqbgq7-bbzyx6wd-50o8n4rm)
     """
-    id: String
+    id: String @deprecated(reason: "2024-05-07: Please use the `transaction` field.")
+
+    """
+    Identifiers to retrieve the transaction.
+    """
+    transaction: TransactionReferenceInput
   ): Transaction
   transactions(
     """
@@ -12293,6 +13684,16 @@ type Query {
     The payment method types. Can include `null` for transactions without a payment method
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    The payment method services.
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Reference of the account(s) assigned to the main side of the transaction you want to EXCLUDE from the results
+    """
+    excludeAccount: [AccountReferenceInput]
 
     """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
@@ -12412,9 +13813,34 @@ type Query {
     """
     The transactions group to filter by
     """
-    group: String
+    group: [String]
     virtualCard: [VirtualCardReferenceInput]
+
+    """
+    Only return transactions that are refunds (or not refunds if false)
+    """
+    isRefund: Boolean
+
+    """
+    Only return transactions that are associated with these external merchant IDs
+    """
+    merchantId: [String]
+
+    """
+    Only return transactions that are associated with these accounting categories
+    """
+    accountingCategory: [String]
   ): TransactionCollection!
+
+  """
+  Fetch a transactions import
+  """
+  transactionsImport(
+    """
+    The public id identifying the import (ie: rvelja97-pkzqbgq7-bbzyx6wd-50o8n4rm)
+    """
+    id: String!
+  ): TransactionsImport
   update(
     """
     Public identifier
@@ -12468,6 +13894,11 @@ type Query {
     """
     amount: AmountInput!
     frequency: ContributionFrequency!
+
+    """
+    The order for which the plan is created, if any
+    """
+    order: OrderReferenceInput
 
     """
     The tier you are contributing to
@@ -13819,6 +15250,8 @@ enum ActivityAndClassesType {
   COLLECTIVE_EXPENSE_RECURRING_DRAFTED
   COLLECTIVE_EXPENSE_MISSING_RECEIPT
   TAXFORM_REQUEST
+  TAXFORM_RECEIVED
+  TAXFORM_INVALIDATED
   COLLECTIVE_VIRTUAL_CARD_ADDED
   COLLECTIVE_VIRTUAL_CARD_MISSING_RECEIPTS
   COLLECTIVE_VIRTUAL_CARD_RESUMED
@@ -13838,6 +15271,7 @@ enum ActivityAndClassesType {
   COLLECTIVE_CORE_MEMBER_REMOVED
   COLLECTIVE_CORE_MEMBER_EDITED
   COLLECTIVE_TRANSACTION_CREATED
+  TRANSACTIONS_IMPORT_CREATED
   COLLECTIVE_UPDATE_CREATED
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
@@ -13845,6 +15279,9 @@ enum ActivityAndClassesType {
   CONTRIBUTION_REJECTED
   SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CANCELED
+  SUBSCRIPTION_PAUSED
+  SUBSCRIPTION_RESUMED
+  SUBSCRIPTION_READY_TO_BE_RESUMED
   TICKET_CONFIRMED
   ORDER_CANCELED_ARCHIVED_COLLECTIVE
   ORDER_PENDING
@@ -13852,6 +15289,10 @@ enum ActivityAndClassesType {
   ORDER_PENDING_CONTRIBUTION_REMINDER
   ORDER_PROCESSING
   ORDER_PAYMENT_FAILED
+  ORDER_REVIEW_OPENED
+  ORDER_REVIEW_CLOSED
+  ORDER_DISPUTE_CREATED
+  ORDER_DISPUTE_CLOSED
   ORDER_THANKYOU
   ORDER_UPDATED
   VENDOR_CREATED
@@ -13860,6 +15301,7 @@ enum ActivityAndClassesType {
   ORDER_PENDING_CREATED
   ORDER_PENDING_FOLLOWUP
   ORDER_PENDING_RECEIVED
+  ORDER_PENDING_EXPIRED
   ORDERS_SUSPICIOUS
   PAYMENT_FAILED
   PAYMENT_CREDITCARD_CONFIRMATION
@@ -13972,11 +15414,6 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
-
-  """
-  Returns whether this account has a custom image
-  """
-  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -14051,6 +15488,16 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     role: [MemberRole]
   ): [MemberInvitation]
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -14123,6 +15570,16 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     The payment method types. Can include `null` for transactions without a payment method
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    The payment method services.
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Reference of the account(s) assigned to the main side of the transaction you want to EXCLUDE from the results
+    """
+    excludeAccount: [AccountReferenceInput]
 
     """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
@@ -14242,8 +15699,23 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     The transactions group to filter by
     """
-    group: String
+    group: [String]
     virtualCard: [VirtualCardReferenceInput]
+
+    """
+    Only return transactions that are refunds (or not refunds if false)
+    """
+    isRefund: Boolean
+
+    """
+    Only return transactions that are associated with these external merchant IDs
+    """
+    merchantId: [String]
+
+    """
+    Only return transactions that are associated with these accounting categories
+    """
+    accountingCategory: [String]
   ): TransactionCollection!
   orders(
     """
@@ -14312,6 +15784,16 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     dateTo: DateTime
 
     """
+    Only return pending orders that were expected after this date
+    """
+    expectedDateFrom: DateTime
+
+    """
+    Only return pending orders that were expected before this date
+    """
+    expectedDateTo: DateTime
+
+    """
     The term to search
     """
     searchTerm: String
@@ -14326,6 +15808,12 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
+    expectedFundsFilter: ExpectedFundsFilter
+
+    """
+    Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
+    """
+    oppositeAccount: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -14363,12 +15851,13 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     Use this field to filter expenses on their statuses
     """
-    status: ExpenseStatusFilter
+    status: [ExpenseStatusFilter]
 
     """
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -14434,6 +15923,16 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Filter expenses of type charges using these virtual cards
     """
     virtualCards: [VirtualCardReferenceInput]
+
+    """
+    Filter expenses by the last user-role who replied to them
+    """
+    lastCommentBy: [LastCommentBy]
+
+    """
+    Only return expenses that match these accounting categories
+    """
+    accountingCategory: [String]
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -14531,6 +16030,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Only return published updates.
     """
     onlyPublishedUpdates: Boolean = false
+    isDraft: Boolean
     onlyChangelogUpdates: Boolean
     orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
@@ -14567,7 +16067,12 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   Virtual Cards Merchants used by the account. Admin only. Scope: "virtualCards".
   """
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection
-  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
+  childrenAccounts(
+    limit: Int! = 100
+    offset: Int! = 0
+    isActive: Boolean
+    accountType: [AccountType]
+  ): AccountCollection!
 
   """
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
@@ -14599,6 +16104,21 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromAccount: Account
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -14626,6 +16146,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   Fees percentage that the host takes for this collective
   """
   hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
+
+  """
+  Returns the Fiscal Host application
+  """
+  hostApplication: HostApplication
 
   """
   How much platform fees are charged for this account
@@ -14699,6 +16224,16 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   """
   platformContributionAvailable: Boolean!
   contributionPolicy: String
+
+  """
+  Returns true if the remote user can start the process to resume contributions for account
+  """
+  canStartResumeContributionsProcess: Boolean!
+
+  """
+  Returns true if the account has started the process to resume contributions
+  """
+  hasResumeContributionsProcessStarted: Boolean!
 }
 
 """
@@ -14749,11 +16284,6 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   """
   isIncognito: Boolean!
   imageUrl(height: Int, format: ImageFormat): String
-
-  """
-  Returns whether this account has a custom image
-  """
-  hasImage: Boolean!
   backgroundImageUrl(height: Int, format: ImageFormat): String
 
   """
@@ -14828,6 +16358,16 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     role: [MemberRole]
   ): [MemberInvitation]
+
+  """
+  The legal documents associated with this account
+  """
+  legalDocuments(
+    """
+    Filter by type
+    """
+    type: [LegalDocumentType]
+  ): [LegalDocument]
   memberOf(
     limit: Int! = 150
     offset: Int! = 0
@@ -14900,6 +16440,16 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     The payment method types. Can include `null` for transactions without a payment method
     """
     paymentMethodType: [PaymentMethodType]
+
+    """
+    The payment method services.
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Reference of the account(s) assigned to the main side of the transaction you want to EXCLUDE from the results
+    """
+    excludeAccount: [AccountReferenceInput]
 
     """
     Reference of the account assigned to the other side of the transaction (CREDIT -> sender, DEBIT -> recipient). Avoid, favor account instead.
@@ -15019,8 +16569,23 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     The transactions group to filter by
     """
-    group: String
+    group: [String]
     virtualCard: [VirtualCardReferenceInput]
+
+    """
+    Only return transactions that are refunds (or not refunds if false)
+    """
+    isRefund: Boolean
+
+    """
+    Only return transactions that are associated with these external merchant IDs
+    """
+    merchantId: [String]
+
+    """
+    Only return transactions that are associated with these accounting categories
+    """
+    accountingCategory: [String]
   ): TransactionCollection!
   orders(
     """
@@ -15089,6 +16654,16 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     dateTo: DateTime
 
     """
+    Only return pending orders that were expected after this date
+    """
+    expectedDateFrom: DateTime
+
+    """
+    Only return pending orders that were expected before this date
+    """
+    expectedDateTo: DateTime
+
+    """
     The term to search
     """
     searchTerm: String
@@ -15103,6 +16678,12 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Same as onlySubscriptions, but returns only orders with active subscriptions
     """
     onlyActiveSubscriptions: Boolean
+    expectedFundsFilter: ExpectedFundsFilter
+
+    """
+    Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
+    """
+    oppositeAccount: AccountReferenceInput
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -15140,12 +16721,13 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     Use this field to filter expenses on their statuses
     """
-    status: ExpenseStatusFilter
+    status: [ExpenseStatusFilter]
 
     """
     Use this field to filter expenses on their type (RECEIPT/INVOICE)
     """
     type: ExpenseType
+    types: [ExpenseType]
 
     """
     Only expenses that match these tags
@@ -15211,6 +16793,16 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Filter expenses of type charges using these virtual cards
     """
     virtualCards: [VirtualCardReferenceInput]
+
+    """
+    Filter expenses by the last user-role who replied to them
+    """
+    lastCommentBy: [LastCommentBy]
+
+    """
+    Only return expenses that match these accounting categories
+    """
+    accountingCategory: [String]
   ): ExpenseCollection!
   settings: JSON!
   conversations(
@@ -15308,6 +16900,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Only return published updates.
     """
     onlyPublishedUpdates: Boolean = false
+    isDraft: Boolean
     onlyChangelogUpdates: Boolean
     orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
     searchTerm: String
@@ -15344,7 +16937,12 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   Virtual Cards Merchants used by the account. Admin only. Scope: "virtualCards".
   """
   virtualCardMerchants(limit: Int! = 100, offset: Int! = 0): AccountCollection
-  childrenAccounts(limit: Int! = 100, offset: Int! = 0, accountType: [AccountType]): AccountCollection!
+  childrenAccounts(
+    limit: Int! = 100
+    offset: Int! = 0
+    isActive: Boolean
+    accountType: [AccountType]
+  ): AccountCollection!
 
   """
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
@@ -15376,6 +16974,21 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     classes: [ActivityClassType]
   ): [Activity]
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromAccount: Account
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  EXPERIMENTAL (this may change or be removed)
+  """
+  transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
   webhooks(
     """
     The number of results to fetch (default 10, max 1000)
@@ -15403,6 +17016,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   Fees percentage that the host takes for this collective
   """
   hostFeePercent(paymentMethodService: PaymentMethodService, paymentMethodType: PaymentMethodType): Float
+
+  """
+  Returns the Fiscal Host application
+  """
+  hostApplication: HostApplication
 
   """
   How much platform fees are charged for this account
@@ -15478,6 +17096,16 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   contributionPolicy: String
 
   """
+  Returns true if the remote user can start the process to resume contributions for account
+  """
+  canStartResumeContributionsProcess: Boolean!
+
+  """
+  Returns true if the account has started the process to resume contributions
+  """
+  hasResumeContributionsProcessStarted: Boolean!
+
+  """
   The Account parenting this account
   """
   parent: Account
@@ -15498,6 +17126,18 @@ input TierReferenceInput {
   Pass this flag to reference the custom tier (/donate)
   """
   isCustom: Boolean
+}
+
+input TransactionReferenceInput {
+  """
+  The public id identifying the transaction (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The internal id of the transaction (ie: 580)
+  """
+  legacyId: Int
 }
 
 """
@@ -15546,9 +17186,14 @@ type Mutation {
     tier: TierReferenceInput
 
     """
-    The total amount of the order, including taxes
+    The total amount of the order, including fees and taxes
     """
     amount: AmountInput!
+
+    """
+    The payment processor fee amount
+    """
+    paymentProcessorFee: AmountInput
 
     """
     The host fee percent to apply to the order, as a float between 0 and 100
@@ -15584,6 +17229,11 @@ type Mutation {
     The accounting category of this order
     """
     accountingCategory: AccountingCategoryReferenceInput
+
+    """
+    The transaction import row to associate with this order
+    """
+    transactionsImportRow: TransactionsImportRowReferenceInput
   ): Order!
 
   """
@@ -15695,6 +17345,41 @@ type Mutation {
     """
     parent: AccountReferenceInput
   ): Project
+
+  """
+  Duplicate an account. Scope: "account".
+  """
+  duplicateAccount(
+    """
+    Account to duplicate
+    """
+    account: AccountReferenceInput!
+
+    """
+    The new slug for the duplicated account. Defaults to an autogenerated slug
+    """
+    newSlug: String
+
+    """
+    The new name for the duplicated account. Defaults to the same as the original account
+    """
+    newName: String
+
+    """
+    Use this if you want to rename the original account
+    """
+    oldName: String
+
+    """
+    Which data should be copied when duplicating the account
+    """
+    include: DuplicateAccountDataTypeInput
+
+    """
+    Whether to mark both accounts as connected
+    """
+    connect: Boolean! = false
+  ): Account!
 
   """
   Edit the settings for the given account. Scope: "account" or "host".
@@ -16045,6 +17730,11 @@ type Mutation {
     Recurring Expense information
     """
     recurring: RecurringExpenseInput
+
+    """
+    If the expense was imported, this is the reference to the row
+    """
+    transactionsImportRow: TransactionsImportRowReferenceInput
   ): Expense!
 
   """
@@ -16210,7 +17900,21 @@ type Mutation {
     The account to unhost
     """
     account: AccountReferenceInput!
+
+    """
+    An optional HTML message to provide additional context to the action
+    """
     message: String
+
+    """
+    An optional HTML message to provide additional context for contributors
+    """
+    messageForContributors: String
+
+    """
+    If true, contributions will be paused rather than canceled
+    """
+    pauseContributions: Boolean! = true
   ): Account!
 
   """
@@ -16237,6 +17941,66 @@ type Mutation {
     """
     currentPassword: String
   ): SetPasswordResponse!
+
+  """
+  Confirm email for Individual. Scope: "account".
+  """
+  confirmEmail(
+    """
+    The token to confirm the email.
+    """
+    token: NonEmptyString!
+  ): IndividualConfirmEmailResponse!
+
+  """
+  Submit a legal document
+  """
+  submitLegalDocument(
+    """
+    The account the legal document is for
+    """
+    account: AccountReferenceInput!
+
+    """
+    The type of legal document
+    """
+    type: LegalDocumentType!
+
+    """
+    The form data for the legal document. Will be validated against the schema for the document type and encrypted.
+    """
+    formData: JSON!
+  ): LegalDocument!
+
+  """
+  Edit the status of a legal document
+  """
+  editLegalDocumentStatus(
+    """
+    The ID of the legal document
+    """
+    id: String!
+
+    """
+    The new status of the legal document
+    """
+    status: LegalDocumentRequestStatus!
+
+    """
+    The host of the legal document
+    """
+    host: AccountReferenceInput!
+
+    """
+    A message to explain the change in status. Will be sent to the legal document submitter
+    """
+    message: String
+
+    """
+    The new document link for the legal document. Must pass status=RECEIVED.
+    """
+    file: Upload
+  ): LegalDocument!
 
   """
   Invite a new member to the Collective. Scope: "account".
@@ -16497,7 +18261,17 @@ type Mutation {
   """
   A mutation for the host to approve or reject an order. Scope: "orders".
   """
-  processPendingOrder(order: OrderUpdateInput!, action: ProcessOrderAction!): Order!
+  processPendingOrder(
+    """
+    The order to process
+    """
+    order: OrderUpdateInput!
+
+    """
+    The action to take on the order
+    """
+    action: ProcessOrderAction!
+  ): Order!
 
   """
   [Root only] A mutation to move orders from one account to another
@@ -16538,6 +18312,21 @@ type Mutation {
   To edit a pending order. Scope: "orders".
   """
   editPendingOrder(order: PendingOrderEditInput!): Order!
+
+  """
+  Starts or resumes the process of notifying contributors for their PAUSED contributions
+  """
+  startResumeOrdersProcess(
+    """
+    The account to start/resume the process for
+    """
+    account: AccountReferenceInput!
+
+    """
+    An optional message to send to contributors
+    """
+    message: String
+  ): Account!
 
   """
   Add a new payment method to be used with an Order. Scope: "orders".
@@ -16705,26 +18494,6 @@ type Mutation {
   ): [Expense]!
 
   """
-  [Root only] A mutation to set the tax from for an account.
-  """
-  setTaxForm(
-    """
-    Reference to the Account the tax form should be set.
-    """
-    account: AccountReferenceInput!
-
-    """
-    The tax from link.
-    """
-    taxFormLink: URL!
-
-    """
-    The tax form year.
-    """
-    year: Int!
-  ): SetTaxFormResult
-
-  """
   Refunds a transaction. Scope: "transactions".
   """
   refundTransaction(
@@ -16748,6 +18517,71 @@ type Mutation {
     """
     message: String
   ): Transaction!
+
+  """
+  Create a new import. To manually add transactions to it, use `importTransactions`.
+  """
+  createTransactionsImport(
+    """
+    Account that will hold the import (usually the host)
+    """
+    account: AccountReferenceInput!
+
+    """
+    Source of the import (e.g. "Bank of America", "Eventbrite", etc...)
+    """
+    source: NonEmptyString!
+
+    """
+    Name of the import (e.g. "Contributions May 2021", "Tickets for Mautic Conference 2024")
+    """
+    name: NonEmptyString!
+
+    """
+    Type of the import
+    """
+    type: TransactionsImportType!
+  ): TransactionsImport!
+
+  """
+  Import transactions, manually or from a CSV file
+  """
+  importTransactions(
+    """
+    ID of the import to add transactions to
+    """
+    id: NonEmptyString!
+
+    """
+    Raw file from which the data was extracted
+    """
+    file: Upload
+
+    """
+    Configuration of the CSV file
+    """
+    csvConfig: JSONObject
+
+    """
+    Data to import
+    """
+    data: [TransactionsImportRowCreateInput!]!
+  ): TransactionsImport!
+
+  """
+  Update transactions import rows to set new values or mark them as dismissed
+  """
+  updateTransactionsImportRows(
+    """
+    ID of the import to add transactions to
+    """
+    id: NonEmptyString!
+
+    """
+    Rows to update
+    """
+    rows: [TransactionsImportRowUpdateInput!]!
+  ): TransactionsImport!
 
   """
   Create update. Scope: "updates".
@@ -17207,6 +19041,13 @@ input AccountingCategoryReferenceInput {
   id: NonEmptyString!
 }
 
+input TransactionsImportRowReferenceInput {
+  """
+  The id of the row
+  """
+  id: NonEmptyString!
+}
+
 input CollectiveCreateInput {
   name: String!
   slug: String!
@@ -17326,6 +19167,16 @@ input ProjectCreateInput {
 }
 
 """
+Which data should be copied when duplicating the account
+"""
+input DuplicateAccountDataTypeInput {
+  admins: Boolean! = false
+  tiers: Boolean! = false
+  projects: Boolean! = false
+  events: Boolean! = false
+}
+
+"""
 Values that can be edited in Account's settings
 """
 scalar AccountSettingsKey
@@ -17429,6 +19280,11 @@ input AccountingCategoryInput {
   If meant for expenses, the types of expenses this category applies to
   """
   expensesTypes: [ExpenseType]
+
+  """
+  If the category is applicable to the Host or Hosted Collectives
+  """
+  appliesTo: AccountingCategoryAppliesTo! = HOSTED_COLLECTIVES
 }
 
 """
@@ -17626,7 +19482,7 @@ input ExpenseCreateInput {
   type: ExpenseType!
 
   """
-  A private note that will be attached to your invoice, as HTML
+  A private note that will be attached to your invoice, as HTML. Only visible to the payee and the collective/host admins.
   """
   privateMessage: String
 
@@ -18072,7 +19928,7 @@ input ExpenseInviteDraftInput {
   type: ExpenseType!
 
   """
-  A private note that will be attached to your invoice, as HTML
+  A private note that will be attached to your invoice, as HTML. Only visible to the payee and the collective/host admins.
   """
   privateMessage: String
 
@@ -18200,6 +20056,23 @@ type SetPasswordResponse {
   individual: Individual!
   token: String
 }
+
+type IndividualConfirmEmailResponse {
+  """
+  The account that was confirmed
+  """
+  individual: Individual!
+
+  """
+  A new session token to use for the account. Only returned if user is signed in already.
+  """
+  sessionToken: String
+}
+
+"""
+The `Upload` scalar type represents a file upload.
+"""
+scalar Upload
 
 input MemberInvitationReferenceInput {
   """
@@ -18400,6 +20273,7 @@ Implemented Captcha Providers
 enum CaptchaProvider {
   HCAPTCHA
   RECAPTCHA
+  TURNSTILE
 }
 
 """
@@ -18544,6 +20418,11 @@ input OrderUpdateInput {
   Date the funds were received
   """
   processedAt: DateTime
+
+  """
+  Reference to the transaction import row to link the order to
+  """
+  transactionsImportRow: TransactionsImportRowReferenceInput
 }
 
 """
@@ -18578,6 +20457,7 @@ input PaymentIntentInput {
   amount: AmountInput!
   fromAccount: AccountReferenceInput
   toAccount: AccountReferenceInput!
+  frequency: ContributionFrequency
 }
 
 """
@@ -18795,20 +20675,73 @@ type BanAccountResponse {
   accounts: [Account!]!
 }
 
-type SetTaxFormResult {
-  success: Boolean!
+input TransactionsImportRowCreateInput {
+  """
+  The source id of the row
+  """
+  sourceId: NonEmptyString!
+
+  """
+  The description of the row
+  """
+  description: String
+
+  """
+  The date of the row
+  """
+  date: DateTime!
+
+  """
+  The amount of the row
+  """
+  amount: AmountInput!
+
+  """
+  The raw value of the row
+  """
+  rawValue: JSONObject
+
+  """
+  Whether the row is dismissed
+  """
+  isDismissed: Boolean! = false
 }
 
-input TransactionReferenceInput {
+input TransactionsImportRowUpdateInput {
   """
-  The public id identifying the transaction (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  The id of the row
   """
-  id: String
+  id: NonEmptyString!
 
   """
-  The internal id of the transaction (ie: 580)
+  The source id of the row
   """
-  legacyId: Int
+  sourceId: NonEmptyString
+
+  """
+  The description of the row
+  """
+  description: String
+
+  """
+  The date of the row
+  """
+  date: DateTime
+
+  """
+  The amount of the row
+  """
+  amount: AmountInput
+
+  """
+  Whether the row is dismissed
+  """
+  isDismissed: Boolean = false
+
+  """
+  The order associated with the row
+  """
+  order: OrderReferenceInput
 }
 
 """
@@ -18822,6 +20755,7 @@ input UpdateCreateInput {
   html: String!
   fromAccount: AccountReferenceInput
   account: AccountReferenceInput!
+  notificationAudience: UpdateAudience
 }
 
 """
@@ -18832,9 +20766,11 @@ input UpdateUpdateInput {
   slug: String
   title: String
   isPrivate: Boolean
+  isChangelog: Boolean
   makePublicOn: DateTime
   html: String
   fromAccount: AccountReferenceInput
+  notificationAudience: UpdateAudience
 }
 
 type UploadFileResult {
@@ -18907,11 +20843,6 @@ input UploadFileInput {
 }
 
 """
-The `Upload` scalar type represents a file upload.
-"""
-scalar Upload
-
-"""
 The kind of file that was uploaded
 """
 enum UploadedFileKind {
@@ -18919,6 +20850,7 @@ enum UploadedFileKind {
   ACCOUNT_BANNER
   EXPENSE_ATTACHED_FILE
   EXPENSE_ITEM
+  TRANSACTIONS_IMPORT
   ACCOUNT_LONG_DESCRIPTION
   UPDATE
   COMMENT

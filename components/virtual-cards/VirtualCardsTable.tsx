@@ -1,24 +1,21 @@
 import React from 'react';
-import { CellContext, ColumnDef } from '@tanstack/react-table';
-import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
+import type { CellContext, ColumnDef } from '@tanstack/react-table';
+import type { IntlShape } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import {
-  Account,
-  Host,
-  VirtualCard as GraphQLVirtualCard,
-  VirtualCardStatus,
-} from '../../lib/graphql/types/v2/graphql';
+import type { Account, Host, VirtualCard as GraphQLVirtualCard } from '../../lib/graphql/types/v2/graphql';
+import { VirtualCardStatus } from '../../lib/graphql/types/v2/graphql';
 import { useWindowResize } from '../../lib/hooks/useWindowResize';
 import { getAvailableLimitShortString } from '../../lib/i18n/virtual-card-spending-limit';
 
 import { AccountHoverCard } from '../AccountHoverCard';
 import Avatar from '../Avatar';
-import { DataTable } from '../DataTable';
 import DateTime from '../DateTime';
 import VirtualCard, { ActionsButton } from '../edit-collective/VirtualCard';
 import { Grid } from '../Grid';
 import StyledTag from '../StyledTag';
+import { DataTable } from '../table/DataTable';
 import { P } from '../Text';
 import { TableActionsButton } from '../ui/Table';
 import { toast } from '../ui/useToast';
@@ -37,7 +34,7 @@ type VirtualCardsTableMeta = {
 const tableColumns: ColumnDef<GraphQLVirtualCard>[] = [
   {
     accessorKey: 'account',
-    header: () => <FormattedMessage defaultMessage="Account" />,
+    header: () => <FormattedMessage defaultMessage="Account" id="TwyMau" />,
     cell: ({ cell }: CellContext<GraphQLVirtualCard, Account>) => {
       const account = cell.getValue();
       return (
@@ -200,7 +197,7 @@ export default function VirtualCardsTable(props: VirtualCardsTableProps) {
           emptyMessage={() => (
             <div>
               <P fontSize="16px">
-                <FormattedMessage defaultMessage="No virtual cards" />
+                <FormattedMessage defaultMessage="No virtual cards" id="Uqkhct" />
               </P>
             </div>
           )}

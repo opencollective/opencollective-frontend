@@ -50,6 +50,7 @@ export default function ExpenseDrawer({ openExpenseLegacyId, handleClose, initia
         legacyExpenseId={openExpenseLegacyId}
         startPolling={startPolling}
         stopPolling={stopPolling}
+        isDrawer
       />
     </Drawer>
   );

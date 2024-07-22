@@ -211,7 +211,7 @@ class RedeemedPage extends React.Component {
 
               <Link href="/search">
                 <StyledButton buttonStyle="primary" buttonSize="large" my={5}>
-                  <FormattedMessage defaultMessage="Discover Collectives to Support" />
+                  <FormattedMessage defaultMessage="Discover Collectives to Support" id="WM71Ho" />
                 </StyledButton>
               </Link>
             </Flex>
@@ -241,6 +241,6 @@ const addRedeemedPageData = graphql(redeemedPageQuery, {
   skip: props => !props.collectiveSlug,
 });
 
-// ignore unused exports default
 // next.js export
+// ts-unused-exports:disable-next-line
 export default withUser(withData(addRedeemedPageData(RedeemedPage)));

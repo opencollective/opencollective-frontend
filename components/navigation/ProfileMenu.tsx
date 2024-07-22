@@ -1,6 +1,7 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
 import { get } from 'lodash';
+import type { LucideIcon } from 'lucide-react';
 import {
   BookOpen,
   ExternalLink,
@@ -9,9 +10,7 @@ import {
   LayoutDashboard,
   LifeBuoy,
   LogOut,
-  LucideIcon,
   Mailbox,
-  PocketKnife,
   Settings,
   User,
 } from 'lucide-react';
@@ -19,7 +18,8 @@ import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import useLoggedInUser, { UserContextProps } from '../../lib/hooks/useLoggedInUser';
+import type { UserContextProps } from '../../lib/hooks/useLoggedInUser';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { cn } from '../../lib/utils';
 
@@ -157,7 +157,7 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
                   </Badge>
                 }
               >
-                <FormattedMessage defaultMessage="Member Invitations" />
+                <FormattedMessage defaultMessage="Member Invitations" id="iW16Sa" />
               </MenuItem>
             )}
 
@@ -167,16 +167,11 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
                 onClick={() => setShowPreviewFeaturesModal(true)}
                 appending={
                   <Badge type="info" round size="sm">
-                    <FormattedMessage defaultMessage="New!" />
+                    <FormattedMessage defaultMessage="New!" id="RlOKwP" />
                   </Badge>
                 }
               >
                 <FormattedMessage id="PreviewFeatures" defaultMessage="Preview Features" />
-              </MenuItem>
-            )}
-            {LoggedInUser.isRoot && (
-              <MenuItem Icon={PocketKnife} href="/opencollective/root-actions">
-                <FormattedMessage id="RootActions" defaultMessage="Root Actions" />
               </MenuItem>
             )}
             <MenuItem Icon={Settings} href={`/dashboard/${LoggedInUser.collective.slug}/info`}>
@@ -186,11 +181,11 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
             <Separator className="my-1" />
 
             <MenuItem Icon={Home} href="/home">
-              <FormattedMessage defaultMessage="Open Collective Home" />
+              <FormattedMessage defaultMessage="Open Collective Home" id="qFt6F7" />
             </MenuItem>
 
             <MenuItem Icon={LifeBuoy} href="/help">
-              <FormattedMessage defaultMessage="Help & Support" />
+              <FormattedMessage defaultMessage="Help & Support" id="Uf3+S6" />
             </MenuItem>
 
             <MenuItem Icon={BookOpen} href="https://docs.opencollective.com" external={true}>

@@ -32,11 +32,6 @@ interface CollectiveInterface {
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON!
-
-  """
-  Defines if a collective is pledged
-  """
-  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -226,6 +221,16 @@ interface CollectiveInterface {
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
   """
   policies: Policies!
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromCollective: CollectiveInterface
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedCollectives(limit: Int! = 100, offset: Int! = 0): CollectiveSearchResults!
 }
 
 """
@@ -733,6 +738,7 @@ enum OrderStatus {
   EXPIRED
   DISPUTED
   REFUNDED
+  PAUSED
   IN_REVIEW
 }
 
@@ -2134,11 +2140,6 @@ type Collective implements CollectiveInterface {
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON!
-
-  """
-  Defines if a collective is pledged
-  """
-  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -2362,6 +2363,16 @@ type Collective implements CollectiveInterface {
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromCollective: CollectiveInterface
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedCollectives(limit: Int! = 100, offset: Int! = 0): CollectiveSearchResults!
 }
 
 """
@@ -2398,11 +2409,6 @@ type Event implements CollectiveInterface {
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON!
-
-  """
-  Defines if a collective is pledged
-  """
-  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -2626,6 +2632,16 @@ type Event implements CollectiveInterface {
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromCollective: CollectiveInterface
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedCollectives(limit: Int! = 100, offset: Int! = 0): CollectiveSearchResults!
 }
 
 """
@@ -2662,11 +2678,6 @@ type Fund implements CollectiveInterface {
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON!
-
-  """
-  Defines if a collective is pledged
-  """
-  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -2890,6 +2901,16 @@ type Fund implements CollectiveInterface {
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromCollective: CollectiveInterface
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedCollectives(limit: Int! = 100, offset: Int! = 0): CollectiveSearchResults!
 }
 
 """
@@ -2926,11 +2947,6 @@ type Organization implements CollectiveInterface {
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON!
-
-  """
-  Defines if a collective is pledged
-  """
-  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -3154,6 +3170,16 @@ type Organization implements CollectiveInterface {
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromCollective: CollectiveInterface
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedCollectives(limit: Int! = 100, offset: Int! = 0): CollectiveSearchResults!
 }
 
 """
@@ -3190,11 +3216,6 @@ type Project implements CollectiveInterface {
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON!
-
-  """
-  Defines if a collective is pledged
-  """
-  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -3418,6 +3439,16 @@ type Project implements CollectiveInterface {
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromCollective: CollectiveInterface
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedCollectives(limit: Int! = 100, offset: Int! = 0): CollectiveSearchResults!
 }
 
 """
@@ -3749,11 +3780,6 @@ type User implements CollectiveInterface {
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON!
-
-  """
-  Defines if a collective is pledged
-  """
-  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -3977,7 +4003,18 @@ type User implements CollectiveInterface {
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromCollective: CollectiveInterface
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedCollectives(limit: Int! = 100, offset: Int! = 0): CollectiveSearchResults!
   email: String
+  newsletterOptIn: Boolean
 }
 
 """
@@ -4014,11 +4051,6 @@ type Vendor implements CollectiveInterface {
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON!
-
-  """
-  Defines if a collective is pledged
-  """
-  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -4242,6 +4274,16 @@ type Vendor implements CollectiveInterface {
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromCollective: CollectiveInterface
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedCollectives(limit: Int! = 100, offset: Int! = 0): CollectiveSearchResults!
 
   """
   Returns whether this account has any payout methods saved
@@ -4513,16 +4555,6 @@ type Mutation {
     """
     email: String!
   ): UserDetails
-
-  """
-  Confirm the new user email from confirmation token
-  """
-  confirmUserEmail(
-    """
-    User's emailConfirmationToken
-    """
-    token: String!
-  ): UserDetails
   editConnectedAccount(connectedAccount: ConnectedAccountInputType!): ConnectedAccountType
 
   """
@@ -4533,25 +4565,27 @@ type Mutation {
     The tier to update
     """
     tier: TierInputType!
-  ): Tier
+  ): Tier @deprecated(reason: "2024-07-16: Please use editTiers mutation from GraphQLV2")
   editTiers(id: Int!, tiers: [TierInputType]): [Tier]
+    @deprecated(reason: "2024-07-16: Please use editTiers mutation from GraphQLV2")
 
   """
   Updates all the core contributors (role = ADMIN or MEMBER) for this collective.
   """
   editCoreContributors(collectiveId: Int!, members: [MemberInputType!]!): CollectiveInterface
-    @deprecated(reason: "2021-07-02: Please use inviteMember, editMember or removeMember mutations from GQLV2")
+    @deprecated(reason: "2021-07-02: Please use inviteMember, editMember or removeMember mutations from GraphQLV2")
 
   """
   A mutation to edit the public message of all matching members.
   """
   editPublicMessage(FromCollectiveId: Int!, CollectiveId: Int!, message: String): [Member]
-    @deprecated(reason: "2021-01-27: Please use editPublicMessage from GQLV2")
+    @deprecated(reason: "2021-01-27: Please use editPublicMessage from GraphQLV2")
 
   """
   Update a payment method
   """
   updatePaymentMethod(id: Int!, name: String, monthlyLimitPerMember: Int): PaymentMethodType
+    @deprecated(reason: "2024-07-16: Please use updateOrder from GraphQLV2")
 
   """
   Replace a payment method
@@ -4755,6 +4789,7 @@ input CollectiveInputType {
   isIncognito: Boolean
   isActive: Boolean
   contributionPolicy: String
+  vendorInfo: JSON
 }
 
 input SocialLinkInput {

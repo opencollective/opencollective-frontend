@@ -4,13 +4,15 @@ import { Field, Form, Formik } from 'formik';
 import { cloneDeep, pick } from 'lodash';
 import { Download, Pencil, Trash, Upload, X } from 'lucide-react';
 import { createPortal } from 'react-dom';
-import { FileRejection, useDropzone } from 'react-dropzone';
+import type { FileRejection } from 'react-dropzone';
+import { useDropzone } from 'react-dropzone';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { requireFields, verifyEmailPattern, verifyURLPattern } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import { DashboardVendorsQuery, UploadedFileKind } from '../../lib/graphql/types/v2/graphql';
+import type { DashboardVendorsQuery } from '../../lib/graphql/types/v2/graphql';
+import { UploadedFileKind } from '../../lib/graphql/types/v2/graphql';
 import { useImageUploader } from '../../lib/hooks/useImageUploader';
 import { elementFromClass } from '../../lib/react-utils';
 import { cn, omitDeep } from '../../lib/utils';
@@ -31,7 +33,8 @@ import { Button } from '../ui/Button';
 import { Switch } from '../ui/Switch';
 import { useToast } from '../ui/useToast';
 
-import { vendorFieldFragment, VendorFieldsFragment } from './queries';
+import type { VendorFieldsFragment } from './queries';
+import { vendorFieldFragment } from './queries';
 
 const FIELD_LABEL_PROPS = { fontSize: 16, fontWeight: 700 };
 
@@ -74,9 +77,10 @@ const EDITABLE_FIELDS = [
 type VendorFormProps = {
   vendor?: VendorFieldsFragment;
   host?: Omit<DashboardVendorsQuery['account'], 'vendors'>;
-  onSuccess?: Function;
+  onSuccess?: () => void;
   onCancel: () => void;
   isModal?: boolean;
+  supportsTaxForm: boolean;
 };
 
 const AvatarContainer = elementFromClass(
@@ -188,7 +192,7 @@ const validateVendorForm = values => {
   return errors;
 };
 
-const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormProps) => {
+const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxForm }: VendorFormProps) => {
   const intl = useIntl();
   const { toast } = useToast();
   const [createVendor, { loading: isCreating }] = useMutation(createVendorMutation, { context: API_V2_CONTEXT });
@@ -213,13 +217,13 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
         await editVendor({ variables: { vendor: { ...data, id: vendor.id } } });
         toast({
           variant: 'success',
-          message: <FormattedMessage defaultMessage="Vendor Updated" />,
+          message: <FormattedMessage defaultMessage="Vendor Updated" id="XqtbM9" />,
         });
       } else {
         await createVendor({ variables: { vendor: data, host: pick(host, ['id', 'slug']) } });
         toast({
           variant: 'success',
-          message: <FormattedMessage defaultMessage="Vendor Created" />,
+          message: <FormattedMessage defaultMessage="Vendor Created" id="4O9yQ3" />,
         });
       }
       onSuccess?.();
@@ -236,9 +240,6 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
     { label: <FormattedMessage id="taxType.Other" defaultMessage="Other" />, value: 'OTHER' },
   ];
   const initialValues = cloneDeep(pick(vendor, EDITABLE_FIELDS));
-  if (vendor?.hasImage !== true) {
-    initialValues.imageUrl = null;
-  }
   if (initialValues.vendorInfo?.taxType && !['EIN', 'VAT', 'GST'].includes(initialValues.vendorInfo?.taxType)) {
     initialValues.vendorInfo['otherTaxType'] = initialValues.vendorInfo?.taxType;
     initialValues.vendorInfo.taxType = 'OTHER';
@@ -254,12 +255,12 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
         {vendor ? (
           <FormattedMessage id="vendor.edit" defaultMessage="Edit Vendor" />
         ) : (
-          <FormattedMessage defaultMessage="Create Vendor" />
+          <FormattedMessage defaultMessage="Create Vendor" id="I5p2+k" />
         )}
         {isModal && (
           <button
             onClick={onCancel}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-transparent bg-transparent text-slate-500 ring-2 ring-transparent transition-colors hover:text-slate-950  focus:outline-none focus-visible:ring-black active:ring-black group-hover:border-slate-200 group-hover:bg-white data-[state=open]:ring-black"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-transparent bg-transparent text-slate-500 ring-2 ring-transparent transition-colors hover:text-slate-950 focus:outline-none focus-visible:ring-black active:ring-black group-hover:border-slate-200 group-hover:bg-white data-[state=open]:ring-black"
           >
             <X size="20px" />
           </button>
@@ -276,7 +277,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
                 {vendor ? (
                   <FormattedMessage id="Vendor.Update" defaultMessage="Update vendor" />
                 ) : (
-                  <FormattedMessage defaultMessage="Create vendor" />
+                  <FormattedMessage defaultMessage="Create vendor" id="jrCJwo" />
                 )}
               </Button>
             </div>
@@ -301,7 +302,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
                 <div className="flex-grow">
                   <StyledInputFormikField
                     name="name"
-                    label={intl.formatMessage({ defaultMessage: "Vendor's name" })}
+                    label={intl.formatMessage({ defaultMessage: "Vendor's name", id: 'iDPmhB' })}
                     labelProps={FIELD_LABEL_PROPS}
                     mt={3}
                     required
@@ -312,7 +313,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
               </div>
               <StyledInputFormikField
                 name="legalName"
-                label={intl.formatMessage({ defaultMessage: "Vendor's legal name" })}
+                label={intl.formatMessage({ defaultMessage: "Vendor's legal name", id: '+5Vgek' })}
                 labelProps={FIELD_LABEL_PROPS}
                 required={false}
                 mt={3}
@@ -321,50 +322,54 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
                   <StyledInput {...field} width="100%" maxWidth={500} maxLength={60} placeholder={formik.values.name} />
                 )}
               </StyledInputFormikField>
-              <StyledInputFormikField
-                name="vendorInfo.taxFormRequired"
-                label={intl.formatMessage({ id: 'TaxForm', defaultMessage: 'Tax form' })}
-                labelProps={FIELD_LABEL_PROPS}
-                required={false}
-                mt={3}
-              >
-                {({ field, form }) => (
-                  <div className="flex items-center gap-2">
-                    <Switch
-                      {...field}
-                      checked={field.value}
-                      onCheckedChange={checked => {
-                        form.setFieldValue(field.name, checked);
-                        if (!checked) {
-                          form.setFieldValue(field.name, null);
-                        }
-                      }}
-                    />
-                    <label htmlFor="taxRequired" className="font-normal">
-                      <FormattedMessage defaultMessage="Requires tax form" />
-                    </label>
-                  </div>
-                )}
-              </StyledInputFormikField>
-              {formik.values.vendorInfo?.taxFormRequired && (
-                <StyledInputFormikField
-                  name="vendorInfo.taxFormUrl"
-                  label={intl.formatMessage({ defaultMessage: 'Tax form URL' })}
-                  labelProps={FIELD_LABEL_PROPS}
-                  required={false}
-                  mt={3}
-                >
-                  {({ field }) => (
-                    <StyledInputGroup {...field} prepend="https://" width="100%" maxWidth={500} maxLength={60} />
+              {supportsTaxForm && (
+                <React.Fragment>
+                  <StyledInputFormikField
+                    name="vendorInfo.taxFormRequired"
+                    label={intl.formatMessage({ id: 'TaxForm', defaultMessage: 'Tax form' })}
+                    labelProps={FIELD_LABEL_PROPS}
+                    required={false}
+                    mt={3}
+                  >
+                    {({ field, form }) => (
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          {...field}
+                          checked={field.value}
+                          onCheckedChange={checked => {
+                            form.setFieldValue(field.name, checked);
+                            if (!checked) {
+                              form.setFieldValue(field.name, null);
+                            }
+                          }}
+                        />
+                        <label htmlFor="taxRequired" className="font-normal">
+                          <FormattedMessage defaultMessage="Requires tax form" id="oKmsSw" />
+                        </label>
+                      </div>
+                    )}
+                  </StyledInputFormikField>
+                  {formik.values.vendorInfo?.taxFormRequired && (
+                    <StyledInputFormikField
+                      name="vendorInfo.taxFormUrl"
+                      label={intl.formatMessage({ defaultMessage: 'Tax form URL', id: '72Ve1d' })}
+                      labelProps={FIELD_LABEL_PROPS}
+                      required={false}
+                      mt={3}
+                    >
+                      {({ field }) => (
+                        <StyledInputGroup {...field} prepend="https://" width="100%" maxWidth={500} maxLength={60} />
+                      )}
+                    </StyledInputFormikField>
                   )}
-                </StyledInputFormikField>
+                </React.Fragment>
               )}
               <p className="mb-3 mt-4 text-base font-bold">
-                <FormattedMessage defaultMessage="Tax identification" />
+                <FormattedMessage defaultMessage="Tax identification" id="YQKRUh" />
               </p>
               <StyledInputFormikField
                 name="vendorInfo.taxType"
-                label={intl.formatMessage({ defaultMessage: 'Identification system' })}
+                label={intl.formatMessage({ defaultMessage: 'Identification system', id: '6MC5jw' })}
                 labelProps={{ ...FIELD_LABEL_PROPS, fontWeight: 400 }}
                 required={false}
                 mt={3}
@@ -379,10 +384,10 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
                   />
                 )}
               </StyledInputFormikField>
-              {formik.values?.vendorInfo?.taxType === 'OTHER' && (
+              {formik.values.vendorInfo?.taxType === 'OTHER' && (
                 <StyledInputFormikField
                   name="vendorInfo.otherTaxType"
-                  label={intl.formatMessage({ defaultMessage: 'Identification system' })}
+                  label={intl.formatMessage({ defaultMessage: 'Identification system', id: '6MC5jw' })}
                   labelProps={{ ...FIELD_LABEL_PROPS, fontWeight: 400 }}
                   required={true}
                   mt={3}
@@ -392,16 +397,16 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
               )}
               <StyledInputFormikField
                 name="vendorInfo.taxId"
-                label={intl.formatMessage({ defaultMessage: 'ID Number' })}
+                label={intl.formatMessage({ defaultMessage: 'ID Number', id: 'lSvafT' })}
                 labelProps={{ ...FIELD_LABEL_PROPS, fontWeight: 400 }}
-                required={formik.values?.vendorInfo?.taxType !== undefined}
+                required={formik.values.vendorInfo?.taxType !== undefined}
                 mt={3}
               >
                 {({ field }) => <StyledInput {...field} width="100%" maxWidth={500} maxLength={60} />}
               </StyledInputFormikField>
 
               <p className="mb-3 mt-4 text-base font-bold">
-                <FormattedMessage defaultMessage="Mailing address" />
+                <FormattedMessage defaultMessage="Mailing address" id="yrKCq7" />
               </p>
               <StyledInputLocation
                 onChange={values => {
@@ -422,7 +427,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
               </StyledInputFormikField>
               <StyledInputFormikField
                 name="vendorInfo.contact.email"
-                label={intl.formatMessage({ defaultMessage: "Contact's email" })}
+                label={intl.formatMessage({ defaultMessage: "Contact's email", id: '9W4YHR' })}
                 labelProps={FIELD_LABEL_PROPS}
                 required={false}
                 mt={3}
@@ -463,7 +468,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal }: VendorFormPr
               {formik.values.payoutMethod && (
                 <Field name="payoutMethod">
                   {({ field }) => (
-                    <div className="mt-3  flex-grow">
+                    <div className="mt-3 flex-grow">
                       <PayoutMethodForm
                         fieldsPrefix="payoutMethod"
                         payoutMethod={field.value}

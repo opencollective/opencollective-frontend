@@ -5,13 +5,13 @@ import { FormattedMessage } from 'react-intl';
 
 import {
   AVERAGE_TRANSACTIONS_PER_MINUTE,
-  DEFAULT_FIELDS,
+  DEFAULT_FIELDS_2023 as DEFAULT_FIELDS,
   FIELD_GROUPS_2024,
-  FIELD_OPTIONS,
   FieldGroupLabels,
   FieldLabels,
-  FieldOptions,
+  FieldOptionsLabels,
   HOST_OMITTED_FIELDS,
+  LEGACY_FIELD_OPTIONS as FIELD_OPTIONS,
 } from '../lib/csv';
 import { simpleDateToISOString } from '../lib/date-utils';
 import { getEnvVar } from '../lib/env-utils';
@@ -61,12 +61,13 @@ const ExportTransactionsCSVModal = ({
   const intervalFromValue = React.useMemo(() => getIntervalFromValue(dateInterval), [dateInterval]);
   const [tmpDateInterval, setTmpDateInterval] = React.useState(intervalFromValue);
   const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');
-  const [fieldOption, setFieldOption] = React.useState(FieldOptions[0].value);
+  const [fieldOption, setFieldOption] = React.useState(FIELD_OPTIONS.DEFAULT);
   const [fields, setFields] = React.useState(DEFAULT_FIELDS.reduce((obj, key) => ({ ...obj, [key]: true }), {}));
   const [isValidDateInterval, setIsValidDateInterval] = React.useState(true);
   const [flattenTaxesAndPaymentProcessorFees, setFlattenTaxesAndPaymentProcessorFees] = React.useState(false);
 
   const fieldGroups = FIELD_GROUPS_2024;
+  const fieldOptions = Object.keys(FIELD_OPTIONS).map(value => ({ value, label: FieldOptionsLabels[value] }));
 
   const {
     loading: isFetchingRows,
@@ -208,7 +209,7 @@ const ExportTransactionsCSVModal = ({
         <Grid mt={3} gridGap={2} gridTemplateColumns={`1fr 1fr`} display={['block', 'grid']}>
           <Box>
             <StyledInputField
-              label={<FormattedMessage defaultMessage="Date range" />}
+              label={<FormattedMessage defaultMessage="Date range" id="tygEJX" />}
               labelFontWeight="700"
               labelProps={{ fontWeight: 'bold', fontSize: '16px' }}
               name="datePresets"
@@ -217,7 +218,6 @@ const ExportTransactionsCSVModal = ({
               {() => (
                 <PeriodFilterPresetsSelect
                   inputId="csv-export-date-presets-select"
-                  // @ts-ignore PeriodFilterPresetsSelect is not typed yet, the following conflicts with proptypes
                   SelectComponent={StyledSelect}
                   onChange={setTmpDateInterval}
                   interval={tmpDateInterval}
@@ -238,7 +238,7 @@ const ExportTransactionsCSVModal = ({
           />
 
           <StyledInputField
-            label={<FormattedMessage defaultMessage="Exported Fields" />}
+            label={<FormattedMessage defaultMessage="Exported Fields" id="Zeba/M" />}
             labelFontWeight="700"
             labelProps={{ fontWeight: 'bold', fontSize: '16px' }}
             name="fieldOptions"
@@ -248,9 +248,9 @@ const ExportTransactionsCSVModal = ({
             {inputProps => (
               <StyledSelect
                 {...inputProps}
-                options={FieldOptions}
+                options={fieldOptions}
                 onChange={handleFieldOptionsChange}
-                defaultValue={FieldOptions.find(option => option.value === fieldOption)}
+                defaultValue={fieldOptions.find(option => option.value === fieldOption)}
                 width="100%"
               />
             )}
@@ -309,10 +309,10 @@ const ExportTransactionsCSVModal = ({
           <div className="mt-4 flex flex-row items-center justify-between rounded-lg border p-4">
             <div className="space-y-0.5">
               <Label className="text-base">
-                <FormattedMessage defaultMessage="Separate transactions compatibility" />
+                <FormattedMessage defaultMessage="Separate transactions compatibility" id="XriXXG" />
               </Label>
               <p className="text-sm text-muted-foreground">
-                <FormattedMessage defaultMessage="Export taxes and payment processor fees as columns" />
+                <FormattedMessage defaultMessage="Export taxes and payment processor fees as columns" id="ZNzyMo" />
               </p>
             </div>
             <Switch

@@ -219,7 +219,7 @@ const HostVirtualCards = props => {
             </Box>
             <Flex alignItems="baseline">
               <Span mr={3}>
-                <FormattedMessage defaultMessage="Days" />
+                <FormattedMessage defaultMessage="Days" id="d8EqQY" />
               </Span>
               <StyledInputField
                 mt={3}

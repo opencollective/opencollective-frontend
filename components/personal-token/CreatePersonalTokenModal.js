@@ -57,7 +57,7 @@ const CreatePersonalTokenModal = ({ account, onSuccess, onClose, ...props }) => 
   return (
     <StyledModal width="576px" onClose={onClose} data-cy="create-personal-token-modal" {...props}>
       <ModalHeader>
-        <FormattedMessage defaultMessage="Create Personal token" />
+        <FormattedMessage defaultMessage="Create Personal token" id="MMyZfL" />
       </ModalHeader>
       <Formik
         initialValues={INITIAL_VALUES}
@@ -74,7 +74,7 @@ const CreatePersonalTokenModal = ({ account, onSuccess, onClose, ...props }) => 
             toast({
               variant: 'success',
               message: intl.formatMessage(
-                { defaultMessage: 'Personal token "{name}" created' },
+                { defaultMessage: 'Personal token "{name}" created', id: 'aIdo8o' },
                 { name: result.data.createPersonalToken.name },
               ),
             });
@@ -92,7 +92,7 @@ const CreatePersonalTokenModal = ({ account, onSuccess, onClose, ...props }) => 
             <ModalBody mt="36px">
               <StyledInputFormikField
                 name="name"
-                label={intl.formatMessage({ defaultMessage: 'Token Name' })}
+                label={intl.formatMessage({ defaultMessage: 'Token Name', id: 'w0wvhm' })}
                 labelProps={LABEL_STYLES}
                 required
               >
@@ -114,6 +114,7 @@ const CreatePersonalTokenModal = ({ account, onSuccess, onClose, ...props }) => 
                 hint={intl.formatMessage(
                   {
                     defaultMessage: 'Scopes define the access for personal tokens. <Link>More info</Link>.',
+                    id: 'OL9S0O',
                   },
                   {
                     Link: getI18nLink({
@@ -159,7 +160,10 @@ const CreatePersonalTokenModal = ({ account, onSuccess, onClose, ...props }) => 
                         onCheckedChange={value => form.setFieldValue(field.name, value)}
                       />
                       <label htmlFor="preAuthorize2FA-checkbox" className="ml-2 text-xs font-normal leading-none">
-                        <FormattedMessage defaultMessage="Allow this token to directly use operations that would normally require 2FA" />
+                        <FormattedMessage
+                          defaultMessage="Allow this token to directly use operations that would normally require 2FA"
+                          id="JClbMN"
+                        />
                       </label>
                     </div>
                   );
@@ -168,11 +172,12 @@ const CreatePersonalTokenModal = ({ account, onSuccess, onClose, ...props }) => 
 
               <StyledInputFormikField
                 name="expiresAt"
-                label={intl.formatMessage({ defaultMessage: 'Expiration date' })}
+                label={intl.formatMessage({ defaultMessage: 'Expiration date', id: 'CICBj0' })}
                 labelProps={LABEL_STYLES}
                 mt={20}
                 hint={intl.formatMessage({
                   defaultMessage: 'Personal tokens can expire after a certain date.',
+                  id: 'Slkvpr',
                 })}
               >
                 {({ field }) => {
@@ -188,7 +193,7 @@ const CreatePersonalTokenModal = ({ account, onSuccess, onClose, ...props }) => 
                   buttonSize="small"
                   loading={isSubmitting || isWaitingForOnSuccess}
                 >
-                  <FormattedMessage defaultMessage="Create token" />
+                  <FormattedMessage defaultMessage="Create token" id="c+swVk" />
                 </StyledButton>
                 <StyledButton
                   type="button"

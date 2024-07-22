@@ -174,7 +174,7 @@ const StyledChevronDown = styled(ChevronDown)`
 
 const ITEM_PADDING = '11px 14px';
 
-const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionForNonMobile, LoggedInUser }) => {
+const CollectiveNavbarActionsMenu = ({ collective, callsToAction = {}, hiddenActionForNonMobile, LoggedInUser }) => {
   const enabledCTAs = Object.keys(pickBy(callsToAction, Boolean));
   const isEmpty = enabledCTAs.length < 1;
   const hasOnlyOneHiddenCTA = enabledCTAs.length === 1 && hiddenActionForNonMobile === enabledCTAs[0];
@@ -321,7 +321,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                             <StyledButton borderRadius={0} p={ITEM_PADDING} isBorderless {...btnProps}>
                               <CreditCard size="20px" />
                               <Span>
-                                <FormattedMessage defaultMessage="Create a Card" />
+                                <FormattedMessage defaultMessage="Create a Card" id="xLybrm" />
                               </Span>
                             </StyledButton>
                           </MenuItem>
@@ -418,11 +418,6 @@ CollectiveNavbarActionsMenu.propTypes = {
   }).isRequired,
   hiddenActionForNonMobile: PropTypes.oneOf(Object.values(NAVBAR_ACTION_TYPE)),
   LoggedInUser: PropTypes.object,
-};
-
-CollectiveNavbarActionsMenu.defaultProps = {
-  callsToAction: {},
-  buttonsMinWidth: 100,
 };
 
 export default CollectiveNavbarActionsMenu;

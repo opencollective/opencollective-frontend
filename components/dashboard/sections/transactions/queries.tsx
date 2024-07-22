@@ -9,6 +9,7 @@ const transactionsTableQueryCollectionFragment = gql`
     limit
     nodes {
       id
+      legacyId
       uuid
       kind
       amount {
@@ -23,9 +24,16 @@ const transactionsTableQueryCollectionFragment = gql`
       type
       description
       createdAt
+      clearedAt
       isRefunded
       isRefund
       isOrderRejected
+      isInReview
+      isDisputed
+      refundTransaction {
+        id
+        group
+      }
       account {
         id
         name
@@ -43,6 +51,10 @@ const transactionsTableQueryCollectionFragment = gql`
         imageUrl
         type
         ...AccountHoverCardFields
+      }
+      toAccount {
+        id
+        slug
       }
       expense {
         id
@@ -63,38 +75,49 @@ export const transactionsTableQuery = gql`
   query TransactionsTable(
     $hostAccount: AccountReferenceInput
     $account: [AccountReferenceInput!]
+    $excludeAccount: [AccountReferenceInput!]
     $limit: Int!
     $offset: Int!
     $type: TransactionType
     $paymentMethodType: [PaymentMethodType]
+    $paymentMethodService: [PaymentMethodService]
     $minAmount: Int
     $maxAmount: Int
     $dateFrom: DateTime
     $dateTo: DateTime
+    $clearedFrom: DateTime
+    $clearedTo: DateTime
     $searchTerm: String
     $kind: [TransactionKind]
     $includeIncognitoTransactions: Boolean
     $includeGiftCardTransactions: Boolean
     $includeChildrenTransactions: Boolean
     $virtualCard: [VirtualCardReferenceInput]
-    $orderBy: ChronologicalOrderInput
-    $group: String
+    $sort: ChronologicalOrderInput
+    $group: [String]
     $includeHost: Boolean
     $expenseType: [ExpenseType]
     $expense: ExpenseReferenceInput
     $order: OrderReferenceInput
+    $isRefund: Boolean
+    $merchantId: [String]
+    $accountingCategory: [String]
   ) {
     transactions(
       host: $hostAccount
       account: $account
+      excludeAccount: $excludeAccount
       limit: $limit
       offset: $offset
       type: $type
       paymentMethodType: $paymentMethodType
+      paymentMethodService: $paymentMethodService
       minAmount: $minAmount
       maxAmount: $maxAmount
       dateFrom: $dateFrom
       dateTo: $dateTo
+      clearedFrom: $clearedFrom
+      clearedTo: $clearedTo
       searchTerm: $searchTerm
       kind: $kind
       includeIncognitoTransactions: $includeIncognitoTransactions
@@ -102,12 +125,15 @@ export const transactionsTableQuery = gql`
       includeChildrenTransactions: $includeChildrenTransactions
       includeDebts: true
       virtualCard: $virtualCard
-      orderBy: $orderBy
+      orderBy: $sort
       group: $group
       includeHost: $includeHost
       expenseType: $expenseType
       expense: $expense
       order: $order
+      isRefund: $isRefund
+      merchantId: $merchantId
+      accountingCategory: $accountingCategory
     ) {
       ...TransactionsTableQueryCollectionFragment
     }

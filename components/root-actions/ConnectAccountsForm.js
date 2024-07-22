@@ -7,6 +7,7 @@ import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
+import DashboardHeader from '../dashboard/DashboardHeader';
 import { Flex } from '../Grid';
 import LinkCollective from '../LinkCollective';
 import StyledButton from '../StyledButton';
@@ -70,6 +71,7 @@ const ConnectAccountsForm = () => {
 
   return (
     <div>
+      <DashboardHeader title="Connect Accounts" className="mb-10" />
       <Flex alignItems="flex-end">
         <StyledInputField htmlFor="connect-account-1" label="Make..." flex="1 1">
           {({ id }) => (

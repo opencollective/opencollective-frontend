@@ -68,6 +68,7 @@ const PayeeTotalPayoutSumTooltip = ({ stats }) => {
       content={() => (
         <FormattedMessage
           defaultMessage="Total expense payouts ({currentYear}): Invoices: {totalPaidInvoices}; Receipts: {totalPaidReceipts}; Grants: {totalPaidGrants}"
+          id="uF45hs"
           values={{
             totalPaidInvoices: (
               <FormattedMoneyAmount
@@ -188,6 +189,7 @@ const ExpenseSummaryAdditionalInformation = ({
               >
                 <FormattedMessage
                   defaultMessage="Host Agreements: <Color>{agreementsCount}</Color>"
+                  id="uX+lpu"
                   values={{
                     Color: text => <Span color="primary.600">{text}</Span>,
                     agreementsCount: collective.hostAgreements.totalCount,

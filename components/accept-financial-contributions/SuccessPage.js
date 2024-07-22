@@ -2,7 +2,6 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
@@ -14,14 +13,6 @@ import StyledLink from '../StyledLink';
 import { H1, H2, P } from '../Text';
 
 const TIERS_INFO_LINK = 'https://docs.opencollective.com/help/collectives/tiers-goals';
-
-const SmallExternalLink = styled(StyledLink)`
-  font-size: 13px;
-`;
-
-SmallExternalLink.defaultProps = {
-  openInNewTab: true,
-};
 
 class SuccessPage extends React.Component {
   static propTypes = {
@@ -115,9 +106,9 @@ class SuccessPage extends React.Component {
                   defaultMessage="Customize your contribution tiers with different names, amounts, frequencies (one-time, monthly, or yearly), goals, and rewards. {knowMore}."
                   values={{
                     knowMore: (
-                      <SmallExternalLink href={TIERS_INFO_LINK}>
+                      <StyledLink href={TIERS_INFO_LINK} fontSize="13px" openInNewTab>
                         <FormattedMessage id="tiers.knowMore" defaultMessage="Learn about tiers" />
-                      </SmallExternalLink>
+                      </StyledLink>
                     ),
                   }}
                 />

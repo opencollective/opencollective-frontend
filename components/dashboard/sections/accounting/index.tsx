@@ -5,14 +5,15 @@ import { PlusIcon } from 'lucide-react';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
+import { CollectiveType } from '../../../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import {
+import type {
   AccountingCategory,
-  AccountingCategoryKind,
   AdminAccountingCategoriesQuery,
   AdminAccountingCategoriesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
+import { AccountingCategoryKind } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
@@ -25,16 +26,18 @@ import { buildComboSelectFilter } from '../../filters/ComboSelectFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { buildOrderByFilter } from '../../filters/OrderFilter';
 import { searchFilter } from '../../filters/SearchFilter';
-import { DashboardSectionProps } from '../../types';
+import type { DashboardSectionProps } from '../../types';
 
 import { AccountingCategoriesTable } from './AccountingCategoriesTable';
-import { AccountingCategoryKindI18n, EditableAccountingCategoryFields } from './AccountingCategoryForm';
+import type { EditableAccountingCategoryFields } from './AccountingCategoryForm';
+import { AccountingCategoryKindI18n } from './AccountingCategoryForm';
 import { CreateAccountingCategoryModal } from './CreateAccountingCategoryModal';
 
 const accountingCategoriesQuery = gql`
   query AdminAccountingCategories($hostSlug: String!) {
     host(slug: $hostSlug) {
       id
+      type
       slug
       accountingCategories {
         totalCount
@@ -48,6 +51,7 @@ const accountingCategoriesQuery = gql`
           friendlyName
           expensesTypes
           createdAt
+          appliesTo
         }
       }
     }
@@ -75,6 +79,7 @@ const editAccountingCategoryMutation = gql`
               friendlyName
               expensesTypes
               createdAt
+              appliesTo
             }
           }
         }
@@ -84,36 +89,45 @@ const editAccountingCategoryMutation = gql`
 `;
 
 function categoryToEditableFields(category: AccountingCategory) {
-  const editableFields = ['kind', 'code', 'name', 'friendlyName', 'expensesTypes', 'hostOnly', 'instructions'];
+  const editableFields = [
+    'kind',
+    'code',
+    'name',
+    'friendlyName',
+    'expensesTypes',
+    'hostOnly',
+    'instructions',
+    'appliesTo',
+  ];
   return pick(category, ['id', ...editableFields]);
 }
 
 const orderByCodeFilter = buildOrderByFilter(
   z.enum(['CODE,DESC', 'CODE,ASC', 'NAME,DESC', 'NAME,ASC']).default('CODE,ASC'),
   {
-    'CODE,DESC': defineMessage({ defaultMessage: 'Code descending' }),
-    'CODE,ASC': defineMessage({ defaultMessage: 'Code ascending' }),
-    'NAME,DESC': defineMessage({ defaultMessage: 'Name descending' }),
-    'NAME,ASC': defineMessage({ defaultMessage: 'Name ascending' }),
+    'CODE,DESC': defineMessage({ defaultMessage: 'Code descending', id: 'WSOB2K' }),
+    'CODE,ASC': defineMessage({ defaultMessage: 'Code ascending', id: 'XeM7ah' }),
+    'NAME,DESC': defineMessage({ defaultMessage: 'Name descending', id: 'mKpwVr' }),
+    'NAME,ASC': defineMessage({ defaultMessage: 'Name ascending', id: 'M5aWJU' }),
   },
 );
 
-const appliesToFilter = buildComboSelectFilter(
+const kindFilter = buildComboSelectFilter(
   z
     .array(
       z.enum([AccountingCategoryKind.ADDED_FUNDS, AccountingCategoryKind.CONTRIBUTION, AccountingCategoryKind.EXPENSE]),
     )
     .optional(),
-  defineMessage({ defaultMessage: 'Applies to' }),
+  defineMessage({ defaultMessage: 'Kind', id: 'Transaction.Kind' }),
   AccountingCategoryKindI18n,
 );
 
 const hostOnlyFilter = buildComboSelectFilter(
   z.enum(['yes', 'no']).optional(),
-  defineMessage({ defaultMessage: 'Host only' }),
+  defineMessage({ defaultMessage: 'Visible only to host admins', id: 'NvBPFR' }),
   {
-    ['yes']: defineMessage({ defaultMessage: 'Yes' }),
-    ['no']: defineMessage({ defaultMessage: 'No' }),
+    ['yes']: defineMessage({ defaultMessage: 'Yes', id: 'a5msuh' }),
+    ['no']: defineMessage({ defaultMessage: 'No', id: 'oUWADl' }),
   },
 );
 
@@ -134,7 +148,7 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
         z.object({
           searchTerm: searchFilter.schema,
           orderBy: orderByCodeFilter.schema,
-          appliesTo: appliesToFilter.schema,
+          kind: kindFilter.schema,
           hostOnly: hostOnlyFilter.schema,
         }),
       [],
@@ -142,13 +156,13 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
     filters: {
       searchTerm: searchFilter.filter,
       orderBy: orderByCodeFilter.filter,
-      appliesTo: appliesToFilter.filter,
+      kind: kindFilter.filter,
       hostOnly: hostOnlyFilter.filter,
     },
     toVariables: {
       searchTerm: searchFilter.toVariables,
       orderBy: orderByCodeFilter.toVariables,
-      appliesTo: appliesToFilter.toVariables,
+      kind: kindFilter.toVariables,
       hostOnly: v => v === 'yes',
     },
   });
@@ -163,13 +177,15 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
     },
   );
 
+  const isIndependentCollective = query.data?.host?.type === CollectiveType.COLLECTIVE;
+
   const categories = React.useMemo(
     () => query.data?.host?.accountingCategories?.nodes || [],
     [query.data?.host?.accountingCategories?.nodes],
   );
 
   const filterFn: (c: (typeof categories)[number]) => boolean = React.useMemo(() => {
-    if (!queryFilter.values.searchTerm && !queryFilter.values.appliesTo && !queryFilter.values.hostOnly) {
+    if (!queryFilter.values.searchTerm && !queryFilter.values.kind && !queryFilter.values.hostOnly) {
       return null;
     }
 
@@ -177,7 +193,7 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
     return c => {
       return (
         (!termRegExp || termRegExp.test(c.code) || termRegExp.test(c.name) || termRegExp.test(c.friendlyName)) &&
-        (!queryFilter.values.appliesTo || queryFilter.values.appliesTo.includes(c.kind)) &&
+        (!queryFilter.values.kind || queryFilter.values.kind.includes(c.kind)) &&
         (!queryFilter.values.hostOnly || (queryFilter.values.hostOnly === 'yes') === c.hostOnly)
       );
     };
@@ -264,14 +280,17 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
     <React.Fragment>
       <div className="flex max-w-screen-lg flex-col gap-4">
         <DashboardHeader
-          title={<FormattedMessage defaultMessage="Chart of Accounts" />}
+          title={<FormattedMessage defaultMessage="Chart of Accounts" id="IzFWHI" />}
           description={
-            <FormattedMessage defaultMessage="Manage your accounting categories, and use these categories to keep your Collectives’ expenses organized." />
+            <FormattedMessage
+              defaultMessage="Manage your accounting categories, and use these categories to keep your Collectives’ expenses organized."
+              id="5j8RQd"
+            />
           }
           actions={
             <Button size="sm" className="gap-1" onClick={() => setIsCreateCategoryModalOpen(true)}>
               <span>
-                <FormattedMessage defaultMessage="Create category" />
+                <FormattedMessage defaultMessage="Create category" id="ZROXxK" />
               </span>
               <PlusIcon size={20} />
             </Button>
@@ -293,14 +312,20 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
         />
       </div>
       {isCreateCategoryModalOpen && (
-        <CreateAccountingCategoryModal onClose={() => setIsCreateCategoryModalOpen(false)} onCreate={onCreate} />
+        <CreateAccountingCategoryModal
+          isIndependentCollective={isIndependentCollective}
+          onClose={() => setIsCreateCategoryModalOpen(false)}
+          onCreate={onCreate}
+        />
       )}
       {deleteCategoryConfirmation && (
         <ConfirmationModal
           isDanger
           type="delete"
           onClose={() => setDeleteCategoryConfirmation(null)}
-          header={<FormattedMessage defaultMessage="Are you sure you want to delete this accounting category?" />}
+          header={
+            <FormattedMessage defaultMessage="Are you sure you want to delete this accounting category?" id="zbCUar" />
+          }
           continueHandler={async () => {
             await onConfirmDelete();
             setDeleteCategoryConfirmation(null);

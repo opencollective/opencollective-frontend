@@ -1,9 +1,12 @@
 import React from 'react';
-import { DataValue, graphql } from '@apollo/client/react/hoc';
+import type { DataValue } from '@apollo/client/react/hoc';
+import { graphql } from '@apollo/client/react/hoc';
 import { has, omit, omitBy } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { NextRouter, withRouter } from 'next/router';
-import { defineMessages, FormattedMessage, injectIntl, IntlShape } from 'react-intl';
+import type { NextRouter } from 'next/router';
+import { withRouter } from 'next/router';
+import type { IntlShape } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { getCollectivePageMetadata, isIndividualAccount } from '../lib/collective';
@@ -12,12 +15,9 @@ import { PayoutMethodType } from '../lib/constants/payout-method';
 import { parseDateInterval } from '../lib/date-utils';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
-import {
-  ExpenseStatus,
-  SubmittedExpensesPageQuery,
-  SubmittedExpensesPageQueryVariables,
-} from '../lib/graphql/types/v2/graphql';
-import LoggedInUser from '../lib/LoggedInUser';
+import type { SubmittedExpensesPageQuery, SubmittedExpensesPageQueryVariables } from '../lib/graphql/types/v2/graphql';
+import { ExpenseStatus } from '../lib/graphql/types/v2/graphql';
+import type LoggedInUser from '../lib/LoggedInUser';
 import { getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
 import { parseAmountRange } from '../components/budget/filters/AmountFilter';
@@ -177,7 +177,7 @@ class SubmittedExpensesPage extends React.Component<SubmittedExpensesPageProps> 
               <Box flex="1 1 500px" minWidth={300} maxWidth={'100%'} mr={0} mb={5}>
                 <Flex>
                   <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
-                    <FormattedMessage defaultMessage="Submitted Expenses" />
+                    <FormattedMessage defaultMessage="Submitted Expenses" id="NpGb+x" />
                   </H1>
                   <Box mx="auto" />
                   <SearchFormContainer p={2} width="276px">
@@ -260,7 +260,7 @@ const submittedExpensesPageQuery = gql`
     $offset: Int!
     $type: ExpenseType
     $tags: [String]
-    $status: ExpenseStatusFilter
+    $status: [ExpenseStatusFilter]
     $minAmount: Int
     $maxAmount: Int
     $payoutMethodType: PayoutMethodType
@@ -337,7 +337,7 @@ const submittedExpensesPageQuery = gql`
 
 const addExpensesPageData = graphql<SubmittedExpensesPageProps>(submittedExpensesPageQuery, {
   options: props => {
-    const amountRange = parseAmountRange(props.query.amount);
+    const amountRange = parseAmountRange(props.query.amount as string);
     const { from: dateFrom, to: dateTo } = parseDateInterval(props.query.period);
     const orderBy = props.query.orderBy && parseChronologicalOrderInput(props.query.orderBy);
     return {
@@ -361,6 +361,6 @@ const addExpensesPageData = graphql<SubmittedExpensesPageProps>(submittedExpense
   },
 });
 
-// ignore unused exports default
 // next.js export
+// ts-unused-exports:disable-next-line
 export default injectIntl(addExpensesPageData(withUser(withRouter(SubmittedExpensesPage))));

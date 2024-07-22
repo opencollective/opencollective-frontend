@@ -5,23 +5,24 @@ import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
-import { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
+import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
 import { limit, offset } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import { HostApplicationsQueryVariables, HostApplicationStatus } from '../../../../lib/graphql/types/v2/graphql';
+import type { HostApplicationsQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import { HostApplicationStatus } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import i18nHostApplicationStatus from '../../../../lib/i18n/host-application-status';
 import { sortSelectOptions } from '../../../../lib/utils';
 
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
-import Pagination from '../../../Pagination';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { orderByFilter } from '../../filters/OrderFilter';
+import { Pagination } from '../../filters/Pagination';
 import { searchFilter } from '../../filters/SearchFilter';
-import { DashboardSectionProps } from '../../types';
+import type { DashboardSectionProps } from '../../types';
 
 import HostApplicationDrawer from './HostApplicationDrawer';
 import HostApplicationsTable from './HostApplicationsTable';
@@ -43,7 +44,7 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
   orderBy: orderByFilter.filter,
   searchTerm: searchFilter.filter,
   status: {
-    labelMsg: defineMessage({ defaultMessage: 'Status' }),
+    labelMsg: defineMessage({ defaultMessage: 'Status', id: 'tzMNF3' }),
     Component: ({ intl, ...props }) => (
       <ComboSelectFilter
         options={Object.values(HostApplicationStatus)
@@ -76,7 +77,7 @@ const HostApplications = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const views: Views<z.infer<typeof schema>> = [
     {
       id: 'pending',
-      label: intl.formatMessage({ defaultMessage: 'Pending' }),
+      label: intl.formatMessage({ defaultMessage: 'Pending', id: 'eKEL/g' }),
       filter: {
         status: HostApplicationStatus.PENDING,
       },
@@ -84,13 +85,13 @@ const HostApplications = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     },
     {
       id: 'approved',
-      label: intl.formatMessage({ defaultMessage: 'Approved' }),
+      label: intl.formatMessage({ defaultMessage: 'Approved', id: '6XFO/C' }),
       filter: { status: HostApplicationStatus.APPROVED },
       count: metadata?.host?.approved?.totalCount,
     },
     {
       id: 'rejected',
-      label: intl.formatMessage({ defaultMessage: 'Rejected' }),
+      label: intl.formatMessage({ defaultMessage: 'Rejected', id: '5qaD7s' }),
       filter: { status: HostApplicationStatus.REJECTED },
       count: metadata?.host?.rejected?.totalCount,
     },
@@ -102,7 +103,7 @@ const HostApplications = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     views,
   });
 
-  const { data, error, loading, variables } = useQuery(hostApplicationsQuery, {
+  const { data, error, loading } = useQuery(hostApplicationsQuery, {
     variables: { hostSlug, ...queryFilter.variables },
     fetchPolicy: 'cache-and-network',
     context: API_V2_CONTEXT,
@@ -149,14 +150,7 @@ const HostApplications = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
             loading={loading}
             openApplication={application => updateQuery(router, { accountId: application.account.legacyId })}
           />
-          <div className="mt-16 flex justify-center">
-            <Pagination
-              total={hostApplications?.totalCount}
-              limit={variables.limit}
-              offset={variables.offset}
-              ignoredQueryParams={ROUTE_PARAMS}
-            />
-          </div>
+          <Pagination queryFilter={queryFilter} total={hostApplications?.totalCount} />
         </React.Fragment>
       )}
 

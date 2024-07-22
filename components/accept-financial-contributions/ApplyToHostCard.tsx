@@ -4,7 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { confettiFireworks } from '../../lib/confettis';
-import { Account, Host } from '../../lib/graphql/types/v2/graphql';
+import type { Account, Host } from '../../lib/graphql/types/v2/graphql';
 
 import ApplyToHostModal from '../ApplyToHostModal';
 import { Box, Flex } from '../Grid';
@@ -29,9 +29,8 @@ export default function ApplyToHostCard(props: {
 
   return (
     <React.Fragment>
-      {/* @ts-ignore StyledCollectiveCard is not typed */}
+      {/* @ts-expect-error StyledCollectiveCard is not typed */}
       <StyledCollectiveCardWrapper
-        /* @ts-ignore StyledCollectiveCard is not typed */
         collective={props.host}
         minWidth={250}
         position="relative"
@@ -45,6 +44,7 @@ export default function ApplyToHostCard(props: {
             <P>
               <FormattedMessage
                 defaultMessage="{ hostedCollectives, plural, one {<b>#</b> Collective} other {<b>#</b> Collectives} } hosted"
+                id="D5tV0Y"
                 values={{
                   hostedCollectives: props.host.totalHostedCollectives,
                   b: chunks => <strong>{chunks}</strong>,
@@ -53,7 +53,8 @@ export default function ApplyToHostCard(props: {
             </P>
             <P mt={2}>
               <FormattedMessage
-                defaultMessage="<b>{ currencyCode  }</b> Currency"
+                defaultMessage="<b>{ currencyCode }</b> Currency"
+                id="yQt2k/"
                 values={{
                   currencyCode: props.host.currency.toUpperCase(),
                   b: chunks => <strong>{chunks}</strong>,
@@ -64,6 +65,7 @@ export default function ApplyToHostCard(props: {
               <P mt={2}>
                 <FormattedMessage
                   defaultMessage="<b>{ hostFeePercent }%</b> Host fee"
+                  id="URR2Ki"
                   values={{
                     hostFeePercent: props.host.hostFeePercent,
                     b: chunks => <strong>{chunks}</strong>,
@@ -103,7 +105,7 @@ export default function ApplyToHostCard(props: {
             width="100%"
             textTransform="capitalize"
           >
-            <FormattedMessage defaultMessage="Learn more" />
+            <FormattedMessage defaultMessage="Learn more" id="TdTXXf" />
           </StyledButton>
         </Box>
       </StyledCollectiveCardWrapper>

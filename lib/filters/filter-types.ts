@@ -38,17 +38,17 @@ type DropdownFilter<FilterValue, Meta> = {
   valueRenderer?: ValueRenderer<FilterValue, Meta>;
 };
 
-export type SetFilter<FV> = <K extends keyof FV>(filter: K, value: FV[K]) => void;
-export type SetFilters<FV> = (filterValues: Partial<FV>) => void;
-export type resetFilters<FV> = (filters: Partial<FV>) => void;
+export type SetFilter<FV> = <K extends keyof FV>(filter: K, value: FV[K], resetPagination?: boolean) => void;
+export type SetFilters<FV> = (filters: Partial<FV>, newPath?: string) => void;
+export type resetFilters<FV> = (filters: Partial<FV>, newPath?: string) => void;
 
-export type StandaloneFilter<FilterValue, Meta = any> = {
+type StandaloneFilter<FilterValue, Meta = any> = {
   static: true;
   Component?: never;
   StandaloneComponent: (props: FilterComponentProps<FilterValue, Meta>) => React.ReactNode;
 };
 
-export type FilterComponentConfig<FilterValue, Meta = any> = {
+type FilterComponentConfig<FilterValue, Meta = any> = {
   labelMsg?: MessageDescriptor;
   static?: boolean;
   hide?: ({ meta }: { meta: Meta }) => boolean;

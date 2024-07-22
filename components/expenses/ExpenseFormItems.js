@@ -238,6 +238,7 @@ class ExpenseFormItems extends React.PureComponent {
           <MessageBox type={hasOCRWarnings ? 'warning' : 'info'} withIcon mt={3}>
             <FormattedMessage
               defaultMessage="Please verify the {count,plural,one{date and amount} other{dates and amounts}} before proceeding."
+              id="XoSnCy"
               values={{ count: itemsWithOCR.length }}
             />
           </MessageBox>
@@ -246,7 +247,7 @@ class ExpenseFormItems extends React.PureComponent {
           <div>
             <Flex alignItems="center" mt={24}>
               <Span color="black.900" fontSize="16px" lineHeight="21px" fontWeight="bold">
-                <FormattedMessage defaultMessage="Tax and Total" />
+                <FormattedMessage defaultMessage="Tax and Total" id="9WIrrf" />
               </Span>
               <StyledHr flex="1" borderColor="black.300" mx={2} />
             </Flex>
@@ -266,6 +267,7 @@ class ExpenseFormItems extends React.PureComponent {
                 label={
                   <FormattedMessage
                     defaultMessage="Apply {taxName}"
+                    id="0JzeTD"
                     values={{ taxName: i18nTaxType(this.props.intl, taxType) }}
                   />
                 }
@@ -282,6 +284,7 @@ class ExpenseFormItems extends React.PureComponent {
                 formik={this.props.form}
                 formikValuePath="taxes.0"
                 isOptional={Boolean(values.payee?.isInvite)}
+                requireIdNumber={taxType === TaxType.GST ? values.type === expenseTypes.INVOICE : undefined}
               />
             )}
           </Box>

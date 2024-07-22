@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import { Activity } from '../../../../lib/graphql/types/v2/graphql';
+import type { Activity } from '../../../../lib/graphql/types/v2/graphql';
 
 import Avatar from '../../../Avatar';
 
@@ -29,7 +29,7 @@ export const ActivityUser = ({
 }) => {
   return activity.isSystem ? (
     <span>
-      <FormattedMessage defaultMessage="System Activity" />
+      <FormattedMessage defaultMessage="System Activity" id="95dooH" />
     </span>
   ) : showBy ? (
     <FormattedMessage

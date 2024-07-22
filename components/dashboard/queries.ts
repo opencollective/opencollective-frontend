@@ -7,16 +7,31 @@ export const adminPanelQuery = gql`
     account(slug: $slug) {
       id
       legacyId
+      createdAt
       slug
       name
       isHost
       type
       settings
       isArchived
+      isActive
       isIncognito
       imageUrl(height: 256)
+      duplicatedAccounts {
+        totalCount
+      }
       pendingExpenses: expenses(status: PENDING, direction: RECEIVED, includeChildrenExpenses: true, limit: 0) {
         totalCount
+      }
+      pausedIncomingContributions: orders(filter: INCOMING, status: PAUSED, includeIncognito: true) {
+        totalCount
+      }
+      pausedOutgoingContributions: orders(filter: OUTGOING, status: PAUSED, includeIncognito: true) {
+        totalCount
+      }
+      ... on AccountWithContributions {
+        canStartResumeContributionsProcess
+        hasResumeContributionsProcessStarted
       }
       childrenAccounts {
         totalCount
@@ -38,6 +53,12 @@ export const adminPanelQuery = gql`
         id
         REQUIRE_2FA_FOR_ADMINS
       }
+      ... on Organization {
+        host {
+          id
+          requiredLegalDocuments
+        }
+      }
       ... on AccountWithParent {
         parent {
           id
@@ -50,8 +71,11 @@ export const adminPanelQuery = gql`
       }
       ... on AccountWithHost {
         hostFeePercent
+        isApproved
         host {
           id
+          requiredLegalDocuments
+          legacyId
           slug
           name
           settings
@@ -70,9 +94,6 @@ export const adminPanelQuery = gql`
             }
           }
         }
-      }
-      ... on AccountWithHost {
-        isApproved
       }
     }
   }

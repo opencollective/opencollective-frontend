@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import {
+import type {
   PaymentIntent,
   Stripe,
   StripeElements,
@@ -12,16 +12,15 @@ import clsx from 'clsx';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import {
+import type {
   Account,
   Host,
   Order,
   PaymentMethod,
-  PaymentMethodLegacyType,
   PaymentMethodPickerQuery,
-  PaymentMethodService,
   PaymentMethodType,
 } from '../../lib/graphql/types/v2/graphql';
+import { PaymentMethodLegacyType, PaymentMethodService } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getPaymentMethodName } from '../../lib/payment_method_label';
 import {
@@ -30,7 +29,8 @@ import {
   isPaymentMethodDisabled,
 } from '../../lib/payment-method-utils';
 import { isStripePaymentMethodEnabledForCurrency, StripePaymentMethodsLabels } from '../../lib/stripe/payment-methods';
-import useSetupIntent, { StripeSetupIntent } from '../../lib/stripe/useSetupIntent';
+import type { StripeSetupIntent } from '../../lib/stripe/useSetupIntent';
+import useSetupIntent from '../../lib/stripe/useSetupIntent';
 
 import PayPal from '../icons/PayPal';
 import Loading from '../Loading';
@@ -313,7 +313,7 @@ function StripeSetupPaymentMethodOption(props: StripeSetupPaymentMethodOptionPro
     let types = setupIntent.payment_method_types
       .filter(t => isStripePaymentMethodEnabledForCurrency(t, props.currency))
       .map(method => {
-        return intl.formatMessage(StripePaymentMethodsLabels[method]);
+        return StripePaymentMethodsLabels[method] ? intl.formatMessage(StripePaymentMethodsLabels[method]) : method;
       });
 
     if (types.length > 3) {
@@ -352,7 +352,7 @@ function StripeSetupPaymentMethodOption(props: StripeSetupPaymentMethodOptionPro
         </div>
         <div>
           <p className="text-xs font-semibold leading-5 text-black">
-            <FormattedMessage defaultMessage="New payment method" />
+            <FormattedMessage defaultMessage="New payment method" id="L3WVIm" />
           </p>
           <p className="text-xs font-normal leading-4 text-gray-400">
             {availableMethodLabels && availableMethodLabels.length > 0 ? (

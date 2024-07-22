@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
-import { CheckCircle2Icon, CircleIcon, PlusIcon } from 'lucide-react';
+import { PlusIcon } from 'lucide-react';
 import QRCode from 'qrcode.react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import speakeasy from 'speakeasy';
@@ -9,7 +9,8 @@ import styled from 'styled-components';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import { Individual, TwoFactorMethod, UserTwoFactorMethod } from '../../lib/graphql/types/v2/graphql';
+import type { Individual, UserTwoFactorMethod } from '../../lib/graphql/types/v2/graphql';
+import { TwoFactorMethod } from '../../lib/graphql/types/v2/graphql';
 
 import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';
@@ -46,9 +47,11 @@ function generateNewAuthenticatorAppSecret(email: string) {
 const I18nMessages = defineMessages({
   INVALID_TOTP_CODE: {
     defaultMessage: 'Invalid code',
+    id: 'x2R8CB',
   },
   REQUIRED: {
     defaultMessage: 'Required',
+    id: 'Seanpx',
   },
 });
 
@@ -102,23 +105,25 @@ export function AuthenticatorSettings(props: AuthenticatorSettingsProps) {
   return (
     <StyledCard px={3} py={2}>
       <Flex alignItems="center">
-        <Box mr={3}>{userTwoFactorMethods.length > 0 ? <CheckCircle2Icon color="#0EA755" /> : <CircleIcon />}</Box>
         <H3 fontSize="14px" fontWeight="700">
-          <FormattedMessage defaultMessage="Authenticator App" />
+          <FormattedMessage defaultMessage="Authenticator App" id="eoPp92" />
         </H3>
       </Flex>
       <div className="mb-3 text-sm">
-        <FormattedMessage defaultMessage="An application that supports TOTP (time-based one-time password). For example, Google Authenticator and 1Password." />
+        <FormattedMessage
+          defaultMessage="An application that supports TOTP (time-based one-time password). For example, Google Authenticator and 1Password."
+          id="gL/uHv"
+        />
       </div>
-      <Box>
+      <div>
         {userTwoFactorMethods.map(device => {
           return (
-            <Box className="border-b last:border-b-0" mx={4} key={device.id} data-cy="authenticator-2fa-method">
+            <Box className="border-b last:border-b-0" key={device.id} data-cy="authenticator-2fa-method">
               <UserTwoFactorMethodItem individual={props.individual} userTwoFactorMethod={device} />
             </Box>
           );
         })}
-      </Box>
+      </div>
       {userTwoFactorMethods.length === 0 && (
         <Box mt={3}>
           <StyledButton
@@ -127,7 +132,7 @@ export function AuthenticatorSettings(props: AuthenticatorSettingsProps) {
             buttonStyle="secondary"
             display="flex"
           >
-            <FormattedMessage defaultMessage="Add authenticator" /> <PlusIcon size="14px" />
+            <FormattedMessage defaultMessage="Add authenticator" id="cMa+0l" /> <PlusIcon size="14px" />
           </StyledButton>
         </Box>
       )}
@@ -180,7 +185,7 @@ function AddAuthenticatorModal(props: AddAuthenticatorModalProps) {
         const result = await addAuthenticatorAppMutation();
         toast({
           variant: 'success',
-          message: <FormattedMessage defaultMessage="Authenticator added" />,
+          message: <FormattedMessage defaultMessage="Authenticator added" id="sL33nT" />,
         });
 
         if (result.data.addTwoFactorAuthTokenToIndividual.recoveryCodes) {
@@ -226,7 +231,7 @@ function AddAuthenticatorModal(props: AddAuthenticatorModalProps) {
   return (
     <StyledModal onClose={props.onClose}>
       <ModalHeader>
-        <FormattedMessage defaultMessage="Add authenticator" />
+        <FormattedMessage defaultMessage="Add authenticator" id="cMa+0l" />
       </ModalHeader>
       <form onSubmit={formik.handleSubmit}>
         <ModalBody>
@@ -252,7 +257,7 @@ function AddAuthenticatorModal(props: AddAuthenticatorModalProps) {
                     required
                     mt={2}
                     mb={3}
-                    label={<FormattedMessage defaultMessage="Enter your code without any dashes" />}
+                    label={<FormattedMessage defaultMessage="Enter your code without any dashes" id="M+Txk3" />}
                     htmlFor="twoFactorAuthenticatorCode"
                     error={formik.touched.twoFactorAuthenticatorCode && formik.errors.twoFactorAuthenticatorCode}
                     {...formik.getFieldProps('twoFactorAuthenticatorCode')}

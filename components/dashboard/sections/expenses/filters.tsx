@@ -5,43 +5,58 @@ import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { boolean, isMulti, limit, offset } from '../../../../lib/filters/schemas';
-import {
+import type {
   AccountExpensesQueryVariables,
   Currency,
+  HostDashboardExpensesQueryVariables,
+} from '../../../../lib/graphql/types/v2/graphql';
+import {
   ExpenseStatusFilter,
   ExpenseType,
-  HostDashboardExpensesQueryVariables,
+  LastCommentBy,
   PayoutMethodType,
 } from '../../../../lib/graphql/types/v2/graphql';
 import { i18nExpenseStatus, i18nExpenseType } from '../../../../lib/i18n/expense';
+import { LastCommentByFilterLabels } from '../../../../lib/i18n/last-comment-by-filter';
 import i18nPayoutMethodType from '../../../../lib/i18n/payout-method-type';
 import { i18nChargeHasReceipts } from '../../../../lib/i18n/receipts-filter';
 import { sortSelectOptions } from '../../../../lib/utils';
 
+import { accountingCategoryFilter } from '../../filters/AccountingCategoryFilter';
 import { amountFilter } from '../../filters/AmountFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { dateFilter } from '../../filters/DateFilter';
 import { expenseTagFilter } from '../../filters/ExpenseTagsFilter';
-import { orderByFilter } from '../../filters/OrderFilter';
 import { searchFilter } from '../../filters/SearchFilter';
+import { buildSortFilter } from '../../filters/SortFilter';
 import { VirtualCardRenderer } from '../../filters/VirtualCardsFilter';
+
+const sortFilter = buildSortFilter({
+  fieldSchema: z.enum(['CREATED_AT']),
+  defaultValue: {
+    field: 'CREATED_AT',
+    direction: 'DESC',
+  },
+});
 
 export const schema = z.object({
   limit: limit.default(10),
   offset,
-  orderBy: orderByFilter.schema,
+  sort: sortFilter.schema,
   searchTerm: searchFilter.schema,
   date: dateFilter.schema,
   amount: amountFilter.schema,
-  status: z.nativeEnum(ExpenseStatusFilter).optional(),
+  status: isMulti(z.nativeEnum(ExpenseStatusFilter)).optional(),
   type: z.nativeEnum(ExpenseType).optional(),
   payout: z.nativeEnum(PayoutMethodType).optional(),
+  lastCommentBy: isMulti(z.nativeEnum(LastCommentBy)).optional(),
   tag: expenseTagFilter.schema,
   chargeHasReceipts: boolean.optional(),
   virtualCard: isMulti(z.string()).optional(),
+  accountingCategory: accountingCategoryFilter.schema,
 });
 
-export type FilterValues = z.infer<typeof schema>;
+type FilterValues = z.infer<typeof schema>;
 
 export type FilterMeta = {
   currency?: Currency;
@@ -52,7 +67,6 @@ export const toVariables: FiltersToVariables<
   FilterValues,
   HostDashboardExpensesQueryVariables & AccountExpensesQueryVariables
 > = {
-  orderBy: orderByFilter.toVariables,
   date: dateFilter.toVariables,
   amount: amountFilter.toVariables,
   payout: value => ({ payoutMethodType: value }),
@@ -62,10 +76,11 @@ export const toVariables: FiltersToVariables<
 
 // The filters config is used to populate the Filters component.
 export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
-  orderBy: orderByFilter.filter,
+  sort: sortFilter.filter,
   searchTerm: searchFilter.filter,
   date: dateFilter.filter,
   amount: amountFilter.filter,
+  accountingCategory: accountingCategoryFilter.filter,
   status: {
     static: true,
     labelMsg: defineMessage({ id: 'expense.status', defaultMessage: 'Status' }),
@@ -74,6 +89,7 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
         options={Object.values(ExpenseStatusFilter)
           .map(value => ({ label: valueRenderer({ intl, value }), value }))
           .sort(sortSelectOptions)}
+        isMulti
         {...props}
       />
     ),
@@ -113,6 +129,21 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
       />
     ),
     valueRenderer: ({ value, intl }) => i18nChargeHasReceipts(intl, value),
+  },
+  lastCommentBy: {
+    labelMsg: defineMessage({ id: 'expenses.lastCommentByFilter', defaultMessage: 'Last Comment By' }),
+    Component: ({ valueRenderer, intl, ...props }) => {
+      const options = React.useMemo(
+        () =>
+          Object.values(LastCommentBy).map(value => ({
+            value,
+            label: valueRenderer({ value, intl }),
+          })),
+        [valueRenderer, intl],
+      );
+      return <ComboSelectFilter options={options} isMulti {...props} />;
+    },
+    valueRenderer: ({ value, intl }) => intl.formatMessage(LastCommentByFilterLabels[value]),
   },
   virtualCard: {
     labelMsg: defineMessage({ id: 'PayoutMethod.Type.VirtualCard', defaultMessage: 'Virtual Card' }),

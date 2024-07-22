@@ -109,7 +109,7 @@ class ErrorPage extends React.Component {
       <Flex data-cy="not-found" flexDirection="column" alignItems="center" p={2}>
         <Image src="/static/images/unexpected-error.png" alt="" width={624} height={403} />
         <H1 textAlign="center" mt={3} fontSize="40px" fontWeight="700">
-          <FormattedMessage defaultMessage="Network error" />
+          <FormattedMessage defaultMessage="Network error" id="BrdgZE" />
         </H1>
         <Box maxWidth={550}>
           <P my="24px" fontSize="20px" fontWeight="500" color="black.800" textAlign="center">
@@ -121,7 +121,7 @@ class ErrorPage extends React.Component {
         </Box>
         <Box>
           <P fontSize="16px" fontWeight="500" color="black.800" mb="16px" textAlign="center">
-            <FormattedMessage defaultMessage="Here are some helpful links instead:" />
+            <FormattedMessage defaultMessage="Here are some helpful links instead:" id="UTSapC" />
           </P>
           <ErrorFallbackLinks />
         </Box>
@@ -140,10 +140,10 @@ class ErrorPage extends React.Component {
       <Flex data-cy="not-found" flexDirection="column" alignItems="center" p={2}>
         <Image src="/static/images/unexpected-error.png" alt="" width={624} height={403} />
         <H1 textAlign="center" mt={3} fontSize="40px" fontWeight="700">
-          <FormattedMessage defaultMessage="Unexpected error" />
+          <FormattedMessage defaultMessage="Unexpected error" id="1rlBUx" />
         </H1>
         <P my="24px" fontSize="20px" fontWeight="500" color="black.800" textAlign="center">
-          <FormattedMessage defaultMessage="Something went wrong, please refresh or try something else" />
+          <FormattedMessage defaultMessage="Something went wrong, please refresh or try something else" id="VEUYB7" />
         </P>
         <Box>
           <Flex mt={5} flexWrap="wrap" alignItems="center" justifyContent="center">
@@ -176,7 +176,10 @@ class ErrorPage extends React.Component {
                         <FormattedMessage id="Details" defaultMessage="Details" />
                       </P>
                       <Flex justifyContent="space-between" alignItems="center" mb={2}>
-                        <FormattedMessage defaultMessage="Please share these details when contacting support" />
+                        <FormattedMessage
+                          defaultMessage="Please share these details when contacting support"
+                          id="UFh1Me"
+                        />
                         <StyledButton
                           buttonSize="tiny"
                           onClick={() => {

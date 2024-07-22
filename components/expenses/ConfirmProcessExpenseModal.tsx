@@ -1,9 +1,10 @@
 import React from 'react';
-import { defineMessages, FormattedMessage, MessageDescriptor, useIntl } from 'react-intl';
+import type { MessageDescriptor } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import useProcessExpense from '../../lib/expenses/useProcessExpense';
-import { Expense } from '../../lib/graphql/types/v2/graphql';
+import type { Expense } from '../../lib/graphql/types/v2/graphql';
 
 import { Flex } from '../Grid';
 import RichTextEditor from '../RichTextEditor';
@@ -15,6 +16,7 @@ import { toast } from '../ui/useToast';
 const messages = defineMessages({
   reasonPlaceholder: {
     defaultMessage: 'e.g. Email Address is wrong',
+    id: 'g0KLMH',
   },
   REQUEST_RE_APPROVAL_TITLE: {
     id: 'expense.requestReApproval.btn',
@@ -23,19 +25,24 @@ const messages = defineMessages({
   REQUEST_RE_APPROVAL_DESCRIPTION: {
     defaultMessage:
       'Please mention the reason why this expense requires re-approval. The reason will be shared with the user and also be documented as a comment under the expense.',
+    id: 'jD5/NS',
   },
   REQUEST_RE_APPROVAL_CONFIRM_BUTTON: {
     defaultMessage: 'Confirm and request re-approval',
+    id: 'UrUS9j',
   },
   MARK_AS_INCOMPLETE_TITLE: {
     defaultMessage: 'Mark as incomplete',
+    id: 'hu7oaH',
   },
   MARK_AS_INCOMPLETE_DESCRIPTION: {
     defaultMessage:
       'Please mention the reason why this expense has been marked as incomplete. The reason will be shared with the user and also be documented as a comment under the expense.',
+    id: 'x7D8vH',
   },
   MARK_AS_INCOMPLETE_CONFIRM_BUTTON: {
     defaultMessage: 'Confirm and mark as incomplete',
+    id: 'lNyyJU',
   },
   APPROVE_TITLE: {
     id: 'actions.approve',
@@ -44,6 +51,7 @@ const messages = defineMessages({
   APPROVE_DESCRIPTION: {
     defaultMessage:
       'You may add a note that will be shared with the user and also be documented as a comment under the expense.',
+    id: 'xmVXUM',
   },
   APPROVE_CONFIRM_BUTTON: {
     id: 'actions.approve',
@@ -56,6 +64,7 @@ const messages = defineMessages({
   UNAPPROVE_DESCRIPTION: {
     defaultMessage:
       'Please mention the reason why this expense has been unapproved. The reason will be shared with the user and also be documented as a comment under the expense.',
+    id: 'SREb+h',
   },
   UNAPPROVE_CONFIRM_BUTTON: { id: 'expense.unapprove.btn', defaultMessage: 'Unapprove' },
   REJECT_TITLE: {
@@ -65,17 +74,21 @@ const messages = defineMessages({
   REJECT_DESCRIPTION: {
     defaultMessage:
       'Please mention the reason why this expense has been rejected. The reason will be shared with the user and also be documented as a comment under the expense.',
+    id: 'aOO6yW',
   },
   REJECT_CONFIRM_BUTTON: { id: 'actions.reject', defaultMessage: 'Reject' },
   HOLD_TITLE: {
     defaultMessage: 'Put expense on hold',
+    id: 'FXOuRH',
   },
   HOLD_DESCRIPTION: {
     defaultMessage:
       'Expense is still approved but can not be paid out until it is released. Expense is also not displayed in ready to pay.',
+    id: 'aE2FPd',
   },
   HOLD_CONFIRM_BUTTON: {
     defaultMessage: 'Put on Hold',
+    id: '+pCc8I',
   },
   RELEASE_TITLE: {
     id: 'actions.release',
@@ -83,6 +96,7 @@ const messages = defineMessages({
   },
   RELEASE_DESCRIPTION: {
     defaultMessage: 'Expense can be paid out and is displayed in ready to pay list.',
+    id: 'zIsgw6',
   },
   RELEASE_CONFIRM_BUTTON: {
     id: 'actions.release',
@@ -148,7 +162,7 @@ const MessagesPerType: Record<
   },
 };
 
-export type ConfirmProcessExpenseModalType =
+type ConfirmProcessExpenseModalType =
   | 'REQUEST_RE_APPROVAL'
   | 'MARK_AS_INCOMPLETE'
   | 'MARK_AS_SPAM'
@@ -158,7 +172,7 @@ export type ConfirmProcessExpenseModalType =
   | 'HOLD'
   | 'RELEASE';
 
-export type ConfirmProcessExpenseModalProps = {
+type ConfirmProcessExpenseModalProps = {
   type: ConfirmProcessExpenseModalType;
   onClose: () => void;
   expense: Pick<Expense, 'id' | 'legacyId' | 'permissions'>;

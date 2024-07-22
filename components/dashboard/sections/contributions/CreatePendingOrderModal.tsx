@@ -12,9 +12,10 @@ import styled from 'styled-components';
 import { formatCurrency } from '../../../../lib/currency-utils';
 import { requireFields, verifyEmailPattern } from '../../../../lib/form-utils';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
-import { CreatePendingContributionModalQuery, OrderPageQuery } from '../../../../lib/graphql/types/v2/graphql';
+import type { CreatePendingContributionModalQuery, OrderPageQuery } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
+import { i18nPendingOrderPaymentMethodTypes } from '../../../../lib/i18n/pending-order-payment-method-type';
 import { i18nTaxType } from '../../../../lib/i18n/taxes';
 import { require2FAForAdmins } from '../../../../lib/policies';
 import { omitDeep } from '../../../../lib/utils';
@@ -22,25 +23,25 @@ import { omitDeep } from '../../../../lib/utils';
 import AccountingCategorySelect from '../../../AccountingCategorySelect';
 import CollectivePicker, { DefaultCollectiveLabel } from '../../../CollectivePicker';
 import CollectivePickerAsync from '../../../CollectivePickerAsync';
-import { confirmContributionFieldsFragment } from '../../../ContributionConfirmationModal';
+import { confirmContributionFieldsFragment } from '../../../contributions/ConfirmContributionForm';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { Box, Flex } from '../../../Grid';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
-import StyledButton from '../../../StyledButton';
 import StyledHr from '../../../StyledHr';
 import StyledInput from '../../../StyledInput';
 import StyledInputAmount from '../../../StyledInputAmount';
 import StyledInputFormikField from '../../../StyledInputFormikField';
 import StyledInputPercentage from '../../../StyledInputPercentage';
-import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../../StyledModal';
+import StyledModal, { ModalHeader } from '../../../StyledModal';
 import StyledSelect from '../../../StyledSelect';
 import StyledTextarea from '../../../StyledTextarea';
 import StyledTooltip from '../../../StyledTooltip';
 import { TaxesFormikFields } from '../../../taxes/TaxesFormikFields';
 import { P, Span } from '../../../Text';
 import { TwoFactorAuthRequiredMessage } from '../../../TwoFactorAuthRequiredMessage';
+import { Button } from '../../../ui/Button';
 import { useToast } from '../../../ui/useToast';
 import { vendorFieldFragment } from '../../../vendors/queries';
 
@@ -106,6 +107,7 @@ const createPendingContributionModalQuery = gql`
           friendlyName
           code
           kind
+          appliesTo
         }
       }
       plan {
@@ -186,6 +188,12 @@ const createPendingContributionModalCollectiveQuery = gql`
           }
         }
       }
+
+      ... on AccountWithParent {
+        parent {
+          id
+        }
+      }
     }
   }
 `;
@@ -239,7 +247,7 @@ const getTiersOptions = (intl, tiers) => {
   return [
     {
       value: null,
-      label: intl.formatMessage({ defaultMessage: 'No tier' }),
+      label: intl.formatMessage({ defaultMessage: 'No tier', id: 'ozkv/Y' }),
     },
     ...tiers.map(tier => ({
       value: tier,
@@ -297,6 +305,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
     if (values.toAccount?.slug) {
       debouncedLazyQuery(getCollectiveInfo, { slug: values.toAccount.slug });
     }
+    setFieldValue('accountingCategory', null);
   }, [values.toAccount]);
 
   React.useEffect(() => {
@@ -351,19 +360,31 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
   const expectedAtOptions = [
     {
       value: dayjs().add(1, 'month'),
-      label: intl.formatMessage({ defaultMessage: 'Within {n} {n, plural, one {month} other {months}}' }, { n: 1 }),
+      label: intl.formatMessage(
+        { defaultMessage: 'Within {n} {n, plural, one {month} other {months}}', id: 'xjMZQI' },
+        { n: 1 },
+      ),
     },
     {
       value: dayjs().add(3, 'month'),
-      label: intl.formatMessage({ defaultMessage: 'Within {n} {n, plural, one {month} other {months}}' }, { n: 3 }),
+      label: intl.formatMessage(
+        { defaultMessage: 'Within {n} {n, plural, one {month} other {months}}', id: 'xjMZQI' },
+        { n: 3 },
+      ),
     },
     {
       value: dayjs().add(6, 'month'),
-      label: intl.formatMessage({ defaultMessage: 'Within {n} {n, plural, one {month} other {months}}' }, { n: 6 }),
+      label: intl.formatMessage(
+        { defaultMessage: 'Within {n} {n, plural, one {month} other {months}}', id: 'xjMZQI' },
+        { n: 6 },
+      ),
     },
     {
       value: dayjs().add(1, 'year'),
-      label: intl.formatMessage({ defaultMessage: 'Within {n} {n, plural, one {year} other {years}}' }, { n: 1 }),
+      label: intl.formatMessage(
+        { defaultMessage: 'Within {n} {n, plural, one {year} other {years}}', id: 'bBxR0J' },
+        { n: 1 },
+      ),
     },
   ];
   if (edit?.pendingContributionData?.expectedAt) {
@@ -375,20 +396,19 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
       ),
     });
   }
-  const paymentMethodOptions = [
-    { value: 'UNKNOWN', label: intl.formatMessage({ id: 'Unknown', defaultMessage: 'Unknown' }) },
-    { value: 'BANK_TRANSFER', label: intl.formatMessage({ defaultMessage: 'Bank Transfer' }) },
-    { value: 'CHECK', label: intl.formatMessage({ id: 'PaymentMethod.Check', defaultMessage: 'Check' }) },
-  ];
+  const paymentMethodOptions = Object.keys(i18nPendingOrderPaymentMethodTypes).map(key => ({
+    label: intl.formatMessage(i18nPendingOrderPaymentMethodTypes[key]),
+    value: key,
+  }));
 
   const amounts = getAmountsFromValues(values);
   return (
-    <Form data-cy="create-pending-contribution-form">
-      <ModalBody mt="24px">
+    <Form data-cy="create-pending-contribution-form" className="flex h-full flex-col overflow-y-hidden">
+      <div className="w-full flex-grow overflow-y-auto py-4">
         <Field
           name="toAccount"
           htmlFor="CreatePendingContribution-toAccount"
-          label={<FormattedMessage defaultMessage="Create pending contribution for:" />}
+          label={<FormattedMessage defaultMessage="Create expected funds for:" id="S5zrpB" />}
           labelFontSize="16px"
           labelFontWeight="700"
         >
@@ -411,7 +431,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
           <Field
             name="childAccount"
             htmlFor="CreatePendingContribution-childAccount"
-            label={<FormattedMessage defaultMessage="Select event or project:" />}
+            label={<FormattedMessage defaultMessage="Select event or project:" id="9IRZG8" />}
             labelFontSize="16px"
             labelFontWeight="700"
             mt={3}
@@ -439,7 +459,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
         <Field
           name="tier"
           htmlFor="CreatePendingContribution-tier"
-          label={<FormattedMessage defaultMessage="Tier" />}
+          label={<FormattedMessage defaultMessage="Tier" id="b07w+D" />}
           mt={3}
           required={false}
         >
@@ -464,7 +484,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
         <Field
           name="fromAccount"
           htmlFor="CreatePendingContribution-fromAccount"
-          label={<FormattedMessage defaultMessage="Who is this contribution from?" />}
+          label={<FormattedMessage defaultMessage="Who is this contribution from?" id="8XrwYZ" />}
           mt={3}
           required
         >
@@ -528,6 +548,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
           >
             {({ form, field }) => (
               <AccountingCategorySelect
+                disabled={!collective}
                 id={field.id}
                 kind="CONTRIBUTION"
                 onChange={value => form.setFieldValue(field.name, value)}
@@ -547,7 +568,10 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
           label={<FormattedMessage id="Fields.PONumber" defaultMessage="PO Number" />}
           mt={3}
           hint={
-            <FormattedMessage defaultMessage="External reference code for this contribution. This is usually a reference number from the contributor accounting system." />
+            <FormattedMessage
+              defaultMessage="External reference code for this contribution. This is usually a reference number from the contributor accounting system."
+              id="LqD2Po"
+            />
           }
           required={false}
         >
@@ -618,7 +642,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
               htmlFor="CreatePendingContribution-hostFeePercent"
               label={
                 <span>
-                  <FormattedMessage defaultMessage="Host Fee" />
+                  <FormattedMessage defaultMessage="Host Fee" id="NJsELs" />
                   {` `}
                   <StyledTooltip
                     content={() => (
@@ -660,7 +684,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
               labelProps={{ fontSize: '16px', fontWeight: '700' }}
               idNumberLabelRenderer={shortTaxTypeLabel =>
                 intl.formatMessage(
-                  { defaultMessage: "Contributor's {taxName} identifier" },
+                  { defaultMessage: "Contributor's {taxName} identifier", id: 'qrc1oy' },
                   { taxName: shortTaxTypeLabel },
                 )
               }
@@ -742,7 +766,13 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
           <AmountDetailsLine
             value={-amounts.tip || 0}
             currency={currency}
-            label={<FormattedMessage defaultMessage="{service} platform tip" values={{ service: 'Open Collective' }} />}
+            label={
+              <FormattedMessage
+                defaultMessage="{service} platform tip"
+                id="t6u2MU"
+                values={{ service: 'Open Collective' }}
+              />
+            }
           />
         )}
         {Boolean(values.tax?.rate) && (
@@ -794,29 +824,19 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
         )}
 
         {error && <MessageBoxGraphqlError error={error} mt={3} fontSize="13px" />}
-      </ModalBody>
-      <ModalFooter>
-        <Flex justifyContent="space-between" flexWrap="wrap">
-          <StyledButton mx={2} mb={1} minWidth={100} onClick={onClose} type="button">
-            <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-          </StyledButton>
-          <StyledButton
-            type="submit"
-            data-cy="create-pending-contribution-submit-btn"
-            buttonStyle="primary"
-            mx={2}
-            mb={1}
-            minWidth={120}
-            loading={isSubmitting}
-          >
-            {edit ? (
-              <FormattedMessage defaultMessage="Edit pending contribution" />
-            ) : (
-              <FormattedMessage defaultMessage="Create pending contribution" />
-            )}
-          </StyledButton>
-        </Flex>
-      </ModalFooter>
+      </div>
+      <div className="border-t-1 flex justify-center gap-4 border-t border-solid border-t-slate-100 pt-4">
+        <Button onClick={onClose} variant="outline" type="button">
+          <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
+        </Button>
+        <Button type="submit" data-cy="create-pending-contribution-submit-btn" loading={isSubmitting}>
+          {edit ? (
+            <FormattedMessage defaultMessage="Edit expected funds" id="hQAJH9" />
+          ) : (
+            <FormattedMessage defaultMessage="Create expected funds" id="OKMbES" />
+          )}
+        </Button>
+      </div>
     </Form>
   );
 };
@@ -868,12 +888,17 @@ const CreatePendingContributionModal = ({ hostSlug, edit, ...props }: CreatePend
     : { hostFeePercent: host?.hostFeePercent || 0 };
 
   return (
-    <CreatePendingContributionModalContainer {...props} trapFocus onClose={handleClose}>
+    <CreatePendingContributionModalContainer
+      className="overflow-y-hidden sm:max-h-[90vh]"
+      {...props}
+      trapFocus
+      onClose={handleClose}
+    >
       <ModalHeader>
         {edit ? (
-          <FormattedMessage defaultMessage="Edit Pending Contribution #{id}" values={{ id: edit.legacyId }} />
+          <FormattedMessage defaultMessage="Edit Expected Funds #{id}" id="/QMYYS" values={{ id: edit.legacyId }} />
         ) : (
-          <FormattedMessage defaultMessage="Create Pending Contribution" />
+          <FormattedMessage defaultMessage="Create Expected Funds" id="8zsN7i" />
         )}
       </ModalHeader>
       {loading ? (
@@ -914,7 +939,8 @@ const CreatePendingContributionModal = ({ hostSlug, edit, ...props }: CreatePend
                 variant: 'success',
                 message: (
                   <FormattedMessage
-                    defaultMessage="Pending contribution #{orderId} updated"
+                    defaultMessage="Expected Funds #{orderId} updated"
+                    id="6mXKXi"
                     values={{ orderId: result.data.editPendingOrder.legacyId }}
                   />
                 ),
@@ -940,7 +966,8 @@ const CreatePendingContributionModal = ({ hostSlug, edit, ...props }: CreatePend
                 variant: 'success',
                 message: (
                   <FormattedMessage
-                    defaultMessage="Pending contribution created with reference #{orderId}"
+                    defaultMessage="Expected Funds created with reference #{orderId}"
+                    id="k8izBg"
                     values={{ orderId: result.data.createPendingOrder.legacyId }}
                   />
                 ),

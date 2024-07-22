@@ -13,7 +13,13 @@ import { LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { require2FAForAdmins } from '../lib/policies';
 import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 
-import { ALL_SECTIONS, SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS } from '../components/dashboard/constants';
+import {
+  ALL_SECTIONS,
+  ROOT_PROFILE_ACCOUNT,
+  ROOT_PROFILE_KEY,
+  ROOT_SECTIONS,
+  SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS,
+} from '../components/dashboard/constants';
 import { DashboardContext } from '../components/dashboard/DashboardContext';
 import DashboardSection from '../components/dashboard/DashboardSection';
 import { getMenuItems } from '../components/dashboard/Menu';
@@ -51,6 +57,8 @@ const messages = defineMessages({
 const getDefaultSectionForAccount = (account, loggedInUser) => {
   if (!account) {
     return null;
+  } else if (account.type === 'ROOT') {
+    return ROOT_SECTIONS.ALL_COLLECTIVES;
   } else if (
     isIndividualAccount(account) ||
     (!isHostAccount(account) && loggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW))
@@ -89,19 +97,26 @@ function getBlocker(LoggedInUser, account, section) {
   if (!LoggedInUser) {
     return <FormattedMessage id="mustBeLoggedIn" defaultMessage="You must be logged in to see this page" />;
   } else if (!account) {
-    return <FormattedMessage defaultMessage="This account doesn't exist" />;
+    return <FormattedMessage defaultMessage="This account doesn't exist" id="3ABdi3" />;
   } else if (account.isIncognito) {
-    return <FormattedMessage defaultMessage="You cannot edit this collective" />;
+    return <FormattedMessage defaultMessage="You cannot edit this collective" id="ZonfjV" />;
+  } else if (account.type === 'ROOT' && LoggedInUser.isRoot) {
+    return;
   }
 
   // Check permissions
   const isAdmin = LoggedInUser.isAdminOfCollective(account);
   if (SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS.includes(section)) {
     if (!isAdmin && !LoggedInUser.hasRole(roles.ACCOUNTANT, account)) {
-      return <FormattedMessage defaultMessage="You need to be logged in as an admin or accountant to view this page" />;
+      return (
+        <FormattedMessage
+          defaultMessage="You need to be logged in as an admin or accountant to view this page"
+          id="9FWGOh"
+        />
+      );
     }
   } else if (!isAdmin) {
-    return <FormattedMessage defaultMessage="You need to be logged in as an admin" />;
+    return <FormattedMessage defaultMessage="You need to be logged in as an admin" id="AQNF/n" />;
   }
 }
 
@@ -117,7 +132,7 @@ const parseQuery = query => {
   return {
     slug: getSingleParam(query.slug),
     section: getSingleParam(query.section),
-    subpath: getAsArray(query.subpath),
+    subpath: getAsArray(query.subpath)?.filter(Boolean),
   };
 };
 
@@ -129,16 +144,17 @@ const DashboardPage = () => {
   const [lastWorkspaceVisit, setLastWorkspaceVisit] = useLocalStorage(LOCAL_STORAGE_KEYS.DASHBOARD_NAVIGATION_STATE, {
     slug: LoggedInUser?.collective.slug,
   });
-
+  const isRootUser = LoggedInUser?.isRoot;
   const defaultSlug = lastWorkspaceVisit.slug || LoggedInUser?.collective.slug;
   const activeSlug = slug || defaultSlug;
+  const isRootProfile = activeSlug === ROOT_PROFILE_KEY;
 
   const { data, loading } = useQuery(adminPanelQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: activeSlug },
-    skip: !activeSlug || !LoggedInUser,
+    skip: !activeSlug || !LoggedInUser || isRootProfile,
   });
-  const account = data?.account;
+  const account = isRootProfile && isRootUser ? ROOT_PROFILE_ACCOUNT : data?.account;
   const selectedSection = section || getDefaultSectionForAccount(account, LoggedInUser);
 
   const useDynamicTopBar = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DYNAMIC_TOP_BAR);
@@ -173,6 +189,7 @@ const DashboardPage = () => {
   const blocker = !isLoading && getBlocker(LoggedInUser, account, selectedSection);
   const titleBase = intl.formatMessage({ id: 'Dashboard', defaultMessage: 'Dashboard' });
   const menuItems = account ? getMenuItems({ intl, account, LoggedInUser }) : [];
+  const accountIdentifier = account && (account.name || `@${account.slug}`);
 
   let subMenu = null;
   const parentMenuItem = menuItems.find(
@@ -186,6 +203,7 @@ const DashboardPage = () => {
     <DashboardContext.Provider
       value={{
         selectedSection,
+        subpath: subpath || [],
         expandedSection,
         setExpandedSection,
         account,
@@ -198,7 +216,7 @@ const DashboardPage = () => {
         <Page
           noRobots
           collective={account}
-          title={account ? `${account.name} - ${titleBase}` : titleBase}
+          title={[accountIdentifier, titleBase].filter(Boolean).join(' - ')}
           pageTitle={titleBase}
           showFooter={false}
         >
@@ -209,7 +227,7 @@ const DashboardPage = () => {
                 <p>{blocker}</p>
                 {LoggedInUser && (
                   <Link className="mt-2 block" href={`/dashboard/${LoggedInUser.collective.slug}`}>
-                    <FormattedMessage defaultMessage="Go to your Dashboard" />
+                    <FormattedMessage defaultMessage="Go to your Dashboard" id="cLaG6g" />
                   </Link>
                 )}
               </MessageBox>
@@ -285,6 +303,6 @@ DashboardPage.getInitialProps = () => {
   };
 };
 
-// ignore unused exports default
 // next.js export
+// ts-unused-exports:disable-next-line
 export default DashboardPage;

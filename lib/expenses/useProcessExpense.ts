@@ -4,13 +4,13 @@ import { useMutation } from '@apollo/client';
 import { expensePageExpenseFieldsFragment } from '../../components/expenses/graphql/fragments';
 
 import { API_V2_CONTEXT, gql } from '../graphql/helpers';
-import { Expense, ProcessExpensePaymentParams } from '../graphql/types/v2/graphql';
+import type { Expense, ProcessExpensePaymentParams } from '../graphql/types/v2/graphql';
 
 type ProcessExpenseAction = (params?: {
   paymentParams?: ProcessExpensePaymentParams;
   message?: string;
 }) => Promise<void>;
-export type ProcessExpenseActionName =
+type ProcessExpenseActionName =
   | 'APPROVE'
   | 'REJECT'
   | 'PAY'

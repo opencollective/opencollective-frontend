@@ -4,11 +4,12 @@ import { isNil } from 'lodash';
 import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import { Amount, Currency, TimeSeriesAmount } from '../../../../lib/graphql/types/v2/graphql';
+import type { Amount, Currency, TimeSeriesAmount } from '../../../../lib/graphql/types/v2/graphql';
 
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { InfoTooltipIcon } from '../../../InfoTooltipIcon';
-import { Badge, BadgeProps } from '../../../ui/Badge';
+import type { BadgeProps } from '../../../ui/Badge';
+import { Badge } from '../../../ui/Badge';
 import { Skeleton } from '../../../ui/Skeleton';
 
 import ComparisonChart from './ComparisonChart';
@@ -46,6 +47,7 @@ interface BaseMetricProps {
   expanded?: boolean;
   currency?: Currency;
   isSnapshot?: boolean;
+  hide?: boolean;
 }
 
 type MetricDivProps = BaseMetricProps & Omit<React.ComponentPropsWithoutRef<'div'>, 'onClick'>;
@@ -129,7 +131,8 @@ export function Metric({
             <div className="text-sm text-muted-foreground">
               {isSnapshot ? (
                 <FormattedMessage
-                  defaultMessage={'{countOrAmount} at start of period'}
+                  defaultMessage="{countOrAmount} at start of period"
+                  id="Pa4OAa"
                   values={{
                     countOrAmount: amount ? (
                       <FormattedMoneyAmount
@@ -146,7 +149,8 @@ export function Metric({
                 />
               ) : (
                 <FormattedMessage
-                  defaultMessage={'{countOrAmount} previous period'}
+                  defaultMessage="{countOrAmount} previous period"
+                  id="T5nXXx"
                   values={{
                     countOrAmount: amount ? (
                       <FormattedMoneyAmount
@@ -186,11 +190,7 @@ export function ChangeBadge({
   showIcon = true,
   size = 'sm',
   ...props
-}: BadgeProps & {
-  percentageDiff: number;
-  showSign?: boolean;
-  showIcon?: boolean;
-}) {
+}: BadgeProps & { percentageDiff: number; showSign?: boolean; showIcon?: boolean }) {
   if (!percentageDiff) {
     return null;
   }

@@ -19,9 +19,9 @@ export const UserContext = React.createContext({
   loadingLoggedInUser: true,
   errorLoggedInUser: null,
   LoggedInUser: null,
-  logout() {},
-  login() {},
-  refetchLoggedInUser() {},
+  logout: async () => null,
+  login: async () => null,
+  async refetchLoggedInUser() {},
 });
 
 class UserProvider extends React.Component {

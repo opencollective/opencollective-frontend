@@ -375,6 +375,7 @@ class ContributionFlow extends React.Component {
 
       const returnUrl = new URL(`${baseRoute}/donate/success`);
       returnUrl.searchParams.set('OrderId', order.id);
+      returnUrl.searchParams.set('stripeAccount', stripeData?.stripe?.stripeAccount);
 
       const queryParams = this.getQueryParams();
       if (queryParams.redirect) {
@@ -585,7 +586,9 @@ class ContributionFlow extends React.Component {
       return action === 'prev';
     } else if (stepProfile.isGuest) {
       if (isCaptchaEnabled() && !stepProfile.captcha) {
-        this.setState({ error: this.props.intl.formatMessage({ defaultMessage: 'Captcha is required.' }) });
+        this.setState({
+          error: this.props.intl.formatMessage({ defaultMessage: 'Captcha is required.', id: 'Rpq6pU' }),
+        });
         window.scrollTo(0, 0);
         return false;
       }
@@ -838,7 +841,7 @@ class ContributionFlow extends React.Component {
               !LoggedInUser &&
               stepPayment?.key === NEW_CREDIT_CARD_KEY
             ) {
-              this.showError(intl.formatMessage({ defaultMessage: 'Captcha is required.' }));
+              this.showError(intl.formatMessage({ defaultMessage: 'Captcha is required.', id: 'Rpq6pU' }));
               return false;
             } else if (isCompleted && stepPayment?.key === NEW_CREDIT_CARD_KEY) {
               return stepPayment.paymentMethod?.stripeData?.complete;

@@ -17,31 +17,31 @@ const getPastDateInterval = timeUnit => {
  */
 export const PERIOD_FILTER_PRESETS = {
   allTime: {
-    label: <FormattedMessage defaultMessage="All time" />,
+    label: <FormattedMessage defaultMessage="All time" id="s+lPP3" />,
     getInterval: () => ({ from: null, to: null }),
   },
   today: {
-    label: <FormattedMessage defaultMessage="Today" />,
+    label: <FormattedMessage defaultMessage="Today" id="zWgbGg" />,
     getInterval: () => ({ from: dayjs().startOf('day'), to: dayjs().endOf('day') }),
   },
   thisMonth: {
-    label: <FormattedMessage defaultMessage="This Month" />,
+    label: <FormattedMessage defaultMessage="This Month" id="3PZa76" />,
     getInterval: () => ({ from: dayjs().startOf('month'), to: dayjs().endOf('day') }),
   },
   thisYear: {
-    label: <FormattedMessage defaultMessage="This Year" />,
+    label: <FormattedMessage defaultMessage="This Year" id="OGk6DC" />,
     getInterval: () => ({ from: dayjs().startOf('year'), to: dayjs().endOf('day') }),
   },
   pastWeek: {
-    label: <FormattedMessage defaultMessage="Past Week" />,
+    label: <FormattedMessage defaultMessage="Past Week" id="li7Ez6" />,
     getInterval: () => getPastDateInterval('week'),
   },
   pastMonth: {
-    label: <FormattedMessage defaultMessage="Past Month" />,
+    label: <FormattedMessage defaultMessage="Past Month" id="+n7iNv" />,
     getInterval: () => getPastDateInterval('month'),
   },
   pastYear: {
-    label: <FormattedMessage defaultMessage="Past Year" />,
+    label: <FormattedMessage defaultMessage="Past Year" id="B0DOrM" />,
     getInterval: () => getPastDateInterval('year'),
   },
 };

@@ -401,7 +401,10 @@ const CreateOrganizationForm = props => {
                       required
                       fontSize="12px"
                       label={
-                        <FormattedMessage defaultMessage="I certify that I am authorized to represent this organization" />
+                        <FormattedMessage
+                          defaultMessage="I certify that I am authorized to represent this organization"
+                          id="U+G/IY"
+                        />
                       }
                       onChange={({ checked }) => {
                         setAuthorization(checked);

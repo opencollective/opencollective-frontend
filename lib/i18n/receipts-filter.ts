@@ -1,8 +1,8 @@
 import { defineMessages } from 'react-intl';
 
 const MESSAGES = defineMessages({
-  RECEIPT_MISSING: { defaultMessage: 'Has missing receipts' },
-  NO_RECEIPT_MISSING: { defaultMessage: 'Has no receipts missing' },
+  RECEIPT_MISSING: { defaultMessage: 'Has missing receipts', id: 'qJxuiQ' },
+  NO_RECEIPT_MISSING: { defaultMessage: 'Has no receipts missing', id: 'wDruhW' },
   HAS_RECEIPTS: { id: 'VirtualCard.WithReceiptsFilter', defaultMessage: 'Has receipts' },
   HAS_NO_RECEIPTS: { id: 'VirtualCard.WithoutReceiptsFilter', defaultMessage: 'Has no receipts' },
 });

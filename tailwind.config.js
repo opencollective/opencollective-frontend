@@ -47,6 +47,14 @@ module.exports = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        oc: {
+          'blue-tints-500': 'hsla(213, 100%, 59%, 1)',
+          'blue-tints-800': 'hsla(222, 80%, 40%, 1)',
+          'blue-tints-transparent': 'hsla(216, 100%, 58%, 0.3)',
+        },
+        dark: {
+          900: 'hsla(216, 2%, 8%, 1)',
+        },
       },
       borderRadius: {
         lg: `var(--radius)`,
@@ -55,6 +63,7 @@ module.exports = {
       },
       fontFamily: {
         sans: ['var(--font-sans)', ...fontFamily.sans],
+        signature: ['JustMeAgainDownHere', 'cursive'],
         emoji: [
           'AppleColorEmoji',
           'Segoe UI Emoji',
@@ -95,5 +104,5 @@ module.exports = {
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [require('tailwindcss-animate'), require('@tailwindcss/typography')],
 };

@@ -4,7 +4,7 @@ import { flatten } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import { TimelineQuery } from '../../../../lib/graphql/types/v2/graphql';
+import type { TimelineQuery } from '../../../../lib/graphql/types/v2/graphql';
 import { ActivityClassesI18N } from '../../../../lib/i18n/activities-classes';
 
 import ExpenseDrawer from '../../../expenses/ExpenseDrawer';
@@ -96,7 +96,7 @@ export function Timeline({ accountSlug, withFilter = false }) {
           <React.Fragment>
             {isTimelineBeingGenerated && (
               <MessageBox type="info" withIcon mb="24px">
-                <FormattedMessage defaultMessage="Generating activity timeline..." />
+                <FormattedMessage defaultMessage="Generating activity timeline..." id="Uf2NLT" />
               </MessageBox>
             )}
             <TimelineItem />
@@ -107,7 +107,7 @@ export function Timeline({ accountSlug, withFilter = false }) {
           </React.Fragment>
         ) : !activities.length ? (
           <MessageBox type="info" withIcon>
-            <FormattedMessage defaultMessage="No activity yet" />
+            <FormattedMessage defaultMessage="No activity yet" id="aojEGT" />
           </MessageBox>
         ) : (
           activities.map(activity => (
@@ -131,7 +131,7 @@ export function Timeline({ accountSlug, withFilter = false }) {
               })
             }
           >
-            <FormattedMessage defaultMessage="View more" />
+            <FormattedMessage defaultMessage="View more" id="34Up+l" />
           </Button>
         )}
       </div>

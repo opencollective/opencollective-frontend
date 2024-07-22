@@ -8,7 +8,8 @@ import StyledInput from '../../../StyledInput';
 import StyledTextarea from '../../../StyledTextarea';
 import { Label, P, Span } from '../../../Text';
 
-import { ReceiptField, ReceiptTemplate, UseReceipt } from './hooks/useReceipt';
+import type { UseReceipt } from './hooks/useReceipt';
+import { ReceiptField, ReceiptTemplate } from './hooks/useReceipt';
 
 type ReceiptTemplateFormProps = {
   receipt: UseReceipt;
@@ -36,7 +37,7 @@ const ReceiptTemplateForm = ({ receipt, onChange }: ReceiptTemplateFormProps) =>
   return (
     <React.Fragment>
       <Label htmlFor={`receipt-title-${template}`} color="black.800" fontSize="16px" fontWeight={700} lineHeight="24px">
-        <FormattedMessage defaultMessage="Receipt title" />
+        <FormattedMessage defaultMessage="Receipt title" id="tOMmos" />
       </Label>
       <StyledInput
         id={`receipt-title-${template}`}
@@ -51,6 +52,7 @@ const ReceiptTemplateForm = ({ receipt, onChange }: ReceiptTemplateFormProps) =>
         <P mt="6px">
           <FormattedMessage
             defaultMessage="Keep this field empty to use the default title: {receiptTitlePlaceholder}."
+            id="DsfNxu"
             values={{ receiptTitlePlaceholder: placeholders.title }}
           />
         </P>
@@ -63,7 +65,7 @@ const ReceiptTemplateForm = ({ receipt, onChange }: ReceiptTemplateFormProps) =>
           fontWeight={700}
           lineHeight="24px"
         >
-          <FormattedMessage defaultMessage="Custom Message" />
+          <FormattedMessage defaultMessage="Custom Message" id="+jDZdn" />
         </Label>
         <StyledButton
           buttonStyle="secondary"
@@ -77,7 +79,7 @@ const ReceiptTemplateForm = ({ receipt, onChange }: ReceiptTemplateFormProps) =>
           onClick={() => setShowPreview(true)}
         >
           <Span fontSize="13px" fontWeight={500} lineHeight="16px">
-            <FormattedMessage defaultMessage="Preview" />
+            <FormattedMessage defaultMessage="Preview" id="TJo5E6" />
           </Span>
         </StyledButton>
       </Flex>
@@ -94,7 +96,7 @@ const ReceiptTemplateForm = ({ receipt, onChange }: ReceiptTemplateFormProps) =>
       />
       {showPreview && (
         <PreviewModal
-          heading={<FormattedMessage defaultMessage="Receipt Preview" />}
+          heading={<FormattedMessage defaultMessage="Receipt Preview" id="F21ZZ6" />}
           onClose={() => setShowPreview(false)}
           previewImage="/static/images/invoice-title-preview.jpg"
           imgHeight="548.6px"

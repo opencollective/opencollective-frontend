@@ -11,16 +11,16 @@ exports.REWRITES = [
     destination: '/fiscal-hosting',
   },
   {
+    source: '/tax-form',
+    destination: '/tax-form',
+  },
+  {
     source: '/welcome',
     destination: '/welcome',
   },
   {
     source: '/:pageSlug(widgets|tos|privacypolicy|hiring)',
     destination: '/staticPage',
-  },
-  {
-    source: '/foundation/apply/:step(intro|fees|form|success)',
-    destination: '/ocf-host-application',
   },
   {
     source: '/opensource/apply/:step(intro|pick-repo|fees|form|success)',
@@ -55,12 +55,21 @@ exports.REWRITES = [
     destination: '/createOrganization',
   },
   {
-    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/updates',
-    destination: '/updates',
+    source: '/dashboard',
+    destination: '/dashboard',
+  },
+  { source: '/workspace', destination: '/dashboard' },
+  {
+    source: '/dashboard/:slug/:section?/:subpath*',
+    destination: '/dashboard',
   },
   {
-    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/updates/new',
-    destination: '/createUpdate',
+    source: '/workspace/:slug/:section?/:subpath*',
+    destination: '/dashboard',
+  },
+  {
+    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/updates',
+    destination: '/updates',
   },
   {
     source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/updates/:updateSlug',
@@ -127,19 +136,6 @@ exports.REWRITES = [
     destination: '/create-project',
   },
   {
-    source: '/dashboard',
-    destination: '/dashboard',
-  },
-  { source: '/workspace', destination: '/dashboard' },
-  {
-    source: '/dashboard/:slug/:section?/:subpath*',
-    destination: '/dashboard',
-  },
-  {
-    source: '/workspace/:slug/:section?/:subpath*',
-    destination: '/dashboard',
-  },
-  {
     source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/contact',
     destination: '/collective-contact',
   },
@@ -180,7 +176,6 @@ exports.REWRITES = [
     source: '/fund/:verb(apply|create)/:step(form)?',
     destination: '/create-fund',
   },
-
   // New Create Collective Flow
   {
     source: '/:hostCollectiveSlug?/:verb(create)/:version(v2)?/:category(community|climate)?/:step(form)?',
@@ -375,11 +370,6 @@ exports.REWRITES = [
   {
     source: '/:slug/:action(apply)?/:mode(onboarding)?/:step(administrators|contact-info|success)?',
     destination: '/collective-page',
-  },
-  // Root actions
-  {
-    source: '/opencollective/root-actions/:section?',
-    destination: '/root-actions',
   },
   // Terms of services for the host
   {

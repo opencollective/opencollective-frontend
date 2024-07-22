@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { IGNORED_TAGS } from '../lib/constants/collectives';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
-import { Collective } from '../lib/graphql/types/v2/graphql';
+import type { Collective } from '../lib/graphql/types/v2/graphql';
 import { editTagsMutation } from '../lib/graphql/v1/mutations';
 
 import { toast } from './ui/useToast';
@@ -27,7 +27,7 @@ const tagStatsQuery = gql`
   }
 `;
 
-export type EditTagsModalProps = {
+type EditTagsModalProps = {
   collective: Collective;
   onClose: () => void;
 };
@@ -61,6 +61,7 @@ export default function EditTagsModal({ collective, onClose }: EditTagsModalProp
         message: (
           <FormattedMessage
             defaultMessage="Error submiting form: {error}"
+            id="FAV3Ng"
             values={{
               error: e.message,
             }}
@@ -71,7 +72,7 @@ export default function EditTagsModal({ collective, onClose }: EditTagsModalProp
     }
     toast({
       variant: 'success',
-      message: <FormattedMessage defaultMessage="Successfully updated tags" />,
+      message: <FormattedMessage defaultMessage="Successfully updated tags" id="8CJ2DZ" />,
     });
     handleClose();
   };
@@ -89,7 +90,7 @@ export default function EditTagsModal({ collective, onClose }: EditTagsModalProp
             {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
             <div tabIndex={0} />
             <ModalHeader onClose={handleClose} hideCloseIcon={true}>
-              <FormattedMessage defaultMessage="Edit tags" />
+              <FormattedMessage defaultMessage="Edit tags" id="ulp3g5" />
             </ModalHeader>
             <ModalBody mb={0}>
               <StyledInputFormikField

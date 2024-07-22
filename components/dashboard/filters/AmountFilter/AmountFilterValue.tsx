@@ -1,13 +1,17 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import { Currency } from '../../../../lib/graphql/types/v2/graphql';
+import type { Currency } from '../../../../lib/graphql/types/v2/graphql';
 
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 
-import { AmountFilterType, AmountFilterValueType } from './schema';
+import type { AmountFilterValueType } from './schema';
+import { AmountFilterType } from './schema';
 
-const Amount = ({ amount, currency }: { amount: number; currency: Currency }) => {
+const Amount = ({ amount, currency }: { amount: number; currency?: Currency }) => {
+  if (!currency) {
+    return amount ? amount / 100 : '';
+  }
   return (
     <FormattedMoneyAmount
       amount={amount}
@@ -25,6 +29,7 @@ const getMessage = ({ filterValue, currency }: { filterValue: AmountFilterValueT
       return (
         <FormattedMessage
           defaultMessage="Exactly {amount}"
+          id="ZNBeE4"
           values={{
             amount: <Amount amount={filterValue.gte} currency={currency} />,
           }}
@@ -34,6 +39,7 @@ const getMessage = ({ filterValue, currency }: { filterValue: AmountFilterValueT
       return (
         <FormattedMessage
           defaultMessage="{amountFrom} to {amountTo}"
+          id="MOgYVM"
           values={{
             amountFrom: <Amount amount={filterValue.gte} currency={currency} />,
             amountTo: <Amount amount={filterValue.lte} currency={currency} />,
@@ -44,6 +50,7 @@ const getMessage = ({ filterValue, currency }: { filterValue: AmountFilterValueT
       return (
         <FormattedMessage
           defaultMessage="More than {amount}"
+          id="B+fVMt"
           values={{
             amount: <Amount amount={filterValue.gte} currency={currency} />,
           }}
@@ -53,6 +60,7 @@ const getMessage = ({ filterValue, currency }: { filterValue: AmountFilterValueT
       return (
         <FormattedMessage
           defaultMessage="Less than {amount}"
+          id="QRythI"
           values={{
             amount: <Amount amount={filterValue.lte} currency={currency} />,
           }}

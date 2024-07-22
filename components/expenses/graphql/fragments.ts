@@ -112,12 +112,14 @@ export const accountingCategoryFields = gql`
     friendlyName
     code
     expensesTypes
+    appliesTo
   }
 `;
 
 export const expenseHostFields = gql`
   fragment ExpenseHostFields on Host {
     id
+    legacyId
     name
     legalName
     slug
@@ -229,6 +231,14 @@ export const expensePageExpenseFieldsFragment = gql`
     invoiceInfo
     merchantId
     requiredLegalDocuments
+    receivedTaxForms: legalDocuments(type: US_TAX_FORM, status: RECEIVED) {
+      nodes {
+        id
+        type
+        documentLink
+        year
+      }
+    }
     feesPayer
     draft
     items {
@@ -285,7 +295,6 @@ export const expensePageExpenseFieldsFragment = gql`
       name
       legalName
       imageUrl
-      hasImage
       type
       isAdmin
       isActive
@@ -325,6 +334,7 @@ export const expensePageExpenseFieldsFragment = gql`
       ... on Organization {
         host {
           id
+          slug
         }
       }
     }
@@ -344,16 +354,7 @@ export const expensePageExpenseFieldsFragment = gql`
     }
     host {
       id
-      name
-      legalName
-      slug
-      type
-      website
-      location {
-        id
-        address
-        country
-      }
+      ...ExpenseHostFields
     }
     requestedByAccount {
       id
@@ -378,7 +379,6 @@ export const expensePageExpenseFieldsFragment = gql`
       name
       type
       imageUrl
-      hasImage
       backgroundImageUrl
       isActive
       description
@@ -499,6 +499,7 @@ export const expensePageExpenseFieldsFragment = gql`
       canUsePrivateNote
       canHold
       canRelease
+      canDownloadTaxForm
       approve {
         allowed
         reason
@@ -714,7 +715,6 @@ export const expensesListFieldsFragment = gql`
       slug
       name
       imageUrl
-      hasImage
       isAdmin
       # For Collectives, Funds, Events and Projects
       ... on AccountWithHost {
@@ -808,6 +808,19 @@ export const expensesListAdminFieldsFragment = gql`
       message
       scope
       details
+    }
+    lastComment: comments(limit: 1, orderBy: { field: CREATED_AT, direction: DESC }) {
+      nodes {
+        id
+        createdAt
+        fromAccount {
+          id
+          type
+          slug
+          name
+          imageUrl
+        }
+      }
     }
   }
 `;

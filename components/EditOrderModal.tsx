@@ -10,7 +10,7 @@ import { formatCurrency } from '../lib/currency-utils';
 import { getIntervalFromContributionFrequency } from '../lib/date-utils';
 import { getErrorFromGraphqlException, i18nGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
-import {
+import type {
   AccountReferenceInput,
   EditPaymentMethodModalQuery,
   PaymentMethod,
@@ -18,7 +18,8 @@ import {
 } from '../lib/graphql/types/v2/graphql';
 import { DEFAULT_MINIMUM_AMOUNT } from '../lib/tier-utils';
 
-import PaymentMethodPicker, { PaymentMethodOption } from './orders/PaymentMethodPicker';
+import type { PaymentMethodOption } from './orders/PaymentMethodPicker';
+import PaymentMethodPicker from './orders/PaymentMethodPicker';
 import { getSubscriptionStartDate } from './recurring-contributions/AddPaymentMethod';
 import {
   ContributionInterval,
@@ -102,14 +103,14 @@ const CancelModal = (props: Omit<EditOrderModalProps, 'action'>) => {
   });
 
   return (
-    <StyledModal onClose={props.onClose} maxWidth="420px">
+    <StyledModal onClose={props.onClose} maxWidth="420px" data-cy="cancel-order-modal">
       <ModalHeader onClose={props.onClose}>
         <H4 fontSize="20px" fontWeight="700">
           <FormattedMessage id="subscription.menu.cancelContribution" defaultMessage="Cancel contribution" />
         </H4>
       </ModalHeader>
       <ModalBody as="form" onSubmit={formik.handleSubmit as () => void} mb={0}>
-        <P fontSize="15px" mb="10" lineHeight="20px">
+        <P fontSize="15px" mb="10px" lineHeight="20px">
           <FormattedMessage
             id="subscription.cancel.question"
             defaultMessage="Why are you cancelling your subscription today? 🥺"
@@ -135,18 +136,25 @@ const CancelModal = (props: Omit<EditOrderModalProps, 'action'>) => {
           <StyledTextarea
             name="reason"
             fontSize="12px"
-            placeholder={intl.formatMessage({ defaultMessage: 'Provide more details (optional)' })}
+            placeholder={intl.formatMessage({ defaultMessage: 'Provide more details (optional)', id: '41Cgcs' })}
             height={70}
             width="100%"
             resize="none"
             onChange={formik.handleChange}
             value={formik.values.reason}
             mt={2}
+            data-cy="cancellation-text-area"
           />
         )}
 
         <Flex flexWrap="wrap" justifyContent="space-evenly" mt={3}>
-          <StyledButton width="100%" m={1} type="submit" loading={formik.isSubmitting}>
+          <StyledButton
+            width="100%"
+            m={1}
+            type="submit"
+            loading={formik.isSubmitting}
+            data-cy="recurring-contribution-cancel-yes"
+          >
             <FormattedMessage id="submit" defaultMessage="Submit" />
           </StyledButton>
         </Flex>
@@ -300,6 +308,7 @@ const EditAmountModal = (props: Omit<EditOrderModalProps, 'action'>) => {
               interval={
                 selectedContributeOption?.interval || getIntervalFromContributionFrequency(props.order.frequency)
               }
+              order={props.order}
               host={props.order.toAccount.host}
               collective={props.order.toAccount}
               tier={selectedTier}
@@ -331,6 +340,7 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
   const router = useRouter();
   const { toast } = useToast();
   const intl = useIntl();
+  const [isSubmitting, setSubmitting] = React.useState(false);
   const [option, setOption] = React.useState<PaymentMethodOption>({
     id: props.order?.paymentMethod?.id,
     name: props.order?.paymentMethod?.name,
@@ -412,71 +422,83 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
     },
   );
 
-  const { isSubmitting: isSubmittingUpdate, updatePaymentMethod } = useUpdatePaymentMethod(props.order);
-
-  const isUpdatingPaymentMethod = isSubmittingUpdate || loading;
+  const { updatePaymentMethod } = useUpdatePaymentMethod(props.order);
 
   const onSaveClick = React.useCallback(async () => {
     let paymentMethodId;
 
-    if (option.id === 'stripe-payment-element' && 'stripe' in option) {
-      const res = await option.elements.submit();
-      if (res.error) {
-        toast({ variant: 'error', message: res.error.message });
-        props.onClose();
-        return;
-      }
+    setSubmitting(true);
+    try {
+      if (option.id === 'stripe-payment-element' && 'stripe' in option) {
+        const res = await option.elements.submit();
+        if (res.error) {
+          toast({ variant: 'error', message: res.error.message });
+          props.onClose();
+          return;
+        }
 
-      const returnUrl = new URL(`${window.location.origin}/dashboard/${props.accountSlug}/outgoing-contributions`);
-      returnUrl.searchParams.set('orderId', props.order.id);
-      returnUrl.searchParams.set('stripeAccount', option.setupIntent.stripeAccount);
-      returnUrl.searchParams.set('action', 'editPaymentMethod');
+        const returnUrl = new URL(`${window.location.origin}/dashboard/${props.accountSlug}/outgoing-contributions`);
+        returnUrl.searchParams.set('orderId', props.order.id);
+        returnUrl.searchParams.set('stripeAccount', option.setupIntent.stripeAccount);
+        returnUrl.searchParams.set('action', 'editPaymentMethod');
 
-      const setupResponse = await option.stripe.confirmSetup({
-        clientSecret: option.setupIntent.client_secret,
-        elements: option.elements,
-        redirect: 'if_required',
-        confirmParams: {
-          expand: ['payment_method'],
-          // eslint-disable-next-line camelcase
-          return_url: returnUrl.href,
-        },
-      });
-      if (setupResponse.error) {
-        toast({ variant: 'error', message: setupResponse.error.message });
-        props.onClose();
-        return;
-      }
-
-      try {
-        const paymentMethodResponse = await addStripePaymentMethodFromSetupIntent({
-          variables: {
-            setupIntent: {
-              id: option.setupIntent.id,
-              stripeAccount: option.setupIntent.stripeAccount,
-            },
+        const setupResponse = await option.stripe.confirmSetup({
+          clientSecret: option.setupIntent.client_secret,
+          elements: option.elements,
+          redirect: 'if_required',
+          confirmParams: {
+            expand: ['payment_method'],
+            // eslint-disable-next-line camelcase
+            return_url: returnUrl.href,
           },
         });
-        paymentMethodId = paymentMethodResponse.data.addStripePaymentMethodFromSetupIntent.id;
-      } catch (e) {
-        toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
-        return;
-      }
-    } else {
-      paymentMethodId = option.id;
-    }
+        if (setupResponse.error) {
+          toast({ variant: 'error', message: setupResponse.error.message });
+          props.onClose();
+          return;
+        }
 
-    await updatePaymentMethod({ id: paymentMethodId });
-    props.onClose();
+        try {
+          const paymentMethodResponse = await addStripePaymentMethodFromSetupIntent({
+            variables: {
+              setupIntent: {
+                id: option.setupIntent.id,
+                stripeAccount: option.setupIntent.stripeAccount,
+              },
+            },
+          });
+          paymentMethodId = paymentMethodResponse.data.addStripePaymentMethodFromSetupIntent.id;
+        } catch (e) {
+          toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+          return;
+        }
+      } else {
+        paymentMethodId = option.id;
+      }
+
+      const success = await updatePaymentMethod({ id: paymentMethodId });
+      if (success) {
+        props.onClose();
+      }
+    } finally {
+      setSubmitting(false);
+    }
   }, [option, props.onClose, intl]);
 
   const onPaypalSubscription = React.useCallback(
     async paypalSubscriptionId => {
-      await updatePaymentMethod({
-        service: PAYMENT_METHOD_SERVICE.PAYPAL,
-        paypalInfo: { subscriptionId: paypalSubscriptionId },
-      });
-      props.onClose();
+      setSubmitting(true);
+      try {
+        const success = await updatePaymentMethod({
+          service: PAYMENT_METHOD_SERVICE.PAYPAL,
+          paypalInfo: { subscriptionId: paypalSubscriptionId },
+        });
+        if (success) {
+          props.onClose();
+        }
+      } finally {
+        setSubmitting(false);
+      }
     },
     [props.onClose],
   );
@@ -504,7 +526,6 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
         toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
         return;
       }
-      // props.onClose();
     }
 
     if (
@@ -521,15 +542,50 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
     <StyledModal onClose={props.onClose} maxWidth="480px" width="100%">
       <ModalHeader onClose={props.onClose}>
         <H4 fontSize="20px" fontWeight="700">
-          <FormattedMessage id="subscription.menu.editPaymentMethod" defaultMessage="Update payment method" />
+          {props.order.status === 'PAUSED' ? (
+            <FormattedMessage defaultMessage="Resume contribution" id="51nF6S" />
+          ) : (
+            <FormattedMessage id="subscription.menu.editPaymentMethod" defaultMessage="Update payment method" />
+          )}
         </H4>
       </ModalHeader>
       <ModalBody mb={0}>
         <P fontSize="15px" mb="10" lineHeight="20px">
-          <FormattedMessage
-            id="subscription.updatePaymentMethod.subheader"
-            defaultMessage="Pick an existing payment method or add a new one."
-          />
+          {props.order.status === 'PAUSED' ? (
+            <FormattedMessage
+              defaultMessage="To resume your {amountAndInterval} contribution to {collective}, pick an existing payment method or add a new one."
+              id="sEJpMg"
+              values={{
+                amountAndInterval: (
+                  <Span fontWeight="bold">
+                    <FormattedMoneyAmount
+                      amount={props.order.totalAmount.valueInCents}
+                      currency={props.order.totalAmount.currency}
+                      interval={getIntervalFromContributionFrequency(props.order.frequency)}
+                    />
+                  </Span>
+                ),
+                collective: <Span fontWeight="bold">{props.order.toAccount.name}</Span>,
+              }}
+            />
+          ) : (
+            <FormattedMessage
+              defaultMessage="Pick an existing payment method or add a new one for your {amountAndInterval} contribution to {collective}."
+              id="JYTV+i"
+              values={{
+                amountAndInterval: (
+                  <Span fontWeight="bold">
+                    <FormattedMoneyAmount
+                      amount={props.order.totalAmount.valueInCents}
+                      currency={props.order.totalAmount.currency}
+                      interval={getIntervalFromContributionFrequency(props.order.frequency)}
+                    />
+                  </Span>
+                ),
+                collective: <Span fontWeight="bold">{props.order.toAccount.slug}</Span>,
+              }}
+            />
+          )}
         </P>
         {!order ? (
           <Loading />
@@ -546,6 +602,7 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
         <Flex flexWrap="wrap" justifyContent="space-between" mt={4}>
           {option.id === 'pay-with-paypal' ? (
             <PayWithPaypalButton
+              order={props.order}
               totalAmount={props.order.totalAmount.valueInCents}
               currency={props.order.totalAmount.currency}
               interval={getIntervalFromContributionFrequency(props.order.frequency)}
@@ -554,7 +611,7 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
               tier={props.order.tier}
               style={{ height: 45, size: 'small' }}
               subscriptionStartDate={getSubscriptionStartDate(props.order)}
-              isSubmitting={isUpdatingPaymentMethod}
+              isSubmitting={isSubmitting}
               onError={e => toast({ variant: 'error', title: e.message })}
               onSuccess={({ subscriptionId }) => {
                 onPaypalSubscription(subscriptionId);
@@ -567,7 +624,9 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
               type="submit"
               data-cy="recurring-contribution-submit-pm-button"
               onClick={onSaveClick}
-              loading={isUpdatingPaymentMethod}
+              loading={isSubmitting}
+              disabled={loading || query.loading}
+              minWidth={60}
             >
               <FormattedMessage id="save" defaultMessage="Save" />
             </StyledButton>

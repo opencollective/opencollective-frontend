@@ -1,14 +1,14 @@
 import React from 'react';
-import { ColumnDef, TableMeta } from '@tanstack/react-table';
+import type { ColumnDef, TableMeta } from '@tanstack/react-table';
 import { FormattedMessage } from 'react-intl';
 
-import { Activity } from '../../../../lib/graphql/types/v2/graphql';
+import type { Activity } from '../../../../lib/graphql/types/v2/graphql';
 import { BREAKPOINTS, useWindowResize } from '../../../../lib/hooks/useWindowResize';
 
-import { DataTable } from '../../../DataTable';
 import DateTime from '../../../DateTime';
 import StyledHr from '../../../StyledHr';
 import StyledLinkButton from '../../../StyledLinkButton';
+import { DataTable } from '../../../table/DataTable';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/DropdownMenu';
 import { TableActionsButton } from '../../../ui/Table';
 
@@ -65,7 +65,7 @@ const tableColumns: ColumnDef<Activity>[] = [
     cell: ({ cell }) => {
       const activity = cell.row.original;
       return (
-        <div className="truncate">
+        <div className="flex items-center gap-1 truncate">
           <ActivityDescription activity={activity} />
         </div>
       );
@@ -90,7 +90,7 @@ const tableColumns: ColumnDef<Activity>[] = [
                 meta.openActivity(activity);
               }}
             >
-              <FormattedMessage defaultMessage="View details" />
+              <FormattedMessage defaultMessage="View details" id="MnpUD7" />
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -131,13 +131,13 @@ export default function ActivitiesTable({
       emptyMessage={() => (
         <div>
           <p className="text-base">
-            <FormattedMessage defaultMessage="No agreements" />
+            <FormattedMessage defaultMessage="No agreements" id="7eGjv6" />
           </p>
           {resetFilters && (
             <div>
               <StyledHr maxWidth={300} m="16px auto" borderColor="black.100" />
               <StyledLinkButton onClick={resetFilters}>
-                <FormattedMessage defaultMessage="Reset filters" />
+                <FormattedMessage defaultMessage="Reset filters" id="jZ0o74" />
               </StyledLinkButton>
             </div>
           )}

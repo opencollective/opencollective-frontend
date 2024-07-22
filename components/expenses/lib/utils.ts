@@ -8,10 +8,10 @@ import { PayoutMethodType } from '../../../lib/constants/payout-method';
 import { diffExchangeRates } from '../../../lib/currency-utils';
 
 import { validateTaxInput } from '../../taxes/TaxesFormikFields';
-import { ExpenseItemFormValues } from '../types/FormValues';
+import type { ExpenseItemFormValues } from '../types/FormValues';
 
 // Please adjust the values below based on `prepareItems` from `api/server/graphql/common/expenses.ts`
-// ignore unused exports FX_RATE_WARNING_THRESHOLD
+// ts-unused-exports:disable-next-line
 export const FX_RATE_WARNING_THRESHOLD = 0.02;
 export const FX_RATE_ERROR_THRESHOLD = 0.1;
 
@@ -47,6 +47,7 @@ export const getExpenseExchangeRateWarningOrError = (intl, exchangeRate, referen
         {
           defaultMessage:
             "This exchange rate is too different from the one in our records ({value}) for that date and won't be accepted.",
+          id: 'cEI/zq',
         },
         { value: round(referenceExchangeRate.value, 7) },
       ),
@@ -56,7 +57,8 @@ export const getExpenseExchangeRateWarningOrError = (intl, exchangeRate, referen
       warning: intl.formatMessage(
         {
           defaultMessage:
-            'This exchange rate looks very different from the one in our records ({value}) for this date.',
+            'This exchange rate is notably different from the one in our records ({value}) for this date.',
+          id: 'mLRswr',
         },
         { value: round(referenceExchangeRate.value, 7) },
       ),
@@ -155,5 +157,5 @@ export const getSupportedCurrencies = (collective, { payee, payoutMethod, type, 
 };
 
 export const expenseTypeSupportsItemCurrency = expenseType => {
-  return expenseType === expenseTypes.RECEIPT;
+  return [expenseTypes.RECEIPT, expenseTypes.INVOICE].includes(expenseType);
 };

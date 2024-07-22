@@ -17,7 +17,7 @@ const getTypeCaption = type => {
   } else if (type === CollectiveType.COLLECTIVE) {
     return <FormattedMessage id="collective.create" defaultMessage="Create Collective" />;
   } else if (type === CollectiveType.VENDOR) {
-    return <FormattedMessage defaultMessage="Create Vendor" />;
+    return <FormattedMessage defaultMessage="Create Vendor" id="I5p2+k" />;
   } else {
     return null;
   }
@@ -26,7 +26,10 @@ const getTypeCaption = type => {
 /**
  * A component showing big buttons to pick between collective types (user, org...etc)
  */
-const CollectiveTypePicker = ({ types, onChange }) => {
+const CollectiveTypePicker = ({
+  types = [CollectiveType.USER, CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION],
+  onChange,
+}) => {
   const isSingleType = types.length === 1;
   return (
     <Grid gridGap={1} gridTemplateColumns={`repeat(${types.length}, 1fr)`}>
@@ -54,10 +57,6 @@ CollectiveTypePicker.propTypes = {
   types: PropTypes.arrayOf(PropTypes.oneOf(Object.values(CollectiveType))).isRequired,
   /** Called when user pick a button */
   onChange: PropTypes.func.isRequired,
-};
-
-CollectiveTypePicker.defaultProps = {
-  types: [CollectiveType.USER, CollectiveType.COLLECTIVE, CollectiveType.ORGANIZATION],
 };
 
 export default CollectiveTypePicker;

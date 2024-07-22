@@ -54,8 +54,6 @@ function CollapsibleAccountsList({ accounts, label }) {
               </div>
             </Button>
           </div>
-
-          {/* <ChevronDown size={24} /> */}
         </CollapsibleTrigger>
         <CollapsibleContent>
           <div className="flex flex-col gap-4 border-t p-3">
@@ -72,7 +70,7 @@ export function Accounts({ accountSlug }) {
   const { data, loading, error } = useQuery(collectiveBalanceQuery, {
     variables: { slug: accountSlug },
     context: API_V2_CONTEXT,
-    fetchPolicy: 'cache-first',
+    fetchPolicy: 'cache-and-network',
   });
 
   const activeChildAccounts = data?.account.childrenAccounts?.nodes.filter(child => !child.isArchived);
@@ -85,7 +83,7 @@ export function Accounts({ accountSlug }) {
     <div>
       <div className="mb-2 flex items-center justify-between">
         <div className="text-lg font-bold">
-          <FormattedMessage defaultMessage="Accounts" />
+          <FormattedMessage defaultMessage="Accounts" id="FvanT6" />
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -97,12 +95,12 @@ export function Accounts({ accountSlug }) {
           <DropdownMenuContent align="end">
             <DropdownMenuItem asChild>
               <Link href={`/${accountSlug}/projects/create`}>
-                <FormattedMessage defaultMessage="New project" />
+                <FormattedMessage defaultMessage="New project" id="lJMkin" />
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link href={`/${accountSlug}/events/create`}>
-                <FormattedMessage defaultMessage="New event" />
+                <FormattedMessage defaultMessage="New event" id="C+Npdp" />
               </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -112,7 +110,7 @@ export function Accounts({ accountSlug }) {
         <div className="space-y-2 rounded-xl border bg-background p-3">
           <div className="flex items-center justify-between text-sm">
             <span className="font-medium">
-              <FormattedMessage defaultMessage="Main account" />
+              <FormattedMessage defaultMessage="Main account" id="pE0V//" />
             </span>
           </div>
           {loading ? (

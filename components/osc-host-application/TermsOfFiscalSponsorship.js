@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
 
 import NextIllustration from '../collectives/HomeNextIllustration';
@@ -42,12 +43,17 @@ const getGithubConnectUrl = collectiveSlug => {
 };
 
 const TermsOfFiscalSponsorship = ({ checked, onChecked }) => {
+  const { LoggedInUser } = useLoggedInUser();
   const { formatMessage } = useIntl();
 
   const router = useRouter();
   const [error, setError] = useState();
 
-  const { collectiveSlug } = router.query;
+  const { collectiveSlug, redirectToGithub } = router.query;
+
+  if (LoggedInUser && redirectToGithub) {
+    window.location.href = getGithubConnectUrl(collectiveSlug);
+  }
 
   return (
     <Flex flexDirection="column" alignItems="center" justifyContent="center" mt={['24px', '48px']}>
@@ -116,12 +122,24 @@ const TermsOfFiscalSponsorship = ({ checked, onChecked }) => {
             onClick={() => {
               if (!checked) {
                 setError(formatMessage(messages.acceptTermsOfFiscalSponsorship));
+              } else if (!LoggedInUser) {
+                router.push({
+                  pathname: '/signin',
+                  query: { next: `${router.asPath}?redirectToGithub=true` },
+                });
               } else {
                 window.location.href = getGithubConnectUrl(collectiveSlug);
               }
             }}
           >
-            <FormattedMessage id="createcollective.opensource.VerifyGithub" defaultMessage="Verify using GitHub" />
+            {!LoggedInUser ? (
+              <FormattedMessage
+                id="createcollective.opensource.LogInAndVerifyGithub"
+                defaultMessage="Sign in and verify using GitHub"
+              />
+            ) : (
+              <FormattedMessage id="createcollective.opensource.VerifyGithub" defaultMessage="Verify using GitHub" />
+            )}
           </StyledButton>
           <Link
             href={{

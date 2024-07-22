@@ -66,7 +66,7 @@ const OrderContainer = styled.div`
   }
 `;
 
-const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign, host }) => {
+const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign = true, host }) => {
   const intl = useIntl();
   return (
     <OrderContainer>
@@ -174,7 +174,7 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign, ho
           ) : (
             <Flex>
               <StyledTag variant="rounded-left" fontSize="10px" fontWeight="500" mr={1} textTransform="uppercase">
-                <FormattedMessage defaultMessage="Contribution" /> #{order.legacyId}
+                <FormattedMessage defaultMessage="Contribution" id="0LK5eg" /> #{order.legacyId}
               </StyledTag>
               <OrderStatusTag status={order.status} />
             </Flex>
@@ -210,7 +210,10 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign, ho
                   <DetailColumnHeader>
                     <StyledTooltip
                       content={
-                        <FormattedMessage defaultMessage="External reference code for this contribution. This is usually a reference number from the contributor accounting system." />
+                        <FormattedMessage
+                          defaultMessage="External reference code for this contribution. This is usually a reference number from the contributor accounting system."
+                          id="LqD2Po"
+                        />
                       }
                       containerCursor="default"
                     >
@@ -230,7 +233,7 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign, ho
               {order.pendingContributionData.expectedAt && (
                 <Flex flexDirection="column" justifyContent="flex-end" mr={[3, 4]} minHeight={50}>
                   <DetailColumnHeader>
-                    <FormattedMessage defaultMessage="Expected" />
+                    <FormattedMessage defaultMessage="Expected" id="6srLb2" />
                   </DetailColumnHeader>
                   {isLoading ? (
                     <LoadingPlaceholder height={16} />
@@ -293,10 +296,6 @@ OrderBudgetItem.propTypes = {
     }),
   }),
   showPlatformTip: PropTypes.bool,
-};
-
-OrderBudgetItem.defaultProps = {
-  showAmountSign: true,
 };
 
 export default OrderBudgetItem;

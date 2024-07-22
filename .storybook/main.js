@@ -2,11 +2,10 @@ const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 module.exports = {
   stories: ['../stories/index.stories.mdx', '../stories/**/*.stories.mdx', '../stories/**/*.stories.@(js|jsx|ts|tsx)'],
   addons: [
-    '@storybook/addon-links',
+    '@storybook/addon-designs',
     '@storybook/addon-docs',
     '@storybook/addon-essentials',
-    '@storybook/addon-designs',
-    '@storybook/addon-mdx-gfm',
+    '@storybook/addon-links',
   ],
   webpackFinal: config => {
     // Configuration for images

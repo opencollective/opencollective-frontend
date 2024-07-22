@@ -45,6 +45,7 @@ const PlatformTipsCollected = ({ host, isLoading }) => {
             <Span mx={2}>{' / '}</Span>
             <FormattedMessage
               defaultMessage="{amount} owed to {account}"
+              id="UKIPT2"
               values={{
                 account: 'Open Collective',
                 amount: (

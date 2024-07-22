@@ -7,11 +7,13 @@ import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import ConfirmationModal from '../ConfirmationModal';
+import DashboardHeader from '../dashboard/DashboardHeader';
 import { Flex } from '../Grid';
 import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledInputField from '../StyledInputField';
 import { P } from '../Text';
+import { Alert, AlertDescription, AlertTitle } from '../ui/Alert';
 import { useToast } from '../ui/useToast';
 
 import BanAccountsSummary from './BanAccountsSummary';
@@ -57,6 +59,13 @@ const BanAccount = () => {
 
   return (
     <div>
+      <DashboardHeader title="Ban Account" className="mb-10" />
+      <Alert className="relative mb-8 flex items-center gap-2 bg-destructive/5 fade-in" variant="destructive">
+        <AlertTitle className="flex items-center">Dangerous Action</AlertTitle>
+        <AlertDescription>
+          Please be super careful with the action below, and double check everything you do.
+        </AlertDescription>
+      </Alert>
       <StyledInputField htmlFor="ban-accounts-picker" label="Account" flex="1 1">
         {({ id }) => (
           <CollectivePickerAsync

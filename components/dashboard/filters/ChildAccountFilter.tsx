@@ -2,8 +2,8 @@ import React from 'react';
 import { defineMessage } from 'react-intl';
 import { z } from 'zod';
 
-import { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
-import { Account } from '../../../lib/graphql/types/v2/graphql';
+import type { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
+import type { Account } from '../../../lib/graphql/types/v2/graphql';
 
 import ComboSelectFilter from './ComboSelectFilter';
 import { AccountRenderer } from './HostedAccountFilter';
@@ -18,7 +18,7 @@ function ChildAccountFilter({
   const groupedOptions = React.useMemo(
     () => [
       {
-        label: intl.formatMessage({ defaultMessage: 'Main account' }),
+        label: intl.formatMessage({ defaultMessage: 'Main account', id: 'pE0V//' }),
         options: [
           {
             value: meta.accountSlug,
@@ -32,6 +32,7 @@ function ChildAccountFilter({
           .filter(a => a.type === 'PROJECT')
           .map(account => ({
             value: account.slug,
+            keywords: [account.name],
             label: <AccountRenderer account={account} inOptionsList />,
           })),
       },
@@ -41,6 +42,7 @@ function ChildAccountFilter({
           .filter(a => a.type === 'EVENT')
           .map(account => ({
             value: account.slug,
+            keywords: [account.name],
             label: <AccountRenderer account={account} inOptionsList />,
           })),
       },
@@ -65,7 +67,7 @@ export const childAccountFilter: FilterConfig<z.infer<typeof schema>> = {
   filter: {
     static: true,
     hide: ({ meta }) => !meta?.childrenAccounts || meta.childrenAccounts.length === 0,
-    labelMsg: defineMessage({ defaultMessage: 'Account' }),
+    labelMsg: defineMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
     Component: ChildAccountFilter,
     valueRenderer: ({ value }) => <AccountRenderer account={{ slug: value }} />,
   },

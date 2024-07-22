@@ -2,9 +2,12 @@
  * A map of keys used for preview features.
  */
 export enum PREVIEW_FEATURE_KEYS {
-  EXPENSE_CATEGORIZATION = 'EXPENSE_CATEGORIZATION',
   DYNAMIC_TOP_BAR = 'DYNAMIC_TOP_BAR',
   COLLECTIVE_OVERVIEW = 'COLLECTIVE_OVERVIEW',
+  NEW_EXPENSE_FLOW = 'NEW_EXPENSE_FLOW',
+  HOST_REPORTS = 'HOST_REPORTS',
+  CROWDFUNDING_REDESIGN = 'CROWDFUNDING_REDESIGN',
+  TRANSACTIONS_IMPORTS = 'TRANSACTIONS_IMPORTS',
 }
 
 export type PreviewFeature = {
@@ -29,14 +32,6 @@ export const previewFeatures: PreviewFeature[] = [
     publicBeta: false,
   },
   {
-    key: PREVIEW_FEATURE_KEYS.EXPENSE_CATEGORIZATION,
-    title: 'Expense categorization',
-    description: 'Facilitate your accounting by categorizing your expenses according to a chart of accounts.',
-    publicBeta: false,
-    closedBetaAccessFor: ['foundation', 'opensource', 'europe'],
-    alwaysEnableInDev: true,
-  },
-  {
     key: PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW,
     title: 'Collective Overview',
     description: 'Overview page for Collectives in Dashboard',
@@ -44,5 +39,36 @@ export const previewFeatures: PreviewFeature[] = [
     alwaysEnableInDev: true,
     enabledByDefaultFor: ['*'],
     closedBetaAccessFor: ['opencollective', 'opensource', 'foundation', 'europe', 'design', 'engineering'],
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW,
+    title: 'New expense submission flow',
+    description: 'Improved expense submission flow in Dashboard',
+    alwaysEnableInDev: true,
+    publicBeta: false,
+    closedBetaAccessFor: ['opencollective', 'design', 'engineering'],
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.HOST_REPORTS,
+    title: 'New Host Transactions Report',
+    description:
+      'A new report that sums up all transactions to create a comprehensive overview of all activity in your account.',
+    publicBeta: true,
+    alwaysEnableInDev: true,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.CROWDFUNDING_REDESIGN,
+    title: 'Crowdfunding Redesign',
+    description:
+      'Be part of the crowdfunding redesign effort and get access to previews of new crowdfunding and profile pages',
+    alwaysEnableInDev: true,
+    publicBeta: true,
+    closedBetaAccessFor: ['opencollective', 'design', 'engineering'],
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.TRANSACTIONS_IMPORTS,
+    title: 'Transactions Imports',
+    description: 'A new tool to import batches of transactions.',
+    publicBeta: true,
   },
 ];

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, useIntl } from 'react-intl';
-import { HeightProps } from 'styled-system';
+import type { HeightProps } from 'styled-system';
 
 import SearchForm from './SearchForm';
 
@@ -21,7 +21,7 @@ const SearchBar = ({
   defaultValue,
   placeholder,
   ...props
-}: HeightProps & React.HTMLAttributes<HTMLFormElement>) => {
+}: HeightProps & React.InputHTMLAttributes<HTMLFormElement>) => {
   const [value, setValue] = React.useState(defaultValue || '');
   const intl = useIntl();
 

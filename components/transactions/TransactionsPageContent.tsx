@@ -199,7 +199,7 @@ const Transactions = ({
         </h1>
         <div className="w-[276px] flex-grow sm:flex-grow-0">
           <SearchBar
-            placeholder={intl.formatMessage({ defaultMessage: 'Search transactions…' })}
+            placeholder={intl.formatMessage({ defaultMessage: 'Search transactions…', id: 'tTmMmK' })}
             defaultValue={router.query.searchTerm}
             height="40px"
             onSubmit={searchTerm => updateFilters({ searchTerm, offset: null })}
@@ -246,15 +246,13 @@ const Transactions = ({
             checked={router.query.displayPendingContributions !== 'false' ? true : false}
             onChange={({ checked }) => updateFilters({ displayPendingContributions: checked })}
             label={
-              <FormattedMessage
-                id="transactions.displayPendingContributions"
-                defaultMessage="Display pending contributions"
-              />
+              <FormattedMessage id="transactions.displayPendingContributions" defaultMessage="Display expected funds" />
             }
           />
         )}
         {state.hasChildren && (
           <StyledCheckbox
+            name="ignoreChildrenTransactions"
             checked={router.query.ignoreChildrenTransactions ? true : false}
             onChange={({ checked }) => updateFilters({ ignoreChildrenTransactions: checked })}
             label={
@@ -267,6 +265,7 @@ const Transactions = ({
         )}
         {state.hasGiftCards && (
           <StyledCheckbox
+            name="ignoreGiftCardsTransactions"
             checked={router.query.ignoreGiftCardsTransactions ? true : false}
             onChange={({ checked }) => updateFilters({ ignoreGiftCardsTransactions: checked })}
             label={
@@ -276,6 +275,7 @@ const Transactions = ({
         )}
         {state.hasIncognito && (
           <StyledCheckbox
+            name="ignoreIncognitoTransactions"
             checked={router.query.ignoreIncognitoTransactions ? true : false}
             onChange={({ checked }) => updateFilters({ ignoreIncognitoTransactions: checked })}
             label={

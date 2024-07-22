@@ -3,8 +3,8 @@ contact_links:
   - name: Issue Tracker
     url: https://github.com/opencollective/opencollective/issues
     about: Repository to track issues across all our projects
-  - name: Slack Channel
-    url: http://slack.opencollective.com/
+  - name: Discord Channel
+    url: https://discord.opencollective.com
     about: Engage with the Open Collective community
   - name: Documentation
     url: https://docs.opencollective.com/help/

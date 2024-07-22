@@ -22,11 +22,12 @@ import DashboardHeader from '../../DashboardHeader';
 import { childAccountFilter } from '../../filters/ChildAccountFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { periodCompareFilter } from '../../filters/PeriodCompareFilter';
-import { DashboardSectionProps } from '../../types';
+import type { DashboardSectionProps } from '../../types';
 
 import { Accounts } from './Accounts';
 import AccountTable from './AccountTable';
-import { Metric, MetricProps } from './Metric';
+import type { MetricProps } from './Metric';
+import { Metric } from './Metric';
 import { overviewMetricsQuery } from './queries';
 import { Timeline } from './Timeline';
 import { TodoList } from './TodoList';
@@ -83,9 +84,9 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
           default:
             return {
               includeReceived: true,
-              includeBalance: true,
+              includeBalance: account.isActive, // only showing Balance if account is active
               includeSpent: true,
-              includeBalanceTimeseries: true,
+              includeBalanceTimeseries: account.isActive, // only showing Balance if account is active
               includeContributionsCount: true,
               includeReceivedTimeseries: true,
             };
@@ -108,7 +109,7 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
       ...queryFilter.variables,
       ...(account.parent && { includeChildren: false }),
     },
-    fetchPolicy: 'cache-first',
+    fetchPolicy: 'cache-and-network',
     context: API_V2_CONTEXT,
   });
 
@@ -121,24 +122,27 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
       id: 'balance',
       className: 'col-span-1 row-span-2',
       label: <FormattedMessage id="TotalBalance" defaultMessage="Total Balance" />,
-      helpLabel: <FormattedMessage defaultMessage="Balance at end of this period, including starting balance" />,
+      helpLabel: (
+        <FormattedMessage defaultMessage="Balance at end of this period, including starting balance" id="hi/nhW" />
+      ),
       timeseries: { ...data?.account.balanceTimeseries, currency: data?.account.balance?.current?.currency },
       amount: data?.account.balance,
       showCurrencyCode: true,
       isSnapshot: true,
       showTimeSeries: true,
+      hide: !account.isActive,
     },
     {
       id: 'received',
-      label: <FormattedMessage defaultMessage="Received" />,
-      helpLabel: <FormattedMessage defaultMessage="Total amount received this period" />,
+      label: <FormattedMessage defaultMessage="Received" id="z/wUXE" />,
+      helpLabel: <FormattedMessage defaultMessage="Total amount received this period" id="2kY5p5" />,
       amount: data?.account.received,
       timeseries: { ...data?.account.receivedTimeseries, currency: data?.account.received?.current?.currency },
     },
     {
       id: 'spent',
-      label: <FormattedMessage defaultMessage="Spent" />,
-      helpLabel: <FormattedMessage defaultMessage="Total amount spent this period" />,
+      label: <FormattedMessage defaultMessage="Spent" id="111qQK" />,
+      helpLabel: <FormattedMessage defaultMessage="Total amount spent this period" id="6ctWuQ" />,
       amount: data?.account.spent,
     },
 
@@ -146,6 +150,7 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
       id: 'contributions',
       label: <FormattedMessage id="Contributions" defaultMessage="Contributions" />,
       count: data?.account.contributionsCount,
+      hide: !account.isActive,
     },
   ];
 
@@ -234,26 +239,28 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
         />
         <Filterbar hideSeparator {...queryFilter} />
 
-        <div className="grid grid-flow-dense grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3  ">
-          {metrics.map(metric => (
-            <Metric
-              key={metric.id}
-              {...metric}
-              loading={loading}
-              onClick={() => queryFilter.setFilter('subpath', metric.id)}
-            />
-          ))}
+        <div className="grid grid-flow-dense grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3">
+          {metrics
+            .filter(metric => !metric.hide)
+            .map(metric => (
+              <Metric
+                key={metric.id}
+                {...metric}
+                loading={loading}
+                onClick={() => queryFilter.setFilter('subpath', metric.id)}
+              />
+            ))}
         </div>
       </div>
 
       <hr />
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3 2xl:grid-cols-3">
-        <div className="order-1 space-y-6 xl:order-none xl:col-span-2 ">
+        <div className="order-1 space-y-6 xl:order-none xl:col-span-2">
           <TodoList />
           <Timeline accountSlug={router.query?.as ?? accountSlug} />
         </div>
-        {!account.parent && (
+        {!account.parent && account.isActive && (
           <div className="-order-1 space-y-6 lg:order-none">
             <Accounts accountSlug={router.query?.as ?? accountSlug} />
           </div>
@@ -263,7 +270,7 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
         open={showFeedbackModal}
         setOpen={setShowFeedbackModal}
         feedbackKey={FEEDBACK_KEY.COLLECTIVE_OVERVIEW}
-        title={<FormattedMessage defaultMessage="Give feedback on the Collective Overview" />}
+        title={<FormattedMessage defaultMessage="Give feedback on the Collective Overview" id="3eBgsu" />}
       />
     </div>
   );

@@ -362,7 +362,7 @@ const ApplicationForm = ({
                             <Box>
                               <StyledInputFormikField
                                 label={intl.formatMessage(i18nLabels.slug)}
-                                helpText={<FormattedMessage defaultMessage="This can be edited later" />}
+                                helpText={<FormattedMessage defaultMessage="This can be edited later" id="03Q893" />}
                                 labelFontSize="16px"
                                 labelProps={{ fontWeight: '600' }}
                                 name="collective.slug"
@@ -697,6 +697,7 @@ const ApplicationForm = ({
                           <MessageBox type="info" mt={3} fontSize="13px">
                             <FormattedMessage
                               defaultMessage="Your selected Fiscal Host requires you to add a minimum of {numberOfAdmins, plural, one {# admin} other {# admins} }. You can manage your admins from the Collective Settings."
+                              id="GTK0Wf"
                               values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
                             />
                           </MessageBox>
@@ -717,6 +718,7 @@ const ApplicationForm = ({
                               {...field}
                               rows={6}
                               fontSize="14px"
+                              maxLength={3000}
                               placeholder={intl.formatMessage(i18nLabels.tellUsMorePlaceholder)}
                             />
                           )}

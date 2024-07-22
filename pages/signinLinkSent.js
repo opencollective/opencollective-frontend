@@ -40,6 +40,7 @@ class SignInLinkSent extends Component {
             <P fontSize="20px" lineHeight="28px" color="black.800" fontWeight={500} mt={4}>
               <FormattedMessage
                 defaultMessage="We've sent it to {email}"
+                id="Yh1nOL"
                 values={{ email: <strong>{email}</strong> }}
               />
             </P>
@@ -72,6 +73,6 @@ SignInLinkSent.propTypes = {
   email: PropTypes.string.isRequired,
 };
 
-// ignore unused exports default
 // next.js export
+// ts-unused-exports:disable-next-line
 export default SignInLinkSent;

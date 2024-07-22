@@ -41,14 +41,13 @@ const RecurringContributionsCard = ({
   isAdmin,
   onCloseEdit,
   onEdit,
-  showPaymentMethod,
+  showPaymentMethod = true,
   ...props
 }) => {
   const { formatMessage } = useIntl();
   const isError = status === ORDER_STATUS.ERROR;
   const isRejected = status === ORDER_STATUS.REJECTED;
   const isEditable = [ORDER_STATUS.ACTIVE, ORDER_STATUS.PROCESSING, ORDER_STATUS.NEW].includes(status) || isError;
-
   return (
     <StyledCollectiveCard
       {...props}
@@ -205,10 +204,6 @@ RecurringContributionsCard.propTypes = {
   LoggedInUser: PropTypes.object,
   account: PropTypes.object.isRequired,
   showPaymentMethod: PropTypes.bool,
-};
-
-RecurringContributionsCard.defaultProps = {
-  showPaymentMethod: true,
 };
 
 export default RecurringContributionsCard;

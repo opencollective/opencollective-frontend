@@ -58,18 +58,25 @@ export const AuthorizedApp = ({ authorization, onRevoke }) => {
               <Tooltip>
                 <TooltipTrigger>
                   <Badge type="warning" className="flex items-center gap-1 text-xs">
-                    <AlertTriangle size={12} /> <FormattedMessage defaultMessage="Extended permissions" />
+                    <AlertTriangle size={12} /> <FormattedMessage defaultMessage="Extended permissions" id="nLWNOi" />
                   </Badge>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <FormattedMessage defaultMessage="This application can directly perform critical operations that would normally require 2FA." />
+                  <FormattedMessage
+                    defaultMessage="This application can directly perform critical operations that would normally require 2FA."
+                    id="RRq5rD"
+                  />
                 </TooltipContent>
               </Tooltip>
             )}
           </div>
           <Container display="flex" alignItems="center" flexWrap="wrap" fontSize="12px" color="black.700">
             <time dateTime={authorization.createdAt} title={generateDateTitle(intl, new Date(authorization.createdAt))}>
-              <FormattedMessage defaultMessage="Connected on {date, date, simple}" values={{ date: new Date() }} />
+              <FormattedMessage
+                defaultMessage="Connected on {date, date, simple}"
+                id="Zi4M6s"
+                values={{ date: new Date() }}
+              />
             </time>
             <Span mr={1}>
               {authorization.lastUsedAt && (
@@ -81,6 +88,7 @@ export const AuthorizedApp = ({ authorization, onRevoke }) => {
                   >
                     <FormattedMessage
                       defaultMessage="Last used {timeElapsed}"
+                      id="lihKZ1"
                       values={{
                         timeElapsed: (
                           <FormattedRelativeTime
@@ -121,6 +129,7 @@ export const AuthorizedApp = ({ authorization, onRevoke }) => {
                   item: (
                     <FormattedMessage
                       defaultMessage="{count,plural,one {Scope} other {Scopes}}"
+                      id="WC8ZBR"
                       values={{ count: authorization.scope.length }}
                     />
                   ),
@@ -149,7 +158,7 @@ export const AuthorizedApp = ({ authorization, onRevoke }) => {
               toast({
                 variant: 'success',
                 message: intl.formatMessage(
-                  { defaultMessage: `Authorization for {appName} revoked` },
+                  { defaultMessage: `Authorization for {appName} revoked`, id: 'hfh76h' },
                   { appName: authorization.application.name },
                 ),
               });
@@ -158,7 +167,7 @@ export const AuthorizedApp = ({ authorization, onRevoke }) => {
             }
           }}
         >
-          <FormattedMessage defaultMessage="Revoke access" />
+          <FormattedMessage defaultMessage="Revoke access" id="KUFMiM" />
         </StyledButton>
       </Container>
     </Flex>

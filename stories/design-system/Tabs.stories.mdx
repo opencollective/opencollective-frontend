@@ -1,0 +1,77 @@
+import { ArgsTable, Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
+import Tabs from '../../components/Tabs';
+
+<Meta title="Design system/Tabs" component={Tabs} />
+
+### Default
+
+<Canvas>
+  <Story name="Default">
+    {() => {
+      const [selected, select] = React.useState('tab1');
+      return (
+        <Tabs
+          tabs={[
+            {
+              id: 'tab1',
+              label: 'Inbox',
+              count: 20,
+            },
+            {
+              id: 'tab2',
+              label: 'Deleted',
+              count: 0,
+            },
+            {
+              id: 'tab3',
+              label: 'Sent',
+              count: 5,
+            },
+          ]}
+          selectedId={selected}
+          onChange={select}
+        />
+      );
+    }}
+  </Story>
+</Canvas>
+
+<ArgsTable story="Default" />
+
+### Vertical
+
+<Canvas>
+  <Story name="Vertical">
+    {() => {
+      const [selected, select] = React.useState('tab1');
+      return (
+        <div className="w-1/3">
+          <Tabs
+            tabs={[
+              {
+                id: 'tab1',
+                label: 'Inbox',
+                count: 20,
+              },
+              {
+                id: 'tab2',
+                label: 'Deleted',
+                count: 0,
+              },
+              {
+                id: 'tab3',
+                label: 'Sent',
+                count: 5,
+              },
+            ]}
+            selectedId={selected}
+            onChange={select}
+            variant="vertical"
+          />
+        </div>
+      );
+    }}
+  </Story>
+</Canvas>
+
+<ArgsTable story="Vertical" />

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { groupBy, intersection, isEqual, last, sortBy, truncate } from 'lodash';
 import memoizeOne from 'memoize-one';
 import ReactDOM from 'react-dom';
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { Manager, Popper, Reference } from 'react-popper';
 import styled from 'styled-components';
 import { isEmail } from 'validator';
@@ -62,19 +62,24 @@ const CollectiveLabelTextContainer = styled.div`
  * Default label builder used to render a collective. For sections titles and custom options,
  * this will just return the default label.
  */
-export const DefaultCollectiveLabel = ({ value: collective }) => (
-  <Flex alignItems="center">
-    <Avatar collective={collective} radius={16} />
-    <CollectiveLabelTextContainer>
-      <Span fontSize="12px" fontWeight="500" lineHeight="18px" color="black.700">
-        {truncate(collective.name, { length: 40 })}
-      </Span>
-      <Span fontSize="11px" lineHeight="13px" color="black.500">
-        {collective.slug && collective.type !== 'VENDOR' ? `@${collective.slug}` : collective.email || ''}
-      </Span>
-    </CollectiveLabelTextContainer>
-  </Flex>
-);
+export const DefaultCollectiveLabel = ({ value: collective }) =>
+  !collective ? (
+    <Span fontSize="12px" lineHeight="18px" color="black.500">
+      <FormattedMessage defaultMessage="No collective" id="159cQ8" />
+    </Span>
+  ) : (
+    <Flex alignItems="center">
+      <Avatar collective={collective} radius={16} />
+      <CollectiveLabelTextContainer>
+        <Span fontSize="12px" fontWeight="500" lineHeight="18px" color="black.700">
+          {truncate(collective.name, { length: 40 })}
+        </Span>
+        <Span fontSize="11px" lineHeight="13px" color="black.500">
+          {collective.slug && collective.type !== 'VENDOR' ? `@${collective.slug}` : collective.email || ''}
+        </Span>
+      </CollectiveLabelTextContainer>
+    </Flex>
+  );
 
 DefaultCollectiveLabel.propTypes = {
   value: PropTypes.shape({
@@ -371,8 +376,7 @@ class CollectivePicker extends React.PureComponent {
                     p={3}
                     my={1}
                     boxShadow="-2px 4px 7px 0 rgba(78, 78, 78, 14%)"
-                    maxHeight={315}
-                    overflowY="auto"
+                    height={400}
                     data-cy="collective-mini-form-scroll"
                     {...this.props.styles?.menu}
                   >

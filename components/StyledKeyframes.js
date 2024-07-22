@@ -4,7 +4,6 @@
 
 import { keyframes } from 'styled-components';
 
-// ignore unused exports
 // utility library
 
 export const rotating = keyframes`
@@ -16,6 +15,7 @@ export const rotating = keyframes`
   }
 `;
 
+// ts-unused-exports:disable-next-line
 export const fadeIn = keyframes`
   from {
     opacity: 0;
@@ -34,6 +34,7 @@ export const slideInUp = keyframes`
   }
 `;
 
+// ts-unused-exports:disable-next-line
 export const fadeInUp = keyframes`
   from {
     opacity: 0;

@@ -12,6 +12,7 @@ import { isURL } from 'validator';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { formatValueAsCurrency } from '../../lib/currency-utils';
 import { createError, ERROR } from '../../lib/errors';
+import { standardizeExpenseItemIncurredAt } from '../../lib/expenses';
 import { formatFormErrorMessage, requireFields } from '../../lib/form-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { cn } from '../../lib/utils';
@@ -106,20 +107,10 @@ export const validateExpenseItem = (expense, item) => {
   return errors;
 };
 
-const standardizeIncurredAt = incurredAt => {
-  if (!incurredAt) {
-    return null;
-  } else if (typeof incurredAt === 'string') {
-    return incurredAt.match(/^\d{4}-\d{2}-\d{2}$/) ? `${incurredAt}T00:00:00Z` : incurredAt;
-  } else if (incurredAt instanceof Date) {
-    return incurredAt.toISOString();
-  }
-};
-
 export const prepareExpenseItemForSubmit = (expenseData, item) => {
   // The frontend currently ignores the time part of the date, we default to midnight UTC
   const incurredAtFullDate = item.incurredAt || new Date().toISOString().split('T')[0];
-  const incurredAt = standardizeIncurredAt(incurredAtFullDate);
+  const incurredAt = standardizeExpenseItemIncurredAt(incurredAtFullDate);
   return {
     id: item.__isNew ? undefined : item.id, // Omit item's ids that were created for keying purposes
     incurredAt,
@@ -156,16 +147,19 @@ const WithOCRComparisonWarning = ({ comparison, formatValue, children, mrClass =
             {comparison.hasCurrencyMismatch ? (
               <FormattedMessage
                 defaultMessage="This currency does not match the one scanned from the document ({value})"
+                id="mNqW2+"
                 values={{ value: comparison.ocrValue?.currency }}
               />
             ) : comparison.hasAmountMismatch ? (
               <FormattedMessage
                 defaultMessage="The amount does not match the one scanned from the document ({value})"
+                id="PlRIcN"
                 values={{ value: formatValue ? formatValue(comparison.ocrValue) : comparison.ocrValue.toString() }}
               />
             ) : (
               <FormattedMessage
                 defaultMessage="This value does not match the one scanned from the document ({value})"
+                id="uMuuUg"
                 values={{ value: formatValue ? formatValue(comparison.ocrValue) : comparison.ocrValue.toString() }}
               />
             )}
@@ -208,7 +202,7 @@ const useExpenseItemExchangeRate = (form, itemPath) => {
   const expenseCurrency = get(form.values, 'currency');
   const itemValues = get(form.values, itemPath);
   const itemCurrency = itemValues?.amountV2?.currency || expenseCurrency;
-  const incurredAt = standardizeIncurredAt(get(itemValues, 'incurredAt'));
+  const incurredAt = standardizeExpenseItemIncurredAt(get(itemValues, 'incurredAt'));
   const existingExchangeRate = get(itemValues, 'amountV2.exchangeRate');
   const defaultExchangeRate = {
     value: null,
@@ -301,7 +295,7 @@ const ExpenseItemForm = ({
   requireDate,
   isRichText,
   itemIdx,
-  isOptional,
+  isOptional = false,
   editOnlyDescriptiveInfo,
   isInvoice,
   hasOCRFeature,
@@ -438,6 +432,7 @@ const ExpenseItemForm = ({
                           width="100%"
                           minHeight="39px"
                           value={typeof field.value === 'string' ? field.value.split('T')[0] : field.value}
+                          placeholder="YYYY-MM-DD"
                         />
                       </WithOCRComparisonWarning>
                     )}
@@ -526,6 +521,7 @@ const ExpenseItemForm = ({
                   }
                   approximateCustomMessage={intl.formatMessage({
                     defaultMessage: 'This value is an estimate. Please set the exact amount received if known.',
+                    id: 'zNBAqh',
                   })}
                 />
               )}
@@ -533,7 +529,7 @@ const ExpenseItemForm = ({
             {hasAccountingCategory && (
               <Container display="flex" flexDirection="column" fontSize="12px" flex="1 1 33%" mt={3}>
                 <P fontSize="13px" lineHeight="1.15em" fontWeight="normal" mr="8px" mb="8px">
-                  <FormattedMessage defaultMessage="Expense category" />
+                  <FormattedMessage defaultMessage="Expense category" id="I4c3ke" />
                 </P>
                 <div className="flex max-h-[38px] grow items-center">
                   <ExpenseAccountingCategoryPill
@@ -602,10 +598,6 @@ ExpenseItemForm.propTypes = {
   itemIdx: PropTypes.number.isRequired,
   ocrComparison: PropTypes.object,
   hasCurrencyPicker: PropTypes.bool,
-};
-
-ExpenseItemForm.defaultProps = {
-  isOptional: false,
 };
 
 ExpenseItemForm.whyDidYouRender = true;

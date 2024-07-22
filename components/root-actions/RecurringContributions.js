@@ -4,6 +4,7 @@ import { useQuery } from '@apollo/client';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
+import DashboardHeader from '../dashboard/DashboardHeader';
 import { Box } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import { manageContributionsQuery } from '../recurring-contributions/graphql/queries';
@@ -18,7 +19,8 @@ const RecurringContributions = () => {
     context: API_V2_CONTEXT,
   });
   return (
-    <Box my={4}>
+    <Box>
+      <DashboardHeader title="Recurring Contributions" className="mb-10" />
       <StyledInputField htmlFor="recurring-contributions-account" label="Account" flex="1 1">
         {({ id }) => (
           <CollectivePickerAsync

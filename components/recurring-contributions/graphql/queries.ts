@@ -3,23 +3,32 @@ import { gql } from '../../../lib/graphql/helpers';
 import { accountHoverCardFields } from '../../AccountHoverCard';
 import { accountNavbarFieldsFragment } from '../../collective-navbar/fragments';
 
+export const paymentMethodFragment = gql`
+  fragment UpdatePaymentMethodFragment on PaymentMethod {
+    id
+    name
+    data
+    service
+    type
+    expiryDate
+    account {
+      id
+    }
+    balance {
+      value
+      valueInCents
+      currency
+    }
+  }
+`;
+
 export const managedOrderFragment = gql`
   fragment ManagedOrderFields on Order {
     id
     legacyId
     nextChargeDate
     paymentMethod {
-      id
-      service
-      name
-      type
-      expiryDate
-      data
-      balance {
-        value
-        valueInCents
-        currency
-      }
+      ...UpdatePaymentMethodFragment
     }
     amount {
       value
@@ -35,10 +44,22 @@ export const managedOrderFragment = gql`
     description
     createdAt
     processedAt
+    hostFeePercent
     frequency
     tier {
       id
       name
+    }
+    permissions {
+      id
+      canResume
+      canMarkAsExpired
+      canMarkAsPaid
+      canEdit
+      canComment
+      canSeePrivateActivities
+      canSetTags
+      canUpdateAccountingCategory
     }
     totalDonations {
       value
@@ -64,7 +85,6 @@ export const managedOrderFragment = gql`
       description
       tags
       imageUrl
-      hasImage
       backgroundImageUrl(height: 256)
       settings
       ... on AccountWithHost {
@@ -89,8 +109,19 @@ export const managedOrderFragment = gql`
       value
       valueInCents
     }
+    pendingContributionData {
+      expectedAt
+      paymentMethod
+      ponumber
+      memo
+      fromAccountInfo {
+        name
+        email
+      }
+    }
   }
   ${accountHoverCardFields}
+  ${paymentMethodFragment}
 `;
 
 export const manageContributionsQuery = gql`

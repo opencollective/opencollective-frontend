@@ -5,10 +5,11 @@ import { defineMessage, FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
 import { CollectiveType } from '../../../../lib/constants/collectives';
-import { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
+import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import { AccountVirtualCardsQueryVariables, VirtualCardStatus } from '../../../../lib/graphql/types/v2/graphql';
+import type { AccountVirtualCardsQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import { VirtualCardStatus } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { sortSelectOptions } from '../../../../lib/utils';
 import { VirtualCardStatusI18n } from '../../../../lib/virtual-cards/constants';
@@ -17,7 +18,6 @@ import VirtualCard from '../../../edit-collective/VirtualCard';
 import HTMLContent from '../../../HTMLContent';
 import { getI18nLink } from '../../../I18nFormatters';
 import Loading from '../../../Loading';
-import Pagination from '../../../Pagination';
 import RequestVirtualCardBtn from '../../../RequestVirtualCardBtn';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../../../ui/Accordion';
 import { Button } from '../../../ui/Button';
@@ -27,7 +27,8 @@ import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { dateFilter } from '../../filters/DateFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { orderByFilter } from '../../filters/OrderFilter';
-import { DashboardSectionProps } from '../../types';
+import { Pagination } from '../../filters/Pagination';
+import type { DashboardSectionProps } from '../../types';
 
 import { accountVirtualCardsQuery } from './queries';
 
@@ -48,10 +49,10 @@ const toVariables: FiltersToVariables<FilterValues, AccountVirtualCardsQueryVari
 };
 
 const filters: FilterComponentConfigs<FilterValues> = {
-  date: { ...dateFilter.filter, labelMsg: defineMessage({ defaultMessage: 'Created at' }) },
+  date: { ...dateFilter.filter, labelMsg: defineMessage({ defaultMessage: 'Created at', id: 'AbXVP4' }) },
   orderBy: orderByFilter.filter,
   status: {
-    labelMsg: defineMessage({ defaultMessage: 'Status' }),
+    labelMsg: defineMessage({ defaultMessage: 'Status', id: 'tzMNF3' }),
     Component: ({ intl, ...props }) => (
       <ComboSelectFilter
         isMulti
@@ -143,7 +144,7 @@ const VitualCards = ({ accountSlug }: DashboardSectionProps) => {
       ) : loading ? (
         <Loading />
       ) : (
-        <div className="flex flex-col gap-12">
+        <React.Fragment>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {data?.account?.virtualCards.nodes.map(virtualCard => (
               <VirtualCard
@@ -158,17 +159,8 @@ const VitualCards = ({ accountSlug }: DashboardSectionProps) => {
               />
             ))}
           </div>
-
-          <div className="flex justify-center">
-            <Pagination
-              onPageChange={page => queryFilter.setFilter('offset', (page - 1) * queryFilter.values.limit)}
-              total={data?.account?.virtualCards.totalCount}
-              limit={queryFilter.values.limit}
-              offset={queryFilter.values.offset}
-              ignoredQueryParams={['slug', 'section']}
-            />
-          </div>
-        </div>
+          <Pagination queryFilter={queryFilter} total={data?.account?.virtualCards.totalCount} />
+        </React.Fragment>
       )}
     </div>
   );

@@ -12,10 +12,13 @@ import styled from 'styled-components';
 
 import { AnalyticsEvent } from '../../lib/analytics/events';
 import { track } from '../../lib/analytics/plausible';
+import { getTwitterHandleFromCollective } from '../../lib/collective';
+import { getIntervalFromGQLV2Frequency } from '../../lib/constants/intervals';
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { formatCurrency } from '../../lib/currency-utils';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { formatManualInstructions } from '../../lib/payment-method-utils';
+import { getStripe } from '../../lib/stripe';
 import {
   facebookShareURL,
   followOrderRedirectUrl,
@@ -64,7 +67,14 @@ const ContainerWithImage = styled(Container)`
   }
 `;
 
-const ShareLink = styled(StyledLink)`
+const ShareLink = styled(StyledLink).attrs({
+  buttonStyle: 'standard',
+  buttonSize: 'medium',
+  minWidth: 130,
+  mx: 2,
+  mb: 2,
+  target: '_blank',
+})`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -72,15 +82,6 @@ const ShareLink = styled(StyledLink)`
     margin-right: 8px;
   }
 `;
-
-ShareLink.defaultProps = {
-  buttonStyle: 'standard',
-  buttonSize: 'medium',
-  minWidth: 130,
-  mx: 2,
-  mb: 2,
-  target: '_blank',
-};
 
 const BankTransferInfoContainer = styled(Container)`
   border: 1px solid ${themeGet('colors.black.400')};
@@ -133,7 +134,7 @@ class ContributionFlowSuccess extends React.Component {
     data: PropTypes.object,
   };
 
-  componentDidMount() {
+  async componentDidMount() {
     track(AnalyticsEvent.CONTRIBUTION_SUCCESS);
     if (this.props.LoggedInUser) {
       toast({
@@ -141,13 +142,63 @@ class ContributionFlowSuccess extends React.Component {
         duration: 20000,
       });
     }
+
+    const isStripeRedirect = this.props.router.query.payment_intent_client_secret;
+
+    if (isStripeRedirect) {
+      const stripe = await getStripe(null, this.props.router.query.stripeAccount);
+      const paymentIntentResult = await stripe.retrievePaymentIntent(
+        this.props.router.query.payment_intent_client_secret,
+      );
+      this.setState({
+        paymentIntentResult,
+      });
+    }
+
+    this.setState({
+      loaded: true,
+    });
   }
 
   componentDidUpdate() {
     const {
       router: { query: queryParams },
       data: { order },
+      intl,
     } = this.props;
+
+    const paymentIntentResult = this.state?.paymentIntentResult;
+    if (order && paymentIntentResult) {
+      const stripeErrorMessage = paymentIntentResult.error
+        ? paymentIntentResult.error.message
+        : !['succeeded', 'processing'].includes(paymentIntentResult.paymentIntent.status)
+          ? (paymentIntentResult.paymentIntent.last_payment_error?.message ??
+            intl.formatMessage({ defaultMessage: 'An unknown error has ocurred', id: 'TGDa6P' }))
+          : null;
+
+      if (stripeErrorMessage) {
+        const tierSlug = order.tier?.slug;
+
+        const path = tierSlug
+          ? `/${order.toAccount.slug}/contribute/${tierSlug}-${order.tier.legacyId}/checkout/payment`
+          : `/${order.toAccount.slug}/donate/payment`;
+
+        const url = new URL(path, window.location.origin);
+        url.searchParams.set('error', stripeErrorMessage);
+        url.searchParams.set('interval', getIntervalFromGQLV2Frequency(order.frequency));
+        url.searchParams.set('amount', order.amount.value);
+        url.searchParams.set('contributeAs', order.fromAccount.slug);
+
+        if (queryParams.redirect) {
+          url.searchParams.set('redirect', queryParams.redirect);
+          url.searchParams.set('shouldRedirectParent', queryParams.shouldRedirectParent);
+        }
+
+        this.props.router.push(url.toString());
+        return;
+      }
+    }
+
     if (order && queryParams.redirect) {
       if (isValidExternalRedirect(queryParams.redirect)) {
         followOrderRedirectUrl(this.props.router, this.props.collective, order, queryParams.redirect, {
@@ -272,6 +323,8 @@ class ContributionFlowSuccess extends React.Component {
     const isProcessing = order?.status === ORDER_STATUS.PROCESSING;
     const isFediverse = order && (isAccountFediverse(order.toAccount) || isAccountFediverse(order.toAccount.parent));
 
+    const loading = data.loading || !this.state?.loaded;
+
     if (!data.loading && !order) {
       return (
         <Flex justifyContent="center" py={[5, 6]}>
@@ -282,6 +335,7 @@ class ContributionFlowSuccess extends React.Component {
       );
     }
 
+    const toAccountTwitterHandle = getTwitterHandleFromCollective(order?.toAccount);
     return (
       <React.Fragment>
         {!isEmbed && isProcessing && (
@@ -294,11 +348,14 @@ class ContributionFlowSuccess extends React.Component {
             flexDirection="column"
           >
             <P fontWeight="700" fontSize="14px" lineHeight="20px">
-              <FormattedMessage defaultMessage="Your Contribution is processing!" />
+              <FormattedMessage defaultMessage="Your Contribution is processing!" id="RTyy4V" />
             </P>
             <Box mt={1} maxWidth="672px">
               <P fontWeight="400" fontSize="14px" lineHeight="20px" textAlign="center">
-                <FormattedMessage defaultMessage="Your contribution will remain in processing state until it is completed from the payment processor's end. You will receive an email when it goes through successfully. No further action is required from your end." />
+                <FormattedMessage
+                  defaultMessage="Your contribution will remain in processing state until it is completed from the payment processor's end. You will receive an email when it goes through successfully. No further action is required from your end."
+                  id="R1RQBD"
+                />
               </P>
             </Box>
             <StyledLink
@@ -310,7 +367,7 @@ class ContributionFlowSuccess extends React.Component {
               color="#0C2D66"
               mt={1}
             >
-              <FormattedMessage defaultMessage="View Contribution!" />
+              <FormattedMessage defaultMessage="View Contribution!" id="zG2d9i" />
             </StyledLink>
           </Flex>
         )}
@@ -322,7 +379,7 @@ class ContributionFlowSuccess extends React.Component {
           css={{ height: '100%' }}
           data-cy="order-success"
         >
-          {data.loading ? (
+          {loading ? (
             <Container display="flex" alignItems="center" justifyContent="center">
               <Loading />
             </Container>
@@ -333,7 +390,7 @@ class ContributionFlowSuccess extends React.Component {
                 alignItems="center"
                 justifyContent="center"
                 width={['100%', null, null, '50%', '762px']}
-                mb={[4, null, 0]}
+                mb={[4, null, null, 0]}
                 flexShrink={0}
               >
                 <Flex flexDirection="column" alignItems="center" justifyContent="center" my={4} width={1}>
@@ -381,7 +438,10 @@ class ContributionFlowSuccess extends React.Component {
                         url: shareURL,
                         text: intl.formatMessage(
                           order.toAccount.type === 'EVENT' ? successMsgs.event : successMsgs.default,
-                          { collective: order.toAccount.name, event: order.toAccount.name },
+                          {
+                            collective: toAccountTwitterHandle ? `@${toAccountTwitterHandle}` : order.toAccount.name,
+                            event: order.toAccount.name,
+                          },
                         ),
                       })}
                     >
@@ -420,9 +480,17 @@ class ContributionFlowSuccess extends React.Component {
                   )}
                 </Flex>
               </ContainerWithImage>
-              <Flex flexDirection="column" alignItems="center" justifyContent="center" width={1}>
+              <Container
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                justifyContent="center"
+                width={1}
+                px={3}
+                boxShadow={['0 -35px 5px 0px #fff', '-15px 0 15px -15px #fff']}
+              >
                 {this.renderInfoByPaymentMethod()}
-              </Flex>
+              </Container>
             </Fragment>
           )}
         </Flex>

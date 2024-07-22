@@ -1,21 +1,14 @@
 // This file is mostly adapted from:
 // https://github.com/zeit/next.js/blob/3949c82bdfe268f841178979800aa8e71bbf412c/examples/with-apollo/lib/initApollo.js
 
-import {
-  ApolloClient,
-  ApolloLink,
-  HttpLink,
-  InMemoryCache,
-  NormalizedCacheObject,
-  QueryOptions,
-  useQuery,
-} from '@apollo/client';
+import type { NormalizedCacheObject, QueryOptions } from '@apollo/client';
+import { ApolloClient, ApolloLink, HttpLink, InMemoryCache, useQuery } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
 import { mergeDeep } from '@apollo/client/utilities';
 import { createUploadLink } from 'apollo-upload-client';
 import { isUndefined, omitBy, pick } from 'lodash';
-import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
+import type { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
 import TwoFactorAuthenticationApolloLink from './two-factor-authentication/TwoFactorAuthenticationApolloLink';
 import { getErrorFromGraphqlException, isNotFoundGraphQLException } from './errors';
@@ -29,8 +22,8 @@ const INTERNAL_API_V2_URL = process.env.INTERNAL_API_V2_URL;
 const INTERNAL_API_V1_OPERATION_NAMES = process.env.INTERNAL_API_V1_OPERATION_NAMES;
 const INTERNAL_API_V2_OPERATION_NAMES = process.env.INTERNAL_API_V2_OPERATION_NAMES;
 
-// ignore unused exports APOLLO_ERROR_PROP_NAME
 export const APOLLO_STATE_PROP_NAME = '__APOLLO_STATE__' as const;
+// ts-unused-exports:disable-next-line
 export const APOLLO_ERROR_PROP_NAME = '__APOLLO_ERROR__' as const;
 export const APOLLO_VARIABLES_PROP_NAME = '__APOLLO_VARIABLES__' as const;
 
@@ -65,8 +58,8 @@ const getCustomAgent = () => {
     const { FETCH_AGENT_KEEP_ALIVE, FETCH_AGENT_KEEP_ALIVE_MSECS } = process.env;
     const keepAlive = FETCH_AGENT_KEEP_ALIVE !== undefined ? parseToBoolean(FETCH_AGENT_KEEP_ALIVE) : true;
     const keepAliveMsecs = FETCH_AGENT_KEEP_ALIVE_MSECS ? Number(FETCH_AGENT_KEEP_ALIVE_MSECS) : 10000;
-    const http = require('http');
-    const https = require('https');
+    const http = require('http'); // eslint-disable-line @typescript-eslint/no-var-requires
+    const https = require('https'); // eslint-disable-line @typescript-eslint/no-var-requires
     const httpAgent = new http.Agent({ keepAlive, keepAliveMsecs });
     const httpsAgent = new https.Agent({ keepAlive, keepAliveMsecs });
     customAgent = _parsedURL => (_parsedURL.protocol === 'http:' ? httpAgent : httpsAgent);
@@ -76,7 +69,7 @@ const getCustomAgent = () => {
 
 const serverSideFetch = async (url, options: { headers?: any; agent?: any; body?: string } = {}) => {
   if (typeof window === 'undefined') {
-    const nodeFetch = require('node-fetch');
+    const nodeFetch = require('node-fetch'); // eslint-disable-line @typescript-eslint/no-var-requires
 
     options.agent = getCustomAgent();
 
@@ -219,7 +212,7 @@ function createInMemoryCache() {
     // Documentation:
     // https://www.apollographql.com/docs/react/data/fragments/#using-fragments-with-unions-and-interfaces
     possibleTypes: {
-      Transaction: ['Expense', 'Order'],
+      Transaction: ['Expense', 'Order', 'Debit', 'Credit'],
       CollectiveInterface: ['Collective', 'Event', 'Project', 'Fund', 'Organization', 'User', 'Vendor'],
       Account: ['Collective', 'Host', 'Individual', 'Fund', 'Project', 'Bot', 'Event', 'Organization', 'Vendor'],
       AccountWithHost: ['Collective', 'Event', 'Fund', 'Project'],
@@ -299,7 +292,7 @@ type SSRQueryHelperProps<TVariables> = {
  * A helper to easily plug Apollo on functional components that use `getServerSideProps` thats make sure that
  * the server-side query and the client-side query/variables are the same; to properly rehydrate the cache.
  */
-export function getSSRQueryHelpers<TVariables, TProps = {}>({
+export function getSSRQueryHelpers<TVariables, TProps = Record<string, unknown>>({
   query,
   getVariablesFromContext = undefined,
   getPropsFromContext = undefined,

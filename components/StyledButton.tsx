@@ -1,27 +1,25 @@
-import React, { ForwardRefExoticComponent } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import StyledSystemPropTypes from '@styled-system/prop-types';
+import type { ForwardRefExoticComponent } from 'react';
 import styled, { css } from 'styled-components';
-import {
-  background,
+import type {
   BackgroundProps,
-  border,
   BorderProps,
-  color,
   ColorProps,
-  flexbox,
   FlexboxProps,
-  layout,
   LayoutProps,
-  space,
   SpaceProps,
-  typography,
   TypographyProps,
 } from 'styled-system';
+import { background, border, color, flexbox, layout, space, typography } from 'styled-system';
 
-import { textTransform, TextTransformProps, whiteSpace, WhiteSpaceProps } from '../lib/styled-system-custom-properties';
+import { mergeRefs } from '../lib/react-utils';
+import type { TextTransformProps, WhiteSpaceProps } from '../lib/styled-system-custom-properties';
+import { textTransform, whiteSpace } from '../lib/styled-system-custom-properties';
 import theme from '../lib/theme';
-import { ButtonSize, buttonSize, ButtonStyle, buttonStyle } from '../lib/theme/variants/button';
+import type { ButtonSize, ButtonStyle } from '../lib/theme/variants/button';
+import { buttonSize, buttonStyle } from '../lib/theme/variants/button';
 
 import StyledSpinner from './StyledSpinner';
 
@@ -128,16 +126,37 @@ const StyledButtonContent = styled.button<StyledButtonProps>`
 const StyledButton: ForwardRefExoticComponent<StyledButtonProps> = React.forwardRef<
   HTMLButtonElement,
   StyledButtonProps
->(({ loading, as, ...props }, ref) =>
+>(({ loading = false, as = null, buttonSize = 'medium', buttonStyle = 'standard', ...props }, ref) => {
+  const internalRef = React.useRef<HTMLButtonElement>(null);
+  const allRefs = mergeRefs([ref, internalRef]);
+  const baseSize = React.useMemo(() => {
+    if (loading) {
+      return {
+        width: internalRef.current?.offsetWidth,
+        height: internalRef.current?.offsetHeight,
+      };
+    }
+  }, [loading]);
+
   // TODO(Typescript): We have to hack the `as` prop because styled-components somehow types it as "never"
-  !loading ? (
-    <StyledButtonContent {...props} as={as as never} ref={ref} />
+  return !loading ? (
+    <StyledButtonContent buttonSize={buttonSize} buttonStyle={buttonStyle} {...props} as={as as never} ref={allRefs} />
   ) : (
-    <StyledButtonContent {...props} as={as as never} onClick={undefined} ref={ref}>
+    <StyledButtonContent
+      {...props}
+      as={as as never}
+      buttonSize={buttonSize}
+      buttonStyle={buttonStyle}
+      width={props.width ?? props.size ?? baseSize?.width}
+      height={props.height ?? props.size ?? baseSize?.height}
+      onClick={undefined}
+      type="button"
+      ref={allRefs}
+    >
       <StyledSpinner size="0.9em" />
     </StyledButtonContent>
-  ),
-);
+  );
+});
 
 StyledButton.displayName = 'StyledButton';
 
@@ -178,12 +197,6 @@ StyledButton.propTypes = {
   isBorderless: PropTypes.bool,
   truncateOverflow: PropTypes.bool,
   children: PropTypes.node,
-};
-
-StyledButton.defaultProps = {
-  buttonSize: 'medium',
-  buttonStyle: 'standard',
-  loading: false,
 };
 
 /** @component */

@@ -1,21 +1,34 @@
+import { startCase } from 'lodash';
 import { defineMessages } from 'react-intl';
+
+import { WebsiteName } from '../../components/I18nFormatters';
 
 import { PAYMENT_METHOD_SERVICE } from '../constants/payment-methods';
 
-const messages = defineMessages({
-  [PAYMENT_METHOD_SERVICE.BANK]: {
-    id: 'paymentMethodService.bank',
-    defaultMessage: 'Bank Account',
+const i18nPaymentMethodServiceLabels = defineMessages({
+  [PAYMENT_METHOD_SERVICE.PREPAID]: {
+    id: 'Prepaid',
+    defaultMessage: 'Prepaid Card',
   },
 });
 
-export const i18nPaymentMethodService = (service, intl) => {
-  const PaymentMethodServiceI18n = {
-    [PAYMENT_METHOD_SERVICE.PAYPAL]: 'PayPal',
-    [PAYMENT_METHOD_SERVICE.WISE]: 'Wise',
-    [PAYMENT_METHOD_SERVICE.BANK]: intl.formatMessage(messages[PAYMENT_METHOD_SERVICE.BANK]),
-  };
+/**
+ * Service names are not meant to be translated (Stripe in Spanish is still Stripe). This helper
+ * simply returns the service display name with the right capitalization.
+ */
+export const i18nPaymentMethodService = (intl, service) => {
+  if (i18nPaymentMethodServiceLabels[service]) {
+    return intl.formatMessage(i18nPaymentMethodServiceLabels[service]);
+  }
 
-  const i18nMsg = PaymentMethodServiceI18n[service];
-  return i18nMsg || service;
+  switch (service) {
+    case PAYMENT_METHOD_SERVICE.PAYPAL:
+      return 'PayPal';
+    case PAYMENT_METHOD_SERVICE.THEGIVINGBLOCK:
+      return 'The Giving Block';
+    case PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE:
+      return WebsiteName;
+    default:
+      return startCase(service.toLowerCase());
+  }
 };

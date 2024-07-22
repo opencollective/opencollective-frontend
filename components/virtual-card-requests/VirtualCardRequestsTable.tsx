@@ -1,23 +1,25 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
-import { CellContext, ColumnDef } from '@tanstack/react-table';
-import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
+import type { CellContext, ColumnDef } from '@tanstack/react-table';
+import type { IntlShape } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import { Account, VirtualCardRequest, VirtualCardRequestStatus } from '../../lib/graphql/types/v2/graphql';
+import type { Account, VirtualCardRequest } from '../../lib/graphql/types/v2/graphql';
+import { VirtualCardRequestStatus } from '../../lib/graphql/types/v2/graphql';
 import { useWindowResize } from '../../lib/hooks/useWindowResize';
 import { i18nVirtualCardRequestStatus } from '../../lib/i18n/virtual-card-request';
 import { getSpendingLimitShortString } from '../../lib/i18n/virtual-card-spending-limit';
 
 import { AccountHoverCard } from '../AccountHoverCard';
 import Avatar from '../Avatar';
-import { DataTable } from '../DataTable';
 import DateTime from '../DateTime';
 import EditVirtualCardModal from '../edit-collective/EditVirtualCardModal';
 import { Box, Flex } from '../Grid';
 import Loading from '../Loading';
 import StyledTag from '../StyledTag';
+import { DataTable } from '../table/DataTable';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -81,7 +83,7 @@ function VirtualCardRequestTableActions({
               onSelectedVirtualCardRequest(virtualCardRequest);
             }}
           >
-            <FormattedMessage defaultMessage="View details" />
+            <FormattedMessage defaultMessage="View details" id="MnpUD7" />
           </DropdownMenuItem>
           {virtualCardRequest.status === VirtualCardRequestStatus.PENDING && (
             <React.Fragment>
@@ -130,7 +132,7 @@ type VirtualCardRequestsTableMeta = {
 const tableColumns: ColumnDef<VirtualCardRequest>[] = [
   {
     accessorKey: 'account',
-    header: () => <FormattedMessage defaultMessage="Account" />,
+    header: () => <FormattedMessage defaultMessage="Account" id="TwyMau" />,
     meta: { className: 'w-48' },
 
     cell: ({ cell }: CellContext<VirtualCardRequest, Account>) => {
@@ -152,7 +154,7 @@ const tableColumns: ColumnDef<VirtualCardRequest>[] = [
     accessorKey: 'assignee',
     meta: { className: 'w-36' },
 
-    header: () => <FormattedMessage defaultMessage="Assignee" />,
+    header: () => <FormattedMessage defaultMessage="Assignee" id="vx8bv3" />,
     cell: ({ cell, row }: CellContext<VirtualCardRequest, Account>) => {
       const assignee = cell.getValue();
       const virtualCardRequest = row.original;
@@ -280,7 +282,7 @@ export function VirtualCardRequestsTable(props: VirtualCardRequestsTableProps) {
           onClickRow={row => props?.onSelectedVirtualCardRequest(row.original)}
           emptyMessage={() => (
             <p className="font-base">
-              <FormattedMessage defaultMessage="No Virtual Card Requests" />
+              <FormattedMessage defaultMessage="No Virtual Card Requests" id="zUk+h9" />
             </p>
           )}
         />

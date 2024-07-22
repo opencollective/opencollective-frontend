@@ -29,6 +29,7 @@ import ResendMemberInviteBtn from '../../edit-collective/sections/team/ResendMem
 import { Box, Flex, Grid } from '../../Grid';
 import { getI18nLink } from '../../I18nFormatters';
 import Link from '../../Link';
+import LinkCollective from '../../LinkCollective';
 import Loading from '../../Loading';
 import MemberRoleDescription from '../../MemberRoleDescription';
 import MessageBox from '../../MessageBox';
@@ -39,7 +40,7 @@ import StyledTag from '../../StyledTag';
 import StyledTooltip from '../../StyledTooltip';
 import { P } from '../../Text';
 import DashboardHeader from '../DashboardHeader';
-import { DashboardSectionProps } from '../types';
+import type { DashboardSectionProps } from '../types';
 
 const MemberContainer = styled(Container)`
   display: block;
@@ -121,7 +122,7 @@ const MemberCard = ({ member, account, index, nbAdmins, refetch }: MemberCardPro
           <Avatar mt={-28} src={get(memberCollective, 'imageUrl')} radius={56} />
         </MemberLogoContainer>
         <P fontSize="14px" lineHeight="20px" m={2} textAlign="center">
-          {get(memberCollective, 'name')}
+          <LinkCollective collective={memberCollective} />
         </P>
         <StyledTag textTransform="uppercase" display="block" mb={2} closeButtonProps={false}>
           {formatMemberRole(intl, get(member, 'role'))}
@@ -224,10 +225,14 @@ const Team = ({ accountSlug }: DashboardSectionProps) => {
         </MessageBox>
       ) : data?.account?.isFrozen ? (
         <MessageBox type="warning" fontSize="13px" withIcon>
-          <FormattedMessage defaultMessage="This account is currently frozen, its team members therefore cannot be edited." />{' '}
+          <FormattedMessage
+            defaultMessage="This account is currently frozen, its team members therefore cannot be edited."
+            id="jcAKng"
+          />{' '}
           {isFeatureEnabled(data.account.host, FEATURES.CONTACT_FORM) && (
             <FormattedMessage
               defaultMessage="Please <ContactLink>contact</ContactLink> your fiscal host for more details."
+              id="KxBiJC"
               values={{ ContactLink: getI18nLink({ href: `${getCollectivePageRoute(data.account.host)}/contact` }) }}
             />
           )}
@@ -240,13 +245,15 @@ const Team = ({ accountSlug }: DashboardSectionProps) => {
                 <P lineHeight="20px" letterSpacing="normal" mt={3}>
                   <FormattedMessage
                     defaultMessage="Your host requires that Collectives have {numberOfAdmins, plural, one {# active administrator} other {# active administrators} }."
+                    id="XW00me"
                     values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
                   />
-                  {host?.policies?.COLLECTIVE_MINIMUM_ADMINS.freeze && (
+                  {host.policies.COLLECTIVE_MINIMUM_ADMINS.freeze && (
                     <React.Fragment>
                       &nbsp;
                       <FormattedMessage
                         defaultMessage="In case of a shortfall, your collective will be frozen until the minimum required administrators are added."
+                        id="kOVj5R"
                         values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
                       />
                     </React.Fragment>
@@ -259,6 +266,7 @@ const Team = ({ accountSlug }: DashboardSectionProps) => {
                 <MessageBox type="error" my={3} fontSize="13px">
                   <FormattedMessage
                     defaultMessage="Your collective doesn’t meet the requirements of having a minimum of {numberOfAdmins, plural, one {# administrator} other {# administrators} }. Add more administrators to comply with your host’s policy."
+                    id="vuvLi/"
                     values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
                   />
                 </MessageBox>
@@ -312,7 +320,10 @@ const Team = ({ accountSlug }: DashboardSectionProps) => {
                 <FormattedMessage id="OtherAdmins" defaultMessage="Other Admins" />
               </P>
               <P>
-                <FormattedMessage defaultMessage="This collective has Events and Projects that hold members with privileged access roles outside your admin team." />
+                <FormattedMessage
+                  defaultMessage="This collective has Events and Projects that hold members with privileged access roles outside your admin team."
+                  id="068S+6"
+                />
               </P>
               {childrenAccountsWithMembers.map(child => (
                 <ChildrenCollectiveSection account={child} key={child.id} refetch={refetch} />

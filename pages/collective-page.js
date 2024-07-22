@@ -5,9 +5,11 @@ import { withRouter } from 'next/router';
 import { createGlobalStyle } from 'styled-components';
 
 import { getCollectivePageMetadata } from '../lib/collective';
+import { OPENCOLLECTIVE_FOUNDATION_ID } from '../lib/constants/collectives';
 import { generateNotFoundError } from '../lib/errors';
 import { ssrGraphQLQuery } from '../lib/graphql/with-ssr-query';
 import { getRequestIntl } from '../lib/i18n/request';
+import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
 import CollectivePageContent from '../components/collective-page';
@@ -15,13 +17,13 @@ import CollectiveNotificationBar from '../components/collective-page/CollectiveN
 import { preloadCollectivePageGraphqlQueries } from '../components/collective-page/graphql/preload';
 import { collectivePageQuery, getCollectivePageQueryVariables } from '../components/collective-page/graphql/queries';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
+import { CrowdfundingPreviewBanner } from '../components/crowdfunding-redesign/CrowdfundingPreviewBanner';
 import ErrorPage from '../components/ErrorPage';
 import Loading from '../components/Loading';
 import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
 
 import Custom404 from './404';
-
 /** A page rendered when collective is incognito */
 const IncognitoUserCollective = dynamic(
   () => import(/* webpackChunkName: 'IncognitoUserCollective' */ '../components/IncognitoUserCollective'),
@@ -160,6 +162,12 @@ class CollectivePage extends React.Component {
       return <Custom404 />;
     }
 
+    const showCrowdfundingPreviewBanner =
+      !['ORGANIZATION', 'FUND', 'INDIVIDUAL', 'USER'].includes(collective?.type) &&
+      LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.CROWDFUNDING_REDESIGN) &&
+      LoggedInUser?.isAdminOfCollective(collective) &&
+      collective?.host?.id !== OPENCOLLECTIVE_FOUNDATION_ID;
+
     return (
       <Page
         collective={collective}
@@ -174,6 +182,8 @@ class CollectivePage extends React.Component {
           </div>
         ) : (
           <React.Fragment>
+            {showCrowdfundingPreviewBanner && <CrowdfundingPreviewBanner account={collective} />}
+
             <CollectiveNotificationBar
               collective={collective}
               host={collective.host}
@@ -232,6 +242,6 @@ const addCollectivePageData = ssrGraphQLQuery({
   preload: (client, result) => preloadCollectivePageGraphqlQueries(client, result?.data?.Collective),
 });
 
-// ignore unused exports default
 // next.js export
+// ts-unused-exports:disable-next-line
 export default withRouter(withUser(addCollectivePageData(CollectivePage)));

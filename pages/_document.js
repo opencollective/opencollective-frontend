@@ -33,8 +33,9 @@ const cache = createIntlCache();
 
 // The document (which is SSR-only) needs to be customized to expose the locale
 // data for the user's locale for React Intl to work in the browser.
-// ignore unused exports default
+
 // next.js export
+// ts-unused-exports:disable-next-line
 export default class IntlDocument extends Document {
   static async getInitialProps(ctx) {
     // Get the `locale` and `messages` from the request object on the server.
@@ -62,8 +63,8 @@ export default class IntlDocument extends Document {
       domain: process.env.CLIENT_ANALYTICS_DOMAIN,
       scriptSrc:
         'development' === process.env.OC_ENV
-          ? 'https://plausible.io/js/script.tagged-events.exclusions.local.js'
-          : 'https://plausible.io/js/script.tagged-events.exclusions.js',
+          ? 'https://plausible.io/js/script.manual.tagged-events.exclusions.local.js'
+          : 'https://plausible.io/js/script.manual.tagged-events.exclusions.js',
       exclusions: process.env.CLIENT_ANALYTICS_EXCLUSIONS,
     };
 
@@ -126,7 +127,10 @@ export default class IntlDocument extends Document {
       'RECAPTCHA_SITE_KEY',
       'RECAPTCHA_ENABLED',
       'WISE_ENVIRONMENT',
+      'TAX_FORMS_USE_LEGACY',
       'HCAPTCHA_SITEKEY',
+      'OCF_DUPLICATE_FLOW',
+      'TURNSTILE_SITEKEY',
       'CAPTCHA_ENABLED',
       'CAPTCHA_PROVIDER',
       'DISABLE_MOCK_UPLOADS',

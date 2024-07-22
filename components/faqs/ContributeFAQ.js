@@ -97,11 +97,12 @@ const ContributeFAQ = ({ collective, ...props }) => (
     </Entry>
     <Entry>
       <Title>
-        <FormattedMessage defaultMessage="What information is shared with the Collectives?" />
+        <FormattedMessage defaultMessage="What information is shared with the Collectives?" id="Ntwzwf" />
       </Title>
       <Content>
         <FormattedMessage
           defaultMessage="When you contribute to a Collective we share your email address with the Administrators. If you wish to keep your contribution private choose the ‘incognito’ profile. Read our <PrivacyPolicyLink>privacy policy</PrivacyPolicyLink>."
+          id="LfwUBd"
           values={{ PrivacyPolicyLink: getI18nLink({ href: '/privacypolicy', openInNewTab: true, as: Link }) }}
         />
       </Content>
@@ -116,9 +117,7 @@ const ContributeFAQ = ({ collective, ...props }) => (
       <Content>
         <FormattedMessage
           id="ContributeDetails.faq.isIncognito.content"
-          defaultMessage={
-            'Publicly, the contribution amount and date will be visible in the transparent budget, but your identity will be obscured, appearing only as "incognito". The contribution will not be linked to your public profile.'
-          }
+          defaultMessage={`Publicly, the contribution amount and date will be visible in the transparent budget, but your identity will be obscured, appearing only as "incognito". The contribution will not be linked to your public profile.`}
         />
       </Content>
     </Entry>

@@ -19,7 +19,9 @@ import { Box } from '../Grid';
 import StyledCard from '../StyledCard';
 import { P, Span } from '../Text';
 
-const StatTitle = styled(Container)`
+const StatTitle = styled(Container).attrs(props => ({
+  color: props.color || 'black.700',
+}))`
   font-size: 12px;
   line-height: 16px;
   font-weight: 500;
@@ -28,10 +30,6 @@ const StatTitle = styled(Container)`
   display: flex;
   align-items: center;
 `;
-
-StatTitle.defaultProps = {
-  color: 'black.700',
-};
 
 const StatAmount = ({ amount, ...props }) => (
   <P fontSize="16px" lineHeight="24px" color="black.700">
@@ -213,7 +211,7 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
           <StatContainer data-cy="budgetSection-total-contributed">
             <StatTitle>
               ↑&nbsp;
-              <FormattedMessage defaultMessage="Total contributed" />
+              <FormattedMessage defaultMessage="Total contributed" id="RogA5E" />
             </StatTitle>
             <StatAmount
               amount={Math.abs(stats.totalAmountSpent.valueInCents)}
@@ -223,7 +221,7 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
           <StatContainer data-cy="budgetSection-total-paid-expenses" borderTop={borderTop}>
             <StatTitle>
               ↓&nbsp;
-              <FormattedMessage defaultMessage="Total received with expenses" />
+              <FormattedMessage defaultMessage="Total received with expenses" id="Nqhan+" />
             </StatTitle>
             <StatAmount amount={stats.totalPaidExpenses.valueInCents} currency={stats.totalPaidExpenses.currency} />
           </StatContainer>

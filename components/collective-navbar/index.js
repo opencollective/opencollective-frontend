@@ -439,11 +439,11 @@ const CollectiveNavbar = ({
   isLoading,
   sections: sectionsFromParent,
   selectedCategory,
-  callsToAction,
+  callsToAction = {},
   onCollectiveClick,
-  isInHero,
-  onlyInfos,
-  showBackButton,
+  isInHero = false,
+  onlyInfos = false,
+  showBackButton = true,
   useAnchorsForCategories,
   showSelectedCategoryOnMobile,
 }) => {
@@ -696,13 +696,6 @@ CollectiveNavbar.propTypes = {
   showSelectedCategoryOnMobile: PropTypes.bool,
   /** To use on the collective page. Sets links to anchors rather than full URLs for faster navigation */
   useAnchorsForCategories: PropTypes.bool,
-};
-
-CollectiveNavbar.defaultProps = {
-  isInHero: false,
-  onlyInfos: false,
-  callsToAction: {},
-  showBackButton: true,
 };
 
 export default React.memo(CollectiveNavbar);

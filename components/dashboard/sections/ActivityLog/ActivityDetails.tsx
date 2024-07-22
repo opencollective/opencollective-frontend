@@ -4,7 +4,7 @@ import { isEmpty } from 'lodash';
 import { defineMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { Activity } from '../../../../lib/graphql/types/v2/graphql';
+import type { Activity } from '../../../../lib/graphql/types/v2/graphql';
 
 import { Box } from '../../../Grid';
 
@@ -21,15 +21,15 @@ const ValueContainer = styled.div`
 
 const ActivityDetailComponents = {
   ACCOUNTING_CATEGORIES_EDITED: {
-    title: defineMessage({ defaultMessage: 'Changes' }),
+    title: defineMessage({ defaultMessage: 'Changes', id: 'dgqhUM' }),
     Component: GenericActivityDiffDataWithList,
   },
   COLLECTIVE_EDITED: {
-    title: defineMessage({ defaultMessage: 'Changes' }),
+    title: defineMessage({ defaultMessage: 'Changes', id: 'dgqhUM' }),
     Component: CollectiveEditedDetails,
   },
   VENDOR_EDITED: {
-    title: defineMessage({ defaultMessage: 'Changes' }),
+    title: defineMessage({ defaultMessage: 'Changes', id: 'dgqhUM' }),
     Component: CollectiveEditedDetails,
   },
   DEFAULT: {

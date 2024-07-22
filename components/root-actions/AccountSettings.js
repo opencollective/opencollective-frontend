@@ -7,6 +7,7 @@ import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import Container from '../Container';
+import DashboardHeader from '../dashboard/DashboardHeader';
 import { Box, Flex } from '../Grid';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
@@ -51,6 +52,7 @@ const AccountSettings = () => {
 
   return (
     <React.Fragment>
+      <DashboardHeader title="Account Settings" className="mb-10" />
       <StyledInputField htmlFor="accounts-picker" label="Account" flex="1 1">
         {({ id }) => (
           <CollectivePickerAsync
@@ -64,7 +66,7 @@ const AccountSettings = () => {
         )}
       </StyledInputField>
 
-      {selectedAccountOption.length !== 0 && (
+      {selectedAccountOption?.length !== 0 && (
         <React.Fragment>
           <Container px={1} pt={3} pb={3}>
             <Box pb={2}>Flags</Box>

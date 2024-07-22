@@ -40,7 +40,7 @@ export function LanguageSwitcher() {
                 <span className="truncate">
                   <SelectValue
                     aria-label={defaultLanguage.label}
-                    placeholder={intl.formatMessage({ defaultMessage: 'Select language' })}
+                    placeholder={intl.formatMessage({ defaultMessage: 'Select language', id: 'eVlu1R' })}
                   />
                 </span>
               </div>
@@ -50,7 +50,7 @@ export function LanguageSwitcher() {
           <SelectContent className="relative max-h-80 max-w-full">
             {languageOptions.map(option => (
               <SelectItem key={option.value} value={option.value} data-cy="language-option">
-                <div className="flex max-w-[--radix-popper-anchor-width]  items-center gap-1">
+                <div className="flex max-w-[--radix-popper-anchor-width] items-center gap-1">
                   <span className="truncate">{option.label}</span>
                   <span>({option.completion})</span>
                 </div>

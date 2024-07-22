@@ -51,6 +51,7 @@ const AddPaymentMethod = ({ onStripeReady, onPaypalSuccess, setNewPaymentMethodI
           </StyledButton>
         )}
         <PayWithPaypalButton
+          order={order}
           totalAmount={order.totalAmount.valueInCents}
           currency={order.totalAmount.currency}
           interval={getIntervalFromContributionFrequency(order.frequency)}

@@ -17,7 +17,8 @@ import { Twitter } from '@styled-icons/feather/Twitter';
 import { Youtube } from '@styled-icons/feather/Youtube';
 import { Pixelfed } from '@styled-icons/remix-line/Pixelfed';
 
-import { SocialLink, SocialLinkType } from '../../../lib/graphql/types/v2/graphql';
+import type { SocialLink } from '../../../lib/graphql/types/v2/graphql';
+import { SocialLinkType } from '../../../lib/graphql/types/v2/graphql';
 
 import StyledLink from '../../StyledLink';
 import StyledRoundButton from '../../StyledRoundButton';
@@ -50,7 +51,7 @@ function iconForSocialLinkType(type: SocialLinkType) {
   return SocialLinkIcon[type] || Globe;
 }
 
-export type HeroSocialLinksProps = {
+type HeroSocialLinksProps = {
   socialLinks: SocialLink[];
   relMe?: boolean;
 };

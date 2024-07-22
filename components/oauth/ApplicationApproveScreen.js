@@ -31,7 +31,6 @@ import Image from '../Image';
 import LinkCollective from '../LinkCollective';
 import Loading from '../Loading';
 import MessageBox from '../MessageBox';
-import RadialIconContainer from '../RadialIconContainer';
 import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import StyledLinkButton from '../StyledLinkButton';
@@ -50,47 +49,47 @@ const TopAvatarsContainer = styled.div`
 
 const SCOPES_INFO = {
   email: {
-    label: <FormattedMessage defaultMessage="Access your email address." />,
+    label: <FormattedMessage defaultMessage="Access your email address." id="bU8NRa" />,
     icon: <Mail size={16} />,
   },
   incognito: {
-    label: <FormattedMessage defaultMessage="Access your incognito account." />,
+    label: <FormattedMessage defaultMessage="Access your incognito account." id="u1mbsP" />,
     icon: <IncognitoAvatar size={32} />,
   },
   account: {
-    label: <FormattedMessage defaultMessage="Manage your account, collectives and organizations." />,
+    label: <FormattedMessage defaultMessage="Manage your account, collectives and organizations." id="kIXYNi" />,
     icon: <Users size={16} />,
   },
   expenses: {
-    label: <FormattedMessage defaultMessage="Create and manage expenses, payout methods." />,
+    label: <FormattedMessage defaultMessage="Create and manage expenses, payout methods." id="SQT1u9" />,
     icon: <Receipt size={16} />,
   },
   orders: {
-    label: <FormattedMessage defaultMessage="Create and manage contributions, payment methods." />,
+    label: <FormattedMessage defaultMessage="Create and manage contributions, payment methods." id="Ny7kBI" />,
     icon: <Coins size={16} />,
   },
   transactions: {
-    label: <FormattedMessage defaultMessage="Refund and reject recorded transactions." />,
+    label: <FormattedMessage defaultMessage="Refund and reject recorded transactions." id="zu5ckP" />,
     icon: <ArrowRightLeft size={16} />,
   },
   virtualCards: {
-    label: <FormattedMessage defaultMessage="Create and manage virtual cards." />,
+    label: <FormattedMessage defaultMessage="Create and manage virtual cards." id="n8EhFC" />,
     icon: <CreditCard size={16} />,
   },
   updates: {
-    label: <FormattedMessage defaultMessage="Create and manage updates." />,
+    label: <FormattedMessage defaultMessage="Create and manage updates." id="USDg2A" />,
     icon: <Newspaper size={16} />,
   },
   conversations: {
-    label: <FormattedMessage defaultMessage="Create and manage conversations." />,
+    label: <FormattedMessage defaultMessage="Create and manage conversations." id="udDupO" />,
     icon: <MessagesSquare size={16} />,
   },
   webhooks: {
-    label: <FormattedMessage defaultMessage="Create and manage webhooks." />,
+    label: <FormattedMessage defaultMessage="Create and manage webhooks." id="m2cP6g" />,
     icon: <Webhook size={16} />,
   },
   host: {
-    label: <FormattedMessage defaultMessage="Administrate fiscal hosts." />,
+    label: <FormattedMessage defaultMessage="Administrate fiscal hosts." id="iHkkt+" />,
     icon: <Network size={16} />,
   },
   /* We disable those scopes for now */
@@ -190,9 +189,9 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
               <Avatar size={96} collective={application.account} />
             </LinkCollective>
           </Container>
-          <RadialIconContainer flex="0 0 40px" height="40px" bg="#29cc75">
-            <Check width="18px" height="15px" />
-          </RadialIconContainer>
+          <div className="flex h-[40px] w-[40px] flex-none items-center justify-center rounded-full bg-green-500">
+            <Check size={18} className="text-white" />
+          </div>
           <Container flex="0 0 96px">
             <Image src="/static/images/oc-oauth-connect-logo.png" height={96} width={96} />
           </Container>
@@ -201,7 +200,7 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
           {isRedirecting ? (
             <Flex flexDirection="column" justifyContent="center" alignItems="center" pb={3}>
               <P fontSize="16px" fontWeight="500" mb={4}>
-                <FormattedMessage defaultMessage="Redirecting…" />
+                <FormattedMessage defaultMessage="Redirecting…" id="ET/GW3" />
               </P>
               <Loading />
             </Flex>
@@ -210,6 +209,7 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
               <P fontWeight="700" fontSize="24px" textAlign="center" color="black.900" mb={32}>
                 <FormattedMessage
                   defaultMessage="{applicationName} wants permission to:"
+                  id="kP5Eb7"
                   values={{ applicationName: application.name }}
                 />
               </P>
@@ -218,6 +218,7 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
                 <P fontSize="16px" color="black.700" ml={3}>
                   <FormattedMessage
                     defaultMessage="Verify your identity on {service}"
+                    id="+cR4M7"
                     values={{ service: 'Open Collective' }}
                   />{' '}
                   <br />
@@ -229,6 +230,7 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
                     {'. '}
                     <FormattedMessage
                       defaultMessage="Not you? <SignOutLink>Sign out</SignOutLink> to switch profile."
+                      id="/GQXtd"
                       values={{
                         SignOutLink: msg => (
                           <StyledLinkButton onClick={logout} type="button">
@@ -242,18 +244,21 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
               </Flex>
               {Boolean(application.preAuthorize2FA) && (
                 <Flex alignItems="center" mt={26}>
-                  <div className="flex h-[32px] w-[32px] flex-none items-center justify-center rounded-full bg-neutral-100 ">
+                  <div className="flex h-[32px] w-[32px] flex-none items-center justify-center rounded-full bg-neutral-100">
                     <AlertTriangle size={18} className="text-red-600" />
                   </div>
                   <P fontSize="16px" color="black.700" ml={3}>
-                    <FormattedMessage defaultMessage="Directly perform critical operations that would normally require 2FA." />
+                    <FormattedMessage
+                      defaultMessage="Directly perform critical operations that would normally require 2FA."
+                      id="jd6G18"
+                    />
                   </P>
                 </Flex>
               )}
               {filteredScopes.map(scope => (
                 <Flex key={scope} alignItems="center" mt={26}>
                   {SCOPES_INFO[scope].icon ? (
-                    <div className="flex h-[32px] w-[32px] flex-none items-center justify-center rounded-full bg-neutral-100 ">
+                    <div className="flex h-[32px] w-[32px] flex-none items-center justify-center rounded-full bg-neutral-100">
                       {SCOPES_INFO[scope].icon}
                     </div>
                   ) : (
@@ -266,7 +271,10 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
               ))}
               {difference(filteredScopes, ['email']).length > 0 && (
                 <MessageBox type="info" mt={40} fontSize="13px">
-                  <FormattedMessage defaultMessage="These permissions are granted to all the accounts you're administrating, including your personal profile." />
+                  <FormattedMessage
+                    defaultMessage="These permissions are granted to all the accounts you're administrating, including your personal profile."
+                    id="FmF1MA"
+                  />
                 </MessageBox>
               )}
               {error && (
@@ -295,7 +303,7 @@ export const ApplicationApproveScreen = ({ application, redirectUri, autoApprove
             <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
           </StyledButton>
           <StyledButton minWidth={175} buttonStyle="primary" loading={loading} onClick={callAuthorize}>
-            <FormattedMessage defaultMessage="Authorize" />
+            <FormattedMessage defaultMessage="Authorize" id="QwnGVY" />
           </StyledButton>
         </Flex>
       )}

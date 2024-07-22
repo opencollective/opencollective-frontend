@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useApolloClient } from '@apollo/client';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
-import { InferGetServerSidePropsType } from 'next';
+import type { InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
 
@@ -62,8 +62,8 @@ const expensePageQueryHelper = getSSRQueryHelpers<
   getPropsFromContext: context => getPropsFromQuery(context.query),
 });
 
-// ignore unused exports getServerSideProps
 // next.js export
+// ts-unused-exports:disable-next-line
 export const getServerSideProps = expensePageQueryHelper.getServerSideProps;
 
 const getPageMetadata = (intl, legacyExpenseId, expense) => {
@@ -78,8 +78,8 @@ const getPageMetadata = (intl, legacyExpenseId, expense) => {
   }
 };
 
-// ignore unused exports default
 // next.js export
+// ts-unused-exports:disable-next-line
 export default function ExpensePage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
@@ -117,7 +117,6 @@ export default function ExpensePage(props: InferGetServerSidePropsType<typeof ge
     expense.payee.stats = data.expensePayeeStats?.payee?.stats;
   }
   const collective = expense?.account;
-  const host = collective?.host;
   const metadata = getPageMetadata(intl, props.legacyExpenseId, expense);
 
   return (
@@ -143,12 +142,17 @@ export default function ExpensePage(props: InferGetServerSidePropsType<typeof ge
         </Box>
         <Flex flex="1 1" justifyContent={['center', null, 'flex-start', 'flex-end']} pt={80}>
           <Box minWidth={270} width={['100%', null, null, 275]} px={2}>
-            <ExpenseInfoSidebar isLoading={queryResult.loading} collective={collective} host={host} />
+            <ExpenseInfoSidebar
+              isLoading={queryResult.loading}
+              collective={collective}
+              host={collective?.host}
+              expenseHost={expense?.host}
+            />
           </Box>
         </Flex>
         <Box width={SIDE_MARGIN_WIDTH} />
       </Flex>
-      <MobileCollectiveInfoStickyBar isLoading={queryResult.loading} collective={collective} host={host} />
+      <MobileCollectiveInfoStickyBar isLoading={queryResult.loading} collective={collective} host={collective?.host} />
     </Page>
   );
 }

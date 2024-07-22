@@ -68,8 +68,8 @@ const TierTitle = ({ collective, tier }) => {
           as={Link}
           href={`${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tier.legacyId || tier.id}`}
           color="black.900"
-          hoverColor="black.900"
-          underlineOnHover
+          $hoverColor="black.900"
+          $underlineOnHover
         >
           {name}
         </StyledLink>
@@ -233,7 +233,11 @@ const ContributeTier = ({ intl, collective, tier, isPreview, ...props }) => {
                   {taxes.length > 1 ? (
                     <FormattedMessage id="ContributeTier.Taxes" defaultMessage="Taxes may apply" />
                   ) : (
-                    <FormattedMessage defaultMessage="{taxName} may apply" values={{ taxName: taxes[0].type }} />
+                    <FormattedMessage
+                      defaultMessage="{taxName} may apply"
+                      id="N9TNT7"
+                      values={{ taxName: taxes[0].type }}
+                    />
                   )}
                 </Span>
               )}

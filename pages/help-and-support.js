@@ -19,6 +19,7 @@ import StyledLink from '../components/StyledLink';
 const messages = defineMessages({
   pageTitle: {
     defaultMessage: 'Help & Support',
+    id: 'Uf3+S6',
   },
   defaultTitle: {
     id: 'OC.helpAndSupport',
@@ -100,6 +101,6 @@ HelpAndSupport.getInitialProps = async ctx => ({
   ...ctx.query,
 });
 
-// ignore unused exports default
 // next.js export
+// ts-unused-exports:disable-next-line
 export default HelpAndSupport;

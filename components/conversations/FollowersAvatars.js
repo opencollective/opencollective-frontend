@@ -30,7 +30,7 @@ const getFollwersNotDisplayedNames = (followers, maxNbDisplayed) => {
 /**
  * A small list of avatars with a count next to it.
  */
-const FollowersAvatars = ({ followers, totalCount, avatarRadius, maxNbDisplayed }) => {
+const FollowersAvatars = ({ followers, totalCount, avatarRadius = 24, maxNbDisplayed = 5 }) => {
   const { formatMessage } = useIntl();
 
   if (!followers || !followers.length) {
@@ -75,11 +75,6 @@ FollowersAvatars.propTypes = {
       id: PropTypes.string,
     }),
   ),
-};
-
-FollowersAvatars.defaultProps = {
-  maxNbDisplayed: 5,
-  avatarRadius: 24,
 };
 
 export default withUser(FollowersAvatars);

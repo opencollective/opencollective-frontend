@@ -171,7 +171,7 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser, refetchLoggedIn
               collective: {
                 ...initialValues.collective,
                 name: handle ? formatNameFromSlug(repo ?? owner) : '',
-                slug: handle ? repo ?? owner : '',
+                slug: handle ? (repo ?? owner) : '',
               },
               applicationData: {
                 ...initialValues.applicationData,
@@ -211,6 +211,6 @@ OSCHostApplication.propTypes = {
   refetchLoggedInUser: PropTypes.func,
 };
 
-// ignore unused exports default
 // next.js export
+// ts-unused-exports:disable-next-line
 export default withUser(OSCHostApplication);

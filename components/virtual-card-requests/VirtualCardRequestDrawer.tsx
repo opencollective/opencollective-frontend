@@ -4,7 +4,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import { VirtualCardRequest, VirtualCardRequestStatus } from '../../lib/graphql/types/v2/graphql';
+import type { VirtualCardRequest } from '../../lib/graphql/types/v2/graphql';
+import { VirtualCardRequestStatus } from '../../lib/graphql/types/v2/graphql';
 import { i18nVirtualCardRequestStatus } from '../../lib/i18n/virtual-card-request';
 import { getSpendingLimitShortString } from '../../lib/i18n/virtual-card-spending-limit';
 
@@ -194,7 +195,7 @@ export function VirtualCardRequestDrawer(props: VirtualCardRequestDrawerProps) {
 
             <InfoList className="sm:grid-cols-2">
               <InfoListItem
-                title={<FormattedMessage defaultMessage="Account" />}
+                title={<FormattedMessage defaultMessage="Account" id="TwyMau" />}
                 value={
                   <LinkCollective
                     collective={virtualCardRequest.account}
@@ -206,7 +207,7 @@ export function VirtualCardRequestDrawer(props: VirtualCardRequestDrawerProps) {
                 }
               />
               <InfoListItem
-                title={<FormattedMessage defaultMessage="Assigned to" />}
+                title={<FormattedMessage defaultMessage="Assigned to" id="ONVN5F" />}
                 value={
                   <LinkCollective
                     collective={virtualCardRequest.assignee}

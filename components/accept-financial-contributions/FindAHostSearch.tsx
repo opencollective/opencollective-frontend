@@ -4,7 +4,7 @@ import { take } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import { Account, Host } from '../../lib/graphql/types/v2/graphql';
+import type { Account, Host } from '../../lib/graphql/types/v2/graphql';
 
 import { Box, Flex } from '../Grid';
 import Loading from '../Loading';
@@ -122,7 +122,7 @@ export default function FindAHostSearch(props: {
     return (
       <Box mt={3}>
         <P fontSize="24px" lineHeight="32px" fontWeight="700" color="black.900">
-          <FormattedMessage defaultMessage="Finding the right host for you..." />
+          <FormattedMessage defaultMessage="Finding the right host for you..." id="D1CbmW" />
         </P>
         <Loading />
       </Box>
@@ -144,7 +144,7 @@ export default function FindAHostSearch(props: {
 
       {isEmpty && (
         <MessageBox mt={3} mb={4} type="warning">
-          <FormattedMessage defaultMessage="We could not find a host that matches all your criteria." />
+          <FormattedMessage defaultMessage="We could not find a host that matches all your criteria." id="3A7J9A" />
         </MessageBox>
       )}
 

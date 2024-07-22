@@ -3,12 +3,13 @@ import { useQuery } from '@apollo/client';
 import type { Content } from '@radix-ui/react-hover-card';
 import clsx from 'clsx';
 import { get } from 'lodash';
-import { Banknote, Building, Calendar, FileText, LucideIcon, Mail, PencilRuler, Receipt, Users } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { Banknote, Building, Calendar, FileText, Mail, PencilRuler, Receipt, Users } from 'lucide-react';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { isIndividualAccount } from '../lib/collective';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
-import { Account, AccountWithHost, UserContextualMembershipsQuery } from '../lib/graphql/types/v2/graphql';
+import type { Account, AccountWithHost, UserContextualMembershipsQuery } from '../lib/graphql/types/v2/graphql';
 import { getCollectivePageRoute } from '../lib/url-helpers';
 
 import PrivateInfoIcon from './icons/PrivateInfoIcon';
@@ -67,7 +68,7 @@ type AccountHoverCardProps = {
     };
     approvedAt?: AccountWithHost['approvedAt'];
     hostAgreements?: {
-      totalCount: AccountWithHost['hostAgreements']['totalCount'];
+      totalCount?: AccountWithHost['hostAgreements']['totalCount'];
     };
     stats?: {
       balanceWithBlockedFunds?: Account['stats']['balanceWithBlockedFunds'];
@@ -136,6 +137,7 @@ const getInfoItems = (account): InfoItemProps[] => {
       info: (
         <FormattedMessage
           defaultMessage="{childAccountType, select, EVENT {Event} PROJECT {Project} other {Account}} by {parentAccount}"
+          id="bZC/zt"
           values={{
             childAccountType: account.type,
             parentAccount: <Link href={getCollectivePageRoute(account.parent)}>@{account.parent.slug}</Link>,
@@ -150,6 +152,7 @@ const getInfoItems = (account): InfoItemProps[] => {
         info: (
           <FormattedMessage
             defaultMessage="Hosted by {host} since {approvedAt}"
+            id="PAGBSx"
             values={{
               childAccountType: account.type,
               host: <Link href={getCollectivePageRoute(account.host)}>@{account.host.slug}</Link>,
@@ -163,6 +166,7 @@ const getInfoItems = (account): InfoItemProps[] => {
       info: (
         <FormattedMessage
           defaultMessage="Has <AgreementsLink>{hostAgreementsCount} host agreements</AgreementsLink>"
+          id="Zh9ojg"
           values={{
             hostAgreementsCount: account.hostAgreements?.totalCount,
             AgreementsLink: chunks => (
@@ -197,6 +201,7 @@ const getInfoItems = (account): InfoItemProps[] => {
       info: (
         <FormattedMessage
           defaultMessage="Total expense payouts {currentYear}: {totalPaidExpenses}"
+          id="wNU66x"
           values={{
             totalPaidExpenses: (
               <span className="text-foreground">
@@ -223,6 +228,7 @@ const getInfoItemsFromMembershipData = (data: UserContextualMembershipsQuery): I
       info: (
         <FormattedMessage
           defaultMessage="Admin of {account} since {date}"
+          id="M0vlyv"
           values={{
             account: <Link href={`/${membership.account.slug}`}>@{membership.account.slug}</Link>,
             date: <FormattedDate dateStyle="medium" value={membership.since} />,
@@ -235,6 +241,7 @@ const getInfoItemsFromMembershipData = (data: UserContextualMembershipsQuery): I
       info: (
         <FormattedMessage
           defaultMessage="Admin of {account} since {date}"
+          id="M0vlyv"
           values={{
             account: <Link href={`/${membership.account.slug}`}>@{membership.account.slug}</Link>,
             date: <FormattedDate dateStyle="medium" value={membership.since} />,
@@ -271,10 +278,10 @@ export const AccountHoverCard = ({
   const hoverTimeoutRef = React.useRef(null);
   const [hasBeenHovered, setHasBeenHovered] = React.useState(false);
 
-  /*  
+  /*
       Query to fetch an individual accounts's contextual admin memberships
       It is triggered after the hover card trigger has been hovered for 100ms (or the hovercard has been opened, after a default delay of 700ms)
-      This aims to prevent unnecessary queries when the hover card is not intended to be opened, while still trying to fetch the data before the hover card is actually opened 
+      This aims to prevent unnecessary queries when the hover card is not intended to be opened, while still trying to fetch the data before the hover card is actually opened
   */
   const { data, loading } = useQuery(userContextualMembershipsQuery, {
     variables: {

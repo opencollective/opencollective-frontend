@@ -1,7 +1,7 @@
 import React from 'react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { Activity } from '../../../../lib/graphql/types/v2/graphql';
+import type { Activity } from '../../../../lib/graphql/types/v2/graphql';
 
 import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';
@@ -25,6 +25,7 @@ const ACCOUNT_KEYS = ['fromAccount', 'account', 'host'] as const;
 const AccountKeysI18n = defineMessages({
   fromAccount: {
     defaultMessage: 'From',
+    id: 'dM+p3/',
   },
   account: {
     id: 'To',
@@ -46,6 +47,7 @@ export default function ActivityDetailsDrawer({ activity, onClose }: ActivityDra
             title={
               <FormattedMessage
                 defaultMessage="Activity <ActivityId></ActivityId>"
+                id="MMUT6d"
                 values={{
                   ActivityId: () => (
                     <StyledTag display="inline-block" verticalAlign="middle" ml={2} fontSize="12px">

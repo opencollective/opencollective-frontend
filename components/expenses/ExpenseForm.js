@@ -167,9 +167,11 @@ export const prepareExpenseForSubmit = expenseData => {
     }
   }
 
-  const payeeLocation = checkRequiresAddress(expenseData)
-    ? pick(expenseData.payeeLocation, ['address', 'country', 'structured'])
-    : null;
+  const payeeLocation = expenseData.payee?.isInvite
+    ? expenseData.payeeLocation
+    : checkRequiresAddress(expenseData)
+      ? pick(expenseData.payeeLocation, ['address', 'country', 'structured'])
+      : null;
 
   const payoutMethod = pick(expenseData.payoutMethod, ['id', 'name', 'data', 'isSaved', 'type']);
   if (payoutMethod.id === 'new') {
@@ -437,17 +439,35 @@ const ExpenseFormBody = ({
     }
   }, [values.payeeLocation]);
 
+  // Handle currency updates
   React.useEffect(() => {
+    // Do nothing while loading
+    if (loading) {
+      return;
+    }
+
+    const payoutMethodCurrency = values.payoutMethod?.currency || values.payoutMethod?.data?.currency;
+    const hasValidPayoutMethodCurrency = payoutMethodCurrency && availableCurrencies.includes(payoutMethodCurrency);
+    const hasItemsWithAmounts = values.items.some(item => Boolean(item.amountV2?.valueInCents));
+
     // If the currency is not supported anymore, we need to do something
-    if (!loading && (!values.currency || !availableCurrencies.includes(values.currency))) {
-      const hasItemsWithAmounts = values.items.some(item => Boolean(item.amountV2?.valueInCents));
+    if (!values.currency || !availableCurrencies.includes(values.currency)) {
       if (!hasItemsWithAmounts) {
         // If no items have amounts yet, we can safely set the default currency
-        formik.setFieldValue('currency', availableCurrencies[0]);
+        const defaultCurrency = hasValidPayoutMethodCurrency ? payoutMethodCurrency : availableCurrencies[0];
+        formik.setFieldValue('currency', defaultCurrency);
       } else if (values.currency) {
         // If there are items with amounts, we need to reset the currency
         formik.setFieldValue('currency', null);
       }
+    } else if (
+      payoutMethodCurrency &&
+      hasValidPayoutMethodCurrency &&
+      !hasItemsWithAmounts &&
+      values.currency !== payoutMethodCurrency
+    ) {
+      // When the payout method changes, if there's no items yet, we set the default currency to the payout method's currency
+      formik.setFieldValue('currency', payoutMethodCurrency);
     }
   }, [loading, values.payoutMethod]);
 
@@ -714,7 +734,7 @@ const ExpenseFormBody = ({
                   {/* Tags */}
                   <div>
                     <Span color="black.900" fontSize="18px" lineHeight="26px" fontWeight="bold">
-                      <FormattedMessage defaultMessage="Tag you expense" />
+                      <FormattedMessage defaultMessage="Tag your expense" id="EosA8s" />
                     </Span>
                     <Flex alignItems="flex-start" mt={2}>
                       <ExpenseTypeTag type={values.type} mr="4px" />
@@ -734,7 +754,7 @@ const ExpenseFormBody = ({
                   {/* Currency */}
                   <div>
                     <Span color="black.900" fontSize="18px" lineHeight="26px" fontWeight="bold" mr={2}>
-                      <FormattedMessage defaultMessage="Expense Currency" />
+                      <FormattedMessage defaultMessage="Expense Currency" id="3135/i" />
                     </Span>
                     <div className="mt-2 flex">
                       <div className="basis-[300px]">
@@ -747,7 +767,7 @@ const ExpenseFormBody = ({
                               onChange={value => formik.setFieldValue('currency', value)}
                               width="100%"
                               maxWidth="160px"
-                              disabled={availableCurrencies.length < 2}
+                              disabled={availableCurrencies.length < 2 && availableCurrencies[0] === values.currency}
                               styles={{ menu: { width: '280px' } }}
                             />
                           )}
@@ -765,7 +785,7 @@ const ExpenseFormBody = ({
                       lineHeight="26px"
                       fontWeight="bold"
                     >
-                      <FormattedMessage defaultMessage="Expense Category" />
+                      <FormattedMessage defaultMessage="Expense Category" id="38dzz9" />
                     </Label>
                     <div className="mt-2 flex">
                       <div className="basis-[300px]">
@@ -797,7 +817,10 @@ const ExpenseFormBody = ({
                       </div>
                     </div>
                     <MessageBox type="info" fontSize="12px" mt="24px">
-                      <FormattedMessage defaultMessage="Please make sure that all the expense items in this expense belong to the selected expense category. If needed, you may submit additional items in separate expenses with different expense categories." />
+                      <FormattedMessage
+                        defaultMessage="Please make sure that all the expense items in this expense belong to the selected expense category. If needed, you may submit additional items in separate expenses with different expense categories."
+                        id="Pkq+ZR"
+                      />
                     </MessageBox>
                     {formik.values.accountingCategory?.instructions && (
                       <MessageBox type="info" fontSize="12px" mt="24px">
@@ -816,6 +839,7 @@ const ExpenseFormBody = ({
                           defaultMessage="If you already have an invoice document, you can upload it here."
                         />
                       }
+                      onChange={attachedFiles => formik.setFieldValue('attachedFiles', attachedFiles)}
                       form={formik}
                       defaultValue={values.attachedFiles}
                     />
@@ -857,7 +881,7 @@ const ExpenseFormBody = ({
                           defaultMessage="If you want to include any documentation, you can upload it here."
                         />
                       }
-                      form={formik}
+                      onChange={attachedFiles => formik.setFieldValue('attachedFiles', attachedFiles)}
                       defaultValue={values.attachedFiles}
                     />
                   </Box>
@@ -902,8 +926,8 @@ const ExpenseFormBody = ({
             setShowResetModal(false);
           }}
           {...(editingExpense && {
-            continueLabel: formatMessage({ defaultMessage: 'Yes, cancel editing' }),
-            cancelLabel: formatMessage({ defaultMessage: 'No, continue editing' }),
+            continueLabel: formatMessage({ defaultMessage: 'Yes, cancel editing', id: 'b++lom' }),
+            cancelLabel: formatMessage({ defaultMessage: 'No, continue editing', id: 'fIsGOi' }),
           })}
         />
       )}
@@ -977,7 +1001,7 @@ const ExpenseForm = ({
   payoutProfiles,
   autoFocusTitle,
   onCancel,
-  validateOnChange,
+  validateOnChange = false,
   formPersister,
   loggedInAccount,
   loading,
@@ -996,7 +1020,7 @@ const ExpenseForm = ({
     initialValues.items = expense.draft.items?.map(newExpenseItem) || [];
     initialValues.taxes = expense.draft.taxes;
     initialValues.attachedFiles = expense.draft.attachedFiles;
-    initialValues.payoutMethod = expense.draft.payoutMethod;
+    initialValues.payoutMethod = expense.draft.payoutMethod || expense.payoutMethod;
     initialValues.payeeLocation = expense.draft.payeeLocation;
     initialValues.payee = expense.recurringExpense ? expense.payee : expense.draft.payee;
   }
@@ -1071,6 +1095,7 @@ ExpenseForm.propTypes = {
     status: PropTypes.string,
     payee: PropTypes.object,
     draft: PropTypes.object,
+    payoutMethod: PropTypes.object,
     recurringExpense: PropTypes.object,
     items: PropTypes.arrayOf(
       PropTypes.shape({
@@ -1114,10 +1139,6 @@ ExpenseForm.propTypes = {
     }),
   ),
   drawerActionsContainer: PropTypes.object,
-};
-
-ExpenseForm.defaultProps = {
-  validateOnChange: false,
 };
 
 export default React.memo(ExpenseForm);

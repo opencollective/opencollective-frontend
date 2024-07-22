@@ -3,6 +3,20 @@ const { pipeline } = require('stream');
 const { promisify } = require('util');
 const streamPipeline = promisify(pipeline);
 
+const isValidS3ImageUrl = (parsedURL, isProd) => {
+  const expectedS3Hostnames = [
+    `opencollective-${isProd ? 'production' : 'staging'}.s3-us-west-1.amazonaws.com`,
+    `opencollective-${isProd ? 'production' : 'staging'}.s3.us-west-1.amazonaws.com`,
+  ];
+
+  return expectedS3Hostnames.includes(parsedURL.hostname) && /\/\w+/.test(parsedURL.pathname);
+};
+
+const isValidRESTApiUrl = (parsedURL, isProd) => {
+  const expectedRestApiHostname = `rest${isProd ? '' : '-staging'}.opencollective.com`;
+  return parsedURL.hostname === expectedRestApiHostname && /\/v2\/[^/]+\/transactions\.csv/.test(parsedURL.pathname);
+};
+
 /* Helper to enable downloading files that are on S3 since Chrome and Firefox does 
    not allow cross-origin downloads when using the download attribute on an anchor tag, 
    see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-download. */
@@ -14,16 +28,17 @@ async function downloadFileHandler(req, res) {
 
   const hostname = req.get('original-hostname') || req.hostname;
   const isProd = hostname === 'opencollective.com';
+  let parsedURL;
+  try {
+    parsedURL = new URL(url);
+  } catch {
+    return res.status(400).json({ error: 'Invalid url parameter' });
+  }
 
-  const S3Url = new RegExp(
-    `^https:\\/\\/opencollective-${isProd ? 'production' : 'staging'}\\.s3[.-]us-west-1\\.amazonaws\\.com`,
-  );
-
-  const RestApiCsvTransactionsUrl = new RegExp(
-    `^https:\\/\\/rest${isProd ? '' : '-staging'}\\.opencollective\\.com\\/v2\\/[^/]+\\/transactions\\.csv`,
-  );
-
-  if (!S3Url.test(url) && !RestApiCsvTransactionsUrl.test(url)) {
+  if (
+    parsedURL.protocol !== 'https:' ||
+    !(isValidS3ImageUrl(parsedURL, isProd) || isValidRESTApiUrl(parsedURL, isProd))
+  ) {
     return res.status(400).json({
       error:
         'Only files from Open Collective S3 buckets and specific REST API are allowed - to the correct environment',
@@ -32,7 +47,7 @@ async function downloadFileHandler(req, res) {
 
   const response = await fetch(url);
   if (!response.ok) {
-    throw new Error(`Unexpected response: ${response.statusText}`);
+    return res.status(response.status).json({ error: response.statusText });
   }
 
   const contentDisposition = response.headers.get('Content-Disposition');

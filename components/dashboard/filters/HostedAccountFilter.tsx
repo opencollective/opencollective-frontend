@@ -3,9 +3,9 @@ import { useLazyQuery, useQuery } from '@apollo/client';
 import { defineMessage } from 'react-intl';
 import { z } from 'zod';
 
-import { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
+import type { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
 import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
-import { Account, AccountHoverCardFieldsFragment } from '../../../lib/graphql/types/v2/graphql';
+import type { Account, AccountHoverCardFieldsFragment, AccountQuery } from '../../../lib/graphql/types/v2/graphql';
 
 import { AccountHoverCard, accountHoverCardFields } from '../../AccountHoverCard';
 import Avatar from '../../Avatar';
@@ -43,13 +43,13 @@ export const AccountRenderer = ({
   };
   inOptionsList?: boolean; // For positioning the HoverCard to the right to prevent blocking options list
 }) => {
-  const { data } = useQuery(accountQuery, {
+  const { data } = useQuery<AccountQuery>(accountQuery, {
     variables: { slug: account.slug },
     fetchPolicy: 'cache-first',
     context: API_V2_CONTEXT,
     // skip query if there is already a field from the hover card data (such as description),
     // to prevent fetching all accounts when used in the combo select filter that already queries for these fields
-    skip: !!account.description,
+    skip: !!account.description && !!account.type,
   });
   account = data?.account || account;
 
@@ -75,14 +75,17 @@ export const hostedAccountFilter: FilterConfig<z.infer<typeof schema>> = {
   schema,
   toVariables: (value, key) => ({ [key]: { slug: value } }),
   filter: {
-    labelMsg: defineMessage({ defaultMessage: 'Account' }),
+    labelMsg: defineMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
     Component: HostedAccountFilter,
-    valueRenderer: ({ value, ...props }) => <AccountRenderer account={{ slug: value }} {...props} />,
+    valueRenderer: ({ value, meta, ...props }) => (
+      <AccountRenderer account={{ slug: value }} inOptionsList={meta.inOptionsList} {...props} />
+    ),
   },
 };
 
 const resultNodeToOption = account => ({
   label: <AccountRenderer account={account} inOptionsList />,
+  keywords: [account.name],
   value: account.slug,
 });
 
@@ -93,7 +96,7 @@ function HostedAccountFilter({
   z.infer<typeof schema>,
   { hostSlug: string; hostedAccounts?: Partial<AccountHoverCardFieldsFragment>[] }
 >) {
-  const defaultAccounts = hostedAccounts?.map(resultNodeToOption) || [];
+  const defaultAccounts = React.useMemo(() => hostedAccounts?.map(resultNodeToOption) || [], [hostedAccounts]);
   const [options, setOptions] = React.useState<{ label: React.ReactNode; value: string }[]>(defaultAccounts);
 
   const [search, { loading, data }] = useLazyQuery(hostedAccountFilterSearchQuery, {
@@ -103,24 +106,27 @@ function HostedAccountFilter({
     context: API_V2_CONTEXT,
   });
 
-  const searchFunc = searchTerm => {
-    if (!searchTerm && defaultAccounts.length) {
-      setOptions(defaultAccounts);
-    } else {
-      search({
-        variables: {
-          searchTerm,
-          ...(!searchTerm && { orderBy: { field: 'ACTIVITY', direction: 'DESC' } }),
-        },
-      });
-    }
-  };
+  const searchFunc = React.useCallback(
+    (searchTerm: string) => {
+      if (!searchTerm && defaultAccounts.length) {
+        setOptions(defaultAccounts);
+      } else {
+        search({
+          variables: {
+            searchTerm,
+            ...(!searchTerm && { orderBy: { field: 'ACTIVITY', direction: 'DESC' } }),
+          },
+        });
+      }
+    },
+    [defaultAccounts, search],
+  );
 
   React.useEffect(() => {
     if (!loading) {
       setOptions(data?.accounts?.nodes.map(resultNodeToOption) || defaultAccounts);
     }
-  }, [loading, data]);
+  }, [loading, data, defaultAccounts]);
 
   return <ComboSelectFilter options={options} loading={loading} searchFunc={searchFunc} {...props} />;
 }

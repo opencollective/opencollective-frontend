@@ -10,14 +10,17 @@ export function Timezonepicker({ value = 'local', onChange }) {
     <div className="text-sm">
       <div className="flex items-center gap-2">
         <h3 className="my-1 text-xs font-medium text-muted-foreground">
-          <FormattedMessage defaultMessage="Timezone" />
+          <FormattedMessage defaultMessage="Timezone" id="7nUCu9" />
         </h3>
         <Tooltip>
           <TooltipTrigger className="cursor-help">
             <InfoIcon size={12} />
           </TooltipTrigger>
           <TooltipContent className="max-w-[320px]">
-            <FormattedMessage defaultMessage="By default, all dates are filtered and displayed using your local timezone. You can switch to UTC to indicate that the dates provided above use the Coordinated Universal Time format, which matches how email reports are generated" />
+            <FormattedMessage
+              defaultMessage="By default, all dates are filtered and displayed using your local timezone. You can switch to UTC to indicate that the dates provided above use the Coordinated Universal Time format, which matches how email reports are generated"
+              id="9sbPks"
+            />
           </TooltipContent>
         </Tooltip>
       </div>

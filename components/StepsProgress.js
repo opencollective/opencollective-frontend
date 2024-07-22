@@ -269,13 +269,13 @@ const getBubbleContent = (idx, checked, disabled, focused, loading) => {
  */
 const StepsProgress = ({
   steps,
-  disabledStepNames,
+  disabledStepNames = [],
   children,
   focus,
-  loadingStep,
+  loadingStep = null,
   onStepSelect,
   allCompleted,
-  stepWidth,
+  stepWidth = '100%',
   viewport,
 }) => {
   const focusIdx = focus ? steps.findIndex(step => step.name === focus.name) : -1;
@@ -395,13 +395,6 @@ StepsProgress.propTypes = {
   stepWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /** @ignore from withViewport */
   viewport: PropTypes.oneOf(Object.values(VIEWPORTS)),
-};
-
-StepsProgress.defaultProps = {
-  focused: null,
-  loadingStep: null,
-  disabledStepNames: [],
-  stepWidth: '100%',
 };
 
 export default withViewport(StepsProgress);

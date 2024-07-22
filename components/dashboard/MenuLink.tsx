@@ -1,6 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
-import { ArrowRight, ChevronDown, ChevronUp, LucideIcon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
 import ReactAnimateHeight from 'react-animate-height';
 import { useIntl } from 'react-intl';
 
@@ -18,7 +19,7 @@ type MenuLinkProps = {
   href?: string;
   className?: string;
   external?: boolean;
-  label?: string;
+  label?: string | React.JSX.Element;
   Icon?: LucideIcon;
   subMenu?: PageMenuItem[];
   section?: string;
@@ -37,14 +38,20 @@ export const MenuLink = ({
   dataCy,
 }: MenuLinkProps) => {
   const { formatMessage } = useIntl();
-  const { selectedSection, account } = React.useContext(DashboardContext);
+  const { selectedSection, account, subpath } = React.useContext(DashboardContext);
   const [selfExpanded, setSelfExpanded] = React.useState(false);
+
+  // also check if the route (section/subpath[0], e.g. 'reports/transactions') match the menu link
+  const sectionAndSubpath = subpath?.length > 0 ? `${selectedSection}/${subpath[0]}` : selectedSection;
 
   const sections = subMenu?.map(item => item.section);
 
-  const sectionExpanded = sections?.includes(selectedSection);
+  const sectionExpanded = sections?.some(section => {
+    return sectionAndSubpath === section;
+  });
   const subMenuExpanded = sectionExpanded || selfExpanded;
-  const isSelected = !subMenu && section && selectedSection === section;
+
+  const isSelected = !subMenu && section && sectionAndSubpath === section;
 
   if (!label && SECTION_LABELS[section]) {
     label = formatMessage(SECTION_LABELS[section]);

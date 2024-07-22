@@ -6,18 +6,21 @@ import dayjs from 'dayjs';
 import { FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
-import { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
+import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
-import { HostReportsPageQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import type { HostReportsPageQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import { getDashboardRoute } from '../../../../lib/url-helpers';
 
 import Container from '../../../Container';
 import { Box, Flex } from '../../../Grid';
+import Link from '../../../Link';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import NotFound from '../../../NotFound';
 import StyledCard from '../../../StyledCard';
 import StyledHr from '../../../StyledHr';
+import StyledLink from '../../../StyledLink';
 import StyledTooltip from '../../../StyledTooltip';
 import { H2 } from '../../../Text';
 import { Button } from '../../../ui/Button';
@@ -27,7 +30,7 @@ import { dateFilter } from '../../filters/DateFilter';
 import { DateFilterType } from '../../filters/DateFilter/schema';
 import { Filterbar } from '../../filters/Filterbar';
 import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
-import { DashboardSectionProps } from '../../types';
+import type { DashboardSectionProps } from '../../types';
 
 import HostFeesSection from './HostFeesSection';
 import PlatformTipsCollected from './PlatformTipsCollected';
@@ -193,6 +196,7 @@ const HostDashboardReports = ({ accountSlug: hostSlug }: DashboardSectionProps) 
     context: API_V2_CONTEXT,
   });
   const host = data?.host;
+  const [displayExportCSVModal, setDisplayExportCSVModal] = React.useState(false);
 
   if (!loading) {
     if (error) {
@@ -202,7 +206,12 @@ const HostDashboardReports = ({ accountSlug: hostSlug }: DashboardSectionProps) 
     } else if (!host.isActive) {
       return (
         <MessageBox withIcon type="error" maxWidth={400} m="0 auto">
-          <FormattedMessage id="host.onlyActive" defaultMessage="This page is only available for active fiscal hosts" />
+          <p className="mb-2">
+            <FormattedMessage defaultMessage="You need to activate Host Budget to see this report." id="XZLOBI" />
+          </p>
+          <StyledLink as={Link} href={getDashboardRoute(host, 'advanced')}>
+            <FormattedMessage defaultMessage="Go to Settings > Advanced" id="TiNmc5" />
+          </StyledLink>
         </MessageBox>
       );
     }
@@ -215,6 +224,8 @@ const HostDashboardReports = ({ accountSlug: hostSlug }: DashboardSectionProps) 
         title={<FormattedMessage id="Reports" defaultMessage="Reports" />}
         actions={
           <ExportTransactionsCSVModal
+            open={displayExportCSVModal}
+            setOpen={setDisplayExportCSVModal}
             account={host}
             isHostReport
             queryFilter={queryFilter}

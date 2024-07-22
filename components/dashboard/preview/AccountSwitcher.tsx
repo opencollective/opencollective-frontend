@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { PopoverAnchor } from '@radix-ui/react-popover';
-import { useCommandState } from 'carloslfu-cmdk-internal';
 import { cx } from 'class-variance-authority';
 import clsx from 'clsx';
-import { flatten, groupBy, uniqBy } from 'lodash';
+import { useCommandState } from 'cmdk';
+import { compact, flatten, groupBy, uniqBy } from 'lodash';
 import { Check, ChevronsUpDown, PlusCircle, Star } from 'lucide-react';
 import memoizeOne from 'memoize-one';
 // eslint-disable-next-line no-restricted-imports -- components/Link does not currently accept a ref, whichis required when used 'asChild' of Button
@@ -25,6 +25,7 @@ import { Button } from '../../ui/Button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '../../ui/Command';
 import { Popover, PopoverContent, PopoverTrigger } from '../../ui/Popover';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../ui/Tooltip';
+import { ROOT_PROFILE_ACCOUNT } from '../constants';
 
 const CREATE_NEW_BUTTONS = {
   [CollectiveType.COLLECTIVE]: {
@@ -164,7 +165,7 @@ const AccountsCommand = ({
       <CommandInput placeholder={inputPlaceholder} autoFocus={active} />
       <CommandList className="max-h-[min(420px,calc(var(--radix-popper-available-height)-70px))]">
         <CommandEmpty>
-          <FormattedMessage defaultMessage="No account found." />
+          <FormattedMessage defaultMessage="No account found." id="Wk6yrM" />
         </CommandEmpty>
         {Object.entries(groupedAccounts).map(([collectiveType, accounts]) => {
           return (
@@ -172,7 +173,7 @@ const AccountsCommand = ({
               key={collectiveType}
               heading={
                 collectiveType === CollectiveType.INDIVIDUAL
-                  ? intl.formatMessage({ defaultMessage: 'Personal Account' })
+                  ? intl.formatMessage({ defaultMessage: 'Personal Account', id: 'Sch2bu' })
                   : formatCollectiveType(intl, collectiveType, 2)
               }
             >
@@ -219,7 +220,7 @@ const AccountsCommand = ({
 
 const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
   let administratedAccounts =
-    loggedInUser?.memberOf.filter(m => m.role === 'ADMIN' && !m.collective.isIncognito).map(m => m.collective) || [];
+    loggedInUser.memberOf.filter(m => m.role === 'ADMIN' && !m.collective.isIncognito).map(m => m.collective) || [];
 
   // Filter out accounts if the user is also an admin of the parent of that account (since we already show the parent)
   const childAccountIds = flatten(administratedAccounts.map(a => a.children)).map((a: { id: number }) => a.id);
@@ -231,7 +232,7 @@ const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
   const activeAccounts = administratedAccounts.filter(a => !a.isArchived);
 
   const groupedAccounts = {
-    [CollectiveType.INDIVIDUAL]: [loggedInUser.collective],
+    [CollectiveType.INDIVIDUAL]: compact([loggedInUser.collective, loggedInUser.isRoot && ROOT_PROFILE_ACCOUNT]),
     [CollectiveType.ORGANIZATION]: [],
     [CollectiveType.COLLECTIVE]: [],
     ...groupBy(activeAccounts, a => a.type),
@@ -331,7 +332,7 @@ export default function AccountSwitcher({ activeSlug, defaultSlug, setDefaultSlu
                 onClick={() => router.push(`/dashboard/${parentAccount.slug}`)}
                 aria-expanded={open}
                 className={clsx(
-                  'group h-8 justify-between gap-1.5 whitespace-nowrap rounded-full border-transparent px-2 ',
+                  'group h-8 justify-between gap-1.5 whitespace-nowrap rounded-full border-transparent px-2',
                   'max-w-[14rem]',
                 )}
               >
@@ -375,7 +376,7 @@ export default function AccountSwitcher({ activeSlug, defaultSlug, setDefaultSlu
           onActive={() => setActivePane('ROOT')}
           selectedValue={selectedRootValue}
           setSelectedValue={setSelectedRootValue}
-          inputPlaceholder={intl.formatMessage({ defaultMessage: 'Search accounts...' })}
+          inputPlaceholder={intl.formatMessage({ defaultMessage: 'Search accounts...', id: 'VSmsWL' })}
           groupedAccounts={groupedAccounts}
           setOpen={setOpen}
           activeAccount={activeAccount}
@@ -393,7 +394,7 @@ export default function AccountSwitcher({ activeSlug, defaultSlug, setDefaultSlu
             onActive={() => setActivePane('CHILD')}
             selectedValue={selectedChildValue}
             setSelectedValue={setSelectedChildValue}
-            inputPlaceholder={intl.formatMessage({ defaultMessage: 'Search projects and events...' })}
+            inputPlaceholder={intl.formatMessage({ defaultMessage: 'Search projects and events...', id: 'DAM4uY' })}
             groupedAccounts={childGroupedAccounts}
             setOpen={setOpen}
             activeAccount={activeAccount}

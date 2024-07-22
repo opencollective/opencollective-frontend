@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { DocumentNode, useLazyQuery } from '@apollo/client';
-import { debounce, uniqBy } from 'lodash';
+import React from 'react';
+import type { DocumentNode } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client';
+import { uniqBy } from 'lodash';
 import { Search, Tags, TagsIcon } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
-import { AccountReferenceInput, InputMaybe, Scalars } from '../lib/graphql/types/v2/graphql';
+import type { AccountReferenceInput, InputMaybe, Scalars } from '../lib/graphql/types/v2/graphql';
+import useDebouncedSearch from '../lib/hooks/useDebouncedSearch';
 
 import { Button } from './ui/Button';
 import { Command, CommandGroup, CommandInput, CommandItem, CommandList } from './ui/Command';
@@ -20,33 +22,6 @@ const getOptions = tags => {
   }
 };
 
-const useDebouncedSearch = (searchFunc, input, delay) => {
-  const [isDebouncing, setIsDebouncing] = useState(false);
-
-  useEffect(() => {
-    if (searchFunc) {
-      // If there's no input, don't debounce, just call the search function.
-      if (!input) {
-        setIsDebouncing(false);
-        searchFunc();
-        return;
-      }
-      const debouncedSearch = debounce(() => {
-        setIsDebouncing(false);
-        searchFunc(input);
-      }, delay);
-
-      setIsDebouncing(true);
-
-      debouncedSearch();
-
-      return debouncedSearch.cancel;
-    }
-  }, [input]);
-
-  return { isDebouncing };
-};
-
 type EditTagsProps = {
   suggestedTags?: string[];
   searchFunc?: (term?: string) => void;
@@ -54,7 +29,7 @@ type EditTagsProps = {
   value: string[];
   onChange: (value: { label: string; value: string }[]) => void;
   defaultValue?: string[];
-  disabled: boolean;
+  disabled?: boolean;
 };
 
 type AutocompleteEditTagsProps = EditTagsProps & {
@@ -73,12 +48,15 @@ export const AutocompleteEditTags = ({ query, variables, ...props }: Autocomplet
     notifyOnNetworkStatusChange: true,
     variables,
   });
-  const searchFunc = searchTerm =>
-    search({
-      variables: {
-        searchTerm,
-      },
-    });
+  const searchFunc = React.useCallback(
+    searchTerm =>
+      search({
+        variables: {
+          searchTerm,
+        },
+      }),
+    [search],
+  );
   const suggestedTags = (data || previousData)?.tagStats?.nodes.map(({ tag }) => tag) || [];
   return <EditTags {...props} suggestedTags={suggestedTags} loading={loading} searchFunc={searchFunc} />;
 };
@@ -103,14 +81,14 @@ const EditTags = ({ suggestedTags, loading, searchFunc, value, onChange, default
     }
   };
   const hasSearch = Boolean(searchFunc);
-  const { isDebouncing } = useDebouncedSearch(searchFunc, inputValue, 500);
+  const { isDebouncing } = useDebouncedSearch(searchFunc, inputValue, { delay: 500, noDelayEmpty: true });
   const isLoading = loading || isDebouncing;
 
   const onSelect = value => addTag(value);
 
   const options = getOptions(suggestedTags ?? []);
   const filteredOptions = options?.filter(o => !value?.includes(o.value) && o.value !== inputValue);
-
+  const hasContent = filteredOptions?.length > 0 || inputValue;
   return (
     <div className="flex flex-wrap items-center gap-1">
       {tags.map(tag => (
@@ -136,7 +114,7 @@ const EditTags = ({ suggestedTags, loading, searchFunc, value, onChange, default
           >
             <Tags size={16} />
             <span>
-              <FormattedMessage defaultMessage="Add tag" />
+              <FormattedMessage defaultMessage="Add tag" id="Un1mxZ" />
             </span>
           </Button>
         </PopoverTrigger>
@@ -144,35 +122,34 @@ const EditTags = ({ suggestedTags, loading, searchFunc, value, onChange, default
           <Command>
             <CommandInput
               customIcon={!hasSearch ? TagsIcon : Search}
-              placeholder={intl.formatMessage({ defaultMessage: 'Add tag' })}
+              placeholder={intl.formatMessage({ defaultMessage: 'Add tag', id: 'Un1mxZ' })}
               value={inputValue}
               onValueChange={setInputValue}
               loading={isLoading}
               data-cy="edit-tags-input"
             />
-
-            {(filteredOptions?.length > 0 || inputValue) && (
-              <CommandList>
-                {(filteredOptions.length > 0 || inputValue) && (
-                  <CommandGroup
-                    heading={!inputValue.length ? intl.formatMessage({ defaultMessage: 'Suggestions' }) : undefined}
-                  >
-                    {inputValue && (
-                      <CommandItem value={inputValue} onSelect={onSelect} disabled={disabled}>
-                        {inputValue.toLowerCase()}
+            <CommandList className={!hasContent && 'border-none'}>
+              {hasContent && (
+                <CommandGroup
+                  heading={
+                    !inputValue.length ? intl.formatMessage({ defaultMessage: 'Suggestions', id: 'Hv0XJn' }) : undefined
+                  }
+                >
+                  {inputValue && (
+                    <CommandItem value={inputValue} onSelect={onSelect} disabled={disabled}>
+                      {inputValue.toLowerCase()}
+                    </CommandItem>
+                  )}
+                  {filteredOptions?.map(option => {
+                    return (
+                      <CommandItem key={option.value} value={option.value} onSelect={onSelect} disabled={disabled}>
+                        {option.label}
                       </CommandItem>
-                    )}
-                    {filteredOptions.map(option => {
-                      return (
-                        <CommandItem key={option.value} value={option.value} onSelect={onSelect} disabled={disabled}>
-                          {option.label}
-                        </CommandItem>
-                      );
-                    })}
-                  </CommandGroup>
-                )}
-              </CommandList>
-            )}
+                    );
+                  })}
+                </CommandGroup>
+              )}
+            </CommandList>
           </Command>
         </PopoverContent>
       </Popover>

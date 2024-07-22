@@ -8,7 +8,6 @@ import { PayoutMethodType } from '../../lib/constants/payout-method';
 import Container from '../Container';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import LoadingPlaceholder from '../LoadingPlaceholder';
-import { P } from '../Text';
 
 const renderObject = object =>
   Object.entries(object).reduce((acc, [key, value]) => {
@@ -17,9 +16,9 @@ const renderObject = object =>
     }
     return [
       ...acc,
-      <P key={key} fontSize="14px" lineHeight="18px">
+      <p className="text-ellipsis text-sm leading-5" key={key}>
         <FormattedMessage id="withColon" defaultMessage="{item}:" values={{ item: startCase(key) }} /> {value}
-      </P>,
+      </p>,
     ];
   }, []);
 
@@ -36,7 +35,7 @@ const getPmData = (payoutMethod, field, isLoading) => {
 /**
  * Shows the data of the given payout method
  */
-const PayoutMethodData = ({ payoutMethod, showLabel, isLoading }) => {
+const PayoutMethodData = ({ payoutMethod, showLabel = true, isLoading = false }) => {
   if (isLoading && !payoutMethod) {
     return <LoadingPlaceholder height={24} mb={2} />;
   } else if (!payoutMethod) {
@@ -54,9 +53,9 @@ const PayoutMethodData = ({ payoutMethod, showLabel, isLoading }) => {
               <PrivateInfoIcon />
             </Container>
           )}
-          <Container fontSize="14px" color="black.700">
+          <div className="overflow-hidden text-ellipsis text-sm text-slate-700">
             {getPmData(payoutMethod, 'email', isLoading)}
-          </Container>
+          </div>
         </div>
       );
     case PayoutMethodType.OTHER:
@@ -69,7 +68,7 @@ const PayoutMethodData = ({ payoutMethod, showLabel, isLoading }) => {
               <PrivateInfoIcon />
             </Container>
           )}
-          <Container fontSize="14px" color="black.700">
+          <Container className="overflow-hidden text-ellipsis" fontSize="14px" color="black.700">
             {getPmData(payoutMethod, 'content', isLoading)}
           </Container>
         </div>
@@ -124,10 +123,6 @@ PayoutMethodData.propTypes = {
     type: PropTypes.oneOf(Object.values(PayoutMethodType)),
     data: PropTypes.object,
   }),
-};
-
-PayoutMethodData.defaultProps = {
-  showLabel: true,
 };
 
 // @component

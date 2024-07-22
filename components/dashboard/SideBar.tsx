@@ -10,7 +10,8 @@ import { DrawerMenu } from '../navigation/DrawerMenu';
 import StyledRoundButton from '../StyledRoundButton';
 
 import AccountSwitcher from './AccountSwitcher';
-import Menu, { MenuItem } from './Menu';
+import type { MenuItem } from './Menu';
+import Menu from './Menu';
 
 interface AdminPanelSideBarProps {
   isLoading?: boolean;

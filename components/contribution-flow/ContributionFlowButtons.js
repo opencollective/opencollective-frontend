@@ -60,7 +60,7 @@ class ContributionFlowButtons extends React.Component {
       case STEPS.PAYMENT:
         return <FormattedMessage id="ContributionFlow.Payment" defaultMessage="Payment" />;
       case STEPS.DETAILS:
-        return <FormattedMessage defaultMessage="Contribution" />;
+        return <FormattedMessage defaultMessage="Contribution" id="0LK5eg" />;
     }
   }
 

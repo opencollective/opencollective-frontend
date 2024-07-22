@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { Delete } from '@styled-icons/material/Delete';
 import { get } from 'lodash';
-import { withRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
 import roles from '../../../../lib/constants/roles';
@@ -78,9 +78,8 @@ const removeMemberMutation = gql`
   }
 `;
 
-const EditMemberModal = props => {
-  const { intl, member, collective, canRemove, isLastAdmin, cancelHandler, onEdit } = props;
-
+const EditMemberModal = ({ intl, member, collective, canRemove = false, isLastAdmin, cancelHandler, onEdit }) => {
+  const router = useRouter();
   const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
 
   const { toast } = useToast();
@@ -243,7 +242,7 @@ const EditMemberModal = props => {
         });
 
         if (get(member, 'account.slug') === get(LoggedInUser, 'collective.slug')) {
-          await props.router.push({ pathname: `/${get(collective, 'slug')}` });
+          await router.push({ pathname: `/${get(collective, 'slug')}` });
           await refetchLoggedInUser();
         }
 
@@ -359,12 +358,7 @@ EditMemberModal.propTypes = {
   intl: PropTypes.object.isRequired,
   isLastAdmin: PropTypes.bool,
   member: PropTypes.object,
-  router: PropTypes.object,
   canRemove: PropTypes.bool,
 };
 
-EditMemberModal.defaultProps = {
-  canRemove: true,
-};
-
-export default withRouter(EditMemberModal);
+export default EditMemberModal;

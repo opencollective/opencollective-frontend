@@ -71,3 +71,42 @@ export const DefaultStory = props => <StyledButton {...props} />;
     }}
   </Story>
 </Canvas>
+
+## Switching the loading state
+
+<Canvas>
+  <Story name="Switching the loading state">
+    {buttonProps => {
+      const [loading, setLoading] = React.useState(false);
+      return (
+        <div className="flex flex-col gap-5">
+          <div>
+            <StyledButton
+              {...buttonProps}
+              loading={loading}
+              onClick={() => {
+                setLoading(true);
+                setTimeout(() => setLoading(false), 2000);
+              }}
+            >
+             Click me, and see the width being preserved!
+            </StyledButton>
+          </div>
+          <div className="w-[30px]">
+            <StyledButton
+              {...buttonProps}
+              loading={loading}
+              onClick={() => {
+                setLoading(true);
+                setTimeout(() => setLoading(false), 2000);
+              }}
+            >
+              Click me,<br/>I am a multi-line button!
+            </StyledButton>
+          </div>
+        </div>
+      );
+    }}
+
+  </Story>
+</Canvas>

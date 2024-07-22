@@ -41,7 +41,7 @@ const ExpenseAmountBreakdown = ({ items, currency, taxes, expenseTotalAmount }) 
         <Flex flexDirection="column" alignItems="flex-end">
           <AmountLine data-cy="expense-invoiced-amount">
             <Span textTransform="capitalize" mr={3}>
-              <FormattedMessage defaultMessage="Subtotal" />
+              <FormattedMessage defaultMessage="Subtotal" id="L8seEc" />
               {currency && ` (${currency})`}
             </Span>
             &nbsp;
@@ -96,13 +96,17 @@ ExpenseAmountBreakdown.propTypes = {
   /** Expense items */
   items: PropTypes.arrayOf(
     PropTypes.shape({
-      amount: PropTypes.number,
+      amountV2: PropTypes.shape({
+        valueInCents: PropTypes.number,
+        currency: PropTypes.string,
+      }),
     }),
   ).isRequired,
   /** Taxes applied to the expense */
   taxes: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string,
+      type: PropTypes.string,
       rate: PropTypes.number,
     }),
   ),

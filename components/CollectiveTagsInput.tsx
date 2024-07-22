@@ -1,19 +1,14 @@
-import React, { Fragment, MouseEventHandler, useCallback, useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
+import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import { useLazyQuery } from '@apollo/client';
 import { DndContext, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { debounce } from 'lodash';
+import type { MouseEventHandler } from 'react';
 import AnimateHeight from 'react-animate-height';
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  components as ReactSelectComponents,
-  ContainerProps,
-  InputProps,
-  MultiValueProps,
-  OptionProps,
-} from 'react-select';
+import type { ContainerProps, InputProps, MultiValueProps, OptionProps } from 'react-select';
+import { components as ReactSelectComponents } from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 
 import { IGNORED_TAGS } from '../lib/constants/collectives';
@@ -103,7 +98,15 @@ const debouncedSearch = debounce((searchFunc, variables) => {
   return searchFunc({ variables });
 }, 500);
 
-function CollectiveTagsInput({ defaultValue = [], onChange, suggestedTags = [] }) {
+function CollectiveTagsInput({
+  defaultValue = [],
+  onChange,
+  suggestedTags = [],
+}: {
+  defaultValue?: string[];
+  onChange: (tags: TagOption[]) => void;
+  suggestedTags?: string[];
+}) {
   const intl = useIntl();
   const [searchTags, { loading: fetching, data }] = useLazyQuery(searchTagsQuery, {
     context: API_V2_CONTEXT,
@@ -247,7 +250,7 @@ function CollectiveTagsInput({ defaultValue = [], onChange, suggestedTags = [] }
         <Flex mt={2} gap={'6px'} flexWrap="wrap" alignItems={'center'}>
           {suggestedTags && (
             <Span color="black.600" mr={1} fontSize="12px">
-              <FormattedMessage defaultMessage="Popular tags:" />
+              <FormattedMessage defaultMessage="Popular tags:" id="W4zXqr" />
             </Span>
           )}
 
@@ -256,10 +259,9 @@ function CollectiveTagsInput({ defaultValue = [], onChange, suggestedTags = [] }
             return (
               <StyledTag
                 variant="rounded-right"
-                type="button"
+                htmlType="button"
                 tabIndex={-1}
                 key={tag}
-                closeButtonProps={false}
                 style={{ opacity: isSelected ? 0.5 : 1, cursor: 'pointer' }}
                 onClick={() =>
                   isSelected
@@ -276,12 +278,5 @@ function CollectiveTagsInput({ defaultValue = [], onChange, suggestedTags = [] }
     </Fragment>
   );
 }
-
-CollectiveTagsInput.propTypes = {
-  defaultValue: PropTypes.arrayOf(PropTypes.string),
-  suggestedTags: PropTypes.arrayOf(PropTypes.string),
-  onChange: PropTypes.func,
-  preload: PropTypes.bool,
-};
 
 export default CollectiveTagsInput;

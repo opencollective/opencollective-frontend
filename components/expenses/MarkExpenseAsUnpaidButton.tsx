@@ -1,10 +1,10 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import useProcessExpense from '../../lib/expenses/useProcessExpense';
-import { Expense, ExpenseStatus, MarkAsUnPaidExpenseStatus } from '../../lib/graphql/types/v2/graphql';
+import type { Expense } from '../../lib/graphql/types/v2/graphql';
+import { ExpenseStatus, MarkAsUnPaidExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import { i18nExpenseStatus } from '../../lib/i18n/expense';
 
 import ConfirmationModal from '../ConfirmationModal';
@@ -34,6 +34,7 @@ const generateNewExpenseStatusOptions = intl => [
 const messages = defineMessages({
   reasonPlaceholder: {
     defaultMessage: 'e.g. Failed transfer',
+    id: 'mOdpl+',
   },
 });
 
@@ -102,7 +103,9 @@ const MarkExpenseAsUnpaidButton = ({ expense, ...props }: MarkExpenseAsUnpaidBut
           <StyledSelect
             inputId="new-expense-status"
             options={expenseStatusOptions}
-            onChange={value => setNewExpenseStatusOption(value)}
+            onChange={(newValue: { value: MarkAsUnPaidExpenseStatus; label: string }) =>
+              setNewExpenseStatusOption(newValue)
+            }
             value={newExpenseStatusOption}
             width="100%"
           />
@@ -142,10 +145,6 @@ const MarkExpenseAsUnpaidButton = ({ expense, ...props }: MarkExpenseAsUnpaidBut
       </ConfirmationModal>
     </React.Fragment>
   );
-};
-
-MarkExpenseAsUnpaidButton.propTypes = {
-  onConfirm: PropTypes.func.isRequired,
 };
 
 export default MarkExpenseAsUnpaidButton;

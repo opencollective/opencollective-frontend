@@ -16,12 +16,21 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  compiler: {
+    styledComponents: {
+      displayName: ['ci', 'test', 'development', 'e2e'].includes(process.env.OC_ENV),
+    },
+  },
   images: {
     disableStaticImages: true,
   },
   experimental: {
     outputFileTracingExcludes: {
-      '*': ['node_modules/@swc/core-linux-x64-gnu', 'node_modules/@swc/core-linux-x64-musl'],
+      '*': [
+        'node_modules/@swc/core-linux-x64-gnu',
+        'node_modules/@swc/core-linux-x64-musl',
+        'node_modules/canvas/build', // https://github.com/wojtekmaj/react-pdf/issues/1504#issuecomment-2007090872
+      ],
     },
     outputFileTracingIncludes: {
       '/_document': ['./.next/language-manifest.json'],
@@ -29,6 +38,7 @@ const nextConfig = {
   },
   webpack: (config, { webpack, isServer, dev }) => {
     config.resolve.alias['@sentry/replay'] = false;
+    config.resolve.alias['canvas'] = false; // https://github.com/wojtekmaj/react-pdf?tab=readme-ov-file#nextjs
 
     config.plugins.push(
       // Ignore __tests__
@@ -42,6 +52,7 @@ const nextConfig = {
         API_KEY: null,
         API_URL: null,
         PDF_SERVICE_URL: null,
+        NEXT_PDF_SERVICE_URL: null,
         ML_SERVICE_URL: null,
         DISABLE_MOCK_UPLOADS: false,
         DYNAMIC_IMPORT: true,
@@ -51,7 +62,10 @@ const nextConfig = {
         SENTRY_DSN: null,
         WISE_PLATFORM_COLLECTIVE_SLUG: null,
         WISE_ENVIRONMENT: 'sandbox',
+        TAX_FORMS_USE_LEGACY: false,
         HCAPTCHA_SITEKEY: false,
+        OCF_DUPLICATE_FLOW: false,
+        TURNSTILE_SITEKEY: false,
         CAPTCHA_ENABLED: false,
         CAPTCHA_PROVIDER: 'HCAPTCHA',
         SENTRY_TRACES_SAMPLE_RATE: null,
@@ -61,7 +75,7 @@ const nextConfig = {
     );
 
     if (['ci', 'test', 'development'].includes(process.env.OC_ENV)) {
-      // eslint-disable-next-line node/no-unpublished-require
+      // eslint-disable-next-line n/no-unpublished-require
       const CircularDependencyPlugin = require('circular-dependency-plugin');
       config.plugins.push(
         new CircularDependencyPlugin({
@@ -77,22 +91,9 @@ const nextConfig = {
       new CopyPlugin({
         patterns: [
           {
+            // eslint-disable-next-line n/no-extraneous-require
             from: path.join(path.dirname(require.resolve('pdfjs-dist/package.json')), 'cmaps'),
             to: path.join(__dirname, 'public/static/cmaps'),
-          },
-        ],
-      }),
-    );
-
-    // Copy pdfjs worker to public folder (used by PDFViewer component)
-    // (Workaround for working with react-pdf and CommonJS - if moving to ESM this can be removed)
-    // TODO(ESM): Move this to standard ESM
-    config.plugins.push(
-      new CopyPlugin({
-        patterns: [
-          {
-            from: require.resolve('pdfjs-dist/build/pdf.worker.min.js'),
-            to: path.join(__dirname, 'public/static/scripts'),
           },
         ],
       }),
@@ -119,7 +120,7 @@ const nextConfig = {
 
     config.module.rules.push({
       test: /\.md$/,
-      use: ['babel-loader', 'raw-loader', 'markdown-loader'],
+      use: ['raw-loader', 'markdown-loader'],
     });
 
     // Configuration for images
@@ -310,7 +311,7 @@ let exportedConfig = withSentryConfig(
 );
 
 if (process.env.ANALYZE) {
-  // eslint-disable-next-line node/no-unpublished-require
+  // eslint-disable-next-line n/no-unpublished-require
   const withBundleAnalyzer = require('@next/bundle-analyzer')({
     enabled: true,
   });

@@ -70,7 +70,7 @@ export const getContributeProfiles = (loggedInUser, collective, tier) => {
       }
       if (!isEmpty(member.collective.children)) {
         const childrenOfSameHost = member.collective.children.filter(
-          child => child.host.id === collective.host.legacyId,
+          child => child.host && child.host.id === collective.host.legacyId,
         );
         contributorProfiles.push(...childrenOfSameHost);
       }
@@ -193,7 +193,7 @@ export const generatePaymentMethodOptions = (
   if (!balanceOnlyCollectiveTypes.includes(stepProfile.type)) {
     if (paymentIntent) {
       let availableMethodLabels = paymentIntent.payment_method_types.map(method => {
-        return intl.formatMessage(StripePaymentMethodsLabels[method]);
+        return StripePaymentMethodsLabels[method] ? intl.formatMessage(StripePaymentMethodsLabels[method]) : method;
       });
 
       if (availableMethodLabels.length > 3) {
@@ -203,6 +203,7 @@ export const generatePaymentMethodOptions = (
       const title = (
         <FormattedMessage
           defaultMessage="New payment method: {methods}"
+          id="jwtunf"
           values={{ methods: availableMethodLabels.join(', ') }}
         />
       );
@@ -271,7 +272,7 @@ export const generatePaymentMethodOptions = (
       uniquePMs.push({
         key: 'manual',
         title: get(collective, 'host.settings.paymentMethods.manual.title', null) || (
-          <FormattedMessage defaultMessage="Bank transfer (manual)" />
+          <FormattedMessage defaultMessage="Bank transfer (manual)" id="ycoJnS" />
         ),
         paymentMethod: {
           service: PAYMENT_METHOD_SERVICE.OPENCOLLECTIVE,

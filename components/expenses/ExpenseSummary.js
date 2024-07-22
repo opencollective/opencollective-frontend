@@ -190,7 +190,7 @@ const ExpenseSummary = ({
                 fontWeight="bold"
                 fontSize="12px"
                 showTaxFormTag={includes(expense.requiredLegalDocuments, 'US_TAX_FORM')}
-                showTaxFormMsg={expense.payee.isAdmin}
+                payee={expense.payee}
               />
             </Box>
           )}
@@ -461,6 +461,7 @@ const ExpenseSummary = ({
             <Container fontSize="12px" fontWeight="500" mr={3} whiteSpace="nowrap" color="black.600">
               <FormattedMessage
                 defaultMessage="Accounted as ({currency}):"
+                id="4Wdhe4"
                 values={{ currency: expense.amountInAccountCurrency.currency }}
               />
             </Container>
@@ -488,7 +489,7 @@ const ExpenseSummary = ({
 
       <Flex mt={4} mb={3} alignItems="center">
         <Span fontWeight="bold" fontSize="16px">
-          <FormattedMessage defaultMessage="Additional Information" />
+          <FormattedMessage defaultMessage="Additional Information" id="laUK3e" />
         </Span>
         <StyledHr flex="1 1" borderColor="black.300" ml={2} />
       </Flex>
@@ -621,7 +622,8 @@ ExpenseSummary.propTypes = {
           id: PropTypes.string,
           incurredAt: PropTypes.string,
           description: PropTypes.string,
-          amount: PropTypes.number.isRequired,
+          amount: PropTypes.number,
+          amountV2: PropTypes.object,
           url: PropTypes.string,
         }),
       ),

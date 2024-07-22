@@ -16,6 +16,7 @@ import ContributeTier from '../../contribute-cards/ContributeTier';
 import { Box, Grid } from '../../Grid';
 import Image from '../../Image';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
+import MessageBox from '../../MessageBox';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import StyledCheckbox from '../../StyledCheckbox';
 import StyledHr from '../../StyledHr';
@@ -36,7 +37,10 @@ const getSortedContributeCards = (collective, tiers, intl) => {
             collective,
             hideContributors: true,
             hideCTA: true,
-            missingCTAMsg: intl.formatMessage({ defaultMessage: 'The default contribution tier cannot be edited.' }),
+            missingCTAMsg: intl.formatMessage({
+              defaultMessage: 'The default contribution tier cannot be edited.',
+              id: 'setJlw',
+            }),
           },
         }
       : {
@@ -69,7 +73,7 @@ const CardsContainer = styled(Grid).attrs({
  * A revamp of `components/edit-collective/sections/Tiers.js`. Meant to be renamed once we'll be ready
  * to replace the old tiers form.
  */
-const Tiers = ({ collective }) => {
+const Tiers = ({ collective, isLegacyOCFDuplicatedAccount }) => {
   const variables = { accountSlug: collective.slug };
   const { data, loading, error, refetch } = useQuery(listTierQuery, { variables, context: API_V2_CONTEXT });
   const intl = useIntl();
@@ -83,12 +87,15 @@ const Tiers = ({ collective }) => {
         <Box ml={2}>
           <P>
             <Strong>
-              <FormattedMessage defaultMessage="About contribution tiers" />
+              <FormattedMessage defaultMessage="About contribution tiers" id="RHApk3" />
             </Strong>
             <br />
             <br />
             <Span>
-              <FormattedMessage defaultMessage="You can provide perks or rewards for your tiers, have a set membership fee, or create categories for your contributors. Tiers can be limited to an amount or frequency (one time, monthly, yearly), or allowed to be flexibly set by contributors." />
+              <FormattedMessage
+                defaultMessage="You can provide perks or rewards for your tiers, have a set membership fee, or create categories for your contributors. Tiers can be limited to an amount or frequency (one time, monthly, yearly), or allowed to be flexibly set by contributors."
+                id="LdgLV7"
+              />
             </Span>
           </P>
           <P mt={3}>
@@ -96,12 +103,28 @@ const Tiers = ({ collective }) => {
               href="https://docs.opencollective.com/help/collectives/collective-settings/tiers-goals"
               openInNewTab
             >
-              <FormattedMessage defaultMessage="Learn more about tiers" />.
+              <FormattedMessage defaultMessage="Learn more about tiers" id="108gPp" />.
             </StyledLink>
           </P>
         </Box>
       </Grid>
       <StyledHr my={4} borderColor="black.300" />
+
+      {isLegacyOCFDuplicatedAccount && (
+        <MessageBox type="error" my={4}>
+          <div className="flex items-center gap-4">
+            <Image src="/static/images/illustrations/signs.png" alt="" width={32} height={32} />
+            <div>
+              <p>You can’t make any changes to the tiers since this is a limited account.</p>
+              <p>
+                <StyledLink href="https://blog.opencollective.com/fiscal-host-transition/" openInNewTab>
+                  Learn more
+                </StyledLink>
+              </p>
+            </div>
+          </div>
+        </MessageBox>
+      )}
 
       <Box my={4}>
         {loading ? (
@@ -109,7 +132,7 @@ const Tiers = ({ collective }) => {
         ) : error ? (
           <MessageBoxGraphqlError error={error} />
         ) : (
-          <div>
+          <div className={isLegacyOCFDuplicatedAccount ? 'pointer-events-none opacity-50 grayscale' : ''}>
             <Box mb={4}>
               <P fontSize="14px" lineHeight="20x" mb={3}>
                 <FormattedMessage
@@ -162,6 +185,7 @@ const Tiers = ({ collective }) => {
 };
 
 Tiers.propTypes = {
+  isLegacyOCFDuplicatedAccount: PropTypes.bool,
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,

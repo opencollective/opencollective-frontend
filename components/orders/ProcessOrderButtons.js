@@ -119,7 +119,10 @@ const ProcessOrderButtons = ({ order, permissions, onSuccess }) => {
               if (selectedAction === 'MARK_AS_EXPIRED') {
                 toast({
                   variant: 'success',
-                  message: intl.formatMessage({ defaultMessage: 'The contribution has been marked as expired' }),
+                  message: intl.formatMessage({
+                    defaultMessage: 'The contribution has been marked as expired',
+                    id: '46L6cy',
+                  }),
                 });
               }
             })
@@ -148,7 +151,7 @@ const ProcessOrderButtons = ({ order, permissions, onSuccess }) => {
           {selectedAction === 'MARK_AS_EXPIRED' && (
             <FormattedMessage
               id="Order.MarkPaidExpiredDetails"
-              defaultMessage="This contribution will be marked as expired removed from Pending Contributions. You can find this page by searching for its ID in the search bar or through the status filter in the Financial Contributions page."
+              defaultMessage="This contribution will be marked as expired removed from Expected Funds. You can find this page by searching for its ID in the search bar or through the status filter in the Financial Contributions page."
             />
           )}
         </ConfirmationModal>

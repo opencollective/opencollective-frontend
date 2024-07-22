@@ -5,7 +5,7 @@ import { ThemeProvider } from 'styled-components';
 
 import { initClient } from '../lib/apollo-client';
 import theme from '../lib/theme';
-import { RouterContext } from 'next/dist/shared/lib/router-context';
+import { RouterContext } from 'next/dist/shared/lib/router-context.shared-runtime';
 
 import { Toaster } from '../components/ui/Toaster';
 import { TooltipProvider } from '../components/ui/Tooltip';
@@ -17,6 +17,8 @@ import 'nprogress/nprogress.css';
 import 'trix/dist/trix.css';
 import '../public/static/styles/app.css';
 
+// config file
+// ts-unused-exports:disable-next-line
 export const parameters = {
   actions: { argTypesRegex: '^on[A-Z].*' },
   nextRouter: {
@@ -24,6 +26,8 @@ export const parameters = {
   },
 };
 
+// config file
+// ts-unused-exports:disable-next-line
 export const decorators = [
   Story => (
     <ApolloProvider client={initClient()}>
