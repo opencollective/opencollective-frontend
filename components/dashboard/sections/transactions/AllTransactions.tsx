@@ -14,6 +14,7 @@ import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import ExportTransactionsCSVModal from '../../ExportTransactionsCSVModal';
 import { accountingCategoryFilter } from '../../filters/AccountingCategoryFilter';
+import { DateFilterType, Period } from '../../filters/DateFilter/schema';
 import { Filterbar } from '../../filters/Filterbar';
 import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
 
@@ -61,6 +62,14 @@ const AllTransactions = () => {
     toVariables,
     filters,
     meta: {},
+    defaultFilterValues: {
+      date: {
+        number: 1,
+        period: Period.DAYS,
+        type: DateFilterType.IN_LAST_PERIOD,
+        tz: 'UTC',
+      },
+    },
   });
 
   const { data, error, loading, refetch } = useQuery(transactionsTableQuery, {
