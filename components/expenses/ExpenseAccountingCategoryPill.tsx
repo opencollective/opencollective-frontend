@@ -58,7 +58,7 @@ const ExpenseAdminAccountingCategoryPill = ({
       selectedCategory={expense.accountingCategory}
       valuesByRole={expense.valuesByRole}
       showCode={showCodeInSelect}
-      predictionStyle="inline"
+      predictionStyle="inline-preload"
       onChange={async selectedCategory => {
         try {
           await editExpense({
