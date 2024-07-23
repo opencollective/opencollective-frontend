@@ -283,7 +283,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       section: ALL_SECTIONS.TRANSACTION_REPORTS,
     },
     {
-      if: isHost && !isAccountantOnly,
+      if: (isHost || isSelfHosted) && !isAccountantOnly,
       section: ALL_SECTIONS.VENDORS,
       Icon: Store,
     },

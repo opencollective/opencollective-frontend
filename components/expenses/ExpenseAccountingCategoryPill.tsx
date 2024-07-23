@@ -73,7 +73,7 @@ const ExpenseAdminAccountingCategoryPill = ({
       }}
     >
       <Button className={cn(BADGE_CLASS, 'h-auto hover:bg-neutral-50 hover:opacity-90')}>
-        <span className="mr-1">{getCategoryLabel(expense.accountingCategory)}</span>
+        <span className="mr-1 max-w-40 truncate">{getCategoryLabel(expense.accountingCategory)}</span>
         {loading ? <StyledSpinner size="1em" /> : <ChevronDown size="1em" />}
       </Button>
     </AccountingCategorySelect>

@@ -273,7 +273,7 @@ const ExpenseFormPayeeStep = ({
   );
   const requiresAddress = checkRequiresAddress(values);
   const requiresPayoutMethod = !isOnBehalf && values.payee?.type !== VENDOR;
-  const canInvite = !values?.status;
+  const canInvite = !values.status;
 
   const collectivePick = canInvite
     ? ({ id }) => (
