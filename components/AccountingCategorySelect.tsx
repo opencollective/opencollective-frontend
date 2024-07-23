@@ -385,7 +385,7 @@ const AccountingCategorySelect = ({
           )}
         </PopoverTrigger>
         <PopoverContent className="min-w-[280px] p-0" style={{ width: 'var(--radix-popover-trigger-width)' }}>
-          <Command filter={(categoryId, search) => (options[categoryId]?.searchText.includes(search) ? 1 : 0)}>
+          <Command>
             {size(options) > 6 && <CommandInput placeholder="Filter by name" />}
 
             <CommandList>
@@ -394,10 +394,10 @@ const AccountingCategorySelect = ({
               </CommandEmpty>
               {useSeparatePredictionsCommandGroup && (
                 <CommandGroup heading={intl.formatMessage({ defaultMessage: 'Suggested categories', id: 'ydZSPT' })}>
-                  {suggestedOptions.map(({ key, label, value }) => (
+                  {suggestedOptions.map(({ key, label, value, searchText }) => (
                     <CommandItem
                       key={key || 'none'}
-                      value={key || 'none'}
+                      value={searchText}
                       onSelect={() => {
                         triggerChange(value);
                         setOpen(false);
@@ -423,13 +423,13 @@ const AccountingCategorySelect = ({
                     : intl.formatMessage({ defaultMessage: 'All Categories', id: '1X6HtI' })
                 }
               >
-                {options.map(({ label, key, value }) => {
+                {options.map(({ label, key, value, searchText }) => {
                   const isSelected = selectedCategory?.id === key;
                   const isPrediction = suggestedOptions.some(option => option.key === key);
                   return (
                     <CommandItem
                       key={key || 'none'} // `CommandItem` doesn't like nil key/value
-                      value={key || 'none'}
+                      value={searchText}
                       onSelect={() => {
                         triggerChange(value);
                         setOpen(false);
