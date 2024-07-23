@@ -787,45 +787,52 @@ const ExpenseFormBody = ({
                     >
                       <FormattedMessage defaultMessage="Expense Category" id="38dzz9" />
                     </Label>
-                    <div className="mt-2 flex">
-                      <div className="basis-[300px]">
-                        <StyledInputFormikField name="accountingCategory" lab>
-                          {({ meta }) => (
-                            <div>
-                              <AccountingCategorySelect
-                                id="ExpenseCategoryInput"
-                                kind="EXPENSE"
-                                host={host}
-                                account={collective}
-                                selectedCategory={values.accountingCategory}
-                                onChange={value => formik.setFieldValue('accountingCategory', value)}
-                                error={Boolean(meta.error)}
-                                allowNone={!isHostAdmin}
-                                showCode={isHostAdmin}
-                                expenseType={values.type}
-                                expenseValues={values}
-                                predictionStyle="full"
-                              />
-                              {meta.error && meta.touched && (
-                                <Span color="red.500" fontSize="12px" mt="4px">
-                                  {formatErrorMessage(intl, meta.error)}
-                                </Span>
-                              )}
-                            </div>
-                          )}
-                        </StyledInputFormikField>
-                      </div>
-                    </div>
-                    <MessageBox type="info" fontSize="12px" mt="24px">
+                    <MessageBox type="info" fontSize="12px" mt={2}>
                       <FormattedMessage
                         defaultMessage="Please make sure that all the expense items in this expense belong to the selected expense category. If needed, you may submit additional items in separate expenses with different expense categories."
                         id="Pkq+ZR"
                       />
                     </MessageBox>
+                    <div className="mt-4 flex">
+                      <StyledInputFormikField name="accountingCategory" lab>
+                        {({ meta }) => (
+                          <div>
+                            <AccountingCategorySelect
+                              id="ExpenseCategoryInput"
+                              kind="EXPENSE"
+                              host={host}
+                              account={collective}
+                              selectedCategory={values.accountingCategory}
+                              onChange={value => formik.setFieldValue('accountingCategory', value)}
+                              error={Boolean(meta.error)}
+                              allowNone={!isHostAdmin}
+                              showCode={isHostAdmin}
+                              expenseType={values.type}
+                              expenseValues={values}
+                              predictionStyle="full"
+                            />
+                            {meta.error && meta.touched && (
+                              <Span color="red.500" fontSize="12px" mt="4px">
+                                {formatErrorMessage(intl, meta.error)}
+                              </Span>
+                            )}
+                          </div>
+                        )}
+                      </StyledInputFormikField>
+                    </div>
                     {formik.values.accountingCategory?.instructions && (
-                      <MessageBox type="info" fontSize="12px" mt="24px">
-                        <HTMLContent content={formik.values.accountingCategory.instructions} openLinksInNewTab />
-                      </MessageBox>
+                      <React.Fragment>
+                        <div className="mb-2 mt-4 text-sm font-semibold text-slate-800">
+                          <FormattedMessage
+                            id="withColon"
+                            defaultMessage="{item}:"
+                            values={{
+                              item: <FormattedMessage defaultMessage="Account Category Instructions" id="+t6c4i" />,
+                            }}
+                          />
+                        </div>
+                        <HTMLContent openLinksInNewTab content={formik.values.accountingCategory.instructions} />
+                      </React.Fragment>
                     )}
                   </div>
                 )}
