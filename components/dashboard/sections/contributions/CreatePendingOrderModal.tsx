@@ -548,6 +548,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
           >
             {({ form, field }) => (
               <AccountingCategorySelect
+                showCode
                 disabled={!collective}
                 id={field.id}
                 kind="CONTRIBUTION"
