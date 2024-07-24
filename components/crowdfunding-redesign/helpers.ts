@@ -56,8 +56,8 @@ export function getDefaultFundraiserValues(account: Account): Fundraiser {
     cover: fundraiserSettings?.cover ?? {
       type: 'IMAGE',
       url: account.backgroundImageUrl,
-      width: account.settings.collectivePage?.background?.mediaSize.width,
-      height: account.settings.collectivePage?.background?.mediaSize.height,
+      width: account.settings.collectivePage?.background?.mediaSize?.width,
+      height: account.settings.collectivePage?.background?.mediaSize?.height,
     },
     longDescription: fundraiserSettings?.longDescription ?? account.longDescription,
   };
@@ -75,8 +75,8 @@ export function getDefaultProfileValues(account: Account): Profile {
     cover: profileSettings?.cover ?? {
       type: 'IMAGE',
       url: account.backgroundImageUrl,
-      width: account.settings.collectivePage?.background?.mediaSize.width,
-      height: account.settings.collectivePage?.background?.mediaSize.height,
+      width: account.settings.collectivePage?.background?.mediaSize?.width,
+      height: account.settings.collectivePage?.background?.mediaSize?.height,
     },
     longDescription: profileSettings?.longDescription ?? account.longDescription,
   };
