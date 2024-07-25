@@ -605,12 +605,13 @@ function buildTransactionGroups(order: ContributionDrawerQuery['order']): Transa
   const groups = uniq(transactions.map(txn => txn.group));
   const byGroup = groupBy(transactions, txn => txn.group);
 
+  const KIND_PRIORITY = [TransactionKind.CONTRIBUTION, TransactionKind.ADDED_FUNDS, TransactionKind.BALANCE_TRANSFER];
   return groups.map(group => ({
     group,
     transactions: byGroup[group].sort((a, b) => {
-      if (a.kind === TransactionKind.CONTRIBUTION && b.kind !== TransactionKind.CONTRIBUTION) {
+      if (KIND_PRIORITY.includes(a.kind) && !KIND_PRIORITY.includes(b.kind)) {
         return -1;
-      } else if (a.kind !== TransactionKind.CONTRIBUTION && b.kind === TransactionKind.CONTRIBUTION) {
+      } else if (!KIND_PRIORITY.includes(a.kind) && KIND_PRIORITY.includes(b.kind)) {
         return 1;
       }
       return a.createdAt - b.createdAt;
