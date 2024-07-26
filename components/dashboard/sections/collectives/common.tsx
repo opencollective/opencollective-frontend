@@ -12,6 +12,7 @@ import {
   ReceiptText,
   SquareSigma,
   Unlink,
+  View,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type { IntlShape } from 'react-intl';
@@ -77,17 +78,32 @@ export const cols: Record<string, ColumnDef<any, any>> = {
           .join(', ')
       );
       return (
-        <div className="flex items-center">
-          <Avatar collective={collective} className="mr-4" radius={48} />
-          {collective.isFrozen && (
-            <Badge type="info" size="xs" className="mr-2">
-              <FormattedMessage id="CollectiveStatus.Frozen" defaultMessage="Frozen" />
-            </Badge>
-          )}
-          <div className="flex flex-col items-start">
-            <div className="flex items-center text-sm">{collective.name}</div>
-            <div className="text-xs">{secondLine}</div>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center">
+            <Avatar collective={collective} className="mr-4" radius={48} />
+            {collective.isFrozen && (
+              <Badge type="info" size="xs" className="mr-2">
+                <FormattedMessage id="CollectiveStatus.Frozen" defaultMessage="Frozen" />
+              </Badge>
+            )}
+            <div className="flex flex-col items-start">
+              <div className="flex items-center text-sm">{collective.name}</div>
+              <div className="text-xs">{secondLine}</div>
+            </div>
           </div>
+          {Boolean(collective.policies?.COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS) && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <View className="cursor-help" size="16" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <FormattedMessage
+                  defaultMessage="All Collective Admins can view sensitive payout method details"
+                  id="CollectiveAdminsPayoutMethods"
+                />
+              </TooltipContent>
+            </Tooltip>
+          )}
         </div>
       );
     },

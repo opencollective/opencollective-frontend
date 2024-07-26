@@ -612,15 +612,20 @@ const CollectiveDetails = ({
                   title={<FormattedMessage defaultMessage="Expense Types" id="D+aS5Z" />}
                   value={<ExpenseTypesPicker host={host} collective={collective} />}
                 />
-                <InfoListItem
-                  title={
-                    <FormattedMessage
-                      defaultMessage="Allow admins to see payout methods"
-                      id="collectiveAdminsPayoutMethodPolicy"
-                    />
-                  }
-                  value={<AdminsCanSeePayoutMethodsSwitch collective={collective} />}
-                />
+                <div className="col-span-2 mb-8 flex items-center justify-between gap-2 rounded-lg border border-gray-200 p-4">
+                  <div className="text-sm">
+                    <p className="font-semibold text-slate-800">
+                      <FormattedMessage defaultMessage="Show payout method details" id="3P4Al8" />
+                    </p>
+                    <p className="mt-2 text-slate-700">
+                      <FormattedMessage
+                        defaultMessage="Allow Collective Admins to view sensitive payout method details of payees"
+                        id="N+kkx3"
+                      />
+                    </p>
+                  </div>
+                  <AdminsCanSeePayoutMethodsSwitch collective={collective} />
+                </div>
               </React.Fragment>
             )}
             <InfoListItem
