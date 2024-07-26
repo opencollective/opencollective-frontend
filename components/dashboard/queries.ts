@@ -53,6 +53,11 @@ export const adminPanelQuery = gql`
         id
         REQUIRE_2FA_FOR_ADMINS
       }
+
+      hostApplicationRequests {
+        totalCount
+      }
+
       ... on Organization {
         host {
           id
