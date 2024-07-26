@@ -104,7 +104,7 @@ const ExpenseMoreActionsButton = ({
     onModalToggle?.(isOpen);
   };
 
-  const viewTransactionsUrl = getTransactionsUrl(account, expense);
+  const viewTransactionsUrl = expense && getTransactionsUrl(account, expense);
 
   if (!permissions) {
     return null;
