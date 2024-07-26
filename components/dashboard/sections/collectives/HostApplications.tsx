@@ -8,7 +8,7 @@ import { z } from 'zod';
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
 import { limit, offset } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import type { HostApplicationsQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import type { HostApplicationsQuery, HostApplicationsQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import { HostApplicationStatus } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import i18nHostApplicationStatus from '../../../../lib/i18n/host-application-status';
@@ -34,6 +34,7 @@ const schema = z.object({
   searchTerm: searchFilter.schema,
   orderBy: orderByFilter.schema,
   status: z.nativeEnum(HostApplicationStatus).optional(),
+  hostApplicationId: z.string().nullable().optional(),
 });
 
 const toVariables: FiltersToVariables<z.infer<typeof schema>, HostApplicationsQueryVariables> = {
@@ -96,34 +97,29 @@ const HostApplications = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       count: metadata?.host?.rejected?.totalCount,
     },
   ];
-  const queryFilter = useQueryFilter({
+  const queryFilter = useQueryFilter<typeof schema, HostApplicationsQueryVariables>({
     schema,
     filters,
     toVariables,
     views,
   });
 
-  const { data, error, loading } = useQuery(hostApplicationsQuery, {
-    variables: { hostSlug, ...queryFilter.variables },
-    fetchPolicy: 'cache-and-network',
-    context: API_V2_CONTEXT,
-  });
+  const { data, error, loading } = useQuery<HostApplicationsQuery, HostApplicationsQueryVariables>(
+    hostApplicationsQuery,
+    {
+      variables: { hostSlug, ...queryFilter.variables },
+      fetchPolicy: 'cache-and-network',
+      context: API_V2_CONTEXT,
+    },
+  );
 
   // Open application account id, checking hash for backwards compatibility
   const accountId = Number(router.query.accountId || window?.location.hash.split('application-')[1]);
-  const [applicationInDrawer, setApplicationInDrawer] = React.useState(null);
-  const drawerOpen = accountId && applicationInDrawer;
-
-  React.useEffect(() => {
-    if (accountId) {
-      const application = data?.host?.hostApplications?.nodes?.find(a => a.account.legacyId === accountId);
-      if (application) {
-        setApplicationInDrawer(application);
-      }
-    }
-  }, [accountId, data?.host?.hostApplications]);
 
   const hostApplications = data?.host?.hostApplications;
+  const drawerApplicationId = accountId
+    ? hostApplications?.nodes?.find(a => a.account.legacyId === accountId)?.id
+    : queryFilter.values.hostApplicationId;
 
   const currentViewCount = views.find(v => v.id === queryFilter.activeViewId)?.count;
   const nbPlaceholders = currentViewCount < queryFilter.values.limit ? currentViewCount : queryFilter.values.limit;
@@ -145,20 +141,22 @@ const HostApplications = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       ) : (
         <React.Fragment>
           <HostApplicationsTable
-            hostApplications={hostApplications}
+            hostApplications={hostApplications?.nodes}
             nbPlaceholders={nbPlaceholders}
             loading={loading}
-            openApplication={application => updateQuery(router, { accountId: application.account.legacyId })}
+            openApplication={application => queryFilter.setFilter('hostApplicationId', application.id)}
           />
           <Pagination queryFilter={queryFilter} total={hostApplications?.totalCount} />
         </React.Fragment>
       )}
 
       <HostApplicationDrawer
-        open={drawerOpen}
-        onClose={() => updateQuery(router, { accountId: null })}
-        host={metadata?.host}
-        application={applicationInDrawer}
+        open={!!drawerApplicationId}
+        onClose={() => {
+          updateQuery(router, { accountId: null });
+          queryFilter.setFilter('hostApplicationId', null);
+        }}
+        applicationId={drawerApplicationId}
       />
     </div>
   );
