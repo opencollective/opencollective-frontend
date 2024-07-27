@@ -16,6 +16,7 @@ export const SECTIONS = {
   HOST_VIRTUAL_CARDS: 'host-virtual-cards',
   HOST_VIRTUAL_CARD_REQUESTS: 'host-virtual-card-requests',
   HOST_APPLICATIONS: 'host-applications',
+  HOST_APPLICATION_REQUESTS: 'host-application-requests',
   HOST_TAX_FORMS: 'host-tax-forms',
   CONTRIBUTORS: 'contributors',
   INCOMING_CONTRIBUTIONS: 'incoming-contributions',

@@ -28,6 +28,7 @@ import { HostAdminAccountingSection } from './sections/accounting';
 import Accounts from './sections/accounts';
 import AccountSettings from './sections/AccountSettings';
 import AllCollectives from './sections/collectives/AllCollectives';
+import HostApplicationRequests from './sections/collectives/HostApplicationRequests';
 import HostApplications from './sections/collectives/HostApplications';
 import HostedCollectives from './sections/collectives/HostedCollectives';
 import HostExpectedFunds from './sections/contributions/HostExpectedFunds';
@@ -86,6 +87,7 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.INCOMING_CONTRIBUTIONS]: IncomingContributions,
   [SECTIONS.OUTGOING_CONTRIBUTIONS]: OutgoingContributions,
   [SECTIONS.HOST_EXPECTED_FUNDS]: HostExpectedFunds,
+  [SECTIONS.HOST_APPLICATION_REQUESTS]: HostApplicationRequests,
   [SECTIONS.TRANSACTIONS]: AccountTransactions,
   [SECTIONS.HOST_TRANSACTIONS]: HostTransactions,
   [SECTIONS.UPDATES]: Updates,

@@ -109,6 +109,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
   const isAccountantOnly = LoggedInUser?.isAccountantOnly(account);
   const isActive = account.isActive;
   const isActiveHost = isHost && isActive;
+  const hasHostApplicationRequests = account.hostApplicationRequests?.totalCount > 0;
 
   const items: MenuItem[] = [
     {
@@ -226,6 +227,12 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           section: ALL_SECTIONS.HOST_APPLICATIONS,
         },
       ],
+    },
+    {
+      if: hasHostApplicationRequests,
+      label: intl.formatMessage({ defaultMessage: 'Host Application Requests', id: 'BM+sH/' }),
+      Icon: Building,
+      section: ALL_SECTIONS.HOST_APPLICATION_REQUESTS,
     },
     {
       if: isHost,
