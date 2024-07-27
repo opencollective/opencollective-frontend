@@ -136,19 +136,23 @@ function HostApplication({ applicationId, onClose }: { onClose: () => void; appl
     HostApplicationThreadQuery['hostApplication']['threadComments']['nodes']
   >([]);
   const [threadOffset, setThreadOffset] = React.useState(0);
-  function onDataComplete(data: HostApplicationThreadQuery, existingThreadItems = threadItems) {
-    const existingPrevPageData = existingThreadItems.slice(0, data.hostApplication.threadComments.offset);
-    const replaced = existingThreadItems.slice(
-      data.hostApplication.threadComments.offset,
-      data.hostApplication.threadComments.offset + data.hostApplication.threadComments.nodes.length,
-    );
-    const existingNextPageData = existingThreadItems.slice(
-      data.hostApplication.threadComments.offset + replaced.length,
-    );
 
-    const newData = [...existingPrevPageData, ...data.hostApplication.threadComments.nodes, ...existingNextPageData];
-    setThreadItems(newData);
-  }
+  const onDataComplete = React.useCallback(
+    (data: HostApplicationThreadQuery, existingThreadItems = threadItems) => {
+      const existingPrevPageData = existingThreadItems.slice(0, data.hostApplication.threadComments.offset);
+      const replaced = existingThreadItems.slice(
+        data.hostApplication.threadComments.offset,
+        data.hostApplication.threadComments.offset + data.hostApplication.threadComments.nodes.length,
+      );
+      const existingNextPageData = existingThreadItems.slice(
+        data.hostApplication.threadComments.offset + replaced.length,
+      );
+
+      const newData = [...existingPrevPageData, ...data.hostApplication.threadComments.nodes, ...existingNextPageData];
+      setThreadItems(newData);
+    },
+    [threadItems],
+  );
   const applicationQuery = useQuery<HostApplicationThreadQuery, HostApplicationThreadQueryVariables>(
     gql`
       query HostApplicationThread($hostApplication: HostApplicationReferenceInput!, $offset: Int!, $limit: Int!) {
@@ -237,6 +241,23 @@ function HostApplication({ applicationId, onClose }: { onClose: () => void; appl
       return application.customData[key];
     }
   };
+
+  const onFetchMore = React.useCallback(() => {
+    setThreadOffset(threadItems.length);
+  }, [threadItems]);
+
+  const onCommentDeleted = React.useCallback(
+    async comment => {
+      const commentIdx = threadItems.findIndex(i => i.id === comment.id);
+      setThreadItems([...threadItems].filter(ti => ti.id !== comment.id));
+      const { data } = await applicationQuery.refetch({ offset: commentIdx });
+      onDataComplete(
+        data,
+        [...threadItems].filter(ti => ti.id !== comment.id),
+      );
+    },
+    [threadItems, applicationQuery, onDataComplete],
+  );
 
   return (
     <React.Fragment>
@@ -415,16 +436,8 @@ function HostApplication({ applicationId, onClose }: { onClose: () => void; appl
               items={threadItems}
               collective={host}
               hasMore={!loading && totalThreadItems > threadItems.length}
-              fetchMore={() => setThreadOffset(threadItems.length)}
-              onCommentDeleted={async comment => {
-                const commentIdx = threadItems.findIndex(i => i.id === comment.id);
-                setThreadItems([...threadItems].filter(ti => ti.id !== comment.id));
-                const { data } = await applicationQuery.refetch({ offset: commentIdx });
-                onDataComplete(
-                  data,
-                  [...threadItems].filter(ti => ti.id !== comment.id),
-                );
-              }}
+              fetchMore={onFetchMore}
+              onCommentDeleted={onCommentDeleted}
               loading={loading}
               getClickedComment={setReplyingToComment}
             />
