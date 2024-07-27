@@ -1,14 +1,15 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
-import { omitBy } from 'lodash';
-import { useRouter } from 'next/router';
+import { gql, useQuery } from '@apollo/client';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
 import { limit, offset } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import type { HostApplicationsQuery, HostApplicationsQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import type {
+  HostApplicationRequestsQuery,
+  HostApplicationRequestsQueryVariables,
+} from '../../../../lib/graphql/types/v2/graphql';
 import { HostApplicationStatus } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import i18nHostApplicationStatus from '../../../../lib/i18n/host-application-status';
@@ -21,29 +22,26 @@ import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { orderByFilter } from '../../filters/OrderFilter';
 import { Pagination } from '../../filters/Pagination';
-import { searchFilter } from '../../filters/SearchFilter';
 import type { DashboardSectionProps } from '../../types';
 
 import HostApplicationDrawer from './HostApplicationDrawer';
 import HostApplicationsTable from './HostApplicationsTable';
-import { hostApplicationsMetadataQuery, hostApplicationsQuery } from './queries';
+import { HostApplicationFields } from './queries';
 
 const schema = z.object({
   limit,
   offset,
-  searchTerm: searchFilter.schema,
   orderBy: orderByFilter.schema,
   status: z.nativeEnum(HostApplicationStatus).optional(),
   hostApplicationId: z.string().nullable().optional(),
 });
 
-const toVariables: FiltersToVariables<z.infer<typeof schema>, HostApplicationsQueryVariables> = {
+const toVariables: FiltersToVariables<z.infer<typeof schema>, HostApplicationRequestsQueryVariables> = {
   orderBy: orderByFilter.toVariables,
 };
 
 const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
   orderBy: orderByFilter.filter,
-  searchTerm: searchFilter.filter,
   status: {
     labelMsg: defineMessage({ defaultMessage: 'Status', id: 'tzMNF3' }),
     Component: ({ intl, ...props }) => (
@@ -58,22 +56,32 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
   },
 };
 
-const ROUTE_PARAMS = ['hostCollectiveSlug', 'slug', 'section', 'view'];
-
-const updateQuery = (router, newParams) => {
-  const query = omitBy({ ...router.query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
-  const pathname = router.asPath.split('?')[0].split('#')[0];
-  return router.push({ pathname, query });
-};
-
-const HostApplications = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
-  const router = useRouter();
+export default function HostApplicationRequests({ accountSlug }: DashboardSectionProps) {
   const intl = useIntl();
-  const { data: metadata } = useQuery(hostApplicationsMetadataQuery, {
-    variables: { hostSlug },
-    fetchPolicy: 'cache-and-network',
-    context: API_V2_CONTEXT,
-  });
+
+  const metadataQuery = useQuery(
+    gql`
+      query HostApplicationRequestsMetadata($accountSlug: String!) {
+        account(slug: $accountSlug) {
+          pending: hostApplicationRequests(limit: 0, offset: 0, status: PENDING) {
+            totalCount
+          }
+          approved: hostApplicationRequests(limit: 0, offset: 0, status: APPROVED) {
+            totalCount
+          }
+          rejected: hostApplicationRequests(limit: 0, offset: 0, status: REJECTED) {
+            totalCount
+          }
+        }
+      }
+    `,
+    {
+      context: API_V2_CONTEXT,
+      variables: {
+        accountSlug,
+      },
+    },
+  );
 
   const views: Views<z.infer<typeof schema>> = [
     {
@@ -82,57 +90,73 @@ const HostApplications = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       filter: {
         status: HostApplicationStatus.PENDING,
       },
-      count: metadata?.host?.pending?.totalCount,
+      count: metadataQuery.data?.account?.pending?.totalCount,
     },
     {
       id: 'approved',
       label: intl.formatMessage({ defaultMessage: 'Approved', id: '6XFO/C' }),
       filter: { status: HostApplicationStatus.APPROVED },
-      count: metadata?.host?.approved?.totalCount,
+      count: metadataQuery.data?.account?.approved?.totalCount,
     },
     {
       id: 'rejected',
       label: intl.formatMessage({ defaultMessage: 'Rejected', id: '5qaD7s' }),
       filter: { status: HostApplicationStatus.REJECTED },
-      count: metadata?.host?.rejected?.totalCount,
+      count: metadataQuery.data?.account?.rejected?.totalCount,
     },
   ];
-  const queryFilter = useQueryFilter<typeof schema, HostApplicationsQueryVariables>({
+  const queryFilter = useQueryFilter<typeof schema, HostApplicationRequestsQueryVariables>({
     schema,
     filters,
     toVariables,
     views,
   });
 
-  const { data, error, loading } = useQuery<HostApplicationsQuery, HostApplicationsQueryVariables>(
-    hostApplicationsQuery,
+  const query = useQuery<HostApplicationRequestsQuery, HostApplicationRequestsQueryVariables>(
+    gql`
+      query HostApplicationRequests(
+        $accountSlug: String!
+        $limit: Int
+        $offset: Int
+        $orderBy: ChronologicalOrderInput
+        $status: HostApplicationStatus
+      ) {
+        account(slug: $accountSlug) {
+          hostApplicationRequests(status: $status, limit: $limit, offset: $offset, orderBy: $orderBy) {
+            totalCount
+            nodes {
+              ...HostApplicationFields
+            }
+          }
+        }
+      }
+
+      ${HostApplicationFields}
+    `,
     {
-      variables: { hostSlug, ...queryFilter.variables },
-      fetchPolicy: 'cache-and-network',
+      variables: { accountSlug, ...queryFilter.variables },
       context: API_V2_CONTEXT,
     },
   );
 
-  // Open application account id, checking hash for backwards compatibility
-  const accountId = Number(router.query.accountId || window?.location.hash.split('application-')[1]);
-
-  const hostApplications = data?.host?.hostApplications;
-  const drawerApplicationId = accountId
-    ? hostApplications?.nodes?.find(a => a.account.legacyId === accountId)?.id
-    : queryFilter.values.hostApplicationId;
-
   const currentViewCount = views.find(v => v.id === queryFilter.activeViewId)?.count;
   const nbPlaceholders = currentViewCount < queryFilter.values.limit ? currentViewCount : queryFilter.values.limit;
 
+  const error = metadataQuery.error || query.error;
+  const loading = metadataQuery.loading || query.loading;
+
+  const applicationRequests = query.data?.account?.hostApplicationRequests?.nodes ?? [];
+  const totalCount = query.data?.account?.hostApplicationRequests?.totalCount ?? 0;
+
   return (
     <div className="flex max-w-screen-lg flex-col gap-4">
-      <DashboardHeader title={<FormattedMessage id="Menu.HostApplications" defaultMessage="Host Applications" />} />
+      <DashboardHeader title={<FormattedMessage defaultMessage="Host Application Requests" id="BM+sH/" />} />
 
       <Filterbar {...queryFilter} />
 
       {error ? (
         <MessageBoxGraphqlError error={error} mb={2} />
-      ) : !loading && !hostApplications?.nodes.length ? (
+      ) : !loading && applicationRequests.length === 0 ? (
         <EmptyResults
           hasFilters={queryFilter.hasFilters}
           entityType="HOST_APPLICATIONS"
@@ -141,25 +165,20 @@ const HostApplications = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       ) : (
         <React.Fragment>
           <HostApplicationsTable
-            hostApplications={hostApplications?.nodes}
+            hostApplications={applicationRequests}
             nbPlaceholders={nbPlaceholders}
             loading={loading}
             openApplication={application => queryFilter.setFilter('hostApplicationId', application.id)}
           />
-          <Pagination queryFilter={queryFilter} total={hostApplications?.totalCount} />
+          <Pagination queryFilter={queryFilter} total={totalCount} />
         </React.Fragment>
       )}
 
       <HostApplicationDrawer
-        open={!!drawerApplicationId}
-        onClose={() => {
-          updateQuery(router, { accountId: null });
-          queryFilter.setFilter('hostApplicationId', null);
-        }}
-        applicationId={drawerApplicationId}
+        open={!!queryFilter.values.hostApplicationId}
+        onClose={() => queryFilter.setFilter('hostApplicationId', null)}
+        applicationId={queryFilter.values.hostApplicationId}
       />
     </div>
   );
-};
-
-export default HostApplications;
+}
