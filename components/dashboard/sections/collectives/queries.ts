@@ -153,6 +153,10 @@ const hostedCollectiveFields = gql`
         currency
       }
     }
+    policies {
+      id
+      COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS
+    }
     ... on AccountWithHost {
       hostFeesStructure
       hostFeePercent

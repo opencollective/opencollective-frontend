@@ -500,6 +500,7 @@ export const expensePageExpenseFieldsFragment = gql`
       canHold
       canRelease
       canDownloadTaxForm
+      canSeePayoutMethodPrivateDetails
       approve {
         allowed
         reason
