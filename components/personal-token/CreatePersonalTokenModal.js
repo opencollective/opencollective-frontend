@@ -55,7 +55,7 @@ const CreatePersonalTokenModal = ({ account, onSuccess, onClose, ...props }) => 
   });
 
   return (
-    <StyledModal width="576px" onClose={onClose} data-cy="create-personal-token-modal" {...props}>
+    <StyledModal onClose={onClose} data-cy="create-personal-token-modal" {...props}>
       <ModalHeader>
         <FormattedMessage defaultMessage="Create Personal token" id="MMyZfL" />
       </ModalHeader>

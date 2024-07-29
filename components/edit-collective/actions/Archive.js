@@ -174,7 +174,7 @@ const ArchiveCollective = ({ collective }) => {
       )}
 
       {modal.show && (
-        <StyledModal width="570px" onClose={closeModal}>
+        <StyledModal onClose={closeModal}>
           <ModalHeader onClose={closeModal}>
             {modal.type === 'Unarchive' ? (
               <FormattedMessage

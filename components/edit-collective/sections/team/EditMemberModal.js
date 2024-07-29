@@ -275,7 +275,7 @@ const EditMemberModal = ({ intl, member, collective, canRemove = false, isLastAd
 
   return (
     <Container>
-      <StyledModal width={688} onClose={cancelHandler}>
+      <StyledModal onClose={cancelHandler}>
         <ModalHeader>
           <FormattedMessage id="editTeam.member.edit" defaultMessage="Edit Team Member" />
         </ModalHeader>

@@ -46,7 +46,7 @@ const SendFundsToCollectiveSection = ({ collective, toCollective, LoggedInUser }
         </StyledButton>
       )}
       {modal.show && (
-        <StyledModal width="570px" onClose={closeModal}>
+        <StyledModal onClose={closeModal}>
           <ModalHeader onClose={closeModal}>
             <FormattedMessage
               id="collective.emptyBalance.header"
