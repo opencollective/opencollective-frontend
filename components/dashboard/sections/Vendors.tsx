@@ -48,6 +48,56 @@ enum VendorsTab {
 }
 
 const dashboardVendorsQuery = gql`
+  fragment HostFields on Host {
+    id
+    name
+    legalName
+    slug
+    type
+    expensePolicy
+    settings
+    currency
+    requiredLegalDocuments
+    features {
+      id
+      MULTI_CURRENCY_EXPENSES
+    }
+    location {
+      id
+      address
+      country
+    }
+    transferwise {
+      id
+      availableCurrencies
+    }
+    supportedPayoutMethods
+    isTrustedHost
+    vendors(searchTerm: $searchTerm, isArchived: $isArchived, limit: $limit, offset: $offset)
+      @skip(if: $includePotentialVendors) {
+      totalCount
+      offset
+      limit
+      nodes {
+        id
+        ...VendorFields
+      }
+    }
+    potentialVendors @include(if: $includePotentialVendors) {
+      nodes {
+        id
+        slug
+        name
+        type
+        description
+        tags
+        imageUrl(height: 96)
+        isArchived
+        createdAt
+      }
+    }
+  }
+
   query DashboardVendors(
     $slug: String!
     $searchTerm: String
@@ -58,55 +108,16 @@ const dashboardVendorsQuery = gql`
   ) {
     account(slug: $slug) {
       id
+      ... on AccountWithHost {
+        host {
+          id
+          ...HostFields
+        }
+      }
       ... on Organization {
         host {
           id
-          name
-          legalName
-          slug
-          type
-          expensePolicy
-          settings
-          currency
-          requiredLegalDocuments
-          features {
-            id
-            MULTI_CURRENCY_EXPENSES
-          }
-          location {
-            id
-            address
-            country
-          }
-          transferwise {
-            id
-            availableCurrencies
-          }
-          supportedPayoutMethods
-          isTrustedHost
-          vendors(searchTerm: $searchTerm, isArchived: $isArchived, limit: $limit, offset: $offset)
-            @skip(if: $includePotentialVendors) {
-            totalCount
-            offset
-            limit
-            nodes {
-              id
-              ...VendorFields
-            }
-          }
-          potentialVendors @include(if: $includePotentialVendors) {
-            nodes {
-              id
-              slug
-              name
-              type
-              description
-              tags
-              imageUrl(height: 96)
-              isArchived
-              createdAt
-            }
-          }
+          ...HostFields
         }
       }
     }
@@ -377,7 +388,7 @@ const Vendors = ({ accountSlug }: DashboardSectionProps) => {
         ) : !loading &&
           ((queryFilter.activeViewId === VendorsTab.POTENTIAL_VENDORS &&
             host?.['potentialVendors']?.nodes?.length === 0) ||
-            host['vendors']?.nodes.length === 0) ? (
+            host?.['vendors']?.nodes.length === 0) ? (
           <EmptyResults hasFilters={queryFilter.hasFilters} onResetFilters={() => queryFilter.resetFilters({})} />
         ) : queryFilter.activeViewId === VendorsTab.POTENTIAL_VENDORS ? (
           <OrgsTable orgs={host?.['potentialVendors']?.nodes || []} loading={loading} openOrg={setOrgDetail} />
