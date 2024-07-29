@@ -131,7 +131,7 @@ const DeleteCollective = ({ collective, ...props }) => {
           </P>
         )}
       {showModal && (
-        <StyledModal width="570px" onClose={closeModal}>
+        <StyledModal onClose={closeModal}>
           <ModalHeader onClose={closeModal}>
             <FormattedMessage
               id="collective.delete.modal.header"

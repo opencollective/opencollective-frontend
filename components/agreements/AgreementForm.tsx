@@ -84,8 +84,8 @@ const EDIT_AGREEMENT_MUTATION = gql`
   ${AGREEMENT_MUTATION_FIELDS_FRAGMENT}
 `;
 
-const ActionButtons = ({ formik, onCancel }) => (
-  <Flex justifyContent="flex-end" width="100%">
+const ActionButtons = ({ formik, onCancel, ...props }) => (
+  <Flex justifyContent="flex-end" width="100%" {...props}>
     <StyledButton type="button" minWidth={120} mr={2} onClick={onCancel}>
       <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
     </StyledButton>
@@ -273,7 +273,7 @@ const AgreementForm = ({
               {drawerActionsContainer && !disableDrawerActions ? (
                 createPortal(<ActionButtons formik={formik} onCancel={onCancel} />, drawerActionsContainer)
               ) : (
-                <ActionButtons formik={formik} onCancel={onCancel} />
+                <ActionButtons formik={formik} onCancel={onCancel} mt={3} />
               )}
             </Form>
           );

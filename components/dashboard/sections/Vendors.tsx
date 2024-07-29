@@ -407,7 +407,7 @@ const Vendors = ({ accountSlug }: DashboardSectionProps) => {
       </div>
 
       {createEditVendor === true && (
-        <StyledModal onClose={closeDrawer} width="570px">
+        <StyledModal onClose={closeDrawer}>
           <VendorForm
             host={host}
             supportsTaxForm={host.requiredLegalDocuments.includes('US_TAX_FORM')}
