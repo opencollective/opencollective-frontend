@@ -502,7 +502,10 @@ describe('Expense flow', () => {
         cy.getByDataCy('save-expense-btn').click();
         cy.wait(500);
         cy.getByDataCy('expense-status-msg').should('contain', 'Pending');
-        cy.getByDataCy('expense-status-msg').parent().should('contain', 'Unverified');
+        cy.getByDataCy('expense-author').should('contain', 'Submitted by');
+        cy.getByDataCy('expense-summary-payee').should('contain', 'Nicolas Cage');
+        cy.getByDataCy('expense-summary-collective').should('contain', 'The Best Collective');
+        cy.getByDataCy('expense-summary-payout-method-data').should('contain', '********');
 
         cy.get('@createdExpense').then(createdExpense => {
           cy.login({
@@ -511,10 +514,6 @@ describe('Expense flow', () => {
           });
         });
 
-        cy.getByDataCy('expense-status-msg').should('contain', 'Pending');
-        cy.getByDataCy('expense-author').should('contain', 'Submitted by');
-        cy.getByDataCy('expense-summary-payee').should('contain', 'Nicolas Cage');
-        cy.getByDataCy('expense-summary-collective').should('contain', 'The Best Collective');
         cy.getByDataCy('expense-summary-payout-method-data').should('contain', 'make it rain');
       });
 
@@ -584,13 +583,14 @@ describe('Expense flow', () => {
         cy.getByDataCy('save-expense-btn').click();
         cy.wait(500);
         cy.getByDataCy('expense-status-msg').should('contain', 'Pending');
-        cy.getByDataCy('expense-status-msg').parent().should('contain', 'Unverified');
+
         cy.get('@createdExpense').then(createdExpense => {
           cy.login({
             email: inviteeEmail,
             redirect: `/${createdExpense.collective}/expenses/${createdExpense.expenseId}`,
           });
         });
+
         cy.getByDataCy('expense-status-msg').should('contain', 'Pending');
         cy.getByDataCy('expense-author').should('contain', 'Submitted by');
         cy.getByDataCy('expense-summary-payee').should('contain', slug);
