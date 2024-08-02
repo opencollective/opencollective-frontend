@@ -17,14 +17,17 @@ describe('event.create.test.js', () => {
   it('create an event', () => {
     cy.get('.inputs .inputField.name input', { timeout: 20000 }).type(title);
     cy.get('.inputField.endsAt input').type('2050-01-20T13:00');
-    cy.get('.geosuggest__input').type('Superfilles');
-    cy.contains('.geosuggest__suggests > :nth-child(1)', 'Super').click();
-    cy.get('#location .address').contains('Lesbroussart');
-    cy.get('#location .address').contains('1050');
+    cy.get('.geosuggest__input').type('Eiffel Tower');
+    cy.contains('.geosuggest__suggests > :nth-child(1)', 'Gustave').click();
+    cy.get('#location .address').contains('Gustave');
+    cy.get('#location .address').contains('Eiffel');
+    cy.get('#location .address').contains('75007');
+    cy.get('#location .address').contains('Paris');
+    cy.get('#location .address').contains('FR');
     cy.contains('button', 'Create Event').click();
     cy.getByDataCy('notification-bar').contains('Your Event has been created');
-    cy.get('#location .address').contains('Lesbroussart');
-    cy.get('#location .address').contains('1050');
+    cy.get('#location .address').contains('Paris');
+    cy.get('#location .address').contains('75007');
 
     // Go to "Edit Tickets"
     cy.get('[data-cy=edit-collective-btn]:first').click();
