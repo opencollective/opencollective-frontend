@@ -1,7 +1,7 @@
 import * as React from 'react';
 import clsx from 'clsx';
 import { isEqual, isNil } from 'lodash';
-import { Plus, X } from 'lucide-react';
+import { Plus, PlusCircle, X, XCircle } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { FilterComponentConfigs, SetFilter as SetFilterType } from '../../../lib/filters/filter-types';
@@ -98,8 +98,9 @@ const FilterButton = ({ filterKey, setFilter, filters, tmpValue, open, isViewAct
       variant="outline"
       size="sm"
       className={clsx(
-        'group rounded-full p-0 [&:has(:focus-visible)]:ring-2 [&:has(:focus-visible)]:ring-ring [&:has(:focus-visible)]:ring-offset-2',
+        'group gap-0 rounded-full p-0 [&:has(:focus-visible)]:ring-2 [&:has(:focus-visible)]:ring-ring [&:has(:focus-visible)]:ring-offset-2',
         (!filterKey || !open) && 'text-muted-foreground',
+        !tmpValue && 'border-dashed',
         isFilterWithoutComponent && 'hover:bg-default hover:text-default-foreground',
       )}
       disabled={isFilterWithoutComponent}
@@ -107,25 +108,25 @@ const FilterButton = ({ filterKey, setFilter, filters, tmpValue, open, isViewAct
       <div className="cursor-pointer">
         {hasValue && (
           <button
-            className="group/remove h-full pl-3"
+            className="group/remove h-full pl-2.5"
             tabIndex={-1}
             onClick={() => {
               setFilter(filterKey, undefined);
             }}
           >
-            <div className="flex h-4 w-4 items-center justify-center rounded-full bg-slate-400 text-white transition-colors group-hover/remove:bg-slate-600">
-              <X size={12} strokeWidth={1.5} absoluteStrokeWidth />
+            <div className="flex h-4 w-4 items-center justify-center rounded-full text-muted-foreground transition-colors group-hover/remove:text-foreground">
+              <XCircle size={16} />
             </div>
           </button>
         )}
         <PopoverTrigger
-          className={clsx('flex h-full items-center px-3 focus:outline-none', hasValue && 'pl-2 text-foreground')}
+          className={clsx('flex h-full items-center px-2.5 focus:outline-none', hasValue && 'pl-2 text-foreground')}
           disabled={isFilterWithoutComponent}
           data-cy={filterKey ? `filter-${filterKey}` : `add-filter`}
         >
           {!hasValue && (
-            <div className="mr-2 flex h-4 w-4 items-center justify-center rounded-full bg-slate-400 text-white transition-colors group-hover:bg-slate-600">
-              <Plus size={12} strokeWidth={1.5} absoluteStrokeWidth />
+            <div className="mr-2 flex h-4 w-4 items-center justify-center rounded-full text-muted-foreground transition-colors group-hover:text-foreground">
+              <PlusCircle size={16} />
             </div>
           )}
           {filterConfig ? (
@@ -153,7 +154,7 @@ const FilterButton = ({ filterKey, setFilter, filters, tmpValue, open, isViewAct
                   arrayValue.map(value => (
                     <Badge
                       className={clsx(
-                        'max-w-[256px] truncate rounded-sm px-1 font-normal',
+                        'max-w-[256px] truncate rounded-sm px-1 py-0.5 font-normal',
                         !isViewActive && 'bg-blue-50 text-blue-700',
                       )}
                       key={JSON.stringify(value)}
@@ -210,7 +211,7 @@ function FilterDropdown<FV, FM>({
         <FilterButton
           filterKey={filterKey}
           filters={filters}
-          tmpValue={tmpValue}
+          tmpValue={values[currentFilterKey]}
           setFilter={setFilter}
           isViewActive={isViewActive}
           open={open}
