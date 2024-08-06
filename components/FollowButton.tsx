@@ -90,7 +90,9 @@ export default function FollowButton({ className, account, isHoverCard }: Follow
     !LoggedInUser ||
     LoggedInUser.collective.slug === account.slug ||
     !account.type ||
-    [CollectiveType.INDIVIDUAL, CollectiveType.USER, CollectiveType.VENDOR, CollectiveType.BOT].includes(account.type)
+    ([CollectiveType.INDIVIDUAL, CollectiveType.USER, CollectiveType.VENDOR, CollectiveType.BOT] as string[]).includes(
+      account.type,
+    )
   ) {
     return null;
   }

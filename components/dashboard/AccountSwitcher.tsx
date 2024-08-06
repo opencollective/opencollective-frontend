@@ -138,7 +138,7 @@ const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
     ...groupBy(activeAccounts, a => a.type),
   };
   if (archivedAccounts?.length > 0) {
-    groupedAccounts.ARCHIVED = archivedAccounts;
+    groupedAccounts['ARCHIVED'] = archivedAccounts;
   }
   return groupedAccounts;
 });
