@@ -42,6 +42,7 @@ export const managedOrderFragment = gql`
     }
     status
     description
+    memo
     createdAt
     processedAt
     hostFeePercent
@@ -108,6 +109,10 @@ export const managedOrderFragment = gql`
     platformTipAmount {
       value
       valueInCents
+    }
+    paymentProcessorFee {
+      valueInCents
+      currency
     }
     pendingContributionData {
       expectedAt
