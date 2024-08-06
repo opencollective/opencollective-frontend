@@ -18,6 +18,7 @@ import type {
 } from '../lib/graphql/types/v2/graphql';
 import { DEFAULT_MINIMUM_AMOUNT } from '../lib/tier-utils';
 
+import AddFundsModal from './dashboard/sections/collectives/AddFundsModal';
 import type { PaymentMethodOption } from './orders/PaymentMethodPicker';
 import PaymentMethodPicker from './orders/PaymentMethodPicker';
 import { getSubscriptionStartDate } from './recurring-contributions/AddPaymentMethod';
@@ -52,13 +53,14 @@ const i18nReasons = defineMessages({
   OTHER: { id: 'subscription.cancel.other', defaultMessage: 'Other' },
 });
 
-export type EditOrderActions = 'cancel' | 'editAmount' | 'editPaymentMethod';
+export type EditOrderActions = 'cancel' | 'editAmount' | 'editPaymentMethod' | 'editAddedFunds';
 
 type EditOrderModalProps = {
   onClose: () => void;
   order: any;
   accountSlug: string;
   action: EditOrderActions;
+  onSuccess?: () => void;
 };
 
 const cancelRecurringContributionMutation = gql`
@@ -637,6 +639,26 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
   );
 }
 
+const EditAddedFundsModal = (props: EditOrderModalProps) => {
+  return (
+    <AddFundsModal
+      open={true}
+      onClose={props.onClose}
+      onSuccess={props.onSuccess}
+      collective={props.order.toAccount}
+      editOrderId={props.order.id}
+      initialValues={{
+        fromAccount: props.order.fromAccount,
+        amount: props.order.amount.valueInCents,
+        paymentProcessorFee: props.order.paymentProcessorFee?.valueInCents,
+        hostFeePercent: props.order.hostFeePercent,
+        description: props.order.description,
+        memo: props.order.memo,
+      }}
+    />
+  );
+};
+
 const EditOrderModal = (props: EditOrderModalProps) => {
   if (props.action === 'cancel') {
     return <CancelModal {...props} />;
@@ -644,6 +666,8 @@ const EditOrderModal = (props: EditOrderModalProps) => {
     return <EditAmountModal {...props} />;
   } else if (props.action === 'editPaymentMethod') {
     return <EditPaymentMethodModal {...props} />;
+  } else if (props.action === 'editAddedFunds') {
+    return <EditAddedFundsModal {...props} />;
   }
   return null;
 };
