@@ -242,11 +242,14 @@ const useExpenseItemExchangeRate = (form, itemPath) => {
   };
 
   // If the item exchange rate isn't valid anymore, let's make sure we invalidate it
+  console.log('Check currency...', { itemPath, itemCurrency, expenseCurrency, existingExchangeRate });
   React.useEffect(() => {
+    console.log('Check started', itemPath);
     if (existingExchangeRate && existingExchangeRate.toCurrency !== expenseCurrency) {
+      console.log('Removing exchange rate', itemPath);
       form.setFieldValue(`${itemPath}.amountV2.exchangeRate`, null);
     }
-  }, [itemCurrency, expenseCurrency]);
+  }, [itemCurrency, expenseCurrency, form.setFieldValue]);
 
   const { loading } = useQuery(currencyExchangeRateQuery, {
     skip: shouldSkipExchangeRateQuery(),
@@ -599,7 +602,5 @@ ExpenseItemForm.propTypes = {
   ocrComparison: PropTypes.object,
   hasCurrencyPicker: PropTypes.bool,
 };
-
-ExpenseItemForm.whyDidYouRender = true;
 
 export default React.memo(ExpenseItemForm);
