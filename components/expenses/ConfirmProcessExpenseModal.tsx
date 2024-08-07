@@ -7,6 +7,7 @@ import useProcessExpense from '../../lib/expenses/useProcessExpense';
 import type { Expense } from '../../lib/graphql/types/v2/graphql';
 
 import { Flex } from '../Grid';
+import MessageBox from '../MessageBox';
 import RichTextEditor from '../RichTextEditor';
 import StyledButton from '../StyledButton';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
@@ -15,8 +16,8 @@ import { toast } from '../ui/useToast';
 
 const messages = defineMessages({
   reasonPlaceholder: {
-    defaultMessage: 'e.g. Email Address is wrong',
-    id: 'g0KLMH',
+    defaultMessage: 'e.g, We never worked with this person.',
+    id: 'mpLU2S',
   },
   REQUEST_RE_APPROVAL_TITLE: {
     id: 'expense.requestReApproval.btn',
@@ -108,17 +109,21 @@ const messages = defineMessages({
   },
   MARK_AS_SPAM_DESCRIPTION: {
     id: 'Expense.MarkAsSpamWarning',
-    defaultMessage: 'This will prevent the submitter account to post new expenses. Are you sure?',
+    defaultMessage: 'This will prevent the submitter account to post new expenses.',
   },
   MARK_AS_SPAM_CONFIRM_BUTTON: {
     id: 'actions.spam',
     defaultMessage: 'Mark as Spam',
   },
+  MARK_AS_SPAM_LABEL: {
+    id: 'Expense.MarkAsSpamLabel',
+    defaultMessage: 'Why are you marking this expense as spam?',
+  },
 });
 
 const MessagesPerType: Record<
   ConfirmProcessExpenseModalType,
-  { title: MessageDescriptor; description: MessageDescriptor; confirmBtn: MessageDescriptor }
+  { title: MessageDescriptor; description: MessageDescriptor; confirmBtn: MessageDescriptor; label?: MessageDescriptor }
 > = {
   REQUEST_RE_APPROVAL: {
     title: messages.REQUEST_RE_APPROVAL_TITLE,
@@ -159,6 +164,7 @@ const MessagesPerType: Record<
     title: messages.MARK_AS_SPAM_TITLE,
     description: messages.MARK_AS_SPAM_DESCRIPTION,
     confirmBtn: messages.MARK_AS_SPAM_CONFIRM_BUTTON,
+    label: messages.MARK_AS_SPAM_LABEL,
   },
 };
 
@@ -250,9 +256,21 @@ export default function ConfirmProcessExpenseModal({ type, onClose, expense }: C
     <StyledModal role="alertdialog" onClose={onClose} trapFocus>
       <ModalHeader>{intl.formatMessage(MessagesPerType[type].title)}</ModalHeader>
       <ModalBody pt={2}>
-        <P mb={3} color="black.700" lineHeight="20px">
-          {intl.formatMessage(MessagesPerType[type].description)}
-        </P>
+        <Flex>
+          <MessageBox lineHeight="20px" mb={10} type="warning" withIcon>
+            {intl.formatMessage(MessagesPerType[type].description)}
+          </MessageBox>
+        </Flex>
+
+        {MessagesPerType[type].label && (
+          <P as="label" htmlFor="expense-ban-reason" mb={2} color="black.700" fontWeight="500">
+            {intl.formatMessage(
+              { id: 'OptionalFieldLabel', defaultMessage: '{field} (optional)' },
+              { field: intl.formatMessage(MessagesPerType[type].label) },
+            )}
+          </P>
+        )}
+
         <RichTextEditor
           data-cy="confirm-action-text"
           kind="COMMENT"

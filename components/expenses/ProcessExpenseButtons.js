@@ -11,6 +11,7 @@ import styled from 'styled-components';
 import PERMISSION_CODES, { ReasonMessage } from '../../lib/constants/permissions';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { collectiveAdminsMustConfirmAccountingCategory } from './lib/accounting-categories';
 
 import {
@@ -71,7 +72,7 @@ export const hasProcessButtons = permissions => {
 const messages = defineMessages({
   markAsSpamWarning: {
     id: 'Expense.MarkAsSpamWarning',
-    defaultMessage: 'This will prevent the submitter account to post new expenses. Are you sure?',
+    defaultMessage: 'This will prevent the submitter account to post new expenses.',
   },
 });
 
@@ -151,6 +152,7 @@ const ProcessExpenseButtons = ({
   const [processExpense, { loading, error }] = useMutation(processExpenseMutation, mutationOptions);
   const intl = useIntl();
   const { toast } = useToast();
+  const { LoggedInUser } = useLoggedInUser();
 
   React.useEffect(() => {
     onModalToggle?.(!!confirmProcessExpenseAction);
@@ -246,6 +248,20 @@ const ProcessExpenseButtons = ({
           buttonStyle="dangerSecondary"
           data-cy="spam-button"
           onClick={() => {
+            const isSubmitter = expense.createdByAccount.legacyId === LoggedInUser?.CollectiveId;
+
+            if (isSubmitter) {
+              toast({
+                variant: 'error',
+                message: intl.formatMessage({
+                  id: 'expense.spam.notAllowed',
+                  defaultMessage: "You can't mark your own expenses as spam",
+                }),
+              });
+
+              return;
+            }
+
             if (confirm(intl.formatMessage(messages.markAsSpamWarning))) {
               triggerAction('MARK_AS_SPAM');
             }
@@ -370,6 +386,9 @@ ProcessExpenseButtons.propTypes = {
         message: PropTypes.string,
       }),
     ),
+    createdByAccount: PropTypes.shape({
+      legacyId: PropTypes.number.isRequired,
+    }),
   }).isRequired,
   /** The account where the expense has been submitted */
   collective: PropTypes.object.isRequired,
@@ -388,6 +407,7 @@ ProcessExpenseButtons.propTypes = {
   displaySecurityChecks: PropTypes.bool,
   isViewingExpenseInHostContext: PropTypes.bool,
   disabled: PropTypes.bool,
+  LoggedInUser: PropTypes.object,
 };
 
 export const DEFAULT_PROCESS_EXPENSE_BTN_PROPS = {
