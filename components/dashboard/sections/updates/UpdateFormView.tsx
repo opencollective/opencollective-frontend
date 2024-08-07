@@ -291,6 +291,8 @@ const FormBody = ({ update }) => {
                       <RichTextEditor
                         kind="UPDATE"
                         {...field}
+                        withStickyToolbar
+                        toolbarOffsetY={0}
                         inputName={field.name}
                         editorMinHeight={300}
                         editorMaxHeight={'100%'}
