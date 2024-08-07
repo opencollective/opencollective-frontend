@@ -1182,6 +1182,11 @@ type Order {
   hostFeePercent: Float
 
   """
+  Payment processor fee attached to manually Added Funds.
+  """
+  paymentProcessorFee: Amount
+
+  """
   Platform Tip attached to the Order.
   """
   platformTipAmount: Amount
@@ -5817,6 +5822,7 @@ enum ActivityType {
   ORDER_DISPUTE_CLOSED
   ORDER_THANKYOU
   ORDER_UPDATED
+  ADDED_FUNDS_EDITED
   VENDOR_CREATED
   VENDOR_EDITED
   VENDOR_DELETED
@@ -15301,6 +15307,7 @@ enum ActivityAndClassesType {
   ORDER_DISPUTE_CLOSED
   ORDER_THANKYOU
   ORDER_UPDATED
+  ADDED_FUNDS_EDITED
   VENDOR_CREATED
   VENDOR_EDITED
   VENDOR_DELETED
@@ -17173,76 +17180,6 @@ This is the root mutation
 """
 type Mutation {
   """
-  Add funds to the given account. Scope: "host".
-  """
-  addFunds(
-    """
-    The account that will be used as the source of the funds
-    """
-    fromAccount: AccountReferenceInput!
-
-    """
-    The account that will receive the funds
-    """
-    account: AccountReferenceInput!
-
-    """
-    The tier to which the funds will be added
-    """
-    tier: TierReferenceInput
-
-    """
-    The total amount of the order, including fees and taxes
-    """
-    amount: AmountInput!
-
-    """
-    The payment processor fee amount
-    """
-    paymentProcessorFee: AmountInput
-
-    """
-    The host fee percent to apply to the order, as a float between 0 and 100
-    """
-    hostFeePercent: Float
-
-    """
-    A short description of the contribution
-    """
-    description: String!
-
-    """
-    A private note for the host
-    """
-    memo: String
-
-    """
-    The date at which the order was processed
-    """
-    processedAt: DateTime
-
-    """
-    The invoice template to use for this order
-    """
-    invoiceTemplate: String
-
-    """
-    The tax to apply to the order
-    """
-    tax: TaxInput
-
-    """
-    The accounting category of this order
-    """
-    accountingCategory: AccountingCategoryReferenceInput
-
-    """
-    The transaction import row to associate with this order
-    """
-    transactionsImportRow: TransactionsImportRowReferenceInput
-  ): Order!
-
-  """
   Create a Collective. Scope: "account".
   """
   createCollective(
@@ -17584,6 +17521,146 @@ type Mutation {
     """
     categories: [AccountingCategoryInput!]!
   ): Account!
+
+  """
+  Add funds to the given account. Scope: "host".
+  """
+  addFunds(
+    """
+    The account that will be used as the source of the funds
+    """
+    fromAccount: AccountReferenceInput!
+
+    """
+    The account that will receive the funds
+    """
+    account: AccountReferenceInput!
+
+    """
+    The tier to which the funds will be added
+    """
+    tier: TierReferenceInput
+
+    """
+    The total amount of the order, including fees and taxes
+    """
+    amount: AmountInput!
+
+    """
+    The payment processor fee amount
+    """
+    paymentProcessorFee: AmountInput
+
+    """
+    The host fee percent to apply to the order, as a float between 0 and 100
+    """
+    hostFeePercent: Float
+
+    """
+    A short description of the contribution
+    """
+    description: String!
+
+    """
+    A private note for the host
+    """
+    memo: String
+
+    """
+    The date at which the order was processed
+    """
+    processedAt: DateTime
+
+    """
+    The invoice template to use for this order
+    """
+    invoiceTemplate: String
+
+    """
+    The tax to apply to the order
+    """
+    tax: TaxInput
+
+    """
+    The accounting category of this order
+    """
+    accountingCategory: AccountingCategoryReferenceInput
+
+    """
+    The transaction import row to associate with this order
+    """
+    transactionsImportRow: TransactionsImportRowReferenceInput
+  ): Order!
+
+  """
+  Add funds to the given account. Scope: "host".
+  """
+  editAddedFunds(
+    """
+    The order to edit
+    """
+    order: OrderReferenceInput!
+
+    """
+    The account that will be used as the source of the funds
+    """
+    fromAccount: AccountReferenceInput!
+
+    """
+    The account that will receive the funds
+    """
+    account: AccountReferenceInput!
+
+    """
+    The tier to which the funds will be added
+    """
+    tier: TierReferenceInput
+
+    """
+    The total amount of the order, including fees and taxes
+    """
+    amount: AmountInput!
+
+    """
+    The payment processor fee amount
+    """
+    paymentProcessorFee: AmountInput
+
+    """
+    The host fee percent to apply to the order, as a float between 0 and 100
+    """
+    hostFeePercent: Float
+
+    """
+    A short description of the contribution
+    """
+    description: String!
+
+    """
+    A private note for the host
+    """
+    memo: String
+
+    """
+    The date at which the order was processed
+    """
+    processedAt: DateTime
+
+    """
+    The invoice template to use for this order
+    """
+    invoiceTemplate: String
+
+    """
+    The tax to apply to the order
+    """
+    tax: TaxInput
+
+    """
+    The accounting category of this order
+    """
+    accountingCategory: AccountingCategoryReferenceInput
+  ): Order!
   createApplication(application: ApplicationCreateInput!): Application
   updateApplication(application: ApplicationUpdateInput!): Application
   deleteApplication(application: ApplicationReferenceInput!): Application
@@ -18992,68 +19069,6 @@ type Mutation {
   sendSurveyResponse(surveyKey: String!, responseId: String!, score: Int!, text: String, okToContact: Boolean): Boolean
 }
 
-"""
-Input to set taxes for an expense
-"""
-input TaxInput {
-  """
-  Tax type
-  """
-  type: TaxType!
-
-  """
-  Tax rate as a float number between 0 and 1
-  """
-  rate: Float!
-
-  """
-  Tax identification number, if any
-  """
-  idNumber: String
-
-  """
-  Country ISO code of the entity paying the tax
-  """
-  country: CountryISO
-
-  """
-  An optional tax amount to make sure the tax displayed in your frontend matches the one calculated by the API
-  """
-  amount: AmountInput
-}
-
-"""
-The type of a tax like GST, VAT, etc
-"""
-enum TaxType {
-  """
-  European Value Added Tax
-  """
-  VAT
-
-  """
-  New Zealand Good and Services Tax
-  """
-  GST
-}
-
-"""
-Reference to an accounting category
-"""
-input AccountingCategoryReferenceInput {
-  """
-  The ID of the accounting category
-  """
-  id: NonEmptyString!
-}
-
-input TransactionsImportRowReferenceInput {
-  """
-  The id of the row
-  """
-  id: NonEmptyString!
-}
-
 input CollectiveCreateInput {
   name: String!
   slug: String!
@@ -19292,6 +19307,68 @@ input AccountingCategoryInput {
   If the category is applicable to the Host or Hosted Collectives
   """
   appliesTo: AccountingCategoryAppliesTo! = HOSTED_COLLECTIVES
+}
+
+"""
+Input to set taxes for an expense
+"""
+input TaxInput {
+  """
+  Tax type
+  """
+  type: TaxType!
+
+  """
+  Tax rate as a float number between 0 and 1
+  """
+  rate: Float!
+
+  """
+  Tax identification number, if any
+  """
+  idNumber: String
+
+  """
+  Country ISO code of the entity paying the tax
+  """
+  country: CountryISO
+
+  """
+  An optional tax amount to make sure the tax displayed in your frontend matches the one calculated by the API
+  """
+  amount: AmountInput
+}
+
+"""
+The type of a tax like GST, VAT, etc
+"""
+enum TaxType {
+  """
+  European Value Added Tax
+  """
+  VAT
+
+  """
+  New Zealand Good and Services Tax
+  """
+  GST
+}
+
+"""
+Reference to an accounting category
+"""
+input AccountingCategoryReferenceInput {
+  """
+  The ID of the accounting category
+  """
+  id: NonEmptyString!
+}
+
+input TransactionsImportRowReferenceInput {
+  """
+  The id of the row
+  """
+  id: NonEmptyString!
 }
 
 """
