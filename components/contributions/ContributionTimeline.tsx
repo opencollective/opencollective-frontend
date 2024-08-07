@@ -165,7 +165,7 @@ const getIcon = (type: ActivityType) => {
     case ActivityType.ORDER_PROCESSING:
     case ActivityType.ORDER_PENDING_CONTRIBUTION_REMINDER:
       return <Hourglass size={16} />;
-    case ActivityType.ADDED_FUNDS_RECTIFIED:
+    case ActivityType.ADDED_FUNDS_EDITED:
       return <Pencil size={16} />;
     default:
       return <Info size={16} />;
@@ -184,7 +184,7 @@ const getActivityStyle = (type: ActivityType) => {
     case ActivityType.ORDER_DISPUTE_CREATED:
     case ActivityType.ORDER_PENDING_CONTRIBUTION_REMINDER:
     case ActivityType.PAYMENT_CREDITCARD_CONFIRMATION:
-    case ActivityType.ADDED_FUNDS_RECTIFIED:
+    case ActivityType.ADDED_FUNDS_EDITED:
       return 'warning';
     default:
       return 'info';
@@ -226,7 +226,7 @@ function ContributionTimeline(props: OrderTimelineProps) {
       return {
         id: a.id,
         title: <ActivityDescription activity={a} />,
-        collapsable: [ActivityType.PAYMENT_FAILED, ActivityType.ADDED_FUNDS_RECTIFIED].includes(a.type),
+        collapsable: [ActivityType.PAYMENT_FAILED, ActivityType.ADDED_FUNDS_EDITED].includes(a.type),
         icon: getIcon(a.type),
         date: a.createdAt,
         details,

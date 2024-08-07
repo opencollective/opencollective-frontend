@@ -540,7 +540,7 @@ export const ActivityDescriptionI18n = defineMessages({
     defaultMessage: 'Vendor <Vendor></Vendor> created',
     id: 'IUlgDG',
   },
-  ADDED_FUNDS_RECTIFIED: {
+  ADDED_FUNDS_EDITED: {
     defaultMessage: '<Individual></Individual> edited added funds',
     id: 'nxtsKq',
   },
