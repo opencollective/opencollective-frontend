@@ -11,7 +11,8 @@ import { createIntl, createIntlCache } from 'react-intl';
 import { ServerStyleSheet } from 'styled-components';
 import { v4 as uuid } from 'uuid';
 
-import { APOLLO_STATE_PROP_NAME, initClient } from '../lib/apollo-client';
+import { APOLLO_STATE_PROP_NAME } from '../lib/apollo-client';
+import { getTokenFromCookie } from '../lib/auth';
 import { getIntlProps, getLocaleMessages } from '../lib/i18n/request';
 import { parseToBoolean } from '../lib/utils';
 import { getCSPHeader } from '../server/content-security-policy';
@@ -45,7 +46,9 @@ export default class IntlDocument extends Document {
     const intl = createIntl({ locale: intlProps.locale, defaultLocale: 'en', messages }, cache);
 
     if (ctx.req && ctx.res) {
-      if (intlProps.locale !== 'en') {
+      if (getTokenFromCookie(ctx.req)) {
+        ctx.res.setHeader('Cache-Control', 'no-store, no-cache, private, max-age=0');
+      } else if (intlProps.locale !== 'en') {
         // Prevent server side caching of non english content
         ctx.res.setHeader('Cache-Control', 'no-store, no-cache, max-age=0');
       } else {
@@ -75,18 +78,22 @@ export default class IntlDocument extends Document {
       ctx.res.setHeader(cspHeader.key, cspHeader.value.replace('__OC_REQUEST_NONCE__', requestNonce));
     }
 
+    const apolloClient = ctx.req?.apolloClient;
+
     try {
       ctx.renderPage = () =>
         originalRenderPage({
-          enhanceApp: App => props =>
-            sheet.collectStyles(
+          enhanceApp: App => props => {
+            return sheet.collectStyles(
               <SSRIntlProvider intl={intl}>
-                <App {...props} {...intlProps} />
+                <App {...props} {...intlProps} apolloClient={apolloClient} />
               </SSRIntlProvider>,
-            ),
+            );
+          },
         });
 
       const initialProps = await Document.getInitialProps(ctx);
+
       return {
         ...initialProps,
         clientAnalytics,
@@ -98,7 +105,7 @@ export default class IntlDocument extends Document {
             {sheet.getStyleElement()}
           </React.Fragment>
         ),
-        [APOLLO_STATE_PROP_NAME]: initClient().cache.extract(),
+        [APOLLO_STATE_PROP_NAME]: apolloClient?.cache.extract(),
       };
     } finally {
       sheet.seal();
@@ -113,6 +120,7 @@ export default class IntlDocument extends Document {
 
     props.__NEXT_DATA__.props.locale = props.locale;
     props.__NEXT_DATA__.props.language = props.language;
+    props.__NEXT_DATA__.props[APOLLO_STATE_PROP_NAME] = props[APOLLO_STATE_PROP_NAME];
 
     // We pick the environment variables that we want to access from the client
     // They can later be read with getEnvVar()
