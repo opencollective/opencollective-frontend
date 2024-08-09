@@ -4,8 +4,8 @@ import { merge, pick } from 'lodash';
 import { z } from 'zod';
 
 import { splitName } from '../../../../lib/collective';
-import type { LoggedInUser } from '../../../../lib/custom_typings/LoggedInUser';
 import type { CountryIso } from '../../../../lib/graphql/types/v2/graphql';
+import type LoggedInUser from '../../../../lib/LoggedInUser';
 import { cn } from '../../../../lib/utils';
 
 import { generateInitialValuesFromSchema } from '../../../FormikZod';

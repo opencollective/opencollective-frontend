@@ -5,10 +5,10 @@ import { useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { splitName } from '../../../../lib/collective';
-import type { LoggedInUser } from '../../../../lib/custom_typings/LoggedInUser';
 import dayjs from '../../../../lib/dayjs';
 import type { CountryIso } from '../../../../lib/graphql/types/v2/graphql';
 import { i18nCountryName } from '../../../../lib/i18n';
+import type LoggedInUser from '../../../../lib/LoggedInUser';
 import { cn } from '../../../../lib/utils';
 
 import { generateInitialValuesFromSchema } from '../../../FormikZod';

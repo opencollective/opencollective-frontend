@@ -139,6 +139,7 @@ export function OCFBannerWithData(props: OCFBannerProps) {
           id
           name
           slug
+          type
           ... on AccountWithHost {
             host {
               id

@@ -43,7 +43,7 @@ const getPageMetaData = (pageProps: TierPageProps, data) => {
       twitterHandle: collective.twitterHandle || get(collective, 'parentCollective.twitterHandle'),
       canonicalURL,
     };
-  } else if ([CollectiveType.EVENT, CollectiveType.PROJECT].includes(collectiveType)) {
+  } else if (([CollectiveType.EVENT, CollectiveType.PROJECT] as string[]).includes(collectiveType)) {
     canonicalURL = `${getWebsiteUrl()}/${parentCollectiveSlug}/${collectiveType}/${collectiveSlug}/contribute/${tierSlug}-${tierId}`;
   } else {
     canonicalURL = `${getWebsiteUrl()}/${collectiveSlug}/contribute/${tierSlug}-${tierId}`;

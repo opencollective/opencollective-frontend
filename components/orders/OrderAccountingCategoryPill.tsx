@@ -31,7 +31,7 @@ type AccountingCategoryPillProps = {
   order: Pick<Order, 'id'> & { accountingCategory?: Pick<AccountingCategory, 'friendlyName' | 'name' | 'code' | 'id'> };
   canEdit: boolean;
   account: Pick<Account, 'id' | 'slug'>;
-  host: Pick<Host, 'id' | 'slug'> & {
+  host: Pick<Host, 'id' | 'slug' | 'type'> & {
     accountingCategories?: { nodes: Array<Pick<AccountingCategory, 'friendlyName' | 'name' | 'code' | 'id'>> };
   };
   /** Whether to allow the user to select "I don't know" */
