@@ -20,7 +20,6 @@ import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
-import { parseToBoolean } from '../../lib/utils';
 import { itemHasOCR } from './lib/ocr';
 
 import ConfirmationModal from '../ConfirmationModal';
@@ -32,7 +31,7 @@ import { useDrawerActionsContainer } from '../Drawer';
 import FilesViewerModal from '../FilesViewerModal';
 import { Box, Flex } from '../Grid';
 import HTMLContent from '../HTMLContent';
-import { getI18nLink, I18nSupportLink, WebsiteName } from '../I18nFormatters';
+import { getI18nLink, WebsiteName } from '../I18nFormatters';
 import CommentIcon from '../icons/CommentIcon';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import Link from '../Link';
@@ -490,19 +489,7 @@ function Expense(props) {
       {showTaxFormMsg && (
         <MessageBox type="warning" withIcon={true} mb={4}>
           <div>
-            {parseToBoolean(process.env.TAX_FORMS_USE_LEGACY) ? (
-              <FormattedMessage
-                id="expenseNeedsTaxFormMessage.msg"
-                defaultMessage="We need your tax information before we can pay you. You will receive an email with a link to fill out a form. If you have not received the email within 24 hours, check your spam, then contact <I18nSupportLink>support</I18nSupportLink>. Questions? See <Link>help docs about taxes</Link>."
-                values={{
-                  I18nSupportLink,
-                  Link: getI18nLink({
-                    href: 'https://docs.opencollective.com/help/expenses-and-getting-paid/tax-information',
-                    openInNewTab: true,
-                  }),
-                }}
-              />
-            ) : LoggedInUser?.isAdminOfCollective(expense.payee) ? (
+            {LoggedInUser?.isAdminOfCollective(expense.payee) ? (
               <div>
                 <strong>
                   <FormattedMessage defaultMessage="We need your tax information before we can pay you." id="a6tGTW" />
