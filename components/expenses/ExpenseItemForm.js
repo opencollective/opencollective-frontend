@@ -246,7 +246,7 @@ const useExpenseItemExchangeRate = (form, itemPath) => {
     if (existingExchangeRate && existingExchangeRate.toCurrency !== expenseCurrency) {
       form.setFieldValue(`${itemPath}.amountV2.exchangeRate`, null);
     }
-  }, [itemCurrency, expenseCurrency]);
+  }, [existingExchangeRate, itemCurrency, expenseCurrency]);
 
   const { loading } = useQuery(currencyExchangeRateQuery, {
     skip: shouldSkipExchangeRateQuery(),
@@ -599,7 +599,5 @@ ExpenseItemForm.propTypes = {
   ocrComparison: PropTypes.object,
   hasCurrencyPicker: PropTypes.bool,
 };
-
-ExpenseItemForm.whyDidYouRender = true;
 
 export default React.memo(ExpenseItemForm);
