@@ -615,28 +615,15 @@ const AddFundsModalContentWithCollective = ({
                   </Button>
                 </div>
               )}
-
+              <Field
+                name="description"
+                htmlFor="addFunds-description"
+                label={<FormattedMessage id="Fields.description" defaultMessage="Description" />}
+                mt={3}
+              >
+                {({ field }) => <StyledInput data-cy="add-funds-description" {...field} />}
+              </Field>
               <div className="w-full flex-grow overflow-y-auto pb-4">
-                {targetOptions.length > 1 && (
-                  <Field
-                    name="account"
-                    htmlFor="addFunds-account"
-                    label={<FormattedMessage id="AddFundsModal.receivingAccount" defaultMessage="Receiving Account" />}
-                  >
-                    {({ form, field }) => (
-                      <CollectivePicker
-                        inputId={field.id}
-                        data-cy="add-funds-target"
-                        error={field.error}
-                        onBlur={() => form.setFieldTouched(field.name, true)}
-                        onChange={({ value }) => form.setFieldValue(field.name, value)}
-                        collective={values.account}
-                        collectives={targetOptions}
-                        menuPortalTarget={null}
-                      />
-                    )}
-                  </Field>
-                )}
                 <Field
                   name="fromAccount"
                   htmlFor="addFunds-fromAccount"
@@ -661,10 +648,31 @@ const AddFundsModalContentWithCollective = ({
                   )}
                 </Field>
                 <Field
+                  name="account"
+                  htmlFor="addFunds-account"
+                  label={<FormattedMessage defaultMessage="Recipient" id="8Rkoyb" />}
+                  mt={3}
+                >
+                  {({ form, field }) => (
+                    <CollectivePicker
+                      inputId={field.id}
+                      data-cy="add-funds-recipient"
+                      error={field.error}
+                      onBlur={() => form.setFieldTouched(field.name, true)}
+                      onChange={({ value }) => form.setFieldValue(field.name, value)}
+                      collective={values.account}
+                      collectives={targetOptions}
+                      menuPortalTarget={null}
+                      disabled={targetOptions.length === 1}
+                    />
+                  )}
+                </Field>
+                <Field
                   name="tier"
                   htmlFor="addFunds-tier"
                   label={<FormattedMessage defaultMessage="Tier" id="b07w+D" />}
                   mt={3}
+                  required={false}
                 >
                   {({ form, field }) => (
                     <StyledSelect
@@ -681,14 +689,6 @@ const AddFundsModalContentWithCollective = ({
                       )}
                     />
                   )}
-                </Field>
-                <Field
-                  name="description"
-                  htmlFor="addFunds-description"
-                  label={<FormattedMessage id="Fields.description" defaultMessage="Description" />}
-                  mt={3}
-                >
-                  {({ field }) => <StyledInput data-cy="add-funds-description" {...field} />}
                 </Field>
                 <Field
                   name="processedAt"
@@ -741,12 +741,7 @@ const AddFundsModalContentWithCollective = ({
                 <Field
                   name="memo"
                   htmlFor="addFunds-memo"
-                  hint={
-                    <FormattedMessage
-                      defaultMessage="This is a private note that will only be visible to the host."
-                      id="znqf9S"
-                    />
-                  }
+                  isPrivate
                   label={<FormattedMessage defaultMessage="Memo" id="D5NqQO" />}
                   required={false}
                   mt={3}

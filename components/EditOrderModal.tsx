@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { useFormik } from 'formik';
-import { get, startCase } from 'lodash';
+import { get, pick, startCase } from 'lodash';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -654,6 +654,7 @@ const EditAddedFundsModal = (props: EditOrderModalProps) => {
         hostFeePercent: props.order.hostFeePercent,
         description: props.order.description,
         memo: props.order.memo,
+        tax: pick(props.order.tax, ['rate', 'idNumber', 'type']),
       }}
     />
   );

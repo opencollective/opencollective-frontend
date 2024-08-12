@@ -51,6 +51,12 @@ export const managedOrderFragment = gql`
       id
       name
     }
+    tax {
+      id
+      type
+      rate
+      idNumber
+    }
     permissions {
       id
       canResume

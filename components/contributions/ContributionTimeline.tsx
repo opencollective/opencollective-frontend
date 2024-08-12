@@ -108,6 +108,7 @@ const formatValue = (key: string, value: any, context: any) => {
     case 'totalAmount':
     case 'paymentProcessorFee':
     case 'amount':
+    case 'taxAmount':
       return <FormattedMoneyAmount amount={value} currency={context.currency} />;
     default:
       return value.toString();
