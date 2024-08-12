@@ -99,6 +99,9 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
           createdByAccount {
             ...ContributionDrawerAccountFields
           }
+          individual: createdByAccount {
+            ...ContributionDrawerAccountFields
+          }
           fromAccount {
             ...ContributionDrawerAccountFields
             ... on AccountWithHost {

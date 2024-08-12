@@ -38,7 +38,7 @@ export const getActivityVariables = (
   hasParent: Boolean(activity.account?.parent),
   Individual: () => (
     <LinkCollective
-      collective={activity.individual || activity.createdByAccount}
+      collective={activity.individual}
       withHoverCard
       className="font-medium hover:underline"
       hoverCardProps={{
