@@ -9,7 +9,6 @@ import type { z } from 'zod';
 
 import type { GetActions } from '../../../../lib/actions/types';
 import { EMPTY_ARRAY } from '../../../../lib/constants/utils';
-import type { LoggedInUser as LoggedInUserType } from '../../../../lib/custom_typings/LoggedInUser';
 import type { Views } from '../../../../lib/filters/filter-types';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 import type { ContributionDrawerQuery } from '../../../../lib/graphql/types/v2/graphql';
@@ -18,6 +17,7 @@ import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import i18nOrderStatus from '../../../../lib/i18n/order-status';
 import { i18nPaymentMethodProviderType } from '../../../../lib/i18n/payment-method-provider-type';
+import type LoggedInUser from '../../../../lib/LoggedInUser';
 import { sortSelectOptions } from '../../../../lib/utils';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
@@ -901,7 +901,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
 };
 
 type GetContributionActionsOptions = {
-  LoggedInUser: LoggedInUserType;
+  LoggedInUser: LoggedInUser;
   intl: IntlShape;
   onUpdatePaymentMethodClick: (order: ContributionDrawerQuery['order']) => void;
   onResumeClick: (order: ContributionDrawerQuery['order']) => void;

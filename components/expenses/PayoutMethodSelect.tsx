@@ -277,7 +277,7 @@ class PayoutMethodSelect extends React.Component<PayoutMethodSelectProps> {
     const { removingPayoutMethod } = this.state;
     const value = !isEmpty(payoutMethod) && this.getOptionFromPayoutMethod(payoutMethod);
 
-    const payeeIsCollectiveFamilyType = payee && AccountTypesWithHost.includes(payee.type);
+    const payeeIsCollectiveFamilyType = payee && (AccountTypesWithHost as readonly string[]).includes(payee.type);
     const payeeIsSameHost = payee && payee.host?.id === collective.host?.id;
 
     const styledSelectOptions = this.getOptions(collective.host, payoutMethods, payee);

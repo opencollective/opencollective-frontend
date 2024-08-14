@@ -24,13 +24,13 @@ import {
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../lib/actions/types';
-import type { LoggedInUser as LoggedInUserType } from '../../lib/custom_typings/LoggedInUser';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type { ContributionDrawerQuery, ContributionDrawerQueryVariables } from '../../lib/graphql/types/v2/graphql';
 import { ActivityType, ContributionFrequency, OrderStatus, TransactionKind } from '../../lib/graphql/types/v2/graphql';
 import useClipboard from '../../lib/hooks/useClipboard';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { i18nPaymentMethodProviderType } from '../../lib/i18n/payment-method-provider-type';
+import type LoggedInUser from '../../lib/LoggedInUser';
 import { getDashboardRoute } from '../../lib/url-helpers';
 
 import { AccountHoverCard } from '../AccountHoverCard';
@@ -217,6 +217,7 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
           host {
             id
             slug
+            type
             accountingCategories {
               nodes {
                 id
@@ -617,7 +618,7 @@ function buildTransactionGroups(order: ContributionDrawerQuery['order']): Transa
   }));
 }
 
-function getTransactionsUrl(LoggedInUser: LoggedInUserType, order: ContributionDrawerQuery['order']): URL {
+function getTransactionsUrl(LoggedInUser: LoggedInUser, order: ContributionDrawerQuery['order']): URL {
   let route = `/${order.toAccount.slug}/transactions`;
   if (LoggedInUser.isSelf(order.fromAccount)) {
     route = getDashboardRoute(order.fromAccount, 'transactions');
@@ -631,7 +632,7 @@ function getTransactionsUrl(LoggedInUser: LoggedInUserType, order: ContributionD
 }
 
 function getTransactionGroupLink(
-  LoggedInUser: LoggedInUserType,
+  LoggedInUser: LoggedInUser,
   order: ContributionDrawerQuery['order'],
   transactionGroup: string,
 ): string {
@@ -640,7 +641,7 @@ function getTransactionGroupLink(
   return url.toString();
 }
 
-function getTransactionOrderLink(LoggedInUser: LoggedInUserType, order: ContributionDrawerQuery['order']): string {
+function getTransactionOrderLink(LoggedInUser: LoggedInUser, order: ContributionDrawerQuery['order']): string {
   const url = getTransactionsUrl(LoggedInUser, order);
   url.searchParams.set('orderId', order.legacyId.toString());
   return url.toString();
