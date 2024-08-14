@@ -654,7 +654,7 @@ const EditAddedFundsModal = (props: EditOrderModalProps) => {
         hostFeePercent: props.order.hostFeePercent,
         description: props.order.description,
         memo: props.order.memo,
-        tax: pick(props.order.tax, ['rate', 'idNumber', 'type']),
+        tax: props.order.tax && pick(props.order.tax, ['rate', 'idNumber', 'type']),
       }}
     />
   );
