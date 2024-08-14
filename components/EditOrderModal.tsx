@@ -648,13 +648,14 @@ const EditAddedFundsModal = (props: EditOrderModalProps) => {
       collective={props.order.toAccount}
       editOrderId={props.order.id}
       initialValues={{
-        fromAccount: props.order.fromAccount,
+        ...pick(props.order, ['fromAccount', 'hostFeePercent', 'description', 'memo']),
         amount: props.order.amount.valueInCents,
+        processedAt: props.order.processedAt?.slice(0, 10),
         paymentProcessorFee: props.order.paymentProcessorFee?.valueInCents,
-        hostFeePercent: props.order.hostFeePercent,
-        description: props.order.description,
-        memo: props.order.memo,
         tax: props.order.tax && pick(props.order.tax, ['rate', 'idNumber', 'type']),
+        tier: props.order.tier && pick(props.order.tier, ['id', 'legacyId', 'name', 'slug']),
+        accountingCategory:
+          props.order.accountingCategory && pick(props.order.accountingCategory, ['id', 'name', 'code', 'type']),
       }}
     />
   );

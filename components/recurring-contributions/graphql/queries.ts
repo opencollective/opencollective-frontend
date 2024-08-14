@@ -130,6 +130,12 @@ export const managedOrderFragment = gql`
         email
       }
     }
+    accountingCategory {
+      id
+      name
+      kind
+      code
+    }
   }
   ${accountHoverCardFields}
   ${paymentMethodFragment}
