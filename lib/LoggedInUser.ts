@@ -173,7 +173,7 @@ class LoggedInUser {
       return false;
     }
 
-    const parent = event['parentCollective'] || event['parent'];
+    const parent = project['parentCollective'] || project['parent'];
     return this.hasRole(MemberRole.ADMIN, parent) || this.hasRole(MemberRole.ADMIN, project);
   }
 
