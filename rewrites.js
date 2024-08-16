@@ -68,11 +68,19 @@ exports.REWRITES = [
     destination: '/dashboard',
   },
   {
-    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/updates',
+    source: '/:parentCollectiveSlug/:collectiveType(events|projects)/:collectiveSlug/updates',
     destination: '/updates',
   },
   {
-    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/updates/:updateSlug',
+    source: '/:collectiveSlug/updates',
+    destination: '/updates',
+  },
+  {
+    source: '/:parentCollectiveSlug/:collectiveType(events|projects)/:collectiveSlug/updates/:updateSlug',
+    destination: '/update',
+  },
+  {
+    source: '/:collectiveSlug/updates/:updateSlug',
     destination: '/update',
   },
   {
@@ -136,23 +144,43 @@ exports.REWRITES = [
     destination: '/create-project',
   },
   {
-    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/contact',
+    source: '/:parentCollectiveSlug/:collectiveType(events|projects)/:collectiveSlug/contact',
     destination: '/collective-contact',
   },
   {
-    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/transactions',
+    source: '/:collectiveSlug/contact',
+    destination: '/collective-contact',
+  },
+  {
+    source: '/:parentCollectiveSlug/:collectiveType(events|projects)/:collectiveSlug/transactions',
     destination: '/transactions',
   },
   {
-    source: '/:parentCollectiveSlug?/:type(events|projects)?/:collectiveSlug/expenses/new',
+    source: '/:collectiveSlug/transactions',
+    destination: '/transactions',
+  },
+  {
+    source: '/:parentCollectiveSlug/:type(events|projects)/:collectiveSlug/expenses/new',
     destination: '/create-expense',
   },
   {
-    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)',
+    source: '/:collectiveSlug/expenses/new',
+    destination: '/create-expense',
+  },
+  {
+    source: '/:parentCollectiveSlug/:collectiveType(events|projects)/:collectiveSlug/expenses/:ExpenseId([0-9]+)',
     destination: '/expense',
   },
   {
-    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses',
+    source: '/:collectiveSlug/expenses/:ExpenseId([0-9]+)',
+    destination: '/expense',
+  },
+  {
+    source: '/:parentCollectiveSlug/:collectiveType(events|projects)/:collectiveSlug/expenses',
+    destination: '/expenses',
+  },
+  {
+    source: '/:collectiveSlug/expenses',
     destination: '/expenses',
   },
   {
@@ -160,12 +188,20 @@ exports.REWRITES = [
     destination: '/submitted-expenses',
   },
   {
-    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/orders',
+    source: '/:parentCollectiveSlug/:collectiveType(events|projects)/:collectiveSlug/orders',
+    destination: '/orders',
+  },
+  {
+    source: '/:collectiveSlug/orders',
     destination: '/orders',
   },
   {
     source:
-      '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/(orders|contributions)/:OrderId([0-9]+)',
+      '/:parentCollectiveSlug/:collectiveType(events|projects)/:collectiveSlug/(orders|contributions)/:OrderId([0-9]+)',
+    destination: '/order',
+  },
+  {
+    source: '/:collectiveSlug/(orders|contributions)/:OrderId([0-9]+)',
     destination: '/order',
   },
   {
@@ -197,22 +233,38 @@ exports.REWRITES = [
   },
   {
     source:
-      '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/:verb(tiers|contribute|connected-collectives)',
+      '/:parentCollectiveSlug/:collectiveType(events|projects)/:collectiveSlug/:verb(tiers|contribute|connected-collectives)',
+    destination: '/contribute',
+  },
+  {
+    source: '/:collectiveSlug/:verb(tiers|contribute|connected-collectives)',
     destination: '/contribute',
   },
   // Embed
   {
-    source: `/embed/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/:verb(donate)/:step(${contributionFlowSteps})?`,
+    source: `/embed/:parentCollectiveSlug/:collectiveType(events|projects)/:collectiveSlug/:verb(donate)/:step(${contributionFlowSteps})?`,
     destination: '/embed/contribution-flow',
   },
   {
-    source: `/embed/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/contribute/:tierSlug?-:tierId([0-9]+)/:action(checkout)?/:step(${contributionFlowSteps})?`,
+    source: `/embed/:collectiveSlug/:verb(donate)/:step(${contributionFlowSteps})?`,
+    destination: '/embed/contribution-flow',
+  },
+  {
+    source: `/embed/:parentCollectiveSlug/:collectiveType(events|projects)/:collectiveSlug/contribute/:tierSlug?-:tierId([0-9]+)/:action(checkout)?/:step(${contributionFlowSteps})?`,
+    destination: '/embed/contribution-flow',
+  },
+  {
+    source: `/embed/:collectiveSlug/contribute/:tierSlug?-:tierId([0-9]+)/:action(checkout)?/:step(${contributionFlowSteps})?`,
     destination: '/embed/contribution-flow',
   },
   // Tier page
   {
     source:
-      '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/:verb(tiers|contribute)/:tierSlug?-:tierId([0-9]+)',
+      '/:parentCollectiveSlug/:collectiveType(events|projects)/:collectiveSlug/:verb(tiers|contribute)/:tierSlug?-:tierId([0-9]+)',
+    destination: '/tier',
+  },
+  {
+    source: '/:collectiveSlug/:verb(tiers|contribute)/:tierSlug?-:tierId([0-9]+)',
     destination: '/tier',
   },
   // Conversations
@@ -255,11 +307,19 @@ exports.REWRITES = [
   },
   // New Routes -> New flow
   {
-    source: `/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/:verb(donate)/:step(${contributionFlowSteps})?`,
+    source: `/:parentCollectiveSlug/:collectiveType(events|projects)/:collectiveSlug/:verb(donate)/:step(${contributionFlowSteps})?`,
     destination: createOrderPage,
   },
   {
-    source: `/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/:verb(contribute)/:tierSlug?-:tierId([0-9]+)/checkout/:step(${contributionFlowSteps})?`,
+    source: `/:collectiveSlug/:verb(donate)/:step(${contributionFlowSteps})?`,
+    destination: createOrderPage,
+  },
+  {
+    source: `/:parentCollectiveSlug/:collectiveType(events|projects)/:collectiveSlug/:verb(contribute)/:tierSlug?-:tierId([0-9]+)/checkout/:step(${contributionFlowSteps})?`,
+    destination: createOrderPage,
+  },
+  {
+    source: `/:collectiveSlug/:verb(contribute)/:tierSlug?-:tierId([0-9]+)/checkout/:step(${contributionFlowSteps})?`,
     destination: createOrderPage,
   },
   // Generic Route
