@@ -159,7 +159,6 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign = t
                             amount={order.platformTipAmount.valueInCents}
                             currency={order.platformTipAmount.currency}
                             precision={2}
-                            amountStyles={null}
                           />
                         ),
                       }}

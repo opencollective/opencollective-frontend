@@ -71,6 +71,7 @@ const ContributorCardWithTier = ({ contribution, ...props }) => {
             </P>
             <Flex flexWrap="wrap" gridGap="4px">
               <P fontSize="14px" lineHeight="20px" fontWeight="bold">
+                what
                 <FormattedMoneyAmount
                   amount={
                     !isNil(contribution.platformTipAmount?.valueInCents)
@@ -79,7 +80,6 @@ const ContributorCardWithTier = ({ contribution, ...props }) => {
                   }
                   currency={contribution.amount.currency}
                   frequency={contribution.frequency}
-                  currencyCodeStyles={{ color: 'black.800' }}
                 />
               </P>
               {Boolean(contribution.platformTipAmount?.valueInCents) && (
@@ -98,7 +98,6 @@ const ContributorCardWithTier = ({ contribution, ...props }) => {
                       currency={contribution.amount.currency}
                       showCurrencyCode={false}
                       precision={2}
-                      amountStyles={{ fontWeight: 'normal', color: 'black.700' }}
                     />
                     <Span mx="1px"> + </Span>
                     <FormattedMoneyAmount
@@ -106,7 +105,6 @@ const ContributorCardWithTier = ({ contribution, ...props }) => {
                       currency={contribution.amount.currency}
                       showCurrencyCode={false}
                       precision={2}
-                      amountStyles={{ fontWeight: 'normal', color: 'black.700' }}
                     />
                     )
                   </P>

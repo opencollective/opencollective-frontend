@@ -170,7 +170,6 @@ export const LeaveHostModal = ({ account, host, onClose }) => {
                             count: portabilitySummary.totalCount,
                             yearlyAmount: (
                               <FormattedMoneyAmount
-                                amountStyles={null}
                                 amount={portabilitySummary.yearlyAmount}
                                 interval="year"
                                 currency={account.currency}

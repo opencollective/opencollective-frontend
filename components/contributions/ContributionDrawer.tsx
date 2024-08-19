@@ -476,7 +476,6 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                                 amount: (
                                   <FormattedMoneyAmount
                                     showCurrencyCode={false}
-                                    amountStyles={{ letterSpacing: 0 }}
                                     currency={query.data.order.totalAmount.currency}
                                     amount={query.data.order.totalAmount.valueInCents}
                                   />
@@ -493,7 +492,6 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                                   amount: (
                                     <FormattedMoneyAmount
                                       showCurrencyCode={false}
-                                      amountStyles={{ letterSpacing: 0 }}
                                       currency={query.data.order.platformTipAmount.currency}
                                       amount={query.data.order.platformTipAmount.valueInCents}
                                     />

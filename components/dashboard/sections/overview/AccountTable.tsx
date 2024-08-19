@@ -177,7 +177,6 @@ const columns: ColumnDef<AccountMetricsRow>[] = [
                 amount={comparison}
                 currency={meta.currency}
                 precision={2}
-                amountStyles={{ letterSpacing: 0 }}
                 showCurrencyCode={false}
               />
             ) : (
@@ -216,13 +215,7 @@ const columns: ColumnDef<AccountMetricsRow>[] = [
       return (
         <span className="font-medium">
           {meta.isAmount ? (
-            <FormattedMoneyAmount
-              amount={current}
-              currency={meta.currency}
-              precision={2}
-              amountStyles={{ letterSpacing: 0 }}
-              showCurrencyCode={false}
-            />
+            <FormattedMoneyAmount amount={current} currency={meta.currency} precision={2} showCurrencyCode={false} />
           ) : (
             current.toLocaleString()
           )}

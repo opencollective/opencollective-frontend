@@ -50,12 +50,7 @@ const getColumns = intl => [
       return (
         <div className="font-normal text-muted-foreground">
           {amount.valueInCents > 0 && '+'}
-          <FormattedMoneyAmount
-            amount={amount.valueInCents}
-            currency={amount.currency}
-            amountStyles={{ letterSpacing: 0 }}
-            showCurrencyCode={false}
-          />
+          <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} showCurrencyCode={false} />
         </div>
       );
     },
@@ -69,12 +64,7 @@ const getColumns = intl => [
       return (
         <div className="font-normal text-muted-foreground">
           {amount.valueInCents > 0 && '+'}
-          <FormattedMoneyAmount
-            amount={amount.valueInCents}
-            currency={amount.currency}
-            amountStyles={{ letterSpacing: 0 }}
-            showCurrencyCode={false}
-          />
+          <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} showCurrencyCode={false} />
         </div>
       );
     },

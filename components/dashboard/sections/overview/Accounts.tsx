@@ -39,7 +39,6 @@ function CollapsibleAccountsList({ accounts, label }) {
               <FormattedMoneyAmount
                 amount={totalBalance}
                 currency={accounts[0].stats.balance.currency}
-                amountStyles={{ letterSpacing: 0 }}
                 showCurrencyCode={false}
               />
             </span>
@@ -158,7 +157,6 @@ const AccountBalanceRow = ({ account, className = undefined, showDashboardLink =
           <FormattedMoneyAmount
             amount={account.stats.balance?.valueInCents}
             currency={account.stats.balance?.currency}
-            amountStyles={{ letterSpacing: 0 }}
             showCurrencyCode={false}
           />
         </span>

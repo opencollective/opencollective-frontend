@@ -14,7 +14,7 @@ export const BalancesBreakdown = ({ balances }) => {
           <FormattedMoneyAmount
             amount={valueInCents}
             currency={currency}
-            amountStyles={{ color: '#FFFFFF', fontWeight: 'bold' }}
+            amountClassName="text-white font-bold"
             showCurrencyCode={false}
           />
           <br />

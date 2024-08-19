@@ -89,7 +89,6 @@ export const getActivityVariables = (
         amount={activity.expense.amountV2.valueInCents}
         currency={activity.expense.amountV2.currency}
         precision={2}
-        amountStyles={{ letterSpacing: 0 }}
       />
     );
   },
