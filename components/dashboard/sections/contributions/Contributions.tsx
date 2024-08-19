@@ -530,7 +530,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
       includeHostedAccounts: !!includeHostedAccounts,
     },
     context: API_V2_CONTEXT,
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
   });
 
   const selectedContributionId = router.query.orderId ? parseInt(router.query.orderId as string) : null;
@@ -689,7 +689,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
         : { expectedFundsFilter: null }),
     },
     context: API_V2_CONTEXT,
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
   });
 
   const [editOrder, setEditOrder] = React.useState<{ order?: { id: string | number }; action: EditOrderActions }>({
