@@ -159,7 +159,7 @@ class OpenCollectiveFrontendApp extends App {
 
   getApolloClient = memoizeOne((ssrCache, pageServerSidePropsCache) => {
     return initClient({
-      initialState: mergeDeep(ssrCache, pageServerSidePropsCache),
+      initialState: mergeDeep(ssrCache || {}, pageServerSidePropsCache || {}),
       twoFactorAuthContext: this.props.twoFactorAuthContext,
     });
   });

@@ -105,12 +105,13 @@ const HostApplications = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
 
   const { data, error, loading } = useQuery(hostApplicationsQuery, {
     variables: { hostSlug, ...queryFilter.variables },
-    fetchPolicy: 'cache-and-network',
     context: API_V2_CONTEXT,
   });
 
   // Open application account id, checking hash for backwards compatibility
-  const accountId = Number(router.query.accountId || window?.location.hash.split('application-')[1]);
+  const accountId = Number(
+    router.query.accountId || (typeof window !== 'undefined' && window?.location.hash.split('application-')[1]),
+  );
   const [applicationInDrawer, setApplicationInDrawer] = React.useState(null);
   const drawerOpen = accountId && applicationInDrawer;
 

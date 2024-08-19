@@ -106,7 +106,7 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
   const { data, error, loading, refetch } = useQuery(accountsQuery, {
     variables: { accountSlug, ...queryFilter.variables },
     context: API_V2_CONTEXT,
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
   });
   useEffect(() => {
     if (subpath[0] !== ((showCollectiveOverview as Collective)?.id || showCollectiveOverview)) {
