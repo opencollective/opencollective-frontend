@@ -45,6 +45,7 @@ const DateTime = ({ value, dateStyle, timeStyle, omitTimeIfMidnight, ...props }:
       title={title}
       dateTime={date.toISOString()}
       onMouseEnter={() => setTitle(generateDateTitle(intl, date))}
+      suppressHydrationWarning
     >
       <FormattedDate dateStyle={dateStyle || 'long'} timeStyle={timeStyle} value={date} />
     </time>
