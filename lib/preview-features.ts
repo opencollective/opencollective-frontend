@@ -88,7 +88,7 @@ export const previewFeatures: PreviewFeature[] = [
       if (!enabled) {
         document.cookie = 'enableAuthSsr=; Max-Age=0';
       } else {
-        document.cookie = 'enableAuthSsr=; Max-Age=9999999';
+        document.cookie = 'enableAuthSsr=1; Path=/; Max-Age=9999999';
       }
     },
   },
@@ -105,7 +105,7 @@ export const previewFeatures: PreviewFeature[] = [
       if (!enabled) {
         document.cookie = 'backend=; Max-Age=0';
       } else {
-        document.cookie = 'backend=vercel; Max-Age=9999999';
+        document.cookie = 'backend=vercel; Path=/; Max-Age=9999999';
       }
     },
   },
