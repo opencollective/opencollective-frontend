@@ -86,7 +86,7 @@ export const previewFeatures: PreviewFeature[] = [
     },
     setIsEnabled(enabled) {
       if (!enabled) {
-        document.cookie = 'enableAuthSsr=; Max-Age=0';
+        document.cookie = 'enableAuthSsr=; Path=/; Max-Age=0';
       } else {
         document.cookie = 'enableAuthSsr=1; Path=/; Max-Age=9999999';
       }
@@ -103,7 +103,7 @@ export const previewFeatures: PreviewFeature[] = [
     },
     setIsEnabled(enabled) {
       if (!enabled) {
-        document.cookie = 'backend=; Max-Age=0';
+        document.cookie = 'backend=; Path=/; Max-Age=0';
       } else {
         document.cookie = 'backend=vercel; Path=/; Max-Age=9999999';
       }
