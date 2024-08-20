@@ -28,6 +28,7 @@ const AccountSettings = ({ account, section }) => {
   const { data, loading } = useQuery(editCollectivePageQuery, {
     variables: { slug: account.slug },
     fetchPolicy: 'network-only',
+    ssr: false,
     skip: !LoggedInUser,
   });
   const collective = data?.Collective;

@@ -23,7 +23,7 @@ import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import i18nOrderStatus from '../../../../lib/i18n/order-status';
 import { i18nPaymentMethodProviderType } from '../../../../lib/i18n/payment-method-provider-type';
 import type LoggedInUser from '../../../../lib/LoggedInUser';
-import { sortSelectOptions } from '../../../../lib/utils';
+import { getWebsiteUrl, sortSelectOptions } from '../../../../lib/utils';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
@@ -1046,7 +1046,7 @@ const getContributionActions: (opts: GetContributionActionsOptions) => GetAction
 
     const toAccount = order.toAccount;
     const legacyId = order.legacyId;
-    const orderUrl = new URL(`${toAccount.slug}/orders/${legacyId}`, window.location.origin);
+    const orderUrl = new URL(`${toAccount.slug}/orders/${legacyId}`, getWebsiteUrl());
 
     actions.secondary.push({
       key: 'copy-link',

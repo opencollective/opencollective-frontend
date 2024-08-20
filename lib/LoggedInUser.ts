@@ -230,6 +230,10 @@ class LoggedInUser {
       return false;
     }
 
+    if ('isEnabled' in feature && typeof feature.isEnabled === 'function') {
+      return feature.isEnabled();
+    }
+
     const enabledByDefault = feature.enabledByDefaultFor?.some(
       slug => slug === '*' || this.hasRole([MemberRole.ADMIN, MemberRole.MEMBER], { slug }),
     );

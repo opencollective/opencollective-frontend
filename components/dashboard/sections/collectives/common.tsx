@@ -197,7 +197,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       return isNil(since) ? (
         ''
       ) : (
-        <div className="whitespace-nowrap">
+        <div suppressHydrationWarning className="whitespace-nowrap">
           <FormattedDate value={since} day="numeric" month="long" year="numeric" />
         </div>
       );
