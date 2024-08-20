@@ -58,8 +58,10 @@ const ExpenseRecurringEditModal = ({ onClose, expense }) => {
   };
 
   return (
-    <StyledModal role="alertdialog" width="432px" onClose={onClose} padding="auto" px={4} py="20px" trapFocus>
-      <ModalHeader onClose={onClose}>Recurring Expense Setting</ModalHeader>
+    <StyledModal role="alertdialog" onClose={onClose} padding="auto" px={4} py="20px" trapFocus>
+      <ModalHeader onClose={onClose}>
+        <FormattedMessage defaultMessage="Recurring Expense Settings" id="L/TmUV" />
+      </ModalHeader>
       <ModalBody pt={2}>
         <Flex flexDirection={'column'}>
           <P color="black.700" fontWeight="400" fontSize="14px" lineHeight="20px" mt={0} mb={2}>

@@ -242,7 +242,7 @@ const FiscalHosting = ({ collective }) => {
       )}
 
       {activateAsHostModal.show && (
-        <StyledModal width="570px" onClose={closeActivateAsHost}>
+        <StyledModal onClose={closeActivateAsHost}>
           <ModalHeader onClose={closeActivateAsHost}>
             {activateAsHostModal.type === 'Activate' && (
               <FormattedMessage id="collective.activateAsHost" defaultMessage="Activate as Host" />
@@ -345,7 +345,7 @@ const FiscalHosting = ({ collective }) => {
       )}
 
       {activateBudgetModal.show && (
-        <StyledModal width="570px" onClose={closeActivateBudget}>
+        <StyledModal onClose={closeActivateBudget}>
           <ModalHeader onClose={closeActivateBudget}>
             {activateBudgetModal.type === 'Activate' && (
               <FormattedMessage id="FiscalHosting.budget.activate" defaultMessage="Activate Host Budget" />

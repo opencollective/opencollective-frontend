@@ -21,7 +21,7 @@ const ApplicationMessageModal = ({ collective, onClose, onConfirm, ...modalProps
   const setMessage = useCallback(_setMessage, [_setMessage]);
 
   return (
-    <StyledModal onClose={onClose} width="576px" {...modalProps} trapFocus>
+    <StyledModal onClose={onClose} {...modalProps} trapFocus>
       <ModalHeader hideCloseIcon>
         <Flex justifyContent="space-between" flexDirection={['column', 'row']} width="100%">
           <Flex>

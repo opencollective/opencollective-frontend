@@ -15,7 +15,7 @@ import { ACCOUNTING_CATEGORY_HOST_FIELDS } from './expenses/lib/accounting-categ
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './ui/Command';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/Popover';
 
-type RequiredHostFields = Pick<Host, 'id' | 'slug'> & {
+type RequiredHostFields = Pick<Host, 'id' | 'slug' | 'type'> & {
   [K in (typeof ACCOUNTING_CATEGORY_HOST_FIELDS)[number]]?: { nodes: RequiredAccountingCategoryFields[] };
 };
 

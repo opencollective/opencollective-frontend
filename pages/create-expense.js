@@ -397,6 +397,7 @@ class CreateExpensePage extends React.Component {
                             shouldLoadValuesFromPersister={this.state.isInitialForm}
                             defaultStep={step}
                             autoFocusTitle
+                            canEditPayoutMethod
                           />
                         ) : (
                           <div>

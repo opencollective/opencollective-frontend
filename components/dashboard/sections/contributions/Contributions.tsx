@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { compact, omit } from 'lodash';
-import { LinkIcon, PlusIcon } from 'lucide-react';
+import { LinkIcon, Pencil, PlusIcon } from 'lucide-react';
 import { useRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
@@ -9,15 +9,20 @@ import type { z } from 'zod';
 
 import type { GetActions } from '../../../../lib/actions/types';
 import { EMPTY_ARRAY } from '../../../../lib/constants/utils';
-import type { LoggedInUser as LoggedInUserType } from '../../../../lib/custom_typings/LoggedInUser';
 import type { Views } from '../../../../lib/filters/filter-types';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 import type { ContributionDrawerQuery } from '../../../../lib/graphql/types/v2/graphql';
-import { ContributionFrequency, ExpectedFundsFilter, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
+import {
+  ContributionFrequency,
+  ExpectedFundsFilter,
+  OrderStatus,
+  PaymentMethodType,
+} from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import i18nOrderStatus from '../../../../lib/i18n/order-status';
 import { i18nPaymentMethodProviderType } from '../../../../lib/i18n/payment-method-provider-type';
+import type LoggedInUser from '../../../../lib/LoggedInUser';
 import { sortSelectOptions } from '../../../../lib/utils';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
@@ -88,6 +93,16 @@ const dashboardContributionsMetadataQuery = gql`
           id
           slug
           type
+        }
+      }
+      ... on AccountWithHost {
+        host {
+          id
+          slug
+          name
+          imageUrl
+          type
+          hostFeePercent
         }
       }
       ALL: orders(
@@ -515,7 +530,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
       includeHostedAccounts: !!includeHostedAccounts,
     },
     context: API_V2_CONTEXT,
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
   });
 
   const selectedContributionId = router.query.orderId ? parseInt(router.query.orderId as string) : null;
@@ -674,7 +689,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
         : { expectedFundsFilter: null }),
     },
     context: API_V2_CONTEXT,
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
   });
 
   const [editOrder, setEditOrder] = React.useState<{ order?: { id: string | number }; action: EditOrderActions }>({
@@ -761,6 +776,9 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
     },
     onEditExpectedFundsClick(order) {
       setEditingExpectedFunds(order);
+    },
+    onEditAddedFundsClick(order) {
+      setEditOrder({ order, action: 'editAddedFunds' });
     },
   });
 
@@ -868,6 +886,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
             order={editOrder.order}
             action={editOrder.action}
             onClose={() => setEditOrder({ order: null, action: null })}
+            onSuccess={() => refetch()}
           />
         )}
         <Pagination queryFilter={queryFilter} total={data?.account?.orders.totalCount} />
@@ -882,7 +901,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
         <ContributionConfirmationModal
           order={confirmCompletedOrder}
           onClose={() => setConfirmCompletedOrder(false)}
-          onSuccess={() => {}}
+          onSuccess={() => refetch()}
         />
       )}
       {editingExpectedFunds && (
@@ -901,7 +920,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
 };
 
 type GetContributionActionsOptions = {
-  LoggedInUser: LoggedInUserType;
+  LoggedInUser: LoggedInUser;
   intl: IntlShape;
   onUpdatePaymentMethodClick: (order: ContributionDrawerQuery['order']) => void;
   onResumeClick: (order: ContributionDrawerQuery['order']) => void;
@@ -910,6 +929,7 @@ type GetContributionActionsOptions = {
   onMarkAsExpiredClick: (order: ContributionDrawerQuery['order']) => void;
   onCancelClick: (order: ContributionDrawerQuery['order']) => void;
   onEditExpectedFundsClick: (order: ContributionDrawerQuery['order']) => void;
+  onEditAddedFundsClick: (order: ContributionDrawerQuery['order']) => void;
 };
 
 const getContributionActions: (opts: GetContributionActionsOptions) => GetActions<ContributionDrawerQuery['order']> =
@@ -945,12 +965,6 @@ const getContributionActions: (opts: GetContributionActionsOptions) => GetAction
       [OrderStatus.PENDING, OrderStatus.EXPIRED].includes(order.status) && order.permissions.canMarkAsPaid;
     const canMarkAsExpired = order.status === OrderStatus.PENDING && order.permissions.canMarkAsExpired;
     const isExpectedFunds = !!order.pendingContributionData?.expectedAt;
-
-    const canDoActions = [canUpdateActiveOrder, canResume, canCancel, canMarkAsCompleted, canMarkAsExpired];
-
-    if (!canDoActions.some(Boolean)) {
-      return null;
-    }
 
     if (canUpdateActiveOrder) {
       actions.primary.push({
@@ -1017,6 +1031,19 @@ const getContributionActions: (opts: GetContributionActionsOptions) => GetAction
       });
     }
 
+    if (order.paymentMethod?.type === PaymentMethodType.HOST) {
+      actions.primary.push({
+        key: 'edit-funds',
+        label: (
+          <React.Fragment>
+            <Pencil size={16} className="text-muted-foreground" />
+            {opts.intl.formatMessage({ defaultMessage: 'Edit funds', id: 'Kbjd3f' })}
+          </React.Fragment>
+        ),
+        onClick: () => opts.onEditAddedFundsClick(order),
+      });
+    }
+
     const toAccount = order.toAccount;
     const legacyId = order.legacyId;
     const orderUrl = new URL(`${toAccount.slug}/orders/${legacyId}`, window.location.origin);
@@ -1025,12 +1052,15 @@ const getContributionActions: (opts: GetContributionActionsOptions) => GetAction
       key: 'copy-link',
       label: (
         <CopyID
-          Icon={<LinkIcon size={12} />}
+          Icon={null}
           value={orderUrl}
           tooltipLabel={<FormattedMessage defaultMessage="Copy link" id="CopyLink" />}
-          className="inline-flex items-center gap-1"
+          className=""
         >
-          <FormattedMessage defaultMessage="Copy link" id="CopyLink" />
+          <div className="flex flex-row items-center gap-2.5">
+            <LinkIcon size={16} className="text-muted-foreground" />
+            <FormattedMessage defaultMessage="Copy link" id="CopyLink" />
+          </div>
         </CopyID>
       ),
       onClick: () => {},

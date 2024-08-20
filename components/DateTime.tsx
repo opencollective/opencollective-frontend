@@ -22,6 +22,7 @@ type DateTimeProps = {
   value: string | Date | typeof dayjs;
   dateStyle?: 'full' | 'long' | 'medium' | 'short';
   timeStyle?: 'full' | 'long' | 'medium' | 'short' | null | undefined;
+  omitTimeIfMidnight?: boolean;
   className?: string;
 };
 
@@ -29,10 +30,15 @@ type DateTimeProps = {
  * A wrapper around `FormattedDate` + HTML `<time>` with sensible defaults.
  * Displays the full date and time in the user's locale and in UTC in the title.
  */
-const DateTime = ({ value, dateStyle, timeStyle, ...props }: DateTimeProps) => {
+const DateTime = ({ value, dateStyle, timeStyle, omitTimeIfMidnight, ...props }: DateTimeProps) => {
   const intl = useIntl();
   const [title, setTitle] = React.useState();
   const date = React.useMemo(() => getDateFromValue(value), [value]);
+
+  if (omitTimeIfMidnight && timeStyle) {
+    timeStyle = date.getUTCHours() === 0 && date.getUTCMinutes() === 0 ? undefined : timeStyle;
+  }
+
   return (
     <time
       {...props}

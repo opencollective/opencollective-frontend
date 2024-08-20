@@ -223,6 +223,9 @@ export const LongDescriptionForm = ({ initialValues, schema, onSubmit }) => {
                   <RichTextEditor
                     kind="ACCOUNT_LONG_DESCRIPTION"
                     {...field}
+                    withStickyToolbar
+                    toolbarOffsetY={0}
+                    toolbarTop={[0, -80]}
                     defaultValue={field.value}
                     onChange={e => formik.setFieldValue('longDescription', e.target.value)}
                     placeholder="Tell your story..."

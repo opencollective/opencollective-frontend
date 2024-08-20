@@ -276,7 +276,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
   }, [useTwoSteps]);
 
   return (
-    <StyledModal onClose={onClose} width="570px" {...props}>
+    <StyledModal onClose={onClose} {...props}>
       {loading ? (
         <React.Fragment>
           <ModalHeader hideCloseIcon>
