@@ -23,6 +23,7 @@ import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
 import { P } from '../Text';
+import { Button } from '../ui/Button';
 import { useToast } from '../ui/useToast';
 
 import { CommentMetadata } from './CommentMetadata';
@@ -197,14 +198,15 @@ const CommentActions = ({
   return (
     <React.Fragment>
       <div>
-        <StyledButton
+        <Button
           ref={setRefElement}
-          buttonSize="tiny"
+          variant="outline"
+          size="xs"
           data-cy="commnent-actions-trigger"
           onClick={() => setShowAdminActions(!showAdminActions)}
         >
           <DotsHorizontalRounded size="16" />
-        </StyledButton>
+        </Button>
       </div>
 
       {showAdminActions && (
