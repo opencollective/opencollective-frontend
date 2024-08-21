@@ -17,6 +17,11 @@ type SmallThreadActivityProps = {
 export default function SmallThreadActivity(props: SmallThreadActivityProps) {
   const theme = useTheme();
   const intl = useIntl();
+
+  if (!props.activity) {
+    return null;
+  }
+
   const activityColors = getActivityColors(props.activity.type, theme);
   const message = ACTIVITIES_INFO[props.activity.type]?.message;
   const details =
@@ -24,10 +29,6 @@ export default function SmallThreadActivity(props: SmallThreadActivityProps) {
     props.activity.data?.message ||
     props.activity.data?.error?.message;
   const DataRenderer = ACTIVITIES_INFO[props.activity.type]?.DataRenderer;
-
-  if (!props.activity) {
-    return null;
-  }
 
   return (
     <div

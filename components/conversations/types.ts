@@ -8,6 +8,9 @@ type ThreadItem =
       __typename?: 'Activity';
       id: string;
     };
+
+// Used in jsdoc comment of javascript Thread component
+// ts-unused-exports:disable-next-line
 export type ThreadProps = {
   items: ThreadItem[];
   onCommentDeleted?: (comment: CommentItem) => void;
@@ -27,6 +30,8 @@ export type SmallThreadProps = ThreadProps & {
   canComment?: boolean;
 };
 
+// Used in jsdoc comment of javascript Thread component
+// ts-unused-exports:disable-next-line
 export type ThreadPropsWithVariant = ThreadProps | SmallThreadProps;
 
 export type CommentProps = {
@@ -42,6 +47,8 @@ export type CommentProps = {
   onReplyClick: (comment: CommentItem) => void;
 };
 
+// Used in jsdoc comment of javascript Thread component
+// ts-unused-exports:disable-next-line
 export type CommentPropsWithVariant = CommentProps & {
   variant?: 'small';
 };

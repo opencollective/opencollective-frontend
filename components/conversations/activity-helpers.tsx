@@ -194,7 +194,7 @@ export const isSupportedActivity = activity => {
   return Object.prototype.hasOwnProperty.call(ACTIVITIES_INFO, activity.type);
 };
 
-export function ExpenseTransactionRenderer({ activity }) {
+function ExpenseTransactionRenderer({ activity }) {
   const intl = useIntl();
   if (!activity.transaction) {
     return null;

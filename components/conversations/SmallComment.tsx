@@ -55,7 +55,7 @@ export default function SmallComment(props: CommentProps) {
           <div>
             <div className="mb-1 text-sm font-medium leading-5">{comment.fromAccount.name}</div>
             <div className="text-sm leading-4 text-[#75777A]">
-              <DateTime dateStyle="medium" value={comment?.createdAt} />
+              <DateTime dateStyle="medium" value={comment.createdAt} />
             </div>
             <div className="mt-4">
               <InlineEditField
