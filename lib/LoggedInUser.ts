@@ -6,7 +6,7 @@ import type { GraphQLV1Collective } from './custom_typings/GraphQLV1Collective';
 import {
   type Account,
   type AccountWithParent,
-  type Comment,
+  type CommentFieldsFragment,
   MemberRole,
   type Update,
 } from './graphql/types/v2/graphql';
@@ -111,7 +111,7 @@ class LoggedInUser {
    * - creator of the comment
    * - is admin or host of the collective
    */
-  canEditComment(comment: Comment) {
+  canEditComment(comment: CommentFieldsFragment) {
     if (!comment) {
       return false;
     }
