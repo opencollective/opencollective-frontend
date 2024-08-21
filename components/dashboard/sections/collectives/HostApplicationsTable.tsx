@@ -2,7 +2,11 @@ import React from 'react';
 import type { ColumnDef, TableMeta } from '@tanstack/react-table';
 import { FormattedMessage } from 'react-intl';
 
-import type { HostApplication, HostApplicationStatus } from '../../../../lib/graphql/types/v2/graphql';
+import type {
+  HostApplication,
+  HostApplicationFieldsFragment,
+  HostApplicationStatus,
+} from '../../../../lib/graphql/types/v2/graphql';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
@@ -14,8 +18,8 @@ import { DataTable } from '../../../table/DataTable';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/DropdownMenu';
 import { TableActionsButton } from '../../../ui/Table';
 
-interface ApplicationMeta extends TableMeta<HostApplication> {
-  openApplication: (agreement: HostApplication) => void;
+interface ApplicationMeta extends TableMeta<HostApplicationFieldsFragment> {
+  openApplication: (agreement: HostApplicationFieldsFragment) => void;
 }
 
 const StatusTag = ({ status }: { status: HostApplicationStatus }) => {
@@ -45,13 +49,13 @@ const StatusTag = ({ status }: { status: HostApplicationStatus }) => {
   }
 };
 
-const columns: ColumnDef<HostApplication>[] = [
+const columns: ColumnDef<HostApplicationFieldsFragment>[] = [
   {
     accessorKey: 'account',
     header: () => <FormattedMessage defaultMessage="Account" id="TwyMau" />,
     meta: { className: 'w-56' },
     cell: ({ cell }) => {
-      const account = cell.getValue() as HostApplication['account'];
+      const account = cell.getValue() as HostApplicationFieldsFragment['account'];
 
       return (
         <AccountHoverCard
@@ -67,8 +71,21 @@ const columns: ColumnDef<HostApplication>[] = [
     },
   },
   {
+    accessorKey: 'message',
+    meta: { className: 'w-24 md:w-auto' },
+    header: () => <FormattedMessage id="Contact.Message" defaultMessage="Message" />,
+    cell: ({ cell }) => {
+      const message = cell.getValue() as HostApplication['message'];
+      return (
+        <div className="truncate">
+          <p className="truncate italic">{message}</p>
+        </div>
+      );
+    },
+  },
+  {
     accessorKey: 'account.admins',
-    meta: { className: 'w-24' },
+    meta: { className: 'w-24 px-3' },
     header: () => <FormattedMessage id="Admins" defaultMessage="Admins" />,
     cell: ({ cell }) => {
       const admins = cell.getValue() as HostApplication['account']['members'];
@@ -87,19 +104,6 @@ const columns: ColumnDef<HostApplication>[] = [
             />
           ))}
           {admins.totalCount > 3 && <div className="pl-2 text-slate-600">+{admins.totalCount - 3}</div>}
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: 'message',
-    meta: { className: 'w-24 md:w-auto' },
-    header: () => <FormattedMessage id="Contact.Message" defaultMessage="Message" />,
-    cell: ({ cell }) => {
-      const message = cell.getValue() as HostApplication['message'];
-      return (
-        <div className="truncate">
-          <p className="truncate italic">{message}</p>
         </div>
       );
     },
@@ -163,8 +167,8 @@ const columns: ColumnDef<HostApplication>[] = [
 ];
 
 type ApplicationsTableProps = {
-  hostApplications: { nodes: HostApplication[] };
-  openApplication: (application: HostApplication) => void;
+  hostApplications: HostApplicationFieldsFragment[];
+  openApplication: (application: HostApplicationFieldsFragment) => void;
   resetFilters?: () => void;
   loading?: boolean;
   nbPlaceholders?: number;
@@ -182,7 +186,7 @@ export default function HostApplicationsTable({
       data-cy="host-applications-table"
       innerClassName="table-fixed"
       columns={columns}
-      data={hostApplications?.nodes || []}
+      data={hostApplications}
       meta={{ openApplication } as ApplicationMeta}
       loading={loading}
       nbPlaceholders={nbPlaceholders}
