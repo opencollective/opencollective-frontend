@@ -1,8 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { CaretDown } from '@styled-icons/fa-solid/CaretDown';
-import { CaretUp } from '@styled-icons/fa-solid/CaretUp';
 import { Markup } from 'interweave';
+import { merge, pick } from 'lodash';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { getLuminance } from 'polished';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -31,6 +31,10 @@ export const isEmptyHTMLValue = value => {
 };
 
 const ReadFullLink = styled.a`
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
   cursor: pointer;
   font-size: 12px;
   > svg {
@@ -48,7 +52,7 @@ const InlineDisplayBox = styled.div`
 
 const CollapsedDisplayBox = styled.div`
   overflow-y: hidden;
-  ${props => props.maxHeight && `max-height: ${props.maxCollapsedHeight + 20}px;`}
+  ${props => props.maxCollapsedHeight && `max-height: ${props.maxCollapsedHeight + 20}px;`}
   -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
   mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
 `;
@@ -71,6 +75,7 @@ const HTMLContent = styled(
     collapsePadding = 1,
     hideViewMoreLink = false,
     openLinksInNewTab = false,
+    readMoreMessage,
     ...props
   }) => {
     const [isOpen, setOpen] = React.useState(false);
@@ -79,8 +84,8 @@ const HTMLContent = styled(
 
     const DisplayBox = !isCollapsed || isOpen ? InlineDisplayBox : CollapsedDisplayBox;
 
-    useEffect(() => {
-      if (collapsable && contentRef?.current?.clientHeight > maxCollapsedHeight + collapsePadding) {
+    useLayoutEffect(() => {
+      if (collapsable && contentRef?.current?.scrollHeight > maxCollapsedHeight + collapsePadding) {
         setIsCollapsed(true);
       }
     }, [content]);
@@ -137,8 +142,8 @@ const HTMLContent = styled(
               }
             }}
           >
-            <FormattedMessage id="ExpandDescription" defaultMessage="Read full description" />
-            <CaretDown size="10px" />
+            {readMoreMessage || <FormattedMessage id="ExpandDescription" defaultMessage="Read full description" />}
+            <ChevronDown size={10} />
           </ReadFullLink>
         )}
         {isOpen && isCollapsed && (
@@ -155,7 +160,7 @@ const HTMLContent = styled(
             }}
           >
             <FormattedMessage defaultMessage="Collapse" id="W/V6+Y" />
-            <CaretUp size="10px" />
+            <ChevronUp size={10} />
           </ReadFullLink>
         )}
       </div>
