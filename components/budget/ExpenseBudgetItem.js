@@ -212,7 +212,7 @@ const ExpenseBudgetItem = ({
                               fontSize={fontSize}
                               data-cy="expense-title"
                             >
-                              {value} wh
+                              {value}
                             </H3>
                           );
                         }}
