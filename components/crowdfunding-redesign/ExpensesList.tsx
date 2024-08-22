@@ -87,7 +87,6 @@ export default function ExpensesList({ account }) {
                         amount={expense.amountV2.valueInCents}
                         currency={expense.amountV2.currency}
                         showCurrencyCode={false}
-                        amountStyles={{ letterSpacing: 0 }}
                       />
                     </div>
                     <Badge size="sm" type="success">

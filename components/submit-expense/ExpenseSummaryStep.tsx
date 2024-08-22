@@ -168,7 +168,6 @@ export function ExpenseSummaryForm(props: ExpenseSummaryFormProps) {
             </div>
             <div className="text-sm">
               <FormattedMoneyAmount
-                amountStyles={{ fontWeight: 'normal' }}
                 amount={account?.stats?.balance?.valueInCents}
                 currency={account?.stats?.balance?.currency}
               />
@@ -265,7 +264,6 @@ function ExpenseItemSummary(props: { expenseItem: ExpenseItem; currency: string 
             <AmountWithExchangeRateInfo
               amount={props.expenseItem.amount as any}
               invertIconPosition
-              amountStyles={{ letterSpacing: 0 }}
               {...getExpenseExchangeRateWarningOrError(
                 intl,
                 props.expenseItem.amount.exchangeRate,

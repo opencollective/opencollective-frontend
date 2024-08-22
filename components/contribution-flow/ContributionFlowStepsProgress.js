@@ -36,7 +36,6 @@ const PrettyAmountFromStepDetails = ({ stepDetails, currency, isFreeTier }) => {
         currency={currency}
         amount={totalAmount}
         abbreviateInterval
-        amountStyles={null}
       />
     );
   } else if (stepDetails.amount === 0 && isFreeTier) {

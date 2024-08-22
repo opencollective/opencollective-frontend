@@ -156,7 +156,6 @@ const transactionsTableColumns = [
             amount={netAmount.valueInCents}
             currency={netAmount.currency}
             precision={2}
-            amountStyles={{ letterSpacing: 0 }}
             showCurrencyCode={false}
           />
         </div>

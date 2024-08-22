@@ -21,7 +21,6 @@ import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import AutosizeText from '../AutosizeText';
 import Avatar from '../Avatar';
 import { AvatarWithLink } from '../AvatarWithLink';
-import Container from '../Container';
 import DateTime from '../DateTime';
 import AdminExpenseStatusTag from '../expenses/AdminExpenseStatusTag';
 import { ExpenseAccountingCategoryPill } from '../expenses/ExpenseAccountingCategoryPill';
@@ -42,7 +41,7 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 import Tags from '../Tags';
-import { H3, Span } from '../Text';
+import { H3 } from '../Text';
 import TransactionSign from '../TransactionSign';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
@@ -203,18 +202,20 @@ const ExpenseBudgetItem = ({
                         mobileRatio={0.875}
                         valueFormatter={toPx}
                       >
-                        {({ value, fontSize }) => (
-                          <H3
-                            fontWeight="500"
-                            lineHeight="1.5em"
-                            textDecoration="none"
-                            color="black.900"
-                            fontSize={fontSize}
-                            data-cy="expense-title"
-                          >
-                            {value}
-                          </H3>
-                        )}
+                        {({ value, fontSize }) => {
+                          return (
+                            <H3
+                              fontWeight="500"
+                              lineHeight="1.5em"
+                              textDecoration="none"
+                              color="black.900"
+                              fontSize={fontSize}
+                              data-cy="expense-title"
+                            >
+                              {value} wh
+                            </H3>
+                          );
+                        }}
                       </AutosizeText>
                     </StyledLink>
                   </span>
@@ -304,7 +305,6 @@ const ExpenseBudgetItem = ({
                               get(expense.account, 'stats.balanceWithBlockedFunds', 0),
                             )}
                             currency={expense.account.currency}
-                            amountStyles={{ color: 'black.700' }}
                           />
                         ),
                       }}
@@ -338,14 +338,17 @@ const ExpenseBudgetItem = ({
               <React.Fragment>
                 <div>
                   {showAmountSign && <TransactionSign isCredit={isInverted} />}
-                  <Span color="black.700" fontSize="16px">
-                    <FormattedMoneyAmount amount={expense.amount} currency={expense.currency} precision={2} />
-                  </Span>
+                  <FormattedMoneyAmount
+                    amountClassName="font-bold"
+                    amount={expense.amount}
+                    currency={expense.currency}
+                    precision={2}
+                  />
                 </div>
                 {isMultiCurrency && (
-                  <Container color="black.600" fontSize="13px" my={1}>
+                  <div className="my-1 text-sm text-muted-foreground">
                     <AmountWithExchangeRateInfo amount={expense.amountInAccountCurrency} />
-                  </Container>
+                  </div>
                 )}
               </React.Fragment>
             )}

@@ -329,12 +329,7 @@ export const MatchContributionDialog = ({
                     <strong>
                       <FormattedMessage id="Fields.amount" defaultMessage="Amount" />
                     </strong>
-                    :{' '}
-                    <FormattedMoneyAmount
-                      amount={row.amount.valueInCents}
-                      currency={row.amount.currency}
-                      amountStyles={null}
-                    />{' '}
+                    : <FormattedMoneyAmount amount={row.amount.valueInCents} currency={row.amount.currency} />{' '}
                     <FilterWithRawValueButton
                       message={<FormattedMessage defaultMessage="Search amount" id="o9K20a" />}
                       SecondaryIcon={Coins}
@@ -414,7 +409,6 @@ export const MatchContributionDialog = ({
                       :{' '}
                       <FormattedMoneyAmount
                         amount={selectedContribution.totalAmount.valueInCents}
-                        amountStyles={null}
                         currency={selectedContribution.totalAmount.currency}
                       />
                       {selectedContribution.platformTipAmount?.valueInCents > 0 && (
@@ -428,7 +422,6 @@ export const MatchContributionDialog = ({
                                   amount={selectedContribution.platformTipAmount.valueInCents}
                                   currency={selectedContribution.platformTipAmount.currency}
                                   precision={2}
-                                  amountStyles={null}
                                 />
                               ),
                             }}

@@ -75,7 +75,6 @@ function FundraiserCard({ account, isRoot = false }) {
                           amount={currentAmount || 0}
                           currency={currency}
                           showCurrencyCode={false}
-                          amountStyles={{ letterSpacing: 0 }}
                           precision={0}
                         />
                         {' raised'}

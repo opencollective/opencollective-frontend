@@ -79,7 +79,7 @@ const Tiers = ({ account }) => {
                       amount={graphqlAmountValueInCents(minAmount)}
                       frequency={tier.frequency && tier.frequency !== TierFrequency.FLEXIBLE ? tier.frequency : null}
                       currency={currency}
-                      amountStyles={{ fontSize: '24px', lineHeight: '22px', fontWeight: 'bold', color: 'black.900' }}
+                      amountClassName="text-foreground font-bold text-2xl"
                       precision={getPrecisionFromAmount(graphqlAmountValueInCents(minAmount))}
                     />
                     {taxes.length > 0 && ' *'}
@@ -147,7 +147,6 @@ const Goals = ({ account }) => {
                     amount={currentAmount}
                     currency={currency}
                     showCurrencyCode={true}
-                    amountStyles={{ letterSpacing: 0 }}
                     precision={0}
                   />
                 </span>
@@ -163,7 +162,6 @@ const Goals = ({ account }) => {
               amount={goalTarget.amount}
               currency={currency}
               showCurrencyCode={false}
-              amountStyles={{ letterSpacing: 0 }}
               precision={0}
             />{' '}
             {hasYearlyGoal ? <span>per year</span> : hasMonthlyGoal && <span>per month</span>} goal

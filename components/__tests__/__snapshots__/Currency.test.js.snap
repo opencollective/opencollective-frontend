@@ -2,7 +2,7 @@
 
 exports[`Currency currency format with separators 1`] = `
 <span
-  className="Text__P-sc-6ff087f9-0 Text__Span-sc-6ff087f9-1 rlLpk"
+  className="whitespace-nowrap"
 >
   $
   42
@@ -11,7 +11,7 @@ exports[`Currency currency format with separators 1`] = `
 
 exports[`Currency currency format with separators 2`] = `
 <span
-  className="Text__P-sc-6ff087f9-0 Text__Span-sc-6ff087f9-1 rlLpk"
+  className="whitespace-nowrap"
 >
   $
   19 000
@@ -20,7 +20,7 @@ exports[`Currency currency format with separators 2`] = `
 
 exports[`Currency currency format with separators 3`] = `
 <span
-  className="Text__P-sc-6ff087f9-0 Text__Span-sc-6ff087f9-1 rlLpk"
+  className="whitespace-nowrap"
 >
   $
   19,000
@@ -29,7 +29,7 @@ exports[`Currency currency format with separators 3`] = `
 
 exports[`Currency renders default options 1`] = `
 <span
-  className="Text__P-sc-6ff087f9-0 Text__Span-sc-6ff087f9-1 rlLpk"
+  className="whitespace-nowrap"
 >
   $42
 </span>
@@ -37,7 +37,7 @@ exports[`Currency renders default options 1`] = `
 
 exports[`Currency renders default options 2`] = `
 <span
-  className="Text__P-sc-6ff087f9-0 Text__Span-sc-6ff087f9-1 rlLpk"
+  className="whitespace-nowrap"
 >
   19 000 $
 </span>

@@ -80,11 +80,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
               />
             </Label>
             <Amount>
-              <FormattedMoneyAmount
-                amount={amount || 0}
-                currency={currency}
-                amountStyles={{ color: 'black.700', fontWeight: 400 }}
-              />
+              <FormattedMoneyAmount amount={amount || 0} currency={currency} />
             </Amount>
           </AmountLine>
           {Boolean(stepSummary?.taxType) &&
@@ -96,11 +92,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
                   {i18nTaxType(intl, stepSummary.taxType)} {stepSummary.percentage}%
                 </Label>
                 <Amount>
-                  <FormattedMoneyAmount
-                    amount={stepSummary.amount}
-                    currency={currency}
-                    amountStyles={{ color: 'black.700', fontWeight: 400 }}
-                  />
+                  <FormattedMoneyAmount amount={stepSummary.amount} currency={currency} />
                 </Amount>
               </AmountLine>
             ))}
@@ -119,11 +111,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
                 )}
               </Label>
               <Amount data-cy="ContributionSummary-Tip">
-                <FormattedMoneyAmount
-                  amount={platformTip}
-                  currency={currency}
-                  amountStyles={{ color: 'black.700', fontWeight: 400 }}
-                />
+                <FormattedMoneyAmount amount={platformTip} currency={currency} />
               </Amount>
             </AmountLine>
           )}
@@ -136,7 +124,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
           <FormattedMessage id="TodaysCharge" defaultMessage="Today's charge" />
         </Label>
         <Amount fontWeight="700" data-cy="ContributionSummary-TodaysCharge">
-          <FormattedMoneyAmount amount={totalAmount} currency={currency} amountStyles={null} />
+          <FormattedMoneyAmount amount={totalAmount} currency={currency} />
         </Amount>
       </AmountLine>
       {Boolean(pmFeeInfo.fee) && (
@@ -184,11 +172,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
                   </StyledTooltip>
                 </Box>
               )}
-              <FormattedMoneyAmount
-                amount={pmFeeInfo.fee || null}
-                currency={currency}
-                amountStyles={{ color: 'black.700', fontWeight: 400 }}
-              />
+              <FormattedMoneyAmount amount={pmFeeInfo.fee || null} currency={currency} />
             </Amount>
           </AmountLine>
           <AmountLine color="black.700">
@@ -215,11 +199,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
                   </StyledTooltip>
                 </Box>
               )}
-              <FormattedMoneyAmount
-                amount={totalAmount - pmFeeInfo.fee - platformTip}
-                currency={currency}
-                amountStyles={null}
-              />
+              <FormattedMoneyAmount amount={totalAmount - pmFeeInfo.fee - platformTip} currency={currency} />
             </Amount>
           </AmountLine>
         </React.Fragment>

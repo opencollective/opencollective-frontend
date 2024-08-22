@@ -34,7 +34,7 @@ const StatTitle = styled(Container).attrs(props => ({
 const StatAmount = ({ amount, ...props }) => (
   <P fontSize="16px" lineHeight="24px" color="black.700">
     {/* Pass null instead of 0 to make sure we display `--.--` */}
-    <FormattedMoneyAmount amount={amount || null} {...props} />
+    <FormattedMoneyAmount amountClassName="font-bold" amount={amount || null} {...props} />
   </P>
 );
 

@@ -208,7 +208,6 @@ function WiseStatus(props: WiseStatusProps) {
               showCurrencyCode={false}
               currency={props.host?.currency}
               amount={props.readyToPayAmount?.valueInCents}
-              amountStyles={null}
             />
 
             {props.readyToPayAmountByCurrency?.length > 0 && (
@@ -229,7 +228,6 @@ function WiseStatus(props: WiseStatusProps) {
               showCurrencyCode={false}
               currency={props.host?.currency}
               amount={props.host?.transferwise?.amountBatched?.valueInCents}
-              amountStyles={null}
             />
 
             {props.scheduledForPaymentAmountByCurrency?.length > 0 && (
@@ -327,7 +325,6 @@ function PayPalStatus(props: PayPalStatusProps) {
               showCurrencyCode={false}
               currency={props.host?.currency}
               amount={props.readyToPayAmount?.valueInCents}
-              amountStyles={null}
             />
 
             {props.readyToPayAmountByCurrency?.length > 0 && (
@@ -348,7 +345,6 @@ function PayPalStatus(props: PayPalStatusProps) {
               showCurrencyCode={false}
               currency={props.host?.currency}
               amount={props.scheduledForPaymentAmount?.valueInCents}
-              amountStyles={null}
             />
 
             {props.scheduledForPaymentAmountByCurrency?.length > 0 && (

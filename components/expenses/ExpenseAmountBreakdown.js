@@ -45,13 +45,7 @@ const ExpenseAmountBreakdown = ({ items, currency, taxes, expenseTotalAmount }) 
               {currency && ` (${currency})`}
             </Span>
             &nbsp;
-            <FormattedMoneyAmount
-              amount={totalInvoiced}
-              precision={2}
-              currency={currency}
-              showCurrencyCode={false}
-              amountStyles={null}
-            />
+            <FormattedMoneyAmount amount={totalInvoiced} precision={2} currency={currency} showCurrencyCode={false} />
           </AmountLine>
           {taxes.map(tax => (
             <AmountLine key={tax.type} data-cy={`tax-${tax.type}-expense-amount-line`}>
@@ -65,7 +59,6 @@ const ExpenseAmountBreakdown = ({ items, currency, taxes, expenseTotalAmount }) 
                 precision={2}
                 currency={currency}
                 showCurrencyCode={false}
-                amountStyles={null}
               />
             </AmountLine>
           ))}

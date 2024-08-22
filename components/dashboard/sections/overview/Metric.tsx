@@ -114,7 +114,6 @@ export function Metric({
                     amount={Math.abs(amount.current.valueInCents)}
                     currency={amount.current.currency}
                     precision={2}
-                    amountStyles={{ letterSpacing: 0 }}
                     showCurrencyCode={showCurrencyCode}
                   />
                 ) : (
@@ -139,7 +138,6 @@ export function Metric({
                         amount={Math.abs(amount.comparison.valueInCents)}
                         currency={amount.comparison.currency}
                         precision={2}
-                        amountStyles={{ letterSpacing: 0 }}
                         showCurrencyCode={false}
                       />
                     ) : (
@@ -157,7 +155,6 @@ export function Metric({
                         amount={Math.abs(amount.comparison.valueInCents)}
                         currency={amount.comparison.currency}
                         precision={2}
-                        amountStyles={{ letterSpacing: 0 }}
                         showCurrencyCode={false}
                       />
                     ) : (

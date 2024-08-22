@@ -42,7 +42,7 @@ import StyledLink from '../components/StyledLink';
 import StyledTag from '../components/StyledTag';
 import StyledTooltip from '../components/StyledTooltip';
 import Tags from '../components/Tags';
-import { H1, H4, H5, P, Span } from '../components/Text';
+import { H1, H5, P, Span } from '../components/Text';
 import { getDisplayedAmount } from '../components/transactions/TransactionItem';
 
 import Custom404 from './404';
@@ -409,9 +409,9 @@ export default function OrderPage(props) {
                   mb={1}
                 >
                   <Box mr={[0, 2]}>
-                    <H4 fontWeight="500" data-cy="contribution-description">
+                    <h4 className="text-xl font-medium" data-cy="contribution-description">
                       {order.description}
-                    </H4>
+                    </h4>
                   </Box>
                   <Box mb={[3, 0]} justifyContent={['space-between', 'flex-end']} alignItems="center">
                     <OrderStatusTag status={order.status} />
@@ -624,7 +624,6 @@ export default function OrderPage(props) {
                                   currency={transaction.taxAmount.currency}
                                   precision={2}
                                   amount={transaction.taxAmount.valueInCents}
-                                  amountStyles={null}
                                 />{' '}
                                 ({round(transaction.taxInfo.rate * 100, 2)}%{' '}
                                 {i18nTaxType(intl, transaction.taxInfo.type, 'long')})
@@ -640,7 +639,6 @@ export default function OrderPage(props) {
                                       <FormattedMoneyAmount
                                         currency={transaction.paymentProcessorFee.currency}
                                         amount={transaction.paymentProcessorFee.valueInCents}
-                                        amountStyles={null}
                                       />
                                     ),
                                   }}
@@ -752,7 +750,7 @@ export default function OrderPage(props) {
                       <FormattedMoneyAmount
                         currency={account.stats.balanceWithBlockedFunds.currency}
                         amount={account.stats.balanceWithBlockedFunds.valueInCents}
-                        amountStyles={{ color: 'black.800' }}
+                        amountClassName="text-foreground"
                       />
                       {account.host && (
                         <P fontSize="11px" color="black.600" mt={2}>

@@ -276,7 +276,6 @@ class TierPage extends Component {
                                   interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
                                   formatWithSeparators={tier.goal > 1000000}
                                   abbreviateInterval
-                                  amountStyles={{ fontWeight: 'bold', color: 'black.900' }}
                                   precision={0}
                                 />
                               ),
@@ -300,7 +299,6 @@ class TierPage extends Component {
                                 amount={amountRaised}
                                 currency={tier.currency}
                                 interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
-                                amountStyles={null}
                               />
                             </P>
                           </Box>
@@ -321,7 +319,6 @@ class TierPage extends Component {
                                   amount={tier.goal - amountRaised}
                                   currency={tier.currency}
                                   interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
-                                  amountStyles={null}
                                 />
                               </P>
                             </Box>
@@ -431,7 +428,7 @@ class TierPage extends Component {
                           interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
                           formatWithSeparators={tier.goal > 1000000}
                           abbreviateInterval
-                          amountStyles={{ fontWeight: 'bold', color: 'black.900' }}
+                          amountClassName="font-bold text-foreground"
                           precision={0}
                         />
                       ),
@@ -457,7 +454,7 @@ class TierPage extends Component {
                           amount={amountRaised}
                           currency={tier.currency}
                           interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
-                          amountStyles={{ fontWeight: 'bold', color: 'black.700' }}
+                          amountClassName="font-bold text-muted-foreground"
                           formatWithSeparators={amountRaised > 1000000}
                           precision={0}
                           abbreviateInterval

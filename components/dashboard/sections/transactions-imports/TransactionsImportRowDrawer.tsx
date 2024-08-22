@@ -42,7 +42,6 @@ export const TransactionsImportRowDrawer = ({
                       amount={row.amount.valueInCents}
                       currency={row.amount.currency}
                       precision={2}
-                      amountStyles={{ letterSpacing: 0 }}
                       showCurrencyCode={false}
                     />
                   </span>
@@ -78,11 +77,7 @@ export const TransactionsImportRowDrawer = ({
                     <FormattedMessage id="Fields.amount" defaultMessage="Amount" />
                   </DataListItemLabel>
                   <DataListItemValue>
-                    <FormattedMoneyAmount
-                      amount={row.amount.valueInCents}
-                      currency={row.amount.currency}
-                      amountStyles={null}
-                    />
+                    <FormattedMoneyAmount amount={row.amount.valueInCents} currency={row.amount.currency} />
                   </DataListItemValue>
                 </DataListItem>
                 <DataListItem>
@@ -133,12 +128,7 @@ export const TransactionsImportRowDrawer = ({
                   <strong>
                     <FormattedMessage id="Fields.amount" defaultMessage="Amount" />
                   </strong>
-                  :{' '}
-                  <FormattedMoneyAmount
-                    amount={row.amount.valueInCents}
-                    currency={row.amount.currency}
-                    amountStyles={null}
-                  />
+                  : <FormattedMoneyAmount amount={row.amount.valueInCents} currency={row.amount.currency} />
                 </li>
                 <li>
                   <strong>
