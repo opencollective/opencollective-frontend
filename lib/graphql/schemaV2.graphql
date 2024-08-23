@@ -505,6 +505,16 @@ interface Account {
     paymentMethod: PaymentMethodReferenceInput
 
     """
+    Only return orders that match these payment method service
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Only return orders that match this payment method type
+    """
+    paymentMethodType: [PaymentMethodType]
+
+    """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
     """
     includeIncognito: Boolean = false
@@ -2188,6 +2198,16 @@ type Host implements Account & AccountWithContributions {
     Only return orders that were paid with this payment method. Must be an admin of the account owning the payment method.
     """
     paymentMethod: PaymentMethodReferenceInput
+
+    """
+    Only return orders that match these payment method service
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Only return orders that match this payment method type
+    """
+    paymentMethodType: [PaymentMethodType]
 
     """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
@@ -4570,6 +4590,16 @@ type PaymentMethod {
     If account is a host, also include hosted accounts orders
     """
     includeHostedAccounts: Boolean
+
+    """
+    Only return orders that match these payment method service
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Only return orders that match this payment method type
+    """
+    paymentMethodType: [PaymentMethodType]
 
     """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
@@ -7626,6 +7656,16 @@ type Bot implements Account {
     paymentMethod: PaymentMethodReferenceInput
 
     """
+    Only return orders that match these payment method service
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Only return orders that match this payment method type
+    """
+    paymentMethodType: [PaymentMethodType]
+
+    """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
     """
     includeIncognito: Boolean = false
@@ -8381,6 +8421,16 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Only return orders that were paid with this payment method. Must be an admin of the account owning the payment method.
     """
     paymentMethod: PaymentMethodReferenceInput
+
+    """
+    Only return orders that match these payment method service
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Only return orders that match this payment method type
+    """
+    paymentMethodType: [PaymentMethodType]
 
     """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
@@ -9593,6 +9643,16 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     paymentMethod: PaymentMethodReferenceInput
 
     """
+    Only return orders that match these payment method service
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Only return orders that match this payment method type
+    """
+    paymentMethodType: [PaymentMethodType]
+
+    """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
     """
     includeIncognito: Boolean = false
@@ -10585,6 +10645,16 @@ type Individual implements Account {
     paymentMethod: PaymentMethodReferenceInput
 
     """
+    Only return orders that match these payment method service
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Only return orders that match this payment method type
+    """
+    paymentMethodType: [PaymentMethodType]
+
+    """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
     """
     includeIncognito: Boolean = false
@@ -11548,6 +11618,16 @@ type Organization implements Account & AccountWithContributions {
     paymentMethod: PaymentMethodReferenceInput
 
     """
+    Only return orders that match these payment method service
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Only return orders that match this payment method type
+    """
+    paymentMethodType: [PaymentMethodType]
+
+    """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
     """
     includeIncognito: Boolean = false
@@ -12398,6 +12478,16 @@ type Vendor implements Account & AccountWithContributions {
     Only return orders that were paid with this payment method. Must be an admin of the account owning the payment method.
     """
     paymentMethod: PaymentMethodReferenceInput
+
+    """
+    Only return orders that match these payment method service
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Only return orders that match this payment method type
+    """
+    paymentMethodType: [PaymentMethodType]
 
     """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
@@ -13507,6 +13597,16 @@ type Query {
     Only return orders that were paid with this payment method. Must be an admin of the account owning the payment method.
     """
     paymentMethod: PaymentMethodReferenceInput
+
+    """
+    Only return orders that match these payment method service
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Only return orders that match this payment method type
+    """
+    paymentMethodType: [PaymentMethodType]
 
     """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
@@ -15752,6 +15852,16 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     paymentMethod: PaymentMethodReferenceInput
 
     """
+    Only return orders that match these payment method service
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Only return orders that match this payment method type
+    """
+    paymentMethodType: [PaymentMethodType]
+
+    """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
     """
     includeIncognito: Boolean = false
@@ -16620,6 +16730,16 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Only return orders that were paid with this payment method. Must be an admin of the account owning the payment method.
     """
     paymentMethod: PaymentMethodReferenceInput
+
+    """
+    Only return orders that match these payment method service
+    """
+    paymentMethodService: [PaymentMethodService]
+
+    """
+    Only return orders that match this payment method type
+    """
+    paymentMethodType: [PaymentMethodType]
 
     """
     Whether to include incognito orders. Must be admin or root. Only with filter null or OUTGOING.
