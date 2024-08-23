@@ -151,7 +151,7 @@ Cypress.Commands.add('createCollective', ({ type = 'ORGANIZATION', email = defau
           }
         }
       `,
-      variables: { collective: { location: {}, name: 'TestOrg', slug: '', tiers: [], type, ...params } },
+      variables: { collective: { location: {}, name: 'TestOrg', slug: '', type, ...params } },
     }).then(({ body }) => {
       return body.data.createCollective;
     });
