@@ -21016,6 +21016,8 @@ input TierUpdateInput {
   amount: AmountInput
   name: NonEmptyString
   description: String
+  longDescription: String
+  videoUrl: URL
   button: String
   goal: AmountInput
   type: TierType

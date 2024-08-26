@@ -424,6 +424,7 @@ This represents an Tier
 """
 type Tier {
   id: Int
+  idV2: String!
   slug: String
   type: String
   name: String

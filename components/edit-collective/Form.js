@@ -4,13 +4,12 @@ import { getApplicableTaxesForCountry, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { ArrowBack } from '@styled-icons/material/ArrowBack';
 import dayjs from 'dayjs';
-import { cloneDeep, find, get, isNil, set } from 'lodash';
+import { cloneDeep, get, isNil, set } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { AccountTypesWithHost, CollectiveType, defaultBackgroundImage } from '../../lib/constants/collectives';
 import { Currency } from '../../lib/constants/currency';
-import { TierTypes } from '../../lib/constants/tiers-types';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
 import { convertDateFromApiUtc, convertDateToApiUtc } from '../../lib/date-utils';
 import { isValidUrl } from '../../lib/utils';
@@ -282,15 +281,9 @@ class EditCollectiveForm extends React.Component {
     collective.slug = collective.slug ? collective.slug.replace(/.*\//, '') : '';
     collective.tos = get(collective, 'settings.tos');
 
-    // TODO Remove this once tier legacy is removed
-    const tiers = collective.tiers && collective.tiers.filter(tier => tier.type !== TierTypes.TICKET);
-    const tickets = collective.tiers && collective.tiers.filter(tier => tier.type === TierTypes.TICKET);
-
     return {
       modified: false,
       collective,
-      tiers: tiers.length === 0 ? [] : tiers,
-      tickets: tickets.length === 0 ? [] : tickets,
       validStartDate: true,
       validEndDate: true,
       isValidSocialLinks: true,
@@ -351,15 +344,6 @@ class EditCollectiveForm extends React.Component {
 
   async handleSubmit() {
     const collective = { ...this.state.collective };
-
-    // Add Tiers and Tickets
-    collective.tiers = [];
-    if (find(this.state.tiers, 'name')) {
-      collective.tiers = [...this.state.tiers];
-    }
-    if (find(this.state.tickets, 'name')) {
-      collective.tiers = [...collective.tiers, ...this.state.tickets];
-    }
 
     // Add a confirm if slug changed
     if (collective.slug !== this.props.collective.slug) {
