@@ -76,7 +76,6 @@ class RedeemedPage extends React.Component {
   }
 
   static propTypes = {
-    client: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object,
     code: PropTypes.string,
     name: PropTypes.string,
@@ -105,23 +104,17 @@ class RedeemedPage extends React.Component {
     }
   }
 
-  async componentDidMount() {
-    const { client, code } = this.props;
-
-    if (code) {
-      client.query({ query: redeemedPaymentMethodQuery, variables: { code } }).then(result => {
-        const { PaymentMethod } = result.data;
-        if (PaymentMethod) {
-          this.setState({
-            amount: PaymentMethod.initialBalance || PaymentMethod.monthlyLimitPerMember,
-            name: PaymentMethod.collective.name,
-            collective: PaymentMethod.collective,
-            emitter: PaymentMethod.emitter,
-            currency: PaymentMethod.currency,
-            expiryDate: PaymentMethod.expiryDate,
-            loading: false,
-          });
-        }
+  async componentDidUpdate() {
+    const { PaymentMethod } = this.props.data || {};
+    if (PaymentMethod && this.state.loading) {
+      this.setState({
+        amount: PaymentMethod.initialBalance || PaymentMethod.monthlyLimitPerMember,
+        name: PaymentMethod.collective.name,
+        collective: PaymentMethod.collective,
+        emitter: PaymentMethod.emitter,
+        currency: PaymentMethod.currency,
+        expiryDate: PaymentMethod.expiryDate,
+        loading: false,
       });
     }
   }
@@ -241,6 +234,10 @@ const addRedeemedPageData = graphql(redeemedPageQuery, {
   skip: props => !props.collectiveSlug,
 });
 
+const addRedeemedPaymentMethodData = graphql(redeemedPaymentMethodQuery, {
+  skip: props => !props.code,
+});
+
 // next.js export
 // ts-unused-exports:disable-next-line
-export default withUser(withData(addRedeemedPageData(RedeemedPage)));
+export default withUser(withData(addRedeemedPageData(addRedeemedPaymentMethodData(RedeemedPage))));
