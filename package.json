@@ -188,6 +188,7 @@
     "start": "node dist/server",
     "start:ci": "nyc --silent --exclude \".next/**\" node server",
     "start:e2e": "cross-env TZ=UTC NODE_ENV=production OC_ENV=e2e node server",
+    "styled-components-migration-progress": "tsx scripts/styled-components-migration-progress.ts",
     "styleguide:build": "storybook build",
     "styleguide:dev": "storybook dev -p 6006",
     "test": "npm run test:jest",
