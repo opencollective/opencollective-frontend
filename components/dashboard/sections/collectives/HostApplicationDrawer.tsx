@@ -12,6 +12,7 @@ import type {
   HostApplicationThreadQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
 import { HostApplicationStatus, ProcessHostApplicationAction } from '../../../../lib/graphql/types/v2/graphql';
+import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import { i18nCustomApplicationFormLabel } from '../../../../lib/i18n/custom-application-form';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
@@ -137,6 +138,8 @@ function HostApplication({
   applicationId: string;
   editCollectiveMutation?: (collective: { id: number; HostCollectiveId?: number }) => Promise<void>;
 }) {
+  const { LoggedInUser } = useLoggedInUser();
+
   const intl = useIntl();
   const { toast } = useToast();
 
@@ -204,6 +207,8 @@ function HostApplication({
   const application = applicationQuery.data?.hostApplication;
   const account = application?.account;
   const host = application?.host;
+
+  const isHostAdmin = LoggedInUser.isAdminOfCollective(host);
 
   const requiresMinimumNumberOfAdmins = host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins > 1;
 
@@ -483,6 +488,7 @@ function HostApplication({
 
             <Thread
               canComment
+              canUsePrivateNote={isHostAdmin}
               variant="small"
               items={threadItems}
               collective={host}
@@ -549,3 +555,4 @@ export default function HostApplicationDrawer({
     />
   );
 }
+
