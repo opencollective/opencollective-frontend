@@ -1,5 +1,3 @@
-const { isEmpty } = require('lodash');
-
 const debug = require('debug')('duplicateHandler');
 
 function duplicateHandler({ skip, timeout } = {}) {
@@ -24,13 +22,6 @@ function duplicateHandler({ skip, timeout } = {}) {
   setInterval(gc, 1000);
 
   return function handleDuplicate(req, res, next) {
-    // If the request includes any cookie or sensitive headers, skip it
-    if (!isEmpty(req.cookies) || req.headers.authorization || req.headers.cookie) {
-      debug('Skipping request with sensitive headers');
-      next();
-      return;
-    }
-
     if (skip && skip(req)) {
       next();
       return;
