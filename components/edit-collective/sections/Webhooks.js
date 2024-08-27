@@ -1,9 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { cloneDeep, difference, get, pick } from 'lodash';
-import { PlusCircle, Save, Trash, WebhookIcon } from 'lucide-react';
+import { Info, PlusCircle, Save, Trash, WebhookIcon } from 'lucide-react';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import { isURL } from 'validator';
@@ -22,6 +21,7 @@ import MessageBox from '../../MessageBox';
 import StyledInputGroup from '../../StyledInputGroup';
 import StyledSelect from '../../StyledSelect';
 import { Button } from '../../ui/Button';
+import { Label } from '../../ui/Label';
 import { Separator } from '../../ui/Separator';
 import { toast } from '../../ui/useToast';
 
@@ -197,9 +197,9 @@ class Webhooks extends React.Component {
 
         <div className="mt-4 flex flex-col gap-2">
           <div>
-            <label htmlFor={`webhook-url-${index}`} className="text-sm font-medium">
+            <Label htmlFor={`webhook-url-${index}`} className="text-sm font-medium">
               <FormattedMessage id="webhooks.url.label" defaultMessage="URL" />
-            </label>
+            </Label>
             <StyledInputGroup
               id={`webhook-url-${index}`}
               type="type"
@@ -211,9 +211,9 @@ class Webhooks extends React.Component {
             />
           </div>
           <div>
-            <label htmlFor={`event-type-select-${index}`} className="text-sm font-medium">
+            <Label htmlFor={`event-type-select-${index}`}>
               <FormattedMessage defaultMessage="Activity" id="ZmlNQ3" />
-            </label>
+            </Label>
             <div className="flex items-center">
               <StyledSelect
                 inputId={`event-type-select-${index}`}
@@ -234,7 +234,7 @@ class Webhooks extends React.Component {
                   title={intl.formatMessage({ id: 'moreInfo', defaultMessage: 'More info' })}
                   onClick={() => this.setState({ moreInfoModal: webhook.type })}
                 >
-                  <InfoCircle size={18} color="#a3a3a3" />
+                  <Info className="text-slate-400" size={18} />
                 </Button>
               )}
             </div>
@@ -292,7 +292,7 @@ class Webhooks extends React.Component {
         <Separator className="my-6" />
 
         <div className="mb-6 mt-8 flex items-center justify-between">
-          <h3 className="text-xl font-bold text-gray-900">
+          <h3 className="text-xl font-bold">
             <FormattedMessage
               defaultMessage="Webhooks for {collective}"
               id="RHr16v"
@@ -307,7 +307,7 @@ class Webhooks extends React.Component {
         {webhooks.length === 0 ? (
           <div className="rounded-lg border bg-card py-12 text-center text-card-foreground shadow-sm">
             <WebhookIcon className="mx-auto mb-4 h-16 w-16 text-gray-400" />
-            <h4 className="text-lg font-semibold text-gray-900">
+            <h4 className="text-lg font-semibold">
               <FormattedMessage defaultMessage="No webhooks configured" id="prsPHX" />
             </h4>
           </div>
