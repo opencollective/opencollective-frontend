@@ -555,4 +555,3 @@ export default function HostApplicationDrawer({
     />
   );
 }
-
