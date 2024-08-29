@@ -5,7 +5,15 @@ import styled, { css } from 'styled-components';
 /**
  * A background for the gift card redeem(ed) pages
  */
-const HappyBackground = styled.div`
+const HappyBackground = styled.div<{
+  collective?: {
+    settings?: {
+      collectivePage?: {
+        primaryColor?: string;
+      };
+    };
+  };
+}>`
   width: 100%;
   background-position: center top;
   background-repeat: no-repeat;

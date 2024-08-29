@@ -5,6 +5,7 @@ export type GraphQLV1Collective = {
   slug: string;
   name: string;
   legalName: string;
+  imageUrl: string;
   type: keyof typeof CollectiveType;
   isArchived?: boolean;
   parentCollective?: GraphQLV1Collective;
