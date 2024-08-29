@@ -943,7 +943,7 @@ const getContributionActions: (opts: GetContributionActionsOptions) => GetAction
       secondary: [],
     };
 
-    const isAdminOfOrder = opts.LoggedInUser.isAdminOfCollective(order.fromAccount);
+    const isAdminOfOrder = opts.LoggedInUser && opts.LoggedInUser.isAdminOfCollective(order.fromAccount);
     const canUpdateActiveOrder =
       order.frequency !== ContributionFrequency.ONETIME &&
       ![

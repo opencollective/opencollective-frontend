@@ -130,24 +130,31 @@ export const getRefetchQueries = account => [
   {
     query: updatesDashboardQuery,
     variables: {
-      slug: account.slug,
+      slug: account?.slug,
       limit: 10,
       offset: 0,
       onlyPublishedUpdates: true,
       orderBy: 'CREATED_AT,DESC',
     },
+    skip: !account?.slug,
     context: API_V2_CONTEXT,
   },
   {
     query: updatesDashboardQuery,
     variables: {
-      slug: account.slug,
+      slug: account?.slug,
       limit: 10,
       offset: 0,
       isDraft: true,
       orderBy: 'CREATED_AT,DESC',
     },
+    skip: !account?.slug,
     context: API_V2_CONTEXT,
   },
-  { query: updatesDashboardMetadataQuery, variables: { slug: account.slug }, context: API_V2_CONTEXT },
+  {
+    query: updatesDashboardMetadataQuery,
+    variables: { slug: account?.slug },
+    context: API_V2_CONTEXT,
+    skip: !account?.slug,
+  },
 ];

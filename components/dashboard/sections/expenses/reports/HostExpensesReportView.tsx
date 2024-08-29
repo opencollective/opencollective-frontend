@@ -13,6 +13,7 @@ import {
   type HostExpensesReportQueryVariables,
 } from '../../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../../lib/hooks/useQueryFilter';
+import { getWebsiteUrl } from '../../../../../lib/utils';
 
 import FormattedMoneyAmount from '../../../../FormattedMoneyAmount';
 import Link from '../../../../Link';
@@ -142,7 +143,7 @@ export function HostExpensesReportView(props: DashboardSectionProps) {
                         item.isHost
                           ? `/dashboard/${props.accountSlug}/expenses`
                           : `/dashboard/${props.accountSlug}/host-expenses`,
-                        window.location.href,
+                        getWebsiteUrl(),
                       );
 
                       url.searchParams.set('accountingCategory', item.accountingCategory?.code || UNCATEGORIZED_VALUE);

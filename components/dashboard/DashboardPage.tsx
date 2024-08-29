@@ -4,14 +4,14 @@ import { clsx } from 'clsx';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { isHostAccount, isIndividualAccount } from '../lib/collective';
-import roles from '../lib/constants/roles';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
-import useLocalStorage from '../lib/hooks/useLocalStorage';
-import useLoggedInUser from '../lib/hooks/useLoggedInUser';
-import { LOCAL_STORAGE_KEYS } from '../lib/local-storage';
-import { require2FAForAdmins } from '../lib/policies';
-import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
+import { isHostAccount, isIndividualAccount } from '../../lib/collective';
+import roles from '../../lib/constants/roles';
+import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import useLocalStorage from '../../lib/hooks/useLocalStorage';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
+import { require2FAForAdmins } from '../../lib/policies';
+import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 
 import {
   ALL_SECTIONS,
@@ -19,21 +19,24 @@ import {
   ROOT_PROFILE_KEY,
   ROOT_SECTIONS,
   SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS,
-} from '../components/dashboard/constants';
-import { DashboardContext } from '../components/dashboard/DashboardContext';
-import DashboardSection from '../components/dashboard/DashboardSection';
-import { getMenuItems } from '../components/dashboard/Menu';
-import DashboardTopBar from '../components/dashboard/preview/DashboardTopBar';
-import SubMenu from '../components/dashboard/preview/SubMenu';
-import { adminPanelQuery } from '../components/dashboard/queries';
-import AdminPanelSideBar from '../components/dashboard/SideBar';
-import Link from '../components/Link';
-import MessageBox from '../components/MessageBox';
-import Footer from '../components/navigation/Footer';
-import NotificationBar from '../components/NotificationBar';
-import Page from '../components/Page';
-import SignInOrJoinFree from '../components/SignInOrJoinFree';
-import { TwoFactorAuthRequiredMessage } from '../components/TwoFactorAuthRequiredMessage';
+} from '../../components/dashboard/constants';
+import { DashboardContext } from '../../components/dashboard/DashboardContext';
+import { getMenuItems } from '../../components/dashboard/Menu';
+import DashboardTopBar from '../../components/dashboard/preview/DashboardTopBar';
+import SubMenu from '../../components/dashboard/preview/SubMenu';
+import { adminPanelQuery } from '../../components/dashboard/queries';
+import AdminPanelSideBar from '../../components/dashboard/SideBar';
+import Link from '../../components/Link';
+import MessageBox from '../../components/MessageBox';
+import Footer from '../../components/navigation/Footer';
+import NotificationBar from '../../components/NotificationBar';
+import Page from '../../components/Page';
+import SignInOrJoinFree from '../../components/SignInOrJoinFree';
+import { TwoFactorAuthRequiredMessage } from '../../components/TwoFactorAuthRequiredMessage';
+
+import { OCFBannerWithData } from '../OCFBanner';
+
+import type { DashboardSectionProps } from './types';
 
 const messages = defineMessages({
   collectiveIsArchived: {
@@ -120,26 +123,17 @@ function getBlocker(LoggedInUser, account, section) {
   }
 }
 
-function getSingleParam(queryParam: string | string[]): string {
-  return Array.isArray(queryParam) ? queryParam[0] : queryParam;
-}
-
-function getAsArray(queryParam: string | string[]): string[] {
-  return Array.isArray(queryParam) ? queryParam : [queryParam];
-}
-
-const parseQuery = query => {
-  return {
-    slug: getSingleParam(query.slug),
-    section: getSingleParam(query.section),
-    subpath: getAsArray(query.subpath)?.filter(Boolean),
-  };
-};
-
-const DashboardPage = () => {
+export default function DashboardPage(props: {
+  Component: React.FC<DashboardSectionProps>;
+  slug: string;
+  section: string;
+  subpath?: string[];
+}) {
   const intl = useIntl();
   const router = useRouter();
-  const { slug, section, subpath } = parseQuery(router.query);
+  const slug = props.slug;
+  const section = props.section;
+  const subpath = props.subpath;
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const [lastWorkspaceVisit, setLastWorkspaceVisit] = useLocalStorage(LOCAL_STORAGE_KEYS.DASHBOARD_NAVIGATION_STATE, {
     slug: LoggedInUser?.collective.slug,
@@ -243,12 +237,10 @@ const DashboardPage = () => {
                 <TwoFactorAuthRequiredMessage className="lg:mt-16" />
               ) : (
                 <div className="min-w-0 max-w-screen-xl flex-1">
-                  <DashboardSection
-                    section={selectedSection}
-                    isLoading={isLoading}
-                    account={account}
-                    subpath={subpath}
-                  />
+                  {!isRootProfile && (
+                    <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
+                  )}
+                  <props.Component isDashboard accountSlug={slug} subpath={subpath} />
                 </div>
               )}
             </div>
@@ -280,12 +272,7 @@ const DashboardPage = () => {
                     <div />
                   )}
 
-                  <DashboardSection
-                    section={selectedSection}
-                    isLoading={isLoading}
-                    account={account}
-                    subpath={subpath}
-                  />
+                  <props.Component isDashboard accountSlug={slug} subpath={subpath} />
                 </div>
               )}
             </div>
@@ -295,14 +282,10 @@ const DashboardPage = () => {
       </div>
     </DashboardContext.Provider>
   );
-};
+}
 
 DashboardPage.getInitialProps = () => {
   return {
     scripts: { googleMaps: true }, // TODO: This should be enabled only for events
   };
 };
-
-// next.js export
-// ts-unused-exports:disable-next-line
-export default DashboardPage;

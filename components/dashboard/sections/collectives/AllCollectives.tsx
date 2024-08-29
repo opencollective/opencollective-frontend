@@ -95,15 +95,16 @@ const AllCollectives = ({ subpath }: Omit<DashboardSectionProps, 'accountSlug'>)
   const intl = useIntl();
   const router = useRouter();
   const [showCollectiveOverview, setShowCollectiveOverview] = React.useState<Collective | undefined | string>(
-    subpath[0],
+    subpath?.length > 0 && subpath[0],
   );
   const query = useMemo(() => omit(router.query, ['slug', 'section', 'subpath']), [router.query]);
 
   const pushSubpath = subpath => {
     router.push(
       {
-        pathname: compact([router.pathname, router.query.slug, router.query.section, subpath]).join('/'),
-        query,
+        pathname: subpath
+          ? `/dashboard/root-actions/all-collectives/${subpath}`
+          : `/dashboard/root-actions/all-collectives`,
       },
       undefined,
       {
@@ -127,10 +128,10 @@ const AllCollectives = ({ subpath }: Omit<DashboardSectionProps, 'accountSlug'>)
   });
 
   useEffect(() => {
-    if (subpath[0] !== ((showCollectiveOverview as Collective)?.id || showCollectiveOverview)) {
-      handleDrawer(subpath[0]);
+    if (subpath?.[0] !== ((showCollectiveOverview as Collective)?.id || showCollectiveOverview)) {
+      handleDrawer(subpath?.[0]);
     }
-  }, [subpath[0]]);
+  }, [subpath?.length > 0 && subpath[0]]);
 
   const handleDrawer = (collective: Collective | string | undefined) => {
     if (collective) {
