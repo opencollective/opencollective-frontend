@@ -12,8 +12,6 @@ import type { Account } from '../../../../lib/graphql/types/v2/graphql';
 import { collectivePageQuery } from '../../../collective-page/graphql/queries';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import StyledModal, { CollectiveModalHeader, ModalBody, ModalFooter } from '../../../StyledModal';
-import StyledTextarea from '../../../StyledTextarea';
-import { Label as StyledComponentsLabel, P, Span } from '../../../Text';
 import { Button } from '../../../ui/Button';
 import { Checkbox } from '../../../ui/Checkbox';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../../ui/Collapsible';
@@ -28,7 +26,7 @@ const editAccountFreezeStatusMutation = gql`
     $account: AccountReferenceInput!
     $action: AccountFreezeAction!
     $pauseExistingRecurringContributions: Boolean!
-    $messageForAccountAdmins: String!
+    $messageForAccountAdmins: String
     $messageForContributors: String
   ) {
     editAccountFreezeStatus(
@@ -89,10 +87,10 @@ const getRecurringContributionsCountSummary = account => {
   }
 
   // Total count of recurring contributions for the account and its children
-  const getAllActiveCounts = (account: Account) =>
-    account.stats.activeRecurringContributionsBreakdown.map(c => c.count);
-  const baseCount = sum(getAllActiveCounts(account));
-  const childrenCount = sum(account.childrenAccounts.nodes.map(child => sum(getAllActiveCounts(child))));
+  const sumActionRecurringContributions = (account: Account) =>
+    sum(account.stats.activeRecurringContributionsBreakdown.map(c => c.count));
+  const baseCount = sumActionRecurringContributions(account);
+  const childrenCount = sum(account.childrenAccounts.nodes.map(child => sumActionRecurringContributions(child)));
 
   // PayPal subscriptions count
   const paypalSubscriptionsCount = account.activePayPalSubscriptionOrders.totalCount;
@@ -104,6 +102,18 @@ const getRecurringContributionsCountSummary = account => {
     totalCount: baseCount + childrenCount,
     activePaypalSubscriptionsCount: paypalSubscriptionsCount + paypalSubscriptionsCountForChildren,
   };
+};
+
+type ModalState = 'FREEZE' | 'UNFREEZE';
+
+const getModalState = (account: Account, submitAction: ModalState | null, fallback: ModalState): ModalState => {
+  if (submitAction) {
+    return submitAction;
+  } else if (account) {
+    return account.isFrozen ? 'UNFREEZE' : 'FREEZE';
+  } else {
+    return fallback;
+  }
 };
 
 const FreezeAccountModal = ({
@@ -119,9 +129,10 @@ const FreezeAccountModal = ({
   const intl = useIntl();
   const { toast } = useToast();
   const [useMessageForAccountAdmins, setUseMessageForAccountAdmins] = useState(false);
-  const [messageForAccountAdmins, setMessageForAccountAdmins] = useState('');
+  const [messageForAccountAdmins, _setMessageForAccountAdmins] = useState('');
   const [pauseContributions, setPauseContributions] = useState(true);
   const [hasConfirmed, setHasConfirmed] = useState(false);
+  const [submitAction, setSubmitAction] = useState<ModalState | null>(null);
   const { data, loading, error } = useQuery(freezeAccountModalQuery, {
     variables: { accountId: collective.id },
     context: API_V2_CONTEXT,
@@ -129,15 +140,25 @@ const FreezeAccountModal = ({
   const [editAccountFreezeStatus, { loading: submitting }] = useMutation(editAccountFreezeStatusMutation, {
     context: API_V2_CONTEXT,
   });
+  const setMessageForAccountAdminsFromInputEvent = React.useCallback(
+    e => _setMessageForAccountAdmins(e.target.value),
+    [],
+  );
 
-  const isUnfreezing = data?.account ? data.account.isFrozen : collective.isFrozen;
+  const defaultState = collective.isFrozen ? 'UNFREEZE' : 'FREEZE';
+  const modalState = getModalState(data?.account, submitAction, defaultState);
+  const isUnfreezing = modalState === 'UNFREEZE';
   const contributionsSummary = getRecurringContributionsCountSummary(data?.account);
   return (
     <StyledModal maxWidth={600} trapFocus onClose={onClose} {...props}>
       <CollectiveModalHeader
-        preText={intl.formatMessage({ defaultMessage: `Freeze`, id: 'Account.Freeze' })}
-        collective={collective}
         mb={3}
+        collective={collective}
+        preText={
+          isUnfreezing
+            ? intl.formatMessage({ defaultMessage: `Unfreeze`, id: '5SBeLS' })
+            : intl.formatMessage({ defaultMessage: `Freeze`, id: 'Account.Freeze' })
+        }
       />
 
       <ModalBody mb={0}>
@@ -151,43 +172,58 @@ const FreezeAccountModal = ({
               <FormattedMessage defaultMessage="Are you sure want to unfreeze this collective?" id="OX8+5o" />
             </h2>
 
-            <P fontSize="14px" lineHeight="20px" color="black.700" mb="10px">
+            <p className="mb-6 text-sm">
               <FormattedMessage
-                defaultMessage="Unfreezing the collective means they will now have full access to the platform."
-                id="nhEmNV"
+                defaultMessage="Unfreezing the collective means they will regain full access to the platform."
+                id="dMaivT"
               />
               <br />
               <br />
               <FormattedMessage
                 defaultMessage="This collective (and all its related Projects & Events) will now have access to accept funds, pay out expenses, post updates, create new Events or Projects."
                 id="1Whmi8"
-              />
-            </P>
-            <StyledComponentsLabel
-              fontSize="16px"
-              fontWeight="700"
-              lineHeight="24px"
-              color="black.800.900"
-              mb="6px"
-              htmlFor="freeze-account-message"
-            >
-              <FormattedMessage defaultMessage="Include a message to the Collective admins (Optional)" id="GLo1nw" />
-              <br />
-              <Span fontSize="13px" fontWeight="400">
-                <FormattedMessage
-                  defaultMessage="They will also be notified of this unfreeze via auto-email."
-                  id="rzknYs"
-                />
-              </Span>
-            </StyledComponentsLabel>
-            <StyledTextarea
-              id="freeze-account-message"
-              width="100%"
-              minHeight={126}
-              maxHeight={300}
-              onChange={e => setMessageForAccountAdmins(e.target.value)}
-              value={messageForAccountAdmins}
-            />
+              />{' '}
+              <FormattedMessage defaultMessage="Their existing recurring contributions will be resumed." id="VxS/8s" />
+            </p>
+            <Collapsible open={useMessageForAccountAdmins}>
+              <CollapsibleTrigger asChild>
+                <div className="mb-4 flex items-center justify-between rounded-md border border-gray-200 p-4">
+                  <span className="text-sm font-medium text-gray-700">
+                    <FormattedMessage defaultMessage="Add a custom message for the Collective Admins" id="PFv8Cm" />
+                  </span>
+                  <Switch
+                    checked={useMessageForAccountAdmins}
+                    onCheckedChange={setUseMessageForAccountAdmins}
+                    disabled={submitting}
+                  />
+                </div>
+              </CollapsibleTrigger>
+
+              <CollapsibleContent>
+                <div className="mb-4 px-1">
+                  <Textarea
+                    id="admin-message"
+                    className="min-h-40 w-full"
+                    maxLength={2048}
+                    showCount
+                    disabled={submitting}
+                    value={messageForAccountAdmins}
+                    onChange={setMessageForAccountAdminsFromInputEvent}
+                    placeholder={intl.formatMessage({
+                      defaultMessage: 'Custom message to the Collective Admins',
+                      id: '2u2sON',
+                    })}
+                    required
+                  />
+                  <p className="mt-2 text-xs text-gray-600">
+                    <FormattedMessage
+                      defaultMessage="This message will be attached in the automatic notification sent to collective admins."
+                      id="DD6LrF"
+                    />
+                  </p>
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
           </div>
         ) : (
           <div>
@@ -209,47 +245,30 @@ const FreezeAccountModal = ({
               />
             </p>
 
-            <div className="mb-4 rounded-md border-blue-200 bg-blue-50 px-5 py-4 text-sm">
-              <Info size={16} className="mr-2 inline-block text-blue-500" />
-              <FormattedMessage
-                defaultMessage="This collective has {count, plural, one {an active PayPal subscription} other {# active PayPal subscriptions}}. When recurring contributions are paused, PayPal will send them an automated notification."
-                id="Lfe7gh"
-                values={{ count: contributionsSummary.activePaypalSubscriptionsCount }}
-              />
-            </div>
-
-            {contributionsSummary.totalCount > 0 && (
-              <div className="mb-4 flex items-center justify-between rounded-md border border-gray-200 p-4">
-                <span className="text-sm font-medium text-gray-700">
-                  <FormattedMessage
-                    defaultMessage="Pause {count} recurring contributions"
-                    id="0bkmNx"
-                    values={{ count: contributionsSummary.totalCount }}
-                  />
-                </span>
-                <Switch checked={pauseContributions} onCheckedChange={setPauseContributions} />
-              </div>
-            )}
-
             <Collapsible open={useMessageForAccountAdmins}>
               <CollapsibleTrigger asChild>
                 <div className="mb-4 flex items-center justify-between rounded-md border border-gray-200 p-4">
                   <span className="text-sm font-medium text-gray-700">
                     <FormattedMessage defaultMessage="Add a custom message for the Collective Admins" id="PFv8Cm" />
                   </span>
-                  <Switch checked={useMessageForAccountAdmins} onCheckedChange={setUseMessageForAccountAdmins} />
+                  <Switch
+                    checked={useMessageForAccountAdmins}
+                    onCheckedChange={setUseMessageForAccountAdmins}
+                    disabled={submitting}
+                  />
                 </div>
               </CollapsibleTrigger>
 
               <CollapsibleContent>
-                <div className="px-1">
+                <div className="mb-4 px-1">
                   <Textarea
                     id="admin-message"
                     className="min-h-40 w-full"
                     maxLength={2048}
                     showCount
                     value={messageForAccountAdmins}
-                    onChange={e => setMessageForAccountAdmins(e.target.value)}
+                    disabled={submitting}
+                    onChange={setMessageForAccountAdminsFromInputEvent}
                     placeholder={intl.formatMessage({
                       defaultMessage: 'Custom message to the Collective Admins',
                       id: '2u2sON',
@@ -258,26 +277,54 @@ const FreezeAccountModal = ({
                   />
                   <p className="mt-2 text-xs text-gray-600">
                     <FormattedMessage
-                      defaultMessage="This message will be attached in the email sent to collective admins to notify them that their collective has been frozen."
-                      id="Juw67v"
+                      defaultMessage="This message will be attached in the automatic notification sent to collective admins."
+                      id="DD6LrF"
                     />
                   </p>
                 </div>
               </CollapsibleContent>
             </Collapsible>
 
-            <div className="mt-8 border-t border-dotted pt-4">
-              <Collapsible open={contributionsSummary.totalCount > 0 && !pauseContributions}>
-                <CollapsibleContent>
-                  <div className="mb-4 rounded-md border border-yellow-200 bg-yellow-50 px-5 py-4 text-sm">
-                    <TriangleAlert size={16} className="mr-2 inline-block text-yellow-500" />
+            {contributionsSummary.totalCount > 0 && (
+              <div>
+                <div className="mb-4 flex items-center justify-between rounded-md border border-gray-200 p-4">
+                  <span className="text-sm font-medium text-gray-700">
                     <FormattedMessage
-                      defaultMessage="We advise you to pause recurring contributions to completely stop the collective from receiving funds. Contributions will restart when you un-freeze the collective."
-                      id="q/eQ02"
+                      defaultMessage="Pause {count} recurring contributions"
+                      id="0bkmNx"
+                      values={{ count: contributionsSummary.totalCount }}
                     />
-                  </div>
-                </CollapsibleContent>
-              </Collapsible>
+                  </span>
+                  <Switch checked={pauseContributions} onCheckedChange={setPauseContributions} disabled={submitting} />
+                </div>
+                <Collapsible open={!pauseContributions}>
+                  <CollapsibleContent>
+                    <div className="mb-4 rounded-md border border-yellow-200 bg-yellow-50 px-5 py-4 text-sm">
+                      <TriangleAlert size={16} className="mr-2 inline-block text-yellow-500" />
+                      <FormattedMessage
+                        defaultMessage="We advise you to pause recurring contributions to completely stop the collective from receiving funds. Contributions will restart when you un-freeze the collective."
+                        id="q/eQ02"
+                      />
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+                <Collapsible open={pauseContributions && contributionsSummary.activePaypalSubscriptionsCount}>
+                  {/* Use a different animation duration to prevent flickering when both content are collapsed/opened simultaneously */}
+                  <CollapsibleContent className="data-[state=closed]:duration-300 data-[state=open]:duration-150">
+                    <div className="mb-4 rounded-md border-blue-200 bg-blue-50 px-5 py-4 text-sm">
+                      <Info size={16} className="mr-2 inline-block text-blue-500" />
+                      <FormattedMessage
+                        defaultMessage="This collective has {count, plural, one {an active PayPal subscription} other {# active PayPal subscriptions}}. When recurring contributions are paused, PayPal will send them an automated notification."
+                        id="Lfe7gh"
+                        values={{ count: contributionsSummary.activePaypalSubscriptionsCount }}
+                      />
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+              </div>
+            )}
+
+            <div className="mt-6 border-t border-dotted pt-4">
               <div className="mb-4 mt-2 flex items-center gap-2 rounded-md border border-yellow-200 bg-yellow-50 px-5 py-4">
                 <Checkbox
                   id="confirm-freeze"
@@ -313,12 +360,12 @@ const FreezeAccountModal = ({
             className="w-full min-w-36 sm:w-auto"
             onClick={async () => {
               try {
-                const action = isUnfreezing ? 'UNFREEZE' : 'FREEZE';
+                setSubmitAction(modalState); // To lock the current state and prevent it to change between the cache update and the closing of the modal
                 const accountInput = getAccountReferenceInput(data.account);
                 const messageForContributors = `We are temporarily pausing contributions to ${data.account.name}.`; // The API allows to customize this, butt we don't want to expose it to host admins for now. See https://github.com/opencollective/opencollective/issues/7513#issuecomment-2311746204.
                 const variables = {
                   account: accountInput,
-                  action,
+                  action: modalState,
                   messageForAccountAdmins: useMessageForAccountAdmins ? messageForAccountAdmins : undefined,
                   messageForContributors,
                   pauseExistingRecurringContributions: contributionsSummary.totalCount > 0 && pauseContributions,
@@ -342,7 +389,7 @@ const FreezeAccountModal = ({
                       ),
                 });
                 onSuccess?.();
-                props.onClose();
+                onClose();
               } catch (e) {
                 toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
               }
