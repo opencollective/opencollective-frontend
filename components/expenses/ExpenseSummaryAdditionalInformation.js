@@ -75,7 +75,6 @@ const PayeeTotalPayoutSumTooltip = ({ stats }) => {
                 amount={stats.totalPaidInvoices.valueInCents}
                 currency={stats.totalPaidInvoices.currency}
                 precision={2}
-                amountStyles={null}
               />
             ),
             totalPaidReceipts: (
@@ -83,7 +82,6 @@ const PayeeTotalPayoutSumTooltip = ({ stats }) => {
                 amount={stats.totalPaidReceipts.valueInCents}
                 currency={stats.totalPaidReceipts.currency}
                 precision={2}
-                amountStyles={null}
               />
             ),
             totalPaidGrants: (
@@ -91,7 +89,6 @@ const PayeeTotalPayoutSumTooltip = ({ stats }) => {
                 amount={stats.totalPaidGrants.valueInCents}
                 currency={stats.totalPaidGrants.currency}
                 precision={2}
-                amountStyles={null}
               />
             ),
             currentYear: <span>{currentYear}</span>,
@@ -172,7 +169,6 @@ const ExpenseSummaryAdditionalInformation = ({
                 <FormattedMoneyAmount
                   amount={collective.stats.balanceWithBlockedFunds.valueInCents}
                   currency={collective.stats.balanceWithBlockedFunds.currency}
-                  amountStyles={null}
                 />
               </Box>
             </Container>

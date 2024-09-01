@@ -77,7 +77,6 @@ export function ReportContent({
                           <td className="text-right font-medium">
                             {debitAmount !== 0 && (
                               <FormattedMoneyAmount
-                                amountStyles={{ letterSpacing: 0 }}
                                 amount={Math.abs(debitAmount)}
                                 currency={currency}
                                 showCurrencyCode={false}
@@ -87,7 +86,6 @@ export function ReportContent({
                           <td className="text-right font-medium">
                             {creditAmount !== 0 && (
                               <FormattedMoneyAmount
-                                amountStyles={{ letterSpacing: 0 }}
                                 amount={Math.abs(creditAmount)}
                                 currency={currency}
                                 showCurrencyCode={false}
@@ -97,12 +95,7 @@ export function ReportContent({
                         </React.Fragment>
                       ) : (
                         <td className="text-right font-medium">
-                          <FormattedMoneyAmount
-                            amountStyles={{ letterSpacing: 0 }}
-                            amount={row.amount}
-                            currency={currency}
-                            showCurrencyCode={false}
-                          />
+                          <FormattedMoneyAmount amount={row.amount} currency={currency} showCurrencyCode={false} />
                         </td>
                       )}
 
@@ -142,7 +135,6 @@ export function ReportContent({
                           amount={Math.abs(section.total)}
                           currency={currency}
                           showCurrencyCode={false}
-                          amountStyles={{ letterSpacing: 0 }}
                         />
                       )}
                     </td>
@@ -152,19 +144,13 @@ export function ReportContent({
                           amount={Math.abs(section.total)}
                           currency={currency}
                           showCurrencyCode={false}
-                          amountStyles={{ letterSpacing: 0 }}
                         />
                       )}
                     </td>
                   </React.Fragment>
                 ) : (
                   <td className="py-1">
-                    <FormattedMoneyAmount
-                      amount={section.total}
-                      currency={currency}
-                      showCurrencyCode={false}
-                      amountStyles={{ letterSpacing: 0 }}
-                    />
+                    <FormattedMoneyAmount amount={section.total} currency={currency} showCurrencyCode={false} />
                   </td>
                 )}
               </tr>
@@ -193,7 +179,6 @@ export function ReportContent({
           </div>
 
           <FormattedMoneyAmount
-            amountStyles={{ letterSpacing: 0 }}
             amount={report.startingBalance?.valueInCents}
             currency={currency}
             showCurrencyCode={false}
@@ -205,7 +190,6 @@ export function ReportContent({
           </div>
 
           <FormattedMoneyAmount
-            amountStyles={{ letterSpacing: 0 }}
             amount={report.totalChange?.valueInCents}
             currency={currency}
             showCurrencyCode={false}
@@ -231,7 +215,6 @@ export function ReportContent({
           </div>
 
           <FormattedMoneyAmount
-            amountStyles={{ letterSpacing: 0 }}
             amount={report.endingBalance?.valueInCents}
             currency={currency}
             showCurrencyCode={false}

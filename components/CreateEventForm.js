@@ -148,10 +148,9 @@ class CreateEventForm extends React.Component {
       return <div />;
     }
 
-    const isNew = !(event && event.id);
+    const isNew = !event.id;
     const submitBtnLabel = loading ? 'loading' : isNew ? 'Create Event' : 'Save';
-
-    this.fields = [
+    const fields = [
       {
         name: 'name',
         maxLength: 255,
@@ -192,9 +191,7 @@ class CreateEventForm extends React.Component {
         type: 'textarea',
         maxLength: 10000,
       },
-    ];
-
-    this.fields = this.fields.map(field => {
+    ].map(field => {
       if (this.messages[`${field.name}.label`]) {
         field.label = intl.formatMessage(this.messages[`${field.name}.label`]);
       }
@@ -208,7 +205,7 @@ class CreateEventForm extends React.Component {
       <div className="EditEventForm">
         <Container maxWidth="700px" margin="0 auto">
           <div className="inputs">
-            {this.fields.map(field =>
+            {fields.map(field =>
               field.name === 'timezone' ? (
                 <TimezonePicker
                   key={field.name}

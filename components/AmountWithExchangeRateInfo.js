@@ -83,7 +83,7 @@ const ContentContainer = styled.div`
 
 const AmountWithExchangeRateInfo = ({
   amount: { exchangeRate, currency, value, valueInCents },
-  amountStyles,
+  amountClassName,
   showCurrencyCode,
   invertIconPosition,
   warning,
@@ -104,7 +104,7 @@ const AmountWithExchangeRateInfo = ({
             amount={valueInCents ?? Math.round(value * 100)}
             currency={currency}
             precision={2}
-            amountStyles={amountStyles || null}
+            amountClassName={amountClassName || null}
             showCurrencyCode={showCurrencyCode}
           />
         </ContentContainer>
@@ -118,7 +118,7 @@ AmountWithExchangeRateInfo.propTypes = {
   amount: AmountPropTypeShape,
   showCurrencyCode: PropTypes.bool,
   invertIconPosition: PropTypes.bool,
-  amountStyles: PropTypes.object,
+  amountClassName: PropTypes.object,
   warning: PropTypes.node,
   error: PropTypes.node,
 };

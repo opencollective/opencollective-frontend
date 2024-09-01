@@ -176,7 +176,6 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
                             amount={paymentProcessorFeeTransaction.netAmount.valueInCents}
                             currency={paymentProcessorFeeTransaction.netAmount.currency}
                             showCurrencyCode={false}
-                            amountStyles={null}
                           />
                         ),
                       }}
@@ -195,7 +194,6 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
                             amount={hostFeeTransaction.netAmount.valueInCents}
                             currency={hostFeeTransaction.netAmount.currency}
                             showCurrencyCode={false}
-                            amountStyles={null}
                           />
                         ),
                       }}
@@ -215,7 +213,6 @@ const TransactionDetails = ({ displayActions, transaction, onMutationSuccess }) 
                             amount={taxTransaction.netAmount.valueInCents}
                             currency={taxTransaction.netAmount.currency}
                             showCurrencyCode={false}
-                            amountStyles={null}
                           />
                         ),
                       }}

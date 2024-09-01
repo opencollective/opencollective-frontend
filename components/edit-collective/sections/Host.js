@@ -255,7 +255,7 @@ class Host extends React.Component {
                     <FormattedMoneyAmount
                       amount={additionalInfo.account.stats.consolidatedBalance.valueInCents}
                       currency={additionalInfo.account.stats.consolidatedBalance.currency}
-                      amountStyles={{ fontSize: '20px', fontWeight: 'bold' }}
+                      amountClassName="text-xl font-bold"
                       precision={2}
                     />
                     {(additionalInfo.account.events.totalCount > 0 || additionalInfo.account.projects > 0) && (
@@ -340,7 +340,7 @@ class Host extends React.Component {
             (action === 'Remove' ? (
               <LeaveHostModal account={collective} host={collective.host} onClose={closeModal} />
             ) : (
-              <StyledModal width="570px" onClose={closeModal}>
+              <StyledModal onClose={closeModal}>
                 <ModalHeader onClose={closeModal}>
                   <FormattedMessage
                     id="collective.editHost.header"

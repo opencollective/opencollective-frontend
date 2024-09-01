@@ -270,7 +270,7 @@ const OCFDuplicateAndApplyToHostModal = ({ hostSlug, collective, onClose, onSucc
 
   const currentStep = STEPS[stepKey];
   return (
-    <StyledModal onClose={() => onClose(successResult)} width="570px" {...props}>
+    <StyledModal onClose={() => onClose(successResult)} {...props}>
       {loading ? (
         <React.Fragment>
           <ModalHeader hideCloseIcon>

@@ -153,6 +153,10 @@ const hostedCollectiveFields = gql`
         currency
       }
     }
+    policies {
+      id
+      COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS
+    }
     ... on AccountWithHost {
       hostFeesStructure
       hostFeePercent
@@ -376,6 +380,12 @@ export const hostedCollectiveDetailQuery = gql`
           name
           imageUrl
         }
+        host {
+          id
+          name
+          slug
+          type
+        }
       }
     }
   }
@@ -405,6 +415,7 @@ export const allCollectivesQuery = gql`
       isActive: $isActive
       host: $host
       consolidatedBalance: $consolidatedBalance
+      skipGuests: false
     ) {
       offset
       limit

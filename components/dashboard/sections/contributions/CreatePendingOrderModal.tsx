@@ -107,6 +107,7 @@ const createPendingContributionModalQuery = gql`
           friendlyName
           code
           kind
+          appliesTo
         }
       }
       plan {
@@ -185,6 +186,12 @@ const createPendingContributionModalCollectiveQuery = gql`
             legacyId
             name
           }
+        }
+      }
+
+      ... on AccountWithParent {
+        parent {
+          id
         }
       }
     }
@@ -298,6 +305,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
     if (values.toAccount?.slug) {
       debouncedLazyQuery(getCollectiveInfo, { slug: values.toAccount.slug });
     }
+    setFieldValue('accountingCategory', null);
   }, [values.toAccount]);
 
   React.useEffect(() => {
@@ -540,6 +548,8 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
           >
             {({ form, field }) => (
               <AccountingCategorySelect
+                showCode
+                disabled={!collective}
                 id={field.id}
                 kind="CONTRIBUTION"
                 onChange={value => form.setFieldValue(field.name, value)}

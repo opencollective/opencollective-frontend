@@ -188,7 +188,6 @@ const getInfoItems = (account): InfoItemProps[] => {
                 <FormattedMoneyAmount
                   amount={get(account, 'stats.balanceWithBlockedFunds.valueInCents', 0)}
                   currency={account.stats.balanceWithBlockedFunds.currency}
-                  amountStyles={{ letterSpacing: 0 }}
                 />
               </span>
             ),
@@ -209,7 +208,6 @@ const getInfoItems = (account): InfoItemProps[] => {
                   amount={account?.stats.totalPaidExpenses.valueInCents}
                   currency={account?.stats.totalPaidExpenses.currency}
                   precision={2}
-                  amountStyles={{ letterSpacing: 0 }}
                 />
               </span>
             ),

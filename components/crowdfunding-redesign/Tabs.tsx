@@ -1,30 +1,44 @@
 import React from 'react';
-import { cva } from 'class-variance-authority';
-import clsx from 'clsx';
+import * as TabsPrimitive from '@radix-ui/react-tabs';
 
-import Link from '../Link';
+import { cn } from '../../lib/utils';
 
-import { triggerPrototypeToast } from './helpers';
+const Tabs = TabsPrimitive.Root;
 
-export const Tabs = ({ tabs, centered }) => {
-  const linkClasses = cva('flex h-full px-1 antialiased hover:text-primary text-sm items-center border-b-[3px]', {
-    variants: {
-      active: {
-        true: 'border-black font-semibold',
-        false: 'border-transparent font-medium',
-      },
-    },
-    defaultVariants: {
-      active: false,
-    },
-  });
-  return (
-    <div className={clsx('flex h-full gap-8', centered && 'justify-center')}>
-      {tabs.map((tab, i) => (
-        <Link href={`#`} key={tab} className={linkClasses({ active: i === 0 })} onClick={triggerPrototypeToast}>
-          <div>{tab}</div>
-        </Link>
-      ))}
-    </div>
-  );
-};
+const TabsList = React.forwardRef<
+  React.ElementRef<typeof TabsPrimitive.List>,
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.List> & { centered?: boolean }
+>(({ className, centered, ...props }, ref) => (
+  <TabsPrimitive.List
+    ref={ref}
+    className={cn('flex h-full gap-8', centered && 'justify-center', className)}
+    {...props}
+  />
+));
+TabsList.displayName = TabsPrimitive.List.displayName;
+
+const TabsTrigger = React.forwardRef<
+  React.ElementRef<typeof TabsPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger> & { count?: number }
+>(({ className, children, count, ...props }, ref) => (
+  <TabsPrimitive.Trigger
+    ref={ref}
+    className={cn(
+      'relative flex h-full items-center gap-1.5 border-b-[3px] px-1 text-sm antialiased hover:text-primary',
+      'border-transparent font-medium transition-colors data-[state=active]:border-black',
+      className,
+    )}
+    {...props}
+  >
+    {children} {count > 0 && <div className="relative -top-1 align-top text-xs text-primary">{count}</div>}
+  </TabsPrimitive.Trigger>
+));
+TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
+
+const TabsContent = React.forwardRef<
+  React.ElementRef<typeof TabsPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content>
+>(({ className, ...props }, ref) => <TabsPrimitive.Content ref={ref} className={cn('', className)} {...props} />);
+TabsContent.displayName = TabsPrimitive.Content.displayName;
+
+export { Tabs, TabsList, TabsTrigger, TabsContent };

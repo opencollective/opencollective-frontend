@@ -1,13 +1,31 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { has } from 'lodash';
+import type { ReactNode } from 'react';
+
+import type { GraphQLV1Collective } from '../../lib/custom_typings/GraphQLV1Collective';
 
 import Avatar from '../Avatar';
 import Container from '../Container';
 import { Flex } from '../Grid';
 import LinkCollective from '../LinkCollective';
 
-const CollectiveCard = ({ collective, children, size, avatarSize, p, ...props }) => {
+type CollectiveCardProps = {
+  collective: GraphQLV1Collective;
+  children?: ReactNode;
+  size?: string | number | (string | number)[];
+  fontSize?: string;
+  p?: number;
+  avatarSize?: string | number | (string | number)[];
+} & React.ComponentProps<typeof Container>;
+
+const CollectiveCard = ({
+  collective,
+  children,
+  size = 300,
+  avatarSize = 75,
+  p = 3,
+  ...props
+}: CollectiveCardProps) => {
   const hasCustomColor = has(collective, 'settings.collectivePage.primaryColor');
   return (
     <Container
@@ -31,21 +49,6 @@ const CollectiveCard = ({ collective, children, size, avatarSize, p, ...props })
       </Flex>
     </Container>
   );
-};
-
-CollectiveCard.propTypes = {
-  collective: PropTypes.object,
-  children: PropTypes.node,
-  size: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
-  fontSize: PropTypes.string,
-  p: PropTypes.number,
-  avatarSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
-};
-
-CollectiveCard.defaultProps = {
-  size: 300,
-  avatarSize: 75,
-  p: 3,
 };
 
 export default CollectiveCard;

@@ -626,10 +626,10 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                 </Label>
                 <Amount>
                   <FormattedMoneyAmount
-                    amountStyles={{ fontWeight: 500 }}
                     amount={amounts.expenseAmountInHostCurrency?.valueInCents}
+                    amountClassName="font-medium"
                     currency={amounts.expenseAmountInHostCurrency?.currency}
-                    currencyCodeStyles={{ color: 'black.500' }}
+                    currencyCodeClassName="text-muted-foreground"
                   />
                 </Amount>
               </AmountLine>
@@ -644,7 +644,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                       amount={getTaxAmount(amountWithoutTaxes, tax)}
                       precision={2}
                       currency={expense.currency}
-                      amountStyles={{ fontWeight: 500 }}
+                      amountClassName="font-medium"
                       showCurrencyCode={false}
                     />
                   </Amount>
@@ -662,11 +662,8 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                       <FormattedMoneyAmount
                         amount={amounts.paymentProcessorFee.valueInCents}
                         currency={amounts.paymentProcessorFee.currency}
-                        currencyCodeStyles={{ color: 'black.500' }}
-                        amountStyles={{
-                          fontWeight: 500,
-                          color: 'black.900',
-                        }}
+                        currencyCodeClassName="text-muted-foreground"
+                        amountClassName="text-foreground font-medium"
                       />
                     )}
                   </Amount>
@@ -687,7 +684,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                     <FormattedMoneyAmount
                       amount={amounts.totalAmount?.valueInCents}
                       currency={amounts.totalAmount?.currency}
-                      currencyCodeStyles={{ color: 'black.500' }}
+                      currencyCodeClassName="text-muted-foreground"
                     />
                   )}
                 </Amount>

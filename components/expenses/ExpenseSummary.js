@@ -21,7 +21,7 @@ import { AccountHoverCard } from '../AccountHoverCard';
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import Avatar from '../Avatar';
 import Container from '../Container';
-import FormattedMoneyAmount, { DEFAULT_AMOUNT_STYLES } from '../FormattedMoneyAmount';
+import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import HTMLContent from '../HTMLContent';
 import LinkCollective from '../LinkCollective';
@@ -29,7 +29,7 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
 import Tags from '../Tags';
-import { H1, H4, P, Span } from '../Text';
+import { H1, P, Span } from '../Text';
 import { Separator } from '../ui/Separator';
 import UploadedFilePreview from '../UploadedFilePreview';
 
@@ -172,13 +172,13 @@ const ExpenseSummary = ({
         mb={3}
       >
         <Flex mr={[0, 2]}>
-          <H4 fontWeight="500" data-cy="expense-description">
+          <h4 className="text-xl font-medium" data-cy="expense-description">
             {!expense?.description && isLoading ? (
               <LoadingPlaceholder height={32} minWidth={250} />
             ) : (
               expense.description
             )}
-          </H4>
+          </h4>
         </Flex>
         <Flex mb={[3, 0]} justifyContent={['space-between', 'flex-end']} alignItems="center">
           {expense?.status && (
@@ -411,14 +411,13 @@ const ExpenseSummary = ({
                         <FormattedMoneyAmount
                           amount={Math.round(attachment.amountV2.valueInCents * attachment.amountV2.exchangeRate.value)}
                           currency={expense.currency}
-                          amountStyles={{ ...DEFAULT_AMOUNT_STYLES, fontWeight: '500' }}
+                          amountClassName="font-medium text-foreground"
                           precision={2}
                         />
                         <div className="mt-[2px] text-xs">
                           <AmountWithExchangeRateInfo
                             amount={attachment.amountV2}
                             invertIconPosition
-                            amountStyles={{ letterSpacing: 0 }}
                             {...getExpenseExchangeRateWarningOrError(
                               intl,
                               attachment.amountV2.exchangeRate,
@@ -431,7 +430,7 @@ const ExpenseSummary = ({
                       <FormattedMoneyAmount
                         amount={attachment.amountV2?.valueInCents || attachment.amount}
                         currency={attachment.amountV2?.currency || expense.currency}
-                        amountStyles={{ ...DEFAULT_AMOUNT_STYLES, fontWeight: '500' }}
+                        amountClassName="font-medium text-foreground"
                         precision={2}
                       />
                     )}
@@ -457,18 +456,18 @@ const ExpenseSummary = ({
           )}
         </Flex>
         {isMultiCurrency && (
-          <Flex alignItems="center" mt={2}>
-            <Container fontSize="12px" fontWeight="500" mr={3} whiteSpace="nowrap" color="black.600">
+          <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+            <Container fontWeight="500" mr={3} whiteSpace="nowrap">
               <FormattedMessage
                 defaultMessage="Accounted as ({currency}):"
                 id="4Wdhe4"
                 values={{ currency: expense.amountInAccountCurrency.currency }}
               />
             </Container>
-            <Container color="black.600">
+            <Container>
               <AmountWithExchangeRateInfo amount={expense.amountInAccountCurrency} />
             </Container>
-          </Flex>
+          </div>
         )}
       </Flex>
       {expenseTypeSupportsAttachments(expense?.type) && expense?.attachedFiles?.length > 0 && (

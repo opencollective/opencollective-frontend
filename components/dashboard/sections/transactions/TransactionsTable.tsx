@@ -177,7 +177,6 @@ const columns: ColumnDef<TransactionsTableQueryNode>[] = [
               amount={Math.abs(amount.valueInCents)}
               currency={amount.currency}
               precision={2}
-              amountStyles={{}}
               showCurrencyCode={false}
             />
           </div>
@@ -203,7 +202,6 @@ const columns: ColumnDef<TransactionsTableQueryNode>[] = [
               amount={Math.abs(amount.valueInCents)}
               currency={amount.currency}
               precision={2}
-              amountStyles={{}}
               showCurrencyCode={false}
             />
           </div>
@@ -234,7 +232,6 @@ const columns: ColumnDef<TransactionsTableQueryNode>[] = [
             amount={netAmount.valueInCents}
             currency={netAmount.currency}
             precision={2}
-            amountStyles={{ letterSpacing: 0 }}
             showCurrencyCode={false}
           />
         </div>

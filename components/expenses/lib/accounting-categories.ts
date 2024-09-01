@@ -1,7 +1,7 @@
 import { get } from 'lodash';
 
-import type { LoggedInUser } from '../../../lib/custom_typings/LoggedInUser';
 import type { Account, Expense, Host, Policies } from '../../../lib/graphql/types/v2/graphql';
+import type LoggedInUser from '../../../lib/LoggedInUser';
 import { getPolicy } from '../../../lib/policies';
 
 const getExpenseCategorizationPolicy = (
@@ -17,8 +17,10 @@ const getExpenseCategorizationPolicy = (
 export const userMustSetAccountingCategory = (
   user: LoggedInUser | null,
   collective: {
+    slug: Account['slug'];
+    type: Account['type'];
     policies: Pick<Policies, 'EXPENSE_CATEGORIZATION'>;
-    host?: { policies: Pick<Policies, 'EXPENSE_CATEGORIZATION'> };
+    host?: { slug: Account['slug']; policies: Pick<Policies, 'EXPENSE_CATEGORIZATION'> };
   },
   host = collective?.['host'],
 ) => {

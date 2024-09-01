@@ -203,12 +203,8 @@ const VATInputs = ({ AmountLine, Amount, Label, currency, taxInfo, dispatchChang
           </Box>
         )}
       </Flex>
-      <Amount pt={2} ml={2} data-cy="VAT-amount">
-        <FormattedMoneyAmount
-          amount={taxInfo.amount}
-          currency={currency}
-          amountStyles={{ color: 'black.700', fontWeight: 400 }}
-        />
+      <Amount pt={2} ml={2} data-cy="VAT-amount" color="black.700" fontWeight={400}>
+        <FormattedMoneyAmount amount={taxInfo.amount} currency={currency} />
       </Amount>
     </AmountLine>
   );
@@ -255,12 +251,8 @@ const GSTInputs = ({ AmountLine, Amount, Label, currency, taxInfo, dispatchChang
           </Box>
         </Flex>
       </Flex>
-      <Amount pt={2} ml={2} data-cy="GST-amount">
-        <FormattedMoneyAmount
-          amount={taxInfo.amount}
-          currency={currency}
-          amountStyles={{ color: 'black.700', fontWeight: 400 }}
-        />
+      <Amount pt={2} ml={2} data-cy="GST-amount" color="black.700" fontWeight={400}>
+        <FormattedMoneyAmount amount={taxInfo.amount} currency={currency} />
       </Amount>
     </AmountLine>
   );

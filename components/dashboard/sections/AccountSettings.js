@@ -28,6 +28,7 @@ const AccountSettings = ({ account, section }) => {
   const { data, loading } = useQuery(editCollectivePageQuery, {
     variables: { slug: account.slug },
     fetchPolicy: 'network-only',
+    ssr: false,
     skip: !LoggedInUser,
   });
   const collective = data?.Collective;
@@ -85,28 +86,6 @@ const AccountSettings = ({ account, section }) => {
     }
 
     const CollectiveInputType = pick(collective, collectiveFields);
-    if (isArray(collective.tiers)) {
-      CollectiveInputType.tiers = collective.tiers.map(tier =>
-        pick(tier, [
-          'id',
-          'type',
-          'name',
-          'description',
-          'longDescription',
-          'useStandalonePage',
-          'amount',
-          'amountType',
-          'interval',
-          'maxQuantity',
-          'presets',
-          'minimumAmount',
-          'goal',
-          'button',
-          'invoiceTemplate',
-          'singleTicket',
-        ]),
-      );
-    }
 
     if (isArray(collective.socialLinks)) {
       CollectiveInputType.socialLinks = collective.socialLinks.map(sl => omit(sl, '__typename'));

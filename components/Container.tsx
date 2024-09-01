@@ -56,7 +56,11 @@ export type ContainerProps = FlexboxProps &
     css?: CSSProp;
   };
 
-const Container = styled.div<ContainerProps>`
+const FILTERED_PROPS = new Set(['display', 'width', 'height', 'overflow']);
+
+const Container = styled.div.withConfig({
+  shouldForwardProp: (prop, validate) => validate(prop) && !FILTERED_PROPS.has(prop),
+})<ContainerProps>`
   box-sizing: border-box;
 
   ${flexbox}

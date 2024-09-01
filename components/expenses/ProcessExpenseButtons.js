@@ -134,13 +134,13 @@ const ProcessExpenseButtons = ({
   collective,
   host,
   permissions,
-  buttonProps,
+  buttonProps = DEFAULT_PROCESS_EXPENSE_BTN_PROPS,
   onSuccess,
   onModalToggle,
   onDelete,
   isMoreActions,
-  displaySecurityChecks,
-  isViewingExpenseInHostContext,
+  displaySecurityChecks = true,
+  isViewingExpenseInHostContext = false,
   disabled,
 }) => {
   const [confirmProcessExpenseAction, setConfirmProcessExpenseAction] = React.useState();
@@ -393,12 +393,6 @@ ProcessExpenseButtons.propTypes = {
 export const DEFAULT_PROCESS_EXPENSE_BTN_PROPS = {
   buttonSize: 'small',
   minWidth: 130,
-};
-
-ProcessExpenseButtons.defaultProps = {
-  buttonProps: DEFAULT_PROCESS_EXPENSE_BTN_PROPS,
-  displaySecurityChecks: true,
-  isViewingExpenseInHostContext: false,
 };
 
 export default ProcessExpenseButtons;

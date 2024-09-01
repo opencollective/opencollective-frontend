@@ -26,14 +26,18 @@ const StyledSVG = styled.svg`
  * to ensure consistency with third-party imported icons.
  */
 const CustomStyledIcon = ({ size, ...props }) => {
-  return <StyledSVG stroke="currentColor" height={size} width={size} {...props} />;
-};
-
-CustomStyledIcon.defaultProps = {
-  focusable: 'false',
-  'aria-hidden': 'true',
-  role: 'img',
-  xmlns: 'http://www.w3.org/2000/svg',
+  return (
+    <StyledSVG
+      stroke="currentColor"
+      height={size}
+      width={size}
+      xmlns="http://www.w3.org/2000/svg"
+      focusable="false"
+      ariaHidden="true"
+      role="img"
+      {...props}
+    />
+  );
 };
 
 CustomStyledIcon.propTypes = {

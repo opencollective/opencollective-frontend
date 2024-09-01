@@ -14,7 +14,6 @@ import type { ZodObjectDef } from 'zod';
 import z from 'zod';
 
 import { AccountTypesWithHost, CollectiveType } from '../../lib/constants/collectives';
-import type { LoggedInUser } from '../../lib/custom_typings/LoggedInUser';
 import { getPayoutProfiles } from '../../lib/expenses';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type {
@@ -28,6 +27,7 @@ import type {
 } from '../../lib/graphql/types/v2/graphql';
 import { Currency, ExpenseStatus, ExpenseType, PayoutMethodType } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import type LoggedInUser from '../../lib/LoggedInUser';
 import { userMustSetAccountingCategory } from '../expenses/lib/accounting-categories';
 import { computeExpenseAmounts, expenseTypeSupportsItemCurrency, getSupportedCurrencies } from '../expenses/lib/utils';
 
@@ -332,6 +332,7 @@ const formSchemaQuery = gql`
         friendlyName
         code
         instructions
+        appliesTo
       }
     }
   }
@@ -403,6 +404,12 @@ const formSchemaQuery = gql`
     ... on Organization {
       host {
         ...ExpenseFormSchemaHostFields
+      }
+    }
+    ... on AccountWithParent {
+      parent {
+        id
+        slug
       }
     }
   }
@@ -773,7 +780,7 @@ async function buildFormOptions(
       );
     }
 
-    if (payee && AccountTypesWithHost.includes(payee.type)) {
+    if (payee && (AccountTypesWithHost as readonly string[]).includes(payee.type)) {
       options.supportedPayoutMethods = options.supportedPayoutMethods.filter(t => t !== PayoutMethodType.OTHER);
     }
 

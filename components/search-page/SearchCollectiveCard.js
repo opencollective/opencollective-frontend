@@ -7,7 +7,7 @@ import { CollectiveType } from '../../lib/constants/collectives';
 import Container from '../Container';
 import Currency from '../Currency';
 import { Box } from '../Grid';
-import { P, Span } from '../Text';
+import { Span } from '../Text';
 
 import StyledCollectiveCard from './StyledCollectiveCard';
 
@@ -55,7 +55,7 @@ const SearchCollectiveCard = ({ collective, ...props }) => {
             </React.Fragment>
           ) : (
             <React.Fragment>
-              <P fontSize="12px" lineHeight="18px">
+              <Container fontSize="12px" lineHeight="18px">
                 {collective.stats?.contributorsCount > 0 && (
                   <Box pb="6px">
                     <Span fontSize="14px" fontWeight={700} color="black.900">
@@ -71,7 +71,7 @@ const SearchCollectiveCard = ({ collective, ...props }) => {
                     </Span>
                   </Box>
                 )}
-              </P>
+              </Container>
 
               {collective.type !== CollectiveType.ORGANIZATION &&
                 collective.stats.totalAmountReceived.valueInCents > 0 && (

@@ -29,7 +29,7 @@ const ApplicationRejectionReasonModal = ({ collective, onClose, onConfirm, ...mo
   const totalAdminCount = collective.admins?.totalCount || admins.length;
 
   return (
-    <StyledModal onClose={onClose} width="576px" {...modalProps}>
+    <StyledModal onClose={onClose} {...modalProps}>
       <ModalHeader hideCloseIcon>
         <Flex justifyContent="space-between" flexDirection={['column', 'row']} width="100%">
           <Flex>

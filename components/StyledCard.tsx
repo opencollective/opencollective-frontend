@@ -39,9 +39,15 @@ type StyledCardProps = BackgroundProps &
  *
  * @see See [styled-system docs](https://github.com/jxnblk/styled-system/blob/master/docs/api.md) for usage of those props
  */
-const StyledCard = styled.div<StyledCardProps>(
-  compose(flexbox, typography, background, border, shadow, color, layout, position, space),
-);
+const StyledCard = styled.div.attrs<StyledCardProps>(props => ({
+  bg: props.bg ?? 'white.full',
+  borderWidth: props.borderWidth ?? '1px',
+  borderStyle: props.borderStyle ?? 'solid',
+  borderColor: props.borderColor ?? 'black.300',
+  borderRadius: props.borderRadius ?? '8px',
+  overflowX: props.overflowX ?? 'hidden',
+  overflowY: props.overflowY ?? 'hidden',
+}))<StyledCardProps>(compose(flexbox, typography, background, border, shadow, color, layout, position, space));
 
 StyledCard.propTypes = {
   ...styledPropTypes.flexbox,
@@ -53,16 +59,6 @@ StyledCard.propTypes = {
   ...styledPropTypes.layout,
   ...styledPropTypes.space,
   ...styledPropTypes.position,
-};
-
-StyledCard.defaultProps = {
-  bg: 'white.full',
-  borderWidth: '1px',
-  borderStyle: 'solid',
-  borderColor: 'black.300',
-  borderRadius: '8px',
-  overflowX: 'hidden',
-  overflowY: 'hidden',
 };
 
 /** @component */

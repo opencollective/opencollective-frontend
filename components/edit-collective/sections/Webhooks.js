@@ -1,10 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
-import { Add } from '@styled-icons/material/Add';
-import { Close } from '@styled-icons/material/Close';
 import { cloneDeep, difference, get, pick } from 'lodash';
+import { Info, PlusCircle, Save, Trash, WebhookIcon } from 'lucide-react';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import { isURL } from 'validator';
@@ -17,15 +15,15 @@ import { gqlV1 } from '../../../lib/graphql/helpers';
 import { i18nWebhookEventType } from '../../../lib/i18n/webhook-event-type';
 import { compose } from '../../../lib/utils';
 
-import { Box, Flex } from '../../Grid';
 import { getI18nLink } from '../../I18nFormatters';
 import Loading from '../../Loading';
 import MessageBox from '../../MessageBox';
-import StyledButton from '../../StyledButton';
-import StyledHr from '../../StyledHr';
 import StyledInputGroup from '../../StyledInputGroup';
 import StyledSelect from '../../StyledSelect';
-import { Label, P, Span } from '../../Text';
+import { Button } from '../../ui/Button';
+import { Label } from '../../ui/Label';
+import { Separator } from '../../ui/Separator';
+import { toast } from '../../ui/useToast';
 
 import WebhookActivityInfoModal, { hasWebhookEventInfo } from './WebhookActivityInfoModal';
 
@@ -49,7 +47,6 @@ class Webhooks extends React.Component {
       webhooks: cloneDeep(this.getWebhooksFromProps(props)),
       isLoaded: false,
       status: null,
-      error: '',
     };
   }
 
@@ -170,7 +167,8 @@ class Webhooks extends React.Component {
       }, 3000);
     } catch (e) {
       const message = getErrorFromGraphqlException(e).message;
-      this.setState({ status: 'error', error: message });
+      toast({ variant: 'error', message });
+      this.setState({ status: null });
     }
   };
 
@@ -178,37 +176,32 @@ class Webhooks extends React.Component {
     const { intl, data } = this.props;
 
     return (
-      <Flex
-        py={4}
-        key={index}
-        width={[0.9, 1]}
-        mx={['auto', 0]}
-        px={[0, 3, 0]}
-        flexWrap="wrap"
-        flexDirection="row-reverse"
-        justifyContent="space-between"
-      >
-        <Box my={[0, 3]}>
-          <StyledButton
-            width={1}
-            py={1}
-            px={3}
-            buttonSize="small"
-            buttonStyle="standard"
+      <div key={index} className="rounded-lg border bg-white p-6 text-card-foreground shadow-sm">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="rounded-full bg-slate-100 p-2">
+              <WebhookIcon size={24} />
+            </div>
+            <span className="text-lg font-bold">
+              <FormattedMessage defaultMessage="Webhook #{index}" id="webhook.index" values={{ index: index + 1 }} />
+            </span>
+          </div>
+          <Button
+            variant="outlineDestructive"
             onClick={() => this.removeWebhook(index)}
+            title={intl.formatMessage({ id: 'webhooks.remove', defaultMessage: 'Remove webhook' })}
           >
-            <Close size="1.2em" />
-            {'  '}
-            <FormattedMessage id="webhooks.remove" defaultMessage="Remove webhook" />
-          </StyledButton>
-        </Box>
+            <Trash size={14} alt={intl.formatMessage({ id: 'webhooks.remove', defaultMessage: 'Remove webhook' })} />
+          </Button>
+        </div>
 
-        <Box width={[1, 0.75]}>
-          <Box mb={4}>
-            <Label fontSize="14px" mb={1}>
+        <div className="mt-4 flex flex-col gap-2">
+          <div>
+            <Label htmlFor={`webhook-url-${index}`} className="text-sm font-medium">
               <FormattedMessage id="webhooks.url.label" defaultMessage="URL" />
             </Label>
             <StyledInputGroup
+              id={`webhook-url-${index}`}
               type="type"
               name="webhookUrl"
               prepend="https://"
@@ -216,16 +209,16 @@ class Webhooks extends React.Component {
               value={this.cleanWebhookUrl(webhook.webhookUrl)}
               onChange={({ target }) => this.editWebhook(index, 'webhookUrl', target.value)}
             />
-          </Box>
-          <Box>
-            <Label fontSize="14px" mb={1}>
+          </div>
+          <div>
+            <Label htmlFor={`event-type-select-${index}`}>
               <FormattedMessage defaultMessage="Activity" id="ZmlNQ3" />
             </Label>
-            <Flex alignItems="center">
+            <div className="flex items-center">
               <StyledSelect
+                inputId={`event-type-select-${index}`}
                 minWidth={300}
                 isSearchable={false}
-                inputId="event-type-select"
                 options={this.getEventTypes(data.Collective).map(eventType => ({
                   label: i18nWebhookEventType(intl, eventType),
                   value: eventType,
@@ -234,18 +227,18 @@ class Webhooks extends React.Component {
                 onChange={({ value }) => this.editWebhook(index, 'type', value)}
               />
               {hasWebhookEventInfo(webhook.type) && (
-                <StyledButton
-                  buttonSize="tiny"
-                  isBorderless
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="ml-2"
                   title={intl.formatMessage({ id: 'moreInfo', defaultMessage: 'More info' })}
                   onClick={() => this.setState({ moreInfoModal: webhook.type })}
-                  ml={2}
                 >
-                  <InfoCircle size={24} color="#a3a3a3" />
-                </StyledButton>
+                  <Info className="text-slate-400" size={18} />
+                </Button>
               )}
-            </Flex>
-          </Box>
+            </div>
+          </div>
           {data.Collective.isHost &&
             [WebhookEvents.COLLECTIVE_EXPENSE_CREATED, WebhookEvents.COLLECTIVE_TRANSACTION_CREATED].includes(
               webhook.type,
@@ -264,15 +257,14 @@ class Webhooks extends React.Component {
               onClose={() => this.setState({ moreInfoModal: null })}
             />
           )}
-        </Box>
-      </Flex>
+        </div>
+      </div>
     );
   };
 
   render() {
-    const { webhooks, status, error } = this.state;
+    const { webhooks, status } = this.state;
     const { data } = this.props;
-    const webhooksCount = webhooks.length;
 
     if (data.loading) {
       return <Loading />;
@@ -280,7 +272,7 @@ class Webhooks extends React.Component {
 
     return (
       <div>
-        <P fontSize="14px" lineHeight="18px">
+        <p className="text-sm text-muted-foreground">
           <FormattedMessage
             defaultMessage="You can use Webhooks to build custom integrations with Open Collective. Slack and Discord webhooks are natively supported. You can also integrate them with tools like Zapier, IFTTT, or Huginn. Learn more about this from <DocLink>the documentation</DocLink> or see how you can go further using our <GraphqlAPILink>public GraphQL API</GraphqlAPILink>."
             id="gN829M"
@@ -295,60 +287,49 @@ class Webhooks extends React.Component {
               }),
             }}
           />
-        </P>
+        </p>
 
-        <div>{webhooks.map(this.renderWebhook)}</div>
+        <Separator className="my-6" />
 
-        {webhooksCount > 0 && <StyledHr borderColor="black.300" />}
-
-        <Box width={[0.9, 0.75]} mx={['auto', 0]} my={3}>
-          <StyledButton
-            width={1}
-            px={[0, 3, 0]}
-            borderRadius={6}
-            buttonSize="medium"
-            buttonStyle="standard"
-            css={'border-style: dashed'}
-            onClick={() => this.addWebhook()}
-          >
-            <Add size="1.2em" />
-            {'  '}
+        <div className="mb-6 mt-8 flex items-center justify-between">
+          <h3 className="text-xl font-bold">
             <FormattedMessage
-              defaultMessage="Add {existingWebhooksCount, select, 0 {your first} other {another}} webhook"
-              id="M3IHfl"
-              values={{ existingWebhooksCount: webhooksCount }}
+              defaultMessage="Webhooks for {collective}"
+              id="RHr16v"
+              values={{ collective: data.Collective.name || `@${data.Collective.slug}` }}
             />
-          </StyledButton>
-        </Box>
+          </h3>
+          <Button onClick={this.addWebhook}>
+            <PlusCircle className="mr-2 h-5 w-5" /> <FormattedMessage defaultMessage="New Webhook" id="q7eF+t" />
+          </Button>
+        </div>
 
-        {status === 'error' && (
-          <Box my={3}>
-            <MessageBox type="error">{error}</MessageBox>
-          </Box>
+        {webhooks.length === 0 ? (
+          <div className="rounded-lg border bg-card py-12 text-center text-card-foreground shadow-sm">
+            <WebhookIcon className="mx-auto mb-4 h-16 w-16 text-gray-400" />
+            <h4 className="text-lg font-semibold">
+              <FormattedMessage defaultMessage="No webhooks configured" id="prsPHX" />
+            </h4>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-6">{webhooks.map(this.renderWebhook)}</div>
         )}
 
-        <Box mr={3}>
-          <StyledButton
-            px={4}
-            buttonSize="medium"
-            buttonStyle="primary"
-            onClick={this.handleSubmit}
-            loading={status === 'loading'}
-            disabled={data.loading || !this.state.modified || status === 'invalid'}
-          >
-            {status === 'saved' ? (
-              <Span textTransform="capitalize">
-                <FormattedMessage id="saved" defaultMessage="Saved" />
-              </Span>
-            ) : (
-              <FormattedMessage
-                id="webhooks.save"
-                defaultMessage="Save {count} webhooks"
-                values={{ count: webhooksCount }}
-              />
-            )}
-          </StyledButton>
-        </Box>
+        <Button
+          className="mt-8 w-full"
+          onClick={this.handleSubmit}
+          loading={status === 'loading'}
+          disabled={data.loading || !this.state.modified || status === 'invalid'}
+        >
+          <Save size={16} className="mr-2" />
+          {status === 'saved' ? (
+            <span>
+              <FormattedMessage id="saved" defaultMessage="Saved" />
+            </span>
+          ) : (
+            <FormattedMessage id="save" defaultMessage="Save" />
+          )}
+        </Button>
       </div>
     );
   }
@@ -358,6 +339,7 @@ const editCollectiveWebhooksQuery = gqlV1/* GraphQL */ `
   query EditCollectiveWebhooks($collectiveSlug: String) {
     Collective(slug: $collectiveSlug) {
       id
+      name
       type
       slug
       isHost

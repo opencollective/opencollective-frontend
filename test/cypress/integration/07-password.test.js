@@ -5,6 +5,7 @@ describe('passwords', () => {
 
   before(() => {
     cy.signup({ user: { name: 'Mr Bungle' } }).then(u => (user = u));
+    cy.logout();
   });
 
   it('can be set from the settings page', () => {
@@ -147,7 +148,7 @@ describe('passwords', () => {
     cy.enableTwoFactorAuth({ userEmail: user.email, userSlug: user.collective.slug, secret: secret.base32 });
 
     // Sign-in flow
-    cy.visit(`/signin`);
+    cy.visit(`/signin?next=/dashboard/${user.collective.slug}/info`);
     cy.get('input[name="email"]').type(user.email);
     cy.getByDataCy('signin-btn').click();
     cy.get('input[name="password"]:visible').type('strongNewP@ssword<>?');

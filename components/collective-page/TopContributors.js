@@ -126,7 +126,6 @@ const ContributorsBlock = ({ title, contributors, totalNbContributors, currency,
                       date: <FormattedDate value={contributor.since} month="short" year="numeric" />,
                       totalDonated: (
                         <FormattedMoneyAmount
-                          amountStyles={null}
                           amount={contributor.totalAmountDonated}
                           currency={currency}
                           precision={0}

@@ -25,6 +25,7 @@ type TaxesFormikFieldsProps = {
   dispatchDefaultValueOnMount?: boolean;
   labelProps?: Record<string, any>;
   idNumberLabelRenderer?: (shortLabel: string) => string;
+  requireIdNumber?: boolean;
 };
 
 type TaxSpecificValues = {
@@ -84,17 +85,21 @@ export const validateTaxInput = (intl: IntlShape, tax: TaxInput, options = { req
   }
 };
 
-const getTaxSpecificValues = (intl: IntlShape, taxType: TaxType, currentTaxValue): TaxSpecificValues => {
+const getTaxSpecificValues = (
+  taxType: TaxType,
+  currentTaxValue,
+  { requireIdNumber = undefined } = {},
+): TaxSpecificValues => {
   switch (taxType) {
     case TaxType.VAT:
       return {
         idNumberPlaceholder: 'EU000011111',
-        requireIdNumber: Boolean(currentTaxValue?.rate),
+        requireIdNumber: isNil(requireIdNumber) ? Boolean(currentTaxValue?.rate) : requireIdNumber,
       };
     case TaxType.GST:
       return {
         idNumberPlaceholder: '123456789',
-        requireIdNumber: false,
+        requireIdNumber: isNil(requireIdNumber) ? false : requireIdNumber,
         forcedRate: GST_RATE_PERCENT / 100,
         possibleRates: [0, GST_RATE_PERCENT / 100],
       };
@@ -123,12 +128,13 @@ export const TaxesFormikFields = ({
   formikValuePath,
   labelProps,
   isOptional,
+  requireIdNumber,
   idNumberLabelRenderer,
   dispatchDefaultValueOnMount = true,
 }: TaxesFormikFieldsProps) => {
   const intl = useIntl();
   const currentTaxValue = get(formik.values, formikValuePath);
-  const taxSpecificValues = getTaxSpecificValues(intl, taxType, currentTaxValue);
+  const taxSpecificValues = getTaxSpecificValues(taxType, currentTaxValue, { requireIdNumber });
 
   const dispatchChange = (rate: number) =>
     formik.setFieldValue(formikValuePath, { ...currentTaxValue, type: taxType, rate: rate });

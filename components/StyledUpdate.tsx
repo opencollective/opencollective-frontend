@@ -26,7 +26,6 @@ import LoadingPlaceholder from './LoadingPlaceholder';
 import MessageBox from './MessageBox';
 import StyledButton from './StyledButton';
 import StyledHr from './StyledHr';
-import { H5 } from './Text';
 
 const UpdateWrapper = styled(Flex)`
   max-width: 100%;
@@ -189,14 +188,16 @@ class StyledUpdate extends Component<StyledUpdateProps, { mode: string; modified
     if (mode === 'summary') {
       return (
         <Link href={`${getCollectivePageRoute(collective)}/updates/${update.slug}`}>
-          <H5 data-cy="updateTitle">{update.title}</H5>
+          <h5 className="text-lg font-medium" data-cy="updateTitle">
+            {update.title}
+          </h5>
         </Link>
       );
     } else {
       return (
-        <H5 data-cy="updateTitle" mb={2}>
+        <h5 className="mb-2 text-lg font-medium" data-cy="updateTitle">
           {update.title}
-        </H5>
+        </h5>
       );
     }
   }

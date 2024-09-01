@@ -18,7 +18,7 @@ import ExpandableExpensePolicies from './ExpandableExpensePolicies';
  * Provide some info (ie. collective balance, tags, policies, etc.) for the expense pages
  * in a sidebar.
  */
-const ExpenseInfoSidebar = ({ isLoading, host, collective, children }) => {
+const ExpenseInfoSidebar = ({ isLoading, host, expenseHost = null, collective, children }) => {
   const balanceWithBlockedFunds = collective?.stats.balanceWithBlockedFunds;
   return (
     <Box width="100%">
@@ -36,7 +36,8 @@ const ExpenseInfoSidebar = ({ isLoading, host, collective, children }) => {
           borderLeft="1px solid"
           borderColor="black.300"
           pl={3}
-          fontSize="20px"
+          pb={1}
+          fontSize="18px"
           color="black.500"
           data-cy="collective-balance"
         >
@@ -47,11 +48,11 @@ const ExpenseInfoSidebar = ({ isLoading, host, collective, children }) => {
               <FormattedMoneyAmount
                 currency={balanceWithBlockedFunds.currency}
                 amount={balanceWithBlockedFunds.valueInCents}
-                amountStyles={{ color: 'black.800' }}
+                amountClassName="text-foreground"
                 precision={CurrencyPrecision.DEFAULT}
               />
               {host && (
-                <P fontSize="11px" color="black.700" mt={2}>
+                <P fontSize="11px" color="black.700" mt={3}>
                   <Span
                     fontSize="9px"
                     fontWeight="600"
@@ -59,7 +60,7 @@ const ExpenseInfoSidebar = ({ isLoading, host, collective, children }) => {
                     color="black.700"
                     letterSpacing="0.06em"
                   >
-                    <FormattedMessage id="Fiscalhost" defaultMessage="Fiscal Host" />
+                    <FormattedMessage defaultMessage="Current Fiscal Host" id="06GnOc" />
                   </Span>
                   <br />
                   <LinkCollective collective={host}>
@@ -75,6 +76,21 @@ const ExpenseInfoSidebar = ({ isLoading, host, collective, children }) => {
                       />
                     )}
                   </LinkCollective>
+                </P>
+              )}
+              {expenseHost && expenseHost.id !== host?.id && (
+                <P fontSize="11px" color="black.700" mt={3}>
+                  <Span
+                    fontSize="9px"
+                    fontWeight="600"
+                    textTransform="uppercase"
+                    color="black.700"
+                    letterSpacing="0.06em"
+                  >
+                    <FormattedMessage defaultMessage="Expense Fiscal Host" id="r4sUYI" />
+                  </Span>
+                  <br />
+                  <LinkCollective collective={expenseHost}>{expenseHost.name}</LinkCollective>
                 </P>
               )}
             </Box>
@@ -113,6 +129,11 @@ ExpenseInfoSidebar.propTypes = {
   host: PropTypes.shape({
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
+  }),
+  /** If different than `host` */
+  expenseHost: PropTypes.shape({
+    id: PropTypes.string,
+    name: PropTypes.string,
   }),
 };
 

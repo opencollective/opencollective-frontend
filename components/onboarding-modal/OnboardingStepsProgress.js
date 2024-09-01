@@ -8,16 +8,14 @@ import { Flex } from '../Grid';
 import StepsProgress from '../StepsProgress';
 import { Span } from '../Text';
 
-const StepLabel = styled(Span)`
-  text-transform: uppercase;
-  text-align: center;
-`;
-
-StepLabel.defaultProps = {
+const StepLabel = styled(Span).attrs({
   color: 'black.400',
   fontSize: '10px',
   mt: 1,
-};
+})`
+  text-transform: uppercase;
+  text-align: center;
+`;
 
 const steps = [{ name: 'Welcome' }, { name: 'Administrators' }, { name: 'Contact' }];
 

@@ -5,6 +5,7 @@ import type { TaxFormType } from '../components/dashboard/sections/tax-informati
 import { CollectiveType } from './constants/collectives';
 import { TransactionTypes } from './constants/transactions';
 import { getWebsiteUrl } from './utils';
+import { getWindowLocation } from './window';
 
 export const PDF_SERVICE_URL = process.env.PDF_SERVICE_URL;
 const NEXT_PDF_SERVICE_URL = process.env.NEXT_PDF_SERVICE_URL;
@@ -161,7 +162,14 @@ const TRUSTED_DOMAINS = [
 ];
 const TRUSTED_ROOT_DOMAINS = ['opencollective.com', 'opencollective.foundation', 'oscollective.org'];
 
-export const isTrustedRedirectHost = host => {
+export const isTrustedRedirectURL = (url: URL) => {
+  if (url.protocol !== 'https:') {
+    return false;
+  } else if (url.port && url.port !== '443') {
+    return false;
+  }
+
+  const host = url.host;
   if (TRUSTED_DOMAINS.includes(host)) {
     return true;
   }
@@ -189,8 +197,30 @@ export const addParentToURLIfMissing = (router, account, url = '', queryParams =
 };
 
 export const isRelativeHref = href => {
+  if (!href) {
+    return true;
+  }
+
+  // We force all relative URLs to start with `/`
   href = href.trim();
-  return !href || href.startsWith('#') || href === '/' || new RegExp('^/[^/\\\\]+').test(href);
+  if (!href.startsWith('/')) {
+    return false;
+  }
+
+  // If we're in the browser, there's a safe way to check this
+  const windowLocation = getWindowLocation();
+  if (windowLocation) {
+    try {
+      const parsedUrl = new URL(href, windowLocation.origin);
+      return parsedUrl.origin === windowLocation.origin;
+    } catch (e) {
+      return false; // Invalid URL
+    }
+  }
+
+  // Otherwise, we fallback on a regex that will protect against `javascript:`, `//evil.com`, etc.
+  href = href.trim();
+  return href.startsWith('#') || href === '/' || new RegExp('^/[^/\\\\]+').test(href);
 };
 
 export async function followOrderRedirectUrl(
@@ -211,7 +241,7 @@ export async function followOrderRedirectUrl(
   }
 
   const fallback = `/${collective.slug}/donate/success?OrderId=${order.id}`;
-  if (isTrustedRedirectHost(url.host)) {
+  if (isTrustedRedirectURL(url)) {
     if (shouldRedirectParent) {
       window.parent.location.href = url.href;
     } else {

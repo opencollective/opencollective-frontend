@@ -35,7 +35,7 @@ const getPmData = (payoutMethod, field, isLoading) => {
 /**
  * Shows the data of the given payout method
  */
-const PayoutMethodData = ({ payoutMethod, showLabel, isLoading }) => {
+const PayoutMethodData = ({ payoutMethod, showLabel = true, isLoading = false }) => {
   if (isLoading && !payoutMethod) {
     return <LoadingPlaceholder height={24} mb={2} />;
   } else if (!payoutMethod) {
@@ -123,10 +123,6 @@ PayoutMethodData.propTypes = {
     type: PropTypes.oneOf(Object.values(PayoutMethodType)),
     data: PropTypes.object,
   }),
-};
-
-PayoutMethodData.defaultProps = {
-  showLabel: true,
 };
 
 // @component

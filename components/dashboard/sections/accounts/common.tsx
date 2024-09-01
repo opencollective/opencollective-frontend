@@ -77,12 +77,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       const amount = account.stats.totalAmountReceived;
       return (
         <div className="font-medium text-foreground">
-          <FormattedMoneyAmount
-            amount={amount.valueInCents}
-            currency={amount.currency}
-            showCurrencyCode={false}
-            amountStyles={{}}
-          />
+          <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} showCurrencyCode={false} />
         </div>
       );
     },
@@ -95,12 +90,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       const amount = account.stats.totalAmountSpent;
       return (
         <div className="font-medium text-foreground">
-          <FormattedMoneyAmount
-            amount={amount.valueInCents}
-            currency={amount.currency}
-            showCurrencyCode={false}
-            amountStyles={{}}
-          />
+          <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} showCurrencyCode={false} />
         </div>
       );
     },
@@ -113,12 +103,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       const balance = account.stats.balance;
       return (
         <div className="font-medium text-foreground">
-          <FormattedMoneyAmount
-            amount={balance.valueInCents}
-            currency={balance.currency}
-            showCurrencyCode={false}
-            amountStyles={{}}
-          />
+          <FormattedMoneyAmount amount={balance.valueInCents} currency={balance.currency} showCurrencyCode={false} />
         </div>
       );
     },

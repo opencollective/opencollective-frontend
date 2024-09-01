@@ -142,11 +142,11 @@ CollectiveContainer.propTypes = {
 const StyledCollectiveCard = ({
   collective,
   tag,
-  bodyHeight,
+  bodyHeight = 260,
   children,
-  borderRadius,
+  borderRadius = 16,
   showWebsite,
-  useLink,
+  useLink = true,
   ...props
 }) => {
   const intl = useIntl();
@@ -263,12 +263,6 @@ StyledCollectiveCard.propTypes = {
   useLink: PropTypes.bool,
   childrenContainerProps: PropTypes.object,
   bodyProps: PropTypes.object,
-};
-
-StyledCollectiveCard.defaultProps = {
-  bodyHeight: 260,
-  borderRadius: 16,
-  useLink: true,
 };
 
 export default injectIntl(StyledCollectiveCard);

@@ -218,7 +218,9 @@ export default function EditVirtualCardModal({
       cardName: virtualCard?.name,
       assignee: virtualCard?.assignee,
       limitAmount: canEditLimit ? virtualCard?.spendingLimitAmount : undefined,
-      limitInterval: canEditLimit ? virtualCard?.spendingLimitInterval ?? VirtualCardLimitInterval.MONTHLY : undefined,
+      limitInterval: canEditLimit
+        ? (virtualCard?.spendingLimitInterval ?? VirtualCardLimitInterval.MONTHLY)
+        : undefined,
     },
     async onSubmit(values) {
       const { assignee, cardName, limitAmount, limitInterval, collective } = values;
@@ -335,7 +337,7 @@ export default function EditVirtualCardModal({
   const collectiveUsers = users?.account?.members.nodes.map(node => node.account);
 
   return (
-    <StyledModal width="420px" onClose={handleClose} trapFocus {...modalProps}>
+    <StyledModal onClose={handleClose} trapFocus {...modalProps}>
       <form onSubmit={formik.handleSubmit}>
         <ModalHeader onClose={handleClose} hideCloseIcon={false}>
           {isEditing ? (

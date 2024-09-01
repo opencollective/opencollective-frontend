@@ -5,6 +5,7 @@ import { withRouter } from 'next/router';
 import { createGlobalStyle } from 'styled-components';
 
 import { getCollectivePageMetadata } from '../lib/collective';
+import { OPENCOLLECTIVE_FOUNDATION_ID } from '../lib/constants/collectives';
 import { generateNotFoundError } from '../lib/errors';
 import { ssrGraphQLQuery } from '../lib/graphql/with-ssr-query';
 import { getRequestIntl } from '../lib/i18n/request';
@@ -163,8 +164,9 @@ class CollectivePage extends React.Component {
 
     const showCrowdfundingPreviewBanner =
       !['ORGANIZATION', 'FUND', 'INDIVIDUAL', 'USER'].includes(collective?.type) &&
-      LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW) &&
-      LoggedInUser?.isAdminOfCollective(collective);
+      LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.CROWDFUNDING_REDESIGN) &&
+      LoggedInUser?.isAdminOfCollective(collective) &&
+      collective?.host?.id !== OPENCOLLECTIVE_FOUNDATION_ID;
 
     return (
       <Page

@@ -6,6 +6,7 @@ export const tierPageQuery = gqlV1/* GraphQL */ `
   query TierPage($tierId: Int!) {
     Tier(id: $tierId) {
       id
+      idV2
       name
       slug
       description

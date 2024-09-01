@@ -12,15 +12,15 @@ const VideoLinkerBox = dynamic(() => import(/* webpackChunkName: 'VideoLinkerBox
  * Displays the video on the page, with an optional form to edit it
  * if user is allowed to do so.
  */
-const TierVideo = ({ tier, editMutation, canEdit }) => {
+const TierVideo = ({ tier, editMutation, canEdit, ...inlineEditFieldProps }) => {
   return (
     <InlineEditField
-      field="videoUrl"
       values={tier}
       mutation={editMutation}
       canEdit={canEdit}
       showEditIcon={Boolean(tier.videoUrl)}
       buttonsMinWidth={150}
+      {...inlineEditFieldProps}
     >
       {({ isEditing, value, setValue, enableEditor, disableEditor }) => {
         if (isEditing || (!value && canEdit)) {

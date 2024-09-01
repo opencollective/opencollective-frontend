@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import { cn } from '../../lib/utils';
@@ -10,8 +9,8 @@ import Link from '../Link';
 import MessageBox from '../MessageBox';
 import { P } from '../Text';
 
-const StepProfileInfoMessage = ({ hasLegalNameField, hasIncognito, isGuest }) => {
-  const nbItems = hasLegalNameField + isGuest + hasIncognito;
+const StepProfileInfoMessage = ({ hasLegalNameField = false, hasIncognito = false, isGuest = false }) => {
+  const nbItems = Number(hasLegalNameField) + Number(isGuest) + Number(hasIncognito);
   const isList = nbItems > 1;
   const ItemContainer = isList ? 'li' : 'span';
   return (
@@ -50,18 +49,6 @@ const StepProfileInfoMessage = ({ hasLegalNameField, hasIncognito, isGuest }) =>
       </Container>
     </MessageBox>
   );
-};
-
-StepProfileInfoMessage.propTypes = {
-  hasLegalNameField: PropTypes.bool,
-  isGuest: PropTypes.bool,
-  hasIncognito: PropTypes.bool,
-};
-
-StepProfileInfoMessage.defaultProps = {
-  hasLegalNameField: false,
-  isGuest: false,
-  hasIncognito: false,
 };
 
 export default StepProfileInfoMessage;

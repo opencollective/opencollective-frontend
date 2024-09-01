@@ -98,12 +98,11 @@ export const Title = styled(({ children, ...props }) => (
 `;
 
 /** Entry content (hidden by default) */
-export const Content = styled(Box)``;
-Content.defaultProps = {
-  py: 2,
-  fontSize: '13px',
-  color: 'black.600',
-};
+export const Content = styled(Box).attrs(props => ({
+  py: props.py ?? 2,
+  fontSize: props.fontSize ?? '13px',
+  color: props.color ?? 'black.600',
+}))``;
 
 export const Separator = styled.hr`
   background: ${themeGet('colors.black.400')};
