@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { CaretDown } from '@styled-icons/fa-solid/CaretDown';
 import { CaretUp } from '@styled-icons/fa-solid/CaretUp';
 import { Markup } from 'interweave';
-import { merge, pick } from 'lodash';
 import { getLuminance } from 'polished';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -105,12 +104,12 @@ const HTMLContent = styled(
                 const parsedUrl = new URL(src);
                 const hostname = parsedUrl.hostname;
                 if (['youtube-nocookie.com', 'www.youtube-nocookie.com', 'anchor.fm'].includes(hostname)) {
-                  const attributes = merge({}, ...node.attributes.map(({ name, value }) => ({ [name]: value })));
                   return (
                     <iframe
-                      {...pick(attributes, ['width', 'height'])}
                       allowFullScreen
-                      title={attributes.title || 'Embed content'}
+                      width={node.getAttribute('width')}
+                      height={node.getAttribute('height')}
+                      title={node.getAttribute('title') || 'Embed content'}
                       src={src}
                     />
                   );

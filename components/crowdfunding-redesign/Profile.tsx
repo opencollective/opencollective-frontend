@@ -1,6 +1,5 @@
 import React from 'react';
 import { Markup } from 'interweave';
-import { merge, pick } from 'lodash';
 import { MoreHorizontal, Share } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
@@ -168,17 +167,18 @@ export default function Profile({ account }) {
               allowAttributes
               transform={node => {
                 // Allow some iframes
-                const attrs = [].slice.call(node.attributes);
                 if (node.tagName.toLowerCase() === 'iframe') {
                   const src = node.getAttribute('src');
                   const parsedUrl = new URL(src);
                   const hostname = parsedUrl.hostname;
                   if (['youtube-nocookie.com', 'www.youtube-nocookie.com', 'anchor.fm'].includes(hostname)) {
-                    const attributes = merge({}, ...attrs.map(({ name, value }) => ({ [name]: value })));
                     return (
                       <iframe
-                        {...pick(attributes, ['width', 'height', 'frameborder', 'allowfullscreen'])}
-                        title={attributes.title || 'Embed content'}
+                        width={node.getAttribute('width')}
+                        height={node.getAttribute('height')}
+                        allowFullScreen={node.getAttribute('allowfullscreen') as any}
+                        frameBorder={node.getAttribute('frameborder')}
+                        title={node.getAttribute('title') || 'Embed content'}
                         src={src}
                       />
                     );
