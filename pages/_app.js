@@ -54,7 +54,9 @@ import { ModalProvider } from '../components/ModalContext';
 import NewsAndUpdatesProvider from '../components/NewsAndUpdatesProvider';
 import { TooltipProvider } from '../components/ui/Tooltip';
 
-PolyfillInterweaveSSR();
+if (typeof window === 'undefined') {
+  PolyfillInterweaveSSR();
+}
 
 class OpenCollectiveFrontendApp extends App {
   static propTypes = {
