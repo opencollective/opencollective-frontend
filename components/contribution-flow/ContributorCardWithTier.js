@@ -71,7 +71,6 @@ const ContributorCardWithTier = ({ contribution, ...props }) => {
             </P>
             <Flex flexWrap="wrap" gridGap="4px">
               <P fontSize="14px" lineHeight="20px" fontWeight="bold">
-                what
                 <FormattedMoneyAmount
                   amount={
                     !isNil(contribution.platformTipAmount?.valueInCents)
