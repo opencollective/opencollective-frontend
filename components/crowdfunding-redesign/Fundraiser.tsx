@@ -319,7 +319,7 @@ export default function Fundraiser({ account }) {
                   transform={node => {
                     // Allow some iframes
                     const attrs = [].slice.call(node.attributes);
-                    if (node.tagName === 'iframe') {
+                    if (node.tagName.toLowerCase() === 'iframe') {
                       const src = node.getAttribute('src');
                       const parsedUrl = new URL(src);
                       const hostname = parsedUrl.hostname;
@@ -333,7 +333,7 @@ export default function Fundraiser({ account }) {
                           />
                         );
                       }
-                    } else if (node.tagName === 'a') {
+                    } else if (node.tagName.toLowerCase() === 'a') {
                       // Open links in new tab
                       node.setAttribute('target', '_blank');
                       node.setAttribute('rel', 'noopener noreferrer');

@@ -100,7 +100,7 @@ const HTMLContent = styled(
             allowAttributes
             transform={node => {
               // Allow some iframes
-              if (node.tagName === 'iframe') {
+              if (node.tagName.toLowerCase() === 'iframe') {
                 const src = node.getAttribute('src');
                 const parsedUrl = new URL(src);
                 const hostname = parsedUrl.hostname;
@@ -115,7 +115,7 @@ const HTMLContent = styled(
                     />
                   );
                 }
-              } else if (node.tagName === 'a') {
+              } else if (node.tagName.toLowerCase() === 'a') {
                 // Open links in new tab
                 if (openLinksInNewTab) {
                   node.setAttribute('target', '_blank');
