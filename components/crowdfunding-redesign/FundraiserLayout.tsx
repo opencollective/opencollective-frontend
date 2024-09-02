@@ -23,7 +23,7 @@ import { ProfileModal } from './ProfileModal';
 import { ArrowRight } from 'lucide-react';
 import { Progress } from '../ui/Progress';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
-import { StackedAvatars } from '../Avatar';
+
 import { Button } from '../ui/Button';
 import { FormattedMessage } from 'react-intl';
 import { TabsList, TabsTrigger } from './DumbTabs';
