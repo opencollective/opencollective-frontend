@@ -6,8 +6,8 @@ export function DataList({ children, className }: { children?: React.ReactNode; 
   return <dl className={cn('flex w-full flex-col gap-3', className)}>{children}</dl>;
 }
 
-export function DataListItemValue({ children }: { children?: React.ReactNode }) {
-  return <div className="max-w-fit overflow-hidden">{children}</div>;
+export function DataListItemValue({ children, className }: { children?: React.ReactNode; className?: string }) {
+  return <div className={cn('max-w-fit overflow-hidden', className)}>{children}</div>;
 }
 
 export function DataListItemLabel({ children }: { children?: React.ReactNode }) {
