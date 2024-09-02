@@ -188,7 +188,7 @@ const FreezeAccountModal = ({
             <Collapsible open={useMessageForAccountAdmins}>
               <CollapsibleTrigger asChild>
                 <div className="mb-4 flex items-center justify-between rounded-md border p-4">
-                  <span className="text-sm font-medium text-muted-foreground">
+                  <span className="text-sm font-medium">
                     <FormattedMessage defaultMessage="Add a custom message for the Collective Admins" id="PFv8Cm" />
                   </span>
                   <Switch
@@ -248,7 +248,7 @@ const FreezeAccountModal = ({
             <Collapsible open={useMessageForAccountAdmins}>
               <CollapsibleTrigger asChild>
                 <div className="mb-4 flex items-center justify-between rounded-md border p-4">
-                  <span className="text-sm font-medium text-muted-foreground">
+                  <span className="text-sm font-medium">
                     <FormattedMessage defaultMessage="Add a custom message for the Collective Admins" id="PFv8Cm" />
                   </span>
                   <Switch
@@ -288,7 +288,7 @@ const FreezeAccountModal = ({
             {contributionsSummary.totalCount > 0 && (
               <div>
                 <div className="mb-4 flex items-center justify-between rounded-md border p-4">
-                  <span className="text-sm font-medium text-muted-foreground">
+                  <span className="text-sm font-medium">
                     <FormattedMessage
                       defaultMessage="Pause {count} recurring contributions"
                       id="0bkmNx"
