@@ -6,6 +6,7 @@ import App from 'next/app';
 import Router from 'next/router';
 import NProgress from 'nprogress';
 import { ThemeProvider } from 'styled-components';
+import { AnimatePresence } from 'framer-motion';
 
 import '../lib/dayjs'; // Import first to make sure plugins are initialized
 import '../lib/analytics/plausible';
@@ -53,6 +54,7 @@ import IntlProvider from '../components/intl/IntlProvider';
 import { ModalProvider } from '../components/ModalContext';
 import NewsAndUpdatesProvider from '../components/NewsAndUpdatesProvider';
 import { TooltipProvider } from '../components/ui/Tooltip';
+import ProfileLayout from '../components/crowdfunding-redesign/ProfileLayout';
 
 if (typeof window === 'undefined') {
   PolyfillInterweaveSSR();
@@ -197,6 +199,7 @@ class OpenCollectiveFrontendApp extends App {
                     <ModalProvider>
                       <NewsAndUpdatesProvider>
                         <Component {...pageProps} />
+
                         <Toaster />
                         <GlobalNewsAndUpdates />
                         <TwoFactorAuthenticationModal />
