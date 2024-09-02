@@ -136,7 +136,7 @@
     "styled-system": "5.1.5",
     "tailwind-merge": "2.4.0",
     "throng": "5.0.0",
-    "trix": "2.1.4",
+    "@opencollective/trix": "2.1.6",
     "uuid": "9.0.1",
     "validator": "13.12.0",
     "webpack-manifest-plugin": "5.0.0",
