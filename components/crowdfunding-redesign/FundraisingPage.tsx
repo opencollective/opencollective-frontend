@@ -1,23 +1,17 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
+import { Markup } from 'interweave';
 import { useRouter } from 'next/router';
+import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
-import Page from '../Page';
 
-import { Banner } from './Banner';
-import { Footer } from './Footer';
-import Fundraiser from './Fundraiser';
-import { profilePageQuery } from './queries';
 import { ContentOverview } from './ContentOverview';
-import { FormattedMessage } from 'react-intl';
 import { getDefaultFundraiserValues } from './helpers';
-import { Markup } from 'interweave';
-import { merge, pick } from 'lodash';
+import { profilePageQuery } from './queries';
 import { Tiers } from './Tiers';
-import { Goals } from './Goals';
 
 export function FundraisingPage() {
   const router = useRouter();
@@ -58,22 +52,22 @@ export function FundraisingPage() {
             allowAttributes
             transform={node => {
               // Allow some iframes
-              const attrs = [].slice.call(node.attributes);
-              if (node.tagName === 'iframe') {
+              if (node.tagName.toLowerCase() === 'iframe') {
                 const src = node.getAttribute('src');
                 const parsedUrl = new URL(src);
                 const hostname = parsedUrl.hostname;
                 if (['youtube-nocookie.com', 'www.youtube-nocookie.com', 'anchor.fm'].includes(hostname)) {
-                  const attributes = merge({}, ...attrs.map(({ name, value }) => ({ [name]: value })));
                   return (
                     <iframe
-                      {...pick(attributes, ['width', 'height', 'frameborder', 'allowfullscreen'])}
-                      title={attributes.title || 'Embed content'}
+                      width={node.getAttribute('width')}
+                      height={node.getAttribute('height')}
+                      allowFullScreen={node.getAttribute('allowfullscreen') as any}
+                      title={node.getAttribute('title') || 'Embed content'}
                       src={src}
                     />
                   );
                 }
-              } else if (node.tagName === 'a') {
+              } else if (node.tagName.toLowerCase() === 'a') {
                 // Open links in new tab
                 node.setAttribute('target', '_blank');
                 node.setAttribute('rel', 'noopener noreferrer');

@@ -1,7 +1,11 @@
 import React from 'react';
-import ProfileLayout from '../../../../components/crowdfunding-redesign/ProfileLayout';
-import { ProfileAccounts } from '../../../../components/crowdfunding-redesign/Accounts';
 import { useRouter } from 'next/router';
+
+import { Finances } from '../../../../components/crowdfunding-redesign/finances/Finances';
+import ProfileLayout from '../../../../components/crowdfunding-redesign/ProfileLayout';
+
+// next.js export
+// ts-unused-exports:disable-next-line
 export default function AccountTransactions() {
   const router = useRouter();
   return (
@@ -13,7 +17,7 @@ export default function AccountTransactions() {
       ]}
     >
       <div className="flex-1">
-        <ProfileAccounts />
+        <Finances />
       </div>
     </ProfileLayout>
   );

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { cva } from 'class-variance-authority';
 // eslint-disable-next-line no-restricted-imports
 import Link from 'next/link';
+import sanitizeHtml from 'sanitize-html';
+
 import { triggerPrototypeToast } from './helpers';
 
 export const ContentOverview = ({ content }) => {
@@ -15,10 +17,10 @@ export const ContentOverview = ({ content }) => {
     setHeadings(headingTexts);
   }, [content]);
 
-  const linkClasses = cva('px-2 font-semibold block hover:text-primary text-sm border-l-[3px]', {
+  const linkClasses = cva('block border-l-[3px] px-2 text-sm font-semibold hover:text-primary', {
     variants: {
       active: {
-        true: 'border-primary/70',
+        true: 'border-primary/80',
         false: 'border-transparent',
       },
     },
@@ -29,11 +31,26 @@ export const ContentOverview = ({ content }) => {
 
   return (
     <div className="space-y-4">
-      {headings.map(heading => (
-        <Link href="#" key={heading} className={linkClasses()} onClick={triggerPrototypeToast}>
-          {heading}
-        </Link>
-      ))}
+      <Link href="#" className={linkClasses({ active: true })} onClick={triggerPrototypeToast}>
+        About
+      </Link>
+      {headings.map(heading => {
+        const sanitizedKey = sanitizeHtml(heading, {
+          allowedTags: [], // No tags allowed
+          allowedAttributes: {}, // No attributes allowed
+        }).replace(/[^a-zA-Z0-9-_]/g, '_'); // Replace unsafe characters
+
+        return (
+          <Link
+            href="#"
+            key={sanitizedKey} // Use sanitized and unique key
+            className={linkClasses()}
+            onClick={triggerPrototypeToast}
+          >
+            {heading}
+          </Link>
+        );
+      })}
     </div>
   );
 };

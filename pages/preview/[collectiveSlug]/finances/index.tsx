@@ -1,12 +1,14 @@
 import React from 'react';
+
+import { Finances } from '../../../../components/crowdfunding-redesign/finances/Finances';
 import ProfileLayout from '../../../../components/crowdfunding-redesign/ProfileLayout';
-import { ProfileAccounts } from '../../../../components/crowdfunding-redesign/Accounts';
-export default function Finances() {
+
+// next.js export
+// ts-unused-exports:disable-next-line
+export default function FinancesPage() {
   return (
     <ProfileLayout activeTab="finances">
-      <div className="flex-1">
-        <ProfileAccounts />
-      </div>
+      <Finances />
     </ProfileLayout>
   );
 }

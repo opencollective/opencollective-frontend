@@ -74,7 +74,6 @@ export function EditProfile({ account }) {
   });
   const intl = useIntl();
   const initialValues = getDefaultProfileValues(account);
-
   const onSubmit = async values => {
     try {
       await submitEditSettings({

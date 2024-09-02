@@ -1,23 +1,23 @@
 import React from 'react';
-import ProfileLayout from '../../../components/crowdfunding-redesign/ProfileLayout';
-import { ContentOverview } from '../../../components/crowdfunding-redesign/ContentOverview';
+import { useQuery } from '@apollo/client';
 import { Markup } from 'interweave';
 import { useRouter } from 'next/router';
-import { gql, useQuery } from '@apollo/client';
-import { contributePageQuery, profileWrapperQuery } from '../../../components/crowdfunding-redesign/queries';
+
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+
+import { ContentOverview } from '../../../components/crowdfunding-redesign/ContentOverview';
 import {
   aggregateGoalAmounts,
   getDefaultFundraiserValues,
   getDefaultProfileValues,
   getYouTubeIDFromUrl,
 } from '../../../components/crowdfunding-redesign/helpers';
-import { merge, pick } from 'lodash';
+import ProfileLayout from '../../../components/crowdfunding-redesign/ProfileLayout';
+import { contributePageQuery } from '../../../components/crowdfunding-redesign/queries';
 import { Tiers } from '../../../components/crowdfunding-redesign/Tiers';
 import FormattedMoneyAmount from '../../../components/FormattedMoneyAmount';
-import { Progress } from '../../../components/ui/Progress';
 import Link from '../../../components/Link';
-import { Goal } from '../../../components/crowdfunding-redesign/Goal';
+import { Progress } from '../../../components/ui/Progress';
 
 function FundraiserCard({ account, collectiveSlug }) {
   const fundraiser = getDefaultFundraiserValues(account);
@@ -91,14 +91,16 @@ function FundraiserCard({ account, collectiveSlug }) {
   );
 }
 
+// next.js export
+// ts-unused-exports:disable-next-line
 export default function ContributePage() {
   const router = useRouter();
-  const { data, error, loading } = useQuery(contributePageQuery, {
+  const { data } = useQuery(contributePageQuery, {
     variables: { slug: router.query.collectiveSlug },
     context: API_V2_CONTEXT,
   });
   const profile = getDefaultProfileValues(data?.account);
-  const mainfundraising = false;
+  const mainfundraising = true;
   return (
     <ProfileLayout activeTab="home">
       <div className="flex-1 space-y-8">
@@ -112,28 +114,29 @@ export default function ContributePage() {
               </div>
 
               <div className="prose prose-slate col-span-7">
+                <h3>About</h3>
                 <Markup
                   noWrap
                   content={profile?.longDescription ?? ''}
                   allowAttributes
                   transform={node => {
                     // Allow some iframes
-                    const attrs = [].slice.call(node.attributes);
-                    if (node.tagName === 'iframe') {
+                    if (node.tagName.toLowerCase() === 'iframe') {
                       const src = node.getAttribute('src');
                       const parsedUrl = new URL(src);
                       const hostname = parsedUrl.hostname;
                       if (['youtube-nocookie.com', 'www.youtube-nocookie.com', 'anchor.fm'].includes(hostname)) {
-                        const attributes = merge({}, ...attrs.map(({ name, value }) => ({ [name]: value })));
                         return (
                           <iframe
-                            {...pick(attributes, ['width', 'height', 'frameborder', 'allowfullscreen'])}
-                            title={attributes.title || 'Embed content'}
+                            width={node.getAttribute('width')}
+                            height={node.getAttribute('height')}
+                            allowFullScreen={node.getAttribute('allowfullscreen') as any}
+                            title={node.getAttribute('title') || 'Embed content'}
                             src={src}
                           />
                         );
                       }
-                    } else if (node.tagName === 'a') {
+                    } else if (node.tagName.toLowerCase() === 'a') {
                       // Open links in new tab
                       node.setAttribute('target', '_blank');
                       node.setAttribute('rel', 'noopener noreferrer');
@@ -146,7 +149,7 @@ export default function ContributePage() {
           </div>
         )}
 
-        <div className="mx-auto max-w-screen-xl space-y-8 px-6 pt-12">
+        <div className="mx-auto max-w-screen-xl space-y-8 px-6 py-12">
           <h3 className="text-2xl font-semibold leading-none tracking-tight">Projects</h3>
           <div className="grid grid-cols-3 gap-4">
             {data?.projects?.nodes?.map(child => {
@@ -166,7 +169,7 @@ export default function ContributePage() {
   );
 }
 
-export const PatternBg = () => (
+const PatternBg = () => (
   <svg id="patternId" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <pattern id="a" patternUnits="userSpaceOnUse" width="36" height="36" patternTransform="scale(2) rotate(0)">
