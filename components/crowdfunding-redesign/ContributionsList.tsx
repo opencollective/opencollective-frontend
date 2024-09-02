@@ -17,6 +17,9 @@ import { triggerPrototypeToast } from './helpers';
 
 export function ContributionsList({ account }) {
   const intl = useIntl();
+  if (!account) {
+    return <div>Fix this</div>;
+  }
   return (
     <div className="relative mx-auto max-w-screen-md space-y-6 px-6 py-12">
       <div className="flex flex-col divide-y rounded-lg border bg-background">

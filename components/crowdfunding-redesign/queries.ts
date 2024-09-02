@@ -243,6 +243,7 @@ export const profileWrapperQuery = gql`
       id
       name
       slug
+      settings
     }
     collective: account(slug: $collectiveSlug) {
       id

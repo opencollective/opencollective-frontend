@@ -23,7 +23,7 @@ import { ProfileModal } from './ProfileModal';
 import { ArrowRight } from 'lucide-react';
 import { Progress } from '../ui/Progress';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
-import { StackedAvatars } from '../Avatar';
+
 import { Button } from '../ui/Button';
 import { FormattedMessage } from 'react-intl';
 import { TabsList, TabsTrigger } from './DumbTabs';
@@ -101,14 +101,14 @@ export function FundraiserLayout({ children, activeTab }) {
                     </div>
 
                     <p>
-                      {account.type === 'EVENT' ? 'Event' : 'Fundraiser'} by{' '}
+                      {account.type === 'EVENT' ? 'Event' : 'Project'} by{' '}
                       <Link
                         className="font-semibold text-primary hover:underline"
                         href={`/preview/${mainAccount.slug}`}
-                        onClick={e => {
-                          e.preventDefault();
-                          showModal(ProfileModal, { account: mainAccount });
-                        }}
+                        // onClick={e => {
+                        //   e.preventDefault();
+                        //   showModal(ProfileModal, { account: mainAccount });
+                        // }}
                       >
                         {mainAccount.name} <ArrowRight className="inline align-middle" size={16} />
                       </Link>
@@ -133,6 +133,9 @@ export function FundraiserLayout({ children, activeTab }) {
                   <TabsTrigger href={baseRoute} value="fundraiser" activeTab={activeTab}>
                     Fundraiser
                   </TabsTrigger>
+                  <TabsTrigger href={`${baseRoute}/finances`} value="finances" activeTab={activeTab}>
+                    Finances
+                  </TabsTrigger>
                   <TabsTrigger
                     href={`${baseRoute}/updates`}
                     value="updates"
@@ -141,26 +144,10 @@ export function FundraiserLayout({ children, activeTab }) {
                   >
                     Updates
                   </TabsTrigger>
-                  <TabsTrigger
-                    href={`${baseRoute}/contributions`}
-                    value="contributions"
-                    activeTab={activeTab}
-                    count={account.contributionTransactions?.totalCount}
-                  >
-                    Contributions
-                  </TabsTrigger>
-                  <TabsTrigger
-                    href={`${baseRoute}/expenses`}
-                    value="expenses"
-                    activeTab={activeTab}
-                    count={account.expenses?.totalCount}
-                  >
-                    Expenses
-                  </TabsTrigger>
                 </TabsList>
               </div>
             </div>
-            {children}
+            <div className="flex-1">{children}</div>
 
             <ThemeColor color={fundraiser.primaryColor} />
           </React.Fragment>

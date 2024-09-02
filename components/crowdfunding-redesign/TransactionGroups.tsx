@@ -10,32 +10,28 @@ import Avatar from '../Avatar';
 import Link from '../Link';
 import { TransactionGroupCard } from './TransactionGroupCard';
 import { useRouter } from 'next/router';
+
 const transactionGroupsQuery = gql`
   query TransactionGroups($slug: String!, $limit: Int) {
-    account(slug: $slug) {
-      id
-      name
-      type
-      transactionGroups(limit: $limit) {
-        totalCount
-        nodes {
+    transactionGroups(account: { slug: $slug }, limit: $limit) {
+      totalCount
+      nodes {
+        id
+        totalAmount {
+          valueInCents
+          currency
+        }
+        createdAt
+        primaryTransaction {
           id
-          amountInHostCurrency {
-            valueInCents
-            currency
-          }
-          createdAt
-          primaryTransaction {
+          kind
+          type
+          oppositeAccount {
             id
-            kind
+            name
+            slug
+            imageUrl
             type
-            oppositeAccount {
-              id
-              name
-              slug
-              imageUrl
-              type
-            }
           }
         }
       }
@@ -61,7 +57,7 @@ export function TransactionGroups() {
     <div>
       <h3 className="mb-3 px-2 text-lg font-semibold text-slate-800">Transactions</h3>
       <div className="divide-y overflow-hidden rounded-xl border bg-background">
-        {data?.account?.transactionGroups?.nodes?.map(group => (
+        {data?.transactionGroups?.nodes?.map(group => (
           <div className="hover:bg-muted" key={group.id}>
             <Link href={`${transactionGroupRoute}/${group.id}`} className="">
               <TransactionGroupCard group={group} />
