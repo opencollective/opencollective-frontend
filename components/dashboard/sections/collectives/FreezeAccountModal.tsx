@@ -187,8 +187,8 @@ const FreezeAccountModal = ({
             </p>
             <Collapsible open={useMessageForAccountAdmins}>
               <CollapsibleTrigger asChild>
-                <div className="mb-4 flex items-center justify-between rounded-md border border-gray-200 p-4">
-                  <span className="text-sm font-medium text-gray-700">
+                <div className="mb-4 flex items-center justify-between rounded-md border p-4">
+                  <span className="text-sm font-medium text-muted-foreground">
                     <FormattedMessage defaultMessage="Add a custom message for the Collective Admins" id="PFv8Cm" />
                   </span>
                   <Switch
@@ -215,7 +215,7 @@ const FreezeAccountModal = ({
                     })}
                     required
                   />
-                  <p className="mt-2 text-xs text-gray-600">
+                  <p className="mt-2 text-xs text-muted-foreground">
                     <FormattedMessage
                       defaultMessage="This message will be attached in the automatic notification sent to collective admins."
                       id="DD6LrF"
@@ -247,8 +247,8 @@ const FreezeAccountModal = ({
 
             <Collapsible open={useMessageForAccountAdmins}>
               <CollapsibleTrigger asChild>
-                <div className="mb-4 flex items-center justify-between rounded-md border border-gray-200 p-4">
-                  <span className="text-sm font-medium text-gray-700">
+                <div className="mb-4 flex items-center justify-between rounded-md border p-4">
+                  <span className="text-sm font-medium text-muted-foreground">
                     <FormattedMessage defaultMessage="Add a custom message for the Collective Admins" id="PFv8Cm" />
                   </span>
                   <Switch
@@ -275,7 +275,7 @@ const FreezeAccountModal = ({
                     })}
                     required
                   />
-                  <p className="mt-2 text-xs text-gray-600">
+                  <p className="mt-2 text-xs text-muted-foreground">
                     <FormattedMessage
                       defaultMessage="This message will be attached in the automatic notification sent to collective admins."
                       id="DD6LrF"
@@ -287,8 +287,8 @@ const FreezeAccountModal = ({
 
             {contributionsSummary.totalCount > 0 && (
               <div>
-                <div className="mb-4 flex items-center justify-between rounded-md border border-gray-200 p-4">
-                  <span className="text-sm font-medium text-gray-700">
+                <div className="mb-4 flex items-center justify-between rounded-md border p-4">
+                  <span className="text-sm font-medium text-muted-foreground">
                     <FormattedMessage
                       defaultMessage="Pause {count} recurring contributions"
                       id="0bkmNx"
