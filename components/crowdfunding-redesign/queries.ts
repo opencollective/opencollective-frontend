@@ -243,6 +243,17 @@ export const profileWrapperQuery = gql`
       id
       name
       slug
+      settings
+      type
+      description
+      longDescription
+      backgroundImageUrl
+      ... on AccountWithParent {
+        parent {
+          id
+          slug
+        }
+      }
     }
     collective: account(slug: $collectiveSlug) {
       id

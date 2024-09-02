@@ -91,6 +91,8 @@ function FundraiserCard({ account, collectiveSlug }) {
   );
 }
 
+// next.js export
+// ts-unused-exports:disable-next-line
 export default function ContributePage() {
   const router = useRouter();
   const { data, error, loading } = useQuery(contributePageQuery, {
@@ -98,7 +100,7 @@ export default function ContributePage() {
     context: API_V2_CONTEXT,
   });
   const profile = getDefaultProfileValues(data?.account);
-  const mainfundraising = false;
+  const mainfundraising = true;
   return (
     <ProfileLayout activeTab="home">
       <div className="flex-1 space-y-8">
@@ -118,22 +120,22 @@ export default function ContributePage() {
                   allowAttributes
                   transform={node => {
                     // Allow some iframes
-                    const attrs = [].slice.call(node.attributes);
-                    if (node.tagName === 'iframe') {
+                    if (node.tagName.toLowerCase() === 'iframe') {
                       const src = node.getAttribute('src');
                       const parsedUrl = new URL(src);
                       const hostname = parsedUrl.hostname;
                       if (['youtube-nocookie.com', 'www.youtube-nocookie.com', 'anchor.fm'].includes(hostname)) {
-                        const attributes = merge({}, ...attrs.map(({ name, value }) => ({ [name]: value })));
                         return (
                           <iframe
-                            {...pick(attributes, ['width', 'height', 'frameborder', 'allowfullscreen'])}
-                            title={attributes.title || 'Embed content'}
+                            width={node.getAttribute('width')}
+                            height={node.getAttribute('height')}
+                            allowFullScreen={node.getAttribute('allowfullscreen') as any}
+                            title={node.getAttribute('title') || 'Embed content'}
                             src={src}
                           />
                         );
                       }
-                    } else if (node.tagName === 'a') {
+                    } else if (node.tagName.toLowerCase() === 'a') {
                       // Open links in new tab
                       node.setAttribute('target', '_blank');
                       node.setAttribute('rel', 'noopener noreferrer');

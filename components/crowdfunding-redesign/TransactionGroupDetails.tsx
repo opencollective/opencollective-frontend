@@ -18,10 +18,10 @@ import { DataList, DataListItem, DataListItemLabel, DataListItemValue } from '..
 import { FormattedMessage, useIntl } from 'react-intl';
 import { i18nTransactionKind } from '../../lib/i18n/transaction';
 const transactionGroupDetailsQuery = gql`
-  query TransactionGroupDetails($slug: String, $groupId: String) {
+  query TransactionGroupDetails($slug: String, $groupId: String!) {
     transactionGroup(account: { slug: $slug }, groupId: $groupId) {
       id
-      amountInHostCurrency {
+      totalAmount {
         valueInCents
         currency
       }
@@ -72,7 +72,7 @@ const transactionGroupDetailsQuery = gql`
         order {
           id
         }
-        amountInHostCurrency {
+        amount {
           valueInCents
           currency
         }
@@ -124,8 +124,8 @@ export function TransactionGroupDetails() {
                   <DataListItemLabel>{i18nTransactionKind(intl, transaction.kind)}</DataListItemLabel>
                   <DataListItemValue className="flex w-full max-w-full justify-end text-right">
                     <FormattedMoneyAmount
-                      amount={transaction.amountInHostCurrency.valueInCents}
-                      currency={transaction.amountInHostCurrency.currency}
+                      amount={transaction.amount.valueInCents}
+                      currency={transaction.amount.currency}
                       showCurrencyCode={false}
                     />
                   </DataListItemValue>

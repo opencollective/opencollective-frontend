@@ -32,7 +32,7 @@ export default function ProfileLayout({ activeTab = 'home', children, collapsed 
 
   return (
     <Page withTopBar={false} showFooter={false} title={`[PREVIEW] ${collective?.name} | Open Collective`}>
-      {/* <Banner account={account || collective} isFundraiser={account?.type === 'EVENT' || account?.type === 'PROJECT'} /> */}
+      <Banner account={account || collective} isFundraiser={account?.type === 'EVENT' || account?.type === 'PROJECT'} />
 
       <AnimatePresence mode="wait" initial={false}>
         <div className="flex min-h-screen flex-col justify-between bg-primary-foreground/75 antialiased">

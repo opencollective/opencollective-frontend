@@ -1,6 +1,9 @@
 import React from 'react';
+
 import ProfileLayout from '../../../components/crowdfunding-redesign/ProfileLayout';
 
+// next.js export
+// ts-unused-exports:disable-next-line
 export default function Expenses() {
   return (
     <ProfileLayout activeTab="expenses">

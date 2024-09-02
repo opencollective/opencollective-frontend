@@ -1,36 +1,29 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
+import clsx from 'clsx';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { TimeUnit } from '../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../lib/hooks/useQueryFilter';
-import { getDashboardRoute } from '../../lib/url-helpers';
 
-import { DashboardContext } from '../dashboard/DashboardContext';
-import DashboardHeader from '../dashboard/DashboardHeader';
+import { accountHoverCardFields } from '../AccountHoverCard';
 import { childAccountFilter } from '../dashboard/filters/ChildAccountFilter';
 import { Filterbar } from '../dashboard/filters/Filterbar';
 import { periodCompareFilter } from '../dashboard/filters/PeriodCompareFilter';
-import { Accounts } from '../dashboard/sections/overview/Accounts';
-import AccountTable from '../dashboard/sections/overview/AccountTable';
-import type { MetricProps } from '../dashboard/sections/overview/Metric';
-import { Metric } from '../dashboard/sections/overview/Metric';
-import { overviewMetricsQuery } from '../dashboard/sections/overview/queries';
-import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
-import { Account, TimeUnit } from '../../lib/graphql/types/v2/graphql';
-import { accountHoverCardFields } from '../AccountHoverCard';
-import AccountsList from './AccountsList';
-import { ProfileMetric } from './ProfileMetric';
-import clsx from 'clsx';
-import ComparisonChart from '../dashboard/sections/overview/ComparisonChart';
 import { PeriodFilterCompare, PeriodFilterType } from '../dashboard/filters/PeriodCompareFilter/schema';
-import { ArrowLeft, ChevronRight } from 'lucide-react';
+import ComparisonChart from '../dashboard/sections/overview/ComparisonChart';
+import type { MetricProps } from '../dashboard/sections/overview/Metric';
+import Link from '../Link';
+import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
+
+import AccountsList from './AccountsList';
+import { ProfileMetric } from './ProfileMetric';
 import { TransactionGroups } from './TransactionGroups';
-import Link from '../Link';
 
 const profileAccountsQuery = gql`
   query MetricsPerAccount(
@@ -233,7 +226,7 @@ const profileAccountsQuery = gql`
   ${accountHoverCardFields}
 `;
 
-export const schema = z.object({
+const schema = z.object({
   period: periodCompareFilter.schema.default({
     type: PeriodFilterType.ALL_TIME,
     compare: PeriodFilterCompare.NO_COMPARISON,
@@ -244,7 +237,7 @@ export const schema = z.object({
   metric: z.coerce.string().nullable().default('balance'),
 });
 
-export function ProfileAccounts() {
+export function AccountFinances({ inFundraiserLayout }: { inFundraiserLayout?: boolean }) {
   const router = useRouter();
   const accountSlug = router.query.accountSlug ?? router.query.collectiveSlug;
   const queryFilter = useQueryFilter({
@@ -365,24 +358,8 @@ export function ProfileAccounts() {
   return (
     <div className="relative mx-auto flex max-w-screen-lg flex-col gap-8 px-6 py-12">
       <div className="flex flex-col gap-3">
-        {router.query.accountSlug && (
+        {router.query.accountSlug && !inFundraiserLayout && (
           <div className="mb-4 space-y-2">
-            {/* <div className="-mx-2 flex items-center gap-1">
-              <Button asChild variant="ghost" size="xs" className="text-muted-foreground">
-                <Link href={`/preview/${router.query.accountSlug}/finances`}>Accounts</Link>
-              </Button>
-              <ChevronRight className="text-muted-foreground" size={16} />
-              <Button asChild variant="ghost" size="xs" className="text-muted-foreground">
-                <span>{data?.account?.name}</span>
-              </Button>
-            </div> */}
-            {/* <Link
-              href={`/preview/${router.query.accountSlug}/finances`}
-              scroll={false}
-              className="flex items-center gap-2 text-sm font-medium text-muted-foreground"
-            >
-              <ArrowLeft size={16} /> Back to overview
-            </Link> */}
             <div className="flex items-start justify-between gap-2">
               <div className="flex items-center gap-2">
                 <h2 className="text-2xl font-semibold">{data?.account?.name} </h2>

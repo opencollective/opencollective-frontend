@@ -4,7 +4,6 @@ import { aggregateGoalAmounts } from './helpers';
 
 import { Progress } from '../ui/Progress';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
-import { StackedAvatars } from '../Avatar';
 
 // Naive implementation of Goals for prototype
 export function Goal({ account }) {

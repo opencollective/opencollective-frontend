@@ -24,7 +24,7 @@ import { TabsList, TabsTrigger } from './DumbTabs';
 
 import { ThemeColor } from './ThemeColor';
 import { Tiers } from './Tiers';
-import { ProfileAccounts } from './Accounts';
+import { ProfileAccounts } from './CollectiveFinances';
 
 export default function Profile({ account }) {
   const hasSocialLinks = account.socialLinks && account.socialLinks.length > 0;

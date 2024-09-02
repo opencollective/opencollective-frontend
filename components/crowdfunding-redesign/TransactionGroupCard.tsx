@@ -63,8 +63,8 @@ export function TransactionGroupCard({ group, className = undefined, asHero = fa
         )}
       >
         <FormattedMoneyAmount
-          amount={group?.amountInHostCurrency.valueInCents}
-          currency={group?.amountInHostCurrency.currency}
+          amount={group?.totalAmount.valueInCents}
+          currency={group?.totalAmount.currency}
           showCurrencyCode={false}
         />
       </div>
