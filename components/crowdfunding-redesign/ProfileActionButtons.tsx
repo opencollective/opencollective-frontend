@@ -1,17 +1,16 @@
 import React from 'react';
-import { Button } from '../ui/Button';
-import { FormattedMessage } from 'react-intl';
-import { triggerPrototypeToast } from './helpers';
 import { MoreHorizontal, Share } from 'lucide-react';
-import Link from '../Link';
+import { FormattedMessage } from 'react-intl';
 
-export function ProfileActionButtons({ account, collective }) {
+import { Button } from '../ui/Button';
+
+import { triggerPrototypeToast } from './helpers';
+
+export function ProfileActionButtons() {
   return (
     <div className="flex gap-2">
-      <Button asChild>
-        <Link href={`/preview/${collective?.slug}/contribute`}>
-          <FormattedMessage defaultMessage="Contribute" id="Contribute" />
-        </Link>
+      <Button onClick={triggerPrototypeToast}>
+        <FormattedMessage defaultMessage="Contribute" id="Contribute" />
       </Button>
 
       <Button

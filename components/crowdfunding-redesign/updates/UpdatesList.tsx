@@ -1,24 +1,25 @@
 import React from 'react';
+import { useQuery } from '@apollo/client';
 import { Markup } from 'interweave';
 import { ChevronRight, MessageSquare, Smile } from 'lucide-react';
 // eslint-disable-next-line no-restricted-imports
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
+
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
 import { EmptyResults } from '../../dashboard/EmptyResults';
 import { Button } from '../../ui/Button';
 import { Separator } from '../../ui/Separator';
 import { triggerPrototypeToast } from '../helpers';
+import { updatesQuery } from '../queries';
 
 import { UpdateHeader } from './UpdateHeader';
-import { updatesQuery } from '../queries';
-import { useQuery } from '@apollo/client';
-import { useRouter } from 'next/router';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
 export function UpdatesList() {
   const router = useRouter();
-  const { data, loading } = useQuery(updatesQuery, {
+  const { data } = useQuery(updatesQuery, {
     variables: { slug: router.query.accountSlug ?? router.query.collectiveSlug },
     context: API_V2_CONTEXT,
   });
@@ -34,15 +35,14 @@ export function UpdatesList() {
             <Link
               key={update.id}
               href={`/preview/${router.query.collectiveSlug}/updates/${update.id}`}
-              // scroll={false}
-              // shallow={true}
               className="flex cursor-pointer flex-col gap-3 rounded-lg border bg-background p-8 transition-shadow hover:shadow"
-              onClick={() => {
-                // const tabElement = tabRef?.current as HTMLElement | null;
-                // if (tabElement) {
-                //   tabElement.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
-                // }
-              }}
+              // TODO: Consider smooth scrolling to content when opening an update if using expanded fundraiser layout
+              // onClick={() => {
+              //   const tabElement = tabRef?.current as HTMLElement | null;
+              //   if (tabElement) {
+              //     tabElement.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+              //   }
+              // }}
             >
               <UpdateHeader update={update} />
               <Separator className="mb-3" />

@@ -1,15 +1,18 @@
 import React from 'react';
 import { getApplicableTaxes } from '@opencollective/taxes';
+import { FormattedMessage } from 'react-intl';
+
+import { getPrecisionFromAmount, graphqlAmountValueInCents } from '../../lib/currency-utils';
 import { isPastEvent } from '../../lib/events';
+import { TierFrequency } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { isTierExpired } from '../../lib/tier-utils';
-import { getPrecisionFromAmount, graphqlAmountValueInCents } from '../../lib/currency-utils';
-import { FormattedMessage } from 'react-intl';
+
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
-import { TierFrequency } from '../../lib/graphql/types/v2/graphql';
 import { Button } from '../ui/Button';
+import { InputGroup } from '../ui/Input';
+
 import { triggerPrototypeToast } from './helpers';
-import { Input, InputGroup } from '../ui/Input';
 
 const canContribute = (collective, LoggedInUser) => {
   if (!collective.isActive) {

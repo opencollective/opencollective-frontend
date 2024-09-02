@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { cva } from 'class-variance-authority';
 // eslint-disable-next-line no-restricted-imports
 import Link from 'next/link';
+
 import { triggerPrototypeToast } from './helpers';
 
 export const ContentOverview = ({ content }) => {

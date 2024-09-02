@@ -1,36 +1,7 @@
-import { useRouter } from 'next/router';
 import React from 'react';
-import Link from '../Link';
 import { Slash } from 'lucide-react';
 
-const getPathdata = (router, collective, account) => {
-  switch (router.pathname) {
-    case '/preview/[collectiveSlug]/finances/[accountSlug]':
-      return [{ href: `/preview/${router.query.collectiveSlug}/finances`, label: 'Finances' }];
-    case '/preview/[collectiveSlug]/transactions/[groupId]':
-      return [
-        { href: `/preview/${router.query.collectiveSlug}/finances`, label: 'Finances' },
-        {
-          href: `/preview/${router.query.collectiveSlug}/finances/${router.query.collectiveSlug}`,
-          label: collective?.name,
-        },
-      ];
-    case '/preview/[collectiveSlug]/[accountSlug]/transactions/[groupId]':
-      return [
-        { href: `/preview/${router.query.collectiveSlug}/finances`, label: 'Finances' },
-        {
-          href: `/preview/${router.query.collectiveSlug}/finances/${router.query.accountSlug}`,
-          label: account?.name,
-        },
-      ];
-    case '/preview/[collectiveSlug]/projects/[accountSlug]':
-      return [{ href: `/preview/${router.query.collectiveSlug}/projects`, label: 'Projects' }];
-    case '/preview/[collectiveSlug]/events/[accountSlug]':
-      return [{ href: `/preview/${router.query.collectiveSlug}/events`, label: 'Events' }];
-    default:
-      return [{ href: '', label: '' }];
-  }
-};
+import Link from '../Link';
 
 export function Breadcrumb({ breadcrumbs }) {
   return (

@@ -66,7 +66,7 @@ export function getDefaultFundraiserValues(account: Account): Fundraiser {
 
 export function getDefaultProfileValues(account?: Account): Profile {
   if (!account) return null;
-  const profileSettings = account.settings.crowdfundingRedesign?.profile || {};
+  const profileSettings = account.settings?.crowdfundingRedesign?.profile || {};
   const primaryColor =
     get(account, 'settings.collectivePage.primaryColor') || get(account, 'parent.settings.collectivePage.primaryColor');
 

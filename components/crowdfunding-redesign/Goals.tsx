@@ -1,10 +1,10 @@
 import React from 'react';
 
-import { aggregateGoalAmounts } from './helpers';
-
-import { Progress } from '../ui/Progress';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
-import { StackedAvatars } from '../Avatar';
+import StackedAvatars from '../StackedAvatars';
+import { Progress } from '../ui/Progress';
+
+import { aggregateGoalAmounts } from './helpers';
 
 // Naive implementation of Goals for prototype
 export function Goals({ account }) {

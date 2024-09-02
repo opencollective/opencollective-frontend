@@ -1,9 +1,11 @@
 import React from 'react';
 import { useRouter } from 'next/router';
 
+import { TransactionGroupDetails } from '../../../../components/crowdfunding-redesign/finances/TransactionGroupDetails';
 import ProfileLayout from '../../../../components/crowdfunding-redesign/ProfileLayout';
-import { TransactionGroupDetails } from '../../../../components/crowdfunding-redesign/TransactionGroupDetails';
 
+// next.js export
+// ts-unused-exports:disable-next-line
 export default function TransactionDetails() {
   const router = useRouter();
   return (
