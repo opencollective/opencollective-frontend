@@ -72,7 +72,7 @@ exports.REWRITES = [
   {
     source:
       '/dashboard/:slug/:section(goals|connected-accounts|export|for-developers|user-security|custom-email|activity-log|collective-page|authorized-apps|advanced|webhooks|sending-money|policies|receiving-money|tiers|tickets|host|info|gift-cards|gift-cards-create|payment-methods|payment-receipts|fiscal-hosting|security|host-virtual-cards-settings)/:subpath*',
-    destination: '/dashboard/:slug/legacy-settings-sections/:section',
+    destination: '/dashboard/:slug/legacy-settings-sections/:section/:subpath*',
   },
   {
     source: '/dashboard/root-actions',

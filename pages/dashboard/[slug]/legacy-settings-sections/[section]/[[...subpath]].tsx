@@ -3,12 +3,16 @@ import { values } from 'lodash';
 import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 
-import { LEGACY_SECTIONS, LEGACY_SETTINGS_SECTIONS, SECTION_LABELS } from '../../../../components/dashboard/constants';
-import { DashboardContext } from '../../../../components/dashboard/DashboardContext';
-import DashboardHeader from '../../../../components/dashboard/DashboardHeader';
-import DashboardPage from '../../../../components/dashboard/DashboardPage';
-import AccountSettings from '../../../../components/dashboard/sections/AccountSettings';
-import NotFound from '../../../../components/NotFound';
+import {
+  LEGACY_SECTIONS,
+  LEGACY_SETTINGS_SECTIONS,
+  SECTION_LABELS,
+} from '../../../../../components/dashboard/constants';
+import { DashboardContext } from '../../../../../components/dashboard/DashboardContext';
+import DashboardHeader from '../../../../../components/dashboard/DashboardHeader';
+import DashboardPage from '../../../../../components/dashboard/DashboardPage';
+import AccountSettings from '../../../../../components/dashboard/sections/AccountSettings';
+import NotFound from '../../../../../components/NotFound';
 
 const SECTIONS = [...values(LEGACY_SECTIONS), ...values(LEGACY_SETTINGS_SECTIONS)];
 
@@ -32,7 +36,9 @@ function SectionComponent() {
 
   return (
     <React.Fragment>
-      <DashboardHeader className="mb-2" title={intl.formatMessage(SECTION_LABELS[section])} />
+      {SECTION_LABELS[section] && (
+        <DashboardHeader className="mb-2" title={intl.formatMessage(SECTION_LABELS[section])} />
+      )}
       <AccountSettings account={account} section={section} />
     </React.Fragment>
   );
