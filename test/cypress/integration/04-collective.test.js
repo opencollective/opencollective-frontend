@@ -177,7 +177,7 @@ describe('Collective page', () => {
       cy.get('[data-cy="InlineEditField-Btn-Save"]').click();
       cy.get('[data-cy="longDescription"]').should(
         'have.html',
-        '<div><strong>Hello world!&nbsp;</strong><strong><iframe width="100%" height="394" allowfullscreen="" title="Embed content" src="https://www.youtube-nocookie.com/embed/2oyhlad64-s/?showinfo=0"></iframe><figcaption></figcaption></strong></div>',
+        '<div><strong>Hello world!&nbsp;</strong><strong><iframe allowfullscreen="" width="100%" height="394" title="Embed content" src="https://www.youtube-nocookie.com/embed/2oyhlad64-s/?showinfo=0"></iframe><figcaption></figcaption></strong></div>',
       );
     });
   });
