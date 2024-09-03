@@ -496,12 +496,12 @@ const Menu = ({ onRoute, menuItems }) => {
   }, [router, onRoute]);
 
   const showLinkToProfilePrototype =
-    !['ROOT', 'ORGANIZATION', 'FUND', 'INDIVIDUAL'].includes(account.type) &&
+    !['ROOT', 'ORGANIZATION', 'FUND', 'INDIVIDUAL'].includes(account?.type) &&
     LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW);
 
   return (
     <div className="space-y-4">
-      {account.type !== 'ROOT' && (
+      {account && account.type !== 'ROOT' && (
         <div className="flex flex-col gap-2">
           <MenuLink
             href={getCollectivePageRoute(account)}

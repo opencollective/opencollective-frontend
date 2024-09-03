@@ -15,6 +15,7 @@ import Avatar from '../Avatar';
 import Container from '../Container';
 import { Flex } from '../Grid';
 import Link from '../Link';
+import LoadingPlaceholder from '../LoadingPlaceholder';
 import { Dropdown, DropdownContent } from '../StyledDropdown';
 import StyledHr from '../StyledHr';
 import StyledRoundButton from '../StyledRoundButton';
@@ -255,7 +256,16 @@ const AccountSwitcher = ({ activeSlug }: { activeSlug: string }) => {
         <React.Fragment>
           <Flex alignItems="center" flex={0}>
             <DropdownButton {...triggerProps}>
-              {activeSlug === ROOT_PROFILE_KEY ? <RootOption /> : <Option collective={activeAccount} />}
+              {!activeSlug ? (
+                <div className="flex w-full flex-col gap-2">
+                  <LoadingPlaceholder height={14} width="100%" />
+                  <LoadingPlaceholder height={12} width="100%" />
+                </div>
+              ) : activeSlug === ROOT_PROFILE_KEY ? (
+                <RootOption />
+              ) : (
+                <Option collective={activeAccount} />
+              )}
               <ChevronsUpDown size={18} />
             </DropdownButton>
           </Flex>

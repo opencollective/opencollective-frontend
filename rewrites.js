@@ -66,7 +66,7 @@ exports.REWRITES = [
   },
   {
     source:
-      '/dashboard/:slug/:section(expected-funds|contributors|vendors|team|host-expenses|host-agreements|host-applications|host-tax-forms|expenses|submitted-expenses|host-virtual-cards|host-virtual-card-requests|incoming-contributions|outgoing-contributions|transactions|virtual-cards|orders|chart-of-accounts|reports|hosted-collectives|updates|host-transactions|accounts|invoices-receipts|tax-information|notifications)/:subpath*',
+      '/dashboard/:slug/:section(overview|expected-funds|contributors|vendors|team|host-expenses|host-agreements|host-applications|host-tax-forms|expenses|submitted-expenses|host-virtual-cards|host-virtual-card-requests|incoming-contributions|outgoing-contributions|transactions|virtual-cards|orders|chart-of-accounts|reports|hosted-collectives|updates|host-transactions|accounts|invoices-receipts|tax-information|notifications)/:subpath*',
     destination: '/dashboard/:slug/:section/:subpath*',
   },
   {
@@ -75,11 +75,15 @@ exports.REWRITES = [
     destination: '/dashboard/:slug/legacy-settings-sections/:section',
   },
   {
-    source: '/dashboard/:slug/:section?/:subpath*',
+    source: '/dashboard/root-actions',
+    destination: '/dashboard/root/all-collectives',
+  },
+  {
+    source: '/dashboard/:slug',
     destination: '/dashboard',
   },
   {
-    source: '/workspace/:slug/:section?/:subpath*',
+    source: '/workspace/:slug',
     destination: '/dashboard',
   },
   {
