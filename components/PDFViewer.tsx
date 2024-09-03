@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { throttle } from 'lodash';
+import type { ComponentProps } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Document, Page, pdfjs } from 'react-pdf';
 import styled from 'styled-components';
@@ -17,9 +18,10 @@ const DocumentContainer = styled.div`
   }
 `;
 
-const options = {
+const options: ComponentProps<typeof Document>['options'] = {
   cMapUrl: `/static/cmaps/`,
   cMapPacked: true,
+  isEvalSupported: false,
 };
 
 const PDFViewer = ({ pdfUrl, contentWrapperRef, errorTextColor = 'white.full', limitToPageWidth = true, ...props }) => {
