@@ -6,10 +6,10 @@ import { get } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import commentTypes from '../../lib/constants/commentTypes';
 import { createError, ERROR, formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { CommentType } from '../../lib/graphql/types/v2/graphql';
 
 import Container from '../Container';
 import ContainerOverlay from '../ContainerOverlay';
@@ -106,7 +106,7 @@ const CommentForm = ({
   LoggedInUser,
   isDisabled,
   canUsePrivateNote,
-  defaultType = commentTypes.COMMENT,
+  defaultType = CommentType.COMMENT,
   replyingToComment,
   minHeight = 250,
   submitButtonJustify,
@@ -116,7 +116,7 @@ const CommentForm = ({
   const intl = useIntl();
   const [html, setHtml] = useState('');
   const [resetValue, setResetValue] = useState();
-  const [asPrivateNote, setPrivateNote] = useState(defaultType === commentTypes.PRIVATE_NOTE);
+  const [asPrivateNote, setPrivateNote] = useState(defaultType === CommentType.PRIVATE_NOTE);
   const [validationError, setValidationError] = useState();
   const [uploading, setUploading] = useState(false);
   const { formatMessage } = intl;
@@ -124,7 +124,7 @@ const CommentForm = ({
 
   const postComment = async event => {
     event.preventDefault();
-    const type = asPrivateNote ? commentTypes.PRIVATE_NOTE : commentTypes.COMMENT;
+    const type = asPrivateNote ? CommentType.PRIVATE_NOTE : CommentType.COMMENT;
 
     if (!html) {
       setValidationError(createError(ERROR.FORM_FIELD_REQUIRED));
@@ -252,7 +252,7 @@ CommentForm.propTypes = {
   /** disable the inputs */
   isDisabled: PropTypes.bool,
   /** Default type of comment */
-  defaultType: PropTypes.oneOf(Object.values(commentTypes)),
+  defaultType: PropTypes.oneOf(Object.values(CommentType)),
   /** Can post comment as private note */
   canUsePrivateNote: PropTypes.bool,
   /** @ignore from withUser */
@@ -263,7 +263,6 @@ CommentForm.propTypes = {
   /** @ignore from withRouter */
   router: PropTypes.object,
   /** Called when comment gets selected*/
-  getClickedComment: PropTypes.func,
   minHeight: PropTypes.number,
   submitButtonJustify: PropTypes.string,
   submitButtonVariant: PropTypes.string,

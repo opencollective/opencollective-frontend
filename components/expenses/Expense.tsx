@@ -12,12 +12,11 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { getCollectiveTypeForUrl } from '../../lib/collective';
-import CommentType from '../../lib/constants/commentTypes';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { getFilesFromExpense, getPayoutProfiles } from '../../lib/expenses';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { ExpenseStatus, OrderByFieldType, OrderDirection } from '../../lib/graphql/types/v2/graphql';
+import { CommentType, ExpenseStatus, OrderByFieldType, OrderDirection } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 import { itemHasOCR } from './lib/ocr';
