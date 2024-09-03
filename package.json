@@ -201,7 +201,7 @@
     "test:e2e:3": "cross-env TZ=UTC cypress run --spec \"test/cypress/integration/3*.js\"",
     "test:jest": "cross-env NODE_ENV=test TZ=UTC jest components lib pages",
     "test:update": "npm run test:jest -- --updateSnapshot",
-    "ts-unused-exports": "ts-unused-exports tsconfig.json --ignoreFiles=lib/graphql/types/ --ignoreFiles=stories/",
+    "ts-unused-exports": "ts-unused-exports tsconfig.json --ignoreFiles=lib/graphql/types/ --ignoreFiles=stories/ --excludePathsFromReport=pages/",
     "type:check": "tsc",
     "jest": "cross-env NODE_ENV=test TZ=UTC jest"
   },
