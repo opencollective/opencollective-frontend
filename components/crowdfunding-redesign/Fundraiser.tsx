@@ -2,7 +2,6 @@ import React from 'react';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { cva } from 'class-variance-authority';
 import { Markup } from 'interweave';
-import { merge, pick } from 'lodash';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 // eslint-disable-next-line no-restricted-imports
 import Link from 'next/link';
@@ -318,22 +317,22 @@ export default function Fundraiser({ account }) {
                   allowAttributes
                   transform={node => {
                     // Allow some iframes
-                    const attrs = [].slice.call(node.attributes);
-                    if (node.tagName === 'iframe') {
+                    if (node.tagName.toLowerCase() === 'iframe') {
                       const src = node.getAttribute('src');
                       const parsedUrl = new URL(src);
                       const hostname = parsedUrl.hostname;
                       if (['youtube-nocookie.com', 'www.youtube-nocookie.com', 'anchor.fm'].includes(hostname)) {
-                        const attributes = merge({}, ...attrs.map(({ name, value }) => ({ [name]: value })));
                         return (
                           <iframe
-                            {...pick(attributes, ['width', 'height', 'frameborder', 'allowfullscreen'])}
-                            title={attributes.title || 'Embed content'}
+                            width={node.getAttribute('width')}
+                            height={node.getAttribute('height')}
+                            allowFullScreen={node.getAttribute('allowfullscreen') as any}
+                            title={node.getAttribute('title') || 'Embed content'}
                             src={src}
                           />
                         );
                       }
-                    } else if (node.tagName === 'a') {
+                    } else if (node.tagName.toLowerCase() === 'a') {
                       // Open links in new tab
                       node.setAttribute('target', '_blank');
                       node.setAttribute('rel', 'noopener noreferrer');
