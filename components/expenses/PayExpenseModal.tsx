@@ -379,7 +379,6 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
   );
   const [disabled, setDisabled] = React.useState(false);
 
-  const canAddTransferDetails = host.settings?.transferwise?.transferDetails === true;
   const canQuote = host.transferwise && payoutMethodType === PayoutMethodType.BANK_ACCOUNT;
   const quoteQuery = useQuery(quoteExpenseQuery, {
     variables: { id: expense.id },
@@ -585,7 +584,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                 </StyledInputField>
               </React.Fragment>
             )}
-            {canQuote && canAddTransferDetails && !hasManualPayment && (
+            {canQuote && !hasManualPayment && (
               <div className="mt-3">
                 <TransferDetailFields expense={expense} setDisabled={setDisabled} />
               </div>
