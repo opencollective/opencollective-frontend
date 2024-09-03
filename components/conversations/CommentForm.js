@@ -262,8 +262,6 @@ CommentForm.propTypes = {
   replyingToComment: PropTypes.object,
   /** @ignore from withRouter */
   router: PropTypes.object,
-  /** Called when comment gets selected*/
-  getClickedComment: PropTypes.func,
   minHeight: PropTypes.number,
   submitButtonJustify: PropTypes.string,
   submitButtonVariant: PropTypes.string,
