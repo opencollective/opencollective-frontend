@@ -401,7 +401,7 @@ const ExpenseBudgetItem = ({
                 <Box mt="6px">
                   <PayoutMethodTypeWithIcon
                     isLoading={isLoading}
-                    type={expense?.payoutMethod?.type}
+                    type={expense.payoutMethod?.type}
                     iconSize="10px"
                     fontSize="11px"
                     fontWeight="normal"
@@ -409,6 +409,18 @@ const ExpenseBudgetItem = ({
                   />
                 </Box>
               </Box>
+              {Boolean(expense.reference) && (
+                <Box mr={[3, 4]}>
+                  <DetailColumnHeader>
+                    <FormattedMessage id="Expense.Reference" defaultMessage="Reference" />
+                  </DetailColumnHeader>
+                  {isLoading ? (
+                    <LoadingPlaceholder height={15} width={90} />
+                  ) : (
+                    <div className="mt-[4px] text-[11px]">{expense.reference}</div>
+                  )}
+                </Box>
+              )}
               {nbAttachedFiles > 0 && (
                 <Box mr={[3, 4]}>
                   <DetailColumnHeader>
@@ -438,7 +450,7 @@ const ExpenseBudgetItem = ({
                   )}
                 </Box>
               )}
-              {Boolean(expense?.account?.hostAgreements?.totalCount) && (
+              {Boolean(expense.account?.hostAgreements?.totalCount) && (
                 <Box mr={[3, 4]}>
                   <DetailColumnHeader>
                     <FormattedMessage defaultMessage="Host Agreements" id="kq2gKV" />
@@ -528,6 +540,7 @@ ExpenseBudgetItem.propTypes = {
       totalCount: PropTypes.number,
     }),
     type: PropTypes.string.isRequired,
+    reference: PropTypes.string,
     description: PropTypes.string.isRequired,
     status: PropTypes.string.isRequired,
     createdAt: PropTypes.string.isRequired,

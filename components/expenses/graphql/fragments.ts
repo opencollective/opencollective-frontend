@@ -205,6 +205,7 @@ export const expensePageExpenseFieldsFragment = gql`
     status
     onHold
     privateMessage
+    reference
     tags
     amount
     accountingCategory {
@@ -622,6 +623,7 @@ export const expensesListFieldsFragment = gql`
     id
     legacyId
     description
+    reference
     status
     createdAt
     tags
