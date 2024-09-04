@@ -893,31 +893,6 @@ interface Account {
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
-
-  """
-  Host application requests
-  """
-  hostApplicationRequests(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-
-    """
-    Order of the results
-    """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
-
-    """
-    Filter applications by status
-    """
-    status: HostApplicationStatus
-  ): HostApplicationCollection!
   feed(
     """
     Only returns activities before this date
@@ -2247,6 +2222,11 @@ type Expense {
   longDescription: String
 
   """
+  User-provided reference number or any other identifier that references the invoice
+  """
+  reference: String
+
+  """
   Total amount of the expense (sum of the item's amounts).
   """
   amount: Int! @deprecated(reason: "2022-02-09: Please use amountV2")
@@ -3287,31 +3267,6 @@ type Host implements Account & AccountWithContributions {
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
-
-  """
-  Host application requests
-  """
-  hostApplicationRequests(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-
-    """
-    Order of the results
-    """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
-
-    """
-    Filter applications by status
-    """
-    status: HostApplicationStatus
-  ): HostApplicationCollection!
   feed(
     """
     Only returns activities before this date
@@ -3536,11 +3491,6 @@ type Host implements Account & AccountWithContributions {
     Filter applications by status
     """
     status: HostApplicationStatus
-
-    """
-    Filter host applications by the last user-role who replied to them
-    """
-    lastCommentBy: [LastCommentBy]
   ): HostApplicationCollection!
 
   """
@@ -5813,66 +5763,6 @@ type Permission {
 }
 
 """
-A collection of "HostApplication"
-"""
-type HostApplicationCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [HostApplication]
-}
-
-type HostApplication {
-  id: String!
-
-  """
-  The account who applied to this host
-  """
-  account: Account!
-
-  """
-  The host the collective applied to
-  """
-  host: Host!
-
-  """
-  The date on which the item was created
-  """
-  createdAt: DateTime!
-
-  """
-  The date on which the item was updated
-  """
-  updatedAt: DateTime!
-  status: HostApplicationStatus
-  message: String
-  customData: JSON
-
-  """
-  Returns the list of comments for this host application, or `null` if user is not allowed to see them
-  """
-  comments(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: ASC }
-  ): CommentCollection
-}
-
-enum HostApplicationStatus {
-  PENDING
-  APPROVED
-  REJECTED
-  EXPIRED
-}
-
-"""
 An activity describing something that happened on the platform
 """
 type Activity {
@@ -6016,7 +5906,6 @@ enum ActivityType {
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
   HOST_APPLICATION_CONTACT
-  HOST_APPLICATION_COMMENT_CREATED
   CONTRIBUTION_REJECTED
   SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CANCELED
@@ -6496,6 +6385,50 @@ Stripe connected account properties
 type StripeConnectedAccount {
   username: String
   issuingBalance: Amount
+}
+
+"""
+A collection of "HostApplication"
+"""
+type HostApplicationCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [HostApplication]
+}
+
+type HostApplication {
+  id: String!
+
+  """
+  The account who applied to this host
+  """
+  account: Account!
+
+  """
+  The host the collective applied to
+  """
+  host: Host!
+
+  """
+  The date on which the item was created
+  """
+  createdAt: DateTime!
+
+  """
+  The date on which the item was updated
+  """
+  updatedAt: DateTime!
+  status: HostApplicationStatus
+  message: String
+  customData: JSON
+}
+
+enum HostApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EXPIRED
 }
 
 """
@@ -8169,31 +8102,6 @@ type Bot implements Account {
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
-
-  """
-  Host application requests
-  """
-  hostApplicationRequests(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-
-    """
-    Order of the results
-    """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
-
-    """
-    Filter applications by status
-    """
-    status: HostApplicationStatus
-  ): HostApplicationCollection!
   feed(
     """
     Only returns activities before this date
@@ -8975,31 +8883,6 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
-
-  """
-  Host application requests
-  """
-  hostApplicationRequests(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-
-    """
-    Order of the results
-    """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
-
-    """
-    Filter applications by status
-    """
-    status: HostApplicationStatus
-  ): HostApplicationCollection!
   feed(
     """
     Only returns activities before this date
@@ -10234,31 +10117,6 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
-
-  """
-  Host application requests
-  """
-  hostApplicationRequests(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-
-    """
-    Order of the results
-    """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
-
-    """
-    Filter applications by status
-    """
-    status: HostApplicationStatus
-  ): HostApplicationCollection!
   feed(
     """
     Only returns activities before this date
@@ -11273,31 +11131,6 @@ type Individual implements Account {
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
-
-  """
-  Host application requests
-  """
-  hostApplicationRequests(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-
-    """
-    Order of the results
-    """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
-
-    """
-    Filter applications by status
-    """
-    status: HostApplicationStatus
-  ): HostApplicationCollection!
   feed(
     """
     Only returns activities before this date
@@ -12285,31 +12118,6 @@ type Organization implements Account & AccountWithContributions {
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
-
-  """
-  Host application requests
-  """
-  hostApplicationRequests(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-
-    """
-    Order of the results
-    """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
-
-    """
-    Filter applications by status
-    """
-    status: HostApplicationStatus
-  ): HostApplicationCollection!
   feed(
     """
     Only returns activities before this date
@@ -13188,31 +12996,6 @@ type Vendor implements Account & AccountWithContributions {
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
-
-  """
-  Host application requests
-  """
-  hostApplicationRequests(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-
-    """
-    Order of the results
-    """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
-
-    """
-    Filter applications by status
-    """
-    status: HostApplicationStatus
-  ): HostApplicationCollection!
   feed(
     """
     Only returns activities before this date
@@ -14456,7 +14239,6 @@ type Query {
     status: [VirtualCardRequestStatus]
     collective: [AccountReferenceInput]
   ): VirtualCardRequestCollection!
-  hostApplication(hostApplication: HostApplicationReferenceInput): HostApplication
   loggedInAccount: Individual
   me: Individual
 }
@@ -15773,7 +15555,6 @@ enum ActivityAndClassesType {
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
   HOST_APPLICATION_CONTACT
-  HOST_APPLICATION_COMMENT_CREATED
   CONTRIBUTION_REJECTED
   SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CANCELED
@@ -16611,31 +16392,6 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
-
-  """
-  Host application requests
-  """
-  hostApplicationRequests(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-
-    """
-    Order of the results
-    """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
-
-    """
-    Filter applications by status
-    """
-    status: HostApplicationStatus
-  ): HostApplicationCollection!
   feed(
     """
     Only returns activities before this date
@@ -17530,31 +17286,6 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
-
-  """
-  Host application requests
-  """
-  hostApplicationRequests(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-
-    """
-    Order of the results
-    """
-    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
-
-    """
-    Filter applications by status
-    """
-    status: HostApplicationStatus
-  ): HostApplicationCollection!
   feed(
     """
     Only returns activities before this date
@@ -17757,13 +17488,6 @@ type VirtualCardRequestCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [VirtualCardRequest!]
-}
-
-input HostApplicationReferenceInput {
-  """
-  The public id identifying the host application (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
-  """
-  id: String
 }
 
 """
@@ -18563,17 +18287,12 @@ type Mutation {
     """
     The account that applied to the host
     """
-    account: AccountReferenceInput @deprecated(reason: "2024-07-24: Please use hostApplication")
-
-    """
-    The host application
-    """
-    hostApplication: HostApplicationReferenceInput
+    account: AccountReferenceInput!
 
     """
     The host concerned by the application
     """
-    host: AccountReferenceInput @deprecated(reason: "2024-07-24: Please use hostApplication")
+    host: AccountReferenceInput!
 
     """
     What to do with the application
@@ -20054,11 +19773,6 @@ input CommentCreateInput {
   expense: ExpenseReferenceInput
 
   """
-  If your comment is linked to an host application, set it here
-  """
-  hostApplication: HostApplicationReferenceInput
-
-  """
   If your comment is linked to an order, set it here
   """
   order: OrderReferenceInput
@@ -20230,6 +19944,11 @@ input ExpenseCreateInput {
   The accounting category this expense belongs to
   """
   accountingCategory: AccountingCategoryReferenceInput
+
+  """
+  User-provided reference number or any other identifier that references the invoice
+  """
+  reference: String
 }
 
 input PayoutMethodInput {
@@ -20332,6 +20051,11 @@ input ExpenseUpdateInput {
   Longer text to attach to the expense
   """
   longDescription: String
+
+  """
+  User-provided reference number or any other identifier that references the invoice
+  """
+  reference: String
 
   """
   Currency that should be used for the payout. Defaults to the account currency
@@ -20678,6 +20402,11 @@ input ExpenseInviteDraftInput {
   accountingCategory: AccountingCategoryReferenceInput
 
   """
+  User-provided reference number or any other identifier that references the invoice
+  """
+  reference: String
+
+  """
   Note to be sent to the invited user through email.
   """
   recipientNote: String
@@ -20725,7 +20454,6 @@ type ProcessHostApplicationResponse {
   When sending a public message, this field will have the info about the conversation created
   """
   conversation: Conversation
-  hostApplication: HostApplication
 }
 
 """
