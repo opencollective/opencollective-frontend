@@ -299,15 +299,7 @@ const ExpenseSummary = ({
         ) : (
           <P fontSize="14px" color="black.700" data-cy="expense-author">
             <FormattedDate value={expense.createdAt} dateStyle="medium" />
-            {expense?.comments && (
-              <React.Fragment>
-                <Spacer />
-                <MessageSquare size="16px" style={{ display: 'inline-block' }} />
-                &nbsp;
-                {expense.comments.totalCount}
-              </React.Fragment>
-            )}
-            {expense?.merchantId && (
+            {expense.merchantId && (
               <React.Fragment>
                 <Spacer />
                 <FormattedMessage
@@ -315,6 +307,24 @@ const ExpenseSummary = ({
                   defaultMessage="Merchant ID: {id}"
                   values={{ id: expense.merchantId }}
                 />
+              </React.Fragment>
+            )}
+            {expense.reference && (
+              <React.Fragment>
+                <Spacer />
+                <FormattedMessage
+                  id="ReferenceValue"
+                  defaultMessage="Ref: {reference}"
+                  values={{ reference: expense.reference }}
+                />
+              </React.Fragment>
+            )}
+            {expense.comments && (
+              <React.Fragment>
+                <Spacer />
+                <MessageSquare size="16px" style={{ display: 'inline-block' }} />
+                &nbsp;
+                {expense.comments.totalCount}
               </React.Fragment>
             )}
           </P>
@@ -535,6 +545,7 @@ ExpenseSummary.propTypes = {
     legacyId: PropTypes.number,
     accountingCategory: PropTypes.object,
     description: PropTypes.string.isRequired,
+    reference: PropTypes.string,
     longDescription: PropTypes.string,
     amount: PropTypes.number.isRequired,
     currency: PropTypes.string.isRequired,

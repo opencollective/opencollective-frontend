@@ -189,6 +189,7 @@ export const prepareExpenseForSubmit = expenseData => {
       'invoiceInfo',
       'tags',
       'currency',
+      'reference',
     ]),
     payee,
     payeeLocation,
@@ -834,20 +835,46 @@ const ExpenseFormBody = ({
                   </div>
                 )}
                 {values.type === expenseTypes.INVOICE && (
-                  <Box my={40}>
-                    <ExpenseAttachedFilesForm
-                      title={<FormattedMessage id="UploadInvoice" defaultMessage="Upload invoice" />}
-                      description={
+                  <React.Fragment>
+                    <div className="mt-2">
+                      <div className="text-lg font-bold text-gray-900">
+                        <FormattedMessage id="InvoiceReference" defaultMessage="Invoice reference" />
+                      </div>
+                      <p className="text-xs text-gray-500">
                         <FormattedMessage
-                          id="UploadInvoiceDescription"
-                          defaultMessage="If you already have an invoice document, you can upload it here."
+                          id="InvoiceReferenceDescription"
+                          defaultMessage="If you have an invoice reference number or any other identifier, you can add it here."
                         />
-                      }
-                      onChange={attachedFiles => formik.setFieldValue('attachedFiles', attachedFiles)}
-                      form={formik}
-                      defaultValue={values.attachedFiles}
-                    />
-                  </Box>
+                      </p>
+                      <Field
+                        as={StyledTextarea}
+                        autoFocus={autoFocusTitle}
+                        error={errors.reference}
+                        fontSize="14px"
+                        id="expense-reference"
+                        mt={3}
+                        name="reference"
+                        px="12px"
+                        py="8px"
+                        width="100%"
+                        autoSize
+                      />
+                    </div>
+                    <div className="mt-5">
+                      <ExpenseAttachedFilesForm
+                        title={<FormattedMessage id="UploadInvoice" defaultMessage="Upload invoice" />}
+                        description={
+                          <FormattedMessage
+                            id="UploadInvoiceDescription"
+                            defaultMessage="If you already have an invoice document, you can upload it here."
+                          />
+                        }
+                        onChange={attachedFiles => formik.setFieldValue('attachedFiles', attachedFiles)}
+                        form={formik}
+                        defaultValue={values.attachedFiles}
+                      />
+                    </div>
+                  </React.Fragment>
                 )}
 
                 <Flex alignItems="center" my={24}>
@@ -1028,6 +1055,7 @@ const ExpenseForm = ({
     initialValues.items = expense.draft.items?.map(newExpenseItem) || [];
     initialValues.taxes = expense.draft.taxes;
     initialValues.attachedFiles = expense.draft.attachedFiles;
+    initialValues.reference = expense.draft.reference;
     initialValues.payoutMethod = expense.draft.payoutMethod || expense.payoutMethod;
     initialValues.payeeLocation = expense.draft.payeeLocation;
     initialValues.payee = expense.recurringExpense ? expense.payee : expense.draft.payee;
