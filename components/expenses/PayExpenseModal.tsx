@@ -46,6 +46,7 @@ const quoteExpenseQuery = gql`
     expense(expense: { id: $id }) {
       id
       currency
+      reference
       amountInHostCurrency: amountV2(currencySource: HOST) {
         exchangeRate {
           value
@@ -385,6 +386,13 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
     context: API_V2_CONTEXT,
     skip: !canQuote,
   });
+
+  useEffect(() => {
+    const reference = quoteQuery.data?.expense?.reference;
+    if (reference && !formik.values.transfer?.details?.reference) {
+      formik.setFieldValue('transfer', { details: { reference } });
+    }
+  }, [quoteQuery.data]);
 
   const amounts = calculateAmounts({
     values: formik.values,
