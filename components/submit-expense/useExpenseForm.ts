@@ -62,6 +62,7 @@ export type ExpenseFormValues = {
   expenseTypeOption?: ExpenseTypeOption;
   payoutMethodId?: string;
   title?: string;
+  reference?: string;
   accountingCategoryId?: string;
   tags?: string[];
   expenseCurrency?: string;
@@ -547,6 +548,7 @@ function buildFormSchema(
         },
       ),
     title: z.string().min(1),
+    reference: z.string().optional(),
     expenseCurrency: z.string().refine(v => supportedCurrencies.includes(v), {
       message: `Currency must be one of: ${supportedCurrencies.join(',')}`,
     }),

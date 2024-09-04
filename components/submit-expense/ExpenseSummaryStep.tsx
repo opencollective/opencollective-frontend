@@ -41,7 +41,7 @@ export function ExpenseSummaryForm(props: ExpenseSummaryFormProps) {
       : null;
 
   const submitter = props.form.options.submitter;
-
+  const reference = props.form.values.reference;
   const invitePayee = props.form.values.invitePayee;
   const invitePayoutMethod = invitePayee && 'payoutMethod' in invitePayee ? invitePayee.payoutMethod : null;
 
@@ -62,6 +62,11 @@ export function ExpenseSummaryForm(props: ExpenseSummaryFormProps) {
           {expenseCategory && (
             <span className="rounded-xl bg-slate-100 px-3 py-1 text-xs text-slate-800">
               {expenseCategory.friendlyName || expenseCategory.name}
+            </span>
+          )}
+          {reference && (
+            <span className="rounded-xl bg-slate-100 px-3 py-1 text-xs text-slate-800">
+              <FormattedMessage id="ReferenceValue" defaultMessage="Ref: {reference}" values={{ reference }} />
             </span>
           )}
 
