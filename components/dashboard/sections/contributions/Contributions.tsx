@@ -172,6 +172,16 @@ const dashboardContributionsMetadataQuery = gql`
       ) @skip(if: $onlyExpectedFunds) {
         totalCount
       }
+      PAUSED_RESUMABLE: orders(
+        filter: INCOMING
+        status: [PAUSED]
+        includeIncognito: true
+        includeHostedAccounts: false
+        includeChildrenAccounts: true
+        pausedBy: [COLLECTIVE, HOST, PLATFORM]
+      ) @skip(if: $onlyExpectedFunds) {
+        totalCount
+      }
       DISPUTED: orders(
         filter: $filter
         status: [DISPUTED]
@@ -852,12 +862,15 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
         />
         <Filterbar {...queryFilter} />
 
-        {isIncoming && !onlyExpectedFunds && metadata?.account?.[ContributionsTab.PAUSED].totalCount > 0 && (
-          <PausedIncomingContributionsMessage
-            account={metadata.account}
-            count={metadata.account[ContributionsTab.PAUSED].totalCount}
-          />
-        )}
+        {isIncoming &&
+          !onlyExpectedFunds &&
+          metadata?.account?.PAUSED_RESUMABLE.totalCount > 0 &&
+          !metadata.account.parent && (
+            <PausedIncomingContributionsMessage
+              account={metadata.account}
+              count={metadata.account[ContributionsTab.PAUSED].totalCount}
+            />
+          )}
 
         {error ? (
           <MessageBoxGraphqlError error={error} />

@@ -38,7 +38,6 @@ module.exports = {
         'components/edit-collective/sections/PaymentReceipts.js',
         'components/edit-collective/sections/Webhooks.js',
         'components/tier-page/graphql/queries.js',
-        'components/tier-page/index.js',
         'lib/graphql/v1/fragments.js',
         'lib/graphql/v1/mutations.js',
         'lib/graphql/v1/queries.js',
