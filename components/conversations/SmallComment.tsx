@@ -25,7 +25,7 @@ export default function SmallComment(props: CommentProps) {
 
   return (
     <div
-      className="relative w-full border-slate-200 py-[16px] first:border-none first:pt-0 [&:last-child_.timeline-indicator]:bottom-[-16px] [&:last-child_.timeline-separator]:hidden"
+      className="relative w-full border-slate-200 py-4 first:border-none first:pt-0 [&:last-child_.timeline-indicator]:-bottom-4 [&:last-child_.timeline-separator]:hidden"
       data-cy="comment"
       id={anchorHash}
     >
@@ -75,8 +75,8 @@ export default function SmallComment(props: CommentProps) {
                 {({ isEditing, setValue, setUploading }) =>
                   !isEditing ? (
                     <HTMLContent
-                      fontSize="13px"
-                      maxCollapsedHeight={40}
+                      fontSize="14px"
+                      maxCollapsedHeight={140}
                       collapsable
                       collapsePadding={22}
                       content={comment.html}
@@ -88,7 +88,7 @@ export default function SmallComment(props: CommentProps) {
                       kind="COMMENT"
                       defaultValue={comment.html}
                       onChange={e => setValue(e.target.value)}
-                      fontSize="13px"
+                      fontSize="14px"
                       autoFocus
                       setUploading={setUploading}
                     />

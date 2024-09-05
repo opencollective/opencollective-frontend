@@ -33,9 +33,9 @@ export default function SmallThread(props: SmallThreadProps) {
   return (
     <React.Fragment>
       {props.canComment && (
-        <div className="flex gap-4 pb-[16px]">
+        <div className="flex gap-4 pb-4">
           <div className="relative">
-            <div className="absolute bottom-[-16px] left-[20px] top-[40px] border-l" />
+            <div className="absolute -bottom-4 left-5 top-10 border-l" />
             <Avatar collective={LoggedInUser.collective} radius={40} />
           </div>
           <div className="flex-grow">
