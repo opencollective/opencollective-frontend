@@ -1191,6 +1191,7 @@
   "E8zg4M": "Application \"{name}\" created",
   "E98WbS": "Opposite Account Email",
   "E9pJQz": "Expense #{id}",
+  "EC5IZi": "This payment provider doesn’t offer a way to calculate the fees in advance.",
   "ecapW0": "New draft created for <Expense>recurring expense</Expense> on <Account></Account>",
   "EcwMPA": "Contact assignee",
   "Edit": "編集",
