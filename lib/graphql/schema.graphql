@@ -4560,18 +4560,6 @@ type Mutation {
   editConnectedAccount(connectedAccount: ConnectedAccountInputType!): ConnectedAccountType
 
   """
-  Update a single tier
-  """
-  editTier(
-    """
-    The tier to update
-    """
-    tier: TierInputType!
-  ): Tier @deprecated(reason: "2024-07-16: Please use editTiers mutation from GraphQLV2")
-  editTiers(id: Int!, tiers: [TierInputType]): [Tier]
-    @deprecated(reason: "2024-07-16: Please use editTiers mutation from GraphQLV2")
-
-  """
   Updates all the core contributors (role = ADMIN or MEMBER) for this collective.
   """
   editCoreContributors(collectiveId: Int!, members: [MemberInputType!]!): CollectiveInterface
@@ -4774,7 +4762,6 @@ input CollectiveInputType {
   image: String
   backgroundImage: String
   tags: [String]
-  tiers: [TierInputType]
   settings: JSON
   data: JSON @deprecated(reason: "2020-10-08: data cannot be edited. This field will be ignored.")
 
@@ -4832,90 +4819,6 @@ input LocationInputType {
   Structured JSON address
   """
   structured: JSON
-}
-
-"""
-Input type for TierType
-"""
-input TierInputType {
-  id: Int
-  type: String
-  name: String
-  description: String
-
-  """
-  A long, html-formatted description.
-  """
-  longDescription: String
-
-  """
-  Whether this tier has a standalone page
-  """
-  useStandalonePage: Boolean
-
-  """
-  Link to a video (YouTube, Vimeo).
-  """
-  videoUrl: String
-
-  """
-  amount in the lowest unit of the currency of the host (ie. in cents)
-  """
-  amount: Int
-
-  """
-  Button text
-  """
-  button: String
-  currency: String
-  presets: [Int]
-  interval: String
-  maxQuantity: Int
-  minimumAmount: Int
-  amountType: String
-
-  """
-  amount that you are trying to raise with this tier
-  """
-  goal: Int
-  customFields: [CustomFieldsInputType]
-
-  """
-  Start of the campaign
-  """
-  startsAt: String
-
-  """
-  End of the campaign
-  """
-  endsAt: String
-
-  """
-  Invoice receipt template
-  """
-  invoiceTemplate: String
-}
-
-"""
-Input for custom fields for order
-"""
-input CustomFieldsInputType {
-  type: CustomFieldType
-  name: String
-  label: String
-  required: Boolean
-}
-
-"""
-Type of custom field
-"""
-enum CustomFieldType {
-  number
-  text
-  email
-  date
-  radio
-  url
 }
 
 """

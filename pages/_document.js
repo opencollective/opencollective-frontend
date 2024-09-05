@@ -150,6 +150,7 @@ export default class IntlDocument extends Document {
       <Html>
         <Head nonce={this.props.cspNonce}>
           <script nonce={this.props.cspNonce} defer src={languageManifest[this.props.locale]} />
+          <link rel="icon" href="/static/images/favicon.ico.png" />
         </Head>
         <body>
           <Main nonce={this.props.cspNonce} />

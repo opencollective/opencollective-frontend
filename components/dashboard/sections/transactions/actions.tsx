@@ -80,7 +80,8 @@ export function useTransactionActions<T extends TransactionsTableQueryNode>({
     const handleDownloadInvoice = async () => {
       const params = transaction.expense?.id
         ? { expenseId: transaction.expense.id }
-        : { transactionUuid: transaction.uuid, toCollectiveSlug: transaction.toAccount?.slug };
+        : { transactionUuid: transaction.id };
+
       const download = downloadInvoiceWith(params);
       return download();
     };
