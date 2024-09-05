@@ -1,7 +1,6 @@
 import React, { useLayoutEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Markup } from 'interweave';
-import { merge, pick } from 'lodash';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { getLuminance } from 'polished';
 import { FormattedMessage } from 'react-intl';

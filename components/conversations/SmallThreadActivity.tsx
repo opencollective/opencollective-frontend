@@ -39,7 +39,7 @@ export default function SmallThreadActivity(props: SmallThreadActivityProps) {
       <div className="flex justify-between">
         <div className="flex gap-4">
           <div className="relative">
-            <div className="timeline-indicator absolute -bottom-4 left-5 -top-4 -z-10 border-l" />
+            <div className="timeline-indicator absolute -bottom-4 -top-4 left-5 -z-10 border-l" />
             {props.activity.individual ? (
               <AccountHoverCard
                 account={props.activity.individual}
