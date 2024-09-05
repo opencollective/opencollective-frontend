@@ -3,6 +3,7 @@ import { useQuery } from '@apollo/client';
 import { Check } from '@styled-icons/boxicons-regular/Check';
 import { FormikProvider, useFormik, useFormikContext } from 'formik';
 import { cloneDeep, kebabCase, omit, round } from 'lodash';
+import { CircleHelp } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import type { BorderProps, SpaceProps } from 'styled-system';
@@ -34,6 +35,7 @@ import StyledModal, { ModalBody, ModalHeader } from '../StyledModal';
 import StyledSelect from '../StyledSelect';
 import StyledTooltip from '../StyledTooltip';
 import { H4, P, Span } from '../Text';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
 import { FieldGroup } from './PayoutBankInformationForm';
 import PayoutMethodData from './PayoutMethodData';
@@ -674,7 +676,18 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                   {amounts.paymentProcessorFee !== null ? (
                     <FormattedMessage id="TotalAmount" defaultMessage="Total amount" />
                   ) : (
-                    <FormattedMessage id="TotalAmountWithoutFee" defaultMessage="Total amount (without fees)" />
+                    <Tooltip>
+                      <TooltipTrigger className="flex items-center gap-1">
+                        <FormattedMessage id="TotalAmountWithoutFee" defaultMessage="Total amount (without fees)" />
+                        <CircleHelp size={16} className="text-muted-foreground" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <FormattedMessage
+                          defaultMessage="This payment provider doesn’t offer a way to calculate the fees in advance."
+                          id="EC5IZi"
+                        />
+                      </TooltipContent>
+                    </Tooltip>
                   )}
                 </Label>
                 <Amount>

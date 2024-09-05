@@ -1191,6 +1191,7 @@
   "E8zg4M": "Application \"{name}\" créée",
   "E98WbS": "E-mail du compte de contrepartie",
   "E9pJQz": "Dépense #{id}",
+  "EC5IZi": "This payment provider doesn’t offer a way to calculate the fees in advance.",
   "ecapW0": "Nouveau brouillon créé pour une <Expense>dépense récurrente</Expense> sur <Account></Account>",
   "EcwMPA": "Contacter le responsable",
   "Edit": "Éditer",
