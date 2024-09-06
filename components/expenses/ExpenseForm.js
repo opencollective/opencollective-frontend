@@ -46,6 +46,7 @@ import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import { StyledCurrencyPicker } from '../StyledCurrencyPicker';
 import StyledHr from '../StyledHr';
+import StyledInput from '../StyledInput';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledTextarea from '../StyledTextarea';
 import { Label, P, Span } from '../Text';
@@ -847,7 +848,7 @@ const ExpenseFormBody = ({
                         />
                       </p>
                       <Field
-                        as={StyledTextarea}
+                        as={StyledInput}
                         autoFocus={autoFocusTitle}
                         error={errors.reference}
                         fontSize="14px"
@@ -857,7 +858,6 @@ const ExpenseFormBody = ({
                         px="12px"
                         py="8px"
                         width="100%"
-                        autoSize
                       />
                     </div>
                     <div className="mt-5">
