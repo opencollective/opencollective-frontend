@@ -18,7 +18,7 @@ const I18nMessages = defineMessages({
   },
   referencePlaceholder: {
     id: 'InvoiceReferenceDescription',
-    defaultMessage: 'If you have an invoice reference number or any other identifier, you can add it here.',
+    defaultMessage: 'If the invoice being submitted has a reference number, add it here',
   },
   grantSubjectPlaceholder: {
     id: `ExpenseForm.GrantSubjectPlaceholder`,
