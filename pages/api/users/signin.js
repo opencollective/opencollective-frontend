@@ -12,6 +12,10 @@ export default async function handle(req, res) {
   const json = await result.json();
   const statusCode = result.status;
 
+  result.headers
+    .getSetCookie()
+    .filter(cookie => cookie.includes('accessTokenPayload') || cookie.includes('accessTokenSignature'))
+    .forEach(cookie => res.appendHeader('Set-Cookie', cookie));
   res.setHeader('Content-Type', 'application/json');
   res.status(statusCode).json(json);
 }
