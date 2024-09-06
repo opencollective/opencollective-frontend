@@ -12,6 +12,7 @@ import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { AmountPropTypeShape } from '../../lib/prop-types';
+import { truncateMiddle } from '../../lib/utils';
 import { shouldDisplayExpenseCategoryPill } from './lib/accounting-categories';
 import { expenseTypeSupportsAttachments } from './lib/attachments';
 import { expenseItemsMustHaveFiles, getExpenseItemAmountV2FromNewAttrs } from './lib/items';
@@ -315,7 +316,7 @@ const ExpenseSummary = ({
                 <FormattedMessage
                   id="ReferenceValue"
                   defaultMessage="Ref: {reference}"
-                  values={{ reference: expense.reference }}
+                  values={{ reference: truncateMiddle(expense.reference, 10) }}
                 />
               </React.Fragment>
             )}

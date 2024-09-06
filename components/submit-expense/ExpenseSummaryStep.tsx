@@ -2,6 +2,7 @@ import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { getPayoutProfiles } from '../../lib/expenses';
+import { truncateMiddle } from '../../lib/utils';
 import { getExpenseExchangeRateWarningOrError } from '../expenses/lib/utils';
 
 import { AccountHoverCard } from '../AccountHoverCard';
@@ -66,7 +67,11 @@ export function ExpenseSummaryForm(props: ExpenseSummaryFormProps) {
           )}
           {reference && (
             <span className="rounded-xl bg-slate-100 px-3 py-1 text-xs text-slate-800">
-              <FormattedMessage id="ReferenceValue" defaultMessage="Ref: {reference}" values={{ reference }} />
+              <FormattedMessage
+                id="ReferenceValue"
+                defaultMessage="Ref: {reference}"
+                values={{ reference: truncateMiddle(reference, 10) }}
+              />
             </span>
           )}
 

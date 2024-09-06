@@ -14,6 +14,7 @@ import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 import { toPx } from '../../lib/theme/helpers';
 import { getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
+import { truncateMiddle } from '../../lib/utils';
 import { shouldDisplayExpenseCategoryPill } from '../expenses/lib/accounting-categories';
 
 import { AccountHoverCard } from '../AccountHoverCard';
@@ -417,7 +418,7 @@ const ExpenseBudgetItem = ({
                   {isLoading ? (
                     <LoadingPlaceholder height={15} width={90} />
                   ) : (
-                    <div className="mt-[4px] text-[11px]">{expense.reference}</div>
+                    <div className="mt-[4px] text-[11px]">{truncateMiddle(expense.reference, 10)}</div>
                   )}
                 </Box>
               )}
