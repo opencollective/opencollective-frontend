@@ -1,8 +1,6 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import { isHostAccount, isIndividualAccount } from '../lib/collective';
-
 import { fetchGraphQLV1, getTokenFromRequest } from './utils';
 
 export default async function dashboardMiddleware(req: NextRequest) {
@@ -76,9 +74,9 @@ export default async function dashboardMiddleware(req: NextRequest) {
 
   const { role, collective } = getDashboardRole(LoggedInUser, lastWorkspaceVisit?.slug);
   let section;
-  if (isIndividualAccount(collective)) {
+  if (['USER', 'INDIVIDUAL'].includes(collective.type)) {
     section = 'overview';
-  } else if (isHostAccount(collective)) {
+  } else if (collective.isHost === true && collective.type !== 'COLLECTIVE') {
     section = 'host-expenses';
   } else if (role === 'ACCOUNTANT') {
     section = 'payment-receipts';
