@@ -15,8 +15,6 @@ import { adminPanelQuery } from '../../components/dashboard/queries';
 import type { DashboardSectionProps } from '../../components/dashboard/types';
 import MessageBoxGraphqlError from '../../components/MessageBoxGraphqlError';
 
-// TODO: what we ideally want from the dashboard index page is a HTTP redirect
-// based on the authentication state and user preference
 export default function DashboardIndexPage({ lastWorkspaceVisit }) {
   const Component: React.FC<DashboardSectionProps> = () => (
     <DashboardComponent lastWorkspaceVisit={lastWorkspaceVisit} />

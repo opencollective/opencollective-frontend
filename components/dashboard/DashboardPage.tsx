@@ -261,9 +261,3 @@ export default function DashboardPage(props: {
     </DashboardContext.Provider>
   );
 }
-
-DashboardPage.getInitialProps = () => {
-  return {
-    scripts: { googleMaps: true }, // TODO: This should be enabled only for events
-  };
-};

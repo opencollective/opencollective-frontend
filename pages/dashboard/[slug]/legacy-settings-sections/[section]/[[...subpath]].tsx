@@ -27,6 +27,12 @@ export default function LegacySettingsSectionPage(props) {
   return <DashboardPage {...props} Component={SectionComponent} slug={router.query.slug} section={section} />;
 }
 
+LegacySettingsSectionPage.getInitialProps = () => {
+  return {
+    scripts: { googleMaps: true }, // TODO: This should be enabled only for events
+  };
+};
+
 function SectionComponent() {
   const router = useRouter();
   const section = router.query.section as string;

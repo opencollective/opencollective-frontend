@@ -531,7 +531,7 @@ const UpdateFormView = ({ updateId }) => {
             <FormattedMessage defaultMessage="New Update" id="+S3jp9" />
           )}
         </h1>
-        {!loading && <FormBody update={data?.update} />}
+        {!loading && account && <FormBody update={data?.update} />}
       </div>
     </div>
   );
