@@ -91,7 +91,7 @@ export function DataTable<TData, TValue>({
   );
 
   const table = useReactTable<TData>({
-    data,
+    data: data || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
