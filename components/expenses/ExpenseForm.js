@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Undo } from '@styled-icons/fa-solid/Undo';
 import { Field, FieldArray, Form, Formik } from 'formik';
-import { first, isEmpty, omit, pick } from 'lodash';
+import { first, isEmpty, omit, pick, trimStart } from 'lodash';
 import { useRouter } from 'next/router';
 import { createPortal } from 'react-dom';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -181,17 +181,7 @@ export const prepareExpenseForSubmit = expenseData => {
   }
 
   return {
-    ...pick(expenseData, [
-      'id',
-      'description',
-      'longDescription',
-      'type',
-      'privateMessage',
-      'invoiceInfo',
-      'tags',
-      'currency',
-      'reference',
-    ]),
+    ...pick(expenseData, ['id', 'type', 'tags', 'currency']),
     payee,
     payeeLocation,
     payoutMethod,
@@ -199,6 +189,11 @@ export const prepareExpenseForSubmit = expenseData => {
     tax: expenseData.taxes?.filter(tax => !tax.isDisabled).map(tax => pick(tax, ['type', 'rate', 'idNumber'])),
     items: expenseData.items.map(item => prepareExpenseItemForSubmit(expenseData, item)),
     accountingCategory: !expenseData.accountingCategory ? null : pick(expenseData.accountingCategory, ['id']),
+    description: expenseData.description?.trim(),
+    longDescription: expenseData.longDescription?.trim(),
+    privateMessage: expenseData.privateMessage?.trim(),
+    invoiceInfo: expenseData.invoiceInfo?.trim(),
+    reference: expenseData.reference?.trim(),
   };
 };
 
@@ -868,6 +863,11 @@ const ExpenseFormBody = ({
                         px="12px"
                         py="8px"
                         width="100%"
+                        maxLength={255}
+                        onChange={e => {
+                          e.target.value = trimStart(e.target.value).replace(/\s+/g, ' ');
+                          handleChange(e);
+                        }}
                       />
                     </div>
                     <div className="mt-5">
