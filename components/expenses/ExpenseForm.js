@@ -838,8 +838,18 @@ const ExpenseFormBody = ({
                 {values.type === expenseTypes.INVOICE && (
                   <React.Fragment>
                     <div className="mt-2">
-                      <div className="text-lg font-bold text-gray-900">
-                        <FormattedMessage id="InvoiceReference" defaultMessage="Invoice reference" />
+                      <div className="text-lg font-normal text-muted-foreground">
+                        <FormattedMessage
+                          defaultMessage="{field} (optional)"
+                          id="OptionalFieldLabel"
+                          values={{
+                            field: (
+                              <span className="font-bold text-foreground">
+                                <FormattedMessage id="InvoiceReference" defaultMessage="Invoice reference" />
+                              </span>
+                            ),
+                          }}
+                        />
                       </div>
                       <p className="text-xs text-gray-500">
                         <FormattedMessage
