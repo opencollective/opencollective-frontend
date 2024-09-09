@@ -14,7 +14,6 @@ import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 import { toPx } from '../../lib/theme/helpers';
 import { getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
-import { truncateMiddle } from '../../lib/utils';
 import { shouldDisplayExpenseCategoryPill } from '../expenses/lib/accounting-categories';
 
 import { AccountHoverCard } from '../AccountHoverCard';
@@ -44,6 +43,7 @@ import StyledLink from '../StyledLink';
 import Tags from '../Tags';
 import { H3 } from '../Text';
 import TransactionSign from '../TransactionSign';
+import TruncatedTextWithTooltip from '../TruncatedTextWithTooltip';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
 const DetailColumnHeader = styled.div`
@@ -418,7 +418,9 @@ const ExpenseBudgetItem = ({
                   {isLoading ? (
                     <LoadingPlaceholder height={15} width={90} />
                   ) : (
-                    <div className="mt-[4px] text-[11px]">{truncateMiddle(expense.reference, 10)}</div>
+                    <div className="mt-[4px] text-[11px]">
+                      <TruncatedTextWithTooltip value={expense.reference} length={10} truncatePosition="middle" />
+                    </div>
                   )}
                 </Box>
               )}

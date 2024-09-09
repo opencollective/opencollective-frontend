@@ -12,7 +12,6 @@ import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { AmountPropTypeShape } from '../../lib/prop-types';
-import { truncateMiddle } from '../../lib/utils';
 import { shouldDisplayExpenseCategoryPill } from './lib/accounting-categories';
 import { expenseTypeSupportsAttachments } from './lib/attachments';
 import { expenseItemsMustHaveFiles, getExpenseItemAmountV2FromNewAttrs } from './lib/items';
@@ -31,6 +30,7 @@ import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
 import Tags from '../Tags';
 import { H1, P, Span } from '../Text';
+import TruncatedTextWithTooltip from '../TruncatedTextWithTooltip';
 import { Separator } from '../ui/Separator';
 import UploadedFilePreview from '../UploadedFilePreview';
 
@@ -316,7 +316,11 @@ const ExpenseSummary = ({
                 <FormattedMessage
                   id="ReferenceValue"
                   defaultMessage="Ref: {reference}"
-                  values={{ reference: truncateMiddle(expense.reference, 10) }}
+                  values={{
+                    reference: (
+                      <TruncatedTextWithTooltip value={expense.reference} length={10} truncatePosition="middle" />
+                    ),
+                  }}
                 />
               </React.Fragment>
             )}
