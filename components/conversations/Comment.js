@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import HTMLContent from '../HTMLContent';
@@ -13,19 +11,8 @@ import CommentActions from './CommentActions';
 import { CommentMetadata } from './CommentMetadata';
 import EmojiReactionPicker from './EmojiReactionPicker';
 import CommentReactions from './EmojiReactions';
-import { commentFieldsFragment } from './graphql';
-
-const editCommentMutation = gql`
-  mutation EditComment($comment: CommentUpdateInput!) {
-    editComment(comment: $comment) {
-      id
-      ...CommentFields
-    }
-  }
-  ${commentFieldsFragment}
-`;
-
-const mutationOptions = { context: API_V2_CONTEXT };
+import { editCommentMutation, mutationOptions } from './graphql';
+import SmallComment from './SmallComment';
 
 /**
  * Render a comment.
@@ -62,7 +49,7 @@ const Comment = ({
             onDelete={onDelete}
             onEditClick={() => setEditing(true)}
             onReplyClick={() => {
-              onReplyClick(comment);
+              onReplyClick?.(comment);
             }}
           />
         )}
@@ -138,4 +125,15 @@ Comment.propTypes = {
   onReplyClick: PropTypes.func,
 };
 
-export default Comment;
+/**
+ *
+ * @param {import('./types').CommentPropsWithVariant} props
+ */
+export default function CommentComponent(props) {
+  // eslint-disable-next-line react/prop-types
+  if (props.variant === 'small') {
+    return <SmallComment {...props} />;
+  }
+
+  return <Comment {...props} />;
+}

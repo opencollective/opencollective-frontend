@@ -4,7 +4,7 @@ import { useMutation } from '@apollo/client';
 import { Undo } from '@styled-icons/fa-solid/Undo';
 import { themeGet } from '@styled-system/theme-get';
 import dayjs from 'dayjs';
-import { cloneDeep, debounce, get, includes, sortBy, uniqBy, update } from 'lodash';
+import { cloneDeep, debounce, get, includes, orderBy, uniqBy, update } from 'lodash';
 import { FilePenLine } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { createPortal } from 'react-dom';
@@ -17,7 +17,7 @@ import expenseTypes from '../../lib/constants/expenseTypes';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { getFilesFromExpense, getPayoutProfiles } from '../../lib/expenses';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
+import { ExpenseStatus, OrderByFieldType, OrderDirection } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 import { itemHasOCR } from './lib/ocr';
@@ -236,16 +236,17 @@ function Expense(props) {
   const payoutProfiles = getPayoutProfiles(loggedInAccount);
   const canEditPayoutMethod = !expense || isDraft || expense.permissions.canSeePayoutMethodPrivateDetails;
 
+  const inDrawer = Boolean(drawerActionsContainer);
+
   const threadItems = React.useMemo(() => {
     const comments = expense?.comments?.nodes || [];
     const activities = expense?.activities || [];
-    return sortBy([...comments, ...activities], 'createdAt');
-  }, [expense]);
+    return orderBy([...comments, ...activities], 'createdAt', inDrawer ? 'desc' : 'asc');
+  }, [expense, inDrawer]);
 
   const isEditing = status === PAGE_STATUS.EDIT || status === PAGE_STATUS.EDIT_SUMMARY;
   const showTaxFormMsg = includes(expense?.requiredLegalDocuments, 'US_TAX_FORM') && !isEditing;
   const isEditingExistingExpense = isEditing && expense !== undefined;
-  const inDrawer = Boolean(drawerActionsContainer);
 
   const handlePolling = debounce(() => {
     if (state.isPollingEnabled) {
@@ -272,7 +273,10 @@ function Expense(props) {
   const clonePageQueryCacheData = () => {
     const { client } = props;
     const query = expensePageQuery;
-    const variables = getVariableFromProps(props);
+    const variables = {
+      ...getVariableFromProps(props),
+      ...(inDrawer ? { orderBy: { field: OrderByFieldType.CREATED_AT, direction: OrderDirection.DESC } } : {}),
+    };
     const data = cloneDeep(client.readQuery({ query, variables }));
     return [data, query, variables];
   };
@@ -703,39 +707,60 @@ function Expense(props) {
             />
           </Box>
 
-          <Box mb={3} pt={3}>
-            {loading ? (
-              <LoadingPlaceholder width="100%" height="44px" />
-            ) : expense ? (
-              <Thread
-                collective={collective}
-                hasMore={expense.comments?.totalCount > threadItems.length}
-                items={threadItems}
-                fetchMore={fetchMoreComments}
-                onCommentDeleted={onCommentDeleted}
-                loading={loading}
-                getClickedComment={setReplyingToComment}
-              />
-            ) : null}
-          </Box>
+          {!inDrawer ? (
+            <React.Fragment>
+              <Box mb={3} pt={3}>
+                {loading ? (
+                  <LoadingPlaceholder width="100%" height="44px" />
+                ) : expense ? (
+                  <Thread
+                    collective={collective}
+                    hasMore={expense.comments?.totalCount > threadItems.length}
+                    items={threadItems}
+                    fetchMore={fetchMoreComments}
+                    onCommentDeleted={onCommentDeleted}
+                    loading={loading}
+                    getClickedComment={setReplyingToComment}
+                  />
+                ) : null}
+              </Box>
 
-          {expense?.permissions.canComment && (
-            <Flex mt="40px">
-              <Box display={['none', null, 'block']} flex="0 0" p={3}>
-                <CommentIcon size={24} color="lightgrey" />
-              </Box>
-              <Box flex="1 1" maxWidth={[null, null, 'calc(100% - 56px)']}>
-                <CommentForm
-                  replyingToComment={replyingToComment}
-                  id="new-comment-on-expense"
-                  ExpenseId={expense && expense.id}
-                  disabled={!expense}
-                  onSuccess={onCommentAdded}
-                  canUsePrivateNote={expense.permissions.canUsePrivateNote}
-                  defaultType={expense.onHold ? CommentType.PRIVATE_NOTE : CommentType.COMMENT}
-                />
-              </Box>
-            </Flex>
+              {expense?.permissions.canComment && (
+                <Flex mt="40px">
+                  <Box display={['none', null, 'block']} flex="0 0" p={3}>
+                    <CommentIcon size={24} color="lightgrey" />
+                  </Box>
+                  <Box flex="1 1" maxWidth={[null, null, 'calc(100% - 56px)']}>
+                    <CommentForm
+                      replyingToComment={replyingToComment}
+                      id="new-comment-on-expense"
+                      ExpenseId={expense && expense.id}
+                      disabled={!expense}
+                      onSuccess={onCommentAdded}
+                      canUsePrivateNote={expense.permissions.canUsePrivateNote}
+                      defaultType={expense.onHold ? CommentType.PRIVATE_NOTE : CommentType.COMMENT}
+                    />
+                  </Box>
+                </Flex>
+              )}
+            </React.Fragment>
+          ) : (
+            <Thread
+              variant="small"
+              items={threadItems}
+              collective={host}
+              hasMore={expense?.comments?.totalCount > threadItems.length}
+              fetchMore={fetchMoreComments}
+              onCommentDeleted={onCommentDeleted}
+              loading={loading}
+              CommentEntity={{
+                ExpenseId: expense && expense.id,
+              }}
+              onCommentCreated={onCommentAdded}
+              canComment={expense?.permissions.canComment}
+              canUsePrivateNote={expense?.permissions?.canUsePrivateNote}
+              defaultType={expense?.onHold ? CommentType.PRIVATE_NOTE : CommentType.COMMENT}
+            />
           )}
         </Fragment>
       )}
