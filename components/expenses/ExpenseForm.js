@@ -51,6 +51,7 @@ import StyledInputFormikField from '../StyledInputFormikField';
 import StyledTextarea from '../StyledTextarea';
 import { Label, P, Span } from '../Text';
 
+import DeclineExpenseInviteButton from './DeclineExpenseInviteButton';
 import ExpenseAttachedFilesForm from './ExpenseAttachedFilesForm';
 import ExpenseFormItems from './ExpenseFormItems';
 import ExpenseFormPayeeInviteNewStep, { validateExpenseFormPayeeInviteNewStep } from './ExpenseFormPayeeInviteNewStep';
@@ -194,6 +195,7 @@ export const prepareExpenseForSubmit = expenseData => {
     privateMessage: expenseData.privateMessage?.trim(),
     invoiceInfo: expenseData.invoiceInfo?.trim(),
     reference: expenseData.reference?.trim(),
+    recipientNote: expenseData.recipientNote?.trim(),
   };
 };
 
@@ -631,6 +633,24 @@ const ExpenseFormBody = ({
 
   return (
     <Form ref={formRef}>
+      {(expense?.permissions?.canDeclineExpenseInvite ||
+        (expense?.status === ExpenseStatus.DRAFT && expense?.draft?.recipientNote)) && (
+        <div>
+          <div className="my-4">
+            {expense?.draft?.recipientNote && (
+              <MessageBox type="info">
+                <div className="mb-4 text-lg font-semibold">
+                  <FormattedMessage defaultMessage="Note for recipient:" id="J9cLGt" />
+                </div>
+                <div>{expense.draft.recipientNote}</div>
+              </MessageBox>
+            )}
+            <div className="mt-4 flex justify-end">
+              <DeclineExpenseInviteButton expense={expense} draftKey={router.query?.key} />
+            </div>
+          </div>
+        </div>
+      )}
       {!isCreditCardCharge && (
         <ExpenseTypeRadioSelect
           name="type"
@@ -1025,6 +1045,9 @@ ExpenseFormBody.propTypes = {
         url: PropTypes.string,
       }),
     ),
+    permissions: PropTypes.shape({
+      canDeclineExpenseInvite: PropTypes.bool,
+    }),
   }),
   drawerActionsContainer: PropTypes.object,
   supportedExpenseTypes: PropTypes.arrayOf(PropTypes.string),
@@ -1149,6 +1172,9 @@ ExpenseForm.propTypes = {
         url: PropTypes.string,
       }),
     ),
+    permissions: PropTypes.shape({
+      canDeclineExpenseInvite: PropTypes.bool,
+    }),
   }),
   /** To reset form */
   originalExpense: PropTypes.shape({
