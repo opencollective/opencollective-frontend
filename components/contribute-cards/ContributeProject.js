@@ -20,7 +20,7 @@ const ContributeProject = ({ collective, project, ...props }) => {
       route={`${getCollectivePageRoute(collective)}/projects/${project.slug}`}
       type={project.isArchived ? ContributionTypes.ARCHIVED_PROJECT : ContributionTypes.PROJECT}
       contributors={project.contributors}
-      stats={project.stats.backers}
+      stats={project.stats?.backers}
       image={project.backgroundImageUrl}
       title={
         <StyledLink as={Link} color="black.800" href={`/${collective.slug}/projects/${project.slug}`}>
