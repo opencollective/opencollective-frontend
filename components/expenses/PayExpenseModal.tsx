@@ -19,6 +19,7 @@ import type { Account, Expense, Host } from '../../lib/graphql/types/v2/graphql'
 import { i18nPaymentMethodService } from '../../lib/i18n/payment-method-service';
 import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
 import { i18nTaxType } from '../../lib/i18n/taxes';
+import { truncateMiddle } from '../../lib/utils';
 import { getAmountWithoutTaxes, getTaxAmount } from './lib/utils';
 
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
@@ -46,6 +47,7 @@ const quoteExpenseQuery = gql`
     expense(expense: { id: $id }) {
       id
       currency
+      reference
       amountInHostCurrency: amountV2(currencySource: HOST) {
         exchangeRate {
           value
@@ -117,7 +119,7 @@ type TransferDetailsFieldsProps = {
 };
 
 const TransferDetailFields = ({ expense, setDisabled }: TransferDetailsFieldsProps) => {
-  const formik = useFormikContext();
+  const formik = useFormikContext<any>();
   const { data, loading, error } = useQuery(validateTransferRequirementsQuery, {
     variables: { id: expense.id },
     context: API_V2_CONTEXT,
@@ -126,6 +128,28 @@ const TransferDetailFields = ({ expense, setDisabled }: TransferDetailsFieldsPro
   useEffect(() => {
     setDisabled(loading);
   }, [loading, setDisabled]);
+
+  useEffect(() => {
+    let reference;
+    data?.expense?.validateTransferRequirements?.find(requirement => {
+      return requirement.fields.find(field => {
+        const r = field?.group?.find(group => group.key === 'reference');
+        if (r) {
+          reference = r;
+        }
+        return r;
+      });
+    });
+    if (
+      formik.values.transfer?.details?.reference &&
+      reference?.maxLength < formik.values.transfer?.details?.reference?.length
+    ) {
+      formik.setFieldValue(
+        'transfer.details.reference',
+        truncateMiddle(formik.values.transfer?.details?.reference, reference.maxLength, ' '),
+      );
+    }
+  }, [data]);
 
   if (error) {
     return (
@@ -379,13 +403,19 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
   );
   const [disabled, setDisabled] = React.useState(false);
 
-  const canAddTransferDetails = host.settings?.transferwise?.transferDetails === true;
   const canQuote = host.transferwise && payoutMethodType === PayoutMethodType.BANK_ACCOUNT;
   const quoteQuery = useQuery(quoteExpenseQuery, {
     variables: { id: expense.id },
     context: API_V2_CONTEXT,
     skip: !canQuote,
   });
+
+  useEffect(() => {
+    const reference = quoteQuery.data?.expense?.reference;
+    if (reference && !formik.values.transfer?.details?.reference) {
+      formik.setFieldValue('transfer', { details: { reference } });
+    }
+  }, [quoteQuery.data]);
 
   const amounts = calculateAmounts({
     values: formik.values,
@@ -585,7 +615,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                 </StyledInputField>
               </React.Fragment>
             )}
-            {canQuote && canAddTransferDetails && !hasManualPayment && (
+            {canQuote && !hasManualPayment && (
               <div className="mt-3">
                 <TransferDetailFields expense={expense} setDisabled={setDisabled} />
               </div>

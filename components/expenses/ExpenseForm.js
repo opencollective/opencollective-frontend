@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Undo } from '@styled-icons/fa-solid/Undo';
 import { Field, FieldArray, Form, Formik } from 'formik';
-import { first, isEmpty, omit, pick } from 'lodash';
+import { first, isEmpty, omit, pick, trimStart } from 'lodash';
 import { useRouter } from 'next/router';
 import { createPortal } from 'react-dom';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -46,6 +46,7 @@ import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import { StyledCurrencyPicker } from '../StyledCurrencyPicker';
 import StyledHr from '../StyledHr';
+import StyledInput from '../StyledInput';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledTextarea from '../StyledTextarea';
 import { Label, P, Span } from '../Text';
@@ -180,16 +181,7 @@ export const prepareExpenseForSubmit = expenseData => {
   }
 
   return {
-    ...pick(expenseData, [
-      'id',
-      'description',
-      'longDescription',
-      'type',
-      'privateMessage',
-      'invoiceInfo',
-      'tags',
-      'currency',
-    ]),
+    ...pick(expenseData, ['id', 'type', 'tags', 'currency']),
     payee,
     payeeLocation,
     payoutMethod,
@@ -197,6 +189,11 @@ export const prepareExpenseForSubmit = expenseData => {
     tax: expenseData.taxes?.filter(tax => !tax.isDisabled).map(tax => pick(tax, ['type', 'rate', 'idNumber'])),
     items: expenseData.items.map(item => prepareExpenseItemForSubmit(expenseData, item)),
     accountingCategory: !expenseData.accountingCategory ? null : pick(expenseData.accountingCategory, ['id']),
+    description: expenseData.description?.trim(),
+    longDescription: expenseData.longDescription?.trim(),
+    privateMessage: expenseData.privateMessage?.trim(),
+    invoiceInfo: expenseData.invoiceInfo?.trim(),
+    reference: expenseData.reference?.trim(),
   };
 };
 
@@ -834,20 +831,60 @@ const ExpenseFormBody = ({
                   </div>
                 )}
                 {values.type === expenseTypes.INVOICE && (
-                  <Box my={40}>
-                    <ExpenseAttachedFilesForm
-                      title={<FormattedMessage id="UploadInvoice" defaultMessage="Upload invoice" />}
-                      description={
+                  <React.Fragment>
+                    <div className="mt-2">
+                      <div className="text-lg font-normal text-muted-foreground">
                         <FormattedMessage
-                          id="UploadInvoiceDescription"
-                          defaultMessage="If you already have an invoice document, you can upload it here."
+                          defaultMessage="{field} (optional)"
+                          id="OptionalFieldLabel"
+                          values={{
+                            field: (
+                              <span className="font-bold text-foreground">
+                                <FormattedMessage id="InvoiceReference" defaultMessage="Invoice reference" />
+                              </span>
+                            ),
+                          }}
                         />
-                      }
-                      onChange={attachedFiles => formik.setFieldValue('attachedFiles', attachedFiles)}
-                      form={formik}
-                      defaultValue={values.attachedFiles}
-                    />
-                  </Box>
+                      </div>
+                      <p className="text-xs text-gray-500">
+                        <FormattedMessage
+                          id="InvoiceReferenceDescription"
+                          defaultMessage="If the invoice being submitted has a reference number, add it here"
+                        />
+                      </p>
+                      <Field
+                        as={StyledInput}
+                        autoFocus={autoFocusTitle}
+                        error={errors.reference}
+                        fontSize="14px"
+                        id="expense-reference"
+                        mt={3}
+                        name="reference"
+                        px="12px"
+                        py="8px"
+                        width="100%"
+                        maxLength={255}
+                        onChange={e => {
+                          e.target.value = trimStart(e.target.value).replace(/\s+/g, ' ');
+                          handleChange(e);
+                        }}
+                      />
+                    </div>
+                    <div className="mt-5">
+                      <ExpenseAttachedFilesForm
+                        title={<FormattedMessage id="UploadInvoice" defaultMessage="Upload invoice" />}
+                        description={
+                          <FormattedMessage
+                            id="UploadInvoiceDescription"
+                            defaultMessage="If you already have an invoice document, you can upload it here."
+                          />
+                        }
+                        onChange={attachedFiles => formik.setFieldValue('attachedFiles', attachedFiles)}
+                        form={formik}
+                        defaultValue={values.attachedFiles}
+                      />
+                    </div>
+                  </React.Fragment>
                 )}
 
                 <Flex alignItems="center" my={24}>
@@ -1028,6 +1065,7 @@ const ExpenseForm = ({
     initialValues.items = expense.draft.items?.map(newExpenseItem) || [];
     initialValues.taxes = expense.draft.taxes;
     initialValues.attachedFiles = expense.draft.attachedFiles;
+    initialValues.reference = expense.draft.reference;
     initialValues.payoutMethod = expense.draft.payoutMethod || expense.payoutMethod;
     initialValues.payeeLocation = expense.draft.payeeLocation;
     initialValues.payee = expense.recurringExpense ? expense.payee : expense.draft.payee;

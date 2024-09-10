@@ -16,6 +16,7 @@ import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import LinkCollective from '../LinkCollective';
 import LocationAddress from '../LocationAddress';
 import { PayoutMethodLabel } from '../PayoutMethodLabel';
+import TruncatedTextWithTooltip from '../TruncatedTextWithTooltip';
 import UploadedFilePreview from '../UploadedFilePreview';
 
 import { InvitedPayeeLabel } from './InvitedPayeeLabel';
@@ -41,7 +42,7 @@ export function ExpenseSummaryForm(props: ExpenseSummaryFormProps) {
       : null;
 
   const submitter = props.form.options.submitter;
-
+  const reference = props.form.values.reference;
   const invitePayee = props.form.values.invitePayee;
   const invitePayoutMethod = invitePayee && 'payoutMethod' in invitePayee ? invitePayee.payoutMethod : null;
 
@@ -63,6 +64,17 @@ export function ExpenseSummaryForm(props: ExpenseSummaryFormProps) {
             <span className="rounded-xl bg-slate-100 px-3 py-1 text-xs text-slate-800">
               {expenseCategory.friendlyName || expenseCategory.name}
             </span>
+          )}
+          {reference && (
+            <div className="px-3 py-1 text-xs text-slate-800">
+              <FormattedMessage
+                id="ReferenceValue"
+                defaultMessage="Ref: {reference}"
+                values={{
+                  reference: <TruncatedTextWithTooltip value={reference} length={10} truncatePosition="middle" />,
+                }}
+              />
+            </div>
           )}
 
           {expenseCategory && props.form.values.tags?.length > 0 && <div className="h-6 border-l-2 border-slate-200" />}

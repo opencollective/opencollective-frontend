@@ -30,6 +30,7 @@ import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
 import Tags from '../Tags';
 import { H1, P, Span } from '../Text';
+import TruncatedTextWithTooltip from '../TruncatedTextWithTooltip';
 import { Separator } from '../ui/Separator';
 import UploadedFilePreview from '../UploadedFilePreview';
 
@@ -299,15 +300,7 @@ const ExpenseSummary = ({
         ) : (
           <P fontSize="14px" color="black.700" data-cy="expense-author">
             <FormattedDate value={expense.createdAt} dateStyle="medium" />
-            {expense?.comments && (
-              <React.Fragment>
-                <Spacer />
-                <MessageSquare size="16px" style={{ display: 'inline-block' }} />
-                &nbsp;
-                {expense.comments.totalCount}
-              </React.Fragment>
-            )}
-            {expense?.merchantId && (
+            {expense.merchantId && (
               <React.Fragment>
                 <Spacer />
                 <FormattedMessage
@@ -315,6 +308,28 @@ const ExpenseSummary = ({
                   defaultMessage="Merchant ID: {id}"
                   values={{ id: expense.merchantId }}
                 />
+              </React.Fragment>
+            )}
+            {expense.reference && (
+              <React.Fragment>
+                <Spacer />
+                <FormattedMessage
+                  id="ReferenceValue"
+                  defaultMessage="Ref: {reference}"
+                  values={{
+                    reference: (
+                      <TruncatedTextWithTooltip value={expense.reference} length={10} truncatePosition="middle" />
+                    ),
+                  }}
+                />
+              </React.Fragment>
+            )}
+            {expense.comments && (
+              <React.Fragment>
+                <Spacer />
+                <MessageSquare size="16px" style={{ display: 'inline-block' }} />
+                &nbsp;
+                {expense.comments.totalCount}
               </React.Fragment>
             )}
           </P>
@@ -535,6 +550,7 @@ ExpenseSummary.propTypes = {
     legacyId: PropTypes.number,
     accountingCategory: PropTypes.object,
     description: PropTypes.string.isRequired,
+    reference: PropTypes.string,
     longDescription: PropTypes.string,
     amount: PropTypes.number.isRequired,
     currency: PropTypes.string.isRequired,
