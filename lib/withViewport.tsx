@@ -76,11 +76,14 @@ const getStateBuilder = (withWidth, withHeight) => {
  *  - `withHeight` (default: false) - pass the height of the window
  *  - `defaultViewport` (default: UNKNOWN) - if detection fails, fallback on this screen size
  */
-const withViewport = (ChildComponent, options) => {
+function withViewport<T>(
+  ChildComponent: React.ComponentType<T>,
+  options?: { withWidth?: boolean; withHeight?: boolean; defaultViewport?: VIEWPORTS },
+): React.ComponentClass<T> {
   const { withWidth, withHeight, defaultViewport = VIEWPORTS.UNKNOWN } = options || {};
   const buildState = getStateBuilder(withWidth || false, withHeight || false);
 
-  return class Viewport extends React.Component {
+  return class Viewport extends React.Component<T> {
     // Default height usually doesn't matters much, so we use the width as default
     constructor(props) {
       super(props);
@@ -118,6 +121,6 @@ const withViewport = (ChildComponent, options) => {
       return <ChildComponent {...this.state} {...this.props} />;
     }
   };
-};
+}
 
 export default withViewport;
