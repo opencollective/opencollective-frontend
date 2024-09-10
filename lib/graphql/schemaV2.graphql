@@ -893,6 +893,31 @@ interface Account {
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
+
+  """
+  Host application requests
+  """
+  hostApplicationRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Filter applications by status
+    """
+    status: HostApplicationStatus
+  ): HostApplicationCollection!
   feed(
     """
     Only returns activities before this date
@@ -3267,6 +3292,31 @@ type Host implements Account & AccountWithContributions {
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
+
+  """
+  Host application requests
+  """
+  hostApplicationRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Filter applications by status
+    """
+    status: HostApplicationStatus
+  ): HostApplicationCollection!
   feed(
     """
     Only returns activities before this date
@@ -3491,6 +3541,11 @@ type Host implements Account & AccountWithContributions {
     Filter applications by status
     """
     status: HostApplicationStatus
+
+    """
+    Filter host applications by the last user-role who replied to them
+    """
+    lastCommentBy: [LastCommentBy]
   ): HostApplicationCollection!
 
   """
@@ -5763,6 +5818,66 @@ type Permission {
 }
 
 """
+A collection of "HostApplication"
+"""
+type HostApplicationCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [HostApplication]
+}
+
+type HostApplication {
+  id: String!
+
+  """
+  The account who applied to this host
+  """
+  account: Account!
+
+  """
+  The host the collective applied to
+  """
+  host: Host!
+
+  """
+  The date on which the item was created
+  """
+  createdAt: DateTime!
+
+  """
+  The date on which the item was updated
+  """
+  updatedAt: DateTime!
+  status: HostApplicationStatus
+  message: String
+  customData: JSON
+
+  """
+  Returns the list of comments for this host application, or `null` if user is not allowed to see them
+  """
+  comments(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: ASC }
+  ): CommentCollection
+}
+
+enum HostApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+"""
 An activity describing something that happened on the platform
 """
 type Activity {
@@ -5906,6 +6021,7 @@ enum ActivityType {
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
   HOST_APPLICATION_CONTACT
+  HOST_APPLICATION_COMMENT_CREATED
   CONTRIBUTION_REJECTED
   SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CANCELED
@@ -6385,50 +6501,6 @@ Stripe connected account properties
 type StripeConnectedAccount {
   username: String
   issuingBalance: Amount
-}
-
-"""
-A collection of "HostApplication"
-"""
-type HostApplicationCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [HostApplication]
-}
-
-type HostApplication {
-  id: String!
-
-  """
-  The account who applied to this host
-  """
-  account: Account!
-
-  """
-  The host the collective applied to
-  """
-  host: Host!
-
-  """
-  The date on which the item was created
-  """
-  createdAt: DateTime!
-
-  """
-  The date on which the item was updated
-  """
-  updatedAt: DateTime!
-  status: HostApplicationStatus
-  message: String
-  customData: JSON
-}
-
-enum HostApplicationStatus {
-  PENDING
-  APPROVED
-  REJECTED
-  EXPIRED
 }
 
 """
@@ -8102,6 +8174,31 @@ type Bot implements Account {
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
+
+  """
+  Host application requests
+  """
+  hostApplicationRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Filter applications by status
+    """
+    status: HostApplicationStatus
+  ): HostApplicationCollection!
   feed(
     """
     Only returns activities before this date
@@ -8883,6 +8980,31 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
+
+  """
+  Host application requests
+  """
+  hostApplicationRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Filter applications by status
+    """
+    status: HostApplicationStatus
+  ): HostApplicationCollection!
   feed(
     """
     Only returns activities before this date
@@ -10117,6 +10239,31 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
+
+  """
+  Host application requests
+  """
+  hostApplicationRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Filter applications by status
+    """
+    status: HostApplicationStatus
+  ): HostApplicationCollection!
   feed(
     """
     Only returns activities before this date
@@ -11131,6 +11278,31 @@ type Individual implements Account {
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
+
+  """
+  Host application requests
+  """
+  hostApplicationRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Filter applications by status
+    """
+    status: HostApplicationStatus
+  ): HostApplicationCollection!
   feed(
     """
     Only returns activities before this date
@@ -12118,6 +12290,31 @@ type Organization implements Account & AccountWithContributions {
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
+
+  """
+  Host application requests
+  """
+  hostApplicationRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Filter applications by status
+    """
+    status: HostApplicationStatus
+  ): HostApplicationCollection!
   feed(
     """
     Only returns activities before this date
@@ -12996,6 +13193,31 @@ type Vendor implements Account & AccountWithContributions {
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
+
+  """
+  Host application requests
+  """
+  hostApplicationRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Filter applications by status
+    """
+    status: HostApplicationStatus
+  ): HostApplicationCollection!
   feed(
     """
     Only returns activities before this date
@@ -14239,6 +14461,7 @@ type Query {
     status: [VirtualCardRequestStatus]
     collective: [AccountReferenceInput]
   ): VirtualCardRequestCollection!
+  hostApplication(hostApplication: HostApplicationReferenceInput): HostApplication
   loggedInAccount: Individual
   me: Individual
 }
@@ -14256,34 +14479,19 @@ Two-letters country code following ISO3166_1
 """
 enum CountryISO {
   """
-  Afghanistan
-  """
-  AF
-
-  """
-  Åland Islands
-  """
-  AX
-
-  """
-  Albania
-  """
-  AL
-
-  """
-  Algeria
-  """
-  DZ
-
-  """
   Andorra
   """
   AD
 
   """
-  Angola
+  The United Arab Emirates
   """
-  AO
+  AE
+
+  """
+  Afghanistan
+  """
+  AF
 
   """
   Antigua and Barbuda
@@ -14291,9 +14499,14 @@ enum CountryISO {
   AG
 
   """
-  Argentina
+  Anguilla
   """
-  AR
+  AI
+
+  """
+  Albania
+  """
+  AL
 
   """
   Armenia
@@ -14301,9 +14514,24 @@ enum CountryISO {
   AM
 
   """
-  Australia
+  Angola
   """
-  AU
+  AO
+
+  """
+  Antarctica
+  """
+  AQ
+
+  """
+  Argentina
+  """
+  AR
+
+  """
+  American Samoa
+  """
+  AS
 
   """
   Austria
@@ -14311,59 +14539,24 @@ enum CountryISO {
   AT
 
   """
+  Australia
+  """
+  AU
+
+  """
+  Aruba
+  """
+  AW
+
+  """
+  Åland Islands
+  """
+  AX
+
+  """
   Azerbaijan
   """
   AZ
-
-  """
-  The Bahamas
-  """
-  BS
-
-  """
-  Bahrain
-  """
-  BH
-
-  """
-  Bangladesh
-  """
-  BD
-
-  """
-  Barbados
-  """
-  BB
-
-  """
-  Belarus
-  """
-  BY
-
-  """
-  Belgium
-  """
-  BE
-
-  """
-  Belize
-  """
-  BZ
-
-  """
-  Benin
-  """
-  BJ
-
-  """
-  Bhutan
-  """
-  BT
-
-  """
-  Bolivia
-  """
-  BO
 
   """
   Bosnia and Herzegovina
@@ -14371,24 +14564,19 @@ enum CountryISO {
   BA
 
   """
-  Botswana
+  Barbados
   """
-  BW
+  BB
 
   """
-  Brazil
+  Bangladesh
   """
-  BR
+  BD
 
   """
-  Brunei
+  Belgium
   """
-  BN
-
-  """
-  Bulgaria
-  """
-  BG
+  BE
 
   """
   Burkina
@@ -14396,19 +14584,84 @@ enum CountryISO {
   BF
 
   """
+  Bulgaria
+  """
+  BG
+
+  """
+  Bahrain
+  """
+  BH
+
+  """
   Burundi
   """
   BI
 
   """
-  Cambodia
+  Benin
   """
-  KH
+  BJ
 
   """
-  Cameroon
+  Saint Barthélemy
   """
-  CM
+  BL
+
+  """
+  Bermuda
+  """
+  BM
+
+  """
+  Brunei
+  """
+  BN
+
+  """
+  Bolivia
+  """
+  BO
+
+  """
+  Bonaire, Sint Eustatius and Saba
+  """
+  BQ
+
+  """
+  Brazil
+  """
+  BR
+
+  """
+  The Bahamas
+  """
+  BS
+
+  """
+  Bhutan
+  """
+  BT
+
+  """
+  Bouvet Island
+  """
+  BV
+
+  """
+  Botswana
+  """
+  BW
+
+  """
+  Belarus
+  """
+  BY
+
+  """
+  Belize
+  """
+  BZ
 
   """
   Canada
@@ -14416,9 +14669,14 @@ enum CountryISO {
   CA
 
   """
-  Cape Verde
+  Cocos Islands
   """
-  CV
+  CC
+
+  """
+  The Democratic Republic of the Congo
+  """
+  CD
 
   """
   The Central African Republic
@@ -14426,14 +14684,34 @@ enum CountryISO {
   CF
 
   """
-  Chad
+  The Congo
   """
-  TD
+  CG
+
+  """
+  Switzerland
+  """
+  CH
+
+  """
+  Côte d'Ivoire
+  """
+  CI
+
+  """
+  Cook Islands
+  """
+  CK
 
   """
   Chile
   """
   CL
+
+  """
+  Cameroon
+  """
+  CM
 
   """
   China
@@ -14446,39 +14724,29 @@ enum CountryISO {
   CO
 
   """
-  The Comoros
-  """
-  KM
-
-  """
-  The Congo
-  """
-  CG
-
-  """
-  The Democratic Republic of the Congo
-  """
-  CD
-
-  """
   Costa Rica
   """
   CR
 
   """
-  Côte d'Ivoire
-  """
-  CI
-
-  """
-  Croatia
-  """
-  HR
-
-  """
   Cuba
   """
   CU
+
+  """
+  Cape Verde
+  """
+  CV
+
+  """
+  Curaçao
+  """
+  CW
+
+  """
+  Christmas Island
+  """
+  CX
 
   """
   Cyprus
@@ -14491,14 +14759,19 @@ enum CountryISO {
   CZ
 
   """
-  Denmark
+  Germany
   """
-  DK
+  DE
 
   """
   Djibouti
   """
   DJ
+
+  """
+  Denmark
+  """
+  DK
 
   """
   Dominica
@@ -14511,9 +14784,9 @@ enum CountryISO {
   DO
 
   """
-  Timor-Leste
+  Algeria
   """
-  TL
+  DZ
 
   """
   Ecuador
@@ -14521,19 +14794,19 @@ enum CountryISO {
   EC
 
   """
+  Estonia
+  """
+  EE
+
+  """
   Egypt
   """
   EG
 
   """
-  El Salvador
+  Western Sahara
   """
-  SV
-
-  """
-  Equatorial Guinea
-  """
-  GQ
+  EH
 
   """
   Eritrea
@@ -14541,9 +14814,9 @@ enum CountryISO {
   ER
 
   """
-  Estonia
+  Spain
   """
-  EE
+  ES
 
   """
   Ethiopia
@@ -14551,14 +14824,29 @@ enum CountryISO {
   ET
 
   """
+  Finland
+  """
+  FI
+
+  """
   Fiji
   """
   FJ
 
   """
-  Finland
+  Falkland Islands
   """
-  FI
+  FK
+
+  """
+  Micronesia
+  """
+  FM
+
+  """
+  Faroe Islands
+  """
+  FO
 
   """
   France
@@ -14571,29 +14859,9 @@ enum CountryISO {
   GA
 
   """
-  The Gambia
+  The United Kingdom
   """
-  GM
-
-  """
-  Georgia
-  """
-  GE
-
-  """
-  Germany
-  """
-  DE
-
-  """
-  Ghana
-  """
-  GH
-
-  """
-  Greece
-  """
-  GR
+  GB
 
   """
   Grenada
@@ -14601,9 +14869,14 @@ enum CountryISO {
   GD
 
   """
-  Guatemala
+  Georgia
   """
-  GT
+  GE
+
+  """
+  French Guiana
+  """
+  GF
 
   """
   Guernsey
@@ -14611,9 +14884,59 @@ enum CountryISO {
   GG
 
   """
+  Ghana
+  """
+  GH
+
+  """
+  Gibraltar
+  """
+  GI
+
+  """
+  Greenland
+  """
+  GL
+
+  """
+  The Gambia
+  """
+  GM
+
+  """
   Guinea
   """
   GN
+
+  """
+  Guadeloupe
+  """
+  GP
+
+  """
+  Equatorial Guinea
+  """
+  GQ
+
+  """
+  Greece
+  """
+  GR
+
+  """
+  South Georgia and The South Sandwich Islands
+  """
+  GS
+
+  """
+  Guatemala
+  """
+  GT
+
+  """
+  Guam
+  """
+  GU
 
   """
   Guinea-Bissau
@@ -14626,14 +14949,14 @@ enum CountryISO {
   GY
 
   """
-  Haiti
+  Hong Kong
   """
-  HT
+  HK
 
   """
-  The Holy See
+  Heard Island and McDonald Islands
   """
-  VA
+  HM
 
   """
   Honduras
@@ -14641,19 +14964,19 @@ enum CountryISO {
   HN
 
   """
+  Croatia
+  """
+  HR
+
+  """
+  Haiti
+  """
+  HT
+
+  """
   Hungary
   """
   HU
-
-  """
-  Iceland
-  """
-  IS
-
-  """
-  India
-  """
-  IN
 
   """
   Indonesia
@@ -14661,24 +14984,9 @@ enum CountryISO {
   ID
 
   """
-  Iran
-  """
-  IR
-
-  """
-  Iraq
-  """
-  IQ
-
-  """
   Ireland
   """
   IE
-
-  """
-  Isle of Man
-  """
-  IM
 
   """
   Israel
@@ -14686,19 +14994,39 @@ enum CountryISO {
   IL
 
   """
+  Isle of Man
+  """
+  IM
+
+  """
+  India
+  """
+  IN
+
+  """
+  The British Indian Ocean Territory
+  """
+  IO
+
+  """
+  Iraq
+  """
+  IQ
+
+  """
+  Iran
+  """
+  IR
+
+  """
+  Iceland
+  """
+  IS
+
+  """
   Italy
   """
   IT
-
-  """
-  Jamaica
-  """
-  JM
-
-  """
-  Japan
-  """
-  JP
 
   """
   Jersey
@@ -14706,14 +15034,19 @@ enum CountryISO {
   JE
 
   """
+  Jamaica
+  """
+  JM
+
+  """
   Jordan
   """
   JO
 
   """
-  Kazakhstan
+  Japan
   """
-  KZ
+  JP
 
   """
   Kenya
@@ -14721,9 +15054,29 @@ enum CountryISO {
   KE
 
   """
+  Kyrgyzstan
+  """
+  KG
+
+  """
+  Cambodia
+  """
+  KH
+
+  """
   Kiribati
   """
   KI
+
+  """
+  The Comoros
+  """
+  KM
+
+  """
+  Saint Kitts and Nevis
+  """
+  KN
 
   """
   The Democratic People's Republic of Korea
@@ -14741,9 +15094,14 @@ enum CountryISO {
   KW
 
   """
-  Kyrgyzstan
+  Cayman Islands
   """
-  KG
+  KY
+
+  """
+  Kazakhstan
+  """
+  KZ
 
   """
   Laos
@@ -14751,19 +15109,24 @@ enum CountryISO {
   LA
 
   """
-  Latvia
-  """
-  LV
-
-  """
   Lebanon
   """
   LB
 
   """
-  Lesotho
+  Saint Lucia
   """
-  LS
+  LC
+
+  """
+  Liechtenstein
+  """
+  LI
+
+  """
+  Sri Lanka
+  """
+  LK
 
   """
   Liberia
@@ -14771,14 +15134,9 @@ enum CountryISO {
   LR
 
   """
-  Libya
+  Lesotho
   """
-  LY
-
-  """
-  Liechtenstein
-  """
-  LI
+  LS
 
   """
   Lithuania
@@ -14791,79 +15149,14 @@ enum CountryISO {
   LU
 
   """
-  Madagascar
+  Latvia
   """
-  MG
+  LV
 
   """
-  Malawi
+  Libya
   """
-  MW
-
-  """
-  Malaysia
-  """
-  MY
-
-  """
-  Maldives
-  """
-  MV
-
-  """
-  Mali
-  """
-  ML
-
-  """
-  Malta
-  """
-  MT
-
-  """
-  The Marshall Islands
-  """
-  MH
-
-  """
-  Mauritania
-  """
-  MR
-
-  """
-  Mauritius
-  """
-  MU
-
-  """
-  Mexico
-  """
-  MX
-
-  """
-  Micronesia
-  """
-  FM
-
-  """
-  Moldova
-  """
-  MD
-
-  """
-  Monaco
-  """
-  MC
-
-  """
-  Mongolia
-  """
-  MN
-
-  """
-  Montenegro
-  """
-  ME
+  LY
 
   """
   Morocco
@@ -14871,9 +15164,44 @@ enum CountryISO {
   MA
 
   """
-  Mozambique
+  Monaco
   """
-  MZ
+  MC
+
+  """
+  Moldova
+  """
+  MD
+
+  """
+  Montenegro
+  """
+  ME
+
+  """
+  Saint Martin
+  """
+  MF
+
+  """
+  Madagascar
+  """
+  MG
+
+  """
+  The Marshall Islands
+  """
+  MH
+
+  """
+  Macedonia
+  """
+  MK
+
+  """
+  Mali
+  """
+  ML
 
   """
   Myanmar
@@ -14881,34 +15209,79 @@ enum CountryISO {
   MM
 
   """
+  Mongolia
+  """
+  MN
+
+  """
+  Macao
+  """
+  MO
+
+  """
+  Northern Mariana Islands
+  """
+  MP
+
+  """
+  Martinique
+  """
+  MQ
+
+  """
+  Mauritania
+  """
+  MR
+
+  """
+  Montserrat
+  """
+  MS
+
+  """
+  Malta
+  """
+  MT
+
+  """
+  Mauritius
+  """
+  MU
+
+  """
+  Maldives
+  """
+  MV
+
+  """
+  Malawi
+  """
+  MW
+
+  """
+  Mexico
+  """
+  MX
+
+  """
+  Malaysia
+  """
+  MY
+
+  """
+  Mozambique
+  """
+  MZ
+
+  """
   Namibia
   """
   NA
 
   """
-  Nauru
+  New Caledonia
   """
-  NR
-
-  """
-  Nepal
-  """
-  NP
-
-  """
-  The Netherlands
-  """
-  NL
-
-  """
-  New Zealand
-  """
-  NZ
-
-  """
-  Nicaragua
-  """
-  NI
+  NC
 
   """
   The Niger
@@ -14916,9 +15289,24 @@ enum CountryISO {
   NE
 
   """
+  Norfolk Island
+  """
+  NF
+
+  """
   Nigeria
   """
   NG
+
+  """
+  Nicaragua
+  """
+  NI
+
+  """
+  The Netherlands
+  """
+  NL
 
   """
   Norway
@@ -14926,19 +15314,29 @@ enum CountryISO {
   NO
 
   """
+  Nepal
+  """
+  NP
+
+  """
+  Nauru
+  """
+  NR
+
+  """
+  Niue
+  """
+  NU
+
+  """
+  New Zealand
+  """
+  NZ
+
+  """
   Oman
   """
   OM
-
-  """
-  Pakistan
-  """
-  PK
-
-  """
-  Palau
-  """
-  PW
 
   """
   Panama
@@ -14946,19 +15344,19 @@ enum CountryISO {
   PA
 
   """
-  Papua New Guinea
-  """
-  PG
-
-  """
-  Paraguay
-  """
-  PY
-
-  """
   Peru
   """
   PE
+
+  """
+  French Polynesia
+  """
+  PF
+
+  """
+  Papua New Guinea
+  """
+  PG
 
   """
   The Philippines
@@ -14966,9 +15364,34 @@ enum CountryISO {
   PH
 
   """
+  Pakistan
+  """
+  PK
+
+  """
   Poland
   """
   PL
+
+  """
+  Saint Pierre and Miquelon
+  """
+  PM
+
+  """
+  Pitcairn
+  """
+  PN
+
+  """
+  Puerto Rico
+  """
+  PR
+
+  """
+  The Occupied Palestinian Territory
+  """
+  PS
 
   """
   Portugal
@@ -14976,14 +15399,34 @@ enum CountryISO {
   PT
 
   """
+  Palau
+  """
+  PW
+
+  """
+  Paraguay
+  """
+  PY
+
+  """
   Qatar
   """
   QA
 
   """
+  Réunion
+  """
+  RE
+
+  """
   Romania
   """
   RO
+
+  """
+  Serbia
+  """
+  RS
 
   """
   Russia
@@ -14996,74 +15439,9 @@ enum CountryISO {
   RW
 
   """
-  Saint Kitts and Nevis
-  """
-  KN
-
-  """
-  Saint Lucia
-  """
-  LC
-
-  """
-  Saint Vincent and The Grenadines
-  """
-  VC
-
-  """
-  Samoa
-  """
-  WS
-
-  """
-  San Marino
-  """
-  SM
-
-  """
-  Sao Tome and Principe
-  """
-  ST
-
-  """
   Saudi Arabia
   """
   SA
-
-  """
-  Senegal
-  """
-  SN
-
-  """
-  Serbia
-  """
-  RS
-
-  """
-  Seychelles
-  """
-  SC
-
-  """
-  Sierra Leone
-  """
-  SL
-
-  """
-  Singapore
-  """
-  SG
-
-  """
-  Slovakia
-  """
-  SK
-
-  """
-  Slovenia
-  """
-  SI
 
   """
   Solomon Islands
@@ -15071,24 +15449,9 @@ enum CountryISO {
   SB
 
   """
-  Somalia
+  Seychelles
   """
-  SO
-
-  """
-  South Africa
-  """
-  ZA
-
-  """
-  Spain
-  """
-  ES
-
-  """
-  Sri Lanka
-  """
-  LK
+  SC
 
   """
   The Sudan
@@ -15096,24 +15459,79 @@ enum CountryISO {
   SD
 
   """
-  Suriname
-  """
-  SR
-
-  """
-  Swaziland
-  """
-  SZ
-
-  """
   Sweden
   """
   SE
 
   """
-  Switzerland
+  Singapore
   """
-  CH
+  SG
+
+  """
+  Saint Helena
+  """
+  SH
+
+  """
+  Slovenia
+  """
+  SI
+
+  """
+  Svalbard and Jan Mayen
+  """
+  SJ
+
+  """
+  Slovakia
+  """
+  SK
+
+  """
+  Sierra Leone
+  """
+  SL
+
+  """
+  San Marino
+  """
+  SM
+
+  """
+  Senegal
+  """
+  SN
+
+  """
+  Somalia
+  """
+  SO
+
+  """
+  Suriname
+  """
+  SR
+
+  """
+  South Sudan
+  """
+  SS
+
+  """
+  Sao Tome and Principe
+  """
+  ST
+
+  """
+  El Salvador
+  """
+  SV
+
+  """
+  Sint Maarten
+  """
+  SX
 
   """
   Syria
@@ -15121,24 +15539,24 @@ enum CountryISO {
   SY
 
   """
-  Tajikistan
+  Swaziland
   """
-  TJ
+  SZ
 
   """
-  Tanzania
+  Turks and Caicos Islands
   """
-  TZ
+  TC
 
   """
-  Thailand
+  Chad
   """
-  TH
+  TD
 
   """
-  Macedonia
+  The French Southern Territories
   """
-  MK
+  TF
 
   """
   Togo
@@ -15146,24 +15564,24 @@ enum CountryISO {
   TG
 
   """
-  Tonga
+  Thailand
   """
-  TO
+  TH
 
   """
-  Trinidad and Tobago
+  Tajikistan
   """
-  TT
+  TJ
 
   """
-  Tunisia
+  Tokelau
   """
-  TN
+  TK
 
   """
-  Turkey
+  Timor-Leste
   """
-  TR
+  TL
 
   """
   Turkmenistan
@@ -15171,14 +15589,39 @@ enum CountryISO {
   TM
 
   """
+  Tunisia
+  """
+  TN
+
+  """
+  Tonga
+  """
+  TO
+
+  """
+  Turkey
+  """
+  TR
+
+  """
+  Trinidad and Tobago
+  """
+  TT
+
+  """
   Tuvalu
   """
   TV
 
   """
-  Uganda
+  Taiwan
   """
-  UG
+  TW
+
+  """
+  Tanzania
+  """
+  TZ
 
   """
   Ukraine
@@ -15186,14 +15629,14 @@ enum CountryISO {
   UA
 
   """
-  The United Arab Emirates
+  Uganda
   """
-  AE
+  UG
 
   """
-  The United Kingdom
+  United States Minor Outlying Islands
   """
-  GB
+  UM
 
   """
   The United States
@@ -15211,259 +15654,19 @@ enum CountryISO {
   UZ
 
   """
-  Vanuatu
+  The Holy See
   """
-  VU
+  VA
+
+  """
+  Saint Vincent and The Grenadines
+  """
+  VC
 
   """
   Venezuela
   """
   VE
-
-  """
-  Viet Nam
-  """
-  VN
-
-  """
-  Yemen
-  """
-  YE
-
-  """
-  Zambia
-  """
-  ZM
-
-  """
-  Zimbabwe
-  """
-  ZW
-
-  """
-  American Samoa
-  """
-  AS
-
-  """
-  Anguilla
-  """
-  AI
-
-  """
-  Antarctica
-  """
-  AQ
-
-  """
-  Aruba
-  """
-  AW
-
-  """
-  Bermuda
-  """
-  BM
-
-  """
-  Bouvet Island
-  """
-  BV
-
-  """
-  The British Indian Ocean Territory
-  """
-  IO
-
-  """
-  Cayman Islands
-  """
-  KY
-
-  """
-  Christmas Island
-  """
-  CX
-
-  """
-  Cocos Islands
-  """
-  CC
-
-  """
-  Cook Islands
-  """
-  CK
-
-  """
-  Falkland Islands
-  """
-  FK
-
-  """
-  Faroe Islands
-  """
-  FO
-
-  """
-  French Guiana
-  """
-  GF
-
-  """
-  French Polynesia
-  """
-  PF
-
-  """
-  The French Southern Territories
-  """
-  TF
-
-  """
-  Gibraltar
-  """
-  GI
-
-  """
-  Greenland
-  """
-  GL
-
-  """
-  Guadeloupe
-  """
-  GP
-
-  """
-  Guam
-  """
-  GU
-
-  """
-  Heard Island and McDonald Islands
-  """
-  HM
-
-  """
-  Hong Kong
-  """
-  HK
-
-  """
-  Macao
-  """
-  MO
-
-  """
-  Martinique
-  """
-  MQ
-
-  """
-  Mayotte
-  """
-  YT
-
-  """
-  Montserrat
-  """
-  MS
-
-  """
-  Netherlands Antilles
-  """
-  AN
-
-  """
-  New Caledonia
-  """
-  NC
-
-  """
-  Niue
-  """
-  NU
-
-  """
-  Norfolk Island
-  """
-  NF
-
-  """
-  Northern Mariana Islands
-  """
-  MP
-
-  """
-  The Occupied Palestinian Territory
-  """
-  PS
-
-  """
-  Pitcairn
-  """
-  PN
-
-  """
-  Puerto Rico
-  """
-  PR
-
-  """
-  Réunion
-  """
-  RE
-
-  """
-  Saint Barthélemy
-  """
-  BL
-
-  """
-  Saint Helena
-  """
-  SH
-
-  """
-  Saint Martin
-  """
-  MF
-
-  """
-  Saint Pierre and Miquelon
-  """
-  PM
-
-  """
-  South Georgia and The South Sandwich Islands
-  """
-  GS
-
-  """
-  Svalbard and Jan Mayen
-  """
-  SJ
-
-  """
-  Taiwan
-  """
-  TW
-
-  """
-  Tokelau
-  """
-  TK
-
-  """
-  Turks and Caicos Islands
-  """
-  TC
-
-  """
-  United States Minor Outlying Islands
-  """
-  UM
 
   """
   British Virgin Islands
@@ -15476,14 +15679,49 @@ enum CountryISO {
   VI
 
   """
+  Viet Nam
+  """
+  VN
+
+  """
+  Vanuatu
+  """
+  VU
+
+  """
   Wallis and Futuna
   """
   WF
 
   """
-  Western Sahara
+  Samoa
   """
-  EH
+  WS
+
+  """
+  Yemen
+  """
+  YE
+
+  """
+  Mayotte
+  """
+  YT
+
+  """
+  South Africa
+  """
+  ZA
+
+  """
+  Zambia
+  """
+  ZM
+
+  """
+  Zimbabwe
+  """
+  ZW
 }
 
 enum ActivityAndClassesType {
@@ -15555,6 +15793,7 @@ enum ActivityAndClassesType {
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
   HOST_APPLICATION_CONTACT
+  HOST_APPLICATION_COMMENT_CREATED
   CONTRIBUTION_REJECTED
   SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CANCELED
@@ -16392,6 +16631,31 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
+
+  """
+  Host application requests
+  """
+  hostApplicationRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Filter applications by status
+    """
+    status: HostApplicationStatus
+  ): HostApplicationCollection!
   feed(
     """
     Only returns activities before this date
@@ -17286,6 +17550,31 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   Logged-in user permissions on an account
   """
   permissions: AccountPermissions!
+
+  """
+  Host application requests
+  """
+  hostApplicationRequests(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Order of the results
+    """
+    orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Filter applications by status
+    """
+    status: HostApplicationStatus
+  ): HostApplicationCollection!
   feed(
     """
     Only returns activities before this date
@@ -17488,6 +17777,13 @@ type VirtualCardRequestCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [VirtualCardRequest!]
+}
+
+input HostApplicationReferenceInput {
+  """
+  The public id identifying the host application (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
 }
 
 """
@@ -18287,12 +18583,17 @@ type Mutation {
     """
     The account that applied to the host
     """
-    account: AccountReferenceInput!
+    account: AccountReferenceInput @deprecated(reason: "2024-07-24: Please use hostApplication")
+
+    """
+    The host application
+    """
+    hostApplication: HostApplicationReferenceInput
 
     """
     The host concerned by the application
     """
-    host: AccountReferenceInput!
+    host: AccountReferenceInput @deprecated(reason: "2024-07-24: Please use hostApplication")
 
     """
     What to do with the application
@@ -19773,6 +20074,11 @@ input CommentCreateInput {
   expense: ExpenseReferenceInput
 
   """
+  If your comment is linked to an host application, set it here
+  """
+  hostApplication: HostApplicationReferenceInput
+
+  """
   If your comment is linked to an order, set it here
   """
   order: OrderReferenceInput
@@ -20454,6 +20760,7 @@ type ProcessHostApplicationResponse {
   When sending a public message, this field will have the info about the conversation created
   """
   conversation: Conversation
+  hostApplication: HostApplication
 }
 
 """
