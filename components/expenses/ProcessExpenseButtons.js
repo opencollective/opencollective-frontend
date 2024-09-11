@@ -395,7 +395,6 @@ ProcessExpenseButtons.propTypes = {
   host: PropTypes.object,
   /** Props passed to all buttons. Useful to customize sizes, spaces, etc. */
   buttonProps: PropTypes.object,
-  showError: PropTypes.bool,
   onSuccess: PropTypes.func,
   /** Called when the expense gets deleted */
   onDelete: PropTypes.func,
@@ -403,11 +402,9 @@ ProcessExpenseButtons.propTypes = {
   isMoreActions: PropTypes.bool,
   /** Called when a modal is opened/closed with a boolean like (isOpen) */
   onModalToggle: PropTypes.func,
-  displayMarkAsIncomplete: PropTypes.bool,
   displaySecurityChecks: PropTypes.bool,
   isViewingExpenseInHostContext: PropTypes.bool,
   disabled: PropTypes.bool,
-  LoggedInUser: PropTypes.object,
 };
 
 export const DEFAULT_PROCESS_EXPENSE_BTN_PROPS = {
