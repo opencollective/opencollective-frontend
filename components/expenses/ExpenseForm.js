@@ -854,7 +854,6 @@ const ExpenseFormBody = ({
                       </p>
                       <Field
                         as={StyledInput}
-                        autoFocus={autoFocusTitle}
                         error={errors.reference}
                         fontSize="14px"
                         id="expense-reference"
