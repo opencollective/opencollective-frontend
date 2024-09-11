@@ -8,6 +8,8 @@ import { initClient } from '../lib/apollo-client';
 import { getLocaleMessages } from '../lib/i18n/request';
 import theme from '../lib/theme';
 
+import { TooltipProvider } from '../components/ui/Tooltip';
+
 const apolloClient = initClient();
 
 /**
@@ -23,7 +25,9 @@ export const withRequiredProviders = (component, providersParams = {}) => {
   return (
     <IntlProvider locale={locale} messages={locale === 'en' ? undefined : getLocaleMessages(locale)}>
       <ApolloProvider client={get(providersParams, 'ApolloProvider.client', apolloClient)}>
-        <ThemeProvider theme={get(providersParams, 'ThemeProvider.theme', theme)}>{component}</ThemeProvider>
+        <TooltipProvider delayDuration={0} skipDelayDuration={0}>
+          <ThemeProvider theme={get(providersParams, 'ThemeProvider.theme', theme)}>{component}</ThemeProvider>
+        </TooltipProvider>
       </ApolloProvider>
     </IntlProvider>
   );

@@ -20,8 +20,8 @@ type StyledLinkProps = BorderProps &
     openInNewTabNoFollow?: boolean;
     openInNewTabNoFollowRelMe?: boolean;
     truncateOverflow?: boolean;
-    underlineOnHover?: boolean;
-    hoverColor?: string;
+    $underlineOnHover?: boolean;
+    $hoverColor?: string;
   };
 
 /**
@@ -30,23 +30,31 @@ type StyledLinkProps = BorderProps &
  * @see See [styled-system docs](https://github.com/jxnblk/styled-system/blob/master/docs/api.md) for usage of those props
  */
 const StyledLink = styled.a.attrs<StyledLinkProps>(props => {
+  const base = {
+    color: props.color ?? 'primary.500',
+    $hoverColor: props.$hoverColor ?? 'primary.400',
+  };
+
   if (props.openInNewTab) {
     return {
+      ...base,
       target: '_blank',
       rel: 'noopener noreferrer',
     };
-  }
-  if (props.openInNewTabNoFollow) {
+  } else if (props.openInNewTabNoFollow) {
     return {
+      ...base,
       target: '_blank',
       rel: 'noopener noreferrer nofollow',
     };
-  }
-  if (props.openInNewTabNoFollowRelMe) {
+  } else if (props.openInNewTabNoFollowRelMe) {
     return {
+      ...base,
       target: '_blank',
       rel: 'noopener noreferrer nofollow me',
     };
+  } else {
+    return base;
   }
 })<StyledLinkProps>`
   cursor: pointer;
@@ -108,19 +116,14 @@ const StyledLink = styled.a.attrs<StyledLinkProps>(props => {
     `}
 
   &:hover {
-    ${system({ hoverColor: { property: 'color', scale: 'colors' } })}
+    ${system({ $hoverColor: { property: 'color', scale: 'colors' } })}
 
     ${props =>
-      props.underlineOnHover &&
+      props.$underlineOnHover &&
       css`
         text-decoration: underline;
       `}
   }
 `;
-
-StyledLink.defaultProps = {
-  color: 'primary.500',
-  hoverColor: 'primary.400',
-};
 
 export default StyledLink;

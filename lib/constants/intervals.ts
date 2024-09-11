@@ -20,4 +20,17 @@ export const getGQLV2FrequencyFromInterval = (interval: (typeof INTERVALS)[keyof
   }
 };
 
+export function getIntervalFromGQLV2Frequency(frequency: TierFrequency) {
+  switch (frequency) {
+    case TierFrequency.MONTHLY:
+      return INTERVALS.month;
+    case TierFrequency.YEARLY:
+      return INTERVALS.year;
+    case TierFrequency.FLEXIBLE:
+      return INTERVALS.flexible;
+    default:
+      return INTERVALS.oneTime;
+  }
+}
+
 export default INTERVALS;

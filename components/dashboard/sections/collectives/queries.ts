@@ -2,6 +2,79 @@ import { gql } from '../../../../lib/graphql/helpers';
 
 import { accountHoverCardFields } from '../../../AccountHoverCard';
 
+export const HostApplicationFields = gql`
+  fragment HostApplicationFields on HostApplication {
+    id
+    message
+    customData
+    status
+    createdAt
+    comments {
+      totalCount
+    }
+
+    host {
+      id
+      legacyId
+      name
+      slug
+      website
+      description
+      type
+      imageUrl
+      createdAt
+      policies {
+        id
+        COLLECTIVE_MINIMUM_ADMINS {
+          numberOfAdmins
+        }
+      }
+    }
+
+    account {
+      id
+      legacyId
+      name
+      slug
+      website
+      description
+      type
+      imageUrl
+      createdAt
+      ... on AccountWithHost {
+        isActive
+        approvedAt
+        isApproved
+        host {
+          id
+        }
+      }
+      memberInvitations(role: [ADMIN]) {
+        id
+        role
+      }
+      admins: members(role: ADMIN) {
+        totalCount
+        nodes {
+          id
+          account {
+            id
+            type
+            slug
+            name
+            imageUrl
+            ...AccountHoverCardFields
+            emails
+          }
+        }
+      }
+      ...AccountHoverCardFields
+    }
+  }
+
+  ${accountHoverCardFields}
+`;
+
 const processApplicationAccountFields = gql`
   fragment ProcessHostApplicationFields on AccountWithHost {
     isActive
@@ -27,6 +100,9 @@ export const hostApplicationsMetadataQuery = gql`
         }
       }
 
+      unreplied: hostApplications(limit: 0, offset: 0, lastCommentBy: COLLECTIVE_ADMIN) {
+        totalCount
+      }
       pending: hostApplications(limit: 0, offset: 0, status: PENDING) {
         totalCount
       }
@@ -43,75 +119,43 @@ export const hostApplicationsMetadataQuery = gql`
 export const hostApplicationsQuery = gql`
   query HostApplications(
     $hostSlug: String!
-    $limit: Int!
-    $offset: Int!
+    $limit: Int
+    $offset: Int
     $orderBy: ChronologicalOrderInput
     $searchTerm: String
     $status: HostApplicationStatus
+    $lastCommentBy: [LastCommentBy]
   ) {
     host(slug: $hostSlug) {
       id
 
-      hostApplications(limit: $limit, offset: $offset, orderBy: $orderBy, status: $status, searchTerm: $searchTerm) {
+      hostApplications(
+        limit: $limit
+        offset: $offset
+        orderBy: $orderBy
+        status: $status
+        searchTerm: $searchTerm
+        lastCommentBy: $lastCommentBy
+      ) {
         offset
         limit
         totalCount
         nodes {
-          id
-          message
-          customData
-          status
-          createdAt
-          account {
-            id
-            legacyId
-            name
-            slug
-            website
-            description
-            type
-            imageUrl
-            createdAt
-            ... on AccountWithHost {
-              ...ProcessHostApplicationFields
-            }
-            memberInvitations(role: [ADMIN]) {
-              id
-              role
-            }
-            admins: members(role: ADMIN) {
-              totalCount
-              nodes {
-                id
-                account {
-                  id
-                  type
-                  slug
-                  name
-                  imageUrl
-                  ...AccountHoverCardFields
-                  emails
-                }
-              }
-            }
-            ...AccountHoverCardFields
-          }
+          ...HostApplicationFields
         }
       }
     }
   }
-  ${processApplicationAccountFields}
-  ${accountHoverCardFields}
+  ${HostApplicationFields}
 `;
 
 export const processApplicationMutation = gql`
   mutation ProcessHostApplication(
-    $host: AccountReferenceInput!
-    $account: AccountReferenceInput!
+    $hostApplication: HostApplicationReferenceInput!
     $action: ProcessHostApplicationAction!
     $message: String
   ) {
-    processHostApplication(host: $host, account: $account, action: $action, message: $message) {
+    processHostApplication(hostApplication: $hostApplication, action: $action, message: $message) {
       account {
         id
         ... on AccountWithHost {
@@ -122,9 +166,13 @@ export const processApplicationMutation = gql`
         id
         slug
       }
+      hostApplication {
+        ...HostApplicationFields
+      }
     }
   }
   ${processApplicationAccountFields}
+  ${HostApplicationFields}
 `;
 
 const hostedCollectiveFields = gql`
@@ -152,6 +200,10 @@ const hostedCollectiveFields = gql`
         valueInCents
         currency
       }
+    }
+    policies {
+      id
+      COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS
     }
     ... on AccountWithHost {
       hostFeesStructure
@@ -376,6 +428,12 @@ export const hostedCollectiveDetailQuery = gql`
           name
           imageUrl
         }
+        host {
+          id
+          name
+          slug
+          type
+        }
       }
     }
   }
@@ -405,6 +463,7 @@ export const allCollectivesQuery = gql`
       isActive: $isActive
       host: $host
       consolidatedBalance: $consolidatedBalance
+      skipGuests: false
     ) {
       offset
       limit

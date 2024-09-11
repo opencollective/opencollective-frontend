@@ -33,7 +33,6 @@ import { CollectiveType } from '../../lib/constants/collectives';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
-import { parseToBoolean } from '../../lib/utils';
 
 import { ALL_SECTIONS, ROOT_SECTIONS, SECTION_LABELS } from './constants';
 import { DashboardContext } from './DashboardContext';
@@ -283,7 +282,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       section: ALL_SECTIONS.TRANSACTION_REPORTS,
     },
     {
-      if: isHost && !isAccountantOnly,
+      if: (isHost || isSelfHosted) && !isAccountantOnly,
       section: ALL_SECTIONS.VENDORS,
       Icon: Store,
     },
@@ -346,7 +345,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         },
         {
           section: ALL_SECTIONS.TAX_INFORMATION,
-          if: !parseToBoolean(process.env.TAX_FORMS_USE_LEGACY) && !isAccountantOnly,
+          if: !isAccountantOnly,
         },
         {
           section: ALL_SECTIONS.COLLECTIVE_PAGE,
@@ -365,7 +364,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
               },
               {
                 section: ALL_SECTIONS.POLICIES,
-                if: isOneOfTypes(account, [USER, ORGANIZATION]) && !isAccountantOnly,
+                if: isOneOfTypes(account, [USER, ORGANIZATION, COLLECTIVE]) && !isAccountantOnly,
               },
               {
                 section: ALL_SECTIONS.RECEIVING_MONEY,

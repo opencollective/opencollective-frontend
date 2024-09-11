@@ -19,7 +19,9 @@ import { Box } from '../Grid';
 import StyledCard from '../StyledCard';
 import { P, Span } from '../Text';
 
-const StatTitle = styled(Container)`
+const StatTitle = styled(Container).attrs(props => ({
+  color: props.color || 'black.700',
+}))`
   font-size: 12px;
   line-height: 16px;
   font-weight: 500;
@@ -29,14 +31,10 @@ const StatTitle = styled(Container)`
   align-items: center;
 `;
 
-StatTitle.defaultProps = {
-  color: 'black.700',
-};
-
 const StatAmount = ({ amount, ...props }) => (
   <P fontSize="16px" lineHeight="24px" color="black.700">
     {/* Pass null instead of 0 to make sure we display `--.--` */}
-    <FormattedMoneyAmount amount={amount || null} {...props} />
+    <FormattedMoneyAmount amountClassName="font-bold" amount={amount || null} {...props} />
   </P>
 );
 

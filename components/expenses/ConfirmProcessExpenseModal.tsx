@@ -253,7 +253,7 @@ export default function ConfirmProcessExpenseModal({ type, onClose, expense }: C
   }, [type, message, intl, processExpense]);
 
   return (
-    <StyledModal role="alertdialog" width="432px" onClose={onClose} trapFocus>
+    <StyledModal role="alertdialog" onClose={onClose} trapFocus>
       <ModalHeader>{intl.formatMessage(MessagesPerType[type].title)}</ModalHeader>
       <ModalBody pt={2}>
         <Flex>

@@ -54,12 +54,7 @@ const getColumns = intl => [
       const count = row.original.managedExpensesCount;
       return (
         <div className="inline-flex items-center gap-1 font-normal text-muted-foreground">
-          <FormattedMoneyAmount
-            amount={amount.valueInCents}
-            currency={amount.currency}
-            amountStyles={{ letterSpacing: 0 }}
-            showCurrencyCode={false}
-          />
+          <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} showCurrencyCode={false} />
           <Tooltip delayDuration={100}>
             <TooltipTrigger asChild>
               <div className="text-xs text-slate-400">({count})</div>
@@ -85,12 +80,7 @@ const getColumns = intl => [
       const count = row.original.operationalExpensesCount;
       return (
         <div className="inline-flex items-center gap-1 font-normal text-muted-foreground">
-          <FormattedMoneyAmount
-            amount={amount.valueInCents}
-            currency={amount.currency}
-            amountStyles={{ letterSpacing: 0 }}
-            showCurrencyCode={false}
-          />
+          <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} showCurrencyCode={false} />
           <Tooltip delayDuration={100}>
             <TooltipTrigger asChild>
               <div className="text-xs text-slate-400">({count})</div>

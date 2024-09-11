@@ -30,8 +30,8 @@ const StyledInputLocation = ({
   labelFontWeight,
   onChange,
   errors,
-  prefix,
-  required,
+  prefix = '',
+  required = true,
   onLoadSuccess,
   useStructuredForFallback,
 }) => {
@@ -141,11 +141,6 @@ StyledInputLocation.propTypes = {
     country: PropTypes.string,
   }),
   errors: PropTypes.object,
-};
-
-StyledInputLocation.defaultProps = {
-  required: true,
-  prefix: '',
 };
 
 export default StyledInputLocation;

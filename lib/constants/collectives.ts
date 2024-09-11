@@ -1,5 +1,7 @@
 import { invert, omit } from 'lodash';
 
+import { AccountType } from '../graphql/types/v2/graphql';
+
 export const CollectiveType = {
   COLLECTIVE: 'COLLECTIVE',
   EVENT: 'EVENT',
@@ -10,23 +12,23 @@ export const CollectiveType = {
   PROJECT: 'PROJECT',
   FUND: 'FUND',
   VENDOR: 'VENDOR',
-};
+} as const;
 
 export const HostedCollectiveTypes = omit(CollectiveType, ['USER', 'INDIVIDUAL', 'ORGANIZATION', 'BOT', 'VENDOR']);
 
 export const AccountTypesWithHost = [
-  CollectiveType.COLLECTIVE,
-  CollectiveType.EVENT,
-  CollectiveType.FUND,
-  CollectiveType.PROJECT,
-];
+  AccountType.COLLECTIVE,
+  AccountType.EVENT,
+  AccountType.FUND,
+  AccountType.PROJECT,
+] as const;
 
 export const defaultBackgroundImage = {
   COLLECTIVE: '/static/images/defaultBackgroundImageCollective.jpg',
   EVENT: '/static/images/defaultBackgroundImage.png',
   ORGANIZATION: '/static/images/defaultBackgroundImage.png',
   USER: '/static/images/defaultBackgroundImage.png',
-};
+} as const;
 
 export const defaultImage = {
   ORGANIZATION: '/static/images/default-organization-logo.svg',
@@ -34,7 +36,7 @@ export const defaultImage = {
   CHAPTER: '/static/images/default-chapter-logo.svg',
   ANONYMOUS: '/static/images/default-anonymous-logo.svg',
   GUEST: '/static/images/default-guest-logo.svg',
-};
+} as const;
 
 /** The ID of the open source collective */
 export const OPENSOURCE_COLLECTIVE_ID = ['staging', 'production'].includes(process.env.OC_ENV) ? 11004 : 9805;
@@ -63,11 +65,11 @@ export const CollectiveCategory = {
   ORGANIZATION: 'organization',
   FUND: 'FUND',
   PROJECT: 'project',
-};
+} as const;
 
 /** Map additional tags to categories */
 export const CollectiveTagsCategories = invert(CollectiveCategory);
 
-export const AVATAR_WIDTH_RANGE = [200, 3000];
-export const AVATAR_HEIGHT_RANGE = [200, 3000];
-export const IGNORED_TAGS = ['community', 'user'];
+export const AVATAR_WIDTH_RANGE = [200, 3000] as const;
+export const AVATAR_HEIGHT_RANGE = [200, 3000] as const;
+export const IGNORED_TAGS = ['community', 'user'] as const;

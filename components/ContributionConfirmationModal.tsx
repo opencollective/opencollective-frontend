@@ -11,7 +11,7 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
   const [submitting, setSubmitting] = useState(false);
 
   return (
-    <StyledModal width="578px" onClose={onClose}>
+    <StyledModal onClose={onClose}>
       <CollectiveModalHeader
         collective={order.toAccount}
         customText={

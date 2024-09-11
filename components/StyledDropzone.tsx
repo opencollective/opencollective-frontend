@@ -347,7 +347,13 @@ const StyledDropzone = ({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => (onSuccess as (files: File[], fileRejections: FileRejection[]) => void)([], [])}
+            onClick={() => {
+              if (isMulti) {
+                (onSuccess as (files: File[], fileRejections: FileRejection[]) => void)([], []);
+              } else {
+                (onSuccess as (file: UploadedFile) => void)(null);
+              }
+            }}
             disabled={isLoading}
           >
             <FormattedMessage defaultMessage="Clear" id="/GCoTA" />
@@ -434,7 +440,7 @@ type StyledDropzoneProps = Omit<ContainerProps, 'accept' | 'children' | 'ref' | 
         | {
             isMulti: false;
             /** Called back with the uploaded files on success */
-            onSuccess?: (file: UploadedFile) => void;
+            onSuccess?: (file: UploadedFile | null) => void;
             /** if set, the image will be displayed and a "replace" banner will be added */
             value?: string;
           }

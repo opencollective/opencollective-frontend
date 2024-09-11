@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Undo } from '@styled-icons/fa-solid/Undo';
 import { Field, FieldArray, Form, Formik } from 'formik';
-import { first, isEmpty, omit, pick } from 'lodash';
+import { first, isEmpty, omit, pick, trimStart } from 'lodash';
 import { useRouter } from 'next/router';
 import { createPortal } from 'react-dom';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -18,6 +18,7 @@ import { requireFields } from '../../lib/form-utils';
 import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
+import { require2FAForAdmins } from '../../lib/policies';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 import { flattenObjectDeep, parseToBoolean } from '../../lib/utils';
 import { userMustSetAccountingCategory } from './lib/accounting-categories';
@@ -45,6 +46,7 @@ import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import { StyledCurrencyPicker } from '../StyledCurrencyPicker';
 import StyledHr from '../StyledHr';
+import StyledInput from '../StyledInput';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledTextarea from '../StyledTextarea';
 import { Label, P, Span } from '../Text';
@@ -53,7 +55,7 @@ import ExpenseAttachedFilesForm from './ExpenseAttachedFilesForm';
 import ExpenseFormItems from './ExpenseFormItems';
 import ExpenseFormPayeeInviteNewStep, { validateExpenseFormPayeeInviteNewStep } from './ExpenseFormPayeeInviteNewStep';
 import ExpenseFormPayeeSignUpStep from './ExpenseFormPayeeSignUpStep';
-import ExpenseFormPayeeStep from './ExpenseFormPayeeStep';
+import ExpenseFormPayeeStep, { checkStepOneCompleted } from './ExpenseFormPayeeStep';
 import { prepareExpenseItemForSubmit, validateExpenseItem } from './ExpenseItemForm';
 import ExpenseRecurringBanner from './ExpenseRecurringBanner';
 import ExpenseSummaryAdditionalInformation from './ExpenseSummaryAdditionalInformation';
@@ -179,16 +181,7 @@ export const prepareExpenseForSubmit = expenseData => {
   }
 
   return {
-    ...pick(expenseData, [
-      'id',
-      'description',
-      'longDescription',
-      'type',
-      'privateMessage',
-      'invoiceInfo',
-      'tags',
-      'currency',
-    ]),
+    ...pick(expenseData, ['id', 'type', 'tags', 'currency']),
     payee,
     payeeLocation,
     payoutMethod,
@@ -196,13 +189,18 @@ export const prepareExpenseForSubmit = expenseData => {
     tax: expenseData.taxes?.filter(tax => !tax.isDisabled).map(tax => pick(tax, ['type', 'rate', 'idNumber'])),
     items: expenseData.items.map(item => prepareExpenseItemForSubmit(expenseData, item)),
     accountingCategory: !expenseData.accountingCategory ? null : pick(expenseData.accountingCategory, ['id']),
+    description: expenseData.description?.trim(),
+    longDescription: expenseData.longDescription?.trim(),
+    privateMessage: expenseData.privateMessage?.trim(),
+    invoiceInfo: expenseData.invoiceInfo?.trim(),
+    reference: expenseData.reference?.trim(),
   };
 };
 
 /**
  * Validate the expense
  */
-const validateExpense = (intl, expense, collective, host, LoggedInUser) => {
+const validateExpense = (intl, expense, collective, host, LoggedInUser, canEditPayoutMethod) => {
   const isCardCharge = expense.type === expenseTypes.CHARGE;
   if (expense.payee?.isInvite) {
     return expense.payee.id
@@ -232,6 +230,7 @@ const validateExpense = (intl, expense, collective, host, LoggedInUser) => {
   }
 
   if (
+    canEditPayoutMethod &&
     expense.payoutMethod &&
     // CHARGE expenses have VirtualCard and do not have PayoutMethod
     isCardCharge
@@ -268,13 +267,6 @@ export const EXPENSE_FORM_STEPS = {
   EXPENSE: 'EXPENSE',
 };
 
-const checkAddressValuesAreCompleted = values => {
-  if (checkRequiresAddress(values)) {
-    return values.payeeLocation?.country && values.payeeLocation?.address;
-  }
-  return true;
-};
-
 const getDefaultStep = (defaultStep, stepOneCompleted, isCreditCardCharge) => {
   // Card Charges take priority here because they are technically incomplete.
   if (isCreditCardCharge) {
@@ -307,6 +299,7 @@ const ExpenseFormBody = ({
   defaultStep,
   drawerActionsContainer,
   supportedExpenseTypes,
+  canEditPayoutMethod,
 }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
@@ -324,11 +317,11 @@ const ExpenseFormBody = ({
   const isGrant = values.type === expenseTypes.GRANT;
   const isCreditCardCharge = values.type === expenseTypes.CHARGE;
   const isRecurring = expense && expense.recurringExpense !== null;
+  const [isOnBehalf, setOnBehalf] = React.useState(false);
+  const isMissing2FA = require2FAForAdmins(values.payee) && !loggedInAccount?.hasTwoFactorAuth;
   const stepOneCompleted =
-    values.payee?.type === CollectiveType.VENDOR ||
-    (values.payoutMethod &&
-      isEmpty(flattenObjectDeep(omit(errors, 'payoutMethod.data.currency'))) &&
-      checkAddressValuesAreCompleted(values));
+    checkStepOneCompleted(values, isOnBehalf, isMissing2FA, canEditPayoutMethod) &&
+    isEmpty(flattenObjectDeep(omit(errors, 'payoutMethod.data.currency')));
   const stepTwoCompleted = isInvite
     ? true
     : (stepOneCompleted || isCreditCardCharge) && hasBaseFormFieldsCompleted && values.items.length > 0;
@@ -337,7 +330,6 @@ const ExpenseFormBody = ({
   const [initWithOCR, setInitWithOCR] = React.useState(null);
 
   // Only true when logged in and drafting the expense
-  const [isOnBehalf, setOnBehalf] = React.useState(false);
   const [showResetModal, setShowResetModal] = React.useState(false);
   const editingExpense = expense !== undefined;
 
@@ -545,12 +537,14 @@ const ExpenseFormBody = ({
         payoutProfiles={payoutProfiles}
         loggedInAccount={loggedInAccount}
         disablePayee={isDraft && isOnBehalf}
+        canEditPayoutMethod={canEditPayoutMethod}
         onChange={payee => {
           setOnBehalf(payee.isInvite);
         }}
         onNext={values => {
           const shouldSkipPayoutMethodValidation =
-            (isOnBehalf || values.payee?.type === CollectiveType.VENDOR) && isEmpty(values.payoutMethod);
+            !canEditPayoutMethod ||
+            ((isOnBehalf || values.payee?.type === CollectiveType.VENDOR) && isEmpty(values.payoutMethod));
           const validation = !shouldSkipPayoutMethodValidation && validatePayoutMethod(values.payoutMethod);
           if (isEmpty(validation)) {
             setStep(EXPENSE_FORM_STEPS.EXPENSE);
@@ -787,63 +781,110 @@ const ExpenseFormBody = ({
                     >
                       <FormattedMessage defaultMessage="Expense Category" id="38dzz9" />
                     </Label>
-                    <div className="mt-2 flex">
-                      <div className="basis-[300px]">
-                        <StyledInputFormikField name="accountingCategory" lab>
-                          {({ meta }) => (
-                            <div>
-                              <AccountingCategorySelect
-                                id="ExpenseCategoryInput"
-                                kind="EXPENSE"
-                                host={host}
-                                account={collective}
-                                selectedCategory={values.accountingCategory}
-                                onChange={value => formik.setFieldValue('accountingCategory', value)}
-                                error={Boolean(meta.error)}
-                                allowNone={!isHostAdmin}
-                                showCode={isHostAdmin}
-                                expenseType={values.type}
-                                expenseValues={values}
-                                predictionStyle="full"
-                              />
-                              {meta.error && meta.touched && (
-                                <Span color="red.500" fontSize="12px" mt="4px">
-                                  {formatErrorMessage(intl, meta.error)}
-                                </Span>
-                              )}
-                            </div>
-                          )}
-                        </StyledInputFormikField>
-                      </div>
-                    </div>
-                    <MessageBox type="info" fontSize="12px" mt="24px">
+                    <MessageBox type="info" fontSize="12px" mt={2}>
                       <FormattedMessage
                         defaultMessage="Please make sure that all the expense items in this expense belong to the selected expense category. If needed, you may submit additional items in separate expenses with different expense categories."
                         id="Pkq+ZR"
                       />
                     </MessageBox>
+                    <div className="mt-4 flex">
+                      <StyledInputFormikField name="accountingCategory" lab>
+                        {({ meta }) => (
+                          <div>
+                            <AccountingCategorySelect
+                              id="ExpenseCategoryInput"
+                              kind="EXPENSE"
+                              host={host}
+                              account={collective}
+                              selectedCategory={values.accountingCategory}
+                              onChange={value => formik.setFieldValue('accountingCategory', value)}
+                              error={Boolean(meta.error)}
+                              allowNone={!isHostAdmin}
+                              showCode={isHostAdmin}
+                              expenseType={values.type}
+                              expenseValues={values}
+                              predictionStyle="full"
+                            />
+                            {meta.error && meta.touched && (
+                              <Span color="red.500" fontSize="12px" mt="4px">
+                                {formatErrorMessage(intl, meta.error)}
+                              </Span>
+                            )}
+                          </div>
+                        )}
+                      </StyledInputFormikField>
+                    </div>
                     {formik.values.accountingCategory?.instructions && (
-                      <MessageBox type="info" fontSize="12px" mt="24px">
-                        <HTMLContent content={formik.values.accountingCategory.instructions} openLinksInNewTab />
-                      </MessageBox>
+                      <React.Fragment>
+                        <div className="mb-2 mt-4 text-sm font-semibold text-slate-800">
+                          <FormattedMessage
+                            id="withColon"
+                            defaultMessage="{item}:"
+                            values={{
+                              item: <FormattedMessage defaultMessage="Account Category Instructions" id="+t6c4i" />,
+                            }}
+                          />
+                        </div>
+                        <HTMLContent openLinksInNewTab content={formik.values.accountingCategory.instructions} />
+                      </React.Fragment>
                     )}
                   </div>
                 )}
                 {values.type === expenseTypes.INVOICE && (
-                  <Box my={40}>
-                    <ExpenseAttachedFilesForm
-                      title={<FormattedMessage id="UploadInvoice" defaultMessage="Upload invoice" />}
-                      description={
+                  <React.Fragment>
+                    <div className="mt-2">
+                      <div className="text-lg font-normal text-muted-foreground">
                         <FormattedMessage
-                          id="UploadInvoiceDescription"
-                          defaultMessage="If you already have an invoice document, you can upload it here."
+                          defaultMessage="{field} (optional)"
+                          id="OptionalFieldLabel"
+                          values={{
+                            field: (
+                              <span className="font-bold text-foreground">
+                                <FormattedMessage id="InvoiceReference" defaultMessage="Invoice reference" />
+                              </span>
+                            ),
+                          }}
                         />
-                      }
-                      onChange={attachedFiles => formik.setFieldValue('attachedFiles', attachedFiles)}
-                      form={formik}
-                      defaultValue={values.attachedFiles}
-                    />
-                  </Box>
+                      </div>
+                      <p className="text-xs text-gray-500">
+                        <FormattedMessage
+                          id="InvoiceReferenceDescription"
+                          defaultMessage="If the invoice being submitted has a reference number, add it here"
+                        />
+                      </p>
+                      <Field
+                        as={StyledInput}
+                        autoFocus={autoFocusTitle}
+                        error={errors.reference}
+                        fontSize="14px"
+                        id="expense-reference"
+                        mt={3}
+                        name="reference"
+                        px="12px"
+                        py="8px"
+                        width="100%"
+                        maxLength={255}
+                        onChange={e => {
+                          e.target.value = trimStart(e.target.value).replace(/\s+/g, ' ');
+                          handleChange(e);
+                        }}
+                      />
+                    </div>
+                    <div className="mt-5">
+                      <ExpenseAttachedFilesForm
+                        title={<FormattedMessage id="UploadInvoice" defaultMessage="Upload invoice" />}
+                        description={
+                          <FormattedMessage
+                            id="UploadInvoiceDescription"
+                            defaultMessage="If you already have an invoice document, you can upload it here."
+                          />
+                        }
+                        onChange={attachedFiles => formik.setFieldValue('attachedFiles', attachedFiles)}
+                        form={formik}
+                        defaultValue={values.attachedFiles}
+                      />
+                    </div>
+                  </React.Fragment>
                 )}
 
                 <Flex alignItems="center" my={24}>
@@ -937,8 +978,9 @@ const ExpenseFormBody = ({
 
 ExpenseFormBody.propTypes = {
   formik: PropTypes.object,
-  payoutProfiles: PropTypes.array,
+  payoutProfiles: PropTypes.array, // Can be null when loading
   autoFocusTitle: PropTypes.bool,
+  canEditPayoutMethod: PropTypes.bool,
   shouldLoadValuesFromPersister: PropTypes.bool,
   onCancel: PropTypes.func,
   formPersister: PropTypes.object,
@@ -1001,13 +1043,14 @@ const ExpenseForm = ({
   payoutProfiles,
   autoFocusTitle,
   onCancel,
-  validateOnChange,
+  validateOnChange = false,
   formPersister,
   loggedInAccount,
   loading,
   shouldLoadValuesFromPersister,
   defaultStep,
   drawerActionsContainer,
+  canEditPayoutMethod,
 }) => {
   const isDraft = expense?.status === ExpenseStatus.DRAFT;
   const [hasValidate, setValidate] = React.useState(validateOnChange && !isDraft);
@@ -1015,11 +1058,14 @@ const ExpenseForm = ({
   const { LoggedInUser } = useLoggedInUser();
   const supportedExpenseTypes = React.useMemo(() => getSupportedExpenseTypes(collective), [collective]);
   const initialValues = { ...getDefaultExpense(collective, supportedExpenseTypes), ...expense };
-  const validate = expenseData => validateExpense(intl, expenseData, collective, host, LoggedInUser);
+  const validate = expenseData =>
+    validateExpense(intl, expenseData, collective, host, LoggedInUser, canEditPayoutMethod);
+
   if (isDraft) {
     initialValues.items = expense.draft.items?.map(newExpenseItem) || [];
     initialValues.taxes = expense.draft.taxes;
     initialValues.attachedFiles = expense.draft.attachedFiles;
+    initialValues.reference = expense.draft.reference;
     initialValues.payoutMethod = expense.draft.payoutMethod || expense.payoutMethod;
     initialValues.payeeLocation = expense.draft.payeeLocation;
     initialValues.payee = expense.recurringExpense ? expense.payee : expense.draft.payee;
@@ -1058,6 +1104,7 @@ const ExpenseForm = ({
           defaultStep={defaultStep}
           drawerActionsContainer={drawerActionsContainer}
           supportedExpenseTypes={supportedExpenseTypes}
+          canEditPayoutMethod={canEditPayoutMethod}
         />
       )}
     </Formik>
@@ -1068,6 +1115,7 @@ ExpenseForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   autoFocusTitle: PropTypes.bool,
   validateOnChange: PropTypes.bool,
+  canEditPayoutMethod: PropTypes.bool,
   shouldLoadValuesFromPersister: PropTypes.bool,
   onCancel: PropTypes.func,
   /** To save draft of form values */
@@ -1139,10 +1187,6 @@ ExpenseForm.propTypes = {
     }),
   ),
   drawerActionsContainer: PropTypes.object,
-};
-
-ExpenseForm.defaultProps = {
-  validateOnChange: false,
 };
 
 export default React.memo(ExpenseForm);

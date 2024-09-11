@@ -159,7 +159,6 @@ export default function LegalDocumentDrawer({
                               <FormattedMoneyAmount
                                 amount={expense.amountV2.valueInCents}
                                 currency={expense.amountV2.currency}
-                                amountStyles={null}
                               />
                             ),
                             expenseType: i18nExpenseType(intl, expense.type),

@@ -3,23 +3,17 @@
 exports[`TruncatedTextWithTooltip component renders default options 1`] = `"A short string"`;
 
 exports[`TruncatedTextWithTooltip component renders default options 2`] = `
-.c0 {
-  display: inline-block;
-  cursor: help;
-}
-
-.c0 button:disabled {
-  pointer-events: none;
-}
-
-<div
-  className="c0"
-  cursor="help"
-  data-cy="tooltip-trigger"
-  display="inline-block"
-  onMouseEnter={[Function]}
-  onMouseLeave={[Function]}
+<button
+  className="cursor-help"
+  data-state="closed"
+  onBlur={[Function]}
+  onClick={[Function]}
+  onFocus={[Function]}
+  onPointerDown={[Function]}
+  onPointerLeave={[Function]}
+  onPointerMove={[Function]}
+  type="button"
 >
   a string that is more than ...
-</div>
+</button>
 `;

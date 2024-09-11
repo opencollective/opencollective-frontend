@@ -2,6 +2,7 @@ import React from 'react';
 import { Eye } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 
 import { getI18nLink } from '../I18nFormatters';
@@ -12,6 +13,7 @@ import { EditFundraiser } from './edit/EditFundraiser';
 import { EditProfile } from './edit/EditProfile';
 
 export function Banner({ account, isFundraiser }) {
+  const { LoggedInUser } = useLoggedInUser();
   return (
     <div className="h-14 w-full bg-yellow-100">
       <div className="flex items-center justify-center gap-4 px-4 py-2 text-sm text-gray-700 dark:bg-gray-800 dark:text-gray-300">
@@ -42,7 +44,8 @@ export function Banner({ account, isFundraiser }) {
               <FormattedMessage defaultMessage="Go to current profile" id="VboEiK" />
             </Link>
           </Button>
-          {isFundraiser ? <EditFundraiser account={account} /> : <EditProfile account={account} />}
+          {LoggedInUser?.isAdminOfCollective(account) &&
+            (isFundraiser ? <EditFundraiser account={account} /> : <EditProfile account={account} />)}
         </div>
       </div>
     </div>

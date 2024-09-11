@@ -14,6 +14,7 @@ export function ThemeColor({ color = undefined }) {
       {`
         :root {
           --primary: ${hsl.hue} ${hsl.saturation * 100}% ${hsl.lightness * 100}%;
+          --primary-foreground: ${hsl.hue} ${(hsl.saturation * 100) / 2}% ${98}%;
         }
       `}
     </style>

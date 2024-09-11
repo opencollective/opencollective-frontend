@@ -186,7 +186,7 @@ class InputTypeLocation extends React.Component {
   }
 
   isAutocompleteServiceAvailable() {
-    return window && Boolean(get(window, 'google.maps.places.AutocompleteService'));
+    return typeof window !== 'undefined' && Boolean(get(window, 'google.maps.places.AutocompleteService'));
   }
 
   render() {

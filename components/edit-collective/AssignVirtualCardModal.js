@@ -190,7 +190,7 @@ const AssignVirtualCardModal = ({ collective = undefined, host, onSuccess, onClo
   const collectiveUsers = users?.account?.members.nodes.map(node => node.account);
 
   return (
-    <StyledModal width="382px" onClose={handleClose} trapFocus {...modalProps}>
+    <StyledModal onClose={handleClose} trapFocus {...modalProps}>
       <form onSubmit={formik.handleSubmit}>
         <ModalHeader onClose={handleClose}>
           <FormattedMessage id="Host.VirtualCards.AssignCard" defaultMessage="Assign Card" />

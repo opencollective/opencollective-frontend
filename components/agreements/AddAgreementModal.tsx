@@ -20,7 +20,7 @@ export default function AddAgreementModal({
   ...props
 }: AddAgreementModalProps) {
   return (
-    <StyledModal width={578} onClose={onClose} trapFocus {...props}>
+    <StyledModal onClose={onClose} trapFocus {...props}>
       <ModalBody>
         <AgreementForm
           account={account}

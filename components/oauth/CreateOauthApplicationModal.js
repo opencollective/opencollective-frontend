@@ -47,7 +47,7 @@ const CreateOauthApplicationModal = ({ account, onSuccess, onClose, ...props }) 
   });
 
   return (
-    <StyledModal width="576px" onClose={onClose} data-cy="create-oauth-app-modal" {...props}>
+    <StyledModal onClose={onClose} data-cy="create-oauth-app-modal" {...props}>
       <ModalHeader>
         <FormattedMessage defaultMessage="Create OAuth app" id="m6BfW0" />
       </ModalHeader>

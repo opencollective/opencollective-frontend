@@ -35,7 +35,9 @@ const AmountLine = styled.div.attrs({
   ${typography}
 `;
 
-const Label = styled(Span)`
+const Label = styled(Span).attrs(props => ({
+  fontWeight: props.fontWeight ?? 400,
+}))`
   margin-right: 4px;
   color: inherit;
   flex: 0 1 70%;
@@ -43,10 +45,6 @@ const Label = styled(Span)`
   word-break: break-word;
   ${flex}
 `;
-
-Label.defaultProps = {
-  fontWeight: 400,
-};
 
 const Amount = styled(Span)`
   flex: 1 1 30%;
@@ -82,11 +80,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
               />
             </Label>
             <Amount>
-              <FormattedMoneyAmount
-                amount={amount || 0}
-                currency={currency}
-                amountStyles={{ color: 'black.700', fontWeight: 400 }}
-              />
+              <FormattedMoneyAmount amount={amount || 0} currency={currency} />
             </Amount>
           </AmountLine>
           {Boolean(stepSummary?.taxType) &&
@@ -98,11 +92,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
                   {i18nTaxType(intl, stepSummary.taxType)} {stepSummary.percentage}%
                 </Label>
                 <Amount>
-                  <FormattedMoneyAmount
-                    amount={stepSummary.amount}
-                    currency={currency}
-                    amountStyles={{ color: 'black.700', fontWeight: 400 }}
-                  />
+                  <FormattedMoneyAmount amount={stepSummary.amount} currency={currency} />
                 </Amount>
               </AmountLine>
             ))}
@@ -121,11 +111,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
                 )}
               </Label>
               <Amount data-cy="ContributionSummary-Tip">
-                <FormattedMoneyAmount
-                  amount={platformTip}
-                  currency={currency}
-                  amountStyles={{ color: 'black.700', fontWeight: 400 }}
-                />
+                <FormattedMoneyAmount amount={platformTip} currency={currency} />
               </Amount>
             </AmountLine>
           )}
@@ -138,7 +124,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
           <FormattedMessage id="TodaysCharge" defaultMessage="Today's charge" />
         </Label>
         <Amount fontWeight="700" data-cy="ContributionSummary-TodaysCharge">
-          <FormattedMoneyAmount amount={totalAmount} currency={currency} amountStyles={null} />
+          <FormattedMoneyAmount amount={totalAmount} currency={currency} />
         </Amount>
       </AmountLine>
       {Boolean(pmFeeInfo.fee) && (
@@ -186,11 +172,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
                   </StyledTooltip>
                 </Box>
               )}
-              <FormattedMoneyAmount
-                amount={pmFeeInfo.fee || null}
-                currency={currency}
-                amountStyles={{ color: 'black.700', fontWeight: 400 }}
-              />
+              <FormattedMoneyAmount amount={pmFeeInfo.fee || null} currency={currency} />
             </Amount>
           </AmountLine>
           <AmountLine color="black.700">
@@ -217,11 +199,7 @@ const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment
                   </StyledTooltip>
                 </Box>
               )}
-              <FormattedMoneyAmount
-                amount={totalAmount - pmFeeInfo.fee - platformTip}
-                currency={currency}
-                amountStyles={null}
-              />
+              <FormattedMoneyAmount amount={totalAmount - pmFeeInfo.fee - platformTip} currency={currency} />
             </Amount>
           </AmountLine>
         </React.Fragment>

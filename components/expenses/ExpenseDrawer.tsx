@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useApolloClient, useLazyQuery } from '@apollo/client';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { OrderByFieldType, OrderDirection } from '../../lib/graphql/types/v2/graphql';
 
 import { getVariablesFromQuery } from '../../pages/expense';
 import { Drawer } from '../Drawer';
@@ -26,7 +27,12 @@ export default function ExpenseDrawer({ openExpenseLegacyId, handleClose, initia
 
   useEffect(() => {
     if (openExpenseLegacyId) {
-      getExpense({ variables: getVariablesFromQuery({ ExpenseId: openExpenseLegacyId }) });
+      getExpense({
+        variables: {
+          ...getVariablesFromQuery({ ExpenseId: openExpenseLegacyId }),
+          orderBy: { field: OrderByFieldType.CREATED_AT, direction: OrderDirection.DESC },
+        },
+      });
     }
   }, [openExpenseLegacyId]);
 

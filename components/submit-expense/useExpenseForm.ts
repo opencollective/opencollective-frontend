@@ -14,7 +14,6 @@ import type { ZodObjectDef } from 'zod';
 import z from 'zod';
 
 import { AccountTypesWithHost, CollectiveType } from '../../lib/constants/collectives';
-import type { LoggedInUser } from '../../lib/custom_typings/LoggedInUser';
 import { getPayoutProfiles } from '../../lib/expenses';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type {
@@ -28,6 +27,7 @@ import type {
 } from '../../lib/graphql/types/v2/graphql';
 import { Currency, ExpenseStatus, ExpenseType, PayoutMethodType } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import type LoggedInUser from '../../lib/LoggedInUser';
 import { userMustSetAccountingCategory } from '../expenses/lib/accounting-categories';
 import { computeExpenseAmounts, expenseTypeSupportsItemCurrency, getSupportedCurrencies } from '../expenses/lib/utils';
 
@@ -62,6 +62,7 @@ export type ExpenseFormValues = {
   expenseTypeOption?: ExpenseTypeOption;
   payoutMethodId?: string;
   title?: string;
+  reference?: string;
   accountingCategoryId?: string;
   tags?: string[];
   expenseCurrency?: string;
@@ -332,6 +333,7 @@ const formSchemaQuery = gql`
         friendlyName
         code
         instructions
+        appliesTo
       }
     }
   }
@@ -403,6 +405,12 @@ const formSchemaQuery = gql`
     ... on Organization {
       host {
         ...ExpenseFormSchemaHostFields
+      }
+    }
+    ... on AccountWithParent {
+      parent {
+        id
+        slug
       }
     }
   }
@@ -540,6 +548,7 @@ function buildFormSchema(
         },
       ),
     title: z.string().min(1),
+    reference: z.string().optional(),
     expenseCurrency: z.string().refine(v => supportedCurrencies.includes(v), {
       message: `Currency must be one of: ${supportedCurrencies.join(',')}`,
     }),
@@ -773,7 +782,7 @@ async function buildFormOptions(
       );
     }
 
-    if (payee && AccountTypesWithHost.includes(payee.type)) {
+    if (payee && (AccountTypesWithHost as readonly string[]).includes(payee.type)) {
       options.supportedPayoutMethods = options.supportedPayoutMethods.filter(t => t !== PayoutMethodType.OTHER);
     }
 

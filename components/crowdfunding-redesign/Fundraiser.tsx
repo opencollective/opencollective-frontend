@@ -2,8 +2,10 @@ import React from 'react';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { cva } from 'class-variance-authority';
 import { Markup } from 'interweave';
-import { merge, pick } from 'lodash';
-import { ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
+// eslint-disable-next-line no-restricted-imports
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import LiteYouTubeEmbed from 'react-lite-youtube-embed';
 
@@ -15,17 +17,22 @@ import { isTierExpired } from '../../lib/tier-utils';
 
 import Avatar, { StackedAvatars } from '../Avatar';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
-import Link from '../Link';
+import { useModal } from '../ModalContext';
 import { Button } from '../ui/Button';
 import { Progress } from '../ui/Progress';
 
+import { SingleUpdate } from './updates/SingleUpdate';
+import { UpdatesList } from './updates/UpdatesList';
+import { ContributionsList } from './ContributionsList';
+import ExpensesList from './ExpensesList';
 import {
   aggregateGoalAmounts,
   getDefaultFundraiserValues,
   getYouTubeIDFromUrl,
   triggerPrototypeToast,
 } from './helpers';
-import { Tabs } from './Tabs';
+import { ProfileModal } from './ProfileModal';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './Tabs';
 import { ThemeColor } from './ThemeColor';
 
 const canContribute = (collective, LoggedInUser) => {
@@ -71,7 +78,7 @@ const Tiers = ({ account }) => {
                       amount={graphqlAmountValueInCents(minAmount)}
                       frequency={tier.frequency && tier.frequency !== TierFrequency.FLEXIBLE ? tier.frequency : null}
                       currency={currency}
-                      amountStyles={{ fontSize: '24px', lineHeight: '22px', fontWeight: 'bold', color: 'black.900' }}
+                      amountClassName="text-foreground font-bold text-2xl"
                       precision={getPrecisionFromAmount(graphqlAmountValueInCents(minAmount))}
                     />
                     {taxes.length > 0 && ' *'}
@@ -139,7 +146,6 @@ const Goals = ({ account }) => {
                     amount={currentAmount}
                     currency={currency}
                     showCurrencyCode={true}
-                    amountStyles={{ letterSpacing: 0 }}
                     precision={0}
                   />
                 </span>
@@ -155,7 +161,6 @@ const Goals = ({ account }) => {
               amount={goalTarget.amount}
               currency={currency}
               showCurrencyCode={false}
-              amountStyles={{ letterSpacing: 0 }}
               precision={0}
             />{' '}
             {hasYearlyGoal ? <span>per year</span> : hasMonthlyGoal && <span>per month</span>} goal
@@ -206,6 +211,10 @@ const ContentOverview = ({ content }) => {
 export default function Fundraiser({ account }) {
   const fundraiser = getDefaultFundraiserValues(account);
   const mainAccount = account.parent || account;
+  const router = useRouter();
+  const tabRef = React.useRef();
+  const { showModal } = useModal();
+
   return (
     <React.Fragment>
       <div className="border-b bg-background">
@@ -240,7 +249,14 @@ export default function Fundraiser({ account }) {
 
               <p>
                 {account.type === 'EVENT' ? 'Event' : 'Fundraiser'} by{' '}
-                <Link className="font-semibold text-primary hover:underline" href={`/preview/${mainAccount.slug}`}>
+                <Link
+                  className="font-semibold text-primary hover:underline"
+                  href={`/preview/${mainAccount.slug}`}
+                  onClick={e => {
+                    e.preventDefault();
+                    showModal(ProfileModal, { account: mainAccount });
+                  }}
+                >
                   {mainAccount.name} <ArrowRight className="inline align-middle" size={16} />
                 </Link>
               </p>
@@ -257,56 +273,103 @@ export default function Fundraiser({ account }) {
           </div>
         </div>
       </div>
-
-      <div className="sticky top-0 z-10 border-b border-t bg-background">
-        <div className="relative mx-auto -mb-px h-16 max-w-screen-xl px-6">
-          <Tabs centered={false} tabs={['Fundraiser', 'Updates', 'Expenses']} />
+      <Tabs
+        defaultValue="fundraiser"
+        value={router.query.path?.[0] || 'fundraiser'}
+        onValueChange={slug =>
+          router.push(`/preview/${account.slug}/support${slug !== 'fundraiser' ? `/${slug}` : ''}`, undefined, {
+            shallow: true,
+          })
+        }
+      >
+        <div className="sticky top-0 z-10 border-b border-t bg-background" ref={tabRef}>
+          <div className="relative mx-auto -mb-px h-16 max-w-screen-xl px-6">
+            <TabsList centered={false}>
+              <TabsTrigger value="fundraiser">Fundraiser</TabsTrigger>
+              <TabsTrigger value="updates" count={account.updates?.totalCount}>
+                Updates
+              </TabsTrigger>
+              <TabsTrigger value="contributions" count={account.contributionTransactions?.totalCount}>
+                Contributions
+              </TabsTrigger>
+              <TabsTrigger value="expenses" count={account.expenses?.totalCount}>
+                Expenses
+              </TabsTrigger>
+            </TabsList>
+          </div>
         </div>
-      </div>
-      <div className="flex-1 bg-background">
-        <div className="relative mx-auto grid max-w-screen-xl grid-cols-12 gap-8 px-6 py-12">
-          <div className="col-span-2">
-            <div className="sticky top-28 space-y-4">
-              <ContentOverview content={fundraiser.longDescription} />
+        <TabsContent value="fundraiser">
+          <div className="flex-1 bg-background">
+            <div className="relative mx-auto grid max-w-screen-xl grid-cols-12 gap-8 px-6 py-12">
+              <div className="col-span-2">
+                <div className="sticky top-28 space-y-4">
+                  <ContentOverview content={fundraiser.longDescription} />
+                </div>
+              </div>
+
+              <div className="prose prose-slate col-span-7">
+                <h2>
+                  <FormattedMessage defaultMessage="About" id="collective.about.title" />
+                </h2>
+                <Markup
+                  noWrap
+                  content={fundraiser.longDescription ?? ''}
+                  allowAttributes
+                  transform={node => {
+                    // Allow some iframes
+                    if (node.tagName.toLowerCase() === 'iframe') {
+                      const src = node.getAttribute('src');
+                      const parsedUrl = new URL(src);
+                      const hostname = parsedUrl.hostname;
+                      if (['youtube-nocookie.com', 'www.youtube-nocookie.com', 'anchor.fm'].includes(hostname)) {
+                        return (
+                          <iframe
+                            width={node.getAttribute('width')}
+                            height={node.getAttribute('height')}
+                            allowFullScreen={node.getAttribute('allowfullscreen') as any}
+                            title={node.getAttribute('title') || 'Embed content'}
+                            src={src}
+                          />
+                        );
+                      }
+                    } else if (node.tagName.toLowerCase() === 'a') {
+                      // Open links in new tab
+                      node.setAttribute('target', '_blank');
+                      node.setAttribute('rel', 'noopener noreferrer');
+                    }
+                  }}
+                />
+              </div>
+              <div className="col-span-3">{account.tiers && <Tiers account={account} />}</div>
             </div>
           </div>
+        </TabsContent>
+        <TabsContent value="updates">
+          {router.query.path?.[1] ? (
+            <div className="flex-1 bg-background">
+              <div className="relative mx-auto flex max-w-[650px] flex-col gap-8 px-6 py-12">
+                <div>
+                  <Button asChild variant="outline" size="sm">
+                    <Link href={`/preview/${account.slug}/support/updates`} scroll={false}>
+                      <ArrowLeft size={16} className="inline" /> All updates
+                    </Link>
+                  </Button>
+                </div>
+                <SingleUpdate updateId={router.query.path[1]} />
+              </div>
+            </div>
+          ) : (
+            <UpdatesList account={account} fundraiser={fundraiser} tabRef={tabRef} />
+          )}
+        </TabsContent>
+        <TabsContent value="contributions">
+          <ContributionsList account={account} />
+        </TabsContent>
+        <TabsContent value="expenses">
+          <ExpensesList account={account} />
+        </TabsContent>
+      </Tabs>
 
-          <div className="prose prose-slate col-span-7">
-            <h2>
-              <FormattedMessage defaultMessage="About" id="collective.about.title" />
-            </h2>
-            <Markup
-              noWrap
-              content={fundraiser.longDescription ?? ''}
-              allowAttributes
-              transform={node => {
-                // Allow some iframes
-                const attrs = [].slice.call(node.attributes);
-                if (node.tagName === 'iframe') {
-                  const src = node.getAttribute('src');
-                  const parsedUrl = new URL(src);
-                  const hostname = parsedUrl.hostname;
-                  if (['youtube-nocookie.com', 'www.youtube-nocookie.com', 'anchor.fm'].includes(hostname)) {
-                    const attributes = merge({}, ...attrs.map(({ name, value }) => ({ [name]: value })));
-                    return (
-                      <iframe
-                        {...pick(attributes, ['width', 'height', 'frameborder', 'allowfullscreen'])}
-                        title={attributes.title || 'Embed content'}
-                        src={src}
-                      />
-                    );
-                  }
-                } else if (node.tagName === 'a') {
-                  // Open links in new tab
-                  node.setAttribute('target', '_blank');
-                  node.setAttribute('rel', 'noopener noreferrer');
-                }
-              }}
-            />
-          </div>
-          <div className="col-span-3">{account.tiers && <Tiers account={account} />}</div>
-        </div>
-      </div>
       <ThemeColor color={fundraiser.primaryColor} />
     </React.Fragment>
   );

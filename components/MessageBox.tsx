@@ -7,6 +7,7 @@ import { themeGet } from '@styled-system/theme-get';
 import styled from 'styled-components';
 import type {
   BordersProps,
+  ColorProps,
   DisplayProps,
   FlexboxProps,
   LayoutProps,
@@ -30,9 +31,11 @@ type MessageProps = BordersProps &
   LayoutProps &
   SpaceProps &
   TypographyProps &
+  ColorProps &
   FlexboxProps &
   WhiteSpaceProps & {
     type: MessageType;
+    color?: any; // ColorProps has a type inconsistency
   };
 
 type MessageBoxProps = MessageProps & {

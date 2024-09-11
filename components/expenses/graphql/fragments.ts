@@ -112,12 +112,14 @@ export const accountingCategoryFields = gql`
     friendlyName
     code
     expensesTypes
+    appliesTo
   }
 `;
 
 export const expenseHostFields = gql`
   fragment ExpenseHostFields on Host {
     id
+    legacyId
     name
     legalName
     slug
@@ -203,6 +205,7 @@ export const expensePageExpenseFieldsFragment = gql`
     status
     onHold
     privateMessage
+    reference
     tags
     amount
     accountingCategory {
@@ -353,16 +356,7 @@ export const expensePageExpenseFieldsFragment = gql`
     }
     host {
       id
-      name
-      legalName
-      slug
-      type
-      website
-      location {
-        id
-        address
-        country
-      }
+      ...ExpenseHostFields
     }
     requestedByAccount {
       id
@@ -508,6 +502,7 @@ export const expensePageExpenseFieldsFragment = gql`
       canHold
       canRelease
       canDownloadTaxForm
+      canSeePayoutMethodPrivateDetails
       approve {
         allowed
         reason
@@ -629,6 +624,7 @@ export const expensesListFieldsFragment = gql`
     id
     legacyId
     description
+    reference
     status
     createdAt
     tags

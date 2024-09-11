@@ -30,7 +30,6 @@ export function ExpenseWarnings(props: ExpenseWarningsProps) {
           values={{
             amount: (
               <FormattedMoneyAmount
-                currencyCodeStyles={{ fontWeight: 'bold' }}
                 amount={props.form.options.account.stats.balance.valueInCents}
                 currency={props.form.options.account.stats.balance.currency}
               />

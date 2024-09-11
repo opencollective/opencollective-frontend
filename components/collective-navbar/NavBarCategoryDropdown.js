@@ -64,7 +64,7 @@ const CategoryContainer = styled(Container).attrs({ px: [1, 3, 0] })`
   }
 
   ${props =>
-    props.isSelected &&
+    props.$isSelected &&
     css`
       @media (min-width: 64em) {
         &::after {
@@ -187,7 +187,7 @@ const NavBarCategoryDropdown = ({ useAnchor, collective, category, isSelected, l
       <NavBarScrollContainer category={category} useAnchor={useAnchor}>
         <CategoryContainer
           mr={[0, null, 3]}
-          isSelected={isSelected}
+          $isSelected={isSelected}
           {...getLinkProps(useAnchor, collective, category)}
           onClick={e => {
             // Remove focus to make sure dropdown gets closed

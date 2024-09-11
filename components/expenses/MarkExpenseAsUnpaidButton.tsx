@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
@@ -146,10 +145,6 @@ const MarkExpenseAsUnpaidButton = ({ expense, ...props }: MarkExpenseAsUnpaidBut
       </ConfirmationModal>
     </React.Fragment>
   );
-};
-
-MarkExpenseAsUnpaidButton.propTypes = {
-  onConfirm: PropTypes.func.isRequired,
 };
 
 export default MarkExpenseAsUnpaidButton;

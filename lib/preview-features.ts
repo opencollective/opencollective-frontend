@@ -8,6 +8,8 @@ export enum PREVIEW_FEATURE_KEYS {
   HOST_REPORTS = 'HOST_REPORTS',
   CROWDFUNDING_REDESIGN = 'CROWDFUNDING_REDESIGN',
   TRANSACTIONS_IMPORTS = 'TRANSACTIONS_IMPORTS',
+  AUTHENTICATED_SSR = 'AUTHENTICATED_SSR',
+  VERCEL_BACKEND = 'VERCEL_BACKEND',
 }
 
 export type PreviewFeature = {
@@ -20,6 +22,8 @@ export type PreviewFeature = {
   env?: Array<'development' | 'test' | 'e2e' | 'staging' | 'production'>; // If set, the feature will be available only in the specified environments.
   alwaysEnableInDev?: boolean; // If true, the feature will be enabled by default in development.
   dependsOn?: PREVIEW_FEATURE_KEYS;
+  setIsEnabled?: (enable: boolean) => void;
+  isEnabled?: () => boolean;
 };
 
 /**
@@ -70,5 +74,39 @@ export const previewFeatures: PreviewFeature[] = [
     title: 'Transactions Imports',
     description: 'A new tool to import batches of transactions.',
     publicBeta: true,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.AUTHENTICATED_SSR,
+    title: 'Authenticated SSR',
+    description: 'Uses cookie based authentication to generate initial page loads on the server',
+    closedBetaAccessFor: ['opencollective', 'design', 'engineering'],
+    publicBeta: false,
+    isEnabled() {
+      return document.cookie.indexOf('enableAuthSsr') !== -1;
+    },
+    setIsEnabled(enabled) {
+      if (!enabled) {
+        document.cookie = 'enableAuthSsr=; Path=/; Max-Age=0';
+      } else {
+        document.cookie = 'enableAuthSsr=1; Path=/; Max-Age=9999999';
+      }
+    },
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.VERCEL_BACKEND,
+    title: 'Vercel Backend',
+    description: 'Uses Vercel as the frontend backend provider',
+    closedBetaAccessFor: ['opencollective', 'design', 'engineering'],
+    publicBeta: false,
+    isEnabled() {
+      return document.cookie.indexOf('backend=vercel') !== -1;
+    },
+    setIsEnabled(enabled) {
+      if (!enabled) {
+        document.cookie = 'backend=; Path=/; Max-Age=0';
+      } else {
+        document.cookie = 'backend=vercel; Path=/; Max-Age=9999999';
+      }
+    },
   },
 ];

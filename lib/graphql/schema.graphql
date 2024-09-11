@@ -32,11 +32,6 @@ interface CollectiveInterface {
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON!
-
-  """
-  Defines if a collective is pledged
-  """
-  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -429,6 +424,7 @@ This represents an Tier
 """
 type Tier {
   id: Int
+  idV2: String!
   slug: String
   type: String
   name: String
@@ -1079,7 +1075,6 @@ type CollectiveFeatures {
   CONTACT_COLLECTIVE: CollectiveFeatureStatus
   CONTACT_FORM: CollectiveFeatureStatus
   CREATE_COLLECTIVE: CollectiveFeatureStatus
-  CROSS_CURRENCY_MANUAL_TRANSACTIONS: CollectiveFeatureStatus
   TRANSFERWISE: CollectiveFeatureStatus
   PAYPAL_PAYOUTS: CollectiveFeatureStatus
   PAYPAL_DONATIONS: CollectiveFeatureStatus
@@ -1146,6 +1141,7 @@ type Policies {
   MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL: MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL
   EXPENSE_CATEGORIZATION: EXPENSE_CATEGORIZATION
   EXPENSE_PUBLIC_VENDORS: Boolean
+  COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS: Boolean
 }
 
 type EXPENSE_AUTHOR_CANNOT_APPROVE {
@@ -2145,11 +2141,6 @@ type Collective implements CollectiveInterface {
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON!
-
-  """
-  Defines if a collective is pledged
-  """
-  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -2419,11 +2410,6 @@ type Event implements CollectiveInterface {
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON!
-
-  """
-  Defines if a collective is pledged
-  """
-  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -2693,11 +2679,6 @@ type Fund implements CollectiveInterface {
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON!
-
-  """
-  Defines if a collective is pledged
-  """
-  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -2967,11 +2948,6 @@ type Organization implements CollectiveInterface {
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON!
-
-  """
-  Defines if a collective is pledged
-  """
-  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -3241,11 +3217,6 @@ type Project implements CollectiveInterface {
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON!
-
-  """
-  Defines if a collective is pledged
-  """
-  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -3810,11 +3781,6 @@ type User implements CollectiveInterface {
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON!
-
-  """
-  Defines if a collective is pledged
-  """
-  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -4086,11 +4052,6 @@ type Vendor implements CollectiveInterface {
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON!
-
-  """
-  Defines if a collective is pledged
-  """
-  isPledged: Boolean @deprecated(reason: "2023-11-20: Pledged collectives do not exist anymore")
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -4595,45 +4556,25 @@ type Mutation {
     """
     email: String!
   ): UserDetails
-
-  """
-  Confirm the new user email from confirmation token
-  """
-  confirmUserEmail(
-    """
-    User's emailConfirmationToken
-    """
-    token: String!
-  ): UserDetails
   editConnectedAccount(connectedAccount: ConnectedAccountInputType!): ConnectedAccountType
-
-  """
-  Update a single tier
-  """
-  editTier(
-    """
-    The tier to update
-    """
-    tier: TierInputType!
-  ): Tier
-  editTiers(id: Int!, tiers: [TierInputType]): [Tier]
 
   """
   Updates all the core contributors (role = ADMIN or MEMBER) for this collective.
   """
   editCoreContributors(collectiveId: Int!, members: [MemberInputType!]!): CollectiveInterface
-    @deprecated(reason: "2021-07-02: Please use inviteMember, editMember or removeMember mutations from GQLV2")
+    @deprecated(reason: "2021-07-02: Please use inviteMember, editMember or removeMember mutations from GraphQLV2")
 
   """
   A mutation to edit the public message of all matching members.
   """
   editPublicMessage(FromCollectiveId: Int!, CollectiveId: Int!, message: String): [Member]
-    @deprecated(reason: "2021-01-27: Please use editPublicMessage from GQLV2")
+    @deprecated(reason: "2021-01-27: Please use editPublicMessage from GraphQLV2")
 
   """
   Update a payment method
   """
   updatePaymentMethod(id: Int!, name: String, monthlyLimitPerMember: Int): PaymentMethodType
+    @deprecated(reason: "2024-07-16: Please use updateOrder from GraphQLV2")
 
   """
   Replace a payment method
@@ -4820,7 +4761,6 @@ input CollectiveInputType {
   image: String
   backgroundImage: String
   tags: [String]
-  tiers: [TierInputType]
   settings: JSON
   data: JSON @deprecated(reason: "2020-10-08: data cannot be edited. This field will be ignored.")
 
@@ -4878,90 +4818,6 @@ input LocationInputType {
   Structured JSON address
   """
   structured: JSON
-}
-
-"""
-Input type for TierType
-"""
-input TierInputType {
-  id: Int
-  type: String
-  name: String
-  description: String
-
-  """
-  A long, html-formatted description.
-  """
-  longDescription: String
-
-  """
-  Whether this tier has a standalone page
-  """
-  useStandalonePage: Boolean
-
-  """
-  Link to a video (YouTube, Vimeo).
-  """
-  videoUrl: String
-
-  """
-  amount in the lowest unit of the currency of the host (ie. in cents)
-  """
-  amount: Int
-
-  """
-  Button text
-  """
-  button: String
-  currency: String
-  presets: [Int]
-  interval: String
-  maxQuantity: Int
-  minimumAmount: Int
-  amountType: String
-
-  """
-  amount that you are trying to raise with this tier
-  """
-  goal: Int
-  customFields: [CustomFieldsInputType]
-
-  """
-  Start of the campaign
-  """
-  startsAt: String
-
-  """
-  End of the campaign
-  """
-  endsAt: String
-
-  """
-  Invoice receipt template
-  """
-  invoiceTemplate: String
-}
-
-"""
-Input for custom fields for order
-"""
-input CustomFieldsInputType {
-  type: CustomFieldType
-  name: String
-  label: String
-  required: Boolean
-}
-
-"""
-Type of custom field
-"""
-enum CustomFieldType {
-  number
-  text
-  email
-  date
-  radio
-  url
 }
 
 """

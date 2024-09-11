@@ -19,6 +19,14 @@ export function truncate(str, length) {
   return `${subString.substr(0, subString.lastIndexOf(' '))} …`;
 }
 
+export function truncateMiddle(str, length, divider = '…') {
+  if (str.length <= length) {
+    return str;
+  }
+  const splitLength = Math.floor(length / 2);
+  return `${str.slice(0, splitLength - 1)}${divider}${str.slice(-splitLength)}`;
+}
+
 export const isValidUrl = url => {
   try {
     new URL(url);

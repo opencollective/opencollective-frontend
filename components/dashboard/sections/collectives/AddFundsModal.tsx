@@ -3,7 +3,7 @@ import { useMutation, useQuery } from '@apollo/client';
 import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Form, Formik } from 'formik';
-import { get, groupBy, isEmpty, map } from 'lodash';
+import { compact, get, groupBy, isEmpty, map } from 'lodash';
 import { ArrowLeft } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -30,7 +30,7 @@ import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 import AccountingCategorySelect from '../../../AccountingCategorySelect';
 import { collectivePageQuery, getCollectivePageQueryVariables } from '../../../collective-page/graphql/queries';
 import { getBudgetSectionQuery, getBudgetSectionQueryVariables } from '../../../collective-page/sections/Budget';
-import { DefaultCollectiveLabel } from '../../../CollectivePicker';
+import CollectivePicker, { DefaultCollectiveLabel } from '../../../CollectivePicker';
 import CollectivePickerAsync from '../../../CollectivePickerAsync';
 import Container from '../../../Container';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
@@ -91,6 +91,61 @@ const AmountDetailsLine = ({
   </Flex>
 );
 
+const addFundsOrderFieldsFragment = gql`
+  fragment AddFundsOrderFields on Order {
+    id
+    description
+    memo
+    processedAt
+    hostFeePercent
+    totalAmount {
+      valueInCents
+    }
+    paymentProcessorFee {
+      valueInCents
+    }
+    taxAmount {
+      valueInCents
+    }
+    transactions {
+      id
+      type
+      kind
+      amount {
+        valueInCents
+      }
+    }
+    fromAccount {
+      id
+      slug
+      name
+    }
+    toAccount {
+      id
+      slug
+      name
+      stats {
+        id
+        balance {
+          valueInCents
+        }
+      }
+    }
+    accountingCategory {
+      id
+      code
+      name
+      kind
+    }
+    tier {
+      id
+      legacyId
+      slug
+      name
+    }
+  }
+`;
+
 const addFundsMutation = gql`
   mutation AddFunds(
     $fromAccount: AccountReferenceInput!
@@ -123,55 +178,48 @@ const addFundsMutation = gql`
       transactionsImportRow: $transactionsImportRow
     ) {
       id
-      description
-      memo
-      processedAt
-      hostFeePercent
-      taxAmount {
-        valueInCents
-      }
-      taxes {
-        type
-        percentage
-      }
-      transactions {
-        id
-        type
-        kind
-        amount {
-          valueInCents
-        }
-      }
-      fromAccount {
-        id
-        slug
-        name
-      }
-      toAccount {
-        id
-        slug
-        name
-        stats {
-          id
-          balance {
-            valueInCents
-          }
-        }
-      }
-      accountingCategory {
-        id
-        code
-        name
-        kind
-      }
-      tier {
-        id
-        legacyId
-        slug
-        name
-      }
+      ...AddFundsOrderFields
     }
   }
+  ${addFundsOrderFieldsFragment}
+`;
+
+const editAddedFundsMutation = gql`
+  mutation EditAddedFunds(
+    $order: OrderReferenceInput!
+    $fromAccount: AccountReferenceInput!
+    $account: AccountReferenceInput!
+    $tier: TierReferenceInput
+    $amount: AmountInput!
+    $paymentProcessorFee: AmountInput
+    $description: String!
+    $memo: String
+    $processedAt: DateTime
+    $hostFeePercent: Float!
+    $invoiceTemplate: String
+    $tax: TaxInput
+    $accountingCategory: AccountingCategoryReferenceInput
+  ) {
+    editAddedFunds(
+      order: $order
+      account: $account
+      fromAccount: $fromAccount
+      amount: $amount
+      paymentProcessorFee: $paymentProcessorFee
+      description: $description
+      memo: $memo
+      processedAt: $processedAt
+      hostFeePercent: $hostFeePercent
+      tier: $tier
+      invoiceTemplate: $invoiceTemplate
+      tax: $tax
+      accountingCategory: $accountingCategory
+    ) {
+      id
+      ...AddFundsOrderFields
+    }
+  }
+  ${addFundsOrderFieldsFragment}
 `;
 
 const addFundsTierFieldsFragment = gql`
@@ -216,6 +264,7 @@ const addFundsAccountQueryHostFieldsFragment = gql`
         code
         name
         kind
+        appliesTo
       }
     }
   }
@@ -246,6 +295,19 @@ const addFundsAccountQuery = gql`
       ... on AccountWithParent {
         parent {
           id
+          slug
+          name
+          imageUrl
+          type
+        }
+      }
+      childrenAccounts {
+        nodes {
+          id
+          slug
+          name
+          imageUrl
+          type
         }
       }
       ... on Host {
@@ -382,6 +444,7 @@ const AddFundsModalContentWithCollective = ({
   onSelectOtherAccount,
   initialValues,
   onSuccess,
+  editOrderId,
 }: {
   collective: Account & AccountWithHost;
   fundDetails: FundDetails;
@@ -390,6 +453,7 @@ const AddFundsModalContentWithCollective = ({
   onSelectOtherAccount?: () => void;
   initialValues?: Partial<AddFundsFormValues>;
   onSuccess?: (order: Order) => void;
+  editOrderId?: string;
 }) => {
   const intl = useIntl();
   const { data, loading } = useQuery(addFundsAccountQuery, {
@@ -400,19 +464,23 @@ const AddFundsModalContentWithCollective = ({
   const currency = account?.currency;
   const host = account?.isHost && !account.host ? account : account?.host;
   const applicableTax = getApplicableTaxType(collective, host);
+  const isEdit = Boolean(editOrderId);
 
-  const [submitAddFunds, { error: fundError, loading: isLoading }] = useMutation(addFundsMutation, {
-    context: API_V2_CONTEXT,
-    refetchQueries: [
-      {
-        context: API_V2_CONTEXT,
-        query: getBudgetSectionQuery(true, false),
-        variables: getBudgetSectionQueryVariables(collective.slug, false),
-      },
-      { query: collectivePageQuery, variables: getCollectivePageQueryVariables(collective.slug) },
-    ],
-    awaitRefetchQueries: true,
-  });
+  const [submitAddFunds, { error: fundError, loading: isLoading }] = useMutation(
+    isEdit ? editAddedFundsMutation : addFundsMutation,
+    {
+      context: API_V2_CONTEXT,
+      refetchQueries: [
+        {
+          context: API_V2_CONTEXT,
+          query: getBudgetSectionQuery(true, false),
+          variables: getBudgetSectionQueryVariables(collective.slug, false),
+        },
+        { query: collectivePageQuery, variables: getCollectivePageQueryVariables(collective.slug) },
+      ],
+      awaitRefetchQueries: true,
+    },
+  );
 
   const tiersNodes = get(data, 'account.tiers.nodes');
   const tiersOptions = React.useMemo(() => getTiersOptions(intl, tiersNodes), [intl, tiersNodes]);
@@ -434,6 +502,11 @@ const AddFundsModalContentWithCollective = ({
       })),
     };
   });
+
+  const targetOptions = React.useMemo(
+    () => compact([collective, account?.parent, ...(account?.childrenAccounts?.nodes || [])]),
+    [account, collective],
+  );
 
   const receiptTemplateTitles = [];
   if (receiptTemplates?.default?.title?.length > 0) {
@@ -473,38 +546,45 @@ const AddFundsModalContentWithCollective = ({
               processedAt: values.processedAt ? new Date(values.processedAt) : null,
               tax: values.tax,
               accountingCategory: values.accountingCategory ? { id: values.accountingCategory.id } : null,
+              ...(isEdit && { order: { id: editOrderId } }),
             },
           });
 
-          const resultOrder = result.data.addFunds;
-          setFundDetails({
-            showSuccessModal: true,
-            fundAmount: values.amount,
-            taxAmount: resultOrder.taxAmount,
-            hostFeePercent: resultOrder.hostFeePercent,
-            paymentProcessorFee: resultOrder.transactions.find(
-              t => t.kind === 'PAYMENT_PROCESSOR_FEE' && t.type === 'DEBIT',
-            )?.amount,
-            taxes: resultOrder.taxes,
-            description: resultOrder.description,
-            memo: resultOrder.memo,
-            processedAt: resultOrder.processedAt,
-            source: resultOrder.fromAccount,
-            tier: resultOrder.tier,
-          });
-          /*
-           * Since `enableReinitialize` is used in this form, during the second step (platform tip step)
-           * the form values will be reset. The validate function in this form
-           * requires `amount`, `fromAccount` and `description` so we should
-           * set them as otherwise the form will not be submittable.
-           */
-          formik.setValues({
-            amount: values.amount,
-            fromAccount: resultOrder.fromAccount,
-            description: resultOrder.description,
-            processedAt: resultOrder.processedAt,
-          });
+          const resultOrder = result.data.addFunds || result.data.editAddedFunds;
+
+          if (!isEdit) {
+            setFundDetails({
+              showSuccessModal: true,
+              fundAmount: values.amount,
+              taxAmount: resultOrder.taxAmount,
+              hostFeePercent: resultOrder.hostFeePercent,
+              paymentProcessorFee: resultOrder.transactions.find(
+                t => t.kind === 'PAYMENT_PROCESSOR_FEE' && t.type === 'DEBIT',
+              )?.amount,
+              taxes: resultOrder.taxes,
+              description: resultOrder.description,
+              memo: resultOrder.memo,
+              processedAt: resultOrder.processedAt,
+              source: resultOrder.fromAccount,
+              tier: resultOrder.tier,
+            });
+            /*
+             * Since `enableReinitialize` is used in this form, during the second step (platform tip step)
+             * the form values will be reset. The validate function in this form
+             * requires `amount`, `fromAccount` and `description` so we should
+             * set them as otherwise the form will not be submittable.
+             */
+            formik.setValues({
+              amount: values.amount,
+              fromAccount: resultOrder.fromAccount,
+              description: resultOrder.description,
+              processedAt: resultOrder.processedAt,
+            });
+          }
           onSuccess?.(resultOrder);
+          if (isEdit) {
+            handleClose();
+          }
         } else {
           handleClose();
         }
@@ -535,11 +615,20 @@ const AddFundsModalContentWithCollective = ({
                   </Button>
                 </div>
               )}
+              <Field
+                name="description"
+                htmlFor="addFunds-description"
+                label={<FormattedMessage id="Fields.description" defaultMessage="Description" />}
+                mt={3}
+              >
+                {({ field }) => <StyledInput data-cy="add-funds-description" {...field} />}
+              </Field>
               <div className="w-full flex-grow overflow-y-auto pb-4">
                 <Field
                   name="fromAccount"
                   htmlFor="addFunds-fromAccount"
                   label={<FormattedMessage id="AddFundsModal.source" defaultMessage="Source" />}
+                  mt={3}
                 >
                   {({ form, field }) => (
                     <CollectivePickerAsync
@@ -550,6 +639,7 @@ const AddFundsModalContentWithCollective = ({
                       onBlur={() => form.setFieldTouched(field.name, true)}
                       customOptions={defaultSourcesOptions}
                       onChange={({ value }) => form.setFieldValue(field.name, value)}
+                      collective={values.fromAccount}
                       menuPortalTarget={null}
                       includeVendorsForHostId={host?.legacyId || undefined}
                       creatable={['USER', 'VENDOR']}
@@ -558,10 +648,31 @@ const AddFundsModalContentWithCollective = ({
                   )}
                 </Field>
                 <Field
+                  name="account"
+                  htmlFor="addFunds-account"
+                  label={<FormattedMessage defaultMessage="Recipient" id="8Rkoyb" />}
+                  mt={3}
+                >
+                  {({ form, field }) => (
+                    <CollectivePicker
+                      inputId={field.id}
+                      data-cy="add-funds-recipient"
+                      error={field.error}
+                      onBlur={() => form.setFieldTouched(field.name, true)}
+                      onChange={({ value }) => form.setFieldValue(field.name, value)}
+                      collective={values.account}
+                      collectives={targetOptions}
+                      menuPortalTarget={null}
+                      disabled={targetOptions.length === 1}
+                    />
+                  )}
+                </Field>
+                <Field
                   name="tier"
                   htmlFor="addFunds-tier"
                   label={<FormattedMessage defaultMessage="Tier" id="b07w+D" />}
                   mt={3}
+                  required={false}
                 >
                   {({ form, field }) => (
                     <StyledSelect
@@ -578,14 +689,6 @@ const AddFundsModalContentWithCollective = ({
                       )}
                     />
                   )}
-                </Field>
-                <Field
-                  name="description"
-                  htmlFor="addFunds-description"
-                  label={<FormattedMessage id="Fields.description" defaultMessage="Description" />}
-                  mt={3}
-                >
-                  {({ field }) => <StyledInput data-cy="add-funds-description" {...field} />}
                 </Field>
                 <Field
                   name="processedAt"
@@ -638,12 +741,7 @@ const AddFundsModalContentWithCollective = ({
                 <Field
                   name="memo"
                   htmlFor="addFunds-memo"
-                  hint={
-                    <FormattedMessage
-                      defaultMessage="This is a private note that will only be visible to the host."
-                      id="znqf9S"
-                    />
-                  }
+                  isPrivate
                   label={<FormattedMessage defaultMessage="Memo" id="D5NqQO" />}
                   required={false}
                   mt={3}
@@ -828,11 +926,18 @@ const AddFundsModalContentWithCollective = ({
                   isLargeAmount
                 />
                 <P fontSize="12px" lineHeight="18px" color="black.700" mt={2}>
-                  <FormattedMessage
-                    id="AddFundsModal.disclaimer"
-                    defaultMessage="By clicking add funds, you agree to set aside {amount} in your bank account on behalf of this collective."
-                    values={{ amount: formatCurrency(values.amount, currency, { locale: intl.locale }) }}
-                  />
+                  {isEdit ? (
+                    <FormattedMessage
+                      id="AddFundsModal.editDisclaimer"
+                      defaultMessage="By clicking edit funds, you're refunding the previous added funds transactions (including any fees ocurred by it) and creating new ones."
+                    />
+                  ) : (
+                    <FormattedMessage
+                      id="AddFundsModal.disclaimer"
+                      defaultMessage="By clicking add funds, you agree to set aside {amount} in your bank account on behalf of this collective."
+                      values={{ amount: formatCurrency(values.amount, currency, { locale: intl.locale }) }}
+                    />
+                  )}
                 </P>
                 {fundError && <MessageBoxGraphqlError error={fundError} mt={3} fontSize="13px" />}
               </div>
@@ -841,7 +946,11 @@ const AddFundsModalContentWithCollective = ({
                   <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
                 </Button>
                 <Button data-cy="add-funds-submit-btn" type="submit" loading={loading}>
-                  <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
+                  {isEdit ? (
+                    <FormattedMessage id="menu.editFunds" defaultMessage="Edit Funds" />
+                  ) : (
+                    <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
+                  )}{' '}
                 </Button>
               </div>
             </Form>
@@ -1023,7 +1132,7 @@ const AddFundsModal = ({
       onClose={handleClose}
       $showSuccessModal={fundDetails.showSuccessModal}
     >
-      {selectedCollective ? (
+      {selectedCollective && !props.editOrderId ? (
         <CollectiveModalHeader
           className="mb-4"
           onClose={handleClose}
@@ -1038,7 +1147,11 @@ const AddFundsModal = ({
         />
       ) : (
         <ModalHeader onClose={handleClose} mb={3}>
-          <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
+          {props.editOrderId ? (
+            <FormattedMessage id="menu.editFunds" defaultMessage="Edit Funds" />
+          ) : (
+            <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
+          )}
         </ModalHeader>
       )}
 

@@ -77,7 +77,7 @@ const ItemTitleWrapper = ({ expense, order, children }) => {
       >
         <StyledLink
           as={Link}
-          underlineOnHover
+          $underlineOnHover
           href={`${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`}
         >
           {children}
@@ -92,7 +92,7 @@ const ItemTitleWrapper = ({ expense, order, children }) => {
       >
         <StyledLink
           as={Link}
-          underlineOnHover
+          $underlineOnHover
           href={`${getCollectivePageRoute(order.toAccount)}/contributions/${order.legacyId}`}
         >
           {children}
@@ -230,7 +230,11 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
                 lineHeight={['20px', null, null, '24px']}
               >
                 <ItemTitleWrapper expense={expense} order={order}>
-                  <Span title={description} color={description ? 'black.900' : 'black.600'}>
+                  <Span
+                    fontSize={['14px', null, null, '16px']}
+                    title={description}
+                    color={description ? 'black.900' : 'black.600'}
+                  >
                     {description ? (
                       truncate(description, { length: 60 })
                     ) : (
@@ -309,12 +313,12 @@ const TransactionItem = ({ displayActions, collective, transaction, onMutationSu
               ml="auto"
             >
               <TransactionSign isCredit={isCredit} />
-              <Span fontWeight="bold" color="black.900" mr={1}>
+              <Span fontWeight="bold" color="black.900" mr={1} fontSize="16px">
                 {formatCurrency(Math.abs(displayedAmount.valueInCents), displayedAmount.currency, {
                   locale: intl.locale,
                 })}
               </Span>
-              <Span color="black.700" textTransform="uppercase">
+              <Span color="black.700" textTransform="uppercase" fontSize="16px">
                 {displayedAmount.currency}
               </Span>
             </Container>

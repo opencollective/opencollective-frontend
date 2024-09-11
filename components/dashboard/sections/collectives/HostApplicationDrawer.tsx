@@ -1,36 +1,39 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { get, isEmpty } from 'lodash';
-import { AlertTriangle, ExternalLink, LinkIcon, Mail, MessageSquare, ShieldCheck } from 'lucide-react';
+import { AlertTriangle, ExternalLink, LinkIcon, ShieldCheck } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type {
-  Account,
-  Host,
-  HostApplication as GraphQLHostApplication,
-  MemberCollection,
+  HostApplicationThreadQuery,
+  HostApplicationThreadQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
 import { HostApplicationStatus, ProcessHostApplicationAction } from '../../../../lib/graphql/types/v2/graphql';
+import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import { i18nCustomApplicationFormLabel } from '../../../../lib/i18n/custom-application-form';
 
+import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
+import { commentFieldsFragment } from '../../../conversations/graphql';
+import Thread from '../../../conversations/Thread';
+import DateTime from '../../../DateTime';
 import { Drawer, DrawerActions, DrawerHeader } from '../../../Drawer';
-import { Flex } from '../../../Grid';
 import Link from '../../../Link';
 import LinkCollective from '../../../LinkCollective';
+import LoadingPlaceholder from '../../../LoadingPlaceholder';
+import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import StyledLink from '../../../StyledLink';
-import StyledRoundButton from '../../../StyledRoundButton';
 import StyledTag from '../../../StyledTag';
 import StyledTooltip from '../../../StyledTooltip';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../../../ui/Accordion';
 import { InfoList, InfoListItem } from '../../../ui/InfoList';
 import { type Toast, useToast } from '../../../ui/useToast';
 
 import AcceptRejectButtons from './AcceptRejectButtons';
-import ApplicationMessageModal from './ApplicationMessageModal';
-import { hostApplicationsMetadataQuery, hostApplicationsQuery, processApplicationMutation } from './queries';
+import { HostApplicationFields, processApplicationMutation } from './queries';
 import ValidatedRepositoryInfo from './ValidatedRepositoryInfo';
 
 const msg = defineMessages({
@@ -125,48 +128,106 @@ const getSuccessToast = (intl, action, collective, result): Toast => {
 };
 
 function HostApplication({
-  host,
-  application,
+  open,
+  applicationId,
   onClose,
+  editCollectiveMutation,
 }: {
+  open: boolean;
   onClose: () => void;
-  application: GraphQLHostApplication;
-  host: Host;
+  applicationId: string;
+  editCollectiveMutation?: (collective: { id: number; HostCollectiveId?: number }) => Promise<void>;
 }) {
+  const { LoggedInUser } = useLoggedInUser();
+
   const intl = useIntl();
-  const [status, setStatus] = React.useState(application?.status);
-  const [showContactModal, setShowContactModal] = React.useState(false);
   const { toast } = useToast();
-  const account = application.account as Account & {
-    admins: MemberCollection;
-  };
-  const [callProcessApplication, { loading }] = useMutation(processApplicationMutation, {
+
+  const [callProcessApplication, { loading: loadingMutation }] = useMutation(processApplicationMutation, {
     context: API_V2_CONTEXT,
-    refetchQueries: [hostApplicationsQuery, hostApplicationsMetadataQuery],
   });
-  const hasNothingToShow = !application.message && !application.customData;
+
+  const [threadItems, setThreadItems] = React.useState<
+    HostApplicationThreadQuery['hostApplication']['threadComments']['nodes']
+  >([]);
+  const [threadOffset, setThreadOffset] = React.useState(0);
+
+  const onDataComplete = React.useCallback(
+    (data: HostApplicationThreadQuery, existingThreadItems = threadItems) => {
+      const existingPrevPageData = existingThreadItems.slice(0, data.hostApplication.threadComments.offset);
+      const replaced = existingThreadItems.slice(
+        data.hostApplication.threadComments.offset,
+        data.hostApplication.threadComments.offset + data.hostApplication.threadComments.nodes.length,
+      );
+      const existingNextPageData = existingThreadItems.slice(
+        data.hostApplication.threadComments.offset + replaced.length,
+      );
+
+      const newData = [...existingPrevPageData, ...data.hostApplication.threadComments.nodes, ...existingNextPageData];
+      setThreadItems(newData);
+    },
+    [threadItems],
+  );
+  const applicationQuery = useQuery<HostApplicationThreadQuery, HostApplicationThreadQueryVariables>(
+    gql`
+      query HostApplicationThread($hostApplication: HostApplicationReferenceInput!, $offset: Int!, $limit: Int!) {
+        hostApplication(hostApplication: $hostApplication) {
+          ...HostApplicationFields
+          threadComments: comments(limit: $limit, offset: $offset, orderBy: { field: CREATED_AT, direction: DESC }) {
+            totalCount
+            offset
+            limit
+            nodes {
+              ...CommentFields
+            }
+          }
+        }
+      }
+
+      ${commentFieldsFragment}
+      ${HostApplicationFields}
+    `,
+    {
+      context: API_V2_CONTEXT,
+      fetchPolicy: 'network-only',
+      variables: {
+        hostApplication: {
+          id: applicationId,
+        },
+        offset: threadOffset,
+        limit: 100,
+      },
+      skip: !open || !applicationId,
+      onCompleted: onDataComplete,
+    },
+  );
+
+  const error = applicationQuery.error;
+  const loading = applicationQuery.loading || loadingMutation;
+  const application = applicationQuery.data?.hostApplication;
+  const account = application?.account;
+  const host = application?.host;
+
+  const isHostAdmin = LoggedInUser.isAdminOfCollective(host);
 
   const requiresMinimumNumberOfAdmins = host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins > 1;
 
   const hasEnoughAdmins =
     requiresMinimumNumberOfAdmins &&
-    account.admins.totalCount >= host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins;
+    account?.admins?.totalCount >= host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins;
   const hasEnoughInvitedAdmins =
     requiresMinimumNumberOfAdmins &&
-    account.admins.totalCount + application.account.memberInvitations.length >=
-      host.policies.COLLECTIVE_MINIMUM_ADMINS.numberOfAdmins;
+    account?.admins?.totalCount + account?.memberInvitations?.length >=
+      host?.policies?.COLLECTIVE_MINIMUM_ADMINS?.numberOfAdmins;
+
+  const totalThreadItems = application?.threadComments?.totalCount ?? 0;
 
   const processApplication = async (action: ProcessHostApplicationAction, message?: string, onSuccess?: () => void) => {
     try {
-      const variables = { host: { id: host.id }, account: { id: account.id }, action, message };
+      const variables = { hostApplication: { id: application.id }, action, message };
       const result = await callProcessApplication({ variables });
       toast(getSuccessToast(intl, action, account, result));
 
-      if (action === ACTIONS.APPROVE) {
-        setStatus(HostApplicationStatus.APPROVED);
-      } else if (action === ACTIONS.REJECT) {
-        setStatus(HostApplicationStatus.REJECTED);
-      }
       if (onSuccess) {
         onSuccess();
       }
@@ -196,165 +257,260 @@ function HostApplication({
     }
   };
 
+  const onFetchMore = React.useCallback(() => {
+    setThreadOffset(threadItems.length);
+  }, [threadItems]);
+
+  const onCommentDeleted = React.useCallback(
+    async comment => {
+      const commentIdx = threadItems.findIndex(i => i.id === comment.id);
+      setThreadItems([...threadItems].filter(ti => ti.id !== comment.id));
+      const { data } = await applicationQuery.refetch({ offset: commentIdx });
+      onDataComplete(
+        data,
+        [...threadItems].filter(ti => ti.id !== comment.id),
+      );
+    },
+    [threadItems, applicationQuery, onDataComplete],
+  );
+
   return (
-    <React.Fragment>
+    <Drawer
+      open={open}
+      onClose={onClose}
+      showActionsContainer={application?.status === HostApplicationStatus.PENDING}
+      className="max-w-2xl"
+      data-cy="host-application-drawer"
+    >
       <div>
         <DrawerHeader
           onClose={onClose}
-          data-cy={`host-application-header-${account.slug}`}
+          data-cy={account ? `host-application-header-${account.slug}` : null}
           title={
             <FormattedMessage
               defaultMessage="Application <ApplicationId></ApplicationId> to <HostCollectiveName></HostCollectiveName>"
               id="pCDDhq"
               values={{
-                ApplicationId: () => (
-                  <StyledTag display="inline-block" verticalAlign="middle" mx={1} fontSize="12px">
-                    #{application.id.split('-')[0]}
-                  </StyledTag>
-                ),
-                HostCollectiveName: () => (
-                  <LinkCollective className="text-inherit hover:underline" collective={host}>
-                    {host.name}
-                  </LinkCollective>
-                ),
+                ApplicationId: () =>
+                  applicationId ? (
+                    <StyledTag display="inline-block" verticalAlign="middle" mx={1} fontSize="12px">
+                      #{applicationId.split('-')[0]}
+                    </StyledTag>
+                  ) : (
+                    <LoadingPlaceholder className="inline-block" height={20} width={60} />
+                  ),
+                HostCollectiveName: () =>
+                  host ? (
+                    <LinkCollective className="text-inherit hover:underline" collective={host}>
+                      {host.name}
+                    </LinkCollective>
+                  ) : (
+                    <LoadingPlaceholder className="inline-block" height={20} width={60} />
+                  ),
               }}
             />
           }
-          statusTag={<StatusTag status={status} />}
+          statusTag={
+            application?.status ? (
+              <StatusTag status={application.status} />
+            ) : (
+              <LoadingPlaceholder height={20} width={60} />
+            )
+          }
         />
 
-        <InfoList className="sm:grid-cols-2">
-          <InfoListItem
-            title={<FormattedMessage defaultMessage="Account" id="TwyMau" />}
-            value={
-              <LinkCollective
-                collective={application.account}
-                className="flex items-center gap-2 font-medium text-slate-700 hover:text-slate-700 hover:underline"
-                withHoverCard
-              >
-                <Avatar collective={application.account} radius={24} />
-                {application.account.name}
-              </LinkCollective>
-            }
-          />
-          <InfoListItem
-            title={<FormattedMessage id="Fields.description" defaultMessage="Description" />}
-            value={application.account.description}
-          />
-          <InfoListItem
-            className="sm:col-span-2"
-            title={
-              <div className="flex items-center gap-2">
-                <FormattedMessage id="Admins" defaultMessage="Admins" />
-                {status === HostApplicationStatus.PENDING &&
-                  requiresMinimumNumberOfAdmins &&
-                  hasEnoughInvitedAdmins &&
-                  !hasEnoughAdmins && (
-                    <StyledTooltip
-                      noArrow
-                      content={
-                        <FormattedMessage
-                          defaultMessage="This collective doesn’t satisfy the minimum admin requirements as admin invitations are still pending."
-                          id="Lg6nmh"
-                        />
-                      }
-                    >
-                      <div>
-                        <AlertTriangle size={12} className="text-red-600" />
-                      </div>
-                    </StyledTooltip>
-                  )}
-              </div>
-            }
-            value={
-              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                {account.admins.nodes.slice(0, 10).map((admin, i, a) => (
-                  <div className="flex items-center whitespace-nowrap" key={admin.id}>
+        {error ? (
+          <MessageBoxGraphqlError error={error} />
+        ) : (
+          <React.Fragment>
+            <InfoList className="sm:grid-cols-3">
+              <InfoListItem
+                className="border-none py-2"
+                title={<FormattedMessage defaultMessage="Account" id="TwyMau" />}
+                value={
+                  account ? (
                     <LinkCollective
-                      collective={admin.account}
+                      collective={account}
                       className="flex items-center gap-2 font-medium text-slate-700 hover:text-slate-700 hover:underline"
                       withHoverCard
-                      hoverCardProps={{ includeAdminMembership: { accountSlug: application.account.slug } }}
                     >
-                      <Avatar collective={admin.account} radius={24} /> {admin.account.name}
+                      <Avatar collective={account} radius={24} />
+                      {account.name}
                     </LinkCollective>
-                    {i !== a.length - 1 && <span className="text-slate-500">,</span>}
-                  </div>
-                ))}
-                {account.admins.totalCount > 10 && (
-                  <span className="text-slate-600">+ {account.admins.totalCount - 10}</span>
-                )}
-              </div>
-            }
-          />
-
-          {application.customData?.validatedRepositoryInfo && (
-            <InfoListItem
-              title={
-                <div className="flex items-center gap-1.5">
-                  <ShieldCheck size={16} className="text-slate-700" />
-                  <FormattedMessage
-                    id="PendingApplication.RepoInfo.Header"
-                    defaultMessage="Validated repository information"
-                  />
-                </div>
-              }
-              value={<ValidatedRepositoryInfo customData={application.customData} />}
-            />
-          )}
-
-          {application.customData &&
-            Object.keys(application.customData).map(key => {
-              // Don't show repository info twice as it is displayed on top in a special component
-              if (
-                key === 'validatedRepositoryInfo' ||
-                (key === 'licenseSpdxId' && application.customData.validatedRepositoryInfo) ||
-                (key === 'useGithubValidation' && application.customData.validatedRepositoryInfo) ||
-                (key === 'typeOfProject' && application.customData.validatedRepositoryInfo)
-              ) {
-                return null;
-              }
-
-              // Don't show empty fields
-              if (isEmpty(application.customData[key])) {
-                return null;
-              }
-
-              return (
+                  ) : (
+                    <LoadingPlaceholder width={60} height={20} />
+                  )
+                }
+              />
+              {application?.createdAt && (
                 <InfoListItem
-                  key={key}
-                  title={i18nCustomApplicationFormLabel(intl, key)}
-                  value={renderCustomDataContent(key)}
+                  className="border-none py-2"
+                  title={<FormattedMessage id="expense.incurredAt" defaultMessage="Date" />}
+                  value={<DateTime dateStyle="medium" value={application?.createdAt} />}
                 />
-              );
-            })}
+              )}
+              <InfoListItem
+                className="border-none py-2"
+                title={
+                  <div className="flex items-center gap-2">
+                    <FormattedMessage id="Admins" defaultMessage="Admins" />
+                    {application &&
+                      application.status === HostApplicationStatus.PENDING &&
+                      requiresMinimumNumberOfAdmins &&
+                      hasEnoughInvitedAdmins &&
+                      !hasEnoughAdmins && (
+                        <StyledTooltip
+                          noArrow
+                          content={
+                            <FormattedMessage
+                              defaultMessage="This collective doesn’t satisfy the minimum admin requirements as admin invitations are still pending."
+                              id="Lg6nmh"
+                            />
+                          }
+                        >
+                          <div>
+                            <AlertTriangle size={12} className="text-red-600" />
+                          </div>
+                        </StyledTooltip>
+                      )}
+                  </div>
+                }
+                value={
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <div className="flex items-center -space-x-1">
+                      {account?.admins?.nodes &&
+                        account.admins.nodes.slice(0, 3).map(admin => (
+                          <AccountHoverCard
+                            key={admin.id}
+                            account={admin.account}
+                            includeAdminMembership={{ accountSlug: application.account.slug }}
+                            trigger={
+                              <span>
+                                <Avatar collective={admin.account} radius={24} />
+                              </span>
+                            }
+                          />
+                        ))}
+                      {account?.admins?.totalCount > 3 && (
+                        <div className="pl-2 text-slate-600">+{account?.admins.totalCount - 3}</div>
+                      )}
+                    </div>
+                  </div>
+                }
+              />
 
-          {(application.message || hasNothingToShow) && (
-            <InfoListItem
-              className="sm:col-span-2"
-              title={
-                <div className="flex items-center gap-1.5">
-                  <MessageSquare size={16} className="text-slate-700" />
-                  <FormattedMessage id="PendingApplication.Message" defaultMessage="Message to Fiscal Host" />
-                </div>
-              }
-              value={
-                <p className="whitespace-pre-line">
-                  {application.message ?? <FormattedMessage id="NoMessage" defaultMessage="No message provided" />}
-                </p>
-              }
+              <Accordion type="single" collapsible className="mt-4 text-sm sm:col-span-3">
+                <AccordionItem value="description" className="rounded border px-4">
+                  <AccordionTrigger>
+                    <div className="font-medium leading-6 text-slate-900">
+                      <FormattedMessage id="Fields.description" defaultMessage="Description" />
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="mt-1 leading-6 text-slate-700 sm:mt-2">
+                      {account ? account.description : <LoadingPlaceholder width={60} height={20} />}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+
+              {application?.customData?.validatedRepositoryInfo && (
+                <InfoListItem
+                  title={
+                    <div className="flex items-center gap-1.5">
+                      <ShieldCheck size={16} className="text-slate-700" />
+                      <FormattedMessage
+                        id="PendingApplication.RepoInfo.Header"
+                        defaultMessage="Validated repository information"
+                      />
+                    </div>
+                  }
+                  value={<ValidatedRepositoryInfo customData={application?.customData} />}
+                />
+              )}
+
+              {application?.customData &&
+                Object.keys(application.customData).map(key => {
+                  // Don't show repository info twice as it is displayed on top in a special component
+                  if (
+                    key === 'validatedRepositoryInfo' ||
+                    (key === 'licenseSpdxId' && application.customData.validatedRepositoryInfo) ||
+                    (key === 'useGithubValidation' && application.customData.validatedRepositoryInfo) ||
+                    (key === 'typeOfProject' && application.customData.validatedRepositoryInfo)
+                  ) {
+                    return null;
+                  }
+
+                  // Don't show empty fields
+                  if (isEmpty(application.customData[key])) {
+                    return null;
+                  }
+
+                  return (
+                    <InfoListItem
+                      key={key}
+                      title={i18nCustomApplicationFormLabel(intl, key)}
+                      value={renderCustomDataContent(key)}
+                    />
+                  );
+                })}
+
+              <Accordion type="single" collapsible className="mt-4 text-sm sm:col-span-3">
+                <AccordionItem value="message" className="rounded border px-4">
+                  <AccordionTrigger>
+                    <div className="font-medium leading-6 text-slate-900">
+                      <FormattedMessage defaultMessage="Application Request" id="bFSM5Q" />
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="mt-1 leading-6 text-slate-700 sm:mt-2">
+                      {application?.message || (
+                        <p className="whitespace-pre-line">
+                          <FormattedMessage id="NoMessage" defaultMessage="No message provided" />
+                        </p>
+                      )}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </InfoList>
+
+            <div className="my-5 border-t border-slate-100" />
+            <div className="mb-5 text-sm leading-3 text-[#344256]">
+              <span className="font-bold">
+                <FormattedMessage defaultMessage="Comments" id="wCgTu5" />
+              </span>
+              <span>
+                &nbsp;
+                <FormattedMessage defaultMessage="(Latest first)" id="K78a3C" />
+              </span>
+            </div>
+
+            <Thread
+              canComment
+              canUsePrivateNote={isHostAdmin}
+              variant="small"
+              items={threadItems}
+              collective={host}
+              hasMore={!loading && totalThreadItems > threadItems.length}
+              fetchMore={onFetchMore}
+              onCommentDeleted={onCommentDeleted}
+              loading={loading}
+              CommentEntity={{
+                HostApplicationId: applicationId,
+              }}
+              onCommentCreated={async comment => {
+                setThreadItems([comment, ...threadItems]);
+                const { data } = await applicationQuery.refetch({ offset: 0 });
+                onDataComplete(data, [comment, ...threadItems]);
+              }}
             />
-          )}
-        </InfoList>
+          </React.Fragment>
+        )}
       </div>
-      <DrawerActions>
-        <div className="flex w-full justify-between">
-          <Flex alignItems="center" gap="10px">
-            <StyledRoundButton onClick={() => setShowContactModal(true)}>
-              <Mail size={16} color="#4E5052" />
-            </StyledRoundButton>
-          </Flex>
-          {status === HostApplicationStatus.PENDING && (
+      {application?.status === HostApplicationStatus.PENDING && (
+        <DrawerActions>
+          <div className="flex w-full justify-between">
             <AcceptRejectButtons
               collective={account}
               isLoading={loading}
@@ -370,40 +526,32 @@ function HostApplication({
               }
               onApprove={() => processApplication(ACTIONS.APPROVE)}
               onReject={message => processApplication(ACTIONS.REJECT, message)}
+              editCollectiveMutation={editCollectiveMutation}
             />
-          )}
-        </div>
-      </DrawerActions>
-
-      {showContactModal && (
-        <ApplicationMessageModal
-          collective={account}
-          onClose={() => setShowContactModal(false)}
-          onConfirm={(message, isPrivate, resetMessage) => {
-            setShowContactModal(false);
-            const action = isPrivate ? ACTIONS.SEND_PRIVATE_MESSAGE : ACTIONS.SEND_PUBLIC_MESSAGE;
-            processApplication(action, message, resetMessage);
-          }}
-        />
+          </div>
+        </DrawerActions>
       )}
-    </React.Fragment>
+    </Drawer>
   );
 }
 
 export default function HostApplicationDrawer({
   open,
   onClose,
-  application,
-  host,
+  applicationId,
+  editCollectiveMutation,
 }: {
   open: boolean;
   onClose: () => void;
-  application: GraphQLHostApplication;
-  host: Host;
+  applicationId: string;
+  editCollectiveMutation?: (collective: { id: number; HostCollectiveId?: number }) => Promise<void>;
 }) {
   return (
-    <Drawer open={open} onClose={onClose} showActionsContainer className="max-w-2xl" data-cy="host-application-drawer">
-      <HostApplication onClose={onClose} application={application} host={host} />
-    </Drawer>
+    <HostApplication
+      open={open}
+      onClose={onClose}
+      applicationId={applicationId}
+      editCollectiveMutation={editCollectiveMutation}
+    />
   );
 }

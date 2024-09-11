@@ -14,7 +14,7 @@ export const editExpenseMutation = gql`
 `;
 
 export const editExpenseCategoryMutation = gql`
-  mutation EditExpenseCategory($expenseId: String!, $category: AccountingCategoryReferenceInput!) {
+  mutation EditExpenseCategory($expenseId: String!, $category: AccountingCategoryReferenceInput) {
     editExpense(expense: { id: $expenseId, accountingCategory: $category }) {
       id
       valuesByRole {

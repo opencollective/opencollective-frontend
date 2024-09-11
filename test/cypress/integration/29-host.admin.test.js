@@ -32,6 +32,7 @@ describe('host dashboard', () => {
       cy.login({ redirect: '/dashboard/brusselstogetherasbl/host-applications' });
       cy.get('[data-cy="menu-item-Collectives"]').click();
       cy.get('[data-cy="menu-item-host-applications"]').click();
+      cy.contains('Pending').click();
       cy.get(`[data-cy="${collectiveSlug}-table-actions"]`).click();
       cy.get(`[data-cy="${collectiveSlug}-view-details"]`).click();
       cy.get(`[data-cy="${collectiveSlug}-approve"]`).click();
@@ -56,6 +57,7 @@ describe('host dashboard', () => {
       cy.login({ redirect: '/dashboard/brusselstogetherasbl/hosted-collectives' });
       cy.get('[data-cy="menu-item-Collectives"]').click();
       cy.get('[data-cy="menu-item-host-applications"]').click();
+      cy.contains('Pending').click();
       cy.get(`[data-cy="${collectiveSlug}-table-actions"]`).click();
       cy.get(`[data-cy="${collectiveSlug}-view-details"]`).click();
       cy.get(`[data-cy="${collectiveSlug}-approve"]`).click();
@@ -87,6 +89,7 @@ describe('host dashboard', () => {
       cy.login({ redirect: '/dashboard/brusselstogetherasbl/hosted-collectives' });
       cy.get('[data-cy="menu-item-Collectives"]').click();
       cy.get('[data-cy="menu-item-host-applications"]').click();
+      cy.contains('Pending').click();
       cy.get(`[data-cy="${collectiveSlug}-table-actions"]`).click();
       cy.get(`[data-cy="${collectiveSlug}-view-details"]`).click();
       cy.get(`[data-cy="${collectiveSlug}-approve"]`).click();

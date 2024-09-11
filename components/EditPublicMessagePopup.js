@@ -128,7 +128,7 @@ const REACT_POPPER_MODIFIERS = [
   },
 ];
 
-function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef, onClose, message, intl }) {
+function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef, onClose, message = '', intl }) {
   const [messageDraft, setMessageDraft] = useState(message || '');
 
   // Can't be rendered SSR
@@ -233,10 +233,6 @@ function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef
     document.body,
   );
 }
-
-EditPublicMessagePopup.defaultProps = {
-  message: '',
-};
 
 EditPublicMessagePopup.propTypes = {
   fromCollectiveId: PropTypes.number.isRequired,

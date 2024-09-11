@@ -68,8 +68,8 @@ const TierTitle = ({ collective, tier }) => {
           as={Link}
           href={`${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tier.legacyId || tier.id}`}
           color="black.900"
-          hoverColor="black.900"
-          underlineOnHover
+          $hoverColor="black.900"
+          $underlineOnHover
         >
           {name}
         </StyledLink>
@@ -183,7 +183,7 @@ const ContributeTier = ({ intl, collective, tier, isPreview, ...props }) => {
                   values={{
                     amount: (
                       <FormattedMoneyAmount
-                        amountStyles={{ fontWeight: '700', color: 'black.700' }}
+                        amountClassName="font-bold text-foreground"
                         amount={graphqlAmountValueInCents(amountRaised)}
                         currency={currency}
                         precision={getPrecisionFromAmount(graphqlAmountValueInCents(amountRaised))}
@@ -191,7 +191,7 @@ const ContributeTier = ({ intl, collective, tier, isPreview, ...props }) => {
                     ),
                     goalWithInterval: (
                       <FormattedMoneyAmount
-                        amountStyles={{ fontWeight: '700', color: 'black.700' }}
+                        amountClassName="font-bold text-foreground"
                         amount={graphqlAmountValueInCents(tier.goal)}
                         currency={currency}
                         interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
@@ -222,7 +222,7 @@ const ContributeTier = ({ intl, collective, tier, isPreview, ...props }) => {
                   amount={graphqlAmountValueInCents(minAmount)}
                   interval={tier.interval && tier.interval !== INTERVALS.flexible ? tier.interval : null}
                   currency={currency}
-                  amountStyles={{ fontSize: '24px', lineHeight: '22px', fontWeight: 'bold', color: 'black.900' }}
+                  amountClassName="text-2xl font-bold text-foreground"
                   precision={getPrecisionFromAmount(graphqlAmountValueInCents(minAmount))}
                 />
                 {taxes.length > 0 && ' *'}

@@ -36,19 +36,27 @@ const PreviewFeatureCard = ({
     context: API_V2_CONTEXT,
   });
 
-  const togglePreviewFeature = async (featureKey, checked) => {
-    setIsChecked(checked);
-    setLoading(true);
-    await submitEditSettings({
-      variables: {
-        account: { slug: LoggedInUser.collective.slug },
-        key: `earlyAccess.${featureKey}`,
-        value: checked,
-      },
-    });
-    await refetchLoggedInUser();
-    setLoading(false);
-  };
+  const togglePreviewFeature = React.useCallback(
+    async checked => {
+      setIsChecked(checked);
+      setLoading(true);
+      if ('setIsEnabled' in feature && typeof feature.setIsEnabled === 'function') {
+        feature.setIsEnabled(checked);
+      } else {
+        await submitEditSettings({
+          variables: {
+            account: { slug: LoggedInUser.collective.slug },
+            key: `earlyAccess.${feature.key}`,
+            value: checked,
+          },
+        });
+        await refetchLoggedInUser();
+      }
+
+      setLoading(false);
+    },
+    [feature, LoggedInUser.collective.slug, submitEditSettings, refetchLoggedInUser],
+  );
 
   return (
     <div className="flex flex-col gap-2 rounded-lg border p-4" key={feature.title}>
@@ -71,7 +79,7 @@ const PreviewFeatureCard = ({
           id={feature.key}
           checked={isChecked}
           disabled={loading || disabled}
-          onCheckedChange={checked => togglePreviewFeature(feature.key, checked)}
+          onCheckedChange={checked => togglePreviewFeature(checked)}
         />
       </div>
       {dependentFeatures?.length > 0 && (

@@ -154,19 +154,31 @@ describe('Collective page', () => {
   });
 
   describe('About section', () => {
-    it('Can add description to about section', () => {
-      const richDescription = 'Hello world!';
+    it('Can add a rich description', () => {
       scrollToSection(Sections.ABOUT);
       cy.contains('#section-about button', 'Add description').click();
+
       // {ctrl}b fails on macos
       // {ctrl} maps control key & {meta} maps command key
       const ctrlOrMetaKey = Cypress.platform === 'darwin' ? '{meta}' : '{ctrl}';
+
+      // Type "Hello world!" and make it bold
       cy.get('#section-about [data-cy="RichTextEditor"] trix-editor')
-        .type(richDescription)
+        .type('Hello world!')
         .type('{selectall}')
-        .type(`${ctrlOrMetaKey}b`);
+        .type(`${ctrlOrMetaKey}b`)
+        .type('{rightArrow} ');
+
+      // Add a YouTube video
+      cy.get('#section-about [data-cy="RichTextEditor"] button[data-trix-action=x-video-dialog-open]').click();
+      cy.get('input[name="video-url"]').type('https://www.youtube.com/watch?v=2oyhlad64-s');
+      cy.getByDataCy('add-video-submit').click();
+
       cy.get('[data-cy="InlineEditField-Btn-Save"]').click();
-      cy.get('[data-cy="longDescription"]').should('have.html', '<div><strong>Hello world!</strong></div>');
+      cy.get('[data-cy="longDescription"]').should(
+        'have.html',
+        '<div><strong>Hello world!&nbsp;</strong><strong><iframe allowfullscreen="" width="100%" height="394" title="Embed content" src="https://www.youtube-nocookie.com/embed/2oyhlad64-s/?showinfo=0"></iframe><figcaption></figcaption></strong></div>',
+      );
     });
   });
 });

@@ -1,9 +1,7 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { CaretDown } from '@styled-icons/fa-solid/CaretDown';
-import { CaretUp } from '@styled-icons/fa-solid/CaretUp';
 import { Markup } from 'interweave';
-import { merge, pick } from 'lodash';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { getLuminance } from 'polished';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
@@ -32,6 +30,10 @@ export const isEmptyHTMLValue = value => {
 };
 
 const ReadFullLink = styled.a`
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
   cursor: pointer;
   font-size: 12px;
   > svg {
@@ -49,7 +51,7 @@ const InlineDisplayBox = styled.div`
 
 const CollapsedDisplayBox = styled.div`
   overflow-y: hidden;
-  ${props => props.maxHeight && `max-height: ${props.maxCollapsedHeight + 20}px;`}
+  ${props => props.maxCollapsedHeight && `max-height: ${props.maxCollapsedHeight + 20}px;`}
   -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
   mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
 `;
@@ -72,6 +74,7 @@ const HTMLContent = styled(
     collapsePadding = 1,
     hideViewMoreLink = false,
     openLinksInNewTab = false,
+    readMoreMessage,
     ...props
   }) => {
     const [isOpen, setOpen] = React.useState(false);
@@ -80,8 +83,8 @@ const HTMLContent = styled(
 
     const DisplayBox = !isCollapsed || isOpen ? InlineDisplayBox : CollapsedDisplayBox;
 
-    useEffect(() => {
-      if (collapsable && contentRef?.current?.clientHeight > maxCollapsedHeight + collapsePadding) {
+    useLayoutEffect(() => {
+      if (collapsable && contentRef?.current?.scrollHeight > maxCollapsedHeight + collapsePadding) {
         setIsCollapsed(true);
       }
     }, [content]);
@@ -100,21 +103,22 @@ const HTMLContent = styled(
             allowAttributes
             transform={node => {
               // Allow some iframes
-              if (node.tagName === 'iframe') {
+              if (node.tagName.toLowerCase() === 'iframe') {
                 const src = node.getAttribute('src');
                 const parsedUrl = new URL(src);
                 const hostname = parsedUrl.hostname;
                 if (['youtube-nocookie.com', 'www.youtube-nocookie.com', 'anchor.fm'].includes(hostname)) {
-                  const attributes = merge({}, ...node.attributes.map(({ name, value }) => ({ [name]: value })));
                   return (
                     <iframe
-                      {...pick(attributes, ['width', 'height', 'frameborder', 'allowfullscreen'])}
-                      title={attributes.title || 'Embed content'}
+                      allowFullScreen
+                      width={node.getAttribute('width')}
+                      height={node.getAttribute('height')}
+                      title={node.getAttribute('title') || 'Embed content'}
                       src={src}
                     />
                   );
                 }
-              } else if (node.tagName === 'a') {
+              } else if (node.tagName.toLowerCase() === 'a') {
                 // Open links in new tab
                 if (openLinksInNewTab) {
                   node.setAttribute('target', '_blank');
@@ -137,8 +141,8 @@ const HTMLContent = styled(
               }
             }}
           >
-            <FormattedMessage id="ExpandDescription" defaultMessage="Read full description" />
-            <CaretDown size="10px" />
+            {readMoreMessage || <FormattedMessage id="ExpandDescription" defaultMessage="Read full description" />}
+            <ChevronDown size={10} />
           </ReadFullLink>
         )}
         {isOpen && isCollapsed && (
@@ -155,13 +159,15 @@ const HTMLContent = styled(
             }}
           >
             <FormattedMessage defaultMessage="Collapse" id="W/V6+Y" />
-            <CaretUp size="10px" />
+            <ChevronUp size={10} />
           </ReadFullLink>
         )}
       </div>
     );
   },
-)`
+).attrs(props => ({
+  fontSize: props.fontSize ?? '14px',
+}))`
   /** Override global styles to match what we have in the editor */
   width: 100%;
   line-height: 1.75em;
@@ -304,10 +310,6 @@ HTMLContent.propTypes = {
   /* Hides the "Read full description/collapse" link */
   hideViewMoreLink: PropTypes.bool,
   openLinksInNewTab: PropTypes.bool,
-};
-
-HTMLContent.defaultProps = {
-  fontSize: '14px',
 };
 
 export default HTMLContent;

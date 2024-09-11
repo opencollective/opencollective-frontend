@@ -35,7 +35,7 @@ export const profileSchema = z.object({
   name: z.string().min(1).max(255),
   description: z.string().max(255).optional(),
   primaryColor: primaryColorSchema.optional(),
-  cover: coverImageSchema.optional(),
+  cover: coverImageSchema.optional().nullable(),
   longDescription: z.string().max(30000).optional(),
 });
 
@@ -56,8 +56,8 @@ export function getDefaultFundraiserValues(account: Account): Fundraiser {
     cover: fundraiserSettings?.cover ?? {
       type: 'IMAGE',
       url: account.backgroundImageUrl,
-      width: account.settings.collectivePage?.background?.mediaSize.width,
-      height: account.settings.collectivePage?.background?.mediaSize.height,
+      width: account.settings.collectivePage?.background?.mediaSize?.width,
+      height: account.settings.collectivePage?.background?.mediaSize?.height,
     },
     longDescription: fundraiserSettings?.longDescription ?? account.longDescription,
   };
@@ -75,8 +75,8 @@ export function getDefaultProfileValues(account: Account): Profile {
     cover: profileSettings?.cover ?? {
       type: 'IMAGE',
       url: account.backgroundImageUrl,
-      width: account.settings.collectivePage?.background?.mediaSize.width,
-      height: account.settings.collectivePage?.background?.mediaSize.height,
+      width: account.settings.collectivePage?.background?.mediaSize?.width,
+      height: account.settings.collectivePage?.background?.mediaSize?.height,
     },
     longDescription: profileSettings?.longDescription ?? account.longDescription,
   };

@@ -133,7 +133,6 @@ const RecurringContributionsCard = ({
                     currency={contribution.amount.currency}
                     showCurrencyCode={false}
                     precision="auto"
-                    amountStyles={{ fontWeight: 'normal', color: 'black.700' }}
                   />
                   {' + '}
                   <FormattedMoneyAmount
@@ -141,7 +140,6 @@ const RecurringContributionsCard = ({
                     currency={contribution.amount.currency}
                     showCurrencyCode={false}
                     precision="auto"
-                    amountStyles={{ fontWeight: 'normal', color: 'black.700' }}
                   />
                   )
                 </P>

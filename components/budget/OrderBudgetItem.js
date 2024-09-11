@@ -66,7 +66,7 @@ const OrderContainer = styled.div`
   }
 `;
 
-const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign, host }) => {
+const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign = true, host }) => {
   const intl = useIntl();
   return (
     <OrderContainer>
@@ -159,7 +159,6 @@ const OrderBudgetItem = ({ isLoading, order, showPlatformTip, showAmountSign, ho
                             amount={order.platformTipAmount.valueInCents}
                             currency={order.platformTipAmount.currency}
                             precision={2}
-                            amountStyles={null}
                           />
                         ),
                       }}
@@ -296,10 +295,6 @@ OrderBudgetItem.propTypes = {
     }),
   }),
   showPlatformTip: PropTypes.bool,
-};
-
-OrderBudgetItem.defaultProps = {
-  showAmountSign: true,
 };
 
 export default OrderBudgetItem;

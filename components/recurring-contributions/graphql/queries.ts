@@ -42,6 +42,7 @@ export const managedOrderFragment = gql`
     }
     status
     description
+    memo
     createdAt
     processedAt
     hostFeePercent
@@ -49,6 +50,12 @@ export const managedOrderFragment = gql`
     tier {
       id
       name
+    }
+    tax {
+      id
+      type
+      rate
+      idNumber
     }
     permissions {
       id
@@ -109,6 +116,10 @@ export const managedOrderFragment = gql`
       value
       valueInCents
     }
+    paymentProcessorFee {
+      valueInCents
+      currency
+    }
     pendingContributionData {
       expectedAt
       paymentMethod
@@ -118,6 +129,12 @@ export const managedOrderFragment = gql`
         name
         email
       }
+    }
+    accountingCategory {
+      id
+      name
+      kind
+      code
     }
   }
   ${accountHoverCardFields}

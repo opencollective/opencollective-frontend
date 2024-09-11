@@ -21,7 +21,6 @@ import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import AutosizeText from '../AutosizeText';
 import Avatar from '../Avatar';
 import { AvatarWithLink } from '../AvatarWithLink';
-import Container from '../Container';
 import DateTime from '../DateTime';
 import AdminExpenseStatusTag from '../expenses/AdminExpenseStatusTag';
 import { ExpenseAccountingCategoryPill } from '../expenses/ExpenseAccountingCategoryPill';
@@ -42,8 +41,9 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 import Tags from '../Tags';
-import { H3, Span } from '../Text';
+import { H3 } from '../Text';
 import TransactionSign from '../TransactionSign';
+import TruncatedTextWithTooltip from '../TruncatedTextWithTooltip';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
 const DetailColumnHeader = styled.div`
@@ -182,7 +182,7 @@ const ExpenseBudgetItem = ({
                 <TooltipTrigger asChild>
                   <span>
                     <StyledLink
-                      underlineOnHover
+                      $underlineOnHover
                       {...(useDrawer
                         ? {
                             as: Link,
@@ -203,18 +203,20 @@ const ExpenseBudgetItem = ({
                         mobileRatio={0.875}
                         valueFormatter={toPx}
                       >
-                        {({ value, fontSize }) => (
-                          <H3
-                            fontWeight="500"
-                            lineHeight="1.5em"
-                            textDecoration="none"
-                            color="black.900"
-                            fontSize={fontSize}
-                            data-cy="expense-title"
-                          >
-                            {value}
-                          </H3>
-                        )}
+                        {({ value, fontSize }) => {
+                          return (
+                            <H3
+                              fontWeight="500"
+                              lineHeight="1.5em"
+                              textDecoration="none"
+                              color="black.900"
+                              fontSize={fontSize}
+                              data-cy="expense-title"
+                            >
+                              {value}
+                            </H3>
+                          );
+                        }}
                       </AutosizeText>
                     </StyledLink>
                   </span>
@@ -231,7 +233,7 @@ const ExpenseBudgetItem = ({
                     host={host}
                     account={expense.account}
                     canEdit={get(expense, 'permissions.canEditAccountingCategory', false)}
-                    allowNone={!isLoggedInUserExpenseHostAdmin}
+                    allowNone
                     showCodeInSelect={isLoggedInUserExpenseHostAdmin}
                   />
                 </div>
@@ -304,7 +306,6 @@ const ExpenseBudgetItem = ({
                               get(expense.account, 'stats.balanceWithBlockedFunds', 0),
                             )}
                             currency={expense.account.currency}
-                            amountStyles={{ color: 'black.700' }}
                           />
                         ),
                       }}
@@ -338,14 +339,17 @@ const ExpenseBudgetItem = ({
               <React.Fragment>
                 <div>
                   {showAmountSign && <TransactionSign isCredit={isInverted} />}
-                  <Span color="black.700" fontSize="16px">
-                    <FormattedMoneyAmount amount={expense.amount} currency={expense.currency} precision={2} />
-                  </Span>
+                  <FormattedMoneyAmount
+                    amountClassName="font-bold"
+                    amount={expense.amount}
+                    currency={expense.currency}
+                    precision={2}
+                  />
                 </div>
                 {isMultiCurrency && (
-                  <Container color="black.600" fontSize="13px" my={1}>
+                  <div className="my-1 text-sm text-muted-foreground">
                     <AmountWithExchangeRateInfo amount={expense.amountInAccountCurrency} />
-                  </Container>
+                  </div>
                 )}
               </React.Fragment>
             )}
@@ -398,7 +402,7 @@ const ExpenseBudgetItem = ({
                 <Box mt="6px">
                   <PayoutMethodTypeWithIcon
                     isLoading={isLoading}
-                    type={expense?.payoutMethod?.type}
+                    type={expense.payoutMethod?.type}
                     iconSize="10px"
                     fontSize="11px"
                     fontWeight="normal"
@@ -406,6 +410,20 @@ const ExpenseBudgetItem = ({
                   />
                 </Box>
               </Box>
+              {Boolean(expense.reference) && (
+                <Box mr={[3, 4]}>
+                  <DetailColumnHeader>
+                    <FormattedMessage id="Expense.Reference" defaultMessage="Reference" />
+                  </DetailColumnHeader>
+                  {isLoading ? (
+                    <LoadingPlaceholder height={15} width={90} />
+                  ) : (
+                    <div className="mt-[4px] text-[11px]">
+                      <TruncatedTextWithTooltip value={expense.reference} length={10} truncatePosition="middle" />
+                    </div>
+                  )}
+                </Box>
+              )}
               {nbAttachedFiles > 0 && (
                 <Box mr={[3, 4]}>
                   <DetailColumnHeader>
@@ -435,7 +453,7 @@ const ExpenseBudgetItem = ({
                   )}
                 </Box>
               )}
-              {Boolean(expense?.account?.hostAgreements?.totalCount) && (
+              {Boolean(expense.account?.hostAgreements?.totalCount) && (
                 <Box mr={[3, 4]}>
                   <DetailColumnHeader>
                     <FormattedMessage defaultMessage="Host Agreements" id="kq2gKV" />
@@ -525,6 +543,7 @@ ExpenseBudgetItem.propTypes = {
       totalCount: PropTypes.number,
     }),
     type: PropTypes.string.isRequired,
+    reference: PropTypes.string,
     description: PropTypes.string.isRequired,
     status: PropTypes.string.isRequired,
     createdAt: PropTypes.string.isRequired,

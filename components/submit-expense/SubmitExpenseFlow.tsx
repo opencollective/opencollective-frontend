@@ -130,6 +130,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
 
         const expenseInput: CreateExpenseFromDashboardMutationVariables['expenseCreateInput'] = {
           description: values.title,
+          reference: values.reference,
           payee: {
             slug: values.payeeSlug,
           },

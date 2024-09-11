@@ -89,10 +89,10 @@ export default function ExpensePage(props: InferGetServerSidePropsType<typeof ge
 
   // Refetch data when logging in
   useEffect(() => {
-    if (LoggedInUser) {
+    if (LoggedInUser && !queryResult.data?.loggedInAccount) {
       queryResult.refetch();
     }
-  }, [LoggedInUser]);
+  }, [LoggedInUser, queryResult.data?.loggedInAccount]);
 
   useEffect(() => {
     addParentToURLIfMissing(router, queryResult.data?.expense?.account, `/expenses/${props.legacyExpenseId}`);
@@ -117,7 +117,6 @@ export default function ExpensePage(props: InferGetServerSidePropsType<typeof ge
     expense.payee.stats = data.expensePayeeStats?.payee?.stats;
   }
   const collective = expense?.account;
-  const host = collective?.host;
   const metadata = getPageMetadata(intl, props.legacyExpenseId, expense);
 
   return (
@@ -143,12 +142,17 @@ export default function ExpensePage(props: InferGetServerSidePropsType<typeof ge
         </Box>
         <Flex flex="1 1" justifyContent={['center', null, 'flex-start', 'flex-end']} pt={80}>
           <Box minWidth={270} width={['100%', null, null, 275]} px={2}>
-            <ExpenseInfoSidebar isLoading={queryResult.loading} collective={collective} host={host} />
+            <ExpenseInfoSidebar
+              isLoading={queryResult.loading}
+              collective={collective}
+              host={collective?.host}
+              expenseHost={expense?.host}
+            />
           </Box>
         </Flex>
         <Box width={SIDE_MARGIN_WIDTH} />
       </Flex>
-      <MobileCollectiveInfoStickyBar isLoading={queryResult.loading} collective={collective} host={host} />
+      <MobileCollectiveInfoStickyBar isLoading={queryResult.loading} collective={collective} host={collective?.host} />
     </Page>
   );
 }
