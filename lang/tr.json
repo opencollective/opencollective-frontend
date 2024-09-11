@@ -1379,7 +1379,7 @@
   "Expense.InvoiceItems": "Invoice items",
   "Expense.JoinAndSubmit": "Join and Submit",
   "expense.markAsPaid": "Ödendi olarak işaretle",
-  "Expense.MarkAsSpamWarning": "This will prevent the submitter account to post new expenses. Are you sure?",
+  "Expense.MarkAsSpamWarning": "This will prevent the submitter account to post new expenses.",
   "Expense.markAsUnpaid": "Mark expense as unpaid",
   "expense.markAsUnpaid.btn": "Ödenmedi olarak işaretle",
   "Expense.markAsUnpaid.details": "The amount will be credited back to the Collective balance.",
