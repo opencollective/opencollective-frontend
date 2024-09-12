@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import z from 'zod';
 
 import useProcessExpense from '../../lib/expenses/useProcessExpense';
@@ -8,6 +8,7 @@ import type { Expense } from '../../lib/graphql/types/v2/graphql';
 import { useFormikZod } from '../FormikZod';
 import ConfirmationModal from '../NewConfirmationModal';
 import { Button } from '../ui/Button';
+import { Label } from '../ui/Label';
 import { Textarea } from '../ui/Textarea';
 
 type DeclineExpenseInviteButtonProps = {
@@ -20,7 +21,6 @@ const schema = z.object({
 });
 
 export default function DeclineExpenseInviteButton(props: DeclineExpenseInviteButtonProps) {
-  const intl = useIntl();
   const [isDeclineModalOpen, setIsDeclineModalOpen] = React.useState(false);
   const { declineInvitation } = useProcessExpense({ expense: props.expense });
 
@@ -51,8 +51,8 @@ export default function DeclineExpenseInviteButton(props: DeclineExpenseInviteBu
 
   return (
     <React.Fragment>
-      <Button variant="destructive" onClick={() => setIsDeclineModalOpen(true)}>
-        <FormattedMessage defaultMessage="Decline expense invite" id="BEVVH+" />
+      <Button variant="destructive" size="sm" onClick={() => setIsDeclineModalOpen(true)}>
+        <FormattedMessage defaultMessage="Decline invitation" id="4DwePS" />
       </Button>
       <ConfirmationModal
         title={<FormattedMessage defaultMessage="Confirm declining this expense invitation" id="syX03a" />}
@@ -61,13 +61,13 @@ export default function DeclineExpenseInviteButton(props: DeclineExpenseInviteBu
         setOpen={setIsDeclineModalOpen}
       >
         <div className="text-base text-foreground">
-          <Textarea
-            placeholder={intl.formatMessage({
-              defaultMessage: 'Please provide a reason for declining this expense invitation',
-              id: '3sYEu2',
-            })}
-            {...formik.getFieldProps('declineReason')}
-          />
+          <Label className="mb-2">
+            <FormattedMessage defaultMessage="Notes" id="expense.notes" />
+          </Label>
+          <Textarea showCount className="max-h-40" {...formik.getFieldProps('declineReason')} maxLength={255} />
+          <div className="ml-1 mt-1 h-4 text-xs text-muted-foreground">
+            <FormattedMessage defaultMessage="Provide a reason for declining this expense invitation" id="Iom3HU" />
+          </div>
           <div className="ml-1 mt-1 h-4 text-xs text-red-500">
             {formik.errors.declineReason && formik.touched.declineReason ? formik.errors.declineReason : ''}
           </div>
