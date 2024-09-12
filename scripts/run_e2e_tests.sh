@@ -1,9 +1,5 @@
 #!/bin/bash
 
-echo "> Starting maildev server"
-npx maildev@2.0.5 &
-MAILDEV_PID=$!
-
 echo "> Starting stripe webhook listener"
 export STRIPE_WEBHOOK_SIGNING_SECRET=$(stripe --api-key $STRIPE_WEBHOOK_KEY listen --forward-connect-to localhost:3060/webhooks/stripe --print-secret)
 stripe --api-key $STRIPE_WEBHOOK_KEY listen --forward-connect-to localhost:3060/webhooks/stripe >/dev/null &
@@ -15,8 +11,11 @@ if [ -z "$API_FOLDER" ]; then
 else
   cd $API_FOLDER
 fi
-PG_DATABASE=opencollective_dvl MAILDEV_CLIENT=true npm run start:e2e:server &
+PG_DATABASE=opencollective_dvl MAILPIT_CLIENT=true npm run start:e2e:server &
 API_PID=$!
+echo "> Starting mailpit server"
+npm run mailpit &
+MAILPIT_PID=$!
 cd -
 
 echo "> Starting frontend server"
