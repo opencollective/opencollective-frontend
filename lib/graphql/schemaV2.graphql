@@ -877,6 +877,7 @@ interface Account {
     offset: Int! = 0
     isActive: Boolean
     accountType: [AccountType]
+    term: String
   ): AccountCollection!
 
   """
@@ -3276,6 +3277,7 @@ type Host implements Account & AccountWithContributions {
     offset: Int! = 0
     isActive: Boolean
     accountType: [AccountType]
+    term: String
   ): AccountCollection!
 
   """
@@ -8158,6 +8160,7 @@ type Bot implements Account {
     offset: Int! = 0
     isActive: Boolean
     accountType: [AccountType]
+    term: String
   ): AccountCollection!
 
   """
@@ -8964,6 +8967,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     offset: Int! = 0
     isActive: Boolean
     accountType: [AccountType]
+    term: String
   ): AccountCollection!
 
   """
@@ -10223,6 +10227,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     offset: Int! = 0
     isActive: Boolean
     accountType: [AccountType]
+    term: String
   ): AccountCollection!
 
   """
@@ -11262,6 +11267,7 @@ type Individual implements Account {
     offset: Int! = 0
     isActive: Boolean
     accountType: [AccountType]
+    term: String
   ): AccountCollection!
 
   """
@@ -12274,6 +12280,7 @@ type Organization implements Account & AccountWithContributions {
     offset: Int! = 0
     isActive: Boolean
     accountType: [AccountType]
+    term: String
   ): AccountCollection!
 
   """
@@ -13177,6 +13184,7 @@ type Vendor implements Account & AccountWithContributions {
     offset: Int! = 0
     isActive: Boolean
     accountType: [AccountType]
+    term: String
   ): AccountCollection!
 
   """
@@ -16615,6 +16623,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     offset: Int! = 0
     isActive: Boolean
     accountType: [AccountType]
+    term: String
   ): AccountCollection!
 
   """
@@ -17534,6 +17543,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     offset: Int! = 0
     isActive: Boolean
     accountType: [AccountType]
+    term: String
   ): AccountCollection!
 
   """
@@ -20063,7 +20073,7 @@ input CommentUpdateInput {
 }
 
 """
-Input to create a comment. You can only specify one entity type: expense, conversation or update
+Input to create a comment. You can only specify one entity type: expense, conversation, update or host application
 """
 input CommentCreateInput {
   html: String
