@@ -50,7 +50,7 @@ export const previewFeatures: PreviewFeature[] = [
     description: 'Improved expense submission flow in Dashboard',
     alwaysEnableInDev: true,
     publicBeta: false,
-    closedBetaAccessFor: ['opencollective', 'design', 'engineering'],
+    closedBetaAccessFor: ['opencollective', 'design', 'engineering', 'opensource', 'europe'],
   },
   {
     key: PREVIEW_FEATURE_KEYS.HOST_REPORTS,
