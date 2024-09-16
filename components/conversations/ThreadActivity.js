@@ -44,7 +44,7 @@ const ThreadActivity = ({ activity }) => {
             <Avatar radius={40} collective={activity.individual} />
           </LinkCollective>
           <Flex flexDirection="column" justifyContent="center" ml={3}>
-            <Span color="black.600">
+            <div className="mb-1 text-sm text-muted-foreground">
               <FormattedMessage
                 id="ByUser"
                 defaultMessage="By {userName}"
@@ -52,7 +52,8 @@ const ThreadActivity = ({ activity }) => {
                   userName: (
                     <StyledLink
                       as={LinkCollective}
-                      color="black.800"
+                      color="black.900"
+                      fontWeight="500"
                       collective={activity.individual}
                       withHoverCard
                       hoverCardProps={{
@@ -66,8 +67,8 @@ const ThreadActivity = ({ activity }) => {
                   ),
                 }}
               />
-            </Span>
-            <Span color="black.600" fontSize="12px">
+            </div>
+            <Span color="#4b5563" fontSize="12px">
               <FormattedMessage
                 defaultMessage="on {date}"
                 id="mzGohi"

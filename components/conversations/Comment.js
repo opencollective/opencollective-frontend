@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import HTMLContent from '../HTMLContent';
 import InlineEditField from '../InlineEditField';
@@ -35,7 +34,7 @@ const Comment = ({
   const anchorHash = `comment-${new Date(comment.createdAt).getTime()}`;
 
   return (
-    <Container width="100%" data-cy="comment" id={anchorHash}>
+    <div data-cy="comment" id={anchorHash} className="w-full">
       <Flex mb={3} justifyContent="space-between">
         <CommentMetadata comment={comment} />
         {hasActions && (
@@ -92,13 +91,14 @@ const Comment = ({
           </Flex>
         )}
       </Box>
-    </Container>
+    </div>
   );
 };
 
 Comment.propTypes = {
   comment: PropTypes.shape({
     id: PropTypes.string.isRequired,
+    type: PropTypes.string,
     html: PropTypes.string,
     createdAt: PropTypes.string,
     fromAccount: PropTypes.shape({
@@ -115,8 +115,6 @@ Comment.propTypes = {
   canReply: PropTypes.bool,
   /** Set this to true if the comment is the root comment of a conversation */
   isConversationRoot: PropTypes.bool,
-  /** Set this to true to disable actions */
-  withoutActions: PropTypes.bool,
   /** If set, comment will be scrollable over this height */
   maxCommentHeight: PropTypes.number,
   /** Called when comment gets deleted */

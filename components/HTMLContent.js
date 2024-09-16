@@ -74,7 +74,7 @@ const HTMLContent = styled(
     collapsePadding = 1,
     hideViewMoreLink = false,
     openLinksInNewTab = false,
-    readMoreMessage,
+    ReadMoreButton,
     ...props
   }) => {
     const [isOpen, setOpen] = React.useState(false);
@@ -128,40 +128,67 @@ const HTMLContent = styled(
             }}
           />
         </DisplayBox>
-        {!isOpen && isCollapsed && !hideViewMoreLink && (
-          <ReadFullLink
-            onClick={() => setOpen(true)}
-            {...props}
-            role="button"
-            tabIndex={0}
-            onKeyDown={event => {
-              if (event.key === 'Enter') {
-                event.preventDefault();
-                setOpen(true);
-              }
-            }}
-          >
-            {readMoreMessage || <FormattedMessage id="ExpandDescription" defaultMessage="Read full description" />}
-            <ChevronDown size={10} />
-          </ReadFullLink>
-        )}
-        {isOpen && isCollapsed && (
-          <ReadFullLink
-            onClick={() => setOpen(false)}
-            {...props}
-            role="button"
-            tabIndex={0}
-            onKeyDown={event => {
-              if (event.key === 'Enter') {
-                event.preventDefault();
-                setOpen(false);
-              }
-            }}
-          >
-            <FormattedMessage defaultMessage="Collapse" id="W/V6+Y" />
-            <ChevronUp size={10} />
-          </ReadFullLink>
-        )}
+        {!isOpen &&
+          isCollapsed &&
+          !hideViewMoreLink &&
+          (ReadMoreButton ? (
+            <ReadMoreButton
+              isOpen={false}
+              onClick={() => setOpen(true)}
+              onKeyDown={event => {
+                if (event.key === 'Enter') {
+                  event.preventDefault();
+                  setOpen(true);
+                }
+              }}
+            />
+          ) : (
+            <ReadFullLink
+              onClick={() => setOpen(true)}
+              {...props}
+              role="button"
+              tabIndex={0}
+              onKeyDown={event => {
+                if (event.key === 'Enter') {
+                  event.preventDefault();
+                  setOpen(true);
+                }
+              }}
+            >
+              <FormattedMessage id="ExpandDescription" defaultMessage="Read full description" />
+              <ChevronDown size={10} />
+            </ReadFullLink>
+          ))}
+        {isOpen &&
+          isCollapsed &&
+          (ReadMoreButton ? (
+            <ReadMoreButton
+              isOpen
+              onClick={() => setOpen(false)}
+              onKeyDown={event => {
+                if (event.key === 'Enter') {
+                  event.preventDefault();
+                  setOpen(false);
+                }
+              }}
+            />
+          ) : (
+            <ReadFullLink
+              onClick={() => setOpen(false)}
+              {...props}
+              role="button"
+              tabIndex={0}
+              onKeyDown={event => {
+                if (event.key === 'Enter') {
+                  event.preventDefault();
+                  setOpen(false);
+                }
+              }}
+            >
+              <FormattedMessage defaultMessage="Collapse" id="W/V6+Y" />
+              <ChevronUp size={10} />
+            </ReadFullLink>
+          ))}
       </div>
     );
   },
