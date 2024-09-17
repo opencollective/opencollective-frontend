@@ -113,6 +113,7 @@ export default function Projects(props: ProjectsProps) {
     [isAdmin, props.projects],
   );
 
+  const hasMore = isSearching && !query.loading && query.data?.account?.projects?.totalCount > searchProjects.length;
   const isLoadingSearch = isSearching && query.loading;
   const displayedProjects = !isSearching ? collectiveProjects : searchProjects;
   if (!hasProjectsSection) {
@@ -156,7 +157,9 @@ export default function Projects(props: ProjectsProps) {
           )}
           {isSearching && isEmpty(displayedProjects) && (
             <div className="ml-8 self-center">
-              <FormattedMessage defaultMessage="No results match your search" id="qqqV4d" />
+              <div className="w-60 text-center">
+                <FormattedMessage defaultMessage="No results match your search" id="qqqV4d" />
+              </div>
             </div>
           )}
           {displayedProjects.map(project => (
@@ -169,6 +172,15 @@ export default function Projects(props: ProjectsProps) {
               />
             </Box>
           ))}
+          {hasMore && (
+            <div className="self-center">
+              <div className="w-60 text-center">
+                <Link href={`/${collective.slug}/projects`}>
+                  <FormattedMessage defaultMessage="More results" id="irPBg/" /> →
+                </Link>
+              </div>
+            </div>
+          )}
           {isAdmin && (
             <ContributeCardContainer minHeight={150}>
               <CreateNew route={`/${collective.slug}/projects/create`}>
