@@ -10,6 +10,7 @@ export const LOCAL_STORAGE_KEYS = {
   DASHBOARD_NAVIGATION_STATE: 'DashboardNavigationState',
   PREFERRED_TWO_FACTOR_METHOD: 'preferredTwoFactorMethod',
   UPDATES_FORM_STATE: 'updatesFormState',
+  RECENTLY_VISITED: 'recentlyVisited',
 };
 
 // The below helpers use a try-catch to gracefully fallback in these scenarios:

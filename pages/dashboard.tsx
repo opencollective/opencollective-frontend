@@ -7,9 +7,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { isHostAccount, isIndividualAccount } from '../lib/collective';
 import roles from '../lib/constants/roles';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
-import useLocalStorage from '../lib/hooks/useLocalStorage';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
-import { LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { require2FAForAdmins } from '../lib/policies';
 import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 
@@ -34,6 +32,7 @@ import NotificationBar from '../components/NotificationBar';
 import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { TwoFactorAuthRequiredMessage } from '../components/TwoFactorAuthRequiredMessage';
+import { useWorkspace } from '../components/WorkspaceProvider';
 
 const messages = defineMessages({
   collectiveIsArchived: {
@@ -141,11 +140,9 @@ const DashboardPage = () => {
   const router = useRouter();
   const { slug, section, subpath } = parseQuery(router.query);
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
-  const [lastWorkspaceVisit, setLastWorkspaceVisit] = useLocalStorage(LOCAL_STORAGE_KEYS.DASHBOARD_NAVIGATION_STATE, {
-    slug: LoggedInUser?.collective.slug,
-  });
+  const { workspace, setWorkspace } = useWorkspace();
   const isRootUser = LoggedInUser?.isRoot;
-  const defaultSlug = lastWorkspaceVisit.slug || LoggedInUser?.collective.slug;
+  const defaultSlug = workspace.slug || LoggedInUser?.collective.slug;
   const activeSlug = slug || defaultSlug;
   const isRootProfile = activeSlug === ROOT_PROFILE_KEY;
 
@@ -161,14 +158,14 @@ const DashboardPage = () => {
 
   // Keep track of last visited workspace account and sections
   React.useEffect(() => {
-    if (activeSlug && activeSlug !== lastWorkspaceVisit.slug) {
+    if (activeSlug && activeSlug !== workspace.slug) {
       if (LoggedInUser && !useDynamicTopBar) {
         // this is instead configured as "default" account in NewAccountSwitcher
-        setLastWorkspaceVisit({ slug: activeSlug });
+        setWorkspace({ slug: activeSlug });
       }
     }
     // If there is no slug set (that means /dashboard)
-    // And if there is an activeSlug (this means lastWorkspaceVisit OR LoggedInUser)
+    // And if there is an activeSlug (this means workspace OR LoggedInUser)
     // And a LoggedInUser
     // And if activeSlug is different than LoggedInUser slug
     if (!slug && activeSlug && LoggedInUser && activeSlug !== LoggedInUser.collective.slug) {
@@ -178,8 +175,8 @@ const DashboardPage = () => {
 
   // Clear last visited workspace account if not admin
   React.useEffect(() => {
-    if (account && !LoggedInUser.isAdminOfCollective(account)) {
-      setLastWorkspaceVisit({ slug: null });
+    if (account && !LoggedInUser.isAdminOfCollective(account) && !(isRootProfile && isRootUser)) {
+      setWorkspace({ slug: undefined });
     }
   }, [account]);
 
@@ -209,7 +206,7 @@ const DashboardPage = () => {
         account,
         activeSlug,
         defaultSlug,
-        setDefaultSlug: slug => setLastWorkspaceVisit({ slug }),
+        setDefaultSlug: slug => setWorkspace({ slug }),
       }}
     >
       <div className="flex min-h-screen flex-col justify-between">

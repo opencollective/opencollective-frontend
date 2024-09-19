@@ -43,13 +43,13 @@ const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT, INDIVIDUAL } = Col
 export type PageMenuItem = {
   type?: 'page';
   Icon?: LucideIcon;
-  label?: string | React.JSX.Element;
+  label?: string;
   section: string;
   if?: boolean;
 };
 type GroupMenuItem = {
   type: 'group';
-  label: string | React.JSX.Element;
+  label: string;
   Icon: LucideIcon;
   subMenu: PageMenuItem[];
   if?: boolean;
