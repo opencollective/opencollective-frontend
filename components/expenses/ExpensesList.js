@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import FlipMove from 'react-flip-move';
 import { FormattedMessage } from 'react-intl';
@@ -126,6 +126,11 @@ const ExpensesList = ({
       }
     },
   });
+  useEffect(() => {
+    const selectedExpense = expenses[selectedExpenseIndex];
+    const expenseElement = document.getElementById(`expense-${selectedExpense?.legacyId}`);
+    expenseElement?.scrollIntoViewIfNeeded?.();
+  }, [selectedExpenseIndex, expenses]);
 
   if (!expenses?.length && !isLoading) {
     return null;
@@ -153,6 +158,7 @@ const ExpensesList = ({
           {expenses.map((expense, idx) => (
             <div
               key={expense.id}
+              id={`expense-${expense.legacyId}`}
               className={cn(idx && 'border-t border-gray-300')}
               data-cy={`expense-${expense.status}`}
             >

@@ -88,7 +88,7 @@ const ExpenseContainer = styled.div`
   ${props =>
     props.useDrawer &&
     css`
-      ${props => props.selected && `background: #f8fafc;`}
+      ${props => props.selected && `background: #E5F3FF;`}
     `}
 
   ${props =>

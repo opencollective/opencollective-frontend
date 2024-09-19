@@ -1,8 +1,28 @@
 import React from 'react';
 
-const useKeyboardKey = ({ callback, keyMatch }) => {
+const INPUT_ELEMENTS = ['INPUT', 'TEXTAREA', 'TRIX-EDITOR'];
+
+type KeyMatch = {
+  key: string;
+  keyName: string;
+  keyCode?: number;
+};
+
+const useKeyboardKey = ({
+  callback,
+  keyMatch,
+  disableOnInput,
+}: {
+  callback: (event: KeyboardEvent) => void;
+  keyMatch: KeyMatch;
+  disableOnInput?: boolean;
+}) => {
   React.useEffect(() => {
     const onKeyDown = event => {
+      if (disableOnInput !== false && INPUT_ELEMENTS.includes(event.target.tagName)) {
+        return;
+      }
+
       let isRecognizedKey = false;
       if ('key' in event) {
         isRecognizedKey = event.key === keyMatch.key || event.key === keyMatch.keyName;
