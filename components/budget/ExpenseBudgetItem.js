@@ -11,6 +11,7 @@ import expenseTypes from '../../lib/constants/expenseTypes';
 import { getFilesFromExpense } from '../../lib/expenses';
 import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 import { toPx } from '../../lib/theme/helpers';
 import { getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
@@ -90,11 +91,15 @@ const ExpenseContainer = styled.div`
       ${props => props.selected && `background: #f8fafc;`}
     `}
 
-  @media (hover: hover) {
-    &:not(:hover):not(:focus-within) ${ButtonsContainer} {
-      opacity: 0.24;
-    }
-  }
+  ${props =>
+    !props.selected &&
+    css`
+      @media (hover: hover) {
+        &:not(:hover):not(:focus-within) ${ButtonsContainer} {
+          opacity: 0.24;
+        }
+      }
+    `}
 `;
 
 const ExpenseBudgetItem = ({
@@ -130,6 +135,7 @@ const ExpenseBudgetItem = ({
   const isLoggedInUserExpenseHostAdmin = LoggedInUser?.isAdminOfCollective(host);
   const isLoggedInUserExpenseAdmin = LoggedInUser?.isAdminOfCollective(expense?.account);
   const isViewingExpenseInHostContext = isLoggedInUserExpenseHostAdmin && !isLoggedInUserExpenseAdmin;
+  const hasKeyboardShortcutsEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.KEYBOARD_SHORTCUTS);
   const lastComment = expense?.lastComment?.nodes?.[0];
 
   return (
@@ -505,6 +511,7 @@ const ExpenseBudgetItem = ({
               permissions={expense.permissions}
               buttonProps={{ ...DEFAULT_PROCESS_EXPENSE_BTN_PROPS, mx: 1, py: 2 }}
               onSuccess={onProcess}
+              enableKeyboardShortcuts={selected && hasKeyboardShortcutsEnabled}
             />
           </ButtonsContainer>
         )}

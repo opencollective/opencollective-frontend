@@ -99,6 +99,7 @@ const ExpenseSummary = ({
   onEdit,
   drawerActionsContainer,
   openFileViewer,
+  enableKeyboardShortcuts,
   ...props
 }) => {
   const intl = useIntl();
@@ -132,6 +133,7 @@ const ExpenseSummary = ({
         onEdit={onEdit}
         expense={expense}
         isViewingExpenseInHostContext={isViewingExpenseInHostContext}
+        enableKeyboardShortcuts={enableKeyboardShortcuts}
         disabled={isLoading}
         onDelete={() => {
           onDelete?.(expense);
@@ -152,6 +154,7 @@ const ExpenseSummary = ({
               onDelete?.(expense);
               onClose?.();
             }}
+            enableKeyboardShortcuts={enableKeyboardShortcuts}
             displayMarkAsIncomplete
           />
         </Flex>
@@ -678,6 +681,7 @@ ExpenseSummary.propTypes = {
   openFileViewer: PropTypes.func,
   /** Reference to the actions container element in the Expense Drawer */
   drawerActionsContainer: PropTypes.object,
+  enableKeyboardShortcuts: PropTypes.bool,
 };
 
 export default ExpenseSummary;

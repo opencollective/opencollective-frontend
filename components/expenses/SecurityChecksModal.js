@@ -8,6 +8,8 @@ import { ShieldAlert, ShieldCheck } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
+import useKeyboardKey, { S } from '../../lib/hooks/useKeyboardKey';
+
 import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
@@ -210,29 +212,40 @@ const LEVEL_BUTTON_STYLE = {
   LOW: 'secondary',
 };
 
-export const SecurityChecksButton = ({ expense, ...buttonProps }) => {
-  const [hasModal, setHasModal] = React.useState(false);
+export const SecurityChecksButton = ({ expense, enableKeyboardShortcuts, ...buttonProps }) => {
+  const [displayModal, setDisplayModal] = React.useState(false);
   const highRiskChecks = expense?.securityChecks?.filter(check => check.level === 'HIGH').length || 0;
   const higherRisk = first(compact(LEVEL_ORDER.map(level => find(expense?.securityChecks, { level }))));
   const ShieldIcon = highRiskChecks ? ShieldAlert : ShieldCheck;
+
+  useKeyboardKey({
+    keyMatch: S,
+    callback: e => {
+      if (enableKeyboardShortcuts) {
+        e.preventDefault();
+        setDisplayModal(true);
+      }
+    },
+  });
 
   return (
     <React.Fragment>
       <RoundButton
         {...buttonProps}
         buttonStyle={LEVEL_BUTTON_STYLE[higherRisk?.level] || 'secondary'}
-        onClick={() => setHasModal(true)}
+        onClick={() => setDisplayModal(true)}
       >
         {highRiskChecks ? <Indicator>{highRiskChecks}</Indicator> : null}
         <ShieldIcon size={18} />
       </RoundButton>
-      {hasModal && <SecurityChecksModal expense={expense} onClose={() => setHasModal(false)} />}
+      {displayModal && <SecurityChecksModal expense={expense} onClose={() => setDisplayModal(false)} />}
     </React.Fragment>
   );
 };
 
 SecurityChecksButton.propTypes = {
   ...SecurityChecksModal.propTypes,
+  isOpen: PropTypes.bool,
   onConfirm: PropTypes.func,
   onClose: PropTypes.func,
 };
