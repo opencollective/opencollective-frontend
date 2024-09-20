@@ -127,9 +127,11 @@ const ExpensesList = ({
     },
   });
   useEffect(() => {
-    const selectedExpense = expenses[selectedExpenseIndex];
-    const expenseElement = document.getElementById(`expense-${selectedExpense?.legacyId}`);
-    expenseElement?.scrollIntoViewIfNeeded?.();
+    const selectedExpense = expenses?.[selectedExpenseIndex];
+    if (selectedExpense) {
+      const expenseElement = document.getElementById(`expense-${selectedExpense?.legacyId}`);
+      expenseElement?.scrollIntoViewIfNeeded?.();
+    }
   }, [selectedExpenseIndex, expenses]);
 
   if (!expenses?.length && !isLoading) {
