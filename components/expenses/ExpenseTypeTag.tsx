@@ -1,8 +1,9 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
 
-import type { ExpenseType } from '../../lib/graphql/types/v2/graphql';
+import { ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import { i18nExpenseType } from '../../lib/i18n/expense';
+import defaultColors from '../../lib/theme/colors';
 
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import type { StyledTagProps } from '../StyledTag';
@@ -13,6 +14,13 @@ interface ExpenseTypeTagProps extends Omit<StyledTagProps, 'type'> {
   legacyId?: number;
   isLoading?: boolean;
 }
+
+const TAG_COLOR = {
+  [ExpenseType.INVOICE]: defaultColors.blue[200],
+  [ExpenseType.RECEIPT]: defaultColors.green[200],
+  [ExpenseType.GRANT]: defaultColors.yellow[200],
+  [ExpenseType.CHARGE]: defaultColors.purple[200],
+};
 
 const ExpenseTypeTag = ({ type, legacyId = undefined, isLoading = false, ...props }: ExpenseTypeTagProps) => {
   const intl = useIntl();
@@ -27,6 +35,7 @@ const ExpenseTypeTag = ({ type, legacyId = undefined, isLoading = false, ...prop
       textTransform="uppercase"
       fontSize="10px"
       fontWeight="600"
+      backgroundColor={TAG_COLOR[type]}
       {...props}
     >
       {i18nExpenseType(intl, type, legacyId)}
