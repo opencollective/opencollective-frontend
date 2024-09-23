@@ -159,7 +159,7 @@
     "depcheck": "npx @opencollective/depcheck",
     "deploy:production": "cross-env ./scripts/pre-deploy.sh production && git push production main",
     "deploy:staging": "cross-env ./scripts/pre-deploy.sh staging && git push -f staging main",
-    "dev": "node server",
+    "dev": "next dev",
     "docs:generate:contribution-flow": "tsx ./scripts/docs/contribution-flow.js",
     "find-unused-exports": "find-unused-exports --module-glob \"(components|lib|pages|test)/**/*.{js,ts,jsx,tsx}\" --resolve-file-extensions js,ts,jsx,tsx --resolve-index-files",
     "git:clean": "cross-env ./scripts/git_clean.sh",
