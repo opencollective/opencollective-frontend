@@ -11,11 +11,11 @@ import type { Account, UpdatesDashboardQueryVariables } from '../../../../lib/gr
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 
-import { StackedAvatars } from '../../../Avatar';
 import EmojiReactions from '../../../conversations/EmojiReactions';
 import HTMLContent from '../../../HTMLContent';
 import Link from '../../../Link';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
+import StackedAvatars from '../../../StackedAvatars';
 import { Button } from '../../../ui/Button';
 import { Skeleton } from '../../../ui/Skeleton';
 import { DashboardContext } from '../../DashboardContext';
