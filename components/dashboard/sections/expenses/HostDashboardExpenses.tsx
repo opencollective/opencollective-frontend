@@ -101,7 +101,6 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
       filter: {},
       id: 'all',
-      count: metaData?.all?.totalCount,
     },
     {
       label: intl.formatMessage({ id: 'expenses.ready', defaultMessage: 'Ready to pay' }),
@@ -154,7 +153,6 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       label: intl.formatMessage({ defaultMessage: 'Paid', id: 'u/vOPu' }),
       filter: { status: [ExpenseStatusFilter.PAID] },
       id: 'paid',
-      count: metaData?.paid?.totalCount,
     },
   ];
 
