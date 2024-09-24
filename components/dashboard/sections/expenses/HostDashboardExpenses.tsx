@@ -12,6 +12,15 @@ import type {
   HostDashboardExpensesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
 import { ExpenseStatusFilter, LastCommentBy, PayoutMethodType } from '../../../../lib/graphql/types/v2/graphql';
+import {
+  A,
+  ARROW_DOWN_KEY,
+  ARROW_LEFT_KEY,
+  ARROW_RIGHT_KEY,
+  ARROW_UP_KEY,
+  B,
+  useKeyboardSequence,
+} from '../../../../lib/hooks/useKeyboardKey';
 import { useLazyGraphQLPaginatedResults } from '../../../../lib/hooks/useLazyGraphQLPaginatedResults';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
@@ -86,6 +95,25 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const query = router.query;
   const [paypalPreApprovalError, setPaypalPreApprovalError] = React.useState(null);
   const pageRoute = `/dashboard/${hostSlug}/host-expenses`;
+
+  // Konami Code
+  useKeyboardSequence({
+    sequence: [
+      ARROW_UP_KEY,
+      ARROW_UP_KEY,
+      ARROW_DOWN_KEY,
+      ARROW_DOWN_KEY,
+      ARROW_LEFT_KEY,
+      ARROW_RIGHT_KEY,
+      ARROW_LEFT_KEY,
+      ARROW_RIGHT_KEY,
+      B,
+      A,
+    ],
+    callback: () => {
+      new Audio('/static/sounds/super.mp3').play();
+    },
+  });
 
   const {
     data: metaData,
