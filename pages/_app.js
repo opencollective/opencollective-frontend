@@ -42,7 +42,6 @@ import memoizeOne from 'memoize-one';
 
 import { APOLLO_STATE_PROP_NAME, initClient } from '../lib/apollo-client';
 import { getTokenFromCookie } from '../lib/auth';
-import { getGoogleMapsScriptUrl, loadGoogleMaps } from '../lib/google-maps';
 import { loggedInUserQuery } from '../lib/graphql/v1/queries';
 import LoggedInUser from '../lib/LoggedInUser';
 import { withTwoFactorAuthentication } from '../lib/two-factor-authentication/TwoFactorAuthenticationContext';
@@ -81,27 +80,27 @@ class OpenCollectiveFrontendApp extends App {
       ctx.req.apolloClient = apolloClient;
     }
 
-    const props = { pageProps: { skipDataFromTree: true }, scripts: {}, ...getIntlProps(ctx) };
+    const props = { pageProps: { skipDataFromTree: true }, ...getIntlProps(ctx) };
 
     try {
       if (Component.getInitialProps) {
         props.pageProps = await Component.getInitialProps({ ...ctx });
       }
 
-      if (props.pageProps.scripts) {
-        if (props.pageProps.scripts.googleMaps) {
-          if (ctx.req) {
-            props.scripts['google-maps'] = getGoogleMapsScriptUrl();
-          } else {
-            try {
-              await loadGoogleMaps();
-            } catch (e) {
-              // eslint-disable-next-line no-console
-              console.error(e);
-            }
-          }
-        }
-      }
+      // if (props.pageProps.scripts) {
+      //   if (props.pageProps.scripts.googleMaps) {
+      //     if (ctx.req) {
+      //       props.scripts['google-maps'] = getGoogleMapsScriptUrl();
+      //     } else {
+      //       try {
+      //         await loadGoogleMaps();
+      //       } catch (e) {
+      //         // eslint-disable-next-line no-console
+      //         console.error(e);
+      //       }
+      //     }
+      //   }
+      // }
     } catch (error) {
       return { ...props, hasError: true, errorEventId: sentryLib.captureException(error, ctx) };
     }
@@ -167,7 +166,7 @@ class OpenCollectiveFrontendApp extends App {
   });
 
   render() {
-    const { Component, pageProps, scripts, locale, LoggedInUserData } = this.props;
+    const { Component, pageProps, locale, LoggedInUserData } = this.props;
 
     if (
       typeof window !== 'undefined' &&
@@ -177,7 +176,6 @@ class OpenCollectiveFrontendApp extends App {
       // eslint-disable-next-line no-console
       console.log('pageProps apollo cache', pageProps?.[APOLLO_STATE_PROP_NAME]);
     }
-
     return (
       <Fragment>
         <ApolloProvider
@@ -209,9 +207,6 @@ class OpenCollectiveFrontendApp extends App {
           </ThemeProvider>
         </ApolloProvider>
         <DefaultPaletteStyle palette={defaultColors.primary} />
-        {Object.keys(scripts).map(key => (
-          <script key={key} type="text/javascript" src={scripts[key]} />
-        ))}
       </Fragment>
     );
   }
