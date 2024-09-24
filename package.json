@@ -148,7 +148,7 @@
     "@radix-ui/react-focus-scope": "^1.0.4"
   },
   "scripts": {
-    "build": "npm-run-all build:updates build:next build:server",
+    "build": "next build",
     "build:e2e": "cross-env NODE_ENV=development OC_ENV=e2e npm run build",
     "build:clean": "shx rm -rf dist .next",
     "build:components": "npm run publish-components -- --build-only",
@@ -163,7 +163,7 @@
     "depcheck": "npx @opencollective/depcheck",
     "deploy:production": "cross-env ./scripts/pre-deploy.sh production && git push production main",
     "deploy:staging": "cross-env ./scripts/pre-deploy.sh staging && git push -f staging main",
-    "dev": "node server",
+    "dev": "next dev",
     "docs:generate:contribution-flow": "tsx ./scripts/docs/contribution-flow.js",
     "git:clean": "cross-env ./scripts/git_clean.sh",
     "graphql:codegen": "graphql-codegen --config scripts/config/graphql-codegen.ts",
