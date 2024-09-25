@@ -138,7 +138,7 @@ const ExpenseBudgetItem = ({
   const isViewingExpenseInHostContext = isLoggedInUserExpenseHostAdmin && !isLoggedInUserExpenseAdmin;
   const hasKeyboardShortcutsEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.KEYBOARD_SHORTCUTS);
   const lastComment = expense?.lastComment?.nodes?.[0];
-  const approvedBy = expense?.approvedBy.length > 0 ? expense.approvedBy : null;
+  const approvedBy = expense?.approvedBy?.length > 0 ? expense.approvedBy : null;
 
   return (
     <ExpenseContainer
