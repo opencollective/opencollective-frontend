@@ -152,6 +152,11 @@ function HostApplication({
   >([]);
   const [threadOffset, setThreadOffset] = React.useState(0);
 
+  React.useEffect(() => {
+    setThreadItems([]);
+    setThreadOffset(0);
+  }, [applicationId]);
+
   const onDataComplete = React.useCallback(
     (data: HostApplicationThreadQuery, existingThreadItems = threadItems) => {
       const existingPrevPageData = existingThreadItems.slice(0, data.hostApplication.threadComments.offset);
@@ -189,7 +194,7 @@ function HostApplication({
     `,
     {
       context: API_V2_CONTEXT,
-      fetchPolicy: 'network-only',
+      fetchPolicy: 'cache-and-network',
       variables: {
         hostApplication: {
           id: applicationId,
