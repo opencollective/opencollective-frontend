@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { useApolloClient, useLazyQuery } from '@apollo/client';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { OrderByFieldType, OrderDirection } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 
@@ -33,10 +32,7 @@ export default function ExpenseDrawer({ openExpenseLegacyId, handleClose, initia
   useEffect(() => {
     if (openExpenseLegacyId) {
       getExpense({
-        variables: {
-          ...getVariablesFromQuery({ ExpenseId: openExpenseLegacyId }),
-          orderBy: { field: OrderByFieldType.CREATED_AT, direction: OrderDirection.ASC },
-        },
+        variables: getVariablesFromQuery({ ExpenseId: openExpenseLegacyId }),
       });
     }
   }, [openExpenseLegacyId]);
