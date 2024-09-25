@@ -178,7 +178,7 @@ function HostApplication({
       query HostApplicationThread($hostApplication: HostApplicationReferenceInput!, $offset: Int!, $limit: Int!) {
         hostApplication(hostApplication: $hostApplication) {
           ...HostApplicationFields
-          threadComments: comments(limit: $limit, offset: $offset, orderBy: { field: CREATED_AT, direction: DESC }) {
+          threadComments: comments(limit: $limit, offset: $offset, orderBy: { field: CREATED_AT, direction: ASC }) {
             totalCount
             offset
             limit
@@ -484,10 +484,6 @@ function HostApplication({
             <div className="mb-5 text-sm leading-3 text-[#344256]">
               <span className="font-bold">
                 <FormattedMessage defaultMessage="Comments" id="wCgTu5" />
-              </span>
-              <span>
-                &nbsp;
-                <FormattedMessage defaultMessage="(Latest first)" id="K78a3C" />
               </span>
             </div>
 

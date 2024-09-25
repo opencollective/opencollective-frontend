@@ -35,7 +35,7 @@ export default function ExpenseDrawer({ openExpenseLegacyId, handleClose, initia
       getExpense({
         variables: {
           ...getVariablesFromQuery({ ExpenseId: openExpenseLegacyId }),
-          orderBy: { field: OrderByFieldType.CREATED_AT, direction: OrderDirection.DESC },
+          orderBy: { field: OrderByFieldType.CREATED_AT, direction: OrderDirection.ASC },
         },
       });
     }
