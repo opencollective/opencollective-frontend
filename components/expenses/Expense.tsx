@@ -17,7 +17,7 @@ import expenseTypes from '../../lib/constants/expenseTypes';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { getFilesFromExpense, getPayoutProfiles } from '../../lib/expenses';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { ExpenseStatus, OrderByFieldType, OrderDirection } from '../../lib/graphql/types/v2/graphql';
+import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useKeyboardKey, { E } from '../../lib/hooks/useKeyboardKey';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
@@ -285,10 +285,7 @@ function Expense(props) {
   const clonePageQueryCacheData = () => {
     const { client } = props;
     const query = expensePageQuery;
-    const variables = {
-      ...getVariableFromProps(props),
-      ...(inDrawer ? { orderBy: { field: OrderByFieldType.CREATED_AT, direction: OrderDirection.DESC } } : {}),
-    };
+    const variables = getVariableFromProps(props);
     const data = cloneDeep(client.readQuery({ query, variables }));
     return [data, query, variables];
   };
