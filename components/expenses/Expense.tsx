@@ -253,7 +253,7 @@ function Expense(props) {
   const threadItems = React.useMemo(() => {
     const comments = expense?.comments?.nodes || [];
     const activities = expense?.activities || [];
-    return orderBy([...comments, ...activities], 'createdAt', inDrawer ? 'desc' : 'asc');
+    return orderBy([...comments, ...activities], 'createdAt', 'asc');
   }, [expense, inDrawer]);
 
   const isEditing = status === PAGE_STATUS.EDIT || status === PAGE_STATUS.EDIT_SUMMARY;

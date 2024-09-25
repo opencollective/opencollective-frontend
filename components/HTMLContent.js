@@ -7,6 +7,8 @@ import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { space, typography } from 'styled-system';
 
+import { Button } from './ui/Button';
+
 /**
  * React-Quill usually saves something like `<p><br/></p` when saving with an empty
  * editor. This function tries to detect this and returns true if there's no real
@@ -28,18 +30,6 @@ export const isEmptyHTMLValue = value => {
     return cleanStr.length === 0;
   }
 };
-
-const ReadFullLink = styled.a`
-  margin-top: 4px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  cursor: pointer;
-  font-size: 12px;
-  > svg {
-    vertical-align: baseline;
-  }
-`;
 
 const InlineDisplayBox = styled.div`
   overflow-y: hidden;
@@ -129,10 +119,11 @@ const HTMLContent = styled(
           />
         </DisplayBox>
         {!isOpen && isCollapsed && !hideViewMoreLink && (
-          <ReadFullLink
+          <Button
+            variant="outline"
+            className="mt-4"
+            size="xs"
             onClick={() => setOpen(true)}
-            {...props}
-            role="button"
             tabIndex={0}
             onKeyDown={event => {
               if (event.key === 'Enter') {
@@ -143,13 +134,14 @@ const HTMLContent = styled(
           >
             {readMoreMessage || <FormattedMessage id="ExpandDescription" defaultMessage="Read full description" />}
             <ChevronDown size={10} />
-          </ReadFullLink>
+          </Button>
         )}
         {isOpen && isCollapsed && (
-          <ReadFullLink
+          <Button
+            variant="outline"
+            className="mt-4"
+            size="xs"
             onClick={() => setOpen(false)}
-            {...props}
-            role="button"
             tabIndex={0}
             onKeyDown={event => {
               if (event.key === 'Enter') {
@@ -160,7 +152,7 @@ const HTMLContent = styled(
           >
             <FormattedMessage defaultMessage="Collapse" id="W/V6+Y" />
             <ChevronUp size={10} />
-          </ReadFullLink>
+          </Button>
         )}
       </div>
     );

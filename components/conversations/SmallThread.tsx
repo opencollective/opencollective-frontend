@@ -33,27 +33,6 @@ export default function SmallThread(props: SmallThreadProps) {
 
   return (
     <React.Fragment>
-      {props.canComment && (
-        <div className="flex gap-4 pb-4">
-          <div className="relative">
-            <div className="absolute -bottom-4 left-5 top-10 border-l" />
-            <Avatar collective={LoggedInUser.collective} radius={40} />
-          </div>
-          <div className="flex-grow">
-            <CommentForm
-              {...props.CommentEntity}
-              submitButtonJustify="end"
-              submitButtonVariant="outline"
-              minHeight={60}
-              isDisabled={props.loading || loading}
-              replyingToComment={replyingToComment}
-              onSuccess={props.onCommentCreated}
-              canUsePrivateNote={props.canUsePrivateNote}
-              defaultType={props.defaultType}
-            />
-          </div>
-        </div>
-      )}
       <div data-cy="thread">
         {props.loading && <Loading />}
         {!props.loading &&
@@ -90,6 +69,28 @@ export default function SmallThread(props: SmallThreadProps) {
           </div>
         )}
       </div>
+      {props.canComment && (
+        <div className="flex gap-4 py-4">
+          <div className="relative">
+            {props.items?.length > 0 && <div className="absolute -top-4 left-5 h-4 border-l" />}
+
+            <Avatar collective={LoggedInUser.collective} radius={40} />
+          </div>
+          <div className="flex-grow">
+            <CommentForm
+              {...props.CommentEntity}
+              submitButtonJustify="end"
+              submitButtonVariant="outline"
+              minHeight={60}
+              isDisabled={props.loading || loading}
+              replyingToComment={replyingToComment}
+              onSuccess={props.onCommentCreated}
+              canUsePrivateNote={props.canUsePrivateNote}
+              defaultType={props.defaultType}
+            />
+          </div>
+        </div>
+      )}
     </React.Fragment>
   );
 }
