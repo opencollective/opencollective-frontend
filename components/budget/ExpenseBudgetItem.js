@@ -56,7 +56,6 @@ const DetailColumnHeader = styled.div`
   letter-spacing: 0.6px;
   text-transform: uppercase;
   color: #c4c7cc;
-  height: min-content;
 `;
 
 const ButtonsContainer = styled.div.attrs({ 'data-cy': 'expense-actions' })`
@@ -186,7 +185,6 @@ const ExpenseBudgetItem = ({
                     <FormattedMessage id="Expense.GoToPage" defaultMessage="Go to expense page" />
                   )}
                 </TooltipContent>
-
                 <TooltipTrigger asChild>
                   <span>
                     <StyledLink
@@ -399,23 +397,28 @@ const ExpenseBudgetItem = ({
           )}
         </Flex>
       </Flex>
-      <Flex flexWrap="wrap" justifyContent="space-between" alignItems="center" mt={2}>
-        <Box mt={2}>
+      {/* <Flex flexWrap="wrap" justifyContent="space-between" alignItems="center" mt={2}> */}
+      <div className="mt-2 flex flex-col justify-between xl:flex-row">
+        <div className="w-full sm:w-auto">
           {isAdminView || isSubmitterView ? (
-            <div className="grid grid-flow-col grid-rows-[14px_1fr] gap-x-6 gap-y-0">
-              <DetailColumnHeader>
-                <FormattedMessage id="expense.payoutMethod" defaultMessage="payout method" />
-              </DetailColumnHeader>
-              <PayoutMethodTypeWithIcon
-                isLoading={isLoading}
-                type={expense.payoutMethod?.type}
-                iconSize="10px"
-                fontSize="11px"
-                fontWeight="normal"
-                color="black.700"
-              />
+            <div className="mx-4 grid w-full grid-cols-2 gap-x-6 gap-y-1 sm:mx-0 sm:grid-flow-col sm:gap-y-0">
+              <div>
+                <DetailColumnHeader>
+                  <FormattedMessage id="expense.payoutMethod" defaultMessage="payout method" />
+                </DetailColumnHeader>
+                <div className="flex h-6 items-center">
+                  <PayoutMethodTypeWithIcon
+                    isLoading={isLoading}
+                    type={expense.payoutMethod?.type}
+                    iconSize="10px"
+                    fontSize="11px"
+                    fontWeight="normal"
+                    color="black.700"
+                  />
+                </div>
+              </div>
               {Boolean(expense.reference) && (
-                <React.Fragment>
+                <div>
                   <DetailColumnHeader>
                     <FormattedMessage id="Expense.Reference" defaultMessage="Reference" />
                   </DetailColumnHeader>
@@ -426,10 +429,10 @@ const ExpenseBudgetItem = ({
                       <TruncatedTextWithTooltip value={expense.reference} length={10} truncatePosition="middle" />
                     </div>
                   )}
-                </React.Fragment>
+                </div>
               )}
               {nbAttachedFiles > 0 && (
-                <React.Fragment>
+                <div>
                   <DetailColumnHeader>
                     <FormattedMessage id="Expense.Attachments" defaultMessage="Attachments" />
                   </DetailColumnHeader>
@@ -445,6 +448,7 @@ const ExpenseBudgetItem = ({
                       px={2}
                       ml={-2}
                       isBorderless
+                      textAlign="left"
                     >
                       <MaximizeIcon size={10} />
                       &nbsp;&nbsp;
@@ -455,10 +459,10 @@ const ExpenseBudgetItem = ({
                       />
                     </StyledButton>
                   )}
-                </React.Fragment>
+                </div>
               )}
               {lastComment && (
-                <React.Fragment>
+                <div>
                   <DetailColumnHeader>
                     <FormattedMessage defaultMessage="Last Comment" id="gSNApa" />
                   </DetailColumnHeader>
@@ -472,10 +476,10 @@ const ExpenseBudgetItem = ({
                       <Avatar collective={lastComment.fromAccount} radius={24} /> {lastComment.fromAccount.name}
                     </LinkCollective>
                   </div>
-                </React.Fragment>
+                </div>
               )}
               {approvedBy && expense.status === ExpenseStatus.APPROVED && !expense.onHold && (
-                <React.Fragment>
+                <div>
                   <DetailColumnHeader>
                     <FormattedMessage defaultMessage="Approved By" id="JavAWD" />
                   </DetailColumnHeader>
@@ -486,15 +490,20 @@ const ExpenseBudgetItem = ({
                       withHoverCard={{ includeAdminMembership: true }}
                     />
                   </div>
-                </React.Fragment>
+                </div>
               )}
             </div>
           ) : (
-            <Tags expense={expense} canEdit={get(expense, 'permissions.canEditTags', false)} />
+            <div className="mt-2">
+              <Tags expense={expense} canEdit={get(expense, 'permissions.canEditTags', false)} />
+            </div>
           )}
-        </Box>
+        </div>
         {showProcessActions && expense?.permissions && !isExpensePaidOrRejected && (
-          <ButtonsContainer>
+          <div
+            data-cy="expense-actions"
+            className="mt-5 flex w-full flex-col items-stretch gap-2 sm:mt-2 sm:w-auto sm:flex-row sm:items-start sm:justify-end"
+          >
             <ProcessExpenseButtons
               host={host}
               isViewingExpenseInHostContext={isViewingExpenseInHostContext}
@@ -505,9 +514,9 @@ const ExpenseBudgetItem = ({
               onSuccess={onProcess}
               enableKeyboardShortcuts={selected && hasKeyboardShortcutsEnabled}
             />
-          </ButtonsContainer>
+          </div>
         )}
-      </Flex>
+      </div>
       {showFilesViewerModal && (
         <FilesViewerModal
           files={files}
