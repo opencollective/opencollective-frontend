@@ -51,7 +51,7 @@ export default function DeclineExpenseInviteButton(props: DeclineExpenseInviteBu
 
   return (
     <React.Fragment>
-      <Button variant="secondary" size="xs" onClick={() => setIsDeclineModalOpen(true)}>
+      <Button variant="outline" size="xs" onClick={() => setIsDeclineModalOpen(true)}>
         <FormattedMessage defaultMessage="Decline invitation" id="4DwePS" />
       </Button>
       <ConfirmationModal

@@ -29,7 +29,7 @@ type ExpenseInviteWelcomeProps = {
 export default function ExpenseInviteWelcome(props: ExpenseInviteWelcomeProps) {
   return (
     <React.Fragment>
-      <div className="mb-4 flex items-center gap-4 rounded-md border border-[#DCDDE0] px-6 py-3">
+      <div className="mb-4 flex flex-col items-center gap-4 rounded-md border border-[#DCDDE0] p-4 sm:flex-row sm:p-6">
         <Image className="object-contain" alt="" src="/static/images/pidgeon.png" width={132} height={132} />
         <div className="grow">
           <div className="mb-2 text-lg font-bold">
@@ -41,6 +41,11 @@ export default function ExpenseInviteWelcome(props: ExpenseInviteWelcomeProps) {
               id="5YI3tk"
             />
           </div>
+          {props.expense.permissions.canDeclineExpenseInvite && (
+            <div className="mt-4">
+              <DeclineExpenseInviteButton expense={props.expense} draftKey={props.draftKey} />
+            </div>
+          )}
         </div>
       </div>
 
@@ -76,11 +81,6 @@ export default function ExpenseInviteWelcome(props: ExpenseInviteWelcomeProps) {
           </div>
 
           <div className="text-sm">{props.expense.draft.recipientNote}</div>
-        </div>
-      )}
-      {props.expense.permissions.canDeclineExpenseInvite && (
-        <div className="mb-4">
-          <DeclineExpenseInviteButton expense={props.expense} draftKey={props.draftKey} />
         </div>
       )}
     </React.Fragment>
