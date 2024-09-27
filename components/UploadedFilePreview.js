@@ -137,7 +137,7 @@ const UploadedFilePreview = ({
     if (isPrivate) {
       return { as: 'div' };
     } else if (isText || !openFileViewer) {
-      return { href: url, openInNewTab: true, as: url.startsWith('/') ? Link : StyledLink };
+      return { href: url, target: '_blank', rel: 'noopener noreferrer', as: url.startsWith('/') ? Link : StyledLink };
     } else {
       return {
         as: 'div',
