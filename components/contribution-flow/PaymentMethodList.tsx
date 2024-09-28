@@ -107,7 +107,7 @@ type PaymentMethodListProps = {
   disabledPaymentMethodTypes: string[];
   stepSummary: object;
   stepDetails: { amount: number; currency: string; interval?: string };
-  stepPayment: { key: string; isKeyOnly?: boolean };
+  stepPayment: { key: string; isKeyOnly?: boolean; chargeAttempt: number };
   isEmbed: boolean;
   isSubmitting: boolean;
   hideCreditCardPostalCode: boolean;
@@ -132,6 +132,7 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
 
   const hostSupportedPaymentMethods = props.host?.supportedPaymentMethods ?? [];
   const [paymentIntent, stripe, loadingPaymentIntent, paymentIntentCreateError] = usePaymentIntent({
+    chargeAttempt: props.stepPayment?.chargeAttempt,
     skip: !hostSupportedPaymentMethods.includes(PaymentMethodLegacyType.PAYMENT_INTENT),
     amount: { valueInCents: props.stepDetails.amount, currency: props.stepDetails.currency },
     fromAccount: props.stepProfile.isGuest
