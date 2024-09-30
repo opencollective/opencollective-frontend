@@ -818,6 +818,11 @@ interface Account {
   stats: AccountStats
 
   """
+  Whether this account can have changelog updates
+  """
+  canHaveChangelogUpdates: Boolean!
+
+  """
   Updates published by the account. To see unpublished updates, you need to be an admin and have the scope "updates".
   """
   updates(
@@ -3215,6 +3220,11 @@ type Host implements Account & AccountWithContributions {
   location: Location
   categories: [String]!
   stats: AccountStats
+
+  """
+  Whether this account can have changelog updates
+  """
+  canHaveChangelogUpdates: Boolean!
 
   """
   Updates published by the account. To see unpublished updates, you need to be an admin and have the scope "updates".
@@ -8099,6 +8109,11 @@ type Bot implements Account {
   stats: AccountStats
 
   """
+  Whether this account can have changelog updates
+  """
+  canHaveChangelogUpdates: Boolean!
+
+  """
   Updates published by the account. To see unpublished updates, you need to be an admin and have the scope "updates".
   """
   updates(
@@ -8903,6 +8918,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   location: Location
   categories: [String]!
   stats: AccountStats
+
+  """
+  Whether this account can have changelog updates
+  """
+  canHaveChangelogUpdates: Boolean!
 
   """
   Updates published by the account. To see unpublished updates, you need to be an admin and have the scope "updates".
@@ -10164,6 +10184,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   stats: AccountStats
 
   """
+  Whether this account can have changelog updates
+  """
+  canHaveChangelogUpdates: Boolean!
+
+  """
   Updates published by the account. To see unpublished updates, you need to be an admin and have the scope "updates".
   """
   updates(
@@ -11203,6 +11228,11 @@ type Individual implements Account {
   stats: AccountStats
 
   """
+  Whether this account can have changelog updates
+  """
+  canHaveChangelogUpdates: Boolean!
+
+  """
   Updates published by the account. To see unpublished updates, you need to be an admin and have the scope "updates".
   """
   updates(
@@ -12215,6 +12245,11 @@ type Organization implements Account & AccountWithContributions {
   stats: AccountStats
 
   """
+  Whether this account can have changelog updates
+  """
+  canHaveChangelogUpdates: Boolean!
+
+  """
   Updates published by the account. To see unpublished updates, you need to be an admin and have the scope "updates".
   """
   updates(
@@ -13116,6 +13151,11 @@ type Vendor implements Account & AccountWithContributions {
   location: Location
   categories: [String]!
   stats: AccountStats
+
+  """
+  Whether this account can have changelog updates
+  """
+  canHaveChangelogUpdates: Boolean!
 
   """
   Updates published by the account. To see unpublished updates, you need to be an admin and have the scope "updates".
@@ -14358,6 +14398,10 @@ type Query {
     """
     account: AccountReferenceInput
   ): Update
+
+  """
+  This query currently returns only published updates
+  """
   updates(
     """
     The number of results to fetch (default 10, max 1000)
@@ -14383,6 +14427,8 @@ type Query {
     Host for the accounts for which to get updates
     """
     host: [AccountReferenceInput]
+    onlyChangelogUpdates: Boolean
+    orderBy: UpdateChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
   ): UpdateCollection!
   paypalPlan(
     """
@@ -16556,6 +16602,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   stats: AccountStats
 
   """
+  Whether this account can have changelog updates
+  """
+  canHaveChangelogUpdates: Boolean!
+
+  """
   Updates published by the account. To see unpublished updates, you need to be an admin and have the scope "updates".
   """
   updates(
@@ -17473,6 +17524,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   location: Location
   categories: [String]!
   stats: AccountStats
+
+  """
+  Whether this account can have changelog updates
+  """
+  canHaveChangelogUpdates: Boolean!
 
   """
   Updates published by the account. To see unpublished updates, you need to be an admin and have the scope "updates".
@@ -20063,7 +20119,7 @@ input CommentUpdateInput {
 }
 
 """
-Input to create a comment. You can only specify one entity type: expense, conversation or update
+Input to create a comment. You can only specify one entity type: expense, conversation, update or host application
 """
 input CommentCreateInput {
   html: String

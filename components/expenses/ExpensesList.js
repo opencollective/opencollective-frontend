@@ -181,9 +181,7 @@ const ExpensesList = ({
                   view={view}
                   onDelete={onDelete}
                   onProcess={onProcess}
-                  selected={
-                    openExpenseLegacyId === expense.legacyId || (!openExpenseLegacyId && selectedExpenseIndex === idx)
-                  }
+                  selected={!openExpenseLegacyId && selectedExpenseIndex === idx}
                   expandExpense={e => {
                     e.preventDefault();
                     setOpenExpenseLegacyId(expense.legacyId);

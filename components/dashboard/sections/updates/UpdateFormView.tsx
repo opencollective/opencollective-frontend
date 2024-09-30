@@ -424,7 +424,7 @@ const FormBody = ({ update }) => {
                             <SelectItem data-cy="update-type-private" value="true">
                               <FormattedMessage defaultMessage="Restricted" id="Restricted" />
                             </SelectItem>
-                            {account.slug === 'opencollective' && (
+                            {account.canHaveChangelogUpdates && (
                               <SelectItem value="changelog">
                                 <FormattedMessage id="update.type.changelog" defaultMessage="Changelog Entry" />
                               </SelectItem>

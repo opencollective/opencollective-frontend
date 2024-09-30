@@ -296,6 +296,7 @@ const ProcessExpenseButtons = ({
           onClick={() => setConfirmProcessExpenseAction('REQUEST_RE_APPROVAL')}
           buttonStyle="dangerSecondary"
           data-cy="request-re-approval-button"
+          className="text-nowrap"
         >
           <UnapproveIcon size={12} />
           <ButtonLabel>

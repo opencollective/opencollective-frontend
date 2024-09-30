@@ -219,12 +219,7 @@ describe('host dashboard', () => {
         cy.getByDataCy(`expense-container-${expense.legacyId}`).as('currentExpense');
       });
 
-      // Security Check
       cy.get('@currentExpense').find('[data-cy="pay-button"]').click();
-      cy.getByDataCy('security-check-modal').as('securityCheckModal');
-      cy.get('@securityCheckModal').find('h1').contains('Are you sure you want to pay?');
-      cy.get('@securityCheckModal').find('[data-cy="pay-button"]').click();
-
       // Pay
       cy.getByDataCy('pay-expense-modal').as('payExpenseModal');
       cy.get('@payExpenseModal').find('[data-cy="pay-type-MANUAL"]').click();

@@ -151,11 +151,19 @@ export const hostApplicationsQuery = gql`
 
 export const processApplicationMutation = gql`
   mutation ProcessHostApplication(
-    $hostApplication: HostApplicationReferenceInput!
+    $host: AccountReferenceInput
+    $account: AccountReferenceInput
+    $hostApplication: HostApplicationReferenceInput
     $action: ProcessHostApplicationAction!
     $message: String
   ) {
-    processHostApplication(hostApplication: $hostApplication, action: $action, message: $message) {
+    processHostApplication(
+      host: $host
+      account: $account
+      hostApplication: $hostApplication
+      action: $action
+      message: $message
+    ) {
       account {
         id
         ... on AccountWithHost {

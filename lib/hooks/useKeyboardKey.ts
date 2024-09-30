@@ -8,15 +8,13 @@ type KeyMatch = {
   keyCode?: number;
 };
 
-const useKeyboardKey = ({
-  callback,
-  keyMatch,
-  disableOnInput,
-}: {
+type UseKeyboardKeyProps = {
   callback: (event: KeyboardEvent) => void;
   keyMatch: KeyMatch;
   disableOnInput?: boolean;
-}) => {
+};
+
+const useKeyboardKey = ({ callback, keyMatch, disableOnInput }: UseKeyboardKeyProps) => {
   React.useEffect(() => {
     const onKeyDown = event => {
       if (disableOnInput !== false && INPUT_ELEMENTS.includes(event.target.tagName)) {
@@ -40,6 +38,41 @@ const useKeyboardKey = ({
       document.removeEventListener('keydown', onKeyDown);
     };
   }, [callback, keyMatch]);
+};
+
+export const useKeyboardSequence = ({
+  sequence,
+  callback,
+  disableOnInput,
+}: Omit<UseKeyboardKeyProps, 'keyMatch'> & { sequence: KeyMatch[] }) => {
+  const [sequenceIndex, setSequenceIndex] = React.useState(0);
+  React.useEffect(() => {
+    const onKeyDown = event => {
+      if (disableOnInput !== false && INPUT_ELEMENTS.includes(event.target.tagName)) {
+        return;
+      }
+
+      let isRecognizedKey = false;
+      const expectedKey = sequence[sequenceIndex];
+      if ('key' in event && expectedKey?.key) {
+        isRecognizedKey = event.key === expectedKey.key || event.key === expectedKey.keyName;
+      }
+
+      if (isRecognizedKey) {
+        setSequenceIndex(sequenceIndex + 1);
+        if (sequenceIndex === sequence.length - 1) {
+          callback(event);
+        }
+      } else {
+        setSequenceIndex(0);
+      }
+    };
+
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [callback, sequence]);
 };
 
 export default useKeyboardKey;
@@ -66,6 +99,16 @@ export const ARROW_RIGHT_KEY = {
   key: 'ArrowRight',
   keyName: 'Right arrow',
   keyCode: 39,
+};
+
+export const ARROW_UP_KEY = {
+  key: 'ArrowUp',
+  keyName: 'Up arrow',
+};
+
+export const ARROW_DOWN_KEY = {
+  key: 'ArrowDown',
+  keyName: 'Down arrow',
 };
 
 export const PAGE_UP_KEY = {
@@ -111,4 +154,14 @@ export const H = {
 export const I = {
   key: 'i',
   keyName: 'I',
+};
+
+export const A = {
+  key: 'a',
+  keyName: 'A',
+};
+
+export const B = {
+  key: 'b',
+  keyName: 'B',
 };
