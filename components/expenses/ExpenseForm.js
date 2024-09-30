@@ -56,6 +56,7 @@ import ExpenseFormItems from './ExpenseFormItems';
 import ExpenseFormPayeeInviteNewStep, { validateExpenseFormPayeeInviteNewStep } from './ExpenseFormPayeeInviteNewStep';
 import ExpenseFormPayeeSignUpStep from './ExpenseFormPayeeSignUpStep';
 import ExpenseFormPayeeStep, { checkStepOneCompleted } from './ExpenseFormPayeeStep';
+import ExpenseInviteWelcome from './ExpenseInviteWelcome';
 import { prepareExpenseItemForSubmit, validateExpenseItem } from './ExpenseItemForm';
 import ExpenseRecurringBanner from './ExpenseRecurringBanner';
 import ExpenseSummaryAdditionalInformation from './ExpenseSummaryAdditionalInformation';
@@ -631,6 +632,10 @@ const ExpenseFormBody = ({
 
   return (
     <Form ref={formRef}>
+      {(expense?.permissions?.canDeclineExpenseInvite ||
+        (expense?.status === ExpenseStatus.DRAFT && expense?.draft?.recipientNote)) && (
+        <ExpenseInviteWelcome expense={expense} draftKey={router.query.key} />
+      )}
       {!isCreditCardCharge && (
         <ExpenseTypeRadioSelect
           name="type"
@@ -1026,6 +1031,9 @@ ExpenseFormBody.propTypes = {
         url: PropTypes.string,
       }),
     ),
+    permissions: PropTypes.shape({
+      canDeclineExpenseInvite: PropTypes.bool,
+    }),
   }),
   drawerActionsContainer: PropTypes.object,
   supportedExpenseTypes: PropTypes.arrayOf(PropTypes.string),
@@ -1150,6 +1158,9 @@ ExpenseForm.propTypes = {
         url: PropTypes.string,
       }),
     ),
+    permissions: PropTypes.shape({
+      canDeclineExpenseInvite: PropTypes.bool,
+    }),
   }),
   /** To reset form */
   originalExpense: PropTypes.shape({

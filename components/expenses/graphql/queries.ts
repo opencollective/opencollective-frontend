@@ -9,6 +9,9 @@ export const expensePageQuery = gql`
     expense(expense: { legacyId: $legacyExpenseId }, draftKey: $draftKey) {
       id
       ...ExpensePageExpenseFields
+      permissions {
+        canDeclineExpenseInvite(draftKey: $draftKey)
+      }
       comments(limit: 100, offset: $offset) {
         totalCount
         nodes {

@@ -169,6 +169,14 @@ export const ACTIVITIES_INFO = {
       defaultMessage: 'Expense was released from hold',
     }),
   },
+  COLLECTIVE_EXPENSE_INVITE_DECLINED: {
+    type: 'error',
+    icon: RejectedIcon,
+    message: defineMessage({
+      id: 'Expense.Activity.Invite.Declined',
+      defaultMessage: 'Expense invite declined',
+    }),
+  },
 };
 
 export const getActivityColors = (activityType, theme) => {

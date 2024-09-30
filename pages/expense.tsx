@@ -37,7 +37,7 @@ export const getVariablesFromQuery = query => {
 const getPropsFromQuery = query => {
   return {
     legacyExpenseId: parseInt(query.ExpenseId),
-    draftKey: query.key,
+    draftKey: query.key || null,
     collectiveSlug: query.collectiveSlug,
     edit: query.edit,
   };
