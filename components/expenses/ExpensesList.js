@@ -97,7 +97,7 @@ const ExpensesList = ({
 
   const [selectedExpenseIndex, setSelectedExpenseIndex] = React.useState();
   const navigateIndex = dif => event => {
-    if (hasKeyboardShortcutsEnabled) {
+    if (hasKeyboardShortcutsEnabled && !openExpenseLegacyId) {
       event.preventDefault();
       let nextIndex = (selectedExpenseIndex ?? -1) + dif;
       if (nextIndex < 0) {
