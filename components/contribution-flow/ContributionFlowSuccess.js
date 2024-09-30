@@ -389,14 +389,14 @@ class ContributionFlowSuccess extends React.Component {
                 display="flex"
                 alignItems="center"
                 justifyContent="center"
-                width={['100%', null, null, '50%', '762px']}
+                width={['100%', null, null, '50%']}
                 mb={[4, null, null, 0]}
                 flexShrink={0}
               >
                 <Flex flexDirection="column" alignItems="center" justifyContent="center" my={4} width={1}>
-                  <H3 mb={3}>
+                  <h3 className="mb-4 text-3xl font-bold">
                     <FormattedMessage id="NewContributionFlow.Success.Header" defaultMessage="Thank you! 🎉" />
-                  </H3>
+                  </h3>
                   <Box mb={3}>
                     <P fontSize="20px" color="black.700" fontWeight={500} textAlign="center">
                       <FormattedMessage

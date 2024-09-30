@@ -17,6 +17,7 @@ export const adminPanelQuery = gql`
       isActive
       isIncognito
       imageUrl(height: 256)
+      canHaveChangelogUpdates
       duplicatedAccounts {
         totalCount
       }

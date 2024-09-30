@@ -4,7 +4,10 @@ import { uniq } from 'lodash';
 import { ChevronDown } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
+import useKeyboardKey, { PAGE_DOWN_KEY, PAGE_UP_KEY } from '../../../lib/hooks/useKeyboardKey';
+import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../../lib/hooks/usePrevious';
+import { PREVIEW_FEATURE_KEYS } from '../../../lib/preview-features';
 
 import { Button } from '../../ui/Button';
 import {
@@ -44,6 +47,7 @@ function SelectLimit({ limit, setLimit, defaultLimit }) {
 }
 
 export function Pagination({ total, queryFilter }) {
+  const { LoggedInUser } = useLoggedInUser();
   const { offset, limit } = queryFilter.values;
   const defaultLimit = queryFilter.defaultSchemaValues.limit;
   const prevTotalCount = usePrevious(total);
@@ -59,6 +63,26 @@ export function Pagination({ total, queryFilter }) {
     const offset = (page - 1) * limit;
     queryFilter.setFilter('offset', offset);
   };
+
+  const hasKeyboardShortcutsEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.KEYBOARD_SHORTCUTS);
+  useKeyboardKey({
+    keyMatch: PAGE_UP_KEY,
+    callback: e => {
+      if (hasKeyboardShortcutsEnabled) {
+        e.preventDefault();
+        goToPage(currentPage - 1);
+      }
+    },
+  });
+  useKeyboardKey({
+    keyMatch: PAGE_DOWN_KEY,
+    callback: e => {
+      if (hasKeyboardShortcutsEnabled) {
+        e.preventDefault();
+        goToPage(currentPage + 1);
+      }
+    },
+  });
 
   // Show pagination if there is more than 1 page or limit is not default (i.e. the user has changed it)
   const showPagination = totalPages > 1 || limit !== defaultLimit;

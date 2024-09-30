@@ -17,7 +17,8 @@ import expenseTypes from '../../lib/constants/expenseTypes';
 import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { getFilesFromExpense, getPayoutProfiles } from '../../lib/expenses';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { ExpenseStatus, OrderByFieldType, OrderDirection } from '../../lib/graphql/types/v2/graphql';
+import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
+import useKeyboardKey, { E } from '../../lib/hooks/useKeyboardKey';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 import { itemHasOCR } from './lib/ocr';
@@ -114,6 +115,7 @@ function Expense(props) {
     isRefetchingDataForUser,
     legacyExpenseId,
     isDrawer,
+    enableKeyboardShortcuts,
   } = props;
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const intl = useIntl();
@@ -210,6 +212,16 @@ function Expense(props) {
     setState(state => ({ ...state, error }));
   }, [error]);
 
+  useKeyboardKey({
+    keyMatch: E,
+    callback: e => {
+      if (props.enableKeyboardShortcuts && state.status !== PAGE_STATUS.EDIT) {
+        e.preventDefault();
+        onEditBtnClick();
+      }
+    },
+  });
+
   const [editExpense] = useMutation(editExpenseMutation, {
     context: API_V2_CONTEXT,
   });
@@ -241,7 +253,7 @@ function Expense(props) {
   const threadItems = React.useMemo(() => {
     const comments = expense?.comments?.nodes || [];
     const activities = expense?.activities || [];
-    return orderBy([...comments, ...activities], 'createdAt', inDrawer ? 'desc' : 'asc');
+    return orderBy([...comments, ...activities], 'createdAt', 'asc');
   }, [expense, inDrawer]);
 
   const isEditing = status === PAGE_STATUS.EDIT || status === PAGE_STATUS.EDIT_SUMMARY;
@@ -273,10 +285,7 @@ function Expense(props) {
   const clonePageQueryCacheData = () => {
     const { client } = props;
     const query = expensePageQuery;
-    const variables = {
-      ...getVariableFromProps(props),
-      ...(inDrawer ? { orderBy: { field: OrderByFieldType.CREATED_AT, direction: OrderDirection.DESC } } : {}),
-    };
+    const variables = getVariableFromProps(props);
     const data = cloneDeep(client.readQuery({ query, variables }));
     return [data, query, variables];
   };
@@ -573,6 +582,7 @@ function Expense(props) {
             showProcessButtons
             drawerActionsContainer={drawerActionsContainer}
             openFileViewer={openFileViewer}
+            enableKeyboardShortcuts={enableKeyboardShortcuts}
           />
 
           {status !== PAGE_STATUS.EDIT_SUMMARY && (
@@ -801,6 +811,7 @@ Expense.propTypes = {
   isRefetchingDataForUser: PropTypes.bool,
   drawerActionsContainer: PropTypes.object,
   isDrawer: PropTypes.bool,
+  enableKeyboardShortcuts: PropTypes.bool,
 };
 
 export default Expense;

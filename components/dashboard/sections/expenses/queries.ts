@@ -250,9 +250,6 @@ export const hostDashboardMetadataQuery = gql`
         }
       }
     }
-    all: expenses(host: { slug: $hostSlug }) {
-      totalCount
-    }
     unreplied: expenses(host: { slug: $hostSlug }, status: [APPROVED, ERROR, INCOMPLETE], lastCommentBy: [USER]) {
       totalCount
     }
@@ -269,9 +266,6 @@ export const hostDashboardMetadataQuery = gql`
       totalCount
     }
     error: expenses(host: { slug: $hostSlug }, status: [ERROR]) {
-      totalCount
-    }
-    paid: expenses(host: { slug: $hostSlug }, status: [PAID]) {
       totalCount
     }
 

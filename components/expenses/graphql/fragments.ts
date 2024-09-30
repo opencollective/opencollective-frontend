@@ -756,17 +756,20 @@ export const expensesListAdminFieldsFragment = gql`
     onHold
     account {
       id
-      ... on AccountWithHost {
-        hostAgreements {
-          totalCount
-        }
-      }
     }
     createdByAccount {
       id
       ... on Individual {
         emails
       }
+    }
+    approvedBy {
+      id
+      type
+      slug
+      name
+      imageUrl
+      ...AccountHoverCardFields
     }
     payee {
       id
@@ -815,6 +818,7 @@ export const expensesListAdminFieldsFragment = gql`
       details
     }
     lastComment: comments(limit: 1, orderBy: { field: CREATED_AT, direction: DESC }) {
+      totalCount
       nodes {
         id
         createdAt

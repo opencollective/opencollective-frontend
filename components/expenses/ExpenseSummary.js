@@ -31,7 +31,6 @@ import StyledHr from '../StyledHr';
 import Tags from '../Tags';
 import { H1, P, Span } from '../Text';
 import TruncatedTextWithTooltip from '../TruncatedTextWithTooltip';
-import { Separator } from '../ui/Separator';
 import UploadedFilePreview from '../UploadedFilePreview';
 
 import { ExpenseAccountingCategoryPill } from './ExpenseAccountingCategoryPill';
@@ -99,6 +98,7 @@ const ExpenseSummary = ({
   onEdit,
   drawerActionsContainer,
   openFileViewer,
+  enableKeyboardShortcuts,
   ...props
 }) => {
   const intl = useIntl();
@@ -132,6 +132,7 @@ const ExpenseSummary = ({
         onEdit={onEdit}
         expense={expense}
         isViewingExpenseInHostContext={isViewingExpenseInHostContext}
+        enableKeyboardShortcuts={enableKeyboardShortcuts}
         disabled={isLoading}
         onDelete={() => {
           onDelete?.(expense);
@@ -152,6 +153,7 @@ const ExpenseSummary = ({
               onDelete?.(expense);
               onClose?.();
             }}
+            enableKeyboardShortcuts={enableKeyboardShortcuts}
             displayMarkAsIncomplete
           />
         </Flex>
@@ -197,7 +199,7 @@ const ExpenseSummary = ({
           )}
         </Flex>
       </Flex>
-      <div className="flex gap-2 align-middle">
+      <div className="flex items-baseline gap-2">
         {shouldDisplayExpenseCategoryPill(LoggedInUser, expense, collective, host) && (
           <React.Fragment>
             <ExpenseAccountingCategoryPill
@@ -208,7 +210,6 @@ const ExpenseSummary = ({
               allowNone={!isLoggedInUserExpenseHostAdmin}
               showCodeInSelect={isLoggedInUserExpenseHostAdmin}
             />
-            <Separator orientation="vertical" className="h-[24px] w-[2px]" />
           </React.Fragment>
         )}
         <Tags expense={expense} isLoading={isLoading} canEdit={canEditTags} />
@@ -678,6 +679,7 @@ ExpenseSummary.propTypes = {
   openFileViewer: PropTypes.func,
   /** Reference to the actions container element in the Expense Drawer */
   drawerActionsContainer: PropTypes.object,
+  enableKeyboardShortcuts: PropTypes.bool,
 };
 
 export default ExpenseSummary;

@@ -12,6 +12,15 @@ import type {
   HostDashboardExpensesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
 import { ExpenseStatusFilter, LastCommentBy, PayoutMethodType } from '../../../../lib/graphql/types/v2/graphql';
+import {
+  A,
+  ARROW_DOWN_KEY,
+  ARROW_LEFT_KEY,
+  ARROW_RIGHT_KEY,
+  ARROW_UP_KEY,
+  B,
+  useKeyboardSequence,
+} from '../../../../lib/hooks/useKeyboardKey';
 import { useLazyGraphQLPaginatedResults } from '../../../../lib/hooks/useLazyGraphQLPaginatedResults';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
@@ -87,6 +96,25 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const [paypalPreApprovalError, setPaypalPreApprovalError] = React.useState(null);
   const pageRoute = `/dashboard/${hostSlug}/host-expenses`;
 
+  // Konami Code
+  useKeyboardSequence({
+    sequence: [
+      ARROW_UP_KEY,
+      ARROW_UP_KEY,
+      ARROW_DOWN_KEY,
+      ARROW_DOWN_KEY,
+      ARROW_LEFT_KEY,
+      ARROW_RIGHT_KEY,
+      ARROW_LEFT_KEY,
+      ARROW_RIGHT_KEY,
+      B,
+      A,
+    ],
+    callback: () => {
+      new Audio('/static/sounds/super.mp3').play();
+    },
+  });
+
   const {
     data: metaData,
     error: errorMetaData,
@@ -101,7 +129,6 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
       filter: {},
       id: 'all',
-      count: metaData?.all?.totalCount,
     },
     {
       label: intl.formatMessage({ id: 'expenses.ready', defaultMessage: 'Ready to pay' }),
@@ -154,7 +181,6 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       label: intl.formatMessage({ defaultMessage: 'Paid', id: 'u/vOPu' }),
       filter: { status: [ExpenseStatusFilter.PAID] },
       id: 'paid',
-      count: metaData?.paid?.totalCount,
     },
   ];
 

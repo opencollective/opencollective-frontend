@@ -32,7 +32,7 @@ export default function SmallThreadActivity(props: SmallThreadActivityProps) {
 
   return (
     <div
-      className="relative w-full border-slate-200 py-4 first:border-none first:pt-0 [&:last-child_.timeline-indicator]:-bottom-4 [&:last-child_.timeline-separator]:hidden"
+      className="relative w-full border-slate-200 py-4 first:border-none first:pt-0 [&:first-child_.timeline-indicator]:top-0 [&:last-child_.timeline-indicator]:-bottom-4 [&:last-child_.timeline-separator]:hidden"
       data-cy="activity"
     >
       <div className="timeline-separator absolute bottom-0 left-5 right-0 border-b" />
