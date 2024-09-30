@@ -134,6 +134,7 @@ type FilesViewerModalProps = {
   allowOutsideInteraction?: boolean;
   canDownload?: boolean;
   canOpenInNewWindow?: boolean;
+  hideCloseButton?: boolean;
 };
 
 export default function FilesViewerModal({
@@ -144,6 +145,7 @@ export default function FilesViewerModal({
   openFileUrl,
   canDownload = true,
   canOpenInNewWindow = true,
+  hideCloseButton = false,
 }: FilesViewerModalProps) {
   const intl = useIntl();
   const initialIndex = openFileUrl ? files?.findIndex(f => f.url === openFileUrl) : 0;
@@ -217,7 +219,7 @@ export default function FilesViewerModal({
           // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
           <div
             className={clsx(
-              'absolute inset-0 z-[1500] bg-foreground/25 backdrop-blur-sm',
+              'absolute inset-0 z-[1500] backdrop-blur-sm',
               open ? 'animate-in fade-in-0' : 'animate-out fade-out-0',
             )}
             onClick={onClose}
@@ -279,16 +281,18 @@ export default function FilesViewerModal({
                 </ButtonLink>
               </StyledTooltip>
             )}
-            <StyledTooltip
-              containerCursor="pointer"
-              noArrow
-              content={intl.formatMessage({ id: 'Close', defaultMessage: 'Close' })}
-              delayHide={0}
-            >
-              <Button onClick={onClose}>
-                <X size="24" aria-hidden="true" />
-              </Button>
-            </StyledTooltip>
+            {!hideCloseButton && (
+              <StyledTooltip
+                containerCursor="pointer"
+                noArrow
+                content={intl.formatMessage({ id: 'Close', defaultMessage: 'Close' })}
+                delayHide={0}
+              >
+                <Button onClick={onClose}>
+                  <X size="24" aria-hidden="true" />
+                </Button>
+              </StyledTooltip>
+            )}
           </Flex>
         </Header>
         {hasMultipleFiles && (

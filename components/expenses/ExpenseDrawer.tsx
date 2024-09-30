@@ -58,6 +58,7 @@ export default function ExpenseDrawer({ openExpenseLegacyId, handleClose, initia
         startPolling={startPolling}
         stopPolling={stopPolling}
         isDrawer
+        onClose={handleClose}
         enableKeyboardShortcuts={hasKeyboardShortcutsEnabled}
       />
     </Drawer>

@@ -444,7 +444,7 @@ const ExpenseBudgetItem = ({
                       fontSize="11px"
                       cursor="pointer"
                       buttonSize="tiny"
-                      onClick={() => setShowFilesViewerModal(true)}
+                      onClick={useDrawer ? expandExpense : () => setShowFilesViewerModal(true)}
                       px={2}
                       ml={-2}
                       isBorderless

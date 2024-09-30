@@ -1,5 +1,5 @@
 import { ArgsTable, Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
-import { getViewportFromWidth } from '../../lib/withViewport';
+import { getViewportFromMaxWidth } from '../../lib/withViewport';
 import breakpoints from '../../lib/theme/breakpoints';
 import { emToPx } from '../../lib/theme/helpers';
 import { BREAKPOINTS_NAMES, BREAKPOINTS_WIDTHS } from '../../lib/withViewport';
@@ -24,7 +24,7 @@ We use the following breakpoints:
   <tbody>
     {breakpoints.map(breakpoint => (
       <tr key={breakpoint}>
-        <td>{getViewportFromWidth(emToPx(breakpoint))}</td>
+        <td>{getViewportFromMaxWidth(emToPx(breakpoint))}</td>
         <td>{breakpoint}</td>
         <td>{emToPx(breakpoint)}px</td>
       </tr>
