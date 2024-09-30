@@ -11,9 +11,10 @@ import expenseTypes from '../../lib/constants/expenseTypes';
 import { getFilesFromExpense } from '../../lib/expenses';
 import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 import { toPx } from '../../lib/theme/helpers';
-import { getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
+import { getCollectivePageRoute } from '../../lib/url-helpers';
 import { shouldDisplayExpenseCategoryPill } from '../expenses/lib/accounting-categories';
 
 import { AccountHoverCard } from '../AccountHoverCard';
@@ -38,6 +39,7 @@ import CommentIcon from '../icons/CommentIcon';
 import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
+import StackedAvatars from '../StackedAvatars';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 import Tags from '../Tags';
@@ -54,7 +56,6 @@ const DetailColumnHeader = styled.div`
   letter-spacing: 0.6px;
   text-transform: uppercase;
   color: #c4c7cc;
-  margin-bottom: 2px;
 `;
 
 const ButtonsContainer = styled.div.attrs({ 'data-cy': 'expense-actions' })`
@@ -87,14 +88,18 @@ const ExpenseContainer = styled.div`
   ${props =>
     props.useDrawer &&
     css`
-      ${props => props.selected && `background: #f8fafc;`}
+      ${props => props.selected && `background: #E5F3FF;`}
     `}
 
-  @media (hover: hover) {
-    &:not(:hover):not(:focus-within) ${ButtonsContainer} {
-      opacity: 0.24;
-    }
-  }
+  ${props =>
+    !props.selected &&
+    css`
+      @media (hover: hover) {
+        &:not(:hover):not(:focus-within) ${ButtonsContainer} {
+          opacity: 0.24;
+        }
+      }
+    `}
 `;
 
 const ExpenseBudgetItem = ({
@@ -130,7 +135,9 @@ const ExpenseBudgetItem = ({
   const isLoggedInUserExpenseHostAdmin = LoggedInUser?.isAdminOfCollective(host);
   const isLoggedInUserExpenseAdmin = LoggedInUser?.isAdminOfCollective(expense?.account);
   const isViewingExpenseInHostContext = isLoggedInUserExpenseHostAdmin && !isLoggedInUserExpenseAdmin;
+  const hasKeyboardShortcutsEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.KEYBOARD_SHORTCUTS);
   const lastComment = expense?.lastComment?.nodes?.[0];
+  const approvedBy = expense?.approvedBy?.length > 0 ? expense.approvedBy : null;
 
   return (
     <ExpenseContainer
@@ -178,7 +185,6 @@ const ExpenseBudgetItem = ({
                     <FormattedMessage id="Expense.GoToPage" defaultMessage="Go to expense page" />
                   )}
                 </TooltipContent>
-
                 <TooltipTrigger asChild>
                   <span>
                     <StyledLink
@@ -391,15 +397,16 @@ const ExpenseBudgetItem = ({
           )}
         </Flex>
       </Flex>
-      <Flex flexWrap="wrap" justifyContent="space-between" alignItems="center" mt={2}>
-        <Box mt={2}>
+      {/* <Flex flexWrap="wrap" justifyContent="space-between" alignItems="center" mt={2}> */}
+      <div className="mt-2 flex flex-col justify-between xl:flex-row">
+        <div className="w-full sm:w-auto">
           {isAdminView || isSubmitterView ? (
-            <Flex>
-              <Box mr={[3, 4]}>
+            <div className="mx-4 grid w-full grid-cols-2 gap-x-6 gap-y-1 sm:mx-0 sm:grid-flow-col sm:gap-y-0">
+              <div>
                 <DetailColumnHeader>
                   <FormattedMessage id="expense.payoutMethod" defaultMessage="payout method" />
                 </DetailColumnHeader>
-                <Box mt="6px">
+                <div className="flex h-6 items-center">
                   <PayoutMethodTypeWithIcon
                     isLoading={isLoading}
                     type={expense.payoutMethod?.type}
@@ -408,24 +415,24 @@ const ExpenseBudgetItem = ({
                     fontWeight="normal"
                     color="black.700"
                   />
-                </Box>
-              </Box>
+                </div>
+              </div>
               {Boolean(expense.reference) && (
-                <Box mr={[3, 4]}>
+                <div>
                   <DetailColumnHeader>
                     <FormattedMessage id="Expense.Reference" defaultMessage="Reference" />
                   </DetailColumnHeader>
                   {isLoading ? (
                     <LoadingPlaceholder height={15} width={90} />
                   ) : (
-                    <div className="mt-[4px] text-[11px]">
+                    <div className="text-[11px]">
                       <TruncatedTextWithTooltip value={expense.reference} length={10} truncatePosition="middle" />
                     </div>
                   )}
-                </Box>
+                </div>
               )}
               {nbAttachedFiles > 0 && (
-                <Box mr={[3, 4]}>
+                <div>
                   <DetailColumnHeader>
                     <FormattedMessage id="Expense.Attachments" defaultMessage="Attachments" />
                   </DetailColumnHeader>
@@ -441,6 +448,7 @@ const ExpenseBudgetItem = ({
                       px={2}
                       ml={-2}
                       isBorderless
+                      textAlign="left"
                     >
                       <MaximizeIcon size={10} />
                       &nbsp;&nbsp;
@@ -451,34 +459,14 @@ const ExpenseBudgetItem = ({
                       />
                     </StyledButton>
                   )}
-                </Box>
-              )}
-              {Boolean(expense.account?.hostAgreements?.totalCount) && (
-                <Box mr={[3, 4]}>
-                  <DetailColumnHeader>
-                    <FormattedMessage defaultMessage="Host Agreements" id="kq2gKV" />
-                  </DetailColumnHeader>
-                  <div className="mt-[7px] text-[11px]">
-                    <StyledLink
-                      as={Link}
-                      color="black.700"
-                      href={`${getDashboardRoute(host, 'host-agreements')}?account=${expense.account.slug}`}
-                    >
-                      <FormattedMessage
-                        defaultMessage="{count, plural, one {# agreement} other {# agreements}}"
-                        id="7FgO5b"
-                        values={{ count: expense.account.hostAgreements.totalCount }}
-                      />
-                    </StyledLink>
-                  </div>
-                </Box>
+                </div>
               )}
               {lastComment && (
-                <Box mr={[3, 4]}>
+                <div>
                   <DetailColumnHeader>
                     <FormattedMessage defaultMessage="Last Comment" id="gSNApa" />
                   </DetailColumnHeader>
-                  <div className="pt-[2px] text-[11px]">
+                  <div className="text-[11px]">
                     <LinkCollective
                       collective={lastComment.fromAccount}
                       className="flex items-center gap-2 font-medium text-slate-700 hover:text-slate-700 hover:underline"
@@ -488,15 +476,34 @@ const ExpenseBudgetItem = ({
                       <Avatar collective={lastComment.fromAccount} radius={24} /> {lastComment.fromAccount.name}
                     </LinkCollective>
                   </div>
-                </Box>
+                </div>
               )}
-            </Flex>
+              {approvedBy && expense.status === ExpenseStatus.APPROVED && !expense.onHold && (
+                <div>
+                  <DetailColumnHeader>
+                    <FormattedMessage defaultMessage="Approved By" id="JavAWD" />
+                  </DetailColumnHeader>
+                  <div className="text-[11px]">
+                    <StackedAvatars
+                      accounts={approvedBy}
+                      imageSize={24}
+                      withHoverCard={{ includeAdminMembership: true }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
           ) : (
-            <Tags expense={expense} canEdit={get(expense, 'permissions.canEditTags', false)} />
+            <div className="mt-2">
+              <Tags expense={expense} canEdit={get(expense, 'permissions.canEditTags', false)} />
+            </div>
           )}
-        </Box>
+        </div>
         {showProcessActions && expense?.permissions && !isExpensePaidOrRejected && (
-          <ButtonsContainer>
+          <div
+            data-cy="expense-actions"
+            className="mt-5 flex w-full flex-col items-stretch gap-2 sm:mt-2 sm:w-auto sm:flex-row sm:items-start sm:justify-end"
+          >
             <ProcessExpenseButtons
               host={host}
               isViewingExpenseInHostContext={isViewingExpenseInHostContext}
@@ -505,10 +512,11 @@ const ExpenseBudgetItem = ({
               permissions={expense.permissions}
               buttonProps={{ ...DEFAULT_PROCESS_EXPENSE_BTN_PROPS, mx: 1, py: 2 }}
               onSuccess={onProcess}
+              enableKeyboardShortcuts={selected && hasKeyboardShortcutsEnabled}
             />
-          </ButtonsContainer>
+          </div>
         )}
-      </Flex>
+      </div>
       {showFilesViewerModal && (
         <FilesViewerModal
           files={files}
@@ -552,6 +560,7 @@ ExpenseBudgetItem.propTypes = {
     amountInAccountCurrency: AmountPropTypeShape,
     currency: PropTypes.string.isRequired,
     permissions: PropTypes.object,
+    onHold: PropTypes.bool,
     accountingCategory: PropTypes.object,
     items: PropTypes.arrayOf(PropTypes.object),
     requiredLegalDocuments: PropTypes.arrayOf(PropTypes.string),
@@ -593,6 +602,14 @@ ExpenseBudgetItem.propTypes = {
         id: PropTypes.string.isRequired,
       }),
     }),
+    approvedBy: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        type: PropTypes.string.isRequired,
+        slug: PropTypes.string.isRequired,
+        name: PropTypes.string.isRequired,
+      }),
+    ),
     lastComment: PropTypes.shape({
       nodes: PropTypes.arrayOf(
         PropTypes.shape({

@@ -5,20 +5,14 @@ import { commentFieldsFragment } from '../../conversations/graphql';
 import { expensePageExpenseFieldsFragment, loggedInAccountExpensePayoutFieldsFragment } from './fragments';
 
 export const expensePageQuery = gql`
-  query ExpensePage(
-    $legacyExpenseId: Int!
-    $draftKey: String
-    $offset: Int
-    $totalPaidExpensesDateFrom: DateTime
-    $orderBy: ChronologicalOrderInput
-  ) {
+  query ExpensePage($legacyExpenseId: Int!, $draftKey: String, $offset: Int, $totalPaidExpensesDateFrom: DateTime) {
     expense(expense: { legacyId: $legacyExpenseId }, draftKey: $draftKey) {
       id
       ...ExpensePageExpenseFields
       permissions {
         canDeclineExpenseInvite(draftKey: $draftKey)
       }
-      comments(limit: 100, offset: $offset, orderBy: $orderBy) {
+      comments(limit: 100, offset: $offset) {
         totalCount
         nodes {
           id

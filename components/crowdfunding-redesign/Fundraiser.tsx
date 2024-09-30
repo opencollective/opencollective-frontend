@@ -15,9 +15,10 @@ import { TierFrequency } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { isTierExpired } from '../../lib/tier-utils';
 
-import Avatar, { StackedAvatars } from '../Avatar';
+import Avatar from '../Avatar';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { useModal } from '../ModalContext';
+import StackedAvatars from '../StackedAvatars';
 import { Button } from '../ui/Button';
 import { Progress } from '../ui/Progress';
 

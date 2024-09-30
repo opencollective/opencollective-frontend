@@ -10,6 +10,7 @@ export enum PREVIEW_FEATURE_KEYS {
   TRANSACTIONS_IMPORTS = 'TRANSACTIONS_IMPORTS',
   AUTHENTICATED_SSR = 'AUTHENTICATED_SSR',
   VERCEL_BACKEND = 'VERCEL_BACKEND',
+  KEYBOARD_SHORTCUTS = 'KEYBOARD_SHORTCUTS',
 }
 
 export type PreviewFeature = {
@@ -50,7 +51,7 @@ export const previewFeatures: PreviewFeature[] = [
     description: 'Improved expense submission flow in Dashboard',
     alwaysEnableInDev: true,
     publicBeta: false,
-    closedBetaAccessFor: ['opencollective', 'design', 'engineering'],
+    closedBetaAccessFor: ['opencollective', 'design', 'engineering', 'opensource', 'europe'],
   },
   {
     key: PREVIEW_FEATURE_KEYS.HOST_REPORTS,
@@ -108,5 +109,11 @@ export const previewFeatures: PreviewFeature[] = [
         document.cookie = 'backend=vercel; Path=/; Max-Age=9999999';
       }
     },
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.KEYBOARD_SHORTCUTS,
+    title: 'Keyboard Shortcuts',
+    description: 'Use keyboard shortcuts to navigate the expense flow',
+    publicBeta: true,
   },
 ];

@@ -20,6 +20,7 @@ import { margin } from 'styled-system';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import useProcessExpense from '../../lib/expenses/useProcessExpense';
 import useClipboard from '../../lib/hooks/useClipboard';
+import useKeyboardKey, { H, I } from '../../lib/hooks/useKeyboardKey';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getCollectivePageCanonicalURL, getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
 
@@ -88,6 +89,7 @@ const ExpenseMoreActionsButton = ({
   onModalToggle,
   onDelete,
   isViewingExpenseInHostContext = false,
+  enableKeyboardShortcuts,
   ...props
 }) => {
   const [processModal, setProcessModal] = React.useState(false);
@@ -104,6 +106,24 @@ const ExpenseMoreActionsButton = ({
     expense,
   });
 
+  useKeyboardKey({
+    keyMatch: H,
+    callback: e => {
+      if (enableKeyboardShortcuts) {
+        e.preventDefault();
+        setProcessModal('HOLD');
+      }
+    },
+  });
+  useKeyboardKey({
+    keyMatch: I,
+    callback: e => {
+      if (enableKeyboardShortcuts) {
+        e.preventDefault();
+        setProcessModal('MARK_AS_INCOMPLETE');
+      }
+    },
+  });
   const { LoggedInUser } = useLoggedInUser();
 
   const showDeleteConfirmMoreActions = isOpen => {
@@ -354,6 +374,7 @@ ExpenseMoreActionsButton.propTypes = {
   onEdit: PropTypes.func,
   linkAction: PropTypes.oneOf(['link', 'copy']),
   isViewingExpenseInHostContext: PropTypes.bool,
+  enableKeyboardShortcuts: PropTypes.bool,
 };
 
 export default ExpenseMoreActionsButton;

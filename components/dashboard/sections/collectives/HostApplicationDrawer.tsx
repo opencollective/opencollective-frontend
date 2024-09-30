@@ -152,6 +152,11 @@ function HostApplication({
   >([]);
   const [threadOffset, setThreadOffset] = React.useState(0);
 
+  React.useEffect(() => {
+    setThreadItems([]);
+    setThreadOffset(0);
+  }, [applicationId]);
+
   const onDataComplete = React.useCallback(
     (data: HostApplicationThreadQuery, existingThreadItems = threadItems) => {
       const existingPrevPageData = existingThreadItems.slice(0, data.hostApplication.threadComments.offset);
@@ -173,7 +178,7 @@ function HostApplication({
       query HostApplicationThread($hostApplication: HostApplicationReferenceInput!, $offset: Int!, $limit: Int!) {
         hostApplication(hostApplication: $hostApplication) {
           ...HostApplicationFields
-          threadComments: comments(limit: $limit, offset: $offset, orderBy: { field: CREATED_AT, direction: DESC }) {
+          threadComments: comments(limit: $limit, offset: $offset, orderBy: { field: CREATED_AT, direction: ASC }) {
             totalCount
             offset
             limit
@@ -189,7 +194,7 @@ function HostApplication({
     `,
     {
       context: API_V2_CONTEXT,
-      fetchPolicy: 'network-only',
+      fetchPolicy: 'cache-and-network',
       variables: {
         hostApplication: {
           id: applicationId,
@@ -479,10 +484,6 @@ function HostApplication({
             <div className="mb-5 text-sm leading-3 text-[#344256]">
               <span className="font-bold">
                 <FormattedMessage defaultMessage="Comments" id="wCgTu5" />
-              </span>
-              <span>
-                &nbsp;
-                <FormattedMessage defaultMessage="(Latest first)" id="K78a3C" />
               </span>
             </div>
 

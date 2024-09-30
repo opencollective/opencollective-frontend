@@ -7,6 +7,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { getAmountInCents } from '../../lib/currency-utils';
+import useKeyboardKey, { P } from '../../lib/hooks/useKeyboardKey';
 
 import TransferwiseIcon from '../icons/TransferwiseIcon';
 import StyledButton from '../StyledButton';
@@ -87,6 +88,16 @@ const PayExpenseButton = ({ expense, collective, host, disabled, onSubmit, error
   const requiresSecurityCheck = expenseRequiresSecurityConfirmation(expense);
 
   const handleClick = () => (requiresSecurityCheck ? showSecurityModal(true) : showModal(true));
+
+  useKeyboardKey({
+    keyMatch: P,
+    callback: e => {
+      if (props.enableKeyboardShortcuts) {
+        e.preventDefault();
+        handleClick();
+      }
+    },
+  });
 
   const button = (
     <StyledButton
@@ -183,6 +194,7 @@ PayExpenseButton.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   /** If set, will be displayed in the pay modal */
   error: PropTypes.string,
+  enableKeyboardShortcuts: PropTypes.bool,
 };
 
 export default PayExpenseButton;

@@ -55,13 +55,8 @@ const ChangelogTrigger = ({ setShowNewsAndUpdates, setChangelogViewDate }) => {
 };
 
 ChangelogTrigger.propTypes = {
-  height: PropTypes.string,
-  width: PropTypes.string,
-  backgroundSize: PropTypes.string,
   setShowNewsAndUpdates: PropTypes.func,
   setChangelogViewDate: PropTypes.func,
-  client: PropTypes.object.isRequired,
-  showDropdown: PropTypes.bool,
 };
 
 const setChangelogViewDateMutation = gql`

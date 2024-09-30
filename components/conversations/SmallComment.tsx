@@ -25,16 +25,16 @@ export default function SmallComment(props: CommentProps) {
 
   return (
     <div
-      className="relative w-full border-slate-200 py-4 first:border-none first:pt-0 [&:last-child_.timeline-indicator]:-bottom-4 [&:last-child_.timeline-separator]:hidden"
+      className="relative w-full border-slate-200 py-4 first:border-none first:pt-0 [&:first-child_.timeline-indicator]:top-0 [&:last-child_.timeline-indicator]:-bottom-4 [&:last-child_.timeline-separator]:hidden"
       data-cy="comment"
       id={anchorHash}
     >
-      <div className="timeline-separator absolute bottom-0 left-[20px] right-0 border-b" />
+      <div className="timeline-separator absolute bottom-0 left-5 right-0 border-b" />
       <div className="flex justify-between">
         <div className="flex gap-4">
           <div className="relative">
             <div
-              className={clsx('timeline-indicator absolute bottom-[-16px] left-[20px] top-[-16px] border-l', {
+              className={clsx('timeline-indicator absolute -bottom-4 -top-4 left-5 border-l', {
                 'border-blue-400': isPrivateNote,
               })}
             />
@@ -44,7 +44,7 @@ export default function SmallComment(props: CommentProps) {
                 <div className="relative">
                   <Avatar collective={comment.fromAccount} radius={40} />
                   {isPrivateNote && (
-                    <div className="absolute bottom-[-4px] right-[-4px] flex h-[20px] w-[20px] items-center justify-center rounded-full bg-white shadow">
+                    <div className="absolute bottom-[-4px] right-[-4px] flex h-5 w-5 items-center justify-center rounded-full bg-white shadow">
                       <Lock size={16} className="text-blue-400" />
                     </div>
                   )}
@@ -76,7 +76,7 @@ export default function SmallComment(props: CommentProps) {
                   !isEditing ? (
                     <HTMLContent
                       fontSize="14px"
-                      maxCollapsedHeight={140}
+                      maxCollapsedHeight={400}
                       collapsable
                       collapsePadding={22}
                       content={comment.html}

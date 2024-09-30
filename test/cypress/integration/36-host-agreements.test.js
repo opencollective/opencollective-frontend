@@ -61,9 +61,6 @@ describe('Host agreements', () => {
     // ---- Agreement count should be displayed in the expenses list ----
     cy.getByDataCy('menu-item-Expenses').click(); // opening the Expenses menu group (that opens the 'Host expenses' page by default)
     cy.contains('[data-cy="expense-container-2340"]', 'Vegan Dining Week Client Dinner').as('expense');
-    cy.get('@expense')
-      .find('a[href="/dashboard/brusselstogetherasbl/host-agreements?account=veganizerbxl"]')
-      .contains('1 agreement');
 
     // ---- Agreement count should be displayed on the expense ----
     cy.get('@expense').find('[data-cy="expense-title"]').click();

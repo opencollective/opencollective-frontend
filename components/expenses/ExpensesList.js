@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import FlipMove from 'react-flip-move';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { DISABLE_ANIMATIONS } from '../../lib/animations';
+import useKeyboardKey, { ENTER_KEY, J, K } from '../../lib/hooks/useKeyboardKey';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
+import { cn } from '../../lib/utils';
 
 import ExpenseBudgetItem from '../budget/ExpenseBudgetItem';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
@@ -81,6 +85,7 @@ const ExpensesList = ({
   openExpenseLegacyId,
   onDuplicateClick,
 }) => {
+  const { LoggedInUser } = useLoggedInUser();
   // Initial values for expense in drawer
   const expenseInDrawer = React.useMemo(() => {
     if (openExpenseLegacyId) {
@@ -88,6 +93,46 @@ const ExpensesList = ({
       return expense || null;
     }
   }, [openExpenseLegacyId, expenses]);
+  const hasKeyboardShortcutsEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.KEYBOARD_SHORTCUTS);
+
+  const [selectedExpenseIndex, setSelectedExpenseIndex] = React.useState();
+  const navigateIndex = dif => event => {
+    if (hasKeyboardShortcutsEnabled) {
+      event.preventDefault();
+      let nextIndex = (selectedExpenseIndex ?? -1) + dif;
+      if (nextIndex < 0) {
+        nextIndex = 0;
+      }
+      if (nextIndex >= expenses.length) {
+        nextIndex = expenses.length - 1;
+      }
+      setSelectedExpenseIndex(nextIndex);
+    }
+  };
+
+  useKeyboardKey({
+    keyMatch: J,
+    callback: navigateIndex(1),
+  });
+  useKeyboardKey({
+    keyMatch: K,
+    callback: navigateIndex(-1),
+  });
+  useKeyboardKey({
+    keyMatch: ENTER_KEY,
+    callback: () => {
+      if (selectedExpenseIndex !== undefined && hasKeyboardShortcutsEnabled) {
+        setOpenExpenseLegacyId(expenses[selectedExpenseIndex].legacyId);
+      }
+    },
+  });
+  useEffect(() => {
+    const selectedExpense = expenses?.[selectedExpenseIndex];
+    if (selectedExpense) {
+      const expenseElement = document.getElementById(`expense-${selectedExpense?.legacyId}`);
+      expenseElement?.scrollIntoViewIfNeeded?.();
+    }
+  }, [selectedExpenseIndex, expenses]);
 
   if (!expenses?.length && !isLoading) {
     return null;
@@ -113,7 +158,12 @@ const ExpensesList = ({
       ) : (
         <FlipMove enterAnimation="fade" leaveAnimation="fade" disableAllAnimations={DISABLE_ANIMATIONS}>
           {expenses.map((expense, idx) => (
-            <ExpenseContainer key={expense.id} isFirst={!idx} data-cy={`expense-${expense.status}`}>
+            <div
+              key={expense.id}
+              id={`expense-${expense.legacyId}`}
+              className={cn(idx && 'border-t border-gray-300')}
+              data-cy={`expense-${expense.status}`}
+            >
               {view === 'submitter-new' ? (
                 <SubmittedExpenseListItem
                   expense={expense}
@@ -131,7 +181,7 @@ const ExpensesList = ({
                   view={view}
                   onDelete={onDelete}
                   onProcess={onProcess}
-                  selected={openExpenseLegacyId === expense.legacyId}
+                  selected={!openExpenseLegacyId && selectedExpenseIndex === idx}
                   expandExpense={e => {
                     e.preventDefault();
                     setOpenExpenseLegacyId(expense.legacyId);
@@ -139,7 +189,7 @@ const ExpensesList = ({
                   useDrawer={useDrawer}
                 />
               )}
-            </ExpenseContainer>
+            </div>
           ))}
         </FlipMove>
       )}

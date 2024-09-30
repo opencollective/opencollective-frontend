@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { omitBy } from 'lodash';
+import { omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -137,7 +137,7 @@ const HostApplications = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const { data, error, loading } = useQuery<HostApplicationsQuery, HostApplicationsQueryVariables>(
     hostApplicationsQuery,
     {
-      variables: { hostSlug, ...queryFilter.variables },
+      variables: { hostSlug, ...omit(queryFilter.variables, 'hostApplicationId') },
       fetchPolicy: 'cache-and-network',
       context: API_V2_CONTEXT,
       onCompleted() {

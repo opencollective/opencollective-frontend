@@ -17,22 +17,18 @@ import StyledLink from './StyledLink';
 import { P, Span } from './Text';
 
 const newsAndUpdatesQuery = gql`
-  query ChangelogUpdates($limit: Int) {
-    account(slug: "opencollective") {
-      id
-      updates(
-        orderBy: { field: PUBLISHED_AT, direction: DESC }
-        onlyChangelogUpdates: true
-        onlyPublishedUpdates: true
-        limit: $limit
-      ) {
-        nodes {
+  query ChangelogUpdates {
+    updates(orderBy: { field: PUBLISHED_AT, direction: DESC }, onlyChangelogUpdates: true, limit: 5) {
+      nodes {
+        id
+        slug
+        publishedAt
+        title
+        html
+        summary
+        account {
           id
           slug
-          publishedAt
-          title
-          html
-          summary
         }
       }
     }
@@ -43,7 +39,7 @@ const renderStyledCarousel = (data, loading, error, onClose) => {
   if (loading === false && data) {
     return (
       <StyledCarousel contentPosition="left">
-        {data.account.updates.nodes.map(update => (
+        {data.updates.nodes.map(update => (
           <div key={update.id} className="px-3">
             <span className="text-sm text-muted-foreground">
               <FormattedDate value={update.publishedAt} day="numeric" month="long" year="numeric" />
@@ -65,7 +61,7 @@ const renderStyledCarousel = (data, loading, error, onClose) => {
               <StyledLink
                 onClick={onClose}
                 as={Link}
-                href={`/opencollective/updates/${update.slug}`}
+                href={`/${update.account?.slug}/updates/${update.slug}`}
                 className="text-blue-800"
                 fontSize="14px"
                 display="flex"
@@ -90,7 +86,7 @@ const renderStyledCarousel = (data, loading, error, onClose) => {
               <StyledLink
                 onClick={onClose}
                 as={Link}
-                href={`/opencollective/updates/${update.slug}`}
+                href={`/${update.account?.slug}/updates/${update.slug}`}
                 fontSize="14px"
                 display="flex"
                 className="text-blue-800"
@@ -142,7 +138,7 @@ const NewsAndUpdatesModal = ({ open, setOpen }) => {
         </DialogHeader>
         <Separator className="my-3" />
         <div className="px-0 pb-6">
-          <Query query={newsAndUpdatesQuery} variables={{ limit: 5 }} context={API_V2_CONTEXT}>
+          <Query query={newsAndUpdatesQuery} context={API_V2_CONTEXT}>
             {({ data, loading, error }) => renderStyledCarousel(data, loading, error, onClose)}
           </Query>
         </div>

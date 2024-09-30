@@ -143,6 +143,7 @@ const ProcessExpenseButtons = ({
   displaySecurityChecks = true,
   isViewingExpenseInHostContext = false,
   disabled,
+  enableKeyboardShortcuts,
 }) => {
   const [confirmProcessExpenseAction, setConfirmProcessExpenseAction] = React.useState();
   const [showApproveExpenseModal, setShowApproveExpenseModal] = React.useState(false);
@@ -227,6 +228,7 @@ const ProcessExpenseButtons = ({
           collective={collective}
           host={host}
           error={error}
+          enableKeyboardShortcuts={enableKeyboardShortcuts}
         />
       )}
       {permissions.canReject && !isViewingExpenseInHostContext && (
@@ -294,6 +296,7 @@ const ProcessExpenseButtons = ({
           onClick={() => setConfirmProcessExpenseAction('REQUEST_RE_APPROVAL')}
           buttonStyle="dangerSecondary"
           data-cy="request-re-approval-button"
+          className="text-nowrap"
         >
           <UnapproveIcon size={12} />
           <ButtonLabel>
@@ -330,7 +333,12 @@ const ProcessExpenseButtons = ({
         />
       )}
       {displaySecurityChecks && expense?.securityChecks?.length > 0 && (
-        <SecurityChecksButton {...buttonProps} minWidth={0} expense={expense} />
+        <SecurityChecksButton
+          {...buttonProps}
+          minWidth={0}
+          expense={expense}
+          enableKeyboardShortcuts={enableKeyboardShortcuts}
+        />
       )}
 
       {confirmProcessExpenseAction && (
@@ -405,6 +413,7 @@ ProcessExpenseButtons.propTypes = {
   displaySecurityChecks: PropTypes.bool,
   isViewingExpenseInHostContext: PropTypes.bool,
   disabled: PropTypes.bool,
+  enableKeyboardShortcuts: PropTypes.bool,
 };
 
 export const DEFAULT_PROCESS_EXPENSE_BTN_PROPS = {
