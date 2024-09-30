@@ -804,6 +804,7 @@ const ExpenseFormBody = ({
                               expenseType={values.type}
                               expenseValues={values}
                               predictionStyle="full"
+                              selectFirstOptionIfSingle
                             />
                             {meta.error && meta.touched && (
                               <Span color="red.500" fontSize="12px" mt="4px">
