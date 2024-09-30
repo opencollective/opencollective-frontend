@@ -229,10 +229,7 @@ function Expense(props) {
   const expenseTopRef = useRef(null);
   const { status, editedExpense } = state;
 
-  const expense = cloneDeep(data?.expense);
-  if (expense && data?.expensePayeeStats?.payee?.stats) {
-    expense.payee.stats = data.expensePayeeStats?.payee?.stats;
-  }
+  const expense = data?.expense;
   const loggedInAccount = data?.loggedInAccount;
   const collective = expense?.account;
   const host = expense?.host ?? collective?.host;
