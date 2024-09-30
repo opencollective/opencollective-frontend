@@ -61,7 +61,7 @@ const getVariableFromProps = props => {
     .toISOString();
   return {
     legacyExpenseId: props.legacyExpenseId,
-    draftKey: props.draftKey,
+    draftKey: props.draftKey || null,
     totalPaidExpensesDateFrom: firstOfCurrentYear,
   };
 };

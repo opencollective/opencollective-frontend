@@ -50,6 +50,7 @@ export interface ConfirmationModalProps extends BaseModalProps {
   ConfirmIcon?: LucideIcon;
   onCancel?: () => void;
   cancelLabel?: React.ReactNode;
+  confirmDisabled?: boolean;
 }
 
 const ConfirmationModal = ({
@@ -94,6 +95,7 @@ const ConfirmationModal = ({
             variant={variant}
             loading={submitting}
             data-cy="confirmation-modal-continue"
+            disabled={props.confirmDisabled}
             onClick={async e => {
               e.preventDefault();
               try {

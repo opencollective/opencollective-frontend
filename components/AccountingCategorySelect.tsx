@@ -42,6 +42,7 @@ type AccountingCategorySelectProps = {
   children?: React.ReactNode;
   borderRadiusClass?: string;
   disabled?: boolean;
+  selectFirstOptionIfSingle?: boolean;
 };
 
 type AccountingCategoryOption = {
@@ -327,6 +328,7 @@ const AccountingCategorySelect = ({
   expenseValues = undefined,
   borderRadiusClass = 'rounded-lg',
   children = null,
+  selectFirstOptionIfSingle,
   disabled,
 }: AccountingCategorySelectProps) => {
   const intl = useIntl();
@@ -346,6 +348,18 @@ const AccountingCategorySelect = ({
     () => getOptions(intl, host, kind, expenseType, showCode, allowNone, valuesByRole, isHostAdmin, account),
     [intl, host, kind, expenseType, allowNone, showCode, valuesByRole, isHostAdmin, account],
   );
+
+  React.useEffect(() => {
+    if (
+      selectFirstOptionIfSingle &&
+      selectedCategory === undefined &&
+      options.length === 1 &&
+      options[0].value !== undefined
+    ) {
+      onChange(options[0].value);
+    }
+  }, [options, selectFirstOptionIfSingle, selectedCategory, onChange]);
+
   const suggestedOptions = React.useMemo(() => {
     return !predictions.length
       ? []

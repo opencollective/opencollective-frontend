@@ -18,6 +18,7 @@ const createPaymentIntentMutation = gql`
 `;
 
 type UsePaymentIntentOptions = {
+  chargeAttempt: number;
   amount: { valueInCents: number; currency: string };
   fromAccount?: AccountReferenceInput;
   guestInfo?: GuestInfoInput;
@@ -29,6 +30,7 @@ type UsePaymentIntentOptions = {
 type StripePaymentIntent = PaymentIntent & { stripeAccount: string };
 
 export default function usePaymentIntent({
+  chargeAttempt,
   amount,
   fromAccount,
   guestInfo,
@@ -105,7 +107,7 @@ export default function usePaymentIntent({
       setPaymentIntent(null);
       setStripe(null);
     };
-  }, [skip, guestInfo?.captcha?.token]);
+  }, [skip, guestInfo?.captcha?.token, chargeAttempt]);
 
   return [paymentIntent, stripe, loading, error];
 }

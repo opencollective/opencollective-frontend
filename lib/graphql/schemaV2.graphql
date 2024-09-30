@@ -4459,6 +4459,7 @@ enum ExpenseStatusFilter {
   SCHEDULED_FOR_PAYMENT
   SPAM
   CANCELED
+  INVITE_DECLINED
 
   """
   Only expenses that are ready to be paid (must be approved, have the sufficiant balance and have the tax forms completed)
@@ -6002,6 +6003,7 @@ enum ActivityType {
   COLLECTIVE_EXPENSE_UNSCHEDULED_FOR_PAYMENT
   COLLECTIVE_EXPENSE_ERROR
   COLLECTIVE_EXPENSE_INVITE_DRAFTED
+  COLLECTIVE_EXPENSE_INVITE_DECLINED
   COLLECTIVE_EXPENSE_RECURRING_DRAFTED
   COLLECTIVE_EXPENSE_MISSING_RECEIPT
   TAXFORM_REQUEST
@@ -6928,6 +6930,7 @@ enum ExpenseStatus {
   SCHEDULED_FOR_PAYMENT
   SPAM
   CANCELED
+  INVITE_DECLINED
 }
 
 """
@@ -7094,6 +7097,16 @@ type ExpensePermissions {
   Whether the current user can reject this expense
   """
   canReject: Boolean!
+
+  """
+  Whether the user or the given draft key is allowed decline the expense invite
+  """
+  canDeclineExpenseInvite(
+    """
+    Key for draft expense
+    """
+    draftKey: String
+  ): Boolean!
 
   """
   Whether the current user can mark this expense as spam
@@ -15810,6 +15823,7 @@ enum ActivityAndClassesType {
   COLLECTIVE_EXPENSE_UNSCHEDULED_FOR_PAYMENT
   COLLECTIVE_EXPENSE_ERROR
   COLLECTIVE_EXPENSE_INVITE_DRAFTED
+  COLLECTIVE_EXPENSE_INVITE_DECLINED
   COLLECTIVE_EXPENSE_RECURRING_DRAFTED
   COLLECTIVE_EXPENSE_MISSING_RECEIPT
   TAXFORM_REQUEST
@@ -18537,6 +18551,11 @@ type Mutation {
     expense: ExpenseReferenceInput!
 
     """
+    Expense draft key if its action by invited user without account
+    """
+    draftKey: String
+
+    """
     The action to trigger
     """
     action: ExpenseProcessAction!
@@ -20615,6 +20634,11 @@ enum ExpenseProcessAction {
   To release the expense from hold
   """
   RELEASE
+
+  """
+  To decline an invited expense
+  """
+  DECLINE_INVITED_EXPENSE
 }
 
 """

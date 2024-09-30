@@ -219,7 +219,11 @@ class CreateExpensePage extends React.Component {
         const result = await this.props.draftExpenseAndInviteUser({
           variables: {
             account: { id: this.props.data.account.id },
-            expense: { ...prepareExpenseForSubmit(expense), customData: this.props.customData },
+            expense: {
+              ...prepareExpenseForSubmit(expense),
+              customData: this.props.customData,
+              recipientNote: expense.recipientNote?.trim(),
+            },
           },
         });
         if (this.state.formPersister) {

@@ -395,7 +395,11 @@ class ContributionFlow extends React.Component {
         this.setState({ isSubmitted: true, isSubmitting: false });
         return this.handleSuccess(order);
       } catch (e) {
-        this.setState({ isSubmitting: false, error: e.message });
+        this.setState({
+          isSubmitting: false,
+          error: e.message,
+          stepPayment: { ...this.state.stepPayment, chargeAttempt: (this.state.stepPayment?.chargeAttempt || 0) + 1 },
+        });
       }
     } else if (stripeError) {
       return this.handleStripeError(order, stripeError, email, guestToken);
