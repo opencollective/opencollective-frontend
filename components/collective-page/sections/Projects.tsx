@@ -15,6 +15,7 @@ import useDebounced from '../../../lib/hooks/useDebounced';
 import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/constants';
 import ContributeProject from '../../contribute-cards/ContributeProject';
 import CreateNew from '../../contribute-cards/CreateNew';
+import { EmptyResults } from '../../dashboard/EmptyResults';
 import { Box } from '../../Grid';
 import HorizontalScroller from '../../HorizontalScroller';
 import Link from '../../Link';
@@ -83,7 +84,7 @@ export default function Projects(props: ProjectsProps) {
     gql`
       query ProjectsSectionSearch($slug: String, $searchTerm: String) {
         account(slug: $slug) {
-          projects: childrenAccounts(accountType: [PROJECT], term: $searchTerm) {
+          projects: childrenAccounts(accountType: [PROJECT], searchTerm: $searchTerm) {
             totalCount
             nodes {
               ...ProjectSectionCardFields
@@ -140,12 +141,14 @@ export default function Projects(props: ProjectsProps) {
             />
           )}
         </P>
-        <Input
-          placeholder={intl.formatMessage({ defaultMessage: 'Search projects...', id: 'Dw9Bae' })}
-          type="search"
-          value={searchTerm}
-          onChange={e => setSearchTerm(e.target.value)}
-        />
+        {collectiveProjects?.length > 10 && (
+          <Input
+            placeholder={intl.formatMessage({ defaultMessage: 'Search projects...', id: 'Dw9Bae' })}
+            type="search"
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+          />
+        )}
       </ContainerSectionContent>
 
       <Box mb={4}>
@@ -155,10 +158,10 @@ export default function Projects(props: ProjectsProps) {
               <LoadingGrid />
             </div>
           )}
-          {isSearching && isEmpty(displayedProjects) && (
+          {isSearching && !isLoadingSearch && isEmpty(displayedProjects) && (
             <div className="ml-8 self-center">
               <div className="w-60 text-center">
-                <FormattedMessage defaultMessage="No results match your search" id="qqqV4d" />
+                <EmptyResults onResetFilters={() => setSearchTerm('')} hasFilters={false} entityType="PROJECTS" />
               </div>
             </div>
           )}
