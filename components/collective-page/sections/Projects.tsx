@@ -75,7 +75,7 @@ function getContributeCardsScrollDistance(width) {
 export default function Projects(props: ProjectsProps) {
   const { collective, isAdmin } = props;
   const intl = useIntl();
-  const hasProjectsSection = (props.projects.length >= 0 && !collective.isActive) || isAdmin;
+  const hasProjectsSection = (props.projects.length >= 0 && collective.isActive) || isAdmin;
 
   const [searchTerm, setSearchTerm] = React.useState('');
   const deboucedSearchTerm = useDebounced(searchTerm, 1000);
