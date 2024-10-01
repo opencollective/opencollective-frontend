@@ -24,6 +24,7 @@ export function EmptyResults({
     | 'VIRTUAL_CARD_REQUESTS'
     | 'TAX_FORM'
     | 'UPDATES'
+    | 'PROJECTS'
     | 'TRANSACTIONS';
 }) {
   return (
