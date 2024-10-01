@@ -1,5 +1,5 @@
 import React from 'react';
-import { debounce, findIndex, isEqual, zipObject } from 'lodash';
+import { debounce, findIndex, findLastIndex, isEqual, zipObject } from 'lodash';
 
 import breakpoints from './theme/breakpoints';
 import { emToPx } from './theme/helpers';
@@ -48,9 +48,15 @@ export const isDesktopOrAbove = viewport => {
 };
 
 /** Returns the name of the viewport based on max-width media selector (see `BREAKPOINTS_NAMES`) */
-export const getViewportFromWidth = width => {
+export const getViewportFromMaxWidth = width => {
   const breakpointIdx = findIndex(BREAKPOINTS_WIDTHS, b => width <= b);
   return breakpointIdx === -1 ? VIEWPORTS.LARGE : BREAKPOINTS_NAMES[breakpointIdx];
+};
+
+/** Returns the name of the viewport based on min-width media selector (see `BREAKPOINTS_NAMES`) */
+export const getViewportFromMinWidth = width => {
+  const breakpointIdx = findLastIndex(BREAKPOINTS_WIDTHS, b => width >= b);
+  return breakpointIdx === -1 ? VIEWPORTS.XSMALL : BREAKPOINTS_NAMES[breakpointIdx];
 };
 
 /** Function to build component's state */
@@ -107,7 +113,7 @@ const withViewport = (ChildComponent, options) => {
     onResize: () => void;
 
     doResize = () => {
-      const viewport = getViewportFromWidth(window.innerWidth);
+      const viewport = getViewportFromMaxWidth(window.innerWidth);
       const state = buildState(window.innerWidth, window.innerHeight, viewport);
       if (!isEqual(this.state, state)) {
         this.setState(state);

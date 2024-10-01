@@ -18,9 +18,10 @@ import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/erro
 import { getFilesFromExpense, getPayoutProfiles } from '../../lib/expenses';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
-import useKeyboardKey, { E } from '../../lib/hooks/useKeyboardKey';
+import useKeyboardKey, { E, ESCAPE_KEY } from '../../lib/hooks/useKeyboardKey';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
+import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { itemHasOCR } from './lib/ocr';
 
 import ConfirmationModal from '../ConfirmationModal';
@@ -43,6 +44,7 @@ import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledLink from '../StyledLink';
 import { H1, H5, Span } from '../Text';
+import { DialogPortal } from '../ui/Dialog';
 
 import { editExpenseMutation } from './graphql/mutations';
 import { expensePageQuery } from './graphql/queries';
@@ -116,6 +118,7 @@ function Expense(props) {
     legacyExpenseId,
     isDrawer,
     enableKeyboardShortcuts,
+    onClose,
   } = props;
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const intl = useIntl();
@@ -222,17 +225,26 @@ function Expense(props) {
     },
   });
 
+  useKeyboardKey({
+    keyMatch: ESCAPE_KEY,
+    callback: e => {
+      if (props.isDrawer && state.status !== PAGE_STATUS.EDIT) {
+        e.preventDefault();
+        onClose?.();
+      }
+    },
+  });
+
   const [editExpense] = useMutation(editExpenseMutation, {
     context: API_V2_CONTEXT,
   });
 
   const expenseTopRef = useRef(null);
   const { status, editedExpense } = state;
+  const { viewport } = useWindowResize(null, { useMinWidth: true });
+  const isDesktop = viewport === VIEWPORTS.LARGE;
 
-  const expense = cloneDeep(data?.expense);
-  if (expense && data?.expensePayeeStats?.payee?.stats) {
-    expense.payee.stats = data.expensePayeeStats?.payee?.stats;
-  }
+  const expense = data?.expense;
   const loggedInAccount = data?.loggedInAccount;
   const collective = expense?.account;
   const host = expense?.host ?? collective?.host;
@@ -396,6 +408,11 @@ function Expense(props) {
   };
 
   const files = React.useMemo(() => getFilesFromExpense(expense, intl), [expense]);
+
+  useEffect(() => {
+    const showFilesViewerModal = isDrawer && isDesktop && files?.length > 0;
+    setState(state => ({ ...state, showFilesViewerModal }));
+  }, [files, isDesktop, isDrawer]);
 
   const confirmSaveButtons = (
     <Flex flex={1} flexWrap="wrap" gridGap={[2, 3]}>
@@ -776,19 +793,24 @@ function Expense(props) {
       )}
 
       {state.showFilesViewerModal && (
-        <FilesViewerModal
-          allowOutsideInteraction={isDrawer}
-          files={files}
-          parentTitle={intl.formatMessage(
-            {
-              defaultMessage: 'Expense #{expenseId} attachment',
-              id: 'At2m8o',
-            },
-            { expenseId: expense.legacyId },
-          )}
-          openFileUrl={openUrl}
-          onClose={() => setState(state => ({ ...state, showFilesViewerModal: false }))}
-        />
+        <DialogPortal>
+          <FilesViewerModal
+            allowOutsideInteraction={isDrawer}
+            files={files}
+            parentTitle={intl.formatMessage(
+              {
+                defaultMessage: 'Expense #{expenseId} attachment',
+                id: 'At2m8o',
+              },
+              { expenseId: expense.legacyId },
+            )}
+            openFileUrl={openUrl}
+            onClose={
+              isDrawer && isDesktop ? onClose : () => setState(state => ({ ...state, showFilesViewerModal: false }))
+            }
+            hideCloseButton={isDrawer && isDesktop}
+          />
+        </DialogPortal>
       )}
     </Box>
   );
@@ -808,6 +830,7 @@ Expense.propTypes = {
   fetchMore: PropTypes.func,
   startPolling: PropTypes.func,
   stopPolling: PropTypes.func,
+  onClose: PropTypes.func,
   isRefetchingDataForUser: PropTypes.bool,
   drawerActionsContainer: PropTypes.object,
   isDrawer: PropTypes.bool,
