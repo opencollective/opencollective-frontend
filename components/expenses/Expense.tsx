@@ -791,24 +791,26 @@ function Expense(props) {
         </Fragment>
       )}
 
-      {state.showFilesViewerModal && (
-        <FilesViewerModal
-          allowOutsideInteraction={isDrawer}
-          files={files}
-          parentTitle={intl.formatMessage(
-            {
-              defaultMessage: 'Expense #{expenseId} attachment',
-              id: 'At2m8o',
-            },
-            { expenseId: expense.legacyId },
-          )}
-          openFileUrl={openUrl}
-          onClose={
-            isDrawer && isDesktop ? onClose : () => setState(state => ({ ...state, showFilesViewerModal: false }))
-          }
-          hideCloseButton={isDrawer && isDesktop}
-        />
-      )}
+      {state.showFilesViewerModal &&
+        createPortal(
+          <FilesViewerModal
+            allowOutsideInteraction={isDrawer}
+            files={files}
+            parentTitle={intl.formatMessage(
+              {
+                defaultMessage: 'Expense #{expenseId} attachment',
+                id: 'At2m8o',
+              },
+              { expenseId: expense.legacyId },
+            )}
+            openFileUrl={openUrl}
+            onClose={
+              isDrawer && isDesktop ? onClose : () => setState(state => ({ ...state, showFilesViewerModal: false }))
+            }
+            hideCloseButton={isDrawer && isDesktop}
+          />,
+          document.body,
+        )}
     </Box>
   );
 }
