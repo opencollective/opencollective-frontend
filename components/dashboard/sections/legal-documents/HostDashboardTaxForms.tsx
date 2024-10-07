@@ -144,7 +144,7 @@ const HostDashboardTaxForms = ({ accountSlug: hostSlug }: DashboardSectionProps)
 
   return (
     <div className="flex max-w-screen-lg flex-col gap-4">
-      <DashboardHeader title={<FormattedMessage defaultMessage="Tax Forms" id="skSw4d" />} />
+      <DashboardHeader dashboardSlug={hostSlug} title={<FormattedMessage defaultMessage="Tax Forms" id="skSw4d" />} />
 
       <Filterbar {...queryFilter} />
 

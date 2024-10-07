@@ -34,6 +34,8 @@ import NotificationBar from '../components/NotificationBar';
 import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { TwoFactorAuthRequiredMessage } from '../components/TwoFactorAuthRequiredMessage';
+import RegisterPage from '@/components/RegisterPage';
+import { LayoutOption, useSidebar } from '@/components/SidebarContext';
 
 const messages = defineMessages({
   collectiveIsArchived: {
@@ -57,20 +59,21 @@ const messages = defineMessages({
 const getDefaultSectionForAccount = (account, loggedInUser) => {
   if (!account) {
     return null;
-  } else if (account.type === 'ROOT') {
-    return ROOT_SECTIONS.ALL_COLLECTIVES;
-  } else if (
-    isIndividualAccount(account) ||
-    (!isHostAccount(account) && loggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW))
-  ) {
-    return ALL_SECTIONS.OVERVIEW;
-  } else if (isHostAccount(account)) {
-    return ALL_SECTIONS.HOST_EXPENSES;
   } else {
-    const isAdmin = loggedInUser?.isAdminOfCollective(account);
-    const isAccountant = loggedInUser?.hasRole(roles.ACCOUNTANT, account);
-    return !isAdmin && isAccountant ? ALL_SECTIONS.PAYMENT_RECEIPTS : ALL_SECTIONS.EXPENSES;
+    return ALL_SECTIONS.OVERVIEW;
   }
+  // } else if (
+  //   isIndividualAccount(account) ||
+  //   (!isHostAccount(account) && loggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW))
+  // ) {
+  //   return ALL_SECTIONS.OVERVIEW;
+  // } else if (isHostAccount(account)) {
+  //   return ALL_SECTIONS.HOST_EXPENSES;
+  // } else {
+  //   const isAdmin = loggedInUser?.isAdminOfCollective(account);
+  //   const isAccountant = loggedInUser?.hasRole(roles.ACCOUNTANT, account);
+  //   return !isAdmin && isAccountant ? ALL_SECTIONS.PAYMENT_RECEIPTS : ALL_SECTIONS.EXPENSES;
+  // }
 };
 
 const getNotification = (intl, account) => {
@@ -145,6 +148,8 @@ const DashboardPage = () => {
     slug: LoggedInUser?.collective.slug,
   });
   const isRootUser = LoggedInUser?.isRoot;
+  const { layout } = useSidebar();
+
   const defaultSlug = lastWorkspaceVisit.slug || LoggedInUser?.collective.slug;
   const activeSlug = slug || defaultSlug;
   const isRootProfile = activeSlug === ROOT_PROFILE_KEY;
@@ -199,6 +204,7 @@ const DashboardPage = () => {
     subMenu = parentMenuItem.subMenu;
   }
 
+  const hasTopbar = layout === LayoutOption.SPLIT_TOP_LEFT_RIGHT;
   return (
     <DashboardContext.Provider
       value={{
@@ -235,15 +241,19 @@ const DashboardPage = () => {
             </div>
           ) : !useDynamicTopBar ? (
             <div
-              className="flex min-h-[600px] flex-col justify-center gap-6 px-4 py-6 md:flex-row lg:gap-12 lg:py-8 xl:px-6"
+              className={clsx(
+                'flex min-h-[600px] flex-col justify-center gap-6 px-4 py-6 md:flex-row lg:gap-12 xl:px-6',
+                hasTopbar ? 'lg:py-2' : 'lg:py-8',
+              )}
               data-cy="admin-panel-container"
             >
-              <AdminPanelSideBar isLoading={isLoading} activeSlug={activeSlug} menuItems={menuItems} />
+              {/* <AdminPanelSideBar isLoading={isLoading} activeSlug={activeSlug} menuItems={menuItems} /> */}
               {LoggedInUser && require2FAForAdmins(account) && !LoggedInUser.hasTwoFactorAuth ? (
                 <TwoFactorAuthRequiredMessage className="lg:mt-16" />
               ) : (
                 <div className="min-w-0 max-w-screen-xl flex-1">
                   <DashboardSection
+                    slug={slug}
                     section={selectedSection}
                     isLoading={isLoading}
                     account={account}
@@ -291,7 +301,7 @@ const DashboardPage = () => {
             </div>
           )}
         </Page>
-        <Footer />
+        {/* <Footer /> */}
       </div>
     </DashboardContext.Provider>
   );

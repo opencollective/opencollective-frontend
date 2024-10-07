@@ -139,6 +139,7 @@ const HostTransactionsBase = ({ accountSlug: hostSlug }: DashboardSectionProps) 
   return (
     <div className="flex flex-col gap-4">
       <DashboardHeader
+        dashboardSlug={hostSlug}
         title={<FormattedMessage id="menu.transactions" defaultMessage="Transactions" />}
         actions={
           <React.Fragment>

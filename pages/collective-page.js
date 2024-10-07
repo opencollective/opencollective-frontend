@@ -22,7 +22,7 @@ import ErrorPage from '../components/ErrorPage';
 import Loading from '../components/Loading';
 import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
-
+import RegisterPage from '@/components/RegisterPage';
 import Custom404 from './404';
 /** A page rendered when collective is incognito */
 const IncognitoUserCollective = dynamic(
@@ -175,6 +175,14 @@ class CollectivePage extends React.Component {
         {...getCollectivePageMetadata(collective)}
         loading={loading}
       >
+        <RegisterPage
+          page={{
+            href: `/${collective.slug}`,
+            imageUrl: collective.imageUrl,
+            label: collective.name,
+          }}
+        />
+
         <GlobalStyles />
         {loading ? (
           <div className="py-16 sm:py-32">

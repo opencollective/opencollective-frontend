@@ -161,7 +161,10 @@ const HostApplications = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
 
   return (
     <div className="flex max-w-screen-lg flex-col gap-4">
-      <DashboardHeader title={<FormattedMessage id="Menu.HostApplications" defaultMessage="Host Applications" />} />
+      <DashboardHeader
+        dashboardSlug={hostSlug}
+        title={<FormattedMessage id="Menu.HostApplications" defaultMessage="Host Applications" />}
+      />
 
       <Filterbar {...queryFilter} />
 

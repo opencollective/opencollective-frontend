@@ -67,6 +67,7 @@ import {
 } from './constants';
 import { DashboardContext } from './DashboardContext';
 import DashboardHeader from './DashboardHeader';
+import RegisterPage from '../RegisterPage';
 
 const DASHBOARD_COMPONENTS = {
   [SECTIONS.HOSTED_COLLECTIVES]: HostedCollectives,
@@ -119,7 +120,7 @@ const ROOT_COMPONENTS = {
   [ROOT_SECTIONS.RECURRING_CONTRIBUTIONS]: RecurringContributions,
 };
 
-const DashboardSection = ({ account, isLoading, section, subpath }) => {
+const DashboardSection = ({ slug, account, isLoading, section, subpath }) => {
   const { LoggedInUser } = useLoggedInUser();
   const { activeSlug } = useContext(DashboardContext);
 
@@ -128,6 +129,8 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
   if (isLoading) {
     return (
       <div className="w-full pb-6">
+        <RegisterPage dashboardSlug={slug} />
+
         <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
         <LoadingPlaceholder height={26} mb={4} maxWidth={500} />
         <LoadingPlaceholder height={300} />
@@ -136,7 +139,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
   }
 
   const RootComponent = ROOT_COMPONENTS[section];
-  if (RootComponent && LoggedInUser.isRoot && activeSlug === ROOT_PROFILE_KEY) {
+  if (RootComponent && LoggedInUser?.isRoot && activeSlug === ROOT_PROFILE_KEY) {
     return (
       <div className="w-full pb-6">
         <RootComponent subpath={subpath} isDashboard />
@@ -147,14 +150,16 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
   let DashboardComponent = DASHBOARD_COMPONENTS[section];
   if (DashboardComponent) {
     if (section === SECTIONS.REPORTS) {
-      if (LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.HOST_REPORTS)) {
+      if (LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.HOST_REPORTS)) {
         DashboardComponent = PreviewReports;
       }
     }
     return (
       <div className="w-full pb-6">
+        <RegisterPage dashboardSlug={slug} />
+
         <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
-        <DashboardComponent accountSlug={account.slug} subpath={subpath} isDashboard />
+        <DashboardComponent accountSlug={slug} subpath={subpath} isDashboard />
       </div>
     );
   }
@@ -162,6 +167,8 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
   if (values(LEGACY_SECTIONS).includes(section)) {
     return (
       <div className="w-full max-w-screen-lg pb-6">
+        <RegisterPage dashboardSlug={slug} />
+
         <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
         {SECTION_LABELS[section] && <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />}
 
@@ -176,8 +183,10 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
     return (
       // <div className="flex max-w-screen-lg justify-center">
       <div className="max-w-screen-md flex-1 pb-6">
+        <RegisterPage dashboardSlug={slug} />
+
         <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
-        <SettingsComponent account={account} accountSlug={account.slug} subpath={subpath} />
+        <SettingsComponent account={account} accountSlug={slug} subpath={subpath} />
       </div>
     );
   }
@@ -186,6 +195,8 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
     return (
       // <div className="flex max-w-screen-lg justify-center">
       <div className="max-w-screen-md flex-1 pb-6">
+        <RegisterPage dashboardSlug={slug} />
+
         <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
         {SECTION_LABELS[section] && <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />}
 

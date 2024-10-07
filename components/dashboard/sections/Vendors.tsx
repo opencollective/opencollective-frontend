@@ -345,6 +345,7 @@ const Vendors = ({ accountSlug }: DashboardSectionProps) => {
   return (
     <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader
+        dashboardSlug={accountSlug}
         title={<FormattedMessage defaultMessage="Vendors" id="RilevA" />}
         description={
           <FormattedMessage

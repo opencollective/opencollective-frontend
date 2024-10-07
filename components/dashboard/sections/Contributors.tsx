@@ -284,6 +284,7 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
   return (
     <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader
+        dashboardSlug={accountSlug}
         title={<FormattedMessage id="Contributors" defaultMessage="Contributors" />}
         actions={
           <div className="flex items-center gap-2">

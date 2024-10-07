@@ -153,7 +153,7 @@ type TopBarProps = {
 
 const TopBar = ({ account }: TopBarProps) => {
   const { LoggedInUser } = useLoggedInUser();
-  const [showSearchModal, setShowSearchModal] = useState(false);
+  // const [showSearchModal, setShowSearchModal] = useState(false);
   const ref = useRef();
   const router = useRouter();
   const { viewport } = useWindowResize();
@@ -193,7 +193,8 @@ const TopBar = ({ account }: TopBarProps) => {
           </Flex>
 
           <Flex alignItems="center" gridGap={2} flexShrink={4} flexGrow={0}>
-            <SearchTrigger setShowSearchModal={setShowSearchModal} />
+            <SearchModal trigger={<SearchTrigger />} />
+
             <div className="hidden sm:block">
               <ChangelogTrigger />
             </div>
@@ -203,7 +204,6 @@ const TopBar = ({ account }: TopBarProps) => {
           </Flex>
         </div>
       </div>
-      <SearchModal open={showSearchModal} setOpen={open => setShowSearchModal(open)} />
       {isMobile && (onDashboardRoute || onSearchRoute) && <MobileFooterMenu {...{ onDashboardRoute, onSearchRoute }} />}
     </Fragment>
   );

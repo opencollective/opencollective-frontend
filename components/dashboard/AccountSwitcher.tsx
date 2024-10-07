@@ -119,7 +119,7 @@ const EMPTY_GROUP_STATE = {
   },
 };
 
-const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
+export const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
   const isAdministratedAccount = m => ['ADMIN', 'ACCOUNTANT'].includes(m.role) && !m.collective.isIncognito;
   let administratedAccounts = loggedInUser?.memberOf.filter(isAdministratedAccount).map(m => m.collective) || [];
 

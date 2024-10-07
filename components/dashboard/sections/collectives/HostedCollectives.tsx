@@ -38,6 +38,7 @@ import CollectiveDetails from './CollectiveDetails';
 import type { HostedCollectivesDataTableMeta } from './common';
 import { cols } from './common';
 import { hostedCollectivesMetadataQuery, hostedCollectivesQuery } from './queries';
+import RegisterPage from '@/components/RegisterPage';
 
 const sortFilter = buildSortFilter({
   fieldSchema: z.enum(['CREATED_AT', 'BALANCE', 'NAME']),
@@ -202,7 +203,10 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
   const onClickRow = row => handleDrawer(row.original);
   return (
     <div className="flex max-w-screen-lg flex-col gap-4">
-      <DashboardHeader title={<FormattedMessage id="HostedCollectives" defaultMessage="Hosted Collectives" />} />
+      <DashboardHeader
+        dashboardSlug={hostSlug}
+        title={<FormattedMessage id="HostedCollectives" defaultMessage="Hosted Collectives" />}
+      />
       <Filterbar {...queryFilter} />
       {error && <MessageBoxGraphqlError error={error} mb={2} />}
       {!error && !loading && !hostedAccounts?.nodes.length ? (

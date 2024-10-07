@@ -32,6 +32,7 @@ import { AccountingCategoriesTable } from './AccountingCategoriesTable';
 import type { EditableAccountingCategoryFields } from './AccountingCategoryForm';
 import { AccountingCategoryKindI18n } from './AccountingCategoryForm';
 import { CreateAccountingCategoryModal } from './CreateAccountingCategoryModal';
+import RegisterPage from '@/components/RegisterPage';
 
 const accountingCategoriesQuery = gql`
   query AdminAccountingCategories($hostSlug: String!) {
@@ -280,6 +281,7 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
     <React.Fragment>
       <div className="flex max-w-screen-lg flex-col gap-4">
         <DashboardHeader
+          dashboardSlug={accountSlug}
           title={<FormattedMessage defaultMessage="Chart of Accounts" id="IzFWHI" />}
           description={
             <FormattedMessage

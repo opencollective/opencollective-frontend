@@ -26,6 +26,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from '../../ui/Popover';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../ui/Tooltip';
 import { ROOT_PROFILE_ACCOUNT } from '../constants';
+import { LayoutOption, useSidebar } from '@/components/SidebarContext';
 
 const CREATE_NEW_BUTTONS = {
   [CollectiveType.COLLECTIVE]: {
@@ -218,7 +219,7 @@ const AccountsCommand = ({
   );
 };
 
-const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
+export const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
   let administratedAccounts =
     loggedInUser.memberOf.filter(m => m.role === 'ADMIN' && !m.collective.isIncognito).map(m => m.collective) || [];
 
@@ -256,14 +257,17 @@ const getGroupedChildAccounts = memoizeOne(accounts => {
   return { groupedAccounts, archivedAccounts };
 });
 
-export default function AccountSwitcher({ activeSlug, defaultSlug, setDefaultSlug }) {
-  const { LoggedInUser } = useLoggedInUser();
+export default function AccountSwitcher({ activeSlug, defaultSlug, setDefaultSlug, expanded }) {
+  const { LoggedInUser, logout } = useLoggedInUser();
   const intl = useIntl();
   const router = useRouter();
   const { viewport } = useWindowResize();
   const isMobile = [VIEWPORTS.XSMALL, VIEWPORTS.SMALL].includes(viewport);
-
+  const { layout } = useSidebar();
   const loggedInUserCollective = LoggedInUser?.collective;
+  // if (!loggedInUserCollective) {
+  //   return null;
+  // }
   const { groupedAccounts, archivedAccounts } = getGroupedAdministratedAccounts(LoggedInUser);
   const rootAccounts = flatten(Object.values({ ...groupedAccounts, archived: archivedAccounts }));
   const allAdministratedAccounts = [
@@ -302,8 +306,11 @@ export default function AccountSwitcher({ activeSlug, defaultSlug, setDefaultSlu
 
   const { groupedAccounts: childGroupedAccounts, archivedAccounts: childArchivedAccounts } =
     getGroupedChildAccounts(childAccounts);
-  const showChildPane = !isMobile && ['ORGANIZATION', 'COLLECTIVE', 'FUND'].includes(selectedRootAccount?.type);
-
+  // const showChildPane = !isMobile && ['ORGANIZATION', 'COLLECTIVE', 'FUND'].includes(selectedRootAccount?.type);
+  const hasLogoutButton = layout !== LayoutOption.SPLIT_TOP_LEFT_RIGHT;
+  const showChildPane =
+    !hasLogoutButton && !isMobile && ['ORGANIZATION', 'COLLECTIVE', 'FUND'].includes(selectedRootAccount?.type);
+  const useButtonStyle = false;
   return (
     <Popover
       open={open}
@@ -321,9 +328,7 @@ export default function AccountSwitcher({ activeSlug, defaultSlug, setDefaultSlu
         }
       }}
     >
-      <PopoverAnchor asChild>
-        <div className="flex items-center gap-2.5">
-          {parentAccount && (
+      {/* {parentAccount && (
             <div className="hidden items-center gap-2.5 md:flex">
               <Button
                 variant="outline"
@@ -345,27 +350,40 @@ export default function AccountSwitcher({ activeSlug, defaultSlug, setDefaultSlu
               </Button>
               <DividerIcon size={32} className="-mx-4 text-slate-300" />
             </div>
-          )}
+          )} */}
 
-          <PopoverTrigger asChild>
-            <Button
-              onClick={() => !open && setOpen(true)}
-              variant="outline"
-              role="combobox"
-              aria-expanded={open}
-              className={clsx(
-                'group h-8 max-w-[10rem] justify-between gap-1.5 whitespace-nowrap rounded-full px-2 sm:max-w-[14rem]',
-              )}
-            >
-              <div className="flex items-center gap-2 truncate">
-                <Avatar collective={activeAccount} radius={20} />
-                <div className="truncate">{activeAccount?.name}</div>
-              </div>
-              <ChevronsUpDown size={16} className="shrink-0 text-slate-500 group-hover:text-slate-900" />
-            </Button>
-          </PopoverTrigger>
-        </div>
-      </PopoverAnchor>
+      <PopoverTrigger asChild>
+        {useButtonStyle ? (
+          <Button
+            onClick={() => !open && setOpen(true)}
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className={clsx('group h-10 w-full justify-between gap-1.5 whitespace-nowrap px-1.5')}
+          >
+            <div className="flex items-center gap-2 truncate">
+              <Avatar collective={activeAccount} radius={24} className="shadow" />
+              {expanded && <div className="truncate">{activeAccount?.name}</div>}
+            </div>
+            {expanded && <ChevronsUpDown size={16} className="shrink-0 text-slate-500 group-hover:text-slate-900" />}
+          </Button>
+        ) : (
+          <button
+            onClick={() => !open && setOpen(true)}
+            role="combobox"
+            aria-expanded={open}
+            className={clsx(
+              'group flex h-10 w-full items-center justify-between gap-1.5 whitespace-nowrap rounded-md px-2 text-left text-sm font-medium hover:bg-muted',
+            )}
+          >
+            <div className="relative flex w-full min-w-0 items-center gap-2">
+              <Avatar collective={activeAccount} radius={24} className="shrink-0 shadow" />
+              {expanded && <div className="relative w-full flex-1 truncate">{activeAccount?.name}</div>}
+            </div>
+            {expanded && <ChevronsUpDown size={16} className="shrink-0 text-slate-500 group-hover:text-slate-900" />}
+          </button>
+        )}
+      </PopoverTrigger>
       <PopoverContent
         align="start"
         className={cx('grid w-auto overflow-hidden rounded-xl p-0', showChildPane ? 'grid-cols-2' : 'grid-cols-1')}
@@ -401,6 +419,16 @@ export default function AccountSwitcher({ activeSlug, defaultSlug, setDefaultSlu
             loggedInUserCollective={loggedInUserCollective}
             archivedAccounts={childArchivedAccounts}
           />
+        )}
+        {hasLogoutButton && (
+          <div className="border-t px-1 py-1.5">
+            <button
+              className="h-8 w-full rounded-md px-3 text-left text-sm text-foreground hover:bg-accent"
+              onClick={() => logOut()}
+            >
+              Log out
+            </button>
+          </div>
         )}
       </PopoverContent>
     </Popover>
