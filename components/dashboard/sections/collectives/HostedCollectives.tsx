@@ -18,8 +18,10 @@ import { formatHostFeeStructure } from '../../../../lib/i18n/host-fee-structure'
 import { Drawer } from '../../../Drawer';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { DataTable } from '../../../table/DataTable';
+import { Button } from '../../../ui/Button';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
+import ExportHostedCollectivesCSVModal from '../../ExportHostedCollectivesCSVModal';
 import { consolidatedBalanceFilter } from '../../filters/BalanceFilter';
 import {
   COLLECTIVE_STATUS,
@@ -113,6 +115,7 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
 const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionProps) => {
   const intl = useIntl();
   const router = useRouter();
+  const [displayExportCSVModal, setDisplayExportCSVModal] = React.useState(false);
   const [showCollectiveOverview, setShowCollectiveOverview] = React.useState<Collective | undefined | string>(
     subpath[0],
   );
@@ -202,7 +205,23 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
   const onClickRow = row => handleDrawer(row.original);
   return (
     <div className="flex max-w-screen-lg flex-col gap-4">
-      <DashboardHeader title={<FormattedMessage id="HostedCollectives" defaultMessage="Hosted Collectives" />} />
+      <DashboardHeader
+        title={<FormattedMessage id="HostedCollectives" defaultMessage="Hosted Collectives" />}
+        actions={
+          <ExportHostedCollectivesCSVModal
+            open={displayExportCSVModal}
+            setOpen={setDisplayExportCSVModal}
+            queryFilter={queryFilter}
+            account={data?.host}
+            isHostReport
+            trigger={
+              <Button size="sm" variant="outline" onClick={() => setDisplayExportCSVModal(true)}>
+                <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
+              </Button>
+            }
+          />
+        }
+      />
       <Filterbar {...queryFilter} />
       {error && <MessageBoxGraphqlError error={error} mb={2} />}
       {!error && !loading && !hostedAccounts?.nodes.length ? (
