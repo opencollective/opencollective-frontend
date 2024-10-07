@@ -1,13 +1,12 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
 
-import type { Account } from '../../lib/graphql/types/v2/graphql';
 import formatCollectiveType from '../../lib/i18n/collective-type';
 
 import Avatar from '../Avatar';
 import { Badge } from '../ui/Badge';
 
-type AccountResultData = Pick<Account, 'name' | 'slug' | 'imageUrl' | 'type'>;
+import type { AccountResultData } from './useRecentlyVisited';
 
 export function AccountResult({ account }: { account: AccountResultData }) {
   const intl = useIntl();

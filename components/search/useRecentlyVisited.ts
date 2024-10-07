@@ -73,7 +73,7 @@ const PageVisitSchema = z.discriminatedUnion('type', [
 const RecentlyVisitedSchema = z.record(z.string(), z.array(PageVisitSchema));
 
 type RecentlyVisited = z.infer<typeof RecentlyVisitedSchema>;
-type PageVisit = z.infer<typeof PageVisitSchema>;
+export type PageVisit = z.infer<typeof PageVisitSchema>;
 
 export function useRecentlyVisited() {
   const [recentlyVisitedRaw, setRecentlyVisitedRaw] = useLocalStorage<RecentlyVisited>(

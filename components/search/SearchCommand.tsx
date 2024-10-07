@@ -26,7 +26,8 @@ import { searchCommandQuery } from './queries';
 import { SearchCommandGroup } from './SearchCommandGroup';
 import { SearchCommandLegend } from './SearchCommandLegend';
 import { TransactionResult } from './TransactionResult';
-import { AccountResultData, ExpenseResultData, TransactionResultData, useRecentlyVisited } from './useRecentlyVisited';
+import type { PageVisit } from './useRecentlyVisited';
+import { useRecentlyVisited } from './useRecentlyVisited';
 
 export const SearchCommand = ({ open, setOpen }) => {
   const router = useRouter();
@@ -103,15 +104,15 @@ export const SearchCommand = ({ open, setOpen }) => {
 
   const { recentlyVisited, addToRecent } = useRecentlyVisited();
 
-  // Update the sections where search results are selected
-
-  type ResultSelect =
-    | { type: 'account'; data: AccountResultData }
-    | { type: 'expense'; data: ExpenseResultData }
-    | { type: 'transaction'; data: TransactionResultData }
-    | { type: 'page'; data: { section: string } };
-
-  const handleResultSelect = ({ type, data }: ResultSelect) => {
+  const handleResultSelect = ({
+    type,
+    data,
+  }:
+    | PageVisit
+    | {
+        type: 'page';
+        data: { section: string };
+      }) => {
     switch (type) {
       case 'account':
         if (data.type !== CollectiveType.VENDOR) {
@@ -192,12 +193,11 @@ export const SearchCommand = ({ open, setOpen }) => {
 
         {recentlyVisited.length > 0 && debouncedInput === '' && (
           <CommandGroup heading="Recent">
-            {recentlyVisited.map(item => (
-              <CommandItem key={item.key} className="gap-2" onSelect={() => handleResultSelect(item)}>
-                {item.type === 'account' && <AccountResult account={item.data} />}
-                {item.type === 'expense' && <ExpenseResult expense={item.data} />}
-                {item.type === 'transaction' && <TransactionResult transaction={item.data} />}
-                {item.type === 'page' && <PageResult page={item.data} />}
+            {recentlyVisited.map(recentVisit => (
+              <CommandItem key={recentVisit.key} className="gap-2" onSelect={() => handleResultSelect(recentVisit)}>
+                {recentVisit.type === 'account' && <AccountResult account={recentVisit.data} />}
+                {recentVisit.type === 'expense' && <ExpenseResult expense={recentVisit.data} />}
+                {recentVisit.type === 'transaction' && <TransactionResult transaction={recentVisit.data} />}
               </CommandItem>
             ))}
           </CommandGroup>
@@ -243,7 +243,10 @@ export const SearchCommand = ({ open, setOpen }) => {
             totalCount={data?.search.results.transactions.collection.totalCount}
             nodes={data?.search.results.transactions.collection.nodes}
             renderNode={transaction => (
-              <CommandItem key={transaction.id} onSelect={() => handleResultSelect('transaction', transaction)}>
+              <CommandItem
+                key={transaction.id}
+                onSelect={() => handleResultSelect({ type: 'transaction', data: transaction })}
+              >
                 <TransactionResult transaction={transaction} />
               </CommandItem>
             )}
