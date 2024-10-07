@@ -16,8 +16,6 @@ export enum PREVIEW_FEATURE_KEYS {
   SEARCH_COMMAND = 'SEARCH_COMMAND',
 }
 
-type Environment = 'development' | 'test' | 'e2e' | 'staging' | 'production';
-
 export type PreviewFeature = {
   key: PREVIEW_FEATURE_KEYS | `${PREVIEW_FEATURE_KEYS}`;
   title: string;
@@ -25,12 +23,12 @@ export type PreviewFeature = {
   publicBeta: boolean; // If true, the feature will be available to toggle for all users.
   closedBetaAccessFor?: string[]; // Account slugs. Members and admins of these accounts will see this feature as a Closed Beta preview in the Preview Features modal.
   enabledByDefaultFor?: ('*' | string)[]; // Account slugs. Members and admins of these accounts will have the feature enabled by default.
-  env?: Array<Environment>; // If set, the feature will be available only in the specified environments.
+  env?: Array<'development' | 'test' | 'e2e' | 'staging' | 'production'>; // If set, the feature will be available only in the specified environments.
   alwaysEnableInDev?: boolean; // If true, the feature will be enabled by default in development.
   dependsOn?: PREVIEW_FEATURE_KEYS;
   setIsEnabled?: (enable: boolean) => void;
   isEnabled?: () => boolean;
-  hasAccess?: (loggedInUser: LoggedInUser, env: Environment) => boolean;
+  hasAccess?: (loggedInUser: LoggedInUser) => boolean;
 };
 
 /**
@@ -127,6 +125,6 @@ export const previewFeatures: PreviewFeature[] = [
     publicBeta: false,
     title: 'Search command menu',
     description: 'Global search powered by ElasticSearch',
-    hasAccess: (user, env) => env === 'development' || user?.isRoot,
+    hasAccess: user => user?.isRoot,
   },
 ];

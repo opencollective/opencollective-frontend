@@ -55,8 +55,6 @@ const basePageVisitSchema = z.object({
   key: z.string(),
 });
 
-export type pageVisitType = z.infer<typeof basePageVisitSchema>['type'];
-
 const PageVisitSchema = z.discriminatedUnion('type', [
   basePageVisitSchema.extend({
     type: z.literal('account'),

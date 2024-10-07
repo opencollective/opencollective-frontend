@@ -26,13 +26,7 @@ import { searchCommandQuery } from './queries';
 import { SearchCommandGroup } from './SearchCommandGroup';
 import { SearchCommandLegend } from './SearchCommandLegend';
 import { TransactionResult } from './TransactionResult';
-import {
-  AccountResultData,
-  ExpenseResultData,
-  pageVisitType,
-  TransactionResultData,
-  useRecentlyVisited,
-} from './useRecentlyVisited';
+import { AccountResultData, ExpenseResultData, TransactionResultData, useRecentlyVisited } from './useRecentlyVisited';
 
 export const SearchCommand = ({ open, setOpen }) => {
   const router = useRouter();
