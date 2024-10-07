@@ -267,9 +267,15 @@ class LoggedInUser {
       );
       const isEnabledInEnv = !feature.env || (feature.env as string[]).includes(process.env.OC_ENV);
       const isEnabledByDevEnv = feature.alwaysEnableInDev && ['development', 'staging'].includes(process.env.NODE_ENV);
+      const hasAccess = feature.hasAccess?.(this, process.env.OC_ENV);
       return (
         isEnabledInEnv &&
-        (isEnabledByDevEnv || feature.publicBeta || userHaveSetting || hasClosedBetaAccess || enabledByDefault)
+        (isEnabledByDevEnv ||
+          feature.publicBeta ||
+          userHaveSetting ||
+          hasClosedBetaAccess ||
+          enabledByDefault ||
+          hasAccess)
       );
     });
 

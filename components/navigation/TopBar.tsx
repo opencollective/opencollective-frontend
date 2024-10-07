@@ -8,6 +8,7 @@ import styled, { css } from 'styled-components';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { ScrollDirection, useWindowScroll } from '../../lib/hooks/useWindowScroll';
+import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 
 import ChangelogTrigger from '../changelog/ChangelogTrigger';
 import { Box, Flex } from '../Grid';
@@ -169,7 +170,7 @@ const TopBar = ({ account }: TopBarProps) => {
   const onSearchRoute =
     isRouteActive('/search') || (account && isRouteActive(`/${account.parentCollective?.slug || account.slug}`));
   const ocLogoRoute = LoggedInUser ? '/dashboard' : '/home';
-  const useSearchCommandMenu = LoggedInUser?.isRoot;
+  const useSearchCommandMenu = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_COMMAND);
   return (
     <Fragment>
       <div className="border-b bg-white px-4 xl:px-6" ref={ref}>

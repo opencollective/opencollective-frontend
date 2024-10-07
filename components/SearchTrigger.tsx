@@ -4,6 +4,7 @@ import { Search } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 
 const SearchTrigger = ({ setShowSearchModal }) => {
   const { LoggedInUser } = useLoggedInUser();
@@ -18,7 +19,7 @@ const SearchTrigger = ({ setShowSearchModal }) => {
     return () => document.removeEventListener('keydown', handleKeydown);
   }, []);
 
-  const useSearchCommandMenu = LoggedInUser?.isRoot;
+  const useSearchCommandMenu = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_COMMAND);
   return (
     <button
       className="relative flex h-8 w-8 shrink items-center justify-center gap-1.5 rounded-full border text-slate-500 ring-black ring-offset-2 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 lg:w-auto lg:justify-start lg:px-2 lg:pr-4"
