@@ -1,3 +1,4 @@
+import * as cheerio from 'cheerio';
 import speakeasy from 'speakeasy';
 
 describe('passwords', () => {
@@ -120,8 +121,16 @@ describe('passwords', () => {
 
     // Email
     const expectedEmailPart = user.email.split('@')[0]; // On CI, email is replaced by email+bcc. We verify only the first part to have a consistent behavior between local and CI
-    cy.openEmail(({ subject, to }) => to[0].address.includes(expectedEmailPart) && subject.includes('Reset Password'));
-    cy.contains('a', 'Reset your password now').click();
+
+    cy.openEmail(
+      ({ Subject, To }) => To[0].Address.includes(expectedEmailPart) && Subject.includes('Reset Password'),
+    ).then(email => {
+      const $html = cheerio.load(email.HTML);
+      const resetLink = $html('a:contains("Reset your password now")');
+      const href = resetLink.attr('href');
+      const parsedUrl = new URL(href);
+      cy.visit(parsedUrl.pathname);
+    });
 
     // Reset password page
     // Should have user info displayed
