@@ -9,7 +9,8 @@ import type { MouseEventHandler } from 'react';
 import { FormattedMessage } from 'react-intl';
 import slugify from 'slugify';
 
-import type { CSVField } from '../../lib/csv';
+import { getEnvVar } from '../../lib/env-utils';
+import type { CSVField } from '../../lib/export-csv/transactions-csv';
 import {
   AVERAGE_TRANSACTIONS_PER_MINUTE,
   FIELD_OPTIONS,
@@ -20,8 +21,7 @@ import {
   GROUPS,
   HOST_OMITTED_FIELDS,
   PLATFORM_PRESETS,
-} from '../../lib/csv';
-import { getEnvVar } from '../../lib/env-utils';
+} from '../../lib/export-csv/transactions-csv';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type {
   Account,
