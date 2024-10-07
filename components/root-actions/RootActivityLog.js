@@ -34,6 +34,7 @@ const RootActivityLog = () => {
             onChange={handleAccountChange}
             collective={{ slug: accountSlug }}
             skipGuests={false}
+            includeArchived
           />
         )}
       </StyledInputField>
