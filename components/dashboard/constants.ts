@@ -48,7 +48,7 @@ export const ROOT_SECTIONS = {
   RECURRING_CONTRIBUTIONS: 'recurring-contributions',
 };
 
-export const SETTINGS_SECTIONS = {
+const SETTINGS_SECTIONS = {
   NOTIFICATIONS: 'notifications',
   INVOICES_RECEIPTS: 'invoices-receipts',
   TAX_INFORMATION: 'tax-information',

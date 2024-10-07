@@ -125,8 +125,9 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
   const pushSubpath = subpath => {
     router.push(
       {
-        pathname: compact([router.pathname, router.query.slug, router.query.section, subpath]).join('/'),
-        query: omit(router.query, ['slug', 'section', 'subpath']),
+        pathname: subpath
+          ? `/dashboard/${router.query.slug}/hosted-collectives/${subpath}`
+          : `/dashboard/${router.query.slug}/hosted-collectives`,
       },
       undefined,
       {

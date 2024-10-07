@@ -25,6 +25,7 @@
     "*.config.*",
     "lib",
     "middleware.ts",
+    "middlewares",
     "next-env.d.ts",
     "pages",
     "rewrites.js",

@@ -97,7 +97,7 @@ describe('signin', () => {
     cy.visit('/signin?next=/signin');
     cy.get('input[name=email]').type('testuser+admin@opencollective.com');
     cy.get('button[type=submit]').click();
-    cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard`);
+    cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/testuseradmin/overview`);
   });
 
   it('can signup as regular user', () => {

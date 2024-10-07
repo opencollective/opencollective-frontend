@@ -60,11 +60,30 @@ exports.REWRITES = [
   },
   { source: '/workspace', destination: '/dashboard' },
   {
-    source: '/dashboard/:slug/:section?/:subpath*',
+    source:
+      '/dashboard/root-actions/:section(recurring-contributions|account-type|account-settings|unhost-accounts|merge-accounts|connect-accounts|clear-cache|move-expenses|move-received-contributions|move-authored-contributions|search-and-ban|ban-account|all-collectives|host-transactions|activity-log)/:subpath*',
+    destination: '/dashboard/root/:section',
+  },
+  {
+    source:
+      '/dashboard/:slug/:section(overview|expected-funds|contributors|vendors|team|host-expenses|host-agreements|host-applications|host-tax-forms|expenses|submitted-expenses|host-virtual-cards|host-virtual-card-requests|incoming-contributions|outgoing-contributions|transactions|virtual-cards|orders|chart-of-accounts|reports|hosted-collectives|updates|host-transactions|accounts|invoices-receipts|tax-information|notifications)/:subpath*',
+    destination: '/dashboard/:slug/:section/:subpath*',
+  },
+  {
+    source:
+      '/dashboard/:slug/:section(goals|connected-accounts|export|for-developers|user-security|custom-email|activity-log|collective-page|authorized-apps|advanced|webhooks|sending-money|policies|receiving-money|tiers|tickets|host|info|gift-cards|gift-cards-create|payment-methods|payment-receipts|fiscal-hosting|security|host-virtual-cards-settings)/:subpath*',
+    destination: '/dashboard/:slug/legacy-settings-sections/:section/:subpath*',
+  },
+  {
+    source: '/dashboard/root-actions',
+    destination: '/dashboard/root/all-collectives',
+  },
+  {
+    source: '/dashboard/:slug',
     destination: '/dashboard',
   },
   {
-    source: '/workspace/:slug/:section?/:subpath*',
+    source: '/workspace/:slug',
     destination: '/dashboard',
   },
   {

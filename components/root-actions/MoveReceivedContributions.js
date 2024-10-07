@@ -273,4 +273,5 @@ const MoveReceivedContributions = () => {
 
 MoveReceivedContributions.propTypes = {};
 
+// ts-unused-exports:disable-next-line
 export default MoveReceivedContributions;

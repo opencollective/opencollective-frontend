@@ -103,9 +103,10 @@ const UpdatesList = () => {
     error: metadataError,
   } = useQuery(updatesDashboardMetadataQuery, {
     variables: {
-      slug: account.slug,
+      slug: account?.slug,
     },
     context: API_V2_CONTEXT,
+    skip: !account?.slug,
   });
 
   const views: Views<z.infer<typeof schema>> = [
@@ -140,9 +141,10 @@ const UpdatesList = () => {
     error: queryError,
   } = useQuery(updatesDashboardQuery, {
     variables: {
-      slug: account.slug,
+      slug: account?.slug,
       ...queryFilter.variables,
     },
+    skip: !account?.slug,
     context: API_V2_CONTEXT,
   });
 

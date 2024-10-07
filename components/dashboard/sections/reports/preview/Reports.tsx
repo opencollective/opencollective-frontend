@@ -1,5 +1,6 @@
 import React from 'react';
 
+import Loading from '../../../../Loading';
 import { DashboardContext } from '../../../DashboardContext';
 import type { DashboardSectionProps } from '../../../types';
 import { HostExpensesReport } from '../../expenses/reports/HostExpensesReport';
@@ -9,6 +10,10 @@ import HostReports from './HostReports';
 
 const Reports = ({ accountSlug, subpath }: DashboardSectionProps) => {
   const { account } = React.useContext(DashboardContext);
+
+  if (!account) {
+    return <Loading />;
+  }
 
   const reportType = subpath[0];
 

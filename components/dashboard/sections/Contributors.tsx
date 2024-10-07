@@ -104,6 +104,7 @@ const dashboardContributorsQuery = gql`
   ) {
     account(slug: $slug) {
       id
+      slug
       members(role: $role, offset: $offset, limit: $limit, orderBy: $orderBy, email: $email) {
         totalCount
         nodes {
@@ -291,12 +292,12 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
               size="sm"
               variant="outline"
               loading={isDownloadingCsv}
+              disabled={!data?.account?.slug}
               onClick={async () => {
                 try {
                   setDownloadingCsv(true);
-                  const filename = `${accountSlug}-contributors.csv`;
-                  const url = `${process.env.REST_URL}/v2/${accountSlug}/contributors.csv?fetchAll=1`;
-                  await fetchCSVFileFromRESTService(url, filename);
+                  const filename = `${data?.account?.slug}-contributors.csv`;
+                  await fetchCSVFileFromRESTService(data?.account?.slug, filename);
                 } finally {
                   setDownloadingCsv(false);
                 }

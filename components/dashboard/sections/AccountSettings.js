@@ -26,10 +26,10 @@ const AccountSettings = ({ account, section }) => {
   const { toast } = useToast();
 
   const { data, loading } = useQuery(editCollectivePageQuery, {
-    variables: { slug: account.slug },
+    variables: { slug: account?.slug },
     fetchPolicy: 'network-only',
     ssr: false,
-    skip: !LoggedInUser,
+    skip: !LoggedInUser || !account?.slug,
   });
   const collective = data?.Collective;
   const [editCollective] = useMutation(editCollectivePageMutation);

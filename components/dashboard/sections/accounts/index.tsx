@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useQuery } from '@apollo/client';
-import { compact, isString, omit } from 'lodash';
+import { compact, isString } from 'lodash';
 import { ChevronDown } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -63,8 +63,9 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
   const pushSubpath = subpath => {
     router.push(
       {
-        pathname: compact([router.pathname, router.query.slug, router.query.section, subpath]).join('/'),
-        query: omit(router.query, ['slug', 'section', 'subpath']),
+        pathname: subpath
+          ? `/dashboard/${router.query.slug}/accounts/${subpath}`
+          : `/dashboard/${router.query.slug}/accounts`,
       },
       undefined,
       {

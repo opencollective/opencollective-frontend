@@ -1,20 +1,19 @@
-import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
-// config file
-// ts-unused-exports:disable-next-line
+import dashboardMiddleware from './middlewares/dashboard';
+import homeMiddleware from './middlewares/home';
+
 export function middleware(req: NextRequest) {
-  // Note: only need to check presence rootRedirectDashboard cookie, not its value
-  const redirectToDashboard = req.cookies.get('rootRedirectDashboard');
-
-  if (redirectToDashboard) {
-    return NextResponse.redirect(new URL('/dashboard', req.url));
+  const pathname = req.nextUrl.pathname;
+  if (pathname === '/') {
+    return homeMiddleware(req);
+  } else if (pathname === '/dashboard') {
+    return dashboardMiddleware(req);
   }
+
   return NextResponse.next();
 }
 
-// config file
-// ts-unused-exports:disable-next-line
 export const config = {
-  matcher: '/',
+  matcher: ['/', { source: '/dashboard', missing: [{ type: 'query', key: 'slug' }] }],
 };
