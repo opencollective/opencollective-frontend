@@ -3,12 +3,11 @@ import clsx from 'clsx';
 import { ArrowDown, ArrowUp } from 'lucide-react';
 import { useIntl } from 'react-intl';
 
-import type { Transaction } from '../../lib/graphql/types/v2/graphql';
 import { i18nTransactionKind } from '../../lib/i18n/transaction';
 
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 
-type TransactionResultData = Pick<Transaction, 'id' | 'kind' | 'amount' | 'type' | 'account' | 'oppositeAccount'>;
+import type { TransactionResultData } from './useRecentlyVisited';
 
 export function TransactionResult({ transaction }: { transaction: TransactionResultData }) {
   const intl = useIntl();
@@ -27,8 +26,8 @@ export function TransactionResult({ transaction }: { transaction: TransactionRes
           <div className="">{i18nTransactionKind(intl, transaction.kind)}</div>
           <span className="font-medium text-foreground">
             <FormattedMoneyAmount
-              amount={transaction.amount.valueInCents}
-              currency={transaction.amount.currency}
+              amount={transaction.netAmount.valueInCents}
+              currency={transaction.netAmount.currency}
               showCurrencyCode={false}
             />
           </span>

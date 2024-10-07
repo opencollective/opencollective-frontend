@@ -32,6 +32,7 @@ export const searchCommandQuery = gql`
               description
               legacyId
               type
+              status
               amountV2 {
                 valueInCents
                 currency
@@ -63,7 +64,7 @@ export const searchCommandQuery = gql`
               description
               type
               kind
-              amount {
+              netAmount {
                 valueInCents
                 currency
               }

@@ -26,7 +26,13 @@ import { searchCommandQuery } from './queries';
 import { SearchCommandGroup } from './SearchCommandGroup';
 import { SearchCommandLegend } from './SearchCommandLegend';
 import { TransactionResult } from './TransactionResult';
-import { useRecentlyVisited } from './useRecentlyVisited';
+import {
+  AccountResultData,
+  ExpenseResultData,
+  pageVisitType,
+  TransactionResultData,
+  useRecentlyVisited,
+} from './useRecentlyVisited';
 
 export const SearchCommand = ({ open, setOpen }) => {
   const router = useRouter();
@@ -104,18 +110,25 @@ export const SearchCommand = ({ open, setOpen }) => {
   const { recentlyVisited, addToRecent } = useRecentlyVisited();
 
   // Update the sections where search results are selected
-  const handleResultSelect = (type, data) => {
+
+  type ResultSelect =
+    | { type: 'account'; data: AccountResultData }
+    | { type: 'expense'; data: ExpenseResultData }
+    | { type: 'transaction'; data: TransactionResultData }
+    | { type: 'page'; data: { section: string } };
+
+  const handleResultSelect = ({ type, data }: ResultSelect) => {
     switch (type) {
       case 'account':
         if (data.type !== CollectiveType.VENDOR) {
           // TODO: Fix vendor links
           router.push(`/${data.slug}`);
         }
-        addToRecent({ key: data.id.toString(), type, data });
+        addToRecent({ key: data.slug.toString(), type, data });
         break;
       case 'expense':
         router.push(`/${data.account.slug}/expenses/${data.legacyId}`);
-        addToRecent({ key: data.id.toString(), type, data });
+        addToRecent({ key: data.legacyId.toString(), type, data });
 
         break;
       case 'transaction':
@@ -186,7 +199,7 @@ export const SearchCommand = ({ open, setOpen }) => {
         {recentlyVisited.length > 0 && debouncedInput === '' && (
           <CommandGroup heading="Recent">
             {recentlyVisited.map(item => (
-              <CommandItem key={item.key} className="gap-2" onSelect={() => handleResultSelect(item.type, item.data)}>
+              <CommandItem key={item.key} className="gap-2" onSelect={() => handleResultSelect(item)}>
                 {item.type === 'account' && <AccountResult account={item.data} />}
                 {item.type === 'expense' && <ExpenseResult expense={item.data} />}
                 {item.type === 'transaction' && <TransactionResult transaction={item.data} />}
@@ -199,7 +212,7 @@ export const SearchCommand = ({ open, setOpen }) => {
         {filteredGoToPages.length > 0 && (
           <CommandGroup heading="Dashboard">
             {filteredGoToPages.map(page => (
-              <CommandItem key={page.section} onSelect={() => handleResultSelect('page', page)}>
+              <CommandItem key={page.section} onSelect={() => handleResultSelect({ type: 'page', data: page })}>
                 <PageResult page={page} />
               </CommandItem>
             ))}
@@ -212,7 +225,7 @@ export const SearchCommand = ({ open, setOpen }) => {
           input={debouncedInput}
           nodes={data?.search.results.accounts.collection.nodes}
           renderNode={account => (
-            <CommandItem key={account.id} onSelect={() => handleResultSelect('account', account)}>
+            <CommandItem key={account.id} onSelect={() => handleResultSelect({ type: 'account', data: account })}>
               <AccountResult account={account} />
             </CommandItem>
           )}
@@ -224,7 +237,7 @@ export const SearchCommand = ({ open, setOpen }) => {
           nodes={data?.search.results.expenses.collection.nodes}
           input={debouncedInput}
           renderNode={expense => (
-            <CommandItem key={expense.id} onSelect={() => handleResultSelect('expense', expense)}>
+            <CommandItem key={expense.id} onSelect={() => handleResultSelect({ type: 'expense', data: expense })}>
               <ExpenseResult expense={expense} />
             </CommandItem>
           )}
