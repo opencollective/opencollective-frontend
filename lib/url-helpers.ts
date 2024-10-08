@@ -19,6 +19,8 @@ const NEXT_PDF_SERVICE_URL = process.env.NEXT_PDF_SERVICE_URL;
  *
  *    > objectToQueryString({a: 42, b: "hello", c: undefined})
  *    "?a=42&b=hello"
+ *
+ * @deprecated Use `new URLSearchParams(options).toString()` instead
  */
 const objectToQueryString = options => {
   const definedOptions = pickBy(options, value => value !== undefined);

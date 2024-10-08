@@ -13,6 +13,7 @@ import StyledLink from '../../../StyledLink';
 import { DataList, DataListItem, DataListItemLabel, DataListItemValue } from '../../../ui/DataList';
 import { Sheet, SheetBody, SheetContent } from '../../../ui/Sheet';
 
+import { TransactionsImportRowDataLine } from './TransactionsImportRowDataLine';
 import { TransactionsImportRowStatus } from './TransactionsImportRowStatus';
 
 export const TransactionsImportRowDrawer = ({
@@ -140,9 +141,7 @@ export const TransactionsImportRowDrawer = ({
                   .filter(entry => !isEmpty(entry[1]))
                   .map(([key, value], index) => (
                     // eslint-disable-next-line react/no-array-index-key
-                    <li key={index}>
-                      <strong>{startCase(key)}</strong>: {value.toString()}{' '}
-                    </li>
+                    <TransactionsImportRowDataLine key={`${key}-${index}`} labelKey={key} value={value} />
                   ))}
               </ul>
             </SheetBody>
