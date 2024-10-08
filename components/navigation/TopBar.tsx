@@ -8,12 +8,14 @@ import styled, { css } from 'styled-components';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { ScrollDirection, useWindowScroll } from '../../lib/hooks/useWindowScroll';
+import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 
 import ChangelogTrigger from '../changelog/ChangelogTrigger';
 import { Box, Flex } from '../Grid';
 import Image from '../Image';
 import Link from '../Link';
 import SearchModal from '../Search';
+import { SearchCommand } from '../search/SearchCommand';
 import SearchTrigger from '../SearchTrigger';
 
 import ProfileMenu from './ProfileMenu';
@@ -168,7 +170,7 @@ const TopBar = ({ account }: TopBarProps) => {
   const onSearchRoute =
     isRouteActive('/search') || (account && isRouteActive(`/${account.parentCollective?.slug || account.slug}`));
   const ocLogoRoute = LoggedInUser ? '/dashboard' : '/home';
-
+  const useSearchCommandMenu = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_COMMAND);
   return (
     <Fragment>
       <div className="border-b bg-white px-4 xl:px-6" ref={ref}>
@@ -203,7 +205,11 @@ const TopBar = ({ account }: TopBarProps) => {
           </Flex>
         </div>
       </div>
-      <SearchModal open={showSearchModal} setOpen={open => setShowSearchModal(open)} />
+      {useSearchCommandMenu ? (
+        <SearchCommand open={showSearchModal} setOpen={open => setShowSearchModal(open)} />
+      ) : (
+        <SearchModal open={showSearchModal} setOpen={open => setShowSearchModal(open)} />
+      )}
       {isMobile && (onDashboardRoute || onSearchRoute) && <MobileFooterMenu {...{ onDashboardRoute, onSearchRoute }} />}
     </Fragment>
   );

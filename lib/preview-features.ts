@@ -1,3 +1,5 @@
+import type LoggedInUser from './LoggedInUser';
+
 /**
  * A map of keys used for preview features.
  */
@@ -11,6 +13,7 @@ export enum PREVIEW_FEATURE_KEYS {
   AUTHENTICATED_SSR = 'AUTHENTICATED_SSR',
   VERCEL_BACKEND = 'VERCEL_BACKEND',
   KEYBOARD_SHORTCUTS = 'KEYBOARD_SHORTCUTS',
+  SEARCH_COMMAND = 'SEARCH_COMMAND',
 }
 
 export type PreviewFeature = {
@@ -25,6 +28,7 @@ export type PreviewFeature = {
   dependsOn?: PREVIEW_FEATURE_KEYS;
   setIsEnabled?: (enable: boolean) => void;
   isEnabled?: () => boolean;
+  hasAccess?: (loggedInUser: LoggedInUser) => boolean;
 };
 
 /**
@@ -115,5 +119,12 @@ export const previewFeatures: PreviewFeature[] = [
     title: 'Keyboard Shortcuts',
     description: 'Use keyboard shortcuts to navigate the expense flow',
     publicBeta: true,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.SEARCH_COMMAND,
+    publicBeta: false,
+    title: 'Search command menu',
+    description: 'Global search powered by ElasticSearch',
+    hasAccess: user => user?.isRoot,
   },
 ];

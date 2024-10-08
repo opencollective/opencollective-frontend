@@ -14177,6 +14177,41 @@ type Query {
     """
     throwIfMissing: Boolean = true
   ): Project
+
+  """
+  [!] Warning: this query is currently in beta and the API might change
+  """
+  search(
+    """
+    The search term to search for
+    """
+    searchTerm: String!
+
+    """
+    Limit the scope of the search to this account and its children
+    """
+    account: AccountReferenceInput
+
+    """
+    Limit the scope of the search to this host and its hosted accounts
+    """
+    host: AccountReferenceInput
+
+    """
+    The maximum amount of time in millisecond to wait for a single entity type query to complete (for SQL search)
+    """
+    timeout: Int! = 10000
+
+    """
+    The default limit for each entity type
+    """
+    defaultLimit: Int! = 10
+
+    """
+    Whether to use ElasticSearch or not
+    """
+    useElasticSearch: Boolean! = true
+  ): SearchResponse!
   tagStats(
     """
     Return tags from collectives which includes this search term. Using this argument will ignore tagSearchTerm. Skipping this argument will use a more efficient query.
@@ -17806,6 +17841,98 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   The Account parenting this account
   """
   parent: Account
+}
+
+type SearchResponse {
+  """
+  Search results
+  """
+  results: SearchResults!
+}
+
+"""
+Search results for all types
+"""
+type SearchResults {
+  """
+  Search results for Accounts
+  """
+  accounts: SearchResultsAccounts
+
+  """
+  Search results for Comments
+  """
+  comments: SearchResultsComments
+
+  """
+  Search results for Expenses
+  """
+  expenses: SearchResultsExpenses
+
+  """
+  Search results for HostApplications
+  """
+  hostApplications: SearchResultsHostApplications
+
+  """
+  Search results for Orders
+  """
+  orders: SearchResultsOrders
+
+  """
+  Search results for Tiers
+  """
+  tiers: SearchResultsTiers
+
+  """
+  Search results for Transactions
+  """
+  transactions: SearchResultsTransactions
+
+  """
+  Search results for Updates
+  """
+  updates: SearchResultsUpdates
+}
+
+type SearchResultsAccounts {
+  collection: AccountCollection!
+  highlights: JSONObject
+}
+
+type SearchResultsComments {
+  collection: CommentCollection!
+  highlights: JSONObject
+}
+
+type SearchResultsExpenses {
+  collection: ExpenseCollection!
+  highlights: JSONObject
+}
+
+type SearchResultsHostApplications {
+  collection: HostApplicationCollection!
+  highlights: JSONObject
+}
+
+type SearchResultsOrders {
+  collection: OrderCollection!
+  highlights: JSONObject
+}
+
+type SearchResultsTiers {
+  collection: TierCollection!
+  highlights: JSONObject
+}
+
+type SearchResultsTransactions {
+  collection: TransactionCollection!
+  highlights: JSONObject
+}
+
+type SearchResultsUpdates {
+  collection: UpdateCollection!
+  highlights: JSONObject
 }
 
 input TierReferenceInput {
