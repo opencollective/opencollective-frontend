@@ -3,7 +3,7 @@ import { FormattedMessage } from 'react-intl';
 
 export const AVERAGE_ROWS_PER_MINUTE = 8240;
 
-export type CSVField =
+type CSVField =
   | 'name'
   | 'slug'
   | 'type'
