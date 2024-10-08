@@ -43,6 +43,7 @@ export type Fundraiser = z.infer<typeof fundraiserSchema>;
 type Profile = z.infer<typeof profileSchema>;
 
 export function getDefaultFundraiserValues(account: Account): Fundraiser {
+  if (!account) return null;
   const fundraiserSettings = account.settings.crowdfundingRedesign?.fundraiser || {};
   const primaryColor =
     get(account, 'settings.collectivePage.primaryColor') || get(account, 'parent.settings.collectivePage.primaryColor');
@@ -63,7 +64,8 @@ export function getDefaultFundraiserValues(account: Account): Fundraiser {
   };
 }
 
-export function getDefaultProfileValues(account: Account): Profile {
+export function getDefaultProfileValues(account?: Account): Profile {
+  if (!account) return null;
   const profileSettings = account.settings.crowdfundingRedesign?.profile || {};
   const primaryColor =
     get(account, 'settings.collectivePage.primaryColor') || get(account, 'parent.settings.collectivePage.primaryColor');

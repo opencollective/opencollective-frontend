@@ -13,11 +13,17 @@ import { updatesViewQuery } from '../../dashboard/sections/updates/queries';
 import { Skeleton } from '../../ui/Skeleton';
 
 import { UpdateHeader } from './UpdateHeader';
+import { useRouter } from 'next/router';
+import { Button } from '../../ui/Button';
+import Link from '../../Link';
+import { ArrowLeft } from 'lucide-react';
 
-export function SingleUpdate({ updateId }) {
+export function SingleUpdate() {
+  const router = useRouter();
+
   const { data, loading } = useQuery(updatesViewQuery, {
     variables: {
-      id: updateId,
+      id: router.query.updateSlug,
     },
     context: API_V2_CONTEXT,
   });
@@ -25,42 +31,53 @@ export function SingleUpdate({ updateId }) {
   const comments = update?.comments;
 
   return (
-    <div className="flex flex-col gap-3">
-      <UpdateHeader update={update} loading={loading} />
-      <Separator className="mb-3" />
-      <div className="prose prose-slate">
-        {loading ? <Skeleton className="h-48 w-full" /> : <Markup noWrap content={update.html} allowAttributes />}
-      </div>
-      {update && (
-        <div className="flex gap-1">
-          <EmojiReactions reactions={update?.reactions} />
-          <EmojiReactionPicker update={update} />
+    <div className="flex-1 bg-background">
+      <div className="relative mx-auto flex max-w-[650px] flex-col gap-8 px-6 py-12">
+        <div>
+          <Button asChild variant="outline" size="sm">
+            <Link href={`/preview/${router.query.collectiveSlug}/updates`} scroll={false}>
+              <ArrowLeft size={16} className="inline" /> All updates
+            </Link>
+          </Button>
         </div>
-      )}
-
-      <Separator className="mt-3" />
-      {update?.userCanSeeUpdate && (
-        <footer>
-          {comments?.nodes?.length > 0 && (
-            <Thread
-              // collective={account}
-              hasMore={comments?.nodes?.length < comments?.totalCount}
-              // fetchMore={handleFetchMoreComments}
-              items={comments?.nodes}
-              // onCommentDeleted={refetchUpdate}
-              // getClickedComment={setReplyingToComment}
-            />
-          )}
-          <div className="flex justify-center">
-            <CommentForm
-              id="new-update"
-              UpdateId={update.id}
-              // onSuccess={refetchUpdate}
-              // replyingToComment={replyingToComment}
-            />
+        <div className="flex flex-col gap-3">
+          <UpdateHeader update={update} loading={loading} />
+          <Separator className="mb-3" />
+          <div className="prose prose-slate">
+            {loading ? <Skeleton className="h-48 w-full" /> : <Markup noWrap content={update.html} allowAttributes />}
           </div>
-        </footer>
-      )}
+          {update && (
+            <div className="flex gap-1">
+              <EmojiReactions reactions={update?.reactions} />
+              <EmojiReactionPicker update={update} />
+            </div>
+          )}
+
+          <Separator className="mt-3" />
+          {update?.userCanSeeUpdate && (
+            <footer>
+              {comments?.nodes?.length > 0 && (
+                <Thread
+                  // collective={account}
+                  hasMore={comments?.nodes?.length < comments?.totalCount}
+                  // fetchMore={handleFetchMoreComments}
+                  items={comments?.nodes}
+                  // onCommentDeleted={refetchUpdate}
+                  // getClickedComment={setReplyingToComment}
+                />
+              )}
+              <div className="flex justify-center">
+                <CommentForm
+                  id="new-update"
+                  UpdateId={update.id}
+                  // onSuccess={refetchUpdate}
+                  // replyingToComment={replyingToComment}
+                />
+              </div>
+            </footer>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

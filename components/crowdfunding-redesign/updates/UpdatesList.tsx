@@ -11,11 +11,21 @@ import { Separator } from '../../ui/Separator';
 import { triggerPrototypeToast } from '../helpers';
 
 import { UpdateHeader } from './UpdateHeader';
+import { updatesQuery } from '../queries';
+import { useQuery } from '@apollo/client';
+import { useRouter } from 'next/router';
+import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
-export function UpdatesList({ account, fundraiser, tabRef }) {
+export function UpdatesList() {
+  const router = useRouter();
+  const { data, loading } = useQuery(updatesQuery, {
+    variables: { slug: router.query.accountSlug ?? router.query.collectiveSlug },
+    context: API_V2_CONTEXT,
+  });
+  const account = data?.account;
   return (
     <div className="relative mx-auto flex max-w-screen-sm flex-col gap-8 px-6 py-16">
-      {account.updates?.totalCount > 0 ? (
+      {data?.account.updates?.totalCount > 0 ? (
         account.updates.nodes.map(update => {
           const numberOfReactions = Object.keys(update.reactions).reduce((acc, emoji) => {
             return acc + update.reactions[emoji];
@@ -23,15 +33,15 @@ export function UpdatesList({ account, fundraiser, tabRef }) {
           return (
             <Link
               key={update.id}
-              href={`/preview/${account.slug}/support/updates/${update.id}`}
-              scroll={false}
-              shallow={true}
+              href={`/preview/${router.query.collectiveSlug}/updates/${update.id}`}
+              // scroll={false}
+              // shallow={true}
               className="flex cursor-pointer flex-col gap-3 rounded-lg border bg-background p-8 transition-shadow hover:shadow"
               onClick={() => {
-                const tabElement = tabRef?.current as HTMLElement | null;
-                if (tabElement) {
-                  tabElement.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
-                }
+                // const tabElement = tabRef?.current as HTMLElement | null;
+                // if (tabElement) {
+                //   tabElement.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+                // }
               }}
             >
               <UpdateHeader update={update} />
@@ -46,7 +56,7 @@ export function UpdatesList({ account, fundraiser, tabRef }) {
                     id="update.private.cannot_view_message"
                     defaultMessage="Contribute to {collective} to see this Update"
                     values={{
-                      collective: fundraiser.name,
+                      collective: account.name,
                     }}
                   />
                 </div>
