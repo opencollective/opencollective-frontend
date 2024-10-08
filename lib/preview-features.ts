@@ -14,6 +14,7 @@ export enum PREVIEW_FEATURE_KEYS {
   VERCEL_BACKEND = 'VERCEL_BACKEND',
   KEYBOARD_SHORTCUTS = 'KEYBOARD_SHORTCUTS',
   SEARCH_COMMAND = 'SEARCH_COMMAND',
+  PLAID_INTEGRATION = 'PLAID_INTEGRATION',
 }
 
 export type PreviewFeature = {
@@ -125,6 +126,13 @@ export const previewFeatures: PreviewFeature[] = [
     publicBeta: false,
     title: 'Search command menu',
     description: 'Global search powered by ElasticSearch',
+    hasAccess: user => user?.isRoot,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.PLAID_INTEGRATION,
+    title: 'Bank Account synchronization',
+    description: 'Connect your bank account to import transactions',
+    publicBeta: false,
     hasAccess: user => user?.isRoot,
   },
 ];

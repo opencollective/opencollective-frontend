@@ -4876,6 +4876,7 @@ enum ConnectedAccountService {
   github
   twitter
   transferwise
+  plaid
   privacy @deprecated(reason: "Not using this service anymore")
   thegivingblock
   meetup @deprecated(reason: "Not using this service anymore")
@@ -6797,6 +6798,7 @@ Type of the import
 enum TransactionsImportType {
   CSV
   MANUAL
+  PLAID
 }
 
 """
@@ -19315,6 +19317,36 @@ type Mutation {
   removePayoutMethod(payoutMethodId: String!): PayoutMethod!
 
   """
+  Generate a Plaid Link token
+  """
+  generatePlaidLinkToken: PlaidLinkTokenCreateResponse!
+
+  """
+  Connect a Plaid account
+  """
+  connectPlaidAccount(
+    """
+    The public token returned by the Plaid Link flow
+    """
+    publicToken: String!
+
+    """
+    The account to which the Plaid account should be connected
+    """
+    host: AccountReferenceInput!
+
+    """
+    The name of the bank
+    """
+    sourceName: String
+
+    """
+    The name of the bank account
+    """
+    name: String
+  ): PlaidConnectAccountResponse!
+
+  """
   [Root only] Edits account flags (deleted, banned, archived, trusted host)
   """
   editAccountFlags(
@@ -21591,6 +21623,40 @@ A Stripe setup intent
 input SetupIntentInput {
   id: String!
   stripeAccount: String!
+}
+
+type PlaidLinkTokenCreateResponse {
+  """
+  The link token that will be used to initialize the Plaid Link flow.
+  """
+  linkToken: String!
+
+  """
+  The expiration date for the link token in ISO 8601 format.
+  """
+  expiration: String!
+
+  """
+  A unique identifier for the request, which can be used for troubleshooting.
+  """
+  requestId: String!
+
+  """
+  A URL of a Plaid-hosted Link flow that will use the Link token returned by this request. Only present if the client is enabled for Host
+  """
+  hostedLinkUrl: String
+}
+
+type PlaidConnectAccountResponse {
+  """
+  The connected account that was created
+  """
+  connectedAccount: ConnectedAccount!
+
+  """
+  The transactions import that was created
+  """
+  transactionsImport: TransactionsImport!
 }
 
 enum AccountCacheType {

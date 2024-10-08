@@ -1,13 +1,27 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { partition } from 'lodash';
-import { Calendar, CalendarClock, Download, FilePenLine, FileSliders, SquareSlashIcon, Upload } from 'lucide-react';
+import {
+  Calendar,
+  CalendarClock,
+  Download,
+  FilePenLine,
+  FileSliders,
+  RefreshCcw,
+  Settings,
+  SquareSlashIcon,
+  Upload,
+} from 'lucide-react';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { formatFileSize } from '../../../../lib/file-utils';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import type { Amount, TransactionsImportRow } from '../../../../lib/graphql/types/v2/graphql';
+import type {
+  Amount,
+  TransactionsImportQuery,
+  TransactionsImportQueryVariables,
+} from '../../../../lib/graphql/types/v2/graphql';
 import { useTransactionsImportActions } from './lib/actions';
 import { TransactionsImportRowFieldsFragment } from './lib/graphql';
 
@@ -103,10 +117,13 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
   const steps = React.useMemo(() => getSteps(intl), [intl]);
   const [csvFile, setCsvFile] = React.useState<File | null>(null);
   const [drawerRowId, setDrawerRowId] = React.useState<string | null>(null);
-  const { data, loading, error } = useQuery(transactionsImportQuery, {
-    context: API_V2_CONTEXT,
-    variables: { importId },
-  });
+  const { data, loading, error } = useQuery<TransactionsImportQuery, TransactionsImportQueryVariables>(
+    transactionsImportQuery,
+    {
+      context: API_V2_CONTEXT,
+      variables: { importId },
+    },
+  );
 
   const importData = data?.transactionsImport;
   const importType = importData?.type;
@@ -171,28 +188,44 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                       <DateTime value={new Date(importData.updatedAt)} timeStyle="short" />
                     </div>
                   </div>
-                  <div className="flex flex-col items-end gap-1">
-                    <div className="flex items-center gap-2">
-                      <Download size={16} />
-                      <div className="font-bold">
-                        <FormattedMessage defaultMessage="File" id="gyrIEl" />
+                  {importData.file && (
+                    <div className="flex flex-col items-end gap-1">
+                      <div className="flex items-center gap-2">
+                        <Download size={16} />
+                        <div className="font-bold">
+                          <FormattedMessage defaultMessage="File" id="gyrIEl" />
+                        </div>
+                      </div>
+                      <a
+                        className="flex gap-1 align-middle hover:underline"
+                        href={importData.file.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <span className="inline-block max-w-72 truncate">{importData.file.name}</span> (
+                        {formatFileSize(importData.file.size)})
+                      </a>
+                    </div>
+                  )}
+                  {importData.type === 'PLAID' && (
+                    <div className="flex flex-col items-end gap-1">
+                      <div className="flex items-center gap-2">
+                        <Button size="xs" variant="outline" onClick={() => {}} disabled>
+                          <RefreshCcw size={16} />
+                          <FormattedMessage defaultMessage="Sync" id="dKtz/9" />
+                        </Button>
+                        <Button size="xs" variant="outline" onClick={() => {}} disabled>
+                          <Settings size={16} />
+                          <FormattedMessage defaultMessage="Import Settings" id="Db2MC3" />
+                        </Button>
                       </div>
                     </div>
-                    <a
-                      className="flex gap-1 align-middle hover:underline"
-                      href={importData.file.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <span className="inline-block max-w-72 truncate">{importData.file.name}</span> (
-                      {formatFileSize(importData.file.size)})
-                    </a>
-                  </div>
+                  )}
                 </div>
               </div>
 
               {/** Import data table */}
-              <DataTable<TransactionsImportRow, unknown>
+              <DataTable<TransactionsImportQuery['transactionsImport']['rows']['nodes'][number], unknown>
                 loading={loading}
                 getRowClassName={row =>
                   row.original.isDismissed ? '[&>td:nth-child(n+2):nth-last-child(n+3)]:opacity-30' : ''

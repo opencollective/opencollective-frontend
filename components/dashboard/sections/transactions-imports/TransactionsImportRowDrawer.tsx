@@ -4,7 +4,7 @@ import type { ComponentProps } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import type { GetActions } from '../../../../lib/actions/types';
-import type { TransactionsImportRow } from '../../../../lib/graphql/types/v2/graphql';
+import type { TransactionsImportQuery } from '../../../../lib/graphql/types/v2/graphql';
 
 import DateTime from '../../../DateTime';
 import DrawerHeader from '../../../DrawerHeader';
@@ -21,8 +21,8 @@ export const TransactionsImportRowDrawer = ({
   rowIndex,
   ...props
 }: {
-  row: TransactionsImportRow;
-  getActions: GetActions<TransactionsImportRow>;
+  row: TransactionsImportQuery['transactionsImport']['rows']['nodes'][number];
+  getActions: GetActions<TransactionsImportQuery['transactionsImport']['rows']['nodes'][number]>;
   rowIndex: number;
 } & ComponentProps<typeof Sheet>) => {
   const dropdownTriggerRef = React.useRef();

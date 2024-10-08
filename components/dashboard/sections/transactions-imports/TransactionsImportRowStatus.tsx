@@ -5,7 +5,14 @@ import type { TransactionsImportRow } from '../../../../lib/graphql/types/v2/gra
 
 import { Badge } from '../../../ui/Badge';
 
-export const TransactionsImportRowStatus = ({ row }: { row: TransactionsImportRow }) => {
+export const TransactionsImportRowStatus = ({
+  row,
+}: {
+  row: Pick<TransactionsImportRow, 'isDismissed'> & {
+    expense?: Pick<TransactionsImportRow['expense'], 'id'> | null | undefined;
+    order?: Pick<TransactionsImportRow['order'], 'id'> | null | undefined;
+  };
+}) => {
   if (row.isDismissed) {
     return (
       <Badge size="sm">
