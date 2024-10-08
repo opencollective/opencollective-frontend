@@ -102,6 +102,10 @@ module.exports = {
         'collapsible-up': 'collapsible-up 0.2s ease-out',
         'arrow-right': 'arrow-right 0.2s ease-out forwards',
       },
+      transitionDuration: {
+        1500: '1500ms',
+        2000: '2000ms',
+      },
     },
   },
   plugins: [require('tailwindcss-animate'), require('@tailwindcss/typography')],
