@@ -3,13 +3,13 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import Container from '../../../Container';
-import FormattedMoneyAmount, { DEFAULT_AMOUNT_STYLES } from '../../../FormattedMoneyAmount';
+import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { Box, Flex } from '../../../Grid';
 import Image from '../../../Image';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import { P, Span } from '../../../Text';
 
-const AMOUNT_STYLES = { ...DEFAULT_AMOUNT_STYLES, fontSize: '18px', lineHeight: '26px' };
+const AMOUNT_CLASSNAME = 'text-lg font-bold';
 
 const PlatformTipsCollected = ({ host, isLoading }) => {
   return (
@@ -37,7 +37,7 @@ const PlatformTipsCollected = ({ host, isLoading }) => {
                   <FormattedMoneyAmount
                     amount={host.hostMetrics.platformTips.valueInCents}
                     currency={host.currency}
-                    amountStyles={AMOUNT_STYLES}
+                    amountClassName={AMOUNT_CLASSNAME}
                   />
                 ),
               }}
@@ -52,7 +52,7 @@ const PlatformTipsCollected = ({ host, isLoading }) => {
                   <FormattedMoneyAmount
                     amount={host.hostMetrics.pendingPlatformTips.valueInCents}
                     currency={host.currency}
-                    amountStyles={AMOUNT_STYLES}
+                    amountClassName={AMOUNT_CLASSNAME}
                   />
                 ),
               }}

@@ -219,7 +219,7 @@ export const ConfirmContributionForm = ({
               />
             </Span>
             <Box fontSize="16px" lineHeight="24px" fontWeight="700" mt={['8px', 0]}>
-              <FormattedMoneyAmount amount={amountInitiated} currency={currency} precision={2} amountStyles={null} />
+              <FormattedMoneyAmount amount={amountInitiated} currency={currency} precision={2} />
             </Box>
           </Flex>
         </Container>
@@ -367,7 +367,7 @@ export const ConfirmContributionForm = ({
               />
             </Span>
             <Box fontSize="16px" lineHeight="24px" fontWeight="700" ml="16px">
-              <FormattedMoneyAmount amount={contributionAmount} currency={currency} precision={2} amountStyles={null} />
+              <FormattedMoneyAmount amount={contributionAmount} currency={currency} precision={2} />
             </Box>
           </Flex>
         </Container>
@@ -390,7 +390,7 @@ export const ConfirmContributionForm = ({
                 />
               </Span>
               <Box fontSize="14px" lineHeight="24px" fontWeight="700" ml="16px">
-                <FormattedMoneyAmount amount={platformTip} currency={currency} precision={2} amountStyles={null} />
+                <FormattedMoneyAmount amount={platformTip} currency={currency} precision={2} />
               </Box>
             </Flex>
           </Container>
@@ -407,12 +407,7 @@ export const ConfirmContributionForm = ({
                 />
               </Span>
               <Box fontSize="14px" lineHeight="24px" fontWeight="700" ml="16px">
-                <FormattedMoneyAmount
-                  amount={paymentProcessorFee}
-                  currency={currency}
-                  precision={2}
-                  amountStyles={null}
-                />
+                <FormattedMoneyAmount amount={paymentProcessorFee} currency={currency} precision={2} />
               </Box>
             </Flex>
           )}
@@ -422,7 +417,7 @@ export const ConfirmContributionForm = ({
                 {i18nTaxType(intl, order.tax?.type || applicableTax, 'full')}
               </Span>
               <Box fontSize="14px" lineHeight="24px" fontWeight="700" ml="16px">
-                <FormattedMoneyAmount amount={taxAmount} currency={currency} precision={2} amountStyles={null} />
+                <FormattedMoneyAmount amount={taxAmount} currency={currency} precision={2} />
               </Box>
             </Flex>
           )}
@@ -436,7 +431,7 @@ export const ConfirmContributionForm = ({
                 />
               </Span>
               <Box fontSize="14px" lineHeight="24px" fontWeight="700" ml="16px">
-                <FormattedMoneyAmount amount={hostFee} currency={currency} precision={2} amountStyles={null} />
+                <FormattedMoneyAmount amount={hostFee} currency={currency} precision={2} />
               </Box>
             </Flex>
           )}
@@ -457,7 +452,7 @@ export const ConfirmContributionForm = ({
               />
             </Span>
             <Box fontSize="14px" lineHeight="24px" fontWeight="700" ml="16px">
-              <FormattedMoneyAmount amount={netAmount} currency={currency} precision={2} amountStyles={null} />
+              <FormattedMoneyAmount amount={netAmount} currency={currency} precision={2} />
             </Box>
           </Flex>
         </Container>

@@ -25,7 +25,7 @@ export const predefinedGroups: Group[] = [
   {
     section: ReportSection.CONTRIBUTIONS,
     label: 'Refunded Added funds',
-    filter: { kind: TransactionKind.ADDED_FUNDS, type: TransactionType.CREDIT, isRefund: true },
+    filter: { kind: TransactionKind.ADDED_FUNDS, type: TransactionType.DEBIT, isRefund: true },
   },
   {
     section: ReportSection.EXPENSES,
@@ -139,8 +139,13 @@ export const predefinedGroups: Group[] = [
   },
   {
     section: ReportSection.OTHER,
-    label: 'Outgoing Added Funds',
-    filter: { kind: TransactionKind.ADDED_FUNDS, type: TransactionType.DEBIT },
+    label: 'Outgoing Added funds',
+    filter: { kind: TransactionKind.ADDED_FUNDS, type: TransactionType.DEBIT, isRefund: false },
+  },
+  {
+    section: ReportSection.OTHER,
+    label: 'Refunded outgoing Added funds',
+    filter: { kind: TransactionKind.ADDED_FUNDS, type: TransactionType.CREDIT, isRefund: true },
   },
   {
     section: ReportSection.OTHER,

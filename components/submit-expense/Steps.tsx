@@ -151,9 +151,6 @@ export const Steps: Record<ExpenseFlowStep, ExpenseStepDefinition> = {
           <div>
             <span>
               <FormattedMoneyAmount
-                amountStyles={{
-                  fontWeight: 'normal',
-                }}
                 showCurrencyCode={false}
                 currency={props.form.values.expenseCurrency}
                 amount={props.form.options.totalInvoicedInExpenseCurrency}
@@ -179,7 +176,6 @@ export const Steps: Record<ExpenseFlowStep, ExpenseStepDefinition> = {
                 precision={2}
                 currency={props.form.values.expenseCurrency}
                 showCurrencyCode={false}
-                amountStyles={null}
               />
               &nbsp;
               {i18nTaxType(intl, props.form.options.taxType, 'short')}

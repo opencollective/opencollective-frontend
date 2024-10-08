@@ -219,7 +219,11 @@ class CreateExpensePage extends React.Component {
         const result = await this.props.draftExpenseAndInviteUser({
           variables: {
             account: { id: this.props.data.account.id },
-            expense: { ...prepareExpenseForSubmit(expense), customData: this.props.customData },
+            expense: {
+              ...prepareExpenseForSubmit(expense),
+              customData: this.props.customData,
+              recipientNote: expense.recipientNote?.trim(),
+            },
           },
         });
         if (this.state.formPersister) {
@@ -304,7 +308,7 @@ class CreateExpensePage extends React.Component {
     const { step } = this.state;
 
     if (!data.loading) {
-      if (!data || data.error) {
+      if (data.error) {
         return <ErrorPage data={data} />;
       } else if (!data.account) {
         return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
@@ -318,9 +322,9 @@ class CreateExpensePage extends React.Component {
       }
     }
 
-    const collective = data && data.account;
+    const collective = data.account;
     const host = collective && collective.host;
-    const loggedInAccount = data && data.loggedInAccount;
+    const loggedInAccount = data.loggedInAccount;
     const payoutProfiles = getPayoutProfiles(loggedInAccount);
     const hasItemsWithOCR = Boolean(this.state.expense?.items?.some(itemHasOCR));
     const mustConfirmOCR = hasItemsWithOCR && !this.state.hasConfirmedOCR;
@@ -457,7 +461,7 @@ class CreateExpensePage extends React.Component {
                                   disabled={mustConfirmOCR}
                                   minWidth={175}
                                 >
-                                  {this.state.expense?.type === expenseTypes.GRANT ? (
+                                  {this.state.expense.type === expenseTypes.GRANT ? (
                                     <FormattedMessage id="ExpenseForm.SubmitRequest" defaultMessage="Submit request" />
                                   ) : (
                                     <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />

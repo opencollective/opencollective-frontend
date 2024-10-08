@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import { useApolloClient, useLazyQuery } from '@apollo/client';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 
 import { getVariablesFromQuery } from '../../pages/expense';
 import { Drawer } from '../Drawer';
@@ -17,6 +19,7 @@ type ExpenseDrawerProps = {
 
 export default function ExpenseDrawer({ openExpenseLegacyId, handleClose, initialExpenseValues }: ExpenseDrawerProps) {
   const client = useApolloClient();
+  const { LoggedInUser } = useLoggedInUser();
   const [getExpense, { data, loading, error, startPolling, stopPolling, refetch, fetchMore }] = useLazyQuery(
     expensePageQuery,
     {
@@ -24,9 +27,13 @@ export default function ExpenseDrawer({ openExpenseLegacyId, handleClose, initia
     },
   );
 
+  const hasKeyboardShortcutsEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.KEYBOARD_SHORTCUTS);
+
   useEffect(() => {
     if (openExpenseLegacyId) {
-      getExpense({ variables: getVariablesFromQuery({ ExpenseId: openExpenseLegacyId }) });
+      getExpense({
+        variables: getVariablesFromQuery({ ExpenseId: openExpenseLegacyId }),
+      });
     }
   }, [openExpenseLegacyId]);
 
@@ -51,6 +58,8 @@ export default function ExpenseDrawer({ openExpenseLegacyId, handleClose, initia
         startPolling={startPolling}
         stopPolling={stopPolling}
         isDrawer
+        onClose={handleClose}
+        enableKeyboardShortcuts={hasKeyboardShortcutsEnabled}
       />
     </Drawer>
   );

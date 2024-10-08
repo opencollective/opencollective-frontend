@@ -1,17 +1,18 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { omitBy } from 'lodash';
+import { omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
-import { limit, offset } from '../../../../lib/filters/schemas';
+import { isMulti, limit, offset } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import type { HostApplicationsQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
-import { HostApplicationStatus } from '../../../../lib/graphql/types/v2/graphql';
+import type { HostApplicationsQuery, HostApplicationsQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import { HostApplicationStatus, LastCommentBy } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import i18nHostApplicationStatus from '../../../../lib/i18n/host-application-status';
+import { LastCommentByFilterLabels } from '../../../../lib/i18n/last-comment-by-filter';
 import { sortSelectOptions } from '../../../../lib/utils';
 
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
@@ -28,12 +29,19 @@ import HostApplicationDrawer from './HostApplicationDrawer';
 import HostApplicationsTable from './HostApplicationsTable';
 import { hostApplicationsMetadataQuery, hostApplicationsQuery } from './queries';
 
+enum HostApplicationLastCommentBy {
+  COLLECTIVE_ADMIN = LastCommentBy.COLLECTIVE_ADMIN,
+  HOST_ADMIN = LastCommentBy.HOST_ADMIN,
+}
+
 const schema = z.object({
   limit,
   offset,
   searchTerm: searchFilter.schema,
   orderBy: orderByFilter.schema,
   status: z.nativeEnum(HostApplicationStatus).optional(),
+  hostApplicationId: z.string().nullable().optional(),
+  lastCommentBy: isMulti(z.nativeEnum(HostApplicationLastCommentBy)).optional(),
 });
 
 const toVariables: FiltersToVariables<z.infer<typeof schema>, HostApplicationsQueryVariables> = {
@@ -55,6 +63,21 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
     ),
     valueRenderer: ({ value, intl }) => i18nHostApplicationStatus(intl, value),
   },
+  lastCommentBy: {
+    labelMsg: defineMessage({ id: 'expenses.lastCommentByFilter', defaultMessage: 'Last Comment By' }),
+    Component: ({ valueRenderer, intl, ...props }) => {
+      const options = React.useMemo(
+        () =>
+          Object.values(HostApplicationLastCommentBy).map(value => ({
+            value,
+            label: valueRenderer({ value, intl }),
+          })),
+        [valueRenderer, intl],
+      );
+      return <ComboSelectFilter options={options} isMulti {...props} />;
+    },
+    valueRenderer: ({ value, intl }) => intl.formatMessage(LastCommentByFilterLabels[value]),
+  },
 };
 
 const ROUTE_PARAMS = ['hostCollectiveSlug', 'slug', 'section', 'view'];
@@ -68,13 +91,21 @@ const updateQuery = (router, newParams) => {
 const HostApplications = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const router = useRouter();
   const intl = useIntl();
-  const { data: metadata } = useQuery(hostApplicationsMetadataQuery, {
+  const { data: metadata, refetch: refetchMetadata } = useQuery(hostApplicationsMetadataQuery, {
     variables: { hostSlug },
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: 'network-only',
     context: API_V2_CONTEXT,
   });
 
   const views: Views<z.infer<typeof schema>> = [
+    {
+      id: 'unreplied',
+      label: intl.formatMessage({ defaultMessage: 'Unreplied', id: 'k9Y5So' }),
+      filter: {
+        lastCommentBy: [HostApplicationLastCommentBy.COLLECTIVE_ADMIN],
+      },
+      count: metadata?.host?.unreplied?.totalCount,
+    },
     {
       id: 'pending',
       label: intl.formatMessage({ defaultMessage: 'Pending', id: 'eKEL/g' }),
@@ -96,35 +127,34 @@ const HostApplications = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       count: metadata?.host?.rejected?.totalCount,
     },
   ];
-  const queryFilter = useQueryFilter({
+  const queryFilter = useQueryFilter<typeof schema, HostApplicationsQueryVariables>({
     schema,
     filters,
     toVariables,
     views,
   });
 
-  const { data, error, loading } = useQuery(hostApplicationsQuery, {
-    variables: { hostSlug, ...queryFilter.variables },
-    context: API_V2_CONTEXT,
-  });
+  const { data, error, loading } = useQuery<HostApplicationsQuery, HostApplicationsQueryVariables>(
+    hostApplicationsQuery,
+    {
+      variables: { hostSlug, ...omit(queryFilter.variables, 'hostApplicationId') },
+      fetchPolicy: 'cache-and-network',
+      context: API_V2_CONTEXT,
+      onCompleted() {
+        refetchMetadata();
+      },
+    },
+  );
 
   // Open application account id, checking hash for backwards compatibility
   const accountId = Number(
-    router.query.accountId || (typeof window !== 'undefined' && window?.location.hash.split('application-')[1]),
+    router.query.accountId || (typeof window !== 'undefined' ? window?.location.hash.split('application-')[1] : null),
   );
-  const [applicationInDrawer, setApplicationInDrawer] = React.useState(null);
-  const drawerOpen = accountId && applicationInDrawer;
-
-  React.useEffect(() => {
-    if (accountId) {
-      const application = data?.host?.hostApplications?.nodes?.find(a => a.account.legacyId === accountId);
-      if (application) {
-        setApplicationInDrawer(application);
-      }
-    }
-  }, [accountId, data?.host?.hostApplications]);
 
   const hostApplications = data?.host?.hostApplications;
+  const drawerApplicationId = accountId
+    ? hostApplications?.nodes?.find(a => a.account.legacyId === accountId)?.id
+    : queryFilter.values.hostApplicationId;
 
   const currentViewCount = views.find(v => v.id === queryFilter.activeViewId)?.count;
   const nbPlaceholders = currentViewCount < queryFilter.values.limit ? currentViewCount : queryFilter.values.limit;
@@ -146,20 +176,22 @@ const HostApplications = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       ) : (
         <React.Fragment>
           <HostApplicationsTable
-            hostApplications={hostApplications}
+            hostApplications={hostApplications?.nodes}
             nbPlaceholders={nbPlaceholders}
             loading={loading}
-            openApplication={application => updateQuery(router, { accountId: application.account.legacyId })}
+            openApplication={application => queryFilter.setFilter('hostApplicationId', application.id)}
           />
           <Pagination queryFilter={queryFilter} total={hostApplications?.totalCount} />
         </React.Fragment>
       )}
 
       <HostApplicationDrawer
-        open={drawerOpen}
-        onClose={() => updateQuery(router, { accountId: null })}
-        host={metadata?.host}
-        application={applicationInDrawer}
+        open={!!drawerApplicationId}
+        onClose={() => {
+          updateQuery(router, { accountId: null });
+          queryFilter.setFilter('hostApplicationId', null);
+        }}
+        applicationId={drawerApplicationId}
       />
     </div>
   );

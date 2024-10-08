@@ -23,7 +23,7 @@ import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import i18nOrderStatus from '../../../../lib/i18n/order-status';
 import { i18nPaymentMethodProviderType } from '../../../../lib/i18n/payment-method-provider-type';
 import type LoggedInUser from '../../../../lib/LoggedInUser';
-import { sortSelectOptions } from '../../../../lib/utils';
+import { getWebsiteUrl, sortSelectOptions } from '../../../../lib/utils';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
@@ -169,6 +169,16 @@ const dashboardContributionsMetadataQuery = gql`
         status: [PAUSED]
         includeIncognito: true
         includeHostedAccounts: $includeHostedAccounts
+      ) @skip(if: $onlyExpectedFunds) {
+        totalCount
+      }
+      PAUSED_RESUMABLE: orders(
+        filter: INCOMING
+        status: [PAUSED]
+        includeIncognito: true
+        includeHostedAccounts: false
+        includeChildrenAccounts: true
+        pausedBy: [COLLECTIVE, HOST, PLATFORM]
       ) @skip(if: $onlyExpectedFunds) {
         totalCount
       }
@@ -852,12 +862,15 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
         />
         <Filterbar {...queryFilter} />
 
-        {isIncoming && !onlyExpectedFunds && metadata?.account?.[ContributionsTab.PAUSED].totalCount > 0 && (
-          <PausedIncomingContributionsMessage
-            account={metadata.account}
-            count={metadata.account[ContributionsTab.PAUSED].totalCount}
-          />
-        )}
+        {isIncoming &&
+          !onlyExpectedFunds &&
+          metadata?.account?.PAUSED_RESUMABLE.totalCount > 0 &&
+          !metadata.account.parent && (
+            <PausedIncomingContributionsMessage
+              account={metadata.account}
+              count={metadata.account[ContributionsTab.PAUSED].totalCount}
+            />
+          )}
 
         {error ? (
           <MessageBoxGraphqlError error={error} />
@@ -1046,7 +1059,7 @@ const getContributionActions: (opts: GetContributionActionsOptions) => GetAction
 
     const toAccount = order.toAccount;
     const legacyId = order.legacyId;
-    const orderUrl = new URL(`${toAccount.slug}/orders/${legacyId}`, window.location.origin);
+    const orderUrl = new URL(`${toAccount.slug}/orders/${legacyId}`, getWebsiteUrl());
 
     actions.secondary.push({
       key: 'copy-link',

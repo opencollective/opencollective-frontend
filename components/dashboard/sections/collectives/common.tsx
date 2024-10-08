@@ -197,7 +197,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       return isNil(since) ? (
         ''
       ) : (
-        <div className="whitespace-nowrap">
+        <div suppressHydrationWarning className="whitespace-nowrap">
           <FormattedDate value={since} day="numeric" month="long" year="numeric" />
         </div>
       );
@@ -211,12 +211,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       const balance = collective.stats.balance;
       return (
         <div className="font-medium text-foreground">
-          <FormattedMoneyAmount
-            amount={balance.valueInCents}
-            currency={balance.currency}
-            showCurrencyCode={true}
-            amountStyles={{}}
-          />
+          <FormattedMoneyAmount amount={balance.valueInCents} currency={balance.currency} showCurrencyCode={true} />
         </div>
       );
     },
@@ -236,7 +231,6 @@ export const cols: Record<string, ColumnDef<any, any>> = {
             amount={displayBalance.valueInCents}
             currency={displayBalance.currency}
             showCurrencyCode={true}
-            amountStyles={{}}
           />
 
           {!isChild && hasDifferentBalances && (

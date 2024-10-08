@@ -194,6 +194,58 @@ export const expenseValuesByRoleFragment = gql`
   ${accountingCategoryFields}
 `;
 
+export const expensePayeeFieldsFragment = gql`
+  fragment ExpensePayeeFields on Account {
+    id
+    slug
+    name
+    legalName
+    imageUrl
+    type
+    isAdmin
+    isActive
+    description
+    ...AccountHoverCardFields
+    location {
+      id
+      address
+      country
+    }
+    payoutMethods {
+      id
+      type
+      name
+      data
+      isSaved
+    }
+
+    # For Collectives, Funds, Events and Projects
+    ... on AccountWithHost {
+      isApproved
+      host {
+        id
+        slug
+        # For Expenses across hosts
+        payoutMethods {
+          id
+          type
+          name
+          data
+          isSaved
+        }
+      }
+    }
+
+    # For Fiscal Hosts
+    ... on Organization {
+      host {
+        id
+        slug
+      }
+    }
+  }
+`;
+
 export const expensePageExpenseFieldsFragment = gql`
   fragment ExpensePageExpenseFields on Expense {
     id
@@ -205,6 +257,7 @@ export const expensePageExpenseFieldsFragment = gql`
     status
     onHold
     privateMessage
+    reference
     tags
     amount
     accountingCategory {
@@ -291,52 +344,7 @@ export const expensePageExpenseFieldsFragment = gql`
     }
     payee {
       id
-      slug
-      name
-      legalName
-      imageUrl
-      type
-      isAdmin
-      isActive
-      description
-      ...AccountHoverCardFields
-      location {
-        id
-        address
-        country
-      }
-      payoutMethods {
-        id
-        type
-        name
-        data
-        isSaved
-      }
-
-      # For Collectives, Funds, Events and Projects
-      ... on AccountWithHost {
-        isApproved
-        host {
-          id
-          slug
-          # For Expenses across hosts
-          payoutMethods {
-            id
-            type
-            name
-            data
-            isSaved
-          }
-        }
-      }
-
-      # For Fiscal Hosts
-      ... on Organization {
-        host {
-          id
-          slug
-        }
-      }
+      ...ExpensePayeeFields
     }
     payeeLocation {
       id
@@ -350,6 +358,7 @@ export const expensePageExpenseFieldsFragment = gql`
       name
       type
       imageUrl
+      legacyId
       ...AccountHoverCardFields
     }
     host {
@@ -615,6 +624,7 @@ export const expensePageExpenseFieldsFragment = gql`
   ${accountingCategoryFields}
   ${accountHoverCardFields}
   ${expenseValuesByRoleFragment}
+  ${expensePayeeFieldsFragment}
 `;
 
 export const expensesListFieldsFragment = gql`
@@ -622,6 +632,7 @@ export const expensesListFieldsFragment = gql`
     id
     legacyId
     description
+    reference
     status
     createdAt
     tags
@@ -738,6 +749,7 @@ export const expensesListFieldsFragment = gql`
       type
       slug
       name
+      legacyId
       ...AccountHoverCardFields
     }
   }
@@ -752,17 +764,20 @@ export const expensesListAdminFieldsFragment = gql`
     onHold
     account {
       id
-      ... on AccountWithHost {
-        hostAgreements {
-          totalCount
-        }
-      }
     }
     createdByAccount {
       id
       ... on Individual {
         emails
       }
+    }
+    approvedBy {
+      id
+      type
+      slug
+      name
+      imageUrl
+      ...AccountHoverCardFields
     }
     payee {
       id
@@ -811,6 +826,7 @@ export const expensesListAdminFieldsFragment = gql`
       details
     }
     lastComment: comments(limit: 1, orderBy: { field: CREATED_AT, direction: DESC }) {
+      totalCount
       nodes {
         id
         createdAt

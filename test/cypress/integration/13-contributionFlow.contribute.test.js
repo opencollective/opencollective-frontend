@@ -120,7 +120,7 @@ describe('Contribution Flow: Order', () => {
       cy.createCollective({ type: 'ORGANIZATION', name: randomSlug() }).then(collective => {
         collectiveSlug = collective.slug;
 
-        cy.clock(Date.parse('2042/05/03'));
+        cy.clock(Date.parse('2042/05/03'), ['Date']);
 
         // Add a paymentMethod to the organization profile
         cy.addCreditCardToCollective({ collectiveSlug });

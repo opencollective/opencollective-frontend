@@ -8,25 +8,23 @@ const UNSAFE_EVAL = "'unsafe-eval'";
 
 const COMMON_DIRECTIVES = {
   blockAllMixedContent: [],
-  defaultSrc: [SELF],
+  defaultSrc: [SELF, 'https://cdn.plaid.com/'],
   imgSrc: [
     SELF,
     process.env.IMAGES_URL,
     process.env.NEXT_IMAGES_URL,
     'data:',
     '*.paypal.com',
+    '*.paypalobjects.com',
     'opencollective.com', // for widgets on /admin/export
     'blog.opencollective.com', // used to easily link images in static pages
     'blob:', // For upload images previews
     'i.ytimg.com', // For youtube embeds
   ].filter(Boolean),
-  workerSrc: [
-    SELF,
-    'blob:', // For confettis worker. TODO: Limit for nonce
-  ],
+  workerSrc: [SELF],
   styleSrc: [
     SELF,
-    UNSAFE_INLINE, // For styled-components. TODO: Limit for nonce
+    UNSAFE_INLINE, // For styled-components, which does not support nonce: https://github.com/styled-components/styled-components/issues/4258
     'https://hcaptcha.com',
     'https://*.hcaptcha.com',
     'https://challenges.cloudflare.com',
@@ -59,7 +57,6 @@ const COMMON_DIRECTIVES = {
   ].filter(Boolean),
   scriptSrc: [
     SELF,
-    UNSAFE_INLINE, // Required by current PayPal integration. https://developer.paypal.com/docs/checkout/troubleshoot/support/#browser-features-and-polyfills provides a way to deal with that through nonces.
     "'nonce-__OC_REQUEST_NONCE__'",
     'maps.googleapis.com',
     'js.stripe.com',
@@ -69,8 +66,9 @@ const COMMON_DIRECTIVES = {
     'https://js.hcaptcha.com',
     'https://*.hcaptcha.com',
     'https://challenges.cloudflare.com',
-    'https://www.google.com',
+    'https://www.google.com', // For reCAPTCHA
     'https://plausible.io',
+    'https://cdn.plaid.com/link/v2/stable/link-initialize.js',
   ],
   frameSrc: [
     'blob:', // For expense invoice previews in the modal, as they're rendered in a blob
@@ -90,6 +88,7 @@ const COMMON_DIRECTIVES = {
     'https://*.hcaptcha.com',
     'https://challenges.cloudflare.com',
     'https://www.google.com',
+    'https://cdn.plaid.com/',
   ],
   objectSrc: ['opencollective.com'],
 };
@@ -153,6 +152,11 @@ const getContentSecurityPolicyConfig = () => {
           'opencollective-staging.s3.us-west-1.amazonaws.com',
           'opencollective-staging.s3-us-west-1.amazonaws.com',
         ],
+        connectSrc: [
+          'opencollective-staging.s3.us-west-1.amazonaws.com',
+          'opencollective-staging.s3-us-west-1.amazonaws.com',
+          'https://sandbox.plaid.com',
+        ],
       }),
     };
   } else if (env === 'staging') {
@@ -166,6 +170,7 @@ const getContentSecurityPolicyConfig = () => {
         connectSrc: [
           'opencollective-staging.s3.us-west-1.amazonaws.com',
           'opencollective-staging.s3-us-west-1.amazonaws.com',
+          'https://sandbox.plaid.com',
         ],
       }),
       reportUri: ['https://o105108.ingest.sentry.io/api/1736806/security/?sentry_key=2ab0f7da3f56423d940f36370df8d625'],
@@ -181,6 +186,7 @@ const getContentSecurityPolicyConfig = () => {
         connectSrc: [
           'opencollective-production.s3.us-west-1.amazonaws.com',
           'opencollective-production.s3-us-west-1.amazonaws.com',
+          'https://production.plaid.com/',
         ],
       }),
       reportUri: ['https://o105108.ingest.sentry.io/api/1736806/security/?sentry_key=2ab0f7da3f56423d940f36370df8d625'],

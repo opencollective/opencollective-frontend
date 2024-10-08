@@ -48,7 +48,7 @@ const ExpenseInfoSidebar = ({ isLoading, host, expenseHost = null, collective, c
               <FormattedMoneyAmount
                 currency={balanceWithBlockedFunds.currency}
                 amount={balanceWithBlockedFunds.valueInCents}
-                amountStyles={{ color: 'black.800' }}
+                amountClassName="text-foreground"
                 precision={CurrencyPrecision.DEFAULT}
               />
               {host && (

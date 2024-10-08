@@ -576,6 +576,7 @@ const CollectiveNavbar = ({
               width="100%"
               justifyContent="space-between"
               flexDirection={['column', 'row']}
+              overflowY="auto"
             >
               {isExpanded && <DisableGlobalScrollOnMobile />}
               <CategoriesContainer

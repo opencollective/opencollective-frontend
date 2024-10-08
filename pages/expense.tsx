@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { useApolloClient } from '@apollo/client';
 import dayjs from 'dayjs';
-import { cloneDeep } from 'lodash';
 import type { InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
@@ -37,7 +36,7 @@ export const getVariablesFromQuery = query => {
 const getPropsFromQuery = query => {
   return {
     legacyExpenseId: parseInt(query.ExpenseId),
-    draftKey: query.key,
+    draftKey: query.key || null,
     collectiveSlug: query.collectiveSlug,
     edit: query.edit,
   };
@@ -112,10 +111,7 @@ export default function ExpensePage(props: InferGetServerSidePropsType<typeof ge
     }
   }
 
-  const expense = cloneDeep(data?.expense);
-  if (expense && data.expensePayeeStats?.payee?.stats) {
-    expense.payee.stats = data.expensePayeeStats?.payee?.stats;
-  }
+  const expense = data?.expense;
   const collective = expense?.account;
   const metadata = getPageMetadata(intl, props.legacyExpenseId, expense);
 

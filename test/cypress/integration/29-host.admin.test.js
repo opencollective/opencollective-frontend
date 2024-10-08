@@ -32,6 +32,7 @@ describe('host dashboard', () => {
       cy.login({ redirect: '/dashboard/brusselstogetherasbl/host-applications' });
       cy.get('[data-cy="menu-item-Collectives"]').click();
       cy.get('[data-cy="menu-item-host-applications"]').click();
+      cy.contains('Pending').click();
       cy.get(`[data-cy="${collectiveSlug}-table-actions"]`).click();
       cy.get(`[data-cy="${collectiveSlug}-view-details"]`).click();
       cy.get(`[data-cy="${collectiveSlug}-approve"]`).click();
@@ -56,6 +57,7 @@ describe('host dashboard', () => {
       cy.login({ redirect: '/dashboard/brusselstogetherasbl/hosted-collectives' });
       cy.get('[data-cy="menu-item-Collectives"]').click();
       cy.get('[data-cy="menu-item-host-applications"]').click();
+      cy.contains('Pending').click();
       cy.get(`[data-cy="${collectiveSlug}-table-actions"]`).click();
       cy.get(`[data-cy="${collectiveSlug}-view-details"]`).click();
       cy.get(`[data-cy="${collectiveSlug}-approve"]`).click();
@@ -87,6 +89,7 @@ describe('host dashboard', () => {
       cy.login({ redirect: '/dashboard/brusselstogetherasbl/hosted-collectives' });
       cy.get('[data-cy="menu-item-Collectives"]').click();
       cy.get('[data-cy="menu-item-host-applications"]').click();
+      cy.contains('Pending').click();
       cy.get(`[data-cy="${collectiveSlug}-table-actions"]`).click();
       cy.get(`[data-cy="${collectiveSlug}-view-details"]`).click();
       cy.get(`[data-cy="${collectiveSlug}-approve"]`).click();
@@ -216,12 +219,7 @@ describe('host dashboard', () => {
         cy.getByDataCy(`expense-container-${expense.legacyId}`).as('currentExpense');
       });
 
-      // Security Check
       cy.get('@currentExpense').find('[data-cy="pay-button"]').click();
-      cy.getByDataCy('security-check-modal').as('securityCheckModal');
-      cy.get('@securityCheckModal').find('h1').contains('Are you sure you want to pay?');
-      cy.get('@securityCheckModal').find('[data-cy="pay-button"]').click();
-
       // Pay
       cy.getByDataCy('pay-expense-modal').as('payExpenseModal');
       cy.get('@payExpenseModal').find('[data-cy="pay-type-MANUAL"]').click();

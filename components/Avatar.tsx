@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import { Calendar, TestTube2, UserCog } from 'lucide-react';
 import styled from 'styled-components';
@@ -7,7 +6,6 @@ import type { BorderProps } from 'styled-system';
 import { border, color, layout, space } from 'styled-system';
 
 import { CollectiveType, defaultImage } from '../lib/constants/collectives';
-import type { Account } from '../lib/graphql/types/v2/graphql';
 import { getAvatarBorderRadius, getCollectiveImage } from '../lib/image-utils';
 
 import type { FlexProps } from './Grid';
@@ -25,7 +23,7 @@ type StyledAvatarProps = FlexProps &
   BorderProps & {
     src?: string;
     type?: string;
-    size?: number;
+    size?: string | number | (string | number)[];
     title?: string;
     backgroundSize?: string;
   };
@@ -59,7 +57,7 @@ const StyledAvatar = styled(Flex).attrs<StyledAvatarProps>(props => ({
 /**
  * Returns the max avatar height multiplied by 2 (for retina screens)
  */
-const getImageHeightFromRadius = (radius: string | number | string[] | number[]): number | undefined => {
+const getImageHeightFromRadius = (radius: string | number | (string | number)[]): number | undefined => {
   const normalizeValue = (value: string | number) => (typeof value === 'string' ? parseInt(value, 10) : value);
   if (Array.isArray(radius)) {
     return !radius.length ? undefined : Math.max(...radius.map(normalizeValue)) * 2;
@@ -78,7 +76,28 @@ const Avatar = ({
   children = null,
   displayTitle = true,
   ...styleProps
-}) => {
+}: {
+  collective?: {
+    type?: string;
+    name?: string;
+    slug?: string;
+    image?: string;
+    isIncognito?: boolean;
+    isGuest?: boolean;
+  };
+  src?: string;
+  type?: string;
+  radius?: string | number | (string | number)[];
+  name?: string;
+  useIcon?: boolean;
+  children?: React.ReactNode;
+  displayTitle?: boolean;
+  backgroundColor?: string;
+  backgroundSize?: string;
+  animationDuration?: number;
+  className?: string;
+  style?: React.CSSProperties;
+} & React.ComponentProps<typeof StyledAvatar>) => {
   let child = children;
   if (collective?.type === 'ROOT') {
     useIcon = true;
@@ -113,38 +132,6 @@ const Avatar = ({
   );
 };
 
-Avatar.propTypes = {
-  /** Collective object */
-  collective: PropTypes.shape({
-    type: PropTypes.string,
-    name: PropTypes.string,
-    slug: PropTypes.string,
-    image: PropTypes.string,
-    isIncognito: PropTypes.bool,
-    isGuest: PropTypes.bool,
-  }),
-  /** Collective name */
-  name: PropTypes.string,
-  /** Collective image url */
-  src: PropTypes.string,
-  /** Collective type */
-  type: PropTypes.oneOf(Object.keys(CollectiveType)),
-  /**
-   Avatar size.
-   TODO: This prop name is confusing. It's not a radius, it's a diameter. We should call it "size"
-   */
-  radius: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
-  /** Duration to transition size. Disabled if 0, null or undefined */
-  animationDuration: PropTypes.number,
-  /* Size of the avatar image */
-  backgroundSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  /* Color of the background */
-  backgroundColor: PropTypes.string,
-  /* If true, will display a default icon instead of image */
-  useIcon: PropTypes.bool,
-  displayTitle: PropTypes.bool,
-};
-
 const shouldUseDefaultGuestAvatar = name => {
   return !name || name === 'Guest';
 };
@@ -152,7 +139,21 @@ const shouldUseDefaultGuestAvatar = name => {
 /**
  * Similar to `Avatar`, but builds from a Contributor instead of a collective
  */
-export const ContributorAvatar = ({ contributor, radius, ...styleProps }) => {
+export const ContributorAvatar = ({
+  contributor,
+  radius,
+  ...styleProps
+}: {
+  contributor: {
+    name: string;
+    image: string;
+    collectiveSlug: string;
+    isIncognito: boolean;
+    isGuest: boolean;
+    type: string;
+  };
+  radius: string | number | (string | number)[];
+}) => {
   let image = null;
   if (contributor.isIncognito) {
     image = defaultImage.ANONYMOUS;
@@ -165,19 +166,6 @@ export const ContributorAvatar = ({ contributor, radius, ...styleProps }) => {
   return <StyledAvatar size={radius} type={contributor.type} src={image} title={contributor.name} {...styleProps} />;
 };
 
-ContributorAvatar.propTypes = {
-  /** Collective object */
-  contributor: PropTypes.shape({
-    name: PropTypes.string,
-    image: PropTypes.string,
-    collectiveSlug: PropTypes.string,
-    isIncognito: PropTypes.bool,
-    isGuest: PropTypes.bool,
-    type: PropTypes.oneOf(Object.keys(CollectiveType)),
-  }).isRequired,
-  radius: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
-};
-
 /** A simple avatar for incognito users */
 export const IncognitoAvatar = avatarProps => {
   return <StyledAvatar {...avatarProps} type={CollectiveType.USER} src={defaultImage.ANONYMOUS} />;
@@ -186,43 +174,6 @@ export const IncognitoAvatar = avatarProps => {
 /** A simple avatar for guest users */
 export const GuestAvatar = avatarProps => {
   return <StyledAvatar {...avatarProps} type={CollectiveType.USER} src={defaultImage.GUEST} />;
-};
-
-export const StackedAvatars = ({
-  accounts = [],
-  imageSize,
-  maxDisplayedAvatars = 3,
-}: {
-  accounts: Partial<Account>[];
-  imageSize: number;
-  maxDisplayedAvatars?: number;
-}) => {
-  const width = `${imageSize}px`;
-  const marginLeft = `-${imageSize / 3}px`;
-  const displayed = accounts.length > maxDisplayedAvatars ? accounts.slice(0, maxDisplayedAvatars - 1) : accounts;
-  const left = accounts.length - displayed.length;
-  return (
-    <div className="flex items-center">
-      {displayed.map(account => (
-        <div key={account.id || account.slug} className="flex items-center first:!ml-0" style={{ marginLeft }}>
-          <Avatar
-            collective={account}
-            radius={imageSize}
-            displayTitle={true}
-            className="border border-solid border-white"
-          />
-        </div>
-      ))}
-      {left ? (
-        <div
-          className="flex items-center justify-center rounded-full bg-blue-50 text-[11px] font-semibold text-blue-400 first:ml-0"
-          style={{ width, height: width, marginLeft }}
-        >
-          +{left}
-        </div>
-      ) : null}
-    </div>
-  );
 };
 
 /** @component */

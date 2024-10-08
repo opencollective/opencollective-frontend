@@ -13,7 +13,7 @@ import StyledTag from './StyledTag';
 import { Span } from './Text';
 
 const expensesSearchQuery = gql`
-  query ExpensesPickerSearch($account: AccountReferenceInput, $searchTerm: String, $status: ExpenseStatusFilter) {
+  query ExpensesPickerSearch($account: AccountReferenceInput, $searchTerm: String, $status: [ExpenseStatusFilter]) {
     expenses(account: $account, limit: 100, searchTerm: $searchTerm, status: $status) {
       nodes {
         id

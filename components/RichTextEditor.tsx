@@ -1,6 +1,6 @@
 import React from 'react';
 import { css } from '@styled-system/css';
-import { get } from 'lodash';
+import { get, remove } from 'lodash';
 import styled from 'styled-components';
 import { v4 as uuid } from 'uuid';
 import { isURL } from 'validator';
@@ -272,7 +272,7 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
 
     // Load Trix
     if (typeof window !== 'undefined') {
-      this.Trix = require('trix').default; // eslint-disable-line @typescript-eslint/no-var-requires
+      this.Trix = require('@opencollective/trix').default; // eslint-disable-line @typescript-eslint/no-var-requires
       document.addEventListener('trix-before-initialize', this.trixBeforeInitialize);
     }
   }
@@ -355,6 +355,8 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
   trixBeforeInitialize = () => {
     this.Trix.config.blockAttributes.heading1 = { tagName: 'h3' };
     this.Trix.config.attachments.preview.caption = { name: false, size: false };
+    remove(this.Trix.config.parser.forbiddenElements, type => type === 'iframe'); // Allow iframes for video embeds
+    this.Trix.config.parser.allowedAttributes.push('frameborder', 'allowfullscreen');
   };
 
   trixInitialize = event => {
@@ -383,7 +385,7 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
         <div class="trix-dialog__link-fields">
           <input type="url" name="video-url" class="trix-input trix-input--dialog trix-input--dialog-embed" placeholder="Enter Video URL…" aria-label="Video URL" data-trix-input="">
           <div class="trix-button-group">
-            <input type="button" class="trix-button trix-button--dialog" value="Add Video" data-trix-action="x-add-embed">
+            <input data-cy="add-video-submit" type="button" class="trix-button trix-button--dialog" value="Add Video" data-trix-action="x-add-embed">
           </div>
         </div>
         <strong>Note: Only YouTube links are supported.</strong>
@@ -410,6 +412,16 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
       const embedLink = toolbarElement.querySelector('.trix-input--dialog-embed').value?.trim();
       if (embedLink) {
         this.embedIframe(embedLink);
+
+        const attachVideoDialog = toolbarElement.querySelector('[data-trix-dialog=video-url]');
+
+        // Clear input
+        attachVideoDialog.querySelector('.trix-input--dialog-embed').value = '';
+
+        // Close dialog
+        if (attachVideoDialog.getAttribute('data-trix-active') === '') {
+          attachVideoDialog.removeAttribute('data-trix-active');
+        }
       }
     }
   };

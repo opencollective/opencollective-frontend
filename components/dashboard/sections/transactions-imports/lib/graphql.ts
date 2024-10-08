@@ -85,3 +85,21 @@ export const updateTransactionsImportRows = gql`
   }
   ${TransactionsImportRowFieldsFragment}
 `;
+
+export const transactionsImportsQuery = gql`
+  query HostTransactionImports($accountSlug: String!, $limit: Int, $offset: Int) {
+    host(slug: $accountSlug) {
+      id
+      transactionsImports(limit: $limit, offset: $offset) {
+        totalCount
+        limit
+        offset
+        nodes {
+          id
+          ...TransactionImportListFields
+        }
+      }
+    }
+  }
+  ${TransactionImportListFieldsFragment}
+`;

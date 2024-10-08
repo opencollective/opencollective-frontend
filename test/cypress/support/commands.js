@@ -1,3 +1,5 @@
+import 'cypress-mailpit';
+
 import { API_V2_CONTEXT, fakeTag as gql, fakeTag as gqlV1 } from '../../../lib/graphql/helpers';
 import { loggedInUserQuery } from '../../../lib/graphql/v1/queries';
 
@@ -57,22 +59,6 @@ Cypress.Commands.add('signup', ({ user = {}, redirect = '/', visitParams } = {})
 });
 
 /**
- * Open a link not covered by `baseUrl`.
- * See https://github.com/cypress-io/cypress/issues/1777
- */
-Cypress.Commands.add('openExternalLink', url => {
-  cy.visit('/signin').then(window => {
-    const linkIdentifier = '__TMP_CY_EXTERNAL_LINK__';
-    const link = window.document.createElement('a');
-    link.innerHTML = linkIdentifier;
-    link.setAttribute('href', url);
-    link.setAttribute('id', linkIdentifier);
-    window.document.body.appendChild(link);
-    cy.get(`#${linkIdentifier}`).click();
-  });
-});
-
-/**
  * Returns all the email sent by the API
  */
 Cypress.Commands.add('getInbox', () => {
@@ -87,7 +73,7 @@ Cypress.Commands.add('getInbox', () => {
 });
 
 /**
- * Navigate to an email in maildev.
+ * Open an email on Mailpit. Resolves the email message.
  *
  * API must be configured to use maildev
  * - configured by default in development, e2e and ci environments
@@ -96,35 +82,8 @@ Cypress.Commands.add('getInbox', () => {
  * @param emailMatcher {func} - used to find the email. Gets passed an email. To see the
  *  list of all fields, check https://github.com/djfarrelly/MailDev/blob/master/docs/rest.md
  */
-Cypress.Commands.add('openEmail', emailMatcher => {
-  return loopOpenEmail(emailMatcher);
-});
-
-/**
- * Gets an email in maildev.
- *
- * API must be configured to use maildev
- * - configured by default in development, e2e and ci environments
- * - otherwise MAILDEV_CLIENT=true and MAILDEV_SERVER=true
- *
- * @param emailMatcher {func} - used to find the email. Gets passed an email. To see the
- *  list of all fields, check https://github.com/djfarrelly/MailDev/blob/master/docs/rest.md
- */
-Cypress.Commands.add('getEmail', emailMatcher => {
-  return getEmail(emailMatcher);
-});
-
-/**
- * Clear maildev inbox.
- */
-Cypress.Commands.add('clearInbox', () => {
-  return cy.request({
-    url: `${Cypress.env('MAILDEV_URL')}/email/all`,
-    method: 'DELETE',
-    headers: {
-      Accept: 'application/json',
-    },
-  });
+Cypress.Commands.add('openEmail', (emailMatcher, timeout = 8000) => {
+  return getEmail(emailMatcher, timeout);
 });
 
 /**
@@ -151,7 +110,7 @@ Cypress.Commands.add('createCollective', ({ type = 'ORGANIZATION', email = defau
           }
         }
       `,
-      variables: { collective: { location: {}, name: 'TestOrg', slug: '', tiers: [], type, ...params } },
+      variables: { collective: { location: {}, name: 'TestOrg', slug: '', type, ...params } },
     }).then(({ body }) => {
       return body.data.createCollective;
     });
@@ -717,21 +676,15 @@ function fillStripeInput(params) {
   });
 }
 
-function loopOpenEmail(emailMatcher, timeout = 8000) {
-  return getEmail(emailMatcher, timeout).then(email => {
-    return cy.openExternalLink(`${Cypress.env('MAILDEV_URL')}/email/${email.id}/html`);
-  });
-}
-
 function getEmail(emailMatcher, timeout = 8000) {
   if (timeout < 0) {
     return assert.fail('Could not find email: getEmail timed out');
   }
 
-  return cy.getInbox().then(inbox => {
-    const email = inbox.find(emailMatcher);
+  return cy.mailpitGetAllMails().then(result => {
+    const email = result.messages.find(emailMatcher);
     if (email) {
-      return cy.wrap(email);
+      return cy.mailpitGetMail(email.ID);
     }
     cy.wait(100);
     return getEmail(emailMatcher, timeout - 100);

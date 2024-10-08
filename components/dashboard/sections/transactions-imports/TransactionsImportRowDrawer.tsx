@@ -4,7 +4,7 @@ import type { ComponentProps } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import type { GetActions } from '../../../../lib/actions/types';
-import type { TransactionsImportRow } from '../../../../lib/graphql/types/v2/graphql';
+import type { TransactionsImportQuery } from '../../../../lib/graphql/types/v2/graphql';
 
 import DateTime from '../../../DateTime';
 import DrawerHeader from '../../../DrawerHeader';
@@ -21,8 +21,8 @@ export const TransactionsImportRowDrawer = ({
   rowIndex,
   ...props
 }: {
-  row: TransactionsImportRow;
-  getActions: GetActions<TransactionsImportRow>;
+  row: TransactionsImportQuery['transactionsImport']['rows']['nodes'][number];
+  getActions: GetActions<TransactionsImportQuery['transactionsImport']['rows']['nodes'][number]>;
   rowIndex: number;
 } & ComponentProps<typeof Sheet>) => {
   const dropdownTriggerRef = React.useRef();
@@ -42,7 +42,6 @@ export const TransactionsImportRowDrawer = ({
                       amount={row.amount.valueInCents}
                       currency={row.amount.currency}
                       precision={2}
-                      amountStyles={{ letterSpacing: 0 }}
                       showCurrencyCode={false}
                     />
                   </span>
@@ -78,11 +77,7 @@ export const TransactionsImportRowDrawer = ({
                     <FormattedMessage id="Fields.amount" defaultMessage="Amount" />
                   </DataListItemLabel>
                   <DataListItemValue>
-                    <FormattedMoneyAmount
-                      amount={row.amount.valueInCents}
-                      currency={row.amount.currency}
-                      amountStyles={null}
-                    />
+                    <FormattedMoneyAmount amount={row.amount.valueInCents} currency={row.amount.currency} />
                   </DataListItemValue>
                 </DataListItem>
                 <DataListItem>
@@ -133,12 +128,7 @@ export const TransactionsImportRowDrawer = ({
                   <strong>
                     <FormattedMessage id="Fields.amount" defaultMessage="Amount" />
                   </strong>
-                  :{' '}
-                  <FormattedMoneyAmount
-                    amount={row.amount.valueInCents}
-                    currency={row.amount.currency}
-                    amountStyles={null}
-                  />
+                  : <FormattedMoneyAmount amount={row.amount.valueInCents} currency={row.amount.currency} />
                 </li>
                 <li>
                   <strong>

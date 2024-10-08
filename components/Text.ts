@@ -13,7 +13,7 @@ import type {
 } from '../lib/styled-system-custom-properties';
 import { cursor, overflowWrap, textTransform, whiteSpace, wordBreak } from '../lib/styled-system-custom-properties';
 
-export type TextProps = ColorProps &
+type TextProps = ColorProps &
   DisplayProps &
   SpaceProps &
   TypographyProps &

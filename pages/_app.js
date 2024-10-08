@@ -18,11 +18,12 @@ import StripeProviderSSR from '../components/StripeProvider';
 import TwoFactorAuthenticationModal from '../components/two-factor-authentication/TwoFactorAuthenticationModal';
 import { Toaster } from '../components/ui/Toaster';
 import UserProvider from '../components/UserProvider';
+import { WorkspaceProvider } from '../components/WorkspaceProvider';
 
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'nprogress/nprogress.css';
-import 'trix/dist/trix.css';
+import '@opencollective/trix/dist/trix.css';
 import '../public/static/styles/app.css';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css';
 
@@ -54,7 +55,9 @@ import { ModalProvider } from '../components/ModalContext';
 import NewsAndUpdatesProvider from '../components/NewsAndUpdatesProvider';
 import { TooltipProvider } from '../components/ui/Tooltip';
 
-PolyfillInterweaveSSR();
+if (typeof window === 'undefined') {
+  PolyfillInterweaveSSR();
+}
 
 class OpenCollectiveFrontendApp extends App {
   static propTypes = {
@@ -192,14 +195,16 @@ class OpenCollectiveFrontendApp extends App {
               <IntlProvider locale={locale}>
                 <TooltipProvider delayDuration={500} skipDelayDuration={100}>
                   <UserProvider initialLoggedInUser={LoggedInUserData ? new LoggedInUser(LoggedInUserData) : null}>
-                    <ModalProvider>
-                      <NewsAndUpdatesProvider>
-                        <Component {...pageProps} />
-                        <Toaster />
-                        <GlobalNewsAndUpdates />
-                        <TwoFactorAuthenticationModal />
-                      </NewsAndUpdatesProvider>
-                    </ModalProvider>
+                    <WorkspaceProvider>
+                      <ModalProvider>
+                        <NewsAndUpdatesProvider>
+                          <Component {...pageProps} />
+                          <Toaster />
+                          <GlobalNewsAndUpdates />
+                          <TwoFactorAuthenticationModal />
+                        </NewsAndUpdatesProvider>
+                      </ModalProvider>
+                    </WorkspaceProvider>
                   </UserProvider>
                 </TooltipProvider>
               </IntlProvider>

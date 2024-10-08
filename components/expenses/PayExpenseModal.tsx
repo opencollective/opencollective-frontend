@@ -3,6 +3,7 @@ import { useQuery } from '@apollo/client';
 import { Check } from '@styled-icons/boxicons-regular/Check';
 import { FormikProvider, useFormik, useFormikContext } from 'formik';
 import { cloneDeep, kebabCase, omit, round } from 'lodash';
+import { CircleHelp } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import type { BorderProps, SpaceProps } from 'styled-system';
@@ -18,6 +19,7 @@ import type { Account, Expense, Host } from '../../lib/graphql/types/v2/graphql'
 import { i18nPaymentMethodService } from '../../lib/i18n/payment-method-service';
 import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
 import { i18nTaxType } from '../../lib/i18n/taxes';
+import { truncateMiddle } from '../../lib/utils';
 import { getAmountWithoutTaxes, getTaxAmount } from './lib/utils';
 
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
@@ -34,6 +36,7 @@ import StyledModal, { ModalBody, ModalHeader } from '../StyledModal';
 import StyledSelect from '../StyledSelect';
 import StyledTooltip from '../StyledTooltip';
 import { H4, P, Span } from '../Text';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
 import { FieldGroup } from './PayoutBankInformationForm';
 import PayoutMethodData from './PayoutMethodData';
@@ -44,6 +47,7 @@ const quoteExpenseQuery = gql`
     expense(expense: { id: $id }) {
       id
       currency
+      reference
       amountInHostCurrency: amountV2(currencySource: HOST) {
         exchangeRate {
           value
@@ -115,7 +119,7 @@ type TransferDetailsFieldsProps = {
 };
 
 const TransferDetailFields = ({ expense, setDisabled }: TransferDetailsFieldsProps) => {
-  const formik = useFormikContext();
+  const formik = useFormikContext<any>();
   const { data, loading, error } = useQuery(validateTransferRequirementsQuery, {
     variables: { id: expense.id },
     context: API_V2_CONTEXT,
@@ -124,6 +128,28 @@ const TransferDetailFields = ({ expense, setDisabled }: TransferDetailsFieldsPro
   useEffect(() => {
     setDisabled(loading);
   }, [loading, setDisabled]);
+
+  useEffect(() => {
+    let reference;
+    data?.expense?.validateTransferRequirements?.find(requirement => {
+      return requirement.fields.find(field => {
+        const r = field?.group?.find(group => group.key === 'reference');
+        if (r) {
+          reference = r;
+        }
+        return r;
+      });
+    });
+    if (
+      formik.values.transfer?.details?.reference &&
+      reference?.maxLength < formik.values.transfer?.details?.reference?.length
+    ) {
+      formik.setFieldValue(
+        'transfer.details.reference',
+        truncateMiddle(formik.values.transfer?.details?.reference, reference.maxLength, ' '),
+      );
+    }
+  }, [data]);
 
   if (error) {
     return (
@@ -377,13 +403,19 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
   );
   const [disabled, setDisabled] = React.useState(false);
 
-  const canAddTransferDetails = host.settings?.transferwise?.transferDetails === true;
   const canQuote = host.transferwise && payoutMethodType === PayoutMethodType.BANK_ACCOUNT;
   const quoteQuery = useQuery(quoteExpenseQuery, {
     variables: { id: expense.id },
     context: API_V2_CONTEXT,
     skip: !canQuote,
   });
+
+  useEffect(() => {
+    const reference = quoteQuery.data?.expense?.reference;
+    if (reference && !formik.values.transfer?.details?.reference) {
+      formik.setFieldValue('transfer', { details: { reference } });
+    }
+  }, [quoteQuery.data]);
 
   const amounts = calculateAmounts({
     values: formik.values,
@@ -583,7 +615,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                 </StyledInputField>
               </React.Fragment>
             )}
-            {canQuote && canAddTransferDetails && !hasManualPayment && (
+            {canQuote && !hasManualPayment && (
               <div className="mt-3">
                 <TransferDetailFields expense={expense} setDisabled={setDisabled} />
               </div>
@@ -626,10 +658,10 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                 </Label>
                 <Amount>
                   <FormattedMoneyAmount
-                    amountStyles={{ fontWeight: 500 }}
                     amount={amounts.expenseAmountInHostCurrency?.valueInCents}
+                    amountClassName="font-medium"
                     currency={amounts.expenseAmountInHostCurrency?.currency}
-                    currencyCodeStyles={{ color: 'black.500' }}
+                    currencyCodeClassName="text-muted-foreground"
                   />
                 </Amount>
               </AmountLine>
@@ -644,7 +676,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                       amount={getTaxAmount(amountWithoutTaxes, tax)}
                       precision={2}
                       currency={expense.currency}
-                      amountStyles={{ fontWeight: 500 }}
+                      amountClassName="font-medium"
                       showCurrencyCode={false}
                     />
                   </Amount>
@@ -662,11 +694,8 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                       <FormattedMoneyAmount
                         amount={amounts.paymentProcessorFee.valueInCents}
                         currency={amounts.paymentProcessorFee.currency}
-                        currencyCodeStyles={{ color: 'black.500' }}
-                        amountStyles={{
-                          fontWeight: 500,
-                          color: 'black.900',
-                        }}
+                        currencyCodeClassName="text-muted-foreground"
+                        amountClassName="text-foreground font-medium"
                       />
                     )}
                   </Amount>
@@ -677,7 +706,18 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                   {amounts.paymentProcessorFee !== null ? (
                     <FormattedMessage id="TotalAmount" defaultMessage="Total amount" />
                   ) : (
-                    <FormattedMessage id="TotalAmountWithoutFee" defaultMessage="Total amount (without fees)" />
+                    <Tooltip>
+                      <TooltipTrigger className="flex items-center gap-1">
+                        <FormattedMessage id="TotalAmountWithoutFee" defaultMessage="Total amount (without fees)" />
+                        <CircleHelp size={16} className="text-muted-foreground" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <FormattedMessage
+                          defaultMessage="This payment provider doesn’t offer a way to calculate the fees in advance."
+                          id="EC5IZi"
+                        />
+                      </TooltipContent>
+                    </Tooltip>
                   )}
                 </Label>
                 <Amount>
@@ -687,7 +727,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                     <FormattedMoneyAmount
                       amount={amounts.totalAmount?.valueInCents}
                       currency={amounts.totalAmount?.currency}
-                      currencyCodeStyles={{ color: 'black.500' }}
+                      currencyCodeClassName="text-muted-foreground"
                     />
                   )}
                 </Amount>

@@ -161,7 +161,7 @@ const StyledInputAmount = ({
   currencyDisplay = 'SYMBOL',
   name = 'amount',
   min = 0,
-  max = 1000000000,
+  max = 100000000000,
   precision = ZERO_DECIMAL_CURRENCIES.includes(currency) ? 0 : 2,
   defaultValue = undefined,
   value,

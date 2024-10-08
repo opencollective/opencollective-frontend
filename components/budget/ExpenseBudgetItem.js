@@ -11,9 +11,10 @@ import expenseTypes from '../../lib/constants/expenseTypes';
 import { getFilesFromExpense } from '../../lib/expenses';
 import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 import { toPx } from '../../lib/theme/helpers';
-import { getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
+import { getCollectivePageRoute } from '../../lib/url-helpers';
 import { shouldDisplayExpenseCategoryPill } from '../expenses/lib/accounting-categories';
 
 import { AccountHoverCard } from '../AccountHoverCard';
@@ -21,7 +22,6 @@ import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import AutosizeText from '../AutosizeText';
 import Avatar from '../Avatar';
 import { AvatarWithLink } from '../AvatarWithLink';
-import Container from '../Container';
 import DateTime from '../DateTime';
 import AdminExpenseStatusTag from '../expenses/AdminExpenseStatusTag';
 import { ExpenseAccountingCategoryPill } from '../expenses/ExpenseAccountingCategoryPill';
@@ -39,11 +39,13 @@ import CommentIcon from '../icons/CommentIcon';
 import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
+import StackedAvatars from '../StackedAvatars';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 import Tags from '../Tags';
-import { H3, Span } from '../Text';
+import { H3 } from '../Text';
 import TransactionSign from '../TransactionSign';
+import TruncatedTextWithTooltip from '../TruncatedTextWithTooltip';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
 const DetailColumnHeader = styled.div`
@@ -54,7 +56,6 @@ const DetailColumnHeader = styled.div`
   letter-spacing: 0.6px;
   text-transform: uppercase;
   color: #c4c7cc;
-  margin-bottom: 2px;
 `;
 
 const ButtonsContainer = styled.div.attrs({ 'data-cy': 'expense-actions' })`
@@ -87,14 +88,18 @@ const ExpenseContainer = styled.div`
   ${props =>
     props.useDrawer &&
     css`
-      ${props => props.selected && `background: #f8fafc;`}
+      ${props => props.selected && `background: #E5F3FF;`}
     `}
 
-  @media (hover: hover) {
-    &:not(:hover):not(:focus-within) ${ButtonsContainer} {
-      opacity: 0.24;
-    }
-  }
+  ${props =>
+    !props.selected &&
+    css`
+      @media (hover: hover) {
+        &:not(:hover):not(:focus-within) ${ButtonsContainer} {
+          opacity: 0.24;
+        }
+      }
+    `}
 `;
 
 const ExpenseBudgetItem = ({
@@ -130,7 +135,9 @@ const ExpenseBudgetItem = ({
   const isLoggedInUserExpenseHostAdmin = LoggedInUser?.isAdminOfCollective(host);
   const isLoggedInUserExpenseAdmin = LoggedInUser?.isAdminOfCollective(expense?.account);
   const isViewingExpenseInHostContext = isLoggedInUserExpenseHostAdmin && !isLoggedInUserExpenseAdmin;
+  const hasKeyboardShortcutsEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.KEYBOARD_SHORTCUTS);
   const lastComment = expense?.lastComment?.nodes?.[0];
+  const approvedBy = expense?.approvedBy?.length > 0 ? expense.approvedBy : null;
 
   return (
     <ExpenseContainer
@@ -140,9 +147,9 @@ const ExpenseBudgetItem = ({
       selected={selected}
       useDrawer={useDrawer}
     >
-      <Flex justifyContent="space-between" flexWrap="wrap">
-        <Flex flex="1" minWidth="max(50%, 200px)" maxWidth={[null, '70%']} mr="24px">
-          <Box mr={3}>
+      <div className="mb-5 flex flex-wrap items-start justify-end gap-3">
+        <div className="flex flex-grow gap-3">
+          <Box>
             {isLoading ? (
               <LoadingPlaceholder width={40} height={40} />
             ) : (
@@ -178,7 +185,6 @@ const ExpenseBudgetItem = ({
                     <FormattedMessage id="Expense.GoToPage" defaultMessage="Go to expense page" />
                   )}
                 </TooltipContent>
-
                 <TooltipTrigger asChild>
                   <span>
                     <StyledLink
@@ -203,18 +209,20 @@ const ExpenseBudgetItem = ({
                         mobileRatio={0.875}
                         valueFormatter={toPx}
                       >
-                        {({ value, fontSize }) => (
-                          <H3
-                            fontWeight="500"
-                            lineHeight="1.5em"
-                            textDecoration="none"
-                            color="black.900"
-                            fontSize={fontSize}
-                            data-cy="expense-title"
-                          >
-                            {value}
-                          </H3>
-                        )}
+                        {({ value, fontSize }) => {
+                          return (
+                            <H3
+                              fontWeight="500"
+                              lineHeight="1.5em"
+                              textDecoration="none"
+                              color="black.900"
+                              fontSize={fontSize}
+                              data-cy="expense-title"
+                            >
+                              {value}
+                            </H3>
+                          );
+                        }}
                       </AutosizeText>
                     </StyledLink>
                   </span>
@@ -304,7 +312,6 @@ const ExpenseBudgetItem = ({
                               get(expense.account, 'stats.balanceWithBlockedFunds', 0),
                             )}
                             currency={expense.account.currency}
-                            amountStyles={{ color: 'black.700' }}
                           />
                         ),
                       }}
@@ -322,30 +329,26 @@ const ExpenseBudgetItem = ({
               </div>
             </Box>
           )}
-        </Flex>
-        <Flex flexDirection={['row', 'column']} mt={[3, 0]} flexWrap="wrap" alignItems={['center', 'flex-end']}>
-          <Flex
-            my={2}
-            mr={[3, 0]}
-            flexDirection="column"
-            minWidth={100}
-            alignItems="flex-end"
-            data-cy="transaction-amount"
-          >
+        </div>
+        <div className="flex w-full flex-col items-end justify-between sm:w-fit">
+          <Flex flexDirection="column" minWidth={100} alignItems="flex-end" data-cy="transaction-amount">
             {isLoading ? (
               <LoadingPlaceholder height={19} width={120} />
             ) : (
               <React.Fragment>
                 <div>
                   {showAmountSign && <TransactionSign isCredit={isInverted} />}
-                  <Span color="black.700" fontSize="16px">
-                    <FormattedMoneyAmount amount={expense.amount} currency={expense.currency} precision={2} />
-                  </Span>
+                  <FormattedMoneyAmount
+                    amountClassName="font-bold"
+                    amount={expense.amount}
+                    currency={expense.currency}
+                    precision={2}
+                  />
                 </div>
                 {isMultiCurrency && (
-                  <Container color="black.600" fontSize="13px" my={1}>
+                  <div className="my-1 text-sm text-muted-foreground">
                     <AmountWithExchangeRateInfo amount={expense.amountInAccountCurrency} />
-                  </Container>
+                  </div>
                 )}
               </React.Fragment>
             )}
@@ -385,29 +388,43 @@ const ExpenseBudgetItem = ({
               )}
             </Flex>
           )}
-        </Flex>
-      </Flex>
-      <Flex flexWrap="wrap" justifyContent="space-between" alignItems="center" mt={2}>
-        <Box mt={2}>
+        </div>
+      </div>
+      <div className="mt-2 flex flex-wrap items-end justify-end gap-4">
+        <div className="w-full sm:flex sm:w-fit sm:flex-grow">
           {isAdminView || isSubmitterView ? (
-            <Flex>
-              <Box mr={[3, 4]}>
+            <div className="mx-4 grid grid-cols-2 gap-x-6 gap-y-1 sm:mx-0 sm:grid-flow-col sm:gap-y-0">
+              <div>
                 <DetailColumnHeader>
                   <FormattedMessage id="expense.payoutMethod" defaultMessage="payout method" />
                 </DetailColumnHeader>
-                <Box mt="6px">
+                <div className="flex h-6 items-center">
                   <PayoutMethodTypeWithIcon
                     isLoading={isLoading}
-                    type={expense?.payoutMethod?.type}
+                    type={expense.payoutMethod?.type}
                     iconSize="10px"
                     fontSize="11px"
                     fontWeight="normal"
                     color="black.700"
                   />
-                </Box>
-              </Box>
+                </div>
+              </div>
+              {Boolean(expense.reference) && (
+                <div>
+                  <DetailColumnHeader>
+                    <FormattedMessage id="Expense.Reference" defaultMessage="Reference" />
+                  </DetailColumnHeader>
+                  {isLoading ? (
+                    <LoadingPlaceholder height={15} width={90} />
+                  ) : (
+                    <div className="text-[11px]">
+                      <TruncatedTextWithTooltip value={expense.reference} length={10} truncatePosition="middle" />
+                    </div>
+                  )}
+                </div>
+              )}
               {nbAttachedFiles > 0 && (
-                <Box mr={[3, 4]}>
+                <div>
                   <DetailColumnHeader>
                     <FormattedMessage id="Expense.Attachments" defaultMessage="Attachments" />
                   </DetailColumnHeader>
@@ -419,10 +436,11 @@ const ExpenseBudgetItem = ({
                       fontSize="11px"
                       cursor="pointer"
                       buttonSize="tiny"
-                      onClick={() => setShowFilesViewerModal(true)}
+                      onClick={useDrawer ? expandExpense : () => setShowFilesViewerModal(true)}
                       px={2}
                       ml={-2}
                       isBorderless
+                      textAlign="left"
                     >
                       <MaximizeIcon size={10} />
                       &nbsp;&nbsp;
@@ -433,34 +451,14 @@ const ExpenseBudgetItem = ({
                       />
                     </StyledButton>
                   )}
-                </Box>
-              )}
-              {Boolean(expense?.account?.hostAgreements?.totalCount) && (
-                <Box mr={[3, 4]}>
-                  <DetailColumnHeader>
-                    <FormattedMessage defaultMessage="Host Agreements" id="kq2gKV" />
-                  </DetailColumnHeader>
-                  <div className="mt-[7px] text-[11px]">
-                    <StyledLink
-                      as={Link}
-                      color="black.700"
-                      href={`${getDashboardRoute(host, 'host-agreements')}?account=${expense.account.slug}`}
-                    >
-                      <FormattedMessage
-                        defaultMessage="{count, plural, one {# agreement} other {# agreements}}"
-                        id="7FgO5b"
-                        values={{ count: expense.account.hostAgreements.totalCount }}
-                      />
-                    </StyledLink>
-                  </div>
-                </Box>
+                </div>
               )}
               {lastComment && (
-                <Box mr={[3, 4]}>
+                <div>
                   <DetailColumnHeader>
                     <FormattedMessage defaultMessage="Last Comment" id="gSNApa" />
                   </DetailColumnHeader>
-                  <div className="pt-[2px] text-[11px]">
+                  <div className="text-[11px]">
                     <LinkCollective
                       collective={lastComment.fromAccount}
                       className="flex items-center gap-2 font-medium text-slate-700 hover:text-slate-700 hover:underline"
@@ -470,15 +468,34 @@ const ExpenseBudgetItem = ({
                       <Avatar collective={lastComment.fromAccount} radius={24} /> {lastComment.fromAccount.name}
                     </LinkCollective>
                   </div>
-                </Box>
+                </div>
               )}
-            </Flex>
+              {approvedBy && expense.status === ExpenseStatus.APPROVED && !expense.onHold && (
+                <div>
+                  <DetailColumnHeader>
+                    <FormattedMessage defaultMessage="Approved By" id="JavAWD" />
+                  </DetailColumnHeader>
+                  <div className="text-[11px]">
+                    <StackedAvatars
+                      accounts={approvedBy}
+                      imageSize={24}
+                      withHoverCard={{ includeAdminMembership: true }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
           ) : (
-            <Tags expense={expense} canEdit={get(expense, 'permissions.canEditTags', false)} />
+            <div className="mt-2">
+              <Tags expense={expense} canEdit={get(expense, 'permissions.canEditTags', false)} />
+            </div>
           )}
-        </Box>
+        </div>
         {showProcessActions && expense?.permissions && !isExpensePaidOrRejected && (
-          <ButtonsContainer>
+          <div
+            data-cy="expense-actions"
+            className="flex w-full flex-col items-stretch gap-2 self-end sm:float-right sm:w-auto sm:flex-row sm:items-end sm:justify-end"
+          >
             <ProcessExpenseButtons
               host={host}
               isViewingExpenseInHostContext={isViewingExpenseInHostContext}
@@ -487,10 +504,11 @@ const ExpenseBudgetItem = ({
               permissions={expense.permissions}
               buttonProps={{ ...DEFAULT_PROCESS_EXPENSE_BTN_PROPS, mx: 1, py: 2 }}
               onSuccess={onProcess}
+              enableKeyboardShortcuts={selected && hasKeyboardShortcutsEnabled}
             />
-          </ButtonsContainer>
+          </div>
         )}
-      </Flex>
+      </div>
       {showFilesViewerModal && (
         <FilesViewerModal
           files={files}
@@ -525,6 +543,7 @@ ExpenseBudgetItem.propTypes = {
       totalCount: PropTypes.number,
     }),
     type: PropTypes.string.isRequired,
+    reference: PropTypes.string,
     description: PropTypes.string.isRequired,
     status: PropTypes.string.isRequired,
     createdAt: PropTypes.string.isRequired,
@@ -533,6 +552,7 @@ ExpenseBudgetItem.propTypes = {
     amountInAccountCurrency: AmountPropTypeShape,
     currency: PropTypes.string.isRequired,
     permissions: PropTypes.object,
+    onHold: PropTypes.bool,
     accountingCategory: PropTypes.object,
     items: PropTypes.arrayOf(PropTypes.object),
     requiredLegalDocuments: PropTypes.arrayOf(PropTypes.string),
@@ -574,6 +594,14 @@ ExpenseBudgetItem.propTypes = {
         id: PropTypes.string.isRequired,
       }),
     }),
+    approvedBy: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        type: PropTypes.string.isRequired,
+        slug: PropTypes.string.isRequired,
+        name: PropTypes.string.isRequired,
+      }),
+    ),
     lastComment: PropTypes.shape({
       nodes: PropTypes.arrayOf(
         PropTypes.shape({

@@ -68,18 +68,12 @@ export function LegacyColumnRows({ parentRow, currency, showCreditDebit }) {
               <React.Fragment>
                 <td className="text-right font-medium">
                   {debitAmount !== 0 && (
-                    <FormattedMoneyAmount
-                      amountStyles={{ letterSpacing: 0 }}
-                      amount={Math.abs(debitAmount)}
-                      currency={currency}
-                      showCurrencyCode={false}
-                    />
+                    <FormattedMoneyAmount amount={Math.abs(debitAmount)} currency={currency} showCurrencyCode={false} />
                   )}
                 </td>
                 <td className="text-right font-medium">
                   {creditAmount !== 0 && (
                     <FormattedMoneyAmount
-                      amountStyles={{ letterSpacing: 0 }}
                       amount={Math.abs(creditAmount)}
                       currency={currency}
                       showCurrencyCode={false}
@@ -89,12 +83,7 @@ export function LegacyColumnRows({ parentRow, currency, showCreditDebit }) {
               </React.Fragment>
             ) : (
               <td className="text-right font-medium">
-                <FormattedMoneyAmount
-                  amountStyles={{ letterSpacing: 0 }}
-                  amount={legacyColumn.amount}
-                  currency={currency}
-                  showCurrencyCode={false}
-                />
+                <FormattedMoneyAmount amount={legacyColumn.amount} currency={currency} showCurrencyCode={false} />
               </td>
             )}
 

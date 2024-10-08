@@ -1,3 +1,5 @@
+import type LoggedInUser from './LoggedInUser';
+
 /**
  * A map of keys used for preview features.
  */
@@ -8,6 +10,11 @@ export enum PREVIEW_FEATURE_KEYS {
   HOST_REPORTS = 'HOST_REPORTS',
   CROWDFUNDING_REDESIGN = 'CROWDFUNDING_REDESIGN',
   TRANSACTIONS_IMPORTS = 'TRANSACTIONS_IMPORTS',
+  AUTHENTICATED_SSR = 'AUTHENTICATED_SSR',
+  VERCEL_BACKEND = 'VERCEL_BACKEND',
+  KEYBOARD_SHORTCUTS = 'KEYBOARD_SHORTCUTS',
+  SEARCH_COMMAND = 'SEARCH_COMMAND',
+  PLAID_INTEGRATION = 'PLAID_INTEGRATION',
 }
 
 export type PreviewFeature = {
@@ -20,6 +27,9 @@ export type PreviewFeature = {
   env?: Array<'development' | 'test' | 'e2e' | 'staging' | 'production'>; // If set, the feature will be available only in the specified environments.
   alwaysEnableInDev?: boolean; // If true, the feature will be enabled by default in development.
   dependsOn?: PREVIEW_FEATURE_KEYS;
+  setIsEnabled?: (enable: boolean) => void;
+  isEnabled?: () => boolean;
+  hasAccess?: (loggedInUser: LoggedInUser) => boolean;
 };
 
 /**
@@ -46,7 +56,7 @@ export const previewFeatures: PreviewFeature[] = [
     description: 'Improved expense submission flow in Dashboard',
     alwaysEnableInDev: true,
     publicBeta: false,
-    closedBetaAccessFor: ['opencollective', 'design', 'engineering'],
+    closedBetaAccessFor: ['opencollective', 'design', 'engineering', 'opensource', 'europe'],
   },
   {
     key: PREVIEW_FEATURE_KEYS.HOST_REPORTS,
@@ -70,5 +80,59 @@ export const previewFeatures: PreviewFeature[] = [
     title: 'Transactions Imports',
     description: 'A new tool to import batches of transactions.',
     publicBeta: true,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.AUTHENTICATED_SSR,
+    title: 'Authenticated SSR',
+    description: 'Uses cookie based authentication to generate initial page loads on the server',
+    closedBetaAccessFor: ['opencollective', 'design', 'engineering'],
+    publicBeta: false,
+    isEnabled() {
+      return document.cookie.indexOf('enableAuthSsr') !== -1;
+    },
+    setIsEnabled(enabled) {
+      if (!enabled) {
+        document.cookie = 'enableAuthSsr=; Path=/; Max-Age=0';
+      } else {
+        document.cookie = 'enableAuthSsr=1; Path=/; Max-Age=9999999';
+      }
+    },
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.VERCEL_BACKEND,
+    title: 'Vercel Backend',
+    description: 'Uses Vercel as the frontend backend provider',
+    closedBetaAccessFor: ['opencollective', 'design', 'engineering'],
+    publicBeta: false,
+    isEnabled() {
+      return document.cookie.indexOf('backend=vercel') !== -1;
+    },
+    setIsEnabled(enabled) {
+      if (!enabled) {
+        document.cookie = 'backend=; Path=/; Max-Age=0';
+      } else {
+        document.cookie = 'backend=vercel; Path=/; Max-Age=9999999';
+      }
+    },
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.KEYBOARD_SHORTCUTS,
+    title: 'Keyboard Shortcuts',
+    description: 'Use keyboard shortcuts to navigate the expense flow',
+    publicBeta: true,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.SEARCH_COMMAND,
+    publicBeta: false,
+    title: 'Search command menu',
+    description: 'Global search powered by ElasticSearch',
+    hasAccess: user => user?.isRoot,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.PLAID_INTEGRATION,
+    title: 'Bank Account synchronization',
+    description: 'Connect your bank account to import transactions',
+    publicBeta: false,
+    hasAccess: user => user?.isRoot,
   },
 ];

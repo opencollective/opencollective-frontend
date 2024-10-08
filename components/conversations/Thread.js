@@ -12,8 +12,10 @@ import CommentIconLib from '../icons/CommentIcon';
 import StyledButton from '../StyledButton';
 import { withUser } from '../UserProvider';
 
+import { getActivityIcon, isSupportedActivity } from './activity-helpers';
 import Comment from './Comment';
-import ThreadActivity, { getActivityIcon, isSupportedActivity } from './ThreadActivity';
+import SmallThread from './SmallThread';
+import ThreadActivity from './ThreadActivity';
 
 const CommentIcon = styled(CommentIconLib).attrs({
   size: 16,
@@ -151,4 +153,17 @@ Thread.propTypes = {
   getClickedComment: PropTypes.func,
 };
 
-export default React.memo(withUser(withTheme(Thread)));
+const DefaultThreadVariant = React.memo(withUser(withTheme(Thread)));
+
+/**
+ *
+ * @param {import('./types').ThreadPropsWithVariant} props
+ */
+export default function ThreadComponent(props) {
+  // eslint-disable-next-line react/prop-types
+  if (props.variant === 'small') {
+    return <SmallThread {...props} />;
+  }
+
+  return <DefaultThreadVariant {...props} />;
+}

@@ -77,7 +77,6 @@ export function ContributionsList({ account }) {
                       amount={transaction.amount.valueInCents}
                       currency={transaction.amount.currency}
                       showCurrencyCode={false}
-                      amountStyles={{ letterSpacing: 0 }}
                     />
                   </span>
                 </div>

@@ -13,19 +13,22 @@ import { Trash2 as IconTrash } from '@styled-icons/feather/Trash2';
 import { get } from 'lodash';
 import { ArrowRightLeft, FileText } from 'lucide-react';
 import { useRouter } from 'next/router';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { margin } from 'styled-system';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
 import useProcessExpense from '../../lib/expenses/useProcessExpense';
 import useClipboard from '../../lib/hooks/useClipboard';
+import useKeyboardKey, { H, I } from '../../lib/hooks/useKeyboardKey';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getCollectivePageCanonicalURL, getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
 
 import { DashboardContext } from '../dashboard/DashboardContext';
 import { DownloadLegalDocument } from '../legal-documents/DownloadLegalDocument';
 import PopupMenu from '../PopupMenu';
 import StyledButton from '../StyledButton';
+import { useToast } from '../ui/useToast';
 
 import ConfirmProcessExpenseModal from './ConfirmProcessExpenseModal';
 import ExpenseConfirmDeletion from './ExpenseConfirmDeletionModal';
@@ -86,18 +89,42 @@ const ExpenseMoreActionsButton = ({
   onModalToggle,
   onDelete,
   isViewingExpenseInHostContext = false,
+  enableKeyboardShortcuts,
   ...props
 }) => {
   const [processModal, setProcessModal] = React.useState(false);
   const [hasDeleteConfirm, setDeleteConfirm] = React.useState(false);
   const { isCopied, copy } = useClipboard();
   const { account } = React.useContext(DashboardContext);
+  const { toast } = useToast();
+  const intl = useIntl();
+
   const router = useRouter();
   const permissions = expense?.permissions;
 
   const processExpense = useProcessExpense({
     expense,
   });
+
+  useKeyboardKey({
+    keyMatch: H,
+    callback: e => {
+      if (enableKeyboardShortcuts) {
+        e.preventDefault();
+        setProcessModal('HOLD');
+      }
+    },
+  });
+  useKeyboardKey({
+    keyMatch: I,
+    callback: e => {
+      if (enableKeyboardShortcuts) {
+        e.preventDefault();
+        setProcessModal('MARK_AS_INCOMPLETE');
+      }
+    },
+  });
+  const { LoggedInUser } = useLoggedInUser();
 
   const showDeleteConfirmMoreActions = isOpen => {
     setDeleteConfirm(isOpen);
@@ -137,6 +164,20 @@ const ExpenseMoreActionsButton = ({
                 buttonStyle="dangerSecondary"
                 data-cy="spam-button"
                 onClick={async () => {
+                  const isSubmitter = expense.createdByAccount.legacyId === LoggedInUser?.CollectiveId;
+
+                  if (isSubmitter) {
+                    toast({
+                      variant: 'error',
+                      message: intl.formatMessage({
+                        id: 'expense.spam.notAllowed',
+                        defaultMessage: "You can't mark your own expenses as spam",
+                      }),
+                    });
+
+                    return;
+                  }
+
                   setProcessModal('MARK_AS_SPAM');
                   setOpen(false);
                 }}
@@ -322,6 +363,9 @@ ExpenseMoreActionsButton.propTypes = {
         slug: PropTypes.string.isRequired,
       }),
     }),
+    createdByAccount: PropTypes.shape({
+      legacyId: PropTypes.number.isRequired,
+    }),
   }),
   /** Called with an error if anything wrong happens */
   onError: PropTypes.func,
@@ -330,6 +374,7 @@ ExpenseMoreActionsButton.propTypes = {
   onEdit: PropTypes.func,
   linkAction: PropTypes.oneOf(['link', 'copy']),
   isViewingExpenseInHostContext: PropTypes.bool,
+  enableKeyboardShortcuts: PropTypes.bool,
 };
 
 export default ExpenseMoreActionsButton;

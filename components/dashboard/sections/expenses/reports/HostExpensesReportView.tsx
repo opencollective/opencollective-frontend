@@ -179,7 +179,6 @@ export function HostExpensesReportView(props: DashboardSectionProps) {
                                 amount={item.amount.valueInCents}
                                 currency={item.amount.currency}
                                 showCurrencyCode={false}
-                                amountStyles={{ letterSpacing: 0 }}
                               />
                             </div>
                           </td>
@@ -225,12 +224,7 @@ export function HostExpensesReportView(props: DashboardSectionProps) {
                         </Tooltip>
                       </td>
                       <td className="pr-6 text-right font-medium">
-                        <FormattedMoneyAmount
-                          amount={totalAmount}
-                          currency={currency}
-                          showCurrencyCode={false}
-                          amountStyles={{ letterSpacing: 0 }}
-                        />
+                        <FormattedMoneyAmount amount={totalAmount} currency={currency} showCurrencyCode={false} />
                       </td>
                     </tr>
                   </tfoot>

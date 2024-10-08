@@ -2,7 +2,6 @@ import React from 'react';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { cva } from 'class-variance-authority';
 import { Markup } from 'interweave';
-import { merge, pick } from 'lodash';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 // eslint-disable-next-line no-restricted-imports
 import Link from 'next/link';
@@ -16,9 +15,10 @@ import { TierFrequency } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { isTierExpired } from '../../lib/tier-utils';
 
-import Avatar, { StackedAvatars } from '../Avatar';
+import Avatar from '../Avatar';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { useModal } from '../ModalContext';
+import StackedAvatars from '../StackedAvatars';
 import { Button } from '../ui/Button';
 import { Progress } from '../ui/Progress';
 
@@ -79,7 +79,7 @@ const Tiers = ({ account }) => {
                       amount={graphqlAmountValueInCents(minAmount)}
                       frequency={tier.frequency && tier.frequency !== TierFrequency.FLEXIBLE ? tier.frequency : null}
                       currency={currency}
-                      amountStyles={{ fontSize: '24px', lineHeight: '22px', fontWeight: 'bold', color: 'black.900' }}
+                      amountClassName="text-foreground font-bold text-2xl"
                       precision={getPrecisionFromAmount(graphqlAmountValueInCents(minAmount))}
                     />
                     {taxes.length > 0 && ' *'}
@@ -147,7 +147,6 @@ const Goals = ({ account }) => {
                     amount={currentAmount}
                     currency={currency}
                     showCurrencyCode={true}
-                    amountStyles={{ letterSpacing: 0 }}
                     precision={0}
                   />
                 </span>
@@ -163,7 +162,6 @@ const Goals = ({ account }) => {
               amount={goalTarget.amount}
               currency={currency}
               showCurrencyCode={false}
-              amountStyles={{ letterSpacing: 0 }}
               precision={0}
             />{' '}
             {hasYearlyGoal ? <span>per year</span> : hasMonthlyGoal && <span>per month</span>} goal
@@ -320,22 +318,22 @@ export default function Fundraiser({ account }) {
                   allowAttributes
                   transform={node => {
                     // Allow some iframes
-                    const attrs = [].slice.call(node.attributes);
-                    if (node.tagName === 'iframe') {
+                    if (node.tagName.toLowerCase() === 'iframe') {
                       const src = node.getAttribute('src');
                       const parsedUrl = new URL(src);
                       const hostname = parsedUrl.hostname;
                       if (['youtube-nocookie.com', 'www.youtube-nocookie.com', 'anchor.fm'].includes(hostname)) {
-                        const attributes = merge({}, ...attrs.map(({ name, value }) => ({ [name]: value })));
                         return (
                           <iframe
-                            {...pick(attributes, ['width', 'height', 'frameborder', 'allowfullscreen'])}
-                            title={attributes.title || 'Embed content'}
+                            width={node.getAttribute('width')}
+                            height={node.getAttribute('height')}
+                            allowFullScreen={node.getAttribute('allowfullscreen') as any}
+                            title={node.getAttribute('title') || 'Embed content'}
                             src={src}
                           />
                         );
                       }
-                    } else if (node.tagName === 'a') {
+                    } else if (node.tagName.toLowerCase() === 'a') {
                       // Open links in new tab
                       node.setAttribute('target', '_blank');
                       node.setAttribute('rel', 'noopener noreferrer');

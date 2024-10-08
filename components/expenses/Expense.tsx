@@ -4,7 +4,7 @@ import { useMutation } from '@apollo/client';
 import { Undo } from '@styled-icons/fa-solid/Undo';
 import { themeGet } from '@styled-system/theme-get';
 import dayjs from 'dayjs';
-import { cloneDeep, debounce, get, includes, sortBy, uniqBy, update } from 'lodash';
+import { cloneDeep, debounce, get, includes, orderBy, uniqBy, update } from 'lodash';
 import { FilePenLine } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { createPortal } from 'react-dom';
@@ -18,8 +18,10 @@ import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/erro
 import { getFilesFromExpense, getPayoutProfiles } from '../../lib/expenses';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
+import useKeyboardKey, { E, ESCAPE_KEY } from '../../lib/hooks/useKeyboardKey';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
+import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { itemHasOCR } from './lib/ocr';
 
 import ConfirmationModal from '../ConfirmationModal';
@@ -60,7 +62,7 @@ const getVariableFromProps = props => {
     .toISOString();
   return {
     legacyExpenseId: props.legacyExpenseId,
-    draftKey: props.draftKey,
+    draftKey: props.draftKey || null,
     totalPaidExpensesDateFrom: firstOfCurrentYear,
   };
 };
@@ -114,6 +116,8 @@ function Expense(props) {
     isRefetchingDataForUser,
     legacyExpenseId,
     isDrawer,
+    enableKeyboardShortcuts,
+    onClose,
   } = props;
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const intl = useIntl();
@@ -210,17 +214,36 @@ function Expense(props) {
     setState(state => ({ ...state, error }));
   }, [error]);
 
+  useKeyboardKey({
+    keyMatch: E,
+    callback: e => {
+      if (props.enableKeyboardShortcuts && state.status !== PAGE_STATUS.EDIT) {
+        e.preventDefault();
+        onEditBtnClick();
+      }
+    },
+  });
+
+  useKeyboardKey({
+    keyMatch: ESCAPE_KEY,
+    callback: e => {
+      if (props.isDrawer && state.status !== PAGE_STATUS.EDIT) {
+        e.preventDefault();
+        onClose?.();
+      }
+    },
+  });
+
   const [editExpense] = useMutation(editExpenseMutation, {
     context: API_V2_CONTEXT,
   });
 
   const expenseTopRef = useRef(null);
   const { status, editedExpense } = state;
+  const { viewport } = useWindowResize(null, { useMinWidth: true });
+  const isDesktop = viewport === VIEWPORTS.LARGE;
 
-  const expense = cloneDeep(data?.expense);
-  if (expense && data?.expensePayeeStats?.payee?.stats) {
-    expense.payee.stats = data.expensePayeeStats?.payee?.stats;
-  }
+  const expense = data?.expense;
   const loggedInAccount = data?.loggedInAccount;
   const collective = expense?.account;
   const host = expense?.host ?? collective?.host;
@@ -236,16 +259,17 @@ function Expense(props) {
   const payoutProfiles = getPayoutProfiles(loggedInAccount);
   const canEditPayoutMethod = !expense || isDraft || expense.permissions.canSeePayoutMethodPrivateDetails;
 
+  const inDrawer = Boolean(drawerActionsContainer);
+
   const threadItems = React.useMemo(() => {
     const comments = expense?.comments?.nodes || [];
     const activities = expense?.activities || [];
-    return sortBy([...comments, ...activities], 'createdAt');
-  }, [expense]);
+    return orderBy([...comments, ...activities], 'createdAt', 'asc');
+  }, [expense, inDrawer]);
 
   const isEditing = status === PAGE_STATUS.EDIT || status === PAGE_STATUS.EDIT_SUMMARY;
   const showTaxFormMsg = includes(expense?.requiredLegalDocuments, 'US_TAX_FORM') && !isEditing;
   const isEditingExistingExpense = isEditing && expense !== undefined;
-  const inDrawer = Boolean(drawerActionsContainer);
 
   const handlePolling = debounce(() => {
     if (state.isPollingEnabled) {
@@ -383,6 +407,11 @@ function Expense(props) {
   };
 
   const files = React.useMemo(() => getFilesFromExpense(expense, intl), [expense]);
+
+  useEffect(() => {
+    const showFilesViewerModal = isDrawer && isDesktop && files?.length > 0;
+    setState(state => ({ ...state, showFilesViewerModal }));
+  }, [files, isDesktop, isDrawer]);
 
   const confirmSaveButtons = (
     <Flex flex={1} flexWrap="wrap" gridGap={[2, 3]}>
@@ -569,6 +598,7 @@ function Expense(props) {
             showProcessButtons
             drawerActionsContainer={drawerActionsContainer}
             openFileViewer={openFileViewer}
+            enableKeyboardShortcuts={enableKeyboardShortcuts}
           />
 
           {status !== PAGE_STATUS.EDIT_SUMMARY && (
@@ -703,58 +733,84 @@ function Expense(props) {
             />
           </Box>
 
-          <Box mb={3} pt={3}>
-            {loading ? (
-              <LoadingPlaceholder width="100%" height="44px" />
-            ) : expense ? (
-              <Thread
-                collective={collective}
-                hasMore={expense.comments?.totalCount > threadItems.length}
-                items={threadItems}
-                fetchMore={fetchMoreComments}
-                onCommentDeleted={onCommentDeleted}
-                loading={loading}
-                getClickedComment={setReplyingToComment}
-              />
-            ) : null}
-          </Box>
+          {!inDrawer ? (
+            <React.Fragment>
+              <Box mb={3} pt={3}>
+                {loading ? (
+                  <LoadingPlaceholder width="100%" height="44px" />
+                ) : expense ? (
+                  <Thread
+                    collective={collective}
+                    hasMore={expense.comments?.totalCount > threadItems.length}
+                    items={threadItems}
+                    fetchMore={fetchMoreComments}
+                    onCommentDeleted={onCommentDeleted}
+                    loading={loading}
+                    getClickedComment={setReplyingToComment}
+                  />
+                ) : null}
+              </Box>
 
-          {expense?.permissions.canComment && (
-            <Flex mt="40px">
-              <Box display={['none', null, 'block']} flex="0 0" p={3}>
-                <CommentIcon size={24} color="lightgrey" />
-              </Box>
-              <Box flex="1 1" maxWidth={[null, null, 'calc(100% - 56px)']}>
-                <CommentForm
-                  replyingToComment={replyingToComment}
-                  id="new-comment-on-expense"
-                  ExpenseId={expense && expense.id}
-                  disabled={!expense}
-                  onSuccess={onCommentAdded}
-                  canUsePrivateNote={expense.permissions.canUsePrivateNote}
-                  defaultType={expense.onHold ? CommentType.PRIVATE_NOTE : CommentType.COMMENT}
-                />
-              </Box>
-            </Flex>
+              {expense?.permissions.canComment && (
+                <Flex mt="40px">
+                  <Box display={['none', null, 'block']} flex="0 0" p={3}>
+                    <CommentIcon size={24} color="lightgrey" />
+                  </Box>
+                  <Box flex="1 1" maxWidth={[null, null, 'calc(100% - 56px)']}>
+                    <CommentForm
+                      replyingToComment={replyingToComment}
+                      id="new-comment-on-expense"
+                      ExpenseId={expense && expense.id}
+                      disabled={!expense}
+                      onSuccess={onCommentAdded}
+                      canUsePrivateNote={expense.permissions.canUsePrivateNote}
+                      defaultType={expense.onHold ? CommentType.PRIVATE_NOTE : CommentType.COMMENT}
+                    />
+                  </Box>
+                </Flex>
+              )}
+            </React.Fragment>
+          ) : (
+            <Thread
+              variant="small"
+              items={threadItems}
+              collective={host}
+              hasMore={expense?.comments?.totalCount > threadItems.length}
+              fetchMore={fetchMoreComments}
+              onCommentDeleted={onCommentDeleted}
+              loading={loading}
+              CommentEntity={{
+                ExpenseId: expense && expense.id,
+              }}
+              onCommentCreated={onCommentAdded}
+              canComment={expense?.permissions.canComment}
+              canUsePrivateNote={expense?.permissions?.canUsePrivateNote}
+              defaultType={expense?.onHold ? CommentType.PRIVATE_NOTE : CommentType.COMMENT}
+            />
           )}
         </Fragment>
       )}
 
-      {state.showFilesViewerModal && (
-        <FilesViewerModal
-          allowOutsideInteraction={isDrawer}
-          files={files}
-          parentTitle={intl.formatMessage(
-            {
-              defaultMessage: 'Expense #{expenseId} attachment',
-              id: 'At2m8o',
-            },
-            { expenseId: expense.legacyId },
-          )}
-          openFileUrl={openUrl}
-          onClose={() => setState(state => ({ ...state, showFilesViewerModal: false }))}
-        />
-      )}
+      {state.showFilesViewerModal &&
+        createPortal(
+          <FilesViewerModal
+            allowOutsideInteraction={isDrawer}
+            files={files}
+            parentTitle={intl.formatMessage(
+              {
+                defaultMessage: 'Expense #{expenseId} attachment',
+                id: 'At2m8o',
+              },
+              { expenseId: expense.legacyId },
+            )}
+            openFileUrl={openUrl}
+            onClose={
+              isDrawer && isDesktop ? onClose : () => setState(state => ({ ...state, showFilesViewerModal: false }))
+            }
+            hideCloseButton={isDrawer && isDesktop}
+          />,
+          document.body,
+        )}
     </Box>
   );
 }
@@ -773,9 +829,11 @@ Expense.propTypes = {
   fetchMore: PropTypes.func,
   startPolling: PropTypes.func,
   stopPolling: PropTypes.func,
+  onClose: PropTypes.func,
   isRefetchingDataForUser: PropTypes.bool,
   drawerActionsContainer: PropTypes.object,
   isDrawer: PropTypes.bool,
+  enableKeyboardShortcuts: PropTypes.bool,
 };
 
 export default Expense;

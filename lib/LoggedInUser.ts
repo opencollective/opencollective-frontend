@@ -6,7 +6,7 @@ import type { GraphQLV1Collective } from './custom_typings/GraphQLV1Collective';
 import {
   type Account,
   type AccountWithParent,
-  type Comment,
+  type CommentFieldsFragment,
   MemberRole,
   type Update,
 } from './graphql/types/v2/graphql';
@@ -111,7 +111,7 @@ class LoggedInUser {
    * - creator of the comment
    * - is admin or host of the collective
    */
-  canEditComment(comment: Comment) {
+  canEditComment(comment: CommentFieldsFragment) {
     if (!comment) {
       return false;
     }
@@ -230,6 +230,10 @@ class LoggedInUser {
       return false;
     }
 
+    if ('isEnabled' in feature && typeof feature.isEnabled === 'function') {
+      return feature.isEnabled();
+    }
+
     const enabledByDefault = feature.enabledByDefaultFor?.some(
       slug => slug === '*' || this.hasRole([MemberRole.ADMIN, MemberRole.MEMBER], { slug }),
     );
@@ -263,9 +267,15 @@ class LoggedInUser {
       );
       const isEnabledInEnv = !feature.env || (feature.env as string[]).includes(process.env.OC_ENV);
       const isEnabledByDevEnv = feature.alwaysEnableInDev && ['development', 'staging'].includes(process.env.NODE_ENV);
+      const hasAccess = feature.hasAccess?.(this);
       return (
         isEnabledInEnv &&
-        (isEnabledByDevEnv || feature.publicBeta || userHaveSetting || hasClosedBetaAccess || enabledByDefault)
+        (isEnabledByDevEnv ||
+          feature.publicBeta ||
+          userHaveSetting ||
+          hasClosedBetaAccess ||
+          enabledByDefault ||
+          hasAccess)
       );
     });
 
