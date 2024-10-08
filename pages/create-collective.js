@@ -10,7 +10,8 @@ import CreateCollective from '../components/create-collective';
 import ErrorPage from '../components/ErrorPage';
 import Page from '../components/Page';
 import { withUser } from '../components/UserProvider';
-
+import { getGoogleMapsScriptUrl } from '../lib/google-maps';
+import Script from 'next/script';
 const createCollectiveHostQuery = gql`
   query CreateCollectiveHost($slug: String!) {
     host(slug: $slug) {
@@ -53,15 +54,23 @@ const CreateCollectivePage = ({ loadingLoggedInUser, LoggedInUser }) => {
   return (
     <Page showFooter={Boolean(LoggedInUser)}>
       <CreateCollective host={data && data.host} />
+      <Script
+        src={getGoogleMapsScriptUrl()}
+        strategy="lazyOnload" // Loads the script lazily on client-side
+        onLoad={() => {
+          console.log('Google Maps script loaded successfully');
+        }}
+      />
     </Page>
   );
 };
 
-CreateCollectivePage.getInitialProps = () => {
-  return {
-    scripts: { googleMaps: true }, // To enable location autocomplete
-  };
-};
+// CreateCollectivePage.getInitialProps = () => {
+//   const googleMapsUrl = getGoogleMapsScriptUrl();
+//   return {
+//     scripts: { googleMaps: true }, // To enable location autocomplete
+//   };
+// };
 
 CreateCollectivePage.propTypes = {
   loadingLoggedInUser: PropTypes.bool.isRequired,

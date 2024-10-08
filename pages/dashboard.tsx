@@ -34,6 +34,8 @@ import NotificationBar from '../components/NotificationBar';
 import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { TwoFactorAuthRequiredMessage } from '../components/TwoFactorAuthRequiredMessage';
+import Script from 'next/script';
+import { getGoogleMapsScriptUrl } from '../lib/google-maps';
 
 const messages = defineMessages({
   collectiveIsArchived: {
@@ -293,15 +295,22 @@ const DashboardPage = () => {
         </Page>
         <Footer />
       </div>
+      <Script
+        src={getGoogleMapsScriptUrl()}
+        strategy="lazyOnload" // Loads the script lazily on client-side
+        onLoad={() => {
+          console.log('Google Maps script loaded successfully');
+        }}
+      />
     </DashboardContext.Provider>
   );
 };
 
-DashboardPage.getInitialProps = () => {
-  return {
-    scripts: { googleMaps: true }, // TODO: This should be enabled only for events
-  };
-};
+// DashboardPage.getInitialProps = () => {
+//   return {
+//     scripts: { googleMaps: true }, // TODO: This should be enabled only for events
+//   };
+// };
 
 // next.js export
 // ts-unused-exports:disable-next-line

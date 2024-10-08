@@ -10,9 +10,10 @@ require('./env');
 const { REWRITES } = require('./rewrites');
 
 const nextConfig = {
+  swcMinify: false, // Disable SWC minification
+  productionBrowserSourceMaps: true,
   eslint: { ignoreDuringBuilds: true },
   useFileSystemPublicRoutes: true,
-  productionBrowserSourceMaps: true,
   typescript: {
     ignoreBuildErrors: true,
   },
