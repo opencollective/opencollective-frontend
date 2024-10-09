@@ -1,7 +1,7 @@
 {
   "++1FQ+": "הגדרת תזכורת לגבי כרטיס אשראי שתוקפו עומד לפוג עבור חשבון <Account></Account>",
   "+5Kafe": "Expense Details",
-  "+5KHJy": "Delete token",
+  "+5KHJy": "מחק טוקן",
   "+5TQLy": "<Individual></Individual> requested re-approval of <Expense>{expenseDescription}</Expense>",
   "+5Vgek": "Vendor's legal name",
   "+5zXCv": "Your contributors will be notified with a link to easily resume their contributions. We will also send a few periodic reminders, in case they miss the first email.",
@@ -1395,7 +1395,7 @@
   "Expense.JoinAndSubmit": "הצטרפות והגשה",
   "expense.markAsPaid": "סימון כשולם",
   "Expense.MarkAsSpamLabel": "Why are you marking this expense as spam?",
-  "Expense.MarkAsSpamWarning": "זה ימנע ממבקש התשלום להזין דרישות חדשות. להמשיך בכל-זאת?",
+  "Expense.MarkAsSpamWarning": "This will prevent the submitter account to post new expenses.",
   "Expense.markAsUnpaid": "סימון הוצאה כלא-שולמה",
   "expense.markAsUnpaid.btn": "סימון כלא-שולם",
   "Expense.markAsUnpaid.details": "הסכום יועבר חזרה למאזן של הקבוצה.",

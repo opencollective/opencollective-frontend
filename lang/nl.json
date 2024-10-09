@@ -1393,7 +1393,7 @@
   "Expense.InviteIsOnItsWay.Description": "An invitation to submit this expense has been sent to {email}. Once they confirm and finish the process, it will appear on the expenses list.",
   "Expense.InvoiceItems": "Invoice items",
   "Expense.JoinAndSubmit": "Join and Submit",
-  "expense.markAsPaid": "Mark as paid",
+  "expense.markAsPaid": "Markeren als betaald",
   "Expense.MarkAsSpamLabel": "Why are you marking this expense as spam?",
   "Expense.MarkAsSpamWarning": "This will prevent the submitter account to post new expenses.",
   "Expense.markAsUnpaid": "Mark expense as unpaid",
