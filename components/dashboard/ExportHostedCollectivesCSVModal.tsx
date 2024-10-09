@@ -9,19 +9,16 @@ import type { MouseEventHandler } from 'react';
 import { FormattedMessage } from 'react-intl';
 import slugify from 'slugify';
 
-import { getEnvVar } from '../../lib/env-utils';
-import type { CSVField } from '../../lib/export-csv/transactions-csv';
 import {
-  AVERAGE_TRANSACTIONS_PER_MINUTE,
+  AVERAGE_ROWS_PER_MINUTE,
   FIELD_OPTIONS,
-  FieldLabels,
   FieldOptionsLabels,
   FIELDS,
   GROUP_FIELDS,
   GROUPS,
-  HOST_OMITTED_FIELDS,
   PLATFORM_PRESETS,
-} from '../../lib/export-csv/transactions-csv';
+} from '../../lib/export-csv/hosted-collectives-csv';
+import type { CSVField } from '../../lib/export-csv/transactions-csv';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type {
   Account,
@@ -31,7 +28,7 @@ import type {
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import type { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
-import { cn, parseToBoolean } from '../../lib/utils';
+import { cn } from '../../lib/utils';
 
 import ConfirmationModal from '../ConfirmationModal';
 import { InfoTooltipIcon } from '../InfoTooltipIcon';
@@ -42,7 +39,6 @@ import { Collapsible, CollapsibleContent } from '../ui/Collapsible';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../ui/Dialog';
 import { Input } from '../ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
-import { Switch } from '../ui/Switch';
 
 const env = process.env.OC_ENV;
 
@@ -54,88 +50,23 @@ const TABS = Object.keys(GROUP_FIELDS).map(group => ({
   count: GROUP_FIELDS[group].length,
 }));
 
-const makeUrl = ({ account, isHostReport, queryFilter, flattenTaxesAndPaymentProcessorFees, fields }) => {
-  const url = isHostReport
-    ? new URL(`${process.env.REST_URL}/v2/${account?.slug}/hostTransactions.csv`)
-    : new URL(`${process.env.REST_URL}/v2/${account?.slug}/transactions.csv`);
-
-  if (isHostReport) {
-    if (queryFilter.values.account) {
-      url.searchParams.set('account', queryFilter.values.account);
-    }
-    if (queryFilter.values.excludeAccount) {
-      url.searchParams.set('excludeAccount', queryFilter.values.excludeAccount);
-    }
-    if (queryFilter.values.excludeHost) {
-      url.searchParams.set('includeHost', '0');
-    }
-  }
-
-  url.searchParams.set('includeGiftCardTransactions', '1');
-  url.searchParams.set('includeIncognitoTransactions', '1');
-  url.searchParams.set('includeChildrenTransactions', '1');
-
-  if (queryFilter.values.kind) {
-    url.searchParams.set('kind', queryFilter.values.kind.join(','));
-  }
-
-  if (queryFilter.values.amount) {
-    const toAmountStr = ({ gte, lte }) => (lte ? `${gte}-${lte}` : `${gte}+`);
-    url.searchParams.set('amount', toAmountStr(queryFilter.values.amount));
-  }
-
-  if (queryFilter.values.paymentMethodService) {
-    url.searchParams.set('paymentMethodService', queryFilter.values.paymentMethodService.join(','));
-  }
-
-  if (queryFilter.values.paymentMethodType) {
-    url.searchParams.set('paymentMethodType', queryFilter.values.paymentMethodType.join(','));
-  }
+const makeUrl = ({ account, queryFilter, fields }) => {
+  const url = new URL(`${process.env.REST_URL}/v2/${account?.slug}/hosted-collectives.csv`);
 
   if (queryFilter.values.type) {
     url.searchParams.set('type', queryFilter.values.type);
   }
-
+  if (queryFilter.values.currencies) {
+    url.searchParams.set('currencies', queryFilter.values.currencies);
+  }
   if (queryFilter.values.searchTerm) {
     url.searchParams.set('searchTerm', queryFilter.values.searchTerm);
   }
-
-  if (queryFilter.values.date) {
-    if (queryFilter.variables.dateFrom) {
-      url.searchParams.set('dateFrom', queryFilter.variables.dateFrom);
-    }
-    if (queryFilter.variables.dateTo) {
-      url.searchParams.set('dateTo', queryFilter.variables.dateTo);
-    }
+  if (!isNil(queryFilter.variables.isFrozen)) {
+    url.searchParams.set('isFrozen', queryFilter.variables.isFrozen ? '1' : '0');
   }
-
-  if (!isNil(queryFilter.values.isRefund)) {
-    url.searchParams.set('isRefund', queryFilter.values.isRefund ? '1' : '0');
-  }
-
-  if (queryFilter.values.orderId) {
-    url.searchParams.set('orderId', queryFilter.values.orderId);
-  }
-
-  if (queryFilter.values.expenseId) {
-    url.searchParams.set('expenseId', queryFilter.values.expenseId);
-  }
-
-  if (queryFilter.values.merchantId) {
-    url.searchParams.set('merchantId', queryFilter.values.merchantId);
-  }
-
-  if (queryFilter.values.accountingCategory) {
-    url.searchParams.set('accountingCategory', queryFilter.values.accountingCategory.join(','));
-  }
-
-  if (queryFilter.values.group) {
-    url.searchParams.set('group', queryFilter.values.group.join(','));
-  }
-
-  if (flattenTaxesAndPaymentProcessorFees) {
-    url.searchParams.set('flattenPaymentProcessorFee', '1');
-    url.searchParams.set('flattenTax', '1');
+  if (!isNil(queryFilter.variables.isUnhosted)) {
+    url.searchParams.set('isUnhosted', queryFilter.variables.isUnhosted ? '1' : '0');
   }
 
   if (!isEmpty(fields)) {
@@ -164,7 +95,7 @@ const FieldTag = ({ id, dragElement, canDrag }: { id: string; dragElement?: bool
   const style = {
     transform: CSS.Translate.toString(transform),
   };
-  const field = FIELDS.find(f => f.id === id) || FieldLabels[id];
+  const field = FIELDS.find(f => f.id === id);
 
   return (
     <button
@@ -203,7 +134,7 @@ const editAccountSettingsMutation = gql`
   }
 `;
 
-type ExportTransactionsCSVModalProps = {
+type ExportHostedCollectivesCSVModalProps = {
   open?: boolean;
   setOpen?: (open: boolean) => void;
   queryFilter: useQueryFilterReturnType<any, TransactionsPageQueryVariables | HostReportsPageQueryVariables>;
@@ -212,19 +143,18 @@ type ExportTransactionsCSVModalProps = {
   trigger?: React.ReactNode;
 };
 
-const ExportTransactionsCSVModal = ({
+const ExportHostedCollectivesCSVModal = ({
   open,
   setOpen,
   account,
   trigger,
   queryFilter,
   isHostReport,
-}: ExportTransactionsCSVModalProps) => {
+}: ExportHostedCollectivesCSVModalProps) => {
   const [downloadUrl, setDownloadUrl] = React.useState<string | null>('#');
   const [preset, setPreset] = React.useState<FIELD_OPTIONS | string>(FIELD_OPTIONS.DEFAULT);
   const [fields, setFields] = React.useState([]);
   const [draggingTag, setDraggingTag] = React.useState<string | null>(null);
-  const [flattenTaxesAndPaymentProcessorFees, setFlattenTaxesAndPaymentProcessorFees] = React.useState(false);
   const [tab, setTab] = React.useState(Object.keys(GROUPS)[0]);
   const [presetName, setPresetName] = React.useState('');
   const [isEditingPreset, setIsEditingPreset] = React.useState(false);
@@ -237,8 +167,8 @@ const ExportTransactionsCSVModal = ({
 
   const customFields = React.useMemo(
     () =>
-      updateSettingsData?.editAccountSetting?.settings?.exportedTransactionsFieldSets ||
-      account?.settings?.exportedTransactionsFieldSets ||
+      updateSettingsData?.editAccountSetting?.settings?.exportedHostedCollectivesFieldSets ||
+      account?.settings?.exportedHostedCollectivesFieldSets ||
       {},
     [updateSettingsData, account],
   );
@@ -250,7 +180,7 @@ const ExportTransactionsCSVModal = ({
   } = useAsyncCall(async () => {
     const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
     if (accessToken) {
-      const url = makeUrl({ account, isHostReport, queryFilter, flattenTaxesAndPaymentProcessorFees, fields });
+      const url = makeUrl({ account, queryFilter, fields });
       const response = await fetch(url, {
         method: 'HEAD',
         headers: {
@@ -289,12 +219,6 @@ const ExportTransactionsCSVModal = ({
       } else {
         setPresetName('');
       }
-
-      if (!isNil(selectedSet.flattenTaxesAndPaymentProcessorFees)) {
-        setFlattenTaxesAndPaymentProcessorFees(selectedSet.flattenTaxesAndPaymentProcessorFees);
-      } else {
-        setFlattenTaxesAndPaymentProcessorFees(false);
-      }
     }
   }, [presetOptions, preset]);
 
@@ -314,8 +238,8 @@ const ExportTransactionsCSVModal = ({
             // I'm enforcing SameSite and Domain in production to prevent CSRF.
             `authorization="Bearer ${accessToken}";path=/;SameSite=strict;max-age=120;domain=opencollective.com;secure`;
     }
-    setDownloadUrl(makeUrl({ account, isHostReport, queryFilter, flattenTaxesAndPaymentProcessorFees, fields }));
-  }, [fields, flattenTaxesAndPaymentProcessorFees, queryFilter, account, isHostReport, setDownloadUrl]);
+    setDownloadUrl(makeUrl({ account, queryFilter, fields }));
+  }, [fields, queryFilter, account, isHostReport, setDownloadUrl]);
 
   const handleFieldSwitch = React.useCallback(
     ({ name, checked }) => {
@@ -327,20 +251,6 @@ const ExportTransactionsCSVModal = ({
     },
     [fields],
   );
-
-  /** Handle existing "Tax and PaymentProcessorFee" columns toggle.
-   * When setting it to true, we'll make sure that both columns are present in the selected fields, adding the missing ones if they're not.
-   * When setting it to false, we'll enforce whatever is set in the preset.
-   * */
-  const handleTaxAndPaymentProcessorFeeSwitch = checked => {
-    setFlattenTaxesAndPaymentProcessorFees(checked);
-    if (checked) {
-      setFields(uniq([...fields, 'paymentProcessorFee', 'taxAmount']));
-    } else {
-      const selectedSet = PLATFORM_PRESETS[preset] || presetOptions.find(option => option.value === preset);
-      setFields(selectedSet?.fields || []);
-    }
-  };
 
   const handleGroupSwitch = ({ name, checked }) => {
     if (checked) {
@@ -387,8 +297,8 @@ const ExportTransactionsCSVModal = ({
     await submitEditSettings({
       variables: {
         account: { slug: account?.slug },
-        key: `exportedTransactionsFieldSets.${key}`,
-        value: { name: presetName, fields, flattenTaxesAndPaymentProcessorFees },
+        key: `exportedHostedCollectivesFieldSets.${key}`,
+        value: { name: presetName, fields },
       },
     });
     setIsEditingPreset(false);
@@ -400,7 +310,7 @@ const ExportTransactionsCSVModal = ({
     await submitEditSettings({
       variables: {
         account: { slug: account?.slug },
-        key: `exportedTransactionsFieldSets`,
+        key: `exportedHostedCollectivesFieldSets`,
         value: omit(customFields, [key]),
       },
     });
@@ -414,7 +324,7 @@ const ExportTransactionsCSVModal = ({
   };
 
   const isAboveRowLimit = exportedRows > 100e3;
-  const expectedTimeInMinutes = Math.round((exportedRows * 1.1) / AVERAGE_TRANSACTIONS_PER_MINUTE);
+  const expectedTimeInMinutes = Math.round((exportedRows * 1.1) / AVERAGE_ROWS_PER_MINUTE);
   const disabled = isAboveRowLimit || isFetchingRows || isSavingSet || isEmpty(fields);
   const isWholeTabSelected = GROUP_FIELDS[tab]?.every(f => fields.includes(f));
   const canEditFields = preset === FIELD_OPTIONS.NEW_PRESET || isEditingPreset;
@@ -426,7 +336,7 @@ const ExportTransactionsCSVModal = ({
         <DialogContent className="gap-2 overflow-hidden p-0 md:max-w-4xl">
           <DialogHeader className="px-4 pt-6 sm:px-8">
             <DialogTitle className="text-xl font-bold">
-              <FormattedMessage id="ExportTransactionsCSVModal.Title" defaultMessage="Export Transactions" />
+              <FormattedMessage id="ExportHostedCollectivesCSVModal.Title" defaultMessage="Export Hosted Collectives" />
             </DialogTitle>
           </DialogHeader>
           <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-4 pb-4 pt-6 sm:px-8">
@@ -511,28 +421,26 @@ const ExportTransactionsCSVModal = ({
                     <div className="gap-2 sm:columns-2">
                       {React.useMemo(
                         () =>
-                          GROUP_FIELDS[tab]
-                            .filter(fieldId => !(isHostReport && HOST_OMITTED_FIELDS.includes(fieldId)))
-                            .map(fieldId => {
-                              const field = FIELDS.find(f => f.id === fieldId);
-                              return (
-                                <div key={fieldId} className="mb-2 flex items-center gap-1">
-                                  <Checkbox
-                                    id={fieldId}
-                                    checked={fields.includes(fieldId)}
-                                    onCheckedChange={checked => handleFieldSwitch({ name: fieldId, checked })}
-                                  />
-                                  <label
-                                    htmlFor={fieldId}
-                                    className="ml-1 cursor-pointer text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                  >
-                                    {field?.label || fieldId}
-                                  </label>
-                                  {field?.tooltip && <InfoTooltipIcon>{field.tooltip}</InfoTooltipIcon>}
-                                </div>
-                              );
-                            }),
-                        [fields, tab, isHostReport, handleFieldSwitch],
+                          GROUP_FIELDS[tab].map(fieldId => {
+                            const field = FIELDS.find(f => f.id === fieldId);
+                            return (
+                              <div key={fieldId} className="mb-2 flex items-center gap-1">
+                                <Checkbox
+                                  id={fieldId}
+                                  checked={fields.includes(fieldId)}
+                                  onCheckedChange={checked => handleFieldSwitch({ name: fieldId, checked })}
+                                />
+                                <label
+                                  htmlFor={fieldId}
+                                  className="ml-1 cursor-pointer text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                >
+                                  {field?.label || fieldId}
+                                </label>
+                                {field?.tooltip && <InfoTooltipIcon>{field.tooltip}</InfoTooltipIcon>}
+                              </div>
+                            );
+                          }),
+                        [fields, tab, handleFieldSwitch],
                       )}
                     </div>
                   </div>
@@ -599,23 +507,6 @@ const ExportTransactionsCSVModal = ({
                 )}
               </div>
             </div>
-            {parseToBoolean(getEnvVar('LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES')) && (
-              <div className="flex flex-row items-center gap-2">
-                <Switch
-                  checked={flattenTaxesAndPaymentProcessorFees}
-                  onCheckedChange={handleTaxAndPaymentProcessorFeeSwitch}
-                />
-                <p className="text-sm">
-                  <FormattedMessage defaultMessage="Export taxes and payment processor fees as columns" id="ZNzyMo" />
-                </p>
-                <InfoTooltipIcon>
-                  <FormattedMessage
-                    defaultMessage="Before 2024 payment processor fees and taxes were columns in transaction records. Since January 2024 they are separate transactions. Enable this option to transform separate payment processor fees and tax transactions into columns in the export."
-                    id="frVonU"
-                  />
-                </InfoTooltipIcon>
-              </div>
-            )}
             {isAboveRowLimit && (
               <div className="flex flex-col gap-4 rounded-lg border border-solid border-red-600 bg-red-50 px-6 py-4">
                 <p className="font-bold">
@@ -623,8 +514,8 @@ const ExportTransactionsCSVModal = ({
                 </p>
                 <p className="text-sm">
                   <FormattedMessage
-                    defaultMessage="Select a different set of filters to enable the transactions export to work."
-                    id="8Q0YZb"
+                    defaultMessage="Select a different set of filters to enable the export to work."
+                    id="YesI6+"
                   />
                 </p>
               </div>
@@ -702,4 +593,4 @@ const ExportTransactionsCSVModal = ({
   );
 };
 
-export default ExportTransactionsCSVModal;
+export default ExportHostedCollectivesCSVModal;

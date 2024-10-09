@@ -3,6 +3,8 @@ import React from 'react';
 import { flatten, isEmpty, omit } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
+import { simpleDateToISOString } from '../lib/date-utils';
+import { getEnvVar } from '../lib/env-utils';
 import {
   AVERAGE_TRANSACTIONS_PER_MINUTE,
   DEFAULT_FIELDS_2023 as DEFAULT_FIELDS,
@@ -12,9 +14,7 @@ import {
   FieldOptionsLabels,
   HOST_OMITTED_FIELDS,
   LEGACY_FIELD_OPTIONS as FIELD_OPTIONS,
-} from '../lib/csv';
-import { simpleDateToISOString } from '../lib/date-utils';
-import { getEnvVar } from '../lib/env-utils';
+} from '../lib/export-csv/transactions-csv';
 import type { Account } from '../lib/graphql/types/v2/graphql';
 import { useAsyncCall } from '../lib/hooks/useAsyncCall';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
