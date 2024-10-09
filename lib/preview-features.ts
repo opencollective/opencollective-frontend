@@ -15,6 +15,7 @@ export enum PREVIEW_FEATURE_KEYS {
   KEYBOARD_SHORTCUTS = 'KEYBOARD_SHORTCUTS',
   SEARCH_COMMAND = 'SEARCH_COMMAND',
   PLAID_INTEGRATION = 'PLAID_INTEGRATION',
+  EXPORT_COLLECTIVES = 'EXPORT_COLLECTIVES',
 }
 
 export type PreviewFeature = {
@@ -134,5 +135,19 @@ export const previewFeatures: PreviewFeature[] = [
     description: 'Connect your bank account to import transactions',
     publicBeta: false,
     hasAccess: user => user?.isRoot,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.EXPORT_COLLECTIVES,
+    title: 'Export Hosted Collectives',
+    description: 'Export CSV on Hosted Collectives Dashboard',
+    closedBetaAccessFor: [
+      'opencollective',
+      'opensource',
+      'ofico',
+      'europe',
+      'oce-foundation-usd',
+      'oce-foundation-eur',
+    ],
+    publicBeta: false,
   },
 ];
