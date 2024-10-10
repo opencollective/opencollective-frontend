@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
-import { partition } from 'lodash';
+import { partition, truncate } from 'lodash';
 import Lottie from 'lottie-react';
 import {
   Calendar,
@@ -35,7 +35,9 @@ import * as SyncAnimation from '../../../../public/static/animations/sync-bank-o
 import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
+import Link from '../../../Link';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
+import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import NotFound from '../../../NotFound';
 import StyledLink from '../../../StyledLink';
@@ -53,6 +55,7 @@ import { StepMapCSVColumns } from './StepMapCSVColumns';
 import { StepSelectCSV } from './StepSelectCSV';
 import { TransactionsImportRowDrawer } from './TransactionsImportRowDrawer';
 import { TransactionsImportRowStatus } from './TransactionsImportRowStatus';
+import TransactionsImportSettingsModal from './TransactionsImportSettingsModal';
 
 const getSteps = (intl: IntlShape): StepItem[] => {
   const getPrefix = stepNum => intl.formatMessage({ defaultMessage: 'Step {stepNum}:', id: 'Z9Dody' }, { stepNum });
@@ -100,6 +103,9 @@ const transactionsImportQuery = gql`
       csvConfig
       createdAt
       updatedAt
+      connectedAccount {
+        id
+      }
       account {
         id
         name
@@ -139,6 +145,8 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
   const [csvFile, setCsvFile] = React.useState<File | null>(null);
   const [drawerRowId, setDrawerRowId] = React.useState<string | null>(null);
   const [hasNewData, setHasNewData] = React.useState(false);
+  const [isDeleted, setIsDeleted] = React.useState(false);
+  const [hasSettingsModal, setHasSettingsModal] = React.useState(false);
   const { data, previousData, loading, error, refetch } = useQuery<
     TransactionsImportQuery,
     TransactionsImportQueryVariables
@@ -157,10 +165,11 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
     pollInterval: !importData?.lastSyncAt ? 2_000 : 20_000, // Poll every 2 seconds if the first sync is in progress, otherwise every 20 seconds
     fetchPolicy: 'no-cache', // We want to always fetch the latest data, and make sure we don't update the cache
     notifyOnNetworkStatusChange: true, // To make sure `onCompleted` is called when the query is polled
-    skip: !importData || hasNewData, // We can stop polling if we already know there's new data
+    skip: !importData || hasNewData || !importData.connectedAccount || hasSettingsModal, // We can stop polling if we already know there's new data
     onCompleted(pollData) {
       if (!pollData.transactionsImport) {
-        return; // TODO: The import was deleted, we should lock everything and show a message
+        setIsDeleted(true);
+        return;
       } else if (importData.lastSyncAt !== pollData.transactionsImport.lastSyncAt) {
         if (!importData.rows?.totalCount) {
           refetch(); // The first transaction(s) have been imported, we can directly refresh the view
@@ -179,13 +188,21 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
   return (
     <div>
       <DashboardHeader
-        title="Transactions Imports"
-        subpathTitle={importData ? `${importData.source} - ${importData.name}` : `#${importId.split('-')[0]}`}
-        titleRoute={`/dashboard/${accountSlug}/host-transactions/import`}
         className="mb-6"
+        title="Transactions Imports"
+        titleRoute={`/dashboard/${accountSlug}/host-transactions/import`}
+        subpathTitle={
+          importData
+            ? `${truncate(importData.source, { length: 25 })} - ${truncate(importData.name, { length: 25 })}`
+            : `#${importId.split('-')[0]}`
+        }
       />
       {loading && !importData ? (
         <LoadingPlaceholder height={300} />
+      ) : isDeleted ? (
+        <MessageBox type="error" withIcon>
+          <FormattedMessage defaultMessage="This import has been deleted." id="forMcN" />
+        </MessageBox>
       ) : error ? (
         <MessageBoxGraphqlError error={error} />
       ) : !importData || importData.account.slug !== accountSlug ? (
@@ -268,43 +285,38 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                       />
                     </div>
                   </div>
-                  {importData.file && (
-                    <div className="flex flex-col items-end gap-1">
-                      <div className="flex items-center gap-2">
-                        <Download size={16} />
-                        <div className="font-bold">
-                          <FormattedMessage defaultMessage="File" id="gyrIEl" />
-                        </div>
-                      </div>
-                      <a
-                        className="flex gap-1 align-middle hover:underline"
-                        href={importData.file.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <span className="inline-block max-w-72 truncate">{importData.file.name}</span> (
-                        {formatFileSize(importData.file.size)})
-                      </a>
-                    </div>
-                  )}
-                  {importData.type === 'PLAID' && (
-                    <div className="flex flex-col items-end gap-1">
-                      <div className="flex items-center gap-2">
+                  <div className="flex flex-col items-end gap-1">
+                    <div className="flex items-center gap-2">
+                      {importData.type === 'PLAID' && importData.connectedAccount && (
                         <Button size="xs" variant="outline" onClick={() => toast({ message: 'Not implemented yet' })}>
                           <RefreshCw size={16} />
                           <span className="hidden sm:inline">
                             <FormattedMessage defaultMessage="Sync" id="sync" />
                           </span>
                         </Button>
-                        <Button size="xs" variant="outline" onClick={() => toast({ message: 'Not implemented yet' })}>
-                          <Settings size={16} />
-                          <span className="hidden sm:inline">
-                            <FormattedMessage defaultMessage="Settings" id="Settings" />
-                          </span>
-                        </Button>
-                      </div>
+                      )}
+                      {importData.file && (
+                        <Link
+                          className="flex gap-1 align-middle hover:underline"
+                          openInNewTab
+                          href={importData.file.url}
+                          title={importData.file.name}
+                        >
+                          <Button size="xs" variant="outline">
+                            <Download size={16} />
+                            <span className="inline-block max-w-52 truncate">{importData.file.name}</span> (
+                            {formatFileSize(importData.file.size)})
+                          </Button>
+                        </Link>
+                      )}
+                      <Button size="xs" variant="outline" onClick={() => setHasSettingsModal(true)}>
+                        <Settings size={16} />
+                        <span className="hidden sm:inline">
+                          <FormattedMessage defaultMessage="Settings" id="Settings" />
+                        </span>
+                      </Button>
                     </div>
-                  )}
+                  </div>
                 </div>
               </div>
 
@@ -533,6 +545,9 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
         getActions={getActions}
         rowIndex={selectedRowIdx}
       />
+      {hasSettingsModal && (
+        <TransactionsImportSettingsModal transactionsImport={importData} onOpenChange={setHasSettingsModal} isOpen />
+      )}
     </div>
   );
 };
