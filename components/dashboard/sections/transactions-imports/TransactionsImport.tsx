@@ -53,6 +53,7 @@ import { StepMapCSVColumns } from './StepMapCSVColumns';
 import { StepSelectCSV } from './StepSelectCSV';
 import { TransactionsImportRowDrawer } from './TransactionsImportRowDrawer';
 import { TransactionsImportRowStatus } from './TransactionsImportRowStatus';
+import TransactionsImportSettingsModal from './TransactionsImportSettingsModal';
 
 const getSteps = (intl: IntlShape): StepItem[] => {
   const getPrefix = stepNum => intl.formatMessage({ defaultMessage: 'Step {stepNum}:', id: 'Z9Dody' }, { stepNum });
@@ -139,6 +140,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
   const [csvFile, setCsvFile] = React.useState<File | null>(null);
   const [drawerRowId, setDrawerRowId] = React.useState<string | null>(null);
   const [hasNewData, setHasNewData] = React.useState(false);
+  const [hasSettingsModal, setHasSettingsModal] = React.useState(false);
   const { data, previousData, loading, error, refetch } = useQuery<
     TransactionsImportQuery,
     TransactionsImportQueryVariables
@@ -296,7 +298,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                             <FormattedMessage defaultMessage="Sync" id="sync" />
                           </span>
                         </Button>
-                        <Button size="xs" variant="outline" onClick={() => toast({ message: 'Not implemented yet' })}>
+                        <Button size="xs" variant="outline" onClick={() => setHasSettingsModal(true)}>
                           <Settings size={16} />
                           <span className="hidden sm:inline">
                             <FormattedMessage defaultMessage="Settings" id="Settings" />
@@ -533,6 +535,9 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
         getActions={getActions}
         rowIndex={selectedRowIdx}
       />
+      {hasSettingsModal && (
+        <TransactionsImportSettingsModal transactionsImport={importData} onOpenChange={setHasSettingsModal} isOpen />
+      )}
     </div>
   );
 };
