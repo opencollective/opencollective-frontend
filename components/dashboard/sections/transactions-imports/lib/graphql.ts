@@ -8,6 +8,7 @@ export const TransactionImportListFieldsFragment = gql`
     type
     createdAt
     updatedAt
+    lastSyncAt
     stats {
       total
       ignored
