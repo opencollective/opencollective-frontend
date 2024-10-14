@@ -6,8 +6,8 @@ import { useRouter } from 'next/router';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
 import { ContentOverview } from '../../../components/crowdfunding-redesign/ContentOverview';
+import { GoalProgress } from '../../../components/crowdfunding-redesign/GoalProgress';
 import {
-  aggregateGoalAmounts,
   getDefaultFundraiserValues,
   getDefaultProfileValues,
   getYouTubeIDFromUrl,
@@ -15,30 +15,11 @@ import {
 import ProfileLayout from '../../../components/crowdfunding-redesign/ProfileLayout';
 import { contributePageQuery } from '../../../components/crowdfunding-redesign/queries';
 import { Tiers } from '../../../components/crowdfunding-redesign/Tiers';
-import FormattedMoneyAmount from '../../../components/FormattedMoneyAmount';
 import Link from '../../../components/Link';
-import { Progress } from '../../../components/ui/Progress';
 
 function FundraiserCard({ account, collectiveSlug }) {
   const fundraiser = getDefaultFundraiserValues(account);
-  const {
-    stats,
-    currency,
-    settings: { goals },
-  } = account;
-  const hasYearlyGoal = goals?.find(g => g.type === 'yearlyBudget');
-  const hasMonthlyGoal = goals?.find(g => g.type === 'monthlyBudget');
-  const currentAmount = hasYearlyGoal
-    ? stats.yearlyBudget.valueInCents
-    : hasMonthlyGoal
-      ? stats.yearlyBudget.valueInCents / 12
-      : stats.totalAmountReceived.valueInCents;
 
-  let goalTarget;
-  if (hasYearlyGoal || hasMonthlyGoal) {
-    goalTarget = aggregateGoalAmounts(goals);
-  }
-  const percentage = Math.round(goalTarget ? (currentAmount / goalTarget.amount) * 100 : 0);
   return (
     <Link
       className="flex flex-col gap-1 overflow-hidden rounded-md border bg-white"
@@ -66,24 +47,7 @@ function FundraiserCard({ account, collectiveSlug }) {
 
         <div>
           <div className="flex flex-col gap-4 text-muted-foreground">
-            {goalTarget && <Progress value={percentage} />}
-            <div>
-              <div className="flex items-end justify-between gap-4">
-                <div className="flex items-end gap-4">
-                  <div>
-                    <span className="text-sm font-medium text-muted-foreground">
-                      <FormattedMoneyAmount
-                        amount={currentAmount || 0}
-                        currency={currency}
-                        showCurrencyCode={false}
-                        precision={0}
-                      />
-                      {' raised'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            {fundraiser.goal && <GoalProgress accountSlug={account.slug} goal={fundraiser.goal} />}
           </div>
         </div>
       </div>
@@ -101,6 +65,7 @@ export default function ContributePage() {
   });
   const profile = getDefaultProfileValues(data?.account);
   const mainfundraising = true;
+
   return (
     <ProfileLayout activeTab="home">
       <div className="flex-1 space-y-8">
@@ -144,26 +109,42 @@ export default function ContributePage() {
                   }}
                 />
               </div>
-              <div className="col-span-3">{data?.account?.tiers && <Tiers account={data?.account} />}</div>
+              <div className="col-span-3 space-y-6">
+                {profile?.goal && <GoalProgress accountSlug={data?.account.slug} goal={profile?.goal} />}
+                {data?.account?.tiers && <Tiers account={data?.account} />}
+              </div>
             </div>
           </div>
         )}
 
-        <div className="mx-auto max-w-screen-xl space-y-8 px-6 py-12">
-          <h3 className="text-2xl font-semibold leading-none tracking-tight">Projects</h3>
-          <div className="grid grid-cols-3 gap-4">
-            {data?.projects?.nodes?.map(child => {
-              return <FundraiserCard key={child.id} account={child} collectiveSlug={router.query.collectiveSlug} />;
-            })}
+        {(data?.projects?.totalCount > 0 || data?.events?.totalCount > 0) && (
+          <div className="mx-auto max-w-screen-xl space-y-8 px-6 py-12">
+            {data?.projects?.totalCount > 0 && (
+              <React.Fragment>
+                <h3 className="text-2xl font-semibold leading-none tracking-tight">Projects</h3>
+                <div className="grid grid-cols-3 gap-4">
+                  {data?.projects?.nodes?.map(child => {
+                    return (
+                      <FundraiserCard key={child.id} account={child} collectiveSlug={router.query.collectiveSlug} />
+                    );
+                  })}
+                </div>
+              </React.Fragment>
+            )}
+            {data?.events?.totalCount > 0 && (
+              <React.Fragment>
+                <h3 className="text-2xl font-semibold leading-none tracking-tight">Events</h3>
+                <div className="grid grid-cols-3 gap-4">
+                  {data?.events?.nodes?.map(child => {
+                    return (
+                      <FundraiserCard key={child.id} account={child} collectiveSlug={router.query.collectiveSlug} />
+                    );
+                  })}
+                </div>
+              </React.Fragment>
+            )}
           </div>
-
-          <h3 className="text-2xl font-semibold leading-none tracking-tight">Events</h3>
-          <div className="grid grid-cols-3 gap-4">
-            {data?.events?.nodes?.map(child => {
-              return <FundraiserCard key={child.id} account={child} collectiveSlug={router.query.collectiveSlug} />;
-            })}
-          </div>
-        </div>
+        )}
       </div>
     </ProfileLayout>
   );

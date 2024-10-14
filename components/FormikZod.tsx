@@ -235,7 +235,7 @@ export const getInputAttributesFromZodSchema = (
     return {};
   }
 
-  const attributes = { name, required: true };
+  const attributes = { name, required: true, defaultValue: undefined };
 
   // Handle optional/required
   if (field.isOptional() || field.isNullable()) {
@@ -251,6 +251,12 @@ export const getInputAttributesFromZodSchema = (
     if (stringOption) {
       field = stringOption;
     }
+  }
+
+  // Handle defaultValue
+  if (isZodType(field, z.ZodFirstPartyTypeKind.ZodDefault)) {
+    attributes.defaultValue = field._def.defaultValue();
+    field = field._def.innerType; // Unwrap the default type to get the actual field type
   }
 
   // Handle type-specific attributes
