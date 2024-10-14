@@ -18,6 +18,7 @@ import FormattedMoneyAmount from '../../../components/FormattedMoneyAmount';
 import { Progress } from '../../../components/ui/Progress';
 import Link from '../../../components/Link';
 import { Goal } from '../../../components/crowdfunding-redesign/Goal';
+import { GoalProgress } from '../../../components/crowdfunding-redesign/GoalProgress';
 
 function FundraiserCard({ account, collectiveSlug }) {
   const fundraiser = getDefaultFundraiserValues(account);
@@ -143,7 +144,17 @@ export default function ContributePage() {
                   }}
                 />
               </div>
-              <div className="col-span-3">{data?.account?.tiers && <Tiers account={data?.account} />}</div>
+              <div className="col-span-3">
+                <div>
+                  {data?.account && (
+                    <GoalProgress
+                      account={data?.account}
+                      goal={data?.account.settings.crowdfundingRedesign.profile?.goal}
+                    />
+                  )}
+                  {data?.account?.tiers && <Tiers account={data?.account} />}
+                </div>
+              </div>
             </div>
           </div>
         )}

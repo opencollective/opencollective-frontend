@@ -248,10 +248,43 @@ export const profileWrapperQuery = gql`
       description
       longDescription
       backgroundImageUrl
+      currency
+      stats {
+        yearlyBudget {
+          valueInCents
+          currency
+        }
+        totalAmountReceived(net: true) {
+          valueInCents
+          currency
+        }
+      }
       ... on AccountWithParent {
         parent {
           id
           slug
+        }
+      }
+      # TODO: mutualize the account stuff as a fragment
+      ... on AccountWithContributions {
+        financialContributors: contributors(roles: [BACKER], limit: 5) {
+          totalCount
+          nodes {
+            id
+            name
+            roles
+            isAdmin
+            isCore
+            isBacker
+            since
+            image
+            description
+            collectiveSlug
+            totalAmountDonated
+            type
+            publicMessage
+            isIncognito
+          }
         }
       }
     }
@@ -270,6 +303,16 @@ export const profileWrapperQuery = gql`
       socialLinks {
         type
         url
+      }
+      stats {
+        yearlyBudget {
+          valueInCents
+          currency
+        }
+        totalAmountReceived(net: true) {
+          valueInCents
+          currency
+        }
       }
       ... on AccountWithContributions {
         tiers {
@@ -294,6 +337,25 @@ export const profileWrapperQuery = gql`
             amountType
             frequency
             availableQuantity
+          }
+        }
+        financialContributors: contributors(roles: [BACKER], limit: 5) {
+          totalCount
+          nodes {
+            id
+            name
+            roles
+            isAdmin
+            isCore
+            isBacker
+            since
+            image
+            description
+            collectiveSlug
+            totalAmountDonated
+            type
+            publicMessage
+            isIncognito
           }
         }
       }
@@ -399,7 +461,7 @@ export const contributePageQuery = gql`
           }
         }
 
-        financialContributors: contributors(roles: [BACKER], limit: 150) {
+        financialContributors: contributors(roles: [BACKER], limit: 5) {
           totalCount
           nodes {
             id

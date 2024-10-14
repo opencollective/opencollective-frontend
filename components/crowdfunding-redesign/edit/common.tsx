@@ -16,6 +16,14 @@ import { Button } from '../../ui/Button';
 import { Input, InputGroup } from '../../ui/Input';
 import { Label } from '../../ui/Label';
 import { Popover, PopoverContent, PopoverTrigger } from '../../ui/Popover';
+import FormattedMoneyAmount from '../../FormattedMoneyAmount';
+import { GoalContributors, GoalProgress, GoalProgressBar, GoalProgressLabel } from '../GoalProgress';
+import { RadioGroup, RadioGroupItem } from '../../ui/RadioGroup';
+import { Separator } from '../../ui/Separator';
+import Currency from '../../Currency';
+import { Textarea } from '../../ui/Textarea';
+import { GoalDescription } from '../GoalDescription';
+import { ButtonGroup } from '../ButtonGroup';
 
 export function FormField({
   label,
@@ -190,6 +198,122 @@ export const MainDetailsForm = ({ initialValues, schema, onSubmit }) => {
               <Button type="submit" loading={formik.isSubmitting}>
                 <FormattedMessage defaultMessage="Save" id="save" />
               </Button>
+            </div>
+          </Form>
+        );
+      }}
+    </FormikZod>
+  );
+};
+
+export const GoalsForm = ({ initialValues, schema, onSubmit, account }) => {
+  console.log({ initialValues });
+  const goal = initialValues.goal;
+  const [isEditing, setIsEditing] = React.useState(false);
+  return (
+    <FormikZod
+      schema={schema}
+      initialValues={initialValues}
+      onSubmit={async values => {
+        await onSubmit(schema.parse(values));
+        setIsEditing(false);
+      }}
+    >
+      {(formik: FormikProps<z.infer<typeof schema>>) => {
+        console.log({ formik });
+
+        if (!isEditing) {
+          if (goal) {
+            return (
+              <div className="space-y-3 rounded-lg border p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <GoalProgressLabel account={account} goal={goal} className="text-base" />
+                  <Button size="sm" onClick={() => setIsEditing(true)} className="" variant="outline">
+                    Edit
+                  </Button>
+                </div>
+                <div className="space-y-4">
+                  <GoalProgressBar account={account} goal={goal} />
+                  <GoalContributors account={account} />
+                </div>
+              </div>
+            );
+          }
+          return (
+            <div className="space-y-4">
+              <Button onClick={() => setIsEditing(true)} className="" variant="outline">
+                Set a goal
+              </Button>{' '}
+              <div className="text-sm text-muted-foreground">{`You can set 1 goal at a time. If you reach your goal, you'll be able to set a new one.`}</div>
+            </div>
+          );
+        }
+        const currentGoal = formik.values.goal || initialValues.goal;
+        const currentType = formik.values.goal?.type || initialValues.goal?.type;
+        return (
+          <Form>
+            <div className="flex flex-col items-start gap-4 rounded-lg border">
+              <div className="space-y-6 px-6 pb-2 pt-6">
+                <FormField name="goal.amount" label={"Amount you're aiming for"}>
+                  {({ field }) => {
+                    return (
+                      <div className="flex items-center gap-2">
+                        <InputGroup {...field} prepend={'$'} />
+                        <span className="text-muted-foreground">
+                          {currentType === 'MONTHLY' ? '/month' : currentType === 'YEARLY' ? '/year' : null}
+                        </span>
+                      </div>
+                    );
+                  }}
+                </FormField>
+                <FormField name="goal.type" label="Is it recurring?">
+                  {({ field }) => {
+                    return (
+                      <ButtonGroup>
+                        <Button
+                          onClick={() => formik.setFieldValue(field.name, 'FIXED')}
+                          variant={field.value === 'FIXED' ? 'default' : 'outline'}
+                        >
+                          No
+                        </Button>
+                        <Button
+                          onClick={() => formik.setFieldValue(field.name, 'MONTHLY')}
+                          variant={field.value === 'MONTHLY' ? 'default' : 'outline'}
+                        >
+                          Monthly
+                        </Button>
+                        <Button
+                          onClick={() => formik.setFieldValue(field.name, 'YEARLY')}
+                          variant={field.value === 'YEARLY' ? 'default' : 'outline'}
+                        >
+                          Yearly
+                        </Button>
+                      </ButtonGroup>
+                    );
+                  }}
+                </FormField>
+              </div>
+              <Separator />
+              <div className="w-full space-y-4 px-6 py-2">
+                <span className="text-sm text-muted-foreground">
+                  <span className="font-semibold">Preview</span>: Here&#39;s how your goal will look on your profile.
+                </span>
+                <GoalProgress account={account} goal={currentGoal} />
+              </div>
+              <Separator />
+              <div className="flex w-full items-center justify-between gap-4 px-6 pb-6 pt-2">
+                <div className="flex items-center gap-2">
+                  <Button type="submit" loading={formik.isSubmitting}>
+                    <FormattedMessage defaultMessage="Save" id="save" />
+                  </Button>
+                  <Button variant="outline" onClick={() => setIsEditing(false)}>
+                    <FormattedMessage defaultMessage="Cancel" id="cancel" />
+                  </Button>
+                </div>
+                <Button variant="ghost" className="text-red-700" onClick={() => setIsEditing(false)}>
+                  Remove goal
+                </Button>
+              </div>
             </div>
           </Form>
         );

@@ -23,6 +23,7 @@ import {
   ColumnSection,
   editCrowdfundingSettingsMutation,
   FormField,
+  GoalsForm,
   LongDescriptionForm,
   MainDetailsForm,
 } from './common';
@@ -192,6 +193,15 @@ export function EditFundraiser({ account }) {
           initialValues={initialValues}
           onSubmit={onSubmit}
         />
+        <Separator />
+        <ColumnSection title="Goal" description="Set a goal to share with your community.">
+          <GoalsForm
+            schema={fundraiserSchema.pick({ goal: true })}
+            initialValues={initialValues}
+            onSubmit={onSubmit}
+            account={account}
+          />
+        </ColumnSection>
         <Separator />
         <LongDescriptionForm
           schema={fundraiserSchema.pick({ longDescription: true })}
