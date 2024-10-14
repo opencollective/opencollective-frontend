@@ -12,6 +12,13 @@ const coverImageSchema = z.object({
   height: z.number().optional(),
 });
 
+const goalSchema = z.object({
+  // type: z.enum(['MONTHLY_BUDGET', 'YEARLY_BUDGET', 'CALENDAR_MONTH', 'CALENDAR_YEAR', 'FIXED']).default('FIXED'),
+  recurrence: z.enum(['MONTHLY', 'YEARLY']).nullable().default(null),
+  continuous: z.boolean().default(false),
+  amount: z.coerce.number().min(0).default(0),
+});
+
 const coverVideoSchema = z.object({
   type: z.literal('VIDEO').default('VIDEO'),
   platform: z.enum(['youtube']).default('youtube'),
@@ -29,6 +36,7 @@ export const fundraiserSchema = z.object({
   primaryColor: primaryColorSchema.optional(),
   cover: z.union([coverImageSchema, coverVideoSchema]).optional(),
   longDescription: z.string().max(30000).optional(),
+  goal: goalSchema.optional(),
 });
 
 export const profileSchema = z.object({
@@ -37,6 +45,7 @@ export const profileSchema = z.object({
   primaryColor: primaryColorSchema.optional(),
   cover: coverImageSchema.optional().nullable(),
   longDescription: z.string().max(30000).optional(),
+  goal: goalSchema.optional(),
 });
 
 export type Fundraiser = z.infer<typeof fundraiserSchema>;
@@ -61,6 +70,7 @@ export function getDefaultFundraiserValues(account: Account): Fundraiser {
       height: account.settings.collectivePage?.background?.mediaSize?.height,
     },
     longDescription: fundraiserSettings?.longDescription ?? account.longDescription,
+    goal: fundraiserSettings?.goal,
   };
 }
 
@@ -81,6 +91,7 @@ export function getDefaultProfileValues(account?: Account): Profile {
       height: account.settings.collectivePage?.background?.mediaSize?.height,
     },
     longDescription: profileSettings?.longDescription ?? account.longDescription,
+    goal: profileSettings?.goal,
   };
 }
 

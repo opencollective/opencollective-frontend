@@ -12,6 +12,18 @@ import RichTextEditor from '../../RichTextEditor';
 import { Button } from '../../ui/Button';
 import { InputGroup } from '../../ui/Input';
 import { Popover, PopoverContent, PopoverTrigger } from '../../ui/Popover';
+import FormattedMoneyAmount from '../../FormattedMoneyAmount';
+import { GoalContributors, GoalPreview, GoalProgress, GoalProgressBar, GoalProgressLabel } from '../GoalProgress';
+import { RadioGroup, RadioGroupItem } from '../../ui/RadioGroup';
+import { Separator } from '../../ui/Separator';
+import Currency from '../../Currency';
+import { Textarea } from '../../ui/Textarea';
+import { GoalDescription } from '../GoalDescription';
+import { ButtonGroup } from '../ButtonGroup';
+import { ButtonSet } from '../../ui/ButtonSet';
+import { Label } from '../../ui/Label';
+import { Switch } from '../../ui/Switch';
+import { Collapsible, CollapsibleContent } from '../../ui/Collapsible';
 
 export function ColumnSection({ title, description, children }) {
   return (
@@ -113,6 +125,171 @@ export const MainDetailsForm = ({ initialValues, schema, onSubmit }) => {
               <Button type="submit" loading={formik.isSubmitting}>
                 <FormattedMessage defaultMessage="Save" id="save" />
               </Button>
+            </div>
+          </Form>
+        );
+      }}
+    </FormikZod>
+  );
+};
+
+export const GoalsForm = ({ initialValues, schema, onSubmit, account }) => {
+  console.log({ initialValues });
+  const goal = initialValues.goal;
+  const [isEditing, setIsEditing] = React.useState(false);
+  console.log({ account });
+  const newinitialValues = {
+    goal: { amount: 0, recurrence: null, continuous: false, ...initialValues.goal },
+  };
+  console.log({ newinitialValues });
+  return (
+    <FormikZod
+      schema={schema}
+      initialValues={newinitialValues}
+      onSubmit={async values => {
+        await onSubmit(schema.parse(values));
+        setIsEditing(false);
+      }}
+    >
+      {(formik: FormikProps<z.infer<typeof schema>>) => {
+        console.log({ formik });
+
+        if (!isEditing) {
+          if (account.settings.crowdfundingRedesign.profile?.goal) {
+            return (
+              <div className="space-y-3 rounded-lg border p-4">
+                <GoalPreview
+                  account={account}
+                  goalInput={account.settings.crowdfundingRedesign.profile?.goal}
+                  editButton={
+                    <Button size="sm" onClick={() => setIsEditing(true)} className="" variant="outline">
+                      Edit
+                    </Button>
+                  }
+                />
+                {/* <div className="flex items-center justify-between gap-3">
+                  <GoalProgressLabel account={account} goal={goal} className="text-base" />
+                  <Button size="sm" onClick={() => setIsEditing(true)} className="" variant="outline">
+                    Edit
+                  </Button>
+                </div>
+                <div className="space-y-4">
+                  <GoalProgressBar account={account} goal={goal} />
+                  <GoalContributors account={account} />
+                </div> */}
+              </div>
+            );
+          }
+          return (
+            <div className="space-y-4">
+              <Button onClick={() => setIsEditing(true)} className="" variant="outline">
+                Set a goal
+              </Button>{' '}
+              <div className="text-sm text-muted-foreground">{`You can set 1 goal at a time. If you reach your goal, you'll be able to set a new one.`}</div>
+            </div>
+          );
+        }
+        const currentGoal = formik.values.goal || initialValues.goal;
+        const currentType = formik.values.goal?.type || initialValues.goal?.type;
+        return (
+          <Form>
+            <div className="flex flex-col items-start gap-4 rounded-lg border">
+              <div className="space-y-6 px-6 pb-2 pt-6">
+                <FormField name="goal.amount" label={"Amount you're aiming for"}>
+                  {({ field }) => {
+                    return (
+                      <div className="flex items-center gap-2">
+                        <InputGroup
+                          {...field}
+                          onChange={e => {
+                            console.log(e.target.value);
+                            console.log(field.name);
+                            formik.setFieldValue(field.name, Number(e.target.value));
+                          }}
+                          prepend={'$'}
+                        />
+                        <span className="text-muted-foreground">
+                          {currentType === 'MONTHLY' ? '/month' : currentType === 'YEARLY' ? '/year' : null}
+                        </span>
+                      </div>
+                    );
+                  }}
+                </FormField>
+                <FormField name="goal.recurrence" label="Is it recurring?">
+                  {({ field }) => {
+                    return (
+                      <ButtonSet
+                        getKey={value => (value ? value.toString() : 'null')}
+                        options={[
+                          { value: null, label: 'No' },
+                          { value: 'MONTHLY', label: 'Monthly' },
+                          { value: 'YEARLY', label: 'Yearly' },
+                        ]}
+                        selected={field.value}
+                        onChange={value => {
+                          formik.setFieldValue(field.name, value);
+                        }}
+                      />
+                    );
+                  }}
+                </FormField>
+                <Collapsible open={Boolean(formik.values.goal.recurrence)}>
+                  <CollapsibleContent>
+                    <FormField name="goal.continuous">
+                      {({ field }) => {
+                        return (
+                          <div className="mt-4 flex flex-row items-center justify-between gap-4 rounded-lg border p-4">
+                            <div className="space-y-0.5">
+                              <Label className="text-base">Continuous calculation</Label>
+                              <div className="space-y-3">
+                                <p className="text-sm text-muted-foreground">
+                                  Default goal progress calculation for recurring goals is based on calendar periods.
+                                  For recurring monthly goals, goal progress is based on contributions made in a given
+                                  calendar month (eg: May). For recurring yearly goals, goal progress is based on
+                                  contributions made in the given year (eg: 2024).
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                  Continuous calculation is an alternative calculation algorithm that is based on time
+                                  relative to the present moment. For recurring monthly goals, goal progress is based on
+                                  contribution made during the last 30 days. For recurring yearly goals, goal progress
+                                  is based on contributions made during the last 365 days.
+                                </p>
+                              </div>
+                            </div>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={val => {
+                                formik.setFieldValue('goal.continuous', val);
+                              }}
+                            />
+                          </div>
+                        );
+                      }}
+                    </FormField>
+                  </CollapsibleContent>
+                </Collapsible>
+              </div>
+              <Separator />
+              <div className="w-full space-y-4 px-6 py-2">
+                <span className="text-sm text-muted-foreground">
+                  <span className="font-semibold">Goal progress preview</span> (based on existing contributions)
+                </span>
+                <GoalPreview isPreview account={account} goalInput={formik.values.goal} />
+              </div>
+              <Separator />
+              <div className="flex w-full items-center justify-between gap-4 px-6 pb-6 pt-2">
+                <div className="flex items-center gap-2">
+                  <Button type="submit" loading={formik.isSubmitting}>
+                    <FormattedMessage defaultMessage="Save" id="save" />
+                  </Button>
+                  <Button variant="outline" onClick={() => setIsEditing(false)}>
+                    <FormattedMessage defaultMessage="Cancel" id="cancel" />
+                  </Button>
+                </div>
+                <Button variant="ghost" className="text-red-700" onClick={() => setIsEditing(false)}>
+                  Remove goal
+                </Button>
+              </div>
             </div>
           </Form>
         );

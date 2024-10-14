@@ -248,10 +248,59 @@ export const profileWrapperQuery = gql`
       description
       longDescription
       backgroundImageUrl
+      currency
+      stats {
+        yearlyBudget {
+          valueInCents
+          currency
+        }
+        totalAmountReceived(net: true) {
+          valueInCents
+          currency
+        }
+        totalAmountReceivedThisMonth: totalAmountReceived(
+          net: true
+          dateFrom: "2024-02-01T00:00:00.000Z"
+          dateTo: "2024-03-01T00:00:00.000Z"
+        ) {
+          valueInCents
+          currency
+        }
+        totalAmountReceivedThisYear: totalAmountReceived(
+          net: true
+          dateFrom: "2024-01-01T00:00:00.000Z"
+          dateTo: "2025-01-01T00:00:00.000Z"
+        ) {
+          valueInCents
+          currency
+        }
+      }
       ... on AccountWithParent {
         parent {
           id
           slug
+        }
+      }
+      # TODO: mutualize the account stuff as a fragment
+      ... on AccountWithContributions {
+        financialContributors: contributors(roles: [BACKER], limit: 5) {
+          totalCount
+          nodes {
+            id
+            name
+            roles
+            isAdmin
+            isCore
+            isBacker
+            since
+            image
+            description
+            collectiveSlug
+            totalAmountDonated
+            type
+            publicMessage
+            isIncognito
+          }
         }
       }
     }
@@ -270,6 +319,32 @@ export const profileWrapperQuery = gql`
       socialLinks {
         type
         url
+      }
+      stats {
+        yearlyBudget {
+          valueInCents
+          currency
+        }
+        totalAmountReceived(net: true) {
+          valueInCents
+          currency
+        }
+        totalAmountReceivedThisMonth: totalAmountReceived(
+          net: true
+          dateFrom: "2024-02-01T00:00:00.000Z"
+          dateTo: "2024-03-01T00:00:00.000Z"
+        ) {
+          valueInCents
+          currency
+        }
+        totalAmountReceivedThisYear: totalAmountReceived(
+          net: true
+          dateFrom: "2024-01-01T00:00:00.000Z"
+          dateTo: "2025-01-01T00:00:00.000Z"
+        ) {
+          valueInCents
+          currency
+        }
       }
       ... on AccountWithContributions {
         tiers {
@@ -294,6 +369,25 @@ export const profileWrapperQuery = gql`
             amountType
             frequency
             availableQuantity
+          }
+        }
+        financialContributors: contributors(roles: [BACKER], limit: 5) {
+          totalCount
+          nodes {
+            id
+            name
+            roles
+            isAdmin
+            isCore
+            isBacker
+            since
+            image
+            description
+            collectiveSlug
+            totalAmountDonated
+            type
+            publicMessage
+            isIncognito
           }
         }
       }
@@ -399,7 +493,7 @@ export const contributePageQuery = gql`
           }
         }
 
-        financialContributors: contributors(roles: [BACKER], limit: 150) {
+        financialContributors: contributors(roles: [BACKER], limit: 5) {
           totalCount
           nodes {
             id

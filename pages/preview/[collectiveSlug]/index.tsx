@@ -6,8 +6,8 @@ import { useRouter } from 'next/router';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 
 import { ContentOverview } from '../../../components/crowdfunding-redesign/ContentOverview';
+import { GoalProgress, GoalPreview } from '../../../components/crowdfunding-redesign/GoalProgress';
 import {
-  aggregateGoalAmounts,
   getDefaultFundraiserValues,
   getDefaultProfileValues,
   getYouTubeIDFromUrl,
@@ -15,30 +15,11 @@ import {
 import ProfileLayout from '../../../components/crowdfunding-redesign/ProfileLayout';
 import { contributePageQuery } from '../../../components/crowdfunding-redesign/queries';
 import { Tiers } from '../../../components/crowdfunding-redesign/Tiers';
-import FormattedMoneyAmount from '../../../components/FormattedMoneyAmount';
 import Link from '../../../components/Link';
-import { Progress } from '../../../components/ui/Progress';
 
 function FundraiserCard({ account, collectiveSlug }) {
   const fundraiser = getDefaultFundraiserValues(account);
-  const {
-    stats,
-    currency,
-    settings: { goals },
-  } = account;
-  const hasYearlyGoal = goals?.find(g => g.type === 'yearlyBudget');
-  const hasMonthlyGoal = goals?.find(g => g.type === 'monthlyBudget');
-  const currentAmount = hasYearlyGoal
-    ? stats.yearlyBudget.valueInCents
-    : hasMonthlyGoal
-      ? stats.yearlyBudget.valueInCents / 12
-      : stats.totalAmountReceived.valueInCents;
 
-  let goalTarget;
-  if (hasYearlyGoal || hasMonthlyGoal) {
-    goalTarget = aggregateGoalAmounts(goals);
-  }
-  const percentage = Math.round(goalTarget ? (currentAmount / goalTarget.amount) * 100 : 0);
   return (
     <Link
       className="flex flex-col gap-1 overflow-hidden rounded-md border bg-white"
@@ -66,24 +47,7 @@ function FundraiserCard({ account, collectiveSlug }) {
 
         <div>
           <div className="flex flex-col gap-4 text-muted-foreground">
-            {goalTarget && <Progress value={percentage} />}
-            <div>
-              <div className="flex items-end justify-between gap-4">
-                <div className="flex items-end gap-4">
-                  <div>
-                    <span className="text-sm font-medium text-muted-foreground">
-                      <FormattedMoneyAmount
-                        amount={currentAmount || 0}
-                        currency={currency}
-                        showCurrencyCode={false}
-                        precision={0}
-                      />
-                      {' raised'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            {fundraiser.goal && <GoalPreview account={account} goalInput={fundraiser.goal} />}
           </div>
         </div>
       </div>
@@ -101,6 +65,7 @@ export default function ContributePage() {
   });
   const profile = getDefaultProfileValues(data?.account);
   const mainfundraising = true;
+  console.log({ goalInSettings: data?.account.settings.crowdfundingRedesign.profile?.goal, profile });
   return (
     <ProfileLayout activeTab="home">
       <div className="flex-1 space-y-8">
@@ -143,7 +108,19 @@ export default function ContributePage() {
                   }}
                 />
               </div>
-              <div className="col-span-3">{data?.account?.tiers && <Tiers account={data?.account} />}</div>
+              <div className="col-span-3">
+                <div>
+                  {data?.account.settings.crowdfundingRedesign.profile?.goal && (
+                    <div>
+                      <GoalPreview
+                        account={data?.account}
+                        goalInput={data?.account.settings.crowdfundingRedesign.profile?.goal}
+                      />
+                    </div>
+                  )}
+                  {data?.account?.tiers && <Tiers account={data?.account} />}
+                </div>
+              </div>
             </div>
           </div>
         )}

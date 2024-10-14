@@ -20,7 +20,13 @@ import { toast } from '../../ui/useToast';
 import type { Fundraiser } from '../helpers';
 import { fundraiserSchema, getDefaultFundraiserValues } from '../helpers';
 
-import { ColumnSection, editCrowdfundingSettingsMutation, LongDescriptionForm, MainDetailsForm } from './common';
+import {
+  ColumnSection,
+  editCrowdfundingSettingsMutation,
+  GoalsForm,
+  LongDescriptionForm,
+  MainDetailsForm,
+} from './common';
 
 const CoverImageForm = ({ schema, initialValues, onSubmit }) => {
   const tabs = React.useMemo(
@@ -187,6 +193,15 @@ export function EditFundraiser({ account }) {
           initialValues={initialValues}
           onSubmit={onSubmit}
         />
+        <Separator />
+        <ColumnSection title="Goal" description="Set a goal to share with your community.">
+          <GoalsForm
+            schema={fundraiserSchema.pick({ goal: true })}
+            initialValues={initialValues}
+            onSubmit={onSubmit}
+            account={account}
+          />
+        </ColumnSection>
         <Separator />
         <LongDescriptionForm
           schema={fundraiserSchema.pick({ longDescription: true })}
