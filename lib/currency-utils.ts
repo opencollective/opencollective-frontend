@@ -14,8 +14,6 @@ export type Options = {
   currencyDisplay?: 'symbol' | 'narrowSymbol' | 'code' | 'name';
 };
 
-type CurrencyDisplay = 'symbol' | 'narrowSymbol' | 'name' | 'code';
-
 function getCurrencySymbolFallback(currency: Currency): string {
   return Number(0)
     .toLocaleString('en-US', {
@@ -87,7 +85,7 @@ export function formatCurrency(
     maximumFractionDigits = 0;
   }
 
-  const formatAmount = (currencyDisplay: CurrencyDisplay): string => {
+  const formatAmount = (currencyDisplay: Options['currencyDisplay']): string => {
     return amount.toLocaleString(options.locale, {
       style: options.style || 'currency',
       currency,
