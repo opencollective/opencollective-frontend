@@ -205,6 +205,7 @@ const FormBody = ({ update }) => {
         id: 'umr49S',
       }),
       description: <UpdateAudienceBreakdown audienceStats={audienceStats} />,
+      confirmDisabled: !audienceStats, // Do not allow publishing if we were not able to fetch audience stats
       onConfirm: async () => {
         try {
           await publishUpdate({
