@@ -6781,6 +6781,11 @@ type TransactionsImport {
   updatedAt: DateTime!
 
   """
+  When the import was last synced
+  """
+  lastSyncAt: DateTime
+
+  """
   List of rows in the import
   """
   rows: TransactionsImportRowCollection!
