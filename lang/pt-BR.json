@@ -1553,6 +1553,7 @@
   "ExportTransactionsCSVModal.ExportRows": "Exportando {rows} {rows, plural, one {linha} other {linhas}}",
   "ExportTransactionsCSVModal.ExportTime": "Tempo estimado: {expectedTimeInMinutes, plural, one {# minuto} other {# minutos}}",
   "ExportTransactionsCSVModal.ExportTimeWarning": "Estamos exportando {rows} {rows, plural, one {linha} other {linhas}}, isso pode levar {expectedTimeInMinutes} {expectedTimeInMinutes, plural, one {minuto} other {minutos}}.",
+  "ExportTransactionsCSVModal.FetchingRows": "Checking number of exported rows...",
   "ExportTransactionsCSVModal.FilteredCollectivesWarning": "Este relatório é afetado pelo filtro coletivo e incluirá todas as transações das seguintes contas: {accounts}",
   "ExportTransactionsCSVModal.FiltersWarning": "Este relatório é afetado pelos filtros definidos na página de transações.",
   "ExportTransactionsCSVModal.RowsWarning": "Desculpe, o arquivo solicitado levaria muito tempo para ser exportado. Contagem de linhas ({rows}) acima do limite.",

@@ -258,7 +258,7 @@ const ExportTransactionsCSVModal = ({
         },
       });
       const rows = parseInt(response.headers.get('x-exported-rows'), 10);
-      return rows;
+      return isNaN(rows) ? null : rows;
     }
   });
 
@@ -632,9 +632,16 @@ const ExportTransactionsCSVModal = ({
           </div>
 
           <DialogFooter className="flex flex-col gap-4 border-t border-solid border-slate-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-            <div>
-              {!isAboveRowLimit && (
-                <div className="flex flex-col gap-3 font-bold text-slate-700 sm:flex-row sm:text-sm">
+            <div className="font-bold text-slate-700 sm:text-sm">
+              {isFetchingRows ? (
+                <React.Fragment>
+                  <FormattedMessage
+                    id="ExportTransactionsCSVModal.FetchingRows"
+                    defaultMessage="Checking number of exported rows..."
+                  />
+                </React.Fragment>
+              ) : !isAboveRowLimit && exportedRows ? (
+                <div className="flex flex-col gap-3 sm:flex-row">
                   <FormattedMessage
                     id="ExportTransactionsCSVModal.ExportRows"
                     defaultMessage="Exporting {rows} {rows, plural, one {row} other {rows}}"
@@ -654,7 +661,7 @@ const ExportTransactionsCSVModal = ({
                     </div>
                   )}
                 </div>
-              )}
+              ) : null}
             </div>
             <div className="flex flex-col justify-stretch gap-2 sm:flex-row sm:justify-normal">
               {canEditFields && (
