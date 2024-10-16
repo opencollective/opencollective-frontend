@@ -85,7 +85,7 @@ export function formatCurrency(
     maximumFractionDigits = 0;
   }
 
-  const formatAmount = (currencyDisplay: string): string => {
+  const formatAmount = (currencyDisplay: Options['currencyDisplay']): string => {
     return amount.toLocaleString(options.locale, {
       style: options.style || 'currency',
       currency,
