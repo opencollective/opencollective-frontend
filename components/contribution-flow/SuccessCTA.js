@@ -56,14 +56,14 @@ const contentMessages = defineMessages({
   [SUCCESS_CTA_TYPE.BLOG]: {
     id: 'NewContributionFlow.Success.CTA.Read.Content',
     defaultMessage:
-      "Open Collective aims to foster transparency and sustainability in communities around the world. Here's how you can participate.",
+      "The Open Collective Platform aims to foster transparency and sustainability in communities around the world. Here's how you can participate.",
   },
   [SUCCESS_CTA_TYPE.NEWSLETTER]: {
     id: 'home.joinUsSection.weNeedUpdate',
     defaultMessage: 'We send updates once a month.',
   },
   [SUCCESS_CTA_TYPE.GO_TO_PROFILE]: {
-    defaultMessage: 'Go to the public page of {accountName} on Open Collective',
+    defaultMessage: 'Go to the public page of {accountName} on the Open Collective Platform',
     id: '/aBz/1',
   },
 });

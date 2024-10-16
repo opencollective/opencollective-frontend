@@ -34,15 +34,11 @@ export const landingPageItems: Item[] = [
     ],
   },
   {
-    label: <FormattedMessage id="company" defaultMessage="Company" />,
+    label: <FormattedMessage id="company" defaultMessage="Who are we?" />,
     items: [
       {
         label: <FormattedMessage id="company.blog" defaultMessage="Blog" />,
         href: 'https://blog.opencollective.com/',
-      },
-      {
-        label: <FormattedMessage id="OC.e2c" defaultMessage="Exit to Community" />,
-        href: '/e2c',
       },
       {
         label: <FormattedMessage id="collective.about.title" defaultMessage="About" />,

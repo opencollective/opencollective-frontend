@@ -28,10 +28,13 @@ const OpenCollectiveIs = () => {
       <Flex px="16px" justifyContent="center" alignItems="center">
         <Box width={['288px', 1]} mb="135px">
           <SectionTitle textAlign="center" mb={3}>
-            <FormattedMessage id="home.OCIs" defaultMessage="Open Collective is" />
+            <FormattedMessage id="home.OCIs" defaultMessage="The Open Collective Platform is" />
           </SectionTitle>
           <SectionDescription textAlign="center">
-            <FormattedMessage id="home.OCIs.description" defaultMessage="…an open finances platform for communities." />
+            <FormattedMessage
+              id="home.OCIs.description"
+              defaultMessage="…an open finances software service for communities."
+            />
           </SectionDescription>
         </Box>
       </Flex>

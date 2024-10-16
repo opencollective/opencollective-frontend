@@ -167,7 +167,7 @@ const JoinUs = ({ page }) => (
           description={
             <FormattedMessage
               id="home.joinUsSection.ourStories"
-              defaultMessage="Open Collective aims to foster transparency and sustainability in communities around the world, see how you could."
+              defaultMessage="The Open Collective Platform aims to foster transparency and sustainability in communities around the world, see how you could."
             />
           }
         />
