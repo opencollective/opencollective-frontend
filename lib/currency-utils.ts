@@ -12,6 +12,7 @@ export type Options = {
   precision?: number;
   style?: 'currency' | 'decimal';
   currencyDisplay?: 'symbol' | 'narrowSymbol' | 'code' | 'name';
+  absolute?: boolean;
 };
 
 function getCurrencySymbolFallback(currency: Currency): string {
@@ -71,6 +72,10 @@ export function formatCurrency(
     }
   }
 
+  if (options.absolute) {
+    amount = Math.abs(amount);
+  }
+
   amount = amount / 100;
   const defaultPrecision = getDefaultCurrencyPrecision(currency);
   let minimumFractionDigits = defaultPrecision;
@@ -85,7 +90,7 @@ export function formatCurrency(
     maximumFractionDigits = 0;
   }
 
-  const formatAmount = (currencyDisplay: string): string => {
+  const formatAmount = (currencyDisplay: Intl.NumberFormatOptions['currencyDisplay']): string => {
     return amount.toLocaleString(options.locale, {
       style: options.style || 'currency',
       currency,
