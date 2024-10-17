@@ -141,9 +141,13 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
                         id="budgetSection-raised-total"
                         defaultMessage="Total contributed before fees: {amount}"
                         values={{
-                          amount: formatCurrency(stats.totalAmountRaised.valueInCents || 0, collective.currency, {
-                            locale,
-                          }),
+                          amount: formatCurrency(
+                            stats.totalAmountRaised.valueInCents || 0,
+                            stats.totalAmountRaised.currency,
+                            {
+                              locale,
+                            },
+                          ),
                         }}
                       />
                     </Box>
@@ -151,7 +155,10 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
                 />
               )}
             </StatTitle>
-            <StatAmount amount={stats.totalNetAmountRaised.valueInCents} currency={collective.currency} />
+            <StatAmount
+              amount={stats.totalNetAmountRaised.valueInCents}
+              currency={stats.totalNetAmountRaised.currency}
+            />
           </StatContainer>
           <StatContainer borderTop={borderTop}>
             <StatTitle>
