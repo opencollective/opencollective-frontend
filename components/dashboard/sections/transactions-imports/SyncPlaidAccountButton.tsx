@@ -18,7 +18,7 @@ const syncPlaidAccountMutation = gql`
   }
 `;
 
-export const SynPlaidAccountButton = ({ hasRequestedSync, setHasRequestedSync, connectedAccountId, isSyncing }) => {
+export const SyncPlaidAccountButton = ({ hasRequestedSync, setHasRequestedSync, connectedAccountId, isSyncing }) => {
   const intl = useIntl();
   const { toast } = useToast();
   const [syncPlaidAccount] = useMutation(syncPlaidAccountMutation, { context: API_V2_CONTEXT });

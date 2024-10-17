@@ -53,7 +53,7 @@ import DashboardHeader from '../../DashboardHeader';
 import { ImportProgressBadge } from './ImportProgressBadge';
 import { StepMapCSVColumns } from './StepMapCSVColumns';
 import { StepSelectCSV } from './StepSelectCSV';
-import { SynPlaidAccountButton } from './SynPlaidAccountButton';
+import { SyncPlaidAccountButton } from './SyncPlaidAccountButton';
 import { TransactionsImportRowDrawer } from './TransactionsImportRowDrawer';
 import { TransactionsImportRowStatus } from './TransactionsImportRowStatus';
 import TransactionsImportSettingsModal from './TransactionsImportSettingsModal';
@@ -316,7 +316,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                   <div className="flex flex-col items-end gap-1">
                     <div className="flex items-center gap-2">
                       {importData.type === 'PLAID' && importData.connectedAccount && (
-                        <SynPlaidAccountButton
+                        <SyncPlaidAccountButton
                           hasRequestedSync={hasRequestedSync}
                           setHasRequestedSync={setHasRequestedSync}
                           connectedAccountId={importData.connectedAccount.id}
