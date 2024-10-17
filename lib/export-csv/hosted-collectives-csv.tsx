@@ -22,7 +22,8 @@ type CSVField =
   | 'totalNumberOfContributions'
   | 'firstExpenseDate'
   | 'lastExpenseDate'
-  | 'numberOfExpenses';
+  | 'numberOfExpenses'
+  | 'status';
 
 export enum FIELD_OPTIONS {
   DEFAULT = 'DEFAULT',
@@ -70,6 +71,11 @@ export const FIELDS: Array<{
     id: 'type',
     group: 'about',
     label: <FormattedMessage id="Fields.type" defaultMessage="Type" />,
+  },
+  {
+    id: 'status',
+    group: 'about',
+    label: <FormattedMessage id="Status" defaultMessage="Status" />,
   },
   {
     id: 'legalName',
