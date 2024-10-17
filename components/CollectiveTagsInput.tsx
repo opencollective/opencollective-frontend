@@ -1,30 +1,25 @@
-import React, { Fragment, MouseEventHandler, useCallback, useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import { gql, useLazyQuery } from '@apollo/client';
+import React, { Fragment, useCallback, useEffect, useState } from 'react';
+import { useLazyQuery } from '@apollo/client';
 import { DndContext, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { debounce } from 'lodash';
+import type { MouseEventHandler } from 'react';
 import AnimateHeight from 'react-animate-height';
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  components as ReactSelectComponents,
-  ContainerProps,
-  InputProps,
-  MultiValueProps,
-  OptionProps,
-} from 'react-select';
+import type { ContainerProps, InputProps, MultiValueProps, OptionProps } from 'react-select';
+import { components as ReactSelectComponents } from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 
 import { IGNORED_TAGS } from '../lib/constants/collectives';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import colors from '../lib/theme/colors';
 
 import { Flex } from './Grid';
 import StyledTag from './StyledTag';
 import { Span } from './Text';
 
-export const searchTagsQuery = gql`
+const searchTagsQuery = gql`
   query SearchTags($term: String) {
     tagStats(tagSearchTerm: $term) {
       nodes {
@@ -103,7 +98,15 @@ const debouncedSearch = debounce((searchFunc, variables) => {
   return searchFunc({ variables });
 }, 500);
 
-function CollectiveTagsInput({ defaultValue = [], onChange, suggestedTags = [] }) {
+function CollectiveTagsInput({
+  defaultValue = [],
+  onChange,
+  suggestedTags = [],
+}: {
+  defaultValue?: string[];
+  onChange: (tags: TagOption[]) => void;
+  suggestedTags?: string[];
+}) {
   const intl = useIntl();
   const [searchTags, { loading: fetching, data }] = useLazyQuery(searchTagsQuery, {
     context: API_V2_CONTEXT,
@@ -188,12 +191,20 @@ function CollectiveTagsInput({ defaultValue = [], onChange, suggestedTags = [] }
             placeholder={intl.formatMessage({ id: 'collective.tags.input.placeholder', defaultMessage: '+ Add tags' })}
             isMulti
             value={selected}
-            menuPortalTarget={document.body}
+            menuPortalTarget={typeof document === 'undefined' ? null : document.body}
             components={{
               MultiValue,
               SelectContainer,
               Input,
               Option,
+            }}
+            onBlur={(event: React.FocusEvent<HTMLInputElement>) => {
+              // Needed for React-select to work with Radix UI dialogs
+              // https://github.com/JedWatson/react-select/issues/5732#issuecomment-1742107647
+              const element = event.relatedTarget;
+              if (element && (element.tagName === 'A' || element.tagName === 'BUTTON' || element.tagName === 'INPUT')) {
+                (element as HTMLElement).focus();
+              }
             }}
             onKeyDown={e => {
               // Stop enter key from closing the menu and submitting the form when it's loading and there are no options
@@ -206,9 +217,11 @@ function CollectiveTagsInput({ defaultValue = [], onChange, suggestedTags = [] }
             isLoading={loading}
             onChange={(selectedOptions: TagOption[]) => setSelected(selectedOptions)}
             styles={{
-              menuPortal: styles => ({ ...styles, zIndex: 9999 }),
-              control: (baseStyles, state) => ({
-                ...baseStyles,
+              menuPortal: styles => ({ ...styles, zIndex: 9999, pointerEvents: 'auto' }),
+              menu: styles => ({ ...styles, fontSize: '14px' }),
+              control: (styles, state) => ({
+                ...styles,
+                fontSize: '14px',
                 boxShadow: `inset 0px 2px 2px ${colors.primary[50]}`,
                 borderColor: state.isFocused ? colors.primary[500] : colors.black[300],
                 '&:hover': {
@@ -236,8 +249,8 @@ function CollectiveTagsInput({ defaultValue = [], onChange, suggestedTags = [] }
       <AnimateHeight height={suggestedTags?.length > 0 ? 'auto' : 0}>
         <Flex mt={2} gap={'6px'} flexWrap="wrap" alignItems={'center'}>
           {suggestedTags && (
-            <Span color="black.600" mr={1}>
-              <FormattedMessage defaultMessage="Popular tags:" />
+            <Span color="black.600" mr={1} fontSize="12px">
+              <FormattedMessage defaultMessage="Popular tags:" id="W4zXqr" />
             </Span>
           )}
 
@@ -246,10 +259,9 @@ function CollectiveTagsInput({ defaultValue = [], onChange, suggestedTags = [] }
             return (
               <StyledTag
                 variant="rounded-right"
-                type="button"
+                htmlType="button"
                 tabIndex={-1}
                 key={tag}
-                closeButtonProps={false}
                 style={{ opacity: isSelected ? 0.5 : 1, cursor: 'pointer' }}
                 onClick={() =>
                   isSelected
@@ -266,12 +278,5 @@ function CollectiveTagsInput({ defaultValue = [], onChange, suggestedTags = [] }
     </Fragment>
   );
 }
-
-CollectiveTagsInput.propTypes = {
-  defaultValue: PropTypes.arrayOf(PropTypes.string),
-  suggestedTags: PropTypes.arrayOf(PropTypes.string),
-  onChange: PropTypes.func,
-  preload: PropTypes.bool,
-};
 
 export default CollectiveTagsInput;

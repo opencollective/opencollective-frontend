@@ -1,17 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { i18nGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 
+import { expenseTagsQuery } from './dashboard/filters/ExpenseTagsFilter';
 import ExpenseTypeTag from './expenses/ExpenseTypeTag';
+import { useToast } from './ui/useToast';
+import EditTags, { AutocompleteEditTags } from './EditTags';
 import { Flex } from './Grid';
-import StyledInputTags from './StyledInputTags';
 import StyledTag from './StyledTag';
-import { TOAST_TYPE, useToasts } from './ToastProvider';
 
 const setTagsMutation = gql`
   mutation SetTags($order: OrderReferenceInput, $expense: ExpenseReferenceInput, $tags: [String!]!) {
@@ -34,23 +35,33 @@ const setTagsMutation = gql`
 const TagsForAdmins = ({ expense, order, suggestedTags }) => {
   const [setTags, { loading }] = useMutation(setTagsMutation, { context: API_V2_CONTEXT });
   const tagList = expense?.tags || order?.tags;
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const intl = useIntl();
-  return (
-    <StyledInputTags
-      disabled={loading}
-      value={tagList}
-      suggestedTags={suggestedTags}
-      onChange={async tags => {
-        try {
-          const referencedObject = expense ? { expense: { id: expense.id } } : { order: { id: order.id } };
-          await setTags({ variables: { ...referencedObject, tags: tags.map(tag => tag.value) } });
-        } catch (e) {
-          addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
-        }
-      }}
-    />
+
+  const onChange = React.useCallback(
+    async tags => {
+      try {
+        const referencedObject = expense ? { expense: { id: expense.id } } : { order: { id: order.id } };
+        await setTags({ variables: { ...referencedObject, tags: tags.map(tag => tag.value) } });
+      } catch (e) {
+        toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+      }
+    },
+    [expense, order],
   );
+
+  if (expense) {
+    return (
+      <AutocompleteEditTags
+        disabled={loading}
+        value={tagList}
+        query={expenseTagsQuery}
+        variables={{ account: { slug: expense?.account?.slug } }}
+        onChange={onChange}
+      />
+    );
+  }
+  return <EditTags disabled={loading} value={tagList} suggestedTags={suggestedTags} onChange={onChange} />;
 };
 
 TagsForAdmins.propTypes = {
@@ -61,6 +72,9 @@ TagsForAdmins.propTypes = {
     tags: PropTypes.arrayOf(PropTypes.string),
     legacyId: PropTypes.number,
     type: PropTypes.string,
+    account: PropTypes.shape({
+      slug: PropTypes.string,
+    }),
   }),
   order: PropTypes.shape({
     id: PropTypes.string,
@@ -77,7 +91,17 @@ const Tag = styled(StyledTag).attrs({
   variant: 'rounded-right',
 })``;
 
-const Tags = ({ expense, order, isLoading, limit, getTagProps, children, canEdit, suggestedTags, showUntagged }) => {
+const Tags = ({
+  expense,
+  order,
+  isLoading,
+  limit = 4,
+  getTagProps,
+  children,
+  canEdit,
+  suggestedTags,
+  showUntagged,
+}) => {
   const intl = useIntl();
   const tagList = expense?.tags || order?.tags;
 
@@ -105,7 +129,7 @@ const Tags = ({ expense, order, isLoading, limit, getTagProps, children, canEdit
             {showUntagged &&
               renderTag({
                 tag: 'untagged',
-                label: intl.formatMessage(defineMessage({ defaultMessage: 'Untagged' })),
+                label: intl.formatMessage(defineMessage({ defaultMessage: 'Untagged', id: '8/OT+O' })),
               })}
 
             {tagList.length > limit && (
@@ -152,10 +176,6 @@ Tags.propTypes = {
   }),
   /** Whether to show an "Untagged" tag (when used for filtering) */
   showUntagged: PropTypes.bool,
-};
-
-Tags.defaultProps = {
-  limit: 4,
 };
 
 export default Tags;

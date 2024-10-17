@@ -34,24 +34,18 @@ const TotalAmountLine = styled(AmountLine)`
  */
 const ExpenseAmountBreakdown = ({ items, currency, taxes, expenseTotalAmount }) => {
   const intl = useIntl();
-  const { hasTaxes, totalInvoiced, totalAmount } = computeExpenseAmounts(items, taxes);
+  const { hasTaxes, totalInvoiced, totalAmount } = computeExpenseAmounts(currency, items, taxes);
   return (
     <Container textAlign="right">
       {hasTaxes && (
         <Flex flexDirection="column" alignItems="flex-end">
           <AmountLine data-cy="expense-invoiced-amount">
             <Span textTransform="capitalize" mr={3}>
-              <FormattedMessage defaultMessage="Subtotal" />
+              <FormattedMessage defaultMessage="Subtotal" id="L8seEc" />
               {currency && ` (${currency})`}
             </Span>
             &nbsp;
-            <FormattedMoneyAmount
-              amount={totalInvoiced}
-              precision={2}
-              currency={currency}
-              showCurrencyCode={false}
-              amountStyles={null}
-            />
+            <FormattedMoneyAmount amount={totalInvoiced} precision={2} currency={currency} showCurrencyCode={false} />
           </AmountLine>
           {taxes.map(tax => (
             <AmountLine key={tax.type} data-cy={`tax-${tax.type}-expense-amount-line`}>
@@ -65,7 +59,6 @@ const ExpenseAmountBreakdown = ({ items, currency, taxes, expenseTotalAmount }) 
                 precision={2}
                 currency={currency}
                 showCurrencyCode={false}
-                amountStyles={null}
               />
             </AmountLine>
           ))}
@@ -77,12 +70,12 @@ const ExpenseAmountBreakdown = ({ items, currency, taxes, expenseTotalAmount }) 
           {intl.formatMessage({ id: 'TotalAmount', defaultMessage: 'Total amount' })}
         </Span>
         &nbsp;
-        <Span color="black.500" fontSize="16px" letterSpacing={0} data-cy="expense-items-total-amount">
+        <Span fontSize="16px" letterSpacing={0} data-cy="expense-items-total-amount">
           <FormattedMoneyAmount
             amount={expenseTotalAmount ?? totalAmount}
             precision={2}
             currency={currency}
-            showCurrencyCode={false}
+            showCurrencyCode={true}
           />
         </Span>
       </TotalAmountLine>
@@ -96,13 +89,17 @@ ExpenseAmountBreakdown.propTypes = {
   /** Expense items */
   items: PropTypes.arrayOf(
     PropTypes.shape({
-      amount: PropTypes.number,
+      amountV2: PropTypes.shape({
+        valueInCents: PropTypes.number,
+        currency: PropTypes.string,
+      }),
     }),
   ).isRequired,
   /** Taxes applied to the expense */
   taxes: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string,
+      type: PropTypes.string,
       rate: PropTypes.number,
     }),
   ),

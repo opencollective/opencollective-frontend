@@ -112,7 +112,7 @@ function contributeNewBancontact({ name } = {}) {
   });
   cy.wait(1000);
   cy.get('button[data-cy="cf-next-step"]').click();
-  cy.contains('Authorize Test Payment').click();
+  cy.contains('a', 'Authorize Test Payment').click();
   cy.wait(3000);
 }
 
@@ -316,6 +316,17 @@ describe('Contribute Flow: Stripe Payment Element', () => {
       });
 
       cy.createCollectiveV2({ host: { slug: 'e2e-eur-host' } }).as('collective');
+
+      // Stripe recently introduced a JS snippet that has a syntax error, which breaks the tests.
+      // Feel free to remove that after some time, see if it's still needed.
+      // This event will automatically be unbound when this test ends because it's attached to the cy object.
+      cy.origin('https://stripe.com', () => {
+        cy.on('uncaught:exception', e => {
+          if (e.message.includes("> Unexpected token ')'")) {
+            return false;
+          }
+        });
+      });
     });
 
     it('Guest', testConfig, () => {

@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { get, orderBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import { isIndividualAccount } from '../../../lib/collective.lib';
+import { isHeavyAccount, isIndividualAccount } from '../../../lib/collective';
 import { TransactionKind } from '../../../lib/constants/transactions';
 import { EMPTY_ARRAY } from '../../../lib/constants/utils';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import { getCollectivePageRoute } from '../../../lib/url-helpers';
 
 import { DebitItem } from '../../budget/DebitCreditList';
@@ -34,22 +34,56 @@ const budgetSectionAccountFieldsFragment = gql`
     id
     isHost
     type
+    ... on AccountWithHost {
+      host {
+        id
+        slug
+        name
+        accountingCategories {
+          nodes {
+            id
+            code
+            name
+            kind
+            appliesTo
+          }
+        }
+      }
+    }
+    ... on Organization {
+      host {
+        id
+        slug
+        name
+        accountingCategories {
+          nodes {
+            id
+            code
+            name
+            kind
+            appliesTo
+          }
+        }
+      }
+    }
+
     stats {
+      # Skip following on Heavy Accounts (low performance vs relevance ratio)
       id
       balance {
         valueInCents
         currency
       }
-      consolidatedBalance {
+      consolidatedBalance @skip(if: $heavyAccount) {
         valueInCents
         currency
       }
-      yearlyBudget {
+      yearlyBudget @skip(if: $heavyAccount) {
         valueInCents
         currency
       }
-      activeRecurringContributions
-      totalAmountReceived(periodInMonths: 12) {
+      activeRecurringContributions @skip(if: $heavyAccount)
+      totalAmountReceived(periodInMonths: 12) @skip(if: $heavyAccount) {
         valueInCents
         currency
       }
@@ -65,8 +99,8 @@ const budgetSectionAccountFieldsFragment = gql`
   }
 `;
 
-export const budgetSectionQuery = gql`
-  query BudgetSection($slug: String!, $limit: Int!, $kind: [TransactionKind]) {
+const budgetSectionQuery = gql`
+  query BudgetSection($slug: String!, $limit: Int!, $kind: [TransactionKind], $heavyAccount: Boolean!) {
     transactions(
       account: { slug: $slug }
       limit: $limit
@@ -99,7 +133,7 @@ export const budgetSectionQuery = gql`
   ${budgetSectionAccountFieldsFragment}
 `;
 
-export const budgetSectionForIndividualQuery = gql`
+const budgetSectionForIndividualQuery = gql`
   query BudgetSectionForIndividual($slug: String!, $limit: Int!, $kind: [TransactionKind]) {
     transactions(
       account: { slug: $slug }
@@ -143,8 +177,8 @@ export const budgetSectionForIndividualQuery = gql`
   ${expenseHostFields}
 `;
 
-export const budgetSectionWithHostQuery = gql`
-  query BudgetSectionWithHost($slug: String!, $limit: Int!, $kind: [TransactionKind]) {
+const budgetSectionWithHostQuery = gql`
+  query BudgetSectionWithHost($slug: String!, $limit: Int!, $kind: [TransactionKind], $heavyAccount: Boolean!) {
     transactions(
       account: { slug: $slug }
       limit: $limit
@@ -193,7 +227,12 @@ export const getBudgetSectionQueryVariables = (collectiveSlug, isIndividual) => 
   if (isIndividual) {
     return { slug: collectiveSlug, limit: 3, kind: getDefaultKinds().filter(kind => kind !== TransactionKind.EXPENSE) };
   } else {
-    return { slug: collectiveSlug, limit: 3, kind: getDefaultKinds() };
+    return {
+      slug: collectiveSlug,
+      limit: 3,
+      kind: getDefaultKinds(),
+      heavyAccount: isHeavyAccount(collectiveSlug),
+    };
   }
 };
 
@@ -348,7 +387,7 @@ const SectionBudget = ({ collective, LoggedInUser }) => {
             {isLoading ? (
               <LoadingPlaceholder height={300} />
             ) : !allItems.length ? (
-              <Container textAlign="center" py={94} px={2}>
+              <div className="flex flex-col items-center justify-center px-1 py-[94px] text-center">
                 <Image src="/static/images/empty-jars.png" alt="Empty jars" width={125} height={125} />
                 <P fontWeight="500" fontSize="20px" lineHeight="28px">
                   <FormattedMessage id="Budget.Empty" defaultMessage="There are no transactions yet." />
@@ -359,7 +398,7 @@ const SectionBudget = ({ collective, LoggedInUser }) => {
                     defaultMessage="Come back to this section once there is at least one transaction!"
                   />
                 </P>
-              </Container>
+              </div>
             ) : (
               allItems.map((item, idx) => {
                 return (

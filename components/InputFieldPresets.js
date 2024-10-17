@@ -7,13 +7,13 @@ import InputField from './InputField';
 
 const InputFieldPresetsContainer = styled.div`
   .inputField {
-    max-width: 14rem;
+    max-width: 8.75rem;
     margin: 0;
   }
   .form-group {
     margin-bottom: 0;
     margin-left: 0;
-    margin-right: 1rem;
+    margin-right: 0.65rem;
   }
 `;
 

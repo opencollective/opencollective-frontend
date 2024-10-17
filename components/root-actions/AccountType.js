@@ -1,18 +1,19 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import ConfirmationModal from '../ConfirmationModal';
+import DashboardHeader from '../dashboard/DashboardHeader';
 import StyledButton from '../StyledButton';
 import StyledInputField from '../StyledInputField';
 import { P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
-export const editAccountTypeMutation = gql`
+const editAccountTypeMutation = gql`
   mutation EditAccountType($account: AccountReferenceInput!) {
     editAccountType(account: $account) {
       id
@@ -23,7 +24,7 @@ export const editAccountTypeMutation = gql`
 `;
 
 const AccountType = () => {
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const intl = useIntl();
   const [selectedAccountOption, setSelectedAccountOption] = React.useState([]);
   const [editAccountType, { loading }] = useMutation(editAccountTypeMutation, { context: API_V2_CONTEXT });
@@ -40,17 +41,22 @@ const AccountType = () => {
           account: { slug: selectedAccountOption?.value?.slug },
         },
       });
-      addToast({ type: TOAST_TYPE.SUCCESS, title: 'Account Type Successfully Changed', message: callToAction });
+      toast({ variant: 'success', title: 'Account Type Successfully Changed', message: callToAction });
       // Reset form and purge cache
       setIsConfirmationModelOpen(false);
       setSelectedAccountOption([]);
     } catch (e) {
-      addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
+      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     }
   }, [selectedAccountOption, callToAction]);
 
   return (
     <React.Fragment>
+      <DashboardHeader
+        title="Account Type"
+        description="This tool is meant to convert a User account to an Organization type. The organization account will have the fields copied from the initial user account. Please notify the user to go through and update the organization account details after this is done. The location data for the user (if exists) will become public for the organization."
+        className="mb-10"
+      />
       <StyledInputField htmlFor="accounts-picker" label="Account" flex="1 1">
         {({ id }) => (
           <CollectivePickerAsync
@@ -68,7 +74,7 @@ const AccountType = () => {
         width="100%"
         buttonStyle="danger"
         loading={loading}
-        disabled={selectedAccountOption.length === 0}
+        disabled={selectedAccountOption?.length === 0}
         onClick={async () => {
           setIsConfirmationModelOpen(true);
         }}

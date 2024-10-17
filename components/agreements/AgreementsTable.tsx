@@ -1,157 +1,123 @@
 import React from 'react';
-import { themeGet } from '@styled-system/theme-get';
-import { ColumnDef, TableMeta } from '@tanstack/react-table';
+import type { ColumnDef, TableMeta } from '@tanstack/react-table';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
 
-import { Agreement } from '../../lib/graphql/types/v2/graphql';
-import { useWindowResize } from '../../lib/hooks/useWindowResize';
+import type { Agreement } from '../../lib/graphql/types/v2/graphql';
 
+import { AccountHoverCard } from '../AccountHoverCard';
 import Avatar from '../Avatar';
-import { DataTable } from '../DataTable';
 import DateTime from '../DateTime';
-import { Box, Flex } from '../Grid';
-import LinkCollective from '../LinkCollective';
+import { Box } from '../Grid';
 import StyledHr from '../StyledHr';
 import StyledLinkButton from '../StyledLinkButton';
-import { P, Span } from '../Text';
+import { DataTable } from '../table/DataTable';
+import { P } from '../Text';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/DropdownMenu';
+import { TableActionsButton } from '../ui/Table';
 import UploadedFilePreview from '../UploadedFilePreview';
-
-const CellButton = styled.button`
-  border: 0;
-  width: 100%;
-  outline: none;
-  background: transparent;
-  text-align: left;
-  cursor: pointer;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  padding: 16px;
-  font-weight: 500;
-  color: ${themeGet('colors.black.900')};
-
-  &:hover,
-  :focus-visible {
-    .title {
-      text-decoration: underline;
-    }
-  }
-`;
 
 interface AgreementMeta extends TableMeta<Agreement> {
   openAgreement: (agreement: Agreement) => void;
+  onFilePreview: (agreement: Agreement) => void;
 }
 
-export const cardColumns: ColumnDef<Agreement>[] = [
-  {
-    accessorKey: 'summary',
-    cell: ({ row, table }) => {
-      const agreement = row.original;
-      const meta = table.options.meta as AgreementMeta;
-      return (
-        <CellButton onClick={() => meta.openAgreement(agreement)}>
-          <Flex alignItems="center" gridGap="16px" mb="16px">
-            <Avatar collective={agreement.account} radius={32} />
-            <Flex flexDirection="column" gridGap="4px">
-              <Span letterSpacing="0" truncateOverflow fontWeight="500">
-                {agreement.account.name}
-              </Span>
-              <Span fontSize="14px" color="black.700" fontWeight="normal">
-                {agreement.expiresAt && <DateTime value={agreement.expiresAt} />}
-                {agreement.expiresAt && agreement.attachment && ' • '}
-                {agreement.attachment && (
-                  <FormattedMessage
-                    id="ExepenseAttachments.count"
-                    defaultMessage="{count, plural, one {# attachment} other {# attachments}}"
-                    values={{ count: 1 }}
-                  />
-                )}
-              </Span>
-            </Flex>
-          </Flex>
-          <Span fontSize="16px" fontWeight="700" lineHeight="24px" color="black.800">
-            {agreement.title}
-          </Span>
-        </CellButton>
-      );
-    },
-  },
-];
-
-export const tableColumns: ColumnDef<Agreement>[] = [
+const columns: ColumnDef<Agreement>[] = [
   {
     accessorKey: 'account',
-    header: () => <FormattedMessage defaultMessage="Account" />,
+    header: () => <FormattedMessage defaultMessage="Account" id="TwyMau" />,
+    meta: { className: 'w-40 sm:w-56' },
+
     cell: ({ cell }) => {
       const account = cell.getValue() as Agreement['account'];
       return (
-        <Flex alignItems="center" p={3} gridGap={2}>
-          <Avatar collective={account} radius={20} />
-          <LinkCollective collective={account}>
-            <Span letterSpacing="0" color="black.700" truncateOverflow fontSize="16px" fontWeight="700">
-              {account.name}
-            </Span>
-          </LinkCollective>
-        </Flex>
+        <AccountHoverCard
+          account={account}
+          trigger={
+            <div className="flex items-center gap-2 truncate">
+              <Avatar collective={account} radius={24} />
+              <span className="truncate">{account.name}</span>
+            </div>
+          }
+        />
       );
     },
   },
   {
     accessorKey: 'title',
+    meta: { className: 'w-32 sm:w-auto' },
     header: () => <FormattedMessage id="Title" defaultMessage="Title" />,
-    cell: ({ cell, row, table }) => {
+    cell: ({ cell }) => {
       const title = cell.getValue() as Agreement['title'];
-      const agreement = row.original;
-      const meta = table.options.meta as AgreementMeta;
-      return (
-        <CellButton onClick={() => meta.openAgreement(agreement)}>
-          <Span fontSize="16px" fontWeight="700">
-            {title}
-          </Span>
-        </CellButton>
-      );
+      return <div className="truncate">{title}</div>;
     },
   },
 
   {
     accessorKey: 'expiresAt',
-    header: () => <FormattedMessage id="Attachment.expiresAt" defaultMessage="Expires" />,
+    header: () => <FormattedMessage id="Agreement.expiresAt" defaultMessage="Expires" />,
+    meta: { className: 'w-32' },
+
     cell: ({ cell }) => {
       const expiresAt = cell.getValue() as Agreement['expiresAt'];
-      return (
-        <Box p={3} fontSize="14px">
-          {expiresAt ? (
-            <Span letterSpacing="0" truncateOverflow>
-              <DateTime value={expiresAt} />
-            </Span>
-          ) : (
-            <Span fontStyle="italic" color="black.500">
-              <FormattedMessage defaultMessage="Never" />
-            </Span>
-          )}
-        </Box>
+      return expiresAt ? (
+        <span className="truncate">
+          <DateTime value={expiresAt} dateStyle="medium" />
+        </span>
+      ) : (
+        <span className="italic text-slate-500">
+          <FormattedMessage defaultMessage="Never" id="du1laW" />
+        </span>
       );
     },
   },
   {
     accessorKey: 'attachment',
     header: () => <FormattedMessage id="Expense.Attachment" defaultMessage="Attachment" />,
-    meta: { align: 'right' },
-    cell: ({ cell }) => {
-      const attachment = cell.getValue() as Agreement['attachment'];
+    meta: { className: 'w-20' },
+    cell: ({ row, table }) => {
+      const agreement = row.original as Agreement;
+      const attachment = agreement.attachment;
       if (!attachment?.url) {
-        return <Box size={48} m={3} />;
+        return <Box size={32} />;
       }
+
+      const meta = table.options.meta as AgreementMeta;
       return (
-        <Flex p={3} justifyContent="flex-end">
+        <div className="flex justify-end">
           <UploadedFilePreview
             url={attachment?.url}
-            size={48}
+            size={32}
             borderRadius="8px"
-            boxShadow="0px 2px 5px rgba(0, 0, 0, 0.14)"
+            openFileViewer={() => meta?.onFilePreview(agreement)}
+            className="hover:shadow"
           />
-        </Flex>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: 'actions',
+    header: null,
+    meta: { className: 'w-14' },
+    cell: ({ table, row }) => {
+      const { openAgreement } = table.options.meta as AgreementMeta;
+      const application = row.original;
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <TableActionsButton />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem
+              onClick={e => {
+                e.stopPropagation();
+                openAgreement(application);
+              }}
+            >
+              <FormattedMessage defaultMessage="View details" id="MnpUD7" />
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       );
     },
   },
@@ -163,6 +129,7 @@ type AgreementsTableProps = {
   resetFilters?: () => void;
   loading?: boolean;
   nbPlaceholders?: number;
+  onFilePreview?: (agreement: Agreement) => void;
 };
 
 export default function AgreementsTable({
@@ -171,28 +138,29 @@ export default function AgreementsTable({
   loading,
   nbPlaceholders,
   resetFilters,
+  onFilePreview,
 }: AgreementsTableProps) {
-  const [isTableView, setIsTableView] = React.useState(true);
-  useWindowResize(() => setIsTableView(window.innerWidth > 1024));
-  const columns = isTableView ? tableColumns : cardColumns;
   return (
     <DataTable
-      hideHeader={!isTableView}
+      data-cy="agreements-table"
+      innerClassName="table-fixed"
+      mobileTableView
       columns={columns}
       data={agreements?.nodes || []}
-      meta={{ openAgreement } as AgreementMeta}
+      meta={{ openAgreement, onFilePreview } as AgreementMeta}
       loading={loading}
       nbPlaceholders={nbPlaceholders}
+      onClickRow={row => openAgreement(row.original)}
       emptyMessage={() => (
         <div>
           <P fontSize="16px">
-            <FormattedMessage defaultMessage="No agreements" />
+            <FormattedMessage defaultMessage="No agreements" id="7eGjv6" />
           </P>
           {resetFilters && (
             <div>
               <StyledHr maxWidth={300} m="16px auto" borderColor="black.100" />
               <StyledLinkButton onClick={resetFilters}>
-                <FormattedMessage defaultMessage="Reset filters" />
+                <FormattedMessage defaultMessage="Reset filters" id="jZ0o74" />
               </StyledLinkButton>
             </div>
           )}

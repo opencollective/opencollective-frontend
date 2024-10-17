@@ -7,6 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import styled, { withTheme } from 'styled-components';
 import { isHexColor } from 'validator';
 
+import { editCollectiveSettingsMutation } from '../../../lib/graphql/v1/mutations';
 import defaultTheme from '../../../lib/theme';
 
 import Container from '../../Container';
@@ -16,7 +17,6 @@ import StyledCard from '../../StyledCard';
 import StyledInput from '../../StyledInput';
 import StyledInputGroup from '../../StyledInputGroup';
 import { P } from '../../Text';
-import { editCollectiveSettingsMutation } from '../graphql/mutations';
 
 const colorPath = 'collectivePage.primaryColor';
 

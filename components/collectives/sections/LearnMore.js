@@ -63,9 +63,9 @@ const DonateButton = styled(StyledButton)`
 
 const learningChannels = [
   {
-    id: 'slack',
-    name: 'Slack',
-    link: 'https://slack.opencollective.com',
+    id: 'discord',
+    name: 'Discord',
+    link: 'https://discord.opencollective.com',
     desktopItemOrder: 2,
   },
   {
@@ -95,7 +95,7 @@ const learningChannels = [
   {
     id: 'openCompany',
     name: 'Open Company',
-    link: 'https://drive.opencollective.com',
+    link: 'https://opencollective.com/opencollective',
     desktopItemOrder: 6,
   },
 ];
@@ -117,13 +117,13 @@ const messages = defineMessages({
     id: 'home.learnMore.blog.buttonText',
     defaultMessage: 'Visit our blog',
   },
-  'home.learnMore.slack': {
-    id: 'home.learnMore.slack',
+  'home.learnMore.discord': {
+    id: 'home.learnMore.discord',
     defaultMessage: 'Come meet the team, chat with the community, and share your questions and stories.',
   },
-  'home.learnMore.slack.buttonText': {
-    id: 'home.learnMore.slack.buttonText',
-    defaultMessage: 'Join our slack',
+  'home.learnMore.discord.buttonText': {
+    id: 'home.learnMore.discord.buttonText',
+    defaultMessage: 'Join our Discord',
   },
   'home.learnMore.openSourceCode': {
     id: 'home.learnMore.OpenSourceCode',

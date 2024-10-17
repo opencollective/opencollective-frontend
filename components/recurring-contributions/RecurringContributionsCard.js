@@ -41,14 +41,13 @@ const RecurringContributionsCard = ({
   isAdmin,
   onCloseEdit,
   onEdit,
-  showPaymentMethod,
+  showPaymentMethod = true,
   ...props
 }) => {
   const { formatMessage } = useIntl();
   const isError = status === ORDER_STATUS.ERROR;
   const isRejected = status === ORDER_STATUS.REJECTED;
   const isEditable = [ORDER_STATUS.ACTIVE, ORDER_STATUS.PROCESSING, ORDER_STATUS.NEW].includes(status) || isError;
-
   return (
     <StyledCollectiveCard
       {...props}
@@ -86,10 +85,10 @@ const RecurringContributionsCard = ({
           {showPaymentMethod && contribution.paymentMethod && (
             <Box mb={3}>
               <P mb={2} fontSize="14px" lineHeight="20px" fontWeight="400">
-                Payment method
+                <FormattedMessage id="Fields.paymentMethod" defaultMessage="Payment method" />
               </P>
               <Flex alignItems="center" height="28px">
-                <Box mr={2}>{getPaymentMethodIcon(contribution.paymentMethod, account)}</Box>
+                <Box mr={2}>{getPaymentMethodIcon(contribution.paymentMethod, account, 32)}</Box>
                 <Flex flexDirection="column" css={{ position: 'relative', minWidth: 0 }}>
                   <P
                     fontSize="11px"
@@ -134,7 +133,6 @@ const RecurringContributionsCard = ({
                     currency={contribution.amount.currency}
                     showCurrencyCode={false}
                     precision="auto"
-                    amountStyles={{ fontWeight: 'normal', color: 'black.700' }}
                   />
                   {' + '}
                   <FormattedMoneyAmount
@@ -142,7 +140,6 @@ const RecurringContributionsCard = ({
                     currency={contribution.amount.currency}
                     showCurrencyCode={false}
                     precision="auto"
-                    amountStyles={{ fontWeight: 'normal', color: 'black.700' }}
                   />
                   )
                 </P>
@@ -205,10 +202,6 @@ RecurringContributionsCard.propTypes = {
   LoggedInUser: PropTypes.object,
   account: PropTypes.object.isRequired,
   showPaymentMethod: PropTypes.bool,
-};
-
-RecurringContributionsCard.defaultProps = {
-  showPaymentMethod: true,
 };
 
 export default RecurringContributionsCard;

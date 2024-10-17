@@ -6,12 +6,14 @@ export const tierPageQuery = gqlV1/* GraphQL */ `
   query TierPage($tierId: Int!) {
     Tier(id: $tierId) {
       id
+      idV2
       name
       slug
       description
       longDescription
       videoUrl
       goal
+      type
       currency
       interval
       endsAt
@@ -73,6 +75,7 @@ export const tierPageQuery = gqlV1/* GraphQL */ `
         parentCollective {
           id
           slug
+          name
           twitterHandle
           image
           backgroundImageUrl

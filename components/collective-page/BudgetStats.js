@@ -1,13 +1,13 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Calendar } from '@styled-icons/feather/Calendar';
-import { Expand } from '@styled-icons/ionicons-solid/Expand';
 import { ShowChart } from '@styled-icons/material/ShowChart';
+import { Expand } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { border } from 'styled-system';
 
-import { isIndividualAccount } from '../../lib/collective.lib';
+import { isIndividualAccount } from '../../lib/collective';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { formatCurrency, getCurrencySymbol } from '../../lib/currency-utils';
 import { AmountPropTypeShape } from '../../lib/prop-types';
@@ -19,22 +19,22 @@ import { Box } from '../Grid';
 import StyledCard from '../StyledCard';
 import { P, Span } from '../Text';
 
-const StatTitle = styled(Container)`
+const StatTitle = styled(Container).attrs(props => ({
+  color: props.color || 'black.700',
+}))`
   font-size: 12px;
   line-height: 16px;
   font-weight: 500;
   text-transform: uppercase;
   margin-bottom: 8px;
+  display: flex;
+  align-items: center;
 `;
-
-StatTitle.defaultProps = {
-  color: 'black.700',
-};
 
 const StatAmount = ({ amount, ...props }) => (
   <P fontSize="16px" lineHeight="24px" color="black.700">
     {/* Pass null instead of 0 to make sure we display `--.--` */}
-    <FormattedMoneyAmount amount={amount || null} {...props} />
+    <FormattedMoneyAmount amountClassName="font-bold" amount={amount || null} {...props} />
   </P>
 );
 
@@ -63,8 +63,11 @@ const StatContainer = styled.div`
 
 const BudgetStats = ({ collective, stats, horizontal }) => {
   const { locale } = useIntl();
-  const monthlyRecurring =
-    (stats.activeRecurringContributions?.monthly || 0) + (stats.activeRecurringContributions?.yearly || 0) / 12;
+
+  if (!stats) {
+    return null;
+  }
+
   const isFund = collective.type === CollectiveType.FUND;
   const isIndividual = !collective.isHost && isIndividualAccount(collective);
   const borderTop = ['1px solid #dcdee0', 'none', horizontal ? null : '1px solid #dcdee0'];
@@ -97,19 +100,21 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
                   textTransform="uppercase"
                   color="black.700"
                   extraTooltipContent={
-                    <Fragment>
-                      <Box mt={2}>
-                        <FormattedMessage
-                          id="budgetSection-balance-consolidated"
-                          defaultMessage="Total consolidated including Projects and Events: {amount}"
-                          values={{
-                            amount: formatCurrency(stats?.consolidatedBalance.valueInCents || 0, collective.currency, {
-                              locale,
-                            }),
-                          }}
-                        />
-                      </Box>
-                    </Fragment>
+                    stats.consolidatedBalance && (
+                      <Fragment>
+                        <Box mt={2}>
+                          <FormattedMessage
+                            id="budgetSection-balance-consolidated"
+                            defaultMessage="Total consolidated including Projects and Events: {amount}"
+                            values={{
+                              amount: formatCurrency(stats.consolidatedBalance.valueInCents || 0, collective.currency, {
+                                locale,
+                              }),
+                            }}
+                          />
+                        </Box>
+                      </Fragment>
+                    )
                   }
                 />
               ) : (
@@ -136,7 +141,7 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
                         id="budgetSection-raised-total"
                         defaultMessage="Total contributed before fees: {amount}"
                         values={{
-                          amount: formatCurrency(stats?.totalAmountRaised.valueInCents || 0, collective.currency, {
+                          amount: formatCurrency(stats.totalAmountRaised.valueInCents || 0, collective.currency, {
                             locale,
                           }),
                         }}
@@ -158,7 +163,7 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
               currency={collective.currency}
             />
           </StatContainer>
-          {!isFund && (
+          {!isFund && stats.totalAmountReceived && stats.yearlyBudget && stats.activeRecurringContributions && (
             <StatContainer data-cy="budgetSection-estimated-budget" borderTop={borderTop}>
               <StatTitle>
                 <Calendar size="12px" />
@@ -172,7 +177,14 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
                         <FormattedMessage
                           id="CollectivePage.SectionBudget.MonthlyRecurringAmount"
                           defaultMessage="Monthly recurring: {amount}"
-                          values={{ amount: formatCurrency(monthlyRecurring, collective.currency, { locale }) }}
+                          values={{
+                            amount: formatCurrency(
+                              (stats.activeRecurringContributions?.monthly || 0) +
+                                (stats.activeRecurringContributions?.yearly || 0) / 12,
+                              collective.currency,
+                              { locale },
+                            ),
+                          }}
                         />
                       </Box>
                       <Box mt={2}>
@@ -180,7 +192,7 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
                           id="CollectivePage.SectionBudget.TotalAmountReceived"
                           defaultMessage="Total received in the last 12 months: {amount}"
                           values={{
-                            amount: formatCurrency(stats?.totalAmountReceived.valueInCents || 0, collective.currency, {
+                            amount: formatCurrency(stats.totalAmountReceived.valueInCents || 0, collective.currency, {
                               locale,
                             }),
                           }}
@@ -199,7 +211,7 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
           <StatContainer data-cy="budgetSection-total-contributed">
             <StatTitle>
               ↑&nbsp;
-              <FormattedMessage defaultMessage="Total contributed" />
+              <FormattedMessage defaultMessage="Total contributed" id="RogA5E" />
             </StatTitle>
             <StatAmount
               amount={Math.abs(stats.totalAmountSpent.valueInCents)}
@@ -209,7 +221,7 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
           <StatContainer data-cy="budgetSection-total-paid-expenses" borderTop={borderTop}>
             <StatTitle>
               ↓&nbsp;
-              <FormattedMessage defaultMessage="Total received with expenses" />
+              <FormattedMessage defaultMessage="Total received with expenses" id="Nqhan+" />
             </StatTitle>
             <StatAmount amount={stats.totalPaidExpenses.valueInCents} currency={stats.totalPaidExpenses.currency} />
           </StatContainer>
@@ -234,9 +246,9 @@ BudgetStats.propTypes = {
 
   /** Stats */
   stats: PropTypes.shape({
-    balance: AmountPropTypeShape.isRequired,
-    consolidatedBalance: AmountPropTypeShape.isRequired,
-    yearlyBudget: AmountPropTypeShape.isRequired,
+    balance: AmountPropTypeShape,
+    consolidatedBalance: AmountPropTypeShape,
+    yearlyBudget: AmountPropTypeShape,
     activeRecurringContributions: PropTypes.object,
     totalAmountReceived: AmountPropTypeShape,
     totalAmountRaised: AmountPropTypeShape,

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import CustomStyledIcon from './CustomStyledIcon';
 
-const PayPal = ({ width, height, size, ...props }) => {
+const PayPal = ({ width = undefined, height = undefined, size = undefined, ...props }) => {
   return (
     <CustomStyledIcon
       width={size || width || 21}

@@ -1,25 +1,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
-import Container from '../Container';
-import StyledButton from '../StyledButton';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import { P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { Button } from '../ui/Button';
+import { useToast } from '../ui/useToast';
 
 const deleteVirtualCardMutation = gql`
-  mutation deleteVirtualCard($virtualCard: VirtualCardReferenceInput!) {
+  mutation DeleteVirtualCard($virtualCard: VirtualCardReferenceInput!) {
     deleteVirtualCard(virtualCard: $virtualCard)
   }
 `;
 
 const DeleteVirtualCardModal = ({ virtualCard, onSuccess, onClose, onDeleteRefetchQuery, ...modalProps }) => {
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const refetchOptions = onDeleteRefetchQuery
     ? {
@@ -43,11 +42,12 @@ const DeleteVirtualCardModal = ({ virtualCard, onSuccess, onClose, onDeleteRefet
           },
         });
       } catch (e) {
-        addToast({
-          type: TOAST_TYPE.ERROR,
+        toast({
+          variant: 'error',
           message: (
             <FormattedMessage
               defaultMessage="Error deleting virtual card: {error}"
+              id="qYxNsK"
               values={{
                 error: e.message,
               }}
@@ -56,7 +56,7 @@ const DeleteVirtualCardModal = ({ virtualCard, onSuccess, onClose, onDeleteRefet
         });
         return;
       }
-      onSuccess?.(<FormattedMessage defaultMessage="Card successfully deleted" />);
+      onSuccess?.(<FormattedMessage defaultMessage="Card successfully deleted" id="+RvjCt" />);
       handleClose();
     },
   });
@@ -66,30 +66,34 @@ const DeleteVirtualCardModal = ({ virtualCard, onSuccess, onClose, onDeleteRefet
   };
 
   return (
-    <StyledModal width="382px" onClose={handleClose} trapFocus {...modalProps}>
+    <StyledModal onClose={handleClose} maxWidth={450} trapFocus {...modalProps}>
       <form onSubmit={formik.handleSubmit}>
         <ModalHeader onClose={handleClose}>
-          <FormattedMessage defaultMessage="Delete virtual card" />
+          <FormattedMessage defaultMessage="Delete virtual card" id="7nrRJ/" />
         </ModalHeader>
         <ModalBody pt={2}>
           <P>
-            <FormattedMessage defaultMessage="You are about to delete the virtual card, are you sure you want to continue ?" />
+            <FormattedMessage
+              defaultMessage="You are about to delete the virtual card, are you sure you want to continue ?"
+              id="TffQlZ"
+            />
           </P>
         </ModalBody>
         <ModalFooter isFullWidth>
-          <Container display="flex" justifyContent={['center', 'flex-end']} flexWrap="Wrap">
-            <StyledButton
-              my={1}
-              minWidth={140}
-              buttonStyle="primary"
+          <div className="flex flex-wrap justify-end gap-2">
+            <Button className="min-w-36" variant="outline" onClick={handleClose} type="button">
+              <FormattedMessage defaultMessage="Cancel" id="actions.cancel" />
+            </Button>
+            <Button
+              variant="destructive"
+              className="min-w-36"
               data-cy="confirmation-modal-continue"
               loading={isBusy}
               type="submit"
-              textTransform="capitalize"
             >
               <FormattedMessage id="actions.delete" defaultMessage="Delete" />
-            </StyledButton>
-          </Container>
+            </Button>
+          </div>
         </ModalFooter>
       </form>
     </StyledModal>

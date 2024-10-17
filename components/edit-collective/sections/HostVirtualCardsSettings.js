@@ -1,11 +1,11 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { Info } from '@styled-icons/feather/Info';
 import { get } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 
 import { Box, Flex } from '../../Grid';
 import InputField from '../../InputField';
@@ -15,7 +15,8 @@ import StyledInput from '../../StyledInput';
 import StyledInputField from '../../StyledInputField';
 import StyledTooltip from '../../StyledTooltip';
 import { P, Span } from '../../Text';
-import { TOAST_TYPE, useToasts } from '../../ToastProvider';
+import { useToast } from '../../ui/useToast';
+import { StripeVirtualCardComplianceStatement } from '../../virtual-cards/StripeVirtualCardComplianceStatement';
 
 import SettingsSectionTitle from './SettingsSectionTitle';
 
@@ -42,13 +43,13 @@ const messages = defineMessages({
 
 const HostVirtualCards = props => {
   const { formatMessage } = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const [updateAccountSetting, { loading: updateLoading }] = useMutation(updateAccountSettingsMutation, {
     context: API_V2_CONTEXT,
     onError: e => {
-      addToast({
-        type: TOAST_TYPE.ERROR,
+      toast({
+        variant: 'error',
         message: (
           <FormattedMessage
             id="Host.VirtualCards.Settings.Error"
@@ -88,14 +89,17 @@ const HostVirtualCards = props => {
         value,
       },
     });
-    addToast({
-      type: TOAST_TYPE.SUCCESS,
+    toast({
+      variant: 'success',
       message: <FormattedMessage id="Host.VirtualCards.Settings.Success" defaultMessage="Setting updated" />,
     });
   };
 
   return (
     <Fragment>
+      <Box my={3}>
+        <StripeVirtualCardComplianceStatement />
+      </Box>
       <Box>
         <SettingsSectionTitle>
           <FormattedMessage id="Host.VirtualCards.Settings.Title" defaultMessage="Settings and Policy" />
@@ -215,7 +219,7 @@ const HostVirtualCards = props => {
             </Box>
             <Flex alignItems="baseline">
               <Span mr={3}>
-                <FormattedMessage defaultMessage="Days" />
+                <FormattedMessage defaultMessage="Days" id="d8EqQY" />
               </Span>
               <StyledInputField
                 mt={3}
@@ -266,7 +270,7 @@ const HostVirtualCards = props => {
               showCount
               maxLength={VIRTUAL_CARDS_POLICY_MAX_LENGTH}
               version="simplified"
-              editorMinHeight="20rem"
+              editorMinHeight="12.5rem"
               editorMaxHeight={500}
               id={inputProps.id}
               inputName={inputProps.name}

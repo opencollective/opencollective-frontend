@@ -11,7 +11,7 @@ describe('Personal Token', () => {
   });
 
   it('create and edit personal token', () => {
-    cy.login({ email: user.email, redirect: `${user.collective.slug}/admin/for-developers` });
+    cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/for-developers` });
 
     cy.log('Starts with an empty state');
     cy.contains('[data-cy="personal-tokens-list"]', "You don't have any token yet");
@@ -75,7 +75,7 @@ describe('Personal Token', () => {
 
   it('create application with 2fa enabled', () => {
     cy.signup({ user: { name: 'Personal token tester', settings: { features: { adminPanel: true } } } }).then(user => {
-      cy.login({ email: user.email, redirect: `${user.collective.slug}/admin/for-developers` });
+      cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/for-developers` });
 
       const secret = speakeasy.generateSecret({ length: 64 });
       cy.enableTwoFactorAuth({

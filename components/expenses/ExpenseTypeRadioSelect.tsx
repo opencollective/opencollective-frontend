@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { defineMessages, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -97,7 +96,14 @@ const staticIllustrations = {
   [expenseTypes.GRANT]: grantIllustration,
 };
 
-const ExpenseTypeOption = ({ name, type, isChecked, onChange }) => {
+interface ExpenseTypeOptionProps {
+  name: string;
+  type: (typeof expenseTypes)[keyof typeof expenseTypes];
+  isChecked?: boolean;
+  onChange?: (...args: unknown[]) => unknown;
+}
+
+const ExpenseTypeOption = ({ name, type, isChecked, onChange }: ExpenseTypeOptionProps) => {
   const { formatMessage } = useIntl();
   const illustrationSrc = illustrations[type] || receiptIllustration;
   const staticIllustrationSrc = staticIllustrations[type] || receiptIllustrationStatic;
@@ -106,7 +112,7 @@ const ExpenseTypeOption = ({ name, type, isChecked, onChange }) => {
       <Box alignSelf={['center', 'baseline', null, 'center']}>
         <input type="radio" name={name} value={type} checked={isChecked} onChange={onChange} />
       </Box>
-      <Box mx={2} size={48} alignSelf="center" display={['block', 'none', null, 'block']}>
+      <Box flexShrink={0} mx={2} size={48} alignSelf="center" display={['block', 'none', null, 'block']}>
         <StaticTypeIllustration src={staticIllustrationSrc} />
         <TypeIllustration src={illustrationSrc} />
       </Box>
@@ -115,7 +121,7 @@ const ExpenseTypeOption = ({ name, type, isChecked, onChange }) => {
           {formatMessage(ExpenseTypeLabels[type])}
         </P>
         <Flex alignItems="center">
-          <Box mr={1} size={48} alignSelf="center" display={['none', 'block', null, 'none']}>
+          <Box flexShrink={0} mr={1} size={48} alignSelf="center" display={['none', 'block', null, 'none']}>
             <StaticTypeIllustration src={staticIllustrationSrc} />
             <TypeIllustration src={illustrationSrc} />
           </Box>
@@ -128,13 +134,6 @@ const ExpenseTypeOption = ({ name, type, isChecked, onChange }) => {
   );
 };
 
-ExpenseTypeOption.propTypes = {
-  name: PropTypes.string.isRequired,
-  type: PropTypes.oneOf(Object.values(expenseTypes)).isRequired,
-  isChecked: PropTypes.bool,
-  onChange: PropTypes.func,
-};
-
 const Fieldset = styled.fieldset`
   border: none;
   padding: 0;
@@ -143,6 +142,17 @@ const Fieldset = styled.fieldset`
 
 const BASE_EXPENSE_TYPES = [expenseTypes.INVOICE, expenseTypes.RECEIPT, expenseTypes.GRANT];
 
+interface ExpenseTypeRadioSelectProps {
+  /** The name of the input in the DOM */
+  name: string;
+  /** Default value */
+  value?: (typeof expenseTypes)[keyof typeof expenseTypes];
+  /** A function called with the new value when it changes */
+  onChange?: (...args: unknown[]) => unknown;
+  /** Supported expense types */
+  supportedExpenseTypes: string[];
+}
+
 /**
  * To select expense's type.
  *
@@ -150,7 +160,12 @@ const BASE_EXPENSE_TYPES = [expenseTypes.INVOICE, expenseTypes.RECEIPT, expenseT
  * IE & Chrome don't support using `flex` on fieldset yet, so we have to create a custom
  * layout. See https://github.com/w3c/csswg-drafts/issues/321
  */
-const ExpenseTypeRadioSelect = ({ name, onChange, value, supportedExpenseTypes }) => {
+const ExpenseTypeRadioSelect = ({
+  name = 'expense-type',
+  onChange,
+  value,
+  supportedExpenseTypes,
+}: ExpenseTypeRadioSelectProps) => {
   return (
     <StyledCard>
       <Fieldset onChange={onChange}>
@@ -162,21 +177,6 @@ const ExpenseTypeRadioSelect = ({ name, onChange, value, supportedExpenseTypes }
       </Fieldset>
     </StyledCard>
   );
-};
-
-ExpenseTypeRadioSelect.propTypes = {
-  /** The name of the input in the DOM */
-  name: PropTypes.string.isRequired,
-  /** Default value */
-  value: PropTypes.oneOf(Object.values(expenseTypes)),
-  /** A function called with the new value when it changes */
-  onChange: PropTypes.func,
-  /** Supported expense types */
-  supportedExpenseTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
-};
-
-ExpenseTypeRadioSelect.defaultProps = {
-  name: 'expense-type',
 };
 
 export default React.memo(ExpenseTypeRadioSelect);

@@ -1,5 +1,7 @@
-// eslint-disable-next-line node/no-unpublished-require
+// eslint-disable-next-line n/no-unpublished-require
 const { defineConfig } = require('cypress');
+const fs = require('fs');
+const { getTextFromPdfContent } = require('./test/cypress/scripts/get-text-from-pdf-content.ts');
 
 module.exports = defineConfig({
   experimentalMemoryManagement: true,
@@ -8,12 +10,12 @@ module.exports = defineConfig({
   projectId: 'yt5kwm',
   defaultCommandTimeout: 15000,
   responseTimeout: 60000,
-  video: false,
+  video: true,
   chromeWebSecurity: false,
   scrollBehavior: 'center',
   blockHosts: ['wtfismyip.com', 'images.opencollective.com', 'images-staging.opencollective.com', 'localhost:3001'],
   env: {
-    MAILDEV_URL: 'http://localhost:1080',
+    MAILPIT_URL: 'http://localhost:1080',
     codeCoverage: {
       url: '/__coverage__',
     },
@@ -21,9 +23,10 @@ module.exports = defineConfig({
   fixturesFolder: 'test/cypress/fixtures',
   screenshotsFolder: 'test/cypress/screenshots',
   videosFolder: 'test/cypress/videos',
+  downloadsFolder: 'test/cypress/downloads',
   e2e: {
     setupNodeEvents(on, config) {
-      // eslint-disable-next-line node/no-unpublished-require
+      // eslint-disable-next-line n/no-unpublished-require
       require('@cypress/code-coverage/task')(on, config);
 
       on('before:browser:launch', (browser, launchOptions) => {
@@ -38,6 +41,19 @@ module.exports = defineConfig({
           console.log(...message); // eslint-disable-line no-console
           return null;
         },
+        getTextFromPdfContent,
+      });
+
+      // Delete videos if the test succeeds
+      on('after:spec', (spec, results) => {
+        if (results && results.video) {
+          // Do we have failures for any retry attempts?
+          const failures = results.tests.some(test => test.attempts.some(attempt => attempt.state === 'failed'));
+          if (!failures) {
+            // delete the video if the spec passed and no tests retried
+            fs.unlinkSync(results.video);
+          }
+        }
       });
 
       config.baseUrl = process.env.WEBSITE_URL || 'http://localhost:3000';

@@ -5,26 +5,22 @@ import { ExclamationTriangle } from '@styled-icons/fa-solid/ExclamationTriangle'
 import { InfoCircle } from '@styled-icons/fa-solid/InfoCircle';
 import { themeGet } from '@styled-system/theme-get';
 import styled from 'styled-components';
-import {
-  borders,
+import type {
   BordersProps,
-  color,
-  display,
+  ColorProps,
   DisplayProps,
-  flexbox,
   FlexboxProps,
-  layout,
   LayoutProps,
-  shadow,
   ShadowProps,
-  space,
   SpaceProps,
-  typography,
   TypographyProps,
 } from 'styled-system';
+import { borders, color, display, flexbox, layout, shadow, space, typography } from 'styled-system';
 
-import { whiteSpace, WhiteSpaceProps } from '../lib/styled-system-custom-properties';
-import { MessageType, messageType } from '../lib/theme/variants/message';
+import type { WhiteSpaceProps } from '../lib/styled-system-custom-properties';
+import { whiteSpace } from '../lib/styled-system-custom-properties';
+import type { MessageType } from '../lib/theme/variants/message';
+import { messageType } from '../lib/theme/variants/message';
 
 import { Box, Flex } from './Grid';
 import StyledSpinner from './StyledSpinner';
@@ -35,15 +31,20 @@ type MessageProps = BordersProps &
   LayoutProps &
   SpaceProps &
   TypographyProps &
+  ColorProps &
   FlexboxProps &
   WhiteSpaceProps & {
     type: MessageType;
+    color?: any; // ColorProps has a type inconsistency
   };
 
 type MessageBoxProps = MessageProps & {
   isLoading?: boolean;
   withIcon?: boolean;
+  className?: string;
   children: React.ReactNode;
+  icon?: React.ReactNode;
+  alignIcon?: 'start' | 'center';
 };
 
 const Message = styled.div<MessageProps>`
@@ -102,18 +103,28 @@ const icons = {
 /**
  * Display messages in a box contextualized for message type (error, success...etc)
  */
-const MessageBox = ({ type = 'white', withIcon = false, isLoading, children, ...props }: MessageBoxProps) => {
-  const icon = withIcon ? icons[type] : null;
+const MessageBox = ({
+  type = 'white',
+  withIcon = false,
+  icon = null,
+  isLoading,
+  children,
+  alignIcon = 'start',
+  ...props
+}: MessageBoxProps) => {
+  const finalIcon = icon || (withIcon ? icons[type] : null);
   return (
     <Message type={type} {...props}>
       <Flex gap="16px">
-        {(icon || isLoading) && (
-          <Box flexShrink={0} alignSelf="start" color={iconColors[type]}>
-            {isLoading ? <StyledSpinner size="1.2em" /> : icon}
+        {(finalIcon || isLoading) && (
+          <Box flexShrink={0} alignSelf={alignIcon} color={!icon && iconColors[type]}>
+            {isLoading ? <StyledSpinner size="1.2em" /> : finalIcon}
           </Box>
         )}
 
-        <Box flex={1}>{children}</Box>
+        <Box flex={1} maxWidth="100%">
+          {children}
+        </Box>
       </Flex>
     </Message>
   );

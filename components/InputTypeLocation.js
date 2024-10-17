@@ -2,8 +2,8 @@ import React, { createRef, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Clear } from '@styled-icons/material/Clear';
 import { themeGet } from '@styled-system/theme-get';
+import Geosuggest from '@ubilabs/react-geosuggest';
 import { get, isNil, omitBy } from 'lodash';
-import Geosuggest from 'react-geosuggest';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { isURL } from 'validator';
@@ -24,7 +24,7 @@ const ClearIcon = styled(Clear)`
 const GeoSuggestItem = styled(Geosuggest)`
   .geosuggest {
     font-size: 18px;
-    font-size: 1rem;
+    font-size: 0.65rem;
     position: relative;
     text-align: left;
   }
@@ -84,8 +84,12 @@ const GeoSuggestItem = styled(Geosuggest)`
     list-style: none;
     margin-top: 1px;
     z-index: 5;
-    -webkit-transition: max-height 0.2s, border 0.2s;
-    transition: max-height 0.2s, border 0.2s;
+    -webkit-transition:
+      max-height 0.2s,
+      border 0.2s;
+    transition:
+      max-height 0.2s,
+      border 0.2s;
   }
   .geosuggest__suggests--hidden {
     max-height: 0;
@@ -182,7 +186,7 @@ class InputTypeLocation extends React.Component {
   }
 
   isAutocompleteServiceAvailable() {
-    return window && Boolean(get(window, 'google.maps.places.AutocompleteService'));
+    return typeof window !== 'undefined' && Boolean(get(window, 'google.maps.places.AutocompleteService'));
   }
 
   render() {
@@ -195,9 +199,7 @@ class InputTypeLocation extends React.Component {
             <FormattedMessage
               id="location.googleAutocompleteService.unavailable"
               values={{ service: 'Google Autocomplete Service', domain: 'maps.googleapis.com', lineBreak: <br /> }}
-              defaultMessage={
-                'Location field requires "{service}" to function.{lineBreak} Make sure "{domain}" is not blocked.'
-              }
+              defaultMessage={`Location field requires "{service}" to function.{lineBreak} Make sure "{domain}" is not blocked.`}
             />
           </MessageBox>
         ) : (

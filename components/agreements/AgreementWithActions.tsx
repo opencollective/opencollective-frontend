@@ -1,5 +1,5 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { Check } from '@styled-icons/feather/Check';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
 import { Link as IconLink } from '@styled-icons/feather/Link';
@@ -9,7 +9,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import useClipboard from '../../lib/hooks/useClipboard';
 
 import ConfirmationModal, { CONFIRMATION_MODAL_TERMINATE } from '../ConfirmationModal';
@@ -18,7 +18,7 @@ import { Flex } from '../Grid';
 import PopupMenu from '../PopupMenu';
 import StyledButton from '../StyledButton';
 import StyledHr from '../StyledHr';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 import Agreement from './Agreement';
 
@@ -60,16 +60,16 @@ const Action = styled.button`
   }
 `;
 
-export const AgreementWithActions = ({ agreement, onEdit, onDelete }) => {
+export const AgreementWithActions = ({ agreement, onEdit, onDelete, openFileViewer }) => {
   const drawerActionsContainer = useDrawerActionsContainer();
   const [hasDeleteConfirm, setDeleteConfirm] = React.useState(false);
   const { isCopied, copy } = useClipboard();
   const [deleteAgreement] = useMutation(DELETE_AGREEMENT_MUTATION, { context: API_V2_CONTEXT });
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const intl = useIntl();
   return (
     <React.Fragment>
-      <Agreement agreement={agreement} />
+      <Agreement agreement={agreement} openFileViewer={() => openFileViewer(agreement.attachment)} />
       {drawerActionsContainer &&
         createPortal(
           <Flex justifyContent="space-between" width="100%">
@@ -77,7 +77,7 @@ export const AgreementWithActions = ({ agreement, onEdit, onDelete }) => {
               placement="bottom-start"
               Button={({ onClick }) => (
                 <StyledButton data-cy="more-actions" onClick={onClick} buttonSize="small" minWidth={140} flexGrow={1}>
-                  <FormattedMessage defaultMessage="More actions" />
+                  <FormattedMessage defaultMessage="More actions" id="S8/4ZI" />
                   &nbsp;
                   <ChevronDown size="20px" />
                 </StyledButton>
@@ -95,12 +95,12 @@ export const AgreementWithActions = ({ agreement, onEdit, onDelete }) => {
                 <StyledHr borderColor="black.100" my={2} mx={2} />
                 <Action data-cy="more-actions-delete-expense-btn" onClick={() => setDeleteConfirm(true)}>
                   <IconTrash size="16px" />
-                  <FormattedMessage defaultMessage="Delete Agreement" />
+                  <FormattedMessage defaultMessage="Delete Agreement" id="iVzX67" />
                 </Action>
               </Flex>
             </PopupMenu>
-            <StyledButton buttonStyle="secondary" onClick={onEdit}>
-              <FormattedMessage defaultMessage="Edit Agreement" />
+            <StyledButton buttonStyle="secondary" onClick={onEdit} data-cy="btn-edit-agreement">
+              <FormattedMessage defaultMessage="Edit Agreement" id="ZhrlbS" />
             </StyledButton>
           </Flex>,
           drawerActionsContainer,
@@ -110,26 +110,29 @@ export const AgreementWithActions = ({ agreement, onEdit, onDelete }) => {
           isDanger
           type="delete"
           onClose={() => setDeleteConfirm(false)}
-          header={<FormattedMessage defaultMessage="Delete Agreement" />}
+          header={<FormattedMessage defaultMessage="Delete Agreement" id="iVzX67" />}
           continueHandler={async () => {
             try {
               await deleteAgreement({ variables: { id: agreement.id } });
-              addToast({
-                type: TOAST_TYPE.SUCCESS,
-                message: <FormattedMessage defaultMessage="Agreement deleted successfully" />,
+              toast({
+                variant: 'success',
+                message: <FormattedMessage defaultMessage="Agreement deleted successfully" id="RJt89q" />,
               });
               setDeleteConfirm(false);
               onDelete(agreement);
               return CONFIRMATION_MODAL_TERMINATE;
             } catch (e) {
-              addToast({
-                type: TOAST_TYPE.ERROR,
+              toast({
+                variant: 'error',
                 message: i18nGraphqlException(intl, e),
               });
             }
           }}
         >
-          <FormattedMessage defaultMessage="This will permanently delete the agreement and all its attachments." />
+          <FormattedMessage
+            defaultMessage="This will permanently delete the agreement and all its attachments."
+            id="SuVMZP"
+          />
         </ConfirmationModal>
       )}
     </React.Fragment>

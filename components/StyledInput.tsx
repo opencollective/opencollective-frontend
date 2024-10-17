@@ -1,13 +1,19 @@
-import PropTypes from 'prop-types';
-import propTypes from '@styled-system/prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import styled, { css } from 'styled-components';
+import type {
+  BackgroundProps,
+  BorderProps,
+  ColorProps,
+  FlexboxProps,
+  LayoutProps,
+  SpaceProps,
+  TypographyProps,
+} from 'styled-system';
 import { background, border, color, flexbox, layout, space, typography } from 'styled-system';
 
 import { overflow } from '../lib/styled-system-custom-properties';
-import { buttonSize, buttonStyle } from '../lib/theme/variants/button';
 
-const getBorderColor = ({ error, success }) => {
+const getBorderColor = ({ error = undefined, success = undefined }) => {
   if (error) {
     return themeGet('colors.red.500');
   }
@@ -19,14 +25,43 @@ const getBorderColor = ({ error, success }) => {
   return themeGet('colors.black.300');
 };
 
+export type StyledInputProps = BackgroundProps &
+  BorderProps &
+  ColorProps &
+  FlexboxProps &
+  LayoutProps &
+  SpaceProps &
+  TypographyProps &
+  React.InputHTMLAttributes<HTMLInputElement> & {
+    /** Show success state for field */
+    success?: boolean;
+    error?: boolean;
+    /** true to hide styled borders */
+    bare?: boolean;
+    /** if true, a default outline will be displayed when focused */
+    withOutline?: boolean;
+    /** Scroll overflow */
+    overflow?: 'auto' | 'hidden' | 'scroll';
+    /** if true, hide spinners for number inputs */
+    hideSpinners?: boolean;
+  };
+
 /**
  * styled-component input tag using styled-system
  *
  * @see See [styled-system docs](https://github.com/jxnblk/styled-system/blob/master/docs/api.md) for usage of those props
  */
-const StyledInput = styled.input`
+const StyledInput = styled.input.attrs<StyledInputProps>(props => ({
+  border: props.border ?? '1px solid',
+  borderColor: props.borderColor ?? 'black.300',
+  borderRadius: props.borderRadius ?? '4px',
+  px: props.px ?? 3,
+  py: props.py ?? 2,
+  lineHeight: props.lineHeight ?? '1.5',
+  fontSize: props.fontSize ?? '14px',
+}))<StyledInputProps>`
   &:not([type='checkbox']):not([type='radio']):not([type='range']) {
-    min-height: 36px;
+    min-height: ${props => props.minHeight || '36px'};
   }
 
   ${background}
@@ -42,6 +77,7 @@ const StyledInput = styled.input`
   border-style: ${props => (props.bare ? 'none' : 'solid')};
   box-sizing: border-box;
   outline: none;
+  max-width: none;
 
   ${props => {
     if (props.withOutline) {
@@ -58,6 +94,22 @@ const StyledInput = styled.input`
           `;
     }
   }}
+
+  ${props =>
+    props.hideSpinners &&
+    css`
+      ::-webkit-inner-spin-button,
+      ::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        -moz-appearance: textfield;
+        margin: 0;
+      }
+
+      &[type='number'] {
+        appearance: none;
+        -moz-appearance: textfield;
+      }
+    `}
 
   &[type=radio] {
     cursor: pointer;
@@ -89,55 +141,6 @@ const StyledInput = styled.input`
     font-family: inherit;
   }
 `;
-
-StyledInput.propTypes = {
-  /** Show success state for field */
-  success: PropTypes.bool,
-  /** true to hide styled borders */
-  bare: PropTypes.bool,
-  /** if true, a default outline will be displayed when focused */
-  withOutline: PropTypes.bool,
-  /** Scroll overflow */
-  overflow: PropTypes.oneOf(['auto', 'hidden', 'scroll']),
-  // Styled-system proptypes
-  ...propTypes.background,
-  ...propTypes.border,
-  ...propTypes.color,
-  ...propTypes.flexbox,
-  ...propTypes.layout,
-  ...propTypes.space,
-  ...propTypes.typography,
-};
-
-StyledInput.defaultProps = {
-  border: '1px solid',
-  borderColor: 'black.300',
-  borderRadius: '4px',
-  px: 3,
-  py: 2,
-  lineHeight: '1.5',
-  fontSize: '14px',
-};
-
-export const TextInput = styled(StyledInput)``;
-
-TextInput.defaultProps = {
-  ...StyledInput.defaultProps,
-  type: 'text',
-};
-
-export const SubmitInput = styled(StyledInput)`
-  ${buttonStyle};
-  ${buttonSize};
-`;
-
-SubmitInput.defaultProps = {
-  buttonStyle: 'primary',
-  buttonSize: 'large',
-  fontWeight: 'bold',
-  type: 'submit',
-  backgroundColor: 'colors.white.full',
-};
 
 /** @component */
 export default StyledInput;

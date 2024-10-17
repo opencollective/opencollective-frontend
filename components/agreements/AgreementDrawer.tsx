@@ -1,19 +1,22 @@
 import React from 'react';
 
-import { Agreement } from '../../lib/graphql/types/v2/graphql';
+import type { Agreement as GraphQLAgreement } from '../../lib/graphql/types/v2/graphql';
 
-import Drawer from '../Drawer';
+import { Drawer } from '../Drawer';
+import FilesViewerModal from '../FilesViewerModal';
 
+import Agreement from './Agreement';
 import AgreementForm from './AgreementForm';
 import { AgreementWithActions } from './AgreementWithActions';
 
 type AgreementDrawerProps = {
   open: boolean;
+  canEdit: boolean;
   onClose: () => void;
-  onCreate: (Agreement) => void;
-  onEdit: (Agreement) => void;
-  onDelete: (Agreement) => void;
-  agreement?: Agreement;
+  onCreate: (GraphQLAgreement) => void;
+  onEdit: (GraphQLAgreement) => void;
+  onDelete: (GraphQLAgreement) => void;
+  agreement?: GraphQLAgreement;
   hostLegacyId: number;
 };
 
@@ -23,30 +26,57 @@ export default function AgreementDrawer({
   onCreate,
   onEdit,
   onDelete,
+  canEdit,
   agreement,
   hostLegacyId,
 }: AgreementDrawerProps) {
   const [isEditing, setEditing] = React.useState<boolean>(false);
+  const [filesViewerOpen, setFilesViewerOpen] = React.useState<boolean>(false);
   const closeDrawer = React.useCallback(() => {
     setEditing(false);
+    setFilesViewerOpen(false);
     onClose();
   }, [onClose]);
 
   return (
-    <Drawer maxWidth="512px" open={open} onClose={closeDrawer} showActionsContainer>
+    <Drawer
+      open={open}
+      onClose={closeDrawer}
+      showCloseButton
+      showActionsContainer={canEdit || isEditing || !agreement}
+      data-cy="agreement-drawer"
+    >
+      {/* <DrawerHeader /> */}
       {isEditing || !agreement ? (
         <AgreementForm
           hostLegacyId={hostLegacyId}
           agreement={agreement}
           onCreate={onCreate}
-          onCancel={closeDrawer}
+          onCancel={() => (isEditing ? setEditing(false) : closeDrawer())}
+          openFileViewer={() => setFilesViewerOpen(true)}
           onEdit={agreement => {
             onEdit?.(agreement);
             closeDrawer();
           }}
         />
+      ) : canEdit ? (
+        <AgreementWithActions
+          agreement={agreement}
+          onEdit={() => setEditing(true)}
+          onDelete={onDelete}
+          openFileViewer={() => setFilesViewerOpen(true)}
+        />
       ) : (
-        <AgreementWithActions agreement={agreement} onEdit={() => setEditing(true)} onDelete={onDelete} />
+        <Agreement agreement={agreement} openFileViewer={() => setFilesViewerOpen(true)} />
+      )}
+      {filesViewerOpen && (
+        <FilesViewerModal
+          files={[agreement.attachment]}
+          openFileUrl={agreement.attachment.url}
+          onClose={() => setFilesViewerOpen(false)}
+          parentTitle={`${agreement.account.name} / ${agreement.title}`}
+          allowOutsideInteraction
+        />
       )}
     </Drawer>
   );

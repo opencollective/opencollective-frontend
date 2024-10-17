@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -16,16 +16,14 @@ import { withUser } from '../UserProvider';
 
 import RecurringContributionsCard from './RecurringContributionsCard';
 
-import EmptyCollectivesSectionImageSVG from '../collective-page/images/EmptyCollectivesSectionImage.svg';
-
-export const FILTERS = {
+const FILTERS = {
   ACTIVE: 'ACTIVE',
   MONTHLY: 'MONTHLY',
   YEARLY: 'YEARLY',
   CANCELLED: 'CANCELLED',
 };
 
-export const I18nFilters = defineMessages({
+const I18nFilters = defineMessages({
   [FILTERS.ACTIVE]: {
     id: 'Subscriptions.Active',
     defaultMessage: 'Active',
@@ -40,7 +38,7 @@ export const I18nFilters = defineMessages({
   },
   [FILTERS.CANCELLED]: {
     id: 'Subscriptions.Cancelled',
-    defaultMessage: 'Cancelled',
+    defaultMessage: 'Canceled',
   },
 });
 
@@ -52,7 +50,7 @@ const filterContributions = (contributions, filterName) => {
   const isActive = ({ status }) =>
     status === ORDER_STATUS.ACTIVE ||
     status === ORDER_STATUS.ERROR ||
-    ORDER_STATUS.PROCESSING ||
+    status === ORDER_STATUS.PROCESSING ||
     status === ORDER_STATUS.NEW;
   const isInactive = ({ status }) => status === ORDER_STATUS.CANCELLED || status === ORDER_STATUS.REJECTED;
   switch (filterName) {
@@ -75,18 +73,25 @@ const RecurringContributionsContainer = ({
   LoggedInUser,
   isLoading,
   displayFilters,
+  filter: outsideFilter,
   ...props
 }) => {
-  const isAdmin = Boolean(LoggedInUser?.isAdminOfCollective(account));
+  const isAdminOrRoot = Boolean(LoggedInUser?.isAdminOfCollective(account) || LoggedInUser?.isRoot);
   const intl = useIntl();
   const [editingContributionId, setEditingContributionId] = React.useState();
-  const [filter, setFilter] = React.useState(FILTERS.ACTIVE);
+  const [filter, setFilter] = React.useState(outsideFilter ?? FILTERS.ACTIVE);
   const displayedRecurringContributions = React.useMemo(() => {
     const filteredContributions = filterContributions(recurringContributions?.nodes || [], filter);
-    return isAdmin
+    return isAdminOrRoot
       ? filteredContributions
       : filteredContributions.filter(contrib => contrib.status !== ORDER_STATUS.ERROR);
-  }, [recurringContributions, filter, isAdmin]);
+  }, [recurringContributions, filter, isAdminOrRoot]);
+
+  useEffect(() => {
+    if (outsideFilter) {
+      setFilter(outsideFilter);
+    }
+  }, [outsideFilter]);
 
   // Reset edit when changing filters and contribution is not in the list anymore
   React.useEffect(() => {
@@ -131,12 +136,12 @@ const RecurringContributionsContainer = ({
                 contribution={contribution}
                 position="relative"
                 account={account}
-                isAdmin={isAdmin}
+                isAdmin={isAdminOrRoot}
                 isEditing={contribution.id === editingContributionId}
-                canEdit={isAdmin && !editingContributionId}
+                canEdit={isAdminOrRoot && !editingContributionId}
                 onEdit={() => setEditingContributionId(contribution.id)}
                 onCloseEdit={() => setEditingContributionId(null)}
-                showPaymentMethod={isAdmin}
+                showPaymentMethod={isAdminOrRoot}
                 data-cy="recurring-contribution-card"
               />
             </CollectiveCardContainer>
@@ -144,7 +149,12 @@ const RecurringContributionsContainer = ({
         </Grid>
       ) : (
         <Flex flexDirection="column" alignItems="center" py={4}>
-          <Image src={EmptyCollectivesSectionImageSVG} alt="" width={309} height={200} />
+          <Image
+            src="/static/images/collective-page/EmptyCollectivesSectionImage.svg"
+            alt=""
+            width={309}
+            height={200}
+          />
           <P color="black.600" fontSize="16px" mt={5}>
             <FormattedMessage
               id="RecurringContributions.none"
@@ -163,6 +173,7 @@ RecurringContributionsContainer.propTypes = {
   LoggedInUser: PropTypes.object,
   displayFilters: PropTypes.bool,
   isLoading: PropTypes.bool,
+  filter: PropTypes.oneOf(Object.values(FILTERS)),
 };
 
 export default withUser(RecurringContributionsContainer);

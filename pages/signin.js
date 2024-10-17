@@ -64,24 +64,28 @@ class SigninPage extends React.Component {
   }
 
   async componentDidUpdate(oldProps, oldState) {
-    const wasConnected = !oldProps.LoggedInUser && this.props.LoggedInUser;
-
     if (oldState.isRobot && !this.state.isRobot) {
       this.initialize();
-    } else if (wasConnected && !this.props.errorLoggedInUser && this.props.form !== 'create-account') {
-      // --- User logged in ---
-      this.setState({ success: true, redirecting: true });
-      // Avoid redirect loop: replace '/signin' redirects by '/'
-      const { next } = this.props;
-      const redirect = next && (next.match(/^\/?signin[?/]?/) || next.match(/^\/?reset-password[?/]?/)) ? null : next;
-      await this.props.router.replace(redirect || '/');
-      window.scroll(0, 0);
-    } else if (this.props.token && oldProps.token !== this.props.token) {
+    } else if (!this.state.redirecting && this.props.token && oldProps.token !== this.props.token) {
       // --- There's a new token in town 🤠 ---
       const user = await this.props.login(this.props.token);
       if (!user) {
         this.setState({ error: 'Token rejected' });
       }
+    } else if (
+      !this.state.redirecting &&
+      this.props.LoggedInUser &&
+      !this.props.errorLoggedInUser &&
+      this.props.form !== 'create-account'
+    ) {
+      // --- User logged in ---
+      this.setState({ success: true, redirecting: true });
+      // Avoid redirect loop: replace '/signin' redirects by '/'
+      const { next } = this.props;
+      const redirect = next && (next.match(/^\/?signin[?/]?/) || next.match(/^\/?reset-password[?/]?/)) ? null : next;
+      const defaultRedirect = '/dashboard';
+      await this.props.router.replace(redirect && redirect !== '/' ? redirect : defaultRedirect);
+      window.scroll(0, 0);
     }
   }
 
@@ -208,4 +212,6 @@ class SigninPage extends React.Component {
   }
 }
 
+// next.js export
+// ts-unused-exports:disable-next-line
 export default withUser(withRouter(SigninPage));

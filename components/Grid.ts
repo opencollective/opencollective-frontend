@@ -5,23 +5,10 @@
 
 import propTypes from '@styled-system/prop-types';
 import styled from 'styled-components';
-import {
-  color,
-  ColorProps,
-  compose,
-  flexbox,
-  FlexboxProps,
-  grid,
-  GridProps,
-  layout,
-  LayoutProps,
-  space,
-  SpaceProps,
-  typography,
-  TypographyProps,
-} from 'styled-system';
+import type { ColorProps, FlexboxProps, GridProps, LayoutProps, SpaceProps, TypographyProps } from 'styled-system';
+import { border, color, compose, flexbox, grid, layout, space, typography } from 'styled-system';
 
-export const boxProps = compose(space, color, layout, typography, flexbox, grid);
+export const boxProps = compose(space, color, layout, typography, flexbox, grid, border);
 
 type BoxProps = SpaceProps &
   ColorProps &
@@ -33,7 +20,11 @@ type BoxProps = SpaceProps &
     css?: string | object;
   };
 
-export const Box = styled.div<BoxProps>(
+const FILTERED_PROPS = new Set(['display', 'width', 'height']);
+
+export const Box = styled.div.withConfig({
+  shouldForwardProp: (prop, validate) => validate(prop) && !FILTERED_PROPS.has(prop),
+})<BoxProps>(
   {
     boxSizing: 'border-box',
   },

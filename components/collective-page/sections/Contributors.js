@@ -13,11 +13,12 @@ import { Dimensions } from '../_constants';
 import ContainerSectionContent from '../ContainerSectionContent';
 import SectionTitle from '../SectionTitle';
 
-import ContributorsGridBackgroundSVG from '../images/ContributorsGridBackground.svg';
+import ContributorsGridBackgroundSVG from '../../../public/static/images/collective-page/ContributorsGridBackground.svg';
 
 /** Main contributors container with the bubbles background */
 const MainContainer = styled(Container)`
-  background: linear-gradient(
+  background:
+    linear-gradient(
       0deg,
       rgba(255, 255, 255, 1) 0,
       rgba(255, 255, 255, 0) 75px,
@@ -59,12 +60,20 @@ export default class SectionContributors extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = { filter: ContributorsFilter.CONTRIBUTOR_FILTERS.ALL };
+    /* reference to the FixedSizedGrid element */
+    this.contributorsGridRef = React.createRef();
   }
 
   static MIN_CONTRIBUTORS_TO_SHOW_FILTERS = 2;
 
   setFilter = filter => {
     this.setState({ filter });
+
+    // whenever the filter is changed, scroll is set to point to the initial item
+    this.contributorsGridRef.current.scrollToItem({
+      columnIndex: 0,
+      rowIndex: 0,
+    });
   };
 
   // Memoize filtering functions as they can get expensive if there are a lot of contributors
@@ -120,7 +129,9 @@ export default class SectionContributors extends React.PureComponent {
               id="CollectivePage.OurContributors"
               defaultMessage="Our contributors {count}"
               values={{
-                count: <Span color="black.600">{stats.backers.all + coreContributors.length}</Span>,
+                count: (
+                  <Span color="black.600">{stats.backers.all + coreContributors.filter(c => !c.isBacker).length}</Span>
+                ),
               }}
             />
           </H3>
@@ -148,6 +159,7 @@ export default class SectionContributors extends React.PureComponent {
           collectiveId={collective.id}
           currency={collective.currency}
           maxWidthWhenNotFull={Dimensions.MAX_SECTION_WIDTH}
+          gridRef={this.contributorsGridRef}
         />
       </MainContainer>
     );

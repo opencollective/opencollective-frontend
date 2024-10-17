@@ -12,13 +12,12 @@ import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { isPastEvent } from '../../../lib/events';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { getCollectiveContributionCardsOrder, TIERS_ORDER_KEY } from '../../../lib/tier-utils';
-import { getCollectivePageRoute } from '../../../lib/url-helpers';
+import { getCollectivePageRoute, getDashboardRoute } from '../../../lib/url-helpers';
 
 import Container from '../../Container';
 import ContainerOverlay from '../../ContainerOverlay';
 import { CONTRIBUTE_CARD_WIDTH } from '../../contribute-cards/constants';
 import ContributeCardContainer, { CONTRIBUTE_CARD_PADDING_X } from '../../contribute-cards/ContributeCardContainer';
-import ContributeCrypto from '../../contribute-cards/ContributeCrypto';
 import ContributeCustom from '../../contribute-cards/ContributeCustom';
 import ContributeTier from '../../contribute-cards/ContributeTier';
 import CreateNew from '../../contribute-cards/CreateNew';
@@ -151,9 +150,6 @@ class SectionContribute extends React.PureComponent {
     const hasNoContributor = !this.hasContributors(contributors);
     const canContribute = collective.isActive && (!isPastEvent(collective) || isAdmin);
     const hasCustomContribution = !get(collective, 'settings.disableCustomContributions', false);
-    const hasCryptoContribution =
-      !get(collective, 'settings.disableCryptoContributions', true) &&
-      get(collective, 'host.settings.cryptoEnabled', false);
 
     // Remove tickets
     const baseTiers = tiers.filter(tier => tier.type !== TierTypes.TICKET);
@@ -175,18 +171,6 @@ class SectionContribute extends React.PureComponent {
           contributors: this.getFinancialContributorsWithoutTier(contributors),
           stats: contributorsStats,
           hideContributors: hasNoContributor,
-          disableCTA: !canContribute,
-        },
-      });
-    }
-
-    if (hasCryptoContribution) {
-      contributeCards.push({
-        key: 'crypto',
-        Component: ContributeCrypto,
-        componentProps: {
-          collective,
-          hideContributors: true, // for the MVP we shall not display the financial contributors for crypto
           disableCTA: !canContribute,
         },
       });
@@ -336,7 +320,7 @@ class SectionContribute extends React.PureComponent {
                   ))}
                   {isAdmin && (
                     <ContributeCardContainer minHeight={150}>
-                      <CreateNew route={`/${collective.parentCollective.slug}/events/${collective.slug}/admin/tickets`}>
+                      <CreateNew route={getDashboardRoute(collective, 'tickets')}>
                         <FormattedMessage id="SectionTickets.CreateTicket" defaultMessage="Create Ticket" />
                       </CreateNew>
                     </ContributeCardContainer>

@@ -16,6 +16,7 @@ env:
   NODE_ENV: test
   WEBSITE_URL: http://localhost:3000
   API_URL: http://localhost:3060
+  PDF_SERVICE_URL: http://localhost:3002
   API_KEY: dvl-1510egmf4a23d80342403fb599qd
   CI: true
 
@@ -27,7 +28,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup project
         uses: ./.github/actions/setup-project
@@ -43,7 +44,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup project
         uses: ./.github/actions/setup-project
@@ -59,7 +60,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup project
         uses: ./.github/actions/setup-project
@@ -68,6 +69,22 @@ jobs:
 
       - run: npm run depcheck
 
+  ts-unused-exports:
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup project
+        uses: ./.github/actions/setup-project
+        with:
+          CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
+
+      - run: npm run ts-unused-exports
+
   check-langs:
     runs-on: ubuntu-latest
 
@@ -75,7 +92,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup project
         uses: ./.github/actions/setup-project
@@ -91,7 +108,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup project
         uses: ./.github/actions/setup-project
@@ -99,7 +116,7 @@ jobs:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
       - name: Restore NextJS build cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: .next/cache
           # Generate a new cache whenever packages or source files change
@@ -120,7 +137,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup project
         uses: ./.github/actions/setup-project
@@ -135,7 +152,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup project
         uses: ./.github/actions/setup-project
@@ -143,6 +160,21 @@ jobs:
           CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
 
       - run: npm run type:check
+
+  build-components:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup project
+        uses: ./.github/actions/setup-project
+        with:
+          CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
+
+      - run: npm run build:components
 
   e2e:
     if: github.ref_name != 'i18n/crowdin'

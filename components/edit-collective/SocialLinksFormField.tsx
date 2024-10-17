@@ -8,7 +8,8 @@ import { DragIndicator } from '@styled-icons/material/DragIndicator';
 import { sortBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { SocialLink, SocialLinkInput, SocialLinkType } from '../../lib/graphql/types/v2/graphql';
+import type { SocialLink, SocialLinkInput } from '../../lib/graphql/types/v2/graphql';
+import { SocialLinkType } from '../../lib/graphql/types/v2/graphql';
 import { isValidUrl } from '../../lib/utils';
 
 import { Box, Flex } from '../Grid';
@@ -17,7 +18,7 @@ import StyledInput from '../StyledInput';
 import StyledSelect from '../StyledSelect';
 import { Span } from '../Text';
 
-export type SocialLinksFormFieldProps = {
+type SocialLinksFormFieldProps = {
   value?: SocialLink[];
   touched?: boolean;
   onChange: (value: SocialLinkInput[]) => void;
@@ -94,7 +95,7 @@ export default function SocialLinksFormField({ value = [], touched, onChange }: 
             >
               <Plus size="10px" />
               <Span ml={2}>
-                <FormattedMessage defaultMessage="Add social link" />
+                <FormattedMessage defaultMessage="Add social link" id="FH4TgN" />
               </Span>
             </StyledButton>
           </Flex>
@@ -190,6 +191,10 @@ function SocialLinkTypePicker({ value, onChange, ...pickerProps }: SocialLinkTyp
     {
       value: SocialLinkType.TIKTOK.toString(),
       label: 'TikTok',
+    },
+    {
+      value: SocialLinkType.TWITCH.toString(),
+      label: 'Twitch',
     },
   ];
 
@@ -314,6 +319,7 @@ const knownSocialLinkDomains = [
   { type: SocialLinkType.SLACK, regexp: /^(https:\/\/)?[^.]+.?slack.com/ },
   { type: SocialLinkType.TIKTOK, regexp: /^(https:\/\/)?(www\.)?tiktok.com/ },
   { type: SocialLinkType.TUMBLR, regexp: /^(https:\/\/)?[^.]+\.?tumblr.com/ },
+  { type: SocialLinkType.TWITCH, regexp: /^(https:\/\/)?(www\.)?twitch.tv/ },
   { type: SocialLinkType.TWITTER, regexp: /^(https:\/\/)?twitter.com/ },
   { type: SocialLinkType.YOUTUBE, regexp: /^(https:\/\/)?(www\.)?youtube.com/ },
 ];

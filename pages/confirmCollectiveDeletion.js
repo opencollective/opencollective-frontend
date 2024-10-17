@@ -31,9 +31,8 @@ class ConfirmCollectiveDeletion extends Component {
     return {};
   }
 
-  constructor(props) {
-    super(props);
-    if (props.type === 'USER') {
+  componentDidMount() {
+    if (this.props.type === 'USER') {
       this.props.logout();
     }
   }
@@ -101,4 +100,6 @@ ConfirmCollectiveDeletion.propTypes = {
   logout: PropTypes.func,
 };
 
+// next.js export
+// ts-unused-exports:disable-next-line
 export default withUser(ConfirmCollectiveDeletion);

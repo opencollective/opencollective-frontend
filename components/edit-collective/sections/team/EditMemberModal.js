@@ -1,14 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { Delete } from '@styled-icons/material/Delete';
 import { get } from 'lodash';
-import { withRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
+import { getAccountReferenceInput } from '../../../../lib/collective';
 import roles from '../../../../lib/constants/roles';
 import { i18nGraphqlException } from '../../../../lib/errors';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 
 import Container from '../../../Container';
@@ -16,7 +17,7 @@ import { Flex } from '../../../Grid';
 import StyledButton from '../../../StyledButton';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../../StyledModal';
 import StyledTooltip from '../../../StyledTooltip';
-import { TOAST_TYPE, useToasts } from '../../../ToastProvider';
+import { useToast } from '../../../ui/useToast';
 
 import MemberForm from './MemberForm';
 import { teamSectionQuery } from './queries';
@@ -78,12 +79,11 @@ const removeMemberMutation = gql`
   }
 `;
 
-const EditMemberModal = props => {
-  const { intl, member, collective, canRemove, isLastAdmin, cancelHandler, onEdit } = props;
-
+const EditMemberModal = ({ intl, member, collective, canRemove = false, isLastAdmin, cancelHandler, onEdit }) => {
+  const router = useRouter();
   const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
 
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const isInvitation = get(member, '__typename') === 'MemberInvitation';
 
@@ -144,8 +144,8 @@ const EditMemberModal = props => {
         },
       });
 
-      addToast({
-        type: TOAST_TYPE.SUCCESS,
+      toast({
+        variant: 'success',
         title: <FormattedMessage id="editTeam.member.edit.success" defaultMessage="Member updated successfully." />,
       });
 
@@ -156,11 +156,10 @@ const EditMemberModal = props => {
       onEdit?.();
       cancelHandler();
     } catch (error) {
-      addToast({
-        type: TOAST_TYPE.ERROR,
+      toast({
+        variant: 'error',
         title: <FormattedMessage id="editTeam.member.edit.error" defaultMessage="Failed to update member." />,
         message: i18nGraphqlException(intl, error),
-        variant: 'light',
       });
     }
   };
@@ -171,18 +170,16 @@ const EditMemberModal = props => {
     try {
       await editMemberInvitationAccount({
         variables: {
-          memberAccount: {
-            slug: get(member, 'memberAccount.slug'),
-          },
-          account: { slug: get(collective, 'slug') },
+          memberAccount: getAccountReferenceInput(member.account), // There is an alias on invitation.memberAccount, we should get rid of it https://github.com/opencollective/opencollective-frontend/blob/c7418dd99aa44da387c9c2a0e48525c415cc8566/components/edit-collective/sections/team/queries.ts#L87
+          account: getAccountReferenceInput(collective),
           description,
           role,
           since,
         },
       });
 
-      addToast({
-        type: TOAST_TYPE.SUCCESS,
+      toast({
+        variant: 'success',
         message: (
           <FormattedMessage
             id="editTeam.memberInvitation.edit.success"
@@ -194,8 +191,8 @@ const EditMemberModal = props => {
       onEdit?.();
       cancelHandler();
     } catch (error) {
-      addToast({
-        type: TOAST_TYPE.ERROR,
+      toast({
+        variant: 'error',
         title: (
           <FormattedMessage
             id="editTeam.memberInvitation.edit.error"
@@ -231,8 +228,8 @@ const EditMemberModal = props => {
           },
         });
 
-        addToast({
-          type: TOAST_TYPE.SUCCESS,
+        toast({
+          variant: 'success',
           message: isInvitation ? (
             <FormattedMessage
               id="editTeam.memberInvitation.remove.success"
@@ -244,15 +241,15 @@ const EditMemberModal = props => {
         });
 
         if (get(member, 'account.slug') === get(LoggedInUser, 'collective.slug')) {
-          await props.router.push({ pathname: `/${get(collective, 'slug')}` });
+          await router.push({ pathname: `/${get(collective, 'slug')}` });
           await refetchLoggedInUser();
         }
 
         onEdit?.();
         cancelHandler();
       } catch (error) {
-        addToast({
-          type: TOAST_TYPE.ERROR,
+        toast({
+          variant: 'error',
           title: isInvitation ? (
             <FormattedMessage id="editTeam.member.remove.error" defaultMessage="Failed to remove member." />
           ) : (
@@ -277,7 +274,7 @@ const EditMemberModal = props => {
 
   return (
     <Container>
-      <StyledModal width={688} onClose={cancelHandler}>
+      <StyledModal onClose={cancelHandler}>
         <ModalHeader>
           <FormattedMessage id="editTeam.member.edit" defaultMessage="Edit Team Member" />
         </ModalHeader>
@@ -360,12 +357,7 @@ EditMemberModal.propTypes = {
   intl: PropTypes.object.isRequired,
   isLastAdmin: PropTypes.bool,
   member: PropTypes.object,
-  router: PropTypes.object,
   canRemove: PropTypes.bool,
 };
 
-EditMemberModal.defaultProps = {
-  canRemove: true,
-};
-
-export default withRouter(EditMemberModal);
+export default EditMemberModal;

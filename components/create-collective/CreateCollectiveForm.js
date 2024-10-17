@@ -3,11 +3,10 @@ import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import { Form, Formik } from 'formik';
 import { get, trim } from 'lodash';
-import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { suggestSlug } from '../../lib/collective.lib';
+import { suggestSlug } from '../../lib/collective';
 import { requireFields, verifyChecked, verifyFieldLength } from '../../lib/form-utils';
 import withData from '../../lib/withData';
 
@@ -85,8 +84,6 @@ class CreateCollectiveForm extends React.Component {
     loading: PropTypes.bool,
     onSubmit: PropTypes.func,
     intl: PropTypes.object.isRequired,
-    onChange: PropTypes.func,
-    router: PropTypes.object.isRequired,
     loggedInUser: PropTypes.object,
     popularTags: PropTypes.arrayOf(PropTypes.string),
   };
@@ -137,7 +134,7 @@ class CreateCollectiveForm extends React.Component {
 
     const submit = values => {
       const { description, name, slug, message, tags, location, inviteMembers } = values;
-      this.props.onSubmit({ collective: { name, description, slug, tags, location }, message, inviteMembers });
+      return this.props.onSubmit({ collective: { name, description, slug, tags, location }, message, inviteMembers });
     };
 
     return (
@@ -351,6 +348,7 @@ class CreateCollectiveForm extends React.Component {
                             <MessageBox type="info" mt={3} fontSize="13px">
                               <FormattedMessage
                                 defaultMessage="Your selected Fiscal Host requires you to add a minimum of {numberOfAdmins, plural, one {# admin} other {# admins} }. You can manage your admins from the Collective Settings."
+                                id="GTK0Wf"
                                 values={host.policies.COLLECTIVE_MINIMUM_ADMINS}
                               />
                             </MessageBox>
@@ -425,7 +423,14 @@ class CreateCollectiveForm extends React.Component {
                           }
                         >
                           {({ field }) => (
-                            <StyledTextarea {...field} width="100%" minHeight={76} maxLength={3000} showCount />
+                            <StyledTextarea
+                              {...field}
+                              width="100%"
+                              minHeight={76}
+                              maxLength={3000}
+                              showCount
+                              fontSize="14px"
+                            />
                           )}
                         </StyledInputFormikField>
                       )}
@@ -503,7 +508,7 @@ class CreateCollectiveForm extends React.Component {
                 }}
               </Formik>
               <Container justifyContent="center" mb={4} display={['flex', 'none']}>
-                <NextIllustration src="/static/images/create-collective/mobileForm.png" width="320px" height="200px" />
+                <NextIllustration src="/static/images/create-collective/mobileForm.png" width={320} height={200} />
               </Container>
             </ContainerWithImage>
           </Flex>
@@ -514,4 +519,4 @@ class CreateCollectiveForm extends React.Component {
   }
 }
 
-export default injectIntl(withData(withRouter(CreateCollectiveForm)));
+export default injectIntl(withData(CreateCollectiveForm));

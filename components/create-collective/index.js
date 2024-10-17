@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { IGNORED_TAGS } from '../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import { Box, Flex } from '../Grid';
 import MessageBox from '../MessageBox';
@@ -166,7 +165,7 @@ const createCollectiveMutation = gql`
 `;
 
 const tagStatsQuery = gql`
-  query TagStatsQuery($host: AccountReferenceInput) {
+  query TagStats($host: AccountReferenceInput) {
     tagStats(limit: 6, host: $host) {
       nodes {
         id

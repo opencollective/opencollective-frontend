@@ -4,14 +4,15 @@ import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { formatAccountName } from '../../lib/collective.lib';
+import { formatAccountName } from '../../lib/collective';
 import { CollectiveType } from '../../lib/constants/collectives';
-import expenseStatus from '../../lib/constants/expense-status';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { INVITE, PayoutMethodType, VIRTUAL_CARD } from '../../lib/constants/payout-method';
+import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import formatCollectiveType from '../../lib/i18n/collective-type';
 import { getDashboardRoute } from '../../lib/url-helpers';
 
+import { AccountHoverCard } from '../AccountHoverCard';
 import Avatar from '../Avatar';
 import Container from '../Container';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
@@ -67,13 +68,13 @@ const PayeeTotalPayoutSumTooltip = ({ stats }) => {
       content={() => (
         <FormattedMessage
           defaultMessage="Total expense payouts ({currentYear}): Invoices: {totalPaidInvoices}; Receipts: {totalPaidReceipts}; Grants: {totalPaidGrants}"
+          id="uF45hs"
           values={{
             totalPaidInvoices: (
               <FormattedMoneyAmount
                 amount={stats.totalPaidInvoices.valueInCents}
                 currency={stats.totalPaidInvoices.currency}
                 precision={2}
-                amountStyles={null}
               />
             ),
             totalPaidReceipts: (
@@ -81,7 +82,6 @@ const PayeeTotalPayoutSumTooltip = ({ stats }) => {
                 amount={stats.totalPaidReceipts.valueInCents}
                 currency={stats.totalPaidReceipts.currency}
                 precision={2}
-                amountStyles={null}
               />
             ),
             totalPaidGrants: (
@@ -89,10 +89,9 @@ const PayeeTotalPayoutSumTooltip = ({ stats }) => {
                 amount={stats.totalPaidGrants.valueInCents}
                 currency={stats.totalPaidGrants.currency}
                 precision={2}
-                amountStyles={null}
               />
             ),
-            currentYear: <Span>{currentYear}</Span>,
+            currentYear: <span>{currentYear}</span>,
           }}
         />
       )}
@@ -116,7 +115,7 @@ const ExpenseSummaryAdditionalInformation = ({
   const payeeStats = payee && !isDraft ? payee.stats : null; // stats not available for drafts
   const isInvoice = expense?.type === expenseTypes.INVOICE;
   const isCharge = expense?.type === expenseTypes.CHARGE;
-  const isPaid = expense?.status === expenseStatus.PAID;
+  const isPaid = expense?.status === ExpenseStatus.PAID;
 
   if (isLoading) {
     return <LoadingPlaceholder height={150} mt={3} />;
@@ -136,21 +135,29 @@ const ExpenseSummaryAdditionalInformation = ({
       {collective && (
         <PrivateInfoColumn data-cy="expense-summary-collective">
           <PrivateInfoColumnHeader>{formatCollectiveType(intl, collective.type)}</PrivateInfoColumnHeader>
-          <LinkCollective collective={collective}>
-            <Flex alignItems="center">
-              <Avatar collective={collective} radius={24} />
-              <Flex flexDirection="column" ml={2} mr={2} css={{ overflow: 'hidden' }}>
-                <Span color="black.800" fontSize="14px" fontWeight="700" truncateOverflow>
-                  {formatAccountName(collective.name, collective.legalName)}
-                </Span>
-                <Span color="black.900" fontSize="13px" truncateOverflow>
-                  @{collective.slug}
-                </Span>
-              </Flex>
-            </Flex>
-          </LinkCollective>
+          <AccountHoverCard
+            account={collective}
+            trigger={
+              <span>
+                <LinkCollective collective={collective} noTitle>
+                  <Flex alignItems="center">
+                    <Avatar collective={collective} radius={24} />
+                    <Flex flexDirection="column" ml={2} mr={2} css={{ overflow: 'hidden' }}>
+                      <Span color="black.800" fontSize="14px" fontWeight="700">
+                        {formatAccountName(collective.name, collective.legalName)}
+                      </Span>
+                      <Span color="black.900" fontSize="13px">
+                        @{collective.slug}
+                      </Span>
+                    </Flex>
+                  </Flex>
+                </LinkCollective>
+              </span>
+            }
+          />
+
           {collective.stats.balanceWithBlockedFunds && (
-            <Container mt={3} fontSize="14px" color="black.700">
+            <Container mt={2} fontSize="14px" color="black.700">
               <Container fontWeight="700">
                 <FormattedMessage
                   id="withColon"
@@ -162,7 +169,6 @@ const ExpenseSummaryAdditionalInformation = ({
                 <FormattedMoneyAmount
                   amount={collective.stats.balanceWithBlockedFunds.valueInCents}
                   currency={collective.stats.balanceWithBlockedFunds.currency}
-                  amountStyles={null}
                 />
               </Box>
             </Container>
@@ -174,10 +180,12 @@ const ExpenseSummaryAdditionalInformation = ({
                 fontWeight="700"
                 color="black.700"
                 textDecoration="underline"
+                fontSize="14px"
                 href={`${getDashboardRoute(host, 'host-agreements')}?account=${collective.slug}`}
               >
                 <FormattedMessage
                   defaultMessage="Host Agreements: <Color>{agreementsCount}</Color>"
+                  id="uX+lpu"
                   values={{
                     Color: text => <Span color="primary.600">{text}</Span>,
                     agreementsCount: collective.hostAgreements.totalCount,
@@ -196,37 +204,48 @@ const ExpenseSummaryAdditionalInformation = ({
             <FormattedMessage id="Expense.PayTo" defaultMessage="Pay to" />
           )}
         </PrivateInfoColumnHeader>
-        <LinkCollective collective={payee}>
-          <Flex alignItems="center" fontSize="14px">
-            {!payee.slug ? (
-              <Avatar
-                name={payee.organization?.name || payee.name}
-                radius={24}
-                backgroundColor="blue.100"
-                color="blue.400"
-              />
-            ) : (
-              <Avatar collective={payee} radius={24} />
-            )}
-            <Flex flexDirection="column" ml={2} mr={2} css={{ overflow: 'hidden' }}>
-              <Span color="black.900" fontWeight="bold" truncateOverflow>
-                {formatAccountName(
-                  payee.organization?.name || payee.name,
-                  payee.organization?.legalName || payee.legalName,
-                )}
-              </Span>
-              {payee.type !== CollectiveType.VENDOR && (payee.organization?.slug || payee.slug) && (
-                <Span color="black.900" fontSize="13px" truncateOverflow>
-                  @{payee.organization?.slug || payee.slug}
-                </Span>
-              )}
-            </Flex>
-            {payeeStats && <PayeeTotalPayoutSumTooltip stats={payeeStats} />}
-          </Flex>
-        </LinkCollective>
+        <AccountHoverCard
+          account={payee}
+          includeAdminMembership={{
+            accountSlug: collective?.slug,
+            hostSlug: host?.slug,
+          }}
+          trigger={
+            <span>
+              <LinkCollective collective={payee} noTitle>
+                <Flex alignItems="center" fontSize="14px">
+                  {!payee.slug ? (
+                    <Avatar
+                      name={payee.organization?.name || payee.name}
+                      radius={24}
+                      backgroundColor="blue.100"
+                      color="blue.400"
+                    />
+                  ) : (
+                    <Avatar collective={payee} radius={24} />
+                  )}
+                  <Flex flexDirection="column" ml={2} mr={2} css={{ overflow: 'hidden' }}>
+                    <Span color="black.900" fontWeight="bold">
+                      {formatAccountName(
+                        payee.organization?.name || payee.name,
+                        payee.organization?.legalName || payee.legalName,
+                      )}
+                    </Span>
+                    {payee.type !== CollectiveType.VENDOR && (payee.organization?.slug || payee.slug) && (
+                      <Span color="black.900" fontSize="13px">
+                        @{payee.organization?.slug || payee.slug}
+                      </Span>
+                    )}
+                  </Flex>
+                  {payeeStats && <PayeeTotalPayoutSumTooltip stats={payeeStats} />}
+                </Flex>
+              </LinkCollective>
+            </span>
+          }
+        />
 
         {payeeLocation && isInvoice && (
-          <Container whiteSpace="pre-wrap" fontSize="14px" lineHeight="16px" mt={2}>
+          <Container whiteSpace="pre-wrap" color="black.700" fontSize="14px" lineHeight="16px" mt={2}>
             <LocationAddress location={payeeLocation} isLoading={isLoadingLoggedInUser} />
           </Container>
         )}
@@ -249,24 +268,24 @@ const ExpenseSummaryAdditionalInformation = ({
                 !expense.payoutMethod?.type && (expense.draft || expense.payee.isInvite)
                   ? expense.draft?.payoutMethod?.type || INVITE
                   : isCharge
-                  ? VIRTUAL_CARD
-                  : expense.payoutMethod?.type
+                    ? VIRTUAL_CARD
+                    : expense.payoutMethod?.type
               }
-              name={expense?.virtualCard?.name && `${expense.virtualCard.name} Card (${expense.virtualCard.last4})`}
+              name={expense.virtualCard?.name && `${expense.virtualCard.name} Card (${expense.virtualCard.last4})`}
             />
           </Box>
-          <div data-cy="expense-summary-payout-method-data">
+          <Container data-cy="expense-summary-payout-method-data" wordBreak="break-word">
             <PayoutMethodData
               payoutMethod={expense.draft?.payoutMethod ?? expense.payoutMethod}
               isLoading={isLoadingLoggedInUser}
             />
-          </div>
+          </Container>
           {expense.invoiceInfo && (
             <Box mt={3} data-cy="expense-summary-invoice-info">
               <Container fontSize="11px" fontWeight="500" mb={2}>
                 <FormattedMessage id="ExpenseForm.InvoiceInfo" defaultMessage="Additional invoice information" />
                 &nbsp;&nbsp;
-                <PrivateInfoIcon color="#969BA3" />
+                <PrivateInfoIcon />
               </Container>
               <P fontSize="11px" lineHeight="16px" whiteSpace="pre-wrap">
                 {expense.invoiceInfo}
@@ -315,7 +334,7 @@ ExpenseSummaryAdditionalInformation.propTypes = {
     currency: PropTypes.string,
     invoiceInfo: PropTypes.string,
     createdAt: PropTypes.string,
-    status: PropTypes.oneOf(Object.values(expenseStatus)),
+    status: PropTypes.oneOf(Object.values(ExpenseStatus)),
     type: PropTypes.oneOf(Object.values(expenseTypes)),
     tags: PropTypes.arrayOf(PropTypes.string),
     requiredLegalDocuments: PropTypes.arrayOf(PropTypes.string),

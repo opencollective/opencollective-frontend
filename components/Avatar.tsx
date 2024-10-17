@@ -1,21 +1,29 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
+import { Calendar, TestTube2, UserCog } from 'lucide-react';
 import styled from 'styled-components';
-import { border, BorderProps, color, layout, space } from 'styled-system';
+import type { BorderProps } from 'styled-system';
+import { border, color, layout, space } from 'styled-system';
 
 import { CollectiveType, defaultImage } from '../lib/constants/collectives';
 import { getAvatarBorderRadius, getCollectiveImage } from '../lib/image-utils';
 
-import { Flex, FlexProps } from './Grid';
+import type { FlexProps } from './Grid';
+import { Flex } from './Grid';
 
 const getInitials = name => name.split(' ').reduce((result, value) => (result += value.slice(0, 1).toUpperCase()), '');
+
+const COLLECTIVE_TYPE_ICON = {
+  [CollectiveType.EVENT]: Calendar,
+  [CollectiveType.PROJECT]: TestTube2,
+  ROOT: UserCog,
+};
 
 type StyledAvatarProps = FlexProps &
   BorderProps & {
     src?: string;
     type?: string;
-    size?: number;
+    size?: string | number | (string | number)[];
     title?: string;
     backgroundSize?: string;
   };
@@ -46,14 +54,54 @@ const StyledAvatar = styled(Flex).attrs<StyledAvatarProps>(props => ({
   ${layout}
 `;
 
+/**
+ * Returns the max avatar height multiplied by 2 (for retina screens)
+ */
+const getImageHeightFromRadius = (radius: string | number | (string | number)[]): number | undefined => {
+  const normalizeValue = (value: string | number) => (typeof value === 'string' ? parseInt(value, 10) : value);
+  if (Array.isArray(radius)) {
+    return !radius.length ? undefined : Math.max(...radius.map(normalizeValue)) * 2;
+  } else {
+    return normalizeValue(radius) * 2;
+  }
+};
+
 const Avatar = ({
   collective = null,
   src = undefined,
   type = 'USER',
   radius = 42,
   name = undefined,
+  useIcon = false,
+  children = null,
+  displayTitle = true,
   ...styleProps
-}) => {
+}: {
+  collective?: {
+    type?: string;
+    name?: string;
+    slug?: string;
+    image?: string;
+    isIncognito?: boolean;
+    isGuest?: boolean;
+  };
+  src?: string;
+  type?: string;
+  radius?: string | number | (string | number)[];
+  name?: string;
+  useIcon?: boolean;
+  children?: React.ReactNode;
+  displayTitle?: boolean;
+  backgroundColor?: string;
+  backgroundSize?: string;
+  animationDuration?: number;
+  className?: string;
+  style?: React.CSSProperties;
+} & React.ComponentProps<typeof StyledAvatar>) => {
+  let child = children;
+  if (collective?.type === 'ROOT') {
+    useIcon = true;
+  }
   // Use collective object instead of props
   if (collective) {
     type = collective.type;
@@ -62,43 +110,26 @@ const Avatar = ({
       src = defaultImage.ANONYMOUS;
     } else if (collective.isGuest && shouldUseDefaultGuestAvatar(collective.name)) {
       src = defaultImage.GUEST;
-    } else if (type === 'VENDOR') {
-      src = defaultImage.ORGANIZATION;
+    } else if (useIcon) {
+      const Icon = COLLECTIVE_TYPE_ICON[type];
+      if (Icon) {
+        child = <Icon size={radius} />;
+      }
     } else {
-      src = getCollectiveImage(collective);
+      src = getCollectiveImage(collective, { height: getImageHeightFromRadius(radius) });
+    }
+
+    if (!src && !child) {
+      if ((type === 'USER' || type === 'INDIVIDUAL') && name) {
+        child = <span>{getInitials(name)}</span>;
+      }
     }
   }
   return (
-    <StyledAvatar size={radius} type={type} src={src} title={name} {...styleProps}>
-      {!src && (type === 'USER' || type === 'INDIVIDUAL') && name && <span>{getInitials(name)}</span>}
+    <StyledAvatar size={radius} type={type} src={src} title={displayTitle ? name : undefined} {...styleProps}>
+      {child}
     </StyledAvatar>
   );
-};
-
-Avatar.propTypes = {
-  /** Collective object */
-  collective: PropTypes.shape({
-    type: PropTypes.string,
-    name: PropTypes.string,
-    slug: PropTypes.string,
-    image: PropTypes.string,
-    isIncognito: PropTypes.bool,
-    isGuest: PropTypes.bool,
-  }),
-  /** Collective name */
-  name: PropTypes.string,
-  /** Collective image url */
-  src: PropTypes.string,
-  /** Collective type */
-  type: PropTypes.oneOf(Object.keys(CollectiveType)),
-  /** Avatar size */
-  radius: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
-  /** Duration to transition size. Disabled if 0, null or undefined */
-  animationDuration: PropTypes.number,
-  /* Size of the avatar image */
-  backgroundSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  /* Color of the background */
-  backgroundColor: PropTypes.string,
 };
 
 const shouldUseDefaultGuestAvatar = name => {
@@ -108,7 +139,21 @@ const shouldUseDefaultGuestAvatar = name => {
 /**
  * Similar to `Avatar`, but builds from a Contributor instead of a collective
  */
-export const ContributorAvatar = ({ contributor, radius, ...styleProps }) => {
+export const ContributorAvatar = ({
+  contributor,
+  radius,
+  ...styleProps
+}: {
+  contributor: {
+    name: string;
+    image: string;
+    collectiveSlug: string;
+    isIncognito: boolean;
+    isGuest: boolean;
+    type: string;
+  };
+  radius: string | number | (string | number)[];
+}) => {
   let image = null;
   if (contributor.isIncognito) {
     image = defaultImage.ANONYMOUS;
@@ -119,19 +164,6 @@ export const ContributorAvatar = ({ contributor, radius, ...styleProps }) => {
   }
 
   return <StyledAvatar size={radius} type={contributor.type} src={image} title={contributor.name} {...styleProps} />;
-};
-
-ContributorAvatar.propTypes = {
-  /** Collective object */
-  contributor: PropTypes.shape({
-    name: PropTypes.string,
-    image: PropTypes.string,
-    collectiveSlug: PropTypes.string,
-    isIncognito: PropTypes.bool,
-    isGuest: PropTypes.bool,
-    type: PropTypes.oneOf(Object.keys(CollectiveType)),
-  }).isRequired,
-  radius: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
 };
 
 /** A simple avatar for incognito users */

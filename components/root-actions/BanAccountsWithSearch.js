@@ -1,15 +1,16 @@
 import React from 'react';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { truncate, uniqBy } from 'lodash';
 import { useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { formatCurrency } from '../../lib/currency-utils';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { stripHTML } from '../../lib/utils';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { stripHTML } from '../../lib/html';
 
 import ConfirmationModal from '../ConfirmationModal';
+import DashboardHeader from '../dashboard/DashboardHeader';
 import { Box, Flex } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
@@ -19,18 +20,20 @@ import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledLink from '../StyledLink';
 import { P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { Alert, AlertDescription, AlertTitle } from '../ui/Alert';
+import { useToast } from '../ui/useToast';
 
 import { banAccountsMutation } from './BanAccounts';
 import BanAccountsSummary from './BanAccountsSummary';
 
-export const searchQuery = gql`
+const searchQuery = gql`
   query BanAccountSearch($term: String!, $offset: Int) {
     accounts(
       searchTerm: $term
       limit: 30
       offset: $offset
       skipRecentAccounts: false
+      includeArchived: true
       orderBy: { field: CREATED_AT, direction: DESC }
       type: [COLLECTIVE, EVENT, FUND, INDIVIDUAL, ORGANIZATION, PROJECT]
     ) {
@@ -87,23 +90,26 @@ export const searchQuery = gql`
 const CardContainer = styled.div`
   border-radius: 16px;
   cursor: crosshair;
-  transition: box-shadow 0.3s;
+  transition:
+    box-shadow 0.3s,
+    outline 0.3s;
   &:hover {
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
   }
   ${props =>
     props.$isSelected &&
     css`
-      box-shadow: 0px 0px 10px red;
+      box-shadow: 0px 0px 5px red;
+      outline: 1px solid red;
       &:hover {
-        box-shadow: 0px 0px 5px red;
+        box-shadow: 0px 0px 10px red;
       }
     `}
 `;
 
 const AccountsContainer = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   grid-gap: 20px;
   margin-top: 20px;
 `;
@@ -119,7 +125,7 @@ const BanAccountsWithSearch = () => {
   const [includeAssociatedAccounts, setIncludeAssociatedAccounts] = React.useState(true);
   const [dryRunData, setDryRunData] = React.useState(null);
   const [_banAccounts, { loading: submitting }] = useMutation(banAccountsMutation, { context: API_V2_CONTEXT });
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const intl = useIntl();
   const isValid = Boolean(selectedAccounts?.length);
   const toggleAccountSelection = account => {
@@ -139,7 +145,16 @@ const BanAccountsWithSearch = () => {
 
   return (
     <div>
-      <SearchBar placeholder="Search accounts" onSubmit={setSearchTerm} disabled={loading || submitting} />
+      <DashboardHeader title="Search & Ban Accounts" className="mb-10" />
+      <Alert className="relative mb-8 flex items-center gap-2 bg-destructive/5 fade-in" variant="destructive">
+        <AlertTitle className="flex items-center">Dangerous Action</AlertTitle>
+        <AlertDescription>
+          Please be super careful with the action below, and double check everything you do.
+        </AlertDescription>
+      </Alert>
+      <Box width="276px">
+        <SearchBar placeholder="Search accounts" onSubmit={setSearchTerm} disabled={loading || submitting} />
+      </Box>
 
       {error ? (
         <MessageBoxGraphqlError error={error} />
@@ -187,7 +202,8 @@ const BanAccountsWithSearch = () => {
                   title={truncate(stripHTML(account.longDescription), { length: 256 })}
                 >
                   <div>
-                    <hr />
+                    <hr className="my-5" />
+
                     <Box>
                       <strong>Received</strong>:{' '}
                       {formatCurrency(account.stats.totalAmountReceived.valueInCents, account.currency)}
@@ -243,8 +259,8 @@ const BanAccountsWithSearch = () => {
             const result = await banAccounts(true);
             setDryRunData(result.data.banAccount);
           } catch (e) {
-            addToast({
-              type: TOAST_TYPE.ERROR,
+            toast({
+              variant: 'error',
               message: i18nGraphqlException(intl, e),
             });
           }
@@ -257,7 +273,7 @@ const BanAccountsWithSearch = () => {
           isDanger
           continueLabel="Ban accounts"
           header="Ban accounts"
-          cancelHandler={() => setDryRunData(null)}
+          onClose={() => setDryRunData(null)}
           disableSubmit={!dryRunData.isAllowed}
           continueHandler={async () => {
             try {
@@ -265,14 +281,14 @@ const BanAccountsWithSearch = () => {
               setDryRunData(null);
               setSelectedAccounts([]);
               refetch(); // Refresh the search results, no need to wait for it
-              addToast({
-                type: TOAST_TYPE.SUCCESS,
+              toast({
+                variant: 'success',
                 title: `Successfully banned ${result.data.banAccount.accounts.length} accounts`,
                 message: <P whiteSpace="pre-wrap">{result.data.banAccount.message}</P>,
               });
             } catch (e) {
-              addToast({
-                type: TOAST_TYPE.ERROR,
+              toast({
+                variant: 'error',
                 message: i18nGraphqlException(intl, e),
               });
             }

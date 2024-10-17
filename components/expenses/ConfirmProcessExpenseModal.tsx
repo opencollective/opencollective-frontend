@@ -1,20 +1,23 @@
 import React from 'react';
-import { defineMessages, FormattedMessage, MessageDescriptor, useIntl } from 'react-intl';
+import type { MessageDescriptor } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import useProcessExpense from '../../lib/expenses/useProcessExpense';
-import { Expense } from '../../lib/graphql/types/v2/graphql';
+import type { Expense } from '../../lib/graphql/types/v2/graphql';
 
 import { Flex } from '../Grid';
+import MessageBox from '../MessageBox';
 import RichTextEditor from '../RichTextEditor';
 import StyledButton from '../StyledButton';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import { P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { toast } from '../ui/useToast';
 
 const messages = defineMessages({
   reasonPlaceholder: {
-    defaultMessage: 'e.g. Email Address is wrong',
+    defaultMessage: 'e.g, We never worked with this person.',
+    id: 'mpLU2S',
   },
   REQUEST_RE_APPROVAL_TITLE: {
     id: 'expense.requestReApproval.btn',
@@ -23,19 +26,24 @@ const messages = defineMessages({
   REQUEST_RE_APPROVAL_DESCRIPTION: {
     defaultMessage:
       'Please mention the reason why this expense requires re-approval. The reason will be shared with the user and also be documented as a comment under the expense.',
+    id: 'jD5/NS',
   },
   REQUEST_RE_APPROVAL_CONFIRM_BUTTON: {
     defaultMessage: 'Confirm and request re-approval',
+    id: 'UrUS9j',
   },
   MARK_AS_INCOMPLETE_TITLE: {
     defaultMessage: 'Mark as incomplete',
+    id: 'hu7oaH',
   },
   MARK_AS_INCOMPLETE_DESCRIPTION: {
     defaultMessage:
       'Please mention the reason why this expense has been marked as incomplete. The reason will be shared with the user and also be documented as a comment under the expense.',
+    id: 'x7D8vH',
   },
   MARK_AS_INCOMPLETE_CONFIRM_BUTTON: {
     defaultMessage: 'Confirm and mark as incomplete',
+    id: 'lNyyJU',
   },
   APPROVE_TITLE: {
     id: 'actions.approve',
@@ -44,6 +52,7 @@ const messages = defineMessages({
   APPROVE_DESCRIPTION: {
     defaultMessage:
       'You may add a note that will be shared with the user and also be documented as a comment under the expense.',
+    id: 'xmVXUM',
   },
   APPROVE_CONFIRM_BUTTON: {
     id: 'actions.approve',
@@ -56,6 +65,7 @@ const messages = defineMessages({
   UNAPPROVE_DESCRIPTION: {
     defaultMessage:
       'Please mention the reason why this expense has been unapproved. The reason will be shared with the user and also be documented as a comment under the expense.',
+    id: 'SREb+h',
   },
   UNAPPROVE_CONFIRM_BUTTON: { id: 'expense.unapprove.btn', defaultMessage: 'Unapprove' },
   REJECT_TITLE: {
@@ -65,17 +75,21 @@ const messages = defineMessages({
   REJECT_DESCRIPTION: {
     defaultMessage:
       'Please mention the reason why this expense has been rejected. The reason will be shared with the user and also be documented as a comment under the expense.',
+    id: 'aOO6yW',
   },
   REJECT_CONFIRM_BUTTON: { id: 'actions.reject', defaultMessage: 'Reject' },
   HOLD_TITLE: {
     defaultMessage: 'Put expense on hold',
+    id: 'FXOuRH',
   },
   HOLD_DESCRIPTION: {
     defaultMessage:
       'Expense is still approved but can not be paid out until it is released. Expense is also not displayed in ready to pay.',
+    id: 'aE2FPd',
   },
   HOLD_CONFIRM_BUTTON: {
     defaultMessage: 'Put on Hold',
+    id: '+pCc8I',
   },
   RELEASE_TITLE: {
     id: 'actions.release',
@@ -83,16 +97,33 @@ const messages = defineMessages({
   },
   RELEASE_DESCRIPTION: {
     defaultMessage: 'Expense can be paid out and is displayed in ready to pay list.',
+    id: 'zIsgw6',
   },
   RELEASE_CONFIRM_BUTTON: {
     id: 'actions.release',
     defaultMessage: 'Release Hold',
   },
+  MARK_AS_SPAM_TITLE: {
+    id: 'actions.spam',
+    defaultMessage: 'Mark as Spam',
+  },
+  MARK_AS_SPAM_DESCRIPTION: {
+    id: 'Expense.MarkAsSpamWarning',
+    defaultMessage: 'This will prevent the submitter account to post new expenses.',
+  },
+  MARK_AS_SPAM_CONFIRM_BUTTON: {
+    id: 'actions.spam',
+    defaultMessage: 'Mark as Spam',
+  },
+  MARK_AS_SPAM_LABEL: {
+    id: 'Expense.MarkAsSpamLabel',
+    defaultMessage: 'Why are you marking this expense as spam?',
+  },
 });
 
 const MessagesPerType: Record<
   ConfirmProcessExpenseModalType,
-  { title: MessageDescriptor; description: MessageDescriptor; confirmBtn: MessageDescriptor }
+  { title: MessageDescriptor; description: MessageDescriptor; confirmBtn: MessageDescriptor; label?: MessageDescriptor }
 > = {
   REQUEST_RE_APPROVAL: {
     title: messages.REQUEST_RE_APPROVAL_TITLE,
@@ -129,18 +160,25 @@ const MessagesPerType: Record<
     description: messages.RELEASE_DESCRIPTION,
     confirmBtn: messages.RELEASE_CONFIRM_BUTTON,
   },
+  MARK_AS_SPAM: {
+    title: messages.MARK_AS_SPAM_TITLE,
+    description: messages.MARK_AS_SPAM_DESCRIPTION,
+    confirmBtn: messages.MARK_AS_SPAM_CONFIRM_BUTTON,
+    label: messages.MARK_AS_SPAM_LABEL,
+  },
 };
 
-export type ConfirmProcessExpenseModalType =
+type ConfirmProcessExpenseModalType =
   | 'REQUEST_RE_APPROVAL'
   | 'MARK_AS_INCOMPLETE'
+  | 'MARK_AS_SPAM'
   | 'APPROVE'
   | 'UNAPPROVE'
   | 'REJECT'
   | 'HOLD'
   | 'RELEASE';
 
-export type ConfirmProcessExpenseModalProps = {
+type ConfirmProcessExpenseModalProps = {
   type: ConfirmProcessExpenseModalType;
   onClose: () => void;
   expense: Pick<Expense, 'id' | 'legacyId' | 'permissions'>;
@@ -148,7 +186,6 @@ export type ConfirmProcessExpenseModalProps = {
 
 export default function ConfirmProcessExpenseModal({ type, onClose, expense }: ConfirmProcessExpenseModalProps) {
   const intl = useIntl();
-  const { addToast } = useToasts();
 
   const [message, setMessage] = React.useState<string>();
   const [uploading, setUploading] = React.useState(false);
@@ -202,20 +239,38 @@ export default function ConfirmProcessExpenseModal({ type, onClose, expense }: C
           });
           break;
         }
+        case 'MARK_AS_SPAM': {
+          await processExpense.markAsSpam({
+            message,
+          });
+          break;
+        }
       }
       onClose();
     } catch (error) {
-      addToast({ type: TOAST_TYPE.ERROR, variant: 'light', message: i18nGraphqlException(intl, error) });
+      toast({ variant: 'error', message: i18nGraphqlException(intl, error) });
     }
   }, [type, message, intl, processExpense]);
 
   return (
-    <StyledModal role="alertdialog" width="432px" onClose={onClose} trapFocus>
+    <StyledModal role="alertdialog" onClose={onClose} trapFocus>
       <ModalHeader>{intl.formatMessage(MessagesPerType[type].title)}</ModalHeader>
       <ModalBody pt={2}>
-        <P mb={3} color="black.700" lineHeight="20px">
-          {intl.formatMessage(MessagesPerType[type].description)}
-        </P>
+        <Flex>
+          <MessageBox lineHeight="20px" mb={10} type="warning" withIcon>
+            {intl.formatMessage(MessagesPerType[type].description)}
+          </MessageBox>
+        </Flex>
+
+        {MessagesPerType[type].label && (
+          <P as="label" htmlFor="expense-ban-reason" mb={2} color="black.700" fontWeight="500">
+            {intl.formatMessage(
+              { id: 'OptionalFieldLabel', defaultMessage: '{field} (optional)' },
+              { field: intl.formatMessage(MessagesPerType[type].label) },
+            )}
+          </P>
+        )}
+
         <RichTextEditor
           data-cy="confirm-action-text"
           kind="COMMENT"

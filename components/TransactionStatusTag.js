@@ -16,7 +16,7 @@ const getTransactionStatusMsgType = transaction => {
   if (transaction.isOrderRejected && transaction.isRefunded) {
     return 'error';
   }
-  if (transaction.isRefunded || transaction.order?.status === ORDER_STATUS.PROCESSING) {
+  if (transaction.isRefunded) {
     return 'grey';
   }
   if (transaction.order?.status === ORDER_STATUS.PENDING) {
@@ -48,7 +48,7 @@ const formatStatus = (intl, transaction) => {
     return intl.formatMessage(msg.rejected);
   } else if (transaction.isRefunded) {
     return intl.formatMessage(msg.refunded);
-  } else if ([ORDER_STATUS.PROCESSING, ORDER_STATUS.PENDING].includes(transaction.order?.status)) {
+  } else if ([ORDER_STATUS.PENDING].includes(transaction.order?.status)) {
     return i18nOrderStatus(intl, transaction.order.status);
   } else {
     return intl.formatMessage(msg.completed);
@@ -59,10 +59,6 @@ const tooltipMessages = defineMessages({
   [ORDER_STATUS.PENDING]: {
     id: 'Order.Status.Pending',
     defaultMessage: 'Please follow the payment instructions in the confirmation email to complete your transaction.',
-  },
-  [ORDER_STATUS.PROCESSING]: {
-    id: 'Order.Status.Processing',
-    defaultMessage: "We're waiting for a third-party service to confirm the transaction was completed.",
   },
 });
 
@@ -82,7 +78,7 @@ const TransactionStatusTag = ({ transaction, ...props }) => {
     </StyledTag>
   );
 
-  if ([ORDER_STATUS.PROCESSING, ORDER_STATUS.PENDING].includes(transaction.order?.status)) {
+  if ([ORDER_STATUS.PENDING].includes(transaction.order?.status)) {
     return (
       <StyledTooltip content={() => intl.formatMessage(tooltipMessages[transaction.order.status], I18nFormatters)}>
         {tag}

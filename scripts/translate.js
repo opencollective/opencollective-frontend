@@ -13,6 +13,7 @@ const DEFAULT_TRANSLATIONS_FILE = `${LANG_DIR}en.json`;
 const DUPLICATED_IGNORED_MESSAGES = new Set([
   'admin', // Can have different masculine/feminine for some languages based on the context (role or action button)
   'all', // Can have different masculine/feminine for some languages based on the context
+  'apply', // In German there is a difference between "Apply" and "Apply" depending on the context: "make an application" where "Bewerben" is the corresponding translation but this is also being used for the filter buttons the sense is "use the filter" where "Bewerben" in German is totally wrong. "Anwenden" would be the correct translation in this context - there is a difference that simply does not exist in English.
   'confirm', // Can have different masculine/feminine for some languages based on the context
   'mark as paid', // Can have different masculine/feminine for some languages based on the context (order or expense)
   'order', // Depends on whether we're talking about ordering (sorting) or an order (contribution)
@@ -21,7 +22,13 @@ const DUPLICATED_IGNORED_MESSAGES = new Set([
   'pending', // Can have different masculine/feminine for some languages based on the context
   'status', // Can have different masculine/feminine for some languages based on the context
   'type', // Can have different masculine/feminine for some languages based on the context
-  'unknown', // Can have different translations if it is "unknown user" or "unknown type"
+  'unknown', // Can have different translations if it is "unknown user" or "unknown type",
+  'applications', // Can have different translations if it is "host applications" or OAuth "applications"
+  'application', // Can have different translations if it is "host application" or OAuth "application"
+  'code', // Can have different translations based on the context (accounting code, program code, etc.)
+  'none', // Can have different masculine/feminine for some languages based on the context
+  'add new', // Can have different masculine/feminine for some languages based on the context
+  'created on', // Can have different masculine/feminine for some languages based on the context
 ]);
 
 /**
@@ -42,7 +49,7 @@ const jsonMessages = JSON.parse(messagesFile);
 const defaultMessages = mapValues(jsonMessages, message => message.defaultMessage);
 
 /**
- * Store new keys in translation file without overwritting the existing ones.
+ * Store new keys in translation file without overwriting the existing ones.
  */
 const translatedMessages = (locale, defaultMessages, updatedKeys) => {
   const filename = `${LANG_DIR}${locale}.json`;

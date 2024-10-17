@@ -46,13 +46,13 @@ const ContributeEvent = ({ collective, event, ...props }) => {
             <Calendar size="1.3em" color="#4E5052" />
             <Span ml={2} color="black.700">
               {startsAt && (
-                <time dateTime={startsAt}>
+                <time suppressHydrationWarning dateTime={startsAt}>
                   <FormattedDate value={startsAt} month="short" day="numeric" year={showYearOnStartDate} />
                 </time>
               )}
               {takesMultipleDays && ' → '}
               {(takesMultipleDays || (!startsAt && endsAt)) && (
-                <time dateTime={endsAt}>
+                <time suppressHydrationWarning dateTime={endsAt}>
                   <FormattedDate value={endsAt} month="short" day="numeric" year="numeric" />
                 </time>
               )}
@@ -64,16 +64,22 @@ const ContributeEvent = ({ collective, event, ...props }) => {
               <Span ml={2} color="black.700">
                 {!takesMultipleDays ? (
                   <React.Fragment>
-                    <FormattedDate value={startsAt} hour="2-digit" minute="2-digit" />
+                    <span suppressHydrationWarning>
+                      <FormattedDate value={startsAt} hour="2-digit" minute="2-digit" />
+                    </span>
                     {endsAt && (
                       <React.Fragment>
                         {`-`}
-                        <FormattedDate value={endsAt} hour="2-digit" minute="2-digit" timeZoneName="short" />
+                        <span suppressHydrationWarning>
+                          <FormattedDate value={endsAt} hour="2-digit" minute="2-digit" timeZoneName="short" />
+                        </span>
                       </React.Fragment>
                     )}
                   </React.Fragment>
                 ) : (
-                  <FormattedDate value={startsAt} hour="2-digit" minute="2-digit" timeZoneName="short" />
+                  <span suppressHydrationWarning>
+                    <FormattedDate value={startsAt} hour="2-digit" minute="2-digit" timeZoneName="short" />
+                  </span>
                 )}
               </Span>
             </Container>

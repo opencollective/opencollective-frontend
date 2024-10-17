@@ -52,6 +52,7 @@ export const ActivityTypes = {
   COLLECTIVE_REJECTED: 'collective.rejected',
   COLLECTIVE_TRANSACTION_CREATED: 'collective.transaction.created',
   COLLECTIVE_UNFROZEN: 'collective.unfrozen',
+  COLLECTIVE_UNHOSTED: 'collective.unhosted',
   COLLECTIVE_UPDATE_CREATED: 'collective.update.created',
   COLLECTIVE_UPDATE_PUBLISHED: 'collective.update.published',
   COLLECTIVE_VIRTUAL_CARD_ADDED: 'collective.virtualcard.added',
@@ -91,15 +92,4 @@ export const ActivityTypes = {
   VIRTUAL_CARD_REQUESTED: 'virtual_card.requested',
   WEBHOOK_PAYPAL_RECEIVED: 'webhook.paypal.received',
   WEBHOOK_STRIPE_RECEIVED: 'webhook.stripe.received',
-} as const;
-
-export const ActivityAttribution = {
-  // Activities initiated by this account
-  AUTHORED: 'AUTHORED',
-  // Activities that targeted this account
-  RECEIVED: 'RECEIVED',
-  // Activities where author and target both points to this account (e.g. settings update)
-  SELF: 'SELF',
-  // Activities that happened on accounts hosted by this account
-  HOSTED_ACCOUNTS: 'HOSTED_ACCOUNTS',
 } as const;

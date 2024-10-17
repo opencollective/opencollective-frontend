@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
 import { trim } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { editCollectivePageQuery } from '../../lib/graphql/queries';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { editCollectivePageQuery } from '../../lib/graphql/v1/queries';
 
 import { getI18nLink, I18nSignInLink } from '../I18nFormatters';
 import StyledButton from '../StyledButton';
@@ -15,7 +15,7 @@ import StyledInputField from '../StyledInputField';
 import { P } from '../Text';
 
 const createConnectedAccountMutation = gql`
-  mutation createConnectedAccount($connectedAccount: ConnectedAccountCreateInput!, $account: AccountReferenceInput!) {
+  mutation CreateConnectedAccount($connectedAccount: ConnectedAccountCreateInput!, $account: AccountReferenceInput!) {
     createConnectedAccount(connectedAccount: $connectedAccount, account: $account) {
       id
       settings
@@ -122,7 +122,7 @@ const EditPayPalAccount = props => {
         </StyledInputField>
 
         <StyledButton type="submit" mt={2} minWidth={150} loading={isCreating}>
-          <FormattedMessage defaultMessage="Connect {service}" values={{ service: 'PayPal' }} />
+          <FormattedMessage defaultMessage="Connect {service}" id="C9HmCs" values={{ service: 'PayPal' }} />
         </StyledButton>
       </form>
     );
@@ -141,6 +141,7 @@ const EditPayPalAccount = props => {
         <P mt={3} fontStyle="italic">
           <FormattedMessage
             defaultMessage="Please contact <SupportLink>support</SupportLink> to disconnect PayPal."
+            id="ivhAav"
             values={{ SupportLink: I18nSignInLink }}
           />
         </P>

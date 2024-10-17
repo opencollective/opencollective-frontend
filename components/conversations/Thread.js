@@ -12,8 +12,10 @@ import CommentIconLib from '../icons/CommentIcon';
 import StyledButton from '../StyledButton';
 import { withUser } from '../UserProvider';
 
+import { getActivityIcon, isSupportedActivity } from './activity-helpers';
 import Comment from './Comment';
-import ThreadActivity, { getActivityIcon, isSupportedActivity } from './ThreadActivity';
+import SmallThread from './SmallThread';
+import ThreadActivity from './ThreadActivity';
 
 const CommentIcon = styled(CommentIconLib).attrs({
   size: 16,
@@ -40,7 +42,16 @@ const ItemContainer = styled.div`
 /**
  * A thread is meant to display comments and activities in a chronological order.
  */
-const Thread = ({ collective, items, onCommentDeleted, LoggedInUser, theme, hasMore, fetchMore }) => {
+const Thread = ({
+  collective,
+  items,
+  onCommentDeleted,
+  LoggedInUser,
+  theme,
+  hasMore,
+  fetchMore,
+  getClickedComment,
+}) => {
   const [loading, setLoading] = React.useState(false);
 
   if (!items || items.length === 0) {
@@ -80,6 +91,7 @@ const Thread = ({ collective, items, onCommentDeleted, LoggedInUser, theme, hasM
                       canReply={Boolean(LoggedInUser)}
                       onDelete={onCommentDeleted}
                       reactions={item.reactions}
+                      onReplyClick={getClickedComment}
                     />
                   </ItemContainer>
                 </Flex>
@@ -104,9 +116,9 @@ const Thread = ({ collective, items, onCommentDeleted, LoggedInUser, theme, hasM
             return null;
         }
       })}
-      <hr />
+      <hr className="my-5" />
       {hasMore && fetchMore && (
-        <Container margin="1rem">
+        <Container margin="0.65rem">
           <StyledButton onClick={handleLoadMore} loading={loading} textTransform="capitalize">
             <FormattedMessage id="loadMore" defaultMessage="load more" /> ↓
           </StyledButton>
@@ -138,6 +150,20 @@ Thread.propTypes = {
   LoggedInUser: PropTypes.object,
   /** @ignore from withTheme */
   theme: PropTypes.object,
+  getClickedComment: PropTypes.func,
 };
 
-export default React.memo(withUser(withTheme(Thread)));
+const DefaultThreadVariant = React.memo(withUser(withTheme(Thread)));
+
+/**
+ *
+ * @param {import('./types').ThreadPropsWithVariant} props
+ */
+export default function ThreadComponent(props) {
+  // eslint-disable-next-line react/prop-types
+  if (props.variant === 'small') {
+    return <SmallThread {...props} />;
+  }
+
+  return <DefaultThreadVariant {...props} />;
+}

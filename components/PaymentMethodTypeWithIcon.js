@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Alipay } from '@styled-icons/fa-brands/Alipay';
 import { Paypal as PaypalIcon } from '@styled-icons/fa-brands/Paypal';
+import { StripeS as StripeIcon } from '@styled-icons/fa-brands/StripeS';
 import { CreditCard } from '@styled-icons/fa-solid/CreditCard';
 import { ExchangeAlt as OtherIcon } from '@styled-icons/fa-solid/ExchangeAlt';
 import { useIntl } from 'react-intl';
@@ -17,10 +18,14 @@ import { Span } from './Text';
 /**
  * Shows the data of the given payout method
  */
-const PaymentMethodTypeWithIcon = ({ isLoading, type, iconSize }) => {
+const PaymentMethodTypeWithIcon = ({ isLoading, type, iconSize = 24 }) => {
   const intl = useIntl();
   if (isLoading) {
     return <LoadingPlaceholder height={15} width={90} />;
+  }
+
+  if (!type) {
+    return null;
   }
 
   switch (type) {
@@ -53,6 +58,13 @@ const PaymentMethodTypeWithIcon = ({ isLoading, type, iconSize }) => {
           <Span ml={2}>PayPal</Span>
         </Flex>
       );
+    case PAYMENT_METHOD_TYPE.PAYMENT_INTENT:
+      return (
+        <Flex alignItems="center">
+          <StripeIcon size={iconSize} color="#6772e5" />
+          <Span ml={2}>Stripe Payment Intent</Span>
+        </Flex>
+      );
     default:
       return (
         <Flex alignItems="center">
@@ -67,10 +79,6 @@ PaymentMethodTypeWithIcon.propTypes = {
   isLoading: PropTypes.bool,
   type: PropTypes.oneOf(Object.values(PAYMENT_METHOD_TYPE)),
   iconSize: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-};
-
-PaymentMethodTypeWithIcon.defaultProps = {
-  iconSize: 24,
 };
 
 // @component

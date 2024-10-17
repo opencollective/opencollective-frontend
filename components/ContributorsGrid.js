@@ -12,7 +12,7 @@ import { fadeIn } from './StyledKeyframes';
 import { withUser } from './UserProvider';
 
 // Define static dimensions
-export const COLLECTIVE_CARD_MARGIN_X = 32;
+const COLLECTIVE_CARD_MARGIN_X = 32;
 const COLLECTIVE_CARD_MARGIN_Y = 26;
 const COLLECTIVE_CARD_WIDTH = 144;
 const COLLECTIVE_CARD_HEIGHT = 220;
@@ -123,18 +123,27 @@ const computePaddingLeft = (width, rowWidth, nbRows, maxWidthWhenNotFull) => {
   }
 };
 
+const DEFAULT_MAX_NB_ROWS_FOR_VIEWPORTS = {
+  [VIEWPORTS.UNKNOWN]: 1,
+  [VIEWPORTS.XSMALL]: 1,
+  [VIEWPORTS.SMALL]: 2,
+  [VIEWPORTS.MEDIUM]: 3,
+  [VIEWPORTS.LARGE]: 3,
+};
+
 /**
  * A grid to show contributors, with horizontal scroll to search them.
  */
 const ContributorsGrid = ({
   contributors,
   width,
-  maxNbRowsForViewports,
+  maxNbRowsForViewports = DEFAULT_MAX_NB_ROWS_FOR_VIEWPORTS,
   viewport,
   maxWidthWhenNotFull,
   currency,
   LoggedInUser,
   collectiveId,
+  gridRef,
 }) => {
   const maxNbRows = maxNbRowsForViewports[viewport];
   const [nbCols, nbRows] = getItemsRepartition(contributors.length, width, maxNbRows);
@@ -159,6 +168,7 @@ const ContributorsGrid = ({
         const idx = getContributorIdx(columnIndex, rowIndex, nbRows, nbCols, hasScroll);
         return idx < contributors.length ? contributors[idx].id : `empty-${idx}`;
       }}
+      ref={gridRef}
     >
       {({ columnIndex, rowIndex, style }) => {
         const idx = getContributorIdx(columnIndex, rowIndex, nbRows, nbCols, hasScroll);
@@ -193,14 +203,14 @@ ContributorsGrid.propTypes = {
     }),
   ),
 
-  /** Maximum number of rows for different viewports. Will fallback on `defaultNbRows` if not provided */
+  /** Maximum number of rows for different viewports */
   maxNbRowsForViewports: PropTypes.shape({
     [VIEWPORTS.UNKNOWN]: PropTypes.number,
     [VIEWPORTS.XSMALL]: PropTypes.number,
     [VIEWPORTS.SMALL]: PropTypes.number,
     [VIEWPORTS.MEDIUM]: PropTypes.number,
     [VIEWPORTS.LARGE]: PropTypes.number,
-  }).isRequired,
+  }),
 
   /** Currency used for contributions */
   currency: PropTypes.string,
@@ -221,18 +231,9 @@ ContributorsGrid.propTypes = {
 
   /** Collective id */
   collectiveId: PropTypes.number,
-};
 
-ContributorsGrid.defaultProps = {
-  limit: 30,
-  defaultNbRows: 1,
-  maxNbRowsForViewports: {
-    [VIEWPORTS.UNKNOWN]: 1,
-    [VIEWPORTS.XSMALL]: 1,
-    [VIEWPORTS.SMALL]: 2,
-    [VIEWPORTS.MEDIUM]: 3,
-    [VIEWPORTS.LARGE]: 3,
-  },
+  /* Reference to the FixedSizedGrid */
+  gridRef: PropTypes.oneOfType([PropTypes.func, PropTypes.shape({ current: PropTypes.any })]),
 };
 
 export default withViewport(withUser(ContributorsGrid), { withWidth: true });

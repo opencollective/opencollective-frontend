@@ -1,7 +1,7 @@
 import React, { Fragment, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Search } from '@styled-icons/octicons/Search';
 import { themeGet } from '@styled-system/theme-get';
+import { Search } from 'lucide-react';
 import { defineMessages, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
@@ -75,7 +75,7 @@ const GithubRepositories = ({ repositories, setGithubInfo, ...fieldProps }) => {
 
         {repositories.length === 0 && (
           <Container my={3}>
-            <H4 textAlign="center" fontSize="1.4rem" color="black.400">
+            <H4 textAlign="center" fontSize="0.85rem" color="black.400">
               No repository match
             </H4>
           </Container>

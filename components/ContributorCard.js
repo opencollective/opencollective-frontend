@@ -97,13 +97,13 @@ const ContributorTag = styled(StyledTag)`
  */
 const ContributorCard = ({
   intl,
-  width,
-  height,
+  width = 144,
+  height = 272,
   contributor,
-  currency,
+  currency = 'USD',
   isLoggedUser,
   collectiveId,
-  hideTotalAmountDonated,
+  hideTotalAmountDonated = false,
   ...props
 }) => {
   const { collectiveId: fromCollectiveId, publicMessage, description } = contributor;
@@ -209,13 +209,6 @@ ContributorCard.propTypes = {
   collectiveId: PropTypes.number,
   /** True if you want to hide the total amount donated */
   hideTotalAmountDonated: PropTypes.bool,
-};
-
-ContributorCard.defaultProps = {
-  width: 144,
-  height: 272,
-  currency: 'USD',
-  hideTotalAmountDonated: false,
 };
 
 export default React.memo(injectIntl(ContributorCard));

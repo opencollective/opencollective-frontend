@@ -1,0 +1,49 @@
+import { ArgsTable, Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
+import { Button } from '../../components/ui/Button';
+
+<Meta
+  title="UI/Button"
+  component={Button}
+  parameters={{
+    actions: {
+      handles: ['mouseover', 'click'],
+    },
+  }}
+/>
+
+# Button
+
+## Default
+
+export const DefaultStory = props => <Button>Click me</Button>;
+
+<Story name="Default">{DefaultStory.bind({})}</Story>
+
+<ArgsTable story="Default" />
+
+## Switching the loading state
+
+<Canvas>
+  <Story name="Switching the loading state">
+    {buttonProps => {
+      const [loading, setLoading] = React.useState(false);
+      return (
+        <div className="flex flex-col gap-5">
+          <div>
+            <Button
+              {...buttonProps}
+              loading={loading}
+              onClick={() => {
+                setLoading(true);
+                setTimeout(() => setLoading(false), 2000);
+              }}
+            >
+             Click me, and see the width being preserved!
+            </Button>
+          </div>
+        </div>
+      );
+    }}
+
+  </Story>
+</Canvas>

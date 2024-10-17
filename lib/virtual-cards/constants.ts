@@ -1,6 +1,6 @@
 import { defineMessages } from 'react-intl';
 
-import { VirtualCardLimitInterval } from '../graphql/types/v2/graphql';
+import { VirtualCardLimitInterval, VirtualCardStatus } from '../graphql/types/v2/graphql';
 
 export const VirtualCardLimitIntervalDescriptionsI18n = defineMessages({
   [VirtualCardLimitInterval.ALL_TIME]: {
@@ -32,6 +32,7 @@ export const VirtualCardLimitIntervalDescriptionsI18n = defineMessages({
 export const VirtualCardLimitIntervalI18n = defineMessages({
   [VirtualCardLimitInterval.ALL_TIME]: {
     defaultMessage: 'All time',
+    id: 's+lPP3',
   },
   [VirtualCardLimitInterval.DAILY]: {
     id: 'virtualCard.intervalLimit.daily',
@@ -52,5 +53,20 @@ export const VirtualCardLimitIntervalI18n = defineMessages({
   [VirtualCardLimitInterval.YEARLY]: {
     id: 'Frequency.Yearly',
     defaultMessage: 'Yearly',
+  },
+});
+
+export const VirtualCardStatusI18n = defineMessages({
+  [VirtualCardStatus.ACTIVE]: {
+    id: 'Subscriptions.Active',
+    defaultMessage: 'Active',
+  },
+  [VirtualCardStatus.INACTIVE]: {
+    id: 'virtualCard.status.inactive',
+    defaultMessage: 'Inactive',
+  },
+  [VirtualCardStatus.CANCELED]: {
+    id: 'virtualCard.status.canceled',
+    defaultMessage: 'Canceled',
   },
 });

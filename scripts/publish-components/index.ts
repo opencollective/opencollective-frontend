@@ -1,15 +1,15 @@
-/* eslint-disable no-process-exit */
+/* eslint-disable n/no-process-exit */
 /* eslint-disable no-console */
 
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
-import RollupPluginBabel from '@rollup/plugin-babel';
 import RollupPluginCommonJS from '@rollup/plugin-commonjs';
 import RollupPluginImages from '@rollup/plugin-image';
 import RollupPluginJSON from '@rollup/plugin-json';
-import RollupPluginTypescript from '@rollup/plugin-typescript';
+import RollupPluginNodeResolve from '@rollup/plugin-node-resolve';
+import RollupPluginSWC from '@rollup/plugin-swc';
 import { Command } from 'commander';
 import fsExtra from 'fs-extra';
 import { glob } from 'glob';
@@ -22,7 +22,7 @@ import { confirm, pickByPatterns } from './helpers';
 // Define program options
 const program = new Command()
   .description('Helper publish Frontend components to the NPM registry')
-  .argument('<version>', 'Version number to publish')
+  .argument('[version]', 'Version number to publish')
   .option('--build-only', 'If set, the package will be build but not published')
   .parse();
 
@@ -32,7 +32,7 @@ const tmpDir = path.join(__dirname, '.tmp');
 const staticFilesDir = path.join(__dirname, 'static');
 const projectRoot = path.join(__dirname, '../..');
 const projectNodeModules = path.join(projectRoot, 'node_modules');
-const basePackageJSON = require(path.join(projectRoot, 'package.json'));
+const basePackageJSON = require(path.join(projectRoot, 'package.json')); // eslint-disable-line @typescript-eslint/no-var-requires
 const extensions = ['.js', '.jsx', '.ts', '.tsx'];
 
 const main = async () => {
@@ -81,28 +81,33 @@ const main = async () => {
     input: filesToInclude,
     external: filterExternal,
     plugins: [
-      // RollupPluginResolve({ extensions }),
+      RollupPluginNodeResolve({ extensions }),
       RollupPluginCommonJS({ include: /node_modules/ }),
       RollupPluginJSON(),
       RollupPluginImages(), // Not ideal as images will be base-64 encoded and thus bigger than optimized PNG
-      RollupPluginTypescript({
-        include: filesToInclude,
-        noForceEmit: true,
-        compilerOptions: {
-          declaration: true,
-          noEmit: false,
-          emitDeclarationOnly: true,
-          declarationDir: tmpDir,
-          outDir: tmpDir,
-          sourceMap: false,
-          allowJs: false,
-          jsx: 'react',
+      RollupPluginSWC({
+        swc: {
+          jsc: {
+            parser: {
+              syntax: 'typescript',
+              tsx: true,
+              dynamicImport: true,
+            },
+            target: 'es2020',
+            transform: {
+              react: {
+                pragma: 'React.createElement',
+                pragmaFrag: 'React.Fragment',
+                throwIfNamespace: true,
+                development: false,
+                useBuiltins: false,
+              },
+            },
+          },
+          module: {
+            type: 'es6',
+          },
         },
-      }),
-      RollupPluginBabel({
-        extensions,
-        babelHelpers: 'runtime',
-        exclude: 'node_modules/**',
       }),
     ],
   });
@@ -114,10 +119,11 @@ const main = async () => {
   await bundle.close();
 
   // ==== 1. Generate `package.json` ====
+  const version = program.args[0];
   console.log('Generating `package.json`...');
   const packageJSON = {
     name: '@opencollective/frontend-components',
-    version: program.args[0],
+    version: version || 'Unpublished',
     private: false,
     repository: basePackageJSON.repository,
     engines: basePackageJSON.engines,
@@ -136,6 +142,10 @@ const main = async () => {
 
   // ==== 4. Publish ====
   if (!options['buildOnly']) {
+    if (!version) {
+      throw new Error('You must specify a version number to publish the components');
+    }
+
     // Dry run
     execSync(`npm publish ${tmpDir} --access public --dry-run`, { stdio: 'inherit' });
 

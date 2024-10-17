@@ -17,13 +17,17 @@ import SearchForm from '../SearchForm';
 import StyledCard from '../StyledCard';
 import StyledHr from '../StyledHr';
 import { P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 const SearchResultPopup = styled(StyledCard)`
   border: 1px solid rgba(50, 51, 52, 0.05);
-  box-shadow: 0px 18px 40px rgba(0, 0, 0, 0.0059351), 0px 7.56604px 12.0812px rgba(0, 0, 0, 0.0111057),
-    0px 4.10431px 6.12521px rgba(0, 0, 0, 0.0160729), 0px 2.27585px 3.41503px rgba(0, 0, 0, 0.0209117),
-    0px 1.1708px 1.84491px rgba(0, 0, 0, 0.0256307), 0px 0.463169px 0.792047px rgba(0, 0, 0, 0.03);
+  box-shadow:
+    0px 18px 40px rgba(0, 0, 0, 0.0059351),
+    0px 7.56604px 12.0812px rgba(0, 0, 0, 0.0111057),
+    0px 4.10431px 6.12521px rgba(0, 0, 0, 0.0160729),
+    0px 2.27585px 3.41503px rgba(0, 0, 0, 0.0209117),
+    0px 1.1708px 1.84491px rgba(0, 0, 0, 0.0256307),
+    0px 0.463169px 0.792047px rgba(0, 0, 0, 0.03);
   border-radius: 16px;
   padding: 20px;
   z-index: 1;
@@ -77,7 +81,7 @@ const SearchTopics = () => {
   const [searchResults, setSearchResults] = React.useState([]);
   const [searchQuery, setSearchQuery] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const { styles, attributes } = usePopper(refElement, popperElement, {
     placement: 'bottom',
     modifiers: REACT_POPPER_MODIFIERS,
@@ -101,15 +105,14 @@ const SearchTopics = () => {
       const results = await searchDocs(query);
       setSearchResults(results.items);
     } catch (error) {
-      addToast({
-        type: TOAST_TYPE.ERROR,
-        title: intl.formatMessage({ defaultMessage: 'Error in fetching results' }),
+      toast({
+        variant: 'error',
+        title: intl.formatMessage({ defaultMessage: 'Error in fetching results', id: 'HqFOSM' }),
         message: (
           <p>
             <FormattedMessage
-              defaultMessage={
-                'Oops! There was an unexpected error.{lineBreak} <openDocsLink><u>Visit our docs page</u></openDocsLink>'
-              }
+              defaultMessage="Oops! There was an unexpected error.{lineBreak} <openDocsLink><u>Visit our docs page</u></openDocsLink>"
+              id="dgz/z/"
               values={{
                 openDocsLink: getI18nLink({
                   href: `${DOCS_BASE_URL}`,
@@ -133,14 +136,15 @@ const SearchTopics = () => {
   return (
     <Flex justifyContent="center" alignItems="center" px="16px">
       <Flex mt={['9px', '32px']} flexDirection="column" ref={innerRef}>
-        <Box ref={setRefElement} data-cy="search-input">
+        <Box ref={setRefElement} maxWidth={'714px'} data-cy="search-input">
           <SearchForm
             width={['1', '500px', '608px']}
             borderRadius="100px"
-            placeholder={intl.formatMessage({ defaultMessage: 'Type keywords to search for topics' })}
+            placeholder={intl.formatMessage({ defaultMessage: 'Type keywords to search for topics', id: 'yGxNSd' })}
             showSearchButton
             searchButtonStyles={{ width: '32px', height: '32px' }}
             value={searchQuery}
+            onSubmit={e => e.preventDefault()}
             onChange={query => {
               if (!showSearchResults) {
                 setShowSearchResults(true);
@@ -150,6 +154,7 @@ const SearchTopics = () => {
               setIsLoading(true);
               debouncedSearch(query);
             }}
+            onClearFilter={() => setSearchQuery('')}
             onFocus={() => setShowSearchResults(true)}
             autoComplete="off"
             fontStyle="normal"
@@ -180,14 +185,15 @@ const SearchTopics = () => {
                   <P fontSize="18px" lineHeight="26px" color="#4D4F51" fontWeight="400">
                     {searchQuery ? (
                       <FormattedMessage
-                        defaultMessage={'No results found for <b>{query}</b>. Please type another keyword.'}
+                        defaultMessage="No results found for <b>{query}</b>. Please type another keyword."
+                        id="uleS3x"
                         values={{
                           query: searchQuery,
                           b: I18nBold,
                         }}
                       />
                     ) : (
-                      <FormattedMessage defaultMessage={'Type something to search'} />
+                      <FormattedMessage defaultMessage="Type something to search" id="2oyci4" />
                     )}
                   </P>
                 </Container>
@@ -228,7 +234,7 @@ const SearchTopics = () => {
           >
             <FormattedMessage
               id="helpAndSupport.searchDescription"
-              defaultMessage={'You can also browse the topics below to find what you’re looking for.'}
+              defaultMessage="You can also browse the topics below to find what you’re looking for."
             />
           </P>
         </Box>

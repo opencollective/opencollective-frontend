@@ -25,6 +25,7 @@ const ExpenseAttachedFiles = ({ files, onRemove, openFileViewer }) => {
             fileSize={file.info?.size}
             showFileName
             openFileViewer={openFileViewer}
+            data-cy="download-expense-invoice-btn"
           />
         ) : (
           <LocalFilePreview size={88} file={file} />

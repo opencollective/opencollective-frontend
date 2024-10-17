@@ -1,12 +1,12 @@
 import React, { Fragment, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Tags } from '@styled-icons/bootstrap/Tags';
 import { Palette } from '@styled-icons/boxicons-regular/Palette';
 import { Camera } from '@styled-icons/feather/Camera';
 import { Globe } from '@styled-icons/feather/Globe';
 import { Mail } from '@styled-icons/feather/Mail';
 import { Twitter } from '@styled-icons/feather/Twitter';
 import { first } from 'lodash';
+import { Tags } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -20,6 +20,7 @@ import ContactCollectiveBtn from '../../ContactCollectiveBtn';
 import Container from '../../Container';
 import DefinedTerm, { Terms } from '../../DefinedTerm';
 import EditTagsModal from '../../EditTagsModal';
+import FollowButton from '../../FollowButton';
 import { Box, Flex } from '../../Grid';
 import I18nCollectiveTags from '../../I18nCollectiveTags';
 import Link from '../../Link';
@@ -27,13 +28,13 @@ import LinkCollective from '../../LinkCollective';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledButton from '../../StyledButton';
 import { Dropdown, DropdownContent } from '../../StyledDropdown';
-import { EditTag } from '../../StyledInputTags';
 import StyledLink from '../../StyledLink';
 import StyledModal from '../../StyledModal';
 import StyledRoundButton from '../../StyledRoundButton';
 import StyledTag from '../../StyledTag';
 import { H1, Span } from '../../Text';
 import TruncatedTextWithTooltip from '../../TruncatedTextWithTooltip';
+import { Button } from '../../ui/Button';
 import UserCompany from '../../UserCompany';
 import ContainerSectionContent from '../ContainerSectionContent';
 
@@ -187,25 +188,28 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                 <StyledLink key={company} as={UserCompany} mr={1} fontSize="20px" fontWeight={600} company={company} />
               ))}
           </Flex>
+          <div className="mt-2 flex">
+            <FollowButton buttonProps={{ buttonSize: 'tiny' }} account={collective} />
+          </div>
+
           {!isEvent && (
             <Fragment>
               {(isCollective || isFund || isProject) && (
-                <Flex my="30px" mb={2} flexWrap="wrap" data-cy="collective-tags">
+                <div className="my-7 mb-2 flex flex-wrap items-center gap-2" data-cy="collective-tags">
                   <StyledTag
                     textTransform="uppercase"
                     variant="rounded-left"
                     backgroundColor="black.200"
-                    mt={['5px', 0]}
                     fontWeight={500}
                   >
                     <I18nCollectiveTags tags={collective.type} />
                   </StyledTag>
                   {tagCount > 0 && (
                     <Fragment>
-                      <Container borderRight="1px solid #C3C6CB" height="22px" padding="5px" mt={['5px', 0]} />
+                      <Container borderRight="1px solid #C3C6CB" height="22px" />
                       {displayedTags.map(tag => (
                         <Link key={tag} href={`/search?tag=${tag}`}>
-                          <StyledTag variant="rounded-right" ml="10px" mt={['5px', 0]} fontWeight={500}>
+                          <StyledTag variant="rounded-right" fontWeight={500}>
                             <I18nCollectiveTags tags={tag} />
                           </StyledTag>
                         </Link>
@@ -218,8 +222,6 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                                 as={StyledButton}
                                 border="none"
                                 variant="rounded-right"
-                                ml="10px"
-                                mt={['5px', 0]}
                                 fontWeight={500}
                                 {...triggerProps}
                               >
@@ -238,7 +240,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                                           <I18nCollectiveTags tags={tag} />
                                         </HiddenTagItem>
                                       </Link>
-                                      <hr />
+                                      <hr className="my-5" />
                                     </Fragment>
                                   ))}
                                   <Link href={`/search?tag=${hiddenTags[numberOfHiddenTags - 1]}`}>
@@ -255,21 +257,24 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                     </Fragment>
                   )}
                   {isAdmin && (
-                    <EditTag ml="10px" mt={['5px', 0]} active={isEditingTags} onClick={() => editTags(true)}>
-                      <Tags size="14px" />{' '}
-                      <Span ml="4px" letterSpacing={0}>
-                        <FormattedMessage id="StyledInputTags.EditLabel" defaultMessage="Edit Tags" />
-                      </Span>
-                    </EditTag>
+                    <Button
+                      size="xs"
+                      variant="outline"
+                      className="h-6 gap-1 border-dashed text-xs text-muted-foreground"
+                      onClick={() => editTags(true)}
+                    >
+                      <Tags size={16} />
+                      <FormattedMessage id="StyledInputTags.EditLabel" defaultMessage="Edit Tags" />
+                    </Button>
                   )}
-                </Flex>
+                </div>
               )}
-              <Flex alignItems="center" flexWrap="wrap">
-                <Flex mb={2} mt={-2} flexWrap="wrap">
+              <Flex alignItems="center" flexWrap="wrap" fontSize="14px" gap="16px" mt={2}>
+                <Flex gap="16px" flexWrap="wrap">
                   {collective.canContact && (
                     <ContactCollectiveBtn collective={collective} LoggedInUser={LoggedInUser}>
                       {btnProps => (
-                        <StyledRoundButton mt={2} {...btnProps} size={32} mr={3} title="Contact" aria-label="Contact">
+                        <StyledRoundButton {...btnProps} size={32} title="Contact" aria-label="Contact">
                           <Mail size={12} />
                         </StyledRoundButton>
                       )}
@@ -282,7 +287,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                       href={twitterProfileUrl(collective.twitterHandle)}
                       openInNewTabNoFollowRelMe
                     >
-                      <StyledRoundButton size={32} mt={2} mr={3} title="Twitter" aria-label="Twitter link">
+                      <StyledRoundButton size={32} title="Twitter" aria-label="Twitter link">
                         <Twitter size={12} />
                       </StyledRoundButton>
                     </StyledLink>
@@ -291,8 +296,6 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                     <StyledLink data-cy="collectiveWebsite" href={collective.website} openInNewTabNoFollowRelMe>
                       <StyledRoundButton
                         size={32}
-                        mr={3}
-                        mt={2}
                         title={intl.formatMessage(Translations.website)}
                         aria-label="Website link"
                       >
@@ -302,10 +305,10 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                   )}
                   {!hasSocialLinks && collective.repositoryUrl && (
                     <StyledLink data-cy="repositoryUrl" href={collective.repositoryUrl} openInNewTabNoFollowRelMe>
-                      <StyledButton mt={2} buttonSize="tiny" color="black.700" height={32} mr={3}>
+                      <StyledButton buttonSize="tiny" color="black.700" height={32}>
                         <CodeRepositoryIcon size={12} repositoryUrl={collective.repositoryUrl} />
                         <Span ml={2}>
-                          <FormattedMessage defaultMessage="Code repository" />
+                          <FormattedMessage defaultMessage="Code repository" id="E2brjR" />
                         </Span>
                       </StyledButton>
                     </StyledLink>
@@ -385,12 +388,11 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                             color="black.700"
                             textDecoration="none"
                             fontSize="12px"
-                            mr={2}
                           >
                             <FormattedMessage id="host.tos" defaultMessage="Terms of fiscal hosting" />
                           </StyledLink>
                         )}
-                        <Container ml={2} mr={3} color="black.700" fontSize="12px">
+                        <Container color="black.700" fontSize="12px">
                           <FormattedMessage
                             id="Hero.HostFee"
                             defaultMessage="Host fee: {fee}"
@@ -406,14 +408,14 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
                       </Fragment>
                     )}
                     {collective.platformFeePercent > 0 && (
-                      <Container ml={2} mr={3} color="black.700" fontSize="12px">
+                      <Container color="black.700" fontSize="12px">
                         <FormattedMessage
                           id="Hero.PlatformFee"
                           defaultMessage="Platform fee: {fee}"
                           values={{
                             fee: (
                               <DefinedTerm term={Terms.PLATFORM_FEE} color="black.700">
-                                {collective.platformFeePercent || 0}%
+                                {collective.platformFeePercent}%
                               </DefinedTerm>
                             ),
                           }}

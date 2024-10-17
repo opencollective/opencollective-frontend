@@ -20,7 +20,12 @@ const PrivateNoteLabel = () => {
     <Span color="black.700">
       <FormattedMessage id="ExpenseSummary.addNotesLabel" defaultMessage="Add notes" />
       &nbsp;&nbsp;
-      <PrivateInfoIcon color="#969BA3" />
+      <PrivateInfoIcon>
+        <FormattedMessage
+          defaultMessage="This will only be visible to you, the Collective admins and its Fiscal Host"
+          id="734IeW"
+        />
+      </PrivateInfoIcon>
     </Span>
   );
 };

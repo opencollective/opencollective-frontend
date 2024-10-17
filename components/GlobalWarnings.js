@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 
-import FreezeAccountModal from './host-dashboard/FreezeAccountModal';
+import FreezeAccountModal from './dashboard/sections/collectives/FreezeAccountModal';
 import I18nFormatters from './I18nFormatters';
 import StyledButton from './StyledButton';
 import { P, Span } from './Text';
@@ -36,10 +36,10 @@ const GlobalWarnings = ({ collective }) => {
     return (
       <GlobalWarningContainer>
         <P fontWeight="700" lineHeight="20px" mb="6px">
-          <FormattedMessage defaultMessage="Some actions are temporarily limited" />
+          <FormattedMessage defaultMessage="Some actions are temporarily limited" id="KUZzwz" />
         </P>
         <P>
-          <FormattedMessage defaultMessage="Contributions to this page cannot be accepted at this time" />
+          <FormattedMessage defaultMessage="Contributions to this page cannot be accepted at this time" id="3tJstK" />
         </P>
         {isLoggedInUserHostAdmin && (
           <StyledButton
@@ -50,7 +50,7 @@ const GlobalWarnings = ({ collective }) => {
             }}
           >
             <Span ml={3} fontSize="14px" lineHeight="20px" css={{ verticalAlign: 'middle' }}>
-              <FormattedMessage defaultMessage="Unfreeze Collective" />
+              <FormattedMessage defaultMessage="Unfreeze Collective" id="gX79wf" />
             </Span>
           </StyledButton>
         )}

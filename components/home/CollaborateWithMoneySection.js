@@ -62,19 +62,20 @@ const CollaborateWithMoney = () => {
         <Box width={['206px']}>
           <NextIllustration
             src="/static/images/new-home/collaborate-withMoney-illustration.png"
+            alt="Collaborate with money illustration"
             width={239}
             height={257}
           />
         </Box>
         <Box maxWidth={['288px', '421px', '594px']} textAlign={['center', 'left']} ml={[null, '40px']}>
           <SectionTitle mb={['8px', 3]}>
-            <FormattedMessage id="home.collaborateWithMoney" defaultMessage={'Collaborate with money'} />
+            <FormattedMessage id="home.collaborateWithMoney" defaultMessage="Collaborate with money" />
           </SectionTitle>
 
           <SectionDescription textAlign={['center', 'left']}>
             <FormattedMessage
               id="home.collaborateWithMoney.description"
-              defaultMessage={'A shared account to fundraise and manage money, connect with your people, and more.'}
+              defaultMessage="A shared account to fundraise and manage money, connect with your people, and more."
             />
           </SectionDescription>
         </Box>

@@ -1,5 +1,5 @@
 const createOrderPage = '/contribution-flow';
-const contributionFlowSteps = '/details|profile|payment|finalize|summary|success';
+const contributionFlowSteps = '/details|profile|payment|summary|success';
 
 exports.REWRITES = [
   {
@@ -11,16 +11,16 @@ exports.REWRITES = [
     destination: '/fiscal-hosting',
   },
   {
+    source: '/tax-form',
+    destination: '/tax-form',
+  },
+  {
     source: '/welcome',
     destination: '/welcome',
   },
   {
     source: '/:pageSlug(widgets|tos|privacypolicy|hiring)',
     destination: '/staticPage',
-  },
-  {
-    source: '/foundation/apply/:step(intro|fees|form|success)',
-    destination: '/ocf-host-application',
   },
   {
     source: '/opensource/apply/:step(intro|pick-repo|fees|form|success)',
@@ -55,15 +55,32 @@ exports.REWRITES = [
     destination: '/createOrganization',
   },
   {
-    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/updates',
+    source: '/dashboard',
+    destination: '/dashboard',
+  },
+  { source: '/workspace', destination: '/dashboard' },
+  {
+    source: '/dashboard/:slug/:section?/:subpath*',
+    destination: '/dashboard',
+  },
+  {
+    source: '/workspace/:slug/:section?/:subpath*',
+    destination: '/dashboard',
+  },
+  {
+    source: '/:parentCollectiveSlug/:collectiveType(events|projects)/:collectiveSlug/updates',
     destination: '/updates',
   },
   {
-    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/updates/new',
-    destination: '/createUpdate',
+    source: '/:collectiveSlug/updates',
+    destination: '/updates',
   },
   {
-    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/updates/:updateSlug',
+    source: '/:parentCollectiveSlug/:collectiveType(events|projects)/:collectiveSlug/updates/:updateSlug',
+    destination: '/update',
+  },
+  {
+    source: '/:collectiveSlug/updates/:updateSlug',
     destination: '/update',
   },
   {
@@ -127,35 +144,43 @@ exports.REWRITES = [
     destination: '/create-project',
   },
   {
-    source: '/dashboard',
-    destination: '/dashboard',
-  },
-  {
-    source: '/dashboard/:slug/:section?/:subpath*',
-    destination: '/dashboard',
-  },
-  {
-    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:slug/admin/:section?/:subpath*',
-    destination: '/admin-panel',
-  },
-  {
-    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/contact',
+    source: '/:parentCollectiveSlug/:collectiveType(events|projects)/:collectiveSlug/contact',
     destination: '/collective-contact',
   },
   {
-    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/transactions',
+    source: '/:collectiveSlug/contact',
+    destination: '/collective-contact',
+  },
+  {
+    source: '/:parentCollectiveSlug/:collectiveType(events|projects)/:collectiveSlug/transactions',
     destination: '/transactions',
   },
   {
-    source: '/:parentCollectiveSlug?/:type(events|projects)?/:collectiveSlug/expenses/new',
+    source: '/:collectiveSlug/transactions',
+    destination: '/transactions',
+  },
+  {
+    source: '/:parentCollectiveSlug/:type(events|projects)/:collectiveSlug/expenses/new',
     destination: '/create-expense',
   },
   {
-    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses/:ExpenseId([0-9]+)',
+    source: '/:collectiveSlug/expenses/new',
+    destination: '/create-expense',
+  },
+  {
+    source: '/:parentCollectiveSlug/:collectiveType(events|projects)/:collectiveSlug/expenses/:ExpenseId([0-9]+)',
     destination: '/expense',
   },
   {
-    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/expenses',
+    source: '/:collectiveSlug/expenses/:ExpenseId([0-9]+)',
+    destination: '/expense',
+  },
+  {
+    source: '/:parentCollectiveSlug/:collectiveType(events|projects)/:collectiveSlug/expenses',
+    destination: '/expenses',
+  },
+  {
+    source: '/:collectiveSlug/expenses',
     destination: '/expenses',
   },
   {
@@ -163,12 +188,20 @@ exports.REWRITES = [
     destination: '/submitted-expenses',
   },
   {
-    source: '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/orders',
+    source: '/:parentCollectiveSlug/:collectiveType(events|projects)/:collectiveSlug/orders',
+    destination: '/orders',
+  },
+  {
+    source: '/:collectiveSlug/orders',
     destination: '/orders',
   },
   {
     source:
-      '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/(orders|contributions)/:OrderId([0-9]+)',
+      '/:parentCollectiveSlug/:collectiveType(events|projects)/:collectiveSlug/(orders|contributions)/:OrderId([0-9]+)',
+    destination: '/order',
+  },
+  {
+    source: '/:collectiveSlug/(orders|contributions)/:OrderId([0-9]+)',
     destination: '/order',
   },
   {
@@ -179,7 +212,6 @@ exports.REWRITES = [
     source: '/fund/:verb(apply|create)/:step(form)?',
     destination: '/create-fund',
   },
-
   // New Create Collective Flow
   {
     source: '/:hostCollectiveSlug?/:verb(create)/:version(v2)?/:category(community|climate)?/:step(form)?',
@@ -201,22 +233,38 @@ exports.REWRITES = [
   },
   {
     source:
-      '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/:verb(tiers|contribute|connected-collectives)',
+      '/:parentCollectiveSlug/:collectiveType(events|projects)/:collectiveSlug/:verb(tiers|contribute|connected-collectives)',
+    destination: '/contribute',
+  },
+  {
+    source: '/:collectiveSlug/:verb(tiers|contribute|connected-collectives)',
     destination: '/contribute',
   },
   // Embed
   {
-    source: `/embed/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/:verb(donate)/:paymentFlow(crypto)?/:step(${contributionFlowSteps})?`,
+    source: `/embed/:parentCollectiveSlug/:collectiveType(events|projects)/:collectiveSlug/:verb(donate)/:step(${contributionFlowSteps})?`,
     destination: '/embed/contribution-flow',
   },
   {
-    source: `/embed/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/contribute/:tierSlug?-:tierId([0-9]+)/:action(checkout)?/:step(${contributionFlowSteps})?`,
+    source: `/embed/:collectiveSlug/:verb(donate)/:step(${contributionFlowSteps})?`,
+    destination: '/embed/contribution-flow',
+  },
+  {
+    source: `/embed/:parentCollectiveSlug/:collectiveType(events|projects)/:collectiveSlug/contribute/:tierSlug?-:tierId([0-9]+)/:action(checkout)?/:step(${contributionFlowSteps})?`,
+    destination: '/embed/contribution-flow',
+  },
+  {
+    source: `/embed/:collectiveSlug/contribute/:tierSlug?-:tierId([0-9]+)/:action(checkout)?/:step(${contributionFlowSteps})?`,
     destination: '/embed/contribution-flow',
   },
   // Tier page
   {
     source:
-      '/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/:verb(tiers|contribute)/:tierSlug?-:tierId([0-9]+)',
+      '/:parentCollectiveSlug/:collectiveType(events|projects)/:collectiveSlug/:verb(tiers|contribute)/:tierSlug?-:tierId([0-9]+)',
+    destination: '/tier',
+  },
+  {
+    source: '/:collectiveSlug/:verb(tiers|contribute)/:tierSlug?-:tierId([0-9]+)',
     destination: '/tier',
   },
   // Conversations
@@ -232,6 +280,19 @@ exports.REWRITES = [
     source: '/:collectiveSlug/conversations/:slug?-:id([a-z0-9]+)',
     destination: '/conversation',
   },
+  // Legacy Banners/Widgets/Buttons
+  {
+    source: '/:collectiveSlug/:verb(contribute|donate)/button:size(|@2x).png',
+    destination: '/api/legacy/contribute',
+  },
+  {
+    source: '/:collectiveSlug/:verb(contribute|donate)/button.js',
+    destination: '/api/legacy/button',
+  },
+  {
+    source: '/:collectiveSlug/:widget(widget|events|collectives|banner).js',
+    destination: '/api/legacy/widget',
+  },
   // Contribute Flow
   // ---------------
   // Legacy create order route. Deprectated on 2019-02-12
@@ -246,11 +307,19 @@ exports.REWRITES = [
   },
   // New Routes -> New flow
   {
-    source: `/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/:verb(donate)/:paymentFlow(crypto)?/:step(${contributionFlowSteps})?`,
+    source: `/:parentCollectiveSlug/:collectiveType(events|projects)/:collectiveSlug/:verb(donate)/:step(${contributionFlowSteps})?`,
     destination: createOrderPage,
   },
   {
-    source: `/:parentCollectiveSlug?/:collectiveType(events|projects)?/:collectiveSlug/:verb(contribute)/:tierSlug?-:tierId([0-9]+)/checkout/:step(${contributionFlowSteps})?`,
+    source: `/:collectiveSlug/:verb(donate)/:step(${contributionFlowSteps})?`,
+    destination: createOrderPage,
+  },
+  {
+    source: `/:parentCollectiveSlug/:collectiveType(events|projects)/:collectiveSlug/:verb(contribute)/:tierSlug?-:tierId([0-9]+)/checkout/:step(${contributionFlowSteps})?`,
+    destination: createOrderPage,
+  },
+  {
+    source: `/:collectiveSlug/:verb(contribute)/:tierSlug?-:tierId([0-9]+)/checkout/:step(${contributionFlowSteps})?`,
     destination: createOrderPage,
   },
   // Generic Route
@@ -263,15 +332,6 @@ exports.REWRITES = [
   {
     source: `/:collectiveSlug/:verb(events|projects)/:eventSlug/order/:tierId/:step(${contributionFlowSteps})?`,
     destination: createOrderPage,
-  },
-  // Pledges
-  {
-    source: `/pledges/new`,
-    destination: '/createPledge',
-  },
-  {
-    source: `/:slug/pledges/new`,
-    destination: '/createPledge',
   },
   // Marketing Pages
   {
@@ -355,6 +415,11 @@ exports.REWRITES = [
     source: '/applications',
     destination: '/applications',
   },
+  // Robots.txt
+  {
+    source: '/robots.txt',
+    destination: '/api/robots',
+  },
   // Collective
   // ----------
   // Collective page
@@ -365,11 +430,6 @@ exports.REWRITES = [
   {
     source: '/:slug/:action(apply)?/:mode(onboarding)?/:step(administrators|contact-info|success)?',
     destination: '/collective-page',
-  },
-  // Root actions
-  {
-    source: '/opencollective/root-actions/:section?',
-    destination: '/root-actions',
   },
   // Terms of services for the host
   {

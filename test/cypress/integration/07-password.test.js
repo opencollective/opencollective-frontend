@@ -1,3 +1,4 @@
+import * as cheerio from 'cheerio';
 import speakeasy from 'speakeasy';
 
 describe('passwords', () => {
@@ -5,10 +6,11 @@ describe('passwords', () => {
 
   before(() => {
     cy.signup({ user: { name: 'Mr Bungle' } }).then(u => (user = u));
+    cy.logout();
   });
 
   it('can be set from the settings page', () => {
-    cy.login({ email: user.email, redirect: `/${user.collective.slug}/admin/user-security` });
+    cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/user-security` });
     cy.contains("Setting a password is optional but can be useful if you're using a password manager.");
 
     // Submit disabled because no password set
@@ -46,11 +48,11 @@ describe('passwords', () => {
 
     // Submit new password
     cy.contains('button', 'Set Password').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Password successfully set' });
+    cy.checkToast({ variant: 'success', message: 'Password successfully set' });
   });
 
   it('can then be edited', () => {
-    cy.login({ sendLink: true, email: user.email, redirect: `/${user.collective.slug}/admin/user-security` });
+    cy.login({ sendLink: true, email: user.email, redirect: `/dashboard/${user.collective.slug}/user-security` });
 
     // Disable button if form is not complete
     cy.contains('button', 'Update Password').should('be.disabled');
@@ -78,7 +80,7 @@ describe('passwords', () => {
     // Submit new password
     cy.get('input[name="current-password"]').type('{selectall}{backspace}qwerty123456!@#amazing!');
     cy.contains('button', 'Update Password').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Password successfully updated' });
+    cy.checkToast({ variant: 'success', message: 'Password successfully updated' });
   });
 
   it('can be used to login', () => {
@@ -88,9 +90,10 @@ describe('passwords', () => {
       cy.getByDataCy('signin-btn').click();
       cy.get('input[name="password"]:visible').type('WRONG'); // waiting for it to be visible since we add the field with "display: none" for password managers to prefill
       cy.getByDataCy('signin-btn').click();
-      cy.checkToast({ type: 'ERROR', message: 'Invalid password' });
+      cy.checkToast({ variant: 'error', message: 'Invalid password' });
       cy.get('input[name="password"]:visible').type('{selectall}{backspace}qwerty123456!@#amazing!"edited\'😊');
       cy.getByDataCy('signin-btn').click();
+      cy.getByDataCy('menu-item-overview').should('be.visible');
       cy.assertLoggedIn(user);
     };
 
@@ -102,8 +105,8 @@ describe('passwords', () => {
     cy.getByDataCy('user-menu-trigger').click();
     cy.getByDataCy('logout').click();
 
-    // Login with password on protected page (`/${user.collective.slug}/admin/user-security`)
-    cy.visit(`/${user.collective.slug}/admin/user-security`);
+    // Login with password on protected page (`/${user.collective.slug}/dashboard/user-security`)
+    cy.visit(`/dashboard/${user.collective.slug}/user-security`);
     completeSignInForm();
   });
 
@@ -118,8 +121,16 @@ describe('passwords', () => {
 
     // Email
     const expectedEmailPart = user.email.split('@')[0]; // On CI, email is replaced by email+bcc. We verify only the first part to have a consistent behavior between local and CI
-    cy.openEmail(({ subject, to }) => to[0].address.includes(expectedEmailPart) && subject.includes('Reset Password'));
-    cy.contains('a', 'Reset your password now').click();
+
+    cy.openEmail(
+      ({ Subject, To }) => To[0].Address.includes(expectedEmailPart) && Subject.includes('Reset Password'),
+    ).then(email => {
+      const $html = cheerio.load(email.HTML);
+      const resetLink = $html('a:contains("Reset your password now")');
+      const href = resetLink.attr('href');
+      const parsedUrl = new URL(href);
+      cy.visit(parsedUrl.pathname);
+    });
 
     // Reset password page
     // Should have user info displayed
@@ -146,7 +157,7 @@ describe('passwords', () => {
     cy.enableTwoFactorAuth({ userEmail: user.email, userSlug: user.collective.slug, secret: secret.base32 });
 
     // Sign-in flow
-    cy.visit(`/signin`);
+    cy.visit(`/signin?next=/dashboard/${user.collective.slug}/info`);
     cy.get('input[name="email"]').type(user.email);
     cy.getByDataCy('signin-btn').click();
     cy.get('input[name="password"]:visible').type('strongNewP@ssword<>?');

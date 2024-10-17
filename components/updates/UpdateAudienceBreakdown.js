@@ -32,8 +32,10 @@ const UpdateAudienceBreakdown = ({ audienceStats, isLoading }) => {
   const intl = useIntl();
   if (isLoading) {
     return <LoadingPlaceholder height={50} />;
-  } else if (!audienceStats || audienceStats?.id.includes('NO_ONE')) {
-    return <FormattedMessage defaultMessage="Your Update will not be sent to anyone." />;
+  } else if (!audienceStats) {
+    return <FormattedMessage defaultMessage="There was an error while loading the audience stats." id="uIHzyf" />;
+  } else if (audienceStats?.id.includes('NO_ONE')) {
+    return <FormattedMessage defaultMessage="Your Update will not be sent to anyone." id="qzsw+D" />;
   }
 
   const typesWithStats = Object.keys(translatedTypes);
@@ -50,7 +52,7 @@ const UpdateAudienceBreakdown = ({ audienceStats, isLoading }) => {
       />
       {hasOnlyTotal ? '.' : ':'}
       {!hasOnlyTotal && (
-        <ul>
+        <ul className="list-inside list-disc">
           {Object.entries(stats).map(([key, count]) => (
             <li key={key}>{intl.formatMessage(translatedTypes[key], { count })}</li>
           ))}

@@ -43,13 +43,13 @@ const RaiseMoney = () => {
       <Flex flexDirection="column" alignItems="center" maxWidth="100%">
         <Box mb="50px" px="16px">
           <SectionTitle textAlign="center" mb={3}>
-            <FormattedMessage id="home.raiseMoney" defaultMessage={'Raise money with full transparency'} />
+            <FormattedMessage id="home.raiseMoney" defaultMessage="Raise money with full transparency" />
           </SectionTitle>
 
           <SectionDescription textAlign="center">
             <FormattedMessage
               id="home.raiseMoney.description"
-              defaultMessage={'We do the paperwork so you can focus on your mission.'}
+              defaultMessage="We do the paperwork so you can focus on your mission."
             />
           </SectionDescription>
         </Box>
@@ -74,12 +74,14 @@ const RaiseMoney = () => {
                   width={250}
                   height={168}
                   src="/static/images/new-home/team-picture-4.png"
+                  alt="Climate Sessions"
                 />
                 <NextIllustration
                   display={[null, 'none']}
                   width={373}
                   height={274}
                   src="/static/images/new-home/team-picture-4-xs.png"
+                  alt="Climate Sessions"
                 />
               </Link>
             </Container>
@@ -95,12 +97,14 @@ const RaiseMoney = () => {
                   width={250}
                   height={168}
                   src="/static/images/new-home/team-picture-5.png"
+                  alt="FNB Raleigh"
                 />
                 <NextIllustration
                   display={[null, 'none']}
                   width={384}
                   height={277}
                   src="/static/images/new-home/team-picture-5-xs.png"
+                  alt="FNB Raleigh"
                 />
               </Link>
             </Container>
@@ -117,12 +121,14 @@ const RaiseMoney = () => {
                   width={361}
                   height={304}
                   src="/static/images/new-home/team-picture-6-xs.png"
+                  alt="Tiwai Wakanz"
                 />
                 <NextIllustration
                   display={['none', 'block']}
                   width={250}
                   height={168}
                   src="/static/images/new-home/team-picture-6.png"
+                  alt="Tiwai Wakanz"
                 />
               </Link>
             </Container>
@@ -139,12 +145,14 @@ const RaiseMoney = () => {
                   width={235}
                   height={258}
                   src="/static/images/new-home/team-picture-7-xs.png"
+                  alt="Love Wins"
                 />
                 <NextIllustration
                   display={['none', 'block']}
                   width={250}
                   height={168}
                   src="/static/images/new-home/team-picture-7.png"
+                  alt="Love Wins"
                 />
               </Link>
             </Container>
@@ -155,12 +163,14 @@ const RaiseMoney = () => {
                   width={303}
                   height={262}
                   src="/static/images/new-home/team-picture-8-xs.png"
+                  alt="Reading Red Kitchen"
                 />
                 <NextIllustration
                   display={['none', 'block']}
                   width={250}
                   height={168}
                   src="/static/images/new-home/team-picture-8.png"
+                  alt="Reading Red Kitchen"
                 />
               </Link>
             </Container>
@@ -176,12 +186,14 @@ const RaiseMoney = () => {
                   width={483}
                   height={333}
                   src="/static/images/new-home/team-picture-9-xs.png"
+                  alt="The Light Inside Film"
                 />
                 <NextIllustration
                   display={['none', 'block']}
                   width={250}
                   height={168}
                   src="/static/images/new-home/team-picture-9.png"
+                  alt="The Light Inside Film"
                 />
               </Link>
             </Container>
@@ -199,9 +211,7 @@ const RaiseMoney = () => {
           >
             <FormattedMessage
               id="home.raiseMoney.description2"
-              defaultMessage={
-                "Whether you're a <mutualAidLink>mutual aid group</mutualAidLink>, a <communityLink>community initiative</communityLink>, an <opensourceLink>open-source software project</opensourceLink>, or a <climateLink>climate change activist</climateLink>, Open Collective helps groups unlock access to money."
-              }
+              defaultMessage="Whether you're a <mutualAidLink>mutual aid group</mutualAidLink>, a <communityLink>community initiative</communityLink>, an <opensourceLink>open-source software project</opensourceLink>, or a <climateLink>climate change activist</climateLink>, Open Collective helps groups unlock access to money."
               values={{
                 u: I18nUnderline,
                 mutualAidLink: getI18nLink({
@@ -254,7 +264,7 @@ const RaiseMoney = () => {
                 >
                   <FormattedMessage
                     id="home.stat"
-                    defaultMessage={'Over 15,000 groups around the world raised and managed USD $35M last year'}
+                    defaultMessage="Over 15,000 groups around the world raised and managed USD $35M last year"
                   />
                 </P>
               </Box>
@@ -270,7 +280,7 @@ const RaiseMoney = () => {
                   >
                     <FormattedMessage
                       id="home.stat.checkout"
-                      defaultMessage={'Check out these amazing Collectives and connect with them.'}
+                      defaultMessage="Check out these amazing Collectives and connect with them."
                     />
                   </P>
                 </Box>
@@ -299,7 +309,7 @@ const RaiseMoney = () => {
               fontWeight="700"
               textDecoration={[null, null, 'underline']}
             >
-              <FormattedMessage id="fiscalHosting" defaultMessage={'Fiscal hosting'} />
+              <FormattedMessage id="fiscalHosting" defaultMessage="Fiscal hosting" />
             </H3>
             <Box maxWidth={['288px', '338px', '478px']} mt={['16px', '24px']}>
               <P
@@ -311,14 +321,12 @@ const RaiseMoney = () => {
               >
                 <FormattedMessage
                   id="home.fiscalHosting.description"
-                  defaultMessage={
-                    'Operate under the umbrella of an established legal entity, so you don’t have to incorporate your own. A Host can take care of accounting, taxes, banking, and non-profit status.'
-                  }
+                  defaultMessage="Operate under the umbrella of an established legal entity, so you don’t have to incorporate your own. A Host can take care of accounting, taxes, banking, and non-profit status."
                 />
               </P>
               <LearnMoreLink as={Link} textDecoration="underline" color="black.800" href="/fiscal-hosting">
                 <P mt="24px" fontSize="16px" lineHeight="24px" fontWeight="500">
-                  <FormattedMessage defaultMessage={'Learn more about fiscal hosting'} />
+                  <FormattedMessage defaultMessage="Learn more about fiscal hosting" id="yOzWJD" />
                 </P>
               </LearnMoreLink>
             </Box>
@@ -342,7 +350,7 @@ const RaiseMoney = () => {
               fontWeight="700"
               textDecoration={[null, null, 'underline']}
             >
-              <FormattedMessage id="home.sharedAccount" defaultMessage={'Shared account'} />
+              <FormattedMessage id="home.sharedAccount" defaultMessage="Shared account" />
             </H3>
             <Box maxWidth={['288px', '338px', '478px']} mt={['16px', '24px']}>
               <P
@@ -354,14 +362,12 @@ const RaiseMoney = () => {
               >
                 <FormattedMessage
                   id="home.sharedAccount.description"
-                  defaultMessage={
-                    'Manage your budget together. Transparency builds trust and accountability, and no individual has to take on all the responsibility.'
-                  }
+                  defaultMessage="Manage your budget together. Transparency builds trust and accountability, and no individual has to take on all the responsibility."
                 />
               </P>
               <LearnMoreLink as={Link} textDecoration="underline" color="black.800" href="/collectives">
                 <P mt="24px" fontSize="16px" lineHeight="24px" fontWeight="500">
-                  <FormattedMessage defaultMessage={'Learn more about creating a Collective'} />
+                  <FormattedMessage defaultMessage="Learn more about creating a Collective" id="yKF8y5" />
                 </P>
               </LearnMoreLink>
             </Box>
@@ -385,7 +391,7 @@ const RaiseMoney = () => {
               fontWeight="700"
               textDecoration={[null, null, 'underline']}
             >
-              <FormattedMessage id="home.powerfulMoneyTools" defaultMessage={'Powerful money tools'} />
+              <FormattedMessage id="home.powerfulMoneyTools" defaultMessage="Powerful money tools" />
             </H3>
             <Box maxWidth={['288px', '338px', '478px']} mt={['16px', '24px']}>
               <P
@@ -397,14 +403,12 @@ const RaiseMoney = () => {
               >
                 <FormattedMessage
                   id="home.powerfulMoneyTools.description"
-                  defaultMessage={
-                    'Pay expenses, receive donations, manage grants, sell event tickets, get a virtual card linked to your balance, and more!'
-                  }
+                  defaultMessage="Pay expenses, receive donations, manage grants, sell event tickets, get a virtual card linked to your balance, and more!"
                 />
               </P>
               <LearnMoreLink as={Link} textDecoration="underline" color="black.800" href="/how-it-works">
                 <P mt="24px" fontSize="16px" lineHeight="24px" fontWeight="500">
-                  <FormattedMessage defaultMessage={'Learn more about how the platform works'} />
+                  <FormattedMessage defaultMessage="Learn more about how the platform works" id="sgLhGq" />
                 </P>
               </LearnMoreLink>
             </Box>

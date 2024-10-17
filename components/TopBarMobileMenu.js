@@ -1,8 +1,8 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
+import { Discord } from '@styled-icons/fa-brands/Discord';
 import { Github } from '@styled-icons/fa-brands/Github';
-import { Slack } from '@styled-icons/fa-brands/Slack';
 import { Twitter } from '@styled-icons/fa-brands/Twitter';
 import { Blog } from '@styled-icons/icomoon/Blog';
 import { Mail } from '@styled-icons/material/Mail';
@@ -37,6 +37,9 @@ const SubListItem = styled(ListItem)`
   padding-bottom: 10px;
 `;
 
+/**
+ * @deprecated Will be replaced by `components/navigation/SiteMenu` when Workspace moves out of preview feature
+ */
 const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
   const [state, setState] = React.useState({
     viewSolutionsMenu: false,
@@ -74,16 +77,16 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
                   <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
                 </Link>
               </ListItem>
-              <hr />
+              <hr className="my-5" />
               <ListItem>
                 <Link href="/search" onClick={closeMenu}>
-                  <FormattedMessage defaultMessage="Explore" />
+                  <FormattedMessage id="Explore" defaultMessage="Explore" />
                 </Link>
               </ListItem>
-              <hr />
+              <hr className="my-5" />
               <ListItem>
                 <Link href="/help" onClick={closeMenu}>
-                  <FormattedMessage defaultMessage="Help & Support" />
+                  <FormattedMessage defaultMessage="Help & Support" id="Uf3+S6" />
                 </Link>
               </ListItem>
             </Fragment>
@@ -94,7 +97,7 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
                   justifyContent="space-between"
                   onClick={() => setState({ ...state, viewSolutionsMenu: !state.viewSolutionsMenu })}
                 >
-                  <FormattedMessage defaultMessage="Solutions" />
+                  <FormattedMessage defaultMessage="Solutions" id="asqGnV" />
                   <ChevronDown size={20} />
                 </Flex>
                 {state.viewSolutionsMenu && (
@@ -106,7 +109,7 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
                     </SubListItem>
                     <SubListItem>
                       <Link href={'/become-a-sponsor'} onClick={closeMenu}>
-                        <FormattedMessage defaultMessage="For Contributors" />
+                        <FormattedMessage defaultMessage="For Contributors" id="CPlDGt" />
                       </Link>
                     </SubListItem>
                     <SubListItem>
@@ -117,7 +120,7 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
                   </Box>
                 )}
               </ListItem>
-              <hr />
+              <hr className="my-5" />
               <ListItem>
                 <Flex
                   justifyContent="space-between"
@@ -146,7 +149,7 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
                   </Box>
                 )}
               </ListItem>
-              <hr />
+              <hr className="my-5" />
               <ListItem>
                 <Flex
                   justifyContent="space-between"
@@ -170,15 +173,15 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
                   </Box>
                 )}
               </ListItem>
-              <hr />
+              <hr className="my-5" />
               <ListItem>
                 <Link href={'/help'} onClick={closeMenu}>
-                  <FormattedMessage defaultMessage="Help & Support" />
+                  <FormattedMessage defaultMessage="Help & Support" id="Uf3+S6" />
                 </Link>
               </ListItem>
               {useDashboard && (
                 <Fragment>
-                  <hr />
+                  <hr className="my-5" />
                   <ListItem>
                     <Link href="/dashboard" onClick={closeMenu}>
                       <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
@@ -216,9 +219,9 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
                 <Github size={17} color="#9D9FA3" />
               </StyledRoundButton>
             </StyledLink>
-            <StyledLink href="https://slack.opencollective.com" openInNewTab onClick={closeMenu}>
+            <StyledLink href="https://discord.opencollective.com" openInNewTab onClick={closeMenu}>
               <StyledRoundButton size={40}>
-                <Slack size={17} color="#9D9FA3" />
+                <Discord size={17} color="#9D9FA3" />
               </StyledRoundButton>
             </StyledLink>
             <StyledLink href="mailto:info@opencollective.com" openInNewTab onClick={closeMenu}>

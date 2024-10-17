@@ -4,18 +4,20 @@ import HCaptcha from '@hcaptcha/react-hcaptcha';
 import * as Sentry from '@sentry/browser';
 import { toUpper } from 'lodash';
 import { FormattedMessage } from 'react-intl';
+import Turnstile from 'react-turnstile';
 
 import { getEnvVar } from '../lib/env-utils';
 import useRecaptcha from '../lib/hooks/useRecaptcha';
 import { parseToBoolean } from '../lib/utils';
 
+import { useToast } from './ui/useToast';
 import { Box } from './Grid';
 import StyledCheckbox from './StyledCheckbox';
-import { TOAST_TYPE, useToasts } from './ToastProvider';
 
-export const PROVIDERS = {
+const PROVIDERS = {
   HCAPTCHA: 'HCAPTCHA',
   RECAPTCHA: 'RECAPTCHA',
+  TURNSTILE: 'TURNSTILE',
 };
 
 const CAPTCHA_PROVIDER = PROVIDERS[toUpper(getEnvVar('CAPTCHA_PROVIDER'))] || PROVIDERS.HCAPTCHA;
@@ -28,7 +30,7 @@ const ReCaptcha = ({ onVerify, onError, ...props }) => {
   const { verify } = useRecaptcha();
   const [loading, setLoading] = React.useState(false);
   const [verified, setVerified] = React.useState(false);
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const handleClick = async () => {
     setLoading(true);
     try {
@@ -38,7 +40,7 @@ const ReCaptcha = ({ onVerify, onError, ...props }) => {
         setVerified(true);
       }
     } catch (e) {
-      addToast({ type: TOAST_TYPE.ERROR, message: e.message });
+      toast({ variant: 'error', message: e.message });
       onError?.(e);
     }
     setLoading(false);
@@ -67,9 +69,10 @@ ReCaptcha.propTypes = {
   onError: PropTypes.func,
 };
 
-const Captcha = React.forwardRef(({ onVerify, provider, ...props }, captchaRef) => {
+const Captcha = React.forwardRef(({ onVerify, provider = CAPTCHA_PROVIDER, ...props }, captchaRef) => {
   const HCAPTCHA_SITEKEY = getEnvVar('HCAPTCHA_SITEKEY');
   const RECAPTCHA_SITE_KEY = getEnvVar('RECAPTCHA_SITE_KEY');
+  const TURNSTILE_SITE_KEY = getEnvVar('TURNSTILE_SITEKEY');
   const handleVerify = obj => {
     onVerify({ ...obj, provider });
   };
@@ -97,7 +100,18 @@ const Captcha = React.forwardRef(({ onVerify, provider, ...props }, captchaRef) 
     );
   } else if (provider === PROVIDERS.RECAPTCHA && RECAPTCHA_SITE_KEY) {
     captcha = <ReCaptcha onVerify={handleVerify} onError={handleError} {...props} />;
+  } else if (provider === PROVIDERS.TURNSTILE) {
+    captcha = (
+      <Turnstile
+        sitekey={TURNSTILE_SITE_KEY}
+        onVerify={token => handleVerify({ token })}
+        onError={handleError}
+        theme="light"
+        {...props}
+      />
+    );
   }
+
   return <Box data-cy="captcha">{captcha}</Box>;
 });
 
@@ -106,10 +120,6 @@ Captcha.displayName = 'Captcha';
 Captcha.propTypes = {
   onVerify: PropTypes.func,
   provider: PropTypes.string,
-};
-
-Captcha.defaultProps = {
-  provider: CAPTCHA_PROVIDER,
 };
 
 export default Captcha;

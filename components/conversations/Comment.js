@@ -1,8 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
-
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
@@ -14,19 +11,8 @@ import CommentActions from './CommentActions';
 import { CommentMetadata } from './CommentMetadata';
 import EmojiReactionPicker from './EmojiReactionPicker';
 import CommentReactions from './EmojiReactions';
-import { commentFieldsFragment } from './graphql';
-
-const editCommentMutation = gql`
-  mutation EditComment($comment: CommentUpdateInput!) {
-    editComment(comment: $comment) {
-      id
-      ...CommentFields
-    }
-  }
-  ${commentFieldsFragment}
-`;
-
-const mutationOptions = { context: API_V2_CONTEXT };
+import { editCommentMutation, mutationOptions } from './graphql';
+import SmallComment from './SmallComment';
 
 /**
  * Render a comment.
@@ -42,6 +28,7 @@ const Comment = ({
   onDelete,
   reactions,
   canReply,
+  onReplyClick,
 }) => {
   const [isEditing, setEditing] = React.useState(false);
   const hasActions = !isEditing;
@@ -58,8 +45,12 @@ const Comment = ({
             isConversationRoot={isConversationRoot}
             canEdit={canEdit}
             canDelete={canDelete}
+            canReply={canReply}
             onDelete={onDelete}
             onEditClick={() => setEditing(true)}
+            onReplyClick={() => {
+              onReplyClick?.(comment);
+            }}
           />
         )}
       </Flex>
@@ -130,6 +121,19 @@ Comment.propTypes = {
   maxCommentHeight: PropTypes.number,
   /** Called when comment gets deleted */
   onDelete: PropTypes.func,
+  /** Called when comment gets selected*/
+  onReplyClick: PropTypes.func,
 };
 
-export default Comment;
+/**
+ *
+ * @param {import('./types').CommentPropsWithVariant} props
+ */
+export default function CommentComponent(props) {
+  // eslint-disable-next-line react/prop-types
+  if (props.variant === 'small') {
+    return <SmallComment {...props} />;
+  }
+
+  return <Comment {...props} />;
+}

@@ -95,8 +95,8 @@ const Arrow = styled('div')`
 `;
 
 const editPublicMessageMutation = gqlV1/* GraphQL */ `
-  mutation EditPublicMessage($FromCollectiveId: Int!, $CollectiveId: Int!, $message: String) {
-    editPublicMessage(FromCollectiveId: $FromCollectiveId, CollectiveId: $CollectiveId, message: $message) {
+  mutation EditPublicMessage($fromCollectiveId: Int!, $collectiveId: Int!, $message: String) {
+    editPublicMessage(FromCollectiveId: $fromCollectiveId, CollectiveId: $collectiveId, message: $message) {
       id
       publicMessage
       tier {
@@ -128,7 +128,7 @@ const REACT_POPPER_MODIFIERS = [
   },
 ];
 
-function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef, onClose, message, intl }) {
+function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef, onClose, message = '', intl }) {
   const [messageDraft, setMessageDraft] = useState(message || '');
 
   // Can't be rendered SSR
@@ -190,8 +190,8 @@ function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef
                     onClick={async () => {
                       await submitMessage({
                         variables: {
-                          FromCollectiveId: fromCollectiveId,
-                          CollectiveId: collectiveId,
+                          fromCollectiveId,
+                          collectiveId,
                           message: messageDraft ? messageDraft.trim() : null,
                         },
                         // Update cache after mutation
@@ -233,10 +233,6 @@ function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef
     document.body,
   );
 }
-
-EditPublicMessagePopup.defaultProps = {
-  message: '',
-};
 
 EditPublicMessagePopup.propTypes = {
   fromCollectiveId: PropTypes.number.isRequired,

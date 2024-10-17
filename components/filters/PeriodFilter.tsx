@@ -4,9 +4,8 @@ import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { has } from 'lodash';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
 
-import { isValidDate, parseDateInterval, stripTime } from '../../lib/date-utils';
+import { parseDateInterval, stripTime } from '../../lib/date-utils';
 import dayjs from '../../lib/dayjs';
 
 import { DateRange } from '../DateRange';
@@ -20,13 +19,15 @@ import StyledInputField from '../StyledInputField';
 import StyledTooltip from '../StyledTooltip';
 import { Span } from '../Text';
 
+import FilterButtonContainer from './FilterButtonContainer';
+
 const DEFAULT_INTERVAL = { from: '', to: '', timezoneType: 'local' };
 
 /**
  * Get a date range as stored internally from a `value` prop, that can be either an object
  * like { from, to } or a stringified value (see `encodeDateInterval`).
  */
-const getIntervalFromValue = value => {
+export const getIntervalFromValue = value => {
   const isIntervalObject = value => typeof value === 'object' && has(value, 'from') && has(value, 'to');
   const intervalFromValue = isIntervalObject(value) ? { ...value } : parseDateInterval(value);
   if (intervalFromValue.timezoneType === 'UTC') {
@@ -46,7 +47,7 @@ const getIntervalFromValue = value => {
  * Update `interval` with a new value for `from` or `to` and return the updated interval
  * as a new object.
  */
-export const getNewInterval = (interval, changeField, newValue) => {
+const getNewInterval = (interval, changeField, newValue) => {
   const newInterval = { ...interval };
   newInterval[changeField] = newValue;
   return newInterval;
@@ -66,7 +67,8 @@ const parseDateForDateRange = (dateStr, isEndOfDay) => {
   }
 };
 
-const UTC_LABEL = defineMessage({ defaultMessage: 'Coordinated Universal Time' });
+const UTC_LABEL = defineMessage({ defaultMessage: 'Coordinated Universal Time', id: '94IjMb' });
+
 const getTimeZoneTypeName = (intl, timezone) => {
   if (timezone === 'local') {
     try {
@@ -80,36 +82,6 @@ const getTimeZoneTypeName = (intl, timezone) => {
     return '';
   }
 };
-
-const TriggerContainer = styled(StyledButton)`
-  min-height: 38px;
-  outline: 0;
-  background: #f7f8fa;
-  padding: 0 16px;
-  width: 100%;
-  text-align: left;
-  font-size: 12px;
-  font-weight: 500;
-  color: hsl(0, 0%, 20%);
-
-  svg {
-    transition: color 0.2s;
-  }
-
-  &:hover {
-    border-color: #c4c7cc;
-    svg {
-      color: #999999;
-    }
-  }
-
-  &:active,
-  &:focus {
-    background: white;
-    color: hsl(0, 0%, 20%);
-    box-shadow: 0 0 0 2px black;
-  }
-`;
 
 type PeriodFilterFormProps = {
   onChange: (interval: { from: string; to: string; timezoneType: string }) => void;
@@ -130,36 +102,21 @@ export const PeriodFilterForm = ({
   omitPresets,
   disabled,
 }: PeriodFilterFormProps) => {
-  const intervalFromValue = React.useMemo(() => getIntervalFromValue(value), [value]);
   const [isValidDateInterval, setIsValidDateInterval] = React.useState(true);
-  const [tmpDateInterval, setTmpDateInterval] = React.useState(intervalFromValue);
-  React.useEffect(() => {
-    if (
-      tmpDateInterval.from !== intervalFromValue.from ||
-      tmpDateInterval.to !== intervalFromValue.to ||
-      tmpDateInterval.timezoneType !== intervalFromValue.timezoneType
-    ) {
-      onChange(tmpDateInterval);
-    }
-  }, [tmpDateInterval]);
-
-  // Secondary effect that allow us to update to react from updated props without triggering onChange
-  React.useEffect(() => {
-    setTmpDateInterval(getIntervalFromValue(value));
-  }, [value]);
-
   const intl = useIntl();
   const formattedMin = stripTime(minDate);
 
   const setDate = (changeField, date) => {
-    const newInterval = getNewInterval(tmpDateInterval, changeField, date);
-    setTmpDateInterval(newInterval);
+    const newInterval = getNewInterval(value, changeField, date);
+    onChange(newInterval);
 
     // Add warning in case fromDate is after toDate
-    if (isValidDate(newInterval.from) && isValidDate(newInterval.to) && newInterval.from > newInterval.to) {
+    if (!newInterval.from || !newInterval.to) {
+      return;
+    } else if (newInterval.from > newInterval.to) {
       setIsValidDateInterval(false);
       onValidate?.(false);
-    } else if (isValidDate(newInterval.from) && isValidDate(newInterval.to) && newInterval.from < newInterval.to) {
+    } else if (newInterval.from < newInterval.to) {
       setIsValidDateInterval(true);
       onValidate?.(true);
     }
@@ -169,11 +126,7 @@ export const PeriodFilterForm = ({
     <React.Fragment>
       {!omitPresets && (
         <Box mb={3}>
-          <PeriodFilterPresetsSelect
-            inputId={`${inputId}-presets-select`}
-            onChange={setTmpDateInterval}
-            interval={tmpDateInterval}
-          />
+          <PeriodFilterPresetsSelect inputId={`${inputId}-presets-select`} onChange={onChange} interval={value} />
         </Box>
       )}
       <StyledInputField
@@ -184,11 +137,14 @@ export const PeriodFilterForm = ({
         label={
           <Flex alignItems="center">
             <Span mr={1}>
-              <FormattedMessage defaultMessage="Timezone" />
+              <FormattedMessage defaultMessage="Timezone" id="7nUCu9" />
             </Span>
             <StyledTooltip
               content={
-                <FormattedMessage defaultMessage="By default, all dates are filtered and displayed using your local timezone. You can switch to UTC to indicate that the dates provided above use the Coordinated Universal Time format, which matches how email reports are generated" />
+                <FormattedMessage
+                  defaultMessage="By default, all dates are filtered and displayed using your local timezone. You can switch to UTC to indicate that the dates provided above use the Coordinated Universal Time format, which matches how email reports are generated"
+                  id="9sbPks"
+                />
               }
             >
               <InfoCircle size={16} />
@@ -202,26 +158,26 @@ export const PeriodFilterForm = ({
             size="tiny"
             items={['local', 'UTC']}
             buttonProps={{ p: 1, fontSize: '13px', fontWeight: 400 }}
-            selected={tmpDateInterval.timezoneType}
+            selected={value.timezoneType}
             buttonPropsBuilder={({ item }) => ({ title: getTimeZoneTypeName(intl, item) })}
             onChange={timezoneType => {
-              setTmpDateInterval(getIntervalFromValue({ ...tmpDateInterval, timezoneType }));
+              onChange(getIntervalFromValue({ ...value, timezoneType }));
             }}
             disabled={disabled}
           >
             {({ item }) => {
               switch (item) {
                 case 'local':
-                  return <FormattedMessage defaultMessage="Local" />;
+                  return <FormattedMessage id="Timezone.Local" defaultMessage="Local" />;
                 case 'UTC':
-                  return <FormattedMessage defaultMessage="UTC" />;
+                  return <FormattedMessage id="Timezone.UTC" defaultMessage="UTC" />;
               }
             }}
           </StyledButtonSet>
         )}
       </StyledInputField>
       <StyledInputField
-        label={<FormattedMessage defaultMessage="Start date" />}
+        label={<FormattedMessage defaultMessage="Start date" id="n5QvJy" />}
         labelFontWeight="700"
         labelProps={{ fontWeight: 'bold', fontSize: '16px' }}
         name="dateFrom"
@@ -236,7 +192,7 @@ export const PeriodFilterForm = ({
             closeOnSelect
             lineHeight={1}
             fontSize="13px"
-            value={tmpDateInterval.from}
+            value={value.from || ''}
             min={formattedMin}
             onChange={e => setDate('from', e.target.value)}
             disabled={disabled}
@@ -244,7 +200,7 @@ export const PeriodFilterForm = ({
         )}
       </StyledInputField>
       <StyledInputField
-        label={<FormattedMessage defaultMessage="End date" />}
+        label={<FormattedMessage defaultMessage="End date" id="Humfno" />}
         labelFontWeight="700"
         labelProps={{ fontWeight: 'bold', fontSize: '16px' }}
         name="dateTo"
@@ -259,7 +215,7 @@ export const PeriodFilterForm = ({
             closeOnSelect
             lineHeight={1}
             fontSize="13px"
-            value={tmpDateInterval.to}
+            value={value.to || ''}
             min={formattedMin}
             max={stripTime(new Date())}
             onChange={e => setDate('to', e.target.value)}
@@ -269,14 +225,14 @@ export const PeriodFilterForm = ({
       </StyledInputField>
       {!isValidDateInterval && (
         <Span display="block" color="red.500" pt={2} fontSize="10px" lineHeight="14px" aria-live="assertive">
-          <FormattedMessage defaultMessage="Start Date should be before the End Date" />
+          <FormattedMessage defaultMessage="Start Date should be before the End Date" id="P6fesn" />
         </Span>
       )}
     </React.Fragment>
   );
 };
 
-const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
+const PeriodFilter = ({ onChange, value, inputId, minDate = null, ...props }) => {
   const intervalFromValue = React.useMemo(() => getIntervalFromValue(value), [value]);
   const [tmpDateInterval, setTmpDateInterval] = React.useState(intervalFromValue);
 
@@ -285,7 +241,7 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
       placement="bottom-start"
       onClose={() => setTmpDateInterval(intervalFromValue)}
       Button={({ onClick }) => (
-        <TriggerContainer onClick={onClick} id={inputId} data-cy="period-filter" {...props}>
+        <FilterButtonContainer onClick={onClick} id={inputId} data-cy="period-filter" {...props}>
           <Flex justifyContent="space-between" alignItems="center">
             <DateRange
               from={parseDateForDateRange(intervalFromValue.from, false)}
@@ -294,17 +250,15 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
             />
             <ChevronDown size={25} color="#cccccc" />
           </Flex>
-        </TriggerContainer>
+        </FilterButtonContainer>
       )}
     >
       {({ setOpen }) => (
         <Box mx="8px" my="8px" width="190px">
           <PeriodFilterForm onChange={setTmpDateInterval} value={tmpDateInterval} minDate={minDate} inputId={inputId} />
-          <Flex mt={2}>
+          <Flex flexWrap="wrap" mt={3} gap="8px">
             <StyledButton
               buttonSize="medium"
-              mr={2}
-              mt="12px"
               flex="1"
               onClick={() => {
                 setTmpDateInterval(DEFAULT_INTERVAL);
@@ -317,7 +271,6 @@ const PeriodFilter = ({ onChange, value, inputId, minDate, ...props }) => {
             <StyledButton
               buttonSize="medium"
               buttonStyle="primary"
-              mt="12px"
               data-cy="btn-apply-period-filter"
               flex="1"
               onClick={() => {

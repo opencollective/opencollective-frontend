@@ -6,7 +6,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { Manager, Popper, Reference } from 'react-popper';
 import styled from 'styled-components';
 
-import expenseStatus from '../../lib/constants/expense-status';
+import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import useKeyboardKey, { ESCAPE_KEY } from '../../lib/hooks/useKeyboardKey';
 import { i18nExpenseStatus } from '../../lib/i18n/expense';
@@ -81,7 +81,7 @@ const AdminExpenseStatusTag = ({ expense, host, collective, ...props }) => {
   const [showPopup, setShowPopup] = React.useState(false);
   const [isClosable, setClosable] = React.useState(true);
   const [processModal, setProcessModal] = React.useState(false);
-  const hideProcessExpenseButtons = expense?.status === expenseStatus.APPROVED;
+  const hideProcessExpenseButtons = expense?.status === ExpenseStatus.APPROVED;
   const buttonProps = { px: 2, py: 2, isBorderless: true, width: '100%', textAlign: 'left' };
   const status = expense.onHold ? 'ON_HOLD' : expense.status;
 

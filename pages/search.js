@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { ShareAlt } from '@styled-icons/boxicons-regular/ShareAlt';
 import copy from 'copy-to-clipboard';
@@ -10,7 +9,7 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import { IGNORED_TAGS } from '../lib/constants/collectives';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import i18nSearchSortingOptions from '../lib/i18n/search-sorting-options';
 import { parseToBoolean } from '../lib/utils';
 
@@ -30,10 +29,11 @@ import StyledButton from '../components/StyledButton';
 import StyledFilters from '../components/StyledFilters';
 import StyledHr from '../components/StyledHr';
 import { fadeIn } from '../components/StyledKeyframes';
+import StyledLink from '../components/StyledLink';
 import { StyledSelectFilter } from '../components/StyledSelectFilter';
 import StyledTag from '../components/StyledTag';
 import { H1, P, Span } from '../components/Text';
-import { TOAST_TYPE, withToasts } from '../components/ToastProvider';
+import { toast } from '../components/ui/useToast';
 
 const CollectiveCardContainer = styled.div`
   animation: ${fadeIn} 0.2s;
@@ -82,13 +82,14 @@ const I18nFilters = defineMessages({
   },
   [FILTERS.FUND]: {
     defaultMessage: 'Funds',
+    id: '59l1l8',
   },
 });
 
 const SearchFormContainer = styled(Box)`
   height: 58px;
   width: 608px;
-  min-width: 10rem;
+  min-width: 6.25rem;
 `;
 
 const FilterLabel = styled.label`
@@ -164,14 +165,13 @@ class SearchPage extends React.Component {
     router: PropTypes.object, // from next.js
     data: PropTypes.object.isRequired, // from withData
     intl: PropTypes.object,
-    addToast: PropTypes.func.isRequired, // from withToasts
     isHost: PropTypes.bool,
     type: PropTypes.array,
   };
 
   constructor(props) {
     super(props);
-    this.onClick = this.onClick.bind(this);
+
     const term = props.term;
     if (this.props.isHost) {
       this.state = { filter: 'HOST', term };
@@ -212,8 +212,8 @@ class SearchPage extends React.Component {
 
   changeTags = tag => {
     const { router, term } = this.props;
-    let tags = router.query?.tag?.split(',');
-    if (!tags || router.query?.tag?.length === 0) {
+    let tags = router.query.tag?.split(',');
+    if (!tags || router.query.tag?.length === 0) {
       tags = [tag];
     } else if (tags.includes(tag)) {
       tags = tags.filter(value => value !== tag);
@@ -244,6 +244,13 @@ class SearchPage extends React.Component {
     router.push({ pathname: router.pathname, query: pickBy(query, value => !isNil(value)) });
   };
 
+  handleClearFilter = () => {
+    const { router } = this.props;
+    this.setState({ term: '' });
+
+    router.push({ pathname: router.pathname });
+  };
+
   onClick = filter => {
     const { term, router } = this.props;
     let query;
@@ -271,9 +278,9 @@ class SearchPage extends React.Component {
 
   handleCopy = () => {
     copy(window.location.href);
-    this.props.addToast({
-      type: TOAST_TYPE.SUCCESS,
-      message: <FormattedMessage defaultMessage="Search Result Copied!" />,
+    toast({
+      variant: 'success',
+      message: <FormattedMessage defaultMessage="Search Result Copied!" id="3x3DF3" />,
     });
   };
 
@@ -299,7 +306,7 @@ class SearchPage extends React.Component {
     const selectedTypeFilter = this.props.isHost ? 'HOST' : this.props.type.length === 1 ? this.props.type[0] : 'ALL';
 
     return (
-      <Page title="Search" showSearch={false}>
+      <Page navTitle={intl.formatMessage({ defaultMessage: 'Explore', id: 'Explore' })} showSearch={false}>
         <Container
           backgroundImage="url(/static/images/home/fiscalhost-blue-bg-lg.png)"
           style={{ transform: 'rotate(180deg)' }}
@@ -320,12 +327,16 @@ class SearchPage extends React.Component {
                 borderRadius="100px"
                 fontSize="16px"
                 height="58px"
-                placeholder={intl.formatMessage({ defaultMessage: 'Search by name, handle, tag, description...' })}
+                placeholder={intl.formatMessage({
+                  defaultMessage: 'Search by name, handle, tag, description...',
+                  id: 'HEJLVH',
+                })}
                 value={this.state.term}
                 onChange={value => this.setState({ term: value })}
                 onSubmit={this.refetch}
                 showSearchButton
                 searchButtonStyles={{ minWidth: '40px', height: '40px' }}
+                onClearFilter={this.handleClearFilter}
               />
             </SearchFormContainer>
           </Flex>
@@ -346,7 +357,7 @@ class SearchPage extends React.Component {
             </Hide>
             <Hide md lg>
               <FilterLabel htmlFor="collective-filter-type">
-                <FormattedMessage defaultMessage="Profile Type" />
+                <FormattedMessage defaultMessage="Profile Type" id="somORZ" />
               </FilterLabel>
               <StyledSelectFilter
                 inputId="collective-type-filter"
@@ -363,7 +374,7 @@ class SearchPage extends React.Component {
           <Flex flexDirection={['column', 'row']}>
             <Container pr={[0, '19px']}>
               <FilterLabel htmlFor="sort-filter-type">
-                <FormattedMessage defaultMessage="Sort" />
+                <FormattedMessage defaultMessage="Sort" id="25oM9Q" />
               </FilterLabel>
               <StyledSelectFilter
                 inputId="sort-filter"
@@ -381,7 +392,9 @@ class SearchPage extends React.Component {
                 inputId="search-country-filter"
                 as={StyledSelectFilter}
                 value={this.props.country || 'ALL'}
-                customOptions={[{ label: <FormattedMessage defaultMessage="All countries" />, value: 'ALL' }]}
+                customOptions={[
+                  { label: <FormattedMessage defaultMessage="All countries" id="n6WiTf" />, value: 'ALL' },
+                ]}
                 onChange={country => this.changeCountry(country)}
                 minWidth={[0, '200px']}
                 fontSize="12px"
@@ -447,31 +460,35 @@ class SearchPage extends React.Component {
             </AllCardsContainer>
 
             {accounts?.nodes?.length === 0 && (
-              <Flex py={3} width={1} justifyContent="center" flexDirection="column" alignItems="center">
+              <Flex py={3} mt={4} width={1} justifyContent="center" flexDirection="column" alignItems="center">
                 <H1 fontSize="32px" lineHeight="40px" color="black.700" fontWeight={500}>
-                  <FormattedMessage defaultMessage="No results match your search" />
+                  <FormattedMessage defaultMessage="No results match your search" id="qqqV4d" />
                 </H1>
                 <Container py={32}>
                   <Image src="/static/images/empty-search.png" alt="No Search Results" width={101.98} height={87.47} />
                 </Container>
                 <Container color="black.800" fontWeight={400}>
                   <Container fontSize="18px" lineHeight="26px" textAlign="center">
-                    <FormattedMessage defaultMessage="Try refining your search, here are some tips:" />
+                    <FormattedMessage defaultMessage="Try refining your search, here are some tips:" id="8SQT+a" />
                   </Container>
                   <Container fontSize="15px" lineHeight="22px">
-                    <ul>
+                    <ul className="list-inside list-disc">
                       <li>
-                        <FormattedMessage defaultMessage="Make sure your spelling is correct" />
+                        <FormattedMessage defaultMessage="Make sure your spelling is correct" id="7HOBG3" />
                       </li>
                       <li>
                         <Span pt="8px">
-                          <FormattedMessage defaultMessage="Broaden your search (e.g. search 'garden' instead of 'community garden')" />
+                          <FormattedMessage
+                            defaultMessage="Broaden your search (e.g. search 'garden' instead of 'community garden')"
+                            id="RdCCty"
+                          />
                         </Span>
                       </li>
                       <li>
                         <Span pt="8px">
                           <FormattedMessage
                             defaultMessage="Search our <Link>Docs</Link> for more info about using the Open Collective platform"
+                            id="mzfp0+"
                             values={{
                               Link: getI18nLink({
                                 openInNewTab: true,
@@ -483,15 +500,17 @@ class SearchPage extends React.Component {
                       </li>
                     </ul>
                   </Container>
-                  <Container fontSize="18px" lineHeight="26px" pt={16}>
+                  <Container fontSize="18px" lineHeight="26px" pt={16} mt={4} textAlign="center">
                     <FormattedMessage
-                      defaultMessage="Still no luck? Contact <SupportLink>support</SupportLink> or find us in <SlackLink>Slack</SlackLink>"
+                      defaultMessage="Still no luck? Contact <SupportLink>support</SupportLink> or find us on {chatLink}."
+                      id="+lM4fw"
                       values={{
                         SupportLink: I18nSupportLink,
-                        SlackLink: getI18nLink({
-                          openInNewTab: true,
-                          href: 'https://slack.opencollective.com/',
-                        }),
+                        chatLink: (
+                          <StyledLink href="https://discord.opencollective.com/" openInNewTab>
+                            Discord
+                          </StyledLink>
+                        ),
                       }}
                     />
                   </Container>
@@ -509,7 +528,7 @@ class SearchPage extends React.Component {
             <Flex flexDirection="column" alignItems="center">
               <StyledButton onClick={this.handleCopy}>
                 <Span pr={1} fontSize="14px" fontWeight={500}>
-                  <FormattedMessage defaultMessage="Share results" />
+                  <FormattedMessage defaultMessage="Share results" id="Pkx+Wj" />
                 </Span>
                 <ShareAlt size="14px" />
               </StyledButton>
@@ -521,6 +540,7 @@ class SearchPage extends React.Component {
                 <em>
                   <FormattedMessage
                     defaultMessage="Can't find what you're looking for? Check our <Link>Docs & Help!</Link>"
+                    id="7ZWOtM"
                     values={{
                       Link: getI18nLink({
                         href: 'https://opencollective.com/help',
@@ -538,9 +558,7 @@ class SearchPage extends React.Component {
   }
 }
 
-export { SearchPage as MockSearchPage };
-
-export const searchPageQuery = gql`
+const searchPageQuery = gql`
   query SearchPage(
     $term: String!
     $type: [AccountType]
@@ -624,7 +642,7 @@ export const searchPageQuery = gql`
   }
 `;
 
-export const addSearchPageData = graphql(searchPageQuery, {
+const addSearchPageData = graphql(searchPageQuery, {
   options: props => ({
     context: API_V2_CONTEXT,
     variables: {
@@ -640,4 +658,6 @@ export const addSearchPageData = graphql(searchPageQuery, {
   }),
 });
 
-export default withToasts(injectIntl(withRouter(addSearchPageData(SearchPage))));
+// next.js export
+// ts-unused-exports:disable-next-line
+export default injectIntl(withRouter(addSearchPageData(SearchPage)));

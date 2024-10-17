@@ -5,10 +5,10 @@ import { lighten } from 'polished';
 import CustomStyledIcon from './CustomStyledIcon';
 
 /* eslint-disable react/no-unknown-property */
-const GiftCard = props => {
-  const gradientID = `gradient-${props.color.replace('#', '')}`;
+const GiftCard = ({ color = '#145ECC', size, ...props }) => {
+  const gradientID = `gradient-${color.replace('#', '')}`;
   return (
-    <CustomStyledIcon width={props.size || 26} height={props.size || 18} viewBox="0 0 26 18" fill="none" {...props}>
+    <CustomStyledIcon width={size || 26} height={size || 18} viewBox="0 0 26 18" fill="none" {...props}>
       <rect width="26" height="18" rx="3" fill="#0061E0" />
       <rect x="0.5" y="0.5" width="25" height="17" rx="1.5" fill="white" stroke="#DCDEE0" />
       <mask id="mask0" mask-type="alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="26" height="18">
@@ -34,16 +34,12 @@ const GiftCard = props => {
       </g>
       <defs>
         <linearGradient id={gradientID} x1="0" y1="0" x2="13.5422" y2="22.8211" gradientUnits="userSpaceOnUse">
-          <stop stopColor={props.color} />
-          <stop offset="1" stopColor={lighten(0.24, props.color)} />
+          <stop stopColor={color} />
+          <stop offset="1" stopColor={lighten(0.24, color)} />
         </linearGradient>
       </defs>
     </CustomStyledIcon>
   );
-};
-
-GiftCard.defaultProps = {
-  color: '#145ECC',
 };
 
 GiftCard.propTypes = {

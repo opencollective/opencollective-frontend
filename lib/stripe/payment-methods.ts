@@ -31,6 +31,25 @@ enum StripePaymentMethod {
   sofort = 'sofort',
   us_bank_account = 'us_bank_account',
   wechat_pay = 'wechat_pay',
+  swish = 'swish',
+}
+
+const RestrictedCurrencyByStripePaymentMethod: Partial<Record<StripePaymentMethod, string[]>> = {
+  [StripePaymentMethod.bacs_debit]: ['gbp'],
+  [StripePaymentMethod.bancontact]: ['eur'],
+  [StripePaymentMethod.sepa_debit]: ['eur'],
+  [StripePaymentMethod.ideal]: ['eur'],
+  [StripePaymentMethod.sofort]: ['eur'],
+  [StripePaymentMethod.us_bank_account]: ['usd'],
+};
+
+export function isStripePaymentMethodEnabledForCurrency(paymentMethod, currency: string): boolean {
+  const allowedCurrencyList = RestrictedCurrencyByStripePaymentMethod[paymentMethod.toLowerCase()];
+  if (!allowedCurrencyList) {
+    return true;
+  }
+
+  return allowedCurrencyList.includes(currency.toLowerCase());
 }
 
 export const StripePaymentMethodsLabels = defineMessages<StripePaymentMethod>({
@@ -79,4 +98,5 @@ export const StripePaymentMethodsLabels = defineMessages<StripePaymentMethod>({
     defaultMessage: 'ACH Direct Debit',
   },
   [StripePaymentMethod.wechat_pay]: { id: 'Stripe.PaymentMethod.Label.wechat_pay', defaultMessage: 'WeChat Pay' },
+  [StripePaymentMethod.swish]: { id: 'Stripe.PaymentMethod.Label.swish', defaultMessage: 'Swish' },
 });

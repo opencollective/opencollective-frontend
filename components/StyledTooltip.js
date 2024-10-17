@@ -110,6 +110,8 @@ const REACT_POPPER_MODIFIERS = [
           case 'top':
           case 'bottom':
             return [0, 3];
+          case 'right':
+            return [0, 8];
           default:
             return [];
         }
@@ -122,7 +124,13 @@ const TooltipContent = ({ place, content, onMouseEnter, onMouseLeave, noArrow })
   return ReactDOM.createPortal(
     <Popper placement={place} modifiers={REACT_POPPER_MODIFIERS}>
       {({ ref, style, placement, arrowProps }) => (
-        <StyledTooltipContainer ref={ref} style={style} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+        <StyledTooltipContainer
+          ref={ref}
+          style={style}
+          onMouseEnter={onMouseEnter}
+          onMouseLeave={onMouseLeave}
+          data-cy="tooltip-content"
+        >
           {typeof content === 'function' ? content() : content}
           {!noArrow && <Arrow ref={arrowProps.ref} data-placement={placement} style={arrowProps.style} />}
         </StyledTooltipContainer>
@@ -216,6 +224,7 @@ class StyledTooltip extends React.Component {
         verticalAlign={this.props.containerVerticalAlign}
         lineHeight={this.props.containerLineHeight}
         cursor={this.props.containerCursor}
+        data-cy="tooltip-trigger"
       >
         {this.props.children}
       </ChildrenContainer>

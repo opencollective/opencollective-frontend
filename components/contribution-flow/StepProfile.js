@@ -28,6 +28,7 @@ const StepProfile = ({ collective, tier, stepDetails, profiles, onChange, data, 
           onChange={onChange}
           onSignInClick={onSignInClick}
           isEmbed={isEmbed}
+          tier={tier}
         />
       )}
     </Box>

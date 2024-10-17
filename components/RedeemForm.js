@@ -10,7 +10,7 @@ import { P } from './Text';
 
 const Description = styled(P)`
   color: #4e5052;
-  font-size: 1.3rem;
+  font-size: 0.8rem;
   line-height: 1.5;
   margin: 12px 0;
 `;
@@ -100,7 +100,7 @@ class RedeemForm extends React.Component {
                 name="name"
                 type="name"
                 defaultValue={name}
-                disabled={LoggedInUser}
+                disabled={Boolean(LoggedInUser)}
                 onChange={value => this.handleChange('name', value)}
               />
               <InputField
@@ -108,7 +108,7 @@ class RedeemForm extends React.Component {
                 name="email"
                 type="email"
                 defaultValue={email}
-                disabled={LoggedInUser}
+                disabled={Boolean(LoggedInUser)}
                 onChange={value => this.handleChange('email', value)}
               />
             </React.Fragment>

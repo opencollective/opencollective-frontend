@@ -23,7 +23,7 @@ const EmojiReactions = ({ reactions }) => {
     .map(emoji => {
       return (
         <EmojiLabel key={emoji}>
-          {emoji}&nbsp;&nbsp;{reactions[emoji]}
+          <span className="font-emoji">{emoji}</span>&nbsp;&nbsp;{reactions[emoji]}
         </EmojiLabel>
       );
     });

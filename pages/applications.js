@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 import { getDashboardRoute } from '../lib/url-helpers';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
@@ -23,17 +22,14 @@ class Apps extends React.Component {
         {LoggedInUser => (
           <Flex flexDirection="column" alignItems="center" justifyContent="center" width={1} my={5}>
             <MessageBox type="info" withIcon>
-              <FormattedMessage defaultMessage="Applications have been deprecated in favor of personal token" />
+              <FormattedMessage
+                defaultMessage="Applications have been deprecated in favor of personal token"
+                id="wQEy7N"
+              />
             </MessageBox>
-            <StyledLink
-              href={
-                LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DASHBOARD)
-                  ? getDashboardRoute(LoggedInUser.collective, 'for-developers')
-                  : `/${LoggedInUser.collective.slug}/admin/for-developers`
-              }
-            >
+            <StyledLink href={getDashboardRoute(LoggedInUser.collective, 'for-developers')}>
               <StyledButton buttonStyle="primary" buttonSize="medium" mt={3}>
-                <FormattedMessage defaultMessage="View personal tokens" />
+                <FormattedMessage defaultMessage="View personal tokens" id="vaSCOx" />
               </StyledButton>
             </StyledLink>
           </Flex>
@@ -43,4 +39,6 @@ class Apps extends React.Component {
   }
 }
 
+// next.js export
+// ts-unused-exports:disable-next-line
 export default Apps;

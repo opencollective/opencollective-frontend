@@ -15,6 +15,7 @@ const ListItem = styled.li`
 
 const ListWrapper = styled.ul`
   padding-left: 20px;
+  list-style: disc;
 `;
 
 const InvestingInTheCommons = () => {

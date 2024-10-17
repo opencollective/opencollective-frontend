@@ -1,6 +1,7 @@
-import { gql } from '@apollo/client';
+import { gql } from '../../../lib/graphql/helpers';
 
-import { collectiveNavbarFieldsFragment } from '../../collective-page/graphql/fragments';
+import { accountHoverCardFields } from '../../AccountHoverCard';
+import { accountNavbarFieldsFragment } from '../../collective-navbar/fragments';
 
 export const loggedInAccountExpensePayoutFieldsFragment = gql`
   fragment LoggedInAccountExpensePayoutFields on Individual {
@@ -37,12 +38,14 @@ export const loggedInAccountExpensePayoutFieldsFragment = gql`
           isActive
           isHost
           policies {
+            id
             REQUIRE_2FA_FOR_ADMINS
           }
           ... on AccountWithParent {
             parent {
               id
               policies {
+                id
                 REQUIRE_2FA_FOR_ADMINS
               }
             }
@@ -100,9 +103,23 @@ export const loggedInAccountExpensePayoutFieldsFragment = gql`
   }
 `;
 
+export const accountingCategoryFields = gql`
+  fragment AccountingCategoryFields on AccountingCategory {
+    id
+    name
+    kind
+    instructions
+    friendlyName
+    code
+    expensesTypes
+    appliesTo
+  }
+`;
+
 export const expenseHostFields = gql`
   fragment ExpenseHostFields on Host {
     id
+    legacyId
     name
     legalName
     slug
@@ -138,6 +155,94 @@ export const expenseHostFields = gql`
     plan {
       id
     }
+    expenseAccountingCategories: accountingCategories(kind: EXPENSE) {
+      nodes {
+        id
+        ...AccountingCategoryFields
+      }
+    }
+    policies {
+      id
+      EXPENSE_CATEGORIZATION {
+        requiredForExpenseSubmitters
+        requiredForCollectiveAdmins
+      }
+    }
+  }
+  ${accountingCategoryFields}
+`;
+
+export const expenseValuesByRoleFragment = gql`
+  fragment ExpenseValuesByRoleFragment on ExpenseValuesByRole {
+    id
+    submitter {
+      accountingCategory {
+        ...AccountingCategoryFields
+      }
+    }
+    accountAdmin {
+      accountingCategory {
+        ...AccountingCategoryFields
+      }
+    }
+    hostAdmin {
+      accountingCategory {
+        ...AccountingCategoryFields
+      }
+    }
+  }
+  ${accountingCategoryFields}
+`;
+
+export const expensePayeeFieldsFragment = gql`
+  fragment ExpensePayeeFields on Account {
+    id
+    slug
+    name
+    legalName
+    imageUrl
+    type
+    isAdmin
+    isActive
+    description
+    ...AccountHoverCardFields
+    location {
+      id
+      address
+      country
+    }
+    payoutMethods {
+      id
+      type
+      name
+      data
+      isSaved
+    }
+
+    # For Collectives, Funds, Events and Projects
+    ... on AccountWithHost {
+      isApproved
+      host {
+        id
+        slug
+        # For Expenses across hosts
+        payoutMethods {
+          id
+          type
+          name
+          data
+          isSaved
+        }
+      }
+    }
+
+    # For Fiscal Hosts
+    ... on Organization {
+      host {
+        id
+        slug
+      }
+    }
   }
 `;
 
@@ -152,8 +257,17 @@ export const expensePageExpenseFieldsFragment = gql`
     status
     onHold
     privateMessage
+    reference
     tags
     amount
+    accountingCategory {
+      id
+      ...AccountingCategoryFields
+    }
+    valuesByRole {
+      id
+      ...ExpenseValuesByRoleFragment
+    }
     amountInAccountCurrency: amountV2(currencySource: ACCOUNT) {
       valueInCents
       currency
@@ -162,11 +276,22 @@ export const expensePageExpenseFieldsFragment = gql`
         value
         source
         isApproximate
+        fromCurrency
+        toCurrency
       }
     }
     createdAt
     invoiceInfo
+    merchantId
     requiredLegalDocuments
+    receivedTaxForms: legalDocuments(type: US_TAX_FORM, status: RECEIVED) {
+      nodes {
+        id
+        type
+        documentLink
+        year
+      }
+    }
     feesPayer
     draft
     items {
@@ -174,6 +299,22 @@ export const expensePageExpenseFieldsFragment = gql`
       incurredAt
       description
       amount
+      amountV2 {
+        valueInCents
+        currency
+        exchangeRate {
+          date
+          value
+          source
+          fromCurrency
+          toCurrency
+        }
+      }
+      referenceExchangeRate {
+        value
+        fromCurrency
+        toCurrency
+      }
       url
       file {
         id
@@ -203,47 +344,7 @@ export const expensePageExpenseFieldsFragment = gql`
     }
     payee {
       id
-      slug
-      name
-      legalName
-      type
-      isAdmin
-      isActive
-      location {
-        id
-        address
-        country
-      }
-      payoutMethods {
-        id
-        type
-        name
-        data
-        isSaved
-      }
-
-      # For Collectives, Funds, Events and Projects
-      ... on AccountWithHost {
-        isApproved
-        host {
-          id
-          # For Expenses across hosts
-          payoutMethods {
-            id
-            type
-            name
-            data
-            isSaved
-          }
-        }
-      }
-
-      # For Fiscal Hosts
-      ... on Organization {
-        host {
-          id
-        }
-      }
+      ...ExpensePayeeFields
     }
     payeeLocation {
       id
@@ -257,19 +358,12 @@ export const expensePageExpenseFieldsFragment = gql`
       name
       type
       imageUrl
+      legacyId
+      ...AccountHoverCardFields
     }
     host {
       id
-      name
-      legalName
-      slug
-      type
-      website
-      location {
-        id
-        address
-        country
-      }
+      ...ExpenseHostFields
     }
     requestedByAccount {
       id
@@ -277,6 +371,15 @@ export const expensePageExpenseFieldsFragment = gql`
       name
       type
       imageUrl
+      ...AccountHoverCardFields
+    }
+    approvedBy {
+      id
+      type
+      slug
+      name
+      imageUrl
+      ...AccountHoverCardFields
     }
     account {
       id
@@ -297,10 +400,6 @@ export const expensePageExpenseFieldsFragment = gql`
         id
         ...NavbarFields
         MULTI_CURRENCY_EXPENSES
-      }
-      expensesTags {
-        id
-        tag
       }
       location {
         id
@@ -333,6 +432,7 @@ export const expensePageExpenseFieldsFragment = gql`
         }
         host {
           id
+          slug
           legacyId
           ...ExpenseHostFields
           transferwise {
@@ -375,6 +475,7 @@ export const expensePageExpenseFieldsFragment = gql`
           imageUrl
         }
       }
+      ...AccountHoverCardFields
     }
     payoutMethod {
       id
@@ -391,6 +492,7 @@ export const expensePageExpenseFieldsFragment = gql`
       id
       canEdit
       canEditTags
+      canEditAccountingCategory
       canDelete
       canSeeInvoiceInfo
       canApprove
@@ -406,6 +508,8 @@ export const expensePageExpenseFieldsFragment = gql`
       canUsePrivateNote
       canHold
       canRelease
+      canDownloadTaxForm
+      canSeePayoutMethodPrivateDetails
       approve {
         allowed
         reason
@@ -417,15 +521,28 @@ export const expensePageExpenseFieldsFragment = gql`
       type
       createdAt
       data
+      account {
+        id
+        slug
+        ... on AccountWithHost {
+          host {
+            id
+            slug
+          }
+        }
+      }
       individual {
         id
         type
         slug
         name
         imageUrl
+        ...AccountHoverCardFields
       }
       transaction {
         id
+        kind
+        type
         amount {
           valueInCents
           currency
@@ -476,6 +593,16 @@ export const expensePageExpenseFieldsFragment = gql`
           id
           currency
           amount
+          feesPayer
+        }
+        relatedTransactions(kind: PAYMENT_PROCESSOR_FEE) {
+          id
+          type
+          kind
+          amount {
+            valueInCents
+            currency
+          }
         }
       }
     }
@@ -493,7 +620,11 @@ export const expensePageExpenseFieldsFragment = gql`
   }
 
   ${expenseHostFields}
-  ${collectiveNavbarFieldsFragment}
+  ${accountNavbarFieldsFragment}
+  ${accountingCategoryFields}
+  ${accountHoverCardFields}
+  ${expenseValuesByRoleFragment}
+  ${expensePayeeFieldsFragment}
 `;
 
 export const expensesListFieldsFragment = gql`
@@ -501,12 +632,21 @@ export const expensesListFieldsFragment = gql`
     id
     legacyId
     description
+    reference
     status
     createdAt
     tags
     amount
     comments {
       totalCount
+    }
+    accountingCategory {
+      id
+      ...AccountingCategoryFields
+    }
+    valuesByRole {
+      id
+      ...ExpenseValuesByRoleFragment
     }
     amountInAccountCurrency: amountV2(currencySource: ACCOUNT) {
       valueInCents
@@ -516,6 +656,8 @@ export const expensesListFieldsFragment = gql`
         value
         source
         isApproximate
+        fromCurrency
+        toCurrency
       }
     }
     currency
@@ -529,6 +671,7 @@ export const expensesListFieldsFragment = gql`
       createdAt
       currency
       type
+      imageUrl
       stats {
         id
         balanceWithBlockedFunds {
@@ -548,6 +691,7 @@ export const expensesListFieldsFragment = gql`
           slug
         }
       }
+      ...AccountHoverCardFields
     }
     permissions {
       id
@@ -561,6 +705,7 @@ export const expensesListFieldsFragment = gql`
       canMarkAsIncomplete
       canSeeInvoiceInfo
       canEditTags
+      canEditAccountingCategory
       canUnschedulePayment
       canHold
       canRelease
@@ -581,9 +726,8 @@ export const expensesListFieldsFragment = gql`
       type
       slug
       name
-      imageUrl(height: 80)
+      imageUrl
       isAdmin
-
       # For Collectives, Funds, Events and Projects
       ... on AccountWithHost {
         isApproved
@@ -598,20 +742,49 @@ export const expensesListFieldsFragment = gql`
           id
         }
       }
+      ...AccountHoverCardFields
     }
     createdByAccount {
       id
       type
       slug
       name
+      legacyId
+      ...AccountHoverCardFields
     }
   }
+  ${accountingCategoryFields}
+  ${expenseValuesByRoleFragment}
+  ${accountHoverCardFields}
 `;
 
 export const expensesListAdminFieldsFragment = gql`
   fragment ExpensesListAdminFieldsFragment on Expense {
     id
     onHold
+    account {
+      id
+    }
+    createdByAccount {
+      id
+      ... on Individual {
+        emails
+      }
+    }
+    approvedBy {
+      id
+      type
+      slug
+      name
+      imageUrl
+      ...AccountHoverCardFields
+    }
+    payee {
+      id
+      ... on Individual {
+        emails
+      }
+    }
     payoutMethod {
       id
       type
@@ -651,6 +824,20 @@ export const expensesListAdminFieldsFragment = gql`
       message
       scope
       details
+    }
+    lastComment: comments(limit: 1, orderBy: { field: CREATED_AT, direction: DESC }) {
+      totalCount
+      nodes {
+        id
+        createdAt
+        fromAccount {
+          id
+          type
+          slug
+          name
+          imageUrl
+        }
+      }
     }
   }
 `;

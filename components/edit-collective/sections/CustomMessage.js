@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
@@ -14,7 +14,7 @@ import RichTextEditor from '../../RichTextEditor';
 import StyledButton from '../../StyledButton';
 import StyledHr from '../../StyledHr';
 import { P, Span } from '../../Text';
-import { TOAST_TYPE, useToasts } from '../../ToastProvider';
+import { useToast } from '../../ui/useToast';
 
 const updateCustomMessageMutation = gql`
   mutation UpdateCustomMessage($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
@@ -33,16 +33,17 @@ const CustomMessage = ({ collective }) => {
   const [customMessage, setCustomMessage] = useState(thankYouMessage);
   const [isModified, setIsModified] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   const [updateCustomEmailMessage, { loading }] = useMutation(updateCustomMessageMutation, {
     context: API_V2_CONTEXT,
     onError: e => {
-      addToast({
-        type: TOAST_TYPE.ERROR,
+      toast({
+        variant: 'error',
         message: (
           <FormattedMessage
             defaultMessage="Error updating custom email message: {error}"
+            id="DVdz90"
             values={{
               error: e.message,
             }}
@@ -51,9 +52,9 @@ const CustomMessage = ({ collective }) => {
       });
     },
     onCompleted: () => {
-      addToast({
-        type: TOAST_TYPE.SUCCESS,
-        message: <FormattedMessage defaultMessage="Email message updated" />,
+      toast({
+        variant: 'success',
+        message: <FormattedMessage defaultMessage="Email message updated" id="PoJg0R" />,
       });
     },
   });
@@ -77,13 +78,16 @@ const CustomMessage = ({ collective }) => {
   return (
     <Container>
       <P fontSize="14px" fontWeight={400} lineHeight="20ppx">
-        <FormattedMessage defaultMessage="Add a custom message to be included in the email sent to financial contributors of your Collective, Project, or Event." />
+        <FormattedMessage
+          defaultMessage="Add a custom message to be included in the email sent to financial contributors of your Collective, Project, or Event."
+          id="jRacqf"
+        />
       </P>
       <StyledHr mt="32px" mb="34px" borderStyle="dotted" />
       <Container maxWidth="1000px">
         <Flex justifyContent="space-between" flexDirection={['column', 'row']}>
           <Box mb={2} fontSize="18px" fontWeight={700} lineHeight="26px">
-            <FormattedMessage defaultMessage="Custom Message" />
+            <FormattedMessage defaultMessage="Custom Message" id="+jDZdn" />
           </Box>
           <StyledButton
             buttonStyle="secondary"
@@ -97,7 +101,7 @@ const CustomMessage = ({ collective }) => {
             onClick={() => setShowPreview(true)}
           >
             <Span fontSize="13px" fontWeight={500} lineHeight="16px">
-              <FormattedMessage defaultMessage="Preview" />
+              <FormattedMessage defaultMessage="Preview" id="TJo5E6" />
             </Span>
           </StyledButton>
         </Flex>
@@ -115,13 +119,19 @@ const CustomMessage = ({ collective }) => {
       {[CollectiveType.EVENT, CollectiveType.PROJECT].includes(collective.type) ? (
         <MessageBox type="info" mt="24px">
           <P fontSize="13px" fontWeight={400} lineHeight="20px">
-            <FormattedMessage defaultMessage="The above text will override the customized message set by the parent Collective of this Event or Project." />
+            <FormattedMessage
+              defaultMessage="The above text will override the customized message set by the parent Collective of this Event or Project."
+              id="l/qt37"
+            />
           </P>
         </MessageBox>
       ) : (
         <MessageBox type="info" mt="24px">
           <P fontSize="13px" fontWeight={400} lineHeight="20px">
-            <FormattedMessage defaultMessage="The above text will be considered as the default customized email response for all contributions to your Collective, and all of your Events and Projects. You also have the ability to customize the messages for Events & Projects from within their individual Setting's Menus." />
+            <FormattedMessage
+              defaultMessage="The above text will be considered as the default customized email response for all contributions to your Collective, and all of your Events and Projects. You also have the ability to customize the messages for Events & Projects from within their individual Setting's Menus."
+              id="4L4QX2"
+            />
           </P>
         </MessageBox>
       )}
@@ -138,9 +148,12 @@ const CustomMessage = ({ collective }) => {
       </Flex>
       {showPreview && (
         <PreviewModal
-          heading={<FormattedMessage defaultMessage="Preview Notification" />}
+          heading={<FormattedMessage defaultMessage="Preview Notification" id="XvKF/A" />}
           subheading={
-            <FormattedMessage defaultMessage="This is the preview of the email template which your financial contributor will receive." />
+            <FormattedMessage
+              defaultMessage="This is the preview of the email template which your financial contributor will receive."
+              id="cka+9I"
+            />
           }
           onClose={() => setShowPreview(false)}
           previewImage="/static/images/custom-email-preview.png"

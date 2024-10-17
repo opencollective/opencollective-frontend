@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, NetworkStatus, useQuery } from '@apollo/client';
+import { NetworkStatus, useQuery } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { getOauthAppSettingsRoute } from '../../lib/url-helpers';
 
 import Avatar from '../Avatar';
@@ -22,7 +22,7 @@ import StyledLink from '../StyledLink';
 import { H3, P } from '../Text';
 
 const applicationsQuery = gql`
-  query ApplicationsQuery($slug: String!, $limit: Int, $offset: Int) {
+  query Applications($slug: String!, $limit: Int, $offset: Int) {
     account(slug: $slug) {
       id
       name
@@ -53,11 +53,11 @@ const OAuthApplicationsList = ({ account, onApplicationCreated, offset = 0 }) =>
     <div data-cy="oauth-apps-list">
       <Flex width="100%" alignItems="center">
         <H3 fontSize="18px" fontWeight="700">
-          <FormattedMessage defaultMessage="OAuth Apps" />
+          <FormattedMessage defaultMessage="OAuth Apps" id="cGHrNj" />
         </H3>
         <StyledHr mx={2} flex="1" borderColor="black.400" />
         <StyledButton data-cy="create-app-btn" buttonSize="tiny" onClick={() => setShowCreateApplicationModal(true)}>
-          + <FormattedMessage defaultMessage="Create OAuth app" />
+          + <FormattedMessage defaultMessage="Create OAuth app" id="m6BfW0" />
         </StyledButton>
         {showCreateApplicationModal && (
           <CreateOauthApplicationModal
@@ -68,9 +68,13 @@ const OAuthApplicationsList = ({ account, onApplicationCreated, offset = 0 }) =>
         )}
       </Flex>
       <P my={2} color="black.700">
-        <FormattedMessage defaultMessage="You can register new apps that you developed using Open Collective's API." />{' '}
+        <FormattedMessage
+          defaultMessage="You can register new apps that you developed using Open Collective's API."
+          id="p4WWnt"
+        />{' '}
         <FormattedMessage
           defaultMessage="For more information about OAuth applications, check <link>our documentation</link>."
+          id="dG3sDf"
           values={{
             link: getI18nLink({
               href: 'https://docs.opencollective.com/help/developers/oauth',
@@ -85,15 +89,16 @@ const OAuthApplicationsList = ({ account, onApplicationCreated, offset = 0 }) =>
           <StyledCard p="24px">
             <Flex>
               <Flex flex="0 0 64px" height="64px" justifyContent="center" alignItems="center">
-                <Image src="/static/icons/apps.png" width="52px" height="52px" alt="" />
+                <Image src="/static/icons/apps.png" width={52} height={52} alt="" />
               </Flex>
               <Flex flexDirection="column" ml={3}>
                 <P fontSize="14px" fontWeight="700" lineHeight="20px" mb="12px">
-                  <FormattedMessage defaultMessage="You don't have any app yet" />
+                  <FormattedMessage defaultMessage="You don't have any app yet" id="v8bmup" />
                 </P>
                 <P fontSize="12px" lineHeight="18px" color="black.700">
                   <FormattedMessage
                     defaultMessage="You can create apps that integrate with the Open Collective platform. <CreateAppLink>Create an app</CreateAppLink> using the Open Collective's API."
+                    id="1lIftz"
                     values={{
                       CreateAppLink: children => (
                         <StyledLink

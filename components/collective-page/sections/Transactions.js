@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 
 import { Box } from '../../Grid';
 import Link from '../../Link';
@@ -85,7 +85,7 @@ const SectionTransactions = props => {
   }, [filter, props.collective.slug, refetch]);
 
   const { intl, collective } = props;
-  const collectiveHasNoTransactions = !loading && data?.transactions?.totalCount === 0 && filter === FILTERS.ALL;
+  const collectiveHasNoTransactions = !loading && data?.transactions?.nodes.length === 0 && filter === FILTERS.ALL;
 
   return (
     <Box pb={4}>
@@ -130,7 +130,7 @@ const SectionTransactions = props => {
               onMutationSuccess={() => refetch()}
             />
           )}
-          {data?.transactions.totalCount === 0 && (
+          {data?.transactions?.nodes.length === 0 && (
             <MessageBox type="info">
               <FormattedMessage
                 id="TransactionsList.Empty"

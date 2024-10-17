@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Markup } from 'interweave';
 import { size } from 'lodash';
 import { defineMessages, FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
@@ -49,13 +50,9 @@ const ConversationListItem = ({ conversation, collectiveSlug }) => {
             }}
           />
         </P>
-        <P
-          color="black.700"
-          mt={2}
-          fontSize="13px"
-          dangerouslySetInnerHTML={{ __html: summary }}
-          data-cy="conversation-preview"
-        />
+        <P color="black.700" mt={2} fontSize="13px" data-cy="conversation-preview">
+          <Markup noWrap content={summary} />
+        </P>
         {(hasFollowers || hasComments) && (
           <Flex mt={3} alignItems="center">
             {hasFollowers && (

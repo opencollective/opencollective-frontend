@@ -29,10 +29,14 @@ describe('host dashboard', () => {
       cy.wait(300);
       cy.get('button[type="submit"]').click();
       cy.contains('Cavies United has been created!');
-      cy.login({ redirect: '/brusselstogetherasbl/admin' });
-      cy.get('[data-cy="menu-item-pending-applications"]').click();
+      cy.login({ redirect: '/dashboard/brusselstogetherasbl/host-applications' });
+      cy.get('[data-cy="menu-item-Collectives"]').click();
+      cy.get('[data-cy="menu-item-host-applications"]').click();
+      cy.contains('Pending').click();
+      cy.get(`[data-cy="${collectiveSlug}-table-actions"]`).click();
+      cy.get(`[data-cy="${collectiveSlug}-view-details"]`).click();
       cy.get(`[data-cy="${collectiveSlug}-approve"]`).click();
-      cy.contains(`[data-cy="host-application"]`, 'Approved');
+      cy.contains(`[data-cy="host-application-header-${collectiveSlug}"]`, 'Approved');
     });
   });
 
@@ -50,18 +54,23 @@ describe('host dashboard', () => {
       cy.getByDataCy('checkbox-tos').click();
       cy.get('button[type="submit"]').click();
       cy.contains('Cavies United has been created!');
-      cy.login({ redirect: '/brusselstogetherasbl/admin' });
-      cy.get('[data-cy="menu-item-pending-applications"]').click();
+      cy.login({ redirect: '/dashboard/brusselstogetherasbl/hosted-collectives' });
+      cy.get('[data-cy="menu-item-Collectives"]').click();
+      cy.get('[data-cy="menu-item-host-applications"]').click();
+      cy.contains('Pending').click();
+      cy.get(`[data-cy="${collectiveSlug}-table-actions"]`).click();
+      cy.get(`[data-cy="${collectiveSlug}-view-details"]`).click();
       cy.get(`[data-cy="${collectiveSlug}-approve"]`).click();
-      cy.contains(`[data-cy="host-application"]`, 'Approved');
+      cy.contains(`[data-cy="host-application-header-${collectiveSlug}"]`, 'Approved');
+      cy.get(`[data-cy="close-drawer"]`).click();
       cy.getByDataCy('menu-item-hosted-collectives').click();
-      cy.getByDataCy(`${collectiveSlug}-collective-card`).within(() => {
-        cy.get('button[title="More options"]').click();
-        cy.contains('button', 'Un-host').click();
+      cy.getByDataCy(`collective-${collectiveSlug}`).within(() => {
+        cy.getByDataCy('more-actions-btn').click();
       });
+      cy.getByDataCy('actions-unhost').click();
       cy.get('textarea#unhost-account-message').type('Un-hosting this collective');
       cy.contains('button', 'Un-host Collective').click();
-      cy.getByDataCy(`${collectiveSlug}-collective-card`).should('not.exist');
+      cy.getByDataCy(`collective-${collectiveSlug}`).should('not.exist');
     });
 
     it('cannot unhost collective with balance', () => {
@@ -77,27 +86,30 @@ describe('host dashboard', () => {
       cy.getByDataCy('checkbox-tos').click();
       cy.get('button[type="submit"]').click();
       cy.contains('Cavies United has been created!');
-      cy.login({ redirect: '/brusselstogetherasbl/admin' });
-      cy.get('[data-cy="menu-item-pending-applications"]').click();
+      cy.login({ redirect: '/dashboard/brusselstogetherasbl/hosted-collectives' });
+      cy.get('[data-cy="menu-item-Collectives"]').click();
+      cy.get('[data-cy="menu-item-host-applications"]').click();
+      cy.contains('Pending').click();
+      cy.get(`[data-cy="${collectiveSlug}-table-actions"]`).click();
+      cy.get(`[data-cy="${collectiveSlug}-view-details"]`).click();
       cy.get(`[data-cy="${collectiveSlug}-approve"]`).click();
-      cy.contains(`[data-cy="host-application"]`, 'Approved');
+      cy.contains(`[data-cy="host-application-header-${collectiveSlug}"]`, 'Approved');
+      cy.get('[data-cy="close-drawer"]').click();
       cy.getByDataCy('menu-item-hosted-collectives').click();
-      cy.getByDataCy(`${collectiveSlug}-collective-card`).within(() => {
-        cy.get('[data-cy="hosted-collective-add-funds-btn"]').click();
+      cy.getByDataCy(`collective-${collectiveSlug}`).within(() => {
+        cy.getByDataCy('more-actions-btn').click();
       });
-
+      cy.getByDataCy('actions-add-funds').click();
       cy.get('[data-cy="add-funds-amount"]').type('20');
       cy.get('[data-cy="add-funds-description"]').type('cypress test - add funds');
       cy.get('[data-cy="add-funds-source"]').type(collectiveSlug);
-      cy.contains(`@${collectiveSlug}`).click();
+      cy.contains(`@brusselstogetherasbl`).click();
       cy.get('[data-cy="add-funds-submit-btn"]').click();
-      cy.contains('button', 'Finish').click();
-      cy.contains('button', 'Finish').should('not.exist');
 
-      cy.getByDataCy(`${collectiveSlug}-collective-card`).within(() => {
-        cy.get('button[title="More options"]').click();
-        cy.contains('button', 'Un-host').click();
+      cy.getByDataCy(`collective-${collectiveSlug}`).within(() => {
+        cy.getByDataCy('more-actions-btn').click();
       });
+      cy.getByDataCy('actions-unhost').click();
 
       cy.contains("The Collective's balance must be zero to un-host").should('exist');
       cy.contains('button', 'Un-host Collective').should('be.disabled');
@@ -105,22 +117,10 @@ describe('host dashboard', () => {
     });
   });
 
-  describe('Orders', () => {
-    it('edit order and mark as paid', () => {
-      cy.login({ redirect: '/brusselstogetherasbl/admin/orders' });
-      cy.get('[data-cy="MARK_AS_PAID-button"]:first').click();
-      cy.get('[data-cy="amount-received"]').type('10.23');
-      cy.get('[data-cy="platform-tip"]').type('1.20');
-      cy.getByDataCy('order-confirmation-modal-submit').click();
-      cy.contains('span', '9.03');
-      cy.contains('[data-cy="order-status-msg"]:first', 'Paid');
-    });
-  });
-
   describe('Pending `Contributions', () => {
     it('Create new pending contribution, edit it and mark it as paid', () => {
       // Create contribution
-      cy.login({ redirect: '/brusselstogetherasbl/admin/pending-contributions' });
+      cy.login({ redirect: '/dashboard/brusselstogetherasbl/expected-funds' });
       cy.get('[data-cy="create-pending-contribution"]:first').click();
       cy.get('[data-cy="create-pending-contribution-to"]:first').type('Veganizer');
       cy.contains('[data-cy=select-option]', 'Veganizer BXL').click();
@@ -137,19 +137,23 @@ describe('host dashboard', () => {
       const description = `Generous donation ${randStr()}`;
       cy.getByDataCy('create-pending-contribution-description').type(description);
       cy.get('[data-cy="create-pending-contribution-submit-btn"]:first').click();
-      cy.contains('[data-cy="order-PENDING"]:first', description).as('createdContribution');
+      cy.get('tbody tr').first().as('createdContribution');
       cy.get('@createdContribution').should('contain', 'Pending');
-      cy.get('@createdContribution').should('contain', 'for Veganizer BXL from Xavier');
       cy.get('@createdContribution').should('contain', '€500.00');
 
       // Go to contribution page
-      cy.get('@createdContribution').find('[data-cy=contribution-title]').click();
-      cy.getByDataCy('contribution-page-content'); // Wait for page to be loaded
+      cy.get('tbody tr:first td button:last').first().click();
+      cy.contains('Open details').click();
+      cy.contains(description).should('exist');
+      cy.contains('More actions').click();
 
       // Mark as expired
       cy.getByDataCy('MARK_AS_EXPIRED-button').click();
-      cy.getByDataCy('confirmation-modal-continue').click();
-      cy.contains('[data-cy=order-status-msg]', 'Expired');
+      cy.contains('Mark as expired').click();
+      cy.checkToast({ variant: 'success', message: 'The contribution has been marked as expired' });
+      cy.contains('Expired').should('exist');
+
+      cy.contains('More actions').click();
 
       // Mark as paid
       cy.getByDataCy('MARK_AS_PAID-button').click();
@@ -157,24 +161,16 @@ describe('host dashboard', () => {
       cy.getByDataCy('platform-tip').clear().type('10');
       cy.getByDataCy('host-fee-percent').clear().type('9');
       cy.getByDataCy('order-confirmation-modal-submit').click();
-      cy.contains('[data-cy="order-status-msg"]', 'Paid');
+      cy.contains('Paid').should('exist');
+
+      cy.contains('View transactions').click();
 
       // Check transactions
-      cy.get('[data-cy=transaction-details-wrapper]:nth-child(1)')
-        .should('contain', description)
-        .should('contain', '€490.00')
-        .should('contain', 'Received by Veganizer BXL')
-        .should('contain', '-€4.00 EUR (Payment Processor Fee)');
+      cy.contains('Contribution').should('exist');
+      cy.contains('€486.00').should('exist');
 
-      cy.get('[data-cy=transaction-details-wrapper]:nth-child(2)')
-        .should('contain', 'Host Fee')
-        .should('contain', '-€44.10 EUR')
-        .should('contain', 'Paid by Veganizer BXL');
-
-      cy.get('[data-cy=transaction-details-wrapper]:nth-child(3)')
-        .should('contain', 'Financial contribution to Open Collective')
-        .should('contain', '-€10.00 EUR')
-        .should('contain', 'Paid by Xavier Damma');
+      cy.contains('Host fee').should('exist');
+      cy.contains('€44.10').should('exist');
     });
   });
 
@@ -197,8 +193,7 @@ describe('host dashboard', () => {
       cy.contains('More actions').click();
       cy.contains('Approve').click();
       cy.getByDataCy('expense-status-msg').contains('Approved');
-
-      cy.visit('/brusselstogetherasbl/admin/expenses?status=ALL');
+      cy.visit('/dashboard/brusselstogetherasbl/host-expenses?sort[field]=CREATED_AT&sort[direction]=DESC&status=ALL');
       cy.get('@expense').then(expense => {
         cy.getByDataCy(`expense-container-${expense.legacyId}`).as('currentExpense');
       });
@@ -219,21 +214,16 @@ describe('host dashboard', () => {
       cy.contains('Approve').click();
       cy.getByDataCy('expense-status-msg').contains('Approved');
 
-      cy.visit('/brusselstogetherasbl/admin/expenses?status=ALL');
+      cy.visit('/dashboard/brusselstogetherasbl/host-expenses?sort[field]=CREATED_AT&sort[direction]=DESC&status=ALL');
       cy.get('@expense').then(expense => {
         cy.getByDataCy(`expense-container-${expense.legacyId}`).as('currentExpense');
       });
 
-      // Security Check
       cy.get('@currentExpense').find('[data-cy="pay-button"]').click();
-      cy.getByDataCy('security-check-modal').as('securityCheckModal');
-      cy.get('@securityCheckModal').find('h1').contains('Are you sure you want to pay?');
-      cy.get('@securityCheckModal').find('[data-cy="pay-button"]').click();
-
       // Pay
       cy.getByDataCy('pay-expense-modal').as('payExpenseModal');
       cy.get('@payExpenseModal').find('[data-cy="pay-type-MANUAL"]').click();
-      cy.get('@payExpenseModal').find('[data-cy="total-amount-paid"]').type('10.23');
+      cy.get('@payExpenseModal').find('[data-cy="expense-amount-paid"]').type('10.00');
       cy.get('@payExpenseModal').find('[data-cy="mark-as-paid-button"]').click();
       cy.get('@currentExpense').find('[data-cy="admin-expense-status-msg"]').contains('Paid');
 
@@ -253,14 +243,17 @@ describe('host dashboard', () => {
 
   describe('Add funds modal', () => {
     it('Cannot submit incomplete form', () => {
-      cy.login({ redirect: '/brusselstogetherasbl/admin/hosted-collectives' });
-      cy.get('[data-cy="hosted-collective-add-funds-btn"]').first().click();
-      cy.getByDataCy('add-funds-submit-btn').click();
+      cy.login({ redirect: '/dashboard/brusselstogetherasbl/hosted-collectives' });
+      cy.getByDataCy(`collective-brusselstogether`).within(() => {
+        cy.getByDataCy('more-actions-btn').click();
+      });
+      cy.getByDataCy('actions-add-funds').click();
+      cy.get('[data-cy="add-funds-submit-btn"]').click();
       cy.contains('[data-cy="add-funds-form"]', 'This field is required');
     });
 
     it.skip('Can add funds and platform tip as collective host', () => {
-      cy.login({ redirect: '/brusselstogetherasbl/admin/hosted-collectives' });
+      cy.login({ redirect: '/dashboard/brusselstogetherasbl/hosted-collectives' });
       cy.get('[data-cy="hosted-collective-add-funds-btn"]').first().click();
       cy.wait(300);
       cy.get('[data-cy="add-funds-amount"]').type('20');

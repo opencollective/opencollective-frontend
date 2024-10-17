@@ -1,28 +1,30 @@
 import React from 'react';
-import { gql } from '@apollo/client';
-import { DataValue, graphql } from '@apollo/client/react/hoc';
+import type { DataValue } from '@apollo/client/react/hoc';
+import { graphql } from '@apollo/client/react/hoc';
 import { has, omit, omitBy } from 'lodash';
 import memoizeOne from 'memoize-one';
-import { NextRouter, withRouter } from 'next/router';
-import { defineMessages, FormattedMessage, injectIntl, IntlShape } from 'react-intl';
+import type { NextRouter } from 'next/router';
+import { withRouter } from 'next/router';
+import type { IntlShape } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { getCollectivePageMetadata, getSuggestedTags, isIndividualAccount } from '../lib/collective.lib';
-import expenseStatus from '../lib/constants/expense-status';
+import { getCollectivePageMetadata, isIndividualAccount } from '../lib/collective';
 import expenseTypes from '../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../lib/constants/payout-method';
 import { parseDateInterval } from '../lib/date-utils';
 import { generateNotFoundError } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
-import { SubmittedExpensesPageQuery, SubmittedExpensesPageQueryVariables } from '../lib/graphql/types/v2/graphql';
-import LoggedInUser from '../lib/LoggedInUser';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
+import type { SubmittedExpensesPageQuery, SubmittedExpensesPageQueryVariables } from '../lib/graphql/types/v2/graphql';
+import { ExpenseStatus } from '../lib/graphql/types/v2/graphql';
+import type LoggedInUser from '../lib/LoggedInUser';
 import { getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
 import { parseAmountRange } from '../components/budget/filters/AmountFilter';
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
+import { accountNavbarFieldsFragment } from '../components/collective-navbar/fragments';
 import { Dimensions } from '../components/collective-page/_constants';
-import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
 import ExpensesFilters from '../components/expenses/ExpensesFilters';
@@ -51,7 +53,7 @@ const messages = defineMessages({
 const SearchFormContainer = styled(Box)`
   width: 100%;
   max-width: 278px;
-  min-width: 10rem;
+  min-width: 6.25rem;
 `;
 
 const EXPENSES_PER_PAGE = 10;
@@ -73,7 +75,7 @@ class SubmittedExpensesPage extends React.Component<SubmittedExpensesPageProps> 
         offset: parseInt(query.offset) || undefined,
         limit: parseInt(query.limit) || undefined,
         type: has(expenseTypes, query.type) ? query.type : undefined,
-        status: has(expenseStatus, query.status) || query.status === 'READY_TO_PAY' ? query.status : undefined,
+        status: has(ExpenseStatus, query.status) || query.status === 'READY_TO_PAY' ? query.status : undefined,
         payout: has(PayoutMethodType, query.payout) ? query.payout : undefined,
         period: query.period,
         amount: query.amount,
@@ -145,8 +147,6 @@ class SubmittedExpensesPage extends React.Component<SubmittedExpensesPageProps> 
     }
   };
 
-  getSuggestedTags = memoizeOne(getSuggestedTags);
-
   render() {
     const { collectiveSlug, data, query } = this.props;
     const searchTerm = Array.isArray(query.searchTerm) ? query.searchTerm[0] : query.searchTerm;
@@ -177,10 +177,10 @@ class SubmittedExpensesPage extends React.Component<SubmittedExpensesPageProps> 
               <Box flex="1 1 500px" minWidth={300} maxWidth={'100%'} mr={0} mb={5}>
                 <Flex>
                   <H1 fontSize="32px" lineHeight="40px" py={2} fontWeight="normal">
-                    <FormattedMessage defaultMessage="Submitted Expenses" />
+                    <FormattedMessage defaultMessage="Submitted Expenses" id="NpGb+x" />
                   </H1>
                   <Box mx="auto" />
-                  <SearchFormContainer p={2}>
+                  <SearchFormContainer p={2} width="276px">
                     <SearchBar
                       defaultValue={searchTerm}
                       onSubmit={searchTerm => this.handleSearch(searchTerm, data.account)}
@@ -203,7 +203,7 @@ class SubmittedExpensesPage extends React.Component<SubmittedExpensesPageProps> 
                   )}
                 </Box>
                 <Box mt={['16px', '46px']}>
-                  {!data?.loading && !data.expenses?.nodes.length ? (
+                  {!data.loading && !data.expenses?.nodes.length ? (
                     <MessageBox type="info" withIcon data-cy="zero-expense-message">
                       {hasFilters ? (
                         <FormattedMessage
@@ -224,11 +224,10 @@ class SubmittedExpensesPage extends React.Component<SubmittedExpensesPageProps> 
                   ) : (
                     <React.Fragment>
                       <ExpensesList
-                        isLoading={Boolean(data?.loading)}
+                        isLoading={Boolean(data.loading)}
                         collective={data.account}
                         expenses={data.expenses?.nodes}
                         nbPlaceholders={data.variables.limit}
-                        suggestedTags={this.getSuggestedTags(data.account)}
                         isInverted
                         view="submitter"
                         expenseFieldForTotalAmount="amountInCreatedByAccountCurrency"
@@ -261,7 +260,7 @@ const submittedExpensesPageQuery = gql`
     $offset: Int!
     $type: ExpenseType
     $tags: [String]
-    $status: ExpenseStatusFilter
+    $status: [ExpenseStatusFilter]
     $minAmount: Int
     $maxAmount: Int
     $payoutMethodType: PayoutMethodType
@@ -332,13 +331,13 @@ const submittedExpensesPageQuery = gql`
   }
 
   ${expensesListFieldsFragment}
-  ${collectiveNavbarFieldsFragment}
+  ${accountNavbarFieldsFragment}
   ${expenseHostFields}
 `;
 
 const addExpensesPageData = graphql<SubmittedExpensesPageProps>(submittedExpensesPageQuery, {
   options: props => {
-    const amountRange = parseAmountRange(props.query.amount);
+    const amountRange = parseAmountRange(props.query.amount as string);
     const { from: dateFrom, to: dateTo } = parseDateInterval(props.query.period);
     const orderBy = props.query.orderBy && parseChronologicalOrderInput(props.query.orderBy);
     return {
@@ -362,4 +361,6 @@ const addExpensesPageData = graphql<SubmittedExpensesPageProps>(submittedExpense
   },
 });
 
+// next.js export
+// ts-unused-exports:disable-next-line
 export default injectIntl(addExpensesPageData(withUser(withRouter(SubmittedExpensesPage))));

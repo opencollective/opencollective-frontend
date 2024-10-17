@@ -1,5 +1,7 @@
 import { pick } from 'lodash';
 
+// next.js export
+// ts-unused-exports:disable-next-line
 export default async function handle(req, res) {
   const graphqlUrl = `${process.env.API_URL}/graphql/v2?api_key=${process.env.API_KEY}`;
 

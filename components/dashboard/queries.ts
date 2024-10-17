@@ -1,20 +1,48 @@
-import { gql } from '@apollo/client';
+import { gql } from '../../lib/graphql/helpers';
 
-import { collectiveNavbarFieldsFragment } from '../collective-page/graphql/fragments';
+import { accountNavbarFieldsFragment } from '../collective-navbar/fragments';
 
 export const adminPanelQuery = gql`
-  query AdminPanel($slug: String!) {
+  query Dashboard($slug: String!) {
     account(slug: $slug) {
       id
       legacyId
+      createdAt
       slug
       name
       isHost
       type
       settings
       isArchived
+      isActive
       isIncognito
       imageUrl(height: 256)
+      canHaveChangelogUpdates
+      duplicatedAccounts {
+        totalCount
+      }
+      pendingExpenses: expenses(status: PENDING, direction: RECEIVED, includeChildrenExpenses: true, limit: 0) {
+        totalCount
+      }
+      pausedIncomingContributions: orders(filter: INCOMING, status: PAUSED, includeIncognito: true) {
+        totalCount
+      }
+      pausedOutgoingContributions: orders(filter: OUTGOING, status: PAUSED, includeIncognito: true) {
+        totalCount
+      }
+      ... on AccountWithContributions {
+        canStartResumeContributionsProcess
+        hasResumeContributionsProcessStarted
+      }
+      childrenAccounts {
+        totalCount
+        nodes {
+          id
+          slug
+          name
+          type
+        }
+      }
       features {
         id
         ...NavbarFields
@@ -23,25 +51,37 @@ export const adminPanelQuery = gql`
         EMIT_GIFT_CARDS
       }
       policies {
+        id
         REQUIRE_2FA_FOR_ADMINS
+      }
+      ... on Organization {
+        host {
+          id
+          requiredLegalDocuments
+        }
       }
       ... on AccountWithParent {
         parent {
           id
           slug
           policies {
+            id
             REQUIRE_2FA_FOR_ADMINS
           }
         }
       }
       ... on AccountWithHost {
         hostFeePercent
+        isApproved
         host {
           id
+          requiredLegalDocuments
+          legacyId
           slug
           name
           settings
           policies {
+            id
             EXPENSE_AUTHOR_CANNOT_APPROVE {
               enabled
               amountInCents
@@ -56,10 +96,7 @@ export const adminPanelQuery = gql`
           }
         }
       }
-      ... on AccountWithHost {
-        isApproved
-      }
     }
   }
-  ${collectiveNavbarFieldsFragment}
+  ${accountNavbarFieldsFragment}
 `;

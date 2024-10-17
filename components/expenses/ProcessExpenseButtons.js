@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Ban as UnapproveIcon } from '@styled-icons/fa-solid/Ban';
 import { Check as ApproveIcon } from '@styled-icons/fa-solid/Check';
@@ -10,15 +10,21 @@ import styled from 'styled-components';
 
 import PERMISSION_CODES, { ReasonMessage } from '../../lib/constants/permissions';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { collectiveAdminsMustConfirmAccountingCategory } from './lib/accounting-categories';
 
-import { getScheduledExpensesQueryVariables, scheduledExpensesQuery } from '../host-dashboard/ScheduledExpensesBanner';
+import {
+  getScheduledExpensesQueryVariables,
+  scheduledExpensesQuery,
+} from '../dashboard/sections/expenses/ScheduledExpensesBanner';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledTooltip from '../StyledTooltip';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 import { expensePageExpenseFieldsFragment } from './graphql/fragments';
+import ApproveExpenseModal from './ApproveExpenseModal';
 import ConfirmProcessExpenseModal from './ConfirmProcessExpenseModal';
 import DeleteExpenseButton from './DeleteExpenseButton';
 import MarkExpenseAsUnpaidButton from './MarkExpenseAsUnpaidButton';
@@ -66,7 +72,7 @@ export const hasProcessButtons = permissions => {
 const messages = defineMessages({
   markAsSpamWarning: {
     id: 'Expense.MarkAsSpamWarning',
-    defaultMessage: 'This will prevent the submitter account to post new expenses. Are you sure?',
+    defaultMessage: 'This will prevent the submitter account to post new expenses.',
   },
 });
 
@@ -76,10 +82,10 @@ const getErrorContent = (intl, error, host) => {
   if (message) {
     if (message.startsWith('Insufficient Paypal balance')) {
       return {
-        title: intl.formatMessage({ defaultMessage: 'Insufficient Paypal balance' }),
+        title: intl.formatMessage({ defaultMessage: 'Insufficient Paypal balance', id: 'BmZrOu' }),
         message: (
           <React.Fragment>
-            <Link href={`/${host.slug}/admin`}>
+            <Link href={`/dashboard/${host.slug}/host-expenses`}>
               <FormattedMessage
                 id="PayExpenseModal.RefillBalanceError"
                 defaultMessage="Refill your balance from the Host dashboard"
@@ -129,21 +135,25 @@ const ProcessExpenseButtons = ({
   collective,
   host,
   permissions,
-  buttonProps,
+  buttonProps = DEFAULT_PROCESS_EXPENSE_BTN_PROPS,
   onSuccess,
   onModalToggle,
   onDelete,
   isMoreActions,
-  displaySecurityChecks,
-  isViewingExpenseInHostContext,
+  displaySecurityChecks = true,
+  isViewingExpenseInHostContext = false,
+  disabled,
+  enableKeyboardShortcuts,
 }) => {
   const [confirmProcessExpenseAction, setConfirmProcessExpenseAction] = React.useState();
+  const [showApproveExpenseModal, setShowApproveExpenseModal] = React.useState(false);
   const [selectedAction, setSelectedAction] = React.useState(null);
   const onUpdate = (cache, response) => onSuccess?.(response.data.processExpense, cache, selectedAction);
   const mutationOptions = { context: API_V2_CONTEXT, update: onUpdate };
   const [processExpense, { loading, error }] = useMutation(processExpenseMutation, mutationOptions);
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
+  const { LoggedInUser } = useLoggedInUser();
 
   React.useEffect(() => {
     onModalToggle?.(!!confirmProcessExpenseAction);
@@ -172,8 +182,7 @@ const ProcessExpenseButtons = ({
       await processExpense({ variables, refetchQueries });
       return true;
     } catch (e) {
-      // Display a toast with light variant since we're in a modal
-      addToast({ type: TOAST_TYPE.ERROR, variant: 'light', ...getErrorContent(intl, e, host) });
+      toast({ variant: 'error', ...getErrorContent(intl, e, host) });
       return false;
     }
   };
@@ -182,7 +191,7 @@ const ProcessExpenseButtons = ({
     const isSelectedAction = selectedAction === action;
     return {
       ...buttonProps,
-      disabled: loading && !isSelectedAction,
+      disabled: disabled || (loading && !isSelectedAction),
       loading: loading && isSelectedAction,
     };
   };
@@ -193,7 +202,13 @@ const ProcessExpenseButtons = ({
         (permissions.approve.allowed || permissions.approve.reason === PERMISSION_CODES.AUTHOR_CANNOT_APPROVE) && (
           <PermissionButton
             {...getButtonProps('APPROVE')}
-            onClick={() => triggerAction('APPROVE')}
+            onClick={() => {
+              if (collectiveAdminsMustConfirmAccountingCategory(collective, host)) {
+                setShowApproveExpenseModal(true);
+              } else {
+                triggerAction('APPROVE');
+              }
+            }}
             buttonStyle="secondary"
             data-cy="approve-button"
             icon={<ApproveIcon size={12} />}
@@ -213,6 +228,7 @@ const ProcessExpenseButtons = ({
           collective={collective}
           host={host}
           error={error}
+          enableKeyboardShortcuts={enableKeyboardShortcuts}
         />
       )}
       {permissions.canReject && !isViewingExpenseInHostContext && (
@@ -228,12 +244,26 @@ const ProcessExpenseButtons = ({
           </ButtonLabel>
         </StyledButton>
       )}
-      {permissions.canMarkAsSpam && (
+      {permissions.canMarkAsSpam && !isMoreActions && (
         <StyledButton
           {...getButtonProps('MARK_AS_SPAM')}
           buttonStyle="dangerSecondary"
           data-cy="spam-button"
           onClick={() => {
+            const isSubmitter = expense.createdByAccount.legacyId === LoggedInUser?.CollectiveId;
+
+            if (isSubmitter) {
+              toast({
+                variant: 'error',
+                message: intl.formatMessage({
+                  id: 'expense.spam.notAllowed',
+                  defaultMessage: "You can't mark your own expenses as spam",
+                }),
+              });
+
+              return;
+            }
+
             if (confirm(intl.formatMessage(messages.markAsSpamWarning))) {
               triggerAction('MARK_AS_SPAM');
             }
@@ -266,6 +296,7 @@ const ProcessExpenseButtons = ({
           onClick={() => setConfirmProcessExpenseAction('REQUEST_RE_APPROVAL')}
           buttonStyle="dangerSecondary"
           data-cy="request-re-approval-button"
+          className="text-nowrap"
         >
           <UnapproveIcon size={12} />
           <ButtonLabel>
@@ -301,8 +332,13 @@ const ProcessExpenseButtons = ({
           onDelete={onDelete}
         />
       )}
-      {displaySecurityChecks && expense?.securityChecks?.length && (
-        <SecurityChecksButton {...buttonProps} minWidth={0} expense={expense} />
+      {displaySecurityChecks && expense?.securityChecks?.length > 0 && (
+        <SecurityChecksButton
+          {...buttonProps}
+          minWidth={0}
+          expense={expense}
+          enableKeyboardShortcuts={enableKeyboardShortcuts}
+        />
       )}
 
       {confirmProcessExpenseAction && (
@@ -313,6 +349,18 @@ const ProcessExpenseButtons = ({
             onModalToggle?.(false);
           }}
           expense={expense}
+        />
+      )}
+      {showApproveExpenseModal && (
+        <ApproveExpenseModal
+          expense={expense}
+          host={host}
+          account={collective}
+          onConfirm={() => triggerAction('APPROVE')}
+          onClose={() => {
+            setShowApproveExpenseModal(false);
+            onModalToggle?.(false);
+          }}
         />
       )}
     </React.Fragment>
@@ -346,13 +394,15 @@ ProcessExpenseButtons.propTypes = {
         message: PropTypes.string,
       }),
     ),
+    createdByAccount: PropTypes.shape({
+      legacyId: PropTypes.number.isRequired,
+    }),
   }).isRequired,
   /** The account where the expense has been submitted */
   collective: PropTypes.object.isRequired,
   host: PropTypes.object,
   /** Props passed to all buttons. Useful to customize sizes, spaces, etc. */
   buttonProps: PropTypes.object,
-  showError: PropTypes.bool,
   onSuccess: PropTypes.func,
   /** Called when the expense gets deleted */
   onDelete: PropTypes.func,
@@ -360,20 +410,15 @@ ProcessExpenseButtons.propTypes = {
   isMoreActions: PropTypes.bool,
   /** Called when a modal is opened/closed with a boolean like (isOpen) */
   onModalToggle: PropTypes.func,
-  displayMarkAsIncomplete: PropTypes.bool,
   displaySecurityChecks: PropTypes.bool,
   isViewingExpenseInHostContext: PropTypes.bool,
+  disabled: PropTypes.bool,
+  enableKeyboardShortcuts: PropTypes.bool,
 };
 
 export const DEFAULT_PROCESS_EXPENSE_BTN_PROPS = {
   buttonSize: 'small',
   minWidth: 130,
-};
-
-ProcessExpenseButtons.defaultProps = {
-  buttonProps: DEFAULT_PROCESS_EXPENSE_BTN_PROPS,
-  displaySecurityChecks: true,
-  isViewingExpenseInHostContext: false,
 };
 
 export default ProcessExpenseButtons;

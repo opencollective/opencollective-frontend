@@ -13,8 +13,8 @@ import { pickBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import { getContributeRoute } from '../../lib/collective.lib';
-import { getCollectivePageRoute, getSettingsRoute } from '../../lib/url-helpers';
+import { getContributeRoute } from '../../lib/collective';
+import { getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
 
 import ActionButton from '../ActionButton';
 import AddFundsBtn from '../AddFundsBtn';
@@ -51,7 +51,7 @@ const MenuItem = styled('li')`
     letter-spacing: -0.4px;
     outline: none;
 
-    @media (max-width: 40em) {
+    @media (max-width: 39.938em) {
       font-size: 14px;
     }
 
@@ -120,7 +120,7 @@ const ActionsDropdown = styled(Dropdown)`
     }
   }
 
-  @media (max-width: 40em) {
+  @media (max-width: 39.938em) {
     ${DropdownArrow} {
       display: none !important;
     }
@@ -144,7 +144,7 @@ const ActionsDropdown = styled(Dropdown)`
   ${props =>
     props.$isHiddenOnNonMobile &&
     css`
-      @media screen and (min-width: 40em) {
+      @media screen and (min-width: 39.938em) {
         display: none;
       }
     `}
@@ -160,21 +160,21 @@ const StyledActionButton = styled(ActionButton).attrs({ isSecondary: true })`
     margin-right: 4px;
   }
 
-  @media (max-width: 40em) {
+  @media (max-width: 39.938em) {
     cursor: none;
     pointer-events: none;
   }
 `;
 
 const StyledChevronDown = styled(ChevronDown)`
-  @media (max-width: 40em) {
+  @media (max-width: 39.938em) {
     display: none;
   }
 `;
 
 const ITEM_PADDING = '11px 14px';
 
-const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionForNonMobile, LoggedInUser }) => {
+const CollectiveNavbarActionsMenu = ({ collective, callsToAction = {}, hiddenActionForNonMobile, LoggedInUser }) => {
   const enabledCTAs = Object.keys(pickBy(callsToAction, Boolean));
   const isEmpty = enabledCTAs.length < 1;
   const hasOnlyOneHiddenCTA = enabledCTAs.length === 1 && hiddenActionForNonMobile === enabledCTAs[0];
@@ -215,7 +215,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.SETTINGS}>
                         <StyledLink
                           as={Link}
-                          href={getSettingsRoute(collective)}
+                          href={getDashboardRoute(collective, 'info')}
                           p={ITEM_PADDING}
                           data-cy="edit-collective-btn"
                         >
@@ -250,7 +250,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                     )}
                     {callsToAction.hasManageSubscriptions && (
                       <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.MANAGE_SUBSCRIPTIONS}>
-                        <StyledLink as={Link} href={`${getCollectivePageRoute(collective)}/manage-contributions`}>
+                        <StyledLink as={Link} href={getDashboardRoute(collective, 'outgoing-contributions')}>
                           <Container p={ITEM_PADDING}>
                             <Stack size="20px" />
                             <span>
@@ -321,7 +321,7 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction, hiddenActionFo
                             <StyledButton borderRadius={0} p={ITEM_PADDING} isBorderless {...btnProps}>
                               <CreditCard size="20px" />
                               <Span>
-                                <FormattedMessage defaultMessage="Create a Card" />
+                                <FormattedMessage defaultMessage="Create a Card" id="xLybrm" />
                               </Span>
                             </StyledButton>
                           </MenuItem>
@@ -418,11 +418,6 @@ CollectiveNavbarActionsMenu.propTypes = {
   }).isRequired,
   hiddenActionForNonMobile: PropTypes.oneOf(Object.values(NAVBAR_ACTION_TYPE)),
   LoggedInUser: PropTypes.object,
-};
-
-CollectiveNavbarActionsMenu.defaultProps = {
-  callsToAction: {},
-  buttonsMinWidth: 100,
 };
 
 export default CollectiveNavbarActionsMenu;

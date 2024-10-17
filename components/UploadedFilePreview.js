@@ -18,19 +18,6 @@ import StyledLink from './StyledLink';
 import StyledSpinner from './StyledSpinner';
 import { P } from './Text';
 
-const ImageLink = styled(StyledLink)`
-  cursor: pointer;
-  overflow: hidden;
-  display: block;
-  width: 100%;
-  height: 100%;
-  text-align: center;
-`;
-
-ImageLink.defaultProps = {
-  openInNewTab: true,
-};
-
 const FileTextIcon = styled(FileText)`
   opacity: 1;
 `;
@@ -85,13 +72,6 @@ const FileName = styled(P)`
   text-overflow: ellipsis;
 `;
 
-const PrivateIconContainer = styled.div`
-  text-align: center;
-  svg {
-    max-height: 32px;
-  }
-`;
-
 const formatFileSize = sizeInBytes => {
   if (sizeInBytes < 1024) {
     return `${sizeInBytes} bytes`;
@@ -133,7 +113,7 @@ const UploadedFilePreview = ({
     content = <StyledSpinner size="50%" />;
   } else if (isPrivate) {
     content = (
-      <PrivateInfoIcon color="#dcdee0" size="60%" tooltipProps={{ childrenContainer: PrivateIconContainer }}>
+      <PrivateInfoIcon size="60%" className="mx-auto text-slate-200">
         <FormattedMessage id="Attachment.Private" defaultMessage="This attachment is private" />
       </PrivateInfoIcon>
     );
@@ -153,20 +133,24 @@ const UploadedFilePreview = ({
     content = <img src={imagePreview(url, null, { width: resizeWidth })} alt={alt || fileName} />;
   }
 
+  const getContainerAttributes = () => {
+    if (isPrivate) {
+      return { as: 'div' };
+    } else if (isText || !openFileViewer) {
+      return { href: url, target: '_blank', rel: 'noopener noreferrer', as: url.startsWith('/') ? Link : StyledLink };
+    } else {
+      return {
+        as: 'div',
+        onClick: e => {
+          e.stopPropagation();
+          openFileViewer(url);
+        },
+      };
+    }
+  };
+
   return (
-    <MainContainer
-      color="black.700"
-      {...props}
-      maxWidth={size}
-      {...(isText || !openFileViewer
-        ? { href: url, openInNewTab: true, as: url.startsWith('/') ? Link : StyledLink }
-        : {
-            onClick: () => {
-              openFileViewer(url);
-            },
-            as: 'div',
-          })}
-    >
+    <MainContainer color="black.700" {...props} maxWidth={size} {...getContainerAttributes()}>
       <CardContainer size={size} maxHeight={maxHeight} title={fileName} border={border}>
         {content}
       </CardContainer>

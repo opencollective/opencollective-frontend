@@ -1,6 +1,6 @@
 import React from 'react';
 import { css } from '@styled-system/css';
-import { get } from 'lodash';
+import { get, remove } from 'lodash';
 import styled from 'styled-components';
 import { v4 as uuid } from 'uuid';
 import { isURL } from 'validator';
@@ -77,7 +77,7 @@ type RichTextEditorProps = RichTextEditorContainerProps & {
   videoEmbedEnabled?: boolean;
   'data-cy': string;
   /** Called when an image is being uploaded to set a boolean */
-  setUploading: (uploading: boolean) => void;
+  setUploading?: (uploading: boolean) => void;
 };
 
 const TrixEditorContainer = styled.div<RichTextEditorContainerProps>`
@@ -93,8 +93,9 @@ const TrixEditorContainer = styled.div<RichTextEditorContainerProps>`
   trix-editor {
     border: none;
     padding: 0;
-    margin-top: 8px;
+    margin-top: 1px;
     padding-top: 8px;
+    padding-right: 4px;
     outline-offset: 0.5em;
     ${CustomScrollbarCSS}
     &::-webkit-scrollbar {
@@ -132,10 +133,19 @@ const TrixEditorContainer = styled.div<RichTextEditorContainerProps>`
   trix-toolbar {
     min-height: 40px;
     background: ${props => props.toolbarBackgroundColor};
-    ${props => !props.withBorders && `box-shadow: 0px 5px 3px -3px rgba(0, 0, 0, 0.1);`}
     z-index: 2;
     margin-bottom: 8px;
-    ${props => props.withBorders && `min-height: 0px; margin-bottom: 0;`}
+    ${props =>
+      props.withBorders
+        ? css`
+            min-height: 0px;
+            margin-bottom: 0;
+            box-shadow: 0px 4px 4px -5px #b7b7b7;
+            padding-bottom: 6px;
+          `
+        : css`
+            box-shadow: 0px 5px 3px -3px rgba(0, 0, 0, 0.1);
+          `}
 
     .trix-button-group {
       border-radius: 6px;
@@ -228,7 +238,7 @@ const TrixEditorContainer = styled.div<RichTextEditorContainerProps>`
     })}
 `;
 
-const SUPPORTED_SERVICE_URLS = { youTube: 'https://www.youtube-nocookie.com/embed/', anchorFm: 'https://anchor.fm/' };
+const SUPPORTED_IFRAME_URLS = { youTube: 'https://www.youtube-nocookie.com/embed/', anchorFm: 'https://anchor.fm/' };
 
 type RichTextEditorState = {
   id: string;
@@ -262,7 +272,7 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
 
     // Load Trix
     if (typeof window !== 'undefined') {
-      this.Trix = require('trix').default;
+      this.Trix = require('@opencollective/trix').default; // eslint-disable-line @typescript-eslint/no-var-requires
       document.addEventListener('trix-before-initialize', this.trixBeforeInitialize);
     }
   }
@@ -334,6 +344,9 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
 
       // Component ready!
       this.isReady = true;
+
+      // Set initial value for text
+      this.setState({ text: this.editorRef.current.innerText });
     }
   };
 
@@ -342,6 +355,8 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
   trixBeforeInitialize = () => {
     this.Trix.config.blockAttributes.heading1 = { tagName: 'h3' };
     this.Trix.config.attachments.preview.caption = { name: false, size: false };
+    remove(this.Trix.config.parser.forbiddenElements, type => type === 'iframe'); // Allow iframes for video embeds
+    this.Trix.config.parser.allowedAttributes.push('frameborder', 'allowfullscreen');
   };
 
   trixInitialize = event => {
@@ -370,7 +385,7 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
         <div class="trix-dialog__link-fields">
           <input type="url" name="video-url" class="trix-input trix-input--dialog trix-input--dialog-embed" placeholder="Enter Video URL…" aria-label="Video URL" data-trix-input="">
           <div class="trix-button-group">
-            <input type="button" class="trix-button trix-button--dialog" value="Add Video" data-trix-action="x-add-embed">
+            <input data-cy="add-video-submit" type="button" class="trix-button trix-button--dialog" value="Add Video" data-trix-action="x-add-embed">
           </div>
         </div>
         <strong>Note: Only YouTube links are supported.</strong>
@@ -397,15 +412,25 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
       const embedLink = toolbarElement.querySelector('.trix-input--dialog-embed').value?.trim();
       if (embedLink) {
         this.embedIframe(embedLink);
+
+        const attachVideoDialog = toolbarElement.querySelector('[data-trix-dialog=video-url]');
+
+        // Clear input
+        attachVideoDialog.querySelector('.trix-input--dialog-embed').value = '';
+
+        // Close dialog
+        if (attachVideoDialog.getAttribute('data-trix-active') === '') {
+          attachVideoDialog.removeAttribute('data-trix-active');
+        }
       }
     }
   };
 
   constructVideoEmbedURL = (service, id) => {
     if (service === 'youtube') {
-      return `${SUPPORTED_SERVICE_URLS.youTube}${id}`;
+      return `${SUPPORTED_IFRAME_URLS.youTube}${id}`;
     } else if (service === 'anchorFm') {
-      return `${SUPPORTED_SERVICE_URLS.anchorFm}${id}`;
+      return `${SUPPORTED_IFRAME_URLS.anchorFm}${id}`;
     } else {
       return null;
     }
@@ -414,7 +439,7 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
   parseServiceLink = videoLink => {
     const regexps = {
       youtube: new RegExp(
-        '(?:https?://)?(?:www\\.)?youtu(?:\\.be/|be\\.com/\\S*(?:watch|embed)(?:(?:(?=/[^&\\s?]+(?!\\S))/)|(?:\\S*v=|v/)))([^&\\s?]+)',
+        '(?:https?://)?(?:www\\.)?youtu(?:\\.be/|be\\.com/\\S*(?:watch|embed|shorts)(?:(?:(?=/[^&\\s?]+(?!\\S))/)|(?:\\S*v=|v/)))([^&\\s?]+)',
         'i',
       ),
       anchorFm: /^(http|https)?:\/\/(www\.)?anchor\.fm\/([^/]+)(\/embed)?(\/episodes\/)?([^/]+)?\/?$/, // TODO: moved to https://podcasters.spotify.com
@@ -494,8 +519,9 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
     const { attachment } = e;
     const attachmentContent = get(attachment, 'attachment.attributes.values.content');
     const isEmbedAttachment =
-      attachmentContent?.includes(`<iframe src="${SUPPORTED_SERVICE_URLS.youTube}`) ||
-      attachmentContent?.includes(`<iframe src="${SUPPORTED_SERVICE_URLS.anchorFm}`);
+      attachmentContent?.includes(`<iframe src="${SUPPORTED_IFRAME_URLS.youTube}`) ||
+      attachmentContent?.includes(`<iframe src="${SUPPORTED_IFRAME_URLS.anchorFm}`);
+
     if (isEmbedAttachment) {
       return;
     } else if (!attachment.file) {
@@ -506,6 +532,10 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
         attachment.remove(); // Remove unknown stuff, usually when copy-pasting HTML
       }
 
+      return;
+    } else if (this.props.version === 'simplified') {
+      // Don't upload files in simplified mode
+      attachment.remove();
       return;
     }
 
@@ -674,6 +704,7 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
         error={error}
         data-cy={this.props['data-cy']}
         ref={this.mainContainerRef}
+        className="focus-within:border-ring"
       >
         {this.state.error && (
           <MessageBox type="error" mb="36px" withIcon>
@@ -681,24 +712,25 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
           </MessageBox>
         )}
 
-        <input id={this.state.id} value={this.state.value} type="hidden" name={inputName} />
+        <input id={this.state.id} value={this.state.value} type="hidden" name={inputName} disabled={disabled} />
         <HTMLContent fontSize={fontSize}>
-          <Container position="relative">
+          <div className="relative focus-visible:[&>_trix-editor]:outline-none">
             {React.createElement('trix-editor', {
               ref: this.editorRef,
               input: this.state.id,
-              autofocus: autoFocus ? true : undefined,
+              autofocus: !disabled && autoFocus ? true : undefined,
               placeholder: placeholder,
+              disabled,
             })}
             <Container position="absolute" bottom="1em" right="1em">
-              {showCount && (
+              {showCount && !disabled && (
                 <StyledTag textTransform="uppercase">
                   <span>{this.state.text.length}</span>
                   {maxLength && <span> / {maxLength}</span>}
                 </StyledTag>
               )}
             </Container>
-          </Container>
+          </div>
         </HTMLContent>
       </TrixEditorContainer>
     );

@@ -1,12 +1,14 @@
 import React from 'react';
 import { checkVATNumberFormat, GST_RATE_PERCENT, TaxType } from '@opencollective/taxes';
-import { FormikProps } from 'formik';
+import type { FormikProps } from 'formik';
 import { get, isNil, round } from 'lodash';
-import { IntlShape, useIntl } from 'react-intl';
+import type { IntlShape } from 'react-intl';
+import { useIntl } from 'react-intl';
 
-import { createError, ERROR, OCError } from '../../lib/errors';
+import type { OCError } from '../../lib/errors';
+import { createError, ERROR } from '../../lib/errors';
 import { verifyValueInRange } from '../../lib/form-utils';
-import { ExpenseTaxInput, TaxInput } from '../../lib/graphql/types/v2/graphql';
+import type { ExpenseTaxInput, TaxInput } from '../../lib/graphql/types/v2/graphql';
 import { i18nTaxType } from '../../lib/i18n/taxes';
 
 import { Flex } from '../Grid';
@@ -23,6 +25,7 @@ type TaxesFormikFieldsProps = {
   dispatchDefaultValueOnMount?: boolean;
   labelProps?: Record<string, any>;
   idNumberLabelRenderer?: (shortLabel: string) => string;
+  requireIdNumber?: boolean;
 };
 
 type TaxSpecificValues = {
@@ -82,17 +85,21 @@ export const validateTaxInput = (intl: IntlShape, tax: TaxInput, options = { req
   }
 };
 
-const getTaxSpecificValues = (intl: IntlShape, taxType: TaxType, currentTaxValue): TaxSpecificValues => {
+const getTaxSpecificValues = (
+  taxType: TaxType,
+  currentTaxValue,
+  { requireIdNumber = undefined } = {},
+): TaxSpecificValues => {
   switch (taxType) {
     case TaxType.VAT:
       return {
         idNumberPlaceholder: 'EU000011111',
-        requireIdNumber: Boolean(currentTaxValue?.rate),
+        requireIdNumber: isNil(requireIdNumber) ? Boolean(currentTaxValue?.rate) : requireIdNumber,
       };
     case TaxType.GST:
       return {
         idNumberPlaceholder: '123456789',
-        requireIdNumber: false,
+        requireIdNumber: isNil(requireIdNumber) ? false : requireIdNumber,
         forcedRate: GST_RATE_PERCENT / 100,
         possibleRates: [0, GST_RATE_PERCENT / 100],
       };
@@ -105,7 +112,10 @@ const i18nTaxRate = (intl: IntlShape, taxType: TaxType, rate: number) => {
   if (rate) {
     return `${rate * 100}%`;
   } else {
-    return intl.formatMessage({ defaultMessage: 'No {taxName}' }, { taxName: i18nTaxType(intl, taxType, 'short') });
+    return intl.formatMessage(
+      { defaultMessage: 'No {taxName}', id: 'lTGBvW' },
+      { taxName: i18nTaxType(intl, taxType, 'short') },
+    );
   }
 };
 
@@ -118,19 +128,25 @@ export const TaxesFormikFields = ({
   formikValuePath,
   labelProps,
   isOptional,
+  requireIdNumber,
   idNumberLabelRenderer,
   dispatchDefaultValueOnMount = true,
 }: TaxesFormikFieldsProps) => {
   const intl = useIntl();
   const currentTaxValue = get(formik.values, formikValuePath);
-  const taxSpecificValues = getTaxSpecificValues(intl, taxType, currentTaxValue);
+  const taxSpecificValues = getTaxSpecificValues(taxType, currentTaxValue, { requireIdNumber });
 
   const dispatchChange = (rate: number) =>
     formik.setFieldValue(formikValuePath, { ...currentTaxValue, type: taxType, rate: rate });
 
   // If mounted, it means that the form is subject to taxType. Let's make sure we initialize taxes field accordingly
   React.useEffect(() => {
-    if (dispatchDefaultValueOnMount && taxType && currentTaxValue?.type !== taxType) {
+    const isForcedRate = !isOptional && !isNil(taxSpecificValues.forcedRate);
+    if (
+      dispatchDefaultValueOnMount &&
+      taxType &&
+      (currentTaxValue?.type !== taxType || (isForcedRate && taxSpecificValues.forcedRate !== currentTaxValue?.rate))
+    ) {
       dispatchChange(taxSpecificValues.forcedRate);
     }
   }, []);
@@ -146,7 +162,7 @@ export const TaxesFormikFields = ({
       <StyledInputFormikField
         name={`${formikValuePath}.rate`}
         htmlFor={`input-${taxType}-rate`}
-        label={intl.formatMessage({ defaultMessage: '{taxName} rate' }, { taxName: shortTaxTypeLabel })}
+        label={intl.formatMessage({ defaultMessage: '{taxName} rate', id: 'Gsyrfa' }, { taxName: shortTaxTypeLabel })}
         labelProps={{ whiteSpace: 'nowrap', ...labelProps }}
         inputType="number"
         required={!isOptional}
@@ -183,7 +199,10 @@ export const TaxesFormikFields = ({
         label={
           idNumberLabelRenderer
             ? idNumberLabelRenderer(shortTaxTypeLabel)
-            : intl.formatMessage({ defaultMessage: '{taxName} identifier' }, { taxName: shortTaxTypeLabel })
+            : intl.formatMessage(
+                { defaultMessage: '{taxName} identifier', id: 'Byg+S/' },
+                { taxName: shortTaxTypeLabel },
+              )
         }
         labelProps={{ whiteSpace: 'nowrap', ...labelProps }}
         required={!isOptional && taxSpecificValues.requireIdNumber}

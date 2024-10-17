@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { FEATURES, isFeatureEnabled } from '../../lib/allowed-features';
 import { getErrorFromGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 
 import { Box, Flex } from '../Grid';
@@ -90,10 +89,14 @@ class CreateProject extends Component {
       return (
         <Flex flexDirection="column" alignItems="center" my={6}>
           <MessageBox withIcon type="warning">
-            <FormattedMessage defaultMessage="This account is frozen, you cannot create new projects at this time." />{' '}
+            <FormattedMessage
+              defaultMessage="This account is frozen, you cannot create new projects at this time."
+              id="vUYcYC"
+            />{' '}
             {isFeatureEnabled(parent.host, FEATURES.CONTACT_FORM) && (
               <FormattedMessage
                 defaultMessage="Please <ContactLink>contact</ContactLink> your fiscal host for more details."
+                id="KxBiJC"
                 values={{ ContactLink: getI18nLink({ href: `${getCollectivePageRoute(parent.host)}/contact` }) }}
               />
             )}

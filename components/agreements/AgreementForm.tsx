@@ -1,16 +1,16 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { Form, Formik } from 'formik';
-import { cloneDeep, pick } from 'lodash';
+import { cloneDeep, omit, pick } from 'lodash';
 import { createPortal } from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { getAccountReferenceInput } from '../../lib/collective.lib';
+import { getAccountReferenceInput } from '../../lib/collective';
 import { stripTime } from '../../lib/date-utils';
 import { i18nGraphqlException } from '../../lib/errors';
 import { requireFields } from '../../lib/form-utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { Agreement } from '../../lib/graphql/types/v2/graphql';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import type { Account, Agreement } from '../../lib/graphql/types/v2/graphql';
 
 import AttachedFilesForm from '../attached-files/AttachedFilesForm';
 import CollectivePickerAsync from '../CollectivePickerAsync';
@@ -21,11 +21,28 @@ import StyledInput from '../StyledInput';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledTextarea from '../StyledTextarea';
 import { H4 } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 import { AGREEMENT_VIEW_FIELDS_FRAGMENT } from './fragments';
 
 const FIELD_LABEL_PROPS = { fontSize: 16, fontWeight: 700 };
+
+const AGREEMENT_MUTATION_FIELDS_FRAGMENT = gql`
+  fragment AgreementMutationFields on Agreement {
+    id
+    ...AgreementViewFields
+    account {
+      id
+      ... on AccountWithHost {
+        # Refetch account agreements count to update the cache
+        hostAgreements {
+          totalCount
+        }
+      }
+    }
+  }
+  ${AGREEMENT_VIEW_FIELDS_FRAGMENT}
+`;
 
 const ADD_AGREEMENT_MUTATION = gql`
   mutation AddAgreement(
@@ -45,10 +62,10 @@ const ADD_AGREEMENT_MUTATION = gql`
       notes: $notes
     ) {
       id
-      ...AgreementViewFields
+      ...AgreementMutationFields
     }
   }
-  ${AGREEMENT_VIEW_FIELDS_FRAGMENT}
+  ${AGREEMENT_MUTATION_FIELDS_FRAGMENT}
 `;
 
 const EDIT_AGREEMENT_MUTATION = gql`
@@ -61,14 +78,14 @@ const EDIT_AGREEMENT_MUTATION = gql`
   ) {
     editAgreement(agreement: $agreement, title: $title, expiresAt: $expiresAt, notes: $notes, attachment: $attachment) {
       id
-      ...AgreementViewFields
+      ...AgreementMutationFields
     }
   }
-  ${AGREEMENT_VIEW_FIELDS_FRAGMENT}
+  ${AGREEMENT_MUTATION_FIELDS_FRAGMENT}
 `;
 
-const ActionButtons = ({ formik, onCancel }) => (
-  <Flex justifyContent="flex-end" width="100%">
+const ActionButtons = ({ formik, onCancel, ...props }) => (
+  <Flex justifyContent="flex-end" width="100%" {...props}>
     <StyledButton type="button" minWidth={120} mr={2} onClick={onCancel}>
       <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
     </StyledButton>
@@ -84,9 +101,9 @@ const ActionButtons = ({ formik, onCancel }) => (
       }}
     >
       {formik.values.id ? (
-        <FormattedMessage defaultMessage="Save Changes" />
+        <FormattedMessage defaultMessage="Save Changes" id="SaveChanges" />
       ) : (
-        <FormattedMessage defaultMessage="Create Agreement" />
+        <FormattedMessage defaultMessage="Create Agreement" id="LSsYSm" />
       )}
     </StyledButton>
   </Flex>
@@ -96,18 +113,30 @@ const validateAgreement = data => {
   return requireFields(data, ['account', 'title']);
 };
 
-type AgreementFormProps = {
+export type AgreementFormProps = {
   hostLegacyId: number;
   onCreate: (Agreement) => void;
-  onEdit: (Agreement) => void;
+  onEdit?: (Agreement) => void;
   onCancel: () => void;
-  agreement: Agreement;
+  agreement?: Agreement;
+  account?: Pick<Account, 'id' | 'slug' | 'name' | 'imageUrl'>;
+  openFileViewer?: (fileUrl: string) => void;
+  disableDrawerActions?: boolean;
 };
 
-const AgreementForm = ({ hostLegacyId, agreement, onCreate, onEdit, onCancel }: AgreementFormProps) => {
+const AgreementForm = ({
+  hostLegacyId,
+  agreement,
+  account,
+  onCreate,
+  onEdit,
+  onCancel,
+  openFileViewer,
+  disableDrawerActions,
+}: AgreementFormProps) => {
   const intl = useIntl();
-  const { addToast } = useToasts();
-  const initialValues = cloneDeep(agreement || {});
+  const { toast } = useToast();
+  const initialValues = cloneDeep(agreement || { account });
   const drawerActionsContainer = useDrawerActionsContainer();
   const isEditing = Boolean(agreement);
   const mutation = isEditing ? EDIT_AGREEMENT_MUTATION : ADD_AGREEMENT_MUTATION;
@@ -116,9 +145,9 @@ const AgreementForm = ({ hostLegacyId, agreement, onCreate, onEdit, onCancel }: 
     <div>
       <H4 mb={32}>
         {isEditing ? (
-          <FormattedMessage defaultMessage="Edit Agreement" />
+          <FormattedMessage defaultMessage="Edit Agreement" id="ZhrlbS" />
         ) : (
-          <FormattedMessage defaultMessage="Add Agreement" />
+          <FormattedMessage defaultMessage="Add Agreement" id="apnXKF" />
         )}
       </H4>
       <Formik
@@ -137,23 +166,23 @@ const AgreementForm = ({ hostLegacyId, agreement, onCreate, onEdit, onCancel }: 
 
               const result = await submitAgreement({ variables });
               onEdit?.(result.data.editAgreement);
-              addToast({
-                type: TOAST_TYPE.SUCCESS,
-                message: intl.formatMessage({ defaultMessage: 'Agreement updated' }),
+              toast({
+                variant: 'success',
+                message: intl.formatMessage({ defaultMessage: 'Agreement updated', id: 'Jy2H0R' }),
               });
             } else {
               const account = getAccountReferenceInput(values.account);
               const variables = { ...values, account, host: { legacyId: hostLegacyId } };
               const result = await submitAgreement({ variables });
               onCreate?.(result.data.addAgreement);
-              addToast({
-                type: TOAST_TYPE.SUCCESS,
-                message: intl.formatMessage({ defaultMessage: 'Agreement created' }),
+              toast({
+                variant: 'success',
+                message: intl.formatMessage({ defaultMessage: 'Agreement created', id: 'Q/kLys' }),
               });
             }
           } catch (e) {
-            addToast({
-              type: TOAST_TYPE.ERROR,
+            toast({
+              variant: 'error',
               message: i18nGraphqlException(intl, e),
             });
           }
@@ -161,7 +190,7 @@ const AgreementForm = ({ hostLegacyId, agreement, onCreate, onEdit, onCancel }: 
       >
         {formik => {
           return (
-            <Form>
+            <Form data-cy="agreement-form">
               <StyledInputFormikField
                 name="account"
                 label={intl.formatMessage({ id: 'Collective', defaultMessage: 'Collective' })}
@@ -175,7 +204,7 @@ const AgreementForm = ({ hostLegacyId, agreement, onCreate, onEdit, onCancel }: 
                     error={field.error}
                     hostCollectiveIds={[hostLegacyId]}
                     collective={formik.values.account}
-                    disabled={isEditing}
+                    disabled={isEditing || account}
                     onChange={({ value }) => {
                       formik.setFieldValue('account', value);
                     }}
@@ -199,27 +228,28 @@ const AgreementForm = ({ hostLegacyId, agreement, onCreate, onEdit, onCancel }: 
                 )}
               </StyledInputFormikField>
               <AttachedFilesForm
-                title={<FormattedMessage defaultMessage="Agreement file" />}
+                title={<FormattedMessage defaultMessage="Agreement file" id="i22tK5" />}
                 name="attachment"
                 kind="AGREEMENT_ATTACHMENT"
                 isMulti={false}
                 onChange={file => formik.setFieldValue('attachment', file)}
                 defaultValue={formik.values.attachment || undefined}
+                openFileViewer={openFileViewer}
               />
               <StyledInputFormikField
                 name="expiresAt"
-                label={intl.formatMessage({ defaultMessage: 'Expiration date' })}
+                label={intl.formatMessage({ defaultMessage: 'Expiration date', id: 'CICBj0' })}
                 labelProps={FIELD_LABEL_PROPS}
                 mt={3}
                 required={false}
               >
                 {({ field }) => (
                   <StyledInput
-                    {...field}
+                    {...omit(field, ['value', 'onChange', 'onBlur'])}
                     type="date"
                     width="100%"
                     maxLength={60}
-                    value={stripTime(formik.values.expiresAt)}
+                    defaultValue={stripTime(formik.values.expiresAt)}
                     onChange={e => {
                       // Consider date input as UTC
                       formik.setFieldValue('expiresAt', e.target.value ? `${e.target.value}T00:00:00.000Z` : null);
@@ -235,14 +265,15 @@ const AgreementForm = ({ hostLegacyId, agreement, onCreate, onEdit, onCancel }: 
                 labelProps={FIELD_LABEL_PROPS}
                 hint={intl.formatMessage({
                   defaultMessage: 'Private note for the host admins.',
+                  id: 'drjPaq',
                 })}
               >
                 {({ field }) => <StyledTextarea {...field} width="100%" minHeight={125} maxLength={3000} showCount />}
               </StyledInputFormikField>
-              {drawerActionsContainer ? (
+              {drawerActionsContainer && !disableDrawerActions ? (
                 createPortal(<ActionButtons formik={formik} onCancel={onCancel} />, drawerActionsContainer)
               ) : (
-                <ActionButtons formik={formik} onCancel={onCancel} />
+                <ActionButtons formik={formik} onCancel={onCancel} mt={3} />
               )}
             </Form>
           );

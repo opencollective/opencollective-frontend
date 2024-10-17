@@ -1,46 +1,43 @@
-import React from 'react';
+import type React from 'react';
+import type { CSSProp } from 'styled-components';
 import styled from 'styled-components';
-import {
-  background,
+import type {
   BackgroundProps,
-  border,
   BorderProps,
-  color,
   ColorProps,
-  flexbox,
   FlexboxProps,
-  layout,
   LayoutProps,
-  position,
   PositionProps,
-  shadow,
   ShadowProps,
-  size,
   SizeProps,
-  space,
   SpaceProps,
-  typography,
   TypographyProps,
 } from 'styled-system';
+import { background, border, color, flexbox, layout, position, shadow, size, space, typography } from 'styled-system';
 
+import type {
+  ClearProps,
+  CursorProps,
+  FloatProps,
+  OverflowProps,
+  PointerEventsProps,
+  WhiteSpaceProps,
+  WordBreakProps,
+} from '../lib/styled-system-custom-properties';
 import {
   clear,
-  ClearProps,
   cursor,
-  CursorProps,
   float,
-  FloatProps,
   overflow,
-  OverflowProps,
   pointerEvents,
-  PointerEventsProps,
   whiteSpace,
-  WhiteSpaceProps,
+  wordBreak,
 } from '../lib/styled-system-custom-properties';
 
 export type ContainerProps = FlexboxProps &
   BackgroundProps &
   BorderProps &
+  LayoutProps &
   ShadowProps &
   ClearProps &
   ColorProps &
@@ -49,16 +46,21 @@ export type ContainerProps = FlexboxProps &
   OverflowProps &
   PointerEventsProps &
   PositionProps &
-  LayoutProps &
   SpaceProps &
   TypographyProps &
   WhiteSpaceProps &
   SizeProps &
+  WordBreakProps &
   React.HTMLProps<HTMLDivElement> & {
     clearfix?: boolean;
+    css?: CSSProp;
   };
 
-const Container = styled.div<ContainerProps>`
+const FILTERED_PROPS = new Set(['display', 'width', 'height', 'overflow']);
+
+const Container = styled.div.withConfig({
+  shouldForwardProp: (prop, validate) => validate(prop) && !FILTERED_PROPS.has(prop),
+})<ContainerProps>`
   box-sizing: border-box;
 
   ${flexbox}
@@ -77,6 +79,7 @@ const Container = styled.div<ContainerProps>`
   ${size}
   ${typography}
   ${whiteSpace}
+  ${wordBreak}
   ${props =>
     props.clearfix &&
     `

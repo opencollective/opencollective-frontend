@@ -17,31 +17,31 @@ const getPastDateInterval = timeUnit => {
  */
 export const PERIOD_FILTER_PRESETS = {
   allTime: {
-    label: <FormattedMessage defaultMessage="All time" />,
+    label: <FormattedMessage defaultMessage="All time" id="s+lPP3" />,
     getInterval: () => ({ from: null, to: null }),
   },
   today: {
-    label: <FormattedMessage defaultMessage="Today" />,
+    label: <FormattedMessage defaultMessage="Today" id="zWgbGg" />,
     getInterval: () => ({ from: dayjs().startOf('day'), to: dayjs().endOf('day') }),
   },
   thisMonth: {
-    label: <FormattedMessage defaultMessage="This Month" />,
+    label: <FormattedMessage defaultMessage="This Month" id="3PZa76" />,
     getInterval: () => ({ from: dayjs().startOf('month'), to: dayjs().endOf('day') }),
   },
   thisYear: {
-    label: <FormattedMessage defaultMessage="This Year" />,
+    label: <FormattedMessage defaultMessage="This Year" id="OGk6DC" />,
     getInterval: () => ({ from: dayjs().startOf('year'), to: dayjs().endOf('day') }),
   },
   pastWeek: {
-    label: <FormattedMessage defaultMessage="Past Week" />,
+    label: <FormattedMessage defaultMessage="Past Week" id="li7Ez6" />,
     getInterval: () => getPastDateInterval('week'),
   },
   pastMonth: {
-    label: <FormattedMessage defaultMessage="Past Month" />,
+    label: <FormattedMessage defaultMessage="Past Month" id="+n7iNv" />,
     getInterval: () => getPastDateInterval('month'),
   },
   pastYear: {
-    label: <FormattedMessage defaultMessage="Past Year" />,
+    label: <FormattedMessage defaultMessage="Past Year" id="B0DOrM" />,
     getInterval: () => getPastDateInterval('year'),
   },
 };
@@ -51,7 +51,7 @@ const PERIOD_FILTER_SELECT_STYLES = {
   option: { fontSize: '12px' },
 };
 
-export const getSelectedPeriodOptionFromInterval = ({ from, to }) => {
+const getSelectedPeriodOptionFromInterval = ({ from, to }) => {
   const isSameDay = (dayjsDate, otherDate) => (!dayjsDate && !otherDate) || dayjsDate?.isSame(otherDate, 'day');
   const preset = Object.keys(PERIOD_FILTER_PRESETS).find(preset => {
     const presetDetails = PERIOD_FILTER_PRESETS[preset];
@@ -68,7 +68,15 @@ export const getSelectedPeriodOptionFromInterval = ({ from, to }) => {
 
 const periodSelectThemeBuilder = theme => ({ ...theme, spacing: { ...theme.spacing, controlHeight: 28 } });
 
-const PeriodFilterPresetsSelect = ({ onChange, interval, inputId, formatDateFn }) => {
+const PeriodFilterPresetsSelect = ({
+  onChange,
+  interval,
+  inputId,
+  formatDateFn = stripTime,
+  SelectComponent = StyledSelectFilter,
+  styles = PERIOD_FILTER_SELECT_STYLES,
+  ...selectProps
+}) => {
   const intl = useIntl();
   const selectedOption = React.useMemo(() => getSelectedPeriodOptionFromInterval(interval), [interval]);
   const options = React.useMemo(() => {
@@ -79,12 +87,13 @@ const PeriodFilterPresetsSelect = ({ onChange, interval, inputId, formatDateFn }
   }, [intl]);
 
   return (
-    <StyledSelectFilter
+    <SelectComponent
+      {...selectProps}
       inputId={inputId}
       value={selectedOption}
       options={options}
       selectTheme={periodSelectThemeBuilder}
-      styles={PERIOD_FILTER_SELECT_STYLES}
+      styles={styles}
       onChange={({ value }) => {
         if (value === 'custom') {
           return interval;
@@ -105,10 +114,9 @@ PeriodFilterPresetsSelect.propTypes = {
     to: PropTypes.string,
   }).isRequired,
   formatDateFn: PropTypes.func,
-};
-
-PeriodFilterPresetsSelect.defaultProps = {
-  formatDateFn: stripTime,
+  width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  SelectComponent: PropTypes.elementType,
+  styles: PropTypes.object,
 };
 
 export default PeriodFilterPresetsSelect;

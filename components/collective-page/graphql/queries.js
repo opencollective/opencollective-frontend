@@ -4,8 +4,6 @@ import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../../contribute-cards/con
 
 import * as fragments from './fragments';
 
-// We have to disable the linter because it's not able to detect that `nbContributorsPerContributeCard` is used in fragments
-/* eslint-disable graphql/template-strings */
 export const collectivePageQuery = gqlV1/* GraphQL */ `
   query CollectivePage($slug: String!, $nbContributorsPerContributeCard: Int) {
     Collective(slug: $slug, throwIfMissing: false) {
@@ -18,11 +16,23 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
       backgroundImage
       backgroundImageUrl
       twitterHandle
+      duplicatedCollectives(limit: 1) {
+        collectives {
+          id
+          slug
+          name
+          type
+        }
+      }
       repositoryUrl
       website
       socialLinks {
         type
         url
+      }
+      location {
+        id
+        country
       }
       tags
       company
@@ -30,7 +40,6 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
       currency
       settings
       isActive
-      isPledged
       isApproved
       isArchived
       isFrozen
@@ -58,22 +67,12 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
       stats {
         id
         balance
-        balanceWithBlockedFunds
         yearlyBudget
-        updates
-        activeRecurringContributions
-        totalAmountReceived(periodInMonths: 12)
-        totalAmountRaised: totalAmountReceived
-        totalNetAmountRaised: totalNetAmountReceived
         backers {
           id
           all
           users
           organizations
-        }
-        transactions {
-          id
-          all
         }
       }
       connectedTo: memberOf(role: "CONNECTED_COLLECTIVE", limit: 1) {
@@ -103,6 +102,10 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
         name
         slug
         type
+        location {
+          id
+          country
+        }
         settings
         plan {
           id
@@ -114,6 +117,7 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
           VIRTUAL_CARDS
         }
         policies {
+          id
           COLLECTIVE_MINIMUM_ADMINS {
             freeze
             numberOfAdmins
@@ -167,10 +171,6 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
           }
         }
       }
-      updates(limit: 3, onlyPublishedUpdates: true) {
-        id
-        ...UpdatesFields
-      }
       plan {
         id
         hostedCollectives
@@ -219,14 +219,12 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
     }
   }
 
-  ${fragments.updatesFieldsFragment}
   ${fragments.contributorsFieldsFragment}
   ${fragments.collectiveNavbarFieldsFragment}
   ${fragments.contributeCardTierFieldsFragment}
   ${fragments.contributeCardEventFieldsFragment}
   ${fragments.contributeCardProjectFieldsFragment}
 `;
-/* eslint-enable graphql/template-strings */
 
 export const getCollectivePageQueryVariables = slug => {
   return {

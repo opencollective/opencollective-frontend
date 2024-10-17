@@ -1,26 +1,24 @@
-import { ThemeProvider } from 'styled-components';
-import { RouterContext } from 'next/dist/shared/lib/router-context';
-import { IntlProvider } from 'react-intl';
-import theme from '../lib/theme';
+import React from 'react';
 import { ApolloProvider } from '@apollo/client';
-import * as nextImage from 'next/legacy/image';
+import { IntlProvider } from 'react-intl';
+import { ThemeProvider } from 'styled-components';
 
-import UserProvider from '../components/UserProvider';
 import { initClient } from '../lib/apollo-client';
-import { withDesign } from 'storybook-addon-designs';
+import theme from '../lib/theme';
+import { RouterContext } from 'next/dist/shared/lib/router-context.shared-runtime';
+
+import { Toaster } from '../components/ui/Toaster';
+import { TooltipProvider } from '../components/ui/Tooltip';
+import UserProvider from '../components/UserProvider';
 
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'nprogress/nprogress.css';
-import 'trix/dist/trix.css';
+import '@opencollective/trix/dist/trix.css';
 import '../public/static/styles/app.css';
-import ToastProvider from '../components/ToastProvider';
 
-Object.defineProperty(nextImage, 'default', {
-  configurable: true,
-  value: props => <img {...props} />,
-});
-
+// config file
+// ts-unused-exports:disable-next-line
 export const parameters = {
   actions: { argTypesRegex: '^on[A-Z].*' },
   nextRouter: {
@@ -28,19 +26,21 @@ export const parameters = {
   },
 };
 
+// config file
+// ts-unused-exports:disable-next-line
 export const decorators = [
   Story => (
     <ApolloProvider client={initClient()}>
       <ThemeProvider theme={theme}>
         <IntlProvider locale="en">
           <UserProvider>
-            <ToastProvider>
+            <TooltipProvider>
               <Story />
-            </ToastProvider>
+              <Toaster />
+            </TooltipProvider>
           </UserProvider>
         </IntlProvider>
       </ThemeProvider>
     </ApolloProvider>
   ),
-  withDesign,
 ];

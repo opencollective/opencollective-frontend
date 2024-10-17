@@ -1,16 +1,17 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 
 import { expensePageExpenseFieldsFragment } from '../../components/expenses/graphql/fragments';
 
-import { API_V2_CONTEXT } from '../graphql/helpers';
-import { Expense, ProcessExpensePaymentParams } from '../graphql/types/v2/graphql';
+import { API_V2_CONTEXT, gql } from '../graphql/helpers';
+import type { Expense, ProcessExpensePaymentParams } from '../graphql/types/v2/graphql';
 
 type ProcessExpenseAction = (params?: {
   paymentParams?: ProcessExpensePaymentParams;
   message?: string;
+  draftKey?: string;
 }) => Promise<void>;
-export type ProcessExpenseActionName =
+type ProcessExpenseActionName =
   | 'APPROVE'
   | 'REJECT'
   | 'PAY'
@@ -21,7 +22,8 @@ export type ProcessExpenseActionName =
   | 'REQUEST_RE_APPROVAL'
   | 'MARK_AS_INCOMPLETE'
   | 'HOLD'
-  | 'RELEASE';
+  | 'RELEASE'
+  | 'DECLINE_INVITED_EXPENSE';
 
 type UseProcessExpenseHook = {
   loading: boolean;
@@ -37,10 +39,11 @@ type UseProcessExpenseHook = {
   requestReApproval: ProcessExpenseAction;
   hold: ProcessExpenseAction;
   release: ProcessExpenseAction;
+  declineInvitation: ProcessExpenseAction;
 };
 
 type UseProcessExpenseOptions = {
-  expense: Pick<Expense, 'id' | 'legacyId' | 'permissions'>;
+  expense: Pick<Expense, 'id' | 'legacyId'>;
 };
 
 const processExpenseMutation = gql`
@@ -49,6 +52,7 @@ const processExpenseMutation = gql`
     $legacyId: Int
     $action: ExpenseProcessAction!
     $message: String
+    $draftKey: String
     $paymentParams: ProcessExpensePaymentParams
   ) {
     processExpense(
@@ -56,6 +60,7 @@ const processExpenseMutation = gql`
       action: $action
       message: $message
       paymentParams: $paymentParams
+      draftKey: $draftKey
     ) {
       id
       ...ExpensePageExpenseFields
@@ -75,9 +80,20 @@ export default function useProcessExpense(opts: UseProcessExpenseOptions): UsePr
   const makeProcessExpenseAction = React.useMemo(
     () =>
       (action: ProcessExpenseActionName) =>
-      async ({ paymentParams, message }: { paymentParams?: ProcessExpensePaymentParams; message?: string } = {}) => {
+      async ({
+        paymentParams,
+        message,
+        draftKey,
+      }: { paymentParams?: ProcessExpensePaymentParams; message?: string; draftKey?: string } = {}) => {
         setCurrentAction(action);
-        const variables = { id: opts.expense.id, legacyId: opts.expense.legacyId, action, paymentParams, message };
+        const variables = {
+          id: opts.expense.id,
+          legacyId: opts.expense.legacyId,
+          action,
+          paymentParams,
+          message,
+          draftKey,
+        };
         try {
           await processExpense({ variables });
         } finally {
@@ -109,6 +125,11 @@ export default function useProcessExpense(opts: UseProcessExpenseOptions): UsePr
   const hold = React.useMemo(() => makeProcessExpenseAction('HOLD'), [makeProcessExpenseAction]);
   const release = React.useMemo(() => makeProcessExpenseAction('RELEASE'), [makeProcessExpenseAction]);
 
+  const declineInvitation = React.useMemo(
+    () => makeProcessExpenseAction('DECLINE_INVITED_EXPENSE'),
+    [makeProcessExpenseAction],
+  );
+
   return {
     loading: mutationResult.loading,
     currentAction,
@@ -123,5 +144,6 @@ export default function useProcessExpense(opts: UseProcessExpenseOptions): UsePr
     unschedulePayment,
     hold,
     release,
+    declineInvitation,
   };
 }

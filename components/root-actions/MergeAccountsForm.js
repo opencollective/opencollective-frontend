@@ -1,17 +1,19 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import ConfirmationModal from '../ConfirmationModal';
+import DashboardHeader from '../dashboard/DashboardHeader';
 import { Flex } from '../Grid';
 import StyledButton from '../StyledButton';
 import StyledInputField from '../StyledInputField';
 import { P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { Alert, AlertDescription, AlertTitle } from '../ui/Alert';
+import { useToast } from '../ui/useToast';
 
 const mergeAccountsMutation = gql`
   mutation MergeAccounts($fromAccount: AccountReferenceInput!, $toAccount: AccountReferenceInput!, $dryRun: Boolean!) {
@@ -21,6 +23,10 @@ const mergeAccountsMutation = gql`
         id
         name
         slug
+        isIncognito
+        ... on Individual {
+          isGuest
+        }
       }
     }
   }
@@ -31,7 +37,7 @@ const MergeAccountsForm = () => {
   const [mergeSummary, setMergeSummary] = React.useState(false);
   const [fromAccount, setFromAccount] = React.useState(null);
   const [toAccount, setToAccount] = React.useState(null);
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const isValid = fromAccount && toAccount;
   const intl = useIntl();
   const mergeCTA = getMergeCTA(fromAccount, toAccount);
@@ -51,8 +57,8 @@ const MergeAccountsForm = () => {
         setMergeSummary(resultMessage);
       } else {
         const successMessage = `@${fromAccount.slug} has been merged into @${toAccount.slug}`;
-        addToast({
-          type: TOAST_TYPE.SUCCESS,
+        toast({
+          variant: 'success',
           message: !resultMessage ? successMessage : `${successMessage}\n${resultMessage}`,
         });
 
@@ -62,9 +68,8 @@ const MergeAccountsForm = () => {
         setToAccount(null);
       }
     } catch (e) {
-      addToast({
-        type: TOAST_TYPE.ERROR,
-        variant: 'light',
+      toast({
+        variant: 'error',
         message: i18nGraphqlException(intl, e),
       });
     }
@@ -72,6 +77,17 @@ const MergeAccountsForm = () => {
 
   return (
     <div>
+      <DashboardHeader
+        title="Merge Accounts"
+        description="Before merging user accounts, you must always make sure that the person who requested it own both emails. Merging means payment methods are merged too, so if we just merge 2 accounts because someones ask for it without verifying we could end up in a very bad situation. A simple way to do that is to send a unique random code to the other account they want to claim and ask them to share this code."
+        className="mb-10"
+      />
+      <Alert className="relative mb-8 flex items-center gap-2 bg-destructive/5 fade-in" variant="destructive">
+        <AlertTitle className="flex items-center">Dangerous Action</AlertTitle>
+        <AlertDescription>
+          Please be super careful with the action below, and double check everything you do.
+        </AlertDescription>
+      </Alert>
       <Flex alignItems="flex-end">
         <StyledInputField htmlFor="merge-account-1" label="Merge Account..." flex="1 1">
           {({ id }) => (
@@ -118,7 +134,7 @@ const MergeAccountsForm = () => {
           continueLabel="Merge profiles"
           header={mergeCTA}
           continueHandler={() => mergeAccounts(false)}
-          cancelHandler={() => setMergeSummary(false)}
+          onClose={() => setMergeSummary(false)}
         >
           <P whiteSpace="pre-wrap" lineHeight="24px">
             {mergeSummary}

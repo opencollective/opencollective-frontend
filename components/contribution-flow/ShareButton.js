@@ -16,7 +16,7 @@ const ShareButton = () => {
         {isCopied ? (
           <FormattedMessage id="Clipboard.Copied" defaultMessage="Copied!" />
         ) : (
-          <FormattedMessage defaultMessage="Share link" />
+          <FormattedMessage defaultMessage="Share link" id="GQNYob" />
         )}
       </Span>
     </StyledButton>

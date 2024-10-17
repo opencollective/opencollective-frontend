@@ -4,20 +4,19 @@ import { omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { getSuggestedTags } from '../../lib/collective.lib';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { addParentToURLIfMissing, getCollectivePageRoute } from '../../lib/url-helpers';
 
 import Container from '../Container';
+import ScheduledExpensesBanner from '../dashboard/sections/expenses/ScheduledExpensesBanner';
 import { Box, Flex } from '../Grid';
-import ScheduledExpensesBanner from '../host-dashboard/ScheduledExpensesBanner';
 import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
 import Pagination from '../Pagination';
 import SearchBar from '../SearchBar';
 import Tags from '../Tags';
-import { H1, H5 } from '../Text';
+import { H5 } from '../Text';
 
 import { ExpensesDirection } from './filters/ExpensesDirection';
 import ExpensesOrder from './filters/ExpensesOrder';
@@ -32,7 +31,9 @@ const Expenses = props => {
   const { query, LoggedInUser, data, loading, variables, refetch, isDashboard, onlySubmittedExpenses } = props;
 
   const expensesRoute = isDashboard
-    ? `/dashboard/${variables.collectiveSlug}/expenses`
+    ? query.direction === 'SUBMITTED'
+      ? `/dashboard/${variables.collectiveSlug}/submitted-expenses`
+      : `/dashboard/${variables.collectiveSlug}/expenses`
     : `${getCollectivePageRoute(data?.account)}/expenses`;
 
   useEffect(() => {
@@ -86,21 +87,24 @@ const Expenses = props => {
     }
   }
 
-  const suggestedTags = React.useMemo(() => getSuggestedTags(data?.account), [data?.account]);
-
   const isSelfHosted = data?.account?.id === data?.account?.host?.id;
 
   return (
     <Container>
-      <H1 fontSize="32px" lineHeight="40px" fontWeight="normal">
-        {onlySubmittedExpenses ? (
-          <FormattedMessage defaultMessage="Submitted Expenses" />
-        ) : (
-          <FormattedMessage id="Expenses" defaultMessage="Expenses" />
-        )}
-      </H1>
-      <Flex alignItems={[null, null, 'center']} my="26px" flexWrap="wrap" gap="16px" mr={2}>
-        {!onlySubmittedExpenses && (
+      {!isDashboard && (
+        <React.Fragment>
+          <h1 className={'mb-6 text-[32px] leading-10'}>
+            {onlySubmittedExpenses ? (
+              <FormattedMessage defaultMessage="Submitted Expenses" id="NpGb+x" />
+            ) : (
+              <FormattedMessage id="Expenses" defaultMessage="Expenses" />
+            )}
+          </h1>
+        </React.Fragment>
+      )}
+
+      <Flex alignItems={[null, null, 'center']} mb="26px" flexWrap="wrap" gap="16px" mr={2}>
+        {!isDashboard && !onlySubmittedExpenses && (
           <Box flex="0 1" flexBasis={['100%', null, '380px']}>
             <ExpensesDirection
               value={query.direction || 'RECEIVED'}
@@ -111,7 +115,7 @@ const Expenses = props => {
             />
           </Box>
         )}
-        <Box flex="12 1 160px">
+        <Box flex="12 1 160px" width="276px">
           <SearchBar defaultValue={query.searchTerm} onSubmit={searchTerm => handleSearch(searchTerm)} height="40px" />
         </Box>
         <Box flex="0 1 160px">
@@ -163,10 +167,9 @@ const Expenses = props => {
               <ExpensesList
                 isLoading={loading}
                 collective={data?.account}
-                host={data?.account?.isHost ? data?.account : data?.account?.host}
+                host={data?.account?.host ?? (data?.account?.isHost ? data?.account : null)}
                 expenses={data?.expenses?.nodes}
                 nbPlaceholders={variables.limit}
-                suggestedTags={suggestedTags}
                 isInverted={query.direction === 'SUBMITTED'}
                 view={query.direction === 'SUBMITTED' ? 'submitter' : undefined}
                 useDrawer={isDashboard}

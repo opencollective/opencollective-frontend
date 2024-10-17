@@ -5,8 +5,6 @@ import { arrayMove, horizontalListSortingStrategy, SortableContext } from '@dnd-
 import { isEqual } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import { CollectiveType } from '../../lib/constants/collectives';
-
 import ContributeCardsContainer from '../collective-page/ContributeCardsContainer';
 import EditTierModal from '../edit-collective/tiers/EditTierModal';
 
@@ -24,9 +22,9 @@ const AdminContributeCardsContainer = ({
   draggingId,
   setDraggingId,
   onMount,
-  CardsContainer,
+  CardsContainer = ContributeCardsContainer,
   useTierModals,
-  enableReordering,
+  enableReordering = true,
   createNewType,
   onTierUpdate,
 }) => {
@@ -65,10 +63,8 @@ const AdminContributeCardsContainer = ({
   }
 
   const [showTierModal, setShowTierModal] = React.useState(false);
-  const isEvent = collective.type === CollectiveType.EVENT;
-  const createContributionTierRoute = isEvent
-    ? `/${collective.parentCollective?.slug || 'collective'}/events/${collective.slug}/admin/tiers`
-    : `/${collective.slug}/admin/tiers`;
+  const createContributionTierRoute = `/dashboard/${collective.slug}/tiers`;
+
   const addNewMessage =
     createNewType === 'TICKET' ? (
       <FormattedMessage id="SectionTickets.CreateTicket" defaultMessage="Create Ticket" />
@@ -169,11 +165,6 @@ AdminContributeCardsContainer.propTypes = {
   createNewType: PropTypes.string,
   enableReordering: PropTypes.bool,
   onTierUpdate: PropTypes.func,
-};
-
-AdminContributeCardsContainer.defaultProps = {
-  CardsContainer: ContributeCardsContainer,
-  enableReordering: true,
 };
 
 export default AdminContributeCardsContainer;

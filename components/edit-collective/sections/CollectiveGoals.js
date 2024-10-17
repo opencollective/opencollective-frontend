@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { get, sortBy, startCase } from 'lodash';
+import { cloneDeep, get, sortBy, startCase } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
-import { gqlV1 } from '../../../lib/graphql/helpers';
+import { editCollectiveSettingsMutation } from '../../../lib/graphql/v1/mutations';
 
+import { Sections } from '../../collective-page/_constants';
 import Container from '../../Container';
 import GoalsCover from '../../GoalsCover';
 import { Box, Flex } from '../../Grid';
@@ -119,8 +120,24 @@ class CollectiveGoals extends React.Component {
   toggleGoalsOnCollectivePage = ({ checked }) => {
     this.setState(state => ({
       isTouched: true,
-      collectivePage: { ...state.collectivePage, showGoals: checked },
+      collectivePage: {
+        ...state.collectivePage,
+        showGoals: checked,
+        sections: this.getCollectivePageSections(state.collectivePage?.sections, checked),
+      },
     }));
+  };
+
+  getCollectivePageSections = (baseSections, checked) => {
+    const sections = cloneDeep([...(baseSections || [])]);
+    const goalsSection = sections.find(({ name }) => name === Sections.GOALS);
+    if (goalsSection) {
+      goalsSection.isEnabled = checked;
+    } else {
+      sections.push({ type: 'SECTION', name: Sections.GOALS, isEnabled: checked });
+    }
+
+    return sections;
   };
 
   addGoal = () => {
@@ -301,15 +318,6 @@ class CollectiveGoals extends React.Component {
     );
   }
 }
-
-const editCollectiveSettingsMutation = gqlV1/* GraphQL */ `
-  mutation EditCollectiveSettings($id: Int!, $settings: JSON) {
-    editCollective(collective: { id: $id, settings: $settings }) {
-      id
-      settings
-    }
-  }
-`;
 
 const addEditCollectiveSettingsMutation = graphql(editCollectiveSettingsMutation, {
   name: 'editCollectiveSettings',

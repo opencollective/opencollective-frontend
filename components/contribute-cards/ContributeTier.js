@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { getApplicableTaxes } from '@opencollective/taxes';
 import { truncate } from 'lodash';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
@@ -67,8 +68,8 @@ const TierTitle = ({ collective, tier }) => {
           as={Link}
           href={`${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tier.legacyId || tier.id}`}
           color="black.900"
-          hoverColor="black.900"
-          underlineOnHover
+          $hoverColor="black.900"
+          $underlineOnHover
         >
           {name}
         </StyledLink>
@@ -114,6 +115,7 @@ const ContributeTier = ({ intl, collective, tier, isPreview, ...props }) => {
   const canContributeToCollective = canContribute(collective, LoggedInUser);
   const isDisabled = !canContributeToCollective || tierIsExpired || hasNoneLeft;
   const tierLegacyId = tier.legacyId || tier.id;
+  const taxes = getApplicableTaxes(collective, collective.host, tier.type);
 
   let description = tier.description;
   if (!tier.description) {
@@ -143,7 +145,7 @@ const ContributeTier = ({ intl, collective, tier, isPreview, ...props }) => {
       <Flex flexDirection="column" justifyContent="space-between" height="100%">
         <Box>
           {tier.maxQuantity > 0 && (
-            <P fontSize="1.1rem" color="#e69900" textTransform="uppercase" fontWeight="500" letterSpacing="1px" mb={2}>
+            <P fontSize="0.7rem" color="#e69900" textTransform="uppercase" fontWeight="500" letterSpacing="1px" mb={2}>
               <FormattedMessage
                 id="tier.limited"
                 values={{
@@ -181,7 +183,7 @@ const ContributeTier = ({ intl, collective, tier, isPreview, ...props }) => {
                   values={{
                     amount: (
                       <FormattedMoneyAmount
-                        amountStyles={{ fontWeight: '700', color: 'black.700' }}
+                        amountClassName="font-bold text-foreground"
                         amount={graphqlAmountValueInCents(amountRaised)}
                         currency={currency}
                         precision={getPrecisionFromAmount(graphqlAmountValueInCents(amountRaised))}
@@ -189,7 +191,7 @@ const ContributeTier = ({ intl, collective, tier, isPreview, ...props }) => {
                     ),
                     goalWithInterval: (
                       <FormattedMoneyAmount
-                        amountStyles={{ fontWeight: '700', color: 'black.700' }}
+                        amountClassName="font-bold text-foreground"
                         amount={graphqlAmountValueInCents(tier.goal)}
                         currency={currency}
                         interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
@@ -207,22 +209,40 @@ const ContributeTier = ({ intl, collective, tier, isPreview, ...props }) => {
           )}
         </Box>
         {!isDisabled && graphqlAmountValueInCents(minAmount) > 0 && (
-          <P mt={3} color="black.700">
+          <div className="mt-3 text-neutral-700">
             {isFlexibleAmount && (
               <Span display="block" fontSize="10px" textTransform="uppercase">
                 <FormattedMessage id="ContributeTier.StartsAt" defaultMessage="Starts at" />
               </Span>
             )}
-            <Span display="block" data-cy="amount">
-              <FormattedMoneyAmount
-                amount={graphqlAmountValueInCents(minAmount)}
-                interval={tier.interval && tier.interval !== INTERVALS.flexible ? tier.interval : null}
-                currency={currency}
-                amountStyles={{ fontSize: '24px', lineHeight: '32px', fontWeight: 'bold', color: 'black.900' }}
-                precision={getPrecisionFromAmount(graphqlAmountValueInCents(minAmount))}
-              />
-            </Span>
-          </P>
+
+            <div className="flex min-h-[36px] flex-col">
+              <Span data-cy="amount">
+                <FormattedMoneyAmount
+                  amount={graphqlAmountValueInCents(minAmount)}
+                  interval={tier.interval && tier.interval !== INTERVALS.flexible ? tier.interval : null}
+                  currency={currency}
+                  amountClassName="text-2xl font-bold text-foreground"
+                  precision={getPrecisionFromAmount(graphqlAmountValueInCents(minAmount))}
+                />
+                {taxes.length > 0 && ' *'}
+              </Span>
+              {taxes.length > 0 && (
+                <Span fontSize="10px" lineHeight="12px">
+                  *{' '}
+                  {taxes.length > 1 ? (
+                    <FormattedMessage id="ContributeTier.Taxes" defaultMessage="Taxes may apply" />
+                  ) : (
+                    <FormattedMessage
+                      defaultMessage="{taxName} may apply"
+                      id="N9TNT7"
+                      values={{ taxName: taxes[0].type }}
+                    />
+                  )}
+                </Span>
+              )}
+            </div>
+          </div>
         )}
       </Flex>
     </Contribute>
@@ -234,6 +254,7 @@ ContributeTier.propTypes = {
     slug: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
     isActive: PropTypes.bool,
+    host: PropTypes.object,
     parentCollective: PropTypes.shape({
       slug: PropTypes.string.isRequired,
     }),
@@ -243,6 +264,7 @@ ContributeTier.propTypes = {
     legacyId: PropTypes.number,
     slug: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
+    type: PropTypes.string.isRequired,
     description: PropTypes.string,
     currency: PropTypes.string,
     useStandalonePage: PropTypes.bool,

@@ -10,7 +10,6 @@ export default {
   dsn: process.env.SENTRY_DSN,
   environment: process.env.OC_ENV,
   attachStacktrace: true,
-  release: process.env.SENTRY_RELEASE,
   enabled: process.env.NODE_ENV !== 'test',
   ignoreErrors: [
     /\[Please ignore this error\]/, // See `IgnorableError`
@@ -22,6 +21,8 @@ export default {
     /Refused to evaluate a string as JavaScript because 'unsafe-eval' is not an allowed source of script in the following Content Security Policy directive/,
     'ResizeObserver loop limit exceeded',
     'ResizeObserver loop completed with undelivered notifications.',
+    'globalThis is not defined', // Happens on old browsers, see https://caniuse.com/?search=globalThis
+    "Can't find variable: globalThis", // Happens on old browsers, see https://caniuse.com/?search=globalThis
   ],
   denyUrls: [
     // Chrome extensions

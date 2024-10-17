@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { Lock } from '@styled-icons/material/Lock';
 import { get } from 'lodash';
 import { withRouter } from 'next/router';
@@ -9,7 +9,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import commentTypes from '../../lib/constants/commentTypes';
 import { createError, ERROR, formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import Container from '../Container';
 import ContainerOverlay from '../ContainerOverlay';
@@ -18,10 +18,9 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
 import RichTextEditor from '../RichTextEditor';
 import SignInOrJoinFree, { SignInOverlayBackground } from '../SignInOrJoinFree';
-import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
-import StyledTooltip from '../StyledTooltip';
 import { P } from '../Text';
+import { Button } from '../ui/Button';
 import { withUser } from '../UserProvider';
 
 import { commentFieldsFragment } from './graphql';
@@ -67,7 +66,7 @@ const isAutoFocused = id => {
 const mutationOptions = { context: API_V2_CONTEXT };
 
 /** A small helper to make the form work with params from both API V1 & V2 */
-const prepareCommentParams = (html, conversationId, expenseId, updateId) => {
+const prepareCommentParams = (html, conversationId, expenseId, updateId, hostApplicationId) => {
   const comment = { html };
   if (conversationId) {
     comment.ConversationId = conversationId;
@@ -85,6 +84,8 @@ const prepareCommentParams = (html, conversationId, expenseId, updateId) => {
     } else {
       comment.update.legacyId = updateId;
     }
+  } else if (hostApplicationId) {
+    comment.hostApplication = { id: hostApplicationId };
   }
   return comment;
 };
@@ -98,6 +99,7 @@ const CommentForm = ({
   ConversationId,
   ExpenseId,
   UpdateId,
+  HostApplicationId,
   onSuccess,
   router,
   loadingLoggedInUser,
@@ -105,6 +107,10 @@ const CommentForm = ({
   isDisabled,
   canUsePrivateNote,
   defaultType = commentTypes.COMMENT,
+  replyingToComment,
+  minHeight = 250,
+  submitButtonJustify,
+  submitButtonVariant,
 }) => {
   const [createComment, { loading, error }] = useMutation(createCommentMutation, mutationOptions);
   const intl = useIntl();
@@ -114,6 +120,7 @@ const CommentForm = ({
   const [validationError, setValidationError] = useState();
   const [uploading, setUploading] = useState(false);
   const { formatMessage } = intl;
+  const isRichTextDisabled = isDisabled || !LoggedInUser || loading;
 
   const postComment = async event => {
     event.preventDefault();
@@ -122,7 +129,7 @@ const CommentForm = ({
     if (!html) {
       setValidationError(createError(ERROR.FORM_FIELD_REQUIRED));
     } else {
-      const comment = prepareCommentParams(html, ConversationId, ExpenseId, UpdateId);
+      const comment = prepareCommentParams(html, ConversationId, ExpenseId, UpdateId, HostApplicationId);
       if (type) {
         comment.type = type;
       }
@@ -132,6 +139,14 @@ const CommentForm = ({
         return onSuccess(response.data.createComment);
       }
     }
+  };
+
+  const getDefaultValueWhenReplying = () => {
+    let value = `<blockquote><div>${replyingToComment.html}</div></blockquote>`;
+    if (html) {
+      value = `${value} ${html}`;
+    }
+    return value;
   };
 
   return (
@@ -145,30 +160,35 @@ const CommentForm = ({
               hideFooter
               showSubHeading={false}
               showOCLogo={false}
+              autoFocus={false}
             />
           </SignInOverlayBackground>
         </ContainerOverlay>
       )}
       <form onSubmit={postComment} data-cy="comment-form">
         {loadingLoggedInUser ? (
-          <LoadingPlaceholder height={232} />
+          <LoadingPlaceholder height={minHeight} />
         ) : (
-          <RichTextEditor
-            kind="COMMENT"
-            withBorders
-            inputName="html"
-            editorMinHeight={150}
-            placeholder={formatMessage(messages.placeholder)}
-            autoFocus={isAutoFocused(id)}
-            disabled={isDisabled || !LoggedInUser || loading}
-            reset={resetValue}
-            fontSize="13px"
-            onChange={e => {
-              setHtml(e.target.value);
-              setValidationError(null);
-            }}
-            setUploading={setUploading}
-          />
+          //  When Key is updated the text editor default value will be updated too
+          <div key={replyingToComment?.id}>
+            <RichTextEditor
+              defaultValue={replyingToComment?.id && getDefaultValueWhenReplying()}
+              kind="COMMENT"
+              withBorders
+              inputName="html"
+              editorMinHeight={minHeight}
+              placeholder={formatMessage(messages.placeholder)}
+              autoFocus={Boolean(!isRichTextDisabled && isAutoFocused(id))}
+              disabled={isRichTextDisabled}
+              reset={resetValue}
+              fontSize="13px"
+              onChange={e => {
+                setHtml(e.target.value);
+                setValidationError(null);
+              }}
+              setUploading={setUploading}
+            />
+          </div>
         )}
         {validationError && (
           <P color="red.500" mt={3}>
@@ -182,32 +202,26 @@ const CommentForm = ({
         )}
         {canUsePrivateNote && (
           <Box mt={3} alignItems="center" gap={12}>
-            <StyledTooltip
-              content={
-                <FormattedMessage
-                  id="CommentForm.PrivateNote.Tooltip"
-                  defaultMessage="Private comments are only visible to Fiscal Host admins."
-                />
+            <StyledCheckbox
+              name="privateNote"
+              label={
+                <React.Fragment>
+                  <FormattedMessage
+                    id="CommentForm.PrivateNoteCheckbox"
+                    defaultMessage="Post as a private note for the host admins"
+                  />{' '}
+                  <Lock size="1em" />
+                </React.Fragment>
               }
-            >
-              <StyledCheckbox
-                name="privateNote"
-                label={
-                  <React.Fragment>
-                    <FormattedMessage id="CommentForm.PrivateNoteCheckbox" defaultMessage="Post private comment" />{' '}
-                    <Lock size="1em" />
-                  </React.Fragment>
-                }
-                checked={asPrivateNote}
-                onChange={() => setPrivateNote(!asPrivateNote)}
-              />
-            </StyledTooltip>
+              checked={asPrivateNote}
+              onChange={() => setPrivateNote(!asPrivateNote)}
+            />
           </Box>
         )}
-        <Flex mt={3} alignItems="center" gap={12}>
-          <StyledButton
+        <Flex mt={3} alignItems="center" justifyContent={submitButtonJustify} gap={12}>
+          <Button
             minWidth={150}
-            buttonStyle="primary"
+            variant={submitButtonVariant}
             disabled={isDisabled || !LoggedInUser || uploading}
             loading={loading}
             data-cy="submit-comment-btn"
@@ -215,7 +229,7 @@ const CommentForm = ({
             name="submit-comment"
           >
             {formatMessage(uploading ? messages.uploadingImage : messages.postReply)}
-          </StyledButton>
+          </Button>
         </Flex>
       </form>
     </Container>
@@ -231,6 +245,8 @@ CommentForm.propTypes = {
   ExpenseId: PropTypes.string,
   /** If commenting on an update */
   UpdateId: PropTypes.string,
+  /** If commenting on a host application */
+  HostApplicationId: PropTypes.string,
   /** Called when the comment is created successfully */
   onSuccess: PropTypes.func,
   /** disable the inputs */
@@ -243,8 +259,14 @@ CommentForm.propTypes = {
   loadingLoggedInUser: PropTypes.bool,
   /** @ignore from withUser */
   LoggedInUser: PropTypes.object,
+  replyingToComment: PropTypes.object,
   /** @ignore from withRouter */
   router: PropTypes.object,
+  /** Called when comment gets selected*/
+  getClickedComment: PropTypes.func,
+  minHeight: PropTypes.number,
+  submitButtonJustify: PropTypes.string,
+  submitButtonVariant: PropTypes.string,
 };
 
 export default withUser(withRouter(CommentForm));

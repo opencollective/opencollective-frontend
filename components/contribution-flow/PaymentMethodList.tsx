@@ -1,14 +1,16 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { Elements } from '@stripe/react-stripe-js';
-import { StripeElementsOptions } from '@stripe/stripe-js';
+import type { StripeElementsOptions } from '@stripe/stripe-js';
 import { themeGet } from '@styled-system/theme-get';
 import { get, isEmpty, pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { Account, CaptchaInput, Host, Individual, PaymentMethodLegacyType } from '../../lib/graphql/types/v2/graphql';
+import { getGQLV2FrequencyFromInterval } from '../../lib/constants/intervals';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import type { Account, CaptchaInput, Host, Individual } from '../../lib/graphql/types/v2/graphql';
+import { PaymentMethodLegacyType } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getStripe } from '../../lib/stripe';
 import usePaymentIntent from '../../lib/stripe/usePaymentIntent';
@@ -105,7 +107,7 @@ type PaymentMethodListProps = {
   disabledPaymentMethodTypes: string[];
   stepSummary: object;
   stepDetails: { amount: number; currency: string; interval?: string };
-  stepPayment: { key: string; isKeyOnly?: boolean };
+  stepPayment: { key: string; isKeyOnly?: boolean; chargeAttempt: number };
   isEmbed: boolean;
   isSubmitting: boolean;
   hideCreditCardPostalCode: boolean;
@@ -130,15 +132,17 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
 
   const hostSupportedPaymentMethods = props.host?.supportedPaymentMethods ?? [];
   const [paymentIntent, stripe, loadingPaymentIntent, paymentIntentCreateError] = usePaymentIntent({
+    chargeAttempt: props.stepPayment?.chargeAttempt,
     skip: !hostSupportedPaymentMethods.includes(PaymentMethodLegacyType.PAYMENT_INTENT),
     amount: { valueInCents: props.stepDetails.amount, currency: props.stepDetails.currency },
     fromAccount: props.stepProfile.isGuest
       ? undefined
       : typeof props.stepProfile.id === 'string'
-      ? { id: props.stepProfile.id }
-      : { legacyId: props.stepProfile.id },
+        ? { id: props.stepProfile.id }
+        : { legacyId: props.stepProfile.id },
     guestInfo: props.stepProfile.isGuest ? getGuestInfoFromStepProfile(props.stepProfile) : undefined,
     toAccount: pick(props.toAccount, 'id'),
+    frequency: getGQLV2FrequencyFromInterval(props.stepDetails.interval as any) as any,
   });
 
   const paymentMethodOptions = React.useMemo(() => {

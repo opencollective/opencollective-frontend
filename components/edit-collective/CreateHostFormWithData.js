@@ -102,7 +102,7 @@ const editCollectiveConnectedAccountsQuery = gqlV1/* GraphQL */ `
   }
 `;
 
-export const addEditCollectiveConnectedAccountsData = graphql(editCollectiveConnectedAccountsQuery, {
+const addEditCollectiveConnectedAccountsData = graphql(editCollectiveConnectedAccountsQuery, {
   options: props => ({
     variables: {
       slug: get(props, 'LoggedInUser.collective.slug'),

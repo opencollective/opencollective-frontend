@@ -1,12 +1,11 @@
-const fs = require('fs');
 const path = require('path');
+const fs = require('fs');
 
 const express = require('express');
 const proxy = require('express-http-proxy');
-const { template, trim } = require('lodash');
+const { trim } = require('lodash');
 
 const downloadFileHandler = require('./download-file');
-const intl = require('./intl');
 const baseApiUrl = process.env.INTERNAL_API_URL || process.env.API_URL;
 
 const maxAge = (maxAge = 60) => {
@@ -16,44 +15,24 @@ const maxAge = (maxAge = 60) => {
   };
 };
 
-module.exports = (expressApp, nextApp) => {
+module.exports = expressApp => {
   const app = expressApp;
-
-  app.use((req, res, next) => {
-    if (!req.language && req.locale !== 'en') {
-      // Prevent server side caching of non english content
-      res.set('Cache-Control', 'no-store, no-cache, max-age=0');
-    } else {
-      // When using Cloudflare, there might be a default cache
-      // We're setting that for all requests to reduce the default to 1 minute
-      res.set('Cache-Control', 'public, max-age=60');
-    }
-    next();
-  });
-
-  app.use((req, res, next) => {
-    if (req.query.language && intl.supportedLanguages.includes(req.query.language) && req.query.set) {
-      res.cookie('language', req.language);
-      const url = new URL(`${req.protocol}://${req.get('host')}${req.originalUrl}`);
-      url.searchParams.delete('language');
-      url.searchParams.delete('set');
-      res.redirect(`${url.pathname}${url.search}`);
-      return;
-    }
-    next();
-  });
 
   // Support older assets from website
   app.use('/public/images', express.static(path.join(__dirname, '../public/static/images')));
 
   app.get('/static/*', maxAge(86400));
 
+  // Load the favicon file into memory
+  const faviconPath = path.join(__dirname, '../public/static/images/favicon.ico.png');
+  const favicon = fs.readFileSync(faviconPath);
   app.get('/favicon.*', maxAge(300000), (req, res) => {
-    return res.sendFile(path.join(__dirname, '../public/static/images/favicon.ico.png'));
+    res.type('image/png');
+    return res.send(favicon);
   });
 
-  /* Helper to enable downloading files that are on S3 since Chrome and Firefox does 
-   not allow cross-origin downloads when using the download attribute on an anchor tag, 
+  /* Helper to enable downloading files that are on S3 since Chrome and Firefox does
+   not allow cross-origin downloads when using the download attribute on an anchor tag,
    see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-download. */
   app.get('/api/download-file', downloadFileHandler);
 
@@ -85,21 +64,6 @@ module.exports = (expressApp, nextApp) => {
     );
   }
 
-  /**
-   * Prevent indexation from search engines
-   * (out of 'production' environment)
-   */
-  app.get('/robots.txt', (req, res, next) => {
-    const hostname = req.get('original-hostname') || req.hostname;
-    if (hostname !== 'opencollective.com') {
-      res.setHeader('Content-Type', 'text/plain');
-      res.send('User-agent: *\nDisallow: /');
-    } else {
-      // Will send public/robots.txt
-      next();
-    }
-  });
-
   // This is used by Cypress to collect server side coverage
   if (process.env.OC_ENV === 'e2e' || process.env.E2E_TEST) {
     app.get('/__coverage__', (req, res) => {
@@ -123,42 +87,4 @@ module.exports = (expressApp, nextApp) => {
     }
     next();
   });
-
-  app.get('/:collectiveSlug/:verb(contribute|donate)/button:size(|@2x).png', maxAge(86400), (req, res) => {
-    const color = req.query.color === 'blue' ? 'blue' : 'white';
-    res.sendFile(
-      path.join(__dirname, `../public/static/images/buttons/${req.params.verb}-button-${color}${req.params.size}.png`),
-    );
-  });
-
-  app.get('/:collectiveSlug/:verb(contribute|donate)/button.js', maxAge(86400), (req, res) => {
-    const content = fs.readFileSync(path.join(__dirname, './templates/button.js'), 'utf8');
-    const compiled = template(content, { interpolate: /{{([\s\S]+?)}}/g });
-    res.setHeader('content-type', 'application/javascript');
-    res.removeHeader('X-Frame-Options');
-    res.send(
-      compiled({
-        collectiveSlug: req.params.collectiveSlug,
-        verb: req.params.verb,
-        host: process.env.WEBSITE_URL || `http://localhost:${process.env.PORT || 3000}`,
-      }),
-    );
-  });
-
-  app.get('/:collectiveSlug/:widget(widget|events|collectives|banner).js', maxAge(86400), (req, res) => {
-    const content = fs.readFileSync(path.join(__dirname, './templates/widget.js'), 'utf8');
-    const compiled = template(content, { interpolate: /{{([\s\S]+?)}}/g });
-    res.setHeader('content-type', 'application/javascript');
-    res.send(
-      compiled({
-        style: '{}',
-        ...req.query,
-        collectiveSlug: req.params.collectiveSlug,
-        widget: req.params.widget,
-        host: process.env.WEBSITE_URL || `http://localhost:${process.env.PORT || 3000}`,
-      }),
-    );
-  });
-
-  return nextApp.getRequestHandler();
 };

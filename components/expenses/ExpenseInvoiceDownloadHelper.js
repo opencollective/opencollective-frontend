@@ -7,7 +7,7 @@ import expenseTypes from '../../lib/constants/expenseTypes';
 import { getErrorFromPdfService } from '../../lib/errors';
 import { expenseInvoiceUrl } from '../../lib/url-helpers';
 
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 const getPrettyDate = expense => {
   if (!expense?.createdAt) {
@@ -18,17 +18,17 @@ const getPrettyDate = expense => {
   return `-${utc.split('T')[0]}`;
 };
 
-export const getExpenseInvoiceFilename = (collective, expense) => {
+const getExpenseInvoiceFilename = (collective, expense) => {
   const prettyDate = getPrettyDate(expense);
   return `Expense-${expense.legacyId}-${collective?.slug}-invoice${prettyDate}.pdf`;
 };
 
-export const generateInvoiceBlob = async expense => {
+const generateInvoiceBlob = async expense => {
   const invoiceUrl = expenseInvoiceUrl(expense.id);
   return fetchFromPDFService(invoiceUrl);
 };
 
-export const downloadExpenseInvoice = async (collective, expense, { setLoading, isLoading, onError }) => {
+const downloadExpenseInvoice = async (collective, expense, { setLoading, isLoading, onError }) => {
   if (isLoading) {
     return false;
   }
@@ -46,10 +46,10 @@ export const downloadExpenseInvoice = async (collective, expense, { setLoading, 
   }
 };
 
-export const useExpenseInvoiceDownloadHelper = ({ expense, collective, onError, disablePreview }) => {
+const useExpenseInvoiceDownloadHelper = ({ expense, collective, onError, disablePreview }) => {
   const [isLoading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(null);
-  const { addToast } = useToasts();
+  const { toast } = useToast();
 
   if (![expenseTypes.INVOICE, expenseTypes.SETTLEMENT].includes(expense.type)) {
     return { error: null, isLoading: false, filename: '', downloadInvoice: null };
@@ -69,7 +69,7 @@ export const useExpenseInvoiceDownloadHelper = ({ expense, collective, onError, 
           if (onError) {
             onError(error);
           } else {
-            addToast({ type: TOAST_TYPE.ERROR, variant: 'light', message: 'Request failed, please try again later' });
+            toast({ variant: 'error', message: 'Request failed, please try again later' });
           }
         },
       });

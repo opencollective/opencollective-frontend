@@ -26,16 +26,14 @@ const TheFutureIsCollective = () => {
               letterSpacing={['-0.04em', '0.012em', null]}
               textAlign="center"
             >
-              <FormattedMessage id="home.futureIsCollective" defaultMessage={'The future is collective'} />
+              <FormattedMessage id="home.futureIsCollective" defaultMessage="The future is collective" />
             </MainTitle>
           </Box>
           <Box my={[4, '40px']} maxWidth={['288px', '608px', '768px', null, '896px']}>
             <MainDescription textAlign="center">
               <FormattedMessage
                 id="home.futureIsCollective.description"
-                defaultMessage={
-                  'Open Collective is a <b>legal and financial</b> toolbox for grassroots groups. It’s a <b>fundraising + legal status + money management</b> platform for your community. What do you want to do?'
-                }
+                defaultMessage="Open Collective is a <b>legal and financial</b> toolbox for grassroots groups. It’s a <b>fundraising + legal status + money management</b> platform for your community. What do you want to do?"
                 values={{
                   b: I18nBold,
                 }}

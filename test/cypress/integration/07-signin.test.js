@@ -1,7 +1,7 @@
+import * as cheerio from 'cheerio';
 import speakeasy from 'speakeasy';
 
 import { randomEmail, randomGmailEmail, randomHotMail } from '../support/faker';
-import generateToken from '../support/token';
 
 describe('signin', () => {
   it('redirects directly when using a dev test account', () => {
@@ -13,13 +13,18 @@ describe('signin', () => {
   });
 
   it('can signin with a valid token and is redirected', () => {
-    cy.visit(`/signin/${generateToken()}?next=/apex`);
+    cy.generateToken().then(token => {
+      cy.visit(`/signin/${token}?next=/apex`);
+    });
+
     cy.assertLoggedIn();
     cy.url().should('eq', `${Cypress.config().baseUrl}/apex`);
   });
 
   it('can signin with a valid token and is redirected, even if next is URL encoded', () => {
-    cy.visit(`/signin/${generateToken()}?next=%2Fapex`);
+    cy.generateToken().then(token => {
+      cy.visit(`/signin/${token}?next=%2Fapex`);
+    });
     cy.assertLoggedIn();
     cy.url().should('eq', `${Cypress.config().baseUrl}/apex`);
   });
@@ -33,7 +38,9 @@ describe('signin', () => {
   });
 
   it('shows an error when token is expired', () => {
-    cy.visit(`/signin?token=${generateToken(null, -100000)}`);
+    cy.generateToken(-100000).then(token => {
+      cy.visit(`/signin?token=${token}`);
+    });
     cy.contains('Sign In failed: Token rejected.');
     cy.contains('You can ask for a new sign in link using the form below.');
     cy.contains('Sign in or create a personal account to continue');
@@ -65,7 +72,9 @@ describe('signin', () => {
     cy.assertLoggedIn();
 
     // Try to signin with an expired token
-    cy.visit(`/signin?token=${generateToken(null, -1000000)}&next=/apex`);
+    cy.generateToken(-1000000).then(token => {
+      cy.visit(`/signin?token=${token}&next=/apex`);
+    });
 
     // Should be logged in with the old account
     cy.assertLoggedIn();
@@ -88,7 +97,7 @@ describe('signin', () => {
     cy.visit('/signin?next=/signin');
     cy.get('input[name=email]').type('testuser+admin@opencollective.com');
     cy.get('button[type=submit]').click();
-    cy.url().should('eq', `${Cypress.config().baseUrl}/`);
+    cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard`);
   });
 
   it('can signup as regular user', () => {
@@ -118,7 +127,7 @@ describe('signin', () => {
   });
 
   it('after signup shows the /welcome page if there is no redirect', () => {
-    cy.clearInbox();
+    cy.mailpitDeleteAllEmails();
     cy.visit('/signin');
 
     // Go to CreateProfile
@@ -133,14 +142,17 @@ describe('signin', () => {
     cy.get('button[type=submit]').click();
 
     const expectedEmailSubject = 'Open Collective: Sign In';
-    cy.openEmail(({ subject }) => subject.includes(expectedEmailSubject));
-    cy.contains('a', 'One-click Sign In').click();
-    cy.wait(200);
-    cy.contains('Welcome to Open Collective!');
+    cy.openEmail(({ Subject }) => Subject.includes(expectedEmailSubject)).then(email => {
+      const $html = cheerio.load(email.HTML);
+      const resetLink = $html('a:contains("One-click Sign In")');
+      const href = resetLink.attr('href');
+      const parsedUrl = new URL(href);
+      cy.visit(parsedUrl.pathname);
+    });
   });
 
   it('after signup do not show the welcome page if there is a redirect', () => {
-    cy.clearInbox();
+    cy.mailpitDeleteAllEmails();
     cy.visit('/signin?next=how-it-works');
 
     // Go to CreateProfile
@@ -155,15 +167,19 @@ describe('signin', () => {
     cy.get('button[type=submit]').click();
 
     const expectedEmailSubject = 'Open Collective: Sign In';
-    cy.openEmail(({ subject }) => subject.includes(expectedEmailSubject));
-    cy.contains('a', 'One-click Sign In').click();
-    cy.wait(200);
-    cy.contains('How Open Collective works');
+    cy.openEmail(({ Subject }) => Subject.includes(expectedEmailSubject)).then(email => {
+      const $html = cheerio.load(email.HTML);
+      const signInLink = $html('a:contains("One-click Sign In")');
+      const href = signInLink.attr('href');
+      const parsedUrl = new URL(href);
+      cy.visit(parsedUrl.pathname + parsedUrl.search);
+      cy.contains('How Open Collective works');
+    });
   });
 
   it('can signup a user with gmail and show Open Gmail button ', () => {
     // Submit the form using the email providers--gmail)
-    const gmailEmail = randomGmailEmail(false);
+    const gmailEmail = randomGmailEmail();
     cy.visit('/signin');
     cy.contains('a', 'Create an account').click();
     cy.get('input[name=name]').type('Dummy Name');
@@ -181,7 +197,7 @@ describe('signin', () => {
 
   it('can signup a user with Hotmail and show Open Hotmail button', () => {
     // Submit the form using the email providers--hotmail
-    const hotmail = randomHotMail(false);
+    const hotmail = randomHotMail();
     cy.visit('/signin');
     cy.contains('a', 'Create an account').click();
     cy.get('input[name=name]').type('Dummy Name');

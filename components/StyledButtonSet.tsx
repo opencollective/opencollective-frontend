@@ -1,11 +1,14 @@
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { themeGet } from '@styled-system/theme-get';
+import type { ReactNode } from 'react';
 import styled from 'styled-components';
 
-import { ButtonSize } from '../lib/theme/variants/button';
+import type { ButtonSize } from '../lib/theme/variants/button';
 
-import Container, { ContainerProps } from './Container';
-import StyledButton, { StyledButtonProps } from './StyledButton';
+import type { ContainerProps } from './Container';
+import Container from './Container';
+import type { StyledButtonProps } from './StyledButton';
+import StyledButton from './StyledButton';
 
 type ButtonItemProps = {
   customBorderRadius: string;
@@ -16,10 +19,16 @@ const ButtonItem = styled(StyledButton)<ButtonItemProps>`
   line-height: 1.5;
   flex-grow: 1;
   border-color: ${themeGet('colors.black.300')};
-  transition: color 0.2s, background 0.1s, font-size 30ms;
+  transition:
+    color 0.2s,
+    background 0.1s,
+    font-size 30ms;
 
   &:active p {
     color: white;
+  }
+  a {
+    color: ${themeGet('colors.primary.600')};
   }
   &:hover,
   &:focus {

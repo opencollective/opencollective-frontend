@@ -6,7 +6,7 @@ import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { isURL } from 'validator';
 
-import { suggestSlug } from '../lib/collective.lib';
+import { suggestSlug } from '../lib/collective';
 
 import { BackButton } from './create-collective/CreateCollectiveForm';
 import OnboardingProfileCard from './onboarding-modal/OnboardingProfileCard';
@@ -401,7 +401,10 @@ const CreateOrganizationForm = props => {
                       required
                       fontSize="12px"
                       label={
-                        <FormattedMessage defaultMessage="I certify that I am authorized to represent this organization" />
+                        <FormattedMessage
+                          defaultMessage="I certify that I am authorized to represent this organization"
+                          id="U+G/IY"
+                        />
                       }
                       onChange={({ checked }) => {
                         setAuthorization(checked);

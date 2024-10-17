@@ -48,15 +48,15 @@ const StepProfileLoggedInForm = ({ profiles, onChange, collective, tier, data, s
           onChange={profile => onChange({ stepProfile: profile, stepPayment: null })}
         />
       </Box>
-      {!isContributingFromSameHost && contributionRequiresLegalName(stepDetails) && (
+      {!isContributingFromSameHost && contributionRequiresLegalName(stepDetails, tier) && (
         <React.Fragment>
           {!data?.isIncognito && (
             <StyledInputField
               htmlFor="name"
-              label={<FormattedMessage defaultMessage="Your name" />}
+              label={<FormattedMessage defaultMessage="Your name" id="vlKhIl" />}
               labelFontSize="16px"
               labelFontWeight="700"
-              hint={<FormattedMessage defaultMessage="This is your display name or alias." />}
+              hint={<FormattedMessage defaultMessage="This is your display name or alias." id="kFLEBd" />}
             >
               {inputProps => (
                 <StyledInput
@@ -71,14 +71,17 @@ const StepProfileLoggedInForm = ({ profiles, onChange, collective, tier, data, s
           )}
           <StyledInputField
             htmlFor="legalName"
-            label={<FormattedMessage defaultMessage="Legal name" />}
+            label={<FormattedMessage defaultMessage="Legal name" id="OozR1Y" />}
             required={!profileInfo.name}
             labelFontSize="16px"
             labelFontWeight="700"
             isPrivate
             mt={20}
             hint={
-              <FormattedMessage defaultMessage="If different from your display name. Not public. Important for receipts, invoices, payments, and official documentation." />
+              <FormattedMessage
+                defaultMessage="If different from your display name. Not public. Important for receipts, invoices, payments, and official documentation."
+                id="QLBxEF"
+              />
             }
           >
             {inputProps => (
@@ -93,14 +96,14 @@ const StepProfileLoggedInForm = ({ profiles, onChange, collective, tier, data, s
           </StyledInputField>
         </React.Fragment>
       )}
-      {!isContributingFromSameHost && contributionRequiresAddress(stepDetails) && (
+      {!isContributingFromSameHost && contributionRequiresAddress(stepDetails, tier) && (
         <React.Fragment>
           <Flex alignItems="center" my="14px">
             <P fontSize="24px" lineHeight="32px" fontWeight="500" mr={2}>
               <FormattedMessage id="collective.address.label" defaultMessage="Address" />
             </P>
             <Span mr={2} lineHeight="0">
-              <PrivateInfoIcon size="14px" tooltipProps={{ containerLineHeight: '0' }} />
+              <PrivateInfoIcon />
             </Span>
             <StyledHr my="18px" borderColor="black.300" width="100%" />
           </Flex>

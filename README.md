@@ -4,6 +4,7 @@
 [![Crowdin](https://d322cqt584bo4o.cloudfront.net/opencollective/localized.svg)](https://crowdin.com/project/opencollective)
 ![React Version](https://img.shields.io/github/package-json/dependency-version/opencollective/opencollective-frontend/react)
 ![Next.JS Version](https://img.shields.io/github/package-json/dependency-version/opencollective/opencollective-frontend/next)
+[![Discord](https://discordapp.com/api/guilds/1241017531318276158/widget.png)](https://discord.opencollective.com)
 
 <p align="center">
   <a href="https://github.com/opencollective/opencollective-frontend">
@@ -19,7 +20,7 @@ If you see a step below that could be improved (or is outdated), please update t
 
 ### Prerequisite
 
-1. Make sure you have Node.js version 18.x and NPM version 8.x.
+1. Make sure you have Node.js version 20.x and NPM version >=9.0.0.
 
 - We recommend using [nvm](https://github.com/creationix/nvm): `nvm install && nvm use`.
 
@@ -85,7 +86,7 @@ We're currently looking for contributions for the following languages:
 - Spanish
 - Japanese
 
-Want to add a new language for Open Collective? [Contact us](https://slack.opencollective.org),
+Want to add a new language for Open Collective? [Contact us](https://discord.opencollective.com) and
 we'll be happy to help you to set it up!
 
 ## Contributing
@@ -116,8 +117,7 @@ To add new files or dependencies to this exported package, have a look at [scrip
 
 ## Discussion
 
-If you have any questions, ping us on Slack
-(https://slack.opencollective.com) or on Twitter
+If you have any questions, ping us on [Discord](https://discord.opencollective.com) or Twitter
 ([@opencollect](https://twitter.com/opencollect)).
 
 ## Thanks

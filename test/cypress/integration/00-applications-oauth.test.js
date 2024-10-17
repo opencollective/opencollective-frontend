@@ -8,7 +8,7 @@ describe('OAuth Applications', () => {
   });
 
   it('create and edit applications', () => {
-    cy.login({ email: user.email, redirect: `${user.collective.slug}/admin/for-developers` });
+    cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/for-developers` });
 
     cy.log('Starts with an empty state');
     cy.contains('[data-cy="oauth-apps-list"]', "You don't have any app yet");
@@ -66,7 +66,7 @@ describe('OAuth Applications', () => {
 
   it('create application with 2fa enabled', () => {
     cy.signup({ user: { name: 'OAuth tester', settings: { features: { adminPanel: true } } } }).then(user => {
-      cy.login({ email: user.email, redirect: `${user.collective.slug}/admin/for-developers` });
+      cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/for-developers` });
 
       const secret = speakeasy.generateSecret({ length: 64 });
       cy.enableTwoFactorAuth({
@@ -142,7 +142,7 @@ describe('OAuth Applications', () => {
   // Warning: this test is dependant on the previous one. To make it independent, connect the OAuth app with
   it('can list & revoke authorization tokens in the admin', () => {
     cy.log('App is in list');
-    cy.login({ email: user.email, redirect: `/${user.collective.slug}/admin/authorized-apps` });
+    cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/authorized-apps` });
     cy.getByDataCy('connected-oauth-app').should('have.length', 1);
     cy.getByDataCy('connected-oauth-app').should('contain', 'My second App');
 

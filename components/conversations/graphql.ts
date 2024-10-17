@@ -1,4 +1,6 @@
-import { gql } from '@apollo/client';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+
+import { accountHoverCardFields } from '../AccountHoverCard';
 
 export const commentFieldsFragment = gql`
   fragment CommentFields on Comment {
@@ -8,14 +10,27 @@ export const commentFieldsFragment = gql`
     reactions
     userReactions
     type
+    account {
+      id
+      slug
+      type
+      ... on AccountWithHost {
+        host {
+          id
+          slug
+        }
+      }
+    }
     fromAccount {
       id
       type
       name
       slug
       imageUrl
+      ...AccountHoverCardFields
     }
   }
+  ${accountHoverCardFields}
 `;
 
 export const conversationListFragment = gql`
@@ -70,27 +85,14 @@ export const isUserFollowingConversationQuery = gql`
   }
 `;
 
-export const updateListFragment = gql`
-  fragment UpdateListFragment on UpdateCollection {
-    totalCount
-    offset
-    limit
-    nodes {
+export const editCommentMutation = gql`
+  mutation EditComment($comment: CommentUpdateInput!) {
+    editComment(comment: $comment) {
       id
-      slug
-      title
-      summary
-      createdAt
-      publishedAt
-      isPrivate
-      userCanSeeUpdate
-      fromAccount {
-        id
-        type
-        name
-        slug
-        imageUrl
-      }
+      ...CommentFields
     }
   }
+  ${commentFieldsFragment}
 `;
+
+export const mutationOptions = { context: API_V2_CONTEXT };

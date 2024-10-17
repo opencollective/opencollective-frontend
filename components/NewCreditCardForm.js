@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { CardElement, ElementsConsumer } from '@stripe/react-stripe-js';
-import { Question } from '@styled-icons/octicons/Question';
 import { isUndefined } from 'lodash';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { HelpCircle } from 'lucide-react';
+import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { PAYMENT_METHOD_SERVICE, PAYMENT_METHOD_TYPE } from '../lib/constants/payment-methods';
@@ -23,18 +23,12 @@ const StyledCardElement = styled(CardElement)`
   border-style: solid;
   border-color: rgb(204, 204, 204);
   border-image: initial;
-  padding: 1rem;
+  padding: 0.65rem;
   border-radius: 3px;
 `;
 
-StyledCardElement.defaultProps = {
-  style: { base: { fontSize: '14px', color: '#313233' } },
-};
-
 class NewCreditCardFormWithoutStripe extends React.Component {
   static propTypes = {
-    intl: PropTypes.object.isRequired,
-    name: PropTypes.string,
     error: PropTypes.string,
     hasSaveCheckBox: PropTypes.bool,
     hidePostalCode: PropTypes.bool,
@@ -122,7 +116,7 @@ class NewCreditCardFormWithoutStripe extends React.Component {
     return (
       <Flex flexDirection="column">
         <StyledCardElement
-          options={{ hidePostalCode }}
+          options={{ hidePostalCode, style: { base: { fontSize: '14px', color: '#313233' } } }}
           onReady={input => input.focus()}
           onChange={this.onCardChange}
           onBlur={() => this.setState({ showAllErrors: true })}
@@ -157,7 +151,7 @@ class NewCreditCardFormWithoutStripe extends React.Component {
                 </Span>
               )}
             >
-              <Question size="1.1em" />
+              <HelpCircle size="1.1em" />
             </StyledTooltip>
           </Flex>
         )}
@@ -166,19 +160,21 @@ class NewCreditCardFormWithoutStripe extends React.Component {
   }
 }
 
-const NewCreditCardForm = props => (
+const NewCreditCardForm = ({ useLegacyCallback = true, ...props }) => (
   <ElementsConsumer>
-    {({ stripe, elements }) => <NewCreditCardFormWithoutStripe stripe={stripe} stripeElements={elements} {...props} />}
+    {({ stripe, elements }) => (
+      <NewCreditCardFormWithoutStripe
+        stripe={stripe}
+        stripeElements={elements}
+        useLegacyCallback={useLegacyCallback}
+        {...props}
+      />
+    )}
   </ElementsConsumer>
 );
 
 NewCreditCardForm.propTypes = {
-  intl: PropTypes.object,
   useLegacyCallback: PropTypes.bool,
 };
 
-NewCreditCardForm.defaultProps = {
-  useLegacyCallback: true,
-};
-
-export default injectIntl(NewCreditCardForm);
+export default NewCreditCardForm;

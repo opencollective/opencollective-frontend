@@ -35,7 +35,9 @@ const AmountLine = styled.div.attrs({
   ${typography}
 `;
 
-const Label = styled(Span)`
+const Label = styled(Span).attrs(props => ({
+  fontWeight: props.fontWeight ?? 400,
+}))`
   margin-right: 4px;
   color: inherit;
   flex: 0 1 70%;
@@ -44,30 +46,17 @@ const Label = styled(Span)`
   ${flex}
 `;
 
-Label.defaultProps = {
-  fontWeight: 400,
-};
-
 const Amount = styled(Span)`
   flex: 1 1 30%;
   text-align: right;
 `;
 
-const ContributionSummary = ({
-  collective,
-  stepDetails,
-  stepSummary,
-  stepPayment,
-  currency,
-  isCrypto,
-  tier,
-  renderTax,
-}) => {
+const ContributionSummary = ({ collective, stepDetails, stepSummary, stepPayment, currency, tier, renderTax }) => {
   const intl = useIntl();
-  const amount = isCrypto ? stepDetails.cryptoAmount : stepDetails.amount;
-  const totalAmount = getTotalAmount(stepDetails, stepSummary, isCrypto);
+  const amount = stepDetails.amount;
+  const totalAmount = getTotalAmount(stepDetails, stepSummary);
   const pmFeeInfo = getPaymentMethodFees(stepPayment?.paymentMethod, totalAmount, currency);
-  const platformTip = !isCrypto ? get(stepDetails, 'platformTip', 0) : 0;
+  const platformTip = get(stepDetails, 'platformTip', 0);
   const showQuantity = stepDetails.quantity > 1 || ['TICKET', 'PRODUCT'].includes(tier?.type);
   const contributionName = tier?.name ? `${collective.name} - "${tier.name}"` : collective.name;
   return (
@@ -91,12 +80,7 @@ const ContributionSummary = ({
               />
             </Label>
             <Amount>
-              <FormattedMoneyAmount
-                amount={amount || 0}
-                currency={currency}
-                amountStyles={{ color: 'black.700', fontWeight: 400 }}
-                isCrypto={isCrypto}
-              />
+              <FormattedMoneyAmount amount={amount || 0} currency={currency} />
             </Amount>
           </AmountLine>
           {Boolean(stepSummary?.taxType) &&
@@ -108,11 +92,7 @@ const ContributionSummary = ({
                   {i18nTaxType(intl, stepSummary.taxType)} {stepSummary.percentage}%
                 </Label>
                 <Amount>
-                  <FormattedMoneyAmount
-                    amount={stepSummary.amount}
-                    currency={currency}
-                    amountStyles={{ color: 'black.700', fontWeight: 400 }}
-                  />
+                  <FormattedMoneyAmount amount={stepSummary.amount} currency={currency} />
                 </Amount>
               </AmountLine>
             ))}
@@ -120,18 +100,18 @@ const ContributionSummary = ({
           {Boolean(platformTip) && (
             <AmountLine color="black.700">
               <Label>
-                <FormattedMessage
-                  id="SupportProject"
-                  defaultMessage="Support {projectName}"
-                  values={{ projectName: 'Open Collective' }}
-                />
+                {stepDetails.isNewPlatformTip ? (
+                  <FormattedMessage defaultMessage="Optional tip to the platform" id="JVRAzE" />
+                ) : (
+                  <FormattedMessage
+                    id="SupportProject"
+                    defaultMessage="Support {projectName}"
+                    values={{ projectName: 'Open Collective' }}
+                  />
+                )}
               </Label>
               <Amount data-cy="ContributionSummary-Tip">
-                <FormattedMoneyAmount
-                  amount={platformTip}
-                  currency={currency}
-                  amountStyles={{ color: 'black.700', fontWeight: 400 }}
-                />
+                <FormattedMoneyAmount amount={platformTip} currency={currency} />
               </Amount>
             </AmountLine>
           )}
@@ -144,10 +124,10 @@ const ContributionSummary = ({
           <FormattedMessage id="TodaysCharge" defaultMessage="Today's charge" />
         </Label>
         <Amount fontWeight="700" data-cy="ContributionSummary-TodaysCharge">
-          <FormattedMoneyAmount amount={totalAmount} currency={currency} amountStyles={null} isCrypto={isCrypto} />
+          <FormattedMoneyAmount amount={totalAmount} currency={currency} />
         </Amount>
       </AmountLine>
-      {Boolean(pmFeeInfo.fee) && !isCrypto && (
+      {Boolean(pmFeeInfo.fee) && (
         <React.Fragment>
           <AmountLine color="black.700">
             <Label>
@@ -192,11 +172,7 @@ const ContributionSummary = ({
                   </StyledTooltip>
                 </Box>
               )}
-              <FormattedMoneyAmount
-                amount={pmFeeInfo.fee || null}
-                currency={currency}
-                amountStyles={{ color: 'black.700', fontWeight: 400 }}
-              />
+              <FormattedMoneyAmount amount={pmFeeInfo.fee || null} currency={currency} />
             </Amount>
           </AmountLine>
           <AmountLine color="black.700">
@@ -213,18 +189,17 @@ const ContributionSummary = ({
                   <StyledTooltip
                     verticalAlign="top"
                     content={
-                      <FormattedMessage defaultMessage="Net Amount = Today's charge - Payment processor fee - Support Open Collective" />
+                      <FormattedMessage
+                        defaultMessage="Net Amount = Today's charge - Payment processor fee - Support Open Collective"
+                        id="4oy6Z0"
+                      />
                     }
                   >
                     <InfoCircle size="16px" color="#76777A" />
                   </StyledTooltip>
                 </Box>
               )}
-              <FormattedMoneyAmount
-                amount={totalAmount - pmFeeInfo.fee - platformTip}
-                currency={currency}
-                amountStyles={null}
-              />
+              <FormattedMoneyAmount amount={totalAmount - pmFeeInfo.fee - platformTip} currency={currency} />
             </Amount>
           </AmountLine>
         </React.Fragment>
@@ -253,7 +228,7 @@ const ContributionSummary = ({
               <FormattedMessage
                 id="withColon"
                 defaultMessage="{item}:"
-                values={{ item: <FormattedMessage defaultMessage="Next charge date" /> }}
+                values={{ item: <FormattedMessage defaultMessage="Next charge date" id="1u4k2w" /> }}
               />{' '}
               <FormattedDate
                 value={getNextChargeDate(new Date(), stepDetails.interval, stepPayment?.paymentMethod?.service)}
@@ -300,7 +275,6 @@ ContributionSummary.propTypes = {
   stepSummary: PropTypes.object,
   stepPayment: PropTypes.object,
   currency: PropTypes.string,
-  isCrypto: PropTypes.bool,
   renderTax: PropTypes.func,
 };
 

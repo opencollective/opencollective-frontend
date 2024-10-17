@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from '../../lib/graphql/helpers';
 
 /**
  * Fields fetched for all possible collective page features
@@ -14,7 +14,6 @@ export const accountNavbarFieldsFragment = gql`
     PROJECTS
     USE_EXPENSES
     RECEIVE_EXPENSES
-    USE_EXPENSES
     COLLECTIVE_GOALS
     TOP_FINANCIAL_CONTRIBUTORS
     CONVERSATIONS

@@ -4,11 +4,12 @@ import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
 import { ChevronUp } from '@styled-icons/feather/ChevronUp/ChevronUp';
 import { themeGet } from '@styled-system/theme-get';
 import styled from 'styled-components';
-import { size, SizeProps, space, SpaceProps } from 'styled-system';
+import type { SizeProps, SpaceProps } from 'styled-system';
+import { size, space } from 'styled-system';
 
 import Container from './Container';
 
-export const Details = styled(Container).attrs({
+const Details = styled(Container).attrs({
   as: 'details',
 })<React.HTMLProps<HTMLDetailsElement>>`
   summary {
@@ -93,7 +94,7 @@ const CollapseBtn = styled.div<CollapseBtnProps>`
 /**
  * A stylized version of the `details` HTML element to hide & show content when clicked.
  */
-const Collapse = ({ children, title, buttonSize, defaultIsOpen, ...props }) => {
+const Collapse = ({ children, title, buttonSize = 18, defaultIsOpen, ...props }) => {
   return (
     <Details open={defaultIsOpen} {...props}>
       {title && (
@@ -101,8 +102,8 @@ const Collapse = ({ children, title, buttonSize, defaultIsOpen, ...props }) => {
           <div>
             <div>{title}</div>
             <CollapseBtn size={buttonSize} ml={3}>
-              <ChevronUp size="80%" data-item="chevron-up" />
-              <ChevronDown size="80%" data-item="chevron-down" />
+              <ChevronUp size="60%" data-item="chevron-up" />
+              <ChevronDown size="60%" data-item="chevron-down" />
             </CollapseBtn>
           </div>
         </summary>
@@ -117,10 +118,6 @@ Collapse.propTypes = {
   children: PropTypes.node,
   defaultIsOpen: PropTypes.bool,
   buttonSize: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-};
-
-Collapse.defaultProps = {
-  buttonSize: 18,
 };
 
 export default Collapse;

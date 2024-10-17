@@ -1,12 +1,11 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import { withRouter } from 'next/router';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../lib/errors';
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import { compose } from '../lib/utils';
 
 import Avatar from '../components/Avatar';
@@ -65,7 +64,10 @@ class ResetPasswordPage extends React.Component {
     if (passwordScore <= 1) {
       this.setState({
         passwordError: (
-          <FormattedMessage defaultMessage="Password is too weak. Try to use more characters or use a password manager to generate a strong one." />
+          <FormattedMessage
+            defaultMessage="Password is too weak. Try to use more characters or use a password manager to generate a strong one."
+            id="C2rcD0"
+          />
         ),
         showError: true,
       });
@@ -107,7 +109,7 @@ class ResetPasswordPage extends React.Component {
                 </Flex>
 
                 <H1 fontWeight={700} fontSize="32px" mb={12} mt={3} textAlign="center">
-                  <FormattedMessage defaultMessage="Reset Password" />
+                  <FormattedMessage defaultMessage="Reset Password" id="xl27nc" />
                 </H1>
 
                 {!this.props.data?.loggedInAccount && (
@@ -117,6 +119,7 @@ class ResetPasswordPage extends React.Component {
                     ) : (
                       <FormattedMessage
                         defaultMessage="Something went wrong while trying to reset your password. Please try again or <SupportLink>contact support</SupportLink> if the problem persists."
+                        id="LeOcpF"
                         values={I18nFormatters}
                       />
                     )}
@@ -168,12 +171,13 @@ class ResetPasswordPage extends React.Component {
                       labelFontSize="13px"
                       alignItems="left"
                       width="100%"
-                      label={<FormattedMessage defaultMessage="New Password" />}
+                      label={<FormattedMessage defaultMessage="New Password" id="Ev6SEF" />}
                       htmlFor="new-password"
                       my={2}
                       helpText={
                         <FormattedMessage
                           defaultMessage="Strong password recommended. Short or weak one restricted. <link>The strength of a password is a function of length, complexity, and unpredictability.</link>"
+                          id="qaIW32"
                           values={{
                             link: getI18nLink({
                               href: 'https://en.wikipedia.org/wiki/Password_strength',
@@ -293,4 +297,6 @@ const addGraphql = compose(
   }),
 );
 
+// next.js export
+// ts-unused-exports:disable-next-line
 export default withRouter(injectIntl(withUser(addGraphql(ResetPasswordPage))));

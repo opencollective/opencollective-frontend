@@ -2,6 +2,7 @@ import React from 'react';
 import { uniqBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
+import type { UploadedFileKind } from '../../lib/graphql/types/v2/graphql';
 import { attachmentDropzoneParams } from './lib/attachments';
 
 import { Flex } from '../Grid';
@@ -20,8 +21,9 @@ type AttachedFilesFormProps = {
   title: React.ReactNode;
   description?: React.ReactNode;
   isMulti?: boolean;
-  kind: string;
+  kind: UploadedFileKind | `${UploadedFileKind}`;
   name: string;
+  openFileViewer?: (fileUrl: string) => void;
 };
 
 const AttachedFilesForm = ({
@@ -33,6 +35,7 @@ const AttachedFilesForm = ({
   isMulti = true,
   kind,
   name,
+  openFileViewer,
 }: AttachedFilesFormProps) => {
   const [files, setFiles] = React.useState(isMulti ? uniqBy(defaultValue, 'url') : defaultValue ? [defaultValue] : []);
   return (
@@ -51,7 +54,7 @@ const AttachedFilesForm = ({
             }}
           />
           &nbsp;
-          <PrivateInfoIcon color="#969BA3" size={12} />
+          <PrivateInfoIcon className="text-muted-foreground" size={12} />
         </Span>
         <StyledHr flex="1" borderColor="black.300" mx={2} />
         {isMulti && files?.length > 0 && (
@@ -75,6 +78,7 @@ const AttachedFilesForm = ({
       {files?.length > 0 ? (
         <AttachedFiles
           files={files}
+          openFileViewer={openFileViewer}
           onRemove={idx => {
             let updatedFiles = null;
             if (isMulti) {

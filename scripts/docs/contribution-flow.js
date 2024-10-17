@@ -15,7 +15,10 @@ const data = jsdoc.explainSync({
 
 const CONFIGS = ['ContributionFlowUrlParametersConfig', 'EmbedContributionFlowUrlParametersConfig'];
 
-const TYPE_LABELS = { stringArray: 'comma-separated list' };
+const TYPE_LABELS = {
+  stringArray: 'comma-separated list',
+  interval: '"month" or "year"',
+};
 
 // Parse info
 let rows = [];
@@ -32,8 +35,8 @@ for (const doc of data) {
     description: doc.deprecated
       ? `Deprecated: ${doc.deprecated}`
       : doc.memberof === 'EmbedContributionFlowUrlParametersConfig'
-      ? `Embed only: ${doc.description}`
-      : doc.description,
+        ? `Embed only: ${doc.description}`
+        : doc.description,
     default: doc.defaultvalue,
     example: doc.examples?.map(value => `\`&${doc.name}=${value}\``)?.join('\n') || '',
   });

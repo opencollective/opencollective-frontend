@@ -4,7 +4,7 @@ import { get } from 'lodash';
 import { injectIntl, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { getCollectiveMainTag } from '../lib/collective.lib';
+import { getCollectiveMainTag } from '../lib/collective';
 import { getCountryDisplayName, getFlagEmoji } from '../lib/i18n/countries';
 
 import Avatar from './Avatar';
@@ -142,11 +142,11 @@ CollectiveContainer.propTypes = {
 const StyledCollectiveCard = ({
   collective,
   tag,
-  bodyHeight,
+  bodyHeight = 260,
   children,
-  borderRadius,
+  borderRadius = 16,
   showWebsite,
-  useLink,
+  useLink = true,
   ...props
 }) => {
   const intl = useIntl();
@@ -205,7 +205,9 @@ const StyledCollectiveCard = ({
               )}
               {collective.isFrozen ? (
                 <StyledTag display="inline-block" variant="rounded-right">
-                  <I18nCollectiveTags tags={intl.formatMessage({ defaultMessage: 'This Collective is frozen' })} />
+                  <I18nCollectiveTags
+                    tags={intl.formatMessage({ defaultMessage: 'This Collective is frozen', id: 'gDbURz' })}
+                  />
                 </StyledTag>
               ) : tag === undefined ? (
                 <StyledTag display="inline-block" variant="rounded-right">
@@ -261,12 +263,6 @@ StyledCollectiveCard.propTypes = {
   useLink: PropTypes.bool,
   childrenContainerProps: PropTypes.object,
   bodyProps: PropTypes.object,
-};
-
-StyledCollectiveCard.defaultProps = {
-  bodyHeight: 260,
-  borderRadius: 16,
-  useLink: true,
 };
 
 export default injectIntl(StyledCollectiveCard);

@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import ConfirmationModal, { CONFIRMATION_MODAL_TERMINATE } from '../ConfirmationModal';
 import { P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 const deleteApplicationMutation = gql`
   mutation DeleteOAuthApplication($id: String!) {
@@ -22,7 +22,7 @@ const deleteApplicationMutation = gql`
 `;
 
 const DeleteOAuthApplicationModal = ({ application, onDelete, ...props }) => {
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const intl = useIntl();
   const [deleteApplication] = useMutation(deleteApplicationMutation, {
     context: API_V2_CONTEXT,
@@ -41,24 +41,32 @@ const DeleteOAuthApplicationModal = ({ application, onDelete, ...props }) => {
     <ConfirmationModal
       isDanger
       type="delete"
-      header={<FormattedMessage defaultMessage="Delete application {name}" values={{ name: application.name }} />}
+      header={
+        <FormattedMessage defaultMessage="Delete application {name}" id="M5dGYy" values={{ name: application.name }} />
+      }
       {...props}
       continueHandler={async () => {
         try {
           await deleteApplication({ variables: { id: application.id } });
           await onDelete(application);
-          addToast({
-            type: TOAST_TYPE.SUCCESS,
-            message: intl.formatMessage({ defaultMessage: 'Application {name} deleted' }, { name: application.name }),
+          toast({
+            variant: 'success',
+            message: intl.formatMessage(
+              { defaultMessage: 'Application {name} deleted', id: 'vAzArE' },
+              { name: application.name },
+            ),
           });
           return CONFIRMATION_MODAL_TERMINATE;
         } catch (e) {
-          addToast({ type: TOAST_TYPE.ERROR, variant: 'light', message: i18nGraphqlException(intl, e) });
+          toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
         }
       }}
     >
       <P>
-        <FormattedMessage defaultMessage="This will permanently delete the application, revoking all tokens associated with it. Are you sure you want to continue?" />
+        <FormattedMessage
+          defaultMessage="This will permanently delete the application, revoking all tokens associated with it. Are you sure you want to continue?"
+          id="pp/kVH"
+        />
       </P>
     </ConfirmationModal>
   );

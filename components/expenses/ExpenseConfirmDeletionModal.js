@@ -1,17 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql } from '@apollo/client';
 import { Mutation } from '@apollo/client/react/components';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import ConfirmationModal from '../ConfirmationModal';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
-export const deleteExpenseMutation = gql`
+const deleteExpenseMutation = gql`
   mutation DeleteExpense($id: String!) {
     deleteExpense(expense: { id: $id }) {
       id
@@ -19,7 +18,7 @@ export const deleteExpenseMutation = gql`
   }
 `;
 
-export const removeExpenseFromCache = (cache, { data: { deleteExpense } }) => {
+const removeExpenseFromCache = (cache, { data: { deleteExpense } }) => {
   cache.modify({
     fields: {
       expenses(existingExpenses, { readField }) {
@@ -38,7 +37,7 @@ export const removeExpenseFromCache = (cache, { data: { deleteExpense } }) => {
 };
 
 const ExpenseConfirmDeletion = ({ onDelete, showDeleteConfirmMoreActions, expense }) => {
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const intl = useIntl();
   return (
     <Mutation mutation={deleteExpenseMutation} context={API_V2_CONTEXT} update={removeExpenseFromCache}>
@@ -51,8 +50,8 @@ const ExpenseConfirmDeletion = ({ onDelete, showDeleteConfirmMoreActions, expens
           continueHandler={async () => {
             try {
               await deleteExpense({ variables: { id: expense.id } });
-              addToast({
-                type: TOAST_TYPE.SUCCESS,
+              toast({
+                variant: 'success',
                 message: (
                   <FormattedMessage
                     id="delete.successMessage"
@@ -61,7 +60,7 @@ const ExpenseConfirmDeletion = ({ onDelete, showDeleteConfirmMoreActions, expens
                 ),
               });
             } catch (e) {
-              addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
+              toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
             }
 
             if (onDelete) {

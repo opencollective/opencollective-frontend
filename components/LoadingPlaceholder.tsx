@@ -1,7 +1,7 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import type React from 'react';
 import styled, { keyframes } from 'styled-components';
-import { border, BorderProps, layout, LayoutProps, space, SpaceProps } from 'styled-system';
+import type { BorderProps, LayoutProps, SpaceProps } from 'styled-system';
+import { border, layout, space } from 'styled-system';
 
 import { flicker } from './StyledKeyframes';
 
@@ -15,8 +15,13 @@ const AnimateBackground = keyframes`
 /**
  * A loading container that will show an animated block instead of a blank space.
  */
-const LoadingPlaceholder = styled.div<LoadingPlaceholderProps>`
-  animation: ${AnimateBackground} 1s linear infinite, ${flicker({ minOpacity: 0.8 })} 1s linear infinite;
+const LoadingPlaceholder = styled.div.attrs<LoadingPlaceholderProps>(props => ({
+  height: props.height ?? '100%',
+  borderRadius: props.borderRadius ?? '2%',
+}))<LoadingPlaceholderProps>`
+  animation:
+    ${AnimateBackground} 1s linear infinite,
+    ${flicker({ minOpacity: 0.8 })} 1s linear infinite;
   background: linear-gradient(to right, #eee 2%, #ddd 18%, #eee 33%);
   background-size: 200%;
   width: 100%;
@@ -25,15 +30,6 @@ const LoadingPlaceholder = styled.div<LoadingPlaceholderProps>`
   ${layout}
   ${space}
 `;
-
-LoadingPlaceholder.propTypes = {
-  height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-};
-
-LoadingPlaceholder.defaultProps = {
-  height: '100%',
-  borderRadius: '2%',
-};
 
 /** @component */
 export default LoadingPlaceholder;

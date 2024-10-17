@@ -1,17 +1,18 @@
 import React from 'react';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { useIntl } from 'react-intl';
 
-import { isIndividualAccount } from '../../lib/collective.lib';
+import { isIndividualAccount } from '../../lib/collective';
 import { formatCurrency } from '../../lib/currency-utils';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import Avatar from '../Avatar';
 import { FLAG_COLLECTIVE_PICKER_COLLECTIVE } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import ConfirmationModal from '../ConfirmationModal';
 import Container from '../Container';
+import DashboardHeader from '../dashboard/DashboardHeader';
 import { Box, Flex } from '../Grid';
 import LinkCollective from '../LinkCollective';
 import MessageBox from '../MessageBox';
@@ -23,7 +24,7 @@ import StyledLink from '../StyledLink';
 import StyledSelect from '../StyledSelect';
 import StyledTag from '../StyledTag';
 import { Label, P, Span } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 const moveOrdersFieldsFragment = gql`
   fragment MoveOrdersFields on Order {
@@ -41,6 +42,9 @@ const moveOrdersFieldsFragment = gql`
       slug
       isIncognito
       imageUrl(height: 48)
+      ... on Individual {
+        isGuest
+      }
     }
     toAccount {
       id
@@ -147,7 +151,7 @@ const getOrdersQueryOptions = selectedProfile => {
 const MoveAuthoredContributions = () => {
   // Local state and hooks
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const [fromAccount, setFromAccount] = React.useState(null);
   const [newFromAccount, setNewFromAccount] = React.useState(null);
   const [hasConfirmationModal, setHasConfirmationModal] = React.useState(false);
@@ -177,7 +181,7 @@ const MoveAuthoredContributions = () => {
 
       // Submit
       await submitMoveContributions({ variables: mutationVariables });
-      addToast({ type: TOAST_TYPE.SUCCESS, title: 'Contributions moved successfully', message: callToAction });
+      toast({ variant: 'success', title: 'Contributions moved successfully', message: callToAction });
 
       // Reset form and purge cache
       setHasConfirmationModal(false);
@@ -185,7 +189,7 @@ const MoveAuthoredContributions = () => {
       setNewFromAccount(null);
       setSelectedOrderOptions([]);
     } catch (e) {
-      addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
+      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     }
   };
 
@@ -195,6 +199,7 @@ const MoveAuthoredContributions = () => {
 
   return (
     <div>
+      <DashboardHeader title="Move Authored Contributions" className="mb-10" />
       <StyledInputField htmlFor="fromAccount" label="Account that authored the contribution" flex="1 1">
         {({ id }) => (
           <CollectivePickerAsync

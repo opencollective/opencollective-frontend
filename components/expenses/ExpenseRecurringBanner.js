@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { pick } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { getDateFromValue, toIsoDateStr } from '../../lib/date-utils';
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { RecurringExpenseIntervals, RecurringIntervalOptions } from '../../lib/i18n/expense';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
 
@@ -20,7 +20,7 @@ import StyledLink from '../StyledLink';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import StyledSelect from '../StyledSelect';
 import { P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 const recurringExpensePropType = PropTypes.shape({
   id: PropTypes.string,
@@ -39,27 +39,29 @@ const deleteExpenseMutation = gql`
 const ExpenseRecurringEditModal = ({ onClose, expense }) => {
   const { recurringExpense } = expense;
   const [deleteExpense, { loading }] = useMutation(deleteExpenseMutation, { context: API_V2_CONTEXT });
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const intl = useIntl();
   const router = useRouter();
 
   const handleDeletion = async () => {
     try {
       await deleteExpense({ variables: { expense: pick(expense, ['id']) } });
-      addToast({
-        type: TOAST_TYPE.SUCCESS,
-        message: intl.formatMessage({ defaultMessage: 'Expense deleted' }),
+      toast({
+        variant: 'success',
+        message: intl.formatMessage({ defaultMessage: 'Expense deleted', id: 'KYXMJ6' }),
       });
       router.push(getCollectivePageRoute(expense.account));
       onClose();
     } catch (e) {
-      addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
+      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     }
   };
 
   return (
-    <StyledModal role="alertdialog" width="432px" onClose={onClose} padding="auto" px={4} py="20px" trapFocus>
-      <ModalHeader onClose={onClose}>Recurring Expense Setting</ModalHeader>
+    <StyledModal role="alertdialog" onClose={onClose} padding="auto" px={4} py="20px" trapFocus>
+      <ModalHeader onClose={onClose}>
+        <FormattedMessage defaultMessage="Recurring Expense Settings" id="L/TmUV" />
+      </ModalHeader>
       <ModalBody pt={2}>
         <Flex flexDirection={'column'}>
           <P color="black.700" fontWeight="400" fontSize="14px" lineHeight="20px" mt={0} mb={2}>

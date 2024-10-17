@@ -1,13 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ShieldFillCheck } from '@styled-icons/bootstrap/ShieldFillCheck';
-import { ShieldFillExclamation } from '@styled-icons/bootstrap/ShieldFillExclamation';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown';
 import { ChevronUp } from '@styled-icons/feather/ChevronUp';
 import { themeGet } from '@styled-system/theme-get';
 import { compact, find, first, uniq, upperCase } from 'lodash';
+import { ShieldAlert, ShieldCheck } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
+
+import useKeyboardKey, { S } from '../../lib/hooks/useKeyboardKey';
 
 import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';
@@ -80,9 +81,9 @@ const SecurityCheck = check => {
             minWidth="max-content"
           >
             {isExpanded ? (
-              <FormattedMessage defaultMessage="Hide Details" />
+              <FormattedMessage defaultMessage="Hide Details" id="jBYmhn" />
             ) : (
-              <FormattedMessage defaultMessage="Show Details" />
+              <FormattedMessage defaultMessage="Show Details" id="kRqDOg" />
             )}
             {isExpanded ? <ChevronUp size="1em" /> : <ChevronDown size="1em" />}
           </StyledLink>
@@ -119,7 +120,7 @@ const SecurityChecksModal = ({ expense, onClose, onConfirm, ...modalProps }) => 
   const [scope, setScope] = React.useState();
 
   return (
-    <StyledModal trapFocus onClose={onClose} width="680px" data-cy="security-check-modal" {...modalProps}>
+    <StyledModal trapFocus onClose={onClose} data-cy="security-check-modal" {...modalProps}>
       <ModalHeader onClose={onClose}>
         <Box>
           <H1 color="black.900" fontSize="20px" lineHeight="28px">
@@ -211,29 +212,40 @@ const LEVEL_BUTTON_STYLE = {
   LOW: 'secondary',
 };
 
-export const SecurityChecksButton = ({ expense, ...buttonProps }) => {
-  const [hasModal, setHasModal] = React.useState(false);
+export const SecurityChecksButton = ({ expense, enableKeyboardShortcuts, ...buttonProps }) => {
+  const [displayModal, setDisplayModal] = React.useState(false);
   const highRiskChecks = expense?.securityChecks?.filter(check => check.level === 'HIGH').length || 0;
   const higherRisk = first(compact(LEVEL_ORDER.map(level => find(expense?.securityChecks, { level }))));
-  const ShieldIcon = highRiskChecks ? ShieldFillExclamation : ShieldFillCheck;
+  const ShieldIcon = highRiskChecks ? ShieldAlert : ShieldCheck;
+
+  useKeyboardKey({
+    keyMatch: S,
+    callback: e => {
+      if (enableKeyboardShortcuts) {
+        e.preventDefault();
+        setDisplayModal(true);
+      }
+    },
+  });
 
   return (
     <React.Fragment>
       <RoundButton
         {...buttonProps}
         buttonStyle={LEVEL_BUTTON_STYLE[higherRisk?.level] || 'secondary'}
-        onClick={() => setHasModal(true)}
+        onClick={() => setDisplayModal(true)}
       >
         {highRiskChecks ? <Indicator>{highRiskChecks}</Indicator> : null}
         <ShieldIcon size={18} />
       </RoundButton>
-      {hasModal && <SecurityChecksModal expense={expense} onClose={() => setHasModal(false)} />}
+      {displayModal && <SecurityChecksModal expense={expense} onClose={() => setDisplayModal(false)} />}
     </React.Fragment>
   );
 };
 
 SecurityChecksButton.propTypes = {
   ...SecurityChecksModal.propTypes,
+  isOpen: PropTypes.bool,
   onConfirm: PropTypes.func,
   onClose: PropTypes.func,
 };

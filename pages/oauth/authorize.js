@@ -1,10 +1,10 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { difference } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
 import EmbeddedPage from '../../components/EmbeddedPage';
@@ -22,6 +22,7 @@ const applicationQuery = gql`
       name
       clientId
       redirectUri
+      preAuthorize2FA
       account {
         id
         name
@@ -72,6 +73,7 @@ const OAuthAuthorizePage = () => {
           <MessageBox withIcon type="error">
             <FormattedMessage
               defaultMessage="Missing parameters: {parameters}"
+              id="evYyQx"
               values={{ parameters: missingParams.join(', ') }}
             />
           </MessageBox>
@@ -79,6 +81,7 @@ const OAuthAuthorizePage = () => {
           <MessageBox withIcon type="error">
             <FormattedMessage
               defaultMessage='{field} has invalid value "{value}". Expected: "{expected}"'
+              id="mGSAXe"
               values={{ field: 'response_type', value: query['response_type'], expected: 'code' }}
             />
           </MessageBox>
@@ -98,4 +101,6 @@ const OAuthAuthorizePage = () => {
   );
 };
 
+// next.js export
+// ts-unused-exports:disable-next-line
 export default OAuthAuthorizePage;

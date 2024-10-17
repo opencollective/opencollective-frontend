@@ -13,7 +13,7 @@ import fetch from 'node-fetch';
  * @param endpoint
  * @param options
  */
-export async function getRemoteSchema(endpoint) {
+async function getRemoteSchema(endpoint) {
   try {
     const introspectionQuery = getIntrospectionQuery({ inputValueDeprecation: true, schemaDescription: true });
     const { data, errors } = await fetch(endpoint, {
@@ -43,7 +43,7 @@ export async function getRemoteSchema(endpoint) {
  * @param dist
  * @param schema
  */
-export function printToFile(schema, filePath) {
+function printToFile(schema, filePath) {
   try {
     const output = path.resolve(process.cwd(), filePath);
     fs.writeFileSync(output, schema);
@@ -54,7 +54,7 @@ export function printToFile(schema, filePath) {
   }
 }
 
-export async function main(endpoint, filePath) {
+async function main(endpoint, filePath) {
   /* Fetch schema */
   const schema = await getRemoteSchema(endpoint);
 

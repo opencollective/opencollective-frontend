@@ -1,3 +1,4 @@
+import * as cheerio from 'cheerio';
 import speakeasy from 'speakeasy';
 
 import { randomEmail, randomSlug } from '../support/faker';
@@ -11,11 +12,11 @@ describe('edit collective', () => {
     });
     // Give it a few ms to actually receive the email before we clean the inbox
     cy.wait(200);
-    cy.clearInbox();
+    cy.mailpitDeleteAllEmails();
   });
 
   beforeEach(() => {
-    cy.login({ redirect: `/${collectiveSlug}/admin` });
+    cy.login({ redirect: `/dashboard/${collectiveSlug}/info` });
   });
 
   it('edit members', () => {
@@ -37,15 +38,20 @@ describe('edit collective', () => {
     cy.getByDataCy('create-collective-mini-form').should('not.exist'); // Wait for form to be submitted
     cy.getByDataCy('confirmation-modal-continue').click();
     cy.get('[data-cy="member-1"] [data-cy="member-pending-tag"]').should('exist');
-    cy.getEmail(({ subject }) => subject.includes('Invitation to join CollectiveToEdit'));
+    cy.mailpitHasEmailsBySubject('Invitation to join CollectiveToEdit').should('eq', 1);
 
     // Re-send the invitation email
-    cy.clearInbox();
+    cy.mailpitDeleteAllEmails();
     cy.getByDataCy('resend-invite-btn').should('exist').first().click({ force: true });
 
     // Check invitation email
-    cy.openEmail(({ subject }) => subject.includes('Invitation to join CollectiveToEdit'));
-    cy.contains('Test User Admin just invited you to the role of Administrator of CollectiveToEdit on Open Collective');
+    cy.openEmail(({ Subject }) => Subject.includes('Invitation to join CollectiveToEdit')).then(email => {
+      const $html = cheerio.load(email.HTML);
+      const emailBody = $html('body').text();
+      expect(emailBody).to.include(
+        'Test User Admin just invited you to the role of Administrator of CollectiveToEdit on Open Collective',
+      );
+    });
 
     // Accept invitation as new user
     cy.login({ email: invitedUserEmail, redirect: `/member-invitations` });
@@ -56,7 +62,7 @@ describe('edit collective', () => {
     cy.url().should('eq', `${Cypress.config().baseUrl}/${collectiveSlug}`);
     cy.contains('#section-our-team', 'AmazingNewUser');
 
-    cy.visit(`/${collectiveSlug}/admin/team`);
+    cy.visit(`/dashboard/${collectiveSlug}/team`);
     cy.get('[data-cy="member-1"]').find('[data-cy="member-pending-tag"]').should('not.exist');
     cy.getByDataCy('resend-invite-btn').should('not.exist');
   });
@@ -101,7 +107,7 @@ describe('edit collective', () => {
     cy.get('input[data-cy=maxQuantity]').type('100');
     cy.get('input[data-cy=button]').type('Buy it!');
     cy.getByDataCy('confirm-btn').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Tier created.' });
+    cy.checkToast({ variant: 'success', message: 'Tier created.' });
     cy.getByDataCy('contribute-card-tier').should('have.length', 3);
 
     // TODO: Also do the check below on the profile page (need https://github.com/opencollective/opencollective/issues/6331)
@@ -122,7 +128,7 @@ describe('edit collective', () => {
     cy.get('.currency1.inputField input').type('{selectall}25');
     cy.get('.currency2.inputField input').type('{selectall}50');
     cy.getByDataCy('confirm-btn').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Tier updated.' });
+    cy.checkToast({ variant: 'success', message: 'Tier updated.' });
     cy.getByDataCy('contribute-card-tier')
       .last()
       .should('contain', 'Potatoes')
@@ -136,7 +142,7 @@ describe('edit collective', () => {
     cy.getByDataCy('contribute-card-tier').last().find('button').click();
     cy.getByDataCy('delete-btn').click();
     cy.getByDataCy('confirm-delete-btn').click();
-    cy.checkToast({ type: 'SUCCESS', message: 'Tier deleted.' });
+    cy.checkToast({ variant: 'success', message: 'Tier deleted.' });
 
     // TODO: Check profile page (need https://github.com/opencollective/opencollective/issues/6331)
   });
@@ -149,7 +155,7 @@ describe('edit collective', () => {
     cy.contains('[data-cy="select-option"]', 'Use my own VAT number').click();
     cy.contains('button', 'Save').click();
     cy.contains('Saved');
-    cy.visit(`${collectiveSlug}/admin/tiers`);
+    cy.visit(`/dashboard/${collectiveSlug}/tiers`);
     cy.getByDataCy('contribute-card-tier').first().find('button').click();
     cy.getByDataCy('select-type').click();
     cy.contains('[data-cy=select-option]', 'product').click();
@@ -163,10 +169,12 @@ describe('edit user collective', () => {
     const userSlug = randomSlug();
     cy.signup({
       user: { name: userSlug, settings: { features: { twoFactorAuth: true } } },
-      redirect: `/${userSlug}/admin`,
+      redirect: `/dashboard/${userSlug}/info`,
     });
 
+    cy.getByDataCy('menu-item-Settings').click();
     cy.getByDataCy('menu-item-user-security').click();
+    cy.contains('Add authenticator').click();
     cy.getByDataCy('qr-code').should('exist');
     cy.getByDataCy('manual-entry-2fa-token')
       .invoke('text')
@@ -176,7 +184,7 @@ describe('edit user collective', () => {
         // typing the wrong code fails
         cy.getByDataCy('add-two-factor-auth-totp-code-field').type('123456');
         cy.getByDataCy('add-two-factor-auth-totp-code-button').click();
-        cy.getByDataCy('add-two-factor-auth-error').should('exist');
+        cy.getByDataCy('InputField-twoFactorAuthenticatorCode').contains('Invalid code');
         // typing the right code passes
         const TOTPCode = speakeasy.totp({
           algorithm: 'SHA1',
@@ -189,7 +197,7 @@ describe('edit user collective', () => {
         cy.getByDataCy('recovery-codes-container').children().should('have.length', 6);
         cy.getByDataCy('add-two-factor-auth-confirm-recovery-codes-button').click();
         cy.getByDataCy('confirmation-modal-continue').click();
-        cy.getByDataCy('add-two-factor-auth-success').should('exist');
+        cy.getByDataCy('authenticator-2fa-method').should('exist');
       });
   });
 });

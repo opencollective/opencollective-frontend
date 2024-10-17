@@ -4,29 +4,26 @@ import { getApplicableTaxesForCountry, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { ArrowBack } from '@styled-icons/material/ArrowBack';
 import dayjs from 'dayjs';
-import { cloneDeep, find, get, set } from 'lodash';
+import { cloneDeep, get, isNil, set } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { AccountTypesWithHost, CollectiveType, defaultBackgroundImage } from '../../lib/constants/collectives';
 import { Currency } from '../../lib/constants/currency';
-import { ORDER_STATUS } from '../../lib/constants/order-status';
-import { TierTypes } from '../../lib/constants/tiers-types';
 import { VAT_OPTIONS } from '../../lib/constants/vat';
 import { convertDateFromApiUtc, convertDateToApiUtc } from '../../lib/date-utils';
 import { isValidUrl } from '../../lib/utils';
 
-import { ALL_SECTIONS } from '../admin-panel/constants';
-import ActivityLog from '../admin-panel/sections/ActivityLog';
-import AuthorizedApps from '../admin-panel/sections/AuthorizedApps';
-import ForDevelopers from '../admin-panel/sections/ForDevelopers';
 import Container from '../Container';
 import CreateGiftCardsForm from '../CreateGiftCardsForm';
+import { ALL_SECTIONS } from '../dashboard/constants';
+import ActivityLog from '../dashboard/sections/ActivityLog';
+import AuthorizedApps from '../dashboard/sections/AuthorizedApps';
+import ForDevelopers from '../dashboard/sections/ForDevelopers';
 import { Box, Flex } from '../Grid';
 import { I18nSupportLink } from '../I18nFormatters';
 import InputField from '../InputField';
 import Link from '../Link';
-import OrdersWithData from '../orders/OrdersWithData';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 
@@ -44,7 +41,7 @@ import FiscalHosting from './sections/FiscalHosting';
 import GiftCards from './sections/GiftCards';
 import Host from './sections/Host';
 import HostVirtualCardsSettings from './sections/HostVirtualCardsSettings';
-import PaymentMethods from './sections/PaymentMethods';
+import ManagePaymentMethods from './sections/ManagePaymentMethods';
 import PaymentReceipts from './sections/PaymentReceipts';
 import Policies from './sections/Policies';
 import ReceivingMoney from './sections/ReceivingMoney';
@@ -53,7 +50,6 @@ import SendingMoney from './sections/SendingMoney';
 import Tickets from './sections/Tickets';
 import Tiers from './sections/Tiers';
 import UserSecurity from './sections/UserSecurity';
-import VirtualCards from './sections/virtual-cards/VirtualCards';
 import Webhooks from './sections/Webhooks';
 // Other Components
 import EditUserEmailForm from './EditUserEmailForm';
@@ -71,6 +67,7 @@ class EditCollectiveForm extends React.Component {
     router: PropTypes.object, // from withRouter
     intl: PropTypes.object.isRequired, // from injectIntl
     query: PropTypes.object, // passed from Page/Router through index/EditCollective
+    isLegacyOCFDuplicatedAccount: PropTypes.bool,
   };
 
   constructor(props) {
@@ -272,7 +269,7 @@ class EditCollectiveForm extends React.Component {
         id: 'event.privateInstructions.description',
         defaultMessage: 'These instructions will be provided by email to the participants.',
       },
-      inValidDateError: { defaultMessage: 'Please enter a valid date' },
+      inValidDateError: { defaultMessage: 'Please enter a valid date', id: '6DCLcI' },
     });
 
     collective.backgroundImage = collective.backgroundImage || defaultBackgroundImage[collective.type];
@@ -284,15 +281,9 @@ class EditCollectiveForm extends React.Component {
     collective.slug = collective.slug ? collective.slug.replace(/.*\//, '') : '';
     collective.tos = get(collective, 'settings.tos');
 
-    // TODO Remove this once tier legacy is removed
-    const tiers = collective.tiers && collective.tiers.filter(tier => tier.type !== TierTypes.TICKET);
-    const tickets = collective.tiers && collective.tiers.filter(tier => tier.type === TierTypes.TICKET);
-
     return {
       modified: false,
       collective,
-      tiers: tiers.length === 0 ? [] : tiers,
-      tickets: tickets.length === 0 ? [] : tickets,
       validStartDate: true,
       validEndDate: true,
       isValidSocialLinks: true,
@@ -354,13 +345,26 @@ class EditCollectiveForm extends React.Component {
   async handleSubmit() {
     const collective = { ...this.state.collective };
 
-    // Add Tiers and Tickets
-    collective.tiers = [];
-    if (find(this.state.tiers, 'name')) {
-      collective.tiers = [...this.state.tiers];
-    }
-    if (find(this.state.tickets, 'name')) {
-      collective.tiers = [...collective.tiers, ...this.state.tickets];
+    // Add a confirm if slug changed
+    if (collective.slug !== this.props.collective.slug) {
+      if (
+        !window.confirm(
+          this.props.intl.formatMessage(
+            {
+              defaultMessage:
+                'Changing the handle from @{previousHandle} to @{newHandle} will break all the links that you previously shared for this profile (i.e., {exampleUrl}). Do you really want to continue?',
+              id: 'F0ZA/r',
+            },
+            {
+              previousHandle: this.props.collective.slug,
+              newHandle: collective.slug,
+              exampleUrl: `https://opencollective.com/${this.props.collective.slug}`,
+            },
+          ),
+        )
+      ) {
+        return;
+      }
     }
 
     this.props.onSubmit(collective);
@@ -385,7 +389,7 @@ class EditCollectiveForm extends React.Component {
   }
 
   renderSection(section) {
-    const { collective, LoggedInUser } = this.props;
+    const { collective, LoggedInUser, isLegacyOCFDuplicatedAccount } = this.props;
 
     switch (section) {
       case ALL_SECTIONS.INFO:
@@ -400,9 +404,6 @@ class EditCollectiveForm extends React.Component {
       case ALL_SECTIONS.CONNECTED_ACCOUNTS:
         return <ConnectedAccounts collective={collective} connectedAccounts={collective.connectedAccounts} />;
 
-      case ALL_SECTIONS.EXPENSES:
-        return null;
-
       case ALL_SECTIONS.EXPORT:
         return <Export collective={collective} />;
 
@@ -412,13 +413,19 @@ class EditCollectiveForm extends React.Component {
         );
 
       case ALL_SECTIONS.PAYMENT_METHODS:
-        return <PaymentMethods collectiveSlug={collective.slug} />;
+        return <ManagePaymentMethods account={collective} />;
 
       case ALL_SECTIONS.TIERS:
-        return <Tiers collective={collective} types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']} />;
+        return (
+          <Tiers
+            isLegacyOCFDuplicatedAccount={isLegacyOCFDuplicatedAccount}
+            collective={collective}
+            types={['TIER', 'MEMBERSHIP', 'SERVICE', 'PRODUCT', 'DONATION']}
+          />
+        );
 
       case ALL_SECTIONS.TICKETS:
-        return <Tickets collective={collective} />;
+        return <Tickets collective={collective} isLegacyOCFDuplicatedAccount={isLegacyOCFDuplicatedAccount} />;
 
       case ALL_SECTIONS.GIFT_CARDS:
         return <GiftCards collectiveId={collective.id} collectiveSlug={collective.slug} />;
@@ -436,8 +443,8 @@ class EditCollectiveForm extends React.Component {
               alignItems="center"
               flexWrap="wrap"
             >
-              <Link href={`/${collective.slug}/admin/gift-cards`}>
-                <StyledButton data-cy="back-to-giftcards-list">
+              <Link href={`/dashboard/${collective.slug}/gift-cards`} data-cy="back-to-giftcards-list">
+                <StyledButton>
                   <ArrowBack size="1em" />{' '}
                   <FormattedMessage id="giftCards.returnToEdit" defaultMessage="Back to Gift Cards list" />
                 </StyledButton>
@@ -477,6 +484,7 @@ class EditCollectiveForm extends React.Component {
         return (
           <Box>
             {collective.type === USER && <EditUserEmailForm />}
+            {collective.type === ORGANIZATION && <FiscalHosting collective={collective} LoggedInUser={LoggedInUser} />}
             {[COLLECTIVE, FUND, PROJECT, EVENT].includes(collective.type) && (
               <EmptyBalance collective={collective} LoggedInUser={LoggedInUser} />
             )}
@@ -488,20 +496,10 @@ class EditCollectiveForm extends React.Component {
       // Fiscal Hosts
 
       case ALL_SECTIONS.FISCAL_HOSTING:
-        return <FiscalHosting collective={collective} LoggedInUser={LoggedInUser} />;
+        return null;
 
       case ALL_SECTIONS.RECEIVING_MONEY:
         return <ReceivingMoney collective={collective} />;
-
-      case ALL_SECTIONS.PENDING_ORDERS:
-        return (
-          <OrdersWithData
-            accountSlug={collective.slug}
-            status={ORDER_STATUS.PENDING}
-            title={<FormattedMessage id="PendingBankTransfers" defaultMessage="Pending bank transfers" />}
-            showPlatformTip
-          />
-        );
 
       case ALL_SECTIONS.SENDING_MONEY:
         return <SendingMoney collective={collective} />;
@@ -528,9 +526,6 @@ class EditCollectiveForm extends React.Component {
       case ALL_SECTIONS.HOST_VIRTUAL_CARDS_SETTINGS:
         return <HostVirtualCardsSettings collective={collective} />;
 
-      case ALL_SECTIONS.VIRTUAL_CARDS:
-        return <VirtualCards collective={collective} />;
-
       default:
         return null;
     }
@@ -544,34 +539,32 @@ class EditCollectiveForm extends React.Component {
     const taxes = getApplicableTaxesForCountry(country);
 
     if (taxes.includes(TaxType.VAT)) {
+      const vatType = get(collective, 'settings.VAT.type');
+      const vatNumber = get(collective, 'settings.VAT.number');
+
       const getVATOptions = () => {
         const options = [
-          {
-            value: '',
-            label: intl.formatMessage(this.messages['VAT.None']),
-          },
-          {
-            value: VAT_OPTIONS.HOST,
-            label: intl.formatMessage(this.messages['VAT.Host']),
-          },
+          { value: '', label: intl.formatMessage(this.messages['VAT.None']) },
+          { value: VAT_OPTIONS.OWN, label: intl.formatMessage(this.messages['VAT.Own']) },
         ];
 
-        return collective.isHost
-          ? options
-          : [
-              ...options,
-              {
-                value: VAT_OPTIONS.OWN,
-                label: intl.formatMessage(this.messages['VAT.Own']),
-              },
-            ];
+        // Show a "Host" VAT option (default) when not a fiscal host, nor self-hosted, or when it's already set
+        if (!collective.isHost || vatType === VAT_OPTIONS.HOST) {
+          options.push({
+            value: VAT_OPTIONS.HOST,
+            label: intl.formatMessage(this.messages['VAT.Host']),
+          });
+        }
+
+        return options;
       };
 
       fields.push(
         {
           name: 'VAT',
           type: 'select',
-          defaultValue: get(collective, 'settings.VAT.type') || VAT_OPTIONS.HOST,
+          // For hosted accounts, we default to `HOST` for VAT type
+          defaultValue: !isNil(vatType) ? vatType : !collective.isHost ? VAT_OPTIONS.HOST : '',
           when: () => {
             return collective.isHost || AccountTypesWithHost.includes(collective.type);
           },
@@ -581,15 +574,9 @@ class EditCollectiveForm extends React.Component {
           name: 'VAT-number',
           type: 'string',
           placeholder: 'FRXX999999999',
-          defaultValue: get(collective, 'settings.VAT.number'),
+          defaultValue: vatNumber,
           when: () => {
-            const { collective } = this.state;
-            if (collective.type === COLLECTIVE || collective.type === EVENT) {
-              // Collectives can set a VAT number if configured
-              return get(collective, 'settings.VAT.type') === VAT_OPTIONS.OWN;
-            } else {
-              return true;
-            }
+            return vatType !== VAT_OPTIONS.HOST || collective.isHost;
           },
         },
       );
@@ -656,7 +643,12 @@ class EditCollectiveForm extends React.Component {
           name: 'slug',
           pre: 'https://opencollective.com/',
           placeholder: '',
+          maxLength: 255,
           when: () => collective.type !== EVENT,
+          description: intl.formatMessage({
+            id: 'createCollective.form.slugLabel',
+            defaultMessage: 'Set your profile URL',
+          }),
         },
         {
           name: 'startsAt',
@@ -712,7 +704,6 @@ class EditCollectiveForm extends React.Component {
           disabled:
             ([COLLECTIVE, FUND].includes(collective.type) && collective.isActive) || collective.isHost ? true : false,
         },
-        ...this.getApplicableTaxesFields(),
         {
           name: 'tags',
           maxLength: 128,
@@ -731,6 +722,7 @@ class EditCollectiveForm extends React.Component {
           when: () => collective.type === USER,
           isPrivate: true,
         },
+        ...this.getApplicableTaxesFields(),
       ],
       'fiscal-hosting': [
         {
@@ -770,7 +762,7 @@ class EditCollectiveForm extends React.Component {
       ],
     };
 
-    Object.keys(this.fields).map(fieldname => {
+    for (const fieldname in this.fields) {
       this.fields[fieldname] = this.fields[fieldname].map(field => {
         if (this.messages[`${field.name}.label`]) {
           field.label = intl.formatMessage(this.messages[`${field.name}.label`]);
@@ -790,7 +782,7 @@ class EditCollectiveForm extends React.Component {
 
         return field;
       });
-    });
+    }
 
     const fields = (this.fields[section] || []).filter(field => !field.when || field.when());
     return (
@@ -838,7 +830,7 @@ class EditCollectiveForm extends React.Component {
             )}
 
             {fields && fields.length > 0 && (
-              <Container className="actions" margin="5rem auto 1rem" textAlign="center">
+              <Container className="actions" margin="3.15rem auto 0.65rem" textAlign="center">
                 <StyledButton
                   buttonStyle="primary"
                   type="submit"
@@ -855,14 +847,14 @@ class EditCollectiveForm extends React.Component {
                   {submitBtnLabel}
                 </StyledButton>
 
-                <Container className="backToProfile" fontSize="1.3rem" margin="1rem">
+                <Container className="backToProfile" fontSize="0.8rem" margin="0.65rem">
                   <Link
                     data-cy="edit-collective-back-to-profile"
                     href={
                       isEvent ? `/${collective.parentCollective.slug}/events/${collective.slug}` : `/${collective.slug}`
                     }
                   >
-                    <FormattedMessage defaultMessage="View profile page" />
+                    <FormattedMessage defaultMessage="View profile page" id="QxN1ZU" />
                   </Link>
                 </Container>
               </Container>

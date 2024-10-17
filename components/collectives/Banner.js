@@ -1,3 +1,5 @@
+// keeping the file in case we want to use it in the future
+
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
@@ -11,6 +13,7 @@ const Banner = () => (
       <P fontSize="14px" lineHeight="20px" color="primary.900">
         <FormattedMessage
           defaultMessage="We're hiring Senior Software Engineers! <link><strong>Learn more about open positions</strong></link>"
+          id="lEZrUV"
           values={{
             strong: I18nBold,
             link: getI18nLink({
@@ -25,4 +28,5 @@ const Banner = () => (
   </Flex>
 );
 
+// ts-unused-exports:disable-next-line
 export default Banner;

@@ -5,7 +5,7 @@ import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { suggestSlug } from '../../lib/collective.lib';
+import { suggestSlug } from '../../lib/collective';
 
 import CollectiveNavbar from '../collective-navbar';
 import NextIllustration from '../collectives/HomeNextIllustration';
@@ -231,8 +231,8 @@ class CreateProjectForm extends React.Component {
               <NextIllustration
                 display={['block', 'none']}
                 src="/static/images/create-collective/mobileForm.png"
-                width="320px"
-                height="200px"
+                width={320}
+                height={200}
               />
             </Flex>
           </ContainerWithImage>

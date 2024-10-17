@@ -88,10 +88,18 @@ const getFakeExpenseEventActivity = type => {
   });
 };
 
-export const getFakeMember = () => ({
+const getFakeMember = () => ({
   role: 'BACKER',
   description: null,
   since: '2022-07-18T10:30:14.985Z',
+  tier: {
+    id: 1212,
+    name: 'backer',
+    amount: 2000,
+    currency: 'USD',
+    description: 'Backers are individuals who support us',
+    maxQuantity: 10,
+  },
   memberCollective: {
     id: 4469,
     type: 'USER',
@@ -171,6 +179,7 @@ const WebhookActivityInfoModal = ({ activity, ...props }) => {
       <ModalHeader>
         <FormattedMessage
           defaultMessage='Details for the "{event}" webhook event'
+          id="NSE1N3"
           values={{
             event: i18nWebhookEventType(intl, activity),
           }}
@@ -178,7 +187,7 @@ const WebhookActivityInfoModal = ({ activity, ...props }) => {
       </ModalHeader>
       <ModalBody mt={4}>
         <P mb={2}>
-          <FormattedMessage defaultMessage="Sample payload:" />
+          <FormattedMessage defaultMessage="Sample payload:" id="dwABvu" />
         </P>
         <CodeContainer>{JSON.stringify(WebhookEventInfo[activity](), null, 2)}</CodeContainer>
       </ModalBody>

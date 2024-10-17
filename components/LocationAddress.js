@@ -8,7 +8,7 @@ import { Span } from './Text';
 /**
  * Displays a location object
  */
-const LocationAddress = ({ location, isLoading, showMessageIfEmpty }) => {
+const LocationAddress = ({ location, isLoading, showMessageIfEmpty, singleLine }) => {
   if (isLoading) {
     return (
       <div>
@@ -28,7 +28,7 @@ const LocationAddress = ({ location, isLoading, showMessageIfEmpty }) => {
   return (
     <React.Fragment>
       {location.address}
-      <br />
+      {!singleLine ? <br /> : ', '}
       {location.country}
     </React.Fragment>
   );
@@ -41,6 +41,7 @@ LocationAddress.propTypes = {
   }),
   isLoading: PropTypes.bool,
   showMessageIfEmpty: PropTypes.bool,
+  singleLine: PropTypes.bool,
 };
 
 export default LocationAddress;

@@ -5,11 +5,11 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { Flex } from '../../Grid';
-import InputSwitch from '../../InputSwitch';
 import StyledButton from '../../StyledButton';
 import StyledHr from '../../StyledHr';
 import StyledModal, { ModalFooter, ModalHeader } from '../../StyledModal';
 import { P } from '../../Text';
+import { Switch } from '../../ui/Switch';
 
 const CancelDeleteModalButton = styled(StyledButton)`
   @media (max-width: 700px) {
@@ -36,6 +36,7 @@ export default function ConfirmTierDeleteModal({ isDeleting, onClose, onConfirmD
   const action = (
     <FormattedMessage
       defaultMessage="Delete {type, select, TICKET {Ticket} other {Tier}}"
+      id="FZQER9"
       values={{ type: tier.type }}
     />
   );
@@ -44,21 +45,24 @@ export default function ConfirmTierDeleteModal({ isDeleting, onClose, onConfirmD
     <StyledModal>
       <ModalHeader hideCloseIcon>{action}</ModalHeader>
       <P mt="1.2em">
-        <FormattedMessage defaultMessage="The tier will be deleted forever and can't be retrieved." />
+        <FormattedMessage defaultMessage="The tier will be deleted forever and can't be retrieved." id="xxi1Y+" />
       </P>
       <StyledHr my="1.2em" />
       <Flex gap="2em" mb="1.2em" alignItems="center" justifyContent="space-between">
         <Flex flexDirection="column">
           <P fontWeight="bold">
-            <FormattedMessage defaultMessage="Do you want to continue recurring contributions?" />
+            <FormattedMessage defaultMessage="Do you want to continue recurring contributions?" id="iG8QUh" />
           </P>
           <P mt={1} color="black.500">
-            <FormattedMessage defaultMessage="If yes, you will still receive existing recurring contributions for this deleted tier." />
+            <FormattedMessage
+              defaultMessage="If yes, you will still receive existing recurring contributions for this deleted tier."
+              id="FR8IoI"
+            />
           </P>
         </Flex>
-        <InputSwitch
+        <Switch
           checked={keepRecurringContributions}
-          onChange={event => setKeepRecurringContributions(event.target.checked)}
+          onCheckedChange={checked => setKeepRecurringContributions(checked)}
         />
       </Flex>
       <ModalFooter isFullWidth dividerMargin="1.2em 0">
@@ -73,7 +77,7 @@ export default function ConfirmTierDeleteModal({ isDeleting, onClose, onConfirmD
             minWidth={100}
             onClick={onClose}
           >
-            <FormattedMessage defaultMessage="Don't Delete" />
+            <FormattedMessage defaultMessage="Don't Delete" id="yHvRF3" />
           </CancelDeleteModalButton>
           <ConfirmDeleteModalButton
             flexGrow={1}

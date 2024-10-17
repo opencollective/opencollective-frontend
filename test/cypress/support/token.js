@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import { SignJWT } from 'jose';
 
 // We put the jwt secret here because we should never set it in production.
 // Setting it in config could result in the entry being set by the person who deploys.
@@ -17,7 +17,14 @@ const TEST_JWT_SECRET = 'vieneixaGhahk2aej2pohsh2aeB1oa6o';
  * @param `expiresIn`: An expiry duration, default to 1h. Set to a negative value
  *                     to generate an expired token.
  */
-export default function generateToken(user, expiresIn = 3000000) {
-  const defaultUser = { id: 9474, sub: 9474, scope: 'login', email: 'testuser+admin@opencollective.com' };
-  return jwt.sign(user || defaultUser, TEST_JWT_SECRET, { expiresIn });
+export default function generateToken(expiresIn = 3000000) {
+  return new SignJWT({
+    id: 9474,
+    sub: 9474,
+    scope: 'login',
+    email: 'testuser+admin@opencollective.com',
+    exp: Math.floor(Date.now() / 1000) + expiresIn,
+  })
+    .setProtectedHeader({ alg: 'HS256' })
+    .sign(new TextEncoder().encode(TEST_JWT_SECRET));
 }

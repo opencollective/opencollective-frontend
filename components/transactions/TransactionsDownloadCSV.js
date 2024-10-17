@@ -11,7 +11,7 @@ import ExportTransactionsCSVModal from '../ExportTransactionsCSVModal';
 import StyledButton from '../StyledButton';
 import StyledTooltip from '../StyledTooltip';
 
-const TransactionsDownloadCSV = ({ collective, query }) => {
+const TransactionsDownloadCSV = ({ collective, query, ...props }) => {
   const [displayModal, setDisplayModal] = React.useState(false);
 
   return (
@@ -30,10 +30,10 @@ const TransactionsDownloadCSV = ({ collective, query }) => {
           buttonSize="small"
           minWidth={140}
           height={38}
-          mb="8px"
           p="6px 10px"
           isBorderless
           flexGrow={1}
+          {...props}
         >
           <FormattedMessage id="transactions.downloadcsvbutton" defaultMessage="Download CSV" />
           <IconDownload size="13px" style={{ marginLeft: '8px' }} />

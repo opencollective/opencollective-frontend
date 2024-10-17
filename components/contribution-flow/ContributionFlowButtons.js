@@ -1,6 +1,10 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
+
+import { AnalyticsEvent } from '../../lib/analytics/events';
+import { track } from '../../lib/analytics/plausible';
 
 import Currency from '../Currency';
 import { Box, Flex } from '../Grid';
@@ -10,17 +14,23 @@ import StyledButton from '../StyledButton';
 import { STEPS } from './constants';
 import { getTotalAmount } from './utils';
 
+const ButtonWithTextCentered = styled(StyledButton)`
+  span {
+    vertical-align: baseline;
+  }
+`;
+
 class ContributionFlowButtons extends React.Component {
   static propTypes = {
     goNext: PropTypes.func,
     goBack: PropTypes.func,
+    step: PropTypes.shape({ name: PropTypes.string }),
     prevStep: PropTypes.shape({ name: PropTypes.string }),
     nextStep: PropTypes.shape({ name: PropTypes.string }),
     isValidating: PropTypes.bool,
     /** If provided, the PayPal button will be displayed in place of the regular submit */
     paypalButtonProps: PropTypes.object,
     currency: PropTypes.string,
-    isCrypto: PropTypes.bool,
     disabled: PropTypes.bool,
     tier: PropTypes.shape({ type: PropTypes.string }),
     stepDetails: PropTypes.object,
@@ -37,6 +47,10 @@ class ContributionFlowButtons extends React.Component {
         this.setState({ isLoadingNext: false });
       });
     }
+
+    if (this.props.step.name === 'details') {
+      track(AnalyticsEvent.CONTRIBUTION_DETAILS_STEP_COMPLETED);
+    }
   };
 
   getStepLabel(step) {
@@ -46,14 +60,13 @@ class ContributionFlowButtons extends React.Component {
       case STEPS.PAYMENT:
         return <FormattedMessage id="ContributionFlow.Payment" defaultMessage="Payment" />;
       case STEPS.DETAILS:
-        return <FormattedMessage defaultMessage="Contribution" />;
+        return <FormattedMessage defaultMessage="Contribution" id="0LK5eg" />;
     }
   }
 
   render() {
-    const { goBack, isValidating, nextStep, paypalButtonProps, currency, tier, isCrypto, stepDetails, disabled } =
-      this.props;
-    const totalAmount = getTotalAmount(stepDetails, this.props.stepSummary, isCrypto);
+    const { goBack, isValidating, nextStep, paypalButtonProps, currency, tier, stepDetails, disabled } = this.props;
+    const totalAmount = getTotalAmount(stepDetails, this.props.stepSummary);
     return (
       <Flex flexWrap="wrap" justifyContent="center">
         <Fragment>
@@ -75,13 +88,13 @@ class ContributionFlowButtons extends React.Component {
             </StyledButton>
           )}
           {!paypalButtonProps || nextStep ? (
-            <StyledButton
+            <ButtonWithTextCentered
               mt={2}
               mx={[1, null, 2]}
               minWidth={!nextStep ? 185 : 145}
               buttonStyle="primary"
               onClick={this.goNext}
-              disabled={disabled || (isCrypto && totalAmount <= 0)}
+              disabled={disabled}
               loading={isValidating || this.state.isLoadingNext}
               data-cy="cf-next-step"
               type="submit"
@@ -93,11 +106,6 @@ class ContributionFlowButtons extends React.Component {
                   )}{' '}
                   &rarr;
                 </React.Fragment>
-              ) : isCrypto ? (
-                <FormattedMessage
-                  defaultMessage="I've sent {CryptoAmount} {CryptoCurrency} to this wallet address"
-                  values={{ CryptoAmount: totalAmount, CryptoCurrency: currency }}
-                />
               ) : tier?.type === 'TICKET' ? (
                 <FormattedMessage
                   id="contribute.ticket"
@@ -115,7 +123,7 @@ class ContributionFlowButtons extends React.Component {
               ) : (
                 <FormattedMessage id="contribute.submit" defaultMessage="Make contribution" />
               )}
-            </StyledButton>
+            </ButtonWithTextCentered>
           ) : (
             <Box mx={[1, null, 2]} minWidth={200} mt={2}>
               <PayWithPaypalButton {...paypalButtonProps} isSubmitting={isValidating || this.state.isLoadingNext} />

@@ -1,16 +1,7 @@
-import React from 'react';
-import propTypes from '@styled-system/prop-types';
+import type React from 'react';
 import styled from 'styled-components';
-import {
-  color,
-  ColorProps,
-  display,
-  DisplayProps,
-  space,
-  SpaceProps,
-  typography,
-  TypographyProps,
-} from 'styled-system';
+import type { ColorProps, DisplayProps, SpaceProps, TypographyProps } from 'styled-system';
+import { color, display, space, typography } from 'styled-system';
 
 type SectionTitleProps = ColorProps &
   DisplayProps &
@@ -18,7 +9,13 @@ type SectionTitleProps = ColorProps &
   TypographyProps &
   React.HTMLAttributes<HTMLHeadingElement>;
 
-const SectionTitle = styled.h2<SectionTitleProps>`
+const SectionTitle = styled.h2.attrs<SectionTitleProps>(props => ({
+  fontSize: props.fontSize ?? '32px',
+  lineHeight: props.lineHeight ?? '36px',
+  fontWeight: props.fontWeight ?? 'normal',
+  color: props.color ?? 'black.900',
+  mb: props.mb ?? 3,
+}))<SectionTitleProps>`
   word-break: break-word;
 
   ${color}
@@ -26,20 +23,5 @@ const SectionTitle = styled.h2<SectionTitleProps>`
   ${space}
   ${typography}
 `;
-
-SectionTitle.defaultProps = {
-  fontSize: '32px',
-  lineHeight: '36px',
-  fontWeight: 'normal',
-  color: 'black.900',
-  mb: 3,
-};
-
-SectionTitle.propTypes = {
-  ...propTypes.color,
-  ...propTypes.display,
-  ...propTypes.space,
-  ...propTypes.typography,
-};
 
 export default SectionTitle;

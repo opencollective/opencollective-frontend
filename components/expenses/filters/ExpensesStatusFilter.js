@@ -2,18 +2,18 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 
-import expenseStatus from '../../../lib/constants/expense-status';
+import { ExpenseStatus } from '../../../lib/graphql/types/v2/graphql';
 import { i18nExpenseStatus } from '../../../lib/i18n/expense';
 import { sortSelectOptions } from '../../../lib/utils';
 
 import { StyledSelectFilter } from '../../StyledSelectFilter';
 
-const IGNORED_EXPENSE_STATUS = [expenseStatus.UNVERIFIED];
+const IGNORED_EXPENSE_STATUS = [ExpenseStatus.UNVERIFIED];
 
 const getOption = (intl, value) => ({ label: i18nExpenseStatus(intl, value), value });
 
 const getOptions = (intl, ignoredExpenseStatus = []) => {
-  return ['ALL', ...Object.values(expenseStatus), 'READY_TO_PAY', 'ON_HOLD']
+  return ['ALL', ...Object.values(ExpenseStatus), 'READY_TO_PAY', 'ON_HOLD']
     .filter(s => !ignoredExpenseStatus.includes(s))
     .map(status => getOption(intl, status));
 };
@@ -50,8 +50,8 @@ const ExpenseStatusFilter = ({
 
 ExpenseStatusFilter.propTypes = {
   onChange: PropTypes.func.isRequired,
-  value: PropTypes.oneOf([...Object.values(expenseStatus), 'ALL', 'READY_TO_PAY']),
-  ignoredExpenseStatus: PropTypes.arrayOf(PropTypes.oneOf(Object.values(expenseStatus))),
+  value: PropTypes.oneOf([...Object.values(ExpenseStatus), 'ALL', 'READY_TO_PAY']),
+  ignoredExpenseStatus: PropTypes.arrayOf(PropTypes.oneOf(Object.values(ExpenseStatus))),
   displayOnHoldPseudoStatus: PropTypes.bool,
 };
 

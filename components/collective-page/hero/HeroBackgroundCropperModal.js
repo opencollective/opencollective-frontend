@@ -11,6 +11,7 @@ import styled from 'styled-components';
 
 import { upload } from '../../../lib/api';
 import { formatErrorMessage, getErrorFromXhrUpload, i18nGraphqlException } from '../../../lib/errors';
+import { editCollectiveBackgroundMutation } from '../../../lib/graphql/v1/mutations';
 import { useElementSize } from '../../../lib/hooks/useElementSize';
 import { mergeRefs } from '../../../lib/react-utils';
 
@@ -22,8 +23,7 @@ import { DROPZONE_ACCEPT_IMAGES } from '../../StyledDropzone';
 import StyledInputSlider from '../../StyledInputSlider';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import { Span } from '../../Text';
-import { TOAST_TYPE, useToasts } from '../../ToastProvider';
-import { editCollectiveBackgroundMutation } from '../graphql/mutations';
+import { useToast } from '../../ui/useToast';
 
 import {
   BASE_HERO_HEIGHT,
@@ -64,7 +64,7 @@ const EmptyDropzoneContainer = styled.div`
 const HeroBackgroundCropperModal = ({ onClose, collective }) => {
   const [isSubmitting, setSubmitting] = React.useState(false); // Not using Apollo to have a common flag with file upload
   const intl = useIntl();
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const [editBackground] = useMutation(editCollectiveBackgroundMutation);
   const containerSize = useElementSize({ defaultWidth: 600 });
   const [mediaSize, setMediaSize] = React.useState();
@@ -89,7 +89,7 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
     <StyledModal onClose={onClose} ignoreEscapeKey>
       <ModalHeader mb={3}>
         <Span fontSize="20px" fontWeight="500">
-          <FormattedMessage defaultMessage="Add cover image" />
+          <FormattedMessage defaultMessage="Add cover image" id="b4iDeN" />
         </Span>
       </ModalHeader>
 
@@ -157,7 +157,7 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
                             }
                             style={{
                               imageStyle: { minHeight: '0', minWidth: '0', maxHeight: 'none', maxWidth: 'none' },
-                              containerStyle: { cursor: hasImage ? 'move' : 'auto' },
+                              containerStyle: { cursor: 'move' },
                             }}
                           />
                         </StyledHeroBackground>
@@ -167,6 +167,7 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
                         <Container maxWidth={268}>
                           <FormattedMessage
                             defaultMessage="Drag and drop your image or <Link>click here</Link> to select it."
+                            id="IxEr/J"
                             values={{ Link: msg => <Span color="blue.500">{msg}</Span> }}
                           />
                         </Container>
@@ -216,7 +217,7 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
                           }
                         } catch (e) {
                           const error = getErrorFromXhrUpload(e);
-                          addToast({ type: TOAST_TYPE.ERROR, message: formatErrorMessage(intl, error) });
+                          toast({ variant: 'error', message: formatErrorMessage(intl, error) });
                           return;
                         } finally {
                           setSubmitting(false);
@@ -244,17 +245,20 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
                           setUploadedImage(null);
 
                           // Show a toast and close the modal
-                          addToast({
-                            type: TOAST_TYPE.SUCCESS,
-                            title: <FormattedMessage defaultMessage="Cover updated" />,
+                          toast({
+                            variant: 'success',
+                            title: <FormattedMessage defaultMessage="Cover updated" id="+cQ6YM" />,
                             message: (
-                              <FormattedMessage defaultMessage="The page might take a few seconds to fully update" />
+                              <FormattedMessage
+                                defaultMessage="The page might take a few seconds to fully update"
+                                id="QaaW8s"
+                              />
                             ),
                           });
 
                           onClose();
                         } catch (e) {
-                          addToast({ type: TOAST_TYPE.ERROR, message: i18nGraphqlException(intl, e) });
+                          toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
                         } finally {
                           setSubmitting(false);
                         }
@@ -275,7 +279,7 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
                     </StyledButton>
                   </Flex>
                   <StyledButton {...BUTTONS_PROPS} onClick={open} disabled={isSubmitting}>
-                    <FormattedMessage defaultMessage="Upload new image" />
+                    <FormattedMessage defaultMessage="Upload new image" id="v4BgXt" />
                   </StyledButton>
                 </Flex>
               </ModalFooter>

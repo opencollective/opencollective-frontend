@@ -1,9 +1,9 @@
 import React from 'react';
-import { ApolloError, gql, useApolloClient } from '@apollo/client';
+import { ApolloError, useApolloClient } from '@apollo/client';
 import type { PaymentIntent, Stripe } from '@stripe/stripe-js';
 
-import { API_V2_CONTEXT } from '../graphql/helpers';
-import { AccountReferenceInput, GuestInfoInput } from '../graphql/types/v2/graphql';
+import { API_V2_CONTEXT, gql } from '../graphql/helpers';
+import type { AccountReferenceInput, ContributionFrequency, GuestInfoInput } from '../graphql/types/v2/graphql';
 import { loadScriptAsync } from '../utils';
 
 const createPaymentIntentMutation = gql`
@@ -18,21 +18,25 @@ const createPaymentIntentMutation = gql`
 `;
 
 type UsePaymentIntentOptions = {
+  chargeAttempt: number;
   amount: { valueInCents: number; currency: string };
   fromAccount?: AccountReferenceInput;
   guestInfo?: GuestInfoInput;
   toAccount: AccountReferenceInput;
   skip?: boolean;
+  frequency?: ContributionFrequency;
 };
 
 type StripePaymentIntent = PaymentIntent & { stripeAccount: string };
 
 export default function usePaymentIntent({
+  chargeAttempt,
   amount,
   fromAccount,
   guestInfo,
   toAccount,
   skip,
+  frequency,
 }: UsePaymentIntentOptions): [StripePaymentIntent, Stripe, boolean, Error] {
   const apolloClient = useApolloClient();
   const [error, setError] = React.useState<Error | null>(null);
@@ -54,6 +58,7 @@ export default function usePaymentIntent({
             amount,
             fromAccount,
             toAccount,
+            frequency,
           },
           guestInfo,
         },
@@ -70,6 +75,8 @@ export default function usePaymentIntent({
         createPaymentIntentResp.data?.createPaymentIntent ?? {};
 
       const stripe = window.Stripe(stripeAccountPublishableSecret, stripeAccount ? { stripeAccount } : {});
+      stripe['stripeAccount'] = stripeAccount;
+      stripe['stripeAccountPublishableSecret'] = stripeAccountPublishableSecret;
       setStripe(stripe);
 
       try {
@@ -100,7 +107,7 @@ export default function usePaymentIntent({
       setPaymentIntent(null);
       setStripe(null);
     };
-  }, [skip, guestInfo?.captcha?.token]);
+  }, [skip, guestInfo?.captcha?.token, chargeAttempt]);
 
   return [paymentIntent, stripe, loading, error];
 }

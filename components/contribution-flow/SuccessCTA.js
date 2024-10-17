@@ -35,11 +35,12 @@ const headerMessages = defineMessages({
     defaultMessage: 'Read our stories',
   },
   [SUCCESS_CTA_TYPE.NEWSLETTER]: {
-    id: 'home.joinUsSection.newsletter',
-    defaultMessage: 'Subscribe to our newsletter',
+    id: 'NewContributionFlow.Success.CTA.Newsletter.Header',
+    defaultMessage: 'Subscribe to the Open{nbsp}Collective newsletter',
   },
   [SUCCESS_CTA_TYPE.GO_TO_PROFILE]: {
     defaultMessage: "Go to {accountName}'s page",
+    id: 'iPy92R',
   },
 });
 
@@ -63,6 +64,7 @@ const contentMessages = defineMessages({
   },
   [SUCCESS_CTA_TYPE.GO_TO_PROFILE]: {
     defaultMessage: 'Go to the public page of {accountName} on Open Collective',
+    id: '/aBz/1',
   },
 });
 
@@ -155,7 +157,10 @@ const SuccessCTA = ({ type, orderId, email, account, isPrimary }) => {
             my={3}
           >
             <H3 mb={3} color="black.800">
-              {formatMessage(headerMessages[type], { accountName: account.name })}
+              {formatMessage(headerMessages[type], {
+                accountName: account.name,
+                nbsp: <React.Fragment>&nbsp;</React.Fragment>,
+              })}
             </H3>
             <P fontSize="14px" lineHeight="24px" fontWeight={300} color="black.700">
               {formatMessage(contentMessages[type], { accountName: account.name })}

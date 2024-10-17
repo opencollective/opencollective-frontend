@@ -1,0 +1,50 @@
+import { ArgsTable, Canvas, Meta, Story } from '@storybook/addon-docs/blocks';
+import UnhostAccountModal from '../../components/dashboard/sections/collectives/UnhostAccountModal';
+import { webpackCollective } from '../mocks/collectives';
+import { UserContext } from '../../components/UserProvider';
+import { loggedInUser } from '../mocks/loggedInUser';
+
+<Meta title="Host Dashboard/UnhostAccountModal" component={UnhostAccountModal} argTypes={{}} />
+
+# StyledCollectiveCard
+
+## Default
+
+export const DefaultStory = props => <UnhostAccountModal {...props} />;
+
+<Canvas>
+  <Story
+    name="Default"
+    parameters={{
+      design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/ZQBMWhnGGtRWeIZknFW1eP/%5BOC-Design%5D-Production-Ready-%E2%9C%85?node-id=18797%3A200561',
+      },
+    }}
+  >
+    <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
+      <UnhostAccountModal collective={webpackCollective} host={webpackCollective.host} />
+    </UserContext.Provider>
+  </Story>
+</Canvas>
+
+## With Balance
+
+<Canvas>
+  <Story
+    name="With Balance"
+    parameters={{
+      design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/ZQBMWhnGGtRWeIZknFW1eP/%5BOC-Design%5D-Production-Ready-%E2%9C%85?node-id=18797%3A200561',
+      },
+    }}
+  >
+    <UserContext.Provider value={{ LoggedInUser: loggedInUser, loadingLoggedInUser: false }}>
+      <UnhostAccountModal
+        collective={{ ...webpackCollective, stats: { balance: { valueInCents: 1000, currency: 'USD' } } }}
+        host={webpackCollective.host}
+      />
+    </UserContext.Provider>
+  </Story>
+</Canvas>

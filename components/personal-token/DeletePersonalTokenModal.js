@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 
 import ConfirmationModal, { CONFIRMATION_MODAL_TERMINATE } from '../ConfirmationModal';
 import { P } from '../Text';
-import { TOAST_TYPE, useToasts } from '../ToastProvider';
+import { useToast } from '../ui/useToast';
 
 const deletePersonalTokenMutation = gql`
   mutation DeletePersonalToken($id: String!) {
@@ -22,7 +22,7 @@ const deletePersonalTokenMutation = gql`
 `;
 
 const DeletePersonalTokenModal = ({ personalToken, onDelete, ...props }) => {
-  const { addToast } = useToasts();
+  const { toast } = useToast();
   const intl = useIntl();
   const [deleteToken] = useMutation(deletePersonalTokenMutation, {
     context: API_V2_CONTEXT,
@@ -40,27 +40,36 @@ const DeletePersonalTokenModal = ({ personalToken, onDelete, ...props }) => {
     <ConfirmationModal
       isDanger
       type="delete"
-      header={<FormattedMessage defaultMessage="Delete token {name}" values={{ name: personalToken.name || '' }} />}
+      header={
+        <FormattedMessage
+          defaultMessage="Delete token {name}"
+          id="WzSLvB"
+          values={{ name: personalToken.name || '' }}
+        />
+      }
       {...props}
       continueHandler={async () => {
         try {
           await deleteToken({ variables: { id: personalToken.id } });
           await onDelete(personalToken);
-          addToast({
-            type: TOAST_TYPE.SUCCESS,
+          toast({
+            variant: 'success',
             message: intl.formatMessage(
-              { defaultMessage: 'Personal token "{name}" deleted' },
+              { defaultMessage: 'Personal token "{name}" deleted', id: 'Ix3kXB' },
               { name: personalToken.name || '' },
             ),
           });
           return CONFIRMATION_MODAL_TERMINATE;
         } catch (e) {
-          addToast({ type: TOAST_TYPE.ERROR, variant: 'light', message: i18nGraphqlException(intl, e) });
+          toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
         }
       }}
     >
       <P>
-        <FormattedMessage defaultMessage="This will permanently delete the token, revoking all access associated with it. Are you sure you want to continue?" />
+        <FormattedMessage
+          defaultMessage="This will permanently delete the token, revoking all access associated with it. Are you sure you want to continue?"
+          id="7YAGj2"
+        />
       </P>
     </ConfirmationModal>
   );

@@ -78,10 +78,6 @@ const CollectHostPageLink = styled(StyledLink)`
 `;
 
 const messages = defineMessages({
-  OCF: {
-    id: 'OCF.description',
-    defaultMessage: 'For US charity initiatives',
-  },
   OSC: {
     id: 'OSC.description',
     defaultMessage: 'For open source projects',
@@ -93,12 +89,6 @@ const messages = defineMessages({
 });
 
 const featuredHosts = [
-  {
-    id: 'OCF',
-    name: 'Open Collective Foundation',
-    collectivePageLink: '/foundation',
-    imageUrl: 'https://images.opencollective.com/foundation/a7d522f/logo/256.png',
-  },
   {
     id: 'OSC',
     name: 'Open Source Collective',

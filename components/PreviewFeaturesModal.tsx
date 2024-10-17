@@ -1,18 +1,15 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
 
-import { API_V2_CONTEXT } from '../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
-import { PreviewFeature } from '../lib/preview-features';
+import type { PreviewFeature } from '../lib/preview-features';
 
-import { Flex } from './Grid';
-import InputSwitch from './InputSwitch';
+import { Badge } from './ui/Badge';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/Dialog';
+import { Switch } from './ui/Switch';
 import Link from './Link';
-import StyledCard from './StyledCard';
-import StyledModal, { ModalBody, ModalHeader } from './StyledModal';
-import StyledTag from './StyledTag';
-import { H2, H4, P } from './Text';
 
 const editAccountSettingsMutation = gql`
   mutation EditAccountSettings($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
@@ -23,7 +20,15 @@ const editAccountSettingsMutation = gql`
   }
 `;
 
-const PreviewFeatureCard = ({ feature }: { feature: PreviewFeature }) => {
+const PreviewFeatureCard = ({
+  feature,
+  disabled,
+  dependentFeatures,
+}: {
+  feature: PreviewFeature;
+  disabled?: boolean;
+  dependentFeatures?: PreviewFeature[];
+}) => {
   const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
   const [isChecked, setIsChecked] = React.useState(LoggedInUser.hasPreviewFeatureEnabled(feature.key));
   const [loading, setLoading] = React.useState(false);
@@ -31,82 +36,95 @@ const PreviewFeatureCard = ({ feature }: { feature: PreviewFeature }) => {
     context: API_V2_CONTEXT,
   });
 
-  const togglePreviewFeature = async (featureKey, checked) => {
-    setIsChecked(checked);
-    setLoading(true);
-    await submitEditSettings({
-      variables: {
-        account: { slug: LoggedInUser.collective.slug },
-        key: `earlyAccess.${featureKey}`,
-        value: checked,
-      },
-    });
-    await refetchLoggedInUser();
-    setLoading(false);
-  };
+  const togglePreviewFeature = React.useCallback(
+    async checked => {
+      setIsChecked(checked);
+      setLoading(true);
+      if ('setIsEnabled' in feature && typeof feature.setIsEnabled === 'function') {
+        feature.setIsEnabled(checked);
+      } else {
+        await submitEditSettings({
+          variables: {
+            account: { slug: LoggedInUser.collective.slug },
+            key: `earlyAccess.${feature.key}`,
+            value: checked,
+          },
+        });
+        await refetchLoggedInUser();
+      }
+
+      setLoading(false);
+    },
+    [feature, LoggedInUser.collective.slug, submitEditSettings, refetchLoggedInUser],
+  );
 
   return (
-    <StyledCard mt={3} key={feature.title} display="flex" justifyContent="space-between" p={'20px'}>
-      <Flex flexDirection="column">
-        <H4 fontSize="18px" fontWeight={700} letterSpacing="0" color="black.700" mb={1}>
-          {feature.title}{' '}
-          <StyledTag
-            variant="rounded"
-            type={feature.publicBeta ? 'success' : 'info'}
-            fontWeight={600}
-            fontSize="12px"
-            p="4px 8px"
-            ml={1}
-            verticalAlign="middle"
-          >
-            {feature.publicBeta ? (
-              <FormattedMessage id="PreviewFeatures.publicBeta" defaultMessage="Public Beta" />
-            ) : (
-              <FormattedMessage id="PreviewFeatures.closedBeta" defaultMessage="Closed Beta" />
-            )}
-          </StyledTag>
-        </H4>
-        <P fontSize="14px" lineHeight="20px" fontWeight="400" color="black.700" letterSpacing={0}>
-          {feature.description}
-        </P>
-      </Flex>
-      <InputSwitch
-        checked={isChecked}
-        disabled={loading}
-        onChange={e => togglePreviewFeature(feature.key, e.target.checked)}
-      />
-    </StyledCard>
+    <div className="flex flex-col gap-2 rounded-lg border p-4" key={feature.title}>
+      <div className="flex flex-row items-center justify-between gap-3">
+        <div className="space-y-0.5">
+          <label className="flex flex-wrap items-center gap-x-2 text-base font-medium" htmlFor={feature.key}>
+            <span>{feature.title}</span>
+            <Badge size="sm" type={feature.publicBeta ? 'success' : 'warning'}>
+              {feature.publicBeta ? (
+                <FormattedMessage id="PreviewFeatures.publicBeta" defaultMessage="Public beta" />
+              ) : (
+                <FormattedMessage id="PreviewFeatures.LimitedAccess" defaultMessage="Limited preview" />
+              )}
+            </Badge>
+          </label>
+
+          {feature.description && <p className="text-sm text-muted-foreground">{feature.description}</p>}
+        </div>
+        <Switch
+          id={feature.key}
+          checked={isChecked}
+          disabled={loading || disabled}
+          onCheckedChange={checked => togglePreviewFeature(checked)}
+        />
+      </div>
+      {dependentFeatures?.length > 0 && (
+        <div className="mt-2 flex flex-col gap-2">
+          {dependentFeatures.map(dependentFeature => (
+            <PreviewFeatureCard key={dependentFeature.key} feature={dependentFeature} disabled={!isChecked} />
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 
-const PreviewFeaturesModal = ({ onClose }: { onClose: () => void }) => {
+const PreviewFeaturesModal = ({ open, setOpen }: { open: boolean; setOpen: (open: boolean) => void }) => {
   const { LoggedInUser } = useLoggedInUser();
   const previewFeatures = LoggedInUser?.getAvailablePreviewFeatures() || [];
-
   return (
-    <StyledModal onClose={onClose} width="576px">
-      <ModalHeader onClose={onClose}>
-        <Flex width="100%" flexDirection="column">
-          <H2 fontSize={'20px'} fontWeight="700" lineHeight="36px" color="black.800" mb={2}>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>
             <FormattedMessage id="PreviewFeatures" defaultMessage="Preview Features" />
-          </H2>
-          <P fontSize="14px" lineHeight="20px" fontWeight="400" color="black.700" letterSpacing={0}>
+          </DialogTitle>
+          <DialogDescription>
             <FormattedMessage
               id="PreviewFeatures.description"
               defaultMessage="Get early access to features that are in development. Please <ContactLink>let us know</ContactLink> how we can make them better."
               values={{
-                ContactLink: msg => <Link href="/contact">{msg}</Link>,
+                ContactLink: msg => (
+                  <Link className="text-blue-700 hover:underline" href="/contact">
+                    {msg}
+                  </Link>
+                ),
               }}
             />
-          </P>
-        </Flex>
-      </ModalHeader>
-      <ModalBody mb={2}>
-        {previewFeatures?.map(feature => (
-          <PreviewFeatureCard key={feature.key} feature={feature} />
-        ))}
-      </ModalBody>
-    </StyledModal>
+          </DialogDescription>
+        </DialogHeader>
+        {previewFeatures
+          .filter(f => !f.dependsOn)
+          .map(feature => {
+            const dependentFeatures = previewFeatures.filter(f => f.dependsOn === feature.key);
+            return <PreviewFeatureCard key={feature.key} feature={feature} dependentFeatures={dependentFeatures} />;
+          })}
+      </DialogContent>
+    </Dialog>
   );
 };
 

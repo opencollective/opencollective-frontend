@@ -6,30 +6,27 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { formatCurrency } from '../../../lib/currency-utils';
-import { formatDate, getWebsiteUrl } from '../../../lib/utils';
+import { getWebsiteUrl } from '../../../lib/utils';
 
-import CollectiveCard from '../../CollectiveCard';
 import Container from '../../Container';
 import { Box, Flex } from '../../Grid';
 import { getI18nLink } from '../../I18nFormatters';
 import Link from '../../Link';
 import MessageBox from '../../MessageBox';
-import StyledButton from '../../StyledButton';
 import StyledInput from '../../StyledInput';
 import StyledLink from '../../StyledLink';
-import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
-import { H4, P } from '../../Text';
+import { H4 } from '../../Text';
+import { Button } from '../../ui/Button';
 import CreateHostFormWithData from '../CreateHostFormWithData';
 import EditConnectedAccount from '../EditConnectedAccount';
+
+import { ActiveFiscalHost } from './fiscal-host/ActiveFiscalHost';
+import AppliedToFiscalHost from './fiscal-host/AppliedToFiscalHost';
 
 const OptionLabel = styled.label`
   display: block;
   font-weight: bold;
   cursor: pointer;
-`;
-
-const Fineprint = styled.div`
-  font-size: 14px;
 `;
 
 const EditCollectiveHostSection = styled.div`
@@ -45,7 +42,6 @@ const EditCollectiveHostSection = styled.div`
 
 class Host extends React.Component {
   static propTypes = {
-    goals: PropTypes.arrayOf(PropTypes.object),
     collective: PropTypes.object.isRequired,
     LoggedInUser: PropTypes.object.isRequired,
     editCollectiveMutation: PropTypes.func.isRequired,
@@ -59,15 +55,13 @@ class Host extends React.Component {
     this.updateSelectedOption = this.updateSelectedOption.bind(this);
     this.state = {
       collective: props.collective,
-      showModal: false,
-      action: '',
       isSubmitting: false,
     };
   }
 
   updateSelectedOption(option) {
     this.props.router.push({
-      pathname: `/${this.props.collective.slug}/admin/host`,
+      pathname: `/dashboard/${this.props.collective.slug}/host`,
       query: {
         selectedOption: option,
       },
@@ -91,7 +85,7 @@ class Host extends React.Component {
         this.updateSelectedOption('noHost');
       }
     } finally {
-      this.setState({ isSubmitting: false, showModal: false });
+      this.setState({ isSubmitting: false });
     }
   }
 
@@ -102,7 +96,7 @@ class Host extends React.Component {
           id="collective.edit.host.legalName.info"
           defaultMessage="Please set the legal name {isSelfHosted, select, false {of the host} other {}} in the Info section of <SettingsLink>the settings</SettingsLink>. This is required if the legal name is different than the display name for tax and accounting purposes."
           values={{
-            SettingsLink: getI18nLink({ href: `/${collective.host?.slug}/admin` }),
+            SettingsLink: getI18nLink({ href: `/dashboard/${collective.host?.slug}` }),
             isSelfHosted: collective.id === collective.host?.id,
           }}
         />
@@ -111,19 +105,16 @@ class Host extends React.Component {
   }
 
   render() {
-    const { LoggedInUser, collective, router, intl } = this.props;
-    const { showModal, action } = this.state;
+    const { LoggedInUser, collective, router, intl, editCollectiveMutation } = this.props;
     const { locale } = intl;
 
     const selectedOption = get(router, 'query.selectedOption', 'noHost');
-    const hostMembership = get(collective, 'members', []).find(m => m.role === 'HOST');
 
-    const closeModal = () => this.setState({ showModal: false });
-    const showLegalNameInfoBox = LoggedInUser?.isHostAdmin(collective) && !collective?.host?.legalName;
+    const showLegalNameInfoBox = LoggedInUser?.isHostAdmin(collective) && !collective.host?.legalName;
 
     if (get(collective, 'host.id') === collective.id) {
       return (
-        <Fragment>
+        <div className="flex flex-col space-y-4">
           <p>
             <FormattedMessage
               id="editCollective.selfHost.label"
@@ -158,196 +149,30 @@ class Host extends React.Component {
           {collective.stats.balance === 0 && (
             <Fragment>
               <p>
-                <StyledButton
-                  buttonStyle="primary"
-                  type="submit"
-                  onClick={() => this.changeHost()}
-                  minWidth={200}
-                  loading={this.state.isSubmitting}
-                >
+                <Button onClick={() => this.changeHost()} minWidth={200} loading={this.state.isSubmitting}>
                   <FormattedMessage id="editCollective.selfHost.removeBtn" defaultMessage="Reset Fiscal Host" />
-                </StyledButton>
+                </Button>
               </p>
             </Fragment>
           )}
-        </Fragment>
+        </div>
       );
     }
 
     if (get(collective, 'host.id')) {
-      const name = collective.host.name;
-
       return (
         <Fragment>
-          <Flex flexDirection={['column', 'row']}>
-            <Box p={1} mr={3} width={[1, 1 / 2]}>
-              <CollectiveCard
-                collective={collective.host}
-                membership={hostMembership}
-                hideRoles={!collective.isActive}
-              />
-            </Box>
-            <Box>
-              {!collective.isActive && (
-                <Fragment>
-                  <p>
-                    <FormattedMessage
-                      id="editCollective.host.pending"
-                      defaultMessage="You applied to be hosted by {host} on {date}. Your application is being reviewed."
-                      values={{
-                        host: get(collective, 'host.name'),
-                        date: formatDate(get(hostMembership, 'createdAt'), {
-                          day: 'numeric',
-                          month: 'long',
-                          year: 'numeric',
-                        }),
-                      }}
-                    />
-                  </p>
-                  <p>
-                    <StyledButton
-                      buttonStyle="primary"
-                      type="submit"
-                      onClick={() => this.setState({ showModal: true, action: 'Withdraw' })}
-                    >
-                      <FormattedMessage
-                        id="editCollective.host.cancelApplicationBtn"
-                        defaultMessage="Withdraw application"
-                      />
-                    </StyledButton>
-                  </p>
-                </Fragment>
-              )}
-              {collective.isActive && (
-                <Fragment>
-                  <p>
-                    <FormattedMessage
-                      id="editCollective.host.label"
-                      defaultMessage="Your Fiscal Host is {host}."
-                      values={{ host: get(collective, 'host.name') }}
-                    />
-                  </p>
-                  {collective.stats.balance > 0 && (
-                    <p>
-                      <FormattedMessage
-                        id="editCollective.host.balance"
-                        defaultMessage="It currently holds {balance} on behalf of {type, select, COLLECTIVE {your Collective} FUND {your Fund} other {your Account}}."
-                        values={{
-                          balance: formatCurrency(collective.stats.balance, collective.currency, { locale }),
-                          type: collective.type,
-                        }}
-                      />
-                    </p>
-                  )}
-                  {collective.stats.balance > 0 && (
-                    <p>
-                      <FormattedMessage
-                        id="editCollective.host.change.balanceNotEmpty"
-                        defaultMessage="To change your Fiscal Host, you first need to empty {type, select, COLLECTIVE {your Collective's balance} FUND {your Fund's balance} other {your balance}}. You can do this by submitting expenses, making financial contributions, or sending the balance to your Fiscal Host using the {emptyBalanceLink} feature."
-                        values={{
-                          type: collective.type,
-                          emptyBalanceLink: (
-                            <Link href={`/${collective.slug}/admin/advanced`}>
-                              <FormattedMessage id="emptyBalance" defaultMessage="Empty Balance" />
-                            </Link>
-                          ),
-                        }}
-                      />
-                    </p>
-                  )}
-                  {collective.stats.balance === 0 && (
-                    <Fragment>
-                      <p>
-                        <StyledButton
-                          buttonStyle="primary"
-                          type="submit"
-                          onClick={() => this.setState({ showModal: true, action: 'Remove' })}
-                        >
-                          <FormattedMessage id="editCollective.host.removeBtn" defaultMessage="Remove Host" />
-                        </StyledButton>
-                      </p>
-                      <Fineprint>
-                        <FormattedMessage
-                          id="editCollective.host.change.removeFirst"
-                          defaultMessage="Without a Fiscal Host, {type, select, COLLECTIVE {your Collective} FUND {your Fund} other {}} won't be able to accept financial contributions. You will be able to apply to another Fiscal Host."
-                          values={{ type: collective.type }}
-                        />
-                      </Fineprint>
-                    </Fragment>
-                  )}
-                  {showLegalNameInfoBox && (
-                    <Container mt={4}>{this.renderLegalNameSetInfoMessage(collective)}</Container>
-                  )}
-                </Fragment>
-              )}
-            </Box>
-          </Flex>
-          {showModal && (
-            <StyledModal width="570px" onClose={closeModal}>
-              <ModalHeader onClose={closeModal}>
-                {action === 'Remove' ? (
-                  <FormattedMessage
-                    id="collective.editHost.remove"
-                    values={{ name }}
-                    defaultMessage={'Remove {name}'}
-                  />
-                ) : (
-                  <FormattedMessage
-                    id="collective.editHost.header"
-                    values={{ name }}
-                    defaultMessage={'Withdraw application to {name}'}
-                  />
-                )}
-              </ModalHeader>
-              <ModalBody>
-                <P>
-                  {action === 'Withdraw' && (
-                    <FormattedMessage
-                      id="collective.editHost.withdrawApp"
-                      values={{ name }}
-                      defaultMessage={'Are you sure you want to withdraw your application to {name}?'}
-                    />
-                  )}
-                  {action === 'Remove' && (
-                    <FormattedMessage
-                      id="collective.editHost.removeHost"
-                      values={{ name }}
-                      defaultMessage={'Are you sure you want to remove {name}?'}
-                    />
-                  )}
-                </P>
-              </ModalBody>
-              <ModalFooter>
-                <Container display="flex" justifyContent="flex-end">
-                  <StyledButton
-                    mx={20}
-                    onClick={() =>
-                      this.setState({
-                        showModal: false,
-                      })
-                    }
-                  >
-                    <FormattedMessage id="actions.cancel" defaultMessage={'Cancel'} />
-                  </StyledButton>
-                  <StyledButton
-                    buttonStyle="primary"
-                    loading={this.state.isSubmitting}
-                    onClick={() => this.changeHost()}
-                    data-cy="continue"
-                  >
-                    {/** TODO(i18n): This should be internationalized */}
-                    {action}
-                  </StyledButton>
-                </Container>
-              </ModalFooter>
-            </StyledModal>
+          {!collective.isActive ? (
+            <AppliedToFiscalHost collectiveSlug={collective.slug} editCollectiveMutation={editCollectiveMutation} />
+          ) : (
+            <ActiveFiscalHost collectiveSlug={collective.slug} showLegalNameInfoBox={showLegalNameInfoBox} />
           )}
         </Fragment>
       );
     }
 
     const connectedAccounts = groupBy(collective.connectedAccounts, 'service');
-    const stripeAccount = connectedAccounts && connectedAccounts['stripe'] && connectedAccounts['stripe'][0];
+    const stripeAccount = connectedAccounts['stripe']?.[0];
 
     return (
       <EditCollectiveHostSection>
@@ -371,7 +196,7 @@ class Host extends React.Component {
             </Box>
             <Box mb={4}>
               <OptionLabel htmlFor="host-radio-noHost">
-                <FormattedMessage defaultMessage="No one" />
+                <FormattedMessage defaultMessage="No one" id="tcxpLX" />
               </OptionLabel>
               <FormattedMessage
                 id="collective.edit.host.noHost.description"
@@ -412,10 +237,8 @@ class Host extends React.Component {
                   alignItems="flex-end"
                   mt={3}
                 >
-                  <Box mb={[3]}>
-                    <StyledButton
-                      buttonStyle="primary"
-                      type="submit"
+                  <Box mb={3}>
+                    <Button
                       onClick={() => this.changeHost({ id: collective.id })}
                       loading={this.state.isSubmitting}
                       minWidth={200}
@@ -424,7 +247,7 @@ class Host extends React.Component {
                         id="host.selfHost.confirm"
                         defaultMessage="Yes, Activate Independent Collective"
                       />
-                    </StyledButton>
+                    </Button>
                   </Box>
                   {!stripeAccount && (
                     <Box textAlign="right">
@@ -432,7 +255,7 @@ class Host extends React.Component {
                         collective={collective}
                         service="stripe"
                         options={{
-                          redirect: `${getWebsiteUrl()}/${collective.slug}/admin/host?selectedOption=selfHost`,
+                          redirect: `${getWebsiteUrl()}/dashboard/${collective.slug}/host?selectedOption=selfHost`,
                         }}
                       />
                     </Box>
@@ -508,7 +331,7 @@ class Host extends React.Component {
                       fontSize="13px"
                       href={`${collective.slug}/accept-financial-contributions/host`}
                     >
-                      <FormattedMessage defaultMessage="Choose a Fiscal Host" />
+                      <FormattedMessage defaultMessage="Choose a Fiscal Host" id="j4X/+l" />
                     </StyledLink>
                   </Container>
                 </div>

@@ -1,36 +1,4 @@
 """
-Input type for Application
-"""
-input ApplicationInput {
-  type: ApplicationType!
-  name: String
-  description: String
-  callbackUrl: String
-}
-
-"""
-All application types
-"""
-enum ApplicationType {
-  API_KEY
-  OAUTH
-}
-
-"""
-Application model
-"""
-type Application {
-  id: Int
-  type: ApplicationType
-  name: String
-  description: String
-  apiKey: String
-  clientId: String
-  clientSecret: String
-  callbackUrl: String
-}
-
-"""
 Collective interface
 """
 interface CollectiveInterface {
@@ -64,11 +32,6 @@ interface CollectiveInterface {
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON!
-
-  """
-  Defines if a collective is pledged
-  """
-  isPledged: Boolean
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -180,8 +143,6 @@ interface CollectiveInterface {
   repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
-  updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
-    @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
     limit: Int
     offset: Int
@@ -260,6 +221,16 @@ interface CollectiveInterface {
   Policies for the account. To see non-public policies you need to be admin and have the scope: "account".
   """
   policies: Policies!
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromCollective: CollectiveInterface
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedCollectives(limit: Int! = 100, offset: Int! = 0): CollectiveSearchResults!
 }
 
 """
@@ -269,7 +240,6 @@ type UserDetails {
   id: Int
   CollectiveId: Int
   collective: CollectiveInterface
-  username: String @deprecated(reason: "2022-01-13: Not used anymore. Will be ignored")
   name: String @deprecated(reason: "2022-06-02: Please use collective.name")
   image: String
   email: String
@@ -336,12 +306,12 @@ type OrderType {
   """
   total amount for this order (doesn't include recurring transactions)
   """
-  totalAmount: Int
+  totalAmount: Float
 
   """
   The amount paid in tax (for example VAT) for this order
   """
-  taxAmount: Int
+  taxAmount: Float
 
   """
   frequency of the subscription if any (could be either null, 'month' or 'year')
@@ -425,7 +395,7 @@ Subscription model
 """
 type Subscription {
   id: Int
-  amount: Int
+  amount: Float
   currency: String
   interval: String
   stripeSubscriptionId: String
@@ -446,7 +416,7 @@ type StatsOrderType {
   """
   total amount of all the transactions for this order (includes past recurring transactions)
   """
-  totalTransactions: Int
+  totalTransactions: Float
 }
 
 """
@@ -454,6 +424,7 @@ This represents an Tier
 """
 type Tier {
   id: Int
+  idV2: String!
   slug: String
   type: String
   name: String
@@ -474,14 +445,14 @@ type Tier {
   """
   videoUrl: String
   button: String
-  amount: Int
-  minimumAmount: Int
+  amount: Float
+  minimumAmount: Float
   amountType: String
   currency: String
   interval: String
-  presets: [Int]
+  presets: [Float]
   maxQuantity: Int
-  goal: Int
+  goal: Float
   customFields: [JSON]
   startsAt: DateString
   endsAt: DateString
@@ -515,11 +486,7 @@ The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://
 """
 scalar JSON
 
-"""
-A person or an entity that contributes financially or by any other mean to the mission
-of the collective. While "Member" is dedicated to permissions, this type is meant
-to surface all the public contributors.
-"""
+"\n    A person or an entity that contributes financially or by any other mean to the mission\n    of the collective. While \"Member\" is dedicated to permissions, this type is meant\n    to surface all the public contributors.\n  "
 type Contributor {
   """
   A unique identifier for this member
@@ -550,11 +517,6 @@ type Contributor {
   True if the contributor is a financial contributor
   """
   isBacker: Boolean!
-
-  """
-  True if the contributor is a fundraiser
-  """
-  isFundraiser: Boolean @deprecated(reason: "2022-09-12: This role does not exist anymore")
 
   """
   A list of tier ids that this contributors is a member of. A null value indicates that a membership without tier.
@@ -656,12 +618,12 @@ type TierStatsType {
   """
   Total amount donated for this tier, in cents.
   """
-  totalDonated: Int
+  totalDonated: Float
 
   """
   How much money is given for this tier for each tier.interval (monthly/yearly). For flexible tiers, this amount is a monthly average of contributions amount, taking into account both yearly and monthly subscriptions.
   """
-  totalRecurringDonations: Int
+  totalRecurringDonations: Float
 
   """
   total number of people/organizations in this tier
@@ -729,13 +691,13 @@ type PaymentMethodType {
   name: String
   description: String
   primary: Boolean
-  monthlyLimitPerMember: Int
-  initialBalance: Int
+  monthlyLimitPerMember: Float
+  initialBalance: Float
 
   """
   Returns the balance in the currency of this paymentMethod
   """
-  balance: Int
+  balance: Float
   collective: CollectiveInterface
   emitter: CollectiveInterface
   limitedToTags: JSON
@@ -770,14 +732,14 @@ enum OrderStatus {
   PAID
   ERROR
   PROCESSING
+  REJECTED
   ACTIVE
   CANCELLED
   PENDING
   EXPIRED
-  PLEDGED
-  REJECTED
   DISPUTED
   REFUNDED
+  PAUSED
   IN_REVIEW
 }
 
@@ -790,12 +752,12 @@ type StatsMemberType {
   """
   total amount donated directly by this member
   """
-  directDonations: Int
+  directDonations: Float
 
   """
   total amount donated by this member either directly or using a gift card it has emitted
   """
-  totalDonations: Int
+  totalDonations: Float
 }
 
 """
@@ -924,7 +886,7 @@ This represents an Expense
 type ExpenseType {
   id: Int
   idV2: String
-  amount: Int
+  amount: Float
   currency: String
   createdAt: DateString
   updatedAt: DateString
@@ -1025,6 +987,7 @@ enum SocialLinkType {
   GHOST
   PEERTUBE
   TIKTOK
+  TWITCH
 }
 
 """
@@ -1036,61 +999,6 @@ scalar URL
 A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
 """
 scalar DateTime
-
-"""
-This represents an Update
-"""
-type UpdateType {
-  id: Int
-  views: Int
-  slug: String
-  image: String
-  isPrivate: Boolean
-  isChangelog: Boolean!
-  notificationAudience: UpdateAudienceTypeEnum
-  makePublicOn: IsoDateString
-
-  """
-  Indicates whether or not the user is allowed to see the content of this update
-  """
-  userCanSeeUpdate: Boolean
-  title: String
-  createdAt: DateString
-  updatedAt: DateString
-  publishedAt: DateString
-  summary: String
-  html: String
-  tags: [String]
-  createdByUser: UserDetails
-  fromCollective: CollectiveInterface
-  collective: CollectiveInterface
-  tier: Tier
-}
-
-"""
-Defines targets for an update
-"""
-enum UpdateAudienceTypeEnum {
-  """
-  Will be sent to collective admins and financial contributors
-  """
-  ALL
-
-  """
-  Will be sent to collective admins
-  """
-  COLLECTIVE_ADMINS
-
-  """
-  Will be sent to financial contributors
-  """
-  FINANCIAL_CONTRIBUTORS
-
-  """
-  Will be sent to no one
-  """
-  NO_ONE
-}
 
 """
 Properties by which PaymenMethods can be ordered
@@ -1167,7 +1075,6 @@ type CollectiveFeatures {
   CONTACT_COLLECTIVE: CollectiveFeatureStatus
   CONTACT_FORM: CollectiveFeatureStatus
   CREATE_COLLECTIVE: CollectiveFeatureStatus
-  CROSS_CURRENCY_MANUAL_TRANSACTIONS: CollectiveFeatureStatus
   TRANSFERWISE: CollectiveFeatureStatus
   PAYPAL_PAYOUTS: CollectiveFeatureStatus
   PAYPAL_DONATIONS: CollectiveFeatureStatus
@@ -1226,10 +1133,15 @@ type PlanType {
 }
 
 type Policies {
+  id: String
   EXPENSE_AUTHOR_CANNOT_APPROVE: EXPENSE_AUTHOR_CANNOT_APPROVE
   REQUIRE_2FA_FOR_ADMINS: Boolean
+  COLLECTIVE_ADMINS_CAN_REFUND: Boolean
   COLLECTIVE_MINIMUM_ADMINS: COLLECTIVE_MINIMUM_ADMINS
   MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL: MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL
+  EXPENSE_CATEGORIZATION: EXPENSE_CATEGORIZATION
+  EXPENSE_PUBLIC_VENDORS: Boolean
+  COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS: Boolean
 }
 
 type EXPENSE_AUTHOR_CANNOT_APPROVE {
@@ -1996,6 +1908,16 @@ enum CurrencyExchangeRateSourceType {
   Wise API
   """
   WISE
+
+  """
+  User-provided exchange rate
+  """
+  USER
+}
+
+type EXPENSE_CATEGORIZATION {
+  requiredForExpenseSubmitters: Boolean
+  requiredForCollectiveAdmins: Boolean
 }
 
 """
@@ -2006,7 +1928,7 @@ type CollectiveSearchResults {
   A unique identifier for this search (for caching)
   """
   id: String
-  collectives: [Collective]
+  collectives: [CollectiveInterface]
   limit: Int
   offset: Int
   total: Int
@@ -2021,12 +1943,12 @@ type CollectiveStatsType {
   """
   Amount of money in cents in the currency of the collective currently available to spend
   """
-  balanceWithBlockedFunds: Int
+  balanceWithBlockedFunds: Float
 
   """
   Amount of money in cents in the currency of the collective.
   """
-  balance: Int
+  balance: Float
 
   """
   Breakdown of all backers of this collective
@@ -2061,12 +1983,12 @@ type CollectiveStatsType {
   """
   Average amount spent per month based on the last 90 days
   """
-  monthlySpending: Int
+  monthlySpending: Float
 
   """
   Total amount spent
   """
-  totalAmountSpent: Int
+  totalAmountSpent: Float
 
   """
   Total amount received
@@ -2079,15 +2001,13 @@ type CollectiveStatsType {
     Computes contributions from the last x months. Cannot be used with startDate/endDate
     """
     periodInMonths: Int
-  ): Int
+  ): Float
 
   """
   Total net amount received
   """
-  totalNetAmountReceived: Int
-  yearlyBudget: Int
-  yearlyBudgetManaged: Int
-    @deprecated(reason: "2023-03-01: This field will be removed soon, please use totalMoneyManaged from GraphQL V2")
+  totalNetAmountReceived: Float
+  yearlyBudget: Float
   activeRecurringContributions: JSON
 }
 
@@ -2221,11 +2141,6 @@ type Collective implements CollectiveInterface {
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON!
-
-  """
-  Defines if a collective is pledged
-  """
-  isPledged: Boolean
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -2386,8 +2301,6 @@ type Collective implements CollectiveInterface {
   repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
-  updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
-    @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
     limit: Int
     offset: Int
@@ -2451,6 +2364,16 @@ type Collective implements CollectiveInterface {
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromCollective: CollectiveInterface
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedCollectives(limit: Int! = 100, offset: Int! = 0): CollectiveSearchResults!
 }
 
 """
@@ -2487,11 +2410,6 @@ type Event implements CollectiveInterface {
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON!
-
-  """
-  Defines if a collective is pledged
-  """
-  isPledged: Boolean
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -2652,8 +2570,6 @@ type Event implements CollectiveInterface {
   repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
-  updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
-    @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
     limit: Int
     offset: Int
@@ -2717,6 +2633,16 @@ type Event implements CollectiveInterface {
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromCollective: CollectiveInterface
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedCollectives(limit: Int! = 100, offset: Int! = 0): CollectiveSearchResults!
 }
 
 """
@@ -2753,11 +2679,6 @@ type Fund implements CollectiveInterface {
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON!
-
-  """
-  Defines if a collective is pledged
-  """
-  isPledged: Boolean
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -2918,8 +2839,6 @@ type Fund implements CollectiveInterface {
   repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
-  updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
-    @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
     limit: Int
     offset: Int
@@ -2983,6 +2902,16 @@ type Fund implements CollectiveInterface {
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromCollective: CollectiveInterface
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedCollectives(limit: Int! = 100, offset: Int! = 0): CollectiveSearchResults!
 }
 
 """
@@ -3019,11 +2948,6 @@ type Organization implements CollectiveInterface {
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON!
-
-  """
-  Defines if a collective is pledged
-  """
-  isPledged: Boolean
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -3184,8 +3108,6 @@ type Organization implements CollectiveInterface {
   repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
-  updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
-    @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
     limit: Int
     offset: Int
@@ -3249,7 +3171,16 @@ type Organization implements CollectiveInterface {
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
-  email: String @deprecated(reason: "2022-07-18: This field is deprecated and will return null")
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromCollective: CollectiveInterface
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedCollectives(limit: Int! = 100, offset: Int! = 0): CollectiveSearchResults!
 }
 
 """
@@ -3286,11 +3217,6 @@ type Project implements CollectiveInterface {
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON!
-
-  """
-  Defines if a collective is pledged
-  """
-  isPledged: Boolean
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -3451,8 +3377,6 @@ type Project implements CollectiveInterface {
   repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
-  updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
-    @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
     limit: Int
     offset: Int
@@ -3516,6 +3440,16 @@ type Project implements CollectiveInterface {
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromCollective: CollectiveInterface
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedCollectives(limit: Int! = 100, offset: Int! = 0): CollectiveSearchResults!
 }
 
 """
@@ -3529,7 +3463,7 @@ type Expense implements Transaction {
   uuid: String
   type: String
   kind: String
-  amount: Int
+  amount: Float
   currency: String
   hostCurrency: String
 
@@ -3546,22 +3480,32 @@ type Expense implements Transaction {
     Fetch HOST_FEE transaction for retro-compatiblity.
     """
     fetchHostFee: Boolean = false
-  ): Int
+  ): Float
 
   """
   Fee kept by the Open Collective Platform in the lowest unit of the currency of the host (ie. in cents)
   """
-  platformFeeInHostCurrency: Int
+  platformFeeInHostCurrency: Float
 
   """
   Fee kept by the payment processor in the lowest unit of the currency of the host (ie. in cents)
   """
-  paymentProcessorFeeInHostCurrency: Int
+  paymentProcessorFeeInHostCurrency(
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
+  ): Float
 
   """
   The amount paid in tax (for example VAT) for this transaction
   """
-  taxAmount: Int
+  taxAmount(
+    """
+    Fetch TAX transaction for retro-compatiblity.
+    """
+    fetchTax: Boolean = false
+  ): Float
 
   """
   If taxAmount is set, this field will contain more info about the tax
@@ -3576,8 +3520,18 @@ type Expense implements Transaction {
     Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
     """
     fetchHostFee: Boolean = false
-  ): Int
-  amountInHostCurrency: Int
+
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction and integrate in calculation for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
+
+    """
+    Fetch TAX transaction transaction and integrate in calculation for retro-compatiblity.
+    """
+    fetchTax: Boolean = false
+  ): Float
+  amountInHostCurrency: Float
   host: User
   createdByUser: UserDetails
   fromCollective: CollectiveInterface
@@ -3643,7 +3597,7 @@ interface Transaction {
   id: Int
   idV2: String
   uuid: String
-  amount: Int
+  amount: Float
   currency: String
   hostCurrency: String
   hostCurrencyFxRate: Float
@@ -3656,8 +3610,13 @@ interface Transaction {
     Fetch HOST_FEE transaction and integrate in calculation for retro-compatibility.
     """
     fetchHostFee: Boolean = false
-  ): Int
-  amountInHostCurrency: Int
+
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
+  ): Float
+  amountInHostCurrency: Float
 
   """
   Fee kept by the host in the lowest unit of the currency of the host (ie. in cents)
@@ -3667,10 +3626,15 @@ interface Transaction {
     Fetch HOST_FEE transaction for retro-compatibility.
     """
     fetchHostFee: Boolean = false
-  ): Int
-  platformFeeInHostCurrency: Int
-  paymentProcessorFeeInHostCurrency: Int
-  taxAmount: Int
+  ): Float
+  platformFeeInHostCurrency: Float
+  paymentProcessorFeeInHostCurrency(
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
+  ): Float
+  taxAmount: Float
   taxInfo: TaxInfo
   createdByUser: UserDetails
   host: CollectiveInterface
@@ -3699,7 +3663,7 @@ type Order implements Transaction {
   uuid: String
   type: String
   kind: String
-  amount: Int
+  amount: Float
   currency: String
   hostCurrency: String
 
@@ -3716,22 +3680,32 @@ type Order implements Transaction {
     Fetch HOST_FEE transaction for retro-compatiblity.
     """
     fetchHostFee: Boolean = false
-  ): Int
+  ): Float
 
   """
   Fee kept by the Open Collective Platform in the lowest unit of the currency of the host (ie. in cents)
   """
-  platformFeeInHostCurrency: Int
+  platformFeeInHostCurrency: Float
 
   """
   Fee kept by the payment processor in the lowest unit of the currency of the host (ie. in cents)
   """
-  paymentProcessorFeeInHostCurrency: Int
+  paymentProcessorFeeInHostCurrency(
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
+  ): Float
 
   """
   The amount paid in tax (for example VAT) for this transaction
   """
-  taxAmount: Int
+  taxAmount(
+    """
+    Fetch TAX transaction for retro-compatiblity.
+    """
+    fetchTax: Boolean = false
+  ): Float
 
   """
   If taxAmount is set, this field will contain more info about the tax
@@ -3746,8 +3720,18 @@ type Order implements Transaction {
     Fetch HOST_FEE transaction and integrate in calculation for retro-compatiblity.
     """
     fetchHostFee: Boolean = false
-  ): Int
-  amountInHostCurrency: Int
+
+    """
+    Fetch PAYMENT_PROCESSOR_FEE transaction and integrate in calculation for retro-compatiblity.
+    """
+    fetchPaymentProcessorFee: Boolean = false
+
+    """
+    Fetch TAX transaction transaction and integrate in calculation for retro-compatiblity.
+    """
+    fetchTax: Boolean = false
+  ): Float
+  amountInHostCurrency: Float
   host: User
   createdByUser: UserDetails
   fromCollective: CollectiveInterface
@@ -3797,11 +3781,6 @@ type User implements CollectiveInterface {
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON!
-
-  """
-  Defines if a collective is pledged
-  """
-  isPledged: Boolean
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -3962,8 +3941,6 @@ type User implements CollectiveInterface {
   repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
-  updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
-    @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
     limit: Int
     offset: Int
@@ -4027,8 +4004,18 @@ type User implements CollectiveInterface {
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromCollective: CollectiveInterface
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedCollectives(limit: Int! = 100, offset: Int! = 0): CollectiveSearchResults!
   email: String
-  applications: [Application]
+  newsletterOptIn: Boolean
 }
 
 """
@@ -4065,11 +4052,6 @@ type Vendor implements CollectiveInterface {
   backgroundImage: String
   backgroundImageUrl(height: Int, format: ImageFormat): String
   settings: JSON!
-
-  """
-  Defines if a collective is pledged
-  """
-  isPledged: Boolean
   data: JSON @deprecated(reason: "2020-10-08: This field is not provided anymore and will return an empty object")
 
   """
@@ -4230,8 +4212,6 @@ type Vendor implements CollectiveInterface {
   repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   website: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   socialLinks: [SocialLink!]!
-  updates(limit: Int, offset: Int, onlyPublishedUpdates: Boolean): [UpdateType]
-    @deprecated(reason: "2022-09-09: Updates moved to GQLV2")
   events(
     limit: Int
     offset: Int
@@ -4295,6 +4275,21 @@ type Vendor implements CollectiveInterface {
   contributionPolicy: String
   categories: [String]!
   policies: Policies!
+
+  """
+  If created by duplication, the account from which this one was duplicated
+  """
+  duplicatedFromCollective: CollectiveInterface
+
+  """
+  If this account was duplicated, the accounts that were created from it
+  """
+  duplicatedCollectives(limit: Int! = 100, offset: Int! = 0): CollectiveSearchResults!
+
+  """
+  Returns whether this account has any payout methods saved
+  """
+  hasPayoutMethod: Boolean
 }
 
 """
@@ -4313,19 +4308,8 @@ type Query {
   Tier(id: Int!): Tier @deprecated(reason: "2023-05-04: Please use GraphQL V2")
   LoggedInUser: UserDetails
   allInvoices(fromCollectiveSlug: String!): [InvoiceType]
-  TransactionInvoice(
-    """
-    Slug of the transaction.
-    """
-    transactionUuid: String!
-  ): InvoiceType @deprecated(reason: "2023-05-04: Please fetch transactions with GraphQL v2")
 
-  """
-  Given a collective, returns all its transactions:
-  - Debit transactions made by collective without using a gift card
-  - Debit transactions made using a gift card from collective
-  - Credit transactions made to collective
-  """
+  "\n    Given a collective, returns all its transactions:\n    - Debit transactions made by collective without using a gift card\n    - Debit transactions made using a gift card from collective\n    - Credit transactions made to collective\n    "
   allTransactions(
     CollectiveId: Int
     collectiveSlug: String
@@ -4340,74 +4324,9 @@ type Query {
     If false, only the transactions not linked to an expense (orders/refunds) will be returned
     """
     includeExpenseTransactions: Boolean
-    fetchDataFromLedger: Boolean
-      @deprecated(
-        reason: "2023-01-11: Removed support for this in 2019 (https://github.com/opencollective/opencollective-api/pull/2384)"
-      )
     includeHostedCollectivesTransactions: Boolean
   ): [Transaction]
-  Application(id: Int): Application @deprecated(reason: "2023-01-03: Please use PersonalToken from GQLV2")
   Transaction(id: Int, uuid: String): Transaction
-  allCollectives(
-    """
-    Fetch collectives with a list of collective slug
-    """
-    slugs: [String]
-
-    """
-    Fetch all collectives that match at least one of the tags
-    """
-    tags: [String]
-
-    """
-    COLLECTIVE, USER, ORGANIZATION, EVENT
-    """
-    type: TypeOfCollective
-
-    """
-    Fetch all collectives hosted by HostCollectiveId
-    """
-    HostCollectiveId: Int
-
-    """
-    Fetch all collectives hosted by hostCollectiveSlug
-    """
-    hostCollectiveSlug: String
-
-    """
-    Only return active collectives
-    """
-    isActive: Boolean
-
-    """
-    Only return pledged or non-pledged collectives
-    """
-    isPledged: Boolean
-
-    """
-    Fetch all collectives that `memberOfCollectiveSlug` is a member of
-    """
-    memberOfCollectiveSlug: String
-
-    """
-    Filter collectives with this minimum number of backers
-    """
-    minBackerCount: Int
-
-    """
-    Only fetch the collectives where `memberOfCollectiveSlug` has the specified role
-    """
-    role: String
-
-    """
-    Fetch all collectives that are a child of `ParentCollectiveId`. Used for "SuperCollectives"
-    """
-    ParentCollectiveId: Int
-    orderBy: CollectiveOrderField = name
-    orderDirection: OrderDirection = ASC
-    limit: Int = 10
-    offset: Int = 0
-  ): CollectiveSearchResults @deprecated(reason: "2023-05-16: Please use \"Accounts\" on GraphQL V2")
 
   """
   Returns all public hosts that are open for applications
@@ -4429,7 +4348,6 @@ type Query {
     onlyOpenHosts: Boolean = true
     minNbCollectivesHosted: Int! = 0
   ): CollectiveSearchResults
-  allCollectiveTags: [String] @deprecated(reason: "2023-05-04: Please use `tagStats` on GraphQL V2 instead")
   allMembers(
     CollectiveId: Int
     collectiveSlug: String
@@ -4448,25 +4366,6 @@ type Query {
     limit: Int
     offset: Int
   ): [Member]
-
-  """
-  [AUTHENTICATED] Returns the pending invitations
-  """
-  memberInvitations(CollectiveId: Int, MemberCollectiveId: Int): [MemberInvitation]
-    @deprecated(reason: "2023-05-04: Please use GraphQL V2")
-  allEvents(
-    """
-    Slug of the parent collective
-    """
-    slug: String
-    limit: Int
-    offset: Int
-
-    """
-    If null, returns all events, if false returns only events that are not archived, if true only returns events that have been archived
-    """
-    isArchived: Boolean
-  ): [CollectiveInterface] @deprecated(reason: "2023-05-04: Please use GraphQL V2")
   PaymentMethod(id: Int, code: String): PaymentMethodType
 
   """
@@ -4502,6 +4401,11 @@ type Query {
     Included collectives which are archived
     """
     includeArchived: Boolean
+
+    """
+    Included vendors for specific host ID
+    """
+    includeVendorsForHostId: Int
 
     """
     Whether to skip recent accounts (48h)
@@ -4552,22 +4456,11 @@ type InvoiceType {
   """
   day: Int
   totalAmount: Int @deprecated(reason: "2021-09-09: Not used, so we stop computing it.")
-  totalTransactions: Int
+  totalTransactions: Float
   currency: String @deprecated(reason: "2021-09-09: Not used, so we stop returning it.")
   host: CollectiveInterface
   fromCollective: CollectiveInterface
   transactions: [Transaction]
-}
-
-enum TypeOfCollective {
-  COLLECTIVE
-  EVENT
-  ORGANIZATION
-  USER
-  BOT
-  PROJECT
-  FUND
-  VENDOR
 }
 
 """
@@ -4595,18 +4488,15 @@ enum HostCollectiveOrderFieldType {
   updatedAt
 }
 
-"""
-An invitation to join the members of a collective
-"""
-type MemberInvitation {
-  id: Int
-  createdAt: DateString
-  collective: CollectiveInterface
-  member: CollectiveInterface
-  role: String
-  description: String
-  tier: Tier
-  since: DateString
+enum TypeOfCollective {
+  COLLECTIVE
+  EVENT
+  ORGANIZATION
+  USER
+  BOT
+  PROJECT
+  FUND
+  VENDOR
 }
 
 """
@@ -4666,50 +4556,25 @@ type Mutation {
     """
     email: String!
   ): UserDetails
-
-  """
-  Confirm the new user email from confirmation token
-  """
-  confirmUserEmail(
-    """
-    User's emailConfirmationToken
-    """
-    token: String!
-  ): UserDetails
   editConnectedAccount(connectedAccount: ConnectedAccountInputType!): ConnectedAccountType
-
-  """
-  Update a single tier
-  """
-  editTier(
-    """
-    The tier to update
-    """
-    tier: TierInputType!
-  ): Tier
-  editTiers(id: Int!, tiers: [TierInputType]): [Tier]
 
   """
   Updates all the core contributors (role = ADMIN or MEMBER) for this collective.
   """
   editCoreContributors(collectiveId: Int!, members: [MemberInputType!]!): CollectiveInterface
-    @deprecated(reason: "2021-07-02: Please use inviteMember, editMember or removeMember mutations from GQLV2")
+    @deprecated(reason: "2021-07-02: Please use inviteMember, editMember or removeMember mutations from GraphQLV2")
 
   """
   A mutation to edit the public message of all matching members.
   """
   editPublicMessage(FromCollectiveId: Int!, CollectiveId: Int!, message: String): [Member]
-    @deprecated(reason: "2021-01-27: Please use editPublicMessage from GQLV2")
-  createOrder(order: OrderInputType!): OrderType
-    @deprecated(reason: "2020-10-13: This mutation has been moved to GQLV2")
-  createApplication(application: ApplicationInput!): Application
-    @deprecated(reason: "2023-01-03: Please use createPersonalToken from GQLV2")
-  deleteApplication(id: Int!): Application @deprecated(reason: "2023-01-03: Please use deletePersonalToken from GQLV2")
+    @deprecated(reason: "2021-01-27: Please use editPublicMessage from GraphQLV2")
 
   """
   Update a payment method
   """
   updatePaymentMethod(id: Int!, name: String, monthlyLimitPerMember: Int): PaymentMethodType
+    @deprecated(reason: "2024-07-16: Please use updateOrder from GraphQLV2")
 
   """
   Replace a payment method
@@ -4828,7 +4693,6 @@ type Mutation {
     """
     id: Int!
   ): NotificationType
-  backyourstackDispatchOrder(id: Int!): BackYourStackDispatchState
 
   """
   Activate a collective as Host.
@@ -4897,7 +4761,6 @@ input CollectiveInputType {
   image: String
   backgroundImage: String
   tags: [String]
-  tiers: [TierInputType]
   settings: JSON
   data: JSON @deprecated(reason: "2020-10-08: data cannot be edited. This field will be ignored.")
 
@@ -4914,6 +4777,7 @@ input CollectiveInputType {
   isIncognito: Boolean
   isActive: Boolean
   contributionPolicy: String
+  vendorInfo: JSON
 }
 
 input SocialLinkInput {
@@ -4954,90 +4818,6 @@ input LocationInputType {
   Structured JSON address
   """
   structured: JSON
-}
-
-"""
-Input type for TierType
-"""
-input TierInputType {
-  id: Int
-  type: String
-  name: String
-  description: String
-
-  """
-  A long, html-formatted description.
-  """
-  longDescription: String
-
-  """
-  Whether this tier has a standalone page
-  """
-  useStandalonePage: Boolean
-
-  """
-  Link to a video (YouTube, Vimeo).
-  """
-  videoUrl: String
-
-  """
-  amount in the lowest unit of the currency of the host (ie. in cents)
-  """
-  amount: Int
-
-  """
-  Button text
-  """
-  button: String
-  currency: String
-  presets: [Int]
-  interval: String
-  maxQuantity: Int
-  minimumAmount: Int
-  amountType: String
-
-  """
-  amount that you are trying to raise with this tier
-  """
-  goal: Int
-  customFields: [CustomFieldsInputType]
-
-  """
-  Start of the campaign
-  """
-  startsAt: String
-
-  """
-  End of the campaign
-  """
-  endsAt: String
-
-  """
-  Invoice receipt template
-  """
-  invoiceTemplate: String
-}
-
-"""
-Input for custom fields for order
-"""
-input CustomFieldsInputType {
-  type: CustomFieldType
-  name: String
-  label: String
-  required: Boolean
-}
-
-"""
-Type of custom field
-"""
-enum CustomFieldType {
-  number
-  text
-  email
-  date
-  radio
-  url
 }
 
 """
@@ -5104,7 +4884,6 @@ input UserInputType {
   name: String
   company: String
   image: String
-  username: String @deprecated(reason: "2022-01-13: Not used anymore. Will be ignored")
   description: String
   twitterHandle: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
@@ -5125,126 +4904,6 @@ input ConnectedAccountInputType {
 }
 
 """
-Input type for OrderType
-"""
-input OrderInputType {
-  id: Int
-  quantity: Int = 1
-  totalAmount: Int
-  hostFeePercent: Float
-  platformFeePercent: Float
-  platformFee: Int
-  isFeesOnTop: Boolean
-  currency: String
-  interval: String
-  description: String
-  publicMessage: String
-  privateMessage: String
-  paymentMethod: PaymentMethodInputType
-  user: UserInputType @deprecated(reason: "2020-10-13: This field is now ignored")
-  fromCollective: CollectiveAttributesInputType
-  collective: CollectiveAttributesInputType!
-  tier: TierInputType
-  customData: JSON
-  recaptchaToken: String
-
-  """
-  Use this when fromAccount is null to pass the guest info
-  """
-  guestInfo: GuestInfoInput
-
-  """
-  The amount of taxes that were included in totalAmount
-  """
-  taxAmount: Int = 0
-
-  """
-  User country, to know which tax applies
-  """
-  countryISO: String
-
-  """
-  User tax ID number
-  """
-  taxIDNumber: String
-}
-
-"""
-Input type for PaymentMethod (paypal/stripe)
-"""
-input PaymentMethodInputType {
-  id: Int
-  uuid: String
-  token: String
-  service: String
-
-  """
-  creditcard, giftcard, prepaid, manual...
-  """
-  type: String
-  customerId: String
-  data: JSON
-  name: String
-  primary: Boolean
-  monthlyLimitPerMember: Int
-  currency: String
-  save: Boolean
-}
-
-"""
-Input type for guest contributions
-"""
-input GuestInfoInput {
-  """
-  Contributor's email
-  """
-  email: String
-
-  """
-  Display name of the user
-  """
-  name: String
-
-  """
-  Legal name of the user
-  """
-  legalName: String
-
-  """
-  The unique guest token
-  """
-  token: String
-
-  """
-  Captcha validation for creating an order
-  """
-  captcha: CaptchaInput
-}
-
-"""
-Captcha related information
-"""
-input CaptchaInput {
-  """
-  Captcha validation token
-  """
-  token: String!
-
-  """
-  Catpcha provider
-  """
-  provider: CaptchaProvider!
-}
-
-"""
-Implemented Captcha Providers
-"""
-enum CaptchaProvider {
-  HCAPTCHA
-  RECAPTCHA
-}
-
-"""
 Input for stripe credit card data
 """
 input StripeCreditCardDataInputType {
@@ -5255,8 +4914,4 @@ input StripeCreditCardDataInputType {
   country: String
   funding: String
   zip: String
-}
-
-type BackYourStackDispatchState {
-  dispatching: Boolean
 }
