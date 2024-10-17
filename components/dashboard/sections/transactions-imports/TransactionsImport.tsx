@@ -1,5 +1,5 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { gql, useApolloClient, useQuery } from '@apollo/client';
 import { partition, truncate } from 'lodash';
 import Lottie from 'lottie-react';
 import {
@@ -53,6 +53,7 @@ import DashboardHeader from '../../DashboardHeader';
 import { ImportProgressBadge } from './ImportProgressBadge';
 import { StepMapCSVColumns } from './StepMapCSVColumns';
 import { StepSelectCSV } from './StepSelectCSV';
+import { SyncPlaidAccountButton } from './SyncPlaidAccountButton';
 import { TransactionsImportRowDrawer } from './TransactionsImportRowDrawer';
 import { TransactionsImportRowStatus } from './TransactionsImportRowStatus';
 import TransactionsImportSettingsModal from './TransactionsImportSettingsModal';
@@ -85,6 +86,8 @@ const transactionsImportQuery = gql`
       source
       name
       lastSyncAt
+      isSyncing
+      lastSyncCursor
       file {
         id
         url
@@ -134,6 +137,8 @@ const transactionsImportLasSyncAtPollQuery = gql`
     transactionsImport(id: $importId) {
       id
       lastSyncAt
+      isSyncing
+      lastSyncCursor
     }
   }
 `;
@@ -146,7 +151,9 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
   const [drawerRowId, setDrawerRowId] = React.useState<string | null>(null);
   const [hasNewData, setHasNewData] = React.useState(false);
   const [isDeleted, setIsDeleted] = React.useState(false);
+  const [hasRequestedSync, setHasRequestedSync] = React.useState(false);
   const [hasSettingsModal, setHasSettingsModal] = React.useState(false);
+  const apolloClient = useApolloClient();
   const { data, previousData, loading, error, refetch } = useQuery<
     TransactionsImportQuery,
     TransactionsImportQueryVariables
@@ -162,7 +169,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
   useQuery(transactionsImportLasSyncAtPollQuery, {
     context: API_V2_CONTEXT,
     variables: { importId },
-    pollInterval: !importData?.lastSyncAt ? 2_000 : 20_000, // Poll every 2 seconds if the first sync is in progress, otherwise every 20 seconds
+    pollInterval: !importData?.lastSyncAt || importData.isSyncing || hasRequestedSync ? 2_000 : 20_000, // Poll every 2 seconds if syncing, otherwise every 20 seconds
     fetchPolicy: 'no-cache', // We want to always fetch the latest data, and make sure we don't update the cache
     notifyOnNetworkStatusChange: true, // To make sure `onCompleted` is called when the query is polled
     skip: !importData || hasNewData || !importData.connectedAccount || hasSettingsModal, // We can stop polling if we already know there's new data
@@ -170,7 +177,28 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
       if (!pollData.transactionsImport) {
         setIsDeleted(true);
         return;
-      } else if (importData.lastSyncAt !== pollData.transactionsImport.lastSyncAt) {
+      }
+
+      // Update the `isSyncing` status
+      if (importData.isSyncing !== pollData.transactionsImport.isSyncing) {
+        const newValue = pollData.transactionsImport.isSyncing;
+        apolloClient.cache.modify({
+          id: apolloClient.cache.identify(importData),
+          fields: { isSyncing: () => newValue },
+        });
+      }
+
+      // If we've manually requested a sync and a new one is registered
+      if (hasRequestedSync && importData.lastSyncAt !== pollData.transactionsImport.lastSyncAt) {
+        setHasRequestedSync(false);
+        apolloClient.cache.modify({
+          id: apolloClient.cache.identify(importData),
+          fields: { lastSyncAt: () => pollData.transactionsImport.lastSyncAt },
+        });
+      }
+
+      // Handle new sync data
+      if (importData.lastSyncCursor !== pollData.transactionsImport.lastSyncCursor) {
         if (!importData.rows?.totalCount) {
           refetch(); // The first transaction(s) have been imported, we can directly refresh the view
         } else {
@@ -236,14 +264,14 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                 <div className="flex justify-between">
                   <div className="flex flex-col gap-2">
                     {importData.type === 'PLAID' ? (
-                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                      <div className="flex min-h-7 flex-col gap-2 sm:flex-row sm:items-center">
                         <div className="flex items-center gap-2">
                           <CalendarClock size={16} />
                           <div className="text-sm font-bold sm:text-base">
                             <FormattedMessage defaultMessage="Last sync" id="transactions.import.lastSync" />
                           </div>
                         </div>
-                        {importData.lastSyncAt ? (
+                        {!importData.isSyncing && importData.lastSyncAt ? (
                           <DateTime value={new Date(importData.lastSyncAt)} timeStyle="short" />
                         ) : (
                           <Badge type="info" className="whitespace-nowrap">
@@ -288,12 +316,12 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                   <div className="flex flex-col items-end gap-1">
                     <div className="flex items-center gap-2">
                       {importData.type === 'PLAID' && importData.connectedAccount && (
-                        <Button size="xs" variant="outline" onClick={() => toast({ message: 'Not implemented yet' })}>
-                          <RefreshCw size={16} />
-                          <span className="hidden sm:inline">
-                            <FormattedMessage defaultMessage="Sync" id="sync" />
-                          </span>
-                        </Button>
+                        <SyncPlaidAccountButton
+                          hasRequestedSync={hasRequestedSync}
+                          setHasRequestedSync={setHasRequestedSync}
+                          connectedAccountId={importData.connectedAccount.id}
+                          isSyncing={importData.isSyncing}
+                        />
                       )}
                       {importData.file && (
                         <Link
