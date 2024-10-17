@@ -395,8 +395,8 @@ class EditCollectiveForm extends React.Component {
       case ALL_SECTIONS.INFO:
         return null;
 
-      case ALL_SECTIONS.COLLECTIVE_GOALS:
-        return <CollectiveGoals collective={collective} currency={collective.currency} />;
+      // case ALL_SECTIONS.COLLECTIVE_GOALS:
+      //   return <CollectiveGoals collective={collective} currency={collective.currency} />;
 
       case ALL_SECTIONS.COLLECTIVE_PAGE:
         return <EditCollectivePage collective={collective} />;

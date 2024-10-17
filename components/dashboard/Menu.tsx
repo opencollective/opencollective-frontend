@@ -428,7 +428,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           if: isOneOfTypes(account, [COLLECTIVE, FUND]) && !isAccountantOnly,
         },
         {
-          section: ALL_SECTIONS.COLLECTIVE_GOALS,
+          section: ALL_SECTIONS.GOALS,
           if: isOneOfTypes(account, [COLLECTIVE, PROJECT]) && !isAccountantOnly,
         },
         {

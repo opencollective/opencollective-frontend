@@ -67,6 +67,7 @@ import {
 } from './constants';
 import { DashboardContext } from './DashboardContext';
 import DashboardHeader from './DashboardHeader';
+import Goals from './sections/Goals';
 
 const DASHBOARD_COMPONENTS = {
   [SECTIONS.HOSTED_COLLECTIVES]: HostedCollectives,
@@ -99,6 +100,7 @@ const SETTINGS_COMPONENTS = {
   [SETTINGS_SECTIONS.INVOICES_RECEIPTS]: InvoicesReceipts,
   [SETTINGS_SECTIONS.NOTIFICATIONS]: NotificationsSettings,
   [SETTINGS_SECTIONS.TAX_INFORMATION]: TaxInformationSettingsSection,
+  [SETTINGS_SECTIONS.GOALS]: Goals,
 };
 
 const ROOT_COMPONENTS = {

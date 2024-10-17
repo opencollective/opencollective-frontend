@@ -49,6 +49,7 @@ export const ROOT_SECTIONS = {
 };
 
 export const SETTINGS_SECTIONS = {
+  GOALS: 'goals',
   NOTIFICATIONS: 'notifications',
   INVOICES_RECEIPTS: 'invoices-receipts',
   TAX_INFORMATION: 'tax-information',
@@ -76,7 +77,8 @@ export const LEGACY_SETTINGS_SECTIONS = {
   WEBHOOKS: 'webhooks',
   ADVANCED: 'advanced',
   AUTHORIZED_APPS: 'authorized-apps',
-  COLLECTIVE_GOALS: 'goals',
+  // COLLECTIVE_GOALS: 'goals',
+  // GOALS: 'goals',
   CONNECTED_ACCOUNTS: 'connected-accounts',
   EXPORT: 'export',
   FOR_DEVELOPERS: 'for-developers',
@@ -145,7 +147,7 @@ export const SECTION_LABELS = defineMessages({
     id: 'editCollective.menu.advanced',
     defaultMessage: 'Advanced',
   },
-  [ALL_SECTIONS.COLLECTIVE_GOALS]: {
+  [ALL_SECTIONS.GOALS]: {
     id: 'Goals',
     defaultMessage: 'Goals',
   },
