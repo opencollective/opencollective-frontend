@@ -115,8 +115,6 @@ Comment.propTypes = {
   canReply: PropTypes.bool,
   /** Set this to true if the comment is the root comment of a conversation */
   isConversationRoot: PropTypes.bool,
-  /** Set this to true to disable actions */
-  withoutActions: PropTypes.bool,
   /** If set, comment will be scrollable over this height */
   maxCommentHeight: PropTypes.number,
   /** Called when comment gets deleted */
