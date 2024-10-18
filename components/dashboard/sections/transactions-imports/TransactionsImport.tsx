@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql, useApolloClient, useQuery } from '@apollo/client';
-import { partition, truncate } from 'lodash';
+import { partition, size, truncate } from 'lodash';
 import Lottie from 'lottie-react';
 import {
   Calendar,
@@ -17,17 +17,23 @@ import {
   Upload,
 } from 'lucide-react';
 import type { IntlShape } from 'react-intl';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
+import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { formatFileSize } from '../../../../lib/file-utils';
+import type { FilterConfig } from '../../../../lib/filters/filter-types';
+import { integer } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import type {
-  Amount,
-  TransactionsImportQuery,
-  TransactionsImportQueryVariables,
+import {
+  type Amount,
+  type TransactionsImportQuery,
+  type TransactionsImportQueryVariables,
+  TransactionsImportRowStatus,
 } from '../../../../lib/graphql/types/v2/graphql';
-import { cn } from '../../../../lib/utils';
+import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import { i18nTransactionsRowStatus } from '../../../../lib/i18n/transactions-import-row';
+import { cn, sortSelectOptions } from '../../../../lib/utils';
 import { useTransactionsImportActions } from './lib/actions';
 import { TransactionsImportRowFieldsFragment } from './lib/graphql';
 
@@ -42,6 +48,10 @@ import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import NotFound from '../../../NotFound';
 import StyledLink from '../../../StyledLink';
 import { actionsColumn, DataTable } from '../../../table/DataTable';
+import {
+  MultiPagesRowSelectionInitialState,
+  multiPagesRowSelectionReducer,
+} from '../../../table/multi-pages-selection';
 import { Badge } from '../../../ui/Badge';
 import { Button } from '../../../ui/Button';
 import { Checkbox } from '../../../ui/Checkbox';
@@ -49,13 +59,17 @@ import type { StepItem } from '../../../ui/Stepper';
 import { Step, Stepper } from '../../../ui/Stepper';
 import { useToast } from '../../../ui/useToast';
 import DashboardHeader from '../../DashboardHeader';
+import ComboSelectFilter from '../../filters/ComboSelectFilter';
+import { Filterbar } from '../../filters/Filterbar';
+import { Pagination } from '../../filters/Pagination';
+import { searchFilter } from '../../filters/SearchFilter';
 
 import { ImportProgressBadge } from './ImportProgressBadge';
 import { StepMapCSVColumns } from './StepMapCSVColumns';
 import { StepSelectCSV } from './StepSelectCSV';
 import { SyncPlaidAccountButton } from './SyncPlaidAccountButton';
 import { TransactionsImportRowDrawer } from './TransactionsImportRowDrawer';
-import { TransactionsImportRowStatus } from './TransactionsImportRowStatus';
+import { TransactionsImportRowStatusBadge } from './TransactionsImportRowStatusBadge';
 import TransactionsImportSettingsModal from './TransactionsImportSettingsModal';
 
 const getSteps = (intl: IntlShape): StepItem[] => {
@@ -80,7 +94,13 @@ const getSteps = (intl: IntlShape): StepItem[] => {
 };
 
 const transactionsImportQuery = gql`
-  query TransactionsImport($importId: String!) {
+  query TransactionsImport(
+    $importId: String!
+    $limit: Int = 50
+    $offset: Int = 0
+    $status: TransactionsImportRowStatus
+    $searchTerm: String
+  ) {
     transactionsImport(id: $importId) {
       id
       source
@@ -119,7 +139,7 @@ const transactionsImportQuery = gql`
         currency
         type
       }
-      rows {
+      rows(limit: $limit, offset: $offset, status: $status, searchTerm: $searchTerm) {
         totalCount
         offset
         limit
@@ -143,6 +163,61 @@ const transactionsImportLasSyncAtPollQuery = gql`
   }
 `;
 
+const DEFAULT_PAGE_SIZE = 50;
+
+const getViews = intl => [
+  {
+    id: 'PENDING',
+    label: intl.formatMessage({ defaultMessage: 'Pending', id: 'eKEL/g' }),
+    filter: { status: TransactionsImportRowStatus.PENDING },
+  },
+  {
+    id: 'IGNORED',
+    label: intl.formatMessage({ defaultMessage: 'Ignored', id: 'ignored' }),
+    filter: { status: TransactionsImportRowStatus.IGNORED },
+  },
+  {
+    id: 'LINKED',
+    label: intl.formatMessage({ defaultMessage: 'Imported', id: 'transaction.imported' }),
+    filter: { status: TransactionsImportRowStatus.LINKED },
+  },
+  {
+    id: 'ALL',
+    label: intl.formatMessage({ defaultMessage: 'All', id: 'all' }),
+    filter: {},
+  },
+];
+
+const rowStatusFilterSchema = z.nativeEnum(TransactionsImportRowStatus).optional();
+
+const rowStatusFilter: FilterConfig<z.infer<typeof rowStatusFilterSchema>> = {
+  schema: rowStatusFilterSchema,
+  filter: {
+    labelMsg: defineMessage({ defaultMessage: 'Status', id: 'tzMNF3' }),
+    Component: ({ valueRenderer, intl, ...props }) => (
+      <ComboSelectFilter
+        options={Object.values(TransactionsImportRowStatus)
+          .map(value => ({ label: valueRenderer({ intl, value }), value }))
+          .sort(sortSelectOptions)}
+        {...props}
+      />
+    ),
+    valueRenderer: ({ intl, value }) => i18nTransactionsRowStatus(intl, value),
+  },
+};
+
+const queryFilterSchema = z.object({
+  limit: integer.default(DEFAULT_PAGE_SIZE),
+  offset: integer.default(0),
+  searchTerm: searchFilter.schema,
+  status: rowStatusFilter.schema,
+});
+
+const filters = {
+  searchTerm: searchFilter.filter,
+  status: rowStatusFilter.filter,
+};
+
 export const TransactionsImport = ({ accountSlug, importId }) => {
   const intl = useIntl();
   const { toast } = useToast();
@@ -154,14 +229,30 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
   const [hasRequestedSync, setHasRequestedSync] = React.useState(false);
   const [hasSettingsModal, setHasSettingsModal] = React.useState(false);
   const apolloClient = useApolloClient();
+  const [selection, dispatchSelection] = React.useReducer(
+    multiPagesRowSelectionReducer,
+    MultiPagesRowSelectionInitialState,
+  );
+
+  const queryFilterViews = React.useMemo(() => getViews(intl), [intl]);
+  const queryFilter = useQueryFilter<typeof queryFilterSchema, TransactionsImportQueryVariables>({
+    schema: queryFilterSchema,
+    views: queryFilterViews,
+    filters,
+  });
   const { data, previousData, loading, error, refetch } = useQuery<
     TransactionsImportQuery,
     TransactionsImportQueryVariables
-  >(transactionsImportQuery, { context: API_V2_CONTEXT, variables: { importId }, notifyOnNetworkStatusChange: true });
+  >(transactionsImportQuery, {
+    context: API_V2_CONTEXT,
+    variables: { importId, ...queryFilter.variables },
+    notifyOnNetworkStatusChange: true,
+    fetchPolicy: 'cache-and-network',
+  });
 
   const importData = data?.transactionsImport || previousData?.transactionsImport;
   const importType = importData?.type;
-  const hasStepper = importType === 'CSV' && !importData?.rows?.totalCount;
+  const hasStepper = importType === 'CSV' && !importData?.file;
   const importRows = importData?.rows?.nodes ?? [];
   const selectedRowIdx = importRows.findIndex(row => row.id === drawerRowId);
 
@@ -213,6 +304,12 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
     host: importData?.account,
   });
 
+  // Clear selection whenever the pagination changes
+  React.useEffect(() => {
+    dispatchSelection({ type: 'CLEAR' });
+  }, [queryFilter.variables]);
+
+  const hasPagination = data?.transactionsImport?.rows.totalCount > queryFilter.values.limit;
   return (
     <div>
       <DashboardHeader
@@ -348,6 +445,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                 </div>
               </div>
 
+              {/** "Refresh data" action bar */}
               {!hasNewData ? (
                 <div className="h-[51px]" />
               ) : (
@@ -387,180 +485,240 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                 </div>
               )}
 
-              {/** Import data table */}
-              <div className="relative mt-2">
-                {!importData.lastSyncAt && (
-                  <div className="absolute z-50 flex h-full w-full items-center justify-center">
-                    <Lottie animationData={SyncAnimation} loop autoPlay className="max-w-[600px]" />
+              <div className="px-2">
+                {/** Tabs & filters */}
+                <Filterbar className="mb-4" {...queryFilter} />
+
+                {/** Select all message */}
+                {size(selection.rows) === importRows.length && hasPagination && (
+                  <div className="flex items-center justify-center rounded-lg bg-neutral-100 p-2 text-sm text-neutral-600">
+                    {!selection.includeAllPages ? (
+                      <React.Fragment>
+                        <FormattedMessage
+                          defaultMessage="All {count} rows on this page are selected."
+                          id="qMKhWs"
+                          values={{ count: importRows.length }}
+                        />
+                        <Button
+                          variant="link"
+                          size="xs"
+                          onClick={() => dispatchSelection({ type: 'SELECT_ALL_PAGES' })}
+                        >
+                          <FormattedMessage
+                            defaultMessage="Select all {count} rows."
+                            id="vbHaiI"
+                            values={{ count: importData.rows.totalCount }}
+                          />
+                        </Button>
+                      </React.Fragment>
+                    ) : (
+                      <React.Fragment>
+                        <FormattedMessage
+                          defaultMessage="All {count} rows are selected."
+                          id="1bUrqi"
+                          values={{ count: importData.rows.totalCount }}
+                        />
+                        <Button variant="link" size="xs" onClick={() => dispatchSelection({ type: 'CLEAR' })}>
+                          <FormattedMessage defaultMessage="Clear selection" id="EYIw2M" />
+                        </Button>
+                      </React.Fragment>
+                    )}
                   </div>
                 )}
-                <DataTable<TransactionsImportQuery['transactionsImport']['rows']['nodes'][number], unknown>
-                  loading={loading || !importData.lastSyncAt}
-                  getRowClassName={row =>
-                    row.original.isDismissed ? '[&>td:nth-child(n+2):nth-last-child(n+3)]:opacity-30' : ''
-                  }
-                  data={importRows}
-                  getActions={getActions}
-                  openDrawer={row => setDrawerRowId(row.original.id)}
-                  emptyMessage={() => (
-                    <FormattedMessage id="SectionTransactions.Empty" defaultMessage="No transactions yet." />
+
+                {/** Import data table */}
+                <div className="relative mt-2">
+                  {!importData.lastSyncAt && (
+                    <div className="absolute z-50 flex h-full w-full items-center justify-center">
+                      <Lottie animationData={SyncAnimation} loop autoPlay className="max-w-[600px]" />
+                    </div>
                   )}
-                  columns={[
-                    {
-                      id: 'select',
-                      header: ({ table }) =>
-                        importRows.some(row => !row.expense && !row.order) ? (
-                          <Checkbox
-                            onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
-                            aria-label="Select all"
-                            className="translate-y-[2px] border-neutral-500"
-                            checked={
-                              table.getIsAllPageRowsSelected() ||
-                              (table.getIsSomePageRowsSelected() && 'indeterminate') ||
-                              false
-                            }
-                          />
-                        ) : null,
-                      cell: ({ row }) =>
-                        !row.original.expense &&
-                        !row.original.order && (
-                          <Checkbox
-                            checked={row.getIsSelected()}
-                            onCheckedChange={value => row.toggleSelected(!!value)}
-                            aria-label="Select row"
-                            className="translate-y-[2px] border-neutral-500"
-                          />
-                        ),
-                    },
-                    {
-                      header: 'Date',
-                      accessorKey: 'date',
-                      cell: ({ cell }) => {
-                        const date = cell.getValue() as string;
-                        return <DateTime value={new Date(date)} />;
+                  <DataTable<TransactionsImportQuery['transactionsImport']['rows']['nodes'][number], unknown>
+                    loading={loading || !importData.lastSyncAt}
+                    getRowClassName={row =>
+                      row.original.isDismissed ? '[&>td:nth-child(n+2):nth-last-child(n+3)]:opacity-30' : ''
+                    }
+                    enableMultiRowSelection
+                    rowSelection={selection.rows}
+                    setRowSelection={rows =>
+                      dispatchSelection({ type: 'SET', rows: typeof rows === 'function' ? rows(selection.rows) : rows })
+                    }
+                    data={importRows}
+                    getActions={getActions}
+                    openDrawer={row => setDrawerRowId(row.original.id)}
+                    emptyMessage={() => (
+                      <FormattedMessage id="SectionTransactions.Empty" defaultMessage="No transactions yet." />
+                    )}
+                    columns={[
+                      {
+                        id: 'select',
+                        header: ({ table }) =>
+                          importRows.some(row => !row.expense && !row.order) ? (
+                            <Checkbox
+                              aria-label="Select all"
+                              className="translate-y-[2px] border-neutral-500"
+                              checked={
+                                table.getIsAllPageRowsSelected() ||
+                                (table.getIsSomePageRowsSelected() && 'indeterminate') ||
+                                false
+                              }
+                              onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
+                            />
+                          ) : null,
+                        cell: ({ row }) =>
+                          !row.original.expense &&
+                          !row.original.order && (
+                            <Checkbox
+                              checked={row.getIsSelected()}
+                              aria-label="Select row"
+                              className="translate-y-[2px] border-neutral-500"
+                              onCheckedChange={value => row.toggleSelected(!!value)}
+                            />
+                          ),
                       },
-                    },
-                    {
-                      header: 'Amount',
-                      accessorKey: 'amount',
-                      cell: ({ cell }) => {
-                        const amount = cell.getValue() as Amount;
-                        return <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} />;
+                      {
+                        header: 'Date',
+                        accessorKey: 'date',
+                        cell: ({ cell }) => {
+                          const date = cell.getValue() as string;
+                          return <DateTime value={new Date(date)} />;
+                        },
                       },
-                    },
-                    {
-                      header: 'Description',
-                      accessorKey: 'description',
-                      cell: ({ cell }) => <p className="max-w-xs">{cell.getValue() as string}</p>,
-                    },
-                    {
-                      header: 'Match',
-                      cell: ({ row }) => {
-                        if (row.original.expense) {
-                          return (
-                            <StyledLink
-                              className="flex items-center gap-1"
-                              href={`/${row.original.expense.account.slug}/expenses/${row.original.expense.legacyId}`}
-                            >
-                              <Avatar collective={row.original.expense.account} size={24} />
-                              <FormattedMessage
-                                id="E9pJQz"
-                                defaultMessage="Expense #{id}"
-                                values={{ id: row.original.expense.legacyId }}
-                              />
-                            </StyledLink>
-                          );
-                        } else if (row.original.order) {
-                          return (
-                            <StyledLink
-                              className="flex items-center gap-1"
-                              href={`/${row.original.order.toAccount.slug}/contributions/${row.original.order.legacyId}`}
-                            >
-                              <Avatar collective={row.original.order.toAccount} size={24} />
-                              <FormattedMessage
-                                id="Siv4wU"
-                                defaultMessage="Contribution #{id}"
-                                values={{ id: row.original.order.legacyId }}
-                              />
-                            </StyledLink>
-                          );
-                        } else {
-                          return '-';
-                        }
+                      {
+                        header: 'Amount',
+                        accessorKey: 'amount',
+                        cell: ({ cell }) => {
+                          const amount = cell.getValue() as Amount;
+                          return <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} />;
+                        },
                       },
-                    },
-                    {
-                      header: 'Status',
-                      cell: ({ row }) => {
-                        return <TransactionsImportRowStatus row={row.original} />;
+                      {
+                        header: 'Description',
+                        accessorKey: 'description',
+                        cell: ({ cell }) => <p className="max-w-xs">{cell.getValue() as string}</p>,
                       },
-                    },
-                    {
-                      id: 'actions',
-                      ...actionsColumn,
-                      header: ({ table }) => {
-                        const selectedRows = table.getSelectedRowModel().rows;
-                        const unprocessedRows = selectedRows.filter(
-                          ({ original }) => !original.expense && !original.order,
-                        );
-                        const [ignoredRows, nonIgnoredRows] = partition(
-                          unprocessedRows,
-                          row => row.original.isDismissed,
-                        );
-                        return (
-                          <div className="flex min-w-36 justify-end">
-                            {ignoredRows.length && !nonIgnoredRows.length ? (
-                              //  If all non-processed rows are dismissed, show restore button
-                              <Button
-                                variant="outline"
-                                size="xs"
-                                className="whitespace-nowrap text-xs"
-                                onClick={async () => {
-                                  const ignoredIds = ignoredRows.map(row => row.original.id);
-                                  await setRowsDismissed(ignoredIds, false);
-                                  table.setRowSelection({});
-                                }}
+                      {
+                        header: 'Match',
+                        cell: ({ row }) => {
+                          if (row.original.expense) {
+                            return (
+                              <StyledLink
+                                className="flex items-center gap-1"
+                                href={`/${row.original.expense.account.slug}/expenses/${row.original.expense.legacyId}`}
                               >
-                                <SquareSlashIcon size={12} />
+                                <Avatar collective={row.original.expense.account} size={24} />
                                 <FormattedMessage
-                                  defaultMessage="Restore {selectedCount}"
-                                  id="restore"
-                                  values={{ selectedCount: ignoredRows.length }}
+                                  id="E9pJQz"
+                                  defaultMessage="Expense #{id}"
+                                  values={{ id: row.original.expense.legacyId }}
                                 />
-                              </Button>
-                            ) : nonIgnoredRows.length ? (
-                              // Otherwise, show ignore button
-                              <Button
-                                variant="outline"
-                                size="xs"
-                                className="whitespace-nowrap text-xs"
-                                onClick={() => {
-                                  const ignoredIds = nonIgnoredRows.map(row => row.original.id);
-                                  setRowsDismissed(ignoredIds, true);
-                                  table.setRowSelection({});
-                                }}
+                              </StyledLink>
+                            );
+                          } else if (row.original.order) {
+                            return (
+                              <StyledLink
+                                className="flex items-center gap-1"
+                                href={`/${row.original.order.toAccount.slug}/contributions/${row.original.order.legacyId}`}
                               >
-                                <SquareSlashIcon size={12} />
+                                <Avatar collective={row.original.order.toAccount} size={24} />
                                 <FormattedMessage
-                                  defaultMessage="Ignore {selectedCount}"
-                                  id="ignore"
-                                  values={{ selectedCount: nonIgnoredRows.length }}
+                                  id="Siv4wU"
+                                  defaultMessage="Contribution #{id}"
+                                  values={{ id: row.original.order.legacyId }}
                                 />
-                              </Button>
-                            ) : (
-                              <div>
-                                <FormattedMessage
-                                  defaultMessage="Actions"
-                                  id="CollectivePage.NavBar.ActionMenu.Actions"
-                                />
-                              </div>
-                            )}
-                          </div>
-                        );
+                              </StyledLink>
+                            );
+                          } else {
+                            return '-';
+                          }
+                        },
                       },
-                    },
-                  ]}
-                />
+                      {
+                        header: 'Status',
+                        cell: ({ row }) => {
+                          return <TransactionsImportRowStatusBadge row={row.original} />;
+                        },
+                      },
+                      {
+                        id: 'actions',
+                        ...actionsColumn,
+                        header: ({ table }) => {
+                          const selectedRows = table.getSelectedRowModel().rows;
+                          const unprocessedRows = selectedRows.filter(
+                            ({ original }) => !original.expense && !original.order,
+                          );
+                          const [ignoredRows, nonIgnoredRows] = partition(
+                            unprocessedRows,
+                            row => row.original.isDismissed,
+                          );
+                          return (
+                            <div className="flex min-w-36 justify-end">
+                              {ignoredRows.length && !nonIgnoredRows.length ? (
+                                //  If all non-processed rows are dismissed, show restore button
+                                <Button
+                                  variant="outline"
+                                  size="xs"
+                                  className="whitespace-nowrap text-xs"
+                                  onClick={async () => {
+                                    const ignoredIds = ignoredRows.map(row => row.original.id);
+                                    await setRowsDismissed(ignoredIds, false, {
+                                      includeAllRows: selection.includeAllPages,
+                                    });
+                                    table.setRowSelection({});
+                                  }}
+                                >
+                                  <SquareSlashIcon size={12} />
+                                  {selection.includeAllPages ? (
+                                    <FormattedMessage defaultMessage="Restore all rows" id="8uECrb" />
+                                  ) : (
+                                    <FormattedMessage
+                                      defaultMessage="Restore {selectedCount}"
+                                      id="restore"
+                                      values={{ selectedCount: ignoredRows.length }}
+                                    />
+                                  )}
+                                </Button>
+                              ) : nonIgnoredRows.length || selection.includeAllPages ? (
+                                // Otherwise, show ignore button
+                                <Button
+                                  variant="outline"
+                                  size="xs"
+                                  className="whitespace-nowrap text-xs"
+                                  onClick={() => {
+                                    const ignoredIds = nonIgnoredRows.map(row => row.original.id);
+                                    setRowsDismissed(ignoredIds, true, { includeAllRows: selection.includeAllPages });
+                                    table.setRowSelection({});
+                                  }}
+                                >
+                                  <SquareSlashIcon size={12} />
+                                  {selection.includeAllPages ? (
+                                    <FormattedMessage defaultMessage="Ignore all rows" id="ogbYeo" />
+                                  ) : (
+                                    <FormattedMessage
+                                      defaultMessage="Ignore {selectedCount}"
+                                      id="ignore"
+                                      values={{ selectedCount: nonIgnoredRows.length }}
+                                    />
+                                  )}
+                                </Button>
+                              ) : (
+                                <div>
+                                  <FormattedMessage
+                                    defaultMessage="Actions"
+                                    id="CollectivePage.NavBar.ActionMenu.Actions"
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          );
+                        },
+                      },
+                    ]}
+                  />
+                  <div className="mt-8">
+                    <Pagination queryFilter={queryFilter} total={data?.transactionsImport?.rows.totalCount} />
+                  </div>
+                </div>
               </div>
             </div>
           )}
