@@ -10,14 +10,10 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { UPDATE_NOTIFICATION_AUDIENCE, UpdateNotificationAudienceLabels } from '../../../../lib/constants/updates';
 import { toIsoDateStr } from '../../../../lib/date-utils';
 import { i18nGraphqlException, isOCError } from '../../../../lib/errors';
+import FormPersister from '../../../../lib/form-persister';
 import { formatFormErrorMessage, requireFields } from '../../../../lib/form-utils';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import {
-  getFromLocalStorageWithTTL,
-  LOCAL_STORAGE_KEYS,
-  removeFromLocalStorage,
-  setLocalStorageWithTTL,
-} from '../../../../lib/local-storage';
+import { LOCAL_STORAGE_KEYS } from '../../../../lib/local-storage';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
 import { cn, formatDate } from '../../../../lib/utils';
 
@@ -107,17 +103,17 @@ const updateAudienceQuery = gql`
   }
 `;
 
-const FormBody = ({ update }) => {
-  const locallyPersistedState = React.useMemo(
-    () => getFromLocalStorageWithTTL(LOCAL_STORAGE_KEYS.UPDATES_FORM_STATE),
-    [],
+const FormBody = ({ update, accountSlug }) => {
+  const formPersister = React.useMemo(
+    () => new FormPersister(`${LOCAL_STORAGE_KEYS.UPDATES_FORM_STATE}-${update?.id || 'newDraft'}-${accountSlug}`),
+    [accountSlug, update],
   );
   const isEditing = !!update?.id;
   const isDraft = !update?.publishedAt;
   const initialValues = React.useMemo(
     () =>
       pick(
-        update || locallyPersistedState || CREATE_UPDATE_DEFAULT_VALUES,
+        update || formPersister.loadValues() || CREATE_UPDATE_DEFAULT_VALUES,
         'id',
         'title',
         'html',
@@ -126,7 +122,7 @@ const FormBody = ({ update }) => {
         'isChangelog',
         'notificationAudience',
       ),
-    [update, locallyPersistedState],
+    [update, formPersister],
   );
 
   const intl = useIntl();
@@ -179,7 +175,7 @@ const FormBody = ({ update }) => {
           <FormattedMessage defaultMessage="Update saved" id="update.saved" />
         ),
       });
-      removeFromLocalStorage(LOCAL_STORAGE_KEYS.UPDATES_FORM_STATE);
+      formPersister.clearValues();
       const id = response.data.createUpdate?.id || response.data.editUpdate?.id;
       if (redirect === true) {
         router.push(getDashboardRoute(account, `updates/${id}`));
@@ -216,7 +212,6 @@ const FormBody = ({ update }) => {
             variant: 'success',
             message: <FormattedMessage defaultMessage="Update published" id="update.published" />,
           });
-          removeFromLocalStorage(LOCAL_STORAGE_KEYS.UPDATES_FORM_STATE);
           router.push(getDashboardRoute(account, `updates/${id}`));
         } catch (e) {
           toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
@@ -256,11 +251,11 @@ const FormBody = ({ update }) => {
 
   const handleStatePersistence = React.useMemo(
     () => values => {
-      setLocalStorageWithTTL(LOCAL_STORAGE_KEYS.UPDATES_FORM_STATE, values, 60 * 60 * 24 * 1000);
+      formPersister.saveValues(values);
       const errors = requireFields(values, ['title', 'html']);
       return errors;
     },
-    [],
+    [formPersister],
   );
 
   return (
@@ -500,7 +495,7 @@ const FormBody = ({ update }) => {
   );
 };
 
-const UpdateFormView = ({ updateId }) => {
+const UpdateFormView = ({ updateId, accountSlug }) => {
   const isEditing = !!updateId;
   const { account } = React.useContext(DashboardContext);
   const { data, loading } = useQuery(updatesViewQuery, {
@@ -532,7 +527,7 @@ const UpdateFormView = ({ updateId }) => {
             <FormattedMessage defaultMessage="New Update" id="+S3jp9" />
           )}
         </h1>
-        {!loading && <FormBody update={data?.update} />}
+        {!loading && <FormBody update={data?.update} accountSlug={accountSlug} />}
       </div>
     </div>
   );
