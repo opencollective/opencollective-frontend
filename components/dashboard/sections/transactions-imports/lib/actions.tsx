@@ -40,20 +40,24 @@ const getOptimisticResponse = (transactionsImport, rowIds, isDismissed) => {
 
 export function useTransactionsImportActions({ transactionsImport, host }): {
   getActions: GetActions<TransactionsImportRow>;
-  setRowsDismissed: (rowIds: string[], isDismissed: boolean) => Promise<void>;
+  setRowsDismissed: (rowIds: string[], isDismissed: boolean, options?: { includeAllRows?: boolean }) => Promise<void>;
 } {
   const { toast } = useToast();
   const intl = useIntl();
   const [updatingRows, setUpdatingRows] = React.useState<Array<string>>([]);
   const [updateRows] = useMutation(updateTransactionsImportRows, { context: API_V2_CONTEXT });
   const { showModal, hideModal } = useModal();
-  const setRowsDismissed = async (rowIds: string[], isDismissed: boolean) => {
+  const setRowsDismissed = async (rowIds: string[], isDismissed: boolean, { includeAllRows = false } = {}) => {
     setUpdatingRows(uniq([...updatingRows, ...rowIds]));
     try {
       await updateRows({
         variables: {
           importId: transactionsImport.id,
-          rows: rowIds.map(id => ({ id, isDismissed })),
+          ...(!includeAllRows
+            ? { rows: rowIds.map(id => ({ id, isDismissed })) }
+            : isDismissed
+              ? { dismissAll: true }
+              : { restoreAll: true }),
         },
         optimisticResponse: getOptimisticResponse(transactionsImport, rowIds, isDismissed),
       });
