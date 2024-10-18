@@ -74,6 +74,7 @@ class OpenCollectiveFrontendApp extends App {
   }
 
   static async getInitialProps({ AppTree, Component, ctx }) {
+    console.log('getInitialProps');
     const apolloClient = initClient({
       accessToken: getTokenFromCookie(ctx.req),
     });
@@ -179,6 +180,7 @@ class OpenCollectiveFrontendApp extends App {
       console.log('pageProps apollo cache', pageProps?.[APOLLO_STATE_PROP_NAME]);
     }
 
+    console.log('props', this.props);
     return (
       <Fragment>
         <ApolloProvider
