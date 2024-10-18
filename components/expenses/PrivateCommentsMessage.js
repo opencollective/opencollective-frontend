@@ -6,7 +6,7 @@ import { Box, Flex } from '../Grid';
 import Image from '../Image';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBox from '../MessageBox';
-import { P, Span } from '../Text';
+import { P } from '../Text';
 
 const PrivateCommentsMessage = ({ isAllowed, isLoading, ...props }) => {
   if (isLoading) {
@@ -16,9 +16,7 @@ const PrivateCommentsMessage = ({ isAllowed, isLoading, ...props }) => {
   return (
     <MessageBox type="info" {...props}>
       <Flex alignItems="center" my={1}>
-        <Span ml="8px">
-          <Image alt="" src="/static/images/PrivateLockIcon.png" width={32} height={32} />
-        </Span>
+        <Image alt="" className="ml-2 min-w-6" src="/static/images/PrivateLockIcon.png" width={32} height={32} />
         <Box ml={3}>
           <P fontWeight="bold" fontSize="12px" lineHeight="20px">
             {isAllowed ? (
