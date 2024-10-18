@@ -41,7 +41,7 @@ export const budgetSectionContributionsQuery = gql`
       currency
       stats {
         id
-        totalAmountReceived(dateFrom: $from, dateTo: $to, includeChildren: false) {
+        totalAmountReceived(dateFrom: $from, dateTo: $to, includeChildren: false, kind: [CONTRIBUTION]) {
           value
           currency
         }
