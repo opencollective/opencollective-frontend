@@ -255,7 +255,7 @@ const FormBody = ({ update, accountSlug }) => {
       const errors = requireFields(values, ['title', 'html']);
       return errors;
     },
-    [],
+    [formPersister],
   );
 
   return (
