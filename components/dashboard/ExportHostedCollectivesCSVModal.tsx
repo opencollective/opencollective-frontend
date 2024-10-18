@@ -62,6 +62,12 @@ const makeUrl = ({ account, queryFilter, fields }) => {
   if (queryFilter.values.searchTerm) {
     url.searchParams.set('searchTerm', queryFilter.values.searchTerm);
   }
+  if (queryFilter.values.sort) {
+    url.searchParams.set('sort', JSON.stringify(queryFilter.values.sort));
+  }
+  if (queryFilter.variables.consolidatedBalance) {
+    url.searchParams.set('consolidatedBalance', JSON.stringify(queryFilter.variables.consolidatedBalance));
+  }
   if (!isNil(queryFilter.variables.isFrozen)) {
     url.searchParams.set('isFrozen', queryFilter.variables.isFrozen ? '1' : '0');
   }

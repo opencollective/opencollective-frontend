@@ -22,7 +22,27 @@ type CSVField =
   | 'totalNumberOfContributions'
   | 'firstExpenseDate'
   | 'lastExpenseDate'
-  | 'numberOfExpenses';
+  | 'numberOfExpenses'
+  | 'status'
+  // Added
+  | 'totalAmountSpent'
+  | 'dateApplied'
+  | 'unhostedAt'
+  | 'unfrozenAt'
+  | 'numberOfExpensesYear'
+  | 'valueOfExpensesYear'
+  | 'maxExpenseValueYear'
+  | 'numberOfPayeesYear'
+  | 'numberOfContributionsYear'
+  | 'numberOfExpensesQuarter'
+  | 'valueOfContributionsYear'
+  | 'valueOfHostFeeYear'
+  | 'valueOfExpensesQuarter'
+  | 'maxExpenseValueQuarter'
+  | 'numberOfPayeesQuarter'
+  | 'numberOfContributionsQuarter'
+  | 'valueOfContributionsQuarter'
+  | 'valueOfHostFeeQuarter';
 
 export enum FIELD_OPTIONS {
   DEFAULT = 'DEFAULT',
@@ -70,6 +90,11 @@ export const FIELDS: Array<{
     id: 'type',
     group: 'about',
     label: <FormattedMessage id="Fields.type" defaultMessage="Type" />,
+  },
+  {
+    id: 'status',
+    group: 'about',
+    label: <FormattedMessage id="Status" defaultMessage="Status" />,
   },
   {
     id: 'legalName',
@@ -145,6 +170,86 @@ export const FIELDS: Array<{
     id: 'numberOfExpenses',
     group: 'expenses',
     label: <FormattedMessage id="Fields.numberOfExpenses" defaultMessage="Number of Expenses" />,
+  },
+  {
+    id: 'totalAmountSpent',
+    group: 'financials',
+    label: <FormattedMessage defaultMessage="Total Amount Spent" id="totalAmountSpent" />,
+  },
+  { id: 'dateApplied', group: 'about', label: <FormattedMessage defaultMessage="Date Applied" id="dateApplied" /> },
+  { id: 'unhostedAt', group: 'about', label: <FormattedMessage defaultMessage="Unhosted At" id="unhostedAt" /> },
+  { id: 'unfrozenAt', group: 'about', label: <FormattedMessage defaultMessage="Unfrozen At" id="unfrozenAt" /> },
+  {
+    id: 'numberOfExpensesYear',
+    group: 'expenses',
+    label: <FormattedMessage defaultMessage="Number of Expenses (1 year)" id="numberOfExpensesYear" />,
+  },
+  {
+    id: 'valueOfExpensesYear',
+    group: 'expenses',
+    label: <FormattedMessage defaultMessage="Total Value of Expenses (1 year)" id="valueOfExpensesYear" />,
+  },
+  {
+    id: 'maxExpenseValueYear',
+    group: 'expenses',
+    label: <FormattedMessage defaultMessage="Max Expense Value (1 year)" id="maxExpenseValueYear" />,
+  },
+  {
+    id: 'numberOfPayeesYear',
+    group: 'expenses',
+    label: <FormattedMessage defaultMessage="Number of Payees (1 year)" id="numberOfPayeesYear" />,
+  },
+  {
+    id: 'numberOfContributionsYear',
+    group: 'contributions',
+    label: <FormattedMessage defaultMessage="Number of Contributions (1 year)" id="numberOfContributionsYear" />,
+  },
+  {
+    id: 'valueOfContributionsYear',
+    group: 'contributions',
+    label: <FormattedMessage defaultMessage="Total Value of Contributions (1 year)" id="valueOfContributionsYear" />,
+  },
+  {
+    id: 'valueOfHostFeeYear',
+    group: 'financials',
+    label: <FormattedMessage defaultMessage="Host Fee Paid (1 year)" id="valueOfHostFeeYear" />,
+  },
+  {
+    id: 'numberOfExpensesQuarter',
+    group: 'expenses',
+    label: <FormattedMessage defaultMessage="Number of Expenses (3 months)" id="numberOfExpensesQuarter" />,
+  },
+  {
+    id: 'valueOfExpensesQuarter',
+    group: 'expenses',
+    label: <FormattedMessage defaultMessage="Total Value of Expenses (3 months)" id="valueOfExpensesQuarter" />,
+  },
+  {
+    id: 'maxExpenseValueQuarter',
+    group: 'expenses',
+    label: <FormattedMessage defaultMessage="Max Expense Value (3 months)" id="maxExpenseValueQuarter" />,
+  },
+  {
+    id: 'numberOfPayeesQuarter',
+    group: 'expenses',
+    label: <FormattedMessage defaultMessage="Number of Payees (3 months)" id="numberOfPayeesQuarter" />,
+  },
+  {
+    id: 'numberOfContributionsQuarter',
+    group: 'contributions',
+    label: <FormattedMessage defaultMessage="Number of Contributions (3 months)" id="numberOfContributionsQuarter" />,
+  },
+  {
+    id: 'valueOfContributionsQuarter',
+    group: 'contributions',
+    label: (
+      <FormattedMessage defaultMessage="Total Value of Contributions (3 months)" id="valueOfContributionsQuarter" />
+    ),
+  },
+  {
+    id: 'valueOfHostFeeQuarter',
+    group: 'financials',
+    label: <FormattedMessage defaultMessage="Host Fee Paid (3 months)" id="valueOfHostFeeQuarter" />,
   },
 ];
 
