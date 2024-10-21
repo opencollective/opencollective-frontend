@@ -375,12 +375,17 @@ const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpected
 
   const totalAmount = {
     accessorKey: 'totalAmount',
-    header: intl.formatMessage({ defaultMessage: 'Total Amount', id: 'CDTMW3' }),
-    cell: ({ cell }) => {
+    header: intl.formatMessage({ defaultMessage: 'Amount', id: 'Fields.amount' }),
+    cell: ({ cell, row }) => {
       const amount = cell.getValue();
       return (
         <div className="flex items-center gap-2 truncate">
-          <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} />
+          <FormattedMoneyAmount
+            amount={amount.valueInCents}
+            currency={amount.currency}
+            frequency={row.original.frequency}
+            abbreviateInterval
+          />
         </div>
       );
     },
