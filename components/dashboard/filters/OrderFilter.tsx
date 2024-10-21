@@ -53,10 +53,10 @@ function buildOrderByFilterComponent<T extends [string, ...string[]]>(
     const Icon = value.endsWith(',DESC') ? ArrowDownNarrowWide : ArrowDownWideNarrow;
     return (
       <Select onValueChange={value => onChange(value)} value={value}>
-        <Button size="sm" variant="outline" asChild className="max-w-fit rounded-full">
+        <Button size="sm" variant="outline" className="max-w-fit rounded-full" asChild>
           <SelectTrigger>
             <div className="flex items-center gap-2 overflow-hidden font-medium">
-              <Icon className="-ml-0.5 h-5 w-5 shrink-0 text-slate-400" aria-hidden="true" />
+              <Icon size={18} className="shrink-0 text-muted-foreground" aria-hidden="true" />
               <span className="block truncate">{option.label}</span>
             </div>
           </SelectTrigger>
