@@ -63,8 +63,13 @@ export const TransactionsImportRowFieldsFragment = gql`
 `;
 
 export const updateTransactionsImportRows = gql`
-  mutation UpdateTransactionsImportRow($importId: NonEmptyString!, $rows: [TransactionsImportRowUpdateInput!]!) {
-    updateTransactionsImportRows(id: $importId, rows: $rows) {
+  mutation UpdateTransactionsImportRow(
+    $importId: NonEmptyString!
+    $rows: [TransactionsImportRowUpdateInput!]
+    $dismissAll: Boolean
+    $restoreAll: Boolean
+  ) {
+    updateTransactionsImportRows(id: $importId, rows: $rows, dismissAll: $dismissAll, restoreAll: $restoreAll) {
       id
       stats {
         total
