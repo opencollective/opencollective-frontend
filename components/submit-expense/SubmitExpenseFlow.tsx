@@ -2,8 +2,8 @@ import React from 'react';
 import type { FetchResult } from '@apollo/client';
 import { gql, useMutation } from '@apollo/client';
 import clsx from 'clsx';
-import { isEmpty, pick } from 'lodash';
-import { ArrowLeft, ArrowRight, ChevronDown, ChevronUp, X } from 'lucide-react';
+import { pick } from 'lodash';
+import { X } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { AnalyticsEvent } from '../../lib/analytics/events';
@@ -20,23 +20,26 @@ import type {
   InviteExpenseFromDashboardMutation,
   InviteExpenseFromDashboardMutationVariables,
 } from '../../lib/graphql/types/v2/graphql';
-import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
+import { ExpenseStatus, ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
-import LoadingPlaceholder from '../LoadingPlaceholder';
 import { Survey, SURVEY_KEY } from '../Survey';
 import { Button } from '../ui/Button';
 import { Dialog, DialogContent, DialogFooter } from '../ui/Dialog';
-import { StepList, StepListItem, StepListItemIcon } from '../ui/StepList';
 import { useToast } from '../ui/useToast';
 
-import { ExpenseWarnings } from './ExpenseWarnings';
-import { useNavigationWarning, useSteps } from './hooks';
-import type { ExpenseFlowStep } from './Steps';
-import { ExpenseStepOrder, Steps } from './Steps';
+import {
+  InviteeAccountType,
+  InviteeOption,
+  PayoutMethodOption,
+  WhoIsGettingPaidOption,
+  WhoIsPayingOption,
+} from './form/experiment';
+import { SubmitExpenseFlowForm } from './form/SubmitExpenseFlowForm';
+import { useNavigationWarning } from './hooks';
+import { Step, SubmitExpenseFlowSteps } from './SubmitExpenseFlowSteps';
 import { SubmittedExpense } from './SubmittedExpense';
-import type { ExpenseForm } from './useExpenseForm';
-import { useExpenseForm } from './useExpenseForm';
+import { RecurrenceFrequencyOption, useExpenseForm, YesNoOption } from './useExpenseForm';
 
 type SubmitExpenseFlowProps = {
   onClose: (submittedExpense: boolean) => void;
@@ -118,6 +121,25 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
     initialValues: {
       title: '',
       expenseCurrency: null,
+      whoIsPayingOption: WhoIsPayingOption.RECENT,
+      whoIsGettingPaidOption: WhoIsGettingPaidOption.MY_PROFILES,
+      inviteeAccountType: InviteeAccountType.INDIVIDUAL,
+      inviteeOption: InviteeOption.EXISTING,
+      payoutMethodOption: PayoutMethodOption.EXISTING_PAYOUT_METHOD,
+      expenseTypeOption: ExpenseType.INVOICE,
+      expenseItems: [
+        {
+          amount: {
+            valueInCents: 0,
+            currency: 'USD',
+          },
+          description: '',
+        },
+      ],
+      additionalAttachments: [],
+      recurrenceFrequency: RecurrenceFrequencyOption.NONE,
+      updatePayoutMethodNameToMatchProfile: YesNoOption.YES,
+      hasInvoiceOption: YesNoOption.YES,
     },
     startOptions: startOptions.current,
     async onSubmit(values, h, formOptions, startOptions) {
@@ -144,7 +166,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
                 id: values.accountingCategoryId,
               }
             : null,
-          attachedFiles: values.expenseAttachedFiles,
+          attachedFiles: values.additionalAttachments,
           currency: values.expenseCurrency as Currency,
           customData: null,
           invoiceInfo: null,
@@ -203,7 +225,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
           result = await createExpense({
             variables: {
               account: {
-                slug: values.collectiveSlug,
+                slug: formOptions.account?.slug,
               },
               expenseCreateInput: expenseInput,
             },
@@ -230,7 +252,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
           result = await draftExpenseAndInviteUser({
             variables: {
               account: {
-                slug: values.collectiveSlug,
+                slug: formOptions.account?.slug,
               },
               expenseInviteInput: inviteInput,
             },
@@ -255,10 +277,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
     },
   });
 
-  const { currentStep, setCurrentStep, prevStep, nextStep, onNextStepClick, step } = useSteps({
-    steps: ExpenseStepOrder,
-    form: expenseForm,
-  });
+  const [activeStep, setActiveStep] = React.useState(Step.WHO_IS_PAYING);
 
   const [confirmNavigation] = useNavigationWarning({
     enabled: !submittedExpenseId,
@@ -306,11 +325,11 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
       <DialogContent
         hideCloseButton
         overlayClassName="p-0 sm:p-0"
-        className={clsx({
+        className={clsx('overflow-hidden', {
           'sm:max-w-screen sm:min-w-screen rounded-none p-0 sm:rounded-none sm:p-0': !submittedExpenseId,
         })}
       >
-        <div className="max-w-screen min-w-screen flex max-h-screen min-h-screen flex-col">
+        <div className="max-w-screen min-w-screen flex max-h-screen min-h-screen flex-col overflow-hidden bg-[#F8FAFC]">
           <header className="min-w-screen flex items-center justify-between border-b border-slate-100 px-4 py-3 sm:px-10">
             <span className="text-xl font-bold leading-7 text-slate-800">
               <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
@@ -331,167 +350,30 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
               <X />
             </Button>
           </header>
-          <main className="flex w-full flex-grow overflow-auto">
-            <div className="flex w-full flex-grow justify-center sm:px-8 sm:pt-10">
-              <div className="flex h-max w-full flex-col pb-4 sm:flex sm:w-[768px] sm:flex-row sm:gap-8 sm:pb-0">
+          <main className="flex w-full flex-grow overflow-hidden">
+            <div className="flex w-full flex-grow justify-center">
+              <div className="flex w-full flex-col overflow-scroll sm:flex sm:flex-row sm:gap-11 sm:px-8 sm:pt-10">
                 <SubmitExpenseFlowSteps
-                  onStepClick={newStepName => setCurrentStep(newStepName)}
+                  className="sticky top-0 w-[250px]"
+                  activeStep={activeStep}
+                  completedSteps={[]}
                   expenseForm={expenseForm}
-                  currentStep={currentStep}
                 />
 
-                <div className="flex-grow px-4 pt-4 sm:px-0 sm:pt-0">
+                <div className="h-max w-[920px] pb-4">
                   <form ref={formRef} onSubmit={e => e.preventDefault()}>
-                    <step.Form form={expenseForm} />
+                    <SubmitExpenseFlowForm
+                      onNextClick={() => setActiveStep(Step.SUMMARY)}
+                      form={expenseForm}
+                      onVisibleSectionChange={v => setActiveStep(v as Step)}
+                    />
                   </form>
                 </div>
               </div>
             </div>
           </main>
-          <ExpenseWarnings form={expenseForm} />
-          <SubmitExpenseFlowFooter
-            expenseForm={expenseForm}
-            isLastStep={ExpenseStepOrder.indexOf(currentStep) === ExpenseStepOrder.length - 1}
-            isStepValid={!step.hasError(expenseForm)}
-            onNextStepClick={onNextStepClick}
-            readyToSubmit={!nextStep && isEmpty(expenseForm.errors)}
-            setCurrentStep={setCurrentStep}
-            nextStep={nextStep}
-            prevStep={prevStep}
-          />
         </div>
       </DialogContent>
     </Dialog>
-  );
-}
-
-type SubmitExpenseFlowStepsProps = {
-  expenseForm: ExpenseForm;
-  currentStep: ExpenseFlowStep;
-  onStepClick: (stepName: ExpenseFlowStep) => void;
-};
-
-function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
-  const [collapsed, setCollapsed] = React.useState(true);
-
-  const currentStep = Steps[props.currentStep];
-  return (
-    <React.Fragment>
-      <div className="sticky top-0 z-50 w-full self-start bg-white drop-shadow-lg sm:top-10 sm:w-[165px] sm:min-w-[165px] sm:drop-shadow-none">
-        <div
-          className={clsx('flex items-center gap-2 px-4 py-2 text-sm sm:hidden', {
-            'border-b border-slate-200': collapsed,
-          })}
-        >
-          <span className="inline-block max-w-[120px] overflow-hidden text-ellipsis whitespace-nowrap text-oc-blue-tints-800">
-            <currentStep.Title form={props.expenseForm} />
-          </span>
-          <span className="text-oc-blue-tints-800">/</span>
-          <div className="flex gap-3 text-xs">
-            {ExpenseStepOrder.map((stepName, i) => {
-              const step = Steps[stepName];
-              return (
-                <StepListItemIcon
-                  key={stepName}
-                  completed={
-                    (props.currentStep === stepName &&
-                      (!step.hasError(props.expenseForm) || i === ExpenseStepOrder.length - 1)) ||
-                    (!step.hasError(props.expenseForm) && i < ExpenseStepOrder.indexOf(props.currentStep))
-                  }
-                  current={props.currentStep === stepName}
-                />
-              );
-            })}
-          </div>
-          <Button variant="ghost" size="xs" className="ml-auto cursor-pointer" onClick={() => setCollapsed(!collapsed)}>
-            {collapsed ? <ChevronDown /> : <ChevronUp />}
-          </Button>
-        </div>
-        <StepList
-          className={clsx(
-            'z-50 w-full border-b border-slate-100 bg-white px-4 py-2 drop-shadow-lg sm:block sm:border-b-0 sm:px-0 sm:py-0 sm:drop-shadow-none',
-            {
-              'hidden sm:block': collapsed,
-              'absolute block': !collapsed,
-            },
-          )}
-        >
-          {ExpenseStepOrder.map((stepName, i) => {
-            const step = Steps[stepName];
-            const completed =
-              (props.currentStep === stepName &&
-                (!step.hasError(props.expenseForm) || i === ExpenseStepOrder.length - 1)) ||
-              (!step.hasError(props.expenseForm) && i < ExpenseStepOrder.indexOf(props.currentStep));
-            const disabled = !completed || i > ExpenseStepOrder.indexOf(props.currentStep);
-            const isInitialLoadOfExpense = props.expenseForm.startOptions.expenseId && props.expenseForm.initialLoading;
-            return (
-              <StepListItem
-                key={stepName}
-                onClick={() => props.onStepClick(stepName)}
-                className="w-full"
-                current={props.currentStep === stepName}
-                disabled={disabled}
-                completed={completed}
-                title={<step.Title form={props.expenseForm} />}
-                subtitle={
-                  isInitialLoadOfExpense ? (
-                    <LoadingPlaceholder height={20} />
-                  ) : step.Subtitle ? (
-                    <step.Subtitle form={props.expenseForm} />
-                  ) : null
-                }
-              />
-            );
-          })}
-        </StepList>
-      </div>
-    </React.Fragment>
-  );
-}
-
-type SubmitExpenseFlowFooterProps = {
-  prevStep?: ExpenseFlowStep;
-  nextStep?: ExpenseFlowStep;
-  isLastStep: boolean;
-  readyToSubmit: boolean;
-  expenseForm: ExpenseForm;
-  isStepValid: boolean;
-  onNextStepClick: () => void;
-  setCurrentStep: (s: ExpenseFlowStep) => void;
-};
-
-function SubmitExpenseFlowFooter(props: SubmitExpenseFlowFooterProps) {
-  return (
-    <footer className="min-w-screen flex items-center justify-between gap-4 border-t border-slate-100 px-10 py-2 sm:justify-center">
-      <Button
-        variant="outline"
-        disabled={!props.prevStep}
-        className={clsx('flex gap-2', { invisible: !props.prevStep })}
-        onClick={props.prevStep ? () => props.setCurrentStep(props.prevStep) : undefined}
-      >
-        <ArrowLeft />
-        <FormattedMessage defaultMessage="Go back" id="orvpWh" />
-      </Button>
-
-      {props.isLastStep ? (
-        <Button
-          disabled={!props.readyToSubmit || props.expenseForm.isSubmitting || props.expenseForm.isValidating}
-          onClick={props.expenseForm.submitForm}
-        >
-          <FormattedMessage id="submit" defaultMessage="Submit" />
-        </Button>
-      ) : (
-        <Button
-          disabled={
-            !props.nextStep || !props.isStepValid || props.expenseForm.isSubmitting || props.expenseForm.isValidating
-          }
-          className={clsx('flex gap-2', { invisible: !props.nextStep })}
-          onClick={props.onNextStepClick}
-        >
-          <FormattedMessage id="Pagination.Next" defaultMessage="Next" />
-          <ArrowRight />
-        </Button>
-      )}
-    </footer>
   );
 }

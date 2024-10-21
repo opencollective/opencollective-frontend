@@ -4,7 +4,7 @@ import { gql, useApolloClient } from '@apollo/client';
 import { accountHasGST, accountHasVAT, checkVATNumberFormat, TaxType } from '@opencollective/taxes';
 import dayjs from 'dayjs';
 import type { Path, PathValue } from 'dot-path-value';
-import type { FormikErrors, FormikHelpers } from 'formik';
+import type { FieldInputProps, FormikErrors, FormikHelpers } from 'formik';
 import { useFormik } from 'formik';
 import { isEmpty, isEqual, pick, set, uniqBy } from 'lodash';
 import memoizeOne from 'memoize-one';
@@ -34,7 +34,8 @@ import { computeExpenseAmounts, expenseTypeSupportsItemCurrency, getSupportedCur
 import { loggedInAccountExpensePayoutFieldsFragment } from '../expenses/graphql/fragments';
 import { getCustomZodErrorMap } from '../FormikZod';
 
-type ExpenseTypeOption = ExpenseType.INVOICE | ExpenseType.RECEIPT;
+import type { InviteeAccountType, InviteeOption, PayoutMethodOption } from './form/experiment';
+import { WhoIsGettingPaidOption, WhoIsPayingOption } from './form/experiment';
 
 export type ExpenseItem = {
   description?: string;
@@ -55,11 +56,65 @@ export type ExpenseItem = {
   url?: string;
 };
 
+export enum RecurrenceFrequencyOption {
+  NONE = 'none',
+  MONTH = 'month',
+  QUARTER = 'quarter',
+  WEEK = 'week',
+  YEAR = 'year',
+}
+
+export enum YesNoOption {
+  YES = 'yes',
+  NO = 'no',
+}
+
 export type ExpenseFormValues = {
-  collectiveSlug?: string;
+  whoIsPayingOption: WhoIsPayingOption;
+  lastExpenseAccountSlug?: string;
+  recentExpenseAccount?: string;
+  searchExpenseAccount?: string;
+
+  whoIsGettingPaidOption: WhoIsGettingPaidOption;
+
+  inviteeOption: InviteeOption;
+  myProfilesExpensePayeePick?: string;
+
+  inviteeExistingAccount?: string;
+
+  inviteeAccountType: InviteeAccountType;
+
+  inviteeNewIndividual?: {
+    contactName: string;
+    emailAddress: string;
+    notes?: string;
+  };
+
+  inviteeNewOrganization?: {
+    contactName: string;
+    emailAddress: string;
+    notes?: string;
+    name: string;
+    slug: string;
+    website: string;
+    description: string;
+  };
+
+  payoutMethodOption: PayoutMethodOption;
+
+  recurrenceFrequency?: RecurrenceFrequencyOption;
+  recurrenceEndAt?: string;
+
+  updatePayoutMethodNameToMatchProfile?: YesNoOption;
+  payoutMethodNameDiscrepancyReason?: string;
+  newPayoutMethod?: {
+    type?: PayoutMethodType;
+  } & Record<string, unknown>;
+
+  // collectiveSlug?: string;
   payeeSlug?: string;
   payeeLocation?: LocationInput;
-  expenseTypeOption?: ExpenseTypeOption;
+  expenseTypeOption?: ExpenseType;
   payoutMethodId?: string;
   title?: string;
   reference?: string;
@@ -67,13 +122,17 @@ export type ExpenseFormValues = {
   tags?: string[];
   expenseCurrency?: string;
   expenseItems?: ExpenseItem[];
-  expenseAttachedFiles?: { url: string }[];
+  additionalAttachments?: { url: string }[];
   hasTax?: boolean;
   tax?: {
     rate: number;
     idNumber: string;
   };
-  acknowledgedExpensePolicy?: boolean;
+  acknowledgedCollectiveExpensePolicy?: boolean;
+  acknowledgedHostExpensePolicy?: boolean;
+  hasInvoiceOption?: YesNoOption;
+  invoiceFile?: File;
+  invoiceNumber?: string;
   inviteNote?: string;
   invitePayee?:
     | {
@@ -94,11 +153,12 @@ export type ExpenseFormValues = {
       };
 };
 
-type ExpenseFormik = Omit<ReturnType<typeof useFormik<ExpenseFormValues>>, 'setFieldValue'> & {
+type ExpenseFormik = Omit<ReturnType<typeof useFormik<ExpenseFormValues>>, 'setFieldValue' | 'getFieldProps'> & {
   setFieldValue: <F extends Path<ExpenseFormValues>>(
     field: F,
     value: PathValue<ExpenseFormValues, F>,
   ) => Promise<void> | Promise<FormikErrors<ExpenseFormValues>>;
+  getFieldProps: <F extends Path<ExpenseFormValues>>(field: F) => FieldInputProps<any>;
 };
 
 export type ExpenseForm = ExpenseFormik & {
@@ -382,6 +442,7 @@ const formSchemaQuery = gql`
     id
     slug
     name
+    legalName
     type
     isAdmin
     payoutMethods {
@@ -477,7 +538,6 @@ function buildFormSchema(
 
   return z.object({
     expenseId: z.number().nullish(),
-    collectiveSlug: z.string(),
     payeeSlug: z
       .string()
       .nullish()
@@ -497,7 +557,7 @@ function buildFormSchema(
           message: 'Required',
         },
       ),
-    expenseTypeOption: z.enum([ExpenseType.INVOICE, ExpenseType.RECEIPT]).refine(
+    expenseTypeOption: z.nativeEnum(ExpenseType).refine(
       v => {
         if (options.account?.supportedExpenseTypes?.length > 0) {
           return options.account.supportedExpenseTypes.includes(v);
@@ -703,6 +763,24 @@ function buildFormSchema(
   });
 }
 
+export function getCollectiveSlug(values: ExpenseFormValues): string {
+  switch (values.whoIsPayingOption) {
+    case WhoIsPayingOption.LAST_SUBMITTED:
+      return values.lastExpenseAccountSlug;
+    case WhoIsPayingOption.RECENT:
+      return values.recentExpenseAccount;
+    case WhoIsPayingOption.SEARCH:
+      return values.searchExpenseAccount;
+  }
+}
+
+function getPayeeSlug(values: ExpenseFormValues): string {
+  switch (values.whoIsGettingPaidOption) {
+    case WhoIsGettingPaidOption.MY_PROFILES:
+      return values.myProfilesExpensePayeePick;
+  }
+}
+
 async function buildFormOptions(
   intl: IntlShape,
   apolloClient: ApolloClient<any>,
@@ -713,14 +791,17 @@ async function buildFormOptions(
 ): Promise<ExpenseFormOptions> {
   const options: ExpenseFormOptions = { schema: z.object({}) };
 
+  const collectiveSlug = getCollectiveSlug(values);
+  const payeeSlug = getPayeeSlug(values);
+
   try {
     const query = await memoizedExpenseFormSchema(
       apolloClient,
       {
-        collectiveSlug: values.collectiveSlug,
-        hasCollectiveSlug: !!values.collectiveSlug,
-        payeeSlug: values.payeeSlug,
-        hasPayeeSlug: !!values.payeeSlug,
+        collectiveSlug: collectiveSlug,
+        hasCollectiveSlug: !!collectiveSlug,
+        payeeSlug: payeeSlug,
+        hasPayeeSlug: !!payeeSlug,
         hasExpenseId: !!startOptions.expenseId,
         expenseId: startOptions.expenseId,
         expenseKey: startOptions.draftKey,
@@ -918,9 +999,10 @@ export function useExpenseForm(opts: {
 
     setInitialExpenseValues.current = true;
     setFieldValue('accountingCategoryId', formOptions.expense.accountingCategory?.id);
-    setFieldValue('collectiveSlug', formOptions.expense.account.slug);
+    setFieldValue('whoIsPayingOption', WhoIsPayingOption.SEARCH);
+    setFieldValue('searchExpenseAccount', formOptions.expense.account.slug);
     setFieldValue('expenseCurrency', formOptions.expense.currency);
-    setFieldValue('expenseTypeOption', formOptions.expense.type as ExpenseTypeOption);
+    setFieldValue('expenseTypeOption', formOptions.expense.type);
     setFieldValue('hasTax', (formOptions.expense.taxes || []).length > 0);
     setFieldValue('payoutMethodId', formOptions.expense.payoutMethod?.id);
     setFieldValue('tags', formOptions.expense.tags);
@@ -936,8 +1018,10 @@ export function useExpenseForm(opts: {
         formOptions.expense.draft.payee?.slug &&
         formOptions.expense.draft.payee?.slug === formOptions.loggedInAccount.slug
       ) {
+        setFieldValue('whoIsGettingPaidOption', WhoIsGettingPaidOption.MY_PROFILES);
         setFieldValue('payeeSlug', formOptions.expense.draft.payee?.slug);
       } else {
+        setFieldValue('whoIsGettingPaidOption', WhoIsGettingPaidOption.INVITEE);
         setFieldValue('inviteNote', formOptions.expense.longDescription);
         setFieldValue('invitePayee', formOptions.expense.draft?.payee);
         if (formOptions.expense.draft?.payoutMethod) {
@@ -945,12 +1029,13 @@ export function useExpenseForm(opts: {
         }
       }
     } else if (formOptions.expense.payee?.slug) {
+      setFieldValue('whoIsGettingPaidOption', WhoIsGettingPaidOption.MY_PROFILES);
       setFieldValue('payeeSlug', formOptions.expense.payee?.slug);
     }
 
     if (formOptions.expense.status === ExpenseStatus.DRAFT) {
       setFieldValue(
-        'expenseAttachedFiles',
+        'additionalAttachments',
         formOptions.expense.draft?.attachedFiles?.map(af => ({ url: af.url })),
       );
       setFieldValue(
@@ -970,12 +1055,13 @@ export function useExpenseForm(opts: {
         !startOptions.current.duplicateExpense &&
         (formOptions.hostExpensePolicy || formOptions.collectiveExpensePolicy)
       ) {
-        setFieldValue('acknowledgedExpensePolicy', true);
+        setFieldValue('acknowledgedHostExpensePolicy', false);
+        setFieldValue('acknowledgedCollectiveExpensePolicy', false);
       }
 
       if (!startOptions.current.duplicateExpense) {
         setFieldValue(
-          'expenseAttachedFiles',
+          'additionalAttachments',
           formOptions.expense.attachedFiles?.map(af => ({ url: af.url })),
         );
       }
