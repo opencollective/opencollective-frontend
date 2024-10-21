@@ -3,7 +3,7 @@ import { FormattedMessage } from 'react-intl';
 
 export const AVERAGE_ROWS_PER_MINUTE = 8240;
 
-type CSVField =
+type Fields =
   | 'name'
   | 'slug'
   | 'type'
@@ -18,11 +18,28 @@ type CSVField =
   | 'adminCount'
   | 'firstContributionDate'
   | 'lastContributionDate'
-  | 'totalAmountOfContributions'
-  | 'totalNumberOfContributions'
   | 'firstExpenseDate'
   | 'lastExpenseDate'
-  | 'numberOfExpenses';
+  | 'status'
+  | 'dateApplied'
+  | 'unhostedAt'
+  | 'unfrozenAt'
+  | 'numberOfExpensesYear'
+  | 'valueOfExpensesYear'
+  | 'maxExpenseValueYear'
+  | 'numberOfPayeesYear'
+  | 'numberOfContributionsYear'
+  | 'valueOfContributionsYear'
+  | 'valueOfHostFeeYear'
+  | 'spentTotalYear'
+  | 'numberOfExpensesAllTime'
+  | 'valueOfExpensesAllTime'
+  | 'maxExpenseValueAllTime'
+  | 'numberOfPayeesAllTime'
+  | 'numberOfContributionsAllTime'
+  | 'valueOfContributionsAllTime'
+  | 'valueOfHostFeeAllTime'
+  | 'spentTotalAllTime';
 
 export enum FIELD_OPTIONS {
   DEFAULT = 'DEFAULT',
@@ -46,7 +63,7 @@ export const GROUPS = {
 };
 
 export const FIELDS: Array<{
-  id: CSVField;
+  id: Fields;
   group: keyof typeof GROUPS;
   tooltip?: React.ReactNode;
   label: React.ReactNode;
@@ -70,6 +87,11 @@ export const FIELDS: Array<{
     id: 'type',
     group: 'about',
     label: <FormattedMessage id="Fields.type" defaultMessage="Type" />,
+  },
+  {
+    id: 'status',
+    group: 'about',
+    label: <FormattedMessage id="Status" defaultMessage="Status" />,
   },
   {
     id: 'legalName',
@@ -122,16 +144,6 @@ export const FIELDS: Array<{
     label: <FormattedMessage id="Fields.lastContributionDate" defaultMessage="Last Contribution Date" />,
   },
   {
-    id: 'totalAmountOfContributions',
-    group: 'contributions',
-    label: <FormattedMessage id="Fields.totalAmountOfContributions" defaultMessage="Total Amount of Contributions" />,
-  },
-  {
-    id: 'totalNumberOfContributions',
-    group: 'contributions',
-    label: <FormattedMessage id="Fields.totalNumberOfContributions" defaultMessage="Total Number of Contributions" />,
-  },
-  {
     id: 'firstExpenseDate',
     group: 'expenses',
     label: <FormattedMessage id="Fields.firstExpenseDate" defaultMessage="First Expense Date" />,
@@ -141,10 +153,102 @@ export const FIELDS: Array<{
     group: 'expenses',
     label: <FormattedMessage id="Fields.lastExpenseDate" defaultMessage="Last Expense Date" />,
   },
+  { id: 'dateApplied', group: 'about', label: <FormattedMessage defaultMessage="Date Applied" id="dateApplied" /> },
+  { id: 'unhostedAt', group: 'about', label: <FormattedMessage defaultMessage="Unhosted At" id="unhostedAt" /> },
+  { id: 'unfrozenAt', group: 'about', label: <FormattedMessage defaultMessage="Unfrozen At" id="unfrozenAt" /> },
   {
-    id: 'numberOfExpenses',
+    id: 'numberOfExpensesYear',
     group: 'expenses',
-    label: <FormattedMessage id="Fields.numberOfExpenses" defaultMessage="Number of Expenses" />,
+    label: <FormattedMessage defaultMessage="Number of Expenses (1 year)" id="numberOfExpensesYear" />,
+  },
+  {
+    id: 'valueOfExpensesYear',
+    group: 'expenses',
+    label: <FormattedMessage defaultMessage="Total Value of Expenses (1 year)" id="valueOfExpensesYear" />,
+  },
+  {
+    id: 'maxExpenseValueYear',
+    group: 'expenses',
+    label: <FormattedMessage defaultMessage="Max Expense Value (1 year)" id="maxExpenseValueYear" />,
+  },
+  {
+    id: 'numberOfPayeesYear',
+    group: 'expenses',
+    label: <FormattedMessage defaultMessage="Distinct of Payees (1 year)" id="numberOfPayeesYear" />,
+  },
+  {
+    id: 'numberOfContributionsYear',
+    group: 'contributions',
+    label: <FormattedMessage defaultMessage="Number of Contributions (1 year)" id="numberOfContributionsYear" />,
+  },
+  {
+    id: 'valueOfContributionsYear',
+    group: 'contributions',
+    label: <FormattedMessage defaultMessage="Total Value of Contributions (1 year)" id="valueOfContributionsYear" />,
+  },
+  {
+    id: 'valueOfHostFeeYear',
+    group: 'financials',
+    label: <FormattedMessage defaultMessage="Host Fee Paid (1 year)" id="valueOfHostFeeYear" />,
+  },
+  {
+    id: 'numberOfExpensesAllTime',
+    group: 'expenses',
+    label: <FormattedMessage defaultMessage="Number of Expenses (All Time)" id="numberOfExpensesAllTime" />,
+  },
+  {
+    id: 'valueOfExpensesAllTime',
+    group: 'expenses',
+    label: <FormattedMessage defaultMessage="Total Value of Expenses (All Time)" id="valueOfExpensesAllTime" />,
+  },
+  {
+    id: 'maxExpenseValueAllTime',
+    group: 'expenses',
+    label: <FormattedMessage defaultMessage="Max Expense Value (All Time)" id="maxExpenseValueAllTime" />,
+  },
+  {
+    id: 'numberOfPayeesAllTime',
+    group: 'expenses',
+    label: <FormattedMessage defaultMessage="Distinct Payees (All Time)" id="numberOfPayeesAllTime" />,
+  },
+  {
+    id: 'numberOfContributionsAllTime',
+    group: 'contributions',
+    label: <FormattedMessage defaultMessage="Number of Contributions (All Time)" id="numberOfContributionsAllTime" />,
+  },
+  {
+    id: 'valueOfContributionsAllTime',
+    group: 'contributions',
+    label: (
+      <FormattedMessage defaultMessage="Total Value of Contributions (All Time)" id="valueOfContributionsAllTime" />
+    ),
+  },
+  {
+    id: 'valueOfHostFeeAllTime',
+    group: 'financials',
+    label: <FormattedMessage defaultMessage="Host Fee Paid (All Time)" id="valueOfHostFeeAllTime" />,
+  },
+  {
+    id: 'spentTotalYear',
+    group: 'financials',
+    label: <FormattedMessage defaultMessage="Total Spent (1 year)" id="spentTotalYear" />,
+    tooltip: (
+      <FormattedMessage
+        defaultMessage="Amount spent in Contributions and Expenses, excluding fees"
+        id="spentTotal.tooltip"
+      />
+    ),
+  },
+  {
+    id: 'spentTotalAllTime',
+    group: 'financials',
+    label: <FormattedMessage defaultMessage="Total Spent (All Time)" id="spentTotalAllTime" />,
+    tooltip: (
+      <FormattedMessage
+        defaultMessage="Amount spent in Contributions and Expenses, excluding fees"
+        id="spentTotal.tooltip"
+      />
+    ),
   },
 ];
 
@@ -152,7 +256,7 @@ export const GROUP_FIELDS = Object.keys(GROUPS).reduce((dict, groupId) => {
   return { ...dict, [groupId]: FIELDS.filter(f => f.group === groupId).map(f => f.id) };
 }, {});
 
-const DEFAULT_FIELDS: Array<CSVField> = [
+const DEFAULT_FIELDS: Array<Fields> = [
   'name',
   'slug',
   'type',
@@ -164,7 +268,7 @@ const DEFAULT_FIELDS: Array<CSVField> = [
   'adminCount',
   'adminEmails',
   'lastContributionDate',
-  'totalNumberOfContributions',
+  'numberOfContributionsAllTime',
 ];
 
 export const PLATFORM_PRESETS = {

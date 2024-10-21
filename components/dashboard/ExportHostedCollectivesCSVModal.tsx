@@ -36,7 +36,15 @@ import Tabs from '../Tabs';
 import { Button } from '../ui/Button';
 import { Checkbox } from '../ui/Checkbox';
 import { Collapsible, CollapsibleContent } from '../ui/Collapsible';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../ui/Dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '../ui/Dialog';
 import { Input } from '../ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 
@@ -61,6 +69,12 @@ const makeUrl = ({ account, queryFilter, fields }) => {
   }
   if (queryFilter.values.searchTerm) {
     url.searchParams.set('searchTerm', queryFilter.values.searchTerm);
+  }
+  if (queryFilter.values.sort) {
+    url.searchParams.set('sort', JSON.stringify(queryFilter.values.sort));
+  }
+  if (queryFilter.variables.consolidatedBalance) {
+    url.searchParams.set('consolidatedBalance', JSON.stringify(queryFilter.variables.consolidatedBalance));
   }
   if (!isNil(queryFilter.variables.isFrozen)) {
     url.searchParams.set('isFrozen', queryFilter.variables.isFrozen ? '1' : '0');
@@ -323,7 +337,7 @@ const ExportHostedCollectivesCSVModal = ({
     setIsEditingPreset(!isEditingPreset);
   };
 
-  const isAboveRowLimit = exportedRows > 100e3;
+  const isAboveRowLimit = exportedRows > 10e3;
   const expectedTimeInMinutes = Math.round((exportedRows * 1.1) / AVERAGE_ROWS_PER_MINUTE);
   const disabled = isAboveRowLimit || isFetchingRows || isSavingSet || isEmpty(fields);
   const isWholeTabSelected = GROUP_FIELDS[tab]?.every(f => fields.includes(f));
@@ -338,6 +352,15 @@ const ExportHostedCollectivesCSVModal = ({
             <DialogTitle className="text-xl font-bold">
               <FormattedMessage id="ExportHostedCollectivesCSVModal.Title" defaultMessage="Export Hosted Collectives" />
             </DialogTitle>
+            <DialogDescription>
+              <FormattedMessage
+                defaultMessage="Export a CSV file with information about the hosted collectives that match the filters you've selected.{br}The information exported is contextual to your fiscal host and does not include information about the time a collective was hosted by another fiscal host."
+                values={{
+                  br: <br />,
+                }}
+                id="APGvDq"
+              />
+            </DialogDescription>
           </DialogHeader>
           <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-4 pb-4 pt-6 sm:px-8">
             <div className="flex flex-col gap-4 sm:flex-row">
