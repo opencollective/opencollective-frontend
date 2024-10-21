@@ -39,7 +39,7 @@ import { WhoIsGettingPaidOption, WhoIsPayingOption } from './form/experiment';
 
 export type ExpenseItem = {
   description?: string;
-  incurredAt?: Date;
+  incurredAt?: Date | string;
   amount?: {
     value?: number;
     valueInCents?: number;
@@ -53,7 +53,7 @@ export type ExpenseItem = {
     };
     referenceExchangeRate?: ExpenseItem['amount']['exchangeRate'] | { source: 'OPENCOLLECTIVE' };
   };
-  url?: string;
+  attachment?: string | File;
 };
 
 export enum RecurrenceFrequencyOption {
@@ -122,7 +122,7 @@ export type ExpenseFormValues = {
   tags?: string[];
   expenseCurrency?: string;
   expenseItems?: ExpenseItem[];
-  additionalAttachments?: { url: string }[];
+  additionalAttachments?: (string | File)[];
   hasTax?: boolean;
   tax?: {
     rate: number;
@@ -904,7 +904,7 @@ async function buildFormOptions(
         (values.expenseItems || []).map(ei => ({
           description: ei.description,
           amountV2: ei.amount as Amount,
-          incurredAt: ei.incurredAt,
+          incurredAt: typeof ei.incurredAt === 'string' ? new Date(ei.incurredAt) : ei.incurredAt,
         })),
         values.tax ? [{ ...values.tax, type: options.taxType }] : [],
       );
@@ -1062,7 +1062,7 @@ export function useExpenseForm(opts: {
       if (!startOptions.current.duplicateExpense) {
         setFieldValue(
           'additionalAttachments',
-          formOptions.expense.attachedFiles?.map(af => ({ url: af.url })),
+          formOptions.expense.attachedFiles?.map(af => af.url),
         );
       }
 

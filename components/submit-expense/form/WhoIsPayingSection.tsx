@@ -36,7 +36,7 @@ export function WhoIsPayingSection(props: WhoIsPayingSectionProps) {
   React.useEffect(() => {
     if (lastSubmittedAccount && !props.form.values.recentExpenseAccount) {
       setFieldValue('lastExpenseAccountSlug', lastSubmittedAccount.slug);
-      setFieldValue('recentExpenseAccount', lastSubmittedAccount.slug)
+      setFieldValue('recentExpenseAccount', lastSubmittedAccount.slug);
     }
   }, [lastSubmittedAccount, setFieldValue, props.form.values.recentExpenseAccount]);
 
@@ -58,7 +58,9 @@ export function WhoIsPayingSection(props: WhoIsPayingSectionProps) {
         onValueChange={newValue => setFieldValue('whoIsPayingOption', newValue as WhoIsPayingOption)}
       >
         <TabsList>
-          <TabsTrigger value={WhoIsPayingOption.RECENT}>{recentlySubmittedAccounts.length > 0 ? "Recent" : 'Last Submitted'}</TabsTrigger>
+          <TabsTrigger value={WhoIsPayingOption.RECENT}>
+            {recentlySubmittedAccounts.length > 0 ? 'Recent' : 'Last Submitted'}
+          </TabsTrigger>
           <TabsTrigger value={WhoIsPayingOption.SEARCH}>Search</TabsTrigger>
         </TabsList>
         <TabsContent value={WhoIsPayingOption.LAST_SUBMITTED}>

@@ -166,7 +166,9 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
                 id: values.accountingCategoryId,
               }
             : null,
-          attachedFiles: values.additionalAttachments,
+          attachedFiles: values.additionalAttachments.map(a => ({
+            url: a,
+          })),
           currency: values.expenseCurrency as Currency,
           customData: null,
           invoiceInfo: null,
@@ -183,7 +185,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
                 : null,
             },
             incurredAt: ei.incurredAt,
-            url: ei.url,
+            url: ei.attachment,
           })),
           longDescription: null,
           privateMessage: null,

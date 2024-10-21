@@ -91,9 +91,9 @@ export function SummarySection(props: SummarySectionProps) {
       </div>
       <div className="mt-4 rounded-md border border-gray-300 p-4 text-sm">
         <Label className="mb-4 font-bold">Invoice items</Label>
-        {props.form.values.expenseItems.map((ei, i) => (
+        {props.form.values.expenseItems.map(ei => (
           <div
-            key={i}
+            key={`${ei.description}-${ei.incurredAt}-${ei.amount?.valueInCents}`}
             className="mb-2 flex items-center justify-between gap-4 border-b border-dotted border-gray-300 pb-2 text-sm last:mb-0 last:border-b-0"
           >
             <div>
@@ -119,15 +119,15 @@ export function SummarySection(props: SummarySectionProps) {
           ))}
         </div>
       </div>
-      <div className='flex gap-2'>
-        <div className="basis-0 flex-grow mt-4 rounded-md border border-gray-300 p-4 text-sm">
-          <div className='font-bold'>Who is paying?</div>
+      <div className="flex gap-2">
+        <div className="mt-4 flex-grow basis-0 rounded-md border border-gray-300 p-4 text-sm">
+          <div className="font-bold">Who is paying?</div>
         </div>
-        <div className="basis-0 flex-grow mt-4 rounded-md border border-gray-300 p-4 text-sm">
-          <div className='font-bold'>Who is getting paid?</div>
+        <div className="mt-4 flex-grow basis-0 rounded-md border border-gray-300 p-4 text-sm">
+          <div className="font-bold">Who is getting paid?</div>
         </div>
-        <div className="basis-0 flex-grow mt-4 rounded-md border border-gray-300 p-4 text-sm">
-          <div className='font-bold'>Payout Method</div>
+        <div className="mt-4 flex-grow basis-0 rounded-md border border-gray-300 p-4 text-sm">
+          <div className="font-bold">Payout Method</div>
         </div>
       </div>
       <div className="h-[200px]"></div>

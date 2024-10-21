@@ -116,7 +116,7 @@ export function WhoIsGettingPaidSection(props: WhoIsGettingPaidSectionProps) {
                 <Label className="mb-2 flex gap-2">
                   Enter legal name <Lock size={14} />
                 </Label>
-                <Input placeholder='E.g. Jogn Doe' className="mb-2" type="text" />
+                <Input placeholder="E.g. Jogn Doe" className="mb-2" type="text" />
                 <Button variant="outline">Save legal name</Button>
               </MessageBox>
             </div>

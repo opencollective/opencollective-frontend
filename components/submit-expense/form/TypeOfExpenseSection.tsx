@@ -104,7 +104,9 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
                     <label className="flex cursor-pointer items-center gap-2 text-sm font-normal leading-normal">
                       <Checkbox
                         checked={props.form.values.acknowledgedCollectiveExpensePolicy}
-                        onCheckedChange={v => props.form.setFieldValue('acknowledgedCollectiveExpensePolicy', v as boolean)}
+                        onCheckedChange={v =>
+                          props.form.setFieldValue('acknowledgedCollectiveExpensePolicy', v as boolean)
+                        }
                       />
                       I have read and understood the instructions and conditions
                     </label>

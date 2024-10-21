@@ -18,7 +18,6 @@ type ExpenseCategorySectionProps = {
 };
 
 export function ExpenseCategorySection(props: ExpenseCategorySectionProps) {
-
   const accountingCategoryId = props.form.values.accountingCategoryId;
   const [isExpenseCategoryPickerOpen, setIsExpenseCategoryPickerOpen] = React.useState(false);
 
@@ -34,7 +33,11 @@ export function ExpenseCategorySection(props: ExpenseCategorySectionProps) {
   const { setFieldValue } = props.form;
 
   return (
-    <FormSectionContainer id={Step.EXPENSE_CATEGORY} inViewChange={props.inViewChange} title={'Select expense category'}>
+    <FormSectionContainer
+      id={Step.EXPENSE_CATEGORY}
+      inViewChange={props.inViewChange}
+      title={'Select expense category'}
+    >
       <Button
         variant="outline"
         size="sm"
@@ -43,7 +46,11 @@ export function ExpenseCategorySection(props: ExpenseCategorySectionProps) {
         })}
         onClick={() => setIsExpenseCategoryPickerOpen(!isExpenseCategoryPickerOpen)}
       >
-        {selectedAccountingCategory ? selectedAccountingCategory.name : <span className='text-muted-foreground'>Choose a category</span>}
+        {selectedAccountingCategory ? (
+          selectedAccountingCategory.name
+        ) : (
+          <span className="text-muted-foreground">Choose a category</span>
+        )}
         <ChevronsUpDown className="ml-2 opacity-50" size={16} />
       </Button>
       {isExpenseCategoryPickerOpen && (

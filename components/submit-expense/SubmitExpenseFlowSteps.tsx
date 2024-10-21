@@ -120,7 +120,7 @@ export function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
         )}
         <li
           className={cn(
-            "before:content-['2'] [--step-line-style:none]",
+            "[--step-line-style:none] before:content-['2']",
             stepListItemVariants({ itemType: props.activeStep === Step.SUMMARY ? 'activeHeader' : 'header' }),
           )}
         >

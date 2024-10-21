@@ -133,7 +133,10 @@ function RecurrenceOptionBox(props: { form: ExpenseForm }) {
           <div>
             <div className="my-4 border-t border-dotted border-gray-400" />
             <Label className="mb-2">Frequency</Label>
-            <Select value={recurrenceFrequency} onValueChange={newValue => setRecurrenceFrequencyEdit(newValue as RecurrenceFrequencyOption)}>
+            <Select
+              value={recurrenceFrequency}
+              onValueChange={newValue => setRecurrenceFrequencyEdit(newValue as RecurrenceFrequencyOption)}
+            >
               <SelectTrigger data-cy="language-switcher">
                 <div className="flex items-center gap-2 overflow-hidden">
                   <span className="truncate">

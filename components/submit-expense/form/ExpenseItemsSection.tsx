@@ -49,7 +49,7 @@ export function ExpenseItemsSection(props: ExpenseItemsSectionProps) {
       }
     >
       {expenseItems.map((ei, i) => (
-        <div key={i} className="flex gap-4">
+        <div key={`${ei.description}-${ei.incurredAt}-${ei.amount?.valueInCents}`} className="flex gap-4">
           <div className="flex-grow">
             <ExpenseItem form={props.form} index={i} />
           </div>
@@ -86,8 +86,8 @@ export function ExpenseItemsSection(props: ExpenseItemsSectionProps) {
         </Button>
         <div>
           {Object.entries(totalByCurrency).map(([currency, total]) => (
-            <div key={currency} className='text-right'>
-              <FormattedMoneyAmount currency={currency} showCurrencyCode amount={total} amountClassName='font-bold' />
+            <div key={currency} className="text-right">
+              <FormattedMoneyAmount currency={currency} showCurrencyCode amount={total} amountClassName="font-bold" />
             </div>
           ))}
         </div>
@@ -207,11 +207,11 @@ function AdditionalAttachments(props: AdditionalAttachmentsProps) {
           />
         </div>
 
-        {additionalAttachments.map((at, index) => (
-          <div key={index}>
+        {additionalAttachments.map(at => (
+          <div key={typeof at === 'string' ? at : `${at.name}-${at.lastModified}`}>
             <StyledDropzone
               {...attachmentDropzoneParams}
-              name={at.name}
+              name={typeof at === 'string' ? at : at.name}
               size={112}
               value={at}
               collectFilesOnly

@@ -17,7 +17,7 @@ import { Input } from '../../ui/Input';
 import { Label } from '../../ui/Label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../ui/Tabs';
 import { Step } from '../SubmitExpenseFlowSteps';
-import { type ExpenseForm,YesNoOption } from '../useExpenseForm';
+import { type ExpenseForm, YesNoOption } from '../useExpenseForm';
 
 import { PayoutMethodOption, WhoIsGettingPaidOption } from './experiment';
 import { FormSectionContainer } from './FormSectionContainer';
@@ -200,7 +200,9 @@ export function PayoutMethodSection(props: PayoutMethodSectionProps) {
                     </Label>
                     <Tabs
                       value={props.form.values.updatePayoutMethodNameToMatchProfile}
-                      onValueChange={newValue => setFieldValue('updatePayoutMethodNameToMatchProfile', newValue as YesNoOption)}
+                      onValueChange={newValue =>
+                        setFieldValue('updatePayoutMethodNameToMatchProfile', newValue as YesNoOption)
+                      }
                     >
                       <TabsList>
                         <TabsTrigger value={YesNoOption.YES}>Yes, update and match</TabsTrigger>
@@ -256,7 +258,9 @@ function NewPayoutMethodOption(props: NewPayoutMethodOptionProps) {
             value: m,
             label: intl.formatMessage(I18nPayoutMethodLabels[m]),
           }))}
-          onChange={(option: { value: string }) => props.form.setFieldValue('newPayoutMethod.type', option.value as PayoutMethodType)}
+          onChange={(option: { value: string }) =>
+            props.form.setFieldValue('newPayoutMethod.type', option.value as PayoutMethodType)
+          }
         />
         {props.form.values.newPayoutMethod?.type && (
           <PayoutMethodForm
