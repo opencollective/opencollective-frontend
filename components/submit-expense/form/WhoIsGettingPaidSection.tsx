@@ -9,7 +9,7 @@ import { Button } from '../../ui/Button';
 import { Command, CommandInput, CommandItem, CommandList } from '../../ui/Command';
 import { Input } from '../../ui/Input';
 import { Label } from '../../ui/Label';
-import { RadioGroup, RadioGroupItem } from '../../ui/RadioGroup';
+import { RadioGroup, RadioGroupCard, RadioGroupItem } from '../../ui/RadioGroup';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../ui/Tabs';
 import { Step } from '../SubmitExpenseFlowSteps';
 import type { ExpenseForm } from '../useExpenseForm';
@@ -19,6 +19,9 @@ import { ExpenseAccountItem } from './ExpenseAccountItem';
 import { InviteeOption, WhoIsGettingPaidOption } from './experiment';
 import { FormSectionContainer } from './FormSectionContainer';
 import { InviteUserOption } from './InviteUserOption';
+import { Collapsible, CollapsibleContent } from '../../ui/Collapsible';
+import CollectivePicker from '../../CollectivePicker';
+import { Select, SelectTrigger } from '../../ui/Select';
 
 type WhoIsGettingPaidSectionProps = {
   form: ExpenseForm;
@@ -30,7 +33,10 @@ export function WhoIsGettingPaidSection(props: WhoIsGettingPaidSectionProps) {
   const [isMyProfilesPickerOpen, setIsMyProfilesPickerOpen] = React.useState(false);
 
   const myProfiles = React.useMemo(() => props.form.options.payoutProfiles || [], [props.form.options.payoutProfiles]);
-
+  const myProfileSlugs = myProfiles.map(m => m.slug);
+  const recentExpensesToMyProfiles = props.form.options.recentlySubmittedExpenses?.nodes?.filter(e =>
+    myProfileSlugs.includes(e.payee.slug),
+  );
   const { setFieldValue } = props.form;
   React.useEffect(() => {
     const myProfileSlugs = myProfiles.map(m => m.slug);
@@ -63,15 +69,66 @@ export function WhoIsGettingPaidSection(props: WhoIsGettingPaidSectionProps) {
         : null,
     [props.form.values.myProfilesExpensePayeePick, myProfiles],
   );
-
+  console.log({ myProfileSelection });
   return (
     <FormSectionContainer
       id={Step.WHO_IS_GETTING_PAID}
       inViewChange={props.inViewChange}
       title={'Who is getting paid?'}
-      subtitle={'(Select the profile of the recipient who needs to be paid)'}
+      subtitle={'Select the profile of the recipient who needs to be paid'}
     >
-      <Tabs
+      <RadioGroup
+        value={props.form.values.myProfilesExpensePayeePick}
+        onValueChange={val => setFieldValue('myProfilesExpensePayeePick', val)}
+      >
+        {myProfiles
+          .filter(a => a.slug === recentExpensesToMyProfiles.at(0).payee.slug)
+          .map(a => (
+            <RadioGroupCard
+              key={a.slug}
+              value={`${a.slug}`}
+              subContent={
+                <Collapsible open={myProfileSelection?.slug === a.slug && isEmpty(myProfileSelection.legalName)}>
+                  <CollapsibleContent className="">
+                    <div className="mt-4">
+                      <MessageBox type="warning">
+                        <div className="mb-2 font-bold">Legal name missing</div>
+                        <div className="mb-4">
+                          Your profile is missing a legal name. It is required for you to get paid. It is private
+                          information that only collective and fiscal host administrators can see.
+                        </div>
+                        <Label className="mb-2 flex gap-2">
+                          Enter legal name <Lock size={14} />
+                        </Label>
+                        <Input placeholder="E.g. Jogn Doe" className="mb-2" type="text" />
+                        <Button variant="outline">Save legal name</Button>
+                      </MessageBox>
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+              }
+            >
+              <ExpenseAccountItem slug={a.slug} />
+            </RadioGroupCard>
+          ))}
+        <RadioGroupCard
+          value={'administrated-account'}
+          subContent={
+            <Collapsible open={props.form.values.myProfilesExpensePayeePick === 'administrated-account'}>
+              <CollapsibleContent>
+                <Select>
+                  <SelectTrigger className="mt-4">Find account</SelectTrigger>
+                </Select>
+              </CollapsibleContent>
+            </Collapsible>
+          }
+        >
+          An account I administer
+        </RadioGroupCard>
+        <RadioGroupCard value={'invite-someone'}>Invite someone</RadioGroupCard>
+        <RadioGroupCard value={'a-vendor'}>A Vendor</RadioGroupCard>
+      </RadioGroup>
+      {/* <Tabs
         value={props.form.values.whoIsGettingPaidOption}
         onValueChange={newValue => setFieldValue('whoIsGettingPaidOption', newValue as WhoIsGettingPaidOption)}
       >
@@ -167,7 +224,7 @@ export function WhoIsGettingPaidSection(props: WhoIsGettingPaidSectionProps) {
           </RadioGroup>
         </TabsContent>
         <TabsContent value={WhoIsGettingPaidOption.VENDOR}>Vendor</TabsContent>
-      </Tabs>
+      </Tabs> */}
     </FormSectionContainer>
   );
 }

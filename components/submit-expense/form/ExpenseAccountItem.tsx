@@ -25,25 +25,30 @@ export function ExpenseAccountItem(props: ExpenseAccountItemProps) {
           name
           type
           imageUrl
-
-          admins: members(role: ADMIN) {
-            totalCount
-            nodes {
+          ... on AccountWithParent {
+            parent {
               id
-              account {
-                id
-                type
-                slug
-                name
-                imageUrl
-                ...AccountHoverCardFields
-                emails
-              }
+              name
+              slug
             }
           }
+          # admins: members(role: ADMIN) {
+          #   totalCount
+          #   nodes {
+          #     id
+          #     account {
+          #       id
+          #       type
+          #       slug
+          #       name
+          #       imageUrl
+          #       ...AccountHoverCardFields
+          #       emails
+          #     }
+          #   }
+          # }
         }
       }
-      ${accountHoverCardFields}
     `,
     {
       context: API_V2_CONTEXT,
@@ -62,18 +67,19 @@ export function ExpenseAccountItem(props: ExpenseAccountItemProps) {
   }
 
   return (
-    <div className={cn('flex w-full gap-2', props.className)}>
-      <div>
-        <Avatar collective={account} radius={24} />
-      </div>
-      <div className="flex flex-grow items-center">
-        <span className="inline-block max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap">
-          {account.name}
-        </span>
-        &nbsp;&nbsp;•&nbsp;&nbsp;
-        <span className="inline-block max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap">
-          @{account.slug}
-        </span>
+    <div className={cn('flex w-full items-center gap-2', props.className)}>
+      <Avatar collective={account} radius={32} />
+      <div className="flex flex-grow flex-col items-start text-sm">
+        <div className="inline-block overflow-hidden text-ellipsis whitespace-nowrap font-medium">{account.name}</div>
+        <div className="inline-block overflow-hidden text-ellipsis whitespace-nowrap font-normal text-muted-foreground">
+          {account.parent ? (
+            <span>
+              {account.type} by @{account.parent.slug}
+            </span>
+          ) : (
+            <span>@{account.slug}</span>
+          )}
+        </div>
       </div>
       <div className="flex items-center -space-x-1">
         {account?.admins?.nodes &&

@@ -17,9 +17,9 @@ export function FormSectionContainer(props: FormSectionContainerProps) {
 
   return (
     <div ref={ref} id={props.id} className="rounded-lg bg-white p-6">
-      <div className="mb-4 flex flex-wrap items-center gap-2">
-        <div className="text-xl font-bold text-[#0F1729]">{props.title}</div>
-        {props.subtitle && <div className="text-sm italic text-[#344256]">{props.subtitle}</div>}
+      <div className="mb-4 space-y-2">
+        <div className="text-xl font-bold">{props.title}</div>
+        {props.subtitle && <div className="text-sm text-muted-foreground">{props.subtitle}</div>}
       </div>
       {props.children}
     </div>

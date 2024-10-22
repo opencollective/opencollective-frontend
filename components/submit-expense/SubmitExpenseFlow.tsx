@@ -362,14 +362,16 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
                   expenseForm={expenseForm}
                 />
 
-                <div className="h-max w-[920px] pb-4">
-                  <form ref={formRef} onSubmit={e => e.preventDefault()}>
-                    <SubmitExpenseFlowForm
-                      onNextClick={() => setActiveStep(Step.SUMMARY)}
-                      form={expenseForm}
-                      onVisibleSectionChange={v => setActiveStep(v as Step)}
-                    />
-                  </form>
+                <div className="flex h-max w-full justify-center">
+                  <div className="max-w-screen-md">
+                    <form ref={formRef} onSubmit={e => e.preventDefault()}>
+                      <SubmitExpenseFlowForm
+                        onNextClick={() => setActiveStep(Step.SUMMARY)}
+                        form={expenseForm}
+                        onVisibleSectionChange={v => setActiveStep(v as Step)}
+                      />
+                    </form>
+                  </div>
                 </div>
               </div>
             </div>
