@@ -21,6 +21,8 @@ import { type ExpenseForm, YesNoOption } from '../useExpenseForm';
 
 import { PayoutMethodOption, WhoIsGettingPaidOption } from './experiment';
 import { FormSectionContainer } from './FormSectionContainer';
+import { RadioGroup, RadioGroupCard } from '../../ui/RadioGroup';
+import { Collapsible, CollapsibleContent } from '../../ui/Collapsible';
 
 type PayoutMethodSectionProps = {
   form: ExpenseForm;
@@ -80,154 +82,238 @@ export function PayoutMethodSection(props: PayoutMethodSectionProps) {
   }, [props.form.options.payoutProfiles, payeeAccount, setFieldValue]);
 
   const selectedPayoutMethod = payoutMethods.find(pm => pm.id === payoutMethod);
-
+  console.log({ selectedPayoutMethod, form: props.form });
   return (
     <FormSectionContainer
       id={Step.PAYOUT_METHOD}
       inViewChange={props.inViewChange}
       title={'Select a payout method'}
-      subtitle={'(Where do you want to receive the money)'}
+      subtitle={'Where do you want to receive the money'}
     >
       {!loggedInUserIsAdminOfPayee ? (
         <MessageBox type="info">
           The person you are inviting to submit this expense will be asked to provide payout method details.
         </MessageBox>
       ) : (
-        <Tabs
-          value={payoutMethodOption}
-          onValueChange={newValue => setFieldValue('payoutMethodOption', newValue as PayoutMethodOption)}
-        >
-          <TabsList>
-            {payoutMethods.length > 0 && (
-              <TabsTrigger value={PayoutMethodOption.EXISTING_PAYOUT_METHOD}>My Payout Methods</TabsTrigger>
-            )}
-            <TabsTrigger value={PayoutMethodOption.NEW_PAYOUT_METHOD}>Add new</TabsTrigger>
-          </TabsList>
-          <TabsContent value={PayoutMethodOption.EXISTING_PAYOUT_METHOD}>
-            <div className="flex items-start gap-2">
-              <div className="flex-grow">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className={cn('mb-4 w-full justify-between', {
-                    'mb-0 rounded-b-none border-b-0': isPayoutMethodPickerOpen,
-                  })}
-                  disabled={!selectedPayoutMethod}
-                  onClick={() => setIsPayoutMethodPickerOpen(!isPayoutMethodPickerOpen)}
-                >
-                  {selectedPayoutMethod ? <PayoutMethodLabel showIcon payoutMethod={selectedPayoutMethod} /> : ''}
-                  <ChevronsUpDown className="ml-2 opacity-50" size={16} />
-                </Button>
-                {!isPayoutMethodPickerOpen &&
-                  selectedPayoutMethod &&
-                  lastUsedPayoutMethod &&
-                  selectedPayoutMethod.id === lastUsedPayoutMethod && (
-                    <span className="text-sm text-muted-foreground">
-                      Last used payout method for the selected profile
-                    </span>
-                  )}
-                {isPayoutMethodPickerOpen && (
-                  <div className="mb-4 rounded-md rounded-t-none border border-gray-200">
-                    <Command>
-                      <CommandInput autoFocus />
-                      <CommandList>
-                        {payoutMethods.map(pm => (
-                          <CommandItem
-                            key={pm.id}
-                            value={`${pm.id}`}
-                            onSelect={() => {
-                              setFieldValue('payoutMethodId', pm.id);
-                              setIsPayoutMethodPickerOpen(false);
-                            }}
-                          >
-                            <PayoutMethodLabel showIcon payoutMethod={pm} />
-                          </CommandItem>
-                        ))}
-                      </CommandList>
-                    </Command>
-                  </div>
-                )}
-              </div>
-              <div className="flex gap-2">
-                <Button disabled size="icon" variant="outline">
-                  <Eye size={16} />
-                </Button>
-                <Button disabled size="icon" variant="outline">
-                  <Pencil size={16} />
-                </Button>
-                <Button disabled size="icon" variant="outline">
-                  <Trash2 size={16} />
-                </Button>
-              </div>
-            </div>
-            {!isPayoutMethodPickerOpen && selectedPayoutMethod && isEmpty(selectedPayoutMethod?.data?.currency) && (
-              <div className="mt-2">
-                <MessageBox type="warning">
-                  <div className="mb-2 font-bold">Missing currency</div>
-                  <div>Your payout method is missing a currency. Please edit your payout method to update it.</div>
-                </MessageBox>
-              </div>
-            )}
-            {!isPayoutMethodPickerOpen &&
-              selectedPayoutMethod &&
-              selectedPayoutMethod.data?.accountHolderName &&
-              props.form.options.payee &&
-              selectedPayoutMethod.data.accountHolderName !== props.form.options.payee.legalName && (
-                <div className="mt-2">
-                  <MessageBox type="warning">
-                    <div className="mb-2 font-bold">The names you provided do not match.</div>
-                    <div>
-                      <FormattedMessage
-                        defaultMessage="The legal name in the payee profile is: {legalName}."
-                        id="NSammt"
-                        values={{
-                          legalName: props.form.options.payee.legalName,
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <FormattedMessage
-                        defaultMessage="The contact name in the payout method is: {accountHolderName}."
-                        id="XC+vMa"
-                        values={{
-                          accountHolderName: selectedPayoutMethod.data.accountHolderName,
-                        }}
-                      />
-                    </div>
-                    <div>This may delay payment.</div>
-                    <Label className="mb-2 mt-4">
-                      Would you like to update the payment method contact name to match your legal name?
-                    </Label>
-                    <Tabs
-                      value={props.form.values.updatePayoutMethodNameToMatchProfile}
-                      onValueChange={newValue =>
-                        setFieldValue('updatePayoutMethodNameToMatchProfile', newValue as YesNoOption)
-                      }
-                    >
-                      <TabsList>
-                        <TabsTrigger value={YesNoOption.YES}>Yes, update and match</TabsTrigger>
-                        <TabsTrigger value={YesNoOption.NO}>No, keep them different</TabsTrigger>
-                      </TabsList>
-                      <TabsContent value={YesNoOption.NO}>
-                        <Label className="my-2 flex gap-2">
-                          Please explain why they are different <Lock size={14} />{' '}
-                        </Label>
-                        <Input
-                          type="text"
-                          placeholder="e.g. divorce, legal name change, etc"
-                          {...props.form.getFieldProps('payoutMethodNameDiscrepancyReason')}
-                        />
-                      </TabsContent>
-                    </Tabs>
-                  </MessageBox>
-                </div>
-              )}
-          </TabsContent>
-          <TabsContent value={PayoutMethodOption.NEW_PAYOUT_METHOD}>
-            <NewPayoutMethodOption form={props.form} />
-          </TabsContent>
-        </Tabs>
+        <div>
+          <RadioGroup value={selectedPayoutMethod?.id} onValueChange={val => setFieldValue('payoutMethodId', val)}>
+            {payoutMethods.map(pm => (
+              <RadioGroupCard
+                key={pm.id}
+                value={`${pm.id}`}
+                subContent={
+                  <Collapsible open={selectedPayoutMethod?.id === pm.id}>
+                    <CollapsibleContent>Hello!</CollapsibleContent>
+                  </Collapsible>
+                }
+                // onSelect={() => {
+                //   setFieldValue('payoutMethodId', pm.id);
+                //   setIsPayoutMethodPickerOpen(false);
+                // }}
+              >
+                <PayoutMethodLabel showIcon payoutMethod={pm} />
+              </RadioGroupCard>
+            ))}
+            <RadioGroupCard value={'newPayoutMethod'}>New payout method</RadioGroupCard>
+          </RadioGroup>
+        </div>
+        // <Tabs
+        //   value={payoutMethodOption}
+        //   onValueChange={newValue => setFieldValue('payoutMethodOption', newValue as PayoutMethodOption)}
+        // >
+        //   <TabsList>
+        //     {payoutMethods.length > 0 && (
+        //       <TabsTrigger value={PayoutMethodOption.EXISTING_PAYOUT_METHOD}>My Payout Methods</TabsTrigger>
+        //     )}
+        //     <TabsTrigger value={PayoutMethodOption.NEW_PAYOUT_METHOD}>Add new</TabsTrigger>
+        //   </TabsList>
+        //   <TabsContent value={PayoutMethodOption.EXISTING_PAYOUT_METHOD}>
+        //     <div className="flex items-start gap-2">
+        //       <div className="flex-grow">
+        //         <Button
+        //           variant="outline"
+        //           size="sm"
+        //           className={cn('mb-4 w-full justify-between', {
+        //             'mb-0 rounded-b-none border-b-0': isPayoutMethodPickerOpen,
+        //           })}
+        //           disabled={!selectedPayoutMethod}
+        //           onClick={() => setIsPayoutMethodPickerOpen(!isPayoutMethodPickerOpen)}
+        //         >
+        //           {selectedPayoutMethod ? <PayoutMethodLabel showIcon payoutMethod={selectedPayoutMethod} /> : ''}
+        //           <ChevronsUpDown className="ml-2 opacity-50" size={16} />
+        //         </Button>
+        //         {!isPayoutMethodPickerOpen &&
+        //           selectedPayoutMethod &&
+        //           lastUsedPayoutMethod &&
+        //           selectedPayoutMethod.id === lastUsedPayoutMethod && (
+        //             <span className="text-sm text-muted-foreground">
+        //               Last used payout method for the selected profile
+        //             </span>
+        //           )}
+        //         {isPayoutMethodPickerOpen && (
+        //           <div className="mb-4 rounded-md rounded-t-none border border-gray-200">
+        //             <Command>
+        //               <CommandInput autoFocus />
+        //               <CommandList>
+        //                 {payoutMethods.map(pm => (
+        //                   <CommandItem
+        //                     key={pm.id}
+        //                     value={`${pm.id}`}
+        //                     onSelect={() => {
+        //                       setFieldValue('payoutMethodId', pm.id);
+        //                       setIsPayoutMethodPickerOpen(false);
+        //                     }}
+        //                   >
+        //                     <PayoutMethodLabel showIcon payoutMethod={pm} />
+        //                   </CommandItem>
+        //                 ))}
+        //               </CommandList>
+        //             </Command>
+        //           </div>
+        //         )}
+        //       </div>
+        //       <div className="flex gap-2">
+        //         <Button disabled size="icon" variant="outline">
+        //           <Eye size={16} />
+        //         </Button>
+        //         <Button disabled size="icon" variant="outline">
+        //           <Pencil size={16} />
+        //         </Button>
+        //         <Button disabled size="icon" variant="outline">
+        //           <Trash2 size={16} />
+        //         </Button>
+        //       </div>
+        //     </div>
+        //     {!isPayoutMethodPickerOpen && selectedPayoutMethod && isEmpty(selectedPayoutMethod?.data?.currency) && (
+        //       <div className="mt-2">
+        //         <MessageBox type="warning">
+        //           <div className="mb-2 font-bold">Missing currency</div>
+        //           <div>Your payout method is missing a currency. Please edit your payout method to update it.</div>
+        //         </MessageBox>
+        //       </div>
+        //     )}
+        //     {!isPayoutMethodPickerOpen &&
+        //       selectedPayoutMethod &&
+        //       selectedPayoutMethod.data?.accountHolderName &&
+        //       props.form.options.payee &&
+        //       selectedPayoutMethod.data.accountHolderName !== props.form.options.payee.legalName && (
+        //         <div className="mt-2">
+        //           <MessageBox type="warning">
+        //             <div className="mb-2 font-bold">The names you provided do not match.</div>
+        //             <div>
+        //               <FormattedMessage
+        //                 defaultMessage="The legal name in the payee profile is: {legalName}."
+        //                 id="NSammt"
+        //                 values={{
+        //                   legalName: props.form.options.payee.legalName,
+        //                 }}
+        //               />
+        //             </div>
+        //             <div>
+        //               <FormattedMessage
+        //                 defaultMessage="The contact name in the payout method is: {accountHolderName}."
+        //                 id="XC+vMa"
+        //                 values={{
+        //                   accountHolderName: selectedPayoutMethod.data.accountHolderName,
+        //                 }}
+        //               />
+        //             </div>
+        //             <div>This may delay payment.</div>
+        //             <Label className="mb-2 mt-4">
+        //               Would you like to update the payment method contact name to match your legal name?
+        //             </Label>
+        //             <Tabs
+        //               value={props.form.values.updatePayoutMethodNameToMatchProfile}
+        //               onValueChange={newValue =>
+        //                 setFieldValue('updatePayoutMethodNameToMatchProfile', newValue as YesNoOption)
+        //               }
+        //             >
+        //               <TabsList>
+        //                 <TabsTrigger value={YesNoOption.YES}>Yes, update and match</TabsTrigger>
+        //                 <TabsTrigger value={YesNoOption.NO}>No, keep them different</TabsTrigger>
+        //               </TabsList>
+        //               <TabsContent value={YesNoOption.NO}>
+        //                 <Label className="my-2 flex gap-2">
+        //                   Please explain why they are different <Lock size={14} />{' '}
+        //                 </Label>
+        //                 <Input
+        //                   type="text"
+        //                   placeholder="e.g. divorce, legal name change, etc"
+        //                   {...props.form.getFieldProps('payoutMethodNameDiscrepancyReason')}
+        //                 />
+        //               </TabsContent>
+        //             </Tabs>
+        //           </MessageBox>
+        //         </div>
+        //       )}
+        //   </TabsContent>
+        //   <TabsContent value={PayoutMethodOption.NEW_PAYOUT_METHOD}>
+        //     <NewPayoutMethodOption form={props.form} />
+        //   </TabsContent>
+        // </Tabs>
       )}
+      {!isPayoutMethodPickerOpen && selectedPayoutMethod && isEmpty(selectedPayoutMethod?.data?.currency) && (
+        <div className="mt-2">
+          <MessageBox type="warning">
+            <div className="mb-2 font-bold">Missing currency</div>
+            <div>Your payout method is missing a currency. Please edit your payout method to update it.</div>
+          </MessageBox>
+        </div>
+      )}
+      {!isPayoutMethodPickerOpen &&
+        selectedPayoutMethod &&
+        selectedPayoutMethod.data?.accountHolderName &&
+        props.form.options.payee &&
+        selectedPayoutMethod.data.accountHolderName !== props.form.options.payee.legalName && (
+          <div className="mt-2">
+            <MessageBox type="warning">
+              <div className="mb-2 font-bold">The names you provided do not match.</div>
+              <div>
+                <FormattedMessage
+                  defaultMessage="The legal name in the payee profile is: {legalName}."
+                  id="NSammt"
+                  values={{
+                    legalName: props.form.options.payee.legalName,
+                  }}
+                />
+              </div>
+              <div>
+                <FormattedMessage
+                  defaultMessage="The contact name in the payout method is: {accountHolderName}."
+                  id="XC+vMa"
+                  values={{
+                    accountHolderName: selectedPayoutMethod.data.accountHolderName,
+                  }}
+                />
+              </div>
+              <div>This may delay payment.</div>
+              <Label className="mb-2 mt-4">
+                Would you like to update the payment method contact name to match your legal name?
+              </Label>
+              <Tabs
+                value={props.form.values.updatePayoutMethodNameToMatchProfile}
+                onValueChange={newValue =>
+                  setFieldValue('updatePayoutMethodNameToMatchProfile', newValue as YesNoOption)
+                }
+              >
+                <TabsList>
+                  <TabsTrigger value={YesNoOption.YES}>Yes, update and match</TabsTrigger>
+                  <TabsTrigger value={YesNoOption.NO}>No, keep them different</TabsTrigger>
+                </TabsList>
+                <TabsContent value={YesNoOption.NO}>
+                  <Label className="my-2 flex gap-2">
+                    Please explain why they are different <Lock size={14} />{' '}
+                  </Label>
+                  <Input
+                    type="text"
+                    placeholder="e.g. divorce, legal name change, etc"
+                    {...props.form.getFieldProps('payoutMethodNameDiscrepancyReason')}
+                  />
+                </TabsContent>
+              </Tabs>
+            </MessageBox>
+          </div>
+        )}
     </FormSectionContainer>
   );
 }
