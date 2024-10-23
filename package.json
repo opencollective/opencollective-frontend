@@ -252,7 +252,7 @@
     "eslint": "^8.57.0",
     "eslint-config-opencollective": "^4.0.0",
     "eslint-plugin-cypress": "^3.0.0",
-    "eslint-plugin-formatjs": "4.13.3",
+    "eslint-plugin-formatjs": "5.1.2",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-n": "^17.7.0",
     "eslint-plugin-react": "^7.34.2",
