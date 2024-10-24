@@ -272,7 +272,7 @@
     "markdown-loader": "^8.0.0",
     "mkdirp": "^3.0.1",
     "node-polyfill-webpack-plugin": "^4.0.0",
-    "npm-run-all2": "^6.2.0",
+    "npm-run-all2": "^7.0.0",
     "nyc": "^17.0.0",
     "pdf-parse": "^1.1.1",
     "postcss": "8.4.41",
