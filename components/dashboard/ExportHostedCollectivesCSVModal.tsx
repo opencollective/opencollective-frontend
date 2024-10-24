@@ -9,6 +9,7 @@ import type { MouseEventHandler } from 'react';
 import { FormattedMessage } from 'react-intl';
 import slugify from 'slugify';
 
+import { setRestAuthorizationCookie } from '../../lib/auth';
 import {
   AVERAGE_ROWS_PER_MINUTE,
   FIELD_OPTIONS,
@@ -47,8 +48,6 @@ import {
 } from '../ui/Dialog';
 import { Input } from '../ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
-
-const env = process.env.OC_ENV;
 
 const TOTAL_AVAILABLE_FIELDS = FIELDS.length;
 
@@ -243,15 +242,7 @@ const ExportHostedCollectivesCSVModal = ({
   }, [queryFilter.values, account, open]);
 
   React.useEffect(() => {
-    const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-    if (typeof document !== 'undefined' && accessToken) {
-      document.cookie =
-        env === 'development' || env === 'e2e'
-          ? `authorization="Bearer ${accessToken}";path=/;SameSite=strict;max-age=120`
-          : // It is not possible to use HttpOnly when setting from JavaScript.
-            // I'm enforcing SameSite and Domain in production to prevent CSRF.
-            `authorization="Bearer ${accessToken}";path=/;SameSite=strict;max-age=120;domain=opencollective.com;secure`;
-    }
+    setRestAuthorizationCookie();
     setDownloadUrl(makeUrl({ account, queryFilter, fields }));
   }, [fields, queryFilter, account, isHostReport, setDownloadUrl]);
 
