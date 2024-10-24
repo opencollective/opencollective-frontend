@@ -14,7 +14,7 @@ import { DataList, DataListItem, DataListItemLabel, DataListItemValue } from '..
 import { Sheet, SheetBody, SheetContent } from '../../../ui/Sheet';
 
 import { TransactionsImportRowDataLine } from './TransactionsImportRowDataLine';
-import { TransactionsImportRowStatus } from './TransactionsImportRowStatus';
+import { TransactionsImportRowStatusBadge } from './TransactionsImportRowStatusBadge';
 
 export const TransactionsImportRowDrawer = ({
   getActions,
@@ -62,7 +62,7 @@ export const TransactionsImportRowDrawer = ({
                     <FormattedMessage id="Fields.status" defaultMessage="Status" />
                   </DataListItemLabel>
                   <DataListItemValue>
-                    <TransactionsImportRowStatus row={row} />
+                    <TransactionsImportRowStatusBadge row={row} />
                   </DataListItemValue>
                 </DataListItem>
                 <DataListItem>
