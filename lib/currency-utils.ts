@@ -11,7 +11,8 @@ export type Options = {
   minimumFractionDigits?: number;
   precision?: number;
   style?: 'currency' | 'decimal';
-  currencyDisplay?: 'symbol' | 'narrowSymbol' | 'code' | 'name';
+  currencyDisplay?: Intl.NumberFormatOptions['currencyDisplay'];
+  absolute?: boolean;
 };
 
 function getCurrencySymbolFallback(currency: Currency): string {
@@ -69,6 +70,10 @@ export function formatCurrency(
     } else {
       return '--';
     }
+  }
+
+  if (options.absolute) {
+    amount = Math.abs(amount);
   }
 
   amount = amount / 100;

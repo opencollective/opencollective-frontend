@@ -10,7 +10,7 @@ import dynamic from 'next/dynamic';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { alignSeries, extractSeriesFromTimeSeries } from '../../../../lib/charts';
-import { formatCurrency } from '../../../../lib/currency-utils';
+import { formatCurrency, formatValueAsCurrency } from '../../../../lib/currency-utils';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
 import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 
@@ -47,6 +47,16 @@ export const budgetSectionExpenseQuery = gql`
       currency
       stats {
         id
+        totalAmountDisbursed: totalAmountSpent(
+          dateFrom: $from
+          dateTo: $to
+          includeChildren: false
+          kind: EXPENSE
+          net: false
+        ) {
+          value
+          currency
+        }
         expensesTags(dateFrom: $from, dateTo: $to, includeChildren: false) {
           label
           count
@@ -136,7 +146,7 @@ const ExpenseBudget = ({ collective, defaultTimeInterval, ...props }) => {
                 <FormattedMessage id="AmountDisbursed" defaultMessage="Amount disbursed" />
               </P>
               <P fontSize="16px" lineHeight="24px" fontWeight="500" mt="4px">
-                {formatCurrency(sumBy(data?.account?.stats.expensesTags, 'amount.valueInCents'), collective.currency)}
+                {formatValueAsCurrency(data?.account?.stats.totalAmountDisbursed, { absolute: true })}
               </P>
             </Box>
           </StatsCardContent>
@@ -154,12 +164,7 @@ const ExpenseBudget = ({ collective, defaultTimeInterval, ...props }) => {
               headers={[
                 <FormattedMessage key={1} id="Tags" defaultMessage="Tags" />,
                 <FormattedMessage key={2} id="Label.NumberOfExpenses" defaultMessage="# of Expenses" />,
-                <FormattedMessage
-                  key={3}
-                  id="Label.AmountWithCurrency"
-                  defaultMessage="Amount ({currency})"
-                  values={{ currency: data?.account.currency }}
-                />,
+                <FormattedMessage key={3} id="Fields.amount" defaultMessage="Amount" />,
               ]}
               rows={data?.account?.stats.expensesTags.map((expenseTag, i) =>
                 makeBudgetTableRow(expenseTag.label + expenseTag.count, [

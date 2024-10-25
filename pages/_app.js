@@ -18,6 +18,7 @@ import StripeProviderSSR from '../components/StripeProvider';
 import TwoFactorAuthenticationModal from '../components/two-factor-authentication/TwoFactorAuthenticationModal';
 import { Toaster } from '../components/ui/Toaster';
 import UserProvider from '../components/UserProvider';
+import { WorkspaceProvider } from '../components/WorkspaceProvider';
 
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
@@ -194,14 +195,16 @@ class OpenCollectiveFrontendApp extends App {
               <IntlProvider locale={locale}>
                 <TooltipProvider delayDuration={500} skipDelayDuration={100}>
                   <UserProvider initialLoggedInUser={LoggedInUserData ? new LoggedInUser(LoggedInUserData) : null}>
-                    <ModalProvider>
-                      <NewsAndUpdatesProvider>
-                        <Component {...pageProps} />
-                        <Toaster />
-                        <GlobalNewsAndUpdates />
-                        <TwoFactorAuthenticationModal />
-                      </NewsAndUpdatesProvider>
-                    </ModalProvider>
+                    <WorkspaceProvider>
+                      <ModalProvider>
+                        <NewsAndUpdatesProvider>
+                          <Component {...pageProps} />
+                          <Toaster />
+                          <GlobalNewsAndUpdates />
+                          <TwoFactorAuthenticationModal />
+                        </NewsAndUpdatesProvider>
+                      </ModalProvider>
+                    </WorkspaceProvider>
                   </UserProvider>
                 </TooltipProvider>
               </IntlProvider>

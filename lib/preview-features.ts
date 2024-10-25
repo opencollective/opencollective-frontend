@@ -1,3 +1,5 @@
+import type LoggedInUser from './LoggedInUser';
+
 /**
  * A map of keys used for preview features.
  */
@@ -11,6 +13,9 @@ export enum PREVIEW_FEATURE_KEYS {
   AUTHENTICATED_SSR = 'AUTHENTICATED_SSR',
   VERCEL_BACKEND = 'VERCEL_BACKEND',
   KEYBOARD_SHORTCUTS = 'KEYBOARD_SHORTCUTS',
+  SEARCH_COMMAND = 'SEARCH_COMMAND',
+  PLAID_INTEGRATION = 'PLAID_INTEGRATION',
+  EXPORT_COLLECTIVES = 'EXPORT_COLLECTIVES',
 }
 
 export type PreviewFeature = {
@@ -25,6 +30,7 @@ export type PreviewFeature = {
   dependsOn?: PREVIEW_FEATURE_KEYS;
   setIsEnabled?: (enable: boolean) => void;
   isEnabled?: () => boolean;
+  hasAccess?: (loggedInUser: LoggedInUser) => boolean;
 };
 
 /**
@@ -115,5 +121,36 @@ export const previewFeatures: PreviewFeature[] = [
     title: 'Keyboard Shortcuts',
     description: 'Use keyboard shortcuts to navigate the expense flow',
     publicBeta: true,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.SEARCH_COMMAND,
+    publicBeta: false,
+    title: 'Search command menu',
+    description: 'Global search powered by ElasticSearch',
+    hasAccess: user => user?.isRoot,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.PLAID_INTEGRATION,
+    title: 'Bank Account synchronization',
+    description: 'Connect your bank account to import transactions',
+    publicBeta: false,
+    hasAccess: user => user?.isRoot,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.EXPORT_COLLECTIVES,
+    title: 'Export Hosted Collectives',
+    description: 'Export CSV on Hosted Collectives Dashboard',
+    closedBetaAccessFor: [
+      'opencollective',
+      'opensource',
+      'ofico',
+      'europe',
+      'oce-foundation-usd',
+      'oce-foundation-eur',
+      'the-social-change-nest',
+      'the-social-change-nest-eu',
+      'allforclimate',
+    ],
+    publicBeta: false,
   },
 ];

@@ -44,7 +44,6 @@ import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledLink from '../StyledLink';
 import { H1, H5, Span } from '../Text';
-import { DialogPortal } from '../ui/Dialog';
 
 import { editExpenseMutation } from './graphql/mutations';
 import { expensePageQuery } from './graphql/queries';
@@ -792,8 +791,8 @@ function Expense(props) {
         </Fragment>
       )}
 
-      {state.showFilesViewerModal && (
-        <DialogPortal>
+      {state.showFilesViewerModal &&
+        createPortal(
           <FilesViewerModal
             allowOutsideInteraction={isDrawer}
             files={files}
@@ -809,9 +808,9 @@ function Expense(props) {
               isDrawer && isDesktop ? onClose : () => setState(state => ({ ...state, showFilesViewerModal: false }))
             }
             hideCloseButton={isDrawer && isDesktop}
-          />
-        </DialogPortal>
-      )}
+          />,
+          document.body,
+        )}
     </Box>
   );
 }

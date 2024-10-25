@@ -23,7 +23,7 @@ const newImportFormSchema = z.object({
   type: z.enum(['CSV', 'MANUAL']),
 });
 
-export const NewTransactionsImportDialog = ({ accountSlug, onSuccess, ...props }) => {
+export const NewCSVTransactionsImportDialog = ({ accountSlug, onSuccess, ...props }) => {
   const router = useRouter();
   const { toast } = useToast();
   const intl = useIntl();
@@ -102,7 +102,11 @@ export const NewTransactionsImportDialog = ({ accountSlug, onSuccess, ...props }
           {formik => (
             <Form>
               <div className="flex flex-col gap-3">
-                <StyledInputFormikField name="source" required label="Source">
+                <StyledInputFormikField
+                  name="source"
+                  required
+                  label={<FormattedMessage defaultMessage="Source name" id="5NOdsW" />}
+                >
                   {({ field }) => (
                     <StyledSelectCreatable
                       inputId={field.id}

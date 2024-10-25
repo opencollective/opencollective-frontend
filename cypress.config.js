@@ -15,7 +15,7 @@ module.exports = defineConfig({
   scrollBehavior: 'center',
   blockHosts: ['wtfismyip.com', 'images.opencollective.com', 'images-staging.opencollective.com', 'localhost:3001'],
   env: {
-    MAILDEV_URL: 'http://localhost:1080',
+    MAILPIT_URL: 'http://localhost:1080',
     codeCoverage: {
       url: '/__coverage__',
     },

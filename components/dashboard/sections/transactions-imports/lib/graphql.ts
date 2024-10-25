@@ -8,6 +8,7 @@ export const TransactionImportListFieldsFragment = gql`
     type
     createdAt
     updatedAt
+    lastSyncAt
     stats {
       total
       ignored
@@ -62,8 +63,13 @@ export const TransactionsImportRowFieldsFragment = gql`
 `;
 
 export const updateTransactionsImportRows = gql`
-  mutation UpdateTransactionsImportRow($importId: NonEmptyString!, $rows: [TransactionsImportRowUpdateInput!]!) {
-    updateTransactionsImportRows(id: $importId, rows: $rows) {
+  mutation UpdateTransactionsImportRow(
+    $importId: NonEmptyString!
+    $rows: [TransactionsImportRowUpdateInput!]
+    $dismissAll: Boolean
+    $restoreAll: Boolean
+  ) {
+    updateTransactionsImportRows(id: $importId, rows: $rows, dismissAll: $dismissAll, restoreAll: $restoreAll) {
       id
       stats {
         total
@@ -84,4 +90,22 @@ export const updateTransactionsImportRows = gql`
     }
   }
   ${TransactionsImportRowFieldsFragment}
+`;
+
+export const transactionsImportsQuery = gql`
+  query HostTransactionImports($accountSlug: String!, $limit: Int, $offset: Int) {
+    host(slug: $accountSlug) {
+      id
+      transactionsImports(limit: $limit, offset: $offset) {
+        totalCount
+        limit
+        offset
+        nodes {
+          id
+          ...TransactionImportListFields
+        }
+      }
+    }
+  }
+  ${TransactionImportListFieldsFragment}
 `;

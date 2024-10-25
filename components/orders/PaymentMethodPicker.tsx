@@ -415,7 +415,11 @@ function paymentMethodFilter(options: PaymentMethodFilterOptions): (pm: PaymentM
     const limitedToHosts = sourcePaymentMethod.limitedToHosts || [];
     const disabledMethodTypes = options.disabledMethodTypes || [];
 
-    if (options.host && limitedToHosts.length > 0 && !pm.limitedToHosts.some(host => host.id === options.host.id)) {
+    if (
+      options.host &&
+      limitedToHosts.length > 0 &&
+      !limitedToHosts.some(host => host && host.id === options.host.id)
+    ) {
       return false;
     }
 

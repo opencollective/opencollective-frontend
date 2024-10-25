@@ -6,6 +6,7 @@ import { get } from 'lodash';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
+import { getAccountReferenceInput } from '../../../../lib/collective';
 import roles from '../../../../lib/constants/roles';
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
@@ -169,10 +170,8 @@ const EditMemberModal = ({ intl, member, collective, canRemove = false, isLastAd
     try {
       await editMemberInvitationAccount({
         variables: {
-          memberAccount: {
-            slug: get(member, 'memberAccount.slug'),
-          },
-          account: { slug: get(collective, 'slug') },
+          memberAccount: getAccountReferenceInput(member.account), // There is an alias on invitation.memberAccount, we should get rid of it https://github.com/opencollective/opencollective-frontend/blob/c7418dd99aa44da387c9c2a0e48525c415cc8566/components/edit-collective/sections/team/queries.ts#L87
+          account: getAccountReferenceInput(collective),
           description,
           role,
           since,

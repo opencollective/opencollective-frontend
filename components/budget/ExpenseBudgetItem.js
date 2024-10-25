@@ -147,9 +147,9 @@ const ExpenseBudgetItem = ({
       selected={selected}
       useDrawer={useDrawer}
     >
-      <Flex justifyContent="space-between" flexWrap="wrap">
-        <Flex flex="1" minWidth="max(50%, 200px)" maxWidth={[null, '70%']} mr="24px">
-          <Box mr={3}>
+      <div className="mb-5 flex flex-wrap items-start justify-end gap-3">
+        <div className="flex flex-grow gap-3">
+          <Box>
             {isLoading ? (
               <LoadingPlaceholder width={40} height={40} />
             ) : (
@@ -329,16 +329,9 @@ const ExpenseBudgetItem = ({
               </div>
             </Box>
           )}
-        </Flex>
-        <Flex flexDirection={['row', 'column']} mt={[3, 0]} flexWrap="wrap" alignItems={['center', 'flex-end']}>
-          <Flex
-            my={2}
-            mr={[3, 0]}
-            flexDirection="column"
-            minWidth={100}
-            alignItems="flex-end"
-            data-cy="transaction-amount"
-          >
+        </div>
+        <div className="flex w-full flex-col items-end justify-between sm:w-fit">
+          <Flex flexDirection="column" minWidth={100} alignItems="flex-end" data-cy="transaction-amount">
             {isLoading ? (
               <LoadingPlaceholder height={19} width={120} />
             ) : (
@@ -395,13 +388,12 @@ const ExpenseBudgetItem = ({
               )}
             </Flex>
           )}
-        </Flex>
-      </Flex>
-      {/* <Flex flexWrap="wrap" justifyContent="space-between" alignItems="center" mt={2}> */}
-      <div className="mt-2 flex flex-col justify-between xl:flex-row">
-        <div className="w-full sm:w-auto">
+        </div>
+      </div>
+      <div className="mt-2 flex flex-wrap items-end justify-end gap-4">
+        <div className="w-full sm:flex sm:w-fit sm:flex-grow">
           {isAdminView || isSubmitterView ? (
-            <div className="mx-4 grid w-full grid-cols-2 gap-x-6 gap-y-1 sm:mx-0 sm:grid-flow-col sm:gap-y-0">
+            <div className="mx-4 grid grid-cols-2 gap-x-6 gap-y-1 sm:mx-0 sm:grid-flow-col sm:gap-y-0">
               <div>
                 <DetailColumnHeader>
                   <FormattedMessage id="expense.payoutMethod" defaultMessage="payout method" />
@@ -502,7 +494,7 @@ const ExpenseBudgetItem = ({
         {showProcessActions && expense?.permissions && !isExpensePaidOrRejected && (
           <div
             data-cy="expense-actions"
-            className="mt-5 flex w-full flex-col items-stretch gap-2 sm:mt-2 sm:w-auto sm:flex-row sm:items-start sm:justify-end"
+            className="flex w-full flex-col items-stretch gap-2 self-end sm:float-right sm:w-auto sm:flex-row sm:items-end sm:justify-end"
           >
             <ProcessExpenseButtons
               host={host}

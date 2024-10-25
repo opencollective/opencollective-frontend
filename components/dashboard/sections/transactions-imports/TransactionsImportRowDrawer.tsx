@@ -1,10 +1,10 @@
 import React from 'react';
-import { isEmpty, startCase } from 'lodash';
+import { isEmpty } from 'lodash';
 import type { ComponentProps } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import type { GetActions } from '../../../../lib/actions/types';
-import type { TransactionsImportRow } from '../../../../lib/graphql/types/v2/graphql';
+import type { TransactionsImportQuery } from '../../../../lib/graphql/types/v2/graphql';
 
 import DateTime from '../../../DateTime';
 import DrawerHeader from '../../../DrawerHeader';
@@ -13,7 +13,8 @@ import StyledLink from '../../../StyledLink';
 import { DataList, DataListItem, DataListItemLabel, DataListItemValue } from '../../../ui/DataList';
 import { Sheet, SheetBody, SheetContent } from '../../../ui/Sheet';
 
-import { TransactionsImportRowStatus } from './TransactionsImportRowStatus';
+import { TransactionsImportRowDataLine } from './TransactionsImportRowDataLine';
+import { TransactionsImportRowStatusBadge } from './TransactionsImportRowStatusBadge';
 
 export const TransactionsImportRowDrawer = ({
   getActions,
@@ -21,8 +22,8 @@ export const TransactionsImportRowDrawer = ({
   rowIndex,
   ...props
 }: {
-  row: TransactionsImportRow;
-  getActions: GetActions<TransactionsImportRow>;
+  row: TransactionsImportQuery['transactionsImport']['rows']['nodes'][number];
+  getActions: GetActions<TransactionsImportQuery['transactionsImport']['rows']['nodes'][number]>;
   rowIndex: number;
 } & ComponentProps<typeof Sheet>) => {
   const dropdownTriggerRef = React.useRef();
@@ -61,7 +62,7 @@ export const TransactionsImportRowDrawer = ({
                     <FormattedMessage id="Fields.status" defaultMessage="Status" />
                   </DataListItemLabel>
                   <DataListItemValue>
-                    <TransactionsImportRowStatus row={row} />
+                    <TransactionsImportRowStatusBadge row={row} />
                   </DataListItemValue>
                 </DataListItem>
                 <DataListItem>
@@ -140,9 +141,7 @@ export const TransactionsImportRowDrawer = ({
                   .filter(entry => !isEmpty(entry[1]))
                   .map(([key, value], index) => (
                     // eslint-disable-next-line react/no-array-index-key
-                    <li key={index}>
-                      <strong>{startCase(key)}</strong>: {value.toString()}{' '}
-                    </li>
+                    <TransactionsImportRowDataLine key={`${key}-${index}`} labelKey={key} value={value} />
                   ))}
               </ul>
             </SheetBody>

@@ -25,7 +25,7 @@ const budgetSectionQuery = gql`
           valueInCents
           currency
         }
-        consolidatedBalance @skip(if: $heavyAccount) {
+        consolidatedBalance: balance(includeChildren: true) @skip(if: $heavyAccount) {
           valueInCents
           currency
         }
@@ -42,7 +42,7 @@ const budgetSectionQuery = gql`
           valueInCents
           currency
         }
-        totalNetAmountRaised: totalNetAmountReceived {
+        totalNetAmountRaised: totalAmountReceived(net: true) {
           valueInCents
           currency
         }

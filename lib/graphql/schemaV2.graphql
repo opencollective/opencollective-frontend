@@ -952,6 +952,41 @@ interface Account {
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
 
   """
+  [!] Warning: this query is currently in beta and the API might change
+  """
+  transactionGroups(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Filter transaction groups by the type of the primary transaction
+    """
+    type: TransactionType
+
+    """
+    Filter transaction groups by the kind of the primary transaction
+    """
+    kind: TransactionKind
+
+    """
+    Only return transaction groups that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return transaction groups that were created before this date
+    """
+    dateTo: DateTime
+  ): TransactionGroupCollection!
+
+  """
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
@@ -3357,6 +3392,41 @@ type Host implements Account & AccountWithContributions {
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
 
   """
+  [!] Warning: this query is currently in beta and the API might change
+  """
+  transactionGroups(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Filter transaction groups by the type of the primary transaction
+    """
+    type: TransactionType
+
+    """
+    Filter transaction groups by the kind of the primary transaction
+    """
+    kind: TransactionKind
+
+    """
+    Only return transaction groups that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return transaction groups that were created before this date
+    """
+    dateTo: DateTime
+  ): TransactionGroupCollection!
+
+  """
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
@@ -4876,6 +4946,7 @@ enum ConnectedAccountService {
   github
   twitter
   transferwise
+  plaid
   privacy @deprecated(reason: "Not using this service anymore")
   thegivingblock
   meetup @deprecated(reason: "Not using this service anymore")
@@ -6111,6 +6182,41 @@ enum ActivityClassType {
 }
 
 """
+A collection of Transactions groups
+"""
+type TransactionGroupCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [TransactionGroup!]!
+}
+
+"""
+Transaction group
+"""
+type TransactionGroup {
+  id: String!
+  totalAmount: Amount!
+  host: Account
+
+  """
+  The account on the main side of the transaction (CREDIT -> recipient, DEBIT -> sender)
+  """
+  account: Account
+
+  """
+  The primary transaction in the group
+  """
+  primaryTransaction: Transaction
+
+  """
+  The transactions in the group
+  """
+  transactions: [Transaction]
+  createdAt: DateTime
+}
+
+"""
 EXPERIMENTAL (this may change or be deleted): Host transaction report
 """
 type TransactionReports {
@@ -6780,9 +6886,49 @@ type TransactionsImport {
   updatedAt: DateTime!
 
   """
+  When the import was last synced
+  """
+  lastSyncAt: DateTime
+
+  """
+  Whether the import is currently syncing
+  """
+  isSyncing: Boolean!
+
+  """
+  Cursor that defines where the last sync left off. Useful to know if there is new data to sync
+  """
+  lastSyncCursor: String
+
+  """
+  Connected account linked to the import
+  """
+  connectedAccount: ConnectedAccount
+
+  """
   List of rows in the import
   """
-  rows: TransactionsImportRowCollection!
+  rows(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Filter rows by status
+    """
+    status: TransactionsImportRowStatus
+
+    """
+    Search by text
+    """
+    searchTerm: String
+  ): TransactionsImportRowCollection!
   stats: TransactionsImportStats
 }
 
@@ -6797,6 +6943,7 @@ Type of the import
 enum TransactionsImportType {
   CSV
   MANUAL
+  PLAID
 }
 
 """
@@ -6863,6 +7010,26 @@ type TransactionsImportRow {
 The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
 scalar JSONObject
+
+"""
+The status of a row in a transactions import
+"""
+enum TransactionsImportRowStatus {
+  """
+  The row has not been processed yet
+  """
+  PENDING
+
+  """
+  The row has been linked to an existing expense or order
+  """
+  LINKED
+
+  """
+  The row has been ignored
+  """
+  IGNORED
+}
 
 type TransactionsImportStats {
   """
@@ -8258,6 +8425,41 @@ type Bot implements Account {
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
 
   """
+  [!] Warning: this query is currently in beta and the API might change
+  """
+  transactionGroups(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Filter transaction groups by the type of the primary transaction
+    """
+    type: TransactionType
+
+    """
+    Filter transaction groups by the kind of the primary transaction
+    """
+    kind: TransactionKind
+
+    """
+    Only return transaction groups that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return transaction groups that were created before this date
+    """
+    dateTo: DateTime
+  ): TransactionGroupCollection!
+
+  """
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
@@ -9068,6 +9270,41 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   If this account was duplicated, the accounts that were created from it
   """
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
+
+  """
+  [!] Warning: this query is currently in beta and the API might change
+  """
+  transactionGroups(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Filter transaction groups by the type of the primary transaction
+    """
+    type: TransactionType
+
+    """
+    Filter transaction groups by the kind of the primary transaction
+    """
+    kind: TransactionKind
+
+    """
+    Only return transaction groups that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return transaction groups that were created before this date
+    """
+    dateTo: DateTime
+  ): TransactionGroupCollection!
 
   """
   EXPERIMENTAL (this may change or be removed)
@@ -10335,6 +10572,41 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
 
   """
+  [!] Warning: this query is currently in beta and the API might change
+  """
+  transactionGroups(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Filter transaction groups by the type of the primary transaction
+    """
+    type: TransactionType
+
+    """
+    Filter transaction groups by the kind of the primary transaction
+    """
+    kind: TransactionKind
+
+    """
+    Only return transaction groups that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return transaction groups that were created before this date
+    """
+    dateTo: DateTime
+  ): TransactionGroupCollection!
+
+  """
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
@@ -11380,6 +11652,41 @@ type Individual implements Account {
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
 
   """
+  [!] Warning: this query is currently in beta and the API might change
+  """
+  transactionGroups(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Filter transaction groups by the type of the primary transaction
+    """
+    type: TransactionType
+
+    """
+    Filter transaction groups by the kind of the primary transaction
+    """
+    kind: TransactionKind
+
+    """
+    Only return transaction groups that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return transaction groups that were created before this date
+    """
+    dateTo: DateTime
+  ): TransactionGroupCollection!
+
+  """
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
@@ -12398,6 +12705,41 @@ type Organization implements Account & AccountWithContributions {
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
 
   """
+  [!] Warning: this query is currently in beta and the API might change
+  """
+  transactionGroups(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Filter transaction groups by the type of the primary transaction
+    """
+    type: TransactionType
+
+    """
+    Filter transaction groups by the kind of the primary transaction
+    """
+    kind: TransactionKind
+
+    """
+    Only return transaction groups that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return transaction groups that were created before this date
+    """
+    dateTo: DateTime
+  ): TransactionGroupCollection!
+
+  """
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
@@ -13307,6 +13649,41 @@ type Vendor implements Account & AccountWithContributions {
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
 
   """
+  [!] Warning: this query is currently in beta and the API might change
+  """
+  transactionGroups(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Filter transaction groups by the type of the primary transaction
+    """
+    type: TransactionType
+
+    """
+    Filter transaction groups by the kind of the primary transaction
+    """
+    kind: TransactionKind
+
+    """
+    Only return transaction groups that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return transaction groups that were created before this date
+    """
+    dateTo: DateTime
+  ): TransactionGroupCollection!
+
+  """
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
@@ -14177,6 +14554,41 @@ type Query {
     """
     throwIfMissing: Boolean = true
   ): Project
+
+  """
+  [!] Warning: this query is currently in beta and the API might change
+  """
+  search(
+    """
+    The search term to search for
+    """
+    searchTerm: String!
+
+    """
+    Limit the scope of the search to this account and its children
+    """
+    account: AccountReferenceInput
+
+    """
+    Limit the scope of the search to this host and its hosted accounts
+    """
+    host: AccountReferenceInput
+
+    """
+    The maximum amount of time in millisecond to wait for a single entity type query to complete (for SQL search)
+    """
+    timeout: Int! = 10000
+
+    """
+    The default limit for each entity type
+    """
+    defaultLimit: Int! = 10
+
+    """
+    Whether to use ElasticSearch or not
+    """
+    useElasticSearch: Boolean! = true
+  ): SearchResponse!
   tagStats(
     """
     Return tags from collectives which includes this search term. Using this argument will ignore tagSearchTerm. Skipping this argument will use a more efficient query.
@@ -14393,6 +14805,61 @@ type Query {
     """
     accountingCategory: [String]
   ): TransactionCollection!
+
+  """
+  [!] Warning: this query is currently in beta and the API might change
+  """
+  transactionGroup(
+    """
+    The public id identifying the transaction group (ie: rvelja97-pkzqbgq7-bbzyx6wd-50o8n4rm)
+    """
+    groupId: String!
+
+    """
+    Account associated to the transaction group
+    """
+    account: AccountReferenceInput!
+  ): TransactionGroup
+
+  """
+  [!] Warning: this query is currently in beta and the API might change
+  """
+  transactionGroups(
+    """
+    Reference of the account(s) assigned to the main side of the transaction group (CREDIT -> recipient, DEBIT -> sender)
+    """
+    account: AccountReferenceInput!
+
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Filter transaction groups by the type of the primary transaction
+    """
+    type: TransactionType
+
+    """
+    Filter transaction groups by the kind of the primary transaction
+    """
+    kind: TransactionKind
+
+    """
+    Only return transaction groups that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return transaction groups that were created before this date
+    """
+    dateTo: DateTime
+  ): TransactionGroupCollection!
 
   """
   Fetch a transactions import
@@ -16758,6 +17225,41 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
 
   """
+  [!] Warning: this query is currently in beta and the API might change
+  """
+  transactionGroups(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Filter transaction groups by the type of the primary transaction
+    """
+    type: TransactionType
+
+    """
+    Filter transaction groups by the kind of the primary transaction
+    """
+    kind: TransactionKind
+
+    """
+    Only return transaction groups that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return transaction groups that were created before this date
+    """
+    dateTo: DateTime
+  ): TransactionGroupCollection!
+
+  """
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
@@ -17683,6 +18185,41 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   duplicatedAccounts(limit: Int! = 100, offset: Int! = 0): AccountCollection!
 
   """
+  [!] Warning: this query is currently in beta and the API might change
+  """
+  transactionGroups(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Filter transaction groups by the type of the primary transaction
+    """
+    type: TransactionType
+
+    """
+    Filter transaction groups by the kind of the primary transaction
+    """
+    kind: TransactionKind
+
+    """
+    Only return transaction groups that were created after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Only return transaction groups that were created before this date
+    """
+    dateTo: DateTime
+  ): TransactionGroupCollection!
+
+  """
   EXPERIMENTAL (this may change or be removed)
   """
   transactionReports(timeUnit: TimeUnit = MONTH, dateFrom: DateTime, dateTo: DateTime): TransactionReports
@@ -17806,6 +18343,98 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   The Account parenting this account
   """
   parent: Account
+}
+
+type SearchResponse {
+  """
+  Search results
+  """
+  results: SearchResults!
+}
+
+"""
+Search results for all types
+"""
+type SearchResults {
+  """
+  Search results for Accounts
+  """
+  accounts: SearchResultsAccounts
+
+  """
+  Search results for Comments
+  """
+  comments: SearchResultsComments
+
+  """
+  Search results for Expenses
+  """
+  expenses: SearchResultsExpenses
+
+  """
+  Search results for HostApplications
+  """
+  hostApplications: SearchResultsHostApplications
+
+  """
+  Search results for Orders
+  """
+  orders: SearchResultsOrders
+
+  """
+  Search results for Tiers
+  """
+  tiers: SearchResultsTiers
+
+  """
+  Search results for Transactions
+  """
+  transactions: SearchResultsTransactions
+
+  """
+  Search results for Updates
+  """
+  updates: SearchResultsUpdates
+}
+
+type SearchResultsAccounts {
+  collection: AccountCollection!
+  highlights: JSONObject
+}
+
+type SearchResultsComments {
+  collection: CommentCollection!
+  highlights: JSONObject
+}
+
+type SearchResultsExpenses {
+  collection: ExpenseCollection!
+  highlights: JSONObject
+}
+
+type SearchResultsHostApplications {
+  collection: HostApplicationCollection!
+  highlights: JSONObject
+}
+
+type SearchResultsOrders {
+  collection: OrderCollection!
+  highlights: JSONObject
+}
+
+type SearchResultsTiers {
+  collection: TierCollection!
+  highlights: JSONObject
+}
+
+type SearchResultsTransactions {
+  collection: TransactionCollection!
+  highlights: JSONObject
+}
+
+type SearchResultsUpdates {
+  collection: UpdateCollection!
+  highlights: JSONObject
 }
 
 input TierReferenceInput {
@@ -19188,6 +19817,46 @@ type Mutation {
   removePayoutMethod(payoutMethodId: String!): PayoutMethod!
 
   """
+  Generate a Plaid Link token
+  """
+  generatePlaidLinkToken: PlaidLinkTokenCreateResponse!
+
+  """
+  Connect a Plaid account
+  """
+  connectPlaidAccount(
+    """
+    The public token returned by the Plaid Link flow
+    """
+    publicToken: String!
+
+    """
+    The account to which the Plaid account should be connected
+    """
+    host: AccountReferenceInput!
+
+    """
+    The name of the bank
+    """
+    sourceName: String
+
+    """
+    The name of the bank account
+    """
+    name: String
+  ): PlaidConnectAccountResponse!
+
+  """
+  Manually request a sync for Plaid account
+  """
+  syncPlaidAccount(
+    """
+    The connected account to refresh
+    """
+    connectedAccount: ConnectedAccountReferenceInput!
+  ): TransactionsImport!
+
+  """
   [Root only] Edits account flags (deleted, banned, archived, trusted host)
   """
   editAccountFlags(
@@ -19343,6 +20012,26 @@ type Mutation {
   ): TransactionsImport!
 
   """
+  Edit an import
+  """
+  editTransactionsImport(
+    """
+    ID of the import to edit
+    """
+    id: NonEmptyString!
+
+    """
+    Source of the import (e.g. "Bank of America", "Eventbrite", etc...)
+    """
+    source: NonEmptyString
+
+    """
+    Name of the import (e.g. "Contributions May 2021", "Tickets for Mautic Conference 2024")
+    """
+    name: NonEmptyString
+  ): TransactionsImport!
+
+  """
   Import transactions, manually or from a CSV file
   """
   importTransactions(
@@ -19379,8 +20068,28 @@ type Mutation {
     """
     Rows to update
     """
-    rows: [TransactionsImportRowUpdateInput!]!
+    rows: [TransactionsImportRowUpdateInput!]
+
+    """
+    Whether to ignore all non-processed rows
+    """
+    dismissAll: Boolean
+
+    """
+    Whether to restore all dismissed rows
+    """
+    restoreAll: Boolean
   ): TransactionsImport!
+
+  """
+  Delete an import and all its associated rows
+  """
+  deleteTransactionsImport(
+    """
+    ID of the import to delete
+    """
+    id: NonEmptyString!
+  ): Boolean!
 
   """
   Create update. Scope: "updates".
@@ -21464,6 +22173,40 @@ A Stripe setup intent
 input SetupIntentInput {
   id: String!
   stripeAccount: String!
+}
+
+type PlaidLinkTokenCreateResponse {
+  """
+  The link token that will be used to initialize the Plaid Link flow.
+  """
+  linkToken: String!
+
+  """
+  The expiration date for the link token in ISO 8601 format.
+  """
+  expiration: String!
+
+  """
+  A unique identifier for the request, which can be used for troubleshooting.
+  """
+  requestId: String!
+
+  """
+  A URL of a Plaid-hosted Link flow that will use the Link token returned by this request. Only present if the client is enabled for Host
+  """
+  hostedLinkUrl: String
+}
+
+type PlaidConnectAccountResponse {
+  """
+  The connected account that was created
+  """
+  connectedAccount: ConnectedAccount!
+
+  """
+  The transactions import that was created
+  """
+  transactionsImport: TransactionsImport!
 }
 
 enum AccountCacheType {

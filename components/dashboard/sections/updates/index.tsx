@@ -200,11 +200,11 @@ enum UpdateDashboardAction {
   NEW = 'new',
 }
 
-const Updates = ({ subpath }: DashboardSectionProps) => {
+const Updates = ({ subpath, accountSlug }: DashboardSectionProps) => {
   const [action, id] = subpath;
 
   if (Object.values(UpdateDashboardAction).includes(action as UpdateDashboardAction)) {
-    return <UpdateFormView updateId={action === UpdateDashboardAction.EDIT ? id : null} />;
+    return <UpdateFormView updateId={action === UpdateDashboardAction.EDIT ? id : null} accountSlug={accountSlug} />;
   } else if (action) {
     return <SingleUpdateView updateId={action} />;
   } else {

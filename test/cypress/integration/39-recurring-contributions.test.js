@@ -1,3 +1,5 @@
+import * as cheerio from 'cheerio';
+
 describe('Recurring contributions', () => {
   let user;
   let collectiveSlug;
@@ -150,7 +152,7 @@ describe('Recurring contributions', () => {
   });
 
   it('Can cancel an active contribution with reasons displayed in modal, "other" displays text area', () => {
-    cy.clearInbox();
+    cy.mailpitDeleteAllEmails();
     cy.login({ email: user.email, redirect: `/dashboard/${user.collective.slug}/outgoing-contributions` }).then(() => {
       cy.get('tbody tr td button').first().click();
       cy.getByDataCy('recurring-contribution-menu-cancel-option').click();
@@ -168,8 +170,11 @@ describe('Recurring contributions', () => {
           cy.getByDataCy('toast-notification').contains('Your recurring contribution has been cancelled');
           cy.getByDataCy('contribution-status').contains('Canceled');
         });
-      cy.openEmail(({ subject }) => subject.includes(`Contribution cancelled to Test Collective`));
-      cy.contains('Because I want to');
+      cy.openEmail(({ Subject }) => Subject.includes(`Contribution cancelled to Test Collective`)).then(email => {
+        const $html = cheerio.load(email.HTML);
+        const emailBody = $html('body').text();
+        expect(emailBody).to.include('Because I want to');
+      });
     });
   });
 });

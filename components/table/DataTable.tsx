@@ -4,6 +4,7 @@ import type {
   ColumnDef,
   OnChangeFn,
   Row,
+  RowSelectionState,
   SortingState,
   TableMeta,
   VisibilityState,
@@ -51,6 +52,9 @@ interface DataTableProps<TData, TValue> {
   defaultColumnVisibility?: VisibilityState;
   queryFilter?: useQueryFilterReturnType<any, any>;
   getActions?: GetActions<TData>;
+  rowSelection?: Record<string, boolean>;
+  setRowSelection?: OnChangeFn<RowSelectionState>;
+  enableMultiRowSelection?: boolean;
 }
 
 const defaultGetRowId = (data: any) => data.id;
@@ -78,6 +82,9 @@ export function DataTable<TData, TValue>({
   setColumnVisibility,
   queryFilter,
   getActions,
+  rowSelection: rowSelectionFromProps,
+  setRowSelection: setRowSelectionFromProps,
+  enableMultiRowSelection,
   meta, // TODO: Possibly remove this prop once the getActions pattern is implemented fully
   ...tableProps
 }: DataTableProps<TData, TValue>) {
@@ -96,12 +103,13 @@ export function DataTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
-    onRowSelectionChange: setRowSelection,
+    onRowSelectionChange: setRowSelectionFromProps ?? setRowSelection,
+    enableMultiRowSelection,
     getRowId,
     onColumnVisibilityChange: setColumnVisibility,
     state: {
       sorting,
-      rowSelection,
+      rowSelection: rowSelectionFromProps ?? rowSelection,
       columnVisibility,
     },
     meta: {

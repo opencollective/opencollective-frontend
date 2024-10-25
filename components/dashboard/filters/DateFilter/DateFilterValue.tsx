@@ -1,15 +1,17 @@
 import React from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nDateFilterLabel } from '../../../../lib/i18n/date-filter';
-
-import DateTime from '../../../DateTime';
 
 import type { DateFilterValueType } from './schema';
 import { DateFilterType } from './schema';
 
-const OneLineDate = ({ value, ...props }) =>
-  value ? <DateTime className="inline-block whitespace-nowrap" value={value} {...props} /> : null;
+const OneLineDate = ({ value }) => {
+  // Passing timeZone="utc" to FormattedDate means that we will not convert this date to the local users timezone,
+  // since they have already decided what timezone to use when setting this date.
+  // Otherwise, the date would be converted to the local users timezone, which would be incorrect.
+  return value ? <FormattedDate timeZone="utc" dateStyle={'medium'} value={value} /> : null;
+};
 
 const getMessage = (intl, dateRange: DateFilterValueType) => {
   switch (dateRange.type) {
@@ -26,7 +28,7 @@ const getMessage = (intl, dateRange: DateFilterValueType) => {
         <FormattedMessage
           defaultMessage="On {date}"
           id="KGXk/j"
-          values={{ date: <OneLineDate value={dateRange.gte} dateStyle="medium" /> }}
+          values={{ date: <OneLineDate value={dateRange.gte} /> }}
         />
       );
     case DateFilterType.BETWEEN:
@@ -35,8 +37,8 @@ const getMessage = (intl, dateRange: DateFilterValueType) => {
           defaultMessage="{dateFrom} to {dateTo}"
           id="76YT3Y"
           values={{
-            dateFrom: <OneLineDate value={dateRange.gte} dateStyle="medium" />,
-            dateTo: <OneLineDate value={dateRange.lte} dateStyle="medium" />,
+            dateFrom: <OneLineDate value={dateRange.gte} />,
+            dateTo: <OneLineDate value={dateRange.lte} />,
           }}
         />
       );
@@ -45,7 +47,7 @@ const getMessage = (intl, dateRange: DateFilterValueType) => {
         <FormattedMessage
           defaultMessage="After {date}"
           id="Bl8xZP"
-          values={{ date: <OneLineDate value={dateRange.gt} dateStyle="medium" /> }}
+          values={{ date: <OneLineDate value={dateRange.gt} /> }}
         />
       );
     case DateFilterType.ON_OR_AFTER:
@@ -53,7 +55,7 @@ const getMessage = (intl, dateRange: DateFilterValueType) => {
         <FormattedMessage
           defaultMessage="Starting from {date}"
           id="iCd6C/"
-          values={{ date: <OneLineDate value={dateRange.gte} dateStyle="medium" /> }}
+          values={{ date: <OneLineDate value={dateRange.gte} /> }}
         />
       );
     case DateFilterType.BEFORE:
@@ -61,7 +63,7 @@ const getMessage = (intl, dateRange: DateFilterValueType) => {
         <FormattedMessage
           defaultMessage="Before {date}"
           id="U5sjCv"
-          values={{ date: <OneLineDate value={dateRange.lt} dateStyle="medium" /> }}
+          values={{ date: <OneLineDate value={dateRange.lt} /> }}
         />
       );
     case DateFilterType.BEFORE_OR_ON:
@@ -69,7 +71,7 @@ const getMessage = (intl, dateRange: DateFilterValueType) => {
         <FormattedMessage
           defaultMessage="Ending on {date}"
           id="VXJpMP"
-          values={{ date: <OneLineDate value={dateRange.lte} dateStyle="medium" /> }}
+          values={{ date: <OneLineDate value={dateRange.lte} /> }}
         />
       );
     default:

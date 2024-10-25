@@ -33,41 +33,44 @@ export default function SmallThread(props: SmallThreadProps) {
 
   return (
     <React.Fragment>
-      <div data-cy="thread">
-        {props.loading && <Loading />}
-        {!props.loading &&
-          props.items.map(item => {
-            switch (item.__typename) {
-              case 'Comment': {
-                return (
-                  <Comment
-                    key={`comment-${item.id}`}
-                    comment={item}
-                    variant="small"
-                    canDelete={isAdmin || Boolean(LoggedInUser && LoggedInUser.canEditComment(item))}
-                    canEdit={Boolean(LoggedInUser && LoggedInUser.canEditComment(item))}
-                    canReply={Boolean(LoggedInUser)}
-                    onDelete={props.onCommentDeleted}
-                    reactions={item.reactions}
-                    onReplyClick={setReplyingToComment}
-                  />
-                );
+      {/* Override the parent padding with negative margins to make sure the "Note" amber background can take the full width */}
+      <div className="mx-[-24px]">
+        <div data-cy="thread">
+          {props.loading && <Loading />}
+          {!props.loading &&
+            props.items.map(item => {
+              switch (item.__typename) {
+                case 'Comment': {
+                  return (
+                    <Comment
+                      key={`comment-${item.id}`}
+                      comment={item}
+                      variant="small"
+                      canDelete={isAdmin || Boolean(LoggedInUser && LoggedInUser.canEditComment(item))}
+                      canEdit={Boolean(LoggedInUser && LoggedInUser.canEditComment(item))}
+                      canReply={Boolean(LoggedInUser)}
+                      onDelete={props.onCommentDeleted}
+                      reactions={item.reactions}
+                      onReplyClick={setReplyingToComment}
+                    />
+                  );
+                }
+                case 'Activity':
+                  return !isSupportedActivity(item) ? null : (
+                    <SmallThreadActivity key={`activity-${item.id}`} activity={item} />
+                  );
+                default:
+                  return null;
               }
-              case 'Activity':
-                return !isSupportedActivity(item) ? null : (
-                  <SmallThreadActivity key={`activity-${item.id}`} activity={item} />
-                );
-              default:
-                return null;
-            }
-          })}
-        {!props.loading && props.hasMore && props.fetchMore && (
-          <div className="mt-2 flex justify-center">
-            <Button variant="outline" onClick={handleLoadMore} loading={loading} className="capitalize">
-              <FormattedMessage id="loadMore" defaultMessage="load more" /> ↓
-            </Button>
-          </div>
-        )}
+            })}
+          {!props.loading && props.hasMore && props.fetchMore && (
+            <div className="mt-2 flex justify-center">
+              <Button variant="outline" onClick={handleLoadMore} loading={loading} className="capitalize">
+                <FormattedMessage id="loadMore" defaultMessage="load more" /> ↓
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
       {props.canComment && (
         <div className="flex gap-4 py-4">
