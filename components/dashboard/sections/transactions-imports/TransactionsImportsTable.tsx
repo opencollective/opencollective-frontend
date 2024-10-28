@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { FileUp, Landmark } from 'lucide-react';
+import { FileUp, Landmark, RefreshCw } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -24,6 +24,7 @@ import { useToast } from '../../../ui/useToast';
 import DashboardHeader from '../../DashboardHeader';
 import { Pagination } from '../../filters/Pagination';
 
+import { ImportProgressBadge } from './ImportProgressBadge';
 import { NewCSVTransactionsImportDialog } from './NewCSVTransactionsImportDialog';
 
 const NB_IMPORTS_DISPLAYED = 20;
@@ -46,7 +47,7 @@ export const TransactionsImportsTable = ({ accountSlug }) => {
   });
   const onPlaidConnectSuccess = React.useCallback(
     async ({ transactionsImport }) => {
-      router.push(`/dashboard/${accountSlug}/host-transactions/import/${transactionsImport.id}?step=last`);
+      refetch();
       toast({
         variant: 'success',
         title: intl.formatMessage({ defaultMessage: 'Bank account connected', id: 'fGNAg9' }),
@@ -55,9 +56,9 @@ export const TransactionsImportsTable = ({ accountSlug }) => {
           id: 'YZGI7N',
         }),
       });
-      refetch();
+      router.push(`/dashboard/${accountSlug}/host-transactions/import/${transactionsImport.id}?step=last`);
     },
-    [accountSlug, refetch, router],
+    [intl, toast, accountSlug, refetch, router],
   );
   const plaidConnectDialog = usePlaidConnectDialog({ host: data?.host, onSuccess: onPlaidConnectSuccess });
 
@@ -119,26 +120,27 @@ export const TransactionsImportsTable = ({ accountSlug }) => {
                 },
               },
               {
-                header: intl.formatMessage({ defaultMessage: 'Last Import Date', id: 'WonClV' }),
-                accessorKey: 'updatedAt',
-                cell: ({ cell }) => <DateTime value={cell.getValue() as Date} />,
-              },
-              {
                 id: 'stats',
                 header: intl.formatMessage({ defaultMessage: 'Processed', id: 'TransactionsImport.processed' }),
                 accessorKey: 'stats',
                 cell: ({ cell }) => {
                   const stats = cell.getValue() as TransactionsImport['stats'];
-                  if (!stats.total) {
-                    return (
-                      <Badge type="neutral">
-                        <FormattedMessage defaultMessage="Not started" id="d5xXmT" />
-                      </Badge>
-                    );
-                  }
-
-                  const percent = Math.floor((stats.processed / stats.total) * 100);
-                  return <Badge type={percent === 100 ? 'success' : 'warning'}>{percent}%</Badge>;
+                  return <ImportProgressBadge progress={!stats.total ? null : stats.processed / stats.total} />;
+                },
+              },
+              {
+                header: intl.formatMessage({ defaultMessage: 'Last sync', id: 'transactions.import.lastSync' }),
+                accessorKey: 'lastSyncAt',
+                cell: ({ cell }) => {
+                  const value = cell.getValue() as string;
+                  return value ? (
+                    <DateTime value={new Date(value)} timeStyle="short" dateStyle="short" />
+                  ) : (
+                    <Badge type="info" className="whitespace-nowrap">
+                      {intl.formatMessage({ defaultMessage: 'In progress', id: 'syncInProgress' })}&nbsp;
+                      <RefreshCw size={12} className="animate-spin duration-1500" />
+                    </Badge>
+                  );
                 },
               },
               {

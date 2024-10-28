@@ -129,11 +129,9 @@ ReplyButton.propTypes = {
 };
 
 AdminActionButtons.propTypes = {
-  comment: PropTypes.object.isRequired,
   openDeleteConfirmation: PropTypes.func,
   onEdit: PropTypes.func,
   closePopup: PropTypes.func,
-  isConversationRoot: PropTypes.bool,
   canEdit: PropTypes.bool,
   canDelete: PropTypes.bool,
   copyLinkToClipboard: PropTypes.func,
