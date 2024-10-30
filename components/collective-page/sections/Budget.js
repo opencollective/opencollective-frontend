@@ -95,6 +95,14 @@ const budgetSectionAccountFieldsFragment = gql`
         valueInCents
         currency
       }
+      totalAmountSpent: totalAmountSpent {
+        valueInCents
+        currency
+      }
+      totalNetAmountSpent: totalAmountSpent(net: true) {
+        valueInCents
+        currency
+      }
     }
   }
 `;

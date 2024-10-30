@@ -163,11 +163,32 @@ const BudgetStats = ({ collective, stats, horizontal }) => {
           <StatContainer borderTop={borderTop}>
             <StatTitle>
               <Expand size="12px" />
-              <FormattedMessage id="budgetSection-disbursed" defaultMessage="Total disbursed" />
+              <DefinedTerm
+                term={Terms.TOTAL_SPENT}
+                textTransform="uppercase"
+                color="black.700"
+                extraTooltipContent={
+                  <Box mt={2}>
+                    <FormattedMessage
+                      id="budgetSection-spent-total"
+                      defaultMessage="Total spent before fees: {amount}"
+                      values={{
+                        amount: formatCurrency(
+                          Math.abs(stats.totalAmountSpent.valueInCents) || 0,
+                          stats.totalAmountSpent.currency,
+                          {
+                            locale,
+                          },
+                        ),
+                      }}
+                    />
+                  </Box>
+                }
+              />
             </StatTitle>
             <StatAmount
-              amount={stats.totalNetAmountRaised.valueInCents - stats.balance.valueInCents}
-              currency={collective.currency}
+              amount={Math.abs(stats.totalNetAmountSpent.valueInCents)}
+              currency={stats.totalNetAmountSpent.currency}
             />
           </StatContainer>
           {!isFund && stats.totalAmountReceived && stats.yearlyBudget && stats.activeRecurringContributions && (
@@ -261,6 +282,7 @@ BudgetStats.propTypes = {
     totalAmountRaised: AmountPropTypeShape,
     totalNetAmountRaised: AmountPropTypeShape,
     totalAmountSpent: AmountPropTypeShape,
+    totalNetAmountSpent: AmountPropTypeShape,
     totalPaidExpenses: AmountPropTypeShape,
   }),
 

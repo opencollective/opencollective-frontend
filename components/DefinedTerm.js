@@ -22,6 +22,7 @@ export const Terms = {
   ESTIMATED_BUDGET: 'ESTIMATED_BUDGET',
   EXPENSE_TYPE: 'EXPENSE_TYPE',
   TOTAL_RAISED: 'TOTAL_RAISED',
+  TOTAL_SPENT: 'TOTAL_SPENT',
   TOTAL_INCOME: 'TOTAL_INCOME',
   BALANCE: 'BALANCE',
 };
@@ -54,6 +55,10 @@ const TranslatedTerms = defineMessages({
   [Terms.TOTAL_RAISED]: {
     id: 'budgetSection-raised',
     defaultMessage: 'Total raised',
+  },
+  [Terms.TOTAL_SPENT]: {
+    id: 'budgetSection-spent',
+    defaultMessage: 'Total disbursed.',
   },
   [Terms.TOTAL_INCOME]: {
     id: 'budgetSection-income',
@@ -97,6 +102,10 @@ const TranslatedDefinitions = defineMessages({
   [Terms.TOTAL_RAISED]: {
     id: 'budgetSection-raised-definition',
     defaultMessage: 'Total net amount available to spend after fees.',
+  },
+  [Terms.TOTAL_SPENT]: {
+    id: 'budgetSection-spent-definition',
+    defaultMessage: 'Total amount spent after fees.',
   },
   [Terms.TOTAL_INCOME]: {
     id: 'budgetSection-total-income-definition',
