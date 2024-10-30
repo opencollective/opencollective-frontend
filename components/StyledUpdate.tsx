@@ -125,7 +125,7 @@ class StyledUpdate extends Component<StyledUpdateProps, { mode: string; modified
     const fromAccount = update.fromCollective || update.fromAccount;
 
     return (
-      <div data-cy="meta" className="flex items-baseline gap-2">
+      <div data-cy="meta" className="flex flex-wrap items-baseline gap-2">
         {isAdmin && <UpdateStatus update={update} />}
         {update.publishedAt ? (
           <Box as="span" fontSize="12px">
