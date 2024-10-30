@@ -1467,7 +1467,7 @@
   "Expense.Type.Settlement": "Abrechnung",
   "expense.type.tooltip": "Wähle \"Quittung\", wenn du für einen bereits getätigten Kauf eine Erstattung erhalten möchtest. Wähle \"Rechnung\", wenn du deine Zeit in Rechnung stellen oder im Voraus bezahlt werden möchtest oder wenn du keine Quittung hast.",
   "Expense.Type.Unclassified": "Nicht klassifiziert",
-  "expense.unapprove.btn": "Ungeprüft",
+  "expense.unapprove.btn": "Ablehnen",
   "expense.unschedulePayment.btn": "Unplanbare Zahlung",
   "ExpenseAmount": "Ausgabenbetrag",
   "ExpenseForm.AddAttachedFile": "Neues Dokument hinzufügen",
