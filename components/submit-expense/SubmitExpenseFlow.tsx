@@ -300,7 +300,11 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
           <div className="max-w-screen min-w-screen before:-z-1 relative flex max-h-screen min-h-screen flex-col overflow-hidden bg-[#F8FAFC] before:absolute before:left-0 before:right-0 before:top-0 before:h-44 before:rotate-180 before:[background:url('/static/images/home/fiscalhost-blue-bg-md.png')]">
             <header className="min-w-screen z-30 flex items-center justify-between border-b border-slate-100 px-4 py-3 sm:px-10">
               <span className="text-xl font-bold leading-7 text-slate-800">
-                Invoice #{submittedExpenseId} has been submitted successfully!
+                <FormattedMessage
+                  defaultMessage="Invoice #{submittedExpenseId} has been submitted successfully!"
+                  id="cMGymL"
+                  values={{ submittedExpenseId }}
+                />
               </span>
               <Button
                 onClick={handleOnClose}
@@ -327,7 +331,10 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
             </main>
             <DialogFooter className="z-30 flex justify-center p-4 sm:justify-center sm:px-0">
               <Button onClick={handleOnClose}>
-                <FormattedMessage defaultMessage="View all expenses" id="CollectivePage.SectionBudget.ViewAllExpenses" />
+                <FormattedMessage
+                  defaultMessage="View all expenses"
+                  id="CollectivePage.SectionBudget.ViewAllExpenses"
+                />
               </Button>
             </DialogFooter>
           </div>

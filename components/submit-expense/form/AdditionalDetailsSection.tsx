@@ -1,4 +1,5 @@
 import React from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { expenseTagsQuery } from '../../dashboard/filters/ExpenseTagsFilter';
 import { AutocompleteEditTags } from '../../EditTags';
@@ -18,6 +19,7 @@ type AdditionalDetailsSectionProps = {
 };
 
 export function AdditionalDetailsSection(props: AdditionalDetailsSectionProps) {
+  const intl = useIntl();
   const expenseTags = props.form.values.tags;
   const expenseTypeOption = props.form.values.expenseTypeOption;
   const collectiveSlug = props.form.values.accountSlug;
@@ -27,7 +29,7 @@ export function AdditionalDetailsSection(props: AdditionalDetailsSectionProps) {
       <StyledInputFormikField
         disabled={props.form.initialLoading}
         name="title"
-        placeholder="Mention a brief expense title"
+        placeholder={intl.formatMessage({ defaultMessage: 'Mention a brief expense title', id: 'Te2Yc2' })}
       />
 
       {!props.form.initialLoading &&
@@ -35,7 +37,7 @@ export function AdditionalDetailsSection(props: AdditionalDetailsSectionProps) {
         props.form.options?.host?.slug !== props.form.options.account?.slug && (
           <div className="mt-4">
             <ExpensePolicyContainer
-              title="Host Instructions for titles"
+              title={<FormattedMessage defaultMessage="Host Instructions for titles" id="R7O6Sr" />}
               policy={props.form.options.host?.policies?.EXPENSE_POLICIES?.titlePolicy}
               checked={props.form.values.acknowledgedHostTitleExpensePolicy}
               onAcknowledgedChanged={v => props.form.setFieldValue('acknowledgedHostTitleExpensePolicy', v)}
@@ -46,7 +48,7 @@ export function AdditionalDetailsSection(props: AdditionalDetailsSectionProps) {
       {!props.form.initialLoading && props.form.options.account?.policies?.EXPENSE_POLICIES?.titlePolicy && (
         <div className="mt-4">
           <ExpensePolicyContainer
-            title="Collective Instructions for titles"
+            title={<FormattedMessage defaultMessage="Collective Instructions for titles" id="ZcXTLk" />}
             policy={props.form.options.account?.policies?.EXPENSE_POLICIES?.titlePolicy}
             checked={props.form.values.acknowledgedCollectiveTitleExpensePolicy}
             onAcknowledgedChanged={v => props.form.setFieldValue('acknowledgedCollectiveTitleExpensePolicy', v)}
@@ -54,7 +56,9 @@ export function AdditionalDetailsSection(props: AdditionalDetailsSectionProps) {
         </div>
       )}
 
-      <Label className="mb-2 mt-4">Tag your expense</Label>
+      <Label className="mb-2 mt-4">
+        <FormattedMessage defaultMessage="Tag your expense" id="EosA8s" />
+      </Label>
       <div className="flex items-center gap-1">
         {props.form.initialLoading ? (
           <LoadingPlaceholder height={20} width={50} />

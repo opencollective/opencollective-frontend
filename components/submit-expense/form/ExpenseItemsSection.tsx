@@ -229,14 +229,18 @@ function ExpenseItem(props: ExpenseItemProps) {
           <div className="mb-2">
             <StyledInputFormikField
               isFastField
-              label="Item Description"
-              placeholder="Enter what best describes the item"
+              label={intl.formatMessage({ defaultMessage: 'Item Description', id: 'xNL/oy' })}
+              placeholder={intl.formatMessage({ defaultMessage: 'Enter what best describes the item', id: '/eapvj' })}
               name={`expenseItems.${props.index}.description`}
             />
           </div>
           <div className="flex gap-4">
             <div className="flex-grow basis-0">
-              <StyledInputFormikField isFastField label="Date" name={`expenseItems.${props.index}.incurredAt`}>
+              <StyledInputFormikField
+                isFastField
+                label={intl.formatMessage({ defaultMessage: 'Date', id: 'expense.incurredAt' })}
+                name={`expenseItems.${props.index}.incurredAt`}
+              >
                 {({ field }) => <Input type="date" {...field} />}
               </StyledInputFormikField>
             </div>
@@ -244,8 +248,7 @@ function ExpenseItem(props: ExpenseItemProps) {
             <div className="flex-grow basis-0">
               <div className="flex flex-col">
                 <StyledInputFormikField
-                  label="Amount"
-                  placeholder="Enter what best describes the item"
+                  label={intl.formatMessage({ defaultMessage: 'Amount', id: 'Fields.amount' })}
                   name={`expenseItems.${props.index}.amount.valueInCents`}
                 >
                   {() => (
@@ -326,7 +329,9 @@ function AdditionalAttachments(props: AdditionalAttachmentsProps) {
 
   return (
     <div>
-      <Label htmlFor="additionalAttachments">Additional Attachments (Optional)</Label>
+      <Label htmlFor="additionalAttachments">
+        <FormattedMessage defaultMessage="Additional Attachments (Optional)" id="n3evmu" />
+      </Label>
       <div className="flex flex-wrap gap-4 pt-2">
         <div>
           <StyledDropzone
@@ -399,7 +404,7 @@ function Taxes(props: { form: ExpenseForm }) {
 
   return (
     <div>
-      <StyledInputFormikField label="Taxes" name="hasTax">
+      <StyledInputFormikField label={intl.formatMessage({ defaultMessage: 'Taxes', id: 'r+dgiv' })} name="hasTax">
         {() => (
           <StyledCheckbox
             name="hasTax"

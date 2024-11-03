@@ -115,7 +115,10 @@ export function PayoutMethodSection(props: PayoutMethodSectionProps) {
       !isPickingProfileAdministered &&
       !props.form.options.isAdminOfPayee ? (
         <MessageBox type="info">
-          The person you are inviting to submit this expense will be asked to provide payout method details.
+          <FormattedMessage
+            defaultMessage="The person you are inviting to submit this expense will be asked to provide payout method details."
+            id="LHdznY"
+          />
         </MessageBox>
       ) : (
         <RadioGroup
@@ -165,7 +168,7 @@ export function PayoutMethodSection(props: PayoutMethodSectionProps) {
                 disabled={isLoading || props.form.initialLoading}
               ></RadioGroupItem>
               <Label className={cn('flex min-h-16 flex-grow items-center p-4')} htmlFor="__newPayoutMethod">
-                New payout method
+                <FormattedMessage defaultMessage="New payout method" id="vJEJ0J" />
               </Label>
             </div>
             <div
@@ -280,7 +283,11 @@ function NewPayoutMethodOption(props: NewPayoutMethodOptionProps) {
         <LoadingPlaceholder width={1} height={24} />
       ) : (
         <React.Fragment>
-          <StyledInputFormikField label="Choose a payout method" isPrivate name="newPayoutMethod.type">
+          <StyledInputFormikField
+            label={intl.formatMessage({ defaultMessage: 'Choose a payout method', id: 'SlAq2H' })}
+            isPrivate
+            name="newPayoutMethod.type"
+          >
             {({ field }) => (
               <StyledSelect
                 inputId="payoutMethodType"
@@ -313,7 +320,11 @@ function NewPayoutMethodOption(props: NewPayoutMethodOptionProps) {
                 host={props.form.options.host}
               />
               <div>
-                <StyledInputFormikField mt={2} label="Name" name="newPayoutMethod.name">
+                <StyledInputFormikField
+                  mt={2}
+                  label={intl.formatMessage({ defaultMessage: 'Name', id: 'Fields.name' })}
+                  name="newPayoutMethod.name"
+                >
                   {({ field }) => (
                     <StyledInput {...field} onFocus={() => props.form.setFieldTouched('newPayoutMethod.name', true)} />
                   )}
@@ -329,7 +340,7 @@ function NewPayoutMethodOption(props: NewPayoutMethodOptionProps) {
                     className="p-0"
                     onClick={() => props.form.setFieldTouched('newPayoutMethod.name', false)}
                   >
-                    Use default generated name
+                    <FormattedMessage defaultMessage="Use default generated name" id="+6P7pM" />
                   </Button>
                 )}
               </div>
@@ -587,7 +598,7 @@ function PayoutMethodRadioGroupItem(props: {
                     />
                     <StyledInputFormikField
                       mt={2}
-                      label="Name"
+                      label={intl.formatMessage({ defaultMessage: 'Name', id: 'Fields.name' })}
                       name={`editingPayoutMethod.${props.payoutMethod.id}.name`}
                     >
                       {({ field }) => (
@@ -607,7 +618,7 @@ function PayoutMethodRadioGroupItem(props: {
                         className="p-0"
                         onClick={() => setFieldTouched(`editingPayoutMethod.${props.payoutMethod.id}.name`, false)}
                       >
-                        Use default generated name
+                        <FormattedMessage defaultMessage="Use default generated name" id="+6P7pM" />
                       </Button>
                     )}
                   </React.Fragment>
@@ -619,10 +630,10 @@ function PayoutMethodRadioGroupItem(props: {
                     variant="secondary"
                     onClick={() => setIsEditingPayoutMethod(false)}
                   >
-                    Cancel
+                    <FormattedMessage defaultMessage="Cancel" id="actions.cancel" />
                   </Button>
                   <Button loading={isLoadingEditPayoutMethod} onClick={onSaveClick}>
-                    Save
+                    <FormattedMessage defaultMessage="Save" id="save" />
                   </Button>
                 </div>
               </React.Fragment>
@@ -631,14 +642,23 @@ function PayoutMethodRadioGroupItem(props: {
                 {isMissingCurrency && (
                   <div className="mt-2">
                     <MessageBox type="warning">
-                      <div className="mb-2 font-bold">Missing currency</div>
-                      <div>Your payout method is missing a currency. Please edit your payout method to update it.</div>
+                      <div className="mb-2 font-bold">
+                        <FormattedMessage defaultMessage="Missing currency" id="dkeCt1" />
+                      </div>
+                      <div>
+                        <FormattedMessage
+                          defaultMessage="Your payout method is missing a currency. Please edit your payout method to update it."
+                          id="nrG4vz"
+                        />
+                      </div>
                     </MessageBox>
                   </div>
                 )}
                 {hasLegalNameMismatch && !legalNameUpdated && (
                   <MessageBox type="warning">
-                    <div className="mb-2 font-bold">The names you provided do not match.</div>
+                    <div className="mb-2 font-bold">
+                      <FormattedMessage defaultMessage="The names you provided do not match." id="XAPZa0" />
+                    </div>
                     <div>
                       <FormattedMessage
                         defaultMessage="The legal name in the payee profile is: {legalName}."
@@ -661,7 +681,10 @@ function PayoutMethodRadioGroupItem(props: {
                     {!keepNameDifferent && (
                       <React.Fragment>
                         <div className="mb-2 mt-4 font-bold">
-                          Would you like to update your legal name to match your payout method contact name?
+                          <FormattedMessage
+                            defaultMessage=" Would you like to update your legal name to match your payout method contact name?"
+                            id="fEYP7x"
+                          />
                         </div>
 
                         <div className="flex gap-4">
@@ -671,10 +694,10 @@ function PayoutMethodRadioGroupItem(props: {
                             variant="outline"
                             onClick={onUpdateLegalNameToMatch}
                           >
-                            Yes, Update and Match
+                            <FormattedMessage defaultMessage="Yes, Update and Match" id="qjpM/f" />
                           </Button>
                           <Button disabled={loading} variant="outline" onClick={() => setKeepNameDifferent(true)}>
-                            No, Keep Them Different
+                            <FormattedMessage defaultMessage="No, Keep Them Different" id="PCBOGA" />
                           </Button>
                         </div>
                       </React.Fragment>
@@ -682,14 +705,22 @@ function PayoutMethodRadioGroupItem(props: {
                     {keepNameDifferent && (
                       <StyledInputFormikField
                         mt={4}
-                        label="Please explain why they are different"
+                        label={intl.formatMessage({
+                          defaultMessage: 'Please explain why they are different',
+                          id: 'bzGbkJ',
+                        })}
                         name="payoutMethodNameDiscrepancyReason"
                       />
                     )}
                   </MessageBox>
                 )}
                 {legalNameUpdated && (
-                  <MessageBox type="warning">Legal name is updated to match the payout method name.</MessageBox>
+                  <MessageBox type="warning">
+                    <FormattedMessage
+                      defaultMessage="Legal name is updated to match the payout method name."
+                      id="TI6gwx"
+                    />
+                  </MessageBox>
                 )}
                 {isPayoutMethodDetailsOpen && (
                   <div className="grid grid-cols-3 gap-2 *:p-2 *:last:mb-0">

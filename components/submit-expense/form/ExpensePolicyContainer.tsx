@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
+import { FormattedMessage } from 'react-intl';
 
 import HTMLContent from '../../HTMLContent';
 import MessageBox from '../../MessageBox';
@@ -52,7 +53,10 @@ export function ExpensePolicyContainer(props: ExpensePolicyContainerProps) {
                       }
                     }}
                   />
-                  I have read and understood the instructions and conditions
+                  <FormattedMessage
+                    defaultMessage="I have read and understood the instructions and conditions"
+                    id="3RrjeI"
+                  />
                 </label>
               </MessageBox>
             </div>

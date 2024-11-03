@@ -3,7 +3,7 @@ import { useQuery } from '@apollo/client';
 import { groupBy, isEmpty } from 'lodash';
 import { X } from 'lucide-react';
 import Image from 'next/image';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { gqlV1 } from '../../../lib/graphql/helpers';
 import { AccountType } from '../../../lib/graphql/types/v2/graphql';
@@ -180,7 +180,7 @@ function DefaultState() {
   return (
     <div className="flex items-center justify-center gap-4 text-lg font-bold">
       <Image alt="" width={48} height={48} src="/static/images/magnifier.png" />
-      Search for Hosts, Collectives, projects and events
+      <FormattedMessage defaultMessage="Search for Hosts, Collectives, projects and events" id="i3IPjW" />
     </div>
   );
 }
@@ -189,7 +189,7 @@ function EmptyState() {
   return (
     <div className="flex items-center justify-center gap-4 text-lg font-bold">
       <Image alt="" width={48} height={48} src="/static/images/magnifier.png" />
-      No results
+      <FormattedMessage defaultMessage="No results found." id="V5JQj+" />
     </div>
   );
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import { gql, useMutation } from '@apollo/client';
 import { isEmpty } from 'lodash';
 import { Lock } from 'lucide-react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../lib/errors';
 import { gqlV1 } from '../../../lib/graphql/helpers';
@@ -179,7 +179,7 @@ export function WhoIsGettingPaidSection(props: WhoIsGettingPaidSectionProps) {
                 checked={isMyOtherProfilesSelected}
               ></RadioGroupItem>
               <Label className={cn('flex min-h-16 flex-grow items-center p-4')} htmlFor="__findAccountIAdminister">
-                An account I administer
+                <FormattedMessage defaultMessage="An account I administer" id="ZRMBXB" />
               </Label>
             </div>
             <div
@@ -211,7 +211,7 @@ export function WhoIsGettingPaidSection(props: WhoIsGettingPaidSectionProps) {
               checked={!props.form.initialLoading && isOtherUserAccountSelected}
             ></RadioGroupItem>
             <Label className={cn('flex min-h-16 flex-grow items-center p-4')} htmlFor="__inviteExistingUser">
-              Another account on the platform
+              <FormattedMessage defaultMessage="Another account on the platform" id="7IUQ/2" />
             </Label>
           </div>
           <div
@@ -234,7 +234,7 @@ export function WhoIsGettingPaidSection(props: WhoIsGettingPaidSectionProps) {
           <div className="flex items-center">
             <RadioGroupItem className="ml-4" value="__invite" disabled={props.form.initialLoading}></RadioGroupItem>
             <Label className={cn('flex min-h-16 flex-grow items-center p-4')} htmlFor="__invite">
-              Invite someone
+              <FormattedMessage defaultMessage="Invite someone" id="SMZ/xh" />
             </Label>
           </div>
           <div
@@ -255,7 +255,7 @@ export function WhoIsGettingPaidSection(props: WhoIsGettingPaidSectionProps) {
             <div className="flex items-center">
               <RadioGroupItem className="ml-4" value="__vendor" checked={isVendorSelected}></RadioGroupItem>
               <Label className={cn('flex min-h-16 flex-grow items-center p-4')} htmlFor="__vendor">
-                A vendor
+                <FormattedMessage defaultMessage="A vendor" id="rth3eX" />
               </Label>
             </div>
             <div
@@ -348,31 +348,37 @@ function LegalNameWarning(props: {
   if (legalNameUpdated) {
     return (
       <MessageBox type="success">
-        <div>Legal name updated</div>
+        <div>
+          <FormattedMessage defaultMessage="Legal name updated" id="aLu6aT" />
+        </div>
       </MessageBox>
     );
   }
 
   return (
     <MessageBox type="warning">
-      <div className="mb-2 font-bold">Legal name missing</div>
+      <div className="mb-2 font-bold">
+        <FormattedMessage defaultMessage="Legal name missing" id="Ftj4tT" />
+      </div>
       <div className="mb-4">
-        Your profile is missing a legal name. It is required for you to get paid. It is private information that only
-        collective and fiscal host administrators can see.
+        <FormattedMessage
+          defaultMessage="Your profile is missing a legal name. It is required for you to get paid. It is private information that only collective and fiscal host administrators can see."
+          id="F2lGTj"
+        />
       </div>
       <Label className="mb-2 flex gap-2">
-        Enter legal name <Lock size={14} />
+        <FormattedMessage defaultMessage="Enter legal name" id="6R5m9f" /> <Lock size={14} />
       </Label>
       <Input
         disabled={loading}
-        placeholder="E.g. Jogn Doe"
+        placeholder="E.g. John Doe"
         className="mb-2"
         type="text"
         value={legalName}
         onChange={e => setLegalName(e.target.value)}
       />
       <Button variant="outline" onClick={onSubmitLegalName} disabled={isEmpty(legalName) || loading} loading={loading}>
-        Save legal name
+        <FormattedMessage defaultMessage=" Save legal name" id="WslCdZ" />
       </Button>
     </MessageBox>
   );

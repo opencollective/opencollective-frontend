@@ -169,7 +169,7 @@ export function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
             }),
           )}
         >
-          Expense Details
+          <FormattedMessage defaultMessage="Expense Details" id="+5Kafe" />
         </li>
         {(props.activeStep !== Step.SUMMARY || hasErrors) &&
           stepOrder.map(step => (
@@ -195,7 +195,7 @@ export function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
             stepListItemVariants({ itemType: props.activeStep === Step.SUMMARY ? 'activeHeader' : 'header' }),
           )}
         >
-          Summary
+          <FormattedMessage defaultMessage="Summary" id="Summary" />
         </li>
       </ol>
     </div>

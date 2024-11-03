@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { ExpenseType } from '../../../lib/graphql/types/v2/graphql';
 import { cn } from '../../../lib/utils';
@@ -24,6 +24,7 @@ type TypeOfExpenseSectionProps = {
 };
 
 export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
+  const intl = useIntl();
   const expenseTypeOption = props.form.values.expenseTypeOption;
   const { toast } = useToast();
 
@@ -51,8 +52,12 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
                 htmlFor={ExpenseType.INVOICE}
               >
                 <div>
-                  <div className="mb-1">Invoice</div>
-                  <div className="text-muted-foreground">I am submitting an invoice to get paid</div>
+                  <div className="mb-1">
+                    <FormattedMessage defaultMessage="Invoice" id="Expense.Type.Invoice" />
+                  </div>
+                  <div className="text-muted-foreground">
+                    <FormattedMessage defaultMessage="I am submitting an invoice to get paid" id="plK07+" />
+                  </div>
                 </div>
               </Label>
             </div>
@@ -68,7 +73,7 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
                   props.form.options.host?.policies?.EXPENSE_POLICIES?.invoicePolicy && (
                     <div className="mt-4">
                       <ExpensePolicyContainer
-                        title="Host Instructions to submit an invoice"
+                        title={<FormattedMessage defaultMessage="Host instructions to submit an invoice" id="jXsDtM" />}
                         policy={props.form.options.host?.policies?.EXPENSE_POLICIES?.invoicePolicy}
                         checked={props.form.values.acknowledgedHostInvoiceExpensePolicy}
                         onAcknowledgedChanged={v => props.form.setFieldValue('acknowledgedHostInvoiceExpensePolicy', v)}
@@ -79,7 +84,9 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
                 {props.form.options.account?.policies?.EXPENSE_POLICIES?.invoicePolicy && (
                   <div className="mt-4">
                     <ExpensePolicyContainer
-                      title="Collective Instructions to submit an invoice"
+                      title={
+                        <FormattedMessage defaultMessage="Collective instructions to submit an invoice" id="NeQw7m" />
+                      }
                       policy={props.form.options.account?.policies?.EXPENSE_POLICIES?.invoicePolicy}
                       checked={props.form.values.acknowledgedCollectiveInvoiceExpensePolicy}
                       onAcknowledgedChanged={v =>
@@ -103,8 +110,12 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
                 htmlFor={ExpenseType.RECEIPT}
               >
                 <div>
-                  <div className="mb-1">Reimbursement</div>
-                  <div className="text-muted-foreground">I want a reimbursement for something I&apos;ve paid for</div>
+                  <div className="mb-1">
+                    <FormattedMessage defaultMessage="Reimbursement" id="ExpenseForm.ReceiptLabel" />
+                  </div>
+                  <div className="text-muted-foreground">
+                    <FormattedMessage defaultMessage="I want a reimbursement for something I've paid for" id="ZQSnky" />
+                  </div>
                 </div>
               </Label>
             </div>
@@ -120,7 +131,7 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
                   props.form.options.host?.policies?.EXPENSE_POLICIES?.receiptPolicy && (
                     <div className="mt-4">
                       <ExpensePolicyContainer
-                        title="Host Instructions to submit a receipt"
+                        title={<FormattedMessage defaultMessage="Host instructions to submit a receipt" id="YQgEUZ" />}
                         policy={props.form.options.host?.policies?.EXPENSE_POLICIES?.receiptPolicy}
                         checked={props.form.values.acknowledgedHostReceiptExpensePolicy}
                         onAcknowledgedChanged={v => props.form.setFieldValue('acknowledgedHostReceiptExpensePolicy', v)}
@@ -131,7 +142,9 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
                 {props.form.options.account?.policies?.EXPENSE_POLICIES?.receiptPolicy && (
                   <div className="mt-4">
                     <ExpensePolicyContainer
-                      title="Collective Instructions to submit a receipt"
+                      title={
+                        <FormattedMessage defaultMessage="Collective instructions to submit a receipt" id="cP95i8" />
+                      }
                       policy={props.form.options.host?.policies?.EXPENSE_POLICIES?.receiptPolicy}
                       checked={props.form.values.acknowledgedCollectiveReceiptExpensePolicy}
                       onAcknowledgedChanged={v =>
@@ -147,20 +160,31 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
 
         {!props.form.initialLoading && expenseTypeOption === ExpenseType.INVOICE && (
           <div className="mt-4 rounded-md border border-gray-300 p-4">
-            <Label>An invoice is required. Do you have one?</Label>
+            <Label>
+              <FormattedMessage defaultMessage="An invoice is required. Do you have one?" id="O+LW+y" />
+            </Label>
             <Tabs
               value={props.form.values.hasInvoiceOption}
               onValueChange={newValue => props.form.setFieldValue('hasInvoiceOption', newValue as YesNoOption)}
             >
               <TabsList>
-                <TabsTrigger value={YesNoOption.YES}>Yes, I have an invoice</TabsTrigger>
-                <TabsTrigger value={YesNoOption.NO}>No, generate an invoice for me</TabsTrigger>
+                <TabsTrigger value={YesNoOption.YES}>
+                  <FormattedMessage defaultMessage="Yes, I have an invoice" id="woKQYE" />
+                </TabsTrigger>
+                <TabsTrigger value={YesNoOption.NO}>
+                  <FormattedMessage defaultMessage="No, generate an invoice for me" id="67idHB" />
+                </TabsTrigger>
               </TabsList>
               <TabsContent value={YesNoOption.YES}>
                 <div className="flex items-start gap-4">
                   <div className="flex-grow basis-0">
                     <div>
-                      <StyledInputFormikField isFastField name="invoiceFile" isPrivate label="Attach your invoice file">
+                      <StyledInputFormikField
+                        isFastField
+                        name="invoiceFile"
+                        isPrivate
+                        label={intl.formatMessage({ defaultMessage: 'Attach your invoice file', id: 'Oa/lhY' })}
+                      >
                         {() => (
                           <StyledDropzone
                             {...attachmentDropzoneParams}
@@ -196,9 +220,12 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
                       isFastField
                       name="invoiceNumber"
                       isPrivate
-                      label="Invoice number"
+                      label={intl.formatMessage({ defaultMessage: 'Invoice number', id: 'ijDMrP' })}
                       placeholder="e.g. INV 001"
-                      hint="The unique identifier mentioned on your invoice"
+                      hint={intl.formatMessage({
+                        defaultMessage: 'The unique identifier mentioned on your invoice',
+                        id: 'lct/39',
+                      })}
                     />
                   </div>
                 </div>

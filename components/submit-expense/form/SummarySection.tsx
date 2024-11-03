@@ -55,7 +55,7 @@ export function SummarySection(props: SummarySectionProps) {
           </div>
           {props.form.values.recurrenceFrequency && props.form.values.recurrenceFrequency !== 'none' && (
             <span className="rounded-xl bg-slate-100 px-3 py-1 font-mono text-xs uppercase text-muted-foreground">
-              Recurring
+              <FormattedMessage defaultMessage="Recurring" id="v84fNv" />
             </span>
           )}
         </div>
@@ -63,7 +63,9 @@ export function SummarySection(props: SummarySectionProps) {
           {props.form.values.expenseTypeOption ? (
             <ExpenseTypeTag type={props.form.values.expenseTypeOption} mb={0} mr={0} />
           ) : (
-            <span className="text-muted-foreground">Expense Type</span>
+            <span className="text-muted-foreground">
+              <FormattedMessage defaultMessage="Expense Type" id="wbd643" />
+            </span>
           )}
           {props.form.values.tags?.length > 0 &&
             props.form.values.tags.map(tag => (
@@ -164,7 +166,9 @@ export function SummarySection(props: SummarySectionProps) {
           <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-right">
             {props.form.values.hasTax && props.form.values.tax && (
               <React.Fragment>
-                <div>Subtotal:</div>
+                <div>
+                  <FormattedMessage defaultMessage="Subtotal:" id="WWhVAU" />
+                </div>
                 <div>
                   <FormattedMoneyAmount
                     amount={props.form.options.totalInvoicedInExpenseCurrency}
@@ -237,13 +241,17 @@ export function SummarySection(props: SummarySectionProps) {
           <Label className="mb-4 font-bold">Invoice</Label>
           {props.form.values.hasInvoiceOption === YesNoOption.NO ? (
             <div>
-              <MessageBox type="info">Invoice will be generated once you submit the expense.</MessageBox>
+              <MessageBox type="info">
+                <FormattedMessage defaultMessage="Invoice will be generated once you submit the expense." id="aWQ0X7" />
+              </MessageBox>
             </div>
           ) : (
             <div>
               <div className="mb-2">
                 {props.form.values.invoiceNumber || (
-                  <span className="text-muted-foreground">Invoice reference number</span>
+                  <span className="text-muted-foreground">
+                    <FormattedMessage defaultMessage="Invoice reference number" id="o6znkL" />
+                  </span>
                 )}
               </div>
               <UploadedFilePreview
@@ -260,7 +268,9 @@ export function SummarySection(props: SummarySectionProps) {
       )}
       <div className="grid grid-cols-2 gap-4">
         <div className="mt-4 h-fit min-h-32 flex-grow basis-0 rounded-md border border-gray-300 p-4 text-sm">
-          <div className="font-bold">Who is paying?</div>
+          <div className="font-bold">
+            <FormattedMessage defaultMessage="Who is paying?" id="IdR7BG" />
+          </div>
           {props.form.options.account && (
             <React.Fragment>
               <div className="mt-2">
@@ -275,7 +285,9 @@ export function SummarySection(props: SummarySectionProps) {
                 />
               </div>
               <div className="mt-4">
-                <div className="font-bold">Collective balance:</div>
+                <div className="font-bold">
+                  <FormattedMessage defaultMessage="Collective balance:" id="cJFNHQ" />
+                </div>
                 <div className="mt-2">
                   <FormattedMoneyAmount
                     amount={props.form.options.account.stats.balance.valueInCents}
@@ -306,7 +318,9 @@ export function SummarySection(props: SummarySectionProps) {
           )}
         </div>
         <div className="mt-4 h-fit min-h-32 flex-grow basis-0 rounded-md border border-gray-300 p-4 text-sm">
-          <div className="font-bold">Who is getting paid?</div>
+          <div className="font-bold">
+            <FormattedMessage defaultMessage="Who is getting paid?" id="W5Z+Fm" />
+          </div>
           {props.form.options.payee ? (
             <React.Fragment>
               <div className="mt-2">
@@ -323,7 +337,7 @@ export function SummarySection(props: SummarySectionProps) {
               {props.form.options.payee.location && (
                 <React.Fragment>
                   <div className="mt-4 flex items-center gap-2 font-bold">
-                    Private address <Lock size={14} />
+                    <FormattedMessage defaultMessage="Private address" id="RmME7+" /> <Lock size={14} />
                   </div>
                   <div className="mt-2">{props.form.options.payee.location.address}</div>
                   <div>{props.form.options.payee.location.country}</div>
@@ -364,7 +378,10 @@ export function SummarySection(props: SummarySectionProps) {
           {expenseFormStepHasError(props.form, Step.PAYOUT_METHOD) ? null : !props.form.options.isAdminOfPayee ? (
             <React.Fragment>
               <div className="mt-2 text-sm text-muted-foreground">
-                The person you are inviting to submit this expense will be asked to provide payout method details.
+                <FormattedMessage
+                  defaultMessage="The person you are inviting to submit this expense will be asked to provide payout method details."
+                  id="LHdznY"
+                />
               </div>
             </React.Fragment>
           ) : (
@@ -404,12 +421,16 @@ function RecurrenceOptionBox(props: { form: ExpenseForm }) {
   return (
     <div className="mt-4">
       <MessageBox type="info">
-        <div className="mb-4 font-bold">Expense Recurrence</div>
+        <div className="mb-4 font-bold">
+          <FormattedMessage defaultMessage="Expense Recurrence" id="JnFWfB" />
+        </div>
         {!recurrenceFrequency ||
           (recurrenceFrequency === 'none' && (
             <div>
-              This expense will be submitted as a one-time expense. To make this a recurring expense, please specify the
-              frequency.
+              <FormattedMessage
+                defaultMessage="This expense will be submitted as a one-time expense. To make this a recurring expense, please specify the frequency."
+                id="4j+TF1"
+              />
             </div>
           ))}
 
@@ -446,14 +467,16 @@ function RecurrenceOptionBox(props: { form: ExpenseForm }) {
             size="xs"
             variant="link"
           >
-            Edit recurrence frequency
+            <FormattedMessage defaultMessage="Edit recurrence frequency" id="E997St" />
           </Button>
         )}
 
         {isEditingRecurrence && (
           <div>
             <div className="my-4 border-t border-dotted border-gray-400" />
-            <Label className="mb-2">Frequency</Label>
+            <Label className="mb-2">
+              <FormattedMessage defaultMessage="Frequency" id="Frequency" />
+            </Label>
             <Select
               value={recurrenceFrequency}
               onValueChange={newValue => setRecurrenceFrequencyEdit(newValue as RecurrenceFrequencyOption)}
@@ -467,7 +490,9 @@ function RecurrenceOptionBox(props: { form: ExpenseForm }) {
               </SelectTrigger>
 
               <SelectContent className="relative max-h-80 max-w-full">
-                <SelectItem value={RecurrenceFrequencyOption.NONE}>None</SelectItem>
+                <SelectItem value={RecurrenceFrequencyOption.NONE}>
+                  <FormattedMessage defaultMessage="None" id="450Fty" />
+                </SelectItem>
                 <SelectItem value={RecurrenceFrequencyOption.WEEK}>{RecurringExpenseIntervals.week}</SelectItem>
                 <SelectItem value={RecurrenceFrequencyOption.MONTH}>{RecurringExpenseIntervals.month}</SelectItem>
                 <SelectItem value={RecurrenceFrequencyOption.QUARTER}>{RecurringExpenseIntervals.quarter}</SelectItem>
@@ -477,7 +502,9 @@ function RecurrenceOptionBox(props: { form: ExpenseForm }) {
 
             {recurrenceFrequency && recurrenceFrequency !== 'none' && (
               <React.Fragment>
-                <Label className="mb-2 mt-4">End Date</Label>
+                <Label className="mb-2 mt-4">
+                  <FormattedMessage defaultMessage="End Date" id="EndDate" />
+                </Label>
                 <Input type="date" value={recurrenceEndAt} onChange={e => setRecurrenceEndAtEdit(e.target.value)} />
               </React.Fragment>
             )}
@@ -491,7 +518,7 @@ function RecurrenceOptionBox(props: { form: ExpenseForm }) {
                 }}
                 variant="outline"
               >
-                Save changes
+                <FormattedMessage defaultMessage="Save changes" id="X0ha1a" />
               </Button>
               <Button
                 onClick={() => {
@@ -501,7 +528,7 @@ function RecurrenceOptionBox(props: { form: ExpenseForm }) {
                 }}
                 variant="outline"
               >
-                Cancel
+                <FormattedMessage defaultMessage="Cancel" id="actions.cancel" />
               </Button>
             </div>
           </div>

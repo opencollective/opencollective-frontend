@@ -1,5 +1,6 @@
 import React from 'react';
 import { useFormikContext } from 'formik';
+import { FormattedMessage } from 'react-intl';
 
 import { cn } from '../../../lib/utils';
 
@@ -48,7 +49,7 @@ export function SubmitExpenseFlowForm(props: SubmitExpenseFlowFormProps) {
       <SummarySection inViewChange={onInViewChange} form={form} />
       <div className="flex justify-end">
         <Button disabled={form.initialLoading} onClick={() => form.handleSubmit()}>
-          Submit Expense
+          <FormattedMessage defaultMessage="Submit Expense" id="menu.submitExpense" />
         </Button>
       </div>
     </div>

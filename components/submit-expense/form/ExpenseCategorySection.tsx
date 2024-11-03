@@ -58,7 +58,9 @@ export function ExpenseCategorySection(props: ExpenseCategorySectionProps) {
               {selectedAccountingCategory ? (
                 selectedAccountingCategory.name
               ) : (
-                <span className="text-muted-foreground">Choose a category</span>
+                <span className="text-muted-foreground">
+                  <FormattedMessage defaultMessage="Choose a category" id="H4hJvF" />
+                </span>
               )}
               <ChevronsUpDown className="ml-2 opacity-50" size={16} />
             </Button>
@@ -92,7 +94,10 @@ export function ExpenseCategorySection(props: ExpenseCategorySectionProps) {
           <div className="group mt-4 rounded-md border border-[#DCDDE0] p-4">
             <CollapsibleTrigger asChild>
               <button className="flex w-full items-center text-start text-sm font-bold">
-                <div className="flex-grow">Expense category instructions</div>
+                <div className="flex-grow">
+                  {' '}
+                  <FormattedMessage defaultMessage="Expense category instructions" id="QVX2sp" />
+                </div>
                 <div className="group-data-[state=open]:rotate-180">
                   <ChevronDown size={16} />
                 </div>

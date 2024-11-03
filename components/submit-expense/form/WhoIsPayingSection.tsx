@@ -98,7 +98,7 @@ export function WhoIsPayingSection(props: WhoIsPayingSectionProps) {
               checked={!props.form.initialLoading && isFindSelected}
             ></RadioGroupItem>
             <Label className={cn('flex min-h-16 flex-grow items-center p-4')} htmlFor="__find">
-              Find account
+              <FormattedMessage defaultMessage="Find account" id="m2G3Nh" />
             </Label>
           </div>
           <div
