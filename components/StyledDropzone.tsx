@@ -121,6 +121,7 @@ const StyledDropzone = ({
   previewSize = size,
   limit = undefined,
   kind = null,
+  showReplaceAction = true,
   ...props
 }: StyledDropzoneProps) => {
   const { toast } = useToast();
@@ -189,7 +190,7 @@ const StyledDropzone = ({
       size={size}
       error={error}
     >
-      <input name={name} {...getInputProps()} />
+      <input name={name} disabled={props.disabled} {...getInputProps()} />
       {isLoading || isUploading || isUploadingWithGraphQL ? (
         <Container
           position="relative"
@@ -320,19 +321,21 @@ const StyledDropzone = ({
               ) : typeof value === 'string' ? (
                 <React.Fragment>
                   <UploadedFilePreview size={previewSize || size} url={value} border="none" />
-                  <ReplaceContainer
-                    onClick={dropProps.onClick}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={event => {
-                      if (event.key === 'Enter') {
-                        event.preventDefault();
-                        dropProps.onClick(null);
-                      }
-                    }}
-                  >
-                    <FormattedMessage id="Image.Replace" defaultMessage="Replace" />
-                  </ReplaceContainer>
+                  {showReplaceAction && (
+                    <ReplaceContainer
+                      onClick={dropProps.onClick}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={event => {
+                        if (event.key === 'Enter') {
+                          event.preventDefault();
+                          dropProps.onClick(null);
+                        }
+                      }}
+                    >
+                      <FormattedMessage id="Image.Replace" defaultMessage="Replace" />
+                    </ReplaceContainer>
+                  )}
                 </React.Fragment>
               ) : value instanceof File ? (
                 <LocalFilePreview size={previewSize || size} file={value} alignItems="center" />
@@ -418,6 +421,7 @@ type StyledDropzoneProps = Omit<ContainerProps, 'accept' | 'children' | 'ref' | 
   UploadingComponent?: React.ComponentType;
   /** When isMulti is true, limit the number of files that can be uploaded */
   limit?: number;
+  showReplaceAction?: boolean;
 } & (
     | {
         /** Collect File only, do not upload files */
