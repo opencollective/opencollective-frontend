@@ -8,6 +8,7 @@ import { PayoutMethodType } from '../../lib/graphql/types/v2/graphql';
 
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import LoadingPlaceholder from '../LoadingPlaceholder';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
 function flattenDetailsObject(details: any) {
   return Object.entries(details).reduce((acc, [key, value]) => {
@@ -26,7 +27,7 @@ function flattenDetailsObject(details: any) {
 }
 
 type PayoutMethodDetailsProps = {
-  payoutMethod: PayoutMethod;
+  payoutMethod: Omit<PayoutMethod, 'id'> & { id?: string };
 };
 
 export function PayoutMethodDetails(props: PayoutMethodDetailsProps) {
@@ -37,29 +38,57 @@ export function PayoutMethodDetails(props: PayoutMethodDetailsProps) {
   switch (props.payoutMethod.type) {
     case PayoutMethodType.PAYPAL:
       return (
-        <PayoutMethodDetailItem
-          className="col-start-1 col-end-[-1]"
-          title={
-            <div className="flex gap-2">
-              <FormattedMessage id="User.EmailAddress" defaultMessage="Email address" /> <PrivateInfoIcon />
-            </div>
-          }
-        >
-          {props.payoutMethod.data?.email ?? '********'};
-        </PayoutMethodDetailItem>
+        <React.Fragment>
+          {props.payoutMethod.data.currency && (
+            <PayoutMethodDetailItem
+              className="col-start-1 col-end-[-1]"
+              title={
+                <div className="flex gap-2">
+                  <FormattedMessage defaultMessage="Currency" id="55hdQy" />
+                </div>
+              }
+            >
+              {upperCase(props.payoutMethod.data.currency)}
+            </PayoutMethodDetailItem>
+          )}
+          <PayoutMethodDetailItem
+            className="col-start-1 col-end-[-1]"
+            title={
+              <div className="flex gap-2">
+                <FormattedMessage id="User.EmailAddress" defaultMessage="Email address" /> <PrivateInfoIcon />
+              </div>
+            }
+          >
+            {props.payoutMethod.data?.email ?? '********'}
+          </PayoutMethodDetailItem>
+        </React.Fragment>
       );
     case PayoutMethodType.OTHER:
       return (
-        <PayoutMethodDetailItem
-          className="col-start-1 col-end-[-1]"
-          title={
-            <div className="flex gap-2">
-              <FormattedMessage id="Details" defaultMessage="Details" /> <PrivateInfoIcon />
-            </div>
-          }
-        >
-          {props.payoutMethod.data?.content ?? '********'}
-        </PayoutMethodDetailItem>
+        <React.Fragment>
+          {props.payoutMethod.data.currency && (
+            <PayoutMethodDetailItem
+              className="col-start-1 col-end-[-1]"
+              title={
+                <div className="flex gap-2">
+                  <FormattedMessage defaultMessage="Currency" id="55hdQy" />
+                </div>
+              }
+            >
+              {upperCase(props.payoutMethod.data.currency)}
+            </PayoutMethodDetailItem>
+          )}
+          <PayoutMethodDetailItem
+            className="col-start-1 col-end-[-1]"
+            title={
+              <div className="flex gap-2">
+                <FormattedMessage id="Details" defaultMessage="Details" /> <PrivateInfoIcon />
+              </div>
+            }
+          >
+            {props.payoutMethod.data?.content ?? '********'}
+          </PayoutMethodDetailItem>
+        </React.Fragment>
       );
     case PayoutMethodType.BANK_ACCOUNT: {
       const items: (PayoutMethodDetailItemProps & { field: string })[] = [];
@@ -73,6 +102,14 @@ export function PayoutMethodDetails(props: PayoutMethodDetailsProps) {
           field: 'type',
           title: <FormattedMessage defaultMessage="Type" id="+U6ozc" />,
           children: upperCase(props.payoutMethod.data.type),
+        });
+      }
+
+      if (props.payoutMethod.data.currency) {
+        items.push({
+          field: 'currency',
+          title: <FormattedMessage defaultMessage="Currency" id="55hdQy" />,
+          children: upperCase(props.payoutMethod.data.currency),
         });
       }
 
@@ -107,9 +144,14 @@ type PayoutMethodDetailItemProps = {
 
 function PayoutMethodDetailItem(props: PayoutMethodDetailItemProps) {
   return (
-    <div className={clsx('rounded-md bg-slate-100 p-2', props.className)}>
+    <div className={clsx('mb-2 rounded-md bg-slate-100 last:mb-0', props.className)}>
       <div className="mb-1 text-sm font-bold">{props.title}</div>
-      <div className="text-sm">{props.children}</div>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div className="overflow-x-clip text-ellipsis text-sm">{props.children}</div>
+        </TooltipTrigger>
+        <TooltipContent>{props.children}</TooltipContent>
+      </Tooltip>
     </div>
   );
 }
