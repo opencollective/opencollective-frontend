@@ -44,7 +44,7 @@ export function PayoutMethodDetails(props: PayoutMethodDetailsProps) {
               className="col-start-1 col-end-[-1]"
               title={
                 <div className="flex gap-2">
-                  <FormattedMessage defaultMessage="Currency" id="55hdQy" />
+                  <FormattedMessage defaultMessage="Currency" id="Currency" />
                 </div>
               }
             >
@@ -71,7 +71,7 @@ export function PayoutMethodDetails(props: PayoutMethodDetailsProps) {
               className="col-start-1 col-end-[-1]"
               title={
                 <div className="flex gap-2">
-                  <FormattedMessage defaultMessage="Currency" id="55hdQy" />
+                  <FormattedMessage defaultMessage="Currency" id="Currency" />
                 </div>
               }
             >
@@ -108,7 +108,7 @@ export function PayoutMethodDetails(props: PayoutMethodDetailsProps) {
       if (props.payoutMethod.data.currency) {
         items.push({
           field: 'currency',
-          title: <FormattedMessage defaultMessage="Currency" id="55hdQy" />,
+          title: <FormattedMessage defaultMessage="Currency" id="Currency" />,
           children: upperCase(props.payoutMethod.data.currency),
         });
       }

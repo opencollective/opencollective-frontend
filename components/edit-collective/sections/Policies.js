@@ -109,23 +109,23 @@ const messages = defineMessages({
     defaultMessage: 'Invoice Expenses Policy',
   },
   'invoiceExpensePolicy.placeholder': {
-    id: 'collective.invoiceExpensePolicy.placeholder',
+    id: 'collective.expensePolicy.placeholder',
     defaultMessage: 'E.g. approval criteria, limitations, or required documentation.',
   },
   'invoiceExpensePolicy.error': {
     id: 'collective.expensePolicy.error',
-    defaultMessage: 'invoiceExpensePolicy policy must contain less than {maxLength} characters',
+    defaultMessage: 'Expense policy must contain less than {maxLength} characters',
   },
   'receiptExpensePolicy.label': {
     id: 'collective.receiptExpensePolicy.label',
     defaultMessage: 'Receipt Expenses Policy',
   },
   'receiptExpensePolicy.placeholder': {
-    id: 'collective.receiptExpensePolicy.placeholder',
+    id: 'collective.expensePolicy.placeholder',
     defaultMessage: 'E.g. approval criteria, limitations, or required documentation.',
   },
   'receiptExpensePolicy.error': {
-    id: 'collective.receiptExpensePolicy.error',
+    id: 'collective.expensePolicy.error',
     defaultMessage: 'Expense policy must contain less than {maxLength} characters',
   },
   'titleExpensePolicy.label': {
@@ -133,11 +133,11 @@ const messages = defineMessages({
     defaultMessage: 'Expenses Title Policy',
   },
   'titleExpensePolicy.placeholder': {
-    id: 'collective.titleExpensePolicy.placeholder',
+    id: 'collective.expensePolicy.placeholder',
     defaultMessage: 'E.g. approval criteria, limitations, or required documentation.',
   },
   'titleExpensePolicy.error': {
-    id: 'collective.titleExpensePolicy.error',
+    id: 'collective.expensePolicy.error',
     defaultMessage: 'Expense policy must contain less than {maxLength} characters',
   },
   'expensePolicy.allowExpense': {
@@ -380,7 +380,7 @@ const Policies = ({ collective }) => {
           </StyledInputField>
           <P fontSize="14px" lineHeight="18px" color="black.600" my={2}>
             <FormattedMessage
-              id="collective.invoiceExpensePolicy.description"
+              id="collective.expensePolicy.description"
               defaultMessage="It can be daunting to file an expense if you're not sure what's allowed. Provide a clear policy to guide expense submitters."
             />
           </P>
@@ -416,7 +416,7 @@ const Policies = ({ collective }) => {
           </StyledInputField>
           <P fontSize="14px" lineHeight="18px" color="black.600" my={2}>
             <FormattedMessage
-              id="collective.receiptExpensePolicy.description"
+              id="collective.expensePolicy.description"
               defaultMessage="It can be daunting to file an expense if you're not sure what's allowed. Provide a clear policy to guide expense submitters."
             />
           </P>
@@ -452,7 +452,7 @@ const Policies = ({ collective }) => {
           </StyledInputField>
           <P fontSize="14px" lineHeight="18px" color="black.600" my={2}>
             <FormattedMessage
-              id="collective.titleExpensePolicy.description"
+              id="collective.expensePolicy.description"
               defaultMessage="It can be daunting to file an expense if you're not sure what's allowed. Provide a clear policy to guide expense submitters."
             />
           </P>

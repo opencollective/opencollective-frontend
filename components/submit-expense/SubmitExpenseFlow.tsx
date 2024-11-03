@@ -327,7 +327,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
             </main>
             <DialogFooter className="z-30 flex justify-center p-4 sm:justify-center sm:px-0">
               <Button onClick={handleOnClose}>
-                <FormattedMessage defaultMessage="View all expenses" id="8/EPRP" />
+                <FormattedMessage defaultMessage="View all expenses" id="CollectivePage.SectionBudget.ViewAllExpenses" />
               </Button>
             </DialogFooter>
           </div>

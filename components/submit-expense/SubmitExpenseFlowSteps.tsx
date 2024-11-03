@@ -77,7 +77,7 @@ export const StepTitles: Record<Step, MessageDescriptor> = {
   }),
   [Step.PAYOUT_METHOD]: defineMessage({
     defaultMessage: 'Payout Method',
-    id: 'p03D8i',
+    id: 'SecurityScope.PayoutMethod',
   }),
   [Step.TYPE_OF_EXPENSE]: defineMessage({
     defaultMessage: 'Type of expense',
@@ -97,7 +97,7 @@ export const StepTitles: Record<Step, MessageDescriptor> = {
   }),
   [Step.SUMMARY]: defineMessage({
     defaultMessage: 'Summary',
-    id: 'RrCui3',
+    id: 'Summary',
   }),
 };
 
