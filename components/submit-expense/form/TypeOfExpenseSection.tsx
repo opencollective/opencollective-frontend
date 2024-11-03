@@ -1,0 +1,212 @@
+import React from 'react';
+import { FormattedMessage } from 'react-intl';
+
+import { ExpenseType } from '../../../lib/graphql/types/v2/graphql';
+import { cn } from '../../../lib/utils';
+import { attachmentDropzoneParams } from '../../expenses/lib/attachments';
+
+import StyledDropzone from '../../StyledDropzone';
+import StyledInputFormikField from '../../StyledInputFormikField';
+import { Label } from '../../ui/Label';
+import { RadioGroup, RadioGroupItem } from '../../ui/RadioGroup';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../ui/Tabs';
+import { useToast } from '../../ui/useToast';
+import { Step } from '../SubmitExpenseFlowSteps';
+import type { ExpenseForm } from '../useExpenseForm';
+import { YesNoOption } from '../useExpenseForm';
+
+import { ExpensePolicyContainer } from './ExpensePolicyContainer';
+import { FormSectionContainer } from './FormSectionContainer';
+
+type TypeOfExpenseSectionProps = {
+  form: ExpenseForm;
+  inViewChange: (inView: boolean, entry: IntersectionObserverEntry) => void;
+};
+
+export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
+  const expenseTypeOption = props.form.values.expenseTypeOption;
+  const { toast } = useToast();
+
+  return (
+    <FormSectionContainer
+      step={Step.TYPE_OF_EXPENSE}
+      form={props.form}
+      inViewChange={props.inViewChange}
+      title={<FormattedMessage defaultMessage="Select the type of expense" id="hT+uK/" />}
+    >
+      <React.Fragment>
+        <RadioGroup
+          value={expenseTypeOption}
+          onValueChange={newValue => props.form.setFieldValue('expenseTypeOption', newValue as ExpenseType)}
+        >
+          <div className="rounded-md border border-gray-200 has-[:checked]:flex-col has-[:checked]:items-start has-[:checked]:gap-2 has-[:checked]:border-blue-300">
+            <div className="flex items-center">
+              <RadioGroupItem
+                className="ml-4"
+                value={ExpenseType.INVOICE}
+                disabled={props.form.initialLoading}
+              ></RadioGroupItem>
+              <Label
+                className={cn('flex min-h-16 flex-grow items-center justify-between p-4')}
+                htmlFor={ExpenseType.INVOICE}
+              >
+                <div>
+                  <div className="mb-1">Invoice</div>
+                  <div className="text-muted-foreground">I am submitting an invoice to get paid</div>
+                </div>
+              </Label>
+            </div>
+            {!props.form.initialLoading && expenseTypeOption === ExpenseType.INVOICE && (
+              <div
+                className={cn({
+                  'p-4 pt-0':
+                    props.form.options.host?.policies?.EXPENSE_POLICIES?.invoicePolicy ||
+                    props.form.options.account?.policies?.EXPENSE_POLICIES?.invoicePolicy,
+                })}
+              >
+                {props.form.options.host?.slug !== props.form.options.account?.slug &&
+                  props.form.options.host?.policies?.EXPENSE_POLICIES?.invoicePolicy && (
+                    <div className="mt-4">
+                      <ExpensePolicyContainer
+                        title="Host Instructions to submit an invoice"
+                        policy={props.form.options.host?.policies?.EXPENSE_POLICIES?.invoicePolicy}
+                        checked={props.form.values.acknowledgedHostInvoiceExpensePolicy}
+                        onAcknowledgedChanged={v => props.form.setFieldValue('acknowledgedHostInvoiceExpensePolicy', v)}
+                      />
+                    </div>
+                  )}
+
+                {props.form.options.account?.policies?.EXPENSE_POLICIES?.invoicePolicy && (
+                  <div className="mt-4">
+                    <ExpensePolicyContainer
+                      title="Collective Instructions to submit an invoice"
+                      policy={props.form.options.account?.policies?.EXPENSE_POLICIES?.invoicePolicy}
+                      checked={props.form.values.acknowledgedCollectiveInvoiceExpensePolicy}
+                      onAcknowledgedChanged={v =>
+                        props.form.setFieldValue('acknowledgedCollectiveInvoiceExpensePolicy', v)
+                      }
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          <div className="rounded-md border border-gray-200 has-[:checked]:flex-col has-[:checked]:items-start has-[:checked]:gap-2 has-[:checked]:border-blue-300">
+            <div className="flex items-center">
+              <RadioGroupItem
+                className="ml-4"
+                value={ExpenseType.RECEIPT}
+                disabled={props.form.initialLoading}
+              ></RadioGroupItem>
+              <Label
+                className={cn('flex min-h-16 flex-grow items-center justify-between p-4')}
+                htmlFor={ExpenseType.RECEIPT}
+              >
+                <div>
+                  <div className="mb-1">Reimbursement</div>
+                  <div className="text-muted-foreground">I want a reimbursement for something I&apos;ve paid for</div>
+                </div>
+              </Label>
+            </div>
+            {!props.form.initialLoading && expenseTypeOption === ExpenseType.RECEIPT && (
+              <div
+                className={cn({
+                  'p-4 pt-0':
+                    props.form.options.host?.policies?.EXPENSE_POLICIES?.receiptPolicy ||
+                    props.form.options.account?.policies?.EXPENSE_POLICIES?.receiptPolicy,
+                })}
+              >
+                {props.form.options.host?.slug !== props.form.options.account?.slug &&
+                  props.form.options.host?.policies?.EXPENSE_POLICIES?.receiptPolicy && (
+                    <div className="mt-4">
+                      <ExpensePolicyContainer
+                        title="Host Instructions to submit a receipt"
+                        policy={props.form.options.host?.policies?.EXPENSE_POLICIES?.receiptPolicy}
+                        checked={props.form.values.acknowledgedHostReceiptExpensePolicy}
+                        onAcknowledgedChanged={v => props.form.setFieldValue('acknowledgedHostReceiptExpensePolicy', v)}
+                      />
+                    </div>
+                  )}
+
+                {props.form.options.account?.policies?.EXPENSE_POLICIES?.receiptPolicy && (
+                  <div className="mt-4">
+                    <ExpensePolicyContainer
+                      title="Collective Instructions to submit a receipt"
+                      policy={props.form.options.host?.policies?.EXPENSE_POLICIES?.receiptPolicy}
+                      checked={props.form.values.acknowledgedCollectiveReceiptExpensePolicy}
+                      onAcknowledgedChanged={v =>
+                        props.form.setFieldValue('acknowledgedCollectiveReceiptExpensePolicy', v)
+                      }
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </RadioGroup>
+
+        {!props.form.initialLoading && expenseTypeOption === ExpenseType.INVOICE && (
+          <div className="mt-4 rounded-md border border-gray-300 p-4">
+            <Label>An invoice is required. Do you have one?</Label>
+            <Tabs
+              value={props.form.values.hasInvoiceOption}
+              onValueChange={newValue => props.form.setFieldValue('hasInvoiceOption', newValue as YesNoOption)}
+            >
+              <TabsList>
+                <TabsTrigger value={YesNoOption.YES}>Yes, I have an invoice</TabsTrigger>
+                <TabsTrigger value={YesNoOption.NO}>No, generate an invoice for me</TabsTrigger>
+              </TabsList>
+              <TabsContent value={YesNoOption.YES}>
+                <div className="flex items-start gap-4">
+                  <div className="flex-grow basis-0">
+                    <div>
+                      <StyledInputFormikField isFastField name="invoiceFile" isPrivate label="Attach your invoice file">
+                        {() => (
+                          <StyledDropzone
+                            {...attachmentDropzoneParams}
+                            kind="EXPENSE_ATTACHED_FILE"
+                            name="invoice"
+                            width={1}
+                            size={150}
+                            showActions
+                            useGraphQL={true}
+                            parseDocument={false}
+                            isMulti={false}
+                            value={
+                              typeof props.form.values.invoiceFile === 'string'
+                                ? props.form.values.invoiceFile
+                                : props.form.values.invoiceFile?.url
+                            }
+                            onGraphQLSuccess={uploadResults => {
+                              props.form.setFieldValue('invoiceFile', uploadResults[0].file);
+                            }}
+                            onSuccess={files => {
+                              props.form.setFieldValue('invoiceFile', files ? files[0] : null);
+                            }}
+                            onReject={msg => {
+                              toast({ variant: 'error', message: msg });
+                            }}
+                          />
+                        )}
+                      </StyledInputFormikField>
+                    </div>
+                  </div>
+                  <div className="flex-grow basis-0">
+                    <StyledInputFormikField
+                      isFastField
+                      name="invoiceNumber"
+                      isPrivate
+                      label="Invoice number"
+                      placeholder="e.g. INV 001"
+                      hint="The unique identifier mentioned on your invoice"
+                    />
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
+        )}
+      </React.Fragment>
+    </FormSectionContainer>
+  );
+}
