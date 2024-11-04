@@ -18,6 +18,7 @@ import Container from '../../Container';
 import { Flex } from '../../Grid';
 import { getI18nLink } from '../../I18nFormatters';
 import Link from '../../Link';
+import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import RichTextEditor from '../../RichTextEditor';
@@ -357,26 +358,30 @@ const Policies = ({ collective }) => {
             labelProps={{ mb: 2, pt: 2, lineHeight: '18px', fontWeight: 'bold' }}
             label={formatMessage(messages['invoiceExpensePolicy.label'])}
           >
-            {inputProps => (
-              <RichTextEditor
-                key={formik.values.policies?.EXPENSE_POLICIES?.invoicePolicy}
-                data-cy="invoice-expense-policy-input"
-                withBorders
-                showCount
-                maxLength={EXPENSE_POLICY_MAX_LENGTH}
-                error={formik.errors.policies?.EXPENSE_POLICIES?.invoicePolicy}
-                version="simplified"
-                editorMinHeight="12.5rem"
-                editorMaxHeight={500}
-                id={inputProps.id}
-                inputName={inputProps.name}
-                onChange={formik.handleChange}
-                placeholder={formatMessage(messages['invoiceExpensePolicy.placeholder'])}
-                defaultValue={formik.values.policies?.EXPENSE_POLICIES?.invoicePolicy}
-                fontSize="14px"
-                maxHeight={600}
-              />
-            )}
+            {inputProps =>
+              loading ? (
+                <LoadingPlaceholder height={50} width={1} />
+              ) : (
+                <RichTextEditor
+                  key={data?.account?.policies?.EXPENSE_POLICIES?.invoicePolicy}
+                  data-cy="invoice-expense-policy-input"
+                  withBorders
+                  showCount
+                  maxLength={EXPENSE_POLICY_MAX_LENGTH}
+                  error={formik.errors.policies?.EXPENSE_POLICIES?.invoicePolicy}
+                  version="simplified"
+                  editorMinHeight="12.5rem"
+                  editorMaxHeight={500}
+                  id={inputProps.id}
+                  inputName={inputProps.name}
+                  onChange={formik.handleChange}
+                  placeholder={formatMessage(messages['invoiceExpensePolicy.placeholder'])}
+                  defaultValue={data?.account?.policies?.EXPENSE_POLICIES?.invoicePolicy}
+                  fontSize="14px"
+                  maxHeight={600}
+                />
+              )
+            }
           </StyledInputField>
           <P fontSize="14px" lineHeight="18px" color="black.600" my={2}>
             <FormattedMessage
@@ -393,26 +398,30 @@ const Policies = ({ collective }) => {
             labelProps={{ mb: 2, pt: 2, lineHeight: '18px', fontWeight: 'bold' }}
             label={formatMessage(messages['receiptExpensePolicy.label'])}
           >
-            {inputProps => (
-              <RichTextEditor
-                key={formik.values.policies?.EXPENSE_POLICIES?.receiptPolicy}
-                data-cy="receipt-expense-policy-input"
-                withBorders
-                showCount
-                maxLength={EXPENSE_POLICY_MAX_LENGTH}
-                error={formik.errors.policies?.EXPENSE_POLICIES?.receiptPolicy}
-                version="simplified"
-                editorMinHeight="12.5rem"
-                editorMaxHeight={500}
-                id={inputProps.id}
-                inputName={inputProps.name}
-                onChange={formik.handleChange}
-                placeholder={formatMessage(messages['receiptExpensePolicy.placeholder'])}
-                defaultValue={formik.values.policies?.EXPENSE_POLICIES?.receiptPolicy}
-                fontSize="14px"
-                maxHeight={600}
-              />
-            )}
+            {inputProps =>
+              loading ? (
+                <LoadingPlaceholder height={50} width={1} />
+              ) : (
+                <RichTextEditor
+                  key={data?.account?.policies?.EXPENSE_POLICIES?.receiptPolicy}
+                  data-cy="receipt-expense-policy-input"
+                  withBorders
+                  showCount
+                  maxLength={EXPENSE_POLICY_MAX_LENGTH}
+                  error={formik.errors.policies?.EXPENSE_POLICIES?.receiptPolicy}
+                  version="simplified"
+                  editorMinHeight="12.5rem"
+                  editorMaxHeight={500}
+                  id={inputProps.id}
+                  inputName={inputProps.name}
+                  onChange={formik.handleChange}
+                  placeholder={formatMessage(messages['receiptExpensePolicy.placeholder'])}
+                  defaultValue={data?.account?.policies?.EXPENSE_POLICIES?.receiptPolicy}
+                  fontSize="14px"
+                  maxHeight={600}
+                />
+              )
+            }
           </StyledInputField>
           <P fontSize="14px" lineHeight="18px" color="black.600" my={2}>
             <FormattedMessage
@@ -429,26 +438,30 @@ const Policies = ({ collective }) => {
             labelProps={{ mb: 2, pt: 2, lineHeight: '18px', fontWeight: 'bold' }}
             label={formatMessage(messages['titleExpensePolicy.label'])}
           >
-            {inputProps => (
-              <RichTextEditor
-                key={formik.values.policies?.EXPENSE_POLICIES?.titlePolicy}
-                data-cy="title-expense-policy-input"
-                withBorders
-                showCount
-                maxLength={EXPENSE_POLICY_MAX_LENGTH}
-                error={formik.errors.policies?.EXPENSE_POLICIES?.titlePolicy}
-                version="simplified"
-                editorMinHeight="12.5rem"
-                editorMaxHeight={500}
-                id={inputProps.id}
-                inputName={inputProps.name}
-                onChange={formik.handleChange}
-                placeholder={formatMessage(messages['titleExpensePolicy.placeholder'])}
-                defaultValue={formik.values.policies?.EXPENSE_POLICIES?.titlePolicy}
-                fontSize="14px"
-                maxHeight={600}
-              />
-            )}
+            {inputProps =>
+              loading ? (
+                <LoadingPlaceholder height={50} width={1} />
+              ) : (
+                <RichTextEditor
+                  key={data?.account?.policies?.EXPENSE_POLICIES?.titlePolicy}
+                  data-cy="title-expense-policy-input"
+                  withBorders
+                  showCount
+                  maxLength={EXPENSE_POLICY_MAX_LENGTH}
+                  error={formik.errors.policies?.EXPENSE_POLICIES?.titlePolicy}
+                  version="simplified"
+                  editorMinHeight="12.5rem"
+                  editorMaxHeight={500}
+                  id={inputProps.id}
+                  inputName={inputProps.name}
+                  onChange={formik.handleChange}
+                  placeholder={formatMessage(messages['titleExpensePolicy.placeholder'])}
+                  defaultValue={data?.account?.policies?.EXPENSE_POLICIES?.titlePolicy}
+                  fontSize="14px"
+                  maxHeight={600}
+                />
+              )
+            }
           </StyledInputField>
           <P fontSize="14px" lineHeight="18px" color="black.600" my={2}>
             <FormattedMessage
