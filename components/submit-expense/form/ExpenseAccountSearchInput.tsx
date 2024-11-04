@@ -136,7 +136,7 @@ export function ExpenseAccountSearchInput(props: ExpenseAccountSearchInputProps)
                 {isSearchLoading && <LoadingPlaceholder height={48} width={1} />}
                 {isSearchError && <MessageBoxGraphqlError error={searchQuery.error} />}
                 {noSearchResults && <EmptyState />}
-                {!isSearching && !hasSelection && <DefaultState />}
+                {!isSearching && <DefaultState />}
                 {isFixedOptions && <EmptyState />}
               </CommandEmpty>
               {accountTypeOrder.map(type => {

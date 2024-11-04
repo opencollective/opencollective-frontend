@@ -838,7 +838,7 @@ function buildFormSchema(
         v =>
           values.expenseTypeOption === ExpenseType.INVOICE &&
           options.host?.policies?.EXPENSE_POLICIES?.invoicePolicy &&
-          options.host?.slug !== options?.account?.slug
+          options.host?.slug !== options.account?.slug
             ? v
             : true,
         {
@@ -852,7 +852,7 @@ function buildFormSchema(
         v =>
           values.expenseTypeOption === ExpenseType.RECEIPT &&
           options.host?.policies?.EXPENSE_POLICIES?.receiptPolicy &&
-          options.host?.slug !== options?.account?.slug
+          options.host?.slug !== options.account?.slug
             ? v
             : true,
         {
@@ -864,7 +864,7 @@ function buildFormSchema(
       .nullish()
       .refine(
         v =>
-          options.host?.policies?.EXPENSE_POLICIES?.titlePolicy && options.host?.slug !== options?.account?.slug
+          options.host?.policies?.EXPENSE_POLICIES?.titlePolicy && options.host?.slug !== options.account?.slug
             ? v
             : true,
         {
@@ -1461,7 +1461,7 @@ export function useExpenseForm(opts: {
   }, [
     prevFormOptions?.host?.slug,
     formOptions.host?.slug,
-    prevFormOptions.vendors,
+    prevFormOptions?.vendors,
     formOptions.vendors,
     expenseForm.values.payeeSlug,
     setFieldValue,

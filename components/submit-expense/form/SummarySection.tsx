@@ -134,11 +134,11 @@ export function SummarySection(props: SummarySectionProps) {
               <div className="text-right">
                 <FormattedMoneyAmount
                   amount={
-                    props.form.options.expenseCurrency !== ei.amount.currency
-                      ? ei.amount.exchangeRate?.value
-                        ? Math.round(ei.amount.valueInCents * ei.amount.exchangeRate.value)
+                    props.form.options.expenseCurrency !== ei.amount?.currency
+                      ? ei.amount?.exchangeRate?.value
+                        ? Math.round(ei.amount?.valueInCents * ei.amount?.exchangeRate.value)
                         : null
-                      : ei.amount.valueInCents
+                      : ei.amount?.valueInCents
                   }
                   currency={props.form.options.expenseCurrency}
                   showCurrencyCode

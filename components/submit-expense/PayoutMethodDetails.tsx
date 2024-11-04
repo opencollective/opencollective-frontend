@@ -59,7 +59,7 @@ export function PayoutMethodDetails(props: PayoutMethodDetailsProps) {
               </div>
             }
           >
-            {props.payoutMethod.data?.email ?? '********'}
+            {props.payoutMethod.data.email ?? '********'}
           </PayoutMethodDetailItem>
         </React.Fragment>
       );
@@ -86,7 +86,7 @@ export function PayoutMethodDetails(props: PayoutMethodDetailsProps) {
               </div>
             }
           >
-            {props.payoutMethod.data?.content ?? '********'}
+            {props.payoutMethod.data.content ?? '********'}
           </PayoutMethodDetailItem>
         </React.Fragment>
       );

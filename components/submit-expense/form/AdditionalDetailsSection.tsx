@@ -34,7 +34,7 @@ export function AdditionalDetailsSection(props: AdditionalDetailsSectionProps) {
 
       {!props.form.initialLoading &&
         props.form.options.host?.policies?.EXPENSE_POLICIES?.titlePolicy &&
-        props.form.options?.host?.slug !== props.form.options.account?.slug && (
+        props.form.options.host?.slug !== props.form.options.account?.slug && (
           <div className="mt-4">
             <ExpensePolicyContainer
               title={<FormattedMessage defaultMessage="Host Instructions for titles" id="R7O6Sr" />}

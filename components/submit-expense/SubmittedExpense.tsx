@@ -31,7 +31,7 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
     return <MessageBoxGraphqlError error={query.error} />;
   }
 
-  const expense = query.data.expense;
+  const expense = query.data?.expense;
 
   return (
     <div className="flex flex-grow flex-wrap gap-8 px-4 sm:p-0">
@@ -47,9 +47,9 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
           isLoadingLoggedInUser={false}
           showProcessButtons={false}
           expense={expense}
-          host={expense.host}
-          isLoading={query.loading || !expense}
-          collective={expense.account}
+          host={expense?.host}
+          isLoading={!expense}
+          collective={expense?.account}
         />
       </div>
       <div className="md:max-w-96">

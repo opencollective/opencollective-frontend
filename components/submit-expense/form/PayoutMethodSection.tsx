@@ -227,7 +227,7 @@ function NewPayoutMethodOption(props: NewPayoutMethodOptionProps) {
       );
     }
   }, [
-    props.form.values.newPayoutMethod?.name,
+    props.form.values.newPayoutMethod.name,
     props.form.values.newPayoutMethod.type,
     props.form.values.newPayoutMethod.data.email,
     props.form.values.newPayoutMethod.data.details,
