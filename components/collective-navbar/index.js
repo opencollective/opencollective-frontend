@@ -23,8 +23,10 @@ import EXPENSE_TYPE from '../../lib/constants/expenseTypes';
 import roles from '../../lib/constants/roles';
 import { isSupportedExpenseType } from '../../lib/expenses';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import useGlobalBlur from '../../lib/hooks/useGlobalBlur';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers';
 
 import ActionButton from '../ActionButton';
@@ -310,7 +312,7 @@ const getDefaultCallsToActions = (
 /**
  * Returns the main CTA that should be displayed as a button outside of the action menu in this component.
  */
-const getMainAction = (collective, callsToAction, LoggedInUser) => {
+const getMainAction = (collective, callsToAction, LoggedInUser, isNewExpenseFlowEnabled = false) => {
   if (!collective || !callsToAction) {
     return null;
   }
@@ -367,7 +369,13 @@ const getMainAction = (collective, callsToAction, LoggedInUser) => {
     return {
       type: NAVBAR_ACTION_TYPE.SUBMIT_EXPENSE,
       component: (
-        <Link href={`${getCollectivePageRoute(collective)}/expenses/new`}>
+        <Link
+          href={
+            isNewExpenseFlowEnabled
+              ? `/dashboard/${LoggedInUser?.collective?.slug}/submitted-expenses?submitExpenseTo=${collective.slug}`
+              : `${getCollectivePageRoute(collective)}/expenses/new`
+          }
+        >
           <ActionButton tabIndex="-1">
             <Receipt size="1em" />
             <Span ml={2}>
@@ -461,6 +469,10 @@ const CollectiveNavbar = ({
 
   const loading = isLoading || dataLoading;
 
+  const isNewExpenseFlowEnabled =
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) &&
+    !isSupportedExpenseType(collective, ExpenseType.GRANT);
+
   const isAllowedAddFunds = Boolean(data?.account?.permissions?.addFunds?.allowed);
   const sections = React.useMemo(() => {
     return sectionsFromParent || getFilteredSectionsForCollective(collective, isAdmin, isHostAdmin);
@@ -478,9 +490,10 @@ const CollectiveNavbar = ({
     ...callsToAction,
   };
   const actionsArray = Object.keys(pickBy(callsToAction, Boolean));
-  const mainAction = getMainAction(collective, actionsArray, LoggedInUser);
+  const mainAction = getMainAction(collective, actionsArray, LoggedInUser, isNewExpenseFlowEnabled);
   const secondAction =
-    actionsArray.length === 2 && getMainAction(collective, without(actionsArray, mainAction?.type), LoggedInUser);
+    actionsArray.length === 2 &&
+    getMainAction(collective, without(actionsArray, mainAction?.type), LoggedInUser, isNewExpenseFlowEnabled);
   const navbarRef = useRef();
   const mainContainerRef = useRef();
 

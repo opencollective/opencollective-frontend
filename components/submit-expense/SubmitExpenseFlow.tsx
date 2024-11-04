@@ -41,6 +41,7 @@ type SubmitExpenseFlowProps = {
   expenseId?: number;
   draftKey?: string;
   duplicateExpense?: boolean;
+  submitExpenseTo?: string;
 };
 
 const I18nMessages = defineMessages({
@@ -382,6 +383,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
             <div className="flex w-full flex-grow justify-center">
               <div className="flex w-full flex-col overflow-scroll sm:flex sm:flex-row sm:gap-11 sm:px-8 sm:pt-10">
                 <ExpenseFormikContainer
+                  submitExpenseTo={props.submitExpenseTo}
                   draftKey={props.draftKey}
                   duplicateExpense={props.duplicateExpense}
                   expenseId={props.expenseId}
@@ -397,6 +399,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
 }
 
 function ExpenseFormikContainer(props: {
+  submitExpenseTo?: string;
   draftKey?: string;
   duplicateExpense?: boolean;
   expenseId?: number;
@@ -416,6 +419,7 @@ function ExpenseFormikContainer(props: {
   const expenseForm = useExpenseForm({
     formRef,
     initialValues: {
+      accountSlug: props.submitExpenseTo,
       title: '',
       inviteeAccountType: InviteeAccountType.INDIVIDUAL,
       expenseItems: [

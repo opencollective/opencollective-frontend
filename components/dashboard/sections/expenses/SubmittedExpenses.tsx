@@ -26,9 +26,9 @@ import { accountExpensesQuery } from './queries';
 const ROUTE_PARAMS = ['slug', 'section', 'subpath'];
 
 const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
-  const [isExpenseFlowOpen, setIsExpenseFlowOpen] = React.useState(false);
-  const [duplicateExpenseId, setDuplicateExpenseId] = React.useState(null);
   const router = useRouter();
+  const [isExpenseFlowOpen, setIsExpenseFlowOpen] = React.useState(!!router.query.submitExpenseTo);
+  const [duplicateExpenseId, setDuplicateExpenseId] = React.useState(null);
   const { LoggedInUser } = useLoggedInUser();
 
   const queryFilter = useQueryFilter({
@@ -136,6 +136,14 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
       {isExpenseFlowOpen && (
         <SubmitExpenseFlow
           onClose={submittedExpense => {
+            const [url, rawQuery] = router.asPath.split('?');
+            const queryParams = new URLSearchParams(rawQuery);
+            queryParams.delete('submitExpenseTo');
+
+            const newUrl = new URL(url, window.location.origin);
+            newUrl.search = queryParams.toString();
+            router.replace(newUrl, undefined, { shallow: true });
+
             setDuplicateExpenseId(null);
             setIsExpenseFlowOpen(false);
             if (submittedExpense) {
@@ -144,6 +152,7 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
           }}
           expenseId={duplicateExpenseId}
           duplicateExpense={!!duplicateExpenseId}
+          submitExpenseTo={router.query.submitExpenseTo as string}
         />
       )}
     </React.Fragment>
