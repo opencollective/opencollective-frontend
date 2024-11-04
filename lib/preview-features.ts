@@ -77,12 +77,6 @@ export const previewFeatures: PreviewFeature[] = [
     closedBetaAccessFor: ['opencollective', 'design', 'engineering'],
   },
   {
-    key: PREVIEW_FEATURE_KEYS.TRANSACTIONS_IMPORTS,
-    title: 'Transactions Imports',
-    description: 'A new tool to import batches of transactions.',
-    publicBeta: true,
-  },
-  {
     key: PREVIEW_FEATURE_KEYS.AUTHENTICATED_SSR,
     title: 'Authenticated SSR',
     description: 'Uses cookie based authentication to generate initial page loads on the server',
@@ -130,11 +124,18 @@ export const previewFeatures: PreviewFeature[] = [
     hasAccess: user => user?.isRoot,
   },
   {
+    key: PREVIEW_FEATURE_KEYS.TRANSACTIONS_IMPORTS,
+    title: 'Transactions Imports',
+    description: 'A new tool to import batches of transactions.',
+    publicBeta: true,
+  },
+  {
     key: PREVIEW_FEATURE_KEYS.PLAID_INTEGRATION,
     title: 'Bank Account synchronization',
     description: 'Connect your bank account to import transactions',
     publicBeta: false,
-    hasAccess: user => user?.isRoot,
+    closedBetaAccessFor: ['opensource', 'ofico', 'ofitech', 'europe', 'oce-foundation-usd', 'oce-foundation-eur'],
+    dependsOn: PREVIEW_FEATURE_KEYS.TRANSACTIONS_IMPORTS,
   },
   {
     key: PREVIEW_FEATURE_KEYS.EXPORT_COLLECTIVES,
