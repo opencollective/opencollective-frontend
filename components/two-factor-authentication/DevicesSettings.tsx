@@ -5,7 +5,12 @@ import { PlusIcon } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import type { Individual, UserTwoFactorMethod } from '../../lib/graphql/types/v2/graphql';
+import type {
+  CreateWebAuthnRegistrationOptionsMutation,
+  CreateWebAuthnRegistrationOptionsMutationVariables,
+  Individual,
+  UserTwoFactorMethod,
+} from '../../lib/graphql/types/v2/graphql';
 import { TwoFactorMethod } from '../../lib/graphql/types/v2/graphql';
 
 import { Box, Flex } from '../Grid';
@@ -60,7 +65,10 @@ export function DevicesSettings(props: DevicesSettingsProps) {
   const twoFactorMethods = props.userTwoFactorAuthenticationMethods.filter(m => m.method === TwoFactorMethod.WEBAUTHN);
   const { toast } = useToast();
 
-  const [createPublicKeyRequestOptions] = useMutation(CreateWebAuthnRegistrationOptionsMutation, {
+  const [createPublicKeyRequestOptions] = useMutation<
+    CreateWebAuthnRegistrationOptionsMutation,
+    CreateWebAuthnRegistrationOptionsMutationVariables
+  >(CreateWebAuthnRegistrationOptionsMutation, {
     context: API_V2_CONTEXT,
   });
 
@@ -78,7 +86,9 @@ export function DevicesSettings(props: DevicesSettingsProps) {
     });
 
     try {
-      const registration = await webauthn.startRegistration(response.data.createWebAuthnRegistrationOptions);
+      const registration = await webauthn.startRegistration({
+        optionsJSON: response.data.createWebAuthnRegistrationOptions,
+      });
       const registrationBase64 = Buffer.from(JSON.stringify(registration)).toString('base64');
 
       const result = await addWebauthnDevice({
