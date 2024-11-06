@@ -17,7 +17,7 @@ import MessageBox from '../../MessageBox';
 import { Button } from '../../ui/Button';
 import { Input } from '../../ui/Input';
 import { Label } from '../../ui/Label';
-import { RadioGroup, RadioGroupItem } from '../../ui/RadioGroup';
+import { RadioGroup, RadioGroupCard, RadioGroupItem } from '../../ui/RadioGroup';
 import { useToast } from '../../ui/useToast';
 import { Step } from '../SubmitExpenseFlowSteps';
 import type { ExpenseForm } from '../useExpenseForm';
@@ -116,61 +116,86 @@ export function WhoIsGettingPaidSection(props: WhoIsGettingPaidSectionProps) {
         }}
       >
         {!props.form.initialLoading && lastUsedProfile && lastUsedProfile?.slug !== personalProfile?.slug && (
-          <div className="rounded-md border border-gray-200 has-[:checked]:flex-col has-[:checked]:items-start has-[:checked]:gap-2 has-[:checked]:border-blue-300">
-            <div className="flex items-center">
-              <RadioGroupItem className="ml-4" value={lastUsedProfile.slug}></RadioGroupItem>
-              <Label className="flex-grow p-4" htmlFor={lastUsedProfile.slug}>
-                <ExpenseAccountItem account={lastUsedProfile} />
-              </Label>
-            </div>
-            {props.form.values.payeeSlug === lastUsedProfile.slug && isEmpty(lastUsedProfile.legalName) && (
-              <div
-                className={cn({
-                  'p-4 pt-0': props.form.values.payeeSlug === lastUsedProfile.slug,
-                })}
-              >
-                <div>
-                  <LegalNameWarning account={lastUsedProfile} onLegalNameUpdate={props.form.refresh} />
-                </div>
-              </div>
-            )}
-          </div>
+          <RadioGroupCard
+            value={lastUsedProfile.slug}
+            showSubcontent={props.form.values.payeeSlug === lastUsedProfile.slug && isEmpty(lastUsedProfile.legalName)}
+            subContent={<LegalNameWarning account={lastUsedProfile} onLegalNameUpdate={props.form.refresh} />}
+          >
+            <ExpenseAccountItem account={lastUsedProfile} />
+          </RadioGroupCard>
+          // <div className="rounded-md border border-gray-200 has-[:checked]:flex-col has-[:checked]:items-start has-[:checked]:gap-2 has-[:checked]:border-blue-300">
+          //   <div className="flex items-center">
+          //     <RadioGroupItem className="ml-4" value={lastUsedProfile.slug}></RadioGroupItem>
+          //     <Label className="flex-grow p-4" htmlFor={lastUsedProfile.slug}>
+          //       <ExpenseAccountItem account={lastUsedProfile} />
+          //     </Label>
+          //   </div>
+          //   {props.form.values.payeeSlug === lastUsedProfile.slug && isEmpty(lastUsedProfile.legalName) && (
+          //     <div
+          //       className={cn({
+          //         'p-4 pt-0': props.form.values.payeeSlug === lastUsedProfile.slug,
+          //       })}
+          //     >
+          //       <div>
+          //         <LegalNameWarning account={lastUsedProfile} onLegalNameUpdate={props.form.refresh} />
+          //       </div>
+          //     </div>
+          //   )}
+          // </div>
         )}
 
         {(personalProfile || props.form.initialLoading) && (
-          <div className="rounded-md border border-gray-200 has-[:checked]:flex-col has-[:checked]:items-start has-[:checked]:gap-2 has-[:checked]:border-blue-300">
-            <div className="flex items-center">
-              <RadioGroupItem
-                className="ml-4"
-                value={!props.form.initialLoading ? personalProfile.slug : ''}
-                checked={props.form.initialLoading || props.form.values.payeeSlug === personalProfile.slug}
-                disabled={props.form.initialLoading}
-              ></RadioGroupItem>
-              <Label
-                className="flex min-h-16 flex-grow items-center p-4"
-                htmlFor={!props.form.initialLoading ? personalProfile.slug : ''}
-              >
-                {props.form.initialLoading ? (
-                  <LoadingPlaceholder height={24} width={1} />
-                ) : (
-                  <ExpenseAccountItem account={personalProfile} />
-                )}
-              </Label>
-            </div>
-            {!props.form.initialLoading &&
+          <RadioGroupCard
+            value={!props.form.initialLoading ? personalProfile.slug : ''}
+            disabled={props.form.initialLoading}
+            checked={props.form.initialLoading || props.form.values.payeeSlug === personalProfile.slug}
+            showSubcontent={
+              !props.form.initialLoading &&
               props.form.values.payeeSlug === personalProfile.slug &&
-              isEmpty(personalProfile.legalName) && (
-                <div
-                  className={cn({
-                    'p-4 pt-0': !props.form.initialLoading && props.form.values.payeeSlug === personalProfile.slug,
-                  })}
-                >
-                  <div>
-                    <LegalNameWarning account={personalProfile} onLegalNameUpdate={props.form.refresh} />
-                  </div>
-                </div>
-              )}
-          </div>
+              isEmpty(personalProfile.legalName)
+            }
+            subContent={<LegalNameWarning account={personalProfile} onLegalNameUpdate={props.form.refresh} />}
+          >
+            {props.form.initialLoading ? (
+              <LoadingPlaceholder height={24} width={1} />
+            ) : (
+              <ExpenseAccountItem account={personalProfile} />
+            )}
+          </RadioGroupCard>
+
+          // <div className="rounded-md border border-gray-200 has-[:checked]:flex-col has-[:checked]:items-start has-[:checked]:gap-2 has-[:checked]:border-blue-300">
+          //   <div className="flex items-center">
+          //     <RadioGroupItem
+          //       className="ml-4"
+          //       value={!props.form.initialLoading ? personalProfile.slug : ''}
+          //       checked={props.form.initialLoading || props.form.values.payeeSlug === personalProfile.slug}
+          //       disabled={props.form.initialLoading}
+          //     ></RadioGroupItem>
+          //     <Label
+          //       className="flex min-h-16 flex-grow items-center p-4"
+          //       htmlFor={!props.form.initialLoading ? personalProfile.slug : ''}
+          //     >
+          //       {props.form.initialLoading ? (
+          //         <LoadingPlaceholder height={24} width={1} />
+          //       ) : (
+          //         <ExpenseAccountItem account={personalProfile} />
+          //       )}
+          //     </Label>
+          //   </div>
+          //   {!props.form.initialLoading &&
+          //     props.form.values.payeeSlug === personalProfile.slug &&
+          //     isEmpty(personalProfile.legalName) && (
+          //       <div
+          //         className={cn({
+          //           'p-4 pt-0': !props.form.initialLoading && props.form.values.payeeSlug === personalProfile.slug,
+          //         })}
+          //       >
+          //         <div>
+          //           <LegalNameWarning account={personalProfile} onLegalNameUpdate={props.form.refresh} />
+          //         </div>
+          //       </div>
+          //     )}
+          // </div>
         )}
 
         {!props.form.initialLoading && hasOtherProfiles && (
@@ -208,7 +233,23 @@ export function WhoIsGettingPaidSection(props: WhoIsGettingPaidSectionProps) {
           </div>
         )}
 
-        <div className="rounded-md border border-gray-200 has-[:checked]:flex-col has-[:checked]:items-start has-[:checked]:gap-2 has-[:checked]:border-blue-300">
+        <RadioGroupCard
+          value="__inviteExistingUser"
+          disabled={props.form.initialLoading}
+          checked={!props.form.initialLoading && isOtherUserAccountSelected}
+          showSubcontent={!props.form.initialLoading && isOtherUserAccountSelected}
+          subContent={
+            <ExpenseAccountSearchInput
+              value={props.form.values.payeeSlug !== '__inviteExistingUser' ? props.form.values.payeeSlug : null}
+              onChange={slug => setFieldValue('payeeSlug', !slug ? '__inviteExistingUser' : slug)}
+            />
+          }
+        >
+          {/* <Label className={cn('flex min-h-16 flex-grow items-center p-4')} htmlFor="__inviteExistingUser"> */}
+          <FormattedMessage defaultMessage="Another account on the platform" id="7IUQ/2" />
+          {/* </Label> */}
+        </RadioGroupCard>
+        {/* <div className="rounded-md border border-gray-200 has-[:checked]:flex-col has-[:checked]:items-start has-[:checked]:gap-2 has-[:checked]:border-blue-300">
           <div className="flex items-center">
             <RadioGroupItem
               className="ml-4"
@@ -234,7 +275,7 @@ export function WhoIsGettingPaidSection(props: WhoIsGettingPaidSectionProps) {
               </div>
             )}
           </div>
-        </div>
+        </div> */}
 
         <div className="rounded-md border border-gray-200 has-[:checked]:flex-col has-[:checked]:items-start has-[:checked]:gap-2 has-[:checked]:border-blue-300">
           <div className="flex items-center">
