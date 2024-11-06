@@ -73,7 +73,9 @@ export default function TwoFactorAuthenticationModal() {
     setConfirming(true);
     setTwoFactorCode('');
     try {
-      const authenticationResponse = await simplewebauthn.startAuthentication(prompt.authenticationOptions.webauthn);
+      const authenticationResponse = await simplewebauthn.startAuthentication({
+        optionsJSON: prompt.authenticationOptions.webauthn,
+      });
       const base64AuthenticationResponse = Buffer.from(JSON.stringify(authenticationResponse), 'utf8').toString(
         'base64',
       );
