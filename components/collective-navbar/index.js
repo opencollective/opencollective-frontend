@@ -42,7 +42,9 @@ import LinkCollective from '../LinkCollective';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import StyledButton from '../StyledButton';
 import { fadeIn } from '../StyledKeyframes';
+import { SubmitExpenseFlow } from '../submit-expense/SubmitExpenseFlow';
 import { Span } from '../Text';
+import { Button } from '../ui/Button';
 
 import CollectiveNavbarActionsMenu from './ActionsMenu';
 import { NAVBAR_CATEGORIES } from './constants';
@@ -312,7 +314,13 @@ const getDefaultCallsToActions = (
 /**
  * Returns the main CTA that should be displayed as a button outside of the action menu in this component.
  */
-const getMainAction = (collective, callsToAction, LoggedInUser, isNewExpenseFlowEnabled = false) => {
+const getMainAction = (
+  collective,
+  callsToAction,
+  LoggedInUser,
+  isNewExpenseFlowEnabled = false,
+  onOpenSubmitExpenseModalClick = () => {},
+) => {
   if (!collective || !callsToAction) {
     return null;
   }
@@ -368,7 +376,14 @@ const getMainAction = (collective, callsToAction, LoggedInUser, isNewExpenseFlow
   } else if (callsToAction.includes('hasSubmitExpense')) {
     return {
       type: NAVBAR_ACTION_TYPE.SUBMIT_EXPENSE,
-      component: (
+      component: isNewExpenseFlowEnabled ? (
+        <ActionButton tabIndex="-1" onClick={onOpenSubmitExpenseModalClick}>
+          <Receipt size="1em" />
+          <Span ml={2}>
+            <FormattedMessage id="menu.submitExpense" defaultMessage="Submit Expense" />
+          </Span>
+        </ActionButton>
+      ) : (
         <Link
           href={
             isNewExpenseFlowEnabled
@@ -467,6 +482,8 @@ const CollectiveNavbar = ({
     skip: !collective?.slug || !LoggedInUser,
   });
 
+  const [isSubmitExpenseModalOpen, setIsSubmitExpenseModalOpen] = React.useState(false);
+
   const loading = isLoading || dataLoading;
 
   const isNewExpenseFlowEnabled =
@@ -490,10 +507,14 @@ const CollectiveNavbar = ({
     ...callsToAction,
   };
   const actionsArray = Object.keys(pickBy(callsToAction, Boolean));
-  const mainAction = getMainAction(collective, actionsArray, LoggedInUser, isNewExpenseFlowEnabled);
+  const mainAction = getMainAction(collective, actionsArray, LoggedInUser, isNewExpenseFlowEnabled, () =>
+    setIsSubmitExpenseModalOpen(true),
+  );
   const secondAction =
     actionsArray.length === 2 &&
-    getMainAction(collective, without(actionsArray, mainAction?.type), LoggedInUser, isNewExpenseFlowEnabled);
+    getMainAction(collective, without(actionsArray, mainAction?.type), LoggedInUser, isNewExpenseFlowEnabled, () =>
+      setIsSubmitExpenseModalOpen(true),
+    );
   const navbarRef = useRef();
   const mainContainerRef = useRef();
 
@@ -633,6 +654,7 @@ const CollectiveNavbar = ({
                 )}
                 {!loading && (
                   <CollectiveNavbarActionsMenu
+                    onOpenSubmitExpenseModalClick={() => setIsSubmitExpenseModalOpen(true)}
                     collective={collective}
                     callsToAction={callsToAction}
                     hiddenActionForNonMobile={mainAction?.type}
@@ -656,6 +678,14 @@ const CollectiveNavbar = ({
           )}
         </NavbarContentContainer>
       </NavBarContainer>
+      {isSubmitExpenseModalOpen && (
+        <SubmitExpenseFlow
+          onClose={() => {
+            setIsSubmitExpenseModalOpen(false);
+          }}
+          submitExpenseTo={collective?.slug}
+        />
+      )}
     </Fragment>
   );
 };

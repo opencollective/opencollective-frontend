@@ -39,8 +39,9 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
         <RadioGroup
           value={expenseTypeOption}
           onValueChange={newValue => props.form.setFieldValue('expenseTypeOption', newValue as ExpenseType)}
+          className="flex"
         >
-          <div className="rounded-md border border-gray-200 has-[:checked]:flex-col has-[:checked]:items-start has-[:checked]:gap-2 has-[:checked]:border-blue-300">
+          <div className="flex-grow basis-0 rounded-md border border-gray-200 has-[:checked]:flex-col has-[:checked]:items-start has-[:checked]:gap-2 has-[:checked]:border-blue-300">
             <div className="flex items-center">
               <RadioGroupItem
                 className="ml-4"
@@ -61,44 +62,8 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
                 </div>
               </Label>
             </div>
-            {!props.form.initialLoading && expenseTypeOption === ExpenseType.INVOICE && (
-              <div
-                className={cn({
-                  'p-4 pt-0':
-                    props.form.options.host?.policies?.EXPENSE_POLICIES?.invoicePolicy ||
-                    props.form.options.account?.policies?.EXPENSE_POLICIES?.invoicePolicy,
-                })}
-              >
-                {props.form.options.host?.slug !== props.form.options.account?.slug &&
-                  props.form.options.host?.policies?.EXPENSE_POLICIES?.invoicePolicy && (
-                    <div className="mt-4">
-                      <ExpensePolicyContainer
-                        title={<FormattedMessage defaultMessage="Host instructions to submit an invoice" id="jXsDtM" />}
-                        policy={props.form.options.host?.policies?.EXPENSE_POLICIES?.invoicePolicy}
-                        checked={props.form.values.acknowledgedHostInvoiceExpensePolicy}
-                        onAcknowledgedChanged={v => props.form.setFieldValue('acknowledgedHostInvoiceExpensePolicy', v)}
-                      />
-                    </div>
-                  )}
-
-                {props.form.options.account?.policies?.EXPENSE_POLICIES?.invoicePolicy && (
-                  <div className="mt-4">
-                    <ExpensePolicyContainer
-                      title={
-                        <FormattedMessage defaultMessage="Collective instructions to submit an invoice" id="NeQw7m" />
-                      }
-                      policy={props.form.options.account?.policies?.EXPENSE_POLICIES?.invoicePolicy}
-                      checked={props.form.values.acknowledgedCollectiveInvoiceExpensePolicy}
-                      onAcknowledgedChanged={v =>
-                        props.form.setFieldValue('acknowledgedCollectiveInvoiceExpensePolicy', v)
-                      }
-                    />
-                  </div>
-                )}
-              </div>
-            )}
           </div>
-          <div className="rounded-md border border-gray-200 has-[:checked]:flex-col has-[:checked]:items-start has-[:checked]:gap-2 has-[:checked]:border-blue-300">
+          <div className="flex-grow basis-0 rounded-md border border-gray-200 has-[:checked]:flex-col has-[:checked]:items-start has-[:checked]:gap-2 has-[:checked]:border-blue-300">
             <div className="flex items-center">
               <RadioGroupItem
                 className="ml-4"
@@ -119,44 +84,62 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
                 </div>
               </Label>
             </div>
-            {!props.form.initialLoading && expenseTypeOption === ExpenseType.RECEIPT && (
-              <div
-                className={cn({
-                  'p-4 pt-0':
-                    props.form.options.host?.policies?.EXPENSE_POLICIES?.receiptPolicy ||
-                    props.form.options.account?.policies?.EXPENSE_POLICIES?.receiptPolicy,
-                })}
-              >
-                {props.form.options.host?.slug !== props.form.options.account?.slug &&
-                  props.form.options.host?.policies?.EXPENSE_POLICIES?.receiptPolicy && (
-                    <div className="mt-4">
-                      <ExpensePolicyContainer
-                        title={<FormattedMessage defaultMessage="Host instructions to submit a receipt" id="YQgEUZ" />}
-                        policy={props.form.options.host?.policies?.EXPENSE_POLICIES?.receiptPolicy}
-                        checked={props.form.values.acknowledgedHostReceiptExpensePolicy}
-                        onAcknowledgedChanged={v => props.form.setFieldValue('acknowledgedHostReceiptExpensePolicy', v)}
-                      />
-                    </div>
-                  )}
+          </div>
+        </RadioGroup>
 
-                {props.form.options.account?.policies?.EXPENSE_POLICIES?.receiptPolicy && (
-                  <div className="mt-4">
-                    <ExpensePolicyContainer
-                      title={
-                        <FormattedMessage defaultMessage="Collective instructions to submit a receipt" id="cP95i8" />
-                      }
-                      policy={props.form.options.host?.policies?.EXPENSE_POLICIES?.receiptPolicy}
-                      checked={props.form.values.acknowledgedCollectiveReceiptExpensePolicy}
-                      onAcknowledgedChanged={v =>
-                        props.form.setFieldValue('acknowledgedCollectiveReceiptExpensePolicy', v)
-                      }
-                    />
-                  </div>
-                )}
+        {!props.form.initialLoading && expenseTypeOption === ExpenseType.INVOICE && (
+          <div>
+            {props.form.options.host?.slug !== props.form.options.account?.slug &&
+              props.form.options.host?.policies?.EXPENSE_POLICIES?.invoicePolicy && (
+                <div className="mt-4">
+                  <ExpensePolicyContainer
+                    title={<FormattedMessage defaultMessage="Host instructions to submit an invoice" id="jXsDtM" />}
+                    policy={props.form.options.host?.policies?.EXPENSE_POLICIES?.invoicePolicy}
+                    checked={props.form.values.acknowledgedHostInvoiceExpensePolicy}
+                    onAcknowledgedChanged={v => props.form.setFieldValue('acknowledgedHostInvoiceExpensePolicy', v)}
+                  />
+                </div>
+              )}
+
+            {props.form.options.account?.policies?.EXPENSE_POLICIES?.invoicePolicy && (
+              <div className="mt-4">
+                <ExpensePolicyContainer
+                  title={<FormattedMessage defaultMessage="Collective instructions to submit an invoice" id="NeQw7m" />}
+                  policy={props.form.options.account?.policies?.EXPENSE_POLICIES?.invoicePolicy}
+                  checked={props.form.values.acknowledgedCollectiveInvoiceExpensePolicy}
+                  onAcknowledgedChanged={v => props.form.setFieldValue('acknowledgedCollectiveInvoiceExpensePolicy', v)}
+                />
               </div>
             )}
           </div>
-        </RadioGroup>
+        )}
+
+        {!props.form.initialLoading && expenseTypeOption === ExpenseType.RECEIPT && (
+          <div>
+            {props.form.options.host?.slug !== props.form.options.account?.slug &&
+              props.form.options.host?.policies?.EXPENSE_POLICIES?.receiptPolicy && (
+                <div className="mt-4">
+                  <ExpensePolicyContainer
+                    title={<FormattedMessage defaultMessage="Host instructions to submit a receipt" id="YQgEUZ" />}
+                    policy={props.form.options.host?.policies?.EXPENSE_POLICIES?.receiptPolicy}
+                    checked={props.form.values.acknowledgedHostReceiptExpensePolicy}
+                    onAcknowledgedChanged={v => props.form.setFieldValue('acknowledgedHostReceiptExpensePolicy', v)}
+                  />
+                </div>
+              )}
+
+            {props.form.options.account?.policies?.EXPENSE_POLICIES?.receiptPolicy && (
+              <div className="mt-4">
+                <ExpensePolicyContainer
+                  title={<FormattedMessage defaultMessage="Collective instructions to submit a receipt" id="cP95i8" />}
+                  policy={props.form.options.host?.policies?.EXPENSE_POLICIES?.receiptPolicy}
+                  checked={props.form.values.acknowledgedCollectiveReceiptExpensePolicy}
+                  onAcknowledgedChanged={v => props.form.setFieldValue('acknowledgedCollectiveReceiptExpensePolicy', v)}
+                />
+              </div>
+            )}
+          </div>
+        )}
 
         {!props.form.initialLoading && expenseTypeOption === ExpenseType.INVOICE && (
           <div className="mt-4 rounded-md border border-gray-300 p-4">
@@ -177,7 +160,7 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
               </TabsList>
               <TabsContent value={YesNoOption.YES}>
                 <div className="flex items-start gap-4">
-                  <div className="flex-grow basis-0">
+                  <div className="flex-grow basis-0 h-16">
                     <div>
                       <StyledInputFormikField
                         isFastField
@@ -191,7 +174,8 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
                             kind="EXPENSE_ATTACHED_FILE"
                             name="invoice"
                             width={1}
-                            size={150}
+                            minHeight={48}
+                            height={1}
                             showActions
                             useGraphQL={true}
                             parseDocument={false}

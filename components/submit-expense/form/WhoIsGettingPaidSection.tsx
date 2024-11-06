@@ -4,11 +4,14 @@ import { isEmpty } from 'lodash';
 import { Lock } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { CollectiveType } from '../../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { gqlV1 } from '../../../lib/graphql/helpers';
 import { AccountType } from '../../../lib/graphql/types/v2/graphql';
 import { cn } from '../../../lib/utils';
 
+import CollectivePicker from '../../CollectivePicker';
+import CollectivePickerAsync from '../../CollectivePickerAsync';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import { Button } from '../../ui/Button';
@@ -51,8 +54,8 @@ export function WhoIsGettingPaidSection(props: WhoIsGettingPaidSectionProps) {
   const { setFieldValue, setFieldTouched } = props.form;
   React.useEffect(() => {
     const myProfileSlugs = myProfiles.map(m => m.slug);
-    const recentExpensesToMyProfiles = props.form.options.recentlySubmittedExpenses?.nodes?.filter(e =>
-      myProfileSlugs.includes(e.payee.slug),
+    const recentExpensesToMyProfiles = props.form.options.recentlySubmittedExpenses?.nodes?.filter(
+      e => e?.payee?.slug && myProfileSlugs.includes(e.payee.slug),
     );
 
     const lastUsedProfileId = recentExpensesToMyProfiles?.length > 0 && recentExpensesToMyProfiles.at(0).payee?.id;
@@ -189,12 +192,15 @@ export function WhoIsGettingPaidSection(props: WhoIsGettingPaidSectionProps) {
             >
               {isMyOtherProfilesSelected && (
                 <div>
-                  <ExpenseAccountSearchInput
-                    value={
-                      props.form.values.payeeSlug !== '__findAccountIAdminister' ? props.form.values.payeeSlug : null
+                  <CollectivePicker
+                    collectives={otherProfiles}
+                    collective={
+                      props.form.values.payeeSlug === '__findAccountIAdminister' ? null : props.form.options.payee
                     }
-                    onChange={slug => setFieldValue('payeeSlug', !slug ? '__findAccountIAdminister' : slug)}
-                    accounts={otherProfiles}
+                    onChange={e => {
+                      const slug = e.value.slug;
+                      setFieldValue('payeeSlug', !slug ? '__findAccountIAdminister' : slug);
+                    }}
                   />
                 </div>
               )}
@@ -244,6 +250,34 @@ export function WhoIsGettingPaidSection(props: WhoIsGettingPaidSectionProps) {
           >
             {props.form.values.payeeSlug === '__invite' && (
               <div>
+                <CollectivePickerAsync
+                  inputId="payee-invite-picker"
+                  // onFocus={() => props.form.setFieldValue('payeeSlug', option.value.slug)}
+                  invitable
+                  // collective={
+                  //   props.form.values.invitePayee && 'legacyId' in props.form.values.invitePayee
+                  //   ? { ...props.form.values.invitePayee, id: props.form.values.invitePayee.legacyId }
+                  //   : null
+                  // }
+                  types={[
+                    CollectiveType.COLLECTIVE,
+                    CollectiveType.EVENT,
+                    CollectiveType.FUND,
+                    CollectiveType.ORGANIZATION,
+                    CollectiveType.PROJECT,
+                    CollectiveType.USER,
+                  ]}
+                  onChange={option => {
+                    if (option?.value?.id) {
+                      setIsNewInvitePayee(false);
+                      props.form.setFieldValue('payeeSlug', option.value.slug);
+                    }
+                  }}
+                  onInvite={() => {
+                    props.form.setFieldValue('payeeSlug', '__invite');
+                    setIsNewInvitePayee(true);
+                  }}
+                />
                 <InviteUserOption form={props.form} />
               </div>
             )}
@@ -265,10 +299,13 @@ export function WhoIsGettingPaidSection(props: WhoIsGettingPaidSectionProps) {
             >
               {isVendorSelected && (
                 <div>
-                  <ExpenseAccountSearchInput
-                    accounts={vendorOptions}
-                    value={props.form.values.payeeSlug !== '__vendor' ? props.form.values.payeeSlug : null}
-                    onChange={slug => setFieldValue('payeeSlug', !slug ? '__vendor' : slug)}
+                  <CollectivePicker
+                    collectives={vendorOptions}
+                    collective={props.form.values.payeeSlug === '__vendor' ? null : props.form.options.payee}
+                    onChange={e => {
+                      const slug = e.value.slug;
+                      setFieldValue('payeeSlug', !slug ? '__vendor' : slug);
+                    }}
                   />
                 </div>
               )}

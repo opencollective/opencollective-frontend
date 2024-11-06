@@ -367,7 +367,6 @@ function PayoutMethodRadioGroupItem(props: {
   const intl = useIntl();
   const { toast } = useToast();
 
-  const [isPayoutMethodDetailsOpen, setIsPayoutMethodDetailsOpen] = React.useState(false);
   const [isEditingPayoutMethod, setIsEditingPayoutMethod] = React.useState(false);
   const [isLoadingEditPayoutMethod, setIsLoadingEditPayoutMethod] = React.useState(false);
 
@@ -379,10 +378,7 @@ function PayoutMethodRadioGroupItem(props: {
     !form.values.payeeSlug.startsWith('__') &&
     form.values.payeeSlug === form.options.payee?.slug &&
     props.payoutMethod.data?.accountHolderName !== form.options.payee?.legalName;
-  const isOpen =
-    isEditingPayoutMethod ||
-    isPayoutMethodDetailsOpen ||
-    (props.isChecked && (isMissingCurrency || hasLegalNameMismatch));
+  const isOpen = props.isChecked;
 
   const [isDeletingPayoutMethod, setIsDeletingPayoutMethod] = React.useState(false);
   const [isDeleted, setIsDeleted] = React.useState(false);
@@ -556,21 +552,12 @@ function PayoutMethodRadioGroupItem(props: {
             </div>
             {!isEditingPayoutMethod && (
               <div className="flex gap-2">
-                <Button
-                  onClick={e => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    setIsPayoutMethodDetailsOpen(!isPayoutMethodDetailsOpen);
-                  }}
-                  size="icon-xs"
-                  variant="ghost"
-                >
-                  {isPayoutMethodDetailsOpen ? <EyeOffIcon size={16} /> : <Eye size={16} />}
-                </Button>
-                <Button onClick={onEditClick} size="icon-xs" variant="ghost">
-                  <Pencil size={16} />
-                </Button>
-                <Button onClick={onDeleteClick} size="icon-xs" variant="ghost">
+                {props.isChecked && (
+                  <Button onClick={onEditClick} size="icon-xs" variant="ghost">
+                    <Pencil size={16} />
+                  </Button>
+                )}
+                <Button className="text-muted-foreground" onClick={onDeleteClick} size="icon-xs" variant="ghost">
                   <Trash2 size={16} />
                 </Button>
               </div>
@@ -639,6 +626,11 @@ function PayoutMethodRadioGroupItem(props: {
               </React.Fragment>
             ) : (
               <div className="flex flex-col gap-2">
+                <div className="max-h-16 relative overflow-hidden after:h-9 after:left-0 after:right-0 after:bottom-0 after:absolute after:[background:linear-gradient(0deg,rgba(0,0,0,0.5)_0%,rgba(255,255,255,0.5)_100%)]">
+                  <div className="grid grid-cols-3 gap-2 *:p-2 *:last:mb-0 shadow">
+                    <PayoutMethodDetails payoutMethod={props.payoutMethod} />
+                  </div>
+                </div>
                 {isMissingCurrency && (
                   <div className="mt-2">
                     <MessageBox type="warning">
@@ -721,11 +713,6 @@ function PayoutMethodRadioGroupItem(props: {
                       id="TI6gwx"
                     />
                   </MessageBox>
-                )}
-                {isPayoutMethodDetailsOpen && (
-                  <div className="grid grid-cols-3 gap-2 *:p-2 *:last:mb-0">
-                    <PayoutMethodDetails payoutMethod={props.payoutMethod} />
-                  </div>
                 )}
               </div>
             ))}

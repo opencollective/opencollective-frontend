@@ -2,9 +2,11 @@ import React from 'react';
 import { uniqBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
+import { CollectiveType } from '../../../lib/constants/collectives';
 import { AccountType } from '../../../lib/graphql/types/v2/graphql';
 import { cn } from '../../../lib/utils';
 
+import CollectivePickerAsync from '../../CollectivePickerAsync';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import { Label } from '../../ui/Label';
 import { RadioGroup, RadioGroupItem } from '../../ui/RadioGroup';
@@ -107,17 +109,23 @@ export function WhoIsPayingSection(props: WhoIsPayingSectionProps) {
             })}
           >
             {!props.form.initialLoading && isFindSelected && (
-              <ExpenseAccountSearchInput
-                showAdmins
-                accountTypes={[
-                  AccountType.COLLECTIVE,
-                  AccountType.ORGANIZATION,
-                  AccountType.PROJECT,
-                  AccountType.EVENT,
-                  AccountType.FUND,
+              <CollectivePickerAsync
+                autoFocus
+                isSearchable
+                filterResults={collectives =>
+                  collectives.filter(c => c.type !== CollectiveType.ORGANIZATION || c.isHost)
+                }
+                inputId="collective-expense-picker"
+                types={[
+                  CollectiveType.COLLECTIVE,
+                  CollectiveType.EVENT,
+                  CollectiveType.FUND,
+                  CollectiveType.ORGANIZATION,
+                  CollectiveType.PROJECT,
                 ]}
-                value={props.form.values.accountSlug !== '__find' ? props.form.values.accountSlug : null}
-                onChange={slug => setFieldValue('accountSlug', !slug ? '__find' : slug)}
+                collective={props.form.values.accountSlug === '__find' ? null : props.form.options.account}
+                // value={{ value: props.form.options.account, label: props.form.options.account?.name }}
+                onChange={e => setFieldValue('accountSlug', e.value.slug)}
               />
             )}
           </div>

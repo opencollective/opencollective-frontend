@@ -1,6 +1,7 @@
 import React from 'react';
 import type { FetchResult } from '@apollo/client';
 import { gql, useMutation } from '@apollo/client';
+import { Receipt } from '@styled-icons/boxicons-regular';
 import dayjs from 'dayjs';
 import { FormikProvider } from 'formik';
 import { omit, pick } from 'lodash';

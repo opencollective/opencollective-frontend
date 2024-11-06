@@ -33,7 +33,9 @@ import StyledButton from '../StyledButton';
 import { Dropdown, DropdownArrow, DropdownContent } from '../StyledDropdown';
 import StyledHr from '../StyledHr';
 import StyledLink from '../StyledLink';
+import { SubmitExpenseFlowButton } from '../submit-expense/SubmitExpenseFlow';
 import { Span } from '../Text';
+import { Button } from '../ui/Button';
 
 import { NAVBAR_ACTION_TYPE } from './menu';
 
@@ -177,7 +179,13 @@ const StyledChevronDown = styled(ChevronDown)`
 
 const ITEM_PADDING = '11px 14px';
 
-const CollectiveNavbarActionsMenu = ({ collective, callsToAction = {}, hiddenActionForNonMobile, LoggedInUser }) => {
+const CollectiveNavbarActionsMenu = ({
+  collective,
+  callsToAction = {},
+  hiddenActionForNonMobile,
+  LoggedInUser,
+  onOpenSubmitExpenseModalClick = () => {},
+}) => {
   const enabledCTAs = Object.keys(pickBy(callsToAction, Boolean));
   const isEmpty = enabledCTAs.length < 1;
   const hasOnlyOneHiddenCTA = enabledCTAs.length === 1 && hiddenActionForNonMobile === enabledCTAs[0];
@@ -233,20 +241,25 @@ const CollectiveNavbarActionsMenu = ({ collective, callsToAction = {}, hiddenAct
                     )}
                     {callsToAction.hasSubmitExpense && (
                       <MenuItem isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.SUBMIT_EXPENSE}>
-                        <StyledLink
-                          data-cy="submit-expense-dropdown"
-                          as={Link}
-                          href={
-                            isNewExpenseFlowEnabled
-                              ? `/dashboard/${LoggedInUser?.collective?.slug}/submitted-expenses?submitExpenseTo=${collective.slug}`
-                              : `${getCollectivePageRoute(collective)}/expenses/new`
-                          }
-                        >
-                          <Container p={ITEM_PADDING}>
-                            <Receipt size="20px" />
-                            <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
-                          </Container>
-                        </StyledLink>
+                        {isNewExpenseFlowEnabled ? (
+                          <StyledLink onClick={onOpenSubmitExpenseModalClick}>
+                            <Container p={ITEM_PADDING}>
+                              <Receipt size="20px" />
+                              <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
+                            </Container>
+                          </StyledLink>
+                        ) : (
+                          <StyledLink
+                            data-cy="submit-expense-dropdown"
+                            as={Link}
+                            href={`${getCollectivePageRoute(collective)}/expenses/new`}
+                          >
+                            <Container p={ITEM_PADDING}>
+                              <Receipt size="20px" />
+                              <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
+                            </Container>
+                          </StyledLink>
+                        )}
                       </MenuItem>
                     )}
                     {callsToAction.hasRequestGrant && (
@@ -429,6 +442,7 @@ CollectiveNavbarActionsMenu.propTypes = {
   }).isRequired,
   hiddenActionForNonMobile: PropTypes.oneOf(Object.values(NAVBAR_ACTION_TYPE)),
   LoggedInUser: PropTypes.object,
+  onOpenSubmitExpenseModalClick: PropTypes.func,
 };
 
 export default CollectiveNavbarActionsMenu;

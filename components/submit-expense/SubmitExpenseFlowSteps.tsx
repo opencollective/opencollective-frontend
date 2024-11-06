@@ -16,19 +16,19 @@ type SubmitExpenseFlowStepsProps = {
   activeStep: Step;
 };
 
-const stepListItemVariants = cva('', {
+const stepListItemVariants = cva('font-normal', {
   variants: {
     itemType: {
       header:
-        '[--step-bullet-border-color:#94A3B8] [--step-bullet-border-width:2px] [--step-bullet-border:2px] [--step-bullet-color:white] [--step-bullet-size:24px] [--step-bullet-text-color:#48566A] last:after:hidden',
+        'text-base font-bold [--step-bullet-border-color:#94A3B8] [--step-bullet-border-width:2px] [--step-bullet-border:2px] [--step-bullet-color:white] [--step-bullet-size:24px] [--step-bullet-text-color:#48566A] last:after:hidden',
       activeHeader:
-        '[--step-bullet-border-color:#1547B8] [--step-bullet-border-width:2px] [--step-bullet-color:white] [--step-bullet-size:24px]',
+        'text-base font-bold [--step-bullet-border-color:#1547B8] [--step-bullet-border-width:2px] [--step-bullet-color:white] [--step-bullet-size:24px]',
       completedHeader:
-        "[--step-bullet-border-color:#1547B8] [--step-bullet-border-width:2px] [--step-bullet-color:#1547B8] [--step-bullet-size:24px] [--step-bullet-text-color:white] before:content-['✓']",
+        "text-base font-bold [--step-bullet-border-color:#1547B8] [--step-bullet-border-width:2px] [--step-bullet-color:#1547B8] [--step-bullet-size:24px] [--step-bullet-text-color:white] before:content-['✓']",
       activeItem:
-        '[--step-bullet-box-shadow:0_0_0_4px_hsla(216,_100%,_58%,_0.3)] [--step-bullet-color:#1547B8] [--step-text-color:#1547B8]',
-      completedItem: '[--step-bullet-color:#1547B8]',
-      item: '',
+        'text-sm [--step-bullet-box-shadow:0_0_0_4px_hsla(216,_100%,_58%,_0.3)] [--step-bullet-color:#1547B8] [--step-text-color:#1547B8]',
+      completedItem: 'text-sm [--step-bullet-color:#1547B8]',
+      item: 'text-sm',
     },
   },
   defaultVariants: {
@@ -160,7 +160,7 @@ export function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
 
   return (
     <div className={cn(props.className)}>
-      <ol className="pl-[12px] [--step-bullet-border-color:#CBD5E1] [--step-bullet-border-width:0px] [--step-bullet-color:#CBD5E1] [--step-bullet-size:8px] [--step-line-color:#E1E7EF] [--step-text-color:#344256] *:relative *:flex *:items-center *:gap-2 *:pb-8 *:pl-7 *:text-base *:font-bold *:text-[var(--step-text-color)] *:before:absolute *:before:left-0 *:before:inline-block *:before:h-[var(--step-bullet-size)] *:before:w-[var(--step-bullet-size)] *:before:-translate-x-[calc(var(--step-bullet-size)/2)] *:before:rounded-full *:before:border-[var(--step-bullet-border-color)] *:before:bg-[--step-bullet-color] *:before:text-center *:before:text-sm *:before:font-medium *:before:text-[var(--step-bullet-text-color,var(--step-bullet-border-color))] *:before:[border-width:var(--step-bullet-border-width)] *:before:[box-shadow:var(--step-bullet-box-shadow,initial)] *:after:absolute *:after:left-0 *:after:top-2 *:after:-z-10 *:after:h-full *:after:-translate-x-[1px] *:after:border-l-2 *:after:border-[--step-line-color] *:after:[border-style:var(--step-line-style,solid)]">
+      <ol className="pl-[12px] [--step-bullet-border-color:#CBD5E1] [--step-bullet-border-width:0px] [--step-bullet-color:#CBD5E1] [--step-bullet-size:8px] [--step-line-color:#E1E7EF] [--step-text-color:#344256] *:relative *:flex *:items-center *:gap-2 *:pb-8 *:pl-7  *:text-[var(--step-text-color)] *:before:absolute *:before:left-0 *:before:inline-block *:before:h-[var(--step-bullet-size)] *:before:w-[var(--step-bullet-size)] *:before:-translate-x-[calc(var(--step-bullet-size)/2)] *:before:rounded-full *:before:border-[var(--step-bullet-border-color)] *:before:bg-[--step-bullet-color] *:before:text-center *:before:text-sm *:before:font-medium *:before:text-[var(--step-bullet-text-color,var(--step-bullet-border-color))] *:before:[border-width:var(--step-bullet-border-width)] *:before:[box-shadow:var(--step-bullet-box-shadow,initial)] *:after:absolute *:after:left-0 *:after:top-2 *:after:-z-10 *:after:h-full *:after:-translate-x-[1px] *:after:border-l-2 *:after:border-[--step-line-color] *:after:[border-style:var(--step-line-style,solid)]">
         <li
           className={cn(
             "before:content-['1']",
