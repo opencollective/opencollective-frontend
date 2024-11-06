@@ -383,13 +383,7 @@ const getMainAction = (
           </Span>
         </ActionButton>
       ) : (
-        <Link
-          href={
-            isNewExpenseFlowEnabled
-              ? `/dashboard/${LoggedInUser?.collective?.slug}/submitted-expenses?submitExpenseTo=${collective.slug}`
-              : `${getCollectivePageRoute(collective)}/expenses/new`
-          }
-        >
+        <Link href={`${getCollectivePageRoute(collective)}/expenses/new`}>
           <ActionButton tabIndex="-1">
             <Receipt size="1em" />
             <Span ml={2}>
