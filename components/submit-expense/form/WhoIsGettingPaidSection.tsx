@@ -14,10 +14,12 @@ import CollectivePicker from '../../CollectivePicker';
 import CollectivePickerAsync from '../../CollectivePickerAsync';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
+import StyledHr from '../../StyledHr';
 import { Button } from '../../ui/Button';
 import { Input } from '../../ui/Input';
 import { Label } from '../../ui/Label';
 import { RadioGroup, RadioGroupCard, RadioGroupItem } from '../../ui/RadioGroup';
+import { Separator } from '../../ui/Separator';
 import { useToast } from '../../ui/useToast';
 import { Step } from '../SubmitExpenseFlowSteps';
 import type { ExpenseForm } from '../useExpenseForm';
@@ -199,7 +201,7 @@ export function WhoIsGettingPaidSection(props: WhoIsGettingPaidSectionProps) {
         )}
 
         {!props.form.initialLoading && hasOtherProfiles && (
-          <div className="rounded-md border border-gray-200 has-[:checked]:flex-col has-[:checked]:items-start has-[:checked]:gap-2 has-[:checked]:border-blue-300">
+          <div className="rounded-md border has-[:checked]:border-2 border-gray-200 has-[:checked]:flex-col has-[:checked]:items-start has-[:checked]:gap-2 has-[:checked]:border-blue-300">
             <div className="flex items-center">
               <RadioGroupItem
                 className="ml-4"
@@ -310,16 +312,18 @@ export function WhoIsGettingPaidSection(props: WhoIsGettingPaidSectionProps) {
                   ]}
                   onChange={option => {
                     if (option?.value?.id) {
-                      setIsNewInvitePayee(false);
                       props.form.setFieldValue('payeeSlug', option.value.slug);
                     }
                   }}
                   onInvite={() => {
                     props.form.setFieldValue('payeeSlug', '__invite');
-                    setIsNewInvitePayee(true);
                   }}
                 />
+                <Separator className="mt-3" />
+                <div className='mt-3'>
+
                 <InviteUserOption form={props.form} />
+                </div>
               </div>
             )}
           </div>

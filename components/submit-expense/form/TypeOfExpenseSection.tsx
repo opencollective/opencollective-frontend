@@ -53,7 +53,7 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
                 htmlFor={ExpenseType.INVOICE}
               >
                 <div>
-                  <div className="mb-1">
+                  <div className="mb-1 font-bold">
                     <FormattedMessage defaultMessage="Invoice" id="Expense.Type.Invoice" />
                   </div>
                   <div className="text-muted-foreground">
@@ -75,7 +75,7 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
                 htmlFor={ExpenseType.RECEIPT}
               >
                 <div>
-                  <div className="mb-1">
+                  <div className="mb-1 font-bold">
                     <FormattedMessage defaultMessage="Reimbursement" id="ExpenseForm.ReceiptLabel" />
                   </div>
                   <div className="text-muted-foreground">

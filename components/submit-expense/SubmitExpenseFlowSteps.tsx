@@ -26,7 +26,7 @@ const stepListItemVariants = cva('font-normal', {
       completedHeader:
         "text-base font-bold [--step-bullet-border-color:#1547B8] [--step-bullet-border-width:2px] [--step-bullet-color:#1547B8] [--step-bullet-size:24px] [--step-bullet-text-color:white] before:content-['✓']",
       activeItem:
-        'text-sm [--step-bullet-box-shadow:0_0_0_4px_hsla(216,_100%,_58%,_0.3)] [--step-bullet-color:#1547B8] [--step-text-color:#1547B8]',
+        'text-sm font-bold [--step-bullet-box-shadow:0_0_0_4px_hsla(216,_100%,_58%,_0.3)] [--step-bullet-color:#1547B8] [--step-text-color:#1547B8]',
       completedItem: 'text-sm [--step-bullet-color:#1547B8]',
       item: 'text-sm',
     },

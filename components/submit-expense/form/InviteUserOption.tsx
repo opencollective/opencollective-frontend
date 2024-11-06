@@ -16,17 +16,17 @@ export function InviteUserOption(props: InviteUserOptionProps) {
   return (
     <div>
       <div>
-        <div className="px-4 pb-4">
+        <div className="">
           <Tabs
             id="lastSubmittedAccount"
             value={props.form.values.inviteeAccountType}
             onValueChange={newValue => setFieldValue('inviteeAccountType', newValue as InviteeAccountType)}
           >
             <TabsList>
-              <TabsTrigger value={InviteeAccountType.INDIVIDUAL}>
+              <TabsTrigger value={InviteeAccountType.INDIVIDUAL} className='data-[state=active]:shadow data-[state=active]:text-blue-900'>
                 <FormattedMessage defaultMessage="Personal Account" id="Sch2bu" />
               </TabsTrigger>
-              <TabsTrigger value={InviteeAccountType.ORGANIZATION}>
+              <TabsTrigger value={InviteeAccountType.ORGANIZATION} className='data-[state=active]:shadow data-[state=active]:text-blue-900'>
                 <FormattedMessage defaultMessage="Organization Account" id="cS9oSV" />
               </TabsTrigger>
             </TabsList>
