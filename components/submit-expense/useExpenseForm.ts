@@ -941,7 +941,7 @@ function buildFormSchema(
       .nullish()
       .refine(
         inviteeExistingAccount => {
-          if (values.payeeSlug === '___inviteExistingUser') {
+          if (values.payeeSlug === '__invite') {
             return !!inviteeExistingAccount;
           }
 
@@ -1122,6 +1122,7 @@ function getPayeeSlug(values: ExpenseFormValues): string {
   switch (values.payeeSlug) {
     case '__findAccountIAdminister':
     case '__invite':
+    case '__inviteSomeone':
     case '__vendor':
       return null;
     case '__inviteExistingUser':

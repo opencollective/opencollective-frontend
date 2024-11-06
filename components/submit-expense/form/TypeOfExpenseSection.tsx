@@ -2,13 +2,12 @@ import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { ExpenseType } from '../../../lib/graphql/types/v2/graphql';
-import { cn } from '../../../lib/utils';
 import { attachmentDropzoneParams } from '../../expenses/lib/attachments';
 
 import StyledDropzone from '../../StyledDropzone';
 import StyledInputFormikField from '../../StyledInputFormikField';
 import { Label } from '../../ui/Label';
-import { RadioGroup, RadioGroupItem } from '../../ui/RadioGroup';
+import { RadioGroup, RadioGroupCard } from '../../ui/RadioGroup';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../ui/Tabs';
 import { useToast } from '../../ui/useToast';
 import { Step } from '../SubmitExpenseFlowSteps';
@@ -41,50 +40,35 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
           onValueChange={newValue => props.form.setFieldValue('expenseTypeOption', newValue as ExpenseType)}
           className="flex"
         >
-          <div className="flex-grow basis-0 rounded-md border border-gray-200 has-[:checked]:flex-col has-[:checked]:items-start has-[:checked]:gap-2 has-[:checked]:border-blue-300">
-            <div className="flex items-center">
-              <RadioGroupItem
-                className="ml-4"
-                value={ExpenseType.INVOICE}
-                disabled={props.form.initialLoading}
-              ></RadioGroupItem>
-              <Label
-                className={cn('flex min-h-16 flex-grow items-center justify-between p-4')}
-                htmlFor={ExpenseType.INVOICE}
-              >
-                <div>
-                  <div className="mb-1 font-bold">
-                    <FormattedMessage defaultMessage="Invoice" id="Expense.Type.Invoice" />
-                  </div>
-                  <div className="text-muted-foreground">
-                    <FormattedMessage defaultMessage="I am submitting an invoice to get paid" id="plK07+" />
-                  </div>
-                </div>
-              </Label>
+          <RadioGroupCard
+            className="flex-grow basis-0"
+            value={ExpenseType.INVOICE}
+            disabled={props.form.initialLoading}
+          >
+            <div>
+              <div className="mb-1 font-bold">
+                <FormattedMessage defaultMessage="Invoice" id="Expense.Type.Invoice" />
+              </div>
+              <div className="text-muted-foreground">
+                <FormattedMessage defaultMessage="I am submitting an invoice to get paid" id="plK07+" />
+              </div>
             </div>
-          </div>
-          <div className="flex-grow basis-0 rounded-md border border-gray-200 has-[:checked]:flex-col has-[:checked]:items-start has-[:checked]:gap-2 has-[:checked]:border-blue-300">
-            <div className="flex items-center">
-              <RadioGroupItem
-                className="ml-4"
-                value={ExpenseType.RECEIPT}
-                disabled={props.form.initialLoading}
-              ></RadioGroupItem>
-              <Label
-                className={cn('flex min-h-16 flex-grow items-center justify-between p-4')}
-                htmlFor={ExpenseType.RECEIPT}
-              >
-                <div>
-                  <div className="mb-1 font-bold">
-                    <FormattedMessage defaultMessage="Reimbursement" id="ExpenseForm.ReceiptLabel" />
-                  </div>
-                  <div className="text-muted-foreground">
-                    <FormattedMessage defaultMessage="I want a reimbursement for something I've paid for" id="ZQSnky" />
-                  </div>
-                </div>
-              </Label>
+          </RadioGroupCard>
+
+          <RadioGroupCard
+            className="flex-grow basis-0"
+            value={ExpenseType.RECEIPT}
+            disabled={props.form.initialLoading}
+          >
+            <div>
+              <div className="mb-1 font-bold">
+                <FormattedMessage defaultMessage="Reimbursement" id="ExpenseForm.ReceiptLabel" />
+              </div>
+              <div className="text-muted-foreground">
+                <FormattedMessage defaultMessage="I want a reimbursement for something I've paid for" id="ZQSnky" />
+              </div>
             </div>
-          </div>
+          </RadioGroupCard>
         </RadioGroup>
 
         {!props.form.initialLoading && expenseTypeOption === ExpenseType.INVOICE && (
@@ -160,7 +144,7 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
               </TabsList>
               <TabsContent value={YesNoOption.YES}>
                 <div className="flex items-start gap-4">
-                  <div className="flex-grow basis-0 h-16">
+                  <div className="h-16 flex-grow basis-0">
                     <div>
                       <StyledInputFormikField
                         isFastField

@@ -2,7 +2,7 @@ import React from 'react';
 import { gql, useMutation } from '@apollo/client';
 import { useFormikContext } from 'formik';
 import { get, isEmpty, omit, truncate } from 'lodash';
-import { Eye, EyeOffIcon, Pencil, Trash2 } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../lib/errors';
@@ -12,7 +12,6 @@ import type {
   SavePayoutMethodMutationVariables,
 } from '../../../lib/graphql/types/v2/graphql';
 import { PayoutMethodType } from '../../../lib/graphql/types/v2/graphql';
-import { cn } from '../../../lib/utils';
 
 import ConfirmationModal, { CONFIRMATION_MODAL_TERMINATE } from '../../ConfirmationModal';
 import PayoutMethodForm, { validatePayoutMethod } from '../../expenses/PayoutMethodForm';
@@ -23,8 +22,7 @@ import StyledInput from '../../StyledInput';
 import StyledInputFormikField from '../../StyledInputFormikField';
 import StyledSelect from '../../StyledSelect';
 import { Button } from '../../ui/Button';
-import { Label } from '../../ui/Label';
-import { RadioGroup, RadioGroupItem } from '../../ui/RadioGroup';
+import { RadioGroup, RadioGroupCard } from '../../ui/RadioGroup';
 import { useToast } from '../../ui/useToast';
 import { PayoutMethodDetails } from '../PayoutMethodDetails';
 import { Step } from '../SubmitExpenseFlowSteps';
@@ -70,7 +68,7 @@ export function PayoutMethodSection(props: PayoutMethodSectionProps) {
     }
 
     const lastSubmittedExpenseByPayee = props.form.options.recentlySubmittedExpenses?.nodes
-      ?.filter(e => e.payee.slug === props.form.values.payeeSlug && e.payoutMethod?.id)
+      ?.filter(e => e && e.payee.slug === props.form.values.payeeSlug && e.payoutMethod?.id)
       ?.at(0);
     const lastUsedPayoutMethodId = lastSubmittedExpenseByPayee?.payoutMethod?.id;
     const lastUsed =
@@ -149,36 +147,20 @@ export function PayoutMethodSection(props: PayoutMethodSectionProps) {
             ))}
 
           {(isLoading || props.form.initialLoading) && (
-            <div className="rounded-md border border-gray-200">
-              <div className="flex items-center">
-                <RadioGroupItem className="ml-4" value="" disabled></RadioGroupItem>
-                <Label className={cn('flex min-h-16 flex-grow items-center p-4')} htmlFor="__newPayoutMethod">
-                  <LoadingPlaceholder height={24} width={1} />
-                </Label>
-              </div>
-            </div>
+            <RadioGroupCard value="" disabled>
+              <LoadingPlaceholder height={24} width={1} />
+            </RadioGroupCard>
           )}
 
-          <div className="rounded-md border border-gray-200 has-[:checked]:flex-col has-[:checked]:items-start has-[:checked]:gap-2 has-[:checked]:border-blue-300">
-            <div className="flex items-center">
-              <RadioGroupItem
-                className="ml-4"
-                value="__newPayoutMethod"
-                checked={isNewPayoutMethodSelected}
-                disabled={isLoading || props.form.initialLoading}
-              ></RadioGroupItem>
-              <Label className={cn('flex min-h-16 flex-grow items-center p-4')} htmlFor="__newPayoutMethod">
-                <FormattedMessage defaultMessage="New payout method" id="vJEJ0J" />
-              </Label>
-            </div>
-            <div
-              className={cn({
-                'p-4 pt-0': !props.form.initialLoading && isNewPayoutMethodSelected,
-              })}
-            >
-              {!props.form.initialLoading && isNewPayoutMethodSelected && <NewPayoutMethodOption form={props.form} />}
-            </div>
-          </div>
+          <RadioGroupCard
+            value="__newPayoutMethod"
+            checked={isNewPayoutMethodSelected}
+            disabled={isLoading || props.form.initialLoading}
+            showSubcontent={!props.form.initialLoading && isNewPayoutMethodSelected}
+            subContent={<NewPayoutMethodOption form={props.form} />}
+          >
+            <FormattedMessage defaultMessage="New payout method" id="vJEJ0J" />
+          </RadioGroupCard>
         </RadioGroup>
       )}
     </FormSectionContainer>
@@ -540,184 +522,174 @@ function PayoutMethodRadioGroupItem(props: {
 
   return (
     <React.Fragment>
-      <div className="rounded-md border border-gray-200 has-[:checked]:flex-col has-[:checked]:items-start has-[:checked]:gap-2 has-[:checked]:border-blue-300">
-        <div className="flex items-center">
-          <RadioGroupItem className="ml-4" value={props.payoutMethod.id}></RadioGroupItem>
-          <Label
-            className={cn('flex min-h-16 flex-grow items-center justify-between p-4')}
-            htmlFor={props.payoutMethod.id}
-          >
-            <div>
-              <PayoutMethodLabel showIcon payoutMethod={props.payoutMethod} />
-            </div>
-            {!isEditingPayoutMethod && (
-              <div className="flex gap-2">
-                {props.isChecked && (
-                  <Button onClick={onEditClick} size="icon-xs" variant="ghost">
-                    <Pencil size={16} />
-                  </Button>
-                )}
-                <Button className="text-muted-foreground" onClick={onDeleteClick} size="icon-xs" variant="ghost">
-                  <Trash2 size={16} />
+      <RadioGroupCard
+        value={props.payoutMethod.id}
+        showSubcontent={isOpen}
+        subContent={
+          isOpen &&
+          (isEditingPayoutMethod ? (
+            <React.Fragment>
+              {isLoadingEditPayoutMethod ? (
+                <LoadingPlaceholder width={1} height={24} />
+              ) : (
+                <React.Fragment>
+                  <PayoutMethodForm
+                    required
+                    alwaysSave
+                    fieldsPrefix={`editingPayoutMethod.${props.payoutMethod.id}`}
+                    payoutMethod={omit(props.payoutMethod, 'id')}
+                    host={form.options.host}
+                  />
+                  <StyledInputFormikField
+                    mt={2}
+                    label={intl.formatMessage({ defaultMessage: 'Name', id: 'Fields.name' })}
+                    name={`editingPayoutMethod.${props.payoutMethod.id}.name`}
+                  >
+                    {({ field }) => (
+                      <StyledInput
+                        {...field}
+                        onFocus={() => form.setFieldTouched(`editingPayoutMethod.${props.payoutMethod.id}.name`, true)}
+                      />
+                    )}
+                  </StyledInputFormikField>
+                  {editPayoutMethodValue?.name !==
+                    generatePayoutMethodName(editPayoutMethodValue.type, editPayoutMethodValue.data) && (
+                    <Button
+                      size="xs"
+                      variant="link"
+                      className="p-0"
+                      onClick={() => setFieldTouched(`editingPayoutMethod.${props.payoutMethod.id}.name`, false)}
+                    >
+                      <FormattedMessage defaultMessage="Use default generated name" id="+6P7pM" />
+                    </Button>
+                  )}
+                </React.Fragment>
+              )}
+
+              <div className="mt-4 flex justify-end gap-2">
+                <Button
+                  disabled={isLoadingEditPayoutMethod}
+                  variant="secondary"
+                  onClick={() => setIsEditingPayoutMethod(false)}
+                >
+                  <FormattedMessage defaultMessage="Cancel" id="actions.cancel" />
+                </Button>
+                <Button loading={isLoadingEditPayoutMethod} onClick={onSaveClick}>
+                  <FormattedMessage defaultMessage="Save" id="save" />
                 </Button>
               </div>
-            )}
-          </Label>
-        </div>
-        <div
-          className={cn({
-            'p-4 pt-0': isOpen,
-          })}
-        >
-          {isOpen &&
-            (isEditingPayoutMethod ? (
-              <React.Fragment>
-                {isLoadingEditPayoutMethod ? (
-                  <LoadingPlaceholder width={1} height={24} />
-                ) : (
-                  <React.Fragment>
-                    <PayoutMethodForm
-                      required
-                      alwaysSave
-                      fieldsPrefix={`editingPayoutMethod.${props.payoutMethod.id}`}
-                      payoutMethod={omit(props.payoutMethod, 'id')}
-                      host={form.options.host}
-                    />
-                    <StyledInputFormikField
-                      mt={2}
-                      label={intl.formatMessage({ defaultMessage: 'Name', id: 'Fields.name' })}
-                      name={`editingPayoutMethod.${props.payoutMethod.id}.name`}
-                    >
-                      {({ field }) => (
-                        <StyledInput
-                          {...field}
-                          onFocus={() =>
-                            form.setFieldTouched(`editingPayoutMethod.${props.payoutMethod.id}.name`, true)
-                          }
-                        />
-                      )}
-                    </StyledInputFormikField>
-                    {editPayoutMethodValue?.name !==
-                      generatePayoutMethodName(editPayoutMethodValue.type, editPayoutMethodValue.data) && (
-                      <Button
-                        size="xs"
-                        variant="link"
-                        className="p-0"
-                        onClick={() => setFieldTouched(`editingPayoutMethod.${props.payoutMethod.id}.name`, false)}
-                      >
-                        <FormattedMessage defaultMessage="Use default generated name" id="+6P7pM" />
-                      </Button>
-                    )}
-                  </React.Fragment>
-                )}
-
-                <div className="mt-4 flex justify-end gap-2">
-                  <Button
-                    disabled={isLoadingEditPayoutMethod}
-                    variant="secondary"
-                    onClick={() => setIsEditingPayoutMethod(false)}
-                  >
-                    <FormattedMessage defaultMessage="Cancel" id="actions.cancel" />
-                  </Button>
-                  <Button loading={isLoadingEditPayoutMethod} onClick={onSaveClick}>
-                    <FormattedMessage defaultMessage="Save" id="save" />
-                  </Button>
+            </React.Fragment>
+          ) : (
+            <div className="flex flex-col gap-2">
+              <div className="relative max-h-16 overflow-hidden after:absolute after:bottom-0 after:left-0 after:right-0 after:h-9 after:[background:linear-gradient(0deg,rgba(0,0,0,0.5)_0%,rgba(255,255,255,0.5)_100%)]">
+                <div className="grid grid-cols-3 gap-2 shadow *:p-2 *:last:mb-0">
+                  <PayoutMethodDetails payoutMethod={props.payoutMethod} />
                 </div>
-              </React.Fragment>
-            ) : (
-              <div className="flex flex-col gap-2">
-                <div className="max-h-16 relative overflow-hidden after:h-9 after:left-0 after:right-0 after:bottom-0 after:absolute after:[background:linear-gradient(0deg,rgba(0,0,0,0.5)_0%,rgba(255,255,255,0.5)_100%)]">
-                  <div className="grid grid-cols-3 gap-2 *:p-2 *:last:mb-0 shadow">
-                    <PayoutMethodDetails payoutMethod={props.payoutMethod} />
-                  </div>
-                </div>
-                {isMissingCurrency && (
-                  <div className="mt-2">
-                    <MessageBox type="warning">
-                      <div className="mb-2 font-bold">
-                        <FormattedMessage defaultMessage="Missing currency" id="dkeCt1" />
-                      </div>
-                      <div>
-                        <FormattedMessage
-                          defaultMessage="Your payout method is missing a currency. Please edit your payout method to update it."
-                          id="nrG4vz"
-                        />
-                      </div>
-                    </MessageBox>
-                  </div>
-                )}
-                {hasLegalNameMismatch && !legalNameUpdated && (
+              </div>
+              {isMissingCurrency && (
+                <div className="mt-2">
                   <MessageBox type="warning">
                     <div className="mb-2 font-bold">
-                      <FormattedMessage defaultMessage="The names you provided do not match." id="XAPZa0" />
+                      <FormattedMessage defaultMessage="Missing currency" id="dkeCt1" />
                     </div>
                     <div>
                       <FormattedMessage
-                        defaultMessage="The legal name in the payee profile is: {legalName}."
-                        id="NSammt"
-                        values={{
-                          legalName: form.options.payee?.legalName,
-                        }}
+                        defaultMessage="Your payout method is missing a currency. Please edit your payout method to update it."
+                        id="nrG4vz"
                       />
                     </div>
-                    <div>
-                      <FormattedMessage
-                        defaultMessage="The contact name in the payout method is: {accountHolderName}."
-                        id="XC+vMa"
-                        values={{
-                          accountHolderName: props.payoutMethod.data?.accountHolderName,
-                        }}
-                      />
-                    </div>
-
-                    {!keepNameDifferent && (
-                      <React.Fragment>
-                        <div className="mb-2 mt-4 font-bold">
-                          <FormattedMessage
-                            defaultMessage=" Would you like to update your legal name to match your payout method contact name?"
-                            id="fEYP7x"
-                          />
-                        </div>
-
-                        <div className="flex gap-4">
-                          <Button
-                            disabled={loading}
-                            loading={loading}
-                            variant="outline"
-                            onClick={onUpdateLegalNameToMatch}
-                          >
-                            <FormattedMessage defaultMessage="Yes, Update and Match" id="qjpM/f" />
-                          </Button>
-                          <Button disabled={loading} variant="outline" onClick={() => setKeepNameDifferent(true)}>
-                            <FormattedMessage defaultMessage="No, Keep Them Different" id="PCBOGA" />
-                          </Button>
-                        </div>
-                      </React.Fragment>
-                    )}
-                    {keepNameDifferent && (
-                      <StyledInputFormikField
-                        mt={4}
-                        label={intl.formatMessage({
-                          defaultMessage: 'Please explain why they are different',
-                          id: 'bzGbkJ',
-                        })}
-                        name="payoutMethodNameDiscrepancyReason"
-                      />
-                    )}
                   </MessageBox>
-                )}
-                {legalNameUpdated && (
-                  <MessageBox type="warning">
+                </div>
+              )}
+              {hasLegalNameMismatch && !legalNameUpdated && (
+                <MessageBox type="warning">
+                  <div className="mb-2 font-bold">
+                    <FormattedMessage defaultMessage="The names you provided do not match." id="XAPZa0" />
+                  </div>
+                  <div>
                     <FormattedMessage
-                      defaultMessage="Legal name is updated to match the payout method name."
-                      id="TI6gwx"
+                      defaultMessage="The legal name in the payee profile is: {legalName}."
+                      id="NSammt"
+                      values={{
+                        legalName: form.options.payee?.legalName,
+                      }}
                     />
-                  </MessageBox>
-                )}
-              </div>
-            ))}
+                  </div>
+                  <div>
+                    <FormattedMessage
+                      defaultMessage="The contact name in the payout method is: {accountHolderName}."
+                      id="XC+vMa"
+                      values={{
+                        accountHolderName: props.payoutMethod.data?.accountHolderName,
+                      }}
+                    />
+                  </div>
+
+                  {!keepNameDifferent && (
+                    <React.Fragment>
+                      <div className="mb-2 mt-4 font-bold">
+                        <FormattedMessage
+                          defaultMessage=" Would you like to update your legal name to match your payout method contact name?"
+                          id="fEYP7x"
+                        />
+                      </div>
+
+                      <div className="flex gap-4">
+                        <Button
+                          disabled={loading}
+                          loading={loading}
+                          variant="outline"
+                          onClick={onUpdateLegalNameToMatch}
+                        >
+                          <FormattedMessage defaultMessage="Yes, Update and Match" id="qjpM/f" />
+                        </Button>
+                        <Button disabled={loading} variant="outline" onClick={() => setKeepNameDifferent(true)}>
+                          <FormattedMessage defaultMessage="No, Keep Them Different" id="PCBOGA" />
+                        </Button>
+                      </div>
+                    </React.Fragment>
+                  )}
+                  {keepNameDifferent && (
+                    <StyledInputFormikField
+                      mt={4}
+                      label={intl.formatMessage({
+                        defaultMessage: 'Please explain why they are different',
+                        id: 'bzGbkJ',
+                      })}
+                      name="payoutMethodNameDiscrepancyReason"
+                    />
+                  )}
+                </MessageBox>
+              )}
+              {legalNameUpdated && (
+                <MessageBox type="warning">
+                  <FormattedMessage
+                    defaultMessage="Legal name is updated to match the payout method name."
+                    id="TI6gwx"
+                  />
+                </MessageBox>
+              )}
+            </div>
+          ))
+        }
+      >
+        <div className="flex-grow">
+          <PayoutMethodLabel showIcon payoutMethod={props.payoutMethod} />
         </div>
-      </div>
+        {!isEditingPayoutMethod && (
+          <div className="flex gap-2">
+            {props.isChecked && (
+              <Button onClick={onEditClick} size="icon-xs" variant="ghost">
+                <Pencil size={16} />
+              </Button>
+            )}
+            <Button className="text-muted-foreground" onClick={onDeleteClick} size="icon-xs" variant="ghost">
+              <Trash2 size={16} />
+            </Button>
+          </div>
+        )}
+      </RadioGroupCard>
+
       {isDeletingPayoutMethod && (
         <ConfirmationModal
           isDanger

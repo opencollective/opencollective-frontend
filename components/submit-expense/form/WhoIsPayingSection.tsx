@@ -3,18 +3,14 @@ import { uniqBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
-import { AccountType } from '../../../lib/graphql/types/v2/graphql';
-import { cn } from '../../../lib/utils';
 
 import CollectivePickerAsync from '../../CollectivePickerAsync';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
-import { Label } from '../../ui/Label';
-import { RadioGroup, RadioGroupItem } from '../../ui/RadioGroup';
+import { RadioGroup, RadioGroupCard } from '../../ui/RadioGroup';
 import { Step } from '../SubmitExpenseFlowSteps';
 import type { ExpenseForm } from '../useExpenseForm';
 
 import { ExpenseAccountItem } from './ExpenseAccountItem';
-import { ExpenseAccountSearchInput } from './ExpenseAccountSearchInput';
 import { FormSectionContainer } from './FormSectionContainer';
 
 type WhoIsPayingSectionProps = {
@@ -69,67 +65,42 @@ export function WhoIsPayingSection(props: WhoIsPayingSectionProps) {
       >
         {!props.form.initialLoading &&
           recentlySubmittedAccounts.map(a => (
-            <div
-              key={a.slug}
-              className="flex items-center rounded-md border border-gray-200 has-[:checked]:border-blue-300"
-            >
-              <RadioGroupItem className="ml-4" value={a.slug}></RadioGroupItem>
-              <Label className="flex-grow p-4" htmlFor={a.slug}>
-                <ExpenseAccountItem account={a} />
-              </Label>
-            </div>
+            <RadioGroupCard key={a.slug} value={a.slug}>
+              <ExpenseAccountItem account={a} />
+            </RadioGroupCard>
           ))}
 
         {props.form.initialLoading && (
-          <div className="rounded-md border border-gray-200">
-            <div className="flex items-center">
-              <RadioGroupItem className="ml-4" value="" disabled></RadioGroupItem>
-              <Label className={cn('flex min-h-16 flex-grow items-center p-4')}>
-                <LoadingPlaceholder height={24} width={1} />
-              </Label>
-            </div>
-          </div>
+          <RadioGroupCard value="" disabled>
+            <LoadingPlaceholder height={24} width={1} />
+          </RadioGroupCard>
         )}
 
-        <div className="rounded-md border border-gray-200 has-[:checked]:flex-col has-[:checked]:items-start has-[:checked]:gap-2 has-[:checked]:border-blue-300">
-          <div className="flex items-center">
-            <RadioGroupItem
-              className="ml-4"
-              value="__find"
-              disabled={props.form.initialLoading}
-              checked={!props.form.initialLoading && isFindSelected}
-            ></RadioGroupItem>
-            <Label className={cn('flex min-h-16 flex-grow items-center p-4')} htmlFor="__find">
-              <FormattedMessage defaultMessage="Find account" id="m2G3Nh" />
-            </Label>
-          </div>
-          <div
-            className={cn({
-              'p-4 pt-0': !props.form.initialLoading && isFindSelected,
-            })}
-          >
-            {!props.form.initialLoading && isFindSelected && (
-              <CollectivePickerAsync
-                autoFocus
-                isSearchable
-                filterResults={collectives =>
-                  collectives.filter(c => c.type !== CollectiveType.ORGANIZATION || c.isHost)
-                }
-                inputId="collective-expense-picker"
-                types={[
-                  CollectiveType.COLLECTIVE,
-                  CollectiveType.EVENT,
-                  CollectiveType.FUND,
-                  CollectiveType.ORGANIZATION,
-                  CollectiveType.PROJECT,
-                ]}
-                collective={props.form.values.accountSlug === '__find' ? null : props.form.options.account}
-                // value={{ value: props.form.options.account, label: props.form.options.account?.name }}
-                onChange={e => setFieldValue('accountSlug', e.value.slug)}
-              />
-            )}
-          </div>
-        </div>
+        <RadioGroupCard
+          value="__find"
+          disabled={props.form.initialLoading}
+          checked={!props.form.initialLoading && isFindSelected}
+          showSubcontent={!props.form.initialLoading && isFindSelected}
+          subContent={
+            <CollectivePickerAsync
+              autoFocus
+              isSearchable
+              filterResults={collectives => collectives.filter(c => c.type !== CollectiveType.ORGANIZATION || c.isHost)}
+              inputId="collective-expense-picker"
+              types={[
+                CollectiveType.COLLECTIVE,
+                CollectiveType.EVENT,
+                CollectiveType.FUND,
+                CollectiveType.ORGANIZATION,
+                CollectiveType.PROJECT,
+              ]}
+              collective={props.form.values.accountSlug === '__find' ? null : props.form.options.account}
+              onChange={e => setFieldValue('accountSlug', e.value.slug)}
+            />
+          }
+        >
+          <FormattedMessage defaultMessage="Find account" id="m2G3Nh" />
+        </RadioGroupCard>
       </RadioGroup>
     </FormSectionContainer>
   );

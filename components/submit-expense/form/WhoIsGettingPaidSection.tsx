@@ -8,24 +8,21 @@ import { CollectiveType } from '../../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { gqlV1 } from '../../../lib/graphql/helpers';
 import { AccountType } from '../../../lib/graphql/types/v2/graphql';
-import { cn } from '../../../lib/utils';
 
 import CollectivePicker from '../../CollectivePicker';
 import CollectivePickerAsync from '../../CollectivePickerAsync';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
-import StyledHr from '../../StyledHr';
 import { Button } from '../../ui/Button';
 import { Input } from '../../ui/Input';
 import { Label } from '../../ui/Label';
-import { RadioGroup, RadioGroupCard, RadioGroupItem } from '../../ui/RadioGroup';
+import { RadioGroup, RadioGroupCard } from '../../ui/RadioGroup';
 import { Separator } from '../../ui/Separator';
 import { useToast } from '../../ui/useToast';
 import { Step } from '../SubmitExpenseFlowSteps';
 import type { ExpenseForm } from '../useExpenseForm';
 
 import { ExpenseAccountItem } from './ExpenseAccountItem';
-import { ExpenseAccountSearchInput } from './ExpenseAccountSearchInput';
 import { FormSectionContainer } from './FormSectionContainer';
 import { InviteUserOption } from './InviteUserOption';
 
@@ -37,7 +34,6 @@ type WhoIsGettingPaidSectionProps = {
 export function WhoIsGettingPaidSection(props: WhoIsGettingPaidSectionProps) {
   const [lastUsedProfile, setLastUsedProfile] = React.useState<ExpenseForm['options']['payoutProfiles'][number]>(null);
   const [isMyOtherProfilesSelected, setIsMyOtherProfilesSelected] = React.useState(false);
-  const [isOtherUserAccountSelected, setIsOtherUserAccountSelected] = React.useState(false);
 
   const myProfiles = React.useMemo(() => props.form.options.payoutProfiles || [], [props.form.options.payoutProfiles]);
   const personalProfile = React.useMemo(() => myProfiles.find(p => p.type === AccountType.INDIVIDUAL), [myProfiles]);
@@ -47,7 +43,6 @@ export function WhoIsGettingPaidSection(props: WhoIsGettingPaidSectionProps) {
     [lastUsedProfile?.slug, myProfiles, personalProfile?.slug],
   );
   const hasOtherProfiles = otherProfiles.length > 0;
-  const isInviteSelected = props.form.values.payeeSlug === '__invite';
   const vendorOptions = props.form.options.vendors || [];
 
   const isVendorSelected =
@@ -84,15 +79,6 @@ export function WhoIsGettingPaidSection(props: WhoIsGettingPaidSectionProps) {
     const isMyOtherProfilesSelected =
       hasOtherProfiles && (!newPayeeSlug || newPayeeSlug === '__findAccountIAdminister' || !!otherProfileSelection);
     setIsMyOtherProfilesSelected(isMyOtherProfilesSelected);
-
-    const isOtherUserAccountSelected =
-      newPayeeSlug === '__inviteExistingUser' ||
-      (!isMyOtherProfilesSelected &&
-        !isInviteSelected &&
-        !isVendorSelected &&
-        ![lastUsedProfile?.slug, personalProfile?.slug].filter(Boolean).includes(newPayeeSlug));
-
-    setIsOtherUserAccountSelected(isOtherUserAccountSelected);
   }, [
     props.form.options.payoutProfiles,
     props.form.options.recentlySubmittedExpenses,
@@ -102,7 +88,6 @@ export function WhoIsGettingPaidSection(props: WhoIsGettingPaidSectionProps) {
     personalProfile,
     otherProfiles,
     hasOtherProfiles,
-    isInviteSelected,
     isVendorSelected,
     lastUsedProfile?.slug,
   ]);
@@ -125,25 +110,6 @@ export function WhoIsGettingPaidSection(props: WhoIsGettingPaidSectionProps) {
           >
             <ExpenseAccountItem account={lastUsedProfile} />
           </RadioGroupCard>
-          // <div className="rounded-md border border-gray-200 has-[:checked]:flex-col has-[:checked]:items-start has-[:checked]:gap-2 has-[:checked]:border-blue-300">
-          //   <div className="flex items-center">
-          //     <RadioGroupItem className="ml-4" value={lastUsedProfile.slug}></RadioGroupItem>
-          //     <Label className="flex-grow p-4" htmlFor={lastUsedProfile.slug}>
-          //       <ExpenseAccountItem account={lastUsedProfile} />
-          //     </Label>
-          //   </div>
-          //   {props.form.values.payeeSlug === lastUsedProfile.slug && isEmpty(lastUsedProfile.legalName) && (
-          //     <div
-          //       className={cn({
-          //         'p-4 pt-0': props.form.values.payeeSlug === lastUsedProfile.slug,
-          //       })}
-          //     >
-          //       <div>
-          //         <LegalNameWarning account={lastUsedProfile} onLegalNameUpdate={props.form.refresh} />
-          //       </div>
-          //     </div>
-          //   )}
-          // </div>
         )}
 
         {(personalProfile || props.form.initialLoading) && (
@@ -164,198 +130,97 @@ export function WhoIsGettingPaidSection(props: WhoIsGettingPaidSectionProps) {
               <ExpenseAccountItem account={personalProfile} />
             )}
           </RadioGroupCard>
-
-          // <div className="rounded-md border border-gray-200 has-[:checked]:flex-col has-[:checked]:items-start has-[:checked]:gap-2 has-[:checked]:border-blue-300">
-          //   <div className="flex items-center">
-          //     <RadioGroupItem
-          //       className="ml-4"
-          //       value={!props.form.initialLoading ? personalProfile.slug : ''}
-          //       checked={props.form.initialLoading || props.form.values.payeeSlug === personalProfile.slug}
-          //       disabled={props.form.initialLoading}
-          //     ></RadioGroupItem>
-          //     <Label
-          //       className="flex min-h-16 flex-grow items-center p-4"
-          //       htmlFor={!props.form.initialLoading ? personalProfile.slug : ''}
-          //     >
-          //       {props.form.initialLoading ? (
-          //         <LoadingPlaceholder height={24} width={1} />
-          //       ) : (
-          //         <ExpenseAccountItem account={personalProfile} />
-          //       )}
-          //     </Label>
-          //   </div>
-          //   {!props.form.initialLoading &&
-          //     props.form.values.payeeSlug === personalProfile.slug &&
-          //     isEmpty(personalProfile.legalName) && (
-          //       <div
-          //         className={cn({
-          //           'p-4 pt-0': !props.form.initialLoading && props.form.values.payeeSlug === personalProfile.slug,
-          //         })}
-          //       >
-          //         <div>
-          //           <LegalNameWarning account={personalProfile} onLegalNameUpdate={props.form.refresh} />
-          //         </div>
-          //       </div>
-          //     )}
-          // </div>
         )}
 
         {!props.form.initialLoading && hasOtherProfiles && (
-          <div className="rounded-md border has-[:checked]:border-2 border-gray-200 has-[:checked]:flex-col has-[:checked]:items-start has-[:checked]:gap-2 has-[:checked]:border-blue-300">
-            <div className="flex items-center">
-              <RadioGroupItem
-                className="ml-4"
-                value="__findAccountIAdminister"
-                checked={isMyOtherProfilesSelected}
-              ></RadioGroupItem>
-              <Label className={cn('flex min-h-16 flex-grow items-center p-4')} htmlFor="__findAccountIAdminister">
-                <FormattedMessage defaultMessage="An account I administer" id="ZRMBXB" />
-              </Label>
-            </div>
-            <div
-              className={cn({
-                'p-4 pt-0': isMyOtherProfilesSelected,
-              })}
-            >
-              {isMyOtherProfilesSelected && (
-                <div>
-                  <CollectivePicker
-                    collectives={otherProfiles}
-                    collective={
-                      props.form.values.payeeSlug === '__findAccountIAdminister' ? null : props.form.options.payee
-                    }
-                    onChange={e => {
-                      const slug = e.value.slug;
-                      setFieldValue('payeeSlug', !slug ? '__findAccountIAdminister' : slug);
-                    }}
-                  />
-                </div>
-              )}
-            </div>
-          </div>
+          <RadioGroupCard
+            value="__findAccountIAdminister"
+            checked={isMyOtherProfilesSelected}
+            showSubcontent={isMyOtherProfilesSelected}
+            subContent={
+              <div>
+                <CollectivePicker
+                  collectives={otherProfiles}
+                  collective={
+                    props.form.values.payeeSlug === '__findAccountIAdminister' ? null : props.form.options.payee
+                  }
+                  onChange={e => {
+                    const slug = e.value.slug;
+                    setFieldValue('payeeSlug', !slug ? '__findAccountIAdminister' : slug);
+                  }}
+                />
+              </div>
+            }
+          >
+            <FormattedMessage defaultMessage="An account I administer" id="ZRMBXB" />
+          </RadioGroupCard>
         )}
 
         <RadioGroupCard
-          value="__inviteExistingUser"
+          value="__inviteSomeone"
+          checked={['__inviteSomeone', '__invite', '__inviteExistingUser'].includes(props.form.values.payeeSlug)}
+          showSubcontent={['__inviteSomeone', '__invite', '__inviteExistingUser'].includes(props.form.values.payeeSlug)}
           disabled={props.form.initialLoading}
-          checked={!props.form.initialLoading && isOtherUserAccountSelected}
-          showSubcontent={!props.form.initialLoading && isOtherUserAccountSelected}
           subContent={
-            <ExpenseAccountSearchInput
-              value={props.form.values.payeeSlug !== '__inviteExistingUser' ? props.form.values.payeeSlug : null}
-              onChange={slug => setFieldValue('payeeSlug', !slug ? '__inviteExistingUser' : slug)}
-            />
-          }
-        >
-          {/* <Label className={cn('flex min-h-16 flex-grow items-center p-4')} htmlFor="__inviteExistingUser"> */}
-          <FormattedMessage defaultMessage="Another account on the platform" id="7IUQ/2" />
-          {/* </Label> */}
-        </RadioGroupCard>
-        {/* <div className="rounded-md border border-gray-200 has-[:checked]:flex-col has-[:checked]:items-start has-[:checked]:gap-2 has-[:checked]:border-blue-300">
-          <div className="flex items-center">
-            <RadioGroupItem
-              className="ml-4"
-              value="__inviteExistingUser"
-              disabled={props.form.initialLoading}
-              checked={!props.form.initialLoading && isOtherUserAccountSelected}
-            ></RadioGroupItem>
-            <Label className={cn('flex min-h-16 flex-grow items-center p-4')} htmlFor="__inviteExistingUser">
-              <FormattedMessage defaultMessage="Another account on the platform" id="7IUQ/2" />
-            </Label>
-          </div>
-          <div
-            className={cn({
-              'p-4 pt-0': !props.form.initialLoading && isOtherUserAccountSelected,
-            })}
-          >
-            {!props.form.initialLoading && isOtherUserAccountSelected && (
-              <div>
-                <ExpenseAccountSearchInput
-                  value={props.form.values.payeeSlug !== '__inviteExistingUser' ? props.form.values.payeeSlug : null}
-                  onChange={slug => setFieldValue('payeeSlug', !slug ? '__inviteExistingUser' : slug)}
-                />
-              </div>
-            )}
-          </div>
-        </div> */}
+            <div>
+              <CollectivePickerAsync
+                inputId="payee-invite-picker"
+                onFocus={() => props.form.setFieldValue('payeeSlug', '__inviteSomeone')}
+                invitable
+                collective={props.form.values.payeeSlug === '__inviteExistingUser' ? props.form.options.payee : null}
+                types={[
+                  CollectiveType.COLLECTIVE,
+                  CollectiveType.EVENT,
+                  CollectiveType.FUND,
+                  CollectiveType.ORGANIZATION,
+                  CollectiveType.PROJECT,
+                  CollectiveType.USER,
+                ]}
+                onChange={option => {
+                  if (option?.value?.id) {
+                    props.form.setFieldValue('inviteeExistingAccount', option.value.slug);
+                    props.form.setFieldValue('payeeSlug', '__inviteExistingUser');
+                  }
+                }}
+                onInvite={() => {
+                  props.form.setFieldValue('payeeSlug', '__invite');
+                }}
+              />
 
-        <div className="rounded-md border border-gray-200 has-[:checked]:flex-col has-[:checked]:items-start has-[:checked]:gap-2 has-[:checked]:border-blue-300">
-          <div className="flex items-center">
-            <RadioGroupItem className="ml-4" value="__invite" disabled={props.form.initialLoading}></RadioGroupItem>
-            <Label className={cn('flex min-h-16 flex-grow items-center p-4')} htmlFor="__invite">
-              <FormattedMessage defaultMessage="Invite someone" id="SMZ/xh" />
-            </Label>
-          </div>
-          <div
-            className={cn({
-              'p-4 pt-0': props.form.values.payeeSlug === '__invite',
-            })}
-          >
-            {props.form.values.payeeSlug === '__invite' && (
-              <div>
-                <CollectivePickerAsync
-                  inputId="payee-invite-picker"
-                  // onFocus={() => props.form.setFieldValue('payeeSlug', option.value.slug)}
-                  invitable
-                  // collective={
-                  //   props.form.values.invitePayee && 'legacyId' in props.form.values.invitePayee
-                  //   ? { ...props.form.values.invitePayee, id: props.form.values.invitePayee.legacyId }
-                  //   : null
-                  // }
-                  types={[
-                    CollectiveType.COLLECTIVE,
-                    CollectiveType.EVENT,
-                    CollectiveType.FUND,
-                    CollectiveType.ORGANIZATION,
-                    CollectiveType.PROJECT,
-                    CollectiveType.USER,
-                  ]}
-                  onChange={option => {
-                    if (option?.value?.id) {
-                      props.form.setFieldValue('payeeSlug', option.value.slug);
-                    }
-                  }}
-                  onInvite={() => {
-                    props.form.setFieldValue('payeeSlug', '__invite');
-                  }}
-                />
-                <Separator className="mt-3" />
-                <div className='mt-3'>
-
-                <InviteUserOption form={props.form} />
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {vendorOptions.length > 0 && (
-          <div className="rounded-md border border-gray-200 has-[:checked]:flex-col has-[:checked]:items-start has-[:checked]:gap-2 has-[:checked]:border-blue-300">
-            <div className="flex items-center">
-              <RadioGroupItem className="ml-4" value="__vendor" checked={isVendorSelected}></RadioGroupItem>
-              <Label className={cn('flex min-h-16 flex-grow items-center p-4')} htmlFor="__vendor">
-                <FormattedMessage defaultMessage="A vendor" id="rth3eX" />
-              </Label>
-            </div>
-            <div
-              className={cn({
-                'p-4 pt-0': isVendorSelected,
-              })}
-            >
-              {isVendorSelected && (
-                <div>
-                  <CollectivePicker
-                    collectives={vendorOptions}
-                    collective={props.form.values.payeeSlug === '__vendor' ? null : props.form.options.payee}
-                    onChange={e => {
-                      const slug = e.value.slug;
-                      setFieldValue('payeeSlug', !slug ? '__vendor' : slug);
-                    }}
-                  />
-                </div>
+              {props.form.values.payeeSlug === '__invite' && (
+                <React.Fragment>
+                  <Separator className="mt-3" />
+                  <div className="mt-3">
+                    <InviteUserOption form={props.form} />
+                  </div>
+                </React.Fragment>
               )}
             </div>
-          </div>
+          }
+        >
+          <FormattedMessage defaultMessage="Invite someone" id="SMZ/xh" />
+        </RadioGroupCard>
+
+        {vendorOptions.length > 0 && (
+          <RadioGroupCard
+            value="__vendor"
+            checked={isVendorSelected}
+            showSubcontent={isVendorSelected}
+            subContent={
+              <div>
+                <CollectivePicker
+                  collectives={vendorOptions}
+                  collective={props.form.values.payeeSlug === '__vendor' ? null : props.form.options.payee}
+                  onChange={e => {
+                    const slug = e.value.slug;
+                    setFieldValue('payeeSlug', !slug ? '__vendor' : slug);
+                  }}
+                />
+              </div>
+            }
+          >
+            <FormattedMessage defaultMessage="A vendor" id="rth3eX" />
+          </RadioGroupCard>
         )}
       </RadioGroup>
     </FormSectionContainer>

@@ -1,5 +1,4 @@
 import React from 'react';
-import { cva } from 'class-variance-authority';
 import type { Path } from 'dot-path-value';
 import { useFormikContext } from 'formik';
 import { get, isEmpty } from 'lodash';
@@ -15,26 +14,6 @@ type SubmitExpenseFlowStepsProps = {
   completedSteps?: Step[];
   activeStep: Step;
 };
-
-const stepListItemVariants = cva('font-normal', {
-  variants: {
-    itemType: {
-      header:
-        'text-base font-bold [--step-bullet-border-color:#94A3B8] [--step-bullet-border-width:2px] [--step-bullet-border:2px] [--step-bullet-color:white] [--step-bullet-size:24px] [--step-bullet-text-color:#48566A] last:after:hidden',
-      activeHeader:
-        'text-base font-bold [--step-bullet-border-color:#1547B8] [--step-bullet-border-width:2px] [--step-bullet-color:white] [--step-bullet-size:24px]',
-      completedHeader:
-        "text-base font-bold [--step-bullet-border-color:#1547B8] [--step-bullet-border-width:2px] [--step-bullet-color:#1547B8] [--step-bullet-size:24px] [--step-bullet-text-color:white] before:content-['✓']",
-      activeItem:
-        'text-sm font-bold [--step-bullet-box-shadow:0_0_0_4px_hsla(216,_100%,_58%,_0.3)] [--step-bullet-color:#1547B8] [--step-text-color:#1547B8]',
-      completedItem: 'text-sm [--step-bullet-color:#1547B8]',
-      item: 'text-sm',
-    },
-  },
-  defaultVariants: {
-    itemType: 'item',
-  },
-});
 
 export enum Step {
   WHO_IS_PAYING = 'WHO_IS_PAYING',
@@ -158,46 +137,92 @@ export function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
     Step.EXPENSE_TITLE,
   ];
 
+  const firstIncompleteIdx = stepOrder.findIndex(s => !isExpenseFormStepCompleted(form, s));
+
   return (
     <div className={cn(props.className)}>
-      <ol className="pl-[12px] [--step-bullet-border-color:#CBD5E1] [--step-bullet-border-width:0px] [--step-bullet-color:#CBD5E1] [--step-bullet-size:8px] [--step-line-color:#E1E7EF] [--step-text-color:#344256] *:relative *:flex *:items-center *:gap-2 *:pb-8 *:pl-7  *:text-[var(--step-text-color)] *:before:absolute *:before:left-0 *:before:inline-block *:before:h-[var(--step-bullet-size)] *:before:w-[var(--step-bullet-size)] *:before:-translate-x-[calc(var(--step-bullet-size)/2)] *:before:rounded-full *:before:border-[var(--step-bullet-border-color)] *:before:bg-[--step-bullet-color] *:before:text-center *:before:text-sm *:before:font-medium *:before:text-[var(--step-bullet-text-color,var(--step-bullet-border-color))] *:before:[border-width:var(--step-bullet-border-width)] *:before:[box-shadow:var(--step-bullet-box-shadow,initial)] *:after:absolute *:after:left-0 *:after:top-2 *:after:-z-10 *:after:h-full *:after:-translate-x-[1px] *:after:border-l-2 *:after:border-[--step-line-color] *:after:[border-style:var(--step-line-style,solid)]">
-        <li
-          className={cn(
-            "before:content-['1']",
-            stepListItemVariants({
-              itemType: props.activeStep === Step.SUMMARY ? (hasErrors ? 'header' : 'completedHeader') : 'activeHeader',
-            }),
-          )}
+      <ol className="pl-[12px] text-sm">
+        <StepHeader
+          isActive={props.activeStep !== Step.SUMMARY}
+          isComplete={!hasErrors}
+          hasError={hasErrors && form.submitCount > 0}
+          stepNumber={1}
+          isCompletedPath
         >
           <FormattedMessage defaultMessage="Expense Details" id="+5Kafe" />
-        </li>
+        </StepHeader>
         {(props.activeStep !== Step.SUMMARY || hasErrors) &&
-          stepOrder.map(step => (
-            <li
+          stepOrder.map((step, i) => (
+            <StepItem
               key={step}
-              className={cn(
-                stepListItemVariants({
-                  itemType:
-                    props.activeStep === step
-                      ? 'activeItem'
-                      : isExpenseFormStepCompleted(form, step)
-                        ? 'completedItem'
-                        : 'item',
-                }),
-              )}
+              isActive={props.activeStep === step}
+              hasError={
+                expenseFormStepHasError(form, step) && isExpenseFormStepTouched(form, step) && form.submitCount > 0
+              }
+              isComplete={isExpenseFormStepCompleted(form, step)}
+              isCompletedPath={i < firstIncompleteIdx - 1 || firstIncompleteIdx < 0}
             >
               <FormattedMessage {...StepTitles[step]} />
-            </li>
+            </StepItem>
           ))}
-        <li
-          className={cn(
-            "[--step-line-style:none] before:content-['2']",
-            stepListItemVariants({ itemType: props.activeStep === Step.SUMMARY ? 'activeHeader' : 'header' }),
-          )}
-        >
+        <StepHeader isActive={props.activeStep === Step.SUMMARY} stepNumber={2}>
           <FormattedMessage defaultMessage="Summary" id="Summary" />
-        </li>
+        </StepHeader>
       </ol>
     </div>
+  );
+}
+
+type StepProps = {
+  isActive?: boolean;
+  hasError?: boolean;
+  isComplete?: boolean;
+  isCompletedPath?: boolean;
+  children?: React.ReactNode;
+};
+
+function StepHeader(props: StepProps & { stepNumber: number }) {
+  return (
+    <li
+      className={cn(
+        'relative flex items-center gap-2 pb-8 pl-7 font-bold before:absolute before:left-0 before:inline-block before:h-6 before:w-6 before:-translate-x-3 before:rounded-full before:border-2 before:border-[#94A3B8] before:bg-white before:text-center after:absolute after:left-0 after:top-2 after:-z-10 after:h-full after:-translate-x-[1px] after:border-l-2 after:border-solid last:after:hidden',
+        {
+          'before:border-blue-900': props.isActive,
+          "before:border-blue-900 before:bg-blue-900 before:text-white before:content-['✓']": props.isComplete,
+          'after:border-blue-900': props.isCompletedPath,
+        },
+      )}
+    >
+      {props.children}
+      {!props.isComplete && (
+        <div
+          className={cn('absolute left-0 flex h-6 w-6 -translate-x-3 items-center justify-center text-[#94A3B8]', {
+            'text-blue-900': props.isActive,
+          })}
+        >
+          {props.stepNumber}
+        </div>
+      )}
+    </li>
+  );
+}
+
+function StepItem(props: StepProps) {
+  return (
+    <li
+      className={cn(
+        'relative flex items-center gap-2 pb-8 pl-7 before:absolute before:left-0 before:inline-block before:h-2 before:w-2 before:-translate-x-1 before:rounded-full before:border-[#CBD5E1] before:bg-[#CBD5E1] before:text-center after:absolute after:left-0 after:top-2 after:-z-10 after:h-full after:-translate-x-[1px] after:border-l-2 after:border-solid after:border-[#E1E7EF]',
+        {
+          'font-bold text-blue-900 before:border-blue-900 before:bg-blue-900 before:[box-shadow:0_0_0_4px_hsla(216,_100%,_58%,_0.3)]':
+            props.isActive,
+          'before:border-blue-900 before:bg-blue-900': props.isComplete && !props.isActive,
+          'after:border-blue-900': props.isCompletedPath && props.isComplete,
+          'after:border-red-500': props.isCompletedPath && props.hasError && !props.isActive,
+          'text-red-500 before:border-red-500 before:bg-red-500': props.hasError && !props.isActive,
+        },
+      )}
+    >
+      {props.children}
+    </li>
   );
 }

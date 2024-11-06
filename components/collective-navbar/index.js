@@ -44,7 +44,6 @@ import StyledButton from '../StyledButton';
 import { fadeIn } from '../StyledKeyframes';
 import { SubmitExpenseFlow } from '../submit-expense/SubmitExpenseFlow';
 import { Span } from '../Text';
-import { Button } from '../ui/Button';
 
 import CollectiveNavbarActionsMenu from './ActionsMenu';
 import { NAVBAR_CATEGORIES } from './constants';

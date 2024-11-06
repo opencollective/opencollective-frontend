@@ -33,9 +33,7 @@ import StyledButton from '../StyledButton';
 import { Dropdown, DropdownArrow, DropdownContent } from '../StyledDropdown';
 import StyledHr from '../StyledHr';
 import StyledLink from '../StyledLink';
-import { SubmitExpenseFlowButton } from '../submit-expense/SubmitExpenseFlow';
 import { Span } from '../Text';
-import { Button } from '../ui/Button';
 
 import { NAVBAR_ACTION_TYPE } from './menu';
 
