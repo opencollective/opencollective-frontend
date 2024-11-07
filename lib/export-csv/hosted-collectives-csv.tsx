@@ -32,6 +32,7 @@ type Fields =
   | 'valueOfContributionsYear'
   | 'valueOfHostFeeYear'
   | 'spentTotalYear'
+  | 'receivedTotalYear'
   | 'numberOfExpensesAllTime'
   | 'valueOfExpensesAllTime'
   | 'maxExpenseValueAllTime'
@@ -39,7 +40,14 @@ type Fields =
   | 'numberOfContributionsAllTime'
   | 'valueOfContributionsAllTime'
   | 'valueOfHostFeeAllTime'
-  | 'spentTotalAllTime';
+  | 'spentTotalAllTime'
+  | 'receivedTotalAllTime'
+  | 'expenseMonthlyAverageCount'
+  | 'expenseMonthlyAverageTotal'
+  | 'contributionMonthlyAverageCount'
+  | 'contributionMonthlyAverageTotal'
+  | 'spentTotalMonthlyAverage'
+  | 'receivedTotalMonthlyAverage';
 
 export enum FIELD_OPTIONS {
   DEFAULT = 'DEFAULT',
@@ -240,6 +248,14 @@ export const FIELDS: Array<{
     ),
   },
   {
+    id: 'receivedTotalYear',
+    group: 'financials',
+    label: <FormattedMessage defaultMessage="Total Received (1 year)" id="receivedTotalYear" />,
+    tooltip: (
+      <FormattedMessage defaultMessage="Amount received in Contributions and Expenses" id="receivedTotal.tooltip" />
+    ),
+  },
+  {
     id: 'spentTotalAllTime',
     group: 'financials',
     label: <FormattedMessage defaultMessage="Total Spent (All Time)" id="spentTotalAllTime" />,
@@ -247,6 +263,84 @@ export const FIELDS: Array<{
       <FormattedMessage
         defaultMessage="Amount spent in Contributions and Expenses, excluding fees"
         id="spentTotal.tooltip"
+      />
+    ),
+  },
+  {
+    id: 'receivedTotalAllTime',
+    group: 'financials',
+    label: <FormattedMessage defaultMessage="Total Received (All Time)" id="receivedTotalAllTime" />,
+    tooltip: (
+      <FormattedMessage defaultMessage="Amount received in Contributions and Expenses" id="receivedTotal.tooltip" />
+    ),
+  },
+  {
+    id: 'expenseMonthlyAverageCount',
+    group: 'expenses',
+    label: <FormattedMessage defaultMessage="Monthly Avg. Number of Expenses" id="expenseMonthlyAverageCount" />,
+    tooltip: (
+      <FormattedMessage
+        defaultMessage="Average calculated based on the number of months since the first transaction of this kind"
+        id="MonthlyAverage.Tooltip"
+      />
+    ),
+  },
+  {
+    id: 'expenseMonthlyAverageTotal',
+    group: 'expenses',
+    label: <FormattedMessage defaultMessage="Monthly Avg. Value of Expenses" id="expenseMonthlyAverageTotal" />,
+    tooltip: (
+      <FormattedMessage
+        defaultMessage="Average calculated based on the number of months since the first transaction of this kind"
+        id="MonthlyAverage.Tooltip"
+      />
+    ),
+  },
+  {
+    id: 'contributionMonthlyAverageCount',
+    group: 'contributions',
+    label: (
+      <FormattedMessage defaultMessage="Monthly Avg. Number of Contributions" id="contributionMonthlyAverageCount" />
+    ),
+    tooltip: (
+      <FormattedMessage
+        defaultMessage="Average calculated based on the number of months since the first transaction of this kind"
+        id="MonthlyAverage.Tooltip"
+      />
+    ),
+  },
+  {
+    id: 'contributionMonthlyAverageTotal',
+    group: 'contributions',
+    label: (
+      <FormattedMessage defaultMessage="Monthly Avg. Value of Contributions" id="contributionMonthlyAverageTotal" />
+    ),
+    tooltip: (
+      <FormattedMessage
+        defaultMessage="Average calculated based on the number of months since the first transaction of this kind"
+        id="MonthlyAverage.Tooltip"
+      />
+    ),
+  },
+  {
+    id: 'receivedTotalMonthlyAverage',
+    group: 'financials',
+    label: <FormattedMessage defaultMessage="Avg. Monthly Received" id="receivedTotalMonthlyAverage" />,
+    tooltip: (
+      <FormattedMessage
+        defaultMessage="Average calculated based on the number of months since the first transaction of this kind"
+        id="MonthlyAverage.Tooltip"
+      />
+    ),
+  },
+  {
+    id: 'spentTotalMonthlyAverage',
+    group: 'financials',
+    label: <FormattedMessage defaultMessage="Avg. Monthly Spent" id="spentTotalMonthlyAverage" />,
+    tooltip: (
+      <FormattedMessage
+        defaultMessage="Average calculated based on the number of months since the first transaction of this kind"
+        id="MonthlyAverage.Tooltip"
       />
     ),
   },
