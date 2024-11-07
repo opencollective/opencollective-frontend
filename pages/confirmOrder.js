@@ -10,7 +10,9 @@ import { getStripe } from '../lib/stripe';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import Container from '../components/Container';
+import Link from '../components/Link';
 import MessageBox from '../components/MessageBox';
+import { Button } from '../components/ui/Button';
 import { withUser } from '../components/UserProvider';
 
 class ConfirmOrderPage extends React.Component {
@@ -35,6 +37,7 @@ class ConfirmOrderPage extends React.Component {
     status: ConfirmOrderPage.SUBMITTING,
     isRequestSent: false,
     error: null,
+    showDashboardLinkForOrder: null,
   };
 
   componentDidMount() {
@@ -70,7 +73,7 @@ class ConfirmOrderPage extends React.Component {
     }
   }
 
-  handleStripeError = async ({ id, stripeError: { message, account, response } }) => {
+  handleStripeError = async ({ order, stripeError: { message, account, response } }) => {
     if (!response) {
       this.setState({ status: ConfirmOrderPage.ERROR, error: message });
       return;
@@ -78,11 +81,16 @@ class ConfirmOrderPage extends React.Component {
     if (response.paymentIntent) {
       const stripe = await getStripe(null, account);
       const result = await stripe.handleCardAction(response.paymentIntent.client_secret);
+      result.error = 'An error occurred while processing your payment. Please try again.';
       if (result.error) {
-        this.setState({ status: ConfirmOrderPage.ERROR, error: result.error.message });
+        this.setState({
+          status: ConfirmOrderPage.ERROR,
+          error: result.error.message,
+          showDashboardLinkForOrder: order,
+        });
       }
       if (result.paymentIntent && result.paymentIntent.status === 'requires_confirmation') {
-        this.triggerRequest({ id });
+        this.triggerRequest();
       }
     }
   };
@@ -106,9 +114,21 @@ class ConfirmOrderPage extends React.Component {
             </MessageBox>
           )}
           {status === ConfirmOrderPage.ERROR && (
-            <MessageBox type="error" withIcon>
-              {error}
-            </MessageBox>
+            <div>
+              <MessageBox type="error" withIcon>
+                {error}
+              </MessageBox>
+              {this.state.showDashboardLinkForOrder && (
+                <Link
+                  href={`/dashboard/${this.state.showDashboardLinkForOrder.fromAccount.slug}/outgoing-contributions?orderId=${this.state.showDashboardLinkForOrder.legacyId}`}
+                  className="mt-4"
+                >
+                  <Button>
+                    <FormattedMessage defaultMessage="Update your contribution in the Dashboard" id="cJ499a" />
+                  </Button>
+                </Link>
+              )}
+            </div>
           )}
         </Container>
       </AuthenticatedPage>
@@ -121,10 +141,8 @@ const confirmOrderMutation = gql`
     confirmOrder(order: $order) {
       order {
         id
+        legacyId
         status
-        transactions {
-          id
-        }
         fromAccount {
           id
           slug
