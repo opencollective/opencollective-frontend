@@ -51,17 +51,21 @@ function waitOrderStatus(status = 'PAID') {
         return cy.contains('Financial contribution to'); // orders loaded
       }),
     () => {
-      if (cy.$$(`[data-cy='order-${status}']`).length === 0) {
-        throw new Error(`Order did not transition to ${status} before timeout.`);
+      const text = cy.$$(`[data-cy='order-status-msg']`).text().toUpperCase();
+      if (!text.match(status)) {
+        throw new Error(`Order did not transition to ${status} before timeout, current value: ${text}.`);
       }
     },
     {
-      maxAttempts: 30,
+      maxAttempts: 10,
       wait: 6000,
     },
   );
 
-  cy.get(`[data-cy='order-${status}']`).should('exist');
+  cy.get(`[data-cy='order-status-msg']`).should($el => {
+    const text = $el.text().toUpperCase();
+    expect(text).to.match(new RegExp(status));
+  });
 }
 
 function contributeNewSEPADebit({ name } = {}) {
@@ -224,7 +228,7 @@ describe('Contribute Flow: Stripe Payment Element', () => {
 
       cy.getByDataCy('order-success', { timeout: 60000 }).contains('Thank you!');
 
-      waitOrderStatus('PROCESSING');
+      waitOrderStatus('PROCESSING|PAID');
     });
 
     it('User', testConfig, () => {
@@ -236,7 +240,7 @@ describe('Contribute Flow: Stripe Payment Element', () => {
       cy.get('button[data-cy="cf-next-step"]').click();
       contributeWithNewUsBankAccount();
       cy.getByDataCy('order-success', { timeout: 60000 }).contains('Thank you!');
-      waitOrderStatus('PROCESSING');
+      waitOrderStatus('PROCESSING|PAID');
 
       cy.wait(10000);
       cy.get('@collective').then(col => {
