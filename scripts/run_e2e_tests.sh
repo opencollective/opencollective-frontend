@@ -86,7 +86,7 @@ wait_for_service PDF 127.0.0.1 3002
 echo ""
 echo "> Running cypress tests"
 
-DEBUG=cypress:server:util:process_profiler npm run cypress:run -- ${CYPRESS_RECORD} --no-runner-ui --env OC_ENV=$OC_ENV --spec "test/cypress/integration/${CYPRESS_TEST_FILES}"
+DEBUG=cypress:* npm run cypress:run -- ${CYPRESS_RECORD} --no-runner-ui --env OC_ENV=$OC_ENV --spec "test/cypress/integration/${CYPRESS_TEST_FILES}"
 
 RETURN_CODE=$?
 if [ $RETURN_CODE -ne 0 ]; then
