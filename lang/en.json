@@ -2483,7 +2483,7 @@
   "mntSey": "Create a profile for your business to appear as a financial contributor, enable your employees to contribute on behalf of your company, and more.",
   "mOdpl+": "e.g. Failed transfer",
   "MOgYVM": "{amountFrom} to {amountTo}",
-  "MonthlyAverage.Tooltip": "Average calculated based on the number of months since the first transaction of this kind",
+  "MonthlyAverage.Tooltip": "The average is calculated over the number of months since the collective was approved on your host",
   "MonthlyBudget": "Monthly budget",
   "moreInfo": "More info",
   "mp9gR3": "Freezing the collective will prevent them from accepting and distributing contributions till they meet the requirements. This is a security measure to make sure the admins are within their rights. Read More.",

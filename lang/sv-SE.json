@@ -2483,7 +2483,7 @@
   "mntSey": "Create a profile for your business to appear as a financial contributor, enable your employees to contribute on behalf of your company, and more.",
   "mOdpl+": "e.g. Failed transfer",
   "MOgYVM": "{amountFrom} till {amountTo}",
-  "MonthlyAverage.Tooltip": "Average calculated based on the number of months since the first transaction of this kind",
+  "MonthlyAverage.Tooltip": "The average is calculated over the number of months since the collective was approved on your host",
   "MonthlyBudget": "Månadsbudget",
   "moreInfo": "Mer information",
   "mp9gR3": "Att frysa kollektivet kommer att hindra dem från att acceptera och använda bidrag tills de uppfyller kraven. Detta är en säkerhetsåtgärd för att se till att administratörerna är inom sina rättigheter. Läs mer.",

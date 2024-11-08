@@ -2483,7 +2483,7 @@
   "mntSey": "Create a profile for your business to appear as a financial contributor, enable your employees to contribute on behalf of your company, and more.",
   "mOdpl+": "z.B. fehlgeschlagener Transfer",
   "MOgYVM": "{amountFrom} bis {amountTo}",
-  "MonthlyAverage.Tooltip": "Average calculated based on the number of months since the first transaction of this kind",
+  "MonthlyAverage.Tooltip": "The average is calculated over the number of months since the collective was approved on your host",
   "MonthlyBudget": "Monatliches Budget",
   "moreInfo": "Mehr Informationen",
   "mp9gR3": "Das Einfrieren des Kollektivs verhindert, dass es Beiträge annimmt und verteilt, bis es die Anforderungen erfüllt. Dies ist eine Sicherheitsmaßnahme, um sicherzustellen, dass die Admins innerhalb ihrer Rechte handeln. Lies mehr.",

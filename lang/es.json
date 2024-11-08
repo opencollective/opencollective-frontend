@@ -2483,7 +2483,7 @@
   "mntSey": "Crea un perfil para tu empresa para aparecer como un colaborador financiero, permitir que tus empleados contribuyan en nombre de la empresa, y más.",
   "mOdpl+": "p. ej., Transferencia fallida",
   "MOgYVM": "{amountFrom} a {amountTo}",
-  "MonthlyAverage.Tooltip": "Average calculated based on the number of months since the first transaction of this kind",
+  "MonthlyAverage.Tooltip": "The average is calculated over the number of months since the collective was approved on your host",
   "MonthlyBudget": "Presupuesto mensual",
   "moreInfo": "Más información",
   "mp9gR3": "Congelar el Colectivo les impedirá aceptar y distribuir contribuciones hasta que cumplan los requisitos. Se trata de una medida de seguridad para asegurarse de que los administradores están en su derecho. Más información.",

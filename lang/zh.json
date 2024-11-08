@@ -2483,7 +2483,7 @@
   "mntSey": "Create a profile for your business to appear as a financial contributor, enable your employees to contribute on behalf of your company, and more.",
   "mOdpl+": "例如：转账失败",
   "MOgYVM": "{amountFrom} to {amountTo}",
-  "MonthlyAverage.Tooltip": "Average calculated based on the number of months since the first transaction of this kind",
+  "MonthlyAverage.Tooltip": "The average is calculated over the number of months since the collective was approved on your host",
   "MonthlyBudget": "每月预算",
   "moreInfo": "更多信息",
   "mp9gR3": "冻结集体将使他们无法接受和分配贡献，直至达到要求。 这是一个安全措施，以确保管理员合理使用权利。阅读更多。",

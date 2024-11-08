@@ -49,6 +49,13 @@ type Fields =
   | 'spentTotalMonthlyAverage'
   | 'receivedTotalMonthlyAverage';
 
+const MonthlyAverageTooltip = (
+  <FormattedMessage
+    defaultMessage="The average is calculated over the number of months since the collective was approved on your host"
+    id="MonthlyAverage.Tooltip"
+  />
+);
+
 export enum FIELD_OPTIONS {
   DEFAULT = 'DEFAULT',
   NEW_PRESET = 'NEW_PRESET',
@@ -278,23 +285,13 @@ export const FIELDS: Array<{
     id: 'expenseMonthlyAverageCount',
     group: 'expenses',
     label: <FormattedMessage defaultMessage="Monthly Avg. Number of Expenses" id="expenseMonthlyAverageCount" />,
-    tooltip: (
-      <FormattedMessage
-        defaultMessage="Average calculated based on the number of months since the first transaction of this kind"
-        id="MonthlyAverage.Tooltip"
-      />
-    ),
+    tooltip: MonthlyAverageTooltip,
   },
   {
     id: 'expenseMonthlyAverageTotal',
     group: 'expenses',
     label: <FormattedMessage defaultMessage="Monthly Avg. Value of Expenses" id="expenseMonthlyAverageTotal" />,
-    tooltip: (
-      <FormattedMessage
-        defaultMessage="Average calculated based on the number of months since the first transaction of this kind"
-        id="MonthlyAverage.Tooltip"
-      />
-    ),
+    tooltip: MonthlyAverageTooltip,
   },
   {
     id: 'contributionMonthlyAverageCount',
@@ -302,12 +299,7 @@ export const FIELDS: Array<{
     label: (
       <FormattedMessage defaultMessage="Monthly Avg. Number of Contributions" id="contributionMonthlyAverageCount" />
     ),
-    tooltip: (
-      <FormattedMessage
-        defaultMessage="Average calculated based on the number of months since the first transaction of this kind"
-        id="MonthlyAverage.Tooltip"
-      />
-    ),
+    tooltip: MonthlyAverageTooltip,
   },
   {
     id: 'contributionMonthlyAverageTotal',
@@ -315,34 +307,19 @@ export const FIELDS: Array<{
     label: (
       <FormattedMessage defaultMessage="Monthly Avg. Value of Contributions" id="contributionMonthlyAverageTotal" />
     ),
-    tooltip: (
-      <FormattedMessage
-        defaultMessage="Average calculated based on the number of months since the first transaction of this kind"
-        id="MonthlyAverage.Tooltip"
-      />
-    ),
+    tooltip: MonthlyAverageTooltip,
   },
   {
     id: 'receivedTotalMonthlyAverage',
     group: 'financials',
     label: <FormattedMessage defaultMessage="Avg. Monthly Received" id="receivedTotalMonthlyAverage" />,
-    tooltip: (
-      <FormattedMessage
-        defaultMessage="Average calculated based on the number of months since the first transaction of this kind"
-        id="MonthlyAverage.Tooltip"
-      />
-    ),
+    tooltip: MonthlyAverageTooltip,
   },
   {
     id: 'spentTotalMonthlyAverage',
     group: 'financials',
     label: <FormattedMessage defaultMessage="Avg. Monthly Spent" id="spentTotalMonthlyAverage" />,
-    tooltip: (
-      <FormattedMessage
-        defaultMessage="Average calculated based on the number of months since the first transaction of this kind"
-        id="MonthlyAverage.Tooltip"
-      />
-    ),
+    tooltip: MonthlyAverageTooltip,
   },
 ];
 
