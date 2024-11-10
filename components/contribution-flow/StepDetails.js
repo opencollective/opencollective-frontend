@@ -124,7 +124,7 @@ const StepDetails = ({ onChange, stepDetails, collective, tier, showPlatformTip,
 
       {!isFixedContribution ? (
         <Box mb="30px">
-          {amount < minAmount && (
+          {amount && amount < minAmount && (
             <div className="mb-2 text-red-400">
               <FormattedMessage
                 id="amount.belowMinimum"
