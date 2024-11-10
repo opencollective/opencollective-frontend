@@ -1,4 +1,29 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["local>opencollective/renovate-config"]
+  "extends": ["local>opencollective/renovate-config"],
+  "packageRules": [
+    {
+      "assignees": ["betree"],
+      "matchPackageNames": [
+        "@opencollective/taxes",
+        "@opencollective/trix",
+        "@sentry/**",
+        "interweave**",
+        "lottie-react",
+        "sanitize-html"
+      ]
+    },
+    {
+      "assignees": ["hdiniz"],
+      "matchPackageNames": ["@simplewebauthn/**"]
+    },
+    {
+      "assignees": ["kewitz"],
+      "matchPackageNames": ["@shopify/address", "@transferwise/**"]
+    },
+    {
+      "assignees": ["gustavlrsn"],
+      "matchPackageNames": ["clsx", "cmdk", "tailwind-merge", "@radix-ui/**"]
+    }
+  ]
 }
