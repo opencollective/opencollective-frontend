@@ -275,6 +275,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
           {({ field, form }) => (
             <InputFieldPresets
               {...field}
+              min={values.minimumAmount?.valueInCents || 0}
               defaultValue={field.value}
               onChange={value => form.setFieldValue(field.name, value)}
             />
