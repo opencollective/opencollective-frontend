@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { isEmpty, isNil } from 'lodash';
 import { withRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
-
 import { AnalyticsEvent } from '../../lib/analytics/events';
 import { track } from '../../lib/analytics/plausible';
 import { AnalyticsProperty } from '../../lib/analytics/properties';
@@ -124,6 +123,14 @@ const StepDetails = ({ onChange, stepDetails, collective, tier, showPlatformTip,
 
       {!isFixedContribution ? (
         <Box mb="30px">
+          {amount < minAmount && (
+            <div className="mb-2 text-red-400">
+              <FormattedMessage
+                id="amount.belowMinimum"
+                defaultMessage={`Please enter an amount of ${formatCurrency(minAmount, currency)} or more`}
+              />
+            </div>
+          )}
           <StyledAmountPicker
             currency={currency}
             presets={presets}
