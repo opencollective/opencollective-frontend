@@ -188,7 +188,7 @@ export default function InternalTransferModal({
                                 availableBalance && setFieldValue('amount.valueInCents', availableBalance.valueInCents)
                               }
                             >
-                              <FormattedMessage defaultMessage="Use all" id="s81PMn" />
+                              <FormattedMessage defaultMessage="Use all" id="balance.useAll" />
                             </Button>
                           )}
                         </div>
