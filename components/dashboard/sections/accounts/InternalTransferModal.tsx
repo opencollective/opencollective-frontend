@@ -123,7 +123,7 @@ export default function InternalTransferModal({
                 variant: 'success',
                 message: intl.formatMessage(
                   {
-                    defaultMessage: 'Transfered {amount} from {fromAccount} to {toAccount}',
+                    defaultMessage: 'Successfully transferred {amount} from {fromAccount} to {toAccount}',
                     id: 'ROFVEn',
                   },
                   {
