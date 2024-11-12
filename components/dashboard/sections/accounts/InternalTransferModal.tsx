@@ -4,6 +4,7 @@ import { Form } from 'formik';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
+import { getAccountReferenceInput } from '../../../../lib/collective';
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { DashboardAccountsQueryFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
@@ -20,8 +21,8 @@ import { InputGroup } from '../../../ui/Input';
 import { toast } from '../../../ui/useToast';
 
 const transferFundsFormValuesSchema = z.object({
-  fromAccount: z.object({ slug: z.string().optional() }), // accountReferenceInput
-  toAccount: z.object({ slug: z.string().optional() }), // / accountReferenceInput
+  fromAccount: z.object({ id: z.string().optional() }), // accountReferenceInput
+  toAccount: z.object({ id: z.string().optional() }), // / accountReferenceInput
   amount: z.object({ valueInCents: z.number().min(1), currency: z.nativeEnum(Currency) }),
 });
 
@@ -88,8 +89,8 @@ export default function InternalTransferModal({
             },
           }}
           onSubmit={async values => {
-            const paymentMethods = values.fromAccount?.slug
-              ? accounts.find(a => a.slug === values.fromAccount.slug)?.paymentMethods
+            const paymentMethods = values.fromAccount?.id
+              ? accounts.find(a => a.id === values.fromAccount.id)?.paymentMethods
               : null;
             if (!paymentMethods || paymentMethods.length === 0) {
               toast({
@@ -126,8 +127,8 @@ export default function InternalTransferModal({
           }}
         >
           {({ setFieldValue, values }) => {
-            const availableBalance = values.fromAccount?.slug
-              ? accounts.find(a => a.slug === values.fromAccount.slug)?.stats.balance
+            const availableBalance = values.fromAccount?.id
+              ? accounts.find(a => a.id === values.fromAccount.id)?.stats.balance
               : null;
             return (
               <Form>
