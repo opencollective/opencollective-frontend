@@ -20,13 +20,12 @@ export function logout() {
 export function setRestAuthorizationCookie() {
   const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
   if (typeof document !== 'undefined' && accessToken) {
-    const domain = new URL(process.env.REST_URL || 'https://rest.opencollective.com').hostname;
     document.cookie =
       env === 'development' || env === 'e2e'
-        ? `authorization="Bearer ${accessToken}";path=/;SameSite=strict;max-age=120`
+        ? `authorization="Bearer ${accessToken}";path=/;SameSite=strict;max-age=1200`
         : // It is not possible to use HttpOnly when setting from JavaScript.
           // I'm enforcing SameSite and Domain in production to prevent CSRF.
-          `authorization="Bearer ${accessToken}";path=/;SameSite=strict;max-age=120;domain=${domain};secure`;
+          `authorization="Bearer ${accessToken}";path=/;SameSite=strict;max-age=1200;domain=opencollective.com;secure`;
   }
 }
 
