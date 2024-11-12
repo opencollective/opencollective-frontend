@@ -3167,7 +3167,7 @@
   "RlOKwP": "New!",
   "rlWQ/t": "For contributions before June 2022 the host fee was recorded as a transaction column in the host currency.",
   "RmME7+": "Private address",
-  "ROFVEn": "Transfered {amount} from {fromAccount} to {toAccount}",
+  "ROFVEn": "Successfully transferred {amount} from {fromAccount} to {toAccount}",
   "RogA5E": "Total contributed",
   "rowNumber": "No. {number}",
   "Rpq6pU": "Vyžaduje sa Captcha.",
