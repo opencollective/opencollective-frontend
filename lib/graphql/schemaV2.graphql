@@ -9602,13 +9602,13 @@ type HostedAccountSummary {
   expenseCount: Int
 
   """
-  Average calculated based on the number of months since the first transaction of this kind within the requested time frame
+  Average calculated over the number of months the collective was approved or the number of months since dateFrom, whichever is less
   """
   expenseMonthlyAverageCount: Float
   expenseTotal: Amount
 
   """
-  Average calculated based on the number of months since the first transaction of this kind within the requested time frame
+  Average calculated over the number of months the collective was approved or the number of months since dateFrom, whichever is less
   """
   expenseMonthlyAverageTotal: Amount
   expenseMaxValue: Amount
@@ -9616,13 +9616,13 @@ type HostedAccountSummary {
   contributionCount: Int
 
   """
-  Average calculated based on the number of months since the first transaction of this kind within the requested time frame
+  Average calculated over the number of months the collective was approved or the number of months since dateFrom, whichever is less
   """
   contributionMonthlyAverageCount: Float
   contributionTotal: Amount
 
   """
-  Average calculated based on the number of months since the first transaction of this kind within the requested time frame
+  Average calculated over the number of months the collective was approved or the number of months since dateFrom, whichever is less
   """
   contributionMonthlyAverageTotal: Amount
   hostFeeTotal: Amount
