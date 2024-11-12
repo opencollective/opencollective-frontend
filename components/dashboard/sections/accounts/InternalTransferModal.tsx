@@ -105,8 +105,8 @@ export default function InternalTransferModal({
             }
 
             const order = {
-              fromAccount: { slug: values.fromAccount.slug },
-              toAccount: { slug: values.toAccount.slug },
+              fromAccount: getAccountReferenceInput(values.fromAccount),
+              toAccount: getAccountReferenceInput(values.toAccount),
               amount: { valueInCents: values.amount.valueInCents, currency: values.amount.currency },
               paymentMethod: { id: paymentMethods[0].id },
               frequency: 'ONETIME',
