@@ -3167,7 +3167,7 @@
   "RlOKwP": "¡Nuevo!",
   "rlWQ/t": "Para las colaboraciones antes de junio 2022, la Tarifa de Anfitrión Fiscal se registraba como una columna de transacción en la moneda local del Anfitrión Fiscal.",
   "RmME7+": "Dirección privada",
-  "ROFVEn": "Transfered {amount} from {fromAccount} to {toAccount}",
+  "ROFVEn": "Successfully transferred {amount} from {fromAccount} to {toAccount}",
   "RogA5E": "Total contribuido",
   "rowNumber": "No. {number}",
   "Rpq6pU": "Se requiere CAPTCHA.",
