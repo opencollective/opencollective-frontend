@@ -138,9 +138,12 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
 
   const isArchived = queryFilter.hasFilters && queryFilter.values.status === ACCOUNT_STATUS.ARCHIVED;
   const accounts = compact([!isArchived && data?.account, ...(data?.account?.childrenAccounts?.nodes || [])]);
-
+  const activeAccounts = React.useMemo(
+    () => [data?.account, ...(data?.account?.childrenAccounts?.nodes.filter(a => a.isActive) || [])],
+    [data?.account],
+  );
   const getActions = useAccountActions<DashboardAccountsQueryFieldsFragment>({
-    accounts,
+    accounts: activeAccounts,
   });
 
   return (
@@ -169,7 +172,7 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            {accounts?.length > 1 && (
+            {activeAccounts?.length > 1 && (
               <Button size="xs" variant="outline" onClick={() => setShowInternalTransferModal(true)}>
                 <FormattedMessage defaultMessage="New internal transfer" id="v4unZI" />
               </Button>
@@ -248,7 +251,7 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
       <InternalTransferModal
         open={showInternalTransferModal}
         setOpen={setShowInternalTransferModal}
-        accounts={accounts}
+        accounts={activeAccounts}
       />
     </div>
   );
