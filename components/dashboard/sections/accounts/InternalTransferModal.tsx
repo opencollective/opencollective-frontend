@@ -21,8 +21,8 @@ import { InputGroup } from '../../../ui/Input';
 import { toast } from '../../../ui/useToast';
 
 const transferFundsFormValuesSchema = z.object({
-  fromAccount: z.object({ id: z.string().optional() }), // accountReferenceInput
-  toAccount: z.object({ id: z.string().optional() }), // / accountReferenceInput
+  fromAccount: z.object({ id: z.string().optional(), name: z.string().optional() }), // accountReferenceInput
+  toAccount: z.object({ id: z.string().optional(), name: z.string().optional() }), // / accountReferenceInput
   amount: z.object({ valueInCents: z.number().min(1), currency: z.nativeEnum(Currency) }),
 });
 
@@ -119,7 +119,27 @@ export default function InternalTransferModal({
                   order,
                 },
               });
-              toast({ variant: 'success', message: 'Transfer created successfully.' });
+              toast({
+                variant: 'success',
+                message: intl.formatMessage(
+                  {
+                    defaultMessage: 'Transfered {amount} from {fromAccount} to {toAccount}',
+                    id: 'ROFVEn',
+                  },
+                  {
+                    amount: (
+                      <FormattedMoneyAmount
+                        amountClassName="font-medium"
+                        showCurrencyCode={false}
+                        amount={values.amount.valueInCents}
+                        currency={values.amount.currency}
+                      />
+                    ),
+                    fromAccount: <span className="font-medium">{values.fromAccount.name}</span>,
+                    toAccount: <span className="font-medium">{values.toAccount.name}</span>,
+                  },
+                ),
+              });
               setOpen(false);
             } catch (e) {
               toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
@@ -178,7 +198,10 @@ export default function InternalTransferModal({
                             type="number"
                             inputMode="numeric"
                             onChange={e =>
-                              setFieldValue('amount.valueInCents', e.target.value ? parseInt(e.target.value) * 100 : '')
+                              setFieldValue(
+                                'amount.valueInCents',
+                                e.target.value ? parseFloat(e.target.value) * 100 : '',
+                              )
                             }
                             className="flex-1"
                           />
