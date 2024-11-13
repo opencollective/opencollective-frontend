@@ -130,7 +130,7 @@ const StepDetails = ({ onChange, stepDetails, collective, tier, showPlatformTip,
                 id="amount.belowMinimum"
                 defaultMessage="Please enter an amount of {minAmount} or more"
                 values={{
-                  minAmount: formatCurrency(minAmount, currency),
+                  minAmount: formatCurrency(minAmount, currency, { locale: intl.locale }),
                 }}
               />
             </div>
