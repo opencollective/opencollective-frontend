@@ -1618,6 +1618,7 @@
   "Fields.fromAccountInfo.email": "E-mail para contato",
   "Fields.fromAccountInfo.email.hint": "Todos os e-mails de comunicação serão enviados a este endereço de e-mail.",
   "Fields.hostFeePercent": "Host Fee Percent",
+  "Fields.id": "ID",
   "Fields.lastContributionDate": "Last Contribution Date",
   "Fields.lastExpenseDate": "Last Expense Date",
   "Fields.name": "Nome",
