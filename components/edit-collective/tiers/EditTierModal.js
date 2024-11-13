@@ -549,6 +549,7 @@ FormFields.propTypes = {
     type: PropTypes.string,
     amountType: PropTypes.string,
     interval: PropTypes.string,
+    minimumAmount: PropTypes.shape({ valueInCents: PropTypes.number, currency: PropTypes.string }),
   }),
   hideTypeSelect: PropTypes.bool,
   tier: PropTypes.shape({
