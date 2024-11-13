@@ -433,6 +433,7 @@
   "Amj+Gh": "继续贡献，即代表你同意我们的 <TOSLink>服务条款</TOSLink>和<PrivacyPolicyLink>隐私政策</PrivacyPolicyLink>。",
   "Amount": "{amount} {currencyCode}",
   "Amount.AllShort": "全部",
+  "amount.belowMinimum": "Please enter an amount of {minAmount} or more",
   "Amount.Free": "免费",
   "Amount.RangeFrom": "{minAmount} 及以上",
   "Amount.RangeFromTo": "{minAmount} 到 {maxAmount}",

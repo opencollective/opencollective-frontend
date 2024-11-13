@@ -433,6 +433,7 @@
   "Amj+Gh": "By contributing, you agree to our <TOSLink>Terms of Service</TOSLink> and <PrivacyPolicyLink>Privacy Policy</PrivacyPolicyLink>.",
   "Amount": "{amount} {currencyCode}",
   "Amount.AllShort": "Vše",
+  "amount.belowMinimum": "Please enter an amount of {minAmount} or more",
   "Amount.Free": "Zdarma",
   "Amount.RangeFrom": "{minAmount} a více",
   "Amount.RangeFromTo": "{minAmount} do {maxAmount}",

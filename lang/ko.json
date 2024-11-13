@@ -433,6 +433,7 @@
   "Amj+Gh": "기부하면 <TOSLink>이용약관</TOSLink>에 동의하는 것으로 간주돼요. <PrivacyPolicyLink>개인정보 처리방침</PrivacyPolicyLink>에서 개인정보가 어떻게 처리되는지 확인할 수 있어요.",
   "Amount": "{amount} {currencyCode}",
   "Amount.AllShort": "모두",
+  "amount.belowMinimum": "Please enter an amount of {minAmount} or more",
   "Amount.Free": "무료",
   "Amount.RangeFrom": "{minAmount} and above",
   "Amount.RangeFromTo": "{minAmount} to {maxAmount}",
