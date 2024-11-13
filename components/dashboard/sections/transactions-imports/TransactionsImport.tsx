@@ -342,7 +342,12 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                     {stepProps.id === 'import-csv' ? (
                       <StepSelectCSV onFileSelected={setCsvFile} />
                     ) : stepProps.id === 'map-csv' ? (
-                      <StepMapCSVColumns importId={importId} file={csvFile} currency={importData.account.currency} />
+                      <StepMapCSVColumns
+                        importId={importId}
+                        file={csvFile}
+                        currency={importData.account.currency}
+                        onSuccess={refetch}
+                      />
                     ) : null}
                   </Step>
                 );
