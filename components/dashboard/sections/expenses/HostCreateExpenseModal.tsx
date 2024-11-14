@@ -172,9 +172,9 @@ export const HostCreateExpenseModal = ({
   host,
   ...props
 }: {
-  transactionsImport: TransactionsImport;
-  transactionsImportRow: TransactionsImportRow;
   host: Account;
+  transactionsImport?: TransactionsImport;
+  transactionsImportRow?: TransactionsImportRow;
 } & BaseModalProps) => {
   const intl = useIntl();
   const [createExpense, { client }] = useMutation(hostCreateExpenseMutation, { context: API_V2_CONTEXT });
