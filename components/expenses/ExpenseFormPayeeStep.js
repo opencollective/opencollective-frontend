@@ -21,7 +21,7 @@ import { require2FAForAdmins } from '../../lib/policies';
 import { flattenObjectDeep } from '../../lib/utils';
 import { checkRequiresAddress } from './lib/utils';
 
-import CollectivePicker, { CUSTOM_OPTIONS_POSITION, FLAG_COLLECTIVE_PICKER_COLLECTIVE } from '../CollectivePicker';
+import { CUSTOM_OPTIONS_POSITION, FLAG_COLLECTIVE_PICKER_COLLECTIVE } from '../CollectivePicker';
 import CollectivePickerAsync from '../CollectivePickerAsync';
 import { Box, Flex } from '../Grid';
 import Image from '../Image';
@@ -277,79 +277,6 @@ const ExpenseFormPayeeStep = ({
   );
   const requiresAddress = checkRequiresAddress(values);
   const requiresPayoutMethod = !isOnBehalf && values.payee?.type !== VENDOR;
-  const canInvite = !values.status;
-
-  const collectivePick = canInvite
-    ? ({ id }) => (
-        <CollectivePickerAsync
-          inputId={id}
-          data-cy="select-expense-payee"
-          isSearchable
-          collective={values.payee}
-          onChange={({ value }) => {
-            if (value) {
-              const existingProfile = payoutProfiles.find(p => p.slug === value.slug);
-              const isVendor = value.type === VENDOR;
-              const isNewlyCreatedProfile = value.members?.some(
-                m => m.role === 'ADMIN' && m.member.slug === loggedInAccount.slug,
-              );
-
-              const payee = existingProfile || {
-                ...pick(value, ['id', 'name', 'slug', 'email', 'type', 'payoutMethods']),
-                isInvite: !isNewlyCreatedProfile && !isVendor,
-              };
-
-              if (isNewlyCreatedProfile && !isVendor) {
-                payee.payoutMethods = [];
-              }
-
-              formik.setFieldValue('payee', payee);
-              formik.setFieldValue('payoutMethod', isVendor ? first(payee.payoutMethods) || null : null);
-              setLocationFromPayee(formik, payee);
-              onChange(payee);
-            }
-          }}
-          styles={{
-            menu: {
-              borderRadius: '16px',
-            },
-            menuList: {
-              padding: '8px',
-            },
-          }}
-          emptyCustomOptions={payeeOptions}
-          customOptionsPosition={CUSTOM_OPTIONS_POSITION.BOTTOM}
-          getDefaultOptions={build => values.payee && build(values.payee)}
-          disabled={disablePayee}
-          invitable
-          onInvite={onInvite}
-          LoggedInUser={loggedInAccount}
-          includeVendorsForHostId={collective.host?.legacyId || undefined}
-          addLoggedInUserAsAdmin
-          excludeAdminFields
-          searchQuery={expenseFormPayeeStepCollectivePickerSearchQuery}
-          filterResults={collectives => collectives.filter(c => c.type !== CollectiveType.VENDOR || c.hasPayoutMethod)}
-          loading={loading}
-        />
-      )
-    : ({ id }) => (
-        <CollectivePicker
-          inputId={id}
-          customOptions={payeeOptions}
-          getDefaultOptions={build => values.payee && build(values.payee)}
-          data-cy="select-expense-payee"
-          isSearchable
-          disabled={disablePayee}
-          collective={values.payee}
-          onChange={({ value }) => {
-            formik.setFieldValue('payee', value);
-            formik.setFieldValue('payoutMethod', null);
-            setLocationFromPayee(formik, value);
-            onChange(value);
-          }}
-          loading={loading}
-        />
-      );
 
   const actionButtons = (
     <Flex flex={1} gridGap={[2, 3]} flexWrap="wrap">
@@ -422,7 +349,60 @@ const ExpenseFormPayeeStep = ({
                 flex="1"
                 mt={3}
               >
-                {collectivePick}
+                {({ id }) => (
+                  <CollectivePickerAsync
+                    inputId={id}
+                    data-cy="select-expense-payee"
+                    isSearchable
+                    collective={values.payee}
+                    onChange={({ value }) => {
+                      if (value) {
+                        const existingProfile = payoutProfiles.find(p => p.slug === value.slug);
+                        const isVendor = value.type === VENDOR;
+                        const isNewlyCreatedProfile = value.members?.some(
+                          m => m.role === 'ADMIN' && m.member.slug === loggedInAccount.slug,
+                        );
+
+                        const payee = existingProfile || {
+                          ...pick(value, ['id', 'name', 'slug', 'email', 'type', 'payoutMethods']),
+                          isInvite: !isNewlyCreatedProfile && !isVendor,
+                        };
+
+                        if (isNewlyCreatedProfile && !isVendor) {
+                          payee.payoutMethods = [];
+                        }
+
+                        formik.setFieldValue('payee', payee);
+                        formik.setFieldValue('payoutMethod', isVendor ? first(payee.payoutMethods) || null : null);
+                        setLocationFromPayee(formik, payee);
+                        onChange(payee);
+                      }
+                    }}
+                    styles={{
+                      menu: {
+                        borderRadius: '16px',
+                      },
+                      menuList: {
+                        padding: '8px',
+                      },
+                    }}
+                    emptyCustomOptions={payeeOptions}
+                    customOptionsPosition={CUSTOM_OPTIONS_POSITION.BOTTOM}
+                    getDefaultOptions={build => values.payee && build(values.payee)}
+                    disabled={disablePayee}
+                    invitable
+                    onInvite={onInvite}
+                    LoggedInUser={loggedInAccount}
+                    includeVendorsForHostId={collective.host?.legacyId || undefined}
+                    addLoggedInUserAsAdmin
+                    excludeAdminFields
+                    searchQuery={expenseFormPayeeStepCollectivePickerSearchQuery}
+                    filterResults={collectives =>
+                      collectives.filter(c => c.type !== CollectiveType.VENDOR || c.hasPayoutMethod)
+                    }
+                    loading={loading}
+                  />
+                )}
               </StyledInputField>
             )}
           </Field>
