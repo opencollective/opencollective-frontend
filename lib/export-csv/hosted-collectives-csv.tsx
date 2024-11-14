@@ -30,6 +30,7 @@ type Fields =
   | 'numberOfPayeesYear'
   | 'numberOfContributionsYear'
   | 'valueOfContributionsYear'
+  | 'valueOfRefundedContributionsYear'
   | 'valueOfHostFeeYear'
   | 'spentTotalYear'
   | 'receivedTotalYear'
@@ -39,6 +40,7 @@ type Fields =
   | 'numberOfPayeesAllTime'
   | 'numberOfContributionsAllTime'
   | 'valueOfContributionsAllTime'
+  | 'valueOfRefundedContributionsAllTime'
   | 'valueOfHostFeeAllTime'
   | 'spentTotalAllTime'
   | 'receivedTotalAllTime'
@@ -47,12 +49,21 @@ type Fields =
   | 'contributionMonthlyAverageCount'
   | 'contributionMonthlyAverageTotal'
   | 'spentTotalMonthlyAverage'
-  | 'receivedTotalMonthlyAverage';
+  | 'receivedTotalMonthlyAverage'
+  | 'spentTotalYearlyAverage'
+  | 'receivedTotalYearlyAverage';
 
 const MonthlyAverageTooltip = (
   <FormattedMessage
     defaultMessage="The average is calculated over the number of months since the collective was approved on your host"
     id="MonthlyAverage.Tooltip"
+  />
+);
+
+const YearlyAverageTooltip = (
+  <FormattedMessage
+    defaultMessage="The average is calculated over the number of years since the collective was approved on your host"
+    id="YearlyAverage.Tooltip"
   />
 );
 
@@ -202,6 +213,11 @@ export const FIELDS: Array<{
     label: <FormattedMessage defaultMessage="Total Value of Contributions (1 year)" id="valueOfContributionsYear" />,
   },
   {
+    id: 'valueOfRefundedContributionsYear',
+    group: 'contributions',
+    label: <FormattedMessage defaultMessage="Total Refunded Value (1 year)" id="valueOfRefundedContributionsYear" />,
+  },
+  {
     id: 'valueOfHostFeeYear',
     group: 'financials',
     label: <FormattedMessage defaultMessage="Host Fee Paid (1 year)" id="valueOfHostFeeYear" />,
@@ -236,6 +252,13 @@ export const FIELDS: Array<{
     group: 'contributions',
     label: (
       <FormattedMessage defaultMessage="Total Value of Contributions (All Time)" id="valueOfContributionsAllTime" />
+    ),
+  },
+  {
+    id: 'valueOfRefundedContributionsAllTime',
+    group: 'contributions',
+    label: (
+      <FormattedMessage defaultMessage="Total Refunded Value (All Time)" id="valueOfRefundedContributionsAllTime" />
     ),
   },
   {
@@ -320,6 +343,18 @@ export const FIELDS: Array<{
     group: 'financials',
     label: <FormattedMessage defaultMessage="Avg. Monthly Spent" id="spentTotalMonthlyAverage" />,
     tooltip: MonthlyAverageTooltip,
+  },
+  {
+    id: 'receivedTotalYearlyAverage',
+    group: 'financials',
+    label: <FormattedMessage defaultMessage="Avg. Yearly Received" id="receivedTotalYearlyAverage" />,
+    tooltip: YearlyAverageTooltip,
+  },
+  {
+    id: 'spentTotalYearlyAverage',
+    group: 'financials',
+    label: <FormattedMessage defaultMessage="Avg. Yearly Spent" id="spentTotalYearlyAverage" />,
+    tooltip: YearlyAverageTooltip,
   },
 ];
 
