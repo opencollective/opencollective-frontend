@@ -135,8 +135,7 @@ describe('Contribute Flow: Stripe Payment Element', () => {
       cy.location('origin', { timeout: 60000 }).should('eql', 'https://opencollective.com');
     });
 
-    // TODO: This test causes an Electron crash
-    it.skip('Redirects to untrusted url', testConfig, () => {
+    it('Redirects to untrusted url', testConfig, () => {
       cy.get('@collective').then(col => {
         cy.visit(`/${col.slug}/donate?redirect=https://google.com`);
       });
