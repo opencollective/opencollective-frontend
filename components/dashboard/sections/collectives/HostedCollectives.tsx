@@ -11,11 +11,9 @@ import { integer, isMulti } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { Collective, HostedCollectivesQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import { HostFeeStructure } from '../../../../lib/graphql/types/v2/graphql';
-import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { formatHostFeeStructure } from '../../../../lib/i18n/host-fee-structure';
-import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
 
 import { Drawer } from '../../../Drawer';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
@@ -116,7 +114,6 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
 
 const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionProps) => {
   const intl = useIntl();
-  const { LoggedInUser } = useLoggedInUser();
   const router = useRouter();
   const [displayExportCSVModal, setDisplayExportCSVModal] = React.useState(false);
   const [showCollectiveOverview, setShowCollectiveOverview] = React.useState<Collective | undefined | string>(
@@ -211,20 +208,18 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
       <DashboardHeader
         title={<FormattedMessage id="HostedCollectives" defaultMessage="Hosted Collectives" />}
         actions={
-          LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.EXPORT_COLLECTIVES) && (
-            <ExportHostedCollectivesCSVModal
-              open={displayExportCSVModal}
-              setOpen={setDisplayExportCSVModal}
-              queryFilter={queryFilter}
-              account={data?.host}
-              isHostReport
-              trigger={
-                <Button size="sm" variant="outline" onClick={() => setDisplayExportCSVModal(true)}>
-                  <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
-                </Button>
-              }
-            />
-          )
+          <ExportHostedCollectivesCSVModal
+            open={displayExportCSVModal}
+            setOpen={setDisplayExportCSVModal}
+            queryFilter={queryFilter}
+            account={data?.host}
+            isHostReport
+            trigger={
+              <Button size="sm" variant="outline" onClick={() => setDisplayExportCSVModal(true)}>
+                <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
+              </Button>
+            }
+          />
         }
       />
       <Filterbar {...queryFilter} />

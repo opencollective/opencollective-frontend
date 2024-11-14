@@ -15,7 +15,6 @@ export enum PREVIEW_FEATURE_KEYS {
   KEYBOARD_SHORTCUTS = 'KEYBOARD_SHORTCUTS',
   SEARCH_COMMAND = 'SEARCH_COMMAND',
   PLAID_INTEGRATION = 'PLAID_INTEGRATION',
-  EXPORT_COLLECTIVES = 'EXPORT_COLLECTIVES',
 }
 
 export type PreviewFeature = {
@@ -136,22 +135,5 @@ export const previewFeatures: PreviewFeature[] = [
     publicBeta: false,
     closedBetaAccessFor: ['opensource', 'ofico', 'ofitech', 'europe', 'oce-foundation-usd', 'oce-foundation-eur'],
     dependsOn: PREVIEW_FEATURE_KEYS.TRANSACTIONS_IMPORTS,
-  },
-  {
-    key: PREVIEW_FEATURE_KEYS.EXPORT_COLLECTIVES,
-    title: 'Export Hosted Collectives',
-    description: 'Export CSV on Hosted Collectives Dashboard',
-    closedBetaAccessFor: [
-      'opencollective',
-      'opensource',
-      'ofico',
-      'europe',
-      'oce-foundation-usd',
-      'oce-foundation-eur',
-      'the-social-change-nest',
-      'the-social-change-nest-eu',
-      'allforclimate',
-    ],
-    publicBeta: false,
   },
 ];

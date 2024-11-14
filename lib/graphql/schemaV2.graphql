@@ -9600,36 +9600,45 @@ Return a summary of transaction info about a given account within the context of
 """
 type HostedAccountSummary {
   expenseCount: Int
-
-  """
-  Average calculated over the number of months the collective was approved or the number of months since dateFrom, whichever is less
-  """
-  expenseMonthlyAverageCount: Float
   expenseTotal: Amount
-
-  """
-  Average calculated over the number of months the collective was approved or the number of months since dateFrom, whichever is less
-  """
-  expenseMonthlyAverageTotal: Amount
   expenseMaxValue: Amount
   expenseDistinctPayee: Int
   contributionCount: Int
-
-  """
-  Average calculated over the number of months the collective was approved or the number of months since dateFrom, whichever is less
-  """
-  contributionMonthlyAverageCount: Float
   contributionTotal: Amount
-
-  """
-  Average calculated over the number of months the collective was approved or the number of months since dateFrom, whichever is less
-  """
-  contributionMonthlyAverageTotal: Amount
   hostFeeTotal: Amount
   spentTotal: Amount
   receivedTotal: Amount
-  spentTotalMonthlyAverage: Amount
-  receivedTotalMonthlyAverage: Amount
+
+  """
+  Average calculated over the number of months the collective was approved or the number of months since dateFrom, whichever is less
+  """
+  expenseAverageTotal(period: AveragePeriod = MONTH): Amount
+
+  """
+  Average calculated over the number of months the collective was approved or the number of months since dateFrom, whichever is less
+  """
+  expenseAverageCount(period: AveragePeriod = MONTH): Float
+
+  """
+  Average calculated over the number of months the collective was approved or the number of months since dateFrom, whichever is less
+  """
+  contributionAverageTotal(period: AveragePeriod = MONTH): Amount
+
+  """
+  Average calculated over the number of months/years the collective was approved or the number of months since dateFrom, whichever is less
+  """
+  contributionAverageCount(period: AveragePeriod = MONTH): Float
+  spentTotalAverage(period: AveragePeriod = MONTH): Amount
+  receivedTotalAverage(period: AveragePeriod = MONTH): Amount
+  contributionRefundedTotal: Amount
+}
+
+"""
+The period over which the average is calculated
+"""
+enum AveragePeriod {
+  YEAR
+  MONTH
 }
 
 """
