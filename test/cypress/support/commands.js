@@ -268,6 +268,12 @@ Cypress.Commands.add('createProject', ({ userEmail = defaultTestUserEmail, colle
   });
 });
 
+Cypress.Commands.add('graphqlQueryV2', (query, { variables = {}, token = null } = {}) => {
+  return graphqlQueryV2(token, { query, variables }).then(({ body }) => {
+    return body.data;
+  });
+});
+
 /**
  * Add a stripe credit card on the collective designated by `collectiveSlug`.
  */
@@ -581,6 +587,43 @@ Cypress.Commands.add('getDownloadedPDFContent', (filename, options) => {
   cy.readFile(`${downloadFolder}/${filename}`, null, options).then(pdfFileContent => {
     cy.task('getTextFromPdfContent', pdfFileContent);
   });
+});
+
+Cypress.Commands.add('waitOrderStatus', (orderId, status) => {
+  return cy.retryChain(
+    () =>
+      cy
+        .graphqlQueryV2(
+          gql`
+            query OrderStatus($orderId: Int!) {
+              order(order: { legacyId: $orderId }) {
+                status
+              }
+            }
+          `,
+          { variables: { orderId } },
+        )
+        .then(data => data.order.status),
+    apiStatus => {
+      if (!apiStatus.match(status)) {
+        throw new Error(`Order did not transition to ${status} before timeout, current value: ${apiStatus}.`);
+      }
+    },
+    {
+      maxAttempts: 50,
+      wait: 1000,
+    },
+  );
+});
+
+Cypress.Commands.add('getOrderIdFromContributionSuccessPage', () => {
+  return cy
+    .get('[data-cy^="contribution-id-"]')
+    .invoke('attr', 'data-cy')
+    .then(contributionIdStr => {
+      const contributionId = parseInt(contributionIdStr.replace('contribution-id-', ''));
+      return contributionId;
+    });
 });
 
 // ---- Private ----
