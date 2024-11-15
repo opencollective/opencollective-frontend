@@ -433,6 +433,7 @@
   "Amj+Gh": "Ao contribuir, você concorda com nossos <TOSLink>Termos de Serviço</TOSLink> e a <PrivacyPolicyLink>Política de Privacidade</PrivacyPolicyLink>.",
   "Amount": "{amount} {currencyCode}",
   "Amount.AllShort": "Todos",
+  "amount.belowMinimum": "Please enter an amount of {minAmount} or more",
   "Amount.Free": "Grátis",
   "Amount.RangeFrom": "A partir de {minAmount}",
   "Amount.RangeFromTo": "{minAmount} até {maxAmount}",
