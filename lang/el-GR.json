@@ -433,6 +433,7 @@
   "Amj+Gh": "Συνεισφέροντας συμφωνείτε με τους <TOSLink>Όρους Παροχής Υπηρεσιών</TOSLink> και την <PrivacyPolicyLink>Πολιτική Απορρήτου</PrivacyPolicyLink>.",
   "Amount": "{amount} {currencyCode}",
   "Amount.AllShort": "Όλα",
+  "amount.belowMinimum": "Please enter an amount of {minAmount} or more",
   "Amount.Free": "Δωρεάν",
   "Amount.RangeFrom": "από {minAmount} και πάνω",
   "Amount.RangeFromTo": "από {minAmount} έως {maxAmount}",
