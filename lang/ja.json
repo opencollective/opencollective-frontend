@@ -433,6 +433,7 @@
   "Amj+Gh": "貢献することで、<TOSLink>利用規約</TOSLink>と<PrivacyPolicyLink>プライバシーポリシー</PrivacyPolicyLink>に同意したことになります。",
   "Amount": "{amount}{currencyCode}",
   "Amount.AllShort": "すべて",
+  "amount.belowMinimum": "Please enter an amount of {minAmount} or more",
   "Amount.Free": "無料",
   "Amount.RangeFrom": "{minAmount} 以上",
   "Amount.RangeFromTo": "{minAmount} 〜 {maxAmount}",
