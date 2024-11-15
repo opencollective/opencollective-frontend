@@ -4,7 +4,7 @@ import { useQuery } from '@apollo/client';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Undo } from '@styled-icons/fa-solid/Undo';
 import { FastField, Field } from 'formik';
-import { first, get, groupBy, isEmpty, omit, pick } from 'lodash';
+import { compact, first, get, groupBy, isEmpty, omit, pick } from 'lodash';
 import { createPortal } from 'react-dom';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -390,16 +390,22 @@ const ExpenseFormPayeeStep = ({
                     customOptionsPosition={CUSTOM_OPTIONS_POSITION.BOTTOM}
                     getDefaultOptions={build => values.payee && build(values.payee)}
                     disabled={disablePayee}
-                    invitable
+                    invitable={!editingExpense}
                     onInvite={onInvite}
                     LoggedInUser={loggedInAccount}
                     includeVendorsForHostId={collective.host?.legacyId || undefined}
                     addLoggedInUserAsAdmin
                     excludeAdminFields
                     searchQuery={expenseFormPayeeStepCollectivePickerSearchQuery}
-                    filterResults={collectives =>
-                      collectives.filter(c => c.type !== CollectiveType.VENDOR || c.hasPayoutMethod)
-                    }
+                    filterResults={collectives => {
+                      if (editingExpense) {
+                        return collectives.filter(c => {
+                          const slugs = compact([c.slug, c.host?.slug]);
+                          return loggedInAccount.adminMemberships?.nodes.some(m => slugs.includes(m.account.slug));
+                        });
+                      }
+                      return collectives.filter(c => c.type !== CollectiveType.VENDOR || c.hasPayoutMethod);
+                    }}
                     loading={loading}
                   />
                 )}
