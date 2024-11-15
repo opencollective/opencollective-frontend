@@ -433,6 +433,7 @@
   "Amj+Gh": "Роблячи внесок, ви погоджуєтеся з нашими <TOSLink>Умовами користування</TOSLink> та <PrivacyPolicyLink>Політикою приватності</PrivacyPolicyLink>.",
   "Amount": "{amount} {currencyCode}",
   "Amount.AllShort": "Всі",
+  "amount.belowMinimum": "Please enter an amount of {minAmount} or more",
   "Amount.Free": "Безплатно",
   "Amount.RangeFrom": "{minAmount} і більше",
   "Amount.RangeFromTo": "{minAmount} до {maxAmount}",
