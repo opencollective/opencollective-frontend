@@ -433,6 +433,7 @@
   "Amj+Gh": "Poskytnutím príspevku vyjadrujete súhlas s našimi <TOSLink>Podmienkami poskytovania služieb</TOSLink> a <PrivacyPolicyLink>Zásadami ochrany osobných údajov</PrivacyPolicyLink>.",
   "Amount": "{amount} {currencyCode}",
   "Amount.AllShort": "Všetko",
+  "amount.belowMinimum": "Please enter an amount of {minAmount} or more",
   "Amount.Free": "Zadarmo",
   "Amount.RangeFrom": "{minAmount} a viac",
   "Amount.RangeFromTo": "od {minAmount} do {maxAmount}",

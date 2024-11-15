@@ -433,6 +433,7 @@
   "Amj+Gh": "Genom att bidra godkänner du våra <TOSLink>användarvillkor</TOSLink> och <PrivacyPolicyLink>integritetspolicy</PrivacyPolicyLink>.",
   "Amount": "{amount} {currencyCode}",
   "Amount.AllShort": "Alla",
+  "amount.belowMinimum": "Please enter an amount of {minAmount} or more",
   "Amount.Free": "Gratis",
   "Amount.RangeFrom": "{minAmount} och högre",
   "Amount.RangeFromTo": "{minAmount} till {maxAmount}",

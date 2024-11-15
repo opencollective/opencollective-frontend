@@ -23,6 +23,7 @@ class InputFieldPresets extends React.Component {
     pre: PropTypes.string,
     options: PropTypes.object,
     onChange: PropTypes.func,
+    min: PropTypes.number,
   };
 
   constructor(props) {
@@ -56,6 +57,7 @@ class InputFieldPresets extends React.Component {
         value={this.state.values[index]}
         options={this.props.options}
         pre={this.props.pre}
+        min={this.props.min}
         onChange={val => this.handleChange(index, val)}
       />
     );
