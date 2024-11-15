@@ -433,6 +433,7 @@
   "Amj+Gh": "crwdns22127:0crwdne22127:0",
   "Amount": "crwdns16778:0{amount}crwdnd16778:0{currencyCode}crwdne16778:0",
   "Amount.AllShort": "crwdns16780:0crwdne16780:0",
+  "amount.belowMinimum": "crwdns28894:0{minAmount}crwdne28894:0",
   "Amount.Free": "crwdns16782:0crwdne16782:0",
   "Amount.RangeFrom": "crwdns16784:0{minAmount}crwdne16784:0",
   "Amount.RangeFromTo": "crwdns16786:0{minAmount}crwdnd16786:0{maxAmount}crwdne16786:0",
