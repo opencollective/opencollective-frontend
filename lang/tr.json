@@ -433,6 +433,7 @@
   "Amj+Gh": "Katkıda bulunarak, <TOSLink>Hizmet Şartlarımızı</TOSLink> ve <PrivacyPolicyLink>Gizlilik Politikamızı</PrivacyPolicyLink> kabul etmiş olursunuz.",
   "Amount": "{amount} {currencyCode}",
   "Amount.AllShort": "Tümü",
+  "amount.belowMinimum": "Please enter an amount of {minAmount} or more",
   "Amount.Free": "Ücretsiz",
   "Amount.RangeFrom": "{minAmount} ve üstü",
   "Amount.RangeFromTo": "{minAmount} ila {maxAmount}",
