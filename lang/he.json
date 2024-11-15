@@ -433,6 +433,7 @@
   "Amj+Gh": "בתרומתך הנך מאשר/ת את <TOSLink>תנאי השירות</TOSLink> ואת <PrivacyPolicyLink>מדיניות הפרטיות</PrivacyPolicyLink>.",
   "Amount": "{amount} {currencyCode}",
   "Amount.AllShort": "כולם",
+  "amount.belowMinimum": "Please enter an amount of {minAmount} or more",
   "Amount.Free": "חינם",
   "Amount.RangeFrom": "{minAmount} ומעלה",
   "Amount.RangeFromTo": "{minAmount} עד {maxAmount}",
