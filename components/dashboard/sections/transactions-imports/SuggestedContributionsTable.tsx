@@ -9,6 +9,7 @@ import DateTime from '../../../DateTime';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import OrderStatusTag from '../../../orders/OrderStatusTag';
 import { DataTable } from '../../../table/DataTable';
+import { Badge } from '../../../ui/Badge';
 import { Button } from '../../../ui/Button';
 import { RadioGroup, RadioGroupItem } from '../../../ui/RadioGroup';
 import { EmptyResults } from '../../EmptyResults';
@@ -60,6 +61,12 @@ export const SuggestedContributionsTable = ({
             id: 'select',
             cell: ({ row }) => <RadioGroupItem value={row.original.id} />,
             meta: { className: 'w-[20px]' },
+          },
+          {
+            id: 'id',
+            header: () => <FormattedMessage id="Fields.id" defaultMessage="ID" />,
+            accessorKey: 'legacyId',
+            cell: ({ cell }) => <Badge size="xs">#{cell.getValue() as number}</Badge>,
           },
           {
             id: 'date',

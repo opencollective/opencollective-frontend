@@ -10,13 +10,17 @@ import { formatCurrency } from '../../../../lib/currency-utils';
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { integer } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import type { Collective, HostedCollectivesQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import type {
+  Collective,
+  DashboardAccountsQueryFieldsFragment,
+  HostedCollectivesQueryVariables,
+} from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
 import { Drawer } from '../../../Drawer';
 import Link from '../../../Link';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
-import { DataTable } from '../../../table/DataTable';
+import { actionsColumn, DataTable } from '../../../table/DataTable';
 import { Button } from '../../../ui/Button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/DropdownMenu';
 import { Skeleton } from '../../../ui/Skeleton';
@@ -29,7 +33,9 @@ import type { DashboardSectionProps } from '../../types';
 import type { HostedCollectivesDataTableMeta } from '../collectives/common';
 
 import AccountDetails from './AccountDetails';
+import { useAccountActions } from './actions';
 import { cols } from './common';
+import InternalTransferModal from './InternalTransferModal';
 import { accountsMetadataQuery, accountsQuery } from './queries';
 
 const COLLECTIVES_PER_PAGE = 20;
@@ -54,6 +60,7 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
   const [showCollectiveOverview, setShowCollectiveOverview] = React.useState<Collective | undefined | string>(
     subpath[0],
   );
+  const [showInternalTransferModal, setShowInternalTransferModal] = React.useState(false);
   const { data: metadata, refetch: refetchMetadata } = useQuery(accountsMetadataQuery, {
     variables: { accountSlug },
     fetchPolicy: 'cache-and-network',
@@ -131,31 +138,46 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
 
   const isArchived = queryFilter.hasFilters && queryFilter.values.status === ACCOUNT_STATUS.ARCHIVED;
   const accounts = compact([!isArchived && data?.account, ...(data?.account?.childrenAccounts?.nodes || [])]);
+  const activeAccounts = React.useMemo(
+    () => [data?.account, ...(data?.account?.childrenAccounts?.nodes.filter(a => a.isActive) || [])],
+    [data?.account],
+  );
+  const getActions = useAccountActions<DashboardAccountsQueryFieldsFragment>({
+    accounts: activeAccounts,
+  });
+
   return (
     <div className="flex max-w-screen-lg flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage id="CollectiveAccounts" defaultMessage="Collective Accounts" />}
         actions={
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button size="xs" variant="outline" className="gap-1">
-                <FormattedMessage id="Accounts.Add" defaultMessage="Add Account" />
-                <ChevronDown className="text-muted-foreground" size={16} />
+          <div className="flex items-center gap-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="xs" variant="outline" className="gap-1">
+                  <FormattedMessage id="Accounts.Add" defaultMessage="Add Account" />
+                  <ChevronDown className="text-muted-foreground" size={16} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link href={`/${accountSlug}/projects/create`}>
+                    <FormattedMessage defaultMessage="New project" id="lJMkin" />
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href={`/${accountSlug}/events/create`}>
+                    <FormattedMessage defaultMessage="New event" id="C+Npdp" />
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            {activeAccounts?.length > 1 && (
+              <Button size="xs" variant="outline" onClick={() => setShowInternalTransferModal(true)}>
+                <FormattedMessage defaultMessage="New internal transfer" id="v4unZI" />
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem asChild>
-                <Link href={`/${accountSlug}/projects/create`}>
-                  <FormattedMessage defaultMessage="New project" id="lJMkin" />
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href={`/${accountSlug}/events/create`}>
-                  <FormattedMessage defaultMessage="New event" id="C+Npdp" />
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            )}
+          </div>
         }
       >
         <div className="flex">
@@ -185,7 +207,7 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
           <DataTable
             data-cy="transactions-table"
             innerClassName="text-muted-foreground"
-            columns={compact([cols.collective, cols.status, cols.raised, cols.spent, cols.balance])}
+            columns={compact([cols.collective, cols.status, cols.raised, cols.spent, cols.balance, actionsColumn])}
             data={accounts}
             loading={loading}
             mobileTableView
@@ -201,6 +223,9 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
             }
             onClickRow={onClickRow}
             getRowDataCy={row => `collective-${row.original.slug}`}
+            getActions={getActions}
+            queryFilter={queryFilter}
+            getRowId={row => String(row.slug)}
           />
           <Pagination queryFilter={queryFilter} total={data?.account?.childrenAccounts?.totalCount} />
         </React.Fragment>
@@ -223,6 +248,11 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
           />
         )}
       </Drawer>
+      <InternalTransferModal
+        open={showInternalTransferModal}
+        setOpen={setShowInternalTransferModal}
+        accounts={activeAccounts}
+      />
     </div>
   );
 };

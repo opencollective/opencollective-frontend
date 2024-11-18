@@ -168,6 +168,11 @@ describe('passwords', () => {
     cy.contains('Two-factor authentication code failed. Please try again').should.exist;
     const code = speakeasy.totp({ algorithm: 'SHA1', encoding: 'base32', secret: secret.base32 });
     cy.complete2FAPrompt(code);
+
+    // Wait for redirect
+    cy.get('input[name="name"]').should('have.value', 'Mr Bungle');
+
+    // Assert logged in
     cy.assertLoggedIn(user);
   });
 });

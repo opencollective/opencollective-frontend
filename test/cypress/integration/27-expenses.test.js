@@ -312,7 +312,7 @@ describe('Expense flow', () => {
       // Check what happens when we change the currency to USD
       cy.getByDataCy('items[1].amountV2-amount-currency-picker').click();
       cy.contains('[data-cy="select-option"]', 'US Dollar').click();
-      cy.get('[data-cy="mismatch-warning"] button').realHover();
+      cy.get('[data-cy="mismatch-warning"] button').realHover({ position: 'center' });
       cy.get('[data-cy="mismatch-warning-tooltip"]').should(
         'contain',
         'The amount does not match the one scanned from the document (USD $65.00)',

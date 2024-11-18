@@ -3,6 +3,8 @@ import { throttle } from 'lodash';
 import { getFromLocalStorage, removeFromLocalStorage, setLocalStorage } from './local-storage';
 
 export default class FormPersister {
+  formId: string | null;
+
   constructor(formId = null, throttlePeriod = 1000) {
     this.formId = formId;
     this.saveValues = throttle(this.saveValues, throttlePeriod);

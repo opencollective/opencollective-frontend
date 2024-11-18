@@ -84,6 +84,7 @@ echo ""
 wait_for_service PDF 127.0.0.1 3002
 
 echo ""
+
 if [ "$USE_PLAYWRIGHT" = "true" ]; then
   echo "> Running playwright tests"
   pwd
@@ -94,7 +95,7 @@ if [ "$USE_PLAYWRIGHT" = "true" ]; then
   npx playwright test test/playwright/integration/*.spec.ts
 else
   echo "> Running cypress tests"
-  npm run cypress:run -- ${CYPRESS_RECORD} --env OC_ENV=$OC_ENV --spec "test/cypress/integration/${CYPRESS_TEST_FILES}"
+  npm run cypress:run -- ${CYPRESS_RECORD} --browser chromium --env OC_ENV=$OC_ENV --spec "test/cypress/integration/${CYPRESS_TEST_FILES}"
 fi
 
 RETURN_CODE=$?

@@ -101,7 +101,7 @@ const TimelineItem = ({ activity, openExpense }: ActivityListItemProps) => {
           <Skeleton className="h-4 w-80" />
         ) : (
           <div className="flex min-w-0 flex-1 flex-col justify-between sm:flex-row sm:gap-1.5 sm:pt-1">
-            <div className="leading-6 text-foreground *:align-middle">{description}</div>
+            <div className="align-baseline leading-6 text-foreground *:align-bottom">{description}</div>
             <div className="flex items-center self-start whitespace-nowrap leading-6 text-muted-foreground">
               {isLastWeek ? (
                 dayjs(activity.createdAt).fromNow()

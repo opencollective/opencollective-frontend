@@ -386,6 +386,12 @@ export const MatchContributionDialog = ({
                   <ul className="mt-2 list-inside list-disc">
                     <li>
                       <strong>
+                        <FormattedMessage id="Fields.id" defaultMessage="ID" />
+                      </strong>
+                      : {selectedContribution.legacyId}
+                    </li>
+                    <li>
+                      <strong>
                         <FormattedMessage id="Fields.description" defaultMessage="Description" />
                       </strong>
                       : {selectedContribution.description}

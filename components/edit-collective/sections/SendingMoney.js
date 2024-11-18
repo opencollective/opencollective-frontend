@@ -65,7 +65,7 @@ class SendingMoney extends React.Component {
           connectedAccounts={this.props.collective.connectedAccounts}
           services={services}
         />
-        {!services.includes('paypal') && (
+        {services.includes('paypal') && this.props.collective.connectedAccounts?.find(c => c.service === 'paypal') && (
           <Fragment>
             <SettingsSectionTitle>
               <FormattedMessage id="PayoutMethod.Type.Paypal" defaultMessage="PayPal" />

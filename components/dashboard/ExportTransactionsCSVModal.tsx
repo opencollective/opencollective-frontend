@@ -9,6 +9,7 @@ import type { MouseEventHandler } from 'react';
 import { FormattedMessage } from 'react-intl';
 import slugify from 'slugify';
 
+import { setRestAuthorizationCookie } from '../../lib/auth';
 import { getEnvVar } from '../../lib/env-utils';
 import type { CSVField } from '../../lib/export-csv/transactions-csv';
 import {
@@ -43,8 +44,6 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Input } from '../ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 import { Switch } from '../ui/Switch';
-
-const env = process.env.OC_ENV;
 
 const TOTAL_AVAILABLE_FIELDS = FIELDS.length;
 
@@ -258,7 +257,7 @@ const ExportTransactionsCSVModal = ({
         },
       });
       const rows = parseInt(response.headers.get('x-exported-rows'), 10);
-      return rows;
+      return isNaN(rows) ? null : rows;
     }
   });
 
@@ -305,15 +304,7 @@ const ExportTransactionsCSVModal = ({
   }, [queryFilter.values, account, open]);
 
   React.useEffect(() => {
-    const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-    if (typeof document !== 'undefined' && accessToken) {
-      document.cookie =
-        env === 'development' || env === 'e2e'
-          ? `authorization="Bearer ${accessToken}";path=/;SameSite=strict;max-age=120`
-          : // It is not possible to use HttpOnly when setting from JavaScript.
-            // I'm enforcing SameSite and Domain in production to prevent CSRF.
-            `authorization="Bearer ${accessToken}";path=/;SameSite=strict;max-age=120;domain=opencollective.com;secure`;
-    }
+    setRestAuthorizationCookie();
     setDownloadUrl(makeUrl({ account, isHostReport, queryFilter, flattenTaxesAndPaymentProcessorFees, fields }));
   }, [fields, flattenTaxesAndPaymentProcessorFees, queryFilter, account, isHostReport, setDownloadUrl]);
 
@@ -632,9 +623,16 @@ const ExportTransactionsCSVModal = ({
           </div>
 
           <DialogFooter className="flex flex-col gap-4 border-t border-solid border-slate-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-            <div>
-              {!isAboveRowLimit && (
-                <div className="flex flex-col gap-3 font-bold text-slate-700 sm:flex-row sm:text-sm">
+            <div className="font-bold text-slate-700 sm:text-sm">
+              {isFetchingRows ? (
+                <React.Fragment>
+                  <FormattedMessage
+                    id="ExportTransactionsCSVModal.FetchingRows"
+                    defaultMessage="Checking number of exported rows..."
+                  />
+                </React.Fragment>
+              ) : !isAboveRowLimit && exportedRows ? (
+                <div className="flex flex-col gap-3 sm:flex-row">
                   <FormattedMessage
                     id="ExportTransactionsCSVModal.ExportRows"
                     defaultMessage="Exporting {rows} {rows, plural, one {row} other {rows}}"
@@ -654,7 +652,7 @@ const ExportTransactionsCSVModal = ({
                     </div>
                   )}
                 </div>
-              )}
+              ) : null}
             </div>
             <div className="flex flex-col justify-stretch gap-2 sm:flex-row sm:justify-normal">
               {canEditFields && (

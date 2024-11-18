@@ -275,6 +275,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
           {({ field, form }) => (
             <InputFieldPresets
               {...field}
+              min={values.minimumAmount?.valueInCents || 0}
               defaultValue={field.value}
               onChange={value => form.setFieldValue(field.name, value)}
             />
@@ -548,6 +549,7 @@ FormFields.propTypes = {
     type: PropTypes.string,
     amountType: PropTypes.string,
     interval: PropTypes.string,
+    minimumAmount: PropTypes.shape({ valueInCents: PropTypes.number, currency: PropTypes.string }),
   }),
   hideTypeSelect: PropTypes.bool,
   tier: PropTypes.shape({

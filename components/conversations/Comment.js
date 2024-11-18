@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import { CommentType } from '../../lib/graphql/types/v2/graphql';
+
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
 import HTMLContent from '../HTMLContent';
@@ -33,6 +35,7 @@ const Comment = ({
   const [isEditing, setEditing] = React.useState(false);
   const hasActions = !isEditing;
   const anchorHash = `comment-${new Date(comment.createdAt).getTime()}`;
+  const isPrivateNote = comment.type === CommentType.PRIVATE_NOTE;
 
   return (
     <Container width="100%" data-cy="comment" id={anchorHash}>
@@ -81,6 +84,7 @@ const Comment = ({
                 fontSize="13px"
                 autoFocus
                 setUploading={setUploading}
+                toolbarBackgroundColor={isPrivateNote ? '#fffbeb' : '#ffffff'}
               />
             )
           }
@@ -101,6 +105,7 @@ Comment.propTypes = {
     id: PropTypes.string.isRequired,
     html: PropTypes.string,
     createdAt: PropTypes.string,
+    type: PropTypes.string,
     fromAccount: PropTypes.shape({
       id: PropTypes.string,
       name: PropTypes.string,
@@ -115,8 +120,6 @@ Comment.propTypes = {
   canReply: PropTypes.bool,
   /** Set this to true if the comment is the root comment of a conversation */
   isConversationRoot: PropTypes.bool,
-  /** Set this to true to disable actions */
-  withoutActions: PropTypes.bool,
   /** If set, comment will be scrollable over this height */
   maxCommentHeight: PropTypes.number,
   /** Called when comment gets deleted */

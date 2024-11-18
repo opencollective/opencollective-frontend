@@ -78,7 +78,9 @@ export function DevicesSettings(props: DevicesSettingsProps) {
     });
 
     try {
-      const registration = await webauthn.startRegistration(response.data.createWebAuthnRegistrationOptions);
+      const registration = await webauthn.startRegistration({
+        optionsJSON: response.data.createWebAuthnRegistrationOptions,
+      });
       const registrationBase64 = Buffer.from(JSON.stringify(registration)).toString('base64');
 
       const result = await addWebauthnDevice({

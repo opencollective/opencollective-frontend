@@ -1,5 +1,5 @@
 import React from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { useTheme } from 'styled-components';
 
 import type { Activity } from '../../lib/graphql/types/v2/graphql';
@@ -32,10 +32,10 @@ export default function SmallThreadActivity(props: SmallThreadActivityProps) {
 
   return (
     <div
-      className="relative w-full border-slate-200 py-4 first:border-none first:pt-0 [&:first-child_.timeline-indicator]:top-0 [&:last-child_.timeline-indicator]:-bottom-4 [&:last-child_.timeline-separator]:hidden"
+      className="relative w-full border-slate-200 px-6 py-4 first:border-none first:pt-0 [&:first-child_.timeline-indicator]:top-0 [&:last-child_.timeline-indicator]:-bottom-4 [&:last-child_.timeline-separator]:hidden"
       data-cy="activity"
     >
-      <div className="timeline-separator absolute bottom-0 left-5 right-0 border-b" />
+      <div className="timeline-separator absolute bottom-0 left-11 right-0 border-b" />
       <div className="flex justify-between">
         <div className="flex gap-4">
           <div className="relative">
@@ -47,14 +47,14 @@ export default function SmallThreadActivity(props: SmallThreadActivityProps) {
                   <div className="relative">
                     <Avatar collective={props.activity.individual} radius={40} />
                     <div className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-white shadow">
-                      {getActivityIcon(props.activity, theme, 16)}
+                      {getActivityIcon(props.activity, theme, 12)}
                     </div>
                   </div>
                 }
               />
             ) : (
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow">
-                {getActivityIcon(props.activity, theme, 20)}
+                {getActivityIcon(props.activity, theme, 12)}
               </div>
             )}
           </div>
@@ -62,9 +62,13 @@ export default function SmallThreadActivity(props: SmallThreadActivityProps) {
             {props.activity.individual && (
               <div className="mb-1 text-sm font-medium leading-5">{props.activity.individual.name}</div>
             )}
-            <div className="text-sm leading-4 text-muted-foreground">
-              <DateTime dateStyle="medium" value={props.activity.createdAt} />
-            </div>
+            <p className="truncate text-xs text-muted-foreground">
+              <FormattedMessage
+                defaultMessage="on {date}"
+                id="mzGohi"
+                values={{ date: <DateTime value={props.activity.createdAt} /> }}
+              />
+            </p>
             {message ? (
               <div className="mt-4 whitespace-pre-line text-sm">
                 <div

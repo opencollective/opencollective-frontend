@@ -77,6 +77,10 @@ const getPageMetadata = (intl, legacyExpenseId, expense) => {
   }
 };
 
+const isValidCollectiveSlug = (collectiveSlug: string, expense) => {
+  return [expense.account.slug, expense.account.parent?.slug].filter(Boolean).includes(collectiveSlug);
+};
+
 // next.js export
 // ts-unused-exports:disable-next-line
 export default function ExpensePage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
@@ -106,7 +110,7 @@ export default function ExpensePage(props: InferGetServerSidePropsType<typeof ge
       return <ErrorPage data={data} />;
     } else if (!data.expense) {
       return <ErrorPage error={generateNotFoundError(null)} log={false} />;
-    } else if (!data.expense.account || props.collectiveSlug !== data.expense.account.slug) {
+    } else if (!data.expense.account || !isValidCollectiveSlug(collectiveSlug, data.expense)) {
       return <ErrorPage error={generateNotFoundError(collectiveSlug)} log={false} />;
     }
   }

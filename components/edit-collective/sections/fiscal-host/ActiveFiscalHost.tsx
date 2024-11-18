@@ -15,7 +15,9 @@ import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { getI18nLink } from '../../../I18nFormatters';
 import Link from '../../../Link';
 import LinkCollective from '../../../LinkCollective';
+import LoadingGrid from '../../../LoadingGrid';
 import MessageBox from '../../../MessageBox';
+import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import StyledHr from '../../../StyledHr';
 import { Button } from '../../../ui/Button';
 import { LeaveHostModal } from '../../LeaveHostModal';
@@ -87,6 +89,18 @@ export function ActiveFiscalHost(props: ActiveFiscalHostProps) {
   const collective = query.data?.account;
   const host = collective && 'host' in collective ? collective.host : null;
   const approvedAt = collective && 'approvedAt' in collective ? collective.approvedAt : null;
+
+  if (query.error) {
+    return <MessageBoxGraphqlError error={query.error} />;
+  }
+
+  if (query.loading || !collective) {
+    return (
+      <div className="m-auto">
+        <LoadingGrid />
+      </div>
+    );
+  }
 
   return (
     <div>

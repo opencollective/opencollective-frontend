@@ -392,6 +392,7 @@ class ContributionFlowSuccess extends React.Component {
                 width={['100%', null, null, '50%']}
                 mb={[4, null, null, 0]}
                 flexShrink={0}
+                data-cy={`contribution-id-${order.legacyId}`}
               >
                 <Flex flexDirection="column" alignItems="center" justifyContent="center" my={4} width={1}>
                   <h3 className="mb-4 text-3xl font-bold">

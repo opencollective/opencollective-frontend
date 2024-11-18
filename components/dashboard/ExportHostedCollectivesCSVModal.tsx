@@ -9,6 +9,7 @@ import type { MouseEventHandler } from 'react';
 import { FormattedMessage } from 'react-intl';
 import slugify from 'slugify';
 
+import { setRestAuthorizationCookie } from '../../lib/auth';
 import {
   AVERAGE_ROWS_PER_MINUTE,
   FIELD_OPTIONS,
@@ -36,11 +37,17 @@ import Tabs from '../Tabs';
 import { Button } from '../ui/Button';
 import { Checkbox } from '../ui/Checkbox';
 import { Collapsible, CollapsibleContent } from '../ui/Collapsible';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../ui/Dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '../ui/Dialog';
 import { Input } from '../ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
-
-const env = process.env.OC_ENV;
 
 const TOTAL_AVAILABLE_FIELDS = FIELDS.length;
 
@@ -61,6 +68,12 @@ const makeUrl = ({ account, queryFilter, fields }) => {
   }
   if (queryFilter.values.searchTerm) {
     url.searchParams.set('searchTerm', queryFilter.values.searchTerm);
+  }
+  if (queryFilter.values.sort) {
+    url.searchParams.set('sort', JSON.stringify(queryFilter.values.sort));
+  }
+  if (queryFilter.variables.consolidatedBalance) {
+    url.searchParams.set('consolidatedBalance', JSON.stringify(queryFilter.variables.consolidatedBalance));
   }
   if (!isNil(queryFilter.variables.isFrozen)) {
     url.searchParams.set('isFrozen', queryFilter.variables.isFrozen ? '1' : '0');
@@ -188,7 +201,7 @@ const ExportHostedCollectivesCSVModal = ({
         },
       });
       const rows = parseInt(response.headers.get('x-exported-rows'), 10);
-      return rows;
+      return isNaN(rows) ? null : rows;
     }
   });
 
@@ -229,15 +242,7 @@ const ExportHostedCollectivesCSVModal = ({
   }, [queryFilter.values, account, open]);
 
   React.useEffect(() => {
-    const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-    if (typeof document !== 'undefined' && accessToken) {
-      document.cookie =
-        env === 'development' || env === 'e2e'
-          ? `authorization="Bearer ${accessToken}";path=/;SameSite=strict;max-age=120`
-          : // It is not possible to use HttpOnly when setting from JavaScript.
-            // I'm enforcing SameSite and Domain in production to prevent CSRF.
-            `authorization="Bearer ${accessToken}";path=/;SameSite=strict;max-age=120;domain=opencollective.com;secure`;
-    }
+    setRestAuthorizationCookie();
     setDownloadUrl(makeUrl({ account, queryFilter, fields }));
   }, [fields, queryFilter, account, isHostReport, setDownloadUrl]);
 
@@ -323,7 +328,7 @@ const ExportHostedCollectivesCSVModal = ({
     setIsEditingPreset(!isEditingPreset);
   };
 
-  const isAboveRowLimit = exportedRows > 100e3;
+  const isAboveRowLimit = exportedRows > 10e3;
   const expectedTimeInMinutes = Math.round((exportedRows * 1.1) / AVERAGE_ROWS_PER_MINUTE);
   const disabled = isAboveRowLimit || isFetchingRows || isSavingSet || isEmpty(fields);
   const isWholeTabSelected = GROUP_FIELDS[tab]?.every(f => fields.includes(f));
@@ -338,6 +343,15 @@ const ExportHostedCollectivesCSVModal = ({
             <DialogTitle className="text-xl font-bold">
               <FormattedMessage id="ExportHostedCollectivesCSVModal.Title" defaultMessage="Export Hosted Collectives" />
             </DialogTitle>
+            <DialogDescription>
+              <FormattedMessage
+                defaultMessage="Export a CSV file with information about the hosted collectives that match the filters you've selected.{br}The information exported is contextual to your fiscal host and does not include information about the time a collective was hosted by another fiscal host."
+                values={{
+                  br: <br />,
+                }}
+                id="APGvDq"
+              />
+            </DialogDescription>
           </DialogHeader>
           <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-4 pb-4 pt-6 sm:px-8">
             <div className="flex flex-col gap-4 sm:flex-row">
@@ -523,9 +537,16 @@ const ExportHostedCollectivesCSVModal = ({
           </div>
 
           <DialogFooter className="flex flex-col gap-4 border-t border-solid border-slate-100 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-            <div>
-              {!isAboveRowLimit && (
-                <div className="flex flex-col gap-3 font-bold text-slate-700 sm:flex-row sm:text-sm">
+            <div className="font-bold text-slate-700 sm:text-sm">
+              {isFetchingRows ? (
+                <React.Fragment>
+                  <FormattedMessage
+                    id="ExportTransactionsCSVModal.FetchingRows"
+                    defaultMessage="Checking number of exported rows..."
+                  />
+                </React.Fragment>
+              ) : !isAboveRowLimit && exportedRows ? (
+                <div className="flex flex-col gap-3 sm:flex-row">
                   <FormattedMessage
                     id="ExportTransactionsCSVModal.ExportRows"
                     defaultMessage="Exporting {rows} {rows, plural, one {row} other {rows}}"
@@ -545,7 +566,7 @@ const ExportHostedCollectivesCSVModal = ({
                     </div>
                   )}
                 </div>
-              )}
+              ) : null}
             </div>
             <div className="flex flex-col justify-stretch gap-2 sm:flex-row sm:justify-normal">
               {canEditFields && (

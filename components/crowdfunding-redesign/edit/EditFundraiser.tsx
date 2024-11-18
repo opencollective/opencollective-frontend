@@ -8,6 +8,7 @@ import { i18nGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { isValidUrl } from '../../../lib/utils';
 
+import { FormField } from '../../FormField';
 import { FormikZod } from '../../FormikZod';
 import StyledDropzone, { DROPZONE_ACCEPT_IMAGES } from '../../StyledDropzone';
 import Tabs from '../../Tabs';
@@ -19,13 +20,7 @@ import { toast } from '../../ui/useToast';
 import type { Fundraiser } from '../helpers';
 import { fundraiserSchema, getDefaultFundraiserValues } from '../helpers';
 
-import {
-  ColumnSection,
-  editCrowdfundingSettingsMutation,
-  FormField,
-  LongDescriptionForm,
-  MainDetailsForm,
-} from './common';
+import { ColumnSection, editCrowdfundingSettingsMutation, LongDescriptionForm, MainDetailsForm } from './common';
 
 const CoverImageForm = ({ schema, initialValues, onSubmit }) => {
   const tabs = React.useMemo(

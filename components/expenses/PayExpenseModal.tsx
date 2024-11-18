@@ -394,7 +394,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
   const payoutMethodType = expense.payoutMethod?.type || PayoutMethodType.OTHER;
   const initialValues = getInitialValues(expense, host);
   const formik = useFormik({ initialValues, validate, onSubmit: getHandleSubmit(intl, host.currency, onSubmit) });
-  const hasManualPayment = payoutMethodType === PayoutMethodType.OTHER || formik.values.forceManual;
+  const isManualPayment = payoutMethodType === PayoutMethodType.OTHER || formik.values.forceManual;
   const payoutMethodLabel = getPayoutLabel(intl, payoutMethodType);
   const hasBankInfoWithoutWise = payoutMethodType === PayoutMethodType.BANK_ACCOUNT && host.transferwise === null;
   const isScheduling = formik.values.action === 'SCHEDULE_FOR_PAYMENT';
@@ -477,7 +477,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                     ...getPayoutOptionValue(payoutMethodType, item === 'AUTO', host),
                     paymentProcessorFeeInHostCurrency: null,
                     expenseAmountInHostCurrency: expense.currency === host.currency ? expense.amount : null,
-                    feesPayer: !getCanCustomizeFeesPayer(expense, collective, hasManualPayment, null)
+                    feesPayer: !getCanCustomizeFeesPayer(expense, collective, isManualPayment, null)
                       ? DEFAULT_VALUES.feesPayer // Reset fees payer if can't customize
                       : formik.values.feesPayer,
                   });
@@ -492,7 +492,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                 }
               </StyledButtonSet>
             )}
-            {hasManualPayment && (
+            {isManualPayment && (
               <React.Fragment>
                 <StyledInputField
                   name="expenseAmountInHostCurrency"
@@ -615,7 +615,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                 </StyledInputField>
               </React.Fragment>
             )}
-            {canQuote && !hasManualPayment && (
+            {canQuote && !isManualPayment && (
               <div className="mt-3">
                 <TransferDetailFields expense={expense} setDisabled={setDisabled} />
               </div>
@@ -623,7 +623,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
             {getCanCustomizeFeesPayer(
               expense,
               collective,
-              hasManualPayment,
+              isManualPayment,
               formik.values.paymentProcessorFeeInHostCurrency,
             ) && (
               <Flex mt={16}>
@@ -788,9 +788,9 @@ Please add funds to your Wise {currency} account."
                 type="submit"
                 loading={formik.isSubmitting}
                 data-cy="mark-as-paid-button"
-                disabled={disabled || quoteQuery.loading || (canQuote && hasFunds === false)}
+                disabled={disabled || (canQuote && !isManualPayment && (quoteQuery.loading || hasFunds === false))}
               >
-                {hasManualPayment ? (
+                {isManualPayment ? (
                   <React.Fragment>
                     <Check size="1.5em" />
                     <Span css={{ verticalAlign: 'middle' }} ml={1}>

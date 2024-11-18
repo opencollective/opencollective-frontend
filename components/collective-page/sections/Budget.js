@@ -74,7 +74,7 @@ const budgetSectionAccountFieldsFragment = gql`
         valueInCents
         currency
       }
-      consolidatedBalance @skip(if: $heavyAccount) {
+      consolidatedBalance: balance(includeChildren: true) @skip(if: $heavyAccount) {
         valueInCents
         currency
       }
@@ -91,7 +91,7 @@ const budgetSectionAccountFieldsFragment = gql`
         valueInCents
         currency
       }
-      totalNetAmountRaised: totalNetAmountReceived {
+      totalNetAmountRaised: totalAmountReceived(net: true) {
         valueInCents
         currency
       }
@@ -403,7 +403,7 @@ const SectionBudget = ({ collective, LoggedInUser }) => {
               allItems.map((item, idx) => {
                 return (
                   <BudgetItemContainer
-                    key={`${item.__typename}-${item?.id || idx}`}
+                    key={`${item.__typename}-${item.id || idx}`}
                     $isFirst={!idx}
                     data-cy="single-budget-item"
                   >

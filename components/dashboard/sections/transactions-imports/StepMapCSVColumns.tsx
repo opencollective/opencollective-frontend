@@ -1,13 +1,13 @@
 import React from 'react';
 import { gql, useMutation } from '@apollo/client';
-import { cloneDeep, set } from 'lodash';
+import { cloneDeep, isNil, set } from 'lodash';
+import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { formatFileSize } from '../../../../lib/file-utils';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import type { Amount, Currency, TransactionsImportRowCreateInput } from '../../../../lib/graphql/types/v2/graphql';
-import { TransactionsImportRowFieldsFragment } from './lib/graphql';
+import { type Amount, Currency, type TransactionsImportRowCreateInput } from '../../../../lib/graphql/types/v2/graphql';
 import { applyCSVConfig, getDefaultCSVConfig, guessCSVColumnsConfig, parseTransactionsCSVFile } from './lib/parse-csv';
 import type { CSVConfig } from './lib/types';
 import { ACCEPTED_DATE_FORMATS, ACCEPTED_NUMBER_FORMATS } from './lib/types';
@@ -77,27 +77,93 @@ const uploadTransactionsImportMutation = gql`
   ) {
     importTransactions(id: $importId, csvConfig: $csvConfig, data: $data, file: $file) {
       id
-      rows {
-        totalCount
-        offset
-        limit
-        nodes {
-          ...TransactionsImportRowFields
-        }
+      csvConfig
+      lastSyncAt
+      file {
+        id
+        url
+        name
+        type
+        size
       }
     }
   }
-  ${TransactionsImportRowFieldsFragment}
 `;
+
+const validateCSVConfig = (
+  intl: IntlShape,
+  parsedData: ParsingResultRow[],
+  csvConfig: CSVConfig,
+): {
+  message: string;
+  rawValue?: string;
+  line?: number;
+} | null => {
+  // Validate CSV config
+  const columns = csvConfig.columns;
+  if (!columns.date.target) {
+    return {
+      message: intl.formatMessage({
+        defaultMessage: 'The date column is required',
+        id: 'transactionsImport.dateColumnRequired',
+      }),
+    };
+  } else if (!columns.credit.target && !columns.debit.target) {
+    return {
+      message: intl.formatMessage({
+        defaultMessage: 'Credit or Debit column is required',
+        id: 'transactionsImport.creditOrDebitColumnRequired',
+      }),
+    };
+  }
+
+  // Validate parsed data
+  let line = 0;
+  for (const row of parsedData) {
+    ++line;
+    if (!row.date?.isValid()) {
+      return {
+        line,
+        rawValue: row.rawValue[columns.date.target],
+        message: intl.formatMessage({
+          defaultMessage: 'Invalid date format',
+          id: 'transactionsImport.invalidDateFormat',
+        }),
+      };
+    } else if (
+      !row.amount ||
+      isNaN(row.amount.valueInCents) ||
+      isNil(row.amount.valueInCents) ||
+      !row.amount.currency
+    ) {
+      return {
+        line,
+        rawValue: row.rawValue[columns.credit.target] || row.rawValue[columns.debit.target],
+        message: intl.formatMessage({
+          defaultMessage: 'Invalid amount format',
+          id: 'transactionsImport.invalidAmountFormat',
+        }),
+      };
+    } else if (!Currency[row.amount.currency]) {
+      return {
+        line,
+        rawValue: row.rawValue[columns.date.target],
+        message: intl.formatMessage({ defaultMessage: 'Invalid currency', id: 'transactionsImport.invalidCurrency' }),
+      };
+    }
+  }
+};
 
 export const StepMapCSVColumns = ({
   importId,
   file,
   currency,
+  onSuccess,
 }: {
   file: File;
   importId: string;
   currency: Currency;
+  onSuccess: () => void;
 }) => {
   const { toast } = useToast();
   const intl = useIntl();
@@ -299,6 +365,21 @@ export const StepMapCSVColumns = ({
           size="sm"
           loading={loading}
           onClick={async () => {
+            const error = validateCSVConfig(intl, parsedData, csvConfig);
+            if (error) {
+              toast({
+                variant: 'error',
+                message: !error.rawValue ? error.message : `${error.message} (${error.rawValue})`,
+                title: !error.line
+                  ? intl.formatMessage({ defaultMessage: 'CSV configuration error', id: 'W4yvlu' })
+                  : intl.formatMessage(
+                      { defaultMessage: 'Parsing error at line {line}', id: 'transactionsImport.parsingError' },
+                      { line: error.line },
+                    ),
+              });
+              return;
+            }
+
             try {
               await importTransactions({
                 variables: {
@@ -309,6 +390,7 @@ export const StepMapCSVColumns = ({
                 },
               });
               nextStep();
+              onSuccess();
             } catch (e) {
               toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
             }
