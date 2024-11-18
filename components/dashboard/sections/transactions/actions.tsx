@@ -15,8 +15,8 @@ import TransactionRejectModal from './TransactionRejectModal';
 import type { TransactionsTableQueryNode } from './types';
 
 const refundTransactionMutation = gql`
-  mutation RefundTransaction($transaction: TransactionReferenceInput!) {
-    refundTransaction(transaction: $transaction) {
+  mutation RefundTransaction($transaction: TransactionReferenceInput!, $ignoreBalanceCheck: Boolean) {
+    refundTransaction(transaction: $transaction, ignoreBalanceCheck: $ignoreBalanceCheck) {
       id
       order {
         id
@@ -68,8 +68,10 @@ export function useTransactionActions<T extends TransactionsTableQueryNode>({
       refetch?.();
     };
 
-    const handleRefundTransaction = async () => {
-      await refundTransaction({ variables: { transaction: { id: transaction.id } } });
+    const handleRefundTransaction = async props => {
+      await refundTransaction({
+        variables: { transaction: { id: transaction.id }, ignoreBalanceCheck: props?.ignoreBalanceCheck },
+      });
       toast({
         variant: 'success',
         message: intl.formatMessage({ defaultMessage: 'Transaction refunded', id: 's766TH' }),
@@ -103,6 +105,15 @@ export function useTransactionActions<T extends TransactionsTableQueryNode>({
                   'Refunding will reimburse the full amount back to your contributor. They can contribute again in the future.',
                 id: 'Ntm6k6',
               }),
+              checks: [
+                {
+                  id: 'ignoreBalanceCheck',
+                  label: intl.formatMessage({
+                    defaultMessage: 'Ignore Collective balance check',
+                    id: 'OGmPSV',
+                  }),
+                },
+              ],
               onConfirm: handleRefundTransaction,
               confirmLabel: intl.formatMessage({ defaultMessage: 'Refund', id: 'Refund' }),
               ConfirmIcon: Undo2,
