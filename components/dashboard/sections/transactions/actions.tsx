@@ -1,4 +1,5 @@
 import { gql, useMutation } from '@apollo/client';
+import { compact } from 'lodash';
 import { Download, Filter, MinusCircle, Undo2 } from 'lucide-react';
 import type React from 'react';
 import { useIntl } from 'react-intl';
@@ -6,6 +7,7 @@ import { useIntl } from 'react-intl';
 import type { GetActions } from '../../../../lib/actions/types';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { useAsyncCall } from '../../../../lib/hooks/useAsyncCall';
+import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import { saveInvoice } from '../../../../lib/transactions';
 
 import { useModal } from '../../../ModalContext';
@@ -15,8 +17,8 @@ import TransactionRejectModal from './TransactionRejectModal';
 import type { TransactionsTableQueryNode } from './types';
 
 const refundTransactionMutation = gql`
-  mutation RefundTransaction($transaction: TransactionReferenceInput!) {
-    refundTransaction(transaction: $transaction) {
+  mutation RefundTransaction($transaction: TransactionReferenceInput!, $ignoreBalanceCheck: Boolean) {
+    refundTransaction(transaction: $transaction, ignoreBalanceCheck: $ignoreBalanceCheck) {
       id
       order {
         id
@@ -49,6 +51,8 @@ export function useTransactionActions<T extends TransactionsTableQueryNode>({
 
   const { showModal, showConfirmationModal } = useModal();
 
+  const { LoggedInUser } = useLoggedInUser();
+
   const [refundTransaction] = useMutation(refundTransactionMutation, {
     context: API_V2_CONTEXT,
   });
@@ -63,13 +67,17 @@ export function useTransactionActions<T extends TransactionsTableQueryNode>({
     if (!transaction) {
       return {};
     }
+
+    const isFiscalHostAdmin = LoggedInUser.isAdminOfCollective(transaction.host);
     const onMutationSuccess = () => {
       refetchList?.();
       refetch?.();
     };
 
-    const handleRefundTransaction = async () => {
-      await refundTransaction({ variables: { transaction: { id: transaction.id } } });
+    const handleRefundTransaction = async props => {
+      await refundTransaction({
+        variables: { transaction: { id: transaction.id }, ignoreBalanceCheck: props?.ignoreBalanceCheck },
+      });
       toast({
         variant: 'success',
         message: intl.formatMessage({ defaultMessage: 'Transaction refunded', id: 's766TH' }),
@@ -103,6 +111,15 @@ export function useTransactionActions<T extends TransactionsTableQueryNode>({
                   'Refunding will reimburse the full amount back to your contributor. They can contribute again in the future.',
                 id: 'Ntm6k6',
               }),
+              checks: compact([
+                isFiscalHostAdmin && {
+                  id: 'ignoreBalanceCheck',
+                  label: intl.formatMessage({
+                    defaultMessage: 'Ignore Collective balance check',
+                    id: 'OGmPSV',
+                  }),
+                },
+              ]),
               onConfirm: handleRefundTransaction,
               confirmLabel: intl.formatMessage({ defaultMessage: 'Refund', id: 'Refund' }),
               ConfirmIcon: Undo2,

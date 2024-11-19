@@ -20231,6 +20231,11 @@ type Mutation {
     Reference of the transaction to refund
     """
     transaction: TransactionReferenceInput!
+
+    """
+    If true, the refund will be processed even if it exceeds the balance of the Collective
+    """
+    ignoreBalanceCheck: Boolean
   ): Transaction
 
   """
