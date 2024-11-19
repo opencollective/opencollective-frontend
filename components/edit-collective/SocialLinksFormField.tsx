@@ -225,6 +225,7 @@ function SocialLinkItem({ value, error, onChange, onRemoveItem }: SocialLinkItem
 }
 
 const knownSocialLinkDomains = [
+  { type: SocialLinkType.BLUESKY, regexp: /^(https:\/\/)?bsky.app/ },
   { type: SocialLinkType.DISCORD, regexp: /^(https:\/\/)?discord.com/ },
   { type: SocialLinkType.FACEBOOK, regexp: /^(https:\/\/)?(www\.)?facebook.com/ },
   { type: SocialLinkType.GITHUB, regexp: /^(https:\/\/)?github.com/ },
@@ -233,6 +234,7 @@ const knownSocialLinkDomains = [
   { type: SocialLinkType.LINKEDIN, regexp: /^(https:\/\/)?(www\.)?linkedin.com/ },
   { type: SocialLinkType.MEETUP, regexp: /^(https:\/\/)?meetup.com/ },
   { type: SocialLinkType.SLACK, regexp: /^(https:\/\/)?[^.]+.?slack.com/ },
+  { type: SocialLinkType.THREADS, regexp: /^(https:\/\/)?(www\.)?threads.net/ },
   { type: SocialLinkType.TIKTOK, regexp: /^(https:\/\/)?(www\.)?tiktok.com/ },
   { type: SocialLinkType.TUMBLR, regexp: /^(https:\/\/)?[^.]+\.?tumblr.com/ },
   { type: SocialLinkType.TWITCH, regexp: /^(https:\/\/)?(www\.)?twitch.tv/ },
