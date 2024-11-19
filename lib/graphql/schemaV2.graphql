@@ -1030,27 +1030,29 @@ type SocialLink {
 The type of social link
 """
 enum SocialLinkType {
-  TWITTER
-  TUMBLR
-  MASTODON
-  MATTERMOST
-  SLACK
-  LINKEDIN
-  MEETUP
-  FACEBOOK
-  INSTAGRAM
+  BLUESKY
   DISCORD
-  YOUTUBE
+  DISCOURSE
+  FACEBOOK
+  GHOST
+  GIT
   GITHUB
   GITLAB
-  GIT
-  WEBSITE
-  DISCOURSE
-  PIXELFED
-  GHOST
+  INSTAGRAM
+  LINKEDIN
+  MASTODON
+  MATTERMOST
+  MEETUP
   PEERTUBE
+  PIXELFED
+  SLACK
+  THREADS
   TIKTOK
+  TUMBLR
   TWITCH
+  TWITTER
+  WEBSITE
+  YOUTUBE
 }
 
 """
@@ -20867,7 +20869,7 @@ input OrganizationCreateInput {
   legalName: String
   slug: String!
   description: String!
-  website: String
+  website: String @deprecated(reason: "2024-11-12: Please use socialLinks")
   settings: JSON
 }
 
@@ -20877,6 +20879,16 @@ input ProjectCreateInput {
   description: String!
   tags: [String]
   settings: JSON
+
+  """
+  The social links in order of preference
+  """
+  socialLinks: [SocialLinkInput!]
+}
+
+input SocialLinkInput {
+  type: SocialLinkType!
+  url: URL!
 }
 
 """
@@ -22852,11 +22864,6 @@ input PersonalTokenReferenceInput {
   The legacy public id identifying the personal-token (ie: 4242)
   """
   legacyId: Int
-}
-
-input SocialLinkInput {
-  type: SocialLinkType!
-  url: URL!
 }
 
 type TagResponse {
