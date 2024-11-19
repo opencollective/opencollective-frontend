@@ -238,7 +238,7 @@ const knownSocialLinkDomains = [
   { type: SocialLinkType.TIKTOK, regexp: /^(https:\/\/)?(www\.)?tiktok.com/ },
   { type: SocialLinkType.TUMBLR, regexp: /^(https:\/\/)?[^.]+\.?tumblr.com/ },
   { type: SocialLinkType.TWITCH, regexp: /^(https:\/\/)?(www\.)?twitch.tv/ },
-  { type: SocialLinkType.TWITTER, regexp: /^(https:\/\/)?twitter.com/ },
+  { type: SocialLinkType.TWITTER, regexp: /^(https:\/\/)?(twitter|x)\.com/ },
   { type: SocialLinkType.YOUTUBE, regexp: /^(https:\/\/)?(www\.)?youtube.com/ },
 ];
 

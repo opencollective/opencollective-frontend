@@ -13,7 +13,6 @@ import { Instagram } from '@styled-icons/feather/Instagram';
 import { Linkedin } from '@styled-icons/feather/Linkedin';
 import { Slack } from '@styled-icons/feather/Slack';
 import { Twitch } from '@styled-icons/feather/Twitch';
-import { Twitter } from '@styled-icons/feather/Twitter';
 import { Youtube } from '@styled-icons/feather/Youtube';
 import { Pixelfed } from '@styled-icons/remix-line/Pixelfed';
 
@@ -64,7 +63,19 @@ const SocialLinkIcon: Record<SocialLinkType, typeof Discord | React.FunctionComp
   [SocialLinkType.TIKTOK]: Tiktok,
   [SocialLinkType.TUMBLR]: Tumblr,
   [SocialLinkType.TWITCH]: Twitch,
-  [SocialLinkType.TWITTER]: Twitter,
+  [SocialLinkType.TWITTER]: (props: { size: number }) => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 512 512"
+      width={props.size}
+      height={props.size}
+      stroke="none"
+      fill="currentcolor"
+    >
+      {/* !Font Awesome Free 6.7.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc. */}
+      <path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z" />
+    </svg>
+  ),
   [SocialLinkType.WEBSITE]: Globe,
   [SocialLinkType.YOUTUBE]: Youtube,
 };
@@ -90,7 +101,7 @@ export const SocialLinkLabel: Record<SocialLinkType, string> = {
   [SocialLinkType.TIKTOK]: 'TikTok',
   [SocialLinkType.TUMBLR]: 'Tumblr',
   [SocialLinkType.TWITCH]: 'Twitch',
-  [SocialLinkType.TWITTER]: 'Twitter',
+  [SocialLinkType.TWITTER]: 'X',
   [SocialLinkType.WEBSITE]: 'Website',
   [SocialLinkType.YOUTUBE]: 'YouTube',
 };
