@@ -7,10 +7,16 @@ import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import type { Account, ExpensesPageQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import {
+  type Account,
+  type ExpensesPageQueryVariables,
+  ExpenseStatusFilter,
+  PayoutMethodType,
+} from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
 import ExpensesList from '../../../expenses/ExpensesList';
+import StyledButton from '../../../StyledButton';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
@@ -23,6 +29,7 @@ import type { DashboardSectionProps } from '../../types';
 import type { FilterMeta as CommonFilterMeta } from './filters';
 import { filters as commonFilters, schema as commonSchema, toVariables as commonToVariables } from './filters';
 import { accountExpensesMetadataQuery, accountExpensesQuery } from './queries';
+import ScheduledExpensesBanner from './ScheduledExpensesBanner';
 
 const schema = commonSchema.extend({
   account: z.string().nullable().default(null),
@@ -79,11 +86,16 @@ const ROUTE_PARAMS = ['slug', 'section', 'subpath'];
 const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
   const router = useRouter();
 
-  const { data: metadata, loading: loadingMetaData } = useQuery(accountExpensesMetadataQuery, {
+  const {
+    data: metadata,
+    loading: loadingMetaData,
+    refetch: refetchMetadata,
+  } = useQuery(accountExpensesMetadataQuery, {
     variables: { accountSlug },
     context: API_V2_CONTEXT,
   });
 
+  const isSelfHosted = metadata?.account && metadata.account.id === metadata.account.host?.id;
   const hostSlug = get(metadata, 'account.host.slug');
 
   const filterMeta: FilterMeta = {
@@ -104,7 +116,7 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
     filters: hostSlug ? filters : filtersWithoutHost,
   });
 
-  const { data, loading } = useQuery(accountExpensesQuery, {
+  const { data, loading, refetch } = useQuery(accountExpensesQuery, {
     variables: {
       account: { slug: accountSlug },
       fetchHostForExpenses: false, // Already fetched at the root level
@@ -122,6 +134,34 @@ const ReceivedExpenses = ({ accountSlug }: DashboardSectionProps) => {
         title={<FormattedMessage defaultMessage="Received Expenses" id="1c0Y31" />}
         description={<FormattedMessage defaultMessage="Expenses submitted to your account." id="0I3Lbj" />}
       />
+      {isSelfHosted && (
+        <ScheduledExpensesBanner
+          hostSlug={hostSlug}
+          onSubmit={() => {
+            refetch();
+            refetchMetadata();
+          }}
+          secondButton={
+            !(
+              queryFilter.values.status?.includes(ExpenseStatusFilter.SCHEDULED_FOR_PAYMENT) &&
+              queryFilter.values.payout === PayoutMethodType.BANK_ACCOUNT
+            ) ? (
+              <StyledButton
+                buttonSize="tiny"
+                buttonStyle="successSecondary"
+                onClick={() =>
+                  queryFilter.resetFilters({
+                    status: [ExpenseStatusFilter.SCHEDULED_FOR_PAYMENT],
+                    payout: PayoutMethodType.BANK_ACCOUNT,
+                  })
+                }
+              >
+                <FormattedMessage id="expenses.list" defaultMessage="List Expenses" />
+              </StyledButton>
+            ) : null
+          }
+        />
+      )}
       <Filterbar {...queryFilter} />
 
       {!loading && !data.expenses?.nodes.length ? (
