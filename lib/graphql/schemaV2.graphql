@@ -224,6 +224,16 @@ interface Account {
   updatedAt: DateTime
 
   """
+  Date of unhosting by a given Fiscal Host.
+  """
+  unhostedAt(
+    """
+    The host account this collective was hosted by
+    """
+    host: AccountReferenceInput!
+  ): DateTime
+
+  """
   Returns whether this account is archived
   """
   isArchived: Boolean!
@@ -1020,27 +1030,29 @@ type SocialLink {
 The type of social link
 """
 enum SocialLinkType {
-  TWITTER
-  TUMBLR
-  MASTODON
-  MATTERMOST
-  SLACK
-  LINKEDIN
-  MEETUP
-  FACEBOOK
-  INSTAGRAM
+  BLUESKY
   DISCORD
-  YOUTUBE
+  DISCOURSE
+  FACEBOOK
+  GHOST
+  GIT
   GITHUB
   GITLAB
-  GIT
-  WEBSITE
-  DISCOURSE
-  PIXELFED
-  GHOST
+  INSTAGRAM
+  LINKEDIN
+  MASTODON
+  MATTERMOST
+  MEETUP
   PEERTUBE
+  PIXELFED
+  SLACK
+  THREADS
   TIKTOK
+  TUMBLR
   TWITCH
+  TWITTER
+  WEBSITE
+  YOUTUBE
 }
 
 """
@@ -1724,6 +1736,23 @@ enum ImageFormat {
   jpg
   gif
   svg
+}
+
+input AccountReferenceInput {
+  """
+  The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
+  """
+  id: String
+
+  """
+  The internal id of the account (ie: 580)
+  """
+  legacyId: Int @deprecated(reason: "2020-01-01: should only be used during the transition to GraphQL API v2.")
+
+  """
+  The slug identifying the account (ie: babel for https://opencollective.com/babel)
+  """
+  slug: String
 }
 
 """
@@ -2646,6 +2675,16 @@ type Host implements Account & AccountWithContributions {
   """
   createdAt: DateTime
   updatedAt: DateTime
+
+  """
+  Date of unhosting by a given Fiscal Host.
+  """
+  unhostedAt(
+    """
+    The host account this collective was hosted by
+    """
+    host: AccountReferenceInput!
+  ): DateTime
 
   """
   Returns whether this account is archived
@@ -4122,23 +4161,6 @@ type Contributor {
   publicMessage: String
 }
 
-input AccountReferenceInput {
-  """
-  The public id identifying the account (ie: dgm9bnk8-0437xqry-ejpvzeol-jdayw5re)
-  """
-  id: String
-
-  """
-  The internal id of the account (ie: 580)
-  """
-  legacyId: Int @deprecated(reason: "2020-01-01: should only be used during the transition to GraphQL API v2.")
-
-  """
-  The slug identifying the account (ie: babel for https://opencollective.com/babel)
-  """
-  slug: String
-}
-
 """
 A legal document (e.g. W9, W8BEN, W8BEN-E)
 """
@@ -5140,6 +5162,31 @@ type AccountStats {
   ): Amount!
 
   """
+  Amount pledged time series
+  """
+  amountPledgedTimeSeries(
+    """
+    The start date of the time series
+    """
+    dateFrom: DateTime
+
+    """
+    The end date of the time series
+    """
+    dateTo: DateTime
+
+    """
+    The time unit of the time series (such as MONTH, YEAR, WEEK etc). If no value is provided this is calculated using the dateFrom and dateTo values.
+    """
+    timeUnit: TimeUnit
+
+    """
+    Include expected funds.
+    """
+    includeExpectedFunds: Boolean = false
+  ): TimeSeriesAmount!
+
+  """
   Total amount received time series
   """
   totalAmountReceivedTimeSeries(
@@ -5449,6 +5496,11 @@ type AccountStats {
     Include transactions from children (Projects and Events)
     """
     includeChildren: Boolean = false
+
+    """
+    Filter by kind
+    """
+    kind: [TransactionKind]
   ): [AmountStats]
 
   """
@@ -5474,6 +5526,11 @@ type AccountStats {
     Include transactions from children (Projects and Events)
     """
     includeChildren: Boolean = false
+
+    """
+    Filter by kind
+    """
+    kind: [TransactionKind]
   ): TimeSeriesAmount!
 }
 
@@ -5533,6 +5590,7 @@ enum TimeUnit {
 type TimeSeriesAmountNode {
   date: DateTime!
   amount: Amount!
+  count: Int
   label: String
 }
 
@@ -7681,6 +7739,16 @@ type Bot implements Account {
   updatedAt: DateTime
 
   """
+  Date of unhosting by a given Fiscal Host.
+  """
+  unhostedAt(
+    """
+    The host account this collective was hosted by
+    """
+    host: AccountReferenceInput!
+  ): DateTime
+
+  """
   Returns whether this account is archived
   """
   isArchived: Boolean!
@@ -8528,6 +8596,16 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   updatedAt: DateTime
 
   """
+  Date of unhosting by a given Fiscal Host.
+  """
+  unhostedAt(
+    """
+    The host account this collective was hosted by
+    """
+    host: AccountReferenceInput!
+  ): DateTime
+
+  """
   Returns whether this account is archived
   """
   isArchived: Boolean!
@@ -9354,6 +9432,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   approvedAt: DateTime
 
   """
+  Date when the collective was last unfrozen by current Fiscal Host
+  """
+  unfrozenAt: DateTime
+
+  """
   Returns whether it's approved by the Fiscal Host
   """
   isApproved: Boolean!
@@ -9372,6 +9455,17 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     offset: Int! = 0
   ): AgreementCollection
+  summary(
+    """
+    Calculate amount after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Calculate amount before this date
+    """
+    dateTo: DateTime
+  ): HostedAccountSummary
 
   """
   Number of unique financial contributors.
@@ -9462,6 +9556,11 @@ interface AccountWithHost {
   approvedAt: DateTime
 
   """
+  Date when the collective was last unfrozen by current Fiscal Host
+  """
+  unfrozenAt: DateTime
+
+  """
   Returns whether it's approved by the Fiscal Host
   """
   isApproved: Boolean!
@@ -9485,6 +9584,63 @@ interface AccountWithHost {
     """
     offset: Int! = 0
   ): AgreementCollection
+  summary(
+    """
+    Calculate amount after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Calculate amount before this date
+    """
+    dateTo: DateTime
+  ): HostedAccountSummary
+}
+
+"""
+Return a summary of transaction info about a given account within the context of its current fiscal host
+"""
+type HostedAccountSummary {
+  expenseCount: Int
+  expenseTotal: Amount
+  expenseMaxValue: Amount
+  expenseDistinctPayee: Int
+  contributionCount: Int
+  contributionTotal: Amount
+  hostFeeTotal: Amount
+  spentTotal: Amount
+  receivedTotal: Amount
+
+  """
+  Average calculated over the number of months the collective was approved or the number of months since dateFrom, whichever is less
+  """
+  expenseAverageTotal(period: AveragePeriod = MONTH): Amount
+
+  """
+  Average calculated over the number of months the collective was approved or the number of months since dateFrom, whichever is less
+  """
+  expenseAverageCount(period: AveragePeriod = MONTH): Float
+
+  """
+  Average calculated over the number of months the collective was approved or the number of months since dateFrom, whichever is less
+  """
+  contributionAverageTotal(period: AveragePeriod = MONTH): Amount
+
+  """
+  Average calculated over the number of months/years the collective was approved or the number of months since dateFrom, whichever is less
+  """
+  contributionAverageCount(period: AveragePeriod = MONTH): Float
+  spentTotalAverage(period: AveragePeriod = MONTH): Amount
+  receivedTotalAverage(period: AveragePeriod = MONTH): Amount
+  contributionRefundedTotal: Amount
+}
+
+"""
+The period over which the average is calculated
+"""
+enum AveragePeriod {
+  YEAR
+  MONTH
 }
 
 """
@@ -9828,6 +9984,16 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   updatedAt: DateTime
 
   """
+  Date of unhosting by a given Fiscal Host.
+  """
+  unhostedAt(
+    """
+    The host account this collective was hosted by
+    """
+    host: AccountReferenceInput!
+  ): DateTime
+
+  """
   Returns whether this account is archived
   """
   isArchived: Boolean!
@@ -10654,6 +10820,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   approvedAt: DateTime
 
   """
+  Date when the collective was last unfrozen by current Fiscal Host
+  """
+  unfrozenAt: DateTime
+
+  """
   Returns whether it's approved by the Fiscal Host
   """
   isApproved: Boolean!
@@ -10672,6 +10843,17 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     offset: Int! = 0
   ): AgreementCollection
+  summary(
+    """
+    Calculate amount after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Calculate amount before this date
+    """
+    dateTo: DateTime
+  ): HostedAccountSummary
 
   """
   Number of unique financial contributors.
@@ -10908,6 +11090,16 @@ type Individual implements Account {
   """
   createdAt: DateTime
   updatedAt: DateTime
+
+  """
+  Date of unhosting by a given Fiscal Host.
+  """
+  unhostedAt(
+    """
+    The host account this collective was hosted by
+    """
+    host: AccountReferenceInput!
+  ): DateTime
 
   """
   Returns whether this account is archived
@@ -11963,6 +12155,16 @@ type Organization implements Account & AccountWithContributions {
   updatedAt: DateTime
 
   """
+  Date of unhosting by a given Fiscal Host.
+  """
+  unhostedAt(
+    """
+    The host account this collective was hosted by
+    """
+    host: AccountReferenceInput!
+  ): DateTime
+
+  """
   Returns whether this account is archived
   """
   isArchived: Boolean!
@@ -12903,6 +13105,16 @@ type Vendor implements Account & AccountWithContributions {
   """
   createdAt: DateTime
   updatedAt: DateTime
+
+  """
+  Date of unhosting by a given Fiscal Host.
+  """
+  unhostedAt(
+    """
+    The host account this collective was hosted by
+    """
+    host: AccountReferenceInput!
+  ): DateTime
 
   """
   Returns whether this account is archived
@@ -16481,6 +16693,16 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   updatedAt: DateTime
 
   """
+  Date of unhosting by a given Fiscal Host.
+  """
+  unhostedAt(
+    """
+    The host account this collective was hosted by
+    """
+    host: AccountReferenceInput!
+  ): DateTime
+
+  """
   Returns whether this account is archived
   """
   isArchived: Boolean!
@@ -17307,6 +17529,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   approvedAt: DateTime
 
   """
+  Date when the collective was last unfrozen by current Fiscal Host
+  """
+  unfrozenAt: DateTime
+
+  """
   Returns whether it's approved by the Fiscal Host
   """
   isApproved: Boolean!
@@ -17325,6 +17552,17 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     offset: Int! = 0
   ): AgreementCollection
+  summary(
+    """
+    Calculate amount after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Calculate amount before this date
+    """
+    dateTo: DateTime
+  ): HostedAccountSummary
 
   """
   Number of unique financial contributors.
@@ -17441,6 +17679,16 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   updatedAt: DateTime
 
   """
+  Date of unhosting by a given Fiscal Host.
+  """
+  unhostedAt(
+    """
+    The host account this collective was hosted by
+    """
+    host: AccountReferenceInput!
+  ): DateTime
+
+  """
   Returns whether this account is archived
   """
   isArchived: Boolean!
@@ -18267,6 +18515,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   approvedAt: DateTime
 
   """
+  Date when the collective was last unfrozen by current Fiscal Host
+  """
+  unfrozenAt: DateTime
+
+  """
   Returns whether it's approved by the Fiscal Host
   """
   isApproved: Boolean!
@@ -18285,6 +18538,17 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     offset: Int! = 0
   ): AgreementCollection
+  summary(
+    """
+    Calculate amount after this date
+    """
+    dateFrom: DateTime
+
+    """
+    Calculate amount before this date
+    """
+    dateTo: DateTime
+  ): HostedAccountSummary
 
   """
   Number of unique financial contributors.
@@ -19969,6 +20233,11 @@ type Mutation {
     Reference of the transaction to refund
     """
     transaction: TransactionReferenceInput!
+
+    """
+    If true, the refund will be processed even if it exceeds the balance of the Collective
+    """
+    ignoreBalanceCheck: Boolean
   ): Transaction
 
   """
@@ -20600,7 +20869,7 @@ input OrganizationCreateInput {
   legalName: String
   slug: String!
   description: String!
-  website: String
+  website: String @deprecated(reason: "2024-11-12: Please use socialLinks")
   settings: JSON
 }
 
@@ -20610,6 +20879,16 @@ input ProjectCreateInput {
   description: String!
   tags: [String]
   settings: JSON
+
+  """
+  The social links in order of preference
+  """
+  socialLinks: [SocialLinkInput!]
+}
+
+input SocialLinkInput {
+  type: SocialLinkType!
+  url: URL!
 }
 
 """
@@ -22585,11 +22864,6 @@ input PersonalTokenReferenceInput {
   The legacy public id identifying the personal-token (ie: 4242)
   """
   legacyId: Int
-}
-
-input SocialLinkInput {
-  type: SocialLinkType!
-  url: URL!
 }
 
 type TagResponse {

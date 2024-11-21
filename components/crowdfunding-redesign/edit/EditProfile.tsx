@@ -8,6 +8,7 @@ import { i18nGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { isValidUrl } from '../../../lib/utils';
 
+import { FormField } from '../../FormField';
 import { FormikZod } from '../../FormikZod';
 import StyledDropzone, { DROPZONE_ACCEPT_IMAGES } from '../../StyledDropzone';
 import { Button } from '../../ui/Button';
@@ -17,13 +18,7 @@ import { toast } from '../../ui/useToast';
 import type { Fundraiser } from '../helpers';
 import { getDefaultProfileValues, profileSchema } from '../helpers';
 
-import {
-  ColumnSection,
-  editCrowdfundingSettingsMutation,
-  FormField,
-  LongDescriptionForm,
-  MainDetailsForm,
-} from './common';
+import { ColumnSection, editCrowdfundingSettingsMutation, LongDescriptionForm, MainDetailsForm } from './common';
 
 const CoverImageForm = ({ schema, initialValues, onSubmit }) => {
   return (

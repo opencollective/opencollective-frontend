@@ -30,16 +30,42 @@ type Fields =
   | 'numberOfPayeesYear'
   | 'numberOfContributionsYear'
   | 'valueOfContributionsYear'
+  | 'valueOfRefundedContributionsYear'
   | 'valueOfHostFeeYear'
   | 'spentTotalYear'
+  | 'receivedTotalYear'
   | 'numberOfExpensesAllTime'
   | 'valueOfExpensesAllTime'
   | 'maxExpenseValueAllTime'
   | 'numberOfPayeesAllTime'
   | 'numberOfContributionsAllTime'
   | 'valueOfContributionsAllTime'
+  | 'valueOfRefundedContributionsAllTime'
   | 'valueOfHostFeeAllTime'
-  | 'spentTotalAllTime';
+  | 'spentTotalAllTime'
+  | 'receivedTotalAllTime'
+  | 'expenseMonthlyAverageCount'
+  | 'expenseMonthlyAverageTotal'
+  | 'contributionMonthlyAverageCount'
+  | 'contributionMonthlyAverageTotal'
+  | 'spentTotalMonthlyAverage'
+  | 'receivedTotalMonthlyAverage'
+  | 'spentTotalYearlyAverage'
+  | 'receivedTotalYearlyAverage';
+
+const MonthlyAverageTooltip = (
+  <FormattedMessage
+    defaultMessage="The average is calculated over the number of months since the collective was approved on your host"
+    id="MonthlyAverage.Tooltip"
+  />
+);
+
+const YearlyAverageTooltip = (
+  <FormattedMessage
+    defaultMessage="The average is calculated over the number of years since the collective was approved on your host"
+    id="YearlyAverage.Tooltip"
+  />
+);
 
 export enum FIELD_OPTIONS {
   DEFAULT = 'DEFAULT',
@@ -187,6 +213,11 @@ export const FIELDS: Array<{
     label: <FormattedMessage defaultMessage="Total Value of Contributions (1 year)" id="valueOfContributionsYear" />,
   },
   {
+    id: 'valueOfRefundedContributionsYear',
+    group: 'contributions',
+    label: <FormattedMessage defaultMessage="Total Refunded Value (1 year)" id="valueOfRefundedContributionsYear" />,
+  },
+  {
     id: 'valueOfHostFeeYear',
     group: 'financials',
     label: <FormattedMessage defaultMessage="Host Fee Paid (1 year)" id="valueOfHostFeeYear" />,
@@ -224,6 +255,13 @@ export const FIELDS: Array<{
     ),
   },
   {
+    id: 'valueOfRefundedContributionsAllTime',
+    group: 'contributions',
+    label: (
+      <FormattedMessage defaultMessage="Total Refunded Value (All Time)" id="valueOfRefundedContributionsAllTime" />
+    ),
+  },
+  {
     id: 'valueOfHostFeeAllTime',
     group: 'financials',
     label: <FormattedMessage defaultMessage="Host Fee Paid (All Time)" id="valueOfHostFeeAllTime" />,
@@ -240,6 +278,14 @@ export const FIELDS: Array<{
     ),
   },
   {
+    id: 'receivedTotalYear',
+    group: 'financials',
+    label: <FormattedMessage defaultMessage="Total Received (1 year)" id="receivedTotalYear" />,
+    tooltip: (
+      <FormattedMessage defaultMessage="Amount received in Contributions and Expenses" id="receivedTotal.tooltip" />
+    ),
+  },
+  {
     id: 'spentTotalAllTime',
     group: 'financials',
     label: <FormattedMessage defaultMessage="Total Spent (All Time)" id="spentTotalAllTime" />,
@@ -249,6 +295,66 @@ export const FIELDS: Array<{
         id="spentTotal.tooltip"
       />
     ),
+  },
+  {
+    id: 'receivedTotalAllTime',
+    group: 'financials',
+    label: <FormattedMessage defaultMessage="Total Received (All Time)" id="receivedTotalAllTime" />,
+    tooltip: (
+      <FormattedMessage defaultMessage="Amount received in Contributions and Expenses" id="receivedTotal.tooltip" />
+    ),
+  },
+  {
+    id: 'expenseMonthlyAverageCount',
+    group: 'expenses',
+    label: <FormattedMessage defaultMessage="Monthly Avg. Number of Expenses" id="expenseMonthlyAverageCount" />,
+    tooltip: MonthlyAverageTooltip,
+  },
+  {
+    id: 'expenseMonthlyAverageTotal',
+    group: 'expenses',
+    label: <FormattedMessage defaultMessage="Monthly Avg. Value of Expenses" id="expenseMonthlyAverageTotal" />,
+    tooltip: MonthlyAverageTooltip,
+  },
+  {
+    id: 'contributionMonthlyAverageCount',
+    group: 'contributions',
+    label: (
+      <FormattedMessage defaultMessage="Monthly Avg. Number of Contributions" id="contributionMonthlyAverageCount" />
+    ),
+    tooltip: MonthlyAverageTooltip,
+  },
+  {
+    id: 'contributionMonthlyAverageTotal',
+    group: 'contributions',
+    label: (
+      <FormattedMessage defaultMessage="Monthly Avg. Value of Contributions" id="contributionMonthlyAverageTotal" />
+    ),
+    tooltip: MonthlyAverageTooltip,
+  },
+  {
+    id: 'receivedTotalMonthlyAverage',
+    group: 'financials',
+    label: <FormattedMessage defaultMessage="Avg. Monthly Received" id="receivedTotalMonthlyAverage" />,
+    tooltip: MonthlyAverageTooltip,
+  },
+  {
+    id: 'spentTotalMonthlyAverage',
+    group: 'financials',
+    label: <FormattedMessage defaultMessage="Avg. Monthly Spent" id="spentTotalMonthlyAverage" />,
+    tooltip: MonthlyAverageTooltip,
+  },
+  {
+    id: 'receivedTotalYearlyAverage',
+    group: 'financials',
+    label: <FormattedMessage defaultMessage="Avg. Yearly Received" id="receivedTotalYearlyAverage" />,
+    tooltip: YearlyAverageTooltip,
+  },
+  {
+    id: 'spentTotalYearlyAverage',
+    group: 'financials',
+    label: <FormattedMessage defaultMessage="Avg. Yearly Spent" id="spentTotalYearlyAverage" />,
+    tooltip: YearlyAverageTooltip,
   },
 ];
 

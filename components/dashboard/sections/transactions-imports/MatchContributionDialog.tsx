@@ -228,18 +228,23 @@ export const MatchContributionDialog = ({
     resetFilters(defaultFilterValues);
   }, [defaultFilterValues, resetFilters]);
 
+  const reset = () => {
+    setSelectedContribution(null);
+    setIsConfirming(false);
+    setIsSubmitting(false);
+    setOpen(false);
+    resetFilters(defaultFilterValues);
+  };
+
   return (
     <Dialog
       {...props}
       onOpenChange={() => {
         if (isSubmitting) {
           return;
+        } else {
+          reset();
         }
-
-        setSelectedContribution(null);
-        setIsConfirming(false);
-        setOpen(false);
-        resetFilters(defaultFilterValues);
       }}
     >
       <DialogContent className="sm:max-w-4xl">
@@ -271,6 +276,7 @@ export const MatchContributionDialog = ({
               });
 
               // Close modal
+              reset();
               setOpen(false);
             }}
             initialValues={{
@@ -384,6 +390,12 @@ export const MatchContributionDialog = ({
                   </div>
 
                   <ul className="mt-2 list-inside list-disc">
+                    <li>
+                      <strong>
+                        <FormattedMessage id="Fields.id" defaultMessage="ID" />
+                      </strong>
+                      : {selectedContribution.legacyId}
+                    </li>
                     <li>
                       <strong>
                         <FormattedMessage id="Fields.description" defaultMessage="Description" />

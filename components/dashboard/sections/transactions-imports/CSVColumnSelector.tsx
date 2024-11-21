@@ -19,7 +19,7 @@ export const CSVColumnSelector = ({ label, selected, columns, onChange, Settings
             <SelectValue />
           </div>
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="max-h-80">
           {columns.map(column => (
             <SelectItem value={column} key={column}>
               {column}

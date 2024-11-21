@@ -19,9 +19,9 @@ const TITLE_OVERRIDE = {
 const ConnectedAccounts = props => {
   const connectedAccountsByService = groupBy(props.connectedAccounts, 'service');
 
-  let services = [];
+  const services = [];
   if (props.services) {
-    services = [...props.services, ...services];
+    services.push(...props.services);
   } else {
     if (props.collective.type === 'COLLECTIVE' || props.collective.isHost) {
       services.push('twitter');

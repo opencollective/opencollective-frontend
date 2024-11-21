@@ -34,6 +34,12 @@ const transactionsTableQueryCollectionFragment = gql`
         id
         group
       }
+      host {
+        id
+        slug
+        legacyId
+        type
+      }
       account {
         id
         name

@@ -10,6 +10,7 @@ import { FormattedMessage } from 'react-intl';
 
 import type { SocialLink, SocialLinkInput } from '../../lib/graphql/types/v2/graphql';
 import { SocialLinkType } from '../../lib/graphql/types/v2/graphql';
+import { SocialLinkLabel } from '../../lib/social-links';
 import { isValidUrl } from '../../lib/utils';
 
 import { Box, Flex } from '../Grid';
@@ -110,94 +111,9 @@ type SocialLinkTypePickerProps = {
   onChange: (value: SocialLinkType) => void;
 } & any;
 
-function SocialLinkTypePicker({ value, onChange, ...pickerProps }: SocialLinkTypePickerProps) {
-  const options = [
-    {
-      value: SocialLinkType.WEBSITE.toString(),
-      label: 'Website',
-    },
-    {
-      value: SocialLinkType.DISCORD.toString(),
-      label: 'Discord',
-    },
-    {
-      value: SocialLinkType.FACEBOOK.toString(),
-      label: 'Facebook',
-    },
-    {
-      value: SocialLinkType.GITHUB.toString(),
-      label: 'GitHub',
-    },
-    {
-      value: SocialLinkType.GITLAB.toString(),
-      label: 'GitLab',
-    },
-    {
-      value: SocialLinkType.GIT.toString(),
-      label: 'Git Repository',
-    },
-    {
-      value: SocialLinkType.INSTAGRAM.toString(),
-      label: 'Instagram',
-    },
-    {
-      value: SocialLinkType.MASTODON.toString(),
-      label: 'Mastodon',
-    },
-    {
-      value: SocialLinkType.MATTERMOST.toString(),
-      label: 'Mattermost',
-    },
-    {
-      value: SocialLinkType.TUMBLR.toString(),
-      label: 'Tumblr',
-    },
-    {
-      value: SocialLinkType.TWITTER.toString(),
-      label: 'Twitter',
-    },
-    {
-      value: SocialLinkType.YOUTUBE.toString(),
-      label: 'YouTube',
-    },
-    {
-      value: SocialLinkType.MEETUP.toString(),
-      label: 'Meetup',
-    },
-    {
-      value: SocialLinkType.LINKEDIN.toString(),
-      label: 'LinkedIn',
-    },
-    {
-      value: SocialLinkType.SLACK.toString(),
-      label: 'Slack',
-    },
-    {
-      value: SocialLinkType.DISCOURSE.toString(),
-      label: 'Discourse',
-    },
-    {
-      value: SocialLinkType.PIXELFED.toString(),
-      label: 'Pixelfed',
-    },
-    {
-      value: SocialLinkType.GHOST.toString(),
-      label: 'Ghost',
-    },
-    {
-      value: SocialLinkType.PEERTUBE.toString(),
-      label: 'PeerTube',
-    },
-    {
-      value: SocialLinkType.TIKTOK.toString(),
-      label: 'TikTok',
-    },
-    {
-      value: SocialLinkType.TWITCH.toString(),
-      label: 'Twitch',
-    },
-  ];
+const options = Object.keys(SocialLinkType).map(value => ({ value, label: SocialLinkLabel[value] }));
 
+function SocialLinkTypePicker({ value, onChange, ...pickerProps }: SocialLinkTypePickerProps) {
   return (
     <StyledSelect
       {...pickerProps}
@@ -309,6 +225,7 @@ function SocialLinkItem({ value, error, onChange, onRemoveItem }: SocialLinkItem
 }
 
 const knownSocialLinkDomains = [
+  { type: SocialLinkType.BLUESKY, regexp: /^(https:\/\/)?bsky.app/ },
   { type: SocialLinkType.DISCORD, regexp: /^(https:\/\/)?discord.com/ },
   { type: SocialLinkType.FACEBOOK, regexp: /^(https:\/\/)?(www\.)?facebook.com/ },
   { type: SocialLinkType.GITHUB, regexp: /^(https:\/\/)?github.com/ },
@@ -317,10 +234,11 @@ const knownSocialLinkDomains = [
   { type: SocialLinkType.LINKEDIN, regexp: /^(https:\/\/)?(www\.)?linkedin.com/ },
   { type: SocialLinkType.MEETUP, regexp: /^(https:\/\/)?meetup.com/ },
   { type: SocialLinkType.SLACK, regexp: /^(https:\/\/)?[^.]+.?slack.com/ },
+  { type: SocialLinkType.THREADS, regexp: /^(https:\/\/)?(www\.)?threads.net/ },
   { type: SocialLinkType.TIKTOK, regexp: /^(https:\/\/)?(www\.)?tiktok.com/ },
   { type: SocialLinkType.TUMBLR, regexp: /^(https:\/\/)?[^.]+\.?tumblr.com/ },
   { type: SocialLinkType.TWITCH, regexp: /^(https:\/\/)?(www\.)?twitch.tv/ },
-  { type: SocialLinkType.TWITTER, regexp: /^(https:\/\/)?twitter.com/ },
+  { type: SocialLinkType.TWITTER, regexp: /^(https:\/\/)?(twitter|x)\.com/ },
   { type: SocialLinkType.YOUTUBE, regexp: /^(https:\/\/)?(www\.)?youtube.com/ },
 ];
 
