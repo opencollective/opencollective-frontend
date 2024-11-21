@@ -15,7 +15,7 @@ import {
   User,
 } from 'lucide-react';
 import { useRouter } from 'next/router';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import type { UserContextProps } from '../../lib/hooks/useLoggedInUser';
@@ -66,11 +66,9 @@ const MenuItem = ({
   );
   const content = (
     <React.Fragment>
-      <div className="flex w-full items-center gap-2">
+      <div className="flex w-full items-center gap-2" title={label}>
         <Icon className="shrink-0 text-muted-foreground transition-colors group-hover:text-foreground" size={16} />
-        <div className="shrink overflow-hidden text-ellipsis text-nowrap" title={label}>
-          {label}
-        </div>
+        <div className="shrink overflow-hidden text-ellipsis text-nowrap">{label}</div>
         {appending}
       </div>
     </React.Fragment>
@@ -174,6 +172,11 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
               <MenuItem
                 Icon={FlaskConical}
                 onClick={() => setShowPreviewFeaturesModal(true)}
+                appending={
+                  <Badge type="info" round size="sm">
+                    <FormattedMessage defaultMessage="New!" id="RlOKwP" />
+                  </Badge>
+                }
                 label={intl.formatMessage({
                   id: 'PreviewFeatures',
                   defaultMessage: 'Preview Features',
