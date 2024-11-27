@@ -301,6 +301,7 @@ const ExpenseItemForm = ({
   hasOCRFeature,
   ocrComparison,
   hasCurrencyPicker,
+  amountIsLocked,
 }) => {
   const intl = useIntl();
   const form = useFormikContext();
@@ -452,7 +453,7 @@ const ExpenseItemForm = ({
                 flexGrow={1}
                 minWidth={200}
                 mt={3}
-                disabled={editOnlyDescriptiveInfo}
+                disabled={editOnlyDescriptiveInfo || amountIsLocked}
               >
                 {inputProps => (
                   <Field name={inputProps.name}>
@@ -546,7 +547,7 @@ const ExpenseItemForm = ({
         </Box>
       </Flex>
       <Flex alignItems="center" mt={3}>
-        {onRemove && !editOnlyDescriptiveInfo && (
+        {onRemove && !editOnlyDescriptiveInfo && !amountIsLocked && (
           <StyledButton
             type="button"
             buttonStyle="dangerSecondary"
@@ -598,6 +599,7 @@ ExpenseItemForm.propTypes = {
   itemIdx: PropTypes.number.isRequired,
   ocrComparison: PropTypes.object,
   hasCurrencyPicker: PropTypes.bool,
+  amountIsLocked: PropTypes.bool,
 };
 
 export default React.memo(ExpenseItemForm);
