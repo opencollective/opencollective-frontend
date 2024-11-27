@@ -255,7 +255,7 @@
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-n": "^17.7.0",
     "eslint-plugin-react": "^7.34.2",
-    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-simple-import-sort": "^12.1.0",
     "eslint-plugin-styled-components-a11y": "^2.1.34",
     "file-loader": "^6.2.0",
