@@ -24,7 +24,7 @@ import { Input } from '../../ui/Input';
 import { Label } from '../../ui/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/Select';
 import UploadedFilePreview from '../../UploadedFilePreview';
-import { PayoutMethodDetails } from '../PayoutMethodDetails';
+import { PayoutMethodDetailsContainer } from '../PayoutMethodDetails';
 import { expenseFormStepHasError, Step } from '../SubmitExpenseFlowSteps';
 import { type ExpenseForm, RecurrenceFrequencyOption, YesNoOption } from '../useExpenseForm';
 
@@ -51,7 +51,11 @@ export function SummarySection(props: SummarySectionProps) {
       <div className="rounded-md border border-gray-300 p-4 text-sm">
         <div className="mb-4 flex justify-between">
           <div className="text-base font-bold">
-            {props.form.values.title || <span className="text-muted-foreground">Expense title</span>}
+            {props.form.values.title || (
+              <span className="text-muted-foreground">
+                <FormattedMessage defaultMessage="Expense title" id="yH3Z6O" />
+              </span>
+            )}
           </div>
           {props.form.values.recurrenceFrequency && props.form.values.recurrenceFrequency !== 'none' && (
             <span className="rounded-xl bg-slate-100 px-3 py-1 font-mono text-xs uppercase text-muted-foreground">
@@ -128,7 +132,13 @@ export function SummarySection(props: SummarySectionProps) {
                 </div>
               )}
               <div className="flex-grow">
-                <div>{ei.description || <span className="text-muted-foreground">Item description</span>}</div>
+                <div>
+                  {ei.description || (
+                    <span className="text-muted-foreground">
+                      <FormattedMessage defaultMessage="Item description" id="1TNkWq" />
+                    </span>
+                  )}
+                </div>
                 <div className="text-xs">{ei.incurredAt && <DateTime value={ei.incurredAt} dateStyle="medium" />}</div>
               </div>
               <div className="text-right">
@@ -219,7 +229,9 @@ export function SummarySection(props: SummarySectionProps) {
       </div>
       {props.form.values.additionalAttachments?.length > 0 && (
         <div className="mt-4 rounded-md border border-gray-300 p-4 text-sm">
-          <Label className="mb-4 font-bold">Attachments</Label>
+          <Label className="mb-4 font-bold">
+            <FormattedMessage defaultMessage="Attachments" id="Expense.Attachments" />
+          </Label>
           <div className="flex flex-wrap gap-4">
             {props.form.values.additionalAttachments.map(at => (
               <div key={typeof at === 'string' ? at : at.id}>
@@ -238,7 +250,9 @@ export function SummarySection(props: SummarySectionProps) {
       )}
       {props.form.values.expenseTypeOption === ExpenseType.INVOICE && (
         <div className="mt-4 rounded-md border border-gray-300 p-4 text-sm">
-          <Label className="mb-4 font-bold">Invoice</Label>
+          <Label className="mb-4 font-bold">
+            <FormattedMessage defaultMessage="Invoice" id="Expense.Type.Invoice" />
+          </Label>
           {props.form.values.hasInvoiceOption === YesNoOption.NO ? (
             <div>
               <MessageBox type="info">
@@ -267,7 +281,7 @@ export function SummarySection(props: SummarySectionProps) {
         </div>
       )}
       <div className="grid grid-cols-2 gap-4">
-        <div className="mt-4 h-fit min-h-32 flex-grow basis-0 rounded-md border border-gray-300 p-4 text-sm">
+        <div className="mt-4 min-h-32 flex-grow basis-0 rounded-md border border-gray-300 p-4 text-sm">
           <div className="font-bold">
             <FormattedMessage defaultMessage="Who is paying?" id="IdR7BG" />
           </div>
@@ -317,7 +331,7 @@ export function SummarySection(props: SummarySectionProps) {
             </React.Fragment>
           )}
         </div>
-        <div className="mt-4 h-fit min-h-32 flex-grow basis-0 rounded-md border border-gray-300 p-4 text-sm">
+        <div className="mt-4 min-h-32 flex-grow basis-0 rounded-md border border-gray-300 p-4 text-sm">
           <div className="font-bold">
             <FormattedMessage defaultMessage="Who is getting paid?" id="W5Z+Fm" />
           </div>
@@ -374,8 +388,10 @@ export function SummarySection(props: SummarySectionProps) {
           )}
         </div>
         <div className="col-span-2 h-fit flex-grow basis-0 rounded-md border border-gray-300 p-4 text-sm">
-          <div className="font-bold">Payout Method</div>
-          {expenseFormStepHasError(props.form, Step.PAYOUT_METHOD) ? null : !props.form.options.isAdminOfPayee ? (
+          <div className="font-bold">
+            <FormattedMessage defaultMessage="Payout Method" id="SecurityScope.PayoutMethod" />
+          </div>
+          {!props.form.options.isAdminOfPayee ? (
             <React.Fragment>
               <div className="mt-2 text-sm text-muted-foreground">
                 <FormattedMessage
@@ -389,9 +405,8 @@ export function SummarySection(props: SummarySectionProps) {
             props.form.options.payoutMethod?.type && (
               <div className="mt-2">
                 <PayoutMethodLabel showIcon payoutMethod={props.form.options.payoutMethod} />
-                <div className="mt-4 grid grid-cols-3 gap-2 *:p-2 *:last:mb-0">
-                  <PayoutMethodDetails payoutMethod={props.form.options.payoutMethod} />
-                </div>
+
+                <PayoutMethodDetailsContainer payoutMethod={props.form.options.payoutMethod} />
               </div>
             )
           )}

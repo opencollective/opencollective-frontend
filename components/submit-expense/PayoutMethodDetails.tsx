@@ -1,6 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
 import { startCase, upperCase } from 'lodash';
+import { ChevronDown } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import type { PayoutMethod } from '../../lib/graphql/types/v2/graphql';
@@ -8,7 +9,10 @@ import { PayoutMethodType } from '../../lib/graphql/types/v2/graphql';
 
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import LoadingPlaceholder from '../LoadingPlaceholder';
+import { Button } from '../ui/Button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
+
+import type { ExpenseForm } from './useExpenseForm';
 
 function flattenDetailsObject(details: any) {
   return Object.entries(details).reduce((acc, [key, value]) => {
@@ -152,6 +156,49 @@ function PayoutMethodDetailItem(props: PayoutMethodDetailItemProps) {
         </TooltipTrigger>
         <TooltipContent>{props.children}</TooltipContent>
       </Tooltip>
+    </div>
+  );
+}
+
+export function PayoutMethodDetailsContainer(props: { payoutMethod: ExpenseForm['options']['payoutMethod'] }) {
+  const [isOpen, setIsOpen] = React.useState(false);
+
+  const toggleContainer = React.useCallback(() => {
+    setIsOpen(isOpen => !isOpen);
+  }, []);
+
+  return (
+    <div
+      className={clsx('relative', {
+        'after:hidden': isOpen,
+        'max-h-16 overflow-hidden after:absolute after:bottom-0 after:left-0 after:right-0 after:h-9 after:[background:linear-gradient(0deg,rgba(0,0,0,0.3)_0%,rgba(255,255,255,0.1)_100%)]':
+          !isOpen,
+      })}
+    >
+      <div className="grid grid-cols-3 gap-2 *:bg-transparent *:p-2 *:last:mb-0">
+        <PayoutMethodDetails payoutMethod={props.payoutMethod} />
+      </div>
+      <div
+        className={clsx('bottom-1 z-20 flex w-full items-center justify-center', {
+          relative: isOpen,
+          absolute: !isOpen,
+        })}
+      >
+        <Button variant="ghost" size="xs" className="flex items-center justify-center gap-2" onClick={toggleContainer}>
+          <span
+            className={clsx('transition-all', {
+              'rotate-180': isOpen,
+            })}
+          >
+            <ChevronDown size={14} />
+          </span>
+          {isOpen ? (
+            <FormattedMessage defaultMessage="Close" id="Close" />
+          ) : (
+            <FormattedMessage defaultMessage="See more" id="yoLwRW" />
+          )}
+        </Button>
+      </div>
     </div>
   );
 }

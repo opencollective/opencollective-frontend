@@ -24,7 +24,7 @@ import StyledSelect from '../../StyledSelect';
 import { Button } from '../../ui/Button';
 import { RadioGroup, RadioGroupCard } from '../../ui/RadioGroup';
 import { useToast } from '../../ui/useToast';
-import { PayoutMethodDetails } from '../PayoutMethodDetails';
+import { PayoutMethodDetailsContainer } from '../PayoutMethodDetails';
 import { Step } from '../SubmitExpenseFlowSteps';
 import { type ExpenseForm } from '../useExpenseForm';
 
@@ -581,11 +581,7 @@ function PayoutMethodRadioGroupItem(props: {
             </React.Fragment>
           ) : (
             <div className="flex flex-col gap-2">
-              <div className="relative max-h-16 overflow-hidden after:absolute after:bottom-0 after:left-0 after:right-0 after:h-9 after:[background:linear-gradient(0deg,rgba(0,0,0,0.5)_0%,rgba(255,255,255,0.5)_100%)]">
-                <div className="grid grid-cols-3 gap-2 shadow *:p-2 *:last:mb-0">
-                  <PayoutMethodDetails payoutMethod={props.payoutMethod} />
-                </div>
-              </div>
+              <PayoutMethodDetailsContainer payoutMethod={props.payoutMethod} />
               {isMissingCurrency && (
                 <div className="mt-2">
                   <MessageBox type="warning">
