@@ -2534,6 +2534,11 @@ type Expense {
   securityChecks: [SecurityCheck]
 
   """
+  [Host Admin only] Key to access the draft of this expense
+  """
+  draftKey: String
+
+  """
   Custom data for this expense
   """
   customData: JSON
@@ -2542,6 +2547,11 @@ type Expense {
   The merchant ID for this expense
   """
   merchantId: String
+
+  """
+  Fields that cannot be edited on this expense
+  """
+  lockedFields: [ExpenseLockableFields]
 }
 
 """
@@ -4148,7 +4158,7 @@ type Contributor {
   If the contributor has a page on Open Collective, this is the slug to link to it. Always null for incognito contributors
   """
   collectiveSlug: String @deprecated(reason: "2024-08-26: Use account.slug instead")
-  account: String
+  account: Account
 
   """
   Contributor avatar or logo
@@ -7531,6 +7541,31 @@ enum SecurityCheckLevel {
   LOW
   MEDIUM
   HIGH
+}
+
+"""
+All fields that can be locked on an expense draft
+"""
+enum ExpenseLockableFields {
+  """
+  Locks items' amount and currency, and it also blocks the hability to add new items.
+  """
+  AMOUNT
+
+  """
+  Locks the payee field, if the user is not on the platform it locks its email.
+  """
+  PAYEE
+
+  """
+  Locks the description field.
+  """
+  DESCRIPTION
+
+  """
+  Locks the type field.
+  """
+  TYPE
 }
 
 """
@@ -19487,6 +19522,16 @@ type Mutation {
     Account where the expense will be created
     """
     account: AccountReferenceInput!
+
+    """
+    Skip sending the invite email
+    """
+    skipInvite: Boolean! = false
+
+    """
+    Fields that the user should not be able to edit when submitting the draft
+    """
+    lockedFields: [ExpenseLockableFields]
   ): Expense!
 
   """
