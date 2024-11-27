@@ -34,7 +34,7 @@ type PayoutMethodDetailsProps = {
   payoutMethod: Omit<PayoutMethod, 'id'> & { id?: string };
 };
 
-export function PayoutMethodDetails(props: PayoutMethodDetailsProps) {
+function PayoutMethodDetails(props: PayoutMethodDetailsProps) {
   if (!props.payoutMethod) {
     return <LoadingPlaceholder height={24} mb={2} />;
   }
