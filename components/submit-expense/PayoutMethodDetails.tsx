@@ -171,18 +171,20 @@ export function PayoutMethodDetailsContainer(props: { payoutMethod: ExpenseForm[
     <div
       className={clsx('relative', {
         'after:hidden': isOpen,
-        'max-h-16 overflow-hidden after:absolute after:bottom-0 after:left-0 after:right-0 after:h-9 after:[background:linear-gradient(0deg,rgba(0,0,0,0.3)_0%,rgba(255,255,255,0.1)_100%)]':
-          !isOpen,
+        'max-h-24 overflow-hidden': !isOpen,
       })}
     >
       <div className="grid grid-cols-3 gap-2 *:bg-transparent *:p-2 *:last:mb-0">
         <PayoutMethodDetails payoutMethod={props.payoutMethod} />
       </div>
       <div
-        className={clsx('bottom-1 z-20 flex w-full items-center justify-center', {
-          relative: isOpen,
-          absolute: !isOpen,
-        })}
+        className={clsx(
+          'bottom-0 z-20 flex w-full items-center justify-center border-t border-slate-200 bg-white pt-1',
+          {
+            relative: isOpen,
+            'absolute [box-shadow:0px_10px_30px_1px_gray]': !isOpen,
+          },
+        )}
       >
         <Button variant="ghost" size="xs" className="flex items-center justify-center gap-2" onClick={toggleContainer}>
           <span
