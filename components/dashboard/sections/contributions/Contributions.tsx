@@ -444,25 +444,10 @@ const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpected
       actionsColumn,
     ]);
   } else {
-    const amount = {
-      accessorKey: 'amount',
-      header: intl.formatMessage({ id: 'Fields.amount', defaultMessage: 'Amount' }),
-      cell: ({ cell, row }) => {
-        const amount = cell.getValue();
-        const order = row.original;
-        return (
-          <div className="flex items-center gap-2 truncate">
-            <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} frequency={order.frequency} />
-          </div>
-        );
-      },
-    };
-
     return compact([
       onlyExpectedFunds ? contributionId : null,
       includeHostedAccounts ? accounts : isIncoming ? fromAccount : toAccount,
       paymentMethod,
-      amount,
       totalAmount,
       onlyExpectedFunds ? expectedAt : null,
       status,
