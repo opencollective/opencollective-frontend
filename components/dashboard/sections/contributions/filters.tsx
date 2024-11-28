@@ -11,10 +11,10 @@ import { sortSelectOptions } from '../../../../lib/utils';
 
 import { amountFilter } from '../../filters/AmountFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
-import { dateFilter, expectedDateFilter } from '../../filters/DateFilter';
+import { expectedDateFilter, orderDateFilter } from '../../filters/DateFilter';
 import { expectedFundsFilter } from '../../filters/ExpectedFundsFilter';
-import { orderByFilter } from '../../filters/OrderFilter';
 import { searchFilter } from '../../filters/SearchFilter';
+import { buildSortFilter } from '../../filters/SortFilter';
 
 // Pseudo type filter
 export enum OrderTypeFilter {
@@ -29,15 +29,29 @@ const i18nOrderType = (intl, value) => {
   return langs[value] ?? value;
 };
 
+export const contributionsOrderFilter = buildSortFilter({
+  fieldSchema: z.enum(['LAST_CHARGED_AT']),
+  defaultValue: {
+    field: 'LAST_CHARGED_AT',
+    direction: 'DESC',
+  },
+  i18nCustomLabels: {
+    LAST_CHARGED_AT: defineMessage({
+      id: 'expense.incurredAt',
+      defaultMessage: 'Date',
+    }),
+  },
+});
+
 const PAGE_SIZE = 20;
 
 export const schema = z.object({
   limit: integer.default(PAGE_SIZE),
   offset: integer.default(0),
-  orderBy: orderByFilter.schema,
+  orderBy: contributionsOrderFilter.schema,
   searchTerm: searchFilter.schema,
-  date: dateFilter.schema,
   expectedDate: expectedDateFilter.schema,
+  date: orderDateFilter.schema,
   expectedFundsFilter: expectedFundsFilter.schema,
   amount: amountFilter.schema,
   status: isMulti(z.nativeEnum(OrderStatus)).optional(),
@@ -56,9 +70,9 @@ type GraphQLQueryVariables = DashboardRecurringContributionsQueryVariables;
 // Only needed when either the values or key of filters are different
 // to expected key or value of QueryVariables
 export const toVariables: FiltersToVariables<FilterValues, GraphQLQueryVariables, FilterMeta> = {
-  orderBy: orderByFilter.toVariables,
-  date: dateFilter.toVariables,
+  orderBy: contributionsOrderFilter.toVariables,
   expectedDate: expectedDateFilter.toVariables,
+  date: orderDateFilter.toVariables,
   amount: amountFilter.toVariables,
   type: (value: OrderTypeFilter) => {
     switch (value) {
@@ -83,11 +97,11 @@ export const toVariables: FiltersToVariables<FilterValues, GraphQLQueryVariables
 
 export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   searchTerm: searchFilter.filter,
-  date: dateFilter.filter,
   expectedDate: expectedDateFilter.filter,
+  date: orderDateFilter.filter,
   expectedFundsFilter: expectedFundsFilter.filter,
   amount: { ...amountFilter.filter, labelMsg: defineMessage({ id: 'TotalAmount', defaultMessage: 'Total amount' }) },
-  orderBy: orderByFilter.filter,
+  orderBy: contributionsOrderFilter.filter,
   status: {
     labelMsg: defineMessage({ defaultMessage: 'Status', id: 'tzMNF3' }),
     Component: ({ valueRenderer, intl, ...props }) => (
