@@ -2747,6 +2747,7 @@
   "order.expired": "Просрочен",
   "Order.fromTo": "для {account} от {contributor}",
   "order.in_review": "In Review",
+  "order.lastChargedAt": "Last Charge Date",
   "order.markAsCompleted": "Отметить как завершенное",
   "order.markAsExpired": "Mark as expired",
   "Order.MarkExpiredConfirm": "Mark this contribution as expired?",

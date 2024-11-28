@@ -2747,6 +2747,7 @@
   "order.expired": "Expirée",
   "Order.fromTo": "pour {account} depuis {contributor}",
   "order.in_review": "En cours de validation",
+  "order.lastChargedAt": "Last Charge Date",
   "order.markAsCompleted": "Marquer comme complétée",
   "order.markAsExpired": "Marquer comme expirée",
   "Order.MarkExpiredConfirm": "Marquer cette contribution comme expirée ?",

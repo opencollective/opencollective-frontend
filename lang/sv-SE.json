@@ -2747,6 +2747,7 @@
   "order.expired": "Upphört",
   "Order.fromTo": "för {account} från {contributor}",
   "order.in_review": "Under granskning",
+  "order.lastChargedAt": "Last Charge Date",
   "order.markAsCompleted": "Markera som klar",
   "order.markAsExpired": "Markera som förfallen",
   "Order.MarkExpiredConfirm": "Mark this contribution as expired?",

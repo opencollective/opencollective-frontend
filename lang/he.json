@@ -2747,6 +2747,7 @@
   "order.expired": "פג תוקף",
   "Order.fromTo": "עבור {account} מאת {contributor}",
   "order.in_review": "בבחינה",
+  "order.lastChargedAt": "Last Charge Date",
   "order.markAsCompleted": "סימון כהושלם",
   "order.markAsExpired": "סימון כפג תוקף",
   "Order.MarkExpiredConfirm": "Mark this contribution as expired?",

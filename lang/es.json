@@ -2747,6 +2747,7 @@
   "order.expired": "Expirado",
   "Order.fromTo": "por {account} de {contributor}",
   "order.in_review": "En Revisión",
+  "order.lastChargedAt": "Last Charge Date",
   "order.markAsCompleted": "Marcar como completado",
   "order.markAsExpired": "Marcar como expirado",
   "Order.MarkExpiredConfirm": "¿Marcar esta colaboración como caducada?",

@@ -2747,6 +2747,7 @@
   "order.expired": "Термін дії завершився",
   "Order.fromTo": "для {account} від {contributor}",
   "order.in_review": "In Review",
+  "order.lastChargedAt": "Last Charge Date",
   "order.markAsCompleted": "Позначити завершеним",
   "order.markAsExpired": "Позначити протермінованим",
   "Order.MarkExpiredConfirm": "Позначити цей внесок протермінованим?",

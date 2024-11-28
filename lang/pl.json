@@ -2747,6 +2747,7 @@
   "order.expired": "Wygasłe",
   "Order.fromTo": "dla {account} od {contributor}",
   "order.in_review": "W trakcie przeglądu",
+  "order.lastChargedAt": "Last Charge Date",
   "order.markAsCompleted": "Oznacz jako ukończony",
   "order.markAsExpired": "Oznacz jako wygasłe",
   "Order.MarkExpiredConfirm": "Oznaczyć ten wkład jako wygasły?",

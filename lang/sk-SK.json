@@ -2747,6 +2747,7 @@
   "order.expired": "Expirované",
   "Order.fromTo": "pre {account} od {contributor}",
   "order.in_review": "In Review",
+  "order.lastChargedAt": "Last Charge Date",
   "order.markAsCompleted": "Označiť ako dokončené",
   "order.markAsExpired": "Označiť ako expirované",
   "Order.MarkExpiredConfirm": "Mark this contribution as expired?",

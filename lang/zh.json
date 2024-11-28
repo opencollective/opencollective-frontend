@@ -2747,6 +2747,7 @@
   "order.expired": "已过期",
   "Order.fromTo": "来自 {contributor} 的 {account}",
   "order.in_review": "正在审查",
+  "order.lastChargedAt": "Last Charge Date",
   "order.markAsCompleted": "标记为已完成",
   "order.markAsExpired": "标记为已过期",
   "Order.MarkExpiredConfirm": "将此贡献标记为过期？",
