@@ -8,8 +8,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import useKeyBoardShortcut, { ARROW_LEFT_KEY, ARROW_RIGHT_KEY } from '../lib/hooks/useKeyboardKey';
-import { imagePreview } from '../lib/image-utils';
-import { getFileExtensionFromUrl } from '../lib/url-helpers';
 
 import { Dialog, DialogOverlay } from './ui/Dialog';
 import { Box, Flex } from './Grid';
@@ -150,6 +148,7 @@ export default function FilesViewerModal({
   const intl = useIntl();
   const initialIndex = openFileUrl ? files?.findIndex(f => f.url === openFileUrl) : 0;
   const [selectedIndex, setSelectedIndex] = useState(initialIndex);
+  const [selectedItemContentType, setSelectedItemContentType] = React.useState(null);
 
   React.useEffect(() => {
     if (openFileUrl) {
@@ -172,25 +171,39 @@ export default function FilesViewerModal({
   const hasMultipleFiles = nbFiles > 1;
   const contentWrapperRef = React.useRef(null);
 
-  const renderFile = (
-    { url, info, name }: { url: string; name?: string; info?: { width: number } },
-    contentWrapperRef,
-  ) => {
-    let content = null;
-    const fileExtension = getFileExtensionFromUrl(url);
+  React.useEffect(() => {
+    async function fetchMeta() {
+      const response = await fetch(selectedItem.url, {
+        method: 'GET',
+        redirect: 'follow',
+        headers: {
+          Range: 'bytes=0-0',
+        },
+      });
 
-    const isText = ['csv', 'txt'].includes(fileExtension);
-    const isPdf = fileExtension === 'pdf';
+      setSelectedItemContentType(response.headers.get('Content-Type'));
+    }
+
+    if (selectedItem) {
+      fetchMeta();
+    } else {
+      setSelectedItemContentType(null);
+    }
+    return () => setSelectedItemContentType(null);
+  }, [selectedItem]);
+
+  const renderFile = ({ url, name }: { url: string; name?: string; info?: { width: number } }, contentWrapperRef) => {
+    let content = null;
+
+    const isText = ['text/csv', 'text/plain'].includes(selectedItemContentType);
+    const isPdf = 'application/pdf' === selectedItemContentType;
 
     if (isText) {
       content = <UploadedFilePreview size={288} url={url} alt={name} showFileName fileName={name} color="black.200" />;
     } else if (isPdf) {
       content = <PDFViewer pdfUrl={url} contentWrapperRef={contentWrapperRef} />;
     } else {
-      const { width: imageWidth } = info || {};
-      const maxWidth = 1200;
-      const resizeWidth = Math.min(maxWidth, imageWidth ?? maxWidth);
-      content = <StyledImg src={imagePreview(url, null, { width: resizeWidth })} alt={name} />;
+      content = <StyledImg src={url} alt={name} />;
     }
 
     return <Content>{content}</Content>;

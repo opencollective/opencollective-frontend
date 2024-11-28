@@ -7,7 +7,6 @@ import { escape, get, isEmpty, omit, pick, unescape } from 'lodash';
 import Lottie from 'lottie-react';
 import { AlertTriangle } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import { isURL } from 'validator';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { formatValueAsCurrency } from '../../lib/currency-utils';
@@ -38,6 +37,15 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
 import { ExpenseAccountingCategoryPill } from './ExpenseAccountingCategoryPill';
 import { ExpenseItemDescriptionHint } from './ItemDescriptionHint';
+
+function isURL(value) {
+  try {
+    new URL(value);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
 
 const msg = defineMessages({
   previewImgAlt: {
