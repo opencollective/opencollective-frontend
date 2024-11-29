@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { compact, omit } from 'lodash';
-import { LinkIcon, Pencil, PlusIcon } from 'lucide-react';
+import { ArrowLeftRightIcon, LinkIcon, Pencil, PlusIcon } from 'lucide-react';
 import { useRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
@@ -29,11 +29,13 @@ import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
 import ContributionConfirmationModal from '../../../ContributionConfirmationModal';
 import { ContributionDrawer } from '../../../contributions/ContributionDrawer';
+import { getTransactionsUrl } from '../../../contributions/ContributionTimeline';
 import { CopyID } from '../../../CopyId';
 import DateTime from '../../../DateTime';
 import type { EditOrderActions } from '../../../EditOrderModal';
 import EditOrderModal from '../../../EditOrderModal';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
+import Link from '../../../Link';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { useModal } from '../../../ModalContext';
 import OrderStatusTag from '../../../orders/OrderStatusTag';
@@ -948,8 +950,22 @@ const getContributionActions: (opts: GetContributionActionsOptions) => GetAction
       return null;
     }
 
+    const transactionsUrl = getTransactionsUrl(opts.LoggedInUser, order);
+    transactionsUrl.searchParams.set('orderId', order.legacyId.toString());
+
     const actions: ReturnType<GetActions<any>> = {
-      primary: [],
+      primary: [
+        {
+          key: 'view-transactions',
+          label: (
+            <Link href={transactionsUrl.toString()} className="flex flex-row items-center gap-2.5">
+              <ArrowLeftRightIcon size={16} className="text-muted-foreground" />
+              <FormattedMessage defaultMessage="View transactions" id="DfQJQ6" />
+            </Link>
+          ),
+          onClick: () => {},
+        },
+      ],
       secondary: [],
     };
 
