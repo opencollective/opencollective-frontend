@@ -125,7 +125,7 @@ export function SummarySection(props: SummarySectionProps) {
               {ei.attachment && (
                 <div>
                   <UploadedFilePreview
-                    size={40}
+                    size={64}
                     url={typeof ei.attachment === 'string' ? ei.attachment : ei.attachment.url}
                     border="none"
                   />

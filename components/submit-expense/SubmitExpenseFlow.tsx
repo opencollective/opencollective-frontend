@@ -421,6 +421,7 @@ function ExpenseFormikContainer(props: {
     initialValues: {
       accountSlug: props.submitExpenseTo,
       title: '',
+      expenseTypeOption: ExpenseType.INVOICE,
       inviteeAccountType: InviteeAccountType.INDIVIDUAL,
       expenseItems: [
         {

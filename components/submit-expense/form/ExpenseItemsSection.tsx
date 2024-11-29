@@ -197,31 +197,35 @@ function ExpenseItem(props: ExpenseItemProps) {
       <div className="flex gap-4">
         {hasAttachment && (
           <div className="flex flex-col">
-            <Label className="mb-2" htmlFor={attachmentId}>
-              Upload file
-            </Label>
-            <div className="flex flex-grow items-center justify-center">
-              <StyledDropzone
-                {...attachmentDropzoneParams}
-                kind="EXPENSE_ITEM"
-                id={attachmentId}
-                name={attachmentId}
-                value={typeof item.attachment === 'string' ? item.attachment : item.attachment?.url}
-                isMulti={false}
-                showActions
-                size={112}
-                useGraphQL={true}
-                parseDocument={false}
-                onGraphQLSuccess={uploadResults => {
-                  setFieldValue(`expenseItems.${props.index}.attachment`, uploadResults[0].file);
-                }}
-                onSuccess={file => {
-                  setFieldValue(`expenseItems.${props.index}.attachment`, file);
-                }}
-                onReject={msg => {
-                  toast({ variant: 'error', message: msg });
-                }}
-              />
+            <div className="flex flex-grow justify-center">
+              <StyledInputFormikField
+                label={intl.formatMessage({ defaultMessage: 'Upload file', id: '6oOCCL' })}
+                name={`expenseItems.${props.index}.attachment`}
+              >
+                {() => (
+                  <StyledDropzone
+                    {...attachmentDropzoneParams}
+                    kind="EXPENSE_ITEM"
+                    id={attachmentId}
+                    name={attachmentId}
+                    value={typeof item.attachment === 'string' ? item.attachment : item.attachment?.url}
+                    isMulti={false}
+                    showActions
+                    size={112}
+                    useGraphQL={true}
+                    parseDocument={false}
+                    onGraphQLSuccess={uploadResults => {
+                      setFieldValue(`expenseItems.${props.index}.attachment`, uploadResults[0].file);
+                    }}
+                    onSuccess={file => {
+                      setFieldValue(`expenseItems.${props.index}.attachment`, file);
+                    }}
+                    onReject={msg => {
+                      toast({ variant: 'error', message: msg });
+                    }}
+                  />
+                )}
+              </StyledInputFormikField>
             </div>
           </div>
         )}
