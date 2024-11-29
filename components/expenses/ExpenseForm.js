@@ -15,7 +15,7 @@ import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { formatErrorMessage } from '../../lib/errors';
 import { getSupportedExpenseTypes } from '../../lib/expenses';
 import { requireFields } from '../../lib/form-utils';
-import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
+import { ExpenseLockableFields, ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 import { require2FAForAdmins } from '../../lib/policies';
@@ -501,6 +501,7 @@ const ExpenseFormBody = ({
         formik={formik}
         onCancel={onCancel}
         onNext={() => setStep(EXPENSE_FORM_STEPS.EXPENSE)}
+        expense={expense}
       />
     );
   } else if (isOnBehalf === true && isNewUser) {
@@ -642,6 +643,7 @@ const ExpenseFormBody = ({
           onChange={handleChange}
           value={values.type}
           supportedExpenseTypes={supportedExpenseTypes}
+          disabled={expense?.lockedFields?.includes(ExpenseLockableFields.TYPE)}
         />
       )}
       {isRecurring && <ExpenseRecurringBanner expense={expense} />}
@@ -727,6 +729,7 @@ const ExpenseFormBody = ({
                     ? formatMessage(msg.grantSubjectPlaceholder)
                     : formatMessage(msg.descriptionPlaceholder)
                 }
+                disabled={expense?.lockedFields?.includes(ExpenseLockableFields.DESCRIPTION)}
               />
               <HiddenFragment show={hasBaseFormFieldsCompleted || isInvite}>
                 <div className="mt-2 flex flex-wrap justify-between gap-3">
@@ -766,7 +769,10 @@ const ExpenseFormBody = ({
                               onChange={value => formik.setFieldValue('currency', value)}
                               width="100%"
                               maxWidth="160px"
-                              disabled={availableCurrencies.length < 2 && availableCurrencies[0] === values.currency}
+                              disabled={
+                                (availableCurrencies.length < 2 && availableCurrencies[0] === values.currency) ||
+                                (values.currency && expense?.lockedFields?.includes(ExpenseLockableFields.AMOUNT))
+                              }
                               styles={{ menu: { width: '280px' } }}
                             />
                           )}
@@ -903,7 +909,7 @@ const ExpenseFormBody = ({
                     onClick={() => addNewExpenseItem(formik)}
                     minWidth={135}
                     data-cy="expense-add-item-btn"
-                    disabled={isCreditCardCharge}
+                    disabled={isCreditCardCharge || expense?.lockedFields?.includes(ExpenseLockableFields.AMOUNT)}
                   >
                     +&nbsp;
                     {formatMessage(isReceipt ? msg.addNewReceipt : isGrant ? msg.addNewGrantItem : msg.addNewItem)}
@@ -912,7 +918,12 @@ const ExpenseFormBody = ({
                 <Box>
                   <FieldArray name="items">
                     {fieldsArrayProps => (
-                      <ExpenseFormItems {...fieldsArrayProps} collective={collective} hasOCRFeature={hasOCRFeature} />
+                      <ExpenseFormItems
+                        {...fieldsArrayProps}
+                        collective={collective}
+                        hasOCRFeature={hasOCRFeature}
+                        expense={expense}
+                      />
                     )}
                   </FieldArray>
                 </Box>
@@ -1021,6 +1032,7 @@ ExpenseFormBody.propTypes = {
     payee: PropTypes.object,
     draft: PropTypes.object,
     payoutMethod: PropTypes.object,
+    lockedFields: PropTypes.arrayOf(PropTypes.string),
     recurringExpense: PropTypes.shape({
       interval: PropTypes.string,
       endsAt: PropTypes.string,

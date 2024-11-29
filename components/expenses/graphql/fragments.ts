@@ -516,6 +516,7 @@ export const expensePageExpenseFieldsFragment = gql`
         reasonDetails
       }
     }
+    lockedFields
     activities {
       id
       type
