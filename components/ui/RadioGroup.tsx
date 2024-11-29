@@ -46,31 +46,31 @@ const RadioGroupCard = React.forwardRef<
   }
 >(({ className, children, showSubcontent, subContent, ...props }, ref) => {
   return (
-    <RadioGroupPrimitive.Item
-      ref={ref}
-      className={cn(
-        'group rounded-lg bg-card p-4 text-left text-sm text-card-foreground shadow-sm ring-1 ring-border data-[state=checked]:outline-none data-[state=checked]:ring-2 data-[state=checked]:ring-ring',
-        className,
-      )}
-      {...props}
-      asChild={false}
+    <div
+      className={`rounded-lg bg-card text-sm text-card-foreground shadow-sm ring-1 ring-border has-[[data-state=checked]]:ring-2 has-[[data-state=checked]]:ring-ring`}
     >
-      <div className="flex w-full items-center gap-4">
-        <div className="flex aspect-square h-4 w-4 shrink-0 items-center justify-center rounded-full border border-primary text-primary ring-offset-background focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
-          <RadioGroupPrimitive.Indicator>
-            <Circle className="h-2.5 w-2.5 fill-current text-current" />
-          </RadioGroupPrimitive.Indicator>
+      <RadioGroupPrimitive.Item
+        ref={ref}
+        className={cn('group w-full p-4 text-left outline-none', className)}
+        {...props}
+        asChild={false}
+      >
+        <div className="flex w-full items-center gap-4">
+          <div className="flex aspect-square h-4 w-4 shrink-0 items-center justify-center rounded-full border border-primary text-primary ring-offset-background focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+            <RadioGroupPrimitive.Indicator>
+              <Circle className="h-2.5 w-2.5 fill-current text-current" />
+            </RadioGroupPrimitive.Indicator>
+          </div>
+
+          {children}
         </div>
-
-        {children}
-      </div>
-
+      </RadioGroupPrimitive.Item>
       {subContent && (
         <Collapsible open={showSubcontent}>
-          <CollapsibleContent className="mt-3">{subContent}</CollapsibleContent>
+          <CollapsibleContent className="p-4 pt-0">{subContent}</CollapsibleContent>
         </Collapsible>
       )}
-    </RadioGroupPrimitive.Item>
+    </div>
   );
 });
 

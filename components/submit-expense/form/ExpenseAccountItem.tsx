@@ -90,8 +90,8 @@ export function ExpenseAccountItem(props: ExpenseAccountItemProps) {
       <div>
         <Avatar collective={account} radius={24} />
       </div>
-      <div className="flex flex-grow flex-col gap-1">
-        <div className="max-w-96 overflow-x-clip text-ellipsis whitespace-nowrap">{account.name}</div>
+      <div className="flex flex-grow flex-col gap-0.5">
+        <div className="max-w-96 overflow-x-clip text-ellipsis whitespace-nowrap font-medium">{account.name}</div>
         <div className="max-w-96 overflow-x-clip text-ellipsis whitespace-nowrap text-muted-foreground">
           {'parent' in account && account.parent ? (
             <FormattedMessage

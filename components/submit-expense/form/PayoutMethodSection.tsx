@@ -526,8 +526,7 @@ function PayoutMethodRadioGroupItem(props: {
         value={props.payoutMethod.id}
         showSubcontent={isOpen}
         subContent={
-          isOpen &&
-          (isEditingPayoutMethod ? (
+          isEditingPayoutMethod ? (
             <React.Fragment>
               {isLoadingEditPayoutMethod ? (
                 <LoadingPlaceholder width={1} height={24} />
@@ -580,8 +579,8 @@ function PayoutMethodRadioGroupItem(props: {
               </div>
             </React.Fragment>
           ) : (
-            <div className="flex flex-col gap-2">
-              <PayoutMethodDetailsContainer payoutMethod={props.payoutMethod} />
+            <div className="flex flex-col gap-4">
+              <PayoutMethodDetailsContainer payoutMethod={props.payoutMethod} maxItems={3} />
               {isMissingCurrency && (
                 <div className="mt-2">
                   <MessageBox type="warning">
@@ -666,7 +665,7 @@ function PayoutMethodRadioGroupItem(props: {
                 </MessageBox>
               )}
             </div>
-          ))
+          )
         }
       >
         <div className="flex-grow">

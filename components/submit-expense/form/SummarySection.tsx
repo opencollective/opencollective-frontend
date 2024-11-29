@@ -403,10 +403,10 @@ export function SummarySection(props: SummarySectionProps) {
           ) : (
             props.form.options.payee &&
             props.form.options.payoutMethod?.type && (
-              <div className="mt-2">
+              <div className="mt-2 space-y-2">
                 <PayoutMethodLabel showIcon payoutMethod={props.form.options.payoutMethod} />
 
-                <PayoutMethodDetailsContainer payoutMethod={props.form.options.payoutMethod} />
+                <PayoutMethodDetailsContainer payoutMethod={props.form.options.payoutMethod} maxItems={3} />
               </div>
             )
           )}
