@@ -134,7 +134,7 @@ const UploadedFilePreview = ({
   }
 
   const getContainerAttributes = () => {
-    if (isPrivate) {
+    if (isPrivate || !url) {
       return { as: 'div' };
     } else if (isText || !openFileViewer) {
       return { href: url, target: '_blank', rel: 'noopener noreferrer', as: url.startsWith('/') ? Link : StyledLink };

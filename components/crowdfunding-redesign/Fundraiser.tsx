@@ -183,7 +183,7 @@ const ContentOverview = ({ content }) => {
   const doc = parser.parseFromString(content, 'text/html');
   const headings = doc.querySelectorAll('h3');
   const headingTexts = Array.from(headings).map(h3 => h3.textContent?.trim() || '');
-  const linkClasses = cva('px-2 font-semibold block hover:text-primary text-sm border-l-[3px]', {
+  const linkClasses = cva('block border-l-[3px] px-2 text-sm font-semibold hover:text-primary', {
     variants: {
       active: {
         true: 'border-primary/70',

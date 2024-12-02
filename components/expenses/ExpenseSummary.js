@@ -519,12 +519,12 @@ const ExpenseSummary = ({
       {!isEditing &&
         (drawerActionsContainer ? (
           createPortal(processButtons, drawerActionsContainer)
-        ) : (
+        ) : showProcessButtons ? (
           <Fragment>
             <StyledHr flex="1" mt={4} mb={3} borderColor="black.300" />
             {processButtons}
           </Fragment>
-        ))}
+        ) : null)}
     </StyledCard>
   );
 };

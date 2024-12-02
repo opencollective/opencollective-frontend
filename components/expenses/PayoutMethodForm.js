@@ -11,6 +11,7 @@ import { formatFormErrorMessage } from '../../lib/form-utils';
 
 import { Box } from '../Grid';
 import StyledCheckbox from '../StyledCheckbox';
+import { StyledCurrencyPicker } from '../StyledCurrencyPicker';
 import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import StyledTextarea from '../StyledTextarea';
@@ -30,6 +31,10 @@ const msg = defineMessages({
     id: 'ExpenseForm.SavePayout',
     defaultMessage: 'Save this info for future payouts',
   },
+  currency: {
+    id: 'Currency',
+    defaultMessage: 'Currency',
+  },
 });
 
 /** Use this function to validate the payout method */
@@ -46,9 +51,6 @@ export const validatePayoutMethod = payoutMethod => {
       set(errors, 'data.email', createError(ERROR.FORM_FIELD_PATTERN));
     }
   } else if (payoutMethod.type === PayoutMethodType.BANK_ACCOUNT) {
-    if (!payoutMethod.data?.currency) {
-      set(errors, 'data.currency', createError(ERROR.FORM_FIELD_REQUIRED));
-    }
     if (!payoutMethod.data?.accountHolderName) {
       set(errors, 'data.accountHolderName', createError(ERROR.FORM_FIELD_REQUIRED));
     }
@@ -57,6 +59,10 @@ export const validatePayoutMethod = payoutMethod => {
     if (!content) {
       set(errors, 'data.content', createError(ERROR.FORM_FIELD_MIN_LENGTH));
     }
+  }
+
+  if (!payoutMethod?.data?.currency) {
+    set(errors, 'data.currency', createError(ERROR.FORM_FIELD_REQUIRED));
   }
 
   return errors;
@@ -77,38 +83,86 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host, required, alwaysSa
   return (
     <Box>
       {payoutMethod.type === PayoutMethodType.PAYPAL && (
-        <Field name={getFieldName('data.email')}>
-          {({ field, meta }) => (
-            <StyledInputField
-              name={field.name}
-              type="email"
-              error={formatFormErrorMessage(intl, meta.error)}
-              label={formatMessage(msg.paypalEmail)}
-              labelFontSize="13px"
-              disabled={!isNew}
-              required={required !== false}
-            >
-              {inputProps => <StyledInput placeholder="e.g., yourname@yourhost.com" {...inputProps} {...field} />}
-            </StyledInputField>
-          )}
-        </Field>
+        <React.Fragment>
+          <Field name={getFieldName('data.currency')}>
+            {({ field, form }) => (
+              <StyledInputField
+                name={field.name}
+                label={formatMessage(msg.currency)}
+                labelFontSize="13px"
+                mt={3}
+                mb={2}
+              >
+                {({ id }) => (
+                  <StyledCurrencyPicker
+                    inputId={id}
+                    name={field.name}
+                    onChange={currency => {
+                      form.setFieldValue(getFieldName('data.currency'), currency);
+                    }}
+                    value={field.value}
+                  />
+                )}
+              </StyledInputField>
+            )}
+          </Field>
+          <Field name={getFieldName('data.email')}>
+            {({ field, meta }) => (
+              <StyledInputField
+                name={field.name}
+                type="email"
+                error={formatFormErrorMessage(intl, meta.error)}
+                label={formatMessage(msg.paypalEmail)}
+                labelFontSize="13px"
+                disabled={!isNew}
+                required={required !== false}
+              >
+                {inputProps => <StyledInput placeholder="e.g., yourname@yourhost.com" {...inputProps} {...field} />}
+              </StyledInputField>
+            )}
+          </Field>
+        </React.Fragment>
       )}
       {payoutMethod.type === PayoutMethodType.OTHER && (
-        <Field name={getFieldName('data.content')}>
-          {({ field, meta }) => (
-            <StyledInputField
-              name={field.name}
-              error={formatFormErrorMessage(intl, meta.error)}
-              label={formatMessage(msg.content)}
-              labelFontSize="13px"
-              disabled={!isNew}
-              data-cy="payout-other-info"
-              required={required !== false}
-            >
-              {inputProps => <StyledTextarea minHeight={100} {...inputProps} {...field} />}
-            </StyledInputField>
-          )}
-        </Field>
+        <React.Fragment>
+          <Field name={getFieldName('data.currency')}>
+            {({ field, form }) => (
+              <StyledInputField
+                name={field.name}
+                label={formatMessage(msg.currency)}
+                labelFontSize="13px"
+                mt={3}
+                mb={2}
+              >
+                {({ id }) => (
+                  <StyledCurrencyPicker
+                    inputId={id}
+                    name={field.name}
+                    onChange={currency => {
+                      form.setFieldValue(getFieldName('data.currency'), currency);
+                    }}
+                    value={field.value}
+                  />
+                )}
+              </StyledInputField>
+            )}
+          </Field>
+          <Field name={getFieldName('data.content')}>
+            {({ field, meta }) => (
+              <StyledInputField
+                name={field.name}
+                error={formatFormErrorMessage(intl, meta.error)}
+                label={formatMessage(msg.content)}
+                labelFontSize="13px"
+                disabled={!isNew}
+                data-cy="payout-other-info"
+                required={required !== false}
+              >
+                {inputProps => <StyledTextarea minHeight={100} {...inputProps} {...field} />}
+              </StyledInputField>
+            )}
+          </Field>
+        </React.Fragment>
       )}
       {payoutMethod.type === PayoutMethodType.BANK_ACCOUNT && (
         <PayoutBankInformationForm
