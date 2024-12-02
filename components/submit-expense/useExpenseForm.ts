@@ -588,7 +588,7 @@ function buildFormSchema(
       .nullish()
       .refine(
         slug => {
-          if (slug === '__invite') {
+          if (slug === '__invite' || slug === '__inviteExistingUser') {
             return true;
           }
 
@@ -941,7 +941,7 @@ function buildFormSchema(
       .nullish()
       .refine(
         inviteeExistingAccount => {
-          if (values.payeeSlug === '__invite') {
+          if (values.payeeSlug === '__inviteExistingUser') {
             return !!inviteeExistingAccount;
           }
 
