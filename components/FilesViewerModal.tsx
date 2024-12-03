@@ -126,7 +126,7 @@ type FilesViewerModalProps = {
   files?: {
     url: string;
     name?: string;
-    info?: { width: number };
+    info?: { width: number; type: string };
   }[];
   openFileUrl?: string;
   allowOutsideInteraction?: boolean;
@@ -148,7 +148,6 @@ export default function FilesViewerModal({
   const intl = useIntl();
   const initialIndex = openFileUrl ? files?.findIndex(f => f.url === openFileUrl) : 0;
   const [selectedIndex, setSelectedIndex] = useState(initialIndex);
-  const [selectedItemContentType, setSelectedItemContentType] = React.useState(null);
 
   React.useEffect(() => {
     if (openFileUrl) {
@@ -166,31 +165,11 @@ export default function FilesViewerModal({
   useKeyBoardShortcut({ callback: onArrowLeft, keyMatch: ARROW_LEFT_KEY });
 
   const selectedItem = files?.length ? files?.[selectedIndex] : null;
+  const selectedItemContentType = selectedItem?.info?.type;
 
   const nbFiles = files?.length || 0;
   const hasMultipleFiles = nbFiles > 1;
   const contentWrapperRef = React.useRef(null);
-
-  React.useEffect(() => {
-    async function fetchMeta() {
-      const response = await fetch(selectedItem.url, {
-        method: 'GET',
-        redirect: 'follow',
-        headers: {
-          Range: 'bytes=0-0',
-        },
-      });
-
-      setSelectedItemContentType(response.headers.get('Content-Type'));
-    }
-
-    if (selectedItem) {
-      fetchMeta();
-    } else {
-      setSelectedItemContentType(null);
-    }
-    return () => setSelectedItemContentType(null);
-  }, [selectedItem]);
 
   const renderFile = ({ url, name }: { url: string; name?: string; info?: { width: number } }, contentWrapperRef) => {
     let content = null;
