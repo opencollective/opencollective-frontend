@@ -938,6 +938,7 @@
   "ContributeTier.StartsAt": "起步",
   "ContributeTier.Taxes": "税收可能包含在内",
   "contribution.amount.other.label": "其他",
+  "Contribution.ChargeDate": "Charge Date",
   "contribution.createdAt": "创建于 {date}",
   "contribution.edit": "编辑贡献",
   "Contribution.GoToPage": "千万贡献页",

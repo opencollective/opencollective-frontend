@@ -938,6 +938,7 @@
   "ContributeTier.StartsAt": "Починається з",
   "ContributeTier.Taxes": "Податки можуть застосовуватися",
   "contribution.amount.other.label": "Інше",
+  "Contribution.ChargeDate": "Charge Date",
   "contribution.createdAt": "Створено {date}",
   "contribution.edit": "Редагувати внесок",
   "Contribution.GoToPage": "Перейти на сторінку внесків",

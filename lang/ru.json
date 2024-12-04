@@ -938,6 +938,7 @@
   "ContributeTier.StartsAt": "Начиная с",
   "ContributeTier.Taxes": "Может облагаться налогом",
   "contribution.amount.other.label": "Другое",
+  "Contribution.ChargeDate": "Charge Date",
   "contribution.createdAt": "Создано {date}",
   "contribution.edit": "Edit Contribution",
   "Contribution.GoToPage": "Go to contribution page",

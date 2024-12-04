@@ -938,6 +938,7 @@
   "ContributeTier.StartsAt": "Beginnt bei",
   "ContributeTier.Taxes": "Es können Steuern anfallen",
   "contribution.amount.other.label": "Andere",
+  "Contribution.ChargeDate": "Charge Date",
   "contribution.createdAt": "Erstellt am {date}",
   "contribution.edit": "Spende bearbeiten",
   "Contribution.GoToPage": "Zur Beitragsseite",

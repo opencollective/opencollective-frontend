@@ -938,6 +938,7 @@
   "ContributeTier.StartsAt": "Začíná na",
   "ContributeTier.Taxes": "Daně mohou být uplatněny",
   "contribution.amount.other.label": "Ostatní",
+  "Contribution.ChargeDate": "Charge Date",
   "contribution.createdAt": "Vytvořeno dne {date}",
   "contribution.edit": "Upravit příspěvek",
   "Contribution.GoToPage": "Přejít na stránku s příspěvkem",

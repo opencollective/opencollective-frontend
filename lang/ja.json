@@ -938,6 +938,7 @@
   "ContributeTier.StartsAt": "最小金額",
   "ContributeTier.Taxes": "Taxes may apply",
   "contribution.amount.other.label": "その他",
+  "Contribution.ChargeDate": "Charge Date",
   "contribution.createdAt": "Created on {date}",
   "contribution.edit": "Edit Contribution",
   "Contribution.GoToPage": "この財政貢献の詳細ページへ移動",

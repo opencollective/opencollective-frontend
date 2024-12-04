@@ -938,6 +938,7 @@
   "ContributeTier.StartsAt": "Začína na",
   "ContributeTier.Taxes": "Možno sa na toto vzťahujú daňové povinnosti",
   "contribution.amount.other.label": "Ostatné",
+  "Contribution.ChargeDate": "Charge Date",
   "contribution.createdAt": "Vytvorené dňa {date}",
   "contribution.edit": "Upraviť príspevok",
   "Contribution.GoToPage": "Prejsť na stránku s príspevkami",

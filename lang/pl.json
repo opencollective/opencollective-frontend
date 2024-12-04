@@ -938,6 +938,7 @@
   "ContributeTier.StartsAt": "Rozpocznij od",
   "ContributeTier.Taxes": "Taxes may apply",
   "contribution.amount.other.label": "Inne",
+  "Contribution.ChargeDate": "Charge Date",
   "contribution.createdAt": "Utworzono {date}",
   "contribution.edit": "Edytuj Wkład",
   "Contribution.GoToPage": "Przejdź do strony z wpłatami",
