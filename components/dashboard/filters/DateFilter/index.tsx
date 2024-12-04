@@ -40,7 +40,7 @@ export const orderDateFilter: FilterConfig<z.infer<typeof dateFilterSchema>> = {
   schema: dateFilterSchema,
   toVariables: value => dateToVariables(value, 'chargedDate'),
   filter: {
-    labelMsg: defineMessage({ id: 'expense.incurredAt', defaultMessage: 'Date' }),
+    labelMsg: defineMessage({ id: 'Contribution.ChargeDate', defaultMessage: 'Charge Date' }),
     Component: DateFilter,
     valueRenderer: DateFilterValue,
   },

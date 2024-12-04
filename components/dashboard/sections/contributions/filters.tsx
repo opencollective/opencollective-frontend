@@ -37,8 +37,8 @@ export const contributionsOrderFilter = buildSortFilter({
   },
   i18nCustomLabels: {
     LAST_CHARGED_AT: defineMessage({
-      id: 'expense.incurredAt',
-      defaultMessage: 'Date',
+      id: 'Contribution.ChargeDate',
+      defaultMessage: 'Charge Date',
     }),
   },
 });
