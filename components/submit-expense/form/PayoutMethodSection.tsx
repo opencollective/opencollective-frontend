@@ -387,7 +387,7 @@ function PayoutMethodRadioGroupItem(props: {
       },
       update(cache, result) {
         cache.writeFragment({
-          id: `Individual:${form.options.payee?.legacyId}`,
+          id: `Individual:${form.options.payee?.id}`,
           fragment: gql`
             fragment PayoutProfile on Account {
               legalName
@@ -397,6 +397,8 @@ function PayoutMethodRadioGroupItem(props: {
             legalName: result.data.editCollective.legalName,
           },
         });
+
+        form.refresh();
       },
     },
   );
@@ -596,7 +598,7 @@ function PayoutMethodRadioGroupItem(props: {
                   </MessageBox>
                 </div>
               )}
-              {hasLegalNameMismatch && !legalNameUpdated && (
+              {hasLegalNameMismatch && (
                 <MessageBox type="warning">
                   <div className="mb-2 font-bold">
                     <FormattedMessage defaultMessage="The names you provided do not match." id="XAPZa0" />
@@ -656,7 +658,7 @@ function PayoutMethodRadioGroupItem(props: {
                   )}
                 </MessageBox>
               )}
-              {legalNameUpdated && (
+              {legalNameUpdated && !hasLegalNameMismatch && (
                 <MessageBox type="warning">
                   <FormattedMessage
                     defaultMessage="Legal name is updated to match the payout method name."

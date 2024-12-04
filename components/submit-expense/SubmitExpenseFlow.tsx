@@ -144,9 +144,12 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
             slug: formOptions.payee?.slug,
           },
           payeeLocation: values.payeeLocation,
-          payoutMethod: {
-            id: values.payoutMethodId,
-          },
+          payoutMethod:
+            !values.payoutMethodId || values.payoutMethodId === '__newPayoutMethod'
+              ? { ...values.newPayoutMethod, isSaved: false }
+              : {
+                  id: values.payoutMethodId,
+                },
           type: values.expenseTypeOption,
           accountingCategory: values.accountingCategoryId
             ? {
@@ -202,6 +205,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
           result = await editExpense({
             variables: {
               expenseEditInput: editInput,
+              draftKey: props.draftKey,
             },
           });
           toast({
@@ -357,6 +361,12 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
         hideCloseButton
         overlayClassName="p-0 sm:p-0"
         className={'sm:max-w-screen sm:min-w-screen overflow-hidden rounded-none p-0 sm:rounded-none sm:p-0'}
+        onEscapeKeyDown={e => {
+          e.preventDefault();
+          if (open) {
+            handleOnClose();
+          }
+        }}
       >
         <div className="max-w-screen min-w-screen flex max-h-screen min-h-screen flex-col overflow-hidden bg-[#F8FAFC]">
           <header className="min-w-screen flex items-center justify-between border-b border-slate-100 px-4 py-3 sm:px-10">

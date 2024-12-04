@@ -618,6 +618,7 @@ function buildFormSchema(
         v => {
           if (
             options.isAdminOfPayee &&
+            v &&
             v !== '__newPayoutMethod' &&
             !options.payee?.payoutMethods?.some(pm => pm.id === v)
           ) {
@@ -890,7 +891,7 @@ function buildFormSchema(
         .nullish()
         .refine(
           type => {
-            if (values.payoutMethodId === '__newPayoutMethod') {
+            if (!values.payoutMethodId || values.payoutMethodId === '__newPayoutMethod') {
               return !!type;
             }
 
@@ -1163,16 +1164,17 @@ async function buildFormOptions(
     );
 
     const expense = query.data?.expense;
-    const recentlySubmittedExpenses = query.data?.recentlySubmittedExpenses;
-    const account = query.data?.account || options.expense?.account;
-    const host = account && 'host' in account ? account.host : null;
-    const payee = options.expense?.payee || query.data?.payee;
-    const payeeHost = payee && 'host' in payee ? payee.host : null;
-    const submitter = options.expense?.submitter || query.data?.submitter;
 
     if (expense) {
       options.expense = query.data.expense;
     }
+
+    const recentlySubmittedExpenses = query.data?.recentlySubmittedExpenses;
+    const account = values.accountSlug ? query.data?.account : options.expense?.account;
+    const host = account && 'host' in account ? account.host : null;
+    const payee = options.expense?.payee || query.data?.payee;
+    const payeeHost = payee && 'host' in payee ? payee.host : null;
+    const submitter = options.expense?.submitter || query.data?.submitter;
 
     if (recentlySubmittedExpenses) {
       options.recentlySubmittedExpenses = recentlySubmittedExpenses;
@@ -1225,7 +1227,7 @@ async function buildFormOptions(
     }
 
     if ((account?.supportedExpenseTypes ?? []).length > 0) {
-      options.supportedExpenseTypes = query.data.account.supportedExpenseTypes;
+      options.supportedExpenseTypes = account.supportedExpenseTypes;
     }
 
     if (query.data?.loggedInAccount) {
@@ -1418,7 +1420,7 @@ export function useExpenseForm(opts: {
         formOptions.expense.draft?.items?.map(ei => ({
           url: ei.url,
           description: ei.description ?? '',
-          incurredAt: dayjs.utc(ei.incurredAt).toDate(),
+          incurredAt: dayjs.utc(ei.incurredAt).toISOString().substring(0, 10),
           amount: {
             valueInCents: ei.amountV2?.valueInCents ?? ei.amount,
             currency: ei.amountV2?.currency ?? ei.currency,
@@ -1438,7 +1440,9 @@ export function useExpenseForm(opts: {
         formOptions.expense.items?.map(ei => ({
           url: !startOptions.current.duplicateExpense ? ei.url : null,
           description: ei.description ?? '',
-          incurredAt: !startOptions.current.duplicateExpense ? ei.incurredAt : null,
+          incurredAt: !startOptions.current.duplicateExpense
+            ? dayjs.utc(ei.incurredAt).toISOString().substring(0, 10)
+            : null,
           amount: {
             valueInCents: ei.amount.valueInCents,
             currency: ei.amount.currency,
