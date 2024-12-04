@@ -68,6 +68,7 @@ const ROOT_MENU = [
       { label: 'Unhost Account', section: ROOT_SECTIONS.UNHOST_ACCOUNTS },
       { label: 'Account Settings', section: ROOT_SECTIONS.ACCOUNT_SETTINGS },
       { label: 'Account Type', section: ROOT_SECTIONS.ACCOUNT_TYPE },
+      { label: 'Anonymize Account', section: ROOT_SECTIONS.ANONYMIZE_ACCOUNT },
       { label: 'Recurring Contributions', section: ROOT_SECTIONS.RECURRING_CONTRIBUTIONS },
       { label: 'Activity Log', section: ALL_SECTIONS.ACTIVITY_LOG },
       { label: 'Clear Cache', section: ROOT_SECTIONS.CLEAR_CACHE },
