@@ -118,7 +118,7 @@ const Tags = ({
   };
   return (
     <Flex flexWrap="wrap" alignItems="flex-start">
-      {expense?.type && <ExpenseTypeTag type={expense.type} legacyId={expense.legacyId} isLoading={isLoading} />}
+      {/* {expense?.type && <ExpenseTypeTag type={expense.type} legacyId={expense.legacyId} isLoading={isLoading} />} */}
 
       {canEdit ? (
         <TagsForAdmins expense={expense} order={order} suggestedTags={suggestedTags} />

@@ -6,6 +6,7 @@ import { createGlobalStyle } from 'styled-components';
 
 import { Sheet, SheetContent } from './ui/Sheet';
 import StyledRoundButton from './StyledRoundButton';
+import { cn } from '../lib/utils';
 
 const DrawerActionsContext = createContext(null);
 
@@ -25,6 +26,7 @@ export function Drawer({
   showActionsContainer,
   showCloseButton = false,
   'data-cy': dataCy,
+  withoutPadding,
 }: {
   open: boolean;
   onClose: () => void;
@@ -34,6 +36,7 @@ export function Drawer({
   showCloseButton?: boolean;
   'data-cy'?: string;
   className?: string;
+  withoutPadding?: boolean;
 }) {
   const [drawerActionsContainer, setDrawerActionsContainer] = useState(null);
 
@@ -64,7 +67,7 @@ export function Drawer({
         }}
       >
         <SheetContent className={clsx('flex flex-col gap-0 p-0', className)} ref={drawerRef} data-cy={dataCy}>
-          <div className="relative flex-1 overflow-y-scroll px-4 py-6 sm:px-6">
+          <div className={cn('relative flex-1', !withoutPadding && 'px-4 py-6 sm:px-6')}>
             {showCloseButton && (
               <StyledRoundButton
                 className="absolute right-5 top-5"

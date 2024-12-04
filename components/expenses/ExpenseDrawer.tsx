@@ -10,6 +10,8 @@ import { Drawer } from '../Drawer';
 
 import { expensePageQuery } from './graphql/queries';
 import Expense from './Expense';
+import NewExpense from './NewExpense';
+import DrawerHeader from '../DrawerHeader';
 
 type ExpenseDrawerProps = {
   handleClose: () => void;
@@ -37,30 +39,50 @@ export default function ExpenseDrawer({ openExpenseLegacyId, handleClose, initia
     }
   }, [openExpenseLegacyId]);
 
+  const useNewLayout = true;
   return (
     <Drawer
-      showCloseButton
+      showCloseButton={false}
       open={Boolean(openExpenseLegacyId)}
       onClose={handleClose}
-      showActionsContainer
+      // showActionsContainer
       data-cy="expense-drawer"
       className="max-w-3xl"
+      withoutPadding
     >
-      <Expense
-        data={initialExpenseValues ? { ...data, expense: { ...initialExpenseValues, ...data?.expense } } : data}
-        // Making sure to initially set loading to true before the query is called
-        loading={loading || (!data && !error)}
-        error={error}
-        refetch={refetch}
-        client={client}
-        fetchMore={fetchMore}
-        legacyExpenseId={openExpenseLegacyId}
-        startPolling={startPolling}
-        stopPolling={stopPolling}
-        isDrawer
-        onClose={handleClose}
-        enableKeyboardShortcuts={hasKeyboardShortcutsEnabled}
-      />
+      {useNewLayout ? (
+        <NewExpense
+          data={initialExpenseValues ? { ...data, expense: { ...initialExpenseValues, ...data?.expense } } : data}
+          // Making sure to initially set loading to true before the query is called
+          loading={loading || (!data && !error)}
+          error={error}
+          refetch={refetch}
+          client={client}
+          fetchMore={fetchMore}
+          legacyExpenseId={openExpenseLegacyId}
+          startPolling={startPolling}
+          stopPolling={stopPolling}
+          isDrawer
+          onClose={handleClose}
+          enableKeyboardShortcuts={hasKeyboardShortcutsEnabled}
+        />
+      ) : (
+        <Expense
+          data={initialExpenseValues ? { ...data, expense: { ...initialExpenseValues, ...data?.expense } } : data}
+          // Making sure to initially set loading to true before the query is called
+          loading={loading || (!data && !error)}
+          error={error}
+          refetch={refetch}
+          client={client}
+          fetchMore={fetchMore}
+          legacyExpenseId={openExpenseLegacyId}
+          startPolling={startPolling}
+          stopPolling={stopPolling}
+          isDrawer
+          onClose={handleClose}
+          enableKeyboardShortcuts={hasKeyboardShortcutsEnabled}
+        />
+      )}
     </Drawer>
   );
 }

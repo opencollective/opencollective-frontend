@@ -16,7 +16,7 @@ import { shouldDisplayExpenseCategoryPill } from './lib/accounting-categories';
 import { expenseTypeSupportsAttachments } from './lib/attachments';
 import { expenseItemsMustHaveFiles, getExpenseItemAmountV2FromNewAttrs } from './lib/items';
 import { getExpenseExchangeRateWarningOrError } from './lib/utils';
-
+import { Button } from '../ui/Button';
 import { AccountHoverCard } from '../AccountHoverCard';
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import Avatar from '../Avatar';
