@@ -594,6 +594,16 @@ interface Account {
     expectedDateTo: DateTime
 
     """
+    Return orders that were charged after this date
+    """
+    chargedDateFrom: DateTime
+
+    """
+    Return orders that were charged before this date
+    """
+    chargedDateTo: DateTime
+
+    """
     The term to search
     """
     searchTerm: String
@@ -1823,6 +1833,11 @@ enum DateTimeField {
   Transactions only: The date when a transaction was cleared by the payment processor
   """
   EFFECTIVE_DATE
+
+  """
+  Orders only: The date when an order was last charged, defaults to createdAt if never charged
+  """
+  LAST_CHARGED_AT
 }
 
 """
@@ -1952,6 +1967,7 @@ type Order {
   status: OrderStatus
   frequency: ContributionFrequency
   nextChargeDate: DateTime
+  lastChargedAt: DateTime
   tier: Tier
   fromAccount: Account
   toAccount: Account
@@ -3086,6 +3102,16 @@ type Host implements Account & AccountWithContributions {
     Only return pending orders that were expected before this date
     """
     expectedDateTo: DateTime
+
+    """
+    Return orders that were charged after this date
+    """
+    chargedDateFrom: DateTime
+
+    """
+    Return orders that were charged before this date
+    """
+    chargedDateTo: DateTime
 
     """
     The term to search
@@ -4314,6 +4340,7 @@ Possible fields you can use to order by
 """
 enum OrderByFieldType {
   CREATED_AT
+  LAST_CHARGED_AT
 
   """
   The financial activity of the collective (number of transactions)
@@ -4899,6 +4926,16 @@ type PaymentMethod {
     Only return pending orders that were expected before this date
     """
     expectedDateTo: DateTime
+
+    """
+    Return orders that were charged after this date
+    """
+    chargedDateFrom: DateTime
+
+    """
+    Return orders that were charged before this date
+    """
+    chargedDateTo: DateTime
 
     """
     The term to search
@@ -8182,6 +8219,16 @@ type Bot implements Account {
     expectedDateTo: DateTime
 
     """
+    Return orders that were charged after this date
+    """
+    chargedDateFrom: DateTime
+
+    """
+    Return orders that were charged before this date
+    """
+    chargedDateTo: DateTime
+
+    """
     The term to search
     """
     searchTerm: String
@@ -9037,6 +9084,16 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Only return pending orders that were expected before this date
     """
     expectedDateTo: DateTime
+
+    """
+    Return orders that were charged after this date
+    """
+    chargedDateFrom: DateTime
+
+    """
+    Return orders that were charged before this date
+    """
+    chargedDateTo: DateTime
 
     """
     The term to search
@@ -10427,6 +10484,16 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     expectedDateTo: DateTime
 
     """
+    Return orders that were charged after this date
+    """
+    chargedDateFrom: DateTime
+
+    """
+    Return orders that were charged before this date
+    """
+    chargedDateTo: DateTime
+
+    """
     The term to search
     """
     searchTerm: String
@@ -11535,6 +11602,16 @@ type Individual implements Account {
     expectedDateTo: DateTime
 
     """
+    Return orders that were charged after this date
+    """
+    chargedDateFrom: DateTime
+
+    """
+    Return orders that were charged before this date
+    """
+    chargedDateTo: DateTime
+
+    """
     The term to search
     """
     searchTerm: String
@@ -12598,6 +12675,16 @@ type Organization implements Account & AccountWithContributions {
     expectedDateTo: DateTime
 
     """
+    Return orders that were charged after this date
+    """
+    chargedDateFrom: DateTime
+
+    """
+    Return orders that were charged before this date
+    """
+    chargedDateTo: DateTime
+
+    """
     The term to search
     """
     searchTerm: String
@@ -13548,6 +13635,16 @@ type Vendor implements Account & AccountWithContributions {
     Only return pending orders that were expected before this date
     """
     expectedDateTo: DateTime
+
+    """
+    Return orders that were charged after this date
+    """
+    chargedDateFrom: DateTime
+
+    """
+    Return orders that were charged before this date
+    """
+    chargedDateTo: DateTime
 
     """
     The term to search
@@ -14745,6 +14842,16 @@ type Query {
     expectedDateTo: DateTime
 
     """
+    Return orders that were charged after this date
+    """
+    chargedDateFrom: DateTime
+
+    """
+    Return orders that were charged before this date
+    """
+    chargedDateTo: DateTime
+
+    """
     The term to search
     """
     searchTerm: String
@@ -14837,11 +14944,6 @@ type Query {
     The default limit for each entity type
     """
     defaultLimit: Int! = 10
-
-    """
-    Whether to use ElasticSearch or not
-    """
-    useElasticSearch: Boolean! = true
   ): SearchResponse!
   tagStats(
     """
@@ -17136,6 +17238,16 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     expectedDateTo: DateTime
 
     """
+    Return orders that were charged after this date
+    """
+    chargedDateFrom: DateTime
+
+    """
+    Return orders that were charged before this date
+    """
+    chargedDateTo: DateTime
+
+    """
     The term to search
     """
     searchTerm: String
@@ -18122,6 +18234,16 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     expectedDateTo: DateTime
 
     """
+    Return orders that were charged after this date
+    """
+    chargedDateFrom: DateTime
+
+    """
+    Return orders that were charged before this date
+    """
+    chargedDateTo: DateTime
+
+    """
     The term to search
     """
     searchTerm: String
@@ -18665,7 +18787,22 @@ type SearchResults {
   """
   Search results for Accounts
   """
-  accounts: SearchResultsAccounts
+  accounts(
+    """
+    Type of account
+    """
+    type: AccountType
+
+    """
+    Whether the account is a host or not
+    """
+    isHost: Boolean
+
+    """
+    Tags to filter the accounts
+    """
+    tags: [String]
+  ): SearchResultsAccounts
 
   """
   Search results for Comments
@@ -18825,11 +18962,6 @@ type Mutation {
     user: IndividualCreateInput
 
     """
-    Whether to trigger the automated approval for Open Source collectives with GitHub.
-    """
-    automateApprovalWithGithub: Boolean = false @deprecated(reason: "2022-10-12: This is now automated")
-
-    """
     A message to attach for the host to review the application
     """
     message: String
@@ -18853,6 +18985,11 @@ type Mutation {
     List of members to invite on Collective creation.
     """
     inviteMembers: [InviteMemberInput]
+
+    """
+    Marks the collective as approved directly. Only available in test/CI environments.
+    """
+    skipApprovalTestOnly: Boolean = false
   ): Collective
 
   """
@@ -18913,6 +19050,11 @@ type Mutation {
     Reference to the parent Account creating the Project.
     """
     parent: AccountReferenceInput
+
+    """
+    Set to true to disable contributions to this project. Host admins will still be able to add funds.
+    """
+    disableContributions: Boolean! = false
   ): Project
 
   """
