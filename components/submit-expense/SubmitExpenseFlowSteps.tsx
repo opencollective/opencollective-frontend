@@ -111,7 +111,7 @@ export function expenseFormStepError(intl: IntlShape, form: ExpenseForm, step: S
   return null;
 }
 
-export function expenseFormStepHasError(form: ExpenseForm, step: Step): boolean {
+function expenseFormStepHasError(form: ExpenseForm, step: Step): boolean {
   return !isExpenseFormStepCompleted(form, step);
 }
 
