@@ -20425,6 +20425,16 @@ type Mutation {
   ): [Expense]!
 
   """
+  [Root only] Anonymizes an account
+  """
+  rootAnonymizeAccount(
+    """
+    Account to anonymize
+    """
+    account: AccountReferenceInput!
+  ): Account!
+
+  """
   Refunds a transaction. Scope: "transactions".
   """
   refundTransaction(
