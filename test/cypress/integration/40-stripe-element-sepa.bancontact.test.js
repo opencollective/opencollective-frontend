@@ -39,7 +39,7 @@ describe('Contribute Flow: Stripe Payment Element', () => {
         });
       });
 
-      cy.createCollectiveV2({ host: { slug: 'e2e-eur-host' } }).as('collective');
+      cy.createCollectiveV2({ skipApproval: true, host: { slug: 'e2e-eur-host' } }).as('collective');
 
       // Stripe recently introduced a JS snippet that has a syntax error, which breaks the tests.
       // Feel free to remove that after some time, see if it's still needed.

@@ -206,7 +206,7 @@ Cypress.Commands.add('createExpense', ({ userEmail = defaultTestUserEmail, accou
 
 /**
  * Create a collective hosted by the open source collective.
- * TODO: Migrate this to GQLV2 -> `createCollective` with `automateApprovalWithGithub` set to true
+ * TODO: Migrate this to GQLV2 -> `createCollective` with `__skipApprovalTestOnly` set to true
  */
 Cypress.Commands.add('createHostedCollective', ({ userEmail = defaultTestUserEmail, ...collectiveParams } = {}) => {
   const collective = {
@@ -534,7 +534,7 @@ Cypress.Commands.add('getStripePaymentElement', getStripePaymentElement);
 
 Cypress.Commands.add(
   'createCollectiveV2',
-  ({ email = defaultTestUserEmail, testPayload, host, collective, applicationData } = {}) => {
+  ({ email = defaultTestUserEmail, testPayload, host, collective, applicationData, skipApproval = false } = {}) => {
     const user = { email, newsletterOptIn: false };
     return signinRequest(user, null).then(response => {
       const token = getTokenFromRedirectUrl(response.body.redirect);
@@ -546,12 +546,14 @@ Cypress.Commands.add(
             $host: AccountReferenceInput!
             $testPayload: JSON
             $applicationData: JSON
+            $skipApproval: Boolean
           ) {
             createCollective(
               collective: $collective
               host: $host
               testPayload: $testPayload
               applicationData: $applicationData
+              skipApprovalTestOnly: $skipApproval
             ) {
               id
               slug
@@ -571,6 +573,7 @@ Cypress.Commands.add(
             ...collective,
           },
           applicationData,
+          skipApproval,
         },
       }).then(({ body }) => {
         return body.data.createCollective;

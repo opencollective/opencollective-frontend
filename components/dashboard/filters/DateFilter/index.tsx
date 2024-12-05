@@ -36,6 +36,16 @@ export const expectedDateFilter: FilterConfig<z.infer<typeof dateFilterSchema>> 
   },
 };
 
+export const orderDateFilter: FilterConfig<z.infer<typeof dateFilterSchema>> = {
+  schema: dateFilterSchema,
+  toVariables: value => dateToVariables(value, 'chargedDate'),
+  filter: {
+    labelMsg: defineMessage({ id: 'Contribution.ChargeDate', defaultMessage: 'Charge Date' }),
+    Component: DateFilter,
+    valueRenderer: DateFilterValue,
+  },
+};
+
 const renderOptions = (value: DateFilterValueType, setValue: (val: DateFilterValueType) => void, intl) => {
   switch (value.type) {
     case DateFilterType.IN_LAST_PERIOD:
@@ -50,7 +60,7 @@ const renderOptions = (value: DateFilterValueType, setValue: (val: DateFilterVal
           />
           <Select
             defaultValue={Period.DAYS}
-            value={value?.period}
+            value={value.period}
             onValueChange={(period: Period) => setValue({ ...value, period })}
           >
             <SelectTrigger className="w-[180px]">
