@@ -81,6 +81,7 @@ export const SearchCommand = ({ open, setOpen }) => {
     variables: queryFilter.variables,
     notifyOnNetworkStatusChange: true,
     context: API_V2_CONTEXT,
+    fetchPolicy: 'cache-and-network',
   });
 
   const { debouncedValue: debouncedInput, isDebouncing } = useDebouncedValue(input, 500);
