@@ -59,7 +59,11 @@ export function ExpenseCategorySection(props: ExpenseCategorySectionProps) {
                 selectedAccountingCategory.name
               ) : (
                 <span className="text-muted-foreground">
-                  <FormattedMessage defaultMessage="Choose a category" id="H4hJvF" />
+                  {props.form.options.isAccountingCategoryRequired ? (
+                    <FormattedMessage defaultMessage="Choose a category" id="H4hJvF" />
+                  ) : (
+                    <FormattedMessage defaultMessage="I don't know" id="AkIyKO" />
+                  )}
                 </span>
               )}
               <ChevronsUpDown className="ml-2 opacity-50" size={16} />
@@ -69,6 +73,19 @@ export function ExpenseCategorySection(props: ExpenseCategorySectionProps) {
                 <Command>
                   <CommandInput autoFocus />
                   <CommandList>
+                    {!props.form.options.isAccountingCategoryRequired && (
+                      <CommandItem
+                        value=""
+                        onSelect={() => {
+                          setFieldValue('accountingCategoryId', null);
+                          setIsExpenseCategoryPickerOpen(false);
+                        }}
+                      >
+                        <div className="flex-grow">
+                          <FormattedMessage defaultMessage="I don't know" id="AkIyKO" />
+                        </div>
+                      </CommandItem>
+                    )}
                     {accountingCategories.map(a => (
                       <CommandItem
                         key={a.id}

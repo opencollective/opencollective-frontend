@@ -111,7 +111,7 @@ export function expenseFormStepError(intl: IntlShape, form: ExpenseForm, step: S
   return null;
 }
 
-export function expenseFormStepHasError(form: ExpenseForm, step: Step): boolean {
+function expenseFormStepHasError(form: ExpenseForm, step: Step): boolean {
   return !isExpenseFormStepCompleted(form, step);
 }
 
@@ -135,7 +135,13 @@ export function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
     Step.EXPENSE_CATEGORY,
     Step.EXPENSE_ITEMS,
     Step.EXPENSE_TITLE,
-  ];
+  ].filter(step => {
+    if (step === Step.EXPENSE_CATEGORY) {
+      return form.options.accountingCategories?.length;
+    }
+
+    return true;
+  });
 
   const firstIncompleteIdx = stepOrder.findIndex(s => !isExpenseFormStepCompleted(form, s));
 

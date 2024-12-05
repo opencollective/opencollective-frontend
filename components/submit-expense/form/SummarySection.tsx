@@ -25,7 +25,7 @@ import { Label } from '../../ui/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/Select';
 import UploadedFilePreview from '../../UploadedFilePreview';
 import { PayoutMethodDetailsContainer } from '../PayoutMethodDetails';
-import { expenseFormStepHasError, Step } from '../SubmitExpenseFlowSteps';
+import { Step } from '../SubmitExpenseFlowSteps';
 import { type ExpenseForm, RecurrenceFrequencyOption, YesNoOption } from '../useExpenseForm';
 
 import { FormSectionContainer } from './FormSectionContainer';
@@ -37,17 +37,8 @@ type SummarySectionProps = {
 export function SummarySection(props: SummarySectionProps) {
   const intl = useIntl();
 
-  const hasErrors =
-    Object.values(Step).some(step => expenseFormStepHasError(props.form, step)) && props.form.submitCount > 0;
-
   return (
-    <FormSectionContainer
-      step={Step.SUMMARY}
-      form={props.form}
-      inViewChange={props.inViewChange}
-      title={<FormattedMessage defaultMessage="Review Expense" id="9brjE4" />}
-      error={hasErrors ? 'Required' : null}
-    >
+    <FormSectionContainer step={Step.SUMMARY} form={props.form} inViewChange={props.inViewChange}>
       <div className="rounded-md border border-gray-300 p-4 text-sm">
         <div className="mb-4 flex justify-between">
           <div className="text-base font-bold">
