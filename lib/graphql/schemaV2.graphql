@@ -3556,6 +3556,24 @@ type Host implements Account & AccountWithContributions {
   ): ContributorCollection!
 
   """
+  [!] Warning: this query is currently in beta and the API might change
+  """
+  activeContributors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    dateFrom: DateTime
+    dateTo: DateTime
+    includeActiveRecurringContributions: Boolean
+  ): AccountCollection
+
+  """
   How much platform fees are charged for this account
   """
   platformFeePercent: Float!
@@ -4077,6 +4095,24 @@ interface AccountWithContributions {
   ): ContributorCollection!
 
   """
+  [!] Warning: this query is currently in beta and the API might change
+  """
+  activeContributors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    dateFrom: DateTime
+    dateTo: DateTime
+    includeActiveRecurringContributions: Boolean
+  ): AccountCollection
+
+  """
   How much platform fees are charged for this account
   """
   platformFeePercent: Float!
@@ -4195,6 +4231,16 @@ type Contributor {
   A public message from contributors to describe their contributions
   """
   publicMessage: String
+}
+
+"""
+A collection of "Accounts"
+"""
+type AccountCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Account]
 }
 
 """
@@ -4722,16 +4768,6 @@ type CommentCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [Comment]
-}
-
-"""
-A collection of "Accounts"
-"""
-type AccountCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [Account]
 }
 
 type ConversationStats {
@@ -9604,6 +9640,24 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   ): ContributorCollection!
 
   """
+  [!] Warning: this query is currently in beta and the API might change
+  """
+  activeContributors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    dateFrom: DateTime
+    dateTo: DateTime
+    includeActiveRecurringContributions: Boolean
+  ): AccountCollection
+
+  """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
   """
   platformContributionAvailable: Boolean!
@@ -11000,6 +11054,24 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     offset: Int! = 0
     roles: [MemberRole]
   ): ContributorCollection!
+
+  """
+  [!] Warning: this query is currently in beta and the API might change
+  """
+  activeContributors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    dateFrom: DateTime
+    dateTo: DateTime
+    includeActiveRecurringContributions: Boolean
+  ): AccountCollection
 
   """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
@@ -13125,6 +13197,24 @@ type Organization implements Account & AccountWithContributions {
   ): ContributorCollection!
 
   """
+  [!] Warning: this query is currently in beta and the API might change
+  """
+  activeContributors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    dateFrom: DateTime
+    dateTo: DateTime
+    includeActiveRecurringContributions: Boolean
+  ): AccountCollection
+
+  """
   How much platform fees are charged for this account
   """
   platformFeePercent: Float!
@@ -14087,6 +14177,24 @@ type Vendor implements Account & AccountWithContributions {
     offset: Int! = 0
     roles: [MemberRole]
   ): ContributorCollection!
+
+  """
+  [!] Warning: this query is currently in beta and the API might change
+  """
+  activeContributors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    dateFrom: DateTime
+    dateTo: DateTime
+    includeActiveRecurringContributions: Boolean
+  ): AccountCollection
 
   """
   How much platform fees are charged for this account
@@ -17756,6 +17864,24 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   ): ContributorCollection!
 
   """
+  [!] Warning: this query is currently in beta and the API might change
+  """
+  activeContributors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    dateFrom: DateTime
+    dateTo: DateTime
+    includeActiveRecurringContributions: Boolean
+  ): AccountCollection
+
+  """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
   """
   platformContributionAvailable: Boolean!
@@ -18750,6 +18876,24 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     offset: Int! = 0
     roles: [MemberRole]
   ): ContributorCollection!
+
+  """
+  [!] Warning: this query is currently in beta and the API might change
+  """
+  activeContributors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    dateFrom: DateTime
+    dateTo: DateTime
+    includeActiveRecurringContributions: Boolean
+  ): AccountCollection
 
   """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account

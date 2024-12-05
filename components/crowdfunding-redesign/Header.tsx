@@ -36,7 +36,7 @@ export function Header({ collective, profile, collapsed = false, activeTab, brea
             </div>
             <div className="space-y-3 text-center">
               <h1 className="text-balance text-3xl font-semibold">{profile?.name}</h1>
-              <p className="text-sm">{profile?.description}</p>
+              <p className="max-w-prose text-balance text-sm leading-normal">{profile?.description}</p>
               {hasSocialLinks && <SocialLinks socialLinks={collective.socialLinks} />}
             </div>
           </div>

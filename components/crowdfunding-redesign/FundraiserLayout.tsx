@@ -11,7 +11,8 @@ import Link from '../Link';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import { Button } from '../ui/Button';
 
-import { Goals } from './Goals';
+import { FundraiserStats } from './FundraiserStats';
+import { GoalProgress } from './GoalProgress';
 import { getDefaultFundraiserValues, getYouTubeIDFromUrl, triggerPrototypeToast } from './helpers';
 import ProfileLayout from './ProfileLayout';
 import { profilePageQuery } from './queries';
@@ -90,8 +91,12 @@ export function FundraiserLayout({ children, activeTab }) {
                   </div>
 
                   {/* sidebar */}
-                  <div className="w-full max-w-[420px] space-y-4">
-                    <Goals account={account} />
+                  <div className="w-full max-w-[420px] space-y-6">
+                    {fundraiser.goal ? (
+                      <GoalProgress accountSlug={account.slug} goal={fundraiser.goal} />
+                    ) : (
+                      <FundraiserStats account={account} />
+                    )}
 
                     <Button className="w-full" size="xl" onClick={triggerPrototypeToast}>
                       <FormattedMessage defaultMessage="Contribute" id="Contribute" />

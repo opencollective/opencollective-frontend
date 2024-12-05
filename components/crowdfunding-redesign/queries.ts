@@ -248,10 +248,59 @@ export const profileWrapperQuery = gql`
       description
       longDescription
       backgroundImageUrl
+      currency
+      stats {
+        yearlyBudget {
+          valueInCents
+          currency
+        }
+        totalAmountReceived(net: true) {
+          valueInCents
+          currency
+        }
+        totalAmountReceivedThisMonth: totalAmountReceived(
+          net: true
+          dateFrom: "2024-02-01T00:00:00.000Z"
+          dateTo: "2024-03-01T00:00:00.000Z"
+        ) {
+          valueInCents
+          currency
+        }
+        totalAmountReceivedThisYear: totalAmountReceived(
+          net: true
+          dateFrom: "2024-01-01T00:00:00.000Z"
+          dateTo: "2025-01-01T00:00:00.000Z"
+        ) {
+          valueInCents
+          currency
+        }
+      }
       ... on AccountWithParent {
         parent {
           id
           slug
+        }
+      }
+      # TODO: mutualize the account stuff as a fragment
+      ... on AccountWithContributions {
+        financialContributors: contributors(roles: [BACKER], limit: 5) {
+          totalCount
+          nodes {
+            id
+            name
+            roles
+            isAdmin
+            isCore
+            isBacker
+            since
+            image
+            description
+            collectiveSlug
+            totalAmountDonated
+            type
+            publicMessage
+            isIncognito
+          }
         }
       }
     }
@@ -270,6 +319,32 @@ export const profileWrapperQuery = gql`
       socialLinks {
         type
         url
+      }
+      stats {
+        yearlyBudget {
+          valueInCents
+          currency
+        }
+        totalAmountReceived(net: true) {
+          valueInCents
+          currency
+        }
+        totalAmountReceivedThisMonth: totalAmountReceived(
+          net: true
+          dateFrom: "2024-02-01T00:00:00.000Z"
+          dateTo: "2024-03-01T00:00:00.000Z"
+        ) {
+          valueInCents
+          currency
+        }
+        totalAmountReceivedThisYear: totalAmountReceived(
+          net: true
+          dateFrom: "2024-01-01T00:00:00.000Z"
+          dateTo: "2025-01-01T00:00:00.000Z"
+        ) {
+          valueInCents
+          currency
+        }
       }
       ... on AccountWithContributions {
         tiers {
@@ -294,6 +369,25 @@ export const profileWrapperQuery = gql`
             amountType
             frequency
             availableQuantity
+          }
+        }
+        financialContributors: contributors(roles: [BACKER], limit: 5) {
+          totalCount
+          nodes {
+            id
+            name
+            roles
+            isAdmin
+            isCore
+            isBacker
+            since
+            image
+            description
+            collectiveSlug
+            totalAmountDonated
+            type
+            publicMessage
+            isIncognito
           }
         }
       }
@@ -399,7 +493,7 @@ export const contributePageQuery = gql`
           }
         }
 
-        financialContributors: contributors(roles: [BACKER], limit: 150) {
+        financialContributors: contributors(roles: [BACKER], limit: 5) {
           totalCount
           nodes {
             id
@@ -483,6 +577,115 @@ export const contributePageQuery = gql`
             currency
           }
           contributorsCount
+        }
+      }
+    }
+  }
+`;
+
+export const goalProgressQuery = gql`
+  query GoalProgress($slug: String!, $oneYearAgo: DateTime, $thisMonthStart: DateTime, $thisYearStart: DateTime) {
+    account(slug: $slug) {
+      id
+      slug
+      type
+      currency
+      ... on AccountWithContributions {
+        activeContributors(limit: 5) {
+          totalCount
+          limit
+          nodes {
+            id
+            name
+            slug
+            type
+            imageUrl
+          }
+        }
+        activeContributorsForBudgetGoal: activeContributors(
+          includeActiveRecurringContributions: true
+          dateFrom: $oneYearAgo
+          limit: 5
+        ) {
+          totalCount
+          limit
+          nodes {
+            id
+            name
+            slug
+            type
+            imageUrl
+          }
+        }
+        activeContributorsForYearlyBudget: activeContributors(
+          includeActiveRecurringContributions: true
+          dateFrom: $oneYearAgo
+          limit: 5
+        ) {
+          totalCount
+          limit
+          nodes {
+            id
+            name
+            slug
+            type
+            imageUrl
+          }
+        }
+        activeContributorsForCalendarYear: activeContributors(dateFrom: $thisYearStart, limit: 5) {
+          totalCount
+          limit
+          nodes {
+            id
+            name
+            slug
+            type
+            imageUrl
+          }
+        }
+        activeContributorsForCalendarMonth: activeContributors(dateFrom: $thisMonthStart, limit: 5) {
+          totalCount
+          limit
+          nodes {
+            id
+            name
+            slug
+            type
+            imageUrl
+          }
+        }
+      }
+
+      stats {
+        yearlyBudget {
+          valueInCents
+          currency
+        }
+        totalAmountReceived(net: true) {
+          valueInCents
+          currency
+        }
+        totalAmountReceivedThisMonth: totalAmountReceived(net: true, dateFrom: $thisMonthStart) {
+          valueInCents
+          currency
+        }
+        totalAmountReceivedThisYear: totalAmountReceived(net: true, dateFrom: $thisYearStart) {
+          valueInCents
+          currency
+        }
+      }
+      members(role: [BACKER], limit: 5) {
+        totalCount
+        limit
+        nodes {
+          id
+          account {
+            id
+            name
+            slug
+            type
+            imageUrl
+          }
         }
       }
     }
