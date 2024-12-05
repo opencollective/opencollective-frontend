@@ -33,6 +33,7 @@ import { Step } from '../SubmitExpenseFlowSteps';
 import { type ExpenseForm } from '../useExpenseForm';
 
 import { FormSectionContainer } from './FormSectionContainer';
+import dayjs from 'dayjs';
 
 type ExpenseItemsSectionProps = {
   form: ExpenseForm;
@@ -40,11 +41,6 @@ type ExpenseItemsSectionProps = {
 };
 
 export function ExpenseItemsSection(props: ExpenseItemsSectionProps) {
-  const intl = useIntl();
-  const expenseItems = props.form.values.expenseItems;
-
-  const { setFieldValue } = props.form;
-
   return (
     <FormSectionContainer
       step={Step.EXPENSE_ITEMS}
@@ -58,116 +54,128 @@ export function ExpenseItemsSection(props: ExpenseItemsSectionProps) {
       }
     >
       <React.Fragment>
-        {!props.form.initialLoading &&
-          expenseItems.map((ei, i) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <div key={i} className="flex gap-4">
-              <div className="flex-grow">
-                <ExpenseItem form={props.form} index={i} />
-              </div>
-              <div>
-                <Button
-                  onClick={() => {
-                    setFieldValue('expenseItems', [...expenseItems.slice(0, i), ...expenseItems.slice(i + 1)]);
-                  }}
-                  disabled={expenseItems.length === 1}
-                  variant="outline"
-                  size="icon-sm"
-                >
-                  <Trash2 size={16} />
-                </Button>
-              </div>
-            </div>
-          ))}
-
-        {props.form.initialLoading && (
-          <div className="mb-4">
-            <LoadingPlaceholder width={1} height={120} />
-          </div>
-        )}
-        <div className="flex justify-between pr-12">
-          <Button
-            variant="outline"
-            disabled={props.form.initialLoading}
-            onClick={() =>
-              setFieldValue('expenseItems', [
-                ...expenseItems,
-                {
-                  amount: { valueInCents: 0, currency: props.form.options.expenseCurrency },
-                  description: '',
-                  incurredAt: new Date().toISOString(),
-                  attachment: '',
-                },
-              ])
-            }
-          >
-            Add invoice item
-          </Button>
-          <div>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-right">
-              {props.form.values.hasTax && props.form.values.tax && (
-                <React.Fragment>
-                  <div>Subtotal:</div>
-                  <div>
-                    <FormattedMoneyAmount
-                      amount={props.form.options.totalInvoicedInExpenseCurrency}
-                      precision={2}
-                      currency={props.form.options.expenseCurrency}
-                      showCurrencyCode
-                    />
-                  </div>
-                </React.Fragment>
-              )}
-              {props.form.values.hasTax && props.form.values.tax && (
-                <React.Fragment>
-                  <span className="captilize">
-                    {i18nTaxType(intl, props.form.options.taxType, 'short')}
-                    {isTaxRateValid(props.form.values.tax.rate) && ` (${round(props.form.values.tax.rate * 100, 2)}%)`}:
-                  </span>
-                  <div>
-                    <FormattedMoneyAmount
-                      amount={
-                        !isTaxRateValid(props.form.values.tax.rate)
-                          ? null
-                          : getTaxAmount(props.form.options.totalInvoicedInExpenseCurrency, props.form.values.tax)
-                      }
-                      precision={2}
-                      currency={props.form.options.expenseCurrency}
-                      showCurrencyCode
-                    />
-                  </div>
-                </React.Fragment>
-              )}
-
-              <div className="col-span-2 text-right">
-                <FormattedMoneyAmount
-                  amount={
-                    props.form.values.hasTax && props.form.values.tax && isTaxRateValid(props.form.values.tax.rate)
-                      ? getTaxAmount(props.form.options.totalInvoicedInExpenseCurrency, props.form.values.tax) +
-                        props.form.options.totalInvoicedInExpenseCurrency
-                      : props.form.options.totalInvoicedInExpenseCurrency
-                  }
-                  precision={2}
-                  currency={props.form.options.expenseCurrency}
-                  showCurrencyCode
-                  amountClassName="font-bold"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {props.form.options.taxType && (
-          <React.Fragment>
-            <div className="my-4 border-t border-gray-200" />
-            <Taxes form={props.form} />
-          </React.Fragment>
-        )}
+        <ExpenseItemsForm form={props.form} />
 
         <div className="my-4 border-t border-gray-200" />
         <AdditionalAttachments form={props.form} />
       </React.Fragment>
     </FormSectionContainer>
+  );
+}
+
+export function ExpenseItemsForm(props: { form: ExpenseForm }) {
+  const intl = useIntl();
+  const expenseItems = props.form.values.expenseItems;
+  const { setFieldValue } = props.form;
+
+  return (
+    <React.Fragment>
+      {!props.form.initialLoading &&
+        expenseItems?.map((ei, i) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <div key={i} className="flex gap-4">
+            <div className="flex-grow">
+              <ExpenseItem form={props.form} index={i} />
+            </div>
+            <div>
+              <Button
+                onClick={() => {
+                  setFieldValue('expenseItems', [...expenseItems.slice(0, i), ...expenseItems.slice(i + 1)]);
+                }}
+                disabled={expenseItems.length === 1}
+                variant="outline"
+                size="icon-sm"
+              >
+                <Trash2 size={16} />
+              </Button>
+            </div>
+          </div>
+        ))}
+
+      {props.form.initialLoading && (
+        <div className="mb-4">
+          <LoadingPlaceholder width={1} height={120} />
+        </div>
+      )}
+      <div className="flex justify-between pr-12">
+        <Button
+          variant="outline"
+          disabled={props.form.initialLoading}
+          onClick={() =>
+            setFieldValue('expenseItems', [
+              ...expenseItems,
+              {
+                amount: { valueInCents: 0, currency: props.form.options.expenseCurrency },
+                description: '',
+                incurredAt: new Date().toISOString(),
+                attachment: '',
+              },
+            ])
+          }
+        >
+          Add invoice item
+        </Button>
+        <div>
+          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-right">
+            {props.form.values.hasTax && props.form.values.tax && (
+              <React.Fragment>
+                <div>Subtotal:</div>
+                <div>
+                  <FormattedMoneyAmount
+                    amount={props.form.options?.totalInvoicedInExpenseCurrency}
+                    precision={2}
+                    currency={props.form.options?.expenseCurrency}
+                    showCurrencyCode
+                  />
+                </div>
+              </React.Fragment>
+            )}
+            {props.form.values.hasTax && props.form.values.tax && (
+              <React.Fragment>
+                <span className="captilize">
+                  {i18nTaxType(intl, props.form.options.taxType, 'short')}
+                  {isTaxRateValid(props.form.values.tax.rate) && ` (${round(props.form.values.tax.rate * 100, 2)}%)`}:
+                </span>
+                <div>
+                  <FormattedMoneyAmount
+                    amount={
+                      !isTaxRateValid(props.form.values.tax.rate)
+                        ? null
+                        : getTaxAmount(props.form.options.totalInvoicedInExpenseCurrency, props.form.values.tax)
+                    }
+                    precision={2}
+                    currency={props.form.options.expenseCurrency}
+                    showCurrencyCode
+                  />
+                </div>
+              </React.Fragment>
+            )}
+
+            <div className="col-span-2 text-right">
+              <FormattedMoneyAmount
+                amount={
+                  props.form.values.hasTax && props.form.values.tax && isTaxRateValid(props.form.values.tax.rate)
+                    ? getTaxAmount(props.form.options.totalInvoicedInExpenseCurrency, props.form.values.tax) +
+                      props.form.options.totalInvoicedInExpenseCurrency
+                    : props.form.options.totalInvoicedInExpenseCurrency
+                }
+                precision={2}
+                currency={props.form.options.expenseCurrency}
+                showCurrencyCode
+                amountClassName="font-bold"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {props.form.options.taxType && (
+        <React.Fragment>
+          <div className="my-4 border-t border-gray-200" />
+          <Taxes form={props.form} />
+        </React.Fragment>
+      )}
+    </React.Fragment>
   );
 }
 
@@ -208,7 +216,13 @@ function ExpenseItem(props: ExpenseItemProps) {
                     kind="EXPENSE_ITEM"
                     id={attachmentId}
                     name={attachmentId}
-                    value={typeof item.attachment === 'string' ? item.attachment : item.attachment?.url}
+                    value={
+                      typeof item.attachment === 'string'
+                        ? item.attachment
+                        : item.url === 'string'
+                          ? item.url
+                          : item.attachment?.url
+                    }
                     isMulti={false}
                     showActions
                     size={112}
@@ -245,7 +259,10 @@ function ExpenseItem(props: ExpenseItemProps) {
                 label={intl.formatMessage({ defaultMessage: 'Date', id: 'expense.incurredAt' })}
                 name={`expenseItems.${props.index}.incurredAt`}
               >
-                {({ field }) => <Input type="date" {...field} />}
+                {({ field }) => {
+                  const value = field.value ? dayjs.utc(field.value).format('YYYY-MM-DD') : undefined;
+                  return <Input type="date" {...field} value={value} />;
+                }}
               </StyledInputFormikField>
             </div>
 

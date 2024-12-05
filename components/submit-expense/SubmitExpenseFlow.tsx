@@ -464,6 +464,8 @@ function ExpenseFormikContainer(props: {
     onSubmit: props.onSubmit,
   });
 
+  console.log({ expenseForm });
+
   return (
     <FormikProvider value={expenseForm}>
       <SubmitExpenseFlowSteps

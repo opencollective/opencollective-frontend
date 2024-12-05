@@ -28,6 +28,7 @@ import { H4, P, Span } from '../Text';
 
 import PayoutMethodData from './PayoutMethodData';
 import PayoutMethodTypeWithIcon from './PayoutMethodTypeWithIcon';
+import EditExpenseDialog from './EditExpenseDialog';
 
 const CreatedByUserLink = ({ account }) => {
   return (
@@ -197,13 +198,22 @@ const ExpenseSummaryAdditionalInformation = ({
         </PrivateInfoColumn>
       )}
       <PrivateInfoColumn data-cy="expense-summary-payee">
-        <PrivateInfoColumnHeader>
-          {isPaid ? (
-            <FormattedMessage id="Expense.PaidTo" defaultMessage="Paid to" />
-          ) : (
-            <FormattedMessage id="Expense.PayTo" defaultMessage="Pay to" />
-          )}
-        </PrivateInfoColumnHeader>
+        <div className="flex justify-between gap-2">
+          <PrivateInfoColumnHeader>
+            {isPaid ? (
+              <FormattedMessage id="Expense.PaidTo" defaultMessage="Paid to" />
+            ) : (
+              <FormattedMessage id="Expense.PayTo" defaultMessage="Pay to" />
+            )}
+          </PrivateInfoColumnHeader>
+          <EditExpenseDialog
+            field={'payee'}
+            expense={expense}
+            title={'Edit payee'}
+            dialogContentClassName="sm:max-w-xl"
+          />
+        </div>
+
         <AccountHoverCard
           account={payee}
           includeAdminMembership={{
@@ -258,9 +268,18 @@ const ExpenseSummaryAdditionalInformation = ({
         )}
       </PrivateInfoColumn>
       <PrivateInfoColumn mr={0}>
-        <PrivateInfoColumnHeader>
-          <FormattedMessage id="expense.payoutMethod" defaultMessage="payout method" />
-        </PrivateInfoColumnHeader>
+        <div className="flex justify-between gap-2">
+          <PrivateInfoColumnHeader>
+            <FormattedMessage id="expense.payoutMethod" defaultMessage="payout method" />
+          </PrivateInfoColumnHeader>
+          <EditExpenseDialog
+            field={'payoutMethod'}
+            expense={expense}
+            title={'Edit payout method'}
+            dialogContentClassName="sm:max-w-xl"
+          />
+        </div>
+
         <Container fontSize="14px" color="black.700">
           <Box mb={3} data-cy="expense-summary-payout-method-type">
             <PayoutMethodTypeWithIcon

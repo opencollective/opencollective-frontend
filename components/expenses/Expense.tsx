@@ -179,6 +179,7 @@ function Expense(props) {
 
   // Automatically edit expense if missing receipt
   useEffect(() => {
+    console.log({ descriptionInDataEffect: data?.expense?.description });
     const expense = data?.expense;
     const isMissingReceipt =
       expense?.status === ExpenseStatus.PAID &&

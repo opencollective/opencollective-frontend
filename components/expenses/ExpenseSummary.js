@@ -2,11 +2,11 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import { includes } from 'lodash';
-import { MessageSquare } from 'lucide-react';
+import { MessageSquare, Pen } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
-
+import { DataList, DataListItem } from '../ui/DataList';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
@@ -16,6 +16,7 @@ import { shouldDisplayExpenseCategoryPill } from './lib/accounting-categories';
 import { expenseTypeSupportsAttachments } from './lib/attachments';
 import { expenseItemsMustHaveFiles, getExpenseItemAmountV2FromNewAttrs } from './lib/items';
 import { getExpenseExchangeRateWarningOrError } from './lib/utils';
+import ExpenseTypeTag from './ExpenseTypeTag';
 
 import { AccountHoverCard } from '../AccountHoverCard';
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
@@ -33,6 +34,7 @@ import { H1, P, Span } from '../Text';
 import TruncatedTextWithTooltip from '../TruncatedTextWithTooltip';
 import UploadedFilePreview from '../UploadedFilePreview';
 
+import EditExpenseDialog from './EditExpenseDialog';
 import { ExpenseAccountingCategoryPill } from './ExpenseAccountingCategoryPill';
 import ExpenseAmountBreakdown from './ExpenseAmountBreakdown';
 import ExpenseAttachedFiles from './ExpenseAttachedFiles';
@@ -40,6 +42,8 @@ import ExpenseMoreActionsButton from './ExpenseMoreActionsButton';
 import ExpenseStatusTag from './ExpenseStatusTag';
 import ExpenseSummaryAdditionalInformation from './ExpenseSummaryAdditionalInformation';
 import ProcessExpenseButtons, { hasProcessButtons } from './ProcessExpenseButtons';
+import { i18nExpenseType } from '../../lib/i18n/expense';
+import { InfoList, InfoListItem } from '../ui/InfoList';
 
 export const SummaryHeader = styled(H1)`
   > a {
@@ -118,7 +122,8 @@ const ExpenseSummary = ({
   const isLoggedInUserExpenseHostAdmin = LoggedInUser?.isHostAdmin(expense?.account);
   const isLoggedInUserExpenseAdmin = LoggedInUser?.isAdminOfCollective(expense?.account);
   const isViewingExpenseInHostContext = isLoggedInUserExpenseHostAdmin && !isLoggedInUserExpenseAdmin;
-
+  const canEditFields = true;
+  console.log({ descriptionInSummary: expense?.description });
   const processButtons = (
     <Flex
       display="flex"
@@ -174,7 +179,7 @@ const ExpenseSummary = ({
         data-cy="expense-title"
         mb={3}
       >
-        <Flex mr={[0, 2]}>
+        <div className="mr-0 flex items-center gap-4 sm:mr-2">
           <h4 className="text-xl font-medium" data-cy="expense-description">
             {!expense?.description && isLoading ? (
               <LoadingPlaceholder height={32} minWidth={250} />
@@ -182,7 +187,14 @@ const ExpenseSummary = ({
               expense.description
             )}
           </h4>
-        </Flex>
+          {canEditFields && (
+            <EditExpenseDialog
+              expense={expense}
+              field="title"
+              title={intl.formatMessage({ defaultMessage: 'Edit expense title', id: 'jMI3+l' })}
+            />
+          )}
+        </div>
         <Flex mb={[3, 0]} justifyContent={['space-between', 'flex-end']} alignItems="center">
           {expense?.status && (
             <Box>
@@ -199,6 +211,20 @@ const ExpenseSummary = ({
           )}
         </Flex>
       </Flex>
+      {expense?.type && (
+        <div className="mb-3 flex items-baseline gap-2">
+          <ExpenseTypeTag type={expense.type} legacyId={expense.legacyId} isLoading={isLoading} />
+
+          <EditExpenseDialog
+            field="type"
+            title="Edit type"
+            description="To edit expense type, use the legacy edit expense flow."
+            expense={expense}
+            onEdit={onEdit}
+          />
+        </div>
+      )}
+
       <div className="flex items-baseline gap-2">
         {shouldDisplayExpenseCategoryPill(LoggedInUser, expense, collective, host) && (
           <React.Fragment>
@@ -348,7 +374,7 @@ const ExpenseSummary = ({
         </Fragment>
       )}
 
-      <Flex mt={4} mb={2} alignItems="center">
+      <Flex mt={4} mb={2} alignItems="center" gridGap={2}>
         {!expense && isLoading ? (
           <LoadingPlaceholder height={20} maxWidth={150} />
         ) : (
@@ -362,7 +388,15 @@ const ExpenseSummary = ({
             )}
           </Span>
         )}
-        <StyledHr flex="1 1" borderColor="black.300" ml={2} />
+        <StyledHr flex="1 1" borderColor="black.300" />
+        {canEditFields && (
+          <EditExpenseDialog
+            expense={expense}
+            dialogContentClassName="sm:max-w-xl"
+            field="expenseItems"
+            title={intl.formatMessage({ defaultMessage: 'Edit expense items', id: 'lzRZ91' })}
+          />
+        )}
       </Flex>
       {!expense && isLoading ? (
         <LoadingPlaceholder height={68} mb={3} />

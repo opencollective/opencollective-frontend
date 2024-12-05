@@ -88,7 +88,7 @@ TagsForAdmins.propTypes = {
 const Tag = styled(StyledTag).attrs({
   mb: '4px',
   mr: '4px',
-  variant: 'rounded-right',
+  variant: 'rounded',
 })``;
 
 const Tags = ({
@@ -118,7 +118,7 @@ const Tags = ({
   };
   return (
     <Flex flexWrap="wrap" alignItems="flex-start">
-      {expense?.type && <ExpenseTypeTag type={expense.type} legacyId={expense.legacyId} isLoading={isLoading} />}
+      {/* {expense?.type && <ExpenseTypeTag type={expense.type} legacyId={expense.legacyId} isLoading={isLoading} />} */}
 
       {canEdit ? (
         <TagsForAdmins expense={expense} order={order} suggestedTags={suggestedTags} />

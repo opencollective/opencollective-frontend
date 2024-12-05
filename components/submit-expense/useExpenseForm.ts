@@ -566,12 +566,13 @@ type RecursivePartial<T> = {
       : T[P];
 };
 
-function buildFormSchema(
+export function buildFormSchema(
   values: ExpenseFormValues,
   options: Omit<ExpenseFormOptions, 'schema'>,
   intl: IntlShape,
+  pick?: any,
 ): z.ZodType<RecursivePartial<ExpenseFormValues>, z.ZodObjectDef, RecursivePartial<ExpenseFormValues>> {
-  return z.object({
+  const schema = z.object({
     accountSlug: z
       .string()
       .nullish()
@@ -1140,6 +1141,8 @@ function buildFormSchema(
         ),
     }),
   });
+
+  return pick ? schema.pick(pick) : schema;
 }
 
 function getPayeeSlug(values: ExpenseFormValues): string {
@@ -1163,6 +1166,7 @@ async function buildFormOptions(
   values: ExpenseFormValues,
   startOptions: ExpenseFormStartOptions,
   refresh?: boolean,
+  pick?: any,
 ): Promise<ExpenseFormOptions> {
   const options: ExpenseFormOptions = { schema: z.object({}) };
 
@@ -1300,8 +1304,11 @@ async function buildFormOptions(
       options.totalInvoicedInExpenseCurrency = totalInvoiced;
     }
 
-    options.schema = buildFormSchema(values, options, intl);
+    options.schema = buildFormSchema(values, options, intl, pick);
 
+    // if (pick) {
+    //   options.schema = options.schema.pick(pick);
+    // }
     return options;
   } catch (err) {
     // eslint-disable-next-line no-console
@@ -1346,6 +1353,7 @@ export function useExpenseForm(opts: {
     options: ExpenseFormOptions,
     startOptions: ExpenseFormStartOptions,
   ) => void | Promise<any>;
+  pick?: any;
 }): ExpenseForm {
   const intl = useIntl();
   const apolloClient = useApolloClient();
@@ -1461,7 +1469,9 @@ export function useExpenseForm(opts: {
       setFieldValue(
         'expenseItems',
         formOptions.expense.items?.map(ei => ({
-          url: !startOptions.current.duplicateExpense ? ei.url : null,
+          attachment: ei.url,
+          url: ei.url, // !startOptions.current.duplicateExpense ? ei.url : null,
+          // url: !startOptions.current.duplicateExpense ? ei.url : null,
           description: ei.description ?? '',
           incurredAt: !startOptions.current.duplicateExpense
             ? dayjs.utc(ei.incurredAt).toISOString().substring(0, 10)
@@ -1608,7 +1618,15 @@ export function useExpenseForm(opts: {
   React.useEffect(() => {
     async function refreshFormOptions() {
       setFormOptions(
-        await buildFormOptions(intl, apolloClient, LoggedInUser, expenseForm.values, startOptions.current),
+        await buildFormOptions(
+          intl,
+          apolloClient,
+          LoggedInUser,
+          expenseForm.values,
+          startOptions.current,
+          false,
+          opts.pick,
+        ),
       );
       if (!startOptions.current.expenseId) {
         initialLoading.current = false;
@@ -1651,7 +1669,15 @@ export function useExpenseForm(opts: {
     initialLoading: initialLoading.current,
     refresh: async () =>
       setFormOptions(
-        await buildFormOptions(intl, apolloClient, LoggedInUser, expenseForm.values, startOptions.current, true),
+        await buildFormOptions(
+          intl,
+          apolloClient,
+          LoggedInUser,
+          expenseForm.values,
+          startOptions.current,
+          true,
+          opts.pick,
+        ),
       ),
   });
 }
