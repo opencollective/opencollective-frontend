@@ -556,7 +556,7 @@ interface Account {
     """
     Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
     """
-    frequency: ContributionFrequency
+    frequency: [ContributionFrequency]
 
     """
     Use this field to filter orders on their statuses
@@ -613,6 +613,7 @@ interface Account {
     """
     searchTerm: String
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tier: [TierReferenceInput]
 
     """
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
@@ -2570,11 +2571,6 @@ type Expense {
   merchantId: String
 
   """
-  The reference text used in the payment transfer
-  """
-  transferReference: String
-
-  """
   Fields that cannot be edited on this expense
   """
   lockedFields: [ExpenseLockableFields]
@@ -3076,7 +3072,7 @@ type Host implements Account & AccountWithContributions {
     """
     Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
     """
-    frequency: ContributionFrequency
+    frequency: [ContributionFrequency]
 
     """
     Use this field to filter orders on their statuses
@@ -3133,6 +3129,7 @@ type Host implements Account & AccountWithContributions {
     """
     searchTerm: String
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tier: [TierReferenceInput]
 
     """
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
@@ -4595,6 +4592,23 @@ enum AccountOrdersFilter {
   OUTGOING
 }
 
+input TierReferenceInput {
+  """
+  The id assigned to the Tier
+  """
+  id: String
+
+  """
+  The DB id assigned to the Tier
+  """
+  legacyId: Int
+
+  """
+  Pass this flag to reference the custom tier (/donate)
+  """
+  isCustom: Boolean
+}
+
 """
 Expected funds filter (ALL_EXPECTED_FUNDS, ONLY_PENDING, ONLY_MANUAL)
 """
@@ -4936,7 +4950,7 @@ type PaymentMethod {
     """
     Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
     """
-    frequency: ContributionFrequency
+    frequency: [ContributionFrequency]
 
     """
     Use this field to filter orders on their statuses
@@ -4993,6 +5007,7 @@ type PaymentMethod {
     """
     searchTerm: String
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tier: [TierReferenceInput]
 
     """
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
@@ -8232,7 +8247,7 @@ type Bot implements Account {
     """
     Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
     """
-    frequency: ContributionFrequency
+    frequency: [ContributionFrequency]
 
     """
     Use this field to filter orders on their statuses
@@ -8289,6 +8304,7 @@ type Bot implements Account {
     """
     searchTerm: String
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tier: [TierReferenceInput]
 
     """
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
@@ -9104,7 +9120,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
     """
-    frequency: ContributionFrequency
+    frequency: [ContributionFrequency]
 
     """
     Use this field to filter orders on their statuses
@@ -9161,6 +9177,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     searchTerm: String
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tier: [TierReferenceInput]
 
     """
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
@@ -10525,7 +10542,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
     """
-    frequency: ContributionFrequency
+    frequency: [ContributionFrequency]
 
     """
     Use this field to filter orders on their statuses
@@ -10582,6 +10599,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     searchTerm: String
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tier: [TierReferenceInput]
 
     """
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
@@ -11666,7 +11684,7 @@ type Individual implements Account {
     """
     Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
     """
-    frequency: ContributionFrequency
+    frequency: [ContributionFrequency]
 
     """
     Use this field to filter orders on their statuses
@@ -11723,6 +11741,7 @@ type Individual implements Account {
     """
     searchTerm: String
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tier: [TierReferenceInput]
 
     """
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
@@ -12744,7 +12763,7 @@ type Organization implements Account & AccountWithContributions {
     """
     Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
     """
-    frequency: ContributionFrequency
+    frequency: [ContributionFrequency]
 
     """
     Use this field to filter orders on their statuses
@@ -12801,6 +12820,7 @@ type Organization implements Account & AccountWithContributions {
     """
     searchTerm: String
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tier: [TierReferenceInput]
 
     """
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
@@ -13729,7 +13749,7 @@ type Vendor implements Account & AccountWithContributions {
     """
     Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
     """
-    frequency: ContributionFrequency
+    frequency: [ContributionFrequency]
 
     """
     Use this field to filter orders on their statuses
@@ -13786,6 +13806,7 @@ type Vendor implements Account & AccountWithContributions {
     """
     searchTerm: String
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tier: [TierReferenceInput]
 
     """
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
@@ -14952,7 +14973,7 @@ type Query {
     """
     Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
     """
-    frequency: ContributionFrequency
+    frequency: [ContributionFrequency]
 
     """
     Use this field to filter orders on their statuses
@@ -15009,6 +15030,7 @@ type Query {
     """
     searchTerm: String
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tier: [TierReferenceInput]
 
     """
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
@@ -17358,7 +17380,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
     """
-    frequency: ContributionFrequency
+    frequency: [ContributionFrequency]
 
     """
     Use this field to filter orders on their statuses
@@ -17415,6 +17437,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     searchTerm: String
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tier: [TierReferenceInput]
 
     """
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
@@ -18377,7 +18400,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
     """
-    frequency: ContributionFrequency
+    frequency: [ContributionFrequency]
 
     """
     Use this field to filter orders on their statuses
@@ -18434,6 +18457,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     searchTerm: String
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tier: [TierReferenceInput]
 
     """
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
@@ -19090,23 +19114,6 @@ type SearchResultsUpdates {
   collection: UpdateCollection!
   highlights: JSONObject
   maxScore: Float!
-}
-
-input TierReferenceInput {
-  """
-  The id assigned to the Tier
-  """
-  id: String
-
-  """
-  The DB id assigned to the Tier
-  """
-  legacyId: Int
-
-  """
-  Pass this flag to reference the custom tier (/donate)
-  """
-  isCustom: Boolean
 }
 
 input TransactionReferenceInput {
