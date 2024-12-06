@@ -1,6 +1,7 @@
 import { defineMessages } from 'react-intl';
 
 import { ORDER_STATUS } from '../constants/order-status';
+import { ContributionFrequency } from '../graphql/types/v2/graphql';
 
 const MESSAGES = defineMessages({
   ALL: {
@@ -65,9 +66,29 @@ const MESSAGES = defineMessages({
   },
 });
 
-const i18nOrderStatus = (intl, status) => {
+export const i18nOrderStatus = (intl, status) => {
   const i18nMsg = MESSAGES[status];
   return i18nMsg ? intl.formatMessage(i18nMsg) : status;
+};
+
+export const I18nFrequencyMessages = defineMessages({
+  [ContributionFrequency.ONETIME]: {
+    id: 'Frequency.OneTime',
+    defaultMessage: 'One time',
+  },
+  [ContributionFrequency.MONTHLY]: {
+    id: 'Frequency.Monthly',
+    defaultMessage: 'Monthly',
+  },
+  [ContributionFrequency.YEARLY]: {
+    id: 'Frequency.Yearly',
+    defaultMessage: 'Yearly',
+  },
+});
+
+export const i18nFrequency = (intl, frequency) => {
+  const i18nMsg = I18nFrequencyMessages[frequency];
+  return i18nMsg ? intl.formatMessage(i18nMsg) : frequency;
 };
 
 export default i18nOrderStatus;
