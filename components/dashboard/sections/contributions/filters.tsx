@@ -4,10 +4,9 @@ import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../../lib/filters/schemas';
-import type { DashboardRecurringContributionsQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
-import type { Currency } from '../../../../lib/graphql/types/v2/schema';
-import { ContributionFrequency, OrderStatus } from '../../../../lib/graphql/types/v2/schema';
-import i18nOrderStatus from '../../../../lib/i18n/order-status';
+import type { Currency, DashboardRecurringContributionsQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import { ContributionFrequency, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
+import { i18nFrequency, i18nOrderStatus } from '../../../../lib/i18n/order';
 import { sortSelectOptions } from '../../../../lib/utils';
 
 import { amountFilter } from '../../filters/AmountFilter';
@@ -16,19 +15,6 @@ import { expectedDateFilter, orderDateFilter } from '../../filters/DateFilter';
 import { expectedFundsFilter } from '../../filters/ExpectedFundsFilter';
 import { searchFilter } from '../../filters/SearchFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
-
-// Pseudo type filter
-export enum OrderTypeFilter {
-  RECURRING = 'RECURRING',
-  ONETIME = 'ONETIME',
-}
-const i18nOrderType = (intl, value) => {
-  const langs = {
-    [OrderTypeFilter.RECURRING]: intl.formatMessage({ defaultMessage: 'Recurring', id: 'v84fNv' }),
-    [OrderTypeFilter.ONETIME]: intl.formatMessage({ defaultMessage: 'One-time', id: '/Zj5Ed' }),
-  };
-  return langs[value] ?? value;
-};
 
 export const contributionsOrderFilter = buildSortFilter({
   fieldSchema: z.enum(['LAST_CHARGED_AT']),
@@ -56,7 +42,7 @@ export const schema = z.object({
   expectedFundsFilter: expectedFundsFilter.schema,
   amount: amountFilter.schema,
   status: isMulti(z.nativeEnum(OrderStatus)).optional(),
-  type: z.nativeEnum(OrderTypeFilter).optional(),
+  frequency: isMulti(z.nativeEnum(ContributionFrequency)).optional(),
   paymentMethod: z.string().optional(),
 });
 
@@ -75,23 +61,10 @@ export const toVariables: FiltersToVariables<FilterValues, GraphQLQueryVariables
   expectedDate: expectedDateFilter.toVariables,
   date: orderDateFilter.toVariables,
   amount: amountFilter.toVariables,
-  type: (value: OrderTypeFilter) => {
-    switch (value) {
-      case OrderTypeFilter.RECURRING:
-        return {
-          onlySubscriptions: true,
-        };
-      case OrderTypeFilter.ONETIME:
-        return {
-          frequency: ContributionFrequency.ONETIME,
-        };
-    }
-  },
   paymentMethod: (value: string) => {
     if (value) {
       return { paymentMethod: { id: value } };
     }
-
     return null;
   },
 };
@@ -110,22 +83,24 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
         options={Object.values(OrderStatus)
           .map(value => ({ label: valueRenderer({ intl, value }), value }))
           .sort(sortSelectOptions)}
+        isMulti
         {...props}
       />
     ),
     valueRenderer: ({ intl, value }) => i18nOrderStatus(intl, value),
   },
-  type: {
-    labelMsg: defineMessage({ id: 'expense.type', defaultMessage: 'Type' }),
+  frequency: {
+    labelMsg: defineMessage({ id: 'Frequency', defaultMessage: 'Frequency' }),
     Component: ({ valueRenderer, intl, ...props }) => (
       <ComboSelectFilter
-        options={Object.values(OrderTypeFilter)
+        options={Object.values(ContributionFrequency)
           .map(value => ({ label: valueRenderer({ value, intl }), value }))
           .sort(sortSelectOptions)}
+        isMulti
         {...props}
       />
     ),
-    valueRenderer: ({ value, intl }) => i18nOrderType(intl, value),
+    valueRenderer: ({ value, intl }) => i18nFrequency(intl, value),
   },
   paymentMethod: {
     labelMsg: defineMessage({ id: 'paymentmethod.label', defaultMessage: 'Payment Method' }),

@@ -2,19 +2,21 @@ import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { isEmpty } from 'lodash';
 import { Check, Link as LinkIcon, X } from 'lucide-react';
-import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../lib/actions/types';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type { ContributionDrawerQuery, ContributionDrawerQueryVariables } from '../../lib/graphql/types/v2/graphql';
-import { ContributionFrequency, OrderStatus } from '../../lib/graphql/types/v2/schema';
+import { OrderStatus } from '../../lib/graphql/types/v2/graphql';
 import useClipboard from '../../lib/hooks/useClipboard';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { i18nFrequency } from '../../lib/i18n/order';
 import { i18nPaymentMethodProviderType } from '../../lib/i18n/payment-method-provider-type';
 import type LoggedInUser from '../../lib/LoggedInUser';
 
 import { AccountHoverCard } from '../AccountHoverCard';
 import Avatar from '../Avatar';
+import DateTime from '../DateTime';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import Link from '../Link';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -37,21 +39,6 @@ type ContributionDrawerProps = {
   orderId?: number;
   getActions: GetActions<ContributionDrawerQuery['order']>;
 };
-
-const I18nFrequencyMessages = defineMessages({
-  [ContributionFrequency.ONETIME]: {
-    id: 'Frequency.OneTime',
-    defaultMessage: 'One time',
-  },
-  [ContributionFrequency.MONTHLY]: {
-    id: 'Frequency.Monthly',
-    defaultMessage: 'Monthly',
-  },
-  [ContributionFrequency.YEARLY]: {
-    id: 'Frequency.Yearly',
-    defaultMessage: 'Yearly',
-  },
-});
 
 function getTransactionOrderLink(LoggedInUser: LoggedInUser, order: ContributionDrawerQuery['order']): string {
   const url = getTransactionsUrl(LoggedInUser, order);
@@ -444,17 +431,37 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                     </React.Fragment>
                   )}
 
-                  <div className="col-span-3">
+                  <div>
                     <div>
                       <FormattedMessage defaultMessage="Frequency" id="Frequency" />
                     </div>
                     <div>
                       {isLoading ? (
                         <LoadingPlaceholder height={20} />
-                      ) : !query.data.order.frequency ? (
-                        <FormattedMessage {...I18nFrequencyMessages[ContributionFrequency.ONETIME]} />
                       ) : (
-                        <FormattedMessage {...I18nFrequencyMessages[query.data.order.frequency]} />
+                        i18nFrequency(intl, query.data?.order?.frequency)
+                      )}
+                    </div>
+                  </div>
+
+                  {query.data?.order?.tier && (
+                    <div>
+                      <div>
+                        <FormattedMessage defaultMessage="Tier" id="b07w+D" />
+                      </div>
+                      <div>{isLoading ? <LoadingPlaceholder height={20} /> : query.data.order.tier.name}</div>
+                    </div>
+                  )}
+
+                  <div>
+                    <div>
+                      <FormattedMessage defaultMessage="Created" id="Created" />
+                    </div>
+                    <div>
+                      {isLoading ? (
+                        <LoadingPlaceholder height={20} />
+                      ) : (
+                        <DateTime value={query.data?.order?.createdAt} dateStyle="medium" />
                       )}
                     </div>
                   </div>

@@ -20,7 +20,7 @@ import {
 } from '../../../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import i18nOrderStatus from '../../../../lib/i18n/order-status';
+import { i18nFrequency, i18nOrderStatus } from '../../../../lib/i18n/order';
 import { i18nPaymentMethodProviderType } from '../../../../lib/i18n/payment-method-provider-type';
 import type LoggedInUser from '../../../../lib/LoggedInUser';
 import { getWebsiteUrl, sortSelectOptions } from '../../../../lib/utils';
@@ -53,7 +53,7 @@ import type { DashboardSectionProps } from '../../types';
 
 import CreatePendingContributionModal from './CreatePendingOrderModal';
 import type { FilterMeta } from './filters';
-import { filters, OrderTypeFilter, schema, toVariables } from './filters';
+import { filters, schema, toVariables } from './filters';
 import { PausedIncomingContributionsMessage } from './PausedIncomingContributionsMessage';
 
 enum ContributionsTab {
@@ -132,7 +132,7 @@ const dashboardContributionsMetadataQuery = gql`
       }
       RECURRING: orders(
         filter: $filter
-        onlyActiveSubscriptions: true
+        frequency: [MONTHLY, YEARLY]
         includeIncognito: true
         includeHostedAccounts: $includeHostedAccounts
       ) @skip(if: $onlyExpectedFunds) {
@@ -149,7 +149,7 @@ const dashboardContributionsMetadataQuery = gql`
       }
       ONETIME: orders(
         filter: $filter
-        frequency: ONETIME
+        frequency: [ONETIME]
         status: [PAID, PROCESSING]
         includeIncognito: true
         minAmount: 1
@@ -211,9 +211,8 @@ const dashboardContributionsQuery = gql`
     $offset: Int
     $limit: Int
     $filter: AccountOrdersFilter!
-    $frequency: ContributionFrequency
+    $frequency: [ContributionFrequency]
     $status: [OrderStatus!]
-    $onlySubscriptions: Boolean
     $includeIncognito: Boolean
     $minAmount: Int
     $maxAmount: Int
@@ -238,7 +237,6 @@ const dashboardContributionsQuery = gql`
         filter: $filter
         frequency: $frequency
         status: $status
-        onlySubscriptions: $onlySubscriptions
         includeIncognito: $includeIncognito
         minAmount: $minAmount
         maxAmount: $maxAmount
@@ -263,7 +261,7 @@ const dashboardContributionsQuery = gql`
   ${managedOrderFragment}
 `;
 
-const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpectedFunds }) => {
+const getColumns = ({ intl, isIncoming, includeHostedAccounts, onlyExpectedFunds }) => {
   const accounts = {
     accessorKey: 'toAccount',
     header: intl.formatMessage({ defaultMessage: 'Collective & Contributors', id: 'kklCrk' }),
@@ -296,10 +294,10 @@ const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpected
             </div>
           </div>
           <div className="overflow-hidden">
-            <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sm font-medium leading-5">
+            <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sm leading-5">
               {toAccount.name || toAccount.slug}
             </div>
-            <div className="overflow-hidden text-ellipsis whitespace-nowrap text-xs leading-4">
+            <div className="overflow-hidden text-ellipsis whitespace-nowrap text-xs font-normal leading-4 text-slate-700">
               {fromAccount.name || fromAccount.slug}
             </div>
           </div>
@@ -311,8 +309,9 @@ const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpected
   const toAccount = {
     accessorKey: 'toAccount',
     header: intl.formatMessage({ id: 'Collective', defaultMessage: 'Collective' }),
-    cell: ({ cell }) => {
+    cell: ({ cell, row }) => {
       const toAccount = cell.getValue();
+      const tier = row.original?.tier;
       return (
         <AccountHoverCard
           account={toAccount}
@@ -321,8 +320,15 @@ const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpected
               <div>
                 <Avatar size={32} collective={toAccount} displayTitle={false} />
               </div>
-              <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sm leading-5">
-                {toAccount.name || toAccount.slug}
+              <div className="overflow-hidden">
+                <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sm leading-5">
+                  {toAccount.name || toAccount.slug}
+                </div>
+                {tier && (
+                  <div className="overflow-hidden text-ellipsis whitespace-nowrap text-xs font-normal leading-4 text-slate-700">
+                    {tier.name}
+                  </div>
+                )}
               </div>
             </div>
           }
@@ -333,8 +339,9 @@ const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpected
   const fromAccount = {
     accessorKey: 'fromAccount',
     header: intl.formatMessage({ id: 'Contributor', defaultMessage: 'Contributor' }),
-    cell: ({ cell }) => {
+    cell: ({ cell, row }) => {
       const fromAccount = cell.getValue();
+      const tier = row.original?.tier;
       return (
         <AccountHoverCard
           account={fromAccount}
@@ -343,8 +350,15 @@ const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpected
               <div>
                 <Avatar size={32} collective={fromAccount} displayTitle={false} />
               </div>
-              <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sm leading-5">
-                {fromAccount.name || fromAccount.slug}
+              <div className="overflow-hidden">
+                <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sm leading-5">
+                  {fromAccount.name || fromAccount.slug}
+                </div>
+                {tier && (
+                  <div className="overflow-hidden text-ellipsis whitespace-nowrap text-xs font-normal leading-4 text-slate-700">
+                    {tier.name}
+                  </div>
+                )}
               </div>
             </div>
           }
@@ -354,18 +368,39 @@ const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpected
   };
   const paymentMethod = {
     accessorKey: 'paymentMethod',
-    header: intl.formatMessage({ id: 'paymentmethod.label', defaultMessage: 'Payment Method' }),
+    header: intl.formatMessage({ id: 'AddFundsModal.source', defaultMessage: 'Source' }),
     cell: ({ cell, row }) => {
       const pm = cell.getValue();
       if (pm) {
         return (
           <div className="flex items-center gap-2 truncate">
-            <PaymentMethodTypeWithIcon iconSize={18} type={pm.type} />
+            <PaymentMethodTypeWithIcon iconSize={18} type={pm.type} iconOnly />
           </div>
         );
       } else if (row.original?.pendingContributionData?.paymentMethod) {
         return i18nPaymentMethodProviderType(intl, row.original?.pendingContributionData?.paymentMethod);
       }
+    },
+  };
+  const frequency = {
+    accessorKey: 'frequency',
+    header: intl.formatMessage({ id: 'Frequency', defaultMessage: 'Frequency' }),
+    cell: ({ cell, row }) => {
+      const frequency = cell.getValue();
+      return (
+        <div>
+          <p>{i18nFrequency(intl, frequency)}</p>
+          {['MONTHLY', 'YEARLY'].includes(frequency) && (
+            <p className="text-xs font-normal text-slate-700">
+              <FormattedMessage
+                id="x9TypM"
+                defaultMessage="Since {date}"
+                values={{ date: <DateTime value={row.original.createdAt} dateStyle="medium" /> }}
+              />
+            </p>
+          )}
+        </div>
+      );
     },
   };
   const status = {
@@ -374,26 +409,21 @@ const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpected
     cell: ({ cell }) => {
       const status = cell.getValue();
       return (
-        <div data-cy="contribution-status">
+        <div data-cy="contribution-status" className="w-fit">
           <OrderStatusTag status={status} />
         </div>
       );
     },
   };
 
-  const totalAmount = {
+  const amount = {
     accessorKey: 'totalAmount',
     header: intl.formatMessage({ defaultMessage: 'Amount', id: 'Fields.amount' }),
-    cell: ({ cell, row }) => {
+    cell: ({ cell }) => {
       const amount = cell.getValue();
       return (
         <div className="flex items-center gap-2 truncate">
-          <FormattedMoneyAmount
-            amount={amount.valueInCents}
-            currency={amount.currency}
-            frequency={row.original.frequency}
-            abbreviateInterval
-          />
+          <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} showCurrencyCode={false} />
         </div>
       );
     },
@@ -429,40 +459,31 @@ const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpected
     },
   };
 
-  if (!tab || [ContributionsTab.ONETIME, ContributionsTab.ALL].includes(tab)) {
-    return compact([
-      onlyExpectedFunds ? contributionId : null,
-      includeHostedAccounts ? accounts : isIncoming ? fromAccount : toAccount,
-      paymentMethod,
-      totalAmount,
-      {
-        accessorKey: 'lastChargedAt',
-        header: intl.formatMessage({ id: 'order.lastChargedAt', defaultMessage: 'Last Charge Date' }),
-        cell: ({ row }) => {
-          const order = row.original;
-          const date = order.lastChargedAt || order.createdAt;
-          return (
-            <div className="flex items-center gap-2 truncate">
-              <DateTime value={date} dateStyle="medium" timeStyle={undefined} />
-            </div>
-          );
-        },
-      },
-      onlyExpectedFunds ? expectedAt : null,
-      status,
-      actionsColumn,
-    ]);
-  } else {
-    return compact([
-      onlyExpectedFunds ? contributionId : null,
-      includeHostedAccounts ? accounts : isIncoming ? fromAccount : toAccount,
-      paymentMethod,
-      totalAmount,
-      onlyExpectedFunds ? expectedAt : null,
-      status,
-      actionsColumn,
-    ]);
-  }
+  const date = {
+    accessorKey: 'lastChargedAt',
+    header: intl.formatMessage({ id: 'Contribution.ChargeDate', defaultMessage: 'Charge Date' }),
+    cell: ({ row }) => {
+      const order = row.original;
+      const date = order.lastChargedAt || order.createdAt;
+      return (
+        <div className="flex items-center gap-2 truncate">
+          <DateTime value={date} dateStyle="medium" timeStyle={undefined} />
+        </div>
+      );
+    },
+  };
+
+  return compact([
+    onlyExpectedFunds ? contributionId : null,
+    includeHostedAccounts ? accounts : isIncoming ? fromAccount : toAccount,
+    date,
+    frequency,
+    paymentMethod,
+    amount,
+    onlyExpectedFunds ? expectedAt : null,
+    status,
+    actionsColumn,
+  ]);
 };
 
 const filtersWithoutExpectedFunds = {
@@ -594,7 +615,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
           label: intl.formatMessage({ defaultMessage: 'Recurring', id: 'v84fNv' }),
           count: metadata?.account?.[ContributionsTab.RECURRING].totalCount,
           filter: {
-            type: OrderTypeFilter.RECURRING,
+            frequency: [ContributionFrequency.MONTHLY, ContributionFrequency.YEARLY],
             status: [OrderStatus.ACTIVE, OrderStatus.ERROR],
           },
         }
@@ -605,7 +626,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
           label: intl.formatMessage({ defaultMessage: 'One-Time', id: 'jX0G5O' }),
           count: metadata?.account?.[ContributionsTab.ONETIME].totalCount,
           filter: {
-            type: OrderTypeFilter.ONETIME,
+            frequency: [ContributionFrequency.ONETIME],
             status: [OrderStatus.PAID, OrderStatus.PROCESSING],
           },
         }
@@ -730,7 +751,6 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
   const error = metadataError || queryError;
 
   const columns = getColumns({
-    tab: queryFilter.activeViewId,
     intl,
     isIncoming,
     includeHostedAccounts,

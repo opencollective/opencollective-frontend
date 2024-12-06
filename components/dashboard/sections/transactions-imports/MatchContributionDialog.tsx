@@ -71,7 +71,7 @@ const suggestExpectedFundsQuery = gql`
     $searchTerm: String
     $offset: Int
     $limit: Int
-    $frequency: ContributionFrequency
+    $frequency: [ContributionFrequency]
     $status: [OrderStatus!]
     $onlySubscriptions: Boolean
     $minAmount: Int
