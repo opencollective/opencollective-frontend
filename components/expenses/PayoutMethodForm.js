@@ -61,8 +61,10 @@ export const validatePayoutMethod = payoutMethod => {
     }
   }
 
-  if (!payoutMethod?.data?.currency) {
-    set(errors, 'data.currency', createError(ERROR.FORM_FIELD_REQUIRED));
+  if (payoutMethod?.type !== PayoutMethodType.ACCOUNT_BALANCE) {
+    if (!payoutMethod.data?.currency) {
+      set(errors, 'data.currency', createError(ERROR.FORM_FIELD_REQUIRED));
+    }
   }
 
   return errors;
