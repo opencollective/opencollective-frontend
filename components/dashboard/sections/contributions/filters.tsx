@@ -44,12 +44,14 @@ export const schema = z.object({
   status: isMulti(z.nativeEnum(OrderStatus)).optional(),
   frequency: isMulti(z.nativeEnum(ContributionFrequency)).optional(),
   paymentMethod: z.string().optional(),
+  tier: isMulti(z.string()).optional(),
 });
 
 type FilterValues = z.infer<typeof schema>;
 
 export type FilterMeta = {
   currency?: Currency;
+  tiers?: Array<{ id: string; name: string }>;
 };
 
 type GraphQLQueryVariables = DashboardRecurringContributionsQueryVariables;
@@ -66,6 +68,9 @@ export const toVariables: FiltersToVariables<FilterValues, GraphQLQueryVariables
       return { paymentMethod: { id: value } };
     }
     return null;
+  },
+  tier: (value: [string]) => {
+    return { tier: value.map(id => ({ id })) };
   },
 };
 
@@ -88,6 +93,17 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
       />
     ),
     valueRenderer: ({ intl, value }) => i18nOrderStatus(intl, value),
+  },
+  tier: {
+    labelMsg: defineMessage({ defaultMessage: 'Tier', id: 'b07w+D' }),
+    Component: ({ meta, ...props }) => (
+      <ComboSelectFilter
+        options={meta.tiers?.map(({ id, name }) => ({ label: name, value: id })) ?? []}
+        isMulti
+        {...props}
+      />
+    ),
+    valueRenderer: ({ value, meta }) => meta.tiers?.find(tier => tier.id === value)?.name ?? value,
   },
   frequency: {
     labelMsg: defineMessage({ id: 'Frequency', defaultMessage: 'Frequency' }),

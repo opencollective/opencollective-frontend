@@ -4,7 +4,7 @@ import { compact, omit } from 'lodash';
 import { ArrowLeftRightIcon, LinkIcon, Pencil, PlusIcon } from 'lucide-react';
 import { useRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
-import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import type { z } from 'zod';
 
 import type { GetActions } from '../../../../lib/actions/types';
@@ -20,10 +20,10 @@ import {
 } from '../../../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import { i18nFrequency, i18nOrderStatus } from '../../../../lib/i18n/order';
+import { i18nFrequency } from '../../../../lib/i18n/order';
 import { i18nPaymentMethodProviderType } from '../../../../lib/i18n/payment-method-provider-type';
 import type LoggedInUser from '../../../../lib/LoggedInUser';
-import { getWebsiteUrl, sortSelectOptions } from '../../../../lib/utils';
+import { getWebsiteUrl } from '../../../../lib/utils';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
@@ -46,14 +46,13 @@ import { Button } from '../../../ui/Button';
 import { useToast } from '../../../ui/useToast';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
-import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { Pagination } from '../../filters/Pagination';
 import type { DashboardSectionProps } from '../../types';
 
 import CreatePendingContributionModal from './CreatePendingOrderModal';
 import type { FilterMeta } from './filters';
-import { filters, schema, toVariables } from './filters';
+import { filters as allFilters, schema, toVariables } from './filters';
 import { PausedIncomingContributionsMessage } from './PausedIncomingContributionsMessage';
 
 enum ContributionsTab {
@@ -89,6 +88,12 @@ const dashboardContributionsMetadataQuery = gql`
       ... on AccountWithContributions {
         canStartResumeContributionsProcess
         hasResumeContributionsProcessStarted
+        tiers {
+          nodes {
+            id
+            name
+          }
+        }
       }
       ... on AccountWithParent {
         parent {
@@ -227,6 +232,7 @@ const dashboardContributionsQuery = gql`
     $chargedDateTo: DateTime
     $expectedFundsFilter: ExpectedFundsFilter
     $orderBy: ChronologicalOrderInput
+    $tier: [TierReferenceInput!]
   ) {
     account(slug: $slug) {
       id
@@ -250,6 +256,7 @@ const dashboardContributionsQuery = gql`
         orderBy: $orderBy
         chargedDateFrom: $chargedDateFrom
         chargedDateTo: $chargedDateTo
+        tier: $tier
       ) {
         totalCount
         nodes {
@@ -487,24 +494,11 @@ const getColumns = ({ intl, isIncoming, includeHostedAccounts, onlyExpectedFunds
   ]);
 };
 
-const filtersWithoutExpectedFunds = {
-  ...omit(filters, ['expectedFundsFilter', 'expectedDate', 'status']),
-  status: {
-    labelMsg: defineMessage({ defaultMessage: 'Status', id: 'tzMNF3' }),
-    Component: ({ valueRenderer, intl, value, onChange, ...props }) => (
-      <ComboSelectFilter
-        value={value}
-        onChange={onChange}
-        options={Object.values(OrderStatus)
-          .filter(s => s !== OrderStatus.PENDING)
-          .map(value => ({ label: valueRenderer({ intl, value }), value }))
-          .sort(sortSelectOptions)}
-        {...props}
-      />
-    ),
-    valueRenderer: ({ intl, value }) => i18nOrderStatus(intl, value),
-  },
-};
+const incomingContributionsFilters = omit(allFilters, ['expectedFundsFilter', 'expectedDate']);
+
+const filters = omit(allFilters, ['expectedFundsFilter', 'expectedDate', 'tier']);
+
+const expectedFundsFilters = omit(allFilters, ['tier']);
 
 type ContributionsProps = DashboardSectionProps & {
   direction?: 'INCOMING' | 'OUTGOING';
@@ -547,6 +541,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
   const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const router = useRouter();
+  const isIncoming = direction === 'INCOMING';
   const {
     data: metadata,
     loading: metadataLoading,
@@ -690,6 +685,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
 
   const filterMeta: FilterMeta = {
     currency: metadata?.account?.currency,
+    tiers: isIncoming ? metadata?.account?.tiers?.nodes : [],
   };
 
   const queryFilter = useQueryFilter({
@@ -697,7 +693,11 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
     toVariables,
     meta: filterMeta,
     views,
-    filters: onlyExpectedFunds ? filters : filtersWithoutExpectedFunds,
+    filters: onlyExpectedFunds
+      ? expectedFundsFilters
+      : isIncoming && !includeHostedAccounts
+        ? incomingContributionsFilters
+        : filters,
   });
 
   const {
@@ -747,7 +747,6 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
     }
   }, [router, selectedOrders]);
 
-  const isIncoming = direction === 'INCOMING';
   const loading = metadataLoading || queryLoading;
   const error = metadataError || queryError;
 
