@@ -133,6 +133,7 @@ const dashboardContributionsMetadataQuery = gql`
       RECURRING: orders(
         filter: $filter
         frequency: [MONTHLY, YEARLY]
+        status: [ACTIVE, ERROR]
         includeIncognito: true
         includeHostedAccounts: $includeHostedAccounts
       ) @skip(if: $onlyExpectedFunds) {
