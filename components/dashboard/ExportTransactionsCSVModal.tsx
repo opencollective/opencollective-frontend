@@ -112,6 +112,10 @@ const makeUrl = ({ account, isHostReport, queryFilter, flattenTaxesAndPaymentPro
     url.searchParams.set('isRefund', queryFilter.values.isRefund ? '1' : '0');
   }
 
+  if (!isNil(queryFilter.values.hasDebt)) {
+    url.searchParams.set('hasDebt', queryFilter.values.hasDebt ? '1' : '0');
+  }
+
   if (queryFilter.values.orderId) {
     url.searchParams.set('orderId', queryFilter.values.orderId);
   }
