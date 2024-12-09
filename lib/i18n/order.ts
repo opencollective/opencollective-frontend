@@ -71,7 +71,7 @@ export const i18nOrderStatus = (intl, status) => {
   return i18nMsg ? intl.formatMessage(i18nMsg) : status;
 };
 
-export const I18nFrequencyMessages = defineMessages({
+const I18nFrequencyMessages = defineMessages({
   [ContributionFrequency.ONETIME]: {
     id: 'Frequency.OneTime',
     defaultMessage: 'One time',
@@ -90,5 +90,3 @@ export const i18nFrequency = (intl, frequency) => {
   const i18nMsg = I18nFrequencyMessages[frequency];
   return i18nMsg ? intl.formatMessage(i18nMsg) : frequency;
 };
-
-export default i18nOrderStatus;
