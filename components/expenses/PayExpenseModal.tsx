@@ -401,7 +401,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
   const hasAutomaticManualPicker = ![PayoutMethodType.OTHER, PayoutMethodType.ACCOUNT_BALANCE].includes(
     payoutMethodType,
   );
-  const [disabled, setDisabled] = React.useState(false);
+  const [isLoadingTransferDetails, setTransferDetailsLoadingState] = React.useState(false);
 
   const canQuote = host.transferwise && payoutMethodType === PayoutMethodType.BANK_ACCOUNT;
   const quoteQuery = useQuery(quoteExpenseQuery, {
@@ -617,7 +617,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
             )}
             {canQuote && !isManualPayment && (
               <div className="mt-3">
-                <TransferDetailFields expense={expense} setDisabled={setDisabled} />
+                <TransferDetailFields expense={expense} setDisabled={setTransferDetailsLoadingState} />
               </div>
             )}
             {getCanCustomizeFeesPayer(
@@ -788,7 +788,9 @@ Please add funds to your Wise {currency} account."
                 type="submit"
                 loading={formik.isSubmitting}
                 data-cy="mark-as-paid-button"
-                disabled={disabled || (canQuote && !isManualPayment && (quoteQuery.loading || hasFunds === false))}
+                disabled={
+                  canQuote && !isManualPayment && (quoteQuery.loading || hasFunds === false || isLoadingTransferDetails)
+                }
               >
                 {isManualPayment ? (
                   <React.Fragment>

@@ -45,6 +45,7 @@ export const managedOrderFragment = gql`
     memo
     createdAt
     processedAt
+    lastChargedAt
     hostFeePercent
     frequency
     tier {

@@ -18,7 +18,13 @@ import { toast } from '../../ui/useToast';
 import type { Fundraiser } from '../helpers';
 import { getDefaultProfileValues, profileSchema } from '../helpers';
 
-import { ColumnSection, editCrowdfundingSettingsMutation, LongDescriptionForm, MainDetailsForm } from './common';
+import {
+  ColumnSection,
+  editCrowdfundingSettingsMutation,
+  GoalsForm,
+  LongDescriptionForm,
+  MainDetailsForm,
+} from './common';
 
 const CoverImageForm = ({ schema, initialValues, onSubmit }) => {
   return (
@@ -74,7 +80,6 @@ export function EditProfile({ account }) {
   });
   const intl = useIntl();
   const initialValues = getDefaultProfileValues(account);
-
   const onSubmit = async values => {
     try {
       await submitEditSettings({
@@ -119,6 +124,15 @@ export function EditProfile({ account }) {
           initialValues={initialValues}
           onSubmit={onSubmit}
         />
+        <Separator />
+        <ColumnSection title="Goal" description="Set a goal to share with your community.">
+          <GoalsForm
+            schema={profileSchema.pick({ goal: true })}
+            initialValues={initialValues}
+            onSubmit={onSubmit}
+            account={account}
+          />
+        </ColumnSection>
         <Separator />
         <LongDescriptionForm
           schema={profileSchema.pick({ longDescription: true })}

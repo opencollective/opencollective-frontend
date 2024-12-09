@@ -8,7 +8,7 @@ import { cn } from '../../lib/utils';
 import StyledSpinner from '../StyledSpinner';
 
 const buttonVariants = cva(
-  'inline-flex relative items-center justify-center rounded-md text-sm gap-1 font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+  'relative inline-flex items-center justify-center gap-1 rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       variant: {
@@ -25,11 +25,12 @@ const buttonVariants = cva(
         default: 'h-10 px-4 py-2',
         xs: 'h-8 px-2.5 tracking-tight',
         sm: 'h-9 rounded-md px-3',
-        lg: 'h-11 rounded-md text-lg px-8',
-        xl: 'h-14 rounded-lg text-xl px-8',
+        lg: 'h-11 rounded-md px-8 text-lg',
+        xl: 'h-14 rounded-lg px-8 text-xl',
         icon: 'h-10 w-10',
-        'icon-sm': 'h-9 w-9',
         'icon-xs': 'h-8 w-8',
+        'icon-sm': 'h-9 w-9',
+        'icon-lg': 'h-11 w-11',
       },
     },
     defaultVariants: {

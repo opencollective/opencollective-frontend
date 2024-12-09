@@ -40,7 +40,7 @@ describe('Contribute Flow: Stripe Payment Element', () => {
         });
       });
 
-      cy.createCollectiveV2({ host: { slug: 'e2e-host' } }).as('collective');
+      cy.createCollectiveV2({ skipApproval: true, host: { slug: 'e2e-host' } }).as('collective');
     });
 
     it('Guest', testConfig, () => {
@@ -118,7 +118,7 @@ describe('Contribute Flow: Stripe Payment Element', () => {
         });
       });
 
-      cy.createCollectiveV2({ host: { slug: 'e2e-eur-host' } }).as('collective');
+      cy.createCollectiveV2({ skipApproval: true, host: { slug: 'e2e-eur-host' } }).as('collective');
     });
 
     it('Redirects to trusted url', testConfig, () => {

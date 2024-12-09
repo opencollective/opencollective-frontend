@@ -8,7 +8,7 @@ import Avatar from './Avatar';
 import LinkCollective from './LinkCollective';
 
 type AvatarWithLinkProps = {
-  account: Pick<Account, 'name' | 'type' | 'isIncognito' | 'slug' | 'imageUrl'>;
+  account: Pick<Account, 'name' | 'type' | 'slug' | 'imageUrl'> & { isIncognito?: boolean };
   secondaryAccount?: Partial<Account> | null;
   /** The size in pixels */
   size: number;

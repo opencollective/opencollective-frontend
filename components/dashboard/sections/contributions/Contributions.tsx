@@ -221,7 +221,10 @@ const dashboardContributionsQuery = gql`
     $dateTo: DateTime
     $expectedDateFrom: DateTime
     $expectedDateTo: DateTime
+    $chargedDateFrom: DateTime
+    $chargedDateTo: DateTime
     $expectedFundsFilter: ExpectedFundsFilter
+    $orderBy: ChronologicalOrderInput
   ) {
     account(slug: $slug) {
       id
@@ -243,6 +246,9 @@ const dashboardContributionsQuery = gql`
         paymentMethod: $paymentMethod
         includeHostedAccounts: $includeHostedAccounts
         expectedFundsFilter: $expectedFundsFilter
+        orderBy: $orderBy
+        chargedDateFrom: $chargedDateFrom
+        chargedDateTo: $chargedDateTo
       ) {
         totalCount
         nodes {
@@ -428,10 +434,11 @@ const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpected
       paymentMethod,
       totalAmount,
       {
-        accessorKey: 'createdAt',
-        header: intl.formatMessage({ id: 'expense.incurredAt', defaultMessage: 'Date' }),
-        cell: ({ cell }) => {
-          const date = cell.getValue();
+        accessorKey: 'lastChargedAt',
+        header: intl.formatMessage({ id: 'order.lastChargedAt', defaultMessage: 'Last Charge Date' }),
+        cell: ({ row }) => {
+          const order = row.original;
+          const date = order.lastChargedAt || order.createdAt;
           return (
             <div className="flex items-center gap-2 truncate">
               <DateTime value={date} dateStyle="medium" timeStyle={undefined} />
@@ -444,25 +451,10 @@ const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpected
       actionsColumn,
     ]);
   } else {
-    const amount = {
-      accessorKey: 'amount',
-      header: intl.formatMessage({ id: 'Fields.amount', defaultMessage: 'Amount' }),
-      cell: ({ cell, row }) => {
-        const amount = cell.getValue();
-        const order = row.original;
-        return (
-          <div className="flex items-center gap-2 truncate">
-            <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} frequency={order.frequency} />
-          </div>
-        );
-      },
-    };
-
     return compact([
       onlyExpectedFunds ? contributionId : null,
       includeHostedAccounts ? accounts : isIncoming ? fromAccount : toAccount,
       paymentMethod,
-      amount,
       totalAmount,
       onlyExpectedFunds ? expectedAt : null,
       status,

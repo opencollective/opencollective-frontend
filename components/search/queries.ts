@@ -8,7 +8,7 @@ export const searchCommandQuery = gql`
     $limit: Int!
     $includeTransactions: Boolean!
   ) {
-    search(searchTerm: $searchTerm, defaultLimit: $limit, host: $host, account: $account, useElasticSearch: true) {
+    search(searchTerm: $searchTerm, defaultLimit: $limit, host: $host, account: $account) {
       results {
         accounts {
           collection {

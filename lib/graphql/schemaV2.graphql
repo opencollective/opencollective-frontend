@@ -204,7 +204,7 @@ interface Account {
   The currency of the account
   """
   currency: Currency!
-  expensePolicy: String
+  expensePolicy: String @deprecated(reason: "2024-11-04: Please use policies.EXPENSE_POLICIES")
 
   """
   Defines if the contributors wants to be incognito (name not displayed)
@@ -592,6 +592,16 @@ interface Account {
     Only return pending orders that were expected before this date
     """
     expectedDateTo: DateTime
+
+    """
+    Return orders that were charged after this date
+    """
+    chargedDateFrom: DateTime
+
+    """
+    Return orders that were charged before this date
+    """
+    chargedDateTo: DateTime
 
     """
     The term to search
@@ -1823,6 +1833,11 @@ enum DateTimeField {
   Transactions only: The date when a transaction was cleared by the payment processor
   """
   EFFECTIVE_DATE
+
+  """
+  Orders only: The date when an order was last charged, defaults to createdAt if never charged
+  """
+  LAST_CHARGED_AT
 }
 
 """
@@ -1952,6 +1967,7 @@ type Order {
   status: OrderStatus
   frequency: ContributionFrequency
   nextChargeDate: DateTime
+  lastChargedAt: DateTime
   tier: Tier
   fromAccount: Account
   toAccount: Account
@@ -2534,6 +2550,11 @@ type Expense {
   securityChecks: [SecurityCheck]
 
   """
+  [Host Admin only] Key to access the draft of this expense
+  """
+  draftKey: String
+
+  """
   Custom data for this expense
   """
   customData: JSON
@@ -2542,6 +2563,11 @@ type Expense {
   The merchant ID for this expense
   """
   merchantId: String
+
+  """
+  Fields that cannot be edited on this expense
+  """
+  lockedFields: [ExpenseLockableFields]
 }
 
 """
@@ -2661,7 +2687,7 @@ type Host implements Account & AccountWithContributions {
   The currency of the account
   """
   currency: Currency!
-  expensePolicy: String
+  expensePolicy: String @deprecated(reason: "2024-11-04: Please use policies.EXPENSE_POLICIES")
 
   """
   Defines if the contributors wants to be incognito (name not displayed)
@@ -3076,6 +3102,16 @@ type Host implements Account & AccountWithContributions {
     Only return pending orders that were expected before this date
     """
     expectedDateTo: DateTime
+
+    """
+    Return orders that were charged after this date
+    """
+    chargedDateFrom: DateTime
+
+    """
+    Return orders that were charged before this date
+    """
+    chargedDateTo: DateTime
 
     """
     The term to search
@@ -3518,6 +3554,24 @@ type Host implements Account & AccountWithContributions {
     offset: Int! = 0
     roles: [MemberRole]
   ): ContributorCollection!
+
+  """
+  [!] Warning: this query is currently in beta and the API might change
+  """
+  activeContributors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    dateFrom: DateTime
+    dateTo: DateTime
+    includeActiveRecurringContributions: Boolean
+  ): AccountCollection
 
   """
   How much platform fees are charged for this account
@@ -4041,6 +4095,24 @@ interface AccountWithContributions {
   ): ContributorCollection!
 
   """
+  [!] Warning: this query is currently in beta and the API might change
+  """
+  activeContributors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    dateFrom: DateTime
+    dateTo: DateTime
+    includeActiveRecurringContributions: Boolean
+  ): AccountCollection
+
+  """
   How much platform fees are charged for this account
   """
   platformFeePercent: Float!
@@ -4148,7 +4220,7 @@ type Contributor {
   If the contributor has a page on Open Collective, this is the slug to link to it. Always null for incognito contributors
   """
   collectiveSlug: String @deprecated(reason: "2024-08-26: Use account.slug instead")
-  account: String
+  account: Account
 
   """
   Contributor avatar or logo
@@ -4159,6 +4231,16 @@ type Contributor {
   A public message from contributors to describe their contributions
   """
   publicMessage: String
+}
+
+"""
+A collection of "Accounts"
+"""
+type AccountCollection implements Collection {
+  offset: Int
+  limit: Int
+  totalCount: Int
+  nodes: [Account]
 }
 
 """
@@ -4304,6 +4386,7 @@ Possible fields you can use to order by
 """
 enum OrderByFieldType {
   CREATED_AT
+  LAST_CHARGED_AT
 
   """
   The financial activity of the collective (number of transactions)
@@ -4687,16 +4770,6 @@ type CommentCollection implements Collection {
   nodes: [Comment]
 }
 
-"""
-A collection of "Accounts"
-"""
-type AccountCollection implements Collection {
-  offset: Int
-  limit: Int
-  totalCount: Int
-  nodes: [Account]
-}
-
 type ConversationStats {
   id: String!
 
@@ -4889,6 +4962,16 @@ type PaymentMethod {
     Only return pending orders that were expected before this date
     """
     expectedDateTo: DateTime
+
+    """
+    Return orders that were charged after this date
+    """
+    chargedDateFrom: DateTime
+
+    """
+    Return orders that were charged before this date
+    """
+    chargedDateTo: DateTime
 
     """
     The term to search
@@ -5838,6 +5921,7 @@ enum VirtualCardStatus {
 
 type Policies {
   id: String
+  EXPENSE_POLICIES: EXPENSE_POLICIES
   EXPENSE_AUTHOR_CANNOT_APPROVE: EXPENSE_AUTHOR_CANNOT_APPROVE
   REQUIRE_2FA_FOR_ADMINS: Boolean
   COLLECTIVE_ADMINS_CAN_REFUND: Boolean
@@ -5846,6 +5930,12 @@ type Policies {
   EXPENSE_CATEGORIZATION: EXPENSE_CATEGORIZATION
   EXPENSE_PUBLIC_VENDORS: Boolean
   COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS: Boolean
+}
+
+type EXPENSE_POLICIES {
+  invoicePolicy: String
+  receiptPolicy: String
+  titlePolicy: String
 }
 
 type EXPENSE_AUTHOR_CANNOT_APPROVE {
@@ -7534,6 +7624,31 @@ enum SecurityCheckLevel {
 }
 
 """
+All fields that can be locked on an expense draft
+"""
+enum ExpenseLockableFields {
+  """
+  Locks items' amount and currency, and it also blocks the hability to add new items.
+  """
+  AMOUNT
+
+  """
+  Locks the payee field, if the user is not on the platform it locks its email.
+  """
+  PAYEE
+
+  """
+  Locks the description field.
+  """
+  DESCRIPTION
+
+  """
+  Locks the type field.
+  """
+  TYPE
+}
+
+"""
 Fields for the user permissions on an transaction
 """
 type TransactionPermissions {
@@ -7723,7 +7838,7 @@ type Bot implements Account {
   The currency of the account
   """
   currency: Currency!
-  expensePolicy: String
+  expensePolicy: String @deprecated(reason: "2024-11-04: Please use policies.EXPENSE_POLICIES")
 
   """
   Defines if the contributors wants to be incognito (name not displayed)
@@ -8138,6 +8253,16 @@ type Bot implements Account {
     Only return pending orders that were expected before this date
     """
     expectedDateTo: DateTime
+
+    """
+    Return orders that were charged after this date
+    """
+    chargedDateFrom: DateTime
+
+    """
+    Return orders that were charged before this date
+    """
+    chargedDateTo: DateTime
 
     """
     The term to search
@@ -8580,7 +8705,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   The currency of the account
   """
   currency: Currency!
-  expensePolicy: String
+  expensePolicy: String @deprecated(reason: "2024-11-04: Please use policies.EXPENSE_POLICIES")
 
   """
   Defines if the contributors wants to be incognito (name not displayed)
@@ -8995,6 +9120,16 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Only return pending orders that were expected before this date
     """
     expectedDateTo: DateTime
+
+    """
+    Return orders that were charged after this date
+    """
+    chargedDateFrom: DateTime
+
+    """
+    Return orders that were charged before this date
+    """
+    chargedDateTo: DateTime
 
     """
     The term to search
@@ -9503,6 +9638,24 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     offset: Int! = 0
     roles: [MemberRole]
   ): ContributorCollection!
+
+  """
+  [!] Warning: this query is currently in beta and the API might change
+  """
+  activeContributors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    dateFrom: DateTime
+    dateTo: DateTime
+    includeActiveRecurringContributions: Boolean
+  ): AccountCollection
 
   """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
@@ -9968,7 +10121,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   The currency of the account
   """
   currency: Currency!
-  expensePolicy: String
+  expensePolicy: String @deprecated(reason: "2024-11-04: Please use policies.EXPENSE_POLICIES")
 
   """
   Defines if the contributors wants to be incognito (name not displayed)
@@ -10383,6 +10536,16 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Only return pending orders that were expected before this date
     """
     expectedDateTo: DateTime
+
+    """
+    Return orders that were charged after this date
+    """
+    chargedDateFrom: DateTime
+
+    """
+    Return orders that were charged before this date
+    """
+    chargedDateTo: DateTime
 
     """
     The term to search
@@ -10893,6 +11056,24 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   ): ContributorCollection!
 
   """
+  [!] Warning: this query is currently in beta and the API might change
+  """
+  activeContributors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    dateFrom: DateTime
+    dateTo: DateTime
+    includeActiveRecurringContributions: Boolean
+  ): AccountCollection
+
+  """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
   """
   platformContributionAvailable: Boolean!
@@ -11076,7 +11257,7 @@ type Individual implements Account {
   The currency of the account
   """
   currency: Currency!
-  expensePolicy: String
+  expensePolicy: String @deprecated(reason: "2024-11-04: Please use policies.EXPENSE_POLICIES")
 
   """
   Defines if the contributors wants to be incognito (name not displayed)
@@ -11491,6 +11672,16 @@ type Individual implements Account {
     Only return pending orders that were expected before this date
     """
     expectedDateTo: DateTime
+
+    """
+    Return orders that were charged after this date
+    """
+    chargedDateFrom: DateTime
+
+    """
+    Return orders that were charged before this date
+    """
+    chargedDateTo: DateTime
 
     """
     The term to search
@@ -12139,7 +12330,7 @@ type Organization implements Account & AccountWithContributions {
   The currency of the account
   """
   currency: Currency!
-  expensePolicy: String
+  expensePolicy: String @deprecated(reason: "2024-11-04: Please use policies.EXPENSE_POLICIES")
 
   """
   Defines if the contributors wants to be incognito (name not displayed)
@@ -12554,6 +12745,16 @@ type Organization implements Account & AccountWithContributions {
     Only return pending orders that were expected before this date
     """
     expectedDateTo: DateTime
+
+    """
+    Return orders that were charged after this date
+    """
+    chargedDateFrom: DateTime
+
+    """
+    Return orders that were charged before this date
+    """
+    chargedDateTo: DateTime
 
     """
     The term to search
@@ -12996,6 +13197,24 @@ type Organization implements Account & AccountWithContributions {
   ): ContributorCollection!
 
   """
+  [!] Warning: this query is currently in beta and the API might change
+  """
+  activeContributors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    dateFrom: DateTime
+    dateTo: DateTime
+    includeActiveRecurringContributions: Boolean
+  ): AccountCollection
+
+  """
   How much platform fees are charged for this account
   """
   platformFeePercent: Float!
@@ -13091,7 +13310,7 @@ type Vendor implements Account & AccountWithContributions {
   The currency of the account
   """
   currency: Currency!
-  expensePolicy: String
+  expensePolicy: String @deprecated(reason: "2024-11-04: Please use policies.EXPENSE_POLICIES")
 
   """
   Defines if the contributors wants to be incognito (name not displayed)
@@ -13506,6 +13725,16 @@ type Vendor implements Account & AccountWithContributions {
     Only return pending orders that were expected before this date
     """
     expectedDateTo: DateTime
+
+    """
+    Return orders that were charged after this date
+    """
+    chargedDateFrom: DateTime
+
+    """
+    Return orders that were charged before this date
+    """
+    chargedDateTo: DateTime
 
     """
     The term to search
@@ -13948,6 +14177,24 @@ type Vendor implements Account & AccountWithContributions {
     offset: Int! = 0
     roles: [MemberRole]
   ): ContributorCollection!
+
+  """
+  [!] Warning: this query is currently in beta and the API might change
+  """
+  activeContributors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    dateFrom: DateTime
+    dateTo: DateTime
+    includeActiveRecurringContributions: Boolean
+  ): AccountCollection
 
   """
   How much platform fees are charged for this account
@@ -14703,6 +14950,16 @@ type Query {
     expectedDateTo: DateTime
 
     """
+    Return orders that were charged after this date
+    """
+    chargedDateFrom: DateTime
+
+    """
+    Return orders that were charged before this date
+    """
+    chargedDateTo: DateTime
+
+    """
     The term to search
     """
     searchTerm: String
@@ -14795,11 +15052,6 @@ type Query {
     The default limit for each entity type
     """
     defaultLimit: Int! = 10
-
-    """
-    Whether to use ElasticSearch or not
-    """
-    useElasticSearch: Boolean! = true
   ): SearchResponse!
   tagStats(
     """
@@ -16677,7 +16929,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   The currency of the account
   """
   currency: Currency!
-  expensePolicy: String
+  expensePolicy: String @deprecated(reason: "2024-11-04: Please use policies.EXPENSE_POLICIES")
 
   """
   Defines if the contributors wants to be incognito (name not displayed)
@@ -17092,6 +17344,16 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Only return pending orders that were expected before this date
     """
     expectedDateTo: DateTime
+
+    """
+    Return orders that were charged after this date
+    """
+    chargedDateFrom: DateTime
+
+    """
+    Return orders that were charged before this date
+    """
+    chargedDateTo: DateTime
 
     """
     The term to search
@@ -17600,6 +17862,24 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     offset: Int! = 0
     roles: [MemberRole]
   ): ContributorCollection!
+
+  """
+  [!] Warning: this query is currently in beta and the API might change
+  """
+  activeContributors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    dateFrom: DateTime
+    dateTo: DateTime
+    includeActiveRecurringContributions: Boolean
+  ): AccountCollection
 
   """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
@@ -17663,7 +17943,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   The currency of the account
   """
   currency: Currency!
-  expensePolicy: String
+  expensePolicy: String @deprecated(reason: "2024-11-04: Please use policies.EXPENSE_POLICIES")
 
   """
   Defines if the contributors wants to be incognito (name not displayed)
@@ -18078,6 +18358,16 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Only return pending orders that were expected before this date
     """
     expectedDateTo: DateTime
+
+    """
+    Return orders that were charged after this date
+    """
+    chargedDateFrom: DateTime
+
+    """
+    Return orders that were charged before this date
+    """
+    chargedDateTo: DateTime
 
     """
     The term to search
@@ -18588,6 +18878,24 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   ): ContributorCollection!
 
   """
+  [!] Warning: this query is currently in beta and the API might change
+  """
+  activeContributors(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    dateFrom: DateTime
+    dateTo: DateTime
+    includeActiveRecurringContributions: Boolean
+  ): AccountCollection
+
+  """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
   """
   platformContributionAvailable: Boolean!
@@ -18623,7 +18931,22 @@ type SearchResults {
   """
   Search results for Accounts
   """
-  accounts: SearchResultsAccounts
+  accounts(
+    """
+    Type of account
+    """
+    type: AccountType
+
+    """
+    Whether the account is a host or not
+    """
+    isHost: Boolean
+
+    """
+    Tags to filter the accounts
+    """
+    tags: [String]
+  ): SearchResultsAccounts
 
   """
   Search results for Comments
@@ -18783,11 +19106,6 @@ type Mutation {
     user: IndividualCreateInput
 
     """
-    Whether to trigger the automated approval for Open Source collectives with GitHub.
-    """
-    automateApprovalWithGithub: Boolean = false @deprecated(reason: "2022-10-12: This is now automated")
-
-    """
     A message to attach for the host to review the application
     """
     message: String
@@ -18811,6 +19129,11 @@ type Mutation {
     List of members to invite on Collective creation.
     """
     inviteMembers: [InviteMemberInput]
+
+    """
+    Marks the collective as approved directly. Only available in test/CI environments.
+    """
+    skipApprovalTestOnly: Boolean = false
   ): Collective
 
   """
@@ -18871,6 +19194,11 @@ type Mutation {
     Reference to the parent Account creating the Project.
     """
     parent: AccountReferenceInput
+
+    """
+    Set to true to disable contributions to this project. Host admins will still be able to add funds.
+    """
+    disableContributions: Boolean! = false
   ): Project
 
   """
@@ -19417,6 +19745,11 @@ type Mutation {
     If the expense was imported, this is the reference to the row
     """
     transactionsImportRow: TransactionsImportRowReferenceInput
+
+    """
+    A optional private comment to add to the created expense
+    """
+    privateComment: String
   ): Expense!
 
   """
@@ -19487,6 +19820,16 @@ type Mutation {
     Account where the expense will be created
     """
     account: AccountReferenceInput!
+
+    """
+    Skip sending the invite email
+    """
+    skipInvite: Boolean! = false
+
+    """
+    Fields that the user should not be able to edit when submitting the draft
+    """
+    lockedFields: [ExpenseLockableFields]
   ): Expense!
 
   """
@@ -20226,6 +20569,16 @@ type Mutation {
   ): [Expense]!
 
   """
+  [Root only] Anonymizes an account
+  """
+  rootAnonymizeAccount(
+    """
+    Account to anonymize
+    """
+    account: AccountReferenceInput!
+  ): Account!
+
+  """
   Refunds a transaction. Scope: "transactions".
   """
   refundTransaction(
@@ -20772,6 +21125,16 @@ input CollectiveCreateInput {
   githubHandle: String @deprecated(reason: "2022-06-03: Please use repositoryUrl")
   repositoryUrl: String @deprecated(reason: "2023-01-16: Please use socialLinks")
   settings: JSON
+
+  """
+  The profile avatar image
+  """
+  image: Upload
+
+  """
+  The profile background image, for the banner and social media sharing
+  """
+  backgroundImage: Upload
 }
 
 """
@@ -20808,6 +21171,11 @@ input LocationInput {
   """
   structured: JSON
 }
+
+"""
+The `Upload` scalar type represents a file upload.
+"""
+scalar Upload
 
 input IndividualCreateInput {
   name: String!
@@ -20854,6 +21222,16 @@ input EventCreateInput {
   Timezone of the Event (TZ database format, e.g. UTC or Europe/Berlin)
   """
   timezone: String!
+
+  """
+  The profile avatar image
+  """
+  image: Upload
+
+  """
+  The profile background image, for the banner and social media sharing
+  """
+  backgroundImage: Upload
 }
 
 input FundCreateInput {
@@ -20862,6 +21240,16 @@ input FundCreateInput {
   description: String!
   tags: [String]
   settings: JSON
+
+  """
+  The profile avatar image
+  """
+  image: Upload
+
+  """
+  The profile background image, for the banner and social media sharing
+  """
+  backgroundImage: Upload
 }
 
 input OrganizationCreateInput {
@@ -20871,6 +21259,16 @@ input OrganizationCreateInput {
   description: String!
   website: String @deprecated(reason: "2024-11-12: Please use socialLinks")
   settings: JSON
+
+  """
+  The profile avatar image
+  """
+  image: Upload
+
+  """
+  The profile background image, for the banner and social media sharing
+  """
+  backgroundImage: Upload
 }
 
 input ProjectCreateInput {
@@ -20884,6 +21282,16 @@ input ProjectCreateInput {
   The social links in order of preference
   """
   socialLinks: [SocialLinkInput!]
+
+  """
+  The profile avatar image
+  """
+  image: Upload
+
+  """
+  The profile background image, for the banner and social media sharing
+  """
+  backgroundImage: Upload
 }
 
 input SocialLinkInput {
@@ -20940,6 +21348,7 @@ input AccountUpdateInput {
 }
 
 input PoliciesInput {
+  EXPENSE_POLICIES: PoliciesExpensePolicies
   EXPENSE_AUTHOR_CANNOT_APPROVE: PoliciesCollectiveExpenseAuthorCannotApprove
   REQUIRE_2FA_FOR_ADMINS: Boolean
   COLLECTIVE_ADMINS_CAN_REFUND: Boolean
@@ -20947,6 +21356,12 @@ input PoliciesInput {
   EXPENSE_CATEGORIZATION: PoliciesExpenseCategorizationInput
   EXPENSE_PUBLIC_VENDORS: Boolean
   COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS: Boolean
+}
+
+input PoliciesExpensePolicies {
+  invoicePolicy: String
+  receiptPolicy: String
+  titlePolicy: String
 }
 
 input PoliciesCollectiveExpenseAuthorCannotApprove {
@@ -21882,11 +22297,6 @@ type IndividualConfirmEmailResponse {
   """
   sessionToken: String
 }
-
-"""
-The `Upload` scalar type represents a file upload.
-"""
-scalar Upload
 
 input MemberInvitationReferenceInput {
   """
@@ -22888,9 +23298,19 @@ input VendorCreateInput {
   legalName: String
   tags: [NonEmptyString]
   location: LocationInput
-  imageUrl: String
+  imageUrl: String @deprecated(reason: "2024-11-26: Please use image + backgroundImage fields")
   vendorInfo: VendorInfoInput
   payoutMethod: PayoutMethodInput
+
+  """
+  The profile avatar image
+  """
+  image: Upload
+
+  """
+  The profile background image, for the banner and social media sharing
+  """
+  backgroundImage: Upload
 }
 
 """
@@ -22932,7 +23352,17 @@ input VendorEditInput {
   legalName: String
   tags: [NonEmptyString]
   location: LocationInput
-  imageUrl: String
+  imageUrl: String @deprecated(reason: "2024-11-26: Please use image + backgroundImage fields")
   vendorInfo: VendorInfoInput
   payoutMethod: PayoutMethodInput
+
+  """
+  The profile avatar image
+  """
+  image: Upload
+
+  """
+  The profile background image, for the banner and social media sharing
+  """
+  backgroundImage: Upload
 }

@@ -6,6 +6,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { formatErrorMessage } from '../../lib/errors';
+import { ExpenseLockableFields } from '../../lib/graphql/types/v2/graphql';
 import { i18nTaxType } from '../../lib/i18n/taxes';
 import { attachmentDropzoneParams } from './lib/attachments';
 import { expenseItemsMustHaveFiles, newExpenseItem } from './lib/items';
@@ -46,6 +47,9 @@ class ExpenseFormItems extends React.PureComponent {
       setFieldValue: PropTypes.func,
       setFieldTouched: PropTypes.func,
     }).isRequired,
+    expense: PropTypes.shape({
+      lockedFields: PropTypes.arrayOf(PropTypes.string),
+    }),
   };
 
   componentDidMount() {
@@ -147,7 +151,7 @@ class ExpenseFormItems extends React.PureComponent {
   }
 
   render() {
-    const { hasOCRFeature, collective } = this.props;
+    const { hasOCRFeature, collective, expense } = this.props;
     const { values, errors, setFieldValue } = this.props.form;
     const requireFile = expenseItemsMustHaveFiles(values.type);
     const isGrant = values.type === expenseTypes.GRANT;
@@ -162,6 +166,7 @@ class ExpenseFormItems extends React.PureComponent {
     const hasOCRWarnings = some(itemsOCRComparisons, comparison =>
       some(comparison, (value, field) => ocrMismatchWarningFields.includes(field) && value.hasMismatch),
     );
+    const amountIsLocked = expense?.lockedFields?.includes(ExpenseLockableFields.AMOUNT);
 
     if (!hasItems && requireFile) {
       return (
@@ -231,6 +236,7 @@ class ExpenseFormItems extends React.PureComponent {
             collective={collective}
             ocrComparison={itemsOCRComparisons[attachment.id]}
             hasCurrencyPicker={itemsHaveCurrencyPicker}
+            amountIsLocked={amountIsLocked}
           />
         ))}
         {/** Do not display OCR warnings for OCR charges since date/amount can't be changed */}

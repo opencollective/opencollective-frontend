@@ -30,6 +30,7 @@ export const loggedInAccountExpensePayoutFieldsFragment = gql`
         id
         account {
           id
+          legacyId
           slug
           imageUrl
           type
@@ -44,6 +45,8 @@ export const loggedInAccountExpensePayoutFieldsFragment = gql`
           ... on AccountWithParent {
             parent {
               id
+              legacyId
+              slug
               policies {
                 id
                 REQUIRE_2FA_FOR_ADMINS
@@ -480,6 +483,7 @@ export const expensePageExpenseFieldsFragment = gql`
     payoutMethod {
       id
       type
+      name
       data
       isSaved
     }
@@ -516,6 +520,7 @@ export const expensePageExpenseFieldsFragment = gql`
         reasonDetails
       }
     }
+    lockedFields
     activities {
       id
       type
@@ -718,6 +723,7 @@ export const expensesListFieldsFragment = gql`
     payoutMethod {
       id
       type
+      name
       data
       isSaved
     }
@@ -788,6 +794,7 @@ export const expensesListAdminFieldsFragment = gql`
     payoutMethod {
       id
       type
+      name
       data
     }
     items {
