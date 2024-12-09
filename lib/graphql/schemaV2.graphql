@@ -2565,6 +2565,11 @@ type Expense {
   merchantId: String
 
   """
+  The reference text used in the payment transfer
+  """
+  transferReference: String
+
+  """
   Fields that cannot be edited on this expense
   """
   lockedFields: [ExpenseLockableFields]
@@ -3571,7 +3576,7 @@ type Host implements Account & AccountWithContributions {
     dateFrom: DateTime
     dateTo: DateTime
     includeActiveRecurringContributions: Boolean
-  ): AccountCollection
+  ): AccountCollection!
 
   """
   How much platform fees are charged for this account
@@ -4110,7 +4115,7 @@ interface AccountWithContributions {
     dateFrom: DateTime
     dateTo: DateTime
     includeActiveRecurringContributions: Boolean
-  ): AccountCollection
+  ): AccountCollection!
 
   """
   How much platform fees are charged for this account
@@ -9655,7 +9660,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     dateFrom: DateTime
     dateTo: DateTime
     includeActiveRecurringContributions: Boolean
-  ): AccountCollection
+  ): AccountCollection!
 
   """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
@@ -11071,7 +11076,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     dateFrom: DateTime
     dateTo: DateTime
     includeActiveRecurringContributions: Boolean
-  ): AccountCollection
+  ): AccountCollection!
 
   """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
@@ -13212,7 +13217,7 @@ type Organization implements Account & AccountWithContributions {
     dateFrom: DateTime
     dateTo: DateTime
     includeActiveRecurringContributions: Boolean
-  ): AccountCollection
+  ): AccountCollection!
 
   """
   How much platform fees are charged for this account
@@ -14194,7 +14199,7 @@ type Vendor implements Account & AccountWithContributions {
     dateFrom: DateTime
     dateTo: DateTime
     includeActiveRecurringContributions: Boolean
-  ): AccountCollection
+  ): AccountCollection!
 
   """
   How much platform fees are charged for this account
@@ -17879,7 +17884,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     dateFrom: DateTime
     dateTo: DateTime
     includeActiveRecurringContributions: Boolean
-  ): AccountCollection
+  ): AccountCollection!
 
   """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
@@ -18893,7 +18898,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     dateFrom: DateTime
     dateTo: DateTime
     includeActiveRecurringContributions: Boolean
-  ): AccountCollection
+  ): AccountCollection!
 
   """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
@@ -18987,41 +18992,49 @@ type SearchResults {
 type SearchResultsAccounts {
   collection: AccountCollection!
   highlights: JSONObject
+  maxScore: Float!
 }
 
 type SearchResultsComments {
   collection: CommentCollection!
   highlights: JSONObject
+  maxScore: Float!
 }
 
 type SearchResultsExpenses {
   collection: ExpenseCollection!
   highlights: JSONObject
+  maxScore: Float!
 }
 
 type SearchResultsHostApplications {
   collection: HostApplicationCollection!
   highlights: JSONObject
+  maxScore: Float!
 }
 
 type SearchResultsOrders {
   collection: OrderCollection!
   highlights: JSONObject
+  maxScore: Float!
 }
 
 type SearchResultsTiers {
   collection: TierCollection!
   highlights: JSONObject
+  maxScore: Float!
 }
 
 type SearchResultsTransactions {
   collection: TransactionCollection!
   highlights: JSONObject
+  maxScore: Float!
 }
 
 type SearchResultsUpdates {
   collection: UpdateCollection!
   highlights: JSONObject
+  maxScore: Float!
 }
 
 input TierReferenceInput {

@@ -67,7 +67,9 @@ export type CSVField =
   | 'expenseCurrency'
   | 'expenseSubmittedByHandle'
   | 'expenseApprovedByHandle'
-  | 'expensePaidByHandle';
+  | 'expensePaidByHandle'
+  | 'expenseReference'
+  | 'expenseTransferReference';
 
 const FIELD_GROUPS: Record<string, readonly CSVField[]> = {
   transaction: [
@@ -119,7 +121,16 @@ const FIELD_GROUPS: Record<string, readonly CSVField[]> = {
     'paymentMethodService',
     'paymentMethodType',
   ],
-  expense: ['expenseId', 'expenseLegacyId', 'expenseType', 'expenseTags', 'payoutMethodType', 'merchantId'],
+  expense: [
+    'expenseId',
+    'expenseLegacyId',
+    'expenseType',
+    'expenseTags',
+    'payoutMethodType',
+    'merchantId',
+    'expenseReference',
+    'expenseTransferReference',
+  ],
   tax: ['taxAmount', 'taxType', 'taxRate', 'taxIdNumber'],
   legacy: ['platformFee', 'hostFee'],
 };
@@ -737,6 +748,25 @@ export const FIELDS: Array<{
       />
     ),
     label: <FormattedMessage defaultMessage="Expense Paid By Handle" id="NaeCZ+" />,
+  },
+  {
+    id: 'expenseReference',
+    group: 'expense',
+    label: <FormattedMessage defaultMessage="Expense Reference Number" id="fnGteD" />,
+    tooltip: (
+      <FormattedMessage defaultMessage="The Reference Number submitted by the user with the expense." id="5Zh4DV" />
+    ),
+  },
+  {
+    id: 'expenseTransferReference',
+    group: 'expense',
+    label: <FormattedMessage defaultMessage="Expense Transfer Reference" id="7wB9iF" />,
+    tooltip: (
+      <FormattedMessage
+        defaultMessage="The Reference Number used when setting up the payment transfer and the actual reference the user will receive on their side."
+        id="ysFgxk"
+      />
+    ),
   },
 
   // Deprecated
