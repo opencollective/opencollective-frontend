@@ -200,7 +200,7 @@ export const FIELDS: Array<{
   {
     id: 'numberOfPayeesYear',
     group: 'expenses',
-    label: <FormattedMessage defaultMessage="Distinct of Payees (1 year)" id="numberOfPayeesYear" />,
+    label: <FormattedMessage defaultMessage="Distinct number of Payees (1 year)" id="numberOfPayeesYear" />,
   },
   {
     id: 'numberOfContributionsYear',
