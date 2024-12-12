@@ -259,7 +259,12 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
         <DrawerHeader
           actions={actions}
           dropdownTriggerRef={dropdownTriggerRef}
-          entityName={<FormattedMessage defaultMessage="Contribution" id="0LK5eg" />}
+          entityName={
+            <div className="flex items-center gap-1">
+              <OrderStatusTag status={query.data?.order?.status} overflow="visible" />
+              <FormattedMessage defaultMessage="Contribution" id="0LK5eg" />
+            </div>
+          }
           forceMoreActions
           entityIdentifier={
             <CopyID
@@ -274,10 +279,7 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
               {isLoading ? (
                 <Skeleton className="h-6 w-56" />
               ) : (
-                <div className="flex items-start gap-2 text-base font-semibold text-foreground">
-                  <OrderStatusTag status={query.data.order.status} overflow="visible" />
-                  {query.data.order.description}
-                </div>
+                <div className="text-base font-semibold text-foreground">{query.data.order.description}</div>
               )}
             </React.Fragment>
           }
