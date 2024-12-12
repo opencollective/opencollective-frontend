@@ -314,7 +314,7 @@ export type AccountOrdersArgs = {
   expectedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
-  frequency?: InputMaybe<ContributionFrequency>;
+  frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
@@ -332,6 +332,7 @@ export type AccountOrdersArgs = {
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
+  tier?: InputMaybe<Array<InputMaybe<TierReferenceInput>>>;
   tierSlug?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -1707,7 +1708,7 @@ export type BotOrdersArgs = {
   expectedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
-  frequency?: InputMaybe<ContributionFrequency>;
+  frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
@@ -1725,6 +1726,7 @@ export type BotOrdersArgs = {
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
+  tier?: InputMaybe<Array<InputMaybe<TierReferenceInput>>>;
   tierSlug?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -2225,7 +2227,7 @@ export type CollectiveOrdersArgs = {
   expectedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
-  frequency?: InputMaybe<ContributionFrequency>;
+  frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
@@ -2243,6 +2245,7 @@ export type CollectiveOrdersArgs = {
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
+  tier?: InputMaybe<Array<InputMaybe<TierReferenceInput>>>;
   tierSlug?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -4192,7 +4195,7 @@ export type EventOrdersArgs = {
   expectedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
-  frequency?: InputMaybe<ContributionFrequency>;
+  frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
@@ -4210,6 +4213,7 @@ export type EventOrdersArgs = {
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
+  tier?: InputMaybe<Array<InputMaybe<TierReferenceInput>>>;
   tierSlug?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -5375,7 +5379,7 @@ export type FundOrdersArgs = {
   expectedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
-  frequency?: InputMaybe<ContributionFrequency>;
+  frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
@@ -5393,6 +5397,7 @@ export type FundOrdersArgs = {
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
+  tier?: InputMaybe<Array<InputMaybe<TierReferenceInput>>>;
   tierSlug?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -6085,7 +6090,7 @@ export type HostOrdersArgs = {
   expectedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
-  frequency?: InputMaybe<ContributionFrequency>;
+  frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
@@ -6103,6 +6108,7 @@ export type HostOrdersArgs = {
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
+  tier?: InputMaybe<Array<InputMaybe<TierReferenceInput>>>;
   tierSlug?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -6871,7 +6877,7 @@ export type IndividualOrdersArgs = {
   expectedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
-  frequency?: InputMaybe<ContributionFrequency>;
+  frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
@@ -6889,6 +6895,7 @@ export type IndividualOrdersArgs = {
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
+  tier?: InputMaybe<Array<InputMaybe<TierReferenceInput>>>;
   tierSlug?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -9204,7 +9211,7 @@ export type OrganizationOrdersArgs = {
   expectedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
-  frequency?: InputMaybe<ContributionFrequency>;
+  frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
@@ -9222,6 +9229,7 @@ export type OrganizationOrdersArgs = {
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
+  tier?: InputMaybe<Array<InputMaybe<TierReferenceInput>>>;
   tierSlug?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -9432,7 +9440,7 @@ export type PaymentMethodOrdersArgs = {
   expectedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
-  frequency?: InputMaybe<ContributionFrequency>;
+  frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
@@ -9449,6 +9457,7 @@ export type PaymentMethodOrdersArgs = {
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
+  tier?: InputMaybe<Array<InputMaybe<TierReferenceInput>>>;
   tierSlug?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -10251,7 +10260,7 @@ export type ProjectOrdersArgs = {
   expectedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
-  frequency?: InputMaybe<ContributionFrequency>;
+  frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
@@ -10269,6 +10278,7 @@ export type ProjectOrdersArgs = {
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
+  tier?: InputMaybe<Array<InputMaybe<TierReferenceInput>>>;
   tierSlug?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -10680,7 +10690,7 @@ export type QueryOrdersArgs = {
   expectedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
-  frequency?: InputMaybe<ContributionFrequency>;
+  frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
@@ -10698,6 +10708,7 @@ export type QueryOrdersArgs = {
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
+  tier?: InputMaybe<Array<InputMaybe<TierReferenceInput>>>;
   tierSlug?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -12357,7 +12368,7 @@ export type VendorOrdersArgs = {
   expectedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
   expectedFundsFilter?: InputMaybe<ExpectedFundsFilter>;
   filter?: InputMaybe<AccountOrdersFilter>;
-  frequency?: InputMaybe<ContributionFrequency>;
+  frequency?: InputMaybe<Array<InputMaybe<ContributionFrequency>>>;
   includeChildrenAccounts?: Scalars['Boolean']['input'];
   includeHostedAccounts?: InputMaybe<Scalars['Boolean']['input']>;
   includeIncognito?: InputMaybe<Scalars['Boolean']['input']>;
@@ -12375,6 +12386,7 @@ export type VendorOrdersArgs = {
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<OrderStatus>>>;
+  tier?: InputMaybe<Array<InputMaybe<TierReferenceInput>>>;
   tierSlug?: InputMaybe<Scalars['String']['input']>;
 };
 
