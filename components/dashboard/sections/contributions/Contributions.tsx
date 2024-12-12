@@ -375,6 +375,7 @@ const getColumns = ({ intl, isIncoming, includeHostedAccounts, onlyExpectedFunds
       );
     },
   };
+
   const paymentMethod = {
     accessorKey: 'paymentMethod',
     header: intl.formatMessage({ id: 'paymentmethod.label', defaultMessage: 'Payment Method' }),
@@ -445,7 +446,6 @@ const getColumns = ({ intl, isIncoming, includeHostedAccounts, onlyExpectedFunds
     header: '#',
     cell: ({ cell }) => {
       const legacyId = cell.getValue();
-
       return (
         // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
         <div className="cursor-default" onClick={e => e.stopPropagation()}>
@@ -455,7 +455,7 @@ const getColumns = ({ intl, isIncoming, includeHostedAccounts, onlyExpectedFunds
     },
   };
 
-  const date = {
+  const chargeDate = {
     accessorKey: 'lastChargedAt',
     header: intl.formatMessage({ id: 'Contribution.ChargeDate', defaultMessage: 'Charge Date' }),
     cell: ({ row }) => {
@@ -469,12 +469,27 @@ const getColumns = ({ intl, isIncoming, includeHostedAccounts, onlyExpectedFunds
     },
   };
 
+  const startDate = {
+    accessorKey: 'createdAt',
+    header: intl.formatMessage({ id: 'Contribution.CreationDate', defaultMessage: 'Creation Date' }),
+    cell: ({ row }) => {
+      const order = row.original;
+      const date = order.createdAt;
+      return (
+        <div className="flex items-center gap-2 truncate">
+          <DateTime value={date} dateStyle="medium" timeStyle={undefined} />
+        </div>
+      );
+    },
+  };
+
   return compact([
     onlyExpectedFunds ? contributionId : null,
     includeHostedAccounts ? accounts : isIncoming ? fromAccount : toAccount,
-    date,
+    chargeDate,
     amount,
     frequency,
+    startDate,
     paymentMethod,
     onlyExpectedFunds ? expectedAt : null,
     status,

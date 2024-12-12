@@ -393,13 +393,13 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                   )}
                   <DataListItem>
                     <DataListItemLabel>
-                      <FormattedMessage defaultMessage="Created" id="Created" />
+                      <FormattedMessage id="Contribution.CreationDate" defaultMessage="Creation Date" />
                     </DataListItemLabel>
                     <DataListItemValue>
                       {isLoading ? (
                         <Skeleton className="h-5 w-32" />
                       ) : (
-                        <DateTime value={query.data?.order?.createdAt} dateStyle="medium" />
+                        <DateTime value={query.data?.order?.createdAt} dateStyle="long" />
                       )}
                     </DataListItemValue>
                   </DataListItem>
@@ -407,10 +407,10 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                     query.data?.order.frequency !== ContributionFrequency.ONETIME && (
                       <DataListItem>
                         <DataListItemLabel>
-                          <FormattedMessage id="Contribution.ChargeDate" defaultMessage="Charge Date" />
+                          <FormattedMessage id="Contribution.LastChargeDate" defaultMessage="Last Charge Date" />
                         </DataListItemLabel>
                         <DataListItemValue>
-                          <DateTime value={query.data?.order?.lastChargedAt} dateStyle="medium" />
+                          <DateTime value={query.data?.order?.lastChargedAt} dateStyle="long" />
                         </DataListItemValue>
                       </DataListItem>
                     )}
@@ -418,13 +418,13 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                     query.data?.order.frequency !== ContributionFrequency.ONETIME && (
                       <DataListItem>
                         <DataListItemLabel>
-                          <FormattedMessage defaultMessage="Next charge date" id="1u4k2w" />
+                          <FormattedMessage defaultMessage="Next Charge Date" id="oJNxUE" />
                         </DataListItemLabel>
                         <DataListItemValue>
                           {isLoading ? (
                             <Skeleton className="h-5 w-32" />
                           ) : (
-                            <DateTime value={query.data?.order?.nextChargeDate} dateStyle="medium" />
+                            <DateTime value={query.data?.order?.nextChargeDate} dateStyle="long" />
                           )}
                         </DataListItemValue>
                       </DataListItem>

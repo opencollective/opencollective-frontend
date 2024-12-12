@@ -11,13 +11,13 @@ import { sortSelectOptions } from '../../../../lib/utils';
 
 import { amountFilter } from '../../filters/AmountFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
-import { expectedDateFilter, orderDateFilter } from '../../filters/DateFilter';
+import { expectedDateFilter, orderChargeDateFilter, orderCreateDateFilter } from '../../filters/DateFilter';
 import { expectedFundsFilter } from '../../filters/ExpectedFundsFilter';
 import { searchFilter } from '../../filters/SearchFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
 
 export const contributionsOrderFilter = buildSortFilter({
-  fieldSchema: z.enum(['LAST_CHARGED_AT']),
+  fieldSchema: z.enum(['LAST_CHARGED_AT', 'CREATED_AT']),
   defaultValue: {
     field: 'LAST_CHARGED_AT',
     direction: 'DESC',
@@ -26,6 +26,10 @@ export const contributionsOrderFilter = buildSortFilter({
     LAST_CHARGED_AT: defineMessage({
       id: 'Contribution.ChargeDate',
       defaultMessage: 'Charge Date',
+    }),
+    CREATED_AT: defineMessage({
+      id: 'Contribution.CreationDate',
+      defaultMessage: 'Creation Date',
     }),
   },
 });
@@ -38,7 +42,8 @@ export const schema = z.object({
   orderBy: contributionsOrderFilter.schema,
   searchTerm: searchFilter.schema,
   expectedDate: expectedDateFilter.schema,
-  date: orderDateFilter.schema,
+  chargeDate: orderChargeDateFilter.schema,
+  creationDate: orderCreateDateFilter.schema,
   expectedFundsFilter: expectedFundsFilter.schema,
   amount: amountFilter.schema,
   status: isMulti(z.nativeEnum(OrderStatus)).optional(),
@@ -61,7 +66,8 @@ type GraphQLQueryVariables = DashboardRecurringContributionsQueryVariables;
 export const toVariables: FiltersToVariables<FilterValues, GraphQLQueryVariables, FilterMeta> = {
   orderBy: contributionsOrderFilter.toVariables,
   expectedDate: expectedDateFilter.toVariables,
-  date: orderDateFilter.toVariables,
+  chargeDate: orderChargeDateFilter.toVariables,
+  creationDate: orderCreateDateFilter.toVariables,
   amount: amountFilter.toVariables,
   paymentMethod: (value: string) => {
     if (value) {
@@ -77,7 +83,8 @@ export const toVariables: FiltersToVariables<FilterValues, GraphQLQueryVariables
 export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   searchTerm: searchFilter.filter,
   expectedDate: expectedDateFilter.filter,
-  date: orderDateFilter.filter,
+  chargeDate: orderChargeDateFilter.filter,
+  creationDate: orderCreateDateFilter.filter,
   expectedFundsFilter: expectedFundsFilter.filter,
   amount: { ...amountFilter.filter, labelMsg: defineMessage({ id: 'Fields.amount', defaultMessage: 'Amount' }) },
   orderBy: contributionsOrderFilter.filter,
