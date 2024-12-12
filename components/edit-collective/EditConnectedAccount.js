@@ -7,13 +7,16 @@ import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { connectAccount, connectAccountCallback, disconnectAccount } from '../../lib/api';
+import { ConnectedAccountService } from '../../lib/graphql/types/v2/graphql';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
 import { getWebsiteUrl, isValidUrl, parseToBoolean } from '../../lib/utils';
 
 import DateTime from '../DateTime';
 import { Box, Flex } from '../Grid';
+import { getI18nLink } from '../I18nFormatters';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
+import StyledLink from '../StyledLink';
 import StyledSpinner from '../StyledSpinner';
 import { P } from '../Text';
 import { toast } from '../ui/useToast';
@@ -45,11 +48,6 @@ class EditConnectedAccount extends React.Component {
       'collective.connectedAccounts.stripe.description': {
         id: 'collective.create.connectedAccounts.stripe.description',
         defaultMessage: 'Connect a Stripe account to start accepting financial contributions.',
-      },
-      // Twitter
-      'collective.connectedAccounts.twitter.description': {
-        id: 'collective.connectedAccounts.twitter.description',
-        defaultMessage: 'Connect a Twitter account to automatically thank new financial contributors',
       },
       // Github
       'collective.connectedAccounts.github.description': {
@@ -202,6 +200,7 @@ class EditConnectedAccount extends React.Component {
     }
 
     const disableReason = this.messages[`collective.connectedAccounts.${service}.disableReason`];
+    const isTwitter = service === ConnectedAccountService.twitter;
     return (
       <Box width="100%">
         {this.isConnectCallback() ? (
@@ -220,13 +219,26 @@ class EditConnectedAccount extends React.Component {
             )}
             {connectedAccount ? (
               <Flex flexDirection="column" width="100%">
-                {Boolean(connectedAccount.settings?.needsReconnect) && (
-                  <MessageBox type="warning" withIcon mb={3}>
-                    <FormattedMessage
-                      defaultMessage="This account is currently inactive. Please reconnect it to continue using it."
-                      id="8n8mAu"
-                    />
-                  </MessageBox>
+                {isTwitter && (
+                  <div className="mb-4">
+                    <MessageBox withIcon type="warning">
+                      <FormattedMessage
+                        id="UjgBCr"
+                        defaultMessage="The Twitter integration is being deprecated. If this affects you, we’d love to hear your feedback! Please share your thoughts in <IssueLink>this Github issue</IssueLink> or join the discussion on {DiscordLink}."
+                        values={{
+                          DiscordLink: (
+                            <StyledLink href="https://discord.opencollective.com" openInNewTab>
+                              Discord
+                            </StyledLink>
+                          ),
+                          IssueLink: getI18nLink({
+                            href: 'https://github.com/opencollective/opencollective/issues/7670',
+                            openInNewTab: true,
+                          }),
+                        }}
+                      />
+                    </MessageBox>
+                  </div>
                 )}
                 <P mb={2}>
                   <FormattedMessage
@@ -244,14 +256,16 @@ class EditConnectedAccount extends React.Component {
                   />
                 </P>
                 <Flex mt={1} gridGap="8px" flexWrap="wrap">
-                  <StyledButton
-                    buttonSize="small"
-                    onClick={() => this.connect(service)}
-                    loading={isConnecting}
-                    disabled={disableReason}
-                  >
-                    <FormattedMessage id="collective.connectedAccounts.reconnect.button" defaultMessage="Reconnect" />
-                  </StyledButton>
+                  {!isTwitter && (
+                    <StyledButton
+                      buttonSize="small"
+                      onClick={() => this.connect(service)}
+                      loading={isConnecting}
+                      disabled={disableReason}
+                    >
+                      <FormattedMessage id="collective.connectedAccounts.reconnect.button" defaultMessage="Reconnect" />
+                    </StyledButton>
+                  )}
                   <StyledButton buttonSize="small" onClick={() => this.disconnect(service)} loading={isDisconnecting}>
                     <FormattedMessage id="collective.connectedAccounts.disconnect.button" defaultMessage="Disconnect" />
                   </StyledButton>
@@ -262,6 +276,26 @@ class EditConnectedAccount extends React.Component {
                   </Box>
                 )}
               </Flex>
+            ) : isTwitter ? (
+              <div>
+                <MessageBox withIcon type="warning">
+                  <FormattedMessage
+                    id="4IdZrh"
+                    defaultMessage="The Twitter integration is no longer supported. If this affects you, we’d love to hear your feedback! Please share your thoughts in <IssueLink>this Github issue</IssueLink> or join the discussion on {DiscordLink}."
+                    values={{
+                      DiscordLink: (
+                        <StyledLink href="https://discord.opencollective.com" openInNewTab>
+                          Discord
+                        </StyledLink>
+                      ),
+                      IssueLink: getI18nLink({
+                        href: 'https://github.com/opencollective/opencollective/issues/7670',
+                        openInNewTab: true,
+                      }),
+                    }}
+                  />
+                </MessageBox>
+              </div>
             ) : (
               <Box>
                 <P fontSize="12px" color="black.600" fontWeight="normal" mb={2}>

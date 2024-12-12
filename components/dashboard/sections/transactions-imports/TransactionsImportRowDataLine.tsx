@@ -71,9 +71,14 @@ const filterEmptyValues = value => {
   return value;
 };
 
+const checkIfKeyIsUnwanted = (key: string) => {
+  return ['personal_finance_category_icon_url'].includes(key);
+};
+
 export const TransactionsImportRowDataLine = ({ value, labelKey, level = 0 }) => {
+  const isUnwanted = React.useMemo(() => checkIfKeyIsUnwanted(labelKey), [labelKey]);
   const cleanValue = React.useMemo(() => filterEmptyValues(value), [value]);
-  if (!cleanValue) {
+  if (isUnwanted || !cleanValue) {
     return null;
   }
 

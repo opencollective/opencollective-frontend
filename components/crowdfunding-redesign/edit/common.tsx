@@ -1,94 +1,23 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { gql } from '@apollo/client';
 import clsx from 'clsx';
 import type { FormikProps } from 'formik';
-import { Field, Form } from 'formik';
-import { pickBy } from 'lodash';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { Form } from 'formik';
+import { FormattedMessage } from 'react-intl';
 import type { z } from 'zod';
 
-import { isOCError } from '../../../lib/errors';
-import { formatFormErrorMessage, RICH_ERROR_MESSAGES } from '../../../lib/form-utils';
-
-import { FormikZod, FormikZodContext, getInputAttributesFromZodSchema } from '../../FormikZod';
+import { FormField } from '../../FormField';
+import { FormikZod } from '../../FormikZod';
 import RichTextEditor from '../../RichTextEditor';
 import { Button } from '../../ui/Button';
-import { Input, InputGroup } from '../../ui/Input';
+import { ButtonSet } from '../../ui/ButtonSet';
+import { Collapsible, CollapsibleContent } from '../../ui/Collapsible';
+import { InputGroup } from '../../ui/Input';
 import { Label } from '../../ui/Label';
 import { Popover, PopoverContent, PopoverTrigger } from '../../ui/Popover';
-
-export function FormField({
-  label,
-  showError = true,
-  name,
-  hint,
-  placeholder,
-  children,
-  ...props
-}: {
-  label?: string;
-  showError?: boolean;
-  name: string;
-  hint?: string;
-  placeholder?: string;
-  children?: (props: { form: FormikProps<any>; meta: any; field: any }) => JSX.Element;
-  required?: boolean;
-  min?: number;
-  max?: number;
-  inputType?: string;
-  disabled?: boolean;
-  htmlFor?: string;
-}) {
-  const intl = useIntl();
-  const htmlFor = props.htmlFor || `input-${name}`;
-  const { schema } = useContext(FormikZodContext);
-
-  return (
-    <Field name={name}>
-      {({ field, form, meta }) => {
-        const hasError = Boolean(meta.error && (meta.touched || form.submitCount));
-        const fieldAttributes = {
-          ...(schema ? getInputAttributesFromZodSchema(schema, name) : null),
-          ...pickBy(
-            {
-              ...field,
-              name: name || htmlFor,
-              id: htmlFor,
-              type: props.inputType,
-              disabled: props.disabled,
-              min: props.min,
-              max: props.max,
-              required: props.required,
-              error: hasError,
-              placeholder,
-            },
-            value => value !== undefined,
-          ),
-        };
-        if (
-          'required' in fieldAttributes &&
-          !fieldAttributes.required &&
-          meta.error &&
-          meta.error === intl.formatMessage(RICH_ERROR_MESSAGES.requiredValue)
-        ) {
-          fieldAttributes.required = true;
-        }
-        return (
-          <div className="flex w-full flex-col gap-1">
-            {label && <Label className="text-base leading-normal">{label}</Label>}
-            {hint && <p className="text-sm text-muted-foreground">{hint}</p>}
-            {children ? children({ form, meta, field: fieldAttributes }) : <Input {...fieldAttributes} />}
-            {hasError && showError && (
-              <p className="text-xs text-red-500">
-                {isOCError(meta.error) ? formatFormErrorMessage(intl, meta.error) : meta.error}
-              </p>
-            )}
-          </div>
-        );
-      }}
-    </Field>
-  );
-}
+import { Separator } from '../../ui/Separator';
+import { Switch } from '../../ui/Switch';
+import { GoalProgress } from '../GoalProgress';
 
 export function ColumnSection({ title, description, children }) {
   return (
@@ -190,6 +119,157 @@ export const MainDetailsForm = ({ initialValues, schema, onSubmit }) => {
               <Button type="submit" loading={formik.isSubmitting}>
                 <FormattedMessage defaultMessage="Save" id="save" />
               </Button>
+            </div>
+          </Form>
+        );
+      }}
+    </FormikZod>
+  );
+};
+
+export const GoalsForm = ({ initialValues, schema, onSubmit, account }) => {
+  const [isEditing, setIsEditing] = React.useState(false);
+  return (
+    <FormikZod
+      schema={schema}
+      initialValues={{ goal: { amount: 0, recurrence: null, continuous: false, ...initialValues.goal } }}
+      onSubmit={async values => {
+        await onSubmit(schema.parse(values));
+        setIsEditing(false);
+      }}
+    >
+      {(formik: FormikProps<z.infer<typeof schema>>) => {
+        if (!isEditing) {
+          if (initialValues.goal) {
+            return (
+              <div className="space-y-3 rounded-lg border p-4">
+                <GoalProgress
+                  accountSlug={account.slug}
+                  goal={initialValues.goal}
+                  editButton={
+                    <Button size="sm" onClick={() => setIsEditing(true)} className="" variant="outline">
+                      Edit
+                    </Button>
+                  }
+                />
+              </div>
+            );
+          }
+          return (
+            <div className="space-y-4">
+              <Button onClick={() => setIsEditing(true)} className="" variant="outline">
+                Set a goal
+              </Button>{' '}
+              <div className="text-sm text-muted-foreground">{`You can set 1 goal at a time. If you reach your goal, you'll be able to set a new one.`}</div>
+            </div>
+          );
+        }
+        const currentType = formik.values.goal?.type || initialValues.goal?.type;
+        return (
+          <Form>
+            <div className="flex flex-col items-start gap-4 rounded-lg border">
+              <div className="space-y-6 px-6 pb-2 pt-6">
+                <FormField name="goal.amount" label={"Amount you're aiming for"}>
+                  {({ field }) => {
+                    return (
+                      <div className="flex items-center gap-2">
+                        <InputGroup
+                          {...field}
+                          onChange={e => {
+                            formik.setFieldValue(field.name, Number(e.target.value));
+                          }}
+                          prepend={'$'}
+                        />
+                        <span className="text-muted-foreground">
+                          {currentType === 'MONTHLY' ? '/month' : currentType === 'YEARLY' ? '/year' : null}
+                        </span>
+                      </div>
+                    );
+                  }}
+                </FormField>
+                <FormField name="goal.recurrence" label="Is it recurring?">
+                  {({ field }) => {
+                    return (
+                      <ButtonSet
+                        getKey={value => (value ? value.toString() : 'null')}
+                        options={[
+                          { value: null, label: 'No' },
+                          { value: 'MONTHLY', label: 'Monthly' },
+                          { value: 'YEARLY', label: 'Yearly' },
+                        ]}
+                        selected={field.value}
+                        onChange={value => {
+                          formik.setFieldValue(field.name, value);
+                        }}
+                      />
+                    );
+                  }}
+                </FormField>
+                <Collapsible open={Boolean(formik.values.goal?.recurrence)}>
+                  <CollapsibleContent>
+                    <FormField name="goal.continuous">
+                      {({ field }) => {
+                        return (
+                          <div className="mt-4 flex flex-row items-center justify-between gap-4 rounded-lg border p-4">
+                            <div className="space-y-0.5">
+                              <Label className="text-base">Continuous calculation</Label>
+                              <div className="space-y-3">
+                                <p className="text-sm text-muted-foreground">
+                                  Default goal progress calculation for recurring goals is based on calendar periods.
+                                  For recurring monthly goals, goal progress is based on contributions made in a given
+                                  calendar month (eg: May). For recurring yearly goals, goal progress is based on
+                                  contributions made in the given year (eg: 2024).
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                  Continuous calculation is an alternative calculation algorithm that is based on time
+                                  relative to the present moment. For recurring monthly goals, goal progress is based on
+                                  contribution made during the last 30 days. For recurring yearly goals, goal progress
+                                  is based on contributions made during the last 365 days.
+                                </p>
+                              </div>
+                            </div>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={val => {
+                                formik.setFieldValue('goal.continuous', val);
+                              }}
+                            />
+                          </div>
+                        );
+                      }}
+                    </FormField>
+                  </CollapsibleContent>
+                </Collapsible>
+              </div>
+              <Separator />
+              <div className="w-full space-y-4 px-6 py-2">
+                <span className="text-sm text-muted-foreground">
+                  <span className="font-semibold">Goal progress preview</span> (based on existing contributions)
+                </span>
+                <GoalProgress accountSlug={account.slug} goal={formik.values.goal} />
+              </div>
+              <Separator />
+              <div className="flex w-full items-center justify-between gap-4 px-6 pb-6 pt-2">
+                <div className="flex items-center gap-2">
+                  <Button type="submit" loading={formik.isSubmitting}>
+                    <FormattedMessage defaultMessage="Save" id="save" />
+                  </Button>
+                  <Button variant="outline" onClick={() => setIsEditing(false)}>
+                    <FormattedMessage defaultMessage="Cancel" id="actions.cancel" />
+                  </Button>
+                </div>
+                <Button
+                  variant="ghost"
+                  className="text-red-700"
+                  onClick={async () => {
+                    await onSubmit(schema.parse({ ...initialValues, goal: undefined }));
+
+                    setIsEditing(false);
+                  }}
+                >
+                  Remove goal
+                </Button>
+              </div>
             </div>
           </Form>
         );

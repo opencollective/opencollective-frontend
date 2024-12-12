@@ -18,6 +18,10 @@ export const adminPanelQuery = gql`
       isIncognito
       imageUrl(height: 256)
       canHaveChangelogUpdates
+      connectedAccounts {
+        id
+        service
+      }
       duplicatedAccounts {
         totalCount
       }

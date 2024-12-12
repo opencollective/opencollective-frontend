@@ -589,7 +589,7 @@ const CollectiveDetails = ({
             </div>
           </SectionTitle>
 
-          <InfoList className="sm:grid-cols-2">
+          <InfoList className="flex flex-col sm:grid sm:grid-cols-2">
             <InfoListItem
               title={<FormattedMessage id="HostedSince" defaultMessage="Hosted since" />}
               value={

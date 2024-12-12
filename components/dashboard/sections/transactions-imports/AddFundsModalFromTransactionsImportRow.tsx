@@ -14,7 +14,7 @@ import AddFundsModal from '../collectives/AddFundsModal';
 const prettyPrintRawValues = (rawValue: Record<string, string>) => {
   return Object.entries(rawValue)
     .filter(([, value]) => !isEmpty(value))
-    .map(([key, value]) => `- ${startCase(key)}: ${value}`)
+    .map(([key, value]) => `- ${startCase(key)}: ${JSON.stringify(value)}`)
     .join('\n');
 };
 

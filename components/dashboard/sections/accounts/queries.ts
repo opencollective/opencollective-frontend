@@ -32,6 +32,11 @@ const dashboardAccountsQueryFields = gql`
         currency
       }
     }
+    paymentMethods(service: OPENCOLLECTIVE, type: COLLECTIVE) {
+      id
+      service
+      name
+    }
   }
 `;
 

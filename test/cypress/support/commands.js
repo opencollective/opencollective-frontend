@@ -206,7 +206,7 @@ Cypress.Commands.add('createExpense', ({ userEmail = defaultTestUserEmail, accou
 
 /**
  * Create a collective hosted by the open source collective.
- * TODO: Migrate this to GQLV2 -> `createCollective` with `automateApprovalWithGithub` set to true
+ * TODO: Migrate this to GQLV2 -> `createCollective` with `__skipApprovalTestOnly` set to true
  */
 Cypress.Commands.add('createHostedCollective', ({ userEmail = defaultTestUserEmail, ...collectiveParams } = {}) => {
   const collective = {
@@ -265,6 +265,12 @@ Cypress.Commands.add('createProject', ({ userEmail = defaultTestUserEmail, colle
     }).then(({ body }) => {
       return body.data.createProject;
     });
+  });
+});
+
+Cypress.Commands.add('graphqlQueryV2', (query, { variables = {}, token = null } = {}) => {
+  return graphqlQueryV2(token, { query, variables }).then(({ body }) => {
+    return body.data;
   });
 });
 
@@ -528,7 +534,7 @@ Cypress.Commands.add('getStripePaymentElement', getStripePaymentElement);
 
 Cypress.Commands.add(
   'createCollectiveV2',
-  ({ email = defaultTestUserEmail, testPayload, host, collective, applicationData } = {}) => {
+  ({ email = defaultTestUserEmail, testPayload, host, collective, applicationData, skipApproval = false } = {}) => {
     const user = { email, newsletterOptIn: false };
     return signinRequest(user, null).then(response => {
       const token = getTokenFromRedirectUrl(response.body.redirect);
@@ -540,12 +546,14 @@ Cypress.Commands.add(
             $host: AccountReferenceInput!
             $testPayload: JSON
             $applicationData: JSON
+            $skipApproval: Boolean
           ) {
             createCollective(
               collective: $collective
               host: $host
               testPayload: $testPayload
               applicationData: $applicationData
+              skipApprovalTestOnly: $skipApproval
             ) {
               id
               slug
@@ -565,6 +573,7 @@ Cypress.Commands.add(
             ...collective,
           },
           applicationData,
+          skipApproval,
         },
       }).then(({ body }) => {
         return body.data.createCollective;
@@ -581,6 +590,43 @@ Cypress.Commands.add('getDownloadedPDFContent', (filename, options) => {
   cy.readFile(`${downloadFolder}/${filename}`, null, options).then(pdfFileContent => {
     cy.task('getTextFromPdfContent', pdfFileContent);
   });
+});
+
+Cypress.Commands.add('waitOrderStatus', (orderId, status) => {
+  return cy.retryChain(
+    () =>
+      cy
+        .graphqlQueryV2(
+          gql`
+            query OrderStatus($orderId: Int!) {
+              order(order: { legacyId: $orderId }) {
+                status
+              }
+            }
+          `,
+          { variables: { orderId } },
+        )
+        .then(data => data.order.status),
+    apiStatus => {
+      if (!apiStatus.match(status)) {
+        throw new Error(`Order did not transition to ${status} before timeout, current value: ${apiStatus}.`);
+      }
+    },
+    {
+      maxAttempts: 50,
+      wait: 1000,
+    },
+  );
+});
+
+Cypress.Commands.add('getOrderIdFromContributionSuccessPage', () => {
+  return cy
+    .get('[data-cy^="contribution-id-"]')
+    .invoke('attr', 'data-cy')
+    .then(contributionIdStr => {
+      const contributionId = parseInt(contributionIdStr.replace('contribution-id-', ''));
+      return contributionId;
+    });
 });
 
 // ---- Private ----

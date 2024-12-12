@@ -377,7 +377,7 @@ const ExpenseSummary = ({
                       url={attachment.url}
                       isLoading={isLoading || isLoadingLoggedInUser}
                       isPrivate={!attachment.url && !isLoading}
-                      size={[640, 48]}
+                      size={[64, 48]}
                       maxHeight={48}
                       openFileViewer={openFileViewer}
                     />
@@ -519,12 +519,12 @@ const ExpenseSummary = ({
       {!isEditing &&
         (drawerActionsContainer ? (
           createPortal(processButtons, drawerActionsContainer)
-        ) : (
+        ) : showProcessButtons ? (
           <Fragment>
             <StyledHr flex="1" mt={4} mb={3} borderColor="black.300" />
             {processButtons}
           </Fragment>
-        ))}
+        ) : null)}
     </StyledCard>
   );
 };

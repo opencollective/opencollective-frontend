@@ -8,6 +8,7 @@ import { i18nGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { isValidUrl } from '../../../lib/utils';
 
+import { FormField } from '../../FormField';
 import { FormikZod } from '../../FormikZod';
 import StyledDropzone, { DROPZONE_ACCEPT_IMAGES } from '../../StyledDropzone';
 import { Button } from '../../ui/Button';
@@ -20,7 +21,7 @@ import { getDefaultProfileValues, profileSchema } from '../helpers';
 import {
   ColumnSection,
   editCrowdfundingSettingsMutation,
-  FormField,
+  GoalsForm,
   LongDescriptionForm,
   MainDetailsForm,
 } from './common';
@@ -79,7 +80,6 @@ export function EditProfile({ account }) {
   });
   const intl = useIntl();
   const initialValues = getDefaultProfileValues(account);
-
   const onSubmit = async values => {
     try {
       await submitEditSettings({
@@ -124,6 +124,15 @@ export function EditProfile({ account }) {
           initialValues={initialValues}
           onSubmit={onSubmit}
         />
+        <Separator />
+        <ColumnSection title="Goal" description="Set a goal to share with your community.">
+          <GoalsForm
+            schema={profileSchema.pick({ goal: true })}
+            initialValues={initialValues}
+            onSubmit={onSubmit}
+            account={account}
+          />
+        </ColumnSection>
         <Separator />
         <LongDescriptionForm
           schema={profileSchema.pick({ longDescription: true })}

@@ -44,7 +44,7 @@ if [ -z "$PDF_FOLDER" ]; then
 else
   cd $PDF_FOLDER
 fi
-PORT=3002 npm start &
+PORT=3002 OPENSSL_CONF=/dev/null npm start &
 PDF_PID=$!
 cd -
 
@@ -86,7 +86,7 @@ wait_for_service PDF 127.0.0.1 3002
 echo ""
 echo "> Running cypress tests"
 
-npm run cypress:run -- ${CYPRESS_RECORD} --env OC_ENV=$OC_ENV --spec "test/cypress/integration/${CYPRESS_TEST_FILES}"
+npm run cypress:run -- ${CYPRESS_RECORD} --browser chromium --env OC_ENV=$OC_ENV --spec "test/cypress/integration/${CYPRESS_TEST_FILES}"
 
 RETURN_CODE=$?
 if [ $RETURN_CODE -ne 0 ]; then

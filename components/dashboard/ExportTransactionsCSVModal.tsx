@@ -9,6 +9,7 @@ import type { MouseEventHandler } from 'react';
 import { FormattedMessage } from 'react-intl';
 import slugify from 'slugify';
 
+import { setRestAuthorizationCookie } from '../../lib/auth';
 import { getEnvVar } from '../../lib/env-utils';
 import type { CSVField } from '../../lib/export-csv/transactions-csv';
 import {
@@ -43,8 +44,6 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Input } from '../ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 import { Switch } from '../ui/Switch';
-
-const env = process.env.OC_ENV;
 
 const TOTAL_AVAILABLE_FIELDS = FIELDS.length;
 
@@ -111,6 +110,10 @@ const makeUrl = ({ account, isHostReport, queryFilter, flattenTaxesAndPaymentPro
 
   if (!isNil(queryFilter.values.isRefund)) {
     url.searchParams.set('isRefund', queryFilter.values.isRefund ? '1' : '0');
+  }
+
+  if (!isNil(queryFilter.values.hasDebt)) {
+    url.searchParams.set('hasDebt', queryFilter.values.hasDebt ? '1' : '0');
   }
 
   if (queryFilter.values.orderId) {
@@ -305,15 +308,7 @@ const ExportTransactionsCSVModal = ({
   }, [queryFilter.values, account, open]);
 
   React.useEffect(() => {
-    const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-    if (typeof document !== 'undefined' && accessToken) {
-      document.cookie =
-        env === 'development' || env === 'e2e'
-          ? `authorization="Bearer ${accessToken}";path=/;SameSite=strict;max-age=120`
-          : // It is not possible to use HttpOnly when setting from JavaScript.
-            // I'm enforcing SameSite and Domain in production to prevent CSRF.
-            `authorization="Bearer ${accessToken}";path=/;SameSite=strict;max-age=120;domain=opencollective.com;secure`;
-    }
+    setRestAuthorizationCookie();
     setDownloadUrl(makeUrl({ account, isHostReport, queryFilter, flattenTaxesAndPaymentProcessorFees, fields }));
   }, [fields, flattenTaxesAndPaymentProcessorFees, queryFilter, account, isHostReport, setDownloadUrl]);
 

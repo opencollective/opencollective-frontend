@@ -34,6 +34,12 @@ const transactionsTableQueryCollectionFragment = gql`
         id
         group
       }
+      host {
+        id
+        slug
+        legacyId
+        type
+      }
       account {
         id
         name
@@ -100,6 +106,7 @@ export const transactionsTableQuery = gql`
     $expense: ExpenseReferenceInput
     $order: OrderReferenceInput
     $isRefund: Boolean
+    $hasDebt: Boolean
     $merchantId: [String]
     $accountingCategory: [String]
   ) {
@@ -132,6 +139,7 @@ export const transactionsTableQuery = gql`
       expense: $expense
       order: $order
       isRefund: $isRefund
+      hasDebt: $hasDebt
       merchantId: $merchantId
       accountingCategory: $accountingCategory
     ) {

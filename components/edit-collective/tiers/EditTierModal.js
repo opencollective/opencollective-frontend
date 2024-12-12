@@ -67,14 +67,17 @@ function getTierTypeOptions(intl, collectiveType) {
   return [...simplifiedTierTypes, membershipTierType];
 }
 
-function getReceiptTemplates(host) {
+function getReceiptTemplates(intl, host) {
   const receiptTemplates = host?.settings?.invoice?.templates;
 
   const receiptTemplateTitles = [];
   if (receiptTemplates?.default) {
     receiptTemplateTitles.push({
       value: 'default',
-      label: receiptTemplates.default.title,
+      label: intl.formatMessage(
+        { defaultMessage: '{value} (default)', id: 'OgbGHX' },
+        { value: receiptTemplates.default.title },
+      ),
     });
   }
   if (receiptTemplates?.alternative) {
@@ -102,7 +105,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
     },
   ];
 
-  const receiptTemplateOptions = getReceiptTemplates(collective.host);
+  const receiptTemplateOptions = getReceiptTemplates(intl, collective.host);
 
   const taxes = getApplicableTaxes(collective, collective.host, values.type);
 
@@ -275,6 +278,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
           {({ field, form }) => (
             <InputFieldPresets
               {...field}
+              min={values.minimumAmount?.valueInCents || 0}
               defaultValue={field.value}
               onChange={value => form.setFieldValue(field.name, value)}
             />
@@ -519,7 +523,7 @@ function FormFields({ collective, values, hideTypeSelect }) {
                 onChange={({ value }) => form.setFieldValue(field.name, value)}
                 isLoading={loading}
                 options={receiptTemplateOptions}
-                value={receiptTemplateOptions.find(option => option.value === field.value)}
+                value={receiptTemplateOptions.find(option => option.value === (field.value ?? 'default'))}
               />
             )}
           </StyledInputFormikField>
@@ -548,6 +552,7 @@ FormFields.propTypes = {
     type: PropTypes.string,
     amountType: PropTypes.string,
     interval: PropTypes.string,
+    minimumAmount: PropTypes.shape({ valueInCents: PropTypes.number, currency: PropTypes.string }),
   }),
   hideTypeSelect: PropTypes.bool,
   tier: PropTypes.shape({

@@ -3,6 +3,7 @@ import React from 'react';
 import { flatten, isEmpty, omit } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
+import { setRestAuthorizationCookie } from '../lib/auth';
 import { simpleDateToISOString } from '../lib/date-utils';
 import { getEnvVar } from '../lib/env-utils';
 import {
@@ -33,8 +34,6 @@ import StyledInputField from './StyledInputField';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from './StyledModal';
 import StyledSelect from './StyledSelect';
 import { Span } from './Text';
-
-const env = process.env.OC_ENV;
 
 type ExportTransactionsCSVModalProps = {
   onClose: () => void;
@@ -166,15 +165,7 @@ const ExportTransactionsCSVModal = ({
   }, [tmpDateInterval, collective, host, accounts]);
 
   React.useEffect(() => {
-    const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-    if (typeof document !== 'undefined' && accessToken) {
-      document.cookie =
-        env === 'development' || env === 'e2e'
-          ? `authorization="Bearer ${accessToken}";path=/;SameSite=strict;max-age=120`
-          : // It is not possible to use HttpOnly when setting from JavaScript.
-            // I'm enforcing SameSite and Domain in production to prevent CSRF.
-            `authorization="Bearer ${accessToken}";path=/;SameSite=strict;max-age=120;domain=opencollective.com;secure`;
-    }
+    setRestAuthorizationCookie();
     setDownloadUrl(getUrl());
   }, [fields, flattenTaxesAndPaymentProcessorFees, tmpDateInterval]);
 

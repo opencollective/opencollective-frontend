@@ -8,6 +8,7 @@ import { i18nGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { isValidUrl } from '../../../lib/utils';
 
+import { FormField } from '../../FormField';
 import { FormikZod } from '../../FormikZod';
 import StyledDropzone, { DROPZONE_ACCEPT_IMAGES } from '../../StyledDropzone';
 import Tabs from '../../Tabs';
@@ -22,7 +23,7 @@ import { fundraiserSchema, getDefaultFundraiserValues } from '../helpers';
 import {
   ColumnSection,
   editCrowdfundingSettingsMutation,
-  FormField,
+  GoalsForm,
   LongDescriptionForm,
   MainDetailsForm,
 } from './common';
@@ -192,6 +193,15 @@ export function EditFundraiser({ account }) {
           initialValues={initialValues}
           onSubmit={onSubmit}
         />
+        <Separator />
+        <ColumnSection title="Goal" description="Set a goal to share with your community.">
+          <GoalsForm
+            schema={fundraiserSchema.pick({ goal: true })}
+            initialValues={initialValues}
+            onSubmit={onSubmit}
+            account={account}
+          />
+        </ColumnSection>
         <Separator />
         <LongDescriptionForm
           schema={fundraiserSchema.pick({ longDescription: true })}

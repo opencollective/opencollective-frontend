@@ -9,6 +9,7 @@ import {
   MoreHorizontal,
   Pause,
   Play,
+  Receipt,
   ReceiptText,
   SquareSigma,
   Unlink,
@@ -39,6 +40,7 @@ import {
 import { TableActionsButton } from '../../../ui/Table';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 import { DashboardContext } from '../../DashboardContext';
+import { HostCreateExpenseModal } from '../expenses/HostCreateExpenseModal';
 
 import AddFundsModal from './AddFundsModal';
 import FreezeAccountModal from './FreezeAccountModal';
@@ -287,7 +289,7 @@ export const MoreActionsMenu = ({
   const router = useRouter();
   const { account } = React.useContext(DashboardContext);
   const [openModal, setOpenModal] = React.useState<
-    null | 'ADD_FUNDS' | 'FREEZE' | 'UNHOST' | 'ADD_AGREEMENT' | 'CONTACT'
+    null | 'ADD_FUNDS' | 'ADD_EXPENSE' | 'FREEZE' | 'UNHOST' | 'ADD_AGREEMENT' | 'CONTACT'
   >(null);
 
   return (
@@ -320,6 +322,15 @@ export const MoreActionsMenu = ({
           >
             <Banknote className="mr-2" size="16" />
             <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            className="cursor-pointer"
+            data-cy="actions-add-expense"
+            onClick={() => setOpenModal('ADD_EXPENSE')}
+          >
+            <Receipt className="mr-2" size="16" />
+            <FormattedMessage defaultMessage="Add expense" id="6/UjBO" />
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
@@ -364,6 +375,9 @@ export const MoreActionsMenu = ({
         <React.Fragment>
           {openModal === 'ADD_FUNDS' && (
             <AddFundsModal collective={collective} onClose={() => setOpenModal(null)} onSuccess={onEdit} />
+          )}
+          {openModal === 'ADD_EXPENSE' && (
+            <HostCreateExpenseModal open setOpen={() => setOpenModal(null)} host={collective.host} />
           )}
           {openModal === 'FREEZE' && (
             <FreezeAccountModal collective={collective} onClose={() => setOpenModal(null)} onSuccess={onEdit} />
