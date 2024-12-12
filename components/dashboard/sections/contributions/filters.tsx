@@ -43,7 +43,7 @@ export const schema = z.object({
   searchTerm: searchFilter.schema,
   expectedDate: expectedDateFilter.schema,
   chargeDate: orderChargeDateFilter.schema,
-  creationDate: orderCreateDateFilter.schema,
+  date: orderCreateDateFilter.schema,
   expectedFundsFilter: expectedFundsFilter.schema,
   amount: amountFilter.schema,
   status: isMulti(z.nativeEnum(OrderStatus)).optional(),
@@ -67,7 +67,7 @@ export const toVariables: FiltersToVariables<FilterValues, GraphQLQueryVariables
   orderBy: contributionsOrderFilter.toVariables,
   expectedDate: expectedDateFilter.toVariables,
   chargeDate: orderChargeDateFilter.toVariables,
-  creationDate: orderCreateDateFilter.toVariables,
+  date: orderCreateDateFilter.toVariables,
   amount: amountFilter.toVariables,
   paymentMethod: (value: string) => {
     if (value) {
@@ -84,7 +84,7 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   searchTerm: searchFilter.filter,
   expectedDate: expectedDateFilter.filter,
   chargeDate: orderChargeDateFilter.filter,
-  creationDate: orderCreateDateFilter.filter,
+  date: orderCreateDateFilter.filter,
   expectedFundsFilter: expectedFundsFilter.filter,
   amount: { ...amountFilter.filter, labelMsg: defineMessage({ id: 'Fields.amount', defaultMessage: 'Amount' }) },
   orderBy: contributionsOrderFilter.filter,
