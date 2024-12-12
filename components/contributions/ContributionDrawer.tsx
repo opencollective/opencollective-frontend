@@ -1,37 +1,33 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { isEmpty } from 'lodash';
-import { Check, Link as LinkIcon, X } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../lib/actions/types';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type { ContributionDrawerQuery, ContributionDrawerQueryVariables } from '../../lib/graphql/types/v2/graphql';
-import { OrderStatus } from '../../lib/graphql/types/v2/graphql';
-import useClipboard from '../../lib/hooks/useClipboard';
-import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { ContributionFrequency, OrderStatus } from '../../lib/graphql/types/v2/graphql';
 import { i18nFrequency } from '../../lib/i18n/order';
 import { i18nPaymentMethodProviderType } from '../../lib/i18n/payment-method-provider-type';
-import type LoggedInUser from '../../lib/LoggedInUser';
 
 import { AccountHoverCard } from '../AccountHoverCard';
 import Avatar from '../Avatar';
+import { CopyID } from '../CopyId';
 import DateTime from '../DateTime';
+import DrawerHeader from '../DrawerHeader';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import Link from '../Link';
-import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import { OrderAdminAccountingCategoryPill } from '../orders/OrderAccountingCategoryPill';
 import OrderStatusTag from '../orders/OrderStatusTag';
 import PaymentMethodTypeWithIcon from '../PaymentMethodTypeWithIcon';
-import { DropdownActionItem } from '../table/RowActionsMenu';
 import Tags from '../Tags';
-import { Button } from '../ui/Button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/DropdownMenu';
-import { Sheet, SheetContent, SheetFooter } from '../ui/Sheet';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
+import { DataList, DataListItem, DataListItemLabel, DataListItemValue } from '../ui/DataList';
+import { InfoList, InfoListItem } from '../ui/InfoList';
+import { Sheet, SheetContent } from '../ui/Sheet';
+import { Skeleton } from '../ui/Skeleton';
 
-import ContributionTimeline, { getTransactionsUrl } from './ContributionTimeline';
+import ContributionTimeline from './ContributionTimeline';
 
 type ContributionDrawerProps = {
   open: boolean;
@@ -40,17 +36,8 @@ type ContributionDrawerProps = {
   getActions: GetActions<ContributionDrawerQuery['order']>;
 };
 
-function getTransactionOrderLink(LoggedInUser: LoggedInUser, order: ContributionDrawerQuery['order']): string {
-  const url = getTransactionsUrl(LoggedInUser, order);
-  url.searchParams.set('orderId', order.legacyId.toString());
-  return url.toString();
-}
-
 export function ContributionDrawer(props: ContributionDrawerProps) {
-  const clipboard = useClipboard();
   const intl = useIntl();
-
-  const { LoggedInUser } = useLoggedInUser();
 
   const query = useQuery<ContributionDrawerQuery, ContributionDrawerQueryVariables>(
     gql`
@@ -59,6 +46,7 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
           id
           legacyId
           nextChargeDate
+          lastChargedAt
           amount {
             value
             valueInCents
@@ -262,96 +250,73 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
 
   const isLoading = !query.called || query.loading || !query.data || query.data.order?.legacyId !== props.orderId;
 
-  const actions = query.data?.order ? props.getActions(query.data.order) : null;
+  const dropdownTriggerRef = React.useRef();
+  const actions = query.data?.order ? props.getActions(query.data.order, dropdownTriggerRef) : null;
 
   return (
     <Sheet open={props.open} onOpenChange={isOpen => !isOpen && props.onClose()}>
       <SheetContent className="flex max-w-xl flex-col overflow-hidden">
+        <DrawerHeader
+          actions={actions}
+          dropdownTriggerRef={dropdownTriggerRef}
+          entityName={<FormattedMessage defaultMessage="Contribution" id="0LK5eg" />}
+          forceMoreActions
+          entityIdentifier={
+            <CopyID
+              value={props.orderId}
+              tooltipLabel={<FormattedMessage defaultMessage="Copy transaction ID" id="zzd7ZI" />}
+            >
+              #{props.orderId}
+            </CopyID>
+          }
+          entityLabel={
+            <React.Fragment>
+              {isLoading ? (
+                <Skeleton className="h-6 w-56" />
+              ) : (
+                <div className="flex items-start gap-2 text-base font-semibold text-foreground">
+                  <OrderStatusTag status={query.data.order.status} overflow="visible" />
+                  {query.data.order.description}
+                </div>
+              )}
+            </React.Fragment>
+          }
+        />
         <div className="flex-grow overflow-auto px-8 py-4">
           {query.error ? (
             <MessageBoxGraphqlError error={query.error} />
           ) : (
             <React.Fragment>
-              <div className="flex items-center">
-                <div className="flex items-center gap-2 text-lg font-bold">
-                  <FormattedMessage defaultMessage="Contribution" id="0LK5eg" />
-                  <div>{isLoading ? <LoadingPlaceholder height={20} /> : `# ${query.data.order.legacyId}`}</div>
-                  {isLoading ? null : (
-                    <Tooltip delayDuration={100}>
-                      <TooltipTrigger asChild>
-                        <Button
-                          asChild
-                          variant="ghost"
-                          size="icon-sm"
-                          onPointerDown={e => {
-                            e.stopPropagation();
-                          }}
-                          onClick={e => {
-                            const orderUrl = new URL(
-                              `${query.data.order.toAccount.slug}/orders/${query.data.order.legacyId}`,
-                              window.location.origin,
-                            );
-
-                            e.preventDefault();
-                            e.stopPropagation();
-                            clipboard.copy(orderUrl.toString());
-                          }}
-                        >
-                          <div className="cursor-pointer">
-                            <LinkIcon size={16} />
-                          </div>
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        {clipboard.isCopied ? (
-                          <div className="flex items-center gap-1">
-                            <Check size={16} />
-                            <FormattedMessage id="Clipboard.Copied" defaultMessage="Copied!" />
-                          </div>
-                        ) : (
-                          <FormattedMessage id="Clipboard.CopyShort" defaultMessage="Copy" />
-                        )}
-                      </TooltipContent>
-                    </Tooltip>
-                  )}
-                </div>
-                <div className="ml-auto flex items-center gap-2">
-                  {query.data?.order?.status && <OrderStatusTag status={query.data.order.status} />}
-                  <Button variant="ghost" size="icon-sm" onClick={props.onClose}>
-                    <X size={16} />
-                  </Button>
-                </div>
-              </div>
-              {query.data?.order?.permissions?.canUpdateAccountingCategory &&
-                query.data.order.toAccount &&
-                'host' in query.data.order.toAccount && (
-                  <div className="mb-4">
+              <div className="flex items-center gap-2">
+                {isLoading ? (
+                  <Skeleton className="h-6 w-32" />
+                ) : (
+                  query.data?.order?.permissions?.canUpdateAccountingCategory &&
+                  query.data.order.toAccount &&
+                  'host' in query.data.order.toAccount && (
                     <OrderAdminAccountingCategoryPill
                       order={query.data?.order}
                       account={query.data?.order.toAccount}
                       host={query.data.order.toAccount.host}
                     />
-                  </div>
+                  )
                 )}
-              <div className="mb-4">
-                {isLoading ? (
-                  <LoadingPlaceholder height={20} />
-                ) : (
-                  <Tags canEdit={query.data?.order?.permissions?.canSetTags} order={query.data?.order} />
-                )}
-              </div>
-              <div className="mb-6">
-                <div>{isLoading ? <LoadingPlaceholder height={20} /> : query.data.order.description}</div>
+                <div>
+                  {isLoading ? (
+                    <Skeleton className="h-6 w-24" />
+                  ) : (
+                    <Tags canEdit={query.data?.order?.permissions?.canSetTags} order={query.data?.order} />
+                  )}
+                </div>
               </div>
               <div className="text-sm">
-                <div className="mb-4 grid grid-cols-3 gap-4 gap-y-6 text-sm [&>*>*:first-child]:mb-2 [&>*>*:first-child]:font-bold [&>*>*:first-child]:text-[#344256]">
-                  <div>
-                    <div>
-                      <FormattedMessage defaultMessage="Contributor" id="Contributor" />
-                    </div>
-                    <div>
-                      {isLoading ? (
-                        <LoadingPlaceholder height={20} />
+                <InfoList className="mb-6 sm:grid-cols-2">
+                  <InfoListItem
+                    className="border-b border-t-0"
+                    title={<FormattedMessage defaultMessage="Contributor" id="Contributor" />}
+                    value={
+                      isLoading ? (
+                        <Skeleton className="h-6 w-48" />
                       ) : (
                         <AccountHoverCard
                           account={query.data.order.fromAccount}
@@ -365,16 +330,16 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                             </Link>
                           }
                         />
-                      )}
-                    </div>
-                  </div>
-                  <div>
-                    <div>
-                      <FormattedMessage defaultMessage="Collective" id="Collective" />
-                    </div>
-                    <div>
-                      {isLoading ? (
-                        <LoadingPlaceholder height={20} />
+                      )
+                    }
+                  />
+
+                  <InfoListItem
+                    className="border-b border-t-0"
+                    title={<FormattedMessage defaultMessage="Collective" id="Collective" />}
+                    value={
+                      isLoading ? (
+                        <Skeleton className="h-6 w-48" />
                       ) : (
                         <AccountHoverCard
                           account={query.data.order.toAccount}
@@ -388,167 +353,182 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                             </Link>
                           }
                         />
-                      )}
-                    </div>
-                  </div>
-                  <div>
-                    <div>
-                      <FormattedMessage defaultMessage="Payment Method" id="paymentmethod.label" />
-                    </div>
-                    <div>
+                      )
+                    }
+                  />
+                </InfoList>
+
+                <DataList className="mb-4">
+                  <DataListItem>
+                    <DataListItemLabel>
+                      <FormattedMessage defaultMessage="Amount" id="Fields.amount" />
+                    </DataListItemLabel>
+                    <DataListItemValue>
                       {isLoading ? (
-                        <LoadingPlaceholder height={20} />
+                        <Skeleton className="h-5 w-32" />
+                      ) : (
+                        <React.Fragment>
+                          <FormattedMoneyAmount
+                            showCurrencyCode={true}
+                            currency={query.data.order.totalAmount.currency}
+                            amount={query.data.order.totalAmount.valueInCents}
+                          />
+                        </React.Fragment>
+                      )}
+                    </DataListItemValue>
+                  </DataListItem>
+                  {query.data?.order?.platformTipAmount?.valueInCents > 0 && (
+                    <DataListItem>
+                      <DataListItemLabel>
+                        <FormattedMessage defaultMessage="Platform Tip" id="Fields.platformTip" />
+                      </DataListItemLabel>
+                      <DataListItemValue>
+                        <FormattedMoneyAmount
+                          showCurrencyCode={true}
+                          currency={query.data.order.platformTipAmount.currency}
+                          amount={query.data.order.platformTipAmount.valueInCents}
+                        />
+                      </DataListItemValue>
+                    </DataListItem>
+                  )}
+                  <DataListItem>
+                    <DataListItemLabel>
+                      <FormattedMessage defaultMessage="Created" id="Created" />
+                    </DataListItemLabel>
+                    <DataListItemValue>
+                      {isLoading ? (
+                        <Skeleton className="h-5 w-32" />
+                      ) : (
+                        <DateTime value={query.data?.order?.createdAt} dateStyle="medium" />
+                      )}
+                    </DataListItemValue>
+                  </DataListItem>
+                  {query.data?.order?.lastChargedAt &&
+                    query.data?.order.frequency !== ContributionFrequency.ONETIME && (
+                      <DataListItem>
+                        <DataListItemLabel>
+                          <FormattedMessage id="Contribution.ChargeDate" defaultMessage="Charge Date" />
+                        </DataListItemLabel>
+                        <DataListItemValue>
+                          <DateTime value={query.data?.order?.lastChargedAt} dateStyle="medium" />
+                        </DataListItemValue>
+                      </DataListItem>
+                    )}
+                  {query.data?.order?.nextChargeDate &&
+                    query.data?.order.frequency !== ContributionFrequency.ONETIME && (
+                      <DataListItem>
+                        <DataListItemLabel>
+                          <FormattedMessage defaultMessage="Next charge date" id="1u4k2w" />
+                        </DataListItemLabel>
+                        <DataListItemValue>
+                          {isLoading ? (
+                            <Skeleton className="h-5 w-32" />
+                          ) : (
+                            <DateTime value={query.data?.order?.nextChargeDate} dateStyle="medium" />
+                          )}
+                        </DataListItemValue>
+                      </DataListItem>
+                    )}
+                  <DataListItem>
+                    <DataListItemLabel>
+                      <FormattedMessage defaultMessage="Payment Method" id="paymentmethod.label" />
+                    </DataListItemLabel>
+                    <DataListItemValue>
+                      {isLoading ? (
+                        <Skeleton className="h-5 w-44" />
                       ) : query.data.order.status === OrderStatus.PENDING ? (
                         i18nPaymentMethodProviderType(intl, query.data.order.pendingContributionData.paymentMethod)
                       ) : (
                         <PaymentMethodTypeWithIcon type={query.data.order.paymentMethod?.type} iconSize={16} />
                       )}
-                    </div>
-                  </div>
-
+                    </DataListItemValue>
+                  </DataListItem>
                   {query.data?.order?.status === OrderStatus.PENDING && (
                     <React.Fragment>
                       {query.data.order.pendingContributionData?.ponumber && (
-                        <div className="col-span-3">
-                          <div>
+                        <DataListItem>
+                          <DataListItemLabel>
                             <FormattedMessage defaultMessage="PO Number" id="Fields.PONumber" />
-                          </div>
-                          <div>{query.data.order.pendingContributionData.ponumber}</div>
-                        </div>
+                          </DataListItemLabel>
+                          <DataListItemValue>{query.data.order.pendingContributionData.ponumber}</DataListItemValue>
+                        </DataListItem>
                       )}
+
                       {query.data.order.pendingContributionData?.fromAccountInfo && (
-                        <div className="col-span-3">
-                          <div>
+                        <DataListItem>
+                          <DataListItemLabel>
                             <FormattedMessage defaultMessage="Contact" id="Contact" />
-                          </div>
-                          <div>
+                          </DataListItemLabel>
+                          <DataListItemValue>
+                            {' '}
                             {query.data.order.pendingContributionData?.fromAccountInfo?.email
                               ? `${query.data.order.pendingContributionData.fromAccountInfo.name} (${query.data.order.pendingContributionData.fromAccountInfo.email})`
                               : query.data.order.pendingContributionData.fromAccountInfo.name}
-                          </div>
-                        </div>
+                          </DataListItemValue>
+                        </DataListItem>
                       )}
                     </React.Fragment>
                   )}
-
-                  <div>
-                    <div>
+                  <DataListItem>
+                    <DataListItemLabel>
                       <FormattedMessage defaultMessage="Frequency" id="Frequency" />
-                    </div>
-                    <div>
+                    </DataListItemLabel>
+                    <DataListItemValue>
                       {isLoading ? (
-                        <LoadingPlaceholder height={20} />
+                        <Skeleton className="h-5 w-44" />
                       ) : (
                         i18nFrequency(intl, query.data?.order?.frequency)
                       )}
-                    </div>
-                  </div>
+                    </DataListItemValue>
+                  </DataListItem>
 
                   {query.data?.order?.tier && (
-                    <div>
-                      <div>
+                    <DataListItem>
+                      <DataListItemLabel>
                         <FormattedMessage defaultMessage="Tier" id="b07w+D" />
-                      </div>
-                      <div>{isLoading ? <LoadingPlaceholder height={20} /> : query.data.order.tier.name}</div>
-                    </div>
+                      </DataListItemLabel>
+                      <DataListItemValue>{query.data.order.tier.name}</DataListItemValue>
+                    </DataListItem>
                   )}
-
-                  <div>
-                    <div>
-                      <FormattedMessage defaultMessage="Created" id="Created" />
-                    </div>
-                    <div>
-                      {isLoading ? (
-                        <LoadingPlaceholder height={20} />
-                      ) : (
-                        <DateTime value={query.data?.order?.createdAt} dateStyle="medium" />
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="col-span-3">
-                    <div>
-                      <FormattedMessage defaultMessage="Amount" id="Fields.amount" />
-                    </div>
-                    <div>
-                      {isLoading ? (
-                        <LoadingPlaceholder height={20} />
-                      ) : (
-                        <React.Fragment>
-                          <div>
-                            <FormattedMessage
-                              defaultMessage="Contribution amount: {amount}"
-                              id="y8CXGa"
-                              values={{
-                                amount: (
-                                  <FormattedMoneyAmount
-                                    showCurrencyCode={false}
-                                    currency={query.data.order.totalAmount.currency}
-                                    amount={query.data.order.totalAmount.valueInCents}
-                                  />
-                                ),
-                              }}
-                            />
-                          </div>
-                          {query.data.order.platformTipAmount?.valueInCents > 0 && (
-                            <div>
-                              <FormattedMessage
-                                defaultMessage="Includes Platform Tip: {amount}"
-                                id="g1BbRX"
-                                values={{
-                                  amount: (
-                                    <FormattedMoneyAmount
-                                      showCurrencyCode={false}
-                                      currency={query.data.order.platformTipAmount.currency}
-                                      amount={query.data.order.platformTipAmount.valueInCents}
-                                    />
-                                  ),
-                                }}
-                              />
-                            </div>
-                          )}
-                        </React.Fragment>
-                      )}
-                    </div>
-                  </div>
 
                   {query.data?.order?.memo ||
                     (query.data?.order?.pendingContributionData?.memo && (
-                      <div>
-                        <div>
+                      <DataListItem>
+                        <DataListItemLabel>
                           <FormattedMessage defaultMessage="Memo" id="D5NqQO" />
-                        </div>
-                        <div>{query.data.order.memo || query.data.order.pendingContributionData.memo}</div>
-                      </div>
+                        </DataListItemLabel>
+                        <DataListItemValue>
+                          {query.data.order.memo || query.data.order.pendingContributionData.memo}
+                        </DataListItemValue>
+                      </DataListItem>
                     ))}
                   {!isEmpty(query.data?.order?.customData) && (
-                    <div>
-                      <div>
+                    <DataListItem>
+                      <DataListItemLabel>
                         <FormattedMessage defaultMessage="Custom Data" id="DRPEis" />
-                      </div>
-                      <div>{JSON.stringify(query.data.order.customData)}</div>
-                    </div>
+                      </DataListItemLabel>
+                      <DataListItemValue>{JSON.stringify(query.data.order.customData)}</DataListItemValue>
+                    </DataListItem>
                   )}
-                </div>
+                </DataList>
+
                 <div>
                   <div className="flex items-center justify-between gap-2 py-4">
                     <div className="text-slate-80 w-fit text-base font-bold leading-6">
                       <FormattedMessage defaultMessage="Related Activity" id="LP8cIK" />
                     </div>
                     <hr className="flex-grow border-neutral-300" />
-                    <Button asChild variant="outline" size="xs" disabled={isLoading} loading={isLoading}>
-                      <Link href={query.data?.order ? getTransactionOrderLink(LoggedInUser, query.data.order) : '#'}>
-                        <FormattedMessage defaultMessage="View transactions" id="DfQJQ6" />
-                      </Link>
-                    </Button>
                   </div>
 
                   {isLoading ? (
-                    <div className="flex flex-col gap-1">
-                      <LoadingPlaceholder height={20} />
-                      <LoadingPlaceholder height={20} />
-                      <LoadingPlaceholder height={20} />
-                      <LoadingPlaceholder height={20} />
+                    <div className="flex flex-col gap-6">
+                      {Array.from({ length: 3 }).map((_, index) => (
+                        // eslint-disable-next-line react/no-array-index-key
+                        <div className="flex gap-5" key={index}>
+                          <Skeleton className="h-10 w-12 rounded-full" />
+                          <Skeleton className="mt-2 h-10 w-full" />
+                        </div>
+                      ))}
                     </div>
                   ) : (
                     <ContributionTimeline order={query.data.order} />
@@ -558,24 +538,6 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
             </React.Fragment>
           )}
         </div>
-        <SheetFooter className="flex px-8 py-2">
-          {(actions?.primary.length > 0 || actions?.secondary.length > 0) && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="xs">
-                  <FormattedMessage defaultMessage="More actions" id="S8/4ZI" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {actions?.primary?.map(action => <DropdownActionItem key={action.key} action={action} />)}
-
-                {actions?.primary.length > 0 && actions?.secondary.length > 0 && <DropdownMenuSeparator />}
-
-                {actions?.secondary?.map(action => <DropdownActionItem key={action.key} action={action} />)}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-        </SheetFooter>
       </SheetContent>
     </Sheet>
   );
