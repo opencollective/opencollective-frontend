@@ -891,7 +891,7 @@ function buildFormSchema(
         .nullish()
         .refine(
           type => {
-            if (!values.payoutMethodId || values.payoutMethodId === '__newPayoutMethod') {
+            if (options.isAdminOfPayee && (!values.payoutMethodId || values.payoutMethodId === '__newPayoutMethod')) {
               return !!type;
             }
 
