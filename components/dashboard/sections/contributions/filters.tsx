@@ -79,7 +79,7 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   expectedDate: expectedDateFilter.filter,
   date: orderDateFilter.filter,
   expectedFundsFilter: expectedFundsFilter.filter,
-  amount: { ...amountFilter.filter, labelMsg: defineMessage({ id: 'TotalAmount', defaultMessage: 'Total amount' }) },
+  amount: { ...amountFilter.filter, labelMsg: defineMessage({ id: 'Fields.amount', defaultMessage: 'Amount' }) },
   orderBy: contributionsOrderFilter.filter,
   status: {
     labelMsg: defineMessage({ defaultMessage: 'Status', id: 'tzMNF3' }),

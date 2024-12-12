@@ -39,7 +39,7 @@ import Link from '../../../Link';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { useModal } from '../../../ModalContext';
 import OrderStatusTag from '../../../orders/OrderStatusTag';
-import PaymentMethodTypeWithIcon from '../../../PaymentMethodTypeWithIcon';
+import { PaymentMethodTypeLabel } from '../../../PaymentMethodTypeWithIcon';
 import { managedOrderFragment } from '../../../recurring-contributions/graphql/queries';
 import { actionsColumn, DataTable } from '../../../table/DataTable';
 import { Button } from '../../../ui/Button';
@@ -344,6 +344,7 @@ const getColumns = ({ intl, isIncoming, includeHostedAccounts, onlyExpectedFunds
       );
     },
   };
+
   const fromAccount = {
     accessorKey: 'fromAccount',
     header: intl.formatMessage({ id: 'Contributor', defaultMessage: 'Contributor' }),
@@ -376,41 +377,41 @@ const getColumns = ({ intl, isIncoming, includeHostedAccounts, onlyExpectedFunds
   };
   const paymentMethod = {
     accessorKey: 'paymentMethod',
-    header: intl.formatMessage({ id: 'AddFundsModal.source', defaultMessage: 'Source' }),
+    header: intl.formatMessage({ id: 'paymentmethod.label', defaultMessage: 'Payment Method' }),
     cell: ({ cell, row }) => {
       const pm = cell.getValue();
-      if (pm) {
-        return (
-          <div className="flex items-center gap-2 truncate">
-            <PaymentMethodTypeWithIcon iconSize={18} type={pm.type} iconOnly />
-          </div>
-        );
-      } else if (row.original?.pendingContributionData?.paymentMethod) {
+      if (row.original?.pendingContributionData?.paymentMethod) {
         return i18nPaymentMethodProviderType(intl, row.original?.pendingContributionData?.paymentMethod);
       }
+
+      return <PaymentMethodTypeLabel type={pm?.type} />;
     },
   };
+
+  const amount = {
+    accessorKey: 'totalAmount',
+    header: intl.formatMessage({ defaultMessage: 'Amount', id: 'Fields.amount' }),
+    meta: { className: 'text-end pr-1' },
+    cell: ({ cell }) => {
+      const amount = cell.getValue();
+      return <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} showCurrencyCode={false} />;
+    },
+  };
+
   const frequency = {
     accessorKey: 'frequency',
-    header: intl.formatMessage({ id: 'Frequency', defaultMessage: 'Frequency' }),
-    cell: ({ cell, row }) => {
+    header: null,
+    meta: { className: 'text-start pl-0' },
+    cell: ({ cell }) => {
       const frequency = cell.getValue();
       return (
-        <div>
-          <p>{i18nFrequency(intl, frequency)}</p>
-          {['MONTHLY', 'YEARLY'].includes(frequency) && (
-            <p className="text-xs font-normal text-slate-700">
-              <FormattedMessage
-                id="x9TypM"
-                defaultMessage="Since {date}"
-                values={{ date: <DateTime value={row.original.createdAt} dateStyle="medium" /> }}
-              />
-            </p>
-          )}
-        </div>
+        ['MONTHLY', 'YEARLY'].includes(frequency) && (
+          <span className="text-xs font-light text-slate-700">{i18nFrequency(intl, frequency)}</span>
+        )
       );
     },
   };
+
   const status = {
     accessorKey: 'status',
     header: intl.formatMessage({ id: 'order.status', defaultMessage: 'Status' }),
@@ -419,19 +420,6 @@ const getColumns = ({ intl, isIncoming, includeHostedAccounts, onlyExpectedFunds
       return (
         <div data-cy="contribution-status" className="w-fit">
           <OrderStatusTag status={status} />
-        </div>
-      );
-    },
-  };
-
-  const amount = {
-    accessorKey: 'totalAmount',
-    header: intl.formatMessage({ defaultMessage: 'Amount', id: 'Fields.amount' }),
-    cell: ({ cell }) => {
-      const amount = cell.getValue();
-      return (
-        <div className="flex items-center gap-2 truncate">
-          <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} showCurrencyCode={false} />
         </div>
       );
     },
@@ -485,9 +473,9 @@ const getColumns = ({ intl, isIncoming, includeHostedAccounts, onlyExpectedFunds
     onlyExpectedFunds ? contributionId : null,
     includeHostedAccounts ? accounts : isIncoming ? fromAccount : toAccount,
     date,
+    amount,
     frequency,
     paymentMethod,
-    amount,
     onlyExpectedFunds ? expectedAt : null,
     status,
     actionsColumn,
