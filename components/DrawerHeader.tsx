@@ -4,7 +4,6 @@ import { MoreHorizontal, X } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import { useWindowResize, VIEWPORTS } from '../lib/hooks/useWindowResize';
-import { cn } from '../lib/utils';
 
 import { DropdownActionItem } from './table/RowActionsMenu';
 import { Button } from './ui/Button';
@@ -49,22 +48,24 @@ export default function DrawerHeader({
         <div className="flex items-center gap-2">{entityLabel}</div>
 
         <div className="flex items-center gap-1">
-          <div className={cn('hidden items-center gap-1', { 'sm:flex': !forceMoreActions })}>
-            {primary?.map(action => (
-              <Button
-                key={action.key || action.label}
-                variant="outline"
-                size="xs"
-                className="gap-1.5"
-                onClick={action.onClick}
-                disabled={action.disabled}
-                data-cy={action['data-cy']}
-              >
-                {action.Icon && <action.Icon size={16} />}
-                <span>{action.label}</span>
-              </Button>
-            ))}
-          </div>
+          {!forceMoreActions && (
+            <div className="items-center gap-1">
+              {primary?.map(action => (
+                <Button
+                  key={action.key || action.label}
+                  variant="outline"
+                  size="xs"
+                  className="gap-1.5"
+                  onClick={action.onClick}
+                  disabled={action.disabled}
+                  data-cy={action['data-cy']}
+                >
+                  {action.Icon && <action.Icon size={16} />}
+                  <span>{action.label}</span>
+                </Button>
+              ))}
+            </div>
+          )}
           {hasMoreActions && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild ref={dropdownTriggerRef}>
