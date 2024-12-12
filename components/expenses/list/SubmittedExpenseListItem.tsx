@@ -5,7 +5,7 @@ import { Check, Copy, Ellipsis, Link } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import type { ExpensePageExpenseFieldsFragment } from '../../../lib/graphql/types/v2/graphql';
-import { ExpenseStatus } from '../../../lib/graphql/types/v2/graphql';
+import { ExpenseStatus } from '../../../lib/graphql/types/v2/schema';
 import useClipboard from '../../../lib/hooks/useClipboard';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 import { i18nExpenseType } from '../../../lib/i18n/expense';

@@ -16,7 +16,7 @@ import { Twitch } from '@styled-icons/feather/Twitch';
 import { Youtube } from '@styled-icons/feather/Youtube';
 import { Pixelfed } from '@styled-icons/remix-line/Pixelfed';
 
-import { SocialLinkType } from './graphql/types/v2/graphql';
+import { SocialLinkType } from './graphql/types/v2/schema';
 
 const SocialLinkIcon: Record<SocialLinkType, typeof Discord | React.FunctionComponent<{ size: number }>> = {
   [SocialLinkType.BLUESKY]: (props: { size: number }) => (

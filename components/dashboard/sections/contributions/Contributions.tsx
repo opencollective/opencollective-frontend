@@ -17,7 +17,7 @@ import {
   ExpectedFundsFilter,
   OrderStatus,
   PaymentMethodType,
-} from '../../../../lib/graphql/types/v2/graphql';
+} from '../../../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import i18nOrderStatus from '../../../../lib/i18n/order-status';

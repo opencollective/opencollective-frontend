@@ -13,7 +13,7 @@ import { parseDateInterval } from '../lib/date-utils';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import type { ExpensesPageQuery } from '../lib/graphql/types/v2/graphql';
-import { ExpenseStatus } from '../lib/graphql/types/v2/graphql';
+import { ExpenseStatus } from '../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { getCollectivePageCanonicalURL } from '../lib/url-helpers';
 

@@ -3,7 +3,7 @@ import { useIntl } from 'react-intl';
 
 import { ZERO_DECIMAL_CURRENCIES } from '../lib/constants/currency';
 import { formatCurrency, getCurrencySymbol } from '../lib/currency-utils';
-import type { Currency as CurrencyEnum } from '../lib/graphql/types/v2/graphql';
+import type { Currency as CurrencyEnum } from '../lib/graphql/types/v2/schema';
 import { cn } from '../lib/utils';
 
 type CurrencyProps = {

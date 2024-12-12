@@ -7,7 +7,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { gqlV1 } from '../../../lib/graphql/helpers';
-import { AccountType } from '../../../lib/graphql/types/v2/graphql';
+import { AccountType } from '../../../lib/graphql/types/v2/schema';
 
 import CollectivePicker from '../../CollectivePicker';
 import CollectivePickerAsync from '../../CollectivePickerAsync';

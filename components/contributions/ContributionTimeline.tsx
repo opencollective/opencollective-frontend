@@ -21,7 +21,7 @@ import {
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { ContributionDrawerQuery } from '../../lib/graphql/types/v2/graphql';
-import { ActivityType, ContributionFrequency, OrderStatus, TransactionKind } from '../../lib/graphql/types/v2/graphql';
+import { ActivityType, ContributionFrequency, OrderStatus, TransactionKind } from '../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import type LoggedInUser from '../../lib/LoggedInUser';
 import { getDashboardRoute } from '../../lib/url-helpers';

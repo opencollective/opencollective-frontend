@@ -5,8 +5,8 @@ import { PlusIcon } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import type { Individual, UserTwoFactorMethod } from '../../lib/graphql/types/v2/graphql';
 import { TwoFactorMethod } from '../../lib/graphql/types/v2/graphql';
+import type { Individual, UserTwoFactorMethod } from '../../lib/graphql/types/v2/schema';
 
 import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';

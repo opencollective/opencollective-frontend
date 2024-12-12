@@ -6,7 +6,7 @@ import { Search, Tags, TagsIcon } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
-import type { AccountReferenceInput, InputMaybe, Scalars } from '../lib/graphql/types/v2/graphql';
+import type { AccountReferenceInput, InputMaybe, Scalars } from '../lib/graphql/types/v2/schema';
 import useDebouncedSearch from '../lib/hooks/useDebouncedSearch';
 
 import { Button } from './ui/Button';

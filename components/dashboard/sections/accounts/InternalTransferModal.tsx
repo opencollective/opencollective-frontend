@@ -8,7 +8,7 @@ import { getAccountReferenceInput } from '../../../../lib/collective';
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { DashboardAccountsQueryFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
-import { Currency } from '../../../../lib/graphql/types/v2/graphql';
+import { Currency } from '../../../../lib/graphql/types/v2/schema';
 
 import CollectivePicker from '../../../CollectivePicker';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';

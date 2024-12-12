@@ -11,7 +11,7 @@ import type {
   SavePayoutMethodMutation,
   SavePayoutMethodMutationVariables,
 } from '../../../lib/graphql/types/v2/graphql';
-import { PayoutMethodType } from '../../../lib/graphql/types/v2/graphql';
+import { PayoutMethodType } from '../../../lib/graphql/types/v2/schema';
 
 import ConfirmationModal, { CONFIRMATION_MODAL_TERMINATE } from '../../ConfirmationModal';
 import PayoutMethodForm, { validatePayoutMethod } from '../../expenses/PayoutMethodForm';

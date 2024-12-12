@@ -15,7 +15,7 @@ import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { formatCurrency } from '../../lib/currency-utils';
 import { createError, ERROR } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import type { Account, Expense, Host } from '../../lib/graphql/types/v2/graphql';
+import type { Account, Expense, Host } from '../../lib/graphql/types/v2/schema';
 import { i18nPaymentMethodService } from '../../lib/i18n/payment-method-service';
 import i18nPayoutMethodType from '../../lib/i18n/payout-method-type';
 import { i18nTaxType } from '../../lib/i18n/taxes';

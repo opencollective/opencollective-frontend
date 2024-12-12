@@ -1,4 +1,5 @@
-import type { AccountType, CommentFieldsFragment, CommentType } from '../../lib/graphql/types/v2/graphql';
+import type { CommentFieldsFragment } from '../../lib/graphql/types/v2/graphql';
+import type { AccountType, CommentType } from '../../lib/graphql/types/v2/schema';
 
 type CommentItem = CommentFieldsFragment;
 

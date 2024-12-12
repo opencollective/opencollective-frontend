@@ -7,7 +7,7 @@ import {
   AccountingCategoryAppliesTo,
   AccountingCategoryKind,
   ExpenseType,
-} from '../../../../lib/graphql/types/v2/graphql';
+} from '../../../../lib/graphql/types/v2/schema';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 
 import RichTextEditor from '../../../RichTextEditor';

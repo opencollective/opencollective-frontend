@@ -5,8 +5,8 @@ import { Lock, Trash2 } from 'lucide-react';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import type { Currency, CurrencyExchangeRateInput } from '../../../lib/graphql/types/v2/graphql';
-import { CurrencyExchangeRateSourceType } from '../../../lib/graphql/types/v2/graphql';
+import type { Currency, CurrencyExchangeRateInput } from '../../../lib/graphql/types/v2/schema';
+import { CurrencyExchangeRateSourceType } from '../../../lib/graphql/types/v2/schema';
 import { i18nTaxType } from '../../../lib/i18n/taxes';
 import { attachmentDropzoneParams } from '../../expenses/lib/attachments';
 import {

@@ -3,7 +3,7 @@ import type { FileRejection } from 'react-dropzone';
 import Dropzone from 'react-dropzone';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import type { OcrParsingOptionsInput, UploadFileResult } from '../../lib/graphql/types/v2/graphql';
+import type { OcrParsingOptionsInput, UploadFileResult } from '../../lib/graphql/types/v2/schema';
 import { useGraphQLFileUploader } from '../../lib/hooks/useGraphQLFileUploader';
 import { getMessageForRejectedDropzoneFiles, useImageUploader } from '../../lib/hooks/useImageUploader';
 import { attachmentDropzoneParams } from './lib/attachments';

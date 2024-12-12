@@ -3,7 +3,7 @@ import type { IntlShape } from 'react-intl';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../../lib/currency-utils';
-import type { Currency } from '../../../lib/graphql/types/v2/graphql';
+import type { Currency } from '../../../lib/graphql/types/v2/schema';
 
 import { StyledSelectFilter } from '../../StyledSelectFilter';
 

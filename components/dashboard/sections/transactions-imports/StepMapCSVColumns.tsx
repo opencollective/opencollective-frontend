@@ -7,7 +7,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { formatFileSize } from '../../../../lib/file-utils';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import { type Amount, Currency, type TransactionsImportRowCreateInput } from '../../../../lib/graphql/types/v2/graphql';
+import { type Amount, Currency, type TransactionsImportRowCreateInput } from '../../../../lib/graphql/types/v2/schema';
 import { applyCSVConfig, getDefaultCSVConfig, guessCSVColumnsConfig, parseTransactionsCSVFile } from './lib/parse-csv';
 import type { CSVConfig } from './lib/types';
 import { ACCEPTED_DATE_FORMATS, ACCEPTED_NUMBER_FORMATS } from './lib/types';

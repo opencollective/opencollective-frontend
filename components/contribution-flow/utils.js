@@ -13,7 +13,7 @@ import {
 } from '../../lib/constants/payment-methods';
 import roles from '../../lib/constants/roles';
 import { TierTypes } from '../../lib/constants/tiers-types';
-import { PaymentMethodService, PaymentMethodType } from '../../lib/graphql/types/v2/graphql';
+import { PaymentMethodService, PaymentMethodType } from '../../lib/graphql/types/v2/schema';
 import { getPaymentMethodName } from '../../lib/payment_method_label';
 import {
   getPaymentMethodIcon,

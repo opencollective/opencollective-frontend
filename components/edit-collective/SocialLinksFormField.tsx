@@ -8,8 +8,8 @@ import { DragIndicator } from '@styled-icons/material/DragIndicator';
 import { sortBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import type { SocialLink, SocialLinkInput } from '../../lib/graphql/types/v2/graphql';
-import { SocialLinkType } from '../../lib/graphql/types/v2/graphql';
+import type { SocialLink, SocialLinkInput } from '../../lib/graphql/types/v2/schema';
+import { SocialLinkType } from '../../lib/graphql/types/v2/schema';
 import { SocialLinkLabel } from '../../lib/social-links';
 import { isValidUrl } from '../../lib/utils';
 

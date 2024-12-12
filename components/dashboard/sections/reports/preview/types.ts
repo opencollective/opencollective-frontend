@@ -1,4 +1,4 @@
-import type { ExpenseType, TransactionKind, TransactionType } from '../../../../../lib/graphql/types/v2/graphql';
+import type { ExpenseType, TransactionKind, TransactionType } from '../../../../../lib/graphql/types/v2/schema';
 
 export enum ReportSection {
   CONTRIBUTIONS = 'CONTRIBUTIONS',

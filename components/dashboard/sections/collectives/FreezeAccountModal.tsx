@@ -7,7 +7,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { getAccountReferenceInput } from '../../../../lib/collective';
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
-import type { Account } from '../../../../lib/graphql/types/v2/graphql';
+import type { Account } from '../../../../lib/graphql/types/v2/schema';
 
 import { collectivePageQuery } from '../../../collective-page/graphql/queries';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';

@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 import { splitName } from '../../../../lib/collective';
 import dayjs from '../../../../lib/dayjs';
-import type { CountryIso } from '../../../../lib/graphql/types/v2/graphql';
+import type { CountryIso } from '../../../../lib/graphql/types/v2/schema';
 import { i18nCountryName } from '../../../../lib/i18n';
 import type LoggedInUser from '../../../../lib/LoggedInUser';
 import { cn } from '../../../../lib/utils';

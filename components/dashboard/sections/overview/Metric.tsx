@@ -4,7 +4,7 @@ import { isNil } from 'lodash';
 import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import type { Amount, Currency, TimeSeriesAmount } from '../../../../lib/graphql/types/v2/graphql';
+import type { Amount, Currency, TimeSeriesAmount } from '../../../../lib/graphql/types/v2/schema';
 
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { InfoTooltipIcon } from '../../../InfoTooltipIcon';

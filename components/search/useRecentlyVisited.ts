@@ -9,7 +9,7 @@ import {
   ExpenseType,
   TransactionKind,
   TransactionType,
-} from '../../lib/graphql/types/v2/graphql';
+} from '../../lib/graphql/types/v2/schema';
 import useLocalStorage from '../../lib/hooks/useLocalStorage';
 import { LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
 

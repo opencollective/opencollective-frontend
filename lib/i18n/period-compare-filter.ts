@@ -2,7 +2,7 @@ import { defineMessages } from 'react-intl';
 
 import { PeriodFilterCompare, PeriodFilterType } from '../../components/dashboard/filters/PeriodCompareFilter/schema';
 
-import { TimeUnit } from '../graphql/types/v2/graphql';
+import { TimeUnit } from '../graphql/types/v2/schema';
 
 export const i18nPeriodFilterCompare = defineMessages({
   [PeriodFilterCompare.PREVIOUS_PERIOD]: {
