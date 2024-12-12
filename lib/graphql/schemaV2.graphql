@@ -2571,6 +2571,11 @@ type Expense {
   merchantId: String
 
   """
+  The reference text used in the payment transfer
+  """
+  transferReference: String
+
+  """
   Fields that cannot be edited on this expense
   """
   lockedFields: [ExpenseLockableFields]
