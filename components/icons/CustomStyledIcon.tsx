@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { alignSelf, height, margin, verticalAlign, width } from 'styled-system';
 
@@ -25,7 +24,7 @@ const StyledSVG = styled.svg`
  * As soon as it is released, we should transition to styled-icons component
  * to ensure consistency with third-party imported icons.
  */
-const CustomStyledIcon = ({ size, ...props }) => {
+const CustomStyledIcon = ({ size, ...props }: Parameters<typeof StyledSVG>[0] & { size?: number | string }) => {
   return (
     <StyledSVG
       stroke="currentColor"
@@ -33,17 +32,11 @@ const CustomStyledIcon = ({ size, ...props }) => {
       width={size}
       xmlns="http://www.w3.org/2000/svg"
       focusable="false"
-      ariaHidden="true"
+      aria-hidden="true"
       role="img"
       {...props}
     />
   );
-};
-
-CustomStyledIcon.propTypes = {
-  /** Size of the icon */
-  size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  cursor: PropTypes.string,
 };
 
 export default CustomStyledIcon;

@@ -1,11 +1,10 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { lighten } from 'polished';
 
 import CustomStyledIcon from './CustomStyledIcon';
 
 /* eslint-disable react/no-unknown-property */
-const GiftCard = ({ color = '#145ECC', size, ...props }) => {
+const GiftCard = ({ color = '#145ECC', size, ...props }: { color?: string; size?: number | string }) => {
   const gradientID = `gradient-${color.replace('#', '')}`;
   return (
     <CustomStyledIcon width={size || 26} height={size || 18} viewBox="0 0 26 18" fill="none" {...props}>
@@ -40,11 +39,6 @@ const GiftCard = ({ color = '#145ECC', size, ...props }) => {
       </defs>
     </CustomStyledIcon>
   );
-};
-
-GiftCard.propTypes = {
-  color: PropTypes.string,
-  size: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 };
 
 export default GiftCard;
