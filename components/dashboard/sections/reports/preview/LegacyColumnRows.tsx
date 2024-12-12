@@ -2,7 +2,7 @@ import React from 'react';
 import { CornerDownRight } from 'lucide-react';
 import { defineMessage, useIntl } from 'react-intl';
 
-import { TransactionKind } from '../../../../../lib/graphql/types/v2/graphql';
+import { TransactionKind } from '../../../../../lib/graphql/types/v2/schema';
 
 import FormattedMoneyAmount from '../../../../FormattedMoneyAmount';
 import { InfoTooltipIcon } from '../../../../InfoTooltipIcon';

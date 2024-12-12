@@ -7,7 +7,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { getCollectivePageMetadata } from '../lib/collective';
 import { generateNotFoundError } from '../lib/errors';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
-import type { Account } from '../lib/graphql/types/v2/graphql';
+import type { Account } from '../lib/graphql/types/v2/schema';
 
 import AuthenticatedPage from '../components/AuthenticatedPage';
 import CollectiveNavbar from '../components/collective-navbar';

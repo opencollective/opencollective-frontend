@@ -16,7 +16,7 @@ import {
   HOST_OMITTED_FIELDS,
   LEGACY_FIELD_OPTIONS as FIELD_OPTIONS,
 } from '../lib/export-csv/transactions-csv';
-import type { Account } from '../lib/graphql/types/v2/graphql';
+import type { Account } from '../lib/graphql/types/v2/schema';
 import { useAsyncCall } from '../lib/hooks/useAsyncCall';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../lib/local-storage';
 import { parseToBoolean } from '../lib/utils';

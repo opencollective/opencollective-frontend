@@ -6,7 +6,7 @@ import { FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
-import { TimeUnit } from '../../../lib/graphql/types/v2/graphql';
+import { TimeUnit } from '../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 
 import { childAccountFilter } from '../../dashboard/filters/ChildAccountFilter';

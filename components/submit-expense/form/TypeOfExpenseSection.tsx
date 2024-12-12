@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { ExpenseType } from '../../../lib/graphql/types/v2/graphql';
+import { ExpenseType } from '../../../lib/graphql/types/v2/schema';
 import { attachmentDropzoneParams } from '../../expenses/lib/attachments';
 
 import StyledDropzone from '../../StyledDropzone';

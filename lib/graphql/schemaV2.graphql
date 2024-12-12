@@ -417,6 +417,11 @@ interface Account {
     searchTerm: String
 
     """
+    If true, return transactions with debt attached, if false transactions without debt attached.
+    """
+    hasDebt: Boolean
+
+    """
     Only return transactions with an Expense attached
     """
     hasExpense: Boolean
@@ -2930,6 +2935,11 @@ type Host implements Account & AccountWithContributions {
     The term to search
     """
     searchTerm: String
+
+    """
+    If true, return transactions with debt attached, if false transactions without debt attached.
+    """
+    hasDebt: Boolean
 
     """
     Only return transactions with an Expense attached
@@ -8083,6 +8093,11 @@ type Bot implements Account {
     searchTerm: String
 
     """
+    If true, return transactions with debt attached, if false transactions without debt attached.
+    """
+    hasDebt: Boolean
+
+    """
     Only return transactions with an Expense attached
     """
     hasExpense: Boolean
@@ -8948,6 +8963,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     The term to search
     """
     searchTerm: String
+
+    """
+    If true, return transactions with debt attached, if false transactions without debt attached.
+    """
+    hasDebt: Boolean
 
     """
     Only return transactions with an Expense attached
@@ -10366,6 +10386,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     searchTerm: String
 
     """
+    If true, return transactions with debt attached, if false transactions without debt attached.
+    """
+    hasDebt: Boolean
+
+    """
     Only return transactions with an Expense attached
     """
     hasExpense: Boolean
@@ -11502,6 +11527,11 @@ type Individual implements Account {
     searchTerm: String
 
     """
+    If true, return transactions with debt attached, if false transactions without debt attached.
+    """
+    hasDebt: Boolean
+
+    """
     Only return transactions with an Expense attached
     """
     hasExpense: Boolean
@@ -12575,6 +12605,11 @@ type Organization implements Account & AccountWithContributions {
     searchTerm: String
 
     """
+    If true, return transactions with debt attached, if false transactions without debt attached.
+    """
+    hasDebt: Boolean
+
+    """
     Only return transactions with an Expense attached
     """
     hasExpense: Boolean
@@ -13553,6 +13588,11 @@ type Vendor implements Account & AccountWithContributions {
     The term to search
     """
     searchTerm: String
+
+    """
+    If true, return transactions with debt attached, if false transactions without debt attached.
+    """
+    hasDebt: Boolean
 
     """
     Only return transactions with an Expense attached
@@ -15192,6 +15232,11 @@ type Query {
     The term to search
     """
     searchTerm: String
+
+    """
+    If true, return transactions with debt attached, if false transactions without debt attached.
+    """
+    hasDebt: Boolean
 
     """
     Only return transactions with an Expense attached
@@ -17174,6 +17219,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     searchTerm: String
 
     """
+    If true, return transactions with debt attached, if false transactions without debt attached.
+    """
+    hasDebt: Boolean
+
+    """
     Only return transactions with an Expense attached
     """
     hasExpense: Boolean
@@ -18186,6 +18236,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     The term to search
     """
     searchTerm: String
+
+    """
+    If true, return transactions with debt attached, if false transactions without debt attached.
+    """
+    hasDebt: Boolean
 
     """
     Only return transactions with an Expense attached
@@ -19212,6 +19267,11 @@ type Mutation {
     Set to true to disable contributions to this project. Host admins will still be able to add funds.
     """
     disableContributions: Boolean! = false
+
+    """
+    Set to true to disable expenses for this project.
+    """
+    disableExpenses: Boolean! = false
   ): Project
 
   """

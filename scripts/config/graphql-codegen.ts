@@ -15,6 +15,10 @@ const config: CodegenConfig = {
       },
       schema: './lib/graphql/schemaV2.graphql',
     },
+    './lib/graphql/types/v2/schema.ts': {
+      plugins: ['typescript'],
+      schema: './lib/graphql/schemaV2.graphql',
+    },
   },
   pluckConfig: {
     globalGqlIdentifierName: 'gql',

@@ -1,6 +1,6 @@
 import { get } from 'lodash';
 
-import type { Account, Expense, Host, Policies } from '../../../lib/graphql/types/v2/graphql';
+import type { Account, Expense, Host, Policies } from '../../../lib/graphql/types/v2/schema';
 import type LoggedInUser from '../../../lib/LoggedInUser';
 import { getPolicy } from '../../../lib/policies';
 

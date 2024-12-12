@@ -17,7 +17,6 @@ import { AccountTypesWithHost } from '../../lib/constants/collectives';
 import { getPayoutProfiles } from '../../lib/expenses';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type {
-  Amount,
   ExpenseFormExchangeRatesQuery,
   ExpenseFormExchangeRatesQueryVariables,
   ExpenseFormSchemaHostFieldsFragment,
@@ -26,7 +25,8 @@ import type {
   ExpenseVendorFieldsFragment,
   LocationInput,
 } from '../../lib/graphql/types/v2/graphql';
-import { Currency, ExpenseStatus, ExpenseType, PayoutMethodType } from '../../lib/graphql/types/v2/graphql';
+import type { Amount } from '../../lib/graphql/types/v2/schema';
+import { Currency, ExpenseStatus, ExpenseType, PayoutMethodType } from '../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import type LoggedInUser from '../../lib/LoggedInUser';
 import { isValidEmail } from '../../lib/utils';

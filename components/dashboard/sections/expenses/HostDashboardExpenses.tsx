@@ -11,7 +11,7 @@ import type {
   AccountHoverCardFieldsFragment,
   HostDashboardExpensesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import { ExpenseStatusFilter, LastCommentBy, PayoutMethodType } from '../../../../lib/graphql/types/v2/graphql';
+import { ExpenseStatusFilter, LastCommentBy, PayoutMethodType } from '../../../../lib/graphql/types/v2/schema';
 import {
   A,
   ARROW_DOWN_KEY,

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type { Agreement as GraphQLAgreement } from '../../lib/graphql/types/v2/graphql';
+import type { Agreement as GraphQLAgreement } from '../../lib/graphql/types/v2/schema';
 
 import { Drawer } from '../Drawer';
 import FilesViewerModal from '../FilesViewerModal';

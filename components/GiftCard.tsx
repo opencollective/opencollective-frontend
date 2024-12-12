@@ -3,7 +3,7 @@ import { Clock } from 'lucide-react';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import type { GraphQLV1Collective } from '../lib/custom_typings/GraphQLV1Collective';
-import type { Currency as GraphQLCurrency } from '../lib/graphql/types/v2/graphql';
+import type { Currency as GraphQLCurrency } from '../lib/graphql/types/v2/schema';
 
 import CollectiveCard from './gift-cards/CollectiveCard';
 import Currency from './Currency';

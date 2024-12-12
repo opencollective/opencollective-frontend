@@ -3,7 +3,7 @@ import { ApolloError, useApolloClient } from '@apollo/client';
 import type { PaymentIntent, Stripe } from '@stripe/stripe-js';
 
 import { API_V2_CONTEXT, gql } from '../graphql/helpers';
-import type { AccountReferenceInput, ContributionFrequency, GuestInfoInput } from '../graphql/types/v2/graphql';
+import type { AccountReferenceInput, ContributionFrequency, GuestInfoInput } from '../graphql/types/v2/schema';
 import { loadScriptAsync } from '../utils';
 
 const createPaymentIntentMutation = gql`

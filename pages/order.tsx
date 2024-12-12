@@ -9,7 +9,7 @@ import { getSSRQueryHelpers } from '../lib/apollo-client';
 import { getCollectivePageMetadata } from '../lib/collective';
 import dayjs from '../lib/dayjs';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
-import type { Account, AccountWithHost } from '../lib/graphql/types/v2/graphql';
+import type { Account, AccountWithHost } from '../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../lib/hooks/usePrevious';
 import { i18nPaymentMethodProviderType } from '../lib/i18n/payment-method-provider-type';

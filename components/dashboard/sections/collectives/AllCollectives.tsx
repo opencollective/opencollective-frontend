@@ -9,8 +9,9 @@ import { CollectiveType } from '../../../../lib/constants/collectives';
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import type { Collective, HostedCollectivesQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
-import { HostFeeStructure } from '../../../../lib/graphql/types/v2/graphql';
+import type { HostedCollectivesQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import type { Account, Collective } from '../../../../lib/graphql/types/v2/schema';
+import { HostFeeStructure } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 
@@ -94,9 +95,7 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
 const AllCollectives = ({ subpath }: Omit<DashboardSectionProps, 'accountSlug'>) => {
   const intl = useIntl();
   const router = useRouter();
-  const [showCollectiveOverview, setShowCollectiveOverview] = React.useState<Collective | undefined | string>(
-    subpath[0],
-  );
+  const [showCollectiveOverview, setShowCollectiveOverview] = React.useState<Account | undefined | string>(subpath[0]);
   const query = useMemo(() => omit(router.query, ['slug', 'section', 'subpath']), [router.query]);
 
   const pushSubpath = subpath => {

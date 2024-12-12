@@ -4,7 +4,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { getPrecisionFromAmount, graphqlAmountValueInCents } from '../../lib/currency-utils';
 import { isPastEvent } from '../../lib/events';
-import { TierFrequency } from '../../lib/graphql/types/v2/graphql';
+import { TierFrequency } from '../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { isTierExpired } from '../../lib/tier-utils';
 

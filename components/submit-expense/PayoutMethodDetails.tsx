@@ -4,8 +4,8 @@ import { startCase, upperCase } from 'lodash';
 import { ChevronDown } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import type { PayoutMethod } from '../../lib/graphql/types/v2/graphql';
-import { PayoutMethodType } from '../../lib/graphql/types/v2/graphql';
+import type { PayoutMethod } from '../../lib/graphql/types/v2/schema';
+import { PayoutMethodType } from '../../lib/graphql/types/v2/schema';
 
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import LoadingPlaceholder from '../LoadingPlaceholder';

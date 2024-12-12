@@ -4,7 +4,7 @@ import { merge, pick } from 'lodash';
 import { z } from 'zod';
 
 import { splitName } from '../../../../lib/collective';
-import type { CountryIso } from '../../../../lib/graphql/types/v2/graphql';
+import type { CountryIso } from '../../../../lib/graphql/types/v2/schema';
 import type LoggedInUser from '../../../../lib/LoggedInUser';
 import { cn } from '../../../../lib/utils';
 

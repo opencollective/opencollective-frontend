@@ -12,11 +12,8 @@ import { CollectiveType } from '../../../../lib/constants/collectives';
 import EXPENSE_TYPE from '../../../../lib/constants/expenseTypes';
 import { HOST_FEE_STRUCTURE } from '../../../../lib/constants/host-fee-structure';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import type {
-  AccountWithHost,
-  HostedCollectiveFieldsFragment,
-  HostedCollectivesQuery,
-} from '../../../../lib/graphql/types/v2/graphql';
+import type { HostedCollectiveFieldsFragment, HostedCollectivesQuery } from '../../../../lib/graphql/types/v2/graphql';
+import type { AccountWithHost } from '../../../../lib/graphql/types/v2/schema';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { formatHostFeeStructure } from '../../../../lib/i18n/host-fee-structure';

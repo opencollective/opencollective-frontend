@@ -11,11 +11,11 @@ import { PAYMENT_METHOD_TYPE } from '../../../lib/constants/payment-methods';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT, gql, gqlV1 } from '../../../lib/graphql/helpers';
 import type {
-  Account,
   ConfirmOrderMutation,
   ManagePaymentMethodsQuery,
   ManagePaymentMethodsQueryVariables,
 } from '../../../lib/graphql/types/v2/graphql';
+import type { Account } from '../../../lib/graphql/types/v2/schema';
 import { getPaymentMethodName } from '../../../lib/payment_method_label';
 import {
   getPaymentMethodIcon,

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
 
-import { ExpenseType } from '../../lib/graphql/types/v2/graphql';
+import { ExpenseType } from '../../lib/graphql/types/v2/schema';
 import { i18nExpenseType } from '../../lib/i18n/expense';
 
 import Avatar from '../Avatar';

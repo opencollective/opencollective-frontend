@@ -1,6 +1,6 @@
 import { defineMessages } from 'react-intl';
 
-import { LegalDocumentRequestStatus } from '../graphql/types/v2/graphql';
+import { LegalDocumentRequestStatus } from '../graphql/types/v2/schema';
 
 const LEGAL_DOCUMENT_STATUSES = defineMessages({
   [LegalDocumentRequestStatus.ERROR]: {

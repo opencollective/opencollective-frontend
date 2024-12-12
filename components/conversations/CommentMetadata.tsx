@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import { type Comment, CommentType } from '../../lib/graphql/types/v2/graphql';
+import { type Comment, CommentType } from '../../lib/graphql/types/v2/schema';
 
 import Avatar from '../Avatar';
 import DateTime from '../DateTime';

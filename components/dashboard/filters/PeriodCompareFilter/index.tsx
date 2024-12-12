@@ -10,7 +10,7 @@ import type { z } from 'zod';
 import { getDayjsIsoUnit, getDayjsOpUnit } from '../../../../lib/date-utils';
 import dayjs from '../../../../lib/dayjs';
 import type { FilterConfig } from '../../../../lib/filters/filter-types';
-import { TimeUnit } from '../../../../lib/graphql/types/v2/graphql';
+import { TimeUnit } from '../../../../lib/graphql/types/v2/schema';
 import {
   i18nPeriodFilterCompare,
   i18nPeriodFilterType,

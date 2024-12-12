@@ -7,7 +7,8 @@ import { z } from 'zod';
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../lib/filters/filter-types';
 import { integer } from '../../../lib/filters/schemas';
 import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
-import type { Agreement, HostAgreementsQueryVariables } from '../../../lib/graphql/types/v2/graphql';
+import type { HostAgreementsQueryVariables } from '../../../lib/graphql/types/v2/graphql';
+import type { Agreement } from '../../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 

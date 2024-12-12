@@ -16,7 +16,7 @@ import type {
   AccountWithParent,
   Member,
   MemberInvitation,
-} from '../../../lib/graphql/types/v2/graphql';
+} from '../../../lib/graphql/types/v2/schema';
 import formatMemberRole from '../../../lib/i18n/member-role';
 import { getCollectivePageRoute } from '../../../lib/url-helpers';
 

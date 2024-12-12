@@ -9,7 +9,8 @@ import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { isIndividualAccount } from '../lib/collective';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
-import type { Account, AccountWithHost, UserContextualMembershipsQuery } from '../lib/graphql/types/v2/graphql';
+import type { UserContextualMembershipsQuery } from '../lib/graphql/types/v2/graphql';
+import type { Account, AccountWithHost } from '../lib/graphql/types/v2/schema';
 import { getCollectivePageRoute } from '../lib/url-helpers';
 
 import PrivateInfoIcon from './icons/PrivateInfoIcon';

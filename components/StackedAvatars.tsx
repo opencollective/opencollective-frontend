@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type { Account } from '../lib/graphql/types/v2/graphql';
+import type { Account } from '../lib/graphql/types/v2/schema';
 
 import Avatar from './Avatar';
 import LinkCollective from './LinkCollective';
