@@ -244,15 +244,15 @@ export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFor
                   name={field.name}
                   checked={field.value}
                   onCheckedChange={checked => formik.setFieldValue(field.name, checked === true)}
-                  disabled={!values.countryOfCitizenship}
+                  disabled={!values.residenceAddress?.country}
                 />
                 <div className="inline align-text-bottom">
                   Within the meaning of the income tax treaty between the United States and this country, I certify that
                   the beneficial owner is a resident of the country defined above
                   <span className="italic">
                     {' ('}
-                    {values.countryOfCitizenship
-                      ? i18nCountryName(intl, values.countryOfCitizenship)
+                    {values.residenceAddress?.country
+                      ? i18nCountryName(intl, values.residenceAddress?.country)
                       : 'please select one'}
                     {').'}
                   </span>
