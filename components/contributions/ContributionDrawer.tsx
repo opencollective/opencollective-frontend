@@ -1,12 +1,14 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { isEmpty } from 'lodash';
+import { ArrowLeftRightIcon } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../lib/actions/types';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type { ContributionDrawerQuery, ContributionDrawerQueryVariables } from '../../lib/graphql/types/v2/graphql';
 import { ContributionFrequency, OrderStatus } from '../../lib/graphql/types/v2/graphql';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { i18nFrequency } from '../../lib/i18n/order';
 import { i18nPaymentMethodProviderType } from '../../lib/i18n/payment-method-provider-type';
 
@@ -22,12 +24,213 @@ import { OrderAdminAccountingCategoryPill } from '../orders/OrderAccountingCateg
 import OrderStatusTag from '../orders/OrderStatusTag';
 import PaymentMethodTypeWithIcon from '../PaymentMethodTypeWithIcon';
 import Tags from '../Tags';
+import { Button } from '../ui/Button';
 import { DataList, DataListItem, DataListItemLabel, DataListItemValue } from '../ui/DataList';
 import { InfoList, InfoListItem } from '../ui/InfoList';
 import { Sheet, SheetContent } from '../ui/Sheet';
 import { Skeleton } from '../ui/Skeleton';
 
-import ContributionTimeline from './ContributionTimeline';
+import ContributionTimeline, { getTransactionsUrl } from './ContributionTimeline';
+
+const contributionDrawerQuery = gql`
+  query ContributionDrawer($orderId: Int!) {
+    order(order: { legacyId: $orderId }) {
+      id
+      legacyId
+      nextChargeDate
+      lastChargedAt
+      amount {
+        value
+        valueInCents
+        currency
+      }
+      totalAmount {
+        value
+        valueInCents
+        currency
+      }
+      paymentMethod {
+        id
+        type
+      }
+      status
+      description
+      createdAt
+      processedAt
+      frequency
+      tier {
+        id
+        name
+        description
+      }
+      createdByAccount {
+        ...ContributionDrawerAccountFields
+      }
+      individual: createdByAccount {
+        ...ContributionDrawerAccountFields
+      }
+      fromAccount {
+        ...ContributionDrawerAccountFields
+        ... on AccountWithHost {
+          host {
+            id
+            slug
+          }
+        }
+      }
+      toAccount {
+        ...ContributionDrawerAccountFields
+      }
+      platformTipEligible
+      platformTipAmount {
+        value
+        valueInCents
+        currency
+      }
+      hostFeePercent
+      tags
+      tax {
+        type
+        idNumber
+        rate
+      }
+      accountingCategory {
+        id
+        name
+        friendlyName
+        code
+      }
+      activities {
+        nodes {
+          id
+          type
+          createdAt
+          fromAccount {
+            ...ContributionDrawerAccountFields
+          }
+          account {
+            ...ContributionDrawerAccountFields
+          }
+          host {
+            ...ContributionDrawerAccountFields
+          }
+          individual {
+            ...ContributionDrawerAccountFields
+          }
+          data
+          transaction {
+            ...ContributionDrawerTransactionFields
+          }
+        }
+      }
+      customData
+      memo
+      needsConfirmation
+      pendingContributionData {
+        expectedAt
+        paymentMethod
+        ponumber
+        memo
+        fromAccountInfo {
+          name
+          email
+        }
+      }
+      transactions {
+        ...ContributionDrawerTransactionFields
+      }
+      permissions {
+        id
+        canResume
+        canMarkAsExpired
+        canMarkAsPaid
+        canEdit
+        canComment
+        canSeePrivateActivities
+        canSetTags
+        canUpdateAccountingCategory
+      }
+    }
+  }
+
+  fragment ContributionDrawerAccountFields on Account {
+    id
+    name
+    slug
+    isIncognito
+    type
+    imageUrl
+    isHost
+    isArchived
+    ... on Individual {
+      isGuest
+    }
+    ... on AccountWithHost {
+      host {
+        id
+        slug
+        type
+        accountingCategories {
+          nodes {
+            id
+            code
+            name
+            friendlyName
+            kind
+            appliesTo
+          }
+        }
+      }
+      approvedAt
+    }
+
+    ... on AccountWithParent {
+      parent {
+        id
+        slug
+      }
+    }
+  }
+
+  fragment ContributionDrawerTransactionFields on Transaction {
+    id
+    legacyId
+    uuid
+    kind
+    amount {
+      currency
+      valueInCents
+    }
+    netAmount {
+      currency
+      valueInCents
+    }
+    group
+    type
+    description
+    createdAt
+    isRefunded
+    isRefund
+    isOrderRejected
+    account {
+      ...ContributionDrawerAccountFields
+    }
+    oppositeAccount {
+      ...ContributionDrawerAccountFields
+    }
+    expense {
+      id
+      type
+    }
+    permissions {
+      id
+      canRefund
+      canDownloadInvoice
+      canReject
+    }
+    paymentProcessorUrl
+  }
+`;
 
 type ContributionDrawerProps = {
   open: boolean;
@@ -38,220 +241,28 @@ type ContributionDrawerProps = {
 
 export function ContributionDrawer(props: ContributionDrawerProps) {
   const intl = useIntl();
+  const { LoggedInUser } = useLoggedInUser();
 
-  const query = useQuery<ContributionDrawerQuery, ContributionDrawerQueryVariables>(
-    gql`
-      query ContributionDrawer($orderId: Int!) {
-        order(order: { legacyId: $orderId }) {
-          id
-          legacyId
-          nextChargeDate
-          lastChargedAt
-          amount {
-            value
-            valueInCents
-            currency
-          }
-          totalAmount {
-            value
-            valueInCents
-            currency
-          }
-          paymentMethod {
-            id
-            type
-          }
-          status
-          description
-          createdAt
-          processedAt
-          frequency
-          tier {
-            id
-            name
-            description
-          }
-          createdByAccount {
-            ...ContributionDrawerAccountFields
-          }
-          individual: createdByAccount {
-            ...ContributionDrawerAccountFields
-          }
-          fromAccount {
-            ...ContributionDrawerAccountFields
-            ... on AccountWithHost {
-              host {
-                id
-                slug
-              }
-            }
-          }
-          toAccount {
-            ...ContributionDrawerAccountFields
-          }
-          platformTipEligible
-          platformTipAmount {
-            value
-            valueInCents
-            currency
-          }
-          hostFeePercent
-          tags
-          tax {
-            type
-            idNumber
-            rate
-          }
-          accountingCategory {
-            id
-            name
-            friendlyName
-            code
-          }
-          activities {
-            nodes {
-              id
-              type
-              createdAt
-              fromAccount {
-                ...ContributionDrawerAccountFields
-              }
-              account {
-                ...ContributionDrawerAccountFields
-              }
-              host {
-                ...ContributionDrawerAccountFields
-              }
-              individual {
-                ...ContributionDrawerAccountFields
-              }
-              data
-              transaction {
-                ...ContributionDrawerTransactionFields
-              }
-            }
-          }
-          customData
-          memo
-          needsConfirmation
-          pendingContributionData {
-            expectedAt
-            paymentMethod
-            ponumber
-            memo
-            fromAccountInfo {
-              name
-              email
-            }
-          }
-          transactions {
-            ...ContributionDrawerTransactionFields
-          }
-          permissions {
-            id
-            canResume
-            canMarkAsExpired
-            canMarkAsPaid
-            canEdit
-            canComment
-            canSeePrivateActivities
-            canSetTags
-            canUpdateAccountingCategory
-          }
-        }
-      }
-
-      fragment ContributionDrawerAccountFields on Account {
-        id
-        name
-        slug
-        isIncognito
-        type
-        imageUrl
-        isHost
-        isArchived
-        ... on Individual {
-          isGuest
-        }
-        ... on AccountWithHost {
-          host {
-            id
-            slug
-            type
-            accountingCategories {
-              nodes {
-                id
-                code
-                name
-                friendlyName
-                kind
-                appliesTo
-              }
-            }
-          }
-          approvedAt
-        }
-
-        ... on AccountWithParent {
-          parent {
-            id
-            slug
-          }
-        }
-      }
-
-      fragment ContributionDrawerTransactionFields on Transaction {
-        id
-        legacyId
-        uuid
-        kind
-        amount {
-          currency
-          valueInCents
-        }
-        netAmount {
-          currency
-          valueInCents
-        }
-        group
-        type
-        description
-        createdAt
-        isRefunded
-        isRefund
-        isOrderRejected
-        account {
-          ...ContributionDrawerAccountFields
-        }
-        oppositeAccount {
-          ...ContributionDrawerAccountFields
-        }
-        expense {
-          id
-          type
-        }
-        permissions {
-          id
-          canRefund
-          canDownloadInvoice
-          canReject
-        }
-        paymentProcessorUrl
-      }
-    `,
-    {
-      context: API_V2_CONTEXT,
-      variables: {
-        orderId: props.orderId,
-      },
-      skip: !props.open || !props.orderId,
+  const query = useQuery<ContributionDrawerQuery, ContributionDrawerQueryVariables>(contributionDrawerQuery, {
+    context: API_V2_CONTEXT,
+    variables: {
+      orderId: props.orderId,
     },
-  );
+    skip: !props.open || !props.orderId,
+  });
 
   const isLoading = !query.called || query.loading || !query.data || query.data.order?.legacyId !== props.orderId;
-
   const dropdownTriggerRef = React.useRef();
-  const actions = query.data?.order ? props.getActions(query.data.order, dropdownTriggerRef) : null;
+  const order = query.data?.order;
+  const actions = React.useMemo(
+    () => (order ? props.getActions(order, dropdownTriggerRef) : null),
+    [order, props.getActions, dropdownTriggerRef],
+  );
+  const transactionsUrl = React.useMemo(() => {
+    const url = order && getTransactionsUrl(LoggedInUser, order);
+    url && url.searchParams?.set('orderId', order.legacyId.toString());
+    return url;
+  }, [LoggedInUser, order]);
 
   return (
     <Sheet open={props.open} onOpenChange={isOpen => !isOpen && props.onClose()}>
@@ -275,13 +286,11 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
             </CopyID>
           }
           entityLabel={
-            <React.Fragment>
-              {isLoading ? (
-                <Skeleton className="h-6 w-56" />
-              ) : (
-                <div className="text-base font-semibold text-foreground">{query.data.order.description}</div>
-              )}
-            </React.Fragment>
+            isLoading ? (
+              <Skeleton className="h-6 w-56" />
+            ) : (
+              <div className="text-base font-semibold text-foreground">{query.data.order.description}</div>
+            )
           }
         />
         <div className="flex-grow overflow-auto px-8 py-4">
@@ -520,6 +529,19 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                       <FormattedMessage defaultMessage="Related Activity" id="LP8cIK" />
                     </div>
                     <hr className="flex-grow border-neutral-300" />
+                    <Button
+                      asChild
+                      variant="outline"
+                      size="xs"
+                      disabled={isLoading}
+                      loading={isLoading}
+                      data-cy="view-transactions-button"
+                    >
+                      <Link href={transactionsUrl?.toString() || '#'} className="flex flex-row items-center gap-2.5">
+                        <ArrowLeftRightIcon size={16} className="text-muted-foreground" />
+                        <FormattedMessage defaultMessage="View transactions" id="DfQJQ6" />
+                      </Link>
+                    </Button>
                   </div>
 
                   {isLoading ? (

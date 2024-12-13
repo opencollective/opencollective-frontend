@@ -163,7 +163,7 @@ describe('host dashboard', () => {
       cy.getByDataCy('order-confirmation-modal-submit').click();
       cy.contains('Paid').should('exist');
 
-      cy.contains('View transactions').click();
+      cy.getByDataCy('view-transactions-button').click();
 
       // Check transactions
       cy.contains('Contribution').should('exist');
