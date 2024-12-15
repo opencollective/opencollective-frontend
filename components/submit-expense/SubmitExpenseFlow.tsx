@@ -133,6 +133,16 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
       try {
         track(AnalyticsEvent.EXPENSE_SUBMISSION_SUBMITTED);
 
+        const attachedFiles = values.additionalAttachments.map(a => ({
+          url: typeof a === 'string' ? a : a?.url,
+        }));
+
+        if (values.hasInvoiceOption === YesNoOption.YES) {
+          attachedFiles.push({
+            url: typeof values.invoiceFile === 'string' ? values.invoiceFile : values.invoiceFile?.url,
+          });
+        }
+
         const expenseInput: CreateExpenseFromDashboardMutationVariables['expenseCreateInput'] = {
           description: values.title,
           reference:
@@ -155,9 +165,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
                 id: values.accountingCategoryId,
               }
             : null,
-          attachedFiles: values.additionalAttachments.map(a => ({
-            url: typeof a === 'string' ? a : a?.url,
-          })),
+          attachedFiles,
           currency: formOptions.expenseCurrency,
           customData: null,
           invoiceInfo: null,
