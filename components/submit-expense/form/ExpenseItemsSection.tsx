@@ -232,7 +232,7 @@ function ExpenseItem(props: ExpenseItemProps) {
         <div className="flex-grow">
           <div className="mb-2">
             <StyledInputFormikField
-              isFastField
+              required={props.form.options.isAdminOfPayee}
               label={intl.formatMessage({ defaultMessage: 'Item Description', id: 'xNL/oy' })}
               placeholder={intl.formatMessage({ defaultMessage: 'Enter what best describes the item', id: '/eapvj' })}
               name={`expenseItems.${props.index}.description`}
@@ -241,7 +241,7 @@ function ExpenseItem(props: ExpenseItemProps) {
           <div className="flex gap-4">
             <div className="flex-grow basis-0">
               <StyledInputFormikField
-                isFastField
+                required={props.form.options.isAdminOfPayee}
                 label={intl.formatMessage({ defaultMessage: 'Date', id: 'expense.incurredAt' })}
                 name={`expenseItems.${props.index}.incurredAt`}
               >
