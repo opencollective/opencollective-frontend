@@ -280,7 +280,7 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
           entityIdentifier={
             <CopyID
               value={props.orderId}
-              tooltipLabel={<FormattedMessage defaultMessage="Copy transaction ID" id="zzd7ZI" />}
+              tooltipLabel={<FormattedMessage defaultMessage="Copy contribution ID" id="u4GUMq" />}
             >
               #{props.orderId}
             </CopyID>
@@ -404,6 +404,18 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                   )}
                   <DataListItem>
                     <DataListItemLabel>
+                      <FormattedMessage defaultMessage="Frequency" id="Frequency" />
+                    </DataListItemLabel>
+                    <DataListItemValue>
+                      {isLoading ? (
+                        <Skeleton className="h-5 w-44" />
+                      ) : (
+                        i18nFrequency(intl, query.data?.order?.frequency)
+                      )}
+                    </DataListItemValue>
+                  </DataListItem>
+                  <DataListItem>
+                    <DataListItemLabel>
                       <FormattedMessage id="Contribution.CreationDate" defaultMessage="Creation Date" />
                     </DataListItemLabel>
                     <DataListItemValue>
@@ -480,18 +492,6 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                       )}
                     </React.Fragment>
                   )}
-                  <DataListItem>
-                    <DataListItemLabel>
-                      <FormattedMessage defaultMessage="Frequency" id="Frequency" />
-                    </DataListItemLabel>
-                    <DataListItemValue>
-                      {isLoading ? (
-                        <Skeleton className="h-5 w-44" />
-                      ) : (
-                        i18nFrequency(intl, query.data?.order?.frequency)
-                      )}
-                    </DataListItemValue>
-                  </DataListItem>
 
                   {query.data?.order?.tier && (
                     <DataListItem>

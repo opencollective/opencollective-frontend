@@ -49,7 +49,7 @@ export default function DrawerHeader({
 
         <div className="flex items-center gap-1">
           {!forceMoreActions && (
-            <div className="items-center gap-1">
+            <div className="items-center gap-1 sm:flex">
               {primary?.map(action => (
                 <Button
                   key={action.key || action.label}

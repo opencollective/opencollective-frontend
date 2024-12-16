@@ -409,7 +409,7 @@ const getColumns = ({ intl, isIncoming, includeHostedAccounts, onlyExpectedFunds
       const frequency = cell.getValue();
       return (
         ['MONTHLY', 'YEARLY'].includes(frequency) && (
-          <span className="text-xs font-light text-slate-700">{i18nFrequency(intl, frequency)}</span>
+          <span className="text-sm font-light lowercase text-muted-foreground">{i18nFrequency(intl, frequency)}</span>
         )
       );
     },
