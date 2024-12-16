@@ -1,35 +1,236 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { isEmpty } from 'lodash';
-import { Check, Link as LinkIcon, X } from 'lucide-react';
-import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import { ArrowLeftRightIcon } from 'lucide-react';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../lib/actions/types';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type { ContributionDrawerQuery, ContributionDrawerQueryVariables } from '../../lib/graphql/types/v2/graphql';
-import { ContributionFrequency, OrderStatus } from '../../lib/graphql/types/v2/schema';
-import useClipboard from '../../lib/hooks/useClipboard';
+import { ContributionFrequency, OrderStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { i18nFrequency } from '../../lib/i18n/order';
 import { i18nPaymentMethodProviderType } from '../../lib/i18n/payment-method-provider-type';
-import type LoggedInUser from '../../lib/LoggedInUser';
 
 import { AccountHoverCard } from '../AccountHoverCard';
 import Avatar from '../Avatar';
+import { CopyID } from '../CopyId';
+import DateTime from '../DateTime';
+import DrawerHeader from '../DrawerHeader';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import Link from '../Link';
-import LoadingPlaceholder from '../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import { OrderAdminAccountingCategoryPill } from '../orders/OrderAccountingCategoryPill';
 import OrderStatusTag from '../orders/OrderStatusTag';
 import PaymentMethodTypeWithIcon from '../PaymentMethodTypeWithIcon';
-import { DropdownActionItem } from '../table/RowActionsMenu';
 import Tags from '../Tags';
 import { Button } from '../ui/Button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/DropdownMenu';
-import { Sheet, SheetContent, SheetFooter } from '../ui/Sheet';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
+import { DataList, DataListItem, DataListItemLabel, DataListItemValue } from '../ui/DataList';
+import { InfoList, InfoListItem } from '../ui/InfoList';
+import { Sheet, SheetContent } from '../ui/Sheet';
+import { Skeleton } from '../ui/Skeleton';
 
 import ContributionTimeline, { getTransactionsUrl } from './ContributionTimeline';
+
+const contributionDrawerQuery = gql`
+  query ContributionDrawer($orderId: Int!) {
+    order(order: { legacyId: $orderId }) {
+      id
+      legacyId
+      nextChargeDate
+      lastChargedAt
+      amount {
+        value
+        valueInCents
+        currency
+      }
+      totalAmount {
+        value
+        valueInCents
+        currency
+      }
+      paymentMethod {
+        id
+        type
+      }
+      status
+      description
+      createdAt
+      processedAt
+      frequency
+      tier {
+        id
+        name
+        description
+      }
+      createdByAccount {
+        ...ContributionDrawerAccountFields
+      }
+      individual: createdByAccount {
+        ...ContributionDrawerAccountFields
+      }
+      fromAccount {
+        ...ContributionDrawerAccountFields
+        ... on AccountWithHost {
+          host {
+            id
+            slug
+          }
+        }
+      }
+      toAccount {
+        ...ContributionDrawerAccountFields
+      }
+      platformTipEligible
+      platformTipAmount {
+        value
+        valueInCents
+        currency
+      }
+      hostFeePercent
+      tags
+      tax {
+        type
+        idNumber
+        rate
+      }
+      accountingCategory {
+        id
+        name
+        friendlyName
+        code
+      }
+      activities {
+        nodes {
+          id
+          type
+          createdAt
+          fromAccount {
+            ...ContributionDrawerAccountFields
+          }
+          account {
+            ...ContributionDrawerAccountFields
+          }
+          host {
+            ...ContributionDrawerAccountFields
+          }
+          individual {
+            ...ContributionDrawerAccountFields
+          }
+          data
+          transaction {
+            ...ContributionDrawerTransactionFields
+          }
+        }
+      }
+      customData
+      memo
+      needsConfirmation
+      pendingContributionData {
+        expectedAt
+        paymentMethod
+        ponumber
+        memo
+        fromAccountInfo {
+          name
+          email
+        }
+      }
+      transactions {
+        ...ContributionDrawerTransactionFields
+      }
+      permissions {
+        id
+        canResume
+        canMarkAsExpired
+        canMarkAsPaid
+        canEdit
+        canComment
+        canSeePrivateActivities
+        canSetTags
+        canUpdateAccountingCategory
+      }
+    }
+  }
+
+  fragment ContributionDrawerAccountFields on Account {
+    id
+    name
+    slug
+    isIncognito
+    type
+    imageUrl
+    isHost
+    isArchived
+    ... on Individual {
+      isGuest
+    }
+    ... on AccountWithHost {
+      host {
+        id
+        slug
+        type
+        accountingCategories {
+          nodes {
+            id
+            code
+            name
+            friendlyName
+            kind
+            appliesTo
+          }
+        }
+      }
+      approvedAt
+    }
+
+    ... on AccountWithParent {
+      parent {
+        id
+        slug
+      }
+    }
+  }
+
+  fragment ContributionDrawerTransactionFields on Transaction {
+    id
+    legacyId
+    uuid
+    kind
+    amount {
+      currency
+      valueInCents
+    }
+    netAmount {
+      currency
+      valueInCents
+    }
+    group
+    type
+    description
+    createdAt
+    isRefunded
+    isRefund
+    isOrderRejected
+    account {
+      ...ContributionDrawerAccountFields
+    }
+    oppositeAccount {
+      ...ContributionDrawerAccountFields
+    }
+    expense {
+      id
+      type
+    }
+    permissions {
+      id
+      canRefund
+      canDownloadInvoice
+      canReject
+    }
+    paymentProcessorUrl
+  }
+`;
 
 type ContributionDrawerProps = {
   open: boolean;
@@ -38,333 +239,95 @@ type ContributionDrawerProps = {
   getActions: GetActions<ContributionDrawerQuery['order']>;
 };
 
-const I18nFrequencyMessages = defineMessages({
-  [ContributionFrequency.ONETIME]: {
-    id: 'Frequency.OneTime',
-    defaultMessage: 'One time',
-  },
-  [ContributionFrequency.MONTHLY]: {
-    id: 'Frequency.Monthly',
-    defaultMessage: 'Monthly',
-  },
-  [ContributionFrequency.YEARLY]: {
-    id: 'Frequency.Yearly',
-    defaultMessage: 'Yearly',
-  },
-});
-
-function getTransactionOrderLink(LoggedInUser: LoggedInUser, order: ContributionDrawerQuery['order']): string {
-  const url = getTransactionsUrl(LoggedInUser, order);
-  url.searchParams.set('orderId', order.legacyId.toString());
-  return url.toString();
-}
-
 export function ContributionDrawer(props: ContributionDrawerProps) {
-  const clipboard = useClipboard();
   const intl = useIntl();
-
   const { LoggedInUser } = useLoggedInUser();
 
-  const query = useQuery<ContributionDrawerQuery, ContributionDrawerQueryVariables>(
-    gql`
-      query ContributionDrawer($orderId: Int!) {
-        order(order: { legacyId: $orderId }) {
-          id
-          legacyId
-          nextChargeDate
-          amount {
-            value
-            valueInCents
-            currency
-          }
-          totalAmount {
-            value
-            valueInCents
-            currency
-          }
-          paymentMethod {
-            id
-            type
-          }
-          status
-          description
-          createdAt
-          processedAt
-          frequency
-          tier {
-            id
-            name
-            description
-          }
-          createdByAccount {
-            ...ContributionDrawerAccountFields
-          }
-          individual: createdByAccount {
-            ...ContributionDrawerAccountFields
-          }
-          fromAccount {
-            ...ContributionDrawerAccountFields
-            ... on AccountWithHost {
-              host {
-                id
-                slug
-              }
-            }
-          }
-          toAccount {
-            ...ContributionDrawerAccountFields
-          }
-          platformTipEligible
-          platformTipAmount {
-            value
-            valueInCents
-            currency
-          }
-          hostFeePercent
-          tags
-          tax {
-            type
-            idNumber
-            rate
-          }
-          accountingCategory {
-            id
-            name
-            friendlyName
-            code
-          }
-          activities {
-            nodes {
-              id
-              type
-              createdAt
-              fromAccount {
-                ...ContributionDrawerAccountFields
-              }
-              account {
-                ...ContributionDrawerAccountFields
-              }
-              host {
-                ...ContributionDrawerAccountFields
-              }
-              individual {
-                ...ContributionDrawerAccountFields
-              }
-              data
-              transaction {
-                ...ContributionDrawerTransactionFields
-              }
-            }
-          }
-          customData
-          memo
-          needsConfirmation
-          pendingContributionData {
-            expectedAt
-            paymentMethod
-            ponumber
-            memo
-            fromAccountInfo {
-              name
-              email
-            }
-          }
-          transactions {
-            ...ContributionDrawerTransactionFields
-          }
-          permissions {
-            id
-            canResume
-            canMarkAsExpired
-            canMarkAsPaid
-            canEdit
-            canComment
-            canSeePrivateActivities
-            canSetTags
-            canUpdateAccountingCategory
-          }
-        }
-      }
-
-      fragment ContributionDrawerAccountFields on Account {
-        id
-        name
-        slug
-        isIncognito
-        type
-        imageUrl
-        isHost
-        isArchived
-        ... on Individual {
-          isGuest
-        }
-        ... on AccountWithHost {
-          host {
-            id
-            slug
-            type
-            accountingCategories {
-              nodes {
-                id
-                code
-                name
-                friendlyName
-                kind
-                appliesTo
-              }
-            }
-          }
-          approvedAt
-        }
-
-        ... on AccountWithParent {
-          parent {
-            id
-            slug
-          }
-        }
-      }
-
-      fragment ContributionDrawerTransactionFields on Transaction {
-        id
-        legacyId
-        uuid
-        kind
-        amount {
-          currency
-          valueInCents
-        }
-        netAmount {
-          currency
-          valueInCents
-        }
-        group
-        type
-        description
-        createdAt
-        isRefunded
-        isRefund
-        isOrderRejected
-        account {
-          ...ContributionDrawerAccountFields
-        }
-        oppositeAccount {
-          ...ContributionDrawerAccountFields
-        }
-        expense {
-          id
-          type
-        }
-        permissions {
-          id
-          canRefund
-          canDownloadInvoice
-          canReject
-        }
-        paymentProcessorUrl
-      }
-    `,
-    {
-      context: API_V2_CONTEXT,
-      variables: {
-        orderId: props.orderId,
-      },
-      skip: !props.open || !props.orderId,
+  const query = useQuery<ContributionDrawerQuery, ContributionDrawerQueryVariables>(contributionDrawerQuery, {
+    context: API_V2_CONTEXT,
+    variables: {
+      orderId: props.orderId,
     },
-  );
+    skip: !props.open || !props.orderId,
+  });
 
   const isLoading = !query.called || query.loading || !query.data || query.data.order?.legacyId !== props.orderId;
-
-  const actions = query.data?.order ? props.getActions(query.data.order) : null;
+  const dropdownTriggerRef = React.useRef();
+  const order = query.data?.order;
+  const actions = React.useMemo(
+    () => (order ? props.getActions(order, dropdownTriggerRef) : null),
+    [order, props.getActions, dropdownTriggerRef],
+  );
+  const transactionsUrl = React.useMemo(() => {
+    const url = order && getTransactionsUrl(LoggedInUser, order);
+    url && url.searchParams?.set('orderId', order.legacyId.toString());
+    return url;
+  }, [LoggedInUser, order]);
 
   return (
     <Sheet open={props.open} onOpenChange={isOpen => !isOpen && props.onClose()}>
       <SheetContent className="flex max-w-xl flex-col overflow-hidden">
+        <DrawerHeader
+          actions={actions}
+          dropdownTriggerRef={dropdownTriggerRef}
+          entityName={
+            <div className="flex items-center gap-1">
+              <OrderStatusTag status={query.data?.order?.status} overflow="visible" />
+              <FormattedMessage defaultMessage="Contribution" id="0LK5eg" />
+            </div>
+          }
+          forceMoreActions
+          entityIdentifier={
+            <CopyID
+              value={props.orderId}
+              tooltipLabel={<FormattedMessage defaultMessage="Copy contribution ID" id="u4GUMq" />}
+            >
+              #{props.orderId}
+            </CopyID>
+          }
+          entityLabel={
+            isLoading ? (
+              <Skeleton className="h-6 w-56" />
+            ) : (
+              <div className="text-base font-semibold text-foreground">{query.data.order.description}</div>
+            )
+          }
+        />
         <div className="flex-grow overflow-auto px-8 py-4">
           {query.error ? (
             <MessageBoxGraphqlError error={query.error} />
           ) : (
             <React.Fragment>
-              <div className="flex items-center">
-                <div className="flex items-center gap-2 text-lg font-bold">
-                  <FormattedMessage defaultMessage="Contribution" id="0LK5eg" />
-                  <div>{isLoading ? <LoadingPlaceholder height={20} /> : `# ${query.data.order.legacyId}`}</div>
-                  {isLoading ? null : (
-                    <Tooltip delayDuration={100}>
-                      <TooltipTrigger asChild>
-                        <Button
-                          asChild
-                          variant="ghost"
-                          size="icon-sm"
-                          onPointerDown={e => {
-                            e.stopPropagation();
-                          }}
-                          onClick={e => {
-                            const orderUrl = new URL(
-                              `${query.data.order.toAccount.slug}/orders/${query.data.order.legacyId}`,
-                              window.location.origin,
-                            );
-
-                            e.preventDefault();
-                            e.stopPropagation();
-                            clipboard.copy(orderUrl.toString());
-                          }}
-                        >
-                          <div className="cursor-pointer">
-                            <LinkIcon size={16} />
-                          </div>
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        {clipboard.isCopied ? (
-                          <div className="flex items-center gap-1">
-                            <Check size={16} />
-                            <FormattedMessage id="Clipboard.Copied" defaultMessage="Copied!" />
-                          </div>
-                        ) : (
-                          <FormattedMessage id="Clipboard.CopyShort" defaultMessage="Copy" />
-                        )}
-                      </TooltipContent>
-                    </Tooltip>
-                  )}
-                </div>
-                <div className="ml-auto flex items-center gap-2">
-                  {query.data?.order?.status && <OrderStatusTag status={query.data.order.status} />}
-                  <Button variant="ghost" size="icon-sm" onClick={props.onClose}>
-                    <X size={16} />
-                  </Button>
-                </div>
-              </div>
-              {query.data?.order?.permissions?.canUpdateAccountingCategory &&
-                query.data.order.toAccount &&
-                'host' in query.data.order.toAccount && (
-                  <div className="mb-4">
+              <div className="flex items-center gap-2">
+                {isLoading ? (
+                  <Skeleton className="h-6 w-32" />
+                ) : (
+                  query.data?.order?.permissions?.canUpdateAccountingCategory &&
+                  query.data.order.toAccount &&
+                  'host' in query.data.order.toAccount && (
                     <OrderAdminAccountingCategoryPill
                       order={query.data?.order}
                       account={query.data?.order.toAccount}
                       host={query.data.order.toAccount.host}
                     />
-                  </div>
+                  )
                 )}
-              <div className="mb-4">
-                {isLoading ? (
-                  <LoadingPlaceholder height={20} />
-                ) : (
-                  <Tags canEdit={query.data?.order?.permissions?.canSetTags} order={query.data?.order} />
-                )}
-              </div>
-              <div className="mb-6">
-                <div>{isLoading ? <LoadingPlaceholder height={20} /> : query.data.order.description}</div>
+                <div>
+                  {isLoading ? (
+                    <Skeleton className="h-6 w-24" />
+                  ) : (
+                    <Tags canEdit={query.data?.order?.permissions?.canSetTags} order={query.data?.order} />
+                  )}
+                </div>
               </div>
               <div className="text-sm">
-                <div className="mb-4 grid grid-cols-3 gap-4 gap-y-6 text-sm [&>*>*:first-child]:mb-2 [&>*>*:first-child]:font-bold [&>*>*:first-child]:text-[#344256]">
-                  <div>
-                    <div>
-                      <FormattedMessage defaultMessage="Contributor" id="Contributor" />
-                    </div>
-                    <div>
-                      {isLoading ? (
-                        <LoadingPlaceholder height={20} />
+                <InfoList className="mb-6 sm:grid-cols-2">
+                  <InfoListItem
+                    className="border-b border-t-0"
+                    title={<FormattedMessage defaultMessage="Contributor" id="Contributor" />}
+                    value={
+                      isLoading ? (
+                        <Skeleton className="h-6 w-48" />
                       ) : (
                         <AccountHoverCard
                           account={query.data.order.fromAccount}
@@ -378,16 +341,16 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                             </Link>
                           }
                         />
-                      )}
-                    </div>
-                  </div>
-                  <div>
-                    <div>
-                      <FormattedMessage defaultMessage="Collective" id="Collective" />
-                    </div>
-                    <div>
-                      {isLoading ? (
-                        <LoadingPlaceholder height={20} />
+                      )
+                    }
+                  />
+
+                  <InfoListItem
+                    className="border-b border-t-0"
+                    title={<FormattedMessage defaultMessage="Collective" id="Collective" />}
+                    value={
+                      isLoading ? (
+                        <Skeleton className="h-6 w-48" />
                       ) : (
                         <AccountHoverCard
                           account={query.data.order.toAccount}
@@ -401,147 +364,195 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                             </Link>
                           }
                         />
-                      )}
-                    </div>
-                  </div>
-                  <div>
-                    <div>
-                      <FormattedMessage defaultMessage="Payment Method" id="paymentmethod.label" />
-                    </div>
-                    <div>
+                      )
+                    }
+                  />
+                </InfoList>
+
+                <DataList className="mb-4">
+                  <DataListItem>
+                    <DataListItemLabel>
+                      <FormattedMessage defaultMessage="Amount" id="Fields.amount" />
+                    </DataListItemLabel>
+                    <DataListItemValue>
                       {isLoading ? (
-                        <LoadingPlaceholder height={20} />
+                        <Skeleton className="h-5 w-32" />
+                      ) : (
+                        <React.Fragment>
+                          <FormattedMoneyAmount
+                            showCurrencyCode={true}
+                            currency={query.data.order.totalAmount.currency}
+                            amount={query.data.order.totalAmount.valueInCents}
+                          />
+                        </React.Fragment>
+                      )}
+                    </DataListItemValue>
+                  </DataListItem>
+                  {query.data?.order?.platformTipAmount?.valueInCents > 0 && (
+                    <DataListItem>
+                      <DataListItemLabel>
+                        <FormattedMessage defaultMessage="Platform Tip" id="Fields.platformTip" />
+                      </DataListItemLabel>
+                      <DataListItemValue>
+                        <FormattedMoneyAmount
+                          showCurrencyCode={true}
+                          currency={query.data.order.platformTipAmount.currency}
+                          amount={query.data.order.platformTipAmount.valueInCents}
+                        />
+                      </DataListItemValue>
+                    </DataListItem>
+                  )}
+                  <DataListItem>
+                    <DataListItemLabel>
+                      <FormattedMessage defaultMessage="Frequency" id="Frequency" />
+                    </DataListItemLabel>
+                    <DataListItemValue>
+                      {isLoading ? (
+                        <Skeleton className="h-5 w-44" />
+                      ) : (
+                        i18nFrequency(intl, query.data?.order?.frequency)
+                      )}
+                    </DataListItemValue>
+                  </DataListItem>
+                  <DataListItem>
+                    <DataListItemLabel>
+                      <FormattedMessage id="Contribution.CreationDate" defaultMessage="Creation Date" />
+                    </DataListItemLabel>
+                    <DataListItemValue>
+                      {isLoading ? (
+                        <Skeleton className="h-5 w-32" />
+                      ) : (
+                        <DateTime value={query.data?.order?.createdAt} dateStyle="long" />
+                      )}
+                    </DataListItemValue>
+                  </DataListItem>
+                  {query.data?.order?.lastChargedAt &&
+                    query.data?.order.frequency !== ContributionFrequency.ONETIME && (
+                      <DataListItem>
+                        <DataListItemLabel>
+                          <FormattedMessage id="Contribution.LastChargeDate" defaultMessage="Last Charge Date" />
+                        </DataListItemLabel>
+                        <DataListItemValue>
+                          <DateTime value={query.data?.order?.lastChargedAt} dateStyle="long" />
+                        </DataListItemValue>
+                      </DataListItem>
+                    )}
+                  {query.data?.order?.nextChargeDate &&
+                    query.data?.order.frequency !== ContributionFrequency.ONETIME && (
+                      <DataListItem>
+                        <DataListItemLabel>
+                          <FormattedMessage defaultMessage="Next Charge Date" id="oJNxUE" />
+                        </DataListItemLabel>
+                        <DataListItemValue>
+                          {isLoading ? (
+                            <Skeleton className="h-5 w-32" />
+                          ) : (
+                            <DateTime value={query.data?.order?.nextChargeDate} dateStyle="long" />
+                          )}
+                        </DataListItemValue>
+                      </DataListItem>
+                    )}
+                  <DataListItem>
+                    <DataListItemLabel>
+                      <FormattedMessage defaultMessage="Payment Method" id="paymentmethod.label" />
+                    </DataListItemLabel>
+                    <DataListItemValue>
+                      {isLoading ? (
+                        <Skeleton className="h-5 w-44" />
                       ) : query.data.order.status === OrderStatus.PENDING ? (
                         i18nPaymentMethodProviderType(intl, query.data.order.pendingContributionData.paymentMethod)
                       ) : (
                         <PaymentMethodTypeWithIcon type={query.data.order.paymentMethod?.type} iconSize={16} />
                       )}
-                    </div>
-                  </div>
-
+                    </DataListItemValue>
+                  </DataListItem>
                   {query.data?.order?.status === OrderStatus.PENDING && (
                     <React.Fragment>
                       {query.data.order.pendingContributionData?.ponumber && (
-                        <div className="col-span-3">
-                          <div>
+                        <DataListItem>
+                          <DataListItemLabel>
                             <FormattedMessage defaultMessage="PO Number" id="Fields.PONumber" />
-                          </div>
-                          <div>{query.data.order.pendingContributionData.ponumber}</div>
-                        </div>
+                          </DataListItemLabel>
+                          <DataListItemValue>{query.data.order.pendingContributionData.ponumber}</DataListItemValue>
+                        </DataListItem>
                       )}
+
                       {query.data.order.pendingContributionData?.fromAccountInfo && (
-                        <div className="col-span-3">
-                          <div>
+                        <DataListItem>
+                          <DataListItemLabel>
                             <FormattedMessage defaultMessage="Contact" id="Contact" />
-                          </div>
-                          <div>
+                          </DataListItemLabel>
+                          <DataListItemValue>
+                            {' '}
                             {query.data.order.pendingContributionData?.fromAccountInfo?.email
                               ? `${query.data.order.pendingContributionData.fromAccountInfo.name} (${query.data.order.pendingContributionData.fromAccountInfo.email})`
                               : query.data.order.pendingContributionData.fromAccountInfo.name}
-                          </div>
-                        </div>
+                          </DataListItemValue>
+                        </DataListItem>
                       )}
                     </React.Fragment>
                   )}
 
-                  <div className="col-span-3">
-                    <div>
-                      <FormattedMessage defaultMessage="Frequency" id="Frequency" />
-                    </div>
-                    <div>
-                      {isLoading ? (
-                        <LoadingPlaceholder height={20} />
-                      ) : !query.data.order.frequency ? (
-                        <FormattedMessage {...I18nFrequencyMessages[ContributionFrequency.ONETIME]} />
-                      ) : (
-                        <FormattedMessage {...I18nFrequencyMessages[query.data.order.frequency]} />
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="col-span-3">
-                    <div>
-                      <FormattedMessage defaultMessage="Amount" id="Fields.amount" />
-                    </div>
-                    <div>
-                      {isLoading ? (
-                        <LoadingPlaceholder height={20} />
-                      ) : (
-                        <React.Fragment>
-                          <div>
-                            <FormattedMessage
-                              defaultMessage="Contribution amount: {amount}"
-                              id="y8CXGa"
-                              values={{
-                                amount: (
-                                  <FormattedMoneyAmount
-                                    showCurrencyCode={false}
-                                    currency={query.data.order.totalAmount.currency}
-                                    amount={query.data.order.totalAmount.valueInCents}
-                                  />
-                                ),
-                              }}
-                            />
-                          </div>
-                          {query.data.order.platformTipAmount?.valueInCents > 0 && (
-                            <div>
-                              <FormattedMessage
-                                defaultMessage="Includes Platform Tip: {amount}"
-                                id="g1BbRX"
-                                values={{
-                                  amount: (
-                                    <FormattedMoneyAmount
-                                      showCurrencyCode={false}
-                                      currency={query.data.order.platformTipAmount.currency}
-                                      amount={query.data.order.platformTipAmount.valueInCents}
-                                    />
-                                  ),
-                                }}
-                              />
-                            </div>
-                          )}
-                        </React.Fragment>
-                      )}
-                    </div>
-                  </div>
+                  {query.data?.order?.tier && (
+                    <DataListItem>
+                      <DataListItemLabel>
+                        <FormattedMessage defaultMessage="Tier" id="b07w+D" />
+                      </DataListItemLabel>
+                      <DataListItemValue>{query.data.order.tier.name}</DataListItemValue>
+                    </DataListItem>
+                  )}
 
                   {query.data?.order?.memo ||
                     (query.data?.order?.pendingContributionData?.memo && (
-                      <div>
-                        <div>
+                      <DataListItem>
+                        <DataListItemLabel>
                           <FormattedMessage defaultMessage="Memo" id="D5NqQO" />
-                        </div>
-                        <div>{query.data.order.memo || query.data.order.pendingContributionData.memo}</div>
-                      </div>
+                        </DataListItemLabel>
+                        <DataListItemValue>
+                          {query.data.order.memo || query.data.order.pendingContributionData.memo}
+                        </DataListItemValue>
+                      </DataListItem>
                     ))}
                   {!isEmpty(query.data?.order?.customData) && (
-                    <div>
-                      <div>
+                    <DataListItem>
+                      <DataListItemLabel>
                         <FormattedMessage defaultMessage="Custom Data" id="DRPEis" />
-                      </div>
-                      <div>{JSON.stringify(query.data.order.customData)}</div>
-                    </div>
+                      </DataListItemLabel>
+                      <DataListItemValue>{JSON.stringify(query.data.order.customData)}</DataListItemValue>
+                    </DataListItem>
                   )}
-                </div>
+                </DataList>
+
                 <div>
                   <div className="flex items-center justify-between gap-2 py-4">
                     <div className="text-slate-80 w-fit text-base font-bold leading-6">
                       <FormattedMessage defaultMessage="Related Activity" id="LP8cIK" />
                     </div>
                     <hr className="flex-grow border-neutral-300" />
-                    <Button asChild variant="outline" size="xs" disabled={isLoading} loading={isLoading}>
-                      <Link href={query.data?.order ? getTransactionOrderLink(LoggedInUser, query.data.order) : '#'}>
+                    <Button
+                      asChild
+                      variant="outline"
+                      size="xs"
+                      disabled={isLoading}
+                      loading={isLoading}
+                      data-cy="view-transactions-button"
+                    >
+                      <Link href={transactionsUrl?.toString() || '#'} className="flex flex-row items-center gap-2.5">
+                        <ArrowLeftRightIcon size={16} className="text-muted-foreground" />
                         <FormattedMessage defaultMessage="View transactions" id="DfQJQ6" />
                       </Link>
                     </Button>
                   </div>
 
                   {isLoading ? (
-                    <div className="flex flex-col gap-1">
-                      <LoadingPlaceholder height={20} />
-                      <LoadingPlaceholder height={20} />
-                      <LoadingPlaceholder height={20} />
-                      <LoadingPlaceholder height={20} />
+                    <div className="flex flex-col gap-6">
+                      {Array.from({ length: 3 }).map((_, index) => (
+                        // eslint-disable-next-line react/no-array-index-key
+                        <div className="flex gap-5" key={index}>
+                          <Skeleton className="h-10 w-12 rounded-full" />
+                          <Skeleton className="mt-2 h-10 w-full" />
+                        </div>
+                      ))}
                     </div>
                   ) : (
                     <ContributionTimeline order={query.data.order} />
@@ -551,24 +562,6 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
             </React.Fragment>
           )}
         </div>
-        <SheetFooter className="flex px-8 py-2">
-          {(actions?.primary.length > 0 || actions?.secondary.length > 0) && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="xs">
-                  <FormattedMessage defaultMessage="More actions" id="S8/4ZI" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {actions?.primary?.map(action => <DropdownActionItem key={action.key} action={action} />)}
-
-                {actions?.primary.length > 0 && actions?.secondary.length > 0 && <DropdownMenuSeparator />}
-
-                {actions?.secondary?.map(action => <DropdownActionItem key={action.key} action={action} />)}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-        </SheetFooter>
       </SheetContent>
     </Sheet>
   );
