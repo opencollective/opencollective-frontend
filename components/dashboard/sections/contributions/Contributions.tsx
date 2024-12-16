@@ -273,7 +273,7 @@ const getColumns = ({ intl, isIncoming, includeHostedAccounts, onlyExpectedFunds
   const accounts = {
     accessorKey: 'toAccount',
     header: intl.formatMessage({ defaultMessage: 'Collective & Contributors', id: 'kklCrk' }),
-    meta: { className: 'max-w-[200px] overflow-hidden' },
+    meta: { className: 'max-w-[400px] overflow-hidden' },
     cell: ({ cell, row }) => {
       const toAccount = cell.getValue();
       const fromAccount = row.original.fromAccount;
@@ -317,6 +317,7 @@ const getColumns = ({ intl, isIncoming, includeHostedAccounts, onlyExpectedFunds
   const toAccount = {
     accessorKey: 'toAccount',
     header: intl.formatMessage({ id: 'Collective', defaultMessage: 'Collective' }),
+    meta: { className: 'max-w-[400px] overflow-hidden' },
     cell: ({ cell, row }) => {
       const toAccount = cell.getValue();
       const tier = row.original?.tier;
@@ -348,6 +349,7 @@ const getColumns = ({ intl, isIncoming, includeHostedAccounts, onlyExpectedFunds
   const fromAccount = {
     accessorKey: 'fromAccount',
     header: intl.formatMessage({ id: 'Contributor', defaultMessage: 'Contributor' }),
+    meta: { className: 'max-w-[400px] overflow-hidden' },
     cell: ({ cell, row }) => {
       const fromAccount = cell.getValue();
       const tier = row.original?.tier;
