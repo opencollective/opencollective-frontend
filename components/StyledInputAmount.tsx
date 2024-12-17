@@ -183,7 +183,7 @@ const StyledInputAmount = ({
   const [rawValue, setRawValue] = React.useState(value || defaultValue || '');
   const isControlled = !isUndefined(value);
   const curValue = isControlled ? getValue(value, rawValue, isEmpty) : undefined;
-  const minAmount = min / 10 ** precision;
+  const minAmount = precision !== 0 ? min / 10 ** precision : min / 100;
   const disabled = props.disabled || loadingExchangeRate;
   const canUseExchangeRate = Boolean(!loadingExchangeRate && exchangeRate && exchangeRate.fromCurrency === currency);
   const minWidth = useAmountInputMinWidth(curValue, max);

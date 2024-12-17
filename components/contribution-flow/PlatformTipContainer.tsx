@@ -154,7 +154,7 @@ export function PlatformTipContainer(props: PlatformTipContainerProps) {
     setIsCollapsed(true);
   }, [props.step]);
 
-  const percentage = props.value / props.amount;
+  const percentage = props.value && props.amount && props.amount > 0 ? props.value / props.amount : 0;
 
   const message = React.useMemo(() => {
     if (percentage <= 0) {
