@@ -128,7 +128,14 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
         {!props.form.initialLoading && expenseTypeOption === ExpenseType.INVOICE && (
           <div className="mt-4 rounded-md border border-gray-300 p-4">
             <Label>
-              <FormattedMessage defaultMessage="An invoice is required. Do you have one?" id="O+LW+y" />
+              {props.form.options.isAdminOfPayee ? (
+                <FormattedMessage defaultMessage="An invoice is required. Do you have one?" id="O+LW+y" />
+              ) : (
+                <FormattedMessage
+                  defaultMessage="The person you are inviting to submit this expense will be asked to provide an invoice. Do you have one?"
+                  id="Sioe6W"
+                />
+              )}
             </Label>
             <Tabs
               value={props.form.values.hasInvoiceOption}
@@ -147,7 +154,7 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
                   <div className="h-16 flex-grow basis-0">
                     <div>
                       <StyledInputFormikField
-                        isFastField
+                        required={props.form.options.isAdminOfPayee}
                         name="invoiceFile"
                         isPrivate
                         label={intl.formatMessage({ defaultMessage: 'Attach your invoice file', id: 'Oa/lhY' })}
@@ -185,7 +192,7 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
                   </div>
                   <div className="flex-grow basis-0">
                     <StyledInputFormikField
-                      isFastField
+                      required={props.form.options.isAdminOfPayee}
                       name="invoiceNumber"
                       isPrivate
                       label={intl.formatMessage({ defaultMessage: 'Invoice number', id: 'ijDMrP' })}
