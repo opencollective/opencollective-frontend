@@ -219,7 +219,7 @@ export const HostCreateExpenseModal = ({
                       {
                         amountV2: omit(values.amount, ['exchangeRate.__typename', 'exchangeRate.isApproximate']),
                         description: values.description,
-                        incurredAt: values.incurredAt,
+                        incurredAt: standardizeExpenseItemIncurredAt(values.incurredAt),
                         url: values.type === ExpenseType.RECEIPT ? values['attachedFile']?.url : null,
                       },
                     ],
