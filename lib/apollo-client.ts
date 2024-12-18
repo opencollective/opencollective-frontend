@@ -78,6 +78,7 @@ const serverSideFetch = async (url, options: { headers?: any; agent?: any; body?
     options.headers['oc-env'] = process.env.OC_ENV;
     options.headers['oc-secret'] = process.env.OC_SECRET;
     options.headers['oc-application'] = process.env.OC_APPLICATION;
+    options.headers['oc-version'] = process.env.HEROKU_SLUG_COMMIT?.slice(0, 7);
     options.headers['user-agent'] = 'opencollective-frontend/1.0 node-fetch/1.0';
 
     // Start benchmarking if the request is server side
@@ -159,7 +160,10 @@ function createLink({ twoFactorAuthContext, accessToken = null }) {
 
   const linkFetch = process.browser ? fetch : serverSideFetch;
 
-  const httpHeaders = { 'oc-application': process.env.OC_APPLICATION };
+  const httpHeaders = {
+    'oc-application': process.env.OC_APPLICATION,
+    'oc-version': process.env.HEROKU_SLUG_COMMIT?.slice(0, 7),
+  };
 
   const apiV1DefaultLink = createUploadLink({
     uri: getGraphqlUrl('v1'),
