@@ -229,7 +229,7 @@
     "@swc/core": "^1.5.24",
     "@tailwindcss/typography": "^0.5.13",
     "@types/apollo-upload-client": "17.0.5",
-    "@types/react": "18.3.16",
+    "@types/react": "18.3.17",
     "@types/styled-components": "^5.1.34",
     "@types/styled-system": "^5.1.22",
     "@types/webpack-env": "^1.18.5",
