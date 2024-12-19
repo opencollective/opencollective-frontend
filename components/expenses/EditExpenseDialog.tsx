@@ -56,6 +56,7 @@ import { WhoIsGettingPaidForm } from '../submit-expense/form/WhoIsGettingPaidSec
 import { TypeOfExpenseForm } from '../submit-expense/form/TypeOfExpenseSection';
 import MessageBox from '../MessageBox';
 import { checkVATNumberFormat } from '@opencollective/taxes';
+import { expensePageExpenseFieldsFragment } from './graphql/fragments';
 
 const RenderFormFields = ({ field, onSubmit, expense }) => {
   switch (field) {
@@ -64,159 +65,95 @@ const RenderFormFields = ({ field, onSubmit, expense }) => {
     case 'expenseItems':
       return <EditExpenseItems onSubmit={onSubmit} expense={expense} />;
     case 'payoutMethod':
-      return <PayoutMethodFormContent onSubmit={onSubmit} expense={expense} />;
+      return <EditPayoutMethod onSubmit={onSubmit} expense={expense} />;
     case 'payee':
       return <WhoIsGettingPaidForm onSubmit={onSubmit} expense={expense} />;
   }
 };
 
-const EditExpenseItems = ({ expense, onSubmit }) => {
-  const intl = useIntl();
-  // const options = {
-  //   isAdminOfPayee: undefined,
-  //   taxType: undefined, // set tax Type
-  // };
-  // const schema = z.object({
-  //   expenseItems: z.array(
-  //     z
-  //       .object({
-  //         description: z
-  //           .string()
-  //           .nullish()
-  //           .refine(
-  //             v => {
-  //               // if (!options.isAdminOfPayee) {
-  //               //   return true;
-  //               // }
-
-  //               return v.length > 0;
-  //             },
-  //             {
-  //               message: 'Required',
-  //             },
-  //           ),
-  //         attachment: z
-  //           .union([
-  //             z.string().nullish(),
-  //             z.object({
-  //               url: z.string().nullish(),
-  //             }),
-  //           ])
-  //           .nullish()
-  //           .refine(
-  //             attachment => {
-  //               if (expense.type === ExpenseType.INVOICE) {
-  //                 return true;
-  //               }
-
-  //               return typeof attachment === 'string' ? !!attachment : !!attachment?.url;
-  //             },
-  //             {
-  //               message: 'Required',
-  //             },
-  //           ),
-  //         incurredAt: z.string(),
-  //         amount: z.object({
-  //           valueInCents: z.number().min(1),
-  //           currency: z.string().refine(v => Object.values(Currency).includes(v as Currency), {
-  //             message: `Currency must be one of: ${Object.values(Currency).join(',')}`,
-  //           }),
-  //           exchangeRate: z
-  //             .object({
-  //               value: z.number(),
-  //               source: z.string(),
-  //               fromCurrency: z.string(),
-  //               toCurrency: z.string(),
-  //               date: z.string().nullable(),
-  //             })
-  //             .nullable(),
-  //         }),
-  //       })
-  //       .refine(
-  //         item => {
-  //           if (item.amount.currency && item.amount.currency !== expense.currency) {
-  //             return (
-  //               item.amount.exchangeRate?.value &&
-  //               item.amount.exchangeRate?.source &&
-  //               item.amount.exchangeRate?.toCurrency === expense.currency
-  //             );
-  //           }
-  //           return true;
-  //         },
-  //         {
-  //           message: intl.formatMessage({ defaultMessage: 'Missing exchange rate', id: 'UXE8lX' }),
-  //           path: ['amount', 'exchangeRate', 'value'],
-  //         },
-  //       ),
-  //   ),
-  //   // hasTax: z.boolean().nullable(),
-  //   tax: z
-  //     .object({
-  //       rate: z
-  //         .number()
-  //         .refine(
-  //           v => {
-  //             if (options.taxType !== TaxType.GST) {
-  //               return true;
-  //             }
-  //             return [0, 0.15].includes(v);
-  //           },
-  //           {
-  //             message: 'GST tax must be 0% or 15%',
-  //           },
-  //         )
-  //         .refine(
-  //           v => {
-  //             if (options.taxType !== TaxType.VAT) {
-  //               return true;
-  //             }
-
-  //             return v > 0 && v < 1;
-  //           },
-  //           {
-  //             message: 'VAT tax must be between 0% and 100%',
-  //           },
-  //         ),
-  //       idNumber: z
-  //         .string()
-  //         .nullable()
-  //         .refine(
-  //           v => {
-  //             if (options.taxType !== TaxType.VAT) {
-  //               return true;
-  //             }
-
-  //             return checkVATNumberFormat(v).isValid;
-  //           },
-  //           {
-  //             message: 'Invalid VAT Number',
-  //           },
-  //         ),
-  //     })
-  //     .nullable()
-  //     .refine(v => {
-  //       if (!values.hasTax) {
-  //         return true;
-  //       }
-
-  //       return !!v;
-  //     }),
-  // });
-  // const transformedOnSubmit = values => {
-  //   const input = {
-  //     items: values.expenseItems,
-  //   };
-  //   onSubmit(input);
-  // };
-  // const initialValues = {
-  //   expenseItems: expense.items,
-  // };
-
+const EditPayoutMethod = ({ expense, onSubmit }) => {
+  const { LoggedInUser } = useLoggedInUser();
   const formRef = React.useRef<HTMLFormElement>();
-
   const startOptions = React.useRef({
-    // draftKey: props.draftKey,
-    // duplicateExpense: props.duplicateExpense,
+    expenseId: expense.legacyId,
+  });
+  const transformedOnSubmit = React.useCallback(
+    async (values, h, formOptions, startOptions) => {
+      const editValues = {
+        payoutMethod:
+          !values.payoutMethodId || values.payoutMethodId === '__newPayoutMethod'
+            ? { ...values.newPayoutMethod, isSaved: false }
+            : {
+                id: values.payoutMethodId,
+              },
+        payee: {
+          slug: formOptions.payee?.slug,
+        },
+        payeeLocation: values.payeeLocation,
+        currency: formOptions.expenseCurrency,
+        items: values.expenseItems.map(ei => ({
+          description: ei.description,
+          amountV2: {
+            valueInCents: ei.amount.valueInCents,
+            currency: ei.amount.currency as Currency,
+            exchangeRate: ei.amount.exchangeRate
+              ? ({
+                  ...pick(ei.amount.exchangeRate, ['source', 'rate', 'value', 'fromCurrency', 'toCurrency']),
+                  date: ei.amount.exchangeRate.date || ei.incurredAt,
+                } as CurrencyExchangeRateInput)
+              : null,
+          },
+          incurredAt: new Date(ei.incurredAt),
+          url: typeof ei.attachment === 'string' ? ei.attachment : ei.attachment?.url,
+        })),
+      };
+      return onSubmit(editValues);
+    },
+    [LoggedInUser],
+  );
+
+  const expenseForm = useExpenseForm({
+    formRef,
+    initialValues: {
+      expenseTypeOption: ExpenseType.INVOICE,
+      inviteeAccountType: InviteeAccountType.INDIVIDUAL,
+      expenseItems: [
+        {
+          amount: {
+            valueInCents: 0,
+            currency: 'USD',
+          },
+          description: '',
+        },
+      ],
+      additionalAttachments: [],
+      hasInvoiceOption: YesNoOption.YES,
+      inviteeNewIndividual: {},
+      inviteeNewOrganization: {
+        organization: {},
+      },
+      newPayoutMethod: {
+        data: {},
+      },
+    },
+    startOptions: startOptions.current,
+    onSubmit: transformedOnSubmit,
+    pick: { expenseItems: true, hasTax: true, tax: true, payoutMethodId: true, payee: true, payeeLocation: true },
+  });
+
+  return (
+    <FormikProvider value={expenseForm}>
+      <form className="space-y-4" ref={formRef} onSubmit={e => e.preventDefault()}>
+        <PayoutMethodFormContent form={expenseForm} />
+        <EditExpenseActionButtons handleSubmit={expenseForm.handleSubmit} />
+      </form>
+    </FormikProvider>
+  );
+};
+
+const EditExpenseItems = ({ expense, onSubmit }) => {
+  const formRef = React.useRef<HTMLFormElement>();
+  const startOptions = React.useRef({
     expenseId: expense.legacyId,
   });
   const transformedOnSubmit = values => {
@@ -359,10 +296,10 @@ export default function EditExpenseDialog({
       mutation EditExpense($expenseEditInput: ExpenseUpdateInput!) {
         expense: editExpense(expense: $expenseEditInput) {
           id
-          description
-          status
+          ...ExpensePageExpenseFields
         }
       }
+      ${expensePageExpenseFieldsFragment}
     `,
     {
       context: API_V2_CONTEXT,
