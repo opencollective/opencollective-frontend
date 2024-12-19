@@ -514,6 +514,7 @@ const formSchemaQuery = gql`
 type ExpenseFormOptions = {
   schema: z.ZodType<RecursivePartial<ExpenseFormValues>, ZodObjectDef, RecursivePartial<ExpenseFormValues>>;
   supportedExpenseTypes?: ExpenseType[];
+  allowInvite?: boolean;
   payoutProfiles?: ExpenseFormSchemaQuery['loggedInAccount'][];
   payoutMethods?: ExpenseFormSchemaQuery['loggedInAccount']['payoutMethods'];
   payoutMethod?:
@@ -1191,15 +1192,18 @@ async function buildFormOptions(
     );
 
     const expense = query.data?.expense;
-
+    console.log({ expense });
     if (expense) {
+      console.log('queryDataExpense exists, setting options.expense');
       options.expense = query.data.expense;
     }
 
     const recentlySubmittedExpenses = query.data?.recentlySubmittedExpenses;
     const account = values.accountSlug ? query.data?.account : options.expense?.account;
     const host = account && 'host' in account ? account.host : null;
-    const payee = options.expense?.payee || query.data?.payee;
+    const payee = query.data?.payee || options.expense?.payee;
+    console.log({ queryDataPayee: query.data?.payee, optionsExpensePayee: options.expense?.payee, payee });
+
     const payeeHost = payee && 'host' in payee ? payee.host : null;
     const submitter = options.expense?.submitter || query.data?.submitter;
 
@@ -1282,6 +1286,8 @@ async function buildFormOptions(
 
     options.allowExpenseItemAttachment = values.expenseTypeOption === ExpenseType.RECEIPT;
 
+    options.allowInvite = startOptions.allowInvite;
+
     if (values.expenseTypeOption === ExpenseType.INVOICE) {
       if (accountHasVAT(account as any, host as any)) {
         options.taxType = TaxType.VAT;
@@ -1341,6 +1347,7 @@ type ExpenseFormStartOptions = {
   duplicateExpense?: boolean;
   expenseId?: number;
   draftKey?: string;
+  allowInvite?: boolean;
 };
 
 export function useExpenseForm(opts: {

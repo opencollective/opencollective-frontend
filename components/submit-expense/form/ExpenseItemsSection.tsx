@@ -344,7 +344,7 @@ type AdditionalAttachmentsProps = {
   form: ExpenseForm;
 };
 
-function AdditionalAttachments(props: AdditionalAttachmentsProps) {
+export function AdditionalAttachments(props: AdditionalAttachmentsProps) {
   const { toast } = useToast();
   const additionalAttachments = props.form.values.additionalAttachments;
 

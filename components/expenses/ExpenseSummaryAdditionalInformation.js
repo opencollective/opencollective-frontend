@@ -26,9 +26,9 @@ import StyledLink from '../StyledLink';
 import StyledTooltip from '../StyledTooltip';
 import { H4, P, Span } from '../Text';
 
+import EditExpenseDialog from './EditExpenseDialog';
 import PayoutMethodData from './PayoutMethodData';
 import PayoutMethodTypeWithIcon from './PayoutMethodTypeWithIcon';
-import EditExpenseDialog from './EditExpenseDialog';
 
 const CreatedByUserLink = ({ account }) => {
   return (
@@ -109,6 +109,7 @@ const ExpenseSummaryAdditionalInformation = ({
   isLoadingLoggedInUser,
   isDraft,
   collective,
+  useInlineExpenseEdit,
 }) => {
   const intl = useIntl();
   const payeeLocation = expense?.payeeLocation || expense?.draft?.payeeLocation;
@@ -206,12 +207,14 @@ const ExpenseSummaryAdditionalInformation = ({
               <FormattedMessage id="Expense.PayTo" defaultMessage="Pay to" />
             )}
           </PrivateInfoColumnHeader>
-          <EditExpenseDialog
-            field={'payee'}
-            expense={expense}
-            title={'Edit payee'}
-            dialogContentClassName="sm:max-w-xl"
-          />
+          {useInlineExpenseEdit && (
+            <EditExpenseDialog
+              field={'payee'}
+              expense={expense}
+              title={'Edit payee'}
+              dialogContentClassName="sm:max-w-xl"
+            />
+          )}
         </div>
 
         <AccountHoverCard
@@ -272,12 +275,14 @@ const ExpenseSummaryAdditionalInformation = ({
           <PrivateInfoColumnHeader>
             <FormattedMessage id="expense.payoutMethod" defaultMessage="payout method" />
           </PrivateInfoColumnHeader>
-          <EditExpenseDialog
-            field={'payoutMethod'}
-            expense={expense}
-            title={'Edit payout method'}
-            dialogContentClassName="sm:max-w-xl"
-          />
+          {useInlineExpenseEdit && (
+            <EditExpenseDialog
+              field={'payoutMethod'}
+              expense={expense}
+              title={'Edit payout method'}
+              dialogContentClassName="sm:max-w-xl"
+            />
+          )}
         </div>
 
         <Container fontSize="14px" color="black.700">

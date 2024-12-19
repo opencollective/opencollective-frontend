@@ -1,21 +1,26 @@
 import React from 'react';
-import { FetchResult, gql, useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 import { DialogClose } from '@radix-ui/react-dialog';
-import { Form, FormikProps, FormikProvider, useFormikContext } from 'formik';
+import type { FormikProps } from 'formik';
+import { Form, FormikProvider, useFormikContext } from 'formik';
+import { pick } from 'lodash';
 import { Pen } from 'lucide-react';
-import { Currency, TaxType } from '../../lib/graphql/types/v2/graphql';
-import type {
-  CurrencyExchangeRateInput,
-  EditExpenseFromDashboardMutationVariables,
-} from '../../lib/graphql/types/v2/graphql';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
+import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import type { Currency, CurrencyExchangeRateInput, Expense, ExpenseType } from '../../lib/graphql/types/v2/graphql';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
 import { FormField } from '../FormField';
 import { FormikZod } from '../FormikZod';
-import InputField from '../InputField';
+import { AdditionalAttachments, ExpenseItemsForm } from '../submit-expense/form/ExpenseItemsSection';
+import { PayoutMethodFormContent } from '../submit-expense/form/PayoutMethodSection';
+import { WhoIsGettingPaidForm } from '../submit-expense/form/WhoIsGettingPaidSection';
+import { InviteeAccountType, useExpenseForm, YesNoOption } from '../submit-expense/useExpenseForm';
 import { Button } from '../ui/Button';
+import { Collapsible, CollapsibleContent } from '../ui/Collapsible';
 import {
   Dialog,
   DialogContent,
@@ -25,37 +30,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '../ui/Dialog';
-import { Input } from '../ui/Input';
+import { Label } from '../ui/Label';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
-
-import { editExpenseMutation } from './graphql/mutations';
 import { toast } from '../ui/useToast';
-import {
-  CreateExpenseFromDashboardMutation,
-  CreateExpenseFromDashboardMutationVariables,
-  EditExpenseFromDashboardMutation,
-  Expense,
-  ExpenseStatus,
-  ExpenseType,
-} from '../../lib/graphql/types/v2/graphql';
-import { ExpenseItemsForm } from '../submit-expense/form/ExpenseItemsSection';
-import {
-  InviteeAccountType,
-  RecurrenceFrequencyOption,
-  YesNoOption,
-  buildFormSchema,
-  useExpenseForm,
-} from '../submit-expense/useExpenseForm';
-import { pick } from 'lodash';
-import { FormattedMessage, useIntl } from 'react-intl';
-import { SURVEY_KEY, Survey } from '../Survey';
-import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { i18nGraphqlException } from '../../lib/errors';
-import { PayoutMethodFormContent } from '../submit-expense/form/PayoutMethodSection';
-import { WhoIsGettingPaidForm } from '../submit-expense/form/WhoIsGettingPaidSection';
-import { TypeOfExpenseForm } from '../submit-expense/form/TypeOfExpenseSection';
-import MessageBox from '../MessageBox';
-import { checkVATNumberFormat } from '@opencollective/taxes';
+
 import { expensePageExpenseFieldsFragment } from './graphql/fragments';
 
 const RenderFormFields = ({ field, onSubmit, expense }) => {
@@ -67,10 +45,105 @@ const RenderFormFields = ({ field, onSubmit, expense }) => {
     case 'payoutMethod':
       return <EditPayoutMethod onSubmit={onSubmit} expense={expense} />;
     case 'payee':
-      return <WhoIsGettingPaidForm onSubmit={onSubmit} expense={expense} />;
+      return <EditPayee onSubmit={onSubmit} expense={expense} />;
+    case 'attachments':
+      return <EditAttachments onSubmit={onSubmit} expense={expense} />;
   }
 };
+const EditPayee = ({ expense, onSubmit }) => {
+  const { LoggedInUser } = useLoggedInUser();
+  const formRef = React.useRef<HTMLFormElement>();
+  const startOptions = React.useRef({
+    expenseId: expense.legacyId,
+    allowInvite: false,
+  });
+  const transformedOnSubmit = React.useCallback(
+    async (values, h, formOptions, startOptions) => {
+      const editValues = {
+        payee: {
+          slug: formOptions.payee?.slug,
+        },
+        ...(formOptions.payee?.slug !== expense.payee.slug && {
+          payeeLocation: values.payeeLocation,
+          currency: formOptions.expenseCurrency,
+          items: values.expenseItems.map(ei => ({
+            description: ei.description,
+            amountV2: {
+              valueInCents: ei.amount.valueInCents,
+              currency: ei.amount.currency as Currency,
+              exchangeRate: ei.amount.exchangeRate
+                ? ({
+                    ...pick(ei.amount.exchangeRate, ['source', 'rate', 'value', 'fromCurrency', 'toCurrency']),
+                    date: ei.amount.exchangeRate.date || ei.incurredAt,
+                  } as CurrencyExchangeRateInput)
+                : null,
+            },
+            incurredAt: new Date(ei.incurredAt),
+            url: typeof ei.attachment === 'string' ? ei.attachment : ei.attachment?.url,
+          })),
+          payoutMethod:
+            !values.payoutMethodId || values.payoutMethodId === '__newPayoutMethod'
+              ? { ...values.newPayoutMethod, isSaved: false }
+              : {
+                  id: values.payoutMethodId,
+                },
+        }),
+      };
+      return onSubmit(editValues);
+    },
+    [LoggedInUser],
+  );
 
+  const expenseForm = useExpenseForm({
+    formRef,
+    initialValues: {
+      inviteeAccountType: InviteeAccountType.INDIVIDUAL,
+      expenseItems: [
+        {
+          amount: {
+            valueInCents: 0,
+            currency: 'USD',
+          },
+          description: '',
+        },
+      ],
+      additionalAttachments: [],
+      hasInvoiceOption: YesNoOption.YES,
+      inviteeNewIndividual: {},
+      inviteeNewOrganization: {
+        organization: {},
+      },
+      newPayoutMethod: {
+        data: {},
+      },
+    },
+    startOptions: startOptions.current,
+    onSubmit: transformedOnSubmit,
+    pick: { expenseItems: true, hasTax: true, tax: true, payoutMethodId: true, payeeSlug: true },
+  });
+
+  const hasChangedPayee =
+    expenseForm.values.payeeSlug &&
+    expenseForm.values.payeeSlug !== expense.payee.slug &&
+    !expenseForm.values.payeeSlug.startsWith('__');
+  return (
+    <FormikProvider value={expenseForm}>
+      <form className="space-y-6" ref={formRef} onSubmit={e => e.preventDefault()}>
+        <WhoIsGettingPaidForm form={expenseForm} />
+        <Collapsible open={hasChangedPayee}>
+          <CollapsibleContent>
+            <div className="space-y-3">
+              <Label>Pick new payout method</Label>
+              <PayoutMethodFormContent form={expenseForm} />
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+
+        <EditExpenseActionButtons disabled={!hasChangedPayee} handleSubmit={expenseForm.handleSubmit} />
+      </form>
+    </FormikProvider>
+  );
+};
 const EditPayoutMethod = ({ expense, onSubmit }) => {
   const { LoggedInUser } = useLoggedInUser();
   const formRef = React.useRef<HTMLFormElement>();
@@ -115,7 +188,6 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
   const expenseForm = useExpenseForm({
     formRef,
     initialValues: {
-      expenseTypeOption: ExpenseType.INVOICE,
       inviteeAccountType: InviteeAccountType.INDIVIDUAL,
       expenseItems: [
         {
@@ -150,7 +222,57 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
     </FormikProvider>
   );
 };
+const EditAttachments = ({ expense, onSubmit }) => {
+  const formRef = React.useRef<HTMLFormElement>();
+  const startOptions = React.useRef({
+    expenseId: expense.legacyId,
+  });
+  const transformedOnSubmit = values => {
+    const editValues = {
+      attachedFiles: values.additionalAttachments.map(a => ({
+        url: typeof a === 'string' ? a : a?.url,
+      })),
+    };
+    return onSubmit(editValues);
+  };
 
+  const expenseForm = useExpenseForm({
+    formRef,
+    initialValues: {
+      inviteeAccountType: InviteeAccountType.INDIVIDUAL,
+      expenseItems: [
+        {
+          amount: {
+            valueInCents: 0,
+            currency: 'USD',
+          },
+          description: '',
+        },
+      ],
+      additionalAttachments: [],
+      hasInvoiceOption: YesNoOption.YES,
+      inviteeNewIndividual: {},
+      inviteeNewOrganization: {
+        organization: {},
+      },
+      newPayoutMethod: {
+        data: {},
+      },
+    },
+    startOptions: startOptions.current,
+    onSubmit: transformedOnSubmit,
+    pick: { expenseAttachedFiles: true },
+  });
+
+  return (
+    <FormikProvider value={expenseForm}>
+      <form className="space-y-4" ref={formRef} onSubmit={e => e.preventDefault()}>
+        <AdditionalAttachments form={expenseForm} />
+        <EditExpenseActionButtons loading={expenseForm.initialLoading} handleSubmit={expenseForm.handleSubmit} />
+      </form>
+    </FormikProvider>
+  );
+};
 const EditExpenseItems = ({ expense, onSubmit }) => {
   const formRef = React.useRef<HTMLFormElement>();
   const startOptions = React.useRef({
@@ -228,7 +350,15 @@ const EditExpenseTitle = ({ expense, onSubmit }) => {
   );
 };
 
-function EditExpenseActionButtons({ handleSubmit }: { handleSubmit?: () => void }) {
+function EditExpenseActionButtons({
+  handleSubmit,
+  disabled,
+  loading,
+}: {
+  handleSubmit?: () => void;
+  disabled?: boolean;
+  loading?: boolean;
+}) {
   const formik = useFormikContext();
 
   return (
@@ -237,7 +367,7 @@ function EditExpenseActionButtons({ handleSubmit }: { handleSubmit?: () => void 
         <Button variant="outline">Cancel</Button>
       </DialogClose>
 
-      <Button type="submit" loading={formik.isSubmitting} onClick={handleSubmit}>
+      <Button disabled={disabled || loading} type="submit" loading={formik.isSubmitting} onClick={handleSubmit}>
         Save
       </Button>
     </DialogFooter>
@@ -282,16 +412,16 @@ export default function EditExpenseDialog({
   description,
   dialogContentClassName,
   triggerClassName,
-  onEdit,
+  goToLegacyEdit,
 }: {
   expense: Expense;
-  field: 'title' | 'expenseItems' | 'payoutMethod' | 'payee';
+  field: 'title' | 'expenseItems' | 'payoutMethod' | 'payee' | 'type' | 'attachments';
 }) {
   const [open, setOpen] = React.useState(false);
 
   const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
-  const [editExpense, { error, loading, data }] = useMutation(
+  const [editExpense] = useMutation(
     gql`
       mutation EditExpense($expenseEditInput: ExpenseUpdateInput!) {
         expense: editExpense(expense: $expenseEditInput) {
@@ -321,7 +451,7 @@ export default function EditExpenseDialog({
         setOpen(false);
         toast({
           variant: 'success',
-          title: <FormattedMessage defaultMessage="Expense edited" id="yTblGN" />,
+          message: <FormattedMessage defaultMessage="Expense edited" id="yTblGN" />,
           duration: 20000,
         });
       } catch (err) {
@@ -353,7 +483,7 @@ export default function EditExpenseDialog({
           <Button
             variant="outline"
             onClick={() => {
-              onEdit?.();
+              goToLegacyEdit?.();
               setOpen(false);
             }}
           >

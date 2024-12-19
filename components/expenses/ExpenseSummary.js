@@ -2,21 +2,21 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import { includes } from 'lodash';
-import { MessageSquare, Pen } from 'lucide-react';
+import { MessageSquare } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
-import { DataList, DataListItem } from '../ui/DataList';
+
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
-import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
+import { ExpenseStatus, ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 import { shouldDisplayExpenseCategoryPill } from './lib/accounting-categories';
 import { expenseTypeSupportsAttachments } from './lib/attachments';
 import { expenseItemsMustHaveFiles, getExpenseItemAmountV2FromNewAttrs } from './lib/items';
 import { getExpenseExchangeRateWarningOrError } from './lib/utils';
-import ExpenseTypeTag from './ExpenseTypeTag';
 
 import { AccountHoverCard } from '../AccountHoverCard';
 import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
@@ -41,9 +41,8 @@ import ExpenseAttachedFiles from './ExpenseAttachedFiles';
 import ExpenseMoreActionsButton from './ExpenseMoreActionsButton';
 import ExpenseStatusTag from './ExpenseStatusTag';
 import ExpenseSummaryAdditionalInformation from './ExpenseSummaryAdditionalInformation';
+import ExpenseTypeTag from './ExpenseTypeTag';
 import ProcessExpenseButtons, { hasProcessButtons } from './ProcessExpenseButtons';
-import { i18nExpenseType } from '../../lib/i18n/expense';
-import { InfoList, InfoListItem } from '../ui/InfoList';
 
 export const SummaryHeader = styled(H1)`
   > a {
@@ -122,8 +121,11 @@ const ExpenseSummary = ({
   const isLoggedInUserExpenseHostAdmin = LoggedInUser?.isHostAdmin(expense?.account);
   const isLoggedInUserExpenseAdmin = LoggedInUser?.isAdminOfCollective(expense?.account);
   const isViewingExpenseInHostContext = isLoggedInUserExpenseHostAdmin && !isLoggedInUserExpenseAdmin;
-  const canEditFields = true;
-  console.log({ descriptionInSummary: expense?.description });
+  const useInlineExpenseEdit =
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) &&
+    expense?.permissions.canEdit &&
+    expense?.type !== ExpenseType.GRANT;
+
   const processButtons = (
     <Flex
       display="flex"
@@ -134,7 +136,7 @@ const ExpenseSummary = ({
       gridGap={[2, 3]}
     >
       <ExpenseMoreActionsButton
-        onEdit={onEdit}
+        onEdit={useInlineExpenseEdit ? undefined : onEdit}
         expense={expense}
         isViewingExpenseInHostContext={isViewingExpenseInHostContext}
         enableKeyboardShortcuts={enableKeyboardShortcuts}
@@ -187,7 +189,7 @@ const ExpenseSummary = ({
               expense.description
             )}
           </h4>
-          {canEditFields && (
+          {useInlineExpenseEdit && (
             <EditExpenseDialog
               expense={expense}
               field="title"
@@ -215,13 +217,15 @@ const ExpenseSummary = ({
         <div className="mb-3 flex items-baseline gap-2">
           <ExpenseTypeTag type={expense.type} legacyId={expense.legacyId} isLoading={isLoading} />
 
-          <EditExpenseDialog
-            field="type"
-            title="Edit type"
-            description="To edit expense type, use the legacy edit expense flow."
-            expense={expense}
-            onEdit={onEdit}
-          />
+          {useInlineExpenseEdit && (
+            <EditExpenseDialog
+              field="type"
+              title="Edit type"
+              description="To edit expense type, use the legacy edit expense flow."
+              expense={expense}
+              goToLegacyEdit={onEdit}
+            />
+          )}
         </div>
       )}
 
@@ -389,7 +393,7 @@ const ExpenseSummary = ({
           </Span>
         )}
         <StyledHr flex="1 1" borderColor="black.300" />
-        {canEditFields && (
+        {useInlineExpenseEdit && (
           <EditExpenseDialog
             expense={expense}
             dialogContentClassName="sm:max-w-xl"
@@ -522,7 +526,7 @@ const ExpenseSummary = ({
       </Flex>
       {expenseTypeSupportsAttachments(expense?.type) && expense?.attachedFiles?.length > 0 && (
         <React.Fragment>
-          <Flex my={4} alignItems="center">
+          <Flex my={4} alignItems="center" gridGap={2}>
             {!expense && isLoading ? (
               <LoadingPlaceholder height={20} maxWidth={150} />
             ) : (
@@ -530,7 +534,10 @@ const ExpenseSummary = ({
                 <FormattedMessage id="Expense.Attachments" defaultMessage="Attachments" />
               </Span>
             )}
-            <StyledHr flex="1 1" borderColor="black.300" ml={2} />
+            <StyledHr flex="1 1" borderColor="black.300" />
+            {useInlineExpenseEdit && (
+              <EditExpenseDialog title="Edit attachments" field="attachments" expense={expense} onEdit={onEdit} />
+            )}
           </Flex>
           <ExpenseAttachedFiles files={expense.attachedFiles} openFileViewer={openFileViewer} />
         </React.Fragment>
@@ -549,6 +556,7 @@ const ExpenseSummary = ({
         expense={expense}
         collective={collective}
         isDraft={!isEditing && expense?.status === ExpenseStatus.DRAFT}
+        useInlineExpenseEdit={useInlineExpenseEdit}
       />
       {!isEditing &&
         (drawerActionsContainer ? (
@@ -688,6 +696,7 @@ ExpenseSummary.propTypes = {
       canSeeInvoiceInfo: PropTypes.bool,
       canDelete: PropTypes.bool,
       canEditAccountingCategory: PropTypes.bool,
+      canEdit: PropTypes.bool,
     }),
     comments: PropTypes.shape({
       totalCount: PropTypes.number,

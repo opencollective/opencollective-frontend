@@ -39,7 +39,7 @@ export function WhoIsGettingPaidSection(props: WhoIsGettingPaidSectionProps) {
   );
 }
 
-export function WhoIsGettingPaidForm(props: WhoIsGettingPaidSectionProps) {
+export function WhoIsGettingPaidForm(props: { form: ExpenseForm }) {
   const [lastUsedProfile, setLastUsedProfile] = React.useState<ExpenseForm['options']['payoutProfiles'][number]>(null);
   const [isMyOtherProfilesSelected, setIsMyOtherProfilesSelected] = React.useState(false);
 
@@ -99,7 +99,7 @@ export function WhoIsGettingPaidForm(props: WhoIsGettingPaidSectionProps) {
     isVendorSelected,
     lastUsedProfile?.slug,
   ]);
-
+  console.log({ payee: props.form.options.payee, payeeSlug: props.form.values.payeeSlug });
   return (
     <RadioGroup
       id="payeeSlug"
@@ -163,50 +163,52 @@ export function WhoIsGettingPaidForm(props: WhoIsGettingPaidSectionProps) {
         </RadioGroupCard>
       )}
 
-      <RadioGroupCard
-        value="__inviteSomeone"
-        checked={['__inviteSomeone', '__invite', '__inviteExistingUser'].includes(props.form.values.payeeSlug)}
-        showSubcontent={['__inviteSomeone', '__invite', '__inviteExistingUser'].includes(props.form.values.payeeSlug)}
-        disabled={props.form.initialLoading}
-        subContent={
-          <div>
-            <CollectivePickerAsync
-              inputId="payee-invite-picker"
-              onFocus={() => props.form.setFieldValue('payeeSlug', '__inviteSomeone')}
-              invitable
-              collective={props.form.values.payeeSlug === '__inviteExistingUser' ? props.form.options.payee : null}
-              types={[
-                CollectiveType.COLLECTIVE,
-                CollectiveType.EVENT,
-                CollectiveType.FUND,
-                CollectiveType.ORGANIZATION,
-                CollectiveType.PROJECT,
-                CollectiveType.USER,
-              ]}
-              onChange={option => {
-                if (option?.value?.id) {
-                  props.form.setFieldValue('inviteeExistingAccount', option.value.slug);
-                  props.form.setFieldValue('payeeSlug', '__inviteExistingUser');
-                }
-              }}
-              onInvite={() => {
-                props.form.setFieldValue('payeeSlug', '__invite');
-              }}
-            />
+      {props.form.options.allowInvite && (
+        <RadioGroupCard
+          value="__inviteSomeone"
+          checked={['__inviteSomeone', '__invite', '__inviteExistingUser'].includes(props.form.values.payeeSlug)}
+          showSubcontent={['__inviteSomeone', '__invite', '__inviteExistingUser'].includes(props.form.values.payeeSlug)}
+          disabled={props.form.initialLoading}
+          subContent={
+            <div>
+              <CollectivePickerAsync
+                inputId="payee-invite-picker"
+                onFocus={() => props.form.setFieldValue('payeeSlug', '__inviteSomeone')}
+                invitable
+                collective={props.form.values.payeeSlug === '__inviteExistingUser' ? props.form.options.payee : null}
+                types={[
+                  CollectiveType.COLLECTIVE,
+                  CollectiveType.EVENT,
+                  CollectiveType.FUND,
+                  CollectiveType.ORGANIZATION,
+                  CollectiveType.PROJECT,
+                  CollectiveType.USER,
+                ]}
+                onChange={option => {
+                  if (option?.value?.id) {
+                    props.form.setFieldValue('inviteeExistingAccount', option.value.slug);
+                    props.form.setFieldValue('payeeSlug', '__inviteExistingUser');
+                  }
+                }}
+                onInvite={() => {
+                  props.form.setFieldValue('payeeSlug', '__invite');
+                }}
+              />
 
-            {props.form.values.payeeSlug === '__invite' && (
-              <React.Fragment>
-                <Separator className="mt-3" />
-                <div className="mt-3">
-                  <InviteUserOption form={props.form} />
-                </div>
-              </React.Fragment>
-            )}
-          </div>
-        }
-      >
-        <FormattedMessage defaultMessage="Invite someone" id="SMZ/xh" />
-      </RadioGroupCard>
+              {props.form.values.payeeSlug === '__invite' && (
+                <React.Fragment>
+                  <Separator className="mt-3" />
+                  <div className="mt-3">
+                    <InviteUserOption form={props.form} />
+                  </div>
+                </React.Fragment>
+              )}
+            </div>
+          }
+        >
+          <FormattedMessage defaultMessage="Invite someone" id="SMZ/xh" />
+        </RadioGroupCard>
+      )}
 
       {vendorOptions.length > 0 && (
         <RadioGroupCard
