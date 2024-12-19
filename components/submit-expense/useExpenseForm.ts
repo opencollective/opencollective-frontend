@@ -567,11 +567,11 @@ type RecursivePartial<T> = {
       : T[P];
 };
 
-export function buildFormSchema(
+function buildFormSchema(
   values: ExpenseFormValues,
   options: Omit<ExpenseFormOptions, 'schema'>,
   intl: IntlShape,
-  pick?: any,
+  pickSchemaFields?: Record<string, boolean>,
 ): z.ZodType<RecursivePartial<ExpenseFormValues>, z.ZodObjectDef, RecursivePartial<ExpenseFormValues>> {
   const schema = z.object({
     accountSlug: z
@@ -1143,7 +1143,7 @@ export function buildFormSchema(
     }),
   });
 
-  return pick ? schema.pick(pick) : schema;
+  return pickSchemaFields ? schema.pick(pickSchemaFields as { [K in keyof z.infer<typeof schema>]?: true }) : schema;
 }
 
 function getPayeeSlug(values: ExpenseFormValues): string {
@@ -1167,7 +1167,7 @@ async function buildFormOptions(
   values: ExpenseFormValues,
   startOptions: ExpenseFormStartOptions,
   refresh?: boolean,
-  pick?: any,
+  pickSchemaFields?: Record<string, boolean>,
 ): Promise<ExpenseFormOptions> {
   const options: ExpenseFormOptions = { schema: z.object({}) };
 
@@ -1307,11 +1307,8 @@ async function buildFormOptions(
       options.totalInvoicedInExpenseCurrency = totalInvoiced;
     }
 
-    options.schema = buildFormSchema(values, options, intl, pick);
+    options.schema = buildFormSchema(values, options, intl, pickSchemaFields);
 
-    // if (pick) {
-    //   options.schema = options.schema.pick(pick);
-    // }
     return options;
   } catch (err) {
     // eslint-disable-next-line no-console
@@ -1357,7 +1354,7 @@ export function useExpenseForm(opts: {
     options: ExpenseFormOptions,
     startOptions: ExpenseFormStartOptions,
   ) => void | Promise<any>;
-  pick?: any;
+  pickSchemaFields?: Record<string, boolean>;
 }): ExpenseForm {
   const intl = useIntl();
   const apolloClient = useApolloClient();
@@ -1629,7 +1626,7 @@ export function useExpenseForm(opts: {
           expenseForm.values,
           startOptions.current,
           false,
-          opts.pick,
+          opts.pickSchemaFields,
         ),
       );
       if (!startOptions.current.expenseId) {
@@ -1640,7 +1637,7 @@ export function useExpenseForm(opts: {
     }
 
     refreshFormOptions();
-  }, [apolloClient, LoggedInUser, expenseForm.values, intl, startOptions]);
+  }, [apolloClient, LoggedInUser, expenseForm.values, intl, startOptions, opts.pickSchemaFields]);
 
   // revalidate form
   const validateForm = expenseForm.validateForm;
@@ -1680,7 +1677,7 @@ export function useExpenseForm(opts: {
           expenseForm.values,
           startOptions.current,
           true,
-          opts.pick,
+          opts.pickSchemaFields,
         ),
       ),
   });

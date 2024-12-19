@@ -9,8 +9,9 @@ import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import type { Currency, CurrencyExchangeRateInput, Expense, ExpenseType } from '../../lib/graphql/types/v2/graphql';
+import type { Currency, CurrencyExchangeRateInput, Expense } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { cn } from '../../lib/utils';
 
 import { FormField } from '../FormField';
 import { FormikZod } from '../FormikZod';
@@ -117,7 +118,7 @@ const EditPayee = ({ expense, onSubmit }) => {
     },
     startOptions: startOptions.current,
     onSubmit: transformedOnSubmit,
-    pick: { expenseItems: true, hasTax: true, tax: true, payoutMethodId: true, payeeSlug: true },
+    pickSchemaFields: { expenseItems: true, hasTax: true, tax: true, payoutMethodId: true, payeeSlug: true },
   });
 
   const hasChangedPayee =
@@ -208,7 +209,14 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
     },
     startOptions: startOptions.current,
     onSubmit: transformedOnSubmit,
-    pick: { expenseItems: true, hasTax: true, tax: true, payoutMethodId: true, payee: true, payeeLocation: true },
+    pickSchemaFields: {
+      expenseItems: true,
+      hasTax: true,
+      tax: true,
+      payoutMethodId: true,
+      payee: true,
+      payeeLocation: true,
+    },
   });
 
   return (
@@ -259,7 +267,7 @@ const EditAttachments = ({ expense, onSubmit }) => {
     },
     startOptions: startOptions.current,
     onSubmit: transformedOnSubmit,
-    pick: { expenseAttachedFiles: true },
+    pickSchemaFields: { expenseAttachedFiles: true },
   });
 
   return (
@@ -322,7 +330,7 @@ const EditExpenseItems = ({ expense, onSubmit }) => {
     },
     startOptions: startOptions.current,
     onSubmit: transformedOnSubmit,
-    pick: { expenseItems: true, hasTax: true, tax: true },
+    pickSchemaFields: { expenseItems: true, hasTax: true, tax: true },
   });
 
   return (
@@ -442,7 +450,7 @@ export default function EditExpenseDialog({
       <Tooltip>
         <TooltipTrigger asChild>
           <DialogTrigger asChild>
-            <Button size="icon-xs" variant="outline" className={triggerClassName}>
+            <Button size="icon-xs" variant="outline" className={cn('h-7 w-7', triggerClassName)}>
               <Pen size={16} />
             </Button>
           </DialogTrigger>

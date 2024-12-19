@@ -214,7 +214,7 @@ const ExpenseSummary = ({
         </Flex>
       </Flex>
       {expense?.type && (
-        <div className="mb-3 flex items-baseline gap-2">
+        <div className="mb-3 flex items-center gap-1">
           <ExpenseTypeTag type={expense.type} legacyId={expense.legacyId} isLoading={isLoading} />
 
           {useInlineExpenseEdit && (
