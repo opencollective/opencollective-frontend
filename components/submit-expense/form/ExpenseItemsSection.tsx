@@ -216,13 +216,7 @@ function ExpenseItem(props: ExpenseItemProps) {
                     kind="EXPENSE_ITEM"
                     id={attachmentId}
                     name={attachmentId}
-                    value={
-                      typeof item.attachment === 'string'
-                        ? item.attachment
-                        : item.url === 'string'
-                          ? item.url
-                          : item.attachment?.url
-                    }
+                    value={typeof item.attachment === 'string' ? item.attachment : item.attachment?.url}
                     isMulti={false}
                     showActions
                     size={112}
