@@ -434,7 +434,6 @@ export default function EditExpenseDialog({
         toast({
           variant: 'success',
           message: <FormattedMessage defaultMessage="Expense edited" id="yTblGN" />,
-          duration: 20000,
         });
       } catch (err) {
         // track(AnalyticsEvent.EXPENSE_SUBMISSION_SUBMITTED_ERROR);
