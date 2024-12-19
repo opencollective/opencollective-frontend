@@ -211,7 +211,7 @@ const ExpenseSummaryAdditionalInformation = ({
             <EditExpenseDialog
               field={'payee'}
               expense={expense}
-              title={'Edit payee'}
+              title={intl.formatMessage({ defaultMessage: 'Edit payee', id: 'expense.editPayee' })}
               dialogContentClassName="sm:max-w-xl"
             />
           )}
@@ -279,7 +279,7 @@ const ExpenseSummaryAdditionalInformation = ({
             <EditExpenseDialog
               field={'payoutMethod'}
               expense={expense}
-              title={'Edit payout method'}
+              title={intl.formatMessage({ defaultMessage: 'Edit payout method', id: 'expense.editPayoutMethod' })}
               dialogContentClassName="sm:max-w-xl"
             />
           )}
@@ -346,6 +346,7 @@ ExpenseSummaryAdditionalInformation.propTypes = {
   isDraft: PropTypes.bool,
   /** Set this to true if the logged in user is currenltly loading */
   isLoadingLoggedInUser: PropTypes.bool,
+  useInlineExpenseEdit: PropTypes.bool,
   host: PropTypes.shape({
     slug: PropTypes.string.isRequired,
   }),

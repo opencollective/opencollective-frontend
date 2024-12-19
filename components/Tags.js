@@ -8,7 +8,6 @@ import { i18nGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 
 import { expenseTagsQuery } from './dashboard/filters/ExpenseTagsFilter';
-import ExpenseTypeTag from './expenses/ExpenseTypeTag';
 import { useToast } from './ui/useToast';
 import EditTags, { AutocompleteEditTags } from './EditTags';
 import { Flex } from './Grid';
@@ -91,17 +90,7 @@ const Tag = styled(StyledTag).attrs({
   variant: 'rounded',
 })``;
 
-const Tags = ({
-  expense,
-  order,
-  isLoading,
-  limit = 4,
-  getTagProps,
-  children,
-  canEdit,
-  suggestedTags,
-  showUntagged,
-}) => {
+const Tags = ({ expense, order, limit = 4, getTagProps, children, canEdit, suggestedTags, showUntagged }) => {
   const intl = useIntl();
   const tagList = expense?.tags || order?.tags;
 
@@ -118,8 +107,6 @@ const Tags = ({
   };
   return (
     <Flex flexWrap="wrap" alignItems="flex-start">
-      {/* {expense?.type && <ExpenseTypeTag type={expense.type} legacyId={expense.legacyId} isLoading={isLoading} />} */}
-
       {canEdit ? (
         <TagsForAdmins expense={expense} order={order} suggestedTags={suggestedTags} />
       ) : (
@@ -149,7 +136,6 @@ const Tags = ({
 };
 
 Tags.propTypes = {
-  isLoading: PropTypes.bool,
   /** Max number of tags to display */
   limit: PropTypes.number,
   /** A render func that gets passed the tag */

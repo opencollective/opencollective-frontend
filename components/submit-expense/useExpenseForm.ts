@@ -1192,9 +1192,7 @@ async function buildFormOptions(
     );
 
     const expense = query.data?.expense;
-    console.log({ expense });
     if (expense) {
-      console.log('queryDataExpense exists, setting options.expense');
       options.expense = query.data.expense;
     }
 
@@ -1202,7 +1200,6 @@ async function buildFormOptions(
     const account = values.accountSlug ? query.data?.account : options.expense?.account;
     const host = account && 'host' in account ? account.host : null;
     const payee = query.data?.payee || options.expense?.payee;
-    console.log({ queryDataPayee: query.data?.payee, optionsExpensePayee: options.expense?.payee, payee });
 
     const payeeHost = payee && 'host' in payee ? payee.host : null;
     const submitter = options.expense?.submitter || query.data?.submitter;

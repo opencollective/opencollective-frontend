@@ -193,7 +193,7 @@ const ExpenseSummary = ({
             <EditExpenseDialog
               expense={expense}
               field="title"
-              title={intl.formatMessage({ defaultMessage: 'Edit expense title', id: 'jMI3+l' })}
+              title={intl.formatMessage({ defaultMessage: 'Edit expense title', id: 'expense.editTitle' })}
             />
           )}
         </div>
@@ -220,8 +220,11 @@ const ExpenseSummary = ({
           {useInlineExpenseEdit && (
             <EditExpenseDialog
               field="type"
-              title="Edit type"
-              description="To edit expense type, use the legacy edit expense flow."
+              title={intl.formatMessage({ defaultMessage: 'Edit expense type', id: 'expense.editType' })}
+              description={intl.formatMessage({
+                defaultMessage: 'To edit expense type, use the legacy edit expense flow.',
+                id: 'expense.editType.description',
+              })}
               expense={expense}
               goToLegacyEdit={onEdit}
             />
@@ -242,7 +245,7 @@ const ExpenseSummary = ({
             />
           </React.Fragment>
         )}
-        <Tags expense={expense} isLoading={isLoading} canEdit={canEditTags} />
+        <Tags expense={expense} canEdit={canEditTags} />
       </div>
       <Flex alignItems="center" mt="12px">
         {isLoading && !expense ? (
@@ -398,7 +401,7 @@ const ExpenseSummary = ({
             expense={expense}
             dialogContentClassName="sm:max-w-xl"
             field="expenseItems"
-            title={intl.formatMessage({ defaultMessage: 'Edit expense items', id: 'lzRZ91' })}
+            title={intl.formatMessage({ defaultMessage: 'Edit expense items', id: 'expense.editItems' })}
           />
         )}
       </Flex>
@@ -536,7 +539,12 @@ const ExpenseSummary = ({
             )}
             <StyledHr flex="1 1" borderColor="black.300" />
             {useInlineExpenseEdit && (
-              <EditExpenseDialog title="Edit attachments" field="attachments" expense={expense} onEdit={onEdit} />
+              <EditExpenseDialog
+                title={intl.formatMessage({ defaultMessage: 'Edit attachments', id: 'expense.editAttachments' })}
+                field="attachments"
+                expense={expense}
+                onEdit={onEdit}
+              />
             )}
           </Flex>
           <ExpenseAttachedFiles files={expense.attachedFiles} openFileViewer={openFileViewer} />

@@ -1,5 +1,6 @@
 import React, { useId } from 'react';
 import { TaxType } from '@opencollective/taxes';
+import dayjs from 'dayjs';
 import { get, round } from 'lodash';
 import { Lock, Trash2 } from 'lucide-react';
 import type { IntlShape } from 'react-intl';
@@ -33,7 +34,6 @@ import { Step } from '../SubmitExpenseFlowSteps';
 import { type ExpenseForm } from '../useExpenseForm';
 
 import { FormSectionContainer } from './FormSectionContainer';
-import dayjs from 'dayjs';
 
 type ExpenseItemsSectionProps = {
   form: ExpenseForm;

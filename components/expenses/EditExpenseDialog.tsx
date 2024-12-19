@@ -1,7 +1,6 @@
 import React from 'react';
 import { gql, useMutation } from '@apollo/client';
 import { DialogClose } from '@radix-ui/react-dialog';
-import type { FormikProps } from 'formik';
 import { Form, FormikProvider, useFormikContext } from 'formik';
 import { pick } from 'lodash';
 import { Pen } from 'lucide-react';
@@ -58,7 +57,7 @@ const EditPayee = ({ expense, onSubmit }) => {
     allowInvite: false,
   });
   const transformedOnSubmit = React.useCallback(
-    async (values, h, formOptions, startOptions) => {
+    async (values, h, formOptions) => {
       const editValues = {
         payee: {
           slug: formOptions.payee?.slug,
@@ -107,7 +106,6 @@ const EditPayee = ({ expense, onSubmit }) => {
           description: '',
         },
       ],
-      additionalAttachments: [],
       hasInvoiceOption: YesNoOption.YES,
       inviteeNewIndividual: {},
       inviteeNewOrganization: {
@@ -151,7 +149,7 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
     expenseId: expense.legacyId,
   });
   const transformedOnSubmit = React.useCallback(
-    async (values, h, formOptions, startOptions) => {
+    async (values, h, formOptions) => {
       const editValues = {
         payoutMethod:
           !values.payoutMethodId || values.payoutMethodId === '__newPayoutMethod'
@@ -198,8 +196,6 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
           description: '',
         },
       ],
-      additionalAttachments: [],
-      hasInvoiceOption: YesNoOption.YES,
       inviteeNewIndividual: {},
       inviteeNewOrganization: {
         organization: {},
@@ -344,9 +340,12 @@ const EditExpenseTitle = ({ expense, onSubmit }) => {
   });
 
   return (
-    <EditExpenseFormikContainer schema={schema} initialValues={expense} onSubmit={onSubmit}>
-      <FormField name="description" label="Title" />
-    </EditExpenseFormikContainer>
+    <FormikZod schema={schema} initialValues={expense} onSubmit={values => onSubmit(schema.parse(values))}>
+      <Form className="space-y-4">
+        <FormField name="description" label="Title" />
+        <EditExpenseActionButtons />
+      </Form>
+    </FormikZod>
   );
 };
 
@@ -364,47 +363,18 @@ function EditExpenseActionButtons({
   return (
     <DialogFooter>
       <DialogClose asChild>
-        <Button variant="outline">Cancel</Button>
+        <Button variant="outline">
+          <FormattedMessage defaultMessage="Cancel" id="cancel" />
+        </Button>
       </DialogClose>
 
       <Button disabled={disabled || loading} type="submit" loading={formik.isSubmitting} onClick={handleSubmit}>
-        Save
+        <FormattedMessage defaultMessage="Save" id="save" />
       </Button>
     </DialogFooter>
   );
 }
 
-function EditExpenseFormikContainer({ schema, initialValues, onSubmit, children }) {
-  return (
-    <FormikZod schema={schema} initialValues={initialValues} onSubmit={values => onSubmit(schema.parse(values))}>
-      {(formik: FormikProps<z.infer<typeof schema>>) => (
-        <Form className="space-y-4">
-          {children}
-          <EditExpenseActionButtons />
-        </Form>
-      )}
-    </FormikZod>
-  );
-}
-
-// const buildEditExpenseSchema = (field, intl) => {
-//   const schema = buildFormSchema({}, {}, intl);
-//   let pick;
-//   switch (field) {
-//     case 'description':
-//       pick = { description: true };
-//       break;
-//     case 'expenseItems':
-//       pick = { currency: true };
-//       break;
-//     case 'payee':
-//       pick = { name: true };
-//       break;
-//     default:
-//       break;
-//   }
-//   return schema.pick(pick);
-// };
 export default function EditExpenseDialog({
   expense,
   field,
@@ -416,6 +386,11 @@ export default function EditExpenseDialog({
 }: {
   expense: Expense;
   field: 'title' | 'expenseItems' | 'payoutMethod' | 'payee' | 'type' | 'attachments';
+  title: string;
+  description?: string;
+  dialogContentClassName?: string;
+  triggerClassName?: string;
+  goToLegacyEdit?: () => void;
 }) {
   const [open, setOpen] = React.useState(false);
 
@@ -487,7 +462,7 @@ export default function EditExpenseDialog({
               setOpen(false);
             }}
           >
-            Go to edit
+            <FormattedMessage defaultMessage="Go to edit" id="expense.goToEdit" />
           </Button>
         ) : (
           <RenderFormFields expense={expense} field={field} onSubmit={onSubmit} />

@@ -99,7 +99,7 @@ export function WhoIsGettingPaidForm(props: { form: ExpenseForm }) {
     isVendorSelected,
     lastUsedProfile?.slug,
   ]);
-  console.log({ payee: props.form.options.payee, payeeSlug: props.form.values.payeeSlug });
+
   return (
     <RadioGroup
       id="payeeSlug"
