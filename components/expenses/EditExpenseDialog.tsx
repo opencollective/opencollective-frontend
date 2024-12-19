@@ -131,7 +131,9 @@ const EditPayee = ({ expense, onSubmit }) => {
         <Collapsible open={hasChangedPayee}>
           <CollapsibleContent>
             <div className="space-y-3">
-              <Label>Pick new payout method</Label>
+              <Label>
+                <FormattedMessage defaultMessage="Pick new payout method" id="expense.pickPayoutMethod" />
+              </Label>
               <PayoutMethodFormContent form={expenseForm} />
             </div>
           </CollapsibleContent>
@@ -298,7 +300,6 @@ const EditExpenseItems = ({ expense, onSubmit }) => {
   const expenseForm = useExpenseForm({
     formRef,
     initialValues: {
-      expenseTypeOption: ExpenseType.INVOICE,
       inviteeAccountType: InviteeAccountType.INDIVIDUAL,
       expenseItems: [
         {
@@ -364,7 +365,7 @@ function EditExpenseActionButtons({
     <DialogFooter>
       <DialogClose asChild>
         <Button variant="outline">
-          <FormattedMessage defaultMessage="Cancel" id="cancel" />
+          <FormattedMessage defaultMessage="Cancel" id="actions.cancel" />
         </Button>
       </DialogClose>
 
