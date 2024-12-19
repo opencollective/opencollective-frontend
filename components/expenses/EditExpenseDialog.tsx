@@ -10,7 +10,6 @@ import { z } from 'zod';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type { Currency, CurrencyExchangeRateInput, Expense } from '../../lib/graphql/types/v2/graphql';
-import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { cn } from '../../lib/utils';
 
 import { FormField } from '../FormField';
@@ -51,11 +50,11 @@ const RenderFormFields = ({ field, onSubmit, expense }) => {
   }
 };
 const EditPayee = ({ expense, onSubmit }) => {
-  const { LoggedInUser } = useLoggedInUser();
   const formRef = React.useRef<HTMLFormElement>();
   const startOptions = React.useRef({
     expenseId: expense.legacyId,
     isInlineEdit: true,
+    pickSchemaFields: { expenseItems: true, hasTax: true, tax: true, payoutMethodId: true, payeeSlug: true },
   });
   const transformedOnSubmit = React.useCallback(
     async (values, h, formOptions) => {
@@ -91,7 +90,7 @@ const EditPayee = ({ expense, onSubmit }) => {
       };
       return onSubmit(editValues);
     },
-    [LoggedInUser],
+    [expense.payee.slug, onSubmit],
   );
 
   const expenseForm = useExpenseForm({
@@ -118,7 +117,6 @@ const EditPayee = ({ expense, onSubmit }) => {
     },
     startOptions: startOptions.current,
     onSubmit: transformedOnSubmit,
-    pickSchemaFields: { expenseItems: true, hasTax: true, tax: true, payoutMethodId: true, payeeSlug: true },
   });
 
   const hasChangedPayee =
@@ -146,11 +144,18 @@ const EditPayee = ({ expense, onSubmit }) => {
   );
 };
 const EditPayoutMethod = ({ expense, onSubmit }) => {
-  const { LoggedInUser } = useLoggedInUser();
   const formRef = React.useRef<HTMLFormElement>();
   const startOptions = React.useRef({
     expenseId: expense.legacyId,
     isInlineEdit: true,
+    pickSchemaFiels: {
+      expenseItems: true,
+      hasTax: true,
+      tax: true,
+      payoutMethodId: true,
+      payee: true,
+      payeeLocation: true,
+    },
   });
   const transformedOnSubmit = React.useCallback(
     async (values, h, formOptions) => {
@@ -184,7 +189,7 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
       };
       return onSubmit(editValues);
     },
-    [LoggedInUser],
+    [onSubmit],
   );
 
   const expenseForm = useExpenseForm({
@@ -210,14 +215,6 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
     },
     startOptions: startOptions.current,
     onSubmit: transformedOnSubmit,
-    pickSchemaFields: {
-      expenseItems: true,
-      hasTax: true,
-      tax: true,
-      payoutMethodId: true,
-      payee: true,
-      payeeLocation: true,
-    },
   });
 
   return (
@@ -234,6 +231,7 @@ const EditAttachments = ({ expense, onSubmit }) => {
   const startOptions = React.useRef({
     expenseId: expense.legacyId,
     isInlineEdit: true,
+    pickSchemaFields: { expenseAttachedFiles: true },
   });
   const transformedOnSubmit = values => {
     const editValues = {
@@ -269,7 +267,6 @@ const EditAttachments = ({ expense, onSubmit }) => {
     },
     startOptions: startOptions.current,
     onSubmit: transformedOnSubmit,
-    pickSchemaFields: { expenseAttachedFiles: true },
   });
 
   return (
@@ -285,7 +282,8 @@ const EditExpenseItems = ({ expense, onSubmit }) => {
   const formRef = React.useRef<HTMLFormElement>();
   const startOptions = React.useRef({
     expenseId: expense.legacyId,
-    isInlineEdit: true,
+    isInlineEdit: false,
+    pickSchemaFields: { expenseItems: true, hasTax: true, tax: true },
   });
   const transformedOnSubmit = values => {
     const editValues = {
@@ -333,7 +331,6 @@ const EditExpenseItems = ({ expense, onSubmit }) => {
     },
     startOptions: startOptions.current,
     onSubmit: transformedOnSubmit,
-    pickSchemaFields: { expenseItems: true, hasTax: true, tax: true },
   });
 
   return (
@@ -405,8 +402,6 @@ export default function EditExpenseDialog({
   goToLegacyEdit?: () => void;
 }) {
   const [open, setOpen] = React.useState(false);
-
-  const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const [editExpense] = useMutation(
     gql`
@@ -446,7 +441,7 @@ export default function EditExpenseDialog({
         toast({ variant: 'error', message: i18nGraphqlException(intl, err) });
       }
     },
-    [LoggedInUser, editExpense, intl, toast],
+    [editExpense, intl, expense.id],
   );
   return (
     <Dialog open={open} onOpenChange={setOpen}>

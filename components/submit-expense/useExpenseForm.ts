@@ -1167,7 +1167,6 @@ async function buildFormOptions(
   values: ExpenseFormValues,
   startOptions: ExpenseFormStartOptions,
   refresh?: boolean,
-  pickSchemaFields?: Record<string, boolean>,
 ): Promise<ExpenseFormOptions> {
   const options: ExpenseFormOptions = { schema: z.object({}) };
 
@@ -1309,7 +1308,7 @@ async function buildFormOptions(
       options.totalInvoicedInExpenseCurrency = totalInvoiced;
     }
 
-    options.schema = buildFormSchema(values, options, intl, pickSchemaFields);
+    options.schema = buildFormSchema(values, options, intl, startOptions.pickSchemaFields);
 
     return options;
   } catch (err) {
@@ -1344,6 +1343,7 @@ type ExpenseFormStartOptions = {
   expenseId?: number;
   draftKey?: string;
   isInlineEdit?: boolean;
+  pickSchemaFields?: Record<string, boolean>;
 };
 
 export function useExpenseForm(opts: {
@@ -1356,7 +1356,6 @@ export function useExpenseForm(opts: {
     options: ExpenseFormOptions,
     startOptions: ExpenseFormStartOptions,
   ) => void | Promise<any>;
-  pickSchemaFields?: Record<string, boolean>;
 }): ExpenseForm {
   const intl = useIntl();
   const apolloClient = useApolloClient();
@@ -1621,15 +1620,7 @@ export function useExpenseForm(opts: {
   React.useEffect(() => {
     async function refreshFormOptions() {
       setFormOptions(
-        await buildFormOptions(
-          intl,
-          apolloClient,
-          LoggedInUser,
-          expenseForm.values,
-          startOptions.current,
-          false,
-          opts.pickSchemaFields,
-        ),
+        await buildFormOptions(intl, apolloClient, LoggedInUser, expenseForm.values, startOptions.current),
       );
       if (!startOptions.current.expenseId) {
         initialLoading.current = false;
@@ -1639,7 +1630,7 @@ export function useExpenseForm(opts: {
     }
 
     refreshFormOptions();
-  }, [apolloClient, LoggedInUser, expenseForm.values, intl, startOptions, opts.pickSchemaFields]);
+  }, [apolloClient, LoggedInUser, expenseForm.values, intl, startOptions]);
 
   // revalidate form
   const validateForm = expenseForm.validateForm;
@@ -1672,15 +1663,7 @@ export function useExpenseForm(opts: {
     initialLoading: initialLoading.current,
     refresh: async () =>
       setFormOptions(
-        await buildFormOptions(
-          intl,
-          apolloClient,
-          LoggedInUser,
-          expenseForm.values,
-          startOptions.current,
-          true,
-          opts.pickSchemaFields,
-        ),
+        await buildFormOptions(intl, apolloClient, LoggedInUser, expenseForm.values, startOptions.current, true),
       ),
   });
 }
