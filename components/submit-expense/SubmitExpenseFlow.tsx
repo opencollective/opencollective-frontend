@@ -428,7 +428,6 @@ function ExpenseFormikContainer(props: {
     draftKey: props.draftKey,
     duplicateExpense: props.duplicateExpense,
     expenseId: props.expenseId,
-    allowInvite: true,
   });
 
   const [activeStep, setActiveStep] = React.useState(Step.WHO_IS_PAYING);

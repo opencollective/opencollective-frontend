@@ -1272,7 +1272,9 @@ async function buildFormOptions(
         options.payoutMethod = values.newPayoutMethod;
       }
 
-      options.isAdminOfPayee = options.payoutProfiles.some(p => p.slug === values.payeeSlug);
+      // Allow setting this flag to true with the `isInlineEdit` flag in start options to enable full editing experience (i.e. editing payotu method)
+      options.isAdminOfPayee =
+        startOptions.isInlineEdit || options.payoutProfiles.some(p => p.slug === values.payeeSlug);
     }
 
     if (options.payoutMethod) {
@@ -1283,7 +1285,7 @@ async function buildFormOptions(
 
     options.allowExpenseItemAttachment = values.expenseTypeOption === ExpenseType.RECEIPT;
 
-    options.allowInvite = startOptions.allowInvite;
+    options.allowInvite = !startOptions.isInlineEdit;
 
     if (values.expenseTypeOption === ExpenseType.INVOICE) {
       if (accountHasVAT(account as any, host as any)) {
@@ -1341,7 +1343,7 @@ type ExpenseFormStartOptions = {
   duplicateExpense?: boolean;
   expenseId?: number;
   draftKey?: string;
-  allowInvite?: boolean;
+  isInlineEdit?: boolean;
 };
 
 export function useExpenseForm(opts: {

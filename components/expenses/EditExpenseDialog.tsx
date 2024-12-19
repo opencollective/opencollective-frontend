@@ -55,7 +55,7 @@ const EditPayee = ({ expense, onSubmit }) => {
   const formRef = React.useRef<HTMLFormElement>();
   const startOptions = React.useRef({
     expenseId: expense.legacyId,
-    allowInvite: false,
+    isInlineEdit: true,
   });
   const transformedOnSubmit = React.useCallback(
     async (values, h, formOptions) => {
@@ -150,6 +150,7 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
   const formRef = React.useRef<HTMLFormElement>();
   const startOptions = React.useRef({
     expenseId: expense.legacyId,
+    isInlineEdit: true,
   });
   const transformedOnSubmit = React.useCallback(
     async (values, h, formOptions) => {
@@ -232,6 +233,7 @@ const EditAttachments = ({ expense, onSubmit }) => {
   const formRef = React.useRef<HTMLFormElement>();
   const startOptions = React.useRef({
     expenseId: expense.legacyId,
+    isInlineEdit: true,
   });
   const transformedOnSubmit = values => {
     const editValues = {
@@ -283,6 +285,7 @@ const EditExpenseItems = ({ expense, onSubmit }) => {
   const formRef = React.useRef<HTMLFormElement>();
   const startOptions = React.useRef({
     expenseId: expense.legacyId,
+    isInlineEdit: true,
   });
   const transformedOnSubmit = values => {
     const editValues = {
