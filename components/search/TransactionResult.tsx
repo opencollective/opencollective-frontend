@@ -1,5 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
+import { Markup } from 'interweave';
 import { ArrowDown, ArrowUp } from 'lucide-react';
 import { useIntl } from 'react-intl';
 
@@ -7,10 +8,20 @@ import { i18nTransactionKind } from '../../lib/i18n/transaction';
 
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 
+import { getHighlightsFields } from './lib';
+import type { SearchHighlights } from './types';
 import type { TransactionResultData } from './useRecentlyVisited';
 
-export function TransactionResult({ transaction }: { transaction: TransactionResultData }) {
+export function TransactionResult({
+  transaction,
+  highlights,
+}: {
+  transaction: TransactionResultData;
+  highlights?: SearchHighlights;
+}) {
   const intl = useIntl();
+  const highlightFields = getHighlightsFields(highlights, []);
+  const otherHighlight = Object.values(highlightFields.others)[0]?.[0];
   return (
     <div className="flex flex-1 items-center gap-2">
       <div
@@ -42,6 +53,11 @@ export function TransactionResult({ transaction }: { transaction: TransactionRes
           </div>
         </div>
       </div>
+      {otherHighlight && (
+        <div className="truncate">
+          <Markup className="italic text-muted-foreground" allowList={['mark']} content={otherHighlight} />
+        </div>
+      )}
     </div>
   );
 }
