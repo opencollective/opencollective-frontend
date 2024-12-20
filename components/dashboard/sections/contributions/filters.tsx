@@ -56,7 +56,7 @@ type FilterValues = z.infer<typeof schema>;
 
 export type FilterMeta = {
   currency?: Currency;
-  tiers?: Array<{ id: string; name: string }>;
+  tierOptions?: Array<{ label: string; value: string }>;
 };
 
 type GraphQLQueryVariables = DashboardRecurringContributionsQueryVariables;
@@ -103,14 +103,10 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   },
   tier: {
     labelMsg: defineMessage({ defaultMessage: 'Tier', id: 'b07w+D' }),
-    Component: ({ meta, ...props }) => (
-      <ComboSelectFilter
-        options={meta.tiers?.map(({ id, name }) => ({ label: name, value: id })) ?? []}
-        isMulti
-        {...props}
-      />
-    ),
-    valueRenderer: ({ value, meta }) => meta.tiers?.find(tier => tier.id === value)?.name ?? value,
+    Component: ({ meta, ...props }) => {
+      return <ComboSelectFilter options={meta.tierOptions} isMulti {...props} />;
+    },
+    valueRenderer: ({ value, meta }) => meta.tierOptions?.find(tier => tier.value === value)?.label ?? value,
   },
   frequency: {
     labelMsg: defineMessage({ id: 'Frequency', defaultMessage: 'Frequency' }),

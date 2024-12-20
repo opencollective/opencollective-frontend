@@ -75,6 +75,7 @@ const dashboardContributionsMetadataQuery = gql`
     $onlyExpectedFunds: Boolean!
     $expectedFundsFilter: ExpectedFundsFilter
     $includeHostedAccounts: Boolean!
+    $includeChildrenAccounts: Boolean
   ) {
     account(slug: $slug) {
       id
@@ -85,6 +86,22 @@ const dashboardContributionsMetadataQuery = gql`
       settings
       imageUrl
       currency
+      childrenAccounts {
+        totalCount
+        nodes {
+          id
+          slug
+          name
+          ... on AccountWithContributions {
+            tiers {
+              nodes {
+                id
+                name
+              }
+            }
+          }
+        }
+      }
       ... on AccountWithContributions {
         canStartResumeContributionsProcess
         hasResumeContributionsProcessStarted
@@ -116,6 +133,7 @@ const dashboardContributionsMetadataQuery = gql`
         filter: $filter
         expectedFundsFilter: $expectedFundsFilter
         includeHostedAccounts: $includeHostedAccounts
+        includeChildrenAccounts: $includeChildrenAccounts
       ) {
         totalCount
       }
@@ -141,6 +159,7 @@ const dashboardContributionsMetadataQuery = gql`
         status: [ACTIVE, ERROR]
         includeIncognito: true
         includeHostedAccounts: $includeHostedAccounts
+        includeChildrenAccounts: $includeChildrenAccounts
       ) @skip(if: $onlyExpectedFunds) {
         totalCount
       }
@@ -160,6 +179,7 @@ const dashboardContributionsMetadataQuery = gql`
         includeIncognito: true
         minAmount: 1
         includeHostedAccounts: $includeHostedAccounts
+        includeChildrenAccounts: $includeChildrenAccounts
       ) @skip(if: $onlyExpectedFunds) {
         totalCount
       }
@@ -169,6 +189,7 @@ const dashboardContributionsMetadataQuery = gql`
         includeIncognito: true
         expectedFundsFilter: $expectedFundsFilter
         includeHostedAccounts: $includeHostedAccounts
+        includeChildrenAccounts: $includeChildrenAccounts
       ) {
         totalCount
       }
@@ -224,6 +245,7 @@ const dashboardContributionsQuery = gql`
     $maxAmount: Int
     $paymentMethod: PaymentMethodReferenceInput
     $includeHostedAccounts: Boolean!
+    $includeChildrenAccounts: Boolean
     $dateFrom: DateTime
     $dateTo: DateTime
     $expectedDateFrom: DateTime
@@ -252,6 +274,7 @@ const dashboardContributionsQuery = gql`
         limit: $limit
         paymentMethod: $paymentMethod
         includeHostedAccounts: $includeHostedAccounts
+        includeChildrenAccounts: $includeChildrenAccounts
         expectedFundsFilter: $expectedFundsFilter
         orderBy: $orderBy
         chargedDateFrom: $chargedDateFrom
@@ -269,33 +292,35 @@ const dashboardContributionsQuery = gql`
   ${managedOrderFragment}
 `;
 
-const getColumns = ({ intl, isIncoming, includeHostedAccounts, onlyExpectedFunds }) => {
-  const accounts = {
+const getColumns = ({ intl, isIncoming, includeHostedAccounts, includeChildrenAccounts, onlyExpectedFunds }) => {
+  const accounts = swap => ({
     accessorKey: 'toAccount',
     header: intl.formatMessage({ defaultMessage: 'Collective & Contributors', id: 'kklCrk' }),
     meta: { className: 'max-w-[400px] overflow-hidden' },
     cell: ({ cell, row }) => {
       const toAccount = cell.getValue();
       const fromAccount = row.original.fromAccount;
+      const big = swap ? fromAccount : toAccount;
+      const small = swap ? toAccount : fromAccount;
       return (
         <div className="flex items-center gap-5">
           <div className="relative">
             <div>
               <AccountHoverCard
-                account={toAccount}
+                account={big}
                 trigger={
                   <span>
-                    <Avatar size={32} collective={toAccount} displayTitle={false} />
+                    <Avatar size={32} collective={big} displayTitle={false} />
                   </span>
                 }
               />
             </div>
             <div className="absolute -bottom-[6px] -right-[6px] rounded-full">
               <AccountHoverCard
-                account={fromAccount}
+                account={small}
                 trigger={
                   <span>
-                    <Avatar size={16} collective={fromAccount} displayTitle={false} />
+                    <Avatar size={16} collective={small} displayTitle={false} />
                   </span>
                 }
               />
@@ -303,16 +328,16 @@ const getColumns = ({ intl, isIncoming, includeHostedAccounts, onlyExpectedFunds
           </div>
           <div className="overflow-hidden">
             <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sm leading-5">
-              {toAccount.name || toAccount.slug}
+              {big.name || big.slug}
             </div>
             <div className="overflow-hidden text-ellipsis whitespace-nowrap text-xs font-normal leading-4 text-slate-700">
-              {fromAccount.name || fromAccount.slug}
+              {small.name || small.slug}
             </div>
           </div>
         </div>
       );
     },
-  };
+  });
 
   const toAccount = {
     accessorKey: 'toAccount',
@@ -487,7 +512,11 @@ const getColumns = ({ intl, isIncoming, includeHostedAccounts, onlyExpectedFunds
 
   return compact([
     onlyExpectedFunds ? contributionId : null,
-    includeHostedAccounts ? accounts : isIncoming ? fromAccount : toAccount,
+    includeHostedAccounts || includeChildrenAccounts
+      ? accounts(isIncoming && includeChildrenAccounts)
+      : isIncoming
+        ? fromAccount
+        : toAccount,
     chargeDate,
     amount,
     frequency,
@@ -509,9 +538,16 @@ type ContributionsProps = DashboardSectionProps & {
   direction?: 'INCOMING' | 'OUTGOING';
   onlyExpectedFunds?: boolean;
   includeHostedAccounts?: boolean;
+  includeChildrenAccounts?: boolean;
 };
 
-const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHostedAccounts }: ContributionsProps) => {
+const Contributions = ({
+  accountSlug,
+  direction,
+  onlyExpectedFunds,
+  includeHostedAccounts,
+  includeChildrenAccounts,
+}: ContributionsProps) => {
   const { toast } = useToast();
 
   const [expireOrder] = useMutation(
@@ -559,6 +595,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
       onlyExpectedFunds: !!onlyExpectedFunds,
       expectedFundsFilter: onlyExpectedFunds ? ExpectedFundsFilter.ALL_EXPECTED_FUNDS : null,
       includeHostedAccounts: !!includeHostedAccounts,
+      includeChildrenAccounts: !!includeChildrenAccounts,
     },
     context: API_V2_CONTEXT,
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
@@ -688,9 +725,26 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
       : null,
   ].filter(Boolean);
 
+  const tierOptions = React.useMemo(() => {
+    if (!includeChildrenAccounts) {
+      return [];
+    }
+    if (metadata?.account.childrenAccounts.nodes?.length === 0) {
+      return metadata.account?.tiers?.nodes.map(tier => ({ label: tier.name, value: tier.id }));
+    } else {
+      const makeOption = account =>
+        account?.tiers?.nodes.map(tier => ({ label: `${tier.name}  (${account.name})`, value: tier.id }));
+      const options = makeOption(metadata?.account);
+      metadata?.account.childrenAccounts.nodes.forEach(children => {
+        options.push(...makeOption(children));
+      });
+      return options;
+    }
+  }, [metadata?.account]);
+
   const filterMeta: FilterMeta = {
     currency: metadata?.account?.currency,
-    tiers: isIncoming ? metadata?.account?.tiers?.nodes : [],
+    tierOptions: isIncoming ? tierOptions : [],
   };
 
   const queryFilter = useQueryFilter({
@@ -716,6 +770,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
       filter: direction || 'OUTGOING',
       includeIncognito: true,
       includeHostedAccounts: !!includeHostedAccounts,
+      includeChildrenAccounts: !!includeChildrenAccounts,
       ...queryFilter.variables,
       ...(onlyExpectedFunds
         ? {
@@ -759,6 +814,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
     intl,
     isIncoming,
     includeHostedAccounts,
+    includeChildrenAccounts: includeChildrenAccounts && metadata?.account?.childrenAccounts?.nodes?.length > 0,
     onlyExpectedFunds,
   });
   const currentViewCount = views.find(v => v.id === queryFilter.activeViewId)?.count;
