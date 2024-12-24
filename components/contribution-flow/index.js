@@ -150,6 +150,8 @@ class ContributionFlow extends React.Component {
     LoggedInUser: PropTypes.object,
     createCollective: PropTypes.func.isRequired, // from mutation
     router: PropTypes.object,
+    onStepChange: PropTypes.func,
+    onSuccess: PropTypes.func,
   };
 
   constructor(props) {
@@ -444,6 +446,7 @@ class ContributionFlow extends React.Component {
     this.setState({ isSubmitted: true, isSubmitting: false });
     this.props.refetchLoggedInUser(); // to update memberships
     const queryParams = this.getQueryParams();
+    this.props.onSuccess?.(order);
     if (isValidExternalRedirect(queryParams.redirect)) {
       followOrderRedirectUrl(this.props.router, this.props.collective, order, queryParams.redirect, {
         shouldRedirectParent: queryParams.shouldRedirectParent,
@@ -658,6 +661,7 @@ class ContributionFlow extends React.Component {
 
     if (!this.state.error) {
       await this.pushStepRoute(step.name);
+      this.props.onStepChange?.(step.name);
     }
   };
 
