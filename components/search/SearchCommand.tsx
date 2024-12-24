@@ -189,7 +189,7 @@ export const SearchCommand = ({ open, setOpen }) => {
         {isLoading && <StyledSpinner size={16} className="absolute right-4 text-muted-foreground" />}
       </div>
 
-      <CommandList className="max-h-[600px] border-b border-t-0">
+      <CommandList className="max-h-[600px] border-b border-t-0 [&_mark]:rounded-xl [&_mark]:bg-amber-100 [&_mark]:px-1 [&_mark]:py-2">
         <CommandItem value="-" className="hidden" />
 
         {recentlyVisited.length > 0 && debouncedInput === '' && (
@@ -221,7 +221,7 @@ export const SearchCommand = ({ open, setOpen }) => {
           nodes={data?.search.results.accounts.collection.nodes}
           renderNode={account => (
             <CommandItem key={account.id} onSelect={() => handleResultSelect({ type: 'account', data: account })}>
-              <AccountResult account={account} />
+              <AccountResult account={account} highlights={data.search.results.accounts.highlights[account.id]} />
             </CommandItem>
           )}
         />
@@ -233,7 +233,7 @@ export const SearchCommand = ({ open, setOpen }) => {
           input={debouncedInput}
           renderNode={expense => (
             <CommandItem key={expense.id} onSelect={() => handleResultSelect({ type: 'expense', data: expense })}>
-              <ExpenseResult expense={expense} />
+              <ExpenseResult expense={expense} highlights={data.search.results.expenses.highlights[expense.id]} />
             </CommandItem>
           )}
         />
@@ -248,7 +248,10 @@ export const SearchCommand = ({ open, setOpen }) => {
                 key={transaction.id}
                 onSelect={() => handleResultSelect({ type: 'transaction', data: transaction })}
               >
-                <TransactionResult transaction={transaction} />
+                <TransactionResult
+                  transaction={transaction}
+                  highlights={data.search.results.transactions.highlights[transaction.id]}
+                />
               </CommandItem>
             )}
           />

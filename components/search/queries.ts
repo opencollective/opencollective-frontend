@@ -11,6 +11,7 @@ export const searchCommandQuery = gql`
     search(searchTerm: $searchTerm, defaultLimit: $limit, host: $host, account: $account) {
       results {
         accounts {
+          highlights
           collection {
             totalCount
             limit
@@ -24,6 +25,7 @@ export const searchCommandQuery = gql`
           }
         }
         expenses {
+          highlights
           collection {
             totalCount
             limit
@@ -55,6 +57,7 @@ export const searchCommandQuery = gql`
           }
         }
         transactions @include(if: $includeTransactions) {
+          highlights
           collection {
             totalCount
             limit
