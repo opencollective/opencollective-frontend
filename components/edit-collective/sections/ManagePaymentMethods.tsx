@@ -155,7 +155,7 @@ export default function ManagePaymentMethods(props: ManagePaymentMethodsProps) {
               id="Order.Confirm.Success"
               defaultMessage="Your payment method has now been confirmed and the payment successfully went through."
             />
-            <StyledButton buttonSize="tiny" onClick={dismissOrderConfirmationMessage}>
+            <StyledButton ml={2} buttonSize="tiny" onClick={dismissOrderConfirmationMessage}>
               <FormattedMessage defaultMessage="Dismiss" id="TDaF6J" />
             </StyledButton>
           </div>
