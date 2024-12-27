@@ -378,7 +378,12 @@ export const MoreActionsMenu = ({
             <AddFundsModal collective={collective} onClose={() => setOpenModal(null)} onSuccess={onEdit} />
           )}
           {openModal === 'ADD_EXPENSE' && (
-            <HostCreateExpenseModal open setOpen={() => setOpenModal(null)} host={collective.host} />
+            <HostCreateExpenseModal
+              open
+              setOpen={() => setOpenModal(null)}
+              host={collective.host}
+              account={collective}
+            />
           )}
           {openModal === 'FREEZE' && (
             <FreezeAccountModal collective={collective} onClose={() => setOpenModal(null)} onSuccess={onEdit} />
