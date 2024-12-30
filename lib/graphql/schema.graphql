@@ -132,6 +132,7 @@ interface CollectiveInterface {
   stats: CollectiveStatsType
   transactions(type: String, limit: Int, offset: Int, includeExpenseTransactions: Boolean): [Transaction]
   expenses(type: String, limit: Int, offset: Int, status: String, includeHostedCollectives: Boolean): [ExpenseType]
+    @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   The list of expense types supported by this account
@@ -371,7 +372,7 @@ type OrderType {
   """
   Whether this subscription is past due or not
   """
-  isPastDue: Boolean
+  isPastDue: Boolean @deprecated(reason: "2024-12-13: Not used, so we stop returning it.")
 
   """
   If there is a subscription, is it active?
@@ -895,9 +896,9 @@ type ExpenseType {
   tags: [String]
   status: String
   type: String
-  PayoutMethod: PayoutMethod
+  PayoutMethod: PayoutMethod @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
   privateMessage: String
-  items: [ExpenseItem]
+  items: [ExpenseItem] @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
   attachedFiles: [ExpenseAttachedFile!]
   user: UserDetails
   fromCollective: CollectiveInterface
@@ -1982,7 +1983,7 @@ type CollectiveStatsType {
   """
   Breakdown of expenses submitted to this collective by type (ALL/PENDING/APPROVED/PAID/REJECTED)
   """
-  expenses: ExpensesStatsType
+  expenses: ExpensesStatsType @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   Number of transactions
@@ -2295,6 +2296,7 @@ type Collective implements CollectiveInterface {
     includeExpenseTransactions: Boolean
   ): [Transaction]
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
+    @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   The list of expense types supported by this account
@@ -2564,6 +2566,7 @@ type Event implements CollectiveInterface {
     includeExpenseTransactions: Boolean
   ): [Transaction]
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
+    @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   The list of expense types supported by this account
@@ -2833,6 +2836,7 @@ type Fund implements CollectiveInterface {
     includeExpenseTransactions: Boolean
   ): [Transaction]
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
+    @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   The list of expense types supported by this account
@@ -3102,6 +3106,7 @@ type Organization implements CollectiveInterface {
     includeExpenseTransactions: Boolean
   ): [Transaction]
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
+    @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   The list of expense types supported by this account
@@ -3371,6 +3376,7 @@ type Project implements CollectiveInterface {
     includeExpenseTransactions: Boolean
   ): [Transaction]
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
+    @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   The list of expense types supported by this account
@@ -3551,7 +3557,7 @@ type Expense implements Transaction {
   paymentMethod: PaymentMethodType
   invoiceTemplate: String
   description: String
-  expense: ExpenseType
+  expense: ExpenseType @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 }
 
 """
@@ -3935,6 +3941,7 @@ type User implements CollectiveInterface {
     includeExpenseTransactions: Boolean
   ): [Transaction]
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
+    @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   The list of expense types supported by this account
@@ -4206,6 +4213,7 @@ type Vendor implements CollectiveInterface {
     includeExpenseTransactions: Boolean
   ): [Transaction]
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
+    @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   The list of expense types supported by this account

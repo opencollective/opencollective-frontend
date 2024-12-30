@@ -282,3 +282,21 @@ export const getTaxFormPDFServiceUrl = (type: TaxFormType, values, { isFinal = f
   url.searchParams.set('isFinal', isFinal.toString());
   return url.toString();
 };
+
+export const getExpensePageUrl = expense => {
+  return `${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`;
+};
+
+export const getCommentUrl = comment => {
+  if (comment.update) {
+    return `${getCollectivePageRoute(comment.update.account)}/updates/${comment.update.slug}#comment-${comment.id}`;
+  } else if (comment.conversation) {
+    return `${getCollectivePageRoute(comment.conversation.account)}/conversations/${comment.conversation.slug}-${comment.conversation.id}#comment-${comment.id}`;
+  } else if (comment.expense) {
+    return `${getExpensePageUrl(comment.expense)}#comment-${new Date(comment.createdAt).getTime()}`;
+  } else if (comment.order) {
+    return `${getCollectivePageRoute(comment.order.fromAccount)}/transactions/${comment.order.legacyId}#comment-${comment.id}`;
+  } else if (comment.hostApplication) {
+    return `${getCollectivePageRoute(comment.hostApplication.account)}/applications/${comment.hostApplication.id}#comment-${comment.id}`;
+  }
+};

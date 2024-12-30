@@ -1989,6 +1989,11 @@ type Order {
   WARNING: Total amount donated between collectives, though there will be edge cases especially when looking on the Order level, as the order id is not used in calculating this.
   """
   totalDonations: Amount!
+
+  """
+  Total amount contributed with this order.
+  """
+  totalContributed: Amount!
   paymentMethod: PaymentMethod
   paymentProcessorUrl: String
 
@@ -4777,6 +4782,11 @@ type Comment {
   Returns the list of reactions added to this comment by logged in user
   """
   userReactions: [String]
+  conversation: Conversation
+  expense: Expense
+  hostApplication: HostApplication
+  order: Order
+  update: Update
 }
 
 """
@@ -4794,6 +4804,56 @@ enum CommentType {
   PRIVATE_NOTE
 }
 
+type HostApplication {
+  id: String!
+
+  """
+  The account who applied to this host
+  """
+  account: Account!
+
+  """
+  The host the collective applied to
+  """
+  host: Host!
+
+  """
+  The date on which the item was created
+  """
+  createdAt: DateTime!
+
+  """
+  The date on which the item was updated
+  """
+  updatedAt: DateTime!
+  status: HostApplicationStatus
+  message: String
+  customData: JSON
+
+  """
+  Returns the list of comments for this host application, or `null` if user is not allowed to see them
+  """
+  comments(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: ASC }
+  ): CommentCollection
+}
+
+enum HostApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
 """
 A collection of "Comments"
 """
@@ -4802,6 +4862,105 @@ type CommentCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [Comment]
+}
+
+"""
+This represents an Update
+"""
+type Update {
+  id: String!
+  legacyId: Int
+  slug: String!
+
+  """
+  Indicates whether or not the user is allowed to see the content of this update
+  """
+  userCanSeeUpdate: Boolean!
+
+  """
+  Indicates whether or not the user is allowed to publish this update
+  """
+  userCanPublishUpdate: Boolean!
+  isPrivate: Boolean!
+  isChangelog: Boolean!
+  title: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  publishedAt: DateTime
+  notificationAudience: UpdateAudience
+
+  """
+  Some stats about the target audience. Will be null if the update is already published or if you don't have enough permissions so see this information. Not backed by a loader, avoid using this field in lists.
+  """
+  audienceStats(
+    """
+    To override the default notificationAudience
+    """
+    audience: UpdateAudience
+  ): UpdateAudienceStats
+  makePublicOn: DateTime
+  summary: String
+  html: String
+  tags: [String]
+  fromAccount: Account
+  account: Account
+
+  """
+  Returns a map of reactions counts for this update
+  """
+  reactions: JSON
+
+  """
+  Returns the list of reactions added to this update by logged in user
+  """
+  userReactions: [String]
+
+  """
+  List the comments for this update. Not backed by a loader, don't use this in lists.
+  """
+  comments(limit: Int! = 150, offset: Int! = 0): CommentCollection
+}
+
+"""
+Defines targets for an update
+"""
+enum UpdateAudience {
+  """
+  Will be sent to collective admins and financial contributors
+  """
+  ALL
+
+  """
+  Will be sent to collective admins
+  """
+  COLLECTIVE_ADMINS
+
+  """
+  Will be sent to financial contributors
+  """
+  FINANCIAL_CONTRIBUTORS
+
+  """
+  Will be sent to no one
+  """
+  NO_ONE
+}
+
+"""
+Stats about the potential audience of an update
+"""
+type UpdateAudienceStats {
+  id: String!
+  coreContributors: Int!
+  individuals: Int!
+  organizations: Int!
+  collectives: Int!
+  hosted: Int!
+
+  """
+  The total number of emails to send
+  """
+  total: Int!
 }
 
 type ConversationStats {
@@ -5743,105 +5902,6 @@ type UpdateCollection implements Collection {
 }
 
 """
-This represents an Update
-"""
-type Update {
-  id: String!
-  legacyId: Int
-  slug: String!
-
-  """
-  Indicates whether or not the user is allowed to see the content of this update
-  """
-  userCanSeeUpdate: Boolean!
-
-  """
-  Indicates whether or not the user is allowed to publish this update
-  """
-  userCanPublishUpdate: Boolean!
-  isPrivate: Boolean!
-  isChangelog: Boolean!
-  title: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  publishedAt: DateTime
-  notificationAudience: UpdateAudience
-
-  """
-  Some stats about the target audience. Will be null if the update is already published or if you don't have enough permissions so see this information. Not backed by a loader, avoid using this field in lists.
-  """
-  audienceStats(
-    """
-    To override the default notificationAudience
-    """
-    audience: UpdateAudience
-  ): UpdateAudienceStats
-  makePublicOn: DateTime
-  summary: String
-  html: String
-  tags: [String]
-  fromAccount: Account
-  account: Account
-
-  """
-  Returns a map of reactions counts for this update
-  """
-  reactions: JSON
-
-  """
-  Returns the list of reactions added to this update by logged in user
-  """
-  userReactions: [String]
-
-  """
-  List the comments for this update. Not backed by a loader, don't use this in lists.
-  """
-  comments(limit: Int! = 150, offset: Int! = 0): CommentCollection
-}
-
-"""
-Defines targets for an update
-"""
-enum UpdateAudience {
-  """
-  Will be sent to collective admins and financial contributors
-  """
-  ALL
-
-  """
-  Will be sent to collective admins
-  """
-  COLLECTIVE_ADMINS
-
-  """
-  Will be sent to financial contributors
-  """
-  FINANCIAL_CONTRIBUTORS
-
-  """
-  Will be sent to no one
-  """
-  NO_ONE
-}
-
-"""
-Stats about the potential audience of an update
-"""
-type UpdateAudienceStats {
-  id: String!
-  coreContributors: Int!
-  individuals: Int!
-  organizations: Int!
-  collectives: Int!
-  hosted: Int!
-
-  """
-  The total number of emails to send
-  """
-  total: Int!
-}
-
-"""
 Input to order updates chronologically
 """
 input UpdateChronologicalOrderInput {
@@ -6092,56 +6152,6 @@ type HostApplicationCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [HostApplication]
-}
-
-type HostApplication {
-  id: String!
-
-  """
-  The account who applied to this host
-  """
-  account: Account!
-
-  """
-  The host the collective applied to
-  """
-  host: Host!
-
-  """
-  The date on which the item was created
-  """
-  createdAt: DateTime!
-
-  """
-  The date on which the item was updated
-  """
-  updatedAt: DateTime!
-  status: HostApplicationStatus
-  message: String
-  customData: JSON
-
-  """
-  Returns the list of comments for this host application, or `null` if user is not allowed to see them
-  """
-  comments(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: ASC }
-  ): CommentCollection
-}
-
-enum HostApplicationStatus {
-  PENDING
-  APPROVED
-  REJECTED
-  EXPIRED
 }
 
 """
@@ -19075,50 +19085,82 @@ type SearchResults {
 
 type SearchResultsAccounts {
   collection: AccountCollection!
-  highlights: JSONObject
   maxScore: Float!
+
+  """
+  Details about the matches typed as: { [id]: { score: number, fields: { [field]: [highlight] } } }
+  """
+  highlights: JSONObject
 }
 
 type SearchResultsComments {
   collection: CommentCollection!
-  highlights: JSONObject
   maxScore: Float!
+
+  """
+  Details about the matches typed as: { [id]: { score: number, fields: { [field]: [highlight] } } }
+  """
+  highlights: JSONObject
 }
 
 type SearchResultsExpenses {
   collection: ExpenseCollection!
-  highlights: JSONObject
   maxScore: Float!
+
+  """
+  Details about the matches typed as: { [id]: { score: number, fields: { [field]: [highlight] } } }
+  """
+  highlights: JSONObject
 }
 
 type SearchResultsHostApplications {
   collection: HostApplicationCollection!
-  highlights: JSONObject
   maxScore: Float!
+
+  """
+  Details about the matches typed as: { [id]: { score: number, fields: { [field]: [highlight] } } }
+  """
+  highlights: JSONObject
 }
 
 type SearchResultsOrders {
   collection: OrderCollection!
-  highlights: JSONObject
   maxScore: Float!
+
+  """
+  Details about the matches typed as: { [id]: { score: number, fields: { [field]: [highlight] } } }
+  """
+  highlights: JSONObject
 }
 
 type SearchResultsTiers {
   collection: TierCollection!
-  highlights: JSONObject
   maxScore: Float!
+
+  """
+  Details about the matches typed as: { [id]: { score: number, fields: { [field]: [highlight] } } }
+  """
+  highlights: JSONObject
 }
 
 type SearchResultsTransactions {
   collection: TransactionCollection!
-  highlights: JSONObject
   maxScore: Float!
+
+  """
+  Details about the matches typed as: { [id]: { score: number, fields: { [field]: [highlight] } } }
+  """
+  highlights: JSONObject
 }
 
 type SearchResultsUpdates {
   collection: UpdateCollection!
-  highlights: JSONObject
   maxScore: Float!
+
+  """
+  Details about the matches typed as: { [id]: { score: number, fields: { [field]: [highlight] } } }
+  """
+  highlights: JSONObject
 }
 
 input TransactionReferenceInput {

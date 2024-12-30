@@ -2454,14 +2454,19 @@ export type CollectiveFeatures = {
 export type Comment = {
   __typename?: 'Comment';
   account?: Maybe<Account>;
+  conversation?: Maybe<Conversation>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
+  expense?: Maybe<Expense>;
   fromAccount?: Maybe<Account>;
+  hostApplication?: Maybe<HostApplication>;
   html?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['String']['output']>;
+  order?: Maybe<Order>;
   /** Returns a map of reactions counts for this comment */
   reactions?: Maybe<Scalars['JSON']['output']>;
   /** The type of this comment */
   type: CommentType;
+  update?: Maybe<Update>;
   /** Returns the list of reactions added to this comment by logged in user */
   userReactions?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
 };
@@ -8663,6 +8668,8 @@ export type Order = {
   toAccount?: Maybe<Account>;
   /** Total order amount, including all taxes and platform tip */
   totalAmount: Amount;
+  /** Total amount contributed with this order. */
+  totalContributed: Amount;
   /** WARNING: Total amount donated between collectives, though there will be edge cases especially when looking on the Order level, as the order id is not used in calculating this. */
   totalDonations: Amount;
   /** Transactions for this order ordered by createdAt ASC */
@@ -10962,6 +10969,7 @@ export type SearchResultsAccountsArgs = {
 export type SearchResultsAccounts = {
   __typename?: 'SearchResultsAccounts';
   collection: AccountCollection;
+  /** Details about the matches typed as: { [id]: { score: number, fields: { [field]: [highlight] } } } */
   highlights?: Maybe<Scalars['JSONObject']['output']>;
   maxScore: Scalars['Float']['output'];
 };
@@ -10969,6 +10977,7 @@ export type SearchResultsAccounts = {
 export type SearchResultsComments = {
   __typename?: 'SearchResultsComments';
   collection: CommentCollection;
+  /** Details about the matches typed as: { [id]: { score: number, fields: { [field]: [highlight] } } } */
   highlights?: Maybe<Scalars['JSONObject']['output']>;
   maxScore: Scalars['Float']['output'];
 };
@@ -10976,6 +10985,7 @@ export type SearchResultsComments = {
 export type SearchResultsExpenses = {
   __typename?: 'SearchResultsExpenses';
   collection: ExpenseCollection;
+  /** Details about the matches typed as: { [id]: { score: number, fields: { [field]: [highlight] } } } */
   highlights?: Maybe<Scalars['JSONObject']['output']>;
   maxScore: Scalars['Float']['output'];
 };
@@ -10983,6 +10993,7 @@ export type SearchResultsExpenses = {
 export type SearchResultsHostApplications = {
   __typename?: 'SearchResultsHostApplications';
   collection: HostApplicationCollection;
+  /** Details about the matches typed as: { [id]: { score: number, fields: { [field]: [highlight] } } } */
   highlights?: Maybe<Scalars['JSONObject']['output']>;
   maxScore: Scalars['Float']['output'];
 };
@@ -10990,6 +11001,7 @@ export type SearchResultsHostApplications = {
 export type SearchResultsOrders = {
   __typename?: 'SearchResultsOrders';
   collection: OrderCollection;
+  /** Details about the matches typed as: { [id]: { score: number, fields: { [field]: [highlight] } } } */
   highlights?: Maybe<Scalars['JSONObject']['output']>;
   maxScore: Scalars['Float']['output'];
 };
@@ -10997,6 +11009,7 @@ export type SearchResultsOrders = {
 export type SearchResultsTiers = {
   __typename?: 'SearchResultsTiers';
   collection: TierCollection;
+  /** Details about the matches typed as: { [id]: { score: number, fields: { [field]: [highlight] } } } */
   highlights?: Maybe<Scalars['JSONObject']['output']>;
   maxScore: Scalars['Float']['output'];
 };
@@ -11004,6 +11017,7 @@ export type SearchResultsTiers = {
 export type SearchResultsTransactions = {
   __typename?: 'SearchResultsTransactions';
   collection: TransactionCollection;
+  /** Details about the matches typed as: { [id]: { score: number, fields: { [field]: [highlight] } } } */
   highlights?: Maybe<Scalars['JSONObject']['output']>;
   maxScore: Scalars['Float']['output'];
 };
@@ -11011,6 +11025,7 @@ export type SearchResultsTransactions = {
 export type SearchResultsUpdates = {
   __typename?: 'SearchResultsUpdates';
   collection: UpdateCollection;
+  /** Details about the matches typed as: { [id]: { score: number, fields: { [field]: [highlight] } } } */
   highlights?: Maybe<Scalars['JSONObject']['output']>;
   maxScore: Scalars['Float']['output'];
 };
