@@ -13,6 +13,7 @@ const nextConfig = {
   eslint: { ignoreDuringBuilds: true },
   useFileSystemPublicRoutes: true,
   productionBrowserSourceMaps: true,
+  reactStrictMode: true,
   typescript: {
     ignoreBuildErrors: true,
   },
