@@ -11,24 +11,30 @@ import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useDebouncedValue from '../../lib/hooks/useDebouncedValue';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../lib/hooks/useQueryFilter';
+import { getCollectivePageRoute, getCommentUrl, getExpensePageUrl } from '../../lib/url-helpers';
 
 import { DashboardContext } from '../dashboard/DashboardContext';
 import { getMenuItems } from '../dashboard/Menu';
+import Link from '../Link';
 import StyledSpinner from '../StyledSpinner';
 import { CommandDialog, CommandGroup, CommandItem, CommandList } from '../ui/Command';
 import { useWorkspace } from '../WorkspaceProvider';
 
-import { AccountResult } from './AccountResult';
+import { AccountResult } from './result/AccountResult';
+import { CommentResult } from './result/CommentResult';
+import { ExpenseResult } from './result/ExpenseResult';
+import { OrderResult } from './result/OrderResult';
+import { TransactionResult } from './result/TransactionResult';
+import { UpdateResult } from './result/UpdateResult';
 import { ContextPill } from './ContextPill';
-import { ExpenseResult } from './ExpenseResult';
 import { PageResult } from './PageResult';
 import { searchCommandQuery } from './queries';
 import { SearchCommandGroup } from './SearchCommandGroup';
 import { SearchCommandLegend } from './SearchCommandLegend';
-import { TransactionResult } from './TransactionResult';
 import type { PageVisit } from './useRecentlyVisited';
 import { useRecentlyVisited } from './useRecentlyVisited';
 
+// TODO i18n
 export const SearchCommand = ({ open, setOpen }) => {
   const router = useRouter();
   const intl = useIntl();
@@ -78,7 +84,7 @@ export const SearchCommand = ({ open, setOpen }) => {
   }, [open]);
 
   const [search, { data, loading }] = useLazyQuery(searchCommandQuery, {
-    variables: queryFilter.variables,
+    variables: { ...queryFilter.variables, imageHeight: 72 },
     notifyOnNetworkStatusChange: true,
     context: API_V2_CONTEXT,
     fetchPolicy: 'cache-and-network',
@@ -135,6 +141,18 @@ export const SearchCommand = ({ open, setOpen }) => {
         }
         addToRecent({ key: data.legacyId.toString(), type, data });
         break;
+      case 'comment':
+        router.push(getCommentUrl(data));
+        // Skip adding comments to recent
+        break;
+      case 'order':
+        router.push(`/dashboard/${workspace.slug}/contributions/${data.legacyId}`);
+        addToRecent({ key: data.legacyId.toString(), type, data });
+        break;
+      case 'update':
+        router.push(`/dashboard/${workspace.slug}/updates/${data.legacyId}`);
+        addToRecent({ key: data.legacyId.toString(), type, data });
+        break;
       case 'page':
         router.push(`/dashboard/${workspace.slug}/${data.section}`);
         // Skip adding dashboard pages to recent
@@ -168,6 +186,7 @@ export const SearchCommand = ({ open, setOpen }) => {
       menuItem.label.toString().toLowerCase().includes(debouncedInput.toLowerCase()),
     );
   }, [debouncedInput, flattenedMenuItems, queryFilter.values.context]);
+
   return (
     <CommandDialog open={open} onOpenChange={setOpen} shouldFilter={false} onKeyDown={handleKeyDown}>
       {/* eslint-disable-next-line react/no-unknown-property */}
@@ -198,7 +217,9 @@ export const SearchCommand = ({ open, setOpen }) => {
               <CommandItem key={recentVisit.key} className="gap-2" onSelect={() => handleResultSelect(recentVisit)}>
                 {recentVisit.type === 'account' && <AccountResult account={recentVisit.data} />}
                 {recentVisit.type === 'expense' && <ExpenseResult expense={recentVisit.data} />}
+                {recentVisit.type === 'order' && <OrderResult order={recentVisit.data} />}
                 {recentVisit.type === 'transaction' && <TransactionResult transaction={recentVisit.data} />}
+                {recentVisit.type === 'update' && <UpdateResult update={recentVisit.data} />}
               </CommandItem>
             ))}
           </CommandGroup>
@@ -220,9 +241,11 @@ export const SearchCommand = ({ open, setOpen }) => {
           input={debouncedInput}
           nodes={data?.search.results.accounts.collection.nodes}
           renderNode={account => (
-            <CommandItem key={account.id} onSelect={() => handleResultSelect({ type: 'account', data: account })}>
-              <AccountResult account={account} highlights={data.search.results.accounts.highlights[account.id]} />
-            </CommandItem>
+            <Link href={getCollectivePageRoute(account)} onClick={e => e.preventDefault()}>
+              <CommandItem key={account.id} onSelect={() => handleResultSelect({ type: 'account', data: account })}>
+                <AccountResult account={account} highlights={data.search.results.accounts.highlights[account.id]} />
+              </CommandItem>
+            </Link>
           )}
         />
 
@@ -232,11 +255,28 @@ export const SearchCommand = ({ open, setOpen }) => {
           nodes={data?.search.results.expenses.collection.nodes}
           input={debouncedInput}
           renderNode={expense => (
-            <CommandItem key={expense.id} onSelect={() => handleResultSelect({ type: 'expense', data: expense })}>
-              <ExpenseResult expense={expense} highlights={data.search.results.expenses.highlights[expense.id]} />
-            </CommandItem>
+            <Link href={getExpensePageUrl(expense)} onClick={e => e.preventDefault()}>
+              <CommandItem key={expense.id} onSelect={() => handleResultSelect({ type: 'expense', data: expense })}>
+                <ExpenseResult expense={expense} highlights={data.search.results.expenses.highlights[expense.id]} />
+              </CommandItem>
+            </Link>
           )}
         />
+        {data?.search.results.orders && (
+          <SearchCommandGroup
+            label="Contributions"
+            input={debouncedInput}
+            totalCount={data?.search.results.orders.collection.totalCount}
+            nodes={data?.search.results.orders.collection.nodes}
+            renderNode={order => (
+              <Link href={getCollectivePageRoute(order.account)} onClick={e => e.preventDefault()}>
+                <CommandItem key={order.id} onSelect={() => handleResultSelect({ type: 'order', data: order })}>
+                  <OrderResult order={order} highlights={data.search.results.orders.highlights[order.id]} />
+                </CommandItem>
+              </Link>
+            )}
+          />
+        )}
         {data?.search.results.transactions && (
           <SearchCommandGroup
             label="Transactions"
@@ -256,6 +296,32 @@ export const SearchCommand = ({ open, setOpen }) => {
             )}
           />
         )}
+        <SearchCommandGroup
+          label="Updates"
+          input={debouncedInput}
+          totalCount={data?.search.results.updates.collection.totalCount}
+          nodes={data?.search.results.updates.collection.nodes}
+          renderNode={update => (
+            <Link href={getCollectivePageRoute(update.account)} onClick={e => e.preventDefault()}>
+              <CommandItem key={update.id} onSelect={() => handleResultSelect({ type: 'update', data: update })}>
+                <UpdateResult update={update} highlights={data.search.results.updates.highlights[update.id]} />
+              </CommandItem>
+            </Link>
+          )}
+        />
+        <SearchCommandGroup
+          label="Comments"
+          input={debouncedInput}
+          totalCount={data?.search.results.comments.collection.totalCount}
+          nodes={data?.search.results.comments.collection.nodes}
+          renderNode={comment => (
+            <Link href={getCommentUrl(comment)} onClick={e => e.preventDefault()}>
+              <CommandItem key={comment.id} onSelect={() => handleResultSelect({ type: 'comment', data: comment })}>
+                <CommentResult comment={comment} highlights={data.search.results.comments.highlights[comment.id]} />
+              </CommandItem>
+            </Link>
+          )}
+        />
       </CommandList>
       <SearchCommandLegend />
     </CommandDialog>
