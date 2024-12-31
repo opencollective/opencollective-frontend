@@ -7,6 +7,7 @@ import { useIntl } from 'react-intl';
 import { i18nTransactionKind } from '../../../lib/i18n/transaction';
 
 import FormattedMoneyAmount from '../../FormattedMoneyAmount';
+import { Badge } from '../../ui/Badge';
 import { getHighlightsFields } from '../lib';
 import type { SearchHighlights } from '../types';
 import type { TransactionResultData } from '../useRecentlyVisited';
@@ -20,7 +21,7 @@ export function TransactionResult({
   highlights?: SearchHighlights;
 }) {
   const intl = useIntl();
-  const highlightFields = getHighlightsFields(highlights, []);
+  const highlightFields = getHighlightsFields(highlights, ['id']);
   const otherHighlight = Object.values(highlightFields.others)[0]?.[0];
   return (
     <div className="flex flex-1 items-center gap-2">
@@ -34,7 +35,16 @@ export function TransactionResult({
       </div>
       <div className="w-full min-w-0 overflow-hidden">
         <div className="flex justify-between gap-2">
-          <div className="">{i18nTransactionKind(intl, transaction.kind)}</div>
+          <div className="flex gap-1">
+            <Badge type="outline" size="xs">
+              {highlightFields.top.id ? (
+                <Markup allowList={['mark']} content={`#${highlightFields.top.id[0]}`} />
+              ) : (
+                `#${transaction.legacyId}`
+              )}
+            </Badge>
+            <div>{i18nTransactionKind(intl, transaction.kind)}</div>
+          </div>
           <span className="font-medium text-foreground">
             <FormattedMoneyAmount
               amount={transaction.netAmount.valueInCents}
