@@ -139,7 +139,7 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
     {
       label: intl.formatMessage({ defaultMessage: 'Unreplied', id: 'k9Y5So' }),
       filter: {
-        lastCommentBy: [LastCommentBy.USER, LastCommentBy.COLLECTIVE_ADMIN],
+        lastCommentBy: [LastCommentBy.NON_HOST_ADMIN],
         status: [
           ExpenseStatusFilter.APPROVED,
           ExpenseStatusFilter.ERROR,
