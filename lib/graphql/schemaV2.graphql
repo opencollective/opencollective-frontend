@@ -4716,6 +4716,11 @@ enum LastCommentBy {
   HOST_ADMIN
 
   """
+  Not a Fiscal Host Admin
+  """
+  NON_HOST_ADMIN
+
+  """
   Collective Admin
   """
   COLLECTIVE_ADMIN
