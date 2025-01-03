@@ -25,6 +25,7 @@ import { ActivityType, ContributionFrequency, OrderStatus, TransactionKind } fro
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import type LoggedInUser from '../../lib/LoggedInUser';
 import { getDashboardRoute } from '../../lib/url-helpers';
+import { getWebsiteUrl } from '../../lib/utils';
 
 import ActivityDescription, { getActivityVariables } from '../dashboard/sections/ActivityLog/ActivityDescription';
 import { useTransactionActions } from '../dashboard/sections/transactions/actions';
@@ -90,7 +91,7 @@ export function getTransactionsUrl(LoggedInUser: LoggedInUser, order: Contributi
     route = getDashboardRoute(order.toAccount, 'transactions');
   }
 
-  return new URL(route, window.location.origin);
+  return new URL(route, getWebsiteUrl());
 }
 
 function getTransactionGroupLink(
