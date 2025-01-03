@@ -7055,6 +7055,8 @@ export enum LastCommentBy {
   COLLECTIVE_ADMIN = 'COLLECTIVE_ADMIN',
   /** Fiscal Host Admin */
   HOST_ADMIN = 'HOST_ADMIN',
+  /** Not a Fiscal Host Admin */
+  NON_HOST_ADMIN = 'NON_HOST_ADMIN',
   /** Expense Submitter */
   USER = 'USER'
 }

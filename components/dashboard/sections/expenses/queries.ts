@@ -252,8 +252,8 @@ export const hostDashboardMetadataQuery = gql`
     }
     unreplied: expenses(
       host: { slug: $hostSlug }
-      status: [APPROVED, ERROR, INCOMPLETE]
-      lastCommentBy: [USER, COLLECTIVE_ADMIN]
+      status: [APPROVED, ERROR, INCOMPLETE, ON_HOLD]
+      lastCommentBy: [NON_HOST_ADMIN]
     ) {
       totalCount
     }
