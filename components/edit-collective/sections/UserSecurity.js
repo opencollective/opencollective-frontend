@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 
 import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import { compose } from '../../../lib/utils';
@@ -12,19 +12,18 @@ import { Flex } from '../../Grid';
 import { getI18nLink } from '../../I18nFormatters';
 import Loading from '../../Loading';
 import MessageBox from '../../MessageBox';
+import { PasswordInput } from '../../PasswordInput';
 import { PasswordStrengthBar } from '../../PasswordStrengthBar';
-import StyledButton from '../../StyledButton';
 import StyledInput from '../../StyledInput';
 import StyledInputField from '../../StyledInputField';
 import { H3, P } from '../../Text';
 import { TwoFactorAuthenticationSettings } from '../../two-factor-authentication/TwoFactorAuthenticationSettings';
+import { Button } from '../../ui/Button';
 import { toast } from '../../ui/useToast';
 import { withUser } from '../../UserProvider';
 
 class UserSecurity extends React.Component {
   static propTypes = {
-    /** From intl */
-    intl: PropTypes.object.isRequired,
     /** From graphql query */
     setPassword: PropTypes.func.isRequired,
     /** From withUser */
@@ -74,7 +73,9 @@ class UserSecurity extends React.Component {
 
     if (password === currentPassword) {
       this.setState({
-        passwordError: <FormattedMessage defaultMessage="Password can't be the same as current password" id="HhwRys" />,
+        passwordError: (
+          <FormattedMessage defaultMessage="New password can't be the same as current password" id="ne9Dbl" />
+        ),
       });
       return;
     }
@@ -167,13 +168,10 @@ class UserSecurity extends React.Component {
               mb={2}
               width="100%"
             >
-              <StyledInput
+              <PasswordInput
                 key={`current-password-${passwordKey}`}
-                fontSize="14px"
                 id="current-password"
-                autoComplete="current-password"
                 name="current-password"
-                type="password"
                 required
                 onChange={e => {
                   this.setState({ passwordError: null, currentPassword: e.target.value });
@@ -202,12 +200,10 @@ class UserSecurity extends React.Component {
               />
             }
           >
-            <StyledInput
+            <PasswordInput
               key={`current-password-${passwordKey}`}
-              fontSize="14px"
               id="new-password"
-              autoComplete="new-password"
-              type="password"
+              name="new-password"
               required
               onChange={e => {
                 this.setState({ passwordError: null, password: e.target.value });
@@ -224,9 +220,10 @@ class UserSecurity extends React.Component {
             />
           </div>
 
-          <StyledButton
-            my={2}
-            minWidth={140}
+          <Button
+            variant="outline"
+            size="default"
+            className="mt-3"
             loading={passwordLoading}
             disabled={!password || (LoggedInUser.hasPassword && !currentPassword)}
             onClick={this.setPassword}
@@ -236,7 +233,7 @@ class UserSecurity extends React.Component {
             ) : (
               <FormattedMessage id="Security.SetPassword.Button" defaultMessage="Set Password" />
             )}
-          </StyledButton>
+          </Button>
         </Container>
       </Fragment>
     );
@@ -314,4 +311,4 @@ const addGraphql = compose(
   }),
 );
 
-export default injectIntl(withUser(addGraphql(UserSecurity)));
+export default withUser(addGraphql(UserSecurity));

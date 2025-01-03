@@ -104,11 +104,9 @@ export function AuthenticatorSettings(props: AuthenticatorSettingsProps) {
 
   return (
     <StyledCard px={3} py={2}>
-      <Flex alignItems="center">
-        <H3 fontSize="14px" fontWeight="700">
-          <FormattedMessage defaultMessage="Authenticator App" id="eoPp92" />
-        </H3>
-      </Flex>
+      <H3 fontSize="14px" fontWeight="700" my={2}>
+        <FormattedMessage defaultMessage="Authenticator App" id="eoPp92" />
+      </H3>
       <div className="mb-3 text-sm">
         <FormattedMessage
           defaultMessage="An application that supports TOTP (time-based one-time password). For example, Google Authenticator and 1Password."

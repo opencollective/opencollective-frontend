@@ -1,6 +1,6 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
-import { CheckCircle2Icon, PencilIcon, TrashIcon } from 'lucide-react';
+import { CheckCircle2Icon, Pencil, Trash2 } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
@@ -10,9 +10,9 @@ import theme from '../../lib/theme';
 
 import ConfirmationModal, { CONFIRMATION_MODAL_TERMINATE } from '../ConfirmationModal';
 import { Box, Flex } from '../Grid';
-import StyledButton from '../StyledButton';
 import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
+import { Button } from '../ui/Button';
 import { useToast } from '../ui/useToast';
 
 const RemoveTwoFactorAuthFromIndividualMutation = gql`
@@ -97,35 +97,29 @@ export function UserTwoFactorMethodItem(props: UserTwoFactorMethodItemProps) {
           {props.userTwoFactorMethod.name}
         </Box>
         <Flex gap="20px">
-          <StyledButton
+          <Button
+            variant="ghost"
+            size="xs"
             onClick={() => setIsEditingMethodName(true)}
             loading={isEditingMethodName || editing.loading}
             disabled={isConfirmingDelete || removing.loading}
-            buttonStyle="borderless"
-            buttonSize="tiny"
             color={theme.colors.blue[500]}
-            display="flex"
-            alignItems="center"
           >
-            <PencilIcon size="18px" />
-            &nbsp;
+            <Pencil className="mr-2 h-4 w-4" />
             <FormattedMessage defaultMessage="Rename" id="iXNbPf" />
-          </StyledButton>
+          </Button>
 
-          <StyledButton
+          <Button
+            variant="ghost"
+            size="xs"
+            className="text-destructive"
             onClick={() => setIsConfirmingRemove(true)}
             loading={isConfirmingDelete || removing.loading}
             disabled={isEditingMethodName || editing.loading}
-            buttonStyle="borderless"
-            buttonSize="tiny"
-            color={theme.colors.red[500]}
-            display="flex"
-            alignItems="center"
           >
-            <TrashIcon size="18px" />
-            &nbsp;
+            <Trash2 className="mr-2 h-4 w-4" />
             <FormattedMessage id="actions.delete" defaultMessage="Delete" />
-          </StyledButton>
+          </Button>
         </Flex>
       </Flex>
       {isEditingMethodName && (

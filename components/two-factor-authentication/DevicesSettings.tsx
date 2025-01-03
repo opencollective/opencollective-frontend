@@ -1,17 +1,16 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
 import * as webauthn from '@simplewebauthn/browser';
-import { PlusIcon } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { TwoFactorMethod } from '../../lib/graphql/types/v2/graphql';
 import type { Individual, UserTwoFactorMethod } from '../../lib/graphql/types/v2/schema';
 
-import { Box, Flex } from '../Grid';
-import StyledButton from '../StyledButton';
 import StyledCard from '../StyledCard';
 import { H3 } from '../Text';
+import { Button } from '../ui/Button';
 import { useToast } from '../ui/useToast';
 
 import { UserTwoFactorMethodItem } from './UserTwoFactorMethodItem';
@@ -107,11 +106,9 @@ export function DevicesSettings(props: DevicesSettingsProps) {
 
   return (
     <StyledCard px={3} py={2}>
-      <Flex alignItems="center">
-        <H3 fontSize="14px" fontWeight="700">
-          <FormattedMessage defaultMessage="U2F (Universal 2nd Factor)" id="7I69Bp" />
-        </H3>
-      </Flex>
+      <H3 fontSize="14px" fontWeight="700" my={2}>
+        <FormattedMessage defaultMessage="U2F (Universal 2nd Factor)" id="7I69Bp" />
+      </H3>
       <div className="mb-3 text-sm">
         <FormattedMessage
           defaultMessage="A device or platform authenticator that supports the U2F specification. This can be a hardware key (like a YubiKey) or other methods supported by your browser."
@@ -127,16 +124,10 @@ export function DevicesSettings(props: DevicesSettingsProps) {
           );
         })}
       </div>
-      <Box mt={3}>
-        <StyledButton
-          onClick={startWebauthnDeviceRegistration}
-          buttonSize="tiny"
-          buttonStyle="secondary"
-          display="flex"
-        >
-          <FormattedMessage defaultMessage="Add device" id="kFWJpj" /> <PlusIcon size="14px" />
-        </StyledButton>
-      </Box>
+      <Button onClick={startWebauthnDeviceRegistration} variant="outline" className="mb-2 mt-3 w-full">
+        <Plus className="mr-2 h-4 w-4" />
+        <FormattedMessage defaultMessage="Add device" id="kFWJpj" />
+      </Button>
     </StyledCard>
   );
 }

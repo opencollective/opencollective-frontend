@@ -62,7 +62,7 @@ describe('passwords', () => {
     // Passwords must not be the same
     cy.get('input#new-password').type('nope');
     cy.contains('button', 'Update Password').click();
-    cy.contains('[data-cy="password-error"]', "Password can't be the same as current password");
+    cy.contains('[data-cy="password-error"]', "New password can't be the same as current password");
 
     // Password must be strong
     cy.get('input#new-password').type('{selectall}{backspace}12345678');
