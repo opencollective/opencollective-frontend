@@ -8,8 +8,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import useKeyBoardShortcut, { ARROW_LEFT_KEY, ARROW_RIGHT_KEY } from '../lib/hooks/useKeyboardKey';
-import { imagePreview } from '../lib/image-utils';
-import { getFileExtensionFromUrl } from '../lib/url-helpers';
 
 import { Dialog, DialogOverlay } from './ui/Dialog';
 import { Box, Flex } from './Grid';
@@ -128,7 +126,7 @@ type FilesViewerModalProps = {
   files?: {
     url: string;
     name?: string;
-    info?: { width: number };
+    info?: { width: number; type: string };
   }[];
   openFileUrl?: string;
   allowOutsideInteraction?: boolean;
@@ -167,30 +165,24 @@ export default function FilesViewerModal({
   useKeyBoardShortcut({ callback: onArrowLeft, keyMatch: ARROW_LEFT_KEY });
 
   const selectedItem = files?.length ? files?.[selectedIndex] : null;
+  const selectedItemContentType = selectedItem?.info?.type;
 
   const nbFiles = files?.length || 0;
   const hasMultipleFiles = nbFiles > 1;
   const contentWrapperRef = React.useRef(null);
 
-  const renderFile = (
-    { url, info, name }: { url: string; name?: string; info?: { width: number } },
-    contentWrapperRef,
-  ) => {
+  const renderFile = ({ url, name }: { url: string; name?: string; info?: { width: number } }, contentWrapperRef) => {
     let content = null;
-    const fileExtension = getFileExtensionFromUrl(url);
 
-    const isText = ['csv', 'txt'].includes(fileExtension);
-    const isPdf = fileExtension === 'pdf';
+    const isText = ['text/csv', 'text/plain'].includes(selectedItemContentType);
+    const isPdf = 'application/pdf' === selectedItemContentType;
 
     if (isText) {
       content = <UploadedFilePreview size={288} url={url} alt={name} showFileName fileName={name} color="black.200" />;
     } else if (isPdf) {
       content = <PDFViewer pdfUrl={url} contentWrapperRef={contentWrapperRef} />;
     } else {
-      const { width: imageWidth } = info || {};
-      const maxWidth = 1200;
-      const resizeWidth = Math.min(maxWidth, imageWidth ?? maxWidth);
-      content = <StyledImg src={imagePreview(url, null, { width: resizeWidth })} alt={name} />;
+      content = <StyledImg src={url} alt={name} />;
     }
 
     return <Content>{content}</Content>;

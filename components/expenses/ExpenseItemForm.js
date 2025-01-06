@@ -7,7 +7,6 @@ import { escape, get, isEmpty, omit, pick, unescape } from 'lodash';
 import Lottie from 'lottie-react';
 import { AlertTriangle } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import { isURL } from 'validator';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { formatValueAsCurrency } from '../../lib/currency-utils';
@@ -15,7 +14,7 @@ import { createError, ERROR } from '../../lib/errors';
 import { standardizeExpenseItemIncurredAt } from '../../lib/expenses';
 import { formatFormErrorMessage, requireFields } from '../../lib/form-utils';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import { cn } from '../../lib/utils';
+import { cn, isValidUrl } from '../../lib/utils';
 import { attachmentDropzoneParams } from './lib/attachments';
 import { expenseItemsMustHaveFiles } from './lib/items';
 import { updateExpenseFormWithUploadResult } from './lib/ocr';
@@ -92,7 +91,7 @@ export const validateExpenseItem = (expense, item) => {
   if (expenseItemsMustHaveFiles(expense.type)) {
     if (!item.url) {
       errors.url = createError(ERROR.FORM_FIELD_REQUIRED);
-    } else if (!isURL(item.url)) {
+    } else if (!isValidUrl(item.url)) {
       errors.url = createError(ERROR.FORM_FIELD_PATTERN);
     } else if (item.__isUploading) {
       errors.url = createError(ERROR.FORM_FILE_UPLOADING);
@@ -328,7 +327,7 @@ const ExpenseItemForm = ({
         {requireFile && (
           <Field name={getFieldName('url')}>
             {({ field, meta }) => {
-              const hasValidUrl = field.value && isURL(field.value);
+              const hasValidUrl = field.value && isValidUrl(field.value);
               return (
                 <StyledInputField
                   flex="0 0 112px"

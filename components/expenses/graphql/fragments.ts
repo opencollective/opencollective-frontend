@@ -321,6 +321,7 @@ export const expensePageExpenseFieldsFragment = gql`
       url
       file {
         id
+        type
         ... on ImageFileInfo {
           width
         }
@@ -338,6 +339,7 @@ export const expensePageExpenseFieldsFragment = gql`
       name
       info {
         id
+        type
         name
         size
         ... on ImageFileInfo {
@@ -805,6 +807,7 @@ export const expensesListAdminFieldsFragment = gql`
       amount
       file {
         id
+        type
         ... on ImageFileInfo {
           width
         }
@@ -821,6 +824,7 @@ export const expensesListAdminFieldsFragment = gql`
       name
       info {
         id
+        type
         ... on ImageFileInfo {
           width
         }
