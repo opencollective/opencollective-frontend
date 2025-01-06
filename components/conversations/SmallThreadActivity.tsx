@@ -2,7 +2,7 @@ import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useTheme } from 'styled-components';
 
-import type { Activity } from '../../lib/graphql/types/v2/graphql';
+import type { Activity } from '../../lib/graphql/types/v2/schema';
 
 import { AccountHoverCard } from '../AccountHoverCard';
 import Avatar from '../Avatar';

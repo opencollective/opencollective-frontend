@@ -2,7 +2,7 @@ import React from 'react';
 import { Banknote } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import type { Account, Amount, Order, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
+import type { Account, Amount, Order, OrderStatus } from '../../../../lib/graphql/types/v2/schema';
 
 import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';

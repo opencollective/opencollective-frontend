@@ -4,7 +4,7 @@ import { NotepadText } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 import styled, { withTheme } from 'styled-components';
 
-import { CommentType } from '../../lib/graphql/types/v2/graphql';
+import { CommentType } from '../../lib/graphql/types/v2/schema';
 import { cn } from '../../lib/utils';
 
 import Container from '../Container';

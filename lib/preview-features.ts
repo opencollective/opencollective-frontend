@@ -119,8 +119,8 @@ export const previewFeatures: PreviewFeature[] = [
     key: PREVIEW_FEATURE_KEYS.SEARCH_COMMAND,
     publicBeta: false,
     title: 'Search command menu',
-    description: 'Global search powered by ElasticSearch',
-    hasAccess: user => user?.isRoot,
+    description: 'A new way to search for collectives, transactions, expenses and more',
+    closedBetaAccessFor: ['ofico', 'ofitech', 'europe', 'oce-foundation-usd', 'oce-foundation-eur', 'opensource'],
   },
   {
     key: PREVIEW_FEATURE_KEYS.TRANSACTIONS_IMPORTS,

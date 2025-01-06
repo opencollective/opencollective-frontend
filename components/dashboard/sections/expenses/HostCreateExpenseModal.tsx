@@ -9,13 +9,14 @@ import { getAccountReferenceInput } from '../../../../lib/collective';
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { standardizeExpenseItemIncurredAt } from '../../../../lib/expenses';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
+import type { HostedCollectiveFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
 import type {
   Account,
   TransactionsImport,
   TransactionsImportRow,
   TransactionsImportStats,
-} from '../../../../lib/graphql/types/v2/graphql';
-import { Currency, ExpenseType } from '../../../../lib/graphql/types/v2/graphql';
+} from '../../../../lib/graphql/types/v2/schema';
+import { Currency, ExpenseType } from '../../../../lib/graphql/types/v2/schema';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { isValidUrl } from '../../../../lib/utils';
@@ -88,7 +89,7 @@ const PayeeSelect = ({
     <CollectivePickerAsync
       {...props}
       data-cy="payee-select"
-      types={['USER', 'ORGANIZATION', 'VENDOR']}
+      types={['USER', 'ORGANIZATION', 'VENDOR', 'PROJECT']}
       customOptions={defaultSourcesOptions}
       menuPortalTarget={null}
       includeVendorsForHostId={host.legacyId}
@@ -149,16 +150,16 @@ const hostExpenseFormValuesSchema = z
     ]),
   );
 
-const getInitialValues = (importRow: TransactionsImportRow): z.infer<typeof hostExpenseFormValuesSchema> => {
+const getInitialValues = (importRow: TransactionsImportRow, account): z.infer<typeof hostExpenseFormValuesSchema> => {
   return {
     type: null,
     description: importRow?.description || '',
     payee: null,
-    account: null,
+    account: account ? pick(account, ['id', 'slug', 'name', 'type', 'imageUrl']) : null,
     incurredAt: standardizeExpenseItemIncurredAt(importRow?.date),
     amount: {
       valueInCents: Math.abs(importRow?.amount.valueInCents) || 0,
-      currency: importRow?.amount.currency || null,
+      currency: importRow?.amount.currency || account?.currency || null,
     },
   };
 };
@@ -170,9 +171,11 @@ export const HostCreateExpenseModal = ({
   transactionsImport,
   transactionsImportRow,
   host,
+  account,
   ...props
 }: {
   host: Account;
+  account?: HostedCollectiveFieldsFragment;
   transactionsImport?: TransactionsImport;
   transactionsImportRow?: TransactionsImportRow;
 } & BaseModalProps) => {
@@ -197,7 +200,7 @@ export const HostCreateExpenseModal = ({
         )}
         <FormikZod<z.infer<typeof hostExpenseFormValuesSchema>>
           schema={hostExpenseFormValuesSchema}
-          initialValues={getInitialValues(transactionsImportRow)}
+          initialValues={getInitialValues(transactionsImportRow, account)}
           onSubmit={async values => {
             try {
               const result = await createExpense({
@@ -219,7 +222,7 @@ export const HostCreateExpenseModal = ({
                       {
                         amountV2: omit(values.amount, ['exchangeRate.__typename', 'exchangeRate.isApproximate']),
                         description: values.description,
-                        incurredAt: values.incurredAt,
+                        incurredAt: standardizeExpenseItemIncurredAt(values.incurredAt),
                         url: values.type === ExpenseType.RECEIPT ? values['attachedFile']?.url : null,
                       },
                     ],

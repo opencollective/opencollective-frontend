@@ -6,7 +6,7 @@ import type {
   TransactionsImport,
   TransactionsImportRow,
   TransactionsImportStats,
-} from '../../../../lib/graphql/types/v2/graphql';
+} from '../../../../lib/graphql/types/v2/schema';
 
 import type { BaseModalProps } from '../../../ModalContext';
 import AddFundsModal from '../collectives/AddFundsModal';

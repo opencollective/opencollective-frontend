@@ -17,6 +17,7 @@ import ErrorPage from '../components/ErrorPage';
 import HappyBackground from '../components/gift-cards/HappyBackground';
 import { Box, Flex } from '../components/Grid';
 import Link from '../components/Link';
+import LinkCollective from '../components/LinkCollective';
 import Loading from '../components/Loading';
 import NewCreditCardForm from '../components/NewCreditCardForm';
 import Page from '../components/Page';
@@ -193,7 +194,7 @@ class UpdatePaymentPage extends React.Component {
     }
 
     const orders = data.PaymentMethod?.orders || [];
-    const hasForm = showCreditCardForm && Boolean(data.PaymentMethod);
+    const hasForm = Boolean(showCreditCardForm && data.PaymentMethod && orders.length);
     const contributingAccount = orders[0]?.fromCollective || LoggedInUser.collective;
     return (
       <div className="UpdatedPaymentMethodPage">
@@ -206,7 +207,7 @@ class UpdatePaymentPage extends React.Component {
                 </H1>
               </Box>
 
-              {Boolean(data.PaymentMethod) && (
+              {Boolean(data.PaymentMethod && orders.length) && (
                 <React.Fragment>
                   <Box mt={3}>
                     <Subtitle fontSize={['0.95rem', null, '1.25rem']} maxWidth={['90%', '640px']}>
@@ -226,7 +227,7 @@ class UpdatePaymentPage extends React.Component {
                           {orders.map(order => {
                             return (
                               <li key={order.id}>
-                                {order.collective.name}:{' '}
+                                <LinkCollective collective={order.collective} openInNewTab />:{' '}
                                 {formatCurrency(order.totalAmount, order.currency, {
                                   precision: 2,
                                   locale: intl.locale,
@@ -261,13 +262,20 @@ class UpdatePaymentPage extends React.Component {
                       ) : success ? (
                         <FormattedMessage
                           id="updatePaymentMethod.form.success"
-                          defaultMessage="Your new card info has been added"
+                          defaultMessage="Your new card info has been added."
+                        />
+                      ) : !data.PaymentMethod ? (
+                        <FormattedMessage
+                          defaultMessage="This payment method does not exist or has already been updated."
+                          id="RiYYFO"
+                        />
+                      ) : !orders.length ? (
+                        <FormattedMessage
+                          defaultMessage="There are no active subscriptions linked to this payment method, it may have already been updated."
+                          id="jor/DD"
                         />
                       ) : (
-                        <FormattedMessage
-                          defaultMessage="This payment method does not exist or has already been updated"
-                          id="a3HMfz"
-                        />
+                        <FormattedMessage defaultMessage="An unexpected error occurred." id="3IKub9" />
                       )}
                     </ShadowBox>
                   </Container>
@@ -371,6 +379,7 @@ const subscriptionsQuery = gqlV1/* GraphQL */ `
         collective {
           id
           name
+          slug
         }
       }
     }

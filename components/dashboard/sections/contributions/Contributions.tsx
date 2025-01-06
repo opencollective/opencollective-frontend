@@ -1,10 +1,10 @@
 import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { compact, omit } from 'lodash';
-import { LinkIcon, Pencil, PlusIcon } from 'lucide-react';
+import { ArrowLeftRightIcon, LinkIcon, Pencil, PlusIcon } from 'lucide-react';
 import { useRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
-import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import type { z } from 'zod';
 
 import type { GetActions } from '../../../../lib/actions/types';
@@ -17,41 +17,42 @@ import {
   ExpectedFundsFilter,
   OrderStatus,
   PaymentMethodType,
-} from '../../../../lib/graphql/types/v2/graphql';
+} from '../../../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import i18nOrderStatus from '../../../../lib/i18n/order-status';
+import { i18nFrequency } from '../../../../lib/i18n/order';
 import { i18nPaymentMethodProviderType } from '../../../../lib/i18n/payment-method-provider-type';
 import type LoggedInUser from '../../../../lib/LoggedInUser';
-import { getWebsiteUrl, sortSelectOptions } from '../../../../lib/utils';
+import { getWebsiteUrl } from '../../../../lib/utils';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
 import ContributionConfirmationModal from '../../../ContributionConfirmationModal';
 import { ContributionDrawer } from '../../../contributions/ContributionDrawer';
+import { getTransactionsUrl } from '../../../contributions/ContributionTimeline';
 import { CopyID } from '../../../CopyId';
 import DateTime from '../../../DateTime';
 import type { EditOrderActions } from '../../../EditOrderModal';
 import EditOrderModal from '../../../EditOrderModal';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
+import Link from '../../../Link';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { useModal } from '../../../ModalContext';
 import OrderStatusTag from '../../../orders/OrderStatusTag';
-import PaymentMethodTypeWithIcon from '../../../PaymentMethodTypeWithIcon';
+import { PaymentMethodTypeLabel } from '../../../PaymentMethodTypeWithIcon';
 import { managedOrderFragment } from '../../../recurring-contributions/graphql/queries';
 import { actionsColumn, DataTable } from '../../../table/DataTable';
 import { Button } from '../../../ui/Button';
 import { useToast } from '../../../ui/useToast';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
-import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { Pagination } from '../../filters/Pagination';
 import type { DashboardSectionProps } from '../../types';
 
 import CreatePendingContributionModal from './CreatePendingOrderModal';
 import type { FilterMeta } from './filters';
-import { filters, OrderTypeFilter, schema, toVariables } from './filters';
+import { filters as allFilters, schema, toVariables } from './filters';
 import { PausedIncomingContributionsMessage } from './PausedIncomingContributionsMessage';
 
 enum ContributionsTab {
@@ -74,6 +75,7 @@ const dashboardContributionsMetadataQuery = gql`
     $onlyExpectedFunds: Boolean!
     $expectedFundsFilter: ExpectedFundsFilter
     $includeHostedAccounts: Boolean!
+    $includeChildrenAccounts: Boolean
   ) {
     account(slug: $slug) {
       id
@@ -84,9 +86,31 @@ const dashboardContributionsMetadataQuery = gql`
       settings
       imageUrl
       currency
+      childrenAccounts {
+        totalCount
+        nodes {
+          id
+          slug
+          name
+          ... on AccountWithContributions {
+            tiers {
+              nodes {
+                id
+                name
+              }
+            }
+          }
+        }
+      }
       ... on AccountWithContributions {
         canStartResumeContributionsProcess
         hasResumeContributionsProcessStarted
+        tiers {
+          nodes {
+            id
+            name
+          }
+        }
       }
       ... on AccountWithParent {
         parent {
@@ -109,6 +133,7 @@ const dashboardContributionsMetadataQuery = gql`
         filter: $filter
         expectedFundsFilter: $expectedFundsFilter
         includeHostedAccounts: $includeHostedAccounts
+        includeChildrenAccounts: $includeChildrenAccounts
       ) {
         totalCount
       }
@@ -130,9 +155,11 @@ const dashboardContributionsMetadataQuery = gql`
       }
       RECURRING: orders(
         filter: $filter
-        onlyActiveSubscriptions: true
+        frequency: [MONTHLY, YEARLY]
+        status: [ACTIVE, ERROR]
         includeIncognito: true
         includeHostedAccounts: $includeHostedAccounts
+        includeChildrenAccounts: $includeChildrenAccounts
       ) @skip(if: $onlyExpectedFunds) {
         totalCount
       }
@@ -147,11 +174,12 @@ const dashboardContributionsMetadataQuery = gql`
       }
       ONETIME: orders(
         filter: $filter
-        frequency: ONETIME
+        frequency: [ONETIME]
         status: [PAID, PROCESSING]
         includeIncognito: true
         minAmount: 1
         includeHostedAccounts: $includeHostedAccounts
+        includeChildrenAccounts: $includeChildrenAccounts
       ) @skip(if: $onlyExpectedFunds) {
         totalCount
       }
@@ -161,6 +189,7 @@ const dashboardContributionsMetadataQuery = gql`
         includeIncognito: true
         expectedFundsFilter: $expectedFundsFilter
         includeHostedAccounts: $includeHostedAccounts
+        includeChildrenAccounts: $includeChildrenAccounts
       ) {
         totalCount
       }
@@ -209,14 +238,14 @@ const dashboardContributionsQuery = gql`
     $offset: Int
     $limit: Int
     $filter: AccountOrdersFilter!
-    $frequency: ContributionFrequency
+    $frequency: [ContributionFrequency]
     $status: [OrderStatus!]
-    $onlySubscriptions: Boolean
     $includeIncognito: Boolean
     $minAmount: Int
     $maxAmount: Int
     $paymentMethod: PaymentMethodReferenceInput
     $includeHostedAccounts: Boolean!
+    $includeChildrenAccounts: Boolean
     $dateFrom: DateTime
     $dateTo: DateTime
     $expectedDateFrom: DateTime
@@ -225,6 +254,7 @@ const dashboardContributionsQuery = gql`
     $chargedDateTo: DateTime
     $expectedFundsFilter: ExpectedFundsFilter
     $orderBy: ChronologicalOrderInput
+    $tier: [TierReferenceInput!]
   ) {
     account(slug: $slug) {
       id
@@ -236,7 +266,6 @@ const dashboardContributionsQuery = gql`
         filter: $filter
         frequency: $frequency
         status: $status
-        onlySubscriptions: $onlySubscriptions
         includeIncognito: $includeIncognito
         minAmount: $minAmount
         maxAmount: $maxAmount
@@ -245,10 +274,12 @@ const dashboardContributionsQuery = gql`
         limit: $limit
         paymentMethod: $paymentMethod
         includeHostedAccounts: $includeHostedAccounts
+        includeChildrenAccounts: $includeChildrenAccounts
         expectedFundsFilter: $expectedFundsFilter
         orderBy: $orderBy
         chargedDateFrom: $chargedDateFrom
         chargedDateTo: $chargedDateTo
+        tier: $tier
       ) {
         totalCount
         nodes {
@@ -261,56 +292,60 @@ const dashboardContributionsQuery = gql`
   ${managedOrderFragment}
 `;
 
-const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpectedFunds }) => {
-  const accounts = {
+const getColumns = ({ intl, isIncoming, includeHostedAccounts, includeChildrenAccounts, onlyExpectedFunds }) => {
+  const accounts = swap => ({
     accessorKey: 'toAccount',
     header: intl.formatMessage({ defaultMessage: 'Collective & Contributors', id: 'kklCrk' }),
-    meta: { className: 'max-w-[200px] overflow-hidden' },
+    meta: { className: 'max-w-[400px] overflow-hidden' },
     cell: ({ cell, row }) => {
       const toAccount = cell.getValue();
       const fromAccount = row.original.fromAccount;
+      const big = swap ? fromAccount : toAccount;
+      const small = swap ? toAccount : fromAccount;
       return (
         <div className="flex items-center gap-5">
           <div className="relative">
             <div>
               <AccountHoverCard
-                account={toAccount}
+                account={big}
                 trigger={
                   <span>
-                    <Avatar size={32} collective={toAccount} displayTitle={false} />
+                    <Avatar size={32} collective={big} displayTitle={false} />
                   </span>
                 }
               />
             </div>
             <div className="absolute -bottom-[6px] -right-[6px] rounded-full">
               <AccountHoverCard
-                account={fromAccount}
+                account={small}
                 trigger={
                   <span>
-                    <Avatar size={16} collective={fromAccount} displayTitle={false} />
+                    <Avatar size={16} collective={small} displayTitle={false} />
                   </span>
                 }
               />
             </div>
           </div>
           <div className="overflow-hidden">
-            <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sm font-medium leading-5">
-              {toAccount.name || toAccount.slug}
+            <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sm leading-5">
+              {big.name || big.slug}
             </div>
-            <div className="overflow-hidden text-ellipsis whitespace-nowrap text-xs leading-4">
-              {fromAccount.name || fromAccount.slug}
+            <div className="overflow-hidden text-ellipsis whitespace-nowrap text-xs font-normal leading-4 text-slate-700">
+              {small.name || small.slug}
             </div>
           </div>
         </div>
       );
     },
-  };
+  });
 
   const toAccount = {
     accessorKey: 'toAccount',
     header: intl.formatMessage({ id: 'Collective', defaultMessage: 'Collective' }),
-    cell: ({ cell }) => {
+    meta: { className: 'max-w-[400px] overflow-hidden' },
+    cell: ({ cell, row }) => {
       const toAccount = cell.getValue();
+      const tier = row.original?.tier;
       return (
         <AccountHoverCard
           account={toAccount}
@@ -319,8 +354,15 @@ const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpected
               <div>
                 <Avatar size={32} collective={toAccount} displayTitle={false} />
               </div>
-              <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sm leading-5">
-                {toAccount.name || toAccount.slug}
+              <div className="overflow-hidden">
+                <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sm leading-5">
+                  {toAccount.name || toAccount.slug}
+                </div>
+                {tier && (
+                  <div className="overflow-hidden text-ellipsis whitespace-nowrap text-xs font-normal leading-4 text-slate-700">
+                    {tier.name}
+                  </div>
+                )}
               </div>
             </div>
           }
@@ -328,11 +370,14 @@ const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpected
       );
     },
   };
+
   const fromAccount = {
     accessorKey: 'fromAccount',
     header: intl.formatMessage({ id: 'Contributor', defaultMessage: 'Contributor' }),
-    cell: ({ cell }) => {
+    meta: { className: 'max-w-[400px] overflow-hidden' },
+    cell: ({ cell, row }) => {
       const fromAccount = cell.getValue();
+      const tier = row.original?.tier;
       return (
         <AccountHoverCard
           account={fromAccount}
@@ -341,8 +386,15 @@ const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpected
               <div>
                 <Avatar size={32} collective={fromAccount} displayTitle={false} />
               </div>
-              <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sm leading-5">
-                {fromAccount.name || fromAccount.slug}
+              <div className="overflow-hidden">
+                <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sm leading-5">
+                  {fromAccount.name || fromAccount.slug}
+                </div>
+                {tier && (
+                  <div className="overflow-hidden text-ellipsis whitespace-nowrap text-xs font-normal leading-4 text-slate-700">
+                    {tier.name}
+                  </div>
+                )}
               </div>
             </div>
           }
@@ -350,48 +402,52 @@ const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpected
       );
     },
   };
+
   const paymentMethod = {
     accessorKey: 'paymentMethod',
     header: intl.formatMessage({ id: 'paymentmethod.label', defaultMessage: 'Payment Method' }),
     cell: ({ cell, row }) => {
       const pm = cell.getValue();
-      if (pm) {
-        return (
-          <div className="flex items-center gap-2 truncate">
-            <PaymentMethodTypeWithIcon iconSize={18} type={pm.type} />
-          </div>
-        );
-      } else if (row.original?.pendingContributionData?.paymentMethod) {
+      if (row.original?.pendingContributionData?.paymentMethod) {
         return i18nPaymentMethodProviderType(intl, row.original?.pendingContributionData?.paymentMethod);
       }
+
+      return <PaymentMethodTypeLabel type={pm?.type} />;
     },
   };
+
+  const amount = {
+    accessorKey: 'totalAmount',
+    header: intl.formatMessage({ defaultMessage: 'Amount', id: 'Fields.amount' }),
+    meta: { className: 'text-end pr-1' },
+    cell: ({ cell }) => {
+      const amount = cell.getValue();
+      return <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} showCurrencyCode={false} />;
+    },
+  };
+
+  const frequency = {
+    accessorKey: 'frequency',
+    header: null,
+    meta: { className: 'text-start pl-0' },
+    cell: ({ cell }) => {
+      const frequency = cell.getValue();
+      return (
+        ['MONTHLY', 'YEARLY'].includes(frequency) && (
+          <span className="text-sm font-light lowercase text-muted-foreground">{i18nFrequency(intl, frequency)}</span>
+        )
+      );
+    },
+  };
+
   const status = {
     accessorKey: 'status',
     header: intl.formatMessage({ id: 'order.status', defaultMessage: 'Status' }),
     cell: ({ cell }) => {
       const status = cell.getValue();
       return (
-        <div data-cy="contribution-status">
+        <div data-cy="contribution-status" className="w-fit">
           <OrderStatusTag status={status} />
-        </div>
-      );
-    },
-  };
-
-  const totalAmount = {
-    accessorKey: 'totalAmount',
-    header: intl.formatMessage({ defaultMessage: 'Amount', id: 'Fields.amount' }),
-    cell: ({ cell, row }) => {
-      const amount = cell.getValue();
-      return (
-        <div className="flex items-center gap-2 truncate">
-          <FormattedMoneyAmount
-            amount={amount.valueInCents}
-            currency={amount.currency}
-            frequency={row.original.frequency}
-            abbreviateInterval
-          />
         </div>
       );
     },
@@ -417,7 +473,6 @@ const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpected
     header: '#',
     cell: ({ cell }) => {
       const legacyId = cell.getValue();
-
       return (
         // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
         <div className="cursor-default" onClick={e => e.stopPropagation()}>
@@ -427,68 +482,72 @@ const getColumns = ({ tab, intl, isIncoming, includeHostedAccounts, onlyExpected
     },
   };
 
-  if (!tab || [ContributionsTab.ONETIME, ContributionsTab.ALL].includes(tab)) {
-    return compact([
-      onlyExpectedFunds ? contributionId : null,
-      includeHostedAccounts ? accounts : isIncoming ? fromAccount : toAccount,
-      paymentMethod,
-      totalAmount,
-      {
-        accessorKey: 'lastChargedAt',
-        header: intl.formatMessage({ id: 'order.lastChargedAt', defaultMessage: 'Last Charge Date' }),
-        cell: ({ row }) => {
-          const order = row.original;
-          const date = order.lastChargedAt || order.createdAt;
-          return (
-            <div className="flex items-center gap-2 truncate">
-              <DateTime value={date} dateStyle="medium" timeStyle={undefined} />
-            </div>
-          );
-        },
-      },
-      onlyExpectedFunds ? expectedAt : null,
-      status,
-      actionsColumn,
-    ]);
-  } else {
-    return compact([
-      onlyExpectedFunds ? contributionId : null,
-      includeHostedAccounts ? accounts : isIncoming ? fromAccount : toAccount,
-      paymentMethod,
-      totalAmount,
-      onlyExpectedFunds ? expectedAt : null,
-      status,
-      actionsColumn,
-    ]);
-  }
+  const chargeDate = {
+    accessorKey: 'lastChargedAt',
+    header: intl.formatMessage({ id: 'Contribution.ChargeDate', defaultMessage: 'Charge Date' }),
+    cell: ({ row }) => {
+      const order = row.original;
+      const date = order.lastChargedAt || order.createdAt;
+      return (
+        <div className="flex items-center gap-2 truncate">
+          <DateTime value={date} dateStyle="medium" timeStyle={undefined} />
+        </div>
+      );
+    },
+  };
+
+  const startDate = {
+    accessorKey: 'createdAt',
+    header: intl.formatMessage({ id: 'Contribution.CreationDate', defaultMessage: 'Creation Date' }),
+    cell: ({ row }) => {
+      const order = row.original;
+      const date = order.createdAt;
+      return (
+        <div className="flex items-center gap-2 truncate">
+          <DateTime value={date} dateStyle="medium" timeStyle={undefined} />
+        </div>
+      );
+    },
+  };
+
+  return compact([
+    onlyExpectedFunds ? contributionId : null,
+    includeHostedAccounts || includeChildrenAccounts
+      ? accounts(isIncoming && includeChildrenAccounts)
+      : isIncoming
+        ? fromAccount
+        : toAccount,
+    chargeDate,
+    amount,
+    frequency,
+    startDate,
+    paymentMethod,
+    onlyExpectedFunds ? expectedAt : null,
+    status,
+    actionsColumn,
+  ]);
 };
 
-const filtersWithoutExpectedFunds = {
-  ...omit(filters, ['expectedFundsFilter', 'expectedDate', 'status']),
-  status: {
-    labelMsg: defineMessage({ defaultMessage: 'Status', id: 'tzMNF3' }),
-    Component: ({ valueRenderer, intl, value, onChange, ...props }) => (
-      <ComboSelectFilter
-        value={value}
-        onChange={onChange}
-        options={Object.values(OrderStatus)
-          .filter(s => s !== OrderStatus.PENDING)
-          .map(value => ({ label: valueRenderer({ intl, value }), value }))
-          .sort(sortSelectOptions)}
-        {...props}
-      />
-    ),
-    valueRenderer: ({ intl, value }) => i18nOrderStatus(intl, value),
-  },
-};
+const incomingContributionsFilters = omit(allFilters, ['expectedFundsFilter', 'expectedDate']);
+
+const filters = omit(allFilters, ['expectedFundsFilter', 'expectedDate', 'tier']);
+
+const expectedFundsFilters = omit(allFilters, ['tier']);
 
 type ContributionsProps = DashboardSectionProps & {
   direction?: 'INCOMING' | 'OUTGOING';
   onlyExpectedFunds?: boolean;
   includeHostedAccounts?: boolean;
+  includeChildrenAccounts?: boolean;
 };
 
-const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHostedAccounts }: ContributionsProps) => {
+const Contributions = ({
+  accountSlug,
+  direction,
+  onlyExpectedFunds,
+  includeHostedAccounts,
+  includeChildrenAccounts,
+}: ContributionsProps) => {
   const { toast } = useToast();
 
   const [expireOrder] = useMutation(
@@ -523,6 +582,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
   const { LoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const router = useRouter();
+  const isIncoming = direction === 'INCOMING';
   const {
     data: metadata,
     loading: metadataLoading,
@@ -535,6 +595,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
       onlyExpectedFunds: !!onlyExpectedFunds,
       expectedFundsFilter: onlyExpectedFunds ? ExpectedFundsFilter.ALL_EXPECTED_FUNDS : null,
       includeHostedAccounts: !!includeHostedAccounts,
+      includeChildrenAccounts: !!includeChildrenAccounts,
     },
     context: API_V2_CONTEXT,
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
@@ -592,7 +653,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
           label: intl.formatMessage({ defaultMessage: 'Recurring', id: 'v84fNv' }),
           count: metadata?.account?.[ContributionsTab.RECURRING].totalCount,
           filter: {
-            type: OrderTypeFilter.RECURRING,
+            frequency: [ContributionFrequency.MONTHLY, ContributionFrequency.YEARLY],
             status: [OrderStatus.ACTIVE, OrderStatus.ERROR],
           },
         }
@@ -603,7 +664,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
           label: intl.formatMessage({ defaultMessage: 'One-Time', id: 'jX0G5O' }),
           count: metadata?.account?.[ContributionsTab.ONETIME].totalCount,
           filter: {
-            type: OrderTypeFilter.ONETIME,
+            frequency: [ContributionFrequency.ONETIME],
             status: [OrderStatus.PAID, OrderStatus.PROCESSING],
           },
         }
@@ -664,8 +725,26 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
       : null,
   ].filter(Boolean);
 
+  const tierOptions = React.useMemo(() => {
+    if (!includeChildrenAccounts) {
+      return [];
+    }
+    if (metadata?.account.childrenAccounts.nodes?.length === 0) {
+      return metadata.account?.tiers?.nodes.map(tier => ({ label: tier.name, value: tier.id }));
+    } else {
+      const makeOption = account =>
+        account?.tiers?.nodes.map(tier => ({ label: `${tier.name}  (${account.name})`, value: tier.id }));
+      const options = makeOption(metadata?.account);
+      metadata?.account.childrenAccounts.nodes.forEach(children => {
+        options.push(...makeOption(children));
+      });
+      return options;
+    }
+  }, [metadata?.account]);
+
   const filterMeta: FilterMeta = {
     currency: metadata?.account?.currency,
+    tierOptions: isIncoming ? tierOptions : [],
   };
 
   const queryFilter = useQueryFilter({
@@ -673,7 +752,11 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
     toVariables,
     meta: filterMeta,
     views,
-    filters: onlyExpectedFunds ? filters : filtersWithoutExpectedFunds,
+    filters: onlyExpectedFunds
+      ? expectedFundsFilters
+      : isIncoming && !includeHostedAccounts
+        ? incomingContributionsFilters
+        : filters,
   });
 
   const {
@@ -687,6 +770,7 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
       filter: direction || 'OUTGOING',
       includeIncognito: true,
       includeHostedAccounts: !!includeHostedAccounts,
+      includeChildrenAccounts: !!includeChildrenAccounts,
       ...queryFilter.variables,
       ...(onlyExpectedFunds
         ? {
@@ -723,15 +807,14 @@ const Contributions = ({ accountSlug, direction, onlyExpectedFunds, includeHoste
     }
   }, [router, selectedOrders]);
 
-  const isIncoming = direction === 'INCOMING';
   const loading = metadataLoading || queryLoading;
   const error = metadataError || queryError;
 
   const columns = getColumns({
-    tab: queryFilter.activeViewId,
     intl,
     isIncoming,
     includeHostedAccounts,
+    includeChildrenAccounts: includeChildrenAccounts && metadata?.account?.childrenAccounts?.nodes?.length > 0,
     onlyExpectedFunds,
   });
   const currentViewCount = views.find(v => v.id === queryFilter.activeViewId)?.count;
@@ -948,8 +1031,22 @@ const getContributionActions: (opts: GetContributionActionsOptions) => GetAction
       return null;
     }
 
+    const transactionsUrl = getTransactionsUrl(opts.LoggedInUser, order);
+    transactionsUrl.searchParams.set('orderId', order.legacyId.toString());
+
     const actions: ReturnType<GetActions<any>> = {
-      primary: [],
+      primary: [
+        {
+          key: 'view-transactions',
+          label: (
+            <Link href={transactionsUrl.toString()} className="flex flex-row items-center gap-2.5">
+              <ArrowLeftRightIcon size={16} className="text-muted-foreground" />
+              <FormattedMessage defaultMessage="View transactions" id="DfQJQ6" />
+            </Link>
+          ),
+          onClick: () => {},
+        },
+      ],
       secondary: [],
     };
 

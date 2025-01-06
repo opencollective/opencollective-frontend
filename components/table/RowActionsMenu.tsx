@@ -56,6 +56,7 @@ export function RowActionsMenu<TData>({ row, actionsMenuTriggerRef, table }: Row
           size="icon-xs"
           variant="outline"
           className="border-transparent text-muted-foreground hover:bg-white hover:text-foreground hover:shadow-sm group-hover/row:border-border data-[state=open]:border-border data-[state=open]:text-foreground"
+          data-cy="actions-menu-trigger"
         >
           <MoreHorizontal size={18} />
         </Button>

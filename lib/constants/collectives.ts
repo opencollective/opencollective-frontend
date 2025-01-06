@@ -1,6 +1,6 @@
 import { invert, omit } from 'lodash';
 
-import { AccountType } from '../graphql/types/v2/graphql';
+import { AccountType } from '../graphql/types/v2/schema';
 
 export const CollectiveType = {
   COLLECTIVE: 'COLLECTIVE',

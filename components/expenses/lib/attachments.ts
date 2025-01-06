@@ -1,4 +1,4 @@
-import { ExpenseType } from '../../../lib/graphql/types/v2/graphql';
+import { ExpenseType } from '../../../lib/graphql/types/v2/schema';
 
 import { DROPZONE_ACCEPT_ALL } from '../../StyledDropzone';
 

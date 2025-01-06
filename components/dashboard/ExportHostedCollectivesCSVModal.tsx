@@ -21,11 +21,8 @@ import {
 } from '../../lib/export-csv/hosted-collectives-csv';
 import type { CSVField } from '../../lib/export-csv/transactions-csv';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import type {
-  Account,
-  HostReportsPageQueryVariables,
-  TransactionsPageQueryVariables,
-} from '../../lib/graphql/types/v2/graphql';
+import type { HostReportsPageQueryVariables, TransactionsPageQueryVariables } from '../../lib/graphql/types/v2/graphql';
+import type { Account } from '../../lib/graphql/types/v2/schema';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import type { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';

@@ -1,13 +1,12 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { get } from 'lodash';
+import { get, omit, pick } from 'lodash';
 import { withRouter } from 'next/router';
 import { injectIntl } from 'react-intl';
 
-import { GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES } from '../../lib/constants/payment-methods';
 import { generateNotFoundError, getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
+import { PaymentMethodLegacyType } from '../../lib/graphql/types/v2/schema';
 import { addParentToURLIfMissing } from '../../lib/url-helpers';
 
 import CollectiveThemeProvider from '../../components/CollectiveThemeProvider';
@@ -24,7 +23,17 @@ import Loading from '../../components/Loading';
 import { withStripeLoader } from '../../components/StripeProvider';
 import { withUser } from '../../components/UserProvider';
 
-class EmbedContributionFlowPage extends React.Component {
+class EmbedContributionFlowPage extends React.Component<{
+  router: any;
+  collectiveSlug: string;
+  tierId: number;
+  error: string;
+  queryParams: Record<string, unknown>;
+  loadStripe: () => void;
+  intl: any;
+  LoggedInUser: any;
+  data: Record<string, any>;
+}> {
   static getInitialProps({ query, res }) {
     if (res) {
       res.removeHeader('X-Frame-Options');
@@ -40,27 +49,6 @@ class EmbedContributionFlowPage extends React.Component {
     };
   }
 
-  static propTypes = {
-    collectiveSlug: PropTypes.string.isRequired,
-    tierId: PropTypes.number,
-    error: PropTypes.string,
-    data: PropTypes.shape({
-      loading: PropTypes.bool,
-      error: PropTypes.any,
-      account: PropTypes.object,
-      tier: PropTypes.object,
-    }), // from withData
-    intl: PropTypes.object,
-    loadStripe: PropTypes.func,
-    LoggedInUser: PropTypes.object,
-    loadingLoggedInUser: PropTypes.bool,
-    router: PropTypes.object,
-    queryParams: PropTypes.shape({
-      useTheme: PropTypes.bool,
-      backgroundColor: PropTypes.string,
-    }),
-  };
-
   componentDidMount() {
     this.loadExternalScripts();
     const { router, data } = this.props;
@@ -68,6 +56,8 @@ class EmbedContributionFlowPage extends React.Component {
     const path = router.asPath;
     const rawPath = path.replace(new RegExp(`^/embed/${account?.slug}/`), '/');
     addParentToURLIfMissing(router, account, rawPath, undefined, { prefix: '/embed' });
+    this.postMessage('initialized');
+    window.addEventListener('resize', this.onResize);
   }
 
   componentDidUpdate(prevProps) {
@@ -77,9 +67,34 @@ class EmbedContributionFlowPage extends React.Component {
     }
   }
 
+  componentWillUnmount(): void {
+    window.removeEventListener('resize', this.onResize);
+  }
+
+  onResize = () => {
+    this.postMessage('resized');
+  };
+
+  postMessage(event, payload = null) {
+    if (window.parent) {
+      try {
+        const size = { height: document.body.scrollHeight, width: document.body.scrollWidth };
+        const message = { event, size };
+        if (payload) {
+          message['payload'] = payload;
+        }
+
+        window.parent.postMessage(message, '*');
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error('Post message failed', e);
+      }
+    }
+  }
+
   loadExternalScripts() {
     const supportedPaymentMethods = get(this.props.data, 'account.host.supportedPaymentMethods', []);
-    if (supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.CREDIT_CARD)) {
+    if (supportedPaymentMethods.includes(PaymentMethodLegacyType.CREDIT_CARD)) {
       this.props.loadStripe();
     }
   }
@@ -93,10 +108,10 @@ class EmbedContributionFlowPage extends React.Component {
   }
 
   renderPageContent() {
-    const { data = {}, LoggedInUser } = this.props;
-    const { account, tier } = data;
+    const { data, LoggedInUser } = this.props;
+    const { account, tier, loading } = data || {};
 
-    if (data.loading) {
+    if (loading) {
       return (
         <Container py={[5, 6]}>
           <Loading />
@@ -116,6 +131,28 @@ class EmbedContributionFlowPage extends React.Component {
             host={account.host}
             tier={tier}
             error={this.props.error}
+            onStepChange={step =>
+              this.postMessage('stepChange', {
+                step,
+                height: document.body.scrollHeight,
+                width: document.body.scrollWidth,
+              })
+            }
+            onSuccess={order =>
+              this.postMessage('success', {
+                order: {
+                  id: order.id,
+                  legacyId: order.legacyId,
+                  status: order.status,
+                  frequency: order.frequency,
+                  amount: omit(order.amount, ['__typename']),
+                  platformTipAmount: omit(order.platformTipAmount, ['__typename']),
+                  tier: order.tier ? pick(order.tier, ['id']) : null,
+                  fromAccount: pick(order.fromAccount, ['id']),
+                  toAccount: pick(order.toAccount, ['id']),
+                },
+              })
+            }
           />
         </Box>
       );
@@ -141,7 +178,7 @@ class EmbedContributionFlowPage extends React.Component {
 }
 
 const addContributionFlowData = graphql(contributionFlowAccountQuery, {
-  options: props => ({
+  options: (props: { collectiveSlug: string; tierId: number }) => ({
     variables: { collectiveSlug: props.collectiveSlug, tierId: props.tierId, includeTier: Boolean(props.tierId) },
     context: API_V2_CONTEXT,
   }),

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { TwoFactorMethod } from '../../lib/graphql/types/v2/graphql';
+import { TwoFactorMethod } from '../../lib/graphql/types/v2/schema';
 
 import { TwoFactorAuthenticationSettings } from '../../components/two-factor-authentication/TwoFactorAuthenticationSettings';
 

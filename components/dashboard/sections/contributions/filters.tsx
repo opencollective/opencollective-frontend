@@ -6,31 +6,18 @@ import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib
 import { integer, isMulti } from '../../../../lib/filters/schemas';
 import type { Currency, DashboardRecurringContributionsQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import { ContributionFrequency, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
-import i18nOrderStatus from '../../../../lib/i18n/order-status';
+import { i18nFrequency, i18nOrderStatus } from '../../../../lib/i18n/order';
 import { sortSelectOptions } from '../../../../lib/utils';
 
 import { amountFilter } from '../../filters/AmountFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
-import { expectedDateFilter, orderDateFilter } from '../../filters/DateFilter';
+import { expectedDateFilter, orderChargeDateFilter, orderCreateDateFilter } from '../../filters/DateFilter';
 import { expectedFundsFilter } from '../../filters/ExpectedFundsFilter';
 import { searchFilter } from '../../filters/SearchFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
 
-// Pseudo type filter
-export enum OrderTypeFilter {
-  RECURRING = 'RECURRING',
-  ONETIME = 'ONETIME',
-}
-const i18nOrderType = (intl, value) => {
-  const langs = {
-    [OrderTypeFilter.RECURRING]: intl.formatMessage({ defaultMessage: 'Recurring', id: 'v84fNv' }),
-    [OrderTypeFilter.ONETIME]: intl.formatMessage({ defaultMessage: 'One-time', id: '/Zj5Ed' }),
-  };
-  return langs[value] ?? value;
-};
-
 export const contributionsOrderFilter = buildSortFilter({
-  fieldSchema: z.enum(['LAST_CHARGED_AT']),
+  fieldSchema: z.enum(['LAST_CHARGED_AT', 'CREATED_AT']),
   defaultValue: {
     field: 'LAST_CHARGED_AT',
     direction: 'DESC',
@@ -39,6 +26,10 @@ export const contributionsOrderFilter = buildSortFilter({
     LAST_CHARGED_AT: defineMessage({
       id: 'Contribution.ChargeDate',
       defaultMessage: 'Charge Date',
+    }),
+    CREATED_AT: defineMessage({
+      id: 'Contribution.CreationDate',
+      defaultMessage: 'Creation Date',
     }),
   },
 });
@@ -51,18 +42,21 @@ export const schema = z.object({
   orderBy: contributionsOrderFilter.schema,
   searchTerm: searchFilter.schema,
   expectedDate: expectedDateFilter.schema,
-  date: orderDateFilter.schema,
+  chargeDate: orderChargeDateFilter.schema,
+  date: orderCreateDateFilter.schema,
   expectedFundsFilter: expectedFundsFilter.schema,
   amount: amountFilter.schema,
   status: isMulti(z.nativeEnum(OrderStatus)).optional(),
-  type: z.nativeEnum(OrderTypeFilter).optional(),
+  frequency: isMulti(z.nativeEnum(ContributionFrequency)).optional(),
   paymentMethod: z.string().optional(),
+  tier: isMulti(z.string()).optional(),
 });
 
 type FilterValues = z.infer<typeof schema>;
 
 export type FilterMeta = {
   currency?: Currency;
+  tierOptions?: Array<{ label: string; value: string }>;
 };
 
 type GraphQLQueryVariables = DashboardRecurringContributionsQueryVariables;
@@ -72,35 +66,27 @@ type GraphQLQueryVariables = DashboardRecurringContributionsQueryVariables;
 export const toVariables: FiltersToVariables<FilterValues, GraphQLQueryVariables, FilterMeta> = {
   orderBy: contributionsOrderFilter.toVariables,
   expectedDate: expectedDateFilter.toVariables,
-  date: orderDateFilter.toVariables,
+  chargeDate: orderChargeDateFilter.toVariables,
+  date: orderCreateDateFilter.toVariables,
   amount: amountFilter.toVariables,
-  type: (value: OrderTypeFilter) => {
-    switch (value) {
-      case OrderTypeFilter.RECURRING:
-        return {
-          onlySubscriptions: true,
-        };
-      case OrderTypeFilter.ONETIME:
-        return {
-          frequency: ContributionFrequency.ONETIME,
-        };
-    }
-  },
   paymentMethod: (value: string) => {
     if (value) {
       return { paymentMethod: { id: value } };
     }
-
     return null;
+  },
+  tier: (value: [string]) => {
+    return { tier: value.map(id => ({ id })) };
   },
 };
 
 export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   searchTerm: searchFilter.filter,
   expectedDate: expectedDateFilter.filter,
-  date: orderDateFilter.filter,
+  chargeDate: orderChargeDateFilter.filter,
+  date: orderCreateDateFilter.filter,
   expectedFundsFilter: expectedFundsFilter.filter,
-  amount: { ...amountFilter.filter, labelMsg: defineMessage({ id: 'TotalAmount', defaultMessage: 'Total amount' }) },
+  amount: { ...amountFilter.filter, labelMsg: defineMessage({ id: 'Fields.amount', defaultMessage: 'Amount' }) },
   orderBy: contributionsOrderFilter.filter,
   status: {
     labelMsg: defineMessage({ defaultMessage: 'Status', id: 'tzMNF3' }),
@@ -109,22 +95,31 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
         options={Object.values(OrderStatus)
           .map(value => ({ label: valueRenderer({ intl, value }), value }))
           .sort(sortSelectOptions)}
+        isMulti
         {...props}
       />
     ),
     valueRenderer: ({ intl, value }) => i18nOrderStatus(intl, value),
   },
-  type: {
-    labelMsg: defineMessage({ id: 'expense.type', defaultMessage: 'Type' }),
+  tier: {
+    labelMsg: defineMessage({ defaultMessage: 'Tier', id: 'b07w+D' }),
+    Component: ({ meta, ...props }) => {
+      return <ComboSelectFilter options={meta.tierOptions} isMulti {...props} />;
+    },
+    valueRenderer: ({ value, meta }) => meta.tierOptions?.find(tier => tier.value === value)?.label ?? value,
+  },
+  frequency: {
+    labelMsg: defineMessage({ id: 'Frequency', defaultMessage: 'Frequency' }),
     Component: ({ valueRenderer, intl, ...props }) => (
       <ComboSelectFilter
-        options={Object.values(OrderTypeFilter)
+        options={Object.values(ContributionFrequency)
           .map(value => ({ label: valueRenderer({ value, intl }), value }))
           .sort(sortSelectOptions)}
+        isMulti
         {...props}
       />
     ),
-    valueRenderer: ({ value, intl }) => i18nOrderType(intl, value),
+    valueRenderer: ({ value, intl }) => i18nFrequency(intl, value),
   },
   paymentMethod: {
     labelMsg: defineMessage({ id: 'paymentmethod.label', defaultMessage: 'Payment Method' }),

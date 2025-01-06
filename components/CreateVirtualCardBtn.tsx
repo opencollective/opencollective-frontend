@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import type { Account } from '../lib/graphql/types/v2/graphql';
+import type { Account } from '../lib/graphql/types/v2/schema';
 
 import EditVirtualCardModal from './edit-collective/EditVirtualCardModal';
 import { useToast } from './ui/useToast';

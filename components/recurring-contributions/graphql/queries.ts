@@ -69,11 +69,6 @@ export const managedOrderFragment = gql`
       canSetTags
       canUpdateAccountingCategory
     }
-    totalDonations {
-      value
-      valueInCents
-      currency
-    }
     fromAccount {
       id
       name
@@ -167,6 +162,11 @@ export const manageContributionsQuery = gql`
         nodes {
           id
           ...ManagedOrderFields
+          totalDonations {
+            value
+            valueInCents
+            currency
+          }
         }
       }
     }

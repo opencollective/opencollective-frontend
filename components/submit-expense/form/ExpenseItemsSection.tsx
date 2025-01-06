@@ -5,8 +5,8 @@ import { Lock, Trash2 } from 'lucide-react';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import type { Currency, CurrencyExchangeRateInput } from '../../../lib/graphql/types/v2/graphql';
-import { CurrencyExchangeRateSourceType } from '../../../lib/graphql/types/v2/graphql';
+import type { Currency, CurrencyExchangeRateInput } from '../../../lib/graphql/types/v2/schema';
+import { CurrencyExchangeRateSourceType } from '../../../lib/graphql/types/v2/schema';
 import { i18nTaxType } from '../../../lib/i18n/taxes';
 import { attachmentDropzoneParams } from '../../expenses/lib/attachments';
 import {
@@ -232,7 +232,7 @@ function ExpenseItem(props: ExpenseItemProps) {
         <div className="flex-grow">
           <div className="mb-2">
             <StyledInputFormikField
-              isFastField
+              required={props.form.options.isAdminOfPayee}
               label={intl.formatMessage({ defaultMessage: 'Item Description', id: 'xNL/oy' })}
               placeholder={intl.formatMessage({ defaultMessage: 'Enter what best describes the item', id: '/eapvj' })}
               name={`expenseItems.${props.index}.description`}
@@ -241,7 +241,7 @@ function ExpenseItem(props: ExpenseItemProps) {
           <div className="flex gap-4">
             <div className="flex-grow basis-0">
               <StyledInputFormikField
-                isFastField
+                required={props.form.options.isAdminOfPayee}
                 label={intl.formatMessage({ defaultMessage: 'Date', id: 'expense.incurredAt' })}
                 name={`expenseItems.${props.index}.incurredAt`}
               >

@@ -9,7 +9,7 @@ import { Loader2, Search } from 'lucide-react';
 
 import { cn } from '../../lib/utils';
 
-import { Dialog, DialogContent } from './Dialog';
+import { Dialog, DialogContent, DialogDescription } from './Dialog';
 import { Skeleton } from './Skeleton';
 
 const Command = React.forwardRef<
@@ -30,12 +30,14 @@ Command.displayName = CommandPrimitive.displayName;
 interface CommandDialogProps extends DialogProps {
   shouldFilter?: boolean;
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  description?: string;
 }
 
-const CommandDialog = ({ children, shouldFilter, onKeyDown, ...props }: CommandDialogProps) => {
+const CommandDialog = ({ children, shouldFilter, onKeyDown, description, ...props }: CommandDialogProps) => {
   return (
     <Dialog {...props}>
       <DialogContent hideCloseButton className="overflow-hidden p-0 shadow-lg">
+        {description && <DialogDescription className="hidden">{description}</DialogDescription>}
         <Command
           onKeyDown={onKeyDown}
           shouldFilter={shouldFilter}

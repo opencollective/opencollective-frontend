@@ -14,15 +14,14 @@ import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type {
   CreateExpenseFromDashboardMutation,
   CreateExpenseFromDashboardMutationVariables,
-  Currency,
   CurrencyExchangeRateInput,
   EditExpenseFromDashboardMutation,
   EditExpenseFromDashboardMutationVariables,
   InviteExpenseFromDashboardMutation,
   InviteExpenseFromDashboardMutationVariables,
-  RecurringExpenseInterval,
 } from '../../lib/graphql/types/v2/graphql';
-import { ExpenseStatus, ExpenseType, PayoutMethodType } from '../../lib/graphql/types/v2/graphql';
+import type { Currency, RecurringExpenseInterval } from '../../lib/graphql/types/v2/schema';
+import { ExpenseStatus, ExpenseType, PayoutMethodType } from '../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
 import { Survey, SURVEY_KEY } from '../Survey';
@@ -134,6 +133,16 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
       try {
         track(AnalyticsEvent.EXPENSE_SUBMISSION_SUBMITTED);
 
+        const attachedFiles = values.additionalAttachments.map(a => ({
+          url: typeof a === 'string' ? a : a?.url,
+        }));
+
+        if (values.hasInvoiceOption === YesNoOption.YES) {
+          attachedFiles.push({
+            url: typeof values.invoiceFile === 'string' ? values.invoiceFile : values.invoiceFile?.url,
+          });
+        }
+
         const expenseInput: CreateExpenseFromDashboardMutationVariables['expenseCreateInput'] = {
           description: values.title,
           reference:
@@ -156,9 +165,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
                 id: values.accountingCategoryId,
               }
             : null,
-          attachedFiles: values.additionalAttachments.map(a => ({
-            url: typeof a === 'string' ? a : a?.url,
-          })),
+          attachedFiles,
           currency: formOptions.expenseCurrency,
           customData: null,
           invoiceInfo: null,

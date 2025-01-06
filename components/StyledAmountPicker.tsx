@@ -3,7 +3,7 @@ import { css } from '@styled-system/css';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import type { Currency as CurrencyEnum } from '../lib/graphql/types/v2/graphql';
+import type { Currency as CurrencyEnum } from '../lib/graphql/types/v2/schema';
 
 import Currency from './Currency';
 import { Flex } from './Grid';

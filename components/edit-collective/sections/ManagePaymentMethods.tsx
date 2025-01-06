@@ -11,11 +11,11 @@ import { PAYMENT_METHOD_TYPE } from '../../../lib/constants/payment-methods';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT, gql, gqlV1 } from '../../../lib/graphql/helpers';
 import type {
-  Account,
   ConfirmOrderMutation,
   ManagePaymentMethodsQuery,
   ManagePaymentMethodsQueryVariables,
 } from '../../../lib/graphql/types/v2/graphql';
+import type { Account } from '../../../lib/graphql/types/v2/schema';
 import { getPaymentMethodName } from '../../../lib/payment_method_label';
 import {
   getPaymentMethodIcon,
@@ -155,7 +155,7 @@ export default function ManagePaymentMethods(props: ManagePaymentMethodsProps) {
               id="Order.Confirm.Success"
               defaultMessage="Your payment method has now been confirmed and the payment successfully went through."
             />
-            <StyledButton buttonSize="tiny" onClick={dismissOrderConfirmationMessage}>
+            <StyledButton ml={2} buttonSize="tiny" onClick={dismissOrderConfirmationMessage}>
               <FormattedMessage defaultMessage="Dismiss" id="TDaF6J" />
             </StyledButton>
           </div>

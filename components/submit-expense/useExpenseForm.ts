@@ -17,7 +17,6 @@ import { AccountTypesWithHost } from '../../lib/constants/collectives';
 import { getPayoutProfiles } from '../../lib/expenses';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type {
-  Amount,
   ExpenseFormExchangeRatesQuery,
   ExpenseFormExchangeRatesQueryVariables,
   ExpenseFormSchemaHostFieldsFragment,
@@ -26,7 +25,8 @@ import type {
   ExpenseVendorFieldsFragment,
   LocationInput,
 } from '../../lib/graphql/types/v2/graphql';
-import { Currency, ExpenseStatus, ExpenseType, PayoutMethodType } from '../../lib/graphql/types/v2/graphql';
+import type { Amount } from '../../lib/graphql/types/v2/schema';
+import { Currency, ExpenseStatus, ExpenseType, PayoutMethodType } from '../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import type LoggedInUser from '../../lib/LoggedInUser';
 import { isValidEmail } from '../../lib/utils';
@@ -670,7 +670,11 @@ function buildFormSchema(
       ])
       .refine(
         attachment => {
-          if (values.expenseTypeOption === ExpenseType.INVOICE && values.hasInvoiceOption === YesNoOption.YES) {
+          if (
+            options.isAdminOfPayee &&
+            values.expenseTypeOption === ExpenseType.INVOICE &&
+            values.hasInvoiceOption === YesNoOption.YES
+          ) {
             return typeof attachment === 'string' ? !!attachment : !!attachment?.url;
           }
           return true;
@@ -684,7 +688,11 @@ function buildFormSchema(
       .nullish()
       .refine(
         invoiceNumber => {
-          if (values.expenseTypeOption === ExpenseType.INVOICE && values.hasInvoiceOption === YesNoOption.YES) {
+          if (
+            options.isAdminOfPayee &&
+            values.expenseTypeOption === ExpenseType.INVOICE &&
+            values.hasInvoiceOption === YesNoOption.YES
+          ) {
             return !!invoiceNumber;
           }
           return true;
@@ -696,14 +704,29 @@ function buildFormSchema(
     expenseItems: z.array(
       z
         .object({
-          description: z.string().min(1),
+          description: z
+            .string()
+            .nullish()
+            .refine(
+              v => {
+                if (!options.isAdminOfPayee) {
+                  return true;
+                }
+
+                return v.length > 0;
+              },
+              {
+                message: 'Required',
+              },
+            ),
           attachment: z
             .union([
-              z.string().url().nullish(),
+              z.string().nullish(),
               z.object({
-                url: z.string().url().nullish(),
+                url: z.string().nullish(),
               }),
             ])
+            .nullish()
             .refine(
               attachment => {
                 if (values.expenseTypeOption === ExpenseType.INVOICE) {
@@ -891,7 +914,7 @@ function buildFormSchema(
         .nullish()
         .refine(
           type => {
-            if (!values.payoutMethodId || values.payoutMethodId === '__newPayoutMethod') {
+            if (options.isAdminOfPayee && (!values.payoutMethodId || values.payoutMethodId === '__newPayoutMethod')) {
               return !!type;
             }
 

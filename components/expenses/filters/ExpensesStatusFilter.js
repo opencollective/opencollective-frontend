@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 
-import { ExpenseStatus } from '../../../lib/graphql/types/v2/graphql';
+import { ExpenseStatus } from '../../../lib/graphql/types/v2/schema';
 import { i18nExpenseStatus } from '../../../lib/i18n/expense';
 import { sortSelectOptions } from '../../../lib/utils';
 

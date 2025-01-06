@@ -26,11 +26,10 @@ import type { FilterConfig } from '../../../../lib/filters/filter-types';
 import { integer } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import {
-  type Amount,
   type TransactionsImportQuery,
   type TransactionsImportQueryVariables,
-  TransactionsImportRowStatus,
 } from '../../../../lib/graphql/types/v2/graphql';
+import { type Amount, TransactionsImportRowStatus } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nTransactionsRowStatus } from '../../../../lib/i18n/transactions-import-row';
 import { cn, sortSelectOptions } from '../../../../lib/utils';

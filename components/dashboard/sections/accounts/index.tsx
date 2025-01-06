@@ -11,10 +11,10 @@ import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib
 import { integer } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type {
-  Collective,
   DashboardAccountsQueryFieldsFragment,
   HostedCollectivesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
+import type { Account, Collective } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
 import { Drawer } from '../../../Drawer';
@@ -57,9 +57,7 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
 const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
   const intl = useIntl();
   const router = useRouter();
-  const [showCollectiveOverview, setShowCollectiveOverview] = React.useState<Collective | undefined | string>(
-    subpath[0],
-  );
+  const [showCollectiveOverview, setShowCollectiveOverview] = React.useState<Account | undefined | string>(subpath[0]);
   const [showInternalTransferModal, setShowInternalTransferModal] = React.useState(false);
   const { data: metadata, refetch: refetchMetadata } = useQuery(accountsMetadataQuery, {
     variables: { accountSlug },
