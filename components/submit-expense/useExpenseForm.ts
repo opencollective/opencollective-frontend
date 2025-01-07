@@ -1471,9 +1471,7 @@ export function useExpenseForm(opts: {
       setFieldValue(
         'expenseItems',
         formOptions.expense.items?.map(ei => ({
-          attachment: ei.url,
-          url: ei.url, // !startOptions.current.duplicateExpense ? ei.url : null,
-          // url: !startOptions.current.duplicateExpense ? ei.url : null,
+          attachment: !startOptions.current.duplicateExpense ? ei.url : null,
           description: ei.description ?? '',
           incurredAt: !startOptions.current.duplicateExpense
             ? dayjs.utc(ei.incurredAt).toISOString().substring(0, 10)
