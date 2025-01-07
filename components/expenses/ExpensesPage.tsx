@@ -206,7 +206,6 @@ const Expenses = props => {
                     <FormattedMessage id="Tags" defaultMessage="Tags" />
                   </H5>
                   <Tags
-                    isLoading={loading}
                     expense={{
                       tags: data?.account?.expensesTags.map(({ tag }) => tag),
                     }}

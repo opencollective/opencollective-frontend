@@ -416,7 +416,6 @@ function RecurrenceOptionBox(props: { form: ExpenseForm }) {
 
   const recurrenceFrequency = isEditingRecurrence ? recurrenceFrequencyEdit : props.form.values.recurrenceFrequency;
   const recurrenceEndAt = isEditingRecurrence ? recurrenceEndAtEdit : props.form.values.recurrenceEndAt;
-
   const { setFieldValue } = props.form;
   React.useEffect(() => {
     if (props.form.values.expenseItems.length === 1 && !props.form.touched.title) {

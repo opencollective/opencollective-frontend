@@ -514,6 +514,7 @@ const formSchemaQuery = gql`
 type ExpenseFormOptions = {
   schema: z.ZodType<RecursivePartial<ExpenseFormValues>, ZodObjectDef, RecursivePartial<ExpenseFormValues>>;
   supportedExpenseTypes?: ExpenseType[];
+  allowInvite?: boolean;
   payoutProfiles?: ExpenseFormSchemaQuery['loggedInAccount'][];
   payoutMethods?: ExpenseFormSchemaQuery['loggedInAccount']['payoutMethods'];
   payoutMethod?:
@@ -570,8 +571,9 @@ function buildFormSchema(
   values: ExpenseFormValues,
   options: Omit<ExpenseFormOptions, 'schema'>,
   intl: IntlShape,
+  pickSchemaFields?: Record<string, boolean>,
 ): z.ZodType<RecursivePartial<ExpenseFormValues>, z.ZodObjectDef, RecursivePartial<ExpenseFormValues>> {
-  return z.object({
+  const schema = z.object({
     accountSlug: z
       .string()
       .nullish()
@@ -1140,6 +1142,8 @@ function buildFormSchema(
         ),
     }),
   });
+
+  return pickSchemaFields ? schema.pick(pickSchemaFields as { [K in keyof z.infer<typeof schema>]?: true }) : schema;
 }
 
 function getPayeeSlug(values: ExpenseFormValues): string {
@@ -1187,7 +1191,6 @@ async function buildFormOptions(
     );
 
     const expense = query.data?.expense;
-
     if (expense) {
       options.expense = query.data.expense;
     }
@@ -1195,7 +1198,8 @@ async function buildFormOptions(
     const recentlySubmittedExpenses = query.data?.recentlySubmittedExpenses;
     const account = values.accountSlug ? query.data?.account : options.expense?.account;
     const host = account && 'host' in account ? account.host : null;
-    const payee = options.expense?.payee || query.data?.payee;
+    const payee = query.data?.payee || options.expense?.payee;
+
     const payeeHost = payee && 'host' in payee ? payee.host : null;
     const submitter = options.expense?.submitter || query.data?.submitter;
 
@@ -1267,7 +1271,9 @@ async function buildFormOptions(
         options.payoutMethod = values.newPayoutMethod;
       }
 
-      options.isAdminOfPayee = options.payoutProfiles.some(p => p.slug === values.payeeSlug);
+      // Allow setting this flag to true with the `isInlineEdit` flag in start options to enable full editing experience (i.e. editing payotu method)
+      options.isAdminOfPayee =
+        startOptions.isInlineEdit || options.payoutProfiles.some(p => p.slug === values.payeeSlug);
     }
 
     if (options.payoutMethod) {
@@ -1277,6 +1283,8 @@ async function buildFormOptions(
     }
 
     options.allowExpenseItemAttachment = values.expenseTypeOption === ExpenseType.RECEIPT;
+
+    options.allowInvite = !startOptions.isInlineEdit;
 
     if (values.expenseTypeOption === ExpenseType.INVOICE) {
       if (accountHasVAT(account as any, host as any)) {
@@ -1300,7 +1308,7 @@ async function buildFormOptions(
       options.totalInvoicedInExpenseCurrency = totalInvoiced;
     }
 
-    options.schema = buildFormSchema(values, options, intl);
+    options.schema = buildFormSchema(values, options, intl, startOptions.pickSchemaFields);
 
     return options;
   } catch (err) {
@@ -1334,6 +1342,8 @@ type ExpenseFormStartOptions = {
   duplicateExpense?: boolean;
   expenseId?: number;
   draftKey?: string;
+  isInlineEdit?: boolean;
+  pickSchemaFields?: Record<string, boolean>;
 };
 
 export function useExpenseForm(opts: {
@@ -1461,7 +1471,7 @@ export function useExpenseForm(opts: {
       setFieldValue(
         'expenseItems',
         formOptions.expense.items?.map(ei => ({
-          url: !startOptions.current.duplicateExpense ? ei.url : null,
+          attachment: !startOptions.current.duplicateExpense ? ei.url : null,
           description: ei.description ?? '',
           incurredAt: !startOptions.current.duplicateExpense
             ? dayjs.utc(ei.incurredAt).toISOString().substring(0, 10)

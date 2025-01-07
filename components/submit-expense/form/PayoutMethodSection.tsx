@@ -36,6 +36,19 @@ type PayoutMethodSectionProps = {
 };
 
 export function PayoutMethodSection(props: PayoutMethodSectionProps) {
+  return (
+    <FormSectionContainer
+      step={Step.PAYOUT_METHOD}
+      form={props.form}
+      inViewChange={props.inViewChange}
+      title={<FormattedMessage defaultMessage="Select a payout method" id="Ri4REE" />}
+    >
+      <PayoutMethodFormContent form={props.form} />
+    </FormSectionContainer>
+  );
+}
+
+export function PayoutMethodFormContent(props) {
   const [lastUsedPayoutMethod, setLastUsedPayoutMethod] =
     React.useState<ExpenseForm['options']['payoutMethods'][number]>(null);
 
@@ -102,12 +115,7 @@ export function PayoutMethodSection(props: PayoutMethodSectionProps) {
     !props.form.values.payoutMethodId || props.form.values.payoutMethodId === '__newPayoutMethod';
 
   return (
-    <FormSectionContainer
-      step={Step.PAYOUT_METHOD}
-      form={props.form}
-      inViewChange={props.inViewChange}
-      title={<FormattedMessage defaultMessage="Select a payout method" id="Ri4REE" />}
-    >
+    <div>
       {!props.form.initialLoading &&
       !isLoading &&
       !isPickingProfileAdministered &&
@@ -163,7 +171,7 @@ export function PayoutMethodSection(props: PayoutMethodSectionProps) {
           </RadioGroupCard>
         </RadioGroup>
       )}
-    </FormSectionContainer>
+    </div>
   );
 }
 
