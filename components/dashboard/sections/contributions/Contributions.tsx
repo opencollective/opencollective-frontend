@@ -129,14 +129,7 @@ const dashboardContributionsMetadataQuery = gql`
           hostFeePercent
         }
       }
-      ALL: orders(
-        filter: $filter
-        expectedFundsFilter: $expectedFundsFilter
-        includeHostedAccounts: $includeHostedAccounts
-        includeChildrenAccounts: $includeChildrenAccounts
-      ) {
-        totalCount
-      }
+
       PENDING: orders(
         filter: $filter
         expectedFundsFilter: $expectedFundsFilter
@@ -622,7 +615,6 @@ const Contributions = ({
     {
       id: ContributionsTab.ALL,
       label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
-      count: metadata?.account?.ALL.totalCount,
       filter: {
         ...(onlyExpectedFunds ? { expectedFundsFilter: ExpectedFundsFilter.ALL_EXPECTED_FUNDS } : {}),
       },
