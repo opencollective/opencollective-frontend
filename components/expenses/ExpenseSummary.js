@@ -123,7 +123,7 @@ const ExpenseSummary = ({
   const isViewingExpenseInHostContext = isLoggedInUserExpenseHostAdmin && !isLoggedInUserExpenseAdmin;
   const useInlineExpenseEdit =
     LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) &&
-    expense?.permissions.canEdit &&
+    expense?.permissions?.canEdit &&
     expense?.type !== ExpenseType.GRANT &&
     expense?.status !== ExpenseStatus.DRAFT;
 
