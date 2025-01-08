@@ -8,6 +8,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
 import useKeyBoardShortcut, { ARROW_LEFT_KEY, ARROW_RIGHT_KEY } from '../lib/hooks/useKeyboardKey';
+import { generateDownloadUrlForFileUrl } from '../lib/image-utils';
 
 import { Dialog, DialogOverlay } from './ui/Dialog';
 import { Box, Flex } from './Grid';
@@ -250,13 +251,7 @@ export default function FilesViewerModal({
                 content={intl.formatMessage({ id: 'Download', defaultMessage: 'Download' })}
                 delayHide={0}
               >
-                <ButtonLink
-                  /* To enable downloading files from S3 directly we're using a /api/download-file endpoint
-                 to stream the file and set the correct headers. */
-                  href={`/api/download-file?url=${encodeURIComponent(selectedItem?.url)}`}
-                  download
-                  target="_blank"
-                >
+                <ButtonLink href={generateDownloadUrlForFileUrl(selectedItem?.url)} download target="_blank">
                   <Download size={24} />
                 </ButtonLink>
               </StyledTooltip>
