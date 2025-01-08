@@ -1,9 +1,9 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import type { Currency } from '../../../../lib/graphql/types/v2/schema';
+import type { Currency } from '@/lib/graphql/types/v2/schema';
 
-import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
+import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
 
 import type { AmountFilterValueType } from './schema';
 import { AmountFilterType } from './schema';
