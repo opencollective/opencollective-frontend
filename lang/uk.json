@@ -688,7 +688,7 @@
   "collective.category.coop": "Кооператив",
   "collective.category.meetup": "Зустріч",
   "collective.category.movement": "Рух",
-  "collective.company.description": "Start with @ to reference an organization (e.g., @airbnb)",
+  "collective.company.description": "Use this field to publicly display your affiliations. Start with @ to mention an organization registered on Open Collective, e.g., @airbnb.",
   "collective.company.label": "компанія",
   "collective.connectedAccounts.disconnect.button": "Від’єднати",
   "collective.connectedAccounts.github.description": "Під'єднайте обліковий запис GitHub, щоб підтвердити вашу особу та додати його до вашого профілю",

@@ -688,7 +688,7 @@
   "collective.category.coop": "協同組合",
   "collective.category.meetup": "ミートアップ",
   "collective.category.movement": "ムーブメント",
-  "collective.company.description": "組織を参照する場合は @ で始めてください (例: @airbnb)",
+  "collective.company.description": "Use this field to publicly display your affiliations. Start with @ to mention an organization registered on Open Collective, e.g., @airbnb.",
   "collective.company.label": "会社",
   "collective.connectedAccounts.disconnect.button": "切断",
   "collective.connectedAccounts.github.description": "GitHub アカウントと連携して本人確認をして、プロフィールに追加します",
