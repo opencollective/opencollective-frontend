@@ -688,7 +688,7 @@
   "collective.category.coop": "조합",
   "collective.category.meetup": "모임",
   "collective.category.movement": "운동",
-  "collective.company.description": "Start with @ to reference an organization (e.g., @airbnb)",
+  "collective.company.description": "Use this field to publicly display your affiliations. Start with @ to mention an organization registered on Open Collective, e.g., @airbnb.",
   "collective.company.label": "회사",
   "collective.connectedAccounts.disconnect.button": "연결 해제",
   "collective.connectedAccounts.github.description": "GitHub 계정을 연결해 사용자를 확인하고 프로필에 추가할 수 있습니다.",

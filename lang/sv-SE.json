@@ -688,7 +688,7 @@
   "collective.category.coop": "Kooperativ",
   "collective.category.meetup": "Meetup",
   "collective.category.movement": "Rörelse",
-  "collective.company.description": "Börja med @ för att hänvisa till en organisation (t.ex., @airbnb)",
+  "collective.company.description": "Use this field to publicly display your affiliations. Start with @ to mention an organization registered on Open Collective, e.g., @airbnb.",
   "collective.company.label": "företag",
   "collective.connectedAccounts.disconnect.button": "Koppla från",
   "collective.connectedAccounts.github.description": "Anslut ett GitHub-konto för att verifiera din identitet och för att länka till den från din profil",

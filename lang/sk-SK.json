@@ -688,7 +688,7 @@
   "collective.category.coop": "Družstvo",
   "collective.category.meetup": "Stretnutie",
   "collective.category.movement": "Hnutie",
-  "collective.company.description": "Ak si želáte odkázať na organizáciu, začnite znakom @ (napr. @airbnb)",
+  "collective.company.description": "Use this field to publicly display your affiliations. Start with @ to mention an organization registered on Open Collective, e.g., @airbnb.",
   "collective.company.label": "spoločnosť",
   "collective.connectedAccounts.disconnect.button": "Odpojiť sa",
   "collective.connectedAccounts.github.description": "Pripojte účet GitHub za účelom overenia vašej identity a pridajte ho do svojho profilu",

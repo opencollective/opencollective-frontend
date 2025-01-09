@@ -688,7 +688,7 @@
   "collective.category.coop": "Cooperative",
   "collective.category.meetup": "Meetup",
   "collective.category.movement": "Movement",
-  "collective.company.description": "Start with @ to reference an organization (e.g., @airbnb)",
+  "collective.company.description": "Use this field to publicly display your affiliations. Start with @ to mention an organization registered on Open Collective, e.g., @airbnb.",
   "collective.company.label": "company",
   "collective.connectedAccounts.disconnect.button": "Disconnect",
   "collective.connectedAccounts.github.description": "Connect a GitHub account to verify your identity and add it to your profile",
