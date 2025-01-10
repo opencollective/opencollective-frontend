@@ -287,25 +287,17 @@ export default function ExpensesPage(props: InferGetServerSidePropsType<typeof g
       return <ErrorPage data={data} error={error} />;
     } else if (!account || !data?.expenses?.nodes) {
       return <ErrorPage error={generateNotFoundError(props.collectiveSlug)} log={false} />;
-    } else if (!isFeatureSupported(data.account, FEATURES.RECEIVE_EXPENSES)) {
+    } else if (!isFeatureSupported(account, FEATURES.RECEIVE_EXPENSES)) {
       return <PageFeatureNotSupported showContactSupportLink />;
-    } else if (!loggedInUserCanAccessFinancialData(LoggedInUser, data.account)) {
+    } else if (!loggedInUserCanAccessFinancialData(LoggedInUser, account)) {
       // Hack for funds that want to keep their budget "private"
       return <PageFeatureNotSupported showContactSupportLink={false} />;
     }
   }
 
   return (
-    <Page
-      collective={data.account}
-      canonicalURL={`${getCollectivePageCanonicalURL(data.account)}/expenses`}
-      {...metadata}
-    >
-      <CollectiveNavbar
-        collective={data.account}
-        isLoading={!data.account}
-        selectedCategory={NAVBAR_CATEGORIES.BUDGET}
-      />
+    <Page collective={account} canonicalURL={`${getCollectivePageCanonicalURL(account)}/expenses`} {...metadata}>
+      <CollectiveNavbar collective={account} isLoading={!account} selectedCategory={NAVBAR_CATEGORIES.BUDGET} />
       <Container position="relative" minHeight={[null, 800]}>
         <Box maxWidth={Dimensions.MAX_SECTION_WIDTH} m="0 auto" px={[2, 3, 4]} py={[0, 5]}>
           <Expenses
