@@ -32,6 +32,7 @@ export const FEATURES = {
   MULTI_CURRENCY_EXPENSES: 'MULTI_CURRENCY_EXPENSES',
   AGREEMENTS: 'AGREEMENTS',
   TAX_FORMS: 'TAX_FORMS',
+  COMMUNITY_DASHBOARD: 'COMMUNITY_DASHBOARD',
   CONTACT_FORM: 'CONTACT_FORM',
   CONNECTED_ACCOUNTS: 'CONNECTED_ACCOUNTS',
   OFF_PLATFORM_TRANSACTIONS: 'OFF_PLATFORM_TRANSACTIONS',
@@ -58,6 +59,7 @@ const FEATURE_FLAGS = {
   [FEATURES.TRANSFERWISE_OTT]: 'settings.transferwise.ott',
   [FEATURES.ADMIN_PANEL]: 'settings.features.adminPanel',
   [FEATURES.RECURRING_EXPENSES]: 'settings.features.recurringExpenses',
+  [FEATURES.COMMUNITY_DASHBOARD]: 'settings.features.communityDashboard',
 };
 
 export const getFeatureStatus = (collective, feature) => {

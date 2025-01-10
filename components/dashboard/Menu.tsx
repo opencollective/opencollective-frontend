@@ -13,6 +13,7 @@ import {
   Globe2,
   HandCoins,
   HeartHandshake,
+  HeartHandshakeIcon,
   LayoutDashboard,
   Megaphone,
   Receipt,
@@ -43,6 +44,7 @@ import { DashboardContext } from './DashboardContext';
 import { MenuLink } from './MenuLink';
 
 const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT, INDIVIDUAL } = CollectiveType;
+const isDevelopment = process.env.NODE_ENV === 'development' || process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview';
 
 export type PageMenuItem = {
   type?: 'page';
@@ -306,6 +308,12 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       if: shouldIncludeMenuItemWithLegacyFallback(account, FEATURES.AGREEMENTS, isHost && canHostAccounts),
       Icon: Signature,
       label: intl.formatMessage({ id: 'Agreements', defaultMessage: 'Agreements' }),
+    },
+    {
+      if: (isHost || isSelfHosted) && (hasFeature(account, FEATURES.COMMUNITY_DASHBOARD) || isDevelopment),
+      label: intl.formatMessage({ id: 'community', defaultMessage: 'Community' }),
+      section: ALL_SECTIONS.HOST_COMMUNITY,
+      Icon: HeartHandshakeIcon,
     },
     {
       section: ALL_SECTIONS.HOST_TAX_FORMS,
