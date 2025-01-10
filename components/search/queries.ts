@@ -1,5 +1,15 @@
 import { gql } from '@apollo/client';
 
+const searchAccountFieldsFragment = gql`
+  fragment SearchAccountFields on Account {
+    id
+    name
+    slug
+    imageUrl(height: $imageHeight)
+    type
+  }
+`;
+
 export const searchCommandQuery = gql`
   query SearchCommand(
     $searchTerm: String!
@@ -7,23 +17,76 @@ export const searchCommandQuery = gql`
     $account: AccountReferenceInput
     $limit: Int!
     $includeTransactions: Boolean!
+    $imageHeight: Int
   ) {
     search(searchTerm: $searchTerm, defaultLimit: $limit, host: $host, account: $account) {
       results {
         accounts {
+          highlights
+          collection {
+            totalCount
+            limit
+            nodes {
+              ...SearchAccountFields
+            }
+          }
+        }
+        comments {
+          highlights
           collection {
             totalCount
             limit
             nodes {
               id
-              name
-              slug
-              imageUrl
-              type
+              html
+              createdAt
+              fromAccount {
+                ...SearchAccountFields
+              }
+              expense {
+                id
+                legacyId
+                description
+                account {
+                  ...SearchAccountFields
+                }
+              }
+              update {
+                id
+                legacyId
+                title
+                account {
+                  ...SearchAccountFields
+                }
+              }
+              order {
+                id
+                legacyId
+                toAccount {
+                  ...SearchAccountFields
+                }
+              }
+              hostApplication {
+                id
+                account {
+                  ...SearchAccountFields
+                }
+                host {
+                  ...SearchAccountFields
+                }
+              }
+              conversation {
+                id
+                slug
+                account {
+                  ...SearchAccountFields
+                }
+              }
             }
           }
         }
         expenses {
+          highlights
           collection {
             totalCount
             limit
@@ -38,23 +101,39 @@ export const searchCommandQuery = gql`
                 currency
               }
               payee {
-                id
-                name
-                slug
-                imageUrl
-                type
+                ...SearchAccountFields
               }
               account {
-                id
-                name
-                slug
-                imageUrl
-                type
+                ...SearchAccountFields
+              }
+            }
+          }
+        }
+        orders @include(if: $includeTransactions) {
+          highlights
+          collection {
+            totalCount
+            limit
+            nodes {
+              id
+              legacyId
+              description
+              status
+              amount {
+                valueInCents
+                currency
+              }
+              toAccount {
+                ...SearchAccountFields
+              }
+              fromAccount {
+                ...SearchAccountFields
               }
             }
           }
         }
         transactions @include(if: $includeTransactions) {
+          highlights
           collection {
             totalCount
             limit
@@ -69,18 +148,26 @@ export const searchCommandQuery = gql`
                 currency
               }
               account {
-                id
-                slug
-                name
-                imageUrl
-                type
+                ...SearchAccountFields
               }
               oppositeAccount {
-                id
-                slug
-                name
-                imageUrl
-                type
+                ...SearchAccountFields
+              }
+            }
+          }
+        }
+
+        updates {
+          highlights
+          collection {
+            totalCount
+            limit
+            nodes {
+              id
+              legacyId
+              title
+              account {
+                ...SearchAccountFields
               }
             }
           }
@@ -88,6 +175,7 @@ export const searchCommandQuery = gql`
       }
     }
   }
+  ${searchAccountFieldsFragment}
 `;
 
 export const contextQuery = gql`

@@ -36,11 +36,21 @@ export const expectedDateFilter: FilterConfig<z.infer<typeof dateFilterSchema>> 
   },
 };
 
-export const orderDateFilter: FilterConfig<z.infer<typeof dateFilterSchema>> = {
+export const orderChargeDateFilter: FilterConfig<z.infer<typeof dateFilterSchema>> = {
   schema: dateFilterSchema,
   toVariables: value => dateToVariables(value, 'chargedDate'),
   filter: {
     labelMsg: defineMessage({ id: 'Contribution.ChargeDate', defaultMessage: 'Charge Date' }),
+    Component: DateFilter,
+    valueRenderer: DateFilterValue,
+  },
+};
+
+export const orderCreateDateFilter: FilterConfig<z.infer<typeof dateFilterSchema>> = {
+  schema: dateFilterSchema,
+  toVariables: value => dateToVariables(value, 'date'),
+  filter: {
+    labelMsg: defineMessage({ id: 'Contribution.CreationDate', defaultMessage: 'Creation Date' }),
     Component: DateFilter,
     valueRenderer: DateFilterValue,
   },

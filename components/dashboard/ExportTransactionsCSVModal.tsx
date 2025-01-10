@@ -24,11 +24,8 @@ import {
   PLATFORM_PRESETS,
 } from '../../lib/export-csv/transactions-csv';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import type {
-  Account,
-  HostReportsPageQueryVariables,
-  TransactionsPageQueryVariables,
-} from '../../lib/graphql/types/v2/graphql';
+import type { HostReportsPageQueryVariables, TransactionsPageQueryVariables } from '../../lib/graphql/types/v2/graphql';
+import type { Account } from '../../lib/graphql/types/v2/schema';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import type { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
@@ -110,6 +107,10 @@ const makeUrl = ({ account, isHostReport, queryFilter, flattenTaxesAndPaymentPro
 
   if (!isNil(queryFilter.values.isRefund)) {
     url.searchParams.set('isRefund', queryFilter.values.isRefund ? '1' : '0');
+  }
+
+  if (!isNil(queryFilter.values.hasDebt)) {
+    url.searchParams.set('hasDebt', queryFilter.values.hasDebt ? '1' : '0');
   }
 
   if (queryFilter.values.orderId) {

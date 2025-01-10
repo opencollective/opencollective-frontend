@@ -7,12 +7,8 @@ import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import {
-  type Account,
-  type ExpensesPageQueryVariables,
-  ExpenseStatusFilter,
-  PayoutMethodType,
-} from '../../../../lib/graphql/types/v2/graphql';
+import { type ExpensesPageQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import { type Account, ExpenseStatusFilter, PayoutMethodType } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
 import ExpensesList from '../../../expenses/ExpensesList';

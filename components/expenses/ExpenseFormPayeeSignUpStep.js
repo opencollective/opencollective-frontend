@@ -13,7 +13,7 @@ import { EMPTY_ARRAY } from '../../lib/constants/utils';
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import { ExpenseLockableFields } from '../../lib/graphql/types/v2/graphql';
+import { ExpenseLockableFields } from '../../lib/graphql/types/v2/schema';
 import { flattenObjectDeep } from '../../lib/utils';
 
 import { Box, Flex, Grid } from '../Grid';

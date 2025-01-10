@@ -9,7 +9,7 @@ import {
   ExpenseType,
   TransactionKind,
   TransactionType,
-} from '../../lib/graphql/types/v2/graphql';
+} from '../../lib/graphql/types/v2/schema';
 import useLocalStorage from '../../lib/hooks/useLocalStorage';
 import { LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
 
@@ -34,6 +34,13 @@ const ExpenseSchema = z.object({
   status: z.nativeEnum(ExpenseStatus),
 });
 
+const OrderSchema = z.object({
+  legacyId: z.number(),
+  description: z.string(),
+  fromAccount: AccountSchema,
+  toAccount: AccountSchema,
+});
+
 const TransactionSchema = z.object({
   legacyId: z.number(),
   kind: z.nativeEnum(TransactionKind),
@@ -46,12 +53,34 @@ const TransactionSchema = z.object({
   oppositeAccount: AccountSchema,
 });
 
+const UpdateSchema = z.object({
+  legacyId: z.number(),
+  slug: z.string(),
+  account: AccountSchema,
+  title: z.string(),
+  html: z.string(),
+});
+
+const CommentSchema = z.object({
+  legacyId: z.number(),
+  html: z.string(),
+  update: UpdateSchema.optional(),
+  expense: ExpenseSchema.optional(),
+  order: OrderSchema.optional(),
+  conversation: z.object({}).optional(),
+  hostApplication: z.object({ id: z.string() }).optional(),
+  fromAccount: AccountSchema,
+});
+
 export type AccountResultData = z.infer<typeof AccountSchema>;
+export type CommentResultData = z.infer<typeof CommentSchema>;
 export type ExpenseResultData = z.infer<typeof ExpenseSchema>;
+export type OrderResultData = z.infer<typeof OrderSchema>;
 export type TransactionResultData = z.infer<typeof TransactionSchema>;
+export type UpdateResultData = z.infer<typeof UpdateSchema>;
 
 const basePageVisitSchema = z.object({
-  type: z.enum(['account', 'expense', 'transaction']),
+  type: z.enum(['account', 'comment', 'expense', 'order', 'transaction', 'update']),
   key: z.string(),
 });
 
@@ -67,6 +96,18 @@ const PageVisitSchema = z.discriminatedUnion('type', [
   basePageVisitSchema.extend({
     type: z.literal('transaction'),
     data: TransactionSchema,
+  }),
+  basePageVisitSchema.extend({
+    type: z.literal('update'),
+    data: UpdateSchema,
+  }),
+  basePageVisitSchema.extend({
+    type: z.literal('order'),
+    data: OrderSchema,
+  }),
+  basePageVisitSchema.extend({
+    type: z.literal('comment'),
+    data: CommentSchema,
   }),
 ]);
 

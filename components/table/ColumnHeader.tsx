@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { ArrowDown10, ArrowDownZA, ArrowUp10, ArrowUpDown, ArrowUpZA, CheckIcon, EyeOff, Filter } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { OrderDirection } from '../../lib/graphql/types/v2/graphql';
+import { OrderDirection } from '../../lib/graphql/types/v2/schema';
 
 import { SetFilter } from '../dashboard/filters/FilterDropdown';
 import { Button } from '../ui/Button';

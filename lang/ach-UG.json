@@ -2764,6 +2764,7 @@
   "order.expired": "crwdns19412:0crwdne19412:0",
   "Order.fromTo": "crwdns19414:0{account}crwdnd19414:0{contributor}crwdne19414:0",
   "order.in_review": "crwdns24113:0crwdne24113:0",
+  "order.lastChargedAt": "crwdns29060:0crwdne29060:0",
   "order.markAsCompleted": "crwdns19416:0crwdne19416:0",
   "order.markAsExpired": "crwdns19418:0crwdne19418:0",
   "Order.MarkExpiredConfirm": "crwdns25329:0crwdne25329:0",

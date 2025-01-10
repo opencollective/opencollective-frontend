@@ -2764,6 +2764,7 @@
   "order.expired": "Έληξε",
   "Order.fromTo": "for {account} from {contributor}",
   "order.in_review": "In Review",
+  "order.lastChargedAt": "Last Charge Date",
   "order.markAsCompleted": "Σήμανση ως ολοκληρωμένου",
   "order.markAsExpired": "Σήμανση ως ληξιπρόθεσμο",
   "Order.MarkExpiredConfirm": "Mark this contribution as expired?",

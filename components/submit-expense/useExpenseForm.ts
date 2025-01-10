@@ -17,7 +17,6 @@ import { AccountTypesWithHost } from '../../lib/constants/collectives';
 import { getPayoutProfiles } from '../../lib/expenses';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type {
-  Amount,
   ExpenseFormExchangeRatesQuery,
   ExpenseFormExchangeRatesQueryVariables,
   ExpenseFormSchemaHostFieldsFragment,
@@ -26,7 +25,8 @@ import type {
   ExpenseVendorFieldsFragment,
   LocationInput,
 } from '../../lib/graphql/types/v2/graphql';
-import { Currency, ExpenseStatus, ExpenseType, PayoutMethodType } from '../../lib/graphql/types/v2/graphql';
+import type { Amount } from '../../lib/graphql/types/v2/schema';
+import { Currency, ExpenseStatus, ExpenseType, PayoutMethodType } from '../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import type LoggedInUser from '../../lib/LoggedInUser';
 import { isValidEmail } from '../../lib/utils';
@@ -514,6 +514,7 @@ const formSchemaQuery = gql`
 type ExpenseFormOptions = {
   schema: z.ZodType<RecursivePartial<ExpenseFormValues>, ZodObjectDef, RecursivePartial<ExpenseFormValues>>;
   supportedExpenseTypes?: ExpenseType[];
+  allowInvite?: boolean;
   payoutProfiles?: ExpenseFormSchemaQuery['loggedInAccount'][];
   payoutMethods?: ExpenseFormSchemaQuery['loggedInAccount']['payoutMethods'];
   payoutMethod?:
@@ -570,8 +571,9 @@ function buildFormSchema(
   values: ExpenseFormValues,
   options: Omit<ExpenseFormOptions, 'schema'>,
   intl: IntlShape,
+  pickSchemaFields?: Record<string, boolean>,
 ): z.ZodType<RecursivePartial<ExpenseFormValues>, z.ZodObjectDef, RecursivePartial<ExpenseFormValues>> {
-  return z.object({
+  const schema = z.object({
     accountSlug: z
       .string()
       .nullish()
@@ -670,7 +672,11 @@ function buildFormSchema(
       ])
       .refine(
         attachment => {
-          if (values.expenseTypeOption === ExpenseType.INVOICE && values.hasInvoiceOption === YesNoOption.YES) {
+          if (
+            options.isAdminOfPayee &&
+            values.expenseTypeOption === ExpenseType.INVOICE &&
+            values.hasInvoiceOption === YesNoOption.YES
+          ) {
             return typeof attachment === 'string' ? !!attachment : !!attachment?.url;
           }
           return true;
@@ -684,7 +690,11 @@ function buildFormSchema(
       .nullish()
       .refine(
         invoiceNumber => {
-          if (values.expenseTypeOption === ExpenseType.INVOICE && values.hasInvoiceOption === YesNoOption.YES) {
+          if (
+            options.isAdminOfPayee &&
+            values.expenseTypeOption === ExpenseType.INVOICE &&
+            values.hasInvoiceOption === YesNoOption.YES
+          ) {
             return !!invoiceNumber;
           }
           return true;
@@ -696,14 +706,29 @@ function buildFormSchema(
     expenseItems: z.array(
       z
         .object({
-          description: z.string().min(1),
+          description: z
+            .string()
+            .nullish()
+            .refine(
+              v => {
+                if (!options.isAdminOfPayee) {
+                  return true;
+                }
+
+                return v.length > 0;
+              },
+              {
+                message: 'Required',
+              },
+            ),
           attachment: z
             .union([
-              z.string().url().nullish(),
+              z.string().nullish(),
               z.object({
-                url: z.string().url().nullish(),
+                url: z.string().nullish(),
               }),
             ])
+            .nullish()
             .refine(
               attachment => {
                 if (values.expenseTypeOption === ExpenseType.INVOICE) {
@@ -891,7 +916,7 @@ function buildFormSchema(
         .nullish()
         .refine(
           type => {
-            if (!values.payoutMethodId || values.payoutMethodId === '__newPayoutMethod') {
+            if (options.isAdminOfPayee && (!values.payoutMethodId || values.payoutMethodId === '__newPayoutMethod')) {
               return !!type;
             }
 
@@ -1117,6 +1142,8 @@ function buildFormSchema(
         ),
     }),
   });
+
+  return pickSchemaFields ? schema.pick(pickSchemaFields as { [K in keyof z.infer<typeof schema>]?: true }) : schema;
 }
 
 function getPayeeSlug(values: ExpenseFormValues): string {
@@ -1164,7 +1191,6 @@ async function buildFormOptions(
     );
 
     const expense = query.data?.expense;
-
     if (expense) {
       options.expense = query.data.expense;
     }
@@ -1172,7 +1198,8 @@ async function buildFormOptions(
     const recentlySubmittedExpenses = query.data?.recentlySubmittedExpenses;
     const account = values.accountSlug ? query.data?.account : options.expense?.account;
     const host = account && 'host' in account ? account.host : null;
-    const payee = options.expense?.payee || query.data?.payee;
+    const payee = query.data?.payee || options.expense?.payee;
+
     const payeeHost = payee && 'host' in payee ? payee.host : null;
     const submitter = options.expense?.submitter || query.data?.submitter;
 
@@ -1244,7 +1271,9 @@ async function buildFormOptions(
         options.payoutMethod = values.newPayoutMethod;
       }
 
-      options.isAdminOfPayee = options.payoutProfiles.some(p => p.slug === values.payeeSlug);
+      // Allow setting this flag to true with the `isInlineEdit` flag in start options to enable full editing experience (i.e. editing payotu method)
+      options.isAdminOfPayee =
+        startOptions.isInlineEdit || options.payoutProfiles.some(p => p.slug === values.payeeSlug);
     }
 
     if (options.payoutMethod) {
@@ -1254,6 +1283,8 @@ async function buildFormOptions(
     }
 
     options.allowExpenseItemAttachment = values.expenseTypeOption === ExpenseType.RECEIPT;
+
+    options.allowInvite = !startOptions.isInlineEdit;
 
     if (values.expenseTypeOption === ExpenseType.INVOICE) {
       if (accountHasVAT(account as any, host as any)) {
@@ -1277,7 +1308,7 @@ async function buildFormOptions(
       options.totalInvoicedInExpenseCurrency = totalInvoiced;
     }
 
-    options.schema = buildFormSchema(values, options, intl);
+    options.schema = buildFormSchema(values, options, intl, startOptions.pickSchemaFields);
 
     return options;
   } catch (err) {
@@ -1311,6 +1342,8 @@ type ExpenseFormStartOptions = {
   duplicateExpense?: boolean;
   expenseId?: number;
   draftKey?: string;
+  isInlineEdit?: boolean;
+  pickSchemaFields?: Record<string, boolean>;
 };
 
 export function useExpenseForm(opts: {
@@ -1438,7 +1471,7 @@ export function useExpenseForm(opts: {
       setFieldValue(
         'expenseItems',
         formOptions.expense.items?.map(ei => ({
-          url: !startOptions.current.duplicateExpense ? ei.url : null,
+          attachment: !startOptions.current.duplicateExpense ? ei.url : null,
           description: ei.description ?? '',
           incurredAt: !startOptions.current.duplicateExpense
             ? dayjs.utc(ei.incurredAt).toISOString().substring(0, 10)

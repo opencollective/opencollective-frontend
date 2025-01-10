@@ -417,6 +417,11 @@ interface Account {
     searchTerm: String
 
     """
+    If true, return transactions with debt attached, if false transactions without debt attached.
+    """
+    hasDebt: Boolean
+
+    """
     Only return transactions with an Expense attached
     """
     hasExpense: Boolean
@@ -551,7 +556,7 @@ interface Account {
     """
     Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
     """
-    frequency: ContributionFrequency
+    frequency: [ContributionFrequency]
 
     """
     Use this field to filter orders on their statuses
@@ -608,6 +613,7 @@ interface Account {
     """
     searchTerm: String
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tier: [TierReferenceInput]
 
     """
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
@@ -1983,6 +1989,11 @@ type Order {
   WARNING: Total amount donated between collectives, though there will be edge cases especially when looking on the Order level, as the order id is not used in calculating this.
   """
   totalDonations: Amount!
+
+  """
+  Total amount contributed with this order.
+  """
+  totalContributed: Amount!
   paymentMethod: PaymentMethod
   paymentProcessorUrl: String
 
@@ -2565,6 +2576,11 @@ type Expense {
   merchantId: String
 
   """
+  The reference text used in the payment transfer
+  """
+  transferReference: String
+
+  """
   Fields that cannot be edited on this expense
   """
   lockedFields: [ExpenseLockableFields]
@@ -2927,6 +2943,11 @@ type Host implements Account & AccountWithContributions {
     searchTerm: String
 
     """
+    If true, return transactions with debt attached, if false transactions without debt attached.
+    """
+    hasDebt: Boolean
+
+    """
     Only return transactions with an Expense attached
     """
     hasExpense: Boolean
@@ -3061,7 +3082,7 @@ type Host implements Account & AccountWithContributions {
     """
     Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
     """
-    frequency: ContributionFrequency
+    frequency: [ContributionFrequency]
 
     """
     Use this field to filter orders on their statuses
@@ -3118,6 +3139,7 @@ type Host implements Account & AccountWithContributions {
     """
     searchTerm: String
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tier: [TierReferenceInput]
 
     """
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
@@ -3571,7 +3593,7 @@ type Host implements Account & AccountWithContributions {
     dateFrom: DateTime
     dateTo: DateTime
     includeActiveRecurringContributions: Boolean
-  ): AccountCollection
+  ): AccountCollection!
 
   """
   How much platform fees are charged for this account
@@ -4110,7 +4132,7 @@ interface AccountWithContributions {
     dateFrom: DateTime
     dateTo: DateTime
     includeActiveRecurringContributions: Boolean
-  ): AccountCollection
+  ): AccountCollection!
 
   """
   How much platform fees are charged for this account
@@ -4580,6 +4602,23 @@ enum AccountOrdersFilter {
   OUTGOING
 }
 
+input TierReferenceInput {
+  """
+  The id assigned to the Tier
+  """
+  id: String
+
+  """
+  The DB id assigned to the Tier
+  """
+  legacyId: Int
+
+  """
+  Pass this flag to reference the custom tier (/donate)
+  """
+  isCustom: Boolean
+}
+
 """
 Expected funds filter (ALL_EXPECTED_FUNDS, ONLY_PENDING, ONLY_MANUAL)
 """
@@ -4677,6 +4716,11 @@ enum LastCommentBy {
   HOST_ADMIN
 
   """
+  Not a Fiscal Host Admin
+  """
+  NON_HOST_ADMIN
+
+  """
   Collective Admin
   """
   COLLECTIVE_ADMIN
@@ -4743,6 +4787,11 @@ type Comment {
   Returns the list of reactions added to this comment by logged in user
   """
   userReactions: [String]
+  conversation: Conversation
+  expense: Expense
+  hostApplication: HostApplication
+  order: Order
+  update: Update
 }
 
 """
@@ -4760,6 +4809,56 @@ enum CommentType {
   PRIVATE_NOTE
 }
 
+type HostApplication {
+  id: String!
+
+  """
+  The account who applied to this host
+  """
+  account: Account!
+
+  """
+  The host the collective applied to
+  """
+  host: Host!
+
+  """
+  The date on which the item was created
+  """
+  createdAt: DateTime!
+
+  """
+  The date on which the item was updated
+  """
+  updatedAt: DateTime!
+  status: HostApplicationStatus
+  message: String
+  customData: JSON
+
+  """
+  Returns the list of comments for this host application, or `null` if user is not allowed to see them
+  """
+  comments(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 10
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: ASC }
+  ): CommentCollection
+}
+
+enum HostApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
 """
 A collection of "Comments"
 """
@@ -4768,6 +4867,105 @@ type CommentCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [Comment]
+}
+
+"""
+This represents an Update
+"""
+type Update {
+  id: String!
+  legacyId: Int
+  slug: String!
+
+  """
+  Indicates whether or not the user is allowed to see the content of this update
+  """
+  userCanSeeUpdate: Boolean!
+
+  """
+  Indicates whether or not the user is allowed to publish this update
+  """
+  userCanPublishUpdate: Boolean!
+  isPrivate: Boolean!
+  isChangelog: Boolean!
+  title: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  publishedAt: DateTime
+  notificationAudience: UpdateAudience
+
+  """
+  Some stats about the target audience. Will be null if the update is already published or if you don't have enough permissions so see this information. Not backed by a loader, avoid using this field in lists.
+  """
+  audienceStats(
+    """
+    To override the default notificationAudience
+    """
+    audience: UpdateAudience
+  ): UpdateAudienceStats
+  makePublicOn: DateTime
+  summary: String
+  html: String
+  tags: [String]
+  fromAccount: Account
+  account: Account
+
+  """
+  Returns a map of reactions counts for this update
+  """
+  reactions: JSON
+
+  """
+  Returns the list of reactions added to this update by logged in user
+  """
+  userReactions: [String]
+
+  """
+  List the comments for this update. Not backed by a loader, don't use this in lists.
+  """
+  comments(limit: Int! = 150, offset: Int! = 0): CommentCollection
+}
+
+"""
+Defines targets for an update
+"""
+enum UpdateAudience {
+  """
+  Will be sent to collective admins and financial contributors
+  """
+  ALL
+
+  """
+  Will be sent to collective admins
+  """
+  COLLECTIVE_ADMINS
+
+  """
+  Will be sent to financial contributors
+  """
+  FINANCIAL_CONTRIBUTORS
+
+  """
+  Will be sent to no one
+  """
+  NO_ONE
+}
+
+"""
+Stats about the potential audience of an update
+"""
+type UpdateAudienceStats {
+  id: String!
+  coreContributors: Int!
+  individuals: Int!
+  organizations: Int!
+  collectives: Int!
+  hosted: Int!
+
+  """
+  The total number of emails to send
+  """
+  total: Int!
 }
 
 type ConversationStats {
@@ -4921,7 +5119,7 @@ type PaymentMethod {
     """
     Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
     """
-    frequency: ContributionFrequency
+    frequency: [ContributionFrequency]
 
     """
     Use this field to filter orders on their statuses
@@ -4978,6 +5176,7 @@ type PaymentMethod {
     """
     searchTerm: String
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tier: [TierReferenceInput]
 
     """
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
@@ -5708,105 +5907,6 @@ type UpdateCollection implements Collection {
 }
 
 """
-This represents an Update
-"""
-type Update {
-  id: String!
-  legacyId: Int
-  slug: String!
-
-  """
-  Indicates whether or not the user is allowed to see the content of this update
-  """
-  userCanSeeUpdate: Boolean!
-
-  """
-  Indicates whether or not the user is allowed to publish this update
-  """
-  userCanPublishUpdate: Boolean!
-  isPrivate: Boolean!
-  isChangelog: Boolean!
-  title: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  publishedAt: DateTime
-  notificationAudience: UpdateAudience
-
-  """
-  Some stats about the target audience. Will be null if the update is already published or if you don't have enough permissions so see this information. Not backed by a loader, avoid using this field in lists.
-  """
-  audienceStats(
-    """
-    To override the default notificationAudience
-    """
-    audience: UpdateAudience
-  ): UpdateAudienceStats
-  makePublicOn: DateTime
-  summary: String
-  html: String
-  tags: [String]
-  fromAccount: Account
-  account: Account
-
-  """
-  Returns a map of reactions counts for this update
-  """
-  reactions: JSON
-
-  """
-  Returns the list of reactions added to this update by logged in user
-  """
-  userReactions: [String]
-
-  """
-  List the comments for this update. Not backed by a loader, don't use this in lists.
-  """
-  comments(limit: Int! = 150, offset: Int! = 0): CommentCollection
-}
-
-"""
-Defines targets for an update
-"""
-enum UpdateAudience {
-  """
-  Will be sent to collective admins and financial contributors
-  """
-  ALL
-
-  """
-  Will be sent to collective admins
-  """
-  COLLECTIVE_ADMINS
-
-  """
-  Will be sent to financial contributors
-  """
-  FINANCIAL_CONTRIBUTORS
-
-  """
-  Will be sent to no one
-  """
-  NO_ONE
-}
-
-"""
-Stats about the potential audience of an update
-"""
-type UpdateAudienceStats {
-  id: String!
-  coreContributors: Int!
-  individuals: Int!
-  organizations: Int!
-  collectives: Int!
-  hosted: Int!
-
-  """
-  The total number of emails to send
-  """
-  total: Int!
-}
-
-"""
 Input to order updates chronologically
 """
 input UpdateChronologicalOrderInput {
@@ -6057,56 +6157,6 @@ type HostApplicationCollection implements Collection {
   limit: Int
   totalCount: Int
   nodes: [HostApplication]
-}
-
-type HostApplication {
-  id: String!
-
-  """
-  The account who applied to this host
-  """
-  account: Account!
-
-  """
-  The host the collective applied to
-  """
-  host: Host!
-
-  """
-  The date on which the item was created
-  """
-  createdAt: DateTime!
-
-  """
-  The date on which the item was updated
-  """
-  updatedAt: DateTime!
-  status: HostApplicationStatus
-  message: String
-  customData: JSON
-
-  """
-  Returns the list of comments for this host application, or `null` if user is not allowed to see them
-  """
-  comments(
-    """
-    The number of results to fetch (default 10, max 1000)
-    """
-    limit: Int! = 10
-
-    """
-    The offset to use to fetch
-    """
-    offset: Int! = 0
-    orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: ASC }
-  ): CommentCollection
-}
-
-enum HostApplicationStatus {
-  PENDING
-  APPROVED
-  REJECTED
-  EXPIRED
 }
 
 """
@@ -8078,6 +8128,11 @@ type Bot implements Account {
     searchTerm: String
 
     """
+    If true, return transactions with debt attached, if false transactions without debt attached.
+    """
+    hasDebt: Boolean
+
+    """
     Only return transactions with an Expense attached
     """
     hasExpense: Boolean
@@ -8212,7 +8267,7 @@ type Bot implements Account {
     """
     Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
     """
-    frequency: ContributionFrequency
+    frequency: [ContributionFrequency]
 
     """
     Use this field to filter orders on their statuses
@@ -8269,6 +8324,7 @@ type Bot implements Account {
     """
     searchTerm: String
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tier: [TierReferenceInput]
 
     """
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
@@ -8945,6 +9001,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     searchTerm: String
 
     """
+    If true, return transactions with debt attached, if false transactions without debt attached.
+    """
+    hasDebt: Boolean
+
+    """
     Only return transactions with an Expense attached
     """
     hasExpense: Boolean
@@ -9079,7 +9140,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
     """
-    frequency: ContributionFrequency
+    frequency: [ContributionFrequency]
 
     """
     Use this field to filter orders on their statuses
@@ -9136,6 +9197,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     """
     searchTerm: String
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tier: [TierReferenceInput]
 
     """
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
@@ -9655,7 +9717,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     dateFrom: DateTime
     dateTo: DateTime
     includeActiveRecurringContributions: Boolean
-  ): AccountCollection
+  ): AccountCollection!
 
   """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
@@ -10361,6 +10423,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     searchTerm: String
 
     """
+    If true, return transactions with debt attached, if false transactions without debt attached.
+    """
+    hasDebt: Boolean
+
+    """
     Only return transactions with an Expense attached
     """
     hasExpense: Boolean
@@ -10495,7 +10562,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
     """
-    frequency: ContributionFrequency
+    frequency: [ContributionFrequency]
 
     """
     Use this field to filter orders on their statuses
@@ -10552,6 +10619,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     """
     searchTerm: String
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tier: [TierReferenceInput]
 
     """
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
@@ -11071,7 +11139,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     dateFrom: DateTime
     dateTo: DateTime
     includeActiveRecurringContributions: Boolean
-  ): AccountCollection
+  ): AccountCollection!
 
   """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
@@ -11497,6 +11565,11 @@ type Individual implements Account {
     searchTerm: String
 
     """
+    If true, return transactions with debt attached, if false transactions without debt attached.
+    """
+    hasDebt: Boolean
+
+    """
     Only return transactions with an Expense attached
     """
     hasExpense: Boolean
@@ -11631,7 +11704,7 @@ type Individual implements Account {
     """
     Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
     """
-    frequency: ContributionFrequency
+    frequency: [ContributionFrequency]
 
     """
     Use this field to filter orders on their statuses
@@ -11688,6 +11761,7 @@ type Individual implements Account {
     """
     searchTerm: String
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tier: [TierReferenceInput]
 
     """
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
@@ -12570,6 +12644,11 @@ type Organization implements Account & AccountWithContributions {
     searchTerm: String
 
     """
+    If true, return transactions with debt attached, if false transactions without debt attached.
+    """
+    hasDebt: Boolean
+
+    """
     Only return transactions with an Expense attached
     """
     hasExpense: Boolean
@@ -12704,7 +12783,7 @@ type Organization implements Account & AccountWithContributions {
     """
     Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
     """
-    frequency: ContributionFrequency
+    frequency: [ContributionFrequency]
 
     """
     Use this field to filter orders on their statuses
@@ -12761,6 +12840,7 @@ type Organization implements Account & AccountWithContributions {
     """
     searchTerm: String
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tier: [TierReferenceInput]
 
     """
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
@@ -13212,7 +13292,7 @@ type Organization implements Account & AccountWithContributions {
     dateFrom: DateTime
     dateTo: DateTime
     includeActiveRecurringContributions: Boolean
-  ): AccountCollection
+  ): AccountCollection!
 
   """
   How much platform fees are charged for this account
@@ -13550,6 +13630,11 @@ type Vendor implements Account & AccountWithContributions {
     searchTerm: String
 
     """
+    If true, return transactions with debt attached, if false transactions without debt attached.
+    """
+    hasDebt: Boolean
+
+    """
     Only return transactions with an Expense attached
     """
     hasExpense: Boolean
@@ -13684,7 +13769,7 @@ type Vendor implements Account & AccountWithContributions {
     """
     Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
     """
-    frequency: ContributionFrequency
+    frequency: [ContributionFrequency]
 
     """
     Use this field to filter orders on their statuses
@@ -13741,6 +13826,7 @@ type Vendor implements Account & AccountWithContributions {
     """
     searchTerm: String
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tier: [TierReferenceInput]
 
     """
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
@@ -14194,7 +14280,7 @@ type Vendor implements Account & AccountWithContributions {
     dateFrom: DateTime
     dateTo: DateTime
     includeActiveRecurringContributions: Boolean
-  ): AccountCollection
+  ): AccountCollection!
 
   """
   How much platform fees are charged for this account
@@ -14907,7 +14993,7 @@ type Query {
     """
     Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
     """
-    frequency: ContributionFrequency
+    frequency: [ContributionFrequency]
 
     """
     Use this field to filter orders on their statuses
@@ -14964,6 +15050,7 @@ type Query {
     """
     searchTerm: String
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tier: [TierReferenceInput]
 
     """
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
@@ -15187,6 +15274,11 @@ type Query {
     The term to search
     """
     searchTerm: String
+
+    """
+    If true, return transactions with debt attached, if false transactions without debt attached.
+    """
+    hasDebt: Boolean
 
     """
     Only return transactions with an Expense attached
@@ -17169,6 +17261,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     searchTerm: String
 
     """
+    If true, return transactions with debt attached, if false transactions without debt attached.
+    """
+    hasDebt: Boolean
+
+    """
     Only return transactions with an Expense attached
     """
     hasExpense: Boolean
@@ -17303,7 +17400,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
     """
-    frequency: ContributionFrequency
+    frequency: [ContributionFrequency]
 
     """
     Use this field to filter orders on their statuses
@@ -17360,6 +17457,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     """
     searchTerm: String
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tier: [TierReferenceInput]
 
     """
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
@@ -17879,7 +17977,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     dateFrom: DateTime
     dateTo: DateTime
     includeActiveRecurringContributions: Boolean
-  ): AccountCollection
+  ): AccountCollection!
 
   """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
@@ -18183,6 +18281,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     searchTerm: String
 
     """
+    If true, return transactions with debt attached, if false transactions without debt attached.
+    """
+    hasDebt: Boolean
+
+    """
     Only return transactions with an Expense attached
     """
     hasExpense: Boolean
@@ -18317,7 +18420,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     Use this field to filter orders on their frequency (ONETIME, MONTHLY or YEARLY)
     """
-    frequency: ContributionFrequency
+    frequency: [ContributionFrequency]
 
     """
     Use this field to filter orders on their statuses
@@ -18374,6 +18477,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     """
     searchTerm: String
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tier: [TierReferenceInput]
 
     """
     Only returns orders that have a subscription (monthly/yearly). Don't use together with frequency.
@@ -18893,7 +18997,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     dateFrom: DateTime
     dateTo: DateTime
     includeActiveRecurringContributions: Boolean
-  ): AccountCollection
+  ): AccountCollection!
 
   """
   Returns true if a custom contribution to Open Collective can be submitted for contributions made to this account
@@ -18986,59 +19090,82 @@ type SearchResults {
 
 type SearchResultsAccounts {
   collection: AccountCollection!
+  maxScore: Float!
+
+  """
+  Details about the matches typed as: { [id]: { score: number, fields: { [field]: [highlight] } } }
+  """
   highlights: JSONObject
 }
 
 type SearchResultsComments {
   collection: CommentCollection!
+  maxScore: Float!
+
+  """
+  Details about the matches typed as: { [id]: { score: number, fields: { [field]: [highlight] } } }
+  """
   highlights: JSONObject
 }
 
 type SearchResultsExpenses {
   collection: ExpenseCollection!
+  maxScore: Float!
+
+  """
+  Details about the matches typed as: { [id]: { score: number, fields: { [field]: [highlight] } } }
+  """
   highlights: JSONObject
 }
 
 type SearchResultsHostApplications {
   collection: HostApplicationCollection!
+  maxScore: Float!
+
+  """
+  Details about the matches typed as: { [id]: { score: number, fields: { [field]: [highlight] } } }
+  """
   highlights: JSONObject
 }
 
 type SearchResultsOrders {
   collection: OrderCollection!
+  maxScore: Float!
+
+  """
+  Details about the matches typed as: { [id]: { score: number, fields: { [field]: [highlight] } } }
+  """
   highlights: JSONObject
 }
 
 type SearchResultsTiers {
   collection: TierCollection!
+  maxScore: Float!
+
+  """
+  Details about the matches typed as: { [id]: { score: number, fields: { [field]: [highlight] } } }
+  """
   highlights: JSONObject
 }
 
 type SearchResultsTransactions {
   collection: TransactionCollection!
+  maxScore: Float!
+
+  """
+  Details about the matches typed as: { [id]: { score: number, fields: { [field]: [highlight] } } }
+  """
   highlights: JSONObject
 }
 
 type SearchResultsUpdates {
   collection: UpdateCollection!
+  maxScore: Float!
+
+  """
+  Details about the matches typed as: { [id]: { score: number, fields: { [field]: [highlight] } } }
+  """
   highlights: JSONObject
-}
-
-input TierReferenceInput {
-  """
-  The id assigned to the Tier
-  """
-  id: String
-
-  """
-  The DB id assigned to the Tier
-  """
-  legacyId: Int
-
-  """
-  Pass this flag to reference the custom tier (/donate)
-  """
-  isCustom: Boolean
 }
 
 input TransactionReferenceInput {
@@ -19199,6 +19326,11 @@ type Mutation {
     Set to true to disable contributions to this project. Host admins will still be able to add funds.
     """
     disableContributions: Boolean! = false
+
+    """
+    Set to true to disable expenses for this project.
+    """
+    disableExpenses: Boolean! = false
   ): Project
 
   """

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
 
-import { LegalDocumentRequestStatus } from '../../../../lib/graphql/types/v2/graphql';
+import { LegalDocumentRequestStatus } from '../../../../lib/graphql/types/v2/schema';
 import { i18nLegalDocumentStatus } from '../../../../lib/i18n/legal-document';
 
 import { Badge } from '../../../ui/Badge';

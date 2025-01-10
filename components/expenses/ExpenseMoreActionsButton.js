@@ -258,7 +258,7 @@ const ExpenseMoreActionsButton = ({
                 <FormattedMessage id="actions.delete" defaultMessage="Delete" />
               </Action>
             )}
-            {permissions.canEdit && (
+            {onEdit && permissions.canEdit && (
               <Action data-cy="edit-expense-btn" onClick={onEdit} disabled={processExpense.loading || isDisabled}>
                 <IconEdit size="16px" />
                 <FormattedMessage id="Edit" defaultMessage="Edit" />

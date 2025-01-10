@@ -10,7 +10,7 @@ import styled from 'styled-components';
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { TransactionKind, TransactionTypes } from '../../lib/constants/transactions';
 import { formatCurrency } from '../../lib/currency-utils';
-import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
+import { ExpenseStatus } from '../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { i18nTransactionKind, i18nTransactionType } from '../../lib/i18n/transaction';
 import { getCollectivePageRoute } from '../../lib/url-helpers';

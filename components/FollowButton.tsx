@@ -6,8 +6,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { CollectiveType } from '../lib/constants/collectives';
 import { i18nGraphqlException } from '../lib/errors';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
-import type { Account } from '../lib/graphql/types/v2/graphql';
-import { MemberRole } from '../lib/graphql/types/v2/graphql';
+import type { Account } from '../lib/graphql/types/v2/schema';
+import { MemberRole } from '../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { cn } from '../lib/utils';
 

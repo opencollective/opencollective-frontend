@@ -7,15 +7,15 @@ import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib
 import { boolean, isMulti, limit, offset } from '../../../../lib/filters/schemas';
 import type {
   AccountExpensesQueryVariables,
-  Currency,
   HostDashboardExpensesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
+import type { Currency } from '../../../../lib/graphql/types/v2/schema';
 import {
   ExpenseStatusFilter,
   ExpenseType,
   LastCommentBy,
   PayoutMethodType,
-} from '../../../../lib/graphql/types/v2/graphql';
+} from '../../../../lib/graphql/types/v2/schema';
 import { i18nExpenseStatus, i18nExpenseType } from '../../../../lib/i18n/expense';
 import { LastCommentByFilterLabels } from '../../../../lib/i18n/last-comment-by-filter';
 import i18nPayoutMethodType from '../../../../lib/i18n/payout-method-type';

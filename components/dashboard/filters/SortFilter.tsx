@@ -14,7 +14,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
-import { DateTimeField, OrderByFieldType, OrderDirection } from '../../../lib/graphql/types/v2/graphql';
+import { DateTimeField, OrderByFieldType, OrderDirection } from '../../../lib/graphql/types/v2/schema';
 
 import { parseChronologicalOrderInput } from '../../expenses/filters/ExpensesOrder';
 import { Button } from '../../ui/Button';

@@ -8,7 +8,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../../lib/constants/collectives';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import type { AccountWithHost, HostedCollectiveFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
+import type { HostedCollectiveFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
+import type { AccountWithHost } from '../../../../lib/graphql/types/v2/schema';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { i18nTransactionKind } from '../../../../lib/i18n/transaction';

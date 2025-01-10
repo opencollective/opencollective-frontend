@@ -7,7 +7,7 @@ import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { connectAccount, connectAccountCallback, disconnectAccount } from '../../lib/api';
-import { ConnectedAccountService } from '../../lib/graphql/types/v2/graphql';
+import { ConnectedAccountService } from '../../lib/graphql/types/v2/schema';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
 import { getWebsiteUrl, isValidUrl, parseToBoolean } from '../../lib/utils';
 

@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import { CurrencyPrecision } from '../lib/constants/currency-precision';
 import INTERVALS from '../lib/constants/intervals';
 import { getIntervalFromContributionFrequency } from '../lib/date-utils';
-import type { Currency as GraphQLCurrency, TierFrequency } from '../lib/graphql/types/v2/graphql';
+import type { Currency as GraphQLCurrency, TierFrequency } from '../lib/graphql/types/v2/schema';
 import { cn } from '../lib/utils';
 
 import Currency from './Currency';

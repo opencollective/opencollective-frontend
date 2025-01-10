@@ -37,7 +37,7 @@ jobs:
   e2e:
     if: github.ref_name != 'i18n/crowdin'
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     timeout-minutes: 30
 
@@ -53,7 +53,7 @@ jobs:
           - 6379:6379
         options: --entrypoint redis-server
       postgres:
-        image: postgres:13.16
+        image: postgres:15.10
         env:
           POSTGRES_USER: postgres
           POSTGRES_DB: postgres
@@ -67,14 +67,15 @@ jobs:
       - name: Update apt
         run: sudo apt-get update || exit 0
 
-      - name: Install Cypress dependencies
-        run: sudo apt-get install --no-install-recommends -y libgtk2.0-0 libgtk-3-0 libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb fonts-arphic-bkai00mp fonts-arphic-bsmi00lp fonts-arphic-gbsn00lp fonts-arphic-gkai00mp fonts-arphic-ukai fonts-arphic-uming ttf-wqy-zenhei ttf-wqy-microhei xfonts-wqy
-
-      - name: Install postgresql-client
-        run: sudo apt-get install -y postgresql-client
-
-      - name: Install graphicsmagick
-        run: sudo apt-get install -y graphicsmagick
+      - name: Install dependencies
+        run: |
+          sudo apt-get install \
+          `# Cypress dependencies - see https://docs.cypress.io/app/get-started/install-cypress#UbuntuDebian` \
+          libgtk2.0-0t64 libgtk-3-0t64 libgbm-dev libnotify-dev libnss3 libxss1 libasound2t64 libxtst6 xauth xvfb \
+          `# Postgres client` \
+          postgresql-client-16 \
+          `# GraphicsMagick (not sure if needed)` \
+          graphicsmagick
 
       - name: Install stripe-cli
         run: |
@@ -220,16 +221,6 @@ jobs:
         with:
           path: .next
           key: ${{ runner.os }}-next-build-${{ github.sha }}
-
-      - name: Restore .next cache (frontend)
-        if: steps.next-build.outputs.cache-hit != 'true'
-        uses: actions/cache@v4
-        with:
-          path: .next/cache
-          key: ${{ runner.os }}-next-cache-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-next-cache-${{ github.sha }}
-            ${{ runner.os }}-next-cache-
 
       - name: Build (frontend)
         if: steps.next-build.outputs.cache-hit != 'true'

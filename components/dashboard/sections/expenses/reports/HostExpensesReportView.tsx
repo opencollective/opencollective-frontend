@@ -8,10 +8,10 @@ import { z } from 'zod';
 import { boolean } from '../../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../../lib/graphql/helpers';
 import {
-  ExpenseStatus,
   type HostExpensesReportQuery,
   type HostExpensesReportQueryVariables,
 } from '../../../../../lib/graphql/types/v2/graphql';
+import { ExpenseStatus } from '../../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../../lib/hooks/useQueryFilter';
 
 import FormattedMoneyAmount from '../../../../FormattedMoneyAmount';

@@ -3,7 +3,8 @@ import { gql, useQuery } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
-import { type AccountItemQuery, AccountType } from '../../../lib/graphql/types/v2/graphql';
+import { type AccountItemQuery } from '../../../lib/graphql/types/v2/graphql';
+import { AccountType } from '../../../lib/graphql/types/v2/schema';
 import formatCollectiveType from '../../../lib/i18n/collective-type';
 import { cn } from '../../../lib/utils';
 

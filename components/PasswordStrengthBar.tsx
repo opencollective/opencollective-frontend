@@ -10,13 +10,15 @@ const ReactPasswordStrengthBar = dynamic(() => import('react-password-strength-b
  * Loads the library dynamically to avoid bloating the bundle size.
  */
 export const PasswordStrengthBar = (
-  props: Omit<PasswordStrengthBarProps, 'style' | 'shortScoreWord' | 'scoreWords'>,
+  props: Omit<PasswordStrengthBarProps, 'style' | 'shortScoreWord' | 'scoreWords'> & {
+    alwaysShow?: boolean;
+  },
 ) => {
   const intl = useIntl();
   return (
     <ReactPasswordStrengthBar
       {...props}
-      style={{ display: props.password ? 'block' : 'none' }}
+      style={{ display: props.alwaysShow || props.password ? 'block' : 'none' }}
       shortScoreWord={intl.formatMessage({ id: 'FormError.minLength', defaultMessage: 'The value is too short' })}
       scoreWords={[
         intl.formatMessage({ id: 'Password.weak', defaultMessage: 'Weak' }),

@@ -7,7 +7,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import type { GetActions } from '../../../../../lib/actions/types';
 import { i18nGraphqlException } from '../../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../../lib/graphql/helpers';
-import type { TransactionsImportRow } from '../../../../../lib/graphql/types/v2/graphql';
+import type { TransactionsImportRow } from '../../../../../lib/graphql/types/v2/schema';
 
 import { useModal } from '../../../../ModalContext';
 import StyledSpinner from '../../../../StyledSpinner';

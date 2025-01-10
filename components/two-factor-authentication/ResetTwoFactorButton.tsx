@@ -1,17 +1,18 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
+import { AlertCircle } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import type { Individual } from '../../lib/graphql/types/v2/graphql';
+import type { Individual } from '../../lib/graphql/types/v2/schema';
 import { TwoFactorAuthenticationHeader } from '../../lib/two-factor-authentication';
 import { useTwoFactorAuthenticationPrompt } from '../../lib/two-factor-authentication/TwoFactorAuthenticationContext';
 
 import ConfirmationModal, { CONFIRMATION_MODAL_TERMINATE } from '../ConfirmationModal';
 import MessageBox from '../MessageBox';
-import StyledButton from '../StyledButton';
 import { P } from '../Text';
+import { Button } from '../ui/Button';
 import { useToast } from '../ui/useToast';
 
 const RemoveTwoFactorAuthenticationMutation = gql`
@@ -83,13 +84,14 @@ export function ResetTwoFactorButton(props: ResetTwoFactorButtonProps) {
 
   return (
     <React.Fragment>
-      <StyledButton
+      <Button
+        className="mt-3 w-full"
         onClick={() => setIsRemovingTwoFactorAuthentication(true)}
-        buttonSize="tiny"
-        buttonStyle="dangerSecondary"
+        variant="outlineDestructive"
       >
+        <AlertCircle className="mr-2 h-4 w-4" />
         <FormattedMessage defaultMessage="Reset Two Factor Authentication" id="NCTAeh" />
-      </StyledButton>
+      </Button>
       {isRemovingTwoFactorAuthentication && (
         <ConfirmationModal
           isDanger
