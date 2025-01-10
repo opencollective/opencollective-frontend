@@ -301,6 +301,7 @@ let exportedConfig = withSentryConfig(
     ...nextConfig,
     sentry: {
       hideSourceMaps: true,
+      widenClientFileUpload: true,
     },
   },
   {
