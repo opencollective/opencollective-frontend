@@ -1,5 +1,15 @@
 import { gql } from '@apollo/client';
 
+const searchAccountFieldsFragment = gql`
+  fragment SearchAccountFields on Account {
+    id
+    name
+    slug
+    imageUrl(height: $imageHeight)
+    type
+  }
+`;
+
 export const searchCommandQuery = gql`
   query SearchCommand(
     $searchTerm: String!
@@ -17,11 +27,7 @@ export const searchCommandQuery = gql`
             totalCount
             limit
             nodes {
-              id
-              name
-              slug
-              imageUrl(height: $imageHeight)
-              type
+              ...SearchAccountFields
             }
           }
         }
@@ -35,22 +41,14 @@ export const searchCommandQuery = gql`
               html
               createdAt
               fromAccount {
-                id
-                slug
-                name
-                imageUrl(height: $imageHeight)
-                type
+                ...SearchAccountFields
               }
               expense {
                 id
                 legacyId
                 description
                 account {
-                  id
-                  name
-                  slug
-                  imageUrl(height: $imageHeight)
-                  type
+                  ...SearchAccountFields
                 }
               }
               update {
@@ -58,50 +56,30 @@ export const searchCommandQuery = gql`
                 legacyId
                 title
                 account {
-                  id
-                  slug
-                  name
-                  imageUrl(height: $imageHeight)
-                  type
+                  ...SearchAccountFields
                 }
               }
               order {
                 id
                 legacyId
                 toAccount {
-                  id
-                  slug
-                  name
-                  imageUrl(height: $imageHeight)
-                  type
+                  ...SearchAccountFields
                 }
               }
               hostApplication {
                 id
                 account {
-                  id
-                  slug
-                  name
-                  imageUrl(height: $imageHeight)
-                  type
+                  ...SearchAccountFields
                 }
                 host {
-                  id
-                  slug
-                  name
-                  imageUrl(height: $imageHeight)
-                  type
+                  ...SearchAccountFields
                 }
               }
               conversation {
                 id
                 slug
                 account {
-                  id
-                  slug
-                  name
-                  imageUrl(height: $imageHeight)
-                  type
+                  ...SearchAccountFields
                 }
               }
             }
@@ -123,18 +101,10 @@ export const searchCommandQuery = gql`
                 currency
               }
               payee {
-                id
-                name
-                slug
-                imageUrl(height: $imageHeight)
-                type
+                ...SearchAccountFields
               }
               account {
-                id
-                name
-                slug
-                imageUrl(height: $imageHeight)
-                type
+                ...SearchAccountFields
               }
             }
           }
@@ -154,18 +124,10 @@ export const searchCommandQuery = gql`
                 currency
               }
               toAccount {
-                id
-                slug
-                name
-                imageUrl(height: $imageHeight)
-                type
+                ...SearchAccountFields
               }
               fromAccount {
-                id
-                slug
-                name
-                imageUrl(height: $imageHeight)
-                type
+                ...SearchAccountFields
               }
             }
           }
@@ -186,18 +148,10 @@ export const searchCommandQuery = gql`
                 currency
               }
               account {
-                id
-                slug
-                name
-                imageUrl(height: $imageHeight)
-                type
+                ...SearchAccountFields
               }
               oppositeAccount {
-                id
-                slug
-                name
-                imageUrl(height: $imageHeight)
-                type
+                ...SearchAccountFields
               }
             }
           }
@@ -213,9 +167,7 @@ export const searchCommandQuery = gql`
               legacyId
               title
               account {
-                id
-                slug
-                name
+                ...SearchAccountFields
               }
             }
           }
@@ -223,6 +175,7 @@ export const searchCommandQuery = gql`
       }
     }
   }
+  ${searchAccountFieldsFragment}
 `;
 
 export const contextQuery = gql`

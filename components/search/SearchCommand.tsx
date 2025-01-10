@@ -11,7 +11,14 @@ import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import useDebouncedValue from '../../lib/hooks/useDebouncedValue';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../lib/hooks/useQueryFilter';
-import { getCollectivePageRoute, getCommentUrl, getExpensePageUrl } from '../../lib/url-helpers';
+import {
+  getCollectivePageRoute,
+  getCommentUrl,
+  getExpensePageUrl,
+  getOrderUrl,
+  getUpdateUrl,
+} from '../../lib/url-helpers';
+import type { Comment, Expense, Order, Update } from '@/lib/graphql/types/v2/schema';
 
 import { DashboardContext } from '../dashboard/DashboardContext';
 import { getMenuItems } from '../dashboard/Menu';
@@ -125,12 +132,12 @@ export const SearchCommand = ({ open, setOpen }) => {
       case 'account':
         if (data.type !== CollectiveType.VENDOR) {
           // TODO: Fix vendor links
-          router.push(`/${data.slug}`);
+          router.push(getCollectivePageRoute(data as { slug: string }));
         }
         addToRecent({ key: data.slug.toString(), type, data });
         break;
       case 'expense':
-        router.push(`/${data.account.slug}/expenses/${data.legacyId}`);
+        router.push(getExpensePageUrl(data as Expense));
         addToRecent({ key: data.legacyId.toString(), type, data });
 
         break;
@@ -143,15 +150,15 @@ export const SearchCommand = ({ open, setOpen }) => {
         addToRecent({ key: data.legacyId.toString(), type, data });
         break;
       case 'comment':
-        router.push(getCommentUrl(data));
+        router.push(getCommentUrl(data as Comment, LoggedInUser));
         // Skip adding comments to recent
         break;
       case 'order':
-        router.push(`/dashboard/${workspace.slug}/contributions/${data.legacyId}`);
+        router.push(getOrderUrl(data as Order, LoggedInUser));
         addToRecent({ key: data.legacyId.toString(), type, data });
         break;
       case 'update':
-        router.push(`/dashboard/${workspace.slug}/updates/${data.legacyId}`);
+        router.push(getUpdateUrl(data as Update, LoggedInUser));
         addToRecent({ key: data.legacyId.toString(), type, data });
         break;
       case 'page':
@@ -220,7 +227,6 @@ export const SearchCommand = ({ open, setOpen }) => {
 
       <CommandList className="max-h-[600px] border-b border-t-0 [&_.text-xs_mark]:px-1 [&_.text-xs_mark]:py-[1px] [&_mark]:rounded-xl [&_mark]:bg-amber-100 [&_mark]:px-1 [&_mark]:py-2">
         <CommandItem value="-" className="hidden" />
-
         {recentlyVisited.length > 0 && debouncedInput === '' && (
           <CommandGroup heading="Recent">
             {recentlyVisited.map(recentVisit => (
@@ -234,7 +240,6 @@ export const SearchCommand = ({ open, setOpen }) => {
             ))}
           </CommandGroup>
         )}
-
         {filteredGoToPages.length > 0 && (
           <CommandGroup heading="Dashboard">
             {filteredGoToPages.map(page => (
@@ -244,7 +249,6 @@ export const SearchCommand = ({ open, setOpen }) => {
             ))}
           </CommandGroup>
         )}
-
         <SearchCommandGroup
           label="Accounts"
           totalCount={data?.search.results.accounts.collection.totalCount}
@@ -258,7 +262,6 @@ export const SearchCommand = ({ open, setOpen }) => {
             </CommandItem>
           )}
         />
-
         <SearchCommandGroup
           label="Expenses"
           totalCount={data?.search.results.expenses.collection.totalCount}
@@ -282,7 +285,7 @@ export const SearchCommand = ({ open, setOpen }) => {
               <CommandItem key={order.id} onSelect={() => handleResultSelect({ type: 'order', data: order })}>
                 <Link
                   className="block w-full"
-                  href={getCollectivePageRoute(order.account)}
+                  href={getOrderUrl(order, LoggedInUser)}
                   onClick={e => e.preventDefault()}
                 >
                   <OrderResult order={order} highlights={data.search.results.orders.highlights[order.id]} />
@@ -319,7 +322,7 @@ export const SearchCommand = ({ open, setOpen }) => {
             <CommandItem key={update.id} onSelect={() => handleResultSelect({ type: 'update', data: update })}>
               <Link
                 className="block w-full"
-                href={getCollectivePageRoute(update.account)}
+                href={getUpdateUrl(update, LoggedInUser)}
                 onClick={e => e.preventDefault()}
               >
                 <UpdateResult update={update} highlights={data.search.results.updates.highlights[update.id]} />
@@ -331,10 +334,14 @@ export const SearchCommand = ({ open, setOpen }) => {
           label="Comments"
           input={debouncedInput}
           totalCount={data?.search.results.comments.collection.totalCount}
-          nodes={data?.search.results.comments.collection.nodes}
+          nodes={data?.search.results.comments.collection.nodes.filter(comment => getCommentUrl(comment, LoggedInUser))} // We still have some comments on deleted entities. See https://github.com/opencollective/opencollective/issues/7734.
           renderNode={comment => (
             <CommandItem key={comment.id} onSelect={() => handleResultSelect({ type: 'comment', data: comment })}>
-              <Link className="block w-full" href={getCommentUrl(comment)} onClick={e => e.preventDefault()}>
+              <Link
+                className="block w-full"
+                href={getCommentUrl(comment, LoggedInUser)}
+                onClick={e => e.preventDefault()}
+              >
                 <CommentResult comment={comment} highlights={data.search.results.comments.highlights[comment.id]} />
               </Link>
             </CommandItem>

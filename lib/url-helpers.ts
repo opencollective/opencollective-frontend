@@ -4,6 +4,8 @@ import type { TaxFormType } from '../components/dashboard/sections/tax-informati
 
 import { CollectiveType } from './constants/collectives';
 import { TransactionTypes } from './constants/transactions';
+import type { Comment, Conversation, Expense, HostApplication, Order, Update } from './graphql/types/v2/schema';
+import type LoggedInUser from './LoggedInUser';
 import { getWebsiteUrl } from './utils';
 import { getWindowLocation } from './window';
 
@@ -140,7 +142,12 @@ export const getCollectivePageCanonicalURL = account => {
   return getWebsiteUrl() + getCollectivePageRoute(account);
 };
 
-export const getCollectivePageRoute = account => {
+export const getCollectivePageRoute = (account: {
+  slug: string;
+  type?: string;
+  parentCollective?: { slug?: string };
+  parent?: { slug?: string };
+}) => {
   if (!account) {
     return '';
   } else if (account.type === CollectiveType.EVENT) {
@@ -283,20 +290,66 @@ export const getTaxFormPDFServiceUrl = (type: TaxFormType, values, { isFinal = f
   return url.toString();
 };
 
-export const getExpensePageUrl = expense => {
+export const getExpensePageUrl = (expense: {
+  account: Parameters<typeof getCollectivePageRoute>[0];
+  legacyId: Expense['legacyId'];
+}) => {
   return `${getCollectivePageRoute(expense.account)}/expenses/${expense.legacyId}`;
 };
 
-export const getCommentUrl = comment => {
+const getUpdatePageUrl = (update: Update) => {
+  return `${getCollectivePageRoute(update.account)}/updates/${update.slug}`;
+};
+
+export const getUpdateUrl = (update: Update, loggedInUser: LoggedInUser) => {
+  if (loggedInUser && loggedInUser.isAdminOfCollective(update.account)) {
+    return `${getDashboardRoute(update.account, 'updates')}/${update.id}`;
+  } else {
+    return getUpdatePageUrl(update);
+  }
+};
+
+const getOrderPageUrl = (order: Order) => {
+  return `${getCollectivePageRoute(order.toAccount)}/contributions/${order.legacyId}`;
+};
+
+export const getOrderUrl = (order: Order, loggedInUser: LoggedInUser) => {
+  if (loggedInUser) {
+    if (loggedInUser.isAdminOfCollective(order.fromAccount)) {
+      return `${getDashboardRoute(order.fromAccount, 'contributions')}?orderId=${order.id}`;
+    } else if (loggedInUser.isAdminOfCollective(order.toAccount)) {
+      return `${getDashboardRoute(order.toAccount, 'incoming-contributions')}?orderId=${order.id}`;
+    }
+  }
+
+  return getOrderPageUrl(order);
+};
+
+const getConversationPageUrl = (conversation: Conversation) => {
+  return `${getCollectivePageRoute(conversation.account)}/conversations/${conversation.slug}-${conversation.id}`;
+};
+
+const getHostApplicationDashboardUrl = (application: HostApplication, loggedInUser: LoggedInUser) => {
+  if (loggedInUser.isAdminOfCollective(application.host) || loggedInUser.isHostAdmin(application.account)) {
+    return `${getDashboardRoute(application.account, 'host-applications')}?hostApplicationId=${application.id}`;
+  } else {
+    return `${getDashboardRoute(application.account, 'host')}`;
+  }
+};
+
+export const getCommentUrl = (comment: Comment, loggedInUser: LoggedInUser) => {
+  const commentAnchor = `#comment-${new Date(comment.createdAt).getTime()}`;
   if (comment.update) {
-    return `${getCollectivePageRoute(comment.update.account)}/updates/${comment.update.slug}#comment-${comment.id}`;
+    return `${getUpdatePageUrl(comment.update)}${commentAnchor}`;
   } else if (comment.conversation) {
-    return `${getCollectivePageRoute(comment.conversation.account)}/conversations/${comment.conversation.slug}-${comment.conversation.id}#comment-${comment.id}`;
+    return `${getConversationPageUrl(comment.conversation)}${commentAnchor}`;
   } else if (comment.expense) {
-    return `${getExpensePageUrl(comment.expense)}#comment-${new Date(comment.createdAt).getTime()}`;
+    return `${getExpensePageUrl(comment.expense)}${commentAnchor}`;
   } else if (comment.order) {
-    return `${getCollectivePageRoute(comment.order.fromAccount)}/transactions/${comment.order.legacyId}#comment-${comment.id}`;
+    return `${getOrderPageUrl(comment.order)}${commentAnchor}`;
   } else if (comment.hostApplication) {
-    return `${getCollectivePageRoute(comment.hostApplication.account)}/applications/${comment.hostApplication.id}#comment-${comment.id}`;
+    return getHostApplicationDashboardUrl(comment.hostApplication, loggedInUser);
+  } else {
+    return getCollectivePageRoute(comment.account);
   }
 };
