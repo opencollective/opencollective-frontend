@@ -148,7 +148,7 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
   const startOptions = React.useRef({
     expenseId: expense.legacyId,
     isInlineEdit: true,
-    pickSchemaFiels: {
+    pickSchemaFields: {
       expenseItems: true,
       hasTax: true,
       tax: true,
