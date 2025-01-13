@@ -105,6 +105,15 @@ const makeUrl = ({ account, isHostReport, queryFilter, flattenTaxesAndPaymentPro
     }
   }
 
+  if (queryFilter.values.clearedAt) {
+    if (queryFilter.variables.clearedFrom) {
+      url.searchParams.set('clearedFrom', queryFilter.variables.clearedFrom);
+    }
+    if (queryFilter.variables.clearedTo) {
+      url.searchParams.set('clearedTo', queryFilter.variables.clearedTo);
+    }
+  }
+
   if (!isNil(queryFilter.values.isRefund)) {
     url.searchParams.set('isRefund', queryFilter.values.isRefund ? '1' : '0');
   }
