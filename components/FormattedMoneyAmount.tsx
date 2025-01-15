@@ -32,6 +32,8 @@ interface FormattedMoneyAmountProps {
   amountClassName?: string;
   /** Classnames for the currency code (eg. `USD`). Doesn't apply on interval */
   currencyCodeClassName?: string;
+  /** Whether the amount is approximate, if true amount is prefixed by ~ */
+  isApproximate?: boolean;
 }
 
 const DEFAULT_AMOUNT_CLASSES = '';
@@ -50,6 +52,7 @@ const FormattedMoneyAmount = ({
   amountClassName,
   showCurrencyCode = true,
   currencyCodeClassName,
+  isApproximate,
 }: FormattedMoneyAmountProps) => {
   if (!currency) {
     return <span className={cn(DEFAULT_AMOUNT_CLASSES, amountClassName)}>{EMPTY_AMOUNT_PLACEHOLDER}</span>;
@@ -65,6 +68,7 @@ const FormattedMoneyAmount = ({
         precision={precision}
         formatWithSeparators={formatWithSeparators}
         className={cn(DEFAULT_AMOUNT_CLASSES, amountClassName)}
+        isApproximate={isApproximate}
       />
     );
 
