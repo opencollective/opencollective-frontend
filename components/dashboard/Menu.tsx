@@ -8,6 +8,7 @@ import {
   Building,
   Coins,
   CreditCard,
+  FileChartColumn,
   FileText,
   FlaskConical,
   Globe2,
@@ -18,6 +19,7 @@ import {
   Settings,
   Store,
   Ticket,
+  Umbrella,
   Users,
   Users2,
   UserX,
@@ -98,7 +100,7 @@ const ROOT_MENU = [
 
 export type MenuItem = PageMenuItem | GroupMenuItem;
 
-export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
+export const getMenuItems = ({ intl, account, LoggedInUser, sidebarPrototypeSettings = undefined }): MenuItem[] => {
   const isRootProfile = account.type === 'ROOT' && LoggedInUser?.isRoot;
   if (isRootProfile) {
     return ROOT_MENU;
@@ -111,359 +113,508 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
   const isActive = account.isActive;
   const isActiveHost = isHost && isActive;
 
-  const items: MenuItem[] = [
-    {
-      if: isIndividual || (LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW) && !isHost),
-      section: ALL_SECTIONS.OVERVIEW,
-      Icon: LayoutDashboard,
-    },
-    {
-      if: isIndividual,
-      section: ALL_SECTIONS.SUBMITTED_EXPENSES,
-      Icon: Receipt,
-      label: intl.formatMessage({ id: 'Expenses', defaultMessage: 'Expenses' }),
-    },
-    {
-      if: !isIndividual && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.CROWDFUNDING_REDESIGN),
-      section: ALL_SECTIONS.ACCOUNTS,
-      Icon: Wallet,
-      label: intl.formatMessage({ defaultMessage: 'Accounts', id: 'FvanT6' }),
-    },
-    {
-      if: !isIndividual,
-      type: 'group',
-      label: intl.formatMessage({ id: 'Expenses', defaultMessage: 'Expenses' }),
-      Icon: Receipt,
-      subMenu: [
-        {
-          if: isHost,
-          section: ALL_SECTIONS.HOST_EXPENSES,
-          label: intl.formatMessage({ id: 'ToCollectives', defaultMessage: 'To Collectives' }),
-        },
-        {
-          section: ALL_SECTIONS.EXPENSES,
-          label: intl.formatMessage(
+  const settingsGroup: GroupMenuItem = {
+    type: 'group',
+    label: intl.formatMessage({ id: 'Settings', defaultMessage: 'Settings' }),
+    Icon: Settings,
+    subMenu: [
+      // General
+      {
+        section: ALL_SECTIONS.INFO,
+        if: !isAccountantOnly,
+      },
+      {
+        section: ALL_SECTIONS.TAX_INFORMATION,
+        if: !isAccountantOnly,
+      },
+      {
+        section: ALL_SECTIONS.COLLECTIVE_PAGE,
+        if: !isAccountantOnly,
+      },
+      {
+        section: ALL_SECTIONS.CONNECTED_ACCOUNTS, // Displayed as "Social accounts"
+        if:
+          isOneOfTypes(account, [COLLECTIVE, ORGANIZATION]) &&
+          !isAccountantOnly &&
+          account.connectedAccounts?.some(({ service }) => service === ConnectedAccountService.twitter),
+      },
+      // Host sections
+      ...(isHost || isSelfHosted
+        ? [
             {
-              id: 'hZhgoW',
-              defaultMessage: 'To {accountName}',
+              section: ALL_SECTIONS.FISCAL_HOSTING,
+              if: !isAccountantOnly && !isSelfHosted,
             },
-            { accountName: account.name },
-          ),
-        },
-        {
-          section: ALL_SECTIONS.SUBMITTED_EXPENSES,
-          label: intl.formatMessage(
             {
-              id: 'PVqJoO',
-              defaultMessage: 'From {accountName}',
+              section: ALL_SECTIONS.POLICIES,
+              if: isOneOfTypes(account, [USER, ORGANIZATION, COLLECTIVE]) && !isAccountantOnly,
             },
-            { accountName: account.name },
-          ),
-        },
-      ],
-    },
-    {
-      if: isIndividual,
-      section: ALL_SECTIONS.OUTGOING_CONTRIBUTIONS,
-      label: intl.formatMessage({ id: 'Contributions', defaultMessage: 'Contributions' }),
-      Icon: Coins,
-    },
-    {
-      if: !isIndividual,
-      section: ALL_SECTIONS.CONTRIBUTORS,
-      label: intl.formatMessage({ id: 'Contributors', defaultMessage: 'Contributors' }),
-      Icon: BookUserIcon,
-    },
-    {
-      if: !isIndividual,
-      type: 'group',
-      label: intl.formatMessage({ id: 'Contributions', defaultMessage: 'Contributions' }),
-      Icon: Coins,
-      subMenu: [
-        {
-          if: isHost || isSelfHosted,
-          label: intl.formatMessage({ id: 'ToCollectives', defaultMessage: 'To Collectives' }),
-          section: ALL_SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS,
-        },
-        {
-          label: intl.formatMessage(
             {
-              id: 'hZhgoW',
-              defaultMessage: 'To {accountName}',
+              section: ALL_SECTIONS.RECEIVING_MONEY,
+              if: !isAccountantOnly,
             },
-            { accountName: account.name },
-          ),
-          section: ALL_SECTIONS.INCOMING_CONTRIBUTIONS,
-        },
-        {
-          label: intl.formatMessage(
             {
-              id: 'PVqJoO',
-              defaultMessage: 'From {accountName}',
+              section: ALL_SECTIONS.SENDING_MONEY,
+              if: !isAccountantOnly,
             },
-            { accountName: account.name },
-          ),
-          section: ALL_SECTIONS.OUTGOING_CONTRIBUTIONS,
-        },
-      ],
-    },
-    {
-      if: isHost || isSelfHosted,
-      label: intl.formatMessage({ defaultMessage: 'Expected Funds', id: 'ExpectedFunds' }),
-      Icon: Coins,
-      section: ALL_SECTIONS.HOST_EXPECTED_FUNDS,
-    },
-    {
-      if: isHost && !isAccountantOnly,
-      type: 'group',
-      Icon: Building,
-      label: intl.formatMessage({ id: 'Collectives', defaultMessage: 'Collectives' }),
-      subMenu: [
-        {
-          section: ALL_SECTIONS.HOSTED_COLLECTIVES,
-        },
-        {
-          label: intl.formatMessage({ id: 'DqD1yK', defaultMessage: 'Applications' }),
-          section: ALL_SECTIONS.HOST_APPLICATIONS,
-        },
-      ],
-    },
-    {
-      if: isHost,
-      type: 'group',
-      Icon: FileText,
-      label: intl.formatMessage({ defaultMessage: 'Legal Documents', id: 'lSFdN4' }),
-      subMenu: [
-        {
-          section: ALL_SECTIONS.HOST_AGREEMENTS,
-          label: intl.formatMessage({ id: 'Agreements', defaultMessage: 'Agreements' }),
-        },
-        {
-          section: ALL_SECTIONS.HOST_TAX_FORMS,
-          label: intl.formatMessage({ defaultMessage: 'Tax Forms', id: 'skSw4d' }),
-          if: Boolean(account.host?.requiredLegalDocuments?.includes('US_TAX_FORM')),
-        },
-      ],
-    },
-    {
-      if: isHost && hasFeature(account, FEATURES.VIRTUAL_CARDS) && !isAccountantOnly,
-      type: 'group',
-      label: intl.formatMessage({ id: 'VirtualCards.Title', defaultMessage: 'Virtual Cards' }),
-      Icon: CreditCard,
-      subMenu: [
-        {
-          label: intl.formatMessage({ id: 'VirtualCards.Issued', defaultMessage: 'Issued' }),
-          section: ALL_SECTIONS.HOST_VIRTUAL_CARDS,
-        },
-        {
-          label: intl.formatMessage({ id: 'VirtualCards.Requests', defaultMessage: 'Requests' }),
-          section: ALL_SECTIONS.HOST_VIRTUAL_CARD_REQUESTS,
-        },
-      ],
-    },
-    {
-      if: isHost,
-      type: 'group',
-      label: intl.formatMessage({ id: 'Reports', defaultMessage: 'Reports' }),
-      Icon: BarChart2,
-      subMenu: [
-        {
-          section: ALL_SECTIONS.TRANSACTION_REPORTS,
-          label: intl.formatMessage({ defaultMessage: 'Transactions', id: 'menu.transactions' }),
-        },
-        {
-          section: ALL_SECTIONS.EXPENSE_REPORTS,
-          label: intl.formatMessage({ defaultMessage: 'Expenses', id: 'Expenses' }),
-        },
-      ],
-    },
-    {
-      if: !isHost && !isIndividual && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.HOST_REPORTS),
-      label: intl.formatMessage({ id: 'Reports', defaultMessage: 'Reports' }),
-      Icon: BarChart2,
-      section: ALL_SECTIONS.TRANSACTION_REPORTS,
-    },
-    {
-      if: (isHost || isSelfHosted) && !isAccountantOnly,
-      section: ALL_SECTIONS.VENDORS,
-      Icon: Store,
-    },
-    {
-      if: isType(account, EVENT),
-      section: ALL_SECTIONS.TICKETS,
-      label: intl.formatMessage({ defaultMessage: 'Ticket tiers', id: 'tG3saB' }),
-      Icon: Ticket,
-    },
-    {
-      if: isType(account, EVENT),
-      section: ALL_SECTIONS.TIERS,
-      label: intl.formatMessage({ defaultMessage: 'Sponsorship tiers', id: '3Qx5eX' }),
-      Icon: HeartHandshake,
-    },
-    {
-      if: !isHost,
-      section: ALL_SECTIONS.TRANSACTIONS,
-      Icon: ArrowRightLeft,
-    },
-    {
-      if: isHost,
-      section: ALL_SECTIONS.HOST_TRANSACTIONS,
-      Icon: ArrowRightLeft,
-      label: intl.formatMessage({ id: 'menu.transactions', defaultMessage: 'Transactions' }),
-    },
-    {
-      if: !isIndividual,
-      section: ALL_SECTIONS.UPDATES,
-      Icon: Megaphone,
-    },
-    {
-      if:
-        !isOneOfTypes(account, [EVENT, USER]) && (account.type !== 'ORGANIZATION' || isActiveHost) && !isAccountantOnly,
-      section: ALL_SECTIONS.TIERS,
-      Icon: HeartHandshake,
-    },
-    {
-      if: !isIndividual && !isAccountantOnly,
-      section: ALL_SECTIONS.TEAM,
-      Icon: Users2,
-    },
-    {
-      if:
-        isOneOfTypes(account, [COLLECTIVE, FUND, EVENT, PROJECT]) &&
-        hasFeature(account.host, FEATURES.VIRTUAL_CARDS) &&
-        account.isApproved,
-      section: ALL_SECTIONS.VIRTUAL_CARDS,
-      Icon: CreditCard,
-    },
-    {
-      type: 'group',
-      label: intl.formatMessage({ id: 'Settings', defaultMessage: 'Settings' }),
-      Icon: Settings,
-      subMenu: [
-        // General
-        {
-          section: ALL_SECTIONS.INFO,
-          if: !isAccountantOnly,
-        },
-        {
-          section: ALL_SECTIONS.TAX_INFORMATION,
-          if: !isAccountantOnly,
-        },
-        {
-          section: ALL_SECTIONS.COLLECTIVE_PAGE,
-          if: !isAccountantOnly,
-        },
-        {
-          section: ALL_SECTIONS.CONNECTED_ACCOUNTS, // Displayed as "Social accounts"
-          if:
-            isOneOfTypes(account, [COLLECTIVE, ORGANIZATION]) &&
-            !isAccountantOnly &&
-            account.connectedAccounts?.some(({ service }) => service === ConnectedAccountService.twitter),
-        },
-        // Host sections
-        ...(isHost || isSelfHosted
-          ? [
+            {
+              section: ALL_SECTIONS.CHART_OF_ACCOUNTS,
+            },
+            {
+              section: ALL_SECTIONS.INVOICES_RECEIPTS,
+              if: !isAccountantOnly,
+            },
+            {
+              section: ALL_SECTIONS.HOST_VIRTUAL_CARDS_SETTINGS,
+              if: hasFeature(account, FEATURES.VIRTUAL_CARDS) && !isAccountantOnly && !isSelfHosted,
+            },
+          ]
+        : []),
+      // Security
+      {
+        section: ALL_SECTIONS.SECURITY,
+        if: isOneOfTypes(account, [COLLECTIVE, FUND, ORGANIZATION]) && !isAccountantOnly,
+      },
+      {
+        section: ALL_SECTIONS.USER_SECURITY,
+        if: isIndividualAccount(account),
+      },
+      {
+        section: ALL_SECTIONS.ACTIVITY_LOG,
+        if: !isAccountantOnly,
+      },
+      // Payments / Payouts
+      {
+        section: ALL_SECTIONS.PAYMENT_METHODS,
+        if: ['ACTIVE', 'AVAILABLE'].includes(account.features.USE_PAYMENT_METHODS) && !isAccountantOnly,
+      },
+      {
+        section: ALL_SECTIONS.PAYMENT_RECEIPTS,
+        if: isOneOfTypes(account, [INDIVIDUAL, USER, ORGANIZATION]),
+      },
+      {
+        section: ALL_SECTIONS.GIFT_CARDS,
+        if: ['ACTIVE', 'AVAILABLE'].includes(account.features.EMIT_GIFT_CARDS) && !isAccountantOnly,
+      },
+      // Sections for individual accounts
+      {
+        section: ALL_SECTIONS.NOTIFICATIONS,
+        if: isIndividualAccount(account),
+      },
+      {
+        section: ALL_SECTIONS.AUTHORIZED_APPS,
+        if: isIndividualAccount(account),
+      },
+      // Collective sections
+      {
+        section: ALL_SECTIONS.HOST,
+        if: isOneOfTypes(account, [COLLECTIVE, FUND]) && !isAccountantOnly,
+      },
+      {
+        section: ALL_SECTIONS.COLLECTIVE_GOALS,
+        if: isOneOfTypes(account, [COLLECTIVE, PROJECT]) && !isAccountantOnly,
+      },
+      {
+        // POLICIES also available for Fiscal hosts further up in this list
+        section: ALL_SECTIONS.POLICIES,
+        if: isOneOfTypes(account, [COLLECTIVE, FUND]) && !isHost && !isSelfHosted && !isAccountantOnly,
+      },
+      {
+        section: ALL_SECTIONS.CUSTOM_EMAIL,
+        if: isOneOfTypes(account, [COLLECTIVE, EVENT, PROJECT]) && !isAccountantOnly,
+      },
+      {
+        section: ALL_SECTIONS.EXPORT,
+        if: isOneOfTypes(account, [COLLECTIVE, EVENT, PROJECT]),
+      },
+      {
+        section: ALL_SECTIONS.FOR_DEVELOPERS,
+        if: isOneOfTypes(account, [COLLECTIVE, USER, INDIVIDUAL, ORGANIZATION]) && !isAccountantOnly,
+      },
+      {
+        section: ALL_SECTIONS.WEBHOOKS,
+        if: !isAccountantOnly,
+      },
+      {
+        section: ALL_SECTIONS.ADVANCED,
+        if: !isAccountantOnly,
+      },
+    ],
+  };
+  let items: MenuItem[] = [];
+
+  if (sidebarPrototypeSettings?.enabled && isHost) {
+    items = [
+      {
+        type: 'group',
+        label: intl.formatMessage({ defaultMessage: 'Organization', id: 'Tags.ORGANIZATION' }),
+        Icon: Building,
+        subMenu: [
+          {
+            if: LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.CROWDFUNDING_REDESIGN),
+            section: ALL_SECTIONS.ACCOUNTS,
+            label: intl.formatMessage({ defaultMessage: 'Accounts', id: 'FvanT6' }),
+          },
+          {
+            section: ALL_SECTIONS.EXPENSES,
+            label: intl.formatMessage({
+              defaultMessage: 'Received Expenses',
+              id: '1c0Y31',
+            }),
+          },
+          {
+            section: ALL_SECTIONS.SUBMITTED_EXPENSES,
+            label: intl.formatMessage({
+              defaultMessage: 'Submitted Expenses',
+              id: 'NpGb+x',
+            }),
+          },
+          {
+            section: ALL_SECTIONS.CONTRIBUTORS,
+            label: intl.formatMessage({ id: 'Contributors', defaultMessage: 'Contributors' }),
+          },
+          {
+            label: intl.formatMessage({
+              defaultMessage: 'Incoming Contributions',
+              id: 'IncomingContributions',
+            }),
+            section: ALL_SECTIONS.INCOMING_CONTRIBUTIONS,
+          },
+          {
+            label: intl.formatMessage({
+              defaultMessage: 'Outgoing Contributions',
+              id: 'OutgoingContributions',
+            }),
+            section: ALL_SECTIONS.OUTGOING_CONTRIBUTIONS,
+          },
+          {
+            if: !sidebarPrototypeSettings.topLevelLedger,
+            section: ALL_SECTIONS.TRANSACTIONS,
+          },
+          {
+            section: ALL_SECTIONS.UPDATES,
+          },
+          {
+            if: (account.type !== 'ORGANIZATION' || isActiveHost) && !isAccountantOnly,
+            section: ALL_SECTIONS.TIERS,
+          },
+          {
+            if: !isAccountantOnly,
+            section: ALL_SECTIONS.TEAM,
+          },
+          {
+            // Keep? Does not exsist for orgs today
+            if: hasFeature(account.host, FEATURES.VIRTUAL_CARDS) && account.isApproved,
+            section: ALL_SECTIONS.VIRTUAL_CARDS,
+          },
+        ],
+      },
+      {
+        type: 'group',
+        label: intl.formatMessage({ defaultMessage: 'Host', id: 'Member.Role.HOST' }),
+        Icon: Umbrella,
+        subMenu: [
+          {
+            section: ALL_SECTIONS.HOST_EXPENSES,
+            label: intl.formatMessage({ defaultMessage: 'Expenses', id: 'Expenses' }),
+          },
+          {
+            section: ALL_SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS,
+          },
+          {
+            label: intl.formatMessage({ defaultMessage: 'Expected Funds', id: 'ExpectedFunds' }),
+            section: ALL_SECTIONS.HOST_EXPECTED_FUNDS,
+          },
+          {
+            section: ALL_SECTIONS.HOSTED_COLLECTIVES,
+          },
+          {
+            section: ALL_SECTIONS.HOST_APPLICATIONS,
+          },
+          {
+            section: ALL_SECTIONS.HOST_AGREEMENTS,
+            label: intl.formatMessage({ id: 'Agreements', defaultMessage: 'Agreements' }),
+          },
+          {
+            if: Boolean(account.host?.requiredLegalDocuments?.includes('US_TAX_FORM')),
+            section: ALL_SECTIONS.HOST_TAX_FORMS,
+            label: intl.formatMessage({ defaultMessage: 'Tax Forms', id: 'skSw4d' }),
+          },
+          {
+            if: hasFeature(account, FEATURES.VIRTUAL_CARDS) && !isAccountantOnly,
+            label: intl.formatMessage({ defaultMessage: 'Virtual Cards', id: 'VirtualCards.Title' }),
+            section: ALL_SECTIONS.HOST_VIRTUAL_CARDS,
+          },
+          {
+            if: hasFeature(account, FEATURES.VIRTUAL_CARDS) && !isAccountantOnly,
+            label: intl.formatMessage({ defaultMessage: 'Virtual Card Requests', id: 'VirtualCardRequests.Title' }),
+            section: ALL_SECTIONS.HOST_VIRTUAL_CARD_REQUESTS,
+          },
+          {
+            if: !isAccountantOnly,
+            section: ALL_SECTIONS.VENDORS,
+          },
+          {
+            if: !sidebarPrototypeSettings.topLevelLedger,
+            section: ALL_SECTIONS.HOST_TRANSACTIONS,
+            label: intl.formatMessage({ id: 'menu.transactions', defaultMessage: 'Transactions' }),
+          },
+        ],
+      },
+      {
+        if: sidebarPrototypeSettings.topLevelLedger,
+        section: ALL_SECTIONS.HOST_TRANSACTIONS,
+        label: intl.formatMessage({ defaultMessage: 'Transactions', id: 'menu.transactions' }),
+        Icon: ArrowRightLeft,
+      },
+      {
+        type: 'group',
+        label: intl.formatMessage({ defaultMessage: 'Reports', id: 'Reports' }),
+        Icon: FileChartColumn,
+        subMenu: [
+          {
+            section: ALL_SECTIONS.TRANSACTION_REPORTS,
+            label: intl.formatMessage({ defaultMessage: 'Transactions', id: 'menu.transactions' }),
+          },
+          {
+            section: ALL_SECTIONS.EXPENSE_REPORTS,
+            label: intl.formatMessage({ defaultMessage: 'Expenses', id: 'Expenses' }),
+          },
+        ],
+      },
+      settingsGroup,
+    ];
+  } else {
+    items = [
+      {
+        if:
+          isIndividual || (LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW) && !isHost),
+        section: ALL_SECTIONS.OVERVIEW,
+        Icon: LayoutDashboard,
+      },
+      {
+        if: isIndividual,
+        section: ALL_SECTIONS.SUBMITTED_EXPENSES,
+        Icon: Receipt,
+        label: intl.formatMessage({ id: 'Expenses', defaultMessage: 'Expenses' }),
+      },
+      {
+        if: !isIndividual && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.CROWDFUNDING_REDESIGN),
+        section: ALL_SECTIONS.ACCOUNTS,
+        Icon: Wallet,
+        label: intl.formatMessage({ defaultMessage: 'Accounts', id: 'FvanT6' }),
+      },
+      {
+        if: !isIndividual,
+        type: 'group',
+        label: intl.formatMessage({ id: 'Expenses', defaultMessage: 'Expenses' }),
+        Icon: Receipt,
+        subMenu: [
+          {
+            if: isHost,
+            section: ALL_SECTIONS.HOST_EXPENSES,
+            label: intl.formatMessage({ id: 'ToCollectives', defaultMessage: 'To Collectives' }),
+          },
+          {
+            section: ALL_SECTIONS.EXPENSES,
+            label: intl.formatMessage(
               {
-                section: ALL_SECTIONS.FISCAL_HOSTING,
-                if: !isAccountantOnly && !isSelfHosted,
+                id: 'hZhgoW',
+                defaultMessage: 'To {accountName}',
               },
+              { accountName: account.name },
+            ),
+          },
+          {
+            section: ALL_SECTIONS.SUBMITTED_EXPENSES,
+            label: intl.formatMessage(
               {
-                section: ALL_SECTIONS.POLICIES,
-                if: isOneOfTypes(account, [USER, ORGANIZATION, COLLECTIVE]) && !isAccountantOnly,
+                id: 'PVqJoO',
+                defaultMessage: 'From {accountName}',
               },
+              { accountName: account.name },
+            ),
+          },
+        ],
+      },
+      {
+        if: isIndividual,
+        section: ALL_SECTIONS.OUTGOING_CONTRIBUTIONS,
+        label: intl.formatMessage({ id: 'Contributions', defaultMessage: 'Contributions' }),
+        Icon: Coins,
+      },
+      {
+        if: !isIndividual,
+        section: ALL_SECTIONS.CONTRIBUTORS,
+        label: intl.formatMessage({ id: 'Contributors', defaultMessage: 'Contributors' }),
+        Icon: BookUserIcon,
+      },
+      {
+        if: !isIndividual,
+        type: 'group',
+        label: intl.formatMessage({ id: 'Contributions', defaultMessage: 'Contributions' }),
+        Icon: Coins,
+        subMenu: [
+          {
+            if: isHost || isSelfHosted,
+            label: intl.formatMessage({ id: 'ToCollectives', defaultMessage: 'To Collectives' }),
+            section: ALL_SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS,
+          },
+          {
+            label: intl.formatMessage(
               {
-                section: ALL_SECTIONS.RECEIVING_MONEY,
-                if: !isAccountantOnly,
+                id: 'hZhgoW',
+                defaultMessage: 'To {accountName}',
               },
+              { accountName: account.name },
+            ),
+            section: ALL_SECTIONS.INCOMING_CONTRIBUTIONS,
+          },
+          {
+            label: intl.formatMessage(
               {
-                section: ALL_SECTIONS.SENDING_MONEY,
-                if: !isAccountantOnly,
+                id: 'PVqJoO',
+                defaultMessage: 'From {accountName}',
               },
-              {
-                section: ALL_SECTIONS.CHART_OF_ACCOUNTS,
-              },
-              {
-                section: ALL_SECTIONS.INVOICES_RECEIPTS,
-                if: !isAccountantOnly,
-              },
-              {
-                section: ALL_SECTIONS.HOST_VIRTUAL_CARDS_SETTINGS,
-                if: hasFeature(account, FEATURES.VIRTUAL_CARDS) && !isAccountantOnly && !isSelfHosted,
-              },
-            ]
-          : []),
-        // Security
-        {
-          section: ALL_SECTIONS.SECURITY,
-          if: isOneOfTypes(account, [COLLECTIVE, FUND, ORGANIZATION]) && !isAccountantOnly,
-        },
-        {
-          section: ALL_SECTIONS.USER_SECURITY,
-          if: isIndividualAccount(account),
-        },
-        {
-          section: ALL_SECTIONS.ACTIVITY_LOG,
-          if: !isAccountantOnly,
-        },
-        // Payments / Payouts
-        {
-          section: ALL_SECTIONS.PAYMENT_METHODS,
-          if: ['ACTIVE', 'AVAILABLE'].includes(account.features.USE_PAYMENT_METHODS) && !isAccountantOnly,
-        },
-        {
-          section: ALL_SECTIONS.PAYMENT_RECEIPTS,
-          if: isOneOfTypes(account, [INDIVIDUAL, USER, ORGANIZATION]),
-        },
-        {
-          section: ALL_SECTIONS.GIFT_CARDS,
-          if: ['ACTIVE', 'AVAILABLE'].includes(account.features.EMIT_GIFT_CARDS) && !isAccountantOnly,
-        },
-        // Sections for individual accounts
-        {
-          section: ALL_SECTIONS.NOTIFICATIONS,
-          if: isIndividualAccount(account),
-        },
-        {
-          section: ALL_SECTIONS.AUTHORIZED_APPS,
-          if: isIndividualAccount(account),
-        },
-        // Collective sections
-        {
-          section: ALL_SECTIONS.HOST,
-          if: isOneOfTypes(account, [COLLECTIVE, FUND]) && !isAccountantOnly,
-        },
-        {
-          section: ALL_SECTIONS.COLLECTIVE_GOALS,
-          if: isOneOfTypes(account, [COLLECTIVE, PROJECT]) && !isAccountantOnly,
-        },
-        {
-          // POLICIES also available for Fiscal hosts further up in this list
-          section: ALL_SECTIONS.POLICIES,
-          if: isOneOfTypes(account, [COLLECTIVE, FUND]) && !isHost && !isSelfHosted && !isAccountantOnly,
-        },
-        {
-          section: ALL_SECTIONS.CUSTOM_EMAIL,
-          if: isOneOfTypes(account, [COLLECTIVE, EVENT, PROJECT]) && !isAccountantOnly,
-        },
-        {
-          section: ALL_SECTIONS.EXPORT,
-          if: isOneOfTypes(account, [COLLECTIVE, EVENT, PROJECT]),
-        },
-        {
-          section: ALL_SECTIONS.FOR_DEVELOPERS,
-          if: isOneOfTypes(account, [COLLECTIVE, USER, INDIVIDUAL, ORGANIZATION]) && !isAccountantOnly,
-        },
-        {
-          section: ALL_SECTIONS.WEBHOOKS,
-          if: !isAccountantOnly,
-        },
-        {
-          section: ALL_SECTIONS.ADVANCED,
-          if: !isAccountantOnly,
-        },
-      ],
-    },
-  ];
+              { accountName: account.name },
+            ),
+            section: ALL_SECTIONS.OUTGOING_CONTRIBUTIONS,
+          },
+        ],
+      },
+      {
+        if: isHost || isSelfHosted,
+        label: intl.formatMessage({ defaultMessage: 'Expected Funds', id: 'ExpectedFunds' }),
+        Icon: Coins,
+        section: ALL_SECTIONS.HOST_EXPECTED_FUNDS,
+      },
+      {
+        if: isHost && !isAccountantOnly,
+        type: 'group',
+        Icon: Building,
+        label: intl.formatMessage({ id: 'Collectives', defaultMessage: 'Collectives' }),
+        subMenu: [
+          {
+            section: ALL_SECTIONS.HOSTED_COLLECTIVES,
+          },
+          {
+            label: intl.formatMessage({ id: 'DqD1yK', defaultMessage: 'Applications' }),
+            section: ALL_SECTIONS.HOST_APPLICATIONS,
+          },
+        ],
+      },
+      {
+        if: isHost,
+        type: 'group',
+        Icon: FileText,
+        label: intl.formatMessage({ defaultMessage: 'Legal Documents', id: 'lSFdN4' }),
+        subMenu: [
+          {
+            section: ALL_SECTIONS.HOST_AGREEMENTS,
+            label: intl.formatMessage({ id: 'Agreements', defaultMessage: 'Agreements' }),
+          },
+          {
+            section: ALL_SECTIONS.HOST_TAX_FORMS,
+            label: intl.formatMessage({ defaultMessage: 'Tax Forms', id: 'skSw4d' }),
+            if: Boolean(account.host?.requiredLegalDocuments?.includes('US_TAX_FORM')),
+          },
+        ],
+      },
+      {
+        if: isHost && hasFeature(account, FEATURES.VIRTUAL_CARDS) && !isAccountantOnly,
+        type: 'group',
+        label: intl.formatMessage({ id: 'VirtualCards.Title', defaultMessage: 'Virtual Cards' }),
+        Icon: CreditCard,
+        subMenu: [
+          {
+            label: intl.formatMessage({ id: 'VirtualCards.Issued', defaultMessage: 'Issued' }),
+            section: ALL_SECTIONS.HOST_VIRTUAL_CARDS,
+          },
+          {
+            label: intl.formatMessage({ id: 'VirtualCards.Requests', defaultMessage: 'Requests' }),
+            section: ALL_SECTIONS.HOST_VIRTUAL_CARD_REQUESTS,
+          },
+        ],
+      },
+      {
+        if: isHost,
+        type: 'group',
+        label: intl.formatMessage({ id: 'Reports', defaultMessage: 'Reports' }),
+        Icon: BarChart2,
+        subMenu: [
+          {
+            section: ALL_SECTIONS.TRANSACTION_REPORTS,
+            label: intl.formatMessage({ defaultMessage: 'Transactions', id: 'menu.transactions' }),
+          },
+          {
+            section: ALL_SECTIONS.EXPENSE_REPORTS,
+            label: intl.formatMessage({ defaultMessage: 'Expenses', id: 'Expenses' }),
+          },
+        ],
+      },
+      {
+        if: !isHost && !isIndividual && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.HOST_REPORTS),
+        label: intl.formatMessage({ id: 'Reports', defaultMessage: 'Reports' }),
+        Icon: BarChart2,
+        section: ALL_SECTIONS.TRANSACTION_REPORTS,
+      },
+      {
+        if: (isHost || isSelfHosted) && !isAccountantOnly,
+        section: ALL_SECTIONS.VENDORS,
+        Icon: Store,
+      },
+      {
+        if: isType(account, EVENT),
+        section: ALL_SECTIONS.TICKETS,
+        label: intl.formatMessage({ defaultMessage: 'Ticket tiers', id: 'tG3saB' }),
+        Icon: Ticket,
+      },
+      {
+        if: isType(account, EVENT),
+        section: ALL_SECTIONS.TIERS,
+        label: intl.formatMessage({ defaultMessage: 'Sponsorship tiers', id: '3Qx5eX' }),
+        Icon: HeartHandshake,
+      },
+      {
+        if: !isHost,
+        section: ALL_SECTIONS.TRANSACTIONS,
+        Icon: ArrowRightLeft,
+      },
+      {
+        if: isHost,
+        section: ALL_SECTIONS.HOST_TRANSACTIONS,
+        Icon: ArrowRightLeft,
+        label: intl.formatMessage({ id: 'menu.transactions', defaultMessage: 'Transactions' }),
+      },
+      {
+        if: !isIndividual,
+        section: ALL_SECTIONS.UPDATES,
+        Icon: Megaphone,
+      },
+      {
+        if:
+          !isOneOfTypes(account, [EVENT, USER]) &&
+          (account.type !== 'ORGANIZATION' || isActiveHost) &&
+          !isAccountantOnly,
+        section: ALL_SECTIONS.TIERS,
+        Icon: HeartHandshake,
+      },
+      {
+        if: !isIndividual && !isAccountantOnly,
+        section: ALL_SECTIONS.TEAM,
+        Icon: Users2,
+      },
+      {
+        if:
+          isOneOfTypes(account, [COLLECTIVE, FUND, EVENT, PROJECT]) &&
+          hasFeature(account.host, FEATURES.VIRTUAL_CARDS) &&
+          account.isApproved,
+        section: ALL_SECTIONS.VIRTUAL_CARDS,
+        Icon: CreditCard,
+      },
+      settingsGroup,
+    ];
+  }
 
   return (
     items
@@ -489,6 +640,7 @@ const Menu = ({ onRoute, menuItems }) => {
   const intl = useIntl();
   const { account } = React.useContext(DashboardContext);
   const { LoggedInUser } = useLoggedInUser();
+
   React.useEffect(() => {
     if (onRoute) {
       router.events.on('routeChangeStart', onRoute);
