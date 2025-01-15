@@ -100,7 +100,7 @@ export const SearchCommand = ({ open, setOpen }) => {
 
   const { debouncedValue: debouncedInput, isDebouncing } = useDebouncedValue(input, 500);
   useEffect(() => {
-    search({ variables: { searchTerm: debouncedInput } });
+    debouncedInput?.length > 0 && search({ variables: { searchTerm: debouncedInput } });
   }, [debouncedInput, search]);
 
   const handleKeyDown = React.useCallback(
