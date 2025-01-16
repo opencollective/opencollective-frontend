@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql, useApolloClient, useMutation, useQuery } from '@apollo/client';
-import { ceil, floor, isEmpty, startCase } from 'lodash';
+import { ceil, floor, isEmpty } from 'lodash';
 import { ArrowLeft, ArrowRight, Ban, Calendar, Coins, ExternalLink, Save } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -41,6 +41,7 @@ import * as ContributionFilters from '../contributions/filters';
 
 import { FilterWithRawValueButton } from './FilterWithRawValueButton';
 import { SuggestedContributionsTable } from './SuggestedContributionsTable';
+import { TransactionsImportRowDataLine } from './TransactionsImportRowDataLine';
 
 const filterRawValueEntries = ([key, value]: [string, string], csvConfig: CSVConfig): boolean => {
   // Ignore empty values
@@ -52,6 +53,10 @@ const filterRawValueEntries = ([key, value]: [string, string], csvConfig: CSVCon
   if (csvConfig) {
     const { columns } = csvConfig;
     if ([columns.credit.target, columns.debit.target, columns.date.target].includes(key)) {
+      return false;
+    }
+  } else {
+    if (['date'].includes(key)) {
       return false;
     }
   }
@@ -221,6 +226,7 @@ export const MatchContributionDialog = ({
   const { data, loading, error } = useQuery(suggestExpectedFundsQuery, {
     context: API_V2_CONTEXT,
     variables: { ...queryFilter.variables, hostId: host.id },
+    fetchPolicy: 'cache-and-network',
   });
 
   // Re-load default filters when changing row
@@ -361,12 +367,7 @@ export const MatchContributionDialog = ({
                   {Object.entries(row.rawValue as Record<string, string>)
                     .filter(entry => filterRawValueEntries(entry, transactionsImport.csvConfig))
                     .map(([key, value]) => (
-                      <li key={key}>
-                        <strong>{startCase(key)}</strong>: {value.toString()}{' '}
-                        <FilterWithRawValueButton
-                          onClick={() => queryFilter.setFilter('searchTerm', value.toString())}
-                        />
-                      </li>
+                      <TransactionsImportRowDataLine key={key} value={value} labelKey={key} />
                     ))}
                 </ul>
               </div>
