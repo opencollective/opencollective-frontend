@@ -108,7 +108,7 @@ export function ExpenseItemsForm(props: { form: ExpenseForm }) {
                 amount: { valueInCents: 0, currency: props.form.options.expenseCurrency },
                 description: '',
                 incurredAt: new Date().toISOString(),
-                attachment: '',
+                attachment: null,
               },
             ])
           }

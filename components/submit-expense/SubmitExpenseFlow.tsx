@@ -137,7 +137,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
           url: typeof a === 'string' ? a : a?.url,
         }));
 
-        if (values.hasInvoiceOption === YesNoOption.YES) {
+        if (values.hasInvoiceOption === YesNoOption.YES && values.expenseTypeOption === ExpenseType.INVOICE) {
           attachedFiles.push({
             url: typeof values.invoiceFile === 'string' ? values.invoiceFile : values.invoiceFile?.url,
           });
@@ -182,7 +182,12 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
                 : null,
             },
             incurredAt: new Date(ei.incurredAt),
-            url: typeof ei.attachment === 'string' ? ei.attachment : ei.attachment?.url,
+            url:
+              values.expenseTypeOption === ExpenseType.RECEIPT
+                ? typeof ei.attachment === 'string'
+                  ? ei.attachment
+                  : ei.attachment?.url
+                : null,
           })),
           longDescription: null,
           privateMessage: null,
