@@ -315,7 +315,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
           hideCloseButton
         >
           <div className="max-w-screen min-w-screen before:-z-1 relative flex max-h-screen min-h-screen flex-col overflow-hidden bg-[#F8FAFC] before:absolute before:left-0 before:right-0 before:top-0 before:h-44 before:rotate-180 before:[background:url('/static/images/home/fiscalhost-blue-bg-md.png')]">
-            <header className="min-w-screen z-30 flex items-center justify-between border-b border-slate-100 px-4 py-3 sm:px-10">
+            <header className="min-w-screen z-30 flex items-center justify-between border-b border-slate-100 bg-background px-4 py-3 sm:px-10">
               <span className="text-xl font-bold leading-7 text-slate-800">
                 <FormattedMessage
                   defaultMessage="Invoice #{submittedExpenseId} has been submitted successfully!"
@@ -340,13 +340,13 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
               </Button>
             </header>
             <main className="z-10 flex w-full flex-grow overflow-hidden">
-              <div className="flex w-full flex-grow justify-center">
-                <div className="flex w-full flex-col overflow-scroll sm:flex sm:flex-row sm:gap-11 sm:px-8 sm:pt-4">
+              <div className="flex w-full flex-grow justify-center overflow-y-scroll">
+                <div className="flex w-full max-w-screen-xl flex-col pt-4 sm:flex sm:flex-row sm:gap-11 sm:px-8 sm:pt-8 lg:pt-24">
                   <SubmittedExpense expenseId={submittedExpenseId} />
                 </div>
               </div>
             </main>
-            <DialogFooter className="z-30 flex justify-center p-4 sm:justify-center sm:px-0">
+            <DialogFooter className="z-30 flex justify-center border-t p-4 sm:justify-center sm:px-0">
               <Button onClick={handleOnClose}>
                 <FormattedMessage
                   defaultMessage="View all expenses"

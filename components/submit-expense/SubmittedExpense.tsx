@@ -24,7 +24,11 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
   });
 
   if (query.loading) {
-    return <Loading />;
+    return (
+      <div className="flex flex-1 items-center justify-center">
+        <Loading />
+      </div>
+    );
   }
 
   if (query.error) {
@@ -34,8 +38,8 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
   const expense = query.data?.expense;
 
   return (
-    <div className="flex flex-grow flex-wrap gap-8 px-4 sm:p-0">
-      <div className="flex-grow">
+    <div className="flex flex-grow flex-col gap-8 px-4 sm:p-0 lg:flex-row">
+      <div className="flex-1 flex-grow-[2]">
         <ExpenseSummary
           onDelete={() => {}}
           onEdit={() => {}}
@@ -52,7 +56,7 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
           collective={expense?.account}
         />
       </div>
-      <div className="md:max-w-96">
+      <div className="flex-1 md:max-w-96">
         <CreateExpenseFAQ defaultOpen />
       </div>
     </div>
