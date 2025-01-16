@@ -1,11 +1,12 @@
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { FormField } from '@/components/FormField';
+
 import { expenseTagsQuery } from '../../dashboard/filters/ExpenseTagsFilter';
 import { AutocompleteEditTags } from '../../EditTags';
 import ExpenseTypeTag from '../../expenses/ExpenseTypeTag';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
-import StyledInputFormikField from '../../StyledInputFormikField';
 import { Label } from '../../ui/Label';
 import { Step } from '../SubmitExpenseFlowSteps';
 import { type ExpenseForm } from '../useExpenseForm';
@@ -26,7 +27,7 @@ export function AdditionalDetailsSection(props: AdditionalDetailsSectionProps) {
 
   return (
     <FormSectionContainer form={props.form} step={Step.EXPENSE_TITLE} inViewChange={props.inViewChange}>
-      <StyledInputFormikField
+      <FormField
         disabled={props.form.initialLoading}
         name="title"
         placeholder={intl.formatMessage({ defaultMessage: 'Mention a brief expense title', id: 'Te2Yc2' })}

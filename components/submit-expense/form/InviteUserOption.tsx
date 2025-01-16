@@ -92,7 +92,7 @@ function NewOrganizationInviteeForm() {
         name="inviteeNewOrganization.organization.slug"
       >
         {({ field }) => (
-          <InputGroup className="w-full" prepend="opencollectice.com/" id="organizationSlug" type="text" {...field} />
+          <InputGroup className="w-full" prepend="opencollective.com/" id="organizationSlug" type="text" {...field} />
         )}
       </StyledInputFormikField>
 

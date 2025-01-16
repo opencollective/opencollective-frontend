@@ -5,8 +5,9 @@ import { CollectiveType } from '../../../lib/constants/collectives';
 import { ExpenseType } from '../../../lib/graphql/types/v2/schema';
 import { attachmentDropzoneParams } from '../../expenses/lib/attachments';
 
+import { FormField } from '@/components/FormField';
+
 import StyledDropzone from '../../StyledDropzone';
-import StyledInputFormikField from '../../StyledInputFormikField';
 import { Label } from '../../ui/Label';
 import { RadioGroup, RadioGroupCard } from '../../ui/RadioGroup';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../ui/Tabs';
@@ -154,7 +155,7 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
                 <div className="flex items-start gap-4">
                   <div className="h-16 flex-grow basis-0">
                     <div>
-                      <StyledInputFormikField
+                      <FormField
                         required={
                           props.form.options.isAdminOfPayee || props.form.options.payee?.type === CollectiveType.VENDOR
                         }
@@ -168,7 +169,7 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
                             kind="EXPENSE_ATTACHED_FILE"
                             name="invoice"
                             width={1}
-                            minHeight={48}
+                            minHeight={64}
                             height={1}
                             showActions
                             useGraphQL={true}
@@ -190,11 +191,11 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
                             }}
                           />
                         )}
-                      </StyledInputFormikField>
+                      </FormField>
                     </div>
                   </div>
                   <div className="flex-grow basis-0">
-                    <StyledInputFormikField
+                    <FormField
                       required={
                         props.form.options.isAdminOfPayee || props.form.options.payee?.type === CollectiveType.VENDOR
                       }
