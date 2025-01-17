@@ -557,7 +557,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
                 account={collective}
                 selectedCategory={field.value}
                 allowNone={true}
-                borderRadiusClass="rounded"
+                buttonClassName="rounded"
               />
             )}
           </Field>

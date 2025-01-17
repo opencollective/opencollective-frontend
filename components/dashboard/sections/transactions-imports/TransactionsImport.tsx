@@ -36,6 +36,8 @@ import { cn, sortSelectOptions } from '../../../../lib/utils';
 import { useTransactionsImportActions } from './lib/actions';
 import { TransactionsImportRowFieldsFragment } from './lib/graphql';
 
+import { accountingCategoryFields } from '@/components/expenses/graphql/fragments';
+
 import * as SyncAnimation from '../../../../public/static/animations/sync-bank-oc.json';
 import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';
@@ -92,6 +94,28 @@ const getSteps = (intl: IntlShape): StepItem[] => {
   ];
 };
 
+const transactionsImportHostFieldsFragment = gql`
+  fragment TransactionsImportHostFields on Host {
+    id
+    name
+    legalName
+    imageUrl
+    legacyId
+    slug
+    currency
+    type
+
+    accountingCategories {
+      totalCount
+      nodes {
+        id
+        ...AccountingCategoryFields
+      }
+    }
+  }
+  ${accountingCategoryFields}
+`;
+
 const transactionsImportQuery = gql`
   query TransactionsImport(
     $importId: String!
@@ -130,13 +154,17 @@ const transactionsImportQuery = gql`
       }
       account {
         id
-        name
-        legalName
-        imageUrl
-        legacyId
         slug
-        currency
-        type
+        ... on AccountWithHost {
+          host {
+            ...TransactionsImportHostFields
+          }
+        }
+        ... on Organization {
+          host {
+            ...TransactionsImportHostFields
+          }
+        }
       }
       rows(limit: $limit, offset: $offset, status: $status, searchTerm: $searchTerm) {
         totalCount
@@ -149,6 +177,7 @@ const transactionsImportQuery = gql`
     }
   }
   ${TransactionsImportRowFieldsFragment}
+  ${transactionsImportHostFieldsFragment}
 `;
 
 const transactionsImportLasSyncAtPollQuery = gql`
@@ -300,7 +329,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
 
   const { getActions, setRowsDismissed } = useTransactionsImportActions({
     transactionsImport: importData,
-    host: importData?.account,
+    host: importData?.account?.['host'],
   });
 
   // Clear selection whenever the pagination changes
