@@ -2086,6 +2086,11 @@ type Order {
     offset: Int! = 0
     orderBy: ChronologicalOrderInput = { field: CREATED_AT, direction: ASC }
   ): CommentCollection
+
+  """
+  [Host admins only] If the order was associated with a transactions import row, this field will reference it
+  """
+  transactionImportRow: TransactionsImportRow
 }
 
 """
@@ -2289,7 +2294,7 @@ type TaxInfo {
   """
   Identifier for this tax (GST, VAT, etc)
   """
-  type: OrderTaxType!
+  type: TaxType!
 
   """
   Percentage applied, between 0-100
@@ -2310,7 +2315,7 @@ type TaxInfo {
 """
 The type of a tax like GST, VAT, etc
 """
-enum OrderTaxType {
+enum TaxType {
   """
   European Value Added Tax
   """
@@ -2584,6 +2589,11 @@ type Expense {
   Fields that cannot be edited on this expense
   """
   lockedFields: [ExpenseLockableFields]
+
+  """
+  [Host admins only] If the expense associated with a transactions import row, this field will reference it
+  """
+  transactionImportRow: TransactionsImportRow
 }
 
 """
@@ -7721,8 +7731,13 @@ type TransactionPermissions {
 }
 
 type OrderTax {
-  type: OrderTaxType!
-  percentage: Int!
+  type: TaxType!
+  percentage: Int! @deprecated(reason: "Please use `rate` instead")
+
+  """
+  Percentage applied, between 0-1
+  """
+  rate: Float!
 }
 
 """
@@ -21591,21 +21606,6 @@ input TaxInput {
 }
 
 """
-The type of a tax like GST, VAT, etc
-"""
-enum TaxType {
-  """
-  European Value Added Tax
-  """
-  VAT
-
-  """
-  New Zealand Good and Services Tax
-  """
-  GST
-}
-
-"""
 Reference to an accounting category
 """
 input AccountingCategoryReferenceInput {
@@ -22705,7 +22705,7 @@ input PaypalPaymentInput {
 Input to set taxes for an order
 """
 input OrderTaxInput {
-  type: OrderTaxType!
+  type: TaxType!
   amount: AmountInput!
 
   """

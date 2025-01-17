@@ -69,7 +69,12 @@ export type CSVField =
   | 'expenseApprovedByHandle'
   | 'expensePaidByHandle'
   | 'expenseReference'
-  | 'expenseTransferReference';
+  | 'expenseTransferReference'
+  | 'importSourceId'
+  | 'importSourceDescription'
+  | 'importSourceAmount'
+  | 'importSourceDate'
+  | 'importSourceData';
 
 const FIELD_GROUPS: Record<string, readonly CSVField[]> = {
   transaction: [
@@ -239,6 +244,7 @@ export const GROUPS = {
   order: <FormattedMessage defaultMessage="Contribution" id="0LK5eg" />,
   expense: <FormattedMessage id="Expense" defaultMessage="Expense" />,
   tax: <FormattedMessage defaultMessage="Tax" id="AwzkSM" />,
+  imports: <FormattedMessage defaultMessage="Imported data" id="tmfin0" />,
   legacy: <FormattedMessage id="Legacy/Deprecated" defaultMessage="Legacy/Deprecated" />,
 };
 
@@ -767,6 +773,47 @@ export const FIELDS: Array<{
         id="ysFgxk"
       />
     ),
+  },
+  // Imported data
+  {
+    id: 'importSourceId',
+    group: 'imports',
+    label: <FormattedMessage defaultMessage="Import Source ID" id="ovrmdQ" />,
+    tooltip: (
+      <FormattedMessage
+        defaultMessage="The ID provided by the import source (e.g., bank statement transaction ID)."
+        id="3Z6Z9n"
+      />
+    ),
+  },
+  {
+    id: 'importSourceDescription',
+    group: 'imports',
+    label: <FormattedMessage defaultMessage="Import Source Description" id="OOduTH" />,
+    tooltip: (
+      <FormattedMessage
+        defaultMessage="The description extracted from the import source, usually corresponds to the bank statement description."
+        id="A/k25b"
+      />
+    ),
+  },
+  {
+    id: 'importSourceAmount',
+    group: 'imports',
+    label: <FormattedMessage defaultMessage="Import Source Amount" id="f97Ybo" />,
+    tooltip: <FormattedMessage defaultMessage="The amount extracted from the import source." id="GKRVxa" />,
+  },
+  {
+    id: 'importSourceDate',
+    group: 'imports',
+    label: <FormattedMessage defaultMessage="Import Source Date" id="cffITg" />,
+    tooltip: <FormattedMessage defaultMessage="The date extracted from the import source." id="W9/Zp3" />,
+  },
+  {
+    id: 'importSourceData',
+    group: 'imports',
+    label: <FormattedMessage defaultMessage="Import Source Data" id="0vHY8L" />,
+    tooltip: <FormattedMessage defaultMessage="The raw data from the import source as a JSON string." id="ydD0AS" />,
   },
 
   // Deprecated
