@@ -8,6 +8,36 @@ export const contributionFlowAccountQuery = gql`
       id
       ...ContributionFlowAccountFields
     }
+    me {
+      contributorProfiles(forAccount: { slug: $collectiveSlug }) {
+        account {
+          id
+          name
+          legalName
+          slug
+          type
+          imageUrl(height: 192)
+          isIncognito
+          ... on Individual {
+            email
+            isGuest
+          }
+          location {
+            address
+            country
+            structured
+          }
+          ... on AccountWithHost {
+            host {
+              id
+              slug
+              name
+              imageUrl(height: 64)
+            }
+          }
+        }
+      }
+    }
     tier(tier: { legacyId: $tierId }, throwIfMissing: false) @include(if: $includeTier) {
       id
       legacyId

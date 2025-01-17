@@ -24,6 +24,7 @@ import { formatErrorMessage, getErrorFromGraphqlException } from '../../lib/erro
 import { isPastEvent } from '../../lib/events';
 import { Experiment, isExperimentEnabled } from '../../lib/experiments/experiments';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { AccountType } from '../../lib/graphql/types/v2/schema';
 import { addCreateCollectiveMutation } from '../../lib/graphql/v1/mutations';
 import { setGuestToken } from '../../lib/guest-accounts';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
@@ -64,7 +65,6 @@ import SignInToContributeAsAnOrganization from './SignInToContributeAsAnOrganiza
 import { validateGuestProfile } from './StepProfileGuestForm';
 import { NEW_ORGANIZATION_KEY } from './StepProfileLoggedInForm';
 import {
-  getContributeProfiles,
   getGQLV2AmountInput,
   getGuestInfoFromStepProfile,
   getTotalAmount,
@@ -136,6 +136,7 @@ class ContributionFlow extends React.Component {
         slug: PropTypes.string,
       }),
     }).isRequired,
+    contributorProfiles: PropTypes.arrayOf(PropTypes.object),
     host: PropTypes.object.isRequired,
     tier: PropTypes.object,
     intl: PropTypes.object,
@@ -391,8 +392,8 @@ class ContributionFlow extends React.Component {
         await confirmPayment(stripeData?.stripe, stripeData?.paymentIntentClientSecret, {
           returnUrl: returnUrl.href,
           elements: stripeData?.elements,
-          type: stepPayment?.paymentMethod?.type,
-          paymentMethodId: stepPayment?.paymentMethod?.data?.stripePaymentMethodId,
+          type: stepPayment.paymentMethod?.type,
+          paymentMethodId: stepPayment.paymentMethod?.data?.stripePaymentMethodId,
         });
         this.setState({ isSubmitted: true, isSubmitting: false });
         return this.handleSuccess(order);
@@ -463,12 +464,9 @@ class ContributionFlow extends React.Component {
   };
 
   // ---- Getters ----
-
-  getContributeProfiles = memoizeOne(getContributeProfiles);
-
   getDefaultStepProfile() {
-    const { LoggedInUser, loadingLoggedInUser, collective, tier } = this.props;
-    const profiles = this.getContributeProfiles(LoggedInUser, collective, tier);
+    const { loadingLoggedInUser, contributorProfiles } = this.props;
+    const profiles = contributorProfiles;
     const queryParams = this.getQueryParams();
 
     // We want to wait for the user to be logged in before matching the profile
@@ -480,17 +478,19 @@ class ContributionFlow extends React.Component {
     let contributorProfile;
     if (queryParams.contributeAs && queryParams.contributeAs !== PERSONAL_PROFILE_ALIAS) {
       if (queryParams.contributeAs === INCOGNITO_PROFILE_ALIAS) {
-        contributorProfile = profiles.find(({ isIncognito }) => isIncognito);
+        contributorProfile = profiles.find(({ account: { isIncognito } }) => isIncognito);
+      } else if (queryParams.contributeAs === 'me') {
+        contributorProfile = profiles.find(({ account: { type } }) => type === AccountType.INDIVIDUAL);
       } else {
-        contributorProfile = profiles.find(({ slug }) => slug === queryParams.contributeAs);
+        contributorProfile = profiles.find(({ account: { slug } }) => slug === queryParams.contributeAs);
       }
     }
 
     if (contributorProfile) {
       return contributorProfile;
-    } else if (profiles[0]) {
+    } else if (profiles[0].account) {
       // Otherwise to the logged-in user personal profile, if any
-      return profiles[0];
+      return profiles[0].account;
     }
 
     // Otherwise, it's a guest contribution
@@ -1012,7 +1012,7 @@ class ContributionFlow extends React.Component {
                     isSubmitting={isValidating || isLoading}
                     disabledPaymentMethodTypes={queryParams.disabledPaymentMethodTypes}
                     hideCreditCardPostalCode={queryParams.hideCreditCardPostalCode}
-                    contributeProfiles={this.getContributeProfiles(LoggedInUser, collective, tier)}
+                    contributorProfiles={this.props.contributorProfiles}
                   />
                   <Box mt={40}>
                     <ContributionFlowButtons

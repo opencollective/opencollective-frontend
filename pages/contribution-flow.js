@@ -86,7 +86,7 @@ class NewContributionFlowPage extends React.Component {
 
   renderPageContent() {
     const { data = {}, LoggedInUser, error } = this.props;
-    const { account, tier } = data;
+    const { account, tier, me } = data;
 
     if (data.loading) {
       return (
@@ -116,7 +116,15 @@ class NewContributionFlowPage extends React.Component {
         </React.Fragment>
       );
     } else {
-      return <ContributionFlowContainer collective={account} host={account.host} tier={tier} error={error} />;
+      return (
+        <ContributionFlowContainer
+          collective={account}
+          host={account.host}
+          tier={tier}
+          contributorProfiles={me?.contributorProfiles || []}
+          error={error}
+        />
+      );
     }
   }
 
