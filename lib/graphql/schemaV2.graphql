@@ -2289,7 +2289,7 @@ type TaxInfo {
   """
   Identifier for this tax (GST, VAT, etc)
   """
-  type: OrderTaxType!
+  type: TaxType!
 
   """
   Percentage applied, between 0-100
@@ -2310,7 +2310,7 @@ type TaxInfo {
 """
 The type of a tax like GST, VAT, etc
 """
-enum OrderTaxType {
+enum TaxType {
   """
   European Value Added Tax
   """
@@ -7721,8 +7721,13 @@ type TransactionPermissions {
 }
 
 type OrderTax {
-  type: OrderTaxType!
-  percentage: Int!
+  type: TaxType!
+  percentage: Int! @deprecated(reason: "Please use `rate` instead")
+
+  """
+  Percentage applied, between 0-1
+  """
+  rate: Float!
 }
 
 """
@@ -12210,6 +12215,7 @@ type Individual implements Account {
   User two factor methods
   """
   twoFactorMethods: [UserTwoFactorMethod]
+  contributorProfiles(forAccount: AccountReferenceInput!): [ContributorProfile]!
 }
 
 """
@@ -12301,6 +12307,16 @@ enum TwoFactorMethod {
   TOTP
   YUBIKEY_OTP
   WEBAUTHN
+}
+
+"""
+This represents a profile that can be use to create a contribution
+"""
+type ContributorProfile {
+  """
+  The account that will be used to create the contribution
+  """
+  account: Account
 }
 
 """
@@ -21591,21 +21607,6 @@ input TaxInput {
 }
 
 """
-The type of a tax like GST, VAT, etc
-"""
-enum TaxType {
-  """
-  European Value Added Tax
-  """
-  VAT
-
-  """
-  New Zealand Good and Services Tax
-  """
-  GST
-}
-
-"""
 Reference to an accounting category
 """
 input AccountingCategoryReferenceInput {
@@ -22705,7 +22706,7 @@ input PaypalPaymentInput {
 Input to set taxes for an order
 """
 input OrderTaxInput {
-  type: OrderTaxType!
+  type: TaxType!
   amount: AmountInput!
 
   """
