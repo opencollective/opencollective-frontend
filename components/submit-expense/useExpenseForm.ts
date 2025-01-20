@@ -1432,7 +1432,7 @@ export function useExpenseForm(opts: {
       setFieldValue('tax.rate', formOptions.expense.taxes[0].rate);
     }
     setFieldValue('title', formOptions.expense.description);
-    setFieldTouched('title', true)
+    setFieldTouched('title', true);
 
     if (formOptions.expense.status === ExpenseStatus.DRAFT && formOptions.expense.draft?.payee) {
       if (
