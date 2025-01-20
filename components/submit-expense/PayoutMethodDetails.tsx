@@ -112,6 +112,16 @@ function getPayoutMethodDetailItems(props: PayoutMethodDetailsProps) {
         }
       }
       break;
+    case PayoutMethodType.ACCOUNT_BALANCE: {
+      if (props.payoutMethod.data.currency) {
+        items.push({
+          id: 'currency',
+          label: <FormattedMessage defaultMessage="Currency" id="Currency" />,
+          value: upperCase(props.payoutMethod.data.currency),
+        });
+      }
+      break;
+    }
     default:
       return null;
   }
@@ -127,13 +137,13 @@ export function PayoutMethodDetailsContainer(props: {
     setIsOpen(isOpen => !isOpen);
   }, []);
 
-  const payoutMethodDetailItems = getPayoutMethodDetailItems(props);
+  const payoutMethodDetailItems = getPayoutMethodDetailItems(props) || [];
   const isExpandable = props.maxItems && payoutMethodDetailItems?.length > props.maxItems;
 
   const shownItems = isExpandable ? payoutMethodDetailItems.slice(0, 3) : payoutMethodDetailItems;
   const hiddenItems = isExpandable ? payoutMethodDetailItems.slice(3) : [];
 
-  if (!payoutMethodDetailItems || payoutMethodDetailItems.length === 0) {
+  if (!props.payoutMethod) {
     return <LoadingPlaceholder height={24} mb={2} />;
   }
 
@@ -185,22 +195,24 @@ export function PayoutMethodDetailsContainer(props: {
             </CollapsibleTrigger>
           </React.Fragment>
         )}
-        <div className={'space-y-1 p-4'}>
-          <DataList className="gap-2">
-            {shownItems.map(({ id, ...item }) => (
-              <DataListItem key={id} {...item} />
-            ))}
-          </DataList>
-          {hiddenItems.length > 0 && (
-            <CollapsibleContent>
-              <DataList className="gap-2">
-                {hiddenItems.map(({ id, ...item }) => (
-                  <DataListItem key={id} {...item} />
-                ))}
-              </DataList>
-            </CollapsibleContent>
-          )}
-        </div>
+        {payoutMethodDetailItems.length > 0 && (
+          <div className={'space-y-1 p-4'}>
+            <DataList className="gap-2">
+              {shownItems.map(({ id, ...item }) => (
+                <DataListItem key={id} {...item} />
+              ))}
+            </DataList>
+            {hiddenItems.length > 0 && (
+              <CollapsibleContent>
+                <DataList className="gap-2">
+                  {hiddenItems.map(({ id, ...item }) => (
+                    <DataListItem key={id} {...item} />
+                  ))}
+                </DataList>
+              </CollapsibleContent>
+            )}
+          </div>
+        )}
       </div>
     </Collapsible>
   );

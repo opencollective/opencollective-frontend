@@ -3,6 +3,7 @@ import { omit, round } from 'lodash';
 import { AtSign, Building, Contact, Globe, Lock, Mail } from 'lucide-react';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
+import { CollectiveType } from '../../../lib/constants/collectives';
 import { ExpenseType } from '../../../lib/graphql/types/v2/schema';
 import { RecurringExpenseIntervals } from '../../../lib/i18n/expense';
 import { i18nTaxType } from '../../../lib/i18n/taxes';
@@ -382,7 +383,7 @@ export function SummarySection(props: SummarySectionProps) {
           <div className="font-bold">
             <FormattedMessage defaultMessage="Payout Method" id="SecurityScope.PayoutMethod" />
           </div>
-          {!props.form.options.isAdminOfPayee ? (
+          {!props.form.options.isAdminOfPayee && props.form.options.payee?.type !== CollectiveType.VENDOR ? (
             <React.Fragment>
               <div className="mt-2 text-sm text-muted-foreground">
                 <FormattedMessage

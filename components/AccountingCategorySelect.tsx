@@ -387,7 +387,7 @@ const AccountingCategorySelect = ({
               disabled={disabled}
             >
               <span
-                className={cn('mr-3 max-w-[280px] truncate text-sm', {
+                className={cn('mr-3 flex-grow truncate text-start text-sm', {
                   'text-gray-400': isUndefined(selectedCategory),
                 })}
               >

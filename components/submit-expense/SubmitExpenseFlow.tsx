@@ -9,6 +9,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { AnalyticsEvent } from '../../lib/analytics/events';
 import { track } from '../../lib/analytics/plausible';
+import { CollectiveType } from '../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type {
@@ -226,7 +227,10 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
             message: LoggedInUser ? <Survey hasParentTitle surveyKey={SURVEY_KEY.EXPENSE_SUBMITTED_NEW_FLOW} /> : null,
             duration: 20000,
           });
-        } else if (formOptions.payoutProfiles.some(p => p.slug === values.payeeSlug)) {
+        } else if (
+          formOptions.payee?.type === CollectiveType.VENDOR ||
+          formOptions.payoutProfiles.some(p => p.slug === values.payeeSlug)
+        ) {
           result = await createExpense({
             variables: {
               account: {

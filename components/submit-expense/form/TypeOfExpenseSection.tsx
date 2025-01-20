@@ -1,6 +1,7 @@
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { CollectiveType } from '../../../lib/constants/collectives';
 import { ExpenseType } from '../../../lib/graphql/types/v2/schema';
 import { attachmentDropzoneParams } from '../../expenses/lib/attachments';
 
@@ -154,7 +155,9 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
                   <div className="h-16 flex-grow basis-0">
                     <div>
                       <StyledInputFormikField
-                        required={props.form.options.isAdminOfPayee}
+                        required={
+                          props.form.options.isAdminOfPayee || props.form.options.payee?.type === CollectiveType.VENDOR
+                        }
                         name="invoiceFile"
                         isPrivate
                         label={intl.formatMessage({ defaultMessage: 'Attach your invoice file', id: 'Oa/lhY' })}
@@ -192,7 +195,9 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
                   </div>
                   <div className="flex-grow basis-0">
                     <StyledInputFormikField
-                      required={props.form.options.isAdminOfPayee}
+                      required={
+                        props.form.options.isAdminOfPayee || props.form.options.payee?.type === CollectiveType.VENDOR
+                      }
                       name="invoiceNumber"
                       isPrivate
                       label={intl.formatMessage({ defaultMessage: 'Invoice number', id: 'ijDMrP' })}
