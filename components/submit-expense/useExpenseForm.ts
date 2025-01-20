@@ -1413,6 +1413,7 @@ export function useExpenseForm(opts: {
 
   /* field dependencies */
   const setFieldValue = expenseForm.setFieldValue;
+  const setFieldTouched = expenseForm.setFieldTouched;
 
   React.useEffect(() => {
     if (!formOptions.expense || setInitialExpenseValues.current) {
@@ -1431,6 +1432,7 @@ export function useExpenseForm(opts: {
       setFieldValue('tax.rate', formOptions.expense.taxes[0].rate);
     }
     setFieldValue('title', formOptions.expense.description);
+    setFieldTouched('title', true)
 
     if (formOptions.expense.status === ExpenseStatus.DRAFT && formOptions.expense.draft?.payee) {
       if (
