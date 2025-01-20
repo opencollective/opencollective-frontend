@@ -223,7 +223,10 @@ class ContributionFlow extends React.Component {
       // User has logged out, reset the state
       this.setState({ stepProfile: null, stepSummary: null, stepPayment: null });
       this.pushStepRoute(STEPS.PROFILE);
-    } else if (!oldProps.LoggedInUser && this.props.LoggedInUser) {
+    } else if (
+      (!oldProps.LoggedInUser && this.props.LoggedInUser) ||
+      (oldProps.contributorProfiles.length === 0 && this.props.contributorProfiles.length > 0)
+    ) {
       // User has logged in, reload the step profile
       this.setState({ stepProfile: this.getDefaultStepProfile() });
 

@@ -65,6 +65,9 @@ class EmbedContributionFlowPage extends React.Component<{
     if (get(this.props, hostPath) !== get(prevProps, hostPath)) {
       this.loadExternalScripts();
     }
+    if (this.props.LoggedInUser && !prevProps.LoggedInUser) {
+      this.props.data.refetch();
+    }
   }
 
   componentWillUnmount(): void {

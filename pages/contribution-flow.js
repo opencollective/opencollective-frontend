@@ -46,7 +46,9 @@ class NewContributionFlowPage extends React.Component {
       loading: PropTypes.bool,
       error: PropTypes.any,
       account: PropTypes.object,
+      me: PropTypes.object,
       tier: PropTypes.object,
+      refetch: PropTypes.func,
     }), // from withData
     intl: PropTypes.object,
     loadStripe: PropTypes.func,
@@ -69,6 +71,9 @@ class NewContributionFlowPage extends React.Component {
     const hostPath = 'data.account.host';
     if (get(this.props, hostPath) !== get(prevProps, hostPath)) {
       this.loadExternalScripts();
+    }
+    if (this.props.LoggedInUser && !this.props.data.me) {
+      this.props.data.refetch();
     }
   }
 
