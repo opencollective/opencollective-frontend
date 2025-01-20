@@ -23,6 +23,7 @@ import type {
 import type { Currency, RecurringExpenseInterval } from '../../lib/graphql/types/v2/schema';
 import { ExpenseStatus, ExpenseType, PayoutMethodType } from '../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { CollectiveType } from '@/lib/constants/collectives';
 
 import { Survey, SURVEY_KEY } from '../Survey';
 import { Button } from '../ui/Button';
@@ -226,7 +227,10 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
             message: LoggedInUser ? <Survey hasParentTitle surveyKey={SURVEY_KEY.EXPENSE_SUBMITTED_NEW_FLOW} /> : null,
             duration: 20000,
           });
-        } else if (formOptions.payoutProfiles.some(p => p.slug === values.payeeSlug)) {
+        } else if (
+          formOptions.payee?.type === CollectiveType.VENDOR ||
+          formOptions.payoutProfiles.some(p => p.slug === values.payeeSlug)
+        ) {
           result = await createExpense({
             variables: {
               account: {

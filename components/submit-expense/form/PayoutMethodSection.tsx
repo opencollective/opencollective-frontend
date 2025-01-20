@@ -12,6 +12,7 @@ import type {
   SavePayoutMethodMutationVariables,
 } from '../../../lib/graphql/types/v2/graphql';
 import { PayoutMethodType } from '../../../lib/graphql/types/v2/schema';
+import { CollectiveType } from '@/lib/constants/collectives';
 
 import ConfirmationModal, { CONFIRMATION_MODAL_TERMINATE } from '../../ConfirmationModal';
 import PayoutMethodForm, { validatePayoutMethod } from '../../expenses/PayoutMethodForm';
@@ -114,11 +115,13 @@ export function PayoutMethodFormContent(props) {
   const isNewPayoutMethodSelected =
     !props.form.values.payoutMethodId || props.form.values.payoutMethodId === '__newPayoutMethod';
 
+  const isVendor = props.form.options.payee?.type === CollectiveType.VENDOR;
   return (
     <div>
       {!props.form.initialLoading &&
       !isLoading &&
       !isPickingProfileAdministered &&
+      !isVendor &&
       !props.form.options.isAdminOfPayee ? (
         <MessageBox type="info">
           <FormattedMessage
@@ -141,6 +144,7 @@ export function PayoutMethodFormContent(props) {
                 key={p.id}
                 payoutMethod={p}
                 isChecked={p.id === props.form.values.payoutMethodId}
+                isEditable={!isVendor}
                 onPaymentMethodDeleted={async () => {
                   if (p.id === props.form.values.payoutMethodId) {
                     setFieldValue('payoutMethodId', null);
@@ -160,15 +164,17 @@ export function PayoutMethodFormContent(props) {
             </RadioGroupCard>
           )}
 
-          <RadioGroupCard
-            value="__newPayoutMethod"
-            checked={isNewPayoutMethodSelected}
-            disabled={isLoading || props.form.initialLoading}
-            showSubcontent={!props.form.initialLoading && isNewPayoutMethodSelected}
-            subContent={<NewPayoutMethodOption form={props.form} />}
-          >
-            <FormattedMessage defaultMessage="New payout method" id="vJEJ0J" />
-          </RadioGroupCard>
+          {!isVendor && (
+            <RadioGroupCard
+              value="__newPayoutMethod"
+              checked={isNewPayoutMethodSelected}
+              disabled={isLoading || props.form.initialLoading}
+              showSubcontent={!props.form.initialLoading && isNewPayoutMethodSelected}
+              subContent={<NewPayoutMethodOption form={props.form} />}
+            >
+              <FormattedMessage defaultMessage="New payout method" id="vJEJ0J" />
+            </RadioGroupCard>
+          )}
         </RadioGroup>
       )}
     </div>
@@ -351,6 +357,7 @@ function PayoutMethodRadioGroupItem(props: {
   isChecked?: boolean;
   onPaymentMethodDeleted: () => void;
   onPaymentMethodEdited: (newPayoutMethodId: string) => void;
+  isEditable?: boolean;
 }) {
   const form = useFormikContext() as ExpenseForm;
 
@@ -681,7 +688,7 @@ function PayoutMethodRadioGroupItem(props: {
         <div className="flex-grow">
           <PayoutMethodLabel showIcon payoutMethod={props.payoutMethod} />
         </div>
-        {!isEditingPayoutMethod && (
+        {!isEditingPayoutMethod && props.isEditable && (
           <div className="flex gap-2">
             {props.isChecked && (
               <Button onClick={onEditClick} size="icon-xs" variant="ghost">

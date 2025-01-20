@@ -13,7 +13,7 @@ import { useIntl } from 'react-intl';
 import type { ZodObjectDef } from 'zod';
 import z from 'zod';
 
-import { AccountTypesWithHost } from '../../lib/constants/collectives';
+import { AccountTypesWithHost, CollectiveType } from '../../lib/constants/collectives';
 import { getPayoutProfiles } from '../../lib/expenses';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type {
@@ -673,7 +673,7 @@ function buildFormSchema(
       .refine(
         attachment => {
           if (
-            options.isAdminOfPayee &&
+            (options.payee?.type === CollectiveType.VENDOR || options.isAdminOfPayee) &&
             values.expenseTypeOption === ExpenseType.INVOICE &&
             values.hasInvoiceOption === YesNoOption.YES
           ) {
@@ -691,7 +691,7 @@ function buildFormSchema(
       .refine(
         invoiceNumber => {
           if (
-            options.isAdminOfPayee &&
+            (options.payee?.type === CollectiveType.VENDOR || options.isAdminOfPayee) &&
             values.expenseTypeOption === ExpenseType.INVOICE &&
             values.hasInvoiceOption === YesNoOption.YES
           ) {
@@ -1151,10 +1151,10 @@ function getPayeeSlug(values: ExpenseFormValues): string {
     case '__findAccountIAdminister':
     case '__invite':
     case '__inviteSomeone':
-    case '__vendor':
       return null;
     case '__inviteExistingUser':
       return values.inviteeExistingAccount;
+    case '__vendor':
     default:
       return values.payeeSlug;
   }
@@ -1232,7 +1232,10 @@ async function buildFormOptions(
 
     if (host) {
       options.host = host;
-      options.vendors = 'vendors' in host ? ((host.vendors as any)?.nodes as ExpenseVendorFieldsFragment[]) || [] : [];
+      options.vendors =
+        'vendors' in host
+          ? (((host.vendors as any)?.nodes as ExpenseVendorFieldsFragment[]) || []).filter(v => v.hasPayoutMethod)
+          : [];
       options.supportedPayoutMethods = host.supportedPayoutMethods || [];
       options.expenseTags = host.expensesTags;
       options.isAccountingCategoryRequired = userMustSetAccountingCategory(loggedInUser, account, host);
@@ -1259,10 +1262,18 @@ async function buildFormOptions(
 
     if (query.data?.loggedInAccount) {
       options.payoutProfiles = getPayoutProfiles(query.data.loggedInAccount);
-      if (payee) {
+      if (payee && payee.type !== CollectiveType.VENDOR) {
         options.payoutMethods = options.payoutProfiles
           ?.find(p => p.slug === payee?.slug)
-          ?.payoutMethods?.filter(p => options.supportedPayoutMethods.includes(p.type));
+          ?.payoutMethods?.filter(p => options.supportedPayoutMethods.includes(p.type))
+          .map(pm => {
+            if (pm.type === PayoutMethodType.ACCOUNT_BALANCE && host) {
+              return { ...pm, data: { currency: host.currency } };
+            }
+            return pm;
+          });
+      } else if (payee && payee.type === CollectiveType.VENDOR) {
+        options.payoutMethods = payee.payoutMethods?.filter(p => options.supportedPayoutMethods.includes(p.type));
       }
 
       if (values.payoutMethodId && values.payoutMethodId !== '__newPayoutMethod') {
