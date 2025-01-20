@@ -105,7 +105,7 @@ const formatProfileOption = (option, _, intl) => {
           </Span>
         ) : (
           <Span fontSize="12px" lineHeight="18px" color="black.700">
-            {account.type === 'USER' && (
+            {account.type === CollectiveType.INDIVIDUAL && (
               <React.Fragment>
                 <FormattedMessage id="ContributionFlow.PersonalProfile" defaultMessage="Personal profile" />
                 {' - '}
