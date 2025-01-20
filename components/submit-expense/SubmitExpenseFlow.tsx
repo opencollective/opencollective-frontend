@@ -9,6 +9,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { AnalyticsEvent } from '../../lib/analytics/events';
 import { track } from '../../lib/analytics/plausible';
+import { CollectiveType } from '../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type {
@@ -23,7 +24,6 @@ import type {
 import type { Currency, RecurringExpenseInterval } from '../../lib/graphql/types/v2/schema';
 import { ExpenseStatus, ExpenseType, PayoutMethodType } from '../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { CollectiveType } from '@/lib/constants/collectives';
 
 import { Survey, SURVEY_KEY } from '../Survey';
 import { Button } from '../ui/Button';

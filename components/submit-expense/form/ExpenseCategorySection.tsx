@@ -1,14 +1,14 @@
 import React from 'react';
-import { ChevronDown, ChevronsUpDown } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import { cn } from '../../../lib/utils';
+import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
+
+import AccountingCategorySelect from '../../../components/AccountingCategorySelect';
 
 import HTMLContent from '../../HTMLContent';
 import StyledInputFormikField from '../../StyledInputFormikField';
-import { Button } from '../../ui/Button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../ui/Collapsible';
-import { Command, CommandInput, CommandItem, CommandList } from '../../ui/Command';
 import { Step } from '../SubmitExpenseFlowSteps';
 import type { ExpenseForm } from '../useExpenseForm';
 
@@ -21,7 +21,7 @@ type ExpenseCategorySectionProps = {
 
 export function ExpenseCategorySection(props: ExpenseCategorySectionProps) {
   const accountingCategoryId = props.form.values.accountingCategoryId;
-  const [isExpenseCategoryPickerOpen, setIsExpenseCategoryPickerOpen] = React.useState(false);
+  const { LoggedInUser } = useLoggedInUser();
 
   const accountingCategories = React.useMemo(
     () => props.form.options.accountingCategories || [],
@@ -32,7 +32,10 @@ export function ExpenseCategorySection(props: ExpenseCategorySectionProps) {
     ? accountingCategories.find(a => a.id === accountingCategoryId)
     : null;
   const instructions = selectedAccountingCategory?.instructions;
-  const { setFieldValue, setFieldTouched } = props.form;
+  const { setFieldValue } = props.form;
+
+  const host = props.form.options.host;
+  const isHostAdmin = Boolean(LoggedInUser?.isAdminOfCollective(host));
 
   return (
     <FormSectionContainer
@@ -43,66 +46,18 @@ export function ExpenseCategorySection(props: ExpenseCategorySectionProps) {
     >
       <StyledInputFormikField name="accountingCategoryId">
         {() => (
-          <React.Fragment>
-            <Button
-              variant="outline"
-              size="sm"
-              className={cn('w-full justify-between', {
-                'mb-0 rounded-b-none border-b-0': isExpenseCategoryPickerOpen,
-              })}
-              onClick={() => {
-                setIsExpenseCategoryPickerOpen(!isExpenseCategoryPickerOpen);
-                setFieldTouched('accountingCategoryId');
-              }}
-            >
-              {selectedAccountingCategory ? (
-                selectedAccountingCategory.name
-              ) : (
-                <span className="text-muted-foreground">
-                  {props.form.options.isAccountingCategoryRequired ? (
-                    <FormattedMessage defaultMessage="Choose a category" id="H4hJvF" />
-                  ) : (
-                    <FormattedMessage defaultMessage="I don't know" id="AkIyKO" />
-                  )}
-                </span>
-              )}
-              <ChevronsUpDown className="ml-2 opacity-50" size={16} />
-            </Button>
-            {isExpenseCategoryPickerOpen && (
-              <div className="rounded-md rounded-t-none border border-gray-200">
-                <Command>
-                  <CommandInput autoFocus />
-                  <CommandList>
-                    {!props.form.options.isAccountingCategoryRequired && (
-                      <CommandItem
-                        value=""
-                        onSelect={() => {
-                          setFieldValue('accountingCategoryId', null);
-                          setIsExpenseCategoryPickerOpen(false);
-                        }}
-                      >
-                        <div className="flex-grow">
-                          <FormattedMessage defaultMessage="I don't know" id="AkIyKO" />
-                        </div>
-                      </CommandItem>
-                    )}
-                    {accountingCategories.map(a => (
-                      <CommandItem
-                        key={a.id}
-                        value={`${a.id}-${a.name}`}
-                        onSelect={() => {
-                          setFieldValue('accountingCategoryId', a.id);
-                          setIsExpenseCategoryPickerOpen(false);
-                        }}
-                      >
-                        <div className="flex-grow">{a.name}</div>
-                      </CommandItem>
-                    ))}
-                  </CommandList>
-                </Command>
-              </div>
-            )}
-          </React.Fragment>
+          <AccountingCategorySelect
+            id="accountingCategoryId"
+            kind="EXPENSE"
+            onChange={value => setFieldValue('accountingCategoryId', value?.id)}
+            host={host}
+            showCode={isHostAdmin}
+            expenseType={props.form.values.expenseTypeOption}
+            account={props.form.options.account}
+            selectedCategory={selectedAccountingCategory}
+            allowNone={!props.form.options.isAccountingCategoryRequired}
+            borderRadiusClass="rounded max-w-full w-full"
+          />
         )}
       </StyledInputFormikField>
 

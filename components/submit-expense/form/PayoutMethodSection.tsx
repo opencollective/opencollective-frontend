@@ -5,6 +5,7 @@ import { get, isEmpty, omit, truncate } from 'lodash';
 import { Pencil, Trash2 } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { CollectiveType } from '../../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
 import type {
@@ -12,7 +13,6 @@ import type {
   SavePayoutMethodMutationVariables,
 } from '../../../lib/graphql/types/v2/graphql';
 import { PayoutMethodType } from '../../../lib/graphql/types/v2/schema';
-import { CollectiveType } from '@/lib/constants/collectives';
 
 import ConfirmationModal, { CONFIRMATION_MODAL_TERMINATE } from '../../ConfirmationModal';
 import PayoutMethodForm, { validatePayoutMethod } from '../../expenses/PayoutMethodForm';

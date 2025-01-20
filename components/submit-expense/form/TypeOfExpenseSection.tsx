@@ -1,9 +1,9 @@
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { CollectiveType } from '../../../lib/constants/collectives';
 import { ExpenseType } from '../../../lib/graphql/types/v2/schema';
 import { attachmentDropzoneParams } from '../../expenses/lib/attachments';
-import { CollectiveType } from '@/lib/constants/collectives';
 
 import StyledDropzone from '../../StyledDropzone';
 import StyledInputFormikField from '../../StyledInputFormikField';
