@@ -156,7 +156,7 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
                     <div>
                       <StyledInputFormikField
                         required={
-                          props.form.options.isAdminOfPayee || props.form.options?.payee?.type === CollectiveType.VENDOR
+                          props.form.options.isAdminOfPayee || props.form.options.payee?.type === CollectiveType.VENDOR
                         }
                         name="invoiceFile"
                         isPrivate
@@ -196,7 +196,7 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
                   <div className="flex-grow basis-0">
                     <StyledInputFormikField
                       required={
-                        props.form.options.isAdminOfPayee || props.form.options?.payee?.type === CollectiveType.VENDOR
+                        props.form.options.isAdminOfPayee || props.form.options.payee?.type === CollectiveType.VENDOR
                       }
                       name="invoiceNumber"
                       isPrivate
