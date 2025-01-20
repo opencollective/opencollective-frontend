@@ -1,5 +1,5 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { DialogClose } from '@radix-ui/react-dialog';
 import { Form, FormikProvider, useFormikContext } from 'formik';
 import { pick } from 'lodash';
@@ -33,7 +33,7 @@ import { Label } from '../ui/Label';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 import { toast } from '../ui/useToast';
 
-import { expensePageExpenseFieldsFragment } from './graphql/fragments';
+import { editExpenseMutation } from './graphql/mutations';
 
 const RenderFormFields = ({ field, onSubmit, expense }) => {
   switch (field) {
@@ -403,20 +403,9 @@ export default function EditExpenseDialog({
 }) {
   const [open, setOpen] = React.useState(false);
   const intl = useIntl();
-  const [editExpense] = useMutation(
-    gql`
-      mutation EditExpense($expenseEditInput: ExpenseUpdateInput!) {
-        expense: editExpense(expense: $expenseEditInput) {
-          id
-          ...ExpensePageExpenseFields
-        }
-      }
-      ${expensePageExpenseFieldsFragment}
-    `,
-    {
-      context: API_V2_CONTEXT,
-    },
-  );
+  const [editExpense] = useMutation(editExpenseMutation, {
+    context: API_V2_CONTEXT,
+  });
 
   const onSubmit = React.useCallback(
     async values => {
@@ -427,7 +416,7 @@ export default function EditExpenseDialog({
         };
         await editExpense({
           variables: {
-            expenseEditInput: editInput,
+            expense: editInput,
           },
         });
         setOpen(false);
