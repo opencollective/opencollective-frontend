@@ -5,9 +5,9 @@ import { FormattedMessage } from 'react-intl';
 import type { Account } from '../../lib/graphql/types/v2/schema';
 import { attachmentDropzoneParams } from './lib/attachments';
 
+import Dropzone from '../Dropzone';
 import { Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
-import StyledDropzone from '../StyledDropzone';
 import StyledHr from '../StyledHr';
 import { P, Span } from '../Text';
 
@@ -67,7 +67,7 @@ const ExpenseAttachedFilesForm = ({
           }}
         />
       ) : (
-        <StyledDropzone
+        <Dropzone
           {...attachmentDropzoneParams}
           isMulti
           name="attachedFiles"

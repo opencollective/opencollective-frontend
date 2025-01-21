@@ -19,16 +19,13 @@ import {
 } from '../../expenses/lib/utils';
 
 import { FormField } from '@/components/FormField';
+import InputAmount from '@/components/InputAmount';
 import { Checkbox } from '@/components/ui/Checkbox';
 
+import Dropzone from '../../Dropzone';
 import { ExchangeRate } from '../../ExchangeRate';
 import FormattedMoneyAmount from '../../FormattedMoneyAmount';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
-import StyledCheckbox from '../../StyledCheckbox';
-import StyledDropzone from '../../StyledDropzone';
-import StyledInputAmount from '../../StyledInputAmount';
-import StyledInputFormikField from '../../StyledInputFormikField';
-import StyledInputGroup from '../../StyledInputGroup';
 import StyledSelect from '../../StyledSelect';
 import { Button } from '../../ui/Button';
 import { Input, InputGroup } from '../../ui/Input';
@@ -38,7 +35,6 @@ import { Step } from '../SubmitExpenseFlowSteps';
 import { type ExpenseForm } from '../useExpenseForm';
 
 import { FormSectionContainer } from './FormSectionContainer';
-import InputAmount from '@/components/InputAmount';
 
 type ExpenseItemsSectionProps = {
   form: ExpenseForm;
@@ -215,17 +211,18 @@ function ExpenseItem(props: ExpenseItemProps) {
                 label={intl.formatMessage({ defaultMessage: 'Upload file', id: '6oOCCL' })}
                 name={`expenseItems.${props.index}.attachment`}
               >
-                {() => {
+                {({ field }) => {
                   return (
-                    <StyledDropzone
+                    <Dropzone
                       {...attachmentDropzoneParams}
+                      {...field}
                       kind="EXPENSE_ITEM"
                       id={attachmentId}
                       name={attachmentId}
                       value={typeof item.attachment === 'string' ? item.attachment : item.attachment?.url}
                       isMulti={false}
                       showActions
-                      size={112}
+                      className="size-28"
                       useGraphQL={true}
                       parseDocument={false}
                       onGraphQLSuccess={uploadResults => {
@@ -312,7 +309,7 @@ function ExpenseItem(props: ExpenseItemProps) {
                 <div className="self-end">
                   {Boolean(item.amount?.currency && props.form.options.expenseCurrency !== item.amount?.currency) && (
                     <ExchangeRate
-                      className="mt-2 text-neutral-600"
+                      className="mt-2 text-muted-foreground"
                       {...getExpenseExchangeRateWarningOrError(
                         intl,
                         item.amount.exchangeRate,
@@ -356,11 +353,11 @@ export function AdditionalAttachments(props: AdditionalAttachmentsProps) {
       </Label>
       <div className="flex flex-wrap gap-4 pt-2">
         <div>
-          <StyledDropzone
+          <Dropzone
             {...attachmentDropzoneParams}
             name="additionalAttachments"
             kind="EXPENSE_ATTACHED_FILE"
-            size={112}
+            className="size-28"
             isMulti
             disabled={props.form.initialLoading}
             isLoading={props.form.initialLoading}
@@ -381,10 +378,10 @@ export function AdditionalAttachments(props: AdditionalAttachmentsProps) {
 
         {additionalAttachments.map(at => (
           <div key={typeof at === 'string' ? at : at.id}>
-            <StyledDropzone
+            <Dropzone
               {...attachmentDropzoneParams}
               name={typeof at === 'string' ? at : at.name}
-              size={112}
+              className="size-28"
               value={typeof at === 'string' ? at : at?.url}
               collectFilesOnly
               showActions

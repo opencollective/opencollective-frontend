@@ -7,7 +7,7 @@ import { attachmentDropzoneParams } from '../../expenses/lib/attachments';
 
 import { FormField } from '@/components/FormField';
 
-import StyledDropzone from '../../StyledDropzone';
+import Dropzone from '../../Dropzone';
 import { Label } from '../../ui/Label';
 import { RadioGroup, RadioGroupCard } from '../../ui/RadioGroup';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../ui/Tabs';
@@ -163,14 +163,16 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
                         isPrivate
                         label={intl.formatMessage({ defaultMessage: 'Attach your invoice file', id: 'Oa/lhY' })}
                       >
-                        {() => (
-                          <StyledDropzone
+                        {({ field }) => (
+                          <Dropzone
+                            {...field}
                             {...attachmentDropzoneParams}
                             kind="EXPENSE_ATTACHED_FILE"
                             name="invoice"
-                            width={1}
-                            minHeight={64}
-                            height={1}
+                            className="min-h-16"
+                            // width={1}
+                            // minHeight={64}
+                            // height={1}
                             showActions
                             useGraphQL={true}
                             parseDocument={false}

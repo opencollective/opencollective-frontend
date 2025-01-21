@@ -19,9 +19,9 @@ import { cn, omitDeep } from '../../lib/utils';
 
 import Avatar from '../Avatar';
 import { useDrawerActionsContainer } from '../Drawer';
+import { DROPZONE_ACCEPT_IMAGES } from '../Dropzone';
 import PayoutMethodForm from '../expenses/PayoutMethodForm';
 import PayoutMethodSelect from '../expenses/PayoutMethodSelect';
-import { DROPZONE_ACCEPT_IMAGES } from '../StyledDropzone';
 import StyledInput from '../StyledInput';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledInputGroup from '../StyledInputGroup';

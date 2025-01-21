@@ -1,27 +1,22 @@
 import React from 'react';
-import { ExclamationCircle } from '@styled-icons/fa-solid/ExclamationCircle';
-import { Download as DownloadIcon } from '@styled-icons/feather/Download';
-import { isNil, omit } from 'lodash';
-import { Upload } from 'lucide-react';
+import { isNil, isString, omit } from 'lodash';
+import { CircleAlert, Upload } from 'lucide-react';
 import type { Accept, FileRejection } from 'react-dropzone';
 import { useDropzone } from 'react-dropzone';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled, { css } from 'styled-components';
 import { v4 as uuid } from 'uuid';
 
 import type { OcrParsingOptionsInput, UploadedFileKind, UploadFileResult } from '../lib/graphql/types/v2/schema';
 import { useGraphQLFileUploader } from '../lib/hooks/useGraphQLFileUploader';
 import { useImageUploader } from '../lib/hooks/useImageUploader';
+import { cn } from '@/lib/utils';
 
 import { Button } from './ui/Button';
 import { useToast } from './ui/useToast';
 import type { ContainerProps } from './Container';
-import Container from './Container';
-import { Box } from './Grid';
 import { getI18nLink } from './I18nFormatters';
 import LocalFilePreview from './LocalFilePreview';
 import StyledSpinner from './StyledSpinner';
-import { P, Span } from './Text';
 import UploadedFilePreview from './UploadedFilePreview';
 
 export const DROPZONE_ACCEPT_IMAGES = { 'image/*': ['.jpeg', '.png'] };
@@ -29,69 +24,10 @@ export const DROPZONE_ACCEPT_CSV = { 'text/csv': ['.csv'] };
 export const DROPZONE_ACCEPT_PDF = { 'application/pdf': ['.pdf'] };
 export const DROPZONE_ACCEPT_ALL = { ...DROPZONE_ACCEPT_IMAGES, ...DROPZONE_ACCEPT_PDF };
 
-const Dropzone = styled(Container)<{ onClick?: () => void; error?: any }>`
-  border: 1px dashed #c4c7cc;
-  border-radius: 10px;
-  text-align: center;
-  background: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-
-  ${props =>
-    props.onClick &&
-    css`
-      cursor: pointer;
-
-      &:hover:not(:disabled) {
-        background: #f9f9f9;
-        border-color: ${props => props.theme.colors.primary[300]};
-      }
-
-      &:focus {
-        outline: 0;
-        border-color: ${props => props.theme.colors.primary[500]};
-      }
-    `}
-
-  ${props =>
-    props.error &&
-    css`
-      border: 1px solid ${props.theme.colors.red[500]};
-    `}
-
-  img {
-    max-height: 100%;
-    max-width: 100%;
-  }
-`;
-
-const ReplaceContainer = styled.div`
-  box-sizing: border-box;
-  background: rgba(49, 50, 51, 0.5);
-  color: #ffffff;
-  cursor: pointer;
-  position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 24px;
-  padding: 8px;
-  margin-top: -24px;
-  font-size: 12px;
-  line-height: 1em;
-
-  &:hover {
-    background: rgba(49, 50, 51, 0.6);
-  }
-`;
-
 /**
  * A dropzone to upload one or multiple files
  */
-const StyledDropzone = ({
+const Dropzone = ({
   onReject = undefined,
   onDrop = undefined,
   children = null,
@@ -99,7 +35,6 @@ const StyledDropzone = ({
   loadingProgress = undefined,
   minHeight = 96,
   size,
-  fontSize = '14px',
   mockImageGenerator = () => `https://loremflickr.com/120/120?lock=${uuid()}`,
   accept,
   minSize,
@@ -122,6 +57,7 @@ const StyledDropzone = ({
   limit = undefined,
   kind = null,
   showReplaceAction = true,
+  className = '',
   ...props
 }: StyledDropzoneProps) => {
   const { toast } = useToast();
@@ -181,69 +117,65 @@ const StyledDropzone = ({
   minHeight = size || minHeight;
   const innerMinHeight = minHeight - 2; // -2 To account for the borders
   const dropProps = getRootProps();
+
+  const errorMsg = isString(error) ? error : undefined;
   return (
-    <Dropzone
-      position="relative"
+    <div
+      className={cn(
+        'group relative flex h-full w-full cursor-pointer place-items-center overflow-hidden rounded-lg border-2 border-dashed border-muted-foreground/25 text-center transition hover:bg-muted/25',
+        'ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+        '[&>img]:max-h-full [&>img]:max-w-full',
+        isDragActive && 'border-muted-foreground/50',
+        props.disabled && 'pointer-events-none opacity-60',
+        error && 'ring-2 ring-destructive ring-offset-2',
+        className,
+      )}
       {...props}
       {...(value ? omit(dropProps, ['onClick']) : dropProps)}
-      minHeight={size || minHeight}
-      size={size}
-      error={error}
+      style={{ height: size, width: size, minHeight: size || minHeight }}
     >
       <input name={name} disabled={props.disabled} {...getInputProps()} />
       {isLoading || isUploading || isUploadingWithGraphQL ? (
-        <Container
-          position="relative"
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          height="100%"
-          width="100%"
-          minHeight={innerMinHeight}
+        <div
+          className="relative flex h-full w-full items-center justify-center"
+          style={{ minHeight: innerMinHeight }}
           data-loading="true"
         >
-          <Container
-            position="absolute"
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            size={innerMinHeight}
+          <div
+            className="absolute flex items-center justify-center"
+            style={{ height: innerMinHeight, width: innerMinHeight }}
           >
-            {UploadingComponent ? <UploadingComponent /> : <StyledSpinner size="70%" />}
-          </Container>
-          {isUploading && <Container fontSize="9px">{uploadProgress}%</Container>}
-          {isLoading && !isNil(loadingProgress) && <Container>{loadingProgress}%</Container>}
-        </Container>
+            {UploadingComponent ? <UploadingComponent /> : <StyledSpinner size="50%" />}
+          </div>
+          {isUploading && <div className="text-xs">{uploadProgress}%</div>}
+          {isLoading && !isNil(loadingProgress) && <div>{loadingProgress}%</div>}
+        </div>
       ) : (
-        <Container position="relative" maxWidth="100%">
+        <div className="relative w-full max-w-full">
           {isDragActive ? (
-            <Container color="primary.500" fontSize="12px">
-              <Box mb={2}>
-                <DownloadIcon size={20} />
-              </Box>
-              <FormattedMessage
-                id="StyledDropzone.DropMsg"
-                defaultMessage="Drop {count,plural, one {file} other {files}} here"
-                values={{ count: isMulti ? 2 : 1 }}
-              />
-            </Container>
+            <div className="flex flex-col items-center gap-2 text-xs">
+              <Upload size={20} />
+              <p>
+                <FormattedMessage
+                  id="StyledDropzone.DropMsg"
+                  defaultMessage="Drop {count,plural, one {file} other {files}} here"
+                  values={{ count: isMulti ? 2 : 1 }}
+                />
+              </p>
+            </div>
           ) : (
             <React.Fragment>
               {!value ? (
-                <Container color={error ? 'red.500' : 'black.600'} px={2} fontSize={fontSize}>
-                  {error ? (
-                    <React.Fragment>
-                      <ExclamationCircle color="#E03F6A" size={16} />
-                      <br />
-                      <Span fontWeight={600} ml={1}>
-                        {error}
-                      </Span>
-                      <br />
-                    </React.Fragment>
+                <div className={cn('px-2 text-sm', errorMsg ? 'text-destructive' : 'text-muted-foreground')}>
+                  {errorMsg ? (
+                    <div className="flex flex-col items-center gap-1">
+                      <CircleAlert size={20} />
+                      <p className="font-semibold">{errorMsg}</p>
+                    </div>
                   ) : isMulti ? (
                     <div className="flex flex-col items-center">
                       {showIcon && (
-                        <div className="mb-1 text-neutral-500">
+                        <div className="mb-1 text-muted-foreground">
                           <Upload size={24} />
                         </div>
                       )}
@@ -255,7 +187,7 @@ const StyledDropzone = ({
                         />
                       </div>
                       {showInstructions && (
-                        <P fontSize="12px" color="black.500" mt={1}>
+                        <p className="mt-1 text-xs text-muted-foreground">
                           <FormattedMessage
                             defaultMessage="{count,plural, one {File} other {Files}} should be {acceptedFormats} and no larger than {maxSize}."
                             id="StyledDropzone.FileInstructions"
@@ -275,13 +207,13 @@ const StyledDropzone = ({
                               />
                             </span>
                           )}
-                        </P>
+                        </p>
                       )}
                     </div>
                   ) : (
                     <div className="flex flex-col items-center">
                       {showIcon && (
-                        <div className="mb-1 text-neutral-500">
+                        <div className="mb-1 text-muted-foreground">
                           <Upload size={24} />
                         </div>
                       )}
@@ -303,7 +235,7 @@ const StyledDropzone = ({
                         )}
                       </div>
                       {showInstructions && (
-                        <P fontSize="12px" color="black.500" mt={1}>
+                        <p className="mt-1 text-xs text-muted-foreground">
                           <FormattedMessage
                             defaultMessage="{count,plural, one {File} other {Files}} should be {acceptedFormats} and no larger than {maxSize}."
                             id="StyledDropzone.FileInstructions"
@@ -313,16 +245,17 @@ const StyledDropzone = ({
                               maxSize: `${Math.round(maxSize / 1024 / 1024)}MB`,
                             }}
                           />
-                        </P>
+                        </p>
                       )}
                     </div>
                   )}
-                </Container>
+                </div>
               ) : typeof value === 'string' ? (
                 <React.Fragment>
                   <UploadedFilePreview size={previewSize || size} url={value} border="none" />
                   {showReplaceAction && (
-                    <ReplaceContainer
+                    <div
+                      className="absolute -mt-6 box-border flex h-6 w-full cursor-pointer items-center justify-center bg-foreground/50 p-2 text-xs leading-none text-background hover:bg-foreground/60"
                       onClick={dropProps.onClick}
                       role="button"
                       tabIndex={0}
@@ -334,7 +267,7 @@ const StyledDropzone = ({
                       }}
                     >
                       <FormattedMessage id="Image.Replace" defaultMessage="Replace" />
-                    </ReplaceContainer>
+                    </div>
                   )}
                 </React.Fragment>
               ) : value instanceof File ? (
@@ -343,13 +276,13 @@ const StyledDropzone = ({
               {children}
             </React.Fragment>
           )}
-        </Container>
+        </div>
       )}
       {value && showActions && (
         <div className="absolute right-3 top-3">
           <Button
             variant="outline"
-            size="sm"
+            size="xs"
             onClick={() => {
               if (isMulti) {
                 (onSuccess as (files: File[], fileRejections: FileRejection[]) => void)([], []);
@@ -363,7 +296,7 @@ const StyledDropzone = ({
           </Button>
         </div>
       )}
-    </Dropzone>
+    </div>
   );
 };
 
@@ -387,8 +320,6 @@ type StyledDropzoneProps = Omit<ContainerProps, 'accept' | 'children' | 'ref' | 
   isLoading?: boolean;
   /** Use this to override the loading progress indicator */
   loadingProgress?: number;
-  /** Font size used for the default messages */
-  fontSize?: number | string;
   /** Min height of the container */
   minHeight?: number;
   /** To have square container */
@@ -451,4 +382,4 @@ type StyledDropzoneProps = Omit<ContainerProps, 'accept' | 'children' | 'ref' | 
       ))
   );
 
-export default StyledDropzone;
+export default Dropzone;

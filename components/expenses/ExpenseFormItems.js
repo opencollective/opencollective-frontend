@@ -13,11 +13,11 @@ import { expenseItemsMustHaveFiles, newExpenseItem } from './lib/items';
 import { compareItemOCRValues, itemHasOCR, updateExpenseFormWithUploadResult } from './lib/ocr';
 import { expenseTypeSupportsItemCurrency } from './lib/utils';
 
+import Dropzone from '../Dropzone';
 import { Box, Flex } from '../Grid';
 import { I18nBold } from '../I18nFormatters';
 import MessageBox from '../MessageBox';
 import StyledCheckbox from '../StyledCheckbox';
-import StyledDropzone from '../StyledDropzone';
 import StyledHr from '../StyledHr';
 import { TaxesFormikFields } from '../taxes/TaxesFormikFields';
 import { P, Span } from '../Text';
@@ -171,7 +171,7 @@ class ExpenseFormItems extends React.PureComponent {
     if (!hasItems && requireFile) {
       return (
         <React.Fragment>
-          <StyledDropzone
+          <Dropzone
             {...attachmentDropzoneParams}
             kind="EXPENSE_ITEM"
             data-cy="expense-multi-items-dropzone"
@@ -181,7 +181,7 @@ class ExpenseFormItems extends React.PureComponent {
               this.removeMultiUploadingItems();
             }}
             mockImageGenerator={index => `https://loremflickr.com/120/120/invoice?lock=${index}`}
-            mb={3}
+            className="mb-4"
             useGraphQL={hasOCRFeature}
             parseDocument={hasOCRFeature}
             parsingOptions={{ currency: values.currency }}
@@ -208,7 +208,7 @@ class ExpenseFormItems extends React.PureComponent {
                 values={{ 'i18n-bold': I18nBold }}
               />
             </P>
-          </StyledDropzone>
+          </Dropzone>
         </React.Fragment>
       );
     }

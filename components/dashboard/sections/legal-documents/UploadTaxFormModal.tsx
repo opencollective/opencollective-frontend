@@ -7,8 +7,8 @@ import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { Account, Host, LegalDocument } from '../../../../lib/graphql/types/v2/schema';
 import { getMessageForRejectedDropzoneFiles } from '../../../../lib/hooks/useImageUploader';
 
+import Dropzone, { DROPZONE_ACCEPT_PDF } from '../../../Dropzone';
 import type { BaseModalProps } from '../../../ModalContext';
-import StyledDropzone, { DROPZONE_ACCEPT_PDF } from '../../../StyledDropzone';
 import { Button } from '../../../ui/Button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../../../ui/Dialog';
 import { useToast } from '../../../ui/useToast';
@@ -87,7 +87,7 @@ export const UploadTaxFormModal = ({
                 }}
               />
             </p>
-            <StyledDropzone
+            <Dropzone
               name="taxFormFileInput"
               accept={DROPZONE_ACCEPT_PDF}
               collectFilesOnly
@@ -99,7 +99,7 @@ export const UploadTaxFormModal = ({
               showIcon
               showActions
               previewSize={56}
-              p="16px"
+              className="p-4"
               onSuccess={(accepted, rejected) => {
                 if (rejected.length) {
                   toast({
