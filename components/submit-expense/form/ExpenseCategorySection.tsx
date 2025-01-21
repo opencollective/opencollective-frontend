@@ -56,7 +56,7 @@ export function ExpenseCategorySection(props: ExpenseCategorySectionProps) {
             account={props.form.options.account}
             selectedCategory={selectedAccountingCategory}
             allowNone={!props.form.options.isAccountingCategoryRequired}
-            borderRadiusClass="rounded max-w-full w-full"
+            buttonClassName="rounded max-w-full w-full"
           />
         )}
       </StyledInputFormikField>
