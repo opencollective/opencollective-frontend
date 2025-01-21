@@ -1,7 +1,6 @@
 import React from 'react';
 import { gql, useMutation } from '@apollo/client';
 import { useFormikContext } from 'formik';
-import FuzzySet from 'fuzzyset';
 import { get, isEmpty, omit, truncate } from 'lodash';
 import { Pencil, Trash2 } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -14,6 +13,7 @@ import type {
   SavePayoutMethodMutationVariables,
 } from '../../../lib/graphql/types/v2/graphql';
 import { PayoutMethodType } from '../../../lib/graphql/types/v2/schema';
+import { isFuzzyMatch } from '../../../lib/utils';
 
 import ConfirmationModal, { CONFIRMATION_MODAL_TERMINATE } from '../../ConfirmationModal';
 import PayoutMethodForm, { validatePayoutMethod } from '../../expenses/PayoutMethodForm';
@@ -351,21 +351,6 @@ function NewPayoutMethodOption(props: NewPayoutMethodOptionProps) {
       </Button>
     </div>
   );
-}
-
-function isFuzzyMatch(target: string, test: string) {
-  if (!target || !test) {
-    return false;
-  }
-
-  const fuzzySet = new FuzzySet();
-  fuzzySet.add(target.toLowerCase());
-  const result = fuzzySet.get(test.toLowerCase(), false, 0.55);
-  if (result && result?.length > 0) {
-    return true;
-  }
-
-  return false;
 }
 
 function PayoutMethodRadioGroupItem(props: {
