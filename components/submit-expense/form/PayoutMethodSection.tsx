@@ -13,7 +13,6 @@ import type {
   SavePayoutMethodMutationVariables,
 } from '../../../lib/graphql/types/v2/graphql';
 import { PayoutMethodType } from '../../../lib/graphql/types/v2/schema';
-import { isFuzzyMatch } from '../../../lib/utils';
 
 import ConfirmationModal, { CONFIRMATION_MODAL_TERMINATE } from '../../ConfirmationModal';
 import PayoutMethodForm, { validatePayoutMethod } from '../../expenses/PayoutMethodForm';
@@ -369,10 +368,11 @@ function PayoutMethodRadioGroupItem(props: {
   const [isLoadingEditPayoutMethod, setIsLoadingEditPayoutMethod] = React.useState(false);
 
   const isMissingCurrency = isEmpty(props.payoutMethod.data?.currency);
-  const isLegalNameFuzzyMatched = React.useMemo(
-    () => isFuzzyMatch(props.payoutMethod.data?.accountHolderName, form.options.payee?.legalName),
-    [props.payoutMethod.data?.accountHolderName, form.options.payee?.legalName],
-  );
+  const isLegalNameFuzzyMatched = React.useMemo(() => {
+    const accountHolderName: string = props.payoutMethod.data?.accountHolderName ?? '';
+    const payeeLegalName: string = form.options.payee?.legalName ?? '';
+    return accountHolderName.trim().toLowerCase() === payeeLegalName.trim().toLowerCase();
+  }, [props.payoutMethod.data?.accountHolderName, form.options.payee?.legalName]);
 
   const hasLegalNameMismatch =
     props.payoutMethod.type === PayoutMethodType.BANK_ACCOUNT &&

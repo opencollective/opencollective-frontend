@@ -29,7 +29,7 @@ import type { Amount } from '../../lib/graphql/types/v2/schema';
 import { Currency, ExpenseStatus, ExpenseType, PayoutMethodType } from '../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import type LoggedInUser from '../../lib/LoggedInUser';
-import { isFuzzyMatch, isValidEmail } from '../../lib/utils';
+import { isValidEmail } from '../../lib/utils';
 import { userMustSetAccountingCategory } from '../expenses/lib/accounting-categories';
 import { computeExpenseAmounts } from '../expenses/lib/utils';
 
@@ -903,7 +903,9 @@ function buildFormSchema(
       .refine(
         v => {
           if (options.payoutMethod?.type === PayoutMethodType.BANK_ACCOUNT) {
-            if (!isFuzzyMatch(options.payoutMethod?.data?.accountHolderName, options.payee?.legalName)) {
+            const accountHolderName: string = options.payoutMethod?.data?.accountHolderName ?? '';
+            const payeeLegalName: string = options.payee?.legalName ?? '';
+            if (accountHolderName.trim().toLowerCase() !== payeeLegalName.trim().toLowerCase()) {
               return !!v;
             }
           }
