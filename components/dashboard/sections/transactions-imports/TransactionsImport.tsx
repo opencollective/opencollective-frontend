@@ -11,7 +11,6 @@ import {
   Info,
   MessageCircle,
   PauseCircle,
-  RefreshCw,
   RotateCcw,
   Settings,
   SquareSlashIcon,
@@ -38,6 +37,7 @@ import { cn, sortSelectOptions } from '../../../../lib/utils';
 import { useTransactionsImportActions } from './lib/actions';
 import { TransactionsImportRowFieldsFragment, TransactionsImportStatsFragment } from './lib/graphql';
 import { getPossibleActionsForSelectedRows } from './lib/table-selection';
+import { usePlaidConnectDialog } from '@/lib/hooks/usePlaidConnectDialog';
 
 import { accountingCategoryFields } from '@/components/expenses/graphql/fragments';
 
@@ -56,7 +56,6 @@ import {
   MultiPagesRowSelectionInitialState,
   multiPagesRowSelectionReducer,
 } from '../../../table/multi-pages-selection';
-import { Badge } from '../../../ui/Badge';
 import { Button } from '../../../ui/Button';
 import { Checkbox } from '../../../ui/Checkbox';
 import type { StepItem } from '../../../ui/Stepper';
@@ -72,6 +71,7 @@ import { ImportProgressBadge } from './ImportProgressBadge';
 import { StepMapCSVColumns } from './StepMapCSVColumns';
 import { StepSelectCSV } from './StepSelectCSV';
 import { SyncPlaidAccountButton } from './SyncPlaidAccountButton';
+import { TransactionImportLastSyncAtBadge } from './TransactionImportLastSyncAtBadge';
 import { TransactionsImportRowDrawer } from './TransactionsImportRowDrawer';
 import { TransactionsImportRowStatusBadge } from './TransactionsImportRowStatusBadge';
 import TransactionsImportSettingsModal from './TransactionsImportSettingsModal';
@@ -288,6 +288,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
     views: queryFilterViews,
     filters,
   });
+
   const { data, previousData, loading, error, refetch } = useQuery<
     TransactionsImportQuery,
     TransactionsImportQueryVariables
@@ -303,6 +304,22 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
   const hasStepper = importType === 'CSV' && !importData?.file;
   const importRows = importData?.rows?.nodes ?? [];
   const selectedRowIdx = !focus ? -1 : importRows.findIndex(row => row.id === focus.rowId);
+
+  const { show: showPlaidDialog, status: plaidStatus } = usePlaidConnectDialog({
+    transactionImportId: importId,
+    host: importData?.account['host'],
+    disabled: importType !== 'PLAID',
+    onOpen: () => {
+      setHasSettingsModal(false); // The two modals don't play well with each others when opened at the same time
+    },
+    onSuccess: () => {
+      setTimeout(() => refetch(), 5_000);
+      toast({
+        variant: 'success',
+        message: intl.formatMessage({ defaultMessage: 'Bank account reconnected.', id: 'HuLtwm' }),
+      });
+    },
+  });
 
   // Polling to check if the import has new data
   useQuery(transactionsImportLasSyncAtPollQuery, {
@@ -358,6 +375,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
   }, [queryFilter.variables]);
 
   const hasPagination = data?.transactionsImport?.rows.totalCount > queryFilter.values.limit;
+  const isInitialSync = Boolean(!importData?.lastSyncAt && importData?.connectedAccount);
   return (
     <div>
       <DashboardHeader
@@ -421,14 +439,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                             <FormattedMessage defaultMessage="Last sync" id="transactions.import.lastSync" />
                           </div>
                         </div>
-                        {!importData.isSyncing && importData.lastSyncAt ? (
-                          <DateTime value={new Date(importData.lastSyncAt)} timeStyle="short" />
-                        ) : (
-                          <Badge type="info" className="whitespace-nowrap">
-                            {intl.formatMessage({ defaultMessage: 'In progress', id: 'syncInProgress' })}&nbsp;
-                            <RefreshCw size={12} className="animate-spin duration-1500" />
-                          </Badge>
-                        )}
+                        <TransactionImportLastSyncAtBadge transactionsImport={importData} />
                       </div>
                     ) : (
                       <div className="flex flex-col gap-1 sm:flex-row sm:items-center">
@@ -585,13 +596,13 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
 
                 {/** Import data table */}
                 <div className="relative mt-2">
-                  {!importData.lastSyncAt && (
+                  {isInitialSync && (
                     <div className="absolute z-50 flex h-full w-full items-center justify-center">
                       <Lottie animationData={SyncAnimation} loop autoPlay className="max-w-[600px]" />
                     </div>
                   )}
                   <DataTable<TransactionsImportQuery['transactionsImport']['rows']['nodes'][number], unknown>
-                    loading={loading || !importData.lastSyncAt}
+                    loading={loading || isInitialSync}
                     getRowClassName={row =>
                       row.original.status === TransactionsImportRowStatus.IGNORED
                         ? '[&>td:nth-child(n+2):nth-last-child(n+3)]:opacity-30'
@@ -846,7 +857,13 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
         autoFocusNoteForm={focus?.noteForm}
       />
       {hasSettingsModal && (
-        <TransactionsImportSettingsModal transactionsImport={importData} onOpenChange={setHasSettingsModal} isOpen />
+        <TransactionsImportSettingsModal
+          transactionsImport={importData}
+          onOpenChange={setHasSettingsModal}
+          isOpen
+          plaidStatus={plaidStatus}
+          onReconnectClick={showPlaidDialog}
+        />
       )}
     </div>
   );
