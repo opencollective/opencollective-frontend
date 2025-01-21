@@ -11,6 +11,7 @@ import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { fetchExpenseCategoryPredictions } from '../lib/ml-service';
 import { cn } from '../lib/utils';
 import { ACCOUNTING_CATEGORY_HOST_FIELDS } from './expenses/lib/accounting-categories';
+import { isSameAccount } from '@/lib/collective';
 
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './ui/Command';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/Popover';
@@ -24,12 +25,16 @@ type RequiredAccountingCategoryFields = Pick<AccountingCategory, 'id' | 'name' |
 type AccountingCategorySelectProps = {
   host: RequiredHostFields;
   /** The account holding the expense. Only used when using the prediction service */
-  account?: Pick<Account, 'id' | 'slug'>;
+  account?: { id: Account['id']; slug: Account['slug']; parent?: { id: Account['id'] } };
   kind: AccountingCategoryKind | `${AccountingCategoryKind}`;
   /** If `kind` is `EXPENSE`, the (optional) expense type is used to filter the categories */
   expenseType?: ExpenseType;
   /** If provided, these values (descriptions, items, etc...) will be used to call the prediction service */
-  expenseValues?: Partial<Expense>;
+  expenseValues?: {
+    type?: Expense['type'];
+    description?: Expense['description'];
+    items?: Array<{ description?: string }>;
+  };
   predictionStyle?: 'full' | 'inline-preload';
   selectedCategory: Pick<AccountingCategory, 'friendlyName' | 'name' | 'code' | 'id'> | undefined | null;
   valuesByRole?: Expense['valuesByRole'];
@@ -40,7 +45,7 @@ type AccountingCategorySelectProps = {
   id?: string;
   error?: boolean;
   children?: React.ReactNode;
-  borderRadiusClass?: string;
+  buttonClassName?: string;
   disabled?: boolean;
   selectFirstOptionIfSingle?: boolean;
 };
@@ -186,7 +191,7 @@ const getOptions = (
   }
 
   const expectedAppliesTo =
-    host.id === account?.id || host.id === account?.parent?.id
+    isSameAccount(host, account) || isSameAccount(host, account?.parent)
       ? AccountingCategoryAppliesTo.HOST
       : AccountingCategoryAppliesTo.HOSTED_COLLECTIVES;
 
@@ -215,7 +220,7 @@ const getOptions = (
 };
 
 const getCleanInputData = (
-  expenseValues: Partial<Expense>,
+  expenseValues: AccountingCategorySelectProps['expenseValues'],
 ): {
   description: string;
   items: string;
@@ -243,7 +248,7 @@ const useExpenseCategoryPredictionService = (
   enabled: boolean,
   host: RequiredHostFields,
   account: Pick<Account, 'slug'>,
-  expenseValues?: Partial<Expense>,
+  expenseValues?: AccountingCategorySelectProps['expenseValues'],
 ) => {
   const { call: fetchPredictionsCall, data, loading } = useAsyncCall(fetchExpenseCategoryPredictions);
   const throttledFetchPredictions = React.useMemo(() => throttle(fetchPredictionsCall, 500), []);
@@ -326,7 +331,7 @@ const AccountingCategorySelect = ({
   allowNone = false,
   showCode = false,
   expenseValues = undefined,
-  borderRadiusClass = 'rounded-lg',
+  buttonClassName = 'rounded-lg',
   children = null,
   selectFirstOptionIfSingle,
   disabled,
@@ -377,7 +382,7 @@ const AccountingCategorySelect = ({
               id={id}
               className={cn(
                 'flex w-full max-w-[300px] items-center justify-between border px-3 py-2',
-                borderRadiusClass,
+                buttonClassName,
                 {
                   'border-red-500': error,
                   'border-gray-300': !error,

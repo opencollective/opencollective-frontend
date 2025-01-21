@@ -733,7 +733,7 @@ const AddFundsModalContentWithCollective = ({
                         account={account}
                         selectedCategory={field.value}
                         allowNone={true}
-                        borderRadiusClass="rounded"
+                        buttonClassName="rounded"
                       />
                     )}
                   </Field>
