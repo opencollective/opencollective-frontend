@@ -1,5 +1,4 @@
 import { type ClassValue, clsx } from 'clsx';
-import FuzzySet from 'fuzzyset';
 import loadScript from 'load-script';
 import { isObject, omit } from 'lodash';
 import { twMerge } from 'tailwind-merge';
@@ -290,18 +289,3 @@ export const sortSelectOptions = (option1, option2) => {
   }
   return option1.label.localeCompare(option2.label);
 };
-
-export function isFuzzyMatch(target: string, test: string) {
-  if (!target || !test) {
-    return false;
-  }
-
-  const fuzzySet = new FuzzySet();
-  fuzzySet.add(target.toLowerCase());
-  const result = fuzzySet.get(test.toLowerCase(), false, 0.55);
-  if (result && result?.length > 0) {
-    return true;
-  }
-
-  return false;
-}
