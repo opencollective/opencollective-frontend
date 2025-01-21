@@ -1,6 +1,7 @@
 import React from 'react';
 import { gql, useMutation } from '@apollo/client';
 import { useFormikContext } from 'formik';
+import FuzzySet from 'fuzzyset';
 import { get, isEmpty, omit, truncate } from 'lodash';
 import { Pencil, Trash2 } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -352,6 +353,21 @@ function NewPayoutMethodOption(props: NewPayoutMethodOptionProps) {
   );
 }
 
+function isFuzzyMatch(target: string, test: string) {
+  if (!target || !test) {
+    return false;
+  }
+
+  const fuzzySet = new FuzzySet();
+  fuzzySet.add(target.toLowerCase());
+  const result = fuzzySet.get(test.toLowerCase(), false, 0.55);
+  if (result && result?.length > 0) {
+    return true;
+  }
+
+  return false;
+}
+
 function PayoutMethodRadioGroupItem(props: {
   payoutMethod: ExpenseForm['options']['payoutMethods'][number];
   isChecked?: boolean;
@@ -368,13 +384,17 @@ function PayoutMethodRadioGroupItem(props: {
   const [isLoadingEditPayoutMethod, setIsLoadingEditPayoutMethod] = React.useState(false);
 
   const isMissingCurrency = isEmpty(props.payoutMethod.data?.currency);
+  const isLegalNameFuzzyMatched = React.useMemo(
+    () => isFuzzyMatch(props.payoutMethod.data?.accountHolderName, form.options.payee?.legalName),
+    [props.payoutMethod.data?.accountHolderName, form.options.payee?.legalName],
+  );
 
   const hasLegalNameMismatch =
     props.payoutMethod.type === PayoutMethodType.BANK_ACCOUNT &&
     form.values.payeeSlug &&
     !form.values.payeeSlug.startsWith('__') &&
     form.values.payeeSlug === form.options.payee?.slug &&
-    props.payoutMethod.data?.accountHolderName !== form.options.payee?.legalName;
+    !isLegalNameFuzzyMatched;
   const isOpen = props.isChecked;
 
   const [isDeletingPayoutMethod, setIsDeletingPayoutMethod] = React.useState(false);
