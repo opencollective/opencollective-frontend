@@ -173,7 +173,7 @@ module.exports = {
       },
     },
     {
-      files: ['server/*.js', '*.config.js', '.storybook/main.js', 'env.js'],
+      files: ['server/*.js', '*.config.js', 'env.js'],
       rules: {
         '@typescript-eslint/no-var-requires': 'off',
       },
