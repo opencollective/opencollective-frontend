@@ -10,7 +10,7 @@ Just replace `:collectiveSlug` with the slug of your collective (e.g., webpack f
 The verb can either be "donate" or "contribute".
 Example:
 
-<center><script src="https://opencollective.com/webpack/donate/button.js"></script><script src="https://opencollective.com/webpack/donate/button.js" color="blue"></script><script src="https://opencollective.com/webpack/contribute/button.js" color="blue"></script></center>
+<center><script src="https://opencollective.com/webpack/donate/button.js"></script><script src="https://opencollective.com/webpack/donate/button.js" color="blue"></script><script src="https://opencollective.com/webpack/contribute/button.js" color="blue"></script><script src="https://opencollective.com/webpack/contribute/button.js"></script></center>
 
 If you want to add a donate button to a blog post, you can load an image version of the logo and then link to the donate page of your collective.
 
