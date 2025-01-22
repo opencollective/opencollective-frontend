@@ -479,10 +479,9 @@ function Taxes(props: { form: ExpenseForm }) {
               )}
               inputType="number"
             >
-              {({ field, hasError }) => (
+              {({ field }) => (
                 <InputGroup
                   {...field}
-                  hasError={hasError}
                   value={field.value ? round(field.value * 100, 2) : 0}
                   onChange={e =>
                     props.form.setFieldValue(

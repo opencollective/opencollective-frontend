@@ -2,7 +2,7 @@ import React from 'react';
 import type { Path } from 'dot-path-value';
 import { useFormikContext } from 'formik';
 import { get, isEmpty } from 'lodash';
-import type { IntlShape, MessageDescriptor } from 'react-intl';
+import type { MessageDescriptor } from 'react-intl';
 import { defineMessage, FormattedMessage } from 'react-intl';
 
 import { cn } from '../../lib/utils';
@@ -101,14 +101,6 @@ function isExpenseFormStepCompleted(form: ExpenseForm, step: Step): boolean {
     return true;
   }
   return valueKeys.map(valueKey => isEmpty(get(form.errors, valueKey))).every(Boolean);
-}
-
-export function expenseFormStepError(intl: IntlShape, form: ExpenseForm, step: Step): string {
-  if (expenseFormStepHasError(form, step) && isExpenseFormStepTouched(form, step) && form.submitCount > 0) {
-    return intl.formatMessage({ defaultMessage: 'Required', id: 'Seanpx' });
-  }
-
-  return null;
 }
 
 function expenseFormStepHasError(form: ExpenseForm, step: Step): boolean {
