@@ -614,7 +614,8 @@ class ContributionFlow extends React.Component {
       this.setState({ isSubmitting: true });
 
       try {
-        const { data: result } = await this.props.createCollective(stepProfile);
+        const collectiveData = { ...stepProfile, type: stepProfile.type === 'INDIVIDUAL' ? 'USER' : stepProfile.type };
+        const { data: result } = await this.props.createCollective(collectiveData);
         const createdProfile = result.createCollective;
         await this.props.refetchLoggedInUser();
         this.setState({ stepProfile: createdProfile, isSubmitting: false });
