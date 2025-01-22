@@ -119,6 +119,17 @@ type TransferDetailsFieldsProps = {
   expense: any;
 };
 
+const generateDefaultReference = (expense, limit) => {
+  const id = expense.legacyId.toString();
+  return [
+    expense.account.name
+      .replace(/ /g, '')
+      .toUpperCase()
+      .slice(0, limit - 1 - id.length),
+    id,
+  ].join(' ');
+};
+
 const TransferDetailFields = ({ expense, setDisabled }: TransferDetailsFieldsProps) => {
   const formik = useFormikContext<any>();
   const { data, loading, error } = useQuery(validateTransferRequirementsQuery, {
@@ -131,24 +142,19 @@ const TransferDetailFields = ({ expense, setDisabled }: TransferDetailsFieldsPro
   }, [loading, setDisabled]);
 
   useEffect(() => {
-    let reference;
+    let referenceField;
     data?.expense?.validateTransferRequirements?.find(requirement => {
       return requirement.fields.find(field => {
         const r = field?.group?.find(group => group.key === 'reference');
         if (r) {
-          reference = r;
+          referenceField = r;
         }
         return r;
       });
     });
-    if (
-      formik.values.transfer?.details?.reference &&
-      reference?.maxLength < formik.values.transfer?.details?.reference?.length
-    ) {
-      formik.setFieldValue(
-        'transfer.details.reference',
-        truncateMiddle(formik.values.transfer?.details?.reference, reference.maxLength, ' '),
-      );
+    if (referenceField) {
+      const reference = expense.reference || generateDefaultReference(expense, referenceField.maxLength);
+      formik.setFieldValue('transfer.details.reference', truncateMiddle(reference, referenceField.maxLength, ' '));
     }
   }, [data]);
 
@@ -415,13 +421,6 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
     context: API_V2_CONTEXT,
     skip: !canQuote,
   });
-
-  useEffect(() => {
-    const reference = quoteQuery.data?.expense?.reference;
-    if (reference && !formik.values.transfer?.details?.reference) {
-      formik.setFieldValue('transfer', { details: { reference } });
-    }
-  }, [quoteQuery.data]);
 
   const amounts = calculateAmounts({
     values: formik.values,
