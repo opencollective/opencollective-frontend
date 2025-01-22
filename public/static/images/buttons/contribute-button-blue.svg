@@ -41,7 +41,7 @@
                                 <path d="M25.5090496,6.02648429 C27.0795729,8.2891249 28,11.0370738 28,14 C28,16.9629262 27.0795729,19.7108751 25.5090496,21.9735157 L21.8824995,18.3469656 C22.5946547,17.0583408 23,15.5765071 23,14 C23,12.4234929 22.5946547,10.9416592 21.8824995,9.65303443 L25.5090496,6.02648429 Z" id="1/4-circle" fill="#B8D5E6"></path>
                             </g>
                         </g>
-                        <g id="::-label" transform="translate(18.000000, 17.000000)" font-size="12" font-family="Montserrat-Regular, Montserrat" letter-spacing="2" fill="#FFFFFF" font-weight="normal">
+                        <g id="::-label" transform="translate(18.000000, 17.000000)" font-size="12" font-family="Montserrat-Regular, Montserrat, Arial" letter-spacing="2" fill="#FFFFFF" font-weight="normal">
                             <text id="CONTRIBUTE-TO-OUR-CO">
                                 <tspan x="0.188" y="12">CONTRIBUTE TO OUR COLLECTIVE</tspan>
                             </text>
@@ -58,7 +58,7 @@
                                 <path d="M25.5090496,6.02648429 C27.0795729,8.2891249 28,11.0370738 28,14 C28,16.9629262 27.0795729,19.7108751 25.5090496,21.9735157 L21.8824995,18.3469656 C22.5946547,17.0583408 23,15.5765071 23,14 C23,12.4234929 22.5946547,10.9416592 21.8824995,9.65303443 L25.5090496,6.02648429 Z" id="1/4-circle" fill="#B8D5E6"></path>
                             </g>
                         </g>
-                        <g id="::-label" transform="translate(54.000000, 17.000000)" font-size="12" font-family="Montserrat-Regular, Montserrat" letter-spacing="2" fill="#FFFFFF" font-weight="normal">
+                        <g id="::-label" transform="translate(54.000000, 17.000000)" font-size="12" font-family="Montserrat-Regular, Montserrat, Arial" letter-spacing="2" fill="#FFFFFF" font-weight="normal">
                             <text id="CONTRIBUTE-TO-OUR-CO">
                                 <tspan x="-35.812" y="12">CONTRIBUTE TO OUR COLLECTIVE</tspan>
                             </text>
@@ -75,7 +75,7 @@
                                 <path d="M25.5090496,6.02648429 C27.0795729,8.2891249 28,11.0370738 28,14 C28,16.9629262 27.0795729,19.7108751 25.5090496,21.9735157 L21.8824995,18.3469656 C22.5946547,17.0583408 23,15.5765071 23,14 C23,12.4234929 22.5946547,10.9416592 21.8824995,9.65303443 L25.5090496,6.02648429 Z" id="1/4-circle" fill="#B8D5E6"></path>
                             </g>
                         </g>
-                        <g id="::-label" transform="translate(54.000000, 17.000000)" font-size="12" font-family="Montserrat-Regular, Montserrat" letter-spacing="2" fill="#FFFFFF" font-weight="normal">
+                        <g id="::-label" transform="translate(54.000000, 17.000000)" font-size="12" font-family="Montserrat-Regular, Montserrat, Arial" letter-spacing="2" fill="#FFFFFF" font-weight="normal">
                             <text id="CONTRIBUTE-TO-OUR-CO">
                                 <tspan x="-35.812" y="12">CONTRIBUTE TO OUR COLLECTIVE</tspan>
                             </text>
