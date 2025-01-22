@@ -308,7 +308,7 @@ const ExportTransactionsCSVModal = ({
   }, [presetOptions, preset]);
 
   React.useEffect(() => {
-    if (open) {
+    if (open && account) {
       fetchRows();
     }
   }, [queryFilter.values, account, open]);
@@ -416,7 +416,7 @@ const ExportTransactionsCSVModal = ({
 
   const isAboveRowLimit = exportedRows > 100e3;
   const expectedTimeInMinutes = Math.round((exportedRows * 1.1) / AVERAGE_TRANSACTIONS_PER_MINUTE);
-  const disabled = isAboveRowLimit || isFetchingRows || isSavingSet || isEmpty(fields);
+  const disabled = !account || isAboveRowLimit || isFetchingRows || isSavingSet || isEmpty(fields);
   const isWholeTabSelected = GROUP_FIELDS[tab]?.every(f => fields.includes(f));
   const canEditFields = preset === FIELD_OPTIONS.NEW_PRESET || isEditingPreset;
 
