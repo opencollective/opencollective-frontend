@@ -59,7 +59,7 @@ const Dropzone = ({
   showReplaceAction = true,
   className = '',
   ...props
-}: StyledDropzoneProps) => {
+}: DropzoneProps) => {
   const { toast } = useToast();
   const intl = useIntl();
   const imgUploaderParams = { isMulti, mockImageGenerator, onSuccess, onReject, kind, accept, minSize, maxSize };
@@ -307,7 +307,7 @@ type UploadedFile = {
   type: string;
 };
 
-type StyledDropzoneProps = Omit<ContainerProps, 'accept' | 'children' | 'ref' | 'onClick' | 'as'> & {
+type DropzoneProps = React.HTMLAttributes<HTMLDivElement> & {
   /** Called back with the rejected files */
   onReject?: (msg: string) => void;
   /** Called when the user drops files */

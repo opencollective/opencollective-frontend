@@ -733,7 +733,6 @@ const AddFundsModalContentWithCollective = ({
                         account={account}
                         selectedCategory={field.value}
                         allowNone={true}
-                        buttonClassName="rounded"
                       />
                     )}
                   </Field>

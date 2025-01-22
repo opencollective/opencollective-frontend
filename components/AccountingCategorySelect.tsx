@@ -13,6 +13,7 @@ import { cn } from '../lib/utils';
 import { ACCOUNTING_CATEGORY_HOST_FIELDS } from './expenses/lib/accounting-categories';
 import { isSameAccount } from '@/lib/collective';
 
+import { Button } from './ui/Button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './ui/Command';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/Popover';
 
@@ -378,16 +379,15 @@ const AccountingCategorySelect = ({
       <Popover open={isOpen} onOpenChange={setOpen}>
         <PopoverTrigger asChild onBlur={onBlur} disabled={disabled}>
           {children || (
-            <button
+            <Button
               id={id}
+              variant="outline"
               className={cn(
-                'flex w-full max-w-[300px] items-center justify-between border px-3 py-2',
-                buttonClassName,
+                'w-full max-w-[300px]',
                 {
-                  'border-red-500': error,
-                  'border-gray-300': !error,
-                  'bg-[hsl(0,0%,95%)] text-[hsl(0,0%,60%)]': disabled,
+                  'ring-2 ring-destructive ring-offset-2': error,
                 },
+                buttonClassName,
               )}
               disabled={disabled}
             >
@@ -400,7 +400,7 @@ const AccountingCategorySelect = ({
                   intl.formatMessage({ defaultMessage: 'Select category', id: 'RUJYth' })}
               </span>
               <ChevronDown size="1em" className={cn({ 'text-[hsl(0,0%,80%)]': disabled })} />
-            </button>
+            </Button>
           )}
         </PopoverTrigger>
         <PopoverContent className="min-w-[280px] p-0" style={{ width: 'var(--radix-popover-trigger-width)' }}>

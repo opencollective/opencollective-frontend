@@ -142,6 +142,7 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
             <Tabs
               value={props.form.values.hasInvoiceOption}
               onValueChange={newValue => props.form.setFieldValue('hasInvoiceOption', newValue as YesNoOption)}
+              className="space-y-4"
             >
               <TabsList>
                 <TabsTrigger value={YesNoOption.YES}>
@@ -171,7 +172,7 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
                             name="invoice"
                             className="min-h-16"
                             // width={1}
-                            // minHeight={64}
+                            minHeight={64}
                             // height={1}
                             showActions
                             useGraphQL={true}
