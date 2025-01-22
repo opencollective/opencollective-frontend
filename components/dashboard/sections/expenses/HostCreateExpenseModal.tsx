@@ -384,7 +384,7 @@ export const HostCreateExpenseModal = ({
                           expenseValues={values}
                           selectedCategory={field.value}
                           onChange={category => setFieldValue(field.name, category)}
-                          buttonClassName="rounded max-w-full"
+                          buttonClassName="max-w-full"
                           predictionStyle="inline-preload"
                           showCode
                           allowNone

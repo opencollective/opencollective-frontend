@@ -332,7 +332,7 @@ const AccountingCategorySelect = ({
   allowNone = false,
   showCode = false,
   expenseValues = undefined,
-  buttonClassName = 'rounded-lg',
+  buttonClassName = '',
   children = null,
   selectFirstOptionIfSingle,
   disabled,
@@ -383,7 +383,7 @@ const AccountingCategorySelect = ({
               id={id}
               variant="outline"
               className={cn(
-                'w-full max-w-[300px]',
+                'w-full max-w-[300px] font-normal',
                 {
                   'ring-2 ring-destructive ring-offset-2': error,
                 },
@@ -399,7 +399,7 @@ const AccountingCategorySelect = ({
                 {getCategoryLabel(intl, selectedCategory, false, valuesByRole) ||
                   intl.formatMessage({ defaultMessage: 'Select category', id: 'RUJYth' })}
               </span>
-              <ChevronDown size="1em" className={cn({ 'text-[hsl(0,0%,80%)]': disabled })} />
+              <ChevronDown size="1em" />
             </Button>
           )}
         </PopoverTrigger>
