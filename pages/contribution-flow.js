@@ -46,7 +46,9 @@ class NewContributionFlowPage extends React.Component {
       loading: PropTypes.bool,
       error: PropTypes.any,
       account: PropTypes.object,
+      me: PropTypes.object,
       tier: PropTypes.object,
+      refetch: PropTypes.func,
     }), // from withData
     intl: PropTypes.object,
     loadStripe: PropTypes.func,
@@ -70,6 +72,9 @@ class NewContributionFlowPage extends React.Component {
     if (get(this.props, hostPath) !== get(prevProps, hostPath)) {
       this.loadExternalScripts();
     }
+    if (this.props.LoggedInUser && !this.props.data.me) {
+      this.props.data.refetch();
+    }
   }
 
   loadExternalScripts() {
@@ -86,7 +91,7 @@ class NewContributionFlowPage extends React.Component {
 
   renderPageContent() {
     const { data = {}, LoggedInUser, error } = this.props;
-    const { account, tier } = data;
+    const { account, tier, me } = data;
 
     if (data.loading) {
       return (
@@ -116,7 +121,15 @@ class NewContributionFlowPage extends React.Component {
         </React.Fragment>
       );
     } else {
-      return <ContributionFlowContainer collective={account} host={account.host} tier={tier} error={error} />;
+      return (
+        <ContributionFlowContainer
+          collective={account}
+          host={account.host}
+          tier={tier}
+          contributorProfiles={me?.contributorProfiles || []}
+          error={error}
+        />
+      );
     }
   }
 

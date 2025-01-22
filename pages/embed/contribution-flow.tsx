@@ -65,6 +65,9 @@ class EmbedContributionFlowPage extends React.Component<{
     if (get(this.props, hostPath) !== get(prevProps, hostPath)) {
       this.loadExternalScripts();
     }
+    if (this.props.LoggedInUser && !prevProps.LoggedInUser) {
+      this.props.data.refetch();
+    }
   }
 
   componentWillUnmount(): void {
@@ -109,7 +112,7 @@ class EmbedContributionFlowPage extends React.Component<{
 
   renderPageContent() {
     const { data, LoggedInUser } = this.props;
-    const { account, tier, loading } = data || {};
+    const { account, tier, loading, me } = data || {};
 
     if (loading) {
       return (
@@ -131,6 +134,7 @@ class EmbedContributionFlowPage extends React.Component<{
             host={account.host}
             tier={tier}
             error={this.props.error}
+            contributorProfiles={me?.contributorProfiles || []}
             onStepChange={step =>
               this.postMessage('stepChange', {
                 step,
