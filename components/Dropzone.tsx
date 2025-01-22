@@ -13,7 +13,6 @@ import { cn } from '@/lib/utils';
 
 import { Button } from './ui/Button';
 import { useToast } from './ui/useToast';
-import type { ContainerProps } from './Container';
 import { getI18nLink } from './I18nFormatters';
 import LocalFilePreview from './LocalFilePreview';
 import StyledSpinner from './StyledSpinner';

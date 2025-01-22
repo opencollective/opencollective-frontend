@@ -5,15 +5,14 @@ import { FormattedMessage } from 'react-intl';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 
 import AccountingCategorySelect from '../../../components/AccountingCategorySelect';
+import { FormField } from '@/components/FormField';
 
 import HTMLContent from '../../HTMLContent';
-import StyledInputFormikField from '../../StyledInputFormikField';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../ui/Collapsible';
 import { Step } from '../SubmitExpenseFlowSteps';
 import type { ExpenseForm } from '../useExpenseForm';
 
 import { FormSectionContainer } from './FormSectionContainer';
-import { FormField } from '@/components/FormField';
 
 type ExpenseCategorySectionProps = {
   form: ExpenseForm;

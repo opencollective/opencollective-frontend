@@ -145,6 +145,15 @@ export function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
 
   const firstIncompleteIdx = stepOrder.findIndex(s => !isExpenseFormStepCompleted(form, s));
 
+  // Scroll to first step with error
+  const firstIncompleteSection = stepOrder.find(s => !isExpenseFormStepCompleted(form, s));
+  const submitCount = form.submitCount;
+  React.useEffect(() => {
+    if (firstIncompleteSection && submitCount > 0) {
+      document.querySelector(`#${firstIncompleteSection}`)?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [hasErrors, firstIncompleteSection, submitCount]);
+
   return (
     <div className={cn(props.className)}>
       <ol className="pl-[12px] text-sm">
