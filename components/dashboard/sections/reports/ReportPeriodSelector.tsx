@@ -4,15 +4,15 @@ import { ArrowLeft, ArrowRight, ChevronDown } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
-import { getDayjsIsoUnit } from '../../../../../lib/date-utils';
-import dayjs from '../../../../../lib/dayjs';
-import type { FilterComponentProps } from '../../../../../lib/filters/filter-types';
-import type { Host } from '../../../../../lib/graphql/types/v2/schema';
-import { TimeUnit } from '../../../../../lib/graphql/types/v2/schema';
+import { getDayjsIsoUnit } from '../../../../lib/date-utils';
+import dayjs from '../../../../lib/dayjs';
+import type { FilterComponentProps } from '../../../../lib/filters/filter-types';
+import type { Host } from '../../../../lib/graphql/types/v2/schema';
+import { TimeUnit } from '../../../../lib/graphql/types/v2/schema';
 
-import { Button } from '../../../../ui/Button';
-import { Label } from '../../../../ui/Label';
-import { Popover, PopoverContent, PopoverTrigger } from '../../../../ui/Popover';
+import { Button } from '../../../ui/Button';
+import { Label } from '../../../ui/Label';
+import { Popover, PopoverContent, PopoverTrigger } from '../../../ui/Popover';
 
 import { CurrentPeriodBadge } from './CurrentPeriodBadge';
 

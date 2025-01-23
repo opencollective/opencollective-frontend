@@ -4,14 +4,14 @@ import { ChevronDown } from '@styled-icons/fa-solid/ChevronDown/ChevronDown';
 import { ChevronUp } from '@styled-icons/fa-solid/ChevronUp/ChevronUp';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { formatCurrency } from '../../../../lib/currency-utils';
+import { formatCurrency } from '../../../../../lib/currency-utils';
 
-import Container from '../../../Container';
-import { Box, Flex } from '../../../Grid';
-import Image from '../../../Image';
-import LoadingPlaceholder from '../../../LoadingPlaceholder';
-import StyledLinkButton from '../../../StyledLinkButton';
-import { P, Span } from '../../../Text';
+import Container from '../../../../Container';
+import { Box, Flex } from '../../../../Grid';
+import Image from '../../../../Image';
+import LoadingPlaceholder from '../../../../LoadingPlaceholder';
+import StyledLinkButton from '../../../../StyledLinkButton';
+import { P, Span } from '../../../../Text';
 
 import { HostFeesSectionHistorical } from './HostFeesSectionHistorical';
 

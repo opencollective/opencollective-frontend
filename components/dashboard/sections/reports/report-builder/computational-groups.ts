@@ -1,4 +1,4 @@
-import { ExpenseType, TransactionKind, TransactionType } from '../../../../../../lib/graphql/types/v2/schema';
+import { ExpenseType, TransactionKind, TransactionType } from '../../../../../lib/graphql/types/v2/schema';
 
 import type { Group, GroupFilter } from '../types';
 import { ReportSection } from '../types';

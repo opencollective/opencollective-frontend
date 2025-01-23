@@ -4,14 +4,14 @@ import { ChevronDown } from '@styled-icons/fa-solid/ChevronDown/ChevronDown';
 import { ChevronUp } from '@styled-icons/fa-solid/ChevronUp/ChevronUp';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { formatCurrency } from '../../../../lib/currency-utils';
+import { formatCurrency } from '../../../../../lib/currency-utils';
 
-import Container from '../../../Container';
-import { Flex } from '../../../Grid';
-import LoadingPlaceholder from '../../../LoadingPlaceholder';
-import ProportionalAreaChart from '../../../ProportionalAreaChart';
-import StyledLinkButton from '../../../StyledLinkButton';
-import { P, Span } from '../../../Text';
+import Container from '../../../../Container';
+import { Flex } from '../../../../Grid';
+import LoadingPlaceholder from '../../../../LoadingPlaceholder';
+import ProportionalAreaChart from '../../../../ProportionalAreaChart';
+import StyledLinkButton from '../../../../StyledLinkButton';
+import { P, Span } from '../../../../Text';
 
 import TotalMoneyManagedHistorical from './TotalMoneyManagedHistorical';
 

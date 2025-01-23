@@ -8,6 +8,7 @@ export const SECTIONS = {
   REPORTS: 'reports',
   EXPENSE_REPORTS: 'reports/expenses',
   TRANSACTION_REPORTS: 'reports/transactions',
+  LEGACY_HOST_REPORT: 'reports/legacy',
   CHART_OF_ACCOUNTS: 'chart-of-accounts',
   HOST_EXPENSES: 'host-expenses',
   HOST_AGREEMENTS: 'host-agreements',

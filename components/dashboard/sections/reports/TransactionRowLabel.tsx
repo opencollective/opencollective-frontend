@@ -1,8 +1,8 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
 
-import { i18nExpenseType } from '../../../../../lib/i18n/expense';
-import { i18nTransactionKind, i18nTransactionKindDefinition } from '../../../../../lib/i18n/transaction';
+import { i18nExpenseType } from '../../../../lib/i18n/expense';
+import { i18nTransactionKind, i18nTransactionKindDefinition } from '../../../../lib/i18n/transaction';
 
 import { DefinitionTooltip } from './DefinitionTooltip';
 
