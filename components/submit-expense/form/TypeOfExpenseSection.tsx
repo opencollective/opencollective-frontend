@@ -171,9 +171,7 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
                             kind="EXPENSE_ATTACHED_FILE"
                             name="invoice"
                             className="min-h-16"
-                            // width={1}
                             minHeight={64}
-                            // height={1}
                             showActions
                             useGraphQL={true}
                             parseDocument={false}
