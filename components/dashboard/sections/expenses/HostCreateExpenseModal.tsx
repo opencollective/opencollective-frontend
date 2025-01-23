@@ -216,7 +216,7 @@ export const HostCreateExpenseModal = ({
                   transactionsImportRow: transactionsImportRow && { id: transactionsImportRow.id },
                   expense: {
                     ...pick(values, ['description', 'type']),
-                    accountingCategory: pick(values.accountingCategory, ['id']),
+                    accountingCategory: values.accountingCategory && pick(values.accountingCategory, ['id']),
                     payee: getAccountReferenceInput(values.payee),
                     currency: host.currency,
                     payoutMethod: {
