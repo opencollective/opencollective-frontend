@@ -1,6 +1,6 @@
 import React from 'react';
 import { CreditCard } from '@styled-icons/fa-solid/CreditCard';
-import { find, get, pick, sortBy, uniqBy } from 'lodash';
+import { find, get, omit, pick, sortBy, uniqBy } from 'lodash';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
 import { canContributeRecurring, getCollectivePageMetadata } from '../../lib/collective';
@@ -335,24 +335,20 @@ const getTotalYearlyAmount = stepDetails => {
 };
 
 /**
- * Whether this contribution requires us to collect the address of the user
+ * Get the required information for the current contribution based on Host policies and total contributed to host
+ * @returns {{ legalName?: boolean, address?: boolean }}
  */
-export const contributionRequiresAddress = (stepDetails, tier) => {
-  return Boolean(
-    (stepDetails?.currency === 'USD' && getTotalYearlyAmount(stepDetails) >= 5000e2) || // Above $5000/year
-      tier?.requireAddress, // Or if enforced by the tier
-  );
-};
-
-/**
- * Whether this contribution requires us to collect the address and legal name of the user
- */
-export const contributionRequiresLegalName = (stepDetails, tier) => {
-  return Boolean(
-    (stepDetails?.currency === 'USD' && getTotalYearlyAmount(stepDetails) >= 250e2) || // Above $250/year
-      tier?.requireAddress || // Or if enforced by the tier, a valid address requires a legal name
-      tier?.type === TierTypes.TICKET,
-  );
+export const getRequiredInformation = (stepProfile, stepDetails, collective, profiles = [], tier) => {
+  let totalAmount = getTotalYearlyAmount(stepDetails);
+  const selectedProfile = profiles.find(p => p.account.id === stepProfile?.id);
+  if (selectedProfile) {
+    totalAmount += selectedProfile.totalContributedToHost?.valueInCents || 0;
+  }
+  const thresholds = omit(collective?.policies?.CONTRIBUTOR_INFO_THRESHOLDS, ['__typename']);
+  return {
+    legalName: tier?.requireAddress || tier?.type === TierTypes.TICKET || totalAmount >= thresholds?.legalName,
+    address: tier?.requireAddress || totalAmount >= thresholds?.address,
+  };
 };
 
 export function getGuestInfoFromStepProfile(stepProfile) {

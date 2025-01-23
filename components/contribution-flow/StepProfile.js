@@ -25,6 +25,7 @@ const StepProfile = ({ collective, tier, stepDetails, profiles, onChange, data, 
         <StepProfileGuestForm
           stepDetails={stepDetails}
           data={data}
+          collective={collective}
           onChange={onChange}
           onSignInClick={onSignInClick}
           isEmbed={isEmbed}
