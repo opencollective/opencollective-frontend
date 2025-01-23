@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Dropzone from 'react-dropzone';
+import ReactDropzone from 'react-dropzone';
 import { FormattedMessage } from 'react-intl';
 
 import { useImageUploader } from '../../lib/hooks/useImageUploader';
@@ -18,7 +18,7 @@ const AddNewAttachedFilesButton = ({ disabled, mockImageGenerator, onSuccess, is
   });
 
   return (
-    <Dropzone {...attachmentDropzoneParams} disabled={disabled} multiple={true} onDrop={uploadFiles}>
+    <ReactDropzone {...attachmentDropzoneParams} disabled={disabled} multiple={true} onDrop={uploadFiles}>
       {({ getRootProps, getInputProps }) => (
         <div {...getRootProps()}>
           <input {...getInputProps()} />
@@ -28,7 +28,7 @@ const AddNewAttachedFilesButton = ({ disabled, mockImageGenerator, onSuccess, is
           </StyledButton>
         </div>
       )}
-    </Dropzone>
+    </ReactDropzone>
   );
 };
 

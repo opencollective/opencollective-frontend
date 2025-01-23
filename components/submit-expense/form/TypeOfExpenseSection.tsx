@@ -5,8 +5,9 @@ import { CollectiveType } from '../../../lib/constants/collectives';
 import { ExpenseType } from '../../../lib/graphql/types/v2/schema';
 import { attachmentDropzoneParams } from '../../expenses/lib/attachments';
 
-import StyledDropzone from '../../StyledDropzone';
-import StyledInputFormikField from '../../StyledInputFormikField';
+import { FormField } from '@/components/FormField';
+
+import Dropzone from '../../Dropzone';
 import { Label } from '../../ui/Label';
 import { RadioGroup, RadioGroupCard } from '../../ui/RadioGroup';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../ui/Tabs';
@@ -141,6 +142,7 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
             <Tabs
               value={props.form.values.hasInvoiceOption}
               onValueChange={newValue => props.form.setFieldValue('hasInvoiceOption', newValue as YesNoOption)}
+              className="space-y-4"
             >
               <TabsList>
                 <TabsTrigger value={YesNoOption.YES}>
@@ -154,7 +156,7 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
                 <div className="flex items-start gap-4">
                   <div className="h-16 flex-grow basis-0">
                     <div>
-                      <StyledInputFormikField
+                      <FormField
                         required={
                           props.form.options.isAdminOfPayee || props.form.options.payee?.type === CollectiveType.VENDOR
                         }
@@ -162,14 +164,14 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
                         isPrivate
                         label={intl.formatMessage({ defaultMessage: 'Attach your invoice file', id: 'Oa/lhY' })}
                       >
-                        {() => (
-                          <StyledDropzone
+                        {({ field }) => (
+                          <Dropzone
+                            {...field}
                             {...attachmentDropzoneParams}
                             kind="EXPENSE_ATTACHED_FILE"
                             name="invoice"
-                            width={1}
-                            minHeight={48}
-                            height={1}
+                            className="min-h-16"
+                            minHeight={64}
                             showActions
                             useGraphQL={true}
                             parseDocument={false}
@@ -190,11 +192,11 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
                             }}
                           />
                         )}
-                      </StyledInputFormikField>
+                      </FormField>
                     </div>
                   </div>
                   <div className="flex-grow basis-0">
-                    <StyledInputFormikField
+                    <FormField
                       required={
                         props.form.options.isAdminOfPayee || props.form.options.payee?.type === CollectiveType.VENDOR
                       }

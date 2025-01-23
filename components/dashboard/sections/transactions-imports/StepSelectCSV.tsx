@@ -1,13 +1,13 @@
 import React from 'react';
 
-import StyledDropzone, { DROPZONE_ACCEPT_CSV } from '../../../StyledDropzone';
+import Dropzone, { DROPZONE_ACCEPT_CSV } from '../../../Dropzone';
 import { useStepper } from '../../../ui/Stepper';
 
 export const StepSelectCSV = ({ onFileSelected }) => {
   const { nextStep } = useStepper();
 
   return (
-    <StyledDropzone
+    <Dropzone
       accept={DROPZONE_ACCEPT_CSV}
       name="transactions-csv"
       isMulti={false}

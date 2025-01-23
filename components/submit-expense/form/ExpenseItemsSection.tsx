@@ -1,7 +1,8 @@
 import React, { useId } from 'react';
 import { TaxType } from '@opencollective/taxes';
+import type { CheckedState } from '@radix-ui/react-checkbox';
 import dayjs from 'dayjs';
-import { get, round } from 'lodash';
+import { get, isNumber, round } from 'lodash';
 import { Lock, Trash2 } from 'lucide-react';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -17,17 +18,17 @@ import {
   isTaxRateValid,
 } from '../../expenses/lib/utils';
 
+import { FormField } from '@/components/FormField';
+import InputAmount from '@/components/InputAmount';
+import { Checkbox } from '@/components/ui/Checkbox';
+
+import Dropzone from '../../Dropzone';
 import { ExchangeRate } from '../../ExchangeRate';
 import FormattedMoneyAmount from '../../FormattedMoneyAmount';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
-import StyledCheckbox from '../../StyledCheckbox';
-import StyledDropzone from '../../StyledDropzone';
-import StyledInputAmount from '../../StyledInputAmount';
-import StyledInputFormikField from '../../StyledInputFormikField';
-import StyledInputGroup from '../../StyledInputGroup';
 import StyledSelect from '../../StyledSelect';
 import { Button } from '../../ui/Button';
-import { Input } from '../../ui/Input';
+import { Input, InputGroup } from '../../ui/Input';
 import { Label } from '../../ui/Label';
 import { useToast } from '../../ui/useToast';
 import { Step } from '../SubmitExpenseFlowSteps';
@@ -201,45 +202,48 @@ function ExpenseItem(props: ExpenseItemProps) {
   }
 
   return (
-    <div className="mb-4 rounded-md border border-[#DCDDE0] p-4 [box-shadow:inset_2px_0_0px_0px_#8DCDFF]">
+    <div className="mb-4 rounded-md border border-slate-300 p-4">
       <div className="flex gap-4">
         {hasAttachment && (
           <div className="flex flex-col">
             <div className="flex flex-grow justify-center">
-              <StyledInputFormikField
+              <FormField
                 label={intl.formatMessage({ defaultMessage: 'Upload file', id: '6oOCCL' })}
                 name={`expenseItems.${props.index}.attachment`}
               >
-                {() => (
-                  <StyledDropzone
-                    {...attachmentDropzoneParams}
-                    kind="EXPENSE_ITEM"
-                    id={attachmentId}
-                    name={attachmentId}
-                    value={typeof item.attachment === 'string' ? item.attachment : item.attachment?.url}
-                    isMulti={false}
-                    showActions
-                    size={112}
-                    useGraphQL={true}
-                    parseDocument={false}
-                    onGraphQLSuccess={uploadResults => {
-                      setFieldValue(`expenseItems.${props.index}.attachment`, uploadResults[0].file);
-                    }}
-                    onSuccess={file => {
-                      setFieldValue(`expenseItems.${props.index}.attachment`, file);
-                    }}
-                    onReject={msg => {
-                      toast({ variant: 'error', message: msg });
-                    }}
-                  />
-                )}
-              </StyledInputFormikField>
+                {({ field }) => {
+                  return (
+                    <Dropzone
+                      {...attachmentDropzoneParams}
+                      {...field}
+                      kind="EXPENSE_ITEM"
+                      id={attachmentId}
+                      name={attachmentId}
+                      value={typeof item.attachment === 'string' ? item.attachment : item.attachment?.url}
+                      isMulti={false}
+                      showActions
+                      className="size-28"
+                      useGraphQL={true}
+                      parseDocument={false}
+                      onGraphQLSuccess={uploadResults => {
+                        setFieldValue(`expenseItems.${props.index}.attachment`, uploadResults[0].file);
+                      }}
+                      onSuccess={file => {
+                        setFieldValue(`expenseItems.${props.index}.attachment`, file);
+                      }}
+                      onReject={msg => {
+                        toast({ variant: 'error', message: msg });
+                      }}
+                    />
+                  );
+                }}
+              </FormField>
             </div>
           </div>
         )}
         <div className="flex-grow">
           <div className="mb-2">
-            <StyledInputFormikField
+            <FormField
               required={props.form.options.isAdminOfPayee}
               label={intl.formatMessage({ defaultMessage: 'Item Description', id: 'xNL/oy' })}
               placeholder={intl.formatMessage({ defaultMessage: 'Enter what best describes the item', id: '/eapvj' })}
@@ -248,7 +252,7 @@ function ExpenseItem(props: ExpenseItemProps) {
           </div>
           <div className="flex gap-4">
             <div className="flex-grow basis-0">
-              <StyledInputFormikField
+              <FormField
                 required={props.form.options.isAdminOfPayee}
                 label={intl.formatMessage({ defaultMessage: 'Date', id: 'expense.incurredAt' })}
                 name={`expenseItems.${props.index}.incurredAt`}
@@ -257,17 +261,18 @@ function ExpenseItem(props: ExpenseItemProps) {
                   const value = field.value ? dayjs.utc(field.value).format('YYYY-MM-DD') : undefined;
                   return <Input type="date" {...field} value={value} />;
                 }}
-              </StyledInputFormikField>
+              </FormField>
             </div>
 
             <div className="flex-grow basis-0">
               <div className="flex flex-col">
-                <StyledInputFormikField
+                <FormField
                   label={intl.formatMessage({ defaultMessage: 'Amount', id: 'Fields.amount' })}
                   name={`expenseItems.${props.index}.amount.valueInCents`}
                 >
-                  {() => (
-                    <StyledInputAmount
+                  {({ field }) => (
+                    <InputAmount
+                      {...field}
                       currencyDisplay="FULL"
                       hasCurrencyPicker
                       currency={item.amount.currency || 'USD'}
@@ -294,18 +299,17 @@ function ExpenseItem(props: ExpenseItemProps) {
                           : 0) *
                           (1 + FX_RATE_ERROR_THRESHOLD) || undefined
                       }
-                      showErrorIfEmpty={false} // Validation is already done in `ExpenseForm`
                       onExchangeRateChange={exchangeRate =>
                         setFieldValue(`expenseItems.${props.index}.amount.exchangeRate`, exchangeRate)
                       }
                     />
                   )}
-                </StyledInputFormikField>
+                </FormField>
 
                 <div className="self-end">
                   {Boolean(item.amount?.currency && props.form.options.expenseCurrency !== item.amount?.currency) && (
                     <ExchangeRate
-                      className="mt-2 text-neutral-600"
+                      className="mt-2 text-muted-foreground"
                       {...getExpenseExchangeRateWarningOrError(
                         intl,
                         item.amount.exchangeRate,
@@ -349,11 +353,11 @@ export function AdditionalAttachments(props: AdditionalAttachmentsProps) {
       </Label>
       <div className="flex flex-wrap gap-4 pt-2">
         <div>
-          <StyledDropzone
+          <Dropzone
             {...attachmentDropzoneParams}
             name="additionalAttachments"
             kind="EXPENSE_ATTACHED_FILE"
-            size={112}
+            className="size-28"
             isMulti
             disabled={props.form.initialLoading}
             isLoading={props.form.initialLoading}
@@ -374,10 +378,10 @@ export function AdditionalAttachments(props: AdditionalAttachmentsProps) {
 
         {additionalAttachments.map(at => (
           <div key={typeof at === 'string' ? at : at.id}>
-            <StyledDropzone
+            <Dropzone
               {...attachmentDropzoneParams}
               name={typeof at === 'string' ? at : at.name}
-              size={112}
+              className="size-28"
               value={typeof at === 'string' ? at : at?.url}
               collectFilesOnly
               showActions
@@ -411,22 +415,19 @@ function Taxes(props: { form: ExpenseForm }) {
   const intl = useIntl();
   const { setFieldValue } = props.form;
   const onHasTaxChange = React.useCallback(
-    ({ checked }) => {
-      setFieldValue('hasTax', checked);
+    (checked: CheckedState) => {
+      setFieldValue('hasTax', Boolean(checked));
     },
     [setFieldValue],
   );
 
   return (
     <div>
-      <StyledInputFormikField label={intl.formatMessage({ defaultMessage: 'Taxes', id: 'r+dgiv' })} name="hasTax">
+      <FormField label={intl.formatMessage({ defaultMessage: 'Taxes', id: 'r+dgiv' })} name="hasTax">
         {() => (
-          <StyledCheckbox
-            name="hasTax"
-            checked={props.form.values.hasTax}
-            onChange={onHasTaxChange}
-            labelProps={{ mt: 3 }}
-            label={
+          <div className="items-top mt-1 flex space-x-2">
+            <Checkbox id="hasTax" checked={props.form.values.hasTax} onCheckedChange={onHasTaxChange} />
+            <Label className="font-normal" htmlFor="hasTax">
               <FormattedMessage
                 defaultMessage="Apply {taxName}"
                 id="0JzeTD"
@@ -434,22 +435,21 @@ function Taxes(props: { form: ExpenseForm }) {
                   taxName: i18nTaxType(intl, props.form.options.taxType),
                 }}
               />
-            }
-          />
+            </Label>
+          </div>
         )}
-      </StyledInputFormikField>
+      </FormField>
 
-      <div className="mt-2 flex gap-4">
+      <div className="items-top mt-4 flex gap-4">
         <div>
           {props.form.values.hasTax && props.form.options.taxType === TaxType.GST && (
-            <StyledInputFormikField
+            <FormField
               name="tax.rate"
               htmlFor={`input-${props.form.options.taxType}-rate`}
               label={intl.formatMessage(
                 { defaultMessage: '{taxName} rate', id: 'Gsyrfa' },
                 { taxName: i18nTaxType(intl, props.form.options.taxType, 'short') },
               )}
-              labelProps={{ mt: 3 }}
               inputType="number"
             >
               {({ field }) => (
@@ -466,26 +466,28 @@ function Taxes(props: { form: ExpenseForm }) {
                   }))}
                 />
               )}
-            </StyledInputFormikField>
+            </FormField>
           )}
 
           {props.form.values.hasTax && props.form.options.taxType === TaxType.VAT && (
-            <StyledInputFormikField
+            <FormField
               name="tax.rate"
               htmlFor={`input-${props.form.options.taxType}-rate`}
               label={intl.formatMessage(
                 { defaultMessage: '{taxName} rate', id: 'Gsyrfa' },
                 { taxName: i18nTaxType(intl, props.form.options.taxType, 'short') },
               )}
-              labelProps={{ mt: 3 }}
               inputType="number"
             >
               {({ field }) => (
-                <StyledInputGroup
+                <InputGroup
                   {...field}
                   value={field.value ? round(field.value * 100, 2) : 0}
                   onChange={e =>
-                    props.form.setFieldValue('tax.rate', e.target.value ? round(e.target.value / 100, 4) : null)
+                    props.form.setFieldValue(
+                      'tax.rate',
+                      isNumber(e.target.value) ? round(e.target.value / 100, 4) : null,
+                    )
                   }
                   minWidth={65}
                   append="%"
@@ -494,20 +496,18 @@ function Taxes(props: { form: ExpenseForm }) {
                   step="0.01"
                 />
               )}
-            </StyledInputFormikField>
+            </FormField>
           )}
         </div>
 
         {props.form.values.hasTax && (
-          <StyledInputFormikField
+          <FormField
             name="tax.idNumber"
             htmlFor={`input-${props.form.options.taxType}-idNumber`}
             label={intl.formatMessage(
               { defaultMessage: '{taxName} identifier', id: 'Byg+S/' },
               { taxName: i18nTaxType(intl, props.form.options.taxType, 'short') },
             )}
-            labelProps={{ mt: 3 }}
-            flexGrow={1}
             placeholder={intl.formatMessage(
               { id: 'examples', defaultMessage: 'e.g., {examples}' },
               { examples: props.form.options.taxType === TaxType.VAT ? 'EU000011111' : '123456789' },

@@ -7,6 +7,7 @@ import { useIntl } from 'react-intl';
 import { isOCError } from '../lib/errors';
 import { formatFormErrorMessage, RICH_ERROR_MESSAGES } from '../lib/form-utils';
 
+import PrivateInfoIcon from './icons/PrivateInfoIcon';
 import { Input } from './ui/Input';
 import { Label } from './ui/Label';
 import { FormikZodContext, getInputAttributesFromZodSchema } from './FormikZod';
@@ -19,6 +20,7 @@ export function FormField({
   placeholder,
   children,
   error: customError,
+  isPrivate,
   ...props
 }: {
   label?: string;
@@ -26,7 +28,7 @@ export function FormField({
   name: string;
   hint?: string;
   placeholder?: string;
-  children?: (props: { form: FormikProps<any>; meta: any; field: any }) => JSX.Element;
+  children?: (props: { form: FormikProps<any>; meta: any; field: any; hasError?: boolean }) => JSX.Element;
   required?: boolean;
   min?: number;
   max?: number;
@@ -34,6 +36,7 @@ export function FormField({
   disabled?: boolean;
   htmlFor?: string;
   error?: string;
+  isPrivate?: boolean;
 }) {
   const intl = useIntl();
   const htmlFor = props.htmlFor || `input-${name}`;
@@ -73,7 +76,17 @@ export function FormField({
         }
         return (
           <div className="flex w-full flex-col gap-1">
-            {label && <Label className="leading-normal">{label}</Label>}
+            {label && (
+              <Label className="leading-normal">
+                {label}
+                {isPrivate && (
+                  <React.Fragment>
+                    &nbsp;
+                    <PrivateInfoIcon />
+                  </React.Fragment>
+                )}
+              </Label>
+            )}
             {hint && <p className="text-sm text-muted-foreground">{hint}</p>}
             {children ? children({ form, meta, field: fieldAttributes }) : <Input {...fieldAttributes} />}
             {hasError && showError && (

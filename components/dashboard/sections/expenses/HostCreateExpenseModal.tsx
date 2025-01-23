@@ -27,10 +27,10 @@ import AccountingCategorySelect from '@/components/AccountingCategorySelect';
 
 import { DefaultCollectiveLabel } from '../../../CollectivePicker';
 import CollectivePickerAsync from '../../../CollectivePickerAsync';
+import Dropzone from '../../../Dropzone';
 import { ExchangeRate } from '../../../ExchangeRate';
 import { FormikZod } from '../../../FormikZod';
 import type { BaseModalProps } from '../../../ModalContext';
-import StyledDropzone from '../../../StyledDropzone';
 import { StyledInputAmountWithDynamicFxRate } from '../../../StyledInputAmountWithDynamicFxRate';
 import StyledInputFormikField from '../../../StyledInputFormikField';
 import StyledSelect from '../../../StyledSelect';
@@ -384,7 +384,7 @@ export const HostCreateExpenseModal = ({
                           expenseValues={values}
                           selectedCategory={field.value}
                           onChange={category => setFieldValue(field.name, category)}
-                          buttonClassName="rounded max-w-full"
+                          buttonClassName="max-w-full"
                           predictionStyle="inline-preload"
                           showCode
                           allowNone
@@ -404,7 +404,7 @@ export const HostCreateExpenseModal = ({
                     }
                   >
                     {({ form, field, meta }) => (
-                      <StyledDropzone
+                      <Dropzone
                         {...attachmentDropzoneParams}
                         kind="EXPENSE_ITEM"
                         data-cy={`${field.name}-dropzone`}
@@ -412,7 +412,6 @@ export const HostCreateExpenseModal = ({
                         isMulti={false}
                         error={(meta.touched || form.submitCount) && meta.error}
                         mockImageGenerator={() => `https://loremflickr.com/120/120/invoice?lock=0`}
-                        fontSize="13px"
                         value={field.value && isValidUrl(field.value?.url) && field.value.url}
                         useGraphQL={true}
                         parseDocument={false}

@@ -407,7 +407,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
           </header>
           <main className="flex w-full flex-grow overflow-hidden">
             <div className="flex w-full flex-grow justify-center">
-              <div className="flex w-full flex-col overflow-scroll sm:flex sm:flex-row sm:gap-11 sm:px-8 sm:pt-10">
+              <div className="relative flex w-full flex-col overflow-y-scroll sm:flex sm:flex-row sm:gap-11 sm:px-8 sm:pt-10">
                 <ExpenseFormikContainer
                   submitExpenseTo={props.submitExpenseTo}
                   draftKey={props.draftKey}

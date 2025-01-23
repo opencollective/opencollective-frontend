@@ -5,9 +5,9 @@ import { FormattedMessage } from 'react-intl';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 
 import AccountingCategorySelect from '../../../components/AccountingCategorySelect';
+import { FormField } from '@/components/FormField';
 
 import HTMLContent from '../../HTMLContent';
-import StyledInputFormikField from '../../StyledInputFormikField';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../ui/Collapsible';
 import { Step } from '../SubmitExpenseFlowSteps';
 import type { ExpenseForm } from '../useExpenseForm';
@@ -44,9 +44,10 @@ export function ExpenseCategorySection(props: ExpenseCategorySectionProps) {
       step={Step.EXPENSE_CATEGORY}
       inViewChange={props.inViewChange}
     >
-      <StyledInputFormikField name="accountingCategoryId">
-        {() => (
+      <FormField name="accountingCategoryId">
+        {({ field }) => (
           <AccountingCategorySelect
+            {...field}
             id="accountingCategoryId"
             kind="EXPENSE"
             onChange={value => setFieldValue('accountingCategoryId', value?.id)}
@@ -56,10 +57,10 @@ export function ExpenseCategorySection(props: ExpenseCategorySectionProps) {
             account={props.form.options.account}
             selectedCategory={selectedAccountingCategory}
             allowNone={!props.form.options.isAccountingCategoryRequired}
-            buttonClassName="rounded max-w-full w-full"
+            buttonClassName="max-w-full w-full"
           />
         )}
-      </StyledInputFormikField>
+      </FormField>
 
       {instructions && (
         <Collapsible asChild defaultOpen>

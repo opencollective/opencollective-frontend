@@ -2,7 +2,7 @@ import React from 'react';
 import type { Path } from 'dot-path-value';
 import { useFormikContext } from 'formik';
 import { get, isEmpty } from 'lodash';
-import type { IntlShape, MessageDescriptor } from 'react-intl';
+import type { MessageDescriptor } from 'react-intl';
 import { defineMessage, FormattedMessage } from 'react-intl';
 
 import { cn } from '../../lib/utils';
@@ -103,14 +103,6 @@ function isExpenseFormStepCompleted(form: ExpenseForm, step: Step): boolean {
   return valueKeys.map(valueKey => isEmpty(get(form.errors, valueKey))).every(Boolean);
 }
 
-export function expenseFormStepError(intl: IntlShape, form: ExpenseForm, step: Step): string {
-  if (expenseFormStepHasError(form, step) && isExpenseFormStepTouched(form, step) && form.submitCount > 0) {
-    return intl.formatMessage({ defaultMessage: 'Required', id: 'Seanpx' });
-  }
-
-  return null;
-}
-
 function expenseFormStepHasError(form: ExpenseForm, step: Step): boolean {
   return !isExpenseFormStepCompleted(form, step);
 }
@@ -144,6 +136,15 @@ export function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
   });
 
   const firstIncompleteIdx = stepOrder.findIndex(s => !isExpenseFormStepCompleted(form, s));
+
+  // Scroll to first step with error
+  const firstIncompleteSection = stepOrder.find(s => !isExpenseFormStepCompleted(form, s));
+  const submitCount = form.submitCount;
+  React.useEffect(() => {
+    if (firstIncompleteSection && submitCount > 0) {
+      document.querySelector(`#${firstIncompleteSection}`)?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [hasErrors, firstIncompleteSection, submitCount]);
 
   return (
     <div className={cn(props.className)}>

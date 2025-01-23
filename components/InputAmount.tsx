@@ -1,17 +1,16 @@
-// Deprecated, use components/InputAmount.tsx instead
 import React from 'react';
 import PropTypes from 'prop-types';
 import { getEmojiByCurrencyCode } from 'country-currency-emoji-flags';
 import { clamp, isNil, isUndefined, round } from 'lodash';
 
-import { Currency, ZERO_DECIMAL_CURRENCIES } from '../lib/constants/currency';
-import { floatAmountToCents, getCurrencySymbol, getDefaultCurrencyPrecision } from '../lib/currency-utils';
-import { cn } from '../lib/utils';
+import { Currency, ZERO_DECIMAL_CURRENCIES } from '@/lib/constants/currency';
+import { floatAmountToCents, getCurrencySymbol, getDefaultCurrencyPrecision } from '@/lib/currency-utils';
+import { cn } from '@/lib/utils';
 
-import { Separator } from './ui/Separator';
-import { StyledCurrencyPicker } from './StyledCurrencyPicker';
-import StyledInput from './StyledInput';
-import StyledSpinner from './StyledSpinner';
+import { StyledCurrencyPicker } from '@/components/StyledCurrencyPicker';
+import StyledSpinner from '@/components/StyledSpinner';
+import { InputGroup } from '@/components/ui/Input';
+import { Separator } from '@/components/ui/Separator';
 
 const formatCurrencyName = (currency, currencyDisplay) => {
   if (currencyDisplay === 'SYMBOL') {
@@ -41,9 +40,9 @@ const getValue = (value, rawValue, isEmpty) => {
   return isNaN(value) || value === null ? rawValue : value / 100;
 };
 
-const getError = (curVal, minAmount, required) => {
-  return Boolean((required && isNil(curVal)) || (minAmount && curVal < minAmount));
-};
+// const getError = (curVal, minAmount, required) => {
+//   return Boolean((required && isNil(curVal)) || (minAmount && curVal < minAmount));
+// };
 
 /** Prevent changing the value when scrolling on the input */
 const ignoreOnWheel = e => {
@@ -81,10 +80,10 @@ const ConvertedAmountInput = ({ inputId, exchangeRate, onChange, baseAmount, min
   };
 
   return (
-    <div className="flex flex-auto whitespace-nowrap px-2 text-sm text-neutral-500">
+    <div className="flex flex-auto whitespace-nowrap px-2 text-sm text-muted-foreground">
       <span className="mr-1 align-middle">= {exchangeRate.toCurrency} </span>
       <input
-        className="w-full flex-auto rounded px-[2px] [appearance:textfield] focus:text-neutral-800 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+        className="w-full flex-auto rounded px-[2px] [appearance:textfield] focus:text-foreground [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
         style={{ minWidth }}
         name={inputId}
         id={inputId}
@@ -155,9 +154,9 @@ const CURRENCY_PICKER_STYLES = {
 };
 
 /**
- * An input for amount inputs. Accepts all props from [StyledInputGroup](/#!/StyledInputGroup).
+ * An input for amount inputs.
  */
-const StyledInputAmount = ({
+const InputAmount = ({
   currency,
   currencyDisplay = 'SYMBOL',
   name = 'amount',
@@ -177,7 +176,6 @@ const StyledInputAmount = ({
   onExchangeRateChange = undefined,
   minFxRate = undefined,
   maxFxRate = undefined,
-  showErrorIfEmpty = true,
   className = null,
   ...props
 }) => {
@@ -206,22 +204,17 @@ const StyledInputAmount = ({
   };
 
   return (
-    <div
-      className={cn(
-        'flex flex-wrap items-center overflow-hidden rounded border border-neutral-200 focus-within:border-blue-500 focus-within:bg-blue-100 hover:border-blue-300',
-        className,
-        {
-          'border-red-500': props.error,
-        },
-      )}
-    >
-      <div className="flex flex-auto basis-1/2">
-        {!hasCurrencyPicker ? (
+    <InputGroup
+      {...props}
+      className={cn('w-full overflow-hidden', className)}
+      disabled={disabled}
+      prepend={
+        !hasCurrencyPicker ? (
           <div className="flex items-center whitespace-nowrap bg-neutral-50 p-2 text-sm text-neutral-800">
             {formatCurrencyName(currency, currencyDisplay)}
           </div>
         ) : (
-          <div className="bg-neutral-50 text-neutral-800">
+          <div className="">
             <StyledCurrencyPicker
               data-cy={`${props.id}-currency-picker`}
               inputId={`${props.id}-currency-picker`}
@@ -233,70 +226,64 @@ const StyledInputAmount = ({
               styles={CURRENCY_PICKER_STYLES}
             />
           </div>
-        )}
-        <StyledInput
-          {...props}
-          disabled={disabled}
-          width="100%"
-          type="number"
-          flex="auto"
-          inputMode="decimal"
-          step={1 / 10 ** precision}
-          alignSelf="stretch"
-          style={{ minWidth }}
-          name={name}
-          min={minAmount}
-          max={max / 100}
-          error={props.error || (showErrorIfEmpty && getError(curValue, minAmount, props.required))}
-          defaultValue={isUndefined(defaultValue) ? undefined : defaultValue / 100}
-          value={curValue}
-          hideSpinners={canUseExchangeRate}
-          borderRadius={null}
-          px={null}
-          pr={canUseExchangeRate ? 1 : 2}
-          pl={2}
-          bare
-          onWheel={ignoreOnWheel}
-          onChange={e => {
-            e.stopPropagation();
-            dispatchValue(e, parseValueFromEvent(e, precision));
-          }}
-          onBlur={e => {
-            // Clean number if valid (ie. 41.1 -> 41.10)
-            const parsedNumber = parseValueFromEvent(e, precision);
-            const valueWithIgnoredComma = parseValueFromEvent(e, precision, true);
-            if (
-              e.target.checkValidity() &&
-              !(typeof parsedNumber === 'number' && isNaN(parsedNumber)) &&
-              parsedNumber !== null &&
-              valueWithIgnoredComma === parsedNumber
-            ) {
-              e.target.value = parsedNumber.toString();
-              dispatchValue(e, parsedNumber);
-            }
+        )
+      }
+      prependClassName="px-0 py-0"
+      append={
+        loadingExchangeRate ? (
+          <div className="px-3 py-2">
+            <StyledSpinner size={16} color="black.700" className="" />
+          </div>
+        ) : canUseExchangeRate ? (
+          <div className="flex h-[38px] flex-auto basis-1/2 items-center" data-cy={`${props.id}-converted`}>
+            <Separator orientation="vertical" className="h-6" />
+            <ConvertedAmountInput
+              inputId={`${props.id}-converted-input`}
+              exchangeRate={exchangeRate}
+              onChange={onExchangeRateChange}
+              baseAmount={value}
+              minFxRate={minFxRate}
+              maxFxRate={maxFxRate}
+            />
+          </div>
+        ) : undefined
+      }
+      appendClassName="px-0 py-0 bg-background"
+      width="100%"
+      type="number"
+      inputMode="decimal"
+      step={1 / 10 ** precision}
+      style={{ minWidth }}
+      name={name}
+      min={minAmount}
+      max={max / 100}
+      defaultValue={isUndefined(defaultValue) ? undefined : defaultValue / 100}
+      value={curValue}
+      onWheel={ignoreOnWheel}
+      onChange={e => {
+        e.stopPropagation();
+        dispatchValue(e, parseValueFromEvent(e, precision));
+      }}
+      onBlur={e => {
+        // Clean number if valid (ie. 41.1 -> 41.10)
+        const parsedNumber = parseValueFromEvent(e, precision);
+        const valueWithIgnoredComma = parseValueFromEvent(e, precision, true);
+        if (
+          e.target.checkValidity() &&
+          !(typeof parsedNumber === 'number' && isNaN(parsedNumber)) &&
+          parsedNumber !== null &&
+          valueWithIgnoredComma === parsedNumber
+        ) {
+          e.target.value = parsedNumber.toString();
+          dispatchValue(e, parsedNumber);
+        }
 
-            if (onBlur) {
-              onBlur(e);
-            }
-          }}
-        />
-      </div>
-      {canUseExchangeRate && (
-        <div className="flex h-[38px] flex-auto basis-1/2 items-center" data-cy={`${props.id}-converted`}>
-          <Separator orientation="vertical" className="h-6" />
-          <ConvertedAmountInput
-            inputId={`${props.id}-converted-input`}
-            exchangeRate={exchangeRate}
-            onChange={onExchangeRateChange}
-            baseAmount={value}
-            minFxRate={minFxRate}
-            maxFxRate={maxFxRate}
-          />
-        </div>
-      )}
-      {loadingExchangeRate && <StyledSpinner size={16} color="black.700" className="absolute right-8" />}
-    </div>
+        if (onBlur) {
+          onBlur(e);
+        }
+      }}
+    />
   );
 };
 
-export default StyledInputAmount;
+export default InputAmount;

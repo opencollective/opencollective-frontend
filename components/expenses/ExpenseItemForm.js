@@ -22,12 +22,12 @@ import { FX_RATE_ERROR_THRESHOLD, getExpenseExchangeRateWarningOrError } from '.
 
 import * as ScanningAnimationJSON from '../../public/static/animations/scanning.json';
 import Container from '../Container';
+import Dropzone from '../Dropzone';
 import { ExchangeRate } from '../ExchangeRate';
 import { Box, Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import RichTextEditor from '../RichTextEditor';
 import StyledButton from '../StyledButton';
-import StyledDropzone from '../StyledDropzone';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import StyledInputAmount from '../StyledInputAmount';
@@ -337,7 +337,7 @@ const ExpenseItemForm = ({
                   required={!isOptional}
                   error={meta.error?.type !== ERROR.FORM_FIELD_REQUIRED && formatFormErrorMessage(intl, meta.error)}
                 >
-                  <StyledDropzone
+                  <Dropzone
                     {...attachmentDropzoneParams}
                     kind="EXPENSE_ITEM"
                     data-cy={`${field.name}-dropzone`}
@@ -350,8 +350,7 @@ const ExpenseItemForm = ({
                       formRef.current.setFieldValue(itemPath, { ...attachment, url, __isUploading: false })
                     }
                     mockImageGenerator={() => `https://loremflickr.com/120/120/invoice?lock=${attachmentKey}`}
-                    fontSize="13px"
-                    size={[84, 112]}
+                    className="size-20 sm:size-28"
                     value={hasValidUrl && field.value}
                     onReject={(...args) => {
                       formRef.current.setFieldValue(itemPath, { ...attachment, __isUploading: false });
