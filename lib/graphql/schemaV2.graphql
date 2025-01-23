@@ -6040,6 +6040,11 @@ type Policies {
   EXPENSE_CATEGORIZATION: EXPENSE_CATEGORIZATION
   EXPENSE_PUBLIC_VENDORS: Boolean
   COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS: Boolean
+
+  """
+  Contribution threshold to enforce contributor info. This resolver can be called from the collective or the host, when resolved through the collective the thresholds are returned in the collective currency
+  """
+  CONTRIBUTOR_INFO_THRESHOLDS: CONTRIBUTOR_INFO_THRESHOLDS
 }
 
 type EXPENSE_POLICIES {
@@ -6081,6 +6086,11 @@ type MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL {
 type EXPENSE_CATEGORIZATION {
   requiredForExpenseSubmitters: Boolean
   requiredForCollectiveAdmins: Boolean
+}
+
+type CONTRIBUTOR_INFO_THRESHOLDS {
+  legalName: Int
+  address: Int
 }
 
 type ActivitySubscription {
@@ -12352,6 +12362,26 @@ type ContributorProfile {
   The account that will be used to create the contribution
   """
   account: Account
+
+  """
+  The account that will receive the contribution
+  """
+  forAccount: Account
+
+  """
+  The total amount contributed to the host by this contributor
+  """
+  totalContributedToHost(
+    """
+    When true, the amount is converted to the currency of the collective
+    """
+    inCollectiveCurrency: Boolean = false
+
+    """
+    The date since when to calculate the total
+    """
+    since: DateTime
+  ): Amount
 }
 
 """
@@ -21534,6 +21564,7 @@ input PoliciesInput {
   EXPENSE_CATEGORIZATION: PoliciesExpenseCategorizationInput
   EXPENSE_PUBLIC_VENDORS: Boolean
   COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS: Boolean
+  CONTRIBUTOR_INFO_THRESHOLDS: PoliciesContributorInfoThresholdsInput
 }
 
 input PoliciesExpensePolicies {
@@ -21558,6 +21589,11 @@ input PoliciesCollectiveMinimumAdminsInput {
 input PoliciesExpenseCategorizationInput {
   requiredForExpenseSubmitters: Boolean
   requiredForCollectiveAdmins: Boolean
+}
+
+input PoliciesContributorInfoThresholdsInput {
+  legalName: Int
+  address: Int
 }
 
 type SendMessageResult {
