@@ -138,7 +138,7 @@ export function useTransactionsImportActions({ transactionsImport, host }): {
           {row.isDismissed ? (
             <FormattedMessage defaultMessage="Revert" id="amT0Gh" />
           ) : (
-            <FormattedMessage defaultMessage="Ignore" id="paBpxN" />
+            <FormattedMessage defaultMessage="No action" id="zue9QR" />
           )}
           {isUpdatingRow && <StyledSpinner size={14} ml={2} />}
         </div>

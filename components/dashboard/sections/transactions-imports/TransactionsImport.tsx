@@ -201,7 +201,7 @@ const getViews = intl => [
   },
   {
     id: 'IGNORED',
-    label: intl.formatMessage({ defaultMessage: 'Ignored', id: 'ignored' }),
+    label: intl.formatMessage({ defaultMessage: 'No action', id: 'zue9QR' }),
     filter: { status: TransactionsImportRowStatus.IGNORED },
   },
   {
@@ -725,11 +725,11 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                                 >
                                   <SquareSlashIcon size={12} />
                                   {selection.includeAllPages ? (
-                                    <FormattedMessage defaultMessage="Ignore all rows" id="ogbYeo" />
+                                    <FormattedMessage defaultMessage="No action (all)" id="UFhJFs" />
                                   ) : (
                                     <FormattedMessage
-                                      defaultMessage="Ignore {selectedCount}"
-                                      id="ignore"
+                                      defaultMessage="No action ({selectedCount})"
+                                      id="B2eNk+"
                                       values={{ selectedCount: nonIgnoredRows.length }}
                                     />
                                   )}
