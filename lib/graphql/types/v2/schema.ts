@@ -2685,6 +2685,13 @@ export type ContributorCollection = Collection & {
   totalCount?: Maybe<Scalars['Int']['output']>;
 };
 
+/** This represents a profile that can be use to create a contribution */
+export type ContributorProfile = {
+  __typename?: 'ContributorProfile';
+  /** The account that will be used to create the contribution */
+  account?: Maybe<Account>;
+};
+
 /** A conversation thread */
 export type Conversation = {
   __typename?: 'Conversation';
@@ -4470,6 +4477,8 @@ export type Expense = {
   tags: Array<Maybe<Scalars['String']['output']>>;
   /** Taxes applied to this expense */
   taxes: Array<Maybe<TaxInfo>>;
+  /** [Host admins only] If the expense associated with a transactions import row, this field will reference it */
+  transactionImportRow?: Maybe<TransactionsImportRow>;
   /** The reference text used in the payment transfer */
   transferReference?: Maybe<Scalars['String']['output']>;
   /** Whether this expense is a receipt or an invoice */
@@ -6578,6 +6587,7 @@ export type Individual = Account & {
   childrenAccounts: AccountCollection;
   /** The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts". */
   connectedAccounts?: Maybe<Array<Maybe<ConnectedAccount>>>;
+  contributorProfiles: Array<Maybe<ContributorProfile>>;
   conversations: ConversationCollection;
   /** Returns conversation's tags for collective sorted by popularity */
   conversationsTags?: Maybe<Array<Maybe<TagStat>>>;
@@ -6724,6 +6734,12 @@ export type IndividualChildrenAccountsArgs = {
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** This represents an Individual account */
+export type IndividualContributorProfilesArgs = {
+  forAccount: AccountReferenceInput;
 };
 
 
@@ -8674,6 +8690,8 @@ export type Order = {
   totalContributed: Amount;
   /** WARNING: Total amount donated between collectives, though there will be edge cases especially when looking on the Order level, as the order id is not used in calculating this. */
   totalDonations: Amount;
+  /** [Host admins only] If the order was associated with a transactions import row, this field will reference it */
+  transactionImportRow?: Maybe<TransactionsImportRow>;
   /** Transactions for this order ordered by createdAt ASC */
   transactions: Array<Maybe<Transaction>>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -8842,8 +8860,11 @@ export enum OrderStatus {
 
 export type OrderTax = {
   __typename?: 'OrderTax';
+  /** @deprecated Please use `rate` instead */
   percentage: Scalars['Int']['output'];
-  type: OrderTaxType;
+  /** Percentage applied, between 0-1 */
+  rate: Scalars['Float']['output'];
+  type: TaxType;
 };
 
 /** Input to set taxes for an order */
@@ -8853,16 +8874,8 @@ export type OrderTaxInput = {
   country?: InputMaybe<CountryIso>;
   /** Tax identification number, if any */
   idNumber?: InputMaybe<Scalars['String']['input']>;
-  type: OrderTaxType;
+  type: TaxType;
 };
-
-/** The type of a tax like GST, VAT, etc */
-export enum OrderTaxType {
-  /** New Zealand Good and Services Tax */
-  GST = 'GST',
-  /** European Value Added Tax */
-  VAT = 'VAT'
-}
 
 export type OrderUpdateInput = {
   /** Amount received by collective, excluding any tips, taxes or fees */
@@ -11190,7 +11203,7 @@ export type TaxInfo = {
   /** Percentage applied, between 0-1 */
   rate: Scalars['Float']['output'];
   /** Identifier for this tax (GST, VAT, etc) */
-  type: OrderTaxType;
+  type: TaxType;
 };
 
 /** Input to set taxes for an expense */
@@ -11722,14 +11735,21 @@ export type TransactionsImportRow = {
   expense?: Maybe<Expense>;
   /** The public id of the imported row */
   id: Scalars['String']['output'];
-  /** Whether the row has been dismissed */
+  /**
+   * Whether the row has been dismissed
+   * @deprecated 2025-01-17: isDismissed is deprecated, use status instead
+   */
   isDismissed: Scalars['Boolean']['output'];
+  /** Optional note for the row */
+  note?: Maybe<Scalars['String']['output']>;
   /** The order associated with the row */
   order?: Maybe<Order>;
   /** The raw data of the row */
   rawValue?: Maybe<Scalars['JSONObject']['output']>;
   /** The source id of the row */
   sourceId: Scalars['NonEmptyString']['output'];
+  /** The status of the row */
+  status: TransactionsImportRowStatus;
 };
 
 /** A collection of "TransactionsImportRow" */
@@ -11767,6 +11787,8 @@ export enum TransactionsImportRowStatus {
   IGNORED = 'IGNORED',
   /** The row has been linked to an existing expense or order */
   LINKED = 'LINKED',
+  /** The row is on hold */
+  ON_HOLD = 'ON_HOLD',
   /** The row has not been processed yet */
   PENDING = 'PENDING'
 }
@@ -11778,10 +11800,14 @@ export type TransactionsImportRowUpdateInput = {
   date?: InputMaybe<Scalars['DateTime']['input']>;
   /** The description of the row */
   description?: InputMaybe<Scalars['String']['input']>;
+  /** The expense associated with the row */
+  expense?: InputMaybe<ExpenseReferenceInput>;
   /** The id of the row */
   id: Scalars['NonEmptyString']['input'];
   /** Whether the row is dismissed */
   isDismissed?: InputMaybe<Scalars['Boolean']['input']>;
+  /** Optional note for the row */
+  note?: InputMaybe<Scalars['String']['input']>;
   /** The order associated with the row */
   order?: InputMaybe<OrderReferenceInput>;
   /** The source id of the row */
@@ -11794,6 +11820,10 @@ export type TransactionsImportStats = {
   expenses: Scalars['Int']['output'];
   /** Number of rows that have been ignored */
   ignored: Scalars['Int']['output'];
+  /** Number of rows that are invalid (e.g. linked but without an expense or order) */
+  invalid: Scalars['Int']['output'];
+  /** Number of rows that are on hold */
+  onHold: Scalars['Int']['output'];
   /** Number of rows that have been converted to orders */
   orders: Scalars['Int']['output'];
   /** Number of rows that have been processed (either dismissed or converted to expenses or orders) */

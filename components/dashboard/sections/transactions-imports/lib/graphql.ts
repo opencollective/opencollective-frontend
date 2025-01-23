@@ -33,6 +33,7 @@ export const TransactionsImportRowFieldsFragment = gql`
     description
     date
     rawValue
+    note
     amount {
       valueInCents
       currency
