@@ -266,7 +266,7 @@
     "pdf-parse": "^1.1.1",
     "postcss": "8.4.49",
     "prettier": "3.4.2",
-    "prettier-plugin-tailwindcss": "0.6.9",
+    "prettier-plugin-tailwindcss": "0.6.10",
     "raf": "^3.4.1",
     "raw-loader": "^4.0.2",
     "react-test-renderer": "^18.3.1",
