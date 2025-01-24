@@ -4,8 +4,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import type { VirtualCard as GraphQLVirtualCard } from '../../lib/graphql/types/v2/graphql';
-import { VirtualCardStatus } from '../../lib/graphql/types/v2/graphql';
+import type { VirtualCard as GraphQLVirtualCard } from '../../lib/graphql/types/v2/schema';
+import { VirtualCardStatus } from '../../lib/graphql/types/v2/schema';
 import { getAvailableLimitShortString } from '../../lib/i18n/virtual-card-spending-limit';
 
 import { accountHoverCardFields } from '../AccountHoverCard';

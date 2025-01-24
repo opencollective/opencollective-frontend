@@ -6,7 +6,7 @@ import type {
   TransactionsImport,
   TransactionsImportRow,
   TransactionsImportStats,
-} from '../../../../lib/graphql/types/v2/graphql';
+} from '../../../../lib/graphql/types/v2/schema';
 
 import type { BaseModalProps } from '../../../ModalContext';
 import AddFundsModal from '../collectives/AddFundsModal';
@@ -14,7 +14,7 @@ import AddFundsModal from '../collectives/AddFundsModal';
 const prettyPrintRawValues = (rawValue: Record<string, string>) => {
   return Object.entries(rawValue)
     .filter(([, value]) => !isEmpty(value))
-    .map(([key, value]) => `- ${startCase(key)}: ${value}`)
+    .map(([key, value]) => `- ${startCase(key)}: ${JSON.stringify(value)}`)
     .join('\n');
 };
 

@@ -33,12 +33,6 @@ class UserProvider extends React.Component {
     client: PropTypes.object,
     children: PropTypes.node,
     intl: PropTypes.object,
-    /**
-     * If not used inside of NextJS (ie. in styleguide), the code that checks if we are
-     * on `/signin` that uses `Router` will crash. Setting this prop bypass this behavior.
-     */
-    skipRouteCheck: PropTypes.bool,
-
     initialLoggedInUser: PropTypes.object,
   };
 
@@ -52,7 +46,7 @@ class UserProvider extends React.Component {
     window.addEventListener('storage', this.checkLogin);
 
     // Disable auto-login on SignIn page
-    if (this.props.skipRouteCheck || Router.pathname !== '/signin') {
+    if (Router.pathname !== '/signin') {
       await this.login();
     }
   }

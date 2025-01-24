@@ -14,7 +14,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentProps, FilterConfig } from '../../../lib/filters/filter-types';
-import { DateTimeField, OrderByFieldType, OrderDirection } from '../../../lib/graphql/types/v2/graphql';
+import { DateTimeField, OrderByFieldType, OrderDirection } from '../../../lib/graphql/types/v2/schema';
 
 import { parseChronologicalOrderInput } from '../../expenses/filters/ExpensesOrder';
 import { Button } from '../../ui/Button';
@@ -60,6 +60,10 @@ const i18nFieldDirectionLabels = {
     [OrderDirection.DESC]: { defaultMessage: 'Highest to Lowest', id: 'SortDirection.HighestToLowest' },
     [OrderDirection.ASC]: { defaultMessage: 'Lowest to Highest', id: 'SortDirection.LowestToHighest' },
   }),
+  [OrderByFieldType.LAST_CHARGED_AT]: defineMessages({
+    [OrderDirection.DESC]: { defaultMessage: 'Newest to Oldest', id: 'SortDirection.NewestToOldest' },
+    [OrderDirection.ASC]: { defaultMessage: 'Oldest to Newest', id: 'SortDirection.OldestToNewest' },
+  }),
 };
 
 const FieldIconTypes = {
@@ -67,6 +71,7 @@ const FieldIconTypes = {
   [OrderByFieldType.ACTIVITY]: 'NUMERICAL',
   [OrderByFieldType.BALANCE]: 'NUMERICAL',
   [OrderByFieldType.CREATED_AT]: 'NUMERICAL',
+  [OrderByFieldType.LAST_CHARGED_AT]: 'NUMERICAL',
   [OrderByFieldType.HOSTED_COLLECTIVES_COUNT]: 'NUMERICAL',
   [OrderByFieldType.HOST_RANK]: 'NUMERICAL',
   [OrderByFieldType.NAME]: 'ALPHABETIC',

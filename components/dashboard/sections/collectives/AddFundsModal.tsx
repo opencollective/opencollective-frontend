@@ -20,7 +20,7 @@ import type {
   Order,
   Tier,
   TransactionReferenceInput,
-} from '../../../../lib/graphql/types/v2/graphql';
+} from '../../../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nTaxType } from '../../../../lib/i18n/taxes';
@@ -733,7 +733,6 @@ const AddFundsModalContentWithCollective = ({
                         account={account}
                         selectedCategory={field.value}
                         allowNone={true}
-                        borderRadiusClass="rounded"
                       />
                     )}
                   </Field>

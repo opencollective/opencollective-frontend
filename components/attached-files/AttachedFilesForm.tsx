@@ -5,9 +5,9 @@ import { FormattedMessage } from 'react-intl';
 import type { UploadedFileKind } from '../../lib/graphql/types/v2/graphql';
 import { attachmentDropzoneParams } from './lib/attachments';
 
+import Dropzone from '../Dropzone';
 import { Flex } from '../Grid';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
-import StyledDropzone from '../StyledDropzone';
 import StyledHr from '../StyledHr';
 import { P, Span } from '../Text';
 
@@ -91,7 +91,7 @@ const AttachedFilesForm = ({
           }}
         />
       ) : (
-        <StyledDropzone
+        <Dropzone
           {...attachmentDropzoneParams}
           name={name}
           kind={kind}

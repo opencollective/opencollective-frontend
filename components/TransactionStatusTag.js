@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { ORDER_STATUS } from '../lib/constants/order-status';
-import i18nOrderStatus from '../lib/i18n/order-status';
+import { i18nOrderStatus } from '../lib/i18n/order';
 
 import I18nFormatters from './I18nFormatters';
 import StyledTag from './StyledTag';

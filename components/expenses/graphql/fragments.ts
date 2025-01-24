@@ -30,6 +30,7 @@ export const loggedInAccountExpensePayoutFieldsFragment = gql`
         id
         account {
           id
+          legacyId
           slug
           imageUrl
           type
@@ -44,6 +45,8 @@ export const loggedInAccountExpensePayoutFieldsFragment = gql`
           ... on AccountWithParent {
             parent {
               id
+              legacyId
+              slug
               policies {
                 id
                 REQUIRE_2FA_FOR_ADMINS
@@ -280,6 +283,18 @@ export const expensePageExpenseFieldsFragment = gql`
         toCurrency
       }
     }
+    amountInHostCurrency: amountV2(currencySource: HOST) {
+      valueInCents
+      currency
+      exchangeRate {
+        date
+        value
+        source
+        isApproximate
+        fromCurrency
+        toCurrency
+      }
+    }
     createdAt
     invoiceInfo
     merchantId
@@ -318,6 +333,7 @@ export const expensePageExpenseFieldsFragment = gql`
       url
       file {
         id
+        type
         ... on ImageFileInfo {
           width
         }
@@ -335,6 +351,7 @@ export const expensePageExpenseFieldsFragment = gql`
       name
       info {
         id
+        type
         name
         size
         ... on ImageFileInfo {
@@ -480,6 +497,7 @@ export const expensePageExpenseFieldsFragment = gql`
     payoutMethod {
       id
       type
+      name
       data
       isSaved
     }
@@ -516,6 +534,7 @@ export const expensePageExpenseFieldsFragment = gql`
         reasonDetails
       }
     }
+    lockedFields
     activities {
       id
       type
@@ -660,6 +679,18 @@ export const expensesListFieldsFragment = gql`
         toCurrency
       }
     }
+    amountInHostCurrency: amountV2(currencySource: HOST) {
+      valueInCents
+      currency
+      exchangeRate {
+        date
+        value
+        source
+        isApproximate
+        fromCurrency
+        toCurrency
+      }
+    }
     currency
     type
     requiredLegalDocuments
@@ -718,6 +749,7 @@ export const expensesListFieldsFragment = gql`
     payoutMethod {
       id
       type
+      name
       data
       isSaved
     }
@@ -788,6 +820,7 @@ export const expensesListAdminFieldsFragment = gql`
     payoutMethod {
       id
       type
+      name
       data
     }
     items {
@@ -798,6 +831,7 @@ export const expensesListAdminFieldsFragment = gql`
       amount
       file {
         id
+        type
         ... on ImageFileInfo {
           width
         }
@@ -814,6 +848,7 @@ export const expensesListAdminFieldsFragment = gql`
       name
       info {
         id
+        type
         ... on ImageFileInfo {
           width
         }

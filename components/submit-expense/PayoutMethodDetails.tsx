@@ -1,13 +1,20 @@
 import React from 'react';
 import clsx from 'clsx';
 import { startCase, upperCase } from 'lodash';
+import { ChevronDown } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import type { PayoutMethod } from '../../lib/graphql/types/v2/graphql';
-import { PayoutMethodType } from '../../lib/graphql/types/v2/graphql';
+import type { PayoutMethod } from '../../lib/graphql/types/v2/schema';
+import { PayoutMethodType } from '../../lib/graphql/types/v2/schema';
 
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import LoadingPlaceholder from '../LoadingPlaceholder';
+import { Button } from '../ui/Button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/Collapsible';
+import type { DataListItemProps } from '../ui/DataList';
+import { DataList, DataListItem } from '../ui/DataList';
+
+import type { ExpenseForm } from './useExpenseForm';
 
 function flattenDetailsObject(details: any) {
   return Object.entries(details).reduce((acc, [key, value]) => {
@@ -18,98 +25,195 @@ function flattenDetailsObject(details: any) {
       ...acc,
       {
         id: key,
-        title: startCase(key),
-        children: value,
+        label: startCase(key),
+        value: value,
       },
     ];
   }, []);
 }
 
 type PayoutMethodDetailsProps = {
-  payoutMethod: PayoutMethod;
+  payoutMethod: Omit<PayoutMethod, 'id'> & { id?: string };
 };
 
-export function PayoutMethodDetails(props: PayoutMethodDetailsProps) {
-  if (!props.payoutMethod) {
-    return <LoadingPlaceholder height={24} mb={2} />;
-  }
+function getPayoutMethodDetailItems(props: PayoutMethodDetailsProps) {
+  const items: (DataListItemProps & { id: string })[] = [];
 
   switch (props.payoutMethod.type) {
     case PayoutMethodType.PAYPAL:
-      return (
-        <PayoutMethodDetailItem
-          className="col-start-1 col-end-[-1]"
-          title={
-            <div className="flex gap-2">
-              <FormattedMessage id="User.EmailAddress" defaultMessage="Email address" /> <PrivateInfoIcon />
-            </div>
-          }
-        >
-          {props.payoutMethod.data?.email ?? '********'};
-        </PayoutMethodDetailItem>
-      );
+      if (props.payoutMethod.data.currency) {
+        items.push({
+          id: 'currency',
+          label: <FormattedMessage defaultMessage="Currency" id="Currency" />,
+          value: upperCase(props.payoutMethod.data.currency),
+        });
+      }
+
+      items.push({
+        id: 'email',
+        label: (
+          <div className="flex gap-2">
+            <FormattedMessage id="User.EmailAddress" defaultMessage="Email address" /> <PrivateInfoIcon />
+          </div>
+        ),
+        value: props.payoutMethod.data.email ?? '********',
+      });
+      break;
     case PayoutMethodType.OTHER:
-      return (
-        <PayoutMethodDetailItem
-          className="col-start-1 col-end-[-1]"
-          title={
-            <div className="flex gap-2">
-              <FormattedMessage id="Details" defaultMessage="Details" /> <PrivateInfoIcon />
-            </div>
-          }
-        >
-          {props.payoutMethod.data?.content ?? '********'}
-        </PayoutMethodDetailItem>
-      );
-    case PayoutMethodType.BANK_ACCOUNT: {
-      const items: (PayoutMethodDetailItemProps & { field: string })[] = [];
-
-      if (!props.payoutMethod.data) {
-        return <LoadingPlaceholder height={20} />;
-      }
-
-      if (props.payoutMethod.data.type) {
+      if (props.payoutMethod.data.currency) {
         items.push({
-          field: 'type',
-          title: <FormattedMessage defaultMessage="Type" id="+U6ozc" />,
-          children: upperCase(props.payoutMethod.data.type),
+          id: 'currency',
+          label: <FormattedMessage defaultMessage="Currency" id="Currency" />,
+          value: upperCase(props.payoutMethod.data.currency),
         });
       }
+      items.push({
+        id: 'details',
+        label: (
+          <div className="flex gap-2">
+            <FormattedMessage id="Details" defaultMessage="Details" /> <PrivateInfoIcon />
+          </div>
+        ),
+        value: props.payoutMethod.data.content ?? '********',
+      });
+      break;
+    case PayoutMethodType.BANK_ACCOUNT:
+      {
+        if (props.payoutMethod.data.type) {
+          items.push({
+            id: 'type',
+            label: <FormattedMessage defaultMessage="Type" id="+U6ozc" />,
+            value: upperCase(props.payoutMethod.data.type),
+          });
+        }
 
-      if (props.payoutMethod.data.accountHolderName) {
+        if (props.payoutMethod.data.currency) {
+          items.push({
+            id: 'currency',
+            label: <FormattedMessage defaultMessage="Currency" id="Currency" />,
+            value: upperCase(props.payoutMethod.data.currency),
+          });
+        }
+
+        if (props.payoutMethod.data.accountHolderName) {
+          items.push({
+            id: 'accountHolderName',
+            label: (
+              <div className="flex gap-2">
+                <FormattedMessage defaultMessage="Account Holder" id="GEFifJ" /> <PrivateInfoIcon />
+              </div>
+            ),
+            value: props.payoutMethod.data.accountHolderName,
+          });
+        }
+
+        if (props.payoutMethod.data.details) {
+          items.push(...flattenDetailsObject(props.payoutMethod.data.details));
+        }
+      }
+      break;
+    case PayoutMethodType.ACCOUNT_BALANCE: {
+      if (props.payoutMethod.data.currency) {
         items.push({
-          field: 'accountHolderName',
-          title: (
-            <div className="flex gap-2">
-              <FormattedMessage defaultMessage="Account Holder" id="GEFifJ" /> <PrivateInfoIcon />
-            </div>
-          ),
-          children: props.payoutMethod.data.accountHolderName,
+          id: 'currency',
+          label: <FormattedMessage defaultMessage="Currency" id="Currency" />,
+          value: upperCase(props.payoutMethod.data.currency),
         });
       }
-
-      if (props.payoutMethod.data.details) {
-        items.push(...flattenDetailsObject(props.payoutMethod.data.details));
-      }
-
-      return items.map(i => <PayoutMethodDetailItem key={i.field} {...i} />);
+      break;
     }
     default:
       return null;
   }
+  return items;
 }
 
-type PayoutMethodDetailItemProps = {
-  title: React.ReactNode;
-  children: React.ReactNode;
-  className?: string;
-};
+export function PayoutMethodDetailsContainer(props: {
+  payoutMethod: ExpenseForm['options']['payoutMethod'];
+  maxItems?: number;
+}) {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const toggleContainer = React.useCallback(() => {
+    setIsOpen(isOpen => !isOpen);
+  }, []);
 
-function PayoutMethodDetailItem(props: PayoutMethodDetailItemProps) {
+  const payoutMethodDetailItems = getPayoutMethodDetailItems(props) || [];
+  const isExpandable = props.maxItems && payoutMethodDetailItems?.length > props.maxItems;
+
+  const shownItems = isExpandable ? payoutMethodDetailItems.slice(0, 3) : payoutMethodDetailItems;
+  const hiddenItems = isExpandable ? payoutMethodDetailItems.slice(3) : [];
+
+  if (!props.payoutMethod) {
+    return <LoadingPlaceholder height={24} mb={2} />;
+  }
+
   return (
-    <div className={clsx('rounded-md bg-slate-100 p-2', props.className)}>
-      <div className="mb-1 text-sm font-bold">{props.title}</div>
-      <div className="text-sm">{props.children}</div>
-    </div>
+    <Collapsible className="group" open={isOpen}>
+      <div className={'relative overflow-hidden rounded-xl bg-muted'}>
+        {isExpandable && (
+          <React.Fragment>
+            <div
+              className={clsx(
+                'absolute bottom-0 z-10 h-8 w-full bg-gradient-to-t from-muted to-transparent transition-opacity',
+                isOpen ? 'opacity-0' : 'opacity-100',
+              )}
+            />
+            <CollapsibleTrigger
+              className={clsx(
+                'group absolute z-20 focus:outline-none',
+                isOpen ? 'bottom-0 right-0' : 'inset-0 flex w-full items-end justify-end',
+              )}
+              onClick={toggleContainer}
+            >
+              <Button
+                variant="ghost"
+                size="xs"
+                asChild
+                className={clsx(
+                  'm-2 border border-transparent text-muted-foreground ring-ring hover:text-foreground group-focus-visible:border-border group-focus-visible:bg-white group-focus-visible:ring-2',
+                  {
+                    'group-hover:border-border group-hover:bg-white': !isOpen,
+                    'hover:border-border hover:bg-white': isOpen,
+                  },
+                )}
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <span
+                    className={clsx('transition-all', {
+                      'rotate-180': isOpen,
+                    })}
+                  >
+                    <ChevronDown size={14} />
+                  </span>
+                  {isOpen ? (
+                    <FormattedMessage defaultMessage="Close" id="Close" />
+                  ) : (
+                    <FormattedMessage defaultMessage="See more" id="yoLwRW" />
+                  )}
+                </div>
+              </Button>
+            </CollapsibleTrigger>
+          </React.Fragment>
+        )}
+        {payoutMethodDetailItems.length > 0 && (
+          <div className={'space-y-1 p-4'}>
+            <DataList className="gap-2">
+              {shownItems.map(({ id, ...item }) => (
+                <DataListItem key={id} {...item} />
+              ))}
+            </DataList>
+            {hiddenItems.length > 0 && (
+              <CollapsibleContent>
+                <DataList className="gap-2">
+                  {hiddenItems.map(({ id, ...item }) => (
+                    <DataListItem key={id} {...item} />
+                  ))}
+                </DataList>
+              </CollapsibleContent>
+            )}
+          </div>
+        )}
+      </div>
+    </Collapsible>
   );
 }

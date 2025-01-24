@@ -9,8 +9,8 @@ import styled from 'styled-components';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import type { Individual, UserTwoFactorMethod } from '../../lib/graphql/types/v2/graphql';
-import { TwoFactorMethod } from '../../lib/graphql/types/v2/graphql';
+import type { Individual, UserTwoFactorMethod } from '../../lib/graphql/types/v2/schema';
+import { TwoFactorMethod } from '../../lib/graphql/types/v2/schema';
 
 import { Box, Flex } from '../Grid';
 import StyledButton from '../StyledButton';
@@ -104,11 +104,9 @@ export function AuthenticatorSettings(props: AuthenticatorSettingsProps) {
 
   return (
     <StyledCard px={3} py={2}>
-      <Flex alignItems="center">
-        <H3 fontSize="14px" fontWeight="700">
-          <FormattedMessage defaultMessage="Authenticator App" id="eoPp92" />
-        </H3>
-      </Flex>
+      <H3 fontSize="14px" fontWeight="700" my={2}>
+        <FormattedMessage defaultMessage="Authenticator App" id="eoPp92" />
+      </H3>
       <div className="mb-3 text-sm">
         <FormattedMessage
           defaultMessage="An application that supports TOTP (time-based one-time password). For example, Google Authenticator and 1Password."

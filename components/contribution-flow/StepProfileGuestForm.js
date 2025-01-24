@@ -141,11 +141,6 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInCl
           />
         )}
       </StyledInputField>
-      {isCaptchaEnabled() && (
-        <Flex mt="18px" justifyContent="center">
-          <Captcha onVerify={result => dispatchChange('captcha', result)} />
-        </Flex>
-      )}
       {contributionRequiresAddress(stepDetails, tier) && (
         <React.Fragment>
           <Flex alignItems="center" my="14px">
@@ -165,6 +160,11 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInCl
             labelFontWeight="700"
           />
         </React.Fragment>
+      )}
+      {isCaptchaEnabled() && (
+        <Flex mt="18px" justifyContent="center">
+          <Captcha onVerify={result => dispatchChange('captcha', result)} />
+        </Flex>
       )}
       <StepProfileInfoMessage isGuest hasLegalNameField />
       <P color="black.500" fontSize="12px" mt={4} data-cy="join-conditions">

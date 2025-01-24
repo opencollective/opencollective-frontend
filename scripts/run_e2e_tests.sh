@@ -44,7 +44,7 @@ if [ -z "$PDF_FOLDER" ]; then
 else
   cd $PDF_FOLDER
 fi
-PORT=3002 npm start &
+PORT=3002 OPENSSL_CONF=/dev/null npm start &
 PDF_PID=$!
 cd -
 

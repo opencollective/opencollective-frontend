@@ -4,14 +4,16 @@ import { Check, ChevronDown, Sparkles } from 'lucide-react';
 import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import type { Account, AccountingCategory, Expense, ExpenseType, Host } from '../lib/graphql/types/v2/graphql';
-import { AccountingCategoryAppliesTo, AccountingCategoryKind } from '../lib/graphql/types/v2/graphql';
+import type { Account, AccountingCategory, Expense, ExpenseType, Host } from '../lib/graphql/types/v2/schema';
+import { AccountingCategoryAppliesTo, AccountingCategoryKind } from '../lib/graphql/types/v2/schema';
 import { useAsyncCall } from '../lib/hooks/useAsyncCall';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { fetchExpenseCategoryPredictions } from '../lib/ml-service';
 import { cn } from '../lib/utils';
 import { ACCOUNTING_CATEGORY_HOST_FIELDS } from './expenses/lib/accounting-categories';
+import { isSameAccount } from '@/lib/collective';
 
+import { Button } from './ui/Button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './ui/Command';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/Popover';
 
@@ -24,12 +26,16 @@ type RequiredAccountingCategoryFields = Pick<AccountingCategory, 'id' | 'name' |
 type AccountingCategorySelectProps = {
   host: RequiredHostFields;
   /** The account holding the expense. Only used when using the prediction service */
-  account?: Pick<Account, 'id' | 'slug'>;
+  account?: { id: Account['id']; slug: Account['slug']; parent?: { id: Account['id'] } };
   kind: AccountingCategoryKind | `${AccountingCategoryKind}`;
   /** If `kind` is `EXPENSE`, the (optional) expense type is used to filter the categories */
   expenseType?: ExpenseType;
   /** If provided, these values (descriptions, items, etc...) will be used to call the prediction service */
-  expenseValues?: Partial<Expense>;
+  expenseValues?: {
+    type?: Expense['type'];
+    description?: Expense['description'];
+    items?: Array<{ description?: string }>;
+  };
   predictionStyle?: 'full' | 'inline-preload';
   selectedCategory: Pick<AccountingCategory, 'friendlyName' | 'name' | 'code' | 'id'> | undefined | null;
   valuesByRole?: Expense['valuesByRole'];
@@ -40,7 +46,7 @@ type AccountingCategorySelectProps = {
   id?: string;
   error?: boolean;
   children?: React.ReactNode;
-  borderRadiusClass?: string;
+  buttonClassName?: string;
   disabled?: boolean;
   selectFirstOptionIfSingle?: boolean;
 };
@@ -186,7 +192,7 @@ const getOptions = (
   }
 
   const expectedAppliesTo =
-    host.id === account?.id || host.id === account?.parent?.id
+    isSameAccount(host, account) || isSameAccount(host, account?.parent)
       ? AccountingCategoryAppliesTo.HOST
       : AccountingCategoryAppliesTo.HOSTED_COLLECTIVES;
 
@@ -215,7 +221,7 @@ const getOptions = (
 };
 
 const getCleanInputData = (
-  expenseValues: Partial<Expense>,
+  expenseValues: AccountingCategorySelectProps['expenseValues'],
 ): {
   description: string;
   items: string;
@@ -243,7 +249,7 @@ const useExpenseCategoryPredictionService = (
   enabled: boolean,
   host: RequiredHostFields,
   account: Pick<Account, 'slug'>,
-  expenseValues?: Partial<Expense>,
+  expenseValues?: AccountingCategorySelectProps['expenseValues'],
 ) => {
   const { call: fetchPredictionsCall, data, loading } = useAsyncCall(fetchExpenseCategoryPredictions);
   const throttledFetchPredictions = React.useMemo(() => throttle(fetchPredictionsCall, 500), []);
@@ -326,7 +332,7 @@ const AccountingCategorySelect = ({
   allowNone = false,
   showCode = false,
   expenseValues = undefined,
-  borderRadiusClass = 'rounded-lg',
+  buttonClassName = '',
   children = null,
   selectFirstOptionIfSingle,
   disabled,
@@ -373,29 +379,28 @@ const AccountingCategorySelect = ({
       <Popover open={isOpen} onOpenChange={setOpen}>
         <PopoverTrigger asChild onBlur={onBlur} disabled={disabled}>
           {children || (
-            <button
+            <Button
               id={id}
+              variant="outline"
               className={cn(
-                'flex w-full max-w-[300px] items-center justify-between border px-3 py-2',
-                borderRadiusClass,
+                'w-full max-w-[300px] font-normal',
                 {
-                  'border-red-500': error,
-                  'border-gray-300': !error,
-                  'bg-[hsl(0,0%,95%)] text-[hsl(0,0%,60%)]': disabled,
+                  'ring-2 ring-destructive ring-offset-2': error,
                 },
+                buttonClassName,
               )}
               disabled={disabled}
             >
               <span
-                className={cn('mr-3 max-w-[280px] truncate text-sm', {
+                className={cn('mr-3 flex-grow truncate text-start text-sm', {
                   'text-gray-400': isUndefined(selectedCategory),
                 })}
               >
                 {getCategoryLabel(intl, selectedCategory, false, valuesByRole) ||
                   intl.formatMessage({ defaultMessage: 'Select category', id: 'RUJYth' })}
               </span>
-              <ChevronDown size="1em" className={cn({ 'text-[hsl(0,0%,80%)]': disabled })} />
-            </button>
+              <ChevronDown size="1em" />
+            </Button>
           )}
         </PopoverTrigger>
         <PopoverContent className="min-w-[280px] p-0" style={{ width: 'var(--radix-popover-trigger-width)' }}>

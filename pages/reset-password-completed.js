@@ -1,11 +1,14 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { LayoutDashboard } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import { getI18nLink } from '../components/I18nFormatters';
 import Image from '../components/Image';
+import Link from '../components/Link';
 import Page from '../components/Page';
 import { P } from '../components/Text';
+import { Button } from '../components/ui/Button';
 import { withUser } from '../components/UserProvider';
 
 const ResetPasswordCompleted = ({ LoggedInUser, loadingLoggedInUser }) => {
@@ -46,6 +49,15 @@ const ResetPasswordCompleted = ({ LoggedInUser, loadingLoggedInUser }) => {
               />
             </P>
           </Fragment>
+        )}
+
+        {LoggedInUser && (
+          <Link href="/dashboard">
+            <Button variant="outline" className="mt-6">
+              <LayoutDashboard />
+              <FormattedMessage defaultMessage="Go to your Dashboard" id="cLaG6g" />
+            </Button>
+          </Link>
         )}
       </div>
     </Page>

@@ -8,9 +8,9 @@ import { i18nGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
 import { isValidUrl } from '../../../lib/utils';
 
+import Dropzone, { DROPZONE_ACCEPT_IMAGES } from '../../Dropzone';
 import { FormField } from '../../FormField';
 import { FormikZod } from '../../FormikZod';
-import StyledDropzone, { DROPZONE_ACCEPT_IMAGES } from '../../StyledDropzone';
 import { Button } from '../../ui/Button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../../ui/Dialog';
 import { Separator } from '../../ui/Separator';
@@ -18,7 +18,13 @@ import { toast } from '../../ui/useToast';
 import type { Fundraiser } from '../helpers';
 import { getDefaultProfileValues, profileSchema } from '../helpers';
 
-import { ColumnSection, editCrowdfundingSettingsMutation, LongDescriptionForm, MainDetailsForm } from './common';
+import {
+  ColumnSection,
+  editCrowdfundingSettingsMutation,
+  GoalsForm,
+  LongDescriptionForm,
+  MainDetailsForm,
+} from './common';
 
 const CoverImageForm = ({ schema, initialValues, onSubmit }) => {
   return (
@@ -33,7 +39,7 @@ const CoverImageForm = ({ schema, initialValues, onSubmit }) => {
                     {({ field }) => {
                       const hasValidUrl = field.value && isValidUrl(field.value);
                       return (
-                        <StyledDropzone
+                        <Dropzone
                           name={field.name}
                           kind="ACCOUNT_BANNER"
                           accept={DROPZONE_ACCEPT_IMAGES}
@@ -41,7 +47,7 @@ const CoverImageForm = ({ schema, initialValues, onSubmit }) => {
                           maxSize={10e6} // in bytes, =10MB
                           isMulti={false}
                           showActions
-                          size={196}
+                          className="size-48"
                           onSuccess={data => {
                             if (data) {
                               formik.setFieldValue(field.name, data.url);
@@ -74,7 +80,6 @@ export function EditProfile({ account }) {
   });
   const intl = useIntl();
   const initialValues = getDefaultProfileValues(account);
-
   const onSubmit = async values => {
     try {
       await submitEditSettings({
@@ -119,6 +124,15 @@ export function EditProfile({ account }) {
           initialValues={initialValues}
           onSubmit={onSubmit}
         />
+        <Separator />
+        <ColumnSection title="Goal" description="Set a goal to share with your community.">
+          <GoalsForm
+            schema={profileSchema.pick({ goal: true })}
+            initialValues={initialValues}
+            onSubmit={onSubmit}
+            account={account}
+          />
+        </ColumnSection>
         <Separator />
         <LongDescriptionForm
           schema={profileSchema.pick({ longDescription: true })}

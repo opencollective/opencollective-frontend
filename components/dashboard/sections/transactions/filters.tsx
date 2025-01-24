@@ -5,13 +5,11 @@ import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { boolean, integer, isMulti, limit, offset } from '../../../../lib/filters/schemas';
-import type {
-  Currency,
-  PaymentMethodType,
-  TransactionsTableQueryVariables,
-} from '../../../../lib/graphql/types/v2/graphql';
-import { ExpenseType, TransactionKind, TransactionType } from '../../../../lib/graphql/types/v2/graphql';
+import type { TransactionsTableQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
+import type { Currency, PaymentMethodType } from '../../../../lib/graphql/types/v2/schema';
+import { ExpenseType, TransactionKind, TransactionType } from '../../../../lib/graphql/types/v2/schema';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
+import { i18nHasDebt } from '../../../../lib/i18n/has-debt';
 import { i18nIsRefund } from '../../../../lib/i18n/is-refund';
 import { i18nTransactionKind, i18nTransactionType } from '../../../../lib/i18n/transaction';
 import { sortSelectOptions } from '../../../../lib/utils';
@@ -61,6 +59,7 @@ export const schema = z.object({
   openTransactionId: z.coerce.string().optional(),
   group: isMulti(z.string().uuid()).optional(),
   isRefund: boolean.optional(),
+  hasDebt: boolean.optional(),
 });
 
 type FilterValues = z.infer<typeof schema>;
@@ -141,6 +140,20 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
       return <ComboSelectFilter options={options} {...props} />;
     },
   },
+
+  hasDebt: {
+    labelMsg: defineMessage({ defaultMessage: 'Has Debt', id: 'ihvDCr' }),
+    Component: ({ intl, ...props }) => {
+      const options = React.useMemo(() => {
+        return [true, false].map(value => ({
+          label: i18nHasDebt(intl, value),
+          value,
+        }));
+      }, [intl]);
+      return <ComboSelectFilter options={options} {...props} />;
+    },
+  },
+
   expenseType: {
     labelMsg: defineMessage({ defaultMessage: 'Expense type', id: '9cwufA' }),
 

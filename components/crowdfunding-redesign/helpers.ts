@@ -1,7 +1,7 @@
 import { get } from 'lodash';
 import { z } from 'zod';
 
-import type { Account } from '../../lib/graphql/types/v2/graphql';
+import type { Account } from '../../lib/graphql/types/v2/schema';
 
 import { toast } from '../ui/useToast';
 
@@ -10,6 +10,12 @@ const coverImageSchema = z.object({
   url: z.string(),
   width: z.number().optional(),
   height: z.number().optional(),
+});
+
+const goalSchema = z.object({
+  recurrence: z.enum(['MONTHLY', 'YEARLY']).nullable().default(null),
+  continuous: z.boolean().default(false),
+  amount: z.coerce.number().min(0).default(0),
 });
 
 const coverVideoSchema = z.object({
@@ -29,6 +35,7 @@ export const fundraiserSchema = z.object({
   primaryColor: primaryColorSchema.optional(),
   cover: z.union([coverImageSchema, coverVideoSchema]).optional(),
   longDescription: z.string().max(30000).optional(),
+  goal: goalSchema.optional(),
 });
 
 export const profileSchema = z.object({
@@ -37,12 +44,16 @@ export const profileSchema = z.object({
   primaryColor: primaryColorSchema.optional(),
   cover: coverImageSchema.optional().nullable(),
   longDescription: z.string().max(30000).optional(),
+  goal: goalSchema.optional(),
 });
 
 export type Fundraiser = z.infer<typeof fundraiserSchema>;
 type Profile = z.infer<typeof profileSchema>;
 
 export function getDefaultFundraiserValues(account: Account): Fundraiser {
+  if (!account) {
+    return null;
+  }
   const fundraiserSettings = account.settings.crowdfundingRedesign?.fundraiser || {};
   const primaryColor =
     get(account, 'settings.collectivePage.primaryColor') || get(account, 'parent.settings.collectivePage.primaryColor');
@@ -60,11 +71,15 @@ export function getDefaultFundraiserValues(account: Account): Fundraiser {
       height: account.settings.collectivePage?.background?.mediaSize?.height,
     },
     longDescription: fundraiserSettings?.longDescription ?? account.longDescription,
+    goal: fundraiserSettings?.goal,
   };
 }
 
-export function getDefaultProfileValues(account: Account): Profile {
-  const profileSettings = account.settings.crowdfundingRedesign?.profile || {};
+export function getDefaultProfileValues(account?: Account): Profile {
+  if (!account) {
+    return null;
+  }
+  const profileSettings = account.settings?.crowdfundingRedesign?.profile || {};
   const primaryColor =
     get(account, 'settings.collectivePage.primaryColor') || get(account, 'parent.settings.collectivePage.primaryColor');
 
@@ -79,6 +94,7 @@ export function getDefaultProfileValues(account: Account): Profile {
       height: account.settings.collectivePage?.background?.mediaSize?.height,
     },
     longDescription: profileSettings?.longDescription ?? account.longDescription,
+    goal: profileSettings?.goal,
   };
 }
 
@@ -87,12 +103,6 @@ export function getYouTubeIDFromUrl(url) {
     /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
   const match = url.match(regex);
   return match ? match[1] : null;
-}
-
-// Naive goal aggregation
-export function aggregateGoalAmounts(goals) {
-  const totalAmount = goals.reduce((acc, goal) => acc + goal.amount, 0);
-  return { amount: totalAmount };
 }
 
 export function triggerPrototypeToast() {

@@ -18,6 +18,7 @@ import Container from '../../Container';
 import { Flex } from '../../Grid';
 import { getI18nLink } from '../../I18nFormatters';
 import Link from '../../Link';
+import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import RichTextEditor from '../../RichTextEditor';
@@ -104,6 +105,42 @@ const messages = defineMessages({
     id: 'collective.expensePolicy.error',
     defaultMessage: 'Expense policy must contain less than {maxLength} characters',
   },
+  'invoiceExpensePolicy.label': {
+    id: 'collective.invoiceExpensePolicy.label',
+    defaultMessage: 'Invoice Expenses Policy',
+  },
+  'invoiceExpensePolicy.placeholder': {
+    id: 'collective.expensePolicy.placeholder',
+    defaultMessage: 'E.g. approval criteria, limitations, or required documentation.',
+  },
+  'invoiceExpensePolicy.error': {
+    id: 'collective.expensePolicy.error',
+    defaultMessage: 'Expense policy must contain less than {maxLength} characters',
+  },
+  'receiptExpensePolicy.label': {
+    id: 'collective.receiptExpensePolicy.label',
+    defaultMessage: 'Receipt Expenses Policy',
+  },
+  'receiptExpensePolicy.placeholder': {
+    id: 'collective.expensePolicy.placeholder',
+    defaultMessage: 'E.g. approval criteria, limitations, or required documentation.',
+  },
+  'receiptExpensePolicy.error': {
+    id: 'collective.expensePolicy.error',
+    defaultMessage: 'Expense policy must contain less than {maxLength} characters',
+  },
+  'titleExpensePolicy.label': {
+    id: 'collective.titleExpensePolicy.label',
+    defaultMessage: 'Expenses Title Policy',
+  },
+  'titleExpensePolicy.placeholder': {
+    id: 'collective.expensePolicy.placeholder',
+    defaultMessage: 'E.g. approval criteria, limitations, or required documentation.',
+  },
+  'titleExpensePolicy.error': {
+    id: 'collective.expensePolicy.error',
+    defaultMessage: 'Expense policy must contain less than {maxLength} characters',
+  },
   'expensePolicy.allowExpense': {
     id: 'collective.expensePolicy.allowExpense',
     defaultMessage:
@@ -127,7 +164,7 @@ const messages = defineMessages({
   },
 });
 
-const Policies = ({ collective, showOnlyExpensePolicy }) => {
+const Policies = ({ collective }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
   const [selected, setSelected] = React.useState([]);
@@ -155,10 +192,10 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
   // Data and data handling
   const collectiveContributionFilteringCategories = get(data, 'account.settings.moderation.rejectedCategories', null);
   const collectiveContributionPolicy = get(collective, 'contributionPolicy', null);
-  const collectiveExpensePolicy = get(collective, 'expensePolicy', null);
   const collectiveDisableExpenseSubmission = get(collective, 'settings.disablePublicExpenseSubmission', false);
   const expenseTypes = get(collective, 'settings.expenseTypes') || DEFAULT_SUPPORTED_EXPENSE_TYPES;
   const numberOfAdmins = size(filter(collective.members, m => m.role === 'ADMIN'));
+  const policies = omitDeep(data?.account?.policies || {}, ['__typename']);
 
   const selectOptions = React.useMemo(() => {
     const optionsArray = Object.entries(MODERATION_CATEGORIES).map(([key, value], index) => ({
@@ -173,13 +210,12 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
   const formik = useFormik({
     initialValues: {
       contributionPolicy: collectiveContributionPolicy || '',
-      expensePolicy: collectiveExpensePolicy || '',
       disablePublicExpenseSubmission: collectiveDisableExpenseSubmission || false,
       expenseTypes,
-      policies: omitDeep(data?.account?.policies || {}, ['__typename']),
+      policies,
     },
     async onSubmit(values) {
-      const { contributionPolicy, expensePolicy, disablePublicExpenseSubmission, expenseTypes, policies } = values;
+      const { contributionPolicy, disablePublicExpenseSubmission, expenseTypes, policies } = values;
       const newSettings = { ...collective.settings, disablePublicExpenseSubmission };
       if (collective.isHost) {
         newSettings.expenseTypes = expenseTypes;
@@ -191,7 +227,6 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
             collective: {
               id: collective.id,
               contributionPolicy,
-              expensePolicy,
               settings: newSettings,
             },
           },
@@ -278,72 +313,155 @@ const Policies = ({ collective, showOnlyExpensePolicy }) => {
       {error && <MessageBoxGraphqlError error={error} />}
       <form onSubmit={formik.handleSubmit}>
         <Container>
-          {!showOnlyExpensePolicy && (
-            <Container mb={4}>
-              <StyledInputField
-                name="contributionPolicy"
-                htmlFor="contributionPolicy"
-                error={formik.errors.contributionPolicy}
-                disabled={isSubmittingSettings}
-                labelProps={{ mb: 2, pt: 2, lineHeight: '18px', fontWeight: 'bold' }}
-                label={
-                  <SettingsSectionTitle>{formatMessage(messages['contributionPolicy.label'])}</SettingsSectionTitle>
-                }
-              >
-                {inputProps => (
-                  <RichTextEditor
-                    withBorders
-                    showCount
-                    maxLength={CONTRIBUTION_POLICY_MAX_LENGTH}
-                    error={formik.errors.contributionPolicy}
-                    version="simplified"
-                    editorMinHeight="12.5rem"
-                    editorMaxHeight={500}
-                    id={inputProps.id}
-                    inputName={inputProps.name}
-                    onChange={formik.handleChange}
-                    placeholder={formatMessage(messages['contributionPolicy.placeholder'])}
-                    defaultValue={formik.values.contributionPolicy}
-                    fontSize="14px"
-                  />
-                )}
-              </StyledInputField>
-              <P fontSize="14px" lineHeight="18px" color="black.600" mt={2}>
-                <FormattedMessage
-                  id="collective.contributionPolicy.description"
-                  defaultMessage="Financial Contributors are manually reviewed by the Open Collective team to check for abuse or spam. Financial Contributors with a good reputation should not be affected by this setting."
+          <Container mb={4}>
+            <StyledInputField
+              name="contributionPolicy"
+              htmlFor="contributionPolicy"
+              error={formik.errors.contributionPolicy}
+              disabled={isSubmittingSettings}
+              labelProps={{ mb: 2, pt: 2, lineHeight: '18px', fontWeight: 'bold' }}
+              label={<SettingsSectionTitle>{formatMessage(messages['contributionPolicy.label'])}</SettingsSectionTitle>}
+            >
+              {inputProps => (
+                <RichTextEditor
+                  withBorders
+                  showCount
+                  maxLength={CONTRIBUTION_POLICY_MAX_LENGTH}
+                  error={formik.errors.contributionPolicy}
+                  version="simplified"
+                  editorMinHeight="12.5rem"
+                  editorMaxHeight={500}
+                  id={inputProps.id}
+                  inputName={inputProps.name}
+                  onChange={formik.handleChange}
+                  placeholder={formatMessage(messages['contributionPolicy.placeholder'])}
+                  defaultValue={formik.values.contributionPolicy}
+                  fontSize="14px"
                 />
-              </P>
-            </Container>
-          )}
+              )}
+            </StyledInputField>
+            <P fontSize="14px" lineHeight="18px" color="black.600" mt={2}>
+              <FormattedMessage
+                id="collective.contributionPolicy.description"
+                defaultMessage="Financial Contributors are manually reviewed by the Open Collective team to check for abuse or spam. Financial Contributors with a good reputation should not be affected by this setting."
+              />
+            </P>
+          </Container>
+
+          <SettingsSectionTitle>{formatMessage(messages['expensePolicy.label'])}</SettingsSectionTitle>
 
           <StyledInputField
-            name="expensePolicy"
-            htmlFor="expensePolicy"
-            error={formik.errors.expensePolicy}
+            name="policies.EXPENSE_POLICIES.invoicePolicy"
+            htmlFor="policies.EXPENSE_POLICIES.invoicePolicy"
+            error={formik.errors.policies?.EXPENSE_POLICIES?.invoicePolicy}
             disabled={isSubmittingSettings}
             labelProps={{ mb: 2, pt: 2, lineHeight: '18px', fontWeight: 'bold' }}
-            label={<SettingsSectionTitle>{formatMessage(messages['expensePolicy.label'])}</SettingsSectionTitle>}
+            label={formatMessage(messages['invoiceExpensePolicy.label'])}
           >
-            {inputProps => (
-              <RichTextEditor
-                data-cy="expense-policy-input"
-                withBorders
-                showCount
-                maxLength={EXPENSE_POLICY_MAX_LENGTH}
-                error={formik.errors.expensePolicy}
-                version="simplified"
-                editorMinHeight="12.5rem"
-                editorMaxHeight={500}
-                id={inputProps.id}
-                inputName={inputProps.name}
-                onChange={formik.handleChange}
-                placeholder={formatMessage(messages['expensePolicy.placeholder'])}
-                defaultValue={formik.values.expensePolicy}
-                fontSize="14px"
-                maxHeight={600}
-              />
-            )}
+            {inputProps =>
+              loading ? (
+                <LoadingPlaceholder height={50} width={1} />
+              ) : (
+                <RichTextEditor
+                  key={data?.account?.policies?.EXPENSE_POLICIES?.invoicePolicy}
+                  data-cy="invoice-expense-policy-input"
+                  withBorders
+                  showCount
+                  maxLength={EXPENSE_POLICY_MAX_LENGTH}
+                  error={formik.errors.policies?.EXPENSE_POLICIES?.invoicePolicy}
+                  version="simplified"
+                  editorMinHeight="12.5rem"
+                  editorMaxHeight={500}
+                  id={inputProps.id}
+                  inputName={inputProps.name}
+                  onChange={formik.handleChange}
+                  placeholder={formatMessage(messages['invoiceExpensePolicy.placeholder'])}
+                  defaultValue={data?.account?.policies?.EXPENSE_POLICIES?.invoicePolicy}
+                  fontSize="14px"
+                  maxHeight={600}
+                />
+              )
+            }
+          </StyledInputField>
+          <P fontSize="14px" lineHeight="18px" color="black.600" my={2}>
+            <FormattedMessage
+              id="collective.expensePolicy.description"
+              defaultMessage="It can be daunting to file an expense if you're not sure what's allowed. Provide a clear policy to guide expense submitters."
+            />
+          </P>
+
+          <StyledInputField
+            name="policies.EXPENSE_POLICIES.receiptPolicy"
+            htmlFor="policies.EXPENSE_POLICIES.receiptPolicy"
+            error={formik.errors.policies?.EXPENSE_POLICIES?.receiptPolicy}
+            disabled={isSubmittingSettings}
+            labelProps={{ mb: 2, pt: 2, lineHeight: '18px', fontWeight: 'bold' }}
+            label={formatMessage(messages['receiptExpensePolicy.label'])}
+          >
+            {inputProps =>
+              loading ? (
+                <LoadingPlaceholder height={50} width={1} />
+              ) : (
+                <RichTextEditor
+                  key={data?.account?.policies?.EXPENSE_POLICIES?.receiptPolicy}
+                  data-cy="receipt-expense-policy-input"
+                  withBorders
+                  showCount
+                  maxLength={EXPENSE_POLICY_MAX_LENGTH}
+                  error={formik.errors.policies?.EXPENSE_POLICIES?.receiptPolicy}
+                  version="simplified"
+                  editorMinHeight="12.5rem"
+                  editorMaxHeight={500}
+                  id={inputProps.id}
+                  inputName={inputProps.name}
+                  onChange={formik.handleChange}
+                  placeholder={formatMessage(messages['receiptExpensePolicy.placeholder'])}
+                  defaultValue={data?.account?.policies?.EXPENSE_POLICIES?.receiptPolicy}
+                  fontSize="14px"
+                  maxHeight={600}
+                />
+              )
+            }
+          </StyledInputField>
+          <P fontSize="14px" lineHeight="18px" color="black.600" my={2}>
+            <FormattedMessage
+              id="collective.expensePolicy.description"
+              defaultMessage="It can be daunting to file an expense if you're not sure what's allowed. Provide a clear policy to guide expense submitters."
+            />
+          </P>
+
+          <StyledInputField
+            name="policies.EXPENSE_POLICIES.titlePolicy"
+            htmlFor="policies.EXPENSE_POLICIES.titlePolicy"
+            error={formik.errors.policies?.EXPENSE_POLICIES?.titlePolicy}
+            disabled={isSubmittingSettings}
+            labelProps={{ mb: 2, pt: 2, lineHeight: '18px', fontWeight: 'bold' }}
+            label={formatMessage(messages['titleExpensePolicy.label'])}
+          >
+            {inputProps =>
+              loading ? (
+                <LoadingPlaceholder height={50} width={1} />
+              ) : (
+                <RichTextEditor
+                  key={data?.account?.policies?.EXPENSE_POLICIES?.titlePolicy}
+                  data-cy="title-expense-policy-input"
+                  withBorders
+                  showCount
+                  maxLength={EXPENSE_POLICY_MAX_LENGTH}
+                  error={formik.errors.policies?.EXPENSE_POLICIES?.titlePolicy}
+                  version="simplified"
+                  editorMinHeight="12.5rem"
+                  editorMaxHeight={500}
+                  id={inputProps.id}
+                  inputName={inputProps.name}
+                  onChange={formik.handleChange}
+                  placeholder={formatMessage(messages['titleExpensePolicy.placeholder'])}
+                  defaultValue={data?.account?.policies?.EXPENSE_POLICIES?.titlePolicy}
+                  fontSize="14px"
+                  maxHeight={600}
+                />
+              )
+            }
           </StyledInputField>
           <P fontSize="14px" lineHeight="18px" color="black.600" my={2}>
             <FormattedMessage
@@ -813,7 +931,6 @@ Policies.propTypes = {
       }),
     ),
   }),
-  showOnlyExpensePolicy: PropTypes.bool,
 };
 
 export default Policies;

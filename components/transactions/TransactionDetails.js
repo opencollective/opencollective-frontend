@@ -7,7 +7,7 @@ import styled, { css } from 'styled-components';
 
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { TransactionKind, TransactionTypes } from '../../lib/constants/transactions';
-import { ExpenseType } from '../../lib/graphql/types/v2/graphql';
+import { ExpenseType } from '../../lib/graphql/types/v2/schema';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import { renderDetailsString, saveInvoice } from '../../lib/transactions';
 

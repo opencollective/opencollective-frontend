@@ -62,6 +62,11 @@ export const getSettingsQuery = gql`
           requiredForCollectiveAdmins
         }
         EXPENSE_PUBLIC_VENDORS
+        EXPENSE_POLICIES {
+          invoicePolicy
+          receiptPolicy
+          titlePolicy
+        }
       }
       ... on AccountWithHost {
         host {

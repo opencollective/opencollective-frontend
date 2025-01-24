@@ -250,7 +250,11 @@ export const hostDashboardMetadataQuery = gql`
         }
       }
     }
-    unreplied: expenses(host: { slug: $hostSlug }, status: [APPROVED, ERROR, INCOMPLETE], lastCommentBy: [USER]) {
+    unreplied: expenses(
+      host: { slug: $hostSlug }
+      status: [APPROVED, ERROR, INCOMPLETE, ON_HOLD]
+      lastCommentBy: [NON_HOST_ADMIN]
+    ) {
       totalCount
     }
     ready_to_pay: expenses(host: { slug: $hostSlug }, status: [READY_TO_PAY]) {

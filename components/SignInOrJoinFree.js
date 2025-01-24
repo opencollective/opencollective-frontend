@@ -148,7 +148,8 @@ class SignInOrJoinFree extends React.Component {
       // In dev/test, API directly returns a redirect URL for emails like
       // test*@opencollective.com.
       if (response.redirect) {
-        await this.props.router.replace(response.redirect);
+        // Use browser redirection to guarantee page, login, and router state are all updated.
+        window.location.href = response.redirect;
       } else if (response.token) {
         const user = await this.props.login(response.token);
         if (!user) {

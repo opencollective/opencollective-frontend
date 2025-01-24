@@ -9,24 +9,28 @@ import { getAccountReferenceInput } from '../../../../lib/collective';
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { standardizeExpenseItemIncurredAt } from '../../../../lib/expenses';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
+import type { HostedCollectiveFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
 import type {
   Account,
+  Host,
   TransactionsImport,
   TransactionsImportRow,
   TransactionsImportStats,
-} from '../../../../lib/graphql/types/v2/graphql';
-import { Currency, ExpenseType } from '../../../../lib/graphql/types/v2/graphql';
+} from '../../../../lib/graphql/types/v2/schema';
+import { Currency, ExpenseType } from '../../../../lib/graphql/types/v2/schema';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { isValidUrl } from '../../../../lib/utils';
 import { attachmentDropzoneParams } from '../../../expenses/lib/attachments';
 
+import AccountingCategorySelect from '@/components/AccountingCategorySelect';
+
 import { DefaultCollectiveLabel } from '../../../CollectivePicker';
 import CollectivePickerAsync from '../../../CollectivePickerAsync';
+import Dropzone from '../../../Dropzone';
 import { ExchangeRate } from '../../../ExchangeRate';
 import { FormikZod } from '../../../FormikZod';
 import type { BaseModalProps } from '../../../ModalContext';
-import StyledDropzone from '../../../StyledDropzone';
 import { StyledInputAmountWithDynamicFxRate } from '../../../StyledInputAmountWithDynamicFxRate';
 import StyledInputFormikField from '../../../StyledInputFormikField';
 import StyledSelect from '../../../StyledSelect';
@@ -35,8 +39,8 @@ import { Dialog, DialogContent, DialogHeader } from '../../../ui/Dialog';
 import { useToast } from '../../../ui/useToast';
 import { TransactionsImportRowDetailsAccordion } from '../transactions-imports/TransactionsImportRowDetailsAccordion';
 
-const hostCreateExpenseModalQuery = gql`
-  query HostCreateExpenseModal($hostId: String!, $forAccount: AccountReferenceInput) {
+const hostCreateExpenseModalPayeeSelectQuery = gql`
+  query HostCreateExpenseModalPayeeSelect($hostId: String!, $forAccount: AccountReferenceInput) {
     host(id: $hostId) {
       id
       slug
@@ -68,7 +72,7 @@ const PayeeSelect = ({
   forAccount: Account;
 } & React.ComponentProps<typeof CollectivePickerAsync>) => {
   const intl = useIntl();
-  const { data, loading } = useQuery(hostCreateExpenseModalQuery, {
+  const { data, loading } = useQuery(hostCreateExpenseModalPayeeSelectQuery, {
     context: API_V2_CONTEXT,
     variables: { hostId: host.id, forAccount: getAccountReferenceInput(forAccount) },
   });
@@ -88,7 +92,7 @@ const PayeeSelect = ({
     <CollectivePickerAsync
       {...props}
       data-cy="payee-select"
-      types={['USER', 'ORGANIZATION', 'VENDOR']}
+      types={['USER', 'ORGANIZATION', 'VENDOR', 'PROJECT']}
       customOptions={defaultSourcesOptions}
       menuPortalTarget={null}
       includeVendorsForHostId={host.legacyId}
@@ -128,10 +132,11 @@ const SUPPORTED_EXPENSE_TYPES = omit(ExpenseType, [
 
 const hostExpenseFormValuesSchema = z
   .object({
-    type: z.enum(Object.values(SUPPORTED_EXPENSE_TYPES) as [string, ...string[]]),
+    type: z.enum(Object.values(SUPPORTED_EXPENSE_TYPES) as [ExpenseType, ...ExpenseType[]]),
     description: z.string().min(3),
     payee: z.object({}),
     account: z.object({}),
+    accountingCategory: z.object({}).optional().nullable(),
     incurredAt: z.string(),
     amount: z.object({ valueInCents: z.number(), currency: z.nativeEnum(Currency) }),
     attachedFile: z.object({ url: z.string() }).optional().nullable(),
@@ -149,16 +154,19 @@ const hostExpenseFormValuesSchema = z
     ]),
   );
 
-const getInitialValues = (importRow: TransactionsImportRow): z.infer<typeof hostExpenseFormValuesSchema> => {
+type FormValuesSchema = z.infer<typeof hostExpenseFormValuesSchema>;
+
+const getInitialValues = (importRow: TransactionsImportRow, account): FormValuesSchema => {
   return {
     type: null,
     description: importRow?.description || '',
     payee: null,
-    account: null,
+    account: account ? pick(account, ['id', 'slug', 'name', 'type', 'imageUrl']) : null,
+    accountingCategory: null,
     incurredAt: standardizeExpenseItemIncurredAt(importRow?.date),
     amount: {
       valueInCents: Math.abs(importRow?.amount.valueInCents) || 0,
-      currency: importRow?.amount.currency || null,
+      currency: importRow?.amount.currency || account?.currency || null,
     },
   };
 };
@@ -170,9 +178,11 @@ export const HostCreateExpenseModal = ({
   transactionsImport,
   transactionsImportRow,
   host,
+  account,
   ...props
 }: {
-  host: Account;
+  host: Host;
+  account?: HostedCollectiveFieldsFragment;
   transactionsImport?: TransactionsImport;
   transactionsImportRow?: TransactionsImportRow;
 } & BaseModalProps) => {
@@ -195,9 +205,9 @@ export const HostCreateExpenseModal = ({
         {transactionsImportRow && (
           <TransactionsImportRowDetailsAccordion transactionsImportRow={transactionsImportRow} className="mb-4" />
         )}
-        <FormikZod<z.infer<typeof hostExpenseFormValuesSchema>>
+        <FormikZod<FormValuesSchema>
           schema={hostExpenseFormValuesSchema}
-          initialValues={getInitialValues(transactionsImportRow)}
+          initialValues={getInitialValues(transactionsImportRow, account)}
           onSubmit={async values => {
             try {
               const result = await createExpense({
@@ -206,20 +216,21 @@ export const HostCreateExpenseModal = ({
                   transactionsImportRow: transactionsImportRow && { id: transactionsImportRow.id },
                   expense: {
                     ...pick(values, ['description', 'type']),
+                    accountingCategory: values.accountingCategory && pick(values.accountingCategory, ['id']),
                     payee: getAccountReferenceInput(values.payee),
                     currency: host.currency,
                     payoutMethod: {
                       type: 'OTHER',
                       data: {
-                        importId: transactionsImport?.id,
-                        source: transactionsImport?.source,
+                        content: `Transaction import${transactionsImport?.source ? ` from ${transactionsImport.source} (#${transactionsImport.id})` : ''}`,
+                        currency: values.amount.currency,
                       },
                     },
                     items: [
                       {
                         amountV2: omit(values.amount, ['exchangeRate.__typename', 'exchangeRate.isApproximate']),
                         description: values.description,
-                        incurredAt: values.incurredAt,
+                        incurredAt: standardizeExpenseItemIncurredAt(values.incurredAt),
                         url: values.type === ExpenseType.RECEIPT ? values['attachedFile']?.url : null,
                       },
                     ],
@@ -260,7 +271,7 @@ export const HostCreateExpenseModal = ({
           {({ isSubmitting, setFieldValue, setFieldTouched, values }) => (
             <Form>
               <div className="grid gap-6">
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-4">
                   <StyledInputFormikField
                     name="description"
                     label={<FormattedMessage defaultMessage="Description" id="Fields.description" />}
@@ -355,6 +366,32 @@ export const HostCreateExpenseModal = ({
                       />
                     )}
                   </StyledInputFormikField>
+                  {host?.accountingCategories?.totalCount > 0 && (
+                    <StyledInputFormikField
+                      name="accountingCategory"
+                      label={
+                        <FormattedMessage defaultMessage="Accounting category" id="AddFundsModal.accountingCategory" />
+                      }
+                    >
+                      {({ field }) => (
+                        <AccountingCategorySelect
+                          id={field.id}
+                          kind="EXPENSE"
+                          host={host}
+                          disabled={!values.account}
+                          account={values.account as null | Account}
+                          expenseType={values.type}
+                          expenseValues={values}
+                          selectedCategory={field.value}
+                          onChange={category => setFieldValue(field.name, category)}
+                          buttonClassName="max-w-full"
+                          predictionStyle="inline-preload"
+                          showCode
+                          allowNone
+                        />
+                      )}
+                    </StyledInputFormikField>
+                  )}
                   <StyledInputFormikField
                     required={values.type === ExpenseType.RECEIPT}
                     name="attachedFile"
@@ -367,7 +404,7 @@ export const HostCreateExpenseModal = ({
                     }
                   >
                     {({ form, field, meta }) => (
-                      <StyledDropzone
+                      <Dropzone
                         {...attachmentDropzoneParams}
                         kind="EXPENSE_ITEM"
                         data-cy={`${field.name}-dropzone`}
@@ -375,7 +412,6 @@ export const HostCreateExpenseModal = ({
                         isMulti={false}
                         error={(meta.touched || form.submitCount) && meta.error}
                         mockImageGenerator={() => `https://loremflickr.com/120/120/invoice?lock=0`}
-                        fontSize="13px"
                         value={field.value && isValidUrl(field.value?.url) && field.value.url}
                         useGraphQL={true}
                         parseDocument={false}

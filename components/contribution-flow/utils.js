@@ -1,6 +1,6 @@
 import React from 'react';
 import { CreditCard } from '@styled-icons/fa-solid/CreditCard';
-import { find, get, isEmpty, pick, sortBy, uniqBy } from 'lodash';
+import { find, get, pick, sortBy, uniqBy } from 'lodash';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
 import { canContributeRecurring, getCollectivePageMetadata } from '../../lib/collective';
@@ -11,9 +11,8 @@ import {
   PAYMENT_METHOD_SERVICE,
   PAYMENT_METHOD_TYPE,
 } from '../../lib/constants/payment-methods';
-import roles from '../../lib/constants/roles';
 import { TierTypes } from '../../lib/constants/tiers-types';
-import { PaymentMethodService, PaymentMethodType } from '../../lib/graphql/types/v2/graphql';
+import { PaymentMethodService, PaymentMethodType } from '../../lib/graphql/types/v2/schema';
 import { getPaymentMethodName } from '../../lib/payment_method_label';
 import {
   getPaymentMethodIcon,
@@ -29,54 +28,11 @@ export const NEW_CREDIT_CARD_KEY = 'newCreditCard';
 export const STRIPE_PAYMENT_ELEMENT_KEY = 'stripe-payment-element';
 const PAYPAL_MAX_AMOUNT = 999999999; // See MAX_VALUE_EXCEEDED https://developer.paypal.com/api/rest/reference/orders/v2/errors/#link-createorder
 
-const memberCanBeUsedToContribute = (member, account, canUseIncognito) => {
-  if (member.role !== roles.ADMIN) {
-    return false;
-  } else if (!canUseIncognito && member.collective.isIncognito) {
-    // Incognito can't be used to contribute if not allowed
-    return false;
-  } else if (
-    [CollectiveType.COLLECTIVE, CollectiveType.FUND].includes(member.collective.type) &&
-    member.collective.host?.id !== account.host.legacyId
-  ) {
-    // If the contributing account is fiscally hosted, the host must be the same as the one you're contributing to
-    return false;
-  } else {
-    return true;
-  }
-};
-
 /*
  **Cannot use contributions for events and "Tickets" tiers, because we need the ticket holder's identity
  */
 export const canUseIncognitoForContribution = tier => {
   return !tier || tier.type !== 'TICKET';
-};
-
-export const getContributeProfiles = (loggedInUser, collective, tier) => {
-  if (!loggedInUser) {
-    return [];
-  } else {
-    const canUseIncognito = canUseIncognitoForContribution(tier);
-    const filteredMembers = loggedInUser.memberOf.filter(member =>
-      memberCanBeUsedToContribute(member, collective, canUseIncognito),
-    );
-    const personalProfile = { email: loggedInUser.email, image: loggedInUser.image, ...loggedInUser.collective };
-    const contributorProfiles = [personalProfile];
-    filteredMembers.forEach(member => {
-      // Account can't contribute to itself
-      if (member.collective.id !== collective.legacyId) {
-        contributorProfiles.push(member.collective);
-      }
-      if (!isEmpty(member.collective.children)) {
-        const childrenOfSameHost = member.collective.children.filter(
-          child => child.host && child.host.id === collective.host.legacyId,
-        );
-        contributorProfiles.push(...childrenOfSameHost);
-      }
-    });
-    return uniqBy([personalProfile, ...contributorProfiles], 'id');
-  }
 };
 
 export const generatePaymentMethodOptions = (
@@ -111,7 +67,7 @@ export const generatePaymentMethodOptions = (
 
   uniquePMs = uniquePMs.filter(
     ({ paymentMethod }) =>
-      paymentMethod.type !== PAYMENT_METHOD_TYPE.COLLECTIVE || collective.host.legacyId === stepProfile.host?.id,
+      paymentMethod.type !== PAYMENT_METHOD_TYPE.COLLECTIVE || collective.host.id === stepProfile.host?.id,
   );
 
   if (paymentIntent) {
@@ -127,7 +83,7 @@ export const generatePaymentMethodOptions = (
 
       return (
         allowedStripeTypes.includes(paymentMethod.type.toLowerCase()) &&
-        (!paymentMethod?.data?.stripeAccount || paymentMethod?.data?.stripeAccount === paymentIntent.stripeAccount)
+        (!paymentMethod.data?.stripeAccount || paymentMethod.data?.stripeAccount === paymentIntent.stripeAccount)
       );
     });
   } else {
@@ -136,7 +92,7 @@ export const generatePaymentMethodOptions = (
         return true;
       }
 
-      return paymentMethod.type === PaymentMethodType.CREDITCARD && !paymentMethod?.data?.stripeAccount;
+      return paymentMethod.type === PaymentMethodType.CREDITCARD && !paymentMethod.data?.stripeAccount;
     });
   }
 

@@ -13,6 +13,7 @@ import { EMPTY_ARRAY } from '../../lib/constants/utils';
 import { ERROR, isErrorType } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { ExpenseLockableFields } from '../../lib/graphql/types/v2/schema';
 import { flattenObjectDeep } from '../../lib/utils';
 
 import { Box, Flex, Grid } from '../Grid';
@@ -127,7 +128,7 @@ const throttledSearch = debounce((searchFunc, variables) => {
   return searchFunc({ variables });
 }, 750);
 
-const ExpenseFormPayeeSignUpStep = ({ formik, collective, onCancel, onNext }) => {
+const ExpenseFormPayeeSignUpStep = ({ formik, collective, onCancel, onNext, expense }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
   const { values, touched, errors } = formik;
@@ -293,6 +294,7 @@ const ExpenseFormPayeeSignUpStep = ({ formik, collective, onCancel, onNext }) =>
                 labelFontSize="13px"
                 error={errors.payee?.email}
                 mt={3}
+                disabled={expense?.lockedFields?.includes(ExpenseLockableFields.PAYEE)}
               >
                 {inputProps => <StyledInput {...inputProps} {...field} type="email" />}
               </StyledInputField>
@@ -469,6 +471,9 @@ ExpenseFormPayeeSignUpStep.propTypes = {
   formik: PropTypes.object,
   onCancel: PropTypes.func,
   onNext: PropTypes.func,
+  expense: PropTypes.shape({
+    lockedFields: PropTypes.arrayOf(PropTypes.string),
+  }),
   collective: PropTypes.shape({
     slug: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,

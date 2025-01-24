@@ -3,7 +3,7 @@ import type { PropsWithChildren } from 'react';
 import { createPortal } from 'react-dom';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
-import type { Host } from '../../lib/graphql/types/v2/graphql';
+import type { Host } from '../../lib/graphql/types/v2/schema';
 import { elementFromClass } from '../../lib/react-utils';
 
 import Avatar from '../Avatar';

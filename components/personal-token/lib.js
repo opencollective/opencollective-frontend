@@ -1,5 +1,5 @@
 import { verifyFieldLength } from '../../lib/form-utils';
-import { OAuthScope } from '../../lib/graphql/types/v2/graphql';
+import { OAuthScope } from '../../lib/graphql/types/v2/schema';
 
 export const validatePersonalTokenValues = (intl, values) => {
   const errors = {};

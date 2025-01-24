@@ -3,8 +3,8 @@ import { padStart } from 'lodash';
 
 import INTERVALS from './constants/intervals';
 import { PAYMENT_METHOD_SERVICE } from './constants/payment-methods';
-import type { TierFrequency } from './graphql/types/v2/graphql';
-import { TimeUnit } from './graphql/types/v2/graphql';
+import type { TierFrequency } from './graphql/types/v2/schema';
+import { TimeUnit } from './graphql/types/v2/schema';
 import dayjs from './dayjs';
 
 /**

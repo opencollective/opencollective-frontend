@@ -11,7 +11,7 @@ import type {
   HostApplicationThreadQuery,
   HostApplicationThreadQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import { HostApplicationStatus, ProcessHostApplicationAction } from '../../../../lib/graphql/types/v2/graphql';
+import { HostApplicationStatus, ProcessHostApplicationAction } from '../../../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import { i18nCustomApplicationFormLabel } from '../../../../lib/i18n/custom-application-form';
 

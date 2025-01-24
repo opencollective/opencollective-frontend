@@ -1,9 +1,10 @@
+// Deprecated, use components/InputAmount.tsx instead
 import React from 'react';
 import PropTypes from 'prop-types';
 import { getEmojiByCurrencyCode } from 'country-currency-emoji-flags';
 import { clamp, isNil, isUndefined, round } from 'lodash';
 
-import { Currency, ZERO_DECIMAL_CURRENCIES } from '../lib/constants/currency';
+import { Currency } from '../lib/constants/currency';
 import { floatAmountToCents, getCurrencySymbol, getDefaultCurrencyPrecision } from '../lib/currency-utils';
 import { cn } from '../lib/utils';
 
@@ -162,7 +163,7 @@ const StyledInputAmount = ({
   name = 'amount',
   min = 0,
   max = 100000000000,
-  precision = ZERO_DECIMAL_CURRENCIES.includes(currency) ? 0 : 2,
+  precision = getDefaultCurrencyPrecision(currency),
   defaultValue = undefined,
   value,
   onBlur = undefined,
@@ -183,7 +184,7 @@ const StyledInputAmount = ({
   const [rawValue, setRawValue] = React.useState(value || defaultValue || '');
   const isControlled = !isUndefined(value);
   const curValue = isControlled ? getValue(value, rawValue, isEmpty) : undefined;
-  const minAmount = min / 10 ** precision;
+  const minAmount = precision !== 0 ? min / 10 ** precision : min / 100;
   const disabled = props.disabled || loadingExchangeRate;
   const canUseExchangeRate = Boolean(!loadingExchangeRate && exchangeRate && exchangeRate.fromCurrency === currency);
   const minWidth = useAmountInputMinWidth(curValue, max);

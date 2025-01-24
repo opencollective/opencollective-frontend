@@ -20,9 +20,8 @@ const ExpenseTypeTag = ({ type, legacyId = undefined, isLoading = false, ...prop
     <LoadingPlaceholder height={24} width={73} borderRadius="12px 2px 2px 12px" />
   ) : (
     <StyledTag
-      variant="rounded-left"
+      variant="rounded"
       type="grey"
-      mb="4px"
       mr="10px"
       textTransform="uppercase"
       fontSize="10px"

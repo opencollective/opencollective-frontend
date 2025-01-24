@@ -4,7 +4,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import useProcessExpense from '../../lib/expenses/useProcessExpense';
-import type { Expense } from '../../lib/graphql/types/v2/graphql';
+import type { Expense } from '../../lib/graphql/types/v2/schema';
 
 import { Flex } from '../Grid';
 import MessageBox from '../MessageBox';

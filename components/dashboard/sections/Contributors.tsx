@@ -7,7 +7,7 @@ import { fetchCSVFileFromRESTService } from '../../../lib/api';
 import type { FilterConfig } from '../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../lib/graphql/helpers';
-import { MemberRole } from '../../../lib/graphql/types/v2/graphql';
+import { MemberRole } from '../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 import { capitalize, sortSelectOptions } from '../../../lib/utils';
 
@@ -18,6 +18,7 @@ import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import { DataTable } from '../../table/DataTable';
 import { Span } from '../../Text';
 import { Button } from '../../ui/Button';
+import { useToast } from '../../ui/useToast';
 import DashboardHeader from '../DashboardHeader';
 import { EmptyResults } from '../EmptyResults';
 import ComboSelectFilter from '../filters/ComboSelectFilter';
@@ -268,6 +269,7 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
   });
 
   const contributors = data?.account?.members.nodes || [];
+  const { toast } = useToast();
 
   const loading = metadataLoading || queryLoading;
   const error = metadataError || queryError;
@@ -297,6 +299,11 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
                   const filename = `${accountSlug}-contributors.csv`;
                   const url = `${process.env.REST_URL}/v2/${accountSlug}/contributors.csv?fetchAll=1`;
                   await fetchCSVFileFromRESTService(url, filename);
+                } catch (error) {
+                  toast({
+                    variant: 'error',
+                    message: error.message,
+                  });
                 } finally {
                   setDownloadingCsv(false);
                 }

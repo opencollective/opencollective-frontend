@@ -30,6 +30,7 @@ import hasFeature, { FEATURES } from '../../lib/allowed-features';
 import { isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective';
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
+import { ConnectedAccountService } from '../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
@@ -67,6 +68,7 @@ const ROOT_MENU = [
       { label: 'Unhost Account', section: ROOT_SECTIONS.UNHOST_ACCOUNTS },
       { label: 'Account Settings', section: ROOT_SECTIONS.ACCOUNT_SETTINGS },
       { label: 'Account Type', section: ROOT_SECTIONS.ACCOUNT_TYPE },
+      { label: 'Anonymize Account', section: ROOT_SECTIONS.ANONYMIZE_ACCOUNT },
       { label: 'Recurring Contributions', section: ROOT_SECTIONS.RECURRING_CONTRIBUTIONS },
       { label: 'Activity Log', section: ALL_SECTIONS.ACTIVITY_LOG },
       { label: 'Clear Cache', section: ROOT_SECTIONS.CLEAR_CACHE },
@@ -353,7 +355,10 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         },
         {
           section: ALL_SECTIONS.CONNECTED_ACCOUNTS, // Displayed as "Social accounts"
-          if: isOneOfTypes(account, [COLLECTIVE, ORGANIZATION]) && !isAccountantOnly,
+          if:
+            isOneOfTypes(account, [COLLECTIVE, ORGANIZATION]) &&
+            !isAccountantOnly &&
+            account.connectedAccounts?.some(({ service }) => service === ConnectedAccountService.twitter),
         },
         // Host sections
         ...(isHost || isSelfHosted

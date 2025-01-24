@@ -7,7 +7,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import type { GetActions } from '../../../../../lib/actions/types';
 import { i18nGraphqlException } from '../../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../../lib/graphql/helpers';
-import type { TransactionsImportRow } from '../../../../../lib/graphql/types/v2/graphql';
+import type { TransactionsImportRow } from '../../../../../lib/graphql/types/v2/schema';
 
 import { useModal } from '../../../../ModalContext';
 import StyledSpinner from '../../../../StyledSpinner';
@@ -138,7 +138,7 @@ export function useTransactionsImportActions({ transactionsImport, host }): {
           {row.isDismissed ? (
             <FormattedMessage defaultMessage="Revert" id="amT0Gh" />
           ) : (
-            <FormattedMessage defaultMessage="Ignore" id="paBpxN" />
+            <FormattedMessage defaultMessage="No action" id="zue9QR" />
           )}
           {isUpdatingRow && <StyledSpinner size={14} ml={2} />}
         </div>

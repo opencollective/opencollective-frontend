@@ -26,9 +26,9 @@ import { accountExpensesQuery } from './queries';
 const ROUTE_PARAMS = ['slug', 'section', 'subpath'];
 
 const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
+  const router = useRouter();
   const [isExpenseFlowOpen, setIsExpenseFlowOpen] = React.useState(false);
   const [duplicateExpenseId, setDuplicateExpenseId] = React.useState(null);
-  const router = useRouter();
   const { LoggedInUser } = useLoggedInUser();
 
   const queryFilter = useQueryFilter({

@@ -12,16 +12,17 @@ import { i18nGraphqlException } from '../../lib/errors';
 import { requireFields, verifyEmailPattern, verifyURLPattern } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import type { DashboardVendorsQuery } from '../../lib/graphql/types/v2/graphql';
-import { UploadedFileKind } from '../../lib/graphql/types/v2/graphql';
+import { UploadedFileKind } from '../../lib/graphql/types/v2/schema';
 import { useImageUploader } from '../../lib/hooks/useImageUploader';
 import { elementFromClass } from '../../lib/react-utils';
 import { cn, omitDeep } from '../../lib/utils';
+import { isImageServiceUrl } from '@/lib/image-utils';
 
 import Avatar from '../Avatar';
 import { useDrawerActionsContainer } from '../Drawer';
+import { DROPZONE_ACCEPT_IMAGES } from '../Dropzone';
 import PayoutMethodForm from '../expenses/PayoutMethodForm';
 import PayoutMethodSelect from '../expenses/PayoutMethodSelect';
-import { DROPZONE_ACCEPT_IMAGES } from '../StyledDropzone';
 import StyledInput from '../StyledInput';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledInputGroup from '../StyledInputGroup';
@@ -203,6 +204,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
     const data = omitDeep(
       {
         ...pick(values, EDITABLE_FIELDS),
+        imageUrl: isImageServiceUrl(values.imageUrl) ? undefined : values.imageUrl,
         vendorInfo: {
           ...pick(values.vendorInfo, ['contact', 'notes', 'taxFormUrl', 'taxFormRequired', 'taxId', 'taxType']),
           taxType:
@@ -239,7 +241,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
     { label: 'GST', value: 'GST' },
     { label: <FormattedMessage id="taxType.Other" defaultMessage="Other" />, value: 'OTHER' },
   ];
-  const initialValues = cloneDeep(pick(vendor, EDITABLE_FIELDS));
+  const initialValues = omitDeep(cloneDeep(pick(vendor, EDITABLE_FIELDS)), ['__typename']);
   if (initialValues.vendorInfo?.taxType && !['EIN', 'VAT', 'GST'].includes(initialValues.vendorInfo?.taxType)) {
     initialValues.vendorInfo['otherTaxType'] = initialValues.vendorInfo?.taxType;
     initialValues.vendorInfo.taxType = 'OTHER';

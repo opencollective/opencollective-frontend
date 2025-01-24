@@ -10,7 +10,7 @@ import styled from 'styled-components';
 import { confettiFireworks } from '../../lib/confettis';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import { SocialLinkType } from '../../lib/graphql/types/v2/graphql';
+import { SocialLinkType } from '../../lib/graphql/types/v2/schema';
 import { editCollectiveContactMutation, editCollectiveMembersMutation } from '../../lib/graphql/v1/mutations';
 import { compose, isValidUrl } from '../../lib/utils';
 

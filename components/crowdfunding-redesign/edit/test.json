@@ -1,0 +1,12 @@
+{
+  "apply": true,
+  "features": { "virtualCards": true },
+  "crowdfundingRedesign": {
+    "profile": {
+      "name": "Open Source Collective org",
+      "cover": { "url": null, "type": "IMAGE" },
+      "description": "This is the Open Source Collective. Consider supporting the open source projects directly or become a member of the Open Source Collective and support all projects. ",
+      "longDescription": null
+    }
+  }
+}

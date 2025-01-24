@@ -132,6 +132,7 @@ interface CollectiveInterface {
   stats: CollectiveStatsType
   transactions(type: String, limit: Int, offset: Int, includeExpenseTransactions: Boolean): [Transaction]
   expenses(type: String, limit: Int, offset: Int, status: String, includeHostedCollectives: Boolean): [ExpenseType]
+    @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   The list of expense types supported by this account
@@ -371,7 +372,7 @@ type OrderType {
   """
   Whether this subscription is past due or not
   """
-  isPastDue: Boolean
+  isPastDue: Boolean @deprecated(reason: "2024-12-13: Not used, so we stop returning it.")
 
   """
   If there is a subscription, is it active?
@@ -895,9 +896,9 @@ type ExpenseType {
   tags: [String]
   status: String
   type: String
-  PayoutMethod: PayoutMethod
+  PayoutMethod: PayoutMethod @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
   privateMessage: String
-  items: [ExpenseItem]
+  items: [ExpenseItem] @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
   attachedFiles: [ExpenseAttachedFile!]
   user: UserDetails
   fromCollective: CollectiveInterface
@@ -967,27 +968,29 @@ type SocialLink {
 The type of social link
 """
 enum SocialLinkType {
-  TWITTER
-  TUMBLR
-  MASTODON
-  MATTERMOST
-  SLACK
-  LINKEDIN
-  MEETUP
-  FACEBOOK
-  INSTAGRAM
+  BLUESKY
   DISCORD
-  YOUTUBE
+  DISCOURSE
+  FACEBOOK
+  GHOST
+  GIT
   GITHUB
   GITLAB
-  GIT
-  WEBSITE
-  DISCOURSE
-  PIXELFED
-  GHOST
+  INSTAGRAM
+  LINKEDIN
+  MASTODON
+  MATTERMOST
+  MEETUP
   PEERTUBE
+  PIXELFED
+  SLACK
+  THREADS
   TIKTOK
+  TUMBLR
   TWITCH
+  TWITTER
+  WEBSITE
+  YOUTUBE
 }
 
 """
@@ -1134,6 +1137,7 @@ type PlanType {
 
 type Policies {
   id: String
+  EXPENSE_POLICIES: EXPENSE_POLICIES
   EXPENSE_AUTHOR_CANNOT_APPROVE: EXPENSE_AUTHOR_CANNOT_APPROVE
   REQUIRE_2FA_FOR_ADMINS: Boolean
   COLLECTIVE_ADMINS_CAN_REFUND: Boolean
@@ -1142,6 +1146,12 @@ type Policies {
   EXPENSE_CATEGORIZATION: EXPENSE_CATEGORIZATION
   EXPENSE_PUBLIC_VENDORS: Boolean
   COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS: Boolean
+}
+
+type EXPENSE_POLICIES {
+  invoicePolicy: String
+  receiptPolicy: String
+  titlePolicy: String
 }
 
 type EXPENSE_AUTHOR_CANNOT_APPROVE {
@@ -1973,7 +1983,7 @@ type CollectiveStatsType {
   """
   Breakdown of expenses submitted to this collective by type (ALL/PENDING/APPROVED/PAID/REJECTED)
   """
-  expenses: ExpensesStatsType
+  expenses: ExpensesStatsType @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   Number of transactions
@@ -2286,6 +2296,7 @@ type Collective implements CollectiveInterface {
     includeExpenseTransactions: Boolean
   ): [Transaction]
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
+    @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   The list of expense types supported by this account
@@ -2555,6 +2566,7 @@ type Event implements CollectiveInterface {
     includeExpenseTransactions: Boolean
   ): [Transaction]
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
+    @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   The list of expense types supported by this account
@@ -2824,6 +2836,7 @@ type Fund implements CollectiveInterface {
     includeExpenseTransactions: Boolean
   ): [Transaction]
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
+    @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   The list of expense types supported by this account
@@ -3093,6 +3106,7 @@ type Organization implements CollectiveInterface {
     includeExpenseTransactions: Boolean
   ): [Transaction]
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
+    @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   The list of expense types supported by this account
@@ -3362,6 +3376,7 @@ type Project implements CollectiveInterface {
     includeExpenseTransactions: Boolean
   ): [Transaction]
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
+    @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   The list of expense types supported by this account
@@ -3542,7 +3557,7 @@ type Expense implements Transaction {
   paymentMethod: PaymentMethodType
   invoiceTemplate: String
   description: String
-  expense: ExpenseType
+  expense: ExpenseType @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 }
 
 """
@@ -3557,7 +3572,7 @@ type TaxInfo {
   """
   Identifier for this tax (GST, VAT, etc)
   """
-  type: OrderTaxType!
+  type: TaxType!
 
   """
   Percentage applied, between 0-100
@@ -3578,7 +3593,7 @@ type TaxInfo {
 """
 The type of a tax like GST, VAT, etc
 """
-enum OrderTaxType {
+enum TaxType {
   """
   European Value Added Tax
   """
@@ -3926,6 +3941,7 @@ type User implements CollectiveInterface {
     includeExpenseTransactions: Boolean
   ): [Transaction]
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
+    @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   The list of expense types supported by this account
@@ -4197,6 +4213,7 @@ type Vendor implements CollectiveInterface {
     includeExpenseTransactions: Boolean
   ): [Transaction]
   expenses(type: String, limit: Int, offset: Int, includeHostedCollectives: Boolean, status: String): [ExpenseType]
+    @deprecated(reason: "2024-12-13: Please move to GraphQL v2")
 
   """
   The list of expense types supported by this account

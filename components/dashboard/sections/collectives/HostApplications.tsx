@@ -9,7 +9,7 @@ import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../..
 import { isMulti, limit, offset } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { HostApplicationsQuery, HostApplicationsQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
-import { HostApplicationStatus, LastCommentBy } from '../../../../lib/graphql/types/v2/graphql';
+import { HostApplicationStatus, LastCommentBy } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import i18nHostApplicationStatus from '../../../../lib/i18n/host-application-status';
 import { LastCommentByFilterLabels } from '../../../../lib/i18n/last-comment-by-filter';

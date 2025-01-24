@@ -5,7 +5,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { encodeDateInterval } from '../../lib/date-utils';
-import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
+import { ExpenseStatus } from '../../lib/graphql/types/v2/schema';
 
 import AmountFilter from '../budget/filters/AmountFilter';
 import PeriodFilter from '../filters/PeriodFilter';

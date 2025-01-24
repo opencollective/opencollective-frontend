@@ -24,11 +24,8 @@ import {
   PLATFORM_PRESETS,
 } from '../../lib/export-csv/transactions-csv';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import type {
-  Account,
-  HostReportsPageQueryVariables,
-  TransactionsPageQueryVariables,
-} from '../../lib/graphql/types/v2/graphql';
+import type { HostReportsPageQueryVariables, TransactionsPageQueryVariables } from '../../lib/graphql/types/v2/graphql';
+import type { Account } from '../../lib/graphql/types/v2/schema';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import type { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
@@ -108,8 +105,21 @@ const makeUrl = ({ account, isHostReport, queryFilter, flattenTaxesAndPaymentPro
     }
   }
 
+  if (queryFilter.values.clearedAt) {
+    if (queryFilter.variables.clearedFrom) {
+      url.searchParams.set('clearedFrom', queryFilter.variables.clearedFrom);
+    }
+    if (queryFilter.variables.clearedTo) {
+      url.searchParams.set('clearedTo', queryFilter.variables.clearedTo);
+    }
+  }
+
   if (!isNil(queryFilter.values.isRefund)) {
     url.searchParams.set('isRefund', queryFilter.values.isRefund ? '1' : '0');
+  }
+
+  if (!isNil(queryFilter.values.hasDebt)) {
+    url.searchParams.set('hasDebt', queryFilter.values.hasDebt ? '1' : '0');
   }
 
   if (queryFilter.values.orderId) {
@@ -298,7 +308,7 @@ const ExportTransactionsCSVModal = ({
   }, [presetOptions, preset]);
 
   React.useEffect(() => {
-    if (open) {
+    if (open && account) {
       fetchRows();
     }
   }, [queryFilter.values, account, open]);
@@ -406,7 +416,7 @@ const ExportTransactionsCSVModal = ({
 
   const isAboveRowLimit = exportedRows > 100e3;
   const expectedTimeInMinutes = Math.round((exportedRows * 1.1) / AVERAGE_TRANSACTIONS_PER_MINUTE);
-  const disabled = isAboveRowLimit || isFetchingRows || isSavingSet || isEmpty(fields);
+  const disabled = !account || isAboveRowLimit || isFetchingRows || isSavingSet || isEmpty(fields);
   const isWholeTabSelected = GROUP_FIELDS[tab]?.every(f => fields.includes(f));
   const canEditFields = preset === FIELD_OPTIONS.NEW_PRESET || isEditingPreset;
 

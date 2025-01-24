@@ -12,6 +12,7 @@ import NotFound from '../NotFound';
 import { OCFBannerWithData } from '../OCFBanner';
 import AccountSettingsForm from '../root-actions/AccountSettings';
 import AccountType from '../root-actions/AccountType';
+import { AnonymizeAccount } from '../root-actions/AnonymizeAccount';
 import BanAccount from '../root-actions/BanAccounts';
 import BanAccountsWithSearch from '../root-actions/BanAccountsWithSearch';
 import ClearCacheForAccountForm from '../root-actions/ClearCacheForAccountForm';
@@ -106,6 +107,7 @@ const ROOT_COMPONENTS = {
   [ALL_SECTIONS.ACTIVITY_LOG]: RootActivityLog,
   [ROOT_SECTIONS.ALL_COLLECTIVES]: AllCollectives,
   [ROOT_SECTIONS.BAN_ACCOUNTS]: BanAccount,
+  [ROOT_SECTIONS.ANONYMIZE_ACCOUNT]: AnonymizeAccount,
   [ROOT_SECTIONS.SEARCH_AND_BAN]: BanAccountsWithSearch,
   [ROOT_SECTIONS.MOVE_AUTHORED_CONTRIBUTIONS]: MoveAuthoredContributions,
   [ROOT_SECTIONS.MOVE_RECEIVED_CONTRIBUTIONS]: MoveReceivedContributions,

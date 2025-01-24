@@ -45,6 +45,7 @@ export const managedOrderFragment = gql`
     memo
     createdAt
     processedAt
+    lastChargedAt
     hostFeePercent
     frequency
     tier {
@@ -67,11 +68,6 @@ export const managedOrderFragment = gql`
       canSeePrivateActivities
       canSetTags
       canUpdateAccountingCategory
-    }
-    totalDonations {
-      value
-      valueInCents
-      currency
     }
     fromAccount {
       id
@@ -166,6 +162,11 @@ export const manageContributionsQuery = gql`
         nodes {
           id
           ...ManagedOrderFields
+          totalDonations {
+            value
+            valueInCents
+            currency
+          }
         }
       }
     }

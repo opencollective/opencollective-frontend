@@ -6,7 +6,7 @@ import memoizeOne from 'memoize-one';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import fetchGeoLocation from '../lib/geolocation_api';
-import { CountryIso } from '../lib/graphql/types/v2/graphql';
+import { CountryIso } from '../lib/graphql/types/v2/schema';
 import { getIntlDisplayNames } from '../lib/i18n';
 
 import { Flex } from './Grid';

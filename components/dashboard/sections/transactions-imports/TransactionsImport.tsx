@@ -26,16 +26,17 @@ import type { FilterConfig } from '../../../../lib/filters/filter-types';
 import { integer } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import {
-  type Amount,
   type TransactionsImportQuery,
   type TransactionsImportQueryVariables,
-  TransactionsImportRowStatus,
 } from '../../../../lib/graphql/types/v2/graphql';
+import { type Amount, TransactionsImportRowStatus } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nTransactionsRowStatus } from '../../../../lib/i18n/transactions-import-row';
 import { cn, sortSelectOptions } from '../../../../lib/utils';
 import { useTransactionsImportActions } from './lib/actions';
 import { TransactionsImportRowFieldsFragment } from './lib/graphql';
+
+import { accountingCategoryFields } from '@/components/expenses/graphql/fragments';
 
 import * as SyncAnimation from '../../../../public/static/animations/sync-bank-oc.json';
 import Avatar from '../../../Avatar';
@@ -93,6 +94,28 @@ const getSteps = (intl: IntlShape): StepItem[] => {
   ];
 };
 
+const transactionsImportHostFieldsFragment = gql`
+  fragment TransactionsImportHostFields on Host {
+    id
+    name
+    legalName
+    imageUrl
+    legacyId
+    slug
+    currency
+    type
+
+    accountingCategories {
+      totalCount
+      nodes {
+        id
+        ...AccountingCategoryFields
+      }
+    }
+  }
+  ${accountingCategoryFields}
+`;
+
 const transactionsImportQuery = gql`
   query TransactionsImport(
     $importId: String!
@@ -131,13 +154,17 @@ const transactionsImportQuery = gql`
       }
       account {
         id
-        name
-        legalName
-        imageUrl
-        legacyId
         slug
-        currency
-        type
+        ... on AccountWithHost {
+          host {
+            ...TransactionsImportHostFields
+          }
+        }
+        ... on Organization {
+          host {
+            ...TransactionsImportHostFields
+          }
+        }
       }
       rows(limit: $limit, offset: $offset, status: $status, searchTerm: $searchTerm) {
         totalCount
@@ -150,6 +177,7 @@ const transactionsImportQuery = gql`
     }
   }
   ${TransactionsImportRowFieldsFragment}
+  ${transactionsImportHostFieldsFragment}
 `;
 
 const transactionsImportLasSyncAtPollQuery = gql`
@@ -173,7 +201,7 @@ const getViews = intl => [
   },
   {
     id: 'IGNORED',
-    label: intl.formatMessage({ defaultMessage: 'Ignored', id: 'ignored' }),
+    label: intl.formatMessage({ defaultMessage: 'No action', id: 'zue9QR' }),
     filter: { status: TransactionsImportRowStatus.IGNORED },
   },
   {
@@ -301,7 +329,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
 
   const { getActions, setRowsDismissed } = useTransactionsImportActions({
     transactionsImport: importData,
-    host: importData?.account,
+    host: importData?.account?.['host'],
   });
 
   // Clear selection whenever the pagination changes
@@ -697,11 +725,11 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                                 >
                                   <SquareSlashIcon size={12} />
                                   {selection.includeAllPages ? (
-                                    <FormattedMessage defaultMessage="Ignore all rows" id="ogbYeo" />
+                                    <FormattedMessage defaultMessage="No action (all)" id="UFhJFs" />
                                   ) : (
                                     <FormattedMessage
-                                      defaultMessage="Ignore {selectedCount}"
-                                      id="ignore"
+                                      defaultMessage="No action ({selectedCount})"
+                                      id="B2eNk+"
                                       values={{ selectedCount: nonIgnoredRows.length }}
                                     />
                                   )}

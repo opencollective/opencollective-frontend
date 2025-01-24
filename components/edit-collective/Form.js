@@ -136,7 +136,8 @@ class EditCollectiveForm extends React.Component {
       },
       'company.description': {
         id: 'collective.company.description',
-        defaultMessage: 'Start with @ to reference an organization (e.g., @airbnb)',
+        defaultMessage:
+          'Use this field to publicly display your affiliations. Start with @ to mention an organization registered on Open Collective, e.g., @airbnb.',
       },
       'amount.label': {
         id: 'Fields.amount',

@@ -15,11 +15,14 @@
     "moduleResolution": "node",
     "typeRoots": ["node_modules/@types", "lib/custom_typings"],
     "jsx": "preserve",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "paths": {
+      "@/components/*": ["./components/*"],
+      "@/lib/*": ["./lib/*"]
+    }
   },
   "include": [
     ".eslintrc.js",
-    ".storybook/*.js",
     "components",
     "cypress",
     "*.config.*",

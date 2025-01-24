@@ -67,7 +67,14 @@ export type CSVField =
   | 'expenseCurrency'
   | 'expenseSubmittedByHandle'
   | 'expenseApprovedByHandle'
-  | 'expensePaidByHandle';
+  | 'expensePaidByHandle'
+  | 'expenseReference'
+  | 'expenseTransferReference'
+  | 'importSourceId'
+  | 'importSourceDescription'
+  | 'importSourceAmount'
+  | 'importSourceDate'
+  | 'importSourceData';
 
 const FIELD_GROUPS: Record<string, readonly CSVField[]> = {
   transaction: [
@@ -119,7 +126,16 @@ const FIELD_GROUPS: Record<string, readonly CSVField[]> = {
     'paymentMethodService',
     'paymentMethodType',
   ],
-  expense: ['expenseId', 'expenseLegacyId', 'expenseType', 'expenseTags', 'payoutMethodType', 'merchantId'],
+  expense: [
+    'expenseId',
+    'expenseLegacyId',
+    'expenseType',
+    'expenseTags',
+    'payoutMethodType',
+    'merchantId',
+    'expenseReference',
+    'expenseTransferReference',
+  ],
   tax: ['taxAmount', 'taxType', 'taxRate', 'taxIdNumber'],
   legacy: ['platformFee', 'hostFee'],
 };
@@ -228,6 +244,7 @@ export const GROUPS = {
   order: <FormattedMessage defaultMessage="Contribution" id="0LK5eg" />,
   expense: <FormattedMessage id="Expense" defaultMessage="Expense" />,
   tax: <FormattedMessage defaultMessage="Tax" id="AwzkSM" />,
+  imports: <FormattedMessage defaultMessage="Imported data" id="tmfin0" />,
   legacy: <FormattedMessage id="Legacy/Deprecated" defaultMessage="Legacy/Deprecated" />,
 };
 
@@ -737,6 +754,66 @@ export const FIELDS: Array<{
       />
     ),
     label: <FormattedMessage defaultMessage="Expense Paid By Handle" id="NaeCZ+" />,
+  },
+  {
+    id: 'expenseReference',
+    group: 'expense',
+    label: <FormattedMessage defaultMessage="Expense Reference Number" id="fnGteD" />,
+    tooltip: (
+      <FormattedMessage defaultMessage="The Reference Number submitted by the user with the expense." id="5Zh4DV" />
+    ),
+  },
+  {
+    id: 'expenseTransferReference',
+    group: 'expense',
+    label: <FormattedMessage defaultMessage="Expense Transfer Reference" id="7wB9iF" />,
+    tooltip: (
+      <FormattedMessage
+        defaultMessage="The Reference Number used when setting up the payment transfer and the actual reference the user will receive on their side."
+        id="ysFgxk"
+      />
+    ),
+  },
+  // Imported data
+  {
+    id: 'importSourceId',
+    group: 'imports',
+    label: <FormattedMessage defaultMessage="Import Source ID" id="ovrmdQ" />,
+    tooltip: (
+      <FormattedMessage
+        defaultMessage="The ID provided by the import source (e.g., bank statement transaction ID)."
+        id="3Z6Z9n"
+      />
+    ),
+  },
+  {
+    id: 'importSourceDescription',
+    group: 'imports',
+    label: <FormattedMessage defaultMessage="Import Source Description" id="OOduTH" />,
+    tooltip: (
+      <FormattedMessage
+        defaultMessage="The description extracted from the import source, usually corresponds to the bank statement description."
+        id="A/k25b"
+      />
+    ),
+  },
+  {
+    id: 'importSourceAmount',
+    group: 'imports',
+    label: <FormattedMessage defaultMessage="Import Source Amount" id="f97Ybo" />,
+    tooltip: <FormattedMessage defaultMessage="The amount extracted from the import source." id="GKRVxa" />,
+  },
+  {
+    id: 'importSourceDate',
+    group: 'imports',
+    label: <FormattedMessage defaultMessage="Import Source Date" id="cffITg" />,
+    tooltip: <FormattedMessage defaultMessage="The date extracted from the import source." id="W9/Zp3" />,
+  },
+  {
+    id: 'importSourceData',
+    group: 'imports',
+    label: <FormattedMessage defaultMessage="Import Source Data" id="0vHY8L" />,
+    tooltip: <FormattedMessage defaultMessage="The raw data from the import source as a JSON string." id="ydD0AS" />,
   },
 
   // Deprecated

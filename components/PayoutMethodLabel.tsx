@@ -2,8 +2,8 @@ import React from 'react';
 import { truncate } from 'lodash';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
-import type { PayoutMethod } from '../lib/graphql/types/v2/graphql';
-import { PayoutMethodType } from '../lib/graphql/types/v2/graphql';
+import type { PayoutMethod } from '../lib/graphql/types/v2/schema';
+import { PayoutMethodType } from '../lib/graphql/types/v2/schema';
 
 import { PayoutMethodIcon } from './PayoutMethodIcon';
 
@@ -57,7 +57,7 @@ export function PayoutMethodLabel(props: PayoutMethodLabelProps) {
         } else if (pm.data?.details?.clabe) {
           label = `Clabe ${pm.data.details.clabe}`;
         } else if (pm.data?.details?.bankgiroNumber) {
-          label = `BankGiro ${pm.data.details.bankgiroNumber}`;
+          label = `Bankgiro ${pm.data.details.bankgiroNumber}`;
         } else if (pm.data?.accountHolderName && pm.data?.currency) {
           label = `${pm.data.accountHolderName} (${pm.data.currency})`;
         }
@@ -83,11 +83,11 @@ export function PayoutMethodLabel(props: PayoutMethodLabelProps) {
 
   if (props.showIcon) {
     return (
-      <span className="whitespace-nowrap">
+      <div className="flex items-center gap-2 whitespace-nowrap">
         <PayoutMethodIcon payoutMethod={pm} />
         &nbsp;
         {label}
-      </span>
+      </div>
     );
   }
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { isEmpty } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
-import type { TransactionsImportRow } from '../../../../lib/graphql/types/v2/graphql';
+import type { TransactionsImportRow } from '../../../../lib/graphql/types/v2/schema';
 
 import DateTime from '../../../DateTime';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';

@@ -49,6 +49,8 @@ describe('Expense flow', () => {
       // Select Payout Method
       cy.getByDataCy('payout-method-select').click();
       cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
+      cy.getByDataCy('currency-picker').click();
+      cy.contains('[data-cy="select-option"]', 'US Dollar').click();
       cy.get('textarea[name="payoutMethod.data.content"]').type('Bank Account: 007');
       cy.getByDataCy('expense-next').click();
 
@@ -121,6 +123,8 @@ describe('Expense flow', () => {
       cy.getByDataCy('expense-back').click();
       cy.getByDataCy('payout-method-select').click();
       cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
+      cy.getByDataCy('currency-picker').click();
+      cy.contains('[data-cy="select-option"]', 'US Dollar').click();
       cy.get('textarea[name="payoutMethod.data.content"]').type('Bank Account: 007');
       cy.getByDataCy('expense-next').click();
       cy.getByDataCy('expense-currency-picker').click();
@@ -150,6 +154,8 @@ describe('Expense flow', () => {
       cy.getByDataCy('radio-expense-type-RECEIPT').click();
       cy.getByDataCy('payout-method-select').click();
       cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
+      cy.getByDataCy('currency-picker').click();
+      cy.contains('[data-cy="select-option"]', 'US Dollar').click();
       cy.get('textarea[name="payoutMethod.data.content"]').type('Bank Account: 007');
       cy.getByDataCy('expense-next').click();
       cy.get('textarea[name="description"]').type('An Expense with OCR enabled');
@@ -229,6 +235,8 @@ describe('Expense flow', () => {
       cy.getByDataCy('radio-expense-type-RECEIPT').click();
       cy.getByDataCy('payout-method-select').click();
       cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
+      cy.getByDataCy('currency-picker').click();
+      cy.contains('[data-cy="select-option"]', 'US Dollar').click();
       cy.get('textarea[name="payoutMethod.data.content"]').type('Bank Account: 007');
       cy.getByDataCy('expense-next').click();
       cy.get('textarea[name="description"]').type('An Expense with multi-currencies on items + OCR');
@@ -377,6 +385,8 @@ describe('Expense flow', () => {
       cy.getByDataCy('radio-expense-type-INVOICE').click();
       cy.getByDataCy('payout-method-select').click();
       cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
+      cy.getByDataCy('currency-picker').click();
+      cy.contains('[data-cy="select-option"]', 'US Dollar').click();
       cy.getByDataCy('country-select').click();
       cy.contains('[data-cy="select-option"]', 'Angola').click();
       cy.get('input[data-cy="address-address1"]').type('Street Name, 123');
@@ -489,6 +499,8 @@ describe('Expense flow', () => {
 
         cy.getByDataCy('payout-method-select').click();
         cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
+        cy.getByDataCy('currency-picker').click();
+        cy.contains('[data-cy="select-option"]', 'US Dollar').click();
         cy.get('textarea[name="payoutMethod.data.content"]').type('make it rain');
 
         cy.getByDataCy('expense-next').click();
@@ -570,6 +582,8 @@ describe('Expense flow', () => {
 
         cy.getByDataCy('payout-method-select').click();
         cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
+        cy.getByDataCy('currency-picker').click();
+        cy.contains('[data-cy="select-option"]', 'US Dollar').click();
         cy.get('textarea[name="payoutMethod.data.content"]').type('make it rain');
 
         cy.getByDataCy('expense-next').click();
@@ -623,6 +637,8 @@ describe('Expense flow', () => {
       // Fill payee / payout method
       cy.getByDataCy('payout-method-select').click();
       cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
+      cy.getByDataCy('currency-picker').click();
+      cy.contains('[data-cy="select-option"]', 'US Dollar').click();
       cy.get('textarea[name="payoutMethod.data.content"]').type('Bank Account: 007');
       cy.getByDataCy('country-select').click();
       cy.contains('[data-cy="select-option"]', 'Angola').click();
@@ -803,7 +819,8 @@ describe('Expense flow', () => {
       cy.get('[data-cy="edit-collective-btn"]:visible').click();
       cy.getByDataCy('menu-item-Settings').click();
       cy.getByDataCy('menu-item-policies').click();
-      cy.getByDataCy('expense-policy-input').type('this is my test expense policy');
+      cy.getByDataCy('invoice-expense-policy-input').click().type('this is my test expense policy');
+      cy.getByDataCy('receipt-expense-policy-input').click().type('this is my test expense policy');
       cy.getByDataCy('submit-policy-btn').click();
       cy.visit(expenseUrl);
       cy.get('[data-cy="collective-navbar-actions-btn"]:visible').click();
@@ -813,7 +830,8 @@ describe('Expense flow', () => {
 
     it('Projects inherit and display expense policy from parent collective', () => {
       cy.login({ email: user.email, redirect: `/dashboard/${collective.slug}/policies` });
-      cy.getByDataCy('expense-policy-input').type('this is my test expense policy');
+      cy.getByDataCy('invoice-expense-policy-input').click().type('this is my test expense policy');
+      cy.getByDataCy('receipt-expense-policy-input').click().type('this is my test expense policy');
       cy.getByDataCy('submit-policy-btn').click();
       cy.createProject({ userEmail: user.email, collective }).then(project => {
         cy.visit(`/${project.slug}/expenses/new`);

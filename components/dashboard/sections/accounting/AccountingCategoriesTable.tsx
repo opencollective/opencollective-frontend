@@ -5,11 +5,11 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { CollectiveType } from '../../../../lib/constants/collectives';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type {
-  AccountingCategory,
   AccountingCategoryTableQuery,
   AccountingCategoryTableQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import { AccountingCategoryKind } from '../../../../lib/graphql/types/v2/graphql';
+import type { AccountingCategory } from '../../../../lib/graphql/types/v2/schema';
+import { AccountingCategoryKind } from '../../../../lib/graphql/types/v2/schema';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 
 import { I18nItalic } from '../../../I18nFormatters';

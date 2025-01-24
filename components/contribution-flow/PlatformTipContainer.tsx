@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../lib/currency-utils';
-import type { Currency } from '../../lib/graphql/types/v2/graphql';
+import type { Currency } from '../../lib/graphql/types/v2/schema';
 import theme from '../../lib/theme';
 
 import { Box, Flex } from '../Grid';
@@ -154,7 +154,7 @@ export function PlatformTipContainer(props: PlatformTipContainerProps) {
     setIsCollapsed(true);
   }, [props.step]);
 
-  const percentage = props.value / props.amount;
+  const percentage = props.value && props.amount && props.amount > 0 ? props.value / props.amount : 0;
 
   const message = React.useMemo(() => {
     if (percentage <= 0) {

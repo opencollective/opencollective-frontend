@@ -1,7 +1,7 @@
 import type { IntlShape } from 'react-intl';
 import { defineMessages } from 'react-intl';
 
-import { TransactionsImportRowStatus } from '../graphql/types/v2/graphql';
+import { TransactionsImportRowStatus } from '../graphql/types/v2/schema';
 
 const MESSAGES = defineMessages({
   ALL: {
@@ -9,8 +9,8 @@ const MESSAGES = defineMessages({
     id: 'transactions.all',
   },
   [TransactionsImportRowStatus.IGNORED]: {
-    defaultMessage: 'Ignored',
-    id: 'transaction.ignored',
+    defaultMessage: 'No action',
+    id: 'zue9QR',
   },
   [TransactionsImportRowStatus.LINKED]: {
     defaultMessage: 'Imported',

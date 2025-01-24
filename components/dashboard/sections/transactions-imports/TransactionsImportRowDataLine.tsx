@@ -61,19 +61,26 @@ const filterEmptyValues = value => {
       return null;
     }
   } else if (typeof value === 'object' && value !== null) {
-    return Object.fromEntries(
+    const cleanObject = Object.fromEntries(
       Object.entries(value)
         .map(([key, value]) => [key, filterEmptyValues(value)])
         .filter(([, value]) => !isEmpty(value)),
     );
+
+    return isEmpty(cleanObject) ? null : cleanObject;
   }
 
   return value;
 };
 
+const checkIfKeyIsUnwanted = (key: string) => {
+  return ['personal_finance_category_icon_url', 'personal_finance_category_icon_url'].includes(key);
+};
+
 export const TransactionsImportRowDataLine = ({ value, labelKey, level = 0 }) => {
+  const isUnwanted = React.useMemo(() => checkIfKeyIsUnwanted(labelKey), [labelKey]);
   const cleanValue = React.useMemo(() => filterEmptyValues(value), [value]);
-  if (!cleanValue) {
+  if (isUnwanted || !cleanValue) {
     return null;
   }
 

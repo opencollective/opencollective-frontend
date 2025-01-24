@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { CommentType } from '../../lib/graphql/types/v2/graphql';
+import { CommentType } from '../../lib/graphql/types/v2/schema';
 
 import Container from '../Container';
 import { Box, Flex } from '../Grid';

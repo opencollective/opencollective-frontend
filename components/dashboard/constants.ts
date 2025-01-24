@@ -45,6 +45,7 @@ export const ROOT_SECTIONS = {
   UNHOST_ACCOUNTS: 'unhost-accounts',
   ACCOUNT_SETTINGS: 'account-settings',
   ACCOUNT_TYPE: 'account-type',
+  ANONYMIZE_ACCOUNT: 'anonymize-account',
   RECURRING_CONTRIBUTIONS: 'recurring-contributions',
 };
 

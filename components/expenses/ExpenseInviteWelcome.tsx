@@ -29,7 +29,7 @@ type ExpenseInviteWelcomeProps = {
 export default function ExpenseInviteWelcome(props: ExpenseInviteWelcomeProps) {
   return (
     <React.Fragment>
-      <div className="mb-4 items-center gap-4 rounded-md border border-[#DCDDE0] px-6 py-3 md:flex">
+      <div className="mb-8 items-center gap-4 rounded-md border border-[#DCDDE0] px-6 py-3 md:flex">
         <Image
           className="hidden object-contain md:block"
           alt=""
