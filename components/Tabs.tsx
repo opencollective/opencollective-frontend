@@ -80,7 +80,7 @@ const Tabs = ({ tabs, selectedId, onChange, ...props }: TabsProps) => {
               )}
             >
               <div className="font-bold">{tab.label}</div>
-              {!isNil(tab.count) && <div className="text-xs text-slate-600">({tab.count})</div>}
+              {!isNil(tab.count) && !isNaN(tab.count) && <div className="text-xs text-slate-600">({tab.count})</div>}
             </button>
           );
         })}
