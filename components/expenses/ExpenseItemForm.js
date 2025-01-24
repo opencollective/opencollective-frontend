@@ -510,6 +510,7 @@ const ExpenseItemForm = ({
                 <ExchangeRate
                   data-cy={`${getFieldName('amountV2')}-exchange-rate`}
                   className="mt-2 text-neutral-600"
+                  loading={loadingExchangeRate}
                   {...getExpenseExchangeRateWarningOrError(intl, exchangeRate, referenceExchangeRate)}
                   exchangeRate={
                     exchangeRate || {
