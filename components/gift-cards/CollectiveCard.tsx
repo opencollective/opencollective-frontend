@@ -2,7 +2,7 @@ import React from 'react';
 import { has } from 'lodash';
 import type { ReactNode } from 'react';
 
-import type { GraphQLV1Collective } from '../../lib/custom_typings/GraphQLV1Collective';
+import type { GraphQLV1Collective } from '../../lib/custom_typings/GraphQLV1';
 
 import Avatar from '../Avatar';
 import Container from '../Container';

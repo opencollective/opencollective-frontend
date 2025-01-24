@@ -472,6 +472,8 @@ function AddCreditCardButton(props: AddCreditCardButtonProps) {
             onClick={submitNewCard}
             disabled={isSubmitting}
             loading={isSubmitting}
+            data-cy="save-credit-card-button"
+            data-loading={isSubmitting}
           >
             <FormattedMessage id="save" defaultMessage="Save" />
           </StyledButton>
