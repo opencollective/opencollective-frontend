@@ -302,10 +302,14 @@ function Expense(props) {
   };
 
   const onEditBtnClick = async () => {
+    props.stopPolling?.();
     return setState(state => ({ ...state, status: PAGE_STATUS.EDIT, editedExpense: data?.expense }));
   };
 
-  const onCancel = () => setState(state => ({ ...state, status: PAGE_STATUS.VIEW, editedExpense: null }));
+  const onCancel = () => {
+    props.startPolling?.(pollingInterval * 1000);
+    return setState(state => ({ ...state, status: PAGE_STATUS.VIEW, editedExpense: null }));
+  };
 
   const onDelete = async expense => {
     const collective = expense.account;
@@ -336,6 +340,7 @@ function Expense(props) {
         await refetch();
       }
       const createdUser = editedExpense.payee;
+      props.startPolling?.(pollingInterval * 1000);
       setState(state => ({
         ...state,
         status: PAGE_STATUS.VIEW,
