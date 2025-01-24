@@ -194,84 +194,116 @@ const currencyExchangeRateQuery = gql`
   }
 `;
 
+const getDefaultExchangeRate = (itemCurrency, expenseCurrency) => ({
+  value: null,
+  source: 'USER',
+  fromCurrency: itemCurrency,
+  toCurrency: expenseCurrency,
+  date: null,
+});
+
+const isValidExchangeRate = (exchangeRate, itemCurrency, expenseCurrency) => {
+  return Boolean(
+    exchangeRate &&
+      exchangeRate.source === 'USER' &&
+      exchangeRate.fromCurrency === itemCurrency &&
+      exchangeRate.toCurrency === expenseCurrency &&
+      exchangeRate.value,
+  );
+};
+
+const extractFormValues = (form, itemPath) => ({
+  expenseCurrency: get(form.values, 'currency'),
+  item: get(form.values, itemPath) || {},
+});
+
 /**
  * A hook that queries the exchange rate if needed and updates the form with the result.
  */
 const useExpenseItemExchangeRate = (form, itemPath) => {
-  const expenseCurrency = get(form.values, 'currency');
-  const itemValues = get(form.values, itemPath);
-  const itemCurrency = itemValues?.amountV2?.currency || expenseCurrency;
-  const incurredAt = standardizeExpenseItemIncurredAt(get(itemValues, 'incurredAt'));
-  const existingExchangeRate = get(itemValues, 'amountV2.exchangeRate');
-  const defaultExchangeRate = {
-    value: null,
-    source: 'USER', // User has to submit an exchange rate manually
-    fromCurrency: itemCurrency,
-    toCurrency: expenseCurrency,
-    date: null,
-  };
+  // We use a ref as `useQuery` callbacks are not guaranteed to be called with the latest values
+  const formValues = React.useRef(extractFormValues(form, itemPath));
+  React.useEffect(() => {
+    formValues.current = extractFormValues(form, itemPath);
+  });
 
   // Do not query exchange rate...
   const shouldSkipExchangeRateQuery = () => {
-    const itemCurrency = get(itemValues, 'amountV2.currency') || expenseCurrency;
-    // if expense currency is not set or if item currency is the same as expense currency
+    const { expenseCurrency, item } = formValues.current;
+    const itemCurrency = get(item, 'amountV2.currency') || expenseCurrency;
+    // ...if expense currency is not set or if item currency is the same as expense currency
     if (!expenseCurrency || !itemCurrency || expenseCurrency === itemCurrency) {
       return true;
     }
 
-    // if we already have a valid exchange rate from Open Collective
+    // ...if we already have a valid exchange rate from Open Collective
+    const existingExchangeRate = get(item, 'amountV2.exchangeRate');
     return Boolean(
       existingExchangeRate &&
         existingExchangeRate.source === 'OPENCOLLECTIVE' &&
         existingExchangeRate.fromCurrency === itemCurrency &&
         existingExchangeRate.toCurrency === expenseCurrency &&
         existingExchangeRate.value &&
-        dayjs(existingExchangeRate?.date).isSame(dayjs(incurredAt)),
-    );
-  };
-
-  const hasValidUserProvidedExchangeRate = () => {
-    return Boolean(
-      existingExchangeRate &&
-        existingExchangeRate.source === 'USER' &&
-        existingExchangeRate.fromCurrency === itemCurrency &&
-        existingExchangeRate.toCurrency === expenseCurrency &&
-        existingExchangeRate.value,
+        dayjs(existingExchangeRate?.date).isSame(dayjs(standardizeExpenseItemIncurredAt(get(item, 'incurredAt')))),
     );
   };
 
   // If the item exchange rate isn't valid anymore, let's make sure we invalidate it
   React.useEffect(() => {
+    const newItemValues = {};
+    const { expenseCurrency, item } = formValues.current;
+    const existingExchangeRate = get(item, 'amountV2.exchangeRate');
     if (existingExchangeRate && existingExchangeRate.toCurrency !== expenseCurrency) {
-      form.setFieldValue(`${itemPath}.amountV2.exchangeRate`, null);
+      newItemValues.amountV2 = { ...item.amountV2, exchangeRate: null };
     }
-  }, [existingExchangeRate, itemCurrency, expenseCurrency]);
+    if (item.referenceExchangeRate && item.referenceExchangeRate.toCurrency !== expenseCurrency) {
+      newItemValues.referenceExchangeRate = null;
+    }
+
+    if (!isEmpty(newItemValues)) {
+      form.setFieldValue(itemPath, { ...item, ...newItemValues });
+    }
+  }, [form, itemPath]);
 
   const { loading } = useQuery(currencyExchangeRateQuery, {
     skip: shouldSkipExchangeRateQuery(),
     context: API_V2_CONTEXT,
     variables: {
-      requests: [{ fromCurrency: itemCurrency, toCurrency: expenseCurrency, date: incurredAt }],
+      requests: [
+        {
+          fromCurrency: formValues.current.item.amountV2?.currency,
+          toCurrency: formValues.current.expenseCurrency,
+          date: standardizeExpenseItemIncurredAt(formValues.current.item.incurredAt),
+        },
+      ],
     },
     onCompleted: data => {
       // Re-check condition in case it changed since triggering the query
-      if (!shouldSkipExchangeRateQuery() && !hasValidUserProvidedExchangeRate()) {
+      const { expenseCurrency, item } = formValues.current;
+      const itemCurrency = get(item, 'amountV2.currency') || expenseCurrency;
+      const existingExchangeRate = get(item, 'amountV2.exchangeRate');
+      if (!shouldSkipExchangeRateQuery() && !isValidExchangeRate(existingExchangeRate, itemCurrency, expenseCurrency)) {
         const exchangeRate = get(data, 'currencyExchangeRate[0]');
         if (exchangeRate && exchangeRate.fromCurrency === itemCurrency && exchangeRate.toCurrency === expenseCurrency) {
           form.setFieldValue(itemPath, {
-            ...itemValues,
-            amountV2: { ...itemValues?.amountV2, exchangeRate },
+            ...item,
+            amountV2: { ...item.amountV2, exchangeRate },
             referenceExchangeRate: exchangeRate,
           });
         } else {
           // If we're not able to find an exchange rate, we'll ask the user to provide one manually
-          form.setFieldValue(`${itemPath}.amountV2.exchangeRate`, defaultExchangeRate);
+          form.setFieldValue(itemPath, {
+            ...item,
+            amountV2: { ...item.amountV2, exchangeRate: getDefaultExchangeRate(itemCurrency, expenseCurrency) },
+            referenceExchangeRate: null,
+          });
         }
       }
     },
     onError: () => {
       // If the API fails (e.g. network error), we'll ask the user to provide an exchange rate manually
-      form.setFieldValue(`${itemPath}.amountV2.exchangeRate`, defaultExchangeRate);
+      const { expenseCurrency, item } = formValues.current;
+      form.setFieldValue(`${itemPath}.amountV2.exchangeRate`, getDefaultExchangeRate(item.currency, expenseCurrency));
     },
   });
 
