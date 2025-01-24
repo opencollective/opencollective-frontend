@@ -35,7 +35,7 @@ const getProfileInfo = (stepProfile, profiles) => {
 };
 
 const StepProfileLoggedInForm = ({ profiles, onChange, collective, tier, data, stepDetails }) => {
-  const profileInfo = React.useMemo(() => getProfileInfo(data, profiles, collective), [data, profiles, collective]);
+  const profileInfo = React.useMemo(() => getProfileInfo(data, profiles), [data, profiles]);
   const requiredInformation = React.useMemo(
     () => getRequiredInformation(data, stepDetails, collective, profiles, tier),
     [data, stepDetails, profiles, collective, tier],

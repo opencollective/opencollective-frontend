@@ -31,7 +31,7 @@ import {
   type TransactionsImportQuery,
   type TransactionsImportQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import { type Amount, TransactionsImportRowStatus } from '../../../../lib/graphql/types/v2/schema';
+import { type Account, type Amount, TransactionsImportRowStatus } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nTransactionsRowStatus } from '../../../../lib/i18n/transactions-import-row';
 import { cn, sortSelectOptions } from '../../../../lib/utils';
@@ -392,7 +392,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                       <StepMapCSVColumns
                         importId={importId}
                         file={csvFile}
-                        currency={importData.account.currency}
+                        currency={(importData.account as Account).currency}
                         onSuccess={refetch}
                       />
                     ) : null}
