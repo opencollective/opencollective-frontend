@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { getEmojiByCurrencyCode } from 'country-currency-emoji-flags';
 import { clamp, isNil, isUndefined, round } from 'lodash';
 
-import { Currency, ZERO_DECIMAL_CURRENCIES } from '../lib/constants/currency';
+import { Currency } from '../lib/constants/currency';
 import { floatAmountToCents, getCurrencySymbol, getDefaultCurrencyPrecision } from '../lib/currency-utils';
 import { cn } from '../lib/utils';
 
@@ -163,7 +163,7 @@ const StyledInputAmount = ({
   name = 'amount',
   min = 0,
   max = 100000000000,
-  precision = ZERO_DECIMAL_CURRENCIES.includes(currency) ? 0 : 2,
+  precision = getDefaultCurrencyPrecision(currency),
   defaultValue = undefined,
   value,
   onBlur = undefined,

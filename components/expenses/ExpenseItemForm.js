@@ -9,7 +9,7 @@ import { AlertTriangle } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
-import { formatValueAsCurrency } from '../../lib/currency-utils';
+import { formatCurrency, formatValueAsCurrency, getDefaultCurrencyPrecision } from '../../lib/currency-utils';
 import { createError, ERROR } from '../../lib/errors';
 import { standardizeExpenseItemIncurredAt } from '../../lib/expenses';
 import { formatFormErrorMessage, requireFields } from '../../lib/form-utils';
@@ -502,9 +502,9 @@ const ExpenseItemForm = ({
                           value={field.value?.valueInCents}
                           currency={itemCurrency}
                           currencyDisplay="CODE"
-                          min={isOptional ? undefined : 1}
+                          min={isOptional ? undefined : 10 ** (2 - getDefaultCurrencyPrecision(itemCurrency))} // Precision is 2 for USD, 0 for JPY, so min is 0.01 for USD, 1 for JPY
                           maxWidth="100%"
-                          placeholder="0.00"
+                          placeholder={formatCurrency(0, itemCurrency, { style: 'decimal' })}
                           hasCurrencyPicker={hasCurrencyPicker}
                           loadingExchangeRate={loadingExchangeRate}
                           exchangeRate={field.value?.exchangeRate}
