@@ -54,7 +54,7 @@ const AdminPanelSideBar = ({
         )}
       </div>
     ),
-    [isLoading, activeSlug, viewport, LoggedInUser],
+    [isLoading, activeSlug, viewport, LoggedInUser, menuItems],
   );
 
   return (

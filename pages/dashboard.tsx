@@ -10,6 +10,7 @@ import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { require2FAForAdmins } from '../lib/policies';
 import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
+import useLocalStorage from '@/lib/hooks/useLocalStorage';
 
 import {
   ALL_SECTIONS,
@@ -33,7 +34,40 @@ import Page from '../components/Page';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { TwoFactorAuthRequiredMessage } from '../components/TwoFactorAuthRequiredMessage';
 import { useWorkspace } from '../components/WorkspaceProvider';
+import { Label } from '@/components/ui/Label';
+import { Switch } from '@/components/ui/Switch';
 
+function SidebarPrototypeSettings({ sidebarPrototypeSettings, setSidebarPrototypeSettings }) {
+  return (
+    <div className="fixed bottom-4 right-4 rounded-xl border bg-white shadow-lg">
+      <div className="border-b p-6">
+        <div className="flex flex-row items-center justify-between gap-4">
+          <div className="space-y-0.5">
+            <Label className="text-base">Sidebar prototype enabled</Label>
+          </div>
+          <Switch
+            checked={sidebarPrototypeSettings.enabled}
+            onCheckedChange={checked => setSidebarPrototypeSettings({ ...sidebarPrototypeSettings, enabled: checked })}
+          />
+        </div>
+      </div>
+      <div className="p-6">
+        <div className="flex flex-row items-center justify-between gap-4">
+          <div className="space-y-0.5">
+            <Label className="">Ledger as top-level item</Label>
+          </div>
+          <Switch
+            checked={sidebarPrototypeSettings.topLevelLedger}
+            disabled={!sidebarPrototypeSettings.enabled}
+            onCheckedChange={checked =>
+              setSidebarPrototypeSettings({ ...sidebarPrototypeSettings, topLevelLedger: checked })
+            }
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
 const messages = defineMessages({
   collectiveIsArchived: {
     id: 'collective.isArchived',
@@ -185,8 +219,14 @@ const DashboardPage = () => {
   const isLoading = loading || loadingLoggedInUser;
   const blocker = !isLoading && getBlocker(LoggedInUser, account, selectedSection);
   const titleBase = intl.formatMessage({ id: 'Dashboard', defaultMessage: 'Dashboard' });
-  const menuItems = account ? getMenuItems({ intl, account, LoggedInUser }) : [];
   const accountIdentifier = account && (account.name || `@${account.slug}`);
+
+  const [sidebarPrototypeSettings, setSidebarPrototypeSettings] = useLocalStorage('sidebar-prototype', {
+    enabled: true,
+    topLevelLedger: false,
+  });
+
+  const menuItems = account ? getMenuItems({ intl, account, LoggedInUser, sidebarPrototypeSettings }) : [];
 
   let subMenu = null;
   const parentMenuItem = menuItems.find(
@@ -290,6 +330,10 @@ const DashboardPage = () => {
         </Page>
         <Footer />
       </div>
+      <SidebarPrototypeSettings
+        sidebarPrototypeSettings={sidebarPrototypeSettings}
+        setSidebarPrototypeSettings={setSidebarPrototypeSettings}
+      />
     </DashboardContext.Provider>
   );
 };
