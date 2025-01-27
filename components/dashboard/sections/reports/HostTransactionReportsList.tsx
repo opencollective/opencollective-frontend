@@ -3,19 +3,19 @@ import { useQuery } from '@apollo/client';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
-import dayjs from '../../../../../lib/dayjs';
-import { integer } from '../../../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../../../lib/graphql/helpers';
-import useQueryFilter from '../../../../../lib/hooks/useQueryFilter';
+import dayjs from '../../../../lib/dayjs';
+import { integer } from '../../../../lib/filters/schemas';
+import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
+import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
-import FormattedMoneyAmount from '../../../../FormattedMoneyAmount';
-import MessageBoxGraphqlError from '../../../../MessageBoxGraphqlError';
-import { DataTable } from '../../../../table/DataTable';
-import Tabs from '../../../../Tabs';
-import { DashboardContext } from '../../../DashboardContext';
-import DashboardHeader from '../../../DashboardHeader';
-import { Pagination } from '../../../filters/Pagination';
-import type { DashboardSectionProps } from '../../../types';
+import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
+import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
+import { DataTable } from '../../../table/DataTable';
+import Tabs from '../../../Tabs';
+import { DashboardContext } from '../../DashboardContext';
+import DashboardHeader from '../../DashboardHeader';
+import { Pagination } from '../../filters/Pagination';
+import type { DashboardSectionProps } from '../../types';
 
 import { CurrentPeriodBadge } from './CurrentPeriodBadge';
 import { hostReportQuery } from './queries';

@@ -2,12 +2,12 @@ import React from 'react';
 import { MoreVertical } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import dayjs from '../../../../../lib/dayjs';
-import { i18nReportSection } from '../../../../../lib/i18n/reports';
+import dayjs from '../../../../lib/dayjs';
+import { i18nReportSection } from '../../../../lib/i18n/reports';
 
-import FormattedMoneyAmount from '../../../../FormattedMoneyAmount';
-import { Button } from '../../../../ui/Button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../../ui/DropdownMenu';
+import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
+import { Button } from '../../../ui/Button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/DropdownMenu';
 
 import { DefinitionTooltip } from './DefinitionTooltip';
 import { LegacyColumnRows } from './LegacyColumnRows';

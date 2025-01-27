@@ -5,14 +5,14 @@ import dynamic from 'next/dynamic';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { alignSeries } from '../../../../lib/charts';
-import { formatCurrency } from '../../../../lib/currency-utils';
-import { i18nTransactionKind } from '../../../../lib/i18n/transaction';
+import { alignSeries } from '../../../../../lib/charts';
+import { formatCurrency } from '../../../../../lib/currency-utils';
+import { i18nTransactionKind } from '../../../../../lib/i18n/transaction';
 
-import { Box } from '../../../Grid';
-import LoadingPlaceholder from '../../../LoadingPlaceholder';
-import ProportionalAreaChart from '../../../ProportionalAreaChart';
-import { P, Span } from '../../../Text';
+import { Box } from '../../../../Grid';
+import LoadingPlaceholder from '../../../../LoadingPlaceholder';
+import ProportionalAreaChart from '../../../../ProportionalAreaChart';
+import { P, Span } from '../../../../Text';
 
 import { formatAmountForLegend } from './helpers';
 

@@ -4,35 +4,40 @@ import { ChevronDown, FlaskConical, Megaphone } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
-import { boolean } from '../../../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../../../lib/graphql/helpers';
-import useQueryFilter from '../../../../../lib/hooks/useQueryFilter';
+import { boolean } from '../../../../lib/filters/schemas';
+import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
+import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
-import { FEEDBACK_KEY, FeedbackModal } from '../../../../FeedbackModal';
-import Loading from '../../../../Loading';
-import MessageBox from '../../../../MessageBox';
-import MessageBoxGraphqlError from '../../../../MessageBoxGraphqlError';
-import { Button } from '../../../../ui/Button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../../ui/DropdownMenu';
-import { Label } from '../../../../ui/Label';
-import { Popover, PopoverContent, PopoverTrigger } from '../../../../ui/Popover';
-import { RadioGroup, RadioGroupItem } from '../../../../ui/RadioGroup';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../../../../ui/Tooltip';
-import { DashboardContext } from '../../../DashboardContext';
-import DashboardHeader from '../../../DashboardHeader';
-import ExportTransactionsCSVModal from '../../../ExportTransactionsCSVModal';
-import type { DashboardSectionProps } from '../../../types';
-import { schema as transactionsSchema, toVariables as transactionsToVariables } from '../../transactions/filters';
+import { FEEDBACK_KEY, FeedbackModal } from '../../../FeedbackModal';
+import Loading from '../../../Loading';
+import MessageBox from '../../../MessageBox';
+import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
+import { Button } from '../../../ui/Button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/DropdownMenu';
+import { Label } from '../../../ui/Label';
+import { Popover, PopoverContent, PopoverTrigger } from '../../../ui/Popover';
+import { RadioGroup, RadioGroupItem } from '../../../ui/RadioGroup';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
+import { DashboardContext } from '../../DashboardContext';
+import DashboardHeader from '../../DashboardHeader';
+import ExportTransactionsCSVModal from '../../ExportTransactionsCSVModal';
+import type { DashboardSectionProps } from '../../types';
+import {
+  schema as hostTransactionsSchema,
+  toVariables as hostTransactionsToVariables,
+} from '../transactions/HostTransactions';
 
 import { buildReport } from './report-builder/build-report';
-import { filterToTransactionsFilterValues } from './helpers';
+import { filterToHostTransactionsFilterValues } from './helpers';
+import { HostReportTabs } from './HostReportTabs';
 import { ReportNavigationArrows } from './NavigationArrows';
-import { reportQuery } from './queries';
+import { hostReportQuery } from './queries';
 import { ReportContent } from './ReportContent';
 import { deserializeReportSlug, ReportPeriodSelector } from './ReportPeriodSelector';
 import type { GroupFilter } from './types';
 
 const schema = z.object({
+  isHost: boolean.default(false),
   computational: boolean.default(false),
 });
 
@@ -41,7 +46,7 @@ enum TestLayout {
   AMOUNT = 'amount',
 }
 
-const TransactionReport = ({ accountSlug, subpath }: DashboardSectionProps) => {
+const HostTransactionReport = ({ accountSlug: hostSlug, subpath }: DashboardSectionProps) => {
   const variables = deserializeReportSlug(subpath[0]);
 
   const { account } = React.useContext(DashboardContext);
@@ -56,9 +61,9 @@ const TransactionReport = ({ accountSlug, subpath }: DashboardSectionProps) => {
 
   const [layout, setLayout] = React.useState(TestLayout.AMOUNT);
 
-  const { loading, error, data } = useQuery(reportQuery, {
+  const { loading, error, data } = useQuery(hostReportQuery, {
     variables: {
-      accountSlug,
+      hostSlug,
       ...variables,
       includeGroups: true,
     },
@@ -69,28 +74,30 @@ const TransactionReport = ({ accountSlug, subpath }: DashboardSectionProps) => {
   const [displayExportCSVModal, setDisplayExportCSVModal] = React.useState(false);
 
   // Query filter for the export transactions modal and for linking to the host transactions page with filters applied
-  const transactionsQueryFilter = useQueryFilter({
-    schema: transactionsSchema,
-    toVariables: transactionsToVariables,
+  const hostTransactionsQueryFilter = useQueryFilter({
+    schema: hostTransactionsSchema,
+    toVariables: hostTransactionsToVariables,
     filters: {},
     skipRouter: true, // we don't want to update the URL (already done by the main query filter)
   });
 
   const openExportTransactionsModal = (rowFilter: GroupFilter = {}) => {
-    const transactionsFilters = filterToTransactionsFilterValues(rowFilter, variables);
-    transactionsQueryFilter.resetFilters(transactionsFilters);
+    const transactionsFilters = filterToHostTransactionsFilterValues(hostSlug, rowFilter, variables);
+    hostTransactionsQueryFilter.resetFilters(transactionsFilters);
     setDisplayExportCSVModal(true);
   };
 
   const viewTransactions = (rowFilter: GroupFilter = {}) => {
-    const transactionsFilters = filterToTransactionsFilterValues(rowFilter, variables);
-    transactionsQueryFilter.resetFilters(transactionsFilters, `/dashboard/${accountSlug}/transactions`);
+    const transactionsFilters = filterToHostTransactionsFilterValues(hostSlug, rowFilter, variables);
+    hostTransactionsQueryFilter.resetFilters(transactionsFilters, `/dashboard/${hostSlug}/host-transactions`);
   };
 
   const showCreditDebit = layout === TestLayout.DEBITCREDIT;
+  const currentRawReport =
+    data?.host?.hostTransactionsReports?.nodes[0]?.[queryFilter.values.isHost ? 'operationalFunds' : 'managedFunds'];
 
-  const report = buildReport(data?.account?.transactionReports?.nodes[0], {
-    filter: {},
+  const report = buildReport(currentRawReport, {
+    filter: { isHost: queryFilter.values.isHost },
     showCreditDebit,
     useComputationalLayout: queryFilter.values.computational,
   });
@@ -104,14 +111,14 @@ const TransactionReport = ({ accountSlug, subpath }: DashboardSectionProps) => {
   }
   const navigateToReport = reportSlug => {
     // Updating the URL without changing any filters (e.g. isHost that controls selected tab)
-    queryFilter.setFilters({}, `/dashboard/${accountSlug}/reports/transactions/${reportSlug}`);
+    queryFilter.setFilters({}, `/dashboard/${hostSlug}/reports/transactions/${reportSlug}`);
   };
   return (
     <Fragment>
       <div className="flex max-w-screen-lg flex-col gap-4">
         <DashboardHeader
           title={<FormattedMessage id="TransactionReports" defaultMessage="Transaction Reports" />}
-          titleRoute={`/dashboard/${accountSlug}/reports/transactions`}
+          titleRoute={`/dashboard/${hostSlug}/reports/transactions`}
           subpathTitle={
             <ReportPeriodSelector value={subpath[0]} onChange={navigateToReport} meta={queryFilter.meta} intl={intl} />
           }
@@ -142,13 +149,15 @@ const TransactionReport = ({ accountSlug, subpath }: DashboardSectionProps) => {
           ) : error ? (
             <MessageBoxGraphqlError error={error} />
           ) : (
-            <div className="space-y-10 overflow-hidden rounded-xl border pb-4 pt-8">
+            <div className="space-y-10 overflow-hidden rounded-xl border pb-4">
+              <HostReportTabs queryFilter={queryFilter} />
+
               <ReportContent
-                report={report}
                 variables={variables}
+                report={report}
                 openExportTransactionsModal={openExportTransactionsModal}
                 viewTransactions={viewTransactions}
-                currency={data?.account?.currency}
+                currency={data?.host?.currency}
                 showCreditDebit={showCreditDebit}
               />
             </div>
@@ -158,14 +167,15 @@ const TransactionReport = ({ accountSlug, subpath }: DashboardSectionProps) => {
       <ExportTransactionsCSVModal
         open={displayExportCSVModal}
         setOpen={setDisplayExportCSVModal}
-        queryFilter={transactionsQueryFilter}
+        queryFilter={hostTransactionsQueryFilter}
         account={account}
+        isHostReport
       />
     </Fragment>
   );
 };
 
-export default TransactionReport;
+export default HostTransactionReport;
 
 const PreviewFeatureConfigButton = ({ layout, setLayout }) => {
   const [feedbackModalOpen, setFeedbackModalOpen] = React.useState(false);
@@ -220,8 +230,8 @@ const PreviewFeatureConfigButton = ({ layout, setLayout }) => {
         </PopoverContent>
       </Popover>
       <FeedbackModal
-        title={<FormattedMessage defaultMessage="Give feedback on the new Transactions Report" id="9XNEey" />}
-        feedbackKey={FEEDBACK_KEY.ACCOUNT_REPORTS}
+        title={<FormattedMessage defaultMessage="Give feedback on the new Host Transactions Report" id="rKPVz/" />}
+        feedbackKey={FEEDBACK_KEY.HOST_REPORTS}
         open={feedbackModalOpen}
         setOpen={setFeedbackModalOpen}
       />

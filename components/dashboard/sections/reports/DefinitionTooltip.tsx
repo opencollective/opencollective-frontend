@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { cn } from '../../../../../lib/utils';
+import { cn } from '../../../../lib/utils';
 
-import { Tooltip, TooltipContent, TooltipTrigger } from '../../../../ui/Tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 
 interface Props extends React.ComponentPropsWithoutRef<'span'> {
   definition: React.ReactNode;

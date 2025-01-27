@@ -5,14 +5,14 @@ import { get, groupBy } from 'lodash';
 import dynamic from 'next/dynamic';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
-import { i18nTransactionSettlementStatus } from '../../../../lib/i18n/transaction';
+import { API_V2_CONTEXT, gql } from '../../../../../lib/graphql/helpers';
+import { i18nTransactionSettlementStatus } from '../../../../../lib/i18n/transaction';
 
-import { ChartWrapper } from '../../../ChartWrapper';
-import { Box, Flex } from '../../../Grid';
-import LoadingPlaceholder from '../../../LoadingPlaceholder';
-import { StyledSelectFilter } from '../../../StyledSelectFilter';
-import { P } from '../../../Text';
+import { ChartWrapper } from '../../../../ChartWrapper';
+import { Box, Flex } from '../../../../Grid';
+import LoadingPlaceholder from '../../../../LoadingPlaceholder';
+import { StyledSelectFilter } from '../../../../StyledSelectFilter';
+import { P } from '../../../../Text';
 
 import { formatAmountForLegend, getActiveYearsOptions } from './helpers';
 

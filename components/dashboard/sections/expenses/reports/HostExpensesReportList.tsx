@@ -22,8 +22,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../../../../ui/Tooltip'
 import DashboardHeader from '../../../DashboardHeader';
 import { Pagination } from '../../../filters/Pagination';
 import type { DashboardSectionProps } from '../../../types';
-import { CurrentPeriodBadge } from '../../reports/preview/CurrentPeriodBadge';
-import { renderReportPeriodLabel, serializeReportSlug } from '../../reports/preview/ReportPeriodSelector';
+import { CurrentPeriodBadge } from '../../reports/CurrentPeriodBadge';
+import { renderReportPeriodLabel, serializeReportSlug } from '../../reports/ReportPeriodSelector';
 
 const schema = z.object({
   timeUnit: z.enum(['MONTH', 'QUARTER', 'YEAR']).default('MONTH'),

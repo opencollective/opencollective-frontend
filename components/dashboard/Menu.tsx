@@ -278,7 +278,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
-      if: !isHost && !isIndividual && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.HOST_REPORTS),
+      if: !isHost && !isIndividual,
       label: intl.formatMessage({ id: 'Reports', defaultMessage: 'Reports' }),
       Icon: BarChart2,
       section: ALL_SECTIONS.TRANSACTION_REPORTS,

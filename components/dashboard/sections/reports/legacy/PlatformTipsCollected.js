@@ -2,12 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import Container from '../../../Container';
-import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
-import { Box, Flex } from '../../../Grid';
-import Image from '../../../Image';
-import LoadingPlaceholder from '../../../LoadingPlaceholder';
-import { P, Span } from '../../../Text';
+import Container from '../../../../Container';
+import FormattedMoneyAmount from '../../../../FormattedMoneyAmount';
+import { Box, Flex } from '../../../../Grid';
+import Image from '../../../../Image';
+import LoadingPlaceholder from '../../../../LoadingPlaceholder';
+import { P, Span } from '../../../../Text';
 
 const AMOUNT_CLASSNAME = 'text-lg font-bold';
 

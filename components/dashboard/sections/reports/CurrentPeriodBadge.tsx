@@ -2,8 +2,8 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import type { z } from 'zod';
 
-import type { BadgeProps } from '../../../../ui/Badge';
-import { Badge } from '../../../../ui/Badge';
+import type { BadgeProps } from '../../../ui/Badge';
+import { Badge } from '../../../ui/Badge';
 
 import { isCurrentPeriod } from './helpers';
 import type { variablesSchema } from './ReportPeriodSelector';

@@ -24,9 +24,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../../../../ui/Tooltip'
 import DashboardHeader from '../../../DashboardHeader';
 import { UNCATEGORIZED_VALUE } from '../../../filters/AccountingCategoryFilter';
 import type { DashboardSectionProps } from '../../../types';
-import { HostExpensesReportTabs } from '../../reports/preview/HostReportTabs';
-import { ReportNavigationArrows } from '../../reports/preview/NavigationArrows';
-import { deserializeReportSlug, ReportPeriodSelector } from '../../reports/preview/ReportPeriodSelector';
+import { HostExpensesReportTabs } from '../../reports/HostReportTabs';
+import { ReportNavigationArrows } from '../../reports/NavigationArrows';
+import { deserializeReportSlug, ReportPeriodSelector } from '../../reports/ReportPeriodSelector';
 
 const schema = z.object({
   isHost: boolean.default(false),

@@ -5,14 +5,14 @@ import { get } from 'lodash';
 import dynamic from 'next/dynamic';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
+import { API_V2_CONTEXT, gql } from '../../../../../lib/graphql/helpers';
 
-import { ChartWrapper } from '../../../ChartWrapper';
-import ContainerOverlay from '../../../ContainerOverlay';
-import { Box, Flex } from '../../../Grid';
-import { StyledSelectFilter } from '../../../StyledSelectFilter';
-import StyledSpinner from '../../../StyledSpinner';
-import { P } from '../../../Text';
+import { ChartWrapper } from '../../../../ChartWrapper';
+import ContainerOverlay from '../../../../ContainerOverlay';
+import { Box, Flex } from '../../../../Grid';
+import { StyledSelectFilter } from '../../../../StyledSelectFilter';
+import StyledSpinner from '../../../../StyledSpinner';
+import { P } from '../../../../Text';
 
 import { formatAmountForLegend, getActiveYearsOptions, getMinMaxDifference } from './helpers';
 
