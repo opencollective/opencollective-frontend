@@ -14,14 +14,16 @@ import type {
 } from '../../../lib/graphql/types/v2/graphql';
 import { PayoutMethodType } from '../../../lib/graphql/types/v2/schema';
 
-import ConfirmationModal, { CONFIRMATION_MODAL_TERMINATE } from '../../ConfirmationModal';
+import { ComboSelect } from '@/components/ComboSelect';
+import { FormField } from '@/components/FormField';
+import { useModal } from '@/components/ModalContext';
+import { Input } from '@/components/ui/Input';
+
+import { CONFIRMATION_MODAL_TERMINATE } from '../../ConfirmationModal';
 import PayoutMethodForm, { validatePayoutMethod } from '../../expenses/PayoutMethodForm';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import { I18nPayoutMethodLabels, PayoutMethodLabel } from '../../PayoutMethodLabel';
-import StyledInput from '../../StyledInput';
-import StyledInputFormikField from '../../StyledInputFormikField';
-import StyledSelect from '../../StyledSelect';
 import { Button } from '../../ui/Button';
 import { RadioGroup, RadioGroupCard } from '../../ui/RadioGroup';
 import { useToast } from '../../ui/useToast';
@@ -274,37 +276,27 @@ function NewPayoutMethodOption(props: NewPayoutMethodOptionProps) {
   }, [createPayoutMethod, intl, props.form, setFieldValue, toast]);
 
   return (
-    <div>
+    <div className="space-y-3 p-2">
       {creatingPayoutMethod ? (
         <LoadingPlaceholder width={1} height={24} />
       ) : (
         <React.Fragment>
-          <StyledInputFormikField
+          <FormField
             label={intl.formatMessage({ defaultMessage: 'Choose a payout method', id: 'SlAq2H' })}
             isPrivate
             name="newPayoutMethod.type"
           >
             {({ field }) => (
-              <StyledSelect
-                inputId="payoutMethodType"
-                value={
-                  field.value
-                    ? {
-                        value: field.value,
-                        label: intl.formatMessage(I18nPayoutMethodLabels[field.value]),
-                      }
-                    : null
-                }
+              <ComboSelect
+                {...field}
                 options={props.form.options.supportedPayoutMethods.map(m => ({
                   value: m,
                   label: intl.formatMessage(I18nPayoutMethodLabels[m]),
                 }))}
-                onChange={(option: { value: string }) =>
-                  props.form.setFieldValue('newPayoutMethod.type', option.value as PayoutMethodType)
-                }
+                onChange={value => props.form.setFieldValue('newPayoutMethod.type', value as PayoutMethodType)}
               />
             )}
-          </StyledInputFormikField>
+          </FormField>
 
           {props.form.values.newPayoutMethod?.type && (
             <React.Fragment>
@@ -316,15 +308,12 @@ function NewPayoutMethodOption(props: NewPayoutMethodOptionProps) {
                 host={props.form.options.host}
               />
               <div>
-                <StyledInputFormikField
-                  mt={2}
-                  label={intl.formatMessage({ defaultMessage: 'Name', id: 'Fields.name' })}
+                <FormField
                   name="newPayoutMethod.name"
-                >
-                  {({ field }) => (
-                    <StyledInput {...field} onFocus={() => props.form.setFieldTouched('newPayoutMethod.name', true)} />
-                  )}
-                </StyledInputFormikField>
+                  label={intl.formatMessage({ defaultMessage: 'Name', id: 'Fields.name' })}
+                  onFocus={() => props.form.setFieldTouched('newPayoutMethod.name', true)}
+                />
+
                 {props.form.values.newPayoutMethod.name !==
                   generatePayoutMethodName(
                     props.form.values.newPayoutMethod.type,
@@ -346,7 +335,7 @@ function NewPayoutMethodOption(props: NewPayoutMethodOptionProps) {
       )}
 
       <Button loading={creatingPayoutMethod} onClick={onSaveButtonClick} className="mt-2">
-        Save
+        <FormattedMessage defaultMessage="Save" id="save" />
       </Button>
     </div>
   );
@@ -382,7 +371,6 @@ function PayoutMethodRadioGroupItem(props: {
     !isLegalNameFuzzyMatched;
   const isOpen = props.isChecked;
 
-  const [isDeletingPayoutMethod, setIsDeletingPayoutMethod] = React.useState(false);
   const [isDeleted, setIsDeleted] = React.useState(false);
 
   const [keepNameDifferent, setKeepNameDifferent] = React.useState(false);
@@ -470,11 +458,43 @@ function PayoutMethodRadioGroupItem(props: {
     },
   );
 
-  const onDeleteClick = React.useCallback(e => {
-    e.stopPropagation();
-    e.preventDefault();
-    setIsDeletingPayoutMethod(true);
-  }, []);
+  const { showConfirmationModal } = useModal();
+
+  const onDeleteClick = React.useCallback(
+    e => {
+      e.stopPropagation();
+      e.preventDefault();
+      showConfirmationModal({
+        title: intl.formatMessage({
+          defaultMessage: 'Delete Payout Method?',
+          id: 'weGvmF',
+        }),
+        description: intl.formatMessage({
+          defaultMessage: 'Are you sure you want to delete this payout method?',
+          id: 'uR+TjD',
+        }),
+        children: <PayoutMethodLabel payoutMethod={props.payoutMethod} />,
+        onConfirm: async () => {
+          try {
+            await deletePayoutMethod();
+            await props.onPaymentMethodDeleted();
+            toast({
+              variant: 'success',
+              message: <FormattedMessage defaultMessage="Payout Method deleted successfully" id="2sVunP" />,
+            });
+          } catch (e) {
+            toast({
+              variant: 'error',
+              message: i18nGraphqlException(intl, e),
+            });
+          }
+        },
+        confirmLabel: intl.formatMessage({ defaultMessage: 'Delete Payout Method', id: 'Rs7g0Y' }),
+        variant: 'destructive',
+      });
+    },
+    [intl, deletePayoutMethod, props, showConfirmationModal, toast],
+  );
 
   const { setFieldValue, setFieldTouched } = form;
   const onEditClick = React.useCallback(
@@ -553,7 +573,7 @@ function PayoutMethodRadioGroupItem(props: {
               {isLoadingEditPayoutMethod ? (
                 <LoadingPlaceholder width={1} height={24} />
               ) : (
-                <React.Fragment>
+                <div className="space-y-2">
                   <PayoutMethodForm
                     required
                     alwaysSave
@@ -561,18 +581,17 @@ function PayoutMethodRadioGroupItem(props: {
                     payoutMethod={omit(props.payoutMethod, 'id')}
                     host={form.options.host}
                   />
-                  <StyledInputFormikField
-                    mt={2}
+                  <FormField
                     label={intl.formatMessage({ defaultMessage: 'Name', id: 'Fields.name' })}
                     name={`editingPayoutMethod.${props.payoutMethod.id}.name`}
                   >
                     {({ field }) => (
-                      <StyledInput
+                      <Input
                         {...field}
                         onFocus={() => form.setFieldTouched(`editingPayoutMethod.${props.payoutMethod.id}.name`, true)}
                       />
                     )}
-                  </StyledInputFormikField>
+                  </FormField>
                   {editPayoutMethodValue?.name !==
                     generatePayoutMethodName(editPayoutMethodValue.type, editPayoutMethodValue.data) && (
                     <Button
@@ -584,7 +603,7 @@ function PayoutMethodRadioGroupItem(props: {
                       <FormattedMessage defaultMessage="Use default generated name" id="+6P7pM" />
                     </Button>
                   )}
-                </React.Fragment>
+                </div>
               )}
 
               <div className="mt-4 flex justify-end gap-2">
@@ -667,8 +686,8 @@ function PayoutMethodRadioGroupItem(props: {
                     </React.Fragment>
                   )}
                   {keepNameDifferent && (
-                    <StyledInputFormikField
-                      mt={4}
+                    <FormField
+                      className="mt-4"
                       label={intl.formatMessage({
                         defaultMessage: 'Please explain why they are different',
                         id: 'bzGbkJ',
@@ -706,40 +725,6 @@ function PayoutMethodRadioGroupItem(props: {
           </div>
         )}
       </RadioGroupCard>
-
-      {isDeletingPayoutMethod && (
-        <ConfirmationModal
-          isDanger
-          type="delete"
-          onClose={() => setIsDeletingPayoutMethod(false)}
-          header={<FormattedMessage defaultMessage="Delete Payout Method?" id="weGvmF" />}
-          body={
-            <div>
-              <FormattedMessage defaultMessage="Are you sure you want to delete this payout method?" id="uR+TjD" />
-              <div className="mt-4">
-                <PayoutMethodLabel payoutMethod={props.payoutMethod} />
-              </div>
-            </div>
-          }
-          continueHandler={async () => {
-            try {
-              await deletePayoutMethod();
-              await props.onPaymentMethodDeleted();
-              toast({
-                variant: 'success',
-                message: <FormattedMessage defaultMessage="Payout Method deleted successfully" id="2sVunP" />,
-              });
-              setIsDeletingPayoutMethod(false);
-              return CONFIRMATION_MODAL_TERMINATE;
-            } catch (e) {
-              toast({
-                variant: 'error',
-                message: i18nGraphqlException(intl, e),
-              });
-            }
-          }}
-        />
-      )}
     </React.Fragment>
   );
 }

@@ -1,0 +1,62 @@
+import React from 'react';
+import { getEmojiByCurrencyCode } from 'country-currency-emoji-flags';
+import { truncate } from 'lodash';
+import { useIntl } from 'react-intl';
+
+import { Currency } from '../lib/constants/currency';
+import { getIntlDisplayNames } from '../lib/i18n';
+
+import { ComboSelect } from './ComboSelect';
+
+const generateCurrencyOptions = (intl, availableCurrencies) => {
+  const currencyDisplayNames = getIntlDisplayNames(intl.locale, 'currency');
+  return availableCurrencies.map(currency => {
+    const currencyName = currencyDisplayNames.of(currency);
+    const emoji = getEmojiByCurrencyCode(currency);
+    return {
+      value: currency,
+      label: (
+        <div
+          className=""
+          // fontSize="14px" lineHeight="20px" fontWeight="500"
+          title={currencyName}
+        >
+          {emoji && <span>{emoji}</span>}
+          &nbsp;
+          <span className="ml-1 whitespace-nowrap">
+            <span className="">{currency}</span>
+            {` `}
+            <span className="align-middle text-xs text-muted-foreground">{truncate(currencyName, { length: 30 })}</span>
+          </span>
+        </div>
+      ),
+    };
+  });
+};
+
+export default function CurrencyPicker({
+  availableCurrencies = Currency,
+  value,
+  onChange,
+  ...props
+}: {
+  /** A list of currencies presented in the currency picker */
+  availableCurrencies: string[];
+  onChange: (selectedCurrency: string) => void;
+  value?: string;
+} & Omit<React.ComponentProps<typeof ComboSelect>, 'options'>) {
+  const intl = useIntl();
+  const currencyOptions = generateCurrencyOptions(intl, availableCurrencies);
+  return (
+    <ComboSelect
+      id="currency-picker"
+      data-cy="currency-picker"
+      error={!value}
+      isSearchable={availableCurrencies.length > 10}
+      options={currencyOptions}
+      value={value}
+      onChange={onChange}
+      {...props}
+    />
+  );
+}

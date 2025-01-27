@@ -6,6 +6,7 @@ import { useIntl } from 'react-intl';
 
 import { isOCError } from '../lib/errors';
 import { formatFormErrorMessage, RICH_ERROR_MESSAGES } from '../lib/form-utils';
+import { cn } from '@/lib/utils';
 
 import PrivateInfoIcon from './icons/PrivateInfoIcon';
 import { Input } from './ui/Input';
@@ -21,6 +22,8 @@ export function FormField({
   children,
   error: customError,
   isPrivate,
+  validate,
+  className,
   ...props
 }: {
   label?: string;
@@ -37,13 +40,16 @@ export function FormField({
   htmlFor?: string;
   error?: string;
   isPrivate?: boolean;
+  validate?: any;
+  className?: string;
+  onFocus?: () => void;
 }) {
   const intl = useIntl();
   const htmlFor = props.htmlFor || `input-${name}`;
   const { schema } = useContext(FormikZodContext);
 
   return (
-    <Field name={name}>
+    <Field name={name} validate={validate}>
       {({ field, form, meta }) => {
         const hasError = Boolean(meta.error && (meta.touched || form.submitCount)) || Boolean(customError);
         const error = customError || meta.error;
@@ -62,6 +68,7 @@ export function FormField({
               required: props.required,
               error: hasError,
               placeholder,
+              onFocus: props.onFocus,
             },
             value => value !== undefined,
           ),
@@ -74,10 +81,11 @@ export function FormField({
         ) {
           fieldAttributes.required = true;
         }
+
         return (
-          <div className="flex w-full flex-col gap-1">
+          <div className={cn('flex w-full flex-col gap-1', className)}>
             {label && (
-              <Label className="leading-normal">
+              <Label className="leading-normal" htmlFor={htmlFor}>
                 {label}
                 {isPrivate && (
                   <React.Fragment>
