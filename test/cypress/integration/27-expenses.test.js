@@ -52,6 +52,7 @@ describe('Expense flow', () => {
       cy.getByDataCy('currency-picker').click();
       cy.contains('[data-cy="select-option"]', 'US Dollar').click();
       cy.get('textarea[name="payoutMethod.data.content"]').type('Bank Account: 007');
+      cy.wait(100);
       cy.getByDataCy('expense-next').click();
 
       cy.get('textarea[name="description"]').type('Brussels January team retreat');
@@ -644,6 +645,7 @@ describe('Expense flow', () => {
       cy.contains('[data-cy="select-option"]', 'Angola').click();
       cy.get('input[data-cy="address-address1"]').type('Street Name, 123');
       cy.get('input[data-cy="address-city"]').type('Citycitycity');
+      cy.wait(100);
       cy.getByDataCy('expense-next').click();
 
       // Fill details

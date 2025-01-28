@@ -73,7 +73,7 @@ export function ComboSelect(props: ComboSelectProps) {
         </SelectTrigger>
         <SelectContent>
           {props.options.map(option => (
-            <SelectItem key={option.value} value={option.value}>
+            <SelectItem key={option.value} value={option.value} data-cy="select-option">
               {option.label}
             </SelectItem>
           ))}
@@ -108,6 +108,7 @@ export function ComboSelect(props: ComboSelectProps) {
                   value={option.value}
                   keywords={option.keywords || (isString(option.label) ? [option.label] : undefined)}
                   onSelect={onChange}
+                  data-cy="select-option"
                 >
                   <Check className={cn('mr-2 h-4 w-4', props.value === option.value ? 'opacity-100' : 'opacity-0')} />
                   {option.label}
