@@ -16,10 +16,7 @@ const generateCurrencyOptions = (intl, availableCurrencies) => {
     return {
       value: currency,
       label: (
-        <div
-          className=""
-          title={currencyName}
-        >
+        <div className="" title={currencyName}>
           {emoji && <span>{emoji}</span>}
           &nbsp;
           <span className="ml-1 whitespace-nowrap">
@@ -45,7 +42,10 @@ export default function CurrencyPicker({
   value?: string;
 } & Omit<React.ComponentProps<typeof ComboSelect>, 'options'>) {
   const intl = useIntl();
-  const currencyOptions = generateCurrencyOptions(intl, availableCurrencies);
+  const currencyOptions = React.useMemo(
+    () => generateCurrencyOptions(intl, availableCurrencies),
+    [intl, availableCurrencies],
+  );
   return (
     <ComboSelect
       id="currency-picker"
