@@ -7179,13 +7179,16 @@ type TransactionsImportRow {
   sourceId: NonEmptyString!
 
   """
-  Whether the row has been dismissed
+  The status of the row
   """
+<<<<<<< HEAD
   isDismissed: Boolean! @deprecated(reason: "2025-01-17: isDismissed is deprecated, use status instead")
 
   """
   The status of the row
   """
+=======
+>>>>>>> f2b29168c (feat(TransactionsImports): add on hold status)
   status: TransactionsImportRowStatus!
 
   """
@@ -7286,6 +7289,14 @@ type TransactionsImportStats {
   onHold: Int!
 
   """
+<<<<<<< HEAD
+=======
+  Number of rows that are pending
+  """
+  pending: Int!
+
+  """
+>>>>>>> f2b29168c (feat(TransactionsImports): add on hold status)
   Number of rows that are invalid (e.g. linked but without an expense or order)
   """
   invalid: Int!
@@ -20862,7 +20873,7 @@ type Mutation {
   ): TransactionsImport!
 
   """
-  Update transactions import rows to set new values or mark them as dismissed
+  Update transactions import rows to set new values or perform actions on them
   """
   updateTransactionsImportRows(
     """
@@ -20876,15 +20887,10 @@ type Mutation {
     rows: [TransactionsImportRowUpdateInput!]
 
     """
-    Whether to ignore all non-processed rows
+    Action to perform on all non-processed rows
     """
-    dismissAll: Boolean
-
-    """
-    Whether to restore all dismissed rows
-    """
-    restoreAll: Boolean
-  ): TransactionsImport!
+    action: TransactionsImportRowAction!
+  ): TransactionsImportEditResponse!
 
   """
   Delete an import and all its associated rows
@@ -23126,11 +23132,18 @@ input TransactionsImportRowCreateInput {
   The raw value of the row
   """
   rawValue: JSONObject
+}
+
+type TransactionsImportEditResponse {
+  """
+  Updated import
+  """
+  import: TransactionsImport!
 
   """
-  Whether the row is dismissed
+  The rows updated by the mutation
   """
-  isDismissed: Boolean! = false
+  rows: [TransactionsImportRow]!
 }
 
 input TransactionsImportRowUpdateInput {
@@ -23160,9 +23173,9 @@ input TransactionsImportRowUpdateInput {
   amount: AmountInput
 
   """
-  Whether the row is dismissed
+  To update the status of the row. Will be ignored if the status is not applicable (e.g. trying to ignore a row that is already linked)
   """
-  isDismissed: Boolean = false
+  status: TransactionsImportRowStatus
 
   """
   The order associated with the row
@@ -23173,11 +23186,24 @@ input TransactionsImportRowUpdateInput {
   The expense associated with the row
   """
   expense: ExpenseReferenceInput
+<<<<<<< HEAD
 
   """
   Optional note for the row
   """
   note: String
+=======
+}
+
+"""
+Action to perform on transactions import rows
+"""
+enum TransactionsImportRowAction {
+  DISMISS_ALL
+  RESTORE_ALL
+  PUT_ON_HOLD_ALL
+  UPDATE_ROWS
+>>>>>>> f2b29168c (feat(TransactionsImports): add on hold status)
 }
 
 """
