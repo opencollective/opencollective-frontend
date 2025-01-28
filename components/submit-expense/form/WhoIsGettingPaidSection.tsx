@@ -8,6 +8,9 @@ import { CollectiveType } from '../../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { gqlV1 } from '../../../lib/graphql/helpers';
 import { AccountType } from '../../../lib/graphql/types/v2/schema';
+import { ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
+
+import LoginBtn from '@/components/LoginBtn';
 
 import CollectivePicker from '../../CollectivePicker';
 import CollectivePickerAsync from '../../CollectivePickerAsync';
@@ -207,6 +210,29 @@ export function WhoIsGettingPaidForm(props: { form: ExpenseForm }) {
           }
         >
           <FormattedMessage defaultMessage="Invite someone" id="SMZ/xh" />
+        </RadioGroupCard>
+      )}
+
+      {props.form.options.expense?.status === ExpenseStatus.DRAFT && !props.form.options.loggedInAccount && (
+        <RadioGroupCard
+          value=""
+          checked
+          showSubcontent
+          disabled={props.form.initialLoading}
+          subContent={
+            <div>
+              <InviteUserOption form={props.form} hideNotesField />
+              <div className="mt-4">
+                <FormattedMessage
+                  id="ExpenseForm.SignUp.SignIn"
+                  defaultMessage="We will use this email to create your account. If you already have an account {loginLink}."
+                  values={{ loginLink: <LoginBtn className="p-0" asLink /> }}
+                />
+              </div>
+            </div>
+          }
+        >
+          <FormattedMessage defaultMessage="New Profile" id="xBIExU" />
         </RadioGroupCard>
       )}
 

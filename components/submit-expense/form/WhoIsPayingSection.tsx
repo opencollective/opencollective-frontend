@@ -57,6 +57,7 @@ export function WhoIsPayingSection(props: WhoIsPayingSectionProps) {
     >
       <RadioGroup
         id="accountSlug"
+        disabled={!props.form.options.canChangeAccount}
         value={props.form.values.accountSlug}
         onValueChange={accountSlug => {
           setFieldValue('accountSlug', accountSlug);
@@ -64,6 +65,7 @@ export function WhoIsPayingSection(props: WhoIsPayingSectionProps) {
         }}
       >
         {!props.form.initialLoading &&
+          props.form.options.canChangeAccount &&
           recentlySubmittedAccounts.map(a => (
             <RadioGroupCard key={a.slug} value={a.slug}>
               <ExpenseAccountItem account={a} />
@@ -76,31 +78,41 @@ export function WhoIsPayingSection(props: WhoIsPayingSectionProps) {
           </RadioGroupCard>
         )}
 
-        <RadioGroupCard
-          value="__find"
-          disabled={props.form.initialLoading}
-          checked={!props.form.initialLoading && isFindSelected}
-          showSubcontent={!props.form.initialLoading && isFindSelected}
-          subContent={
-            <CollectivePickerAsync
-              autoFocus
-              isSearchable
-              filterResults={collectives => collectives.filter(c => c.type !== CollectiveType.ORGANIZATION || c.isHost)}
-              inputId="collective-expense-picker"
-              types={[
-                CollectiveType.COLLECTIVE,
-                CollectiveType.EVENT,
-                CollectiveType.FUND,
-                CollectiveType.ORGANIZATION,
-                CollectiveType.PROJECT,
-              ]}
-              collective={props.form.values.accountSlug === '__find' ? null : props.form.options.account}
-              onChange={e => setFieldValue('accountSlug', e.value.slug)}
-            />
-          }
-        >
-          <FormattedMessage defaultMessage="Find account" id="m2G3Nh" />
-        </RadioGroupCard>
+        {props.form.options.canChangeAccount && (
+          <RadioGroupCard
+            value="__find"
+            disabled={props.form.initialLoading}
+            checked={!props.form.initialLoading && isFindSelected}
+            showSubcontent={!props.form.initialLoading && isFindSelected}
+            subContent={
+              <CollectivePickerAsync
+                autoFocus
+                isSearchable
+                filterResults={collectives =>
+                  collectives.filter(c => c.type !== CollectiveType.ORGANIZATION || c.isHost)
+                }
+                inputId="collective-expense-picker"
+                types={[
+                  CollectiveType.COLLECTIVE,
+                  CollectiveType.EVENT,
+                  CollectiveType.FUND,
+                  CollectiveType.ORGANIZATION,
+                  CollectiveType.PROJECT,
+                ]}
+                collective={props.form.values.accountSlug === '__find' ? null : props.form.options.account}
+                onChange={e => setFieldValue('accountSlug', e.value.slug)}
+              />
+            }
+          >
+            <FormattedMessage defaultMessage="Find account" id="m2G3Nh" />
+          </RadioGroupCard>
+        )}
+
+        {!props.form.options.canChangeAccount && props.form.options.account && (
+          <RadioGroupCard value={props.form.options.account.slug}>
+            <ExpenseAccountItem account={props.form.options.account} />
+          </RadioGroupCard>
+        )}
       </RadioGroup>
     </FormSectionContainer>
   );

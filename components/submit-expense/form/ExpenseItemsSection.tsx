@@ -376,7 +376,7 @@ export function AdditionalAttachments(props: AdditionalAttachmentsProps) {
           />
         </div>
 
-        {additionalAttachments.map(at => (
+        {additionalAttachments?.map(at => (
           <div key={typeof at === 'string' ? at : at.id}>
             <Dropzone
               {...attachmentDropzoneParams}

@@ -9,6 +9,7 @@ import { type ExpenseForm, InviteeAccountType } from '../useExpenseForm';
 
 type InviteUserOptionProps = {
   form: ExpenseForm;
+  hideNotesField?: boolean;
 };
 
 export function InviteUserOption(props: InviteUserOptionProps) {
@@ -37,10 +38,10 @@ export function InviteUserOption(props: InviteUserOptionProps) {
               </TabsTrigger>
             </TabsList>
             <TabsContent value={InviteeAccountType.INDIVIDUAL}>
-              <NewIndividualInviteeForm />
+              <NewIndividualInviteeForm hideNotesField={props.hideNotesField} />
             </TabsContent>
             <TabsContent value={InviteeAccountType.ORGANIZATION}>
-              <NewOrganizationInviteeForm />
+              <NewOrganizationInviteeForm hideNotesField={props.hideNotesField} />
             </TabsContent>
           </Tabs>
         </div>
@@ -49,7 +50,7 @@ export function InviteUserOption(props: InviteUserOptionProps) {
   );
 }
 
-function NewIndividualInviteeForm() {
+function NewIndividualInviteeForm(props: { hideNotesField?: boolean }) {
   const intl = useIntl();
   return (
     <fieldset className="flex flex-col gap-4">
@@ -65,18 +66,20 @@ function NewIndividualInviteeForm() {
         name="inviteeNewIndividual.email"
       />
 
-      <StyledInputFormikField
-        isFastField
-        label={intl.formatMessage({ defaultMessage: 'Notes for the recipient (optional)', id: 'd+MntU' })}
-        name="inviteeNewIndividual.notes"
-      >
-        {({ field }) => <Textarea className="w-full" {...field} />}
-      </StyledInputFormikField>
+      {!props.hideNotesField && (
+        <StyledInputFormikField
+          isFastField
+          label={intl.formatMessage({ defaultMessage: 'Notes for the recipient (optional)', id: 'd+MntU' })}
+          name="inviteeNewIndividual.notes"
+        >
+          {({ field }) => <Textarea className="w-full" {...field} />}
+        </StyledInputFormikField>
+      )}
     </fieldset>
   );
 }
 
-function NewOrganizationInviteeForm() {
+function NewOrganizationInviteeForm(props: { hideNotesField?: boolean }) {
   const intl = useIntl();
   return (
     <fieldset className="flex flex-col gap-4">
@@ -121,13 +124,15 @@ function NewOrganizationInviteeForm() {
         name="inviteeNewOrganization.email"
       />
 
-      <StyledInputFormikField
-        isFastField
-        label={intl.formatMessage({ defaultMessage: 'Notes for the recipient (optional)', id: 'd+MntU' })}
-        name="inviteeNewOrganization.notes"
-      >
-        {({ field }) => <Textarea className="w-full" {...field} />}
-      </StyledInputFormikField>
+      {!props.hideNotesField && (
+        <StyledInputFormikField
+          isFastField
+          label={intl.formatMessage({ defaultMessage: 'Notes for the recipient (optional)', id: 'd+MntU' })}
+          name="inviteeNewOrganization.notes"
+        >
+          {({ field }) => <Textarea className="w-full" {...field} />}
+        </StyledInputFormikField>
+      )}
     </fieldset>
   );
 }
