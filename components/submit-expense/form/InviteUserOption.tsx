@@ -1,6 +1,8 @@
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { ExpenseLockableFields } from '@/lib/graphql/types/v2/schema';
+
 import StyledInputFormikField from '../../StyledInputFormikField';
 import { InputGroup } from '../../ui/Input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../ui/Tabs';
@@ -14,6 +16,7 @@ type InviteUserOptionProps = {
 
 export function InviteUserOption(props: InviteUserOptionProps) {
   const { setFieldValue } = props.form;
+  const lockEmail = props.form.options.lockedFields?.includes?.(ExpenseLockableFields.PAYEE);
   return (
     <div>
       <div>
@@ -38,10 +41,10 @@ export function InviteUserOption(props: InviteUserOptionProps) {
               </TabsTrigger>
             </TabsList>
             <TabsContent value={InviteeAccountType.INDIVIDUAL}>
-              <NewIndividualInviteeForm hideNotesField={props.hideNotesField} />
+              <NewIndividualInviteeForm disableEmailField={lockEmail} hideNotesField={props.hideNotesField} />
             </TabsContent>
             <TabsContent value={InviteeAccountType.ORGANIZATION}>
-              <NewOrganizationInviteeForm hideNotesField={props.hideNotesField} />
+              <NewOrganizationInviteeForm disableEmailField={lockEmail} hideNotesField={props.hideNotesField} />
             </TabsContent>
           </Tabs>
         </div>
@@ -50,7 +53,7 @@ export function InviteUserOption(props: InviteUserOptionProps) {
   );
 }
 
-function NewIndividualInviteeForm(props: { hideNotesField?: boolean }) {
+function NewIndividualInviteeForm(props: { hideNotesField?: boolean; disableEmailField?: boolean }) {
   const intl = useIntl();
   return (
     <fieldset className="flex flex-col gap-4">
@@ -61,6 +64,7 @@ function NewIndividualInviteeForm(props: { hideNotesField?: boolean }) {
       />
 
       <StyledInputFormikField
+        disabled={props.disableEmailField}
         isFastField
         label={intl.formatMessage({ defaultMessage: 'Email address', id: 'User.EmailAddress' })}
         name="inviteeNewIndividual.email"
@@ -70,7 +74,7 @@ function NewIndividualInviteeForm(props: { hideNotesField?: boolean }) {
         <StyledInputFormikField
           isFastField
           label={intl.formatMessage({ defaultMessage: 'Notes for the recipient (optional)', id: 'd+MntU' })}
-          name="inviteeNewIndividual.notes"
+          name="inviteNote"
         >
           {({ field }) => <Textarea className="w-full" {...field} />}
         </StyledInputFormikField>
@@ -79,7 +83,7 @@ function NewIndividualInviteeForm(props: { hideNotesField?: boolean }) {
   );
 }
 
-function NewOrganizationInviteeForm(props: { hideNotesField?: boolean }) {
+function NewOrganizationInviteeForm(props: { hideNotesField?: boolean; disableEmailField?: boolean }) {
   const intl = useIntl();
   return (
     <fieldset className="flex flex-col gap-4">
@@ -119,6 +123,7 @@ function NewOrganizationInviteeForm(props: { hideNotesField?: boolean }) {
       />
 
       <StyledInputFormikField
+        disabled={props.disableEmailField}
         isFastField
         label={intl.formatMessage({ defaultMessage: 'Email Address', id: 'xxQxLE' })}
         name="inviteeNewOrganization.email"
@@ -128,7 +133,7 @@ function NewOrganizationInviteeForm(props: { hideNotesField?: boolean }) {
         <StyledInputFormikField
           isFastField
           label={intl.formatMessage({ defaultMessage: 'Notes for the recipient (optional)', id: 'd+MntU' })}
-          name="inviteeNewOrganization.notes"
+          name="inviteNote"
         >
           {({ field }) => <Textarea className="w-full" {...field} />}
         </StyledInputFormikField>

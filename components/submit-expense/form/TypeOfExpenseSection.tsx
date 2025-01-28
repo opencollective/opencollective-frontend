@@ -4,6 +4,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { ExpenseType } from '../../../lib/graphql/types/v2/schema';
 import { attachmentDropzoneParams } from '../../expenses/lib/attachments';
+import { ExpenseLockableFields } from '@/lib/graphql/types/v2/graphql';
 
 import { FormField } from '@/components/FormField';
 
@@ -29,6 +30,8 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
   const expenseTypeOption = props.form.values.expenseTypeOption;
   const { toast } = useToast();
 
+  const isTypeLocked = props.form.options.lockedFields?.includes?.(ExpenseLockableFields.TYPE);
+
   return (
     <FormSectionContainer
       step={Step.TYPE_OF_EXPENSE}
@@ -38,6 +41,7 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
     >
       <React.Fragment>
         <RadioGroup
+          disabled={isTypeLocked}
           value={expenseTypeOption}
           onValueChange={newValue => props.form.setFieldValue('expenseTypeOption', newValue as ExpenseType)}
           className="flex"

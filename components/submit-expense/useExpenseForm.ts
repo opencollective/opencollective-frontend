@@ -25,8 +25,8 @@ import type {
   ExpenseVendorFieldsFragment,
   LocationInput,
 } from '../../lib/graphql/types/v2/graphql';
-import type { Amount } from '../../lib/graphql/types/v2/schema';
-import { Currency, ExpenseStatus, ExpenseType, PayoutMethodType } from '../../lib/graphql/types/v2/schema';
+import type { Amount} from '../../lib/graphql/types/v2/schema';
+import { Currency, ExpenseLockableFields , ExpenseStatus, ExpenseType, PayoutMethodType } from '../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import type LoggedInUser from '../../lib/LoggedInUser';
 import { isValidEmail } from '../../lib/utils';
@@ -310,6 +310,7 @@ const formSchemaQuery = gql`
         canDeclineExpenseInvite(draftKey: $expenseKey)
       }
       draft
+      lockedFields
       submitter: createdByAccount {
         ...ExpenseFormSubmitterFields
       }
@@ -545,6 +546,7 @@ type ExpenseFormOptions = {
   invitee?: ExpenseFormValues['inviteeNewIndividual'] | ExpenseFormValues['inviteeNewOrganization'];
   expenseCurrency?: Currency;
   canChangeAccount?: boolean;
+  lockedFields?: ExpenseLockableFields[];
 };
 
 const memoizedExpenseFormSchema = memoizeOne(
@@ -1326,7 +1328,19 @@ async function buildFormOptions(
       options.payoutMethod = values.newPayoutMethod;
     }
 
-    if (options.payoutMethod) {
+    if (!startOptions.duplicateExpense && options.expense?.lockedFields?.length) {
+      options.lockedFields = options.expense.lockedFields;
+    } else {
+      options.lockedFields = [];
+    }
+
+    if (
+      options.expense &&
+      !startOptions.duplicateExpense &&
+      options.lockedFields?.includes?.(ExpenseLockableFields.AMOUNT)
+    ) {
+      options.expenseCurrency = options.expense.currency;
+    } else if (options.payoutMethod) {
       options.expenseCurrency = options.payoutMethod.data?.currency || options.account?.currency;
     } else {
       options.expenseCurrency = options.account?.currency;
@@ -1484,10 +1498,12 @@ export function useExpenseForm(opts: {
         if (formOptions.expense.draft?.payee?.slug) {
           setFieldValue('payeeSlug', formOptions.expense.draft?.payee?.slug);
         } else if (formOptions.expense?.draft?.payee?.organization) {
-          setFieldValue('inviteeNewOrganization', formOptions.expense?.draft?.payee);
+          setFieldValue('inviteeAccountType', InviteeAccountType.ORGANIZATION);
         } else {
-          setFieldValue('inviteeNewIndividual', formOptions.expense?.draft?.payee);
+          setFieldValue('inviteeAccountType', InviteeAccountType.INDIVIDUAL);
         }
+        setFieldValue('inviteeNewOrganization', formOptions.expense?.draft?.payee);
+        setFieldValue('inviteeNewIndividual', formOptions.expense?.draft?.payee);
 
         setFieldValue('inviteNote', formOptions.expense.longDescription);
       }
@@ -1495,12 +1511,12 @@ export function useExpenseForm(opts: {
       setFieldValue('payeeSlug', formOptions.expense.payee?.slug);
     } else if (formOptions.expense.draft?.payee) {
       if (formOptions.expense?.draft?.payee?.organization) {
-        setFieldValue('inviteeNewOrganization', formOptions.expense?.draft?.payee);
         setFieldValue('inviteeAccountType', InviteeAccountType.ORGANIZATION);
       } else {
-        setFieldValue('inviteeNewIndividual', formOptions.expense?.draft?.payee);
         setFieldValue('inviteeAccountType', InviteeAccountType.INDIVIDUAL);
       }
+      setFieldValue('inviteeNewOrganization', formOptions.expense?.draft?.payee);
+      setFieldValue('inviteeNewIndividual', formOptions.expense?.draft?.payee);
     }
 
     if (formOptions.expense.status === ExpenseStatus.DRAFT) {
@@ -1571,6 +1587,16 @@ export function useExpenseForm(opts: {
       setFieldValue('tax', null);
     }
   }, [formOptions.taxType, setFieldValue]);
+
+  React.useEffect(() => {
+    if (
+      expenseForm.values.expenseItems.length === 1 &&
+      !expenseForm.touched.title &&
+      !formOptions.lockedFields?.includes?.(ExpenseLockableFields.DESCRIPTION)
+    ) {
+      setFieldValue('title', expenseForm.values.expenseItems[0].description);
+    }
+  }, [expenseForm.values.expenseItems, expenseForm.touched.title, setFieldValue, formOptions.lockedFields]);
 
   React.useEffect(() => {
     if (!expenseForm.values.hasTax) {

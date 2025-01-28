@@ -3,7 +3,7 @@ import type { FetchResult } from '@apollo/client';
 import { gql, useMutation } from '@apollo/client';
 import dayjs from 'dayjs';
 import { FormikProvider } from 'formik';
-import { omit, pick } from 'lodash';
+import { pick } from 'lodash';
 import { X } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -274,7 +274,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
           const inviteInput: InviteExpenseFromDashboardMutationVariables['expenseInviteInput'] = {
             ...expenseInput,
             payee: {
-              ...omit(payee, 'notes'),
+              ...payee,
               isInvite: true,
             },
             recipientNote: values.inviteNote,

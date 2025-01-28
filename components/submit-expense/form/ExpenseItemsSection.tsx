@@ -8,7 +8,7 @@ import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { Currency, CurrencyExchangeRateInput } from '../../../lib/graphql/types/v2/schema';
-import { CurrencyExchangeRateSourceType } from '../../../lib/graphql/types/v2/schema';
+import { CurrencyExchangeRateSourceType, ExpenseLockableFields } from '../../../lib/graphql/types/v2/schema';
 import { i18nTaxType } from '../../../lib/i18n/taxes';
 import { attachmentDropzoneParams } from '../../expenses/lib/attachments';
 import {
@@ -69,6 +69,8 @@ export function ExpenseItemsForm(props: { form: ExpenseForm }) {
   const expenseItems = props.form.values.expenseItems;
   const { setFieldValue } = props.form;
 
+  const isAmountLocked = props.form.options.lockedFields?.includes?.(ExpenseLockableFields.AMOUNT);
+
   return (
     <React.Fragment>
       {!props.form.initialLoading &&
@@ -76,14 +78,14 @@ export function ExpenseItemsForm(props: { form: ExpenseForm }) {
           // eslint-disable-next-line react/no-array-index-key
           <div key={i} className="flex gap-4">
             <div className="grow">
-              <ExpenseItem form={props.form} index={i} />
+              <ExpenseItem form={props.form} index={i} isAmountLocked={isAmountLocked} />
             </div>
             <div>
               <Button
                 onClick={() => {
                   setFieldValue('expenseItems', [...expenseItems.slice(0, i), ...expenseItems.slice(i + 1)]);
                 }}
-                disabled={expenseItems.length === 1}
+                disabled={expenseItems.length === 1 || isAmountLocked}
                 variant="outline"
                 size="icon-sm"
               >
@@ -101,7 +103,7 @@ export function ExpenseItemsForm(props: { form: ExpenseForm }) {
       <div className="flex justify-between pr-12">
         <Button
           variant="outline"
-          disabled={props.form.initialLoading}
+          disabled={props.form.initialLoading || isAmountLocked}
           onClick={() =>
             setFieldValue('expenseItems', [
               ...expenseItems,
@@ -114,13 +116,15 @@ export function ExpenseItemsForm(props: { form: ExpenseForm }) {
             ])
           }
         >
-          Add invoice item
+          <FormattedMessage defaultMessage="Add item" id="KDO3hW" />
         </Button>
         <div>
           <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-right">
             {props.form.values.hasTax && props.form.values.tax && (
               <React.Fragment>
-                <div>Subtotal:</div>
+                <div>
+                  <FormattedMessage defaultMessage="Subtotal:" id="WWhVAU" />
+                </div>
                 <div>
                   <FormattedMoneyAmount
                     amount={props.form.options?.totalInvoicedInExpenseCurrency}
@@ -183,6 +187,7 @@ export function ExpenseItemsForm(props: { form: ExpenseForm }) {
 type ExpenseItemProps = {
   index: number;
   form: ExpenseForm;
+  isAmountLocked?: boolean;
 };
 
 function ExpenseItem(props: ExpenseItemProps) {
@@ -267,6 +272,7 @@ function ExpenseItem(props: ExpenseItemProps) {
             <div className="grow basis-0">
               <div className="flex flex-col">
                 <FormField
+                  disabled={props.isAmountLocked}
                   label={intl.formatMessage({ defaultMessage: 'Amount', id: 'Fields.amount' })}
                   name={`expenseItems.${props.index}.amount.valueInCents`}
                 >
