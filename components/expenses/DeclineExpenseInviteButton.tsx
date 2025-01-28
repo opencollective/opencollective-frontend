@@ -14,6 +14,7 @@ import { Textarea } from '../ui/Textarea';
 type DeclineExpenseInviteButtonProps = {
   expense: Pick<Expense, 'legacyId' | 'id'>;
   draftKey?: string;
+  onExpenseInviteDeclined?: () => void;
 };
 
 const schema = z.object({
@@ -40,6 +41,7 @@ export default function DeclineExpenseInviteButton(props: DeclineExpenseInviteBu
   }, [isDeclineModalOpen, resetForm]);
 
   const { setFieldTouched, submitForm, validateForm } = formik;
+  const { onExpenseInviteDeclined } = props;
   const onConfirm = React.useCallback(async () => {
     const errors = await validateForm();
     setFieldTouched('declineReason');
@@ -47,7 +49,8 @@ export default function DeclineExpenseInviteButton(props: DeclineExpenseInviteBu
       throw new Error(errors.declineReason);
     }
     await submitForm();
-  }, [submitForm, validateForm, setFieldTouched]);
+    onExpenseInviteDeclined?.();
+  }, [submitForm, validateForm, setFieldTouched, onExpenseInviteDeclined]);
 
   return (
     <React.Fragment>
