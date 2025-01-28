@@ -18,7 +18,6 @@ const generateCurrencyOptions = (intl, availableCurrencies) => {
       label: (
         <div
           className=""
-          // fontSize="14px" lineHeight="20px" fontWeight="500"
           title={currencyName}
         >
           {emoji && <span>{emoji}</span>}
