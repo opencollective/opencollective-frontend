@@ -230,7 +230,7 @@
     "autoprefixer": "10.4.20",
     "cheerio": "^1.0.0",
     "circular-dependency-plugin": "^5.2.2",
-    "commander": "^12.1.0",
+    "commander": "^13.0.0",
     "commitizen": "^4.3.0",
     "cross-env": "^7.0.3",
     "css-loader": "^7.1.2",
