@@ -414,7 +414,7 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
       context: API_V2_CONTEXT,
       variables: {
         account: {
-          slug: props.accountSlug,
+          slug: order?.fromAccount?.slug,
         },
       },
     },
