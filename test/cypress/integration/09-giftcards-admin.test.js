@@ -50,7 +50,7 @@ describe('Gift cards admin', () => {
     });
 
     // Should have pagination
-    cy.get('.vc-pagination').contains(`of ${numberOfPages}`);
+    cy.get('[data-cy="gift-cards-pagination"] button').should('have.length', numberOfPages + 1); // 2 pages + next button
   });
 
   it('send gift cards by emails', () => {

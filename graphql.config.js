@@ -34,7 +34,7 @@ module.exports = {
         'components/edit-collective/actions/Archive.js',
         'components/edit-collective/actions/Delete.js',
         'components/edit-collective/sections/FiscalHosting.js',
-        'components/edit-collective/sections/GiftCards.js',
+        'components/edit-collective/sections/GiftCards.ts',
         'components/edit-collective/sections/PaymentReceipts.js',
         'components/edit-collective/sections/Webhooks.js',
         'components/tier-page/graphql/queries.js',

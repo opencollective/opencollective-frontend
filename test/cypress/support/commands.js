@@ -284,7 +284,8 @@ Cypress.Commands.add('addCreditCardToCollective', ({ collectiveSlug }) => {
   fillStripeInput();
   cy.wait(1000);
   cy.contains('button[type="submit"]', 'Save').click();
-  cy.wait(2000);
+  cy.get('[data-cy="save-credit-card-button"][data-loading="true"]').should('exist');
+  cy.get('[data-cy="save-credit-card-button"][data-loading="true"]').should('not.exist', { timeout: 30_000 });
 });
 
 /**

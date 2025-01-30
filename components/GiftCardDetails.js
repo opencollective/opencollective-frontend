@@ -9,11 +9,12 @@ import styled, { withTheme } from 'styled-components';
 import { formatCurrency } from '../lib/currency-utils';
 
 import GiftCard from './icons/GiftCard';
+import { Button } from './ui/Button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/Collapsible';
 import Avatar from './Avatar';
 import Container from './Container';
 import { Box, Flex } from './Grid';
 import Link from './Link';
-import StyledButton from './StyledButton';
 import { Span } from './Text';
 
 const DetailsColumnHeader = styled.span`
@@ -184,43 +185,40 @@ class GiftCardDetails extends React.Component {
           )}
         </Box>
         {/* Infos + details column */}
-        <Flex flexDirection="column" p="0.1em">
-          <Box>
-            <strong>{this.renderValue()}</strong>{' '}
-            <GiftCardStatus isConfirmed={isConfirmed} collective={collective} data={data} />
-          </Box>
-          <Box color={this.props.theme.colors.black[500]} fontSize="0.9em">
-            <Flex alignItems="center">
-              <FormattedMessage
-                id="giftCards.balance"
-                defaultMessage="Balance: {balance}"
-                values={{ balance: formatCurrency(balance, currency, { locale }) }}
-              />
-              {isExpired && (
-                <React.Fragment>
-                  <Box mx={1}>|</Box>
-                  <FormattedMessage id="GiftCard.Expired" defaultMessage="Expired" />
-                </React.Fragment>
-              )}
-              <Box mx={1}>|</Box>
-              <StyledButton
-                isBorderless
-                buttonSize="tiny"
-                buttonStyle="secondary"
-                fontSize="11px"
-                onClick={() => this.toggleExpended()}
-                px={1}
-              >
-                {this.state.expended ? (
-                  <FormattedMessage id="closeDetails" defaultMessage="Close Details" />
-                ) : (
-                  <FormattedMessage id="viewDetails" defaultMessage="View Details" />
+        <Collapsible>
+          <Flex flexDirection="column" p="0.1em">
+            <Box>
+              <strong>{this.renderValue()}</strong>{' '}
+              <GiftCardStatus isConfirmed={isConfirmed} collective={collective} data={data} />
+            </Box>
+            <Box color={this.props.theme.colors.black[500]} fontSize="0.9em">
+              <Flex alignItems="center">
+                <FormattedMessage
+                  id="giftCards.balance"
+                  defaultMessage="Balance: {balance}"
+                  values={{ balance: formatCurrency(balance, currency, { locale }) }}
+                />
+                {isExpired && (
+                  <React.Fragment>
+                    <Box mx={1}>|</Box>
+                    <FormattedMessage id="GiftCard.Expired" defaultMessage="Expired" />
+                  </React.Fragment>
                 )}
-              </StyledButton>
-            </Flex>
-          </Box>
-          {this.state.expended && this.renderDetails()}
-        </Flex>
+                <Box mx={1}>|</Box>
+                <CollapsibleTrigger asChild>
+                  <Button variant="link" className="font-normal" size="xs">
+                    {this.state.expended ? (
+                      <FormattedMessage id="closeDetails" defaultMessage="Close Details" />
+                    ) : (
+                      <FormattedMessage id="viewDetails" defaultMessage="View Details" />
+                    )}
+                  </Button>
+                </CollapsibleTrigger>
+              </Flex>
+            </Box>
+            <CollapsibleContent className="mt-4 w-full">{this.renderDetails()}</CollapsibleContent>
+          </Flex>
+        </Collapsible>
       </Flex>
     );
   }
