@@ -293,6 +293,14 @@ const ExpenseFormPayeeStep = ({
           <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
         </StyledButton>
       )}
+      <div className="max-w-full whitespace-break-spaces break-all">
+        {JSON.stringify({
+          values: pick(values, ['payee.type', 'payoutMethod', 'payeeLocation']),
+          isOnBehalf,
+          isMissing2FA,
+          canEditPayoutMethod,
+        })}
+      </div>
       <StyledButton
         type="button"
         width={['100%', 'auto']}
