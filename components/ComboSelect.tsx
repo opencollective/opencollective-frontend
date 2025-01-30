@@ -71,7 +71,7 @@ export function ComboSelect(props: ComboSelectProps) {
         >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent data-cy="select-content">
           {props.options.map(option => (
             <SelectItem key={option.value} value={option.value} data-cy="select-option">
               {option.label}
@@ -96,7 +96,7 @@ export function ComboSelect(props: ComboSelectProps) {
           <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-(--radix-popover-trigger-width) p-0">
+      <PopoverContent className="w-(--radix-popover-trigger-width) p-0" data-cy="select-content">
         <Command>
           <CommandInput placeholder={props.inputPlaceholder || intl.formatMessage(Messages.inputPlaceholder)} />
           <CommandList>
