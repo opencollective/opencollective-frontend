@@ -15,6 +15,8 @@ type StyledHrProps = SpaceProps &
 
 /**
  * An horizontal line. Control the color and size using border properties.
+ *
+ * @deprecated Use `ui/Separator` instead
  */
 const StyledHr = styled.hr<StyledHrProps>`
   border: 0;

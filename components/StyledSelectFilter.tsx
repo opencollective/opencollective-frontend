@@ -91,6 +91,8 @@ export const getSelectFilterStyles = stylesFromProps => ({
 /**
  * A superset of `StyledSelect` with custom styles, to use for selects that contains
  * filters for lists.
+ *
+ * @deprecated Use `ui/Select` instead
  */
 export const StyledSelectFilter = (props: StyledSelectProps) => {
   const styles = React.useMemo(() => getSelectFilterStyles(props.styles), [props.styles]);

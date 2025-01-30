@@ -17,6 +17,7 @@ type StyledLinkButtonProps = ColorProps &
 
 /**
  * A button element but with the styles of a anchor element (https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a).
+ * @deprecated Use `ui/Button` with link variant instead
  */
 const StyledLinkButton = styled.button.attrs<StyledLinkButtonProps>(props => ({
   color: props.color ?? '#3385FF',

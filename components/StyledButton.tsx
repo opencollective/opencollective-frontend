@@ -123,6 +123,9 @@ const StyledButtonContent = styled.button<StyledButtonProps>`
     `}
 `;
 
+/**
+ * @deprecated Use `ui/Button` instead
+ */
 const StyledButton: ForwardRefExoticComponent<StyledButtonProps> = React.forwardRef<
   HTMLButtonElement,
   StyledButtonProps

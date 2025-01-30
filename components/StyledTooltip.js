@@ -145,6 +145,8 @@ const TooltipContent = ({ place, content, onMouseEnter, onMouseLeave, noArrow })
  *
  * Relies on [react-tooltip](https://react-tooltip.netlify.com/) and accepts any
  * of its properties.
+ *
+ * @deprecated Use `ui/Tooltip` instead
  */
 class StyledTooltip extends React.Component {
   static propTypes = {
