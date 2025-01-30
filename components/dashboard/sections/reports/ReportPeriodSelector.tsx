@@ -162,7 +162,7 @@ export const ReportPeriodSelector = ({
                 className={clsx(
                   'rounded-md py-1',
                   selectedTimeUnit === 'MONTH'
-                    ? 'bg-white text-foreground shadow-sm'
+                    ? 'bg-white text-foreground shadow-xs'
                     : 'bg-transparent text-muted-foreground',
                 )}
                 onClick={() => setSelectedTimeUnit(TimeUnit.MONTH)}
@@ -174,7 +174,7 @@ export const ReportPeriodSelector = ({
                 className={clsx(
                   'rounded-md py-1',
                   selectedTimeUnit === 'QUARTER'
-                    ? 'bg-white text-foreground shadow-sm'
+                    ? 'bg-white text-foreground shadow-xs'
                     : 'bg-transparent text-muted-foreground',
                 )}
                 onClick={() => setSelectedTimeUnit(TimeUnit.QUARTER)}
@@ -186,7 +186,7 @@ export const ReportPeriodSelector = ({
                 className={clsx(
                   'rounded-md py-1',
                   selectedTimeUnit === 'YEAR'
-                    ? 'bg-white text-foreground shadow-sm'
+                    ? 'bg-white text-foreground shadow-xs'
                     : 'bg-transparent text-muted-foreground',
                 )}
                 onClick={() => setSelectedTimeUnit(TimeUnit.YEAR)}

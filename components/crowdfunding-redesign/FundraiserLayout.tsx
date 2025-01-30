@@ -57,9 +57,9 @@ export function FundraiserLayout({ children, activeTab }) {
         <div className="flex flex-1 flex-col">
           <React.Fragment>
             <div className="">
-              <div className="mx-auto max-w-screen-xl space-y-8 px-6 py-12">
+              <div className="mx-auto max-w-(--breakpoint-xl) space-y-8 px-6 py-12">
                 <div className="space-y-4 text-center">
-                  <h1 className="text-balance text-4xl font-semibold">{fundraiser.name}</h1>
+                  <h1 className="text-4xl font-semibold text-balance">{fundraiser.name}</h1>
                   <p className="text-lg">{fundraiser.description}</p>
                 </div>
 
@@ -106,8 +106,8 @@ export function FundraiserLayout({ children, activeTab }) {
               </div>
             </div>
 
-            <div className="sticky top-0 z-10 border-b border-t bg-background" ref={tabRef}>
-              <div className="relative mx-auto -mb-px h-16 max-w-screen-xl px-6">
+            <div className="sticky top-0 z-10 border-t border-b bg-background" ref={tabRef}>
+              <div className="relative mx-auto -mb-px h-16 max-w-(--breakpoint-xl) px-6">
                 <TabsList centered={false}>
                   <TabsTrigger href={baseRoute} active={activeTab === 'fundraiser'}>
                     Fundraiser

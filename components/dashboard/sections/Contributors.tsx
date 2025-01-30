@@ -284,7 +284,7 @@ const Contributors = ({ accountSlug }: ContributorsProps) => {
   const [isDownloadingCsv, setDownloadingCsv] = React.useState(false);
 
   return (
-    <div className="flex max-w-screen-lg flex-col gap-4">
+    <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage id="Contributors" defaultMessage="Contributors" />}
         actions={

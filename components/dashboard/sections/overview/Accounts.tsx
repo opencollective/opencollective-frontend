@@ -25,7 +25,7 @@ function CollapsibleAccountsList({ accounts, label }) {
   return (
     <div className="rounded-xl border bg-background">
       <Collapsible>
-        <CollapsibleTrigger className="group flex w-full flex-1 items-center justify-between p-3 text-sm [&_svg]:data-[state=open]:rotate-180">
+        <CollapsibleTrigger className="group flex w-full flex-1 items-center justify-between p-3 text-sm data-[state=open]:[&_svg]:rotate-180">
           <div className="flex w-full flex-1 justify-between">
             <div className="flex items-center gap-2">
               <div className="font-medium">{label}</div>

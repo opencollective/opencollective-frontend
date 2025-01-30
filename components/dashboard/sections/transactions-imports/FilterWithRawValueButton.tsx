@@ -26,7 +26,7 @@ export function FilterWithRawValueButton({
         >
           <Filter size={14} className="inline" />
           {SecondaryIcon && (
-            <SecondaryIcon size={12} className="radius-50 absolute -bottom-1 -right-1 bg-white bg-opacity-50" />
+            <SecondaryIcon size={12} className="radius-50 bg-opacity-50 absolute -right-1 -bottom-1 bg-white" />
           )}
         </Button>
       </TooltipTrigger>

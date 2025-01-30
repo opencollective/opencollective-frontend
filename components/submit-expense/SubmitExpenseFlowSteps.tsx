@@ -192,7 +192,7 @@ function StepHeader(props: StepProps & { stepNumber: number }) {
   return (
     <li
       className={cn(
-        'relative flex items-center gap-2 pb-8 pl-7 font-bold before:absolute before:left-0 before:inline-block before:h-6 before:w-6 before:-translate-x-3 before:rounded-full before:border-2 before:border-[#94A3B8] before:bg-white before:text-center after:absolute after:left-0 after:top-2 after:-z-10 after:h-full after:-translate-x-[1px] after:border-l-2 after:border-solid last:after:hidden',
+        'relative flex items-center gap-2 pb-8 pl-7 font-bold before:absolute before:left-0 before:inline-block before:h-6 before:w-6 before:-translate-x-3 before:rounded-full before:border-2 before:border-[#94A3B8] before:bg-white before:text-center after:absolute after:top-2 after:left-0 after:-z-10 after:h-full after:-translate-x-[1px] after:border-l-2 after:border-solid last:after:hidden',
         {
           'before:border-blue-900': props.isActive,
           "before:border-blue-900 before:bg-blue-900 before:text-white before:content-['✓']": props.isComplete,
@@ -218,7 +218,7 @@ function StepItem(props: StepProps) {
   return (
     <li
       className={cn(
-        'relative flex items-center gap-2 pb-8 pl-7 before:absolute before:left-0 before:inline-block before:h-2 before:w-2 before:-translate-x-1 before:rounded-full before:border-[#CBD5E1] before:bg-[#CBD5E1] before:text-center after:absolute after:left-0 after:top-2 after:-z-10 after:h-full after:-translate-x-[1px] after:border-l-2 after:border-solid after:border-[#E1E7EF]',
+        'relative flex items-center gap-2 pb-8 pl-7 before:absolute before:left-0 before:inline-block before:h-2 before:w-2 before:-translate-x-1 before:rounded-full before:border-[#CBD5E1] before:bg-[#CBD5E1] before:text-center after:absolute after:top-2 after:left-0 after:-z-10 after:h-full after:-translate-x-[1px] after:border-l-2 after:border-solid after:border-[#E1E7EF]',
         {
           'font-bold text-blue-900 before:border-blue-900 before:bg-blue-900 before:[box-shadow:0_0_0_4px_hsla(216,_100%,_58%,_0.3)]':
             props.isActive,

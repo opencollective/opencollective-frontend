@@ -11,7 +11,7 @@ interface Props extends React.ComponentPropsWithoutRef<'span'> {
 export function DefinitionTooltip({ children, className, definition }: Props) {
   return (
     <Tooltip>
-      <TooltipTrigger className="inline cursor-help break-before-auto break-words text-left" asChild>
+      <TooltipTrigger className="inline cursor-help break-before-auto text-left break-words" asChild>
         <span
           className={cn(
             'underline decoration-slate-300 decoration-dashed underline-offset-2 transition-colors hover:decoration-slate-400',

@@ -136,7 +136,7 @@ export function Finances({ inFundraiserLayout }: { inFundraiserLayout?: boolean 
   const metric = metrics.find(m => m.id === queryFilter.values.metric) ?? metrics[0];
 
   return (
-    <div className="relative mx-auto flex max-w-screen-lg flex-col gap-8 px-6 py-12">
+    <div className="relative mx-auto flex max-w-(--breakpoint-lg) flex-col gap-8 px-6 py-12">
       <div className="flex flex-col gap-3">
         {router.query.accountSlug && !inFundraiserLayout && (
           <div className="mb-4 space-y-2">

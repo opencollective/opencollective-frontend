@@ -34,7 +34,7 @@ export function ExpensePolicyContainer(props: ExpensePolicyContainerProps) {
       <div className="group rounded-md border border-[#DCDDE0] p-4">
         <CollapsibleTrigger asChild>
           <button className="flex w-full items-center text-start text-sm font-bold">
-            <div className="flex-grow">{props.title}</div>
+            <div className="grow">{props.title}</div>
             <div className="group-data-[state=open]:rotate-180">{props.checked && <ChevronDown size={16} />}</div>
           </button>
         </CollapsibleTrigger>
@@ -43,7 +43,7 @@ export function ExpensePolicyContainer(props: ExpensePolicyContainerProps) {
             <HTMLContent content={props.policy} />
             <div className="mt-4">
               <MessageBox type="warning">
-                <label className="flex cursor-pointer items-center gap-2 text-sm font-normal leading-normal">
+                <label className="flex cursor-pointer items-center gap-2 text-sm leading-normal font-normal">
                   <Checkbox
                     checked={props.checked}
                     onCheckedChange={v => {

@@ -44,7 +44,7 @@ const ButtonContainer = styled.span<{ flexGrow: FlexGrowProps['flexGrow'] }>`
   ${props =>
     props.flexGrow &&
     css`
-      flex-grow: ${props.flexGrow};
+      grow: ${props.flexGrow};
     `}
 `;
 

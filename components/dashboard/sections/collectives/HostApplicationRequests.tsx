@@ -72,7 +72,7 @@ export default function HostApplicationRequests({
   const totalCount = query.data?.account?.hostApplicationRequests?.totalCount ?? 0;
 
   return (
-    <div className="flex max-w-screen-lg flex-col gap-4">
+    <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
       {error ? (
         <MessageBoxGraphqlError error={error} mb={2} />
       ) : !loading && applicationRequests.length === 0 ? (

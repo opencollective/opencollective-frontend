@@ -83,7 +83,7 @@ const HostDashboardAgreements = ({ accountSlug: hostSlug }: DashboardSectionProp
 
   const canEdit = Boolean(LoggedInUser && !LoggedInUser.isAccountantOnly(data?.host));
   return (
-    <div className="flex max-w-screen-lg flex-col gap-4">
+    <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage id="Agreements" defaultMessage="Agreements" />}
         actions={

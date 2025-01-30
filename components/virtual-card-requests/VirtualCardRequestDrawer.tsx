@@ -227,8 +227,8 @@ export function VirtualCardRequestDrawer(props: VirtualCardRequestDrawerProps) {
                   virtualCardRequest.spendingLimitAmount,
                   virtualCardRequest.spendingLimitInterval,
                   {
-                    LimitAmount: v => <span className="italic text-slate-600">{v}</span>,
-                    LimitInterval: v => <span className="italic text-slate-600">{v}</span>,
+                    LimitAmount: v => <span className="text-slate-600 italic">{v}</span>,
+                    LimitInterval: v => <span className="text-slate-600 italic">{v}</span>,
                   },
                 )}
               />

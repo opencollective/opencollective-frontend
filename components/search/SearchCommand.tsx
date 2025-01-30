@@ -220,12 +220,12 @@ export const SearchCommand = ({ open, setOpen }) => {
           onValueChange={setInput}
           value={input}
           placeholder={queryFilter.values.context ? '' : 'Search...'}
-          className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-hidden placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
         />
         {isLoading && <StyledSpinner size={16} className="absolute right-4 text-muted-foreground" />}
       </div>
 
-      <CommandList className="max-h-[600px] border-b border-t-0 [&_.text-xs_mark]:px-1 [&_.text-xs_mark]:py-[1px] [&_mark]:rounded-xl [&_mark]:bg-amber-100 [&_mark]:px-1 [&_mark]:py-2">
+      <CommandList className="max-h-[600px] border-t-0 border-b [&_.text-xs_mark]:px-1 [&_.text-xs_mark]:py-[1px] [&_mark]:rounded-xl [&_mark]:bg-amber-100 [&_mark]:px-1 [&_mark]:py-2">
         <CommandItem value="-" className="hidden" />
         {recentlyVisited.length > 0 && debouncedInput === '' && (
           <CommandGroup heading="Recent">

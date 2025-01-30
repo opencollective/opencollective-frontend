@@ -299,7 +299,7 @@ const CreateCollectiveMiniForm = ({
         return (
           <Form data-cy="create-collective-mini-form" className="flex h-full flex-col overflow-y-hidden">
             <H5 fontWeight={600}>{CreateNewMessages[type] ? formatMessage(CreateNewMessages[type]) : null}</H5>
-            <div className="w-full flex-grow overflow-y-auto pb-4">
+            <div className="w-full grow overflow-y-auto pb-4">
               {(isUser || isOrganization) && !noAdminFields && (
                 <StyledInputField
                   name={isOrganization ? 'members[0].member.email' : 'email'}

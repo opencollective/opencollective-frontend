@@ -114,7 +114,7 @@ const ResetPasswordPage = ({ token }: { token: string }) => {
             </h1>
 
             {loading ? (
-              <div className="mb-4 mt-6 flex w-full justify-center">
+              <div className="mt-6 mb-4 flex w-full justify-center">
                 <LoadingGrid />
               </div>
             ) : (

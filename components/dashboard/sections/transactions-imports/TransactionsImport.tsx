@@ -406,7 +406,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
               {/** Import details (creation date, last update, file info) */}
               <div
                 className={cn(
-                  'border border-neutral-200 bg-white p-4 text-base shadow-sm',
+                  'border border-neutral-200 bg-white p-4 text-base shadow-xs',
                   hasNewData ? 'rounded-tl-lg rounded-tr-lg border-b-0' : 'rounded-lg',
                 )}
               >
@@ -501,7 +501,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
               {!hasNewData ? (
                 <div className="h-[51px]" />
               ) : (
-                <div className="sticky top-0 z-50 flex items-center justify-between rounded-none rounded-bl-lg rounded-br-lg bg-blue-500 px-4 py-2 text-sm text-white animate-in fade-in">
+                <div className="sticky top-0 z-50 flex items-center justify-between rounded-none rounded-br-lg rounded-bl-lg bg-blue-500 px-4 py-2 text-sm text-white animate-in fade-in">
                   <span className="flex items-center gap-2">
                     <Info size={18} className="text-info" />
                     <FormattedMessage
@@ -711,7 +711,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                             >
                               <MessageCircle size={16} className={hasNote ? 'text-neutral-600' : 'text-neutral-300'} />
                               {hasNote && (
-                                <div className="absolute right-[6px] top-[6px] flex h-[8px] w-[8px] items-center justify-center rounded-full bg-yellow-400 text-xs text-white"></div>
+                                <div className="absolute top-[6px] right-[6px] flex h-[8px] w-[8px] items-center justify-center rounded-full bg-yellow-400 text-xs text-white"></div>
                               )}
                             </Button>
                           );
@@ -735,7 +735,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                                     <Button
                                       variant="outline"
                                       size="xs"
-                                      className="whitespace-nowrap text-xs"
+                                      className="text-xs whitespace-nowrap"
                                       onClick={async () => {
                                         await setRowsStatus(
                                           rowsActions.canRestore,
@@ -762,7 +762,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                                     <Button
                                       variant="outline"
                                       size="xs"
-                                      className="whitespace-nowrap text-xs"
+                                      className="text-xs whitespace-nowrap"
                                       onClick={async () => {
                                         await setRowsStatus(
                                           rowsActions.canIgnore,
@@ -789,7 +789,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                                     <Button
                                       variant="outline"
                                       size="xs"
-                                      className="whitespace-nowrap text-xs"
+                                      className="text-xs whitespace-nowrap"
                                       onClick={async () => {
                                         await setRowsStatus(
                                           rowsActions.canPutOnHold,

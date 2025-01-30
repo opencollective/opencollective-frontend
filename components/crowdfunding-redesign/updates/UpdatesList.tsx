@@ -25,7 +25,7 @@ export function UpdatesList() {
   });
   const account = data?.account;
   return (
-    <div className="relative mx-auto flex max-w-screen-sm flex-col gap-8 px-6 py-16">
+    <div className="relative mx-auto flex max-w-(--breakpoint-sm) flex-col gap-8 px-6 py-16">
       {data?.account.updates?.totalCount > 0 ? (
         account.updates.nodes.map(update => {
           const numberOfReactions = Object.keys(update.reactions).reduce((acc, emoji) => {
@@ -35,7 +35,7 @@ export function UpdatesList() {
             <Link
               key={update.id}
               href={`/preview/${router.query.collectiveSlug}/updates/${update.id}`}
-              className="flex cursor-pointer flex-col gap-3 rounded-lg border bg-background p-8 transition-shadow hover:shadow"
+              className="flex cursor-pointer flex-col gap-3 rounded-lg border bg-background p-8 transition-shadow hover:shadow-sm"
               // TODO: Consider smooth scrolling to content when opening an update if using expanded fundraiser layout
               // onClick={() => {
               //   const tabElement = tabRef?.current as HTMLElement | null;

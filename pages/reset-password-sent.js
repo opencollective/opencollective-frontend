@@ -31,7 +31,7 @@ class ResetPasswordSent extends Component {
     const isValidEmail = email && isEmail(email);
     return (
       <Page noRobots showFooter={false}>
-        <div className="flex flex-col items-center px-4 pb-32 pt-8 text-center sm:pt-16">
+        <div className="flex flex-col items-center px-4 pt-8 pb-32 text-center sm:pt-16">
           <Image src="/static/images/sign-in-illustration.png" width={624} height={372} />
           <P fontSize="32px" lineHeight="40px" color="black.900" fontWeight={700}>
             <FormattedMessage defaultMessage="Your reset password email is on its way." id="tSQ2Fc" />

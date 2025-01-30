@@ -38,8 +38,8 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
   const expense = query.data?.expense;
 
   return (
-    <div className="flex flex-grow flex-col gap-8 px-4 sm:p-0 lg:flex-row">
-      <div className="flex-1 flex-grow-[2]">
+    <div className="flex grow flex-col gap-8 px-4 sm:p-0 lg:flex-row">
+      <div className="flex-1 flex-grow-2">
         <ExpenseSummary
           onDelete={() => {}}
           onEdit={() => {}}

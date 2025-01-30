@@ -112,7 +112,7 @@ export const GenericActivityDiffDataWithList = ({ activity }) => {
           </div>
           <div className="flex w-full flex-col space-y-2">
             {added.map(item => (
-              <div key={item.id} className="w-full flex-grow rounded bg-green-100 p-2">
+              <div key={item.id} className="w-full grow rounded bg-green-100 p-2">
                 {Object.keys(item)
                   .filter(key => item[key] && !DEFAULT_IGNORED_FIELDS.includes(key))
                   .map(key => (
@@ -132,7 +132,7 @@ export const GenericActivityDiffDataWithList = ({ activity }) => {
           </div>
           <div className="flex w-full flex-col space-y-2">
             {removed.map(item => (
-              <div key={item.id} className="w-full flex-grow rounded bg-red-100 p-2">
+              <div key={item.id} className="w-full grow rounded bg-red-100 p-2">
                 {Object.keys(item)
                   .filter(key => item[key] && !DEFAULT_IGNORED_FIELDS.includes(key))
                   .map(key => (
@@ -152,7 +152,7 @@ export const GenericActivityDiffDataWithList = ({ activity }) => {
           </div>
           <div className="flex w-full flex-col space-y-2">
             {edited.map(({ previousData, newData }) => (
-              <div key={previousData.id} className="w-full flex-grow rounded bg-blue-100 p-2">
+              <div key={previousData.id} className="w-full grow rounded bg-blue-100 p-2">
                 {ALWAYS_DISPLAYED.map(key => {
                   if (previousData[key] === newData[key]) {
                     return (

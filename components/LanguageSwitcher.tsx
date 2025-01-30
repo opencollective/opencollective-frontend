@@ -36,7 +36,7 @@ export function LanguageSwitcher() {
           <TooltipTrigger asChild>
             <SelectTrigger data-cy="language-switcher">
               <div className="flex items-center gap-2 overflow-hidden">
-                <LanguagesIcon className="flex-shrink-0" size={16} />
+                <LanguagesIcon className="shrink-0" size={16} />
                 <span className="truncate">
                   <SelectValue
                     aria-label={defaultLanguage.label}
@@ -50,7 +50,7 @@ export function LanguageSwitcher() {
           <SelectContent className="relative max-h-80 max-w-full">
             {languageOptions.map(option => (
               <SelectItem key={option.value} value={option.value} data-cy="language-option">
-                <div className="flex max-w-[--radix-popper-anchor-width] items-center gap-1">
+                <div className="flex max-w-(--radix-popper-anchor-width) items-center gap-1">
                   <span className="truncate">{option.label}</span>
                   <span>({option.completion})</span>
                 </div>

@@ -289,17 +289,17 @@ function PaymentMethodItem(props: PaymentMethodItemProps) {
             {getPaymentMethodIcon(props.paymentMethod, props.paymentMethod.account, 24)}
           </div>
           <div>
-            <p className="text-xs font-semibold leading-5 text-black">
+            <p className="text-xs leading-5 font-semibold text-black">
               {getPaymentMethodName(props.paymentMethod as any)}
             </p>
             {getPaymentMethodMetadata(props.paymentMethod) && (
-              <p className="text-xs font-normal leading-4 text-gray-400">
+              <p className="text-xs leading-4 font-normal text-gray-400">
                 {getPaymentMethodMetadata(props.paymentMethod)}
               </p>
             )}
             {hasRecurringContributions && (
               <StyledLink
-                className="text-xs font-normal leading-4 text-gray-400"
+                className="text-xs leading-4 font-normal text-gray-400"
                 href={`/dashboard/${props.account.slug}/outgoing-contributions?status=ACTIVE&status=ERROR&type=RECURRING&paymentMethod=${props.paymentMethod.id}`}
               >
                 <FormattedMessage

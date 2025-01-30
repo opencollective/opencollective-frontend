@@ -350,7 +350,7 @@ const ExportHostedCollectivesCSVModal = ({
               />
             </DialogDescription>
           </DialogHeader>
-          <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-4 pb-4 pt-6 sm:px-8">
+          <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-4 pt-6 pb-4 sm:px-8">
             <div className="flex flex-col gap-4 sm:flex-row">
               <div className="flex flex-1 flex-col gap-2">
                 <h1 className="font-bold">
@@ -423,7 +423,7 @@ const ExportHostedCollectivesCSVModal = ({
                         />
                         <label
                           htmlFor={tab}
-                          className="cursor-pointer text-sm font-bold leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                          className="cursor-pointer text-sm leading-none font-bold peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                         >
                           <FormattedMessage id="ExportTransactionsCSVModal.SelectAll" defaultMessage="Select all" />
                         </label>
@@ -443,7 +443,7 @@ const ExportHostedCollectivesCSVModal = ({
                                 />
                                 <label
                                   htmlFor={fieldId}
-                                  className="ml-1 cursor-pointer text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                  className="ml-1 cursor-pointer text-sm leading-none font-normal peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                 >
                                   {field?.label || fieldId}
                                 </label>
