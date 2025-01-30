@@ -32,7 +32,7 @@ export type PreviewFeature = {
 };
 
 const PLATFORM_ACCOUNTS = ['ofico', 'ofitech'];
-const FIRST_PARTY_HOSTS = ['opensource', 'europe', 'oce-foundation-usd', 'oce-foundation-eur'];
+const FIRST_PARTY_HOSTS = ['opensource', 'europe', 'oce-foundation-usd', 'oce-foundation-eur', 'raft'];
 
 /**
  * List of current preview features.
