@@ -567,6 +567,7 @@ function PayoutMethodRadioGroupItem(props: {
       <RadioGroupCard
         value={props.payoutMethod.id}
         showSubcontent={isOpen}
+        asChild
         subContent={
           isEditingPayoutMethod ? (
             <React.Fragment>
