@@ -308,7 +308,7 @@ const getColumns = ({ intl, isIncoming, includeHostedAccounts, includeChildrenAc
                 }
               />
             </div>
-            <div className="absolute -bottom-[6px] -right-[6px] rounded-full">
+            <div className="absolute -right-[6px] -bottom-[6px] rounded-full">
               <AccountHoverCard
                 account={small}
                 trigger={
@@ -320,10 +320,10 @@ const getColumns = ({ intl, isIncoming, includeHostedAccounts, includeChildrenAc
             </div>
           </div>
           <div className="overflow-hidden">
-            <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sm leading-5">
+            <div className="overflow-hidden text-sm leading-5 text-ellipsis whitespace-nowrap">
               {big.name || big.slug}
             </div>
-            <div className="overflow-hidden text-ellipsis whitespace-nowrap text-xs font-normal leading-4 text-slate-700">
+            <div className="overflow-hidden text-xs leading-4 font-normal text-ellipsis whitespace-nowrap text-slate-700">
               {small.name || small.slug}
             </div>
           </div>
@@ -348,11 +348,11 @@ const getColumns = ({ intl, isIncoming, includeHostedAccounts, includeChildrenAc
                 <Avatar size={32} collective={toAccount} displayTitle={false} />
               </div>
               <div className="overflow-hidden">
-                <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sm leading-5">
+                <div className="overflow-hidden text-sm leading-5 text-ellipsis whitespace-nowrap">
                   {toAccount.name || toAccount.slug}
                 </div>
                 {tier && (
-                  <div className="overflow-hidden text-ellipsis whitespace-nowrap text-xs font-normal leading-4 text-slate-700">
+                  <div className="overflow-hidden text-xs leading-4 font-normal text-ellipsis whitespace-nowrap text-slate-700">
                     {tier.name}
                   </div>
                 )}
@@ -380,11 +380,11 @@ const getColumns = ({ intl, isIncoming, includeHostedAccounts, includeChildrenAc
                 <Avatar size={32} collective={fromAccount} displayTitle={false} />
               </div>
               <div className="overflow-hidden">
-                <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sm leading-5">
+                <div className="overflow-hidden text-sm leading-5 text-ellipsis whitespace-nowrap">
                   {fromAccount.name || fromAccount.slug}
                 </div>
                 {tier && (
-                  <div className="overflow-hidden text-ellipsis whitespace-nowrap text-xs font-normal leading-4 text-slate-700">
+                  <div className="overflow-hidden text-xs leading-4 font-normal text-ellipsis whitespace-nowrap text-slate-700">
                     {tier.name}
                   </div>
                 )}
@@ -427,7 +427,7 @@ const getColumns = ({ intl, isIncoming, includeHostedAccounts, includeChildrenAc
       const frequency = cell.getValue();
       return (
         ['MONTHLY', 'YEARLY'].includes(frequency) && (
-          <span className="text-sm font-light lowercase text-muted-foreground">{i18nFrequency(intl, frequency)}</span>
+          <span className="text-sm font-light text-muted-foreground lowercase">{i18nFrequency(intl, frequency)}</span>
         )
       );
     },
@@ -866,7 +866,7 @@ const Contributions = ({
 
   return (
     <React.Fragment>
-      <div className="flex max-w-screen-lg flex-col gap-4">
+      <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
         <DashboardHeader
           title={
             isIncoming ? (

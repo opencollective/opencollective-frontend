@@ -24,7 +24,7 @@ const RadioGroupItem = React.forwardRef<
     <RadioGroupPrimitive.Item
       ref={ref}
       className={cn(
-        'aspect-square h-4 w-4 rounded-full border border-primary text-primary ring-offset-background focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+        'aspect-square h-4 w-4 rounded-full border border-primary text-primary ring-offset-background focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
         className,
       )}
       id={props.id || props.value}
@@ -47,16 +47,16 @@ const RadioGroupCard = React.forwardRef<
 >(({ className, children, showSubcontent, subContent, ...props }, ref) => {
   return (
     <div
-      className={`rounded-lg bg-card text-sm text-card-foreground shadow-sm ring-1 ring-border has-[[data-state=checked]]:ring-2 has-[[data-state=checked]]:ring-ring [&:has(:focus-visible)]:bg-primary/5`}
+      className={`rounded-lg bg-card text-sm text-card-foreground ring-1 shadow-xs ring-border has-data-[state=checked]:ring-2 has-data-[state=checked]:ring-ring [&:has(:focus-visible)]:bg-primary/5`}
     >
       <RadioGroupPrimitive.Item
         ref={ref}
-        className={cn('group w-full p-4 text-left outline-none', className)}
+        className={cn('group w-full p-4 text-left outline-hidden', className)}
         {...props}
         asChild={false}
       >
         <div className="flex w-full items-center gap-4">
-          <div className="flex aspect-square h-4 w-4 shrink-0 items-center justify-center rounded-full border border-primary text-primary ring-offset-background focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+          <div className="flex aspect-square h-4 w-4 shrink-0 items-center justify-center rounded-full border border-primary text-primary ring-offset-background focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
             <RadioGroupPrimitive.Indicator>
               <Circle className="h-2.5 w-2.5 fill-current text-current" />
             </RadioGroupPrimitive.Indicator>

@@ -29,7 +29,7 @@ export const LegalDocumentStatusBadge = ({
 }) => {
   const intl = useIntl();
   return (
-    <Badge className="whitespace-nowrap text-nowrap" type={getBadgeType(status, isExpired)}>
+    <Badge className="text-nowrap whitespace-nowrap" type={getBadgeType(status, isExpired)}>
       {i18nLegalDocumentStatus(intl, status, isExpired)}
     </Badge>
   );

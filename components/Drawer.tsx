@@ -67,7 +67,7 @@ export function Drawer({
           <div className="relative flex-1 overflow-y-scroll px-4 py-6 sm:px-6">
             {showCloseButton && (
               <StyledRoundButton
-                className="absolute right-5 top-5"
+                className="absolute top-5 right-5"
                 size={36}
                 type="button"
                 isBorderless
@@ -82,7 +82,7 @@ export function Drawer({
           </div>
           {showActionsContainer && (
             <div
-              className="flex flex-shrink-0 flex-wrap justify-between gap-2 border-t p-4"
+              className="flex shrink-0 flex-wrap justify-between gap-2 border-t p-4"
               ref={ref => setDrawerActionsContainer(ref)}
             />
           )}

@@ -80,10 +80,10 @@ const ConvertedAmountInput = ({ inputId, exchangeRate, onChange, baseAmount, min
   };
 
   return (
-    <div className="flex flex-auto whitespace-nowrap px-2 text-sm text-muted-foreground">
+    <div className="flex flex-auto px-2 text-sm whitespace-nowrap text-muted-foreground">
       <span className="mr-1 align-middle">= {exchangeRate.toCurrency} </span>
       <input
-        className="w-full flex-auto rounded px-[2px] [appearance:textfield] focus:text-foreground [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+        className="w-full flex-auto [appearance:textfield] rounded px-[2px] focus:text-foreground [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
         style={{ minWidth }}
         name={inputId}
         id={inputId}
@@ -210,7 +210,7 @@ const InputAmount = ({
       disabled={disabled}
       prepend={
         !hasCurrencyPicker ? (
-          <div className="flex items-center whitespace-nowrap bg-neutral-50 p-2 text-sm text-neutral-800">
+          <div className="flex items-center bg-neutral-50 p-2 text-sm whitespace-nowrap text-neutral-800">
             {formatCurrencyName(currency, currencyDisplay)}
           </div>
         ) : (

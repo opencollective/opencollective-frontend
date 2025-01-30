@@ -11,7 +11,7 @@ const Table = React.forwardRef<
     className={cn(
       'table-auto overflow-auto',
       mobileTableView || fullWidth
-        ? '-mx-4 border-b border-t 2xl:mx-0 2xl:rounded-xl 2xl:border'
+        ? '-mx-4 border-t border-b 2xl:mx-0 2xl:rounded-xl 2xl:border'
         : 'w-full rounded-xl border',
       fullWidth ? 'sm:-mx-6' : mobileTableView ? 'sm:mx-0 sm:w-full sm:rounded-xl sm:border' : '',
       className,
@@ -48,8 +48,8 @@ const TableRow = React.forwardRef<
   <tr
     ref={ref}
     className={cn(
-      'group/row border-b ring-inset ring-ring data-[state=selected]:bg-muted',
-      highlightOnHover && 'hover:bg-muted has-[[data-state=open]]:bg-muted',
+      'group/row border-b ring-ring ring-inset data-[state=selected]:bg-muted',
+      highlightOnHover && 'hover:bg-muted has-data-[state=open]:bg-muted',
       className,
     )}
     {...props}
@@ -105,7 +105,7 @@ const TableActionsButton = React.forwardRef<HTMLButtonElement, React.ButtonHTMLA
     <button
       ref={ref}
       className={cn(
-        'flex h-8 w-8 items-center justify-center rounded-lg border border-transparent bg-transparent text-slate-500 shadow-sm shadow-transparent ring-2 ring-transparent transition-colors hover:text-slate-950 hover:shadow-slate-200 focus:outline-none focus-visible:ring-black active:ring-black disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 group-hover/row:border-slate-200 group-hover/row:bg-white data-[state=open]:ring-black',
+        'flex h-8 w-8 items-center justify-center rounded-lg border border-transparent bg-transparent text-slate-500 ring-2 shadow-xs shadow-transparent ring-transparent transition-colors group-hover/row:border-slate-200 group-hover/row:bg-white hover:text-slate-950 hover:shadow-slate-200 focus:outline-hidden focus-visible:ring-black active:ring-black disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 data-[state=open]:ring-black',
         className,
       )}
       {...props}

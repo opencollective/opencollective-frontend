@@ -663,7 +663,7 @@ function PayoutMethodRadioGroupItem(props: {
 
                   {!keepNameDifferent && (
                     <React.Fragment>
-                      <div className="mb-2 mt-4 font-bold">
+                      <div className="mt-4 mb-2 font-bold">
                         <FormattedMessage
                           defaultMessage=" Would you like to update your legal name to match your payout method contact name?"
                           id="fEYP7x"
@@ -709,7 +709,7 @@ function PayoutMethodRadioGroupItem(props: {
           )
         }
       >
-        <div className="flex-grow">
+        <div className="grow">
           <PayoutMethodLabel showIcon payoutMethod={props.payoutMethod} />
         </div>
         {!isEditingPayoutMethod && props.isEditable && (

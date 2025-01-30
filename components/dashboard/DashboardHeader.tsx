@@ -25,7 +25,7 @@ export default function DashboardHeader({
   return (
     <div className={cn('flex flex-col gap-2', className)}>
       <div className="flex flex-col flex-wrap justify-between gap-1.5 sm:flex-row sm:items-center">
-        <div className="flex items-center gap-1.5 text-2xl font-bold leading-9 tracking-tight text-muted-foreground">
+        <div className="flex items-center gap-1.5 text-2xl leading-9 font-bold tracking-tight text-muted-foreground">
           {subpathTitle && (
             <React.Fragment>
               <Link href={titleRoute}>

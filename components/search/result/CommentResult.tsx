@@ -37,7 +37,7 @@ export function CommentResult({ comment, highlights }: { comment: CommentResultD
         </div>
         {otherHighlight && (
           <div className="truncate">
-            <Markup className="italic text-muted-foreground" allowList={['mark']} content={otherHighlight} />
+            <Markup className="text-muted-foreground italic" allowList={['mark']} content={otherHighlight} />
           </div>
         )}
       </div>

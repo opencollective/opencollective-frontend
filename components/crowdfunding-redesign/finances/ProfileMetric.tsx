@@ -51,8 +51,8 @@ export function ProfileMetric({
   return (
     <Comp
       className={clsx(
-        'group flex flex-col gap-1 border-0 border-b-[3px] border-r-border [&:not(:last-child)]:border-r',
-        isButton && 'cursor-pointer text-left ring-ring ring-offset-2 focus:outline-none focus-visible:ring-2',
+        'group flex flex-col gap-1 border-0 border-b-[3px] border-r-border not-last:border-r',
+        isButton && 'cursor-pointer text-left ring-ring ring-offset-2 focus:outline-hidden focus-visible:ring-2',
         active ? 'border-primary bg-background' : 'border-transparent bg-muted',
         className,
       )}

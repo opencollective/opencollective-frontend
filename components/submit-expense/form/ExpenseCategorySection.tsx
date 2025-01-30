@@ -67,7 +67,7 @@ export function ExpenseCategorySection(props: ExpenseCategorySectionProps) {
           <div className="group mt-4 rounded-md border border-[#DCDDE0] p-4">
             <CollapsibleTrigger asChild>
               <button className="flex w-full items-center text-start text-sm font-bold">
-                <div className="flex-grow">
+                <div className="grow">
                   {' '}
                   <FormattedMessage defaultMessage="Expense category instructions" id="QVX2sp" />
                 </div>

@@ -122,7 +122,7 @@ const Dropzone = ({
     <div
       className={cn(
         'group relative flex h-full w-full cursor-pointer place-items-center overflow-hidden rounded-lg border-2 border-dashed border-muted-foreground/25 text-center transition hover:bg-muted/25',
-        'ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+        'ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-hidden',
         '[&>img]:max-h-full [&>img]:max-w-full',
         isDragActive && 'border-muted-foreground/50',
         props.disabled && 'pointer-events-none opacity-60',
@@ -278,7 +278,7 @@ const Dropzone = ({
         </div>
       )}
       {value && showActions && (
-        <div className="absolute right-3 top-3">
+        <div className="absolute top-3 right-3">
           <Button
             variant="outline"
             size="xs"

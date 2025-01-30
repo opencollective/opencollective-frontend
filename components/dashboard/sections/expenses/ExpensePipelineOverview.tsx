@@ -187,7 +187,7 @@ function WiseStatus(props: WiseStatusProps) {
         </div>
         <TransferwiseIcon size={16} />
       </div>
-      <div className="mt-2 flex-grow text-2xl font-bold text-slate-900">
+      <div className="mt-2 grow text-2xl font-bold text-slate-900">
         <FormattedMoneyAmount
           showCurrencyCode={false}
           currency={mainBalance?.currency}
@@ -305,7 +305,7 @@ function PayPalStatus(props: PayPalStatusProps) {
         />
         <Paypal size={16} />
       </div>
-      <div className="mt-2 flex-grow text-2xl font-bold text-slate-900">
+      <div className="mt-2 grow text-2xl font-bold text-slate-900">
         <FormattedMoneyAmount
           showCurrencyCode={false}
           currency={props.host?.paypalPreApproval?.balance?.currency}
@@ -380,7 +380,7 @@ function StripeIssuingStatus(props: StripeIssuingStatusProps) {
         />
         <CcStripe />
       </div>
-      <div className="mt-2 flex-grow text-2xl font-bold text-slate-900">
+      <div className="mt-2 grow text-2xl font-bold text-slate-900">
         <FormattedMoneyAmount
           showCurrencyCode={false}
           currency={props.host?.stripe?.issuingBalance?.currency}

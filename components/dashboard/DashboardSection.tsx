@@ -161,7 +161,7 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
 
   if (values(LEGACY_SECTIONS).includes(section)) {
     return (
-      <div className="w-full max-w-screen-lg pb-6">
+      <div className="w-full max-w-(--breakpoint-lg) pb-6">
         <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
         {SECTION_LABELS[section] && section !== ALL_SECTIONS.GIFT_CARDS && (
           <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />
@@ -176,8 +176,8 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
   const SettingsComponent = SETTINGS_COMPONENTS[section];
   if (SettingsComponent) {
     return (
-      // <div className="flex max-w-screen-lg justify-center">
-      <div className="max-w-screen-md flex-1 pb-6">
+      // <div className="flex max-w-(--breakpoint-lg) justify-center">
+      <div className="max-w-(--breakpoint-md) flex-1 pb-6">
         <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
         <SettingsComponent account={account} accountSlug={account.slug} subpath={subpath} />
       </div>
@@ -186,8 +186,8 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
 
   if (values(LEGACY_SETTINGS_SECTIONS).includes(section)) {
     return (
-      // <div className="flex max-w-screen-lg justify-center">
-      <div className="max-w-screen-md flex-1 pb-6">
+      // <div className="flex max-w-(--breakpoint-lg) justify-center">
+      <div className="max-w-(--breakpoint-md) flex-1 pb-6">
         <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
         {SECTION_LABELS[section] && section !== ALL_SECTIONS.GIFT_CARDS && (
           <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />

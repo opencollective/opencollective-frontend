@@ -278,7 +278,7 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
 
   return (
     <React.Fragment>
-      <div className="flex max-w-screen-lg flex-col gap-4">
+      <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
         <DashboardHeader
           title={<FormattedMessage defaultMessage="Chart of Accounts" id="IzFWHI" />}
           description={
@@ -335,7 +335,7 @@ export const HostAdminAccountingSection = ({ accountSlug }: DashboardSectionProp
           <div className="inline-block rounded-xl bg-slate-50 px-2 py-1 font-bold text-slate-800">
             {deleteCategoryConfirmation.name}
             {deleteCategoryConfirmation.friendlyName && (
-              <span className="font-normal italic text-slate-700">
+              <span className="font-normal text-slate-700 italic">
                 &nbsp;·&nbsp;{deleteCategoryConfirmation.friendlyName}
               </span>
             )}

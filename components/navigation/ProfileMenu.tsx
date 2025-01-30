@@ -68,7 +68,7 @@ const MenuItem = ({
     <React.Fragment>
       <div className="flex w-full items-center gap-2" title={label}>
         <Icon className="shrink-0 text-muted-foreground transition-colors group-hover:text-foreground" size={16} />
-        <div className="shrink overflow-hidden text-ellipsis text-nowrap">{label}</div>
+        <div className="shrink overflow-hidden text-nowrap text-ellipsis">{label}</div>
         {appending}
       </div>
     </React.Fragment>
@@ -216,7 +216,7 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
         </div>
         <Separator className="sm:hidden" />
         <div className="flex flex-col sm:w-[256px]">
-          <div className="flex-grow border-l text-sm sm:basis-0 sm:overflow-y-auto">
+          <div className="grow border-l text-sm sm:basis-0 sm:overflow-y-auto">
             <ProfileMenuMemberships user={LoggedInUser} closeDrawer={() => setMenuOpen(false)} />
           </div>
         </div>
@@ -229,7 +229,7 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
       <Popover open={isMenuOpen} onOpenChange={open => setMenuOpen(open)}>
         <PopoverTrigger asChild>
           <button
-            className="rounded-full ring-black ring-offset-1 focus:outline-none focus:ring-2"
+            className="rounded-full ring-black ring-offset-1 focus:ring-2 focus:outline-hidden"
             data-cy="user-menu-trigger"
           >
             <Avatar collective={get(LoggedInUser, 'collective')} radius={32} />

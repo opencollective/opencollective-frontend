@@ -75,7 +75,7 @@ export function ExpenseItemsForm(props: { form: ExpenseForm }) {
         expenseItems?.map((ei, i) => (
           // eslint-disable-next-line react/no-array-index-key
           <div key={i} className="flex gap-4">
-            <div className="flex-grow">
+            <div className="grow">
               <ExpenseItem form={props.form} index={i} />
             </div>
             <div>
@@ -206,7 +206,7 @@ function ExpenseItem(props: ExpenseItemProps) {
       <div className="flex gap-4">
         {hasAttachment && (
           <div className="flex flex-col">
-            <div className="flex flex-grow justify-center">
+            <div className="flex grow justify-center">
               <FormField
                 label={intl.formatMessage({ defaultMessage: 'Upload file', id: '6oOCCL' })}
                 name={`expenseItems.${props.index}.attachment`}
@@ -241,7 +241,7 @@ function ExpenseItem(props: ExpenseItemProps) {
             </div>
           </div>
         )}
-        <div className="flex-grow">
+        <div className="grow">
           <div className="mb-2">
             <FormField
               required={props.form.options.isAdminOfPayee}
@@ -251,7 +251,7 @@ function ExpenseItem(props: ExpenseItemProps) {
             />
           </div>
           <div className="flex gap-4">
-            <div className="flex-grow basis-0">
+            <div className="grow basis-0">
               <FormField
                 required={props.form.options.isAdminOfPayee}
                 label={intl.formatMessage({ defaultMessage: 'Date', id: 'expense.incurredAt' })}
@@ -264,7 +264,7 @@ function ExpenseItem(props: ExpenseItemProps) {
               </FormField>
             </div>
 
-            <div className="flex-grow basis-0">
+            <div className="grow basis-0">
               <div className="flex flex-col">
                 <FormField
                   label={intl.formatMessage({ defaultMessage: 'Amount', id: 'Fields.amount' })}

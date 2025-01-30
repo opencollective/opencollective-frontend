@@ -50,7 +50,7 @@ export function SummarySection(props: SummarySectionProps) {
             )}
           </div>
           {props.form.values.recurrenceFrequency && props.form.values.recurrenceFrequency !== 'none' && (
-            <span className="rounded-xl bg-slate-100 px-3 py-1 font-mono text-xs uppercase text-muted-foreground">
+            <span className="rounded-xl bg-slate-100 px-3 py-1 font-mono text-xs text-muted-foreground uppercase">
               <FormattedMessage defaultMessage="Recurring" id="v84fNv" />
             </span>
           )}
@@ -67,7 +67,7 @@ export function SummarySection(props: SummarySectionProps) {
             props.form.values.tags.map(tag => (
               <span
                 key={tag}
-                className="rounded-xl rounded-es-none rounded-ss-none bg-slate-100 px-3 py-1 text-xs text-slate-800"
+                className="rounded-xl rounded-ss-none rounded-es-none bg-slate-100 px-3 py-1 text-xs text-slate-800"
               >
                 {tag}
               </span>
@@ -123,7 +123,7 @@ export function SummarySection(props: SummarySectionProps) {
                   />
                 </div>
               )}
-              <div className="flex-grow">
+              <div className="grow">
                 <div>
                   {ei.description || (
                     <span className="text-muted-foreground">
@@ -273,7 +273,7 @@ export function SummarySection(props: SummarySectionProps) {
         </div>
       )}
       <div className="grid grid-cols-2 gap-4">
-        <div className="mt-4 min-h-32 flex-grow basis-0 rounded-md border border-gray-300 p-4 text-sm">
+        <div className="mt-4 min-h-32 grow basis-0 rounded-md border border-gray-300 p-4 text-sm">
           <div className="font-bold">
             <FormattedMessage defaultMessage="Who is paying?" id="IdR7BG" />
           </div>
@@ -323,7 +323,7 @@ export function SummarySection(props: SummarySectionProps) {
             </React.Fragment>
           )}
         </div>
-        <div className="mt-4 min-h-32 flex-grow basis-0 rounded-md border border-gray-300 p-4 text-sm">
+        <div className="mt-4 min-h-32 grow basis-0 rounded-md border border-gray-300 p-4 text-sm">
           <div className="font-bold">
             <FormattedMessage defaultMessage="Who is getting paid?" id="W5Z+Fm" />
           </div>
@@ -379,7 +379,7 @@ export function SummarySection(props: SummarySectionProps) {
             )
           )}
         </div>
-        <div className="col-span-2 h-fit flex-grow basis-0 rounded-md border border-gray-300 p-4 text-sm">
+        <div className="col-span-2 h-fit grow basis-0 rounded-md border border-gray-300 p-4 text-sm">
           <div className="font-bold">
             <FormattedMessage defaultMessage="Payout Method" id="SecurityScope.PayoutMethod" />
           </div>
@@ -508,7 +508,7 @@ function RecurrenceOptionBox(props: { form: ExpenseForm }) {
 
             {recurrenceFrequency && recurrenceFrequency !== 'none' && (
               <React.Fragment>
-                <Label className="mb-2 mt-4">
+                <Label className="mt-4 mb-2">
                   <FormattedMessage defaultMessage="End Date" id="EndDate" />
                 </Label>
                 <Input type="date" value={recurrenceEndAt} onChange={e => setRecurrenceEndAtEdit(e.target.value)} />

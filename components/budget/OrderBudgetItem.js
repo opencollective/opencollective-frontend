@@ -43,7 +43,7 @@ const ButtonsContainer = styled.div.attrs({ 'data-cy': 'order-actions' })`
   display: flex;
   flex-wrap: wrap;
   margin-top: 8px;
-  flex-grow: 1;
+  grow: 1;
   transition: opacity 0.05s;
   justify-content: flex-end;
 

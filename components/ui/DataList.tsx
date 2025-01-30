@@ -11,7 +11,7 @@ export function DataListItemValue({ children, className }: { children?: React.Re
 }
 
 export function DataListItemLabel({ children }: { children?: React.ReactNode }) {
-  return <div className="min-w-[180px] max-w-[240px] shrink-0 grow-0 basis-1/4 text-muted-foreground">{children}</div>;
+  return <div className="max-w-[240px] min-w-[180px] shrink-0 grow-0 basis-1/4 text-muted-foreground">{children}</div>;
 }
 
 export type DataListItemProps = {

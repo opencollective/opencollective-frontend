@@ -105,7 +105,7 @@ export function EditProfile({ account }) {
       <DialogTrigger asChild>
         <Button>Edit prototype</Button>
       </DialogTrigger>
-      <DialogContent className="gap-6 sm:max-w-screen-lg">
+      <DialogContent className="gap-6 sm:max-w-(--breakpoint-lg)">
         <DialogHeader>
           <DialogTitle className="text-xl">Edit profile prototype</DialogTitle>
           <DialogDescription>This will only affect the prototype and not your actual profile.</DialogDescription>

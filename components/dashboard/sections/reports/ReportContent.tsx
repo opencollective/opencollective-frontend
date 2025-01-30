@@ -66,8 +66,8 @@ export function ReportContent({
 
                 return (
                   <React.Fragment key={JSON.stringify(row.filter)}>
-                    <tr className="group text-sm hover:bg-muted has-[[data-state=open]]:bg-muted">
-                      <td className="flex min-h-8 flex-1 items-center gap-1 overflow-hidden truncate text-wrap py-1 pl-6 text-left sm:pl-10">
+                    <tr className="group text-sm hover:bg-muted has-data-[state=open]:bg-muted">
+                      <td className="flex min-h-8 flex-1 items-center gap-1 truncate overflow-hidden py-1 pl-6 text-left text-wrap sm:pl-10">
                         <span className="underline-offset-2 transition-colors hover:decoration-slate-400">
                           {row.label || <TransactionReportRowLabel filter={row.filter} />}
                         </span>

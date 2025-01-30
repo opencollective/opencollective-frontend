@@ -1,179 +1,306 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src:
-    url('../fonts/inter/Inter-Regular.woff2') format('woff2'),
-    url('../fonts/inter/Inter-Regular.woff') format('woff');
-}
-@font-face {
-  font-family: 'Inter';
-  font-style: italic;
-  font-weight: 400;
-  font-display: swap;
-  src:
-    url('../fonts/inter/Inter-Italic.woff2') format('woff2'),
-    url('../fonts/inter/Inter-Italic.woff') format('woff');
+@plugin 'tailwindcss-animate';
+@plugin '@tailwindcss/typography';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --color-oc-blue-tints-500: hsla(213, 100%, 59%, 1);
+  --color-oc-blue-tints-800: hsla(222, 80%, 40%, 1);
+  --color-oc-blue-tints-transparent: hsla(216, 100%, 58%, 0.3);
+
+  --color-dark-900: hsla(216, 2%, 8%, 1);
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 6px);
+
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-signature: JustMeAgainDownHere, cursive;
+  --font-emoji: AppleColorEmoji, Segoe UI Emoji, NotoColorEmoji,
+    Segoe UI Symbol, Android Emoji, EmojiSymbols;
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-collapsible-down: collapsible-down 0.2s ease-out;
+  --animate-collapsible-up: collapsible-up 0.2s ease-out;
+  --animate-arrow-right: arrow-right 0.2s ease-out forwards;
+
+  --transition-duration-1500: 1500ms;
+  --transition-duration-2000: 2000ms;
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+  @keyframes collapsible-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-collapsible-content-height);
+    }
+  }
+  @keyframes collapsible-up {
+    from {
+      height: var(--radix-collapsible-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+  @keyframes arrow-right {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(25%);
+    }
+  }
 }
 
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src:
-    url('../fonts/inter/Inter-Medium.woff2') format('woff2'),
-    url('../fonts/inter/Inter-Medium.woff') format('woff');
-}
-@font-face {
-  font-family: 'Inter';
-  font-style: italic;
-  font-weight: 500;
-  font-display: swap;
-  src:
-    url('../fonts/inter/Inter-MediumItalic.woff2') format('woff2'),
-    url('../fonts/inter/Inter-MediumItalic.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src:
-    url('../fonts/inter/Inter-SemiBold.woff2') format('woff2'),
-    url('../fonts/inter/Inter-SemiBold.woff') format('woff');
-}
-@font-face {
-  font-family: 'Inter';
-  font-style: italic;
-  font-weight: 600;
-  font-display: swap;
-  src:
-    url('../fonts/inter/Inter-SemiBoldItalic.woff2') format('woff2'),
-    url('../fonts/inter/Inter-SemiBoldItalic.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src:
-    url('../fonts/inter/Inter-Bold.woff2') format('woff2'),
-    url('../fonts/inter/Inter-Bold.woff') format('woff');
-}
-@font-face {
-  font-family: 'Inter';
-  font-style: italic;
-  font-weight: 700;
-  font-display: swap;
-  src:
-    url('../fonts/inter/Inter-BoldItalic.woff2') format('woff2'),
-    url('../fonts/inter/Inter-BoldItalic.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 800;
-  font-display: swap;
-  src:
-    url('../fonts/inter/Inter-ExtraBold.woff2') format('woff2'),
-    url('../fonts/inter/Inter-ExtraBold.woff') format('woff');
-}
-@font-face {
-  font-family: 'Inter';
-  font-style: italic;
-  font-weight: 800;
-  font-display: swap;
-  src:
-    url('../fonts/inter/Inter-ExtraBoldItalic.woff2') format('woff2'),
-    url('../fonts/inter/Inter-ExtraBoldItalic.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 900;
-  font-display: swap;
-  src:
-    url('../fonts/inter/Inter-Black.woff2') format('woff2'),
-    url('../fonts/inter/Inter-Black.woff') format('woff');
-}
-@font-face {
-  font-family: 'Inter';
-  font-style: italic;
-  font-weight: 900;
-  font-display: swap;
-  src:
-    url('../fonts/inter/Inter-BlackItalic.woff2') format('woff2'),
-    url('../fonts/inter/Inter-BlackItalic.woff') format('woff');
+@utility container {
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+  @media (width >= --theme(--breakpoint-sm)) {
+    max-width: none;
+  }
+  @media (width >= 1536px) {
+    max-width: 1536px;
+  }
 }
 
 /*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
+
+@layer utilities {
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src:
+      url('../fonts/inter/Inter-Regular.woff2') format('woff2'),
+      url('../fonts/inter/Inter-Regular.woff') format('woff');
+  }
+  @font-face {
+    font-family: 'Inter';
+    font-style: italic;
+    font-weight: 400;
+    font-display: swap;
+    src:
+      url('../fonts/inter/Inter-Italic.woff2') format('woff2'),
+      url('../fonts/inter/Inter-Italic.woff') format('woff');
+  }
+
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src:
+      url('../fonts/inter/Inter-Medium.woff2') format('woff2'),
+      url('../fonts/inter/Inter-Medium.woff') format('woff');
+  }
+  @font-face {
+    font-family: 'Inter';
+    font-style: italic;
+    font-weight: 500;
+    font-display: swap;
+    src:
+      url('../fonts/inter/Inter-MediumItalic.woff2') format('woff2'),
+      url('../fonts/inter/Inter-MediumItalic.woff') format('woff');
+  }
+
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src:
+      url('../fonts/inter/Inter-SemiBold.woff2') format('woff2'),
+      url('../fonts/inter/Inter-SemiBold.woff') format('woff');
+  }
+  @font-face {
+    font-family: 'Inter';
+    font-style: italic;
+    font-weight: 600;
+    font-display: swap;
+    src:
+      url('../fonts/inter/Inter-SemiBoldItalic.woff2') format('woff2'),
+      url('../fonts/inter/Inter-SemiBoldItalic.woff') format('woff');
+  }
+
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src:
+      url('../fonts/inter/Inter-Bold.woff2') format('woff2'),
+      url('../fonts/inter/Inter-Bold.woff') format('woff');
+  }
+  @font-face {
+    font-family: 'Inter';
+    font-style: italic;
+    font-weight: 700;
+    font-display: swap;
+    src:
+      url('../fonts/inter/Inter-BoldItalic.woff2') format('woff2'),
+      url('../fonts/inter/Inter-BoldItalic.woff') format('woff');
+  }
+
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 800;
+    font-display: swap;
+    src:
+      url('../fonts/inter/Inter-ExtraBold.woff2') format('woff2'),
+      url('../fonts/inter/Inter-ExtraBold.woff') format('woff');
+  }
+  @font-face {
+    font-family: 'Inter';
+    font-style: italic;
+    font-weight: 800;
+    font-display: swap;
+    src:
+      url('../fonts/inter/Inter-ExtraBoldItalic.woff2') format('woff2'),
+      url('../fonts/inter/Inter-ExtraBoldItalic.woff') format('woff');
+  }
+
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 900;
+    font-display: swap;
+    src:
+      url('../fonts/inter/Inter-Black.woff2') format('woff2'),
+      url('../fonts/inter/Inter-Black.woff') format('woff');
+  }
+  @font-face {
+    font-family: 'Inter';
+    font-style: italic;
+    font-weight: 900;
+    font-display: swap;
+    src:
+      url('../fonts/inter/Inter-BlackItalic.woff2') format('woff2'),
+      url('../fonts/inter/Inter-BlackItalic.woff') format('woff');
+  }
+
+  /*
 * A font for signatures. Imported as absolute to prevent NextJS from appending a hash to the URL and including it
 * on all pages.
 */
-@font-face {
-  font-family: 'JustMeAgainDownHere';
-  src: url('/static/fonts/JustMeAgainDownHere-Regular.ttf');
-  font-weight: normal;
-  font-style: normal;
+  @font-face {
+    font-family: 'JustMeAgainDownHere';
+    src: url('/static/fonts/JustMeAgainDownHere-Regular.ttf');
+    font-weight: normal;
+    font-style: normal;
+  }
 }
 
+/* Default theme */
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 47.4% 11.2%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    --background: var(--color-white);
+    --foreground: var(--color-slate-900);
+    --card: var(--color-white);
+    --card-foreground: var(--color-slate-900);
+    --popover: var(--color-white);
+    --popover-foreground: var(--color-slate-900);
+    --primary: var(--color-blue-600);
+    --primary-foreground: var(--color-slate-50);
+    --secondary: var(--color-slate-100);
+    --secondary-foreground: var(--color-slate-900);
+    --muted: var(--color-slate-100);
+    --muted-foreground: var(--color-slate-500);
+    --accent: var(--color-slate-100);
+    --accent-foreground: var(--color-slate-900);
+    --destructive: var(--color-rose-500);
+    --destructive-foreground: var(--color-slate-50);
+    --border: var(--color-slate-200);
+    --input: var(--color-slate-200);
+    --ring: var(--color-slate-400);
     --radius: 0.75rem;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+    --background: var(--color-zinc-950);
+    --foreground: var(--color-zinc-50);
+    --card: var(--color-zinc-950);
+    --card-foreground: var(--color-zinc-50);
+    --popover: var(--color-zinc-950);
+    --popover-foreground: var(--color-zinc-50);
+    --primary: var(--color-zinc-50);
+    --primary-foreground: var(--color-zinc-900);
+    --secondary: var(--color-zinc-800);
+    --secondary-foreground: var(--color-zinc-50);
+    --muted: var(--color-zinc-800);
+    --muted-foreground: var(--color-zinc-400);
+    --accent: var(--color-zinc-800);
+    --accent-foreground: var(--color-zinc-50);
+    --destructive: var(--color-rose-700);
+    --destructive-foreground: var(--color-zinc-50);
+    --border: var(--color-zinc-800);
+    --input: var(--color-zinc-800);
+    --ring: var(--color-zinc-300);
   }
 }
 
@@ -242,7 +369,7 @@ h4 {
   @apply mt-4 scroll-m-20 text-xl font-semibold tracking-tight;
 }
 .markdown p {
-  @apply leading-7 [&:not(:first-child)]:mt-4;
+  @apply leading-7 not-first:mt-4;
 }
 .markdown p.lead {
   @apply text-lg text-slate-600 sm:text-xl;

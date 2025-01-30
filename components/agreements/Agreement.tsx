@@ -65,7 +65,7 @@ export default function Agreement({ agreement, openFileViewer = undefined }: Agr
             agreement.expiresAt ? (
               <DateTime value={agreement.expiresAt} />
             ) : (
-              <span className="italic text-slate-500">
+              <span className="text-slate-500 italic">
                 <FormattedMessage defaultMessage="Never" id="du1laW" />
               </span>
             )

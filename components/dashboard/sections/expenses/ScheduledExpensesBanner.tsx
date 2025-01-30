@@ -155,7 +155,7 @@ const ScheduledExpensesBanner = ({ hostSlug, onSubmit, secondButton }) => {
             />
           }
           continueHandler={handlePayBatch}
-          overlayClassName="z-[1000]"
+          overlayClassName="z-1000"
         />
       )}
     </React.Fragment>

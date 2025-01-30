@@ -15,14 +15,14 @@ export const ContextPill = ({ slug, onRemove }) => {
     fetchPolicy: 'cache-first',
   });
   return (
-    <div className="flex max-w-fit shrink-0 select-none items-center gap-2 overflow-hidden rounded-md bg-muted pr-1">
-      <Avatar collective={data?.account} size={20} className="m-1 bg-white shadow-sm" />
+    <div className="flex max-w-fit shrink-0 items-center gap-2 overflow-hidden rounded-md bg-muted pr-1 select-none">
+      <Avatar collective={data?.account} size={20} className="m-1 bg-white shadow-xs" />
       <div className="text-sm">{data?.account.name ?? slug}</div>
       {onRemove && (
         <button
           tabIndex={-1}
           onClick={onRemove}
-          className="flex size-5 items-center justify-center rounded p-0.5 hover:bg-slate-200 focus:outline-none focus-visible:bg-slate-200"
+          className="flex size-5 items-center justify-center rounded p-0.5 hover:bg-slate-200 focus:outline-hidden focus-visible:bg-slate-200"
         >
           <X size={16} className="text-muted-foreground" />
         </button>

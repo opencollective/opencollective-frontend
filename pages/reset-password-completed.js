@@ -15,7 +15,7 @@ const ResetPasswordCompleted = ({ LoggedInUser, loadingLoggedInUser }) => {
   return (
     <Page noRobots showFooter={false}>
       <div
-        className="flex flex-col items-center px-4 pb-32 pt-8 text-center sm:pt-16"
+        className="flex flex-col items-center px-4 pt-8 pb-32 text-center sm:pt-16"
         data-cy="reset-password-success-page"
       >
         <Image src="/static/images/sign-in-illustration.png" width={624} height={372} />

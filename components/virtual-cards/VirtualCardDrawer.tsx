@@ -184,8 +184,8 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
                   {
                     AvailableAmount: I18nBold,
                     AmountSeparator: v => <strong>&nbsp;{v}&nbsp;</strong>,
-                    LimitAmount: v => <span className="italic text-slate-600">{v}</span>,
-                    LimitInterval: v => <span className="italic text-slate-600">{v}</span>,
+                    LimitAmount: v => <span className="text-slate-600 italic">{v}</span>,
+                    LimitInterval: v => <span className="text-slate-600 italic">{v}</span>,
                   },
                 )}
               />

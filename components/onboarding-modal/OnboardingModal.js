@@ -66,7 +66,7 @@ const ResponsiveModalHeader = styled(ModalHeader)`
 
 const ResponsiveModalBody = styled(ModalBody)`
   @media screen and (max-width: 40em) {
-    flex-grow: 1;
+    grow: 1;
   }
 `;
 
@@ -84,7 +84,7 @@ const ModalWithImage = styled(ResponsiveModal)`
   }
 `;
 const FormWithStyles = styled(Form)`
-  flex-grow: 1;
+  grow: 1;
   display: flex;
   flex-direction: column;
   justify-content: space-between;

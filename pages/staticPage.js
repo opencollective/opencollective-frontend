@@ -43,9 +43,9 @@ class StaticPage extends React.Component {
     const { path, pageSlug, title } = this.props;
     return (
       <Page title={title} navTitle={title}>
-        <div className="markdown mx-auto mt-10 max-w-screen-lg px-4 py-2 sm:px-6 sm:py-4">
+        <div className="markdown mx-auto mt-10 max-w-(--breakpoint-lg) px-4 py-2 sm:px-6 sm:py-4">
           {path && pageSlug && (
-            <div className="mt-3 uppercase text-gray-400">
+            <div className="mt-3 text-gray-400 uppercase">
               <Link href={`/${path}`}>{path}</Link>
             </div>
           )}

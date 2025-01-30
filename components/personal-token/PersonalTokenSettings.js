@@ -254,7 +254,7 @@ const PersonalTokenSettings = ({ backPath, id }) => {
                           checked={field.value}
                           onCheckedChange={value => form.setFieldValue(field.name, value)}
                         />
-                        <label htmlFor="preAuthorize2FA-checkbox" className="ml-2 text-xs font-normal leading-none">
+                        <label htmlFor="preAuthorize2FA-checkbox" className="ml-2 text-xs leading-none font-normal">
                           <FormattedMessage
                             defaultMessage="Allow this token to directly use operations that would normally require 2FA"
                             id="JClbMN"

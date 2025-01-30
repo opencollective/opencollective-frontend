@@ -25,13 +25,13 @@ export function InviteUserOption(props: InviteUserOptionProps) {
             <TabsList>
               <TabsTrigger
                 value={InviteeAccountType.INDIVIDUAL}
-                className="data-[state=active]:text-blue-900 data-[state=active]:shadow"
+                className="data-[state=active]:text-blue-900 data-[state=active]:shadow-sm"
               >
                 <FormattedMessage defaultMessage="Personal Account" id="Sch2bu" />
               </TabsTrigger>
               <TabsTrigger
                 value={InviteeAccountType.ORGANIZATION}
-                className="data-[state=active]:text-blue-900 data-[state=active]:shadow"
+                className="data-[state=active]:text-blue-900 data-[state=active]:shadow-sm"
               >
                 <FormattedMessage defaultMessage="Organization Account" id="cS9oSV" />
               </TabsTrigger>

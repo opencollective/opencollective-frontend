@@ -42,11 +42,7 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
           onValueChange={newValue => props.form.setFieldValue('expenseTypeOption', newValue as ExpenseType)}
           className="flex"
         >
-          <RadioGroupCard
-            className="flex-grow basis-0"
-            value={ExpenseType.INVOICE}
-            disabled={props.form.initialLoading}
-          >
+          <RadioGroupCard className="grow basis-0" value={ExpenseType.INVOICE} disabled={props.form.initialLoading}>
             <div>
               <div className="mb-1 font-bold">
                 <FormattedMessage defaultMessage="Invoice" id="Expense.Type.Invoice" />
@@ -57,11 +53,7 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
             </div>
           </RadioGroupCard>
 
-          <RadioGroupCard
-            className="flex-grow basis-0"
-            value={ExpenseType.RECEIPT}
-            disabled={props.form.initialLoading}
-          >
+          <RadioGroupCard className="grow basis-0" value={ExpenseType.RECEIPT} disabled={props.form.initialLoading}>
             <div>
               <div className="mb-1 font-bold">
                 <FormattedMessage defaultMessage="Reimbursement" id="ExpenseForm.ReceiptLabel" />
@@ -154,7 +146,7 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
               </TabsList>
               <TabsContent value={YesNoOption.YES}>
                 <div className="flex items-start gap-4">
-                  <div className="h-16 flex-grow basis-0">
+                  <div className="h-16 grow basis-0">
                     <div>
                       <FormField
                         required={
@@ -195,7 +187,7 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
                       </FormField>
                     </div>
                   </div>
-                  <div className="flex-grow basis-0">
+                  <div className="grow basis-0">
                     <FormField
                       required={
                         props.form.options.isAdminOfPayee || props.form.options.payee?.type === CollectiveType.VENDOR

@@ -32,7 +32,7 @@ export const SuggestedContributionsTable = ({
         data={contributions}
         getRowClassName={({ original }) =>
           selectedContribution?.id === original.id
-            ? 'bg-blue-50 font-semibold shadow-inner shadow-blue-100 !border-l-2 border-l-blue-500'
+            ? 'bg-blue-50 font-semibold shadow-inner shadow-blue-100 border-l-2! border-l-blue-500'
             : ''
         }
         emptyMessage={() => (

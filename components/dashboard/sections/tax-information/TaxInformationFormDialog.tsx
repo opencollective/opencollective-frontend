@@ -39,7 +39,7 @@ export const TaxInformationFormDialog = ({ account, open, onOpenChange, onSucces
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <Overlay className="fixed inset-0 z-[3000] max-h-screen min-h-full overflow-y-auto bg-white px-0 py-0 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out data-[state=open]:zoom-in">
+      <Overlay className="fixed inset-0 z-3000 max-h-screen min-h-full overflow-y-auto bg-white px-0 py-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in">
         <div className="sticky top-0 z-50 flex items-center justify-between border-b border-gray-100 bg-white px-6 py-4 shadow-md">
           <div className="text-sm">
             <h2 className="text-xl font-bold">

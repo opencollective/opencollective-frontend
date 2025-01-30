@@ -16,7 +16,7 @@ export function UpdateResult({ update, highlights }: { update: UpdateResultData;
         <div className="truncate font-medium">
           <Markup allowList={['mark']} content={highlightFields.top.title?.[0] || update.title} />
         </div>
-        <div className="truncate italic text-muted-foreground">
+        <div className="truncate text-muted-foreground italic">
           <Markup allowList={['mark']} content={highlightFields.top.html?.[0] || update.html} />
         </div>
       </div>

@@ -116,7 +116,7 @@ const HostFeeStructurePicker = ({ collective, host }: Partial<CollectiveDetailsP
       <PopoverTrigger asChild>
         <Button variant="outline">
           {formatHostFeeStructure(intl, collective.hostFeesStructure)}
-          <ChevronDown className="ml-4 h-4 w-4 flex-shrink-0 opacity-50" />
+          <ChevronDown className="ml-4 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent align="start">
@@ -145,7 +145,7 @@ const HostFeeStructurePicker = ({ collective, host }: Partial<CollectiveDetailsP
                 {formatHostFeeStructure(intl, HOST_FEE_STRUCTURE.CUSTOM_FEE)}
               </label>
             </div>
-            <div className="ml-6 mt-1 text-xs text-slate-700">
+            <div className="mt-1 ml-6 text-xs text-slate-700">
               <InputGroup
                 disabled={loading}
                 tabIndex={-1}
@@ -272,7 +272,7 @@ const ExpenseTypesPicker = ({ collective }: Partial<CollectiveDetailsProps>) => 
               .map(expenseType => i18nExpenseType(intl, expenseType))
               .join(', ') || <FormattedMessage defaultMessage="Custom" id="Sjo1P4" />
           )}
-          <ChevronDown className="ml-4 h-4 w-4 flex-shrink-0 opacity-50" />
+          <ChevronDown className="ml-4 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent align="start">
@@ -304,7 +304,7 @@ const ExpenseTypesPicker = ({ collective }: Partial<CollectiveDetailsProps>) => 
                 <FormattedMessage defaultMessage="Customize" id="TXpOBi" />
               </label>
             </div>
-            <div className="ml-6 mt-1 flex flex-col gap-1 text-slate-700">
+            <div className="mt-1 ml-6 flex flex-col gap-1 text-slate-700">
               {DISPLAYED_EXPENSE_TYPES.map(expenseType => (
                 <div key={expenseType}>
                   <label className="flex items-center gap-2 text-sm font-normal">
@@ -745,7 +745,7 @@ const CollectiveDetails = ({
           {drawerActionsContainer &&
             isHostedCollective &&
             createPortal(
-              <div className="flex flex-grow justify-end gap-2">
+              <div className="flex grow justify-end gap-2">
                 <MoreActionsMenu collective={collective} onEdit={onEdit}>
                   <Button className="rounded-full" variant="outline">
                     <FormattedMessage defaultMessage="More Actions" id="A7ugfn" />

@@ -49,7 +49,7 @@ const columns = [
         <div className="inline-block rounded-xl bg-slate-50 px-2 py-1 font-bold text-slate-800">
           {cell.getValue()}
           {row.original.friendlyName && (
-            <span className="font-normal italic text-slate-700">&nbsp;·&nbsp;{row.original.friendlyName}</span>
+            <span className="font-normal text-slate-700 italic">&nbsp;·&nbsp;{row.original.friendlyName}</span>
           )}
         </div>
       );

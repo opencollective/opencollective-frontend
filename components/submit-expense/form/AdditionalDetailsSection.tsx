@@ -57,7 +57,7 @@ export function AdditionalDetailsSection(props: AdditionalDetailsSectionProps) {
         </div>
       )}
 
-      <Label className="mb-2 mt-4">
+      <Label className="mt-4 mb-2">
         <FormattedMessage defaultMessage="Tag your expense" id="EosA8s" />
       </Label>
       <div className="flex items-center gap-1">

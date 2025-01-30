@@ -828,7 +828,7 @@ const ExpenseFormBody = ({
                     </div>
                     {formik.values.accountingCategory?.instructions && (
                       <React.Fragment>
-                        <div className="mb-2 mt-4 text-sm font-semibold text-slate-800">
+                        <div className="mt-4 mb-2 text-sm font-semibold text-slate-800">
                           <FormattedMessage
                             id="withColon"
                             defaultMessage="{item}:"
