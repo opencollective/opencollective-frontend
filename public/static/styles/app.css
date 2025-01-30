@@ -277,7 +277,7 @@
     --destructive-foreground: var(--color-slate-50);
     --border: var(--color-slate-200);
     --input: var(--color-slate-200);
-    --ring: var(--color-slate-400);
+    --ring: var(--color-blue-600);
     --radius: 0.75rem;
   }
 
