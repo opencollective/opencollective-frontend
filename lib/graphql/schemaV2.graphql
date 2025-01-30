@@ -7181,7 +7181,12 @@ type TransactionsImportRow {
   """
   Whether the row has been dismissed
   """
-  isDismissed: Boolean!
+  isDismissed: Boolean! @deprecated(reason: "2025-01-17: isDismissed is deprecated, use status instead")
+
+  """
+  The status of the row
+  """
+  status: TransactionsImportRowStatus!
 
   """
   The description of the row
@@ -7199,6 +7204,11 @@ type TransactionsImportRow {
   amount: Amount!
 
   """
+  Optional note for the row
+  """
+  note: String
+
+  """
   The expense associated with the row
   """
   expense: Expense
@@ -7213,11 +7223,6 @@ type TransactionsImportRow {
   """
   order: Order
 }
-
-"""
-The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
-"""
-scalar JSONObject
 
 """
 The status of a row in a transactions import
@@ -7237,7 +7242,17 @@ enum TransactionsImportRowStatus {
   The row has been ignored
   """
   IGNORED
+
+  """
+  The row is on hold
+  """
+  ON_HOLD
 }
+
+"""
+The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSONObject
 
 type TransactionsImportStats {
   """
@@ -7264,6 +7279,16 @@ type TransactionsImportStats {
   Number of rows that have been processed (either dismissed or converted to expenses or orders)
   """
   processed: Int!
+
+  """
+  Number of rows that are on hold
+  """
+  onHold: Int!
+
+  """
+  Number of rows that are invalid (e.g. linked but without an expense or order)
+  """
+  invalid: Int!
 }
 
 enum AccountingCategoryAppliesTo {
@@ -23143,6 +23168,16 @@ input TransactionsImportRowUpdateInput {
   The order associated with the row
   """
   order: OrderReferenceInput
+
+  """
+  The expense associated with the row
+  """
+  expense: ExpenseReferenceInput
+
+  """
+  Optional note for the row
+  """
+  note: String
 }
 
 """

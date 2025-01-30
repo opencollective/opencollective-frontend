@@ -16,7 +16,11 @@ export const TransactionsImportRowStatusBadge = ({
 }) => {
   const intl = useIntl();
   if (row.isDismissed) {
-    return <Badge size="sm">{i18nTransactionsRowStatus(intl, 'IGNORED')}</Badge>;
+    return (
+      <Badge className="whitespace-nowrap" size="sm">
+        {i18nTransactionsRowStatus(intl, 'IGNORED')}
+      </Badge>
+    );
   } else if (row.expense || row.order) {
     return (
       <Badge type="success" size="sm">

@@ -9,6 +9,7 @@ import {
   FilePenLine,
   FileSliders,
   Info,
+  MessageCircle,
   RefreshCw,
   RotateCcw,
   Settings,
@@ -251,7 +252,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
   const { toast } = useToast();
   const steps = React.useMemo(() => getSteps(intl), [intl]);
   const [csvFile, setCsvFile] = React.useState<File | null>(null);
-  const [drawerRowId, setDrawerRowId] = React.useState<string | null>(null);
+  const [focus, setFocus] = React.useState<{ rowId: string; noteForm?: boolean } | null>(null);
   const [hasNewData, setHasNewData] = React.useState(false);
   const [isDeleted, setIsDeleted] = React.useState(false);
   const [hasRequestedSync, setHasRequestedSync] = React.useState(false);
@@ -282,7 +283,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
   const importType = importData?.type;
   const hasStepper = importType === 'CSV' && !importData?.file;
   const importRows = importData?.rows?.nodes ?? [];
-  const selectedRowIdx = importRows.findIndex(row => row.id === drawerRowId);
+  const selectedRowIdx = !focus ? -1 : importRows.findIndex(row => row.id === focus.rowId);
 
   // Polling to check if the import has new data
   useQuery(transactionsImportLasSyncAtPollQuery, {
@@ -373,7 +374,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                       <StepMapCSVColumns
                         importId={importId}
                         file={csvFile}
-                        currency={importData.account.currency}
+                        currency={importData.account['currency']}
                         onSuccess={refetch}
                       />
                     ) : null}
@@ -578,7 +579,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                     }
                     data={importRows}
                     getActions={getActions}
-                    openDrawer={row => setDrawerRowId(row.original.id)}
+                    openDrawer={row => setFocus({ rowId: row.original.id })}
                     emptyMessage={() => (
                       <FormattedMessage id="SectionTransactions.Empty" defaultMessage="No transactions yet." />
                     )}
@@ -631,6 +632,12 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                         cell: ({ cell }) => <p className="max-w-xs">{cell.getValue() as string}</p>,
                       },
                       {
+                        header: 'Status',
+                        cell: ({ row }) => {
+                          return <TransactionsImportRowStatusBadge row={row.original} />;
+                        },
+                      },
+                      {
                         header: 'Match',
                         cell: ({ row }) => {
                           if (row.original.expense) {
@@ -667,9 +674,23 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                         },
                       },
                       {
-                        header: 'Status',
-                        cell: ({ row }) => {
-                          return <TransactionsImportRowStatusBadge row={row.original} />;
+                        header: 'Note',
+                        accessorKey: 'note',
+                        cell: ({ row, cell }) => {
+                          const hasNote = Boolean(cell.getValue());
+                          return (
+                            <Button
+                              className="relative"
+                              variant="ghost"
+                              size="icon-xs"
+                              onClick={() => setFocus({ rowId: row.original.id, noteForm: true })}
+                            >
+                              <MessageCircle size={16} className={hasNote ? 'text-neutral-600' : 'text-neutral-300'} />
+                              {hasNote && (
+                                <div className="absolute right-[6px] top-[6px] flex h-[8px] w-[8px] items-center justify-center rounded-full bg-yellow-400 text-xs text-white"></div>
+                              )}
+                            </Button>
+                          );
                         },
                       },
                       {
@@ -760,9 +781,11 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
       <TransactionsImportRowDrawer
         row={importRows?.[selectedRowIdx]}
         open={Boolean(selectedRowIdx !== -1)}
-        onOpenChange={() => setDrawerRowId(null)}
+        onOpenChange={() => setFocus(null)}
         getActions={getActions}
         rowIndex={selectedRowIdx}
+        transactionsImportId={importData?.id}
+        autoFocusNoteForm={focus?.noteForm}
       />
       {hasSettingsModal && (
         <TransactionsImportSettingsModal transactionsImport={importData} onOpenChange={setHasSettingsModal} isOpen />
