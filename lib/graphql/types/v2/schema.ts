@@ -7541,8 +7541,8 @@ export type Mutation = {
   updatePersonalToken: PersonalToken;
   /** Updates collective social links */
   updateSocialLinks: Array<SocialLink>;
-  /** Update transactions import rows to set new values or mark them as dismissed */
-  updateTransactionsImportRows: TransactionsImport;
+  /** Update transactions import rows to set new values or perform actions on them */
+  updateTransactionsImportRows: TransactionsImportEditResponse;
   /** Update webhook. Scope: "webhooks". */
   updateWebhook?: Maybe<Webhook>;
   uploadFile: Array<UploadFileResult>;
@@ -8504,9 +8504,8 @@ export type MutationUpdateSocialLinksArgs = {
 
 /** This is the root mutation */
 export type MutationUpdateTransactionsImportRowsArgs = {
-  dismissAll?: InputMaybe<Scalars['Boolean']['input']>;
+  action: TransactionsImportRowAction;
   id: Scalars['NonEmptyString']['input'];
-  restoreAll?: InputMaybe<Scalars['Boolean']['input']>;
   rows?: InputMaybe<Array<TransactionsImportRowUpdateInput>>;
 };
 
@@ -11722,6 +11721,14 @@ export type TransactionsImportRowsArgs = {
   status?: InputMaybe<TransactionsImportRowStatus>;
 };
 
+export type TransactionsImportEditResponse = {
+  __typename?: 'TransactionsImportEditResponse';
+  /** Updated import */
+  import: TransactionsImport;
+  /** The rows updated by the mutation */
+  rows: Array<Maybe<TransactionsImportRow>>;
+};
+
 /** A row in a transactions import */
 export type TransactionsImportRow = {
   __typename?: 'TransactionsImportRow';
@@ -11735,11 +11742,6 @@ export type TransactionsImportRow = {
   expense?: Maybe<Expense>;
   /** The public id of the imported row */
   id: Scalars['String']['output'];
-  /**
-   * Whether the row has been dismissed
-   * @deprecated 2025-01-17: isDismissed is deprecated, use status instead
-   */
-  isDismissed: Scalars['Boolean']['output'];
   /** Optional note for the row */
   note?: Maybe<Scalars['String']['output']>;
   /** The order associated with the row */
@@ -11751,6 +11753,14 @@ export type TransactionsImportRow = {
   /** The status of the row */
   status: TransactionsImportRowStatus;
 };
+
+/** Action to perform on transactions import rows */
+export enum TransactionsImportRowAction {
+  DISMISS_ALL = 'DISMISS_ALL',
+  PUT_ON_HOLD_ALL = 'PUT_ON_HOLD_ALL',
+  RESTORE_ALL = 'RESTORE_ALL',
+  UPDATE_ROWS = 'UPDATE_ROWS'
+}
 
 /** A collection of "TransactionsImportRow" */
 export type TransactionsImportRowCollection = Collection & {
@@ -11768,8 +11778,6 @@ export type TransactionsImportRowCreateInput = {
   date: Scalars['DateTime']['input'];
   /** The description of the row */
   description?: InputMaybe<Scalars['String']['input']>;
-  /** Whether the row is dismissed */
-  isDismissed?: Scalars['Boolean']['input'];
   /** The raw value of the row */
   rawValue?: InputMaybe<Scalars['JSONObject']['input']>;
   /** The source id of the row */
@@ -11804,14 +11812,14 @@ export type TransactionsImportRowUpdateInput = {
   expense?: InputMaybe<ExpenseReferenceInput>;
   /** The id of the row */
   id: Scalars['NonEmptyString']['input'];
-  /** Whether the row is dismissed */
-  isDismissed?: InputMaybe<Scalars['Boolean']['input']>;
   /** Optional note for the row */
   note?: InputMaybe<Scalars['String']['input']>;
   /** The order associated with the row */
   order?: InputMaybe<OrderReferenceInput>;
   /** The source id of the row */
   sourceId?: InputMaybe<Scalars['NonEmptyString']['input']>;
+  /** To update the status of the row. Will be ignored if the status is not applicable (e.g. trying to ignore a row that is already linked) */
+  status?: InputMaybe<TransactionsImportRowStatus>;
 };
 
 export type TransactionsImportStats = {
@@ -11826,6 +11834,8 @@ export type TransactionsImportStats = {
   onHold: Scalars['Int']['output'];
   /** Number of rows that have been converted to orders */
   orders: Scalars['Int']['output'];
+  /** Number of rows that are pending */
+  pending: Scalars['Int']['output'];
   /** Number of rows that have been processed (either dismissed or converted to expenses or orders) */
   processed: Scalars['Int']['output'];
   /** Total number of rows in the import */

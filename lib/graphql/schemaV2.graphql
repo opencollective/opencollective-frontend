@@ -7181,14 +7181,6 @@ type TransactionsImportRow {
   """
   The status of the row
   """
-<<<<<<< HEAD
-  isDismissed: Boolean! @deprecated(reason: "2025-01-17: isDismissed is deprecated, use status instead")
-
-  """
-  The status of the row
-  """
-=======
->>>>>>> f2b29168c (feat(TransactionsImports): add on hold status)
   status: TransactionsImportRowStatus!
 
   """
@@ -7289,14 +7281,11 @@ type TransactionsImportStats {
   onHold: Int!
 
   """
-<<<<<<< HEAD
-=======
   Number of rows that are pending
   """
   pending: Int!
 
   """
->>>>>>> f2b29168c (feat(TransactionsImports): add on hold status)
   Number of rows that are invalid (e.g. linked but without an expense or order)
   """
   invalid: Int!
@@ -23186,13 +23175,11 @@ input TransactionsImportRowUpdateInput {
   The expense associated with the row
   """
   expense: ExpenseReferenceInput
-<<<<<<< HEAD
 
   """
   Optional note for the row
   """
   note: String
-=======
 }
 
 """
@@ -23203,7 +23190,6 @@ enum TransactionsImportRowAction {
   RESTORE_ALL
   PUT_ON_HOLD_ALL
   UPDATE_ROWS
->>>>>>> f2b29168c (feat(TransactionsImports): add on hold status)
 }
 
 """

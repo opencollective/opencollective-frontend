@@ -154,6 +154,7 @@ const transactionsImportQuery = gql`
       account {
         id
         slug
+        currency
         ... on AccountWithHost {
           host {
             ...TransactionsImportHostFields
@@ -391,7 +392,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                       <StepMapCSVColumns
                         importId={importId}
                         file={csvFile}
-                        currency={importData.account['currency']}
+                        currency={importData.account.currency}
                         onSuccess={refetch}
                       />
                     ) : null}
