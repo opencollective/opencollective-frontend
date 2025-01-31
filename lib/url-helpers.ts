@@ -74,7 +74,7 @@ export const giftCardsDownloadUrl = filename => {
  *  - via: A Twitter username to associate with the Tweet, such as your site’s Twitter account (default: opencollect)
  */
 export const tweetURL = opts => {
-  return `https://twitter.com/intent/tweet${objectToQueryString({ via: 'opencollect', ...opts })}`;
+  return `https://x.com/intent/tweet${objectToQueryString({ via: 'opencollect', ...opts })}`;
 };
 
 /**
@@ -89,15 +89,28 @@ export const mastodonShareURL = opts => {
  * Generate a URL from a twitter handle
  */
 export const twitterProfileUrl = twitterHandle => {
-  return `https://twitter.com/${twitterHandle}`;
+  return `https://x.com/${twitterHandle}`;
+};
+
+/**
+ * TODO: Use the new Facebook share dialog, see https://developers.facebook.com/docs/sharing/reference/feed-dialog.
+ * Not migrating it now because we need an APP ID.
+ *
+ * @param opts {object} With the following attributes:
+ *  - u: A URL to share in the tweet
+ *  - text: The text to share
+ *  - via: A Facebook username to associate with the Tweet
+ */
+export const facebookShareURL = opts => {
+  return `https://www.facebook.com/sharer/sharer.php${objectToQueryString({ via: 'OpenCollect', ...opts })}`;
 };
 
 /**
  * @param opts {object} With the following attributes:
- *  - u: A URL to share in the tweet
+ *  - text: The message to share
  */
-export const facebookShareURL = opts => {
-  return `https://www.facebook.com/sharer/sharer.php${objectToQueryString(opts)}`;
+export const blueSkyShareURL = opts => {
+  return `https://bsky.app/intent/compose${objectToQueryString(opts)}`;
 };
 
 /**
@@ -110,6 +123,14 @@ export const facebookShareURL = opts => {
  */
 export const linkedInShareURL = opts => {
   return `https://www.linkedin.com/shareArticle${objectToQueryString({ mini: 'true', ...opts })}`;
+};
+
+/**
+ * @param opts {object} With the following attributes:
+ *  - text: The text to share
+ */
+export const threadsShareURL = opts => {
+  return `https://threads.net/intent/post${objectToQueryString(opts)}`;
 };
 
 /**

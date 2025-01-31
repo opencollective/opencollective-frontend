@@ -1,29 +1,29 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
-import { Facebook } from '@styled-icons/fa-brands/Facebook';
-import { Mastodon } from '@styled-icons/fa-brands/Mastodon';
-import { Twitter } from '@styled-icons/fa-brands/Twitter';
 import { themeGet } from '@styled-system/theme-get';
-import { get } from 'lodash';
+import { get, uniqBy } from 'lodash';
 import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import { AnalyticsEvent } from '../../lib/analytics/events';
 import { track } from '../../lib/analytics/plausible';
-import { getTwitterHandleFromCollective } from '../../lib/collective';
 import { getIntervalFromGQLV2Frequency } from '../../lib/constants/intervals';
 import { ORDER_STATUS } from '../../lib/constants/order-status';
 import { formatCurrency } from '../../lib/currency-utils';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
+import { SocialLinkType } from '../../lib/graphql/types/v2/schema';
 import { formatManualInstructions } from '../../lib/payment-method-utils';
+import { iconForSocialLinkType } from '../../lib/social-links';
 import { getStripe } from '../../lib/stripe';
 import {
-  facebookShareURL,
+  blueSkyShareURL,
   followOrderRedirectUrl,
   getCollectivePageRoute,
+  linkedInShareURL,
   mastodonShareURL,
+  threadsShareURL,
   tweetURL,
 } from '../../lib/url-helpers';
 import { getWebsiteUrl } from '../../lib/utils';
@@ -69,7 +69,7 @@ const ContainerWithImage = styled(Container)`
 
 const ShareLink = styled(StyledLink).attrs({
   buttonStyle: 'standard',
-  buttonSize: 'medium',
+  buttonSize: 'small',
   minWidth: 130,
   mx: 2,
   mb: 2,
@@ -115,6 +115,67 @@ const isAccountFediverse = account => {
   );
 };
 
+/**
+ * @returns {object}
+ *  - url: A URL to share in the tweet
+ *  - Icon: A React component to display the icon
+ */
+const getShareProperties = (service, url, text) => {
+  switch (service) {
+    case SocialLinkType.TWITTER:
+      return {
+        name: 'X',
+        Icon: iconForSocialLinkType(SocialLinkType.TWITTER),
+        url: tweetURL({ url, text }),
+      };
+    // Skeeping it as you now need an App id to use sharing: https://developers.facebook.com/docs/sharing/reference/feed-dialog
+    // case SocialLinkType.FACEBOOK:
+    //   return {
+    //     name: 'Facebook',
+    //     Icon: iconForSocialLinkType(SocialLinkType.FACEBOOK),
+    //     url: facebookShareURL({ u: url, text }),
+    //   };
+    case SocialLinkType.MASTODON:
+      return {
+        name: 'Mastodon',
+        Icon: iconForSocialLinkType(SocialLinkType.MASTODON),
+        url: mastodonShareURL({ text: `${text} ${url}` }),
+      };
+    case SocialLinkType.BLUESKY:
+      return {
+        name: 'Bluesky',
+        Icon: iconForSocialLinkType(SocialLinkType.BLUESKY),
+        url: blueSkyShareURL({ text: `${text} ${url}` }),
+      };
+    case SocialLinkType.LINKEDIN:
+      return {
+        name: 'Linkedin',
+        Icon: iconForSocialLinkType(SocialLinkType.LINKEDIN),
+        url: linkedInShareURL({ text: `${text} ${url}` }),
+      };
+    case SocialLinkType.THREADS:
+      return {
+        name: 'Threads',
+        Icon: iconForSocialLinkType(SocialLinkType.THREADS),
+        url: threadsShareURL({ text: `${text} ${url}` }),
+      };
+    default:
+      return null;
+  }
+};
+
+const getSocialLinksForAccount = (account, shareURL, shareSuccessMessage) => {
+  const allSocialLinks = [...(account?.socialLinks || []), ...(account?.parent?.socialLinks || [])];
+  if (isAccountFediverse(account) || isAccountFediverse(account?.parent)) {
+    allSocialLinks.push({ type: SocialLinkType.MASTODON });
+  }
+
+  const uniqueSocialLinks = uniqBy(allSocialLinks, 'type');
+  return uniqueSocialLinks
+    .map(socialLink => getShareProperties(socialLink.type, shareURL, shareSuccessMessage))
+    .filter(Boolean);
+};
+
 const getMainTag = collective => {
   if (collective.host?.slug === 'opensource' || collective.tags?.includes('open source')) {
     return 'open source';
@@ -128,7 +189,6 @@ class ContributionFlowSuccess extends React.Component {
     collective: PropTypes.object,
     LoggedInUser: PropTypes.object,
     intl: PropTypes.object,
-    loadingLoggedInUser: PropTypes.bool,
     router: PropTypes.object,
     isEmbed: PropTypes.bool,
     data: PropTypes.object,
@@ -316,12 +376,22 @@ class ContributionFlowSuccess extends React.Component {
     }
   }
 
+  getShareSuccessMessage = () => {
+    const toAccount = this.props.data?.order?.toAccount;
+    if (!toAccount) {
+      return null;
+    }
+    return this.props.intl.formatMessage(toAccount.type === 'EVENT' ? successMsgs.event : successMsgs.default, {
+      collective: toAccount.name,
+      event: toAccount.name,
+    });
+  };
+
   render() {
-    const { LoggedInUser, collective, data, intl, isEmbed } = this.props;
+    const { LoggedInUser, collective, data, isEmbed } = this.props;
     const { order } = data;
     const shareURL = `${getWebsiteUrl()}/${collective.slug}`;
     const isProcessing = order?.status === ORDER_STATUS.PROCESSING;
-    const isFediverse = order && (isAccountFediverse(order.toAccount) || isAccountFediverse(order.toAccount.parent));
 
     const loading = data.loading || !this.state?.loaded;
 
@@ -335,7 +405,6 @@ class ContributionFlowSuccess extends React.Component {
       );
     }
 
-    const toAccountTwitterHandle = getTwitterHandleFromCollective(order?.toAccount);
     return (
       <React.Fragment>
         {!isEmbed && isProcessing && (
@@ -433,45 +502,18 @@ class ContributionFlowSuccess extends React.Component {
                       </Link>
                     </Box>
                   )}
-                  <Flex justifyContent="center" mt={3}>
-                    <ShareLink
-                      href={tweetURL({
-                        url: shareURL,
-                        text: intl.formatMessage(
-                          order.toAccount.type === 'EVENT' ? successMsgs.event : successMsgs.default,
-                          {
-                            collective: toAccountTwitterHandle ? `@${toAccountTwitterHandle}` : order.toAccount.name,
-                            event: order.toAccount.name,
-                          },
-                        ),
-                      })}
-                    >
-                      <Twitter size="1.2em" color="#4E5052" />
-                      <FormattedMessage id="tweetIt" defaultMessage="Tweet it" />
-                    </ShareLink>
-                    {!isFediverse && (
-                      <ShareLink href={facebookShareURL({ u: shareURL })}>
-                        <Facebook size="1.2em" color="#4E5052" />
-                        <FormattedMessage id="shareIt" defaultMessage="Share it" />
-                      </ShareLink>
-                    )}
-                    {isFediverse && (
-                      <ShareLink
-                        href={mastodonShareURL({
-                          text:
-                            // eslint-disable-next-line prefer-template
-                            intl.formatMessage(
-                              order.toAccount.type === 'EVENT' ? successMsgs.event : successMsgs.default,
-                              {
-                                collective: order.toAccount.name,
-                                event: order.toAccount.name,
-                              },
-                            ) + ` ${shareURL}`,
-                        })}
-                      >
-                        <Mastodon size="1.2em" color="#4E5052" />
-                        <FormattedMessage id="shareOnMastodon" defaultMessage="Share on Mastodon" />
-                      </ShareLink>
+                  <Flex justifyContent="center" my={3} maxWidth="500px" flexWrap="wrap">
+                    {getSocialLinksForAccount(order.toAccount, shareURL, this.getShareSuccessMessage()).map(
+                      shareLink => (
+                        <ShareLink key={shareLink.url} href={shareLink.url}>
+                          <shareLink.Icon size="1em" />
+                          <FormattedMessage
+                            defaultMessage="Share on {serviceName}"
+                            id="45jyHl"
+                            values={{ serviceName: shareLink.name }}
+                          />
+                        </ShareLink>
+                      ),
                     )}
                   </Flex>
                   {LoggedInUser && (
