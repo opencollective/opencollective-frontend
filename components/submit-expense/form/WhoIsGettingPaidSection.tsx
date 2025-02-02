@@ -12,6 +12,8 @@ import { AccountType } from '../../../lib/graphql/types/v2/schema';
 import { ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
 
 import LoginBtn from '@/components/LoginBtn';
+import StyledInputFormikField from '@/components/StyledInputFormikField';
+import { Textarea } from '@/components/ui/Textarea';
 
 import CollectivePicker from '../../CollectivePicker';
 import CollectivePickerAsync from '../../CollectivePickerAsync';
@@ -67,6 +69,8 @@ export const WhoIsGettingPaidSection = memoWithGetFormProps(function WhoIsGettin
 export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPaidForm(
   props: ReturnType<typeof getFormProps>,
 ) {
+  const [isLoading, setIsLoading] = React.useState(true);
+  const intl = useIntl();
   const [lastUsedProfile, setLastUsedProfile] = React.useState<ExpenseForm['options']['payoutProfiles'][number]>(null);
   const [isMyOtherProfilesSelected, setIsMyOtherProfilesSelected] = React.useState(false);
 
@@ -110,6 +114,10 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
     const isMyOtherProfilesSelected =
       hasOtherProfiles && (!newPayeeSlug || newPayeeSlug === '__findAccountIAdminister' || !!otherProfileSelection);
     setIsMyOtherProfilesSelected(isMyOtherProfilesSelected);
+
+    if (!props.initialLoading) {
+      setIsLoading(false);
+    }
   }, [
     props.payoutProfiles,
     props.recentlySubmittedExpenses,
@@ -120,6 +128,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
     otherProfiles,
     hasOtherProfiles,
     lastUsedProfile?.slug,
+    props.initialLoading,
   ]);
 
   return (
@@ -131,7 +140,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
         setFieldTouched('payeeSlug', true);
       }}
     >
-      {!props.initialLoading && lastUsedProfile && lastUsedProfile?.slug !== personalProfile?.slug && (
+      {!isLoading && lastUsedProfile && lastUsedProfile?.slug !== personalProfile?.slug && (
         <RadioGroupCard
           value={lastUsedProfile.slug}
           showSubcontent={props.payeeSlug === lastUsedProfile.slug && isEmpty(lastUsedProfile.legalName)}
@@ -141,25 +150,19 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
         </RadioGroupCard>
       )}
 
-      {(personalProfile || props.initialLoading) && (
+      {(personalProfile || isLoading) && (
         <RadioGroupCard
-          value={!props.initialLoading ? personalProfile.slug : ''}
-          disabled={props.initialLoading}
-          checked={props.initialLoading || props.payeeSlug === personalProfile.slug}
-          showSubcontent={
-            !props.initialLoading && props.payeeSlug === personalProfile.slug && isEmpty(personalProfile.legalName)
-          }
+          value={!isLoading ? personalProfile.slug : ''}
+          disabled={isLoading}
+          checked={isLoading ? false : props.payeeSlug === personalProfile.slug}
+          showSubcontent={!isLoading && props.payeeSlug === personalProfile.slug && isEmpty(personalProfile.legalName)}
           subContent={<LegalNameWarning account={personalProfile} onLegalNameUpdate={props.refresh} />}
         >
-          {props.initialLoading ? (
-            <LoadingPlaceholder height={24} width={1} />
-          ) : (
-            <ExpenseAccountItem account={personalProfile} />
-          )}
+          {isLoading ? <LoadingPlaceholder height={24} width={1} /> : <ExpenseAccountItem account={personalProfile} />}
         </RadioGroupCard>
       )}
 
-      {!props.initialLoading && hasOtherProfiles && (
+      {!isLoading && hasOtherProfiles && (
         <RadioGroupCard
           value="__findAccountIAdminister"
           checked={isMyOtherProfilesSelected}
@@ -181,7 +184,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
         </RadioGroupCard>
       )}
 
-      {props.allowInvite && (
+      {!isLoading && props.allowInvite && (
         <RadioGroupCard
           value="__inviteSomeone"
           checked={['__inviteSomeone', '__invite', '__inviteExistingUser'].includes(props.payeeSlug)}
@@ -213,6 +216,21 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
                 }}
               />
 
+              {props.payeeSlug === '__inviteExistingUser' && props.payee && (
+                <React.Fragment>
+                  <Separator className="mt-3" />
+                  <div className="mt-3">
+                    <StyledInputFormikField
+                      isFastField
+                      label={intl.formatMessage({ defaultMessage: 'Notes for the recipient (optional)', id: 'd+MntU' })}
+                      name="inviteNote"
+                    >
+                      {({ field }) => <Textarea className="w-full" {...field} />}
+                    </StyledInputFormikField>
+                  </div>
+                </React.Fragment>
+              )}
+
               {props.payeeSlug === '__invite' && (
                 <React.Fragment>
                   <Separator className="mt-3" />
@@ -232,7 +250,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
         </RadioGroupCard>
       )}
 
-      {props.expense?.status === ExpenseStatus.DRAFT && !props.loggedInAccount && (
+      {!isLoading && props.expense?.status === ExpenseStatus.DRAFT && !props.loggedInAccount && (
         <RadioGroupCard
           value=""
           checked

@@ -635,12 +635,11 @@ function buildFormSchema(
       .nullish()
       .refine(
         v => {
-          if (
-            options.isAdminOfPayee &&
-            v &&
-            v !== '__newPayoutMethod' &&
-            !options.payee?.payoutMethods?.some(pm => pm.id === v)
-          ) {
+          if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
+            return true;
+          }
+
+          if (v && v !== '__newPayoutMethod' && !options.payee?.payoutMethods?.some(pm => pm.id === v)) {
             return false;
           }
 
@@ -689,10 +688,13 @@ function buildFormSchema(
       ])
       .refine(
         attachment => {
+          if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
+            return true;
+          }
+
           if (
-            (options.payee?.type === CollectiveType.VENDOR || options.isAdminOfPayee) &&
-            values.expenseTypeOption === ExpenseType.INVOICE &&
-            values.hasInvoiceOption === YesNoOption.YES
+            !values.payeeSlug ||
+            (values.expenseTypeOption === ExpenseType.INVOICE && values.hasInvoiceOption === YesNoOption.YES)
           ) {
             return typeof attachment === 'string' ? !!attachment : !!attachment?.url;
           }
@@ -707,10 +709,13 @@ function buildFormSchema(
       .nullish()
       .refine(
         invoiceNumber => {
+          if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
+            return true;
+          }
+
           if (
-            (options.payee?.type === CollectiveType.VENDOR || options.isAdminOfPayee) &&
-            values.expenseTypeOption === ExpenseType.INVOICE &&
-            values.hasInvoiceOption === YesNoOption.YES
+            !values.payeeSlug ||
+            (values.expenseTypeOption === ExpenseType.INVOICE && values.hasInvoiceOption === YesNoOption.YES)
           ) {
             return !!invoiceNumber;
           }
@@ -939,11 +944,15 @@ function buildFormSchema(
         .nullish()
         .refine(
           type => {
+            if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
+              return true;
+            }
+
             if (options.expense?.status === ExpenseStatus.DRAFT && !options.loggedInAccount) {
               return !!type;
             }
 
-            if (options.isAdminOfPayee && (!values.payoutMethodId || values.payoutMethodId === '__newPayoutMethod')) {
+            if (!values.payoutMethodId || values.payoutMethodId === '__newPayoutMethod') {
               return !!type;
             }
 
@@ -958,6 +967,10 @@ function buildFormSchema(
         .nullish()
         .refine(
           name => {
+            if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
+              return true;
+            }
+
             if (values.payoutMethodId === '__newPayoutMethod') {
               return !!name;
             }
@@ -975,6 +988,10 @@ function buildFormSchema(
             .nullish()
             .refine(
               currency => {
+                if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
+                  return true;
+                }
+
                 if (values.payoutMethodId === '__newPayoutMethod') {
                   return !!currency;
                 }
@@ -1431,6 +1448,7 @@ export function useExpenseForm(opts: {
   const [formOptions, setFormOptions] = React.useState<ExpenseFormOptions>({ schema: z.object({}) });
   const startOptions = React.useRef(opts.startOptions);
   const setInitialExpenseValues = React.useRef(false);
+  const setInitialFormOptions = React.useRef(false);
   const initialLoading = React.useRef(true);
   const expenseFormValues = React.useRef<ExpenseFormValues>(opts.initialValues);
 
@@ -1732,13 +1750,10 @@ export function useExpenseForm(opts: {
           force,
         ),
       );
-      if (!startOptions.current.expenseId) {
-        initialLoading.current = false;
-      } else if (setInitialExpenseValues.current) {
-        initialLoading.current = false;
-      }
+
+      setInitialFormOptions.current = true;
     },
-    [apolloClient, LoggedInUser, intl, startOptions],
+    [apolloClient, LoggedInUser, intl],
   );
 
   // calculate form
@@ -1751,7 +1766,17 @@ export function useExpenseForm(opts: {
   // revalidate form
   const validateForm = expenseForm.validateForm;
   React.useEffect(() => {
-    validateForm();
+    async function runValidation() {
+      await validateForm();
+
+      if (setInitialFormOptions.current && !startOptions.current.expenseId) {
+        initialLoading.current = false;
+      } else if (setInitialFormOptions.current && setInitialExpenseValues.current) {
+        initialLoading.current = false;
+      }
+    }
+
+    runValidation();
   }, [formOptions.schema, validateForm]);
 
   React.useEffect(() => {

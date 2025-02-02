@@ -74,8 +74,9 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
 ) {
   const [lastUsedPayoutMethod, setLastUsedPayoutMethod] =
     React.useState<ExpenseForm['options']['payoutMethods'][number]>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
 
-  const isLoading = props.payeeSlug && !props.payeeSlug.startsWith('__') && props.payee?.slug !== props.payeeSlug;
+  const isLoadingPayee = props.payeeSlug && !props.payeeSlug.startsWith('__') && props.payee?.slug !== props.payeeSlug;
 
   const isPickingProfileAdministered = props.payeeSlug === '__findAccountIAdminister';
 
@@ -93,15 +94,11 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
 
   const { setFieldValue, setFieldTouched, refresh } = props;
   React.useEffect(() => {
-    if (isLoading) {
-      return;
-    }
-
-    const lastSubmittedExpenseByPayee = props.recentlySubmittedExpenses?.nodes
-      ?.filter(e => e && e.payee.slug === props.payeeSlug && e.payoutMethod?.id)
-      ?.at(0);
+    const lastSubmittedExpenseByPayee = (props.recentlySubmittedExpenses?.nodes || [])
+      .filter(e => e && e.payee.slug === props.payeeSlug && e.payoutMethod?.id)
+      .find(() => true);
     const lastUsedPayoutMethodId = lastSubmittedExpenseByPayee?.payoutMethod?.id;
-    const lastUsed = lastUsedPayoutMethodId && props.payoutMethods?.find(p => p.id === lastUsedPayoutMethodId);
+    const lastUsed = lastUsedPayoutMethodId && (props.payoutMethods || []).find(p => p.id === lastUsedPayoutMethodId);
 
     if (lastUsed) {
       setLastUsedPayoutMethod(lastUsed);
@@ -117,8 +114,12 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
     ) {
       setFieldValue('payoutMethodId', payoutMethods.at(0)?.id);
     }
+
+    if (!props.initialLoading) {
+      setIsLoading(false);
+    }
   }, [
-    isLoading,
+    props.initialLoading,
     props.payeeSlug,
     props.recentlySubmittedExpenses,
     setFieldValue,
@@ -127,7 +128,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
     payoutMethods,
   ]);
 
-  const isNewPayoutMethodSelected = !props.payoutMethodId || props.payoutMethodId === '__newPayoutMethod';
+  const isNewPayoutMethodSelected = !isLoadingPayee && props.payoutMethodId === '__newPayoutMethod';
 
   const isVendor = props.payee?.type === CollectiveType.VENDOR;
 
@@ -151,8 +152,8 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
 
   return (
     <div>
-      {!props.initialLoading &&
-      !isLoading &&
+      {!isLoading &&
+      !isLoadingPayee &&
       !isPickingProfileAdministered &&
       !isVendor &&
       !props.isAdminOfPayee &&
@@ -172,7 +173,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
             setFieldTouched('payoutMethodId', true);
           }}
         >
-          {!(isLoading || props.initialLoading) &&
+          {!(isLoading || isLoadingPayee) &&
             payoutMethods?.map(p => (
               <PayoutMethodRadioGroupItemWrapper
                 key={p.id}
@@ -184,13 +185,13 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
               />
             ))}
 
-          {(isLoading || props.initialLoading) && (
+          {(isLoading || isLoadingPayee) && (
             <RadioGroupCard value="" disabled>
               <LoadingPlaceholder height={24} width={1} />
             </RadioGroupCard>
           )}
 
-          {!isVendor && (
+          {!(isLoading || isLoadingPayee) && !isVendor && (
             <RadioGroupCard
               value="__newPayoutMethod"
               checked={isNewPayoutMethodSelected}

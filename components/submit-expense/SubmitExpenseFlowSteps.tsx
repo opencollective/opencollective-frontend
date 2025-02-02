@@ -108,6 +108,10 @@ export const StepSubtitles: Partial<Record<Step, MessageDescriptor>> = {
 };
 
 function isExpenseFormStepCompleted(form: ExpenseForm, step: Step): boolean {
+  if (form.initialLoading) {
+    return false;
+  }
+
   const valueKeys = StepValues[step];
   if (isEmpty(valueKeys)) {
     return true;
@@ -120,6 +124,10 @@ function expenseFormStepHasError(form: ExpenseForm, step: Step): boolean {
 }
 
 function isExpenseFormStepTouched(form: ExpenseForm, step: Step): boolean {
+  if (form.initialLoading) {
+    return false;
+  }
+
   const valueKeys = StepValues[step];
   if (isEmpty(valueKeys)) {
     return true;

@@ -31,7 +31,7 @@ function getFormProps(form: ExpenseForm) {
 
 // eslint-disable-next-line prefer-arrow-callback
 export const WhoIsPayingSection = memoWithGetFormProps(function WhoIsPayingSection(props: WhoIsPayingSectionProps) {
-  const loading = !props.recentlySubmittedExpenses;
+  const [isLoading, setIsLoading] = React.useState(true);
   const lastSubmittedExpense = props.recentlySubmittedExpenses?.nodes?.at?.(0);
   const lastSubmittedAccount = lastSubmittedExpense && lastSubmittedExpense.account;
 
@@ -45,7 +45,18 @@ export const WhoIsPayingSection = memoWithGetFormProps(function WhoIsPayingSecti
     if (lastSubmittedAccount && !props.accountSlug && !props.accountSlugTouched) {
       setFieldValue('accountSlug', lastSubmittedAccount.slug);
     }
-  }, [lastSubmittedAccount, setFieldValue, props.accountSlug, props.accountSlugTouched, loading, setFieldTouched]);
+
+    if (!props.initialLoading) {
+      setIsLoading(false);
+    }
+  }, [
+    lastSubmittedAccount,
+    setFieldValue,
+    props.accountSlug,
+    props.accountSlugTouched,
+    props.initialLoading,
+    setFieldTouched,
+  ]);
 
   const isFindSelected =
     !props.accountSlug ||
@@ -67,7 +78,7 @@ export const WhoIsPayingSection = memoWithGetFormProps(function WhoIsPayingSecti
           setFieldTouched('accountSlug', true);
         }}
       >
-        {!props.initialLoading &&
+        {!isLoading &&
           props.canChangeAccount &&
           recentlySubmittedAccounts.map(a => (
             <RadioGroupCard key={a.slug} value={a.slug}>
@@ -75,18 +86,17 @@ export const WhoIsPayingSection = memoWithGetFormProps(function WhoIsPayingSecti
             </RadioGroupCard>
           ))}
 
-        {props.initialLoading && (
+        {isLoading && (
           <RadioGroupCard value="" disabled>
             <LoadingPlaceholder height={24} width={1} />
           </RadioGroupCard>
         )}
 
-        {props.canChangeAccount && (
+        {!isLoading && props.canChangeAccount && (
           <RadioGroupCard
             value="__find"
-            disabled={props.initialLoading}
-            checked={!props.initialLoading && isFindSelected}
-            showSubcontent={!props.initialLoading && isFindSelected}
+            checked={isFindSelected}
+            showSubcontent={isFindSelected}
             subContent={
               <CollectivePickerAsync
                 autoFocus
@@ -111,7 +121,7 @@ export const WhoIsPayingSection = memoWithGetFormProps(function WhoIsPayingSecti
           </RadioGroupCard>
         )}
 
-        {!props.canChangeAccount && props.account && (
+        {!isLoading && !props.canChangeAccount && props.account && (
           <RadioGroupCard value={props.account.slug}>
             <ExpenseAccountItem account={props.account} />
           </RadioGroupCard>
