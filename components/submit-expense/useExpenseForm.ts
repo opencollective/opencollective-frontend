@@ -1178,10 +1178,10 @@ function getPayeeSlug(values: ExpenseFormValues): string {
     case '__findAccountIAdminister':
     case '__invite':
     case '__inviteSomeone':
+    case '__vendor':
       return null;
     case '__inviteExistingUser':
       return values.inviteeExistingAccount;
-    case '__vendor':
     default:
       return values.payeeSlug;
   }
@@ -1435,10 +1435,19 @@ export function useExpenseForm(opts: {
   const setInitialExpenseValues = React.useRef(false);
   const initialLoading = React.useRef(true);
 
-  const expenseForm: ExpenseFormik = useFormik<ExpenseFormValues>({
-    initialValues: opts.initialValues,
-    initialStatus: { schema: formOptions.schema },
-    async validate(values) {
+  const initialValues = React.useRef(opts.initialValues);
+  const initialStatus = React.useRef({ schema: formOptions.schema });
+
+  const onSubmit = opts.onSubmit;
+  const onSubmitCallback = React.useCallback(
+    (values: ExpenseFormValues, formikHelpers: FormikHelpers<ExpenseFormValues>) => {
+      return onSubmit(values, formikHelpers, formOptions, startOptions.current);
+    },
+    [onSubmit, formOptions],
+  );
+
+  const validate = React.useCallback(
+    (values: ExpenseFormValues) => {
       const result = formOptions.schema.safeParse(values, { errorMap: getCustomZodErrorMap(intl) });
       const newPayoutMethodErrors =
         values.payoutMethodId === '__newPayoutMethod' &&
@@ -1462,9 +1471,14 @@ export function useExpenseForm(opts: {
         return errs;
       }
     },
-    onSubmit(values, formikHelpers) {
-      return opts.onSubmit(values, formikHelpers, formOptions, startOptions.current);
-    },
+    [formOptions.schema, intl],
+  );
+
+  const expenseForm: ExpenseFormik = useFormik<ExpenseFormValues>({
+    initialValues: initialValues.current,
+    initialStatus: initialStatus.current,
+    validate,
+    onSubmit: onSubmitCallback,
     validateOnBlur: false,
   });
 
@@ -1566,7 +1580,7 @@ export function useExpenseForm(opts: {
         })),
       );
     }
-  }, [formOptions.expense, formOptions.loggedInAccount, setInitialExpenseValues, setFieldValue]);
+  }, [formOptions.expense, formOptions.loggedInAccount, setInitialExpenseValues, setFieldValue, setFieldTouched]);
 
   React.useEffect(() => {
     if (prevFormOptions?.host?.slug !== formOptions.host?.slug) {
