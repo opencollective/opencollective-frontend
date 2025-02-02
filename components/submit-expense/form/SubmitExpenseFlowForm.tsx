@@ -53,15 +53,15 @@ export function SubmitExpenseFlowForm(props: SubmitExpenseFlowFormProps) {
       {form.options.expense?.status === ExpenseStatus.DRAFT && form.options.expense?.draft?.recipientNote && (
         <ExpenseInviteNotesSection inViewChange={onInViewChange} form={form} />
       )}
-      <WhoIsPayingSection inViewChange={onInViewChange} form={form} />
-      <WhoIsGettingPaidSection inViewChange={onInViewChange} form={form} />
-      <PayoutMethodSection inViewChange={onInViewChange} form={form} />
-      <TypeOfExpenseSection inViewChange={onInViewChange} form={form} />
+      <WhoIsPayingSection inViewChange={onInViewChange} {...WhoIsPayingSection.getFormProps(form)} />
+      <WhoIsGettingPaidSection inViewChange={onInViewChange} {...WhoIsGettingPaidSection.getFormProps(form)} />
+      <PayoutMethodSection inViewChange={onInViewChange} {...PayoutMethodSection.getFormProps(form)} />
+      <TypeOfExpenseSection inViewChange={onInViewChange} {...TypeOfExpenseSection.getFormProps(form)} />
       {form.options.accountingCategories?.length > 0 && (
-        <ExpenseCategorySection inViewChange={onInViewChange} form={form} />
+        <ExpenseCategorySection inViewChange={onInViewChange} {...ExpenseCategorySection.getFormProps(form)} />
       )}
       <ExpenseItemsSection inViewChange={onInViewChange} form={form} />
-      <AdditionalDetailsSection inViewChange={onInViewChange} form={form} />
+      <AdditionalDetailsSection inViewChange={onInViewChange} {...AdditionalDetailsSection.getFormProps(form)} />
       <SummarySection inViewChange={onInViewChange} form={form} />
       <div className="flex justify-end">
         <Button disabled={form.initialLoading} onClick={() => form.handleSubmit()}>
@@ -80,13 +80,7 @@ type ExpenseInviteWelcomeSectionProps = {
 
 function ExpenseInviteWelcomeSection(props: ExpenseInviteWelcomeSectionProps) {
   return (
-    <FormSectionContainer
-      step={Step.INVITE_WELCOME}
-      form={props.form}
-      inViewChange={props.inViewChange}
-      hideTitle
-      hideSubtitle
-    >
+    <FormSectionContainer step={Step.INVITE_WELCOME} inViewChange={props.inViewChange} hideTitle hideSubtitle>
       <ExpenseInviteWelcome
         expense={props.form.options.expense}
         draftKey={props.form.startOptions.draftKey}
@@ -103,7 +97,7 @@ type ExpenseInviteNotesSectionProps = {
 
 function ExpenseInviteNotesSection(props: ExpenseInviteNotesSectionProps) {
   return (
-    <FormSectionContainer step={Step.INVITE_NOTE} form={props.form} inViewChange={props.inViewChange}>
+    <FormSectionContainer step={Step.INVITE_NOTE} inViewChange={props.inViewChange}>
       <ExpenseInviteRecipientNote expense={props.form.options.expense} />
     </FormSectionContainer>
   );

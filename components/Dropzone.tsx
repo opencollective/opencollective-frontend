@@ -382,3 +382,5 @@ type DropzoneProps = React.HTMLAttributes<HTMLDivElement> & {
   );
 
 export default Dropzone;
+
+export const MemoizedDropzone = React.memo(Dropzone);

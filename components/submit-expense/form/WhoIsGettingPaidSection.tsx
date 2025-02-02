@@ -1,6 +1,7 @@
 import React from 'react';
 import { gql, useMutation } from '@apollo/client';
-import { isEmpty } from 'lodash';
+import { useFormikContext } from 'formik';
+import { isEmpty, pick } from 'lodash';
 import { Lock } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -27,26 +28,49 @@ import type { ExpenseForm } from '../useExpenseForm';
 
 import { ExpenseAccountItem } from './ExpenseAccountItem';
 import { FormSectionContainer } from './FormSectionContainer';
+import { memoWithGetFormProps } from './helper';
 import { InviteUserOption } from './InviteUserOption';
 
 type WhoIsGettingPaidSectionProps = {
-  form: ExpenseForm;
   inViewChange: (inView: boolean, entry: IntersectionObserverEntry) => void;
-};
+} & ReturnType<typeof getFormProps>;
 
-export function WhoIsGettingPaidSection(props: WhoIsGettingPaidSectionProps) {
-  return (
-    <FormSectionContainer step={Step.WHO_IS_GETTING_PAID} form={props.form} inViewChange={props.inViewChange}>
-      <WhoIsGettingPaidForm {...props} />
-    </FormSectionContainer>
-  );
+function getFormProps(form: ExpenseForm) {
+  return {
+    ...pick(form, 'initialLoading', 'setFieldValue', 'setFieldTouched', 'refresh'),
+    ...pick(form.options, [
+      'payoutProfiles',
+      'recentlySubmittedExpenses',
+      'payee',
+      'allowInvite',
+      'lockedFields',
+      'expense',
+      'loggedInAccount',
+    ]),
+    ...pick(form.values, ['payeeSlug', 'inviteeAccountType']),
+  };
 }
 
-export function WhoIsGettingPaidForm(props: { form: ExpenseForm }) {
+// eslint-disable-next-line prefer-arrow-callback
+export const WhoIsGettingPaidSection = memoWithGetFormProps(function WhoIsGettingPaidSection(
+  props: WhoIsGettingPaidSectionProps,
+) {
+  const { inViewChange, ...rest } = props;
+  return (
+    <FormSectionContainer step={Step.WHO_IS_GETTING_PAID} inViewChange={inViewChange}>
+      <WhoIsGettingPaidForm {...rest} />
+    </FormSectionContainer>
+  );
+}, getFormProps);
+
+// eslint-disable-next-line prefer-arrow-callback
+export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPaidForm(
+  props: ReturnType<typeof getFormProps>,
+) {
   const [lastUsedProfile, setLastUsedProfile] = React.useState<ExpenseForm['options']['payoutProfiles'][number]>(null);
   const [isMyOtherProfilesSelected, setIsMyOtherProfilesSelected] = React.useState(false);
 
-  const myProfiles = React.useMemo(() => props.form.options.payoutProfiles || [], [props.form.options.payoutProfiles]);
+  const myProfiles = React.useMemo(() => props.payoutProfiles || [], [props.payoutProfiles]);
   const personalProfile = React.useMemo(() => myProfiles.find(p => p.type === AccountType.INDIVIDUAL), [myProfiles]);
 
   const otherProfiles = React.useMemo(
@@ -54,21 +78,17 @@ export function WhoIsGettingPaidForm(props: { form: ExpenseForm }) {
     [lastUsedProfile?.slug, myProfiles, personalProfile?.slug],
   );
   const hasOtherProfiles = otherProfiles.length > 0;
-  const vendorOptions = props.form.options.vendors || [];
 
-  const isVendorSelected =
-    props.form.values.payeeSlug === '__vendor' || vendorOptions.some(v => v.slug === props.form.values.payeeSlug);
-
-  const { setFieldValue, setFieldTouched } = props.form;
+  const { setFieldValue, setFieldTouched } = props;
   React.useEffect(() => {
     const myProfileSlugs = myProfiles.map(m => m.slug);
-    const recentExpensesToMyProfiles = props.form.options.recentlySubmittedExpenses?.nodes?.filter(
+    const recentExpensesToMyProfiles = props.recentlySubmittedExpenses?.nodes?.filter(
       e => e?.payee?.slug && myProfileSlugs.includes(e.payee.slug),
     );
 
     const lastUsedProfileId = recentExpensesToMyProfiles?.length > 0 && recentExpensesToMyProfiles.at(0).payee?.id;
 
-    const lastUsed = props.form.options.payoutProfiles?.find(p => p.id === lastUsedProfileId);
+    const lastUsed = props.payoutProfiles?.find(p => p.id === lastUsedProfileId);
 
     if (lastUsed) {
       setLastUsedProfile(lastUsed);
@@ -76,7 +96,7 @@ export function WhoIsGettingPaidForm(props: { form: ExpenseForm }) {
       setLastUsedProfile(null);
     }
 
-    let newPayeeSlug = props.form.values.payeeSlug;
+    let newPayeeSlug = props.payeeSlug;
     if (!newPayeeSlug) {
       if (recentExpensesToMyProfiles?.length > 0) {
         newPayeeSlug = recentExpensesToMyProfiles.at(0).payee.slug;
@@ -91,50 +111,47 @@ export function WhoIsGettingPaidForm(props: { form: ExpenseForm }) {
       hasOtherProfiles && (!newPayeeSlug || newPayeeSlug === '__findAccountIAdminister' || !!otherProfileSelection);
     setIsMyOtherProfilesSelected(isMyOtherProfilesSelected);
   }, [
-    props.form.options.payoutProfiles,
-    props.form.options.recentlySubmittedExpenses,
+    props.payoutProfiles,
+    props.recentlySubmittedExpenses,
     myProfiles,
     setFieldValue,
-    props.form.values.payeeSlug,
+    props.payeeSlug,
     personalProfile,
     otherProfiles,
     hasOtherProfiles,
-    isVendorSelected,
     lastUsedProfile?.slug,
   ]);
 
   return (
     <RadioGroup
       id="payeeSlug"
-      value={props.form.values.payeeSlug}
+      value={props.payeeSlug}
       onValueChange={payeeSlug => {
         setFieldValue('payeeSlug', payeeSlug);
         setFieldTouched('payeeSlug', true);
       }}
     >
-      {!props.form.initialLoading && lastUsedProfile && lastUsedProfile?.slug !== personalProfile?.slug && (
+      {!props.initialLoading && lastUsedProfile && lastUsedProfile?.slug !== personalProfile?.slug && (
         <RadioGroupCard
           value={lastUsedProfile.slug}
-          showSubcontent={props.form.values.payeeSlug === lastUsedProfile.slug && isEmpty(lastUsedProfile.legalName)}
-          subContent={<LegalNameWarning account={lastUsedProfile} onLegalNameUpdate={props.form.refresh} />}
+          showSubcontent={props.payeeSlug === lastUsedProfile.slug && isEmpty(lastUsedProfile.legalName)}
+          subContent={<LegalNameWarning account={lastUsedProfile} onLegalNameUpdate={props.refresh} />}
         >
           <ExpenseAccountItem account={lastUsedProfile} />
         </RadioGroupCard>
       )}
 
-      {(personalProfile || props.form.initialLoading) && (
+      {(personalProfile || props.initialLoading) && (
         <RadioGroupCard
-          value={!props.form.initialLoading ? personalProfile.slug : ''}
-          disabled={props.form.initialLoading}
-          checked={props.form.initialLoading || props.form.values.payeeSlug === personalProfile.slug}
+          value={!props.initialLoading ? personalProfile.slug : ''}
+          disabled={props.initialLoading}
+          checked={props.initialLoading || props.payeeSlug === personalProfile.slug}
           showSubcontent={
-            !props.form.initialLoading &&
-            props.form.values.payeeSlug === personalProfile.slug &&
-            isEmpty(personalProfile.legalName)
+            !props.initialLoading && props.payeeSlug === personalProfile.slug && isEmpty(personalProfile.legalName)
           }
-          subContent={<LegalNameWarning account={personalProfile} onLegalNameUpdate={props.form.refresh} />}
+          subContent={<LegalNameWarning account={personalProfile} onLegalNameUpdate={props.refresh} />}
         >
-          {props.form.initialLoading ? (
+          {props.initialLoading ? (
             <LoadingPlaceholder height={24} width={1} />
           ) : (
             <ExpenseAccountItem account={personalProfile} />
@@ -142,7 +159,7 @@ export function WhoIsGettingPaidForm(props: { form: ExpenseForm }) {
         </RadioGroupCard>
       )}
 
-      {!props.form.initialLoading && hasOtherProfiles && (
+      {!props.initialLoading && hasOtherProfiles && (
         <RadioGroupCard
           value="__findAccountIAdminister"
           checked={isMyOtherProfilesSelected}
@@ -151,9 +168,7 @@ export function WhoIsGettingPaidForm(props: { form: ExpenseForm }) {
             <div>
               <CollectivePicker
                 collectives={otherProfiles}
-                collective={
-                  props.form.values.payeeSlug === '__findAccountIAdminister' ? null : props.form.options.payee
-                }
+                collective={props.payeeSlug === '__findAccountIAdminister' ? null : props.payee}
                 onChange={e => {
                   const slug = e.value.slug;
                   setFieldValue('payeeSlug', !slug ? '__findAccountIAdminister' : slug);
@@ -166,19 +181,19 @@ export function WhoIsGettingPaidForm(props: { form: ExpenseForm }) {
         </RadioGroupCard>
       )}
 
-      {props.form.options.allowInvite && (
+      {props.allowInvite && (
         <RadioGroupCard
           value="__inviteSomeone"
-          checked={['__inviteSomeone', '__invite', '__inviteExistingUser'].includes(props.form.values.payeeSlug)}
-          showSubcontent={['__inviteSomeone', '__invite', '__inviteExistingUser'].includes(props.form.values.payeeSlug)}
-          disabled={props.form.initialLoading}
+          checked={['__inviteSomeone', '__invite', '__inviteExistingUser'].includes(props.payeeSlug)}
+          showSubcontent={['__inviteSomeone', '__invite', '__inviteExistingUser'].includes(props.payeeSlug)}
+          disabled={props.initialLoading}
           subContent={
             <div>
               <CollectivePickerAsync
                 inputId="payee-invite-picker"
-                onFocus={() => props.form.setFieldValue('payeeSlug', '__inviteSomeone')}
+                onFocus={() => props.setFieldValue('payeeSlug', '__inviteSomeone')}
                 invitable
-                collective={props.form.values.payeeSlug === '__inviteExistingUser' ? props.form.options.payee : null}
+                collective={props.payeeSlug === '__inviteExistingUser' ? props.payee : null}
                 types={[
                   CollectiveType.COLLECTIVE,
                   CollectiveType.EVENT,
@@ -189,20 +204,24 @@ export function WhoIsGettingPaidForm(props: { form: ExpenseForm }) {
                 ]}
                 onChange={option => {
                   if (option?.value?.id) {
-                    props.form.setFieldValue('inviteeExistingAccount', option.value.slug);
-                    props.form.setFieldValue('payeeSlug', '__inviteExistingUser');
+                    props.setFieldValue('inviteeExistingAccount', option.value.slug);
+                    props.setFieldValue('payeeSlug', '__inviteExistingUser');
                   }
                 }}
                 onInvite={() => {
-                  props.form.setFieldValue('payeeSlug', '__invite');
+                  props.setFieldValue('payeeSlug', '__invite');
                 }}
               />
 
-              {props.form.values.payeeSlug === '__invite' && (
+              {props.payeeSlug === '__invite' && (
                 <React.Fragment>
                   <Separator className="mt-3" />
                   <div className="mt-3">
-                    <InviteUserOption form={props.form} />
+                    <InviteUserOption
+                      inviteeAccountType={props.inviteeAccountType}
+                      setFieldValue={props.setFieldValue}
+                      lockedFields={props.lockedFields}
+                    />
                   </div>
                 </React.Fragment>
               )}
@@ -213,15 +232,20 @@ export function WhoIsGettingPaidForm(props: { form: ExpenseForm }) {
         </RadioGroupCard>
       )}
 
-      {props.form.options.expense?.status === ExpenseStatus.DRAFT && !props.form.options.loggedInAccount && (
+      {props.expense?.status === ExpenseStatus.DRAFT && !props.loggedInAccount && (
         <RadioGroupCard
           value=""
           checked
           showSubcontent
-          disabled={props.form.initialLoading}
+          disabled={props.initialLoading}
           subContent={
             <div>
-              <InviteUserOption form={props.form} hideNotesField />
+              <InviteUserOption
+                hideNotesField
+                setFieldValue={setFieldValue}
+                inviteeAccountType={props.inviteeAccountType}
+                lockedFields={props.lockedFields}
+              />
               <div className="mt-4">
                 <FormattedMessage
                   id="ExpenseForm.SignUp.SignIn"
@@ -236,7 +260,36 @@ export function WhoIsGettingPaidForm(props: { form: ExpenseForm }) {
         </RadioGroupCard>
       )}
 
-      {vendorOptions.length > 0 && (
+      <VendorOptionWrapper />
+    </RadioGroup>
+  );
+}, getFormProps);
+
+function VendorOptionWrapper() {
+  const form = useFormikContext() as ExpenseForm;
+
+  return (
+    <VendorOption
+      setFieldValue={form.setFieldValue}
+      payeeSlug={form.values.payeeSlug}
+      payee={form.options.payee}
+      vendors={form.options.vendors || []}
+    />
+  );
+}
+
+// eslint-disable-next-line prefer-arrow-callback
+const VendorOption = React.memo(function VendorOption(props: {
+  setFieldValue: ExpenseForm['setFieldValue'];
+  payeeSlug: ExpenseForm['values']['payeeSlug'];
+  payee: ExpenseForm['options']['payee'];
+  vendors: ExpenseForm['options']['vendors'];
+}) {
+  const isVendorSelected = props.payeeSlug === '__vendor' || props.vendors.some(v => v.slug === props.payeeSlug);
+
+  return (
+    <React.Fragment>
+      {props.vendors.length > 0 && (
         <RadioGroupCard
           value="__vendor"
           checked={isVendorSelected}
@@ -244,11 +297,11 @@ export function WhoIsGettingPaidForm(props: { form: ExpenseForm }) {
           subContent={
             <div>
               <CollectivePicker
-                collectives={vendorOptions}
-                collective={props.form.values.payeeSlug === '__vendor' ? null : props.form.options.payee}
+                collectives={props.vendors}
+                collective={props.payeeSlug === '__vendor' ? null : props.payee}
                 onChange={e => {
                   const slug = e.value.slug;
-                  setFieldValue('payeeSlug', !slug ? '__vendor' : slug);
+                  props.setFieldValue('payeeSlug', !slug ? '__vendor' : slug);
                 }}
               />
             </div>
@@ -257,9 +310,9 @@ export function WhoIsGettingPaidForm(props: { form: ExpenseForm }) {
           <FormattedMessage defaultMessage="A vendor" id="rth3eX" />
         </RadioGroupCard>
       )}
-    </RadioGroup>
+    </React.Fragment>
   );
-}
+});
 
 function LegalNameWarning(props: {
   account: ExpenseForm['options']['payoutProfiles'][number];

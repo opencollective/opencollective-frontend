@@ -1,5 +1,5 @@
 import React from 'react';
-import { uniqBy } from 'lodash';
+import { pick, uniqBy } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
@@ -12,78 +12,81 @@ import type { ExpenseForm } from '../useExpenseForm';
 
 import { ExpenseAccountItem } from './ExpenseAccountItem';
 import { FormSectionContainer } from './FormSectionContainer';
+import { memoWithGetFormProps } from './helper';
 
 type WhoIsPayingSectionProps = {
-  form: ExpenseForm;
   inViewChange: (inView: boolean, entry: IntersectionObserverEntry) => void;
-};
+} & ReturnType<typeof getFormProps>;
 
-export function WhoIsPayingSection(props: WhoIsPayingSectionProps) {
-  const loading = !props.form.options.recentlySubmittedExpenses;
-  const lastSubmittedExpense = props.form.options.recentlySubmittedExpenses?.nodes?.at?.(0);
+function getFormProps(form: ExpenseForm) {
+  return {
+    setFieldValue: form.setFieldValue,
+    setFieldTouched: form.setFieldTouched,
+    initialLoading: form.initialLoading,
+    ...pick(form.options, ['recentlySubmittedExpenses', 'account', 'canChangeAccount']),
+    ...pick(form.values, ['accountSlug']),
+    accountSlugTouched: form.touched.accountSlug,
+  };
+}
+
+// eslint-disable-next-line prefer-arrow-callback
+export const WhoIsPayingSection = memoWithGetFormProps(function WhoIsPayingSection(props: WhoIsPayingSectionProps) {
+  const loading = !props.recentlySubmittedExpenses;
+  const lastSubmittedExpense = props.recentlySubmittedExpenses?.nodes?.at?.(0);
   const lastSubmittedAccount = lastSubmittedExpense && lastSubmittedExpense.account;
 
   const recentlySubmittedAccounts = React.useMemo(
-    () =>
-      uniqBy((props.form.options.recentlySubmittedExpenses?.nodes || []).map(e => e?.account).filter(Boolean), 'slug'),
-    [props.form.options.recentlySubmittedExpenses],
+    () => uniqBy((props.recentlySubmittedExpenses?.nodes || []).map(e => e?.account).filter(Boolean), 'slug'),
+    [props.recentlySubmittedExpenses],
   );
 
-  const { setFieldValue, setFieldTouched } = props.form;
+  const { setFieldValue, setFieldTouched } = props;
   React.useEffect(() => {
-    if (lastSubmittedAccount && !props.form.values.accountSlug && !props.form.touched.accountSlug) {
+    if (lastSubmittedAccount && !props.accountSlug && !props.accountSlugTouched) {
       setFieldValue('accountSlug', lastSubmittedAccount.slug);
     }
-  }, [
-    lastSubmittedAccount,
-    setFieldValue,
-    props.form.values.accountSlug,
-    props.form.touched.accountSlug,
-    loading,
-    setFieldTouched,
-  ]);
+  }, [lastSubmittedAccount, setFieldValue, props.accountSlug, props.accountSlugTouched, loading, setFieldTouched]);
 
   const isFindSelected =
-    !props.form.values.accountSlug ||
+    !props.accountSlug ||
     recentlySubmittedAccounts.length === 0 ||
-    !recentlySubmittedAccounts.find(a => a.slug === props.form.values.accountSlug);
+    !recentlySubmittedAccounts.find(a => a.slug === props.accountSlug);
 
   return (
     <FormSectionContainer
       step={Step.WHO_IS_PAYING}
-      form={props.form}
       inViewChange={props.inViewChange}
       title={<FormattedMessage defaultMessage="Who are you submitting the expense to?" id="bn8pIi" />}
     >
       <RadioGroup
         id="accountSlug"
-        disabled={!props.form.options.canChangeAccount}
-        value={props.form.values.accountSlug}
+        disabled={!props.canChangeAccount}
+        value={props.accountSlug}
         onValueChange={accountSlug => {
           setFieldValue('accountSlug', accountSlug);
           setFieldTouched('accountSlug', true);
         }}
       >
-        {!props.form.initialLoading &&
-          props.form.options.canChangeAccount &&
+        {!props.initialLoading &&
+          props.canChangeAccount &&
           recentlySubmittedAccounts.map(a => (
             <RadioGroupCard key={a.slug} value={a.slug}>
               <ExpenseAccountItem account={a} />
             </RadioGroupCard>
           ))}
 
-        {props.form.initialLoading && (
+        {props.initialLoading && (
           <RadioGroupCard value="" disabled>
             <LoadingPlaceholder height={24} width={1} />
           </RadioGroupCard>
         )}
 
-        {props.form.options.canChangeAccount && (
+        {props.canChangeAccount && (
           <RadioGroupCard
             value="__find"
-            disabled={props.form.initialLoading}
-            checked={!props.form.initialLoading && isFindSelected}
-            showSubcontent={!props.form.initialLoading && isFindSelected}
+            disabled={props.initialLoading}
+            checked={!props.initialLoading && isFindSelected}
+            showSubcontent={!props.initialLoading && isFindSelected}
             subContent={
               <CollectivePickerAsync
                 autoFocus
@@ -99,7 +102,7 @@ export function WhoIsPayingSection(props: WhoIsPayingSectionProps) {
                   CollectiveType.ORGANIZATION,
                   CollectiveType.PROJECT,
                 ]}
-                collective={props.form.values.accountSlug === '__find' ? null : props.form.options.account}
+                collective={props.accountSlug === '__find' ? null : props.account}
                 onChange={e => setFieldValue('accountSlug', e.value.slug)}
               />
             }
@@ -108,12 +111,12 @@ export function WhoIsPayingSection(props: WhoIsPayingSectionProps) {
           </RadioGroupCard>
         )}
 
-        {!props.form.options.canChangeAccount && props.form.options.account && (
-          <RadioGroupCard value={props.form.options.account.slug}>
-            <ExpenseAccountItem account={props.form.options.account} />
+        {!props.canChangeAccount && props.account && (
+          <RadioGroupCard value={props.account.slug}>
+            <ExpenseAccountItem account={props.account} />
           </RadioGroupCard>
         )}
       </RadioGroup>
     </FormSectionContainer>
   );
-}
+}, getFormProps);

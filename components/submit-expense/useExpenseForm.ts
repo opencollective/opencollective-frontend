@@ -1336,8 +1336,6 @@ async function buildFormOptions(
 
     if (!startOptions.duplicateExpense && options.expense?.lockedFields?.length) {
       options.lockedFields = options.expense.lockedFields;
-    } else {
-      options.lockedFields = [];
     }
 
     if (
@@ -1434,6 +1432,7 @@ export function useExpenseForm(opts: {
   const startOptions = React.useRef(opts.startOptions);
   const setInitialExpenseValues = React.useRef(false);
   const initialLoading = React.useRef(true);
+  const expenseFormValues = React.useRef<ExpenseFormValues>(opts.initialValues);
 
   const initialValues = React.useRef(opts.initialValues);
   const initialStatus = React.useRef({ schema: formOptions.schema });
@@ -1611,6 +1610,7 @@ export function useExpenseForm(opts: {
   React.useEffect(() => {
     if (
       expenseForm.values.expenseItems.length === 1 &&
+      !isEmpty(expenseForm.values.expenseItems[0].description) &&
       !expenseForm.touched.title &&
       !formOptions.lockedFields?.includes?.(ExpenseLockableFields.DESCRIPTION)
     ) {
@@ -1720,21 +1720,33 @@ export function useExpenseForm(opts: {
     setStatus({ schema: formOptions.schema });
   }, [formOptions.schema, setStatus]);
 
-  // calculate form
-  React.useEffect(() => {
-    async function refreshFormOptions() {
+  const refreshFormOptions = React.useCallback(
+    async (force?: boolean) => {
       setFormOptions(
-        await buildFormOptions(intl, apolloClient, LoggedInUser, expenseForm.values, startOptions.current),
+        await buildFormOptions(
+          intl,
+          apolloClient,
+          LoggedInUser,
+          expenseFormValues.current,
+          startOptions.current,
+          force,
+        ),
       );
       if (!startOptions.current.expenseId) {
         initialLoading.current = false;
       } else if (setInitialExpenseValues.current) {
         initialLoading.current = false;
       }
-    }
+    },
+    [apolloClient, LoggedInUser, intl, startOptions],
+  );
+
+  // calculate form
+  React.useEffect(() => {
+    expenseFormValues.current = expenseForm.values;
 
     refreshFormOptions();
-  }, [apolloClient, LoggedInUser, expenseForm.values, intl, startOptions]);
+  }, [refreshFormOptions, expenseForm.values]);
 
   // revalidate form
   const validateForm = expenseForm.validateForm;
@@ -1761,13 +1773,12 @@ export function useExpenseForm(opts: {
     }
   }, [formOptions.payoutMethods, expenseForm.values.payoutMethodId, setFieldValue]);
 
+  const refresh = React.useCallback(async () => refreshFormOptions(true), [refreshFormOptions]);
+
   return Object.assign(expenseForm, {
     options: formOptions,
     startOptions: startOptions.current,
     initialLoading: initialLoading.current,
-    refresh: async () =>
-      setFormOptions(
-        await buildFormOptions(intl, apolloClient, LoggedInUser, expenseForm.values, startOptions.current, true),
-      ),
+    refresh,
   });
 }

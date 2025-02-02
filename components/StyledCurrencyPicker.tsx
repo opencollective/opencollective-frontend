@@ -45,7 +45,8 @@ const getSelectedCurrencyLabel = value => {
   );
 };
 
-export const StyledCurrencyPicker = ({
+// eslint-disable-next-line prefer-arrow-callback
+export const StyledCurrencyPicker = React.memo(function StyledCurrencyPicker({
   availableCurrencies = Currency,
   value,
   onChange,
@@ -55,9 +56,12 @@ export const StyledCurrencyPicker = ({
   availableCurrencies: string[];
   onChange: (selectedCurrency: string) => void;
   value?: string;
-} & React.ComponentProps<typeof StyledSelect>) => {
+} & React.ComponentProps<typeof StyledSelect>) {
   const intl = useIntl();
-  const currencyOptions = generateCurrencyOptions(intl, availableCurrencies);
+  const currencyOptions = React.useMemo(
+    () => generateCurrencyOptions(intl, availableCurrencies),
+    [intl, availableCurrencies],
+  );
   return (
     <StyledSelect
       inputId="currency-picker"
@@ -72,4 +76,4 @@ export const StyledCurrencyPicker = ({
       {...props}
     />
   );
-};
+});

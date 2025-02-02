@@ -1,4 +1,5 @@
 import React from 'react';
+import { pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
@@ -8,7 +9,7 @@ import { ExpenseLockableFields } from '@/lib/graphql/types/v2/graphql';
 
 import { FormField } from '@/components/FormField';
 
-import Dropzone from '../../Dropzone';
+import { MemoizedDropzone } from '../../Dropzone';
 import { Label } from '../../ui/Label';
 import { RadioGroup, RadioGroupCard } from '../../ui/RadioGroup';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../ui/Tabs';
@@ -19,23 +20,69 @@ import { YesNoOption } from '../useExpenseForm';
 
 import { ExpensePolicyContainer } from './ExpensePolicyContainer';
 import { FormSectionContainer } from './FormSectionContainer';
+import { memoWithGetFormProps } from './helper';
 
 type TypeOfExpenseSectionProps = {
-  form: ExpenseForm;
   inViewChange: (inView: boolean, entry: IntersectionObserverEntry) => void;
-};
+} & ReturnType<typeof getFormProps>;
 
-export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
+function getFormProps(form: ExpenseForm) {
+  return {
+    setFieldValue: form.setFieldValue,
+    initialLoading: form.initialLoading,
+    ...pick(form.options, ['isAdminOfPayee', 'account', 'host', 'payee', 'lockedFields']),
+    ...pick(form.values, [
+      'expenseTypeOption',
+      'invoiceFile',
+      'hasInvoiceOption',
+      'acknowledgedCollectiveReceiptExpensePolicy',
+      'acknowledgedCollectiveInvoiceExpensePolicy',
+      'acknowledgedHostInvoiceExpensePolicy',
+      'acknowledgedHostReceiptExpensePolicy',
+    ]),
+  };
+}
+
+// eslint-disable-next-line prefer-arrow-callback
+export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseSection(
+  props: TypeOfExpenseSectionProps,
+) {
   const intl = useIntl();
-  const expenseTypeOption = props.form.values.expenseTypeOption;
+  const expenseTypeOption = props.expenseTypeOption;
   const { toast } = useToast();
 
-  const isTypeLocked = props.form.options.lockedFields?.includes?.(ExpenseLockableFields.TYPE);
+  const isTypeLocked = props.lockedFields?.includes?.(ExpenseLockableFields.TYPE);
+  const { setFieldValue } = props;
+
+  const onGraphQLSuccess = React.useCallback(
+    uploadResults => {
+      setFieldValue('invoiceFile', uploadResults[0].file);
+    },
+    [setFieldValue],
+  );
+
+  const onSuccess = React.useCallback(
+    files => {
+      setFieldValue('invoiceFile', files ? files[0] : null);
+    },
+    [setFieldValue],
+  );
+
+  const onReject = React.useCallback(
+    msg => {
+      toast({ variant: 'error', message: msg });
+    },
+    [toast],
+  );
+
+  const attachInvoiceLabel = React.useMemo(
+    () => intl.formatMessage({ defaultMessage: 'Attach your invoice file', id: 'Oa/lhY' }),
+    [intl],
+  );
 
   return (
     <FormSectionContainer
       step={Step.TYPE_OF_EXPENSE}
-      form={props.form}
       inViewChange={props.inViewChange}
       title={<FormattedMessage defaultMessage="Select the type of expense" id="hT+uK/" />}
     >
@@ -43,10 +90,10 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
         <RadioGroup
           disabled={isTypeLocked}
           value={expenseTypeOption}
-          onValueChange={newValue => props.form.setFieldValue('expenseTypeOption', newValue as ExpenseType)}
+          onValueChange={newValue => props.setFieldValue('expenseTypeOption', newValue as ExpenseType)}
           className="flex"
         >
-          <RadioGroupCard className="grow basis-0" value={ExpenseType.INVOICE} disabled={props.form.initialLoading}>
+          <RadioGroupCard className="grow basis-0" value={ExpenseType.INVOICE} disabled={props.initialLoading}>
             <div>
               <div className="mb-1 font-bold">
                 <FormattedMessage defaultMessage="Invoice" id="Expense.Type.Invoice" />
@@ -57,7 +104,7 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
             </div>
           </RadioGroupCard>
 
-          <RadioGroupCard className="grow basis-0" value={ExpenseType.RECEIPT} disabled={props.form.initialLoading}>
+          <RadioGroupCard className="grow basis-0" value={ExpenseType.RECEIPT} disabled={props.initialLoading}>
             <div>
               <div className="mb-1 font-bold">
                 <FormattedMessage defaultMessage="Reimbursement" id="ExpenseForm.ReceiptLabel" />
@@ -69,64 +116,62 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
           </RadioGroupCard>
         </RadioGroup>
 
-        {!props.form.initialLoading && expenseTypeOption === ExpenseType.INVOICE && (
+        {!props.initialLoading && expenseTypeOption === ExpenseType.INVOICE && (
           <div>
-            {props.form.options.host?.slug !== props.form.options.account?.slug &&
-              props.form.options.host?.policies?.EXPENSE_POLICIES?.invoicePolicy && (
-                <div className="mt-4">
-                  <ExpensePolicyContainer
-                    title={<FormattedMessage defaultMessage="Host instructions to submit an invoice" id="jXsDtM" />}
-                    policy={props.form.options.host?.policies?.EXPENSE_POLICIES?.invoicePolicy}
-                    checked={props.form.values.acknowledgedHostInvoiceExpensePolicy}
-                    onAcknowledgedChanged={v => props.form.setFieldValue('acknowledgedHostInvoiceExpensePolicy', v)}
-                  />
-                </div>
-              )}
+            {props.host?.slug !== props.account?.slug && props.host?.policies?.EXPENSE_POLICIES?.invoicePolicy && (
+              <div className="mt-4">
+                <ExpensePolicyContainer
+                  title={<FormattedMessage defaultMessage="Host instructions to submit an invoice" id="jXsDtM" />}
+                  policy={props.host?.policies?.EXPENSE_POLICIES?.invoicePolicy}
+                  checked={props.acknowledgedHostInvoiceExpensePolicy}
+                  onAcknowledgedChanged={v => props.setFieldValue('acknowledgedHostInvoiceExpensePolicy', v)}
+                />
+              </div>
+            )}
 
-            {props.form.options.account?.policies?.EXPENSE_POLICIES?.invoicePolicy && (
+            {props.account?.policies?.EXPENSE_POLICIES?.invoicePolicy && (
               <div className="mt-4">
                 <ExpensePolicyContainer
                   title={<FormattedMessage defaultMessage="Collective instructions to submit an invoice" id="NeQw7m" />}
-                  policy={props.form.options.account?.policies?.EXPENSE_POLICIES?.invoicePolicy}
-                  checked={props.form.values.acknowledgedCollectiveInvoiceExpensePolicy}
-                  onAcknowledgedChanged={v => props.form.setFieldValue('acknowledgedCollectiveInvoiceExpensePolicy', v)}
+                  policy={props.account?.policies?.EXPENSE_POLICIES?.invoicePolicy}
+                  checked={props.acknowledgedCollectiveInvoiceExpensePolicy}
+                  onAcknowledgedChanged={v => props.setFieldValue('acknowledgedCollectiveInvoiceExpensePolicy', v)}
                 />
               </div>
             )}
           </div>
         )}
 
-        {!props.form.initialLoading && expenseTypeOption === ExpenseType.RECEIPT && (
+        {!props.initialLoading && expenseTypeOption === ExpenseType.RECEIPT && (
           <div>
-            {props.form.options.host?.slug !== props.form.options.account?.slug &&
-              props.form.options.host?.policies?.EXPENSE_POLICIES?.receiptPolicy && (
-                <div className="mt-4">
-                  <ExpensePolicyContainer
-                    title={<FormattedMessage defaultMessage="Host instructions to submit a receipt" id="YQgEUZ" />}
-                    policy={props.form.options.host?.policies?.EXPENSE_POLICIES?.receiptPolicy}
-                    checked={props.form.values.acknowledgedHostReceiptExpensePolicy}
-                    onAcknowledgedChanged={v => props.form.setFieldValue('acknowledgedHostReceiptExpensePolicy', v)}
-                  />
-                </div>
-              )}
+            {props.host?.slug !== props.account?.slug && props.host?.policies?.EXPENSE_POLICIES?.receiptPolicy && (
+              <div className="mt-4">
+                <ExpensePolicyContainer
+                  title={<FormattedMessage defaultMessage="Host instructions to submit a receipt" id="YQgEUZ" />}
+                  policy={props.host?.policies?.EXPENSE_POLICIES?.receiptPolicy}
+                  checked={props.acknowledgedHostReceiptExpensePolicy}
+                  onAcknowledgedChanged={v => props.setFieldValue('acknowledgedHostReceiptExpensePolicy', v)}
+                />
+              </div>
+            )}
 
-            {props.form.options.account?.policies?.EXPENSE_POLICIES?.receiptPolicy && (
+            {props.account?.policies?.EXPENSE_POLICIES?.receiptPolicy && (
               <div className="mt-4">
                 <ExpensePolicyContainer
                   title={<FormattedMessage defaultMessage="Collective instructions to submit a receipt" id="cP95i8" />}
-                  policy={props.form.options.host?.policies?.EXPENSE_POLICIES?.receiptPolicy}
-                  checked={props.form.values.acknowledgedCollectiveReceiptExpensePolicy}
-                  onAcknowledgedChanged={v => props.form.setFieldValue('acknowledgedCollectiveReceiptExpensePolicy', v)}
+                  policy={props.host?.policies?.EXPENSE_POLICIES?.receiptPolicy}
+                  checked={props.acknowledgedCollectiveReceiptExpensePolicy}
+                  onAcknowledgedChanged={v => props.setFieldValue('acknowledgedCollectiveReceiptExpensePolicy', v)}
                 />
               </div>
             )}
           </div>
         )}
 
-        {!props.form.initialLoading && expenseTypeOption === ExpenseType.INVOICE && (
+        {!props.initialLoading && expenseTypeOption === ExpenseType.INVOICE && (
           <div className="mt-4 rounded-md border border-gray-300 p-4">
             <Label>
-              {props.form.options.isAdminOfPayee ? (
+              {props.isAdminOfPayee ? (
                 <FormattedMessage defaultMessage="An invoice is required. Do you have one?" id="O+LW+y" />
               ) : (
                 <FormattedMessage
@@ -136,8 +181,8 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
               )}
             </Label>
             <Tabs
-              value={props.form.values.hasInvoiceOption}
-              onValueChange={newValue => props.form.setFieldValue('hasInvoiceOption', newValue as YesNoOption)}
+              value={props.hasInvoiceOption}
+              onValueChange={newValue => props.setFieldValue('hasInvoiceOption', newValue as YesNoOption)}
               className="space-y-4"
             >
               <TabsList>
@@ -153,15 +198,13 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
                   <div className="h-16 grow basis-0">
                     <div>
                       <FormField
-                        required={
-                          props.form.options.isAdminOfPayee || props.form.options.payee?.type === CollectiveType.VENDOR
-                        }
+                        required={props.isAdminOfPayee || props.payee?.type === CollectiveType.VENDOR}
                         name="invoiceFile"
                         isPrivate
-                        label={intl.formatMessage({ defaultMessage: 'Attach your invoice file', id: 'Oa/lhY' })}
+                        label={attachInvoiceLabel}
                       >
                         {({ field }) => (
-                          <Dropzone
+                          <MemoizedDropzone
                             {...field}
                             {...attachmentDropzoneParams}
                             kind="EXPENSE_ATTACHED_FILE"
@@ -172,20 +215,10 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
                             useGraphQL={true}
                             parseDocument={false}
                             isMulti={false}
-                            value={
-                              typeof props.form.values.invoiceFile === 'string'
-                                ? props.form.values.invoiceFile
-                                : props.form.values.invoiceFile?.url
-                            }
-                            onGraphQLSuccess={uploadResults => {
-                              props.form.setFieldValue('invoiceFile', uploadResults[0].file);
-                            }}
-                            onSuccess={files => {
-                              props.form.setFieldValue('invoiceFile', files ? files[0] : null);
-                            }}
-                            onReject={msg => {
-                              toast({ variant: 'error', message: msg });
-                            }}
+                            value={typeof props.invoiceFile === 'string' ? props.invoiceFile : props.invoiceFile?.url}
+                            onGraphQLSuccess={onGraphQLSuccess}
+                            onSuccess={onSuccess}
+                            onReject={onReject}
                           />
                         )}
                       </FormField>
@@ -193,9 +226,7 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
                   </div>
                   <div className="grow basis-0">
                     <FormField
-                      required={
-                        props.form.options.isAdminOfPayee || props.form.options.payee?.type === CollectiveType.VENDOR
-                      }
+                      required={props.isAdminOfPayee || props.payee?.type === CollectiveType.VENDOR}
                       name="invoiceNumber"
                       isPrivate
                       label={intl.formatMessage({ defaultMessage: 'Invoice number', id: 'ijDMrP' })}
@@ -214,4 +245,4 @@ export function TypeOfExpenseSection(props: TypeOfExpenseSectionProps) {
       </React.Fragment>
     </FormSectionContainer>
   );
-}
+}, getFormProps);

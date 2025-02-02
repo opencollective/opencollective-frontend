@@ -10,20 +10,22 @@ import { Textarea } from '../../ui/Textarea';
 import { type ExpenseForm, InviteeAccountType } from '../useExpenseForm';
 
 type InviteUserOptionProps = {
-  form: ExpenseForm;
   hideNotesField?: boolean;
+  setFieldValue: ExpenseForm['setFieldValue'];
+  inviteeAccountType: ExpenseForm['values']['inviteeAccountType'];
+  lockedFields: ExpenseForm['options']['lockedFields'];
 };
 
 export function InviteUserOption(props: InviteUserOptionProps) {
-  const { setFieldValue } = props.form;
-  const lockEmail = props.form.options.lockedFields?.includes?.(ExpenseLockableFields.PAYEE);
+  const { setFieldValue } = props;
+  const lockEmail = props.lockedFields?.includes?.(ExpenseLockableFields.PAYEE);
   return (
     <div>
       <div>
         <div className="">
           <Tabs
             id="lastSubmittedAccount"
-            value={props.form.values.inviteeAccountType}
+            value={props.inviteeAccountType}
             onValueChange={newValue => setFieldValue('inviteeAccountType', newValue as InviteeAccountType)}
           >
             <TabsList>
