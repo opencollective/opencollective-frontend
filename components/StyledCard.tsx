@@ -38,6 +38,7 @@ type StyledCardProps = BackgroundProps &
  * A simple styled-component to contain content in a card UI using styled-system.
  *
  * @see See [styled-system docs](https://github.com/jxnblk/styled-system/blob/master/docs/api.md) for usage of those props
+ * @deprecated Use `ui/Card` instead
  */
 const StyledCard = styled.div.attrs<StyledCardProps>(props => ({
   bg: props.bg ?? 'white.full',

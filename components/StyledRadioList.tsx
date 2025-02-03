@@ -198,4 +198,7 @@ const StyledRadioList = ({
 
 StyledRadioList.displayName = 'StyledRadioList';
 
+/**
+ * @deprecated Use `ui/RadioGroup` instead
+ */
 export default StyledRadioList;

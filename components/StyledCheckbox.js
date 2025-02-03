@@ -223,4 +223,7 @@ StyledCheckbox.propTypes = {
   error: PropTypes.any,
 };
 
+/**
+ * @deprecated Use `ui/Checkbox` instead
+ */
 export default StyledCheckbox;

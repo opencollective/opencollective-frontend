@@ -62,6 +62,8 @@ const TextArea = styled.textarea`
 
 /**
  * A styled textarea that can grows with its content.
+ *
+ * @deprecated Use `ui/Textarea` instead
  */
 export default class StyledTextarea extends React.PureComponent {
   static propTypes = {

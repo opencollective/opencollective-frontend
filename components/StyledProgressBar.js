@@ -22,6 +22,7 @@ const ProgressBar = styled.div`
 
 /**
  * A progress bar that displays the current advancement.
+ * @deprecated Use `ui/Progress` instead
  */
 const StyledProgressBar = ({
   percentage,
