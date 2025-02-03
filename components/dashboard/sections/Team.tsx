@@ -214,7 +214,7 @@ const Team = ({ accountSlug }: DashboardSectionProps) => {
     data?.account?.childrenAccounts?.nodes?.filter(child => child.members?.nodes?.length > 0) || [];
 
   return (
-    <div className="max-w-screen-lg">
+    <div className="max-w-(--breakpoint-lg)">
       <DashboardHeader title={<FormattedMessage id="Team" defaultMessage="Team" />} />
 
       {loading ? (

@@ -35,32 +35,32 @@ export default function SmallThreadActivity(props: SmallThreadActivityProps) {
       className="relative w-full border-slate-200 px-6 py-4 first:border-none first:pt-0 [&:first-child_.timeline-indicator]:top-0 [&:last-child_.timeline-indicator]:-bottom-4 [&:last-child_.timeline-separator]:hidden"
       data-cy="activity"
     >
-      <div className="timeline-separator absolute bottom-0 left-11 right-0 border-b" />
+      <div className="timeline-separator absolute right-0 bottom-0 left-11 border-b" />
       <div className="flex justify-between">
         <div className="flex gap-4">
           <div className="relative">
-            <div className="timeline-indicator absolute -bottom-4 -top-4 left-5 -z-10 border-l" />
+            <div className="timeline-indicator absolute -top-4 -bottom-4 left-5 -z-10 border-l" />
             {props.activity.individual ? (
               <AccountHoverCard
                 account={props.activity.individual}
                 trigger={
                   <div className="relative">
                     <Avatar collective={props.activity.individual} radius={40} />
-                    <div className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-white shadow">
+                    <div className="absolute -right-1 -bottom-1 flex h-5 w-5 items-center justify-center rounded-full bg-white shadow-sm">
                       {getActivityIcon(props.activity, theme, 12)}
                     </div>
                   </div>
                 }
               />
             ) : (
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm">
                 {getActivityIcon(props.activity, theme, 12)}
               </div>
             )}
           </div>
           <div>
             {props.activity.individual && (
-              <div className="mb-1 text-sm font-medium leading-5">{props.activity.individual.name}</div>
+              <div className="mb-1 text-sm leading-5 font-medium">{props.activity.individual.name}</div>
             )}
             <p className="truncate text-xs text-muted-foreground">
               <FormattedMessage
@@ -70,7 +70,7 @@ export default function SmallThreadActivity(props: SmallThreadActivityProps) {
               />
             </p>
             {message ? (
-              <div className="mt-4 whitespace-pre-line text-sm">
+              <div className="mt-4 text-sm whitespace-pre-line">
                 <div
                   className="font-medium"
                   style={{

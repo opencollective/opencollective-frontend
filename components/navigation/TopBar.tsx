@@ -37,7 +37,7 @@ const MobileFooterLink = styled(Link)<{ $isActive: boolean }>`
   align-items: center;
   flex-direction: column;
   gap: 8px;
-  flex-grow: 1;
+  grow: 1;
   font-size: 12px;
   line-height: 16px;
   font-weight: 500;
@@ -67,7 +67,7 @@ const MainNavItem = styled(Link)<{ $isActive: boolean }>`
   align-items: center;
   gap: 8px;
   max-width: 340px;
-  flex-shrink: 1;
+  shrink: 1;
   color: #0f172a;
   font-size: 14px;
   height: 32px;

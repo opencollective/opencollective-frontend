@@ -77,7 +77,7 @@ function ColorPicker({ value, onChange }) {
                 className={clsx(
                   'size-10 cursor-pointer appearance-none overflow-hidden rounded-md border bg-transparent p-2.5',
                   '[&::-moz-color-swatch]:rounded [&::-moz-color-swatch]:border-none [&::-moz-focus-inner]:p-0',
-                  '[&::-webkit-color-swatch-wrapper]:p-0 [&::-webkit-color-swatch]:rounded [&::-webkit-color-swatch]:border-none',
+                  '[&::-webkit-color-swatch]:rounded [&::-webkit-color-swatch]:border-none [&::-webkit-color-swatch-wrapper]:p-0',
                 )}
               />
               <InputGroup prepend="#" value={value?.replace('#', '')} onChange={e => onChange(`#${e.target.value}`)} />
@@ -168,7 +168,7 @@ export const GoalsForm = ({ initialValues, schema, onSubmit, account }) => {
         return (
           <Form>
             <div className="flex flex-col items-start gap-4 rounded-lg border">
-              <div className="space-y-6 px-6 pb-2 pt-6">
+              <div className="space-y-6 px-6 pt-6 pb-2">
                 <FormField name="goal.amount" label={"Amount you're aiming for"}>
                   {({ field }) => {
                     return (
@@ -249,7 +249,7 @@ export const GoalsForm = ({ initialValues, schema, onSubmit, account }) => {
                 <GoalProgress accountSlug={account.slug} goal={formik.values.goal} />
               </div>
               <Separator />
-              <div className="flex w-full items-center justify-between gap-4 px-6 pb-6 pt-2">
+              <div className="flex w-full items-center justify-between gap-4 px-6 pt-2 pb-6">
                 <div className="flex items-center gap-2">
                   <Button type="submit" loading={formik.isSubmitting}>
                     <FormattedMessage defaultMessage="Save" id="save" />

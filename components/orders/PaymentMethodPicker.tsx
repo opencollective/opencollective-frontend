@@ -179,9 +179,9 @@ export default function PaymentMethodPicker(props: PaymentMethodPickerProps) {
                   />
                   <div className="mr-3 w-7 text-center">{getPaymentMethodIcon(pm, pm.account, 24)}</div>
                   <div>
-                    <p className="text-xs font-semibold leading-5 text-black">{getPaymentMethodName(pm as any)}</p>
+                    <p className="text-xs leading-5 font-semibold text-black">{getPaymentMethodName(pm as any)}</p>
                     {getPaymentMethodMetadata(pm, props.order?.totalAmount?.valueInCents) && (
-                      <p className="text-xs font-normal leading-4 text-gray-400">
+                      <p className="text-xs leading-4 font-normal text-gray-400">
                         {getPaymentMethodMetadata(pm, props.order?.totalAmount?.valueInCents)}
                       </p>
                     )}
@@ -345,10 +345,10 @@ function StripeSetupPaymentMethodOption(props: StripeSetupPaymentMethodOptionPro
           <CreditCard color="#c9ced4" size={24} />
         </div>
         <div>
-          <p className="text-xs font-semibold leading-5 text-black">
+          <p className="text-xs leading-5 font-semibold text-black">
             <FormattedMessage defaultMessage="New payment method" id="L3WVIm" />
           </p>
-          <p className="text-xs font-normal leading-4 text-gray-400">
+          <p className="text-xs leading-4 font-normal text-gray-400">
             {availableMethodLabels && availableMethodLabels.length > 0 ? (
               availableMethodLabels.join(', ')
             ) : (
@@ -387,7 +387,7 @@ function PayPalSetupOption(props: PayPalSetupOptionProps) {
           <PayPal size={24} />
         </div>
         <div>
-          <p className="text-xs font-semibold leading-5 text-black">
+          <p className="text-xs leading-5 font-semibold text-black">
             <FormattedMessage id="PayoutMethod.Type.Paypal" defaultMessage="PayPal" />
           </p>
         </div>

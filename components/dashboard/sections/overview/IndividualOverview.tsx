@@ -22,7 +22,7 @@ const Home = ({ accountSlug }: DashboardSectionProps) => {
   const slug = router.query?.as || accountSlug;
 
   return (
-    <div className="flex max-w-screen-lg flex-col-reverse xl:flex-row">
+    <div className="flex max-w-(--breakpoint-lg) flex-col-reverse xl:flex-row">
       <div className="flex flex-1 flex-col gap-4">
         <DashboardHeader
           title={<FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />}
@@ -78,7 +78,7 @@ const Home = ({ accountSlug }: DashboardSectionProps) => {
               </div>
 
               <button
-                className="absolute right-1 top-1 rounded-full p-2 text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                className="absolute top-1 right-1 rounded-full p-2 text-slate-500 hover:bg-slate-50 hover:text-slate-900"
                 onClick={dismiss}
               >
                 <X size={16} />

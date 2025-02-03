@@ -19,6 +19,7 @@ class LoginBtn extends React.Component {
     children: PropTypes.node,
     loadingLoggedInUser: PropTypes.bool,
     asLink: PropTypes.bool,
+    className: PropTypes.string,
   };
 
   static defaultProps = {
@@ -45,7 +46,8 @@ class LoginBtn extends React.Component {
           this.props.loadingLoggedInUser ? 'h-8 w-8' : 'h-8 px-4',
           this.props.asLink
             ? 'inline'
-            : 'inline-flex items-center justify-center whitespace-nowrap rounded-full border text-sm',
+            : 'inline-flex items-center justify-center rounded-full border text-sm whitespace-nowrap',
+          this.props.className,
         )}
       >
         {this.props.loadingLoggedInUser ? (

@@ -64,7 +64,7 @@ const columns: ColumnDef<Agreement>[] = [
           <DateTime value={expiresAt} dateStyle="medium" />
         </span>
       ) : (
-        <span className="italic text-slate-500">
+        <span className="text-slate-500 italic">
           <FormattedMessage defaultMessage="Never" id="du1laW" />
         </span>
       );
@@ -89,7 +89,7 @@ const columns: ColumnDef<Agreement>[] = [
             size={32}
             borderRadius="8px"
             openFileViewer={() => meta?.onFilePreview(agreement)}
-            className="hover:shadow"
+            className="hover:shadow-sm"
           />
         </div>
       );

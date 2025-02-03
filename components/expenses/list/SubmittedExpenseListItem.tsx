@@ -71,7 +71,7 @@ export function SubmittedExpenseListItem(props: SubmittedExpenseListItemProps) {
       }}
     >
       <div>
-        <div className="mb-1 max-w-[250px] overflow-hidden text-ellipsis text-sm font-medium text-slate-800 sm:max-w-[400px]">
+        <div className="mb-1 max-w-[250px] overflow-hidden text-sm font-medium text-ellipsis text-slate-800 sm:max-w-[400px]">
           {props.expense.description}
         </div>
         <div className="text-xs text-slate-700">
@@ -141,7 +141,7 @@ export function SubmittedExpenseListItem(props: SubmittedExpenseListItemProps) {
           )}
         </div>
         <div className="flex flex-wrap items-end justify-end gap-2">
-          <span className="rounded-xl rounded-ee-none rounded-se-none bg-slate-100 px-3 py-1 text-xs text-slate-800">
+          <span className="rounded-xl rounded-se-none rounded-ee-none bg-slate-100 px-3 py-1 text-xs text-slate-800">
             {i18nExpenseType(intl, props.expense.type)} #{props.expense.legacyId}
           </span>
 

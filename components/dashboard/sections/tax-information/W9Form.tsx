@@ -188,7 +188,7 @@ export const W9TaxFormFields = ({ formik }: { formik: FormikProps<W9TaxFormValue
       </StyledInputFormikField>
       <StyledInputFormikField name="hasConfirmedTOS">
         {({ field }) => (
-          <label className="cursor-pointer text-sm font-normal leading-normal">
+          <label className="cursor-pointer text-sm leading-normal font-normal">
             <Checkbox
               className={cn('mr-2 align-text-top', { 'border-red-500': field.error })}
               name={field.name}

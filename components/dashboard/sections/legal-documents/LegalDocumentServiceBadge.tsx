@@ -8,7 +8,7 @@ import { Badge } from '../../../ui/Badge';
 
 export const LegalDocumentServiceBadge = ({ service }: { service: LegalDocumentService }) => {
   return (
-    <Badge className="whitespace-nowrap text-nowrap">
+    <Badge className="text-nowrap whitespace-nowrap">
       {service === 'OPENCOLLECTIVE' ? WebsiteName : startCase(service.toLowerCase())}
     </Badge>
   );

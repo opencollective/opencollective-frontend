@@ -29,7 +29,7 @@ const MenuLink = ({ section, label, href, Icon, isActive, onChangeVisiblity, vis
       ref={ref}
       data-cy={`menu-item-${section}`}
       className={clsx(
-        'group flex w-full items-center gap-x-1.5 rounded-full px-2.5 py-0.5 text-sm font-medium leading-6 antialiased transition-colors',
+        'group flex w-full items-center gap-x-1.5 rounded-full px-2.5 py-0.5 text-sm leading-6 font-medium antialiased transition-colors',
         isActive ? 'bg-blue-50 text-blue-700' : 'text-slate-950 hover:bg-slate-50 hover:text-blue-700',
         inView ? 'visible' : 'invisible',
       )}
@@ -71,7 +71,7 @@ const DashboardTopBar = ({ menuItems, isLoading, account }) => {
     ({ section, subMenu }) => section === selectedSection || subMenu?.find(item => item.section === selectedSection),
   );
   return (
-    <div className="z-10 border-b bg-white py-2 pl-1.5 pr-2 xl:px-6">
+    <div className="z-10 border-b bg-white py-2 pr-2 pl-1.5 xl:px-6">
       <div className="relative flex justify-between">
         <div className="flex shrink gap-1.5 overflow-hidden">
           {isLoading

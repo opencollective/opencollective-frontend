@@ -101,7 +101,7 @@ const getSelectionInfoForLabel = (
   if (rolesHaveSelectedCategory.some(Boolean)) {
     const rolesToDisplay = roles.filter((_, index) => rolesHaveSelectedCategory[index]);
     return (
-      <span className="text-xs font-normal italic text-muted-foreground">
+      <span className="text-xs font-normal text-muted-foreground italic">
         <FormattedMessage
           id="accountingCategory.selectedBy"
           defaultMessage="Selected by {nbRoles, select, 1 {{role1}} 2 {{role1} and {role2}} other {{role1}, {role2} and {role3}}}."
@@ -392,7 +392,7 @@ const AccountingCategorySelect = ({
               disabled={disabled}
             >
               <span
-                className={cn('mr-3 flex-grow truncate text-start text-sm', {
+                className={cn('mr-3 grow truncate text-start text-sm', {
                   'text-gray-400': isUndefined(selectedCategory),
                 })}
               >
@@ -502,7 +502,7 @@ const AccountingCategorySelect = ({
                         role="button"
                         onKeyDown={e => e.key === 'Enter' && triggerChange(option.value)}
                         onClick={() => triggerChange(option.value)}
-                        className="cursor-pointer text-[--primary-color-600] underline hover:opacity-80"
+                        className="cursor-pointer text-(--primary-color-600) underline hover:opacity-80"
                         aria-label={intl.formatMessage(
                           { defaultMessage: 'Select {name}', id: 'G65XME' },
                           { name: option.value.name },
@@ -524,3 +524,4 @@ const AccountingCategorySelect = ({
 };
 
 export default AccountingCategorySelect;
+export const MemoizedAccountingCategorySelect = React.memo(AccountingCategorySelect);

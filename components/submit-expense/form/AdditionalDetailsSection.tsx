@@ -1,5 +1,8 @@
 import React from 'react';
+import { pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
+
+import { ExpenseLockableFields } from '@/lib/graphql/types/v2/schema';
 
 import { FormField } from '@/components/FormField';
 
@@ -13,65 +16,82 @@ import { type ExpenseForm } from '../useExpenseForm';
 
 import { ExpensePolicyContainer } from './ExpensePolicyContainer';
 import { FormSectionContainer } from './FormSectionContainer';
+import { memoWithGetFormProps } from './helper';
 
 type AdditionalDetailsSectionProps = {
-  form: ExpenseForm;
   inViewChange: (inView: boolean, entry: IntersectionObserverEntry) => void;
-};
+} & ReturnType<typeof getFormProps>;
 
-export function AdditionalDetailsSection(props: AdditionalDetailsSectionProps) {
+function getFormProps(form: ExpenseForm) {
+  return {
+    ...pick(form, ['setFieldValue', 'initialLoading']),
+    ...pick(form.options, ['host', 'account', 'lockedFields']),
+    ...pick(form.values, [
+      'expenseTypeOption',
+      'tags',
+      'accountSlug',
+      'acknowledgedHostTitleExpensePolicy',
+      'acknowledgedCollectiveTitleExpensePolicy',
+    ]),
+  };
+}
+
+// eslint-disable-next-line prefer-arrow-callback
+export const AdditionalDetailsSection = memoWithGetFormProps(function AdditionalDetailsSection(
+  props: AdditionalDetailsSectionProps,
+) {
   const intl = useIntl();
-  const expenseTags = props.form.values.tags;
-  const expenseTypeOption = props.form.values.expenseTypeOption;
-  const collectiveSlug = props.form.values.accountSlug;
+  const expenseTags = props.tags;
+  const expenseTypeOption = props.expenseTypeOption;
+  const collectiveSlug = props.accountSlug;
 
   return (
-    <FormSectionContainer form={props.form} step={Step.EXPENSE_TITLE} inViewChange={props.inViewChange}>
+    <FormSectionContainer step={Step.EXPENSE_TITLE} inViewChange={props.inViewChange}>
       <FormField
-        disabled={props.form.initialLoading}
+        disabled={props.initialLoading || props.lockedFields?.includes?.(ExpenseLockableFields.DESCRIPTION)}
         name="title"
         placeholder={intl.formatMessage({ defaultMessage: 'Mention a brief expense title', id: 'Te2Yc2' })}
       />
 
-      {!props.form.initialLoading &&
-        props.form.options.host?.policies?.EXPENSE_POLICIES?.titlePolicy &&
-        props.form.options.host?.slug !== props.form.options.account?.slug && (
+      {!props.initialLoading &&
+        props.host?.policies?.EXPENSE_POLICIES?.titlePolicy &&
+        props.host?.slug !== props.account?.slug && (
           <div className="mt-4">
             <ExpensePolicyContainer
               title={<FormattedMessage defaultMessage="Host Instructions for titles" id="R7O6Sr" />}
-              policy={props.form.options.host?.policies?.EXPENSE_POLICIES?.titlePolicy}
-              checked={props.form.values.acknowledgedHostTitleExpensePolicy}
-              onAcknowledgedChanged={v => props.form.setFieldValue('acknowledgedHostTitleExpensePolicy', v)}
+              policy={props.host?.policies?.EXPENSE_POLICIES?.titlePolicy}
+              checked={props.acknowledgedHostTitleExpensePolicy}
+              onAcknowledgedChanged={v => props.setFieldValue('acknowledgedHostTitleExpensePolicy', v)}
             />
           </div>
         )}
 
-      {!props.form.initialLoading && props.form.options.account?.policies?.EXPENSE_POLICIES?.titlePolicy && (
+      {!props.initialLoading && props.account?.policies?.EXPENSE_POLICIES?.titlePolicy && (
         <div className="mt-4">
           <ExpensePolicyContainer
             title={<FormattedMessage defaultMessage="Collective Instructions for titles" id="ZcXTLk" />}
-            policy={props.form.options.account?.policies?.EXPENSE_POLICIES?.titlePolicy}
-            checked={props.form.values.acknowledgedCollectiveTitleExpensePolicy}
-            onAcknowledgedChanged={v => props.form.setFieldValue('acknowledgedCollectiveTitleExpensePolicy', v)}
+            policy={props.account?.policies?.EXPENSE_POLICIES?.titlePolicy}
+            checked={props.acknowledgedCollectiveTitleExpensePolicy}
+            onAcknowledgedChanged={v => props.setFieldValue('acknowledgedCollectiveTitleExpensePolicy', v)}
           />
         </div>
       )}
 
-      <Label className="mb-2 mt-4">
+      <Label className="mt-4 mb-2">
         <FormattedMessage defaultMessage="Tag your expense" id="EosA8s" />
       </Label>
       <div className="flex items-center gap-1">
-        {props.form.initialLoading ? (
+        {props.initialLoading ? (
           <LoadingPlaceholder height={20} width={50} />
         ) : (
           expenseTypeOption && <ExpenseTypeTag type={expenseTypeOption} mb={0} mr={0} />
         )}
-        {!props.form.initialLoading && collectiveSlug && (
+        {!props.initialLoading && collectiveSlug && (
           <AutocompleteEditTags
             query={expenseTagsQuery}
             variables={{ account: { slug: collectiveSlug } }}
             onChange={tags =>
-              props.form.setFieldValue(
+              props.setFieldValue(
                 'tags',
                 tags.map(t => t.value.toLowerCase()),
               )
@@ -79,8 +99,8 @@ export function AdditionalDetailsSection(props: AdditionalDetailsSectionProps) {
             value={expenseTags}
           />
         )}
-        {props.form.initialLoading && <LoadingPlaceholder height={20} width={70} />}
+        {props.initialLoading && <LoadingPlaceholder height={20} width={70} />}
       </div>
     </FormSectionContainer>
   );
-}
+}, getFormProps);

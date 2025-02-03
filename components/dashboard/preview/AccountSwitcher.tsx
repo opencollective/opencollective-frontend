@@ -332,7 +332,7 @@ export default function AccountSwitcher({ activeSlug, defaultSlug, setDefaultSlu
                 onClick={() => router.push(`/dashboard/${parentAccount.slug}`)}
                 aria-expanded={open}
                 className={clsx(
-                  'group h-8 justify-between gap-1.5 whitespace-nowrap rounded-full border-transparent px-2',
+                  'group h-8 justify-between gap-1.5 rounded-full border-transparent px-2 whitespace-nowrap',
                   'max-w-[14rem]',
                 )}
               >
@@ -354,7 +354,7 @@ export default function AccountSwitcher({ activeSlug, defaultSlug, setDefaultSlu
               role="combobox"
               aria-expanded={open}
               className={clsx(
-                'group h-8 max-w-[10rem] justify-between gap-1.5 whitespace-nowrap rounded-full px-2 sm:max-w-[14rem]',
+                'group h-8 max-w-[10rem] justify-between gap-1.5 rounded-full px-2 whitespace-nowrap sm:max-w-[14rem]',
               )}
             >
               <div className="flex items-center gap-2 truncate">

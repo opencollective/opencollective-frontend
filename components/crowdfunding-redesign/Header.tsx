@@ -30,26 +30,26 @@ export function Header({ collective, profile, collapsed = false, activeTab, brea
       </div>
       {!collapsed && (
         <div className="relative bg-background pb-6">
-          <div className="mx-auto flex max-w-screen-xl flex-col items-center justify-center gap-2">
+          <div className="mx-auto flex max-w-(--breakpoint-xl) flex-col items-center justify-center gap-2">
             <div className="z-10 -mt-16 mb-2">
-              <Avatar className="border-8 border-white bg-white shadow-sm" collective={collective} radius={128} />
+              <Avatar className="border-8 border-white bg-white shadow-xs" collective={collective} radius={128} />
             </div>
             <div className="space-y-3 text-center">
-              <h1 className="text-balance text-3xl font-semibold">{profile?.name}</h1>
-              <p className="max-w-prose text-balance text-sm leading-normal">{profile?.description}</p>
+              <h1 className="text-3xl font-semibold text-balance">{profile?.name}</h1>
+              <p className="max-w-prose text-sm leading-normal text-balance">{profile?.description}</p>
               {hasSocialLinks && <SocialLinks socialLinks={collective.socialLinks} />}
             </div>
           </div>
-          <div className="absolute right-4 top-4">
+          <div className="absolute top-4 right-4">
             <ProfileActionButtons />
           </div>
         </div>
       )}
-      <header className="sticky top-0 z-[1000] flex h-16 border-b bg-white backdrop-blur-md">
+      <header className="sticky top-0 z-1000 flex h-16 border-b bg-white backdrop-blur-md">
         <div
           className={clsx(
             'w-full items-center gap-4 px-6',
-            collapsed ? 'flex justify-center' : 'grid grid-cols-[minmax(auto,_1fr)_1fr_minmax(auto,_1fr)]',
+            collapsed ? 'flex justify-center' : 'grid grid-cols-[minmax(auto,1fr)_1fr_minmax(auto,1fr)]',
           )}
         >
           <motion.div
@@ -65,7 +65,7 @@ export function Header({ collective, profile, collapsed = false, activeTab, brea
             className=""
           >
             <Link href={`/preview/${collective?.slug}`}>
-              <Avatar collective={collective} radius={32} className="border-2 border-white bg-white shadow-sm" />
+              <Avatar collective={collective} radius={32} className="border-2 border-white bg-white shadow-xs" />
             </Link>
           </motion.div>
           {collapsed ? (
@@ -76,7 +76,7 @@ export function Header({ collective, profile, collapsed = false, activeTab, brea
             <div className="mx-auto flex max-w-3xl flex-1 shrink-0 flex-col items-center justify-end">
               <nav className="sticky top-0 flex space-x-4 text-sm font-medium text-muted-foreground">
                 <div className="">
-                  <div className="relative mx-auto -mb-px h-16 max-w-screen-xl px-6">
+                  <div className="relative mx-auto -mb-px h-16 max-w-(--breakpoint-xl) px-6">
                     <TabsList centered={true}>
                       <TabsTrigger
                         // scroll={false}

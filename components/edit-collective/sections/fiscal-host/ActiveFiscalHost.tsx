@@ -104,7 +104,7 @@ export function ActiveFiscalHost(props: ActiveFiscalHostProps) {
 
   return (
     <div>
-      <h2 className="mb-2 mt-8 text-base font-bold">
+      <h2 className="mt-8 mb-2 text-base font-bold">
         <FormattedMessage defaultMessage="Active Fiscal Host" id="e2wNyb" />
       </h2>
       <div className="flex justify-between gap-4 rounded-lg border border-gray-300 p-4">

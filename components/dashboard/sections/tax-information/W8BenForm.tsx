@@ -238,7 +238,7 @@ export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFor
         <React.Fragment>
           <StyledInputFormikField name="certifiesResidentCountry">
             {({ field }) => (
-              <label className="cursor-pointer text-sm font-normal leading-normal">
+              <label className="cursor-pointer text-sm leading-normal font-normal">
                 <Checkbox
                   className={cn('mr-2 align-text-top', { 'border-red-500': field.error })}
                   name={field.name}
@@ -332,7 +332,7 @@ export const W8BenTaxFormFields = ({ formik }: { formik: FormikProps<W8BenTaxFor
 
       <StyledInputFormikField name="hasConfirmedTOS">
         {({ field }) => (
-          <label className="cursor-pointer text-sm font-normal leading-normal">
+          <label className="cursor-pointer text-sm leading-normal font-normal">
             <Checkbox
               className={cn('mr-2 align-text-top', { 'border-red-500': field.error })}
               name={field.name}

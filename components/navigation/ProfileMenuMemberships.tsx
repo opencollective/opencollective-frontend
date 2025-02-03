@@ -87,11 +87,11 @@ const MembershipLine = ({ user, membership, closeDrawer }) => {
       </MenuLink>
 
       {Boolean(user?.canSeeAdminPanel(membership.collective)) && (
-        <div className="absolute bottom-1 right-1 top-1">
+        <div className="absolute top-1 right-1 bottom-1">
           <Tooltip>
             <TooltipTrigger>
               <Link
-                className="flex h-7 w-7 items-center justify-center rounded-md border bg-white text-slate-950 opacity-0 transition-all hover:border-white hover:bg-slate-900 hover:text-white group-hover:opacity-100"
+                className="flex h-7 w-7 items-center justify-center rounded-md border bg-white text-slate-950 opacity-0 transition-all group-hover:opacity-100 hover:border-white hover:bg-slate-900 hover:text-white"
                 href={getDashboardRoute(membership.collective)}
                 onClick={closeDrawer}
               >

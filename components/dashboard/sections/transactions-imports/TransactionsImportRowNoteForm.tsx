@@ -1,18 +1,21 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { updateTransactionsImportRows } from './lib/graphql';
+import { i18nGraphqlException } from '@/lib/errors';
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 
 import { Button } from '@/components/ui/Button';
 import { Label } from '@/components/ui/Label';
 import { Textarea } from '@/components/ui/Textarea';
+import { useToast } from '@/components/ui/useToast';
 
 export const TransactionsImportRowNoteForm = ({ row, transactionsImportId, autoFocus = false }) => {
   const [updateRows, { loading }] = useMutation(updateTransactionsImportRows, { context: API_V2_CONTEXT });
   const [newText, setNewText] = React.useState(row.comment || '');
-
+  const { toast } = useToast();
+  const intl = useIntl();
   return (
     <div>
       <Label htmlFor="import-row-note" className="mb-1 font-bold text-gray-600">
@@ -33,7 +36,20 @@ export const TransactionsImportRowNoteForm = ({ row, transactionsImportId, autoF
           loading={loading}
           disabled={newText === (row.note || '')}
           onClick={() => {
-            updateRows({ variables: { importId: transactionsImportId, rows: [{ id: row.id, note: newText }] } });
+            try {
+              updateRows({
+                variables: {
+                  importId: transactionsImportId,
+                  rows: [{ id: row.id, note: newText }],
+                  action: 'UPDATE_ROWS',
+                },
+              });
+            } catch (error) {
+              toast({
+                variant: 'error',
+                message: i18nGraphqlException(intl, error),
+              });
+            }
           }}
         >
           <FormattedMessage defaultMessage="Save" id="save" />

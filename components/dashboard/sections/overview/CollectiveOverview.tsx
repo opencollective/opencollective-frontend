@@ -158,7 +158,7 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
     const metric = metrics.find(m => m.id === queryFilter.values.subpath);
     if (metric) {
       return (
-        <div className="flex max-w-screen-lg flex-col gap-3">
+        <div className="flex max-w-(--breakpoint-lg) flex-col gap-3">
           <DashboardHeader
             title={<FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />}
             subpathTitle={metric.label}
@@ -176,7 +176,7 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
   }
 
   return (
-    <div className="max-w-screen-lg space-y-6">
+    <div className="max-w-(--breakpoint-lg) space-y-6">
       <div className="flex flex-col gap-3">
         <DashboardHeader
           title={<FormattedMessage id="AdminPanel.Menu.Overview" defaultMessage="Overview" />}
@@ -202,7 +202,7 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
                           src="/static/images/dashboard.png"
                           aria-hidden="true"
                         />
-                        <AlertTitle className="text-balance text-lg leading-tight">
+                        <AlertTitle className="text-lg leading-tight text-balance">
                           <FormattedMessage
                             id="PreviewFeatures.CollectiveOverview.Welcome.Title"
                             defaultMessage="Welcome to your new Collective Overview"
@@ -226,7 +226,7 @@ export function CollectiveOverview({ accountSlug }: DashboardSectionProps) {
                     <Button
                       variant="ghost"
                       size="icon-xs"
-                      className="absolute right-1 top-1 text-muted-foreground"
+                      className="absolute top-1 right-1 text-muted-foreground"
                       onClick={dismiss}
                     >
                       <X size={16} />

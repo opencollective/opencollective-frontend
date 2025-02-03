@@ -115,7 +115,7 @@ const HostTransactionReport = ({ accountSlug: hostSlug, subpath }: DashboardSect
   };
   return (
     <Fragment>
-      <div className="flex max-w-screen-lg flex-col gap-4">
+      <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
         <DashboardHeader
           title={<FormattedMessage id="TransactionReports" defaultMessage="Transaction Reports" />}
           titleRoute={`/dashboard/${hostSlug}/reports/transactions`}
@@ -207,7 +207,7 @@ const PreviewFeatureConfigButton = ({ layout, setLayout }) => {
         <PopoverContent align="end" sideOffset={8}>
           <div className="flex flex-col gap-4">
             <div className="space-y-2">
-              <h4 className="font-medium leading-none">Configure layout</h4>
+              <h4 className="leading-none font-medium">Configure layout</h4>
               <p className="text-sm text-muted-foreground">
                 {"We're testing layout options, please let us know what you prefer!"}
               </p>

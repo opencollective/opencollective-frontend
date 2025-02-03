@@ -427,7 +427,7 @@ export const HostCreateExpenseModal = ({
                   </StyledInputFormikField>
                 </div>
               </div>
-              <div className="border-t-1 mt-8 flex justify-end gap-4 border-t border-solid border-t-slate-100 pt-4">
+              <div className="mt-8 flex justify-end gap-4 border-t border-t-1 border-solid border-t-slate-100 pt-4">
                 <Button onClick={() => setOpen(false)} type="button" variant="outline" disabled={isSubmitting}>
                   <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
                 </Button>

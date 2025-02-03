@@ -623,7 +623,7 @@ const AddFundsModalContentWithCollective = ({
               >
                 {({ field }) => <StyledInput data-cy="add-funds-description" {...field} />}
               </Field>
-              <div className="w-full flex-grow overflow-y-auto pb-4">
+              <div className="w-full grow overflow-y-auto pb-4">
                 <Field
                   name="fromAccount"
                   htmlFor="addFunds-fromAccount"
@@ -940,7 +940,7 @@ const AddFundsModalContentWithCollective = ({
                 </P>
                 {fundError && <MessageBoxGraphqlError error={fundError} mt={3} fontSize="13px" />}
               </div>
-              <div className="border-t-1 flex justify-center gap-4 border-t border-solid border-t-slate-100 pt-4">
+              <div className="flex justify-center gap-4 border-t border-t-1 border-solid border-t-slate-100 pt-4">
                 <Button onClick={handleClose} type="button" variant="outline">
                   <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
                 </Button>
@@ -1070,7 +1070,7 @@ const AddFundsModalContentWithCollective = ({
                             values={{ item: <FormattedMessage defaultMessage="Memo" id="D5NqQO" /> }}
                           />
                           <p
-                            className="text-black-600 border-black-200 mt-1 max-h-32 overflow-y-auto whitespace-pre-wrap break-words rounded border bg-neutral-50 p-2 text-xs"
+                            className="text-black-600 border-black-200 mt-1 max-h-32 overflow-y-auto rounded border bg-neutral-50 p-2 text-xs break-words whitespace-pre-wrap"
                             data-cy="add-funds-memo"
                           >
                             {fundDetails.memo}

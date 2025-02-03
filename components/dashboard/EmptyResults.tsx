@@ -57,7 +57,7 @@ export function EmptyResults({
 
       {hasFilters && (
         <React.Fragment>
-          <p className="text-balance text-center text-muted-foreground">
+          <p className="text-center text-balance text-muted-foreground">
             <FormattedMessage
               id="filter.NoMatchingResults.subtitle"
               defaultMessage="We can't find any {type, select, EXPENSES {expenses} CONTRIBUTIONS {contributions} VIRTUAL_CARDS {virtual cards} VIRTUAL_CARD_REQUESTS {virtual card requests} TRANSACTIONS {transactions} AGREEMENTS {agreements} COLLECTIVES {collectives} HOST_APPLICATIONS {host applications} UPDATES {updates} other {results}} matching the given filters."

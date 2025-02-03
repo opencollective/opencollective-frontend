@@ -276,7 +276,7 @@ const FormBody = ({ update, accountSlug }) => {
                   label={<FormattedMessage id="Title" defaultMessage="Title" />}
                   required
                 >
-                  {({ field }) => <Input {...field} data-cy="update-title" className="flex-grow" maxLength={255} />}
+                  {({ field }) => <Input {...field} data-cy="update-title" className="grow" maxLength={255} />}
                 </StyledInputFormikField>
                 <Field name="html">
                   {({ field, meta }) => (
@@ -507,7 +507,7 @@ const UpdateFormView = ({ updateId, accountSlug }) => {
   });
 
   return (
-    <div className="flex max-w-screen-lg flex-col-reverse xl:flex-row">
+    <div className="flex max-w-(--breakpoint-lg) flex-col-reverse xl:flex-row">
       <div className="flex flex-1 flex-col gap-6">
         <Link
           className="flex w-fit items-center text-sm text-gray-500"

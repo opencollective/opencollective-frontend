@@ -8,17 +8,17 @@ export const Footer = ({ account }) => {
   const mainAccount = account?.parent ?? account;
   return (
     <footer className="border-t px-6 py-12">
-      <div className="mx-auto max-w-screen-xl space-y-8">
+      <div className="mx-auto max-w-(--breakpoint-xl) space-y-8">
         <div className="flex justify-between text-sm">
           <Link href={`/preview/${mainAccount?.slug}`} className="flex items-center gap-2">
-            <Avatar className="border-2 border-white bg-white shadow-sm" radius={28} collective={mainAccount} />{' '}
+            <Avatar className="border-2 border-white bg-white shadow-xs" radius={28} collective={mainAccount} />{' '}
             <span className="">{mainAccount?.name}</span>
           </Link>
           {account?.host && account.host.slug !== mainAccount?.slug && (
             <div className="flex flex-col items-end gap-1 text-right text-sm">
               <span className="text-muted-foreground">{mainAccount?.name} is fiscally hosted by</span>
               <div className="inline-flex items-center gap-2 align-middle">
-                <Avatar className="border-2 border-white bg-white shadow-sm" radius={28} collective={account?.host} />{' '}
+                <Avatar className="border-2 border-white bg-white shadow-xs" radius={28} collective={account?.host} />{' '}
                 <span>{account?.host.name}</span>
               </div>
             </div>

@@ -90,8 +90,8 @@ export function TransactionGroupDetails() {
   const intl = useIntl();
   return (
     <div className="">
-      <div className="relative mx-auto flex max-w-screen-lg flex-col gap-8 px-6 py-12">
-        <h3 className="text-2xl font-semibold leading-none tracking-tight">
+      <div className="relative mx-auto flex max-w-(--breakpoint-lg) flex-col gap-8 px-6 py-12">
+        <h3 className="text-2xl leading-none font-semibold tracking-tight">
           Transaction group {router.query.groupId.slice(0, 8)}
         </h3>
         <TransactionGroupCard

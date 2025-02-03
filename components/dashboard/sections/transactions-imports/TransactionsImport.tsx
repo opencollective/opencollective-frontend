@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql, useApolloClient, useQuery } from '@apollo/client';
-import { partition, size, truncate } from 'lodash';
+import { size, truncate } from 'lodash';
 import Lottie from 'lottie-react';
 import {
   Calendar,
@@ -10,6 +10,7 @@ import {
   FileSliders,
   Info,
   MessageCircle,
+  PauseCircle,
   RefreshCw,
   RotateCcw,
   Settings,
@@ -35,7 +36,8 @@ import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nTransactionsRowStatus } from '../../../../lib/i18n/transactions-import-row';
 import { cn, sortSelectOptions } from '../../../../lib/utils';
 import { useTransactionsImportActions } from './lib/actions';
-import { TransactionsImportRowFieldsFragment } from './lib/graphql';
+import { TransactionsImportRowFieldsFragment, TransactionsImportStatsFragment } from './lib/graphql';
+import { getPossibleActionsForSelectedRows } from './lib/table-selection';
 
 import { accountingCategoryFields } from '@/components/expenses/graphql/fragments';
 
@@ -140,11 +142,7 @@ const transactionsImportQuery = gql`
         size
       }
       stats {
-        total
-        ignored
-        expenses
-        orders
-        processed
+        ...TransactionsImportStats
       }
       type
       csvConfig
@@ -156,6 +154,7 @@ const transactionsImportQuery = gql`
       account {
         id
         slug
+        currency
         ... on AccountWithHost {
           host {
             ...TransactionsImportHostFields
@@ -179,6 +178,7 @@ const transactionsImportQuery = gql`
   }
   ${TransactionsImportRowFieldsFragment}
   ${transactionsImportHostFieldsFragment}
+  ${TransactionsImportStatsFragment}
 `;
 
 const transactionsImportLasSyncAtPollQuery = gql`
@@ -194,28 +194,46 @@ const transactionsImportLasSyncAtPollQuery = gql`
 
 const DEFAULT_PAGE_SIZE = 50;
 
-const getViews = intl => [
-  {
-    id: 'PENDING',
-    label: intl.formatMessage({ defaultMessage: 'Pending', id: 'eKEL/g' }),
-    filter: { status: TransactionsImportRowStatus.PENDING },
-  },
-  {
-    id: 'IGNORED',
-    label: intl.formatMessage({ defaultMessage: 'No action', id: 'zue9QR' }),
-    filter: { status: TransactionsImportRowStatus.IGNORED },
-  },
-  {
-    id: 'LINKED',
-    label: intl.formatMessage({ defaultMessage: 'Imported', id: 'transaction.imported' }),
-    filter: { status: TransactionsImportRowStatus.LINKED },
-  },
-  {
-    id: 'ALL',
-    label: intl.formatMessage({ defaultMessage: 'All', id: 'all' }),
-    filter: {},
-  },
-];
+const getViews = intl =>
+  [
+    {
+      id: 'PENDING',
+      label: intl.formatMessage({ defaultMessage: 'Pending', id: 'eKEL/g' }),
+      filter: { status: TransactionsImportRowStatus.PENDING },
+    },
+    {
+      id: 'IGNORED',
+      label: intl.formatMessage({ defaultMessage: 'No action', id: 'zue9QR' }),
+      filter: { status: TransactionsImportRowStatus.IGNORED },
+    },
+    {
+      id: 'ON_HOLD',
+      label: intl.formatMessage({ defaultMessage: 'On Hold', id: 'PQoBVd' }),
+      filter: { status: TransactionsImportRowStatus.ON_HOLD },
+    },
+    {
+      id: 'LINKED',
+      label: intl.formatMessage({ defaultMessage: 'Imported', id: 'transaction.imported' }),
+      filter: { status: TransactionsImportRowStatus.LINKED },
+    },
+    {
+      id: 'ALL',
+      label: intl.formatMessage({ defaultMessage: 'All', id: 'all' }),
+      filter: {},
+    },
+  ] as const;
+
+const addCountsToViews = (views, stats) => {
+  const viewIdToStatsKey = {
+    PENDING: 'pending',
+    IGNORED: 'ignored',
+    ON_HOLD: 'onHold',
+    LINKED: 'processed',
+    ALL: 'total',
+  };
+
+  return views.map(view => ({ ...view, count: stats[viewIdToStatsKey[view.id]] }));
+};
 
 const rowStatusFilterSchema = z.nativeEnum(TransactionsImportRowStatus).optional();
 
@@ -328,7 +346,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
     },
   });
 
-  const { getActions, setRowsDismissed } = useTransactionsImportActions({
+  const { getActions, setRowsStatus } = useTransactionsImportActions({
     transactionsImport: importData,
     host: importData?.account?.['host'],
   });
@@ -374,7 +392,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                       <StepMapCSVColumns
                         importId={importId}
                         file={csvFile}
-                        currency={importData.account['currency']}
+                        currency={importData.account.currency}
                         onSuccess={refetch}
                       />
                     ) : null}
@@ -388,7 +406,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
               {/** Import details (creation date, last update, file info) */}
               <div
                 className={cn(
-                  'border border-neutral-200 bg-white p-4 text-base shadow-sm',
+                  'border border-neutral-200 bg-white p-4 text-base shadow-xs',
                   hasNewData ? 'rounded-tl-lg rounded-tr-lg border-b-0' : 'rounded-lg',
                 )}
               >
@@ -483,7 +501,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
               {!hasNewData ? (
                 <div className="h-[51px]" />
               ) : (
-                <div className="sticky top-0 z-50 flex items-center justify-between rounded-none rounded-bl-lg rounded-br-lg bg-blue-500 px-4 py-2 text-sm text-white animate-in fade-in">
+                <div className="sticky top-0 z-50 flex items-center justify-between rounded-none rounded-br-lg rounded-bl-lg bg-blue-500 px-4 py-2 text-sm text-white animate-in fade-in">
                   <span className="flex items-center gap-2">
                     <Info size={18} className="text-info" />
                     <FormattedMessage
@@ -521,7 +539,11 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
 
               <div className="px-2">
                 {/** Tabs & filters */}
-                <Filterbar className="mb-4" {...queryFilter} />
+                <Filterbar
+                  className="mb-4"
+                  {...queryFilter}
+                  views={addCountsToViews(queryFilter.views, importData?.stats)}
+                />
 
                 {/** Select all message */}
                 {size(selection.rows) === importRows.length && hasPagination && (
@@ -570,7 +592,9 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                   <DataTable<TransactionsImportQuery['transactionsImport']['rows']['nodes'][number], unknown>
                     loading={loading || !importData.lastSyncAt}
                     getRowClassName={row =>
-                      row.original.isDismissed ? '[&>td:nth-child(n+2):nth-last-child(n+3)]:opacity-30' : ''
+                      row.original.status === TransactionsImportRowStatus.IGNORED
+                        ? '[&>td:nth-child(n+2):nth-last-child(n+3)]:opacity-30'
+                        : ''
                     }
                     enableMultiRowSelection
                     rowSelection={selection.rows}
@@ -687,7 +711,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                             >
                               <MessageCircle size={16} className={hasNote ? 'text-neutral-600' : 'text-neutral-300'} />
                               {hasNote && (
-                                <div className="absolute right-[6px] top-[6px] flex h-[8px] w-[8px] items-center justify-center rounded-full bg-yellow-400 text-xs text-white"></div>
+                                <div className="absolute top-[6px] right-[6px] flex h-[8px] w-[8px] items-center justify-center rounded-full bg-yellow-400 text-xs text-white"></div>
                               )}
                             </Button>
                           );
@@ -697,64 +721,97 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                         id: 'actions',
                         ...actionsColumn,
                         header: ({ table }) => {
-                          const selectedRows = table.getSelectedRowModel().rows;
-                          const unprocessedRows = selectedRows.filter(
-                            ({ original }) => !original.expense && !original.order,
-                          );
-                          const [ignoredRows, nonIgnoredRows] = partition(
-                            unprocessedRows,
-                            row => row.original.isDismissed,
-                          );
+                          const selectedRows = table.getSelectedRowModel().rows.map(row => row.original);
+                          const includeAllPages = selection.includeAllPages;
+                          const rowsActions = getPossibleActionsForSelectedRows(selectedRows);
                           return (
                             <div className="flex min-w-36 justify-end">
-                              {ignoredRows.length && !nonIgnoredRows.length ? (
-                                //  If all non-processed rows are dismissed, show restore button
-                                <Button
-                                  variant="outline"
-                                  size="xs"
-                                  className="whitespace-nowrap text-xs"
-                                  onClick={async () => {
-                                    const ignoredIds = ignoredRows.map(row => row.original.id);
-                                    await setRowsDismissed(ignoredIds, false, {
-                                      includeAllRows: selection.includeAllPages,
-                                    });
-                                    table.setRowSelection({});
-                                  }}
-                                >
-                                  <SquareSlashIcon size={12} />
-                                  {selection.includeAllPages ? (
-                                    <FormattedMessage defaultMessage="Restore all rows" id="8uECrb" />
-                                  ) : (
-                                    <FormattedMessage
-                                      defaultMessage="Restore {selectedCount}"
-                                      id="restore"
-                                      values={{ selectedCount: ignoredRows.length }}
-                                    />
+                              {includeAllPages ||
+                              rowsActions.canIgnore.length ||
+                              rowsActions.canRestore.length ||
+                              rowsActions.canPutOnHold.length ? (
+                                <div className="flex gap-1">
+                                  {(includeAllPages || rowsActions.canRestore.length > 0) && (
+                                    <Button
+                                      variant="outline"
+                                      size="xs"
+                                      className="text-xs whitespace-nowrap"
+                                      onClick={async () => {
+                                        await setRowsStatus(
+                                          rowsActions.canRestore,
+                                          TransactionsImportRowStatus.PENDING,
+                                          { includeAllPages },
+                                        );
+                                        table.setRowSelection({});
+                                      }}
+                                    >
+                                      <SquareSlashIcon size={12} />
+                                      {includeAllPages ? (
+                                        <FormattedMessage defaultMessage="Restore all rows" id="8uECrb" />
+                                      ) : (
+                                        <FormattedMessage
+                                          defaultMessage="Restore {selectedCount}"
+                                          id="restore"
+                                          values={{ selectedCount: rowsActions.canRestore.length }}
+                                        />
+                                      )}
+                                    </Button>
                                   )}
-                                </Button>
-                              ) : nonIgnoredRows.length || selection.includeAllPages ? (
-                                // Otherwise, show ignore button
-                                <Button
-                                  variant="outline"
-                                  size="xs"
-                                  className="whitespace-nowrap text-xs"
-                                  onClick={() => {
-                                    const ignoredIds = nonIgnoredRows.map(row => row.original.id);
-                                    setRowsDismissed(ignoredIds, true, { includeAllRows: selection.includeAllPages });
-                                    table.setRowSelection({});
-                                  }}
-                                >
-                                  <SquareSlashIcon size={12} />
-                                  {selection.includeAllPages ? (
-                                    <FormattedMessage defaultMessage="No action (all)" id="UFhJFs" />
-                                  ) : (
-                                    <FormattedMessage
-                                      defaultMessage="No action ({selectedCount})"
-                                      id="B2eNk+"
-                                      values={{ selectedCount: nonIgnoredRows.length }}
-                                    />
+
+                                  {(includeAllPages || rowsActions.canIgnore.length > 0) && (
+                                    <Button
+                                      variant="outline"
+                                      size="xs"
+                                      className="text-xs whitespace-nowrap"
+                                      onClick={async () => {
+                                        await setRowsStatus(
+                                          rowsActions.canIgnore,
+                                          TransactionsImportRowStatus.IGNORED,
+                                          { includeAllPages },
+                                        );
+                                        table.setRowSelection({});
+                                      }}
+                                    >
+                                      <SquareSlashIcon size={12} />
+                                      {includeAllPages ? (
+                                        <FormattedMessage defaultMessage="No action (all)" id="UFhJFs" />
+                                      ) : (
+                                        <FormattedMessage
+                                          defaultMessage="No action ({selectedCount})"
+                                          id="B2eNk+"
+                                          values={{ selectedCount: rowsActions.canIgnore.length }}
+                                        />
+                                      )}
+                                    </Button>
                                   )}
-                                </Button>
+
+                                  {(includeAllPages || rowsActions.canPutOnHold.length > 0) && (
+                                    <Button
+                                      variant="outline"
+                                      size="xs"
+                                      className="text-xs whitespace-nowrap"
+                                      onClick={async () => {
+                                        await setRowsStatus(
+                                          rowsActions.canPutOnHold,
+                                          TransactionsImportRowStatus.ON_HOLD,
+                                          { includeAllPages },
+                                        );
+                                        table.setRowSelection({});
+                                      }}
+                                    >
+                                      <PauseCircle size={12} />
+                                      {includeAllPages ? (
+                                        <FormattedMessage defaultMessage="Put all on hold" id="putAllOnHold" />
+                                      ) : (
+                                        <FormattedMessage
+                                          defaultMessage="Put on hold ({selectedCount})"
+                                          id="putOnHoldCount"
+                                          values={{ selectedCount: rowsActions.canPutOnHold.length }}
+                                        />
+                                      )}
+                                    </Button>
+                                  )}
+                                </div>
                               ) : (
                                 <div>
                                   <FormattedMessage

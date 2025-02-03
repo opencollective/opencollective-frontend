@@ -22,11 +22,11 @@ const SearchTrigger = ({ setShowSearchModal }) => {
   const useSearchCommandMenu = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_COMMAND);
   return (
     <button
-      className="relative flex h-8 w-8 shrink items-center justify-center gap-1.5 rounded-full border text-slate-500 ring-black ring-offset-2 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 lg:w-auto lg:justify-start lg:px-2 lg:pr-4"
+      className="relative flex h-8 w-8 shrink items-center justify-center gap-1.5 rounded-full border text-slate-500 ring-black ring-offset-2 hover:bg-slate-50 focus:outline-hidden focus-visible:ring-2 lg:w-auto lg:justify-start lg:px-2 lg:pr-4"
       onClick={() => setShowSearchModal(true)}
     >
       <Search size={16} />
-      <span className={clsx('hidden whitespace-nowrap text-sm lg:block', useSearchCommandMenu && 'pr-12')}>
+      <span className={clsx('hidden text-sm whitespace-nowrap lg:block', useSearchCommandMenu && 'pr-12')}>
         {useSearchCommandMenu ? (
           <FormattedMessage
             defaultMessage="Type {slash} to search..."

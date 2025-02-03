@@ -407,7 +407,7 @@ function HostApplication({
               <Accordion type="single" collapsible className="mt-4 text-sm sm:col-span-3">
                 <AccordionItem value="description" className="rounded border px-4">
                   <AccordionTrigger>
-                    <div className="font-medium leading-6 text-slate-900">
+                    <div className="leading-6 font-medium text-slate-900">
                       <FormattedMessage id="Fields.description" defaultMessage="Description" />
                     </div>
                   </AccordionTrigger>
@@ -463,7 +463,7 @@ function HostApplication({
               <Accordion type="single" collapsible className="mt-4 text-sm sm:col-span-3">
                 <AccordionItem value="message" className="rounded border px-4">
                   <AccordionTrigger>
-                    <div className="font-medium leading-6 text-slate-900">
+                    <div className="leading-6 font-medium text-slate-900">
                       <FormattedMessage defaultMessage="Application Request" id="bFSM5Q" />
                     </div>
                   </AccordionTrigger>

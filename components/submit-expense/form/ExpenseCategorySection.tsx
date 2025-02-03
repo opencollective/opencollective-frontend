@@ -1,10 +1,11 @@
 import React from 'react';
+import { pick } from 'lodash';
 import { ChevronDown } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 
-import AccountingCategorySelect from '../../../components/AccountingCategorySelect';
+import { MemoizedAccountingCategorySelect } from '../../../components/AccountingCategorySelect';
 import { FormField } from '@/components/FormField';
 
 import HTMLContent from '../../HTMLContent';
@@ -13,50 +14,64 @@ import { Step } from '../SubmitExpenseFlowSteps';
 import type { ExpenseForm } from '../useExpenseForm';
 
 import { FormSectionContainer } from './FormSectionContainer';
+import { memoWithGetFormProps } from './helper';
 
 type ExpenseCategorySectionProps = {
-  form: ExpenseForm;
   inViewChange: (inView: boolean, entry: IntersectionObserverEntry) => void;
-};
+} & ReturnType<typeof getFormProps>;
 
-export function ExpenseCategorySection(props: ExpenseCategorySectionProps) {
-  const accountingCategoryId = props.form.values.accountingCategoryId;
+function getFormProps(form: ExpenseForm) {
+  return {
+    ...pick(form, 'setFieldValue'),
+    ...pick(form.values, ['accountingCategoryId', 'expenseTypeOption']),
+    ...pick(form.options, ['accountingCategories', 'host', 'account', 'isAccountingCategoryRequired']),
+  };
+}
+
+// eslint-disable-next-line prefer-arrow-callback
+export const ExpenseCategorySection = memoWithGetFormProps(function ExpenseCategorySection(
+  props: ExpenseCategorySectionProps,
+) {
+  const accountingCategoryId = props.accountingCategoryId;
   const { LoggedInUser } = useLoggedInUser();
 
-  const accountingCategories = React.useMemo(
-    () => props.form.options.accountingCategories || [],
-    [props.form.options.accountingCategories],
-  );
+  const accountingCategories = React.useMemo(() => props.accountingCategories || [], [props.accountingCategories]);
 
   const selectedAccountingCategory = accountingCategoryId
     ? accountingCategories.find(a => a.id === accountingCategoryId)
     : null;
   const instructions = selectedAccountingCategory?.instructions;
-  const { setFieldValue } = props.form;
+  const { setFieldValue } = props;
 
-  const host = props.form.options.host;
+  const host = props.host;
   const isHostAdmin = Boolean(LoggedInUser?.isAdminOfCollective(host));
+
+  const onAccountingCategorySelectChange = React.useCallback(
+    value => {
+      setFieldValue('accountingCategoryId', value?.id);
+    },
+    [setFieldValue],
+  );
 
   return (
     <FormSectionContainer
       title={<FormattedMessage defaultMessage="Select expense category" id="oNW1LD" />}
-      form={props.form}
       step={Step.EXPENSE_CATEGORY}
       inViewChange={props.inViewChange}
     >
       <FormField name="accountingCategoryId">
         {({ field }) => (
-          <AccountingCategorySelect
+          <MemoizedAccountingCategorySelect
             {...field}
             id="accountingCategoryId"
             kind="EXPENSE"
-            onChange={value => setFieldValue('accountingCategoryId', value?.id)}
+            onChange={onAccountingCategorySelectChange}
             host={host}
             showCode={isHostAdmin}
-            expenseType={props.form.values.expenseTypeOption}
-            account={props.form.options.account}
+            expenseType={props.expenseTypeOption}
+            account={props.account}
             selectedCategory={selectedAccountingCategory}
-            allowNone={!props.form.options.isAccountingCategoryRequired}
+            allowNone={!props.isAccountingCategoryRequired}
             buttonClassName="max-w-full w-full"
           />
         )}
@@ -67,7 +82,7 @@ export function ExpenseCategorySection(props: ExpenseCategorySectionProps) {
           <div className="group mt-4 rounded-md border border-[#DCDDE0] p-4">
             <CollapsibleTrigger asChild>
               <button className="flex w-full items-center text-start text-sm font-bold">
-                <div className="flex-grow">
+                <div className="grow">
                   {' '}
                   <FormattedMessage defaultMessage="Expense category instructions" id="QVX2sp" />
                 </div>
@@ -86,4 +101,4 @@ export function ExpenseCategorySection(props: ExpenseCategorySectionProps) {
       )}
     </FormSectionContainer>
   );
-}
+}, getFormProps);

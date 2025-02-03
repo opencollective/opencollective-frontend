@@ -200,7 +200,7 @@ export default function FilesViewerModal({
       }}
     >
       <DialogPrimitive.Content
-        className="fixed left-0 top-0 z-[3000] flex h-screen w-screen items-center justify-center xl:w-[calc(100vw-var(--drawer-width,0px))]"
+        className="fixed top-0 left-0 z-3000 flex h-screen w-screen items-center justify-center xl:w-[calc(100vw-var(--drawer-width,0px))]"
         onInteractOutside={e => {
           if (allowOutsideInteraction) {
             e.preventDefault();
@@ -212,13 +212,13 @@ export default function FilesViewerModal({
           // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
           <div
             className={clsx(
-              'absolute inset-0 z-[1500] backdrop-blur-sm',
+              'absolute inset-0 z-1500 backdrop-blur-xs',
               open ? 'animate-in fade-in-0' : 'animate-out fade-out-0',
             )}
             onClick={onClose}
           />
         ) : (
-          <DialogOverlay onClick={onClose} className="absolute z-[1500] backdrop-blur-sm" />
+          <DialogOverlay onClick={onClose} className="absolute z-1500 backdrop-blur-xs" />
         )}
 
         <Header>
@@ -300,7 +300,7 @@ export default function FilesViewerModal({
 
         {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
         <div
-          className="z-[3000] flex max-h-screen w-full justify-center overflow-y-auto px-4 py-16"
+          className="z-3000 flex max-h-screen w-full justify-center overflow-y-auto px-4 py-16"
           onClick={e => {
             if (e.target === e.currentTarget) {
               onClose();

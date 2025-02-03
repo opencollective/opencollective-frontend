@@ -83,9 +83,9 @@ const GiftCard = ({
           </p>
         </div>
       )}
-      <div className="absolute bottom-[8px] right-[8px] md:bottom-[12px] md:right-[12px]">
+      <div className="absolute right-[8px] bottom-[8px] md:right-[12px] md:bottom-[12px]">
         <div className="AmountCurrency flex items-start">
-          <span className="text-[2.5rem] font-bold leading-[2.5rem] text-[#313233]">
+          <span className="text-[2.5rem] leading-[2.5rem] font-bold text-[#313233]">
             <Currency value={amount} currency={currency} precision="auto" />
           </span>
           <div className="ml-1">

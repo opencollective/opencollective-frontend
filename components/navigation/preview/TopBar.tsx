@@ -27,7 +27,7 @@ const MainNavItem = props => {
     <Link
       {...props}
       className={clsx(
-        'flex h-8 shrink items-center gap-2 truncate whitespace-nowrap rounded-full px-1 text-sm font-medium text-foreground transition-colors hover:bg-slate-100 md:px-3',
+        'flex h-8 shrink items-center gap-2 truncate rounded-full px-1 text-sm font-medium whitespace-nowrap text-foreground transition-colors hover:bg-slate-100 md:px-3',
         props.isActive && 'bg-slate-100',
         props.className,
       )}
@@ -60,7 +60,7 @@ const DashboardProfileQuickLink = ({ slug, toProfile }) => {
     <Link
       href={toProfile ? getCollectivePageRoute({ slug }) : getDashboardRoute({ slug })}
       className={cn(
-        'group shrink-0 items-center justify-center rounded-full border border-border text-sm font-medium leading-6 antialiased transition-colors hover:border-border sm:border-transparent',
+        'group shrink-0 items-center justify-center rounded-full border border-border text-sm leading-6 font-medium antialiased transition-colors hover:border-border sm:border-transparent',
         'text-muted-foreground hover:bg-slate-50 hover:text-foreground',
         'flex h-8 w-8 px-0 sm:w-auto sm:px-3',
       )}
@@ -133,7 +133,7 @@ const TopBar = ({ account, navTitle = '' }: TopBarProps) => {
                     <FormattedMessage id="Dashboard" defaultMessage="Dashboard" />
                   </span>
                 </MainNavItem>
-                <DividerIcon size={32} className="-ml-4 -mr-3 shrink-0 text-slate-300" />
+                <DividerIcon size={32} className="-mr-3 -ml-4 shrink-0 text-slate-300" />
                 <AccountSwitcher activeSlug={activeSlug} defaultSlug={defaultSlug} setDefaultSlug={setDefaultSlug} />
 
                 <DashboardProfileQuickLink slug={activeSlug} toProfile />
@@ -144,7 +144,7 @@ const TopBar = ({ account, navTitle = '' }: TopBarProps) => {
                   <React.Fragment>
                     <DividerIcon size={32} className="-mx-2 text-slate-300" />
 
-                    <MainNavItem href={getCollectivePageRoute(parentCollective)} className="!font-normal">
+                    <MainNavItem href={getCollectivePageRoute(parentCollective)} className="font-normal!">
                       {parentCollective.name}
                     </MainNavItem>
                   </React.Fragment>

@@ -16,6 +16,8 @@ type SubmitExpenseFlowStepsProps = {
 };
 
 export enum Step {
+  INVITE_WELCOME = 'INVITE_WELCOME',
+  INVITE_NOTE = 'INVITE_NOTE',
   WHO_IS_PAYING = 'WHO_IS_PAYING',
   WHO_IS_GETTING_PAID = 'WHO_IS_GETTING_PAID',
   PAYOUT_METHOD = 'PAYOUT_METHOD',
@@ -43,9 +45,19 @@ const StepValues: Record<Step, Path<ExpenseFormValues>[]> = {
   [Step.EXPENSE_ITEMS]: ['expenseItems'],
   [Step.EXPENSE_TITLE]: ['title', 'acknowledgedCollectiveTitleExpensePolicy', 'acknowledgedHostTitleExpensePolicy'],
   [Step.SUMMARY]: [],
+  [Step.INVITE_WELCOME]: [],
+  [Step.INVITE_NOTE]: [],
 };
 
 export const StepTitles: Record<Step, MessageDescriptor> = {
+  [Step.INVITE_WELCOME]: defineMessage({
+    defaultMessage: 'Invitation',
+    id: 'GM/hd6',
+  }),
+  [Step.INVITE_NOTE]: defineMessage({
+    defaultMessage: 'Invitation Note',
+    id: 'aqqLMi',
+  }),
   [Step.WHO_IS_PAYING]: defineMessage({
     defaultMessage: 'Who is paying',
     id: 'NpMPF+',
@@ -96,6 +108,10 @@ export const StepSubtitles: Partial<Record<Step, MessageDescriptor>> = {
 };
 
 function isExpenseFormStepCompleted(form: ExpenseForm, step: Step): boolean {
+  if (form.initialLoading) {
+    return false;
+  }
+
   const valueKeys = StepValues[step];
   if (isEmpty(valueKeys)) {
     return true;
@@ -108,6 +124,10 @@ function expenseFormStepHasError(form: ExpenseForm, step: Step): boolean {
 }
 
 function isExpenseFormStepTouched(form: ExpenseForm, step: Step): boolean {
+  if (form.initialLoading) {
+    return false;
+  }
+
   const valueKeys = StepValues[step];
   if (isEmpty(valueKeys)) {
     return true;
@@ -192,7 +212,7 @@ function StepHeader(props: StepProps & { stepNumber: number }) {
   return (
     <li
       className={cn(
-        'relative flex items-center gap-2 pb-8 pl-7 font-bold before:absolute before:left-0 before:inline-block before:h-6 before:w-6 before:-translate-x-3 before:rounded-full before:border-2 before:border-[#94A3B8] before:bg-white before:text-center after:absolute after:left-0 after:top-2 after:-z-10 after:h-full after:-translate-x-[1px] after:border-l-2 after:border-solid last:after:hidden',
+        'relative flex items-center gap-2 pb-8 pl-7 font-bold before:absolute before:left-0 before:inline-block before:h-6 before:w-6 before:-translate-x-3 before:rounded-full before:border-2 before:border-[#94A3B8] before:bg-white before:text-center after:absolute after:top-2 after:left-0 after:-z-10 after:h-full after:-translate-x-[1px] after:border-l-2 after:border-solid last:after:hidden',
         {
           'before:border-blue-900': props.isActive,
           "before:border-blue-900 before:bg-blue-900 before:text-white before:content-['✓']": props.isComplete,
@@ -218,7 +238,7 @@ function StepItem(props: StepProps) {
   return (
     <li
       className={cn(
-        'relative flex items-center gap-2 pb-8 pl-7 before:absolute before:left-0 before:inline-block before:h-2 before:w-2 before:-translate-x-1 before:rounded-full before:border-[#CBD5E1] before:bg-[#CBD5E1] before:text-center after:absolute after:left-0 after:top-2 after:-z-10 after:h-full after:-translate-x-[1px] after:border-l-2 after:border-solid after:border-[#E1E7EF]',
+        'relative flex items-center gap-2 pb-8 pl-7 before:absolute before:left-0 before:inline-block before:h-2 before:w-2 before:-translate-x-1 before:rounded-full before:border-[#CBD5E1] before:bg-[#CBD5E1] before:text-center after:absolute after:top-2 after:left-0 after:-z-10 after:h-full after:-translate-x-[1px] after:border-l-2 after:border-solid after:border-[#E1E7EF]',
         {
           'font-bold text-blue-900 before:border-blue-900 before:bg-blue-900 before:[box-shadow:0_0_0_4px_hsla(216,_100%,_58%,_0.3)]':
             props.isActive,
