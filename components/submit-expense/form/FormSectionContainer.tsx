@@ -3,12 +3,10 @@ import { useInView } from 'react-intersection-observer';
 import { FormattedMessage } from 'react-intl';
 
 import { type Step, StepSubtitles, StepTitles } from '../SubmitExpenseFlowSteps';
-import type { ExpenseForm } from '../useExpenseForm';
 
 type FormSectionContainerProps = {
   children: React.ReactNode;
   step: Step;
-  form: ExpenseForm;
   title?: React.ReactNode;
   subtitle?: React.ReactNode;
   hideTitle?: boolean;

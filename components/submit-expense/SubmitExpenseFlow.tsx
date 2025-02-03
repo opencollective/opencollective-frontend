@@ -327,8 +327,8 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
             <header className="z-30 flex min-w-screen items-center justify-between border-b border-slate-100 bg-background px-4 py-3 sm:px-10">
               <span className="text-xl leading-7 font-bold text-slate-800">
                 <FormattedMessage
-                  defaultMessage="Invoice #{submittedExpenseId} has been submitted successfully!"
-                  id="cMGymL"
+                  defaultMessage="Expense #{submittedExpenseId} has been submitted successfully!"
+                  id="e1biOC"
                   values={{ submittedExpenseId }}
                 />
               </span>

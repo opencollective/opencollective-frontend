@@ -524,3 +524,4 @@ const AccountingCategorySelect = ({
 };
 
 export default AccountingCategorySelect;
+export const MemoizedAccountingCategorySelect = React.memo(AccountingCategorySelect);

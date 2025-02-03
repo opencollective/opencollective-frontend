@@ -284,6 +284,8 @@ const checkOCREnabled = (router, host) => {
   return urlFlag !== false && isInternalHost(host);
 };
 
+const STYLED_CURRENCY_PICKER_STYLE = { menu: { width: '280px' } };
+
 const ExpenseFormBody = ({
   formik,
   payoutProfiles,
@@ -490,6 +492,9 @@ const ExpenseFormBody = ({
       formPersister.saveValues(values);
     }
   }, [formPersister, dirty, values]);
+
+  const { setFieldValue } = formik;
+  const onCurrencyPickerChange = React.useCallback(value => setFieldValue('currency', value), [setFieldValue]);
 
   let payeeForm;
   if (loading) {
@@ -778,14 +783,14 @@ const ExpenseFormBody = ({
                               data-cy="expense-currency-picker"
                               availableCurrencies={availableCurrencies}
                               value={field.value}
-                              onChange={value => formik.setFieldValue('currency', value)}
+                              onChange={onCurrencyPickerChange}
                               width="100%"
                               maxWidth="160px"
                               disabled={
                                 (availableCurrencies.length < 2 && availableCurrencies[0] === values.currency) ||
                                 (values.currency && expense?.lockedFields?.includes(ExpenseLockableFields.AMOUNT))
                               }
-                              styles={{ menu: { width: '280px' } }}
+                              styles={STYLED_CURRENCY_PICKER_STYLE}
                             />
                           )}
                         </StyledInputFormikField>
