@@ -1,6 +1,8 @@
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { ExpenseLockableFields } from '@/lib/graphql/types/v2/schema';
+
 import { FormField } from '@/components/FormField';
 
 import { expenseTagsQuery } from '../../dashboard/filters/ExpenseTagsFilter';
@@ -28,7 +30,9 @@ export function AdditionalDetailsSection(props: AdditionalDetailsSectionProps) {
   return (
     <FormSectionContainer form={props.form} step={Step.EXPENSE_TITLE} inViewChange={props.inViewChange}>
       <FormField
-        disabled={props.form.initialLoading}
+        disabled={
+          props.form.initialLoading || props.form.options.lockedFields?.includes?.(ExpenseLockableFields.DESCRIPTION)
+        }
         name="title"
         placeholder={intl.formatMessage({ defaultMessage: 'Mention a brief expense title', id: 'Te2Yc2' })}
       />

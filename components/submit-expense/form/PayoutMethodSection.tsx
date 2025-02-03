@@ -8,9 +8,10 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { API_V2_CONTEXT, gqlV1 } from '../../../lib/graphql/helpers';
-import type {
-  SavePayoutMethodMutation,
-  SavePayoutMethodMutationVariables,
+import {
+  ExpenseStatus,
+  type SavePayoutMethodMutation,
+  type SavePayoutMethodMutationVariables,
 } from '../../../lib/graphql/types/v2/graphql';
 import { PayoutMethodType } from '../../../lib/graphql/types/v2/schema';
 
@@ -51,7 +52,7 @@ export function PayoutMethodSection(props: PayoutMethodSectionProps) {
   );
 }
 
-export function PayoutMethodFormContent(props) {
+export function PayoutMethodFormContent(props: { form: ExpenseForm }) {
   const [lastUsedPayoutMethod, setLastUsedPayoutMethod] =
     React.useState<ExpenseForm['options']['payoutMethods'][number]>(null);
 
@@ -124,7 +125,8 @@ export function PayoutMethodFormContent(props) {
       !isLoading &&
       !isPickingProfileAdministered &&
       !isVendor &&
-      !props.form.options.isAdminOfPayee ? (
+      !props.form.options.isAdminOfPayee &&
+      !(props.form.options.expense?.status === ExpenseStatus.DRAFT && !props.form.options.loggedInAccount) ? (
         <MessageBox type="info">
           <FormattedMessage
             defaultMessage="The person you are inviting to submit this expense will be asked to provide payout method details."
@@ -141,7 +143,7 @@ export function PayoutMethodFormContent(props) {
           }}
         >
           {!(isLoading || props.form.initialLoading) &&
-            payoutMethods.map(p => (
+            payoutMethods?.map(p => (
               <PayoutMethodRadioGroupItem
                 key={p.id}
                 payoutMethod={p}
@@ -334,9 +336,11 @@ function NewPayoutMethodOption(props: NewPayoutMethodOptionProps) {
         </React.Fragment>
       )}
 
-      <Button loading={creatingPayoutMethod} onClick={onSaveButtonClick} className="mt-2">
-        <FormattedMessage defaultMessage="Save" id="save" />
-      </Button>
+      {props.form.options.loggedInAccount && (
+        <Button loading={creatingPayoutMethod} onClick={onSaveButtonClick} className="mt-2">
+          <FormattedMessage defaultMessage="Save" id="save" />
+        </Button>
+      )}
     </div>
   );
 }

@@ -8,6 +8,7 @@ import { ExpenseType } from '../../../lib/graphql/types/v2/schema';
 import { RecurringExpenseIntervals } from '../../../lib/i18n/expense';
 import { i18nTaxType } from '../../../lib/i18n/taxes';
 import { getExpenseExchangeRateWarningOrError, getTaxAmount, isTaxRateValid } from '../../expenses/lib/utils';
+import { ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
 
 import { AccountHoverCard } from '../../AccountHoverCard';
 import AmountWithExchangeRateInfo from '../../AmountWithExchangeRateInfo';
@@ -383,7 +384,9 @@ export function SummarySection(props: SummarySectionProps) {
           <div className="font-bold">
             <FormattedMessage defaultMessage="Payout Method" id="SecurityScope.PayoutMethod" />
           </div>
-          {!props.form.options.isAdminOfPayee && props.form.options.payee?.type !== CollectiveType.VENDOR ? (
+          {!props.form.options.isAdminOfPayee &&
+          !(props.form.options.expense?.status === ExpenseStatus.DRAFT && !props.form.options.loggedInAccount) &&
+          props.form.options.payee?.type !== CollectiveType.VENDOR ? (
             <React.Fragment>
               <div className="mt-2 text-sm text-muted-foreground">
                 <FormattedMessage
@@ -393,7 +396,7 @@ export function SummarySection(props: SummarySectionProps) {
               </div>
             </React.Fragment>
           ) : (
-            props.form.options.payee &&
+            (props.form.options.payee || !props.form.options.loggedInAccount) &&
             props.form.options.payoutMethod?.type && (
               <div className="mt-2 space-y-2">
                 <PayoutMethodLabel showIcon payoutMethod={props.form.options.payoutMethod} />
@@ -417,12 +420,6 @@ function RecurrenceOptionBox(props: { form: ExpenseForm }) {
 
   const recurrenceFrequency = isEditingRecurrence ? recurrenceFrequencyEdit : props.form.values.recurrenceFrequency;
   const recurrenceEndAt = isEditingRecurrence ? recurrenceEndAtEdit : props.form.values.recurrenceEndAt;
-  const { setFieldValue } = props.form;
-  React.useEffect(() => {
-    if (props.form.values.expenseItems.length === 1 && !props.form.touched.title) {
-      setFieldValue('title', props.form.values.expenseItems[0].description);
-    }
-  }, [props.form.values.expenseItems, props.form.touched.title, setFieldValue]);
 
   return (
     <div className="mt-4">

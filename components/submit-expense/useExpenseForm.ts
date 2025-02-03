@@ -26,7 +26,13 @@ import type {
   LocationInput,
 } from '../../lib/graphql/types/v2/graphql';
 import type { Amount } from '../../lib/graphql/types/v2/schema';
-import { Currency, ExpenseStatus, ExpenseType, PayoutMethodType } from '../../lib/graphql/types/v2/schema';
+import {
+  Currency,
+  ExpenseLockableFields,
+  ExpenseStatus,
+  ExpenseType,
+  PayoutMethodType,
+} from '../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import type LoggedInUser from '../../lib/LoggedInUser';
 import { isValidEmail } from '../../lib/utils';
@@ -236,6 +242,7 @@ const formSchemaQuery = gql`
       id
       legacyId
       description
+      createdAt
       longDescription
       amountV2 {
         valueInCents
@@ -255,6 +262,9 @@ const formSchemaQuery = gql`
       type
       status
       account {
+        ...ExpenseFormAccountFields
+      }
+      createdByAccount {
         ...ExpenseFormAccountFields
       }
       payee {
@@ -303,8 +313,10 @@ const formSchemaQuery = gql`
         canEdit
         canEditAccountingCategory
         canEditTags
+        canDeclineExpenseInvite(draftKey: $expenseKey)
       }
       draft
+      lockedFields
       submitter: createdByAccount {
         ...ExpenseFormSubmitterFields
       }
@@ -415,6 +427,7 @@ const formSchemaQuery = gql`
       }
     }
 
+    ...AccountHoverCardFields
     ...ExpenseFormSchemaFeatureFields
     ...ExpenseFormSchemaPolicyFields
 
@@ -538,6 +551,8 @@ type ExpenseFormOptions = {
   totalInvoicedInExpenseCurrency?: number;
   invitee?: ExpenseFormValues['inviteeNewIndividual'] | ExpenseFormValues['inviteeNewOrganization'];
   expenseCurrency?: Currency;
+  canChangeAccount?: boolean;
+  lockedFields?: ExpenseLockableFields[];
 };
 
 const memoizedExpenseFormSchema = memoizeOne(
@@ -594,7 +609,9 @@ function buildFormSchema(
             return true;
           }
 
-          return slug && !slug.startsWith('__');
+          return options.expense?.status === ExpenseStatus.DRAFT && !options.loggedInAccount
+            ? true
+            : slug && !slug.startsWith('__');
         },
         {
           message: 'Required',
@@ -922,6 +939,10 @@ function buildFormSchema(
         .nullish()
         .refine(
           type => {
+            if (options.expense?.status === ExpenseStatus.DRAFT && !options.loggedInAccount) {
+              return !!type;
+            }
+
             if (options.isAdminOfPayee && (!values.payoutMethodId || values.payoutMethodId === '__newPayoutMethod')) {
               return !!type;
             }
@@ -1204,10 +1225,22 @@ async function buildFormOptions(
     const recentlySubmittedExpenses = query.data?.recentlySubmittedExpenses;
     const account = values.accountSlug ? query.data?.account : options.expense?.account;
     const host = account && 'host' in account ? account.host : null;
-    const payee = query.data?.payee || options.expense?.payee;
+    const payee =
+      query.data?.payee ||
+      (options.expense?.status === ExpenseStatus.DRAFT &&
+      options.expense.payee &&
+      options.expense.draft?.payee?.slug === options.expense.payee.slug
+        ? options.expense.payee
+        : null);
 
     const payeeHost = payee && 'host' in payee ? payee.host : null;
     const submitter = options.expense?.submitter || query.data?.submitter;
+
+    if (account && options.expense?.status === ExpenseStatus.DRAFT) {
+      options.canChangeAccount = false;
+    } else {
+      options.canChangeAccount = true;
+    }
 
     if (recentlySubmittedExpenses) {
       options.recentlySubmittedExpenses = recentlySubmittedExpenses;
@@ -1225,15 +1258,21 @@ async function buildFormOptions(
       options.payee = payee;
     }
 
+    if (query.data?.loggedInAccount) {
+      options.loggedInAccount = query.data.loggedInAccount;
+    }
+
     if (values.payeeSlug === '__invite') {
       options.invitee =
         values.inviteeAccountType === InviteeAccountType.INDIVIDUAL
           ? values.inviteeNewIndividual
           : values.inviteeNewOrganization;
-    }
-
-    if (query.data?.loggedInAccount) {
-      options.loggedInAccount = query.data.loggedInAccount;
+    } else if (
+      options.expense?.status === ExpenseStatus.DRAFT &&
+      options.expense.draft.payee &&
+      !options.loggedInAccount
+    ) {
+      options.invitee = options.expense.draft.payee;
     }
 
     if (host) {
@@ -1291,9 +1330,23 @@ async function buildFormOptions(
       // Allow setting this flag to true with the `isInlineEdit` flag in start options to enable full editing experience (i.e. editing payotu method)
       options.isAdminOfPayee =
         startOptions.isInlineEdit || options.payoutProfiles.some(p => p.slug === values.payeeSlug);
+    } else {
+      options.payoutMethod = values.newPayoutMethod;
     }
 
-    if (options.payoutMethod) {
+    if (!startOptions.duplicateExpense && options.expense?.lockedFields?.length) {
+      options.lockedFields = options.expense.lockedFields;
+    } else {
+      options.lockedFields = [];
+    }
+
+    if (
+      options.expense &&
+      !startOptions.duplicateExpense &&
+      options.lockedFields?.includes?.(ExpenseLockableFields.AMOUNT)
+    ) {
+      options.expenseCurrency = options.expense.currency;
+    } else if (options.payoutMethod) {
       options.expenseCurrency = options.payoutMethod.data?.currency || options.account?.currency;
     } else {
       options.expenseCurrency = options.account?.currency;
@@ -1301,7 +1354,7 @@ async function buildFormOptions(
 
     options.allowExpenseItemAttachment = values.expenseTypeOption === ExpenseType.RECEIPT;
 
-    options.allowInvite = !startOptions.isInlineEdit;
+    options.allowInvite = !startOptions.isInlineEdit && options.expense?.status !== ExpenseStatus.DRAFT;
 
     if (values.expenseTypeOption === ExpenseType.INVOICE) {
       if (accountHasVAT(account as any, host as any)) {
@@ -1451,15 +1504,25 @@ export function useExpenseForm(opts: {
         if (formOptions.expense.draft?.payee?.slug) {
           setFieldValue('payeeSlug', formOptions.expense.draft?.payee?.slug);
         } else if (formOptions.expense?.draft?.payee?.organization) {
-          setFieldValue('inviteeNewOrganization', formOptions.expense?.draft?.payee);
+          setFieldValue('inviteeAccountType', InviteeAccountType.ORGANIZATION);
         } else {
-          setFieldValue('inviteeNewIndividual', formOptions.expense?.draft?.payee);
+          setFieldValue('inviteeAccountType', InviteeAccountType.INDIVIDUAL);
         }
+        setFieldValue('inviteeNewOrganization', formOptions.expense?.draft?.payee);
+        setFieldValue('inviteeNewIndividual', formOptions.expense?.draft?.payee);
 
         setFieldValue('inviteNote', formOptions.expense.longDescription);
       }
     } else if (formOptions.expense.payee?.slug) {
       setFieldValue('payeeSlug', formOptions.expense.payee?.slug);
+    } else if (formOptions.expense.draft?.payee) {
+      if (formOptions.expense?.draft?.payee?.organization) {
+        setFieldValue('inviteeAccountType', InviteeAccountType.ORGANIZATION);
+      } else {
+        setFieldValue('inviteeAccountType', InviteeAccountType.INDIVIDUAL);
+      }
+      setFieldValue('inviteeNewOrganization', formOptions.expense?.draft?.payee);
+      setFieldValue('inviteeNewIndividual', formOptions.expense?.draft?.payee);
     }
 
     if (formOptions.expense.status === ExpenseStatus.DRAFT) {
@@ -1530,6 +1593,16 @@ export function useExpenseForm(opts: {
       setFieldValue('tax', null);
     }
   }, [formOptions.taxType, setFieldValue]);
+
+  React.useEffect(() => {
+    if (
+      expenseForm.values.expenseItems.length === 1 &&
+      !expenseForm.touched.title &&
+      !formOptions.lockedFields?.includes?.(ExpenseLockableFields.DESCRIPTION)
+    ) {
+      setFieldValue('title', expenseForm.values.expenseItems[0].description);
+    }
+  }, [expenseForm.values.expenseItems, expenseForm.touched.title, setFieldValue, formOptions.lockedFields]);
 
   React.useEffect(() => {
     if (!expenseForm.values.hasTax) {
