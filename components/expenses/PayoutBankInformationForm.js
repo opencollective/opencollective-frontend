@@ -228,7 +228,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
   }
   if (error) {
     return (
-      <MessageBox fontSize="12px" type="error">
+      <MessageBox mt={2} fontSize="12px" type="error">
         <FormattedMessage
           id="PayoutBankInformationForm.Error.RequiredFields"
           defaultMessage="There was an error fetching the required fields"
@@ -243,7 +243,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
   if (!data?.host?.transferwise?.requiredFields) {
     if (process.env.OC_ENV === 'development') {
       return (
-        <MessageBox fontSize="12px" type="warning">
+        <MessageBox mt={2} fontSize="12px" type="warning">
           Could not fetch requiredFields, Wise is likely not configured on the platform.
         </MessageBox>
       );
@@ -279,7 +279,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
     });
 
   return (
-    <div className="flex flex-col">
+    <div className="mt-2 flex flex-col">
       <FormField
         name={getFieldName('data.type')}
         label={transactionMethodLabel}
@@ -492,7 +492,7 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
                 formik.setFieldValue(getFieldName('data'), {});
                 formik.setFieldValue(field.name, value);
               }}
-              availableCurrencies={currencies.map(c => c.value)}
+              availableCurrencies={currencies.map(c => c.value).filter(Boolean)}
             />
           );
         }}
