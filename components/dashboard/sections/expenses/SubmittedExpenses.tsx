@@ -72,7 +72,7 @@ const SubmittedExpenses = ({ accountSlug }: DashboardSectionProps) => {
 
   return (
     <React.Fragment>
-      <div className="flex max-w-screen-lg flex-col gap-4">
+      <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
         <DashboardHeader
           title={<FormattedMessage defaultMessage="Submitted Expenses" id="NpGb+x" />}
           description={

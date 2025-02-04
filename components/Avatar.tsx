@@ -48,7 +48,7 @@ const StyledAvatar = styled(Flex).attrs<StyledAvatarProps>(props => ({
   overflow: hidden;
   width: 64px;
   height: 64px;
-  flex-shrink: 0;
+  shrink: 0;
   ${color}
   ${space}
   ${layout}

@@ -110,8 +110,8 @@ const SearchCollectiveCard = ({ collective, ...props }) => {
           )}
           {collective.description && (
             <div className="text-xs">
-              <div className="mb-1 mt-2 flex items-center justify-between gap-2">
-                <span className="font-medium uppercase text-slate-700">
+              <div className="mt-2 mb-1 flex items-center justify-between gap-2">
+                <span className="font-medium text-slate-700 uppercase">
                   <FormattedMessage defaultMessage="About Us" id="ZjDH42" />
                 </span>
                 <hr className="flex-1" />

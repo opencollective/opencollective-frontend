@@ -345,4 +345,7 @@ export type StyledSelectCustomComponent = Select & React.ExoticComponent<StyledS
 
 const StyledSelect: StyledSelectCustomComponent = makeStyledSelect(Select);
 
+/**
+ * @deprecated Use `ui/Select` instead
+ */
 export default injectIntl(StyledSelect) as undefined as StyledSelectCustomComponent;

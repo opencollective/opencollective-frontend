@@ -10,12 +10,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 export const CSVColumnSelector = ({ label, selected, columns, onChange, SettingsDropdownMenuContent = null }) => {
   return (
     <div className="flex items-stretch">
-      <div className="relative flex items-center rounded-bl-md rounded-tl-md border border-r-0 border-neutral-200 bg-neutral-100 px-3 text-sm font-medium text-neutral-700">
+      <div className="relative flex items-center rounded-tl-md rounded-bl-md border border-r-0 border-neutral-200 bg-neutral-100 px-3 text-sm font-medium text-neutral-700">
         {label}
       </div>
       <Select onValueChange={onChange} value={selected}>
-        <SelectTrigger className={cn('rounded-none', { 'rounded-br-md rounded-tr-md': !SettingsDropdownMenuContent })}>
-          <div className="truncate italic text-neutral-800">
+        <SelectTrigger className={cn('rounded-none', { 'rounded-tr-md rounded-br-md': !SettingsDropdownMenuContent })}>
+          <div className="truncate text-neutral-800 italic">
             <SelectValue />
           </div>
         </SelectTrigger>
@@ -32,7 +32,7 @@ export const CSVColumnSelector = ({ label, selected, columns, onChange, Settings
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
-              className="rounded-bl-none rounded-tl-none border-l-0 px-2"
+              className="rounded-tl-none rounded-bl-none border-l-0 px-2"
               aria-label="Configure"
             >
               <Settings size={16} color="#777" />

@@ -154,14 +154,14 @@ export function PayoutMethodDetailsContainer(props: {
           <React.Fragment>
             <div
               className={clsx(
-                'absolute bottom-0 z-10 h-8 w-full bg-gradient-to-t from-muted to-transparent transition-opacity',
+                'absolute bottom-0 z-10 h-8 w-full bg-linear-to-t from-muted to-transparent transition-opacity',
                 isOpen ? 'opacity-0' : 'opacity-100',
               )}
             />
             <CollapsibleTrigger
               className={clsx(
-                'group absolute z-20 focus:outline-none',
-                isOpen ? 'bottom-0 right-0' : 'inset-0 flex w-full items-end justify-end',
+                'group absolute z-20 focus:outline-hidden',
+                isOpen ? 'right-0 bottom-0' : 'inset-0 flex w-full items-end justify-end',
               )}
               onClick={toggleContainer}
             >
@@ -170,7 +170,7 @@ export function PayoutMethodDetailsContainer(props: {
                 size="xs"
                 asChild
                 className={clsx(
-                  'm-2 border border-transparent text-muted-foreground ring-ring hover:text-foreground group-focus-visible:border-border group-focus-visible:bg-white group-focus-visible:ring-2',
+                  'm-2 border border-transparent text-muted-foreground ring-ring group-focus-visible:border-border group-focus-visible:bg-white group-focus-visible:ring-2 hover:text-foreground',
                   {
                     'group-hover:border-border group-hover:bg-white': !isOpen,
                     'hover:border-border hover:bg-white': isOpen,

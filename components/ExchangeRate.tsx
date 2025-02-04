@@ -40,7 +40,7 @@ export const ExchangeRate = ({
   return (
     <Tooltip>
       <TooltipTrigger data-cy={dataCy}>
-        <div className={cn('flex items-center whitespace-nowrap text-xs text-neutral-700', className)}>
+        <div className={cn('flex items-center text-xs whitespace-nowrap text-neutral-700', className)}>
           <InfoIcon
             size={14}
             className={cn({

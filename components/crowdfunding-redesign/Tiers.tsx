@@ -58,7 +58,7 @@ export const Tiers = ({ account }) => {
 
         return (
           <div key={tier.id} className="space-y-2 rounded-lg border p-4">
-            <div className="text-balance text-lg font-semibold">{tier.name}</div>
+            <div className="text-lg font-semibold text-balance">{tier.name}</div>
             <div className="text-sm">{tier.description}</div>
             {!isDisabled && graphqlAmountValueInCents(minAmount) > 0 && (
               <div className="mt-3 text-muted-foreground">

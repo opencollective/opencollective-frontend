@@ -26,6 +26,7 @@ import InputField from '../InputField';
 import Link from '../Link';
 import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
+import { Button } from '../ui/Button';
 
 // Actions
 import Archive from './actions/Archive';
@@ -445,10 +446,10 @@ class EditCollectiveForm extends React.Component {
               flexWrap="wrap"
             >
               <Link href={`/dashboard/${collective.slug}/gift-cards`} data-cy="back-to-giftcards-list">
-                <StyledButton>
+                <Button variant="outline">
                   <ArrowBack size="1em" />{' '}
                   <FormattedMessage id="giftCards.returnToEdit" defaultMessage="Back to Gift Cards list" />
-                </StyledButton>
+                </Button>
               </Link>
 
               <StyledLink

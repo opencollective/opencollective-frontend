@@ -37,11 +37,11 @@ const ChangelogTrigger = ({ setShowNewsAndUpdates, setChangelogViewDate }) => {
   return (
     <Tooltip>
       <TooltipTrigger
-        className="relative flex h-8 w-8 items-center justify-center rounded-full border text-slate-500 ring-black ring-offset-2 hover:bg-slate-50 focus:outline-none focus-visible:ring-2"
+        className="relative flex h-8 w-8 items-center justify-center rounded-full border text-slate-500 ring-black ring-offset-2 hover:bg-slate-50 focus:outline-hidden focus-visible:ring-2"
         onClick={handleShowNewUpdates}
       >
         <Megaphone size={18} />
-        {!hasSeenNewUpdates && <div className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-primary" />}
+        {!hasSeenNewUpdates && <div className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-primary" />}
       </TooltipTrigger>
       <TooltipContent>
         <FormattedMessage

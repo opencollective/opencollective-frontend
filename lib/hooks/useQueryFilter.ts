@@ -12,7 +12,7 @@ import type {
   resetFilters,
   SetFilter,
   SetFilters,
-  Views,
+  View,
 } from '../filters/filter-types';
 import {
   destructureFilterValues,
@@ -31,7 +31,7 @@ export type useQueryFilterReturnType<S extends z.ZodObject<z.ZodRawShape, any, a
   hasFilters: boolean;
   activeViewId?: string;
   filters: FilterComponentConfigs<z.infer<S>>;
-  views?: Views<z.infer<S>>;
+  views?: readonly View<z.infer<S>>[];
   meta?: any;
   defaultSchemaValues: Partial<z.infer<S>>;
 };
@@ -42,7 +42,7 @@ type useQueryFilterOptions<S extends z.ZodObject<z.ZodRawShape, any, any>, GQLQu
   toVariables?: Partial<FiltersToVariables<z.infer<S>, GQLQueryVars, FilterMeta>>;
   defaultFilterValues?: Partial<z.infer<S>>; // Default valuFes for filters, views[0].filter will be used if not set
   meta?: FilterMeta;
-  views?: Views<z.infer<S>>;
+  views?: readonly View<z.infer<S>>[];
   skipRouter?: boolean; // Used when not updating the URL query is desired, this will instead use internal state.
 };
 

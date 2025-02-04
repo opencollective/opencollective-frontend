@@ -20,6 +20,10 @@ const MESSAGES = defineMessages({
     defaultMessage: 'Pending',
     id: 'transaction.pending',
   },
+  [TransactionsImportRowStatus.ON_HOLD]: {
+    defaultMessage: 'On hold',
+    id: 'transaction.onHold',
+  },
 });
 
 export const i18nTransactionsRowStatus = (

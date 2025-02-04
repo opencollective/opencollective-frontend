@@ -56,7 +56,7 @@ import ExpenseFormItems from './ExpenseFormItems';
 import ExpenseFormPayeeInviteNewStep, { validateExpenseFormPayeeInviteNewStep } from './ExpenseFormPayeeInviteNewStep';
 import ExpenseFormPayeeSignUpStep from './ExpenseFormPayeeSignUpStep';
 import ExpenseFormPayeeStep, { checkStepOneCompleted } from './ExpenseFormPayeeStep';
-import ExpenseInviteWelcome from './ExpenseInviteWelcome';
+import ExpenseInviteWelcome, { ExpenseInviteRecipientNote } from './ExpenseInviteWelcome';
 import { prepareExpenseItemForSubmit, validateExpenseItem } from './ExpenseItemForm';
 import ExpenseRecurringBanner from './ExpenseRecurringBanner';
 import ExpenseSummaryAdditionalInformation from './ExpenseSummaryAdditionalInformation';
@@ -284,6 +284,8 @@ const checkOCREnabled = (router, host) => {
   return urlFlag !== false && isInternalHost(host);
 };
 
+const STYLED_CURRENCY_PICKER_STYLE = { menu: { width: '280px' } };
+
 const ExpenseFormBody = ({
   formik,
   payoutProfiles,
@@ -491,6 +493,9 @@ const ExpenseFormBody = ({
     }
   }, [formPersister, dirty, values]);
 
+  const { setFieldValue } = formik;
+  const onCurrencyPickerChange = React.useCallback(value => setFieldValue('currency', value), [setFieldValue]);
+
   let payeeForm;
   if (loading) {
     payeeForm = <LoadingPlaceholder height={32} />;
@@ -635,7 +640,19 @@ const ExpenseFormBody = ({
     <Form ref={formRef}>
       {(expense?.permissions?.canDeclineExpenseInvite ||
         (expense?.status === ExpenseStatus.DRAFT && expense?.draft?.recipientNote)) && (
-        <ExpenseInviteWelcome expense={expense} draftKey={router.query.key} />
+        <React.Fragment>
+          <ExpenseInviteWelcome
+            className="mb-8 rounded-md border border-[#DCDDE0] px-6 py-3"
+            expense={expense}
+            draftKey={router.query.key}
+          />
+          {expense?.draft?.recipientNote && (
+            <div className="mb-3 text-lg font-bold">
+              <FormattedMessage defaultMessage="Invitation note" id="WcjKTY" />
+            </div>
+          )}
+          <ExpenseInviteRecipientNote className="mb-4 rounded-md border border-[#DCDDE0] px-6 py-3" expense={expense} />
+        </React.Fragment>
       )}
       {!isCreditCardCharge && (
         <ExpenseTypeRadioSelect
@@ -766,14 +783,14 @@ const ExpenseFormBody = ({
                               data-cy="expense-currency-picker"
                               availableCurrencies={availableCurrencies}
                               value={field.value}
-                              onChange={value => formik.setFieldValue('currency', value)}
+                              onChange={onCurrencyPickerChange}
                               width="100%"
                               maxWidth="160px"
                               disabled={
                                 (availableCurrencies.length < 2 && availableCurrencies[0] === values.currency) ||
                                 (values.currency && expense?.lockedFields?.includes(ExpenseLockableFields.AMOUNT))
                               }
-                              styles={{ menu: { width: '280px' } }}
+                              styles={STYLED_CURRENCY_PICKER_STYLE}
                             />
                           )}
                         </StyledInputFormikField>
@@ -828,7 +845,7 @@ const ExpenseFormBody = ({
                     </div>
                     {formik.values.accountingCategory?.instructions && (
                       <React.Fragment>
-                        <div className="mb-2 mt-4 text-sm font-semibold text-slate-800">
+                        <div className="mt-4 mb-2 text-sm font-semibold text-slate-800">
                           <FormattedMessage
                             id="withColon"
                             defaultMessage="{item}:"

@@ -75,7 +75,7 @@ const tableColumns: ColumnDef<GraphQLVirtualCard>[] = [
       const vc = row.original;
       const meta = table.options.meta as VirtualCardsTableMeta;
       return (
-        <div className="italic text-slate-500">
+        <div className="text-slate-500 italic">
           {getAvailableLimitShortString(
             meta.intl,
             vc.currency,
@@ -83,7 +83,7 @@ const tableColumns: ColumnDef<GraphQLVirtualCard>[] = [
             vc.spendingLimitAmount,
             vc.spendingLimitInterval,
             {
-              AvailableAmount: v => <span className="font-medium not-italic text-slate-950">{v}</span>,
+              AvailableAmount: v => <span className="font-medium text-slate-950 not-italic">{v}</span>,
               AmountSeparator: v => <span>&nbsp;{v}&nbsp;</span>,
               LimitAmount: v => <span>{v}</span>,
               LimitInterval: v => <span>{v}</span>,

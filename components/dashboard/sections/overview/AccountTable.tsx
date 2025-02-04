@@ -127,7 +127,7 @@ const columns: ColumnDef<AccountMetricsRow>[] = [
                   <Link
                     href={getCollectivePageRoute(account)}
                     className={clsx(
-                      'truncate hover:underline group-hover/row:text-foreground',
+                      'truncate group-hover/row:text-foreground hover:underline',
                       isSelected ? 'text-foreground' : 'text-muted-foreground',
                     )}
                   >

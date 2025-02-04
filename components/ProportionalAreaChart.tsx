@@ -32,8 +32,8 @@ const Label = styled.div`
 
 const Area = styled.div<{ percentage: string } & ColorProps>`
   padding: 12px 8px;
-  flex-shrink: 0;
-  flex-grow: 1;
+  shrink: 0;
+  grow: 1;
   flex-basis: ${props => props.percentage};
   ${color}
 `;

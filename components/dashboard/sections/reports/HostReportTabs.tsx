@@ -7,7 +7,7 @@ const Tab = ({ title, description, isActive, onClick }) => {
     <button
       onClick={onClick}
       className={clsx(
-        'flex flex-col items-start justify-stretch gap-2 border-b-2 px-6 py-4 text-left ring-ring transition-colors focus:outline-none focus-visible:ring-2 sm:gap-1 sm:px-10 sm:pb-8 sm:pt-10',
+        'flex flex-col items-start justify-stretch gap-2 border-b-2 px-6 py-4 text-left ring-ring transition-colors focus:outline-hidden focus-visible:ring-2 sm:gap-1 sm:px-10 sm:pt-10 sm:pb-8',
         isActive
           ? 'border-b-primary bg-white'
           : 'border-b-transparent text-slate-700 hover:bg-slate-50 hover:text-inherit',

@@ -51,6 +51,8 @@ export const DropdownArrow = styled('div')`
  * When using `click` as a `trigger` you must pass a function as `children` and
  * make sure you pass down the `triggerProps` and `dropdownProps`.
  * The ref must be on the wrapping div in order to work in Firefox (Mac) and Safari.
+ *
+ * @deprecated Use `ui/DropdownMenu` instead
  */
 export const Dropdown = styled(({ children, trigger, ...props }) => {
   const dropdownRef = useRef();

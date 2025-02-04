@@ -139,6 +139,8 @@ export const ModalFooter = ({
 /**
  * Modal component. Will pass down additional props to `ModalWrapper`, which is
  * a styled `Container`.
+ *
+ * @deprecated Use `ui/Dialog` instead
  */
 const StyledModal = ({
   children,

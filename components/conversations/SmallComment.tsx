@@ -33,18 +33,18 @@ export default function SmallComment(props: CommentProps) {
       data-cy="comment"
       id={anchorHash}
     >
-      <div className="timeline-separator absolute bottom-0 left-11 right-0 border-b" />
+      <div className="timeline-separator absolute right-0 bottom-0 left-11 border-b" />
       <div className="flex justify-between">
         <div className="flex gap-4">
           <div className="relative">
-            <div className={clsx('timeline-indicator absolute bottom-[-16px] left-[20px] top-[-16px] border-l')} />
+            <div className={clsx('timeline-indicator absolute top-[-16px] bottom-[-16px] left-[20px] border-l')} />
             <AccountHoverCard
               account={comment.fromAccount}
               trigger={
                 <div className="relative">
                   <Avatar collective={comment.fromAccount} radius={40} />
                   {isPrivateNote && (
-                    <div className="absolute bottom-[-4px] right-[-4px] flex h-[20px] w-[20px] items-center justify-center rounded-full bg-white shadow">
+                    <div className="absolute right-[-4px] bottom-[-4px] flex h-[20px] w-[20px] items-center justify-center rounded-full bg-white shadow-sm">
                       <NotepadText className="text-amber-500" size={13} />
                     </div>
                   )}

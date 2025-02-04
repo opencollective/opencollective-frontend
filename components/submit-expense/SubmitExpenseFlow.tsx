@@ -3,7 +3,7 @@ import type { FetchResult } from '@apollo/client';
 import { gql, useMutation } from '@apollo/client';
 import dayjs from 'dayjs';
 import { FormikProvider } from 'formik';
-import { omit, pick } from 'lodash';
+import { pick } from 'lodash';
 import { X } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -42,6 +42,7 @@ type SubmitExpenseFlowProps = {
   draftKey?: string;
   duplicateExpense?: boolean;
   submitExpenseTo?: string;
+  endFlowButtonLabel?: React.ReactNode;
 };
 
 const I18nMessages = defineMessages({
@@ -128,6 +129,10 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
     }
   }, [confirmNavigation, onClose, submittedExpenseId]);
 
+  const onExpenseInviteDeclined = React.useCallback(() => {
+    onClose(true);
+  }, [onClose]);
+
   const onSubmit: React.ComponentProps<typeof ExpenseFormikContainer>['onSubmit'] = React.useCallback(
     async (values, h, formOptions, startOptions) => {
       let result: FetchResult<CreateExpenseFromDashboardMutation> | FetchResult<EditExpenseFromDashboardMutation>;
@@ -210,7 +215,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
             id: formOptions.expense.id,
             payee:
               formOptions.expense?.status === ExpenseStatus.DRAFT && !formOptions.payee?.slug
-                ? null
+                ? formOptions.expense?.draft?.payee
                 : {
                     slug: formOptions.payee?.slug,
                   },
@@ -269,7 +274,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
           const inviteInput: InviteExpenseFromDashboardMutationVariables['expenseInviteInput'] = {
             ...expenseInput,
             payee: {
-              ...omit(payee, 'notes'),
+              ...payee,
               isInvite: true,
             },
             recipientNote: values.inviteNote,
@@ -315,22 +320,22 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
       >
         <DialogContent
           overlayClassName="p-0 sm:p-0"
-          className="sm:max-w-screen sm:min-w-screen overflow-hidden rounded-none p-0 sm:rounded-none sm:p-0"
+          className="overflow-hidden rounded-none p-0 sm:max-w-screen sm:min-w-screen sm:rounded-none sm:p-0"
           hideCloseButton
         >
-          <div className="max-w-screen min-w-screen before:-z-1 relative flex max-h-screen min-h-screen flex-col overflow-hidden bg-[#F8FAFC] before:absolute before:left-0 before:right-0 before:top-0 before:h-44 before:rotate-180 before:[background:url('/static/images/home/fiscalhost-blue-bg-md.png')]">
-            <header className="min-w-screen z-30 flex items-center justify-between border-b border-slate-100 bg-background px-4 py-3 sm:px-10">
-              <span className="text-xl font-bold leading-7 text-slate-800">
+          <div className="relative flex max-h-screen min-h-screen max-w-screen min-w-screen flex-col overflow-hidden bg-[#F8FAFC] before:absolute before:top-0 before:right-0 before:left-0 before:-z-1 before:h-44 before:rotate-180 before:[background:url('/static/images/home/fiscalhost-blue-bg-md.png')]">
+            <header className="z-30 flex min-w-screen items-center justify-between border-b border-slate-100 bg-background px-4 py-3 sm:px-10">
+              <span className="text-xl leading-7 font-bold text-slate-800">
                 <FormattedMessage
-                  defaultMessage="Invoice #{submittedExpenseId} has been submitted successfully!"
-                  id="cMGymL"
+                  defaultMessage="Expense #{submittedExpenseId} has been submitted successfully!"
+                  id="e1biOC"
                   values={{ submittedExpenseId }}
                 />
               </span>
               <Button
                 onClick={handleOnClose}
                 variant="ghost"
-                className="hidden cursor-pointer items-center gap-2 px-4 py-3 text-base font-medium leading-5 text-slate-800 sm:visible sm:flex"
+                className="hidden cursor-pointer items-center gap-2 px-4 py-3 text-base leading-5 font-medium text-slate-800 sm:visible sm:flex"
                 asChild
               >
                 <span>
@@ -343,19 +348,21 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
                 <X />
               </Button>
             </header>
-            <main className="z-10 flex w-full flex-grow overflow-hidden">
-              <div className="flex w-full flex-grow justify-center overflow-y-scroll">
-                <div className="flex w-full max-w-screen-xl flex-col pt-4 sm:flex sm:flex-row sm:gap-11 sm:px-8 sm:pt-8 lg:pt-24">
+            <main className="z-10 flex w-full grow overflow-hidden">
+              <div className="flex w-full grow justify-center overflow-y-scroll">
+                <div className="flex w-full max-w-(--breakpoint-xl) flex-col pt-4 sm:flex sm:flex-row sm:gap-11 sm:px-8 sm:pt-8 lg:pt-24">
                   <SubmittedExpense expenseId={submittedExpenseId} />
                 </div>
               </div>
             </main>
             <DialogFooter className="z-30 flex justify-center border-t p-4 sm:justify-center sm:px-0">
               <Button onClick={handleOnClose}>
-                <FormattedMessage
-                  defaultMessage="View all expenses"
-                  id="CollectivePage.SectionBudget.ViewAllExpenses"
-                />
+                {props.endFlowButtonLabel || (
+                  <FormattedMessage
+                    defaultMessage="View all expenses"
+                    id="CollectivePage.SectionBudget.ViewAllExpenses"
+                  />
+                )}
               </Button>
             </DialogFooter>
           </div>
@@ -376,7 +383,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
       <DialogContent
         hideCloseButton
         overlayClassName="p-0 sm:p-0"
-        className={'sm:max-w-screen sm:min-w-screen overflow-hidden rounded-none p-0 sm:rounded-none sm:p-0'}
+        className={'overflow-hidden rounded-none p-0 sm:max-w-screen sm:min-w-screen sm:rounded-none sm:p-0'}
         onEscapeKeyDown={e => {
           e.preventDefault();
           if (open) {
@@ -384,15 +391,15 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
           }
         }}
       >
-        <div className="max-w-screen min-w-screen flex max-h-screen min-h-screen flex-col overflow-hidden bg-[#F8FAFC]">
-          <header className="min-w-screen flex items-center justify-between border-b border-slate-100 px-4 py-3 sm:px-10">
-            <span className="text-xl font-bold leading-7 text-slate-800">
+        <div className="flex max-h-screen min-h-screen max-w-screen min-w-screen flex-col overflow-hidden bg-[#F8FAFC]">
+          <header className="flex min-w-screen items-center justify-between border-b border-slate-100 px-4 py-3 sm:px-10">
+            <span className="text-xl leading-7 font-bold text-slate-800">
               <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
             </span>
             <Button
               onClick={handleOnClose}
               variant="ghost"
-              className="hidden cursor-pointer items-center gap-2 px-4 py-3 text-base font-medium leading-5 text-slate-800 sm:visible sm:flex"
+              className="hidden cursor-pointer items-center gap-2 px-4 py-3 text-base leading-5 font-medium text-slate-800 sm:visible sm:flex"
               asChild
             >
               <span>
@@ -405,8 +412,8 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
               <X />
             </Button>
           </header>
-          <main className="flex w-full flex-grow overflow-hidden">
-            <div className="flex w-full flex-grow justify-center">
+          <main className="flex w-full grow overflow-hidden">
+            <div className="flex w-full grow justify-center">
               <div className="relative flex w-full flex-col overflow-y-scroll sm:flex sm:flex-row sm:gap-11 sm:px-8 sm:pt-10">
                 <ExpenseFormikContainer
                   submitExpenseTo={props.submitExpenseTo}
@@ -414,6 +421,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
                   duplicateExpense={props.duplicateExpense}
                   expenseId={props.expenseId}
                   onSubmit={onSubmit}
+                  onExpenseInviteDeclined={onExpenseInviteDeclined}
                 />
               </div>
             </div>
@@ -430,6 +438,7 @@ function ExpenseFormikContainer(props: {
   duplicateExpense?: boolean;
   expenseId?: number;
   onSubmit: Parameters<typeof useExpenseForm>['0']['onSubmit'];
+  onExpenseInviteDeclined: () => void;
 }) {
   const formRef = React.useRef<HTMLFormElement>();
 
@@ -485,6 +494,7 @@ function ExpenseFormikContainer(props: {
           <SubmitExpenseFlowForm
             onNextClick={() => setActiveStep(Step.SUMMARY)}
             onVisibleSectionChange={onVisibleSectionChange}
+            onExpenseInviteDeclined={props.onExpenseInviteDeclined}
           />
         </form>
       </div>

@@ -325,7 +325,7 @@ const FreezeAccountModal = ({
             )}
 
             <div className="mt-6 border-t border-dotted pt-4">
-              <div className="mb-4 mt-2 flex items-center gap-2 rounded-md border border-yellow-200 bg-yellow-50 px-5 py-4">
+              <div className="mt-2 mb-4 flex items-center gap-2 rounded-md border border-yellow-200 bg-yellow-50 px-5 py-4">
                 <Checkbox
                   id="confirm-freeze"
                   required

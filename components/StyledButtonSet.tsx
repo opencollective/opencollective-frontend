@@ -17,7 +17,7 @@ type ButtonItemProps = {
 const ButtonItem = styled(StyledButton)<ButtonItemProps>`
   border-radius: 0;
   line-height: 1.5;
-  flex-grow: 1;
+  grow: 1;
   border-color: ${themeGet('colors.black.300')};
   transition:
     color 0.2s,
@@ -175,4 +175,7 @@ const StyledButtonSet = ({
   </Container>
 );
 
+/**
+ * @deprecated Use `ui/ButtonSet` instead
+ */
 export default StyledButtonSet;

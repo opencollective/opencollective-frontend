@@ -26,7 +26,13 @@ import type {
   LocationInput,
 } from '../../lib/graphql/types/v2/graphql';
 import type { Amount } from '../../lib/graphql/types/v2/schema';
-import { Currency, ExpenseStatus, ExpenseType, PayoutMethodType } from '../../lib/graphql/types/v2/schema';
+import {
+  Currency,
+  ExpenseLockableFields,
+  ExpenseStatus,
+  ExpenseType,
+  PayoutMethodType,
+} from '../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import type LoggedInUser from '../../lib/LoggedInUser';
 import { isValidEmail } from '../../lib/utils';
@@ -236,6 +242,7 @@ const formSchemaQuery = gql`
       id
       legacyId
       description
+      createdAt
       longDescription
       amountV2 {
         valueInCents
@@ -255,6 +262,9 @@ const formSchemaQuery = gql`
       type
       status
       account {
+        ...ExpenseFormAccountFields
+      }
+      createdByAccount {
         ...ExpenseFormAccountFields
       }
       payee {
@@ -303,8 +313,10 @@ const formSchemaQuery = gql`
         canEdit
         canEditAccountingCategory
         canEditTags
+        canDeclineExpenseInvite(draftKey: $expenseKey)
       }
       draft
+      lockedFields
       submitter: createdByAccount {
         ...ExpenseFormSubmitterFields
       }
@@ -415,6 +427,7 @@ const formSchemaQuery = gql`
       }
     }
 
+    ...AccountHoverCardFields
     ...ExpenseFormSchemaFeatureFields
     ...ExpenseFormSchemaPolicyFields
 
@@ -538,6 +551,8 @@ type ExpenseFormOptions = {
   totalInvoicedInExpenseCurrency?: number;
   invitee?: ExpenseFormValues['inviteeNewIndividual'] | ExpenseFormValues['inviteeNewOrganization'];
   expenseCurrency?: Currency;
+  canChangeAccount?: boolean;
+  lockedFields?: ExpenseLockableFields[];
 };
 
 const memoizedExpenseFormSchema = memoizeOne(
@@ -594,7 +609,9 @@ function buildFormSchema(
             return true;
           }
 
-          return slug && !slug.startsWith('__');
+          return options.expense?.status === ExpenseStatus.DRAFT && !options.loggedInAccount
+            ? true
+            : slug && !slug.startsWith('__');
         },
         {
           message: 'Required',
@@ -618,12 +635,11 @@ function buildFormSchema(
       .nullish()
       .refine(
         v => {
-          if (
-            options.isAdminOfPayee &&
-            v &&
-            v !== '__newPayoutMethod' &&
-            !options.payee?.payoutMethods?.some(pm => pm.id === v)
-          ) {
+          if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
+            return true;
+          }
+
+          if (v && v !== '__newPayoutMethod' && !options.payee?.payoutMethods?.some(pm => pm.id === v)) {
             return false;
           }
 
@@ -672,10 +688,13 @@ function buildFormSchema(
       ])
       .refine(
         attachment => {
+          if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
+            return true;
+          }
+
           if (
-            (options.payee?.type === CollectiveType.VENDOR || options.isAdminOfPayee) &&
-            values.expenseTypeOption === ExpenseType.INVOICE &&
-            values.hasInvoiceOption === YesNoOption.YES
+            !values.payeeSlug ||
+            (values.expenseTypeOption === ExpenseType.INVOICE && values.hasInvoiceOption === YesNoOption.YES)
           ) {
             return typeof attachment === 'string' ? !!attachment : !!attachment?.url;
           }
@@ -690,10 +709,13 @@ function buildFormSchema(
       .nullish()
       .refine(
         invoiceNumber => {
+          if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
+            return true;
+          }
+
           if (
-            (options.payee?.type === CollectiveType.VENDOR || options.isAdminOfPayee) &&
-            values.expenseTypeOption === ExpenseType.INVOICE &&
-            values.hasInvoiceOption === YesNoOption.YES
+            !values.payeeSlug ||
+            (values.expenseTypeOption === ExpenseType.INVOICE && values.hasInvoiceOption === YesNoOption.YES)
           ) {
             return !!invoiceNumber;
           }
@@ -922,7 +944,15 @@ function buildFormSchema(
         .nullish()
         .refine(
           type => {
-            if (options.isAdminOfPayee && (!values.payoutMethodId || values.payoutMethodId === '__newPayoutMethod')) {
+            if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
+              return true;
+            }
+
+            if (options.expense?.status === ExpenseStatus.DRAFT && !options.loggedInAccount) {
+              return !!type;
+            }
+
+            if (!values.payoutMethodId || values.payoutMethodId === '__newPayoutMethod') {
               return !!type;
             }
 
@@ -937,6 +967,10 @@ function buildFormSchema(
         .nullish()
         .refine(
           name => {
+            if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
+              return true;
+            }
+
             if (values.payoutMethodId === '__newPayoutMethod') {
               return !!name;
             }
@@ -954,6 +988,10 @@ function buildFormSchema(
             .nullish()
             .refine(
               currency => {
+                if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
+                  return true;
+                }
+
                 if (values.payoutMethodId === '__newPayoutMethod') {
                   return !!currency;
                 }
@@ -1157,10 +1195,10 @@ function getPayeeSlug(values: ExpenseFormValues): string {
     case '__findAccountIAdminister':
     case '__invite':
     case '__inviteSomeone':
+    case '__vendor':
       return null;
     case '__inviteExistingUser':
       return values.inviteeExistingAccount;
-    case '__vendor':
     default:
       return values.payeeSlug;
   }
@@ -1204,10 +1242,22 @@ async function buildFormOptions(
     const recentlySubmittedExpenses = query.data?.recentlySubmittedExpenses;
     const account = values.accountSlug ? query.data?.account : options.expense?.account;
     const host = account && 'host' in account ? account.host : null;
-    const payee = query.data?.payee || options.expense?.payee;
+    const payee =
+      query.data?.payee ||
+      (options.expense?.status === ExpenseStatus.DRAFT &&
+      options.expense.payee &&
+      options.expense.draft?.payee?.slug === options.expense.payee.slug
+        ? options.expense.payee
+        : null);
 
     const payeeHost = payee && 'host' in payee ? payee.host : null;
     const submitter = options.expense?.submitter || query.data?.submitter;
+
+    if (account && options.expense?.status === ExpenseStatus.DRAFT) {
+      options.canChangeAccount = false;
+    } else {
+      options.canChangeAccount = true;
+    }
 
     if (recentlySubmittedExpenses) {
       options.recentlySubmittedExpenses = recentlySubmittedExpenses;
@@ -1225,15 +1275,21 @@ async function buildFormOptions(
       options.payee = payee;
     }
 
+    if (query.data?.loggedInAccount) {
+      options.loggedInAccount = query.data.loggedInAccount;
+    }
+
     if (values.payeeSlug === '__invite') {
       options.invitee =
         values.inviteeAccountType === InviteeAccountType.INDIVIDUAL
           ? values.inviteeNewIndividual
           : values.inviteeNewOrganization;
-    }
-
-    if (query.data?.loggedInAccount) {
-      options.loggedInAccount = query.data.loggedInAccount;
+    } else if (
+      options.expense?.status === ExpenseStatus.DRAFT &&
+      options.expense.draft.payee &&
+      !options.loggedInAccount
+    ) {
+      options.invitee = options.expense.draft.payee;
     }
 
     if (host) {
@@ -1291,9 +1347,21 @@ async function buildFormOptions(
       // Allow setting this flag to true with the `isInlineEdit` flag in start options to enable full editing experience (i.e. editing payotu method)
       options.isAdminOfPayee =
         startOptions.isInlineEdit || options.payoutProfiles.some(p => p.slug === values.payeeSlug);
+    } else {
+      options.payoutMethod = values.newPayoutMethod;
     }
 
-    if (options.payoutMethod) {
+    if (!startOptions.duplicateExpense && options.expense?.lockedFields?.length) {
+      options.lockedFields = options.expense.lockedFields;
+    }
+
+    if (
+      options.expense &&
+      !startOptions.duplicateExpense &&
+      options.lockedFields?.includes?.(ExpenseLockableFields.AMOUNT)
+    ) {
+      options.expenseCurrency = options.expense.currency;
+    } else if (options.payoutMethod) {
       options.expenseCurrency = options.payoutMethod.data?.currency || options.account?.currency;
     } else {
       options.expenseCurrency = options.account?.currency;
@@ -1301,7 +1369,7 @@ async function buildFormOptions(
 
     options.allowExpenseItemAttachment = values.expenseTypeOption === ExpenseType.RECEIPT;
 
-    options.allowInvite = !startOptions.isInlineEdit;
+    options.allowInvite = !startOptions.isInlineEdit && options.expense?.status !== ExpenseStatus.DRAFT;
 
     if (values.expenseTypeOption === ExpenseType.INVOICE) {
       if (accountHasVAT(account as any, host as any)) {
@@ -1380,12 +1448,23 @@ export function useExpenseForm(opts: {
   const [formOptions, setFormOptions] = React.useState<ExpenseFormOptions>({ schema: z.object({}) });
   const startOptions = React.useRef(opts.startOptions);
   const setInitialExpenseValues = React.useRef(false);
+  const setInitialFormOptions = React.useRef(false);
   const initialLoading = React.useRef(true);
+  const expenseFormValues = React.useRef<ExpenseFormValues>(opts.initialValues);
 
-  const expenseForm: ExpenseFormik = useFormik<ExpenseFormValues>({
-    initialValues: opts.initialValues,
-    initialStatus: { schema: formOptions.schema },
-    async validate(values) {
+  const initialValues = React.useRef(opts.initialValues);
+  const initialStatus = React.useRef({ schema: formOptions.schema });
+
+  const onSubmit = opts.onSubmit;
+  const onSubmitCallback = React.useCallback(
+    (values: ExpenseFormValues, formikHelpers: FormikHelpers<ExpenseFormValues>) => {
+      return onSubmit(values, formikHelpers, formOptions, startOptions.current);
+    },
+    [onSubmit, formOptions],
+  );
+
+  const validate = React.useCallback(
+    (values: ExpenseFormValues) => {
       const result = formOptions.schema.safeParse(values, { errorMap: getCustomZodErrorMap(intl) });
       const newPayoutMethodErrors =
         values.payoutMethodId === '__newPayoutMethod' &&
@@ -1409,9 +1488,14 @@ export function useExpenseForm(opts: {
         return errs;
       }
     },
-    onSubmit(values, formikHelpers) {
-      return opts.onSubmit(values, formikHelpers, formOptions, startOptions.current);
-    },
+    [formOptions.schema, intl],
+  );
+
+  const expenseForm: ExpenseFormik = useFormik<ExpenseFormValues>({
+    initialValues: initialValues.current,
+    initialStatus: initialStatus.current,
+    validate,
+    onSubmit: onSubmitCallback,
     validateOnBlur: false,
   });
 
@@ -1451,15 +1535,25 @@ export function useExpenseForm(opts: {
         if (formOptions.expense.draft?.payee?.slug) {
           setFieldValue('payeeSlug', formOptions.expense.draft?.payee?.slug);
         } else if (formOptions.expense?.draft?.payee?.organization) {
-          setFieldValue('inviteeNewOrganization', formOptions.expense?.draft?.payee);
+          setFieldValue('inviteeAccountType', InviteeAccountType.ORGANIZATION);
         } else {
-          setFieldValue('inviteeNewIndividual', formOptions.expense?.draft?.payee);
+          setFieldValue('inviteeAccountType', InviteeAccountType.INDIVIDUAL);
         }
+        setFieldValue('inviteeNewOrganization', formOptions.expense?.draft?.payee);
+        setFieldValue('inviteeNewIndividual', formOptions.expense?.draft?.payee);
 
         setFieldValue('inviteNote', formOptions.expense.longDescription);
       }
     } else if (formOptions.expense.payee?.slug) {
       setFieldValue('payeeSlug', formOptions.expense.payee?.slug);
+    } else if (formOptions.expense.draft?.payee) {
+      if (formOptions.expense?.draft?.payee?.organization) {
+        setFieldValue('inviteeAccountType', InviteeAccountType.ORGANIZATION);
+      } else {
+        setFieldValue('inviteeAccountType', InviteeAccountType.INDIVIDUAL);
+      }
+      setFieldValue('inviteeNewOrganization', formOptions.expense?.draft?.payee);
+      setFieldValue('inviteeNewIndividual', formOptions.expense?.draft?.payee);
     }
 
     if (formOptions.expense.status === ExpenseStatus.DRAFT) {
@@ -1503,7 +1597,7 @@ export function useExpenseForm(opts: {
         })),
       );
     }
-  }, [formOptions.expense, formOptions.loggedInAccount, setInitialExpenseValues, setFieldValue]);
+  }, [formOptions.expense, formOptions.loggedInAccount, setInitialExpenseValues, setFieldValue, setFieldTouched]);
 
   React.useEffect(() => {
     if (prevFormOptions?.host?.slug !== formOptions.host?.slug) {
@@ -1530,6 +1624,17 @@ export function useExpenseForm(opts: {
       setFieldValue('tax', null);
     }
   }, [formOptions.taxType, setFieldValue]);
+
+  React.useEffect(() => {
+    if (
+      expenseForm.values.expenseItems.length === 1 &&
+      !isEmpty(expenseForm.values.expenseItems[0].description) &&
+      !expenseForm.touched.title &&
+      !formOptions.lockedFields?.includes?.(ExpenseLockableFields.DESCRIPTION)
+    ) {
+      setFieldValue('title', expenseForm.values.expenseItems[0].description);
+    }
+  }, [expenseForm.values.expenseItems, expenseForm.touched.title, setFieldValue, formOptions.lockedFields]);
 
   React.useEffect(() => {
     if (!expenseForm.values.hasTax) {
@@ -1633,26 +1738,45 @@ export function useExpenseForm(opts: {
     setStatus({ schema: formOptions.schema });
   }, [formOptions.schema, setStatus]);
 
+  const refreshFormOptions = React.useCallback(
+    async (force?: boolean) => {
+      setFormOptions(
+        await buildFormOptions(
+          intl,
+          apolloClient,
+          LoggedInUser,
+          expenseFormValues.current,
+          startOptions.current,
+          force,
+        ),
+      );
+
+      setInitialFormOptions.current = true;
+    },
+    [apolloClient, LoggedInUser, intl],
+  );
+
   // calculate form
   React.useEffect(() => {
-    async function refreshFormOptions() {
-      setFormOptions(
-        await buildFormOptions(intl, apolloClient, LoggedInUser, expenseForm.values, startOptions.current),
-      );
-      if (!startOptions.current.expenseId) {
-        initialLoading.current = false;
-      } else if (setInitialExpenseValues.current) {
-        initialLoading.current = false;
-      }
-    }
+    expenseFormValues.current = expenseForm.values;
 
     refreshFormOptions();
-  }, [apolloClient, LoggedInUser, expenseForm.values, intl, startOptions]);
+  }, [refreshFormOptions, expenseForm.values]);
 
   // revalidate form
   const validateForm = expenseForm.validateForm;
   React.useEffect(() => {
-    validateForm();
+    async function runValidation() {
+      await validateForm();
+
+      if (setInitialFormOptions.current && !startOptions.current.expenseId) {
+        initialLoading.current = false;
+      } else if (setInitialFormOptions.current && setInitialExpenseValues.current) {
+        initialLoading.current = false;
+      }
+    }
+
+    runValidation();
   }, [formOptions.schema, validateForm]);
 
   React.useEffect(() => {
@@ -1674,13 +1798,12 @@ export function useExpenseForm(opts: {
     }
   }, [formOptions.payoutMethods, expenseForm.values.payoutMethodId, setFieldValue]);
 
+  const refresh = React.useCallback(async () => refreshFormOptions(true), [refreshFormOptions]);
+
   return Object.assign(expenseForm, {
     options: formOptions,
     startOptions: startOptions.current,
     initialLoading: initialLoading.current,
-    refresh: async () =>
-      setFormOptions(
-        await buildFormOptions(intl, apolloClient, LoggedInUser, expenseForm.values, startOptions.current, true),
-      ),
+    refresh,
   });
 }

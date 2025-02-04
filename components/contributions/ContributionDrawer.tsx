@@ -293,7 +293,7 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
             )
           }
         />
-        <div className="flex-grow overflow-auto px-8 py-4">
+        <div className="grow overflow-auto px-8 py-4">
           {query.error ? (
             <MessageBoxGraphqlError error={query.error} />
           ) : (
@@ -323,7 +323,7 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
               <div className="text-sm">
                 <InfoList className="mb-6 sm:grid-cols-2">
                   <InfoListItem
-                    className="border-b border-t-0"
+                    className="border-t-0 border-b"
                     title={<FormattedMessage defaultMessage="Contributor" id="Contributor" />}
                     value={
                       isLoading ? (
@@ -346,7 +346,7 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                   />
 
                   <InfoListItem
-                    className="border-b border-t-0"
+                    className="border-t-0 border-b"
                     title={<FormattedMessage defaultMessage="Collective" id="Collective" />}
                     value={
                       isLoading ? (
@@ -525,10 +525,10 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
 
                 <div>
                   <div className="flex items-center justify-between gap-2 py-4">
-                    <div className="text-slate-80 w-fit text-base font-bold leading-6">
+                    <div className="text-slate-80 w-fit text-base leading-6 font-bold">
                       <FormattedMessage defaultMessage="Related Activity" id="LP8cIK" />
                     </div>
-                    <hr className="flex-grow border-neutral-300" />
+                    <hr className="grow border-neutral-300" />
                     <Button
                       asChild
                       variant="outline"

@@ -1,10 +1,14 @@
 import React from 'react';
 import { isEmpty } from 'lodash';
+import { Eye, EyeOff } from 'lucide-react';
 import type { ComponentProps } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import type { GetActions } from '../../../../lib/actions/types';
 import type { TransactionsImportQuery } from '../../../../lib/graphql/types/v2/graphql';
+
+import { Card } from '@/components/ui/Card';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/Collapsible';
 
 import DateTime from '../../../DateTime';
 import DrawerHeader from '../../../DrawerHeader';
@@ -14,19 +18,25 @@ import { DataList, DataListItem, DataListItemLabel, DataListItemValue } from '..
 import { Sheet, SheetBody, SheetContent } from '../../../ui/Sheet';
 
 import { TransactionsImportRowDataLine } from './TransactionsImportRowDataLine';
+import { TransactionsImportRowNoteForm } from './TransactionsImportRowNoteForm';
 import { TransactionsImportRowStatusBadge } from './TransactionsImportRowStatusBadge';
 
 export const TransactionsImportRowDrawer = ({
   getActions,
   row,
   rowIndex,
+  transactionsImportId,
+  autoFocusNoteForm,
   ...props
 }: {
   row: TransactionsImportQuery['transactionsImport']['rows']['nodes'][number];
   getActions: GetActions<TransactionsImportQuery['transactionsImport']['rows']['nodes'][number]>;
   rowIndex: number;
+  transactionsImportId: string;
+  autoFocusNoteForm: boolean;
 } & ComponentProps<typeof Sheet>) => {
   const dropdownTriggerRef = React.useRef();
+  const [hasRawValuesExpanded, setHasRawValuesExpanded] = React.useState(false);
   return (
     <Sheet {...props}>
       <SheetContent>
@@ -55,7 +65,7 @@ export const TransactionsImportRowDrawer = ({
                 <FormattedMessage defaultMessage="No. {number}" id="rowNumber" values={{ number: rowIndex + 1 }} />
               }
             />
-            <SheetBody>
+            <SheetBody className="break-all">
               <DataList>
                 <DataListItem>
                   <DataListItemLabel>
@@ -87,6 +97,57 @@ export const TransactionsImportRowDrawer = ({
                   </DataListItemLabel>
                   <DataListItemValue>{row.description}</DataListItemValue>
                 </DataListItem>
+                <Collapsible open={hasRawValuesExpanded}>
+                  <DataListItem>
+                    <DataListItemLabel>
+                      <FormattedMessage defaultMessage="Raw values" id="gWz5pY" />
+                    </DataListItemLabel>
+                    <DataListItemValue>
+                      <CollapsibleTrigger
+                        className="text-sm font-bold text-neutral-600"
+                        onClick={() => setHasRawValuesExpanded(!hasRawValuesExpanded)}
+                      >
+                        {!hasRawValuesExpanded ? (
+                          <React.Fragment>
+                            <FormattedMessage defaultMessage="See all" id="seeRawValues" />
+                            <Eye size={16} className="ml-2 inline-block" />
+                          </React.Fragment>
+                        ) : (
+                          <React.Fragment>
+                            <FormattedMessage defaultMessage="Hide" id="Hide" />
+                            <EyeOff size={16} className="ml-2 inline-block" />
+                          </React.Fragment>
+                        )}
+                      </CollapsibleTrigger>
+                    </DataListItemValue>
+                  </DataListItem>
+                  <DataListItem>
+                    <CollapsibleContent>
+                      <Card className="mt-2 max-h-80 overflow-y-auto px-2 py-4 text-xs text-neutral-800">
+                        <ul className="list-inside list-disc pl-2">
+                          <li>
+                            <strong>
+                              <FormattedMessage id="Fields.amount" defaultMessage="Amount" />
+                            </strong>
+                            : <FormattedMoneyAmount amount={row.amount.valueInCents} currency={row.amount.currency} />
+                          </li>
+                          <li>
+                            <strong>
+                              <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />
+                            </strong>
+                            : <DateTime value={row.date} />
+                          </li>
+                          {Object.entries(row.rawValue as Record<string, string>)
+                            .filter(entry => !isEmpty(entry[1]))
+                            .map(([key, value], index) => (
+                              // eslint-disable-next-line react/no-array-index-key
+                              <TransactionsImportRowDataLine key={`${key}-${index}`} labelKey={key} value={value} />
+                            ))}
+                        </ul>
+                      </Card>
+                    </CollapsibleContent>
+                  </DataListItem>
+                </Collapsible>
                 {row.expense && (
                   <DataListItem>
                     <DataListItemLabel>
@@ -121,29 +182,11 @@ export const TransactionsImportRowDrawer = ({
                 )}
               </DataList>
               <hr className="my-4 border-gray-200" />
-              <p className="text-sm font-bold text-gray-600">
-                <FormattedMessage defaultMessage="Raw values" id="gWz5pY" />
-              </p>
-              <ul className="mt-2 list-inside list-disc text-sm">
-                <li>
-                  <strong>
-                    <FormattedMessage id="Fields.amount" defaultMessage="Amount" />
-                  </strong>
-                  : <FormattedMoneyAmount amount={row.amount.valueInCents} currency={row.amount.currency} />
-                </li>
-                <li>
-                  <strong>
-                    <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />
-                  </strong>
-                  : <DateTime value={row.date} />
-                </li>
-                {Object.entries(row.rawValue as Record<string, string>)
-                  .filter(entry => !isEmpty(entry[1]))
-                  .map(([key, value], index) => (
-                    // eslint-disable-next-line react/no-array-index-key
-                    <TransactionsImportRowDataLine key={`${key}-${index}`} labelKey={key} value={value} />
-                  ))}
-              </ul>
+              <TransactionsImportRowNoteForm
+                transactionsImportId={transactionsImportId}
+                row={row}
+                autoFocus={autoFocusNoteForm}
+              />
             </SheetBody>
           </React.Fragment>
         )}

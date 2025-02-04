@@ -71,14 +71,14 @@ export default function ContributePage() {
       <div className="flex-1 space-y-8">
         {mainfundraising && (
           <div className="border-b bg-white py-12">
-            <div className="gap- relative mx-auto grid max-w-screen-xl grid-cols-12 px-6">
+            <div className="gap- relative mx-auto grid max-w-(--breakpoint-xl) grid-cols-12 px-6">
               <div className="col-span-2">
                 <div className="sticky top-28 space-y-4">
                   <ContentOverview content={profile?.longDescription} />
                 </div>
               </div>
 
-              <div className="prose prose-slate col-span-7">
+              <div className="col-span-7 prose prose-slate">
                 <h3>About</h3>
                 <Markup
                   noWrap
@@ -118,10 +118,10 @@ export default function ContributePage() {
         )}
 
         {(data?.projects?.totalCount > 0 || data?.events?.totalCount > 0) && (
-          <div className="mx-auto max-w-screen-xl space-y-8 px-6 py-12">
+          <div className="mx-auto max-w-(--breakpoint-xl) space-y-8 px-6 py-12">
             {data?.projects?.totalCount > 0 && (
               <React.Fragment>
-                <h3 className="text-2xl font-semibold leading-none tracking-tight">Projects</h3>
+                <h3 className="text-2xl leading-none font-semibold tracking-tight">Projects</h3>
                 <div className="grid grid-cols-3 gap-4">
                   {data?.projects?.nodes?.map(child => {
                     return (
@@ -133,7 +133,7 @@ export default function ContributePage() {
             )}
             {data?.events?.totalCount > 0 && (
               <React.Fragment>
-                <h3 className="text-2xl font-semibold leading-none tracking-tight">Events</h3>
+                <h3 className="text-2xl leading-none font-semibold tracking-tight">Events</h3>
                 <div className="grid grid-cols-3 gap-4">
                   {data?.events?.nodes?.map(child => {
                     return (

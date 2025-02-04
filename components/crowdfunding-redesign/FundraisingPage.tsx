@@ -35,14 +35,14 @@ export function FundraisingPage() {
 
   return (
     <div className="flex-1 bg-background">
-      <div className="relative mx-auto grid max-w-screen-xl grid-cols-12 gap-8 px-6 py-12">
+      <div className="relative mx-auto grid max-w-(--breakpoint-xl) grid-cols-12 gap-8 px-6 py-12">
         <div className="col-span-2">
           <div className="sticky top-28 space-y-4">
             <ContentOverview content={fundraiser.longDescription} />
           </div>
         </div>
 
-        <div className="prose prose-slate col-span-7">
+        <div className="col-span-7 prose prose-slate">
           <h2>
             <FormattedMessage defaultMessage="About" id="collective.about.title" />
           </h2>

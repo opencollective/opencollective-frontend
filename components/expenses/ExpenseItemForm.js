@@ -137,7 +137,7 @@ const WithOCRComparisonWarning = ({ comparison, formatValue, children, mrClass =
   <div className="relative flex grow">
     {children}
     {Boolean(comparison?.hasMismatch) && (
-      <div className={cn('absolute right-0 top-0 mt-[9px]', mrClass)} data-cy="mismatch-warning">
+      <div className={cn('absolute top-0 right-0 mt-[9px]', mrClass)} data-cy="mismatch-warning">
         <Tooltip>
           <TooltipTrigger>
             <AlertTriangle size={16} color="#CB9C03" />

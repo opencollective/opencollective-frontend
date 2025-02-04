@@ -151,7 +151,7 @@ export default function TwoFactorAuthenticationModal() {
         </div>
 
         <AlertDialogHeader className="sm:text-center">
-          <Button onClick={cancel} variant="ghost" size="icon-xs" className="absolute right-1.5 top-1.5">
+          <Button onClick={cancel} variant="ghost" size="icon-xs" className="absolute top-1.5 right-1.5">
             <X size={16} />
             <span className="sr-only">
               <FormattedMessage id="Close" defaultMessage="Close" />
@@ -239,7 +239,7 @@ function AuthenticatorOption(props: {
 }) {
   return (
     <div className="space-y-4 pb-2">
-      <p className="text-balance text-sm text-muted-foreground">
+      <p className="text-sm text-balance text-muted-foreground">
         <FormattedMessage
           id="TwoFactorAuth.Setup.Form.InputLabel"
           defaultMessage="Please enter the 6-digit code from your authenticator app."
@@ -258,7 +258,7 @@ function AuthenticatorOption(props: {
           character:
             'z-10 pointer-events-none rounded-md border border-input bg-background text-lg ring-offset-background items-center flex justify-center',
           characterInactive: 'bg-muted',
-          characterSelected: 'ring-ring ring-2 ring-offset-2 outline-none text-foreground',
+          characterSelected: 'ring-ring ring-2 ring-offset-2 outline-hidden text-foreground',
         }}
         onChange={val => props.onChange(val)}
       />
@@ -269,7 +269,7 @@ function AuthenticatorOption(props: {
 function RecoveryCodeOptions(props: { value: string; onChange: (string) => void; disabled: boolean }) {
   return (
     <div className="space-y-4">
-      <p className="text-balance text-sm text-muted-foreground">
+      <p className="text-sm text-balance text-muted-foreground">
         <FormattedMessage
           id="TwoFactorAuth.RecoveryCodes.Form.InputLabel"
           defaultMessage="Please enter one of your alphanumeric recovery codes."

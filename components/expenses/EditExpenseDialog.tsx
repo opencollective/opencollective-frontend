@@ -9,8 +9,9 @@ import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import type { Currency, CurrencyExchangeRateInput, Expense } from '../../lib/graphql/types/v2/graphql';
+import type { Currency, CurrencyExchangeRateInput } from '../../lib/graphql/types/v2/graphql';
 import { cn } from '../../lib/utils';
+import type { Expense } from '@/lib/graphql/types/v2/schema';
 
 import { FormField } from '../FormField';
 import { FormikZod } from '../FormikZod';
@@ -126,14 +127,14 @@ const EditPayee = ({ expense, onSubmit }) => {
   return (
     <FormikProvider value={expenseForm}>
       <form className="space-y-6" ref={formRef} onSubmit={e => e.preventDefault()}>
-        <WhoIsGettingPaidForm form={expenseForm} />
+        <WhoIsGettingPaidForm {...WhoIsGettingPaidForm.getFormProps(expenseForm)} />
         <Collapsible open={hasChangedPayee}>
           <CollapsibleContent>
             <div className="space-y-3">
               <Label>
                 <FormattedMessage defaultMessage="Pick new payout method" id="expense.pickPayoutMethod" />
               </Label>
-              <PayoutMethodFormContent form={expenseForm} />
+              <PayoutMethodFormContent {...PayoutMethodFormContent.getFormProps(expenseForm)} />
             </div>
           </CollapsibleContent>
         </Collapsible>
@@ -220,7 +221,7 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
   return (
     <FormikProvider value={expenseForm}>
       <form className="space-y-4" ref={formRef} onSubmit={e => e.preventDefault()}>
-        <PayoutMethodFormContent form={expenseForm} />
+        <PayoutMethodFormContent {...PayoutMethodFormContent.getFormProps(expenseForm)} />
         <EditExpenseActionButtons handleSubmit={expenseForm.handleSubmit} />
       </form>
     </FormikProvider>
@@ -272,7 +273,7 @@ const EditAttachments = ({ expense, onSubmit }) => {
   return (
     <FormikProvider value={expenseForm}>
       <form className="space-y-4" ref={formRef} onSubmit={e => e.preventDefault()}>
-        <AdditionalAttachments form={expenseForm} />
+        <AdditionalAttachments {...AdditionalAttachments.getFormProps(expenseForm)} />
         <EditExpenseActionButtons loading={expenseForm.initialLoading} handleSubmit={expenseForm.handleSubmit} />
       </form>
     </FormikProvider>
@@ -336,7 +337,7 @@ const EditExpenseItems = ({ expense, onSubmit }) => {
   return (
     <FormikProvider value={expenseForm}>
       <form className="space-y-4" ref={formRef} onSubmit={e => e.preventDefault()}>
-        <ExpenseItemsForm form={expenseForm} />
+        <ExpenseItemsForm {...ExpenseItemsForm.getFormProps(expenseForm)} />
         <EditExpenseActionButtons handleSubmit={expenseForm.handleSubmit} />
       </form>
     </FormikProvider>

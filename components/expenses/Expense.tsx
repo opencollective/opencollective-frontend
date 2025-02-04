@@ -23,6 +23,7 @@ import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { itemHasOCR } from './lib/ocr';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import ConfirmationModal from '../ConfirmationModal';
 import Container from '../Container';
@@ -43,6 +44,7 @@ import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledLink from '../StyledLink';
+import { SubmitExpenseFlow } from '../submit-expense/SubmitExpenseFlow';
 import { H1, H5, Span } from '../Text';
 
 import { editExpenseMutation } from './graphql/mutations';
@@ -50,6 +52,7 @@ import { expensePageQuery } from './graphql/queries';
 import { ConfirmOCRValues } from './ConfirmOCRValues';
 import ExpenseForm, { msg as expenseFormMsg, prepareExpenseForSubmit } from './ExpenseForm';
 import ExpenseInviteNotificationBanner from './ExpenseInviteNotificationBanner';
+import ExpenseInviteWelcome, { ExpenseInviteRecipientNote } from './ExpenseInviteWelcome';
 import ExpenseMissingReceiptNotificationBanner from './ExpenseMissingReceiptNotificationBanner';
 import ExpenseNotesForm from './ExpenseNotesForm';
 import ExpenseRecurringBanner from './ExpenseRecurringBanner';
@@ -122,9 +125,20 @@ function Expense(props) {
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const router = useRouter();
+  const isNewExpenseSubmissionFlow =
+    (LoggedInUser && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW)) ||
+    router.query.newExpenseFlow;
+
+  const [isSubmittionFlowOpen, setIsSubmittionFlowOpen] = React.useState(false);
+
   const [state, setState] = useState({
     error: error || null,
-    status: draftKey && data?.expense?.status === ExpenseStatus.DRAFT ? PAGE_STATUS.EDIT : PAGE_STATUS.VIEW,
+    status:
+      draftKey && data?.expense?.status === ExpenseStatus.DRAFT
+        ? isNewExpenseSubmissionFlow
+          ? PAGE_STATUS.VIEW
+          : PAGE_STATUS.EDIT
+        : PAGE_STATUS.VIEW,
     editedExpense: null,
     isSubmitting: false,
     isPollingEnabled: true,
@@ -146,7 +160,9 @@ function Expense(props) {
   const drawerActionsContainer = useDrawerActionsContainer();
 
   useEffect(() => {
-    const shouldEditDraft = data?.expense?.status === ExpenseStatus.DRAFT && draftKey;
+    const shouldEditDraft = isNewExpenseSubmissionFlow
+      ? false
+      : data?.expense?.status === ExpenseStatus.DRAFT && draftKey;
     if (shouldEditDraft) {
       setState(state => ({
         ...state,
@@ -194,11 +210,16 @@ function Expense(props) {
 
   // Update status when data or draftKey changes
   useEffect(() => {
-    const status = draftKey && data?.expense?.status === ExpenseStatus.DRAFT ? PAGE_STATUS.EDIT : PAGE_STATUS.VIEW;
+    const status =
+      draftKey && data?.expense?.status === ExpenseStatus.DRAFT
+        ? isNewExpenseSubmissionFlow
+          ? PAGE_STATUS.VIEW
+          : PAGE_STATUS.EDIT
+        : PAGE_STATUS.VIEW;
     if (status !== state.status) {
       setState(state => ({ ...state, status }));
     }
-  }, [props.data, draftKey]);
+  }, [props.data, draftKey, isNewExpenseSubmissionFlow]);
 
   // Scroll to expense's top when changing status
   const prevState = usePrevious(state);
@@ -582,7 +603,8 @@ function Expense(props) {
         </MessageBox>
       )}
       {status === PAGE_STATUS.VIEW &&
-        ((expense?.status === ExpenseStatus.UNVERIFIED && state.createdUser) || (isDraft && !isRecurring)) && (
+        ((expense?.status === ExpenseStatus.UNVERIFIED && state.createdUser) ||
+          (isDraft && !isRecurring && !draftKey)) && (
           <ExpenseInviteNotificationBanner expense={expense} createdUser={state.createdUser} />
         )}
       {isMissingReceipt && (
@@ -590,6 +612,32 @@ function Expense(props) {
       )}
       {status !== PAGE_STATUS.EDIT && (
         <Box mb={3}>
+          {isNewExpenseSubmissionFlow &&
+            (expense?.permissions?.canDeclineExpenseInvite ||
+              (expense?.status === ExpenseStatus.DRAFT &&
+                !isRecurring &&
+                draftKey &&
+                expense?.draft?.recipientNote)) && (
+              <React.Fragment>
+                <ExpenseInviteWelcome
+                  onContinueSubmissionClick={() => {
+                    setIsSubmittionFlowOpen(true);
+                  }}
+                  className="mb-4 rounded-md border border-[#DCDDE0] px-6 py-3"
+                  expense={expense}
+                  draftKey={draftKey}
+                />
+                {expense?.draft?.recipientNote && (
+                  <div className="mb-3 text-lg font-bold">
+                    <FormattedMessage defaultMessage="Invitation note" id="WcjKTY" />
+                  </div>
+                )}
+                <ExpenseInviteRecipientNote
+                  className="mb-4 rounded-md border border-[#DCDDE0] px-6 py-3"
+                  expense={expense}
+                />
+              </React.Fragment>
+            )}
           <ExpenseSummary
             expense={status === PAGE_STATUS.EDIT_SUMMARY ? editedExpense : expense}
             host={host}
@@ -794,6 +842,21 @@ function Expense(props) {
             />
           )}
         </Fragment>
+      )}
+
+      {isSubmittionFlowOpen && (
+        <SubmitExpenseFlow
+          onClose={submitted => {
+            setIsSubmittionFlowOpen(false);
+            if (submitted) {
+              refetch();
+            }
+          }}
+          expenseId={legacyExpenseId}
+          draftKey={draftKey}
+          submitExpenseTo={collective?.slug}
+          endFlowButtonLabel={<FormattedMessage defaultMessage="View expense" id="CaE5Oi" />}
+        />
       )}
 
       {state.showFilesViewerModal &&

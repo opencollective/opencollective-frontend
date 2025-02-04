@@ -4,5 +4,6 @@
   "arrowParens": "avoid",
   "printWidth": 120,
   "plugins": ["prettier-plugin-tailwindcss"],
-  "tailwindFunctions": ["clsx", "cn", "cva"]
+  "tailwindFunctions": ["clsx", "cn", "cva"],
+  "tailwindStylesheet": "./public/static/styles/app.css"
 }
