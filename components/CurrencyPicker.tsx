@@ -32,32 +32,37 @@ const generateCurrencyOptions = (intl, availableCurrencies) => {
   });
 };
 
-export default function CurrencyPicker({
-  availableCurrencies = Currency,
-  value,
-  onChange,
-  ...props
-}: {
-  /** A list of currencies presented in the currency picker */
-  availableCurrencies: string[];
-  onChange: (selectedCurrency: string) => void;
-  value?: string;
-} & Omit<React.ComponentProps<typeof ComboSelect>, 'options'>) {
-  const intl = useIntl();
-  const currencyOptions = React.useMemo(
-    () => generateCurrencyOptions(intl, availableCurrencies),
-    [intl, availableCurrencies],
-  );
-  return (
-    <ComboSelect
-      id="currency-picker"
-      data-cy="currency-picker"
-      error={!value}
-      isSearchable={availableCurrencies.length > 10}
-      options={currencyOptions}
-      value={value}
-      onChange={onChange}
-      {...props}
-    />
-  );
-}
+const CurrencyPicker = React.memo(
+  // eslint-disable-next-line prefer-arrow-callback
+  function CurrencyPicker({
+    availableCurrencies = Currency,
+    value,
+    onChange,
+    ...props
+  }: {
+    /** A list of currencies presented in the currency picker */
+    availableCurrencies: string[];
+    onChange: (selectedCurrency: string) => void;
+    value?: string;
+  } & Omit<React.ComponentProps<typeof ComboSelect>, 'options'>) {
+    const intl = useIntl();
+    const currencyOptions = React.useMemo(
+      () => generateCurrencyOptions(intl, availableCurrencies),
+      [intl, availableCurrencies],
+    );
+    return (
+      <ComboSelect
+        id="currency-picker"
+        data-cy="currency-picker"
+        error={!value}
+        isSearchable={availableCurrencies.length > 10}
+        options={currencyOptions}
+        value={value}
+        onChange={onChange}
+        {...props}
+      />
+    );
+  },
+);
+
+export default CurrencyPicker;

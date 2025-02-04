@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { useFormikContext } from 'formik';
-import { compact, get, kebabCase, partition, set } from 'lodash';
+import { compact, get, kebabCase, partition } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../lib/currency-utils';
@@ -85,11 +85,30 @@ const CUSTOM_METHOD_LABEL_BY_CURRENCY = {
 const validateRequiredInput = (intl, input, required) =>
   required ? value => (value ? undefined : intl.formatMessage(msg.fieldRequired, { name: input.name })) : undefined;
 
-const Input = ({ input, getFieldName, disabled, currency, loading, refetch, formik, host }) => {
+const Input = ({ input, getFieldName, disabled, loading, refetch, formik }) => {
   const intl = useIntl();
   const isAccountHolderName = input.key === 'accountHolderName';
   const fieldName = isAccountHolderName ? getFieldName(input.key) : getFieldName(`details.${input.key}`);
   const required = disabled ? false : input.required;
+
+  const comboOptions = React.useMemo(
+    () =>
+      input.type === 'radio' || input.type === 'select'
+        ? formatTransferWiseSelectOptions(input.valuesAllowed || [])
+        : [],
+    [input.type, input.valuesAllowed],
+  );
+
+  const { setFieldValue } = formik;
+  const comboOnChange = React.useCallback(
+    value => {
+      setFieldValue(fieldName, value);
+      if (input.refreshRequirementsOnChange && refetch) {
+        refetch();
+      }
+    },
+    [fieldName, input.refreshRequirementsOnChange, refetch, setFieldValue],
+  );
 
   let validate = validateRequiredInput(intl, input, required);
   if (input.type === 'text') {
@@ -134,8 +153,6 @@ const Input = ({ input, getFieldName, disabled, currency, loading, refetch, form
       </div>
     );
   } else if (input.type === 'radio' || input.type === 'select') {
-    const options = formatTransferWiseSelectOptions(input.valuesAllowed || []);
-
     return (
       <div className="mt-2 flex-1">
         <FormField name={fieldName} label={input.name} hint={input.hint} required={required}>
@@ -145,19 +162,10 @@ const Input = ({ input, getFieldName, disabled, currency, loading, refetch, form
               inputId={field.name}
               disabled={disabled}
               error={field.error}
-              onChange={value => {
-                formik.setFieldValue(field.name, value);
-                if (input.refreshRequirementsOnChange && refetch) {
-                  refetch({
-                    slug: host ? host.slug : WISE_PLATFORM_COLLECTIVE_SLUG,
-                    currency,
-                    accountDetails: get(set({ ...formik.values }, field.name, value), getFieldName('')),
-                  });
-                }
-              }}
-              options={options}
+              onChange={comboOnChange}
+              options={comboOptions}
               value={get(formik.values, field.name)}
-              loading={loading && !options.length}
+              loading={loading && !comboOptions.length}
             />
           )}
         </FormField>
@@ -171,10 +179,6 @@ const Input = ({ input, getFieldName, disabled, currency, loading, refetch, form
 Input.propTypes = {
   disabled: PropTypes.bool,
   loading: PropTypes.bool,
-  host: PropTypes.shape({
-    slug: PropTypes.string,
-  }),
-  currency: PropTypes.string,
   formik: PropTypes.object.isRequired,
   getFieldName: PropTypes.func.isRequired,
   refetch: PropTypes.func,
@@ -206,6 +210,7 @@ FieldGroup.propTypes = {
 
 const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
   const intl = useIntl();
+  const needsRefetchRef = React.useRef(false);
   const { loading, error, data, refetch } = useQuery(requiredFieldsQuery, {
     context: API_V2_CONTEXT,
     // A) If `fixedCurrency` was passed in PayoutBankInformationForm (2) (3)
@@ -216,12 +221,50 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
     variables: { slug: host ? host.slug : WISE_PLATFORM_COLLECTIVE_SLUG, currency },
   });
 
+  const doRefetchOnChange = React.useCallback(() => {
+    needsRefetchRef.current = true;
+  }, []);
+
+  const accountDetails = get(formik.values, getFieldName(''));
+  React.useEffect(() => {
+    if (needsRefetchRef.current) {
+      needsRefetchRef.current = false;
+      refetch({
+        slug: host ? host.slug : WISE_PLATFORM_COLLECTIVE_SLUG,
+        currency,
+        accountDetails: accountDetails,
+      });
+    }
+  }, [currency, accountDetails, host, refetch]);
+
   // Make sure we load the form data on initial load. Otherwise certain form fields such
   // as the state field in the "Recipient's Address" section might not be visible on first load
   // and only be visible after the user reselect the country.
   useEffect(() => {
     refetch({ accountDetails: get(formik.values, getFieldName('data')) });
   }, []);
+
+  const transactionTypeValues = React.useMemo(
+    () =>
+      (data?.host?.transferwise?.requiredFields ?? []).map(rf => ({
+        label: CUSTOM_METHOD_LABEL_BY_CURRENCY[currency]?.requiredFields?.options?.[rf.type] || rf.title,
+        value: rf.type,
+      })),
+    [currency, data?.host?.transferwise?.requiredFields],
+  );
+
+  const transactionMethodFieldName = getFieldName('data.type');
+  const dataFieldName = getFieldName(`data`);
+
+  const { setFieldValue } = formik;
+  const { type, currency: formCurrencyValue } = get(formik.values, dataFieldName);
+  const onComboChange = React.useCallback(
+    value => {
+      setFieldValue(dataFieldName, { type, currency: formCurrencyValue });
+      setFieldValue(transactionMethodFieldName, value);
+    },
+    [dataFieldName, setFieldValue, transactionMethodFieldName, type, formCurrencyValue],
+  );
 
   if (loading && !data) {
     return <StyledSpinner />;
@@ -254,10 +297,6 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
     }
   }
 
-  const transactionTypeValues = data.host.transferwise.requiredFields.map(rf => ({
-    label: CUSTOM_METHOD_LABEL_BY_CURRENCY[currency]?.requiredFields?.options?.[rf.type] || rf.title,
-    value: rf.type,
-  }));
   // Some currencies offer different methods for the transaction
   // e.g., USD allows ABA and SWIFT transactions.
   const availableMethods = data.host.transferwise.requiredFields.find(
@@ -267,7 +306,6 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
     field.group.every(g => g.key.includes('address.')),
   );
 
-  const transactionMethodFieldName = getFieldName('data.type');
   const transactionMethod = get(formik.values, transactionMethodFieldName);
 
   const transactionMethodLabel =
@@ -281,7 +319,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
   return (
     <div className="mt-2 flex flex-col">
       <FormField
-        name={getFieldName('data.type')}
+        name={transactionMethodFieldName}
         label={transactionMethodLabel}
         validate={validateRequiredInput(intl, { name: transactionMethodLabel }, !disabled)}
       >
@@ -291,11 +329,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
               {...field}
               inputId={field.id}
               options={transactionTypeValues}
-              onChange={value => {
-                const { type, currency } = get(formik.values, getFieldName(`data`));
-                formik.setFieldValue(getFieldName('data'), { type, currency });
-                formik.setFieldValue(field.name, value);
-              }}
+              onChange={onComboChange}
               value={availableMethods?.type ?? undefined}
             />
           );
@@ -319,7 +353,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
               host={host}
               key={kebabCase(field.name)}
               loading={loading}
-              refetch={refetch}
+              refetch={doRefetchOnChange}
             />
           ))}
         </div>
@@ -348,7 +382,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
               host={host}
               key={kebabCase(field.name)}
               loading={loading}
-              refetch={refetch}
+              refetch={doRefetchOnChange}
             />
           ))}
         </React.Fragment>
@@ -405,47 +439,46 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
     // Or if availableCurrencies is already available. Expense Flow + Host with Wise configured (1)
     skip: Boolean(fixedCurrency || host?.transferwise?.availableCurrencies),
   });
+  const wiseHost = data?.host || host;
+
   const formik = useFormikContext();
   const { formatMessage } = useIntl();
 
-  // Display spinner if loading
-  if (loading) {
-    return <StyledSpinner />;
-  }
-
-  // Fiscal Host with Wise configured (1) OR Platform account as fallback (1) or default (2) (3)
-  // NOTE: If `fixedCurrency is set`, `wiseHost` will be null (at least today)
-  const wiseHost = data?.host || host;
-
-  const availableCurrencies = wiseHost?.transferwise?.availableCurrencies;
-
-  let currencies;
-  if (fixedCurrency) {
-    currencies = formatStringOptions([fixedCurrency]);
-  } else if (availableCurrencies) {
-    currencies = formatStringOptions(availableCurrencies.map(c => c.code));
-  } else {
-    // If at this point we don't have `fixedCurrency` or `availableCurrencies`,
-    // we can display an error message, Wise is likely not configured on the platform
-    return (
-      <MessageBox fontSize="12px" type="warning">
-        <FormattedMessage
-          defaultMessage="An error occurred while preparing the form for bank accounts. Please contact <I18nSupportLink>support</I18nSupportLink>"
-          id="fCWfnb"
-          values={{ I18nSupportLink }}
-        />
-      </MessageBox>
-    );
-  }
-
-  if (optional) {
-    currencies.unshift({ label: 'No selection', value: null });
-  }
-
   const currencyFieldName = getFieldName('data.currency');
+  const dataFieldName = getFieldName('data');
   const selectedCurrency = get(formik.values, currencyFieldName);
 
-  const validateCurrencyMinimumAmount = () => {
+  const { setFieldValue } = formik;
+  const onCurrencyPickerChange = React.useCallback(
+    value => {
+      setFieldValue(dataFieldName, {});
+      setFieldValue(currencyFieldName, value);
+    },
+    [currencyFieldName, setFieldValue, dataFieldName],
+  );
+
+  const currencies = React.useMemo(() => {
+    // Fiscal Host with Wise configured (1) OR Platform account as fallback (1) or default (2) (3)
+    // NOTE: If `fixedCurrency is set`, `wiseHost` will be null (at least today)
+    const availableCurrencies = wiseHost?.transferwise?.availableCurrencies;
+    let currencies;
+    if (fixedCurrency) {
+      currencies = formatStringOptions([fixedCurrency]);
+    } else if (availableCurrencies) {
+      currencies = formatStringOptions(availableCurrencies.map(c => c.code));
+    }
+
+    if (optional) {
+      currencies = currencies || [];
+      currencies.unshift({ label: 'No selection', value: null });
+    }
+
+    return currencies;
+  }, [fixedCurrency, optional, wiseHost?.transferwise?.availableCurrencies]);
+
+  const availableCurrencies = React.useMemo(() => (currencies || []).map(c => c.value).filter(Boolean), [currencies]);
+
+  const validateCurrencyMinimumAmount = React.useCallback(() => {
     // Skip if currency is fixed (2) (3)
     // or if `availableCurrencies` is not set (but we're not supposed to be there anyway)
     if (fixedCurrency || !availableCurrencies) {
@@ -469,12 +502,32 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
           },
           {
             selectedCurrency,
-            minAmountForSelectedCurrency: formatCurrency(minAmountForSelectedCurrency, wiseHost.currency),
+            minAmountForSelectedCurrency: formatCurrency(minAmountForSelectedCurrency, wiseHost?.currency),
           },
         );
       }
     }
-  };
+  }, [availableCurrencies, fixedCurrency, formatMessage, formik.values.items, selectedCurrency, wiseHost?.currency]);
+
+  // Display spinner if loading
+  if (loading) {
+    return <StyledSpinner />;
+  }
+
+  if (!currencies) {
+    // If at this point we don't have `fixedCurrency` or `availableCurrencies`,
+    // we can display an error message, Wise is likely not configured on the platform
+    return (
+      <MessageBox fontSize="12px" type="warning">
+        <FormattedMessage
+          defaultMessage="An error occurred while preparing the form for bank accounts. Please contact <I18nSupportLink>support</I18nSupportLink>"
+          id="fCWfnb"
+          values={{ I18nSupportLink }}
+        />
+      </MessageBox>
+    );
+  }
+
   return (
     <React.Fragment>
       <FormField
@@ -488,11 +541,8 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
             <CurrencyPicker
               {...field}
               inputId={field.id}
-              onChange={value => {
-                formik.setFieldValue(getFieldName('data'), {});
-                formik.setFieldValue(field.name, value);
-              }}
-              availableCurrencies={currencies.map(c => c.value).filter(Boolean)}
+              onChange={onCurrencyPickerChange}
+              availableCurrencies={availableCurrencies}
             />
           );
         }}
