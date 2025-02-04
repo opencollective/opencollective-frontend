@@ -179,10 +179,6 @@ const Input = ({ input, getFieldName, disabled, loading, refetch, formik }) => {
 Input.propTypes = {
   disabled: PropTypes.bool,
   loading: PropTypes.bool,
-  host: PropTypes.shape({
-    slug: PropTypes.string,
-  }),
-  currency: PropTypes.string,
   formik: PropTypes.object.isRequired,
   getFieldName: PropTypes.func.isRequired,
   refetch: PropTypes.func,
