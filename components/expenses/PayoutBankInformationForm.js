@@ -148,7 +148,14 @@ const Input = ({ input, getFieldName, disabled, loading, refetch, formik }) => {
   } else if (input.type === 'date') {
     return (
       <div className="mt-2 flex-1" key={input.key}>
-        <FormField label={input.name} name={fieldName} hint={input.hint} required={required} disabled={disabled}>
+        <FormField
+          label={input.name}
+          name={fieldName}
+          hint={input.hint}
+          required={required}
+          disabled={disabled}
+          validate={validate}
+        >
           {({ field }) => <Input type="date" {...field} value={get(formik.values, field.name) || ''} />}
         </FormField>
       </div>
@@ -156,7 +163,14 @@ const Input = ({ input, getFieldName, disabled, loading, refetch, formik }) => {
   } else if (input.type === 'radio' || input.type === 'select') {
     return (
       <div className="mt-2 flex-1">
-        <FormField disabled={disabled} name={fieldName} label={input.name} hint={input.hint} required={required}>
+        <FormField
+          disabled={disabled}
+          name={fieldName}
+          label={input.name}
+          hint={input.hint}
+          required={required}
+          validate={validate}
+        >
           {({ field }) => (
             <ComboSelect
               {...field}

@@ -244,7 +244,7 @@ function getNewPayoutMethodOptionFormProps(form: ExpenseForm) {
   return {
     ...pick(form, ['setFieldValue', 'setFieldTouched', 'validateForm', 'refresh', 'isSubmitting']),
     ...pick(form.values, ['newPayoutMethod', 'payeeSlug']),
-    ...pick(form.options, ['supportedPayoutMethods', 'host', 'loggedInAccount']),
+    ...pick(form.options, ['supportedPayoutMethods', 'host', 'loggedInAccount', 'payee']),
     touchedNewPayoutMethod: form.touched.newPayoutMethod,
   };
 }
@@ -295,7 +295,10 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
     try {
       setFieldTouched('newPayoutMethod.type');
       setFieldTouched('newPayoutMethod.data.currency');
-      validateForm();
+      const formErrors = await validateForm();
+      if (!isEmpty(get(formErrors, 'newPayoutMethod')) || formErrors.payoutMethodNameDiscrepancyReason) {
+        return;
+      }
       const errors = validatePayoutMethod(props.newPayoutMethod);
       if (!isEmpty(errors)) {
         return;
@@ -327,6 +330,20 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
     value => setFieldValue('newPayoutMethod.type', value as PayoutMethodType),
     [setFieldValue],
   );
+
+  const isLegalNameFuzzyMatched = React.useMemo(() => {
+    const accountHolderName: string = props.newPayoutMethod.data?.accountHolderName ?? '';
+    const payeeLegalName: string = props.payee?.legalName ?? '';
+    return accountHolderName.trim().toLowerCase() === payeeLegalName.trim().toLowerCase();
+  }, [props.newPayoutMethod.data?.accountHolderName, props.payee?.legalName]);
+
+  const hasLegalNameMismatch =
+    props.newPayoutMethod.data?.accountHolderName?.length &&
+    props.newPayoutMethod.type === PayoutMethodType.BANK_ACCOUNT &&
+    props.payeeSlug &&
+    !props.payeeSlug.startsWith('__') &&
+    props.payeeSlug === props.payee?.slug &&
+    !isLegalNameFuzzyMatched;
 
   return (
     <div className="space-y-3 p-2">
@@ -384,6 +401,41 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
             </React.Fragment>
           )}
         </React.Fragment>
+      )}
+
+      {hasLegalNameMismatch && (
+        <MessageBox type="warning">
+          <div className="mb-2 font-bold">
+            <FormattedMessage defaultMessage="The names you provided do not match." id="XAPZa0" />
+          </div>
+          <div>
+            <FormattedMessage
+              defaultMessage="The legal name in the payee profile is: {legalName}."
+              id="NSammt"
+              values={{
+                legalName: props.payee?.legalName,
+              }}
+            />
+          </div>
+          <div>
+            <FormattedMessage
+              defaultMessage="The contact name in the payout method is: {accountHolderName}."
+              id="XC+vMa"
+              values={{
+                accountHolderName: props.newPayoutMethod.data?.accountHolderName,
+              }}
+            />
+          </div>
+
+          <FormField
+            className="mt-4"
+            label={intl.formatMessage({
+              defaultMessage: 'Please explain why they are different',
+              id: 'bzGbkJ',
+            })}
+            name="payoutMethodNameDiscrepancyReason"
+          />
+        </MessageBox>
       )}
 
       {props.loggedInAccount && (
@@ -628,9 +680,10 @@ const PayoutMethodRadioGroupItem = memoWithGetFormProps(function PayoutMethodRad
         message: i18nGraphqlException(intl, e),
       });
     } finally {
+      setFieldValue(`editingPayoutMethod`, {});
       setIsLoadingEditPayoutMethod(false);
     }
-  }, [createPayoutMethod, deletePayoutMethod, intl, onPaymentMethodEdited, toast]);
+  }, [createPayoutMethod, deletePayoutMethod, intl, onPaymentMethodEdited, toast, setFieldValue]);
 
   if (isDeleted) {
     return null;
@@ -690,7 +743,10 @@ const PayoutMethodRadioGroupItem = memoWithGetFormProps(function PayoutMethodRad
                   disabled={isLoadingEditPayoutMethod || props.isSubmitting}
                   loading={isLoadingEditPayoutMethod || props.isSubmitting}
                   variant="secondary"
-                  onClick={() => setIsEditingPayoutMethod(false)}
+                  onClick={() => {
+                    setIsEditingPayoutMethod(false);
+                    setFieldValue(`editingPayoutMethod`, {});
+                  }}
                 >
                   <FormattedMessage defaultMessage="Cancel" id="actions.cancel" />
                 </Button>

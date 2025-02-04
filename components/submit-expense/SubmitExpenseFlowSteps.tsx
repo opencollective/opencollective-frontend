@@ -31,7 +31,12 @@ export enum Step {
 const StepValues: Record<Step, Path<ExpenseFormValues>[]> = {
   [Step.WHO_IS_PAYING]: ['accountSlug'],
   [Step.WHO_IS_GETTING_PAID]: ['payeeSlug', 'inviteeNewIndividual', 'inviteeNewOrganization'],
-  [Step.PAYOUT_METHOD]: ['payoutMethodId', 'newPayoutMethod', 'payoutMethodNameDiscrepancyReason'],
+  [Step.PAYOUT_METHOD]: [
+    'payoutMethodId',
+    'newPayoutMethod',
+    'payoutMethodNameDiscrepancyReason',
+    'editingPayoutMethod',
+  ],
   [Step.TYPE_OF_EXPENSE]: [
     'expenseTypeOption',
     'acknowledgedCollectiveInvoiceExpensePolicy',

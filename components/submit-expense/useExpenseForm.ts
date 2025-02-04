@@ -124,7 +124,7 @@ export type ExpenseFormValues = {
     type?: PayoutMethodType;
     name?: string;
     isSaved?: boolean;
-    data?: { currency?: string } & Record<string, unknown>;
+    data?: { currency?: string; accountHolderName?: string } & Record<string, unknown>;
   };
 
   editingPayoutMethod?: Record<string, ExpenseFormValues['newPayoutMethod']>;
@@ -952,6 +952,21 @@ function buildFormSchema(
           message: 'Required',
         },
       ),
+    editingPayoutMethod: z
+      .object({})
+      .nullish()
+      .refine(
+        () => {
+          if (isEmpty(values.editingPayoutMethod)) {
+            return true;
+          }
+
+          return false;
+        },
+        {
+          message: 'Required',
+        },
+      ),
     newPayoutMethod: z.object({
       type: z
         .nativeEnum(PayoutMethodType)
@@ -1640,6 +1655,11 @@ export function useExpenseForm(opts: {
       setFieldValue('tax', null);
     }
   }, [formOptions.taxType, setFieldValue]);
+
+  React.useEffect(() => {
+    setFieldValue('payoutMethodNameDiscrepancyReason', '');
+    setFieldTouched('payoutMethodNameDiscrepancyReason', false);
+  }, [expenseForm.values.payoutMethodId, setFieldValue, setFieldTouched]);
 
   React.useEffect(() => {
     if (
