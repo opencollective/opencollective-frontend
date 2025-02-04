@@ -68,7 +68,13 @@ export const ComboSelect = React.memo(function ComboSelect(props: ComboSelectPro
 
   if (!isSearchable) {
     return (
-      <Select open={open} onOpenChange={setOpen} onValueChange={onChangeCallback} value={props.value}>
+      <Select
+        open={open}
+        onOpenChange={setOpen}
+        onValueChange={onChangeCallback}
+        value={props.value}
+        disabled={props.disabled}
+      >
         <SelectTrigger
           className={cn({ 'text-muted-foreground': !props.value }, props.className)}
           id={props.id}
@@ -91,6 +97,7 @@ export const ComboSelect = React.memo(function ComboSelect(props: ComboSelectPro
       <PopoverTrigger asChild>
         <Button
           id={props.id}
+          disabled={props.disabled}
           data-cy={props['data-cy']}
           variant="outline"
           role="combobox"

@@ -134,6 +134,7 @@ const Input = ({ input, getFieldName, disabled, loading, refetch, formik }) => {
     return (
       <div className="mt-2 flex-1" key={input.key}>
         <FormField
+          disabled={disabled}
           name={fieldName}
           label={input.name}
           placeholder={input.example}
@@ -155,7 +156,7 @@ const Input = ({ input, getFieldName, disabled, loading, refetch, formik }) => {
   } else if (input.type === 'radio' || input.type === 'select') {
     return (
       <div className="mt-2 flex-1">
-        <FormField name={fieldName} label={input.name} hint={input.hint} required={required}>
+        <FormField disabled={disabled} name={fieldName} label={input.name} hint={input.hint} required={required}>
           {({ field }) => (
             <ComboSelect
               {...field}
@@ -319,6 +320,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
   return (
     <div className="mt-2 flex flex-col">
       <FormField
+        disabled={disabled}
         name={transactionMethodFieldName}
         label={transactionMethodLabel}
         validate={validateRequiredInput(intl, { name: transactionMethodLabel }, !disabled)}
@@ -431,7 +433,15 @@ const availableCurrenciesQuery = gql`
  *   * If `fixedCurrency` is set, we don't need `availableCurrencies`
  *   * If `fixedCurrency` is not set, we'll fetch `availableCurrencies` from the Platform Wise account
  */
-const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, ignoreBlockedCurrencies, optional }) => {
+const PayoutBankInformationForm = ({
+  isNew,
+  getFieldName,
+  host,
+  fixedCurrency,
+  ignoreBlockedCurrencies,
+  optional,
+  disabled,
+}) => {
   const { data, loading } = useQuery(availableCurrenciesQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: WISE_PLATFORM_COLLECTIVE_SLUG, ignoreBlockedCurrencies },
@@ -533,7 +543,7 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
       <FormField
         name={currencyFieldName}
         label={formatMessage(msg.currency)}
-        disabled={Boolean(fixedCurrency && !optional) || !isNew}
+        disabled={Boolean(fixedCurrency && !optional) || !isNew || disabled}
         validate={validateCurrencyMinimumAmount}
       >
         {({ field }) => {
@@ -551,7 +561,7 @@ const PayoutBankInformationForm = ({ isNew, getFieldName, host, fixedCurrency, i
       {selectedCurrency && (
         <DetailsForm
           currency={selectedCurrency}
-          disabled={!isNew}
+          disabled={!isNew || disabled}
           formik={formik}
           getFieldName={getFieldName}
           host={wiseHost}
@@ -578,6 +588,7 @@ PayoutBankInformationForm.propTypes = {
       availableCurrencies: PropTypes.arrayOf(PropTypes.object),
     }),
   }),
+  disabled: PropTypes.bool,
   isNew: PropTypes.bool,
   optional: PropTypes.bool,
   ignoreBlockedCurrencies: PropTypes.bool,

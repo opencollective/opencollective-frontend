@@ -39,7 +39,7 @@ type WhoIsGettingPaidSectionProps = {
 
 function getFormProps(form: ExpenseForm) {
   return {
-    ...pick(form, 'initialLoading', 'setFieldValue', 'setFieldTouched', 'refresh'),
+    ...pick(form, 'initialLoading', 'setFieldValue', 'setFieldTouched', 'refresh', 'isSubmitting'),
     ...pick(form.options, [
       'payoutProfiles',
       'recentlySubmittedExpenses',
@@ -134,6 +134,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
   return (
     <RadioGroup
       id="payeeSlug"
+      disabled={props.isSubmitting}
       value={props.payeeSlug}
       onValueChange={payeeSlug => {
         setFieldValue('payeeSlug', payeeSlug);
@@ -142,6 +143,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
     >
       {!isLoading && lastUsedProfile && lastUsedProfile?.slug !== personalProfile?.slug && (
         <RadioGroupCard
+          disabled={props.isSubmitting}
           value={lastUsedProfile.slug}
           showSubcontent={props.payeeSlug === lastUsedProfile.slug && isEmpty(lastUsedProfile.legalName)}
           subContent={<LegalNameWarning account={lastUsedProfile} onLegalNameUpdate={props.refresh} />}
@@ -153,7 +155,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
       {(personalProfile || isLoading) && (
         <RadioGroupCard
           value={!isLoading ? personalProfile.slug : ''}
-          disabled={isLoading}
+          disabled={isLoading || props.isSubmitting}
           checked={isLoading ? false : props.payeeSlug === personalProfile.slug}
           showSubcontent={!isLoading && props.payeeSlug === personalProfile.slug && isEmpty(personalProfile.legalName)}
           subContent={<LegalNameWarning account={personalProfile} onLegalNameUpdate={props.refresh} />}
@@ -167,9 +169,11 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
           value="__findAccountIAdminister"
           checked={isMyOtherProfilesSelected}
           showSubcontent={isMyOtherProfilesSelected}
+          disabled={props.isSubmitting}
           subContent={
             <div>
               <CollectivePicker
+                disabled={props.isSubmitting}
                 collectives={otherProfiles}
                 collective={props.payeeSlug === '__findAccountIAdminister' ? null : props.payee}
                 onChange={e => {
@@ -189,11 +193,12 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
           value="__inviteSomeone"
           checked={['__inviteSomeone', '__invite', '__inviteExistingUser'].includes(props.payeeSlug)}
           showSubcontent={['__inviteSomeone', '__invite', '__inviteExistingUser'].includes(props.payeeSlug)}
-          disabled={props.initialLoading}
+          disabled={props.initialLoading || props.isSubmitting}
           subContent={
             <div>
               <CollectivePickerAsync
                 inputId="payee-invite-picker"
+                disabled={props.isSubmitting}
                 onFocus={() => props.setFieldValue('payeeSlug', '__inviteSomeone')}
                 invitable
                 collective={props.payeeSlug === '__inviteExistingUser' ? props.payee : null}
@@ -221,6 +226,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
                   <Separator className="mt-3" />
                   <div className="mt-3">
                     <StyledInputFormikField
+                      disabled={props.isSubmitting}
                       isFastField
                       label={intl.formatMessage({ defaultMessage: 'Notes for the recipient (optional)', id: 'd+MntU' })}
                       name="inviteNote"
@@ -236,6 +242,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
                   <Separator className="mt-3" />
                   <div className="mt-3">
                     <InviteUserOption
+                      isSubmitting={props.isSubmitting}
                       inviteeAccountType={props.inviteeAccountType}
                       setFieldValue={props.setFieldValue}
                       lockedFields={props.lockedFields}
@@ -255,11 +262,12 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
           value=""
           checked
           showSubcontent
-          disabled={props.initialLoading}
+          disabled={props.initialLoading || props.isSubmitting}
           subContent={
             <div>
               <InviteUserOption
                 hideNotesField
+                isSubmitting={props.isSubmitting}
                 setFieldValue={setFieldValue}
                 inviteeAccountType={props.inviteeAccountType}
                 lockedFields={props.lockedFields}
@@ -288,6 +296,7 @@ function VendorOptionWrapper() {
 
   return (
     <VendorOption
+      isSubmitting={form.isSubmitting}
       setFieldValue={form.setFieldValue}
       payeeSlug={form.values.payeeSlug}
       payee={form.options.payee}
@@ -299,6 +308,7 @@ function VendorOptionWrapper() {
 // eslint-disable-next-line prefer-arrow-callback
 const VendorOption = React.memo(function VendorOption(props: {
   setFieldValue: ExpenseForm['setFieldValue'];
+  isSubmitting: ExpenseForm['isSubmitting'];
   payeeSlug: ExpenseForm['values']['payeeSlug'];
   payee: ExpenseForm['options']['payee'];
   vendors: ExpenseForm['options']['vendors'];
@@ -312,9 +322,11 @@ const VendorOption = React.memo(function VendorOption(props: {
           value="__vendor"
           checked={isVendorSelected}
           showSubcontent={isVendorSelected}
+          disabled={props.isSubmitting}
           subContent={
             <div>
               <CollectivePicker
+                disabled={props.isSubmitting}
                 collectives={props.vendors}
                 collective={props.payeeSlug === '__vendor' ? null : props.payee}
                 onChange={e => {

@@ -41,7 +41,7 @@ type PayoutMethodSectionProps = {
 
 function getFormProps(form: ExpenseForm) {
   return {
-    ...pick(form, ['setFieldTouched', 'setFieldValue', 'initialLoading', 'refresh']),
+    ...pick(form, ['setFieldTouched', 'setFieldValue', 'initialLoading', 'refresh', 'isSubmitting']),
     ...pick(form.values, ['payeeSlug', 'payoutMethodId']),
     ...pick(form.options, [
       'payee',
@@ -167,6 +167,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
       ) : (
         <RadioGroup
           id="payoutMethodId"
+          disabled={props.isSubmitting}
           value={props.payoutMethodId}
           onValueChange={payoutMethodId => {
             setFieldValue('payoutMethodId', payoutMethodId);
@@ -195,7 +196,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
             <RadioGroupCard
               value="__newPayoutMethod"
               checked={isNewPayoutMethodSelected}
-              disabled={isLoading || props.initialLoading}
+              disabled={isLoading || props.initialLoading || props.isSubmitting}
               showSubcontent={!props.initialLoading && isNewPayoutMethodSelected}
               subContent={<NewPayoutMethodOptionWrapper />}
             >
@@ -241,7 +242,7 @@ type NewPayoutMethodOptionProps = ReturnType<typeof getNewPayoutMethodOptionForm
 
 function getNewPayoutMethodOptionFormProps(form: ExpenseForm) {
   return {
-    ...pick(form, ['setFieldValue', 'setFieldTouched', 'validateForm', 'refresh']),
+    ...pick(form, ['setFieldValue', 'setFieldTouched', 'validateForm', 'refresh', 'isSubmitting']),
     ...pick(form.values, ['newPayoutMethod', 'payeeSlug']),
     ...pick(form.options, ['supportedPayoutMethods', 'host', 'loggedInAccount']),
     touchedNewPayoutMethod: form.touched.newPayoutMethod,
@@ -334,18 +335,25 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
       ) : (
         <React.Fragment>
           <FormField
+            disabled={props.isSubmitting}
             label={intl.formatMessage({ defaultMessage: 'Choose a payout method', id: 'SlAq2H' })}
             isPrivate
             name="newPayoutMethod.type"
           >
             {({ field }) => (
-              <ComboSelect {...field} options={suportedPayoutMethodComboOptions} onChange={onPayoutMethodTypeChange} />
+              <ComboSelect
+                {...field}
+                disabled={props.isSubmitting}
+                options={suportedPayoutMethodComboOptions}
+                onChange={onPayoutMethodTypeChange}
+              />
             )}
           </FormField>
 
           {props.newPayoutMethod?.type && (
             <React.Fragment>
               <PayoutMethodForm
+                disabled={props.isSubmitting}
                 required
                 alwaysSave
                 fieldsPrefix="newPayoutMethod"
@@ -354,6 +362,7 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
               />
               <div>
                 <FormField
+                  disabled={props.isSubmitting}
                   name="newPayoutMethod.name"
                   label={intl.formatMessage({ defaultMessage: 'Name', id: 'Fields.name' })}
                   onFocus={() => setFieldTouched('newPayoutMethod.name', true)}
@@ -362,6 +371,7 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
                 {props.newPayoutMethod.name !==
                   generatePayoutMethodName(props.newPayoutMethod.type, props.newPayoutMethod.data) && (
                   <Button
+                    disabled={props.isSubmitting}
                     size="xs"
                     variant="link"
                     className="p-0"
@@ -377,7 +387,12 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
       )}
 
       {props.loggedInAccount && (
-        <Button loading={creatingPayoutMethod} onClick={onSaveButtonClick} className="mt-2">
+        <Button
+          loading={creatingPayoutMethod || props.isSubmitting}
+          disabled={props.isSubmitting}
+          onClick={onSaveButtonClick}
+          className="mt-2"
+        >
           <FormattedMessage defaultMessage="Save" id="save" />
         </Button>
       )}
@@ -393,7 +408,7 @@ function PayoutMethodRadioGroupItemWrapper(props: PayoutMethodRadioGroupItemProp
 
 function getPayoutMethodRadioGroupItemFormProps(form: ExpenseForm) {
   return {
-    ...pick(form, ['setFieldValue', 'setFieldTouched', 'refresh']),
+    ...pick(form, ['setFieldValue', 'setFieldTouched', 'refresh', 'isSubmitting']),
     ...pick(form.values, ['payeeSlug', 'editingPayoutMethod']),
     ...pick(form.options, ['payee', 'host']),
     touchedEditingPayoutMethod: form.touched.editingPayoutMethod,
@@ -626,6 +641,7 @@ const PayoutMethodRadioGroupItem = memoWithGetFormProps(function PayoutMethodRad
       <RadioGroupCard
         value={props.payoutMethod.id}
         showSubcontent={isOpen}
+        disabled={props.isSubmitting}
         asChild
         subContent={
           isEditingPayoutMethod ? (
@@ -642,6 +658,7 @@ const PayoutMethodRadioGroupItem = memoWithGetFormProps(function PayoutMethodRad
                     host={props.host}
                   />
                   <FormField
+                    disabled={props.isSubmitting}
                     label={intl.formatMessage({ defaultMessage: 'Name', id: 'Fields.name' })}
                     name={`editingPayoutMethod.${props.payoutMethod.id}.name`}
                   >
@@ -655,6 +672,8 @@ const PayoutMethodRadioGroupItem = memoWithGetFormProps(function PayoutMethodRad
                   {editPayoutMethodValue?.name !==
                     generatePayoutMethodName(editPayoutMethodValue.type, editPayoutMethodValue.data) && (
                     <Button
+                      disabled={props.isSubmitting}
+                      loading={props.isSubmitting}
                       size="xs"
                       variant="link"
                       className="p-0"
@@ -668,7 +687,8 @@ const PayoutMethodRadioGroupItem = memoWithGetFormProps(function PayoutMethodRad
 
               <div className="mt-4 flex justify-end gap-2">
                 <Button
-                  disabled={isLoadingEditPayoutMethod}
+                  disabled={isLoadingEditPayoutMethod || props.isSubmitting}
+                  loading={isLoadingEditPayoutMethod || props.isSubmitting}
                   variant="secondary"
                   onClick={() => setIsEditingPayoutMethod(false)}
                 >
@@ -775,11 +795,17 @@ const PayoutMethodRadioGroupItem = memoWithGetFormProps(function PayoutMethodRad
         {!isEditingPayoutMethod && props.isEditable && (
           <div className="flex gap-2">
             {props.isChecked && (
-              <Button onClick={onEditClick} size="icon-xs" variant="ghost">
+              <Button disabled={props.isSubmitting} onClick={onEditClick} size="icon-xs" variant="ghost">
                 <Pencil size={16} />
               </Button>
             )}
-            <Button className="text-muted-foreground" onClick={onDeleteClick} size="icon-xs" variant="ghost">
+            <Button
+              disabled={props.isSubmitting}
+              className="text-muted-foreground"
+              onClick={onDeleteClick}
+              size="icon-xs"
+              variant="ghost"
+            >
               <Trash2 size={16} />
             </Button>
           </div>

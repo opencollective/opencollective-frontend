@@ -12,6 +12,7 @@ import { type ExpenseForm, InviteeAccountType } from '../useExpenseForm';
 type InviteUserOptionProps = {
   hideNotesField?: boolean;
   setFieldValue: ExpenseForm['setFieldValue'];
+  isSubmitting: ExpenseForm['isSubmitting'];
   inviteeAccountType: ExpenseForm['values']['inviteeAccountType'];
   lockedFields: ExpenseForm['options']['lockedFields'];
 };
@@ -30,12 +31,14 @@ export function InviteUserOption(props: InviteUserOptionProps) {
           >
             <TabsList>
               <TabsTrigger
+                disabled={props.isSubmitting}
                 value={InviteeAccountType.INDIVIDUAL}
                 className="data-[state=active]:text-blue-900 data-[state=active]:shadow-sm"
               >
                 <FormattedMessage defaultMessage="Personal Account" id="Sch2bu" />
               </TabsTrigger>
               <TabsTrigger
+                disabled={props.isSubmitting}
                 value={InviteeAccountType.ORGANIZATION}
                 className="data-[state=active]:text-blue-900 data-[state=active]:shadow-sm"
               >

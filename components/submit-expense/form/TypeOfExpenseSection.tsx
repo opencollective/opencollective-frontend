@@ -30,6 +30,7 @@ function getFormProps(form: ExpenseForm) {
   return {
     setFieldValue: form.setFieldValue,
     initialLoading: form.initialLoading,
+    isSubmitting: form.isSubmitting,
     ...pick(form.options, ['isAdminOfPayee', 'account', 'host', 'payee', 'lockedFields']),
     ...pick(form.values, [
       'expenseTypeOption',
@@ -88,12 +89,16 @@ export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseS
     >
       <React.Fragment>
         <RadioGroup
-          disabled={isTypeLocked}
+          disabled={isTypeLocked || props.isSubmitting}
           value={expenseTypeOption}
           onValueChange={newValue => props.setFieldValue('expenseTypeOption', newValue as ExpenseType)}
           className="flex"
         >
-          <RadioGroupCard className="grow basis-0" value={ExpenseType.INVOICE} disabled={props.initialLoading}>
+          <RadioGroupCard
+            className="grow basis-0"
+            value={ExpenseType.INVOICE}
+            disabled={props.initialLoading || props.isSubmitting}
+          >
             <div>
               <div className="mb-1 font-bold">
                 <FormattedMessage defaultMessage="Invoice" id="Expense.Type.Invoice" />
@@ -104,7 +109,11 @@ export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseS
             </div>
           </RadioGroupCard>
 
-          <RadioGroupCard className="grow basis-0" value={ExpenseType.RECEIPT} disabled={props.initialLoading}>
+          <RadioGroupCard
+            className="grow basis-0"
+            value={ExpenseType.RECEIPT}
+            disabled={props.initialLoading || props.isSubmitting}
+          >
             <div>
               <div className="mb-1 font-bold">
                 <FormattedMessage defaultMessage="Reimbursement" id="ExpenseForm.ReceiptLabel" />
@@ -186,10 +195,10 @@ export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseS
               className="space-y-4"
             >
               <TabsList className="flex-wrap">
-                <TabsTrigger value={YesNoOption.YES}>
+                <TabsTrigger value={YesNoOption.YES} disabled={props.isSubmitting}>
                   <FormattedMessage defaultMessage="Yes, I have an invoice" id="woKQYE" />
                 </TabsTrigger>
-                <TabsTrigger value={YesNoOption.NO}>
+                <TabsTrigger value={YesNoOption.NO} disabled={props.isSubmitting}>
                   <FormattedMessage defaultMessage="No, generate an invoice for me" id="67idHB" />
                 </TabsTrigger>
               </TabsList>
@@ -199,6 +208,7 @@ export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseS
                     <div>
                       <FormField
                         required={props.isAdminOfPayee || props.payee?.type === CollectiveType.VENDOR}
+                        disabled={props.isSubmitting}
                         name="invoiceFile"
                         isPrivate
                         label={attachInvoiceLabel}
@@ -227,6 +237,7 @@ export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseS
                   <div className="grow basis-0">
                     <FormField
                       required={props.isAdminOfPayee || props.payee?.type === CollectiveType.VENDOR}
+                      disabled={props.isSubmitting}
                       name="invoiceNumber"
                       isPrivate
                       label={intl.formatMessage({ defaultMessage: 'Invoice number', id: 'ijDMrP' })}

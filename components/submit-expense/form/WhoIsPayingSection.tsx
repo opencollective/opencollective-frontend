@@ -26,6 +26,7 @@ function getFormProps(form: ExpenseForm) {
     ...pick(form.options, ['recentlySubmittedExpenses', 'account', 'canChangeAccount']),
     ...pick(form.values, ['accountSlug']),
     accountSlugTouched: form.touched.accountSlug,
+    isSubmitting: form.isSubmitting,
   };
 }
 
@@ -71,7 +72,7 @@ export const WhoIsPayingSection = memoWithGetFormProps(function WhoIsPayingSecti
     >
       <RadioGroup
         id="accountSlug"
-        disabled={!props.canChangeAccount}
+        disabled={!props.canChangeAccount || props.isSubmitting}
         value={props.accountSlug}
         onValueChange={accountSlug => {
           setFieldValue('accountSlug', accountSlug);
@@ -81,7 +82,7 @@ export const WhoIsPayingSection = memoWithGetFormProps(function WhoIsPayingSecti
         {!isLoading &&
           props.canChangeAccount &&
           recentlySubmittedAccounts.map(a => (
-            <RadioGroupCard key={a.slug} value={a.slug}>
+            <RadioGroupCard key={a.slug} value={a.slug} disabled={props.isSubmitting}>
               <ExpenseAccountItem account={a} />
             </RadioGroupCard>
           ))}
@@ -97,8 +98,10 @@ export const WhoIsPayingSection = memoWithGetFormProps(function WhoIsPayingSecti
             value="__find"
             checked={isFindSelected}
             showSubcontent={isFindSelected}
+            disabled={props.isSubmitting}
             subContent={
               <CollectivePickerAsync
+                disabled={props.isSubmitting}
                 autoFocus
                 isSearchable
                 filterResults={collectives =>
@@ -122,7 +125,7 @@ export const WhoIsPayingSection = memoWithGetFormProps(function WhoIsPayingSecti
         )}
 
         {!isLoading && !props.canChangeAccount && props.account && (
-          <RadioGroupCard value={props.account.slug}>
+          <RadioGroupCard value={props.account.slug} disabled={props.isSubmitting}>
             <ExpenseAccountItem account={props.account} />
           </RadioGroupCard>
         )}

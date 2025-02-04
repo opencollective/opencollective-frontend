@@ -587,7 +587,7 @@ function RecurrenceOptionBox(props: { form: ExpenseForm }) {
         )}
         {!isEditingRecurrence && (
           <Button
-            disabled={props.form.initialLoading}
+            disabled={props.form.initialLoading || props.form.isSubmitting}
             onClick={() => setIsEdittingRecurrence(true)}
             className="mt-2 p-0 text-sm"
             size="xs"
@@ -605,6 +605,7 @@ function RecurrenceOptionBox(props: { form: ExpenseForm }) {
             </Label>
             <Select
               value={recurrenceFrequency}
+              disabled={props.form.initialLoading || props.form.isSubmitting}
               onValueChange={newValue => setRecurrenceFrequencyEdit(newValue as RecurrenceFrequencyOption)}
             >
               <SelectTrigger data-cy="language-switcher">
@@ -631,12 +632,18 @@ function RecurrenceOptionBox(props: { form: ExpenseForm }) {
                 <Label className="mt-4 mb-2">
                   <FormattedMessage defaultMessage="End Date" id="EndDate" />
                 </Label>
-                <Input type="date" value={recurrenceEndAt} onChange={e => setRecurrenceEndAtEdit(e.target.value)} />
+                <Input
+                  disabled={props.form.initialLoading || props.form.isSubmitting}
+                  type="date"
+                  value={recurrenceEndAt}
+                  onChange={e => setRecurrenceEndAtEdit(e.target.value)}
+                />
               </React.Fragment>
             )}
 
             <div className="mt-4 flex gap-2">
               <Button
+                disabled={props.form.initialLoading || props.form.isSubmitting}
                 onClick={() => {
                   props.form.setFieldValue('recurrenceEndAt', recurrenceEndAtEdit);
                   props.form.setFieldValue('recurrenceFrequency', recurrenceFrequencyEdit);
@@ -647,6 +654,7 @@ function RecurrenceOptionBox(props: { form: ExpenseForm }) {
                 <FormattedMessage defaultMessage="Save changes" id="X0ha1a" />
               </Button>
               <Button
+                disabled={props.form.initialLoading || props.form.isSubmitting}
                 onClick={() => {
                   setRecurrenceEndAtEdit(props.form.values.recurrenceEndAt);
                   setRecurrenceFrequencyEdit(props.form.values.recurrenceFrequency);

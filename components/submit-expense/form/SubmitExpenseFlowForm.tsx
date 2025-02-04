@@ -64,7 +64,11 @@ export function SubmitExpenseFlowForm(props: SubmitExpenseFlowFormProps) {
       <AdditionalDetailsSection inViewChange={onInViewChange} {...AdditionalDetailsSection.getFormProps(form)} />
       <SummarySection inViewChange={onInViewChange} form={form} />
       <div className="flex justify-end">
-        <Button disabled={form.initialLoading} onClick={() => form.handleSubmit()}>
+        <Button
+          disabled={form.initialLoading || form.isSubmitting}
+          loading={form.isSubmitting || form.isValidating}
+          onClick={() => form.handleSubmit()}
+        >
           <FormattedMessage defaultMessage="Submit Expense" id="menu.submitExpense" />
         </Button>
       </div>

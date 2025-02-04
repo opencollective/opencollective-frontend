@@ -24,7 +24,7 @@ type AdditionalDetailsSectionProps = {
 
 function getFormProps(form: ExpenseForm) {
   return {
-    ...pick(form, ['setFieldValue', 'initialLoading']),
+    ...pick(form, ['setFieldValue', 'initialLoading', 'isSubmitting']),
     ...pick(form.options, ['host', 'account', 'lockedFields']),
     ...pick(form.values, [
       'expenseTypeOption',
@@ -48,7 +48,11 @@ export const AdditionalDetailsSection = memoWithGetFormProps(function Additional
   return (
     <FormSectionContainer step={Step.EXPENSE_TITLE} inViewChange={props.inViewChange}>
       <FormField
-        disabled={props.initialLoading || props.lockedFields?.includes?.(ExpenseLockableFields.DESCRIPTION)}
+        disabled={
+          props.initialLoading ||
+          props.lockedFields?.includes?.(ExpenseLockableFields.DESCRIPTION) ||
+          props.isSubmitting
+        }
         name="title"
         placeholder={intl.formatMessage({ defaultMessage: 'Mention a brief expense title', id: 'Te2Yc2' })}
       />
@@ -88,6 +92,7 @@ export const AdditionalDetailsSection = memoWithGetFormProps(function Additional
         )}
         {!props.initialLoading && collectiveSlug && (
           <AutocompleteEditTags
+            disabled={props.isSubmitting}
             query={expenseTagsQuery}
             variables={{ account: { slug: collectiveSlug } }}
             onChange={tags =>
