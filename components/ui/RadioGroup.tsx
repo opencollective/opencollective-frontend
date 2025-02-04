@@ -47,7 +47,7 @@ const RadioGroupCard = React.forwardRef<
 >(({ className, children, showSubcontent, subContent, ...props }, ref) => {
   return (
     <div
-      className={`rounded-lg bg-card text-sm text-card-foreground ring-1 shadow-xs ring-border has-data-[state=checked]:ring-2 has-data-[state=checked]:ring-ring [&:has(:focus-visible)]:bg-primary/5`}
+      className={`rounded-lg bg-card text-sm text-card-foreground ring-1 shadow-xs ring-border has-data-[state=checked]:ring-2 has-data-[state=checked]:ring-ring [&:has([role="radio"]:focus-visible)]:bg-primary/5`}
     >
       <RadioGroupPrimitive.Item
         ref={ref}
