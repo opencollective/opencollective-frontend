@@ -489,7 +489,7 @@ function ExpenseFormikContainer(props: {
         activeStep={activeStep}
       />
 
-      <div className="mx-auto h-max w-full px-4 pb-4 sm:w-[760px] sm:px-0">
+      <div className="mx-auto h-max w-full px-4 pb-4 sm:w-auto sm:max-w-[760px] sm:overflow-x-hidden sm:px-0">
         <form ref={formRef} onSubmit={e => e.preventDefault()}>
           <SubmitExpenseFlowForm
             onNextClick={() => setActiveStep(Step.SUMMARY)}

@@ -73,11 +73,11 @@ export function SummarySection(props: SummarySectionProps) {
           />
         </div>
       )}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="mt-4 min-h-32 grow basis-0 rounded-md border border-gray-300 p-4 text-sm">
+      <div className="mt-4 grid grid-cols-2 gap-4">
+        <div className="col-span-2 grow basis-0 rounded-md border border-gray-300 p-4 text-sm sm:col-span-1 sm:min-h-32">
           <WhoIsPayingSummarySection account={props.form.options.account} />
         </div>
-        <div className="mt-4 min-h-32 grow basis-0 rounded-md border border-gray-300 p-4 text-sm">
+        <div className="col-span-2 grow basis-0 rounded-md border border-gray-300 p-4 text-sm sm:col-span-1 sm:min-h-32">
           <WhoIsGettingPaidSummarySection payee={props.form.options.payee} invitee={props.form.options.invitee} />
         </div>
         <div className="col-span-2 h-fit grow basis-0 rounded-md border border-gray-300 p-4 text-sm">
@@ -187,7 +187,9 @@ const ExpenseItemsSection = React.memo(function ExpenseItemSection(
 
   return (
     <React.Fragment>
-      <Label className="mb-4 font-bold">Items</Label>
+      <Label className="mb-4 font-bold">
+        <FormattedMessage defaultMessage="Items" id="yNmV/R" />
+      </Label>
       {props.expenseItems.map(ei => (
         <div
           key={`${ei.description}-${ei.incurredAt}-${ei.amount?.valueInCents}`}

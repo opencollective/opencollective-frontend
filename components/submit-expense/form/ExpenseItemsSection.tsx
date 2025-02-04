@@ -280,7 +280,7 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
 
   return (
     <div className="mb-4 rounded-md border border-slate-300 p-4">
-      <div className="flex gap-4">
+      <div className="flex flex-wrap gap-4">
         {hasAttachment && (
           <div className="flex flex-col">
             <div className="flex grow justify-center">
@@ -321,7 +321,7 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
               name={`expenseItems.${props.index}.description`}
             />
           </div>
-          <div className="flex gap-4">
+          <div className="flex flex-wrap gap-4">
             <div className="grow basis-0">
               <FormField
                 required={props.isAdminOfPayee}

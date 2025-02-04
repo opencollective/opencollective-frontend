@@ -185,7 +185,7 @@ export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseS
               onValueChange={newValue => props.setFieldValue('hasInvoiceOption', newValue as YesNoOption)}
               className="space-y-4"
             >
-              <TabsList>
+              <TabsList className="flex-wrap">
                 <TabsTrigger value={YesNoOption.YES}>
                   <FormattedMessage defaultMessage="Yes, I have an invoice" id="woKQYE" />
                 </TabsTrigger>
