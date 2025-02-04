@@ -668,7 +668,21 @@ function buildFormSchema(
           message: 'Required',
         },
       ),
-    title: z.string().min(1),
+    title: z
+      .string()
+      .nullish()
+      .refine(
+        v => {
+          if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
+            return true;
+          }
+
+          return v.length > 0;
+        },
+        {
+          message: 'Required',
+        },
+      ),
     reference: z.string().optional(),
     tags: z.array(z.string()).optional(),
     expenseAttachedFiles: z
@@ -1346,7 +1360,9 @@ async function buildFormOptions(
 
       // Allow setting this flag to true with the `isInlineEdit` flag in start options to enable full editing experience (i.e. editing payotu method)
       options.isAdminOfPayee =
-        startOptions.isInlineEdit || options.payoutProfiles.some(p => p.slug === values.payeeSlug);
+        startOptions.isInlineEdit ||
+        options.payoutProfiles.some(p => p.slug === values.payeeSlug) ||
+        values.payeeSlug === '__findAccountIAdminister';
     } else {
       options.payoutMethod = values.newPayoutMethod;
     }

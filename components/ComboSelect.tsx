@@ -47,7 +47,8 @@ type ComboSelectProps = {
   'data-cy'?: string;
 };
 
-export function ComboSelect(props: ComboSelectProps) {
+// eslint-disable-next-line prefer-arrow-callback
+export const ComboSelect = React.memo(function ComboSelect(props: ComboSelectProps) {
   const [open, setOpen] = React.useState(false);
   const intl = useIntl();
   const isSearchable = props.isSearchable ?? props.options?.length > 8;
@@ -56,14 +57,18 @@ export function ComboSelect(props: ComboSelectProps) {
     : (props.placeholder ?? intl.formatMessage(Messages.placeholder));
   const selectedOption = props.options.find(option => option.value === props.value);
 
-  const onChange = (val: string) => {
-    props.onChange(val);
-    setOpen(false);
-  };
+  const { onChange } = props;
+  const onChangeCallback = React.useCallback(
+    (val: string) => {
+      onChange(val);
+      setOpen(false);
+    },
+    [onChange],
+  );
 
   if (!isSearchable) {
     return (
-      <Select open={open} onOpenChange={setOpen} onValueChange={onChange} value={props.value}>
+      <Select open={open} onOpenChange={setOpen} onValueChange={onChangeCallback} value={props.value}>
         <SelectTrigger
           className={cn({ 'text-muted-foreground': !props.value }, props.className)}
           id={props.id}
@@ -107,7 +112,7 @@ export function ComboSelect(props: ComboSelectProps) {
                   key={option.value}
                   value={option.value}
                   keywords={option.keywords || (isString(option.label) ? [option.label] : undefined)}
-                  onSelect={onChange}
+                  onSelect={onChangeCallback}
                   data-cy="select-option"
                 >
                   <Check className={cn('mr-2 h-4 w-4', props.value === option.value ? 'opacity-100' : 'opacity-0')} />
@@ -120,4 +125,4 @@ export function ComboSelect(props: ComboSelectProps) {
       </PopoverContent>
     </Popover>
   );
-}
+});

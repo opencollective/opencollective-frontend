@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import type { FormikProps } from 'formik';
 import { Field } from 'formik';
 import { pickBy } from 'lodash';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { isOCError } from '../lib/errors';
 import { formatFormErrorMessage, RICH_ERROR_MESSAGES } from '../lib/form-utils';
@@ -86,7 +86,17 @@ export function FormField({
           <div className={cn('flex w-full flex-col gap-1', className)}>
             {label && (
               <Label className="leading-normal" htmlFor={htmlFor}>
-                {label}
+                {label ? (
+                  'required' in fieldAttributes && !fieldAttributes.required ? (
+                    <FormattedMessage
+                      id="OptionalFieldLabel"
+                      defaultMessage="{field} (optional)"
+                      values={{ field: label }}
+                    />
+                  ) : (
+                    label
+                  )
+                ) : null}
                 {isPrivate && (
                   <React.Fragment>
                     &nbsp;

@@ -313,6 +313,20 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
     }
   }, [createPayoutMethod, intl, props.newPayoutMethod, refresh, setFieldTouched, setFieldValue, toast, validateForm]);
 
+  const suportedPayoutMethodComboOptions = React.useMemo(
+    () =>
+      props.supportedPayoutMethods.map(m => ({
+        value: m,
+        label: intl.formatMessage(I18nPayoutMethodLabels[m]),
+      })),
+    [intl, props.supportedPayoutMethods],
+  );
+
+  const onPayoutMethodTypeChange = React.useCallback(
+    value => setFieldValue('newPayoutMethod.type', value as PayoutMethodType),
+    [setFieldValue],
+  );
+
   return (
     <div className="space-y-3 p-2">
       {creatingPayoutMethod ? (
@@ -325,14 +339,7 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
             name="newPayoutMethod.type"
           >
             {({ field }) => (
-              <ComboSelect
-                {...field}
-                options={props.supportedPayoutMethods.map(m => ({
-                  value: m,
-                  label: intl.formatMessage(I18nPayoutMethodLabels[m]),
-                }))}
-                onChange={value => setFieldValue('newPayoutMethod.type', value as PayoutMethodType)}
-              />
+              <ComboSelect {...field} options={suportedPayoutMethodComboOptions} onChange={onPayoutMethodTypeChange} />
             )}
           </FormField>
 

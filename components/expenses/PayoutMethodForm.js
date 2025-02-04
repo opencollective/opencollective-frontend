@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Field } from 'formik';
+import { Field, useFormikContext } from 'formik';
 import { compact, get, set } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
 import { isEmail } from 'validator';
@@ -70,21 +70,29 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host, required, alwaysSa
   const intl = useIntl();
   const { formatMessage } = intl;
   const isNew = !payoutMethod.id;
+  const form = useFormikContext();
 
-  const getFieldName = field => compact([fieldsPrefix, field]).join('.');
+  const getFieldName = React.useCallback(field => compact([fieldsPrefix, field]).join('.'), [fieldsPrefix]);
+  const currencyFieldName = getFieldName('data.currency');
+
+  const { setFieldValue } = form;
+  const onCurrencyPickerChange = React.useCallback(
+    currency => {
+      setFieldValue(currencyFieldName, currency);
+    },
+    [currencyFieldName, setFieldValue],
+  );
 
   return (
     <div className="space-y-3">
       {payoutMethod.type === PayoutMethodType.PAYPAL && (
         <React.Fragment>
-          <FormField name={getFieldName('data.currency')} label={formatMessage(msg.currency)}>
-            {({ field, form }) => (
+          <FormField name={currencyFieldName} label={formatMessage(msg.currency)}>
+            {({ field }) => (
               <CurrencyPicker
                 inputId={field.id}
                 name={field.name}
-                onChange={currency => {
-                  form.setFieldValue(getFieldName('data.currency'), currency);
-                }}
+                onChange={onCurrencyPickerChange}
                 value={field.value}
               />
             )}
@@ -101,14 +109,12 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host, required, alwaysSa
       )}
       {payoutMethod.type === PayoutMethodType.OTHER && (
         <React.Fragment>
-          <FormField name={getFieldName('data.currency')} label={formatMessage(msg.currency)}>
-            {({ field, form }) => (
+          <FormField name={currencyFieldName} label={formatMessage(msg.currency)}>
+            {({ field }) => (
               <CurrencyPicker
                 inputId={field.id}
                 name={field.name}
-                onChange={currency => {
-                  form.setFieldValue(getFieldName('data.currency'), currency);
-                }}
+                onChange={onCurrencyPickerChange}
                 value={field.value}
               />
             )}
