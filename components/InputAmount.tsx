@@ -7,10 +7,11 @@ import { Currency, ZERO_DECIMAL_CURRENCIES } from '@/lib/constants/currency';
 import { floatAmountToCents, getCurrencySymbol, getDefaultCurrencyPrecision } from '@/lib/currency-utils';
 import { cn } from '@/lib/utils';
 
-import { StyledCurrencyPicker } from '@/components/StyledCurrencyPicker';
 import StyledSpinner from '@/components/StyledSpinner';
 import { InputGroup } from '@/components/ui/Input';
 import { Separator } from '@/components/ui/Separator';
+
+import CurrencyPicker from './CurrencyPicker';
 
 const formatCurrencyName = (currency, currencyDisplay) => {
   if (currencyDisplay === 'SYMBOL') {
@@ -131,28 +132,6 @@ ConvertedAmountInput.propTypes = {
   maxFxRate: PropTypes.number,
 };
 
-/** Some custom styles to integrate the currency picker nicely */
-const CURRENCY_PICKER_STYLES = {
-  control: {
-    border: 'none',
-    background: '#F7F8FA',
-    minHeight: '37px', // 39px - 2px border
-  },
-  menu: {
-    width: '280px',
-  },
-  valueContainer: {
-    padding: '0 0 0 8px',
-  },
-  input: {
-    margin: '0',
-  },
-  dropdownIndicator: {
-    paddingLeft: '0',
-    paddingRight: '6px',
-  },
-};
-
 /**
  * An input for amount inputs.
  */
@@ -210,22 +189,19 @@ const InputAmount = ({
       disabled={disabled}
       prepend={
         !hasCurrencyPicker ? (
-          <div className="flex items-center bg-neutral-50 p-2 text-sm whitespace-nowrap text-neutral-800">
+          <div className="flex items-center p-2 text-sm whitespace-nowrap">
             {formatCurrencyName(currency, currencyDisplay)}
           </div>
         ) : (
-          <div className="">
-            <StyledCurrencyPicker
-              data-cy={`${props.id}-currency-picker`}
-              inputId={`${props.id}-currency-picker`}
-              onChange={onCurrencyChange}
-              value={currency}
-              availableCurrencies={availableCurrencies}
-              disabled={disabled}
-              minWidth="95px"
-              styles={CURRENCY_PICKER_STYLES}
-            />
-          </div>
+          <CurrencyPicker
+            data-cy={`${props.id}-currency-picker`}
+            id={`${props.id}-currency-picker`}
+            onChange={onCurrencyChange}
+            value={currency}
+            availableCurrencies={availableCurrencies}
+            disabled={disabled}
+            className="w-24 rounded-none border-0 bg-muted px-2 focus-visible:bg-primary/20 focus-visible:ring-0"
+          />
         )
       }
       prependClassName="px-0 py-0"

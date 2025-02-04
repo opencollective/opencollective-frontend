@@ -101,7 +101,7 @@ export const ComboSelect = React.memo(function ComboSelect(props: ComboSelectPro
           <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-(--radix-popover-trigger-width) p-0" data-cy="select-content">
+      <PopoverContent align="start" className="w-(--radix-popover-trigger-width) min-w-sm p-0" data-cy="select-content">
         <Command>
           <CommandInput placeholder={props.inputPlaceholder || intl.formatMessage(Messages.inputPlaceholder)} />
           <CommandList>
