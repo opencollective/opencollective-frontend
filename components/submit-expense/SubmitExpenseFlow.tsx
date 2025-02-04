@@ -414,7 +414,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
           </header>
           <main className="flex w-full grow overflow-hidden">
             <div className="flex w-full grow justify-center">
-              <div className="relative flex w-full flex-col overflow-y-scroll sm:flex sm:flex-row sm:gap-11 sm:px-8 sm:pt-10">
+              <div className="relative flex w-full flex-col justify-center overflow-y-scroll sm:flex sm:flex-row sm:gap-11 sm:px-8 sm:pt-10">
                 <ExpenseFormikContainer
                   submitExpenseTo={props.submitExpenseTo}
                   draftKey={props.draftKey}
@@ -484,12 +484,9 @@ function ExpenseFormikContainer(props: {
 
   return (
     <FormikProvider value={expenseForm}>
-      <SubmitExpenseFlowSteps
-        className="sticky top-0 hidden w-[250px] min-w-[180px] sm:block"
-        activeStep={activeStep}
-      />
+      <SubmitExpenseFlowSteps className="sticky top-0 hidden w-64 min-w-44 sm:block" activeStep={activeStep} />
 
-      <div className="mx-auto h-max w-full px-4 pb-4 sm:w-[760px] sm:px-0">
+      <div className="h-max w-full px-4 pb-4 sm:w-3xl sm:px-0">
         <form ref={formRef} onSubmit={e => e.preventDefault()}>
           <SubmitExpenseFlowForm
             onNextClick={() => setActiveStep(Step.SUMMARY)}
