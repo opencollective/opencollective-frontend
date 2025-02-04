@@ -503,7 +503,7 @@ const ExportTransactionsCSVModal = ({
                         />
                         <label
                           htmlFor={tab}
-                          className="cursor-pointer text-sm leading-none font-bold peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                          className="cursor-pointer text-sm leading-none font-bold! peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                         >
                           <FormattedMessage id="ExportTransactionsCSVModal.SelectAll" defaultMessage="Select all" />
                         </label>
@@ -525,7 +525,7 @@ const ExportTransactionsCSVModal = ({
                                   />
                                   <label
                                     htmlFor={fieldId}
-                                    className="ml-1 cursor-pointer text-sm leading-none font-normal peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                    className="ml-1 cursor-pointer text-sm leading-none font-normal! peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                   >
                                     {field?.label || fieldId}
                                   </label>
