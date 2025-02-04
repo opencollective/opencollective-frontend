@@ -86,17 +86,15 @@ export function FormField({
           <div className={cn('flex w-full flex-col gap-1', className)}>
             {label && (
               <Label className="leading-normal" htmlFor={htmlFor}>
-                {label ? (
-                  'required' in fieldAttributes && !fieldAttributes.required ? (
-                    <FormattedMessage
-                      id="OptionalFieldLabel"
-                      defaultMessage="{field} (optional)"
-                      values={{ field: label }}
-                    />
-                  ) : (
-                    label
-                  )
-                ) : null}
+                {'required' in fieldAttributes && !fieldAttributes.required ? (
+                  <FormattedMessage
+                    id="OptionalFieldLabel"
+                    defaultMessage="{field} (optional)"
+                    values={{ field: label }}
+                  />
+                ) : (
+                  label
+                )}
                 {isPrivate && (
                   <React.Fragment>
                     &nbsp;

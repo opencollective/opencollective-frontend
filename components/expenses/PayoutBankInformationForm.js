@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { useFormikContext } from 'formik';
-import { compact, get, kebabCase, partition, set } from 'lodash';
+import { compact, get, kebabCase, partition } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../lib/currency-utils';
@@ -85,7 +85,7 @@ const CUSTOM_METHOD_LABEL_BY_CURRENCY = {
 const validateRequiredInput = (intl, input, required) =>
   required ? value => (value ? undefined : intl.formatMessage(msg.fieldRequired, { name: input.name })) : undefined;
 
-const Input = ({ input, getFieldName, disabled, currency, loading, refetch, formik, host }) => {
+const Input = ({ input, getFieldName, disabled, loading, refetch, formik }) => {
   const intl = useIntl();
   const isAccountHolderName = input.key === 'accountHolderName';
   const fieldName = isAccountHolderName ? getFieldName(input.key) : getFieldName(`details.${input.key}`);
@@ -100,29 +100,14 @@ const Input = ({ input, getFieldName, disabled, currency, loading, refetch, form
   );
 
   const { setFieldValue } = formik;
-  const rootFieldName = getFieldName('');
   const comboOnChange = React.useCallback(
     value => {
       setFieldValue(fieldName, value);
       if (input.refreshRequirementsOnChange && refetch) {
-        refetch({
-          slug: host ? host.slug : WISE_PLATFORM_COLLECTIVE_SLUG,
-          currency,
-          // dependency on formik.values will cause rerender on any other form field change..
-          accountDetails: get(set({ ...formik.values }, fieldName, value), rootFieldName),
-        });
+        refetch();
       }
     },
-    [
-      currency,
-      fieldName,
-      formik.values,
-      rootFieldName,
-      host,
-      input.refreshRequirementsOnChange,
-      refetch,
-      setFieldValue,
-    ],
+    [fieldName, input.refreshRequirementsOnChange, refetch, setFieldValue],
   );
 
   let validate = validateRequiredInput(intl, input, required);
@@ -229,6 +214,7 @@ FieldGroup.propTypes = {
 
 const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
   const intl = useIntl();
+  const needsRefetchRef = React.useRef(false);
   const { loading, error, data, refetch } = useQuery(requiredFieldsQuery, {
     context: API_V2_CONTEXT,
     // A) If `fixedCurrency` was passed in PayoutBankInformationForm (2) (3)
@@ -238,6 +224,22 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
     //      * The Collective Host doesn't have Wise configured and `host` is already switched to the Platform account
     variables: { slug: host ? host.slug : WISE_PLATFORM_COLLECTIVE_SLUG, currency },
   });
+
+  const doRefetchOnChange = React.useCallback(() => {
+    needsRefetchRef.current = true;
+  }, []);
+
+  const accountDetails = get(formik.values, getFieldName(''));
+  React.useEffect(() => {
+    if (needsRefetchRef.current) {
+      needsRefetchRef.current = false;
+      refetch({
+        slug: host ? host.slug : WISE_PLATFORM_COLLECTIVE_SLUG,
+        currency,
+        accountDetails: accountDetails,
+      });
+    }
+  }, [currency, accountDetails, host, refetch]);
 
   // Make sure we load the form data on initial load. Otherwise certain form fields such
   // as the state field in the "Recipient's Address" section might not be visible on first load
@@ -259,14 +261,13 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
   const dataFieldName = getFieldName(`data`);
 
   const { setFieldValue } = formik;
+  const { type, currency: formCurrencyValue } = get(formik.values, dataFieldName);
   const onComboChange = React.useCallback(
     value => {
-      // dependency on formik.values will cause rerender on any field change...
-      const { type, currency } = get(formik.values, dataFieldName);
-      setFieldValue(dataFieldName, { type, currency });
+      setFieldValue(dataFieldName, { type, currency: formCurrencyValue });
       setFieldValue(transactionMethodFieldName, value);
     },
-    [dataFieldName, formik.values, setFieldValue, transactionMethodFieldName],
+    [dataFieldName, setFieldValue, transactionMethodFieldName, type, formCurrencyValue],
   );
 
   if (loading && !data) {
@@ -356,7 +357,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
               host={host}
               key={kebabCase(field.name)}
               loading={loading}
-              refetch={refetch}
+              refetch={doRefetchOnChange}
             />
           ))}
         </div>
@@ -385,7 +386,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency }) => {
               host={host}
               key={kebabCase(field.name)}
               loading={loading}
-              refetch={refetch}
+              refetch={doRefetchOnChange}
             />
           ))}
         </React.Fragment>
