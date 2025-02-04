@@ -619,6 +619,7 @@ const PayoutMethodRadioGroupItem = memoWithGetFormProps(function PayoutMethodRad
       <RadioGroupCard
         value={props.payoutMethod.id}
         showSubcontent={isOpen}
+        asChild
         subContent={
           isEditingPayoutMethod ? (
             <React.Fragment>
