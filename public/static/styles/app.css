@@ -391,12 +391,6 @@ h4 {
 }
 
 /* TODO: Migrate away from these default styles below */
-label {
-  font-size: 14px;
-  display: inline-block;
-  font-weight: 700;
-}
-
 summary {
   color: #337ab7;
   cursor: pointer;
