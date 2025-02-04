@@ -486,7 +486,7 @@ function ExpenseFormikContainer(props: {
     <FormikProvider value={expenseForm}>
       <SubmitExpenseFlowSteps className="sticky top-0 hidden w-64 min-w-44 sm:block" activeStep={activeStep} />
 
-      <div className="h-max w-full px-4 pb-4 sm:w-3xl sm:px-0">
+      <div className="h-max w-full px-4 pb-4 sm:max-w-3xl sm:overflow-x-hidden sm:px-0">
         <form ref={formRef} onSubmit={e => e.preventDefault()}>
           <SubmitExpenseFlowForm
             onNextClick={() => setActiveStep(Step.SUMMARY)}

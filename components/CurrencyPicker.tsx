@@ -16,13 +16,15 @@ const generateCurrencyOptions = (intl, availableCurrencies) => {
     return {
       value: currency,
       label: (
-        <div className="" title={currencyName}>
+        <div className="@container flex-1 overflow-hidden text-left" title={currencyName}>
           {emoji && <span>{emoji}</span>}
           &nbsp;
           <span className="ml-1 whitespace-nowrap">
             <span className="">{currency}</span>
             {` `}
-            <span className="align-middle text-xs text-muted-foreground">{truncate(currencyName, { length: 30 })}</span>
+            <span className="invisible align-middle text-xs text-muted-foreground @2xs:visible">
+              {truncate(currencyName, { length: 30 })}
+            </span>
           </span>
         </div>
       ),
