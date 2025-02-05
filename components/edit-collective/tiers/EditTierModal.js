@@ -563,7 +563,7 @@ FormFields.propTypes = {
 
 const EditSectionContainer = styled(Flex)`
   overflow-y: scroll;
-  grow: 1;
+  flex-grow: 1;
   flex-direction: column;
   padding-right: 0.65rem;
   min-width: 250px;
@@ -576,7 +576,7 @@ const EditSectionContainer = styled(Flex)`
 const PreviewSectionContainer = styled(Flex)`
   overflow: hidden;
   max-height: 600px;
-  grow: 1;
+  flex-grow: 1;
   min-width: 300px;
   justify-content: center;
   @media (max-width: 700px) {
