@@ -121,8 +121,8 @@ const SeparatorLine = styled(props => (
 ))`
   height: 100%;
   z-index: 1;
-  grow: 1;
-  shrink: 1;
+  flex-grow: 1;
+  flex-shrink: 1;
   line {
     stroke-width: 1;
     stroke: #c4c7cc;
@@ -158,7 +158,7 @@ const StepsOuter = styled(Flex)`
 `;
 
 const StepsMobileLeft = styled(Box)`
-  grow: 2;
+  flex-grow: 2;
   flex-direction: column;
 `;
 
@@ -168,7 +168,7 @@ const StepsMobileRight = styled(Flex)`
   height: 56px;
   align-items: center;
   justify-content: center;
-  shrink: 0;
+  flex-shrink: 0;
   position: relative;
 `;
 

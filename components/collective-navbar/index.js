@@ -165,13 +165,13 @@ const CollectiveName = styled(LinkCollective).attrs({
 const CategoriesContainer = styled(Container)`
   background-color: #ffffff;
   max-height: calc(100vh - 70px);
-  shrink: 2;
-  grow: 1;
+  flex-shrink: 2;
+  flex-grow: 1;
   overflow: auto;
 
   @media screen and (max-width: 40em) {
     max-height: none;
-    shrink: 0;
+    flex-shrink: 0;
   }
 
   @media screen and (min-width: 40em) and (max-width: 64em) {
