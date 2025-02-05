@@ -22,7 +22,7 @@ type ExpenseCategorySectionProps = {
 
 function getFormProps(form: ExpenseForm) {
   return {
-    ...pick(form, 'setFieldValue'),
+    ...pick(form, 'setFieldValue', 'isSubmitting'),
     ...pick(form.values, ['accountingCategoryId', 'expenseTypeOption']),
     ...pick(form.options, ['accountingCategories', 'host', 'account', 'isAccountingCategoryRequired']),
   };
@@ -65,6 +65,7 @@ export const ExpenseCategorySection = memoWithGetFormProps(function ExpenseCateg
             {...field}
             id="accountingCategoryId"
             kind="EXPENSE"
+            disabled={props.isSubmitting}
             onChange={onAccountingCategorySelectChange}
             host={host}
             showCode={isHostAdmin}

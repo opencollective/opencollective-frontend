@@ -59,7 +59,10 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
   const { toast } = useToast();
 
   const [submittedExpenseId, setSubmittedExpenseId] = React.useState(null);
-  const [createExpense] = useMutation<CreateExpenseFromDashboardMutation, CreateExpenseFromDashboardMutationVariables>(
+  const [createExpense, createExpenseMutationResult] = useMutation<
+    CreateExpenseFromDashboardMutation,
+    CreateExpenseFromDashboardMutationVariables
+  >(
     gql`
       mutation CreateExpenseFromDashboard(
         $expenseCreateInput: ExpenseCreateInput!
@@ -83,7 +86,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
     },
   );
 
-  const [draftExpenseAndInviteUser] = useMutation<
+  const [draftExpenseAndInviteUser, draftExpenseAndInviteUserMutationResult] = useMutation<
     InviteExpenseFromDashboardMutation,
     InviteExpenseFromDashboardMutationVariables
   >(
@@ -103,7 +106,10 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
     },
   );
 
-  const [editExpense] = useMutation<EditExpenseFromDashboardMutation, EditExpenseFromDashboardMutationVariables>(
+  const [editExpense, editExpenseMutationResult] = useMutation<
+    EditExpenseFromDashboardMutation,
+    EditExpenseFromDashboardMutationVariables
+  >(
     gql`
       mutation EditExpenseFromDashboard($expenseEditInput: ExpenseUpdateInput!, $draftKey: String) {
         expense: editExpense(expense: $expenseEditInput, draftKey: $draftKey) {
@@ -116,6 +122,11 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
       context: API_V2_CONTEXT,
     },
   );
+
+  const isLoading =
+    createExpenseMutationResult.loading ||
+    draftExpenseAndInviteUserMutationResult.loading ||
+    editExpenseMutationResult.loading;
 
   const [confirmNavigation] = useNavigationWarning({
     enabled: !submittedExpenseId,
@@ -305,7 +316,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
         h.setSubmitting(false);
       }
     },
-    [LoggedInUser, createExpense, draftExpenseAndInviteUser, editExpense, intl, toast],
+    [LoggedInUser, createExpense, draftExpenseAndInviteUser, editExpense, intl, props.draftKey, toast],
   );
 
   if (submittedExpenseId) {
@@ -397,6 +408,8 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
               <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
             </span>
             <Button
+              disabled={isLoading}
+              loading={isLoading}
               onClick={handleOnClose}
               variant="ghost"
               className="hidden cursor-pointer items-center gap-2 px-4 py-3 text-base leading-5 font-medium text-slate-800 sm:visible sm:flex"
@@ -408,13 +421,19 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
               </span>
             </Button>
 
-            <Button onClick={handleOnClose} variant="ghost" className="cursor-pointer sm:hidden">
+            <Button
+              onClick={handleOnClose}
+              loading={isLoading}
+              disabled={isLoading}
+              variant="ghost"
+              className="cursor-pointer sm:hidden"
+            >
               <X />
             </Button>
           </header>
           <main className="flex w-full grow overflow-hidden">
             <div className="flex w-full grow justify-center">
-              <div className="relative flex w-full flex-col justify-center overflow-y-scroll sm:flex sm:flex-row sm:gap-11 sm:px-8 sm:pt-10">
+              <div className="relative flex w-full flex-row justify-center overflow-y-scroll pt-10 sm:gap-11 sm:px-8">
                 <ExpenseFormikContainer
                   submitExpenseTo={props.submitExpenseTo}
                   draftKey={props.draftKey}

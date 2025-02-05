@@ -66,7 +66,7 @@ export const validatePayoutMethod = payoutMethod => {
  * This component is **fully controlled**, you need to call `validatePayoutMethod`
  * to proceed with the validation and pass the result with the `errors` prop.
  */
-const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host, required, alwaysSave = false }) => {
+const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host, required, alwaysSave = false, disabled }) => {
   const intl = useIntl();
   const { formatMessage } = intl;
   const isNew = !payoutMethod.id;
@@ -87,9 +87,10 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host, required, alwaysSa
     <div className="space-y-3">
       {payoutMethod.type === PayoutMethodType.PAYPAL && (
         <React.Fragment>
-          <FormField name={currencyFieldName} label={formatMessage(msg.currency)}>
+          <FormField name={currencyFieldName} disabled={disabled} label={formatMessage(msg.currency)}>
             {({ field }) => (
               <CurrencyPicker
+                disabled={disabled}
                 inputId={field.id}
                 name={field.name}
                 onChange={onCurrencyPickerChange}
@@ -101,7 +102,7 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host, required, alwaysSa
             type="email"
             name={getFieldName('data.email')}
             label={formatMessage(msg.paypalEmail)}
-            disabled={!isNew}
+            disabled={!isNew || disabled}
             required={required !== false}
             placeholder="e.g., yourname@yourhost.com"
           />
@@ -109,23 +110,25 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host, required, alwaysSa
       )}
       {payoutMethod.type === PayoutMethodType.OTHER && (
         <React.Fragment>
-          <FormField name={currencyFieldName} label={formatMessage(msg.currency)}>
+          <FormField name={currencyFieldName} disabled={disabled} label={formatMessage(msg.currency)}>
             {({ field }) => (
               <CurrencyPicker
                 inputId={field.id}
+                disabled={disabled}
                 name={field.name}
                 onChange={onCurrencyPickerChange}
                 value={field.value}
               />
             )}
           </FormField>
-          <FormField name={getFieldName('data.content')} label={formatMessage(msg.content)}>
+          <FormField disabled={disabled} name={getFieldName('data.content')} label={formatMessage(msg.content)}>
             {({ field }) => <Textarea {...field} minHeight={100} disabled={!isNew} data-cy="payout-other-info" />}
           </FormField>
         </React.Fragment>
       )}
       {payoutMethod.type === PayoutMethodType.BANK_ACCOUNT && (
         <PayoutBankInformationForm
+          disabled={disabled}
           isNew={isNew}
           getFieldName={getFieldName}
           host={host}
@@ -139,6 +142,7 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host, required, alwaysSa
               <div className="flex items-center gap-2">
                 <Checkbox
                   {...field}
+                  disabled={disabled}
                   id={field.name}
                   checked={field.value}
                   onCheckedChange={val => form.setFieldValue(field.name, val)}
@@ -171,6 +175,7 @@ PayoutMethodForm.propTypes = {
   /** Base name of the field in the form */
   fieldsPrefix: PropTypes.string,
   required: PropTypes.bool,
+  disabled: PropTypes.bool,
   alwaysSave: PropTypes.bool,
 };
 

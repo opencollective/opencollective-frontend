@@ -107,6 +107,7 @@ const EditTags = ({ suggestedTags, loading, searchFunc, value, onChange, default
       <Popover>
         <PopoverTrigger asChild>
           <Button
+            disabled={disabled}
             size="xs"
             variant="outline"
             className="h-6 gap-1 border-dashed text-xs text-muted-foreground"
@@ -121,6 +122,7 @@ const EditTags = ({ suggestedTags, loading, searchFunc, value, onChange, default
         <PopoverContent className="max-w-48 p-0">
           <Command>
             <CommandInput
+              disabled={disabled}
               customIcon={!hasSearch ? TagsIcon : Search}
               placeholder={intl.formatMessage({ defaultMessage: 'Add tag', id: 'Un1mxZ' })}
               value={inputValue}

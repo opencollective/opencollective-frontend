@@ -68,7 +68,7 @@ export function ExpenseItemsSection(props: ExpenseItemsSectionProps) {
 
 function getExpenseItemFormProps(form: ExpenseForm) {
   return {
-    ...pick(form, ['setFieldValue', 'initialLoading']),
+    ...pick(form, ['setFieldValue', 'initialLoading', 'isSubmitting']),
     ...pick(form.options, ['expenseCurrency', 'totalInvoicedInExpenseCurrency', 'taxType', 'lockedFields']),
     ...pick(form.values, ['tax', 'hasTax', 'expenseItems']),
     expenseItemCount: form.values.expenseItems?.length || 0,
@@ -98,7 +98,7 @@ export const ExpenseItemsForm = memoWithGetFormProps(function ExpenseItemsForm(
                 onClick={() => {
                   setFieldValue('expenseItems', [...expenseItems.slice(0, i), ...expenseItems.slice(i + 1)]);
                 }}
-                disabled={expenseItems.length === 1 || isAmountLocked}
+                disabled={expenseItems.length === 1 || isAmountLocked || props.isSubmitting}
                 variant="outline"
                 size="icon-sm"
               >
@@ -116,7 +116,7 @@ export const ExpenseItemsForm = memoWithGetFormProps(function ExpenseItemsForm(
       <div className="flex justify-between pr-12">
         <Button
           variant="outline"
-          disabled={props.initialLoading || isAmountLocked}
+          disabled={props.initialLoading || isAmountLocked || props.isSubmitting}
           onClick={() =>
             setFieldValue('expenseItems', [
               ...expenseItems,
@@ -190,7 +190,13 @@ export const ExpenseItemsForm = memoWithGetFormProps(function ExpenseItemsForm(
       {props.taxType && (
         <React.Fragment>
           <div className="my-4 border-t border-gray-200" />
-          <Taxes hasTax={props.hasTax} taxType={props.taxType} setFieldValue={setFieldValue} tax={props.tax} />
+          <Taxes
+            hasTax={props.hasTax}
+            taxType={props.taxType}
+            setFieldValue={setFieldValue}
+            tax={props.tax}
+            isSubmitting={props.isSubmitting}
+          />
         </React.Fragment>
       )}
     </React.Fragment>
@@ -205,7 +211,7 @@ type ExpenseItemProps = {
 
 function getExpenseItemProps(form: ExpenseForm) {
   return {
-    ...pick(form, ['setFieldValue']),
+    ...pick(form, ['setFieldValue', 'isSubmitting']),
     ...pick(form.options, ['allowExpenseItemAttachment', 'isAdminOfPayee', 'expenseCurrency']),
   };
 }
@@ -285,6 +291,7 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
           <div className="flex flex-col">
             <div className="flex grow justify-center">
               <FormField
+                disabled={props.isSubmitting}
                 label={intl.formatMessage({ defaultMessage: 'Upload file', id: '6oOCCL' })}
                 name={`expenseItems.${props.index}.attachment`}
               >
@@ -293,6 +300,7 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
                     <MemoizedDropzone
                       {...attachmentDropzoneParams}
                       {...field}
+                      disabled={props.isSubmitting}
                       kind="EXPENSE_ITEM"
                       id={attachmentId}
                       name={attachmentId}
@@ -316,6 +324,7 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
           <div className="mb-2">
             <FormField
               required={props.isAdminOfPayee}
+              disabled={props.isSubmitting}
               label={intl.formatMessage({ defaultMessage: 'Item Description', id: 'xNL/oy' })}
               placeholder={intl.formatMessage({ defaultMessage: 'Enter what best describes the item', id: '/eapvj' })}
               name={`expenseItems.${props.index}.description`}
@@ -325,6 +334,7 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
             <div className="grow basis-0">
               <FormField
                 required={props.isAdminOfPayee}
+                disabled={props.isSubmitting}
                 label={intl.formatMessage({ defaultMessage: 'Date', id: 'expense.incurredAt' })}
                 name={`expenseItems.${props.index}.incurredAt`}
               >
@@ -338,7 +348,7 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
             <div className="grow basis-0">
               <div className="flex flex-col">
                 <FormField
-                  disabled={props.isAmountLocked}
+                  disabled={props.isAmountLocked || props.isSubmitting}
                   label={intl.formatMessage({ defaultMessage: 'Amount', id: 'Fields.amount' })}
                   name={`expenseItems.${props.index}.amount.valueInCents`}
                 >
@@ -411,7 +421,7 @@ type AdditionalAttachmentsProps = ReturnType<typeof getAdditionalAttachmentFormP
 
 function getAdditionalAttachmentFormProps(form: ExpenseForm) {
   return {
-    ...pick(form, ['initialLoading', 'setFieldValue']),
+    ...pick(form, ['initialLoading', 'setFieldValue', 'isSubmitting']),
     ...pick(form.values, ['additionalAttachments']),
   };
 }
@@ -451,7 +461,7 @@ export const AdditionalAttachments = memoWithGetFormProps(function AdditionalAtt
             kind="EXPENSE_ATTACHED_FILE"
             className="size-28"
             isMulti
-            disabled={props.initialLoading}
+            disabled={props.initialLoading || props.isSubmitting}
             isLoading={props.initialLoading}
             useGraphQL={true}
             parseDocument={false}
@@ -465,6 +475,7 @@ export const AdditionalAttachments = memoWithGetFormProps(function AdditionalAtt
           <div key={typeof at === 'string' ? at : at.id}>
             <Dropzone
               {...attachmentDropzoneParams}
+              disabled={props.isSubmitting}
               name={typeof at === 'string' ? at : at.name}
               className="size-28"
               value={typeof at === 'string' ? at : at?.url}
@@ -498,6 +509,7 @@ const i18nTaxRate = (intl: IntlShape, taxType: TaxType, rate: number) => {
 
 const Taxes = React.memo(function Taxes(props: {
   setFieldValue: ExpenseForm['setFieldValue'];
+  isSubmitting: ExpenseForm['isSubmitting'];
   tax: ExpenseForm['values']['tax'];
   hasTax: ExpenseForm['values']['hasTax'];
   taxType: ExpenseForm['options']['taxType'];
@@ -516,7 +528,12 @@ const Taxes = React.memo(function Taxes(props: {
       <FormField label={intl.formatMessage({ defaultMessage: 'Taxes', id: 'r+dgiv' })} name="hasTax">
         {() => (
           <div className="items-top mt-1 flex space-x-2">
-            <Checkbox id="hasTax" checked={props.hasTax} onCheckedChange={onHasTaxChange} />
+            <Checkbox
+              id="hasTax"
+              disabled={props.isSubmitting}
+              checked={props.hasTax}
+              onCheckedChange={onHasTaxChange}
+            />
             <Label className="font-normal" htmlFor="hasTax">
               <FormattedMessage
                 defaultMessage="Apply {taxName}"
@@ -535,6 +552,7 @@ const Taxes = React.memo(function Taxes(props: {
           {props.hasTax && props.taxType === TaxType.GST && (
             <FormField
               name="tax.rate"
+              disabled={props.isSubmitting}
               htmlFor={`input-${props.taxType}-rate`}
               label={intl.formatMessage(
                 { defaultMessage: '{taxName} rate', id: 'Gsyrfa' },
@@ -544,6 +562,7 @@ const Taxes = React.memo(function Taxes(props: {
             >
               {({ field }) => (
                 <StyledSelect
+                  disabled={props.isSubmitting}
                   inputId={`input-${props.taxType}-rate`}
                   value={{
                     value: round(field.value * 100, 2),
@@ -562,6 +581,7 @@ const Taxes = React.memo(function Taxes(props: {
           {props.hasTax && props.taxType === TaxType.VAT && (
             <FormField
               name="tax.rate"
+              disabled={props.isSubmitting}
               htmlFor={`input-${props.taxType}-rate`}
               label={intl.formatMessage(
                 { defaultMessage: '{taxName} rate', id: 'Gsyrfa' },
@@ -599,6 +619,7 @@ const Taxes = React.memo(function Taxes(props: {
               { id: 'examples', defaultMessage: 'e.g., {examples}' },
               { examples: props.taxType === TaxType.VAT ? 'EU000011111' : '123456789' },
             )}
+            disabled={props.isSubmitting}
           />
         )}
       </div>
