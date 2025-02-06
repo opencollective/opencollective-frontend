@@ -1,6 +1,6 @@
 import React from 'react';
 import { CreditCard } from '@styled-icons/fa-solid/CreditCard';
-import { find, get, omit, pick, sortBy, uniqBy } from 'lodash';
+import { find, get, pick, sortBy, uniqBy } from 'lodash';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
 import { canContributeRecurring, getCollectivePageMetadata } from '../../lib/collective';
@@ -344,7 +344,7 @@ export const getRequiredInformation = (stepProfile, stepDetails, collective, pro
   if (selectedProfile) {
     totalAmount += selectedProfile.totalContributedToHost?.valueInCents || 0;
   }
-  const thresholds = omit(collective?.policies?.CONTRIBUTOR_INFO_THRESHOLDS, ['__typename']);
+  const thresholds = collective?.policies?.CONTRIBUTOR_INFO_THRESHOLDS;
   return {
     legalName: tier?.requireAddress || tier?.type === TierTypes.TICKET || totalAmount >= thresholds?.legalName,
     address: tier?.requireAddress || totalAmount >= thresholds?.address,
