@@ -65,7 +65,7 @@ function commonScenarios(expenseType: 'invoice' | 'reimbursement') {
     cy.wrap(userSlug).as('userSlug');
     cy.signup({
       user: { name: userSlug, email: `oc-test-${userSlug}@opencollective.com` },
-      redirect: `/dashboard/${userSlug}/submitted-expenses?newExpenseFlowEnabled`,
+      redirect: `/dashboard/${userSlug}/submitted-expenses?newExpenseFlowEnabled=true`,
     });
 
     cy.get<string>('@userSlug').then(userSlug =>
