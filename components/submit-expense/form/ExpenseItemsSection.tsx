@@ -86,27 +86,29 @@ export const ExpenseItemsForm = memoWithGetFormProps(function ExpenseItemsForm(
 
   return (
     <React.Fragment>
-      {!props.initialLoading &&
-        expenseItems?.map((ei, i) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <div key={i} className="flex gap-4">
-            <div className="grow">
-              <ExpenseItemWrapper index={i} isAmountLocked={isAmountLocked} />
+      <div role="list">
+        {!props.initialLoading &&
+          expenseItems?.map((ei, i) => (
+            // eslint-disable-next-line react/no-array-index-key
+            <div key={i} role="listitem" className="flex gap-4">
+              <div className="grow">
+                <ExpenseItemWrapper index={i} isAmountLocked={isAmountLocked} />
+              </div>
+              <div>
+                <Button
+                  onClick={() => {
+                    setFieldValue('expenseItems', [...expenseItems.slice(0, i), ...expenseItems.slice(i + 1)]);
+                  }}
+                  disabled={expenseItems.length === 1 || isAmountLocked || props.isSubmitting}
+                  variant="outline"
+                  size="icon-sm"
+                >
+                  <Trash2 size={16} />
+                </Button>
+              </div>
             </div>
-            <div>
-              <Button
-                onClick={() => {
-                  setFieldValue('expenseItems', [...expenseItems.slice(0, i), ...expenseItems.slice(i + 1)]);
-                }}
-                disabled={expenseItems.length === 1 || isAmountLocked || props.isSubmitting}
-                variant="outline"
-                size="icon-sm"
-              >
-                <Trash2 size={16} />
-              </Button>
-            </div>
-          </div>
-        ))}
+          ))}
+      </div>
 
       {props.initialLoading && (
         <div className="mb-4">
@@ -235,7 +237,6 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
 
   const hasAttachment = props.allowExpenseItemAttachment;
 
-  const amountId = useId();
   const attachmentId = useId();
 
   const { setFieldValue } = props;
@@ -359,8 +360,6 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
                       hasCurrencyPicker
                       currency={item.amount.currency || 'USD'}
                       onCurrencyChange={onCurrencyChange}
-                      id={amountId}
-                      name={amountId}
                       value={item.amount.valueInCents}
                       onChange={onAmountChange}
                       exchangeRate={
@@ -457,6 +456,7 @@ export const AdditionalAttachments = memoWithGetFormProps(function AdditionalAtt
         <div>
           <Dropzone
             {...attachmentDropzoneParams}
+            id="additionalAttachments"
             name="additionalAttachments"
             kind="EXPENSE_ATTACHED_FILE"
             className="size-28"
