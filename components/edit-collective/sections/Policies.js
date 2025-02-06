@@ -350,7 +350,7 @@ const Policies = ({ collective }) => {
               />
             </P>
 
-            <div className="mb-2 mt-4 text-sm font-bold">
+            <div className="mt-4 mb-2 text-sm font-bold">
               <FormattedMessage defaultMessage="Required Fields" id="Uh5tDl" />
             </div>
             <p className="mb-2 text-sm">
