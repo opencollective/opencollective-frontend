@@ -111,7 +111,7 @@ export default function usePaymentIntent({
     // If this hook is called again during component rerender and we still have a in-flight payment intent, abort it.
     // Without the abort controller, we can get another payment intent created for a previous render that will be unused
     // and will make the form render again with the setStripe, setPaymentIntent state changes. This also prevents generating
-    // to many incomplete payment intents on stripe
+    // too many incomplete payment intents on stripe
     if (!abort.current.signal.aborted) {
       abort.current.abort();
     }
