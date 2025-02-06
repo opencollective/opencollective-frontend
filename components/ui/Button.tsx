@@ -8,7 +8,7 @@ import { cn } from '../../lib/utils';
 import StyledSpinner from '../StyledSpinner';
 
 const buttonVariants = cva(
-  'relative inline-flex items-center justify-center gap-1 rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50',
+  'relative inline-flex cursor-pointer items-center justify-center gap-1 rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       variant: {
