@@ -40,10 +40,7 @@ const StepProfileLoggedInForm = ({ profiles, onChange, collective, tier, data, s
     () => getRequiredInformation(data, stepDetails, collective, profiles, tier),
     [data, stepDetails, profiles, collective, tier],
   );
-  const isContributingFromSameHost = React.useMemo(
-    () => data?.host?.id === collective.host.legacyId,
-    [data, collective],
-  );
+  const isContributingFromSameHost = data?.host?.id === collective.host.legacyId;
 
   return (
     <Fragment>
