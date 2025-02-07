@@ -14,8 +14,6 @@ import { editCollectivePolicyMutation } from '../../../lib/graphql/v1/mutations'
 import { stripHTML } from '../../../lib/html';
 import { omitDeep } from '../../../lib/utils';
 
-import { Switch } from '@/components/ui/Switch';
-
 import Container from '../../Container';
 import { Flex } from '../../Grid';
 import { getI18nLink } from '../../I18nFormatters';
@@ -30,6 +28,7 @@ import StyledInputAmount from '../../StyledInputAmount';
 import StyledInputField from '../../StyledInputField';
 import StyledSelect from '../../StyledSelect';
 import { P } from '../../Text';
+import { Switch } from '../../ui/Switch';
 import { useToast } from '../../ui/useToast';
 
 import { getSettingsQuery } from './EditCollectivePage';
