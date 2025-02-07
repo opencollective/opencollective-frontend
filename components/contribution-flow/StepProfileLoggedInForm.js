@@ -12,7 +12,7 @@ import { P, Span } from '../Text';
 
 import ContributeProfilePicker from './ContributeProfilePicker';
 import StepProfileInfoMessage from './StepProfileInfoMessage';
-import { contributionRequiresAddress, contributionRequiresLegalName } from './utils';
+import { getRequiredInformation } from './utils';
 
 export const NEW_ORGANIZATION_KEY = 'newOrg';
 
@@ -35,7 +35,11 @@ const getProfileInfo = (stepProfile, profiles) => {
 };
 
 const StepProfileLoggedInForm = ({ profiles, onChange, collective, tier, data, stepDetails }) => {
-  const profileInfo = getProfileInfo(data, profiles);
+  const profileInfo = React.useMemo(() => getProfileInfo(data, profiles), [data, profiles]);
+  const requiredInformation = React.useMemo(
+    () => getRequiredInformation(data, stepDetails, collective, profiles, tier),
+    [data, stepDetails, profiles, collective, tier],
+  );
   const isContributingFromSameHost = data?.host?.id === collective.host.legacyId;
 
   return (
@@ -48,7 +52,7 @@ const StepProfileLoggedInForm = ({ profiles, onChange, collective, tier, data, s
           onChange={profile => onChange({ stepProfile: profile, stepPayment: null })}
         />
       </Box>
-      {!isContributingFromSameHost && contributionRequiresLegalName(stepDetails, tier) && (
+      {!isContributingFromSameHost && requiredInformation.legalName && (
         <React.Fragment>
           {!data?.isIncognito && (
             <StyledInputField
@@ -96,7 +100,7 @@ const StepProfileLoggedInForm = ({ profiles, onChange, collective, tier, data, s
           </StyledInputField>
         </React.Fragment>
       )}
-      {!isContributingFromSameHost && contributionRequiresAddress(stepDetails, tier) && (
+      {!isContributingFromSameHost && requiredInformation.address && (
         <React.Fragment>
           <Flex alignItems="center" my="14px">
             <P fontSize="24px" lineHeight="32px" fontWeight="500" mr={2}>

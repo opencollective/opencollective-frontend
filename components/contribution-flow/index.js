@@ -602,7 +602,7 @@ class ContributionFlow extends React.Component {
         window.scrollTo(0, 0);
         return false;
       }
-      return validateGuestProfile(stepProfile, stepDetails, this.props.tier);
+      return validateGuestProfile(stepProfile, stepDetails, this.props.tier, this.props.collective);
     }
 
     // Check if we're creating a new profile
@@ -774,7 +774,8 @@ class ContributionFlow extends React.Component {
     const minAmount = this.getTierMinAmount(tier, currency);
     const noPaymentRequired = minAmount === 0 && (isFixedContribution || stepDetails?.amount === 0);
     const isStepProfileCompleted = Boolean(
-      (stepProfile && LoggedInUser) || (stepProfile?.isGuest && validateGuestProfile(stepProfile, stepDetails, tier)),
+      (stepProfile && LoggedInUser) ||
+        (stepProfile?.isGuest && validateGuestProfile(stepProfile, stepDetails, tier, collective)),
     );
 
     const steps = [

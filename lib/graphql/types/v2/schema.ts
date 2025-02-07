@@ -1851,6 +1851,12 @@ export type Collective_Minimum_Admins = {
   numberOfAdmins?: Maybe<Scalars['Int']['output']>;
 };
 
+export type Contributor_Info_Thresholds = {
+  __typename?: 'CONTRIBUTOR_INFO_THRESHOLDS';
+  address?: Maybe<Scalars['Int']['output']>;
+  legalName?: Maybe<Scalars['Int']['output']>;
+};
+
 /** Captcha related information */
 export type CaptchaInput = {
   /** Catpcha provider */
@@ -2690,6 +2696,17 @@ export type ContributorProfile = {
   __typename?: 'ContributorProfile';
   /** The account that will be used to create the contribution */
   account?: Maybe<Account>;
+  /** The account that will receive the contribution */
+  forAccount?: Maybe<Account>;
+  /** The total amount contributed to the host by this contributor */
+  totalContributedToHost?: Maybe<Amount>;
+};
+
+
+/** This represents a profile that can be use to create a contribution */
+export type ContributorProfileTotalContributedToHostArgs = {
+  inCollectiveCurrency?: InputMaybe<Scalars['Boolean']['input']>;
+  since?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 /** A conversation thread */
@@ -9827,6 +9844,8 @@ export type Policies = {
   COLLECTIVE_ADMINS_CAN_REFUND?: Maybe<Scalars['Boolean']['output']>;
   COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS?: Maybe<Scalars['Boolean']['output']>;
   COLLECTIVE_MINIMUM_ADMINS?: Maybe<Collective_Minimum_Admins>;
+  /** Contribution threshold to enforce contributor info. This resolver can be called from the collective or the host, when resolved through the collective the thresholds are returned in the collective currency */
+  CONTRIBUTOR_INFO_THRESHOLDS?: Maybe<Contributor_Info_Thresholds>;
   EXPENSE_AUTHOR_CANNOT_APPROVE?: Maybe<Expense_Author_Cannot_Approve>;
   EXPENSE_CATEGORIZATION?: Maybe<Expense_Categorization>;
   EXPENSE_POLICIES?: Maybe<Expense_Policies>;
@@ -9849,6 +9868,11 @@ export type PoliciesCollectiveMinimumAdminsInput = {
   numberOfAdmins?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type PoliciesContributorInfoThresholdsInput = {
+  address?: InputMaybe<Scalars['Int']['input']>;
+  legalName?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export type PoliciesExpenseCategorizationInput = {
   requiredForCollectiveAdmins?: InputMaybe<Scalars['Boolean']['input']>;
   requiredForExpenseSubmitters?: InputMaybe<Scalars['Boolean']['input']>;
@@ -9864,6 +9888,7 @@ export type PoliciesInput = {
   COLLECTIVE_ADMINS_CAN_REFUND?: InputMaybe<Scalars['Boolean']['input']>;
   COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS?: InputMaybe<Scalars['Boolean']['input']>;
   COLLECTIVE_MINIMUM_ADMINS?: InputMaybe<PoliciesCollectiveMinimumAdminsInput>;
+  CONTRIBUTOR_INFO_THRESHOLDS?: InputMaybe<PoliciesContributorInfoThresholdsInput>;
   EXPENSE_AUTHOR_CANNOT_APPROVE?: InputMaybe<PoliciesCollectiveExpenseAuthorCannotApprove>;
   EXPENSE_CATEGORIZATION?: InputMaybe<PoliciesExpenseCategorizationInput>;
   EXPENSE_POLICIES?: InputMaybe<PoliciesExpensePolicies>;

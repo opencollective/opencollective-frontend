@@ -7,6 +7,13 @@ export const contributionFlowAccountQuery = gql`
     account(slug: $collectiveSlug, throwIfMissing: false) {
       id
       ...ContributionFlowAccountFields
+      policies {
+        id
+        CONTRIBUTOR_INFO_THRESHOLDS {
+          legalName
+          address
+        }
+      }
     }
     me {
       contributorProfiles(forAccount: { slug: $collectiveSlug }) {
@@ -35,6 +42,10 @@ export const contributionFlowAccountQuery = gql`
               imageUrl(height: 64)
             }
           }
+        }
+        totalContributedToHost(inCollectiveCurrency: true) {
+          valueInCents
+          currency
         }
       }
     }
