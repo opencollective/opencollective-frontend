@@ -10,6 +10,7 @@ type Fields =
   | 'legalName'
   | 'description'
   | 'website'
+  | 'tags'
   | 'currency'
   | 'approvedAt'
   | 'balance'
@@ -133,6 +134,11 @@ export const FIELDS: Array<{
     id: 'currency',
     group: 'about',
     label: <FormattedMessage id="Currency" defaultMessage="Currency" />,
+  },
+  {
+    id: 'tags',
+    group: 'about',
+    label: <FormattedMessage id="Tags" defaultMessage="Tags" />,
   },
   {
     id: 'approvedAt',

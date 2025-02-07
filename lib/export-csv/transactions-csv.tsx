@@ -74,7 +74,11 @@ export type CSVField =
   | 'importSourceDescription'
   | 'importSourceAmount'
   | 'importSourceDate'
-  | 'importSourceData';
+  | 'importSourceData'
+  | 'orderContributorAddress'
+  | 'orderContributorCountry'
+  | 'expensePayeeAddress'
+  | 'expensePayeeCountry';
 
 const FIELD_GROUPS: Record<string, readonly CSVField[]> = {
   transaction: [
@@ -125,6 +129,8 @@ const FIELD_GROUPS: Record<string, readonly CSVField[]> = {
     'orderCustomData',
     'paymentMethodService',
     'paymentMethodType',
+    'orderContributorAddress',
+    'orderContributorCountry',
   ],
   expense: [
     'expenseId',
@@ -135,6 +141,8 @@ const FIELD_GROUPS: Record<string, readonly CSVField[]> = {
     'merchantId',
     'expenseReference',
     'expenseTransferReference',
+    'expensePayeeAddress',
+    'expensePayeeCountry',
   ],
   tax: ['taxAmount', 'taxType', 'taxRate', 'taxIdNumber'],
   legacy: ['platformFee', 'hostFee'],
@@ -539,6 +547,16 @@ export const FIELDS: Array<{
     label: <FormattedMessage defaultMessage="Contribution Custom Data" id="OV4x2C" />,
   },
   {
+    id: 'orderContributorAddress',
+    group: 'order',
+    label: <FormattedMessage defaultMessage="Contributor Address" id="Mle9tk" />,
+  },
+  {
+    id: 'orderContributorCountry',
+    group: 'order',
+    label: <FormattedMessage defaultMessage="Contributor Country" id="Ib+hA6" />,
+  },
+  {
     id: 'expenseLegacyId',
     group: 'expense',
     tooltip: <FormattedMessage defaultMessage="A unique platform identifier for an expense." id="ndQbVX" />,
@@ -773,6 +791,16 @@ export const FIELDS: Array<{
         id="ysFgxk"
       />
     ),
+  },
+  {
+    id: 'expensePayeeAddress',
+    group: 'expense',
+    label: <FormattedMessage defaultMessage="Payee Address" id="R4eFnz" />,
+  },
+  {
+    id: 'expensePayeeCountry',
+    group: 'expense',
+    label: <FormattedMessage defaultMessage="Payee Country" id="ZRVrsh" />,
   },
   // Imported data
   {
