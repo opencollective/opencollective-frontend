@@ -179,6 +179,7 @@ const StyledInputAmount = ({
   maxFxRate = undefined,
   showErrorIfEmpty = true,
   className = null,
+  suffix = null,
   ...props
 }) => {
   const [rawValue, setRawValue] = React.useState(value || defaultValue || '');
@@ -295,6 +296,11 @@ const StyledInputAmount = ({
         </div>
       )}
       {loadingExchangeRate && <StyledSpinner size={16} color="black.700" className="absolute right-8" />}
+      {suffix && (
+        <div className="pointer-events-none mx-2 flex h-[38px] grow-0 items-center text-xs text-muted-foreground">
+          {suffix}
+        </div>
+      )}
     </div>
   );
 };

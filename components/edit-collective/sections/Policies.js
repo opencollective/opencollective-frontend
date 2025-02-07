@@ -14,6 +14,8 @@ import { editCollectivePolicyMutation } from '../../../lib/graphql/v1/mutations'
 import { stripHTML } from '../../../lib/html';
 import { omitDeep } from '../../../lib/utils';
 
+import { Switch } from '@/components/ui/Switch';
+
 import Container from '../../Container';
 import { Flex } from '../../Grid';
 import { getI18nLink } from '../../I18nFormatters';
@@ -323,7 +325,7 @@ const Policies = ({ collective }) => {
               htmlFor="contributionPolicy"
               error={formik.errors.contributionPolicy}
               disabled={isSubmittingSettings}
-              label={<div className="text-sm font-bold">{formatMessage(messages['contributionPolicy.label'])}</div>}
+              label={<div className="font-bold">{formatMessage(messages['contributionPolicy.label'])}</div>}
             >
               {inputProps => (
                 <RichTextEditor
@@ -350,38 +352,43 @@ const Policies = ({ collective }) => {
               />
             </P>
 
-            <div className="mt-4 mb-2 text-sm font-bold">
+            <div className="mt-4 mb-2 font-bold">
               <FormattedMessage defaultMessage="Required Fields" id="Uh5tDl" />
             </div>
-            <p className="mb-2 text-sm">
-              <FormattedMessage
-                defaultMessage="Require additional information from contributors for donations above defined total yearly contributed threshold."
-                id="KHy1oZ"
-              />
-            </p>
             <div className="flex flex-col gap-2">
-              <div className="flex flex-col gap-0">
-                <StyledCheckbox
-                  name={`checkbox-CONTRIBUTOR_INFO_THRESHOLDS-legalName`}
-                  label={<FormattedMessage defaultMessage="Legal Name" id="LegalName" />}
-                  checked={!isNil(formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.legalName)}
-                  onChange={({ checked }) => {
-                    const newPolicies = cloneDeep(formik.values.policies);
-                    if (checked) {
-                      set(newPolicies, 'CONTRIBUTOR_INFO_THRESHOLDS.legalName', 0);
-                    } else if (!isNil(newPolicies.CONTRIBUTOR_INFO_THRESHOLDS?.legalName)) {
-                      delete newPolicies.CONTRIBUTOR_INFO_THRESHOLDS?.legalName;
-                    }
-                    formik.setFieldValue('policies', newPolicies);
-                  }}
-                />
-                <div className="flex items-center gap-2 pl-6 text-sm">
-                  <FormattedMessage
-                    defaultMessage="Request contributor's legal name when donating more than"
-                    id="2FrNzU"
+              <div className="flex flex-col gap-2 rounded-2xl border p-4">
+                <div className="flex items-center justify-between gap-2">
+                  <div>
+                    <h1 className="text-sm/6 font-bold">
+                      <FormattedMessage defaultMessage="Legal Name" id="LegalName" />
+                    </h1>
+                    <p className="mt-1 text-sm">
+                      <FormattedMessage
+                        defaultMessage="Require the contributor to provide their legal name after a defined amount"
+                        id="/IW5Qr"
+                      />
+                    </p>
+                  </div>
+                  <Switch
+                    name={`checkbox-CONTRIBUTOR_INFO_THRESHOLDS-legalName`}
+                    checked={!isNil(formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.legalName)}
+                    onCheckedChange={checked => {
+                      const newPolicies = cloneDeep(formik.values.policies);
+                      if (checked) {
+                        set(newPolicies, 'CONTRIBUTOR_INFO_THRESHOLDS.legalName', 0);
+                      } else if (!isNil(newPolicies.CONTRIBUTOR_INFO_THRESHOLDS?.legalName)) {
+                        delete newPolicies.CONTRIBUTOR_INFO_THRESHOLDS?.legalName;
+                      }
+                      formik.setFieldValue('policies', newPolicies);
+                    }}
                   />
+                </div>
+                {!isNil(formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.legalName) && (
                   <StyledInputAmount
+                    className="mt-2 sm:max-w-1/3"
                     maxWidth="11em"
+                    placeholder="0"
+                    suffix={<FormattedMessage defaultMessage="/ year" id="8hNOud" />}
                     disabled={
                       isSettingPolicies ||
                       authorCannotApproveExpenseEnforcedByHost ||
@@ -389,41 +396,52 @@ const Policies = ({ collective }) => {
                     }
                     currency={data?.account?.currency}
                     currencyDisplay="CODE"
-                    placeholder="0"
                     value={formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.legalName || 0}
                     onChange={value =>
+                      !isNil(value) &&
                       formik.setFieldValue('policies', {
                         ...formik.values.policies,
                         ['CONTRIBUTOR_INFO_THRESHOLDS']: {
                           ...formik.values.policies?.['CONTRIBUTOR_INFO_THRESHOLDS'],
-                          legalName: value,
+                          legalName: value || 0,
                         },
                       })
                     }
                   />
-                </div>
+                )}
               </div>
-              <div className="flex flex-col gap-2">
-                <StyledCheckbox
-                  name={`checkbox-CONTRIBUTOR_INFO_THRESHOLDS-address`}
-                  label={<FormattedMessage defaultMessage="Physical Address" id="OQhu3R" />}
-                  checked={!isNil(formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.address)}
-                  onChange={({ checked }) => {
-                    const newPolicies = cloneDeep(formik.values.policies);
-                    if (checked) {
-                      set(newPolicies, 'CONTRIBUTOR_INFO_THRESHOLDS.address', 0);
-                    } else if (!isNil(newPolicies.CONTRIBUTOR_INFO_THRESHOLDS?.address)) {
-                      delete newPolicies.CONTRIBUTOR_INFO_THRESHOLDS?.address;
-                    }
-                    formik.setFieldValue('policies', newPolicies);
-                  }}
-                />
-                <div className="flex items-center gap-2 pl-6 text-sm">
-                  <FormattedMessage
-                    defaultMessage="Request contributor's physical address when donating more than"
-                    id="a8ibh1"
+              <div className="flex flex-col gap-2 rounded-2xl border p-4">
+                <div className="flex items-center justify-between gap-2">
+                  <div>
+                    <h1 className="text-sm/6 font-bold">
+                      <FormattedMessage defaultMessage="Physical Address" id="OQhu3R" />
+                    </h1>
+                    <p className="mt-1 text-sm">
+                      <FormattedMessage
+                        defaultMessage="Require the contributor to provide their registered address after a defined amount"
+                        id="kyyHU5"
+                      />
+                    </p>
+                  </div>
+                  <Switch
+                    name={`checkbox-CONTRIBUTOR_INFO_THRESHOLDS-address`}
+                    checked={!isNil(formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.address)}
+                    onCheckedChange={checked => {
+                      const newPolicies = cloneDeep(formik.values.policies);
+                      if (checked) {
+                        set(newPolicies, 'CONTRIBUTOR_INFO_THRESHOLDS.address', 0);
+                      } else if (!isNil(newPolicies.CONTRIBUTOR_INFO_THRESHOLDS?.address)) {
+                        delete newPolicies.CONTRIBUTOR_INFO_THRESHOLDS?.address;
+                      }
+                      formik.setFieldValue('policies', newPolicies);
+                    }}
                   />
+                </div>
+                {!isNil(formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.address) && (
                   <StyledInputAmount
+                    className="mt-2 sm:max-w-1/3"
+                    placeholder="0"
+                    suffix={<FormattedMessage defaultMessage="/ year" id="8hNOud" />}
                     maxWidth="11em"
                     disabled={
                       isSettingPolicies ||
@@ -432,19 +450,18 @@ const Policies = ({ collective }) => {
                     }
                     currency={data?.account?.currency}
                     currencyDisplay="CODE"
-                    placeholder="0"
                     value={formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.address || 0}
                     onChange={value =>
                       formik.setFieldValue('policies', {
                         ...formik.values.policies,
                         ['CONTRIBUTOR_INFO_THRESHOLDS']: {
                           ...formik.values.policies?.['CONTRIBUTOR_INFO_THRESHOLDS'],
-                          address: value,
+                          address: value || 0,
                         },
                       })
                     }
                   />
-                </div>
+                )}
               </div>
             </div>
           </Container>
