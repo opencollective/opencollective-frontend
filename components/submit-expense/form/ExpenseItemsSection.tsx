@@ -4,7 +4,7 @@ import { TaxType } from '@opencollective/taxes';
 import type { CheckedState } from '@radix-ui/react-checkbox';
 import dayjs from 'dayjs';
 import { useFormikContext } from 'formik';
-import { get, isNumber, pick, round } from 'lodash';
+import { get, pick, round } from 'lodash';
 import { Lock, Trash2 } from 'lucide-react';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -593,9 +593,7 @@ const Taxes = React.memo(function Taxes(props: {
                 <InputGroup
                   {...field}
                   value={field.value ? round(field.value * 100, 2) : 0}
-                  onChange={e =>
-                    props.setFieldValue('tax.rate', isNumber(e.target.value) ? round(e.target.value / 100, 4) : null)
-                  }
+                  onChange={e => props.setFieldValue('tax.rate', round((e.target.value as any) / 100, 4))}
                   minWidth={65}
                   append="%"
                   min={0}

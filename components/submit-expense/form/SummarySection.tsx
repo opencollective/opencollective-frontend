@@ -611,7 +611,7 @@ function RecurrenceOptionBox(props: { form: ExpenseForm }) {
               disabled={props.form.initialLoading || props.form.isSubmitting}
               onValueChange={newValue => setRecurrenceFrequencyEdit(newValue as RecurrenceFrequencyOption)}
             >
-              <SelectTrigger data-cy="language-switcher">
+              <SelectTrigger data-cy="expense-frequency">
                 <div className="flex items-center gap-2 overflow-hidden">
                   <span className="truncate">
                     <SelectValue placeholder={intl.formatMessage({ defaultMessage: 'Select one', id: 'aJxdzZ' })} />
@@ -623,19 +623,28 @@ function RecurrenceOptionBox(props: { form: ExpenseForm }) {
                 <SelectItem value={RecurrenceFrequencyOption.NONE}>
                   <FormattedMessage defaultMessage="None" id="450Fty" />
                 </SelectItem>
-                <SelectItem value={RecurrenceFrequencyOption.WEEK}>{RecurringExpenseIntervals.week}</SelectItem>
-                <SelectItem value={RecurrenceFrequencyOption.MONTH}>{RecurringExpenseIntervals.month}</SelectItem>
-                <SelectItem value={RecurrenceFrequencyOption.QUARTER}>{RecurringExpenseIntervals.quarter}</SelectItem>
-                <SelectItem value={RecurrenceFrequencyOption.YEAR}>{RecurringExpenseIntervals.year}</SelectItem>
+                <SelectItem data-cy="expense-frequency-option" value={RecurrenceFrequencyOption.WEEK}>
+                  {RecurringExpenseIntervals.week}
+                </SelectItem>
+                <SelectItem data-cy="expense-frequency-option" value={RecurrenceFrequencyOption.MONTH}>
+                  {RecurringExpenseIntervals.month}
+                </SelectItem>
+                <SelectItem data-cy="expense-frequency-option" value={RecurrenceFrequencyOption.QUARTER}>
+                  {RecurringExpenseIntervals.quarter}
+                </SelectItem>
+                <SelectItem data-cy="expense-frequency-option" value={RecurrenceFrequencyOption.YEAR}>
+                  {RecurringExpenseIntervals.year}
+                </SelectItem>
               </SelectContent>
             </Select>
 
             {recurrenceFrequency && recurrenceFrequency !== 'none' && (
               <React.Fragment>
-                <Label className="mt-4 mb-2">
+                <Label htmlFor="expenseRecurrenceEndAt" className="mt-4 mb-2">
                   <FormattedMessage defaultMessage="End Date" id="EndDate" />
                 </Label>
                 <Input
+                  id="expenseRecurrenceEndAt"
                   disabled={props.form.initialLoading || props.form.isSubmitting}
                   type="date"
                   value={recurrenceEndAt}
