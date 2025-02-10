@@ -19,7 +19,7 @@ import { i18nOrderStatus } from '../../../../lib/i18n/order';
 import { i18nPendingOrderPaymentMethodTypes } from '../../../../lib/i18n/pending-order-payment-method-type';
 import { updateTransactionsImportRows } from './lib/graphql';
 import type { CSVConfig } from './lib/types';
-import { ExpectedFundsFilter, TransactionsImportRowAction } from '@/lib/graphql/types/v2/graphql';
+import { TransactionsImportRowAction } from '@/lib/graphql/types/v2/graphql';
 
 import { accountHoverCardFields } from '../../../AccountHoverCard';
 import {
@@ -217,7 +217,7 @@ export const MatchContributionDialog = ({
     () => ({
       amount: getAmountRangeFilter(row.amount.valueInCents),
       status: [OrderStatus.PENDING],
-      expectedFundsFilter: ExpectedFundsFilter.ALL_EXPECTED_FUNDS,
+      expectedFundsFilter: null,
     }),
     [row],
   );
