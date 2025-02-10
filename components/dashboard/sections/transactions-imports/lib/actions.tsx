@@ -119,7 +119,7 @@ export function useTransactionsImportActions({ transactionsImport, host }): {
         actions.primary.push({
           key: 'match',
           Icon: Merge,
-          label: <FormattedMessage defaultMessage="Match expected funds" id="J/7TIn" />,
+          label: <FormattedMessage defaultMessage="Match contribution" id="c7INEq" />,
           disabled: isUpdatingRow,
           onClick: () =>
             showModal(
