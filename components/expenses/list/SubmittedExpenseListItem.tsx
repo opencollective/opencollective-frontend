@@ -46,7 +46,7 @@ export function SubmittedExpenseListItem(props: SubmittedExpenseListItemProps) {
   const { LoggedInUser } = useLoggedInUser();
   const router = useRouter();
   const hasNewSubmitExpenseFlow =
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) && router.query.newExpenseFlowEnabled;
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) || router.query.newExpenseFlowEnabled;
 
   const clipboard = useClipboard();
   const intl = useIntl();
