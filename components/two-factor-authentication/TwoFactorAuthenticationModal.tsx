@@ -157,7 +157,7 @@ export default function TwoFactorAuthenticationModal() {
               <FormattedMessage id="Close" defaultMessage="Close" />
             </span>
           </Button>
-          <AlertDialogTitle>
+          <AlertDialogTitle className="text-balance">
             {supportedMethods.length === 0 ? (
               <FormattedMessage defaultMessage="You must configure 2FA to access this feature" id="CMlTK9" />
             ) : (
@@ -165,7 +165,7 @@ export default function TwoFactorAuthenticationModal() {
             )}
           </AlertDialogTitle>
           {LoggedInUser && supportedMethods.length === 0 && (
-            <AlertDialogDescription>
+            <AlertDialogDescription className="text-balance">
               <FormattedMessage
                 defaultMessage="To enable Two-Factor Authentication (2FA), follow the steps <link>here</link>"
                 id="j8E0VG"
@@ -254,11 +254,11 @@ function AuthenticatorOption(props: {
         placeholder=""
         autoFocus
         classNames={{
-          container: 'ml-6 w-auto pr-12 -mr-6', // negative margin to make space for password manager browser extension icon
+          container: 'ml-6! w-auto! pr-12! -mr-6!', // negative margin to make space for password manager browser extension icon
           character:
-            'z-10 pointer-events-none rounded-md border border-input bg-background text-lg ring-offset-background items-center flex justify-center',
-          characterInactive: 'bg-muted',
-          characterSelected: 'ring-ring ring-2 ring-offset-2 outline-hidden text-foreground',
+            'z-10! pointer-events-none! rounded-md! border! border-input! bg-background! text-lg! ring-offset-background! items-center! flex! justify-center!',
+          characterInactive: 'bg-muted!',
+          characterSelected: 'ring-ring! ring-2! ring-offset-2! outline-hidden! text-foreground!',
         }}
         onChange={val => props.onChange(val)}
       />
