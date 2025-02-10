@@ -270,6 +270,7 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
     props.newPayoutMethod.data.details,
     props.newPayoutMethod.data.currency,
     props.touchedNewPayoutMethodName,
+    props.newPayoutMethod.data.content,
     props.newPayoutMethod.data,
     setFieldValue,
   ]);

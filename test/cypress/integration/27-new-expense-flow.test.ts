@@ -4,6 +4,10 @@ import * as cheerio from 'cheerio';
 import { randomSlug } from '../support/faker';
 
 describe('New expense flow', () => {
+  beforeEach(() => {
+    cy.mailpitDeleteAllEmails();
+  });
+
   describe('Invoices', () => {
     commonScenarios('invoice');
 
@@ -180,6 +184,7 @@ function commonScenarios(expenseType: 'invoice' | 'reimbursement') {
       fillNewPayoutMethod({
         type: 'OTHER',
         slug: randomSlug(),
+        save: true,
         data: {
           currency: 'USD',
           content: 'New payout method',
@@ -614,7 +619,8 @@ function fillNewPayoutMethod(payoutMethod: {
     cy.wait(400);
     cy.contains('label', 'Name').click();
     cy.get('input#input-newPayoutMethod\\.name').should('have.value', payoutMethod.data.content);
-    cy.get('input#input-newPayoutMethod\\.name').type(`{selectall}${payoutMethod.slug}`);
+    cy.get('input#input-newPayoutMethod\\.name').clear();
+    cy.get('input#input-newPayoutMethod\\.name').clear().type(payoutMethod.slug);
     cy.get('input#input-newPayoutMethod\\.name').should('have.value', payoutMethod.slug);
 
     if (payoutMethod.save) {
@@ -636,6 +642,7 @@ function fillTypeOfExpense(opts: { expenseType: 'invoice' | 'reimbursement'; has
     if (opts.expenseType === 'invoice') {
       if (opts.hasInvoice) {
         cy.contains('Attach your invoice file').selectFile(getReceiptFixture({ fileName: 'invoice0.jpg' }));
+        cy.contains('Clear').should('exist');
         cy.contains('Invoice number').click().type('INV0001');
       } else {
         cy.contains('No, generate an invoice for me').click();
