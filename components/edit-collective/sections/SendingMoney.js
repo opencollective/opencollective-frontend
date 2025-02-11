@@ -7,8 +7,8 @@ import hasFeature, { FEATURES } from '../../../lib/allowed-features';
 import { editCollectiveSettingsMutation } from '../../../lib/graphql/v1/mutations';
 
 import MessageBox from '../../MessageBox';
-import StyledButton from '../../StyledButton';
 import { P } from '../../Text';
+import { Button } from '../../ui/Button';
 
 import ConnectedAccounts from './ConnectedAccounts';
 import SettingsSectionTitle from './SettingsSectionTitle';
@@ -53,9 +53,13 @@ class SendingMoney extends React.Component {
 
     let paypalConnectButton;
     if (this.props.collective.settings?.disablePaypalPayouts) {
-      paypalConnectButton = <FormattedMessage id="collective.paypalEnable.button" defaultMessage="Enable PayPal" />;
+      paypalConnectButton = (
+        <FormattedMessage id="collective.paypalPayoutsEnable.button" defaultMessage="Enable PayPal Payouts" />
+      );
     } else {
-      paypalConnectButton = <FormattedMessage id="collective.paypalDisable.button" defaultMessage="Disable PayPal" />;
+      paypalConnectButton = (
+        <FormattedMessage id="collective.paypalPayoutsDisable.button" defaultMessage="Disable PayPal Payouts" />
+      );
     }
 
     return (
@@ -86,15 +90,16 @@ class SendingMoney extends React.Component {
                 />
               </P>
             )}
-            <StyledButton
+            <Button
               loading={this.state.isSubmitting}
               onClick={this.togglePaypal}
-              mt={2}
               type="submit"
-              maxWidth={200}
+              size="sm"
+              variant="outline"
+              className="w-fit grow-0"
             >
               {paypalConnectButton}
-            </StyledButton>
+            </Button>
             {this.state.error && (
               <MessageBox type="error" withIcon my={3}>
                 {this.state.error}

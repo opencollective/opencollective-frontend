@@ -9,10 +9,10 @@ import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
 import { editCollectivePageQuery } from '../../lib/graphql/v1/queries';
 
 import { getI18nLink, I18nSignInLink } from '../I18nFormatters';
-import StyledButton from '../StyledButton';
 import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import { P } from '../Text';
+import { Button } from '../ui/Button';
 
 const createConnectedAccountMutation = gql`
   mutation CreateConnectedAccount($connectedAccount: ConnectedAccountCreateInput!, $account: AccountReferenceInput!) {
@@ -121,9 +121,9 @@ const EditPayPalAccount = props => {
           )}
         </StyledInputField>
 
-        <StyledButton type="submit" mt={2} minWidth={150} loading={isCreating}>
+        <Button size="sm" variant="outline" type="submit" className="mt-2" loading={isCreating}>
           <FormattedMessage defaultMessage="Connect {service}" id="C9HmCs" values={{ service: 'PayPal' }} />
-        </StyledButton>
+        </Button>
       </form>
     );
   } else {

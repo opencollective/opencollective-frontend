@@ -1,18 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useMutation } from '@apollo/client';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import { connectAccount, disconnectAccount } from '../../lib/api';
+import { editCollectiveSettingsMutation } from '../../lib/graphql/v1/mutations';
 
 import MessageBox from '../MessageBox';
-import StyledButton from '../StyledButton';
+import StyledCheckbox from '../StyledCheckbox';
 import { P } from '../Text';
+import { Button } from '../ui/Button';
 
 const EditTransferWiseAccount = ({ collective, ...props }) => {
   const router = useRouter();
   const error = router.query?.error;
   const [connectedAccount, setConnectedAccount] = React.useState(props.connectedAccount);
+  const [setSettings, { loading }] = useMutation(editCollectiveSettingsMutation);
   const handleConnect = async () => {
     const json = await connectAccount(collective.id, 'transferwise');
     window.location.href = json.redirectUrl;
@@ -22,6 +26,20 @@ const EditTransferWiseAccount = ({ collective, ...props }) => {
     if (json.deleted === true) {
       setConnectedAccount(null);
     }
+  };
+  const handleUpdateSetting = async generateReference => {
+    await setSettings({
+      variables: {
+        id: collective.id,
+        settings: {
+          ...collective.settings,
+          transferwise: {
+            ...collective.settings.transferwise,
+            generateReference,
+          },
+        },
+      },
+    });
   };
 
   if (!connectedAccount) {
@@ -39,9 +57,9 @@ const EditTransferWiseAccount = ({ collective, ...props }) => {
           </MessageBox>
         )}
 
-        <StyledButton mt={2} type="submit" onClick={handleConnect}>
+        <Button size="sm" className="mt-2 w-fit" variant="outline" type="submit" onClick={handleConnect}>
           <FormattedMessage defaultMessage="Connect {service}" id="C9HmCs" values={{ service: 'Wise' }} />
-        </StyledButton>
+        </Button>
       </React.Fragment>
     );
   } else {
@@ -57,14 +75,31 @@ const EditTransferWiseAccount = ({ collective, ...props }) => {
           />
         </P>
         <P>
-          <StyledButton type="submit" mt={2} onClick={handleDisconnect}>
+          <Button type="submit" size="sm" className="mt-2 w-fit" variant="outline" onClick={handleDisconnect}>
             <FormattedMessage
               id="collective.connectedAccounts.disconnect.button"
               defaultMessage="Disconnect"
               buttonStyle="dangerSecondary"
             />
-          </StyledButton>
+          </Button>
         </P>
+        <div className="mt-4 flex flex-col gap-2">
+          <h1 className="text-base font-bold">
+            <FormattedMessage id="header.options" defaultMessage="Options" />
+          </h1>
+          <StyledCheckbox
+            name="generateReference"
+            label={
+              <FormattedMessage
+                id="collective.connectedAccounts.wise.generateReference"
+                defaultMessage="Automatically generate the transfer reference based on Collective name and Expense ID."
+              />
+            }
+            checked={collective.settings?.transferwise?.generateReference !== false}
+            onChange={({ checked }) => handleUpdateSetting(checked)}
+            loading={loading}
+          />
+        </div>
       </React.Fragment>
     );
   }

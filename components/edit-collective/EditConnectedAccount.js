@@ -15,10 +15,10 @@ import DateTime from '../DateTime';
 import { Box, Flex } from '../Grid';
 import { getI18nLink } from '../I18nFormatters';
 import MessageBox from '../MessageBox';
-import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 import StyledSpinner from '../StyledSpinner';
 import { P } from '../Text';
+import { Button } from '../ui/Button';
 import { toast } from '../ui/useToast';
 
 import EditPayPalAccount from './EditPayPalAccount';
@@ -257,18 +257,24 @@ class EditConnectedAccount extends React.Component {
                 </P>
                 <Flex mt={1} gridGap="8px" flexWrap="wrap">
                   {!isTwitter && (
-                    <StyledButton
-                      buttonSize="small"
+                    <Button
+                      size="sm"
                       onClick={() => this.connect(service)}
                       loading={isConnecting}
                       disabled={disableReason}
+                      variant="outline"
                     >
                       <FormattedMessage id="collective.connectedAccounts.reconnect.button" defaultMessage="Reconnect" />
-                    </StyledButton>
+                    </Button>
                   )}
-                  <StyledButton buttonSize="small" onClick={() => this.disconnect(service)} loading={isDisconnecting}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => this.disconnect(service)}
+                    loading={isDisconnecting}
+                  >
                     <FormattedMessage id="collective.connectedAccounts.disconnect.button" defaultMessage="Disconnect" />
-                  </StyledButton>
+                  </Button>
                 </Flex>
                 {!disableReason && connectedAccount.service === 'twitter' && (
                   <Box my={3}>
@@ -301,19 +307,18 @@ class EditConnectedAccount extends React.Component {
                 <P fontSize="12px" color="black.600" fontWeight="normal" mb={2}>
                   {intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.description`])}
                 </P>
-                <StyledButton
+                <Button
                   data-cy={`connect-${service}-button`}
-                  buttonSize="small"
+                  size="sm"
                   onClick={() => this.connect(service)}
                   loading={isConnecting}
-                  minWidth={120}
-                  mb={2}
+                  className="max-w-xs"
                 >
                   {intl.formatMessage(
                     { defaultMessage: 'Connect {service}', id: 'C9HmCs' },
                     { service: capitalize(service) },
                   )}
-                </StyledButton>
+                </Button>
               </Box>
             )}
           </div>
