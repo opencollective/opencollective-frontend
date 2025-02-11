@@ -88,6 +88,7 @@ const EditTransferWiseAccount = ({ collective, ...props }) => {
             <FormattedMessage id="header.options" defaultMessage="Options" />
           </h1>
           <StyledCheckbox
+            name="generateReference"
             label={
               <FormattedMessage
                 id="collective.connectedAccounts.wise.generateReference"
