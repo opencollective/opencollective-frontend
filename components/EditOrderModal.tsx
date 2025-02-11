@@ -259,13 +259,12 @@ const EditAmountModal = (props: Omit<EditOrderModalProps, 'action'>) => {
                           </P>
                           <Box>
                             <StyledInputAmount
-                              type="number"
                               data-cy="recurring-contribution-custom-amount-input"
                               currency={currency}
                               value={inputAmountValue}
                               onChange={setInputAmountValue}
                               min={DEFAULT_MINIMUM_AMOUNT}
-                              px="2px"
+                              className="px-1"
                             />
                           </Box>
                           <P fontSize="12px" fontWeight="600" my={2}>

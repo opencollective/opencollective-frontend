@@ -28,7 +28,14 @@ export const StyledInputAmountWithDynamicFxRate = ({
   value,
   onChange,
   ...props
-}: Omit<React.ComponentProps<typeof StyledInputAmount>, 'currency' | 'loadingExchangeRate' | 'hasCurrencyPicker'>) => {
+}: Omit<
+  React.ComponentProps<typeof StyledInputAmount>,
+  'fromCurrency' | 'toCurrency' | 'loadingExchangeRate' | 'hasCurrencyPicker'
+> & {
+  fromCurrency: string;
+  toCurrency: string;
+  date?: string;
+}) => {
   const intl = useIntl();
   const { toast } = useToast();
   const { loading } = useQuery(currencyExchangeRateQuery, {

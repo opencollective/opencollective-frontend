@@ -773,7 +773,7 @@ const AddFundsModalContentWithCollective = ({
                         placeholder="0.00"
                         error={field.error}
                         value={field.value}
-                        maxWidth="100%"
+                        className="max-w-full"
                         onChange={value => form.setFieldValue(field.name, value)}
                         onBlur={() => form.setFieldTouched(field.name, true)}
                       />
@@ -830,7 +830,7 @@ const AddFundsModalContentWithCollective = ({
                         placeholder="0.00"
                         error={field.error}
                         value={field.value}
-                        maxWidth="100%"
+                        className="max-w-full"
                         onChange={value => form.setFieldValue(field.name, value)}
                         onBlur={() => form.setFieldTouched(field.name, true)}
                       />
