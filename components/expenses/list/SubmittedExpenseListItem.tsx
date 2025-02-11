@@ -2,6 +2,7 @@ import React from 'react';
 import clsx from 'clsx';
 import { includes } from 'lodash';
 import { Check, Copy, Ellipsis, Link } from 'lucide-react';
+import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import type { ExpensePageExpenseFieldsFragment } from '../../../lib/graphql/types/v2/graphql';
@@ -43,7 +44,9 @@ const I18nMessages = defineMessages({
 
 export function SubmittedExpenseListItem(props: SubmittedExpenseListItemProps) {
   const { LoggedInUser } = useLoggedInUser();
-  const hasNewSubmitExpenseFlow = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW);
+  const router = useRouter();
+  const hasNewSubmitExpenseFlow =
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) || router.query.newExpenseFlowEnabled;
 
   const clipboard = useClipboard();
   const intl = useIntl();
@@ -155,7 +158,7 @@ export function SubmittedExpenseListItem(props: SubmittedExpenseListItemProps) {
       </div>
       <div className="flex items-center">
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenuTrigger onClick={e => e.stopPropagation()} onPointerDown={e => e.stopPropagation()} asChild>
             <Button size="icon-xs" variant="outline">
               <Ellipsis className="h-4 w-4" />
             </Button>

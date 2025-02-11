@@ -126,7 +126,7 @@ function Expense(props) {
   const router = useRouter();
   const isNewExpenseSubmissionFlow =
     (LoggedInUser && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW)) ||
-    router.query.newExpenseFlow;
+    router.query.newExpenseFlowEnabled;
 
   const [isSubmissionFlowOpen, setIsSubmissionFlowOpen] = React.useState(false);
 
