@@ -8,6 +8,7 @@ import { connectAccount, disconnectAccount } from '../../lib/api';
 import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import { P } from '../Text';
+import { Button } from '../ui/Button';
 
 const EditTransferWiseAccount = ({ collective, ...props }) => {
   const router = useRouter();
@@ -57,13 +58,13 @@ const EditTransferWiseAccount = ({ collective, ...props }) => {
           />
         </P>
         <P>
-          <StyledButton type="submit" mt={2} onClick={handleDisconnect}>
+          <Button type="submit" size="sm" className="mt-2 w-fit" variant="outline" onClick={handleDisconnect}>
             <FormattedMessage
               id="collective.connectedAccounts.disconnect.button"
               defaultMessage="Disconnect"
               buttonStyle="dangerSecondary"
             />
-          </StyledButton>
+          </Button>
         </P>
       </React.Fragment>
     );

@@ -19,6 +19,7 @@ import Image from '../../Image';
 import Loading from '../../Loading';
 import StyledButton from '../../StyledButton';
 import { P } from '../../Text';
+import { Button } from '../../ui/Button';
 import UpdateBankDetailsForm from '../UpdateBankDetailsForm';
 import { formatAccountDetails } from '../utils';
 
@@ -130,7 +131,7 @@ const BankTransfer = props => {
   };
 
   const latestBankAccount = findLast(
-    data?.host?.payoutMethods,
+    data.host?.payoutMethods,
     payoutMethod => payoutMethod.type === PayoutMethodType.BANK_ACCOUNT,
   );
 
@@ -168,9 +169,9 @@ const BankTransfer = props => {
             </Box>
           )}
           <Box alignItems="center" my={2}>
-            <StyledButton
-              buttonStyle="standard"
-              buttonSize="small"
+            <Button
+              size="sm"
+              variant="outline"
               disabled={!data.host.plan.manualPayments}
               onClick={() => {
                 setShowForm(true);
@@ -186,19 +187,19 @@ const BankTransfer = props => {
                   <FormattedMessage id="paymentMethods.manual.add" defaultMessage="Set bank details" />
                 </Fragment>
               )}
-            </StyledButton>{' '}
+            </Button>{' '}
             {existingManualPaymentMethod && (
-              <StyledButton
-                mt={[2, 0]}
-                buttonStyle="standard"
-                buttonSize="small"
+              <Button
+                size="sm"
+                variant="outline"
+                className="mt-2"
                 disabled={!data.host.plan.manualPayments}
                 onClick={() => {
                   setShowRemoveBankConfirmationModal(true);
                 }}
               >
                 <FormattedMessage defaultMessage="Remove bank details" id="D0TAWz" />
-              </StyledButton>
+              </Button>
             )}
           </Box>
         </Fragment>
