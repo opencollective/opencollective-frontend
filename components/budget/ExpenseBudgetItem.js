@@ -417,7 +417,7 @@ const ExpenseBudgetItem = ({
                   {isLoading ? (
                     <LoadingPlaceholder height={15} width={90} />
                   ) : (
-                    <div className="text-[11px]">
+                    <div className="text-[11px] leading-6">
                       <TruncatedTextWithTooltip value={expense.reference} length={10} truncatePosition="middle" />
                     </div>
                   )}
