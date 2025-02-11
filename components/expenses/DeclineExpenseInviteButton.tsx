@@ -14,6 +14,7 @@ import { Textarea } from '../ui/Textarea';
 type DeclineExpenseInviteButtonProps = {
   expense: Pick<Expense, 'legacyId' | 'id'>;
   draftKey?: string;
+  onExpenseInviteDeclined?: () => void;
 };
 
 const schema = z.object({
@@ -40,6 +41,7 @@ export default function DeclineExpenseInviteButton(props: DeclineExpenseInviteBu
   }, [isDeclineModalOpen, resetForm]);
 
   const { setFieldTouched, submitForm, validateForm } = formik;
+  const { onExpenseInviteDeclined } = props;
   const onConfirm = React.useCallback(async () => {
     const errors = await validateForm();
     setFieldTouched('declineReason');
@@ -47,11 +49,12 @@ export default function DeclineExpenseInviteButton(props: DeclineExpenseInviteBu
       throw new Error(errors.declineReason);
     }
     await submitForm();
-  }, [submitForm, validateForm, setFieldTouched]);
+    onExpenseInviteDeclined?.();
+  }, [submitForm, validateForm, setFieldTouched, onExpenseInviteDeclined]);
 
   return (
     <React.Fragment>
-      <Button variant="outline" size="xs" onClick={() => setIsDeclineModalOpen(true)}>
+      <Button variant="outline" size="sm" onClick={() => setIsDeclineModalOpen(true)}>
         <FormattedMessage defaultMessage="Decline invitation" id="4DwePS" />
       </Button>
       <ConfirmationModal
@@ -65,10 +68,10 @@ export default function DeclineExpenseInviteButton(props: DeclineExpenseInviteBu
             <FormattedMessage defaultMessage="Notes" id="expense.notes" />
           </Label>
           <Textarea showCount className="max-h-40" {...formik.getFieldProps('declineReason')} maxLength={255} />
-          <div className="ml-1 mt-1 h-4 text-xs text-muted-foreground">
+          <div className="mt-1 ml-1 h-4 text-xs text-muted-foreground">
             <FormattedMessage defaultMessage="Provide a reason for declining this expense invitation" id="Iom3HU" />
           </div>
-          <div className="ml-1 mt-1 h-4 text-xs text-red-500">
+          <div className="mt-1 ml-1 h-4 text-xs text-red-500">
             {formik.errors.declineReason && formik.touched.declineReason ? formik.errors.declineReason : ''}
           </div>
         </div>

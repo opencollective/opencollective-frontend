@@ -5,7 +5,6 @@ import { Undo } from '@styled-icons/fa-solid/Undo';
 import { themeGet } from '@styled-system/theme-get';
 import dayjs from 'dayjs';
 import { cloneDeep, debounce, get, includes, orderBy, uniqBy, update } from 'lodash';
-import { FilePenLine } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { createPortal } from 'react-dom';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -23,17 +22,17 @@ import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../lib/hooks/usePrevious';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { itemHasOCR } from './lib/ocr';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import ConfirmationModal from '../ConfirmationModal';
 import Container from '../Container';
 import CommentForm from '../conversations/CommentForm';
 import Thread from '../conversations/Thread';
-import { TaxInformationFormDialog } from '../dashboard/sections/tax-information/TaxInformationFormDialog';
 import { useDrawerActionsContainer } from '../Drawer';
 import FilesViewerModal from '../FilesViewerModal';
 import { Box, Flex } from '../Grid';
 import HTMLContent from '../HTMLContent';
-import { getI18nLink, WebsiteName } from '../I18nFormatters';
+import { WebsiteName } from '../I18nFormatters';
 import CommentIcon from '../icons/CommentIcon';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import Link from '../Link';
@@ -43,6 +42,7 @@ import MessageBox from '../MessageBox';
 import StyledButton from '../StyledButton';
 import StyledCheckbox from '../StyledCheckbox';
 import StyledLink from '../StyledLink';
+import { SubmitExpenseFlow } from '../submit-expense/SubmitExpenseFlow';
 import { H1, H5, Span } from '../Text';
 
 import { editExpenseMutation } from './graphql/mutations';
@@ -50,11 +50,13 @@ import { expensePageQuery } from './graphql/queries';
 import { ConfirmOCRValues } from './ConfirmOCRValues';
 import ExpenseForm, { msg as expenseFormMsg, prepareExpenseForSubmit } from './ExpenseForm';
 import ExpenseInviteNotificationBanner from './ExpenseInviteNotificationBanner';
+import ExpenseInviteWelcome from './ExpenseInviteWelcome';
 import ExpenseMissingReceiptNotificationBanner from './ExpenseMissingReceiptNotificationBanner';
 import ExpenseNotesForm from './ExpenseNotesForm';
 import ExpenseRecurringBanner from './ExpenseRecurringBanner';
 import ExpenseSummary from './ExpenseSummary';
 import PrivateCommentsMessage from './PrivateCommentsMessage';
+import TaxFormMessage from './TaxFormMessage';
 
 const getVariableFromProps = props => {
   const firstOfCurrentYear = dayjs(new Date(new Date().getFullYear(), 0, 1))
@@ -122,9 +124,20 @@ function Expense(props) {
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const router = useRouter();
+  const isNewExpenseSubmissionFlow =
+    (LoggedInUser && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW)) ||
+    router.query.newExpenseFlow;
+
+  const [isSubmissionFlowOpen, setIsSubmissionFlowOpen] = React.useState(false);
+
   const [state, setState] = useState({
     error: error || null,
-    status: draftKey && data?.expense?.status === ExpenseStatus.DRAFT ? PAGE_STATUS.EDIT : PAGE_STATUS.VIEW,
+    status:
+      draftKey && data?.expense?.status === ExpenseStatus.DRAFT
+        ? isNewExpenseSubmissionFlow
+          ? PAGE_STATUS.VIEW
+          : PAGE_STATUS.EDIT
+        : PAGE_STATUS.VIEW,
     editedExpense: null,
     isSubmitting: false,
     isPollingEnabled: true,
@@ -136,7 +149,6 @@ function Expense(props) {
   const [openUrl, setOpenUrl] = useState(null);
   const [replyingToComment, setReplyingToComment] = useState(null);
   const [hasConfirmedOCR, setConfirmedOCR] = useState(false);
-  const [hasTaxInformationForm, setHasTaxInformationForm] = React.useState(false);
   const hasItemsWithOCR = Boolean(state.editedExpense?.items?.some(itemHasOCR));
   const mustConfirmOCR = hasItemsWithOCR && !hasConfirmedOCR;
   const pollingInterval = 60;
@@ -146,7 +158,9 @@ function Expense(props) {
   const drawerActionsContainer = useDrawerActionsContainer();
 
   useEffect(() => {
-    const shouldEditDraft = data?.expense?.status === ExpenseStatus.DRAFT && draftKey;
+    const shouldEditDraft = isNewExpenseSubmissionFlow
+      ? false
+      : data?.expense?.status === ExpenseStatus.DRAFT && draftKey;
     if (shouldEditDraft) {
       setState(state => ({
         ...state,
@@ -194,11 +208,16 @@ function Expense(props) {
 
   // Update status when data or draftKey changes
   useEffect(() => {
-    const status = draftKey && data?.expense?.status === ExpenseStatus.DRAFT ? PAGE_STATUS.EDIT : PAGE_STATUS.VIEW;
+    const status =
+      draftKey && data?.expense?.status === ExpenseStatus.DRAFT
+        ? isNewExpenseSubmissionFlow
+          ? PAGE_STATUS.VIEW
+          : PAGE_STATUS.EDIT
+        : PAGE_STATUS.VIEW;
     if (status !== state.status) {
       setState(state => ({ ...state, status }));
     }
-  }, [props.data, draftKey]);
+  }, [props.data, draftKey, isNewExpenseSubmissionFlow]);
 
   // Scroll to expense's top when changing status
   const prevState = usePrevious(state);
@@ -302,10 +321,14 @@ function Expense(props) {
   };
 
   const onEditBtnClick = async () => {
+    props.stopPolling?.();
     return setState(state => ({ ...state, status: PAGE_STATUS.EDIT, editedExpense: data?.expense }));
   };
 
-  const onCancel = () => setState(state => ({ ...state, status: PAGE_STATUS.VIEW, editedExpense: null }));
+  const onCancel = () => {
+    props.startPolling?.(pollingInterval * 1000);
+    return setState(state => ({ ...state, status: PAGE_STATUS.VIEW, editedExpense: null }));
+  };
 
   const onDelete = async expense => {
     const collective = expense.account;
@@ -336,6 +359,7 @@ function Expense(props) {
         await refetch();
       }
       const createdUser = editedExpense.payee;
+      props.startPolling?.(pollingInterval * 1000);
       setState(state => ({
         ...state,
         status: PAGE_STATUS.VIEW,
@@ -515,69 +539,10 @@ function Expense(props) {
           {formatErrorMessage(intl, state.error)}
         </MessageBox>
       )}
-      {showTaxFormMsg && (
-        <MessageBox type="warning" withIcon={true} mb={4}>
-          <div>
-            {LoggedInUser?.isAdminOfCollective(expense.payee) ? (
-              <div>
-                <strong>
-                  <FormattedMessage defaultMessage="We need your tax information before we can pay you." id="a6tGTW" />
-                </strong>
-                <p className="my-2">
-                  <FormattedMessage
-                    defaultMessage="United States regulations require US entities to collect certain information from payees for tax reporting purposes, even if the payee is outside the US."
-                    id="H/ROIG"
-                  />
-                </p>
-                <StyledButton
-                  buttonSize="tiny"
-                  buttonStyle="primary"
-                  className="mt-2"
-                  onClick={() => setHasTaxInformationForm(true)}
-                >
-                  <FilePenLine className="mr-1 inline-block" size={14} />
-                  <span>
-                    <FormattedMessage defaultMessage="Fill Tax Information" id="TxJpk1" />
-                  </span>
-                </StyledButton>
-                <TaxInformationFormDialog
-                  account={expense.payee}
-                  open={hasTaxInformationForm}
-                  onOpenChange={setHasTaxInformationForm}
-                  onSuccess={refetch}
-                />
-              </div>
-            ) : (
-              <div>
-                <strong>
-                  <FormattedMessage
-                    defaultMessage="This expense requires the payee to provide their tax information before it can be paid."
-                    id="XNW4Sq"
-                  />
-                </strong>
-                <p className="my-2">
-                  <FormattedMessage
-                    defaultMessage="United States regulations require US entities to collect certain information from payees for tax reporting purposes, even if the payee is outside the US."
-                    id="H/ROIG"
-                  />{' '}
-                  <FormattedMessage
-                    defaultMessage="See <HelpDocsLink>help docs</HelpDocsLink> for more information."
-                    id="f2Ypkz"
-                    values={{
-                      HelpDocsLink: getI18nLink({
-                        href: 'https://docs.opencollective.com/help/expenses-and-getting-paid/tax-information',
-                        openInNewTab: true,
-                      }),
-                    }}
-                  />
-                </p>
-              </div>
-            )}
-          </div>
-        </MessageBox>
-      )}
+      {showTaxFormMsg && <TaxFormMessage expense={expense} refetch={refetch} />}
       {status === PAGE_STATUS.VIEW &&
-        ((expense?.status === ExpenseStatus.UNVERIFIED && state.createdUser) || (isDraft && !isRecurring)) && (
+        ((expense?.status === ExpenseStatus.UNVERIFIED && state.createdUser) ||
+          (isDraft && !isRecurring && !draftKey)) && (
           <ExpenseInviteNotificationBanner expense={expense} createdUser={state.createdUser} />
         )}
       {isMissingReceipt && (
@@ -585,6 +550,21 @@ function Expense(props) {
       )}
       {status !== PAGE_STATUS.EDIT && (
         <Box mb={3}>
+          {isNewExpenseSubmissionFlow &&
+            (expense?.permissions?.canDeclineExpenseInvite ||
+              (expense?.status === ExpenseStatus.DRAFT &&
+                !isRecurring &&
+                draftKey &&
+                expense?.draft?.recipientNote)) && (
+              <ExpenseInviteWelcome
+                onContinueSubmissionClick={() => {
+                  setIsSubmissionFlowOpen(true);
+                }}
+                className="mb-6"
+                expense={expense}
+                draftKey={draftKey}
+              />
+            )}
           <ExpenseSummary
             expense={status === PAGE_STATUS.EDIT_SUMMARY ? editedExpense : expense}
             host={host}
@@ -789,6 +769,21 @@ function Expense(props) {
             />
           )}
         </Fragment>
+      )}
+
+      {isSubmissionFlowOpen && (
+        <SubmitExpenseFlow
+          onClose={submitted => {
+            setIsSubmissionFlowOpen(false);
+            if (submitted) {
+              refetch();
+            }
+          }}
+          expenseId={legacyExpenseId}
+          draftKey={draftKey}
+          submitExpenseTo={collective?.slug}
+          endFlowButtonLabel={<FormattedMessage defaultMessage="View expense" id="CaE5Oi" />}
+        />
       )}
 
       {state.showFilesViewerModal &&

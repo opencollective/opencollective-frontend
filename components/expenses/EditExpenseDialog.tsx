@@ -1,5 +1,5 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { DialogClose } from '@radix-ui/react-dialog';
 import { Form, FormikProvider, useFormikContext } from 'formik';
 import { pick } from 'lodash';
@@ -9,8 +9,9 @@ import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import type { Currency, CurrencyExchangeRateInput, Expense } from '../../lib/graphql/types/v2/graphql';
+import type { Currency, CurrencyExchangeRateInput } from '../../lib/graphql/types/v2/graphql';
 import { cn } from '../../lib/utils';
+import type { Expense } from '@/lib/graphql/types/v2/schema';
 
 import { FormField } from '../FormField';
 import { FormikZod } from '../FormikZod';
@@ -33,7 +34,7 @@ import { Label } from '../ui/Label';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 import { toast } from '../ui/useToast';
 
-import { expensePageExpenseFieldsFragment } from './graphql/fragments';
+import { editExpenseMutation } from './graphql/mutations';
 
 const RenderFormFields = ({ field, onSubmit, expense }) => {
   switch (field) {
@@ -126,14 +127,14 @@ const EditPayee = ({ expense, onSubmit }) => {
   return (
     <FormikProvider value={expenseForm}>
       <form className="space-y-6" ref={formRef} onSubmit={e => e.preventDefault()}>
-        <WhoIsGettingPaidForm form={expenseForm} />
+        <WhoIsGettingPaidForm {...WhoIsGettingPaidForm.getFormProps(expenseForm)} />
         <Collapsible open={hasChangedPayee}>
           <CollapsibleContent>
             <div className="space-y-3">
               <Label>
                 <FormattedMessage defaultMessage="Pick new payout method" id="expense.pickPayoutMethod" />
               </Label>
-              <PayoutMethodFormContent form={expenseForm} />
+              <PayoutMethodFormContent {...PayoutMethodFormContent.getFormProps(expenseForm)} />
             </div>
           </CollapsibleContent>
         </Collapsible>
@@ -148,7 +149,7 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
   const startOptions = React.useRef({
     expenseId: expense.legacyId,
     isInlineEdit: true,
-    pickSchemaFiels: {
+    pickSchemaFields: {
       expenseItems: true,
       hasTax: true,
       tax: true,
@@ -220,7 +221,7 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
   return (
     <FormikProvider value={expenseForm}>
       <form className="space-y-4" ref={formRef} onSubmit={e => e.preventDefault()}>
-        <PayoutMethodFormContent form={expenseForm} />
+        <PayoutMethodFormContent {...PayoutMethodFormContent.getFormProps(expenseForm)} />
         <EditExpenseActionButtons handleSubmit={expenseForm.handleSubmit} />
       </form>
     </FormikProvider>
@@ -272,7 +273,7 @@ const EditAttachments = ({ expense, onSubmit }) => {
   return (
     <FormikProvider value={expenseForm}>
       <form className="space-y-4" ref={formRef} onSubmit={e => e.preventDefault()}>
-        <AdditionalAttachments form={expenseForm} />
+        <AdditionalAttachments {...AdditionalAttachments.getFormProps(expenseForm)} />
         <EditExpenseActionButtons loading={expenseForm.initialLoading} handleSubmit={expenseForm.handleSubmit} />
       </form>
     </FormikProvider>
@@ -336,7 +337,7 @@ const EditExpenseItems = ({ expense, onSubmit }) => {
   return (
     <FormikProvider value={expenseForm}>
       <form className="space-y-4" ref={formRef} onSubmit={e => e.preventDefault()}>
-        <ExpenseItemsForm form={expenseForm} />
+        <ExpenseItemsForm {...ExpenseItemsForm.getFormProps(expenseForm)} />
         <EditExpenseActionButtons handleSubmit={expenseForm.handleSubmit} />
       </form>
     </FormikProvider>
@@ -403,20 +404,9 @@ export default function EditExpenseDialog({
 }) {
   const [open, setOpen] = React.useState(false);
   const intl = useIntl();
-  const [editExpense] = useMutation(
-    gql`
-      mutation EditExpense($expenseEditInput: ExpenseUpdateInput!) {
-        expense: editExpense(expense: $expenseEditInput) {
-          id
-          ...ExpensePageExpenseFields
-        }
-      }
-      ${expensePageExpenseFieldsFragment}
-    `,
-    {
-      context: API_V2_CONTEXT,
-    },
-  );
+  const [editExpense] = useMutation(editExpenseMutation, {
+    context: API_V2_CONTEXT,
+  });
 
   const onSubmit = React.useCallback(
     async values => {
@@ -427,7 +417,7 @@ export default function EditExpenseDialog({
         };
         await editExpense({
           variables: {
-            expenseEditInput: editInput,
+            expense: editInput,
           },
         });
         setOpen(false);

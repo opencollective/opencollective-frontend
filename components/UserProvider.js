@@ -33,12 +33,6 @@ class UserProvider extends React.Component {
     client: PropTypes.object,
     children: PropTypes.node,
     intl: PropTypes.object,
-    /**
-     * If not used inside of NextJS (ie. in styleguide), the code that checks if we are
-     * on `/signin` that uses `Router` will crash. Setting this prop bypass this behavior.
-     */
-    skipRouteCheck: PropTypes.bool,
-
     initialLoggedInUser: PropTypes.object,
   };
 
@@ -52,7 +46,7 @@ class UserProvider extends React.Component {
     window.addEventListener('storage', this.checkLogin);
 
     // Disable auto-login on SignIn page
-    if (this.props.skipRouteCheck || Router.pathname !== '/signin') {
+    if (Router.pathname !== '/signin') {
       await this.login();
     }
   }
@@ -143,6 +137,13 @@ class UserProvider extends React.Component {
               authenticationOptions: decodedToken.authenticationOptions,
               allowRecovery: true,
             });
+
+            // An empty result means the prompt is already open elsewhere. This could either be due to
+            // React strict mode calling lifecycle methods twice or a developer mistake. The safest option is to early
+            // return and let the other prompt handle the result.
+            if (!result) {
+              return;
+            }
 
             const LoggedInUser = await getLoggedInUser({
               token: getFromLocalStorage(LOCAL_STORAGE_KEYS.TWO_FACTOR_AUTH_TOKEN),

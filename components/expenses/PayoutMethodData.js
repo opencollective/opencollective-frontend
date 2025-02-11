@@ -16,7 +16,7 @@ const renderObject = object =>
     }
     return [
       ...acc,
-      <p className="text-ellipsis text-sm leading-5" key={key}>
+      <p className="text-sm leading-5 text-ellipsis" key={key}>
         <FormattedMessage id="withColon" defaultMessage="{item}:" values={{ item: startCase(key) }} /> {value}
       </p>,
     ];
@@ -53,7 +53,7 @@ const PayoutMethodData = ({ payoutMethod, showLabel = true, isLoading = false })
               <PrivateInfoIcon />
             </Container>
           )}
-          <div className="overflow-hidden text-ellipsis text-sm text-slate-700">
+          <div className="overflow-hidden text-sm text-ellipsis text-slate-700">
             {getPmData(payoutMethod, 'email', isLoading)}
           </div>
         </div>

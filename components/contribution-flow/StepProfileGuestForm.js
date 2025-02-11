@@ -17,16 +17,17 @@ import StyledInputLocation from '../StyledInputLocation';
 import { P, Span } from '../Text';
 
 import StepProfileInfoMessage from './StepProfileInfoMessage';
-import { contributionRequiresAddress, contributionRequiresLegalName } from './utils';
+import { getRequiredInformation } from './utils';
 
-export const validateGuestProfile = (stepProfile, stepDetails, tier) => {
-  if (contributionRequiresAddress(stepDetails, tier)) {
+export const validateGuestProfile = (stepProfile, stepDetails, tier, collective) => {
+  const requiredInformation = getRequiredInformation(undefined, stepDetails, collective, undefined, tier);
+  if (requiredInformation.address) {
     const location = stepProfile.location || {};
     if (!location.country || !(location.address || location.structured)) {
       return false;
     }
   }
-  if (contributionRequiresLegalName(stepDetails, tier)) {
+  if (requiredInformation.legalName) {
     if (!stepProfile.name && !stepProfile.legalName) {
       return false;
     }
@@ -48,9 +49,13 @@ const getSignInLinkQueryParams = email => {
   return email ? { ...params, email } : params;
 };
 
-const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInClick, tier }) => {
+const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInClick, tier, collective }) => {
   const dispatchChange = (field, value) => onChange({ stepProfile: set({ ...data, isGuest: true }, field, value) });
   const dispatchGenericEvent = e => dispatchChange(e.target.name, e.target.value);
+  const requiredInformation = React.useMemo(
+    () => getRequiredInformation(undefined, stepDetails, collective, undefined, tier),
+    [stepDetails, collective, tier],
+  );
 
   return (
     <Container border="none" width={1} pb={3}>
@@ -122,7 +127,7 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInCl
         labelFontSize="16px"
         labelFontWeight="700"
         isPrivate
-        required={contributionRequiresLegalName(stepDetails, tier) && !data?.name}
+        required={requiredInformation.legalName && !data?.name}
         mt={20}
         hint={
           <FormattedMessage
@@ -141,12 +146,7 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInCl
           />
         )}
       </StyledInputField>
-      {isCaptchaEnabled() && (
-        <Flex mt="18px" justifyContent="center">
-          <Captcha onVerify={result => dispatchChange('captcha', result)} />
-        </Flex>
-      )}
-      {contributionRequiresAddress(stepDetails, tier) && (
+      {requiredInformation.address && (
         <React.Fragment>
           <Flex alignItems="center" my="14px">
             <P fontSize="24px" lineHeight="32px" fontWeight="500" mr={2}>
@@ -166,6 +166,11 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInCl
           />
         </React.Fragment>
       )}
+      {isCaptchaEnabled() && (
+        <Flex mt="18px" justifyContent="center">
+          <Captcha onVerify={result => dispatchChange('captcha', result)} />
+        </Flex>
+      )}
       <StepProfileInfoMessage isGuest hasLegalNameField />
       <P color="black.500" fontSize="12px" mt={4} data-cy="join-conditions">
         <FormattedMessage
@@ -184,6 +189,7 @@ StepProfileGuestForm.propTypes = {
     interval: PropTypes.string,
   }).isRequired,
   data: PropTypes.object,
+  collective: PropTypes.object,
   onSignInClick: PropTypes.func,
   onChange: PropTypes.func,
   defaultEmail: PropTypes.string,

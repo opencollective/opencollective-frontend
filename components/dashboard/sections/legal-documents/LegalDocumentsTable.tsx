@@ -65,7 +65,7 @@ const columns: ColumnDef<LegalDocument>[] = [
           <DateTime value={requestedAt} dateStyle="medium" />
         </span>
       ) : (
-        <span className="italic text-slate-500">
+        <span className="text-slate-500 italic">
           <FormattedMessage defaultMessage="Never" id="du1laW" />
         </span>
       );

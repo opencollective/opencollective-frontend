@@ -24,9 +24,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../../../../ui/Tooltip'
 import DashboardHeader from '../../../DashboardHeader';
 import { UNCATEGORIZED_VALUE } from '../../../filters/AccountingCategoryFilter';
 import type { DashboardSectionProps } from '../../../types';
-import { HostExpensesReportTabs } from '../../reports/preview/HostReportTabs';
-import { ReportNavigationArrows } from '../../reports/preview/NavigationArrows';
-import { deserializeReportSlug, ReportPeriodSelector } from '../../reports/preview/ReportPeriodSelector';
+import { HostExpensesReportTabs } from '../../reports/HostReportTabs';
+import { ReportNavigationArrows } from '../../reports/NavigationArrows';
+import { deserializeReportSlug, ReportPeriodSelector } from '../../reports/ReportPeriodSelector';
 
 const schema = z.object({
   isHost: boolean.default(false),
@@ -104,7 +104,7 @@ export function HostExpensesReportView(props: DashboardSectionProps) {
 
   return (
     <React.Fragment>
-      <div className="flex max-w-screen-lg flex-col gap-4">
+      <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
         <DashboardHeader
           title={<FormattedMessage defaultMessage="Expense Reports" id="qC0ZXX" />}
           titleRoute={`/dashboard/${props.accountSlug}/reports/expenses`}
@@ -157,8 +157,8 @@ export function HostExpensesReportView(props: DashboardSectionProps) {
 
                       return (
                         // eslint-disable-next-line react/no-array-index-key
-                        <tr key={i} className="group border-b text-sm hover:bg-muted has-[[data-state=open]]:bg-muted">
-                          <td className="flex min-h-8 flex-1 items-center gap-1 overflow-hidden truncate text-wrap py-1 pl-6 text-left sm:pl-10">
+                        <tr key={i} className="group border-b text-sm hover:bg-muted has-data-[state=open]:bg-muted">
+                          <td className="flex min-h-8 flex-1 items-center gap-1 truncate overflow-hidden py-1 pl-6 text-left text-wrap sm:pl-10">
                             <AccountingCategoryLabel accountingCategory={item.accountingCategory} />
                             <Tooltip delayDuration={100}>
                               <TooltipTrigger asChild>
@@ -208,7 +208,7 @@ export function HostExpensesReportView(props: DashboardSectionProps) {
                   </tbody>
                   <tfoot className="py-4">
                     <tr>
-                      <td className="flex min-h-8 flex-1 items-center gap-1 overflow-hidden truncate text-wrap py-1 pl-6 text-left sm:pl-10">
+                      <td className="flex min-h-8 flex-1 items-center gap-1 truncate overflow-hidden py-1 pl-6 text-left text-wrap sm:pl-10">
                         <FormattedMessage defaultMessage="Total" id="MJ2jZQ" />
                         <Tooltip delayDuration={100}>
                           <TooltipTrigger asChild>

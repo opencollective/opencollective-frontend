@@ -90,7 +90,7 @@ export function Metric({
       className={clsx(
         'group flex flex-col gap-1 rounded-xl border transition-all',
         isButton &&
-          'cursor-pointer text-left ring-ring ring-offset-2 hover:shadow-lg focus:outline-none focus-visible:ring-2',
+          'cursor-pointer text-left ring-ring ring-offset-2 hover:shadow-lg focus:outline-hidden focus-visible:ring-2',
         className,
       )}
       {...(isButton && { onClick: props.onClick })}

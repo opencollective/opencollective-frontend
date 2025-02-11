@@ -36,7 +36,7 @@ const Count = ({ count, selected }: { count?: number; selected?: boolean }) => {
 };
 
 type TabsProps = {
-  tabs: Array<{ id: string; label: React.ReactNode | string; count?: number }>;
+  tabs: readonly { id: string; label: React.ReactNode | string; count?: number }[];
   selectedId?: string;
   onChange?: (value: string) => void;
   variant?: 'horizontal' | 'vertical';
@@ -75,12 +75,12 @@ const Tabs = ({ tabs, selectedId, onChange, ...props }: TabsProps) => {
               key={tab.id}
               onClick={() => onChange?.(tab.id)}
               className={clsx(
-                'ring-ringtransition-colors flex items-center justify-between gap-2 whitespace-nowrap rounded-md px-2 py-1 ring-inset focus:outline-none focus-visible:ring-2',
+                'ring-ringtransition-colors flex items-center justify-between gap-2 rounded-md px-2 py-1 whitespace-nowrap ring-inset focus:outline-hidden focus-visible:ring-2',
                 selected ? 'bg-primary/10' : 'hover:border-border hover:text-foreground/80',
               )}
             >
               <div className="font-bold">{tab.label}</div>
-              {!isNil(tab.count) && <div className="text-xs text-slate-600">({tab.count})</div>}
+              {!isNil(tab.count) && !isNaN(tab.count) && <div className="text-xs text-slate-600">({tab.count})</div>}
             </button>
           );
         })}
@@ -99,7 +99,7 @@ const Tabs = ({ tabs, selectedId, onChange, ...props }: TabsProps) => {
               type="button"
               onClick={() => onChange?.(tab.id)}
               className={clsx(
-                'flex gap-3 whitespace-nowrap border-b-2 px-1 pb-4 pt-2 text-sm font-medium ring-inset ring-ring transition-colors focus:outline-none focus-visible:ring-2',
+                'flex gap-3 border-b-2 px-1 pt-2 pb-4 text-sm font-medium whitespace-nowrap ring-ring transition-colors ring-inset focus:outline-hidden focus-visible:ring-2',
                 selected
                   ? 'border-primary text-primary'
                   : 'border-transparent text-muted-foreground hover:border-border hover:text-foreground/80',

@@ -12,7 +12,7 @@ import { Span } from '../Text';
 
 import { canUseIncognitoForContribution } from './utils';
 
-const { USER, ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT } = CollectiveType;
+const { ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT, INDIVIDUAL } = CollectiveType;
 
 const formatAccountName = (intl, account) => {
   return account.isIncognito
@@ -21,22 +21,28 @@ const formatAccountName = (intl, account) => {
 };
 
 const getProfileOptions = (intl, profiles, tier) => {
-  const getOptionFromAccount = value => ({ [FLAG_COLLECTIVE_PICKER_COLLECTIVE]: true, value, label: value.name });
+  const getOptionFromAccount = value => ({
+    [FLAG_COLLECTIVE_PICKER_COLLECTIVE]: true,
+    value: value.account,
+    label: value.account.name,
+  });
   const sortOptions = options => sortBy(options, 'value.name');
   const profileOptions = profiles.map(getOptionFromAccount);
   const profilesByType = groupBy(profileOptions, p => p.value.type);
-  const myself = profilesByType[USER] || [];
+  const myself = profilesByType[INDIVIDUAL] || [];
   const myOrganizations = sortOptions(profilesByType[ORGANIZATION] || []);
 
   // Add incognito profile entry if it doesn't exists
-  const hasIncognitoProfile = profiles.some(p => p.type === CollectiveType.USER && p.isIncognito);
+  const hasIncognitoProfile = profiles.some(p => p.account.type === CollectiveType.INDIVIDUAL && p.account.isIncognito);
   if (!hasIncognitoProfile && canUseIncognitoForContribution(tier)) {
     myself.push(
       getOptionFromAccount({
-        id: 'incognito',
-        type: CollectiveType.USER,
-        isIncognito: true,
-        name: intl.formatMessage({ id: 'profile.incognito', defaultMessage: 'Incognito' }),
+        account: {
+          id: 'incognito',
+          type: CollectiveType.INDIVIDUAL,
+          isIncognito: true,
+          name: intl.formatMessage({ id: 'profile.incognito', defaultMessage: 'Incognito' }),
+        },
       }),
     );
   }
@@ -99,7 +105,7 @@ const formatProfileOption = (option, _, intl) => {
           </Span>
         ) : (
           <Span fontSize="12px" lineHeight="18px" color="black.700">
-            {account.type === 'USER' && (
+            {account.type === CollectiveType.INDIVIDUAL && (
               <React.Fragment>
                 <FormattedMessage id="ContributionFlow.PersonalProfile" defaultMessage="Personal profile" />
                 {' - '}

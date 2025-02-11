@@ -176,7 +176,7 @@ class Webhooks extends React.Component {
     const { intl, data } = this.props;
 
     return (
-      <div key={index} className="rounded-lg border bg-white p-6 text-card-foreground shadow-sm">
+      <div key={index} className="rounded-lg border bg-white p-6 text-card-foreground shadow-xs">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="rounded-full bg-slate-100 p-2">
@@ -291,7 +291,7 @@ class Webhooks extends React.Component {
 
         <Separator className="my-6" />
 
-        <div className="mb-6 mt-8 flex items-center justify-between">
+        <div className="mt-8 mb-6 flex items-center justify-between">
           <h3 className="text-xl font-bold">
             <FormattedMessage
               defaultMessage="Webhooks for {collective}"
@@ -305,7 +305,7 @@ class Webhooks extends React.Component {
         </div>
 
         {webhooks.length === 0 ? (
-          <div className="rounded-lg border bg-card py-12 text-center text-card-foreground shadow-sm">
+          <div className="rounded-lg border bg-card py-12 text-center text-card-foreground shadow-xs">
             <WebhookIcon className="mx-auto mb-4 h-16 w-16 text-gray-400" />
             <h4 className="text-lg font-semibold">
               <FormattedMessage defaultMessage="No webhooks configured" id="prsPHX" />

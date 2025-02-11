@@ -283,6 +283,18 @@ export const expensePageExpenseFieldsFragment = gql`
         toCurrency
       }
     }
+    amountInHostCurrency: amountV2(currencySource: HOST) {
+      valueInCents
+      currency
+      exchangeRate {
+        date
+        value
+        source
+        isApproximate
+        fromCurrency
+        toCurrency
+      }
+    }
     createdAt
     invoiceInfo
     merchantId
@@ -656,6 +668,18 @@ export const expensesListFieldsFragment = gql`
       ...ExpenseValuesByRoleFragment
     }
     amountInAccountCurrency: amountV2(currencySource: ACCOUNT) {
+      valueInCents
+      currency
+      exchangeRate {
+        date
+        value
+        source
+        isApproximate
+        fromCurrency
+        toCurrency
+      }
+    }
+    amountInHostCurrency: amountV2(currencySource: HOST) {
       valueInCents
       currency
       exchangeRate {

@@ -9,9 +9,9 @@ import styled from 'styled-components';
 import { giftCardsDownloadUrl } from '../lib/url-helpers';
 import { getWebsiteUrl } from '../lib/utils';
 
+import { Button } from './ui/Button';
 import FileDownloader from './FileDownloader';
 import { Box, Flex } from './Grid';
-import StyledButton from './StyledButton';
 import StyledInput from './StyledInput';
 import { P } from './Text';
 
@@ -83,17 +83,10 @@ export default class CreateGiftCardsSuccess extends React.Component {
 
         <Flex width={1} flexDirection="column" alignItems="center">
           <Flex my={3} flexWrap="wrap" justifyContent="center">
-            <StyledButton
-              m={2}
-              minWidth={270}
-              buttonSize="large"
-              buttonStyle="primary"
-              onClick={this.copyLinksToClipboard}
-            >
-              <Clipboard size="1em" />
-              &nbsp;
+            <Button className="mx-2 min-w-[270px]" onClick={this.copyLinksToClipboard}>
+              <Clipboard className="mr-2" size="1em" />
               <FormattedMessage id="CreateGiftCardsSuccess.RedeemLinks" defaultMessage="Copy links" />
-            </StyledButton>
+            </Button>
             {this.props.cards.length < 300 && (
               <FileDownloader
                 url={downloadUrl}
@@ -105,18 +98,16 @@ export default class CreateGiftCardsSuccess extends React.Component {
                 })}
               >
                 {({ loading, downloadFile }) => (
-                  <StyledButton
-                    minWidth={270}
-                    m={2}
-                    buttonSize="large"
-                    loading={loading}
+                  <Button
+                    className="mx-2 min-w-[270px]"
+                    disabled={loading}
                     onClick={downloadFile}
                     data-cy="download-gift-cards-btn"
+                    variant="outline"
                   >
-                    <Printer size="1em" />
-                    &nbsp;
+                    <Printer className="mr-2" size="1em" />
                     <FormattedMessage id="CreateGiftCardsSuccess.Download" defaultMessage="Download cards" />
-                  </StyledButton>
+                  </Button>
                 )}
               </FileDownloader>
             )}

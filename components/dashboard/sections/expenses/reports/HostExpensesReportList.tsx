@@ -22,8 +22,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../../../../ui/Tooltip'
 import DashboardHeader from '../../../DashboardHeader';
 import { Pagination } from '../../../filters/Pagination';
 import type { DashboardSectionProps } from '../../../types';
-import { CurrentPeriodBadge } from '../../reports/preview/CurrentPeriodBadge';
-import { renderReportPeriodLabel, serializeReportSlug } from '../../reports/preview/ReportPeriodSelector';
+import { CurrentPeriodBadge } from '../../reports/CurrentPeriodBadge';
+import { renderReportPeriodLabel, serializeReportSlug } from '../../reports/ReportPeriodSelector';
 
 const schema = z.object({
   timeUnit: z.enum(['MONTH', 'QUARTER', 'YEAR']).default('MONTH'),
@@ -213,7 +213,7 @@ export function HostExpensesReportList(props: DashboardSectionProps) {
 
   return (
     <React.Fragment>
-      <div className="flex max-w-screen-lg flex-col gap-4">
+      <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
         <DashboardHeader
           title={<FormattedMessage defaultMessage="Expense Reports" id="qC0ZXX" />}
           titleRoute={`/dashboard/${props.accountSlug}/reports/expenses`}

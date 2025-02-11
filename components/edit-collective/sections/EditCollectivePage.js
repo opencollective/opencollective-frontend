@@ -67,6 +67,10 @@ export const getSettingsQuery = gql`
           receiptPolicy
           titlePolicy
         }
+        CONTRIBUTOR_INFO_THRESHOLDS {
+          legalName
+          address
+        }
       }
       ... on AccountWithHost {
         host {
@@ -485,12 +489,12 @@ const EditCollectivePage = ({ collective }) => {
       </SettingsSubtitle>
       <Flex flexWrap="wrap" mt={4}>
         <Box width="100%" maxWidth={436}>
-          {loading || !sections ? (
+          {loading ? (
             <LoadingPlaceholder height={400} />
           ) : (
             <div>
               <StyledCard mb={4} overflowX={'visible'} overflowY="visible" position="relative">
-                <SortableContext items={sections?.map(item => item.name)} strategy={verticalListSortingStrategy}>
+                <SortableContext items={sections.map(item => item.name)} strategy={verticalListSortingStrategy}>
                   {sections.map((item, index) => {
                     return (
                       <React.Fragment key={item.name}>

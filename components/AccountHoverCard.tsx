@@ -259,7 +259,7 @@ type InfoItemProps = {
 const InfoItem = ({ Icon, info }: InfoItemProps) => (
   <div className="flex items-start gap-2 overflow-hidden text-xs text-muted-foreground">
     <Icon size={14} className="shrink-0" />
-    <span className="[&>a:hover]:text-primary [&>a]:text-foreground [&>a]:underline">{info}</span>
+    <span className="[&>a]:text-foreground [&>a]:underline [&>a:hover]:text-primary">{info}</span>
   </div>
 );
 
@@ -346,7 +346,7 @@ export const AccountHoverCard = ({
           </div>
 
           {account.description && (
-            <div className="line-clamp-1 whitespace-pre-wrap text-sm text-foreground">{account.description}</div>
+            <div className="line-clamp-1 text-sm whitespace-pre-wrap text-foreground">{account.description}</div>
           )}
 
           {(infoItems.length > 0 || asyncInfoItems.length > 0 || loading) && (
@@ -372,7 +372,7 @@ export const AccountHoverCard = ({
             </div>
           )}
 
-          {loading && <StyledSpinner className="absolute right-0 top-0 text-muted-foreground" />}
+          {loading && <StyledSpinner className="absolute top-0 right-0 text-muted-foreground" />}
         </div>
       </HoverCardContent>
     </HoverCard>

@@ -75,7 +75,7 @@ export function ColumnHeader<TData, TValue>({
             variant="ghost"
             size="xs"
             className={clsx(
-              'group/btn -m-2.5 gap-2 data-[state=open]:bg-accent data-[state=open]:text-foreground [&>svg]:data-[state=open]:!text-muted-foreground',
+              'group/btn -m-2.5 gap-2 data-[state=open]:bg-accent data-[state=open]:text-foreground data-[state=open]:[&>svg]:text-muted-foreground!',
               isSorted && 'text-foreground',
             )}
           >

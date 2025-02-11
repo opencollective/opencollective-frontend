@@ -7,7 +7,7 @@ export enum PREVIEW_FEATURE_KEYS {
   DYNAMIC_TOP_BAR = 'DYNAMIC_TOP_BAR',
   COLLECTIVE_OVERVIEW = 'COLLECTIVE_OVERVIEW',
   NEW_EXPENSE_FLOW = 'NEW_EXPENSE_FLOW',
-  HOST_REPORTS = 'HOST_REPORTS',
+  INLINE_EDIT_EXPENSE = 'INLINE_EDIT_EXPENSE',
   CROWDFUNDING_REDESIGN = 'CROWDFUNDING_REDESIGN',
   TRANSACTIONS_IMPORTS = 'TRANSACTIONS_IMPORTS',
   AUTHENTICATED_SSR = 'AUTHENTICATED_SSR',
@@ -32,6 +32,9 @@ export type PreviewFeature = {
   hasAccess?: (loggedInUser: LoggedInUser) => boolean;
 };
 
+const PLATFORM_ACCOUNTS = ['ofico', 'ofitech'];
+const FIRST_PARTY_HOSTS = ['opensource', 'europe', 'oce-foundation-usd', 'oce-foundation-eur', 'raft', 'metagov'];
+
 /**
  * List of current preview features.
  */
@@ -48,7 +51,7 @@ export const previewFeatures: PreviewFeature[] = [
     publicBeta: true,
     alwaysEnableInDev: true,
     enabledByDefaultFor: ['*'],
-    closedBetaAccessFor: ['opencollective', 'opensource', 'foundation', 'europe', 'design', 'engineering'],
+    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
   },
   {
     key: PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW,
@@ -56,15 +59,16 @@ export const previewFeatures: PreviewFeature[] = [
     description: 'Improved expense submission flow in Dashboard',
     alwaysEnableInDev: true,
     publicBeta: false,
-    closedBetaAccessFor: ['opencollective', 'design', 'engineering', 'opensource', 'europe'],
+    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
   },
   {
-    key: PREVIEW_FEATURE_KEYS.HOST_REPORTS,
-    title: 'New Host Transactions Report',
-    description:
-      'A new report that sums up all transactions to create a comprehensive overview of all activity in your account.',
-    publicBeta: true,
+    key: PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE,
+    dependsOn: PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW,
+    title: 'Inline edit expense',
+    description: 'Inline edit expense in Dashboard',
     alwaysEnableInDev: true,
+    publicBeta: false,
+    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
   },
   {
     key: PREVIEW_FEATURE_KEYS.CROWDFUNDING_REDESIGN,
@@ -73,13 +77,12 @@ export const previewFeatures: PreviewFeature[] = [
       'Be part of the crowdfunding redesign effort and get access to previews of new crowdfunding and profile pages',
     alwaysEnableInDev: true,
     publicBeta: true,
-    closedBetaAccessFor: ['opencollective', 'design', 'engineering'],
   },
   {
     key: PREVIEW_FEATURE_KEYS.AUTHENTICATED_SSR,
     title: 'Authenticated SSR',
     description: 'Uses cookie based authentication to generate initial page loads on the server',
-    closedBetaAccessFor: ['opencollective', 'design', 'engineering'],
+    closedBetaAccessFor: PLATFORM_ACCOUNTS,
     publicBeta: false,
     isEnabled() {
       return document.cookie.indexOf('enableAuthSsr') !== -1;
@@ -96,8 +99,8 @@ export const previewFeatures: PreviewFeature[] = [
     key: PREVIEW_FEATURE_KEYS.VERCEL_BACKEND,
     title: 'Vercel Backend',
     description: 'Uses Vercel as the frontend backend provider',
-    closedBetaAccessFor: ['opencollective', 'design', 'engineering'],
     publicBeta: false,
+    closedBetaAccessFor: PLATFORM_ACCOUNTS,
     isEnabled() {
       return document.cookie.indexOf('backend=vercel') !== -1;
     },
@@ -120,7 +123,7 @@ export const previewFeatures: PreviewFeature[] = [
     publicBeta: false,
     title: 'Search command menu',
     description: 'A new way to search for collectives, transactions, expenses and more',
-    closedBetaAccessFor: ['ofico', 'ofitech', 'europe', 'oce-foundation-usd', 'oce-foundation-eur', 'opensource'],
+    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
   },
   {
     key: PREVIEW_FEATURE_KEYS.TRANSACTIONS_IMPORTS,
@@ -133,7 +136,7 @@ export const previewFeatures: PreviewFeature[] = [
     title: 'Bank Account synchronization',
     description: 'Connect your bank account to import transactions',
     publicBeta: false,
-    closedBetaAccessFor: ['opensource', 'ofico', 'ofitech', 'europe', 'oce-foundation-usd', 'oce-foundation-eur'],
+    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS, 'opencollective'],
     dependsOn: PREVIEW_FEATURE_KEYS.TRANSACTIONS_IMPORTS,
   },
 ];

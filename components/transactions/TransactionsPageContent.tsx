@@ -194,10 +194,10 @@ const Transactions = ({
   return (
     <Container>
       <div className="flex flex-wrap justify-between gap-4">
-        <h1 className={isDashboard ? 'text-2xl font-bold leading-10 tracking-tight' : 'text-[32px] leading-10'}>
+        <h1 className={isDashboard ? 'text-2xl leading-10 font-bold tracking-tight' : 'text-[32px] leading-10'}>
           <FormattedMessage id="menu.transactions" defaultMessage="Transactions" />
         </h1>
-        <div className="w-[276px] flex-grow sm:flex-grow-0">
+        <div className="w-[276px] grow sm:grow-0">
           <SearchBar
             placeholder={intl.formatMessage({ defaultMessage: 'Search transactions…', id: 'tTmMmK' })}
             defaultValue={router.query.searchTerm}

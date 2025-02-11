@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { round } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
 
 import { AmountPropTypeShape } from '../lib/prop-types';
 import { cn } from '../lib/utils';
@@ -77,10 +76,6 @@ export const formatFxRateInfo = (intl, exchangeRate, { approximateCustomMessage,
   );
 };
 
-const ContentContainer = styled.div`
-  white-space: nowrap;
-`;
-
 const AmountWithExchangeRateInfo = ({
   amount: { exchangeRate, currency, value, valueInCents },
   amountClassName,
@@ -88,6 +83,8 @@ const AmountWithExchangeRateInfo = ({
   invertIconPosition,
   warning,
   error,
+  amountWrapperClassName,
+  currencyCodeClassName,
 }) => {
   const intl = useIntl();
   return (
@@ -98,16 +95,17 @@ const AmountWithExchangeRateInfo = ({
       content={() => formatFxRateInfo(intl, exchangeRate, { warning, error })}
     >
       <Flex flexWrap="noWrap" alignItems="center" flexDirection={invertIconPosition ? 'row-reverse' : 'row'} gap="4px">
-        <ContentContainer>
-          {exchangeRate?.isApproximate && `~ `}
+        <div className={cn('flex flex-row gap-1 whitespace-nowrap', amountWrapperClassName)}>
           <FormattedMoneyAmount
             amount={valueInCents ?? Math.round(value * 100)}
             currency={currency}
             precision={2}
             amountClassName={amountClassName || null}
             showCurrencyCode={showCurrencyCode}
+            isApproximate={exchangeRate?.isApproximate}
+            currencyCodeClassName={currencyCodeClassName}
           />
-        </ContentContainer>
+        </div>
         <InfoCircle size="1em" className={cn({ 'text-yellow-600': warning, 'text-red-600': error })} />
       </Flex>
     </StyledTooltip>
@@ -119,6 +117,8 @@ AmountWithExchangeRateInfo.propTypes = {
   showCurrencyCode: PropTypes.bool,
   invertIconPosition: PropTypes.bool,
   amountClassName: PropTypes.object,
+  amountWrapperClassName: PropTypes.string,
+  currencyCodeClassName: PropTypes.string,
   warning: PropTypes.node,
   error: PropTypes.node,
 };

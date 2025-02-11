@@ -9,6 +9,7 @@ import { cn } from '../lib/utils';
 import { Input } from './ui/Input';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/Tooltip';
 import { formatFxRateInfo } from './AmountWithExchangeRateInfo';
+import StyledSpinner from './StyledSpinner';
 
 /**
  * Displays an exchange rate in the format: 1 {fromCurrency} = {value} {toCurrency}
@@ -22,6 +23,7 @@ export const ExchangeRate = ({
   error = null,
   onChange = undefined,
   'data-cy': dataCy = 'exchange-rate',
+  loading = false,
 }: {
   exchangeRate: CurrencyExchangeRate | CurrencyExchangeRateInput;
   approximateCustomMessage?: React.ReactNode;
@@ -30,6 +32,7 @@ export const ExchangeRate = ({
   warning?: React.ReactNode;
   error?: React.ReactNode;
   'data-cy'?: string;
+  loading?: boolean;
 }) => {
   const [isEditing, setEditing] = React.useState(false);
   const intl = useIntl();
@@ -37,7 +40,7 @@ export const ExchangeRate = ({
   return (
     <Tooltip>
       <TooltipTrigger data-cy={dataCy}>
-        <div className={cn('flex items-center whitespace-nowrap text-xs text-neutral-700', className)}>
+        <div className={cn('flex items-center text-xs whitespace-nowrap text-neutral-700', className)}>
           <InfoIcon
             size={14}
             className={cn({
@@ -75,7 +78,8 @@ export const ExchangeRate = ({
             ) : (
               <span>
                 {exchangeRate['isApproximate'] ? '~' : ''}
-                {exchangeRate.value ? round(exchangeRate.value, 7) : '?'} {exchangeRate.toCurrency}
+                {loading ? <StyledSpinner size="1em" /> : exchangeRate.value ? round(exchangeRate.value, 7) : '?'}{' '}
+                {exchangeRate.toCurrency}
               </span>
             )}
           </div>

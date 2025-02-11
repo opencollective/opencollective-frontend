@@ -71,7 +71,7 @@ const MemoizedTaxFormPreview = React.memo(({ url }: { url: string }) => {
 
   return (
     <div ref={contentWrapperRef}>
-      <div key={currentRender.time} className={cn({ 'blur-sm': hasPendingReRender || !isInitialized })}>
+      <div key={currentRender.time} className={cn({ 'blur-xs': hasPendingReRender || !isInitialized })}>
         {currentRender.result}
       </div>
       {hasPendingReRender && nextRender && nextRender.time !== currentRender.time && (

@@ -83,7 +83,7 @@ export function PayoutMethodLabel(props: PayoutMethodLabelProps) {
 
   if (props.showIcon) {
     return (
-      <div className="flex items-center gap-2 whitespace-nowrap">
+      <div className="flex min-h-8 items-center gap-2 whitespace-nowrap">
         <PayoutMethodIcon payoutMethod={pm} />
         &nbsp;
         {label}

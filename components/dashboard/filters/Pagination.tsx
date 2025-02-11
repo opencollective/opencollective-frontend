@@ -30,7 +30,7 @@ function SelectLimit({ limit, setLimit, defaultLimit }) {
         <Button variant="outline" size="sm" className="shrink-0">
           <FormattedMessage defaultMessage="{rowCount} per page" id="Pagination.PerPage" values={{ rowCount: limit }} />
           <SelectPrimitive.Icon asChild>
-            <ChevronDown className="h-4 w-4 flex-shrink-0 opacity-50" />
+            <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
           </SelectPrimitive.Icon>
         </Button>
       </SelectPrimitive.Trigger>

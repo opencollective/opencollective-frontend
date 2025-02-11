@@ -20,7 +20,7 @@ export function truncate(str, length) {
 }
 
 export function truncateMiddle(str, length, divider = '…') {
-  if (str.length <= length) {
+  if (!str || typeof str !== 'string' || str.length <= length) {
     return str;
   }
   const splitLength = Math.floor(length / 2);

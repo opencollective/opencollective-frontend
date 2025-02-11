@@ -404,7 +404,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
   const amounts = getAmountsFromValues(values);
   return (
     <Form data-cy="create-pending-contribution-form" className="flex h-full flex-col overflow-y-hidden">
-      <div className="w-full flex-grow overflow-y-auto py-4">
+      <div className="w-full grow overflow-y-auto py-4">
         <Field
           name="toAccount"
           htmlFor="CreatePendingContribution-toAccount"
@@ -557,7 +557,6 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
                 account={collective}
                 selectedCategory={field.value}
                 allowNone={true}
-                borderRadiusClass="rounded"
               />
             )}
           </Field>
@@ -826,7 +825,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
 
         {error && <MessageBoxGraphqlError error={error} mt={3} fontSize="13px" />}
       </div>
-      <div className="border-t-1 flex justify-center gap-4 border-t border-solid border-t-slate-100 pt-4">
+      <div className="flex justify-center gap-4 border-t border-t-1 border-solid border-t-slate-100 pt-4">
         <Button onClick={onClose} variant="outline" type="button">
           <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
         </Button>

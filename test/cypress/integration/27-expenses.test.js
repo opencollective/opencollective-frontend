@@ -51,7 +51,9 @@ describe('Expense flow', () => {
       cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
       cy.getByDataCy('currency-picker').click();
       cy.contains('[data-cy="select-option"]', 'US Dollar').click();
+      cy.getByDataCy('select-content').should('not.exist');
       cy.get('textarea[name="payoutMethod.data.content"]').type('Bank Account: 007');
+      cy.wait(100);
       cy.getByDataCy('expense-next').click();
 
       cy.get('textarea[name="description"]').type('Brussels January team retreat');
@@ -125,6 +127,7 @@ describe('Expense flow', () => {
       cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
       cy.getByDataCy('currency-picker').click();
       cy.contains('[data-cy="select-option"]', 'US Dollar').click();
+      cy.getByDataCy('select-content').should('not.exist');
       cy.get('textarea[name="payoutMethod.data.content"]').type('Bank Account: 007');
       cy.getByDataCy('expense-next').click();
       cy.getByDataCy('expense-currency-picker').click();
@@ -156,6 +159,7 @@ describe('Expense flow', () => {
       cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
       cy.getByDataCy('currency-picker').click();
       cy.contains('[data-cy="select-option"]', 'US Dollar').click();
+      cy.getByDataCy('select-content').should('not.exist');
       cy.get('textarea[name="payoutMethod.data.content"]').type('Bank Account: 007');
       cy.getByDataCy('expense-next').click();
       cy.get('textarea[name="description"]').type('An Expense with OCR enabled');
@@ -237,6 +241,7 @@ describe('Expense flow', () => {
       cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
       cy.getByDataCy('currency-picker').click();
       cy.contains('[data-cy="select-option"]', 'US Dollar').click();
+      cy.getByDataCy('select-content').should('not.exist');
       cy.get('textarea[name="payoutMethod.data.content"]').type('Bank Account: 007');
       cy.getByDataCy('expense-next').click();
       cy.get('textarea[name="description"]').type('An Expense with multi-currencies on items + OCR');
@@ -387,6 +392,7 @@ describe('Expense flow', () => {
       cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
       cy.getByDataCy('currency-picker').click();
       cy.contains('[data-cy="select-option"]', 'US Dollar').click();
+      cy.getByDataCy('select-content').should('not.exist');
       cy.getByDataCy('country-select').click();
       cy.contains('[data-cy="select-option"]', 'Angola').click();
       cy.get('input[data-cy="address-address1"]').type('Street Name, 123');
@@ -501,6 +507,7 @@ describe('Expense flow', () => {
         cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
         cy.getByDataCy('currency-picker').click();
         cy.contains('[data-cy="select-option"]', 'US Dollar').click();
+        cy.getByDataCy('select-content').should('not.exist');
         cy.get('textarea[name="payoutMethod.data.content"]').type('make it rain');
 
         cy.getByDataCy('expense-next').click();
@@ -584,6 +591,8 @@ describe('Expense flow', () => {
         cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
         cy.getByDataCy('currency-picker').click();
         cy.contains('[data-cy="select-option"]', 'US Dollar').click();
+        cy.getByDataCy('select-content').should('not.exist');
+
         cy.get('textarea[name="payoutMethod.data.content"]').type('make it rain');
 
         cy.getByDataCy('expense-next').click();
@@ -639,11 +648,13 @@ describe('Expense flow', () => {
       cy.contains('[data-cy="select-option"]', 'New custom payout method').click();
       cy.getByDataCy('currency-picker').click();
       cy.contains('[data-cy="select-option"]', 'US Dollar').click();
+      cy.getByDataCy('select-content').should('not.exist');
       cy.get('textarea[name="payoutMethod.data.content"]').type('Bank Account: 007');
       cy.getByDataCy('country-select').click();
       cy.contains('[data-cy="select-option"]', 'Angola').click();
       cy.get('input[data-cy="address-address1"]').type('Street Name, 123');
       cy.get('input[data-cy="address-city"]').type('Citycitycity');
+      cy.wait(100);
       cy.getByDataCy('expense-next').click();
 
       // Fill details

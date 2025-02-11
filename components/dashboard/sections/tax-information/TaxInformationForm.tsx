@@ -209,7 +209,7 @@ export const TaxInformationForm = ({
                               />
                             )}
                           </StyledInputFormikField>
-                          <p className="mb-4 mt-3 text-sm text-neutral-700">
+                          <p className="mt-3 mb-4 text-sm text-neutral-700">
                             {
                               'I agree to be legally bound by the document, and agree to the Open Collective Terms and Privacy Policy. Click on "I agree" to sign this document.'
                             }

@@ -105,6 +105,15 @@ const makeUrl = ({ account, isHostReport, queryFilter, flattenTaxesAndPaymentPro
     }
   }
 
+  if (queryFilter.values.clearedAt) {
+    if (queryFilter.variables.clearedFrom) {
+      url.searchParams.set('clearedFrom', queryFilter.variables.clearedFrom);
+    }
+    if (queryFilter.variables.clearedTo) {
+      url.searchParams.set('clearedTo', queryFilter.variables.clearedTo);
+    }
+  }
+
   if (!isNil(queryFilter.values.isRefund)) {
     url.searchParams.set('isRefund', queryFilter.values.isRefund ? '1' : '0');
   }
@@ -299,7 +308,7 @@ const ExportTransactionsCSVModal = ({
   }, [presetOptions, preset]);
 
   React.useEffect(() => {
-    if (open) {
+    if (open && account) {
       fetchRows();
     }
   }, [queryFilter.values, account, open]);
@@ -407,7 +416,7 @@ const ExportTransactionsCSVModal = ({
 
   const isAboveRowLimit = exportedRows > 100e3;
   const expectedTimeInMinutes = Math.round((exportedRows * 1.1) / AVERAGE_TRANSACTIONS_PER_MINUTE);
-  const disabled = isAboveRowLimit || isFetchingRows || isSavingSet || isEmpty(fields);
+  const disabled = !account || isAboveRowLimit || isFetchingRows || isSavingSet || isEmpty(fields);
   const isWholeTabSelected = GROUP_FIELDS[tab]?.every(f => fields.includes(f));
   const canEditFields = preset === FIELD_OPTIONS.NEW_PRESET || isEditingPreset;
 
@@ -421,7 +430,7 @@ const ExportTransactionsCSVModal = ({
               <FormattedMessage id="ExportTransactionsCSVModal.Title" defaultMessage="Export Transactions" />
             </DialogTitle>
           </DialogHeader>
-          <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-4 pb-4 pt-6 sm:px-8">
+          <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-4 pt-6 pb-4 sm:px-8">
             <div className="flex flex-col gap-4 sm:flex-row">
               <div className="flex flex-1 flex-col gap-2">
                 <h1 className="font-bold">
@@ -494,7 +503,7 @@ const ExportTransactionsCSVModal = ({
                         />
                         <label
                           htmlFor={tab}
-                          className="cursor-pointer text-sm font-bold leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                          className="cursor-pointer text-sm leading-none font-bold! peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                         >
                           <FormattedMessage id="ExportTransactionsCSVModal.SelectAll" defaultMessage="Select all" />
                         </label>
@@ -516,7 +525,7 @@ const ExportTransactionsCSVModal = ({
                                   />
                                   <label
                                     htmlFor={fieldId}
-                                    className="ml-1 cursor-pointer text-sm font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                    className="ml-1 cursor-pointer text-sm leading-none font-normal! peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                   >
                                     {field?.label || fieldId}
                                   </label>

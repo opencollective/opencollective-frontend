@@ -148,7 +148,7 @@ const ExpenseBudgetItem = ({
       useDrawer={useDrawer}
     >
       <div className="mb-5 flex flex-wrap items-start justify-end gap-3">
-        <div className="flex flex-grow gap-3">
+        <div className="flex grow gap-3">
           <Box>
             {isLoading ? (
               <LoadingPlaceholder width={40} height={40} />
@@ -391,7 +391,7 @@ const ExpenseBudgetItem = ({
         </div>
       </div>
       <div className="mt-2 flex flex-wrap items-end justify-end gap-4">
-        <div className="w-full sm:flex sm:w-fit sm:flex-grow">
+        <div className="w-full sm:flex sm:w-fit sm:grow">
           {isAdminView || isSubmitterView ? (
             <div className="mx-4 grid grid-cols-2 gap-x-6 gap-y-1 sm:mx-0 sm:grid-flow-col sm:gap-y-0">
               <div>

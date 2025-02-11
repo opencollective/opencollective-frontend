@@ -73,7 +73,7 @@ function AccountingCategoryDrawerView(props: AccountingCategoryDrawerViewProps) 
   return (
     <React.Fragment>
       <div>
-        <label className="mb-1 mt-4 text-base">
+        <label className="mt-4 mb-1 text-base">
           <FormattedMessage defaultMessage="Accounting code" id="tvVFNA" />
         </label>
 
@@ -83,14 +83,14 @@ function AccountingCategoryDrawerView(props: AccountingCategoryDrawerViewProps) 
           </span>
         </p>
 
-        <label className="mb-1 mt-4 text-base">
+        <label className="mt-4 mb-1 text-base">
           <FormattedMessage defaultMessage="Category name" id="kgVqk1" />
         </label>
         <p>{props.accountingCategory?.name}</p>
 
         {props.accountingCategory?.friendlyName && (
           <React.Fragment>
-            <label className="mb-1 mt-4 text-base">
+            <label className="mt-4 mb-1 text-base">
               <FormattedMessage id="AccountingCategory.friendlyName" defaultMessage="Friendly name" />
             </label>
             <p className="italic">{props.accountingCategory?.friendlyName}</p>
@@ -100,7 +100,7 @@ function AccountingCategoryDrawerView(props: AccountingCategoryDrawerViewProps) 
         {!props.isIndependentCollective && (
           <React.Fragment>
             {' '}
-            <label className="mb-1 mt-4 text-base">
+            <label className="mt-4 mb-1 text-base">
               <FormattedMessage defaultMessage="Applies to" id="6WqHWi" />
             </label>
             <p>
@@ -111,7 +111,7 @@ function AccountingCategoryDrawerView(props: AccountingCategoryDrawerViewProps) 
           </React.Fragment>
         )}
 
-        <label className="mb-1 mt-4 text-base">
+        <label className="mt-4 mb-1 text-base">
           <FormattedMessage defaultMessage="Kind" id="Transaction.Kind" />
         </label>
         <p>
@@ -120,7 +120,7 @@ function AccountingCategoryDrawerView(props: AccountingCategoryDrawerViewProps) 
           )}
         </p>
 
-        <label className="mb-1 mt-4 text-base">
+        <label className="mt-4 mb-1 text-base">
           <FormattedMessage defaultMessage="Visible only to host admins" id="NvBPFR" />
         </label>
         <p>
@@ -133,7 +133,7 @@ function AccountingCategoryDrawerView(props: AccountingCategoryDrawerViewProps) 
 
         {props.accountingCategory?.kind === AccountingCategoryKind.EXPENSE && (
           <React.Fragment>
-            <label className="mb-1 mt-4 text-base">
+            <label className="mt-4 mb-1 text-base">
               <FormattedMessage defaultMessage="Expense types" id="7oAuzt" />
             </label>
             <p>
@@ -148,7 +148,7 @@ function AccountingCategoryDrawerView(props: AccountingCategoryDrawerViewProps) 
 
         {!isEmptyHTMLValue(props.accountingCategory?.instructions) && (
           <React.Fragment>
-            <label className="mb-1 mt-4 text-base">
+            <label className="mt-4 mb-1 text-base">
               <FormattedMessage defaultMessage="Instructions" id="sV2v5L" />
             </label>
             <div>

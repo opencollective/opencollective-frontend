@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
 import { Discord } from '@styled-icons/fa-brands/Discord';
 import { Github } from '@styled-icons/fa-brands/Github';
-import { Twitter } from '@styled-icons/fa-brands/Twitter';
 import { Blog } from '@styled-icons/icomoon/Blog';
 import { Mail } from '@styled-icons/material/Mail';
 import { FormattedMessage, injectIntl } from 'react-intl';
@@ -207,11 +206,6 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
             <StyledLink href="https://blog.opencollective.com/" openInNewTab onClick={closeMenu}>
               <StyledRoundButton size={40}>
                 <Blog size={17} color="#9D9FA3" />
-              </StyledRoundButton>
-            </StyledLink>
-            <StyledLink href="https://twitter.com/opencollect" openInNewTab onClick={closeMenu}>
-              <StyledRoundButton size={40}>
-                <Twitter size={17} color="#9D9FA3" />
               </StyledRoundButton>
             </StyledLink>
             <StyledLink href="https://github.com/opencollective" openInNewTab onClick={closeMenu}>

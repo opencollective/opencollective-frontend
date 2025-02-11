@@ -112,6 +112,16 @@ function getPayoutMethodDetailItems(props: PayoutMethodDetailsProps) {
         }
       }
       break;
+    case PayoutMethodType.ACCOUNT_BALANCE: {
+      if (props.payoutMethod.data.currency) {
+        items.push({
+          id: 'currency',
+          label: <FormattedMessage defaultMessage="Currency" id="Currency" />,
+          value: upperCase(props.payoutMethod.data.currency),
+        });
+      }
+      break;
+    }
     default:
       return null;
   }
@@ -127,13 +137,13 @@ export function PayoutMethodDetailsContainer(props: {
     setIsOpen(isOpen => !isOpen);
   }, []);
 
-  const payoutMethodDetailItems = getPayoutMethodDetailItems(props);
+  const payoutMethodDetailItems = getPayoutMethodDetailItems(props) || [];
   const isExpandable = props.maxItems && payoutMethodDetailItems?.length > props.maxItems;
 
   const shownItems = isExpandable ? payoutMethodDetailItems.slice(0, 3) : payoutMethodDetailItems;
   const hiddenItems = isExpandable ? payoutMethodDetailItems.slice(3) : [];
 
-  if (!payoutMethodDetailItems || payoutMethodDetailItems.length === 0) {
+  if (!props.payoutMethod) {
     return <LoadingPlaceholder height={24} mb={2} />;
   }
 
@@ -144,14 +154,14 @@ export function PayoutMethodDetailsContainer(props: {
           <React.Fragment>
             <div
               className={clsx(
-                'absolute bottom-0 z-10 h-8 w-full bg-gradient-to-t from-muted to-transparent transition-opacity',
+                'absolute bottom-0 z-10 h-8 w-full bg-linear-to-t from-muted to-transparent transition-opacity',
                 isOpen ? 'opacity-0' : 'opacity-100',
               )}
             />
             <CollapsibleTrigger
               className={clsx(
-                'group absolute z-20 focus:outline-none',
-                isOpen ? 'bottom-0 right-0' : 'inset-0 flex w-full items-end justify-end',
+                'group absolute z-20 focus:outline-hidden',
+                isOpen ? 'right-0 bottom-0' : 'inset-0 flex w-full items-end justify-end',
               )}
               onClick={toggleContainer}
             >
@@ -160,7 +170,7 @@ export function PayoutMethodDetailsContainer(props: {
                 size="xs"
                 asChild
                 className={clsx(
-                  'm-2 border border-transparent text-muted-foreground ring-ring hover:text-foreground group-focus-visible:border-border group-focus-visible:bg-white group-focus-visible:ring-2',
+                  'm-2 border border-transparent text-muted-foreground ring-ring group-focus-visible:border-border group-focus-visible:bg-white group-focus-visible:ring-2 hover:text-foreground',
                   {
                     'group-hover:border-border group-hover:bg-white': !isOpen,
                     'hover:border-border hover:bg-white': isOpen,
@@ -185,22 +195,24 @@ export function PayoutMethodDetailsContainer(props: {
             </CollapsibleTrigger>
           </React.Fragment>
         )}
-        <div className={'space-y-1 p-4'}>
-          <DataList className="gap-2">
-            {shownItems.map(({ id, ...item }) => (
-              <DataListItem key={id} {...item} />
-            ))}
-          </DataList>
-          {hiddenItems.length > 0 && (
-            <CollapsibleContent>
-              <DataList className="gap-2">
-                {hiddenItems.map(({ id, ...item }) => (
-                  <DataListItem key={id} {...item} />
-                ))}
-              </DataList>
-            </CollapsibleContent>
-          )}
-        </div>
+        {payoutMethodDetailItems.length > 0 && (
+          <div className={'space-y-1 p-4'}>
+            <DataList className="gap-2">
+              {shownItems.map(({ id, ...item }) => (
+                <DataListItem key={id} {...item} />
+              ))}
+            </DataList>
+            {hiddenItems.length > 0 && (
+              <CollapsibleContent>
+                <DataList className="gap-2">
+                  {hiddenItems.map(({ id, ...item }) => (
+                    <DataListItem key={id} {...item} />
+                  ))}
+                </DataList>
+              </CollapsibleContent>
+            )}
+          </div>
+        )}
       </div>
     </Collapsible>
   );

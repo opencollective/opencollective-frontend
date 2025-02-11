@@ -200,8 +200,8 @@ const tableColumns: ColumnDef<VirtualCardRequest>[] = [
       const vcr = row.original;
       const meta = table.options.meta as VirtualCardRequestsTableMeta;
       return getSpendingLimitShortString(meta.intl, vcr.currency, vcr.spendingLimitAmount, vcr.spendingLimitInterval, {
-        LimitAmount: v => <span className="italic text-slate-600">{v}</span>,
-        LimitInterval: v => <span className="italic text-slate-600">{v}</span>,
+        LimitAmount: v => <span className="text-slate-600 italic">{v}</span>,
+        LimitInterval: v => <span className="text-slate-600 italic">{v}</span>,
       });
     },
   },

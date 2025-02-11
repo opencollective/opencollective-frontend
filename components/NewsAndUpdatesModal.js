@@ -57,7 +57,7 @@ const renderStyledCarousel = (data, loading, error, onClose) => {
                 {update.title}
               </P>
             </div>
-            <div className="flex pb-4 pt-2">
+            <div className="flex pt-2 pb-4">
               <StyledLink
                 onClick={onClose}
                 as={Link}
@@ -82,7 +82,7 @@ const renderStyledCarousel = (data, loading, error, onClose) => {
                 />
               </div>
             </div>
-            <div className="flex pb-4 pt-1">
+            <div className="flex pt-1 pb-4">
               <StyledLink
                 onClick={onClose}
                 as={Link}

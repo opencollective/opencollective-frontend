@@ -22,6 +22,7 @@ import { i18nTaxType } from '../../lib/i18n/taxes';
 import { truncateMiddle } from '../../lib/utils';
 import { getAmountWithoutTaxes, getTaxAmount } from './lib/utils';
 
+import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -118,6 +119,17 @@ type TransferDetailsFieldsProps = {
   expense: any;
 };
 
+const generateDefaultReference = (expense, limit) => {
+  const id = expense.legacyId.toString();
+  return [
+    expense.account.name
+      .replace(/ /g, '')
+      .toUpperCase()
+      .slice(0, limit - 1 - id.length),
+    id,
+  ].join(' ');
+};
+
 const TransferDetailFields = ({ expense, setDisabled }: TransferDetailsFieldsProps) => {
   const formik = useFormikContext<any>();
   const { data, loading, error } = useQuery(validateTransferRequirementsQuery, {
@@ -130,24 +142,19 @@ const TransferDetailFields = ({ expense, setDisabled }: TransferDetailsFieldsPro
   }, [loading, setDisabled]);
 
   useEffect(() => {
-    let reference;
+    let referenceField;
     data?.expense?.validateTransferRequirements?.find(requirement => {
       return requirement.fields.find(field => {
         const r = field?.group?.find(group => group.key === 'reference');
         if (r) {
-          reference = r;
+          referenceField = r;
         }
         return r;
       });
     });
-    if (
-      formik.values.transfer?.details?.reference &&
-      reference?.maxLength < formik.values.transfer?.details?.reference?.length
-    ) {
-      formik.setFieldValue(
-        'transfer.details.reference',
-        truncateMiddle(formik.values.transfer?.details?.reference, reference.maxLength, ' '),
-      );
+    if (referenceField) {
+      const reference = expense.reference || generateDefaultReference(expense, referenceField.maxLength);
+      formik.setFieldValue('transfer.details.reference', truncateMiddle(reference, referenceField.maxLength, ' '));
     }
   }, [data]);
 
@@ -304,15 +311,13 @@ const getInitialValues = (expense, host) => {
     ...DEFAULT_VALUES,
     ...getPayoutOptionValue(expense.payoutMethod, true, host),
     feesPayer: expense.feesPayer || DEFAULT_VALUES.feesPayer,
-    expenseAmountInHostCurrency: expense.currency === host.currency ? expense.amount : null,
+    expenseAmountInHostCurrency:
+      expense.currency === host.currency ? expense.amount : expense.amountInHostCurrency?.valueInCents,
   };
 };
 
 const calculateAmounts = ({ values, expense, quote, host, feesPayer }) => {
-  const expenseAmountInHostCurrency = {
-    valueInCents: values.expenseAmountInHostCurrency,
-    currency: host.currency,
-  };
+  const expenseAmountInHostCurrency = expense.amountInHostCurrency;
 
   if (values.forceManual) {
     const totalAmount = {
@@ -343,7 +348,14 @@ const calculateAmounts = ({ values, expense, quote, host, feesPayer }) => {
       expenseAmountInHostCurrency,
     };
   } else {
-    return { expenseAmountInHostCurrency, totalAmount: expenseAmountInHostCurrency, paymentProcessorFee: null };
+    const isMultiCurrency = expense.currency !== host.currency;
+    return {
+      amountInExpenseCurrency: { valueInCents: expense.amount, currency: expense.currency },
+      expenseAmountInHostCurrency,
+      totalAmount: expenseAmountInHostCurrency,
+      paymentProcessorFee: null,
+      isMultiCurrency,
+    };
   }
 };
 
@@ -377,7 +389,7 @@ const getHandleSubmit = (intl, currency, onSubmit) => async values => {
 };
 
 type PayExpenseModalProps = {
-  expense: Expense;
+  expense: Expense & { amountInHostCurrency?: { valueInCents: number; currency?: string } };
   collective: Pick<Account, 'currency'>;
   host: Pick<Host, 'plan' | 'slug' | 'currency' | 'transferwise' | 'settings'>;
   onClose: () => void;
@@ -409,13 +421,6 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
     context: API_V2_CONTEXT,
     skip: !canQuote,
   });
-
-  useEffect(() => {
-    const reference = quoteQuery.data?.expense?.reference;
-    if (reference && !formik.values.transfer?.details?.reference) {
-      formik.setFieldValue('transfer', { details: { reference } });
-    }
-  }, [quoteQuery.data]);
 
   const amounts = calculateAmounts({
     values: formik.values,
@@ -476,7 +481,8 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                     ...formik.values,
                     ...getPayoutOptionValue(payoutMethodType, item === 'AUTO', host),
                     paymentProcessorFeeInHostCurrency: null,
-                    expenseAmountInHostCurrency: expense.currency === host.currency ? expense.amount : null,
+                    expenseAmountInHostCurrency:
+                      expense.currency === host.currency ? expense.amount : expense.amountInHostCurrency?.valueInCents,
                     feesPayer: !getCanCustomizeFeesPayer(expense, collective, isManualPayment, null)
                       ? DEFAULT_VALUES.feesPayer // Reset fees payer if can't customize
                       : formik.values.feesPayer,
@@ -657,12 +663,21 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                   <FormattedMessage id="ExpenseAmount" defaultMessage="Expense amount" />
                 </Label>
                 <Amount>
-                  <FormattedMoneyAmount
-                    amount={amounts.expenseAmountInHostCurrency?.valueInCents}
-                    amountClassName="font-medium"
-                    currency={amounts.expenseAmountInHostCurrency?.currency}
-                    currencyCodeClassName="text-muted-foreground"
-                  />
+                  {amounts.isMultiCurrency ? (
+                    <FormattedMoneyAmount
+                      amount={amounts.amountInExpenseCurrency?.valueInCents}
+                      currency={amounts.amountInExpenseCurrency?.currency}
+                      amountClassName="font-medium"
+                      currencyCodeClassName="text-muted-foreground"
+                    />
+                  ) : (
+                    <FormattedMoneyAmount
+                      amount={amounts.expenseAmountInHostCurrency?.valueInCents}
+                      currency={amounts.expenseAmountInHostCurrency?.currency}
+                      amountClassName="font-medium"
+                      currencyCodeClassName="text-muted-foreground"
+                    />
+                  )}
                 </Amount>
               </AmountLine>
               {expense.taxes?.map(tax => (
@@ -723,6 +738,12 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                 <Amount>
                   {quoteQuery.loading ? (
                     <LoadingPlaceholder height="16px" />
+                  ) : amounts.isMultiCurrency ? (
+                    <AmountWithExchangeRateInfo
+                      amount={amounts.expenseAmountInHostCurrency}
+                      currencyCodeClassName="text-muted-foreground"
+                      amountWrapperClassName="flex flex-row-reverse gap-1"
+                    />
                   ) : (
                     <FormattedMoneyAmount
                       amount={amounts.totalAmount?.valueInCents}

@@ -14,6 +14,7 @@ import { isPrepaid } from '../lib/constants/payment-methods';
 import { gqlV1 } from '../lib/graphql/helpers';
 import { compose, reportValidityHTML5 } from '../lib/utils';
 
+import { Button } from './ui/Button';
 import CollectivePicker from './CollectivePicker';
 import Container from './Container';
 import CreateGiftCardsSuccess from './CreateGiftCardsSuccess';
@@ -23,7 +24,6 @@ import Link from './Link';
 import Loading from './Loading';
 import MessageBox from './MessageBox';
 import PaymentMethodSelect from './PaymentMethodSelect';
-import StyledButton from './StyledButton';
 import StyledCheckbox from './StyledCheckbox';
 import StyledInput from './StyledInput';
 import StyledInputAmount from './StyledInputAmount';
@@ -311,17 +311,9 @@ class CreateGiftCardsForm extends Component {
     const count = this.getGiftCardsCount();
     const enable = this.isSubmitEnabled();
     return (
-      <StyledButton
-        type="submit"
-        buttonSize="large"
-        buttonStyle="primary"
-        minWidth="16em"
-        disabled={!submitting && !enable}
-        loading={submitting}
-        data-cy="submit-new-gift-cards"
-      >
+      <Button type="submit" disabled={!submitting && !enable} loading={submitting} data-cy="submit-new-gift-cards">
         <FormattedMessage id="giftCards.generate" defaultMessage="Create {count} gift cards" values={{ count }} />
-      </StyledButton>
+      </Button>
     );
   }
 
@@ -329,12 +321,12 @@ class CreateGiftCardsForm extends Component {
     return (
       <Flex justifyContent="center">
         <Link href={`/dashboard/${this.props.collectiveSlug}/payment-methods`}>
-          <StyledButton buttonSize="large" mt="2em" justifyContent="center">
+          <Button className="mt-8 justify-center">
             <FormattedMessage
               id="giftCards.create.requirePM"
               defaultMessage="Add a payment method to create gift cards"
             />
-          </StyledButton>
+          </Button>
         </Link>
       </Flex>
     );

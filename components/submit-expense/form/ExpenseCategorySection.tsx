@@ -1,117 +1,89 @@
 import React from 'react';
-import { ChevronDown, ChevronsUpDown } from 'lucide-react';
+import { pick } from 'lodash';
+import { ChevronDown } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import { cn } from '../../../lib/utils';
+import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
+
+import { MemoizedAccountingCategorySelect } from '../../../components/AccountingCategorySelect';
+import { FormField } from '@/components/FormField';
 
 import HTMLContent from '../../HTMLContent';
-import StyledInputFormikField from '../../StyledInputFormikField';
-import { Button } from '../../ui/Button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../ui/Collapsible';
-import { Command, CommandInput, CommandItem, CommandList } from '../../ui/Command';
 import { Step } from '../SubmitExpenseFlowSteps';
 import type { ExpenseForm } from '../useExpenseForm';
 
 import { FormSectionContainer } from './FormSectionContainer';
+import { memoWithGetFormProps } from './helper';
 
 type ExpenseCategorySectionProps = {
-  form: ExpenseForm;
   inViewChange: (inView: boolean, entry: IntersectionObserverEntry) => void;
-};
+} & ReturnType<typeof getFormProps>;
 
-export function ExpenseCategorySection(props: ExpenseCategorySectionProps) {
-  const accountingCategoryId = props.form.values.accountingCategoryId;
-  const [isExpenseCategoryPickerOpen, setIsExpenseCategoryPickerOpen] = React.useState(false);
+function getFormProps(form: ExpenseForm) {
+  return {
+    ...pick(form, 'setFieldValue', 'isSubmitting'),
+    ...pick(form.values, ['accountingCategoryId', 'expenseTypeOption']),
+    ...pick(form.options, ['accountingCategories', 'host', 'account', 'isAccountingCategoryRequired']),
+  };
+}
 
-  const accountingCategories = React.useMemo(
-    () => props.form.options.accountingCategories || [],
-    [props.form.options.accountingCategories],
-  );
+// eslint-disable-next-line prefer-arrow-callback
+export const ExpenseCategorySection = memoWithGetFormProps(function ExpenseCategorySection(
+  props: ExpenseCategorySectionProps,
+) {
+  const accountingCategoryId = props.accountingCategoryId;
+  const { LoggedInUser } = useLoggedInUser();
+
+  const accountingCategories = React.useMemo(() => props.accountingCategories || [], [props.accountingCategories]);
 
   const selectedAccountingCategory = accountingCategoryId
     ? accountingCategories.find(a => a.id === accountingCategoryId)
     : null;
   const instructions = selectedAccountingCategory?.instructions;
-  const { setFieldValue, setFieldTouched } = props.form;
+  const { setFieldValue } = props;
+
+  const host = props.host;
+  const isHostAdmin = Boolean(LoggedInUser?.isAdminOfCollective(host));
+
+  const onAccountingCategorySelectChange = React.useCallback(
+    value => {
+      setFieldValue('accountingCategoryId', value?.id);
+    },
+    [setFieldValue],
+  );
 
   return (
     <FormSectionContainer
       title={<FormattedMessage defaultMessage="Select expense category" id="oNW1LD" />}
-      form={props.form}
       step={Step.EXPENSE_CATEGORY}
       inViewChange={props.inViewChange}
     >
-      <StyledInputFormikField name="accountingCategoryId">
-        {() => (
-          <React.Fragment>
-            <Button
-              variant="outline"
-              size="sm"
-              className={cn('w-full justify-between', {
-                'mb-0 rounded-b-none border-b-0': isExpenseCategoryPickerOpen,
-              })}
-              onClick={() => {
-                setIsExpenseCategoryPickerOpen(!isExpenseCategoryPickerOpen);
-                setFieldTouched('accountingCategoryId');
-              }}
-            >
-              {selectedAccountingCategory ? (
-                selectedAccountingCategory.name
-              ) : (
-                <span className="text-muted-foreground">
-                  {props.form.options.isAccountingCategoryRequired ? (
-                    <FormattedMessage defaultMessage="Choose a category" id="H4hJvF" />
-                  ) : (
-                    <FormattedMessage defaultMessage="I don't know" id="AkIyKO" />
-                  )}
-                </span>
-              )}
-              <ChevronsUpDown className="ml-2 opacity-50" size={16} />
-            </Button>
-            {isExpenseCategoryPickerOpen && (
-              <div className="rounded-md rounded-t-none border border-gray-200">
-                <Command>
-                  <CommandInput autoFocus />
-                  <CommandList>
-                    {!props.form.options.isAccountingCategoryRequired && (
-                      <CommandItem
-                        value=""
-                        onSelect={() => {
-                          setFieldValue('accountingCategoryId', null);
-                          setIsExpenseCategoryPickerOpen(false);
-                        }}
-                      >
-                        <div className="flex-grow">
-                          <FormattedMessage defaultMessage="I don't know" id="AkIyKO" />
-                        </div>
-                      </CommandItem>
-                    )}
-                    {accountingCategories.map(a => (
-                      <CommandItem
-                        key={a.id}
-                        value={`${a.id}-${a.name}`}
-                        onSelect={() => {
-                          setFieldValue('accountingCategoryId', a.id);
-                          setIsExpenseCategoryPickerOpen(false);
-                        }}
-                      >
-                        <div className="flex-grow">{a.name}</div>
-                      </CommandItem>
-                    ))}
-                  </CommandList>
-                </Command>
-              </div>
-            )}
-          </React.Fragment>
+      <FormField name="accountingCategoryId">
+        {({ field }) => (
+          <MemoizedAccountingCategorySelect
+            {...field}
+            id="accountingCategoryId"
+            kind="EXPENSE"
+            disabled={props.isSubmitting}
+            onChange={onAccountingCategorySelectChange}
+            host={host}
+            showCode={isHostAdmin}
+            expenseType={props.expenseTypeOption}
+            account={props.account}
+            selectedCategory={selectedAccountingCategory}
+            allowNone={!props.isAccountingCategoryRequired}
+            buttonClassName="max-w-full w-full"
+          />
         )}
-      </StyledInputFormikField>
+      </FormField>
 
       {instructions && (
         <Collapsible asChild defaultOpen>
           <div className="group mt-4 rounded-md border border-[#DCDDE0] p-4">
             <CollapsibleTrigger asChild>
               <button className="flex w-full items-center text-start text-sm font-bold">
-                <div className="flex-grow">
+                <div className="grow">
                   {' '}
                   <FormattedMessage defaultMessage="Expense category instructions" id="QVX2sp" />
                 </div>
@@ -130,4 +102,4 @@ export function ExpenseCategorySection(props: ExpenseCategorySectionProps) {
       )}
     </FormSectionContainer>
   );
-}
+}, getFormProps);

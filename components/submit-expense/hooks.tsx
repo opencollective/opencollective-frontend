@@ -26,7 +26,7 @@ export function useNavigationWarning(opts: useNavigationWarningOpts) {
     }
 
     function warnOnRouteChangeStart(url, { shallow }) {
-      if (opts.enabled && !shallow) {
+      if (opts.enabled && !shallow && !url.startsWith('/signin')) {
         if (!confirm(opts.confirmationMessage)) {
           router.events.emit('routeChangeError');
           throw 'abort navigation';

@@ -67,7 +67,7 @@ const Thread = ({
                 </Box>
                 <Container width="1px" height="100%" background="#E8E9EB" />
               </Flex>
-              <div className="flex-grow p-4 pl-0">
+              <div className="grow p-4 pl-0">
                 <Comment
                   comment={item}
                   canDelete={isAdmin || Boolean(LoggedInUser && LoggedInUser.canEditComment(item))}

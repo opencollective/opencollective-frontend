@@ -4,7 +4,6 @@ import { values } from 'lodash';
 import { useIntl } from 'react-intl';
 
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 
 import Container from '../Container';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -46,8 +45,8 @@ import InvoicesReceipts from './sections/invoices-receipts/InvoicesReceipts';
 import HostDashboardTaxForms from './sections/legal-documents/HostDashboardTaxForms';
 import NotificationsSettings from './sections/NotificationsSettings';
 import Overview from './sections/overview/Overview';
-import HostDashboardReports from './sections/reports/HostDashboardReports';
-import PreviewReports from './sections/reports/preview/Reports';
+import LegacyHostDashboardReports from './sections/reports/legacy/HostDashboardReports';
+import Reports from './sections/reports/Reports';
 import { TaxInformationSettingsSection } from './sections/tax-information';
 import Team from './sections/Team';
 import AccountTransactions from './sections/transactions/AccountTransactions';
@@ -77,7 +76,8 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.HOST_AGREEMENTS]: HostDashboardAgreements,
   [SECTIONS.HOST_TAX_FORMS]: HostDashboardTaxForms,
   [SECTIONS.HOST_APPLICATIONS]: HostApplications,
-  [SECTIONS.REPORTS]: HostDashboardReports,
+  [SECTIONS.REPORTS]: Reports,
+  [SECTIONS.LEGACY_HOST_REPORT]: LegacyHostDashboardReports,
   [SECTIONS.HOST_VIRTUAL_CARDS]: HostVirtualCards,
   [SECTIONS.HOST_VIRTUAL_CARD_REQUESTS]: HostVirtualCardRequests,
   [SECTIONS.OVERVIEW]: Overview,
@@ -148,10 +148,8 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
 
   let DashboardComponent = DASHBOARD_COMPONENTS[section];
   if (DashboardComponent) {
-    if (section === SECTIONS.REPORTS) {
-      if (LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.HOST_REPORTS)) {
-        DashboardComponent = PreviewReports;
-      }
+    if (section === SECTIONS.REPORTS && subpath[0] === 'legacy') {
+      DashboardComponent = LegacyHostDashboardReports;
     }
     return (
       <div className="w-full pb-6">
@@ -163,9 +161,11 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
 
   if (values(LEGACY_SECTIONS).includes(section)) {
     return (
-      <div className="w-full max-w-screen-lg pb-6">
+      <div className="w-full max-w-(--breakpoint-lg) pb-6">
         <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
-        {SECTION_LABELS[section] && <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />}
+        {SECTION_LABELS[section] && section !== ALL_SECTIONS.GIFT_CARDS && (
+          <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />
+        )}
 
         <AccountSettings account={account} section={section} />
       </div>
@@ -176,8 +176,8 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
   const SettingsComponent = SETTINGS_COMPONENTS[section];
   if (SettingsComponent) {
     return (
-      // <div className="flex max-w-screen-lg justify-center">
-      <div className="max-w-screen-md flex-1 pb-6">
+      // <div className="flex max-w-(--breakpoint-lg) justify-center">
+      <div className="max-w-(--breakpoint-md) flex-1 pb-6">
         <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
         <SettingsComponent account={account} accountSlug={account.slug} subpath={subpath} />
       </div>
@@ -186,10 +186,12 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
 
   if (values(LEGACY_SETTINGS_SECTIONS).includes(section)) {
     return (
-      // <div className="flex max-w-screen-lg justify-center">
-      <div className="max-w-screen-md flex-1 pb-6">
+      // <div className="flex max-w-(--breakpoint-lg) justify-center">
+      <div className="max-w-(--breakpoint-md) flex-1 pb-6">
         <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
-        {SECTION_LABELS[section] && <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />}
+        {SECTION_LABELS[section] && section !== ALL_SECTIONS.GIFT_CARDS && (
+          <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />
+        )}
 
         <AccountSettings account={account} section={section} />
       </div>

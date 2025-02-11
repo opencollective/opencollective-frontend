@@ -79,7 +79,7 @@ export default function SmallThread(props: SmallThreadProps) {
 
             <Avatar collective={LoggedInUser.collective} radius={40} />
           </div>
-          <div className="flex-grow">
+          <div className="grow">
             <CommentForm
               {...props.CommentEntity}
               submitButtonJustify="end"

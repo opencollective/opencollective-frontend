@@ -1,13 +1,15 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
-import { cloneDeep, uniq, update } from 'lodash';
-import { ArchiveRestore, Banknote, Merge, Receipt, SquareSlashIcon } from 'lucide-react';
+import { cloneDeep, pick, uniq, update } from 'lodash';
+import { ArchiveRestore, Banknote, Merge, PauseCircle, Receipt, SquareSlashIcon } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { GetActions } from '../../../../../lib/actions/types';
 import { i18nGraphqlException } from '../../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../../lib/graphql/helpers';
 import type { TransactionsImportRow } from '../../../../../lib/graphql/types/v2/schema';
+import { TransactionsImportRowStatus } from '../../../../../lib/graphql/types/v2/schema';
+import type { UpdateTransactionsImportRowMutation } from '@/lib/graphql/types/v2/graphql';
 
 import { useModal } from '../../../../ModalContext';
 import StyledSpinner from '../../../../StyledSpinner';
@@ -18,21 +20,29 @@ import { MatchContributionDialog } from '../MatchContributionDialog';
 
 import { updateTransactionsImportRows } from './graphql';
 
-const getOptimisticResponse = (transactionsImport, rowIds, isDismissed) => {
-  const optimisticResult = cloneDeep(transactionsImport);
+const getOptimisticResponse = (
+  transactionsImport,
+  rowIds,
+  status: TransactionsImportRowStatus,
+): UpdateTransactionsImportRowMutation => {
+  type ReturnedTransactionsImport = UpdateTransactionsImportRowMutation['updateTransactionsImportRows']['import'];
+  const optimisticResult = {
+    import: cloneDeep(pick<ReturnedTransactionsImport, 'id' | 'stats'>(transactionsImport, ['id', 'stats'])),
+    rows: [],
+  };
 
   // Update nodes
-  update(optimisticResult, 'rows.nodes', nodes =>
-    nodes.map(node => (rowIds.includes(node.id) ? { ...node, isDismissed } : node)),
+  update(optimisticResult, 'rows', nodes =>
+    nodes.map(node => (!rowIds.includes(node.id) ? node : { ...node, status })),
   );
 
   // Update stats
-  if (isDismissed) {
-    update(optimisticResult, 'stats.ignored', ignored => ignored + rowIds.length);
-    update(optimisticResult, 'stats.processed', processed => processed + rowIds.length);
-  } else {
-    update(optimisticResult, 'stats.ignored', ignored => ignored - rowIds.length);
-    update(optimisticResult, 'stats.processed', processed => processed - rowIds.length);
+  if (status === TransactionsImportRowStatus.IGNORED) {
+    update(optimisticResult, 'import.stats.ignored', ignored => ignored + rowIds.length);
+    update(optimisticResult, 'import.stats.processed', processed => processed + rowIds.length);
+  } else if (status === TransactionsImportRowStatus.PENDING) {
+    update(optimisticResult, 'import.stats.ignored', ignored => ignored - rowIds.length);
+    update(optimisticResult, 'import.stats.processed', processed => processed - rowIds.length);
   }
 
   return { updateTransactionsImportRows: optimisticResult };
@@ -40,26 +50,49 @@ const getOptimisticResponse = (transactionsImport, rowIds, isDismissed) => {
 
 export function useTransactionsImportActions({ transactionsImport, host }): {
   getActions: GetActions<TransactionsImportRow>;
-  setRowsDismissed: (rowIds: string[], isDismissed: boolean, options?: { includeAllRows?: boolean }) => Promise<void>;
+  setRowsStatus: (
+    rowIds: string[],
+    newStatus: TransactionsImportRowStatus,
+    options?: { includeAllPages?: boolean },
+  ) => Promise<void>;
 } {
   const { toast } = useToast();
   const intl = useIntl();
   const [updatingRows, setUpdatingRows] = React.useState<Array<string>>([]);
   const [updateRows] = useMutation(updateTransactionsImportRows, { context: API_V2_CONTEXT });
   const { showModal, hideModal } = useModal();
-  const setRowsDismissed = async (rowIds: string[], isDismissed: boolean, { includeAllRows = false } = {}) => {
+
+  const setRowsStatus = async (
+    rowIds: string[],
+    newStatus: TransactionsImportRowStatus,
+    { includeAllPages = false } = {},
+  ) => {
     setUpdatingRows(uniq([...updatingRows, ...rowIds]));
     try {
+      let action: string;
+      if (includeAllPages) {
+        if (newStatus === TransactionsImportRowStatus.IGNORED) {
+          action = 'DISMISS_ALL';
+        } else if (newStatus === TransactionsImportRowStatus.PENDING) {
+          action = 'RESTORE_ALL';
+        } else if (newStatus === TransactionsImportRowStatus.ON_HOLD) {
+          action = 'PUT_ON_HOLD_ALL';
+        } else {
+          action = 'UPDATE_ROWS';
+        }
+      } else {
+        action = 'UPDATE_ROWS';
+      }
+
       await updateRows({
         variables: {
           importId: transactionsImport.id,
-          ...(!includeAllRows
-            ? { rows: rowIds.map(id => ({ id, isDismissed })) }
-            : isDismissed
-              ? { dismissAll: true }
-              : { restoreAll: true }),
+          action,
+          ...(!includeAllPages && {
+            rows: rowIds.map(id => ({ id, status: newStatus })),
+          }),
         },
-        optimisticResponse: getOptimisticResponse(transactionsImport, rowIds, isDismissed),
+        optimisticResponse: getOptimisticResponse(transactionsImport, rowIds, newStatus),
       });
     } catch (error) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, error) });
@@ -81,7 +114,7 @@ export function useTransactionsImportActions({ transactionsImport, host }): {
 
     if (isImported) {
       return actions;
-    } else if (!row.isDismissed) {
+    } else if (row.status !== TransactionsImportRowStatus.IGNORED) {
       if (row.amount.valueInCents > 0) {
         actions.primary.push({
           key: 'match',
@@ -128,17 +161,38 @@ export function useTransactionsImportActions({ transactionsImport, host }): {
       }
     }
 
+    if (row.status !== TransactionsImportRowStatus.IGNORED && row.status !== TransactionsImportRowStatus.ON_HOLD) {
+      actions.primary.push({
+        key: 'on-hold',
+        Icon: PauseCircle,
+        onClick: () => setRowsStatus([row.id], TransactionsImportRowStatus.ON_HOLD),
+        disabled: isUpdatingRow,
+        label: (
+          <div>
+            <FormattedMessage defaultMessage="Put on Hold" id="+pCc8I" />
+            {isUpdatingRow && <StyledSpinner size={14} ml={2} />}
+          </div>
+        ),
+      });
+    }
+
     actions.primary.push({
       key: 'ignore',
-      Icon: row.isDismissed ? ArchiveRestore : SquareSlashIcon,
-      onClick: () => setRowsDismissed([row.id], !row.isDismissed),
+      Icon: row.status === TransactionsImportRowStatus.IGNORED ? ArchiveRestore : SquareSlashIcon,
+      onClick: () =>
+        setRowsStatus(
+          [row.id],
+          row.status === TransactionsImportRowStatus.IGNORED
+            ? TransactionsImportRowStatus.PENDING
+            : TransactionsImportRowStatus.IGNORED,
+        ),
       disabled: isUpdatingRow,
       label: (
         <div>
-          {row.isDismissed ? (
+          {row.status === TransactionsImportRowStatus.IGNORED ? (
             <FormattedMessage defaultMessage="Revert" id="amT0Gh" />
           ) : (
-            <FormattedMessage defaultMessage="Ignore" id="paBpxN" />
+            <FormattedMessage defaultMessage="No action" id="zue9QR" />
           )}
           {isUpdatingRow && <StyledSpinner size={14} ml={2} />}
         </div>
@@ -148,5 +202,5 @@ export function useTransactionsImportActions({ transactionsImport, host }): {
     return actions;
   };
 
-  return { getActions, setRowsDismissed };
+  return { getActions, setRowsStatus };
 }

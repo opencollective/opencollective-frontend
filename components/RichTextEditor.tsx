@@ -714,7 +714,7 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
 
         <input id={this.state.id} value={this.state.value} type="hidden" name={inputName} disabled={disabled} />
         <HTMLContent fontSize={fontSize}>
-          <div className="relative focus-visible:[&>_trix-editor]:outline-none">
+          <div className="relative [&>_trix-editor]:focus-visible:outline-hidden">
             {React.createElement('trix-editor', {
               ref: this.editorRef,
               input: this.state.id,

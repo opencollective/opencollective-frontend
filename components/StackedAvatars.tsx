@@ -23,7 +23,7 @@ const StackedAvatars = ({
   return (
     <div className="flex items-center">
       {displayed.map(account => (
-        <div key={account.id || account.slug} className="flex items-center first:!ml-0" style={{ marginLeft }}>
+        <div key={account.id || account.slug} className="flex items-center first:ml-0!" style={{ marginLeft }}>
           <LinkCollective
             collective={account}
             withHoverCard={Boolean(withHoverCard)}

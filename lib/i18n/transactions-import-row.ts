@@ -9,8 +9,8 @@ const MESSAGES = defineMessages({
     id: 'transactions.all',
   },
   [TransactionsImportRowStatus.IGNORED]: {
-    defaultMessage: 'Ignored',
-    id: 'transaction.ignored',
+    defaultMessage: 'No action',
+    id: 'zue9QR',
   },
   [TransactionsImportRowStatus.LINKED]: {
     defaultMessage: 'Imported',
@@ -19,6 +19,10 @@ const MESSAGES = defineMessages({
   [TransactionsImportRowStatus.PENDING]: {
     defaultMessage: 'Pending',
     id: 'transaction.pending',
+  },
+  [TransactionsImportRowStatus.ON_HOLD]: {
+    defaultMessage: 'On hold',
+    id: 'transaction.onHold',
   },
 });
 

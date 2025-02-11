@@ -29,10 +29,11 @@ export const TransactionsImportRowFieldsFragment = gql`
   fragment TransactionsImportRowFields on TransactionsImportRow {
     id
     sourceId
-    isDismissed
+    status
     description
     date
     rawValue
+    note
     amount {
       valueInCents
       currency
@@ -62,34 +63,39 @@ export const TransactionsImportRowFieldsFragment = gql`
   }
 `;
 
+export const TransactionsImportStatsFragment = gql`
+  fragment TransactionsImportStats on TransactionsImportStats {
+    total
+    ignored
+    onHold
+    expenses
+    orders
+    processed
+    pending
+  }
+`;
+
 export const updateTransactionsImportRows = gql`
   mutation UpdateTransactionsImportRow(
     $importId: NonEmptyString!
     $rows: [TransactionsImportRowUpdateInput!]
-    $dismissAll: Boolean
-    $restoreAll: Boolean
+    $action: TransactionsImportRowAction!
   ) {
-    updateTransactionsImportRows(id: $importId, rows: $rows, dismissAll: $dismissAll, restoreAll: $restoreAll) {
-      id
-      stats {
-        total
-        ignored
-        expenses
-        orders
-        processed
+    updateTransactionsImportRows(id: $importId, rows: $rows, action: $action) {
+      import {
+        id
+        stats {
+          ...TransactionsImportStats
+        }
       }
       rows {
-        totalCount
-        offset
-        limit
-        nodes {
-          id
-          ...TransactionsImportRowFields
-        }
+        id
+        ...TransactionsImportRowFields
       }
     }
   }
   ${TransactionsImportRowFieldsFragment}
+  ${TransactionsImportStatsFragment}
 `;
 
 export const transactionsImportsQuery = gql`

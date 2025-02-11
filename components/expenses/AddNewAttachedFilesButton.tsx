@@ -1,6 +1,6 @@
 import React from 'react';
 import type { FileRejection } from 'react-dropzone';
-import Dropzone from 'react-dropzone';
+import ReactDropzone from 'react-dropzone';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { OcrParsingOptionsInput, UploadFileResult } from '../../lib/graphql/types/v2/schema';
@@ -52,7 +52,7 @@ const AddNewAttachedFilesButton = ({
   );
 
   return (
-    <Dropzone {...attachmentDropzoneParams} disabled={disabled} multiple={true} onDrop={onDrop}>
+    <ReactDropzone {...attachmentDropzoneParams} disabled={disabled} multiple={true} onDrop={onDrop}>
       {({ getRootProps, getInputProps }) => (
         <div {...getRootProps()}>
           <input name="addAttachedFile" {...getInputProps()} />
@@ -69,7 +69,7 @@ const AddNewAttachedFilesButton = ({
           </StyledButton>
         </div>
       )}
-    </Dropzone>
+    </ReactDropzone>
   );
 };
 

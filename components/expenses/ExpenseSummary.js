@@ -122,7 +122,7 @@ const ExpenseSummary = ({
   const isLoggedInUserExpenseAdmin = LoggedInUser?.isAdminOfCollective(expense?.account);
   const isViewingExpenseInHostContext = isLoggedInUserExpenseHostAdmin && !isLoggedInUserExpenseAdmin;
   const useInlineExpenseEdit =
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) &&
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE) &&
     expense?.permissions?.canEdit &&
     expense?.type !== ExpenseType.GRANT &&
     expense?.status !== ExpenseStatus.DRAFT;

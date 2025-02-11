@@ -153,7 +153,11 @@ export interface StyledTagProps extends React.ComponentProps<typeof StyledTagBas
   htmlType?: 'button' | 'submit' | 'reset';
 }
 
-/** Simple tag to display a short string */
+/**
+ * Simple tag to display a short string
+ *
+ * @deprecated Use `ui/Badge` instead
+ */
 const StyledTag = ({ closeButtonProps = null, children, variant = 'squared', htmlType, ...props }: StyledTagProps) => {
   return !closeButtonProps ? (
     <StyledTagBase variant={variant} type={htmlType} {...props}>

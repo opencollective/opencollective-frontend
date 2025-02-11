@@ -61,7 +61,7 @@ export function RecoverySettings(props: RecoverySettingsProps) {
           variant="outline"
           loading={loading}
           onClick={() => setIsRegeneratingRecoveryCodes(true)}
-          className="mb-2 mt-3 w-full"
+          className="mt-3 mb-2 w-full"
         >
           <RefreshCcw className="mr-2 h-4 w-4" />
           <FormattedMessage defaultMessage="Regenerate codes" id="TWwiPo" />

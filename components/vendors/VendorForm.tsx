@@ -16,12 +16,13 @@ import { UploadedFileKind } from '../../lib/graphql/types/v2/schema';
 import { useImageUploader } from '../../lib/hooks/useImageUploader';
 import { elementFromClass } from '../../lib/react-utils';
 import { cn, omitDeep } from '../../lib/utils';
+import { isImageServiceUrl } from '@/lib/image-utils';
 
 import Avatar from '../Avatar';
 import { useDrawerActionsContainer } from '../Drawer';
+import { DROPZONE_ACCEPT_IMAGES } from '../Dropzone';
 import PayoutMethodForm from '../expenses/PayoutMethodForm';
 import PayoutMethodSelect from '../expenses/PayoutMethodSelect';
-import { DROPZONE_ACCEPT_IMAGES } from '../StyledDropzone';
 import StyledInput from '../StyledInput';
 import StyledInputFormikField from '../StyledInputFormikField';
 import StyledInputGroup from '../StyledInputGroup';
@@ -203,6 +204,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
     const data = omitDeep(
       {
         ...pick(values, EDITABLE_FIELDS),
+        imageUrl: isImageServiceUrl(values.imageUrl) ? undefined : values.imageUrl,
         vendorInfo: {
           ...pick(values.vendorInfo, ['contact', 'notes', 'taxFormUrl', 'taxFormRequired', 'taxId', 'taxType']),
           taxType:
@@ -239,7 +241,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
     { label: 'GST', value: 'GST' },
     { label: <FormattedMessage id="taxType.Other" defaultMessage="Other" />, value: 'OTHER' },
   ];
-  const initialValues = cloneDeep(pick(vendor, EDITABLE_FIELDS));
+  const initialValues = omitDeep(cloneDeep(pick(vendor, EDITABLE_FIELDS)), ['__typename']);
   if (initialValues.vendorInfo?.taxType && !['EIN', 'VAT', 'GST'].includes(initialValues.vendorInfo?.taxType)) {
     initialValues.vendorInfo['otherTaxType'] = initialValues.vendorInfo?.taxType;
     initialValues.vendorInfo.taxType = 'OTHER';
@@ -260,7 +262,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
         {isModal && (
           <button
             onClick={onCancel}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-transparent bg-transparent text-slate-500 ring-2 ring-transparent transition-colors hover:text-slate-950 focus:outline-none focus-visible:ring-black active:ring-black group-hover:border-slate-200 group-hover:bg-white data-[state=open]:ring-black"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-transparent bg-transparent text-slate-500 ring-2 ring-transparent transition-colors group-hover:border-slate-200 group-hover:bg-white hover:text-slate-950 focus:outline-hidden focus-visible:ring-black active:ring-black data-[state=open]:ring-black"
           >
             <X size="20px" />
           </button>
@@ -269,7 +271,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
       <Formik initialValues={initialValues} onSubmit={handleSubmit} validate={validateVendorForm}>
         {formik => {
           const actionButtons = (
-            <div className="flex flex-grow justify-between gap-2">
+            <div className="flex grow justify-between gap-2">
               <Button onClick={onCancel} variant="outline" className="rounded-full" disabled={loading}>
                 <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
               </Button>
@@ -299,7 +301,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
                     />
                   )}
                 </Field>
-                <div className="flex-grow">
+                <div className="grow">
                   <StyledInputFormikField
                     name="name"
                     label={intl.formatMessage({ defaultMessage: "Vendor's name", id: 'iDPmhB' })}
@@ -364,7 +366,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
                   )}
                 </React.Fragment>
               )}
-              <p className="mb-3 mt-4 text-base font-bold">
+              <p className="mt-4 mb-3 text-base font-bold">
                 <FormattedMessage defaultMessage="Tax identification" id="YQKRUh" />
               </p>
               <StyledInputFormikField
@@ -405,7 +407,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
                 {({ field }) => <StyledInput {...field} width="100%" maxWidth={500} maxLength={60} />}
               </StyledInputFormikField>
 
-              <p className="mb-3 mt-4 text-base font-bold">
+              <p className="mt-4 mb-3 text-base font-bold">
                 <FormattedMessage defaultMessage="Mailing address" id="yrKCq7" />
               </p>
               <StyledInputLocation
@@ -443,7 +445,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
                   />
                 )}
               </StyledInputFormikField>
-              <div className="mt-3 flex-grow">
+              <div className="mt-3 grow">
                 <p className="mb-2 text-[#4D4F51]">
                   <FormattedMessage
                     id="OptionalFieldLabel"
@@ -468,7 +470,7 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
               {formik.values.payoutMethod && (
                 <Field name="payoutMethod">
                   {({ field }) => (
-                    <div className="mt-3 flex-grow">
+                    <div className="mt-3 grow">
                       <PayoutMethodForm
                         fieldsPrefix="payoutMethod"
                         payoutMethod={field.value}

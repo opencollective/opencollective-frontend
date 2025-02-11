@@ -1,9 +1,10 @@
+// Deprecated, use components/InputAmount.tsx instead
 import React from 'react';
 import PropTypes from 'prop-types';
 import { getEmojiByCurrencyCode } from 'country-currency-emoji-flags';
 import { clamp, isNil, isUndefined, round } from 'lodash';
 
-import { Currency, ZERO_DECIMAL_CURRENCIES } from '../lib/constants/currency';
+import { Currency } from '../lib/constants/currency';
 import { floatAmountToCents, getCurrencySymbol, getDefaultCurrencyPrecision } from '../lib/currency-utils';
 import { cn } from '../lib/utils';
 
@@ -80,10 +81,10 @@ const ConvertedAmountInput = ({ inputId, exchangeRate, onChange, baseAmount, min
   };
 
   return (
-    <div className="flex flex-auto whitespace-nowrap px-2 text-sm text-neutral-500">
+    <div className="flex flex-auto px-2 text-sm whitespace-nowrap text-neutral-500">
       <span className="mr-1 align-middle">= {exchangeRate.toCurrency} </span>
       <input
-        className="w-full flex-auto rounded px-[2px] [appearance:textfield] focus:text-neutral-800 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+        className="w-full flex-auto [appearance:textfield] rounded px-[2px] focus:text-neutral-800 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
         style={{ minWidth }}
         name={inputId}
         id={inputId}
@@ -162,7 +163,7 @@ const StyledInputAmount = ({
   name = 'amount',
   min = 0,
   max = 100000000000,
-  precision = ZERO_DECIMAL_CURRENCIES.includes(currency) ? 0 : 2,
+  precision = getDefaultCurrencyPrecision(currency),
   defaultValue = undefined,
   value,
   onBlur = undefined,
@@ -178,6 +179,7 @@ const StyledInputAmount = ({
   maxFxRate = undefined,
   showErrorIfEmpty = true,
   className = null,
+  suffix = null,
   ...props
 }) => {
   const [rawValue, setRawValue] = React.useState(value || defaultValue || '');
@@ -216,7 +218,7 @@ const StyledInputAmount = ({
     >
       <div className="flex flex-auto basis-1/2">
         {!hasCurrencyPicker ? (
-          <div className="flex items-center whitespace-nowrap bg-neutral-50 p-2 text-sm text-neutral-800">
+          <div className="flex items-center bg-neutral-50 p-2 text-sm whitespace-nowrap text-neutral-800">
             {formatCurrencyName(currency, currencyDisplay)}
           </div>
         ) : (
@@ -294,6 +296,11 @@ const StyledInputAmount = ({
         </div>
       )}
       {loadingExchangeRate && <StyledSpinner size={16} color="black.700" className="absolute right-8" />}
+      {suffix && (
+        <div className="pointer-events-none mx-2 flex h-[38px] grow-0 items-center text-xs text-muted-foreground">
+          {suffix}
+        </div>
+      )}
     </div>
   );
 };

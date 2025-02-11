@@ -236,10 +236,13 @@ const DashboardPage = () => {
               data-cy="admin-panel-container"
             >
               <AdminPanelSideBar isLoading={isLoading} activeSlug={activeSlug} menuItems={menuItems} />
-              {LoggedInUser && require2FAForAdmins(account) && !LoggedInUser.hasTwoFactorAuth ? (
+              {LoggedInUser &&
+              require2FAForAdmins(account) &&
+              !LoggedInUser.hasTwoFactorAuth &&
+              selectedSection !== 'user-security' ? (
                 <TwoFactorAuthRequiredMessage className="lg:mt-16" />
               ) : (
-                <div className="min-w-0 max-w-screen-xl flex-1">
+                <div className="max-w-(--breakpoint-xl) min-w-0 flex-1">
                   <DashboardSection
                     section={selectedSection}
                     isLoading={isLoading}
@@ -258,7 +261,7 @@ const DashboardPage = () => {
               ) : (
                 <div
                   className={clsx(
-                    'mx-auto grid w-full max-w-screen-2xl grid-cols-1 justify-center px-3 xl:px-6',
+                    'mx-auto grid w-full max-w-(--breakpoint-2xl) grid-cols-1 justify-center px-3 xl:px-6',
                     ['host-transactions', 'transactions', 'overview'].includes(selectedSection)
                       ? 'lg:grid-cols-[minmax(0,1fr)_minmax(0,1536px)_minmax(0,1fr)]'
                       : subMenu

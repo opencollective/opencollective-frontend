@@ -142,7 +142,7 @@ export const FiscalHostOCFTransition = ({ collective }) => {
       <div className="mt-4 flex flex-col gap-3">
         {/** Recurring contributions */}
         <Collapsible className="rounded-md border border-gray-300 p-4" {...getOpenProps('recurringContributions')}>
-          <CollapsibleTrigger className="group flex w-full flex-1 items-center justify-between text-sm [&_svg]:data-[state=open]:rotate-180">
+          <CollapsibleTrigger className="group flex w-full flex-1 items-center justify-between text-sm data-[state=open]:[&_svg]:rotate-180">
             <div className="font-medium">Paused Recurring Contributions</div>
             <ChevronButton />
           </CollapsibleTrigger>
@@ -179,7 +179,7 @@ export const FiscalHostOCFTransition = ({ collective }) => {
         </Collapsible>
         {/** Balance */}
         <Collapsible className="rounded-md border border-gray-300 p-4" {...getOpenProps('balance')}>
-          <CollapsibleTrigger className="group flex w-full flex-1 items-center justify-between text-sm [&_svg]:data-[state=open]:rotate-180">
+          <CollapsibleTrigger className="group flex w-full flex-1 items-center justify-between text-sm data-[state=open]:[&_svg]:rotate-180">
             <div className="font-medium">{step2Label}</div>
             <ChevronButton />
           </CollapsibleTrigger>
@@ -209,7 +209,7 @@ export const FiscalHostOCFTransition = ({ collective }) => {
         {/** Move Host */}
         {!data.account.newAccounts.totalCount && (
           <Collapsible className="rounded-md border border-gray-300 p-4" {...getOpenProps('moveHost')}>
-            <CollapsibleTrigger className="group flex w-full flex-1 items-center justify-between text-sm [&_svg]:data-[state=open]:rotate-180">
+            <CollapsibleTrigger className="group flex w-full flex-1 items-center justify-between text-sm data-[state=open]:[&_svg]:rotate-180">
               <div className="font-medium">Find a new Fiscal Host on Open Collective</div>
               <ChevronButton />
             </CollapsibleTrigger>
@@ -278,7 +278,7 @@ export const FiscalHostOCFTransition = ({ collective }) => {
         )}
         {/** Starting your own Fiscal Host */}
         <Collapsible className="rounded-md border border-gray-300 p-4" {...getOpenProps('ownHost')}>
-          <CollapsibleTrigger className="group flex w-full flex-1 items-center justify-between text-sm [&_svg]:data-[state=open]:rotate-180">
+          <CollapsibleTrigger className="group flex w-full flex-1 items-center justify-between text-sm data-[state=open]:[&_svg]:rotate-180">
             <div className="font-medium">Starting your own Fiscal Host</div>
             <ChevronButton />
           </CollapsibleTrigger>
@@ -319,7 +319,7 @@ export const FiscalHostOCFTransition = ({ collective }) => {
         </Collapsible>
         {/** Leave OCF */}
         <Collapsible className="rounded-md border border-gray-300 p-4" {...getOpenProps('leaveHost')}>
-          <CollapsibleTrigger className="group flex w-full flex-1 items-center justify-between text-sm [&_svg]:data-[state=open]:rotate-180">
+          <CollapsibleTrigger className="group flex w-full flex-1 items-center justify-between text-sm data-[state=open]:[&_svg]:rotate-180">
             <div className="font-medium">Leaving Open Collective Foundation</div>
             <ChevronButton />
           </CollapsibleTrigger>
@@ -345,7 +345,7 @@ export const FiscalHostOCFTransition = ({ collective }) => {
         {/** Reactivating your recurring contributions */}
         {data.account.pausedContributions.totalCount > 0 && (
           <Collapsible className="rounded-md border border-gray-300 p-4" {...getOpenProps('reactivateContributions')}>
-            <CollapsibleTrigger className="group flex w-full flex-1 items-center justify-between text-sm [&_svg]:data-[state=open]:rotate-180">
+            <CollapsibleTrigger className="group flex w-full flex-1 items-center justify-between text-sm data-[state=open]:[&_svg]:rotate-180">
               <div className="font-medium">Reactivating your recurring contributions</div>
               <ChevronButton />
             </CollapsibleTrigger>
@@ -364,7 +364,7 @@ export const FiscalHostOCFTransition = ({ collective }) => {
         )}
         {/** External Host */}
         <Collapsible className="rounded-md border border-gray-300 p-4" {...getOpenProps('externalHost')}>
-          <CollapsibleTrigger className="group flex w-full flex-1 items-center justify-between text-sm [&_svg]:data-[state=open]:rotate-180">
+          <CollapsibleTrigger className="group flex w-full flex-1 items-center justify-between text-sm data-[state=open]:[&_svg]:rotate-180">
             <div className="font-medium">Your new Fiscal Host isn’t on Open Collective</div>
             <ChevronButton />
           </CollapsibleTrigger>
@@ -382,7 +382,7 @@ export const FiscalHostOCFTransition = ({ collective }) => {
         </Collapsible>
         {/** More Options */}
         <Collapsible className="rounded-md border border-gray-300 p-4" {...getOpenProps('moreOptions')}>
-          <CollapsibleTrigger className="group flex w-full flex-1 items-center justify-between text-sm [&_svg]:data-[state=open]:rotate-180">
+          <CollapsibleTrigger className="group flex w-full flex-1 items-center justify-between text-sm data-[state=open]:[&_svg]:rotate-180">
             <div className="font-medium">More options</div>
             <ChevronButton />
           </CollapsibleTrigger>
