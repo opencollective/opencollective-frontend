@@ -64,6 +64,9 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
+      # man-db trigger on apt install is taking some time
+      - name: Disable man-db update
+        run: sudo rm -f /var/lib/man-db/auto-update
       - name: Update apt
         run: sudo apt-get update || exit 0
 
