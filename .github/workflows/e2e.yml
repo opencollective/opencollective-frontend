@@ -17,6 +17,7 @@ env:
   E2E_TEST: 1
   PGHOST: localhost
   PGUSER: postgres
+  CYPRESS_COVERAGE: false
   CYPRESS_RECORD: false
   CYPRESS_VIDEO: false
   CYPRESS_VIDEO_UPLOAD_ON_PASSES: false
