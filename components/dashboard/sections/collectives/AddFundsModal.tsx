@@ -964,7 +964,7 @@ const AddFundsModalContentWithCollective = ({
                   </h3>
                   <Container pb={2} mt={3}>
                     <FormattedMessage id="AddFundsModal.YouAdded" defaultMessage="You added:" />
-                    <ul className="mt-2 list-inside list-disc pl-3">
+                    <ul className="mt-2 list-inside list-disc pl-3 break-words">
                       <li>
                         <strong>{`${fundDetails.fundAmount / 100} ${currency}`}</strong>
                       </li>

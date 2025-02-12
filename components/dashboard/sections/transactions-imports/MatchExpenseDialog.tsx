@@ -244,7 +244,7 @@ export const MatchExpenseDialog = ({
               <FormattedMessage defaultMessage="Imported data" id="tmfin0" />
             </strong>
 
-            <ul className="mt-2 list-inside list-disc">
+            <ul className="mt-2 list-inside list-disc break-words">
               <li>
                 <strong>
                   <FormattedMessage id="AddFundsModal.source" defaultMessage="Source" />
@@ -307,7 +307,7 @@ export const MatchExpenseDialog = ({
                 </Link>
               </div>
 
-              <ul className="mt-2 list-inside list-disc">
+              <ul className="mt-2 list-inside list-disc break-words">
                 <li>
                   <strong>
                     <FormattedMessage id="Fields.id" defaultMessage="ID" />
