@@ -93,19 +93,6 @@ export const twitterProfileUrl = twitterHandle => {
 };
 
 /**
- * TODO: Use the new Facebook share dialog, see https://developers.facebook.com/docs/sharing/reference/feed-dialog.
- * Not migrating it now because we need an APP ID.
- *
- * @param opts {object} With the following attributes:
- *  - u: A URL to share in the tweet
- *  - text: The text to share
- *  - via: A Facebook username to associate with the Tweet
- */
-export const facebookShareURL = opts => {
-  return `https://www.facebook.com/sharer/sharer.php${objectToQueryString({ via: 'OpenCollect', ...opts })}`;
-};
-
-/**
  * @param opts {object} With the following attributes:
  *  - text: The message to share
  */

@@ -44,7 +44,7 @@ export type Account = {
   /** Categories set by Open Collective to help moderation. */
   categories: Array<Maybe<Scalars['String']['output']>>;
   childrenAccounts: AccountCollection;
-  /** The list of connected accounts (Stripe, Twitter, etc ...) */
+  /** The list of connected accounts (Stripe, PayPal, etc ...) */
   connectedAccounts?: Maybe<Array<Maybe<ConnectedAccount>>>;
   conversations: ConversationCollection;
   /** Returns conversation's tags for collective sorted by popularity */
@@ -174,6 +174,7 @@ export type AccountChildrenAccountsArgs = {
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  orderBy?: OrderByInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -1437,7 +1438,7 @@ export type Bot = Account & {
   canHaveChangelogUpdates: Scalars['Boolean']['output'];
   categories: Array<Maybe<Scalars['String']['output']>>;
   childrenAccounts: AccountCollection;
-  /** The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts". */
+  /** The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts". */
   connectedAccounts?: Maybe<Array<Maybe<ConnectedAccount>>>;
   conversations: ConversationCollection;
   /** Returns conversation's tags for collective sorted by popularity */
@@ -1562,6 +1563,7 @@ export type BotChildrenAccountsArgs = {
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  orderBy?: OrderByInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -1903,7 +1905,7 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   canStartResumeContributionsProcess: Scalars['Boolean']['output'];
   categories: Array<Maybe<Scalars['String']['output']>>;
   childrenAccounts: AccountCollection;
-  /** The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts". */
+  /** The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts". */
   connectedAccounts?: Maybe<Array<Maybe<ConnectedAccount>>>;
   contributionPolicy?: Maybe<Scalars['String']['output']>;
   /** All the persons and entities that contribute to this account */
@@ -2065,6 +2067,7 @@ export type CollectiveChildrenAccountsArgs = {
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  orderBy?: OrderByInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -3886,7 +3889,7 @@ export type Event = Account & AccountWithContributions & AccountWithHost & Accou
   canStartResumeContributionsProcess: Scalars['Boolean']['output'];
   categories: Array<Maybe<Scalars['String']['output']>>;
   childrenAccounts: AccountCollection;
-  /** The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts". */
+  /** The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts". */
   connectedAccounts?: Maybe<Array<Maybe<ConnectedAccount>>>;
   contributionPolicy?: Maybe<Scalars['String']['output']>;
   /** All the persons and entities that contribute to this account */
@@ -4056,6 +4059,7 @@ export type EventChildrenAccountsArgs = {
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  orderBy?: OrderByInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -5080,7 +5084,7 @@ export type Fund = Account & AccountWithContributions & AccountWithHost & {
   canStartResumeContributionsProcess: Scalars['Boolean']['output'];
   categories: Array<Maybe<Scalars['String']['output']>>;
   childrenAccounts: AccountCollection;
-  /** The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts". */
+  /** The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts". */
   connectedAccounts?: Maybe<Array<Maybe<ConnectedAccount>>>;
   contributionPolicy?: Maybe<Scalars['String']['output']>;
   /** All the persons and entities that contribute to this account */
@@ -5242,6 +5246,7 @@ export type FundChildrenAccountsArgs = {
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  orderBy?: OrderByInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -5623,7 +5628,7 @@ export type Host = Account & AccountWithContributions & {
   canStartResumeContributionsProcess: Scalars['Boolean']['output'];
   categories: Array<Maybe<Scalars['String']['output']>>;
   childrenAccounts: AccountCollection;
-  /** The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts". */
+  /** The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts". */
   connectedAccounts?: Maybe<Array<Maybe<ConnectedAccount>>>;
   contributionPolicy?: Maybe<Scalars['String']['output']>;
   contributionStats: ContributionStats;
@@ -5834,6 +5839,7 @@ export type HostChildrenAccountsArgs = {
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  orderBy?: OrderByInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -6602,7 +6608,7 @@ export type Individual = Account & {
   canHaveChangelogUpdates: Scalars['Boolean']['output'];
   categories: Array<Maybe<Scalars['String']['output']>>;
   childrenAccounts: AccountCollection;
-  /** The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts". */
+  /** The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts". */
   connectedAccounts?: Maybe<Array<Maybe<ConnectedAccount>>>;
   contributorProfiles: Array<Maybe<ContributorProfile>>;
   conversations: ConversationCollection;
@@ -6750,6 +6756,7 @@ export type IndividualChildrenAccountsArgs = {
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  orderBy?: OrderByInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -8727,12 +8734,16 @@ export enum OrderByFieldType {
   ACTIVITY = 'ACTIVITY',
   BALANCE = 'BALANCE',
   CREATED_AT = 'CREATED_AT',
+  /** Order by end date */
+  ENDS_AT = 'ENDS_AT',
   HOSTED_COLLECTIVES_COUNT = 'HOSTED_COLLECTIVES_COUNT',
   HOST_RANK = 'HOST_RANK',
   LAST_CHARGED_AT = 'LAST_CHARGED_AT',
   MEMBER_COUNT = 'MEMBER_COUNT',
   NAME = 'NAME',
   RANK = 'RANK',
+  /** Order by start date */
+  STARTS_AT = 'STARTS_AT',
   TOTAL_CONTRIBUTED = 'TOTAL_CONTRIBUTED'
 }
 
@@ -8938,7 +8949,7 @@ export type Organization = Account & AccountWithContributions & {
   canStartResumeContributionsProcess: Scalars['Boolean']['output'];
   categories: Array<Maybe<Scalars['String']['output']>>;
   childrenAccounts: AccountCollection;
-  /** The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts". */
+  /** The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts". */
   connectedAccounts?: Maybe<Array<Maybe<ConnectedAccount>>>;
   contributionPolicy?: Maybe<Scalars['String']['output']>;
   /** All the persons and entities that contribute to this account */
@@ -9095,6 +9106,7 @@ export type OrganizationChildrenAccountsArgs = {
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  orderBy?: OrderByInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -9974,7 +9986,7 @@ export type Project = Account & AccountWithContributions & AccountWithHost & Acc
   canStartResumeContributionsProcess: Scalars['Boolean']['output'];
   categories: Array<Maybe<Scalars['String']['output']>>;
   childrenAccounts: AccountCollection;
-  /** The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts". */
+  /** The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts". */
   connectedAccounts?: Maybe<Array<Maybe<ConnectedAccount>>>;
   contributionPolicy?: Maybe<Scalars['String']['output']>;
   /** All the persons and entities that contribute to this account */
@@ -10138,6 +10150,7 @@ export type ProjectChildrenAccountsArgs = {
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  orderBy?: OrderByInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -12144,7 +12157,7 @@ export type Vendor = Account & AccountWithContributions & {
   canStartResumeContributionsProcess: Scalars['Boolean']['output'];
   categories: Array<Maybe<Scalars['String']['output']>>;
   childrenAccounts: AccountCollection;
-  /** The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts". */
+  /** The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts". */
   connectedAccounts?: Maybe<Array<Maybe<ConnectedAccount>>>;
   contributionPolicy?: Maybe<Scalars['String']['output']>;
   /** All the persons and entities that contribute to this account */
@@ -12296,6 +12309,7 @@ export type VendorChildrenAccountsArgs = {
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  orderBy?: OrderByInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
 };
 

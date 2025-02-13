@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Clipboard } from '@styled-icons/feather/Clipboard';
-import { Facebook } from '@styled-icons/feather/Facebook';
 import { Linkedin } from '@styled-icons/feather/Linkedin';
 // Styled-icons
 import { Mail } from '@styled-icons/feather/Mail';
@@ -10,7 +9,7 @@ import copy from 'copy-to-clipboard';
 import { defineMessages, injectIntl } from 'react-intl';
 
 // Open Collective Frontend imports
-import { facebookShareURL, linkedInShareURL, mailToURL, tweetURL } from '../../lib/url-helpers';
+import { linkedInShareURL, mailToURL, tweetURL } from '../../lib/url-helpers';
 
 import Container from '../Container';
 import { Flex } from '../Grid';
@@ -48,11 +47,6 @@ const ShareButtons = ({ pageUrl, intl, collective: { name, twitterHandle } }) =>
 
   return (
     <Flex>
-      <StyledLink title="Facebook" href={facebookShareURL({ u: pageUrl })} openInNewTab>
-        <StyledRoundButton size={40} mr="12px">
-          <Facebook size={14} />
-        </StyledRoundButton>
-      </StyledLink>
       <StyledLink title="Twitter" href={tweetURL({ url: pageUrl, text: twitterShareMsg })} openInNewTab>
         <StyledRoundButton size={40} mr="12px">
           <Twitter size={14} />

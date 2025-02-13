@@ -30,7 +30,6 @@ import hasFeature, { FEATURES } from '../../lib/allowed-features';
 import { isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective';
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
-import { ConnectedAccountService } from '../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { getCollectivePageRoute } from '../../lib/url-helpers';
@@ -352,13 +351,6 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
         {
           section: ALL_SECTIONS.COLLECTIVE_PAGE,
           if: !isAccountantOnly,
-        },
-        {
-          section: ALL_SECTIONS.CONNECTED_ACCOUNTS, // Displayed as "Social accounts"
-          if:
-            isOneOfTypes(account, [COLLECTIVE, ORGANIZATION]) &&
-            !isAccountantOnly &&
-            account.connectedAccounts?.some(({ service }) => service === ConnectedAccountService.twitter),
         },
         // Host sections
         ...(isHost || isSelfHosted

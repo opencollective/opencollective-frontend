@@ -111,5 +111,4 @@ To add new files or dependencies to this exported package, have a look at [scrip
 
 ## Discussion
 
-If you have any questions, ping us on [Discord](https://discord.opencollective.com) or Twitter
-([@opencollect](https://twitter.com/opencollect)).
+If you have any questions, ping us on [Discord](https://discord.opencollective.com).

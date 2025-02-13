@@ -29,7 +29,6 @@ module.exports = {
         'components/collective-page/graphql/queries.js',
         'components/collective-page/hero/HeroTotalCollectiveContributionsWithData.js',
         'components/edit-collective/CreateHostFormWithData.js',
-        'components/edit-collective/EditTwitterAccount.js',
         'components/edit-collective/EditUserEmailForm.js',
         'components/edit-collective/actions/Archive.js',
         'components/edit-collective/actions/Delete.js',
