@@ -60,6 +60,7 @@ export function Filterbar<FV extends Record<string, any>, FM>({
   const { displayedFilters, remainingFilters } = useGetFilterbarOptions(filters, values, defaultSchemaValues, meta);
   const sortFilterKey = filters.sort ? 'sort' : filters.orderBy ? 'orderBy' : null;
   const sortFilter = filters.sort || filters.orderBy;
+
   return (
     <div className={cn('flex flex-col gap-4', className)}>
       {views ? (

@@ -1,52 +1,58 @@
 import React from 'react';
-import { Banknote } from 'lucide-react';
+import { Receipt } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
-import type { Account, Amount, Order, OrderStatus } from '../../../../lib/graphql/types/v2/schema';
+import type { Account, Amount, Expense } from '../../../../lib/graphql/types/v2/schema';
 
 import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';
+import ExpenseStatusTag from '../../../expenses/ExpenseStatusTag';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
-import OrderStatusTag from '../../../orders/OrderStatusTag';
 import { DataTable } from '../../../table/DataTable';
 import { Badge } from '../../../ui/Badge';
 import { Button } from '../../../ui/Button';
 import { RadioGroup, RadioGroupItem } from '../../../ui/RadioGroup';
 import { EmptyResults } from '../../EmptyResults';
 
-export const SuggestedContributionsTable = ({
+export const SuggestedExpensesTable = ({
   loading,
-  selectedContribution,
-  setSelectedContribution,
-  contributions,
-  totalContributions,
+  selectedExpense,
+  setSelectedExpense,
+  expenses,
+  totalExpenses,
   queryFilter,
-  onAddFundsClick,
+  onCreateExpenseClick,
+}: {
+  loading: boolean;
+  selectedExpense: Expense;
+  setSelectedExpense: (expense: Expense) => void;
+  expenses: Expense[];
+  totalExpenses: number;
+  queryFilter: any;
+  onCreateExpenseClick: () => void;
 }) => {
   return (
-    <RadioGroup value={selectedContribution?.id}>
-      <DataTable<Order, unknown>
+    <RadioGroup value={selectedExpense?.id}>
+      <DataTable<Expense, unknown>
         loading={loading}
         nbPlaceholders={3}
-        onClickRow={({ original }) => setSelectedContribution(original)}
-        data={contributions}
+        onClickRow={({ original }) => setSelectedExpense(original)}
+        data={expenses}
         getRowClassName={({ original }) =>
-          selectedContribution?.id === original.id
+          selectedExpense?.id === original.id
             ? 'bg-blue-50 font-semibold shadow-inner shadow-blue-100 border-l-2! border-l-blue-500'
             : ''
         }
         emptyMessage={() => (
           <EmptyResults
             hasFilters={queryFilter.hasFilters}
-            entityType="CONTRIBUTIONS"
-            onResetFilters={() => queryFilter.resetFilters({ expectedFundsFilter: null })}
+            entityType="EXPENSES"
+            onResetFilters={() => queryFilter.resetFilters()}
             imageSize={120}
             otherActions={
-              <Button data-cy="reset-filters" variant="outline" onClick={onAddFundsClick}>
-                <Banknote size={16} />
-                <span>
-                  <FormattedMessage defaultMessage="Manually add funds" id="OrmUye" />
-                </span>
+              <Button data-cy="create-expense" variant="outline" onClick={onCreateExpenseClick}>
+                <Receipt size={16} className="mr-2" />
+                <FormattedMessage defaultMessage="Create new expense" id="tbnLgX" />
               </Button>
             }
           />
@@ -64,18 +70,15 @@ export const SuggestedContributionsTable = ({
             cell: ({ cell }) => <Badge size="xs">#{cell.getValue() as number}</Badge>,
           },
           {
-            id: 'date',
-            header: () => <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />,
-            accessorKey: 'createdAt',
-            cell: ({ cell }) => {
-              const date = cell.getValue() as string;
-              return <DateTime value={new Date(date)} />;
-            },
+            id: 'description',
+            header: () => <FormattedMessage id="Fields.description" defaultMessage="Description" />,
+            accessorKey: 'description',
+            cell: ({ cell }) => <div className="flex items-center gap-1">{cell.getValue() as string}</div>,
           },
           {
             id: 'amount',
             header: () => <FormattedMessage defaultMessage="Amount" id="Fields.amount" />,
-            accessorKey: 'totalAmount',
+            accessorKey: 'amountV2',
             cell: ({ cell }) => {
               const value = cell.getValue() as Amount;
               return (
@@ -84,53 +87,56 @@ export const SuggestedContributionsTable = ({
             },
           },
           {
-            id: 'from',
-            header: () => <FormattedMessage defaultMessage="From" id="dM+p3/" />,
-            accessorKey: 'fromAccount',
-            cell: ({ cell }) => {
-              const account = cell.getValue() as Account;
-              return (
-                <div className="flex items-center gap-1">
-                  <Avatar account={account} size={24} />
-                  {account.name}
-                </div>
-              );
-            },
-          },
-          {
-            id: 'to',
-            header: () => <FormattedMessage id="To" defaultMessage="To" />,
-            accessorKey: 'toAccount',
-            cell: ({ cell }) => {
-              const account = cell.getValue() as Account;
-              return (
-                <div className="flex items-center gap-1">
-                  <Avatar account={account} size={24} />
-                  {account.name}
-                </div>
-              );
-            },
-          },
-          {
             id: 'status',
             accessorKey: 'status',
-            header: () => <FormattedMessage defaultMessage="Status" id="order.status" />,
-            cell: ({ cell }) => <OrderStatusTag status={cell.getValue() as OrderStatus} />,
+            header: () => <FormattedMessage defaultMessage="Status" id="Fields.status" />,
+            cell: ({ cell }) => <ExpenseStatusTag status={cell.getValue() as string} />,
           },
           {
-            id: 'description',
-            header: () => <FormattedMessage id="Fields.description" defaultMessage="Description" />,
-            accessorKey: 'description',
-            cell: ({ cell }) => <div className="flex items-center gap-1">{cell.getValue() as string}</div>,
+            id: 'date',
+            header: () => <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />,
+            accessorKey: 'createdAt',
+            cell: ({ cell }) => {
+              const date = cell.getValue() as string;
+              return <DateTime value={new Date(date)} timeStyle="short" />;
+            },
+          },
+          {
+            id: 'payee',
+            header: () => <FormattedMessage defaultMessage="Payee" id="SecurityScope.Payee" />,
+            accessorKey: 'payee',
+            cell: ({ cell }) => {
+              const account = cell.getValue() as Account;
+              return (
+                <div className="flex items-center gap-1">
+                  <Avatar account={account} size={24} />
+                  {account.name}
+                </div>
+              );
+            },
+          },
+          {
+            id: 'account',
+            header: () => <FormattedMessage defaultMessage="Account" id="TwyMau" />,
+            accessorKey: 'account',
+            cell: ({ cell }) => {
+              const account = cell.getValue() as Account;
+              return (
+                <div className="flex items-center gap-1">
+                  <Avatar account={account} size={24} />
+                  {account.name}
+                </div>
+              );
+            },
           },
         ]}
         footer={
-          totalContributions > contributions.length && (
+          totalExpenses > expenses.length && (
             <div className="flex justify-center border-t border-neutral-200 p-3 text-center">
               <FormattedMessage
-                id="/zSZjG"
-                defaultMessage="{totalContributions, plural, one {# contribution} other {# contributions}} also match your filters. Narrow down your search to see them."
-                values={{ totalContributions }}
+                id="SuggestedExpensesTable.MoreResults"
+                defaultMessage="{totalExpenses, plural, one {# expense} other {# expenses}} also match your filters. Narrow down your search to see them."
+                values={{ totalExpenses }}
               />
             </div>
           )

@@ -166,7 +166,7 @@ function buildSortFilterComponent(
           onValueChange={value => onChange(parseChronologicalOrderInput(value))}
         >
           <SelectPrimitive.Trigger asChild>
-            <Button className="gap-1.5 rounded-full" variant="outline" size="sm">
+            <Button className="gap-1.5 rounded-full whitespace-nowrap" variant="outline" size="sm">
               <span>
                 <span className="text-muted-foreground">
                   <FormattedMessage

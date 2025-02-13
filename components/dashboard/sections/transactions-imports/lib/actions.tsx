@@ -17,6 +17,7 @@ import { useToast } from '../../../../ui/useToast';
 import { HostCreateExpenseModal } from '../../expenses/HostCreateExpenseModal';
 import { AddFundsModalFromImportRow } from '../AddFundsModalFromTransactionsImportRow';
 import { MatchContributionDialog } from '../MatchContributionDialog';
+import { MatchExpenseDialog } from '../MatchExpenseDialog';
 
 import { updateTransactionsImportRows } from './graphql';
 
@@ -119,7 +120,7 @@ export function useTransactionsImportActions({ transactionsImport, host }): {
         actions.primary.push({
           key: 'match',
           Icon: Merge,
-          label: <FormattedMessage defaultMessage="Match expected funds" id="J/7TIn" />,
+          label: <FormattedMessage defaultMessage="Match contribution" id="c7INEq" />,
           disabled: isUpdatingRow,
           onClick: () =>
             showModal(
@@ -145,6 +146,19 @@ export function useTransactionsImportActions({ transactionsImport, host }): {
           onClick: showAddFundsModal,
         });
       } else if (row.amount.valueInCents < 0) {
+        actions.primary.push({
+          key: 'match-expense',
+          Icon: Merge,
+          label: <FormattedMessage defaultMessage="Match expense" id="BGB+3j" />,
+          disabled: isUpdatingRow,
+          onClick: () => {
+            showModal(
+              MatchExpenseDialog,
+              { host, row, transactionsImport, onCloseFocusRef },
+              'host-match-expense-modal',
+            );
+          },
+        });
         actions.primary.push({
           key: 'create-expense',
           Icon: Receipt,
