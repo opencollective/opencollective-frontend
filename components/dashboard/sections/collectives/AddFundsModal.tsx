@@ -1181,7 +1181,7 @@ const AddFundsModal = ({
         </MessageBox>
       ) : (
         <div>
-          <label htmlFor="add-funds-collective-picker" className="my-2 text-sm font-normal">
+          <label htmlFor="add-funds-collective-picker" className="mt-2 text-base font-bold">
             <FormattedMessage defaultMessage="Select an account to add funds to:" id="addFunds.selectCollective" />
           </label>
           <CollectivePickerAsync
@@ -1192,6 +1192,7 @@ const AddFundsModal = ({
                 options: [{ value: host, label: <DefaultCollectiveLabel value={host} /> }],
               },
             ]}
+            mt={2}
             hostCollectiveIds={getLegacyIdForCollective(host)}
             types={['COLLECTIVE', 'PROJECT', 'EVENT', 'FUND']}
             getDefaultOptions={buildOption => buildOption(selectedCollective)}

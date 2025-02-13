@@ -188,7 +188,7 @@ const ExpenseItemsSection = React.memo(function ExpenseItemSection(
   return (
     <React.Fragment>
       <Label className="mb-4 font-bold">
-        <FormattedMessage defaultMessage="Items" id="yNmV/R" />
+        <FormattedMessage defaultMessage="Items" id="Fields.items" />
       </Label>
       <div role="list">
         {props.expenseItems.map(ei => (

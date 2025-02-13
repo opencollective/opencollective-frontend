@@ -105,6 +105,14 @@ const suggestExpenseMatchQuery = gql`
           id
           type
         }
+        items {
+          id
+          description
+          amountV2 {
+            valueInCents
+            currency
+          }
+        }
         payee {
           id
           name
@@ -360,6 +368,45 @@ export const MatchExpenseDialog = ({
                       <FormattedMessage defaultMessage="Payout method" id="ExpenseForm.PayoutOptionLabel" />
                     </strong>
                     : {selectedExpense.payoutMethod.type}
+                  </li>
+                )}
+                {selectedExpense.items.length > 0 && (
+                  <li>
+                    <strong>
+                      <FormattedMessage id="Fields.items" defaultMessage="Items" />
+                    </strong>
+                    :{' '}
+                    {selectedExpense.items.length === 1 ? (
+                      <span>
+                        <i>
+                          {selectedExpense.items[0].description || (
+                            <FormattedMessage id="NoDescription" defaultMessage="No description provided" />
+                          )}
+                        </i>{' '}
+                        -{' '}
+                        <FormattedMoneyAmount
+                          amount={selectedExpense.items[0].amountV2.valueInCents}
+                          currency={selectedExpense.items[0].amountV2.currency}
+                        />
+                      </span>
+                    ) : (
+                      <ul className="list-inside list-disc pl-4">
+                        {selectedExpense.items.map(item => (
+                          <li key={item.id}>
+                            <i>
+                              {item.description || (
+                                <FormattedMessage id="NoDescription" defaultMessage="No description provided" />
+                              )}
+                            </i>{' '}
+                            -{' '}
+                            <FormattedMoneyAmount
+                              amount={item.amountV2.valueInCents}
+                              currency={item.amountV2.currency}
+                            />
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </li>
                 )}
               </ul>
