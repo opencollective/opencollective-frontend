@@ -153,6 +153,7 @@ const transactionsImportQuery = gql`
       }
       account {
         id
+        legacyId
         slug
         currency
         ... on AccountWithHost {

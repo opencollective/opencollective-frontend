@@ -13,7 +13,7 @@ const TransactionsImportRowDataLineValue = ({ value, level }) => {
       return <span>{value.join(', ')}</span>;
     } else {
       return (
-        <ul className="list-inside list-disc pl-2">
+        <ul className="list-inside list-disc pl-4">
           {value.map((item, index) => (
             // eslint-disable-next-line react/no-array-index-key
             <li key={index}>
@@ -25,7 +25,7 @@ const TransactionsImportRowDataLineValue = ({ value, level }) => {
     }
   } else if (typeof value === 'object' && value !== null) {
     return (
-      <ul className="list-inside list-disc pl-2">
+      <ul className="list-inside list-disc pl-4">
         {Object.entries(value).map(([key, value]) => (
           <TransactionsImportRowDataLine key={key} value={value} labelKey={key} level={level + 1} />
         ))}
