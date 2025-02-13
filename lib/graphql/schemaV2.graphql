@@ -813,7 +813,7 @@ interface Account {
   paymentMethodsWithPendingConfirmation: [PaymentMethod]
 
   """
-  The list of connected accounts (Stripe, Twitter, etc ...)
+  The list of connected accounts (Stripe, PayPal, etc ...)
   """
   connectedAccounts: [ConnectedAccount]
 
@@ -909,6 +909,11 @@ interface Account {
     isActive: Boolean
     accountType: [AccountType]
     searchTerm: String
+
+    """
+    Order of the results. Defaults to createdAt DESC.
+    """
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
   ): AccountCollection!
 
   """
@@ -3338,7 +3343,7 @@ type Host implements Account & AccountWithContributions {
   paymentMethodsWithPendingConfirmation: [PaymentMethod]
 
   """
-  The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts".
+  The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
   """
   connectedAccounts: [ConnectedAccount]
 
@@ -3430,6 +3435,11 @@ type Host implements Account & AccountWithContributions {
     isActive: Boolean
     accountType: [AccountType]
     searchTerm: String
+
+    """
+    Order of the results. Defaults to createdAt DESC.
+    """
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
   ): AccountCollection!
 
   """
@@ -4431,6 +4441,16 @@ enum OrderByFieldType {
   MEMBER_COUNT
   TOTAL_CONTRIBUTED
   NAME
+
+  """
+  Order by start date
+  """
+  STARTS_AT
+
+  """
+  Order by end date
+  """
+  ENDS_AT
 }
 
 """
@@ -5258,9 +5278,9 @@ enum ConnectedAccountService {
   stripe
   stripe_customer
   github
-  twitter
   transferwise
   plaid
+  twitter
   privacy @deprecated(reason: "Not using this service anymore")
   thegivingblock
   meetup @deprecated(reason: "Not using this service anymore")
@@ -6136,9 +6156,9 @@ All supported Activity channels we can broadcast to
 """
 enum ActivityChannel {
   slack
-  twitter
   webhook
   email
+  twitter
 }
 
 """
@@ -8563,7 +8583,7 @@ type Bot implements Account {
   paymentMethodsWithPendingConfirmation: [PaymentMethod]
 
   """
-  The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts".
+  The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
   """
   connectedAccounts: [ConnectedAccount]
 
@@ -8655,6 +8675,11 @@ type Bot implements Account {
     isActive: Boolean
     accountType: [AccountType]
     searchTerm: String
+
+    """
+    Order of the results. Defaults to createdAt DESC.
+    """
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
   ): AccountCollection!
 
   """
@@ -9436,7 +9461,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   paymentMethodsWithPendingConfirmation: [PaymentMethod]
 
   """
-  The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts".
+  The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
   """
   connectedAccounts: [ConnectedAccount]
 
@@ -9528,6 +9553,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     isActive: Boolean
     accountType: [AccountType]
     searchTerm: String
+
+    """
+    Order of the results. Defaults to createdAt DESC.
+    """
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
   ): AccountCollection!
 
   """
@@ -10858,7 +10888,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   paymentMethodsWithPendingConfirmation: [PaymentMethod]
 
   """
-  The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts".
+  The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
   """
   connectedAccounts: [ConnectedAccount]
 
@@ -10950,6 +10980,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     isActive: Boolean
     accountType: [AccountType]
     searchTerm: String
+
+    """
+    Order of the results. Defaults to createdAt DESC.
+    """
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
   ): AccountCollection!
 
   """
@@ -12000,7 +12035,7 @@ type Individual implements Account {
   paymentMethodsWithPendingConfirmation: [PaymentMethod]
 
   """
-  The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts".
+  The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
   """
   connectedAccounts: [ConnectedAccount]
 
@@ -12090,6 +12125,11 @@ type Individual implements Account {
     isActive: Boolean
     accountType: [AccountType]
     searchTerm: String
+
+    """
+    Order of the results. Defaults to createdAt DESC.
+    """
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
   ): AccountCollection!
 
   """
@@ -12378,7 +12418,7 @@ type ContributorProfile {
     inCollectiveCurrency: Boolean = false
 
     """
-    The date since when to calculate the total
+    The date since when to calculate the total. Defaults to the start of the current year.
     """
     since: DateTime
   ): Amount
@@ -13110,7 +13150,7 @@ type Organization implements Account & AccountWithContributions {
   paymentMethodsWithPendingConfirmation: [PaymentMethod]
 
   """
-  The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts".
+  The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
   """
   connectedAccounts: [ConnectedAccount]
 
@@ -13200,6 +13240,11 @@ type Organization implements Account & AccountWithContributions {
     isActive: Boolean
     accountType: [AccountType]
     searchTerm: String
+
+    """
+    Order of the results. Defaults to createdAt DESC.
+    """
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
   ): AccountCollection!
 
   """
@@ -14096,7 +14141,7 @@ type Vendor implements Account & AccountWithContributions {
   paymentMethodsWithPendingConfirmation: [PaymentMethod]
 
   """
-  The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts".
+  The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
   """
   connectedAccounts: [ConnectedAccount]
 
@@ -14188,6 +14233,11 @@ type Vendor implements Account & AccountWithContributions {
     isActive: Boolean
     accountType: [AccountType]
     searchTerm: String
+
+    """
+    Order of the results. Defaults to createdAt DESC.
+    """
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
   ): AccountCollection!
 
   """
@@ -17727,7 +17777,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   paymentMethodsWithPendingConfirmation: [PaymentMethod]
 
   """
-  The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts".
+  The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
   """
   connectedAccounts: [ConnectedAccount]
 
@@ -17819,6 +17869,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     isActive: Boolean
     accountType: [AccountType]
     searchTerm: String
+
+    """
+    Order of the results. Defaults to createdAt DESC.
+    """
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
   ): AccountCollection!
 
   """
@@ -18747,7 +18802,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   paymentMethodsWithPendingConfirmation: [PaymentMethod]
 
   """
-  The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts".
+  The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
   """
   connectedAccounts: [ConnectedAccount]
 
@@ -18839,6 +18894,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     isActive: Boolean
     accountType: [AccountType]
     searchTerm: String
+
+    """
+    Order of the results. Defaults to createdAt DESC.
+    """
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
   ): AccountCollection!
 
   """
