@@ -7,7 +7,7 @@ type Item = {
   items?: Item[];
 };
 
-export const landingPageItems: Item[] = [
+const landingPageItems: Item[] = [
   {
     label: <FormattedMessage defaultMessage="Solutions" id="asqGnV" />,
     items: [
