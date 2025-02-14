@@ -127,6 +127,13 @@ const ExpenseSummary = ({
     expense?.type !== ExpenseType.GRANT &&
     expense?.status !== ExpenseStatus.DRAFT;
 
+  const files = React.useMemo(() => expense?.attachedFiles || [], [expense?.attachedFiles]);
+  const invoiceFile = React.useMemo(
+    () => expense?.invoiceFile || files.find(f => f.isInvoice),
+    [files, expense?.invoiceFile],
+  );
+  const attachedFiles = React.useMemo(() => files.filter(f => f !== invoiceFile), [files, invoiceFile]);
+
   const processButtons = (
     <Flex
       display="flex"
@@ -142,6 +149,7 @@ const ExpenseSummary = ({
         isViewingExpenseInHostContext={isViewingExpenseInHostContext}
         enableKeyboardShortcuts={enableKeyboardShortcuts}
         disabled={isLoading}
+        hasAttachedInvoiceFile={Boolean(invoiceFile)}
         onDelete={() => {
           onDelete?.(expense);
           onClose?.();
@@ -528,7 +536,30 @@ const ExpenseSummary = ({
           </div>
         )}
       </Flex>
-      {expenseTypeSupportsAttachments(expense?.type) && expense?.attachedFiles?.length > 0 && (
+      {expenseTypeSupportsAttachments(expense?.type) && (Boolean(invoiceFile) || useInlineExpenseEdit) && (
+        <React.Fragment>
+          <Flex my={4} alignItems="center" gridGap={2}>
+            {!expense && isLoading ? (
+              <LoadingPlaceholder height={20} maxWidth={150} />
+            ) : (
+              <Span fontWeight="bold" fontSize="16px">
+                <FormattedMessage defaultMessage="Invoice" id="Expense.Type.Invoice" />
+              </Span>
+            )}
+            <StyledHr flex="1 1" borderColor="black.300" />
+            {useInlineExpenseEdit && (
+              <EditExpenseDialog
+                title={intl.formatMessage({ defaultMessage: 'Edit invoice file', id: 'expense.editInvoice' })}
+                field="invoiceFile"
+                expense={expense}
+                onEdit={onEdit}
+              />
+            )}
+          </Flex>
+          <ExpenseAttachedFiles files={invoiceFile ? [invoiceFile] : []} openFileViewer={openFileViewer} />
+        </React.Fragment>
+      )}
+      {expenseTypeSupportsAttachments(expense?.type) && (attachedFiles.length > 0 || useInlineExpenseEdit) && (
         <React.Fragment>
           <Flex my={4} alignItems="center" gridGap={2}>
             {!expense && isLoading ? (
@@ -548,7 +579,7 @@ const ExpenseSummary = ({
               />
             )}
           </Flex>
-          <ExpenseAttachedFiles files={expense.attachedFiles} openFileViewer={openFileViewer} />
+          <ExpenseAttachedFiles files={attachedFiles} openFileViewer={openFileViewer} />
         </React.Fragment>
       )}
 
@@ -640,6 +671,10 @@ ExpenseSummary.propTypes = {
         url: PropTypes.string.isRequired,
       }).isRequired,
     ),
+    invoiceFile: PropTypes.shape({
+      id: PropTypes.string,
+      url: PropTypes.string.isRequired,
+    }),
     taxes: PropTypes.arrayOf(
       PropTypes.shape({
         type: PropTypes.string,

@@ -181,12 +181,21 @@ export const prepareExpenseForSubmit = expenseData => {
     payoutMethod.id = null;
   }
 
+  const attachedFiles = [];
+  if (keepAttachedFiles) {
+    attachedFiles.push(...(expenseData.attachedFiles || []).map(file => ({ ...file, isInvoice: false })));
+
+    if (expenseData.invoiceFile) {
+      attachedFiles.push({ ...expenseData.invoiceFile, isInvoice: true });
+    }
+  }
+
   return {
     ...pick(expenseData, ['id', 'type', 'tags', 'currency']),
     payee,
     payeeLocation,
     payoutMethod,
-    attachedFiles: keepAttachedFiles ? expenseData.attachedFiles?.map(file => pick(file, ['id', 'url', 'name'])) : [],
+    attachedFiles: attachedFiles.map(file => pick(file, ['id', 'url', 'name', 'isInvoice'])),
     tax: expenseData.taxes?.filter(tax => !tax.isDisabled).map(tax => pick(tax, ['type', 'rate', 'idNumber'])),
     items: expenseData.items.map(item => prepareExpenseItemForSubmit(expenseData, item)),
     accountingCategory: !expenseData.accountingCategory ? null : pick(expenseData.accountingCategory, ['id']),
@@ -895,6 +904,24 @@ const ExpenseFormBody = ({
                             defaultMessage="If you already have an invoice document, you can upload it here."
                           />
                         }
+                        onChange={invoiceFile =>
+                          formik.setFieldValue('invoiceFile', invoiceFile?.length ? invoiceFile[0] : null)
+                        }
+                        form={formik}
+                        isSingle
+                        fieldName="invoiceFile"
+                        defaultValue={values.invoiceFile ? [values.invoiceFile] : []}
+                      />
+                    </div>
+                    <div className="mt-5">
+                      <ExpenseAttachedFilesForm
+                        title={<FormattedMessage defaultMessage="Additional attachments" id="zO+Zv3" />}
+                        description={
+                          <FormattedMessage
+                            id="UploadInvoiceDescription"
+                            defaultMessage="If you already have an invoice document, you can upload it here."
+                          />
+                        }
                         onChange={attachedFiles => formik.setFieldValue('attachedFiles', attachedFiles)}
                         form={formik}
                         defaultValue={values.attachedFiles}
@@ -1095,6 +1122,9 @@ const ExpenseForm = ({
     initialValues.payeeLocation = expense.draft.payeeLocation;
     initialValues.payee = expense.recurringExpense ? expense.payee : expense.draft.payee;
   }
+
+  initialValues.invoiceFile = (initialValues.attachedFiles || []).find(f => f.isInvoice);
+  initialValues.attachedFiles = (initialValues.attachedFiles || []).filter(f => !f.isInvoice);
 
   return (
     <Formik
