@@ -10,9 +10,9 @@ import { getWebsiteUrl } from '../../../lib/utils';
 import Container from '../../Container';
 import ExportImages from '../../ExportImages';
 import { Box } from '../../Grid';
-import StyledButton from '../../StyledButton';
 import StyledLink from '../../StyledLink';
 import { H4, P } from '../../Text';
+import { Button } from '../../ui/Button';
 
 import SettingsSectionTitle from './SettingsSectionTitle';
 
@@ -32,8 +32,9 @@ const Export = ({ collective }) => {
           values={{ format: 'CSV' }}
         />
       </P>
-      <StyledButton
+      <Button
         minWidth={150}
+        variant="outline"
         loading={isDownloadingCsv}
         onClick={async () => {
           try {
@@ -45,7 +46,7 @@ const Export = ({ collective }) => {
         }}
       >
         <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
-      </StyledButton>
+      </Button>
 
       <SettingsSectionTitle mt={4}>
         <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'JSON' }} />
