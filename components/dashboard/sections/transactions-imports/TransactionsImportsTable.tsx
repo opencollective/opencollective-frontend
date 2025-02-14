@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { FileUp, Landmark, RefreshCw } from 'lucide-react';
+import { FileUp, Landmark } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -15,7 +15,6 @@ import { i18nTransactionsImportType } from '../../../../lib/i18n/transactions-im
 import { capitalize } from '../../../../lib/utils';
 import { transactionsImportsQuery } from './lib/graphql';
 
-import DateTime from '../../../DateTime';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { DataTable } from '../../../table/DataTable';
 import { Badge } from '../../../ui/Badge';
@@ -61,7 +60,7 @@ export const TransactionsImportsTable = ({ accountSlug }) => {
     },
     [intl, toast, accountSlug, refetch, router],
   );
-  const plaidConnectDialog = usePlaidConnectDialog({ host: data?.host, onSuccess: onPlaidConnectSuccess });
+  const plaidConnectDialog = usePlaidConnectDialog({ host: data?.host, onConnectSuccess: onPlaidConnectSuccess });
 
   return (
     <div>

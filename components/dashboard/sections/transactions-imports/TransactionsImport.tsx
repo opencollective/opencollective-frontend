@@ -70,7 +70,6 @@ import { searchFilter } from '../../filters/SearchFilter';
 import { ImportProgressBadge } from './ImportProgressBadge';
 import { StepMapCSVColumns } from './StepMapCSVColumns';
 import { StepSelectCSV } from './StepSelectCSV';
-import { SyncPlaidAccountButton } from './SyncPlaidAccountButton';
 import { TransactionImportLastSyncAtBadge } from './TransactionImportLastSyncAtBadge';
 import { TransactionsImportRowDrawer } from './TransactionsImportRowDrawer';
 import { TransactionsImportRowStatusBadge } from './TransactionsImportRowStatusBadge';
@@ -312,11 +311,11 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
     onOpen: () => {
       setHasSettingsModal(false); // The two modals don't play well with each others when opened at the same time
     },
-    onSuccess: () => {
+    onUpdateSuccess: () => {
       setTimeout(() => refetch(), 5_000);
       toast({
         variant: 'success',
-        message: intl.formatMessage({ defaultMessage: 'Bank account reconnected.', id: 'HuLtwm' }),
+        message: intl.formatMessage({ defaultMessage: 'The Bank account connection has been updated.', id: 'z8w85r' }),
       });
     },
   });
@@ -476,14 +475,6 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                   </div>
                   <div className="flex flex-col items-end gap-1">
                     <div className="flex items-center gap-2">
-                      {importData.type === 'PLAID' && importData.connectedAccount && (
-                        <SyncPlaidAccountButton
-                          hasRequestedSync={hasRequestedSync}
-                          setHasRequestedSync={setHasRequestedSync}
-                          connectedAccountId={importData.connectedAccount.id}
-                          isSyncing={importData.isSyncing}
-                        />
-                      )}
                       {importData.file && (
                         <Link
                           className="flex gap-1 align-middle hover:underline"
@@ -860,9 +851,11 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
         <TransactionsImportSettingsModal
           transactionsImport={importData}
           onOpenChange={setHasSettingsModal}
-          isOpen
+          hasRequestedSync={hasRequestedSync}
+          setHasRequestedSync={setHasRequestedSync}
           plaidStatus={plaidStatus}
           onReconnectClick={showPlaidDialog}
+          isOpen={hasSettingsModal}
         />
       )}
     </div>
