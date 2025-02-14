@@ -2,14 +2,13 @@ import React from 'react';
 import { gql, useApolloClient, useMutation } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import { omit } from 'lodash';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Unplug } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { TransactionsImport } from '../../../../lib/graphql/types/v2/schema';
-import type { PlaidDialogStatus } from '../../../../lib/hooks/usePlaidConnectDialog';
 
 import {
   AlertDialog,
@@ -57,15 +56,11 @@ const deleteConnectedAccountMutation = gql`
 
 export default function TransactionsImportSettingsModal({
   transactionsImport,
-  plaidStatus,
   onOpenChange,
-  onReconnectClick,
   isOpen,
 }: {
   onOpenChange: (isOpen: boolean) => void;
   isOpen: boolean;
-  onReconnectClick: () => void;
-  plaidStatus: PlaidDialogStatus;
   transactionsImport: Pick<TransactionsImport, 'id' | 'source' | 'name' | 'type'> & {
     connectedAccount?: Pick<TransactionsImport['connectedAccount'], 'id'>;
   };
@@ -123,7 +118,7 @@ export default function TransactionsImportSettingsModal({
           </DialogTitle>
         </DialogHeader>
         <Tabs defaultValue="general" className="w-full">
-          <TabsList className="mb-3 grid w-full grid-cols-2">
+          <TabsList className="mb-3 grid w-full grid-cols-3">
             <TabsTrigger value="general">
               <FormattedMessage id="settings.general" defaultMessage="General" />
             </TabsTrigger>
@@ -202,13 +197,19 @@ export default function TransactionsImportSettingsModal({
                       </h3>
                       <p className="mb-4 text-sm text-muted-foreground">
                         <FormattedMessage
-                          defaultMessage="Stops future imports. Existing data will remain intact."
-                          id="RYIqod"
+                          defaultMessage="Stops future imports. Existing data will remain intact, but you won't be able to resume the synchronization in the future."
+                          id="j15K8y"
                         />
                       </p>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
-                          <Button variant="outline" className="w-full" loading={isDisconnecting} disabled={isDeleting}>
+                          <Button
+                            variant="destructive"
+                            className="w-full"
+                            loading={isDisconnecting}
+                            disabled={isDeleting}
+                          >
+                            <Unplug size={16} className="mr-2" />
                             <FormattedMessage defaultMessage="Disconnect Bank Account" id="iEOcw+" />
                           </Button>
                         </AlertDialogTrigger>
@@ -237,34 +238,6 @@ export default function TransactionsImportSettingsModal({
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
-                    </div>
-                    <Separator />
-                  </React.Fragment>
-                )}
-                {!transactionsImport.connectedAccount && transactionsImport.type === 'PLAID' && (
-                  <React.Fragment>
-                    <div>
-                      <h3 className="mb-2 text-sm font-medium">
-                        <FormattedMessage defaultMessage="Reconnect Bank Account" id="BankAccount.Reconnect" />
-                      </h3>
-                      <p className="mb-4 text-sm text-muted-foreground">
-                        <FormattedMessage
-                          defaultMessage="Reconnect your bank account to resume importing transactions."
-                          id="BankAccount.Reconnect.Description"
-                        />
-                      </p>
-                      <Button
-                        variant="outline"
-                        className="w-full"
-                        loading={plaidStatus === 'loading' || plaidStatus === 'active'}
-                        disabled={plaidStatus === 'disabled' || isDeleting}
-                        onClick={onReconnectClick}
-                      >
-                        <FormattedMessage
-                          id="collective.connectedAccounts.reconnect.button"
-                          defaultMessage="Reconnect"
-                        />
-                      </Button>
                     </div>
                     <Separator />
                   </React.Fragment>

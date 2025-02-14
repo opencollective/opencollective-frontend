@@ -37,7 +37,6 @@ import { cn, sortSelectOptions } from '../../../../lib/utils';
 import { useTransactionsImportActions } from './lib/actions';
 import { TransactionsImportRowFieldsFragment, TransactionsImportStatsFragment } from './lib/graphql';
 import { getPossibleActionsForSelectedRows } from './lib/table-selection';
-import { usePlaidConnectDialog } from '@/lib/hooks/usePlaidConnectDialog';
 
 import { accountingCategoryFields } from '@/components/expenses/graphql/fragments';
 
@@ -304,22 +303,6 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
   const hasStepper = importType === 'CSV' && !importData?.file;
   const importRows = importData?.rows?.nodes ?? [];
   const selectedRowIdx = !focus ? -1 : importRows.findIndex(row => row.id === focus.rowId);
-
-  const { show: showPlaidDialog, status: plaidStatus } = usePlaidConnectDialog({
-    transactionImportId: importId,
-    host: importData?.account['host'],
-    disabled: importType !== 'PLAID',
-    onOpen: () => {
-      setHasSettingsModal(false); // The two modals don't play well with each others when opened at the same time
-    },
-    onSuccess: () => {
-      setTimeout(() => refetch(), 5_000);
-      toast({
-        variant: 'success',
-        message: intl.formatMessage({ defaultMessage: 'Bank account reconnected.', id: 'HuLtwm' }),
-      });
-    },
-  });
 
   // Polling to check if the import has new data
   useQuery(transactionsImportLasSyncAtPollQuery, {
@@ -857,13 +840,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
         autoFocusNoteForm={focus?.noteForm}
       />
       {hasSettingsModal && (
-        <TransactionsImportSettingsModal
-          transactionsImport={importData}
-          onOpenChange={setHasSettingsModal}
-          isOpen
-          plaidStatus={plaidStatus}
-          onReconnectClick={showPlaidDialog}
-        />
+        <TransactionsImportSettingsModal transactionsImport={importData} onOpenChange={setHasSettingsModal} isOpen />
       )}
     </div>
   );
