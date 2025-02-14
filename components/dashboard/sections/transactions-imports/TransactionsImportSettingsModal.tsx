@@ -2,7 +2,7 @@ import React from 'react';
 import { gql, useApolloClient, useMutation } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import { omit } from 'lodash';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Unplug } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -61,7 +61,7 @@ export default function TransactionsImportSettingsModal({
 }: {
   onOpenChange: (isOpen: boolean) => void;
   isOpen: boolean;
-  transactionsImport: Pick<TransactionsImport, 'id' | 'source' | 'name'> & {
+  transactionsImport: Pick<TransactionsImport, 'id' | 'source' | 'name' | 'type'> & {
     connectedAccount?: Pick<TransactionsImport['connectedAccount'], 'id'>;
   };
 }) {
@@ -118,7 +118,7 @@ export default function TransactionsImportSettingsModal({
           </DialogTitle>
         </DialogHeader>
         <Tabs defaultValue="general" className="w-full">
-          <TabsList className="mb-3 grid w-full grid-cols-2">
+          <TabsList className="mb-3 grid w-full grid-cols-3">
             <TabsTrigger value="general">
               <FormattedMessage id="settings.general" defaultMessage="General" />
             </TabsTrigger>
@@ -197,13 +197,19 @@ export default function TransactionsImportSettingsModal({
                       </h3>
                       <p className="mb-4 text-sm text-muted-foreground">
                         <FormattedMessage
-                          defaultMessage="Stops future imports. Existing data will remain intact."
-                          id="RYIqod"
+                          defaultMessage="Stops future imports. Existing data will remain intact, but you won't be able to resume the synchronization in the future."
+                          id="j15K8y"
                         />
                       </p>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
-                          <Button variant="outline" className="w-full" loading={isDisconnecting} disabled={isDeleting}>
+                          <Button
+                            variant="destructive"
+                            className="w-full"
+                            loading={isDisconnecting}
+                            disabled={isDeleting}
+                          >
+                            <Unplug size={16} className="mr-2" />
                             <FormattedMessage defaultMessage="Disconnect Bank Account" id="iEOcw+" />
                           </Button>
                         </AlertDialogTrigger>
