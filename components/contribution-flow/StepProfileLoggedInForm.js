@@ -92,6 +92,7 @@ const StepProfileLoggedInForm = ({ profiles, onChange, collective, tier, data, s
                 {inputProps => (
                   <StyledInput
                     {...inputProps}
+                    data-cy="input-name"
                     value={profileInfo.name}
                     placeholder="Thomas Anderson"
                     onChange={e => onChange({ stepProfile: { ...data, name: e.target.value } })}
@@ -126,6 +127,7 @@ const StepProfileLoggedInForm = ({ profiles, onChange, collective, tier, data, s
               {inputProps => (
                 <StyledInput
                   {...inputProps}
+                  data-cy="input-legalName"
                   value={profileInfo.legalName}
                   placeholder={profileInfo.name}
                   onChange={e => onChange({ stepProfile: { ...data, legalName: e.target.value } })}

@@ -140,6 +140,7 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInCl
           <StyledInput
             {...inputProps}
             value={data?.name || ''}
+            data-cy="input-name"
             placeholder="Thomas Anderson"
             onChange={dispatchGenericEvent}
             maxLength="255"
@@ -152,6 +153,7 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInCl
         labelFontSize="16px"
         labelFontWeight="700"
         isPrivate
+        hideOptionalLabel={requiredInformation.legalName}
         required={requiredInformation.legalName && !data?.name}
         hint={
           requiredInformation.legalName ? (
@@ -176,6 +178,7 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInCl
           <StyledInput
             {...inputProps}
             value={data?.legalName || ''}
+            data-cy="input-legalName"
             placeholder="Thomas A. Anderson"
             onChange={dispatchGenericEvent}
             maxLength="255"
