@@ -69,6 +69,9 @@ ReCaptcha.propTypes = {
   onError: PropTypes.func,
 };
 
+/**
+ * @type {React.ForwardRefExoticComponent<{ onVerify: (result) => void;}>}
+ */
 const Captcha = React.forwardRef(({ onVerify, provider = CAPTCHA_PROVIDER, ...props }, captchaRef) => {
   const HCAPTCHA_SITEKEY = getEnvVar('HCAPTCHA_SITEKEY');
   const RECAPTCHA_SITE_KEY = getEnvVar('RECAPTCHA_SITE_KEY');
