@@ -5,9 +5,9 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { Box, Flex } from '../../../Grid';
-import StyledButton from '../../../StyledButton';
 import StyledLink from '../../../StyledLink';
 import { P } from '../../../Text';
+import { Button } from '../../../ui/Button';
 
 import CollectiveSettings from './CollectiveSettings';
 
@@ -44,7 +44,9 @@ const GroupView = ({ accounts, title, advancedSettings, roleLabel }) => {
           </CollectiveContainer>
         ))}
       </Flex>
-      <StyledButton onClick={handleBack}>Back</StyledButton>
+      <Button variant="outline" onClick={handleBack}>
+        Back
+      </Button>
     </Box>
   );
 };

@@ -22,12 +22,12 @@ import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import RichTextEditor from '../../RichTextEditor';
-import StyledButton from '../../StyledButton';
 import StyledCheckbox from '../../StyledCheckbox';
 import StyledInputAmount from '../../StyledInputAmount';
 import StyledInputField from '../../StyledInputField';
 import StyledSelect from '../../StyledSelect';
 import { P } from '../../Text';
+import { Button } from '../../ui/Button';
 import { Switch } from '../../ui/Switch';
 import { useToast } from '../../ui/useToast';
 
@@ -1021,20 +1021,17 @@ const Policies = ({ collective }) => {
             />
           </Container>
         )}
-        <Flex mt={5} mb={3} alignItems="center" justifyContent="center">
-          <StyledButton
+        <div className="mt-10 flex w-full justify-stretch">
+          <Button
             data-cy="submit-policy-btn"
-            buttonStyle="primary"
-            mx={2}
-            minWidth={200}
-            buttonSize="medium"
+            className="w-full"
             loading={isSubmittingSettings || isSubmittingCategories}
             type="submit"
             onSubmit={formik.handleSubmit}
           >
             <FormattedMessage id="save" defaultMessage="Save" />
-          </StyledButton>
-        </Flex>
+          </Button>
+        </div>
       </form>
     </Flex>
   );

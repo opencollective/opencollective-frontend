@@ -33,12 +33,12 @@ import LinkCollective from '../../LinkCollective';
 import Loading from '../../Loading';
 import MemberRoleDescription from '../../MemberRoleDescription';
 import MessageBox from '../../MessageBox';
-import StyledButton from '../../StyledButton';
 import StyledHr from '../../StyledHr';
 import StyledRoundButton from '../../StyledRoundButton';
 import StyledTag from '../../StyledTag';
 import StyledTooltip from '../../StyledTooltip';
 import { P } from '../../Text';
+import { Button } from '../../ui/Button';
 import DashboardHeader from '../DashboardHeader';
 import type { DashboardSectionProps } from '../types';
 
@@ -331,13 +331,13 @@ const Team = ({ accountSlug }: DashboardSectionProps) => {
             </React.Fragment>
           )}
 
-          <Flex justifyContent="center" flexWrap="wrap" mt={5}>
-            <Link href={`/${accountSlug}`}>
-              <StyledButton mx={2} minWidth={200}>
-                <FormattedMessage id="ViewCollectivePage" defaultMessage="View Profile page" />
-              </StyledButton>
-            </Link>
-          </Flex>
+          <div className="mt-5 flex flex-col gap-2 sm:justify-stretch">
+            <Button className="grow" variant="link" asChild>
+              <Link href={`/${accountSlug}`}>
+                <FormattedMessage id="ViewPublicProfile" defaultMessage="View Public Profile" />
+              </Link>
+            </Button>
+          </div>
           {showInviteModal && (
             <InviteMemberModal
               intl={intl}

@@ -9,9 +9,9 @@ import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import { collectiveBalanceFragment } from '../lib/graphql/v1/fragments';
 import { compose } from '../lib/utils';
 
+import { Button } from './ui/Button';
 import { toast } from './ui/useToast';
 import { Flex } from './Grid';
-import StyledButton from './StyledButton';
 
 class SendMoneyToCollectiveBtn extends React.Component {
   static propTypes = {
@@ -125,7 +125,7 @@ class SendMoneyToCollectiveBtn extends React.Component {
               ),
             })
           ) : (
-            <StyledButton onClick={this.props.confirmTransfer || this.onClick}>
+            <Button variant="outline" onClick={this.props.confirmTransfer || this.onClick}>
               {this.state.loading && <FormattedMessage id="form.processing" defaultMessage="processing" />}
               {!this.state.loading && (
                 <FormattedMessage
@@ -137,7 +137,7 @@ class SendMoneyToCollectiveBtn extends React.Component {
                   }}
                 />
               )}
-            </StyledButton>
+            </Button>
           )}
         </Flex>
       </div>

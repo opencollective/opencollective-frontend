@@ -23,14 +23,14 @@ import Container from '../../Container';
 import EditCollectivePageFAQ from '../../faqs/EditCollectivePageFAQ';
 import { Box, Flex } from '../../Grid';
 import Link from '../../Link';
-import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
-import StyledButton from '../../StyledButton';
 import StyledCard from '../../StyledCard';
 import StyledHr from '../../StyledHr';
 import StyledSelect from '../../StyledSelect';
 import StyledTooltip from '../../StyledTooltip';
 import { P, Span } from '../../Text';
+import { Button } from '../../ui/Button';
+import { Skeleton } from '../../ui/Skeleton';
 import { editAccountSettingsMutation } from '../mutations';
 import SettingsSubtitle from '../SettingsSubtitle';
 
@@ -487,10 +487,10 @@ const EditCollectivePage = ({ collective }) => {
           defaultMessage="Drag and drop to reorder sections. Toggle on and off with the visibility setting dropdown. Remember to click save at the bottom!"
         />
       </SettingsSubtitle>
-      <Flex flexWrap="wrap" mt={4}>
-        <Box width="100%" maxWidth={436}>
+      <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:gap-8">
+        <div className="max-w-md grow">
           {loading ? (
-            <LoadingPlaceholder height={400} />
+            <Skeleton className="h-[400px] w-full" />
           ) : (
             <div>
               <StyledCard mb={4} overflowX={'visible'} overflowY="visible" position="relative">
@@ -532,48 +532,44 @@ const EditCollectivePage = ({ collective }) => {
                   {formatErrorMessage(intl, getErrorFromGraphqlException(error))}
                 </MessageBox>
               )}
-              <Flex flexWrap="wrap" alignItems="center" justifyContent={['center', 'flex-start']}>
-                <StyledButton
-                  buttonStyle="primary"
-                  m={2}
-                  minWidth={150}
-                  loading={isSubmitting}
-                  disabled={!isDirty}
-                  onClick={async () => {
-                    await submitSetting({
-                      variables: {
-                        account: { id: data.account.id },
-                        key: 'collectivePage',
-                        value: {
-                          ...data.account.settings.collectivePage,
-                          sections,
-                          showGoals: flatten(sections, item => item.sections || item).some(
-                            ({ name, isEnabled }) => name === Sections.GOALS && isEnabled,
-                          ),
-                        },
-                      },
-                    });
-
-                    setDirty(false);
-                  }}
-                >
-                  <FormattedMessage id="save" defaultMessage="Save" />
-                </StyledButton>
-                <Box m={2}>
-                  <Link href={`/${collective.slug}`}>
-                    <Span fontSize="14px">
-                      <FormattedMessage id="ViewCollectivePage" defaultMessage="View Profile page" />
-                    </Span>
-                  </Link>
-                </Box>
-              </Flex>
             </div>
           )}
-        </Box>
-        <Box ml={[0, null, null, 42]} maxWidth={400} width="100%">
+        </div>
+        <div className="mb-8 grow">
           <EditCollectivePageFAQ withNewButtons withBorderLeft />
-        </Box>
-      </Flex>
+        </div>
+      </div>
+      <div className="flex flex-col gap-2 sm:justify-stretch">
+        <Button
+          className="grow"
+          loading={isSubmitting}
+          disabled={!isDirty}
+          onClick={async () => {
+            await submitSetting({
+              variables: {
+                account: { id: data?.account?.id },
+                key: 'collectivePage',
+                value: {
+                  ...data?.account?.settings.collectivePage,
+                  sections,
+                  showGoals: flatten(sections, item => item.sections || item).some(
+                    ({ name, isEnabled }) => name === Sections.GOALS && isEnabled,
+                  ),
+                },
+              },
+            });
+
+            setDirty(false);
+          }}
+        >
+          <FormattedMessage id="save" defaultMessage="Save" />
+        </Button>
+        <Button className="grow" variant="link" asChild>
+          <Link href={`/${collective.slug}`}>
+            <FormattedMessage id="ViewPublicProfile" defaultMessage="View Public Profile" />
+          </Link>
+        </Button>
+      </div>
     </DndContext>
   );
 };

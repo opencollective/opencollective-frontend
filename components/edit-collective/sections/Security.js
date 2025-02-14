@@ -13,14 +13,13 @@ import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 
 import Container from '../../Container';
 import { Box } from '../../Grid';
+import Link from '../../Link';
 import LoadingPlaceholder from '../../LoadingPlaceholder';
-import StyledButton from '../../StyledButton';
 import StyledCheckbox from '../../StyledCheckbox';
-import StyledHr from '../../StyledHr';
 import StyledInputAmount from '../../StyledInputAmount';
 import StyledInputField from '../../StyledInputField';
-import StyledLink from '../../StyledLink';
-import { H4, P, Span } from '../../Text';
+import { H4, P } from '../../Text';
+import { Button } from '../../ui/Button';
 import { useToast } from '../../ui/useToast';
 
 import SettingsSectionTitle from './SettingsSectionTitle';
@@ -209,28 +208,24 @@ const Security = ({ collective }) => {
               )}
             </Container>
           )}
-          <P mt={26} fontWeight="500">
-            <StyledLink
-              openInNewTab
-              href={
-                data.account.isHost
-                  ? 'https://docs.opencollective.com/help/fiscal-hosts/payouts/two-factor-authentication-for-payouts'
-                  : 'https://docs.opencollective.com/help/product/two-factor-authentication'
-              }
-            >
-              <span>
+
+          <div className="mt-4 flex flex-col gap-2 sm:justify-stretch">
+            <Button className="grow" variant="link" asChild>
+              <Link
+                href={
+                  data.account.isHost
+                    ? 'https://docs.opencollective.com/help/fiscal-hosts/payouts/two-factor-authentication-for-payouts'
+                    : 'https://docs.opencollective.com/help/product/two-factor-authentication'
+                }
+              >
                 <FormattedMessage defaultMessage="Read the documentation about 2FA" id="E+Bll1" />
-              </span>
-              <Span ml="6px">
+
                 <ExternalLink size="1.1em" strokeWidth={2} style={{ marginBottom: 3 }} />
-              </Span>
-            </StyledLink>
-          </P>
-          <StyledHr borderColor="black.400" my={4} />
-          <div>
-            <StyledButton buttonStyle="primary" minWidth={100} type="submit" loading={submitting} disabled={!dirty}>
+              </Link>
+            </Button>
+            <Button className="grow" type="submit" loading={submitting} disabled={!dirty}>
               <FormattedMessage id="save" defaultMessage="Save" />
-            </StyledButton>
+            </Button>
           </div>
         </form>
       )}
