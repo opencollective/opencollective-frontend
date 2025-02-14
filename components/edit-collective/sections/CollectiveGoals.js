@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { cloneDeep, get, sortBy, startCase } from 'lodash';
+import { Plus, Trash } from 'lucide-react';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
@@ -10,16 +11,16 @@ import { editCollectiveSettingsMutation } from '../../../lib/graphql/v1/mutation
 import { Sections } from '../../collective-page/_constants';
 import Container from '../../Container';
 import GoalsCover from '../../GoalsCover';
-import { Box, Flex } from '../../Grid';
+import { Box } from '../../Grid';
 import Link from '../../Link';
 import MessageBox from '../../MessageBox';
-import StyledButton from '../../StyledButton';
 import StyledCheckbox from '../../StyledCheckbox';
 import StyledInput from '../../StyledInput';
 import StyledInputField from '../../StyledInputField';
 import StyledInputGroup from '../../StyledInputGroup';
 import StyledSelect from '../../StyledSelect';
 import StyledTextarea from '../../StyledTextarea';
+import { Button } from '../../ui/Button';
 import SettingsSubtitle from '../SettingsSubtitle';
 
 const BORDER = '1px solid #efefef';
@@ -188,8 +189,8 @@ class CollectiveGoals extends React.Component {
 
     return (
       <Container mt={4} pb={4} borderBottom={BORDER} key={`goal-${index}-${goal.key}`}>
-        <form>
-          <Box mb={4}>
+        <form className="flex flex-col gap-2">
+          <Box>
             <StyledInputField name={this.fields[0].name} label={this.fields[0].label}>
               <StyledInput
                 width="100%"
@@ -200,7 +201,7 @@ class CollectiveGoals extends React.Component {
               />
             </StyledInputField>
           </Box>
-          <Box mb={4}>
+          <Box>
             <StyledInputField name={this.fields[1].name} label={this.fields[1].label}>
               <StyledSelect
                 inputId={`collective-goals-${this.fields[1].name}`}
@@ -216,7 +217,7 @@ class CollectiveGoals extends React.Component {
               />
             </StyledInputField>
           </Box>
-          <Box mb={4}>
+          <Box>
             <StyledInputField name={this.fields[2].name} label={this.fields[2].label}>
               <StyledInputGroup
                 prepend={this.fields[2].pre}
@@ -227,7 +228,7 @@ class CollectiveGoals extends React.Component {
               />
             </StyledInputField>
           </Box>
-          <Box mb={4}>
+          <Box>
             <StyledInputField name={this.fields[3].name} label={this.fields[3].label}>
               <StyledTextarea
                 placeholder={this.fields[3].placeholder}
@@ -238,10 +239,11 @@ class CollectiveGoals extends React.Component {
             </StyledInputField>
           </Box>
         </form>
-        <Container className="goalActions" textAlign="right">
-          <StyledButton isBorderless={true} buttonStyle="dangerSecondary" onClick={() => this.removeGoal(index)}>
+        <Container className="goalActions mt-4" textAlign="right">
+          <Button variant="outlineDestructive" size="sm" onClick={() => this.removeGoal(index)}>
+            <Trash size={16} />
             {intl.formatMessage(this.messages.remove)}
-          </StyledButton>
+          </Button>
         </Container>
       </Container>
     );
@@ -284,36 +286,30 @@ class CollectiveGoals extends React.Component {
           <Container borderTop={BORDER}>{goals.map(this.renderGoal)}</Container>
         </Container>
         <Container textAlign="center" py={4} mb={4} borderBottom={BORDER}>
-          <StyledButton width="100%" color="#297EFF" borderColor="#297EFF" onClick={() => this.addGoal()}>
-            {intl.formatMessage(this.messages.add)} +
-          </StyledButton>
+          <Button className="w-full" onClick={() => this.addGoal()}>
+            <Plus size={16} /> {intl.formatMessage(this.messages.add)}
+          </Button>
         </Container>
         {error && (
           <MessageBox type="error" withIcon my={3}>
             {error}
           </MessageBox>
         )}
-        <Flex justifyContent="center" flexWrap="wrap" mt={5}>
-          <Link href={`/${collective.slug}`}>
-            <StyledButton mx={2} minWidth={200}>
-              <FormattedMessage id="ViewCollectivePage" defaultMessage="View Profile page" />
-            </StyledButton>
-          </Link>
-          <StyledButton
-            buttonStyle="primary"
-            onClick={this.handleSubmit}
-            loading={isSubmitting}
-            disabled={submitted || !isTouched}
-            mx={2}
-            minWidth={200}
-          >
+
+        <div className="flex flex-col gap-2 sm:justify-stretch">
+          <Button onClick={this.handleSubmit} loading={isSubmitting} disabled={submitted || !isTouched} minWidth={200}>
             {submitted ? (
               <FormattedMessage id="saved" defaultMessage="Saved" />
             ) : (
               <FormattedMessage id="save" defaultMessage="Save" />
             )}
-          </StyledButton>
-        </Flex>
+          </Button>
+          <Button className="grow" variant="link" asChild>
+            <Link href={`/${collective.slug}`}>
+              <FormattedMessage id="ViewPublicProfile" defaultMessage="View Public Profile" />
+            </Link>
+          </Button>
+        </div>
       </Container>
     );
   }

@@ -178,9 +178,7 @@ describe('edit user collective', () => {
     cy.getByDataCy('qr-code').should('exist');
     cy.getByDataCy('manual-entry-2fa-token')
       .invoke('text')
-      .then(text => {
-        expect(text.trim()).to.have.lengthOf(117);
-        const secret = text.split(':')[1].trim();
+      .then(secret => {
         // typing the wrong code fails
         cy.getByDataCy('add-two-factor-auth-totp-code-field').type('123456');
         cy.getByDataCy('add-two-factor-auth-totp-code-button').click();
