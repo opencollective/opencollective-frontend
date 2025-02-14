@@ -240,6 +240,7 @@ const EditAttachments = ({ expense, onSubmit }) => {
   const transformedOnSubmit = values => {
     const attachedFiles = values.additionalAttachments.map(a => ({
       url: typeof a === 'string' ? a : a?.url,
+      isInvoice: false,
     }));
 
     if (values.hasInvoiceOption === YesNoOption.YES && values.invoiceFile) {
@@ -302,6 +303,7 @@ const EditInvoiceFile = ({ expense, onSubmit }) => {
   const transformedOnSubmit = values => {
     const attachedFiles = values.additionalAttachments.map(a => ({
       url: typeof a === 'string' ? a : a?.url,
+      isInvoice: false,
     }));
 
     if (values.hasInvoiceOption === YesNoOption.YES && values.invoiceFile) {

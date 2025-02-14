@@ -128,7 +128,10 @@ const ExpenseSummary = ({
     expense?.status !== ExpenseStatus.DRAFT;
 
   const files = React.useMemo(() => expense?.attachedFiles || [], [expense?.attachedFiles]);
-  const invoiceFile = React.useMemo(() => files.find(f => f.isInvoice), [files]);
+  const invoiceFile = React.useMemo(
+    () => expense?.invoiceFile || files.find(f => f.isInvoice),
+    [files, expense?.invoiceFile],
+  );
   const attachedFiles = React.useMemo(() => files.filter(f => f !== invoiceFile), [files, invoiceFile]);
 
   const processButtons = (
@@ -668,6 +671,10 @@ ExpenseSummary.propTypes = {
         url: PropTypes.string.isRequired,
       }).isRequired,
     ),
+    invoiceFile: PropTypes.shape({
+      id: PropTypes.string,
+      url: PropTypes.string.isRequired,
+    }),
     taxes: PropTypes.arrayOf(
       PropTypes.shape({
         type: PropTypes.string,

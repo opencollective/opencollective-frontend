@@ -20,6 +20,8 @@ const ExpenseAttachedFilesForm = ({
   title,
   description,
   onChange,
+  fieldName = 'attachedFiles',
+  isSingle = false,
 }: ExpenseAttachedFilesFormProps) => {
   const [files, setFiles] = React.useState(uniqBy(defaultValue, 'url'));
 
@@ -42,7 +44,7 @@ const ExpenseAttachedFilesForm = ({
           <PrivateInfoIcon className="text-muted-foreground" />
         </Span>
         <StyledHr flex="1" borderColor="black.300" mx={2} />
-        {files?.length > 0 && (
+        {files?.length > 0 && !isSingle && (
           <AddNewAttachedFilesButton
             disabled={disabled}
             onSuccess={newFiles => {
@@ -69,14 +71,18 @@ const ExpenseAttachedFilesForm = ({
       ) : (
         <Dropzone
           {...attachmentDropzoneParams}
-          isMulti
-          name="attachedFiles"
+          isMulti={!isSingle}
+          name={fieldName}
           kind="EXPENSE_ATTACHED_FILE"
           disabled={disabled}
           minHeight={72}
           onSuccess={uploadedFiles => {
-            setFiles(uploadedFiles);
-            onChange(uploadedFiles);
+            let value = uploadedFiles;
+            if (!Array.isArray(uploadedFiles)) {
+              value = [uploadedFiles];
+            }
+            setFiles(value);
+            onChange(value);
           }}
         />
       )}
@@ -91,6 +97,8 @@ type ExpenseAttachedFilesFormProps = {
   disabled?: boolean;
   hasOCRFeature?: boolean;
   collective?: Account;
+  fieldName?: string;
+  isSingle?: boolean;
   onChange: (attachedFiles: Array<{ url: string }>) => void;
 };
 
