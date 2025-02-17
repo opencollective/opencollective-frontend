@@ -12,11 +12,19 @@
 // You can read more here:
 // https://on.cypress.io/configuration
 // ***********************************************************
+
 import '@cypress/code-coverage/support';
 import 'cypress-real-events';
 // Import commands.js using ES2015 syntax:
 import './commands';
 import './typed-commands';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+require('cypress-terminal-report/src/installLogsCollector')({
+  xhr: {
+    printRequestData: true,
+  },
+});
 
 // See https://github.com/opencollective/opencollective/issues/2676
 Cypress.on('uncaught:exception', (err, runnable, promise) => {
