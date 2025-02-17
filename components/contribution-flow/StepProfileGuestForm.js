@@ -66,11 +66,12 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInCl
         </h1>
         <p>
           <FormattedMessage
-            defaultMessage="When you contribute to {collectiveName}, your email address will be visible to its administrators and by {hostName}, the legal entity collecting this contribution."
-            id="ContributionFlow.StepProfileLoggedInForm.EmailInfo"
+            defaultMessage="When you contribute to {collectiveName}, your email address will be visible to its administrators{isSelfHosted, select, false { and by {hostName}, the legal entity collecting this contribution} other {}}."
+            id="Ut9sjF"
             values={{
               collectiveName: collective.name,
               hostName: collective.host.name,
+              isSelfHosted: collective.id === collective.host.id,
             }}
           />
         </p>
@@ -158,12 +159,13 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInCl
         hint={
           requiredInformation.legalName ? (
             <FormattedMessage
-              defaultMessage="Required for legal purposes as your total anual contribution is more than {amount}. Your legal name is private and it can only be seen by {collectiveName} and {hostName}."
-              id="tLn/BI"
+              defaultMessage="Required for legal purposes as your total anual contribution is more than {amount}. Your legal name is private and it can only be seen by {collectiveName}{isSelfHosted, select, false { and {hostName}} other {}}."
+              id="kO9+PM"
               values={{
                 amount: formatCurrency(collective.policies.CONTRIBUTOR_INFO_THRESHOLDS.legalName, collective.currency),
                 hostName: collective.host.name,
                 collectiveName: collective.name,
+                isSelfHosted: collective.id === collective.host.id,
               }}
             />
           ) : (
