@@ -1721,7 +1721,10 @@ export function useExpenseForm(opts: {
           expenseForm.values.expenseItems.forEach((ei, i) => {
             if (needExchangeRateFilter(formOptions.expenseCurrency)(ei)) {
               const exchangeRate = res.data.currencyExchangeRate.find(
-                rate => rate.fromCurrency === ei.amount.currency && rate.toCurrency === formOptions.expenseCurrency,
+                rate =>
+                  rate.fromCurrency === ei.amount.currency &&
+                  rate.toCurrency === formOptions.expenseCurrency &&
+                  dayjs(ei.incurredAt).isSame(rate.date, 'day'),
               );
               setFieldValue(
                 `expenseItems.${i}.amount.exchangeRate`,
