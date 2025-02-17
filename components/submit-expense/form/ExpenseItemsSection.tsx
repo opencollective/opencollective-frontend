@@ -323,8 +323,8 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
   }
 
   return (
-    <div className="mb-4 rounded-md border border-slate-300 p-4">
-      <div className="flex flex-wrap gap-4">
+    <div className="@container mb-4 rounded-md border border-slate-300 p-4">
+      <div className="flex flex-col gap-4 @md:flex-row">
         {hasAttachment && (
           <div className="flex flex-col">
             <div className="flex grow justify-center">
