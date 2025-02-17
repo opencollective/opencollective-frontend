@@ -4,19 +4,20 @@ import { set } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
 
+import { formatCurrency } from '../../lib/currency-utils';
+
 import Captcha, { isCaptchaEnabled } from '../Captcha';
-import Container from '../Container';
 import { Flex } from '../Grid';
 import I18nFormatters, { getI18nLink } from '../I18nFormatters';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import Link from '../Link';
+import MessageBox from '../MessageBox';
 import StyledHr from '../StyledHr';
 import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import StyledInputLocation from '../StyledInputLocation';
 import { P, Span } from '../Text';
 
-import StepProfileInfoMessage from './StepProfileInfoMessage';
 import { getRequiredInformation } from './utils';
 
 export const validateGuestProfile = (stepProfile, stepDetails, tier, collective) => {
@@ -58,7 +59,32 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInCl
   );
 
   return (
-    <Container border="none" width={1} pb={3}>
+    <div className="flex flex-col gap-4">
+      <MessageBox type="info">
+        <h1 className="font-bold">
+          <FormattedMessage defaultMessage="Privacy Information" id="AyQ5sz" />
+        </h1>
+        <p>
+          <FormattedMessage
+            defaultMessage="When you contribute to {collectiveName}, your email address will be visible to its administrators{isSelfHosted, select, false { and by {hostName}, the legal entity collecting this contribution} other {}}."
+            id="Ut9sjF"
+            values={{
+              collectiveName: collective.name,
+              hostName: collective.host.name,
+              isSelfHosted: collective.id === collective.host.id,
+            }}
+          />
+        </p>
+        <p className="mt-2">
+          <FormattedMessage
+            defaultMessage="<PrivacyPolicyLink>Read our privacy policy</PrivacyPolicyLink>."
+            id="ReadOurPrivacyPolicy"
+            values={{
+              PrivacyPolicyLink: getI18nLink({ href: '/privacypolicy', openInNewTab: true, as: Link }),
+            }}
+          />
+        </p>
+      </MessageBox>
       <StyledInputField
         htmlFor="email"
         label={<FormattedMessage defaultMessage="Your email" id="nONnTw" />}
@@ -97,7 +123,7 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInCl
           />
         )}
       </StyledInputField>
-      <StyledHr my="18px" borderColor="black.300" />
+      <StyledHr my="4px" borderColor="black.300" />
       <StyledInputField
         htmlFor="name"
         label={<FormattedMessage defaultMessage="Your name" id="vlKhIl" />}
@@ -115,6 +141,7 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInCl
           <StyledInput
             {...inputProps}
             value={data?.name || ''}
+            data-cy="input-name"
             placeholder="Thomas Anderson"
             onChange={dispatchGenericEvent}
             maxLength="255"
@@ -127,19 +154,33 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInCl
         labelFontSize="16px"
         labelFontWeight="700"
         isPrivate
+        hideOptionalLabel={requiredInformation.legalName}
         required={requiredInformation.legalName && !data?.name}
-        mt={20}
         hint={
-          <FormattedMessage
-            defaultMessage="If different from your display name. Not public. Important for receipts, invoices, payments, and official documentation."
-            id="QLBxEF"
-          />
+          requiredInformation.legalName ? (
+            <FormattedMessage
+              defaultMessage="Required for legal purposes as your total anual contribution is more than {amount}. Your legal name is private and it can only be seen by {collectiveName}{isSelfHosted, select, false { and {hostName}} other {}}."
+              id="kO9+PM"
+              values={{
+                amount: formatCurrency(collective.policies.CONTRIBUTOR_INFO_THRESHOLDS.legalName, collective.currency),
+                hostName: collective.host.name,
+                collectiveName: collective.name,
+                isSelfHosted: collective.id === collective.host.id,
+              }}
+            />
+          ) : (
+            <FormattedMessage
+              defaultMessage="Important for receipts, invoices, payments and official documentation if different from your name."
+              id="LdGP5g"
+            />
+          )
         }
       >
         {inputProps => (
           <StyledInput
             {...inputProps}
             value={data?.legalName || ''}
+            data-cy="input-legalName"
             placeholder="Thomas A. Anderson"
             onChange={dispatchGenericEvent}
             maxLength="255"
@@ -148,15 +189,39 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInCl
       </StyledInputField>
       {requiredInformation.address && (
         <React.Fragment>
-          <Flex alignItems="center" my="14px">
+          <Flex alignItems="center">
             <P fontSize="24px" lineHeight="32px" fontWeight="500" mr={2}>
               <FormattedMessage id="collective.address.label" defaultMessage="Address" />
             </P>
             <Span mr={2} lineHeight="0">
               <PrivateInfoIcon className="text-muted-foreground" />
             </Span>
-            <StyledHr my="18px" borderColor="black.300" width="100%" />
+            <StyledHr my="16px" borderColor="black.300" width="100%" />
           </Flex>
+          <MessageBox type="info">
+            <h1 className="font-bold">
+              <FormattedMessage defaultMessage="Address Requirement" id="Mc7YHZ" />
+            </h1>
+            <p>
+              <FormattedMessage
+                defaultMessage="We require your physical address for legal purposes as your total anual contribution is more than {amount}. Your address is private and it can only be seen by {hostName}."
+                id="mp9ThO"
+                values={{
+                  amount: formatCurrency(collective.policies.CONTRIBUTOR_INFO_THRESHOLDS.address, collective.currency),
+                  hostName: collective.host.name,
+                }}
+              />
+            </p>
+            <p className="mt-2">
+              <FormattedMessage
+                defaultMessage="<PrivacyPolicyLink>Read our privacy policy</PrivacyPolicyLink>."
+                id="ReadOurPrivacyPolicy"
+                values={{
+                  PrivacyPolicyLink: getI18nLink({ href: '/privacypolicy', openInNewTab: true, as: Link }),
+                }}
+              />
+            </p>
+          </MessageBox>
           <StyledInputLocation
             autoDetectCountry
             location={data?.location}
@@ -167,19 +232,18 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInCl
         </React.Fragment>
       )}
       {isCaptchaEnabled() && (
-        <Flex mt="18px" justifyContent="center">
+        <Flex justifyContent="center">
           <Captcha onVerify={result => dispatchChange('captcha', result)} />
         </Flex>
       )}
-      <StepProfileInfoMessage isGuest hasLegalNameField />
-      <P color="black.500" fontSize="12px" mt={4} data-cy="join-conditions">
+      <P color="black.500" fontSize="12px" data-cy="join-conditions">
         <FormattedMessage
           defaultMessage="By contributing, you agree to our <TOSLink>Terms of Service</TOSLink> and <PrivacyPolicyLink>Privacy Policy</PrivacyPolicyLink>."
           id="Amj+Gh"
           values={I18nFormatters}
         />
       </P>
-    </Container>
+    </div>
   );
 };
 
