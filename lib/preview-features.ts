@@ -4,7 +4,6 @@ import type LoggedInUser from './LoggedInUser';
  * A map of keys used for preview features.
  */
 export enum PREVIEW_FEATURE_KEYS {
-  DYNAMIC_TOP_BAR = 'DYNAMIC_TOP_BAR',
   COLLECTIVE_OVERVIEW = 'COLLECTIVE_OVERVIEW',
   NEW_EXPENSE_FLOW = 'NEW_EXPENSE_FLOW',
   INLINE_EDIT_EXPENSE = 'INLINE_EDIT_EXPENSE',
@@ -39,11 +38,6 @@ const FIRST_PARTY_HOSTS = ['opensource', 'europe', 'oce-foundation-usd', 'oce-fo
  * List of current preview features.
  */
 export const previewFeatures: PreviewFeature[] = [
-  {
-    key: PREVIEW_FEATURE_KEYS.DYNAMIC_TOP_BAR,
-    title: 'Dynamic top bar',
-    publicBeta: false,
-  },
   {
     key: PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW,
     title: 'Collective Overview',
