@@ -960,6 +960,7 @@ function buildFormSchema(
         },
         {
           message: 'Required',
+          path: ['isEditing'],
         },
       ),
     newPayoutMethod: z.object({
@@ -1672,13 +1673,13 @@ export function useExpenseForm(opts: {
       expenseForm.values.expenseItems.filter(needExchangeRateFilter(formOptions.expenseCurrency)).map(ei => ({
         fromCurrency: ei.amount.currency as Currency,
         toCurrency: formOptions.expenseCurrency,
-        date: dayjs(ei.incurredAt).toDate(),
+        date: dayjs.utc(ei.incurredAt).toDate(),
       })),
       ei => `${ei.fromCurrency}-${ei.toCurrency}-${ei.date}`,
     );
 
     expenseForm.values.expenseItems.forEach((ei, i) => {
-      if (ei.amount?.currency && ei.amount.currency === formOptions.expenseCurrency) {
+      if (formOptions.expenseCurrency && ei.amount?.currency && ei.amount.currency === formOptions.expenseCurrency) {
         setFieldValue(`expenseItems.${i}.amount.exchangeRate`, null);
       }
     });
@@ -1716,16 +1717,19 @@ export function useExpenseForm(opts: {
         });
 
         queryComplete = true;
-
         if (!isEmpty(res.data?.currencyExchangeRate)) {
           expenseForm.values.expenseItems.forEach((ei, i) => {
             if (needExchangeRateFilter(formOptions.expenseCurrency)(ei)) {
-              const exchangeRate = res.data.currencyExchangeRate.find(
-                rate =>
-                  rate.fromCurrency === ei.amount.currency &&
-                  rate.toCurrency === formOptions.expenseCurrency &&
-                  dayjs(ei.incurredAt).isSame(rate.date, 'day'),
-              );
+              const exchangeRate =
+                res.data.currencyExchangeRate.find(
+                  rate =>
+                    rate.fromCurrency === ei.amount.currency &&
+                    rate.toCurrency === formOptions.expenseCurrency &&
+                    (!ei.incurredAt || dayjs.utc(ei.incurredAt).isSame(dayjs.utc(rate.date), 'day')),
+                ) ||
+                res.data.currencyExchangeRate.find(
+                  rate => rate.fromCurrency === ei.amount.currency && rate.toCurrency === formOptions.expenseCurrency,
+                );
               setFieldValue(
                 `expenseItems.${i}.amount.exchangeRate`,
                 pick(exchangeRate, ['date', 'fromCurrency', 'toCurrency', 'value', 'source']),

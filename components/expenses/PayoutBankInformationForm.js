@@ -241,7 +241,7 @@ const DetailsForm = ({ disabled, getFieldName, formik, host, currency, alwaysSav
     needsRefetchRef.current = true;
   }, []);
 
-  const accountDetails = get(formik.values, getFieldName(''));
+  const accountDetails = get(formik.values, getFieldName('data'));
   React.useEffect(() => {
     if (needsRefetchRef.current) {
       needsRefetchRef.current = false;
