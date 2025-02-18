@@ -851,6 +851,7 @@ class EditCollectiveForm extends React.Component {
 
                 <Button className="grow" variant="link" asChild>
                   <Link
+                    data-cy="view-public-profile-link"
                     href={
                       isEvent ? `/${collective.parentCollective.slug}/events/${collective.slug}` : `/${collective.slug}`
                     }
