@@ -387,7 +387,7 @@ const WhoIsPayingSummarySection = React.memo(function WhoIsPayingSummarySection(
   return (
     <React.Fragment>
       <div className="font-bold">
-        <FormattedMessage defaultMessage="Who is paying?" id="IdR7BG" />
+        <FormattedMessage defaultMessage="Requesting money from" id="CPB9In" />
       </div>
       {props.account && (
         <React.Fragment>
@@ -445,7 +445,7 @@ const WhoIsGettingPaidSummarySection = React.memo(function WhoIsGettingPaidSumma
   return (
     <React.Fragment>
       <div className="font-bold">
-        <FormattedMessage defaultMessage="Who is getting paid?" id="W5Z+Fm" />
+        <FormattedMessage defaultMessage="Recipient" id="8Rkoyb" />
       </div>
       {props.payee ? (
         <React.Fragment>
