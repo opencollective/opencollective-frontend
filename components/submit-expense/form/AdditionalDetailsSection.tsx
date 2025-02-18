@@ -5,11 +5,11 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { ExpenseLockableFields } from '@/lib/graphql/types/v2/schema';
 
 import { FormField } from '@/components/FormField';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 import { expenseTagsQuery } from '../../dashboard/filters/ExpenseTagsFilter';
 import { AutocompleteEditTags } from '../../EditTags';
 import ExpenseTypeTag from '../../expenses/ExpenseTypeTag';
-import LoadingPlaceholder from '../../LoadingPlaceholder';
 import { Label } from '../../ui/Label';
 import { Step } from '../SubmitExpenseFlowSteps';
 import { type ExpenseForm } from '../useExpenseForm';
@@ -86,7 +86,7 @@ export const AdditionalDetailsSection = memoWithGetFormProps(function Additional
       </Label>
       <div className="flex items-center gap-1">
         {props.initialLoading ? (
-          <LoadingPlaceholder height={20} width={50} />
+          <Skeleton className="h-5 w-12" />
         ) : (
           expenseTypeOption && <ExpenseTypeTag type={expenseTypeOption} mb={0} mr={0} />
         )}
@@ -104,7 +104,7 @@ export const AdditionalDetailsSection = memoWithGetFormProps(function Additional
             value={expenseTags}
           />
         )}
-        {props.initialLoading && <LoadingPlaceholder height={20} width={70} />}
+        {props.initialLoading && <Skeleton className="h-5 w-16" />}
       </div>
     </FormSectionContainer>
   );

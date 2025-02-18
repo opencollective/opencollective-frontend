@@ -8,11 +8,11 @@ import type { PayoutMethod } from '../../lib/graphql/types/v2/schema';
 import { PayoutMethodType } from '../../lib/graphql/types/v2/schema';
 
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
-import LoadingPlaceholder from '../LoadingPlaceholder';
 import { Button } from '../ui/Button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/Collapsible';
 import type { DataListItemProps } from '../ui/DataList';
 import { DataList, DataListItem } from '../ui/DataList';
+import { Skeleton } from '../ui/Skeleton';
 
 import type { ExpenseForm } from './useExpenseForm';
 
@@ -144,7 +144,7 @@ export function PayoutMethodDetailsContainer(props: {
   const hiddenItems = isExpandable ? payoutMethodDetailItems.slice(3) : [];
 
   if (!props.payoutMethod) {
-    return <LoadingPlaceholder height={24} mb={2} />;
+    return <Skeleton className="mb-2 h-6" />;
   }
 
   return (

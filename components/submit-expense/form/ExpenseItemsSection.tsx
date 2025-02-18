@@ -26,11 +26,11 @@ import { DISABLE_ANIMATIONS } from '@/lib/animations';
 import { FormField } from '@/components/FormField';
 import InputAmount from '@/components/InputAmount';
 import { Checkbox } from '@/components/ui/Checkbox';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 import Dropzone, { MemoizedDropzone } from '../../Dropzone';
 import { ExchangeRate } from '../../ExchangeRate';
 import FormattedMoneyAmount from '../../FormattedMoneyAmount';
-import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledSelect from '../../StyledSelect';
 import { Button } from '../../ui/Button';
 import { Input, InputGroup } from '../../ui/Input';
@@ -148,7 +148,7 @@ export const ExpenseItemsForm = memoWithGetFormProps(function ExpenseItemsForm(
 
       {props.initialLoading && (
         <div className="mb-4">
-          <LoadingPlaceholder width={1} height={120} />
+          <Skeleton className="h-30 w-full" />
         </div>
       )}
       <div className="flex justify-between pr-12">

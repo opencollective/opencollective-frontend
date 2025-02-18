@@ -19,10 +19,10 @@ import { objectKeys } from '@/lib/utils';
 import { ComboSelect } from '@/components/ComboSelect';
 import { FormField } from '@/components/FormField';
 import { useModal } from '@/components/ModalContext';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 import { CONFIRMATION_MODAL_TERMINATE } from '../../ConfirmationModal';
 import PayoutMethodForm, { validatePayoutMethod } from '../../expenses/PayoutMethodForm';
-import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import { I18nPayoutMethodLabels, PayoutMethodLabel } from '../../PayoutMethodLabel';
 import { Button } from '../../ui/Button';
@@ -188,7 +188,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
 
           {(isLoading || isLoadingPayee) && (
             <RadioGroupCard value="" disabled>
-              <LoadingPlaceholder height={24} width={1} />
+              <Skeleton className="h-6 w-full" />
             </RadioGroupCard>
           )}
 
@@ -339,7 +339,7 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
   return (
     <div className="space-y-3 p-2">
       {creatingPayoutMethod ? (
-        <LoadingPlaceholder width={1} height={24} />
+        <Skeleton className="h-6 w-full" />
       ) : (
         <React.Fragment>
           <FormField
@@ -666,7 +666,7 @@ const PayoutMethodRadioGroupItem = memoWithGetFormProps(function PayoutMethodRad
           isEditingPayoutMethod ? (
             <React.Fragment>
               {isLoadingEditPayoutMethod ? (
-                <LoadingPlaceholder width={1} height={24} />
+                <Skeleton className="h-6 w-full" />
               ) : (
                 <div className="space-y-2">
                   <PayoutMethodForm
