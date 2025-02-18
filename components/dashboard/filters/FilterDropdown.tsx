@@ -1,6 +1,6 @@
 import * as React from 'react';
 import clsx from 'clsx';
-import { isEqual, isNil } from 'lodash';
+import { isEmpty, isEqual, isNil } from 'lodash';
 import { Plus, X } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -58,6 +58,7 @@ export function SetFilter({ tmpValue, setTmpValue, filterKey, filters, setFilter
     return null;
   }
   const hasChanged = !isEqual(tmpValue, values[filterKey]);
+  const isDisallowedEmpty = Boolean(filterConfig.getDisallowEmpty?.({ meta }) && isEmpty(tmpValue));
 
   return (
     <form
@@ -76,7 +77,13 @@ export function SetFilter({ tmpValue, setTmpValue, filterKey, filters, setFilter
         meta={meta}
       />
       <div className="border-t p-2">
-        <Button type="submit" className="w-full" size="sm" disabled={!hasChanged} data-cy="apply-filter">
+        <Button
+          type="submit"
+          className="w-full"
+          size="sm"
+          disabled={!hasChanged || isDisallowedEmpty}
+          data-cy="apply-filter"
+        >
           <FormattedMessage id="Apply" defaultMessage="Apply" />
         </Button>
       </div>
@@ -92,6 +99,7 @@ const FilterButton = ({ filterKey, setFilter, filters, tmpValue, open, isViewAct
   const valueRenderer = filterConfig?.valueRenderer;
   const hasValue = !isNil(value);
   const isFilterWithoutComponent = filterConfig && !filterConfig.Component;
+  const disallowEmpty = Boolean(filterConfig?.getDisallowEmpty?.({ meta }));
   return (
     <Button
       asChild
@@ -105,19 +113,22 @@ const FilterButton = ({ filterKey, setFilter, filters, tmpValue, open, isViewAct
       disabled={isFilterWithoutComponent}
     >
       <div className="cursor-pointer">
-        {hasValue && (
-          <button
-            className="group/remove h-full pl-3"
-            tabIndex={-1}
-            onClick={() => {
-              setFilter(filterKey, undefined);
-            }}
-          >
-            <div className="flex h-4 w-4 items-center justify-center rounded-full bg-slate-400 text-white transition-colors group-hover/remove:bg-slate-600">
-              <X size={12} strokeWidth={1.5} absoluteStrokeWidth />
-            </div>
-          </button>
-        )}
+        {hasValue &&
+          (!disallowEmpty ? (
+            <button
+              className="group/remove h-full pl-3"
+              tabIndex={-1}
+              onClick={() => {
+                setFilter(filterKey, undefined);
+              }}
+            >
+              <div className="flex h-4 w-4 items-center justify-center rounded-full bg-slate-400 text-white transition-colors group-hover/remove:bg-slate-600">
+                <X size={12} strokeWidth={1.5} absoluteStrokeWidth />
+              </div>
+            </button>
+          ) : (
+            <div />
+          ))}
         <PopoverTrigger
           className={clsx('flex h-full items-center px-3 focus:outline-hidden', hasValue && 'pl-2 text-foreground')}
           disabled={isFilterWithoutComponent}

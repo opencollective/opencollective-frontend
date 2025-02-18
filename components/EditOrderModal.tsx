@@ -638,7 +638,6 @@ function EditPaymentMethodModal(props: EditOrderModalProps) {
 const EditAddedFundsModal = (props: EditOrderModalProps) => {
   return (
     <AddFundsModal
-      open={true}
       onClose={props.onClose}
       onSuccess={props.onSuccess}
       collective={props.order.toAccount}
