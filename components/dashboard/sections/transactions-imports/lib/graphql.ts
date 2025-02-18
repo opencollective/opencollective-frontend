@@ -34,6 +34,7 @@ export const TransactionsImportRowFieldsFragment = gql`
     date
     rawValue
     note
+    accountId
     amount {
       valueInCents
       currency
@@ -75,6 +76,21 @@ export const TransactionsImportStatsFragment = gql`
   }
 `;
 
+export const TransactionsImportAssignmentFieldsFragment = gql`
+  fragment TransactionsImportAssignmentFields on TransactionsImportAssignment {
+    importedAccountId
+    accounts {
+      id
+      legacyId
+      slug
+      type
+      name
+      legalName
+      currency
+      imageUrl(height: 32)
+    }
+  }
+`;
 export const updateTransactionsImportRows = gql`
   mutation UpdateTransactionsImportRow(
     $importId: NonEmptyString!

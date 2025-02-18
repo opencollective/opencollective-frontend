@@ -1,4 +1,5 @@
 import type { CollectiveType } from '../constants/collectives';
+import type { Policies } from '../graphql/types/v2/schema';
 
 export type GraphQLV1Collective = {
   id: number;
@@ -11,6 +12,7 @@ export type GraphQLV1Collective = {
   parentCollective?: GraphQLV1Collective;
   settings?: Record<string, unknown>;
   isHost?: boolean;
+  policies: Policies;
 };
 
 export interface GraphQLV1PaymentMethod {

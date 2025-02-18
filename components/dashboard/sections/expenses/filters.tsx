@@ -56,7 +56,7 @@ export const schema = z.object({
   accountingCategory: accountingCategoryFilter.schema,
 });
 
-type FilterValues = z.infer<typeof schema>;
+export type FilterValues = z.infer<typeof schema>;
 
 export type FilterMeta = {
   currency?: Currency;

@@ -1,6 +1,7 @@
 import { get } from 'lodash';
 
-import type { Policies } from './graphql/types/v2/schema';
+import type { GraphQLV1Collective } from './custom_typings/GraphQLV1';
+import type { Account, Policies } from './graphql/types/v2/schema';
 
 type PoliciesUnion = Exclude<keyof Policies, '__typename' | 'id'>;
 
@@ -21,6 +22,11 @@ export const getPolicy = <Policy extends PoliciesUnion = PoliciesUnion>(
 /**
  * Returns true if the account requires 2FA for admins. Parent must be preloaded.
  */
-export const require2FAForAdmins = (collective): boolean => {
+export const require2FAForAdmins = (
+  collective: Pick<Account, 'policies'> & {
+    parent?: Pick<Account, 'policies'> | null;
+    parentCollective?: Pick<GraphQLV1Collective, 'policies'> | null;
+  },
+): boolean => {
   return Boolean(getPolicy<'REQUIRE_2FA_FOR_ADMINS'>(collective, 'REQUIRE_2FA_FOR_ADMINS'));
 };

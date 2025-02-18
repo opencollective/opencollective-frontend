@@ -19,12 +19,16 @@ const prettyPrintRawValues = (rawValue: Record<string, string>) => {
 };
 
 export const AddFundsModalFromImportRow = ({
+  collective,
   transactionsImport,
   row,
   open,
   setOpen,
 }: {
-  transactionsImport: TransactionsImport;
+  collective?: React.ComponentProps<typeof AddFundsModal>['collective'];
+  transactionsImport: Pick<TransactionsImport, 'source' | 'name'> & {
+    account: React.ComponentProps<typeof AddFundsModal>['host'];
+  };
   row: TransactionsImportRow;
 } & BaseModalProps) => {
   const client = useApolloClient();
@@ -34,13 +38,12 @@ export const AddFundsModalFromImportRow = ({
 
   return (
     <AddFundsModal
-      open={open}
       onClose={() => setOpen(false)}
       host={transactionsImport.account}
       transactionsImportRow={row}
+      collective={collective}
       initialValues={{
         amount: row.amount.valueInCents,
-        currency: row.amount.currency,
         description: row.description,
         processedAt: row.date.split('T')[0],
         memo: `Imported from "${transactionsImport.source} - ${transactionsImport.name}". Row values:\n${prettyPrintRawValues(row.rawValue)}`,
