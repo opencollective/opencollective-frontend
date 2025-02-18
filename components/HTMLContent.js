@@ -1,5 +1,6 @@
-import React, { useLayoutEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
+import { useIsomorphicLayoutEffect } from 'framer-motion';
 import { Markup } from 'interweave';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { getLuminance } from 'polished';
@@ -73,7 +74,7 @@ const HTMLContent = styled(
 
     const DisplayBox = !isCollapsed || isOpen ? InlineDisplayBox : CollapsedDisplayBox;
 
-    useLayoutEffect(() => {
+    useIsomorphicLayoutEffect(() => {
       if (collapsable && contentRef?.current?.scrollHeight > maxCollapsedHeight + collapsePadding) {
         setIsCollapsed(true);
       }
