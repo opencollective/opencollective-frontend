@@ -62,7 +62,7 @@ export function SubmitExpenseFlowForm(props: SubmitExpenseFlowFormProps) {
       <SummarySection inViewChange={onInViewChange} form={form} />
       <div className="flex justify-end">
         <Button
-          disabled={form.initialLoading || form.isSubmitting}
+          disabled={form.initialLoading || form.isSubmitting || form.isValidating}
           loading={form.isSubmitting || form.isValidating}
           onClick={() => form.handleSubmit()}
         >
