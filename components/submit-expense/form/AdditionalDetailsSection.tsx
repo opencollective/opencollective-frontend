@@ -81,7 +81,7 @@ export const AdditionalDetailsSection = memoWithGetFormProps(function Additional
         </div>
       )}
 
-      <Label className="mt-4 mb-2">
+      <Label className="mt-4 mb-3 block">
         <FormattedMessage defaultMessage="Tag your expense" id="EosA8s" />
       </Label>
       <div className="flex items-center gap-1">
