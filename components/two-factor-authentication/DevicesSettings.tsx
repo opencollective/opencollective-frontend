@@ -125,7 +125,7 @@ export function DevicesSettings(props: DevicesSettingsProps) {
         })}
       </div>
       <Button onClick={startWebauthnDeviceRegistration} variant="outline" className="mt-3 mb-2 w-full">
-        <Plus className="mr-2 h-4 w-4" />
+        <Plus size="14px" />
         <FormattedMessage defaultMessage="Add device" id="kFWJpj" />
       </Button>
     </StyledCard>

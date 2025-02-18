@@ -58,8 +58,8 @@ describe('event.create.test.js', () => {
     // edit event info
     cy.get('.inputs .inputField.name input').type(`{selectall}${updatedTitle}`);
     cy.wait(400);
-    cy.get('.actions > [data-cy="collective-save"]').click();
-    cy.get('.actions > [data-cy="collective-save"]').contains('Saved');
+    cy.get('[data-cy="collective-save"]').click();
+    cy.get('[data-cy="collective-save"]').contains('Saved');
     // edit event tickets
     cy.getByDataCy('menu-item-tickets').click();
     cy.getByDataCy('contribute-card-tier').last().find('button').click();

@@ -12,9 +12,9 @@ import CollectivePickerAsync from '../../../CollectivePickerAsync';
 import Container from '../../../Container';
 import { Flex } from '../../../Grid';
 import MessageBox from '../../../MessageBox';
-import StyledButton from '../../../StyledButton';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../../StyledModal';
 import { P } from '../../../Text';
+import { Button } from '../../../ui/Button';
 import { useToast } from '../../../ui/useToast';
 
 import MemberForm from './MemberForm';
@@ -116,7 +116,7 @@ const InviteMemberModal = props => {
   return (
     <Container>
       <StyledModal onClose={cancelHandler} trapFocus>
-        <ModalHeader mb={4}>
+        <ModalHeader mb={2}>
           <FormattedMessage id="editTeam.member.invite" defaultMessage="Invite Team Member" />
         </ModalHeader>
         <ModalBody>
@@ -151,31 +151,27 @@ const InviteMemberModal = props => {
             triggerSubmit={handleInviteMemberMutation}
           />
         </ModalBody>
-        <ModalFooter mt={6}>
-          <Container display="flex" justifyContent={['center', 'flex-end']} flexWrap="Wrap">
-            <StyledButton
-              mx={20}
-              my={1}
+        <ModalFooter showDivider={false}>
+          <div className="flex justify-between gap-2">
+            <Button
               autoFocus
-              minWidth={140}
+              variant="outline"
               onClick={cancelHandler}
               disabled={isInviting}
               data-cy="confirmation-modal-cancel"
             >
               <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-            </StyledButton>
-            <StyledButton
-              my={1}
-              minWidth={140}
-              buttonStyle="primary"
+            </Button>
+            <Button
               data-cy="confirmation-modal-continue"
               loading={isInviting}
               onClick={handleSubmitForm}
               disabled={!member}
+              className="w-1/4"
             >
               <FormattedMessage id="save" defaultMessage="Save" />
-            </StyledButton>
-          </Container>
+            </Button>
+          </div>
         </ModalFooter>
       </StyledModal>
     </Container>
