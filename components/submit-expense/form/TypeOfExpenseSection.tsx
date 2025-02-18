@@ -206,51 +206,46 @@ export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseS
                 </TabsTrigger>
               </TabsList>
               <TabsContent value={YesNoOption.YES}>
-                <div className="flex items-start gap-4">
-                  <div className="h-16 grow basis-0">
-                    <div>
-                      <FormField
-                        required={props.isAdminOfPayee || props.payee?.type === CollectiveType.VENDOR}
-                        disabled={props.isSubmitting}
-                        name="invoiceFile"
-                        isPrivate
-                        label={attachInvoiceLabel}
-                      >
-                        {({ field }) => (
-                          <MemoizedDropzone
-                            {...field}
-                            {...attachmentDropzoneParams}
-                            kind="EXPENSE_ATTACHED_FILE"
-                            name="invoice"
-                            className="min-h-16"
-                            minHeight={64}
-                            showActions
-                            useGraphQL={true}
-                            parseDocument={false}
-                            isMulti={false}
-                            value={typeof props.invoiceFile === 'string' ? props.invoiceFile : props.invoiceFile?.url}
-                            onGraphQLSuccess={onGraphQLSuccess}
-                            onSuccess={onSuccess}
-                            onReject={onReject}
-                          />
-                        )}
-                      </FormField>
-                    </div>
-                  </div>
-                  <div className="grow basis-0">
-                    <FormField
-                      required={props.isAdminOfPayee || props.payee?.type === CollectiveType.VENDOR}
-                      disabled={props.isSubmitting}
-                      name="invoiceNumber"
-                      isPrivate
-                      label={intl.formatMessage({ defaultMessage: 'Invoice number', id: 'ijDMrP' })}
-                      placeholder="e.g. INV 001"
-                      hint={intl.formatMessage({
-                        defaultMessage: 'The unique identifier mentioned on your invoice',
-                        id: 'lct/39',
-                      })}
-                    />
-                  </div>
+                <div className="space-y-4">
+                  <FormField
+                    required={props.isAdminOfPayee || props.payee?.type === CollectiveType.VENDOR}
+                    disabled={props.isSubmitting}
+                    name="invoiceFile"
+                    isPrivate
+                    label={attachInvoiceLabel}
+                  >
+                    {({ field }) => (
+                      <MemoizedDropzone
+                        {...field}
+                        {...attachmentDropzoneParams}
+                        kind="EXPENSE_ATTACHED_FILE"
+                        name="invoice"
+                        className="size-28"
+                        minHeight={112}
+                        showActions
+                        useGraphQL={true}
+                        parseDocument={false}
+                        isMulti={false}
+                        value={typeof props.invoiceFile === 'string' ? props.invoiceFile : props.invoiceFile?.url}
+                        onGraphQLSuccess={onGraphQLSuccess}
+                        onSuccess={onSuccess}
+                        onReject={onReject}
+                      />
+                    )}
+                  </FormField>
+
+                  <FormField
+                    required={props.isAdminOfPayee || props.payee?.type === CollectiveType.VENDOR}
+                    disabled={props.isSubmitting}
+                    name="invoiceNumber"
+                    isPrivate
+                    label={intl.formatMessage({ defaultMessage: 'Invoice number', id: 'ijDMrP' })}
+                    placeholder="e.g. INV 001"
+                    hint={intl.formatMessage({
+                      defaultMessage: 'The unique identifier mentioned on your invoice',
+                      id: 'lct/39',
+                    })}
+                  />
                 </div>
               </TabsContent>
             </Tabs>
