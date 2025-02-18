@@ -55,11 +55,11 @@ const StepProfileLoggedInForm = ({ profiles, onChange, collective, tier, data, s
           </h1>
           <p>
             <FormattedMessage
-              defaultMessage="When you contribute to {collectiveName}, your email address will be visible to its administrators{isSelfHosted, select, false { and by {hostName}, the legal entity collecting this contribution} other {}}."
-              id="Ut9sjF"
+              defaultMessage="When you contribute to {collectiveName}, your email address will be shared with it's administrators.{isSelfHosted, select, false { It will also be shared with {hostName}, the legal entity that provides {collectiveName} with financial services and will be receiving this contribution on their behalf.} other {}}"
+              id="iVRVyA"
               values={{
                 collectiveName: collective.name,
-                hostName: collective.host.name,
+                hostName: <Link href={`/${collective.host.slug}`}>{collective.host.name}</Link>,
                 isSelfHosted: collective.id === collective.host.id,
               }}
             />
@@ -112,8 +112,8 @@ const StepProfileLoggedInForm = ({ profiles, onChange, collective, tier, data, s
               isPrivate
               hint={
                 <FormattedMessage
-                  defaultMessage="Required for legal purposes as your total anual contribution is more than {amount}. Your legal name is private and it can only be seen by {collectiveName}{isSelfHosted, select, false { and {hostName}} other {}}."
-                  id="kO9+PM"
+                  defaultMessage="Required by {isSelfHosted, select, true {{collectiveName}} other {{hostName}, the legal entity that provides {collectiveName} with financial services,}} as total contributions in the current fiscal year exceeds {amount}."
+                  id="0FWFFg"
                   values={{
                     amount: formatCurrency(
                       collective.policies.CONTRIBUTOR_INFO_THRESHOLDS.legalName,
@@ -156,14 +156,17 @@ const StepProfileLoggedInForm = ({ profiles, onChange, collective, tier, data, s
               </h1>
               <p>
                 <FormattedMessage
-                  defaultMessage="We require your physical address for legal purposes as your total anual contribution is more than {amount}. Your address is private and it can only be seen by {hostName}."
-                  id="mp9ThO"
+                  defaultMessage="Your total contributions in the current fiscal year to {isSelfHosted, select, true {{collectiveName}} other {{hostLink}, the legal entity that provides {collectiveName} with financial services,}} exceeds {amount}. Therefore, {hostName} requires your legal address."
+                  id="/Lrubf"
                   values={{
                     amount: formatCurrency(
                       collective.policies.CONTRIBUTOR_INFO_THRESHOLDS.address,
                       collective.currency,
                     ),
+                    collectiveName: collective.name,
                     hostName: collective.host.name,
+                    hostLink: <Link href={`/${collective.host.slug}`}>{collective.host.name}</Link>,
+                    isSelfHosted: collective.id === collective.host.id,
                   }}
                 />
               </p>
@@ -205,6 +208,7 @@ StepProfileLoggedInForm.propTypes = {
       id: PropTypes.string,
       legacyId: PropTypes.number,
       name: PropTypes.string,
+      slug: PropTypes.string,
     }),
     policies: PropTypes.shape({
       CONTRIBUTOR_INFO_THRESHOLDS: PropTypes.shape({

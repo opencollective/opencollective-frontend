@@ -52,13 +52,6 @@ describe('Contribution Flow: Donate', () => {
     cy.contains('[data-cy="select-option"]:first', 'Personal');
     cy.get('body').type('{esc}');
     cy.getByDataCy('input-legalName').type('Very Legal Name');
-
-    // Country required since we're contributing > $500
-    cy.getByDataCy('country-select').click();
-    cy.contains('[data-cy="select-option"]', 'Algeria').click();
-    cy.get('input[data-cy="address-address1"]').type('Street Name, 123');
-    cy.get('input[data-cy="address-postalCode"]').type('123');
-    cy.get('input[data-cy="address-city"]').type('Citycitycity');
     cy.get('button[data-cy="cf-next-step"]').click();
 
     // User profile is shown on step, all other steps must be disabled
