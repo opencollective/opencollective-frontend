@@ -97,7 +97,6 @@ class EditUserEmailForm extends React.Component {
               }}
             />
             <Button
-              minWidth={180}
               disabled={!isTouched || !newEmail || !isValid || isDone}
               loading={isSubmitting}
               variant="outline"

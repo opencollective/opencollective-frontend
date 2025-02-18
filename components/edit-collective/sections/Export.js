@@ -33,7 +33,6 @@ const Export = ({ collective }) => {
         />
       </P>
       <Button
-        minWidth={150}
         variant="outline"
         loading={isDownloadingCsv}
         onClick={async () => {

@@ -89,7 +89,7 @@ const CustomMessage = ({ collective }) => {
           <Box mb={2} fontSize="18px" fontWeight={700} lineHeight="26px">
             <FormattedMessage defaultMessage="Custom Message" id="+jDZdn" />
           </Box>
-          <Button variant="outline" size="xs" maxWidth="78px" height="24px" onClick={() => setShowPreview(true)}>
+          <Button variant="outline" size="xs" className="h-6 max-w-20" onClick={() => setShowPreview(true)}>
             <FormattedMessage defaultMessage="Preview" id="TJo5E6" />
           </Button>
         </Flex>

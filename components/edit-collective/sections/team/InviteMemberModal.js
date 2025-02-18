@@ -156,7 +156,6 @@ const InviteMemberModal = props => {
             <Button
               autoFocus
               variant="outline"
-              minWidth={140}
               onClick={cancelHandler}
               disabled={isInviting}
               data-cy="confirmation-modal-cancel"
