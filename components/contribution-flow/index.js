@@ -490,7 +490,7 @@ class ContributionFlow extends React.Component {
     }
 
     if (contributorProfile) {
-      return contributorProfile;
+      return contributorProfile.account;
     } else if (profiles[0]?.account) {
       // Otherwise to the logged-in user personal profile, if any
       return profiles[0].account;

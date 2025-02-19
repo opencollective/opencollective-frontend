@@ -28,6 +28,9 @@ module.exports = defineConfig({
     setupNodeEvents(on, config) {
       // eslint-disable-next-line n/no-unpublished-require
       require('@cypress/code-coverage/task')(on, config);
+      require('cypress-terminal-report/src/installLogsPrinter')(on, {
+        printLogsToConsole: 'onFail',
+      });
 
       on('before:browser:launch', (browser, launchOptions) => {
         if (browser.name === 'chrome') {

@@ -139,17 +139,9 @@ describe('Contribution Flow: Order', () => {
         cy.getByDataCy('contribute-profile-picker').click();
         cy.contains('[data-cy="select-option"]', collective.name).click();
         cy.getByDataCy('input-legalName').type('Very Legal Organization');
-
-        // Country required since we're contributing > $500
-        cy.getByDataCy('country-select').click();
-        cy.contains('[data-cy="select-option"]', 'Algeria').click();
-        cy.get('input[data-cy="address-address1"]').type('Street Name, 123');
-        cy.get('input[data-cy="address-postalCode"]').type('123');
-        cy.get('input[data-cy="address-city"]').type('Citycitycity');
-        cy.get('button[data-cy="cf-next-step"]').click();
+        cy.getByDataCy('cf-next-step').click();
 
         // Payment
-        cy.getByDataCy('cf-next-step').click();
         cy.checkStepsProgress({ enabled: ['profile', 'details', 'payment'] });
         cy.contains('Next charge date: June 1, 2042');
         cy.get('#PaymentMethod').then($paymentMethod => {

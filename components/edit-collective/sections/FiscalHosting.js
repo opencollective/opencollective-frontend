@@ -9,9 +9,9 @@ import useKeyboardShortcut, { ENTER_KEY } from '../../../lib/hooks/useKeyboardKe
 
 import Container from '../../Container';
 import { adminPanelQuery } from '../../dashboard/queries';
-import StyledButton from '../../StyledButton';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import { P } from '../../Text';
+import { Button } from '../../ui/Button';
 
 import SettingsSectionTitle from './SettingsSectionTitle';
 
@@ -209,26 +209,26 @@ const FiscalHosting = ({ collective }) => {
 
       {activateAsHostStatus.error && <P color="#ff5252">{activateAsHostStatus.error}</P>}
 
-      {!isHostAccount && (
-        <StyledButton
-          onClick={() => setActivateAsHostModal({ type: 'Activate', show: true })}
-          loading={activateAsHostStatus.processing}
-          disabled={false}
-          my={2}
-        >
-          <FormattedMessage id="collective.activateAsHost" defaultMessage="Activate as Host" />
-        </StyledButton>
-      )}
-
-      {isHostAccount && (
-        <StyledButton
+      {isHostAccount ? (
+        <Button
           onClick={() => setActivateAsHostModal({ type: 'Deactivate', show: true })}
           loading={activateAsHostStatus.processing}
           disabled={collective.plan.hostedCollectives > 0}
-          mb={2}
+          variant="outline"
+          className="my-2"
         >
           <FormattedMessage id="host.deactivate" defaultMessage="Deactivate as Host" />
-        </StyledButton>
+        </Button>
+      ) : (
+        <Button
+          onClick={() => setActivateAsHostModal({ type: 'Activate', show: true })}
+          loading={activateAsHostStatus.processing}
+          disabled={false}
+          variant="outline"
+          className="my-2"
+        >
+          <FormattedMessage id="collective.activateAsHost" defaultMessage="Activate as Host" />
+        </Button>
       )}
 
       {collective.plan.hostedCollectives > 0 && (
@@ -276,12 +276,12 @@ const FiscalHosting = ({ collective }) => {
               )}
             </P>
           </ModalBody>
-          <ModalFooter>
-            <Container display="flex" justifyContent="flex-end">
-              <StyledButton mx={20} onClick={() => setActivateAsHostModal({ ...activateAsHostModal, show: false })}>
+          <ModalFooter showDivider={false}>
+            <div className="flex justify-between gap-2">
+              <Button variant="outline" onClick={() => setActivateAsHostModal({ ...activateAsHostModal, show: false })}>
                 <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-              </StyledButton>
-              <StyledButton
+              </Button>
+              <Button
                 buttonStyle="primary"
                 data-cy="action"
                 onClick={() => {
@@ -298,8 +298,8 @@ const FiscalHosting = ({ collective }) => {
                 {activateAsHostModal.type === 'Deactivate' && (
                   <FormattedMessage id="host.deactivate" defaultMessage="Deactivate as Host" />
                 )}
-              </StyledButton>
-            </Container>
+              </Button>
+            </div>
           </ModalFooter>
         </StyledModal>
       )}
@@ -333,13 +333,13 @@ const FiscalHosting = ({ collective }) => {
           {activateBudgetStatus.error && <P color="#ff5252">{activateBudgetStatus.error}</P>}
 
           {!isBudgetActive && collective.type === 'ORGANIZATION' && (
-            <StyledButton
+            <Button
               onClick={() => setActivateBudgetModal({ type: 'Activate', show: true })}
               loading={activateBudgetStatus.processing}
-              mb={2}
+              className="mb-2"
             >
               <FormattedMessage id="FiscalHosting.budget.activate" defaultMessage="Activate Host Budget" />
-            </StyledButton>
+            </Button>
           )}
         </Fragment>
       )}
@@ -370,20 +370,20 @@ const FiscalHosting = ({ collective }) => {
               )}
             </P>
           </ModalBody>
-          <ModalFooter>
-            <Container display="flex" justifyContent="flex-end">
-              <StyledButton mx={20} onClick={() => setActivateBudgetModal({ ...activateBudgetModal, show: false })}>
+          <ModalFooter showDivider={false}>
+            <div className="flex justify-between gap-2">
+              <Button variant="outline" onClick={() => setActivateBudgetModal({ ...activateBudgetModal, show: false })}>
                 <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-              </StyledButton>
-              <StyledButton buttonStyle="primary" data-cy="action" onClick={() => handlePrimaryBtnClick()}>
+              </Button>
+              <Button data-cy="action" onClick={() => handlePrimaryBtnClick()}>
                 {activateBudgetModal.type === 'Activate' && (
                   <FormattedMessage id="FiscalHosting.budget.activate" defaultMessage="Activate Host Budget" />
                 )}
                 {activateBudgetModal.type === 'Deactivate' && (
                   <FormattedMessage id="FiscalHosting.budget.deactivate" defaultMessage="Deactivate Host Budget" />
                 )}
-              </StyledButton>
-            </Container>
+              </Button>
+            </div>
           </ModalFooter>
         </StyledModal>
       )}

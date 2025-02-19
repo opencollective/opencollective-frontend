@@ -14,6 +14,7 @@ import {
   type SavePayoutMethodMutationVariables,
 } from '../../../lib/graphql/types/v2/graphql';
 import { PayoutMethodType } from '../../../lib/graphql/types/v2/schema';
+import { objectKeys } from '@/lib/utils';
 
 import { ComboSelect } from '@/components/ComboSelect';
 import { FormField } from '@/components/FormField';
@@ -279,6 +280,14 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
       setFieldTouched('newPayoutMethod.data.currency');
       const formErrors = await validateForm();
       if (!isEmpty(get(formErrors, 'newPayoutMethod')) || formErrors.payoutMethodNameDiscrepancyReason) {
+        if (formErrors.payoutMethodNameDiscrepancyReason) {
+          setFieldTouched('payoutMethodNameDiscrepancyReason');
+        }
+
+        for (const k of objectKeys(formErrors.newPayoutMethod)) {
+          setFieldTouched(`newPayoutMethod.${k}`);
+        }
+
         return;
       }
       const errors = validatePayoutMethod(props.newPayoutMethod);
@@ -419,7 +428,7 @@ function PayoutMethodRadioGroupItemWrapper(props: PayoutMethodRadioGroupItemProp
 
 function getPayoutMethodRadioGroupItemFormProps(form: ExpenseForm) {
   return {
-    ...pick(form, ['setFieldValue', 'setFieldTouched', 'refresh', 'isSubmitting']),
+    ...pick(form, ['setFieldValue', 'setFieldTouched', 'refresh', 'isSubmitting', 'validateForm']),
     ...pick(form.values, ['payeeSlug', 'editingPayoutMethod']),
     ...pick(form.options, ['payee', 'host']),
     touchedEditingPayoutMethod: form.touched.editingPayoutMethod,
@@ -596,7 +605,20 @@ const PayoutMethodRadioGroupItem = memoWithGetFormProps(function PayoutMethodRad
   );
 
   const { onPaymentMethodEdited } = props;
+  const formFieldParent = `editingPayoutMethod.${props.payoutMethod.id}`;
+  const { setFieldTouched, validateForm } = props;
   const onSaveClick = React.useCallback(async () => {
+    setFieldTouched(`${formFieldParent}.type`);
+    setFieldTouched(`${formFieldParent}.data.currency`);
+    const formErrors = await validateForm();
+    if (!isEmpty(get(formErrors, formFieldParent))) {
+      for (const k of objectKeys(get(formErrors, formFieldParent))) {
+        setFieldTouched(`${formFieldParent}.${k}`);
+      }
+
+      return;
+    }
+
     try {
       setIsLoadingEditPayoutMethod(true);
       const newPayoutMethodResponse = await createPayoutMethod();
@@ -617,7 +639,17 @@ const PayoutMethodRadioGroupItem = memoWithGetFormProps(function PayoutMethodRad
       setFieldValue(`editingPayoutMethod`, {});
       setIsLoadingEditPayoutMethod(false);
     }
-  }, [createPayoutMethod, deletePayoutMethod, intl, onPaymentMethodEdited, toast, setFieldValue]);
+  }, [
+    createPayoutMethod,
+    deletePayoutMethod,
+    intl,
+    onPaymentMethodEdited,
+    toast,
+    setFieldValue,
+    formFieldParent,
+    validateForm,
+    setFieldTouched,
+  ]);
 
   if (isDeleted) {
     return null;

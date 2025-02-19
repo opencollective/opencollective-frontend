@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from 'clsx';
 import loadScript from 'load-script';
-import { isObject, omit } from 'lodash';
+import { isEmpty, isObject, omit } from 'lodash';
 import { twMerge } from 'tailwind-merge';
 
 /**
@@ -264,6 +264,21 @@ export const omitDeep = (obj, keys) =>
     (acc, next) => ({ ...acc, [next]: isObject(obj[next]) ? omitDeep(obj[next], keys) : obj[next] }),
     {},
   );
+
+/** Return all object keys paths */
+export function objectKeys(obj: object, filter = Boolean, parentPath = ''): string[] {
+  const keys = [];
+  Object.entries(obj).forEach(([childKey, child]) => {
+    const childPath = `${parentPath}${isEmpty(parentPath) ? '' : '.'}${childKey}`;
+    if (typeof child === 'object') {
+      keys.push(...objectKeys(child, filter, childPath /* parentPath */));
+    } else {
+      keys.push(childPath);
+    }
+  });
+
+  return keys;
+}
 
 /**
  * Sort options as: All, then by alphabetical order, then "No payment method" or "Other" at the end

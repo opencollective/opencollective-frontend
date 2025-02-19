@@ -10,9 +10,9 @@ import { gqlV1 } from '../../../lib/graphql/helpers';
 
 import Container from '../../Container';
 import { getI18nLink } from '../../I18nFormatters';
-import StyledButton from '../../StyledButton';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import { P } from '../../Text';
+import { Button } from '../../ui/Button';
 import { withUser } from '../../UserProvider';
 import SettingsSectionTitle from '../sections/SettingsSectionTitle';
 
@@ -80,18 +80,18 @@ const DeleteCollective = ({ collective, ...props }) => {
           {error}
         </P>
       )}
-      <StyledButton
+      <Button
         onClick={() => setShowModal(true)}
         loading={deleting}
         disabled={collective.isHost || !collective.isDeletable}
-        mb={2}
+        variant="outline"
       >
         <FormattedMessage
           id="collective.delete.title"
           defaultMessage="Delete {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}"
           values={{ type: collective.type }}
         />
-      </StyledButton>
+      </Button>
       {collective.isHost && (
         <P color="rgb(224, 183, 0)" my={1}>
           {isSelfHosted ? (
@@ -148,13 +148,12 @@ const DeleteCollective = ({ collective, ...props }) => {
               />
             </P>
           </ModalBody>
-          <ModalFooter>
-            <Container display="flex" justifyContent="flex-end">
-              <StyledButton mx={20} onClick={() => setShowModal(false)}>
+          <ModalFooter showDivider={false}>
+            <div className="flex justify-between gap-2">
+              <Button variant="outline" onClick={() => setShowModal(false)}>
                 <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-              </StyledButton>
-              <StyledButton
-                buttonStyle="primary"
+              </Button>
+              <Button
                 data-cy="delete"
                 onClick={() => {
                   setShowModal(false);
@@ -162,8 +161,8 @@ const DeleteCollective = ({ collective, ...props }) => {
                 }}
               >
                 <FormattedMessage id="actions.delete" defaultMessage="Delete" />
-              </StyledButton>
-            </Container>
+              </Button>
+            </div>
           </ModalFooter>
         </StyledModal>
       )}
