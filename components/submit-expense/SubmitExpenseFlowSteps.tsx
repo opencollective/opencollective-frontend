@@ -148,7 +148,7 @@ export function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
     Step.EXPENSE_TITLE,
   ].filter(step => {
     if (step === Step.EXPENSE_CATEGORY) {
-      return form.options.accountingCategories?.length;
+      return form.options.isAccountingCategoryRequired && form.options.accountingCategories?.length;
     }
 
     return true;

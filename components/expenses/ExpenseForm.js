@@ -804,7 +804,7 @@ const ExpenseFormBody = ({
                       />
                     </MessageBox>
                     <div className="mt-4 flex">
-                      <StyledInputFormikField name="accountingCategory" lab>
+                      <StyledInputFormikField name="accountingCategoryId" lab>
                         {({ meta }) => (
                           <div>
                             <AccountingCategorySelect
@@ -812,8 +812,8 @@ const ExpenseFormBody = ({
                               kind="EXPENSE"
                               host={host}
                               account={collective}
-                              selectedCategory={values.accountingCategory}
-                              onChange={value => formik.setFieldValue('accountingCategory', value)}
+                              selectedCategoryId={values.accountingCategoryId}
+                              onChange={value => formik.setFieldValue('accountingCategoryId', value)}
                               error={Boolean(meta.error)}
                               allowNone={!isHostAdmin}
                               showCode={isHostAdmin}

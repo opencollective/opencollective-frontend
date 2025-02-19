@@ -360,7 +360,7 @@ type AddFundsFormValues = {
   tax?: any;
   transactionsImportRow?: TransactionReferenceInput | null;
   invoiceTemplate?: { value: string };
-  accountingCategory?: { id: string };
+  accountingCategoryId?: string;
 };
 
 const getInitialValues = (values): AddFundsFormValues => ({
@@ -545,7 +545,7 @@ const AddFundsModalContentWithCollective = ({
               invoiceTemplate: values.invoiceTemplate?.value || defaultInvoiceTemplate,
               processedAt: values.processedAt ? new Date(values.processedAt) : null,
               tax: values.tax,
-              accountingCategory: values.accountingCategory ? { id: values.accountingCategory.id } : null,
+              accountingCategory: values.accountingCategoryId ? { id: values.accountingCategoryId } : null,
               ...(isEdit && { order: { id: editOrderId } }),
             },
           });
@@ -716,8 +716,8 @@ const AddFundsModalContentWithCollective = ({
                 </Field>
                 {account?.host?.orderAccountingCategories?.nodes?.length > 0 && (
                   <Field
-                    name="accountingCategory"
-                    htmlFor="addFunds-accountingCategory"
+                    name="accountingCategoryId"
+                    htmlFor="addFunds-accountingCategoryId"
                     required={false}
                     label={
                       <FormattedMessage id="AddFundsModal.accountingCategory" defaultMessage="Accounting category" />
@@ -731,7 +731,7 @@ const AddFundsModalContentWithCollective = ({
                         onChange={value => form.setFieldValue(field.name, value)}
                         host={host}
                         account={account}
-                        selectedCategory={field.value}
+                        selectedCategoryId={field.value}
                         allowNone={true}
                       />
                     )}

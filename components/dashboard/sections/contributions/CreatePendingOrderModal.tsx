@@ -305,7 +305,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
     if (values.toAccount?.slug) {
       debouncedLazyQuery(getCollectiveInfo, { slug: values.toAccount.slug });
     }
-    setFieldValue('accountingCategory', null);
+    setFieldValue('accountingCategoryId', null);
   }, [values.toAccount]);
 
   React.useEffect(() => {
@@ -540,8 +540,8 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
         {/* Contribution */}
         {host.orderAccountingCategories?.nodes?.length > 0 && (
           <Field
-            name="accountingCategory"
-            htmlFor="addFunds-accountingCategory"
+            name="accountingCategoryId"
+            htmlFor="addFunds-accountingCategoryId"
             required={false}
             label={<FormattedMessage id="AddFundsModal.accountingCategory" defaultMessage="Accounting category" />}
             mt={3}
@@ -555,7 +555,7 @@ const CreatePendingContributionForm = ({ host, onClose, error, edit }: CreatePen
                 onChange={value => form.setFieldValue(field.name, value)}
                 host={host}
                 account={collective}
-                selectedCategory={field.value}
+                selectedCategoryId={field.value}
                 allowNone={true}
               />
             )}
@@ -957,7 +957,7 @@ const CreatePendingContributionModal = ({ hostSlug, edit, ...props }: CreatePend
                 tier: !values.tier ? null : { id: values.tier.id },
                 expectedAt: values.expectedAt ? dayjs(values.expectedAt).format() : null,
                 tax,
-                accountingCategory: values.accountingCategory && { id: values.accountingCategory.id },
+                accountingCategory: values.accountingCategoryId && { id: values.accountingCategoryId },
               };
 
               const result = await createPendingOrder({ variables: { order } });

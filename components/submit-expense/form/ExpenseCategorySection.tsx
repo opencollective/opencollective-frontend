@@ -1,5 +1,5 @@
 import React from 'react';
-import { pick } from 'lodash';
+import { isNil, isNull, pick } from 'lodash';
 import { ChevronDown } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
@@ -40,6 +40,7 @@ export const ExpenseCategorySection = memoWithGetFormProps(function ExpenseCateg
   const selectedAccountingCategory = accountingCategoryId
     ? accountingCategories.find(a => a.id === accountingCategoryId)
     : null;
+
   const instructions = selectedAccountingCategory?.instructions;
   const { setFieldValue } = props;
 
@@ -48,7 +49,7 @@ export const ExpenseCategorySection = memoWithGetFormProps(function ExpenseCateg
 
   const onAccountingCategorySelectChange = React.useCallback(
     value => {
-      setFieldValue('accountingCategoryId', value?.id);
+      setFieldValue('accountingCategoryId', value);
     },
     [setFieldValue],
   );
@@ -71,8 +72,8 @@ export const ExpenseCategorySection = memoWithGetFormProps(function ExpenseCateg
             showCode={isHostAdmin}
             expenseType={props.expenseTypeOption}
             account={props.account}
-            selectedCategory={selectedAccountingCategory}
-            allowNone={!props.isAccountingCategoryRequired}
+            selectedCategoryId={accountingCategoryId}
+            allowNone={true}
             buttonClassName="max-w-full w-full"
           />
         )}

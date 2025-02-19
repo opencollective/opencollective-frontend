@@ -55,16 +55,16 @@ const ExpenseAdminAccountingCategoryPill = ({
       expenseType={expense.type}
       expenseValues={expense}
       allowNone={allowNone}
-      selectedCategory={expense.accountingCategory}
+      selectedCategoryId={expense.accountingCategory?.id}
       valuesByRole={expense.valuesByRole}
       showCode={showCodeInSelect}
       predictionStyle="inline-preload"
-      onChange={async selectedCategory => {
+      onChange={async selectedCategoryId => {
         try {
           await editExpense({
             variables: {
               expenseId: expense.id,
-              category: selectedCategory ? { id: selectedCategory.id } : null,
+              category: selectedCategoryId ? { id: selectedCategoryId } : undefined,
             },
           });
         } catch (e) {

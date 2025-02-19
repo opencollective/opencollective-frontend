@@ -29,22 +29,22 @@ export default function ApproveExpenseModal({
 }: ConfirmProcessExpenseModalProps) {
   const intl = useIntl();
   const [editExpense] = useMutation(editExpenseCategoryMutation, { context: API_V2_CONTEXT });
-  const [selectedCategory, setSelectedCategory] = React.useState(expense.accountingCategory);
+  const [selectedCategoryId, setSelectedCategoryId] = React.useState(expense.accountingCategory?.id);
   const { toast } = useToast();
   return (
     <ConfirmationModal
       onClose={onClose}
       header={<FormattedMessage defaultMessage="Approve Expense" id="PJNkaW" />}
       maxWidth={384}
-      disableSubmit={!selectedCategory}
+      disableSubmit={!selectedCategoryId}
       continueHandler={async () => {
         try {
           // 1. Edit the accounting category if it was changed
-          if (selectedCategory?.id !== expense.accountingCategory?.id) {
+          if (selectedCategoryId !== expense.accountingCategory?.id) {
             await editExpense({
               variables: {
                 expenseId: expense.id,
-                category: selectedCategory ? { id: selectedCategory.id } : null,
+                category: selectedCategoryId ? { id: selectedCategoryId } : null,
               },
             });
           }
@@ -64,12 +64,12 @@ export default function ApproveExpenseModal({
         <AccountingCategorySelect
           id="confirm-expense-category"
           kind="EXPENSE"
-          onChange={setSelectedCategory}
+          onChange={setSelectedCategoryId}
           host={host}
           account={account}
           expenseType={expense.type}
           expenseValues={expense}
-          selectedCategory={selectedCategory}
+          selectedCategoryId={selectedCategoryId}
           valuesByRole={expense.valuesByRole}
           allowNone={false}
           predictionStyle="full"

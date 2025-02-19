@@ -136,7 +136,7 @@ const hostExpenseFormValuesSchema = z
     description: z.string().min(3),
     payee: z.object({}),
     account: z.object({}),
-    accountingCategory: z.object({}).optional().nullable(),
+    accountingCategoryId: z.string().optional().nullable(),
     incurredAt: z.string(),
     amount: z.object({ valueInCents: z.number(), currency: z.nativeEnum(Currency) }),
     attachedFile: z.object({ url: z.string() }).optional().nullable(),
@@ -162,7 +162,7 @@ const getInitialValues = (importRow: TransactionsImportRow, account): FormValues
     description: importRow?.description || '',
     payee: null,
     account: account ? pick(account, ['id', 'slug', 'name', 'type', 'imageUrl']) : null,
-    accountingCategory: null,
+    accountingCategoryId: undefined,
     incurredAt: standardizeExpenseItemIncurredAt(importRow?.date),
     amount: {
       valueInCents: Math.abs(importRow?.amount.valueInCents) || 0,
@@ -216,7 +216,7 @@ export const HostCreateExpenseModal = ({
                   transactionsImportRow: transactionsImportRow && { id: transactionsImportRow.id },
                   expense: {
                     ...pick(values, ['description', 'type']),
-                    accountingCategory: values.accountingCategory && pick(values.accountingCategory, ['id']),
+                    accountingCategory: values.accountingCategoryId && { id: values.accountingCategoryId },
                     payee: getAccountReferenceInput(values.payee),
                     currency: host.currency,
                     payoutMethod: {
@@ -368,7 +368,7 @@ export const HostCreateExpenseModal = ({
                   </StyledInputFormikField>
                   {host?.accountingCategories?.totalCount > 0 && (
                     <StyledInputFormikField
-                      name="accountingCategory"
+                      name="accountingCategoryId"
                       label={
                         <FormattedMessage defaultMessage="Accounting category" id="AddFundsModal.accountingCategory" />
                       }
@@ -382,8 +382,8 @@ export const HostCreateExpenseModal = ({
                           account={values.account as null | Account}
                           expenseType={values.type}
                           expenseValues={values}
-                          selectedCategory={field.value}
-                          onChange={category => setFieldValue(field.name, category)}
+                          selectedCategoryId={field.value}
+                          onChange={categoryId => setFieldValue(field.name, categoryId)}
                           buttonClassName="max-w-full"
                           predictionStyle="inline-preload"
                           showCode
