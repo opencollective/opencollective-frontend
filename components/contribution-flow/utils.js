@@ -339,6 +339,12 @@ const getTotalYearlyAmount = stepDetails => {
  * @returns {{ legalName?: boolean, address?: boolean }}
  */
 export const getRequiredInformation = (stepProfile, stepDetails, collective, profiles = [], tier) => {
+  const isContributingFromSameHost =
+    stepProfile?.host?.id === collective?.host.id || stepProfile?.id === collective?.host.id;
+  if (isContributingFromSameHost) {
+    return { address: false, legalName: false };
+  }
+
   let totalAmount = getTotalYearlyAmount(stepDetails);
   let selectedProfile = profiles.find(p => p.account.id === stepProfile?.id);
   if (selectedProfile) {

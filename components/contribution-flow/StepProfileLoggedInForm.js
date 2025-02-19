@@ -44,7 +44,6 @@ const StepProfileLoggedInForm = ({ profiles, onChange, collective, tier, data, s
     () => getRequiredInformation(data, stepDetails, collective, profiles, tier),
     [data, stepDetails, profiles, collective, tier],
   );
-  const isContributingFromSameHost = data?.host?.id === collective.host.legacyId;
 
   return (
     <Fragment>
@@ -80,7 +79,7 @@ const StepProfileLoggedInForm = ({ profiles, onChange, collective, tier, data, s
           selectedProfile={data}
           onChange={profile => onChange({ stepProfile: profile, stepPayment: null })}
         />
-        {!isContributingFromSameHost && requiredInformation.legalName && (
+        {requiredInformation.legalName && (
           <React.Fragment>
             {!data?.isIncognito && (
               <StyledInputField
@@ -139,7 +138,7 @@ const StepProfileLoggedInForm = ({ profiles, onChange, collective, tier, data, s
             </StyledInputField>
           </React.Fragment>
         )}
-        {!isContributingFromSameHost && requiredInformation.address && (
+        {requiredInformation.address && (
           <React.Fragment>
             <Flex alignItems="center" mt={2}>
               <P fontSize="24px" lineHeight="32px" fontWeight="500" mr={2}>
