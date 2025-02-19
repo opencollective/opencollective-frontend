@@ -1067,6 +1067,7 @@ export enum ActivityAndClassesType {
   TAXFORM_REQUEST = 'TAXFORM_REQUEST',
   TICKET_CONFIRMED = 'TICKET_CONFIRMED',
   TRANSACTIONS_IMPORT_CREATED = 'TRANSACTIONS_IMPORT_CREATED',
+  TRANSACTIONS_IMPORT_ROW_UPDATED = 'TRANSACTIONS_IMPORT_ROW_UPDATED',
   TWO_FACTOR_CODE_REQUESTED = 'TWO_FACTOR_CODE_REQUESTED',
   TWO_FACTOR_METHOD_ADDED = 'TWO_FACTOR_METHOD_ADDED',
   TWO_FACTOR_METHOD_DELETED = 'TWO_FACTOR_METHOD_DELETED',
@@ -1249,6 +1250,7 @@ export enum ActivityType {
   TAXFORM_REQUEST = 'TAXFORM_REQUEST',
   TICKET_CONFIRMED = 'TICKET_CONFIRMED',
   TRANSACTIONS_IMPORT_CREATED = 'TRANSACTIONS_IMPORT_CREATED',
+  TRANSACTIONS_IMPORT_ROW_UPDATED = 'TRANSACTIONS_IMPORT_ROW_UPDATED',
   TWO_FACTOR_CODE_REQUESTED = 'TWO_FACTOR_CODE_REQUESTED',
   TWO_FACTOR_METHOD_ADDED = 'TWO_FACTOR_METHOD_ADDED',
   TWO_FACTOR_METHOD_DELETED = 'TWO_FACTOR_METHOD_DELETED',
@@ -4455,6 +4457,8 @@ export type Expense = {
   /** The account from where the expense was paid */
   host?: Maybe<Host>;
   id: Scalars['String']['output'];
+  /** (Optional - applicable to invoice expense only) The invoice file for this expense */
+  invoiceFile?: Maybe<FileInfo>;
   /** Information to display on the invoice. Only visible to user and admins. */
   invoiceInfo?: Maybe<Scalars['String']['output']>;
   items?: Maybe<Array<Maybe<ExpenseItem>>>;
@@ -4600,6 +4604,8 @@ export type ExpenseCreateInput = {
   customData?: InputMaybe<Scalars['JSON']['input']>;
   /** Main title of the expense */
   description: Scalars['String']['input'];
+  /** (Optional - applicable to invoice expense only) The invoice file for this expense */
+  invoiceFile?: InputMaybe<ExpenseAttachedFileInput>;
   /** Custom information to print on the invoice */
   invoiceInfo?: InputMaybe<Scalars['String']['input']>;
   /** The list of items for this expense. Total amount will be computed from them. */
@@ -4655,6 +4661,8 @@ export type ExpenseInviteDraftInput = {
   customData?: InputMaybe<Scalars['JSON']['input']>;
   /** Main title of the expense */
   description?: InputMaybe<Scalars['String']['input']>;
+  /** (Optional - applicable to invoice expense only) The invoice file for this expense */
+  invoiceFile?: InputMaybe<Scalars['JSON']['input']>;
   /** Custom information to print on the invoice */
   invoiceInfo?: InputMaybe<Scalars['String']['input']>;
   /** The list of items for this expense. Total amount will be computed from them. */
@@ -5000,6 +5008,8 @@ export type ExpenseUpdateInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   /** ID of the expense that you are trying to edit */
   id: Scalars['String']['input'];
+  /** (Optional - applicable to invoice expense only) The invoice file for this expense */
+  invoiceFile?: InputMaybe<ExpenseAttachedFileInput>;
   /** Tax ID, VAT number...etc This information will be printed on your invoice. */
   invoiceInfo?: InputMaybe<Scalars['String']['input']>;
   /** The list of items for this expense. Total amount will be computed from them. */
@@ -7211,20 +7221,22 @@ export enum MarkAsUnPaidExpenseStatus {
 export type Member = {
   __typename?: 'Member';
   account?: Maybe<Account>;
-  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  createdAt: Scalars['DateTime']['output'];
   /** Custom user description */
   description?: Maybe<Scalars['String']['output']>;
-  id?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
   /** If membership is inherited from parent collective */
-  inherited?: Maybe<Scalars['Boolean']['output']>;
+  inherited: Scalars['Boolean']['output'];
+  /** Whether the membership is active. Warning: this definition is subject to change. */
+  isActive: Scalars['Boolean']['output'];
   /** Custom user message from member to the collective */
   publicMessage?: Maybe<Scalars['String']['output']>;
-  role?: Maybe<MemberRole>;
-  since?: Maybe<Scalars['DateTime']['output']>;
+  role: MemberRole;
+  since: Scalars['DateTime']['output'];
   tier?: Maybe<Tier>;
   /** Total amount donated */
   totalDonations: Amount;
-  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
 };
 
 /** A collection of "Members" (ie: Organization backing a Collective) */
@@ -7262,20 +7274,22 @@ export type MemberInvitationReferenceInput = {
 export type MemberOf = {
   __typename?: 'MemberOf';
   account?: Maybe<Account>;
-  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  createdAt: Scalars['DateTime']['output'];
   /** Custom user description */
   description?: Maybe<Scalars['String']['output']>;
-  id?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
   /** If membership is inherited from parent collective */
-  inherited?: Maybe<Scalars['Boolean']['output']>;
+  inherited: Scalars['Boolean']['output'];
+  /** Whether the membership is active. Warning: this definition is subject to change. */
+  isActive: Scalars['Boolean']['output'];
   /** Custom user message from member to the collective */
   publicMessage?: Maybe<Scalars['String']['output']>;
-  role?: Maybe<MemberRole>;
-  since?: Maybe<Scalars['DateTime']['output']>;
+  role: MemberRole;
+  since: Scalars['DateTime']['output'];
   tier?: Maybe<Tier>;
   /** Total amount donated */
   totalDonations: Amount;
-  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
 };
 
 /** A collection of "MemberOf" (ie: Collective backed by an Organization) */
@@ -12121,6 +12135,7 @@ export enum UploadedFileKind {
   AGREEMENT_ATTACHMENT = 'AGREEMENT_ATTACHMENT',
   COMMENT = 'COMMENT',
   EXPENSE_ATTACHED_FILE = 'EXPENSE_ATTACHED_FILE',
+  EXPENSE_INVOICE = 'EXPENSE_INVOICE',
   EXPENSE_ITEM = 'EXPENSE_ITEM',
   TIER_LONG_DESCRIPTION = 'TIER_LONG_DESCRIPTION',
   TRANSACTIONS_IMPORT = 'TRANSACTIONS_IMPORT',

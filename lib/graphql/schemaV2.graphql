@@ -2484,6 +2484,11 @@ type Expense {
   (Optional) files attached to the expense
   """
   attachedFiles: [ExpenseAttachedFile!]
+
+  """
+  (Optional - applicable to invoice expense only) The invoice file for this expense
+  """
+  invoiceFile: FileInfo
   items: [ExpenseItem]
 
   """
@@ -6340,6 +6345,7 @@ enum ActivityType {
   COLLECTIVE_CORE_MEMBER_EDITED
   COLLECTIVE_TRANSACTION_CREATED
   TRANSACTIONS_IMPORT_CREATED
+  TRANSACTIONS_IMPORT_ROW_UPDATED
   COLLECTIVE_UPDATE_CREATED
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
@@ -12428,12 +12434,12 @@ type ContributorProfile {
 This represents a Member relationship (ie: Organization backing a Collective)
 """
 type Member {
-  id: String
-  role: MemberRole
+  id: String!
+  role: MemberRole!
   tier: Tier
-  createdAt: DateTime
-  updatedAt: DateTime
-  since: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  since: DateTime!
 
   """
   Total amount donated
@@ -12453,7 +12459,12 @@ type Member {
   """
   If membership is inherited from parent collective
   """
-  inherited: Boolean
+  inherited: Boolean!
+
+  """
+  Whether the membership is active. Warning: this definition is subject to change.
+  """
+  isActive: Boolean!
   account: Account
 }
 
@@ -12461,12 +12472,12 @@ type Member {
 This represents a MemberOf relationship (ie: Collective backed by an Organization)
 """
 type MemberOf {
-  id: String
-  role: MemberRole
+  id: String!
+  role: MemberRole!
   tier: Tier
-  createdAt: DateTime
-  updatedAt: DateTime
-  since: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  since: DateTime!
 
   """
   Total amount donated
@@ -12486,7 +12497,12 @@ type MemberOf {
   """
   If membership is inherited from parent collective
   """
-  inherited: Boolean
+  inherited: Boolean!
+
+  """
+  Whether the membership is active. Warning: this definition is subject to change.
+  """
+  isActive: Boolean!
   account: Account
 }
 
@@ -17011,6 +17027,7 @@ enum ActivityAndClassesType {
   COLLECTIVE_CORE_MEMBER_EDITED
   COLLECTIVE_TRANSACTION_CREATED
   TRANSACTIONS_IMPORT_CREATED
+  TRANSACTIONS_IMPORT_ROW_UPDATED
   COLLECTIVE_UPDATE_CREATED
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
@@ -21974,6 +21991,11 @@ input ExpenseCreateInput {
   attachedFiles: [ExpenseAttachedFileInput!]
 
   """
+  (Optional - applicable to invoice expense only) The invoice file for this expense
+  """
+  invoiceFile: ExpenseAttachedFileInput
+
+  """
   Account to reimburse
   """
   payee: AccountReferenceInput!
@@ -22154,6 +22176,11 @@ input ExpenseUpdateInput {
   (Optional) A list of files that you want to attach to this expense
   """
   attachedFiles: [ExpenseAttachedFileInput!]
+
+  """
+  (Optional - applicable to invoice expense only) The invoice file for this expense
+  """
+  invoiceFile: ExpenseAttachedFileInput
 
   """
   Account to reimburse
@@ -22433,6 +22460,11 @@ input ExpenseInviteDraftInput {
   (Optional) A list of files that you want to attach to this expense
   """
   attachedFiles: [JSON]
+
+  """
+  (Optional - applicable to invoice expense only) The invoice file for this expense
+  """
+  invoiceFile: JSON
 
   """
   Account to reimburse
@@ -23401,6 +23433,7 @@ enum UploadedFileKind {
   TIER_LONG_DESCRIPTION
   ACCOUNT_CUSTOM_EMAIL
   AGREEMENT_ATTACHMENT
+  EXPENSE_INVOICE
 }
 
 """
