@@ -5,6 +5,9 @@ import type { AccountingCategory } from '../../../../lib/graphql/types/v2/schema
 import { AccountingCategoryAppliesTo, AccountingCategoryKind } from '../../../../lib/graphql/types/v2/schema';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 
+import { DataList, DataListItem, DataListItemLabel, DataListItemValue } from '@/components/ui/DataList';
+import { Separator } from '@/components/ui/Separator';
+
 import { Drawer, DrawerActions, DrawerHeader } from '../../../Drawer';
 import HTMLContent, { isEmptyHTMLValue } from '../../../HTMLContent';
 import StyledButton from '../../../StyledButton';
@@ -72,91 +75,101 @@ function AccountingCategoryDrawerView(props: AccountingCategoryDrawerViewProps) 
 
   return (
     <React.Fragment>
-      <div>
-        <label className="mt-4 mb-1 text-base">
-          <FormattedMessage defaultMessage="Accounting code" id="tvVFNA" />
-        </label>
+      <DataList className="text-sm">
+        <DataListItem>
+          <DataListItemLabel>
+            <FormattedMessage defaultMessage="Accounting code" id="tvVFNA" />
+          </DataListItemLabel>
+          <DataListItemValue>
+            <span className="rounded-xl bg-slate-50 px-2 py-1 font-bold text-slate-800">
+              {props.accountingCategory?.code}
+            </span>
+          </DataListItemValue>
+        </DataListItem>
 
-        <p>
-          <span className="inline-block rounded-xl bg-slate-50 px-2 py-1 font-bold text-slate-800">
-            {props.accountingCategory?.code}
-          </span>
-        </p>
-
-        <label className="mt-4 mb-1 text-base">
-          <FormattedMessage defaultMessage="Category name" id="kgVqk1" />
-        </label>
-        <p>{props.accountingCategory?.name}</p>
+        <DataListItem>
+          <DataListItemLabel>
+            <FormattedMessage defaultMessage="Category name" id="kgVqk1" />
+          </DataListItemLabel>
+          <DataListItemValue>{props.accountingCategory?.name}</DataListItemValue>
+        </DataListItem>
 
         {props.accountingCategory?.friendlyName && (
-          <React.Fragment>
-            <label className="mt-4 mb-1 text-base">
+          <DataListItem>
+            <DataListItemLabel>
               <FormattedMessage id="AccountingCategory.friendlyName" defaultMessage="Friendly name" />
-            </label>
-            <p className="italic">{props.accountingCategory?.friendlyName}</p>
-          </React.Fragment>
+            </DataListItemLabel>
+            <DataListItemValue className="italic">{props.accountingCategory?.friendlyName}</DataListItemValue>
+          </DataListItem>
         )}
 
         {!props.isIndependentCollective && (
-          <React.Fragment>
-            {' '}
-            <label className="mt-4 mb-1 text-base">
+          <DataListItem>
+            <DataListItemLabel>
               <FormattedMessage defaultMessage="Applies to" id="6WqHWi" />
-            </label>
-            <p>
+            </DataListItemLabel>
+            <DataListItemValue>
               {props.accountingCategory?.appliesTo && (
                 <FormattedMessage {...AccountingCategoryAppliesToI18n[props.accountingCategory?.appliesTo]} />
               )}
-            </p>
-          </React.Fragment>
+            </DataListItemValue>
+          </DataListItem>
         )}
 
-        <label className="mt-4 mb-1 text-base">
-          <FormattedMessage defaultMessage="Kind" id="Transaction.Kind" />
-        </label>
-        <p>
-          {props.accountingCategory?.kind && (
-            <FormattedMessage {...AccountingCategoryKindI18n[props.accountingCategory?.kind]} />
-          )}
-        </p>
+        <DataListItem>
+          <DataListItemLabel>
+            <FormattedMessage defaultMessage="Kind" id="Transaction.Kind" />
+          </DataListItemLabel>
+          <DataListItemValue>
+            {props.accountingCategory?.kind && (
+              <FormattedMessage {...AccountingCategoryKindI18n[props.accountingCategory?.kind]} />
+            )}
+          </DataListItemValue>
+        </DataListItem>
 
-        <label className="mt-4 mb-1 text-base">
-          <FormattedMessage defaultMessage="Visible only to host admins" id="NvBPFR" />
-        </label>
-        <p>
-          {props.accountingCategory?.hostOnly ? (
-            <FormattedMessage defaultMessage="Yes" id="a5msuh" />
-          ) : (
-            <FormattedMessage defaultMessage="No" id="oUWADl" />
-          )}
-        </p>
+        <DataListItem>
+          <DataListItemLabel>
+            <FormattedMessage defaultMessage="Visible only to host admins" id="NvBPFR" />
+          </DataListItemLabel>
+          <DataListItemValue>
+            {props.accountingCategory?.hostOnly ? (
+              <FormattedMessage defaultMessage="Yes" id="a5msuh" />
+            ) : (
+              <FormattedMessage defaultMessage="No" id="oUWADl" />
+            )}
+          </DataListItemValue>
+        </DataListItem>
 
         {props.accountingCategory?.kind === AccountingCategoryKind.EXPENSE && (
-          <React.Fragment>
-            <label className="mt-4 mb-1 text-base">
+          <DataListItem>
+            <DataListItemLabel>
               <FormattedMessage defaultMessage="Expense types" id="7oAuzt" />
-            </label>
-            <p>
+            </DataListItemLabel>
+            <DataListItemValue>
               {props.accountingCategory?.expensesTypes ? (
                 props.accountingCategory.expensesTypes.map(value => i18nExpenseType(intl, value)).join(', ')
               ) : (
                 <FormattedMessage id="AllExpenses" defaultMessage="All expenses" />
               )}
-            </p>
-          </React.Fragment>
+            </DataListItemValue>
+          </DataListItem>
         )}
 
         {!isEmptyHTMLValue(props.accountingCategory?.instructions) && (
           <React.Fragment>
-            <label className="mt-4 mb-1 text-base">
-              <FormattedMessage defaultMessage="Instructions" id="sV2v5L" />
-            </label>
-            <div>
-              <HTMLContent content={props.accountingCategory?.instructions} />
-            </div>
+            <Separator className="my-3" />
+            <DataListItem className="sm:flex-col">
+              <DataListItemLabel>
+                <FormattedMessage defaultMessage="Instructions" id="sV2v5L" />
+              </DataListItemLabel>
+              <DataListItemValue>
+                <HTMLContent content={props.accountingCategory?.instructions} />
+              </DataListItemValue>
+            </DataListItem>
           </React.Fragment>
         )}
-      </div>
+      </DataList>
+
       <DrawerActions>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

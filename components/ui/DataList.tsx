@@ -7,7 +7,7 @@ export function DataList({ children, className }: { children?: React.ReactNode; 
 }
 
 export function DataListItemValue({ children, className }: { children?: React.ReactNode; className?: string }) {
-  return <div className={cn('max-w-fit overflow-hidden break-words', className)}>{children}</div>;
+  return <div className={cn('max-w-fit break-words', className)}>{children}</div>;
 }
 
 export function DataListItemLabel({ children }: { children?: React.ReactNode }) {
