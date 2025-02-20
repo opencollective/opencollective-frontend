@@ -142,7 +142,7 @@
     "validator": "13.12.0",
     "webpack-manifest-plugin": "5.0.0",
     "winston": "3.17.0",
-    "zod": "3.24.1"
+    "zod": "3.24.2"
   },
   "resolutions": {
     "@radix-ui/react-dismissable-layer": "^1.0.5",
