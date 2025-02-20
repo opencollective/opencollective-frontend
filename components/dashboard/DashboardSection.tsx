@@ -43,6 +43,7 @@ import HostVirtualCardRequests from './sections/HostVirtualCardRequests';
 import HostVirtualCards from './sections/HostVirtualCards';
 import InvoicesReceipts from './sections/invoices-receipts/InvoicesReceipts';
 import HostDashboardTaxForms from './sections/legal-documents/HostDashboardTaxForms';
+import Notifications from './sections/Notifications';
 import NotificationsSettings from './sections/NotificationsSettings';
 import Overview from './sections/overview/Overview';
 import LegacyHostDashboardReports from './sections/reports/legacy/HostDashboardReports';
@@ -94,6 +95,7 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.TEAM]: Team,
   [SECTIONS.VENDORS]: Vendors,
   [SECTIONS.ACCOUNTS]: Accounts,
+  [SECTIONS.NOTIFICATIONS_INBOX]: Notifications,
 };
 
 const SETTINGS_COMPONENTS = {

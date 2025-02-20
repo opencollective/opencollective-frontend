@@ -12,6 +12,7 @@ import {
   FlaskConical,
   Globe2,
   HeartHandshake,
+  Inbox,
   LayoutDashboard,
   Megaphone,
   Receipt,
@@ -115,6 +116,11 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       if: isIndividual || (LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW) && !isHost),
       section: ALL_SECTIONS.OVERVIEW,
       Icon: LayoutDashboard,
+    },
+    {
+      section: ALL_SECTIONS.NOTIFICATIONS_INBOX,
+      Icon: Inbox,
+      label: intl.formatMessage({ defaultMessage: 'Notifications', id: '2s6i6Z' }),
     },
     {
       if: isIndividual,

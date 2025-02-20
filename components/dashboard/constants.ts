@@ -5,6 +5,7 @@ export const ROOT_PROFILE_ACCOUNT = { slug: ROOT_PROFILE_KEY, type: 'ROOT', name
 
 export const SECTIONS = {
   OVERVIEW: 'overview',
+  NOTIFICATIONS_INBOX: 'notifications-inbox',
   REPORTS: 'reports',
   EXPENSE_REPORTS: 'reports/expenses',
   TRANSACTION_REPORTS: 'reports/transactions',
