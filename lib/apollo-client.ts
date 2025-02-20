@@ -158,6 +158,17 @@ function createLink({ twoFactorAuthContext, accessToken = null }) {
     }
   });
 
+  const sentryLink = setContext((_, { headers }) => {
+    if (
+      headers?.['x-sentry-force-sample'] ||
+      (typeof window !== 'undefined' && window.location.search.includes('forceSentryTracing=1'))
+    ) {
+      return {
+        headers: { ...headers, 'x-sentry-force-sample': '1' },
+      };
+    }
+  });
+
   const linkFetch = process.browser ? fetch : serverSideFetch;
 
   const httpHeaders = {
@@ -208,7 +219,7 @@ function createLink({ twoFactorAuthContext, accessToken = null }) {
 
   const twoFactorAuthLink = new TwoFactorAuthenticationApolloLink(twoFactorAuthContext);
 
-  return ApolloLink.from([errorLink, authLink, twoFactorAuthLink, httpLink]);
+  return ApolloLink.from([sentryLink, errorLink, authLink, twoFactorAuthLink, httpLink]);
 }
 
 function createInMemoryCache() {
