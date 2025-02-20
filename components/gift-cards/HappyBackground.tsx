@@ -28,7 +28,8 @@ const HappyBackground = styled.div<{
       `;
     } else {
       return css`
-        background: url('/static/images/redeem-hero.svg'),
+        background:
+          url('/static/images/redeem-hero.svg'),
           radial-gradient(${theme.colors.primary[500]}, ${theme.colors.primary[900]});
       `;
     }

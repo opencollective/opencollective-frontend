@@ -227,8 +227,8 @@ const ExpandMenuIcon = styled(DotsVerticalRounded).attrs({ size: 28 })`
   color: ${themeGet('colors.primary.600')};
 
   &:hover {
-    background: radial-gradient(transparent 14px, white 3px),
-      linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)),
+    background:
+      radial-gradient(transparent 14px, white 3px), linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)),
       linear-gradient(${themeGet('colors.primary.600')}, ${themeGet('colors.primary.600')});
   }
 
@@ -249,8 +249,8 @@ const CloseMenuIcon = styled(Close).attrs({ size: 28 })`
   color: ${themeGet('colors.primary.600')};
 
   &:hover {
-    background: radial-gradient(transparent 14px, white 3px),
-      linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)),
+    background:
+      radial-gradient(transparent 14px, white 3px), linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)),
       linear-gradient(${themeGet('colors.primary.600')}, ${themeGet('colors.primary.600')});
   }
 
