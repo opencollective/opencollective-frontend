@@ -70,20 +70,20 @@ export const StepTitles: Record<Step, MessageDescriptor> = {
     id: 'SecurityScope.PayoutMethod',
   }),
   [Step.TYPE_OF_EXPENSE]: defineMessage({
-    defaultMessage: 'Type of expense',
-    id: 'qftRxm',
+    defaultMessage: 'Type',
+    id: '+U6ozc',
   }),
   [Step.EXPENSE_CATEGORY]: defineMessage({
-    defaultMessage: 'Expense Category',
-    id: '38dzz9',
+    defaultMessage: 'Category',
+    id: 'expense.accountingCategory',
   }),
   [Step.EXPENSE_ITEMS]: defineMessage({
     defaultMessage: 'Expense items',
     id: '3ldWIL',
   }),
   [Step.EXPENSE_TITLE]: defineMessage({
-    defaultMessage: 'Expense Title',
-    id: 'E0WDTk',
+    defaultMessage: 'Title',
+    id: 'Title',
   }),
   [Step.SUMMARY]: defineMessage({
     defaultMessage: 'Summary',

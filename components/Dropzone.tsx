@@ -185,11 +185,21 @@ const Dropzone = ({
                         </div>
                       )}
                       <div>
-                        <FormattedMessage
-                          id="DropZone.UploadBox"
-                          defaultMessage="Drag and drop one or multiple files or <i18n-link>click here to select</i18n-link>."
-                          values={{ 'i18n-link': getI18nLink() }}
-                        />
+                        {collectFilesOnly ? (
+                          <FormattedMessage
+                            id="DragAndDropOrClickToSelect"
+                            defaultMessage="Drag & drop or <i18n-link>click to select</i18n-link>"
+                            values={{ 'i18n-link': getI18nLink() }}
+                            tagName="span"
+                          />
+                        ) : (
+                          <FormattedMessage
+                            id="DragAndDropOrClickToUpload"
+                            defaultMessage="Drag & drop or <i18n-link>click to upload</i18n-link>"
+                            values={{ 'i18n-link': getI18nLink() }}
+                            tagName="span"
+                          />
+                        )}
                       </div>
                       {showInstructions && (
                         <p className="mt-1 text-xs text-muted-foreground">

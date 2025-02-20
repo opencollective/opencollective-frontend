@@ -110,14 +110,14 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host, required, alwaysSa
             <FormField
               disabled={disabled}
               name={getFieldName('name')}
-              label={intl.formatMessage({ defaultMessage: 'Label', id: 'PayoutMethod.New.customLabel' })}
+              label={intl.formatMessage({ defaultMessage: 'Alias', id: 'PayoutMethod.New.Alias' })}
               hint={intl.formatMessage({
-                defaultMessage: 'Give this payout method a label that will help you identify it',
-                id: 'PayoutMethod.New.customLabel.hint',
+                defaultMessage: 'Give this payout method an alias that will help you identify it',
+                id: 'PayoutMethod.New.Alias.hint',
               })}
               placeholder={intl.formatMessage({
                 defaultMessage: 'e.g., PayPal Personal',
-                id: 'PayoutMethod.New.customLabel.placeholder.paypal',
+                id: 'PayoutMethod.New.Alias.placeholder.paypal',
               })}
               required={false}
             />
@@ -144,14 +144,14 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host, required, alwaysSa
             <FormField
               disabled={disabled}
               name={getFieldName('name')}
-              label={intl.formatMessage({ defaultMessage: 'Label', id: 'PayoutMethod.New.customLabel' })}
+              label={intl.formatMessage({ defaultMessage: 'Alias', id: 'PayoutMethod.New.Alias' })}
               hint={intl.formatMessage({
-                defaultMessage: 'Give this payout method a label that will help you identify it',
-                id: 'PayoutMethod.New.customLabel.hint',
+                defaultMessage: 'Give this payout method an alias that will help you identify it',
+                id: 'PayoutMethod.New.Alias.hint',
               })}
               placeholder={intl.formatMessage({
                 defaultMessage: 'e.g., Main Bank Account',
-                id: 'PayoutMethod.New.customLabel.placeholder.bankAccount',
+                id: 'PayoutMethod.New.Alias.placeholder.bankAccount',
               })}
               required={false}
             />

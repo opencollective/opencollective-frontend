@@ -12,6 +12,8 @@ import { i18nTaxType } from '../../../lib/i18n/taxes';
 import { getExpenseExchangeRateWarningOrError, getTaxAmount, isTaxRateValid } from '../../expenses/lib/utils';
 import { ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
 
+import { Skeleton } from '@/components/ui/Skeleton';
+
 import { AccountHoverCard } from '../../AccountHoverCard';
 import AmountWithExchangeRateInfo from '../../AmountWithExchangeRateInfo';
 import Avatar from '../../Avatar';
@@ -20,7 +22,6 @@ import DateTime from '../../DateTime';
 import ExpenseTypeTag from '../../expenses/ExpenseTypeTag';
 import FormattedMoneyAmount from '../../FormattedMoneyAmount';
 import LinkCollective from '../../LinkCollective';
-import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import { PayoutMethodLabel } from '../../PayoutMethodLabel';
 import { Button } from '../../ui/Button';
@@ -387,7 +388,7 @@ const WhoIsPayingSummarySection = React.memo(function WhoIsPayingSummarySection(
   return (
     <React.Fragment>
       <div className="font-bold">
-        <FormattedMessage defaultMessage="Who is paying?" id="IdR7BG" />
+        <FormattedMessage defaultMessage="Requesting money from" id="CPB9In" />
       </div>
       {props.account && (
         <React.Fragment>
@@ -445,7 +446,7 @@ const WhoIsGettingPaidSummarySection = React.memo(function WhoIsGettingPaidSumma
   return (
     <React.Fragment>
       <div className="font-bold">
-        <FormattedMessage defaultMessage="Who is getting paid?" id="W5Z+Fm" />
+        <FormattedMessage defaultMessage="Recipient" id="8Rkoyb" />
       </div>
       {props.payee ? (
         <React.Fragment>
@@ -474,10 +475,10 @@ const WhoIsGettingPaidSummarySection = React.memo(function WhoIsGettingPaidSumma
         props.invitee && (
           <React.Fragment>
             <div className="mt-2 flex items-center gap-2 font-bold">
-              <Contact size={14} /> {props.invitee.name || <LoadingPlaceholder height={14} width={1} />}
+              <Contact size={14} /> {props.invitee.name || <Skeleton className="h-3.5 w-full" />}
             </div>
             <div className="mt-2 flex items-center gap-2">
-              <Mail size={14} /> {props.invitee.email || <LoadingPlaceholder height={14} width={1} />}
+              <Mail size={14} /> {props.invitee.email || <Skeleton className="h-3.5 w-full" />}
             </div>
             {'name' in props.invitee && props.invitee.name && (
               <div className="mt-2 flex items-center gap-2">

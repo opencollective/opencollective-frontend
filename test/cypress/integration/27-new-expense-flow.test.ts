@@ -557,8 +557,8 @@ function submitExpense(options: {
         });
     }
 
-    cy.contains('Who is paying?').parent().contains(opts.accountSlug).should('exist');
-    cy.contains('Who is getting paid?')
+    cy.contains('Requesting money from').parent().contains(opts.accountSlug).should('exist');
+    cy.contains('Recipient')
       .parent()
       .within(() => {
         if (opts.payeeSlug) {
@@ -617,7 +617,7 @@ function fillNewPayoutMethod(payoutMethod: {
       .click()
       .type(payoutMethod.data.content as string);
     cy.wait(400);
-    cy.contains('label', 'Label').click();
+    cy.contains('label', 'Alias').click();
     cy.get('input#input-newPayoutMethod\\.name').type(payoutMethod.slug);
     cy.get('input#input-newPayoutMethod\\.name').should('have.value', payoutMethod.slug);
 

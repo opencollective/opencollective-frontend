@@ -13,11 +13,11 @@ import { ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
 
 import LoginBtn from '@/components/LoginBtn';
 import StyledInputFormikField from '@/components/StyledInputFormikField';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { Textarea } from '@/components/ui/Textarea';
 
 import CollectivePicker from '../../CollectivePicker';
 import CollectivePickerAsync from '../../CollectivePickerAsync';
-import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import { Button } from '../../ui/Button';
 import { Input } from '../../ui/Input';
@@ -160,7 +160,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
           showSubcontent={!isLoading && props.payeeSlug === personalProfile.slug && isEmpty(personalProfile.legalName)}
           subContent={<LegalNameWarning account={personalProfile} onLegalNameUpdate={props.refresh} />}
         >
-          {isLoading ? <LoadingPlaceholder height={24} width={1} /> : <ExpenseAccountItem account={personalProfile} />}
+          {isLoading ? <Skeleton className="h-6 w-full" /> : <ExpenseAccountItem account={personalProfile} />}
         </RadioGroupCard>
       )}
 
