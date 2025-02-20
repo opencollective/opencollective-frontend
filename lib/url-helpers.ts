@@ -176,6 +176,7 @@ const TRUSTED_DOMAINS = [
   'app.papertree.earth',
   'sharedground.co',
   'gatherfor.org',
+  'funds.ecosyste.ms',
 ];
 const TRUSTED_ROOT_DOMAINS = ['opencollective.com', 'opencollective.foundation', 'oscollective.org'];
 
