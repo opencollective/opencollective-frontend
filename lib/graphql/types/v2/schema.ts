@@ -24,6 +24,8 @@ export type Scalars = {
   JSON: { input: any; output: any; }
   /** The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
   JSONObject: { input: any; output: any; }
+  /** The locale in the format of a BCP 47 (RFC 5646) standard string */
+  Locale: { input: any; output: any; }
   /** A string that cannot be passed as an empty value */
   NonEmptyString: { input: any; output: any; }
   /** A positive float value between 0 and 100 */
@@ -7211,20 +7213,22 @@ export enum MarkAsUnPaidExpenseStatus {
 export type Member = {
   __typename?: 'Member';
   account?: Maybe<Account>;
-  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  createdAt: Scalars['DateTime']['output'];
   /** Custom user description */
   description?: Maybe<Scalars['String']['output']>;
-  id?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
   /** If membership is inherited from parent collective */
-  inherited?: Maybe<Scalars['Boolean']['output']>;
+  inherited: Scalars['Boolean']['output'];
+  /** Whether the membership is active. Warning: this definition is subject to change. */
+  isActive: Scalars['Boolean']['output'];
   /** Custom user message from member to the collective */
   publicMessage?: Maybe<Scalars['String']['output']>;
-  role?: Maybe<MemberRole>;
-  since?: Maybe<Scalars['DateTime']['output']>;
+  role: MemberRole;
+  since: Scalars['DateTime']['output'];
   tier?: Maybe<Tier>;
   /** Total amount donated */
   totalDonations: Amount;
-  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
 };
 
 /** A collection of "Members" (ie: Organization backing a Collective) */
@@ -7262,20 +7266,22 @@ export type MemberInvitationReferenceInput = {
 export type MemberOf = {
   __typename?: 'MemberOf';
   account?: Maybe<Account>;
-  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  createdAt: Scalars['DateTime']['output'];
   /** Custom user description */
   description?: Maybe<Scalars['String']['output']>;
-  id?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
   /** If membership is inherited from parent collective */
-  inherited?: Maybe<Scalars['Boolean']['output']>;
+  inherited: Scalars['Boolean']['output'];
+  /** Whether the membership is active. Warning: this definition is subject to change. */
+  isActive: Scalars['Boolean']['output'];
   /** Custom user message from member to the collective */
   publicMessage?: Maybe<Scalars['String']['output']>;
-  role?: Maybe<MemberRole>;
-  since?: Maybe<Scalars['DateTime']['output']>;
+  role: MemberRole;
+  since: Scalars['DateTime']['output'];
   tier?: Maybe<Tier>;
   /** Total amount donated */
   totalDonations: Amount;
-  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
 };
 
 /** A collection of "MemberOf" (ie: Collective backed by an Organization) */
@@ -8202,6 +8208,15 @@ export type MutationFollowAccountArgs = {
 export type MutationFollowConversationArgs = {
   id: Scalars['String']['input'];
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+/** This is the root mutation */
+export type MutationGeneratePlaidLinkTokenArgs = {
+  countries?: InputMaybe<Array<CountryIso>>;
+  host: AccountReferenceInput;
+  locale?: InputMaybe<Scalars['Locale']['input']>;
+  transactionImport?: InputMaybe<TransactionsImportReferenceInput>;
 };
 
 
@@ -11765,6 +11780,11 @@ export type TransactionsImportEditResponse = {
   import: TransactionsImport;
   /** The rows updated by the mutation */
   rows: Array<Maybe<TransactionsImportRow>>;
+};
+
+export type TransactionsImportReferenceInput = {
+  /** The id of the row */
+  id: Scalars['NonEmptyString']['input'];
 };
 
 /** A row in a transactions import */

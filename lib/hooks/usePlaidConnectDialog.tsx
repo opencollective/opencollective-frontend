@@ -14,10 +14,15 @@ import type {
   GeneratePlaidLinkTokenMutation,
   GeneratePlaidLinkTokenMutationVariables,
 } from '../graphql/types/v2/graphql';
+import type { Host } from '../graphql/types/v2/schema';
 
 const generatePlaidLinkTokenMutation = gql`
-  mutation GeneratePlaidLinkToken {
-    generatePlaidLinkToken {
+  mutation GeneratePlaidLinkToken(
+    $host: AccountReferenceInput!
+    $transactionImport: TransactionsImportReferenceInput
+    $locale: Locale
+  ) {
+    generatePlaidLinkToken(host: $host, transactionImport: $transactionImport, locale: $locale) {
       linkToken
       expiration
       requestId
@@ -44,11 +49,22 @@ const connectPlaidAccountMutation = gql`
   }
 `;
 
-type PlaidDialogStatus = 'idle' | 'loading' | 'active' | 'disabled' | 'success';
+export type PlaidDialogStatus = 'idle' | 'loading' | 'active' | 'disabled' | 'success';
 
 export const usePlaidConnectDialog = ({
   host,
-  onSuccess,
+  onConnectSuccess,
+  onUpdateSuccess,
+  disabled,
+  onOpen,
+  transactionImportId,
+}: {
+  host: Host;
+  onConnectSuccess?: (result: ConnectPlaidAccountMutation['connectPlaidAccount']) => void;
+  onUpdateSuccess?: () => void;
+  disabled?: boolean;
+  onOpen?: () => void;
+  transactionImportId?: string;
 }): {
   status: PlaidDialogStatus;
   show: () => void;
@@ -70,6 +86,7 @@ export const usePlaidConnectDialog = ({
     onEvent: eventName => {
       if (eventName === 'OPEN') {
         setStatus('active');
+        onOpen?.();
       }
     },
     onExit: err => {
@@ -81,22 +98,29 @@ export const usePlaidConnectDialog = ({
     },
     onSuccess: async (publicToken, metadata) => {
       let result: Awaited<ReturnType<typeof connectPlaidAccount>>;
-      try {
-        result = await connectPlaidAccount({
-          variables: {
-            publicToken,
-            host: getAccountReferenceInput(host),
-            sourceName: metadata.institution.name,
-            name: metadata.accounts.map(a => a.name).join(', '),
-          },
-        });
-      } catch (e) {
-        toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
-        return;
-      }
 
-      setStatus('success');
-      onSuccess?.(result.data.connectPlaidAccount);
+      if (transactionImportId) {
+        // There is no need to re-connect the account in the API if the transaction import is already connected
+        setStatus('success');
+        onUpdateSuccess?.();
+      } else {
+        try {
+          result = await connectPlaidAccount({
+            variables: {
+              publicToken,
+              host: getAccountReferenceInput(host),
+              sourceName: metadata.institution.name,
+              name: metadata.accounts.map(a => a.name).join(', '),
+            },
+          });
+        } catch (e) {
+          toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+          return;
+        }
+
+        setStatus('success');
+        onConnectSuccess?.(result.data?.connectPlaidAccount);
+      }
     },
   });
 
@@ -104,13 +128,19 @@ export const usePlaidConnectDialog = ({
     if (status === 'idle') {
       try {
         setStatus('loading');
-        await generatePlaidToken(); // The process will continue when the `React.useEffect` below detects the token
+        await generatePlaidToken({
+          variables: {
+            host: getAccountReferenceInput(host),
+            transactionImport: transactionImportId ? { id: transactionImportId } : undefined,
+            locale: intl.locale,
+          },
+        }); // The process will continue when the `React.useEffect` below detects the token
       } catch (error) {
         toast({ variant: 'error', message: i18nGraphqlException(intl, error) });
         setStatus('idle');
       }
     }
-  }, [intl, status, generatePlaidToken, toast]);
+  }, [intl, status, generatePlaidToken, toast, host, transactionImportId]);
 
   React.useEffect(() => {
     if (ready && linkToken) {
@@ -119,7 +149,7 @@ export const usePlaidConnectDialog = ({
   }, [ready, linkToken, open]);
 
   return {
-    status: !host ? 'disabled' : status,
+    status: !host || disabled ? 'disabled' : status,
     show,
   };
 };
