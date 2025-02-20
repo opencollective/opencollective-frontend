@@ -54,7 +54,7 @@ export function SubmitExpenseFlowForm(props: SubmitExpenseFlowFormProps) {
       <WhoIsGettingPaidSection inViewChange={onInViewChange} {...WhoIsGettingPaidSection.getFormProps(form)} />
       <PayoutMethodSection inViewChange={onInViewChange} {...PayoutMethodSection.getFormProps(form)} />
       <TypeOfExpenseSection inViewChange={onInViewChange} {...TypeOfExpenseSection.getFormProps(form)} />
-      {form.options.accountingCategories?.length > 0 && (
+      {form.options.isAccountingCategoryRequired && form.options.accountingCategories?.length > 0 && (
         <ExpenseCategorySection inViewChange={onInViewChange} {...ExpenseCategorySection.getFormProps(form)} />
       )}
       <ExpenseItemsSection inViewChange={onInViewChange} form={form} />

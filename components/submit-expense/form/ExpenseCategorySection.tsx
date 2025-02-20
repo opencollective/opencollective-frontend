@@ -1,5 +1,5 @@
 import React from 'react';
-import { pick } from 'lodash';
+import { isNil, pick } from 'lodash';
 import { ChevronDown } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
@@ -37,9 +37,11 @@ export const ExpenseCategorySection = memoWithGetFormProps(function ExpenseCateg
 
   const accountingCategories = React.useMemo(() => props.accountingCategories || [], [props.accountingCategories]);
 
-  const selectedAccountingCategory = accountingCategoryId
-    ? accountingCategories.find(a => a.id === accountingCategoryId)
-    : null;
+  // Passing along either `null` (representing "I don't know") or `undefined` (representing unset value)
+  const selectedAccountingCategory = isNil(accountingCategoryId)
+    ? accountingCategoryId
+    : accountingCategories.find(a => a.id === accountingCategoryId);
+
   const instructions = selectedAccountingCategory?.instructions;
   const { setFieldValue } = props;
 
@@ -48,7 +50,7 @@ export const ExpenseCategorySection = memoWithGetFormProps(function ExpenseCateg
 
   const onAccountingCategorySelectChange = React.useCallback(
     value => {
-      setFieldValue('accountingCategoryId', value?.id);
+      setFieldValue('accountingCategoryId', value ? value.id : null);
     },
     [setFieldValue],
   );
@@ -72,7 +74,7 @@ export const ExpenseCategorySection = memoWithGetFormProps(function ExpenseCateg
             expenseType={props.expenseTypeOption}
             account={props.account}
             selectedCategory={selectedAccountingCategory}
-            allowNone={!props.isAccountingCategoryRequired}
+            allowNone={true}
             buttonClassName="max-w-full w-full"
           />
         )}
