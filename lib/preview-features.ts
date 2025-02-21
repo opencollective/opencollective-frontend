@@ -32,7 +32,15 @@ export type PreviewFeature = {
 };
 
 const PLATFORM_ACCOUNTS = ['ofico', 'ofitech'];
-const FIRST_PARTY_HOSTS = ['opensource', 'europe', 'oce-foundation-usd', 'oce-foundation-eur', 'raft', 'metagov'];
+const FIRST_PARTY_HOSTS = [
+  'opencollective',
+  'opensource',
+  'europe',
+  'oce-foundation-usd',
+  'oce-foundation-eur',
+  'raft',
+  'metagov',
+];
 
 /**
  * List of current preview features.
@@ -129,7 +137,7 @@ export const previewFeatures: PreviewFeature[] = [
     title: 'Bank Account synchronization',
     description: 'Connect your bank account to import transactions',
     publicBeta: false,
-    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS, 'opencollective'],
+    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
     dependsOn: PREVIEW_FEATURE_KEYS.TRANSACTIONS_IMPORTS,
   },
 ];
