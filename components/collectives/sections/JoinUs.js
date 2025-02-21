@@ -140,10 +140,7 @@ const JoinUs = ({ page }) => (
                 defaultMessage="Open Collective makes fiscal sponsorship shine. Grantees and project participants will love the simplicity and accessibility, and you’ll love the huge reduction of overheads."
               />
             ) : (
-              <FormattedMessage
-                defaultMessage="Collective finances. Collective technology. Collective power."
-                id="Jzh8eo"
-              />
+              <FormattedMessage defaultMessage="Rebuild communities. Community is immunity." id="Jzh8eo" />
             )}
           </SectionSubtitle>
         </Box>
@@ -156,7 +153,7 @@ const JoinUs = ({ page }) => (
             page === 'becomeAHost' ? (
               <FormattedMessage defaultMessage="Join as a Fiscal Host" id="Y0G9KM" />
             ) : (
-              <FormattedMessage defaultMessage="Get started now free!" id="uw0ZU2" />
+              <FormattedMessage defaultMessage="Get started now for free!" id="uw0ZU2" />
             )
           }
           description={<FormattedMessage id="home.joinUsSection.getStarted" defaultMessage="Get started now!" />}
@@ -167,7 +164,7 @@ const JoinUs = ({ page }) => (
           description={
             <FormattedMessage
               id="home.joinUsSection.ourStories"
-              defaultMessage="Open Collective aims to foster transparency and sustainability in communities around the world, see how you could."
+              defaultMessage="Discover how communities around the world use open collective to manage their finances in a transparent way."
             />
           }
         />

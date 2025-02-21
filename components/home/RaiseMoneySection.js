@@ -43,13 +43,13 @@ const RaiseMoney = () => {
       <Flex flexDirection="column" alignItems="center" maxWidth="100%">
         <Box mb="50px" px="16px">
           <SectionTitle textAlign="center" mb={3}>
-            <FormattedMessage id="home.raiseMoney" defaultMessage="Raise money with full transparency" />
+            <FormattedMessage id="home.raiseMoney" defaultMessage="Collect and spend money in full transparency" />
           </SectionTitle>
 
           <SectionDescription textAlign="center">
             <FormattedMessage
               id="home.raiseMoney.description"
-              defaultMessage="We do the paperwork so you can focus on your mission."
+              defaultMessage="The Fiscal Host takes care of the back office, you take care of your mission."
             />
           </SectionDescription>
         </Box>
@@ -211,7 +211,7 @@ const RaiseMoney = () => {
           >
             <FormattedMessage
               id="home.raiseMoney.description2"
-              defaultMessage="Whether you're a <mutualAidLink>mutual aid group</mutualAidLink>, a <communityLink>community initiative</communityLink>, an <opensourceLink>open-source software project</opensourceLink>, or a <climateLink>climate change activist</climateLink>, Open Collective helps groups unlock access to money."
+              defaultMessage="Whether you're a <mutualAidLink>mutual aid group</mutualAidLink>, a <communityLink>community initiative</communityLink>, an <opensourceLink>open-source software project</opensourceLink>, or a <climateLink>climate change activist group</climateLink>, Fiscal Hosts on Open Collective enable you to receive and spend money for your activities."
               values={{
                 u: I18nUnderline,
                 mutualAidLink: getI18nLink({
@@ -321,7 +321,7 @@ const RaiseMoney = () => {
               >
                 <FormattedMessage
                   id="home.fiscalHosting.description"
-                  defaultMessage="Operate under the umbrella of an established legal entity, so you don’t have to incorporate your own. A Host can take care of accounting, taxes, banking, and non-profit status."
+                  defaultMessage="Operate under the umbrella of an established legal entity, so you don’t have to incorporate your own. The Fiscal Host takes care of accounting, taxes, banking, and non-profit status."
                 />
               </P>
               <LearnMoreLink as={Link} textDecoration="underline" color="black.800" href="/fiscal-hosting">
@@ -350,7 +350,7 @@ const RaiseMoney = () => {
               fontWeight="700"
               textDecoration={[null, null, 'underline']}
             >
-              <FormattedMessage id="home.sharedAccount" defaultMessage="Shared account" />
+              <FormattedMessage id="home.sharedAccount" defaultMessage="Transparent account" />
             </H3>
             <Box maxWidth={['288px', '338px', '478px']} mt={['16px', '24px']}>
               <P
@@ -362,7 +362,7 @@ const RaiseMoney = () => {
               >
                 <FormattedMessage
                   id="home.sharedAccount.description"
-                  defaultMessage="Manage your budget together. Transparency builds trust and accountability, and no individual has to take on all the responsibility."
+                  defaultMessage="Manage your budget together. Transparency builds trust and accountability. Everyone in the community can see the costs associated to your project."
                 />
               </P>
               <LearnMoreLink as={Link} textDecoration="underline" color="black.800" href="/collectives">

@@ -157,7 +157,7 @@ const HowOCIsDifferent = () => {
           <Description>
             <FormattedMessage
               id="howItWorks.moneyManagement.description"
-              defaultMessage="Open Collective uniquely combines a powerful tech platform with fiscal hosting, enabling Collectives to raise and spend money without legally incorporating, worrying about taxes, or opening a bank account."
+              defaultMessage="Open Collective uniquely combines a powerful tech platform with a network of Fiscal Hosts. This enables Collectives to rent a slice of an existing legal entity so that they can quicky get up and running, start collecting funds and spend money for their activities. No need to create (yet another) legal entity."
             />
           </Description>
         </Box>
