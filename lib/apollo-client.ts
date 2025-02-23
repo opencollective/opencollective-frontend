@@ -180,11 +180,17 @@ function createLink({ twoFactorAuthContext, accessToken = null }) {
     uri: getGraphqlUrl('v1'),
     fetch: linkFetch,
     headers: { ...httpHeaders, 'Apollo-Require-Preflight': 'true' },
+    formDataAppendFile(formData, fieldName, file) {
+      formData.append(fieldName, new Blob([file as File], { type: file.type }));
+    },
   });
   const apiV2DefaultLink = createUploadLink({
     uri: getGraphqlUrl('v2'),
     fetch: linkFetch,
     headers: { ...httpHeaders, 'Apollo-Require-Preflight': 'true' },
+    formDataAppendFile(formData, fieldName, file) {
+      formData.append(fieldName, new Blob([file as File], { type: file.type }));
+    },
   });
 
   // Setup internal links handling to be able to split traffic to different API servers
