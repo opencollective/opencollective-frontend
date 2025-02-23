@@ -5,15 +5,24 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { updateTransactionsImportRows } from './lib/graphql';
 import { i18nGraphqlException } from '@/lib/errors';
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
+import type { TransactionsImportRow } from '@/lib/graphql/types/v2/schema';
 
 import { Button } from '@/components/ui/Button';
 import { Label } from '@/components/ui/Label';
 import { Textarea } from '@/components/ui/Textarea';
 import { useToast } from '@/components/ui/useToast';
 
-export const TransactionsImportRowNoteForm = ({ row, transactionsImportId, autoFocus = false }) => {
+export const TransactionsImportRowNoteForm = ({
+  row,
+  transactionsImportId,
+  autoFocus = false,
+}: {
+  row: Pick<TransactionsImportRow, 'id' | 'note'>;
+  transactionsImportId: string;
+  autoFocus?: boolean;
+}) => {
   const [updateRows, { loading }] = useMutation(updateTransactionsImportRows, { context: API_V2_CONTEXT });
-  const [newText, setNewText] = React.useState(row.comment || '');
+  const [newText, setNewText] = React.useState(row.note || '');
   const { toast } = useToast();
   const intl = useIntl();
   return (

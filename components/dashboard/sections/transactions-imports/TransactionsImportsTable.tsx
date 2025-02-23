@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { FileUp, Landmark, RefreshCw } from 'lucide-react';
+import { FileUp, Landmark } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -15,7 +15,6 @@ import { i18nTransactionsImportType } from '../../../../lib/i18n/transactions-im
 import { capitalize } from '../../../../lib/utils';
 import { transactionsImportsQuery } from './lib/graphql';
 
-import DateTime from '../../../DateTime';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { DataTable } from '../../../table/DataTable';
 import { Badge } from '../../../ui/Badge';
@@ -26,6 +25,7 @@ import { Pagination } from '../../filters/Pagination';
 
 import { ImportProgressBadge } from './ImportProgressBadge';
 import { NewCSVTransactionsImportDialog } from './NewCSVTransactionsImportDialog';
+import { TransactionImportLastSyncAtBadge } from './TransactionImportLastSyncAtBadge';
 
 const NB_IMPORTS_DISPLAYED = 20;
 
@@ -60,7 +60,7 @@ export const TransactionsImportsTable = ({ accountSlug }) => {
     },
     [intl, toast, accountSlug, refetch, router],
   );
-  const plaidConnectDialog = usePlaidConnectDialog({ host: data?.host, onSuccess: onPlaidConnectSuccess });
+  const plaidConnectDialog = usePlaidConnectDialog({ host: data?.host, onConnectSuccess: onPlaidConnectSuccess });
 
   return (
     <div>
@@ -131,16 +131,9 @@ export const TransactionsImportsTable = ({ accountSlug }) => {
               {
                 header: intl.formatMessage({ defaultMessage: 'Last sync', id: 'transactions.import.lastSync' }),
                 accessorKey: 'lastSyncAt',
-                cell: ({ cell }) => {
-                  const value = cell.getValue() as string;
-                  return value ? (
-                    <DateTime value={new Date(value)} timeStyle="short" dateStyle="short" />
-                  ) : (
-                    <Badge type="info" className="whitespace-nowrap">
-                      {intl.formatMessage({ defaultMessage: 'In progress', id: 'syncInProgress' })}&nbsp;
-                      <RefreshCw size={12} className="animate-spin duration-1500" />
-                    </Badge>
-                  );
+                cell: ({ row }) => {
+                  const transactionsImport = row.original;
+                  return <TransactionImportLastSyncAtBadge transactionsImport={transactionsImport} />;
                 },
               },
               {

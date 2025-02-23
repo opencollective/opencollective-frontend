@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 import type { Path, PathValue } from 'dot-path-value';
 import type { FieldInputProps, FormikErrors, FormikHelpers } from 'formik';
 import { useFormik } from 'formik';
-import { isEmpty, isEqual, omit, pick, set, uniqBy } from 'lodash';
+import { isEmpty, isEqual, isNull, omit, pick, set, uniqBy } from 'lodash';
 import memoizeOne from 'memoize-one';
 import type { IntlShape } from 'react-intl';
 import { useIntl } from 'react-intl';
@@ -669,7 +669,8 @@ function buildFormSchema(
           if (
             options.isAccountingCategoryRequired &&
             options.accountingCategories?.length > 0 &&
-            !options.accountingCategories.some(ac => ac.id === v)
+            !options.accountingCategories.some(ac => ac.id === v) &&
+            !isNull(v) // null represents "I don't know" and is a valid option
           ) {
             return false;
           }

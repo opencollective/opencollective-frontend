@@ -67,7 +67,9 @@ export const generatePaymentMethodOptions = (
 
   uniquePMs = uniquePMs.filter(
     ({ paymentMethod }) =>
-      paymentMethod.type !== PAYMENT_METHOD_TYPE.COLLECTIVE || collective.host.id === stepProfile.host?.id,
+      paymentMethod.type !== PAYMENT_METHOD_TYPE.COLLECTIVE ||
+      collective.host.id === stepProfile.host?.id ||
+      collective.host.id === stepProfile.id,
   );
 
   if (paymentIntent) {

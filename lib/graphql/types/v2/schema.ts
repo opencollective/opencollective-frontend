@@ -24,6 +24,8 @@ export type Scalars = {
   JSON: { input: any; output: any; }
   /** The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
   JSONObject: { input: any; output: any; }
+  /** The locale in the format of a BCP 47 (RFC 5646) standard string */
+  Locale: { input: any; output: any; }
   /** A string that cannot be passed as an empty value */
   NonEmptyString: { input: any; output: any; }
   /** A positive float value between 0 and 100 */
@@ -8220,6 +8222,15 @@ export type MutationFollowConversationArgs = {
 
 
 /** This is the root mutation */
+export type MutationGeneratePlaidLinkTokenArgs = {
+  countries?: InputMaybe<Array<CountryIso>>;
+  host: AccountReferenceInput;
+  locale?: InputMaybe<Scalars['Locale']['input']>;
+  transactionImport?: InputMaybe<TransactionsImportReferenceInput>;
+};
+
+
+/** This is the root mutation */
 export type MutationImportTransactionsArgs = {
   csvConfig?: InputMaybe<Scalars['JSONObject']['input']>;
   data: Array<TransactionsImportRowCreateInput>;
@@ -11779,6 +11790,11 @@ export type TransactionsImportEditResponse = {
   import: TransactionsImport;
   /** The rows updated by the mutation */
   rows: Array<Maybe<TransactionsImportRow>>;
+};
+
+export type TransactionsImportReferenceInput = {
+  /** The id of the row */
+  id: Scalars['NonEmptyString']['input'];
 };
 
 /** A row in a transactions import */

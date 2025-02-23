@@ -20716,7 +20716,27 @@ type Mutation {
   """
   Generate a Plaid Link token
   """
-  generatePlaidLinkToken: PlaidLinkTokenCreateResponse!
+  generatePlaidLinkToken(
+    """
+    The account to which the Plaid account should be connected
+    """
+    host: AccountReferenceInput!
+
+    """
+    Use this parameter to specify the import to update (when using the Plaid update flow)
+    """
+    transactionImport: TransactionsImportReferenceInput
+
+    """
+    The countries to enable in the accounts selection. Defaults to the host country.
+    """
+    countries: [CountryISO!]
+
+    """
+    The language to use in the Plaid Link flow. Defaults to "en".
+    """
+    locale: Locale
+  ): PlaidLinkTokenCreateResponse!
 
   """
   Connect a Plaid account
@@ -23176,6 +23196,18 @@ type PlaidLinkTokenCreateResponse {
   """
   hostedLinkUrl: String
 }
+
+input TransactionsImportReferenceInput {
+  """
+  The id of the row
+  """
+  id: NonEmptyString!
+}
+
+"""
+The locale in the format of a BCP 47 (RFC 5646) standard string
+"""
+scalar Locale
 
 type PlaidConnectAccountResponse {
   """
