@@ -9678,11 +9678,17 @@ export type PayoutMethod = {
 };
 
 export type PayoutMethodInput = {
+  /** Additional data specific to the payout method type. For custom payout methods (type=OTHER), must contain only `content` (string) and `currency` fields. For other types, may contain type-specific details (e.g., bank account details, PayPal email) */
   data?: InputMaybe<Scalars['JSON']['input']>;
+  /** The unique identifier of the payout method */
   id?: InputMaybe<Scalars['String']['input']>;
+  /** Whether this payout method should be saved for future use */
   isSaved?: InputMaybe<Scalars['Boolean']['input']>;
+  /** The legacy identifier used in older systems */
   legacyId?: InputMaybe<Scalars['Int']['input']>;
+  /** A human-readable name for the payout method */
   name?: InputMaybe<Scalars['String']['input']>;
+  /** The type of payout method (e.g., PayPal, bank transfer) */
   type?: InputMaybe<PayoutMethodType>;
 };
 

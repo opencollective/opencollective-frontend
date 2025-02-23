@@ -22047,11 +22047,34 @@ input ExpenseCreateInput {
 }
 
 input PayoutMethodInput {
+  """
+  The unique identifier of the payout method
+  """
   id: String
+
+  """
+  The legacy identifier used in older systems
+  """
   legacyId: Int
+
+  """
+  Additional data specific to the payout method type. For custom payout methods (type=OTHER), must contain only `content` (string) and `currency` fields. For other types, may contain type-specific details (e.g., bank account details, PayPal email)
+  """
   data: JSON
+
+  """
+  A human-readable name for the payout method
+  """
   name: String
+
+  """
+  Whether this payout method should be saved for future use
+  """
   isSaved: Boolean
+
+  """
+  The type of payout method (e.g., PayPal, bank transfer)
+  """
   type: PayoutMethodType
 }
 
