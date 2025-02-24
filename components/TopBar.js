@@ -243,11 +243,6 @@ const TopBar = ({
                       <FormattedMessage id="company.blog" defaultMessage="Blog" />
                     </NavItem>
                   </a>
-                  <Link href="/e2c">
-                    <NavItem as={Container} mb={16}>
-                      <FormattedMessage id="OC.e2c" defaultMessage="Exit to Community" />
-                    </NavItem>
-                  </Link>
                   <a href="https://docs.opencollective.com/help/about/introduction">
                     <NavItem as={Container} mb={16}>
                       <FormattedMessage id="collective.about.title" defaultMessage="About" />

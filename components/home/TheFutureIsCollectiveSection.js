@@ -33,7 +33,7 @@ const TheFutureIsCollective = () => {
             <MainDescription textAlign="center">
               <FormattedMessage
                 id="home.futureIsCollective.description"
-                defaultMessage="Open Collective is a <b>legal and financial</b> toolbox for grassroots groups. It’s a <b>fundraising + legal status + money management</b> platform for your community. What do you want to do?"
+                defaultMessage="Create an open collective, apply to a fiscal host and <b>start collecting money</b> in a <b>transparent way</b> for your community."
                 values={{
                   b: I18nBold,
                 }}

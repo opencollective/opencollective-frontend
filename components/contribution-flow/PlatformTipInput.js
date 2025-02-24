@@ -114,7 +114,7 @@ const PlatformTipInput = ({ currency, amount, quantity, value, onChange, isEmbed
           />
         ) : (
           <FormattedMessage
-            defaultMessage="Powered by Open Collective, a platform to raise and spend money in full transparency. Tips from contributors like you help keep this service free for Collectives. Thanks for any support!"
+            defaultMessage="Powered by Open Collective, an open source platform to manage the finances of communities transparently. Tips from contributors like you help keep this service free for Collectives. Thanks for any support!"
             id="pCwxIS"
           />
         )}
