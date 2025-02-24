@@ -181,7 +181,7 @@ function createLink({ twoFactorAuthContext, accessToken = null }) {
     fetch: linkFetch,
     headers: { ...httpHeaders, 'Apollo-Require-Preflight': 'true' },
     formDataAppendFile(formData, fieldName, file) {
-      formData.append(fieldName, new Blob([file as File], { type: file.type }));
+      formData.append(fieldName, new Blob([file as File], { type: file.type }), (file as File).name);
     },
   });
   const apiV2DefaultLink = createUploadLink({
@@ -189,7 +189,7 @@ function createLink({ twoFactorAuthContext, accessToken = null }) {
     fetch: linkFetch,
     headers: { ...httpHeaders, 'Apollo-Require-Preflight': 'true' },
     formDataAppendFile(formData, fieldName, file) {
-      formData.append(fieldName, new Blob([file as File], { type: file.type }));
+      formData.append(fieldName, new Blob([file as File], { type: file.type }), (file as File).name);
     },
   });
 
