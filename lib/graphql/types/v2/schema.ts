@@ -206,6 +206,7 @@ export type AccountDuplicatedAccountsArgs = {
 export type AccountExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
   customData?: InputMaybe<Scalars['JSON']['input']>;
@@ -1595,6 +1596,7 @@ export type BotDuplicatedAccountsArgs = {
 export type BotExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
   customData?: InputMaybe<Scalars['JSON']['input']>;
@@ -2107,6 +2109,7 @@ export type CollectiveDuplicatedAccountsArgs = {
 export type CollectiveExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
   customData?: InputMaybe<Scalars['JSON']['input']>;
@@ -4099,6 +4102,7 @@ export type EventDuplicatedAccountsArgs = {
 export type EventExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
   customData?: InputMaybe<Scalars['JSON']['input']>;
@@ -5286,6 +5290,7 @@ export type FundDuplicatedAccountsArgs = {
 export type FundExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
   customData?: InputMaybe<Scalars['JSON']['input']>;
@@ -5897,6 +5902,7 @@ export type HostExpenseStatsArgs = {
 export type HostExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
   customData?: InputMaybe<Scalars['JSON']['input']>;
@@ -6794,6 +6800,7 @@ export type IndividualDuplicatedAccountsArgs = {
 export type IndividualExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
   customData?: InputMaybe<Scalars['JSON']['input']>;
@@ -7506,6 +7513,8 @@ export type Mutation = {
   processPendingOrder: Order;
   /** Publish update. Scope: "updates". */
   publishUpdate: Update;
+  /** Refresh the list of sub-accounts & other metadata by re-fetching the account info */
+  refreshPlaidAccount: PlaidConnectAccountResponse;
   /** Refunds a transaction. Scope: "transactions". */
   refundTransaction?: Maybe<Transaction>;
   /** Regenerate two factor authentication recovery codes */
@@ -8162,6 +8171,7 @@ export type MutationEditTierArgs = {
 
 /** This is the root mutation */
 export type MutationEditTransactionsImportArgs = {
+  assignments?: InputMaybe<Array<TransactionsImportAssignmentInput>>;
   id: Scalars['NonEmptyString']['input'];
   name?: InputMaybe<Scalars['NonEmptyString']['input']>;
   source?: InputMaybe<Scalars['NonEmptyString']['input']>;
@@ -8213,6 +8223,7 @@ export type MutationFollowConversationArgs = {
 
 /** This is the root mutation */
 export type MutationGeneratePlaidLinkTokenArgs = {
+  accountSelectionEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   countries?: InputMaybe<Array<CountryIso>>;
   host: AccountReferenceInput;
   locale?: InputMaybe<Scalars['Locale']['input']>;
@@ -8300,6 +8311,13 @@ export type MutationProcessPendingOrderArgs = {
 export type MutationPublishUpdateArgs = {
   id: Scalars['String']['input'];
   notificationAudience?: InputMaybe<UpdateAudience>;
+};
+
+
+/** This is the root mutation */
+export type MutationRefreshPlaidAccountArgs = {
+  connectedAccount?: InputMaybe<ConnectedAccountReferenceInput>;
+  transactionImport?: InputMaybe<TransactionsImportReferenceInput>;
 };
 
 
@@ -9159,6 +9177,7 @@ export type OrganizationDuplicatedAccountsArgs = {
 export type OrganizationExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
   customData?: InputMaybe<Scalars['JSON']['input']>;
@@ -9846,6 +9865,31 @@ export type PersonalTokenUpdateInput = {
   scope?: InputMaybe<Array<InputMaybe<OAuthScope>>>;
 };
 
+export type PlaidAccount = {
+  __typename?: 'PlaidAccount';
+  accountId: Scalars['String']['output'];
+  mask: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  officialName: Scalars['String']['output'];
+  subtype: Scalars['String']['output'];
+  type: PlaidAccountType;
+};
+
+export enum PlaidAccountType {
+  /** Brokerage */
+  brokerage = 'brokerage',
+  /** Credit */
+  credit = 'credit',
+  /** Depository */
+  depository = 'depository',
+  /** Investment */
+  investment = 'investment',
+  /** Loan */
+  loan = 'loan',
+  /** Other */
+  other = 'other'
+}
+
 export type PlaidConnectAccountResponse = {
   __typename?: 'PlaidConnectAccountResponse';
   /** The connected account that was created */
@@ -10203,6 +10247,7 @@ export type ProjectDuplicatedAccountsArgs = {
 export type ProjectExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
   customData?: InputMaybe<Scalars['JSON']['input']>;
@@ -10664,6 +10709,7 @@ export type QueryExpenseTagStatsArgs = {
 export type QueryExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
   customData?: InputMaybe<Scalars['JSON']['input']>;
@@ -11737,6 +11783,8 @@ export type TransactionsImport = {
   __typename?: 'TransactionsImport';
   /** Account that holds the import */
   account: Account;
+  /** Assignments for the import, as a map of account id to legacy collective IDs. The `__default__` key can be use to set the default assignment. */
+  assignments: Array<TransactionsImportAssignment>;
   /** Connected account linked to the import */
   connectedAccount?: Maybe<ConnectedAccount>;
   /** When the import was created */
@@ -11755,6 +11803,8 @@ export type TransactionsImport = {
   lastSyncCursor?: Maybe<Scalars['String']['output']>;
   /** Name of the import (e.g. "Contributions May 2021", "Tickets for Mautic Conference 2024") */
   name: Scalars['NonEmptyString']['output'];
+  /** List of available accounts for the import */
+  plaidAccounts?: Maybe<Array<Maybe<PlaidAccount>>>;
   /** List of rows in the import */
   rows: TransactionsImportRowCollection;
   /** Source of the import (e.g. "Bank of America", "Eventbrite", etc...) */
@@ -11768,10 +11818,24 @@ export type TransactionsImport = {
 
 
 export type TransactionsImportRowsArgs = {
+  accountId?: InputMaybe<Array<InputMaybe<Scalars['NonEmptyString']['input']>>>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<TransactionsImportRowStatus>;
+};
+
+export type TransactionsImportAssignment = {
+  __typename?: 'TransactionsImportAssignment';
+  accounts: Array<Account>;
+  importedAccountId: Scalars['NonEmptyString']['output'];
+};
+
+export type TransactionsImportAssignmentInput = {
+  /** The accounts to assign the transactions to */
+  accounts: Array<AccountReferenceInput>;
+  /** The ID of the account to assign the transactions to */
+  importedAccountId: Scalars['NonEmptyString']['input'];
 };
 
 export type TransactionsImportEditResponse = {
@@ -12367,6 +12431,7 @@ export type VendorDuplicatedAccountsArgs = {
 export type VendorExpensesArgs = {
   account?: InputMaybe<AccountReferenceInput>;
   accountingCategory?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  accounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   chargeHasReceipts?: InputMaybe<Scalars['Boolean']['input']>;
   createdByAccount?: InputMaybe<AccountReferenceInput>;
   customData?: InputMaybe<Scalars['JSON']['input']>;

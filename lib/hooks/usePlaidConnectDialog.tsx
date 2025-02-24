@@ -21,8 +21,14 @@ const generatePlaidLinkTokenMutation = gql`
     $host: AccountReferenceInput!
     $transactionImport: TransactionsImportReferenceInput
     $locale: Locale
+    $accountSelectionEnabled: Boolean
   ) {
-    generatePlaidLinkToken(host: $host, transactionImport: $transactionImport, locale: $locale) {
+    generatePlaidLinkToken(
+      host: $host
+      transactionImport: $transactionImport
+      locale: $locale
+      accountSelectionEnabled: $accountSelectionEnabled
+    ) {
       linkToken
       expiration
       requestId
@@ -58,6 +64,7 @@ export const usePlaidConnectDialog = ({
   disabled,
   onOpen,
   transactionImportId,
+  accountSelectionEnabled,
 }: {
   host: Host;
   onConnectSuccess?: (result: ConnectPlaidAccountMutation['connectPlaidAccount']) => void;
@@ -65,6 +72,7 @@ export const usePlaidConnectDialog = ({
   disabled?: boolean;
   onOpen?: () => void;
   transactionImportId?: string;
+  accountSelectionEnabled?: boolean;
 }): {
   status: PlaidDialogStatus;
   show: () => void;
@@ -133,6 +141,7 @@ export const usePlaidConnectDialog = ({
             host: getAccountReferenceInput(host),
             transactionImport: transactionImportId ? { id: transactionImportId } : undefined,
             locale: intl.locale,
+            accountSelectionEnabled,
           },
         }); // The process will continue when the `React.useEffect` below detects the token
       } catch (error) {
@@ -140,7 +149,7 @@ export const usePlaidConnectDialog = ({
         setStatus('idle');
       }
     }
-  }, [intl, status, generatePlaidToken, toast, host, transactionImportId]);
+  }, [intl, status, generatePlaidToken, toast, host, transactionImportId, accountSelectionEnabled]);
 
   React.useEffect(() => {
     if (ready && linkToken) {

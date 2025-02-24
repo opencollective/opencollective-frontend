@@ -655,6 +655,11 @@ interface Account {
     account: AccountReferenceInput
 
     """
+    An alternative to filter by accounts, both cannot be used together
+    """
+    accounts: [AccountReferenceInput]
+
+    """
     Return expenses only for this host
     """
     host: AccountReferenceInput
@@ -3194,6 +3199,11 @@ type Host implements Account & AccountWithContributions {
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
+
+    """
+    An alternative to filter by accounts, both cannot be used together
+    """
+    accounts: [AccountReferenceInput]
 
     """
     Return expenses only for this host
@@ -7139,6 +7149,16 @@ type TransactionsImport {
   lastSyncCursor: String
 
   """
+  List of available accounts for the import
+  """
+  plaidAccounts: [PlaidAccount]
+
+  """
+  Assignments for the import, as a map of account id to legacy collective IDs. The `__default__` key can be use to set the default assignment.
+  """
+  assignments: [TransactionsImportAssignment!]!
+
+  """
   Connected account linked to the import
   """
   connectedAccount: ConnectedAccount
@@ -7166,6 +7186,11 @@ type TransactionsImport {
     Search by text
     """
     searchTerm: String
+
+    """
+    Filter rows by plaid account id
+    """
+    accountId: [NonEmptyString]
   ): TransactionsImportRowCollection!
   stats: TransactionsImportStats
 }
@@ -7182,6 +7207,52 @@ enum TransactionsImportType {
   CSV
   MANUAL
   PLAID
+}
+
+type PlaidAccount {
+  accountId: String!
+  mask: String!
+  name: String!
+  officialName: String!
+  subtype: String!
+  type: PlaidAccountType!
+}
+
+enum PlaidAccountType {
+  """
+  Investment
+  """
+  investment
+
+  """
+  Credit
+  """
+  credit
+
+  """
+  Depository
+  """
+  depository
+
+  """
+  Loan
+  """
+  loan
+
+  """
+  Brokerage
+  """
+  brokerage
+
+  """
+  Other
+  """
+  other
+}
+
+type TransactionsImportAssignment {
+  importedAccountId: NonEmptyString!
+  accounts: [Account!]!
 }
 
 """
@@ -8436,6 +8507,11 @@ type Bot implements Account {
     account: AccountReferenceInput
 
     """
+    An alternative to filter by accounts, both cannot be used together
+    """
+    accounts: [AccountReferenceInput]
+
+    """
     Return expenses only for this host
     """
     host: AccountReferenceInput
@@ -9312,6 +9388,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
+
+    """
+    An alternative to filter by accounts, both cannot be used together
+    """
+    accounts: [AccountReferenceInput]
 
     """
     Return expenses only for this host
@@ -10741,6 +10822,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     account: AccountReferenceInput
 
     """
+    An alternative to filter by accounts, both cannot be used together
+    """
+    accounts: [AccountReferenceInput]
+
+    """
     Return expenses only for this host
     """
     host: AccountReferenceInput
@@ -11888,6 +11974,11 @@ type Individual implements Account {
     account: AccountReferenceInput
 
     """
+    An alternative to filter by accounts, both cannot be used together
+    """
+    accounts: [AccountReferenceInput]
+
+    """
     Return expenses only for this host
     """
     host: AccountReferenceInput
@@ -13013,6 +13104,11 @@ type Organization implements Account & AccountWithContributions {
     account: AccountReferenceInput
 
     """
+    An alternative to filter by accounts, both cannot be used together
+    """
+    accounts: [AccountReferenceInput]
+
+    """
     Return expenses only for this host
     """
     host: AccountReferenceInput
@@ -14004,6 +14100,11 @@ type Vendor implements Account & AccountWithContributions {
     account: AccountReferenceInput
 
     """
+    An alternative to filter by accounts, both cannot be used together
+    """
+    accounts: [AccountReferenceInput]
+
+    """
     Return expenses only for this host
     """
     host: AccountReferenceInput
@@ -14814,6 +14915,11 @@ type Query {
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
+
+    """
+    An alternative to filter by accounts, both cannot be used together
+    """
+    accounts: [AccountReferenceInput]
 
     """
     Return expenses only for this host
@@ -17640,6 +17746,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     account: AccountReferenceInput
 
     """
+    An alternative to filter by accounts, both cannot be used together
+    """
+    accounts: [AccountReferenceInput]
+
+    """
     Return expenses only for this host
     """
     host: AccountReferenceInput
@@ -18663,6 +18774,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
+
+    """
+    An alternative to filter by accounts, both cannot be used together
+    """
+    accounts: [AccountReferenceInput]
 
     """
     Return expenses only for this host
@@ -20729,6 +20845,11 @@ type Mutation {
     The language to use in the Plaid Link flow. Defaults to "en".
     """
     locale: Locale
+
+    """
+    If true, the account selection flow will be enabled. Requires an `accessToken`.
+    """
+    accountSelectionEnabled: Boolean
   ): PlaidLinkTokenCreateResponse!
 
   """
@@ -20765,6 +20886,21 @@ type Mutation {
     """
     connectedAccount: ConnectedAccountReferenceInput!
   ): TransactionsImport!
+
+  """
+  Refresh the list of sub-accounts & other metadata by re-fetching the account info
+  """
+  refreshPlaidAccount(
+    """
+    The Plaid connected account to refresh
+    """
+    connectedAccount: ConnectedAccountReferenceInput
+
+    """
+    The transactions import to refresh
+    """
+    transactionImport: TransactionsImportReferenceInput
+  ): PlaidConnectAccountResponse!
 
   """
   [Root only] Edits account flags (deleted, banned, archived, trusted host)
@@ -20954,6 +21090,11 @@ type Mutation {
     Name of the import (e.g. "Contributions May 2021", "Tickets for Mautic Conference 2024")
     """
     name: NonEmptyString
+
+    """
+    Assignments for the import
+    """
+    assignments: [TransactionsImportAssignmentInput!]
   ): TransactionsImport!
 
   """
@@ -23232,6 +23373,18 @@ type BanAccountResponse {
   The accounts impacted by the mutation
   """
   accounts: [Account!]!
+}
+
+input TransactionsImportAssignmentInput {
+  """
+  The ID of the account to assign the transactions to
+  """
+  importedAccountId: NonEmptyString!
+
+  """
+  The accounts to assign the transactions to
+  """
+  accounts: [AccountReferenceInput!]!
 }
 
 input TransactionsImportRowCreateInput {
