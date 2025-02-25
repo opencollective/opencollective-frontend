@@ -1070,6 +1070,7 @@ export enum ActivityAndClassesType {
   TAXFORM_REQUEST = 'TAXFORM_REQUEST',
   TICKET_CONFIRMED = 'TICKET_CONFIRMED',
   TRANSACTIONS_IMPORT_CREATED = 'TRANSACTIONS_IMPORT_CREATED',
+  TRANSACTIONS_IMPORT_ROW_UPDATED = 'TRANSACTIONS_IMPORT_ROW_UPDATED',
   TWO_FACTOR_CODE_REQUESTED = 'TWO_FACTOR_CODE_REQUESTED',
   TWO_FACTOR_METHOD_ADDED = 'TWO_FACTOR_METHOD_ADDED',
   TWO_FACTOR_METHOD_DELETED = 'TWO_FACTOR_METHOD_DELETED',
@@ -1252,6 +1253,7 @@ export enum ActivityType {
   TAXFORM_REQUEST = 'TAXFORM_REQUEST',
   TICKET_CONFIRMED = 'TICKET_CONFIRMED',
   TRANSACTIONS_IMPORT_CREATED = 'TRANSACTIONS_IMPORT_CREATED',
+  TRANSACTIONS_IMPORT_ROW_UPDATED = 'TRANSACTIONS_IMPORT_ROW_UPDATED',
   TWO_FACTOR_CODE_REQUESTED = 'TWO_FACTOR_CODE_REQUESTED',
   TWO_FACTOR_METHOD_ADDED = 'TWO_FACTOR_METHOD_ADDED',
   TWO_FACTOR_METHOD_DELETED = 'TWO_FACTOR_METHOD_DELETED',
@@ -4461,6 +4463,8 @@ export type Expense = {
   /** The account from where the expense was paid */
   host?: Maybe<Host>;
   id: Scalars['String']['output'];
+  /** (Optional - applicable to invoice expense only) The invoice file for this expense */
+  invoiceFile?: Maybe<FileInfo>;
   /** Information to display on the invoice. Only visible to user and admins. */
   invoiceInfo?: Maybe<Scalars['String']['output']>;
   items?: Maybe<Array<Maybe<ExpenseItem>>>;
@@ -4606,6 +4610,8 @@ export type ExpenseCreateInput = {
   customData?: InputMaybe<Scalars['JSON']['input']>;
   /** Main title of the expense */
   description: Scalars['String']['input'];
+  /** (Optional - applicable to invoice expense only) The invoice file for this expense */
+  invoiceFile?: InputMaybe<ExpenseAttachedFileInput>;
   /** Custom information to print on the invoice */
   invoiceInfo?: InputMaybe<Scalars['String']['input']>;
   /** The list of items for this expense. Total amount will be computed from them. */
@@ -4661,6 +4667,8 @@ export type ExpenseInviteDraftInput = {
   customData?: InputMaybe<Scalars['JSON']['input']>;
   /** Main title of the expense */
   description?: InputMaybe<Scalars['String']['input']>;
+  /** (Optional - applicable to invoice expense only) The invoice file for this expense */
+  invoiceFile?: InputMaybe<Scalars['JSON']['input']>;
   /** Custom information to print on the invoice */
   invoiceInfo?: InputMaybe<Scalars['String']['input']>;
   /** The list of items for this expense. Total amount will be computed from them. */
@@ -5006,6 +5014,8 @@ export type ExpenseUpdateInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   /** ID of the expense that you are trying to edit */
   id: Scalars['String']['input'];
+  /** (Optional - applicable to invoice expense only) The invoice file for this expense */
+  invoiceFile?: InputMaybe<ExpenseAttachedFileInput>;
   /** Tax ID, VAT number...etc This information will be printed on your invoice. */
   invoiceInfo?: InputMaybe<Scalars['String']['input']>;
   /** The list of items for this expense. Total amount will be computed from them. */
@@ -9687,11 +9697,17 @@ export type PayoutMethod = {
 };
 
 export type PayoutMethodInput = {
+  /** Additional data specific to the payout method type. For custom payout methods (type=OTHER), must contain only `content` (string) and `currency` fields. For other types, may contain type-specific details (e.g., bank account details, PayPal email) */
   data?: InputMaybe<Scalars['JSON']['input']>;
+  /** The unique identifier of the payout method */
   id?: InputMaybe<Scalars['String']['input']>;
+  /** Whether this payout method should be saved for future use */
   isSaved?: InputMaybe<Scalars['Boolean']['input']>;
+  /** The legacy identifier used in older systems */
   legacyId?: InputMaybe<Scalars['Int']['input']>;
+  /** A human-readable name for the payout method */
   name?: InputMaybe<Scalars['String']['input']>;
+  /** The type of payout method (e.g., PayPal, bank transfer) */
   type?: InputMaybe<PayoutMethodType>;
 };
 
@@ -12205,6 +12221,7 @@ export enum UploadedFileKind {
   AGREEMENT_ATTACHMENT = 'AGREEMENT_ATTACHMENT',
   COMMENT = 'COMMENT',
   EXPENSE_ATTACHED_FILE = 'EXPENSE_ATTACHED_FILE',
+  EXPENSE_INVOICE = 'EXPENSE_INVOICE',
   EXPENSE_ITEM = 'EXPENSE_ITEM',
   TIER_LONG_DESCRIPTION = 'TIER_LONG_DESCRIPTION',
   TRANSACTIONS_IMPORT = 'TRANSACTIONS_IMPORT',

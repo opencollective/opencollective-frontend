@@ -283,6 +283,16 @@ const formSchemaQuery = gql`
           size
         }
       }
+      invoiceFile {
+        id
+        url
+        name
+        type
+        size
+        ... on ImageFileInfo {
+          width
+        }
+      }
       items {
         id
         description
@@ -308,6 +318,7 @@ const formSchemaQuery = gql`
       }
       privateMessage
       invoiceInfo
+      reference
       tags
       permissions {
         id
@@ -1566,11 +1577,33 @@ export function useExpenseForm(opts: {
       setFieldValue('inviteeNewIndividual', formOptions.expense?.draft?.payee);
     }
 
+    const expenseAttachedFiles =
+      formOptions.expense.status === ExpenseStatus.DRAFT
+        ? formOptions.expense.draft?.attachedFiles
+        : formOptions.expense.attachedFiles;
+    const invoiceFile =
+      formOptions.expense.status === ExpenseStatus.DRAFT
+        ? formOptions.expense.draft?.invoiceFile
+        : formOptions.expense.invoiceFile;
+    const additionalAttachments = expenseAttachedFiles;
+
+    if (!startOptions.current.duplicateExpense) {
+      if (invoiceFile) {
+        setFieldValue('invoiceFile', invoiceFile.url);
+        setFieldValue('hasInvoiceOption', YesNoOption.YES);
+        setFieldValue('invoiceNumber', formOptions.expense.reference);
+      } else {
+        setFieldValue('hasInvoiceOption', YesNoOption.NO);
+      }
+      if (additionalAttachments) {
+        setFieldValue(
+          'additionalAttachments',
+          additionalAttachments.map(af => af.url),
+        );
+      }
+    }
+
     if (formOptions.expense.status === ExpenseStatus.DRAFT) {
-      setFieldValue(
-        'additionalAttachments',
-        formOptions.expense.draft?.attachedFiles?.map(af => ({ url: af.url })),
-      );
       setFieldValue(
         'expenseItems',
         formOptions.expense.draft?.items?.map(ei => ({
@@ -1585,13 +1618,6 @@ export function useExpenseForm(opts: {
         })),
       );
     } else {
-      if (!startOptions.current.duplicateExpense) {
-        setFieldValue(
-          'additionalAttachments',
-          formOptions.expense.attachedFiles?.map(af => af.url),
-        );
-      }
-
       setFieldValue(
         'expenseItems',
         formOptions.expense.items?.map(ei => ({
