@@ -316,9 +316,12 @@ class ContributionFlowSuccess extends React.Component {
     const platformTipAmount = get(this.props.data, 'order.platformTipAmount.valueInCents', 0);
     const totalAmount = amount + platformTipAmount;
     const currency = get(this.props.data, 'order.amount.currency');
-    const formattedAmount = formatCurrency(totalAmount, currency, { locale: this.props.intl.locale });
+    const formattedAmount = formatCurrency(totalAmount, currency, {
+      locale: this.props.intl.locale,
+      currencyDisplay: 'code',
+    });
 
-    const formatValues = {
+    const formattedValues = {
       account: bankAccount ? formatAccountDetails(bankAccount) : '',
       reference: get(this.props.data, 'order.legacyId', null),
       amount: formattedAmount,
@@ -342,7 +345,7 @@ class ContributionFlowSuccess extends React.Component {
               <FormattedMessage id="NewContributionFlow.PaymentInstructions" defaultMessage="Payment instructions" />
             </H3>
             <Flex mt={2}>
-              <Flex style={{ whiteSpace: 'pre-wrap' }}>{formatManualInstructions(instructions, formatValues)}</Flex>
+              <Flex style={{ whiteSpace: 'pre-wrap' }}>{formatManualInstructions(instructions, formattedValues)}</Flex>
             </Flex>
           </BankTransferInfoContainer>
         )}
