@@ -128,8 +128,6 @@ export type ExpenseFormValues = {
     data?: { currency?: string; accountHolderName?: string } & Record<string, unknown>;
   };
 
-  editingPayoutMethod?: Record<string, ExpenseFormValues['newPayoutMethod']>;
-
   payeeSlug?: string;
   payeeLocation?: LocationInput;
   expenseTypeOption?: ExpenseType;
@@ -508,6 +506,7 @@ const formSchemaQuery = gql`
       name
       data
       isSaved
+      canBeEditedOrDeleted
     }
 
     location {
@@ -957,22 +956,6 @@ function buildFormSchema(
         },
         {
           message: 'Required',
-        },
-      ),
-    editingPayoutMethod: z
-      .object({})
-      .nullish()
-      .refine(
-        () => {
-          if (isEmpty(values.editingPayoutMethod)) {
-            return true;
-          }
-
-          return false;
-        },
-        {
-          message: 'Required',
-          path: ['isEditing'],
         },
       ),
     newPayoutMethod: z.object({
