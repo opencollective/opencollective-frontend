@@ -415,6 +415,10 @@ exports.REWRITES = [
     source: '/applications',
     destination: '/applications',
   },
+  {
+    source: '/services/plaid/oauth/callback',
+    destination: '/services/plaid/oauth/callback',
+  },
   // Robots.txt
   {
     source: '/robots.txt',
