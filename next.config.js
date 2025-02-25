@@ -87,6 +87,14 @@ const nextConfig = {
       );
     }
 
+    if (!dev) {
+      config.plugins.push(
+        new webpack.DefinePlugin({
+          'globalThis.__DEV__': false,
+        }),
+      );
+    }
+
     // Copying cMaps to get non-latin characters to work in PDFs (https://github.com/wojtekmaj/react-pdf#support-for-non-latin-characters)
     config.plugins.push(
       new CopyPlugin({
