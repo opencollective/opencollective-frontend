@@ -1,17 +1,20 @@
 import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import { ceil, floor, isEmpty } from 'lodash';
+import { ceil, floor, isEmpty, omit } from 'lodash';
 import { Ban, Calendar, Coins, ExternalLink, Save } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
+import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
-import { integer } from '../../../../lib/filters/schemas';
+import { integer, isMulti } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import type { Host, TransactionsImport, TransactionsImportRow } from '../../../../lib/graphql/types/v2/schema';
+import type { Account, Host, TransactionsImport, TransactionsImportRow } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nExpenseStatus } from '../../../../lib/i18n/expense';
 import { updateTransactionsImportRows } from './lib/graphql';
 import type { CSVConfig } from './lib/types';
+import type { FilterComponentConfigs, FiltersToVariables } from '@/lib/filters/filter-types';
+import type { SuggestExpenseMatchQueryVariables } from '@/lib/graphql/types/v2/graphql';
 import { TransactionsImportRowAction } from '@/lib/graphql/types/v2/graphql';
 
 import { accountHoverCardFields } from '../../../AccountHoverCard';
@@ -28,6 +31,8 @@ import { useToast } from '../../../ui/useToast';
 import { AmountFilterType } from '../../filters/AmountFilter/schema';
 import { DateFilterType } from '../../filters/DateFilter/schema';
 import { Filterbar } from '../../filters/Filterbar';
+import type { HostedAccountFilterMeta } from '../../filters/HostedAccountFilter';
+import { hostedAccountsFilter } from '../../filters/HostedAccountFilter';
 import * as ExpenseFilters from '../expenses/filters';
 import { HostCreateExpenseModal } from '../expenses/HostCreateExpenseModal';
 
@@ -60,7 +65,24 @@ const NB_EXPENSES_DISPLAYED = 5;
 
 const filtersSchema = ExpenseFilters.schema.extend({
   limit: integer.default(NB_EXPENSES_DISPLAYED),
+  account: isMulti(z.string()).optional(),
 });
+
+type FiltersMeta = ExpenseFilters.FilterMeta & HostedAccountFilterMeta;
+
+const toVariables: FiltersToVariables<z.infer<typeof filtersSchema>, SuggestExpenseMatchQueryVariables, FiltersMeta> = {
+  ...ExpenseFilters.toVariables,
+  account: hostedAccountsFilter.toVariables,
+};
+
+const filters: FilterComponentConfigs<z.infer<typeof filtersSchema>, FiltersMeta> = {
+  searchTerm: ExpenseFilters.filters.searchTerm,
+  account: {
+    ...hostedAccountsFilter.filter,
+    getDisallowEmpty: ({ meta }) => Boolean(meta?.hostedAccounts?.length), // Disable clearing accounts if provided by the parent
+  },
+  ...omit(ExpenseFilters.filters, ['account', 'searchTerm']),
+};
 
 const suggestExpenseMatchQuery = gql`
   query SuggestExpenseMatch(
@@ -74,6 +96,7 @@ const suggestExpenseMatchQuery = gql`
     $dateFrom: DateTime
     $dateTo: DateTime
     $payoutMethodType: PayoutMethodType
+    $account: [AccountReferenceInput!]
   ) {
     expenses(
       host: { id: $hostId }
@@ -86,6 +109,8 @@ const suggestExpenseMatchQuery = gql`
       offset: $offset
       limit: $limit
       payoutMethodType: $payoutMethodType
+      accounts: $account
+      includeChildrenExpenses: true
     ) {
       totalCount
       offset
@@ -150,6 +175,7 @@ const getAmountRangeFilter = (valueInCents: number) => {
 };
 
 export const MatchExpenseDialog = ({
+  accounts,
   host,
   row,
   transactionsImport,
@@ -157,9 +183,10 @@ export const MatchExpenseDialog = ({
   onCloseFocusRef,
   ...props
 }: {
-  host: Host;
+  accounts: Pick<Account, 'slug'>[];
+  host: Pick<Host, 'id'> & React.ComponentProps<typeof HostCreateExpenseModal>['host'];
   row: TransactionsImportRow;
-  transactionsImport: TransactionsImport;
+  transactionsImport: Pick<TransactionsImport, 'id' | 'source' | 'csvConfig'>;
   onCloseFocusRef: React.MutableRefObject<HTMLElement>;
 } & BaseModalProps) => {
   const { toast } = useToast();
@@ -170,26 +197,34 @@ export const MatchExpenseDialog = ({
   const defaultFilterValues = React.useMemo(
     () => ({
       amount: getAmountRangeFilter(row.amount.valueInCents),
+      account: accounts?.map(account => account.slug),
     }),
-    [row],
+    [row, accounts],
   );
+
+  const queryFilterMeta = React.useMemo(
+    () => ({
+      currency: row.amount.currency,
+      hostSlug: host.slug,
+      hostedAccounts: accounts,
+      disableHostedAccountsSearch: Boolean(accounts?.length),
+    }),
+    [row, host, accounts],
+  );
+
   const queryFilter = useQueryFilter({
     schema: filtersSchema,
     skipRouter: true,
-    toVariables: ExpenseFilters.toVariables,
-    filters: ExpenseFilters.filters,
-    meta: { currency: row.amount.currency },
+    toVariables: toVariables,
+    filters: filters,
+    meta: queryFilterMeta,
     defaultFilterValues,
   });
 
   const [updateRows] = useMutation(updateTransactionsImportRows, { context: API_V2_CONTEXT });
   const { data, loading, error } = useQuery(suggestExpenseMatchQuery, {
     context: API_V2_CONTEXT,
-    variables: {
-      ...queryFilter.variables,
-      hostId: host.id,
-      payoutMethodType: null,
-    },
+    variables: { ...queryFilter.variables, hostId: host.id },
     fetchPolicy: 'cache-and-network',
   });
 

@@ -14,6 +14,9 @@ export const ACCEPTED_NUMBER_FORMATS = ['1,000.00', '1.000,00'] as const;
 
 export const CSV_DELIMITERS = [',', ';', '\t', '|'] as const;
 
+// Must match the one defined in api/server/graphql/v2/object/TransactionsImportRow.ts
+export const DEFAULT_ASSIGNMENT_ACCOUNT_ID = '__default__';
+
 type CommonColumnSettings = {
   target: string;
 };

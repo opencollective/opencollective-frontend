@@ -34,6 +34,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../ui/Tabs';
 import { useToast } from '../../../ui/useToast';
 
 import { SyncPlaidAccountButton } from './SyncPlaidAccountButton';
+import { TransactionsImportAssignmentsForm } from './TransactionsImportAssignmentsForm';
 
 const deleteTransactionsImportMutation = gql`
   mutation DeleteTransactionsImport($id: NonEmptyString!) {
@@ -63,20 +64,24 @@ export default function TransactionsImportSettingsModal({
   transactionsImport,
   plaidStatus,
   onOpenChange,
-  onReconnectClick,
+  showPlaidDialog,
   isOpen,
   hasRequestedSync,
   setHasRequestedSync,
 }: {
   onOpenChange: (isOpen: boolean) => void;
   isOpen: boolean;
-  onReconnectClick: () => void;
+  showPlaidDialog: () => void;
   plaidStatus: PlaidDialogStatus;
   hasRequestedSync: boolean;
   setHasRequestedSync: (hasRequestedSync: boolean) => void;
-  transactionsImport: Pick<TransactionsImport, 'id' | 'source' | 'name' | 'type' | 'isSyncing' | 'lastSyncAt'> & {
-    connectedAccount?: Pick<TransactionsImport['connectedAccount'], 'id'>;
-  };
+  transactionsImport: Pick<
+    TransactionsImport,
+    'id' | 'source' | 'name' | 'type' | 'isSyncing' | 'lastSyncAt' | 'plaidAccounts'
+  > &
+    React.ComponentProps<typeof TransactionsImportAssignmentsForm>['transactionsImport'] & {
+      connectedAccount?: Pick<TransactionsImport['connectedAccount'], 'id'>;
+    };
 }) {
   const router = useRouter();
   const { toast } = useToast();
@@ -124,16 +129,19 @@ export default function TransactionsImportSettingsModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[460px]">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">
             <FormattedMessage defaultMessage="Transaction Import Settings" id="38fPNE" />
           </DialogTitle>
         </DialogHeader>
         <Tabs defaultValue="general" className="w-full">
-          <TabsList className="mb-3 grid w-full grid-cols-2">
+          <TabsList className="mb-3 grid w-full grid-cols-3">
             <TabsTrigger value="general">
               <FormattedMessage id="settings.general" defaultMessage="General" />
+            </TabsTrigger>
+            <TabsTrigger value="accounts">
+              <FormattedMessage id="FvanT6" defaultMessage="Accounts" />
             </TabsTrigger>
             <TabsTrigger value="advanced">
               <FormattedMessage id="editCollective.menu.advanced" defaultMessage="Advanced" />
@@ -192,12 +200,21 @@ export default function TransactionsImportSettingsModal({
                       <FormattedMessage defaultMessage="Cancel" id="actions.cancel" />
                     </Button>
                     <Button loading={isSubmitting} type="submit" className="flex-1" disabled={!dirty}>
-                      <FormattedMessage id="SaveChanges" defaultMessage="Save Changes" />
+                      <FormattedMessage id="save" defaultMessage="Save" />
                     </Button>
                   </div>
                 </Form>
               )}
             </Formik>
+          </TabsContent>
+          <TabsContent value="accounts" className="px-1">
+            <TransactionsImportAssignmentsForm
+              transactionsImport={transactionsImport}
+              plaidStatus={plaidStatus}
+              onOpenChange={onOpenChange}
+              showPlaidDialog={showPlaidDialog}
+              isDeleting={isDeleting}
+            />
           </TabsContent>
           <TabsContent value="advanced">
             {transactionsImport.type === 'PLAID' && transactionsImport.connectedAccount && (
@@ -215,7 +232,7 @@ export default function TransactionsImportSettingsModal({
                   <Button
                     loading={plaidStatus === 'loading' || plaidStatus === 'active'}
                     disabled={plaidStatus === 'disabled' || isDeleting}
-                    onClick={onReconnectClick}
+                    onClick={showPlaidDialog}
                     variant="outline"
                     className="w-full"
                   >

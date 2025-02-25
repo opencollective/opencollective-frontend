@@ -1,11 +1,12 @@
 import React from 'react';
 import { gql, useApolloClient, useMutation, useQuery } from '@apollo/client';
-import { ceil, floor, isEmpty } from 'lodash';
+import { ceil, floor, isEmpty, omit } from 'lodash';
 import { ArrowLeft, ArrowRight, Ban, Calendar, Coins, ExternalLink, Save } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
+import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
-import { integer } from '../../../../lib/filters/schemas';
+import { integer, isMulti } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type {
   Account,
@@ -39,6 +40,7 @@ import { AmountFilterType } from '../../filters/AmountFilter/schema';
 import { DateFilterType } from '../../filters/DateFilter/schema';
 import { expectedFundsFilter } from '../../filters/ExpectedFundsFilter';
 import { Filterbar } from '../../filters/Filterbar';
+import { hostedAccountsFilter } from '../../filters/HostedAccountFilter';
 import * as ContributionFilters from '../contributions/filters';
 
 import { FilterWithRawValueButton } from './FilterWithRawValueButton';
@@ -71,7 +73,22 @@ const NB_CONTRIBUTIONS_DISPLAYED = 5;
 const filtersSchema = ContributionFilters.schema.extend({
   limit: integer.default(NB_CONTRIBUTIONS_DISPLAYED),
   expectedFundsFilter: expectedFundsFilter.schema.default(null), // To make sure the filter is displayed even when "Expected Funds" is set to "All" (default)
+  account: isMulti(z.string()).optional(),
 });
+
+const toVariables = {
+  ...ContributionFilters.toVariables,
+  account: hostedAccountsFilter.toVariables,
+};
+
+const filters = {
+  searchTerm: ContributionFilters.filters.searchTerm,
+  account: {
+    ...hostedAccountsFilter.filter,
+    getDisallowEmpty: ({ meta }) => Boolean(meta?.hostedAccounts?.length), // Disable clearing accounts if provided by the parent
+  },
+  ...omit(ContributionFilters.filters, ['account', 'searchTerm']),
+};
 
 const suggestContributionMatchQuery = gql`
   query SuggestContributionMatch(
@@ -90,6 +107,7 @@ const suggestContributionMatchQuery = gql`
     $expectedDateFrom: DateTime
     $expectedDateTo: DateTime
     $expectedFundsFilter: ExpectedFundsFilter
+    $account: [AccountReferenceInput!]
   ) {
     account(id: $hostId) {
       id
@@ -111,6 +129,8 @@ const suggestContributionMatchQuery = gql`
         limit: $limit
         paymentMethod: $paymentMethod
         expectedFundsFilter: $expectedFundsFilter
+        hostedAccounts: $account
+        includeChildrenAccounts: true
       ) {
         totalCount
         offset
@@ -200,11 +220,13 @@ export const MatchContributionDialog = ({
   transactionsImport,
   setOpen,
   onAddFundsClick,
+  accounts,
   ...props
 }: {
+  accounts: Pick<Account, 'id' | 'slug'>[];
   host: Account;
   row: TransactionsImportRow;
-  transactionsImport: TransactionsImport;
+  transactionsImport: Pick<TransactionsImport, 'id' | 'source' | 'csvConfig'>;
   onAddFundsClick: () => void;
 } & BaseModalProps) => {
   const client = useApolloClient();
@@ -218,15 +240,26 @@ export const MatchContributionDialog = ({
       amount: getAmountRangeFilter(row.amount.valueInCents),
       status: [OrderStatus.PENDING],
       expectedFundsFilter: null,
+      account: accounts?.map(account => account.slug),
     }),
-    [row],
+    [row, accounts],
   );
+  const queryFilterMeta = React.useMemo(
+    () => ({
+      currency: row.amount.currency,
+      hostSlug: host.slug,
+      hostedAccounts: accounts,
+      disableHostedAccountsSearch: Boolean(accounts?.length),
+    }),
+    [row, host, accounts],
+  );
+
   const queryFilter = useQueryFilter({
     schema: filtersSchema,
     skipRouter: true,
-    toVariables: ContributionFilters.toVariables,
-    filters: ContributionFilters.filters,
-    meta: { currency: row.amount.currency },
+    toVariables: toVariables,
+    filters: filters,
+    meta: queryFilterMeta,
     defaultFilterValues,
   });
 

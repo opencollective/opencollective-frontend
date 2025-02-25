@@ -14,7 +14,7 @@ export const TransactionsImportRowDetailsAccordion = ({
   transactionsImportRow,
   className,
 }: {
-  transactionsImportRow: TransactionsImportRow;
+  transactionsImportRow: Pick<TransactionsImportRow, 'amount' | 'date' | 'rawValue'>;
   className?: string;
 }) => {
   return (
