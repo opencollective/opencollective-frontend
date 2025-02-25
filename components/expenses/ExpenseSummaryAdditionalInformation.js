@@ -279,7 +279,7 @@ const ExpenseSummaryAdditionalInformation = ({
             <EditExpenseDialog
               field={'payoutMethod'}
               expense={expense}
-              title={intl.formatMessage({ defaultMessage: 'Edit payout method', id: 'expense.editPayoutMethod' })}
+              title={intl.formatMessage({ defaultMessage: 'Edit payout method', id: 'EditPayoutMethod' })}
               dialogContentClassName="sm:max-w-xl"
             />
           )}
