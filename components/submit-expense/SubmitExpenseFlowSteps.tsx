@@ -30,12 +30,7 @@ export enum Step {
 const StepValues: Record<Step, Path<ExpenseFormValues>[]> = {
   [Step.WHO_IS_PAYING]: ['accountSlug'],
   [Step.WHO_IS_GETTING_PAID]: ['payeeSlug', 'inviteeNewIndividual', 'inviteeNewOrganization'],
-  [Step.PAYOUT_METHOD]: [
-    'payoutMethodId',
-    'newPayoutMethod',
-    'payoutMethodNameDiscrepancyReason',
-    'editingPayoutMethod',
-  ],
+  [Step.PAYOUT_METHOD]: ['payoutMethodId', 'newPayoutMethod', 'payoutMethodNameDiscrepancyReason'],
   [Step.TYPE_OF_EXPENSE]: [
     'expenseTypeOption',
     'acknowledgedCollectiveInvoiceExpensePolicy',
@@ -67,7 +62,7 @@ export const StepTitles: Record<Step, MessageDescriptor> = {
   }),
   [Step.PAYOUT_METHOD]: defineMessage({
     defaultMessage: 'Payout Method',
-    id: 'SecurityScope.PayoutMethod',
+    id: 'PayoutMethod',
   }),
   [Step.TYPE_OF_EXPENSE]: defineMessage({
     defaultMessage: 'Type',

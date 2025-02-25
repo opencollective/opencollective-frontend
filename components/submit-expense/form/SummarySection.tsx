@@ -512,7 +512,7 @@ const PayoutMethodSummarySection = React.memo(function PayoutMethodSummarySectio
   return (
     <React.Fragment>
       <div className="font-bold">
-        <FormattedMessage defaultMessage="Payout Method" id="SecurityScope.PayoutMethod" />
+        <FormattedMessage defaultMessage="Payout Method" id="PayoutMethod" />
       </div>
       {!props.isAdminOfPayee &&
       !(props.expense?.status === ExpenseStatus.DRAFT && !props.loggedInAccount) &&
