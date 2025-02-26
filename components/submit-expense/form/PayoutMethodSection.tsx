@@ -215,7 +215,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
   );
 }, getFormProps);
 
-export function generatePayoutMethodName(type, data) {
+function generatePayoutMethodName(type, data) {
   switch (type) {
     case PayoutMethodType.PAYPAL:
       return data.email;
