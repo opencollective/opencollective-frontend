@@ -13,11 +13,10 @@ import Container from '../../../Container';
 import SettingsSectionTitle from '../../../edit-collective/sections/SettingsSectionTitle';
 import { Box, Flex } from '../../../Grid';
 import MessageBox from '../../../MessageBox';
-import StyledButton from '../../../StyledButton';
-import StyledHr from '../../../StyledHr';
 import StyledInputField from '../../../StyledInputField';
 import StyledSelect from '../../../StyledSelect';
 import { H2, P, Span } from '../../../Text';
+import { Button } from '../../../ui/Button';
 import { useToast } from '../../../ui/useToast';
 
 import { useReceipt } from './hooks/useReceipt';
@@ -136,67 +135,40 @@ const InvoicesReceipts = ({ account }) => {
           {i18nGraphqlException(intl, error)}
         </MessageBox>
       )}
-      <Flex flexWrap="wrap" flexDirection="column" width="100%">
+      <div className="flex flex-col">
         <ReceiptTemplateForm receipt={defaultReceipt} onChange={onChangeField} />
-        <SettingsSectionTitle>
-          <FormattedMessage defaultMessage="Alternative receipt template" id="CJtvlX" />
-        </SettingsSectionTitle>
-        <P>
-          <FormattedMessage
-            defaultMessage="You can create an additional receipt for you to use as a non-tax-deductible payments for cases like event tickets, merch, or services."
-            id="MNi3fa"
-          />
-        </P>
-        {!showAlternativeReceiptsSection && (
-          <StyledButton
-            buttonStyle="secondary"
-            mt="24px"
-            mb="24px"
-            maxWidth={209}
-            pt="7px"
-            pb="7px"
-            pl="18px"
-            pr="16px"
-            onClick={() => setShowAlternativeReceiptsSection(true)}
-          >
-            <Flex fontSize="14px" fontWeight={500} lineHeight="18px" color="#1869F5">
-              <Box pr="10px">
-                <Plus size={17} />
-              </Box>
+        <div>
+          <SettingsSectionTitle>
+            <FormattedMessage defaultMessage="Alternative receipt template" id="CJtvlX" />
+          </SettingsSectionTitle>
+          <P>
+            <FormattedMessage
+              defaultMessage="You can create an additional receipt for you to use as a non-tax-deductible payments for cases like event tickets, merch, or services."
+              id="MNi3fa"
+            />
+          </P>
+        </div>
+        <div className="mt-5 mb-10">
+          {!showAlternativeReceiptsSection && (
+            <Button size="sm" onClick={() => setShowAlternativeReceiptsSection(true)}>
+              <Plus size={16} />
               <FormattedMessage defaultMessage="Add alternative receipt" id="7It+w9" />
-            </Flex>
-          </StyledButton>
-        )}
-        {showAlternativeReceiptsSection && (
-          <Container mt="26px" mb="24px">
-            <Flex flexWrap="wrap" flexDirection="column" width="100%">
-              <ReceiptTemplateForm receipt={alternativeReceipt} onChange={onChangeField} />
-            </Flex>
-            <StyledButton
-              buttonStyle="danger"
-              borderColor="#CC2955"
-              backgroundColor="white"
-              background="none"
-              mt="24px"
-              maxWidth={225}
-              pt="7px"
-              pb="7px"
-              pl="18px"
-              pr="16px"
-              onClick={() => deleteAlternativeReceipt()}
-            >
-              <Span display="flex" fontSize="14px" fontWeight={500} lineHeight="18px" color="#CC2955">
-                <Box pr="10px">
-                  <Trash size={17} />
-                </Box>
+            </Button>
+          )}
+          {showAlternativeReceiptsSection && (
+            <React.Fragment>
+              <Flex flexWrap="wrap" flexDirection="column" width="100%">
+                <ReceiptTemplateForm receipt={alternativeReceipt} onChange={onChangeField} />
+              </Flex>
+              <Button onClick={() => deleteAlternativeReceipt()} variant="outlineDestructive" size="sm" className="">
+                <Trash size={17} />
                 <FormattedMessage defaultMessage="Delete alternative receipt" id="aXAB2R" />
-              </Span>
-            </StyledButton>
-          </Container>
-        )}
-        <StyledHr borderColor="#C3C6CB" />
+              </Button>
+            </React.Fragment>
+          )}
+        </div>
         {showAlternativeReceiptsSection && (
-          <MessageBox type="info" mt="24px">
+          <MessageBox type="info" mb={2}>
             <Span fontSize="13px" fontWeight={400} lineHeight="20px">
               <FormattedMessage
                 defaultMessage="Please advise your Collectives to select the correct receipt setting for any tiers where the alternative receipt should be used, or manage related contributions through the Add Funds process, where you as the Host Admin can select the correct receipt."
@@ -205,10 +177,7 @@ const InvoicesReceipts = ({ account }) => {
             </Span>
           </MessageBox>
         )}
-        <StyledButton
-          buttonStyle="primary"
-          mt="24px"
-          maxWidth={200}
+        <Button
           loading={loading}
           disabled={!isFieldChanged}
           onClick={() => {
@@ -233,8 +202,8 @@ const InvoicesReceipts = ({ account }) => {
           ) : (
             <FormattedMessage id="save" defaultMessage="Save" />
           )}
-        </StyledButton>
-      </Flex>
+        </Button>
+      </div>
     </Container>
   );
 };
