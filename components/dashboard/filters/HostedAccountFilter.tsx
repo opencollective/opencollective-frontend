@@ -8,20 +8,10 @@ import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import type { AccountHoverCardFieldsFragment, AccountQuery } from '../../../lib/graphql/types/v2/graphql';
 import type { Account } from '../../../lib/graphql/types/v2/schema';
 
-import { AccountHoverCard, accountHoverCardFields } from '../../AccountHoverCard';
+import { AccountHoverCard, accountHoverCardFields, accountHoverCardQuery } from '../../AccountHoverCard';
 import Avatar from '../../Avatar';
 
 import ComboSelectFilter from './ComboSelectFilter';
-
-const accountQuery = gql`
-  query Account($slug: String!) {
-    account(slug: $slug) {
-      id
-      ...AccountHoverCardFields
-    }
-  }
-  ${accountHoverCardFields}
-`;
 
 const hostedAccountFilterSearchQuery = gql`
   query HostedAccountFilterSearch($searchTerm: String, $hostSlug: String, $orderBy: OrderByInput) {
@@ -44,7 +34,7 @@ export const AccountRenderer = ({
   };
   inOptionsList?: boolean; // For positioning the HoverCard to the right to prevent blocking options list
 }) => {
-  const { data } = useQuery<AccountQuery>(accountQuery, {
+  const { data } = useQuery<AccountQuery>(accountHoverCardQuery, {
     variables: { slug: account.slug },
     fetchPolicy: 'cache-first',
     context: API_V2_CONTEXT,

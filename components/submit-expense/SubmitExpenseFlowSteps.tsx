@@ -150,6 +150,9 @@ export function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
     if (step === Step.EXPENSE_CATEGORY) {
       return form.options.isAccountingCategoryRequired && form.options.accountingCategories?.length;
     }
+    if (step === Step.WHO_IS_PAYING) {
+      return form.options.canChangeAccount;
+    }
 
     return true;
   });
