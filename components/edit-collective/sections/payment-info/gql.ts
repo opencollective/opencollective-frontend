@@ -11,7 +11,7 @@ export const PayoutMethodFragment = gql`
   }
 `;
 
-export const PaymentMethodFragment = gql`
+const PaymentMethodFragment = gql`
   fragment PaymentMethodFields on PaymentMethod {
     id
     legacyId
