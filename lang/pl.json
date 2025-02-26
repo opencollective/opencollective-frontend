@@ -1535,6 +1535,7 @@
   "ExpenseForm.StepPayeeInvoice": "Informacje o odbiorcy",
   "ExpenseForm.Submit": "Prześlij wydatki",
   "ExpenseForm.SubmitRequest": "Wyślij wniosek",
+  "ExpenseForm.SubmitTo": "Submit expense to {account}",
   "ExpenseForm.Type.Request": "Wniosek o dotację",
   "ExpenseFormPayeeStep.PrivateInfo": "This information is private",
   "ExpenseFormPayeeStep.PrivateInfoDetails": "The payout method details are private and can only be viewed by the Payee and the Host admins.",

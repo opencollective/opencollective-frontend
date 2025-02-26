@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 import type { Path, PathValue } from 'dot-path-value';
 import type { FieldInputProps, FormikErrors, FormikHelpers } from 'formik';
 import { useFormik } from 'formik';
-import { isEmpty, isEqual, isNull, omit, pick, set, uniqBy } from 'lodash';
+import { isEmpty, isEqual, isNull, isUndefined, omit, pick, set, uniqBy } from 'lodash';
 import memoizeOne from 'memoize-one';
 import type { IntlShape } from 'react-intl';
 import { useIntl } from 'react-intl';
@@ -1272,10 +1272,14 @@ async function buildFormOptions(
     const payeeHost = payee && 'host' in payee ? payee.host : null;
     const submitter = options.expense?.submitter || query.data?.submitter;
 
-    if (account && options.expense?.status === ExpenseStatus.DRAFT) {
-      options.canChangeAccount = false;
+    if (isUndefined(startOptions.canChangeAccount)) {
+      if (account && options.expense?.status === ExpenseStatus.DRAFT) {
+        options.canChangeAccount = false;
+      } else {
+        options.canChangeAccount = true;
+      }
     } else {
-      options.canChangeAccount = true;
+      options.canChangeAccount = startOptions.canChangeAccount;
     }
 
     if (recentlySubmittedExpenses) {
@@ -1450,6 +1454,7 @@ type ExpenseFormStartOptions = {
   draftKey?: string;
   isInlineEdit?: boolean;
   pickSchemaFields?: Record<string, boolean>;
+  canChangeAccount?: boolean;
 };
 
 export function useExpenseForm(opts: {

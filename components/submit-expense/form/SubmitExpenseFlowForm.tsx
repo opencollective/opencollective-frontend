@@ -50,7 +50,9 @@ export function SubmitExpenseFlowForm(props: SubmitExpenseFlowFormProps) {
           onExpenseInviteDeclined={props.onExpenseInviteDeclined}
         />
       )}
-      <WhoIsPayingSection inViewChange={onInViewChange} {...WhoIsPayingSection.getFormProps(form)} />
+      {form.options.canChangeAccount && (
+        <WhoIsPayingSection inViewChange={onInViewChange} {...WhoIsPayingSection.getFormProps(form)} />
+      )}
       <WhoIsGettingPaidSection inViewChange={onInViewChange} {...WhoIsGettingPaidSection.getFormProps(form)} />
       <PayoutMethodSection inViewChange={onInViewChange} {...PayoutMethodSection.getFormProps(form)} />
       <TypeOfExpenseSection inViewChange={onInViewChange} {...TypeOfExpenseSection.getFormProps(form)} />
