@@ -18,6 +18,7 @@ export const accountExpensesQuery = gql`
     $status: [ExpenseStatusFilter]
     $minAmount: Int
     $maxAmount: Int
+    $payoutMethod: PayoutMethodReferenceInput
     $payoutMethodType: PayoutMethodType
     $dateFrom: DateTime
     $dateTo: DateTime
@@ -41,6 +42,7 @@ export const accountExpensesQuery = gql`
       status: $status
       minAmount: $minAmount
       maxAmount: $maxAmount
+      payoutMethod: $payoutMethod
       payoutMethodType: $payoutMethodType
       dateFrom: $dateFrom
       dateTo: $dateTo

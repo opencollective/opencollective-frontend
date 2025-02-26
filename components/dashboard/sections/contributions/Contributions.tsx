@@ -236,7 +236,7 @@ const dashboardContributionsQuery = gql`
     $includeIncognito: Boolean
     $minAmount: Int
     $maxAmount: Int
-    $paymentMethod: PaymentMethodReferenceInput
+    $paymentMethod: [PaymentMethodReferenceInput]
     $includeHostedAccounts: Boolean!
     $includeChildrenAccounts: Boolean
     $dateFrom: DateTime
