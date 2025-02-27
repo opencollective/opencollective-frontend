@@ -1535,6 +1535,7 @@
   "ExpenseForm.StepPayeeInvoice": "수취인 정보",
   "ExpenseForm.Submit": "경비 제출",
   "ExpenseForm.SubmitRequest": "요청 제출",
+  "ExpenseForm.SubmitTo": "Submit expense to {account}",
   "ExpenseForm.Type.Request": "Request Grant",
   "ExpenseFormPayeeStep.PrivateInfo": "This information is private",
   "ExpenseFormPayeeStep.PrivateInfoDetails": "The payout method details are private and can only be viewed by the Payee and the Host admins.",

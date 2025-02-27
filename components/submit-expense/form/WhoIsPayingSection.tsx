@@ -17,6 +17,7 @@ import { memoWithGetFormProps } from './helper';
 
 type WhoIsPayingSectionProps = {
   inViewChange: (inView: boolean, entry: IntersectionObserverEntry) => void;
+  lockPayee?: boolean;
 } & ReturnType<typeof getFormProps>;
 
 function getFormProps(form: ExpenseForm) {
@@ -36,7 +37,6 @@ export const WhoIsPayingSection = memoWithGetFormProps(function WhoIsPayingSecti
   const [isLoading, setIsLoading] = React.useState(true);
   const lastSubmittedExpense = props.recentlySubmittedExpenses?.nodes?.at?.(0);
   const lastSubmittedAccount = lastSubmittedExpense && lastSubmittedExpense.account;
-
   const recentlySubmittedAccounts = React.useMemo(
     () => uniqBy((props.recentlySubmittedExpenses?.nodes || []).map(e => e?.account).filter(Boolean), 'slug'),
     [props.recentlySubmittedExpenses],

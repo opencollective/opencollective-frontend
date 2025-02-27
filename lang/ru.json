@@ -1535,6 +1535,7 @@
   "ExpenseForm.StepPayeeInvoice": "Информация о получателе",
   "ExpenseForm.Submit": "Отправить расходы",
   "ExpenseForm.SubmitRequest": "Отправить расходы",
+  "ExpenseForm.SubmitTo": "Submit expense to {account}",
   "ExpenseForm.Type.Request": "Запросить грант",
   "ExpenseFormPayeeStep.PrivateInfo": "This information is private",
   "ExpenseFormPayeeStep.PrivateInfoDetails": "The payout method details are private and can only be viewed by the Payee and the Host admins.",

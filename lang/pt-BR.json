@@ -1535,6 +1535,7 @@
   "ExpenseForm.StepPayeeInvoice": "Informações do beneficiário",
   "ExpenseForm.Submit": "Enviar despesa",
   "ExpenseForm.SubmitRequest": "Enviar solicitação",
+  "ExpenseForm.SubmitTo": "Submit expense to {account}",
   "ExpenseForm.Type.Request": "Solicitação de concessão",
   "ExpenseFormPayeeStep.PrivateInfo": "Essa informação é privada",
   "ExpenseFormPayeeStep.PrivateInfoDetails": "Os detalhes do método de pagamento são privados e só podem ser vistos pelo beneficiário e os administradores.",

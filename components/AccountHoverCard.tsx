@@ -52,6 +52,16 @@ export const accountHoverCardFields = gql`
   }
 `;
 
+export const accountHoverCardQuery = gql`
+  query Account($slug: String!) {
+    account(slug: $slug) {
+      id
+      ...AccountHoverCardFields
+    }
+  }
+  ${accountHoverCardFields}
+`;
+
 type AccountHoverCardProps = {
   trigger: React.ReactNode;
   account: {

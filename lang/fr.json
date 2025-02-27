@@ -1535,6 +1535,7 @@
   "ExpenseForm.StepPayeeInvoice": "Informations sur le bénéficiaire",
   "ExpenseForm.Submit": "Envoyer une dépense",
   "ExpenseForm.SubmitRequest": "Soumettre une requête",
+  "ExpenseForm.SubmitTo": "Submit expense to {account}",
   "ExpenseForm.Type.Request": "Demande de subvention",
   "ExpenseFormPayeeStep.PrivateInfo": "Cette information est privée",
   "ExpenseFormPayeeStep.PrivateInfoDetails": "Les détails de la méthode de paiement sont privés et ne peuvent être consultés que par le bénéficiaire et les administrateurs de l'hôte.",
