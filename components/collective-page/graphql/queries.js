@@ -16,14 +16,6 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
       backgroundImage
       backgroundImageUrl
       twitterHandle
-      duplicatedCollectives(limit: 1) {
-        collectives {
-          id
-          slug
-          name
-          type
-        }
-      }
       repositoryUrl
       website
       socialLinks {
@@ -111,10 +103,6 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
           id
           hostFees
           hostFeeSharePercent
-        }
-        features {
-          id
-          VIRTUAL_CARDS
         }
         policies {
           id

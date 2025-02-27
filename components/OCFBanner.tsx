@@ -82,7 +82,7 @@ const OCFCollectiveAdminsBannerMessage = ({ account, newAccount, isCentered, hid
   );
 };
 
-export const getOCFBannerMessage = ({
+const getOCFBannerMessage = ({
   isAdmin,
   account,
   newAccount,
