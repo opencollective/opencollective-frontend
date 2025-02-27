@@ -9,7 +9,6 @@ import { moneyCanMoveFromEvent } from '../../lib/events';
 
 import Link from '../Link';
 import NotificationBar, { NotificationBarButton, NotificationBarLink } from '../NotificationBar';
-import { getOCFBannerMessage } from '../OCFBanner';
 import SendMoneyToCollectiveBtn from '../SendMoneyToCollectiveBtn';
 
 import PendingApplicationActions from './PendingApplicationActions';
@@ -227,22 +226,6 @@ const getNotification = (intl, status, collective, host, LoggedInUser, refetch) 
           .
         </React.Fragment>
       ),
-    };
-  } else if (checkIfOCF(collective.host)) {
-    const duplicateCollective = get(collective, 'duplicatedCollectives.collectives.0');
-    const isAdmin = LoggedInUser?.isAdminOfCollectiveOrHost(collective);
-    const { title, severity, message } = getOCFBannerMessage({
-      isAdmin,
-      account: collective,
-      newAccount: duplicateCollective,
-      isCentered: true,
-      hideNextSteps: true,
-    });
-    return {
-      type: severity,
-      title,
-      description: message,
-      isSticky: true,
     };
   }
 };

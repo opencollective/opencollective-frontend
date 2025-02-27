@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { Envelope } from '@styled-icons/boxicons-regular/Envelope';
 import { Planet } from '@styled-icons/boxicons-regular/Planet';
 import { Receipt } from '@styled-icons/boxicons-regular/Receipt';
-import { CreditCard } from '@styled-icons/fa-solid/CreditCard';
 import { MoneyCheckAlt } from '@styled-icons/fa-solid/MoneyCheckAlt';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
 import { AttachMoney } from '@styled-icons/material/AttachMoney';
@@ -22,13 +21,10 @@ import { getCollectivePageRoute, getDashboardRoute } from '../../lib/url-helpers
 import ActionButton from '../ActionButton';
 import AddFundsBtn from '../AddFundsBtn';
 import ApplyToHostBtn from '../ApplyToHostBtn';
-import AssignVirtualCardBtn from '../AssignVirtualCardBtn';
 import ContactCollectiveBtn from '../ContactCollectiveBtn';
 import Container from '../Container';
-import CreateVirtualCardBtn from '../CreateVirtualCardBtn';
 import { Box, Flex } from '../Grid';
 import Link from '../Link';
-import RequestVirtualCardBtn from '../RequestVirtualCardBtn';
 import StyledButton from '../StyledButton';
 import { Dropdown, DropdownArrow, DropdownContent } from '../StyledDropdown';
 import StyledHr from '../StyledHr';
@@ -37,7 +33,6 @@ import { Span } from '../Text';
 
 import { NAVBAR_ACTION_TYPE } from './menu';
 
-//  Styled components
 const MenuItem = styled('li')`
   display: flex;
   align-items: center;
@@ -332,60 +327,6 @@ const CollectiveNavbarActionsMenu = ({
                           buttonProps={{ isBorderless: true, p: ITEM_PADDING }}
                         />
                       </MenuItem>
-                    )}
-                    {callsToAction.createVirtualCard && collective.isApproved && (
-                      <CreateVirtualCardBtn collective={collective} host={collective.host}>
-                        {btnProps => (
-                          <MenuItem
-                            py={1}
-                            isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.CREATE_CARD}
-                          >
-                            <StyledButton borderRadius={0} p={ITEM_PADDING} isBorderless {...btnProps}>
-                              <CreditCard size="20px" />
-                              <Span>
-                                <FormattedMessage defaultMessage="Create a Card" id="xLybrm" />
-                              </Span>
-                            </StyledButton>
-                          </MenuItem>
-                        )}
-                      </CreateVirtualCardBtn>
-                    )}
-                    {callsToAction.assignVirtualCard && collective.isApproved && (
-                      <AssignVirtualCardBtn collective={collective} host={collective.host}>
-                        {btnProps => (
-                          <MenuItem
-                            py={1}
-                            isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ASSIGN_CARD}
-                          >
-                            <StyledButton borderRadius={0} p={ITEM_PADDING} isBorderless {...btnProps}>
-                              <CreditCard size="20px" />
-                              <Span>
-                                <FormattedMessage id="menu.assignCard" defaultMessage="Assign a Card" />
-                              </Span>
-                            </StyledButton>
-                          </MenuItem>
-                        )}
-                      </AssignVirtualCardBtn>
-                    )}
-                    {callsToAction.requestVirtualCard && collective.isApproved && (
-                      <RequestVirtualCardBtn collective={collective} host={collective.host}>
-                        {btnProps => (
-                          <MenuItem
-                            py={1}
-                            isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.ASSIGN_CARD}
-                          >
-                            <StyledButton borderRadius={0} p={ITEM_PADDING} isBorderless {...btnProps}>
-                              <CreditCard size="20px" />
-                              <Span>
-                                <FormattedMessage
-                                  id="Collective.VirtualCards.RequestCard"
-                                  defaultMessage="Request a Card"
-                                />
-                              </Span>
-                            </StyledButton>
-                          </MenuItem>
-                        )}
-                      </RequestVirtualCardBtn>
                     )}
                   </Box>
                 </DropdownContent>

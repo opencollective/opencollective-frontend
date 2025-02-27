@@ -278,20 +278,12 @@ const getHasContribute = (collective, sections, isAdmin) => {
   );
 };
 
-const getDefaultCallsToActions = (
-  collective,
-  sections,
-  isAdmin,
-  isAccountant,
-  isHostAdmin,
-  LoggedInUser,
-  isAllowedAddFunds,
-) => {
+const getDefaultCallsToActions = (collective, sections, isAdmin, isAccountant, LoggedInUser, isAllowedAddFunds) => {
   if (!collective) {
     return {};
   }
 
-  const { features, host } = collective;
+  const { features } = collective;
   return {
     hasContribute: getHasContribute(collective, sections, isAdmin),
     hasContact: isFeatureAvailable(collective, 'CONTACT_FORM'),
@@ -303,9 +295,6 @@ const getDefaultCallsToActions = (
     hasRequestGrant:
       isSupportedExpenseType(collective, EXPENSE_TYPE.GRANT) && expenseSubmissionAllowed(collective, LoggedInUser),
     addFunds: isAllowedAddFunds,
-    createVirtualCard: isHostAdmin && isFeatureAvailable(host, 'VIRTUAL_CARDS'),
-    assignVirtualCard: isHostAdmin && isFeatureAvailable(host, 'VIRTUAL_CARDS'),
-    requestVirtualCard: isAdmin && isFeatureAvailable(collective, 'REQUEST_VIRTUAL_CARDS'),
     hasSettings: isAdmin || isAccountant,
   };
 };
@@ -488,15 +477,7 @@ const CollectiveNavbar = ({
     return sectionsFromParent || getFilteredSectionsForCollective(collective, isAdmin, isHostAdmin);
   }, [sectionsFromParent, collective, isAdmin, isHostAdmin]);
   callsToAction = {
-    ...getDefaultCallsToActions(
-      collective,
-      sections,
-      isAdmin,
-      isAccountant,
-      isHostAdmin,
-      LoggedInUser,
-      isAllowedAddFunds,
-    ),
+    ...getDefaultCallsToActions(collective, sections, isAdmin, isAccountant, LoggedInUser, isAllowedAddFunds),
     ...callsToAction,
   };
   const actionsArray = Object.keys(pickBy(callsToAction, Boolean));
