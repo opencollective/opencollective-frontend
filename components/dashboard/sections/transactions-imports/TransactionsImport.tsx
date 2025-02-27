@@ -218,14 +218,14 @@ const DEFAULT_PAGE_SIZE = 50;
 const getViews = intl =>
   [
     {
+      id: 'ALL',
+      label: intl.formatMessage({ defaultMessage: 'All', id: 'all' }),
+      filter: {},
+    },
+    {
       id: 'PENDING',
       label: intl.formatMessage({ defaultMessage: 'Pending', id: 'eKEL/g' }),
       filter: { status: TransactionsImportRowStatus.PENDING },
-    },
-    {
-      id: 'IGNORED',
-      label: intl.formatMessage({ defaultMessage: 'No action', id: 'zue9QR' }),
-      filter: { status: TransactionsImportRowStatus.IGNORED },
     },
     {
       id: 'ON_HOLD',
@@ -233,14 +233,14 @@ const getViews = intl =>
       filter: { status: TransactionsImportRowStatus.ON_HOLD },
     },
     {
+      id: 'IGNORED',
+      label: intl.formatMessage({ defaultMessage: 'No action', id: 'zue9QR' }),
+      filter: { status: TransactionsImportRowStatus.IGNORED },
+    },
+    {
       id: 'LINKED',
       label: intl.formatMessage({ defaultMessage: 'Imported', id: 'transaction.imported' }),
       filter: { status: TransactionsImportRowStatus.LINKED },
-    },
-    {
-      id: 'ALL',
-      label: intl.formatMessage({ defaultMessage: 'All', id: 'all' }),
-      filter: {},
     },
   ] as const;
 
@@ -281,7 +281,7 @@ const plaidAccountFilter: FilterConfig<z.infer<typeof plaidAccountFilterSchema>>
   filter: {
     labelMsg: defineMessage({ defaultMessage: 'Sub-account', id: '1duVXZ' }),
     static: true,
-    hide: ({ meta }) => meta.plaidAccounts?.length < 2,
+    hide: ({ meta }) => !meta.plaidAccounts || meta.plaidAccounts.length < 2,
     Component: ({ meta, ...props }) => {
       const plaidAccounts = meta.plaidAccounts as PlaidAccount[];
       return (
@@ -315,6 +315,10 @@ const queryFilterSchema = z.object({
   plaidAccountId: plaidAccountFilter.schema,
 });
 
+const defaultFilterValues = {
+  status: TransactionsImportRowStatus.PENDING,
+};
+
 export const TransactionsImport = ({ accountSlug, importId }) => {
   const intl = useIntl();
   const { toast } = useToast();
@@ -333,6 +337,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
 
   const queryFilterViews = React.useMemo(() => getViews(intl), [intl]);
   const queryFilter = useQueryFilter<typeof queryFilterSchema, TransactionsImportQueryVariables>({
+    defaultFilterValues,
     schema: queryFilterSchema,
     views: queryFilterViews,
     filters,
@@ -672,6 +677,12 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                     data={importRows}
                     getActions={getActions}
                     openDrawer={row => setFocus({ rowId: row.original.id })}
+                    onClickRow={(row, _, e) => {
+                      // Ignore click when on checkbox or "Note" icon
+                      if (!(e.target as Element).closest('button')) {
+                        setFocus({ rowId: row.original.id });
+                      }
+                    }}
                     emptyMessage={() => (
                       <FormattedMessage id="SectionTransactions.Empty" defaultMessage="No transactions yet." />
                     )}
@@ -710,11 +721,11 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                           return <DateTime value={new Date(date)} />;
                         },
                       },
-                      ...(importData.plaidAccounts?.length <= 1
+                      ...(!importData.plaidAccounts || importData.plaidAccounts.length < 2
                         ? []
                         : [
                             {
-                              header: 'Account',
+                              header: 'Sub-Account',
                               cell: ({ row }) => {
                                 const importRow =
                                   row.original as (typeof data)['transactionsImport']['rows']['nodes'][number];
@@ -728,17 +739,27 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                             },
                           ]),
                       {
+                        header: 'Description',
+                        accessorKey: 'description',
+                        cell: ({ cell }) => <p className="max-w-xs">{cell.getValue() as string}</p>,
+                      },
+                      {
                         header: 'Amount',
                         accessorKey: 'amount',
                         cell: ({ cell }) => {
                           const amount = cell.getValue() as Amount;
-                          return <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} />;
+                          const isCredit = amount.valueInCents > 0;
+                          return (
+                            <div
+                              className={cn(
+                                'font-semibold antialiased',
+                                isCredit ? 'text-green-600' : 'text-slate-700',
+                              )}
+                            >
+                              <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} />
+                            </div>
+                          );
                         },
-                      },
-                      {
-                        header: 'Description',
-                        accessorKey: 'description',
-                        cell: ({ cell }) => <p className="max-w-xs">{cell.getValue() as string}</p>,
                       },
                       {
                         header: 'Status',
