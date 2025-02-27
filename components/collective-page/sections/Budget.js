@@ -409,20 +409,10 @@ const SectionBudget = ({ collective, LoggedInUser }) => {
                   >
                     {item.__typename === 'Expense' ? (
                       <DebitItem>
-                        <ExpenseBudgetItem
-                          expense={item}
-                          host={item.host || data.account.host}
-                          showAmountSign
-                          showProcessActions
-                        />
+                        <ExpenseBudgetItem expense={item} host={item.host || data.account.host} showAmountSign />
                       </DebitItem>
                     ) : (
-                      <TransactionItem
-                        transaction={item}
-                        collective={collective}
-                        displayActions
-                        onMutationSuccess={refetch}
-                      />
+                      <TransactionItem transaction={item} collective={collective} />
                     )}
                   </BudgetItemContainer>
                 );
