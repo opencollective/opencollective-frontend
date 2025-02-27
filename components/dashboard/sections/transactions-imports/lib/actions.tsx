@@ -7,7 +7,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import type { GetActions } from '../../../../../lib/actions/types';
 import { i18nGraphqlException } from '../../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../../lib/graphql/helpers';
-import type { TransactionsImportRow } from '../../../../../lib/graphql/types/v2/schema';
+import type { Account, TransactionsImport, TransactionsImportRow } from '../../../../../lib/graphql/types/v2/schema';
 import { TransactionsImportRowStatus } from '../../../../../lib/graphql/types/v2/schema';
 import type { UpdateTransactionsImportRowMutation } from '@/lib/graphql/types/v2/graphql';
 
@@ -49,7 +49,19 @@ const getOptimisticResponse = (
   return { updateTransactionsImportRows: optimisticResult };
 };
 
-export function useTransactionsImportActions({ transactionsImport, host }): {
+export function useTransactionsImportActions({
+  host,
+  transactionsImport,
+  assignments,
+}: {
+  host: React.ComponentProps<typeof MatchContributionDialog>['host'] &
+    React.ComponentProps<typeof MatchExpenseDialog>['host'];
+  transactionsImport: Pick<TransactionsImport, 'id'> &
+    React.ComponentProps<typeof AddFundsModalFromImportRow>['transactionsImport'] &
+    React.ComponentProps<typeof MatchContributionDialog>['transactionsImport'] &
+    React.ComponentProps<typeof MatchExpenseDialog>['transactionsImport'];
+  assignments: Record<string, Pick<Account, 'id' | 'slug' | 'type'>[]>;
+}): {
   getActions: GetActions<TransactionsImportRow>;
   setRowsStatus: (
     rowIds: string[],
@@ -109,8 +121,13 @@ export function useTransactionsImportActions({ transactionsImport, host }): {
     const actions: ReturnType<GetActions<TransactionsImportRow>> = { primary: [], secondary: [] };
     const isImported = Boolean(row.expense || row.order);
     const isUpdatingRow = updatingRows.includes(row.id);
+    const assignedAccounts = assignments[row.accountId];
     const showAddFundsModal = () => {
-      showModal(AddFundsModalFromImportRow, { transactionsImport, row, onCloseFocusRef }, 'add-funds-modal');
+      showModal(
+        AddFundsModalFromImportRow,
+        { collective: assignedAccounts, transactionsImport, row, onCloseFocusRef },
+        'add-funds-modal',
+      );
     };
 
     if (isImported) {
@@ -126,6 +143,7 @@ export function useTransactionsImportActions({ transactionsImport, host }): {
             showModal(
               MatchContributionDialog,
               {
+                accounts: assignedAccounts,
                 transactionsImport,
                 row,
                 host,
@@ -154,7 +172,7 @@ export function useTransactionsImportActions({ transactionsImport, host }): {
           onClick: () => {
             showModal(
               MatchExpenseDialog,
-              { host, row, transactionsImport, onCloseFocusRef },
+              { host, row, transactionsImport, onCloseFocusRef, accounts: assignedAccounts },
               'host-match-expense-modal',
             );
           },
@@ -167,7 +185,7 @@ export function useTransactionsImportActions({ transactionsImport, host }): {
           onClick: () => {
             showModal(
               HostCreateExpenseModal,
-              { host, onCloseFocusRef, transactionsImport, transactionsImportRow: row },
+              { host, onCloseFocusRef, transactionsImport, transactionsImportRow: row, account: assignedAccounts },
               'host-create-expense-modal',
             );
           },

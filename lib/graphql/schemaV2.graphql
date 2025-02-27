@@ -612,7 +612,7 @@ interface Account {
     The term to search
     """
     searchTerm: String
-    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
     """
@@ -630,6 +630,11 @@ interface Account {
     Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
     """
     oppositeAccount: AccountReferenceInput
+
+    """
+    Return only orders made from/to these hosted accounts
+    """
+    hostedAccounts: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -3163,7 +3168,7 @@ type Host implements Account & AccountWithContributions {
     The term to search
     """
     searchTerm: String
-    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
     """
@@ -3181,6 +3186,11 @@ type Host implements Account & AccountWithContributions {
     Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
     """
     oppositeAccount: AccountReferenceInput
+
+    """
+    Return only orders made from/to these hosted accounts
+    """
+    hostedAccounts: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -5220,7 +5230,7 @@ type PaymentMethod {
     The term to search
     """
     searchTerm: String
-    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
     """
@@ -5238,6 +5248,11 @@ type PaymentMethod {
     Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
     """
     oppositeAccount: AccountReferenceInput
+
+    """
+    Return only orders made from/to these hosted accounts
+    """
+    hostedAccounts: [AccountReferenceInput]
   ): OrderCollection
 }
 
@@ -7316,6 +7331,11 @@ type TransactionsImportRow {
   expense: Expense
 
   """
+  If an account ID is available in the imported row, it will be stored here
+  """
+  accountId: String
+
+  """
   The raw data of the row
   """
   rawValue: JSONObject
@@ -8470,7 +8490,7 @@ type Bot implements Account {
     The term to search
     """
     searchTerm: String
-    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
     """
@@ -8488,6 +8508,11 @@ type Bot implements Account {
     Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
     """
     oppositeAccount: AccountReferenceInput
+
+    """
+    Return only orders made from/to these hosted accounts
+    """
+    hostedAccounts: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -9353,7 +9378,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     The term to search
     """
     searchTerm: String
-    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
     """
@@ -9371,6 +9396,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
     """
     oppositeAccount: AccountReferenceInput
+
+    """
+    Return only orders made from/to these hosted accounts
+    """
+    hostedAccounts: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -10785,7 +10815,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     The term to search
     """
     searchTerm: String
-    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
     """
@@ -10803,6 +10833,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
     """
     oppositeAccount: AccountReferenceInput
+
+    """
+    Return only orders made from/to these hosted accounts
+    """
+    hostedAccounts: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -11937,7 +11972,7 @@ type Individual implements Account {
     The term to search
     """
     searchTerm: String
-    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
     """
@@ -11955,6 +11990,11 @@ type Individual implements Account {
     Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
     """
     oppositeAccount: AccountReferenceInput
+
+    """
+    Return only orders made from/to these hosted accounts
+    """
+    hostedAccounts: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -13067,7 +13107,7 @@ type Organization implements Account & AccountWithContributions {
     The term to search
     """
     searchTerm: String
-    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
     """
@@ -13085,6 +13125,11 @@ type Organization implements Account & AccountWithContributions {
     Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
     """
     oppositeAccount: AccountReferenceInput
+
+    """
+    Return only orders made from/to these hosted accounts
+    """
+    hostedAccounts: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -14063,7 +14108,7 @@ type Vendor implements Account & AccountWithContributions {
     The term to search
     """
     searchTerm: String
-    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
     """
@@ -14081,6 +14126,11 @@ type Vendor implements Account & AccountWithContributions {
     Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
     """
     oppositeAccount: AccountReferenceInput
+
+    """
+    Return only orders made from/to these hosted accounts
+    """
+    hostedAccounts: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -15302,7 +15352,7 @@ type Query {
     The term to search
     """
     searchTerm: String
-    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
     """
@@ -15320,6 +15370,11 @@ type Query {
     Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
     """
     oppositeAccount: AccountReferenceInput
+
+    """
+    Return only orders made from/to these hosted accounts
+    """
+    hostedAccounts: [AccountReferenceInput]
   ): OrderCollection!
   organization(
     """
@@ -17710,7 +17765,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     The term to search
     """
     searchTerm: String
-    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
     """
@@ -17728,6 +17783,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
     """
     oppositeAccount: AccountReferenceInput
+
+    """
+    Return only orders made from/to these hosted accounts
+    """
+    hostedAccounts: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -18740,7 +18800,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     The term to search
     """
     searchTerm: String
-    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
     """
@@ -18758,6 +18818,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
     """
     oppositeAccount: AccountReferenceInput
+
+    """
+    Return only orders made from/to these hosted accounts
+    """
+    hostedAccounts: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection

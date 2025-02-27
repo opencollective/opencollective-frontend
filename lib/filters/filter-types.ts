@@ -52,6 +52,7 @@ type FilterComponentConfig<FilterValue, Meta = any> = {
   labelMsg?: MessageDescriptor;
   static?: boolean;
   hide?: ({ meta }: { meta: Meta }) => boolean;
+  getDisallowEmpty?: ({ meta }: { meta: Meta }) => boolean;
 } & (DropdownFilter<FilterValue, Meta> | StandaloneFilter<FilterValue, Meta>);
 
 export type FilterComponentConfigs<FilterValues = Record<string, any>, Meta = any> = Partial<{

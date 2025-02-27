@@ -75,7 +75,7 @@ export const TransactionsImportsTable = ({ accountSlug }) => {
               <Button
                 size="sm"
                 variant="outline"
-                onClick={plaidConnectDialog.show}
+                onClick={() => plaidConnectDialog.show()}
                 disabled={plaidConnectDialog.status !== 'idle'}
                 loading={plaidConnectDialog.status === 'loading'}
               >
