@@ -7331,7 +7331,7 @@ type TransactionsImportRow {
   expense: Expense
 
   """
-  If an account ID is available in the imported row, it will be stored here
+  If an account ID is available in the imported row, it will be stored here. Returns the default account ID otherwise.
   """
   accountId: String
 
@@ -20919,7 +20919,7 @@ type Mutation {
     locale: Locale
 
     """
-    If true, the account selection flow will be enabled. Requires an `accessToken`.
+    If true, the account selection flow will be enabled. Requires a `transactionImport`.
     """
     accountSelectionEnabled: Boolean
   ): PlaidLinkTokenCreateResponse!

@@ -11881,7 +11881,7 @@ export type TransactionsImportReferenceInput = {
 /** A row in a transactions import */
 export type TransactionsImportRow = {
   __typename?: 'TransactionsImportRow';
-  /** If an account ID is available in the imported row, it will be stored here */
+  /** If an account ID is available in the imported row, it will be stored here. Returns the default account ID otherwise. */
   accountId?: Maybe<Scalars['String']['output']>;
   /** The amount of the row */
   amount: Amount;
