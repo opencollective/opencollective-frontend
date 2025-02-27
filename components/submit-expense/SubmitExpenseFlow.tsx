@@ -182,9 +182,14 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
           payoutMethod:
             !values.payoutMethodId || values.payoutMethodId === '__newPayoutMethod'
               ? { ...values.newPayoutMethod, isSaved: false }
-              : {
-                  id: values.payoutMethodId,
-                },
+              : values.payoutMethodId === '__newAccountBalancePayoutMethod'
+                ? {
+                    type: PayoutMethodType.ACCOUNT_BALANCE,
+                    data: {},
+                  }
+                : {
+                    id: values.payoutMethodId,
+                  },
           type: values.expenseTypeOption,
           accountingCategory: values.accountingCategoryId
             ? {
