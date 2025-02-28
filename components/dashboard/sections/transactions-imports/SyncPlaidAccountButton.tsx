@@ -7,6 +7,7 @@ import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { usePrevious } from '../../../../lib/hooks/usePrevious';
 
+import type { ButtonProps } from '../../../ui/Button';
 import { Button } from '../../../ui/Button';
 import { useToast } from '../../../ui/useToast';
 
@@ -18,7 +19,18 @@ const syncPlaidAccountMutation = gql`
   }
 `;
 
-export const SyncPlaidAccountButton = ({ hasRequestedSync, setHasRequestedSync, connectedAccountId, isSyncing }) => {
+export const SyncPlaidAccountButton = ({
+  hasRequestedSync,
+  setHasRequestedSync,
+  connectedAccountId,
+  isSyncing,
+  ...props
+}: {
+  hasRequestedSync: boolean;
+  setHasRequestedSync: (hasRequestedSync: boolean) => void;
+  connectedAccountId: string;
+  isSyncing: boolean;
+} & ButtonProps) => {
   const intl = useIntl();
   const { toast } = useToast();
   const [syncPlaidAccount] = useMutation(syncPlaidAccountMutation, { context: API_V2_CONTEXT });
@@ -48,6 +60,7 @@ export const SyncPlaidAccountButton = ({ hasRequestedSync, setHasRequestedSync, 
       size="xs"
       variant="outline"
       loading={isSyncing || hasRequestedSync}
+      {...props}
       onClick={async () => {
         setHasRequestedSync(true);
         try {
@@ -74,7 +87,7 @@ export const SyncPlaidAccountButton = ({ hasRequestedSync, setHasRequestedSync, 
     >
       <RefreshCw size={16} />
       <span className="hidden sm:inline">
-        <FormattedMessage defaultMessage="Sync" id="sync" />
+        <FormattedMessage defaultMessage="Synchronize" id="Rih0DL" />
       </span>
     </Button>
   );

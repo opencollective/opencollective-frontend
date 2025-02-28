@@ -13,19 +13,15 @@ import { formatCurrency } from '../../../../lib/currency-utils';
 import { getCurrentLocalDateStr } from '../../../../lib/date-utils';
 import { requireFields } from '../../../../lib/form-utils';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
-import type {
-  Account,
-  AccountWithHost,
-  Amount,
-  Order,
-  Tier,
-  TransactionReferenceInput,
-} from '../../../../lib/graphql/types/v2/schema';
+import type { Account, Amount, Order, Tier, TransactionReferenceInput } from '../../../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nTaxType } from '../../../../lib/i18n/taxes';
 import { require2FAForAdmins } from '../../../../lib/policies';
 import { getCollectivePageRoute } from '../../../../lib/url-helpers';
+import type { TierReferenceInput } from '@/lib/graphql/types/v2/graphql';
+
+import { Skeleton } from '@/components/ui/Skeleton';
 
 import AccountingCategorySelect from '../../../AccountingCategorySelect';
 import { collectivePageQuery, getCollectivePageQueryVariables } from '../../../collective-page/graphql/queries';
@@ -37,7 +33,6 @@ import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { Box, Flex } from '../../../Grid';
 import Link from '../../../Link';
 import LinkCollective from '../../../LinkCollective';
-import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBox from '../../../MessageBox';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import StyledHr from '../../../StyledHr';
@@ -299,6 +294,7 @@ const addFundsAccountQuery = gql`
           name
           imageUrl
           type
+          settings
         }
       }
       childrenAccounts {
@@ -356,7 +352,7 @@ type AddFundsFormValues = {
   paymentProcessorFee?: number;
   hostFeePercent?: number;
   memo?: string;
-  tier?: Tier;
+  tier?: TierReferenceInput;
   tax?: any;
   transactionsImportRow?: TransactionReferenceInput | null;
   invoiceTemplate?: { value: string };
@@ -387,7 +383,9 @@ const validate = (intl, values) => {
 };
 
 const getApplicableTaxType = (collective, host) => {
-  if (accountHasVAT(collective, host || collective.host)) {
+  if (!collective) {
+    return null;
+  } else if (accountHasVAT(collective, host || collective.host)) {
     return TaxType.VAT;
   } else if (accountHasGST(host || collective.host || collective)) {
     return TaxType.GST;
@@ -446,7 +444,7 @@ const AddFundsModalContentWithCollective = ({
   onSuccess,
   editOrderId,
 }: {
-  collective: Account & AccountWithHost;
+  collective: Pick<Account, 'slug'>;
   fundDetails: FundDetails;
   setFundDetails: React.Dispatch<React.SetStateAction<FundDetails>>;
   handleClose: () => void;
@@ -456,14 +454,18 @@ const AddFundsModalContentWithCollective = ({
   editOrderId?: string;
 }) => {
   const intl = useIntl();
-  const { data, loading } = useQuery(addFundsAccountQuery, {
+  const {
+    data,
+    loading,
+    error: fetchAccountError,
+  } = useQuery(addFundsAccountQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: collective.slug },
   });
   const account = data?.account;
   const currency = account?.currency;
   const host = account?.isHost && !account.host ? account : account?.host;
-  const applicableTax = getApplicableTaxType(collective, host);
+  const applicableTax = getApplicableTaxType(account, host);
   const isEdit = Boolean(editOrderId);
 
   const [submitAddFunds, { error: fundError, loading: isLoading }] = useMutation(
@@ -488,7 +490,7 @@ const AddFundsModalContentWithCollective = ({
   // From the Collective page we pass collective as API v1 objects
   // From the Host dashboard we pass collective as API v2 objects
   const canAddHostFee = checkCanAddHostFee(account);
-  const hostFeePercent = account?.addedFundsHostFeePercent || collective.hostFeePercent;
+  const hostFeePercent = account?.addedFundsHostFeePercent;
   const defaultHostFeePercent = canAddHostFee ? hostFeePercent : 0;
   const receiptTemplates = host?.settings?.invoice?.templates;
   const recommendedVendors = host?.vendors?.nodes || [];
@@ -503,9 +505,9 @@ const AddFundsModalContentWithCollective = ({
     };
   });
 
-  const targetOptions = React.useMemo(
-    () => compact([collective, account?.parent, ...(account?.childrenAccounts?.nodes || [])]),
-    [account, collective],
+  const receivingCollectiveOptions = React.useMemo(
+    () => compact([account, account?.parent, ...(account?.childrenAccounts?.nodes || [])]),
+    [account],
   );
 
   const receiptTemplateTitles = [];
@@ -520,12 +522,20 @@ const AddFundsModalContentWithCollective = ({
   }
 
   if (loading) {
-    return <LoadingPlaceholder mt={2} height={200} />;
+    return (
+      <div className="space-y-8 py-8">
+        <Skeleton className="h-16" />
+        <Skeleton className="h-16" />
+        <Skeleton className="h-16" />
+      </div>
+    );
+  } else if (fetchAccountError) {
+    return <MessageBoxGraphqlError my={2} error={fetchAccountError} />;
   }
 
   return (
     <Formik
-      initialValues={getInitialValues({ hostFeePercent: defaultHostFeePercent, account: collective, ...initialValues })}
+      initialValues={getInitialValues({ hostFeePercent: defaultHostFeePercent, account, ...initialValues })}
       enableReinitialize={true}
       validate={values => validate(intl, values)}
       onSubmit={async (values, formik) => {
@@ -661,9 +671,9 @@ const AddFundsModalContentWithCollective = ({
                       onBlur={() => form.setFieldTouched(field.name, true)}
                       onChange={({ value }) => form.setFieldValue(field.name, value)}
                       collective={values.account}
-                      collectives={targetOptions}
+                      collectives={receivingCollectiveOptions}
                       menuPortalTarget={null}
-                      disabled={targetOptions.length === 1}
+                      disabled={receivingCollectiveOptions.length === 1}
                     />
                   )}
                 </Field>
@@ -964,7 +974,7 @@ const AddFundsModalContentWithCollective = ({
                   </h3>
                   <Container pb={2} mt={3}>
                     <FormattedMessage id="AddFundsModal.YouAdded" defaultMessage="You added:" />
-                    <ul className="mt-2 list-inside list-disc pl-3">
+                    <ul className="mt-2 list-inside list-disc pl-3 break-words">
                       <li>
                         <strong>{`${fundDetails.fundAmount / 100} ${currency}`}</strong>
                       </li>
@@ -1054,7 +1064,7 @@ const AddFundsModalContentWithCollective = ({
                           <StyledLink
                             as={Link}
                             openInNewTab
-                            href={`${getCollectivePageRoute(collective)}/contribute/${fundDetails.tier.slug}-${
+                            href={`${getCollectivePageRoute(account)}/contribute/${fundDetails.tier.slug}-${
                               fundDetails.tier.legacyId
                             }`}
                           >
@@ -1105,6 +1115,14 @@ const AddFundsModalContentWithCollective = ({
   );
 };
 
+function getDefaultSelectedCollective<T>(collective: Array<T> | T): T | null {
+  if (Array.isArray(collective)) {
+    return collective.length === 1 ? collective[0] : null;
+  } else {
+    return collective;
+  }
+}
+
 const AddFundsModal = ({
   collective = null,
   host = null,
@@ -1112,10 +1130,19 @@ const AddFundsModal = ({
   onSuccess = null,
   transactionsImportRow = null,
   ...props
+}: {
+  collective: Pick<Account, 'slug' | 'name'> | Pick<Account, 'slug' | 'name'>[] | null;
+  host?: Pick<Account, 'id' | 'legacyId' | 'slug' | 'policies'> | null;
+  initialValues?: Partial<AddFundsFormValues>;
+  onSuccess?: (order: Order) => void;
+  transactionsImportRow?: TransactionReferenceInput &
+    React.ComponentProps<typeof TransactionsImportRowDetailsAccordion>['transactionsImportRow'];
+  editOrderId?: string;
+  onClose: () => void;
 }) => {
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
-  const [selectedCollective, setSelectedCollective] = useState(collective);
+  const [selectedCollective, setSelectedCollective] = useState(() => getDefaultSelectedCollective(collective));
   const [hasConfirmedCollective, setHasConfirmedCollective] = useState(Boolean(selectedCollective));
   const [fundDetails, setFundDetails] = useState<FundDetails>({});
   const handleClose = () => {
@@ -1181,24 +1208,37 @@ const AddFundsModal = ({
         </MessageBox>
       ) : (
         <div>
-          <label htmlFor="add-funds-collective-picker" className="my-2 text-sm font-normal">
+          <label htmlFor="add-funds-collective-picker" className="mt-2 text-base font-bold">
             <FormattedMessage defaultMessage="Select an account to add funds to:" id="addFunds.selectCollective" />
           </label>
-          <CollectivePickerAsync
-            inputId="add-funds-collective-picker"
-            customOptions={[
-              {
-                label: intl.formatMessage({ defaultMessage: 'Fiscal Host', id: 'Fiscalhost' }),
-                options: [{ value: host, label: <DefaultCollectiveLabel value={host} /> }],
-              },
-            ]}
-            hostCollectiveIds={getLegacyIdForCollective(host)}
-            types={['COLLECTIVE', 'PROJECT', 'EVENT', 'FUND']}
-            getDefaultOptions={buildOption => buildOption(selectedCollective)}
-            onChange={({ value }) => {
-              setSelectedCollective(value);
-            }}
-          />
+          {collective ? (
+            <CollectivePicker
+              inputId="add-funds-collective-picker"
+              collectives={collective}
+              collective={selectedCollective}
+              mt={2}
+              onChange={({ value }) => {
+                setSelectedCollective(value);
+              }}
+            />
+          ) : (
+            <CollectivePickerAsync
+              inputId="add-funds-collective-picker"
+              customOptions={[
+                {
+                  label: intl.formatMessage({ defaultMessage: 'Fiscal Host', id: 'Fiscalhost' }),
+                  options: [{ value: host, label: <DefaultCollectiveLabel value={host} /> }],
+                },
+              ]}
+              mt={2}
+              hostCollectiveIds={getLegacyIdForCollective(host)}
+              types={['COLLECTIVE', 'PROJECT', 'EVENT', 'FUND']}
+              getDefaultOptions={buildOption => buildOption(selectedCollective)}
+              onChange={({ value }) => {
+                setSelectedCollective(value);
+              }}
+            />
+          )}
           <div className="mt-8 flex justify-center gap-4">
             <Button onClick={handleClose} variant="outline" type="button">
               <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />

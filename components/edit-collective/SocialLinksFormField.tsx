@@ -3,9 +3,9 @@ import { closestCenter, DndContext } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Plus } from '@styled-icons/fa-solid/Plus';
-import { Times } from '@styled-icons/fa-solid/Times';
 import { DragIndicator } from '@styled-icons/material/DragIndicator';
 import { sortBy } from 'lodash';
+import { Trash } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
 import type { SocialLink, SocialLinkInput } from '../../lib/graphql/types/v2/schema';
@@ -14,10 +14,9 @@ import { SocialLinkLabel } from '../../lib/social-links';
 import { isValidUrl } from '../../lib/utils';
 
 import { Box, Flex } from '../Grid';
-import StyledButton from '../StyledButton';
 import StyledInput from '../StyledInput';
 import StyledSelect from '../StyledSelect';
-import { Span } from '../Text';
+import { Button } from '../ui/Button';
 
 type SocialLinksFormFieldProps = {
   value?: SocialLink[];
@@ -87,18 +86,10 @@ export default function SocialLinksFormField({ value = [], touched, onChange }: 
             );
           })}
           <Flex mt={2} justifyContent="center">
-            <StyledButton
-              disabled={value.length >= 10}
-              type="button"
-              buttonSize="tiny"
-              buttonStyle="standard"
-              onClick={addItem}
-            >
+            <Button disabled={value.length >= 10} type="button" size="xs" variant="outline" onClick={addItem}>
               <Plus size="10px" />
-              <Span ml={2}>
-                <FormattedMessage defaultMessage="Add social link" id="FH4TgN" />
-              </Span>
-            </StyledButton>
+              <FormattedMessage defaultMessage="Add social link" id="FH4TgN" />
+            </Button>
           </Flex>
         </SortableContext>
       </Flex>
@@ -209,17 +200,9 @@ function SocialLinkItem({ value, error, onChange, onRemoveItem }: SocialLinkItem
         />
       </Flex>
 
-      <StyledButton
-        tabIndex={-1}
-        padding={0}
-        width="20px"
-        height="20px"
-        type="button"
-        buttonStyle="borderless"
-        onClick={onRemove}
-      >
-        <Times size="10px" />
-      </StyledButton>
+      <Button tabIndex={-1} type="button" variant="outlineDestructive" size="icon" onClick={onRemove}>
+        <Trash size="14px" />
+      </Button>
     </Flex>
   );
 }

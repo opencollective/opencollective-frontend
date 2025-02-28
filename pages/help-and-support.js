@@ -76,7 +76,7 @@ const HelpAndSupport = ({ action, formConfirmation }) => {
   const { formatMessage } = useIntl();
 
   return (
-    <Page navTitle={formatMessage(messages.pageTitle)} description={formatMessage(messages.defaultTitle)}>
+    <Page description={formatMessage(messages.defaultTitle)}>
       {action === 'contact' ? (
         renderFormContent(formConfirmation)
       ) : (

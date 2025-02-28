@@ -612,7 +612,7 @@ interface Account {
     The term to search
     """
     searchTerm: String
-    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
     """
@@ -630,6 +630,11 @@ interface Account {
     Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
     """
     oppositeAccount: AccountReferenceInput
+
+    """
+    Return only orders made from/to these hosted accounts
+    """
+    hostedAccounts: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -653,6 +658,11 @@ interface Account {
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
+
+    """
+    An alternative to filter by accounts, both cannot be used together
+    """
+    accounts: [AccountReferenceInput]
 
     """
     Return expenses only for this host
@@ -813,7 +823,7 @@ interface Account {
   paymentMethodsWithPendingConfirmation: [PaymentMethod]
 
   """
-  The list of connected accounts (Stripe, Twitter, etc ...)
+  The list of connected accounts (Stripe, PayPal, etc ...)
   """
   connectedAccounts: [ConnectedAccount]
 
@@ -909,6 +919,11 @@ interface Account {
     isActive: Boolean
     accountType: [AccountType]
     searchTerm: String
+
+    """
+    Order of the results. Defaults to createdAt DESC.
+    """
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
   ): AccountCollection!
 
   """
@@ -2479,6 +2494,11 @@ type Expense {
   (Optional) files attached to the expense
   """
   attachedFiles: [ExpenseAttachedFile!]
+
+  """
+  (Optional - applicable to invoice expense only) The invoice file for this expense
+  """
+  invoiceFile: FileInfo
   items: [ExpenseItem]
 
   """
@@ -3148,7 +3168,7 @@ type Host implements Account & AccountWithContributions {
     The term to search
     """
     searchTerm: String
-    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
     """
@@ -3166,6 +3186,11 @@ type Host implements Account & AccountWithContributions {
     Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
     """
     oppositeAccount: AccountReferenceInput
+
+    """
+    Return only orders made from/to these hosted accounts
+    """
+    hostedAccounts: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -3189,6 +3214,11 @@ type Host implements Account & AccountWithContributions {
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
+
+    """
+    An alternative to filter by accounts, both cannot be used together
+    """
+    accounts: [AccountReferenceInput]
 
     """
     Return expenses only for this host
@@ -3338,7 +3368,7 @@ type Host implements Account & AccountWithContributions {
   paymentMethodsWithPendingConfirmation: [PaymentMethod]
 
   """
-  The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts".
+  The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
   """
   connectedAccounts: [ConnectedAccount]
 
@@ -3430,6 +3460,11 @@ type Host implements Account & AccountWithContributions {
     isActive: Boolean
     accountType: [AccountType]
     searchTerm: String
+
+    """
+    Order of the results. Defaults to createdAt DESC.
+    """
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
   ): AccountCollection!
 
   """
@@ -4431,6 +4466,16 @@ enum OrderByFieldType {
   MEMBER_COUNT
   TOTAL_CONTRIBUTED
   NAME
+
+  """
+  Order by start date
+  """
+  STARTS_AT
+
+  """
+  Order by end date
+  """
+  ENDS_AT
 }
 
 """
@@ -5185,7 +5230,7 @@ type PaymentMethod {
     The term to search
     """
     searchTerm: String
-    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
     """
@@ -5203,6 +5248,11 @@ type PaymentMethod {
     Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
     """
     oppositeAccount: AccountReferenceInput
+
+    """
+    Return only orders made from/to these hosted accounts
+    """
+    hostedAccounts: [AccountReferenceInput]
   ): OrderCollection
 }
 
@@ -5258,9 +5308,9 @@ enum ConnectedAccountService {
   stripe
   stripe_customer
   github
-  twitter
   transferwise
   plaid
+  twitter
   privacy @deprecated(reason: "Not using this service anymore")
   thegivingblock
   meetup @deprecated(reason: "Not using this service anymore")
@@ -6136,9 +6186,9 @@ All supported Activity channels we can broadcast to
 """
 enum ActivityChannel {
   slack
-  twitter
   webhook
   email
+  twitter
 }
 
 """
@@ -6320,6 +6370,7 @@ enum ActivityType {
   COLLECTIVE_CORE_MEMBER_EDITED
   COLLECTIVE_TRANSACTION_CREATED
   TRANSACTIONS_IMPORT_CREATED
+  TRANSACTIONS_IMPORT_ROW_UPDATED
   COLLECTIVE_UPDATE_CREATED
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
@@ -7119,6 +7170,16 @@ type TransactionsImport {
   lastSyncCursor: String
 
   """
+  List of available accounts for the import
+  """
+  plaidAccounts: [PlaidAccount]
+
+  """
+  Assignments for the import, as a map of account id to legacy collective IDs. The `__default__` key can be use to set the default assignment.
+  """
+  assignments: [TransactionsImportAssignment!]!
+
+  """
   Connected account linked to the import
   """
   connectedAccount: ConnectedAccount
@@ -7146,6 +7207,11 @@ type TransactionsImport {
     Search by text
     """
     searchTerm: String
+
+    """
+    Filter rows by plaid account id
+    """
+    accountId: [NonEmptyString]
   ): TransactionsImportRowCollection!
   stats: TransactionsImportStats
 }
@@ -7162,6 +7228,52 @@ enum TransactionsImportType {
   CSV
   MANUAL
   PLAID
+}
+
+type PlaidAccount {
+  accountId: String!
+  mask: String!
+  name: String!
+  officialName: String!
+  subtype: String!
+  type: PlaidAccountType!
+}
+
+enum PlaidAccountType {
+  """
+  Investment
+  """
+  investment
+
+  """
+  Credit
+  """
+  credit
+
+  """
+  Depository
+  """
+  depository
+
+  """
+  Loan
+  """
+  loan
+
+  """
+  Brokerage
+  """
+  brokerage
+
+  """
+  Other
+  """
+  other
+}
+
+type TransactionsImportAssignment {
+  importedAccountId: NonEmptyString!
+  accounts: [Account!]!
 }
 
 """
@@ -7217,6 +7329,11 @@ type TransactionsImportRow {
   The expense associated with the row
   """
   expense: Expense
+
+  """
+  If an account ID is available in the imported row, it will be stored here. Returns the default account ID otherwise.
+  """
+  accountId: String
 
   """
   The raw data of the row
@@ -8373,7 +8490,7 @@ type Bot implements Account {
     The term to search
     """
     searchTerm: String
-    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
     """
@@ -8391,6 +8508,11 @@ type Bot implements Account {
     Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
     """
     oppositeAccount: AccountReferenceInput
+
+    """
+    Return only orders made from/to these hosted accounts
+    """
+    hostedAccounts: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -8414,6 +8536,11 @@ type Bot implements Account {
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
+
+    """
+    An alternative to filter by accounts, both cannot be used together
+    """
+    accounts: [AccountReferenceInput]
 
     """
     Return expenses only for this host
@@ -8563,7 +8690,7 @@ type Bot implements Account {
   paymentMethodsWithPendingConfirmation: [PaymentMethod]
 
   """
-  The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts".
+  The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
   """
   connectedAccounts: [ConnectedAccount]
 
@@ -8655,6 +8782,11 @@ type Bot implements Account {
     isActive: Boolean
     accountType: [AccountType]
     searchTerm: String
+
+    """
+    Order of the results. Defaults to createdAt DESC.
+    """
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
   ): AccountCollection!
 
   """
@@ -9246,7 +9378,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     The term to search
     """
     searchTerm: String
-    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
     """
@@ -9264,6 +9396,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
     """
     oppositeAccount: AccountReferenceInput
+
+    """
+    Return only orders made from/to these hosted accounts
+    """
+    hostedAccounts: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -9287,6 +9424,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
+
+    """
+    An alternative to filter by accounts, both cannot be used together
+    """
+    accounts: [AccountReferenceInput]
 
     """
     Return expenses only for this host
@@ -9436,7 +9578,7 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
   paymentMethodsWithPendingConfirmation: [PaymentMethod]
 
   """
-  The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts".
+  The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
   """
   connectedAccounts: [ConnectedAccount]
 
@@ -9528,6 +9670,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     isActive: Boolean
     accountType: [AccountType]
     searchTerm: String
+
+    """
+    Order of the results. Defaults to createdAt DESC.
+    """
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
   ): AccountCollection!
 
   """
@@ -10668,7 +10815,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     The term to search
     """
     searchTerm: String
-    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
     """
@@ -10686,6 +10833,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
     """
     oppositeAccount: AccountReferenceInput
+
+    """
+    Return only orders made from/to these hosted accounts
+    """
+    hostedAccounts: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -10709,6 +10861,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
+
+    """
+    An alternative to filter by accounts, both cannot be used together
+    """
+    accounts: [AccountReferenceInput]
 
     """
     Return expenses only for this host
@@ -10858,7 +11015,7 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
   paymentMethodsWithPendingConfirmation: [PaymentMethod]
 
   """
-  The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts".
+  The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
   """
   connectedAccounts: [ConnectedAccount]
 
@@ -10950,6 +11107,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     isActive: Boolean
     accountType: [AccountType]
     searchTerm: String
+
+    """
+    Order of the results. Defaults to createdAt DESC.
+    """
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
   ): AccountCollection!
 
   """
@@ -11810,7 +11972,7 @@ type Individual implements Account {
     The term to search
     """
     searchTerm: String
-    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
     """
@@ -11828,6 +11990,11 @@ type Individual implements Account {
     Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
     """
     oppositeAccount: AccountReferenceInput
+
+    """
+    Return only orders made from/to these hosted accounts
+    """
+    hostedAccounts: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -11851,6 +12018,11 @@ type Individual implements Account {
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
+
+    """
+    An alternative to filter by accounts, both cannot be used together
+    """
+    accounts: [AccountReferenceInput]
 
     """
     Return expenses only for this host
@@ -12000,7 +12172,7 @@ type Individual implements Account {
   paymentMethodsWithPendingConfirmation: [PaymentMethod]
 
   """
-  The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts".
+  The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
   """
   connectedAccounts: [ConnectedAccount]
 
@@ -12090,6 +12262,11 @@ type Individual implements Account {
     isActive: Boolean
     accountType: [AccountType]
     searchTerm: String
+
+    """
+    Order of the results. Defaults to createdAt DESC.
+    """
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
   ): AccountCollection!
 
   """
@@ -12378,7 +12555,7 @@ type ContributorProfile {
     inCollectiveCurrency: Boolean = false
 
     """
-    The date since when to calculate the total
+    The date since when to calculate the total. Defaults to the start of the current year.
     """
     since: DateTime
   ): Amount
@@ -12388,12 +12565,12 @@ type ContributorProfile {
 This represents a Member relationship (ie: Organization backing a Collective)
 """
 type Member {
-  id: String
-  role: MemberRole
+  id: String!
+  role: MemberRole!
   tier: Tier
-  createdAt: DateTime
-  updatedAt: DateTime
-  since: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  since: DateTime!
 
   """
   Total amount donated
@@ -12413,7 +12590,12 @@ type Member {
   """
   If membership is inherited from parent collective
   """
-  inherited: Boolean
+  inherited: Boolean!
+
+  """
+  Whether the membership is active. Warning: this definition is subject to change.
+  """
+  isActive: Boolean!
   account: Account
 }
 
@@ -12421,12 +12603,12 @@ type Member {
 This represents a MemberOf relationship (ie: Collective backed by an Organization)
 """
 type MemberOf {
-  id: String
-  role: MemberRole
+  id: String!
+  role: MemberRole!
   tier: Tier
-  createdAt: DateTime
-  updatedAt: DateTime
-  since: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  since: DateTime!
 
   """
   Total amount donated
@@ -12446,7 +12628,12 @@ type MemberOf {
   """
   If membership is inherited from parent collective
   """
-  inherited: Boolean
+  inherited: Boolean!
+
+  """
+  Whether the membership is active. Warning: this definition is subject to change.
+  """
+  isActive: Boolean!
   account: Account
 }
 
@@ -12920,7 +13107,7 @@ type Organization implements Account & AccountWithContributions {
     The term to search
     """
     searchTerm: String
-    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
     """
@@ -12938,6 +13125,11 @@ type Organization implements Account & AccountWithContributions {
     Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
     """
     oppositeAccount: AccountReferenceInput
+
+    """
+    Return only orders made from/to these hosted accounts
+    """
+    hostedAccounts: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -12961,6 +13153,11 @@ type Organization implements Account & AccountWithContributions {
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
+
+    """
+    An alternative to filter by accounts, both cannot be used together
+    """
+    accounts: [AccountReferenceInput]
 
     """
     Return expenses only for this host
@@ -13110,7 +13307,7 @@ type Organization implements Account & AccountWithContributions {
   paymentMethodsWithPendingConfirmation: [PaymentMethod]
 
   """
-  The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts".
+  The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
   """
   connectedAccounts: [ConnectedAccount]
 
@@ -13200,6 +13397,11 @@ type Organization implements Account & AccountWithContributions {
     isActive: Boolean
     accountType: [AccountType]
     searchTerm: String
+
+    """
+    Order of the results. Defaults to createdAt DESC.
+    """
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
   ): AccountCollection!
 
   """
@@ -13906,7 +14108,7 @@ type Vendor implements Account & AccountWithContributions {
     The term to search
     """
     searchTerm: String
-    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
     """
@@ -13924,6 +14126,11 @@ type Vendor implements Account & AccountWithContributions {
     Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
     """
     oppositeAccount: AccountReferenceInput
+
+    """
+    Return only orders made from/to these hosted accounts
+    """
+    hostedAccounts: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -13947,6 +14154,11 @@ type Vendor implements Account & AccountWithContributions {
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
+
+    """
+    An alternative to filter by accounts, both cannot be used together
+    """
+    accounts: [AccountReferenceInput]
 
     """
     Return expenses only for this host
@@ -14096,7 +14308,7 @@ type Vendor implements Account & AccountWithContributions {
   paymentMethodsWithPendingConfirmation: [PaymentMethod]
 
   """
-  The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts".
+  The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
   """
   connectedAccounts: [ConnectedAccount]
 
@@ -14188,6 +14400,11 @@ type Vendor implements Account & AccountWithContributions {
     isActive: Boolean
     accountType: [AccountType]
     searchTerm: String
+
+    """
+    Order of the results. Defaults to createdAt DESC.
+    """
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
   ): AccountCollection!
 
   """
@@ -14756,6 +14973,11 @@ type Query {
     account: AccountReferenceInput
 
     """
+    An alternative to filter by accounts, both cannot be used together
+    """
+    accounts: [AccountReferenceInput]
+
+    """
     Return expenses only for this host
     """
     host: AccountReferenceInput
@@ -15130,7 +15352,7 @@ type Query {
     The term to search
     """
     searchTerm: String
-    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
     """
@@ -15148,6 +15370,11 @@ type Query {
     Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
     """
     oppositeAccount: AccountReferenceInput
+
+    """
+    Return only orders made from/to these hosted accounts
+    """
+    hostedAccounts: [AccountReferenceInput]
   ): OrderCollection!
   organization(
     """
@@ -16961,6 +17188,7 @@ enum ActivityAndClassesType {
   COLLECTIVE_CORE_MEMBER_EDITED
   COLLECTIVE_TRANSACTION_CREATED
   TRANSACTIONS_IMPORT_CREATED
+  TRANSACTIONS_IMPORT_ROW_UPDATED
   COLLECTIVE_UPDATE_CREATED
   COLLECTIVE_UPDATE_PUBLISHED
   COLLECTIVE_CONTACT
@@ -17537,7 +17765,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     The term to search
     """
     searchTerm: String
-    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
     """
@@ -17555,6 +17783,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
     """
     oppositeAccount: AccountReferenceInput
+
+    """
+    Return only orders made from/to these hosted accounts
+    """
+    hostedAccounts: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -17578,6 +17811,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
+
+    """
+    An alternative to filter by accounts, both cannot be used together
+    """
+    accounts: [AccountReferenceInput]
 
     """
     Return expenses only for this host
@@ -17727,7 +17965,7 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
   paymentMethodsWithPendingConfirmation: [PaymentMethod]
 
   """
-  The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts".
+  The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
   """
   connectedAccounts: [ConnectedAccount]
 
@@ -17819,6 +18057,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     isActive: Boolean
     accountType: [AccountType]
     searchTerm: String
+
+    """
+    Order of the results. Defaults to createdAt DESC.
+    """
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
   ): AccountCollection!
 
   """
@@ -18557,7 +18800,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     The term to search
     """
     searchTerm: String
-    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference. Not existing yet.")
+    tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
     """
@@ -18575,6 +18818,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Return only orders made from/to that opposite account (only works when orders are already filtered with a main account)
     """
     oppositeAccount: AccountReferenceInput
+
+    """
+    Return only orders made from/to these hosted accounts
+    """
+    hostedAccounts: [AccountReferenceInput]
   ): OrderCollection!
   expenses(
     direction: ExpenseDirection
@@ -18598,6 +18846,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
+
+    """
+    An alternative to filter by accounts, both cannot be used together
+    """
+    accounts: [AccountReferenceInput]
 
     """
     Return expenses only for this host
@@ -18747,7 +19000,7 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
   paymentMethodsWithPendingConfirmation: [PaymentMethod]
 
   """
-  The list of connected accounts (Stripe, Twitter, etc ...). Admin only. Scope: "connectedAccounts".
+  The list of connected accounts (Stripe, PayPal, etc ...). Admin only. Scope: "connectedAccounts".
   """
   connectedAccounts: [ConnectedAccount]
 
@@ -18839,6 +19092,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     isActive: Boolean
     accountType: [AccountType]
     searchTerm: String
+
+    """
+    Order of the results. Defaults to createdAt DESC.
+    """
+    orderBy: OrderByInput! = { field: CREATED_AT, direction: DESC }
   ): AccountCollection!
 
   """
@@ -20639,7 +20897,32 @@ type Mutation {
   """
   Generate a Plaid Link token
   """
-  generatePlaidLinkToken: PlaidLinkTokenCreateResponse!
+  generatePlaidLinkToken(
+    """
+    The account to which the Plaid account should be connected
+    """
+    host: AccountReferenceInput!
+
+    """
+    Use this parameter to specify the import to update (when using the Plaid update flow)
+    """
+    transactionImport: TransactionsImportReferenceInput
+
+    """
+    The countries to enable in the accounts selection. Defaults to the host country.
+    """
+    countries: [CountryISO!]
+
+    """
+    The language to use in the Plaid Link flow. Defaults to "en".
+    """
+    locale: Locale
+
+    """
+    If true, the account selection flow will be enabled. Requires a `transactionImport`.
+    """
+    accountSelectionEnabled: Boolean
+  ): PlaidLinkTokenCreateResponse!
 
   """
   Connect a Plaid account
@@ -20675,6 +20958,21 @@ type Mutation {
     """
     connectedAccount: ConnectedAccountReferenceInput!
   ): TransactionsImport!
+
+  """
+  Refresh the list of sub-accounts & other metadata by re-fetching the account info
+  """
+  refreshPlaidAccount(
+    """
+    The Plaid connected account to refresh
+    """
+    connectedAccount: ConnectedAccountReferenceInput
+
+    """
+    The transactions import to refresh
+    """
+    transactionImport: TransactionsImportReferenceInput
+  ): PlaidConnectAccountResponse!
 
   """
   [Root only] Edits account flags (deleted, banned, archived, trusted host)
@@ -20864,6 +21162,11 @@ type Mutation {
     Name of the import (e.g. "Contributions May 2021", "Tickets for Mautic Conference 2024")
     """
     name: NonEmptyString
+
+    """
+    Assignments for the import
+    """
+    assignments: [TransactionsImportAssignmentInput!]
   ): TransactionsImport!
 
   """
@@ -21914,6 +22217,11 @@ input ExpenseCreateInput {
   attachedFiles: [ExpenseAttachedFileInput!]
 
   """
+  (Optional - applicable to invoice expense only) The invoice file for this expense
+  """
+  invoiceFile: ExpenseAttachedFileInput
+
+  """
   Account to reimburse
   """
   payee: AccountReferenceInput!
@@ -21945,11 +22253,34 @@ input ExpenseCreateInput {
 }
 
 input PayoutMethodInput {
+  """
+  The unique identifier of the payout method
+  """
   id: String
+
+  """
+  The legacy identifier used in older systems
+  """
   legacyId: Int
+
+  """
+  Additional data specific to the payout method type. For custom payout methods (type=OTHER), must contain only `content` (string) and `currency` fields. For other types, may contain type-specific details (e.g., bank account details, PayPal email)
+  """
   data: JSON
+
+  """
+  A human-readable name for the payout method
+  """
   name: String
+
+  """
+  Whether this payout method should be saved for future use
+  """
   isSaved: Boolean
+
+  """
+  The type of payout method (e.g., PayPal, bank transfer)
+  """
   type: PayoutMethodType
 }
 
@@ -22094,6 +22425,11 @@ input ExpenseUpdateInput {
   (Optional) A list of files that you want to attach to this expense
   """
   attachedFiles: [ExpenseAttachedFileInput!]
+
+  """
+  (Optional - applicable to invoice expense only) The invoice file for this expense
+  """
+  invoiceFile: ExpenseAttachedFileInput
 
   """
   Account to reimburse
@@ -22373,6 +22709,11 @@ input ExpenseInviteDraftInput {
   (Optional) A list of files that you want to attach to this expense
   """
   attachedFiles: [JSON]
+
+  """
+  (Optional - applicable to invoice expense only) The invoice file for this expense
+  """
+  invoiceFile: JSON
 
   """
   Account to reimburse
@@ -23085,6 +23426,18 @@ type PlaidLinkTokenCreateResponse {
   hostedLinkUrl: String
 }
 
+input TransactionsImportReferenceInput {
+  """
+  The id of the row
+  """
+  id: NonEmptyString!
+}
+
+"""
+The locale in the format of a BCP 47 (RFC 5646) standard string
+"""
+scalar Locale
+
 type PlaidConnectAccountResponse {
   """
   The connected account that was created
@@ -23130,6 +23483,18 @@ type BanAccountResponse {
   The accounts impacted by the mutation
   """
   accounts: [Account!]!
+}
+
+input TransactionsImportAssignmentInput {
+  """
+  The ID of the account to assign the transactions to
+  """
+  importedAccountId: NonEmptyString!
+
+  """
+  The accounts to assign the transactions to
+  """
+  accounts: [AccountReferenceInput!]!
 }
 
 input TransactionsImportRowCreateInput {
@@ -23341,6 +23706,7 @@ enum UploadedFileKind {
   TIER_LONG_DESCRIPTION
   ACCOUNT_CUSTOM_EMAIL
   AGREEMENT_ATTACHMENT
+  EXPENSE_INVOICE
 }
 
 """

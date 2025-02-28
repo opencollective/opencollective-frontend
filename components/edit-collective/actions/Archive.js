@@ -11,9 +11,9 @@ import Container from '../../Container';
 import { adminPanelQuery } from '../../dashboard/queries';
 import { getI18nLink } from '../../I18nFormatters';
 import MessageBox from '../../MessageBox';
-import StyledButton from '../../StyledButton';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../StyledModal';
 import { P } from '../../Text';
+import { Button } from '../../ui/Button';
 import SettingsSectionTitle from '../sections/SettingsSectionTitle';
 
 const archiveCollectiveMutation = gqlV1/* GraphQL */ `
@@ -118,18 +118,18 @@ const ArchiveCollective = ({ collective }) => {
         </P>
       )}
       {!isArchived && (
-        <StyledButton
+        <Button
           onClick={() => setModal({ type: 'Archive', show: true })}
           loading={processing}
           disabled={collective.isHost || hasBalance}
-          mb={2}
+          variant="outline"
         >
           <FormattedMessage
             id="collective.archive.title"
             defaultMessage="Archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}"
             values={{ type: collective.type }}
           />
-        </StyledButton>
+        </Button>
       )}
       {!isArchived && hasBalance && (
         <P color="rgb(224, 183, 0)" my={1}>
@@ -164,13 +164,13 @@ const ArchiveCollective = ({ collective }) => {
       )}
 
       {isArchived && (
-        <StyledButton onClick={() => setModal({ type: 'Unarchive', show: true })} loading={processing}>
+        <Button variant="outline" onClick={() => setModal({ type: 'Unarchive', show: true })} loading={processing}>
           <FormattedMessage
             id="collective.unarchive.button"
             defaultMessage="Unarchive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}"
             values={{ type: collective.type }}
           />
-        </StyledButton>
+        </Button>
       )}
 
       {modal.show && (
@@ -199,7 +199,7 @@ const ArchiveCollective = ({ collective }) => {
                     defaultMessage="Are you sure you want to archive {type, select, EVENT {this Event} PROJECT {this Project} FUND {this Fund} COLLECTIVE {this Collective} ORGANIZATION {this Organization} other {this account}}?"
                     values={{ type: collective.type }}
                   />
-                  <MessageBox fontSize={13} type="warning" withIcon mt={3} mb={3}>
+                  <MessageBox fontSize={13} type="warning" withIcon mt={4}>
                     <FormattedMessage
                       defaultMessage="Note that archiving will cancel all active recurring contributions."
                       id="kyC4C+"
@@ -216,12 +216,12 @@ const ArchiveCollective = ({ collective }) => {
               )}
             </P>
           </ModalBody>
-          <ModalFooter>
-            <Container display="flex" justifyContent="flex-end">
-              <StyledButton mx={20} onClick={() => setModal({ ...modal, show: false })}>
+          <ModalFooter showDivider={false}>
+            <div className="flex justify-between gap-2">
+              <Button variant="outline" onClick={() => setModal({ ...modal, show: false })}>
                 <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-              </StyledButton>
-              <StyledButton
+              </Button>
+              <Button
                 buttonStyle="primary"
                 data-cy="action"
                 onClick={() => {
@@ -237,8 +237,8 @@ const ArchiveCollective = ({ collective }) => {
                 ) : (
                   <FormattedMessage id="collective.archive.confirm.btn" defaultMessage="Archive" />
                 )}
-              </StyledButton>
-            </Container>
+              </Button>
+            </div>
           </ModalFooter>
         </StyledModal>
       )}

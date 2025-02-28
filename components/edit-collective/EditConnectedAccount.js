@@ -7,23 +7,19 @@ import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
 import { connectAccount, connectAccountCallback, disconnectAccount } from '../../lib/api';
-import { ConnectedAccountService } from '../../lib/graphql/types/v2/schema';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
 import { getWebsiteUrl, isValidUrl, parseToBoolean } from '../../lib/utils';
 
 import DateTime from '../DateTime';
 import { Box, Flex } from '../Grid';
-import { getI18nLink } from '../I18nFormatters';
 import MessageBox from '../MessageBox';
-import StyledButton from '../StyledButton';
-import StyledLink from '../StyledLink';
 import StyledSpinner from '../StyledSpinner';
 import { P } from '../Text';
+import { Button } from '../ui/Button';
 import { toast } from '../ui/useToast';
 
 import EditPayPalAccount from './EditPayPalAccount';
 import EditTransferWiseAccount from './EditTransferWiseAccount';
-import EditTwitterAccount from './EditTwitterAccount';
 
 class EditConnectedAccount extends React.Component {
   static propTypes = {
@@ -113,7 +109,7 @@ class EditConnectedAccount extends React.Component {
     this.setState({ isConnecting: true });
 
     // Redirect to OAuth flow
-    if (service === 'github' || service === 'twitter') {
+    if (service === 'github') {
       const redirectUrl = `${getWebsiteUrl()}/api/connected-accounts/${service}/oauthUrl`;
       const redirectUrlParams = new URLSearchParams({ CollectiveId: collective.id });
       const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
@@ -200,7 +196,6 @@ class EditConnectedAccount extends React.Component {
     }
 
     const disableReason = this.messages[`collective.connectedAccounts.${service}.disableReason`];
-    const isTwitter = service === ConnectedAccountService.twitter;
     return (
       <Box width="100%">
         {this.isConnectCallback() ? (
@@ -219,27 +214,6 @@ class EditConnectedAccount extends React.Component {
             )}
             {connectedAccount ? (
               <Flex flexDirection="column" width="100%">
-                {isTwitter && (
-                  <div className="mb-4">
-                    <MessageBox withIcon type="warning">
-                      <FormattedMessage
-                        id="UjgBCr"
-                        defaultMessage="The Twitter integration is being deprecated. If this affects you, we’d love to hear your feedback! Please share your thoughts in <IssueLink>this Github issue</IssueLink> or join the discussion on {DiscordLink}."
-                        values={{
-                          DiscordLink: (
-                            <StyledLink href="https://discord.opencollective.com" openInNewTab>
-                              Discord
-                            </StyledLink>
-                          ),
-                          IssueLink: getI18nLink({
-                            href: 'https://github.com/opencollective/opencollective/issues/7670',
-                            openInNewTab: true,
-                          }),
-                        }}
-                      />
-                    </MessageBox>
-                  </div>
-                )}
                 <P mb={2}>
                   <FormattedMessage
                     defaultMessage="{service} account {username} connected on {date}"
@@ -256,64 +230,42 @@ class EditConnectedAccount extends React.Component {
                   />
                 </P>
                 <Flex mt={1} gridGap="8px" flexWrap="wrap">
-                  {!isTwitter && (
-                    <StyledButton
-                      buttonSize="small"
-                      onClick={() => this.connect(service)}
-                      loading={isConnecting}
-                      disabled={disableReason}
-                    >
-                      <FormattedMessage id="collective.connectedAccounts.reconnect.button" defaultMessage="Reconnect" />
-                    </StyledButton>
-                  )}
-                  <StyledButton buttonSize="small" onClick={() => this.disconnect(service)} loading={isDisconnecting}>
+                  <Button
+                    size="sm"
+                    onClick={() => this.connect(service)}
+                    loading={isConnecting}
+                    disabled={disableReason}
+                    variant="outline"
+                  >
+                    <FormattedMessage id="collective.connectedAccounts.reconnect.button" defaultMessage="Reconnect" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => this.disconnect(service)}
+                    loading={isDisconnecting}
+                  >
                     <FormattedMessage id="collective.connectedAccounts.disconnect.button" defaultMessage="Disconnect" />
-                  </StyledButton>
+                  </Button>
                 </Flex>
-                {!disableReason && connectedAccount.service === 'twitter' && (
-                  <Box my={3}>
-                    <EditTwitterAccount collective={collective} connectedAccount={connectedAccount} />
-                  </Box>
-                )}
               </Flex>
-            ) : isTwitter ? (
-              <div>
-                <MessageBox withIcon type="warning">
-                  <FormattedMessage
-                    id="4IdZrh"
-                    defaultMessage="The Twitter integration is no longer supported. If this affects you, we’d love to hear your feedback! Please share your thoughts in <IssueLink>this Github issue</IssueLink> or join the discussion on {DiscordLink}."
-                    values={{
-                      DiscordLink: (
-                        <StyledLink href="https://discord.opencollective.com" openInNewTab>
-                          Discord
-                        </StyledLink>
-                      ),
-                      IssueLink: getI18nLink({
-                        href: 'https://github.com/opencollective/opencollective/issues/7670',
-                        openInNewTab: true,
-                      }),
-                    }}
-                  />
-                </MessageBox>
-              </div>
             ) : (
               <Box>
                 <P fontSize="12px" color="black.600" fontWeight="normal" mb={2}>
                   {intl.formatMessage(this.messages[`collective.connectedAccounts.${service}.description`])}
                 </P>
-                <StyledButton
+                <Button
                   data-cy={`connect-${service}-button`}
-                  buttonSize="small"
+                  size="sm"
                   onClick={() => this.connect(service)}
                   loading={isConnecting}
-                  minWidth={120}
-                  mb={2}
+                  className="max-w-xs"
                 >
                   {intl.formatMessage(
                     { defaultMessage: 'Connect {service}', id: 'C9HmCs' },
                     { service: capitalize(service) },
                   )}
-                </StyledButton>
+                </Button>
               </Box>
             )}
           </div>

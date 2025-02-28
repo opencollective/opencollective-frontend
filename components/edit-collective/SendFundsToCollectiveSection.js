@@ -4,11 +4,10 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { formatCurrency } from '../../lib/currency-utils';
 
-import Container from '../Container';
 import SendMoneyToCollectiveBtn from '../SendMoneyToCollectiveBtn';
-import StyledButton from '../StyledButton';
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../StyledModal';
 import { P } from '../Text';
+import { Button } from '../ui/Button';
 
 const SendFundsToCollectiveSection = ({ collective, toCollective, LoggedInUser }) => {
   const { locale } = useIntl();
@@ -34,7 +33,7 @@ const SendFundsToCollectiveSection = ({ collective, toCollective, LoggedInUser }
         />
       )}
       {collective.stats.balance === 0 && (
-        <StyledButton disabled={true}>
+        <Button variant="outline" disabled={true}>
           <FormattedMessage
             id="SendMoneyToCollective.btn"
             defaultMessage="Send {amount} to {collective}"
@@ -43,7 +42,7 @@ const SendFundsToCollectiveSection = ({ collective, toCollective, LoggedInUser }
               collective: toCollective.name,
             }}
           />
-        </StyledButton>
+        </Button>
       )}
       {modal.show && (
         <StyledModal onClose={closeModal}>
@@ -63,19 +62,19 @@ const SendFundsToCollectiveSection = ({ collective, toCollective, LoggedInUser }
               />
             </P>
           </ModalBody>
-          <ModalFooter>
-            <Container display="flex" justifyContent="flex-end">
-              <StyledButton mx={20} onClick={() => setModal({ ...modal, show: false, isApproved: false })}>
+          <ModalFooter showDivider={false}>
+            <div className="flex justify-between gap-2">
+              <Button variant="outline" onClick={() => setModal({ ...modal, show: false, isApproved: false })}>
                 <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-              </StyledButton>
-              <StyledButton
+              </Button>
+              <Button
                 buttonStyle="primary"
                 data-cy="action"
                 onClick={() => setModal({ ...modal, show: false, isApproved: true })}
               >
                 <FormattedMessage id="confirm" defaultMessage="Confirm" />
-              </StyledButton>
-            </Container>
+              </Button>
+            </div>
           </ModalFooter>
         </StyledModal>
       )}

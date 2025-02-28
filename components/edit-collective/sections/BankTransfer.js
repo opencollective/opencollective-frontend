@@ -4,6 +4,7 @@ import { useMutation, useQuery } from '@apollo/client';
 import { Add } from '@styled-icons/material/Add';
 import { Formik } from 'formik';
 import { findLast, get, omit } from 'lodash';
+import { Edit, X } from 'lucide-react';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { BANK_TRANSFER_DEFAULT_INSTRUCTIONS, PayoutMethodType } from '../../../lib/constants/payout-method';
@@ -11,14 +12,14 @@ import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import { formatManualInstructions } from '../../../lib/payment-method-utils';
 
 import ConfirmationModal from '../../ConfirmationModal';
-import Container from '../../Container';
 import PayoutBankInformationForm from '../../expenses/PayoutBankInformationForm';
 import { Box, Flex } from '../../Grid';
 import { WebsiteName } from '../../I18nFormatters';
 import Image from '../../Image';
 import Loading from '../../Loading';
-import StyledButton from '../../StyledButton';
 import { P } from '../../Text';
+import { Button } from '../../ui/Button';
+import { useToast } from '../../ui/useToast';
 import UpdateBankDetailsForm from '../UpdateBankDetailsForm';
 import { formatAccountDetails } from '../utils';
 
@@ -84,18 +85,19 @@ const editBankTransferMutation = gql`
 `;
 
 const renderBankInstructions = (instructions, bankAccountInfo) => {
-  const formatValues = {
+  const formattedValues = {
     account: bankAccountInfo ? formatAccountDetails(bankAccountInfo) : '',
     reference: '76400',
     OrderId: '76400',
-    amount: '$30',
+    amount: '30,00 USD',
     collective: 'acme',
   };
 
-  return formatManualInstructions(instructions, formatValues);
+  return formatManualInstructions(instructions, formattedValues);
 };
 
 const BankTransfer = props => {
+  const { toast } = useToast();
   const { loading, data } = useQuery(hostQuery, {
     context: API_V2_CONTEXT,
     variables: { slug: props.collectiveSlug },
@@ -130,7 +132,7 @@ const BankTransfer = props => {
   };
 
   const latestBankAccount = findLast(
-    data?.host?.payoutMethods,
+    data.host?.payoutMethods,
     payoutMethod => payoutMethod.type === PayoutMethodType.BANK_ACCOUNT,
   );
 
@@ -143,7 +145,7 @@ const BankTransfer = props => {
           </SettingsSectionTitle>
 
           <Box>
-            <Container fontSize="12px" mt={2} color="black.600" textAlign="left">
+            <p>
               {data.host.plan.manualPayments ? (
                 <FormattedMessage
                   id="paymentMethods.manual.add.info"
@@ -155,22 +157,35 @@ const BankTransfer = props => {
                   defaultMessage="Subscribe to our special plans for hosts"
                 />
               )}
-            </Container>
+            </p>
           </Box>
           {existingManualPaymentMethod && (
             <Box pt={2}>
-              <Container fontSize="12px" mt={2} mb={2} color="black.600" textAlign="left">
+              <p className="mb-2 text-sm font-bold">
                 <FormattedMessage defaultMessage="Preview of bank transfer instructions" id="13qBPb" />
-              </Container>
-              <pre style={{ whiteSpace: 'pre-wrap' }}>
+              </p>
+              <pre className="rounded border bg-neutral-100 px-4 py-3 text-sm whitespace-pre-wrap">
                 {renderBankInstructions(instructions, latestBankAccount?.data)}
               </pre>
             </Box>
           )}
-          <Box alignItems="center" my={2}>
-            <StyledButton
-              buttonStyle="standard"
-              buttonSize="small"
+          <div className="my-3 flex items-center gap-2">
+            {existingManualPaymentMethod && (
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={!data.host.plan.manualPayments}
+                onClick={() => {
+                  setShowRemoveBankConfirmationModal(true);
+                }}
+              >
+                <X size={12} className="mr-1" />
+                <FormattedMessage defaultMessage="Remove bank details" id="D0TAWz" />
+              </Button>
+            )}
+            <Button
+              size="sm"
+              variant="outline"
               disabled={!data.host.plan.manualPayments}
               onClick={() => {
                 setShowForm(true);
@@ -178,7 +193,10 @@ const BankTransfer = props => {
               }}
             >
               {existingManualPaymentMethod ? (
-                <FormattedMessage id="paymentMethods.manual.edit" defaultMessage="Edit bank details" />
+                <Fragment>
+                  <Edit size={12} className="mr-1" />
+                  <FormattedMessage id="paymentMethods.manual.edit" defaultMessage="Edit bank details" />
+                </Fragment>
               ) : (
                 <Fragment>
                   <Add size="1em" />
@@ -186,21 +204,8 @@ const BankTransfer = props => {
                   <FormattedMessage id="paymentMethods.manual.add" defaultMessage="Set bank details" />
                 </Fragment>
               )}
-            </StyledButton>{' '}
-            {existingManualPaymentMethod && (
-              <StyledButton
-                mt={[2, 0]}
-                buttonStyle="standard"
-                buttonSize="small"
-                disabled={!data.host.plan.manualPayments}
-                onClick={() => {
-                  setShowRemoveBankConfirmationModal(true);
-                }}
-              >
-                <FormattedMessage defaultMessage="Remove bank details" id="D0TAWz" />
-              </StyledButton>
-            )}
-          </Box>
+            </Button>
+          </div>
         </Fragment>
       )}
       {showForm && (
@@ -230,9 +235,14 @@ const BankTransfer = props => {
             setSubmitting(false);
             setShowForm(false);
             props.hideTopsection(false);
+            window.scrollTo(0, 0);
+            toast({
+              variant: 'success',
+              message: <FormattedMessage defaultMessage="Bank transfer instructions have been updated" id="9BftpU" />,
+            });
           }}
         >
-          {({ handleSubmit, isSubmitting, setFieldValue, values }) => (
+          {({ handleSubmit, isSubmitting, setFieldValue, dirty, values }) => (
             <form onSubmit={handleSubmit}>
               <SettingsSectionTitle>
                 <FormattedMessage id="paymentMethods.manual.HowDoesItWork" defaultMessage="How does it work?" />
@@ -278,11 +288,11 @@ const BankTransfer = props => {
                   bankAccount={values.data}
                 />
               </Box>
-              <Box my={3} textAlign={['center', 'left']}>
-                <StyledButton
+              <div className="mt-3 flex flex-row gap-2">
+                <Button
                   mr={2}
-                  buttonStyle="standard"
-                  buttonSize="medium"
+                  variant="outline"
+                  className="min-w-32"
                   onClick={() => {
                     setShowForm(false);
                     props.hideTopsection(false);
@@ -290,17 +300,11 @@ const BankTransfer = props => {
                   disabled={isSubmitting}
                 >
                   <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-                </StyledButton>
-                <StyledButton
-                  buttonStyle="primary"
-                  buttonSize="medium"
-                  type="submit"
-                  disabled={isSubmitting}
-                  loading={isSubmitting}
-                >
+                </Button>
+                <Button className="min-w-32" type="submit" disabled={isSubmitting || !dirty} loading={isSubmitting}>
                   <FormattedMessage id="save" defaultMessage="Save" />
-                </StyledButton>
-              </Box>
+                </Button>
+              </div>
             </form>
           )}
         </Formik>

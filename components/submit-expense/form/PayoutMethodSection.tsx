@@ -14,15 +14,15 @@ import {
   type SavePayoutMethodMutationVariables,
 } from '../../../lib/graphql/types/v2/graphql';
 import { PayoutMethodType } from '../../../lib/graphql/types/v2/schema';
+import { objectKeys } from '@/lib/utils';
 
 import { ComboSelect } from '@/components/ComboSelect';
 import { FormField } from '@/components/FormField';
 import { useModal } from '@/components/ModalContext';
-import { Input } from '@/components/ui/Input';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 import { CONFIRMATION_MODAL_TERMINATE } from '../../ConfirmationModal';
 import PayoutMethodForm, { validatePayoutMethod } from '../../expenses/PayoutMethodForm';
-import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBox from '../../MessageBox';
 import { I18nPayoutMethodLabels, PayoutMethodLabel } from '../../PayoutMethodLabel';
 import { Button } from '../../ui/Button';
@@ -112,7 +112,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
       props.payoutMethodId !== '__newPayoutMethod' &&
       (!props.payoutMethodId || !payoutMethods.some(p => p.id === props.payoutMethodId))
     ) {
-      setFieldValue('payoutMethodId', payoutMethods.at(0)?.id);
+      setFieldValue('payoutMethodId', payoutMethods.at(0)?.id ?? '');
     }
 
     if (!props.initialLoading) {
@@ -135,7 +135,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
   const onPaymentMethodDeleted = React.useCallback(
     async deletedPayoutMethodId => {
       if (deletedPayoutMethodId === props.payoutMethodId) {
-        setFieldValue('payoutMethodId', null);
+        setFieldValue('payoutMethodId', '');
       }
       await refresh();
     },
@@ -188,7 +188,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
 
           {(isLoading || isLoadingPayee) && (
             <RadioGroupCard value="" disabled>
-              <LoadingPlaceholder height={24} width={1} />
+              <Skeleton className="h-6 w-full" />
             </RadioGroupCard>
           )}
 
@@ -245,7 +245,7 @@ function getNewPayoutMethodOptionFormProps(form: ExpenseForm) {
     ...pick(form, ['setFieldValue', 'setFieldTouched', 'validateForm', 'refresh', 'isSubmitting']),
     ...pick(form.values, ['newPayoutMethod', 'payeeSlug']),
     ...pick(form.options, ['supportedPayoutMethods', 'host', 'loggedInAccount', 'payee']),
-    touchedNewPayoutMethod: form.touched.newPayoutMethod,
+    touchedNewPayoutMethodName: form.touched.newPayoutMethod?.name,
   };
 }
 
@@ -256,23 +256,6 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
   const [creatingPayoutMethod, setIsCreatingPayoutMethod] = React.useState(false);
 
   const { setFieldValue, setFieldTouched, validateForm, refresh } = props;
-  React.useEffect(() => {
-    if (!props.touchedNewPayoutMethod?.name) {
-      setFieldValue(
-        'newPayoutMethod.name',
-        generatePayoutMethodName(props.newPayoutMethod.type, props.newPayoutMethod.data),
-      );
-    }
-  }, [
-    props.newPayoutMethod.name,
-    props.newPayoutMethod.type,
-    props.newPayoutMethod.data.email,
-    props.newPayoutMethod.data.details,
-    props.newPayoutMethod.data.currency,
-    props.touchedNewPayoutMethod?.name,
-    props.newPayoutMethod.data,
-    setFieldValue,
-  ]);
 
   const [createPayoutMethod] = useMutation<SavePayoutMethodMutation, SavePayoutMethodMutationVariables>(
     gql`
@@ -285,7 +268,7 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
     {
       context: API_V2_CONTEXT,
       variables: {
-        payoutMethod: props.newPayoutMethod,
+        payoutMethod: { ...props.newPayoutMethod },
         payeeSlug: props.payeeSlug,
       },
     },
@@ -297,6 +280,14 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
       setFieldTouched('newPayoutMethod.data.currency');
       const formErrors = await validateForm();
       if (!isEmpty(get(formErrors, 'newPayoutMethod')) || formErrors.payoutMethodNameDiscrepancyReason) {
+        if (formErrors.payoutMethodNameDiscrepancyReason) {
+          setFieldTouched('payoutMethodNameDiscrepancyReason');
+        }
+
+        for (const k of objectKeys(formErrors.newPayoutMethod)) {
+          setFieldTouched(`newPayoutMethod.${k}`);
+        }
+
         return;
       }
       const errors = validatePayoutMethod(props.newPayoutMethod);
@@ -348,7 +339,7 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
   return (
     <div className="space-y-3 p-2">
       {creatingPayoutMethod ? (
-        <LoadingPlaceholder width={1} height={24} />
+        <Skeleton className="h-6 w-full" />
       ) : (
         <React.Fragment>
           <FormField
@@ -368,37 +359,14 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
           </FormField>
 
           {props.newPayoutMethod?.type && (
-            <React.Fragment>
-              <PayoutMethodForm
-                disabled={props.isSubmitting}
-                required
-                alwaysSave
-                fieldsPrefix="newPayoutMethod"
-                payoutMethod={props.newPayoutMethod}
-                host={props.host}
-              />
-              <div>
-                <FormField
-                  disabled={props.isSubmitting}
-                  name="newPayoutMethod.name"
-                  label={intl.formatMessage({ defaultMessage: 'Name', id: 'Fields.name' })}
-                  onFocus={() => setFieldTouched('newPayoutMethod.name', true)}
-                />
-
-                {props.newPayoutMethod.name !==
-                  generatePayoutMethodName(props.newPayoutMethod.type, props.newPayoutMethod.data) && (
-                  <Button
-                    disabled={props.isSubmitting}
-                    size="xs"
-                    variant="link"
-                    className="p-0"
-                    onClick={() => setFieldTouched('newPayoutMethod.name', false)}
-                  >
-                    <FormattedMessage defaultMessage="Use default generated name" id="+6P7pM" />
-                  </Button>
-                )}
-              </div>
-            </React.Fragment>
+            <PayoutMethodForm
+              disabled={props.isSubmitting}
+              required
+              alwaysSave
+              fieldsPrefix="newPayoutMethod"
+              payoutMethod={props.newPayoutMethod}
+              host={props.host}
+            />
           )}
         </React.Fragment>
       )}
@@ -460,7 +428,7 @@ function PayoutMethodRadioGroupItemWrapper(props: PayoutMethodRadioGroupItemProp
 
 function getPayoutMethodRadioGroupItemFormProps(form: ExpenseForm) {
   return {
-    ...pick(form, ['setFieldValue', 'setFieldTouched', 'refresh', 'isSubmitting']),
+    ...pick(form, ['setFieldValue', 'setFieldTouched', 'refresh', 'isSubmitting', 'validateForm']),
     ...pick(form.values, ['payeeSlug', 'editingPayoutMethod']),
     ...pick(form.options, ['payee', 'host']),
     touchedEditingPayoutMethod: form.touched.editingPayoutMethod,
@@ -599,7 +567,7 @@ const PayoutMethodRadioGroupItem = memoWithGetFormProps(function PayoutMethodRad
           defaultMessage: 'Are you sure you want to delete this payout method?',
           id: 'uR+TjD',
         }),
-        children: <PayoutMethodLabel payoutMethod={props.payoutMethod} />,
+        children: <PayoutMethodLabel showIcon payoutMethod={props.payoutMethod} />,
         onConfirm: async () => {
           try {
             await deletePayoutMethod();
@@ -622,7 +590,7 @@ const PayoutMethodRadioGroupItem = memoWithGetFormProps(function PayoutMethodRad
     [intl, deletePayoutMethod, props, showConfirmationModal, toast],
   );
 
-  const { setFieldValue, setFieldTouched } = props;
+  const { setFieldValue } = props;
   const onEditClick = React.useCallback(
     e => {
       e.stopPropagation();
@@ -636,33 +604,21 @@ const PayoutMethodRadioGroupItem = memoWithGetFormProps(function PayoutMethodRad
     [isEditingPayoutMethod, props.payoutMethod, setFieldValue],
   );
 
-  const editNameTouched = get(props.touchedEditingPayoutMethod, `${props.payoutMethod.id}.name`, false);
-  React.useEffect(() => {
-    if (!isEditingPayoutMethod) {
+  const { onPaymentMethodEdited } = props;
+  const formFieldParent = `editingPayoutMethod.${props.payoutMethod.id}`;
+  const { setFieldTouched, validateForm } = props;
+  const onSaveClick = React.useCallback(async () => {
+    setFieldTouched(`${formFieldParent}.type`);
+    setFieldTouched(`${formFieldParent}.data.currency`);
+    const formErrors = await validateForm();
+    if (!isEmpty(get(formErrors, formFieldParent))) {
+      for (const k of objectKeys(get(formErrors, formFieldParent))) {
+        setFieldTouched(`${formFieldParent}.${k}`);
+      }
+
       return;
     }
 
-    if (!editNameTouched) {
-      setFieldValue(
-        `editingPayoutMethod.${props.payoutMethod.id}.name`,
-        generatePayoutMethodName(editPayoutMethodValue.type, editPayoutMethodValue.data),
-      );
-    }
-  }, [
-    editPayoutMethodValue.name,
-    editPayoutMethodValue.type,
-    editPayoutMethodValue.data?.email,
-    editPayoutMethodValue.data?.details,
-    editPayoutMethodValue.data?.currency,
-    editPayoutMethodValue.data,
-    setFieldValue,
-    isEditingPayoutMethod,
-    editNameTouched,
-    props.payoutMethod.id,
-  ]);
-
-  const { onPaymentMethodEdited } = props;
-  const onSaveClick = React.useCallback(async () => {
     try {
       setIsLoadingEditPayoutMethod(true);
       const newPayoutMethodResponse = await createPayoutMethod();
@@ -683,7 +639,17 @@ const PayoutMethodRadioGroupItem = memoWithGetFormProps(function PayoutMethodRad
       setFieldValue(`editingPayoutMethod`, {});
       setIsLoadingEditPayoutMethod(false);
     }
-  }, [createPayoutMethod, deletePayoutMethod, intl, onPaymentMethodEdited, toast, setFieldValue]);
+  }, [
+    createPayoutMethod,
+    deletePayoutMethod,
+    intl,
+    onPaymentMethodEdited,
+    toast,
+    setFieldValue,
+    formFieldParent,
+    validateForm,
+    setFieldTouched,
+  ]);
 
   if (isDeleted) {
     return null;
@@ -700,7 +666,7 @@ const PayoutMethodRadioGroupItem = memoWithGetFormProps(function PayoutMethodRad
           isEditingPayoutMethod ? (
             <React.Fragment>
               {isLoadingEditPayoutMethod ? (
-                <LoadingPlaceholder width={1} height={24} />
+                <Skeleton className="h-6 w-full" />
               ) : (
                 <div className="space-y-2">
                   <PayoutMethodForm
@@ -710,31 +676,6 @@ const PayoutMethodRadioGroupItem = memoWithGetFormProps(function PayoutMethodRad
                     payoutMethod={omit(props.payoutMethod, 'id')}
                     host={props.host}
                   />
-                  <FormField
-                    disabled={props.isSubmitting}
-                    label={intl.formatMessage({ defaultMessage: 'Name', id: 'Fields.name' })}
-                    name={`editingPayoutMethod.${props.payoutMethod.id}.name`}
-                  >
-                    {({ field }) => (
-                      <Input
-                        {...field}
-                        onFocus={() => props.setFieldTouched(`editingPayoutMethod.${props.payoutMethod.id}.name`, true)}
-                      />
-                    )}
-                  </FormField>
-                  {editPayoutMethodValue?.name !==
-                    generatePayoutMethodName(editPayoutMethodValue.type, editPayoutMethodValue.data) && (
-                    <Button
-                      disabled={props.isSubmitting}
-                      loading={props.isSubmitting}
-                      size="xs"
-                      variant="link"
-                      className="p-0"
-                      onClick={() => setFieldTouched(`editingPayoutMethod.${props.payoutMethod.id}.name`, false)}
-                    >
-                      <FormattedMessage defaultMessage="Use default generated name" id="+6P7pM" />
-                    </Button>
-                  )}
                 </div>
               )}
 

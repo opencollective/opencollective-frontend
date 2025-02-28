@@ -345,6 +345,16 @@ export const expensePageExpenseFieldsFragment = gql`
       rate
       idNumber
     }
+    invoiceFile {
+      id
+      url
+      name
+      type
+      size
+      ... on ImageFileInfo {
+        width
+      }
+    }
     attachedFiles {
       id
       url
@@ -841,6 +851,16 @@ export const expensesListAdminFieldsFragment = gql`
       id
       type
       rate
+    }
+    invoiceFile {
+      id
+      url
+      name
+      type
+      size
+      ... on ImageFileInfo {
+        width
+      }
     }
     attachedFiles {
       id

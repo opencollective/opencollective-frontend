@@ -106,6 +106,22 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host, required, alwaysSa
             required={required !== false}
             placeholder="e.g., yourname@yourhost.com"
           />
+          {alwaysSave && (
+            <FormField
+              disabled={disabled}
+              name={getFieldName('name')}
+              label={intl.formatMessage({ defaultMessage: 'Alias', id: 'PayoutMethod.New.Alias' })}
+              hint={intl.formatMessage({
+                defaultMessage: 'Give this payout method an alias that will help you identify it',
+                id: 'PayoutMethod.New.Alias.hint',
+              })}
+              placeholder={intl.formatMessage({
+                defaultMessage: 'e.g., PayPal Personal',
+                id: 'PayoutMethod.New.Alias.placeholder.paypal',
+              })}
+              required={false}
+            />
+          )}
         </React.Fragment>
       )}
       {payoutMethod.type === PayoutMethodType.OTHER && (
@@ -124,6 +140,22 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host, required, alwaysSa
           <FormField disabled={disabled} name={getFieldName('data.content')} label={formatMessage(msg.content)}>
             {({ field }) => <Textarea {...field} minHeight={100} disabled={!isNew} data-cy="payout-other-info" />}
           </FormField>
+          {alwaysSave && (
+            <FormField
+              disabled={disabled}
+              name={getFieldName('name')}
+              label={intl.formatMessage({ defaultMessage: 'Alias', id: 'PayoutMethod.New.Alias' })}
+              hint={intl.formatMessage({
+                defaultMessage: 'Give this payout method an alias that will help you identify it',
+                id: 'PayoutMethod.New.Alias.hint',
+              })}
+              placeholder={intl.formatMessage({
+                defaultMessage: 'e.g., Main Bank Account',
+                id: 'PayoutMethod.New.Alias.placeholder.bankAccount',
+              })}
+              required={false}
+            />
+          )}
         </React.Fragment>
       )}
       {payoutMethod.type === PayoutMethodType.BANK_ACCOUNT && (
@@ -133,6 +165,7 @@ const PayoutMethodForm = ({ payoutMethod, fieldsPrefix, host, required, alwaysSa
           getFieldName={getFieldName}
           host={host}
           optional={required === false}
+          alwaysSave={alwaysSave}
         />
       )}
       {isNew && !alwaysSave && (

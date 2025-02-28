@@ -16,7 +16,8 @@ describe('Contribution Flow: Guest contributions', () => {
     cy.get('button[data-cy="cf-next-step"]').click();
     cy.contains('Contribute as a guest');
     cy.get('input[name=email]').type(defaultTestUserEmail);
-    cy.get('input[name=name]').type('Jack London');
+    cy.getByDataCy('input-name').type('Jack London');
+    cy.getByDataCy('input-legalName').type('Very Legal Organization');
     cy.wait(200);
     cy.get('button[data-cy="cf-next-step"]').click();
 
@@ -136,10 +137,12 @@ describe('Contribution Flow: Guest contributions', () => {
       cy.get('input[name=legalName]:invalid').should('have.length', 1); // Legal name is not (contrib > $500)
       cy.get('input[name=email]:invalid').should('have.length', 1); // Empty
 
-      cy.get('input[name=name]').type('Rick Astley');
-      cy.get('input[name=legalName]:invalid').should('not.exist'); // Legal name is optional if name is provided
+      cy.getByDataCy('input-name').type('Rick Astley');
+      cy.getByDataCy('input-legalName').type('Very Legal Organization');
+
       cy.get('input[name=email]').type(`{selectall}${firstEmail}`);
       cy.get('button[data-cy="cf-next-step"]').click();
+
       cy.useAnyPaymentMethod();
       cy.contains('button[data-cy="cf-next-step"]', 'Contribute $500').click();
 

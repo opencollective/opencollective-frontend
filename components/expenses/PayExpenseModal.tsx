@@ -116,8 +116,7 @@ const validateTransferRequirementsQuery = gql`
 
 type TransferDetailsFieldsProps = {
   setDisabled: (disabled: boolean) => void;
-  expense: any;
-};
+} & Pick<PayExpenseModalProps, 'expense' | 'host'>;
 
 const generateDefaultReference = (expense, limit) => {
   const id = expense.legacyId.toString();
@@ -130,8 +129,9 @@ const generateDefaultReference = (expense, limit) => {
   ].join(' ');
 };
 
-const TransferDetailFields = ({ expense, setDisabled }: TransferDetailsFieldsProps) => {
+const TransferDetailFields = ({ expense, setDisabled, host }: TransferDetailsFieldsProps) => {
   const formik = useFormikContext<any>();
+  const generateReference = host.settings?.transferwise?.generateReference !== false;
   const { data, loading, error } = useQuery(validateTransferRequirementsQuery, {
     variables: { id: expense.id },
     context: API_V2_CONTEXT,
@@ -149,12 +149,17 @@ const TransferDetailFields = ({ expense, setDisabled }: TransferDetailsFieldsPro
         if (r) {
           referenceField = r;
         }
-        return r;
+        return;
       });
     });
     if (referenceField) {
-      const reference = expense.reference || generateDefaultReference(expense, referenceField.maxLength);
-      formik.setFieldValue('transfer.details.reference', truncateMiddle(reference, referenceField.maxLength, ' '));
+      const reference =
+        expense.reference || generateReference
+          ? generateDefaultReference(expense, referenceField.maxLength)
+          : undefined;
+      if (reference) {
+        formik.setFieldValue('transfer.details.reference', truncateMiddle(reference, referenceField.maxLength, ' '));
+      }
     }
   }, [data]);
 
@@ -623,7 +628,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
             )}
             {canQuote && !isManualPayment && (
               <div className="mt-3">
-                <TransferDetailFields expense={expense} setDisabled={setTransferDetailsLoadingState} />
+                <TransferDetailFields host={host} expense={expense} setDisabled={setTransferDetailsLoadingState} />
               </div>
             )}
             {getCanCustomizeFeesPayer(

@@ -67,7 +67,9 @@ export const generatePaymentMethodOptions = (
 
   uniquePMs = uniquePMs.filter(
     ({ paymentMethod }) =>
-      paymentMethod.type !== PAYMENT_METHOD_TYPE.COLLECTIVE || collective.host.id === stepProfile.host?.id,
+      paymentMethod.type !== PAYMENT_METHOD_TYPE.COLLECTIVE ||
+      collective.host.id === stepProfile.host?.id ||
+      collective.host.id === stepProfile.id,
   );
 
   if (paymentIntent) {
@@ -339,9 +341,19 @@ const getTotalYearlyAmount = stepDetails => {
  * @returns {{ legalName?: boolean, address?: boolean }}
  */
 export const getRequiredInformation = (stepProfile, stepDetails, collective, profiles = [], tier) => {
+  const isContributingFromSameHost =
+    stepProfile?.host?.id === collective?.host.id || stepProfile?.id === collective?.host.id;
+  if (isContributingFromSameHost) {
+    return { address: false, legalName: false };
+  }
+
   let totalAmount = getTotalYearlyAmount(stepDetails);
-  const selectedProfile = profiles.find(p => p.account.id === stepProfile?.id);
+  let selectedProfile = profiles.find(p => p.account.id === stepProfile?.id);
   if (selectedProfile) {
+    // If incognito, use the user individual profile
+    if (stepProfile.isIncognito) {
+      selectedProfile = profiles[0];
+    }
     totalAmount += selectedProfile.totalContributedToHost?.valueInCents || 0;
   }
   const thresholds = collective?.policies?.CONTRIBUTOR_INFO_THRESHOLDS;

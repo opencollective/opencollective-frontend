@@ -79,7 +79,6 @@ export const LEGACY_SETTINGS_SECTIONS = {
   ADVANCED: 'advanced',
   AUTHORIZED_APPS: 'authorized-apps',
   COLLECTIVE_GOALS: 'goals',
-  CONNECTED_ACCOUNTS: 'connected-accounts',
   EXPORT: 'export',
   FOR_DEVELOPERS: 'for-developers',
   USER_SECURITY: 'user-security',
@@ -154,10 +153,6 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.COLLECTIVE_PAGE]: {
     id: 'editCollective.menu.collectivePage',
     defaultMessage: 'Profile Sections',
-  },
-  [ALL_SECTIONS.CONNECTED_ACCOUNTS]: {
-    id: 'H/VkpN',
-    defaultMessage: 'Social Accounts',
   },
   [ALL_SECTIONS.EXPORT]: {
     id: 'editCollective.menu.export',

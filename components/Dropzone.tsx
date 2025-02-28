@@ -57,6 +57,7 @@ const Dropzone = ({
   kind = null,
   showReplaceAction = true,
   className = '',
+  id,
   ...props
 }: DropzoneProps) => {
   const { toast } = useToast();
@@ -133,7 +134,7 @@ const Dropzone = ({
       {...(value ? omit(dropProps, ['onClick']) : dropProps)}
       style={{ height: size, width: size, minHeight: size || minHeight }}
     >
-      <input name={name} disabled={props.disabled} {...getInputProps()} />
+      <input id={id} name={name} disabled={props.disabled} {...getInputProps()} />
       {isLoading || isUploading || isUploadingWithGraphQL ? (
         <div
           className="relative flex h-full w-full items-center justify-center"
@@ -165,7 +166,12 @@ const Dropzone = ({
           ) : (
             <React.Fragment>
               {!value ? (
-                <div className={cn('px-2 text-sm', errorMsg ? 'text-destructive' : 'text-muted-foreground')}>
+                <div
+                  className={cn(
+                    'flex flex-col items-center justify-center px-2 text-sm text-balance',
+                    errorMsg ? 'text-destructive' : 'text-muted-foreground',
+                  )}
+                >
                   {errorMsg ? (
                     <div className="flex flex-col items-center gap-1">
                       <CircleAlert size={20} />
@@ -179,11 +185,21 @@ const Dropzone = ({
                         </div>
                       )}
                       <div>
-                        <FormattedMessage
-                          id="DropZone.UploadBox"
-                          defaultMessage="Drag and drop one or multiple files or <i18n-link>click here to select</i18n-link>."
-                          values={{ 'i18n-link': getI18nLink() }}
-                        />
+                        {collectFilesOnly ? (
+                          <FormattedMessage
+                            id="DragAndDropOrClickToSelect"
+                            defaultMessage="Drag & drop or <i18n-link>click to select</i18n-link>"
+                            values={{ 'i18n-link': getI18nLink() }}
+                            tagName="span"
+                          />
+                        ) : (
+                          <FormattedMessage
+                            id="DragAndDropOrClickToUpload"
+                            defaultMessage="Drag & drop or <i18n-link>click to upload</i18n-link>"
+                            values={{ 'i18n-link': getI18nLink() }}
+                            tagName="span"
+                          />
+                        )}
                       </div>
                       {showInstructions && (
                         <p className="mt-1 text-xs text-muted-foreground">
@@ -355,7 +371,7 @@ type DropzoneProps = React.HTMLAttributes<HTMLDivElement> & {
 } & (
     | {
         /** Collect File only, do not upload files */
-        collectFilesOnly: true;
+        collectFilesOnly?: boolean;
         /** Whether the dropzone should accept multiple files */
         isMulti?: boolean;
         /** Called back with the uploaded files on success */

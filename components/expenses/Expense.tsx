@@ -126,7 +126,7 @@ function Expense(props) {
   const router = useRouter();
   const isNewExpenseSubmissionFlow =
     (LoggedInUser && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW)) ||
-    router.query.newExpenseFlow;
+    router.query.newExpenseFlowEnabled;
 
   const [isSubmissionFlowOpen, setIsSubmissionFlowOpen] = React.useState(false);
 
@@ -146,7 +146,7 @@ function Expense(props) {
     createdUser: null,
     showFilesViewerModal: false,
   });
-  const [openUrl, setOpenUrl] = useState(null);
+  const [openUrl, setOpenUrl] = useState(router.query.attachmentUrl as string);
   const [replyingToComment, setReplyingToComment] = useState(null);
   const [hasConfirmedOCR, setConfirmedOCR] = useState(false);
   const hasItemsWithOCR = Boolean(state.editedExpense?.items?.some(itemHasOCR));
@@ -430,7 +430,7 @@ function Expense(props) {
     setState({ ...state, showFilesViewerModal: true });
   };
 
-  const files = React.useMemo(() => getFilesFromExpense(expense, intl), [expense]);
+  const files = React.useMemo(() => getFilesFromExpense(expense, intl), [expense, intl]);
 
   useEffect(() => {
     const showFilesViewerModal = isDrawer && isDesktop && files?.length > 0;

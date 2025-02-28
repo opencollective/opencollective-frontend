@@ -468,14 +468,9 @@ class ContributionFlow extends React.Component {
 
   // ---- Getters ----
   getDefaultStepProfile() {
-    const { loadingLoggedInUser, contributorProfiles } = this.props;
+    const { contributorProfiles } = this.props;
     const profiles = contributorProfiles || [];
     const queryParams = this.getQueryParams();
-
-    // We want to wait for the user to be logged in before matching the profile
-    if (loadingLoggedInUser) {
-      return { slug: queryParams.contributeAs };
-    }
 
     // If there's a default profile set in contributeAs, use it
     let contributorProfile;
@@ -490,7 +485,7 @@ class ContributionFlow extends React.Component {
     }
 
     if (contributorProfile) {
-      return contributorProfile;
+      return contributorProfile.account;
     } else if (profiles[0]?.account) {
       // Otherwise to the logged-in user personal profile, if any
       return profiles[0].account;

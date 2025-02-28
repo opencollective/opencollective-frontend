@@ -149,7 +149,6 @@ type TopBarProps = {
     name: string;
     slug: string;
   };
-  navTitle?: string;
   loading?: boolean;
 };
 

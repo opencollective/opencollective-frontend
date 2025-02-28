@@ -4,10 +4,12 @@ import { TaxType } from '@opencollective/taxes';
 import type { CheckedState } from '@radix-ui/react-checkbox';
 import dayjs from 'dayjs';
 import { useFormikContext } from 'formik';
-import { get, isNumber, pick, round } from 'lodash';
-import { Lock, Trash2 } from 'lucide-react';
+import { get, pick, round } from 'lodash';
+import { ArrowDown, ArrowUp, Lock, Plus, Trash2 } from 'lucide-react';
+import FlipMove from 'react-flip-move';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
+import { v4 as uuid } from 'uuid';
 
 import type { Currency, CurrencyExchangeRateInput } from '../../../lib/graphql/types/v2/schema';
 import { CurrencyExchangeRateSourceType, ExpenseLockableFields } from '../../../lib/graphql/types/v2/schema';
@@ -19,15 +21,16 @@ import {
   getTaxAmount,
   isTaxRateValid,
 } from '../../expenses/lib/utils';
+import { DISABLE_ANIMATIONS } from '@/lib/animations';
 
 import { FormField } from '@/components/FormField';
 import InputAmount from '@/components/InputAmount';
 import { Checkbox } from '@/components/ui/Checkbox';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 import Dropzone, { MemoizedDropzone } from '../../Dropzone';
 import { ExchangeRate } from '../../ExchangeRate';
 import FormattedMoneyAmount from '../../FormattedMoneyAmount';
-import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledSelect from '../../StyledSelect';
 import { Button } from '../../ui/Button';
 import { Input, InputGroup } from '../../ui/Input';
@@ -86,31 +89,70 @@ export const ExpenseItemsForm = memoWithGetFormProps(function ExpenseItemsForm(
 
   return (
     <React.Fragment>
-      {!props.initialLoading &&
-        expenseItems?.map((ei, i) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <div key={i} className="flex gap-4">
-            <div className="grow">
-              <ExpenseItemWrapper index={i} isAmountLocked={isAmountLocked} />
-            </div>
-            <div>
-              <Button
-                onClick={() => {
-                  setFieldValue('expenseItems', [...expenseItems.slice(0, i), ...expenseItems.slice(i + 1)]);
-                }}
-                disabled={expenseItems.length === 1 || isAmountLocked || props.isSubmitting}
-                variant="outline"
-                size="icon-sm"
-              >
-                <Trash2 size={16} />
-              </Button>
-            </div>
-          </div>
-        ))}
+      {!props.initialLoading && (
+        <div role="list">
+          <FlipMove enterAnimation="fade" leaveAnimation="fade" disableAllAnimations={DISABLE_ANIMATIONS}>
+            {expenseItems?.map((ei, i) => {
+              return (
+                // eslint-disable-next-line react/no-array-index-key
+                <div key={ei.key} id={ei.key} role="listitem" className="flex gap-4">
+                  <div className="grow">
+                    <ExpenseItemWrapper
+                      index={i}
+                      isAmountLocked={isAmountLocked}
+                      isSubjectToTax={Boolean(props.taxType)}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <Button
+                      onClick={() => {
+                        setFieldValue('expenseItems', [...expenseItems.slice(0, i), ...expenseItems.slice(i + 1)]);
+                      }}
+                      disabled={expenseItems.length === 1 || isAmountLocked || props.isSubmitting}
+                      variant="outline"
+                      size="icon-sm"
+                    >
+                      <Trash2 size={16} />
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        if (i > 0) {
+                          const newExpenseItems = [...expenseItems];
+                          [newExpenseItems[i - 1], newExpenseItems[i]] = [newExpenseItems[i], newExpenseItems[i - 1]];
+                          setFieldValue('expenseItems', newExpenseItems);
+                        }
+                      }}
+                      disabled={i === 0 || props.isSubmitting}
+                      variant="outline"
+                      size="icon-sm"
+                    >
+                      <ArrowUp size={16} />
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        if (i < expenseItems.length - 1) {
+                          const newExpenseItems = [...expenseItems];
+                          [newExpenseItems[i + 1], newExpenseItems[i]] = [newExpenseItems[i], newExpenseItems[i + 1]];
+                          setFieldValue('expenseItems', newExpenseItems);
+                        }
+                      }}
+                      disabled={i === expenseItems.length - 1 || props.isSubmitting}
+                      variant="outline"
+                      size="icon-sm"
+                    >
+                      <ArrowDown size={16} />
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </FlipMove>
+        </div>
+      )}
 
       {props.initialLoading && (
         <div className="mb-4">
-          <LoadingPlaceholder width={1} height={120} />
+          <Skeleton className="h-30 w-full" />
         </div>
       )}
       <div className="flex justify-between pr-12">
@@ -121,6 +163,7 @@ export const ExpenseItemsForm = memoWithGetFormProps(function ExpenseItemsForm(
             setFieldValue('expenseItems', [
               ...expenseItems,
               {
+                key: uuid(),
                 amount: { valueInCents: 0, currency: props.expenseCurrency },
                 description: '',
                 incurredAt: new Date().toISOString(),
@@ -129,7 +172,7 @@ export const ExpenseItemsForm = memoWithGetFormProps(function ExpenseItemsForm(
             ])
           }
         >
-          <FormattedMessage defaultMessage="Add item" id="KDO3hW" />
+          <Plus size={16} /> <FormattedMessage defaultMessage="Add item" id="KDO3hW" />
         </Button>
         <div>
           <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-right">
@@ -207,6 +250,7 @@ type ExpenseItemProps = {
   index: number;
   isAmountLocked?: boolean;
   item: ExpenseForm['values']['expenseItems'][number];
+  isSubjectToTax?: boolean;
 } & ReturnType<typeof getExpenseItemProps>;
 
 function getExpenseItemProps(form: ExpenseForm) {
@@ -216,13 +260,14 @@ function getExpenseItemProps(form: ExpenseForm) {
   };
 }
 
-function ExpenseItemWrapper(props: { index: number; isAmountLocked?: boolean }) {
+function ExpenseItemWrapper(props: { index: number; isAmountLocked?: boolean; isSubjectToTax?: boolean }) {
   const form = useFormikContext() as ExpenseForm;
   return (
     <ExpenseItem
       index={props.index}
       item={get(form.values, `expenseItems.${props.index}`)}
       isAmountLocked={props.isAmountLocked}
+      isSubjectToTax={props.isSubjectToTax}
       {...ExpenseItem.getFormProps(form)}
     />
   );
@@ -235,7 +280,6 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
 
   const hasAttachment = props.allowExpenseItemAttachment;
 
-  const amountId = useId();
   const attachmentId = useId();
 
   const { setFieldValue } = props;
@@ -285,8 +329,8 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
   }
 
   return (
-    <div className="mb-4 rounded-md border border-slate-300 p-4">
-      <div className="flex flex-wrap gap-4">
+    <div className="@container mb-4 rounded-md border border-slate-300 p-4">
+      <div className="flex flex-col gap-4 @md:flex-row">
         {hasAttachment && (
           <div className="flex flex-col">
             <div className="flex grow justify-center">
@@ -320,7 +364,7 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
             </div>
           </div>
         )}
-        <div className="grow">
+        <div className="@container grow">
           <div className="mb-2">
             <FormField
               required={props.isAdminOfPayee}
@@ -330,84 +374,80 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
               name={`expenseItems.${props.index}.description`}
             />
           </div>
-          <div className="flex flex-wrap gap-4">
-            <div className="grow basis-0">
+          <div className="flex flex-col gap-4 @md:grid @md:grid-cols-3">
+            <FormField
+              required={props.isAdminOfPayee}
+              disabled={props.isSubmitting}
+              label={intl.formatMessage({ defaultMessage: 'Date', id: 'expense.incurredAt' })}
+              name={`expenseItems.${props.index}.incurredAt`}
+            >
+              {({ field }) => {
+                const value = field.value ? dayjs.utc(field.value).format('YYYY-MM-DD') : undefined;
+                return <Input type="date" {...field} value={value} />;
+              }}
+            </FormField>
+
+            <div className="col-span-2 flex flex-col">
               <FormField
-                required={props.isAdminOfPayee}
-                disabled={props.isSubmitting}
-                label={intl.formatMessage({ defaultMessage: 'Date', id: 'expense.incurredAt' })}
-                name={`expenseItems.${props.index}.incurredAt`}
+                disabled={props.isAmountLocked || props.isSubmitting}
+                label={
+                  props.isSubjectToTax
+                    ? intl.formatMessage({ defaultMessage: 'Gross Amount', id: 'bwZInO' })
+                    : intl.formatMessage({ defaultMessage: 'Amount', id: 'Fields.amount' })
+                }
+                name={`expenseItems.${props.index}.amount.valueInCents`}
               >
-                {({ field }) => {
-                  const value = field.value ? dayjs.utc(field.value).format('YYYY-MM-DD') : undefined;
-                  return <Input type="date" {...field} value={value} />;
-                }}
+                {({ field }) => (
+                  <InputAmount
+                    {...field}
+                    currencyDisplay="FULL"
+                    hasCurrencyPicker
+                    currency={item.amount.currency || 'USD'}
+                    onCurrencyChange={onCurrencyChange}
+                    value={item.amount.valueInCents}
+                    onChange={onAmountChange}
+                    exchangeRate={item.amount.currency !== props.expenseCurrency && get(item, `amount.exchangeRate`, 0)}
+                    minFxRate={
+                      (item.amount?.referenceExchangeRate && 'value' in item.amount.referenceExchangeRate
+                        ? item.amount.referenceExchangeRate.value || 0
+                        : 0) *
+                        (1 - FX_RATE_ERROR_THRESHOLD) || undefined
+                    }
+                    maxFxRate={
+                      (item.amount?.referenceExchangeRate && 'value' in item.amount.referenceExchangeRate
+                        ? item.amount.referenceExchangeRate.value || 0
+                        : 0) *
+                        (1 + FX_RATE_ERROR_THRESHOLD) || undefined
+                    }
+                    onExchangeRateChange={onExchangeRateChange}
+                  />
+                )}
               </FormField>
-            </div>
 
-            <div className="grow basis-0">
-              <div className="flex flex-col">
-                <FormField
-                  disabled={props.isAmountLocked || props.isSubmitting}
-                  label={intl.formatMessage({ defaultMessage: 'Amount', id: 'Fields.amount' })}
-                  name={`expenseItems.${props.index}.amount.valueInCents`}
-                >
-                  {({ field }) => (
-                    <InputAmount
-                      {...field}
-                      currencyDisplay="FULL"
-                      hasCurrencyPicker
-                      currency={item.amount.currency || 'USD'}
-                      onCurrencyChange={onCurrencyChange}
-                      id={amountId}
-                      name={amountId}
-                      value={item.amount.valueInCents}
-                      onChange={onAmountChange}
-                      exchangeRate={
-                        item.amount.currency !== props.expenseCurrency && get(item, `amount.exchangeRate`, 0)
-                      }
-                      minFxRate={
-                        (item.amount?.referenceExchangeRate && 'value' in item.amount.referenceExchangeRate
-                          ? item.amount.referenceExchangeRate.value || 0
-                          : 0) *
-                          (1 - FX_RATE_ERROR_THRESHOLD) || undefined
-                      }
-                      maxFxRate={
-                        (item.amount?.referenceExchangeRate && 'value' in item.amount.referenceExchangeRate
-                          ? item.amount.referenceExchangeRate.value || 0
-                          : 0) *
-                          (1 + FX_RATE_ERROR_THRESHOLD) || undefined
-                      }
-                      onExchangeRateChange={onExchangeRateChange}
-                    />
-                  )}
-                </FormField>
-
-                <div className="self-end">
-                  {Boolean(item.amount?.currency && props.expenseCurrency !== item.amount?.currency) && (
-                    <ExchangeRate
-                      className="mt-2 text-muted-foreground"
-                      {...getExpenseExchangeRateWarningOrError(
-                        intl,
-                        item.amount.exchangeRate,
-                        item.amount.referenceExchangeRate,
-                      )}
-                      exchangeRate={
-                        (item.amount.exchangeRate || {
-                          source: CurrencyExchangeRateSourceType.USER,
-                          fromCurrency: item.amount.currency as Currency,
-                          toCurrency: props.expenseCurrency,
-                        }) as CurrencyExchangeRateInput
-                      }
-                      approximateCustomMessage={
-                        <FormattedMessage
-                          defaultMessage="This value is an estimate. Please set the exact amount received if known."
-                          id="zNBAqh"
-                        />
-                      }
-                    />
-                  )}
-                </div>
+              <div className="self-end">
+                {Boolean(item.amount?.currency && props.expenseCurrency !== item.amount?.currency) && (
+                  <ExchangeRate
+                    className="mt-2 text-muted-foreground"
+                    {...getExpenseExchangeRateWarningOrError(
+                      intl,
+                      item.amount.exchangeRate,
+                      item.amount.referenceExchangeRate,
+                    )}
+                    exchangeRate={
+                      (item.amount.exchangeRate || {
+                        source: CurrencyExchangeRateSourceType.USER,
+                        fromCurrency: item.amount.currency as Currency,
+                        toCurrency: props.expenseCurrency,
+                      }) as CurrencyExchangeRateInput
+                    }
+                    approximateCustomMessage={
+                      <FormattedMessage
+                        defaultMessage="This value is an estimate. Please set the exact amount received if known."
+                        id="zNBAqh"
+                      />
+                    }
+                  />
+                )}
               </div>
             </div>
           </div>
@@ -457,6 +497,7 @@ export const AdditionalAttachments = memoWithGetFormProps(function AdditionalAtt
         <div>
           <Dropzone
             {...attachmentDropzoneParams}
+            id="additionalAttachments"
             name="additionalAttachments"
             kind="EXPENSE_ATTACHED_FILE"
             className="size-28"
@@ -593,9 +634,7 @@ const Taxes = React.memo(function Taxes(props: {
                 <InputGroup
                   {...field}
                   value={field.value ? round(field.value * 100, 2) : 0}
-                  onChange={e =>
-                    props.setFieldValue('tax.rate', isNumber(e.target.value) ? round(e.target.value / 100, 4) : null)
-                  }
+                  onChange={e => props.setFieldValue('tax.rate', round((e.target.value as any) / 100, 4))}
                   minWidth={65}
                   append="%"
                   min={0}

@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 import type { Path, PathValue } from 'dot-path-value';
 import type { FieldInputProps, FormikErrors, FormikHelpers } from 'formik';
 import { useFormik } from 'formik';
-import { isEmpty, isEqual, omit, pick, set, uniqBy } from 'lodash';
+import { isEmpty, isEqual, isNull, omit, pick, set, uniqBy } from 'lodash';
 import memoizeOne from 'memoize-one';
 import type { IntlShape } from 'react-intl';
 import { useIntl } from 'react-intl';
@@ -50,6 +50,7 @@ export enum InviteeAccountType {
 }
 
 type ExpenseItem = {
+  key?: string; // used to enable FlipMove animations (will either be a generated uuid on "Add item", or using the expense item id)
   description?: string;
   incurredAt?: string;
   amount?: {
@@ -282,6 +283,16 @@ const formSchemaQuery = gql`
           size
         }
       }
+      invoiceFile {
+        id
+        url
+        name
+        type
+        size
+        ... on ImageFileInfo {
+          width
+        }
+      }
       items {
         id
         description
@@ -307,6 +318,7 @@ const formSchemaQuery = gql`
       }
       privateMessage
       invoiceInfo
+      reference
       tags
       permissions {
         id
@@ -657,7 +669,8 @@ function buildFormSchema(
           if (
             options.isAccountingCategoryRequired &&
             options.accountingCategories?.length > 0 &&
-            !options.accountingCategories.some(ac => ac.id === v)
+            !options.accountingCategories.some(ac => ac.id === v) &&
+            !isNull(v) // null represents "I don't know" and is a valid option
           ) {
             return false;
           }
@@ -706,10 +719,7 @@ function buildFormSchema(
             return true;
           }
 
-          if (
-            !values.payeeSlug ||
-            (values.expenseTypeOption === ExpenseType.INVOICE && values.hasInvoiceOption === YesNoOption.YES)
-          ) {
+          if (values.expenseTypeOption === ExpenseType.INVOICE && values.hasInvoiceOption === YesNoOption.YES) {
             return typeof attachment === 'string' ? !!attachment : !!attachment?.url;
           }
           return true;
@@ -727,10 +737,7 @@ function buildFormSchema(
             return true;
           }
 
-          if (
-            !values.payeeSlug ||
-            (values.expenseTypeOption === ExpenseType.INVOICE && values.hasInvoiceOption === YesNoOption.YES)
-          ) {
+          if (values.expenseTypeOption === ExpenseType.INVOICE && values.hasInvoiceOption === YesNoOption.YES) {
             return !!invoiceNumber;
           }
           return true;
@@ -965,6 +972,7 @@ function buildFormSchema(
         },
         {
           message: 'Required',
+          path: ['isEditing'],
         },
       ),
     newPayoutMethod: z.object({
@@ -991,25 +999,7 @@ function buildFormSchema(
             message: 'Required',
           },
         ),
-      name: z
-        .string()
-        .nullish()
-        .refine(
-          name => {
-            if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
-              return true;
-            }
-
-            if (values.payoutMethodId === '__newPayoutMethod') {
-              return !!name;
-            }
-
-            return true;
-          },
-          {
-            message: 'Required',
-          },
-        ),
+      name: z.string().nullish(),
       data: z
         .object({
           currency: z
@@ -1587,15 +1577,38 @@ export function useExpenseForm(opts: {
       setFieldValue('inviteeNewIndividual', formOptions.expense?.draft?.payee);
     }
 
+    const expenseAttachedFiles =
+      formOptions.expense.status === ExpenseStatus.DRAFT
+        ? formOptions.expense.draft?.attachedFiles
+        : formOptions.expense.attachedFiles;
+    const invoiceFile =
+      formOptions.expense.status === ExpenseStatus.DRAFT
+        ? formOptions.expense.draft?.invoiceFile
+        : formOptions.expense.invoiceFile;
+    const additionalAttachments = expenseAttachedFiles;
+
+    if (!startOptions.current.duplicateExpense) {
+      if (invoiceFile) {
+        setFieldValue('invoiceFile', invoiceFile.url);
+        setFieldValue('hasInvoiceOption', YesNoOption.YES);
+        setFieldValue('invoiceNumber', formOptions.expense.reference);
+      } else {
+        setFieldValue('hasInvoiceOption', YesNoOption.NO);
+      }
+      if (additionalAttachments) {
+        setFieldValue(
+          'additionalAttachments',
+          additionalAttachments.map(af => af.url),
+        );
+      }
+    }
+
     if (formOptions.expense.status === ExpenseStatus.DRAFT) {
-      setFieldValue(
-        'additionalAttachments',
-        formOptions.expense.draft?.attachedFiles?.map(af => ({ url: af.url })),
-      );
       setFieldValue(
         'expenseItems',
         formOptions.expense.draft?.items?.map(ei => ({
-          url: ei.url,
+          key: ei.id,
+          attachment: ei.url,
           description: ei.description ?? '',
           incurredAt: dayjs.utc(ei.incurredAt).toISOString().substring(0, 10),
           amount: {
@@ -1605,16 +1618,10 @@ export function useExpenseForm(opts: {
         })),
       );
     } else {
-      if (!startOptions.current.duplicateExpense) {
-        setFieldValue(
-          'additionalAttachments',
-          formOptions.expense.attachedFiles?.map(af => af.url),
-        );
-      }
-
       setFieldValue(
         'expenseItems',
         formOptions.expense.items?.map(ei => ({
+          key: ei.id,
           attachment: !startOptions.current.duplicateExpense ? ei.url : null,
           description: ei.description ?? '',
           incurredAt: !startOptions.current.duplicateExpense
@@ -1693,13 +1700,13 @@ export function useExpenseForm(opts: {
       expenseForm.values.expenseItems.filter(needExchangeRateFilter(formOptions.expenseCurrency)).map(ei => ({
         fromCurrency: ei.amount.currency as Currency,
         toCurrency: formOptions.expenseCurrency,
-        date: dayjs(ei.incurredAt).toDate(),
+        date: dayjs.utc(ei.incurredAt).toDate(),
       })),
       ei => `${ei.fromCurrency}-${ei.toCurrency}-${ei.date}`,
     );
 
     expenseForm.values.expenseItems.forEach((ei, i) => {
-      if (ei.amount?.currency && ei.amount.currency === formOptions.expenseCurrency) {
+      if (formOptions.expenseCurrency && ei.amount?.currency && ei.amount.currency === formOptions.expenseCurrency) {
         setFieldValue(`expenseItems.${i}.amount.exchangeRate`, null);
       }
     });
@@ -1737,13 +1744,19 @@ export function useExpenseForm(opts: {
         });
 
         queryComplete = true;
-
         if (!isEmpty(res.data?.currencyExchangeRate)) {
           expenseForm.values.expenseItems.forEach((ei, i) => {
             if (needExchangeRateFilter(formOptions.expenseCurrency)(ei)) {
-              const exchangeRate = res.data.currencyExchangeRate.find(
-                rate => rate.fromCurrency === ei.amount.currency && rate.toCurrency === formOptions.expenseCurrency,
-              );
+              const exchangeRate =
+                res.data.currencyExchangeRate.find(
+                  rate =>
+                    rate.fromCurrency === ei.amount.currency &&
+                    rate.toCurrency === formOptions.expenseCurrency &&
+                    (!ei.incurredAt || dayjs.utc(ei.incurredAt).isSame(dayjs.utc(rate.date), 'day')),
+                ) ||
+                res.data.currencyExchangeRate.find(
+                  rate => rate.fromCurrency === ei.amount.currency && rate.toCurrency === formOptions.expenseCurrency,
+                );
               setFieldValue(
                 `expenseItems.${i}.amount.exchangeRate`,
                 pick(exchangeRate, ['date', 'fromCurrency', 'toCurrency', 'value', 'source']),

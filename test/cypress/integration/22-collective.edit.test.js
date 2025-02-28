@@ -77,8 +77,8 @@ describe('edit collective', () => {
     cy.contains('Add social link').click();
     cy.focused().type('https://github.com/opencollective');
     cy.wait(500);
-    cy.get('.actions > [data-cy="collective-save"]').click(); // save changes
-    cy.get('.backToProfile a').click(); // back to profile
+    cy.get('[data-cy="collective-save"]').click(); // save changes
+    cy.getByDataCy('view-public-profile-link').click();
     cy.wait(500);
     cy.get('[data-cy="collective-hero"] [data-cy="collective-title"]').contains('edited');
     cy.get('[data-cy="social-link-0"]').should('have.attr', 'href', 'https://opencollective.com/');
@@ -178,9 +178,7 @@ describe('edit user collective', () => {
     cy.getByDataCy('qr-code').should('exist');
     cy.getByDataCy('manual-entry-2fa-token')
       .invoke('text')
-      .then(text => {
-        expect(text.trim()).to.have.lengthOf(117);
-        const secret = text.split(':')[1].trim();
+      .then(secret => {
         // typing the wrong code fails
         cy.getByDataCy('add-two-factor-auth-totp-code-field').type('123456');
         cy.getByDataCy('add-two-factor-auth-totp-code-button').click();
