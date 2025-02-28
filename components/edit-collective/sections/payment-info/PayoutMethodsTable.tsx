@@ -124,8 +124,8 @@ export default function PayoutMethodsTable({ account, loading, onUpdate, ...prop
             </h1>
             <p className="text-sm leading-none text-muted-foreground">
               <FormattedMessage
-                defaultMessage="Account information that were previously used and/or edited"
-                id="LyzQUC"
+                defaultMessage="Account details that were previously used and can no longer be deleted."
+                id="bqX7g3"
               />
             </p>
           </div>

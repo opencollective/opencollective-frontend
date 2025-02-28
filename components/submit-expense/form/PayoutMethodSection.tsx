@@ -572,8 +572,8 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
             })
           : intl.formatMessage({
               defaultMessage:
-                'This payout method was already used and now it can only be archived. Archiving is does not delete the payout method information and can be reversed if you want to.',
-              id: 'Z9u0j3',
+                "This payout method was already used in another expense and can no longer be deleted for security reasons. However, you can archive it to prevent its re-use. Note that this operation is reversible, and you'll be able to restore this payout method if you change your mind.",
+              id: 'x0+ddp',
             }),
         children: <PayoutMethodLabel showIcon payoutMethod={props.payoutMethod} />,
         onConfirm: async () => {
