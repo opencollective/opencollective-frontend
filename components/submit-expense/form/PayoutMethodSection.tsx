@@ -652,7 +652,6 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
       initialValues={{
         editingPayoutMethod: {
           ...omit(props.payoutMethod, ['__typename']),
-          name: props.payoutMethod.name || generatePayoutMethodName(props.payoutMethod.type, props.payoutMethod.data),
         },
       }}
     >
