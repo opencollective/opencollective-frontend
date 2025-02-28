@@ -100,17 +100,17 @@ export default function PayoutMethodsTable({ account, loading, onUpdate, ...prop
     </div>
   ) : (
     <div className="flex flex-col gap-5">
-      {active?.map(p => (
+      {active?.map(payoutMethod => (
         <PayoutMethodRadioGroupItem
-          key={p.id}
-          payoutMethod={p}
+          key={payoutMethod.id}
+          payoutMethod={payoutMethod}
           payeeSlug={account.slug}
           payee={account}
           Component={MethodCard}
           onPaymentMethodDeleted={onUpdate}
           onPaymentMethodEdited={onUpdate}
           refresh={onUpdate}
-          moreActions={generateMoreActions(p)}
+          moreActions={generateMoreActions(payoutMethod)}
           isChecked
           isEditable
           disableWarningMessages
@@ -129,18 +129,18 @@ export default function PayoutMethodsTable({ account, loading, onUpdate, ...prop
               />
             </p>
           </div>
-          {archived?.map(p => (
+          {archived?.map(payoutMethod => (
             <PayoutMethodRadioGroupItem
-              key={p.id}
-              payoutMethod={p}
+              key={payoutMethod.id}
+              payoutMethod={payoutMethod}
               payeeSlug={account.slug}
               payee={account}
               Component={MethodCard}
               onPaymentMethodDeleted={onUpdate}
               onPaymentMethodEdited={onUpdate}
               refresh={onUpdate}
-              onRestore={() => actions.restore(p.id)}
-              moreActions={generateMoreActions(p)}
+              onRestore={() => actions.restore(payoutMethod.id)}
+              moreActions={generateMoreActions(payoutMethod)}
               isChecked
               isEditable
               archived

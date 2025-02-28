@@ -43,7 +43,7 @@ const PaymentMethodCard = ({ paymentMethods, onRemove, onConfirm, moreActions }:
                 <DataList className="gap-2">
                   <DataListItem
                     label={<FormattedMessage defaultMessage="Used with" id="npLwc6" />}
-                    value={hosts.map(h => h.name).join(', ')}
+                    value={hosts.map(host => host.name).join(', ')}
                   />
                 </DataList>
               </div>
