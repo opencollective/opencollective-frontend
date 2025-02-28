@@ -49,7 +49,6 @@ const RadioGroupCard = React.forwardRef<
     <div
       className={cn(
         `rounded-lg bg-card text-sm text-card-foreground ring-1 shadow-xs ring-border has-data-[state=checked]:ring-2 has-data-[state=checked]:ring-ring [&:has([role="radio"]:focus-visible)]:bg-primary/5`,
-        props.disabled && 'bg-gray-500',
       )}
     >
       <RadioGroupPrimitive.Item

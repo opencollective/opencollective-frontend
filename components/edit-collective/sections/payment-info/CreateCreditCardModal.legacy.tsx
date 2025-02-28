@@ -74,7 +74,7 @@ export default function CreateCreditCardModal({ account, open, onOpenChange, onU
       setIsSubmitting(false);
       onOpenChange(false);
     }
-  }, [toast, intl, card, account, addCreditCard, confirmCreditCard]);
+  }, [toast, intl, card, account, addCreditCard, confirmCreditCard, onUpdate, onOpenChange]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -87,12 +87,11 @@ export default function CreateCreditCardModal({ account, open, onOpenChange, onU
         <div className="flex flex-col gap-4">
           <div>
             <label className="mb-1 text-sm leading-normal font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-              Credit card details
+              <FormattedMessage defaultMessage="Credit card details" id="credit-card-details" />
             </label>
             <Elements stripe={getStripe()}>
               <NewCreditCardForm
                 hasSaveCheckBox={false}
-                // onChange={newCreditCardInfo => this.setState({ newCreditCardInfo, error: null })}
                 onChange={cardInfo => setCard(state => ({ ...state, cardInfo }))}
                 onReady={({ stripe, stripeElements }) => setCard(state => ({ ...state, stripe, stripeElements }))}
               />
