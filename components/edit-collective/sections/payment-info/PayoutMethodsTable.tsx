@@ -5,6 +5,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT, gql } from '../../../../lib/graphql/helpers';
+import { PayoutMethodType } from '@/lib/constants/payout-method';
 
 import { PayoutMethodRadioGroupItem } from '@/components/submit-expense/form/PayoutMethodSection';
 
@@ -75,17 +76,19 @@ export default function PayoutMethodsTable({ account, loading, onUpdate, ...prop
   );
 
   const [archived, active] = React.useMemo(() => {
-    const { archived, active } = orderBy(props.payoutMethods, ['isSaved'], ['desc']).reduce(
-      (acc, pm) => {
-        if (pm.isSaved) {
-          acc.active.push(pm);
-        } else {
-          acc.archived.push(pm);
-        }
-        return acc;
-      },
-      { archived: [], active: [] },
-    );
+    const { archived, active } = orderBy(props.payoutMethods, ['isSaved'], ['desc'])
+      .filter(pm => pm.type !== PayoutMethodType.ACCOUNT_BALANCE)
+      .reduce(
+        (acc, pm) => {
+          if (pm.isSaved) {
+            acc.active.push(pm);
+          } else {
+            acc.archived.push(pm);
+          }
+          return acc;
+        },
+        { archived: [], active: [] },
+      );
     return [archived, active];
   }, [props.payoutMethods]);
 
