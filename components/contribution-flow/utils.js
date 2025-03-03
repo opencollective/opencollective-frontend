@@ -351,7 +351,7 @@ export const getRequiredInformation = (stepProfile, stepDetails, collective, pro
 
   let totalAmount = getTotalYearlyAmount(stepDetails);
   const selectedProfile =
-    stepProfile.id === INCOGNITO_ID
+    stepProfile?.id === INCOGNITO_ID
       ? // If this is a new incognito profile, apply existing Individual account contribution value
         profiles.find(p => p.account.type === CollectiveType.INDIVIDUAL)
       : profiles.find(p => p.account.id === stepProfile?.id);
