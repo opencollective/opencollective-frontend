@@ -54,9 +54,10 @@ export const schema = z.object({
   chargeHasReceipts: boolean.optional(),
   virtualCard: isMulti(z.string()).optional(),
   accountingCategory: accountingCategoryFilter.schema,
+  payoutMethodId: z.string().optional(),
 });
 
-type FilterValues = z.infer<typeof schema>;
+export type FilterValues = z.infer<typeof schema>;
 
 export type FilterMeta = {
   currency?: Currency;
@@ -72,6 +73,7 @@ export const toVariables: FiltersToVariables<
   payout: value => ({ payoutMethodType: value }),
   tag: value => ({ tags: value }),
   virtualCard: virtualCardIds => ({ virtualCards: virtualCardIds.map(id => ({ id })) }),
+  payoutMethodId: id => ({ payoutMethod: { id } }),
 };
 
 // The filters config is used to populate the Filters component.
@@ -148,5 +150,9 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   virtualCard: {
     labelMsg: defineMessage({ id: 'PayoutMethod.Type.VirtualCard', defaultMessage: 'Virtual Card' }),
     valueRenderer: ({ value }) => <VirtualCardRenderer id={value} />,
+  },
+  payoutMethodId: {
+    labelMsg: defineMessage({ defaultMessage: 'Payout Method', id: 'PayoutMethod' }),
+    valueRenderer: ({ value }) => value.split('-')[0],
   },
 };

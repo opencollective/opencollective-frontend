@@ -13,16 +13,25 @@ import type {
   ConnectPlaidAccountMutationVariables,
   GeneratePlaidLinkTokenMutation,
   GeneratePlaidLinkTokenMutationVariables,
+  RefreshPlaidAccountMutation,
+  RefreshPlaidAccountMutationVariables,
 } from '../graphql/types/v2/graphql';
 import type { Host } from '../graphql/types/v2/schema';
+import { LOCAL_STORAGE_KEYS, setLocalStorage } from '../local-storage';
 
 const generatePlaidLinkTokenMutation = gql`
   mutation GeneratePlaidLinkToken(
     $host: AccountReferenceInput!
     $transactionImport: TransactionsImportReferenceInput
     $locale: Locale
+    $accountSelectionEnabled: Boolean
   ) {
-    generatePlaidLinkToken(host: $host, transactionImport: $transactionImport, locale: $locale) {
+    generatePlaidLinkToken(
+      host: $host
+      transactionImport: $transactionImport
+      locale: $locale
+      accountSelectionEnabled: $accountSelectionEnabled
+    ) {
       linkToken
       expiration
       requestId
@@ -31,7 +40,7 @@ const generatePlaidLinkTokenMutation = gql`
   }
 `;
 
-const connectPlaidAccountMutation = gql`
+export const connectPlaidAccountMutation = gql`
   mutation ConnectPlaidAccount(
     $publicToken: String!
     $host: AccountReferenceInput!
@@ -44,6 +53,28 @@ const connectPlaidAccountMutation = gql`
       }
       transactionsImport {
         id
+        account {
+          id
+          slug
+        }
+      }
+    }
+  }
+`;
+
+const refreshPlaidAccountMutation = gql`
+  mutation RefreshPlaidAccount($transactionImport: TransactionsImportReferenceInput) {
+    refreshPlaidAccount(transactionImport: $transactionImport) {
+      transactionsImport {
+        id
+        plaidAccounts {
+          accountId
+          mask
+          name
+          officialName
+          subtype
+          type
+        }
       }
     }
   }
@@ -67,7 +98,7 @@ export const usePlaidConnectDialog = ({
   transactionImportId?: string;
 }): {
   status: PlaidDialogStatus;
-  show: () => void;
+  show: (options?: { accountSelectionEnabled?: boolean }) => Promise<void>;
 } => {
   const [status, setStatus] = React.useState<PlaidDialogStatus>('idle');
   const intl = useIntl();
@@ -78,6 +109,10 @@ export const usePlaidConnectDialog = ({
   >(generatePlaidLinkTokenMutation, { context: API_V2_CONTEXT });
   const [connectPlaidAccount] = useMutation<ConnectPlaidAccountMutation, ConnectPlaidAccountMutationVariables>(
     connectPlaidAccountMutation,
+    { context: API_V2_CONTEXT },
+  );
+  const [refreshPlaidAccount] = useMutation<RefreshPlaidAccountMutation, RefreshPlaidAccountMutationVariables>(
+    refreshPlaidAccountMutation,
     { context: API_V2_CONTEXT },
   );
   const linkToken = plaidTokenData?.generatePlaidLinkToken?.linkToken;
@@ -102,6 +137,13 @@ export const usePlaidConnectDialog = ({
       if (transactionImportId) {
         // There is no need to re-connect the account in the API if the transaction import is already connected
         setStatus('success');
+        try {
+          await refreshPlaidAccount({ variables: { transactionImport: { id: transactionImportId } } });
+        } catch (e) {
+          toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+          return;
+        }
+
         onUpdateSuccess?.();
       } else {
         try {
@@ -124,23 +166,43 @@ export const usePlaidConnectDialog = ({
     },
   });
 
-  const show = React.useCallback(async () => {
-    if (status === 'idle') {
-      try {
-        setStatus('loading');
-        await generatePlaidToken({
-          variables: {
-            host: getAccountReferenceInput(host),
-            transactionImport: transactionImportId ? { id: transactionImportId } : undefined,
-            locale: intl.locale,
-          },
-        }); // The process will continue when the `React.useEffect` below detects the token
-      } catch (error) {
-        toast({ variant: 'error', message: i18nGraphqlException(intl, error) });
-        setStatus('idle');
+  const show = React.useCallback(
+    async ({
+      accountSelectionEnabled,
+    }: {
+      accountSelectionEnabled?: boolean;
+    } = {}) => {
+      if (status === 'idle') {
+        try {
+          setStatus('loading');
+          const result = await generatePlaidToken({
+            variables: {
+              host: getAccountReferenceInput(host),
+              transactionImport: transactionImportId ? { id: transactionImportId } : undefined,
+              locale: intl.locale,
+              accountSelectionEnabled,
+            },
+          });
+
+          // We store the link token in local storage to be accessible from the OAuth flow
+          // later on. The token quickly expire, so it is safe to keep it in local storage.
+          setLocalStorage(
+            LOCAL_STORAGE_KEYS.PLAID_LINK_TOKEN,
+            JSON.stringify({
+              hostId: host.id,
+              token: result.data.generatePlaidLinkToken.linkToken,
+            }),
+          );
+
+          // The process will continue when the `React.useEffect` below detects the token
+        } catch (error) {
+          toast({ variant: 'error', message: i18nGraphqlException(intl, error) });
+          setStatus('idle');
+        }
       }
-    }
-  }, [intl, status, generatePlaidToken, toast, host, transactionImportId]);
+    },
+    [intl, status, generatePlaidToken, toast, host, transactionImportId],
+  );
 
   React.useEffect(() => {
     if (ready && linkToken) {

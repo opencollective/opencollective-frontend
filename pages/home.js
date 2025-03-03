@@ -41,8 +41,8 @@ export const HomePage = () => {
       <RaiseMoney />
       <OpenCollectiveIs />
       <CollaborateWithMoney />
-      {/* <DedicatedTeam /> */}
-      {/* <GetToKnowUs /> */}
+      <DedicatedTeam />
+      <GetToKnowUs />
       <JoinUsSection />
     </Page>
   );

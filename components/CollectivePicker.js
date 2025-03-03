@@ -268,7 +268,9 @@ class CollectivePicker extends React.PureComponent {
 
   getValue = () => {
     if (this.props.collective !== undefined) {
-      return this.buildCollectiveOption(this.props.collective);
+      return this.props.isMulti && Array.isArray(this.props.collective)
+        ? this.props.collective.map(this.buildCollectiveOption)
+        : this.buildCollectiveOption(this.props.collective);
     } else if (this.state.showCreatedCollective) {
       return this.buildCollectiveOption(last(this.state.createdCollectives));
     } else {

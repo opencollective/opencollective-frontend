@@ -46,7 +46,7 @@ const PricingFAQ = props => (
         <P fontSize="14px" lineHeight="20px" fontWeight="400" color="black.800">
           <FormattedMessage
             id="OCFHostApplication.faq.fiscalHost.content"
-            defaultMessage="A Fiscal Host holds funds on behalf of Collectives, enabling them to operate using the Fiscal Host's bank account and legal entity."
+            defaultMessage="A Fiscal Host holds funds on behalf of Collectives, enabling them to operate using the Host's bank account and legal entity."
           />
         </P>
       </Content>

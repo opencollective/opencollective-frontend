@@ -24,6 +24,7 @@ export const loggedInAccountExpensePayoutFieldsFragment = gql`
       name
       data
       isSaved
+      canBeEditedOrDeleted
     }
     adminMemberships: memberOf(role: ADMIN, includeIncognito: false, accountType: [ORGANIZATION, COLLECTIVE, FUND]) {
       nodes {
@@ -344,6 +345,16 @@ export const expensePageExpenseFieldsFragment = gql`
       type
       rate
       idNumber
+    }
+    invoiceFile {
+      id
+      url
+      name
+      type
+      size
+      ... on ImageFileInfo {
+        width
+      }
     }
     attachedFiles {
       id
@@ -841,6 +852,16 @@ export const expensesListAdminFieldsFragment = gql`
       id
       type
       rate
+    }
+    invoiceFile {
+      id
+      url
+      name
+      type
+      size
+      ... on ImageFileInfo {
+        width
+      }
     }
     attachedFiles {
       id

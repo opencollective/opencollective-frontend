@@ -371,7 +371,7 @@ type DropzoneProps = React.HTMLAttributes<HTMLDivElement> & {
 } & (
     | {
         /** Collect File only, do not upload files */
-        collectFilesOnly: true;
+        collectFilesOnly?: boolean;
         /** Whether the dropzone should accept multiple files */
         isMulti?: boolean;
         /** Called back with the uploaded files on success */

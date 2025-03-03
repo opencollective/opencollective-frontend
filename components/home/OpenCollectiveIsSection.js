@@ -31,10 +31,7 @@ const OpenCollectiveIs = () => {
             <FormattedMessage id="home.OCIs" defaultMessage="Open Collective is" />
           </SectionTitle>
           <SectionDescription textAlign="center">
-            <FormattedMessage
-              id="home.OCIs.description"
-              defaultMessage="the place to manage the finances of your community…"
-            />
+            <FormattedMessage id="home.OCIs.description" defaultMessage="…an open finances platform for communities." />
           </SectionDescription>
         </Box>
       </Flex>
@@ -80,7 +77,7 @@ const OpenCollectiveIs = () => {
               fontWeight="700"
             >
               <FormattedMessage
-                defaultMessage="… and a network of Fiscal Hosts that enable over 15,000 collectives around the world to spend and raise $35M a year."
+                defaultMessage="And a network of Fiscal Hosts that enable over 15,000 collectives around the world to spend and raise $35M a year."
                 id="N5fOog"
               />
             </P>
@@ -118,7 +115,7 @@ const OpenCollectiveIs = () => {
             buttonSize="medium"
             href="/search?isHost=true"
           >
-            <FormattedMessage id="home.discoverMoreHome" defaultMessage="Discover More Fiscal Hosts" />
+            <FormattedMessage id="home.discoverMoreHome" defaultMessage="Discover More Hosts" />
           </StyledLink>
         </Flex>
       </OvalShapeWrapper>

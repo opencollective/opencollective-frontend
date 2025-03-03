@@ -181,12 +181,18 @@ export const prepareExpenseForSubmit = expenseData => {
     payoutMethod.id = null;
   }
 
+  const attachedFiles = [];
+  if (keepAttachedFiles) {
+    attachedFiles.push(...(expenseData.attachedFiles || []));
+  }
+
   return {
     ...pick(expenseData, ['id', 'type', 'tags', 'currency']),
     payee,
     payeeLocation,
     payoutMethod,
-    attachedFiles: keepAttachedFiles ? expenseData.attachedFiles?.map(file => pick(file, ['id', 'url', 'name'])) : [],
+    attachedFiles: attachedFiles.map(file => pick(file, ['id', 'url', 'name'])),
+    invoiceFile: expenseData.invoiceFile ? pick(expenseData.invoiceFile, 'url') : null,
     tax: expenseData.taxes?.filter(tax => !tax.isDisabled).map(tax => pick(tax, ['type', 'rate', 'idNumber'])),
     items: expenseData.items.map(item => prepareExpenseItemForSubmit(expenseData, item)),
     accountingCategory: !expenseData.accountingCategory ? null : pick(expenseData.accountingCategory, ['id']),
@@ -888,7 +894,26 @@ const ExpenseFormBody = ({
                     </div>
                     <div className="mt-5">
                       <ExpenseAttachedFilesForm
+                        kind="EXPENSE_INVOICE"
                         title={<FormattedMessage id="UploadInvoice" defaultMessage="Upload invoice" />}
+                        description={
+                          <FormattedMessage
+                            id="UploadInvoiceDescription"
+                            defaultMessage="If you already have an invoice document, you can upload it here."
+                          />
+                        }
+                        onChange={invoiceFile =>
+                          formik.setFieldValue('invoiceFile', invoiceFile?.length ? invoiceFile[0] : null)
+                        }
+                        form={formik}
+                        isSingle
+                        fieldName="invoiceFile"
+                        defaultValue={values.invoiceFile ? [values.invoiceFile] : []}
+                      />
+                    </div>
+                    <div className="mt-5">
+                      <ExpenseAttachedFilesForm
+                        title={<FormattedMessage defaultMessage="Additional attachments" id="zO+Zv3" />}
                         description={
                           <FormattedMessage
                             id="UploadInvoiceDescription"
@@ -1094,6 +1119,7 @@ const ExpenseForm = ({
     initialValues.payoutMethod = expense.draft.payoutMethod || expense.payoutMethod;
     initialValues.payeeLocation = expense.draft.payeeLocation;
     initialValues.payee = expense.recurringExpense ? expense.payee : expense.draft.payee;
+    initialValues.invoiceFile = expense.draft.invoiceFile;
   }
 
   return (

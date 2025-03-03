@@ -7,6 +7,7 @@ import type { FilterComponentProps, FilterConfig } from '../../../lib/filters/fi
 import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 import type { AccountHoverCardFieldsFragment, AccountQuery } from '../../../lib/graphql/types/v2/graphql';
 import type { Account } from '../../../lib/graphql/types/v2/schema';
+import { isMulti } from '@/lib/filters/schemas';
 
 import { AccountHoverCard, accountHoverCardFields } from '../../AccountHoverCard';
 import Avatar from '../../Avatar';
@@ -84,19 +85,37 @@ export const hostedAccountFilter: FilterConfig<z.infer<typeof schema>> = {
   },
 };
 
+const multiSchema = isMulti(z.string()).optional();
+
+export const hostedAccountsFilter: FilterConfig<z.infer<typeof multiSchema>> = {
+  schema: multiSchema,
+  toVariables: (value, key) => ({ [key]: value.map(slug => ({ slug })) }),
+  filter: {
+    labelMsg: hostedAccountFilter.filter.labelMsg,
+    Component: props => <HostedAccountFilter isMulti {...props} />,
+    valueRenderer: ({ value, meta, ...props }) => (
+      <AccountRenderer account={{ slug: value }} inOptionsList={meta.inOptionsList} {...props} />
+    ),
+  },
+};
+
 const resultNodeToOption = account => ({
   label: <AccountRenderer account={account} inOptionsList />,
   keywords: [account.name],
   value: account.slug,
 });
 
+export type HostedAccountFilterMeta = {
+  hostSlug: string;
+  hostedAccounts?: Partial<AccountHoverCardFieldsFragment>[];
+  disableHostedAccountsSearch?: boolean;
+};
+
 function HostedAccountFilter({
-  meta: { hostSlug, hostedAccounts },
+  meta: { hostSlug, hostedAccounts, disableHostedAccountsSearch },
   ...props
-}: FilterComponentProps<
-  z.infer<typeof schema>,
-  { hostSlug: string; hostedAccounts?: Partial<AccountHoverCardFieldsFragment>[] }
->) {
+}: FilterComponentProps<z.infer<typeof schema | typeof multiSchema>, HostedAccountFilterMeta> &
+  React.ComponentProps<typeof ComboSelectFilter>) {
   const defaultAccounts = React.useMemo(() => hostedAccounts?.map(resultNodeToOption) || [], [hostedAccounts]);
   const [options, setOptions] = React.useState<{ label: React.ReactNode; value: string }[]>(defaultAccounts);
 
@@ -129,5 +148,12 @@ function HostedAccountFilter({
     }
   }, [loading, data, defaultAccounts]);
 
-  return <ComboSelectFilter options={options} loading={loading} searchFunc={searchFunc} {...props} />;
+  return (
+    <ComboSelectFilter
+      options={options}
+      loading={loading}
+      searchFunc={disableHostedAccountsSearch ? undefined : searchFunc}
+      {...props}
+    />
+  );
 }

@@ -375,7 +375,12 @@ export const MoreActionsMenu = ({
       {openModal && (
         <React.Fragment>
           {openModal === 'ADD_FUNDS' && (
-            <AddFundsModal collective={collective} onClose={() => setOpenModal(null)} onSuccess={onEdit} />
+            <AddFundsModal
+              host={collective.host}
+              collective={collective}
+              onClose={() => setOpenModal(null)}
+              onSuccess={onEdit}
+            />
           )}
           {openModal === 'ADD_EXPENSE' && (
             <HostCreateExpenseModal

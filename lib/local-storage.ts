@@ -11,6 +11,7 @@ export const LOCAL_STORAGE_KEYS = {
   PREFERRED_TWO_FACTOR_METHOD: 'preferredTwoFactorMethod',
   UPDATES_FORM_STATE: 'updatesFormState',
   RECENTLY_VISITED: 'recentlyVisited',
+  PLAID_LINK_TOKEN: 'plaidLinkToken',
 };
 
 // The below helpers use a try-catch to gracefully fallback in these scenarios:

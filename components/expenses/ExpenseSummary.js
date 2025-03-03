@@ -2,13 +2,14 @@ import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import { includes } from 'lodash';
-import { MessageSquare } from 'lucide-react';
+import { Download, MessageSquare } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
+import { i18nGraphqlException } from '../../lib/errors';
 import { ExpenseStatus, ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
@@ -32,12 +33,15 @@ import StyledHr from '../StyledHr';
 import Tags from '../Tags';
 import { H1, P, Span } from '../Text';
 import TruncatedTextWithTooltip from '../TruncatedTextWithTooltip';
+import { Button } from '../ui/Button';
+import { useToast } from '../ui/useToast';
 import UploadedFilePreview from '../UploadedFilePreview';
 
 import EditExpenseDialog from './EditExpenseDialog';
 import { ExpenseAccountingCategoryPill } from './ExpenseAccountingCategoryPill';
 import ExpenseAmountBreakdown from './ExpenseAmountBreakdown';
 import ExpenseAttachedFiles from './ExpenseAttachedFiles';
+import ExpenseInvoiceDownloadHelper from './ExpenseInvoiceDownloadHelper';
 import ExpenseMoreActionsButton from './ExpenseMoreActionsButton';
 import ExpenseStatusTag from './ExpenseStatusTag';
 import ExpenseSummaryAdditionalInformation from './ExpenseSummaryAdditionalInformation';
@@ -105,6 +109,7 @@ const ExpenseSummary = ({
   ...props
 }) => {
   const intl = useIntl();
+  const { toast } = useToast();
   const isReceipt = expense?.type === expenseTypes.RECEIPT;
   const isCreditCardCharge = expense?.type === expenseTypes.CHARGE;
   const isGrant = expense?.type === expenseTypes.GRANT;
@@ -127,6 +132,15 @@ const ExpenseSummary = ({
     expense?.type !== ExpenseType.GRANT &&
     expense?.status !== ExpenseStatus.DRAFT;
 
+  const invoiceFile = React.useMemo(
+    () => expense?.invoiceFile || expense?.draft?.invoiceFile,
+    [expense?.invoiceFile, expense?.draft?.invoiceFile],
+  );
+  const attachedFiles = React.useMemo(
+    () => (expense?.attachedFiles?.length ? expense.attachedFiles : (expense?.draft?.attachedFiles ?? [])),
+    [expense?.attachedFiles, expense?.draft?.attachedFiles],
+  );
+
   const processButtons = (
     <Flex
       display="flex"
@@ -142,6 +156,7 @@ const ExpenseSummary = ({
         isViewingExpenseInHostContext={isViewingExpenseInHostContext}
         enableKeyboardShortcuts={enableKeyboardShortcuts}
         disabled={isLoading}
+        hasAttachedInvoiceFile={Boolean(invoiceFile)}
         onDelete={() => {
           onDelete?.(expense);
           onClose?.();
@@ -528,7 +543,55 @@ const ExpenseSummary = ({
           </div>
         )}
       </Flex>
-      {expenseTypeSupportsAttachments(expense?.type) && expense?.attachedFiles?.length > 0 && (
+      {expenseTypeSupportsAttachments(expense?.type) && (invoiceFile || useInlineExpenseEdit) && (
+        <React.Fragment>
+          <Flex my={4} alignItems="center" gridGap={2}>
+            {!expense && isLoading ? (
+              <LoadingPlaceholder height={20} maxWidth={150} />
+            ) : (
+              <Span fontWeight="bold" fontSize="16px">
+                <FormattedMessage defaultMessage="Invoice" id="Expense.Type.Invoice" />
+              </Span>
+            )}
+            <StyledHr flex="1 1" borderColor="black.300" />
+            {useInlineExpenseEdit && (
+              <EditExpenseDialog
+                title={intl.formatMessage({ defaultMessage: 'Edit invoice file', id: 'expense.editInvoice' })}
+                field="invoiceFile"
+                expense={expense}
+                onEdit={onEdit}
+              />
+            )}
+          </Flex>
+          {invoiceFile ? (
+            <ExpenseAttachedFiles files={[invoiceFile]} openFileViewer={openFileViewer} />
+          ) : (
+            <ExpenseInvoiceDownloadHelper
+              expense={expense}
+              collective={expense.account}
+              onError={e =>
+                toast({
+                  variant: 'error',
+                  message: i18nGraphqlException(intl, e),
+                })
+              }
+            >
+              {({ isLoading, downloadInvoice }) => (
+                <Button
+                  variant="outline"
+                  loading={isLoading}
+                  onClick={downloadInvoice}
+                  data-cy="download-expense-invoice-btn"
+                >
+                  <Download size="16px" />
+                  <FormattedMessage defaultMessage="Download generated invoice" id="OBGGNj" />
+                </Button>
+              )}
+            </ExpenseInvoiceDownloadHelper>
+          )}
+        </React.Fragment>
+      )}
+      {expenseTypeSupportsAttachments(expense?.type) && (attachedFiles.length > 0 || useInlineExpenseEdit) && (
         <React.Fragment>
           <Flex my={4} alignItems="center" gridGap={2}>
             {!expense && isLoading ? (
@@ -548,7 +611,7 @@ const ExpenseSummary = ({
               />
             )}
           </Flex>
-          <ExpenseAttachedFiles files={expense.attachedFiles} openFileViewer={openFileViewer} />
+          <ExpenseAttachedFiles files={attachedFiles} openFileViewer={openFileViewer} />
         </React.Fragment>
       )}
 
@@ -640,6 +703,10 @@ ExpenseSummary.propTypes = {
         url: PropTypes.string.isRequired,
       }).isRequired,
     ),
+    invoiceFile: PropTypes.shape({
+      id: PropTypes.string,
+      url: PropTypes.string.isRequired,
+    }),
     taxes: PropTypes.arrayOf(
       PropTypes.shape({
         type: PropTypes.string,
@@ -694,6 +761,16 @@ ExpenseSummary.propTypes = {
           url: PropTypes.string,
         }),
       ),
+      attachedFiles: PropTypes.arrayOf(
+        PropTypes.shape({
+          id: PropTypes.string,
+          url: PropTypes.string.isRequired,
+        }).isRequired,
+      ),
+      invoiceFile: PropTypes.shape({
+        id: PropTypes.string,
+        url: PropTypes.string.isRequired,
+      }),
       taxes: PropTypes.arrayOf(
         PropTypes.shape({
           type: PropTypes.string,
