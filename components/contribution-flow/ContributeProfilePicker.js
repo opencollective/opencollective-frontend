@@ -10,7 +10,7 @@ import CollectivePicker, { FLAG_COLLECTIVE_PICKER_COLLECTIVE, FLAG_NEW_COLLECTIV
 import { Flex } from '../Grid';
 import { Span } from '../Text';
 
-import { canUseIncognitoForContribution } from './utils';
+import { canUseIncognitoForContribution, INCOGNITO_ID } from './utils';
 
 const { ORGANIZATION, COLLECTIVE, FUND, EVENT, PROJECT, INDIVIDUAL } = CollectiveType;
 
@@ -38,7 +38,7 @@ const getProfileOptions = (intl, profiles, tier) => {
     myself.push(
       getOptionFromAccount({
         account: {
-          id: 'incognito',
+          id: INCOGNITO_ID,
           type: CollectiveType.INDIVIDUAL,
           isIncognito: true,
           name: intl.formatMessage({ id: 'profile.incognito', defaultMessage: 'Incognito' }),
