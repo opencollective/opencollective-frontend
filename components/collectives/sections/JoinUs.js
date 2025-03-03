@@ -11,7 +11,7 @@ import { H1, H3, P } from '../../Text';
 import Newsletter from '../Newsletter';
 import SectionSubtitle from '../SectionSubtitle';
 
-export const JoinUsWrapper = styled(Container)`
+const JoinUsWrapper = styled(Container)`
   background: ${props =>
     props.page && props.page === 'becomeAHost'
       ? `url('/static/images/home/joinus-green-bg-sm.png')`
@@ -66,7 +66,7 @@ const Wrapper = styled(Container)`
   }
 `;
 
-export const JoinUsActionContainer = ({ title, description, link }) => {
+const JoinUsActionContainer = ({ title, description, link }) => {
   return (
     <Link href={link}>
       <Wrapper
