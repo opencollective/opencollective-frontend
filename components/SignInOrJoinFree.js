@@ -82,6 +82,8 @@ class SignInOrJoinFree extends React.Component {
     login: PropTypes.func,
     /** whether the input needs to be auto-focused */
     autoFocus: PropTypes.bool,
+    /** whether to update the page title when the sign in form is active */
+    noSignInTitle: PropTypes.bool,
   };
 
   constructor(props) {
@@ -258,6 +260,7 @@ class SignInOrJoinFree extends React.Component {
               oAuthAppName={this.props.oAuthApplication?.name}
               oAuthAppImage={this.props.oAuthApplication?.account?.imageUrl}
               autoFocus={this.props.autoFocus}
+              noSignInTitle={this.props.noSignInTitle}
             />
           ) : (
             <Flex flexDirection="column" width={1} alignItems="center">
