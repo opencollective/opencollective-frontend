@@ -336,6 +336,8 @@ const getTotalYearlyAmount = stepDetails => {
   return totalAmount && stepDetails?.interval === INTERVALS.month ? totalAmount * 12 : totalAmount;
 };
 
+export const INCOGNITO_ID = 'incognito';
+
 /**
  * Get the required information for the current contribution based on Host policies and total contributed to host
  * @returns {{ legalName?: boolean, address?: boolean }}
@@ -348,14 +350,16 @@ export const getRequiredInformation = (stepProfile, stepDetails, collective, pro
   }
 
   let totalAmount = getTotalYearlyAmount(stepDetails);
-  let selectedProfile = profiles.find(p => p.account.id === stepProfile?.id);
+  const selectedProfile =
+    stepProfile.id === INCOGNITO_ID
+      ? // If this is a new incognito profile, apply existing Individual account contribution value
+        profiles.find(p => p.account.type === CollectiveType.INDIVIDUAL)
+      : profiles.find(p => p.account.id === stepProfile?.id);
+
   if (selectedProfile) {
-    // If incognito, use the user individual profile
-    if (stepProfile.isIncognito) {
-      selectedProfile = profiles[0];
-    }
     totalAmount += selectedProfile.totalContributedToHost?.valueInCents || 0;
   }
+
   const thresholds = collective?.policies?.CONTRIBUTOR_INFO_THRESHOLDS;
   return {
     legalName:
