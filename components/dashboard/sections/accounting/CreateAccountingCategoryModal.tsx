@@ -4,7 +4,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import type { AccountingCategory } from '../../../../lib/graphql/types/v2/schema';
 import { AccountingCategoryAppliesTo, AccountingCategoryKind } from '../../../../lib/graphql/types/v2/schema';
 
-import StyledButton from '../../../StyledButton';
+import { Button } from '@/components/ui/Button';
+
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../../StyledModal';
 
 import type { EditableAccountingCategoryFields } from './AccountingCategoryForm';
@@ -78,13 +79,13 @@ export function CreateAccountingCategoryModal(props: CreateAccountingCategoryMod
       </ModalBody>
       <ModalFooter showDivider={false}>
         <form onSubmit={e => formik.handleSubmit(e)}>
-          <div className="flex justify-center gap-4">
-            <StyledButton type="submit" buttonStyle="primary">
-              <FormattedMessage defaultMessage="Create category" id="ZROXxK" />
-            </StyledButton>
-            <StyledButton onClick={props.onClose}>
+          <div className="flex justify-end gap-4 border-t-1 border-solid border-t-slate-100 pt-4">
+            <Button onClick={props.onClose} variant="outline">
               <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-            </StyledButton>
+            </Button>
+            <Button type="submit">
+              <FormattedMessage defaultMessage="Create category" id="ZROXxK" />
+            </Button>
           </div>
         </form>
       </ModalFooter>
