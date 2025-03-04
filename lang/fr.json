@@ -363,6 +363,7 @@
   "Account.None": "Aucun",
   "account.slug.label": "Identifiant",
   "accountingCategory.accountAdmin": "l'administrateur du collectif",
+  "AccountingCategory.appliesTo.both": "All",
   "AccountingCategory.AppliesTo.HOST": "Fonds opérationnels",
   "AccountingCategory.AppliesTo.HOSTED_COLLECTIVES": "Fonds gérés",
   "AccountingCategory.code": "Code",

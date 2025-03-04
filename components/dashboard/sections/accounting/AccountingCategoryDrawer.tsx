@@ -28,16 +28,21 @@ type AccountingCategoryDrawerProps = {
   onDelete: (category: Pick<AccountingCategory, 'id'>) => void;
   accountingCategory?: Pick<AccountingCategory, 'id' | EditableAccountingCategoryFields>;
   isIndependentCollective: boolean;
+  isInitiallyEditing?: boolean;
 };
 
 export function AccountingCategoryDrawer(props: AccountingCategoryDrawerProps) {
-  const [isEditing, setIsEditing] = React.useState(false);
+  const [isEditing, setIsEditing] = React.useState(props.isInitiallyEditing || false);
 
   React.useEffect(() => {
     if (!props.open) {
       setIsEditing(false);
     }
   }, [props.open]);
+
+  React.useEffect(() => {
+    setIsEditing(props.isInitiallyEditing || false);
+  }, [props.isInitiallyEditing]);
 
   return (
     <Drawer maxWidth="512px" open={props.open} onClose={props.onClose} showActionsContainer>
@@ -214,12 +219,10 @@ function AccountingCategoryEditingDrawerView(props: AccountingCategoryEditingDra
           AccountingCategoryKindI18n[props.accountingCategory?.kind || AccountingCategoryKind.EXPENSE],
         ),
       },
-      appliesTo: props.accountingCategory?.appliesTo
-        ? {
-            value: props.accountingCategory?.appliesTo,
-            label: intl.formatMessage(AccountingCategoryAppliesToI18n[props.accountingCategory?.appliesTo]),
-          }
-        : null,
+      appliesTo: {
+        value: props.accountingCategory?.appliesTo || null,
+        label: intl.formatMessage(AccountingCategoryAppliesToI18n[props.accountingCategory?.appliesTo || 'ALL']),
+      },
       hostOnly: {
         value: props.accountingCategory?.hostOnly,
         label: props.accountingCategory?.hostOnly

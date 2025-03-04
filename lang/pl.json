@@ -363,6 +363,7 @@
   "Account.None": "Brak",
   "account.slug.label": "Uchwyt identyfikacyjny",
   "accountingCategory.accountAdmin": "the collective admin",
+  "AccountingCategory.appliesTo.both": "All",
   "AccountingCategory.AppliesTo.HOST": "Operational Funds",
   "AccountingCategory.AppliesTo.HOSTED_COLLECTIVES": "Managed Funds",
   "AccountingCategory.code": "Code",

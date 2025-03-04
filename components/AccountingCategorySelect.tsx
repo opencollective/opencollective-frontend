@@ -196,7 +196,8 @@ const getOptions = (
       ? AccountingCategoryAppliesTo.HOST
       : AccountingCategoryAppliesTo.HOSTED_COLLECTIVES;
 
-  remove(categories, category => category.appliesTo !== expectedAppliesTo);
+  // Allow categories that either match the expected appliesTo or have no appliesTo (meaning they apply to both)
+  remove(categories, category => category.appliesTo && category.appliesTo !== expectedAppliesTo);
 
   if (allowNone) {
     options.push({

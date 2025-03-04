@@ -363,6 +363,7 @@
   "Account.None": "Nič",
   "account.slug.label": "Handle",
   "accountingCategory.accountAdmin": "správca kolektívu",
+  "AccountingCategory.appliesTo.both": "All",
   "AccountingCategory.AppliesTo.HOST": "Prevádzkové fondy",
   "AccountingCategory.AppliesTo.HOSTED_COLLECTIVES": "Spravované fondy",
   "AccountingCategory.code": "Kód",

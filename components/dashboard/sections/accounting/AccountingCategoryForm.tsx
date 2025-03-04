@@ -80,6 +80,10 @@ export const AccountingCategoryAppliesToI18n = defineMessages({
     id: 'AccountingCategory.AppliesTo.HOSTED_COLLECTIVES',
     defaultMessage: 'Managed Funds',
   },
+  ALL: {
+    id: 'AccountingCategory.appliesTo.both',
+    defaultMessage: 'All',
+  },
 });
 
 type AccountingCategoryFormProps = {
@@ -102,6 +106,10 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
   ];
 
   const accountingCategoryAppliesToOptions = [
+    {
+      value: null,
+      label: intl.formatMessage(AccountingCategoryAppliesToI18n.ALL),
+    },
     {
       value: AccountingCategoryAppliesTo.HOSTED_COLLECTIVES,
       label: intl.formatMessage(AccountingCategoryAppliesToI18n[AccountingCategoryAppliesTo.HOSTED_COLLECTIVES]),

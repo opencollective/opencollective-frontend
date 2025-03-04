@@ -363,6 +363,7 @@
   "Account.None": "Ninguno",
   "account.slug.label": "Usuario",
   "accountingCategory.accountAdmin": "Administrador del Colectivo",
+  "AccountingCategory.appliesTo.both": "All",
   "AccountingCategory.AppliesTo.HOST": "Fondos operacionales",
   "AccountingCategory.AppliesTo.HOSTED_COLLECTIVES": "Fondos gestionados",
   "AccountingCategory.code": "Código",

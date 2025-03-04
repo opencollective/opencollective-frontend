@@ -363,6 +363,7 @@
   "Account.None": "Немає",
   "account.slug.label": "Обробник",
   "accountingCategory.accountAdmin": "адміністратор колективу",
+  "AccountingCategory.appliesTo.both": "All",
   "AccountingCategory.AppliesTo.HOST": "Operational Funds",
   "AccountingCategory.AppliesTo.HOSTED_COLLECTIVES": "Managed Funds",
   "AccountingCategory.code": "Код",
