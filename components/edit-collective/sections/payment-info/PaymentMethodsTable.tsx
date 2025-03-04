@@ -112,7 +112,7 @@ export default function PaymentMethodsTable({ paymentMethods, account, loading }
   const [removePaymentMethod] = useMutation(
     gql`
       mutation RemovePaymentMethod($paymentMethod: PaymentMethodReferenceInput!) {
-        removePaymentMethod(paymentMethod: $paymentMethod, cancelActiveSubscriptions: false) {
+        removePaymentMethod(paymentMethod: $paymentMethod, cancelActiveSubscriptions: true) {
           id
         }
       }
