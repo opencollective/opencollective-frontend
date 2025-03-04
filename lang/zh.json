@@ -363,6 +363,7 @@
   "Account.None": "无",
   "account.slug.label": "处理",
   "accountingCategory.accountAdmin": "the collective admin",
+  "AccountingCategory.appliesTo.both": "All",
   "AccountingCategory.AppliesTo.HOST": "Operational Funds",
   "AccountingCategory.AppliesTo.HOSTED_COLLECTIVES": "Managed Funds",
   "AccountingCategory.code": "代码",

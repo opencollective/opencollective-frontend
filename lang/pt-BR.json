@@ -363,6 +363,7 @@
   "Account.None": "Nenhum",
   "account.slug.label": "Tratar",
   "accountingCategory.accountAdmin": "o administrador coletivo",
+  "AccountingCategory.appliesTo.both": "All",
   "AccountingCategory.AppliesTo.HOST": "Fundos operacionais",
   "AccountingCategory.AppliesTo.HOSTED_COLLECTIVES": "Fundos gerenciados",
   "AccountingCategory.code": "Código",
