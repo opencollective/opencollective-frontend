@@ -823,7 +823,7 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
               </Badge>
             )}
           </div>
-          {!isEditingPayoutMethod && props.isEditable && (
+          {!isEditingPayoutMethod && isEditable && (
             <div className="flex gap-2">
               {!props.archived && props.isChecked && (
                 <Button
