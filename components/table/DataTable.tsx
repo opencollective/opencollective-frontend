@@ -32,7 +32,11 @@ interface DataTableProps<TData, TValue> {
   hideHeader?: boolean;
   emptyMessage?: () => React.ReactNode;
   nbPlaceholders?: number;
-  onClickRow?: (row: Row<TData>, actionsMenuTriggerRef?: React.RefObject<HTMLElement>) => void;
+  onClickRow?: (
+    row: Row<TData>,
+    actionsMenuTriggerRef?: React.RefObject<HTMLElement>,
+    event?: React.MouseEvent,
+  ) => void;
   openDrawer?: (row: Row<TData>, actionsMenuTriggerRef?: React.RefObject<HTMLElement>) => void;
   onHoverRow?: (row: Row<TData>) => void;
   rowHasIndicator?: (row: Row<TData>) => boolean;
@@ -229,7 +233,7 @@ function DataTableRow({
       data-state={row.getIsSelected() && 'selected'}
       className={cn(getRowClassName?.(row), onClickRow && 'cursor-pointer')}
       {...(onClickRow && {
-        onClick: () => onClickRow(row, actionsMenuTriggerRef),
+        onClick: e => onClickRow(row, actionsMenuTriggerRef, e),
       })}
       {...(onHoverRow && {
         onMouseEnter: () => onHoverRow(row),

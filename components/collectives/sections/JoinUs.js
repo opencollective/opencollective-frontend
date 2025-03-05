@@ -11,7 +11,7 @@ import { H1, H3, P } from '../../Text';
 import Newsletter from '../Newsletter';
 import SectionSubtitle from '../SectionSubtitle';
 
-export const JoinUsWrapper = styled(Container)`
+const JoinUsWrapper = styled(Container)`
   background: ${props =>
     props.page && props.page === 'becomeAHost'
       ? `url('/static/images/home/joinus-green-bg-sm.png')`
@@ -66,7 +66,7 @@ const Wrapper = styled(Container)`
   }
 `;
 
-export const JoinUsActionContainer = ({ title, description, link }) => {
+const JoinUsActionContainer = ({ title, description, link }) => {
   return (
     <Link href={link}>
       <Wrapper
@@ -156,7 +156,7 @@ const JoinUs = ({ page }) => (
             page === 'becomeAHost' ? (
               <FormattedMessage defaultMessage="Join as a Fiscal Host" id="Y0G9KM" />
             ) : (
-              <FormattedMessage defaultMessage="Get started now free!" id="uw0ZU2" />
+              <FormattedMessage defaultMessage="Get started now for free!" id="KOBC7Z" />
             )
           }
           description={<FormattedMessage id="home.joinUsSection.getStarted" defaultMessage="Get started now!" />}

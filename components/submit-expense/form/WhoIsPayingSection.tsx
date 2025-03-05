@@ -4,8 +4,9 @@ import { FormattedMessage } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
 
+import { Skeleton } from '@/components/ui/Skeleton';
+
 import CollectivePickerAsync from '../../CollectivePickerAsync';
-import LoadingPlaceholder from '../../LoadingPlaceholder';
 import { RadioGroup, RadioGroupCard } from '../../ui/RadioGroup';
 import { Step } from '../SubmitExpenseFlowSteps';
 import type { ExpenseForm } from '../useExpenseForm';
@@ -89,7 +90,7 @@ export const WhoIsPayingSection = memoWithGetFormProps(function WhoIsPayingSecti
 
         {isLoading && (
           <RadioGroupCard value="" disabled>
-            <LoadingPlaceholder height={24} width={1} />
+            <Skeleton className="h-6 w-full" />
           </RadioGroupCard>
         )}
 

@@ -117,14 +117,19 @@ const ExpenseBudgetItem = ({
 }) => {
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
-  const [showFilesViewerModal, setShowFilesViewerModal] = React.useState(false);
+  const [showFilesViewerModal, setShowFilesViewerModal] = React.useState(null);
   const featuredProfile = isInverted ? expense?.account : expense?.payee;
   const isAdminView = view === 'admin';
   const isSubmitterView = view === 'submitter';
   const isCharge = expense?.type === expenseTypes.CHARGE;
   const pendingReceipt = isCharge && expense?.items?.every(i => i.url === null);
-  const files = React.useMemo(() => getFilesFromExpense(expense, intl), [expense]);
-  const nbAttachedFiles = !isAdminView ? 0 : files.length;
+  const invoiceFile = expense?.invoiceFile;
+  const attachedFiles = React.useMemo(
+    () => getFilesFromExpense(expense, intl).filter(f => !invoiceFile || f.url !== invoiceFile.url),
+    [expense, intl, invoiceFile],
+  );
+  const files = React.useMemo(() => getFilesFromExpense(expense, intl), [expense, intl]);
+  const nbAttachedFiles = !isAdminView ? 0 : attachedFiles.length;
   const isExpensePaidOrRejected = [ExpenseStatus.REJECTED, ExpenseStatus.PAID].includes(expense?.status);
   const shouldDisplayStatusTagActions =
     (isExpensePaidOrRejected || expense?.status === ExpenseStatus.APPROVED) &&
@@ -423,6 +428,40 @@ const ExpenseBudgetItem = ({
                   )}
                 </div>
               )}
+              {expense.invoiceFile && (
+                <div>
+                  <DetailColumnHeader>
+                    <FormattedMessage defaultMessage="Invoice" id="Expense.Type.Invoice" />
+                  </DetailColumnHeader>
+                  {isLoading ? (
+                    <LoadingPlaceholder height={15} width={90} />
+                  ) : (
+                    <StyledButton
+                      color="black.700"
+                      fontSize="11px"
+                      cursor="pointer"
+                      buttonSize="tiny"
+                      onClick={
+                        useDrawer
+                          ? e => expandExpense(e, expense.invoiceFile.url)
+                          : () => setShowFilesViewerModal([expense.invoiceFile])
+                      }
+                      px={2}
+                      ml={-2}
+                      isBorderless
+                      textAlign="left"
+                    >
+                      <MaximizeIcon size={10} />
+                      &nbsp;&nbsp;
+                      <FormattedMessage
+                        id="ExpenseInvoice.count"
+                        defaultMessage="{count, plural, one {# invoice} other {# invoices}}"
+                        values={{ count: 1 }}
+                      />
+                    </StyledButton>
+                  )}
+                </div>
+              )}
               {nbAttachedFiles > 0 && (
                 <div>
                   <DetailColumnHeader>
@@ -436,7 +475,11 @@ const ExpenseBudgetItem = ({
                       fontSize="11px"
                       cursor="pointer"
                       buttonSize="tiny"
-                      onClick={useDrawer ? expandExpense : () => setShowFilesViewerModal(true)}
+                      onClick={
+                        useDrawer
+                          ? e => expandExpense(e, attachedFiles[0].url)
+                          : () => setShowFilesViewerModal(attachedFiles)
+                      }
                       px={2}
                       ml={-2}
                       isBorderless
@@ -453,6 +496,7 @@ const ExpenseBudgetItem = ({
                   )}
                 </div>
               )}
+
               {lastComment && (
                 <div>
                   <DetailColumnHeader>
@@ -519,7 +563,7 @@ const ExpenseBudgetItem = ({
             },
             { expenseId: expense.legacyId },
           )}
-          onClose={() => setShowFilesViewerModal(false)}
+          onClose={() => setShowFilesViewerModal(null)}
         />
       )}
     </ExpenseContainer>
@@ -557,6 +601,7 @@ ExpenseBudgetItem.propTypes = {
     items: PropTypes.arrayOf(PropTypes.object),
     requiredLegalDocuments: PropTypes.arrayOf(PropTypes.string),
     attachedFiles: PropTypes.arrayOf(PropTypes.object),
+    invoiceFile: PropTypes.object,
     payee: PropTypes.shape({
       id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
       type: PropTypes.string.isRequired,

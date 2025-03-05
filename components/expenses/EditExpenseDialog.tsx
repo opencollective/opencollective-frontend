@@ -9,7 +9,7 @@ import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import type { Currency, CurrencyExchangeRateInput } from '../../lib/graphql/types/v2/graphql';
+import { type Currency, type CurrencyExchangeRateInput, PayoutMethodType } from '../../lib/graphql/types/v2/graphql';
 import { cn } from '../../lib/utils';
 import type { Expense } from '@/lib/graphql/types/v2/schema';
 
@@ -17,6 +17,7 @@ import { FormField } from '../FormField';
 import { FormikZod } from '../FormikZod';
 import { AdditionalAttachments, ExpenseItemsForm } from '../submit-expense/form/ExpenseItemsSection';
 import { PayoutMethodFormContent } from '../submit-expense/form/PayoutMethodSection';
+import { InvoiceFormOption } from '../submit-expense/form/TypeOfExpenseSection';
 import { WhoIsGettingPaidForm } from '../submit-expense/form/WhoIsGettingPaidSection';
 import { InviteeAccountType, useExpenseForm, YesNoOption } from '../submit-expense/useExpenseForm';
 import { Button } from '../ui/Button';
@@ -48,6 +49,8 @@ const RenderFormFields = ({ field, onSubmit, expense }) => {
       return <EditPayee onSubmit={onSubmit} expense={expense} />;
     case 'attachments':
       return <EditAttachments onSubmit={onSubmit} expense={expense} />;
+    case 'invoiceFile':
+      return <EditInvoiceFile onSubmit={onSubmit} expense={expense} />;
   }
 };
 const EditPayee = ({ expense, onSubmit }) => {
@@ -84,9 +87,14 @@ const EditPayee = ({ expense, onSubmit }) => {
           payoutMethod:
             !values.payoutMethodId || values.payoutMethodId === '__newPayoutMethod'
               ? { ...values.newPayoutMethod, isSaved: false }
-              : {
-                  id: values.payoutMethodId,
-                },
+              : values.payoutMethodId === '__newAccountBalancePayoutMethod'
+                ? {
+                    type: PayoutMethodType.ACCOUNT_BALANCE,
+                    data: {},
+                  }
+                : {
+                    id: values.payoutMethodId,
+                  },
         }),
       };
       return onSubmit(editValues);
@@ -164,9 +172,14 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
         payoutMethod:
           !values.payoutMethodId || values.payoutMethodId === '__newPayoutMethod'
             ? { ...values.newPayoutMethod, isSaved: false }
-            : {
-                id: values.payoutMethodId,
-              },
+            : values.payoutMethodId === '__newAccountBalancePayoutMethod'
+              ? {
+                  type: PayoutMethodType.ACCOUNT_BALANCE,
+                  data: {},
+                }
+              : {
+                  id: values.payoutMethodId,
+                },
         payee: {
           slug: formOptions.payee?.slug,
         },
@@ -235,10 +248,12 @@ const EditAttachments = ({ expense, onSubmit }) => {
     pickSchemaFields: { expenseAttachedFiles: true },
   });
   const transformedOnSubmit = values => {
+    const attachedFiles = values.additionalAttachments.map(a => ({
+      url: typeof a === 'string' ? a : a?.url,
+    }));
+
     const editValues = {
-      attachedFiles: values.additionalAttachments.map(a => ({
-        url: typeof a === 'string' ? a : a?.url,
-      })),
+      attachedFiles,
     };
     return onSubmit(editValues);
   };
@@ -279,6 +294,66 @@ const EditAttachments = ({ expense, onSubmit }) => {
     </FormikProvider>
   );
 };
+
+const EditInvoiceFile = ({ expense, onSubmit }) => {
+  const formRef = React.useRef<HTMLFormElement>();
+  const startOptions = React.useRef({
+    expenseId: expense.legacyId,
+    isInlineEdit: true,
+    pickSchemaFields: { invoiceFile: true, invoiceNumber: true },
+  });
+  const transformedOnSubmit = values => {
+    let invoiceFile;
+    if (values.hasInvoiceOption === YesNoOption.YES && values.invoiceFile) {
+      invoiceFile = { url: typeof values.invoiceFile === 'string' ? values.invoiceFile : values.invoiceFile.url };
+    } else if (values.hasInvoiceOption === YesNoOption.NO) {
+      invoiceFile = null;
+    }
+
+    const editValues = {
+      invoiceFile,
+      reference: values.invoiceNumber,
+    };
+    return onSubmit(editValues);
+  };
+
+  const expenseForm = useExpenseForm({
+    formRef,
+    initialValues: {
+      inviteeAccountType: InviteeAccountType.INDIVIDUAL,
+      expenseItems: [
+        {
+          amount: {
+            valueInCents: 0,
+            currency: 'USD',
+          },
+          description: '',
+        },
+      ],
+      additionalAttachments: [],
+      hasInvoiceOption: YesNoOption.YES,
+      inviteeNewIndividual: {},
+      inviteeNewOrganization: {
+        organization: {},
+      },
+      newPayoutMethod: {
+        data: {},
+      },
+    },
+    startOptions: startOptions.current,
+    onSubmit: transformedOnSubmit,
+  });
+
+  return (
+    <FormikProvider value={expenseForm}>
+      <form className="space-y-4" ref={formRef} onSubmit={e => e.preventDefault()}>
+        <InvoiceFormOption {...InvoiceFormOption.getFormProps(expenseForm)} />
+        <EditExpenseActionButtons loading={expenseForm.initialLoading} handleSubmit={expenseForm.handleSubmit} />
+      </form>
+    </FormikProvider>
+  );
+};
+
 const EditExpenseItems = ({ expense, onSubmit }) => {
   const formRef = React.useRef<HTMLFormElement>();
   const startOptions = React.useRef({
@@ -395,7 +470,7 @@ export default function EditExpenseDialog({
   goToLegacyEdit,
 }: {
   expense: Expense;
-  field: 'title' | 'expenseItems' | 'payoutMethod' | 'payee' | 'type' | 'attachments';
+  field: 'title' | 'expenseItems' | 'payoutMethod' | 'payee' | 'type' | 'attachments' | 'invoiceFile';
   title: string;
   description?: string;
   dialogContentClassName?: string;

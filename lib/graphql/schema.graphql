@@ -288,6 +288,11 @@ type Member {
   tier: Tier
   stats: StatsMemberType
   since: DateString
+
+  """
+  Whether the membership is active. Warning: this definition is subject to change.
+  """
+  isActive: Boolean!
 }
 
 scalar DateString
@@ -4669,7 +4674,7 @@ type Mutation {
     customMessage: String
     expiryDate: String
   ): [PaymentMethodType]
-  claimPaymentMethod(code: String!, user: UserInputType): PaymentMethodType
+  claimPaymentMethod(code: String!, user: UserInputType): PaymentMethodType!
 
   """
   Removes the payment method

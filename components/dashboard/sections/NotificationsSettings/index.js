@@ -12,11 +12,11 @@ import Avatar from '../../../Avatar';
 import { Box, Flex } from '../../../Grid';
 import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
-import StyledButton from '../../../StyledButton';
 import StyledCard from '../../../StyledCard';
 import StyledHr from '../../../StyledHr';
 import StyledTag from '../../../StyledTag';
 import { P, Span } from '../../../Text';
+import { Button } from '../../../ui/Button';
 import { Switch } from '../../../ui/Switch';
 
 import CollectiveSettings from './CollectiveSettings';
@@ -134,9 +134,9 @@ const GroupSettings = ({ accounts, group, title, ...boxProps }) => {
               </P>
             )}
           </Flex>
-          <StyledButton buttonStyle="primary" buttonSize="tiny" onClick={handleGroupSettings}>
+          <Button size="xs" variant="outline" onClick={handleGroupSettings}>
             <FormattedMessage id="GroupSettings.Show" defaultMessage="Show group settings" />
-          </StyledButton>
+          </Button>
         </Flex>
         <Box display={['block', 'none']} mt={2}>
           <P fontSize="12px" lineHeight="18px" color="black.700">

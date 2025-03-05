@@ -6,13 +6,14 @@ import { FormattedMessage } from 'react-intl';
 
 import type { PayoutMethod } from '../../lib/graphql/types/v2/schema';
 import { PayoutMethodType } from '../../lib/graphql/types/v2/schema';
+import { cn } from '@/lib/utils';
 
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
-import LoadingPlaceholder from '../LoadingPlaceholder';
 import { Button } from '../ui/Button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/Collapsible';
 import type { DataListItemProps } from '../ui/DataList';
 import { DataList, DataListItem } from '../ui/DataList';
+import { Skeleton } from '../ui/Skeleton';
 
 import type { ExpenseForm } from './useExpenseForm';
 
@@ -131,6 +132,7 @@ function getPayoutMethodDetailItems(props: PayoutMethodDetailsProps) {
 export function PayoutMethodDetailsContainer(props: {
   payoutMethod: ExpenseForm['options']['payoutMethod'];
   maxItems?: number;
+  className?: string;
 }) {
   const [isOpen, setIsOpen] = React.useState(false);
   const toggleContainer = React.useCallback(() => {
@@ -144,12 +146,12 @@ export function PayoutMethodDetailsContainer(props: {
   const hiddenItems = isExpandable ? payoutMethodDetailItems.slice(3) : [];
 
   if (!props.payoutMethod) {
-    return <LoadingPlaceholder height={24} mb={2} />;
+    return <Skeleton className="mb-2 h-6" />;
   }
 
   return (
     <Collapsible className="group" open={isOpen}>
-      <div className={'relative overflow-hidden rounded-xl bg-muted'}>
+      <div className={cn('relative overflow-hidden rounded-xl bg-muted', props.className)}>
         {isExpandable && (
           <React.Fragment>
             <div

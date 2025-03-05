@@ -125,7 +125,7 @@ export const TaxInformationForm = ({
   }
 
   return (
-    <FormikZod
+    <FormikZod<typeof schema._output>
       schema={schema}
       initialValues={initialValues}
       config={FORM_CONFIG}

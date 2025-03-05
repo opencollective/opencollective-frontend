@@ -26,11 +26,11 @@ import { DISABLE_ANIMATIONS } from '@/lib/animations';
 import { FormField } from '@/components/FormField';
 import InputAmount from '@/components/InputAmount';
 import { Checkbox } from '@/components/ui/Checkbox';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 import Dropzone, { MemoizedDropzone } from '../../Dropzone';
 import { ExchangeRate } from '../../ExchangeRate';
 import FormattedMoneyAmount from '../../FormattedMoneyAmount';
-import LoadingPlaceholder from '../../LoadingPlaceholder';
 import StyledSelect from '../../StyledSelect';
 import { Button } from '../../ui/Button';
 import { Input, InputGroup } from '../../ui/Input';
@@ -97,7 +97,11 @@ export const ExpenseItemsForm = memoWithGetFormProps(function ExpenseItemsForm(
                 // eslint-disable-next-line react/no-array-index-key
                 <div key={ei.key} id={ei.key} role="listitem" className="flex gap-4">
                   <div className="grow">
-                    <ExpenseItemWrapper index={i} isAmountLocked={isAmountLocked} />
+                    <ExpenseItemWrapper
+                      index={i}
+                      isAmountLocked={isAmountLocked}
+                      isSubjectToTax={Boolean(props.taxType)}
+                    />
                   </div>
                   <div className="flex flex-col gap-1">
                     <Button
@@ -148,7 +152,7 @@ export const ExpenseItemsForm = memoWithGetFormProps(function ExpenseItemsForm(
 
       {props.initialLoading && (
         <div className="mb-4">
-          <LoadingPlaceholder width={1} height={120} />
+          <Skeleton className="h-30 w-full" />
         </div>
       )}
       <div className="flex justify-between pr-12">
@@ -246,6 +250,7 @@ type ExpenseItemProps = {
   index: number;
   isAmountLocked?: boolean;
   item: ExpenseForm['values']['expenseItems'][number];
+  isSubjectToTax?: boolean;
 } & ReturnType<typeof getExpenseItemProps>;
 
 function getExpenseItemProps(form: ExpenseForm) {
@@ -255,13 +260,14 @@ function getExpenseItemProps(form: ExpenseForm) {
   };
 }
 
-function ExpenseItemWrapper(props: { index: number; isAmountLocked?: boolean }) {
+function ExpenseItemWrapper(props: { index: number; isAmountLocked?: boolean; isSubjectToTax?: boolean }) {
   const form = useFormikContext() as ExpenseForm;
   return (
     <ExpenseItem
       index={props.index}
       item={get(form.values, `expenseItems.${props.index}`)}
       isAmountLocked={props.isAmountLocked}
+      isSubjectToTax={props.isSubjectToTax}
       {...ExpenseItem.getFormProps(form)}
     />
   );
@@ -323,8 +329,8 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
   }
 
   return (
-    <div className="mb-4 rounded-md border border-slate-300 p-4">
-      <div className="flex flex-wrap gap-4">
+    <div className="@container mb-4 rounded-md border border-slate-300 p-4">
+      <div className="flex flex-col gap-4 @md:flex-row">
         {hasAttachment && (
           <div className="flex flex-col">
             <div className="flex grow justify-center">
@@ -358,7 +364,7 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
             </div>
           </div>
         )}
-        <div className="grow">
+        <div className="@container grow">
           <div className="mb-2">
             <FormField
               required={props.isAdminOfPayee}
@@ -368,82 +374,80 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
               name={`expenseItems.${props.index}.description`}
             />
           </div>
-          <div className="flex flex-wrap gap-4">
-            <div className="grow basis-0">
+          <div className="flex flex-col gap-4 @md:grid @md:grid-cols-3">
+            <FormField
+              required={props.isAdminOfPayee}
+              disabled={props.isSubmitting}
+              label={intl.formatMessage({ defaultMessage: 'Date', id: 'expense.incurredAt' })}
+              name={`expenseItems.${props.index}.incurredAt`}
+            >
+              {({ field }) => {
+                const value = field.value ? dayjs.utc(field.value).format('YYYY-MM-DD') : undefined;
+                return <Input type="date" {...field} value={value} />;
+              }}
+            </FormField>
+
+            <div className="col-span-2 flex flex-col">
               <FormField
-                required={props.isAdminOfPayee}
-                disabled={props.isSubmitting}
-                label={intl.formatMessage({ defaultMessage: 'Date', id: 'expense.incurredAt' })}
-                name={`expenseItems.${props.index}.incurredAt`}
+                disabled={props.isAmountLocked || props.isSubmitting}
+                label={
+                  props.isSubjectToTax
+                    ? intl.formatMessage({ defaultMessage: 'Gross Amount', id: 'bwZInO' })
+                    : intl.formatMessage({ defaultMessage: 'Amount', id: 'Fields.amount' })
+                }
+                name={`expenseItems.${props.index}.amount.valueInCents`}
               >
-                {({ field }) => {
-                  const value = field.value ? dayjs.utc(field.value).format('YYYY-MM-DD') : undefined;
-                  return <Input type="date" {...field} value={value} />;
-                }}
+                {({ field }) => (
+                  <InputAmount
+                    {...field}
+                    currencyDisplay="FULL"
+                    hasCurrencyPicker
+                    currency={item.amount.currency || 'USD'}
+                    onCurrencyChange={onCurrencyChange}
+                    value={item.amount.valueInCents}
+                    onChange={onAmountChange}
+                    exchangeRate={item.amount.currency !== props.expenseCurrency && get(item, `amount.exchangeRate`, 0)}
+                    minFxRate={
+                      (item.amount?.referenceExchangeRate && 'value' in item.amount.referenceExchangeRate
+                        ? item.amount.referenceExchangeRate.value || 0
+                        : 0) *
+                        (1 - FX_RATE_ERROR_THRESHOLD) || undefined
+                    }
+                    maxFxRate={
+                      (item.amount?.referenceExchangeRate && 'value' in item.amount.referenceExchangeRate
+                        ? item.amount.referenceExchangeRate.value || 0
+                        : 0) *
+                        (1 + FX_RATE_ERROR_THRESHOLD) || undefined
+                    }
+                    onExchangeRateChange={onExchangeRateChange}
+                  />
+                )}
               </FormField>
-            </div>
 
-            <div className="grow basis-0">
-              <div className="flex flex-col">
-                <FormField
-                  disabled={props.isAmountLocked || props.isSubmitting}
-                  label={intl.formatMessage({ defaultMessage: 'Amount', id: 'Fields.amount' })}
-                  name={`expenseItems.${props.index}.amount.valueInCents`}
-                >
-                  {({ field }) => (
-                    <InputAmount
-                      {...field}
-                      currencyDisplay="FULL"
-                      hasCurrencyPicker
-                      currency={item.amount.currency || 'USD'}
-                      onCurrencyChange={onCurrencyChange}
-                      value={item.amount.valueInCents}
-                      onChange={onAmountChange}
-                      exchangeRate={
-                        item.amount.currency !== props.expenseCurrency && get(item, `amount.exchangeRate`, 0)
-                      }
-                      minFxRate={
-                        (item.amount?.referenceExchangeRate && 'value' in item.amount.referenceExchangeRate
-                          ? item.amount.referenceExchangeRate.value || 0
-                          : 0) *
-                          (1 - FX_RATE_ERROR_THRESHOLD) || undefined
-                      }
-                      maxFxRate={
-                        (item.amount?.referenceExchangeRate && 'value' in item.amount.referenceExchangeRate
-                          ? item.amount.referenceExchangeRate.value || 0
-                          : 0) *
-                          (1 + FX_RATE_ERROR_THRESHOLD) || undefined
-                      }
-                      onExchangeRateChange={onExchangeRateChange}
-                    />
-                  )}
-                </FormField>
-
-                <div className="self-end">
-                  {Boolean(item.amount?.currency && props.expenseCurrency !== item.amount?.currency) && (
-                    <ExchangeRate
-                      className="mt-2 text-muted-foreground"
-                      {...getExpenseExchangeRateWarningOrError(
-                        intl,
-                        item.amount.exchangeRate,
-                        item.amount.referenceExchangeRate,
-                      )}
-                      exchangeRate={
-                        (item.amount.exchangeRate || {
-                          source: CurrencyExchangeRateSourceType.USER,
-                          fromCurrency: item.amount.currency as Currency,
-                          toCurrency: props.expenseCurrency,
-                        }) as CurrencyExchangeRateInput
-                      }
-                      approximateCustomMessage={
-                        <FormattedMessage
-                          defaultMessage="This value is an estimate. Please set the exact amount received if known."
-                          id="zNBAqh"
-                        />
-                      }
-                    />
-                  )}
-                </div>
+              <div className="self-end">
+                {Boolean(item.amount?.currency && props.expenseCurrency !== item.amount?.currency) && (
+                  <ExchangeRate
+                    className="mt-2 text-muted-foreground"
+                    {...getExpenseExchangeRateWarningOrError(
+                      intl,
+                      item.amount.exchangeRate,
+                      item.amount.referenceExchangeRate,
+                    )}
+                    exchangeRate={
+                      (item.amount.exchangeRate || {
+                        source: CurrencyExchangeRateSourceType.USER,
+                        fromCurrency: item.amount.currency as Currency,
+                        toCurrency: props.expenseCurrency,
+                      }) as CurrencyExchangeRateInput
+                    }
+                    approximateCustomMessage={
+                      <FormattedMessage
+                        defaultMessage="This value is an estimate. Please set the exact amount received if known."
+                        id="zNBAqh"
+                      />
+                    }
+                  />
+                )}
               </div>
             </div>
           </div>

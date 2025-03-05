@@ -7,7 +7,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import type { GetActions } from '../../../../../lib/actions/types';
 import { i18nGraphqlException } from '../../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../../lib/graphql/helpers';
-import type { TransactionsImportRow } from '../../../../../lib/graphql/types/v2/schema';
+import type { Account, TransactionsImport, TransactionsImportRow } from '../../../../../lib/graphql/types/v2/schema';
 import { TransactionsImportRowStatus } from '../../../../../lib/graphql/types/v2/schema';
 import type { UpdateTransactionsImportRowMutation } from '@/lib/graphql/types/v2/graphql';
 
@@ -17,6 +17,7 @@ import { useToast } from '../../../../ui/useToast';
 import { HostCreateExpenseModal } from '../../expenses/HostCreateExpenseModal';
 import { AddFundsModalFromImportRow } from '../AddFundsModalFromTransactionsImportRow';
 import { MatchContributionDialog } from '../MatchContributionDialog';
+import { MatchExpenseDialog } from '../MatchExpenseDialog';
 
 import { updateTransactionsImportRows } from './graphql';
 
@@ -48,7 +49,19 @@ const getOptimisticResponse = (
   return { updateTransactionsImportRows: optimisticResult };
 };
 
-export function useTransactionsImportActions({ transactionsImport, host }): {
+export function useTransactionsImportActions({
+  host,
+  transactionsImport,
+  assignments,
+}: {
+  host: React.ComponentProps<typeof MatchContributionDialog>['host'] &
+    React.ComponentProps<typeof MatchExpenseDialog>['host'];
+  transactionsImport: Pick<TransactionsImport, 'id'> &
+    React.ComponentProps<typeof AddFundsModalFromImportRow>['transactionsImport'] &
+    React.ComponentProps<typeof MatchContributionDialog>['transactionsImport'] &
+    React.ComponentProps<typeof MatchExpenseDialog>['transactionsImport'];
+  assignments: Record<string, Pick<Account, 'id' | 'slug' | 'type'>[]>;
+}): {
   getActions: GetActions<TransactionsImportRow>;
   setRowsStatus: (
     rowIds: string[],
@@ -108,8 +121,13 @@ export function useTransactionsImportActions({ transactionsImport, host }): {
     const actions: ReturnType<GetActions<TransactionsImportRow>> = { primary: [], secondary: [] };
     const isImported = Boolean(row.expense || row.order);
     const isUpdatingRow = updatingRows.includes(row.id);
+    const assignedAccounts = assignments[row.accountId];
     const showAddFundsModal = () => {
-      showModal(AddFundsModalFromImportRow, { transactionsImport, row, onCloseFocusRef }, 'add-funds-modal');
+      showModal(
+        AddFundsModalFromImportRow,
+        { collective: assignedAccounts, transactionsImport, row, onCloseFocusRef },
+        'add-funds-modal',
+      );
     };
 
     if (isImported) {
@@ -119,12 +137,13 @@ export function useTransactionsImportActions({ transactionsImport, host }): {
         actions.primary.push({
           key: 'match',
           Icon: Merge,
-          label: <FormattedMessage defaultMessage="Match expected funds" id="J/7TIn" />,
+          label: <FormattedMessage defaultMessage="Match contribution" id="c7INEq" />,
           disabled: isUpdatingRow,
           onClick: () =>
             showModal(
               MatchContributionDialog,
               {
+                accounts: assignedAccounts,
                 transactionsImport,
                 row,
                 host,
@@ -146,6 +165,19 @@ export function useTransactionsImportActions({ transactionsImport, host }): {
         });
       } else if (row.amount.valueInCents < 0) {
         actions.primary.push({
+          key: 'match-expense',
+          Icon: Merge,
+          label: <FormattedMessage defaultMessage="Match expense" id="BGB+3j" />,
+          disabled: isUpdatingRow,
+          onClick: () => {
+            showModal(
+              MatchExpenseDialog,
+              { host, row, transactionsImport, onCloseFocusRef, accounts: assignedAccounts },
+              'host-match-expense-modal',
+            );
+          },
+        });
+        actions.primary.push({
           key: 'create-expense',
           Icon: Receipt,
           label: <FormattedMessage defaultMessage="Add expense" id="6/UjBO" />,
@@ -153,7 +185,7 @@ export function useTransactionsImportActions({ transactionsImport, host }): {
           onClick: () => {
             showModal(
               HostCreateExpenseModal,
-              { host, onCloseFocusRef, transactionsImport, transactionsImportRow: row },
+              { host, onCloseFocusRef, transactionsImport, transactionsImportRow: row, account: assignedAccounts },
               'host-create-expense-modal',
             );
           },

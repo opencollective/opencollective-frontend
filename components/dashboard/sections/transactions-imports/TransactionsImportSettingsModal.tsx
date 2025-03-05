@@ -2,13 +2,16 @@ import React from 'react';
 import { gql, useApolloClient, useMutation } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import { omit } from 'lodash';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Plug, Unplug } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { TransactionsImport } from '../../../../lib/graphql/types/v2/schema';
+import type { PlaidDialogStatus } from '@/lib/hooks/usePlaidConnectDialog';
+
+import DateTime from '@/components/DateTime';
 
 import {
   AlertDialog,
@@ -29,6 +32,9 @@ import { Label } from '../../../ui/Label';
 import { Separator } from '../../../ui/Separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../ui/Tabs';
 import { useToast } from '../../../ui/useToast';
+
+import { SyncPlaidAccountButton } from './SyncPlaidAccountButton';
+import { TransactionsImportAssignmentsForm } from './TransactionsImportAssignmentsForm';
 
 const deleteTransactionsImportMutation = gql`
   mutation DeleteTransactionsImport($id: NonEmptyString!) {
@@ -56,14 +62,26 @@ const deleteConnectedAccountMutation = gql`
 
 export default function TransactionsImportSettingsModal({
   transactionsImport,
+  plaidStatus,
   onOpenChange,
+  showPlaidDialog,
   isOpen,
+  hasRequestedSync,
+  setHasRequestedSync,
 }: {
   onOpenChange: (isOpen: boolean) => void;
   isOpen: boolean;
-  transactionsImport: Pick<TransactionsImport, 'id' | 'source' | 'name'> & {
-    connectedAccount?: Pick<TransactionsImport['connectedAccount'], 'id'>;
-  };
+  showPlaidDialog: () => void;
+  plaidStatus: PlaidDialogStatus;
+  hasRequestedSync: boolean;
+  setHasRequestedSync: (hasRequestedSync: boolean) => void;
+  transactionsImport: Pick<
+    TransactionsImport,
+    'id' | 'source' | 'name' | 'type' | 'isSyncing' | 'lastSyncAt' | 'plaidAccounts'
+  > &
+    React.ComponentProps<typeof TransactionsImportAssignmentsForm>['transactionsImport'] & {
+      connectedAccount?: Pick<TransactionsImport['connectedAccount'], 'id'>;
+    };
 }) {
   const router = useRouter();
   const { toast } = useToast();
@@ -111,16 +129,19 @@ export default function TransactionsImportSettingsModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[460px]">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">
             <FormattedMessage defaultMessage="Transaction Import Settings" id="38fPNE" />
           </DialogTitle>
         </DialogHeader>
         <Tabs defaultValue="general" className="w-full">
-          <TabsList className="mb-3 grid w-full grid-cols-2">
+          <TabsList className="mb-3 grid w-full grid-cols-3">
             <TabsTrigger value="general">
               <FormattedMessage id="settings.general" defaultMessage="General" />
+            </TabsTrigger>
+            <TabsTrigger value="accounts">
+              <FormattedMessage id="FvanT6" defaultMessage="Accounts" />
             </TabsTrigger>
             <TabsTrigger value="advanced">
               <FormattedMessage id="editCollective.menu.advanced" defaultMessage="Advanced" />
@@ -179,14 +200,84 @@ export default function TransactionsImportSettingsModal({
                       <FormattedMessage defaultMessage="Cancel" id="actions.cancel" />
                     </Button>
                     <Button loading={isSubmitting} type="submit" className="flex-1" disabled={!dirty}>
-                      <FormattedMessage id="SaveChanges" defaultMessage="Save Changes" />
+                      <FormattedMessage id="save" defaultMessage="Save" />
                     </Button>
                   </div>
                 </Form>
               )}
             </Formik>
           </TabsContent>
+          <TabsContent value="accounts" className="px-1">
+            <TransactionsImportAssignmentsForm
+              transactionsImport={transactionsImport}
+              plaidStatus={plaidStatus}
+              onOpenChange={onOpenChange}
+              showPlaidDialog={showPlaidDialog}
+              isDeleting={isDeleting}
+            />
+          </TabsContent>
           <TabsContent value="advanced">
+            {transactionsImport.type === 'PLAID' && transactionsImport.connectedAccount && (
+              <Card className="mb-4">
+                <CardContent className="pt-6">
+                  <h3 className="mb-2 text-sm font-medium">
+                    <FormattedMessage defaultMessage="Update connection" id="qFfWnO" />
+                  </h3>
+                  <p className="mb-4 text-sm text-muted-foreground">
+                    <FormattedMessage
+                      defaultMessage="If the synchronization stopped working, you can reconnect the bank account."
+                      id="ZMw3dZ"
+                    />
+                  </p>
+                  <Button
+                    loading={plaidStatus === 'loading' || plaidStatus === 'active'}
+                    disabled={plaidStatus === 'disabled' || isDeleting}
+                    onClick={showPlaidDialog}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    <Plug size={16} />
+                    <FormattedMessage defaultMessage="Reconnect" id="collective.connectedAccounts.reconnect.button" />
+                  </Button>
+                  <Separator className="my-4" />
+                  <h3 className="mb-2 text-sm font-medium">
+                    <FormattedMessage defaultMessage="Synchronize Bank Account" id="+EAopb" />
+                  </h3>
+                  <p className="mb-4 text-sm text-muted-foreground">
+                    <FormattedMessage
+                      id="withColon"
+                      defaultMessage="{item}:"
+                      values={{
+                        item: <FormattedMessage defaultMessage="Last sync" id="transactions.import.lastSync" />,
+                      }}
+                    />{' '}
+                    {transactionsImport.lastSyncAt ? (
+                      <span className="underline decoration-dotted underline-offset-2">
+                        <DateTime value={transactionsImport.lastSyncAt} timeStyle="short" />
+                      </span>
+                    ) : (
+                      <FormattedMessage defaultMessage="Never" id="du1laW" />
+                    )}
+                    .
+                  </p>
+                  <p className="mb-4 text-sm text-muted-foreground">
+                    <FormattedMessage
+                      defaultMessage="The synchronization of your bank account is automatic and happens up to 4 times per day. You can manually request a sync at any time using the button below."
+                      id="SNajqm"
+                    />
+                  </p>
+
+                  <SyncPlaidAccountButton
+                    hasRequestedSync={hasRequestedSync}
+                    setHasRequestedSync={setHasRequestedSync}
+                    connectedAccountId={transactionsImport.connectedAccount.id}
+                    isSyncing={transactionsImport.isSyncing}
+                    size="default"
+                    className="w-full"
+                  />
+                </CardContent>
+              </Card>
+            )}
             <Card>
               <CardContent className="space-y-6 pt-6">
                 {transactionsImport.connectedAccount && (
@@ -197,13 +288,19 @@ export default function TransactionsImportSettingsModal({
                       </h3>
                       <p className="mb-4 text-sm text-muted-foreground">
                         <FormattedMessage
-                          defaultMessage="Stops future imports. Existing data will remain intact."
-                          id="RYIqod"
+                          defaultMessage="Stops future imports. Existing data will remain intact, but you won't be able to resume the synchronization in the future."
+                          id="j15K8y"
                         />
                       </p>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
-                          <Button variant="outline" className="w-full" loading={isDisconnecting} disabled={isDeleting}>
+                          <Button
+                            variant="destructive"
+                            className="w-full"
+                            loading={isDisconnecting}
+                            disabled={isDeleting}
+                          >
+                            <Unplug size={16} />
                             <FormattedMessage defaultMessage="Disconnect Bank Account" id="iEOcw+" />
                           </Button>
                         </AlertDialogTrigger>
@@ -214,7 +311,7 @@ export default function TransactionsImportSettingsModal({
                             </AlertDialogTitle>
                             <AlertDialogDescription>
                               <FormattedMessage
-                                defaultMessage="You'll need to reconnect to continue importing transactions."
+                                defaultMessage="You won't be able to resume the synchronization in the future."
                                 id="FKMNjH"
                               />
                             </AlertDialogDescription>
@@ -243,14 +340,14 @@ export default function TransactionsImportSettingsModal({
                   <p className="mb-4 text-sm text-muted-foreground">
                     <FormattedMessage
                       values={{ hasConnectedAccount: transactionsImport.connectedAccount ? 0 : 1 }}
-                      defaultMessage="This will permanently delete the import and remove all associated data. {hasConnectedAccount, select, 0 {The bank account will also be disconnected.} other {}}"
-                      id="e2Cd5r"
+                      defaultMessage="This will {hasConnectedAccount, select, 0 {disconnect the Bank Account and } other {}}permanently delete the import with its associated data. Items imported in your ledger (expenses and added funds) will be preserved."
+                      id="N5p0sU"
                     />
                   </p>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button variant="destructive" className="w-full" loading={isDeleting} disabled={isDisconnecting}>
-                        <AlertTriangle className="mr-2 h-4 w-4" />
+                        <AlertTriangle size={16} />
                         <FormattedMessage defaultMessage="Delete Import" id="naIILe" />
                       </Button>
                     </AlertDialogTrigger>

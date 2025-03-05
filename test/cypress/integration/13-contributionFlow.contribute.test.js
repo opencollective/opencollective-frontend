@@ -85,6 +85,7 @@ describe('Contribution Flow: Order', () => {
       cy.contains('[data-cy="select-option"]:first', userName);
       cy.getByDataCy('progress-step-profile').contains(userName);
       cy.get('body').type('{esc}');
+      cy.getByDataCy('input-legalName').type('Very Legal Name');
 
       // Country required since we're contributing > $500
       cy.getByDataCy('country-select').click();
@@ -137,25 +138,26 @@ describe('Contribution Flow: Order', () => {
         cy.checkStepsProgress({ enabled: ['profile', 'details'], disabled: 'payment' });
         cy.getByDataCy('contribute-profile-picker').click();
         cy.contains('[data-cy="select-option"]', collective.name).click();
+        cy.getByDataCy('input-legalName').type('Very Legal Organization');
+        cy.getByDataCy('cf-next-step').click();
 
         // Payment
-        cy.getByDataCy('cf-next-step').click();
         cy.checkStepsProgress({ enabled: ['profile', 'details', 'payment'] });
         cy.contains('Next charge date: June 1, 2042');
         cy.get('#PaymentMethod').then($paymentMethod => {
           // Checks if the organization already has a payment method configured
           if ($paymentMethod.text().includes('VISA **** 4242')) {
-            cy.contains('button', 'Contribute $').click();
+            $paymentMethod.click();
           } else {
             cy.get('input[type=checkbox][name=save]').should('be.checked');
             cy.wait(1000); // Wait for stripe to be loaded
             cy.fillStripeInput();
-            cy.contains('button', 'Contribute $100').click();
           }
-          cy.getByDataCy('order-success', { timeout: 20000 }).contains('$100.00 USD / mont');
-          cy.contains(`You are now supporting APEX.`);
-          cy.contains(`APEX - Sponsors`);
         });
+        cy.getByDataCy('cf-next-step').contains('Contribute $100').click();
+        cy.getByDataCy('order-success', { timeout: 20000 }).contains('$100.00 USD / mont');
+        cy.contains(`You are now supporting APEX.`);
+        cy.contains(`APEX - Sponsors`);
       });
     });
   });

@@ -3,7 +3,7 @@ import { useQuery } from '@apollo/client';
 import { Elements } from '@stripe/react-stripe-js';
 import type { StripeElementsOptions } from '@stripe/stripe-js';
 import { themeGet } from '@styled-system/theme-get';
-import { get, isEmpty, pick } from 'lodash';
+import { get, isEmpty, pick, set } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -15,6 +15,7 @@ import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { getStripe } from '../../lib/stripe';
 import usePaymentIntent from '../../lib/stripe/usePaymentIntent';
 
+import Captcha from '../Captcha';
 import { Box, Flex } from '../Grid';
 import Loading from '../Loading';
 import MessageBox from '../MessageBox';
@@ -209,6 +210,15 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
     }
   }, [paymentMethodOptions, props.stepPayment, loading, paymentIntent]);
 
+  const onCaptchaResult = React.useCallback(
+    result => {
+      if (result) {
+        props.onChange({ stepProfile: set({ ...props.stepProfile }, 'captcha', result) });
+      }
+    },
+    [props.onChange, props.stepProfile],
+  );
+
   if (loading) {
     return <Loading />;
   }
@@ -217,14 +227,19 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
     return <MessageBoxGraphqlError error={error} />;
   }
 
-  if (paymentIntentCreateError?.message === 'You need to provide a valid captcha token') {
+  if (paymentIntentCreateError?.message?.toLowerCase().includes('captcha')) {
     return (
-      <MessageBox type="warning" withIcon>
-        <FormattedMessage
-          id="NewContribute.completeCaptchToContinue"
-          defaultMessage="Complete the captcha form to continue"
-        />
-      </MessageBox>
+      <div>
+        <MessageBox type="warning" withIcon>
+          <FormattedMessage
+            id="NewContribute.completeCaptchToContinue"
+            defaultMessage="Complete the captcha form to continue"
+          />
+        </MessageBox>
+        <Flex mt="18px" justifyContent="center">
+          <Captcha onVerify={onCaptchaResult} />
+        </Flex>
+      </div>
     );
   }
 

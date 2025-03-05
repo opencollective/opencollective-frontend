@@ -39,15 +39,10 @@ export const SuggestedContributionsTable = ({
           <EmptyResults
             hasFilters={queryFilter.hasFilters}
             entityType="CONTRIBUTIONS"
-            onResetFilters={() => queryFilter.resetFilters({})}
+            onResetFilters={() => queryFilter.resetFilters({ expectedFundsFilter: null })}
+            imageSize={120}
             otherActions={
-              <Button
-                data-cy="reset-filters"
-                size="lg"
-                variant="outline"
-                className="gap-2 rounded-full"
-                onClick={onAddFundsClick}
-              >
+              <Button data-cy="reset-filters" variant="outline" onClick={onAddFundsClick}>
                 <Banknote size={16} />
                 <span>
                   <FormattedMessage defaultMessage="Manually add funds" id="OrmUye" />

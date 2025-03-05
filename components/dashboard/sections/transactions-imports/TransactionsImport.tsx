@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql, useApolloClient, useQuery } from '@apollo/client';
-import { size, truncate } from 'lodash';
+import { keyBy, mapValues, size, truncate } from 'lodash';
 import Lottie from 'lottie-react';
 import {
   Calendar,
@@ -11,7 +11,6 @@ import {
   Info,
   MessageCircle,
   PauseCircle,
-  RefreshCw,
   RotateCcw,
   Settings,
   SquareSlashIcon,
@@ -25,19 +24,25 @@ import { z } from 'zod';
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { formatFileSize } from '../../../../lib/file-utils';
 import type { FilterConfig } from '../../../../lib/filters/filter-types';
-import { integer } from '../../../../lib/filters/schemas';
+import { integer, isMulti } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import {
   type TransactionsImportQuery,
   type TransactionsImportQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import { type Account, type Amount, TransactionsImportRowStatus } from '../../../../lib/graphql/types/v2/schema';
+import type { Account, Amount, PlaidAccount } from '../../../../lib/graphql/types/v2/schema';
+import { TransactionsImportRowStatus } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nTransactionsRowStatus } from '../../../../lib/i18n/transactions-import-row';
 import { cn, sortSelectOptions } from '../../../../lib/utils';
 import { useTransactionsImportActions } from './lib/actions';
-import { TransactionsImportRowFieldsFragment, TransactionsImportStatsFragment } from './lib/graphql';
+import {
+  TransactionsImportAssignmentFieldsFragment,
+  TransactionsImportRowFieldsFragment,
+  TransactionsImportStatsFragment,
+} from './lib/graphql';
 import { getPossibleActionsForSelectedRows } from './lib/table-selection';
+import { usePlaidConnectDialog } from '@/lib/hooks/usePlaidConnectDialog';
 
 import { accountingCategoryFields } from '@/components/expenses/graphql/fragments';
 
@@ -56,7 +61,6 @@ import {
   MultiPagesRowSelectionInitialState,
   multiPagesRowSelectionReducer,
 } from '../../../table/multi-pages-selection';
-import { Badge } from '../../../ui/Badge';
 import { Button } from '../../../ui/Button';
 import { Checkbox } from '../../../ui/Checkbox';
 import type { StepItem } from '../../../ui/Stepper';
@@ -71,7 +75,7 @@ import { searchFilter } from '../../filters/SearchFilter';
 import { ImportProgressBadge } from './ImportProgressBadge';
 import { StepMapCSVColumns } from './StepMapCSVColumns';
 import { StepSelectCSV } from './StepSelectCSV';
-import { SyncPlaidAccountButton } from './SyncPlaidAccountButton';
+import { TransactionImportLastSyncAtBadge } from './TransactionImportLastSyncAtBadge';
 import { TransactionsImportRowDrawer } from './TransactionsImportRowDrawer';
 import { TransactionsImportRowStatusBadge } from './TransactionsImportRowStatusBadge';
 import TransactionsImportSettingsModal from './TransactionsImportSettingsModal';
@@ -126,6 +130,7 @@ const transactionsImportQuery = gql`
     $offset: Int = 0
     $status: TransactionsImportRowStatus
     $searchTerm: String
+    $plaidAccountId: [NonEmptyString]
   ) {
     transactionsImport(id: $importId) {
       id
@@ -148,13 +153,28 @@ const transactionsImportQuery = gql`
       csvConfig
       createdAt
       updatedAt
+      assignments {
+        ...TransactionsImportAssignmentFields
+      }
+      plaidAccounts {
+        accountId
+        mask
+        name
+        officialName
+        subtype
+        type
+      }
       connectedAccount {
         id
       }
       account {
         id
+        legacyId
         slug
         currency
+        policies {
+          REQUIRE_2FA_FOR_ADMINS
+        }
         ... on AccountWithHost {
           host {
             ...TransactionsImportHostFields
@@ -166,7 +186,7 @@ const transactionsImportQuery = gql`
           }
         }
       }
-      rows(limit: $limit, offset: $offset, status: $status, searchTerm: $searchTerm) {
+      rows(limit: $limit, offset: $offset, status: $status, searchTerm: $searchTerm, accountId: $plaidAccountId) {
         totalCount
         offset
         limit
@@ -179,6 +199,7 @@ const transactionsImportQuery = gql`
   ${TransactionsImportRowFieldsFragment}
   ${transactionsImportHostFieldsFragment}
   ${TransactionsImportStatsFragment}
+  ${TransactionsImportAssignmentFieldsFragment}
 `;
 
 const transactionsImportLasSyncAtPollQuery = gql`
@@ -197,14 +218,14 @@ const DEFAULT_PAGE_SIZE = 50;
 const getViews = intl =>
   [
     {
+      id: 'ALL',
+      label: intl.formatMessage({ defaultMessage: 'All', id: 'all' }),
+      filter: {},
+    },
+    {
       id: 'PENDING',
       label: intl.formatMessage({ defaultMessage: 'Pending', id: 'eKEL/g' }),
       filter: { status: TransactionsImportRowStatus.PENDING },
-    },
-    {
-      id: 'IGNORED',
-      label: intl.formatMessage({ defaultMessage: 'No action', id: 'zue9QR' }),
-      filter: { status: TransactionsImportRowStatus.IGNORED },
     },
     {
       id: 'ON_HOLD',
@@ -212,14 +233,14 @@ const getViews = intl =>
       filter: { status: TransactionsImportRowStatus.ON_HOLD },
     },
     {
+      id: 'IGNORED',
+      label: intl.formatMessage({ defaultMessage: 'No action', id: 'zue9QR' }),
+      filter: { status: TransactionsImportRowStatus.IGNORED },
+    },
+    {
       id: 'LINKED',
       label: intl.formatMessage({ defaultMessage: 'Imported', id: 'transaction.imported' }),
       filter: { status: TransactionsImportRowStatus.LINKED },
-    },
-    {
-      id: 'ALL',
-      label: intl.formatMessage({ defaultMessage: 'All', id: 'all' }),
-      filter: {},
     },
   ] as const;
 
@@ -236,6 +257,7 @@ const addCountsToViews = (views, stats) => {
 };
 
 const rowStatusFilterSchema = z.nativeEnum(TransactionsImportRowStatus).optional();
+const plaidAccountFilterSchema = isMulti(z.string()).optional();
 
 const rowStatusFilter: FilterConfig<z.infer<typeof rowStatusFilterSchema>> = {
   schema: rowStatusFilterSchema,
@@ -253,16 +275,48 @@ const rowStatusFilter: FilterConfig<z.infer<typeof rowStatusFilterSchema>> = {
   },
 };
 
+const plaidAccountFilter: FilterConfig<z.infer<typeof plaidAccountFilterSchema>> = {
+  schema: plaidAccountFilterSchema,
+  toVariables: value => ({ plaidAccountId: value }),
+  filter: {
+    labelMsg: defineMessage({ defaultMessage: 'Sub-account', id: '1duVXZ' }),
+    static: true,
+    hide: ({ meta }) => !meta.plaidAccounts || meta.plaidAccounts.length < 2,
+    Component: ({ meta, ...props }) => {
+      const plaidAccounts = meta.plaidAccounts as PlaidAccount[];
+      return (
+        <ComboSelectFilter
+          isMulti
+          options={plaidAccounts
+            .map(plaidAccount => ({ value: plaidAccount.accountId, label: plaidAccount.name }))
+            .sort(sortSelectOptions)}
+          {...props}
+        />
+      );
+    },
+    valueRenderer: ({ value, meta }) => {
+      const plaidAccount = meta.plaidAccounts?.find(plaidAccount => plaidAccount.accountId === value);
+      return plaidAccount?.name;
+    },
+  },
+};
+
+const filters = {
+  searchTerm: searchFilter.filter,
+  status: rowStatusFilter.filter,
+  plaidAccountId: plaidAccountFilter.filter,
+};
+
 const queryFilterSchema = z.object({
   limit: integer.default(DEFAULT_PAGE_SIZE),
   offset: integer.default(0),
   searchTerm: searchFilter.schema,
   status: rowStatusFilter.schema,
+  plaidAccountId: plaidAccountFilter.schema,
 });
 
-const filters = {
-  searchTerm: searchFilter.filter,
-  status: rowStatusFilter.filter,
+const defaultFilterValues = {
+  status: TransactionsImportRowStatus.PENDING,
 };
 
 export const TransactionsImport = ({ accountSlug, importId }) => {
@@ -283,10 +337,12 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
 
   const queryFilterViews = React.useMemo(() => getViews(intl), [intl]);
   const queryFilter = useQueryFilter<typeof queryFilterSchema, TransactionsImportQueryVariables>({
+    defaultFilterValues,
     schema: queryFilterSchema,
     views: queryFilterViews,
     filters,
   });
+
   const { data, previousData, loading, error, refetch } = useQuery<
     TransactionsImportQuery,
     TransactionsImportQueryVariables
@@ -302,6 +358,22 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
   const hasStepper = importType === 'CSV' && !importData?.file;
   const importRows = importData?.rows?.nodes ?? [];
   const selectedRowIdx = !focus ? -1 : importRows.findIndex(row => row.id === focus.rowId);
+
+  const { show: showPlaidDialog, status: plaidStatus } = usePlaidConnectDialog({
+    transactionImportId: importId,
+    host: importData?.account['host'],
+    disabled: importType !== 'PLAID',
+    onOpen: () => {
+      setHasSettingsModal(false); // The two modals don't play well with each others when opened at the same time
+    },
+    onUpdateSuccess: () => {
+      setTimeout(() => refetch(), 5_000);
+      toast({
+        variant: 'success',
+        message: intl.formatMessage({ defaultMessage: 'The Bank account connection has been updated.', id: 'z8w85r' }),
+      });
+    },
+  });
 
   // Polling to check if the import has new data
   useQuery(transactionsImportLasSyncAtPollQuery, {
@@ -346,9 +418,14 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
     },
   });
 
+  const assignmentsByAccountId = React.useMemo(() => {
+    return mapValues(keyBy(importData?.assignments, 'importedAccountId'), assignments => assignments.accounts);
+  }, [importData?.assignments]);
+
   const { getActions, setRowsStatus } = useTransactionsImportActions({
     transactionsImport: importData,
     host: importData?.account?.['host'],
+    assignments: assignmentsByAccountId,
   });
 
   // Clear selection whenever the pagination changes
@@ -356,7 +433,17 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
     dispatchSelection({ type: 'CLEAR' });
   }, [queryFilter.variables]);
 
+  const filtersMeta = React.useMemo(() => {
+    return { plaidAccounts: importData?.plaidAccounts, hostSlug: importData?.account?.['host']?.slug };
+  }, [importData?.plaidAccounts, importData?.account]);
+
+  const keyedPlaidAccounts = React.useMemo(() => {
+    return keyBy(importData?.plaidAccounts, 'accountId');
+  }, [importData?.plaidAccounts]);
+
   const hasPagination = data?.transactionsImport?.rows.totalCount > queryFilter.values.limit;
+  const isInitialSync = Boolean(!importData?.lastSyncAt && importData?.connectedAccount);
+
   return (
     <div>
       <DashboardHeader
@@ -420,14 +507,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                             <FormattedMessage defaultMessage="Last sync" id="transactions.import.lastSync" />
                           </div>
                         </div>
-                        {!importData.isSyncing && importData.lastSyncAt ? (
-                          <DateTime value={new Date(importData.lastSyncAt)} timeStyle="short" />
-                        ) : (
-                          <Badge type="info" className="whitespace-nowrap">
-                            {intl.formatMessage({ defaultMessage: 'In progress', id: 'syncInProgress' })}&nbsp;
-                            <RefreshCw size={12} className="animate-spin duration-1500" />
-                          </Badge>
-                        )}
+                        <TransactionImportLastSyncAtBadge transactionsImport={importData} />
                       </div>
                     ) : (
                       <div className="flex flex-col gap-1 sm:flex-row sm:items-center">
@@ -464,14 +544,6 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                   </div>
                   <div className="flex flex-col items-end gap-1">
                     <div className="flex items-center gap-2">
-                      {importData.type === 'PLAID' && importData.connectedAccount && (
-                        <SyncPlaidAccountButton
-                          hasRequestedSync={hasRequestedSync}
-                          setHasRequestedSync={setHasRequestedSync}
-                          connectedAccountId={importData.connectedAccount.id}
-                          isSyncing={importData.isSyncing}
-                        />
-                      )}
                       {importData.file && (
                         <Link
                           className="flex gap-1 align-middle hover:underline"
@@ -543,6 +615,7 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                   className="mb-4"
                   {...queryFilter}
                   views={addCountsToViews(queryFilter.views, importData?.stats)}
+                  meta={filtersMeta}
                 />
 
                 {/** Select all message */}
@@ -584,13 +657,13 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
 
                 {/** Import data table */}
                 <div className="relative mt-2">
-                  {!importData.lastSyncAt && (
+                  {isInitialSync && (
                     <div className="absolute z-50 flex h-full w-full items-center justify-center">
                       <Lottie animationData={SyncAnimation} loop autoPlay className="max-w-[600px]" />
                     </div>
                   )}
                   <DataTable<TransactionsImportQuery['transactionsImport']['rows']['nodes'][number], unknown>
-                    loading={loading || !importData.lastSyncAt}
+                    loading={loading || isInitialSync}
                     getRowClassName={row =>
                       row.original.status === TransactionsImportRowStatus.IGNORED
                         ? '[&>td:nth-child(n+2):nth-last-child(n+3)]:opacity-30'
@@ -604,6 +677,12 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                     data={importRows}
                     getActions={getActions}
                     openDrawer={row => setFocus({ rowId: row.original.id })}
+                    onClickRow={(row, _, e) => {
+                      // Ignore click when on checkbox or "Note" icon
+                      if (!(e.target as Element).closest('button')) {
+                        setFocus({ rowId: row.original.id });
+                      }
+                    }}
                     emptyMessage={() => (
                       <FormattedMessage id="SectionTransactions.Empty" defaultMessage="No transactions yet." />
                     )}
@@ -642,18 +721,45 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
                           return <DateTime value={new Date(date)} />;
                         },
                       },
+                      ...(!importData.plaidAccounts || importData.plaidAccounts.length < 2
+                        ? []
+                        : [
+                            {
+                              header: 'Sub-Account',
+                              cell: ({ row }) => {
+                                const importRow =
+                                  row.original as (typeof data)['transactionsImport']['rows']['nodes'][number];
+                                const plaidAccount = keyedPlaidAccounts[importRow.accountId];
+                                if (!plaidAccount) {
+                                  return null;
+                                }
+
+                                return truncate(plaidAccount.name, { length: 25 });
+                              },
+                            },
+                          ]),
+                      {
+                        header: 'Description',
+                        accessorKey: 'description',
+                        cell: ({ cell }) => <p className="max-w-xs">{cell.getValue() as string}</p>,
+                      },
                       {
                         header: 'Amount',
                         accessorKey: 'amount',
                         cell: ({ cell }) => {
                           const amount = cell.getValue() as Amount;
-                          return <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} />;
+                          const isCredit = amount.valueInCents > 0;
+                          return (
+                            <div
+                              className={cn(
+                                'font-semibold antialiased',
+                                isCredit ? 'text-green-600' : 'text-slate-700',
+                              )}
+                            >
+                              <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} />
+                            </div>
+                          );
                         },
-                      },
-                      {
-                        header: 'Description',
-                        accessorKey: 'description',
-                        cell: ({ cell }) => <p className="max-w-xs">{cell.getValue() as string}</p>,
                       },
                       {
                         header: 'Status',
@@ -845,7 +951,15 @@ export const TransactionsImport = ({ accountSlug, importId }) => {
         autoFocusNoteForm={focus?.noteForm}
       />
       {hasSettingsModal && (
-        <TransactionsImportSettingsModal transactionsImport={importData} onOpenChange={setHasSettingsModal} isOpen />
+        <TransactionsImportSettingsModal
+          transactionsImport={importData}
+          onOpenChange={setHasSettingsModal}
+          hasRequestedSync={hasRequestedSync}
+          setHasRequestedSync={setHasRequestedSync}
+          plaidStatus={plaidStatus}
+          showPlaidDialog={showPlaidDialog}
+          isOpen={hasSettingsModal}
+        />
       )}
     </div>
   );

@@ -557,8 +557,8 @@ function submitExpense(options: {
         });
     }
 
-    cy.contains('Who is paying?').parent().contains(opts.accountSlug).should('exist');
-    cy.contains('Who is getting paid?')
+    cy.contains('Requesting money from').parent().contains(opts.accountSlug).should('exist');
+    cy.contains('Recipient')
       .parent()
       .within(() => {
         if (opts.payeeSlug) {
@@ -617,10 +617,8 @@ function fillNewPayoutMethod(payoutMethod: {
       .click()
       .type(payoutMethod.data.content as string);
     cy.wait(400);
-    cy.contains('label', 'Name').click();
-    cy.get('input#input-newPayoutMethod\\.name').should('have.value', payoutMethod.data.content);
-    cy.get('input#input-newPayoutMethod\\.name').clear();
-    cy.get('input#input-newPayoutMethod\\.name').clear().type(payoutMethod.slug);
+    cy.contains('label', 'Alias').click();
+    cy.get('input#input-newPayoutMethod\\.name').type(payoutMethod.slug);
     cy.get('input#input-newPayoutMethod\\.name').should('have.value', payoutMethod.slug);
 
     if (payoutMethod.save) {
@@ -641,6 +639,7 @@ function fillTypeOfExpense(opts: { expenseType: 'invoice' | 'reimbursement'; has
       .should('be.checked');
     if (opts.expenseType === 'invoice') {
       if (opts.hasInvoice) {
+        cy.contains('Yes, I have an invoice').click();
         cy.contains('Attach your invoice file').selectFile(getReceiptFixture({ fileName: 'invoice0.jpg' }));
         cy.contains('Clear').should('exist');
         cy.contains('Invoice number').click().type('INV0001');

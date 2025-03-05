@@ -67,7 +67,9 @@ export const generatePaymentMethodOptions = (
 
   uniquePMs = uniquePMs.filter(
     ({ paymentMethod }) =>
-      paymentMethod.type !== PAYMENT_METHOD_TYPE.COLLECTIVE || collective.host.id === stepProfile.host?.id,
+      paymentMethod.type !== PAYMENT_METHOD_TYPE.COLLECTIVE ||
+      collective.host.id === stepProfile.host?.id ||
+      collective.host.id === stepProfile.id,
   );
 
   if (paymentIntent) {
@@ -334,16 +336,30 @@ const getTotalYearlyAmount = stepDetails => {
   return totalAmount && stepDetails?.interval === INTERVALS.month ? totalAmount * 12 : totalAmount;
 };
 
+export const INCOGNITO_ID = 'incognito';
+
 /**
  * Get the required information for the current contribution based on Host policies and total contributed to host
  * @returns {{ legalName?: boolean, address?: boolean }}
  */
 export const getRequiredInformation = (stepProfile, stepDetails, collective, profiles = [], tier) => {
+  const isContributingFromSameHost =
+    stepProfile?.host?.id === collective?.host.id || stepProfile?.id === collective?.host.id;
+  if (isContributingFromSameHost) {
+    return { address: false, legalName: false };
+  }
+
   let totalAmount = getTotalYearlyAmount(stepDetails);
-  const selectedProfile = profiles.find(p => p.account.id === stepProfile?.id);
+  const selectedProfile =
+    stepProfile?.id === INCOGNITO_ID
+      ? // If this is a new incognito profile, apply existing Individual account contribution value
+        profiles.find(p => p.account.type === CollectiveType.INDIVIDUAL)
+      : profiles.find(p => p.account.id === stepProfile?.id);
+
   if (selectedProfile) {
     totalAmount += selectedProfile.totalContributedToHost?.valueInCents || 0;
   }
+
   const thresholds = collective?.policies?.CONTRIBUTOR_INFO_THRESHOLDS;
   return {
     legalName:

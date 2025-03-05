@@ -26,7 +26,6 @@ interface PageProps {
   showSearch?: boolean;
   noRobots?: boolean;
   title?: string;
-  navTitle?: string;
   metaTitle?: string;
   twitterHandle?: string;
   collective?: object;
@@ -45,7 +44,6 @@ const Page = ({
   loadingLoggedInUser,
   LoggedInUser,
   title,
-  navTitle,
   metaTitle,
   noRobots,
   twitterHandle,
@@ -68,7 +66,6 @@ const Page = ({
       <Header
         showSearch={showSearch}
         title={title}
-        navTitle={navTitle}
         noRobots={noRobots}
         twitterHandle={twitterHandle}
         description={description}

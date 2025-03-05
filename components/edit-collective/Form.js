@@ -24,7 +24,6 @@ import { Box, Flex } from '../Grid';
 import { I18nSupportLink } from '../I18nFormatters';
 import InputField from '../InputField';
 import Link from '../Link';
-import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
 import { Button } from '../ui/Button';
 
@@ -42,7 +41,7 @@ import FiscalHosting from './sections/FiscalHosting';
 import GiftCards from './sections/GiftCards';
 import Host from './sections/Host';
 import HostVirtualCardsSettings from './sections/HostVirtualCardsSettings';
-import ManagePaymentMethods from './sections/ManagePaymentMethods';
+import PaymentInformation from './sections/payment-info';
 import PaymentReceipts from './sections/PaymentReceipts';
 import Policies from './sections/Policies';
 import ReceivingMoney from './sections/ReceivingMoney';
@@ -415,7 +414,7 @@ class EditCollectiveForm extends React.Component {
         );
 
       case ALL_SECTIONS.PAYMENT_METHODS:
-        return <ManagePaymentMethods account={collective} />;
+        return <PaymentInformation account={collective} />;
 
       case ALL_SECTIONS.TIERS:
         return (
@@ -599,7 +598,7 @@ class EditCollectiveForm extends React.Component {
 
     const section = this.props.section || get(router, 'query.section', 'info');
 
-    const isNew = !(collective && collective.id);
+    const isNew = !collective.id;
     let submitBtnMessageId = isNew ? 'event.create.btn' : 'save';
     if (['loading', 'saved'].includes(status)) {
       submitBtnMessageId = status;
@@ -832,8 +831,9 @@ class EditCollectiveForm extends React.Component {
             )}
 
             {fields && fields.length > 0 && (
-              <Container className="actions" margin="3.15rem auto 0.65rem" textAlign="center">
-                <StyledButton
+              <div className="mt-4 flex flex-col gap-2 sm:justify-stretch">
+                <Button
+                  className="grow"
                   buttonStyle="primary"
                   type="submit"
                   onClick={this.handleSubmit}
@@ -847,19 +847,19 @@ class EditCollectiveForm extends React.Component {
                   }
                 >
                   {submitBtnLabel}
-                </StyledButton>
+                </Button>
 
-                <Container className="backToProfile" fontSize="0.8rem" margin="0.65rem">
+                <Button className="grow" variant="link" asChild>
                   <Link
-                    data-cy="edit-collective-back-to-profile"
+                    data-cy="view-public-profile-link"
                     href={
                       isEvent ? `/${collective.parentCollective.slug}/events/${collective.slug}` : `/${collective.slug}`
                     }
                   >
-                    <FormattedMessage defaultMessage="View profile page" id="QxN1ZU" />
+                    <FormattedMessage id="ViewPublicProfile" defaultMessage="View Public Profile" />
                   </Link>
-                </Container>
-              </Container>
+                </Button>
+              </div>
             )}
 
             {this.renderSection(section)}

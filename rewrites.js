@@ -400,10 +400,6 @@ exports.REWRITES = [
     destination: '/how-it-works',
   },
   {
-    source: '/e2c',
-    destination: '/e2c',
-  },
-  {
     source: '/:action(help|contact)/:formConfirmation(success)?',
     destination: '/help-and-support',
   },
@@ -414,6 +410,10 @@ exports.REWRITES = [
   {
     source: '/applications',
     destination: '/applications',
+  },
+  {
+    source: '/services/plaid/oauth/callback',
+    destination: '/services/plaid/oauth/callback',
   },
   // Robots.txt
   {

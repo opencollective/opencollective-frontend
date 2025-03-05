@@ -13,11 +13,9 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 import theme from '../lib/theme';
 
 import ChangelogTrigger from './changelog/ChangelogTrigger';
-import DynamicTopBar from './navigation/preview/TopBar';
 import ProfileMenu from './navigation/ProfileMenu';
 import NewTopBar from './navigation/TopBar';
 import Container from './Container';
@@ -81,7 +79,6 @@ const TopBar = ({
   menuItems = { solutions: true, product: true, company: true, docs: true },
   showProfileAndChangelogMenu = true,
   account,
-  navTitle,
 }) => {
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -100,10 +97,6 @@ const TopBar = ({
     return regex.test(router.asPath);
   };
 
-  if (LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.DYNAMIC_TOP_BAR)) {
-    return <DynamicTopBar {...{ account, navTitle }} />;
-  }
-
   const onDashboardRoute = isRouteActive('/dashboard');
   const homeRoutes = [
     '/',
@@ -114,7 +107,6 @@ const TopBar = ({
     '/pricing',
     '/how-it-works',
     '/fiscal-hosting',
-    '/e2c',
     '/help',
   ];
   const onHomeRoute = homeRoutes.some(isRouteActive);
@@ -250,11 +242,6 @@ const TopBar = ({
                       <FormattedMessage id="company.blog" defaultMessage="Blog" />
                     </NavItem>
                   </a>
-                  <Link href="/e2c">
-                    <NavItem as={Container} mb={16}>
-                      <FormattedMessage id="OC.e2c" defaultMessage="Exit to Community" />
-                    </NavItem>
-                  </Link>
                   <a href="https://docs.opencollective.com/help/about/introduction">
                     <NavItem as={Container} mb={16}>
                       <FormattedMessage id="collective.about.title" defaultMessage="About" />
@@ -313,7 +300,6 @@ TopBar.propTypes = {
   showProfileAndChangelogMenu: PropTypes.bool,
   menuItems: PropTypes.object,
   account: PropTypes.object,
-  navTitle: PropTypes.string,
 };
 
 export default TopBar;

@@ -8,9 +8,10 @@ import { AccountType } from '../../../lib/graphql/types/v2/schema';
 import formatCollectiveType from '../../../lib/i18n/collective-type';
 import { cn } from '../../../lib/utils';
 
+import { Skeleton } from '@/components/ui/Skeleton';
+
 import { AccountHoverCard, accountHoverCardFields } from '../../AccountHoverCard';
 import Avatar from '../../Avatar';
-import LoadingPlaceholder from '../../LoadingPlaceholder';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 
 type ExpenseAccountItemProps = {
@@ -79,7 +80,7 @@ export function ExpenseAccountItem(props: ExpenseAccountItemProps) {
   const account = query.data?.account || ('account' in props ? props.account : null);
 
   if (query.loading) {
-    return <LoadingPlaceholder height={24} width={1} />;
+    return <Skeleton className="h-6 w-full" />;
   } else if (query.error) {
     return <MessageBoxGraphqlError error={query.error} />;
   } else if (!account) {

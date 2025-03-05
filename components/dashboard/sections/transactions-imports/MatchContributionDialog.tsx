@@ -1,11 +1,12 @@
 import React from 'react';
 import { gql, useApolloClient, useMutation, useQuery } from '@apollo/client';
-import { ceil, floor, isEmpty } from 'lodash';
+import { ceil, floor, isEmpty, omit } from 'lodash';
 import { ArrowLeft, ArrowRight, Ban, Calendar, Coins, ExternalLink, Save } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
+import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
-import { integer } from '../../../../lib/filters/schemas';
+import { integer, isMulti } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type {
   Account,
@@ -19,6 +20,7 @@ import { i18nOrderStatus } from '../../../../lib/i18n/order';
 import { i18nPendingOrderPaymentMethodTypes } from '../../../../lib/i18n/pending-order-payment-method-type';
 import { updateTransactionsImportRows } from './lib/graphql';
 import type { CSVConfig } from './lib/types';
+import { TransactionsImportRowAction } from '@/lib/graphql/types/v2/graphql';
 
 import { accountHoverCardFields } from '../../../AccountHoverCard';
 import {
@@ -36,7 +38,9 @@ import { Dialog, DialogContent, DialogHeader } from '../../../ui/Dialog';
 import { useToast } from '../../../ui/useToast';
 import { AmountFilterType } from '../../filters/AmountFilter/schema';
 import { DateFilterType } from '../../filters/DateFilter/schema';
+import { expectedFundsFilter } from '../../filters/ExpectedFundsFilter';
 import { Filterbar } from '../../filters/Filterbar';
+import { hostedAccountsFilter } from '../../filters/HostedAccountFilter';
 import * as ContributionFilters from '../contributions/filters';
 
 import { FilterWithRawValueButton } from './FilterWithRawValueButton';
@@ -68,10 +72,26 @@ const NB_CONTRIBUTIONS_DISPLAYED = 5;
 
 const filtersSchema = ContributionFilters.schema.extend({
   limit: integer.default(NB_CONTRIBUTIONS_DISPLAYED),
+  expectedFundsFilter: expectedFundsFilter.schema.default(null), // To make sure the filter is displayed even when "Expected Funds" is set to "All" (default)
+  account: isMulti(z.string()).optional(),
 });
 
-const suggestExpectedFundsQuery = gql`
-  query SuggestExpectedFunds(
+const toVariables = {
+  ...ContributionFilters.toVariables,
+  account: hostedAccountsFilter.toVariables,
+};
+
+const filters = {
+  searchTerm: ContributionFilters.filters.searchTerm,
+  account: {
+    ...hostedAccountsFilter.filter,
+    getDisallowEmpty: ({ meta }) => Boolean(meta?.hostedAccounts?.length), // Disable clearing accounts if provided by the parent
+  },
+  ...omit(ContributionFilters.filters, ['account', 'searchTerm']),
+};
+
+const suggestContributionMatchQuery = gql`
+  query SuggestContributionMatch(
     $hostId: String!
     $searchTerm: String
     $offset: Int
@@ -81,12 +101,13 @@ const suggestExpectedFundsQuery = gql`
     $onlySubscriptions: Boolean
     $minAmount: Int
     $maxAmount: Int
-    $paymentMethod: PaymentMethodReferenceInput
+    $paymentMethod: [PaymentMethodReferenceInput]
     $dateFrom: DateTime
     $dateTo: DateTime
     $expectedDateFrom: DateTime
     $expectedDateTo: DateTime
     $expectedFundsFilter: ExpectedFundsFilter
+    $account: [AccountReferenceInput!]
   ) {
     account(id: $hostId) {
       id
@@ -108,6 +129,8 @@ const suggestExpectedFundsQuery = gql`
         limit: $limit
         paymentMethod: $paymentMethod
         expectedFundsFilter: $expectedFundsFilter
+        hostedAccounts: $account
+        includeChildrenAccounts: true
       ) {
         totalCount
         offset
@@ -197,11 +220,13 @@ export const MatchContributionDialog = ({
   transactionsImport,
   setOpen,
   onAddFundsClick,
+  accounts,
   ...props
 }: {
+  accounts: Pick<Account, 'id' | 'slug'>[];
   host: Account;
   row: TransactionsImportRow;
-  transactionsImport: TransactionsImport;
+  transactionsImport: Pick<TransactionsImport, 'id' | 'source' | 'csvConfig'>;
   onAddFundsClick: () => void;
 } & BaseModalProps) => {
   const client = useApolloClient();
@@ -211,25 +236,42 @@ export const MatchContributionDialog = ({
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const intl = useIntl();
   const defaultFilterValues = React.useMemo(
-    () => ({ amount: getAmountRangeFilter(row.amount.valueInCents), status: [OrderStatus.PENDING] }),
-    [row],
+    () => ({
+      amount: getAmountRangeFilter(row.amount.valueInCents),
+      status: [OrderStatus.PENDING],
+      expectedFundsFilter: null,
+      account: accounts?.map(account => account.slug),
+    }),
+    [row, accounts],
   );
-  const { resetFilters, ...queryFilter } = useQueryFilter({
+  const queryFilterMeta = React.useMemo(
+    () => ({
+      currency: row.amount.currency,
+      hostSlug: host.slug,
+      hostedAccounts: accounts,
+      disableHostedAccountsSearch: Boolean(accounts?.length),
+    }),
+    [row, host, accounts],
+  );
+
+  const queryFilter = useQueryFilter({
     schema: filtersSchema,
     skipRouter: true,
-    toVariables: ContributionFilters.toVariables,
-    filters: ContributionFilters.filters,
-    meta: { currency: row.amount.currency },
+    toVariables: toVariables,
+    filters: filters,
+    meta: queryFilterMeta,
     defaultFilterValues,
   });
+
   const [updateRows] = useMutation(updateTransactionsImportRows, { context: API_V2_CONTEXT });
-  const { data, loading, error } = useQuery(suggestExpectedFundsQuery, {
+  const { data, loading, error } = useQuery(suggestContributionMatchQuery, {
     context: API_V2_CONTEXT,
     variables: { ...queryFilter.variables, hostId: host.id },
     fetchPolicy: 'cache-and-network',
   });
 
   // Re-load default filters when changing row
+  const { resetFilters } = queryFilter;
   React.useEffect(() => {
     resetFilters(defaultFilterValues);
   }, [defaultFilterValues, resetFilters]);
@@ -256,7 +298,7 @@ export const MatchContributionDialog = ({
       <DialogContent className="sm:max-w-4xl">
         <DialogHeader>
           <h2 className="text-xl font-bold">
-            <FormattedMessage defaultMessage="Match expected funds" id="J/7TIn" />
+            <FormattedMessage defaultMessage="Match contribution" id="c7INEq" />
           </h2>
         </DialogHeader>
         {isConfirming ? (
@@ -327,7 +369,7 @@ export const MatchContributionDialog = ({
                   <FormattedMessage defaultMessage="Imported data" id="tmfin0" />
                 </strong>
 
-                <ul className="mt-2 list-inside list-disc">
+                <ul className="mt-2 list-inside list-disc break-words">
                   <li>
                     <strong>
                       <FormattedMessage id="AddFundsModal.source" defaultMessage="Source" />
@@ -390,7 +432,7 @@ export const MatchContributionDialog = ({
                     </Link>
                   </div>
 
-                  <ul className="mt-2 list-inside list-disc">
+                  <ul className="mt-2 list-inside list-disc break-words">
                     <li>
                       <strong>
                         <FormattedMessage id="Fields.id" defaultMessage="ID" />
@@ -527,6 +569,7 @@ export const MatchContributionDialog = ({
                       await updateRows({
                         variables: {
                           importId: transactionsImport.id,
+                          action: TransactionsImportRowAction.UPDATE_ROWS,
                           rows: [{ id: row.id, order: { id: selectedContribution.id } }],
                         },
                       });

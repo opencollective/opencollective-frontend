@@ -1,5 +1,5 @@
 import React from 'react';
-import { get, isUndefined, pick, remove, size, throttle, uniq } from 'lodash';
+import { get, isNull, isUndefined, pick, remove, size, throttle, uniq } from 'lodash';
 import { Check, ChevronDown, Sparkles } from 'lucide-react';
 import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
@@ -39,7 +39,7 @@ type AccountingCategorySelectProps = {
   predictionStyle?: 'full' | 'inline-preload';
   selectedCategory: Pick<AccountingCategory, 'friendlyName' | 'name' | 'code' | 'id'> | undefined | null;
   valuesByRole?: Expense['valuesByRole'];
-  onChange: (category: AccountingCategory) => void;
+  onChange: (category: AccountingCategory | null) => void;
   onBlur?: () => void;
   allowNone?: boolean;
   showCode?: boolean;
@@ -196,7 +196,17 @@ const getOptions = (
       ? AccountingCategoryAppliesTo.HOST
       : AccountingCategoryAppliesTo.HOSTED_COLLECTIVES;
 
-  remove(categories, category => category.appliesTo !== expectedAppliesTo);
+  // Allow categories that either match the expected appliesTo or have no appliesTo (meaning they apply to both)
+  remove(categories, category => category.appliesTo && category.appliesTo !== expectedAppliesTo);
+
+  if (allowNone) {
+    options.push({
+      key: null,
+      value: null,
+      label: getCategoryLabel(intl, null, false, valuesByRole),
+      searchText: intl.formatMessage({ defaultMessage: "I don't know", id: 'AkIyKO' }).toLocaleLowerCase(),
+    });
+  }
 
   categories.forEach(category => {
     options.push({
@@ -206,16 +216,6 @@ const getOptions = (
       searchText: getSearchTextFromCategory(category),
     });
   });
-
-  if (allowNone) {
-    const label = getCategoryLabel(intl, null, false, valuesByRole);
-    options.push({
-      key: null,
-      value: null,
-      label,
-      searchText: intl.formatMessage({ defaultMessage: "I don't know", id: 'AkIyKO' }).toLocaleLowerCase(),
-    });
-  }
 
   return options;
 };
@@ -311,7 +311,7 @@ const shouldUsePredictions = (
   } else if (predictionStyle === 'full') {
     return true;
   } else if (predictionStyle === 'inline-preload') {
-    return !selectedCategory || isOpen; // Only preload suggestions if no category is selected
+    return isUndefined(selectedCategory) || isOpen; // Only preload suggestions if no category is selected
   } else if (predictionStyle === 'inline') {
     return isOpen;
   }
@@ -346,10 +346,12 @@ const AccountingCategorySelect = ({
   const hasPredictions = Boolean(predictions?.length);
 
   const triggerChange = newCategory => {
-    if (selectedCategory?.id !== newCategory?.id) {
+    // Allow setting `null` that represents "I don't know"
+    if (selectedCategory?.id !== newCategory?.id || (isNull(newCategory) && !isNull(selectedCategory))) {
       onChange(newCategory);
     }
   };
+
   const options = React.useMemo(
     () => getOptions(intl, host, kind, expenseType, showCode, allowNone, valuesByRole, isHostAdmin, account),
     [intl, host, kind, expenseType, allowNone, showCode, valuesByRole, isHostAdmin, account],
@@ -393,11 +395,12 @@ const AccountingCategorySelect = ({
             >
               <span
                 className={cn('mr-3 grow truncate text-start text-sm', {
-                  'text-gray-400': isUndefined(selectedCategory),
+                  'text-muted-foreground': isUndefined(selectedCategory),
                 })}
               >
-                {getCategoryLabel(intl, selectedCategory, false, valuesByRole) ||
-                  intl.formatMessage({ defaultMessage: 'Select category', id: 'RUJYth' })}
+                {!isUndefined(selectedCategory)
+                  ? getCategoryLabel(intl, selectedCategory, false, valuesByRole)
+                  : intl.formatMessage({ defaultMessage: 'Select category', id: 'RUJYth' })}
               </span>
               <ChevronDown size="1em" />
             </Button>
@@ -415,8 +418,9 @@ const AccountingCategorySelect = ({
                 <CommandGroup heading={intl.formatMessage({ defaultMessage: 'Suggested categories', id: 'ydZSPT' })}>
                   {suggestedOptions.map(({ key, label, value, searchText }) => (
                     <CommandItem
-                      key={key || 'none'}
-                      value={searchText}
+                      key={key}
+                      value={key}
+                      keywords={[searchText]}
                       onSelect={() => {
                         triggerChange(value);
                         setOpen(false);
@@ -425,7 +429,7 @@ const AccountingCategorySelect = ({
                       <div className="flex flex-1 items-center justify-between">
                         <span>{label}</span>
                         <span
-                          className="text-right text-xs text-gray-500"
+                          className="text-right text-xs text-muted-foreground"
                           title={intl.formatMessage({ defaultMessage: 'Suggested', id: 'a0lFbM' })}
                         >
                           <Sparkles size={16} className="mr-1 inline-block text-yellow-500" strokeWidth={1.5} />
@@ -443,12 +447,15 @@ const AccountingCategorySelect = ({
                 }
               >
                 {options.map(({ label, key, value, searchText }) => {
-                  const isSelected = selectedCategory?.id === key;
+                  const isSelected =
+                    (isNull(selectedCategory) && isNull(value)) ||
+                    (selectedCategory && value && selectedCategory?.id === value?.id);
                   const isPrediction = suggestedOptions.some(option => option.key === key);
                   return (
                     <CommandItem
-                      key={key || 'none'} // `CommandItem` doesn't like nil key/value
-                      value={searchText}
+                      key={key || 'none'}
+                      value={key || 'none'}
+                      keywords={[searchText]}
                       onSelect={() => {
                         triggerChange(value);
                         setOpen(false);

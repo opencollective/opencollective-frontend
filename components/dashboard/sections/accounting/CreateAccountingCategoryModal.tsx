@@ -4,7 +4,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import type { AccountingCategory } from '../../../../lib/graphql/types/v2/schema';
 import { AccountingCategoryAppliesTo, AccountingCategoryKind } from '../../../../lib/graphql/types/v2/schema';
 
-import StyledButton from '../../../StyledButton';
+import { Button } from '@/components/ui/Button';
+
 import StyledModal, { ModalBody, ModalFooter, ModalHeader } from '../../../StyledModal';
 
 import type { EditableAccountingCategoryFields } from './AccountingCategoryForm';
@@ -31,6 +32,8 @@ export function CreateAccountingCategoryModal(props: CreateAccountingCategoryMod
     [onCreate],
   );
 
+  const defaultAppliesTo = props.isIndependentCollective ? AccountingCategoryAppliesTo.HOST : null;
+
   const formik = useAccountingCategoryFormik({
     initialValues: {
       name: '',
@@ -46,16 +49,8 @@ export function CreateAccountingCategoryModal(props: CreateAccountingCategoryMod
         label: intl.formatMessage({ defaultMessage: 'No', id: 'oUWADl' }),
       },
       appliesTo: {
-        value: props.isIndependentCollective
-          ? AccountingCategoryAppliesTo.HOST
-          : AccountingCategoryAppliesTo.HOSTED_COLLECTIVES,
-        label: intl.formatMessage(
-          AccountingCategoryAppliesToI18n[
-            props.isIndependentCollective
-              ? AccountingCategoryAppliesTo.HOST
-              : AccountingCategoryAppliesTo.HOSTED_COLLECTIVES
-          ],
-        ),
+        value: defaultAppliesTo,
+        label: intl.formatMessage(AccountingCategoryAppliesToI18n[defaultAppliesTo || 'ALL']),
       },
     },
     async onSubmit(values) {
@@ -84,13 +79,13 @@ export function CreateAccountingCategoryModal(props: CreateAccountingCategoryMod
       </ModalBody>
       <ModalFooter showDivider={false}>
         <form onSubmit={e => formik.handleSubmit(e)}>
-          <div className="flex justify-center gap-4">
-            <StyledButton type="submit" buttonStyle="primary">
-              <FormattedMessage defaultMessage="Create category" id="ZROXxK" />
-            </StyledButton>
-            <StyledButton onClick={props.onClose}>
+          <div className="flex justify-end gap-4 border-t-1 border-solid border-t-slate-100 pt-4">
+            <Button onClick={props.onClose} variant="outline">
               <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
-            </StyledButton>
+            </Button>
+            <Button type="submit">
+              <FormattedMessage defaultMessage="Create category" id="ZROXxK" />
+            </Button>
           </div>
         </form>
       </ModalFooter>

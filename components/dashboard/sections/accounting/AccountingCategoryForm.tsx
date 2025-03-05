@@ -1,7 +1,8 @@
 import React from 'react';
-import { useFormik } from 'formik';
+import type { useFormik } from 'formik';
 import { omit } from 'lodash';
 import { defineMessages, useIntl } from 'react-intl';
+import { z } from 'zod';
 
 import {
   AccountingCategoryAppliesTo,
@@ -10,10 +11,42 @@ import {
 } from '../../../../lib/graphql/types/v2/schema';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 
+import { useFormikZod } from '@/components/FormikZod';
+
 import RichTextEditor from '../../../RichTextEditor';
 import StyledInput from '../../../StyledInput';
 import StyledInputField from '../../../StyledInputField';
 import StyledSelect from '../../../StyledSelect';
+
+const accountingCategoryFormSchema = z.object({
+  name: z.string().min(1).max(60),
+  friendlyName: z.string().max(60).optional(),
+  code: z.string().min(1).max(60),
+  appliesTo: z
+    .object({
+      value: z.nativeEnum(AccountingCategoryAppliesTo).nullable(),
+      label: z.string(),
+    })
+    .nullable(),
+  kind: z.object({
+    value: z.nativeEnum(AccountingCategoryKind),
+    label: z.string(),
+  }),
+  expensesTypes: z
+    .array(
+      z.object({
+        value: z.nativeEnum(ExpenseType),
+        label: z.string(),
+      }),
+    )
+    .optional()
+    .nullable(),
+  hostOnly: z.object({
+    value: z.boolean(),
+    label: z.string(),
+  }),
+  instructions: z.string().optional().nullable(),
+});
 
 type FormValues = {
   name: string;
@@ -37,11 +70,13 @@ export type EditableAccountingCategoryFields =
   | 'appliesTo';
 
 type useAccountingCategoryFormikOptions = {
-  onSubmit: (values: FormValues) => void | Promise<void>;
+  onSubmit: (values) => void | Promise<void>;
   initialValues: FormValues;
 };
+
 export function useAccountingCategoryFormik(opts: useAccountingCategoryFormikOptions) {
-  const formik = useFormik({
+  const formik = useFormikZod({
+    schema: accountingCategoryFormSchema,
     initialValues: opts.initialValues,
     onSubmit: opts.onSubmit,
   });
@@ -80,6 +115,10 @@ export const AccountingCategoryAppliesToI18n = defineMessages({
     id: 'AccountingCategory.AppliesTo.HOSTED_COLLECTIVES',
     defaultMessage: 'Managed Funds',
   },
+  ALL: {
+    id: 'AccountingCategory.appliesTo.both',
+    defaultMessage: 'All',
+  },
 });
 
 type AccountingCategoryFormProps = {
@@ -102,6 +141,10 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
   ];
 
   const accountingCategoryAppliesToOptions = [
+    {
+      value: null,
+      label: intl.formatMessage(AccountingCategoryAppliesToI18n.ALL),
+    },
     {
       value: AccountingCategoryAppliesTo.HOSTED_COLLECTIVES,
       label: intl.formatMessage(AccountingCategoryAppliesToI18n[AccountingCategoryAppliesTo.HOSTED_COLLECTIVES]),
@@ -128,12 +171,16 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
     },
   ];
 
+  const getFieldError = field =>
+    (props.formik.submitCount || props.formik.touched[field]) && props.formik.errors[field];
+
   return (
     <React.Fragment>
       <StyledInputField
         required
         name="code"
         label={intl.formatMessage({ defaultMessage: 'Accounting code', id: 'tvVFNA' })}
+        error={getFieldError('code')}
         mt={3}
       >
         <StyledInput
@@ -149,6 +196,7 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
         name="name"
         required
         label={intl.formatMessage({ defaultMessage: 'Category name', id: 'kgVqk1' })}
+        error={getFieldError('name')}
         mt={3}
       >
         <StyledInput
@@ -163,6 +211,7 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
       <StyledInputField
         required={false}
         name="friendlyName"
+        error={getFieldError('friendlyName')}
         label={intl.formatMessage({ id: 'AccountingCategory.friendlyName', defaultMessage: 'Friendly name' })}
         mt={3}
       >
@@ -179,6 +228,7 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
         <StyledInputField
           name="appliesTo"
           required
+          error={getFieldError('appliesTo')}
           label={intl.formatMessage({ defaultMessage: 'Applies To', id: 'M+BG8u' })}
           mt={3}
         >
@@ -202,6 +252,7 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
         name="kind"
         required
         label={intl.formatMessage({ defaultMessage: 'Kind', id: 'Transaction.Kind' })}
+        error={getFieldError('kind')}
         mt={3}
       >
         <StyledSelect
@@ -224,6 +275,7 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
       <StyledInputField
         name="hostOnly"
         required
+        error={getFieldError('hostOnly')}
         label={intl.formatMessage({ defaultMessage: 'Visible only to host admins', id: 'NvBPFR' })}
         mt={3}
       >
@@ -247,6 +299,7 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
         <StyledInputField
           name="expensesTypes"
           required
+          error={getFieldError('expensesTypes')}
           label={intl.formatMessage({ defaultMessage: 'Expense Types', id: 'D+aS5Z' })}
           mt={3}
         >
@@ -272,6 +325,7 @@ export function AccountingCategoryForm(props: AccountingCategoryFormProps) {
         <StyledInputField
           name="instructions"
           required
+          error={getFieldError('instructions')}
           label={intl.formatMessage({ defaultMessage: 'Instructions', id: 'sV2v5L' })}
           mt={3}
         >

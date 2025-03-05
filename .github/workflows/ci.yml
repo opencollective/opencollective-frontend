@@ -19,6 +19,7 @@ env:
   PDF_SERVICE_URL: http://localhost:3002
   API_KEY: dvl-1510egmf4a23d80342403fb599qd
   CI: true
+  DISABLE_MOCK_UPLOADS: 1
 
 jobs:
   lint:

@@ -12,7 +12,7 @@ const schema = z.nativeEnum(ExpectedFundsFilter).optional().nullish().default(Ex
 export const expectedFundsFilter: FilterConfig<z.infer<typeof schema>> = {
   schema: schema,
   filter: {
-    labelMsg: defineMessage({ defaultMessage: 'Created by', id: 'Agreement.createdBy' }),
+    labelMsg: defineMessage({ defaultMessage: 'Expected Funds', id: 'ExpectedFunds' }),
     Component: ({ valueRenderer, intl, ...props }) => {
       const options = React.useMemo(
         () => Object.values(ExpectedFundsFilter).map(value => ({ label: valueRenderer({ intl, value }), value })),
@@ -22,11 +22,11 @@ export const expectedFundsFilter: FilterConfig<z.infer<typeof schema>> = {
     },
     valueRenderer: ({ value }) =>
       value === ExpectedFundsFilter.ALL_EXPECTED_FUNDS ? (
-        <FormattedMessage defaultMessage="Anyone" id="TFJD82" />
+        <FormattedMessage defaultMessage="All" id="All" />
       ) : value === ExpectedFundsFilter.ONLY_PENDING ? (
-        <FormattedMessage defaultMessage="Host Admin" id="oaDOlQ" />
+        <FormattedMessage defaultMessage="Only Pending" id="Filter.OnlyPending" />
       ) : (
-        <FormattedMessage defaultMessage="Contributors" id="Contributors" />
+        <FormattedMessage defaultMessage="Only Confirmed" id="Filter.OnlyConfirmed" />
       ),
   },
 };

@@ -158,6 +158,17 @@ function createLink({ twoFactorAuthContext, accessToken = null }) {
     }
   });
 
+  const sentryLink = setContext((_, { headers }) => {
+    if (
+      headers?.['x-sentry-force-sample'] ||
+      (typeof window !== 'undefined' && window.location.search.includes('forceSentryTracing=1'))
+    ) {
+      return {
+        headers: { ...headers, 'x-sentry-force-sample': '1' },
+      };
+    }
+  });
+
   const linkFetch = process.browser ? fetch : serverSideFetch;
 
   const httpHeaders = {
@@ -169,11 +180,17 @@ function createLink({ twoFactorAuthContext, accessToken = null }) {
     uri: getGraphqlUrl('v1'),
     fetch: linkFetch,
     headers: { ...httpHeaders, 'Apollo-Require-Preflight': 'true' },
+    formDataAppendFile(formData, fieldName, file) {
+      formData.append(fieldName, new Blob([file as File], { type: file.type }), (file as File).name);
+    },
   });
   const apiV2DefaultLink = createUploadLink({
     uri: getGraphqlUrl('v2'),
     fetch: linkFetch,
     headers: { ...httpHeaders, 'Apollo-Require-Preflight': 'true' },
+    formDataAppendFile(formData, fieldName, file) {
+      formData.append(fieldName, new Blob([file as File], { type: file.type }), (file as File).name);
+    },
   });
 
   // Setup internal links handling to be able to split traffic to different API servers
@@ -208,7 +225,7 @@ function createLink({ twoFactorAuthContext, accessToken = null }) {
 
   const twoFactorAuthLink = new TwoFactorAuthenticationApolloLink(twoFactorAuthContext);
 
-  return ApolloLink.from([errorLink, authLink, twoFactorAuthLink, httpLink]);
+  return ApolloLink.from([sentryLink, errorLink, authLink, twoFactorAuthLink, httpLink]);
 }
 
 function createInMemoryCache() {

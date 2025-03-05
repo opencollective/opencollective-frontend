@@ -7,7 +7,7 @@ type Item = {
   items?: Item[];
 };
 
-export const landingPageItems: Item[] = [
+const landingPageItems: Item[] = [
   {
     label: <FormattedMessage defaultMessage="Solutions" id="asqGnV" />,
     items: [
@@ -39,10 +39,6 @@ export const landingPageItems: Item[] = [
       {
         label: <FormattedMessage id="company.blog" defaultMessage="Blog" />,
         href: 'https://blog.opencollective.com/',
-      },
-      {
-        label: <FormattedMessage id="OC.e2c" defaultMessage="Exit to Community" />,
-        href: '/e2c',
       },
       {
         label: <FormattedMessage id="collective.about.title" defaultMessage="About" />,
@@ -154,10 +150,6 @@ export const regularFooterItems: Item[] = [
       {
         label: <FormattedMessage id="company.hiring" defaultMessage="Hiring" />,
         href: '/hiring',
-      },
-      {
-        label: <FormattedMessage id="e2c.title" defaultMessage="Exit to Community #E2C" />,
-        href: '/e2c',
       },
       {
         label: <FormattedMessage id="company.termsOfService" defaultMessage="Terms of service" />,

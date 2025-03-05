@@ -9,7 +9,6 @@ import { getAccountReferenceInput } from '../../../../lib/collective';
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { standardizeExpenseItemIncurredAt } from '../../../../lib/expenses';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import type { HostedCollectiveFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
 import type {
   Account,
   Host,
@@ -22,10 +21,11 @@ import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { isValidUrl } from '../../../../lib/utils';
 import { attachmentDropzoneParams } from '../../../expenses/lib/attachments';
+import type { PossiblyArray } from '@/lib/types';
 
 import AccountingCategorySelect from '@/components/AccountingCategorySelect';
 
-import { DefaultCollectiveLabel } from '../../../CollectivePicker';
+import CollectivePicker, { DefaultCollectiveLabel } from '../../../CollectivePicker';
 import CollectivePickerAsync from '../../../CollectivePickerAsync';
 import Dropzone from '../../../Dropzone';
 import { ExchangeRate } from '../../../ExchangeRate';
@@ -68,7 +68,7 @@ const PayeeSelect = ({
   forAccount = null,
   ...props
 }: {
-  host: Account;
+  host: Pick<Account, 'id' | 'legacyId'>;
   forAccount: Account;
 } & React.ComponentProps<typeof CollectivePickerAsync>) => {
   const intl = useIntl();
@@ -157,11 +157,12 @@ const hostExpenseFormValuesSchema = z
 type FormValuesSchema = z.infer<typeof hostExpenseFormValuesSchema>;
 
 const getInitialValues = (importRow: TransactionsImportRow, account): FormValuesSchema => {
+  const defaultAccount = !Array.isArray(account) ? account : account.length === 1 ? account[0] : null;
   return {
     type: null,
     description: importRow?.description || '',
     payee: null,
-    account: account ? pick(account, ['id', 'slug', 'name', 'type', 'imageUrl']) : null,
+    account: pick(defaultAccount, ['id', 'slug', 'name', 'type', 'imageUrl']),
     accountingCategory: null,
     incurredAt: standardizeExpenseItemIncurredAt(importRow?.date),
     amount: {
@@ -181,9 +182,9 @@ export const HostCreateExpenseModal = ({
   account,
   ...props
 }: {
-  host: Host;
-  account?: HostedCollectiveFieldsFragment;
-  transactionsImport?: TransactionsImport;
+  host: Pick<Host, 'id' | 'slug' | 'type' | 'legacyId' | 'currency' | 'accountingCategories'>;
+  account?: PossiblyArray<Pick<Account, 'id' | 'slug' | 'name' | 'type'>>;
+  transactionsImport?: Pick<TransactionsImport, 'id' | 'source' | 'csvConfig'>;
   transactionsImportRow?: TransactionsImportRow;
 } & BaseModalProps) => {
   const intl = useIntl();
@@ -336,18 +337,30 @@ export const HostCreateExpenseModal = ({
                     name="account"
                     label={<FormattedMessage defaultMessage="Account" id="TwyMau" />}
                   >
-                    {({ field }) => (
-                      <CollectivePickerAsync
-                        inputId={field.id}
-                        collective={field.value}
-                        disabled={field.disabled}
-                        error={field.error}
-                        onBlur={() => setFieldTouched(field.name, true)}
-                        onChange={({ value }) => setFieldValue(field.name, value)}
-                        hostCollectiveIds={[host.legacyId]}
-                        preload
-                      />
-                    )}
+                    {({ field }) =>
+                      Array.isArray(account) && account.length > 0 ? (
+                        <CollectivePicker
+                          inputId={field.id}
+                          collective={field.value}
+                          disabled={field.disabled || account.length === 1}
+                          error={field.error}
+                          collectives={account}
+                          onChange={({ value }) => setFieldValue(field.name, value)}
+                          onBlur={() => setFieldTouched(field.name, true)}
+                        />
+                      ) : (
+                        <CollectivePickerAsync
+                          inputId={field.id}
+                          collective={field.value}
+                          disabled={field.disabled || Boolean(account)}
+                          error={field.error}
+                          onBlur={() => setFieldTouched(field.name, true)}
+                          onChange={({ value }) => setFieldValue(field.name, value)}
+                          hostCollectiveIds={[host.legacyId]}
+                          preload
+                        />
+                      )
+                    }
                   </StyledInputFormikField>
                   <StyledInputFormikField
                     name="payee"
