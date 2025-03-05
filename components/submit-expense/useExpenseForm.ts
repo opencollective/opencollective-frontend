@@ -1358,9 +1358,7 @@ async function buildFormOptions(
             {
               id: '__newAccountBalancePayoutMethod',
               type: PayoutMethodType.ACCOUNT_BALANCE,
-              // name: 'Account balance',
               data: { currency: host.currency },
-              // data: { currency: host.currency },
               isSaved: true,
             },
           ];

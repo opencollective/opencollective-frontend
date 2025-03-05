@@ -252,7 +252,6 @@ function getNewPayoutMethodOptionFormProps(form: ExpenseForm) {
     ...pick(form, ['setFieldValue', 'setFieldTouched', 'validateForm', 'refresh', 'isSubmitting']),
     ...pick(form.values, ['newPayoutMethod', 'payeeSlug']),
     ...pick(form.options, ['newPayoutMethodTypes', 'payoutMethods', 'host', 'loggedInAccount', 'payee']),
-    touchedNewPayoutMethodName: form.touched.newPayoutMethod?.name, // can be removed now?
   };
 }
 
