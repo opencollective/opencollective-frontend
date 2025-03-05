@@ -156,7 +156,7 @@ const JoinUs = ({ page }) => (
             page === 'becomeAHost' ? (
               <FormattedMessage defaultMessage="Join as a Fiscal Host" id="Y0G9KM" />
             ) : (
-              <FormattedMessage defaultMessage="Get started now free!" id="uw0ZU2" />
+              <FormattedMessage defaultMessage="Get started now for free!" id="KOBC7Z" />
             )
           }
           description={<FormattedMessage id="home.joinUsSection.getStarted" defaultMessage="Get started now!" />}
