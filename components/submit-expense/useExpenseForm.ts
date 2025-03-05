@@ -1383,6 +1383,7 @@ async function buildFormOptions(
         values.payeeSlug === '__findAccountIAdminister';
     } else {
       options.payoutMethod = values.newPayoutMethod;
+      options.newPayoutMethodTypes = options.supportedPayoutMethods;
     }
 
     if (!startOptions.duplicateExpense && options.expense?.lockedFields?.length) {
