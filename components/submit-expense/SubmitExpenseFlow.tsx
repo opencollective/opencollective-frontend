@@ -1,6 +1,6 @@
 import React from 'react';
 import type { FetchResult } from '@apollo/client';
-import { gql, useMutation } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import dayjs from 'dayjs';
 import { FormikProvider } from 'formik';
 import { pick } from 'lodash';
@@ -13,6 +13,7 @@ import { CollectiveType } from '../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type {
+  AccountQuery,
   CreateExpenseFromDashboardMutation,
   CreateExpenseFromDashboardMutationVariables,
   CurrencyExchangeRateInput,
@@ -21,10 +22,12 @@ import type {
   InviteExpenseFromDashboardMutation,
   InviteExpenseFromDashboardMutationVariables,
 } from '../../lib/graphql/types/v2/graphql';
-import type { Currency, RecurringExpenseInterval } from '../../lib/graphql/types/v2/schema';
+import type { Account, Currency, RecurringExpenseInterval } from '../../lib/graphql/types/v2/schema';
 import { ExpenseStatus, ExpenseType, PayoutMethodType } from '../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 
+import { AccountHoverCard, accountHoverCardQuery } from '../AccountHoverCard';
+import Avatar from '../Avatar';
 import { Survey, SURVEY_KEY } from '../Survey';
 import { Button } from '../ui/Button';
 import { Dialog, DialogContent, DialogFooter } from '../ui/Dialog';
@@ -419,9 +422,17 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
       >
         <div className="flex max-h-screen min-h-screen max-w-screen min-w-screen flex-col overflow-hidden bg-[#F8FAFC]">
           <header className="flex min-w-screen items-center justify-between border-b border-slate-100 px-4 py-3 sm:px-10">
-            <span className="text-xl leading-7 font-bold text-slate-800">
-              <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
-            </span>
+            <div className="flex grow items-center gap-2 text-xl leading-7 font-semibold">
+              {props.submitExpenseTo ? (
+                <FormattedMessage
+                  id="ExpenseForm.SubmitTo"
+                  defaultMessage="Submit expense to {account}"
+                  values={{ account: <AccountRenderer accountSlug={props.submitExpenseTo} /> }}
+                />
+              ) : (
+                <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
+              )}
+            </div>
             <Button
               disabled={isLoading}
               loading={isLoading}
@@ -466,6 +477,28 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
   );
 }
 
+const AccountRenderer = ({ accountSlug }: { accountSlug: Account['slug'] }) => {
+  const { data } = useQuery<AccountQuery>(accountHoverCardQuery, {
+    variables: { slug: accountSlug },
+    fetchPolicy: 'cache-first',
+    context: API_V2_CONTEXT,
+  });
+
+  return (
+    <AccountHoverCard
+      account={data.account}
+      trigger={
+        <div className="inline-flex h-full w-full max-w-48 items-center justify-between gap-2 overflow-hidden">
+          <Avatar collective={data.account} radius={20} />
+          <div className="relative flex flex-1 items-center justify-between gap-1 overflow-hidden">
+            <span className="truncate">{data.account?.name ?? accountSlug}</span>
+          </div>
+        </div>
+      }
+    />
+  );
+};
+
 function ExpenseFormikContainer(props: {
   submitExpenseTo?: string;
   draftKey?: string;
@@ -480,6 +513,7 @@ function ExpenseFormikContainer(props: {
     draftKey: props.draftKey,
     duplicateExpense: props.duplicateExpense,
     expenseId: props.expenseId,
+    canChangeAccount: !props.submitExpenseTo,
   });
 
   const [activeStep, setActiveStep] = React.useState(Step.WHO_IS_PAYING);
