@@ -31,6 +31,8 @@ export function CreateAccountingCategoryModal(props: CreateAccountingCategoryMod
     [onCreate],
   );
 
+  const defaultAppliesTo = props.isIndependentCollective ? AccountingCategoryAppliesTo.HOST : null;
+
   const formik = useAccountingCategoryFormik({
     initialValues: {
       name: '',
@@ -46,16 +48,8 @@ export function CreateAccountingCategoryModal(props: CreateAccountingCategoryMod
         label: intl.formatMessage({ defaultMessage: 'No', id: 'oUWADl' }),
       },
       appliesTo: {
-        value: props.isIndependentCollective
-          ? AccountingCategoryAppliesTo.HOST
-          : AccountingCategoryAppliesTo.HOSTED_COLLECTIVES,
-        label: intl.formatMessage(
-          AccountingCategoryAppliesToI18n[
-            props.isIndependentCollective
-              ? AccountingCategoryAppliesTo.HOST
-              : AccountingCategoryAppliesTo.HOSTED_COLLECTIVES
-          ],
-        ),
+        value: defaultAppliesTo,
+        label: intl.formatMessage(AccountingCategoryAppliesToI18n[defaultAppliesTo || 'ALL']),
       },
     },
     async onSubmit(values) {
