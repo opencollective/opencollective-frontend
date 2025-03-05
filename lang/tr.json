@@ -363,6 +363,7 @@
   "Account.None": "Hiçbiri",
   "account.slug.label": "Tanımlayıcı",
   "accountingCategory.accountAdmin": "kolekti̇f yöneti̇ci̇",
+  "AccountingCategory.appliesTo.both": "All",
   "AccountingCategory.AppliesTo.HOST": "Operational Funds",
   "AccountingCategory.AppliesTo.HOSTED_COLLECTIVES": "Managed Funds",
   "AccountingCategory.code": "Kod",
