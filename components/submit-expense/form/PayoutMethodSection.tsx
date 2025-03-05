@@ -50,6 +50,7 @@ function getFormProps(form: ExpenseForm) {
     ...pick(form.options, [
       'payee',
       'payoutMethods',
+      'newPayoutMethodTypes',
       'recentlySubmittedExpenses',
       'isAdminOfPayee',
       'loggedInAccount',
@@ -198,7 +199,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
             </RadioGroupCard>
           )}
 
-          {!(isLoading || isLoadingPayee) && !isVendor && (
+          {!(isLoading || isLoadingPayee) && !isVendor && props.newPayoutMethodTypes?.length > 0 && (
             <RadioGroupCard
               value="__newPayoutMethod"
               checked={isNewPayoutMethodSelected}
@@ -250,8 +251,7 @@ function getNewPayoutMethodOptionFormProps(form: ExpenseForm) {
   return {
     ...pick(form, ['setFieldValue', 'setFieldTouched', 'validateForm', 'refresh', 'isSubmitting']),
     ...pick(form.values, ['newPayoutMethod', 'payeeSlug']),
-    ...pick(form.options, ['supportedPayoutMethods', 'host', 'loggedInAccount', 'payee']),
-    touchedNewPayoutMethodName: form.touched.newPayoutMethod?.name,
+    ...pick(form.options, ['newPayoutMethodTypes', 'payoutMethods', 'host', 'loggedInAccount', 'payee']),
   };
 }
 
@@ -314,13 +314,13 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
     }
   }, [createPayoutMethod, intl, props.newPayoutMethod, refresh, setFieldTouched, setFieldValue, toast, validateForm]);
 
-  const suportedPayoutMethodComboOptions = React.useMemo(
+  const newPayoutMethodComboOptions = React.useMemo(
     () =>
-      props.supportedPayoutMethods.map(m => ({
+      props.newPayoutMethodTypes.map(m => ({
         value: m,
         label: intl.formatMessage(I18nPayoutMethodLabels[m]),
       })),
-    [intl, props.supportedPayoutMethods],
+    [intl, props.newPayoutMethodTypes],
   );
 
   const onPayoutMethodTypeChange = React.useCallback(
@@ -358,7 +358,7 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
               <ComboSelect
                 {...field}
                 disabled={props.isSubmitting}
-                options={suportedPayoutMethodComboOptions}
+                options={newPayoutMethodComboOptions}
                 onChange={onPayoutMethodTypeChange}
               />
             )}
@@ -459,6 +459,7 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
   const intl = useIntl();
   const { toast } = useToast();
 
+  const isEditable = props.payoutMethod.type !== PayoutMethodType.ACCOUNT_BALANCE && props.isEditable;
   const isMissingCurrency = isEmpty(props.payoutMethod.data?.currency);
   const isLegalNameFuzzyMatched = React.useMemo(() => {
     const accountHolderName: string = props.payoutMethod.data?.accountHolderName ?? '';
@@ -821,7 +822,7 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
               </Badge>
             )}
           </div>
-          {!isEditingPayoutMethod && props.isEditable && (
+          {!isEditingPayoutMethod && isEditable && (
             <div className="flex gap-2">
               {!props.archived && props.isChecked && (
                 <Button

@@ -545,6 +545,7 @@ type ExpenseFormOptions = {
     | ExpenseFormSchemaQuery['loggedInAccount']['payoutMethods'][number]
     | ExpenseFormValues['newPayoutMethod'];
   supportedPayoutMethods?: PayoutMethodType[];
+  newPayoutMethodTypes?: PayoutMethodType[];
   expenseTags?: ExpenseFormSchemaHostFieldsFragment['expensesTags'];
   isAccountingCategoryRequired?: boolean;
   accountingCategories?: ExpenseFormSchemaHostFieldsFragment['accountingCategories']['nodes'];
@@ -649,7 +650,12 @@ function buildFormSchema(
           if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
             return true;
           }
-
+          if (
+            v === '__newAccountBalancePayoutMethod' &&
+            options.payoutMethods?.some(pm => pm.type === PayoutMethodType.ACCOUNT_BALANCE)
+          ) {
+            return true;
+          }
           if (v && v !== '__newPayoutMethod' && !options.payee?.payoutMethods?.some(pm => pm.id === v)) {
             return false;
           }
@@ -991,6 +997,10 @@ function buildFormSchema(
             .refine(
               currency => {
                 if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
+                  return true;
+                }
+
+                if (values.payoutMethodId === '__newAccountBalancePayoutMethod') {
                   return true;
                 }
 
@@ -1336,9 +1346,29 @@ async function buildFormOptions(
             }
             return pm;
           });
+
+        // Add ACCOUNT_BALANCE payout method if it's supported but not available for the payee
+        if (
+          options.supportedPayoutMethods?.includes(PayoutMethodType.ACCOUNT_BALANCE) &&
+          host &&
+          !options.payoutMethods?.some(pm => pm.type === PayoutMethodType.ACCOUNT_BALANCE)
+        ) {
+          options.payoutMethods = [
+            ...(options.payoutMethods || []),
+            {
+              id: '__newAccountBalancePayoutMethod',
+              type: PayoutMethodType.ACCOUNT_BALANCE,
+              data: { currency: host.currency },
+              isSaved: true,
+            },
+          ];
+        }
       } else if (payee && payee.type === CollectiveType.VENDOR) {
         options.payoutMethods = payee.payoutMethods?.filter(p => options.supportedPayoutMethods.includes(p.type));
       }
+
+      // Filter out ACCOUNT_BALANCE from the list of payout methods, since we add it manually to the default list
+      options.newPayoutMethodTypes = options.supportedPayoutMethods.filter(t => t !== PayoutMethodType.ACCOUNT_BALANCE);
 
       if (values.payoutMethodId && values.payoutMethodId !== '__newPayoutMethod') {
         options.payoutMethod = options.payoutMethods?.find(p => p.id === values.payoutMethodId);
@@ -1353,6 +1383,7 @@ async function buildFormOptions(
         values.payeeSlug === '__findAccountIAdminister';
     } else {
       options.payoutMethod = values.newPayoutMethod;
+      options.newPayoutMethodTypes = options.supportedPayoutMethods;
     }
 
     if (!startOptions.duplicateExpense && options.expense?.lockedFields?.length) {
