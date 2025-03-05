@@ -12,7 +12,7 @@ export function EmptyResults({
   otherActions,
   imageSize = 160,
 }: {
-  onResetFilters: (e) => void;
+  onResetFilters?: (e) => void;
   hasFilters: boolean;
   otherActions?: React.ReactNode;
   entityType?:
@@ -26,7 +26,8 @@ export function EmptyResults({
     | 'TAX_FORM'
     | 'UPDATES'
     | 'PROJECTS'
-    | 'TRANSACTIONS';
+    | 'TRANSACTIONS'
+    | 'PAYMENT_METHODS';
   imageSize?: number;
 }) {
   return (

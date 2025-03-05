@@ -65,7 +65,7 @@ Not required, but a bonus:
 
 ### A little about Open Collective
 
-[Open Collective](https://opencollective.com/), an open-source software company founded in 2015, is committed to supporting grassroots groups and communities around the world with transparent fundraising, money management, and legal tools. We're proud to have supported over 15,000 groups and 30+ nonprofits globally, raising and spending $35 million dollars in full transparency. Our platform helps open source projects, community projects, and mutual aid groups thrive all over the world, and we are on a long-term path toward [community governance](http://opencollective.com/e2c).
+[Open Collective](https://opencollective.com/), an open-source software company founded in 2015, is committed to supporting grassroots groups and communities around the world with transparent fundraising, money management, and legal tools. We're proud to have supported over 15,000 groups and 30+ nonprofits globally, raising and spending $35 million dollars in full transparency. Our platform helps open source projects, community projects, and mutual aid groups thrive all over the world.
 
 “Open Collective” means transparency (“Open”) and community (“Collective”), and thus our platform is built on values of openness, transparency, and collective collaboration. The team is a group of optimistic, driven, nerdy, and open people. Our culture, though ever-changing and sometimes chaotic like many start-ups, is also oriented toward care, candor, rigor, generosity, and autonomy. (You can read more about our values in our [Community Guidelines](https://docs.opencollective.com/help/about/the-open-collective-way/community-guidelines).)
 

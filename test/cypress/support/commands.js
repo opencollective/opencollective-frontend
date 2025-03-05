@@ -279,11 +279,11 @@ Cypress.Commands.add('graphqlQueryV2', (query, { variables = {}, token = null } 
  */
 Cypress.Commands.add('addCreditCardToCollective', ({ collectiveSlug }) => {
   cy.login({ redirect: `/dashboard/${collectiveSlug}/payment-methods` });
-  cy.contains('button', 'Add a credit card').click();
+  cy.getByDataCy('add-credit-card-button').click();
   cy.wait(2000);
   fillStripeInput();
   cy.wait(1000);
-  cy.contains('button[type="submit"]', 'Save').click();
+  cy.getByDataCy('save-credit-card-button').click();
   cy.get('[data-cy="save-credit-card-button"][data-loading="true"]').should('exist');
   cy.get('[data-cy="save-credit-card-button"][data-loading="true"]').should('not.exist', { timeout: 30_000 });
 });

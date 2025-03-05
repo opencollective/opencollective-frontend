@@ -222,6 +222,7 @@ export type AccountExpensesArgs = {
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   payoutMethodType?: InputMaybe<PayoutMethodType>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<ExpenseStatusFilter>>>;
@@ -332,7 +333,7 @@ export type AccountOrdersArgs = {
   oppositeAccount?: InputMaybe<AccountReferenceInput>;
   orderBy?: ChronologicalOrderInput;
   pausedBy?: InputMaybe<Array<InputMaybe<OrderPausedBy>>>;
-  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
@@ -348,6 +349,12 @@ export type AccountPaymentMethodsArgs = {
   includeExpired?: InputMaybe<Scalars['Boolean']['input']>;
   service?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   type?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+};
+
+
+/** Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization) */
+export type AccountPayoutMethodsArgs = {
+  includeArchived?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
@@ -401,8 +408,10 @@ export type AccountTransactionsArgs = {
   offset?: Scalars['Int']['input'];
   order?: InputMaybe<OrderReferenceInput>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   type?: InputMaybe<TransactionType>;
@@ -1615,6 +1624,7 @@ export type BotExpensesArgs = {
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   payoutMethodType?: InputMaybe<PayoutMethodType>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<ExpenseStatusFilter>>>;
@@ -1731,7 +1741,7 @@ export type BotOrdersArgs = {
   oppositeAccount?: InputMaybe<AccountReferenceInput>;
   orderBy?: ChronologicalOrderInput;
   pausedBy?: InputMaybe<Array<InputMaybe<OrderPausedBy>>>;
-  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
@@ -1747,6 +1757,12 @@ export type BotPaymentMethodsArgs = {
   includeExpired?: InputMaybe<Scalars['Boolean']['input']>;
   service?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   type?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+};
+
+
+/** This represents a Bot account */
+export type BotPayoutMethodsArgs = {
+  includeArchived?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
@@ -1800,8 +1816,10 @@ export type BotTransactionsArgs = {
   offset?: Scalars['Int']['input'];
   order?: InputMaybe<OrderReferenceInput>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   type?: InputMaybe<TransactionType>;
@@ -2129,6 +2147,7 @@ export type CollectiveExpensesArgs = {
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   payoutMethodType?: InputMaybe<PayoutMethodType>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<ExpenseStatusFilter>>>;
@@ -2259,7 +2278,7 @@ export type CollectiveOrdersArgs = {
   oppositeAccount?: InputMaybe<AccountReferenceInput>;
   orderBy?: ChronologicalOrderInput;
   pausedBy?: InputMaybe<Array<InputMaybe<OrderPausedBy>>>;
-  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
@@ -2275,6 +2294,12 @@ export type CollectivePaymentMethodsArgs = {
   includeExpired?: InputMaybe<Scalars['Boolean']['input']>;
   service?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   type?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+};
+
+
+/** This represents a Collective account */
+export type CollectivePayoutMethodsArgs = {
+  includeArchived?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
@@ -2348,8 +2373,10 @@ export type CollectiveTransactionsArgs = {
   offset?: Scalars['Int']['input'];
   order?: InputMaybe<OrderReferenceInput>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   type?: InputMaybe<TransactionType>;
@@ -4123,6 +4150,7 @@ export type EventExpensesArgs = {
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   payoutMethodType?: InputMaybe<PayoutMethodType>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<ExpenseStatusFilter>>>;
@@ -4253,7 +4281,7 @@ export type EventOrdersArgs = {
   oppositeAccount?: InputMaybe<AccountReferenceInput>;
   orderBy?: ChronologicalOrderInput;
   pausedBy?: InputMaybe<Array<InputMaybe<OrderPausedBy>>>;
-  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
@@ -4269,6 +4297,12 @@ export type EventPaymentMethodsArgs = {
   includeExpired?: InputMaybe<Scalars['Boolean']['input']>;
   service?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   type?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+};
+
+
+/** This represents an Event account */
+export type EventPayoutMethodsArgs = {
+  includeArchived?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
@@ -4342,8 +4376,10 @@ export type EventTransactionsArgs = {
   offset?: Scalars['Int']['input'];
   order?: InputMaybe<OrderReferenceInput>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   type?: InputMaybe<TransactionType>;
@@ -5320,6 +5356,7 @@ export type FundExpensesArgs = {
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   payoutMethodType?: InputMaybe<PayoutMethodType>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<ExpenseStatusFilter>>>;
@@ -5450,7 +5487,7 @@ export type FundOrdersArgs = {
   oppositeAccount?: InputMaybe<AccountReferenceInput>;
   orderBy?: ChronologicalOrderInput;
   pausedBy?: InputMaybe<Array<InputMaybe<OrderPausedBy>>>;
-  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
@@ -5466,6 +5503,12 @@ export type FundPaymentMethodsArgs = {
   includeExpired?: InputMaybe<Scalars['Boolean']['input']>;
   service?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   type?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+};
+
+
+/** This represents an Project account */
+export type FundPayoutMethodsArgs = {
+  includeArchived?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
@@ -5539,8 +5582,10 @@ export type FundTransactionsArgs = {
   offset?: Scalars['Int']['input'];
   order?: InputMaybe<OrderReferenceInput>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   type?: InputMaybe<TransactionType>;
@@ -5933,6 +5978,7 @@ export type HostExpensesArgs = {
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   payoutMethodType?: InputMaybe<PayoutMethodType>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<ExpenseStatusFilter>>>;
@@ -6164,7 +6210,7 @@ export type HostOrdersArgs = {
   oppositeAccount?: InputMaybe<AccountReferenceInput>;
   orderBy?: ChronologicalOrderInput;
   pausedBy?: InputMaybe<Array<InputMaybe<OrderPausedBy>>>;
-  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
@@ -6180,6 +6226,12 @@ export type HostPaymentMethodsArgs = {
   includeExpired?: InputMaybe<Scalars['Boolean']['input']>;
   service?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   type?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+};
+
+
+/** This represents an Host account */
+export type HostPayoutMethodsArgs = {
+  includeArchived?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
@@ -6262,8 +6314,10 @@ export type HostTransactionsArgs = {
   offset?: Scalars['Int']['input'];
   order?: InputMaybe<OrderReferenceInput>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   type?: InputMaybe<TransactionType>;
@@ -6832,6 +6886,7 @@ export type IndividualExpensesArgs = {
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   payoutMethodType?: InputMaybe<PayoutMethodType>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<ExpenseStatusFilter>>>;
@@ -6961,7 +7016,7 @@ export type IndividualOrdersArgs = {
   oppositeAccount?: InputMaybe<AccountReferenceInput>;
   orderBy?: ChronologicalOrderInput;
   pausedBy?: InputMaybe<Array<InputMaybe<OrderPausedBy>>>;
-  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
@@ -6977,6 +7032,12 @@ export type IndividualPaymentMethodsArgs = {
   includeExpired?: InputMaybe<Scalars['Boolean']['input']>;
   service?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   type?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+};
+
+
+/** This represents an Individual account */
+export type IndividualPayoutMethodsArgs = {
+  includeArchived?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
@@ -7037,8 +7098,10 @@ export type IndividualTransactionsArgs = {
   offset?: Scalars['Int']['input'];
   order?: InputMaybe<OrderReferenceInput>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   type?: InputMaybe<TransactionType>;
@@ -7488,6 +7551,7 @@ export type Mutation = {
   editMember: Member;
   /** Edit an existing member invitation of the Collective. Scope: "account". */
   editMemberInvitation?: Maybe<MemberInvitation>;
+  editPayoutMethod: PayoutMethod;
   /** To edit a pending order. Scope: "orders". */
   editPendingOrder: Order;
   /** Edit the public message for the given Member of a Collective. Scope: "account". */
@@ -7546,6 +7610,8 @@ export type Mutation = {
   removeHost: Account;
   /** Remove a member from the Collective. Scope: "account". */
   removeMember?: Maybe<Scalars['Boolean']['output']>;
+  /** Remove a payment method */
+  removePaymentMethod: PaymentMethod;
   /** Remove the given payout method. Scope: "expenses". */
   removePayoutMethod: PayoutMethod;
   /** Remove 2FA from the Individual if it has been enabled. Scope: "account". */
@@ -7556,6 +7622,8 @@ export type Mutation = {
   requestVirtualCard?: Maybe<Scalars['Boolean']['output']>;
   /** To re-send the invitation to complete a draft expense. Scope: "expenses". */
   resendDraftExpenseInvite: Expense;
+  /** Restore the given payout method. Scope: "expenses". */
+  restorePayoutMethod: PayoutMethod;
   /** Resume paused Virtual Card. Scope: "virtualCards". */
   resumeVirtualCard: VirtualCard;
   /** Revoke an OAuth authorization. Scope: "account". */
@@ -8167,6 +8235,12 @@ export type MutationEditMemberInvitationArgs = {
 
 
 /** This is the root mutation */
+export type MutationEditPayoutMethodArgs = {
+  payoutMethod: PayoutMethodInput;
+};
+
+
+/** This is the root mutation */
 export type MutationEditPendingOrderArgs = {
   order: PendingOrderEditInput;
 };
@@ -8385,6 +8459,13 @@ export type MutationRemoveMemberArgs = {
 
 
 /** This is the root mutation */
+export type MutationRemovePaymentMethodArgs = {
+  cancelActiveSubscriptions?: InputMaybe<Scalars['Boolean']['input']>;
+  paymentMethod: PaymentMethodReferenceInput;
+};
+
+
+/** This is the root mutation */
 export type MutationRemovePayoutMethodArgs = {
   payoutMethodId: Scalars['String']['input'];
 };
@@ -8420,6 +8501,12 @@ export type MutationRequestVirtualCardArgs = {
 /** This is the root mutation */
 export type MutationResendDraftExpenseInviteArgs = {
   expense: ExpenseReferenceInput;
+};
+
+
+/** This is the root mutation */
+export type MutationRestorePayoutMethodArgs = {
+  payoutMethod: PayoutMethodReferenceInput;
 };
 
 
@@ -9210,6 +9297,7 @@ export type OrganizationExpensesArgs = {
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   payoutMethodType?: InputMaybe<PayoutMethodType>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<ExpenseStatusFilter>>>;
@@ -9326,7 +9414,7 @@ export type OrganizationOrdersArgs = {
   oppositeAccount?: InputMaybe<AccountReferenceInput>;
   orderBy?: ChronologicalOrderInput;
   pausedBy?: InputMaybe<Array<InputMaybe<OrderPausedBy>>>;
-  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
@@ -9342,6 +9430,12 @@ export type OrganizationPaymentMethodsArgs = {
   includeExpired?: InputMaybe<Scalars['Boolean']['input']>;
   service?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   type?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+};
+
+
+/** This represents an Organization account */
+export type OrganizationPayoutMethodsArgs = {
+  includeArchived?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
@@ -9408,8 +9502,10 @@ export type OrganizationTransactionsArgs = {
   offset?: Scalars['Int']['input'];
   order?: InputMaybe<OrderReferenceInput>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   type?: InputMaybe<TransactionType>;
@@ -9693,6 +9789,8 @@ export enum PaymentMethodType {
 /** A payout method */
 export type PayoutMethod = {
   __typename?: 'PayoutMethod';
+  /** Whether this payout method can be edit or deleted */
+  canBeEditedOrDeleted?: Maybe<Scalars['Boolean']['output']>;
   /** The actual data for this payout method. Content depends on the type. */
   data?: Maybe<Scalars['JSON']['output']>;
   /** Unique identifier for this payout method */
@@ -9718,6 +9816,11 @@ export type PayoutMethodInput = {
   name?: InputMaybe<Scalars['String']['input']>;
   /** The type of payout method (e.g., PayPal, bank transfer) */
   type?: InputMaybe<PayoutMethodType>;
+};
+
+export type PayoutMethodReferenceInput = {
+  /** The id assigned to the payout method */
+  id?: InputMaybe<Scalars['String']['input']>;
 };
 
 export enum PayoutMethodType {
@@ -10288,6 +10391,7 @@ export type ProjectExpensesArgs = {
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   payoutMethodType?: InputMaybe<PayoutMethodType>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<ExpenseStatusFilter>>>;
@@ -10418,7 +10522,7 @@ export type ProjectOrdersArgs = {
   oppositeAccount?: InputMaybe<AccountReferenceInput>;
   orderBy?: ChronologicalOrderInput;
   pausedBy?: InputMaybe<Array<InputMaybe<OrderPausedBy>>>;
-  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
@@ -10434,6 +10538,12 @@ export type ProjectPaymentMethodsArgs = {
   includeExpired?: InputMaybe<Scalars['Boolean']['input']>;
   service?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   type?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+};
+
+
+/** This represents an Project account */
+export type ProjectPayoutMethodsArgs = {
+  includeArchived?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
@@ -10507,8 +10617,10 @@ export type ProjectTransactionsArgs = {
   offset?: Scalars['Int']['input'];
   order?: InputMaybe<OrderReferenceInput>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   type?: InputMaybe<TransactionType>;
@@ -10750,6 +10862,7 @@ export type QueryExpensesArgs = {
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   payoutMethodType?: InputMaybe<PayoutMethodType>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<ExpenseStatusFilter>>>;
@@ -10850,7 +10963,7 @@ export type QueryOrdersArgs = {
   oppositeAccount?: InputMaybe<AccountReferenceInput>;
   orderBy?: ChronologicalOrderInput;
   pausedBy?: InputMaybe<Array<InputMaybe<OrderPausedBy>>>;
-  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
@@ -10980,8 +11093,10 @@ export type QueryTransactionsArgs = {
   offset?: Scalars['Int']['input'];
   order?: InputMaybe<OrderReferenceInput>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   type?: InputMaybe<TransactionType>;
@@ -11881,7 +11996,7 @@ export type TransactionsImportReferenceInput = {
 /** A row in a transactions import */
 export type TransactionsImportRow = {
   __typename?: 'TransactionsImportRow';
-  /** If an account ID is available in the imported row, it will be stored here */
+  /** If an account ID is available in the imported row, it will be stored here. Returns the default account ID otherwise. */
   accountId?: Maybe<Scalars['String']['output']>;
   /** The amount of the row */
   amount: Amount;
@@ -12477,6 +12592,7 @@ export type VendorExpensesArgs = {
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   payoutMethodType?: InputMaybe<PayoutMethodType>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<ExpenseStatusFilter>>>;
@@ -12593,7 +12709,7 @@ export type VendorOrdersArgs = {
   oppositeAccount?: InputMaybe<AccountReferenceInput>;
   orderBy?: ChronologicalOrderInput;
   pausedBy?: InputMaybe<Array<InputMaybe<OrderPausedBy>>>;
-  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
@@ -12609,6 +12725,12 @@ export type VendorPaymentMethodsArgs = {
   includeExpired?: InputMaybe<Scalars['Boolean']['input']>;
   service?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   type?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+};
+
+
+/** This represents a Vendor account */
+export type VendorPayoutMethodsArgs = {
+  includeArchived?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
@@ -12675,8 +12797,10 @@ export type VendorTransactionsArgs = {
   offset?: Scalars['Int']['input'];
   order?: InputMaybe<OrderReferenceInput>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   type?: InputMaybe<TransactionType>;

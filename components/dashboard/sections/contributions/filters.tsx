@@ -48,7 +48,7 @@ export const schema = z.object({
   amount: amountFilter.schema,
   status: isMulti(z.nativeEnum(OrderStatus)).optional(),
   frequency: isMulti(z.nativeEnum(ContributionFrequency)).optional(),
-  paymentMethod: z.string().optional(),
+  paymentMethodId: isMulti(z.string()).optional(),
   tier: isMulti(z.string()).optional(),
 });
 
@@ -69,12 +69,7 @@ export const toVariables: FiltersToVariables<FilterValues, GraphQLQueryVariables
   chargeDate: orderChargeDateFilter.toVariables,
   date: orderCreateDateFilter.toVariables,
   amount: amountFilter.toVariables,
-  paymentMethod: (value: string) => {
-    if (value) {
-      return { paymentMethod: { id: value } };
-    }
-    return null;
-  },
+  paymentMethodId: ids => ({ paymentMethod: ids.map(id => ({ id })) }),
   tier: (value: [string]) => {
     return { tier: value.map(id => ({ id })) };
   },
@@ -121,7 +116,8 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     ),
     valueRenderer: ({ value, intl }) => i18nFrequency(intl, value),
   },
-  paymentMethod: {
-    labelMsg: defineMessage({ id: 'paymentmethod.label', defaultMessage: 'Payment Method' }),
+  paymentMethodId: {
+    labelMsg: defineMessage({ defaultMessage: 'Payment Method', id: 'paymentmethod.label' }),
+    valueRenderer: ({ value }) => value.split('-')[0],
   },
 };

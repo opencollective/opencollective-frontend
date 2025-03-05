@@ -3,15 +3,12 @@ import { themeGet } from '@styled-system/theme-get';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import NextIllustration from '../collectives/HomeNextIllustration';
 import Container from '../Container';
 import { Box, Flex } from '../Grid';
-import Link from '../Link';
 import ListItem from '../ListItem';
 import { SectionDescription, SectionTitle } from '../marketing/Text';
-import StyledButton from '../StyledButton';
 import StyledLink from '../StyledLink';
-import { H3, H5, P } from '../Text';
+import { H3, P } from '../Text';
 
 const ListContainer = styled.ul`
   padding-left: 20px;
@@ -84,18 +81,6 @@ const GetToKnowUs = () => {
                 textDecoration="underline"
               >
                 <FormattedMessage defaultMessage="Read our blog" id="AgyCr7" />
-              </StyledLink>
-            </StyledListItem>
-            <StyledListItem
-              fontSize="20px"
-              lineHeight="28px"
-              letterSpacing="-0.008em"
-              fontWeight="500"
-              color="black.800"
-              mb="24px"
-            >
-              <StyledLink color="black.800" href="/e2c" textDecoration="underline">
-                <FormattedMessage defaultMessage="Our exit strategy" id="WvqSvr" />
               </StyledLink>
             </StyledListItem>
             <StyledListItem fontSize="20px" lineHeight="28px" letterSpacing="-0.008em" fontWeight="500" mb="24px">
@@ -199,71 +184,6 @@ const GetToKnowUs = () => {
             </StyledListItem>
           </ListContainer>
         </Container>
-      </Flex>
-      <Flex flexDirection={['column', 'row']} justifyContent="center" alignItems="center">
-        <Box mb="16px" display={[null, 'none']}>
-          <NextIllustration
-            width={288}
-            height={238}
-            alt="Exit to community illustration"
-            src="/static/images/new-home/e2c-illustration.png"
-          />
-        </Box>
-        <Box mb="16px" display={['none', 'block', 'none']}>
-          <NextIllustration
-            width={392}
-            height={324}
-            alt="Exit to community illustration"
-            src="/static/images/new-home/e2c-illustration-sm.png"
-          />
-        </Box>
-        <Box mb="16px" display={['none', null, 'block']}>
-          <NextIllustration
-            width={558}
-            height={454}
-            alt="Exit to community illustration"
-            src="/static/images/new-home/e2c-illustration-lg.png"
-          />
-        </Box>
-        <Box textAlign={['center', 'left']} ml={[null, '24px']} width={['288px', '318px', '472px']}>
-          <H5
-            mb="16px"
-            fontSize={['20px', '32px', '40px']}
-            lineHeight={['28px', '40px', '48px']}
-            fontWeight="700"
-            letterSpacing={['-0.008em', null, '-0.04em']}
-            color="primary.900"
-          >
-            <FormattedMessage defaultMessage="Where we're heading..." id="r96v2J" />
-          </H5>
-          <P
-            fontSize={['15px', '16px', '20px']}
-            lineHeight={['22px', '24px', '28px']}
-            color="black.800"
-            letterSpacing={[null, null, '-0.008em']}
-            fontWeight="500"
-          >
-            <FormattedMessage
-              id="e2c.description"
-              defaultMessage="Join us as we transition from a privately owned company to a structure that allows us to share power and revenue with you."
-            />
-          </P>
-          <Box display={['none', null, 'block']} mt="24px">
-            <Link href="/e2c">
-              <StyledButton
-                minWidth="135px"
-                my={['12px', null, 0]}
-                buttonStyle="marketing"
-                whiteSpace="nowrap"
-                backgroundColor="primary.900"
-                fontSize="16px"
-                lineHeight="20px"
-              >
-                <FormattedMessage defaultMessage="Learn more" id="TdTXXf" />
-              </StyledButton>
-            </Link>
-          </Box>
-        </Box>
       </Flex>
     </Flex>
   );

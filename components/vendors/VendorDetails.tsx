@@ -110,7 +110,7 @@ const VendorDetails = ({ vendor, host, onCancel, editVendor }: VendorDetailsProp
         )}
         {payoutMethod && (
           <VendorInfo>
-            <FormattedMessage id="SecurityScope.PayoutMethod" defaultMessage="Payout Method" />
+            <FormattedMessage id="PayoutMethod" defaultMessage="Payout Method" />
             <PayoutMethodData payoutMethod={payoutMethod} />
           </VendorInfo>
         )}

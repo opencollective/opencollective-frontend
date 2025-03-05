@@ -109,6 +109,8 @@ export const transactionsTableQuery = gql`
     $hasDebt: Boolean
     $merchantId: [String]
     $accountingCategory: [String]
+    $paymentMethod: [PaymentMethodReferenceInput]
+    $payoutMethod: PayoutMethodReferenceInput
   ) {
     transactions(
       host: $hostAccount
@@ -142,6 +144,8 @@ export const transactionsTableQuery = gql`
       hasDebt: $hasDebt
       merchantId: $merchantId
       accountingCategory: $accountingCategory
+      paymentMethod: $paymentMethod
+      payoutMethod: $payoutMethod
     ) {
       ...TransactionsTableQueryCollectionFragment
     }

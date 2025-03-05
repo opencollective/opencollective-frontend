@@ -17,6 +17,7 @@ import type {
   RefreshPlaidAccountMutationVariables,
 } from '../graphql/types/v2/graphql';
 import type { Host } from '../graphql/types/v2/schema';
+import { LOCAL_STORAGE_KEYS, setLocalStorage } from '../local-storage';
 
 const generatePlaidLinkTokenMutation = gql`
   mutation GeneratePlaidLinkToken(
@@ -39,7 +40,7 @@ const generatePlaidLinkTokenMutation = gql`
   }
 `;
 
-const connectPlaidAccountMutation = gql`
+export const connectPlaidAccountMutation = gql`
   mutation ConnectPlaidAccount(
     $publicToken: String!
     $host: AccountReferenceInput!
@@ -52,6 +53,10 @@ const connectPlaidAccountMutation = gql`
       }
       transactionsImport {
         id
+        account {
+          id
+          slug
+        }
       }
     }
   }
@@ -170,7 +175,7 @@ export const usePlaidConnectDialog = ({
       if (status === 'idle') {
         try {
           setStatus('loading');
-          await generatePlaidToken({
+          const result = await generatePlaidToken({
             variables: {
               host: getAccountReferenceInput(host),
               transactionImport: transactionImportId ? { id: transactionImportId } : undefined,
@@ -178,6 +183,17 @@ export const usePlaidConnectDialog = ({
               accountSelectionEnabled,
             },
           });
+
+          // We store the link token in local storage to be accessible from the OAuth flow
+          // later on. The token quickly expire, so it is safe to keep it in local storage.
+          setLocalStorage(
+            LOCAL_STORAGE_KEYS.PLAID_LINK_TOKEN,
+            JSON.stringify({
+              hostId: host.id,
+              token: result.data.generatePlaidLinkToken.linkToken,
+            }),
+          );
+
           // The process will continue when the `React.useEffect` below detects the token
         } catch (error) {
           toast({ variant: 'error', message: i18nGraphqlException(intl, error) });

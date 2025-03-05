@@ -55,6 +55,8 @@ export default class SignIn extends React.Component {
     showOCLogo: PropTypes.bool,
     /** whether the input needs to be auto-focused */
     autoFocus: PropTypes.bool,
+    /** whether to show the title or not */
+    noSignInTitle: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -121,14 +123,16 @@ export default class SignIn extends React.Component {
   }
 
   render() {
-    const { onSubmit, loading, email, password, onEmailChange, onPasswordChange, label } = this.props;
+    const { onSubmit, loading, email, password, onEmailChange, onPasswordChange, label, noSignInTitle } = this.props;
     const { error, showError } = this.state;
     return (
       <React.Fragment>
-        <Head>
-          {/* Add title hint for 1password and perhaps other password managers*/}
-          <title>Sign In - Open Collective</title>
-        </Head>
+        {!noSignInTitle && (
+          <Head>
+            {/* Add title hint for 1password and perhaps other password managers*/}
+            <title>Sign In - Open Collective</title>
+          </Head>
+        )}
         <Box maxWidth={390} px={['20px', 0]}>
           {this.props.isOAuth ? (
             <React.Fragment>
