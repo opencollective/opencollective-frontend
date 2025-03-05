@@ -161,6 +161,7 @@ const CommentForm = ({
               showSubHeading={false}
               showOCLogo={false}
               autoFocus={false}
+              noSignInTitle
             />
           </SignInOverlayBackground>
         </ContainerOverlay>
