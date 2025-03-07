@@ -72,6 +72,7 @@ const nextConfig = {
         OC_APPLICATION: null,
         HEROKU_SLUG_COMMIT: null,
         LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES: false,
+        WHITELABEL_DOMAINS: null,
       }),
     );
 
