@@ -301,6 +301,7 @@ function VendorOptionWrapper() {
       payeeSlug={form.values.payeeSlug}
       payee={form.options.payee}
       vendors={form.options.vendors || []}
+      host={form.options.host}
     />
   );
 }
@@ -312,9 +313,14 @@ const VendorOption = React.memo(function VendorOption(props: {
   payeeSlug: ExpenseForm['values']['payeeSlug'];
   payee: ExpenseForm['options']['payee'];
   vendors: ExpenseForm['options']['vendors'];
+  host: ExpenseForm['options']['host'];
 }) {
-  const isVendorSelected = props.payeeSlug === '__vendor' || props.vendors.some(v => v.slug === props.payeeSlug);
-
+  // Setting a state variable to keep the Vendor option open when a vendor that is not part of the preloaded vendors is selected
+  const [selectedVendorSlug, setSelectedVendorSlug] = React.useState(undefined);
+  const isVendorSelected =
+    props.payeeSlug === '__vendor' ||
+    props.vendors.some(v => v.slug === props.payeeSlug) ||
+    selectedVendorSlug === props.payeeSlug;
   return (
     <React.Fragment>
       {props.vendors.length > 0 && (
@@ -325,12 +331,17 @@ const VendorOption = React.memo(function VendorOption(props: {
           disabled={props.isSubmitting}
           subContent={
             <div>
-              <CollectivePicker
+              <CollectivePickerAsync
+                inputId="__vendor"
+                isSearchable
+                types={['VENDOR']}
+                includeVendorsForHostId={props.host.legacyId}
                 disabled={props.isSubmitting}
-                collectives={props.vendors}
+                defaultCollectives={props.vendors}
                 collective={props.payeeSlug === '__vendor' ? null : props.payee}
                 onChange={e => {
                   const slug = e.value.slug;
+                  setSelectedVendorSlug(slug);
                   props.setFieldValue('payeeSlug', !slug ? '__vendor' : slug);
                 }}
               />

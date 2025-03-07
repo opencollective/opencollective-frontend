@@ -48,6 +48,9 @@ const collectivePickerSearchQuery = gqlV1/* GraphQL */ `
         isActive
         isArchived
         isHost
+        ... on Vendor {
+          hasPayoutMethod
+        }
         ... on User {
           isTwoFactorAuthEnabled
         }
@@ -134,13 +137,54 @@ const CollectivePickerAsync = ({
   skipGuests = true,
   includeArchived = false,
   includeVendorsForHostId = undefined,
+  defaultCollectives = undefined,
   ...props
 }) => {
   const fetchPolicy = noCache ? 'network-only' : undefined;
   const [searchCollectives, { loading, data }] = useLazyQuery(searchQuery, { fetchPolicy });
   const [term, setTerm] = React.useState(null);
   const intl = useIntl();
-  const collectives = ((term || preload) && data?.search?.collectives) || [];
+
+  // Filter defaultCollectives by term if provided
+  const filteredDefaultCollectives = React.useMemo(() => {
+    if (!defaultCollectives) {
+      return [];
+    }
+
+    if (!term) {
+      return defaultCollectives;
+    }
+
+    const normalizedTerm = term.toLowerCase();
+    return defaultCollectives.filter(
+      c => c.name?.toLowerCase().includes(normalizedTerm) || c.slug?.toLowerCase().includes(normalizedTerm),
+    );
+  }, [defaultCollectives, term]);
+
+  // Combine API results with defaultCollectives
+  const collectives = React.useMemo(() => {
+    // If we have search results, use them
+    if ((term || preload) && data?.search?.collectives) {
+      const apiResults = [...data.search.collectives];
+
+      // When loading is complete, we only need unique collectives
+      if (!loading && filteredDefaultCollectives.length > 0) {
+        const apiResultIds = new Set(apiResults.map(c => c.id));
+        // Add default collectives that aren't already in the results
+        filteredDefaultCollectives.forEach(c => {
+          if (!apiResultIds.has(c.id)) {
+            apiResults.push(c);
+          }
+        });
+      }
+
+      return apiResults;
+    }
+
+    // When no search or results yet, show default collectives
+    return filteredDefaultCollectives;
+  }, [term, preload, data, loading, filteredDefaultCollectives]);
+
   const filteredCollectives = filterResults ? filterResults(collectives) : collectives;
   const placeholder = getPlaceholder(intl, types);
 
