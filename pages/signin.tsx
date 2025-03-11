@@ -32,6 +32,7 @@ type SigninPageProps = {
   loadingLoggedInUser: boolean;
   router: any;
   whitelabel: WhitelabelProps;
+  untrustedDomainRedirection: boolean;
 };
 
 type SigninPageState = {
@@ -48,14 +49,16 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
       next = decodeURIComponent(next);
     }
 
-    next = next && (isValidRelativeUrl(next) || isTrustedSigninRedirectionUrl(next as string)) ? next : null;
+    const isTrustedRedirection = isTrustedSigninRedirectionUrl(next as string);
+    const isValidRelative = isValidRelativeUrl(next);
     email = typeof email === 'string' && decodeURIComponent(email);
     return {
       token,
-      next,
+      next: next && (isValidRelative || isTrustedRedirection) ? next : null,
       form: form || 'signin',
       isSuspiciousUserAgent: isSuspiciousUserAgent((req as any)?.get('User-Agent')),
       email: email && isEmail(email) ? email : null,
+      untrustedDomainRedirection: !isValidRelative && !isTrustedRedirection ? next : null,
     };
   }
 
@@ -162,8 +165,17 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
           <FormattedMessage id="domain.notAuthorized" defaultMessage="This page is not available on this domain." />
         </MessageBox>
       );
-    }
-    if (this.state.isRobot && token) {
+    } else if (this.props.untrustedDomainRedirection) {
+      return (
+        <MessageBox type="error" withIcon>
+          <FormattedMessage
+            id="signin.untrustedDomain"
+            defaultMessage="You've been requested to log-in to Open Collective by an untrusted domain: {domain}"
+            values={{ domain: this.props.untrustedDomainRedirection }}
+          />
+        </MessageBox>
+      );
+    } else if (this.state.isRobot && token) {
       return (
         <Flex flexDirection="column" alignItems="center" px={3} pb={3}>
           <P fontSize="30px" mb={3}>
