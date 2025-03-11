@@ -7,7 +7,7 @@ import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
 import { mergeDeep } from '@apollo/client/utilities';
 import { createUploadLink } from 'apollo-upload-client';
-import { isUndefined, omitBy, pick } from 'lodash';
+import { isUndefined, keys, omitBy, pick } from 'lodash';
 import type { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
 import TwoFactorAuthenticationApolloLink from './two-factor-authentication/TwoFactorAuthenticationApolloLink';
@@ -311,6 +311,10 @@ type SSRQueryHelperProps<TVariables> = {
   [APOLLO_ERROR_PROP_NAME]: any;
 };
 
+export type Context = GetServerSidePropsContext & {
+  req: GetServerSidePropsContext['res'] & { apolloClient: ApolloClient<unknown> };
+};
+
 /**
  * A helper to easily plug Apollo on functional components that use `getServerSideProps` thats make sure that
  * the server-side query and the client-side query/variables are the same; to properly rehydrate the cache.
@@ -328,11 +332,7 @@ export function getSSRQueryHelpers<TVariables, TProps = Record<string, unknown>>
 }) {
   type ServerSideProps = TProps & SSRQueryHelperProps<TVariables>;
   return {
-    getServerSideProps: async (
-      context: GetServerSidePropsContext & {
-        req: GetServerSidePropsContext['res'] & { apolloClient: ApolloClient<unknown> };
-      },
-    ): Promise<GetServerSidePropsResult<ServerSideProps>> => {
+    getServerSideProps: async (context: Context): Promise<GetServerSidePropsResult<ServerSideProps>> => {
       const props = (getPropsFromContext && getPropsFromContext(context)) || {};
       const variables = (getVariablesFromContext && getVariablesFromContext(context, props)) || {};
       const client = context.req.apolloClient;
@@ -369,5 +369,9 @@ export function getSSRQueryHelpers<TVariables, TProps = Record<string, unknown>>
     getSSRErrorFromPageProps: (pageProps: ServerSideProps): any => {
       return pageProps[APOLLO_ERROR_PROP_NAME] && getErrorFromGraphqlException(pageProps[APOLLO_ERROR_PROP_NAME]);
     },
+    checkResultContainsNonNullResult: (pageProps: ServerSideProps, key: string) =>
+      keys(pageProps[APOLLO_STATE_PROP_NAME]?.ROOT_QUERY)
+        .filter(k => k.startsWith(key))
+        .every(k => pageProps[APOLLO_STATE_PROP_NAME]?.ROOT_QUERY?.[k] === null),
   };
 }
