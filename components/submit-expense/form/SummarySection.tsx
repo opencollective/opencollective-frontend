@@ -42,6 +42,14 @@ type SummarySectionProps = {
 export function SummarySection(props: SummarySectionProps) {
   return (
     <FormSectionContainer step={Step.SUMMARY} inViewChange={props.inViewChange}>
+      <SummarySectionContent form={props.form} />
+    </FormSectionContainer>
+  );
+}
+
+export function SummarySectionContent(props: { form: ExpenseForm }) {
+  return (
+    <React.Fragment>
       <div className="rounded-md border border-gray-300 p-4 text-sm">
         <SummaryHeader
           recurrenceFrequency={props.form.values.recurrenceFrequency}
@@ -91,8 +99,8 @@ export function SummarySection(props: SummarySectionProps) {
           />
         </div>
       </div>
-      <RecurrenceOptionBox form={props.form} />
-    </FormSectionContainer>
+      {props.form.options.canSetupRecurrence && <RecurrenceOptionBox form={props.form} />}
+    </React.Fragment>
   );
 }
 
