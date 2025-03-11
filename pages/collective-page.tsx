@@ -21,6 +21,7 @@ import { CrowdfundingPreviewBanner } from '../components/crowdfunding-redesign/C
 import ErrorPage from '../components/ErrorPage';
 import Loading from '../components/Loading';
 import Page from '../components/Page';
+import { preloadCollectivePageGraphqlQueries } from '@/components/collective-page/graphql/preload';
 import { collectivePageQuery } from '@/components/collective-page/graphql/queries';
 import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '@/components/contribute-cards/constants';
 import GuestUserProfile from '@/components/GuestUserProfile';
@@ -57,6 +58,7 @@ const collectivePageQueryHelper = getSSRQueryHelpers<
   query: collectivePageQuery,
   getVariablesFromContext,
   getPropsFromContext,
+  preload: (client, result) => preloadCollectivePageGraphqlQueries(client, result?.data?.Collective),
 });
 
 // next.js export

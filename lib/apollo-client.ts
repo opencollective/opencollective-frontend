@@ -329,6 +329,7 @@ export function getSSRQueryHelpers<TVariables, TProps = Record<string, unknown>>
   getPropsFromContext?: (context: GetServerSidePropsContext) => TProps;
   getVariablesFromContext?: (context: GetServerSidePropsContext, props: Partial<TProps>) => TVariables;
   skipClientIfSSRThrows404?: boolean;
+  preload?: (client: ApolloClient<unknown>, queryResult: any) => Promise<void>;
 }) {
   type ServerSideProps = TProps & SSRQueryHelperProps<TVariables>;
   return {
@@ -339,7 +340,10 @@ export function getSSRQueryHelpers<TVariables, TProps = Record<string, unknown>>
       let error;
 
       try {
-        await client.query({ query, variables, ...queryOptions }); // Not handling the result here, we just want to make sure the query result is in the cache
+        const result = await client.query({ query, variables, ...queryOptions }); // Not handling the result here, we just want to make sure the query result is in the cache
+        if (queryOptions.preload) {
+          await queryOptions.preload(client, result);
+        }
       } catch (e) {
         error = e;
       }
