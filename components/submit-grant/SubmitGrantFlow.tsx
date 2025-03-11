@@ -202,7 +202,7 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
       {
         name: Step.INFORMATION,
         title: <FormattedMessage defaultMessage="Information" id="E80WrK" />,
-        nextButtonMessage: <FormattedMessage defaultMessage="Proceed" id="VNX4fn" />,
+        nextButtonMessage: <FormattedMessage defaultMessage="Proceed" id="VNX4fn"/>,
         items: [
           {
             name: Step.GRANT_PROVIDER,
@@ -223,8 +223,8 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
       {
         name: Step.APPLICATION_FORM,
         title: <FormattedMessage defaultMessage="Application Form" id="TeGcrX" />,
-        previousButtonMessage: <FormattedMessage defaultMessage="Back" id="cyR7Kh" />,
-        nextButtonMessage: <FormattedMessage defaultMessage="Proceed to Summary" id="VNX4fn" />,
+        previousButtonMessage: <FormattedMessage defaultMessage="Back" id="Back" />,
+        nextButtonMessage: <FormattedMessage defaultMessage="Proceed to Summary" id="tqKBWl" />,
         items: [
           {
             name: Step.WHO_WILL_RECEIVE_FUNDS,
@@ -233,21 +233,21 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
           },
           {
             name: Step.PAYOUT_METHOD,
-            title: <FormattedMessage defaultMessage="Payout Method" id="p03D8i" />,
+            title: <FormattedMessage defaultMessage="Payout Method" id="PayoutMethod" />,
             formValues: ['payoutMethodId', 'newPayoutMethod', 'payoutMethodNameDiscrepancyReason'],
           },
           {
             name: Step.DESCRIPTION,
-            title: <FormattedMessage defaultMessage="Description" id="Q8Qw5B" />,
+            title: <FormattedMessage defaultMessage="Description" id="Fields.description" />,
             formValues: ['expenseItems'],
           },
         ],
       },
       {
         name: Step.SUMMARY,
-        previousButtonMessage: <FormattedMessage defaultMessage="Back" id="cyR7Kh" />,
+        previousButtonMessage: <FormattedMessage defaultMessage="Edit Application" id="ByzFz7" />,
         nextButtonMessage: <FormattedMessage defaultMessage="Submit Application" id="1vrJP6" />,
-        title: <FormattedMessage defaultMessage="Summary" id="RrCui3" />,
+        title: <FormattedMessage defaultMessage="Summary" id="Summary" />,
       },
     ],
     expenseForm,
