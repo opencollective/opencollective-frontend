@@ -3343,6 +3343,7 @@
   "SignIn.LinkSent": "ログイン用リンクを送信しました！",
   "SignIn.SentTo": "{email} にメールを送信しました。",
   "SignIn.SuccessDetails": "メール内のリンクからリダイレクトされるので、このタブを安全に閉じることができます。",
+  "signin.untrustedDomain": "You've been requested to log-in to Open Collective by an untrusted domain: {domain}",
   "signinLinkSent.": "ログインシステムについての<Link>詳細</Link>",
   "Sioe6W": "The person you are inviting to submit this expense will be asked to provide an invoice. Do you have one?",
   "Siv4wU": "Contribution #{id}",

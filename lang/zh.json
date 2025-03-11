@@ -3343,6 +3343,7 @@
   "SignIn.LinkSent": "魔法链接正在路上！",
   "SignIn.SentTo": "我们已发送至 {email}。",
   "SignIn.SuccessDetails": "邮件中的链接将会把你带回这里，你可以安全地关闭此标签。",
+  "signin.untrustedDomain": "You've been requested to log-in to Open Collective by an untrusted domain: {domain}",
   "signinLinkSent.": "<Link>了解更多</Link>关于登录系统的信息。",
   "Sioe6W": "The person you are inviting to submit this expense will be asked to provide an invoice. Do you have one?",
   "Siv4wU": "Contribution #{id}",

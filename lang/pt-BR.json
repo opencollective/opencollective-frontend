@@ -3343,6 +3343,7 @@
   "SignIn.LinkSent": "Seu link mágico está a caminho!",
   "SignIn.SentTo": "Nós enviamos para {email}.",
   "SignIn.SuccessDetails": "Você será redirecionado a partir do link no e-mail e já pode fechar essa aba.",
+  "signin.untrustedDomain": "You've been requested to log-in to Open Collective by an untrusted domain: {domain}",
   "signinLinkSent.": "<Link>Learn more</Link> about our login system.",
   "Sioe6W": "The person you are inviting to submit this expense will be asked to provide an invoice. Do you have one?",
   "Siv4wU": "Contribution #{id}",
