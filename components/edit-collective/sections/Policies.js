@@ -119,6 +119,18 @@ const messages = defineMessages({
     id: 'collective.expensePolicy.error',
     defaultMessage: 'Expense policy must contain less than {maxLength} characters',
   },
+  'grantExpensePolicy.label': {
+    id: 'collective.grantExpensePolicy.label',
+    defaultMessage: 'Grant Expenses Policy',
+  },
+  'grantExpensePolicy.placeholder': {
+    id: 'collective.expensePolicy.placeholder',
+    defaultMessage: 'E.g. approval criteria, limitations, or required documentation.',
+  },
+  'grantExpensePolicy.error': {
+    id: 'collective.expensePolicy.error',
+    defaultMessage: 'Expense policy must contain less than {maxLength} characters',
+  },
   'receiptExpensePolicy.label': {
     id: 'collective.receiptExpensePolicy.label',
     defaultMessage: 'Receipt Expenses Policy',
@@ -533,6 +545,46 @@ const Policies = ({ collective }) => {
                   onChange={formik.handleChange}
                   placeholder={formatMessage(messages['receiptExpensePolicy.placeholder'])}
                   defaultValue={data?.account?.policies?.EXPENSE_POLICIES?.receiptPolicy}
+                  fontSize="14px"
+                  maxHeight={600}
+                />
+              )
+            }
+          </StyledInputField>
+          <P fontSize="14px" lineHeight="18px" color="black.600" my={2}>
+            <FormattedMessage
+              id="collective.expensePolicy.description"
+              defaultMessage="It can be daunting to file an expense if you're not sure what's allowed. Provide a clear policy to guide expense submitters."
+            />
+          </P>
+
+          <StyledInputField
+            name="policies.EXPENSE_POLICIES.grantPolicy"
+            htmlFor="policies.EXPENSE_POLICIES.grantPolicy"
+            error={formik.errors.policies?.EXPENSE_POLICIES?.grantPolicy}
+            disabled={isSubmittingSettings}
+            labelProps={{ mb: 2, pt: 2, lineHeight: '18px', fontWeight: 'bold' }}
+            label={formatMessage(messages['grantExpensePolicy.label'])}
+          >
+            {inputProps =>
+              loading ? (
+                <LoadingPlaceholder height={50} width={1} />
+              ) : (
+                <RichTextEditor
+                  key={data?.account?.policies?.EXPENSE_POLICIES?.grantPolicy}
+                  data-cy="grant-expense-policy-input"
+                  withBorders
+                  showCount
+                  maxLength={EXPENSE_POLICY_MAX_LENGTH}
+                  error={formik.errors.policies?.EXPENSE_POLICIES?.grantPolicy}
+                  version="simplified"
+                  editorMinHeight="12.5rem"
+                  editorMaxHeight={500}
+                  id={inputProps.id}
+                  inputName={inputProps.name}
+                  onChange={formik.handleChange}
+                  placeholder={formatMessage(messages['grantExpensePolicy.placeholder'])}
+                  defaultValue={data?.account?.policies?.EXPENSE_POLICIES?.grantPolicy || ''}
                   fontSize="14px"
                   maxHeight={600}
                 />
