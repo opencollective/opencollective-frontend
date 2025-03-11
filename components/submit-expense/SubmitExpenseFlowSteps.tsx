@@ -209,7 +209,8 @@ export function StepHeader(props: StepProps & { stepNumber: number }) {
         'relative flex items-center gap-2 pb-8 pl-7 font-bold before:absolute before:left-0 before:inline-block before:h-6 before:w-6 before:-translate-x-3 before:rounded-full before:border-2 before:border-[#94A3B8] before:bg-white before:text-center after:absolute after:top-2 after:left-0 after:-z-10 after:h-full after:-translate-x-[1px] after:border-l-2 after:border-solid last:after:hidden',
         {
           'before:border-blue-900': props.isActive,
-          "before:border-blue-900 before:bg-blue-900 before:text-white before:content-['✓']": props.isComplete && !props.isActive,
+          "before:border-blue-900 before:bg-blue-900 before:text-white before:content-['✓']":
+            props.isComplete && !props.isActive,
           'after:border-blue-900': props.isCompletedPath,
         },
       )}

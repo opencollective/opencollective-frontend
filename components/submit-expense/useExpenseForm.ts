@@ -1734,7 +1734,6 @@ export function useExpenseForm(opts: {
               : null,
           };
 
-          console.log(expenseInput)
           if (formOptions.expense?.id && !startOptions.current.duplicateExpense) {
             const editInput: EditExpenseFromDashboardMutationVariables['expenseEditInput'] = {
               ...expenseInput,
