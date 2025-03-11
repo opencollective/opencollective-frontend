@@ -202,7 +202,7 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
       {
         name: Step.INFORMATION,
         title: <FormattedMessage defaultMessage="Information" id="E80WrK" />,
-        nextButtonMessage: <FormattedMessage defaultMessage="Proceed" id="VNX4fn"/>,
+        nextButtonMessage: <FormattedMessage defaultMessage="Proceed" id="VNX4fn" />,
         items: [
           {
             name: Step.GRANT_PROVIDER,

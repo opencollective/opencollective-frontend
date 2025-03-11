@@ -37,7 +37,7 @@ type StepHeaderConfig<StepNames extends string> = {
 type StepValue<StepNames extends string> = StepItemValue<StepNames> | StepHeaderValue<StepNames>;
 
 type StepCommonValue<StepNames extends string> = {
-  name: StepNames
+  name: StepNames;
   title?: React.ReactNode;
   isHeader: boolean;
   stepNumber: number;
@@ -45,8 +45,7 @@ type StepCommonValue<StepNames extends string> = {
   isComplete: boolean;
   hasError: boolean;
   isActive: boolean;
-
-}
+};
 type StepItemValue<StepNames extends string> = StepCommonValue<StepNames> & {
   hidden?: boolean;
   isHeader?: false;
@@ -57,7 +56,7 @@ type StepHeaderValue<StepNames extends string> = StepCommonValue<StepNames> & {
   isHeader: true;
   previousButtonMessage?: React.ReactNode;
   nextButtonMessage?: React.ReactNode;
-}
+};
 
 export function useExpenseFormSteps<StepNames extends string>(
   config: StepHeaderConfig<StepNames>[],
@@ -81,7 +80,10 @@ export function useExpenseFormSteps<StepNames extends string>(
       isActive:
         step.name === activeStep || ('items' in step && (step.items ?? []).some(item => item.name === activeStep)),
       isComplete: i !== steps.length - 1 && isEmpty(pick(form.errors, step.formValues)),
-      hasError: !isEmpty(pick(form.errors, step.formValues)) && !isEmpty(pick(form.touched, step.formValues)) && form.submitCount > 0,
+      hasError:
+        !isEmpty(pick(form.errors, step.formValues)) &&
+        !isEmpty(pick(form.touched, step.formValues)) &&
+        form.submitCount > 0,
     }));
   }, [config, activeStep, form.errors, form.touched, form.submitCount]);
 
@@ -103,7 +105,10 @@ export default function SubmitGrantFlowSteps(props: SubmitGrantFlowStepsProps) {
     () => props.steps.findIndex(s => !s.isComplete && !s.isHeader),
     [props.steps],
   );
-  const activeHeader = React.useMemo(() => props.steps.find((s): s is StepHeaderValue<any> => s.isHeader && s.isActive), [props.steps]);
+  const activeHeader = React.useMemo(
+    () => props.steps.find((s): s is StepHeaderValue<any> => s.isHeader && s.isActive),
+    [props.steps],
+  );
 
   return (
     <ol className="fixed pl-[12px] text-sm">

@@ -18,7 +18,8 @@ import SubmitGrantFlow from '@/components/submit-grant/SubmitGrantFlow';
 
 const CreateGrantPageI18n = defineMessages({
   TITLE: {
-    defaultMessage: 'Grant application to {account}', id: 'miGVdq',
+    defaultMessage: 'Grant application to {account}',
+    id: 'miGVdq',
   },
 });
 
@@ -50,7 +51,7 @@ function CreateGrantPage(props: Awaited<ReturnType<typeof CreateGrantPage.getIni
 
   return (
     <Page {...pageMetadata} collective={props.account} withTopBar={false} showFooter={false}>
-      <SubmitGrantFlow accountSlug={props.account.slug} />
+      <SubmitGrantFlow accountSlug={props.account.slug} handleOnClose={() => {}} />
     </Page>
   );
 }
