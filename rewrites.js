@@ -168,6 +168,14 @@ exports.REWRITES = [
     destination: '/create-expense',
   },
   {
+    source: '/:parentCollectiveSlug/:type(events|projects)/:collectiveSlug/grants/new',
+    destination: '/create-grant',
+  },
+  {
+    source: '/:collectiveSlug/grants/new',
+    destination: '/create-grant',
+  },
+  {
     source: '/:parentCollectiveSlug/:collectiveType(events|projects)/:collectiveSlug/expenses/:ExpenseId([0-9]+)',
     destination: '/expense',
   },

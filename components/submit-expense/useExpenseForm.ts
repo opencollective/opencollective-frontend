@@ -1,6 +1,6 @@
 import React from 'react';
-import type { ApolloClient } from '@apollo/client';
-import { gql, useApolloClient } from '@apollo/client';
+import type { ApolloClient, FetchResult } from '@apollo/client';
+import { gql, useApolloClient, useMutation } from '@apollo/client';
 import { accountHasGST, accountHasVAT, checkVATNumberFormat, TaxType } from '@opencollective/taxes';
 import dayjs from 'dayjs';
 import type { Path, PathValue } from 'dot-path-value';
@@ -17,15 +17,21 @@ import { AccountTypesWithHost, CollectiveType } from '../../lib/constants/collec
 import { getPayoutProfiles } from '../../lib/expenses';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type {
+  CreateExpenseFromDashboardMutation,
+  CreateExpenseFromDashboardMutationVariables,
+  EditExpenseFromDashboardMutation,
+  EditExpenseFromDashboardMutationVariables,
   ExpenseFormExchangeRatesQuery,
   ExpenseFormExchangeRatesQueryVariables,
   ExpenseFormSchemaHostFieldsFragment,
   ExpenseFormSchemaQuery,
   ExpenseFormSchemaQueryVariables,
   ExpenseVendorFieldsFragment,
+  InviteExpenseFromDashboardMutation,
+  InviteExpenseFromDashboardMutationVariables,
   LocationInput,
 } from '../../lib/graphql/types/v2/graphql';
-import type { Amount } from '../../lib/graphql/types/v2/schema';
+import type { Amount, CurrencyExchangeRateInput, RecurringExpenseInterval } from '../../lib/graphql/types/v2/schema';
 import {
   Currency,
   ExpenseLockableFields,
@@ -38,6 +44,8 @@ import type LoggedInUser from '../../lib/LoggedInUser';
 import { isValidEmail } from '../../lib/utils';
 import { userMustSetAccountingCategory } from '../expenses/lib/accounting-categories';
 import { computeExpenseAmounts } from '../expenses/lib/utils';
+import { AnalyticsEvent } from '@/lib/analytics/events';
+import { track } from '@/lib/analytics/plausible';
 
 import { accountHoverCardFields } from '../AccountHoverCard';
 import { loggedInAccountExpensePayoutFieldsFragment } from '../expenses/graphql/fragments';
@@ -145,9 +153,11 @@ export type ExpenseFormValues = {
   acknowledgedCollectiveInvoiceExpensePolicy?: boolean;
   acknowledgedCollectiveReceiptExpensePolicy?: boolean;
   acknowledgedCollectiveTitleExpensePolicy?: boolean;
+  acknowledgedCollectiveGrantExpensePolicy?: boolean;
   acknowledgedHostInvoiceExpensePolicy?: boolean;
   acknowledgedHostReceiptExpensePolicy?: boolean;
   acknowledgedHostTitleExpensePolicy?: boolean;
+  acknowledgedHostGrantExpensePolicy?: boolean;
   hasInvoiceOption?: YesNoOption;
   invoiceFile?: Attachment;
   invoiceNumber?: string;
@@ -360,6 +370,7 @@ const formSchemaQuery = gql`
         invoicePolicy
         receiptPolicy
         titlePolicy
+        grantPolicy
       }
     }
   }
@@ -463,6 +474,7 @@ const formSchemaQuery = gql`
         invoicePolicy
         receiptPolicy
         titlePolicy
+        grantPolicy
       }
     }
 
@@ -570,6 +582,10 @@ type ExpenseFormOptions = {
   totalInvoicedInExpenseCurrency?: number;
   invitee?: ExpenseFormValues['inviteeNewIndividual'] | ExpenseFormValues['inviteeNewOrganization'];
   expenseCurrency?: Currency;
+  allowDifferentItemCurrency?: boolean;
+  isLongFormItemDescription?: boolean;
+  hasExpenseItemDate?: boolean;
+  canSetupRecurrence?: boolean;
   canChangeAccount?: boolean;
   lockedFields?: ExpenseLockableFields[];
 };
@@ -786,7 +802,7 @@ function buildFormSchema(
             .nullish()
             .refine(
               attachment => {
-                if (values.expenseTypeOption === ExpenseType.INVOICE) {
+                if ([ExpenseType.GRANT, ExpenseType.INVOICE].includes(values.expenseTypeOption)) {
                   return true;
                 }
 
@@ -796,7 +812,21 @@ function buildFormSchema(
                 message: 'Required',
               },
             ),
-          incurredAt: z.string(),
+          incurredAt: z
+            .string()
+            .nullish()
+            .refine(
+              incurredAt => {
+                if (values.expenseTypeOption === ExpenseType.GRANT) {
+                  return true;
+                }
+
+                return !!incurredAt;
+              },
+              {
+                message: 'Required',
+              },
+            ),
           amount: z.object({
             valueInCents: z.number().min(1),
             currency: z.string().refine(v => Object.values(Currency).includes(v as Currency), {
@@ -909,9 +939,29 @@ function buildFormSchema(
     acknowledgedCollectiveTitleExpensePolicy: z
       .boolean()
       .nullish()
-      .refine(v => (options.account?.policies?.EXPENSE_POLICIES?.titlePolicy ? v : true), {
-        message: 'Required',
-      }),
+      .refine(
+        v => {
+          if (values.expenseTypeOption === ExpenseType.GRANT) {
+            return true;
+          }
+          return options.account?.policies?.EXPENSE_POLICIES?.titlePolicy ? v : true;
+        },
+        {
+          message: 'Required',
+        },
+      ),
+    acknowledgedCollectiveGrantExpensePolicy: z
+      .boolean()
+      .nullish()
+      .refine(
+        v =>
+          values.expenseTypeOption === ExpenseType.GRANT && options.account?.policies?.EXPENSE_POLICIES?.grantPolicy
+            ? v
+            : true,
+        {
+          message: 'Required',
+        },
+      ),
     acknowledgedHostInvoiceExpensePolicy: z
       .boolean()
       .nullish()
@@ -944,8 +994,26 @@ function buildFormSchema(
       .boolean()
       .nullish()
       .refine(
+        v => {
+          if (values.expenseTypeOption === ExpenseType.GRANT) {
+            return true;
+          }
+          return options.host?.policies?.EXPENSE_POLICIES?.titlePolicy && options.host?.slug !== options.account?.slug
+            ? v
+            : true;
+        },
+        {
+          message: 'Required',
+        },
+      ),
+    acknowledgedHostGrantExpensePolicy: z
+      .boolean()
+      .nullish()
+      .refine(
         v =>
-          options.host?.policies?.EXPENSE_POLICIES?.titlePolicy && options.host?.slug !== options.account?.slug
+          values.expenseTypeOption === ExpenseType.GRANT &&
+          options.host?.policies?.EXPENSE_POLICIES?.grantPolicy &&
+          options.host?.slug !== options.account?.slug
             ? v
             : true,
         {
@@ -1406,10 +1474,24 @@ async function buildFormOptions(
       options.lockedFields?.includes?.(ExpenseLockableFields.AMOUNT)
     ) {
       options.expenseCurrency = options.expense.currency;
+    } else if (values.expenseTypeOption === ExpenseType.GRANT) {
+      options.expenseCurrency = options.account?.currency;
     } else if (options.payoutMethod) {
       options.expenseCurrency = options.payoutMethod.data?.currency || options.account?.currency;
     } else {
       options.expenseCurrency = options.account?.currency;
+    }
+
+    options.isLongFormItemDescription = false;
+    options.allowDifferentItemCurrency = true;
+    options.hasExpenseItemDate = true;
+    options.canSetupRecurrence = true;
+
+    if (values.expenseTypeOption === ExpenseType.GRANT) {
+      options.isLongFormItemDescription = true;
+      options.allowDifferentItemCurrency = false;
+      options.hasExpenseItemDate = false;
+      options.canSetupRecurrence = false;
     }
 
     options.allowExpenseItemAttachment = values.expenseTypeOption === ExpenseType.RECEIPT;
@@ -1480,7 +1562,13 @@ export function useExpenseForm(opts: {
   formRef?: React.MutableRefObject<HTMLFormElement>;
   initialValues: ExpenseFormValues;
   startOptions: ExpenseFormStartOptions;
-  onSubmit: (
+  handleOnSubmit?: boolean;
+  onSuccess?: (
+    result: FetchResult<CreateExpenseFromDashboardMutation> | FetchResult<EditExpenseFromDashboardMutation>,
+    type: 'new' | 'invite' | 'edit',
+  ) => void; // when handleOnSubmit === true
+  onError?: (err) => void; // when handleOnSubmit === true
+  onSubmit?: (
     values: ExpenseFormValues,
     formikHelpers: FormikHelpers<ExpenseFormValues>,
     options: ExpenseFormOptions,
@@ -1500,12 +1588,257 @@ export function useExpenseForm(opts: {
   const initialValues = React.useRef(opts.initialValues);
   const initialStatus = React.useRef({ schema: formOptions.schema });
 
-  const onSubmit = opts.onSubmit;
+  const [createExpense] = useMutation<CreateExpenseFromDashboardMutation, CreateExpenseFromDashboardMutationVariables>(
+    gql`
+      mutation CreateExpenseFromDashboard(
+        $expenseCreateInput: ExpenseCreateInput!
+        $account: AccountReferenceInput!
+        $recurring: RecurringExpenseInput
+        $privateComment: String
+      ) {
+        expense: createExpense(
+          expense: $expenseCreateInput
+          account: $account
+          privateComment: $privateComment
+          recurring: $recurring
+        ) {
+          id
+          legacyId
+        }
+      }
+    `,
+    {
+      context: {
+        ...API_V2_CONTEXT,
+        headers: {
+          'x-is-new-expense-flow': 'true',
+        },
+      },
+    },
+  );
+
+  const [draftExpenseAndInviteUser] = useMutation<
+    InviteExpenseFromDashboardMutation,
+    InviteExpenseFromDashboardMutationVariables
+  >(
+    gql`
+      mutation InviteExpenseFromDashboard(
+        $expenseInviteInput: ExpenseInviteDraftInput!
+        $account: AccountReferenceInput!
+      ) {
+        expense: draftExpenseAndInviteUser(expense: $expenseInviteInput, account: $account) {
+          id
+          legacyId
+        }
+      }
+    `,
+    {
+      context: {
+        ...API_V2_CONTEXT,
+        headers: {
+          'x-is-new-expense-flow': 'true',
+        },
+      },
+    },
+  );
+
+  const [editExpense] = useMutation<EditExpenseFromDashboardMutation, EditExpenseFromDashboardMutationVariables>(
+    gql`
+      mutation EditExpenseFromDashboard($expenseEditInput: ExpenseUpdateInput!, $draftKey: String) {
+        expense: editExpense(expense: $expenseEditInput, draftKey: $draftKey) {
+          id
+          legacyId
+        }
+      }
+    `,
+    {
+      context: {
+        ...API_V2_CONTEXT,
+        headers: {
+          'x-is-new-expense-flow': 'true',
+        },
+      },
+    },
+  );
+
+  const { onSubmit, onError, onSuccess } = opts;
   const onSubmitCallback = React.useCallback(
-    (values: ExpenseFormValues, formikHelpers: FormikHelpers<ExpenseFormValues>) => {
+    async (values: ExpenseFormValues, formikHelpers: FormikHelpers<ExpenseFormValues>) => {
+      if (opts.handleOnSubmit) {
+        let result: FetchResult<CreateExpenseFromDashboardMutation> | FetchResult<EditExpenseFromDashboardMutation>;
+        try {
+          track(AnalyticsEvent.EXPENSE_SUBMISSION_SUBMITTED);
+
+          const attachedFiles = values.additionalAttachments.map(a => ({
+            url: typeof a === 'string' ? a : a?.url,
+          }));
+
+          const expenseInput: CreateExpenseFromDashboardMutationVariables['expenseCreateInput'] = {
+            description: values.title,
+            reference:
+              values.expenseTypeOption === ExpenseType.INVOICE && values.hasInvoiceOption === YesNoOption.YES
+                ? values.invoiceNumber
+                : null,
+            payee: {
+              slug: formOptions.payee?.slug,
+            },
+            payeeLocation: values.payeeLocation,
+            payoutMethod:
+              !values.payoutMethodId || values.payoutMethodId === '__newPayoutMethod'
+                ? { ...values.newPayoutMethod, isSaved: false }
+                : values.payoutMethodId === '__newAccountBalancePayoutMethod'
+                  ? {
+                      type: PayoutMethodType.ACCOUNT_BALANCE,
+                      data: {},
+                    }
+                  : {
+                      id: values.payoutMethodId,
+                    },
+            type: values.expenseTypeOption,
+            accountingCategory: values.accountingCategoryId
+              ? {
+                  id: values.accountingCategoryId,
+                }
+              : null,
+            attachedFiles,
+            currency: formOptions.expenseCurrency,
+            customData: null,
+            invoiceInfo: null,
+            invoiceFile:
+              values.hasInvoiceOption === YesNoOption.NO
+                ? null
+                : values.invoiceFile
+                  ? { url: typeof values.invoiceFile === 'string' ? values.invoiceFile : values.invoiceFile.url }
+                  : undefined,
+            items: values.expenseItems.map(ei => ({
+              description: ei.description,
+              amountV2: {
+                valueInCents: ei.amount.valueInCents,
+                currency: ei.amount.currency as Currency,
+                exchangeRate: ei.amount.exchangeRate
+                  ? ({
+                      ...pick(ei.amount.exchangeRate, ['source', 'rate', 'value', 'fromCurrency', 'toCurrency']),
+                      date: ei.amount.exchangeRate.date || ei.incurredAt,
+                    } as CurrencyExchangeRateInput)
+                  : null,
+              },
+              incurredAt: values.expenseTypeOption === ExpenseType.GRANT ? new Date() : new Date(ei.incurredAt),
+              url:
+                values.expenseTypeOption === ExpenseType.RECEIPT
+                  ? typeof ei.attachment === 'string'
+                    ? ei.attachment
+                    : ei.attachment?.url
+                  : null,
+            })),
+            longDescription: null,
+            privateMessage: null,
+            tags: values.tags,
+            tax: values.hasTax
+              ? [
+                  {
+                    rate: values.tax.rate,
+                    type: formOptions.taxType,
+                    idNumber: values.tax.idNumber,
+                  },
+                ]
+              : null,
+          };
+
+          console.log(expenseInput)
+          if (formOptions.expense?.id && !startOptions.current.duplicateExpense) {
+            const editInput: EditExpenseFromDashboardMutationVariables['expenseEditInput'] = {
+              ...expenseInput,
+              id: formOptions.expense.id,
+              payee:
+                formOptions.expense?.status === ExpenseStatus.DRAFT && !formOptions.payee?.slug
+                  ? formOptions.expense?.draft?.payee
+                  : {
+                      slug: formOptions.payee?.slug,
+                    },
+            };
+            result = await editExpense({
+              variables: {
+                expenseEditInput: editInput,
+                draftKey: startOptions.current.draftKey,
+              },
+            });
+
+            onSuccess(result, 'edit');
+          } else if (
+            formOptions.payee?.type === CollectiveType.VENDOR ||
+            formOptions.payoutProfiles.some(p => p.slug === values.payeeSlug)
+          ) {
+            result = await createExpense({
+              variables: {
+                account: {
+                  slug: formOptions.account?.slug,
+                },
+                expenseCreateInput: expenseInput,
+                ...(values.recurrenceFrequency !== RecurrenceFrequencyOption.NONE
+                  ? {
+                      recurring: {
+                        interval: values.recurrenceFrequency as unknown as RecurringExpenseInterval,
+                        endsAt: dayjs(values.recurrenceEndAt).toDate(),
+                      },
+                    }
+                  : {}),
+                privateComment:
+                  formOptions.payoutMethod?.type === PayoutMethodType.BANK_ACCOUNT &&
+                  formOptions.payoutMethod?.data?.accountHolderName !== formOptions.payee?.legalName
+                    ? values.payoutMethodNameDiscrepancyReason
+                    : null,
+              },
+            });
+
+            onSuccess(result, 'new');
+          } else {
+            const payee =
+              values.payeeSlug === '__inviteExistingUser'
+                ? { slug: values.inviteeExistingAccount }
+                : values.inviteeAccountType === InviteeAccountType.INDIVIDUAL
+                  ? values.inviteeNewIndividual
+                  : values.inviteeNewOrganization;
+            const inviteInput: InviteExpenseFromDashboardMutationVariables['expenseInviteInput'] = {
+              ...expenseInput,
+              payee: {
+                ...payee,
+                isInvite: true,
+              },
+              recipientNote: values.inviteNote,
+            };
+            result = await draftExpenseAndInviteUser({
+              variables: {
+                account: {
+                  slug: formOptions.account?.slug,
+                },
+                expenseInviteInput: inviteInput,
+              },
+            });
+
+            onSuccess(result, 'invite');
+          }
+
+          track(AnalyticsEvent.EXPENSE_SUBMISSION_SUBMITTED_SUCCESS);
+        } catch (err) {
+          track(AnalyticsEvent.EXPENSE_SUBMISSION_SUBMITTED_ERROR);
+          onError(err);
+        } finally {
+          // h.setSubmitting(false);
+        }
+        return;
+      }
       return onSubmit(values, formikHelpers, formOptions, startOptions.current);
     },
-    [onSubmit, formOptions],
+    [
+      opts.handleOnSubmit,
+      onSubmit,
+      formOptions,
+      editExpense,
+      onSuccess,
+      createExpense,
+      draftExpenseAndInviteUser,
+      onError,
+    ],
   );
 
   const validate = React.useCallback(
