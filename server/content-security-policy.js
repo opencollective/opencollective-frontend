@@ -1,5 +1,7 @@
 const mergeWith = require('lodash/mergeWith');
 const { kebabCase, omit } = require('lodash');
+
+const { WHITELABEL_DOMAINS } = require('../lib/whitelabel.ts');
 const env = process.env.OC_ENV;
 
 const SELF = "'self'";
@@ -36,6 +38,7 @@ const COMMON_DIRECTIVES = {
     process.env.NEXT_PDF_SERVICE_URL,
     process.env.REST_URL,
     process.env.ML_SERVICE_URL,
+    ...WHITELABEL_DOMAINS,
     'wtfismyip.com',
     '*.paypal.com',
     '*.paypalobjects.com',

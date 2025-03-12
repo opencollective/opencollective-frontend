@@ -31,19 +31,21 @@ describe('white-label signin', () => {
     let secret;
     let TOTPCode;
 
-    before(() =>
-      cy.signup({ user: { settings: { features: { twoFactorAuth: true } } }, redirect: `/` }).then(u => {
-        user = u;
-        cy.logout();
-      }),
-    );
     before(() => {
       secret = speakeasy.generateSecret({ length: 64 });
-      cy.enableTwoFactorAuth({
-        userEmail: user.email,
-        userSlug: user.collective.slug,
-        secret: secret.base32,
-      });
+      return cy
+        .signup({ user: { settings: { features: { twoFactorAuth: true } } }, redirect: `/` })
+        .then(u => {
+          user = u;
+          return cy.logout();
+        })
+        .then(() => {
+          return cy.enableTwoFactorAuth({
+            userEmail: user.email,
+            userSlug: user.collective.slug,
+            secret: secret.base32,
+          });
+        });
     });
 
     it('can signin with 2fa enabled', () => {
