@@ -6,13 +6,9 @@ describe('white-label signin', () => {
     cy.contains('This page is not available on this domain');
   });
 
-  it('does not redirect if next domain is not authorized', () => {
-    cy.visit(`http://localhost:3000/signin`);
-    cy.generateToken().then(token => {
-      cy.visit(`/signin/${token}?next=http%3A%2F%2Flocal.crooked%3A3000`);
-    });
-    cy.assertLoggedIn();
-    cy.url().should('eq', `http://localhost:3000/dashboard`);
+  it('fails if platform domain is asked to redirect to an unauthorized domain', () => {
+    cy.visit(`http://localhost:3000/signin?next=http%3A%2F%2Flocal.crooked%3A3000`);
+    cy.contains("You've been requested to log-in to Open Collective by an untrusted domain");
   });
 
   it('redirects you to the main web url', () => {
@@ -35,11 +31,12 @@ describe('white-label signin', () => {
     let secret;
     let TOTPCode;
 
-    before(() => {
-      cy.signup({ user: { settings: { features: { twoFactorAuth: true } } }, redirect: `/` }).then(u => (user = u));
-      cy.logout();
-    });
-
+    before(() =>
+      cy.signup({ user: { settings: { features: { twoFactorAuth: true } } }, redirect: `/` }).then(u => {
+        user = u;
+        cy.logout();
+      }),
+    );
     before(() => {
       secret = speakeasy.generateSecret({ length: 64 });
       cy.enableTwoFactorAuth({
