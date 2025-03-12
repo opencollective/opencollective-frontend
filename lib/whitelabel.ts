@@ -3,12 +3,12 @@ import type { NextPageContext } from 'next';
 
 import { getEnvVar } from './env-utils';
 
-export const AUHTORIZED_DOMAINS: string[] = getEnvVar('WHITELABEL_DOMAINS')?.split(',') || [];
+export const WHITELABEL_DOMAINS: string[] = getEnvVar('WHITELABEL_DOMAINS')?.split(',') || [];
 
 export type WhitelabelProps = {
-  isWhitelabel: boolean;
+  isNonPlatformDomain: boolean;
   origin: string;
-  isAuthorizedDomain: boolean;
+  isWhitelabelDomain: boolean;
 };
 
 const getOrigin = (ctx: NextPageContext & { req: any }) => {
@@ -25,7 +25,7 @@ export const getWhitelabelProps = (ctx: NextPageContext & { req: any }): Whitela
     return null;
   }
 
-  const isWhitelabel = !process.env.WEBSITE_URL.includes(origin);
-  const isAuthorizedDomain = isEmpty(AUHTORIZED_DOMAINS) ? false : AUHTORIZED_DOMAINS.includes(origin);
-  return { isWhitelabel, origin, isAuthorizedDomain };
+  const isNonPlatformDomain = !process.env.WEBSITE_URL.includes(origin);
+  const isWhitelabelDomain = isEmpty(WHITELABEL_DOMAINS) ? false : WHITELABEL_DOMAINS.includes(origin);
+  return { isNonPlatformDomain, origin, isWhitelabelDomain };
 };
