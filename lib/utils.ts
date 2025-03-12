@@ -3,6 +3,8 @@ import loadScript from 'load-script';
 import { isEmpty, isObject, omit } from 'lodash';
 import { twMerge } from 'tailwind-merge';
 
+import { WHITELABEL_DOMAINS } from './whitelabel';
+
 /**
  * Helper to make it easier to conditionally add and deduplicate Tailwind CSS classes and deduplicate
  */
@@ -67,6 +69,16 @@ export const isValidRelativeUrl = url => {
       return true;
     }
   }
+};
+
+export const isTrustedSigninRedirectionUrl = (url: string) => {
+  if (!url) {
+    return false;
+  } else if (url.startsWith('http://') || url.startsWith('https://')) {
+    const parsedUrl = new URL(url);
+    return WHITELABEL_DOMAINS.includes(parsedUrl.origin);
+  }
+  return false;
 };
 
 export const isValidEmail = email => {
