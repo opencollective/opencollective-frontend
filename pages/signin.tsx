@@ -73,8 +73,8 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
       this.robotsDetector.startListening(() => this.setState({ isRobot: false }));
     } else if (
       !this.props.token &&
-      this.props.whitelabel.isNonPlatformDomain &&
-      this.props.whitelabel.isWhitelabelDomain
+      this.props.whitelabel?.isNonPlatformDomain &&
+      this.props.whitelabel?.isWhitelabelDomain
     ) {
       const platformSignInUrl = new URL(`${process.env.WEBSITE_URL}/signin`);
       platformSignInUrl.searchParams.set('next', window.location.origin + (this.props.next || '/'));
