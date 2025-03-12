@@ -1,14 +1,12 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { mapValues } from 'lodash';
-import type { NextPageContext } from 'next';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
 
 import { isSuspiciousUserAgent, RobotsDetector } from '../lib/robots-detector';
-import { isTrustedSigninRedirectionUrl, isValidRelativeUrl } from '../lib/utils';
-import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '@/lib/local-storage';
-import type { WhitelabelProps } from '@/lib/whitelabel';
+import { isValidRelativeUrl } from '../lib/utils';
 
 import Body from '../components/Body';
 import { Flex } from '../components/Grid';
@@ -20,47 +18,36 @@ import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { P } from '../components/Text';
 import { withUser } from '../components/UserProvider';
 
-type SigninPageProps = {
-  token: string;
-  next: string;
-  form: 'signin' | 'create-account';
-  isSuspiciousUserAgent: boolean;
-  email: string;
-  login: (token?: string) => Promise<any>;
-  errorLoggedInUser: string;
-  LoggedInUser: any;
-  loadingLoggedInUser: boolean;
-  router: any;
-  whitelabel: WhitelabelProps;
-  untrustedDomainRedirection: boolean;
-};
-
-type SigninPageState = {
-  error: string | null;
-  success: boolean | null;
-  isRobot: boolean;
-  redirecting: boolean;
-};
-
-class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
-  static getInitialProps({ query: { token, next, form, email }, req }: NextPageContext) {
+class SigninPage extends React.Component {
+  static getInitialProps({ query: { token, next, form, email }, req }) {
     // Decode next URL if URI encoded
-    if (typeof next === 'string' && next.startsWith('%2F')) {
+    if (next && next.startsWith('%2F')) {
       next = decodeURIComponent(next);
     }
 
-    const isTrustedRedirection = isTrustedSigninRedirectionUrl(next as string);
-    const isValidRelative = isValidRelativeUrl(next);
-    email = typeof email === 'string' && decodeURIComponent(email);
+    next = next && isValidRelativeUrl(next) ? next : null;
+    email = email && decodeURIComponent(email);
     return {
       token,
-      next: next && (isValidRelative || isTrustedRedirection) ? next : null,
+      next,
       form: form || 'signin',
-      isSuspiciousUserAgent: isSuspiciousUserAgent((req as any)?.get('User-Agent')),
+      isSuspiciousUserAgent: isSuspiciousUserAgent(req?.get('User-Agent')),
       email: email && isEmail(email) ? email : null,
-      untrustedDomainRedirection: !isValidRelative && !isTrustedRedirection ? next : null,
     };
   }
+
+  static propTypes = {
+    form: PropTypes.oneOf(['signin', 'create-account']).isRequired,
+    token: PropTypes.string,
+    email: PropTypes.string,
+    next: PropTypes.string,
+    login: PropTypes.func,
+    errorLoggedInUser: PropTypes.string,
+    LoggedInUser: PropTypes.object,
+    loadingLoggedInUser: PropTypes.bool,
+    isSuspiciousUserAgent: PropTypes.bool,
+    router: PropTypes.object,
+  };
 
   constructor(props) {
     super(props);
@@ -71,14 +58,6 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
   componentDidMount() {
     if (this.state.isRobot) {
       this.robotsDetector.startListening(() => this.setState({ isRobot: false }));
-    } else if (
-      !this.props.token &&
-      this.props.whitelabel.isNonPlatformDomain &&
-      this.props.whitelabel.isWhitelabelDomain
-    ) {
-      const platformSignInUrl = new URL(`${process.env.WEBSITE_URL}/signin`);
-      platformSignInUrl.searchParams.set('next', window.location.origin + (this.props.next || '/'));
-      this.props.router.replace(platformSignInUrl.toString());
     } else {
       this.initialize();
     }
@@ -103,17 +82,7 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
       this.setState({ success: true, redirecting: true });
       // Avoid redirect loop: replace '/signin' redirects by '/'
       const { next } = this.props;
-      let redirect = next && (next.match(/^\/?signin[?/]?/) || next.match(/^\/?reset-password[?/]?/)) ? null : next;
-      const isTrustedWhitelabel = isTrustedSigninRedirectionUrl(redirect);
-      if (isTrustedWhitelabel) {
-        const parsedUrl = new URL(redirect);
-        parsedUrl.pathname = '/signin';
-
-        const token = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-        parsedUrl.searchParams.set('token', token);
-        parsedUrl.searchParams.set('next', parsedUrl.pathname);
-        redirect = parsedUrl.toString();
-      }
+      const redirect = next && (next.match(/^\/?signin[?/]?/) || next.match(/^\/?reset-password[?/]?/)) ? null : next;
       const defaultRedirect = '/dashboard';
       await this.props.router.replace(redirect && redirect !== '/' ? redirect : defaultRedirect);
       window.scroll(0, 0);
@@ -123,8 +92,6 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
   componentWillUnmount() {
     this.robotsDetector.stopListening();
   }
-
-  robotsDetector: RobotsDetector;
 
   async initialize() {
     if (this.props.token) {
@@ -161,25 +128,9 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
   }
 
   renderContent() {
-    const { loadingLoggedInUser, errorLoggedInUser, token, next, form, LoggedInUser, whitelabel } = this.props;
+    const { loadingLoggedInUser, errorLoggedInUser, token, next, form, LoggedInUser } = this.props;
 
-    if (whitelabel?.isNonPlatformDomain && !whitelabel?.isWhitelabelDomain) {
-      return (
-        <MessageBox type="error" withIcon>
-          <FormattedMessage id="domain.notAuthorized" defaultMessage="This page is not available on this domain." />
-        </MessageBox>
-      );
-    } else if (this.props.untrustedDomainRedirection) {
-      return (
-        <MessageBox type="error" withIcon>
-          <FormattedMessage
-            id="signin.untrustedDomain"
-            defaultMessage="You've been requested to log-in to Open Collective by an untrusted domain: {domain}"
-            values={{ domain: this.props.untrustedDomainRedirection }}
-          />
-        </MessageBox>
-      );
-    } else if (this.state.isRobot && token) {
+    if (this.state.isRobot && token) {
       return (
         <Flex flexDirection="column" alignItems="center" px={3} pb={3}>
           <P fontSize="30px" mb={3}>

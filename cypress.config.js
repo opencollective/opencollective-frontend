@@ -24,10 +24,6 @@ module.exports = defineConfig({
   screenshotsFolder: 'test/cypress/screenshots',
   videosFolder: 'test/cypress/videos',
   downloadsFolder: 'test/cypress/downloads',
-  hosts: {
-    'local.opencollective': '127.0.0.1',
-    'local.crooked': '127.0.0.1',
-  },
   e2e: {
     setupNodeEvents(on, config) {
       // eslint-disable-next-line n/no-unpublished-require

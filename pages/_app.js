@@ -47,7 +47,6 @@ import { getGoogleMapsScriptUrl, loadGoogleMaps } from '../lib/google-maps';
 import { loggedInUserQuery } from '../lib/graphql/v1/queries';
 import LoggedInUser from '../lib/LoggedInUser';
 import { withTwoFactorAuthentication } from '../lib/two-factor-authentication/TwoFactorAuthenticationContext';
-import { getWhitelabelProps } from '../lib/whitelabel';
 import sentryLib, { Sentry } from '../server/sentry';
 
 import GlobalNewsAndUpdates from '../components/GlobalNewsAndUpdates';
@@ -83,15 +82,11 @@ class OpenCollectiveFrontendApp extends App {
       ctx.req.apolloClient = apolloClient;
     }
 
-    const props = {
-      pageProps: { skipDataFromTree: true, whitelabel: getWhitelabelProps(ctx) },
-      scripts: {},
-      ...getIntlProps(ctx),
-    };
+    const props = { pageProps: { skipDataFromTree: true }, scripts: {}, ...getIntlProps(ctx) };
 
     try {
       if (Component.getInitialProps) {
-        props.pageProps = { ...(await Component.getInitialProps({ ...ctx })), whitelabel: props.pageProps.whitelabel };
+        props.pageProps = await Component.getInitialProps({ ...ctx });
       }
 
       if (props.pageProps.scripts) {
