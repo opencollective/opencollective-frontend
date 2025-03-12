@@ -71,7 +71,11 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
   componentDidMount() {
     if (this.state.isRobot) {
       this.robotsDetector.startListening(() => this.setState({ isRobot: false }));
-    } else if (!this.props.token && this.props.whitelabel.isWhitelabel && this.props.whitelabel.isAuthorizedDomain) {
+    } else if (
+      !this.props.token &&
+      this.props.whitelabel.isNonPlatformDomain &&
+      this.props.whitelabel.isWhitelabelDomain
+    ) {
       const platformSignInUrl = new URL(`${process.env.WEBSITE_URL}/signin`);
       platformSignInUrl.searchParams.set('next', window.location.origin + (this.props.next || '/'));
       this.props.router.replace(platformSignInUrl.toString());
@@ -159,7 +163,7 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
   renderContent() {
     const { loadingLoggedInUser, errorLoggedInUser, token, next, form, LoggedInUser, whitelabel } = this.props;
 
-    if (whitelabel?.isWhitelabel && !whitelabel?.isAuthorizedDomain) {
+    if (whitelabel?.isNonPlatformDomain && !whitelabel?.isWhitelabelDomain) {
       return (
         <MessageBox type="error" withIcon>
           <FormattedMessage id="domain.notAuthorized" defaultMessage="This page is not available on this domain." />
