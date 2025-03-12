@@ -29,10 +29,6 @@ export const APOLLO_VARIABLES_PROP_NAME = '__APOLLO_VARIABLES__' as const;
 
 const getBaseApiUrl = (apiVersion, internal = false) => {
   if (process.browser) {
-    const origin = window.location.origin;
-    if (origin !== process.env.WEBSITE_URL) {
-      return `${process.env.WEBSITE_URL}/api`;
-    }
     return '/api';
   }
 
