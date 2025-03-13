@@ -714,7 +714,10 @@ function buildFormSchema(
       .nullish()
       .refine(
         v => {
-          if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
+          if (
+            ['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug) ||
+            values.expenseTypeOption === ExpenseType.GRANT
+          ) {
             return true;
           }
 
@@ -1674,7 +1677,10 @@ export function useExpenseForm(opts: {
           }));
 
           const expenseInput: CreateExpenseFromDashboardMutationVariables['expenseCreateInput'] = {
-            description: values.title,
+            description:
+              values.expenseTypeOption === ExpenseType.GRANT && isEmpty(values.title)
+                ? generateGrantTitle(formOptions.account, formOptions.payee, formOptions.invitee)
+                : values.title,
             reference:
               values.expenseTypeOption === ExpenseType.INVOICE && values.hasInvoiceOption === YesNoOption.YES
                 ? values.invoiceNumber
@@ -2029,11 +2035,18 @@ export function useExpenseForm(opts: {
       expenseForm.values.expenseItems.length === 1 &&
       !isEmpty(expenseForm.values.expenseItems[0].description) &&
       !expenseForm.touched.title &&
-      !formOptions.lockedFields?.includes?.(ExpenseLockableFields.DESCRIPTION)
+      !formOptions.lockedFields?.includes?.(ExpenseLockableFields.DESCRIPTION) &&
+      expenseForm.values.expenseTypeOption !== ExpenseType.GRANT
     ) {
       setFieldValue('title', expenseForm.values.expenseItems[0].description);
     }
-  }, [expenseForm.values.expenseItems, expenseForm.touched.title, setFieldValue, formOptions.lockedFields]);
+  }, [
+    expenseForm.values.expenseItems,
+    expenseForm.touched.title,
+    setFieldValue,
+    formOptions.lockedFields,
+    expenseForm.values.expenseTypeOption,
+  ]);
 
   React.useEffect(() => {
     if (!expenseForm.values.hasTax) {
@@ -2211,4 +2224,11 @@ export function useExpenseForm(opts: {
     initialLoading: initialLoading.current,
     refresh,
   });
+}
+export function generateGrantTitle(
+  account: ExpenseFormOptions['account'],
+  payee: ExpenseFormOptions['payee'],
+  invitee: ExpenseFormOptions['invitee'],
+): string {
+  return `${account.name} - ${payee ? payee.name : invitee?.name}`;
 }

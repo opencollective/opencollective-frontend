@@ -1,6 +1,5 @@
 /* eslint-disable prefer-arrow-callback */
 import React from 'react';
-import { FastField } from 'formik';
 import { omit, pick, round } from 'lodash';
 import { AtSign, Building, Contact, Globe, Lock, Mail } from 'lucide-react';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
@@ -31,7 +30,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import UploadedFilePreview from '../../UploadedFilePreview';
 import { PayoutMethodDetailsContainer } from '../PayoutMethodDetails';
 import { Step } from '../SubmitExpenseFlowSteps';
-import { type ExpenseForm, RecurrenceFrequencyOption, YesNoOption } from '../useExpenseForm';
+import { type ExpenseForm, generateGrantTitle, RecurrenceFrequencyOption, YesNoOption } from '../useExpenseForm';
 
 import { FormSectionContainer } from './FormSectionContainer';
 
@@ -56,6 +55,10 @@ export function SummarySectionContent(props: { form: ExpenseForm }) {
           expenseTypeOption={props.form.values.expenseTypeOption}
           tags={props.form.values.tags}
           submitter={props.form.options.submitter}
+          account={props.form.options.account}
+          payee={props.form.options.payee}
+          invitee={props.form.options.invitee}
+          title={props.form.values.title}
         />
       </div>
       <div className="mt-4 rounded-md border border-gray-300 p-4 text-sm">
@@ -108,23 +111,23 @@ const SummaryHeader = React.memo(function SummaryHeader(props: {
   recurrenceFrequency: ExpenseForm['values']['recurrenceFrequency'];
   expenseTypeOption: ExpenseForm['values']['expenseTypeOption'];
   tags: ExpenseForm['values']['tags'];
+  title: ExpenseForm['values']['title'];
   submitter: ExpenseForm['options']['submitter'];
+  account: ExpenseForm['options']['account'];
+  payee: ExpenseForm['options']['payee'];
+  invitee: ExpenseForm['options']['invitee'];
 }) {
   return (
     <React.Fragment>
       <div className="mb-4 flex justify-between">
         <div className="text-base font-bold">
-          <FastField name="title">
-            {({ field }) => {
-              return (
-                field.value || (
-                  <span className="text-muted-foreground">
-                    <FormattedMessage defaultMessage="Expense title" id="yH3Z6O" />
-                  </span>
-                )
-              );
-            }}
-          </FastField>
+          {props.title || props.expenseTypeOption === ExpenseType.GRANT ? (
+            generateGrantTitle(props.account, props.payee, props.invitee)
+          ) : (
+            <span className="text-muted-foreground">
+              <FormattedMessage defaultMessage="Expense title" id="yH3Z6O" />
+            </span>
+          )}
         </div>
         {props.recurrenceFrequency && props.recurrenceFrequency !== 'none' && (
           <span className="rounded-xl bg-slate-100 px-3 py-1 font-mono text-xs text-muted-foreground uppercase">
