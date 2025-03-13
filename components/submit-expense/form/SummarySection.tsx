@@ -1,5 +1,7 @@
 /* eslint-disable prefer-arrow-callback */
 import React from 'react';
+import { gql, useQuery } from '@apollo/client';
+import dayjs from 'dayjs';
 import { omit, pick, round } from 'lodash';
 import { AtSign, Building, Contact, Globe, Lock, Mail } from 'lucide-react';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
@@ -9,8 +11,10 @@ import { ExpenseType } from '../../../lib/graphql/types/v2/schema';
 import { RecurringExpenseIntervals } from '../../../lib/i18n/expense';
 import { i18nTaxType } from '../../../lib/i18n/taxes';
 import { getExpenseExchangeRateWarningOrError, getTaxAmount, isTaxRateValid } from '../../expenses/lib/utils';
+import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import { ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
 
+import { I18nBold, I18nItalic } from '@/components/I18nFormatters';
 import { Skeleton } from '@/components/ui/Skeleton';
 
 import { AccountHoverCard } from '../../AccountHoverCard';
@@ -70,7 +74,17 @@ export function SummarySectionContent(props: { form: ExpenseForm }) {
           totalInvoicedInExpenseCurrency={props.form.options.totalInvoicedInExpenseCurrency}
           taxType={props.form.options.taxType}
         />
+        {props.form.options.expenseCurrency !== props.form.options.payoutMethod?.data?.currency && (
+          <MessageBox className="mt-4" type="warning">
+            <PayoutMethodExchangeRateWarning
+              expenseCurrency={props.form.options.expenseCurrency}
+              payoutMethodCurrency={props.form.options.payoutMethod?.data?.currency}
+              totalInvoicedInExpenseCurrency={props.form.options.totalInvoicedInExpenseCurrency}
+            />
+          </MessageBox>
+        )}
       </div>
+
       {props.form.values.additionalAttachments?.length > 0 && (
         <div className="mt-4 rounded-md border border-gray-300 p-4 text-sm">
           <AdditionalAttachmentsSection additionalAttachments={props.form.values.additionalAttachments} />
@@ -692,6 +706,77 @@ function RecurrenceOptionBox(props: { form: ExpenseForm }) {
           </div>
         )}
       </MessageBox>
+    </div>
+  );
+}
+
+type PayoutMethodExchangeRateWarningProps = {
+  expenseCurrency: string;
+  payoutMethodCurrency: string;
+  totalInvoicedInExpenseCurrency: number;
+};
+
+function PayoutMethodExchangeRateWarning(props: PayoutMethodExchangeRateWarningProps) {
+  const exchangeRateRequests = React.useMemo(
+    () => [
+      {
+        fromCurrency: props.expenseCurrency,
+        toCurrency: props.payoutMethodCurrency,
+        date: dayjs.utc().toDate(),
+      },
+    ],
+    [props.expenseCurrency, props.payoutMethodCurrency],
+  );
+
+  const exchangeRateQuery = useQuery(
+    gql`
+      query PayoutMethodExchangeRateWarning($exchangeRateRequests: [CurrencyExchangeRateRequest!]!) {
+        currencyExchangeRate(requests: $exchangeRateRequests) {
+          value
+          source
+          fromCurrency
+          toCurrency
+          date
+          isApproximate
+        }
+      }
+    `,
+    {
+      context: API_V2_CONTEXT,
+      variables: {
+        exchangeRateRequests,
+      },
+    },
+  );
+
+  if (exchangeRateQuery.loading) {
+    return <Skeleton />;
+  }
+
+  const exchangeRate = exchangeRateQuery.data?.currencyExchangeRate?.at(0);
+  const amount = {
+    value: (props.totalInvoicedInExpenseCurrency / 100) * exchangeRate.value,
+    valueInCents: props.totalInvoicedInExpenseCurrency * exchangeRate.value,
+    currency: props.payoutMethodCurrency,
+    exchangeRate,
+  };
+
+  return (
+    <div>
+      <FormattedMessage
+        defaultMessage="Amount in your payout method currency: <b>{amountInPayoutMethodCurrency}</b>.<br></br><i>This is only an <b>estimate</b> based on today's exchange rate</i><br></br><br></br><b>Payment processor fees can be applied and exchange rate is subject to change until payout.</b>"
+        id="kmQQS/"
+        values={{
+          b: I18nBold,
+          br: () => <br />,
+          i: I18nItalic,
+          amountInPayoutMethodCurrency: (
+            <div className="inline-flex">
+              <AmountWithExchangeRateInfo amount={amount} />
+            </div>
+          ),
+        }}
+      />
     </div>
   );
 }
