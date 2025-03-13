@@ -135,7 +135,9 @@ const SummaryHeader = React.memo(function SummaryHeader(props: {
     <React.Fragment>
       <div className="mb-4 flex justify-between">
         <div className="text-base font-bold">
-          {props.title || props.expenseTypeOption === ExpenseType.GRANT ? (
+          {props.title ? (
+            props.title
+          ) : props.expenseTypeOption === ExpenseType.GRANT ? (
             generateGrantTitle(props.account, props.payee, props.invitee)
           ) : (
             <span className="text-muted-foreground">
@@ -746,14 +748,17 @@ function PayoutMethodExchangeRateWarning(props: PayoutMethodExchangeRateWarningP
       variables: {
         exchangeRateRequests,
       },
+      skip:
+        !props.expenseCurrency || !props.payoutMethodCurrency || props.expenseCurrency === props.payoutMethodCurrency,
     },
   );
 
-  if (exchangeRateQuery.loading) {
+  const exchangeRate = exchangeRateQuery.data?.currencyExchangeRate?.at(0);
+
+  if (!exchangeRate) {
     return <Skeleton />;
   }
 
-  const exchangeRate = exchangeRateQuery.data?.currencyExchangeRate?.at(0);
   const amount = {
     value: (props.totalInvoicedInExpenseCurrency / 100) * exchangeRate.value,
     valueInCents: props.totalInvoicedInExpenseCurrency * exchangeRate.value,
