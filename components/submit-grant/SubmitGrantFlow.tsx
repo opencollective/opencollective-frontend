@@ -3,6 +3,7 @@ import type { FetchResult } from '@apollo/client';
 import { FormikProvider, useFormikContext } from 'formik';
 import { isEmpty, pick } from 'lodash';
 import { X } from 'lucide-react';
+import { useRouter } from 'next/router';
 import { useInView } from 'react-intersection-observer';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -15,6 +16,7 @@ import { ExpenseStatus, ExpenseType } from '@/lib/graphql/types/v2/schema';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { objectKeys } from '@/lib/utils';
 
+import { I18nBold } from '../I18nFormatters';
 import { AdditionalAttachments, ExpenseItemsForm } from '../submit-expense/form/ExpenseItemsSection';
 import { PayoutMethodFormContent } from '../submit-expense/form/PayoutMethodSection';
 import { SummarySectionContent } from '../submit-expense/form/SummarySection';
@@ -29,30 +31,53 @@ import {
 } from '../submit-expense/useExpenseForm';
 import { Survey, SURVEY_KEY } from '../Survey';
 import { Button } from '../ui/Button';
-import { Dialog, DialogContent } from '../ui/Dialog';
+import { Dialog, DialogContent, DialogFooter } from '../ui/Dialog';
 import { useToast } from '../ui/useToast';
 
 import { GrantProviderSection } from './sections/GrantProviderSection';
 import { InstructionSection } from './sections/InstructionsSection';
+import { InvitationNoteSection } from './sections/InvitationNoteSection';
 import SubmitGrantFlowSteps, { Step, useExpenseFormSteps } from './SubmitGrantFlowSteps';
 
 type SubmitGrantFlowProps = {
-  accountSlug: string;
+  account: { slug: string; name?: string };
+  expenseId?: number;
+  draftKey?: string;
   handleOnClose: () => void;
 };
 
 export default function SubmitGrantFlow(props: SubmitGrantFlowProps) {
-  return <SubmitGrantDialog accountSlug={props.accountSlug} handleOnClose={props.handleOnClose} />;
+  return (
+    <SubmitGrantDialog
+      expenseId={props.expenseId}
+      draftKey={props.draftKey}
+      account={props.account}
+      handleOnClose={props.handleOnClose}
+    />
+  );
 }
 
 type SubmitGrantDialogProps = {
   handleOnClose: () => void;
   loading?: boolean;
-  accountSlug: string;
+  expenseId?: number;
+  draftKey?: string;
+  account: { slug: string; name?: string };
 };
 
 function SubmitGrantDialog(props: SubmitGrantDialogProps) {
+  const router = useRouter();
+  const { LoggedInUser } = useLoggedInUser();
   const [submittedGrantId, setSubmittedGrantId] = React.useState(null);
+
+  const onViewAllExpensesClick = React.useCallback(() => {
+    if (LoggedInUser) {
+      router.replace(`/dashboard/${LoggedInUser.collective.slug}/submitted-expenses`);
+    } else {
+      router.replace(`${props.account.slug}/expenses`);
+    }
+  }, [LoggedInUser, props.account.slug, router]);
+
   return (
     <Dialog
       defaultOpen
@@ -76,7 +101,15 @@ function SubmitGrantDialog(props: SubmitGrantDialogProps) {
         <div className="flex max-h-screen min-h-screen max-w-screen min-w-screen flex-col overflow-hidden bg-[#F8FAFC]">
           <header className="flex min-w-screen items-center justify-between border-b border-slate-100 px-4 py-3 sm:px-10">
             <span className="text-xl leading-7 font-bold text-slate-800">
-              {!submittedGrantId && <FormattedMessage defaultMessage="Submit grant" id="D0n2CD" />}
+              {!submittedGrantId && (
+                <FormattedMessage
+                  defaultMessage="Grant Applicatio to {accountName}"
+                  id="tk1wte"
+                  values={{
+                    accountName: props.account.name,
+                  }}
+                />
+              )}
               {submittedGrantId && (
                 <span className="text-xl leading-7 font-bold text-slate-800">
                   <FormattedMessage
@@ -113,16 +146,47 @@ function SubmitGrantDialog(props: SubmitGrantDialogProps) {
           </header>
           <main className="flex w-full grow overflow-hidden">
             {!submittedGrantId && (
-              <SubmitGrantDialogContent accountSlug={props.accountSlug} onGrantSubmitted={setSubmittedGrantId} />
+              <SubmitGrantDialogContent
+                draftKey={props.draftKey}
+                expenseId={props.expenseId}
+                accountSlug={props.account.slug}
+                onGrantSubmitted={setSubmittedGrantId}
+              />
             )}
             {submittedGrantId && (
               <div className="flex w-full grow justify-center overflow-y-scroll">
-                <div className="flex w-full max-w-(--breakpoint-xl) flex-col pt-4 sm:flex sm:flex-row sm:gap-11 sm:px-8 sm:pt-8 lg:pt-24">
+                <div className="flex w-full max-w-(--breakpoint-xl) flex-col justify-center pt-4 sm:flex sm:flex-row sm:gap-11 sm:px-8 sm:pt-8 lg:pt-24">
                   <SubmittedExpense expenseId={submittedGrantId} />
                 </div>
               </div>
             )}
           </main>
+          {submittedGrantId && (
+            <DialogFooter className="z-30 flex justify-center border-t bg-[#BBE0FF] p-4 text-sm leading-5 text-[#184090] sm:justify-center sm:px-0">
+              <FormattedMessage
+                defaultMessage="<b>Grants are processed as 'expenses'.</b> To view your application, <link>View All Expenses</link>"
+                id="oAwTV8"
+                values={{
+                  b: I18nBold,
+                  link: c => {
+                    return (
+                      <React.Fragment>
+                        &nbsp;
+                        <Button
+                          className="h-5 px-0 leading-5"
+                          size="xs"
+                          variant="link"
+                          onClick={onViewAllExpensesClick}
+                        >
+                          {c}
+                        </Button>
+                      </React.Fragment>
+                    );
+                  },
+                }}
+              />
+            </DialogFooter>
+          )}
         </div>
       </DialogContent>
     </Dialog>
@@ -131,6 +195,8 @@ function SubmitGrantDialog(props: SubmitGrantDialogProps) {
 
 type SubmitGrantDialogContentProps = {
   accountSlug: string;
+  expenseId?: number;
+  draftKey?: string;
   onGrantSubmitted: (expenseId: number) => void;
 };
 
@@ -140,7 +206,10 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
   const intl = useIntl();
   const formRef = React.useRef<HTMLFormElement>();
 
-  const startOptions = React.useRef({});
+  const startOptions = React.useRef<ExpenseForm['startOptions']>({
+    expenseId: props.expenseId,
+    draftKey: props.draftKey,
+  });
 
   const onError = React.useCallback(
     err => {
@@ -290,6 +359,7 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
       setActiveStep(Step.SUMMARY);
       return;
     }
+
     handleSubmit();
   }, [
     validateForm,
@@ -302,17 +372,17 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
 
   return (
     <FormikProvider value={expenseForm}>
-      <div className="relative flex w-full grow flex-row justify-center pt-10 sm:gap-11 sm:pl-8">
+      <div className="relative flex w-full grow flex-row justify-center overflow-y-scroll pt-10 sm:gap-11 sm:pl-8">
         <div className="hidden w-64 min-w-44 sm:block">
           <SubmitGrantFlowSteps steps={steps.steps} />
         </div>
-        <form className="flex flex-grow flex-col" ref={formRef} onSubmit={e => e.preventDefault()}>
-          <div className="grow basis-1 overflow-y-scroll">
-            <div className="w-full px-4 pb-4 sm:max-w-3xl sm:overflow-x-hidden sm:px-0">
+        <form className="flex w-full flex-col sm:max-w-3xl" ref={formRef} onSubmit={e => e.preventDefault()}>
+          <div className="grow basis-1 sm:px-0">
+            <div className="px-4 pb-4">
               <FormContainer activeHeader={steps.activeHeaderName} onVisibleSectionChange={onVisibleSectionChange} />
             </div>
-            <div className="sticky bottom-0 w-full bg-[#F8FAFC] sm:max-w-3xl">
-              <div className="flex justify-between px-4 py-4 sm:overflow-x-hidden sm:px-0">
+            <div className="sticky bottom-0 bg-[#F8FAFC]">
+              <div className="flex justify-between px-4 py-4">
                 {steps.activeHeader.previousButtonMessage ? (
                   <Button variant="outline" onClick={onBackStepClick}>
                     {steps.activeHeader.previousButtonMessage}
@@ -362,23 +432,28 @@ function FormContainer(props: FormContainerProps) {
             <GrantProviderSection {...GrantProviderSection.getFormProps(form)} />
           </FormSectionContainer>
 
-          <FormSectionContainer
-            id={Step.INSTRUCTIONS}
-            inViewChange={onInViewChange}
-            title={<FormattedMessage defaultMessage="Instructions" id="sV2v5L" />}
-          >
-            <InstructionSection {...InstructionSection.getFormProps(form)} />
-          </FormSectionContainer>
-
-          {form.options.expense?.status === ExpenseStatus.DRAFT && (
+          {((form.options.host?.slug !== form.options.account?.slug &&
+            form.options.host?.policies?.EXPENSE_POLICIES?.grantPolicy) ||
+            form.options.account?.policies?.EXPENSE_POLICIES?.grantPolicy) && (
             <FormSectionContainer
-              id={Step.INVITATION_NOTE}
+              id={Step.INSTRUCTIONS}
               inViewChange={onInViewChange}
-              title={<FormattedMessage defaultMessage="Invitation Note" id="aqqLMi" />}
+              title={<FormattedMessage defaultMessage="Instructions" id="sV2v5L" />}
             >
-              <FormattedMessage defaultMessage="Invitation Note" id="aqqLMi" />
+              <InstructionSection {...InstructionSection.getFormProps(form)} />
             </FormSectionContainer>
           )}
+
+          {form.options.expense?.status === ExpenseStatus.DRAFT &&
+            !isEmpty(form.options.expense?.draft?.recipientNote) && (
+              <FormSectionContainer
+                id={Step.INVITATION_NOTE}
+                inViewChange={onInViewChange}
+                title={<FormattedMessage defaultMessage="Invitation Note" id="aqqLMi" />}
+              >
+                <InvitationNoteSection form={form} />
+              </FormSectionContainer>
+            )}
         </React.Fragment>
       )}
       {props.activeHeader === Step.APPLICATION_FORM && (

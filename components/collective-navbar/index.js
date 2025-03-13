@@ -307,6 +307,7 @@ const getMainAction = (
   callsToAction,
   LoggedInUser,
   isNewExpenseFlowEnabled = false,
+  isNewGrantFlowEnabled = false,
   onOpenSubmitExpenseModalClick = () => {},
 ) => {
   if (!collective || !callsToAction) {
@@ -351,7 +352,7 @@ const getMainAction = (
     return {
       type: NAVBAR_ACTION_TYPE.REQUEST_GRANT,
       component: (
-        <Link href={`${getCollectivePageRoute(collective)}/expenses/new`}>
+        <Link href={`${getCollectivePageRoute(collective)}/${isNewGrantFlowEnabled ? 'grants' : 'expenses'}/new`}>
           <ActionButton tabIndex="-1">
             <MoneyCheckAlt size="1em" />
             <Span ml={2}>
@@ -468,9 +469,11 @@ const CollectiveNavbar = ({
 
   const loading = isLoading || dataLoading;
 
+  const isNewGrantFlowEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_GRANT_FLOW);
+
   const isNewExpenseFlowEnabled =
     LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) &&
-    !isSupportedExpenseType(collective, ExpenseType.GRANT);
+    (!isSupportedExpenseType(collective, ExpenseType.GRANT) || isNewGrantFlowEnabled);
 
   const isAllowedAddFunds = Boolean(data?.account?.permissions?.addFunds?.allowed);
   const sections = React.useMemo(() => {
@@ -481,13 +484,23 @@ const CollectiveNavbar = ({
     ...callsToAction,
   };
   const actionsArray = Object.keys(pickBy(callsToAction, Boolean));
-  const mainAction = getMainAction(collective, actionsArray, LoggedInUser, isNewExpenseFlowEnabled, () =>
-    setIsSubmitExpenseModalOpen(true),
+  const mainAction = getMainAction(
+    collective,
+    actionsArray,
+    LoggedInUser,
+    isNewExpenseFlowEnabled,
+    isNewGrantFlowEnabled,
+    () => setIsSubmitExpenseModalOpen(true),
   );
   const secondAction =
     actionsArray.length === 2 &&
-    getMainAction(collective, without(actionsArray, mainAction?.type), LoggedInUser, isNewExpenseFlowEnabled, () =>
-      setIsSubmitExpenseModalOpen(true),
+    getMainAction(
+      collective,
+      without(actionsArray, mainAction?.type),
+      LoggedInUser,
+      isNewExpenseFlowEnabled,
+      isNewGrantFlowEnabled,
+      () => setIsSubmitExpenseModalOpen(true),
     );
   const navbarRef = useRef();
   const mainContainerRef = useRef();

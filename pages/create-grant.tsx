@@ -1,6 +1,7 @@
 import React from 'react';
 import { type ApolloClient, gql } from '@apollo/client';
 import type { NextPageContext } from 'next';
+import { useRouter } from 'next/router';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { APOLLO_STATE_PROP_NAME, initClient } from '@/lib/apollo-client';
@@ -9,7 +10,7 @@ import { generateNotFoundError } from '@/lib/errors';
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type { CreateGrantPageQuery } from '@/lib/graphql/types/v2/graphql';
 import { ExpenseType } from '@/lib/graphql/types/v2/schema';
-import { getCollectivePageCanonicalURL } from '@/lib/url-helpers';
+import { getCollectivePageCanonicalURL, getCollectivePageRoute } from '@/lib/url-helpers';
 
 import ErrorPage from '@/components/ErrorPage';
 import Page from '@/components/Page';
@@ -25,6 +26,7 @@ const CreateGrantPageI18n = defineMessages({
 
 function CreateGrantPage(props: Awaited<ReturnType<typeof CreateGrantPage.getInitialProps>>) {
   const intl = useIntl();
+  const router = useRouter();
   const pageMetadata = React.useMemo(() => {
     if (!props.account) {
       return null;
@@ -41,17 +43,27 @@ function CreateGrantPage(props: Awaited<ReturnType<typeof CreateGrantPage.getIni
     };
   }, [props.account, intl]);
 
+  const handleOnClose = React.useCallback(() => {
+    const collectivePage = getCollectivePageRoute(props.account);
+    router.replace(collectivePage);
+  }, [props.account, router]);
+
   if (props.error) {
     return <ErrorPage error={props.error} />;
   } else if (!props.account) {
     return <ErrorPage error={generateNotFoundError(props.collectiveSlug)} log={false} />;
-  } else if (!(props.account.supportedExpenseTypes || []).includes(ExpenseType.GRANT)) {
+  } else if (!props.isGrantPreviewEnabled || !(props.account.supportedExpenseTypes || []).includes(ExpenseType.GRANT)) {
     return <PageFeatureNotSupported />;
   }
 
   return (
     <Page {...pageMetadata} collective={props.account} withTopBar={false} showFooter={false}>
-      <SubmitGrantFlow accountSlug={props.account.slug} handleOnClose={() => {}} />
+      <SubmitGrantFlow
+        expenseId={router.query.expenseId ? parseInt(router.query.expenseId as string, 10) : null}
+        draftKey={router.query.draftKey as string}
+        account={props.account}
+        handleOnClose={handleOnClose}
+      />
     </Page>
   );
 }
@@ -97,6 +109,12 @@ CreateGrantPage.getInitialProps = async (ctx: NextPageContext) => {
 
           ...CollectivePageMetadataFields
         }
+
+        loggedInAccount {
+          id
+          legacyId
+          settings
+        }
       }
 
       ${CollectivePageMetadataFieldsFragment}
@@ -109,8 +127,12 @@ CreateGrantPage.getInitialProps = async (ctx: NextPageContext) => {
 
   const account = queryResult.data?.account;
   const error = queryResult.error;
+  const isGrantPreviewEnabled =
+    !!queryResult.data?.loggedInAccount?.settings?.earlyAccess?.NEW_GRANT_FLOW ||
+    !!ctx.query.newGrantFlowEnabled ||
+    !queryResult.data?.loggedInAccount;
 
-  return { collectiveSlug, account, error };
+  return { collectiveSlug, account, error, isGrantPreviewEnabled };
 };
 
 function getApolloClient(ctx: NextPageContext) {
