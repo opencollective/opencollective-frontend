@@ -2357,6 +2357,7 @@
   "kklCrk": "Collectif et contributeurs",
   "KLENgi": "Vous ne pouvez télécharger que {count, plural, one {# fichier} other {# fichiers}} à la fois",
   "KmbUa3": "Soumettre un problème",
+  "kmQQS/": "Amount in your payout method currency: <b>{amountInPayoutMethodCurrency}</b>.<br></br><i>This is only an <b>estimate</b> based on today's exchange rate</i><br></br><br></br><b>Payment processor fees can be applied and exchange rate is subject to change until payout.</b>",
   "Kn0NEC": "You can override this assignment for each sub-account.",
   "kN43KR": "Fonds entrant et sortant du compte du Collectif hébergé",
   "knowMoreAboutUs": "En savoir plus sur nous",
