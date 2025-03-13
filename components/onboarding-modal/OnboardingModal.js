@@ -4,7 +4,7 @@ import { graphql } from '@apollo/client/react/hoc';
 import { Form, Formik } from 'formik';
 import { map, omit } from 'lodash';
 import { withRouter } from 'next/router';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
 import { confettiFireworks } from '../../lib/confettis';
@@ -405,4 +405,4 @@ const addGraphql = compose(
   addMemberInvitationQuery,
 );
 
-export default injectIntl(addGraphql(withRouter(OnboardingModal)));
+export default addGraphql(withRouter(OnboardingModal));
