@@ -62,7 +62,7 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
             collective={expense?.account}
           />
         </div>
-        {expense.type !== ExpenseType.GRANT && (
+        {expense?.type !== ExpenseType.GRANT && (
           <div className="flex-1 pb-12 md:max-w-96">
             <CreateExpenseFAQ defaultOpen />
           </div>
