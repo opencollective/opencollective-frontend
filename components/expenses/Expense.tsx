@@ -23,6 +23,7 @@ import { usePrevious } from '../../lib/hooks/usePrevious';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { itemHasOCR } from './lib/ocr';
 import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
+import { getCollectivePageRoute } from '@/lib/url-helpers';
 
 import ConfirmationModal from '../ConfirmationModal';
 import Container from '../Container';
@@ -124,12 +125,31 @@ function Expense(props) {
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const intl = useIntl();
   const router = useRouter();
+
   const isNewExpenseSubmissionFlow =
-    [expenseTypes.INVOICE, expenseTypes.RECEIPT].includes(data?.expense?.type) &&
-    ((LoggedInUser && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW)) ||
-      router.query.newExpenseFlowEnabled);
+    ([expenseTypes.INVOICE, expenseTypes.RECEIPT].includes(data?.expense?.type) &&
+      ((LoggedInUser && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW)) ||
+        router.query.newExpenseFlowEnabled)) ||
+    ([expenseTypes.GRANT].includes(data?.expense?.type) &&
+      ((LoggedInUser && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW)) ||
+        router.query.newGrantFlowEnabled));
 
   const [isSubmissionFlowOpen, setIsSubmissionFlowOpen] = React.useState(false);
+
+  const onContinueSubmissionClick = React.useCallback(() => {
+    if ([expenseTypes.GRANT].includes(data?.expense?.type)) {
+      router.push({
+        pathname: `${getCollectivePageRoute(data?.expense?.account)}/grants/new`,
+        query: {
+          expenseId: data?.expense?.legacyId,
+          draftKey,
+        },
+      });
+      return;
+    }
+
+    setIsSubmissionFlowOpen(true);
+  }, [data?.expense?.account, data?.expense?.legacyId, data?.expense?.type, draftKey, router]);
 
   const [state, setState] = useState({
     error: error || null,
@@ -558,9 +578,7 @@ function Expense(props) {
                 draftKey &&
                 expense?.draft?.recipientNote)) && (
               <ExpenseInviteWelcome
-                onContinueSubmissionClick={() => {
-                  setIsSubmissionFlowOpen(true);
-                }}
+                onContinueSubmissionClick={onContinueSubmissionClick}
                 className="mb-6"
                 expense={expense}
                 draftKey={draftKey}

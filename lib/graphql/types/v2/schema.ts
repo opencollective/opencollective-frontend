@@ -862,7 +862,7 @@ export type AccountingCategory = {
   /** The account this category belongs to */
   account: Host;
   /** If the category is applicable to the Host or Hosted Collectives */
-  appliesTo: AccountingCategoryAppliesTo;
+  appliesTo?: Maybe<AccountingCategoryAppliesTo>;
   /** The code of the accounting category */
   code: Scalars['String']['output'];
   /** The time of creation of this accounting category */
@@ -899,8 +899,8 @@ export type AccountingCategoryCollection = Collection & {
 
 /** Input for creating or updating an account category */
 export type AccountingCategoryInput = {
-  /** If the category is applicable to the Host or Hosted Collectives */
-  appliesTo?: AccountingCategoryAppliesTo;
+  /** If the category is applicable to the Host or Hosted Collectives, or both if null */
+  appliesTo?: InputMaybe<AccountingCategoryAppliesTo>;
   /** The code of the accounting category */
   code?: InputMaybe<Scalars['NonEmptyString']['input']>;
   /** If meant for expenses, the types of expenses this category applies to */
@@ -3897,6 +3897,7 @@ export type Expense_Categorization = {
 
 export type Expense_Policies = {
   __typename?: 'EXPENSE_POLICIES';
+  grantPolicy?: Maybe<Scalars['String']['output']>;
   invoicePolicy?: Maybe<Scalars['String']['output']>;
   receiptPolicy?: Maybe<Scalars['String']['output']>;
   titlePolicy?: Maybe<Scalars['String']['output']>;
@@ -10078,6 +10079,7 @@ export type PoliciesExpenseCategorizationInput = {
 };
 
 export type PoliciesExpensePolicies = {
+  grantPolicy?: InputMaybe<Scalars['String']['input']>;
   invoicePolicy?: InputMaybe<Scalars['String']['input']>;
   receiptPolicy?: InputMaybe<Scalars['String']['input']>;
   titlePolicy?: InputMaybe<Scalars['String']['input']>;

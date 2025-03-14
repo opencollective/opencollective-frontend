@@ -183,9 +183,11 @@ const CollectiveNavbarActionsMenu = ({
   const isEmpty = enabledCTAs.length < 1;
   const hasOnlyOneHiddenCTA = enabledCTAs.length === 1 && hiddenActionForNonMobile === enabledCTAs[0];
 
+  const isNewGrantFlowEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_GRANT_FLOW);
+
   const isNewExpenseFlowEnabled =
     LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) &&
-    !isSupportedExpenseType(collective, ExpenseType.GRANT);
+    (!isSupportedExpenseType(collective, ExpenseType.GRANT) || isNewGrantFlowEnabled);
 
   // Do not render the menu if there are no available CTAs
   if (isEmpty) {
@@ -257,7 +259,10 @@ const CollectiveNavbarActionsMenu = ({
                     )}
                     {callsToAction.hasRequestGrant && (
                       <MenuItem py={1} isHiddenOnMobile={hiddenActionForNonMobile === NAVBAR_ACTION_TYPE.REQUEST_GRANT}>
-                        <StyledLink as={Link} href={`${getCollectivePageRoute(collective)}/expenses/new`}>
+                        <StyledLink
+                          as={Link}
+                          href={`${getCollectivePageRoute(collective)}/${isNewGrantFlowEnabled ? 'grants' : 'expenses'}/new`}
+                        >
                           <Container p={ITEM_PADDING}>
                             <MoneyCheckAlt size="20px" />
                             <FormattedMessage id="ExpenseForm.Type.Request" defaultMessage="Request Grant" />
