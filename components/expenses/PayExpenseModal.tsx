@@ -677,7 +677,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                     />
                   ) : (
                     <FormattedMoneyAmount
-                      amount={amounts.expenseAmountInHostCurrency?.valueInCents}
+                      amount={formik.values.expenseAmountInHostCurrency}
                       currency={amounts.expenseAmountInHostCurrency?.currency}
                       amountClassName="font-medium"
                       currencyCodeClassName="text-muted-foreground"
