@@ -19,7 +19,7 @@ describe('edit collective', () => {
     cy.login({ redirect: `/dashboard/${collectiveSlug}/info` });
   });
 
-  it.only('edit members', () => {
+  it('edit members', () => {
     const invitedUserEmail = randomEmail();
 
     // Add a new member by creating it inline with the collective picker
