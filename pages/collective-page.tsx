@@ -5,7 +5,7 @@ import { useIntl } from 'react-intl';
 import { createGlobalStyle } from 'styled-components';
 
 import type { Context } from '../lib/apollo-client';
-import { getSSRQueryHelpers } from '../lib/apollo-client';
+import { APOLLO_ERROR_PROP_NAME, getSSRQueryHelpers } from '../lib/apollo-client';
 import { getCollectivePageMetadata } from '../lib/collective';
 import { OPENCOLLECTIVE_FOUNDATION_ID } from '../lib/constants/collectives';
 import { generateNotFoundError } from '../lib/errors';
@@ -63,7 +63,7 @@ const collectivePageQueryHelper = getSSRQueryHelpers<
 
 // next.js export
 // ts-unused-exports:disable-next-line
-export const getServerSideProps = async (context: Context) => {
+export const getServerSideProps: typeof collectivePageQueryHelper.getServerSideProps = async (context: Context) => {
   const result = await collectivePageQueryHelper.getServerSideProps(context);
   const props = result['props'];
   const notFound = collectivePageQueryHelper.checkResultContainsNonNullResult(props, 'Collective(');
@@ -86,7 +86,7 @@ export const getServerSideProps = async (context: Context) => {
 // next.js export
 // ts-unused-exports:disable-next-line
 export default function CollectivePage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const { slug, status, step, mode, action } = props;
+  const { slug, status, step, mode, action, [APOLLO_ERROR_PROP_NAME]: ssrError } = props;
   const [showOnboardingModal, setShowOnboardingModal] = React.useState(mode === 'onboarding');
   const router = useRouter();
   const intl = useIntl();
@@ -101,7 +101,9 @@ export default function CollectivePage(props: InferGetServerSidePropsType<typeof
     addParentToURLIfMissing(router, collective);
   }, [router, collective]);
 
-  if (!loading) {
+  if (ssrError) {
+    return <ErrorPage data={ssrError} />;
+  } else if (!loading) {
     if (!data || data.error) {
       return <ErrorPage data={data} />;
     } else if (!collective || collective.type === 'VENDOR') {
