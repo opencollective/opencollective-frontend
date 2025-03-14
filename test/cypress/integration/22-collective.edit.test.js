@@ -38,7 +38,7 @@ describe('edit collective', () => {
     cy.getByDataCy('create-collective-mini-form').should('not.exist'); // Wait for form to be submitted
     cy.getByDataCy('confirmation-modal-continue').click();
     cy.get('[data-cy="member-1"] [data-cy="member-pending-tag"]').should('exist');
-    cy.mailpitHasEmailsBySubject('Invitation to join CollectiveToEdit').should('eq', 1);
+    cy.mailpitHasEmailsBySubject('[TESTING] Invitation to join CollectiveToEdit').should('eq', 1);
 
     // Re-send the invitation email
     cy.mailpitDeleteAllEmails();
