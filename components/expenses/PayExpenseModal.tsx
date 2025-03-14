@@ -371,7 +371,7 @@ const getHandleSubmit = (intl, currency, onSubmit) => async values => {
   if (
     values.forceManual &&
     values.paymentProcessorFeeInHostCurrency &&
-    values.paymentProcessorFeeInHostCurrency > values.totalAmountPaidInHostCurrency / 2 &&
+    values.paymentProcessorFeeInHostCurrency > totalAmountPaidInHostCurrency / 2 &&
     !confirm(
       intl.formatMessage(
         {
