@@ -83,7 +83,7 @@ export function CreateAccountingCategoryModal(props: CreateAccountingCategoryMod
             <Button onClick={props.onClose} variant="outline">
               <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
             </Button>
-            <Button type="submit">
+            <Button type="submit" data-cy="create-category-button">
               <FormattedMessage defaultMessage="Create category" id="ZROXxK" />
             </Button>
           </div>
