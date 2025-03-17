@@ -371,7 +371,7 @@ const getHandleSubmit = (intl, currency, onSubmit) => async values => {
   if (
     values.forceManual &&
     values.paymentProcessorFeeInHostCurrency &&
-    values.paymentProcessorFeeInHostCurrency > values.totalAmountPaidInHostCurrency / 2 &&
+    values.paymentProcessorFeeInHostCurrency > totalAmountPaidInHostCurrency / 2 &&
     !confirm(
       intl.formatMessage(
         {
@@ -677,7 +677,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                     />
                   ) : (
                     <FormattedMoneyAmount
-                      amount={amounts.expenseAmountInHostCurrency?.valueInCents}
+                      amount={formik.values.expenseAmountInHostCurrency}
                       currency={amounts.expenseAmountInHostCurrency?.currency}
                       amountClassName="font-medium"
                       currencyCodeClassName="text-muted-foreground"
