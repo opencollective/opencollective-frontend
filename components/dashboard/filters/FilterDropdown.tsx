@@ -117,6 +117,7 @@ const FilterButton = ({ filterKey, setFilter, filters, tmpValue, open, isViewAct
           (!disallowEmpty ? (
             <button
               className="group/remove h-full pl-3"
+              data-cy={`remove-filter-${filterKey}`}
               tabIndex={-1}
               onClick={() => {
                 setFilter(filterKey, undefined);
