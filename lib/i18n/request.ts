@@ -32,7 +32,7 @@ export function getRequestIntl(req: NextPageContext['req']): IntlProps {
       language = queryLanguage;
     } else if (typeof window === 'undefined') {
       const cookie = require('cookie'); // eslint-disable-line @typescript-eslint/no-var-requires
-      const cookies = cookie.parse(req?.headers?.['cookie'] ?? '');
+      const cookies = cookie.parse(req.headers['cookie'] ?? '');
       const cookieLanguage = cookies?.['language'];
 
       if (cookieLanguage && supportedLanguages.includes(cookieLanguage)) {
