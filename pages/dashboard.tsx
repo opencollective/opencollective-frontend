@@ -10,7 +10,6 @@ import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { require2FAForAdmins } from '../lib/policies';
 import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 import type { Context } from '@/lib/apollo-client';
-import { CollectiveType } from '@/lib/constants/collectives';
 import { loadGoogleMaps } from '@/lib/google-maps';
 import { getWhitelabelProps } from '@/lib/whitelabel';
 
@@ -191,10 +190,12 @@ const DashboardPage = () => {
   React.useEffect(() => {
     if (account && !LoggedInUser.isAdminOfCollective(account) && !(isRootProfile && isRootUser)) {
       setWorkspace({ slug: undefined });
-    } else if (account?.type === CollectiveType.EVENT) {
-      loadGoogleMaps();
     }
   }, [account]);
+
+  React.useEffect(() => {
+    loadGoogleMaps();
+  }, []);
 
   const notification = getNotification(intl, account);
   const [expandedSection, setExpandedSection] = React.useState(null);
