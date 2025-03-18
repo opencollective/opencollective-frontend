@@ -1,9 +1,7 @@
 import { isEmpty } from 'lodash';
-import type { NextPageContext } from 'next';
 
-import { getEnvVar } from './env-utils';
-
-export const WHITELABEL_DOMAINS: string[] = getEnvVar('WHITELABEL_DOMAINS')?.split(',') || [];
+import { WHITELABEL_DOMAINS, WHITELABEL_PROVIDERS } from './constants/whitelabel-providers';
+import type { Context } from './apollo-client';
 
 export type WhitelabelProps = {
   isNonPlatformDomain: boolean;

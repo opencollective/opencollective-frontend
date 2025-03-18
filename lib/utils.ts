@@ -3,7 +3,7 @@ import loadScript from 'load-script';
 import { isEmpty, isObject, omit } from 'lodash';
 import { twMerge } from 'tailwind-merge';
 
-import { WHITELABEL_DOMAINS } from './whitelabel';
+import { WHITELABEL_DOMAINS } from './constants/whitelabel-providers';
 
 /**
  * Helper to make it easier to conditionally add and deduplicate Tailwind CSS classes and deduplicate
