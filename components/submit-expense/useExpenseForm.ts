@@ -185,20 +185,26 @@ const formSchemaQuery = gql`
 
       ... on AccountWithHost {
         host {
-          vendors(forAccount: { slug: $collectiveSlug }, limit: 5) {
+          vendorsForAccount: vendors(forAccount: { slug: $collectiveSlug }, limit: 5) {
             nodes {
               ...ExpenseVendorFields
             }
+          }
+          vendors(limit: 1) {
+            totalCount
           }
         }
       }
 
       ... on Organization {
         host {
-          vendors(forAccount: { slug: $collectiveSlug }, limit: 5) {
+          vendorsForAccount: vendors(forAccount: { slug: $collectiveSlug }, limit: 5) {
             nodes {
               ...ExpenseVendorFields
             }
+          }
+          vendors(limit: 1) {
+            totalCount
           }
         }
       }
@@ -553,7 +559,8 @@ type ExpenseFormOptions = {
   taxType?: TaxType;
   recentlySubmittedExpenses?: ExpenseFormSchemaQuery['recentlySubmittedExpenses'];
   host?: ExpenseFormSchemaHostFieldsFragment;
-  vendors?: ExpenseVendorFieldsFragment[];
+  vendorsForAccount?: ExpenseVendorFieldsFragment[];
+  showVendorsOption?: boolean;
   account?: ExpenseFormSchemaQuery['account'] | ExpenseFormSchemaQuery['expense']['account'];
   payee?: ExpenseFormSchemaQuery['payee'];
   isAdminOfPayee?: boolean;
@@ -1306,10 +1313,13 @@ async function buildFormOptions(
 
     if (host) {
       options.host = host;
-      options.vendors =
-        'vendors' in host
-          ? (((host.vendors as any)?.nodes as ExpenseVendorFieldsFragment[]) || []).filter(v => v.hasPayoutMethod)
+      options.vendorsForAccount =
+        'vendorsForAccount' in host
+          ? (((host.vendorsForAccount as any)?.nodes as ExpenseVendorFieldsFragment[]) || []).filter(
+              v => v.hasPayoutMethod,
+            )
           : [];
+      options.showVendorsOption = 'vendors' in host ? (host.vendors as any)?.totalCount > 0 : false;
       options.supportedPayoutMethods = host.supportedPayoutMethods || [];
       options.expenseTags = host.expensesTags;
       options.isAccountingCategoryRequired = userMustSetAccountingCategory(loggedInUser, account, host);
@@ -1655,8 +1665,8 @@ export function useExpenseForm(opts: {
     if (prevFormOptions?.host?.slug !== formOptions.host?.slug) {
       if (
         (expenseForm.values.payeeSlug === '__vendor' ||
-          prevFormOptions.vendors?.some(v => v.slug === expenseForm.values.payeeSlug)) &&
-        !formOptions.vendors?.some(v => v.slug === expenseForm.values.payeeSlug)
+          prevFormOptions.vendorsForAccount?.some(v => v.slug === expenseForm.values.payeeSlug)) &&
+        !formOptions.vendorsForAccount?.some(v => v.slug === expenseForm.values.payeeSlug)
       ) {
         setFieldValue('payeeSlug', null);
       }
@@ -1664,8 +1674,8 @@ export function useExpenseForm(opts: {
   }, [
     prevFormOptions?.host?.slug,
     formOptions.host?.slug,
-    prevFormOptions?.vendors,
-    formOptions.vendors,
+    prevFormOptions?.vendorsForAccount,
+    formOptions.vendorsForAccount,
     expenseForm.values.payeeSlug,
     setFieldValue,
   ]);
