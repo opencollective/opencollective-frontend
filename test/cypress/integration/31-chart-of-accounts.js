@@ -44,7 +44,7 @@ describe('Chart of Accounts', () => {
     cy.get('[data-value="Kind"]').click();
     cy.contains('Added Funds').click();
     cy.get('[data-cy=apply-filter]').click();
-    cy.wait(1000);
+    cy.get('[data-cy=apply-filter]').should('not.exist');
     cy.contains('No chart of accounts');
 
     cy.get('[data-cy=filter-kind]').click();
@@ -54,7 +54,6 @@ describe('Chart of Accounts', () => {
 
     // Clear filtering by kind
     cy.get('[data-cy=remove-filter-kind]').click();
-    cy.wait(1000);
     cy.contains('Workspace Expenses');
     cy.contains('Contractor Expenses');
 
@@ -63,7 +62,7 @@ describe('Chart of Accounts', () => {
     cy.get('[data-value="Visible only to host admins"]').click();
     cy.get('[data-cy=combo-select-option]').contains('Yes').click();
     cy.get('[data-cy=apply-filter]').click();
-    cy.wait(1000);
+    cy.get('[data-cy=apply-filter]').should('not.exist');
     cy.contains('No chart of accounts');
 
     cy.get('[data-cy=filter-hostOnly]').click();
@@ -73,7 +72,6 @@ describe('Chart of Accounts', () => {
 
     // Clear filtering by visibility
     cy.get('[data-cy=remove-filter-hostOnly]').click();
-    cy.wait(1000);
     cy.contains('Workspace Expenses');
     cy.contains('Contractor Expenses');
 
@@ -96,7 +94,6 @@ describe('Chart of Accounts', () => {
     cy.contains('Workspace Expenses').should('not.exist');
 
     cy.get('[data-cy=admin-panel-container] input').clear();
-    cy.wait(1000);
 
     // Test sorting by code
     cy.contains('Code ascending').should('exist');
