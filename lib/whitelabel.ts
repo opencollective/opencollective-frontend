@@ -1,17 +1,17 @@
 import { isEmpty } from 'lodash';
-import type { NextPageContext } from 'next';
 
-import { getEnvVar } from './env-utils';
-
-export const WHITELABEL_DOMAINS: string[] = getEnvVar('WHITELABEL_DOMAINS')?.split(',') || [];
+import { WHITELABEL_DOMAINS, WHITELABEL_PROVIDERS } from './constants/whitelabel-providers';
+import type { Context } from './apollo-client';
 
 export type WhitelabelProps = {
   isNonPlatformDomain: boolean;
   origin: string;
   isWhitelabelDomain: boolean;
+  provider: (typeof WHITELABEL_PROVIDERS)[number];
+  path?: string;
 };
 
-const getOrigin = (ctx: NextPageContext) => {
+const getOrigin = (ctx?: Context) => {
   if (typeof window !== 'undefined') {
     return window.location.origin;
   } else if (ctx?.req?.headers) {
@@ -24,13 +24,35 @@ const getOrigin = (ctx: NextPageContext) => {
   return null;
 };
 
-export const getWhitelabelProps = (ctx: NextPageContext & { req: any }): WhitelabelProps => {
+const getPath = (ctx?: Context) => {
+  if (typeof window !== 'undefined') {
+    return window.location.pathname;
+  } else if (ctx?.req?.url) {
+    const path = ctx.req.url;
+    if (!path?.startsWith('/_next')) {
+      return path;
+    }
+  }
+  return null;
+};
+
+export const shouldRedirect = (hostSlug?: string, slug?: string) => {
+  const provider = hostSlug && WHITELABEL_PROVIDERS.find(provider => provider.slug === hostSlug);
+  if (provider) {
+    return { domain: provider.domain, slug: slug || provider.slug };
+  }
+};
+
+export const getWhitelabelProps = (ctx?: Context): WhitelabelProps => {
   const origin = getOrigin(ctx);
   if (!origin) {
     return null;
   }
 
+  const path = getPath(ctx);
+
   const isNonPlatformDomain = !process.env.WEBSITE_URL.includes(origin);
   const isWhitelabelDomain = isEmpty(WHITELABEL_DOMAINS) ? false : WHITELABEL_DOMAINS.includes(origin);
-  return { isNonPlatformDomain, origin, isWhitelabelDomain };
+  const provider = WHITELABEL_PROVIDERS.find(provider => provider.domain === origin);
+  return { isNonPlatformDomain, origin, isWhitelabelDomain, path, provider };
 };

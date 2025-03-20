@@ -45,7 +45,7 @@ type SigninPageState = {
 class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
   static getInitialProps({ query: { token, next, form, email }, req }: NextPageContext) {
     // Decode next URL if URI encoded
-    if (typeof next === 'string' && next.startsWith('%2F')) {
+    if (typeof next === 'string' && next.includes('%2F')) {
       next = decodeURIComponent(next);
     }
 
@@ -107,11 +107,10 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
       const isTrustedWhitelabel = isTrustedSigninRedirectionUrl(redirect);
       if (isTrustedWhitelabel) {
         const parsedUrl = new URL(redirect);
-        parsedUrl.pathname = '/signin';
-
         const token = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
         parsedUrl.searchParams.set('token', token);
         parsedUrl.searchParams.set('next', parsedUrl.pathname);
+        parsedUrl.pathname = '/signin';
         redirect = parsedUrl.toString();
       }
       const defaultRedirect = '/dashboard';

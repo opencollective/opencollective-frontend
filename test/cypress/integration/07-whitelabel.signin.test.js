@@ -7,7 +7,7 @@ describe('white-label signin', () => {
   });
 
   it('fails if platform domain is asked to redirect to an unauthorized domain', () => {
-    cy.visit(`http://localhost:3000/signin?next=http%3A%2F%2Flocal.crooked%3A3000`);
+    cy.visit(`http://localhost:3000/signin?next=${escape('http://local.crooked:3000')}`);
     cy.contains("You've been requested to log-in to Open Collective by an untrusted domain");
   });
 
@@ -20,10 +20,15 @@ describe('white-label signin', () => {
   it('can signin with a valid token and redirected to white-labeled domain', () => {
     cy.visit(`http://localhost:3000/signin`);
     cy.generateToken().then(token => {
-      cy.visit(`/signin/${token}?next=http%3A%2F%2Flocal.opencollective%3A3000`);
+      cy.visit(`/signin/${token}?next=http%3A%2F%2Flocal.opencollective%3A3000%2Fopencollective`);
     });
     cy.assertLoggedIn();
-    cy.url().should('eq', `http://local.opencollective:3000/dashboard`);
+    cy.url().should('eq', `http://local.opencollective:3000/opencollective`);
+  });
+
+  it('redirects from collective profile to white-label domain', () => {
+    cy.visit(`http://localhost:3000/opencollective`);
+    cy.url().should('eq', `http://local.opencollective:3000/opencollective`);
   });
 
   describe('signin with 2FA', () => {
@@ -50,7 +55,7 @@ describe('white-label signin', () => {
 
     it('can signin with 2fa enabled', () => {
       // now login with 2FA enabled
-      cy.login({ email: user.email, redirect: 'http://local.opencollective:3000' });
+      cy.login({ email: user.email, redirect: 'http://local.opencollective:3000/opencollective' });
       cy.complete2FAPrompt('123456');
       cy.contains('Two-factor authentication code failed. Please try again').should.exist;
       TOTPCode = speakeasy.totp({
@@ -60,7 +65,7 @@ describe('white-label signin', () => {
       });
       cy.complete2FAPrompt(TOTPCode);
       cy.assertLoggedIn();
-      cy.url().should('eq', `http://local.opencollective:3000/dashboard`);
+      cy.url().should('eq', `http://local.opencollective:3000/opencollective`);
     });
   });
 });

@@ -26,6 +26,7 @@ export const APOLLO_STATE_PROP_NAME = '__APOLLO_STATE__' as const;
 // ts-unused-exports:disable-next-line
 export const APOLLO_ERROR_PROP_NAME = '__APOLLO_ERROR__' as const;
 export const APOLLO_VARIABLES_PROP_NAME = '__APOLLO_VARIABLES__' as const;
+export const APOLLO_QUERY_DATA_PROP_NAME = '__APOLLO_QUERY_DATA__' as const;
 
 const getBaseApiUrl = (apiVersion, internal = false) => {
   if (process.browser) {
@@ -305,10 +306,11 @@ export function initClient({ initialState, twoFactorAuthContext, accessToken }: 
   return apolloClient;
 }
 
-type SSRQueryHelperProps<TVariables> = {
+type SSRQueryHelperProps<TVariables, TQueryData> = {
   [APOLLO_STATE_PROP_NAME]: NormalizedCacheObject;
   [APOLLO_VARIABLES_PROP_NAME]: Partial<TVariables>;
   [APOLLO_ERROR_PROP_NAME]: any;
+  [APOLLO_QUERY_DATA_PROP_NAME]: TQueryData;
 };
 
 export type Context = GetServerSidePropsContext & {
@@ -319,7 +321,7 @@ export type Context = GetServerSidePropsContext & {
  * A helper to easily plug Apollo on functional components that use `getServerSideProps` thats make sure that
  * the server-side query and the client-side query/variables are the same; to properly rehydrate the cache.
  */
-export function getSSRQueryHelpers<TVariables, TProps = Record<string, unknown>>({
+export function getSSRQueryHelpers<TVariables, TProps = Record<string, unknown>, TQueryData = Record<string, unknown>>({
   query,
   getVariablesFromContext = undefined,
   getPropsFromContext = undefined,
@@ -329,20 +331,20 @@ export function getSSRQueryHelpers<TVariables, TProps = Record<string, unknown>>
   getPropsFromContext?: (context: GetServerSidePropsContext) => TProps;
   getVariablesFromContext?: (context: GetServerSidePropsContext, props: Partial<TProps>) => TVariables;
   skipClientIfSSRThrows404?: boolean;
-  preload?: (client: ApolloClient<unknown>, queryResult: any) => Promise<void>;
+  preload?: (client: ApolloClient<unknown>, queryResult: TQueryData) => Promise<void>;
 }) {
-  type ServerSideProps = TProps & SSRQueryHelperProps<TVariables>;
+  type ServerSideProps = TProps & SSRQueryHelperProps<TVariables, TQueryData>;
   return {
     getServerSideProps: async (context: Context): Promise<GetServerSidePropsResult<ServerSideProps>> => {
       const props = (getPropsFromContext && getPropsFromContext(context)) || {};
       const variables = (getVariablesFromContext && getVariablesFromContext(context, props)) || {};
       const client = context.req.apolloClient;
-      let error;
 
+      let error, result;
       try {
-        const result = await client.query({ query, variables, ...queryOptions }); // Not handling the result here, we just want to make sure the query result is in the cache
+        result = await client.query<TQueryData>({ query, variables, ...queryOptions }); // Not handling the result here, we just want to make sure the query result is in the cache
         if (queryOptions.preload) {
-          await queryOptions.preload(client, result);
+          await queryOptions.preload(client, result?.data);
         }
       } catch (e) {
         error = e;
@@ -351,9 +353,10 @@ export function getSSRQueryHelpers<TVariables, TProps = Record<string, unknown>>
       return {
         props: {
           ...omitBy<TProps>(props, isUndefined),
-          [APOLLO_STATE_PROP_NAME]: client.cache.extract(),
+          [APOLLO_STATE_PROP_NAME]: client.cache.extract() as NormalizedCacheObject,
           [APOLLO_VARIABLES_PROP_NAME]: omitBy<TVariables>(variables, isUndefined) as Partial<TVariables>,
           [APOLLO_ERROR_PROP_NAME]: !error ? null : JSON.parse(JSON.stringify(error)),
+          [APOLLO_QUERY_DATA_PROP_NAME]: result?.data,
         } as ServerSideProps,
       };
     },

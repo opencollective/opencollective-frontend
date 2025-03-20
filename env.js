@@ -29,7 +29,6 @@ const defaults = {
   PDF_SERVICE_URL: 'https://pdf-staging.opencollective.com',
   NEXT_PDF_SERVICE_URL: 'https://next-pdf.opencollective.com',
   ML_SERVICE_URL: 'https://ml.opencollective.com',
-  WHITELABEL_DOMAINS: 'http://local.opencollective:3000',
   DISABLE_MOCK_UPLOADS: false,
   PAYPAL_ENVIRONMENT: 'sandbox',
   STRIPE_KEY: 'pk_test_VgSB4VSg2wb5LdAkz7p38Gw8',

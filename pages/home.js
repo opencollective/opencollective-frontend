@@ -2,6 +2,7 @@ import React from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { getRequestIntl } from '../lib/i18n/request';
+import { getWhitelabelProps } from '../lib/whitelabel';
 
 // import Banner from '../components/collectives/Banner';
 import JoinUsSection from '../components/collectives/sections/JoinUs';
@@ -50,12 +51,18 @@ export const HomePage = () => {
 
 // next.js export
 // ts-unused-exports:disable-next-line
-export const getServerSideProps = async ({ req, res }) => {
+export const getServerSideProps = async context => {
+  const { req, res } = context;
   if (res && req) {
     const { locale } = getRequestIntl(req);
     if (locale === 'en') {
       res.setHeader('Cache-Control', 'public, s-maxage=3600');
     }
+  }
+
+  const whitelabel = getWhitelabelProps(context);
+  if (whitelabel?.provider) {
+    return { redirect: { destination: `${whitelabel.provider.domain}/${whitelabel.provider.slug}`, permanent: false } };
   }
 
   let skipDataFromTree = false;

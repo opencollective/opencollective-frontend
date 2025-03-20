@@ -9,6 +9,9 @@ import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { require2FAForAdmins } from '../lib/policies';
 import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
+import type { Context } from '@/lib/apollo-client';
+import { loadGoogleMaps } from '@/lib/google-maps';
+import { getWhitelabelProps } from '@/lib/whitelabel';
 
 import {
   ALL_SECTIONS,
@@ -132,6 +135,22 @@ const parseQuery = query => {
   };
 };
 
+// ts-unused-exports:disable-next-line
+export const getServerSideProps = async (context: Context) => {
+  const whitelabel = getWhitelabelProps(context);
+  // Dashboard should always be opened on the platform domain
+  if (whitelabel.isWhitelabelDomain) {
+    return {
+      redirect: {
+        destination: process.env.WEBSITE_URL + (whitelabel.path || '/dashboard'),
+        permanent: false,
+      },
+    };
+  }
+
+  return { props: {} };
+};
+
 const DashboardPage = () => {
   const intl = useIntl();
   const router = useRouter();
@@ -173,6 +192,10 @@ const DashboardPage = () => {
       setWorkspace({ slug: undefined });
     }
   }, [account]);
+
+  React.useEffect(() => {
+    loadGoogleMaps();
+  }, []);
 
   const notification = getNotification(intl, account);
   const [expandedSection, setExpandedSection] = React.useState(null);
@@ -244,12 +267,6 @@ const DashboardPage = () => {
       </div>
     </DashboardContext.Provider>
   );
-};
-
-DashboardPage.getInitialProps = () => {
-  return {
-    scripts: { googleMaps: true }, // TODO: This should be enabled only for events
-  };
 };
 
 // next.js export

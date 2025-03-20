@@ -5,7 +5,7 @@ import { useIntl } from 'react-intl';
 import { createGlobalStyle } from 'styled-components';
 
 import type { Context } from '../lib/apollo-client';
-import { APOLLO_ERROR_PROP_NAME, getSSRQueryHelpers } from '../lib/apollo-client';
+import { APOLLO_ERROR_PROP_NAME, APOLLO_QUERY_DATA_PROP_NAME, getSSRQueryHelpers } from '../lib/apollo-client';
 import { getCollectivePageMetadata } from '../lib/collective';
 import { OPENCOLLECTIVE_FOUNDATION_ID } from '../lib/constants/collectives';
 import { generateNotFoundError } from '../lib/errors';
@@ -13,6 +13,7 @@ import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 import { getRequestIntl } from '@/lib/i18n/request';
+import { getWhitelabelProps, shouldRedirect } from '@/lib/whitelabel';
 
 import CollectivePageContent from '../components/collective-page';
 import CollectiveNotificationBar from '../components/collective-page/CollectiveNotificationBar';
@@ -53,24 +54,45 @@ const getPropsFromContext = (context: Context) => {
 
 const collectivePageQueryHelper = getSSRQueryHelpers<
   ReturnType<typeof getVariablesFromContext>,
-  ReturnType<typeof getPropsFromContext>
+  ReturnType<typeof getPropsFromContext>,
+  // TODO: Use the query auto-generated type when we move this to V2
+  { Collective: { slug: string; id: number; name: string; isHost: boolean; host?: { slug: string } } }
 >({
   query: collectivePageQuery,
   getVariablesFromContext,
   getPropsFromContext,
-  preload: (client, result) => preloadCollectivePageGraphqlQueries(client, result?.data?.Collective),
+  preload: (client, result) => preloadCollectivePageGraphqlQueries(client, result?.Collective),
 });
 
 // next.js export
 // ts-unused-exports:disable-next-line
-export const getServerSideProps: typeof collectivePageQueryHelper.getServerSideProps = async (context: Context) => {
+export const getServerSideProps = async (context: Context) => {
+  const whitelabel = getWhitelabelProps(context);
   const result = await collectivePageQueryHelper.getServerSideProps(context);
   const props = result['props'];
-  const notFound = collectivePageQueryHelper.checkResultContainsNonNullResult(props, 'Collective(');
+  const error = props[APOLLO_ERROR_PROP_NAME];
+  const data = props[APOLLO_QUERY_DATA_PROP_NAME];
+  const notFound = !error && collectivePageQueryHelper.checkResultContainsNonNullResult(props, 'Collective({"slug"');
+
   if (context.res && context.req) {
     const { locale } = getRequestIntl(context.req);
     if (locale === 'en') {
       context.res.setHeader('Cache-Control', 'public, s-maxage=300');
+    }
+  }
+
+  if (!whitelabel?.isNonPlatformDomain && data?.Collective) {
+    const whitelabelRedirect = shouldRedirect(
+      data?.Collective?.host?.slug || data?.Collective?.slug,
+      data?.Collective?.slug,
+    );
+    if (whitelabelRedirect) {
+      return {
+        redirect: {
+          destination: `${whitelabelRedirect.domain}/${whitelabelRedirect.slug}`,
+          permanent: false,
+        },
+      };
     }
   }
 
