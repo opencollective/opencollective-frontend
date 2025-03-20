@@ -138,7 +138,7 @@
     "styled-system": "5.1.5",
     "tailwind-merge": "3.0.2",
     "throng": "5.0.0",
-    "uuid": "11.1.0",
+    "uuid": "10.0.0",
     "validator": "13.12.0",
     "webpack-manifest-plugin": "5.0.0",
     "winston": "3.17.0",
