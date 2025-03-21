@@ -154,6 +154,8 @@ export type Account = {
   virtualCards?: Maybe<VirtualCardCollection>;
   /** @deprecated 2023-01-16: Please use socialLinks */
   website?: Maybe<Scalars['String']['output']>;
+  /** The whitelabel domain of this account */
+  whitelabel?: Maybe<WhitelabelProvider>;
 };
 
 
@@ -862,7 +864,7 @@ export type AccountingCategory = {
   /** The account this category belongs to */
   account: Host;
   /** If the category is applicable to the Host or Hosted Collectives */
-  appliesTo: AccountingCategoryAppliesTo;
+  appliesTo?: Maybe<AccountingCategoryAppliesTo>;
   /** The code of the accounting category */
   code: Scalars['String']['output'];
   /** The time of creation of this accounting category */
@@ -899,8 +901,8 @@ export type AccountingCategoryCollection = Collection & {
 
 /** Input for creating or updating an account category */
 export type AccountingCategoryInput = {
-  /** If the category is applicable to the Host or Hosted Collectives */
-  appliesTo?: AccountingCategoryAppliesTo;
+  /** If the category is applicable to the Host or Hosted Collectives, or both if null */
+  appliesTo?: InputMaybe<AccountingCategoryAppliesTo>;
   /** The code of the accounting category */
   code?: InputMaybe<Scalars['NonEmptyString']['input']>;
   /** If meant for expenses, the types of expenses this category applies to */
@@ -1556,6 +1558,8 @@ export type Bot = Account & {
   webhooks: WebhookCollection;
   /** @deprecated 2023-01-16: Please use socialLinks */
   website?: Maybe<Scalars['String']['output']>;
+  /** The whitelabel domain of this account */
+  whitelabel?: Maybe<WhitelabelProvider>;
 };
 
 
@@ -2061,6 +2065,8 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   webhooks: WebhookCollection;
   /** @deprecated 2023-01-16: Please use socialLinks */
   website?: Maybe<Scalars['String']['output']>;
+  /** The whitelabel domain of this account */
+  whitelabel?: Maybe<WhitelabelProvider>;
 };
 
 
@@ -4064,6 +4070,8 @@ export type Event = Account & AccountWithContributions & AccountWithHost & Accou
   webhooks: WebhookCollection;
   /** @deprecated 2023-01-16: Please use socialLinks */
   website?: Maybe<Scalars['String']['output']>;
+  /** The whitelabel domain of this account */
+  whitelabel?: Maybe<WhitelabelProvider>;
 };
 
 
@@ -5270,6 +5278,8 @@ export type Fund = Account & AccountWithContributions & AccountWithHost & {
   webhooks: WebhookCollection;
   /** @deprecated 2023-01-16: Please use socialLinks */
   website?: Maybe<Scalars['String']['output']>;
+  /** The whitelabel domain of this account */
+  whitelabel?: Maybe<WhitelabelProvider>;
 };
 
 
@@ -5867,6 +5877,8 @@ export type Host = Account & AccountWithContributions & {
   webhooks: WebhookCollection;
   /** @deprecated 2023-01-16: Please use socialLinks */
   website?: Maybe<Scalars['String']['output']>;
+  /** The whitelabel domain of this account */
+  whitelabel?: Maybe<WhitelabelProvider>;
 };
 
 
@@ -6812,6 +6824,8 @@ export type Individual = Account & {
   webhooks: WebhookCollection;
   /** @deprecated 2023-01-16: Please use socialLinks */
   website?: Maybe<Scalars['String']['output']>;
+  /** The whitelabel domain of this account */
+  whitelabel?: Maybe<WhitelabelProvider>;
 };
 
 
@@ -9211,6 +9225,8 @@ export type Organization = Account & AccountWithContributions & {
   webhooks: WebhookCollection;
   /** @deprecated 2023-01-16: Please use socialLinks */
   website?: Maybe<Scalars['String']['output']>;
+  /** The whitelabel domain of this account */
+  whitelabel?: Maybe<WhitelabelProvider>;
 };
 
 
@@ -10305,6 +10321,8 @@ export type Project = Account & AccountWithContributions & AccountWithHost & Acc
   webhooks: WebhookCollection;
   /** @deprecated 2023-01-16: Please use socialLinks */
   website?: Maybe<Scalars['String']['output']>;
+  /** The whitelabel domain of this account */
+  whitelabel?: Maybe<WhitelabelProvider>;
 };
 
 
@@ -10737,6 +10755,8 @@ export type Query = {
   virtualCard?: Maybe<VirtualCard>;
   virtualCardRequest?: Maybe<VirtualCardRequest>;
   virtualCardRequests: VirtualCardRequestCollection;
+  /** Return a list of all whitelabel providers */
+  whitelabelProviders?: Maybe<Array<Maybe<Account>>>;
 };
 
 
@@ -12506,6 +12526,8 @@ export type Vendor = Account & AccountWithContributions & {
   webhooks: WebhookCollection;
   /** @deprecated 2023-01-16: Please use socialLinks */
   website?: Maybe<Scalars['String']['output']>;
+  /** The whitelabel domain of this account */
+  whitelabel?: Maybe<WhitelabelProvider>;
 };
 
 
@@ -13082,6 +13104,13 @@ export type WebhookUpdateInput = {
   /** The legacy public id identifying the webhook (ie: 4242) */
   legacyId?: InputMaybe<Scalars['Int']['input']>;
   webhookUrl: Scalars['URL']['input'];
+};
+
+/** A Virtual Card used to pay expenses */
+export type WhitelabelProvider = {
+  __typename?: 'WhitelabelProvider';
+  domain?: Maybe<Scalars['String']['output']>;
+  logo?: Maybe<Scalars['String']['output']>;
 };
 
 export type WiseTransferDetails = {
