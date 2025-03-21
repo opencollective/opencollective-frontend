@@ -81,15 +81,13 @@ export const getServerSideProps = async (context: Context) => {
     }
   }
 
-  if (!whitelabel?.isNonPlatformDomain && data?.Collective) {
-    const whitelabelRedirect = shouldRedirect(
-      data?.Collective?.host?.slug || data?.Collective?.slug,
-      data?.Collective?.slug,
-    );
-    if (whitelabelRedirect) {
+  // Deals with the redirection TO a white label domain, not back to platform
+  if (data.Collective?.settings?.whitelabelDomain && whitelabel?.isWhitelabelDomain === false) {
+    const destination = shouldRedirect(data.Collective);
+    if (destination) {
       return {
         redirect: {
-          destination: `${whitelabelRedirect.domain}/${whitelabelRedirect.slug}`,
+          destination: destination,
           permanent: false,
         },
       };
