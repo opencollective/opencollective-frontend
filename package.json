@@ -140,7 +140,7 @@
     "throng": "5.0.0",
     "uuid": "11.1.0",
     "validator": "13.12.0",
-    "webpack-manifest-plugin": "5.0.0",
+    "webpack-manifest-plugin": "5.0.1",
     "winston": "3.17.0",
     "zod": "3.24.2"
   },
