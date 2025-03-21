@@ -15,6 +15,7 @@ import { APOLLO_STATE_PROP_NAME } from '../lib/apollo-client';
 import { getTokenFromCookie } from '../lib/auth';
 import { getIntlProps, getLocaleMessages } from '../lib/i18n/request';
 import { parseToBoolean } from '../lib/utils';
+import { getWhitelabelDomains } from '../lib/whitelabel';
 import { getCSPHeader } from '../server/content-security-policy';
 
 import { SSRIntlProvider } from '../components/intl/SSRIntlProvider';
@@ -27,8 +28,6 @@ try {
 } catch (e) {
   Sentry.captureException(e);
 }
-
-const cspHeader = getCSPHeader();
 
 const cache = createIntlCache();
 
@@ -58,6 +57,10 @@ export default class IntlDocument extends Document {
       }
     }
 
+    const apolloClient = ctx.req?.apolloClient;
+    const whitelabelDomains = await getWhitelabelDomains(apolloClient);
+    const cspHeader = getCSPHeader(whitelabelDomains);
+
     const sheet = new ServerStyleSheet();
     const originalRenderPage = ctx.renderPage;
 
@@ -77,8 +80,6 @@ export default class IntlDocument extends Document {
       requestNonce = uuid();
       ctx.res.setHeader(cspHeader.key, cspHeader.value.replace('__OC_REQUEST_NONCE__', requestNonce));
     }
-
-    const apolloClient = ctx.req?.apolloClient;
 
     try {
       ctx.renderPage = () =>

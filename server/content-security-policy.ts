@@ -1,7 +1,5 @@
-const mergeWith = require('lodash/mergeWith');
-const { kebabCase, omit } = require('lodash');
+import { kebabCase, memoize, mergeWith, omit } from 'lodash';
 
-import { WHITELABEL_DOMAINS } from '../lib/constants/whitelabel-providers';
 const env = process.env.OC_ENV;
 
 const SELF = "'self'";
@@ -38,7 +36,6 @@ const COMMON_DIRECTIVES = {
     process.env.NEXT_PDF_SERVICE_URL,
     process.env.REST_URL,
     process.env.ML_SERVICE_URL,
-    ...WHITELABEL_DOMAINS,
     'wtfismyip.com',
     '*.paypal.com',
     '*.paypalobjects.com',
@@ -96,7 +93,9 @@ const COMMON_DIRECTIVES = {
   objectSrc: ['opencollective.com'],
 };
 
-const generateDirectives = customValues => {
+const generateDirectives = (
+  customValues?: Partial<Record<keyof typeof COMMON_DIRECTIVES, boolean | string | string[]>>,
+) => {
   const toRemove = [];
 
   const result = mergeWith(COMMON_DIRECTIVES, customValues, (objValue, srcValue, key) => {
@@ -144,7 +143,7 @@ const getHeaderValueFromDirectives = directives => {
 /**
  * Get a config compatible with Helmet's format
  */
-const getContentSecurityPolicyConfig = () => {
+const getContentSecurityPolicyConfig = memoize((whitelabelDomains = []) => {
   if (env === 'development' || env === 'e2e') {
     return {
       reportOnly: true,
@@ -154,11 +153,13 @@ const getContentSecurityPolicyConfig = () => {
         imgSrc: [
           'opencollective-staging.s3.us-west-1.amazonaws.com',
           'opencollective-staging.s3-us-west-1.amazonaws.com',
+          ...whitelabelDomains,
         ],
         connectSrc: [
           'opencollective-staging.s3.us-west-1.amazonaws.com',
           'opencollective-staging.s3-us-west-1.amazonaws.com',
           'https://sandbox.plaid.com',
+          ...whitelabelDomains,
         ],
       }),
     };
@@ -169,11 +170,13 @@ const getContentSecurityPolicyConfig = () => {
         imgSrc: [
           'opencollective-staging.s3.us-west-1.amazonaws.com',
           'opencollective-staging.s3-us-west-1.amazonaws.com',
+          ...whitelabelDomains,
         ],
         connectSrc: [
           'opencollective-staging.s3.us-west-1.amazonaws.com',
           'opencollective-staging.s3-us-west-1.amazonaws.com',
           'https://sandbox.plaid.com',
+          ...whitelabelDomains,
         ],
       }),
       reportUri: ['https://o105108.ingest.sentry.io/api/1736806/security/?sentry_key=2ab0f7da3f56423d940f36370df8d625'],
@@ -185,11 +188,13 @@ const getContentSecurityPolicyConfig = () => {
         imgSrc: [
           'opencollective-production.s3.us-west-1.amazonaws.com',
           'opencollective-production.s3-us-west-1.amazonaws.com',
+          ...whitelabelDomains,
         ],
         connectSrc: [
           'opencollective-production.s3.us-west-1.amazonaws.com',
           'opencollective-production.s3-us-west-1.amazonaws.com',
           'https://production.plaid.com/',
+          ...whitelabelDomains,
         ],
       }),
       reportUri: ['https://o105108.ingest.sentry.io/api/1736806/security/?sentry_key=2ab0f7da3f56423d940f36370df8d625'],
@@ -204,12 +209,12 @@ const getContentSecurityPolicyConfig = () => {
       directives: generateDirectives(),
     };
   }
-};
+});
 
 module.exports = {
   getContentSecurityPolicyConfig,
-  getCSPHeader: () => {
-    const config = getContentSecurityPolicyConfig();
+  getCSPHeader: whitelabelDomains => {
+    const config = getContentSecurityPolicyConfig(whitelabelDomains);
     if (config) {
       return {
         key: config.reportOnly ? 'Content-Security-Policy-Report-Only' : 'Content-Security-Policy',

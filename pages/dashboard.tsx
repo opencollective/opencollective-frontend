@@ -137,7 +137,7 @@ const parseQuery = query => {
 
 // ts-unused-exports:disable-next-line
 export const getServerSideProps = async (context: Context) => {
-  const whitelabel = getWhitelabelProps(context);
+  const whitelabel = await getWhitelabelProps(context);
   // Dashboard should always be opened on the platform domain
   if (whitelabel.isWhitelabelDomain) {
     return {

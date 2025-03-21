@@ -1,58 +1,132 @@
-import { isEmpty } from 'lodash';
+import { gql } from '@apollo/client';
+import debugLib from 'debug';
 
-import { WHITELABEL_DOMAINS, WHITELABEL_PROVIDERS } from './constants/whitelabel-providers';
-import type { Context } from './apollo-client';
+import { API_V2_CONTEXT } from './graphql/helpers';
+import type { Account } from './graphql/types/v2/schema';
+import type { ApolloClientType, Context } from './apollo-client';
+
+const debug = debugLib('whitelabel');
+const env = process.env.OC_ENV || process.env.NODE_ENV || 'development';
+
+type Provider = Partial<Pick<Account, 'id' | 'slug' | 'name' | 'imageUrl' | 'website' | 'whitelabel' | 'socialLinks'>>;
 
 export type WhitelabelProps = {
   isNonPlatformDomain: boolean;
   origin: string;
   isWhitelabelDomain: boolean;
-  provider: (typeof WHITELABEL_PROVIDERS)[number];
+  provider: Provider;
+  providers: Provider[];
   path?: string;
 };
 
-const getOrigin = (ctx?: Context) => {
+const getOriginAndPath = (ctx?: Context) => {
+  let origin, path;
   if (typeof window !== 'undefined') {
-    return window.location.origin;
-  } else if (ctx?.req?.headers) {
+    origin = window.location.origin;
+    path = window.location.pathname;
+  }
+  if (ctx?.req?.headers) {
     const proto = ctx.req.headers['x-forwarded-proto'] || 'https';
     const hostname = ctx.req.headers['original-hostname'] || ctx.req.headers['host'];
     if (hostname) {
-      return `${proto}://${hostname}`;
+      origin = `${proto}://${hostname}`;
     }
   }
-  return null;
+  if (ctx?.req?.url) {
+    if (!ctx.req.url?.startsWith('/_next')) {
+      path = ctx.req.url;
+    }
+  }
+
+  return { origin, path };
 };
 
-const getPath = (ctx?: Context) => {
-  if (typeof window !== 'undefined') {
-    return window.location.pathname;
-  } else if (ctx?.req?.url) {
-    const path = ctx.req.url;
-    if (!path?.startsWith('/_next')) {
-      return path;
-    }
+let whitelabelProviderCache: Provider[];
+// Inject some E2E test values
+if (['e2e', 'ci'].includes(env)) {
+  whitelabelProviderCache = [
+    {
+      slug: 'opencollective',
+      whitelabel: {
+        domain: 'http://local.opencollective:3000',
+      },
+    },
+  ];
+}
+
+const getWhitelabelProviders = async (apolloClient: ApolloClientType): Promise<Provider[]> => {
+  if (whitelabelProviderCache) {
+    debug('Returning cached whitelabel providers');
+    return whitelabelProviderCache;
   }
-  return null;
+
+  debug('Fetching whitelabel providers...');
+  const { data } = await apolloClient.query({
+    query: gql/* GraphQLV2 */ `
+      query WhitelabelProviders {
+        whitelabelProviders {
+          id
+          slug
+          name
+          imageUrl
+          website
+          socialLinks {
+            type
+            url
+          }
+          whitelabel {
+            domain
+            logo
+          }
+        }
+      }
+    `,
+    context: API_V2_CONTEXT,
+  });
+
+  debug('Loaded whitelabel providers', data.whitelabelProviders);
+  whitelabelProviderCache = data.whitelabelProviders;
+  return whitelabelProviderCache;
+};
+
+export const getWhitelabelDomains = async (apolloClient: ApolloClientType) => {
+  const providers = await getWhitelabelProviders(apolloClient);
+  return providers.map(provider => provider.whitelabel.domain);
+};
+
+export const isWhitelabelDomain = (providers, origin: string) => {
+  if (!origin) {
+    return false;
+  } else {
+    return providers.some(provider => provider.whitelabel.domain === origin);
+  }
 };
 
 export const shouldRedirect = (hostSlug?: string, slug?: string) => {
-  const provider = hostSlug && WHITELABEL_PROVIDERS.find(provider => provider.slug === hostSlug);
+  const provider = hostSlug && whitelabelProviderCache.find(provider => provider.slug === hostSlug);
   if (provider) {
-    return { domain: provider.domain, slug: slug || provider.slug };
+    return { domain: provider.whitelabel.domain, slug: slug || provider.slug };
   }
 };
 
-export const getWhitelabelProps = (ctx?: Context): WhitelabelProps => {
-  const origin = getOrigin(ctx);
+/**
+ * @param apolloClient {ApolloClientType} It is optional when calling this function from getServerSideProps but required when calling from the browser
+ */
+export const getWhitelabelProps = async (ctx?: Context, apolloClient?: ApolloClientType): Promise<WhitelabelProps> => {
+  const { origin, path } = getOriginAndPath(ctx);
   if (!origin) {
     return null;
   }
 
-  const path = getPath(ctx);
-
+  const whitelabelProviders = await getWhitelabelProviders((apolloClient || ctx.req?.apolloClient) as ApolloClientType);
   const isNonPlatformDomain = !process.env.WEBSITE_URL.includes(origin);
-  const isWhitelabelDomain = isEmpty(WHITELABEL_DOMAINS) ? false : WHITELABEL_DOMAINS.includes(origin);
-  const provider = WHITELABEL_PROVIDERS.find(provider => provider.domain === origin);
-  return { isNonPlatformDomain, origin, isWhitelabelDomain, path, provider };
+  const provider = whitelabelProviders?.find(provider => provider.whitelabel.domain === origin);
+  return {
+    isNonPlatformDomain,
+    origin,
+    isWhitelabelDomain: isWhitelabelDomain(whitelabelProviders, origin),
+    path,
+    provider,
+    providers: whitelabelProviders,
+  };
 };

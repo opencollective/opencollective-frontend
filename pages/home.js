@@ -60,7 +60,7 @@ export const getServerSideProps = async context => {
     }
   }
 
-  const whitelabel = getWhitelabelProps(context);
+  const whitelabel = await getWhitelabelProps(context);
   if (whitelabel?.provider) {
     return { redirect: { destination: `${whitelabel.provider.domain}/${whitelabel.provider.slug}`, permanent: false } };
   }

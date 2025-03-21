@@ -9,6 +9,7 @@ import { isSuspiciousUserAgent, RobotsDetector } from '../lib/robots-detector';
 import { isTrustedSigninRedirectionUrl, isValidRelativeUrl } from '../lib/utils';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '@/lib/local-storage';
 import type { WhitelabelProps } from '@/lib/whitelabel';
+import { getWhitelabelProps } from '@/lib/whitelabel';
 
 import Body from '../components/Body';
 import { Flex } from '../components/Grid';
@@ -43,13 +44,19 @@ type SigninPageState = {
 };
 
 class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
-  static getInitialProps({ query: { token, next, form, email }, req }: NextPageContext) {
+  static async getInitialProps(context: NextPageContext) {
+    const {
+      query: { token, form },
+      req,
+    } = context;
+    let { email, next } = context.query;
     // Decode next URL if URI encoded
     if (typeof next === 'string' && next.includes('%2F')) {
       next = decodeURIComponent(next);
     }
 
-    const isTrustedRedirection = isTrustedSigninRedirectionUrl(next as string);
+    const whitelabelProps = await getWhitelabelProps(context as any);
+    const isTrustedRedirection = isTrustedSigninRedirectionUrl(next as string, whitelabelProps.providers);
     const isValidRelative = isValidRelativeUrl(next);
     email = typeof email === 'string' && decodeURIComponent(email);
     return {
@@ -104,7 +111,7 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
       // Avoid redirect loop: replace '/signin' redirects by '/'
       const { next } = this.props;
       let redirect = next && (next.match(/^\/?signin[?/]?/) || next.match(/^\/?reset-password[?/]?/)) ? null : next;
-      const isTrustedWhitelabel = isTrustedSigninRedirectionUrl(redirect);
+      const isTrustedWhitelabel = isTrustedSigninRedirectionUrl(redirect, this.props.whitelabel?.providers);
       if (isTrustedWhitelabel) {
         const parsedUrl = new URL(redirect);
         const token = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);

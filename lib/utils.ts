@@ -3,7 +3,7 @@ import loadScript from 'load-script';
 import { isEmpty, isObject, omit } from 'lodash';
 import { twMerge } from 'tailwind-merge';
 
-import * as whitelabel from './constants/whitelabel-providers';
+import { isWhitelabelDomain } from './whitelabel';
 
 /**
  * Helper to make it easier to conditionally add and deduplicate Tailwind CSS classes and deduplicate
@@ -71,12 +71,12 @@ export const isValidRelativeUrl = url => {
   }
 };
 
-export const isTrustedSigninRedirectionUrl = (url: string) => {
+export const isTrustedSigninRedirectionUrl = (url: string, providers) => {
   if (!url) {
     return false;
   } else if (url.startsWith('http://') || url.startsWith('https://')) {
     const parsedUrl = new URL(url);
-    return whitelabel.WHITELABEL_DOMAINS.includes(parsedUrl.origin);
+    return isWhitelabelDomain(providers, parsedUrl.origin);
   }
   return false;
 };

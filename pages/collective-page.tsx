@@ -67,7 +67,7 @@ const collectivePageQueryHelper = getSSRQueryHelpers<
 // next.js export
 // ts-unused-exports:disable-next-line
 export const getServerSideProps = async (context: Context) => {
-  const whitelabel = getWhitelabelProps(context);
+  const whitelabel = await getWhitelabelProps(context);
   const result = await collectivePageQueryHelper.getServerSideProps(context);
   const props = result['props'];
   const error = props[APOLLO_ERROR_PROP_NAME];

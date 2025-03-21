@@ -276,6 +276,8 @@ function createClient({ initialState, twoFactorAuthContext, accessToken }: any =
   });
 }
 
+export type ApolloClientType = ReturnType<typeof createClient>;
+
 export function initClient({ initialState, twoFactorAuthContext, accessToken }: any = {}): ReturnType<
   typeof createClient
 > {

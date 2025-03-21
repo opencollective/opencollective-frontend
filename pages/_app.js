@@ -84,7 +84,7 @@ class OpenCollectiveFrontendApp extends App {
     }
 
     const props = {
-      pageProps: { skipDataFromTree: true, whitelabel: getWhitelabelProps(ctx) },
+      pageProps: { skipDataFromTree: true, whitelabel: await getWhitelabelProps(ctx, apolloClient) },
       scripts: {},
       ...getIntlProps(ctx),
     };
