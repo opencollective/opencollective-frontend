@@ -1,7 +1,9 @@
 import React from 'react';
 import { Discord } from '@styled-icons/fa-brands/Discord';
 import { Github } from '@styled-icons/fa-brands/Github';
+import { Linkedin } from '@styled-icons/fa-brands/Linkedin';
 import { Mastodon } from '@styled-icons/fa-brands/Mastodon';
+import { Twitter } from '@styled-icons/fa-brands/Twitter';
 import { ChevronDown, ExternalLink, Mail } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
@@ -30,6 +32,12 @@ const SocialLink = ({ href, children, ...props }) => (
 const SocialLinks = ({ className }: { className?: string }) => {
   return (
     <div className={cn('flex items-center gap-1', className)}>
+      <SocialLink href="https://linkedin.com/company/opencollective" rel="me" title="Open Collective LinkedIn link">
+        <Linkedin size={16} />
+      </SocialLink>
+      <SocialLink href="https://x.com/@opencollect" rel="me" title="Open Collective Twitter link">
+        <Twitter size={16} />
+      </SocialLink>
       <SocialLink
         href="https://mastodon.opencollective.com/@opencollective"
         rel="me"
