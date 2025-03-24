@@ -22,6 +22,7 @@ import type { UserContextProps } from '../../lib/hooks/useLoggedInUser';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { cn } from '../../lib/utils';
+import useWhitelabelProvider from '@/lib/hooks/useWhitelabel';
 
 import Avatar from '../Avatar';
 import Link from '../Link';
@@ -32,6 +33,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '../ui/Popover';
 import { Separator } from '../ui/Separator';
 
 import { DrawerMenu } from './DrawerMenu';
+import { ProfileMenuIconsMap } from './Icons';
 import ProfileMenuMemberships from './ProfileMenuMemberships';
 
 const memberInvitationsCountQuery = gql`
@@ -52,7 +54,7 @@ const MenuItem = ({
   label,
   ...props
 }: {
-  Icon: LucideIcon;
+  Icon: LucideIcon | string;
   appending?: React.ReactNode;
   href?: string;
   label?: string;
@@ -60,6 +62,9 @@ const MenuItem = ({
   className?: string;
   external?: boolean;
 }) => {
+  if (typeof Icon === 'string') {
+    Icon = ProfileMenuIconsMap[Icon as keyof typeof ProfileMenuIconsMap];
+  }
   const classes = cn(
     'group mx-2 flex h-9 items-center justify-between gap-2 overflow-hidden rounded-md px-2 text-left text-sm hover:bg-primary-foreground',
     className,
@@ -97,6 +102,7 @@ const MenuItem = ({
 };
 
 const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserContextProps['logout']>[0] }) => {
+  const whitelabel = useWhitelabelProvider();
   const router = useRouter();
   const intl = useIntl();
   const { LoggedInUser, logout } = useLoggedInUser();
@@ -122,10 +128,11 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
   }, []);
 
   if (!LoggedInUser) {
-    return <LoginBtn />;
+    return <LoginBtn isWhitelabelDomain={!!whitelabel} />;
   }
 
   const pendingInvitations = data?.memberInvitations?.length > 0 ? data?.memberInvitations?.length : null;
+  const menuLinks = whitelabel?.links?.filter(link => !!link.icon);
 
   const content = (
     <React.Fragment>
@@ -189,23 +196,36 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
               label={intl.formatMessage({ id: 'Settings', defaultMessage: 'Settings' })}
             />
             <Separator className="my-1" />
-            <MenuItem
-              Icon={Home}
-              href="/home"
-              label={intl.formatMessage({ id: 'qFt6F7', defaultMessage: 'Open Collective Home' })}
-            />
-            <MenuItem
-              Icon={LifeBuoy}
-              href="/help"
-              label={intl.formatMessage({ id: 'Uf3+S6', defaultMessage: 'Help & Support' })}
-            />
-            <MenuItem
-              Icon={BookOpen}
-              href="https://docs.opencollective.com"
-              external={true}
-              label={intl.formatMessage({ id: 'menu.documentation', defaultMessage: 'Documentation' })}
-            />
-            <Separator className="my-1" />
+            {!whitelabel ? ( // <div className="min-h-10" />
+              <React.Fragment>
+                <MenuItem
+                  Icon={Home}
+                  href="/home"
+                  label={intl.formatMessage({ id: 'qFt6F7', defaultMessage: 'Open Collective Home' })}
+                />
+                <MenuItem
+                  Icon={LifeBuoy}
+                  href="/help"
+                  label={intl.formatMessage({ id: 'Uf3+S6', defaultMessage: 'Help & Support' })}
+                />
+                <MenuItem
+                  Icon={BookOpen}
+                  href="https://docs.opencollective.com"
+                  external={true}
+                  label={intl.formatMessage({ id: 'menu.documentation', defaultMessage: 'Documentation' })}
+                />
+                <Separator className="my-1" />
+              </React.Fragment>
+            ) : (
+              menuLinks?.length > 0 && (
+                <React.Fragment>
+                  {menuLinks.map(({ label, href, icon }) => (
+                    <MenuItem key={href} Icon={icon} href={href} external={href.startsWith('http')} label={label} />
+                  ))}
+                  <Separator className="my-1" />
+                </React.Fragment>
+              )
+            )}
             <MenuItem
               Icon={LogOut}
               onClick={() => logout(logoutParameters)}
