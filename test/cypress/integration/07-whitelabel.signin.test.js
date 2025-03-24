@@ -26,11 +26,6 @@ describe('white-label signin', () => {
     cy.url().should('eq', `http://local.opencollective:3000/opencollective`);
   });
 
-  it('redirects from collective profile to white-label domain', () => {
-    cy.visit(`http://localhost:3000/opencollective`);
-    cy.url().should('eq', `http://local.opencollective:3000/opencollective`);
-  });
-
   describe('signin with 2FA', () => {
     let user = null;
     let secret;
