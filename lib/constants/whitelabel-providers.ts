@@ -16,7 +16,24 @@ type WhitelabelProvider = {
   }[];
 };
 
-const WHITELABEL_PROVIDERS: WhitelabelProvider[] = [];
+const WHITELABEL_PROVIDERS: WhitelabelProvider[] = [
+  {
+    slug: 'ofico',
+    domain: env === 'development' ? 'http://local.ofi:3000' : 'https://oficollective.com',
+    name: 'OFiCo',
+    logo: '/static/images/logotype-ofi-collective.svg',
+    links: [
+      {
+        label: 'Home',
+        href: '/home',
+        icon: ProfileMenuIcons.Home,
+      },
+      { label: 'About', href: 'https://docs.opencollective.com/help/about/introduction' },
+      { label: 'Help & Support', href: '/help', icon: ProfileMenuIcons.LifeBuoy },
+      { label: 'Terms of Service', href: '/tos', icon: ProfileMenuIcons.FileText },
+    ],
+  },
+];
 
 // Inject WHITELABEL_DOMAIN for testing purposes
 if (['development', 'e2e', 'ci'].includes(env)) {
