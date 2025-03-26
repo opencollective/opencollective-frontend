@@ -789,9 +789,13 @@ export const ActivityTypeI18n: ActivityTranslations = defineMessages({
     defaultMessage: 'New expected funds',
     id: 'kzIWOG',
   },
-  ORDER_THANKYOU: {
-    defaultMessage: 'New contribution',
-    id: 'raUlsb',
+  ORDER_PROCESSED: {
+    defaultMessage: 'Contribution processed',
+    id: 'mrdaqR',
+  },
+  ORDER_PENDING_CREATED: {
+    defaultMessage: 'New expected funds',
+    id: 'kzIWOG',
   },
   ORDERS_SUSPICIOUS: {
     defaultMessage: 'Suspicious contribution',

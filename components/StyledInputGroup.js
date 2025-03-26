@@ -77,18 +77,18 @@ const getBorderColor = ({ error, focused, success }) => {
  * @see See [StyledInput](/#!/StyledInput) for details about props passed to it
  */
 const StyledInputGroup = ({
-  append,
-  prepend,
-  disabled,
-  success,
-  error,
-  maxWidth,
-  containerProps,
-  prependProps,
-  appendProps,
-  innerRef,
-  autoFocus,
-  overflow,
+  append = undefined,
+  prepend = undefined,
+  disabled = undefined,
+  success = undefined,
+  error = undefined,
+  maxWidth = undefined,
+  containerProps = undefined,
+  prependProps = undefined,
+  appendProps = undefined,
+  innerRef = undefined,
+  autoFocus = undefined,
+  overflow = undefined,
   ...inputProps
 }) => {
   const [focused, setFocus] = useState(false);
