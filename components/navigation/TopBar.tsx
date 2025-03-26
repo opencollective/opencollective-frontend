@@ -9,6 +9,7 @@ import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { ScrollDirection, useWindowScroll } from '../../lib/hooks/useWindowScroll';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
+import { useWhitelabelProvider } from '@/lib/hooks/useWhitelabel';
 
 import ChangelogTrigger from '../changelog/ChangelogTrigger';
 import { Box, Flex } from '../Grid';
@@ -153,6 +154,7 @@ type TopBarProps = {
 };
 
 const TopBar = ({ account }: TopBarProps) => {
+  const whitelabel = useWhitelabelProvider();
   const { LoggedInUser } = useLoggedInUser();
   const [showSearchModal, setShowSearchModal] = useState(false);
   const ref = useRef();
@@ -168,7 +170,7 @@ const TopBar = ({ account }: TopBarProps) => {
   const onDashboardRoute = isRouteActive('/dashboard');
   const onSearchRoute =
     isRouteActive('/search') || (account && isRouteActive(`/${account.parentCollective?.slug || account.slug}`));
-  const ocLogoRoute = LoggedInUser ? '/dashboard' : '/home';
+  const ocLogoRoute = LoggedInUser ? '/dashboard' : whitelabel ? `/${whitelabel.slug}` : '/home';
   const useSearchCommandMenu = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.SEARCH_COMMAND);
   return (
     <Fragment>
@@ -195,9 +197,7 @@ const TopBar = ({ account }: TopBarProps) => {
 
           <Flex alignItems="center" gridGap={2} flexShrink={4} flexGrow={0}>
             <SearchTrigger setShowSearchModal={setShowSearchModal} />
-            <div className="hidden sm:block">
-              <ChangelogTrigger />
-            </div>
+            <div className="hidden sm:block">{!whitelabel && <ChangelogTrigger />}</div>
             <ProfileMenu
               logoutParameters={{ skipQueryRefetch: onDashboardRoute, redirect: onDashboardRoute ? '/' : undefined }}
             />

@@ -11,48 +11,39 @@ export type WhitelabelProps = {
   path?: string;
 };
 
-const getOrigin = (ctx?: Context) => {
+const getOriginAndPath = (ctx?: Context) => {
   if (typeof window !== 'undefined') {
-    return window.location.origin;
-  } else if (ctx?.req?.headers) {
-    const proto = ctx.req.headers['x-forwarded-proto'] || 'https';
-    const hostname = ctx.req.headers['original-hostname'] || ctx.req.headers['host'];
-    if (hostname) {
-      return `${proto}://${hostname}`;
+    return { origin: window.location.origin, path: window.location.pathname };
+  } else {
+    let origin, path;
+    if (ctx?.req?.headers) {
+      const proto = ctx.req.headers['x-forwarded-proto'] || 'https';
+      const hostname = ctx.req.headers['original-hostname'] || ctx.req.headers['host'];
+      if (hostname) {
+        origin = `${proto}://${hostname}`;
+      }
     }
+    if (ctx?.req?.url && !ctx.req.url.startsWith('/_next')) {
+      path = ctx.req.url;
+    }
+    return { origin, path };
   }
-  return null;
 };
 
-const getPath = (ctx?: Context) => {
-  if (typeof window !== 'undefined') {
-    return window.location.pathname;
-  } else if (ctx?.req?.url) {
-    const path = ctx.req.url;
-    if (!path?.startsWith('/_next')) {
-      return path;
-    }
-  }
-  return null;
-};
-
-export const shouldRedirect = (hostSlug?: string, slug?: string) => {
-  const provider = hostSlug && WHITELABEL_PROVIDERS.find(provider => provider.slug === hostSlug);
-  if (provider) {
-    return { domain: provider.domain, slug: slug || provider.slug };
+export const shouldRedirect = (account: { settings?: { whitelabelDomain?: string }; slug: string }) => {
+  if (account?.settings?.whitelabelDomain && WHITELABEL_DOMAINS.includes(account.settings.whitelabelDomain)) {
+    return `${account.settings.whitelabelDomain}/${account.slug}`;
   }
 };
 
 export const getWhitelabelProps = (ctx?: Context): WhitelabelProps => {
-  const origin = getOrigin(ctx);
+  const { origin, path } = getOriginAndPath(ctx);
   if (!origin) {
     return null;
   }
 
-  const path = getPath(ctx);
-
   const isNonPlatformDomain = !process.env.WEBSITE_URL.includes(origin);
   const isWhitelabelDomain = isEmpty(WHITELABEL_DOMAINS) ? false : WHITELABEL_DOMAINS.includes(origin);
   const provider = WHITELABEL_PROVIDERS.find(provider => provider.domain === origin);
-  return { isNonPlatformDomain, origin, isWhitelabelDomain, path, provider };
+  return { origin, path, provider, isNonPlatformDomain, isWhitelabelDomain };
 };
