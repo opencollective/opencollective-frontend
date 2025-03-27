@@ -103,7 +103,7 @@ function SubmitGrantDialog(props: SubmitGrantDialogProps) {
             <span className="text-xl leading-7 font-bold text-slate-800">
               {!submittedGrantId && (
                 <FormattedMessage
-                  defaultMessage="Grant Applicatio to {accountName}"
+                  defaultMessage="Grant Application to {accountName}"
                   id="tk1wte"
                   values={{
                     accountName: props.account.name,
