@@ -10,9 +10,13 @@ import { generateNotFoundError } from '@/lib/errors';
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type { CreateGrantPageQuery } from '@/lib/graphql/types/v2/graphql';
 import { ExpenseType } from '@/lib/graphql/types/v2/schema';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 import { getCollectivePageCanonicalURL, getCollectivePageRoute } from '@/lib/url-helpers';
+import { parseToBoolean } from '@/lib/utils';
 
 import ErrorPage from '@/components/ErrorPage';
+import Loading from '@/components/Loading';
 import Page from '@/components/Page';
 import PageFeatureNotSupported from '@/components/PageFeatureNotSupported';
 import SubmitGrantFlow from '@/components/submit-grant/SubmitGrantFlow';
@@ -27,6 +31,7 @@ const CreateGrantPageI18n = defineMessages({
 function CreateGrantPage(props: Awaited<ReturnType<typeof CreateGrantPage.getInitialProps>>) {
   const intl = useIntl();
   const router = useRouter();
+  const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const pageMetadata = React.useMemo(() => {
     if (!props.account) {
       return null;
@@ -48,11 +53,26 @@ function CreateGrantPage(props: Awaited<ReturnType<typeof CreateGrantPage.getIni
     router.replace(collectivePage);
   }, [props.account, router]);
 
-  if (props.error) {
+  const { queryResult } = props;
+  const isGrantPreviewEnabled =
+    !LoggedInUser ||
+    LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_GRANT_FLOW) ||
+    props.newFlowEnabledInUrl;
+
+  if (queryResult.loading || loadingLoggedInUser) {
+    return (
+      <Page {...pageMetadata} collective={props.account} withTopBar={false} showFooter={false}>
+        <div className="flex h-screen flex-col items-center justify-center p-12">
+          <Loading />
+          <Loading />
+        </div>
+      </Page>
+    );
+  } else if (props.error) {
     return <ErrorPage error={props.error} />;
   } else if (!props.account) {
     return <ErrorPage error={generateNotFoundError(props.collectiveSlug)} log={false} />;
-  } else if (!props.isGrantPreviewEnabled || !(props.account.supportedExpenseTypes || []).includes(ExpenseType.GRANT)) {
+  } else if (!isGrantPreviewEnabled || !(props.account.supportedExpenseTypes || []).includes(ExpenseType.GRANT)) {
     return <PageFeatureNotSupported />;
   }
 
@@ -109,12 +129,6 @@ CreateGrantPage.getInitialProps = async (ctx: NextPageContext) => {
 
           ...CollectivePageMetadataFields
         }
-
-        loggedInAccount {
-          id
-          legacyId
-          settings
-        }
       }
 
       ${CollectivePageMetadataFieldsFragment}
@@ -127,12 +141,13 @@ CreateGrantPage.getInitialProps = async (ctx: NextPageContext) => {
 
   const account = queryResult.data?.account;
   const error = queryResult.error;
-  const isGrantPreviewEnabled =
-    !!queryResult.data?.loggedInAccount?.settings?.earlyAccess?.NEW_GRANT_FLOW ||
-    !!ctx.query.newGrantFlowEnabled ||
-    !queryResult.data?.loggedInAccount;
-
-  return { collectiveSlug, account, error, isGrantPreviewEnabled };
+  return {
+    collectiveSlug,
+    account,
+    error,
+    queryResult,
+    newFlowEnabledInUrl: parseToBoolean(ctx.query.newGrantFlowEnabled),
+  };
 };
 
 function getApolloClient(ctx: NextPageContext) {
