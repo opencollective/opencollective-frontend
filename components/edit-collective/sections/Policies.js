@@ -128,8 +128,8 @@ const messages = defineMessages({
     defaultMessage: 'E.g. approval criteria, limitations, or required documentation.',
   },
   'grantExpensePolicy.error': {
-    id: 'collective.expensePolicy.error',
-    defaultMessage: 'Expense policy must contain less than {maxLength} characters',
+    id: 'collective.grantExpensePolicy.error',
+    defaultMessage: 'Grant policy must contain less than {maxLength} characters',
   },
   'receiptExpensePolicy.label': {
     id: 'collective.receiptExpensePolicy.label',
@@ -593,8 +593,8 @@ const Policies = ({ collective }) => {
           </StyledInputField>
           <P fontSize="14px" lineHeight="18px" color="black.600" my={2}>
             <FormattedMessage
-              id="collective.expensePolicy.description"
-              defaultMessage="It can be daunting to file an expense if you're not sure what's allowed. Provide a clear policy to guide expense submitters."
+              id="collective.grantExpensePolicy.description"
+              defaultMessage="It can be daunting to request a grant if you're not sure what's allowed. Provide a clear policy to guide grant requesters."
             />
           </P>
 
