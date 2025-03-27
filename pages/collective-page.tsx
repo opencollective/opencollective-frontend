@@ -72,14 +72,7 @@ export const getServerSideProps = async (context: Context) => {
   const props = result['props'];
   const error = props[APOLLO_ERROR_PROP_NAME];
   const data = props[APOLLO_QUERY_DATA_PROP_NAME];
-  const notFound = !error && collectivePageQueryHelper.checkResultContainsNonNullResult(props, 'Collective({"slug"');
-
-  if (context.res && context.req) {
-    const { locale } = getRequestIntl(context.req);
-    if (locale === 'en') {
-      context.res.setHeader('Cache-Control', 'public, s-maxage=300');
-    }
-  }
+  const notFound = !error && !data.Collective;
 
   // Deals with the redirection TO a white label domain, not back to platform
   if (data.Collective?.settings?.whitelabelDomain && whitelabel?.isWhitelabelDomain === false) {
