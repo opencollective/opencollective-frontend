@@ -78,6 +78,7 @@ export const getServerSideProps = async (context: Context) => {
   if (data.Collective?.settings?.whitelabelDomain && whitelabel?.isWhitelabelDomain === false) {
     const destination = shouldRedirect(data.Collective);
     if (destination) {
+      context.res?.setHeader('Cache-Control', 'no-cache');
       return {
         redirect: {
           destination: destination,
@@ -91,6 +92,13 @@ export const getServerSideProps = async (context: Context) => {
     return {
       notFound: true,
     };
+  }
+
+  if (context.res && context.req) {
+    const { locale } = getRequestIntl(context.req);
+    if (locale === 'en') {
+      context.res.setHeader('Cache-Control', 'public, s-maxage=300');
+    }
   }
 
   return { props };
