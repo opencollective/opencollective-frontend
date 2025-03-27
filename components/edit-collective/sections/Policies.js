@@ -803,7 +803,7 @@ const Policies = ({ collective }) => {
           </Flex>
           {collective.isHost && !isSelfHosted && (
             <React.Fragment>
-              <P
+              <Container
                 ml="1.4rem"
                 mt="0.65rem"
                 color={!formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.enabled ? 'black.600' : undefined}
@@ -830,8 +830,8 @@ const Policies = ({ collective }) => {
                     })
                   }
                 />
-              </P>
-              <P
+              </Container>
+              <Container
                 ml="1.4rem"
                 mt="0.65rem"
                 color={
@@ -864,7 +864,7 @@ const Policies = ({ collective }) => {
                     })
                   }
                 />
-              </P>
+              </Container>
             </React.Fragment>
           )}
           {numberOfAdmins < 2 && Boolean(!formik.values.policies?.['EXPENSE_AUTHOR_CANNOT_APPROVE']?.enabled) && (
