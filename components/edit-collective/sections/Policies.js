@@ -352,7 +352,7 @@ const Policies = ({ collective }) => {
                   inputName={inputProps.name}
                   onChange={formik.handleChange}
                   placeholder={formatMessage(messages['contributionPolicy.placeholder'])}
-                  defaultValue={formik.values.contributionPolicy}
+                  defaultValue={formik.values.contributionPolicy || ''}
                   fontSize="14px"
                 />
               )}
@@ -504,7 +504,7 @@ const Policies = ({ collective }) => {
                   inputName={inputProps.name}
                   onChange={formik.handleChange}
                   placeholder={formatMessage(messages['invoiceExpensePolicy.placeholder'])}
-                  defaultValue={data?.account?.policies?.EXPENSE_POLICIES?.invoicePolicy}
+                  defaultValue={data?.account?.policies?.EXPENSE_POLICIES?.invoicePolicy || ''}
                   fontSize="14px"
                   maxHeight={600}
                 />
@@ -544,7 +544,7 @@ const Policies = ({ collective }) => {
                   inputName={inputProps.name}
                   onChange={formik.handleChange}
                   placeholder={formatMessage(messages['receiptExpensePolicy.placeholder'])}
-                  defaultValue={data?.account?.policies?.EXPENSE_POLICIES?.receiptPolicy}
+                  defaultValue={data?.account?.policies?.EXPENSE_POLICIES?.receiptPolicy || ''}
                   fontSize="14px"
                   maxHeight={600}
                 />
@@ -582,7 +582,7 @@ const Policies = ({ collective }) => {
                   editorMaxHeight={500}
                   id={inputProps.id}
                   inputName={inputProps.name}
-                  onChange={formik.handleChange}
+                  onChange={e => console.log(e) || formik.handleChange(e)}
                   placeholder={formatMessage(messages['grantExpensePolicy.placeholder'])}
                   defaultValue={data?.account?.policies?.EXPENSE_POLICIES?.grantPolicy || ''}
                   fontSize="14px"
@@ -624,7 +624,7 @@ const Policies = ({ collective }) => {
                   inputName={inputProps.name}
                   onChange={formik.handleChange}
                   placeholder={formatMessage(messages['titleExpensePolicy.placeholder'])}
-                  defaultValue={data?.account?.policies?.EXPENSE_POLICIES?.titlePolicy}
+                  defaultValue={data?.account?.policies?.EXPENSE_POLICIES?.titlePolicy || ''}
                   fontSize="14px"
                   maxHeight={600}
                 />
