@@ -222,7 +222,7 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
     (result: FetchResult<CreateExpenseFromDashboardMutation> | FetchResult<EditExpenseFromDashboardMutation>) => {
       toast({
         variant: 'success',
-        title: <FormattedMessage id="Expense.Submitted" defaultMessage="Expense submitted" />,
+        title: <FormattedMessage defaultMessage="Grant Application submitted" id="9XkBTl" />,
         message: LoggedInUser ? <Survey hasParentTitle surveyKey={SURVEY_KEY.EXPENSE_SUBMITTED_NEW_FLOW} /> : null,
         duration: 20000,
       });
