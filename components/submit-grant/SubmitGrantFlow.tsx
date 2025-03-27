@@ -338,8 +338,6 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
       setActiveStep(Step.INFORMATION);
       return;
     }
-
-    // TODO(henrique): exit form
   }, [steps.activeHeaderName, setActiveStep]);
 
   const onNextStepClick = React.useCallback(async () => {
