@@ -214,7 +214,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
               exchangeRate: ei.amount.exchangeRate
                 ? ({
                     ...pick(ei.amount.exchangeRate, ['source', 'rate', 'value', 'fromCurrency', 'toCurrency']),
-                    date: ei.amount.exchangeRate.date || ei.incurredAt,
+                    date: new Date(ei.amount.exchangeRate.date || ei.incurredAt),
                   } as CurrencyExchangeRateInput)
                 : null,
             },
