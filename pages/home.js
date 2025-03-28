@@ -53,16 +53,18 @@ export const HomePage = () => {
 // ts-unused-exports:disable-next-line
 export const getServerSideProps = async context => {
   const { req, res } = context;
+
+  const whitelabel = getWhitelabelProps(context);
+  if (whitelabel?.provider) {
+    res?.setHeader('Cache-Control', 'no-cache');
+    return { redirect: { destination: `${whitelabel.provider.domain}/${whitelabel.provider.slug}`, permanent: false } };
+  }
+
   if (res && req) {
     const { locale } = getRequestIntl(req);
     if (locale === 'en') {
       res.setHeader('Cache-Control', 'public, s-maxage=3600');
     }
-  }
-
-  const whitelabel = getWhitelabelProps(context);
-  if (whitelabel?.provider) {
-    return { redirect: { destination: `${whitelabel.provider.domain}/${whitelabel.provider.slug}`, permanent: false } };
   }
 
   let skipDataFromTree = false;

@@ -245,7 +245,6 @@ type RichTextEditorState = {
   value: string;
   text: string;
   error: any;
-  hasRunBeforeInitialize: boolean;
 };
 
 /**
@@ -268,13 +267,7 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
     super(props);
     this.editorRef = React.createRef();
     this.mainContainerRef = React.createRef();
-    this.state = {
-      id: props.id,
-      error: null,
-      value: this.prepareHTML(props.defaultValue),
-      text: '',
-      hasRunBeforeInitialize: false,
-    };
+    this.state = { id: props.id, error: null, value: this.prepareHTML(props.defaultValue), text: '' };
     this.isReady = false;
 
     // Load Trix
@@ -287,19 +280,17 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
   componentDidMount() {
     if (!this.state.id) {
       this.setState({ id: uuid() });
-    } else if (!this.isReady && this.state.hasRunBeforeInitialize) {
+    } else if (!this.isReady) {
       // Initialize Trix
       this.initialize();
     }
   }
 
   componentDidUpdate(oldProps) {
-    if (this.state.hasRunBeforeInitialize) {
-      if (!this.isReady) {
-        this.initialize();
-      } else if (oldProps.reset !== this.props.reset) {
-        this.getEditor().loadHTML('');
-      }
+    if (!this.isReady) {
+      this.initialize();
+    } else if (oldProps.reset !== this.props.reset) {
+      this.getEditor().loadHTML('');
     }
   }
 
@@ -366,7 +357,6 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
     this.Trix.config.attachments.preview.caption = { name: false, size: false };
     remove(this.Trix.config.parser.forbiddenElements, type => type === 'iframe'); // Allow iframes for video embeds
     this.Trix.config.parser.allowedAttributes.push('frameborder', 'allowfullscreen');
-    this.setState({ hasRunBeforeInitialize: true });
   };
 
   trixInitialize = event => {

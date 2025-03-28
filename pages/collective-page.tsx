@@ -72,24 +72,16 @@ export const getServerSideProps = async (context: Context) => {
   const props = result['props'];
   const error = props[APOLLO_ERROR_PROP_NAME];
   const data = props[APOLLO_QUERY_DATA_PROP_NAME];
-  const notFound = !error && collectivePageQueryHelper.checkResultContainsNonNullResult(props, 'Collective({"slug"');
+  const notFound = !error && !data?.Collective;
 
-  if (context.res && context.req) {
-    const { locale } = getRequestIntl(context.req);
-    if (locale === 'en') {
-      context.res.setHeader('Cache-Control', 'public, s-maxage=300');
-    }
-  }
-
-  if (!whitelabel?.isNonPlatformDomain && data?.Collective) {
-    const whitelabelRedirect = shouldRedirect(
-      data?.Collective?.host?.slug || data?.Collective?.slug,
-      data?.Collective?.slug,
-    );
-    if (whitelabelRedirect) {
+  // Deals with the redirection TO a white label domain, not back to platform
+  if (data?.Collective?.settings?.whitelabelDomain && whitelabel?.isWhitelabelDomain === false) {
+    const destination = shouldRedirect(data.Collective);
+    if (destination) {
+      context.res?.setHeader('Cache-Control', 'no-cache');
       return {
         redirect: {
-          destination: `${whitelabelRedirect.domain}/${whitelabelRedirect.slug}`,
+          destination: destination,
           permanent: false,
         },
       };
@@ -100,6 +92,13 @@ export const getServerSideProps = async (context: Context) => {
     return {
       notFound: true,
     };
+  }
+
+  if (context.res && context.req) {
+    const { locale } = getRequestIntl(context.req);
+    if (locale === 'en') {
+      context.res.setHeader('Cache-Control', 'public, s-maxage=300');
+    }
   }
 
   return { props };
