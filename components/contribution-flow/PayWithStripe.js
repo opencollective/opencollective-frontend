@@ -38,10 +38,15 @@ export function PayWithStripeForm({
   const stripe = useStripe();
   const [selectedPaymentMethodType, setSelectedPaymentMethodType] = React.useState('card');
   const [isSavePaymentMethod, setIsSavePaymentMethod] = React.useState(defaultIsSaved);
+  const [hasFieldErrors, setHasFieldErrors] = React.useState(false);
 
   const onElementChange = React.useCallback(
     event => {
       setSelectedPaymentMethodType(event.value.type);
+      // Track if there are validation errors in the fields
+      const hasErrors = event.error || (event.value.type === 'bacs_debit' && !event.complete);
+      setHasFieldErrors(hasErrors);
+      
       onChange({
         stepPayment: {
           key: STRIPE_PAYMENT_ELEMENT_KEY,
@@ -103,9 +108,73 @@ export function PayWithStripeForm({
             googlePay: 'always',
             paypal: 'always',
           },
+          appearance: {
+            theme: 'stripe',
+            variables: {
+              colorPrimary: '#3385ff',
+              colorBackground: '#ffffff',
+              colorText: '#30313d',
+              colorDanger: '#df1b41',
+              fontFamily: 'Inter, sans-serif',
+            },
+            rules: {
+              // General field styling
+              '.Input': {
+                transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+              },
+              '.Input--empty': {
+                borderColor: '#c0c4c9',
+              },
+              // Highlight incomplete/invalid fields with red border
+              '.Input--invalid': {
+                borderColor: 'var(--colorDanger)',
+                boxShadow: '0 1px 3px 0 rgba(223, 27, 65, 0.2)',
+              },
+              // Add more visible focus state
+              '.Input:focus': {
+                borderColor: 'var(--colorPrimary)',
+                boxShadow: '0 1px 3px 0 rgba(51, 133, 255, 0.3)',
+              },
+              // Keep error state visible when focused
+              '.Input--invalid:focus': {
+                borderColor: 'var(--colorDanger)',
+                boxShadow: '0 1px 3px 0 rgba(223, 27, 65, 0.3)',
+              },
+              // Specific Bacs direct debit styling
+              '.Label--bacs': {
+                marginBottom: '4px',
+              },
+              // Style the checkbox 
+              '.CheckboxInput': {
+                borderWidth: '2px',
+              },
+              '.CheckboxInput--invalid': {
+                borderColor: 'var(--colorDanger)',
+                boxShadow: '0 1px 3px 0 rgba(223, 27, 65, 0.3)',
+              },
+              // Make the confirmation checkbox more noticeable for Bacs
+              '.Label.Label--checkbox': {
+                fontWeight: '500',
+              },
+              // Success state for completed fields
+              '.Input--complete': {
+                borderColor: '#09825d',
+              },
+            },
+          },
         }}
         onChange={onElementChange}
       />
+      
+      {/* Show validation error message for Bacs direct debit */}
+      {hasFieldErrors && selectedPaymentMethodType === 'bacs_debit' && (
+        <Flex mt={2} color="red.500" fontSize="13px">
+          <FormattedMessage
+            id="PayWithStripe.BacsValidationError"
+            defaultMessage="Please complete all required fields and check the confirmation checkbox."
+          />
+        </Flex>
+      )}
 
       {hasSaveCheckBox && isReusableStripePaymentMethodType(selectedPaymentMethodType) && (
         <Flex mt={3} alignItems="center" color="black.700">
