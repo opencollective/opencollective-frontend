@@ -199,7 +199,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
             </RadioGroupCard>
           )}
 
-          {!(isLoading || isLoadingPayee) && !isVendor && props.newPayoutMethodTypes?.length > 0 && (
+          {!(isLoading || isLoadingPayee) && !isVendor && (props.newPayoutMethodTypes && props.newPayoutMethodTypes.length > 0) && (
             <RadioGroupCard
               value="__newPayoutMethod"
               checked={isNewPayoutMethodSelected}
