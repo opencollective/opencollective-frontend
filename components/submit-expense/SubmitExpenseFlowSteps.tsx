@@ -202,20 +202,21 @@ type StepProps = {
   children?: React.ReactNode;
 };
 
-function StepHeader(props: StepProps & { stepNumber: number }) {
+export function StepHeader(props: StepProps & { stepNumber: number }) {
   return (
     <li
       className={cn(
         'relative flex items-center gap-2 pb-8 pl-7 font-bold before:absolute before:left-0 before:inline-block before:h-6 before:w-6 before:-translate-x-3 before:rounded-full before:border-2 before:border-[#94A3B8] before:bg-white before:text-center after:absolute after:top-2 after:left-0 after:-z-10 after:h-full after:-translate-x-[1px] after:border-l-2 after:border-solid last:after:hidden',
         {
           'before:border-blue-900': props.isActive,
-          "before:border-blue-900 before:bg-blue-900 before:text-white before:content-['✓']": props.isComplete,
+          "before:border-blue-900 before:bg-blue-900 before:text-white before:content-['✓']":
+            props.isComplete && !props.isActive,
           'after:border-blue-900': props.isCompletedPath,
         },
       )}
     >
       {props.children}
-      {!props.isComplete && (
+      {(!props.isComplete || props.isActive) && (
         <div
           className={cn('absolute left-0 flex h-6 w-6 -translate-x-3 items-center justify-center text-[#94A3B8]', {
             'text-blue-900': props.isActive,
@@ -228,7 +229,7 @@ function StepHeader(props: StepProps & { stepNumber: number }) {
   );
 }
 
-function StepItem(props: StepProps) {
+export function StepItem(props: StepProps) {
   return (
     <li
       className={cn(

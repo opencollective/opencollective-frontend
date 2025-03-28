@@ -3897,6 +3897,7 @@ export type Expense_Categorization = {
 
 export type Expense_Policies = {
   __typename?: 'EXPENSE_POLICIES';
+  grantPolicy?: Maybe<Scalars['String']['output']>;
   invoicePolicy?: Maybe<Scalars['String']['output']>;
   receiptPolicy?: Maybe<Scalars['String']['output']>;
   titlePolicy?: Maybe<Scalars['String']['output']>;
@@ -10078,6 +10079,7 @@ export type PoliciesExpenseCategorizationInput = {
 };
 
 export type PoliciesExpensePolicies = {
+  grantPolicy?: InputMaybe<Scalars['String']['input']>;
   invoicePolicy?: InputMaybe<Scalars['String']['input']>;
   receiptPolicy?: InputMaybe<Scalars['String']['input']>;
   titlePolicy?: InputMaybe<Scalars['String']['input']>;

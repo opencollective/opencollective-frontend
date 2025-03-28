@@ -1162,6 +1162,7 @@ type EXPENSE_POLICIES {
   invoicePolicy: String
   receiptPolicy: String
   titlePolicy: String
+  grantPolicy: String
 }
 
 type EXPENSE_AUTHOR_CANNOT_APPROVE {

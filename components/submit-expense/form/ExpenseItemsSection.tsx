@@ -27,6 +27,7 @@ import { FormField } from '@/components/FormField';
 import InputAmount from '@/components/InputAmount';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { Textarea } from '@/components/ui/Textarea';
 
 import Dropzone, { MemoizedDropzone } from '../../Dropzone';
 import { ExchangeRate } from '../../ExchangeRate';
@@ -256,7 +257,14 @@ type ExpenseItemProps = {
 function getExpenseItemProps(form: ExpenseForm) {
   return {
     ...pick(form, ['setFieldValue', 'isSubmitting']),
-    ...pick(form.options, ['allowExpenseItemAttachment', 'isAdminOfPayee', 'expenseCurrency']),
+    ...pick(form.options, [
+      'allowExpenseItemAttachment',
+      'isAdminOfPayee',
+      'expenseCurrency',
+      'allowDifferentItemCurrency',
+      'isLongFormItemDescription',
+      'hasExpenseItemDate',
+    ]),
   };
 }
 
@@ -372,20 +380,29 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
               label={intl.formatMessage({ defaultMessage: 'Item Description', id: 'xNL/oy' })}
               placeholder={intl.formatMessage({ defaultMessage: 'Enter what best describes the item', id: '/eapvj' })}
               name={`expenseItems.${props.index}.description`}
-            />
-          </div>
-          <div className="flex flex-col gap-4 @md:grid @md:grid-cols-3">
-            <FormField
-              required={props.isAdminOfPayee}
-              disabled={props.isSubmitting}
-              label={intl.formatMessage({ defaultMessage: 'Date', id: 'expense.incurredAt' })}
-              name={`expenseItems.${props.index}.incurredAt`}
             >
               {({ field }) => {
-                const value = field.value ? dayjs.utc(field.value).format('YYYY-MM-DD') : undefined;
-                return <Input type="date" {...field} value={value} />;
+                if (props.isLongFormItemDescription) {
+                  return <Textarea {...field} />;
+                }
+                return <Input {...field} />;
               }}
             </FormField>
+          </div>
+          <div className="flex flex-col gap-4 @md:grid @md:grid-cols-3">
+            {props.hasExpenseItemDate && (
+              <FormField
+                required={props.isAdminOfPayee}
+                disabled={props.isSubmitting}
+                label={intl.formatMessage({ defaultMessage: 'Date', id: 'expense.incurredAt' })}
+                name={`expenseItems.${props.index}.incurredAt`}
+              >
+                {({ field }) => {
+                  const value = field.value ? dayjs.utc(field.value).format('YYYY-MM-DD') : undefined;
+                  return <Input type="date" {...field} value={value} />;
+                }}
+              </FormField>
+            )}
 
             <div className="col-span-2 flex flex-col">
               <FormField
@@ -401,7 +418,7 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
                   <InputAmount
                     {...field}
                     currencyDisplay="FULL"
-                    hasCurrencyPicker
+                    hasCurrencyPicker={props.allowDifferentItemCurrency}
                     currency={item.amount.currency || 'USD'}
                     onCurrencyChange={onCurrencyChange}
                     value={item.amount.valueInCents}
