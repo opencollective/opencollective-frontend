@@ -280,11 +280,11 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
     // Load Trix
     if (typeof window !== 'undefined') {
       this.Trix = require('@opencollective/trix').default; // eslint-disable-line @typescript-eslint/no-var-requires
-      document.addEventListener('trix-before-initialize', this.trixBeforeInitialize);
     }
   }
 
   componentDidMount() {
+    document.addEventListener('trix-before-initialize', this.trixBeforeInitialize);
     if (!this.state.id) {
       this.setState({ id: uuid() });
     } else if (!this.isReady && this.state.hasRunBeforeInitialize) {
@@ -695,7 +695,7 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
       editorMaxHeight,
     } = this.props;
 
-    return !this.state.id ? (
+    return !this.state.id || !this.state.hasRunBeforeInitialize ? (
       <LoadingPlaceholder
         maxHeight={editorMaxHeight && typeof editorMaxHeight === 'number' ? editorMaxHeight + 56 : undefined}
         height={editorMinHeight && typeof editorMinHeight === 'number' ? editorMinHeight + 56 : 200}

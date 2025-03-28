@@ -45,6 +45,7 @@ import { APOLLO_STATE_PROP_NAME, initClient } from '../lib/apollo-client';
 import { getTokenFromCookie } from '../lib/auth';
 import { getGoogleMapsScriptUrl, loadGoogleMaps } from '../lib/google-maps';
 import { loggedInUserQuery } from '../lib/graphql/v1/queries';
+import { WhitelabelProviderContext } from '../lib/hooks/useWhitelabel';
 import LoggedInUser from '../lib/LoggedInUser';
 import { withTwoFactorAuthentication } from '../lib/two-factor-authentication/TwoFactorAuthenticationContext';
 import { getWhitelabelProps } from '../lib/whitelabel';
@@ -199,16 +200,18 @@ class OpenCollectiveFrontendApp extends App {
               <IntlProvider locale={locale}>
                 <TooltipProvider delayDuration={500} skipDelayDuration={100}>
                   <UserProvider initialLoggedInUser={LoggedInUserData ? new LoggedInUser(LoggedInUserData) : null}>
-                    <WorkspaceProvider>
-                      <ModalProvider>
-                        <NewsAndUpdatesProvider>
-                          <Component {...pageProps} />
-                          <Toaster />
-                          <GlobalNewsAndUpdates />
-                          <TwoFactorAuthenticationModal />
-                        </NewsAndUpdatesProvider>
-                      </ModalProvider>
-                    </WorkspaceProvider>
+                    <WhitelabelProviderContext.Provider value={pageProps?.whitelabel?.provider}>
+                      <WorkspaceProvider>
+                        <ModalProvider>
+                          <NewsAndUpdatesProvider>
+                            <Component {...pageProps} />
+                            <Toaster />
+                            <GlobalNewsAndUpdates />
+                            <TwoFactorAuthenticationModal />
+                          </NewsAndUpdatesProvider>
+                        </ModalProvider>
+                      </WorkspaceProvider>
+                    </WhitelabelProviderContext.Provider>
                   </UserProvider>
                 </TooltipProvider>
               </IntlProvider>

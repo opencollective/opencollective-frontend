@@ -7,7 +7,7 @@ import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
 import { mergeDeep } from '@apollo/client/utilities';
 import { createUploadLink } from 'apollo-upload-client';
-import { isUndefined, keys, omitBy, pick } from 'lodash';
+import { isUndefined, omitBy, pick } from 'lodash';
 import type { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
 import TwoFactorAuthenticationApolloLink from './two-factor-authentication/TwoFactorAuthenticationApolloLink';
@@ -376,9 +376,5 @@ export function getSSRQueryHelpers<TVariables, TProps = Record<string, unknown>,
     getSSRErrorFromPageProps: (pageProps: ServerSideProps): any => {
       return pageProps[APOLLO_ERROR_PROP_NAME] && getErrorFromGraphqlException(pageProps[APOLLO_ERROR_PROP_NAME]);
     },
-    checkResultContainsNonNullResult: (pageProps: ServerSideProps, key: string) =>
-      keys(pageProps[APOLLO_STATE_PROP_NAME]?.ROOT_QUERY)
-        .filter(k => k.startsWith(key))
-        .every(k => pageProps[APOLLO_STATE_PROP_NAME]?.ROOT_QUERY?.[k] === null),
   };
 }

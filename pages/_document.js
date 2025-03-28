@@ -46,6 +46,7 @@ export default class IntlDocument extends Document {
     const intl = createIntl({ locale: intlProps.locale, defaultLocale: 'en', messages }, cache);
 
     if (ctx.req && ctx.res) {
+      ctx.res.setHeader('Vary', 'Host');
       if (getTokenFromCookie(ctx.req)) {
         ctx.res.setHeader('Cache-Control', 'no-store, no-cache, private, max-age=0');
       } else if (intlProps.locale !== 'en') {

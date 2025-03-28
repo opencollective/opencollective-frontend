@@ -582,7 +582,7 @@ const Policies = ({ collective }) => {
                   editorMaxHeight={500}
                   id={inputProps.id}
                   inputName={inputProps.name}
-                  onChange={e => console.log(e) || formik.handleChange(e)}
+                  onChange={e => formik.handleChange(e)}
                   placeholder={formatMessage(messages['grantExpensePolicy.placeholder'])}
                   defaultValue={data?.account?.policies?.EXPENSE_POLICIES?.grantPolicy || ''}
                   fontSize="14px"

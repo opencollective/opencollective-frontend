@@ -4,6 +4,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { cn } from '../lib/utils';
 
+import Image from './Image';
 import Link from './Link';
 import StyledSpinner from './StyledSpinner';
 import { withUser } from './UserProvider';
@@ -20,6 +21,7 @@ class LoginBtn extends React.Component {
     loadingLoggedInUser: PropTypes.bool,
     asLink: PropTypes.bool,
     className: PropTypes.string,
+    isWhitelabelDomain: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -38,6 +40,21 @@ class LoginBtn extends React.Component {
   }
 
   render() {
+    const label =
+      this.props.children || this.props.isWhitelabelDomain ? (
+        <React.Fragment>
+          <FormattedMessage id="signInWith" defaultMessage="Sign In with" />
+          <Image
+            width={18}
+            height={18}
+            src="/static/images/opencollectiveicon-48x48@2x.png"
+            alt="Open Collective"
+            style={{ marginLeft: '4px' }}
+          />
+        </React.Fragment>
+      ) : (
+        <FormattedMessage id="signIn" defaultMessage="Sign In" />
+      );
     return (
       <Link
         href={{ pathname: '/signin', query: { next: this.redirectAfterSignin } }}
@@ -50,11 +67,7 @@ class LoginBtn extends React.Component {
           this.props.className,
         )}
       >
-        {this.props.loadingLoggedInUser ? (
-          <StyledSpinner size="1em" />
-        ) : (
-          this.props.children || <FormattedMessage id="signIn" defaultMessage="Sign In" />
-        )}
+        {this.props.loadingLoggedInUser ? <StyledSpinner size="1em" /> : label}
       </Link>
     );
   }
