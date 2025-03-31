@@ -71,6 +71,10 @@ const makeUrl = ({ account, isHostReport, queryFilter, flattenTaxesAndPaymentPro
   url.searchParams.set('includeIncognitoTransactions', '1');
   url.searchParams.set('includeChildrenTransactions', '1');
 
+  if (queryFilter.values.expenseType) {
+    url.searchParams.set('expenseType', queryFilter.values.expenseType.join(','));
+  }
+
   if (queryFilter.values.kind) {
     url.searchParams.set('kind', queryFilter.values.kind.join(','));
   }
