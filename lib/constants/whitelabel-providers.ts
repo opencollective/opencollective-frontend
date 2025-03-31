@@ -33,6 +33,36 @@ const WHITELABEL_PROVIDERS: WhitelabelProvider[] = [
       { label: 'Terms of Service', href: '/tos', icon: ProfileMenuIcons.FileText },
     ],
   },
+  {
+    slug: 'opensource',
+    domain: env === 'development' ? 'http://local.osc:3000' : 'https://collective.oscollective.org',
+    name: 'Open Source Collective',
+    logo: 'https://oscollective.org/wp-content/uploads/2024/02/cropped-OSC-Logo_1_transparency.png',
+    links: [
+      {
+        icon: ProfileMenuIcons.Home,
+        label: 'Home',
+        href: 'https://oscollective.org/',
+      },
+      {
+        label: 'For Projects',
+        href: 'https://oscollective.org/projects/',
+      },
+      {
+        label: 'For Donors',
+        href: 'https://oscollective.org/donors/',
+      },
+      {
+        label: 'About Us',
+        href: 'https://oscollective.org/about/',
+      },
+      {
+        icon: ProfileMenuIcons.BookOpen,
+        label: 'Docs',
+        href: 'https://docs.oscollective.org/',
+      },
+    ],
+  },
 ];
 
 // Inject WHITELABEL_DOMAIN for testing purposes
@@ -43,38 +73,6 @@ if (['development', 'e2e', 'ci'].includes(env)) {
     name: 'Open Collective',
     logo: '/static/images/opencollectivelogo-footer-n.svg',
   });
-  if (env === 'development') {
-    WHITELABEL_PROVIDERS.push({
-      slug: 'opensource',
-      domain: 'http://local.osc:3000',
-      name: 'Open Source Collective',
-      logo: 'https://oscollective.org/wp-content/uploads/2024/02/cropped-OSC-Logo_1_transparency.png',
-      links: [
-        {
-          icon: ProfileMenuIcons.Home,
-          label: 'Home',
-          href: 'https://oscollective.org/',
-        },
-        {
-          label: 'For Projects',
-          href: 'https://oscollective.org/projects/',
-        },
-        {
-          label: 'For Donors',
-          href: 'https://oscollective.org/donors/',
-        },
-        {
-          label: 'About Us',
-          href: 'https://oscollective.org/about/',
-        },
-        {
-          icon: ProfileMenuIcons.BookOpen,
-          label: 'Docs',
-          href: 'https://docs.oscollective.org/',
-        },
-      ],
-    });
-  }
 }
 
 const WHITELABEL_DOMAINS = WHITELABEL_PROVIDERS.map(provider => provider.domain);
