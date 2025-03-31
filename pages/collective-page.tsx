@@ -125,7 +125,7 @@ export default function CollectivePage(props: InferGetServerSidePropsType<typeof
   if (ssrError) {
     return <ErrorPage data={ssrError} />;
   } else if (!loading) {
-    if (!data || data.error) {
+    if (!data || queryResult.error) {
       return <ErrorPage data={data} />;
     } else if (!collective || collective.type === 'VENDOR') {
       return <ErrorPage error={generateNotFoundError(slug)} log={false} />;
@@ -168,7 +168,7 @@ export default function CollectivePage(props: InferGetServerSidePropsType<typeof
             host={collective.host}
             status={status}
             LoggedInUser={LoggedInUser}
-            refetch={data.refetch}
+            refetch={queryResult.refetch}
           />
           <CollectiveThemeProvider collective={collective}>
             {({ onPrimaryColorChange }) => (
@@ -193,7 +193,7 @@ export default function CollectivePage(props: InferGetServerSidePropsType<typeof
                 onPrimaryColorChange={onPrimaryColorChange}
                 step={step}
                 mode={mode}
-                refetch={data.refetch}
+                refetch={queryResult.refetch}
               />
             )}
           </CollectiveThemeProvider>
