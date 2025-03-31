@@ -6,6 +6,7 @@ import type LoggedInUser from './LoggedInUser';
 export enum PREVIEW_FEATURE_KEYS {
   COLLECTIVE_OVERVIEW = 'COLLECTIVE_OVERVIEW',
   NEW_EXPENSE_FLOW = 'NEW_EXPENSE_FLOW',
+  NEW_GRANT_FLOW = 'NEW_GRANT_FLOW',
   INLINE_EDIT_EXPENSE = 'INLINE_EDIT_EXPENSE',
   CROWDFUNDING_REDESIGN = 'CROWDFUNDING_REDESIGN',
   TRANSACTIONS_IMPORTS = 'TRANSACTIONS_IMPORTS',
@@ -61,6 +62,14 @@ export const previewFeatures: PreviewFeature[] = [
     description: 'Improved expense submission flow in Dashboard',
     alwaysEnableInDev: true,
     publicBeta: true,
+    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.NEW_GRANT_FLOW,
+    title: 'New grant submission flow',
+    description: 'Improved grant submission flow in Dashboard',
+    alwaysEnableInDev: true,
+    publicBeta: false,
     closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
   },
   {

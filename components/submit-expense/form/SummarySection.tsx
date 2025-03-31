@@ -1,6 +1,7 @@
 /* eslint-disable prefer-arrow-callback */
 import React from 'react';
-import { FastField } from 'formik';
+import { gql, useQuery } from '@apollo/client';
+import dayjs from 'dayjs';
 import { omit, pick, round } from 'lodash';
 import { AtSign, Building, Contact, Globe, Lock, Mail } from 'lucide-react';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
@@ -10,8 +11,10 @@ import { ExpenseType } from '../../../lib/graphql/types/v2/schema';
 import { RecurringExpenseIntervals } from '../../../lib/i18n/expense';
 import { i18nTaxType } from '../../../lib/i18n/taxes';
 import { getExpenseExchangeRateWarningOrError, getTaxAmount, isTaxRateValid } from '../../expenses/lib/utils';
+import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import { ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
 
+import { I18nBold, I18nItalic } from '@/components/I18nFormatters';
 import { Skeleton } from '@/components/ui/Skeleton';
 
 import { AccountHoverCard } from '../../AccountHoverCard';
@@ -31,7 +34,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import UploadedFilePreview from '../../UploadedFilePreview';
 import { PayoutMethodDetailsContainer } from '../PayoutMethodDetails';
 import { Step } from '../SubmitExpenseFlowSteps';
-import { type ExpenseForm, RecurrenceFrequencyOption, YesNoOption } from '../useExpenseForm';
+import { type ExpenseForm, generateGrantTitle, RecurrenceFrequencyOption, YesNoOption } from '../useExpenseForm';
 
 import { FormSectionContainer } from './FormSectionContainer';
 
@@ -42,12 +45,24 @@ type SummarySectionProps = {
 export function SummarySection(props: SummarySectionProps) {
   return (
     <FormSectionContainer step={Step.SUMMARY} inViewChange={props.inViewChange}>
+      <SummarySectionContent form={props.form} />
+    </FormSectionContainer>
+  );
+}
+
+export function SummarySectionContent(props: { form: ExpenseForm }) {
+  return (
+    <React.Fragment>
       <div className="rounded-md border border-gray-300 p-4 text-sm">
         <SummaryHeader
           recurrenceFrequency={props.form.values.recurrenceFrequency}
           expenseTypeOption={props.form.values.expenseTypeOption}
           tags={props.form.values.tags}
           submitter={props.form.options.submitter}
+          account={props.form.options.account}
+          payee={props.form.options.payee}
+          invitee={props.form.options.invitee}
+          title={props.form.values.title}
         />
       </div>
       <div className="mt-4 rounded-md border border-gray-300 p-4 text-sm">
@@ -59,7 +74,17 @@ export function SummarySection(props: SummarySectionProps) {
           totalInvoicedInExpenseCurrency={props.form.options.totalInvoicedInExpenseCurrency}
           taxType={props.form.options.taxType}
         />
+        {props.form.options.expenseCurrency !== props.form.options.payoutMethod?.data?.currency && (
+          <MessageBox className="mt-4" type="warning">
+            <PayoutMethodExchangeRateWarning
+              expenseCurrency={props.form.options.expenseCurrency}
+              payoutMethodCurrency={props.form.options.payoutMethod?.data?.currency}
+              totalInvoicedInExpenseCurrency={props.form.options.totalInvoicedInExpenseCurrency}
+            />
+          </MessageBox>
+        )}
       </div>
+
       {props.form.values.additionalAttachments?.length > 0 && (
         <div className="mt-4 rounded-md border border-gray-300 p-4 text-sm">
           <AdditionalAttachmentsSection additionalAttachments={props.form.values.additionalAttachments} />
@@ -91,8 +116,8 @@ export function SummarySection(props: SummarySectionProps) {
           />
         </div>
       </div>
-      <RecurrenceOptionBox form={props.form} />
-    </FormSectionContainer>
+      {props.form.options.canSetupRecurrence && <RecurrenceOptionBox form={props.form} />}
+    </React.Fragment>
   );
 }
 
@@ -100,23 +125,25 @@ const SummaryHeader = React.memo(function SummaryHeader(props: {
   recurrenceFrequency: ExpenseForm['values']['recurrenceFrequency'];
   expenseTypeOption: ExpenseForm['values']['expenseTypeOption'];
   tags: ExpenseForm['values']['tags'];
+  title: ExpenseForm['values']['title'];
   submitter: ExpenseForm['options']['submitter'];
+  account: ExpenseForm['options']['account'];
+  payee: ExpenseForm['options']['payee'];
+  invitee: ExpenseForm['options']['invitee'];
 }) {
   return (
     <React.Fragment>
       <div className="mb-4 flex justify-between">
         <div className="text-base font-bold">
-          <FastField name="title">
-            {({ field }) => {
-              return (
-                field.value || (
-                  <span className="text-muted-foreground">
-                    <FormattedMessage defaultMessage="Expense title" id="yH3Z6O" />
-                  </span>
-                )
-              );
-            }}
-          </FastField>
+          {props.title ? (
+            props.title
+          ) : props.expenseTypeOption === ExpenseType.GRANT ? (
+            generateGrantTitle(props.account, props.payee, props.invitee)
+          ) : (
+            <span className="text-muted-foreground">
+              <FormattedMessage defaultMessage="Expense title" id="yH3Z6O" />
+            </span>
+          )}
         </div>
         {props.recurrenceFrequency && props.recurrenceFrequency !== 'none' && (
           <span className="rounded-xl bg-slate-100 px-3 py-1 font-mono text-xs text-muted-foreground uppercase">
@@ -681,6 +708,80 @@ function RecurrenceOptionBox(props: { form: ExpenseForm }) {
           </div>
         )}
       </MessageBox>
+    </div>
+  );
+}
+
+type PayoutMethodExchangeRateWarningProps = {
+  expenseCurrency: string;
+  payoutMethodCurrency: string;
+  totalInvoicedInExpenseCurrency: number;
+};
+
+function PayoutMethodExchangeRateWarning(props: PayoutMethodExchangeRateWarningProps) {
+  const exchangeRateRequests = React.useMemo(
+    () => [
+      {
+        fromCurrency: props.expenseCurrency,
+        toCurrency: props.payoutMethodCurrency,
+        date: dayjs.utc().toDate(),
+      },
+    ],
+    [props.expenseCurrency, props.payoutMethodCurrency],
+  );
+
+  const exchangeRateQuery = useQuery(
+    gql`
+      query PayoutMethodExchangeRateWarning($exchangeRateRequests: [CurrencyExchangeRateRequest!]!) {
+        currencyExchangeRate(requests: $exchangeRateRequests) {
+          value
+          source
+          fromCurrency
+          toCurrency
+          date
+          isApproximate
+        }
+      }
+    `,
+    {
+      context: API_V2_CONTEXT,
+      variables: {
+        exchangeRateRequests,
+      },
+      skip:
+        !props.expenseCurrency || !props.payoutMethodCurrency || props.expenseCurrency === props.payoutMethodCurrency,
+    },
+  );
+
+  const exchangeRate = exchangeRateQuery.data?.currencyExchangeRate?.at(0);
+
+  if (!exchangeRate) {
+    return <Skeleton />;
+  }
+
+  const amount = {
+    value: (props.totalInvoicedInExpenseCurrency / 100) * exchangeRate.value,
+    valueInCents: props.totalInvoicedInExpenseCurrency * exchangeRate.value,
+    currency: props.payoutMethodCurrency,
+    exchangeRate,
+  };
+
+  return (
+    <div>
+      <FormattedMessage
+        defaultMessage="Amount in your payout method currency: <b>{amountInPayoutMethodCurrency}</b>.<br></br><i>This is only an <b>estimate</b> based on today's exchange rate</i><br></br><br></br><b>Payment processor fees can be applied and exchange rate is subject to change until payout.</b>"
+        id="kmQQS/"
+        values={{
+          b: I18nBold,
+          br: () => <br />,
+          i: I18nItalic,
+          amountInPayoutMethodCurrency: (
+            <div className="inline-flex">
+              <AmountWithExchangeRateInfo amount={amount} />
+            </div>
+          ),
+        }}
+      />
     </div>
   );
 }

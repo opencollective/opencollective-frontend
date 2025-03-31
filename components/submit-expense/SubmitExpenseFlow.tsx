@@ -1,29 +1,11 @@
 import React from 'react';
-import type { FetchResult } from '@apollo/client';
-import { gql, useMutation } from '@apollo/client';
-import dayjs from 'dayjs';
 import { FormikProvider } from 'formik';
-import { pick } from 'lodash';
 import { X } from 'lucide-react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { AnalyticsEvent } from '../../lib/analytics/events';
-import { track } from '../../lib/analytics/plausible';
-import { CollectiveType } from '../../lib/constants/collectives';
-import { i18nGraphqlException } from '../../lib/errors';
-import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import type {
-  CreateExpenseFromDashboardMutation,
-  CreateExpenseFromDashboardMutationVariables,
-  CurrencyExchangeRateInput,
-  EditExpenseFromDashboardMutation,
-  EditExpenseFromDashboardMutationVariables,
-  InviteExpenseFromDashboardMutation,
-  InviteExpenseFromDashboardMutationVariables,
-} from '../../lib/graphql/types/v2/graphql';
-import type { Currency, RecurringExpenseInterval } from '../../lib/graphql/types/v2/schema';
-import { ExpenseStatus, ExpenseType, PayoutMethodType } from '../../lib/graphql/types/v2/schema';
+import { ExpenseType } from '../../lib/graphql/types/v2/schema';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { i18nGraphqlException } from '@/lib/errors';
 
 import { Survey, SURVEY_KEY } from '../Survey';
 import { Button } from '../ui/Button';
@@ -59,89 +41,6 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
   const { toast } = useToast();
 
   const [submittedExpenseId, setSubmittedExpenseId] = React.useState(null);
-  const [createExpense, createExpenseMutationResult] = useMutation<
-    CreateExpenseFromDashboardMutation,
-    CreateExpenseFromDashboardMutationVariables
-  >(
-    gql`
-      mutation CreateExpenseFromDashboard(
-        $expenseCreateInput: ExpenseCreateInput!
-        $account: AccountReferenceInput!
-        $recurring: RecurringExpenseInput
-        $privateComment: String
-      ) {
-        expense: createExpense(
-          expense: $expenseCreateInput
-          account: $account
-          privateComment: $privateComment
-          recurring: $recurring
-        ) {
-          id
-          legacyId
-        }
-      }
-    `,
-    {
-      context: {
-        ...API_V2_CONTEXT,
-        headers: {
-          'x-is-new-expense-flow': 'true',
-        },
-      },
-    },
-  );
-
-  const [draftExpenseAndInviteUser, draftExpenseAndInviteUserMutationResult] = useMutation<
-    InviteExpenseFromDashboardMutation,
-    InviteExpenseFromDashboardMutationVariables
-  >(
-    gql`
-      mutation InviteExpenseFromDashboard(
-        $expenseInviteInput: ExpenseInviteDraftInput!
-        $account: AccountReferenceInput!
-      ) {
-        expense: draftExpenseAndInviteUser(expense: $expenseInviteInput, account: $account) {
-          id
-          legacyId
-        }
-      }
-    `,
-    {
-      context: {
-        ...API_V2_CONTEXT,
-        headers: {
-          'x-is-new-expense-flow': 'true',
-        },
-      },
-    },
-  );
-
-  const [editExpense, editExpenseMutationResult] = useMutation<
-    EditExpenseFromDashboardMutation,
-    EditExpenseFromDashboardMutationVariables
-  >(
-    gql`
-      mutation EditExpenseFromDashboard($expenseEditInput: ExpenseUpdateInput!, $draftKey: String) {
-        expense: editExpense(expense: $expenseEditInput, draftKey: $draftKey) {
-          id
-          legacyId
-        }
-      }
-    `,
-    {
-      context: {
-        ...API_V2_CONTEXT,
-        headers: {
-          'x-is-new-expense-flow': 'true',
-        },
-      },
-    },
-  );
-
-  const isLoading =
-    createExpenseMutationResult.loading ||
-    draftExpenseAndInviteUserMutationResult.loading ||
-    editExpenseMutationResult.loading;
 
   const [confirmNavigation] = useNavigationWarning({
     enabled: !submittedExpenseId,
@@ -159,184 +58,47 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
     onClose(true);
   }, [onClose]);
 
-  const onSubmit: React.ComponentProps<typeof ExpenseFormikContainer>['onSubmit'] = React.useCallback(
-    async (values, h, formOptions, startOptions) => {
-      let result: FetchResult<CreateExpenseFromDashboardMutation> | FetchResult<EditExpenseFromDashboardMutation>;
-      try {
-        track(AnalyticsEvent.EXPENSE_SUBMISSION_SUBMITTED);
-
-        const attachedFiles = values.additionalAttachments.map(a => ({
-          url: typeof a === 'string' ? a : a?.url,
-        }));
-
-        const expenseInput: CreateExpenseFromDashboardMutationVariables['expenseCreateInput'] = {
-          description: values.title,
-          reference:
-            values.expenseTypeOption === ExpenseType.INVOICE && values.hasInvoiceOption === YesNoOption.YES
-              ? values.invoiceNumber
-              : null,
-          payee: {
-            slug: formOptions.payee?.slug,
-          },
-          payeeLocation: values.payeeLocation,
-          payoutMethod:
-            !values.payoutMethodId || values.payoutMethodId === '__newPayoutMethod'
-              ? { ...values.newPayoutMethod, isSaved: false }
-              : values.payoutMethodId === '__newAccountBalancePayoutMethod'
-                ? {
-                    type: PayoutMethodType.ACCOUNT_BALANCE,
-                    data: {},
-                  }
-                : {
-                    id: values.payoutMethodId,
-                  },
-          type: values.expenseTypeOption,
-          accountingCategory: values.accountingCategoryId
-            ? {
-                id: values.accountingCategoryId,
-              }
-            : null,
-          attachedFiles,
-          currency: formOptions.expenseCurrency,
-          customData: null,
-          invoiceInfo: null,
-          invoiceFile:
-            values.hasInvoiceOption === YesNoOption.NO
-              ? null
-              : values.invoiceFile
-                ? { url: typeof values.invoiceFile === 'string' ? values.invoiceFile : values.invoiceFile.url }
-                : undefined,
-          items: values.expenseItems.map(ei => ({
-            description: ei.description,
-            amountV2: {
-              valueInCents: ei.amount.valueInCents,
-              currency: ei.amount.currency as Currency,
-              exchangeRate: ei.amount.exchangeRate
-                ? ({
-                    ...pick(ei.amount.exchangeRate, ['source', 'rate', 'value', 'fromCurrency', 'toCurrency']),
-                    date: new Date(ei.amount.exchangeRate.date || ei.incurredAt),
-                  } as CurrencyExchangeRateInput)
-                : null,
-            },
-            incurredAt: new Date(ei.incurredAt),
-            url:
-              values.expenseTypeOption === ExpenseType.RECEIPT
-                ? typeof ei.attachment === 'string'
-                  ? ei.attachment
-                  : ei.attachment?.url
-                : null,
-          })),
-          longDescription: null,
-          privateMessage: null,
-          tags: values.tags,
-          tax: values.hasTax
-            ? [
-                {
-                  rate: values.tax.rate,
-                  type: formOptions.taxType,
-                  idNumber: values.tax.idNumber,
-                },
-              ]
-            : null,
-        };
-
-        if (formOptions.expense?.id && !startOptions.duplicateExpense) {
-          const editInput: EditExpenseFromDashboardMutationVariables['expenseEditInput'] = {
-            ...expenseInput,
-            id: formOptions.expense.id,
-            payee:
-              formOptions.expense?.status === ExpenseStatus.DRAFT && !formOptions.payee?.slug
-                ? formOptions.expense?.draft?.payee
-                : {
-                    slug: formOptions.payee?.slug,
-                  },
-          };
-          result = await editExpense({
-            variables: {
-              expenseEditInput: editInput,
-              draftKey: props.draftKey,
-            },
-          });
+  const onSuccess = React.useCallback(
+    (result, type: 'edit' | 'new' | 'invite') => {
+      setSubmittedExpenseId(result.data.expense.legacyId);
+      switch (type) {
+        case 'edit': {
           toast({
             variant: 'success',
             title: <FormattedMessage defaultMessage="Expense edited" id="yTblGN" />,
             message: LoggedInUser ? <Survey hasParentTitle surveyKey={SURVEY_KEY.EXPENSE_SUBMITTED_NEW_FLOW} /> : null,
             duration: 20000,
           });
-        } else if (
-          formOptions.payee?.type === CollectiveType.VENDOR ||
-          formOptions.payoutProfiles.some(p => p.slug === values.payeeSlug)
-        ) {
-          result = await createExpense({
-            variables: {
-              account: {
-                slug: formOptions.account?.slug,
-              },
-              expenseCreateInput: expenseInput,
-              ...(values.recurrenceFrequency !== RecurrenceFrequencyOption.NONE
-                ? {
-                    recurring: {
-                      interval: values.recurrenceFrequency as unknown as RecurringExpenseInterval,
-                      endsAt: dayjs(values.recurrenceEndAt).toDate(),
-                    },
-                  }
-                : {}),
-              privateComment:
-                formOptions.payoutMethod?.type === PayoutMethodType.BANK_ACCOUNT &&
-                formOptions.payoutMethod?.data?.accountHolderName !== formOptions.payee?.legalName
-                  ? values.payoutMethodNameDiscrepancyReason
-                  : null,
-            },
-          });
-
-          toast({
-            variant: 'success',
-            title: <FormattedMessage id="Expense.Submitted" defaultMessage="Expense submitted" />,
-            message: LoggedInUser ? <Survey hasParentTitle surveyKey={SURVEY_KEY.EXPENSE_SUBMITTED_NEW_FLOW} /> : null,
-            duration: 20000,
-          });
-        } else {
-          const payee =
-            values.payeeSlug === '__inviteExistingUser'
-              ? { slug: values.inviteeExistingAccount }
-              : values.inviteeAccountType === InviteeAccountType.INDIVIDUAL
-                ? values.inviteeNewIndividual
-                : values.inviteeNewOrganization;
-          const inviteInput: InviteExpenseFromDashboardMutationVariables['expenseInviteInput'] = {
-            ...expenseInput,
-            payee: {
-              ...payee,
-              isInvite: true,
-            },
-            recipientNote: values.inviteNote,
-          };
-          result = await draftExpenseAndInviteUser({
-            variables: {
-              account: {
-                slug: formOptions.account?.slug,
-              },
-              expenseInviteInput: inviteInput,
-            },
-          });
-
+          break;
+        }
+        case 'invite': {
           toast({
             variant: 'success',
             title: <FormattedMessage defaultMessage="Expense invite sent" id="Fhue1N" />,
             message: LoggedInUser ? <Survey hasParentTitle surveyKey={SURVEY_KEY.EXPENSE_SUBMITTED_NEW_FLOW} /> : null,
             duration: 20000,
           });
+          break;
         }
-
-        track(AnalyticsEvent.EXPENSE_SUBMISSION_SUBMITTED_SUCCESS);
-        setSubmittedExpenseId(result.data.expense.legacyId);
-      } catch (err) {
-        track(AnalyticsEvent.EXPENSE_SUBMISSION_SUBMITTED_ERROR);
-        toast({ variant: 'error', message: i18nGraphqlException(intl, err) });
-      } finally {
-        h.setSubmitting(false);
+        case 'new': {
+          toast({
+            variant: 'success',
+            title: <FormattedMessage id="Expense.Submitted" defaultMessage="Expense submitted" />,
+            message: LoggedInUser ? <Survey hasParentTitle surveyKey={SURVEY_KEY.EXPENSE_SUBMITTED_NEW_FLOW} /> : null,
+            duration: 20000,
+          });
+          break;
+        }
       }
     },
-    [LoggedInUser, createExpense, draftExpenseAndInviteUser, editExpense, intl, props.draftKey, toast],
+    [LoggedInUser, toast],
+  );
+
+  const onError = React.useCallback(
+    err => {
+      toast({ variant: 'error', message: i18nGraphqlException(intl, err) });
+    },
+    [intl, toast],
   );
 
   if (submittedExpenseId) {
@@ -428,8 +190,6 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
               <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />
             </span>
             <Button
-              disabled={isLoading}
-              loading={isLoading}
               onClick={handleOnClose}
               variant="ghost"
               className="hidden cursor-pointer items-center gap-2 px-4 py-3 text-base leading-5 font-medium text-slate-800 sm:visible sm:flex"
@@ -441,13 +201,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
               </span>
             </Button>
 
-            <Button
-              onClick={handleOnClose}
-              loading={isLoading}
-              disabled={isLoading}
-              variant="ghost"
-              className="cursor-pointer sm:hidden"
-            >
+            <Button onClick={handleOnClose} variant="ghost" className="cursor-pointer sm:hidden">
               <X />
             </Button>
           </header>
@@ -459,7 +213,8 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
                   draftKey={props.draftKey}
                   duplicateExpense={props.duplicateExpense}
                   expenseId={props.expenseId}
-                  onSubmit={onSubmit}
+                  onSuccess={onSuccess}
+                  onError={onError}
                   onExpenseInviteDeclined={onExpenseInviteDeclined}
                 />
               </div>
@@ -476,7 +231,8 @@ function ExpenseFormikContainer(props: {
   draftKey?: string;
   duplicateExpense?: boolean;
   expenseId?: number;
-  onSubmit: Parameters<typeof useExpenseForm>['0']['onSubmit'];
+  onError: (err) => void;
+  onSuccess: (result, type: 'edit' | 'new' | 'invite') => void;
   onExpenseInviteDeclined: () => void;
 }) {
   const formRef = React.useRef<HTMLFormElement>();
@@ -519,7 +275,9 @@ function ExpenseFormikContainer(props: {
       },
     },
     startOptions: startOptions.current,
-    onSubmit: props.onSubmit,
+    handleOnSubmit: true,
+    onSuccess: props.onSuccess,
+    onError: props.onError,
   });
 
   return (
