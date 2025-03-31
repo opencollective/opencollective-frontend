@@ -240,7 +240,7 @@ function generatePayoutMethodName(type, data) {
   }
 }
 
-export function NewPayoutMethodOptionWrapper(props) {
+export function NewPayoutMethodOptionWrapper(props?: Partial<NewPayoutMethodOptionProps>) {
   const form = useFormikContext() as ExpenseForm;
   return <NewPayoutMethodOption {...props} {...NewPayoutMethodOption.getFormProps(form)} />;
 }
