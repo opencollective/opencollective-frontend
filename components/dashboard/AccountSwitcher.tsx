@@ -36,6 +36,7 @@ const StyledMenuEntry = styled(Link)`
   max-width: 100%;
   text-align: left;
   border-radius: 8px;
+  margin-left: 16px;
   font-size: 13px;
   font-weight: 500;
   grid-gap: 4px;
@@ -230,7 +231,6 @@ const MenuEntry = ({ account, activeSlug }: { account: any; activeSlug: string }
               href={`/dashboard/${child.slug}`}
               title={child.name}
               $isActive={activeSlug === child.slug}
-              ml={3}
             >
               <Option collective={child} isChild />
             </StyledMenuEntry>

@@ -9,7 +9,7 @@ import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { useWindowResize, VIEWPORTS } from '../../lib/hooks/useWindowResize';
 import { ScrollDirection, useWindowScroll } from '../../lib/hooks/useWindowScroll';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
-import { useWhitelabelProvider } from '@/lib/hooks/useWhitelabel';
+import useWhitelabelProvider from '@/lib/hooks/useWhitelabel';
 
 import ChangelogTrigger from '../changelog/ChangelogTrigger';
 import { Box, Flex } from '../Grid';

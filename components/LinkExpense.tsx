@@ -17,7 +17,7 @@ type LinkExpenseProps = {
     legacyId?: number;
   };
   onClick?: (expenseId: string | number) => void;
-  children?: React.ReactNode;
+  children: React.ReactNode;
 
   title?: string;
   openInNewTab?: boolean;
