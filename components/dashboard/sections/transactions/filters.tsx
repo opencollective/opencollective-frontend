@@ -6,7 +6,7 @@ import { z } from 'zod';
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { boolean, integer, isMulti, limit, offset } from '../../../../lib/filters/schemas';
 import type { TransactionsTableQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
-import type { Currency, PaymentMethodType } from '../../../../lib/graphql/types/v2/schema';
+import type { Account, Currency, PaymentMethodType } from '../../../../lib/graphql/types/v2/schema';
 import { ExpenseType, TransactionKind, TransactionType } from '../../../../lib/graphql/types/v2/schema';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { i18nHasDebt } from '../../../../lib/i18n/has-debt';
@@ -16,6 +16,7 @@ import { sortSelectOptions } from '../../../../lib/utils';
 
 import { Input } from '../../../ui/Input';
 import { amountFilter } from '../../filters/AmountFilter';
+import { childAccountFilter } from '../../filters/ChildAccountFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { dateFilter } from '../../filters/DateFilter';
 import { dateToVariables } from '../../filters/DateFilter/schema';
@@ -45,6 +46,7 @@ export const schema = z.object({
   offset,
   date: dateFilter.schema,
   clearedAt: clearedAtDateFilter.schema,
+  account: childAccountFilter.schema,
   amount: amountFilter.schema,
   sort: sortFilter.schema,
   searchTerm: searchFilter.schema,
@@ -70,6 +72,8 @@ export type FilterMeta = {
   currency?: Currency;
   paymentMethodTypes?: PaymentMethodType[];
   kinds?: TransactionKind[];
+  childrenAccounts: Account[];
+  accountSlug: string;
 };
 
 // Only needed when values and key of filters are different
@@ -77,6 +81,18 @@ export type FilterMeta = {
 export const toVariables: FiltersToVariables<FilterValues, TransactionsTableQueryVariables, FilterMeta> = {
   date: dateFilter.toVariables,
   clearedAt: clearedAtDateFilter.toVariables,
+  account: (value, key, meta) => {
+    if (meta?.childrenAccounts && !meta.childrenAccounts.length) {
+      return { includeChildrenTransactions: false };
+    } else if (!value) {
+      return { includeChildrenTransactions: true };
+    } else {
+      return {
+        account: { slug: value },
+        includeChildrenTransactions: false,
+      };
+    }
+  },
   amount: amountFilter.toVariables,
   virtualCard: (virtualCardIds, key) => ({ [key]: virtualCardIds.map(id => ({ id })) }),
   expenseId: id => ({ expense: { legacyId: id } }),
@@ -91,6 +107,7 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   searchTerm: searchFilter.filter,
   date: dateFilter.filter,
   clearedAt: clearedAtDateFilter.filter,
+  account: childAccountFilter.filter,
   sort: sortFilter.filter,
   amount: amountFilter.filter,
   type: {
