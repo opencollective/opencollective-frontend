@@ -23,14 +23,6 @@ const dashboardAccountsQueryFields = gql`
         valueInCents
         currency
       }
-      totalAmountSpent {
-        valueInCents
-        currency
-      }
-      totalAmountReceived {
-        valueInCents
-        currency
-      }
     }
     paymentMethods(service: OPENCOLLECTIVE, type: COLLECTIVE) {
       id

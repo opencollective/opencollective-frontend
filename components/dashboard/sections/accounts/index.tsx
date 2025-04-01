@@ -32,11 +32,12 @@ import { Pagination } from '../../filters/Pagination';
 import type { DashboardSectionProps } from '../../types';
 import type { HostedCollectivesDataTableMeta } from '../collectives/common';
 
-import AccountDetails from './AccountDetails';
+import AccountDetails, { AccountDrawer } from './AccountDetails';
 import { useAccountActions } from './actions';
 import { cols } from './common';
 import InternalTransferModal from './InternalTransferModal';
 import { accountsMetadataQuery, accountsQuery } from './queries';
+import { useDrawer } from '@/lib/hooks/useDrawer';
 
 const COLLECTIVES_PER_PAGE = 20;
 
@@ -44,6 +45,7 @@ const schema = z.object({
   limit: integer.default(COLLECTIVES_PER_PAGE),
   offset: integer.default(0),
   status: accountStatusFilter.schema,
+  collectiveId: z.string().min(1).optional(),
 });
 
 const toVariables: FiltersToVariables<z.infer<typeof schema>, HostedCollectivesQueryVariables> = {
@@ -111,28 +113,34 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
   const { data, error, loading, refetch } = useQuery(accountsQuery, {
     variables: { accountSlug, ...queryFilter.variables },
     context: API_V2_CONTEXT,
-    fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
+    // fetchPolicy: 'cache-and-network',
   });
-  useEffect(() => {
-    if (subpath[0] !== ((showCollectiveOverview as Collective)?.id || showCollectiveOverview)) {
-      handleDrawer(subpath[0]);
-    }
-  }, [subpath[0]]);
+  // useEffect(() => {
+  //   if (subpath[0] !== ((showCollectiveOverview as Collective)?.id || showCollectiveOverview)) {
+  //     handleDrawer(subpath[0]);
+  //   }
+  // }, [subpath[0]]);
 
-  const handleDrawer = (collective: Collective | string | undefined) => {
-    if (collective) {
-      pushSubpath(typeof collective === 'string' ? collective : collective.id);
-    } else {
-      pushSubpath(undefined);
-    }
-    setShowCollectiveOverview(collective);
-  };
+  // const handleDrawer = (collective: Collective | string | undefined) => {
+  //   if (collective) {
+  //     pushSubpath(typeof collective === 'string' ? collective : collective.id);
+  //   } else {
+  //     pushSubpath(undefined);
+  //   }
+  //   setShowCollectiveOverview(collective);
+  // };
 
-  const handleEdit = () => {
-    refetchMetadata();
-    refetch();
-  };
-  const onClickRow = row => handleDrawer(row.original);
+  const { openDrawer, drawerProps } = useDrawer({
+    open: Boolean(queryFilter.values.collectiveId),
+    onOpen: id => queryFilter.setFilter('collectiveId', id, false),
+    onClose: () => queryFilter.setFilter('collectiveId', undefined, false),
+  });
+
+  // const handleEdit = () => {
+  //   refetchMetadata();
+  //   refetch();
+  // };
+  // const onClickRow = row => handleDrawer(row.original);
 
   const isArchived = queryFilter.hasFilters && queryFilter.values.status === ACCOUNT_STATUS.ARCHIVED;
   const accounts = compact([!isArchived && data?.account, ...(data?.account?.childrenAccounts?.nodes || [])]);
@@ -147,7 +155,7 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
   return (
     <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
       <DashboardHeader
-        title={<FormattedMessage id="CollectiveAccounts" defaultMessage="Collective Accounts" />}
+        title={<FormattedMessage defaultMessage="Accounts" id="FvanT6" />}
         actions={
           <div className="flex items-center gap-4">
             <DropdownMenu>
@@ -205,31 +213,33 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
           <DataTable
             data-cy="transactions-table"
             innerClassName="text-muted-foreground"
-            columns={compact([cols.collective, cols.status, cols.raised, cols.spent, cols.balance, actionsColumn])}
+            columns={compact([cols.collective, cols.status, cols.balance, actionsColumn])}
             data={accounts}
             loading={loading}
             mobileTableView
             compact
-            meta={
-              {
-                intl,
-                onClickRow,
-                onEdit: handleEdit,
-                host: data?.host,
-                openCollectiveDetails: handleDrawer,
-              } as HostedCollectivesDataTableMeta
-            }
-            onClickRow={onClickRow}
+            // meta={
+            //   {
+            //     intl,
+            //     onClickRow,
+            //     onEdit: handleEdit,
+            //     host: data?.host,
+            //     openCollectiveDetails: handleDrawer,
+            //   } as HostedCollectivesDataTableMeta
+            // }
+            // onClickRow={onClickRow}
+            onClickRow={(row, menuRef) => openDrawer(row.id, menuRef)}
             getRowDataCy={row => `collective-${row.original.slug}`}
             getActions={getActions}
             queryFilter={queryFilter}
-            getRowId={row => String(row.slug)}
+            getRowId={row => String(row.id)}
           />
           <Pagination queryFilter={queryFilter} total={data?.account?.childrenAccounts?.totalCount} />
         </React.Fragment>
       )}
 
-      <Drawer
+      <AccountDrawer {...drawerProps} collectiveId={queryFilter.values.collectiveId} getActions={getActions} />
+      {/* <Drawer
         open={Boolean(showCollectiveOverview)}
         onClose={() => handleDrawer(null)}
         className={'max-w-2xl'}
@@ -245,7 +255,7 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
             loading={loading}
           />
         )}
-      </Drawer>
+      </Drawer> */}
       <InternalTransferModal
         open={showInternalTransferModal}
         setOpen={setShowInternalTransferModal}
