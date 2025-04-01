@@ -7,6 +7,7 @@ import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { Button } from '../../../ui/Button';
+import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import ExportTransactionsCSVModal from '../../ExportTransactionsCSVModal';
@@ -30,11 +31,19 @@ const accountTransactionsMetaDataQuery = gql`
       slug
       currency
       settings
+      childrenAccounts {
+        totalCount
+        nodes {
+          id
+        }
+      }
     }
   }
 `;
 
 const AccountTransactions = ({ accountSlug }: DashboardSectionProps) => {
+  const { account } = React.useContext(DashboardContext);
+
   const [displayExportCSVModal, setDisplayExportCSVModal] = React.useState(false);
   const { data: metaData } = useQuery(accountTransactionsMetaDataQuery, {
     variables: { slug: accountSlug },
@@ -50,6 +59,8 @@ const AccountTransactions = ({ accountSlug }: DashboardSectionProps) => {
       currency: metaData?.account?.currency,
       paymentMethodTypes: metaData?.transactions?.paymentMethodTypes,
       kinds: metaData?.transactions?.kinds,
+      accountSlug,
+      childrenAccounts: account.childrenAccounts?.nodes ?? [],
     },
   });
 
