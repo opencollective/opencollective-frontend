@@ -220,7 +220,7 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
               menuLinks?.length > 0 && (
                 <React.Fragment>
                   {menuLinks.map(({ label, href, icon }) => (
-                    <MenuItem key={href} Icon={icon} href={href} external={href.startsWith('http')} label={label} />
+                    <MenuItem key={href} Icon={icon} href={href} label={label} external />
                   ))}
                   <Separator className="my-1" />
                 </React.Fragment>

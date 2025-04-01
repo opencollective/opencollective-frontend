@@ -287,11 +287,11 @@ const TopBar = ({
                 </React.Fragment>
               )}
               {whitelabel?.links?.map(({ label, href }) => (
-                <Link key={href} href={href}>
+                <a key={href} href={href}>
                   <NavButton as={Container} whiteSpace="nowrap">
                     {label}
                   </NavButton>
-                </Link>
+                </a>
               ))}
               {showSearch && menuItems.docs && (
                 <Container borderRight="2px solid #DCDDE0" height="20px" padding="5px" />

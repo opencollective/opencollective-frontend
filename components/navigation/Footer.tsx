@@ -148,9 +148,9 @@ const Footer = () => {
             )}
             {whitelabel?.links?.map(({ label, href }) => (
               <div key={href}>
-                <Link className="block hover:text-foreground" href={href}>
+                <a className="block hover:text-foreground" href={href}>
                   {label}
-                </Link>
+                </a>
               </div>
             ))}
           </div>
