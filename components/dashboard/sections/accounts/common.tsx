@@ -69,32 +69,6 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       );
     },
   },
-  raised: {
-    accessorKey: 'raised',
-    header: () => <FormattedMessage id="Raised" defaultMessage="Raised" />,
-    cell: ({ row }) => {
-      const account = row.original;
-      const amount = account.stats.totalAmountReceived;
-      return (
-        <div className="font-medium text-foreground">
-          <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} showCurrencyCode={false} />
-        </div>
-      );
-    },
-  },
-  spent: {
-    accessorKey: 'spent',
-    header: () => <FormattedMessage defaultMessage="Spent" id="111qQK" />,
-    cell: ({ row }) => {
-      const account = row.original;
-      const amount = account.stats.totalAmountSpent;
-      return (
-        <div className="font-medium text-foreground">
-          <FormattedMoneyAmount amount={amount.valueInCents} currency={amount.currency} showCurrencyCode={false} />
-        </div>
-      );
-    },
-  },
   balance: {
     accessorKey: 'balance',
     header: () => <FormattedMessage id="Balance" defaultMessage="Balance" />,

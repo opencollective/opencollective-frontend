@@ -44,10 +44,10 @@ export default function DrawerHeader({
           </SheetClose>
         </div>
       </div>
-      <div className="flex justify-between">
+      <div className="flex flex-wrap justify-between gap-2">
         <div className="flex items-center gap-2">{entityLabel}</div>
 
-        <div className="flex items-center gap-1">
+        <div className="ml-auto flex items-center justify-end gap-1">
           {!forceMoreActions && (
             <div className="items-center gap-1 sm:flex">
               {primary?.map(action => (
