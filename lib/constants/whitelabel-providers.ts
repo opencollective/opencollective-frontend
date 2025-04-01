@@ -35,7 +35,7 @@ const WHITELABEL_PROVIDERS: WhitelabelProvider[] = [
   },
   {
     slug: 'opensource',
-    domain: env === 'development' ? 'http://local.osc:3000' : 'https://collective.oscollective.org',
+    domain: env === 'development' ? 'http://local.osc:3000' : 'https://oscollective.org',
     name: 'Open Source Collective',
     logo: 'https://oscollective.org/wp-content/uploads/2024/02/cropped-OSC-Logo_1_transparency.png',
     links: [
