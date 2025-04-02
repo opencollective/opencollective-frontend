@@ -3,6 +3,10 @@ import { isEmpty } from 'lodash';
 import { WHITELABEL_DOMAINS, WHITELABEL_PROVIDERS } from './constants/whitelabel-providers';
 import type { Context } from './apollo-client';
 
+const WEBSITE_URL = process.env.WEBSITE_URL;
+
+const getURL = (base: string, path: string) => new URL(path, base).href;
+
 export type WhitelabelProps = {
   isNonPlatformDomain: boolean;
   origin: string;
@@ -30,9 +34,23 @@ const getOriginAndPath = (ctx?: Context) => {
   }
 };
 
-export const shouldRedirect = (account: { settings?: { whitelabelDomain?: string }; slug: string }) => {
-  if (account?.settings?.whitelabelDomain && WHITELABEL_DOMAINS.includes(account.settings.whitelabelDomain)) {
-    return `${account.settings.whitelabelDomain}/${account.slug}`;
+/**
+ * Provides seemless redirections URLs between whitelabel domains and the platform.
+ */
+export const getWhitelabelRedirection = (
+  ctx: Context,
+  account?: { settings?: { whitelabelDomain?: string }; slug: string },
+): string | void => {
+  if (!account) {
+    return;
+  }
+  const { isWhitelabelDomain, isNonPlatformDomain } = getWhitelabelProps(ctx);
+
+  const accountDomain = account?.settings?.whitelabelDomain;
+  if (!isWhitelabelDomain && accountDomain && WHITELABEL_DOMAINS.includes(accountDomain)) {
+    return getURL(account.settings.whitelabelDomain, account.slug);
+  } else if (isWhitelabelDomain && !accountDomain && isNonPlatformDomain) {
+    return getURL(WEBSITE_URL, account.slug);
   }
 };
 
@@ -42,7 +60,7 @@ export const getWhitelabelProps = (ctx?: Context): WhitelabelProps => {
     return null;
   }
 
-  const isNonPlatformDomain = !process.env.WEBSITE_URL.includes(origin);
+  const isNonPlatformDomain = !WEBSITE_URL.includes(origin);
   const isWhitelabelDomain = isEmpty(WHITELABEL_DOMAINS) ? false : WHITELABEL_DOMAINS.includes(origin);
   const provider = WHITELABEL_PROVIDERS.find(provider => provider.domain === origin);
   return { origin, path, provider, isNonPlatformDomain, isWhitelabelDomain };
