@@ -45,6 +45,7 @@ export function ExpensePolicyContainer(props: ExpensePolicyContainerProps) {
               <MessageBox type="warning">
                 <label className="flex cursor-pointer items-center gap-2 text-sm leading-normal font-normal">
                   <Checkbox
+                    data-cy={`${props.title?.toString().toLowerCase().includes('host') ? 'host' : 'collective'}-grant-policy-checkbox`}
                     checked={props.checked}
                     onCheckedChange={v => {
                       props.onAcknowledgedChanged(v as boolean);
