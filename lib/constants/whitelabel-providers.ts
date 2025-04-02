@@ -5,8 +5,12 @@ const env = process.env.OC_ENV || process.env.NODE_ENV || 'development';
 type WhitelabelProvider = {
   slug: string;
   domain: string;
-  logo: string;
   name: string;
+  border?: string;
+  logo: {
+    url: string;
+    width?: number;
+  };
   /** List of links to display in our Menus. If the link contains an Icon, we'll also render it in the ProfileMenu */
   links?: {
     label: string;
@@ -21,7 +25,7 @@ const WHITELABEL_PROVIDERS: WhitelabelProvider[] = [
     slug: 'ofico',
     domain: env === 'development' ? 'http://local.ofi:3000' : 'https://oficollective.com',
     name: 'OFiCo',
-    logo: '/static/images/logotype-ofi-collective.svg',
+    logo: { url: '/static/images/logotype-ofi-collective.svg', width: 125 },
     links: [
       {
         label: 'Home',
@@ -37,7 +41,11 @@ const WHITELABEL_PROVIDERS: WhitelabelProvider[] = [
     slug: 'opensource',
     domain: env === 'development' ? 'http://local.osc:3000' : 'https://oscollective.org',
     name: 'Open Source Collective',
-    logo: 'https://oscollective.org/wp-content/uploads/2024/02/cropped-OSC-Logo_1_transparency.png',
+    logo: {
+      url: 'https://oscollective.org/wp-content/uploads/2024/02/cropped-OSC-Logo_1_transparency.png',
+      width: 200,
+    },
+    border: '1px solid #4b3084ff',
     links: [
       {
         icon: ProfileMenuIcons.Home,
@@ -71,7 +79,7 @@ if (['development', 'e2e', 'ci'].includes(env)) {
     slug: 'opencollective',
     domain: 'http://local.opencollective:3000',
     name: 'Open Collective',
-    logo: '/static/images/opencollectivelogo-footer-n.svg',
+    logo: { url: '/static/images/opencollectivelogo-footer-n.svg' },
   });
 }
 
