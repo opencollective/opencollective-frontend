@@ -15,6 +15,8 @@ import { expectedDateFilter, orderChargeDateFilter, orderCreateDateFilter } from
 import { expectedFundsFilter } from '../../filters/ExpectedFundsFilter';
 import { searchFilter } from '../../filters/SearchFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
+import { childAccountFilter } from '../../filters/ChildAccountFilter';
+import { Account } from '@/lib/graphql/types/v2/schema';
 
 export const contributionsOrderFilter = buildSortFilter({
   fieldSchema: z.enum(['LAST_CHARGED_AT', 'CREATED_AT']),
@@ -50,6 +52,7 @@ export const schema = z.object({
   frequency: isMulti(z.nativeEnum(ContributionFrequency)).optional(),
   paymentMethodId: isMulti(z.string()).optional(),
   tier: isMulti(z.string()).optional(),
+  account: childAccountFilter.schema,
 });
 
 type FilterValues = z.infer<typeof schema>;
@@ -57,6 +60,9 @@ type FilterValues = z.infer<typeof schema>;
 export type FilterMeta = {
   currency?: Currency;
   tierOptions?: Array<{ label: string; value: string }>;
+  childrenAccounts: Account[];
+  accountSlug?: string;
+  showChildAccountFilter?: boolean;
 };
 
 type GraphQLQueryVariables = DashboardRecurringContributionsQueryVariables;
@@ -72,6 +78,15 @@ export const toVariables: FiltersToVariables<FilterValues, GraphQLQueryVariables
   paymentMethodId: ids => ({ paymentMethod: ids.map(id => ({ id })) }),
   tier: (value: [string]) => {
     return { tier: value.map(id => ({ id })) };
+  },
+  account: (value, key, meta) => {
+    if (meta?.childrenAccounts && !meta.childrenAccounts.length) {
+      return { includeChildrenAccounts: false };
+    } else if (!value) {
+      return { includeChildrenAccounts: true };
+    } else {
+      return { slug: value, includeChildrenAccounts: false };
+    }
   },
 };
 
@@ -119,5 +134,9 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   paymentMethodId: {
     labelMsg: defineMessage({ defaultMessage: 'Payment Method', id: 'paymentmethod.label' }),
     valueRenderer: ({ value }) => value.split('-')[0],
+  },
+  account: {
+    ...childAccountFilter.filter,
+    hide: ({ meta }) => !meta.showChildAccountFilter || !meta?.childrenAccounts || meta.childrenAccounts.length === 0,
   },
 };
