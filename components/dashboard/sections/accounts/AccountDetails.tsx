@@ -40,6 +40,7 @@ import { Sheet, SheetBody, SheetContent } from '@/components/ui/Sheet';
 import DrawerHeader from '@/components/DrawerHeader';
 import { GetActions } from '@/lib/actions/types';
 import { Skeleton } from '@/components/ui/Skeleton';
+import formatAccountType from '@/lib/i18n/account-type';
 
 type CollectiveDetailsProps = {
   // collective?: HostedCollectiveFieldsFragment & Partial<AccountWithHost>;
@@ -243,29 +244,40 @@ const AccountDetails = ({ collectiveId, openCollectiveDetails, getActions }: Col
           //   #{id}
           // </CopyID>
         }
-        entityLabel={<div />}
-
-        // entityLabel={
-        //   <div>
-        //     {isLoading ? (
-        //       <Skeleton className="h-8 w-64" />
-        //     ) : (
-        //       <div className="flex items-center gap-3">
-        //         <Avatar collective={account} radius={32} />
-        //         <div className={'text-xl font-semibold text-foreground'}>{account.name}</div>
-        //         <Badge type="outline" size="sm">
-        //           {formatCollectiveType(intl, account.type)}
-        //         </Badge>
-        //       </div>
-        //     )}
-        //   </div>
-        // }
+        separateRowForEntityLabel
+        entityLabel={
+          <div className="w-full">
+            {isLoading ? (
+              <Skeleton className="h-8 w-64" />
+            ) : (
+              <div className="flex w-full items-center gap-4">
+                <div className="flex items-center gap-3 overflow-hidden">
+                  <Avatar collective={account} className="" radius={32} />
+                  <p className="truncate text-xl font-semibold text-foreground">{account.name}</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Badge size="sm" type="outline">
+                    {formatAccountType(intl, account.type)}
+                  </Badge>
+                  {account.isFrozen && (
+                    <Badge size="sm" type="info">
+                      <FormattedMessage id="CollectiveStatus.Frozen" defaultMessage="Frozen" />
+                    </Badge>
+                  )}
+                  {!account.isActive && (
+                    <Badge size="sm">
+                      <FormattedMessage id="Archived" defaultMessage="Archived" />
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        }
       />
-      <SheetBody className="">
+      <SheetBody className="pt-0">
         {isLoading ? (
           <React.Fragment>
-            <Skeleton className="h-8 w-64" />
-
             <InfoList className="sm:grid-cols-2">
               <InfoListItem
                 className="border-t-0"
@@ -281,15 +293,15 @@ const AccountDetails = ({ collectiveId, openCollectiveDetails, getActions }: Col
           </React.Fragment>
         ) : (
           <React.Fragment>
-            <div className="flex items-center gap-3">
+            {/* <div className="flex items-center gap-3">
               <Avatar collective={account} radius={32} />
               <div className={'text-xl font-semibold text-foreground'}>{account.name}</div>
               <Badge type="outline" size="sm">
                 {formatCollectiveType(intl, account.type)}
               </Badge>
-            </div>
+            </div> */}
             {/* <SectionTitle>
-              <Avatar collective={collective} radius={48} />
+              <Avatar collective={collective} radius=ß{48} />
               <div>
                 <div className="flex flex-row">
                   <LinkCollective

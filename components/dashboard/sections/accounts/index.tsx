@@ -213,11 +213,11 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
           <DataTable
             data-cy="transactions-table"
             innerClassName="text-muted-foreground"
-            columns={compact([cols.collective, cols.status, cols.balance, actionsColumn])}
+            columns={compact([cols.collective, cols.balance, actionsColumn])}
             data={accounts}
             loading={loading}
             mobileTableView
-            compact
+            // compact
             // meta={
             //   {
             //     intl,

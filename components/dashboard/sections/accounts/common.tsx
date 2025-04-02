@@ -4,72 +4,54 @@ import type { IntlShape } from 'react-intl';
 import { FormattedMessage } from 'react-intl';
 
 import type { HostedCollectiveFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
-import formatCollectiveType from '../../../../lib/i18n/collective-type';
-import { cn } from '../../../../lib/utils';
 
 import Avatar from '../../../Avatar';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { Badge } from '../../../ui/Badge';
-import { Label } from '../../../ui/Label';
+import formatAccountType from '@/lib/i18n/account-type';
 
 export interface HostedCollectivesDataTableMeta extends TableMeta<any> {
   openCollectiveDetails?: (c: HostedCollectiveFieldsFragment) => void;
 }
 
-const DEFAULT_LABEL_STYLE = 'rounded px-1 py-0.5 text-xs';
-
 export const cols: Record<string, ColumnDef<any, any>> = {
   collective: {
     accessorKey: 'collective',
     header: () => <FormattedMessage defaultMessage="Account" id="TwyMau" />,
-    cell: ({ row }) => {
+    cell: ({ row, table }) => {
+      const { intl } = table.options.meta as {
+        intl: IntlShape;
+      };
       const account = row.original;
       return (
-        <div className="flex items-center">
-          <Avatar collective={account} className="mr-4" radius={48} />
-          {account.isFrozen && (
-            <Badge type="info" size="xs" className="mr-2">
-              <FormattedMessage id="CollectiveStatus.Frozen" defaultMessage="Frozen" />
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 overflow-hidden">
+            <Avatar collective={account} className="" radius={32} />
+            <p className="truncate text-sm text-foreground">{account.name}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Badge type="outline" size="sm">
+              {formatAccountType(intl, account.type)}
             </Badge>
-          )}
-          <div className="flex flex-col items-start">
-            <div className="flex items-center text-sm">{account.name}</div>
+            {account.isFrozen && (
+              <Badge type="info" size="sm" className="">
+                <FormattedMessage id="CollectiveStatus.Frozen" defaultMessage="Frozen" />
+              </Badge>
+            )}
+            {!account.isActive && (
+              <Badge size="sm">
+                <FormattedMessage id="Archived" defaultMessage="Archived" />
+              </Badge>
+            )}
           </div>
         </div>
       );
     },
   },
-  status: {
-    accessorKey: 'status',
-    header: () => '',
-    cell: ({ row, table }) => {
-      const { intl } = table.options.meta as {
-        intl: IntlShape;
-      };
-
-      const account = row.original;
-      return (
-        <div className="flex items-center gap-2">
-          <Label className={cn(DEFAULT_LABEL_STYLE, 'border border-slate-500 text-slate-500')}>
-            {formatCollectiveType(intl, account.type)}
-          </Label>
-          <Label
-            className={cn(
-              DEFAULT_LABEL_STYLE,
-              account.isActive ? 'bg-green-200 text-green-600' : 'bg-slate-200 text-slate-600',
-            )}
-          >
-            {account.isActive ? (
-              <FormattedMessage id="Subscriptions.Active" defaultMessage="Active" />
-            ) : (
-              <FormattedMessage id="Archived" defaultMessage="Archived" />
-            )}
-          </Label>
-        </div>
-      );
-    },
-  },
   balance: {
+    meta: {
+      align: 'right',
+    },
     accessorKey: 'balance',
     header: () => <FormattedMessage id="Balance" defaultMessage="Balance" />,
     cell: ({ row }) => {
