@@ -1,4 +1,4 @@
-import { isNil } from 'lodash';
+import { isNil, isUndefined } from 'lodash';
 
 import { getDayjsIsoUnit } from '../../../../lib/date-utils';
 import dayjs from '../../../../lib/dayjs';
@@ -22,13 +22,14 @@ export const filterToHostTransactionsFilterValues = (
   variables,
 ): Partial<HostTransactionsFilterValues> => {
   return {
-    ...(groupFilter.isHost
-      ? {
-          account: hostSlug,
-        }
-      : {
-          excludeAccount: hostSlug,
-        }),
+    ...(!isUndefined(groupFilter.isHost) &&
+      (groupFilter.isHost
+        ? {
+            account: hostSlug,
+          }
+        : {
+            excludeAccount: hostSlug,
+          })),
     ...(groupFilter.kind && {
       kind: [groupFilter.kind],
     }),
