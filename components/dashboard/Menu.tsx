@@ -27,7 +27,7 @@ import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
-import { isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective';
+import { isChildAccount, isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective';
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
@@ -109,6 +109,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
   const isAccountantOnly = LoggedInUser?.isAccountantOnly(account);
   const isActive = account.isActive;
   const isActiveHost = isHost && isActive;
+  const isChild = isChildAccount(account);
 
   const items: MenuItem[] = [
     {
@@ -123,7 +124,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       label: intl.formatMessage({ id: 'Expenses', defaultMessage: 'Expenses' }),
     },
     {
-      if: !isIndividual,
+      if: !isIndividual && !isChild,
       section: ALL_SECTIONS.ACCOUNTS,
       Icon: Wallet,
       label: intl.formatMessage({ defaultMessage: 'Accounts', id: 'FvanT6' }),

@@ -29,6 +29,12 @@ const dashboardAccountsQueryFields = gql`
       service
       name
     }
+    ... on AccountWithParent {
+      parent {
+        id
+        slug
+      }
+    }
   }
 `;
 
