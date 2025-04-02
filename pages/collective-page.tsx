@@ -13,7 +13,7 @@ import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 import { addParentToURLIfMissing, getCollectivePageCanonicalURL } from '../lib/url-helpers';
 import { getRequestIntl } from '@/lib/i18n/request';
-import { getWhitelabelProps, shouldRedirect } from '@/lib/whitelabel';
+import { getWhitelabelRedirection } from '@/lib/whitelabel';
 
 import CollectivePageContent from '../components/collective-page';
 import CollectiveNotificationBar from '../components/collective-page/CollectiveNotificationBar';
@@ -67,25 +67,22 @@ const collectivePageQueryHelper = getSSRQueryHelpers<
 // next.js export
 // ts-unused-exports:disable-next-line
 export const getServerSideProps = async (context: Context) => {
-  const whitelabel = getWhitelabelProps(context);
   const result = await collectivePageQueryHelper.getServerSideProps(context);
   const props = result['props'];
   const error = props[APOLLO_ERROR_PROP_NAME];
   const data = props[APOLLO_QUERY_DATA_PROP_NAME];
   const notFound = !error && !data?.Collective;
 
-  // Deals with the redirection TO a white label domain, not back to platform
-  if (data?.Collective?.settings?.whitelabelDomain && whitelabel?.isWhitelabelDomain === false) {
-    const destination = shouldRedirect(data.Collective);
-    if (destination) {
-      context.res?.setHeader('Cache-Control', 'no-cache');
-      return {
-        redirect: {
-          destination: destination,
-          permanent: false,
-        },
-      };
-    }
+  // Deals with whitelabel redirection from and to the platform
+  const redirect = getWhitelabelRedirection(context, data?.Collective);
+  if (redirect) {
+    context.res?.setHeader('Cache-Control', 'no-cache');
+    return {
+      redirect: {
+        destination: redirect,
+        permanent: false,
+      },
+    };
   }
 
   if (notFound) {
