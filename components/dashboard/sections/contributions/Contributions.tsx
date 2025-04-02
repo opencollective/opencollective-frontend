@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { compact, omit } from 'lodash';
 import { ArrowLeftRightIcon, LinkIcon, Pencil, PlusIcon } from 'lucide-react';
@@ -54,6 +54,7 @@ import CreatePendingContributionModal from './CreatePendingOrderModal';
 import type { FilterMeta } from './filters';
 import { filters as allFilters, schema, toVariables } from './filters';
 import { PausedIncomingContributionsMessage } from './PausedIncomingContributionsMessage';
+import { DashboardContext } from '../../DashboardContext';
 
 enum ContributionsTab {
   ALL = 'ALL',
@@ -734,9 +735,13 @@ const Contributions = ({
     }
   }, [metadata?.account]);
 
+  const { account } = useContext(DashboardContext);
   const filterMeta: FilterMeta = {
     currency: metadata?.account?.currency,
     tierOptions: isIncoming ? tierOptions : [],
+    childrenAccounts: account.childrenAccounts?.nodes ?? [],
+    accountSlug: account.slug,
+    showChildAccountFilter: direction === 'INCOMING' && !includeHostedAccounts && includeChildrenAccounts,
   };
 
   const queryFilter = useQueryFilter({
