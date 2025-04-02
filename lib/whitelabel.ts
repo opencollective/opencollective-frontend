@@ -44,12 +44,12 @@ export const getWhitelabelRedirection = (
   if (!account) {
     return;
   }
-  const { isWhitelabelDomain } = getWhitelabelProps(ctx);
+  const { isWhitelabelDomain, isNonPlatformDomain } = getWhitelabelProps(ctx);
 
   const accountDomain = account?.settings?.whitelabelDomain;
   if (!isWhitelabelDomain && accountDomain && WHITELABEL_DOMAINS.includes(accountDomain)) {
     return getURL(account.settings.whitelabelDomain, account.slug);
-  } else if (isWhitelabelDomain && !accountDomain) {
+  } else if (isWhitelabelDomain && !accountDomain && isNonPlatformDomain) {
     return getURL(WEBSITE_URL, account.slug);
   }
 };
