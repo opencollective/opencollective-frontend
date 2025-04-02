@@ -72,7 +72,7 @@ const Footer = () => {
               {whitelabel ? (
                 <React.Fragment>
                   <Link href={`/${whitelabel.slug}`}>
-                    <img className="max-h-7" src={whitelabel.logo} alt={whitelabel.name} />
+                    <img className="max-h-7" src={whitelabel.logo.url} alt={whitelabel.name} />
                   </Link>
                   <span className="relative top-px hidden text-xs text-muted-foreground md:block">
                     <FormattedMessage id="footer.Whitelabel.description" defaultMessage="Powered by Open Collective." />

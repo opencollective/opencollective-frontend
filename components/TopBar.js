@@ -80,7 +80,7 @@ const TopBarIcon = ({ provider }) => {
     <Link href={`/${provider?.slug || ''}`}>
       <Flex alignItems="center">
         {provider?.logo ? (
-          <img className="max-h-6" src={provider.logo} alt={provider.name} />
+          <img width={provider.logo.width ?? 150} src={provider.logo.url} alt={provider.name} />
         ) : (
           <Image width={32} height={32} src="/static/images/oc-logo-watercolor-256.png" alt="Open Collective" />
         )}
@@ -155,7 +155,11 @@ const TopBar = ({
       alignItems="center"
       flexDirection="row"
       justifyContent="space-around"
-      css={{ height: theme.sizes.navbarHeight, background: 'white', borderBottom: '1px solid rgb(232, 233, 235)' }}
+      css={{
+        height: theme.sizes.navbarHeight,
+        background: 'white',
+        borderBottom: whitelabel?.border ?? '1px solid rgb(232, 233, 235)',
+      }}
       ref={ref}
     >
       <TopBarIcon provider={whitelabel} />
