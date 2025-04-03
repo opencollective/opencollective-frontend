@@ -2274,7 +2274,7 @@
   "iuxiAF": "Related expense",
   "iUxV8v": "Zaangażuj się",
   "ivhAav": "Skontaktuj się z <SupportLink>pomocą techniczną</SupportLink>, aby odłączyć PayPal.",
-  "iVRVyA": "When you contribute to {collectiveName}, your email address will be shared with it's administrators.{isSelfHosted, select, false { It will also be shared with {hostName}, the legal entity that provides {collectiveName} with financial services and will be receiving this contribution on their behalf.} other {}}",
+  "iVRVyA": "When you contribute to {collectiveName}, your email address will be shared with its administrators.{isSelfHosted, select, false { It will also be shared with {hostName}, the legal entity that provides {collectiveName} with financial services and will be receiving this contribution on their behalf.} other {}}",
   "IVw0RN": "Zamrożenie zbiorki oznacza tymczasowe ograniczenie możliwości, jakie zbiórka (i powiązane z nią Projekty i Wydarzenia) może, a czego nie może robić na platformie.",
   "iVzX67": "Delete Agreement",
   "iW16Sa": "Member Invitations",
