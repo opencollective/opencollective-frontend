@@ -3137,6 +3137,7 @@
   "qBST+n": "Numéro de carte",
   "qC0ZXX": "Rapports de dépenses",
   "qck/cA": "{pausedIncomingContributionsCount, plural, one {Une contribution récurrente à votre Collectif est suspendue et <Link>peut être réactivée</Link>} other {# contributions récurrentes à votre Collectif sont suspendues et <Link>peuvent être réactivées</Link>}}.",
+  "QeM97p": "Sign in to {whitelabelProviderName} with your Open Collective account.",
   "qFfWnO": "Update connection",
   "qFt6F7": "Page d’accueil d’Open Collective",
   "QGJ3Z6": "Le gestionnaire (identifiant URL sur le site Web) du compte de transaction.",
