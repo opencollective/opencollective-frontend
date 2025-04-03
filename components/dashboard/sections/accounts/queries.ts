@@ -33,6 +33,23 @@ const dashboardAccountsQueryFields = gql`
       parent {
         id
         slug
+        settings
+      }
+    }
+    ... on AccountWithHost {
+      host {
+        id
+        legacyId
+        slug
+        policies {
+          id
+          REQUIRE_2FA_FOR_ADMINS
+        }
+      }
+    }
+    permissions {
+      addFunds {
+        allowed
       }
     }
   }
