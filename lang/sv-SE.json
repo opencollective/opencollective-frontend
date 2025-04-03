@@ -2274,7 +2274,7 @@
   "iuxiAF": "Related expense",
   "iUxV8v": "Engagera dig",
   "ivhAav": "Kontakta <SupportLink>support</SupportLink> för att ta bort PayPal.",
-  "iVRVyA": "When you contribute to {collectiveName}, your email address will be shared with it's administrators.{isSelfHosted, select, false { It will also be shared with {hostName}, the legal entity that provides {collectiveName} with financial services and will be receiving this contribution on their behalf.} other {}}",
+  "iVRVyA": "When you contribute to {collectiveName}, your email address will be shared with its administrators.{isSelfHosted, select, false { It will also be shared with {hostName}, the legal entity that provides {collectiveName} with financial services and will be receiving this contribution on their behalf.} other {}}",
   "IVw0RN": "Att frysa detta kollektiv innebär att tillfälligt begränsa vad ett kollektiv (och deras anslutna Projekt & Evenemang) kan och inte kan göra på plattformen.",
   "iVzX67": "Delete Agreement",
   "iW16Sa": "Member Invitations",
