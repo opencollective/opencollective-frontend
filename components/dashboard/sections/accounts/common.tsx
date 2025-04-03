@@ -9,6 +9,9 @@ import Avatar from '../../../Avatar';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { Badge } from '../../../ui/Badge';
 import formatAccountType from '@/lib/i18n/account-type';
+import { BaseModalProps } from '@/components/ModalContext';
+import AddFundsModal from '../collectives/AddFundsModal';
+import { SubmitExpenseFlow } from '@/components/submit-expense/SubmitExpenseFlow';
 
 export interface HostedCollectivesDataTableMeta extends TableMeta<any> {
   openCollectiveDetails?: (c: HostedCollectiveFieldsFragment) => void;
@@ -65,3 +68,58 @@ export const cols: Record<string, ColumnDef<any, any>> = {
     },
   },
 };
+
+export function AddFundsModalAccount({
+  collective,
+  host,
+  open,
+  setOpen,
+}: {
+  collective?: React.ComponentProps<typeof AddFundsModal>['collective'];
+  host?: React.ComponentProps<typeof AddFundsModal>['host'];
+} & BaseModalProps) {
+  if (!open) {
+    return null;
+  }
+
+  return (
+    <AddFundsModal
+      onClose={() => setOpen(false)}
+      host={host}
+      // transactionsImportRow={row}
+      collective={collective}
+      // initialValues={{
+      //   amount: row.amount.valueInCents,
+      //   description: row.description,
+      //   processedAt: row.date.split('T')[0],
+      //   memo: `Imported from "${transactionsImport.source} - ${transactionsImport.name}". Row values:\n${prettyPrintRawValues(row.rawValue)}`,
+      //   transactionsImportRow: { id: row.id },
+      // }}
+      // onSuccess={order => {
+      //   // Update row
+      //   client.cache.modify({
+      //     id: client.cache.identify(row),
+      //     fields: { order: () => order },
+      //   });
+
+      //   // Update transactions import stats
+      //   client.cache.modify({
+      //     id: client.cache.identify(transactionsImport),
+      //     fields: {
+      //       stats: (stats: TransactionsImportStats): TransactionsImportStats => {
+      //         return { ...stats, processed: stats.processed + 1, orders: stats.orders + 1 };
+      //       },
+      //     },
+      //   });
+      // }}
+    />
+  );
+}
+
+export function ExpenseFlowModal({ collective, open, setOpen }) {
+  if (!open) {
+    return null;
+  }
+
+  return <SubmitExpenseFlow submitExpenseTo={collective.slug} onClose={() => setOpen(false)} />;
+}

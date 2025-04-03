@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { useQuery } from '@apollo/client';
 import { compact, isString, omit } from 'lodash';
 import { ChevronDown } from 'lucide-react';
@@ -34,11 +34,15 @@ import type { HostedCollectivesDataTableMeta } from '../collectives/common';
 
 import AccountDetails, { AccountDrawer } from './AccountDetails';
 import { useAccountActions } from './actions';
-import { cols } from './common';
+import { AddFundsModalAccount, cols } from './common';
 import InternalTransferModal from './InternalTransferModal';
 import { accountsMetadataQuery, accountsQuery } from './queries';
 import { useDrawer } from '@/lib/hooks/useDrawer';
-
+import { BaseModalProps, useModal } from '@/components/ModalContext';
+import AddFundsModal from '../collectives/AddFundsModal';
+import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
+import { DashboardContext } from '../../DashboardContext';
+import formatCollectiveType from '@/lib/i18n/collective-type';
 const COLLECTIVES_PER_PAGE = 20;
 
 const schema = z.object({
@@ -66,6 +70,7 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
     fetchPolicy: 'cache-and-network',
     context: API_V2_CONTEXT,
   });
+  const { account } = useContext(DashboardContext);
 
   const pushSubpath = subpath => {
     router.push(
@@ -136,6 +141,10 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
     onClose: () => queryFilter.setFilter('collectiveId', undefined, false),
   });
 
+  const isAllowedAddFunds = Boolean(data?.account?.permissions?.addFunds?.allowed);
+
+  const { showModal, hideModal } = useModal();
+
   // const handleEdit = () => {
   //   refetchMetadata();
   //   refetch();
@@ -156,8 +165,15 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
     <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
       <DashboardHeader
         title={<FormattedMessage defaultMessage="Accounts" id="FvanT6" />}
+        description={
+          <FormattedMessage
+            defaultMessage="Manage the accounts in your {collectiveType}."
+            id="vPnM7w"
+            values={{ collectiveType: formatCollectiveType(intl, account.type) }}
+          />
+        }
         actions={
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button size="xs" variant="outline" className="gap-1">
@@ -183,10 +199,43 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
                 <FormattedMessage defaultMessage="New internal transfer" id="v4unZI" />
               </Button>
             )}
+            {isAllowedAddFunds && (
+              <Button
+                size="xs"
+                variant="outline"
+                onClick={() =>
+                  showModal(AddFundsModalAccount, { collective: data?.account, host: data?.host }, 'add-funds-modal')
+                }
+              >
+                <FormattedMessage defaultMessage="Add funds" id="sx0aSl" />
+              </Button>
+            )}
           </div>
         }
       >
-        <div className="flex">
+        <div className="mt-2 w-full max-w-xs space-y-1 rounded-lg border p-3">
+          <div>
+            <div className="flex items-center gap-1">
+              <span className="block text-sm font-medium tracking-tight">Total Balance</span>
+            </div>
+
+            {loading ? (
+              <Skeleton className="mt-1 h-7 w-1/2" />
+            ) : (
+              <div className="flex items-center gap-2">
+                <span className="block text-2xl font-bold">
+                  <FormattedMoneyAmount
+                    amount={data?.account?.stats?.consolidatedBalance?.valueInCents}
+                    currency={data?.account?.stats?.consolidatedBalance?.currency}
+                    precision={2}
+                    showCurrencyCode={true}
+                  />
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+        {/* <div className="flex">
           <FormattedMessage id="TotalBalance" defaultMessage="Total Balance" />:
           {loading ? (
             <Skeleton className="ml-1 h-6 w-32" />
@@ -198,7 +247,7 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
               )}
             </span>
           )}
-        </div>
+        </div> */}
       </DashboardHeader>
       <Filterbar {...queryFilter} />
       {error && <MessageBoxGraphqlError error={error} mb={2} />}

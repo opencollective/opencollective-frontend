@@ -1,4 +1,14 @@
-import { Archive, ArrowLeftRight, Coins, Globe2, LayoutDashboard, Logs, Receipt } from 'lucide-react';
+import {
+  Archive,
+  ArrowLeftRight,
+  Banknote,
+  Coins,
+  Globe2,
+  Landmark,
+  LayoutDashboard,
+  Logs,
+  Receipt,
+} from 'lucide-react';
 import { useIntl } from 'react-intl';
 
 import type { GetActions } from '../../../../lib/actions/types';
@@ -9,6 +19,7 @@ import { useModal } from '../../../ModalContext';
 import InternalTransferModal from './InternalTransferModal';
 import { getCollectivePageRoute, getDashboardRoute } from '@/lib/url-helpers';
 import { useRouter } from 'next/router';
+import { AddFundsModalAccount, ExpenseFlowModal } from './common';
 
 export function useAccountActions<T extends DashboardAccountsQueryFieldsFragment>({ accounts = null } = {}) {
   const intl = useIntl();
@@ -19,6 +30,8 @@ export function useAccountActions<T extends DashboardAccountsQueryFieldsFragment
     if (!account) {
       return {};
     }
+
+    const isAllowedAddFunds = Boolean(account.permissions?.addFunds?.allowed);
 
     return {
       primary: [
@@ -40,12 +53,22 @@ export function useAccountActions<T extends DashboardAccountsQueryFieldsFragment
           Icon: ArrowLeftRight,
         },
         {
+          key: 'add-funds',
+          label: 'Add funds',
+          Icon: Banknote,
+          onClick: () => {
+            // TODO
+            showModal(AddFundsModalAccount, { collective: account, host: account.host }, 'add-funds-modal');
+          },
+          if: isAllowedAddFunds,
+        },
+        {
           key: 'submit-expense',
           label: 'Submit Payment Request',
           Icon: Receipt,
           onClick: () => {
             // TODO
-            console.log('click');
+            showModal(ExpenseFlowModal, { collective: account }, 'submit-payment-request');
           },
         },
       ].filter(a => a.if ?? true),
