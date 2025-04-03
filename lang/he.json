@@ -2274,7 +2274,7 @@
   "iuxiAF": "Related expense",
   "iUxV8v": "להצטרף ולהיות מעורב",
   "ivhAav": "Please contact <SupportLink>support</SupportLink> to disconnect PayPal.",
-  "iVRVyA": "When you contribute to {collectiveName}, your email address will be shared with it's administrators.{isSelfHosted, select, false { It will also be shared with {hostName}, the legal entity that provides {collectiveName} with financial services and will be receiving this contribution on their behalf.} other {}}",
+  "iVRVyA": "When you contribute to {collectiveName}, your email address will be shared with its administrators.{isSelfHosted, select, false { It will also be shared with {hostName}, the legal entity that provides {collectiveName} with financial services and will be receiving this contribution on their behalf.} other {}}",
   "IVw0RN": "הקפאת הקבוצה משמעותה הגבלת הפעולות במערכת (כולל פרויקטים ואירועים).",
   "iVzX67": "Delete Agreement",
   "iW16Sa": "Member Invitations",

@@ -2274,7 +2274,7 @@
   "iuxiAF": "Gasto relacionado",
   "iUxV8v": "Involúcrate",
   "ivhAav": "Ponte en contacto con <SupportLink>Soporte</SupportLink> para desconectar PayPal.",
-  "iVRVyA": "When you contribute to {collectiveName}, your email address will be shared with it's administrators.{isSelfHosted, select, false { It will also be shared with {hostName}, the legal entity that provides {collectiveName} with financial services and will be receiving this contribution on their behalf.} other {}}",
+  "iVRVyA": "When you contribute to {collectiveName}, your email address will be shared with its administrators.{isSelfHosted, select, false { It will also be shared with {hostName}, the legal entity that provides {collectiveName} with financial services and will be receiving this contribution on their behalf.} other {}}",
   "IVw0RN": "Congelar este Colectivo significa limitar temporalmente lo que un Colectivo (y sus Proyectos y Eventos relacionados) puede y no puede hacer en la plataforma.",
   "iVzX67": "Eliminar Acuerdo",
   "iW16Sa": "Invitaciones de miembros",

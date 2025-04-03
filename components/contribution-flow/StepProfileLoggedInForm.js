@@ -54,7 +54,7 @@ const StepProfileLoggedInForm = ({ profiles, onChange, collective, tier, data, s
           </h1>
           <p>
             <FormattedMessage
-              defaultMessage="When you contribute to {collectiveName}, your email address will be shared with it's administrators.{isSelfHosted, select, false { It will also be shared with {hostName}, the legal entity that provides {collectiveName} with financial services and will be receiving this contribution on their behalf.} other {}}"
+              defaultMessage="When you contribute to {collectiveName}, your email address will be shared with its administrators.{isSelfHosted, select, false { It will also be shared with {hostName}, the legal entity that provides {collectiveName} with financial services and will be receiving this contribution on their behalf.} other {}}"
               id="iVRVyA"
               values={{
                 collectiveName: collective.name,
