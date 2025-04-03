@@ -10,7 +10,7 @@ import { isEmail } from 'validator';
 import { signin } from '../lib/api';
 import { i18nGraphqlException } from '../lib/errors';
 import { gqlV1 } from '../lib/graphql/helpers';
-import { getWebsiteUrl } from '../lib/utils';
+import { getWebsiteUrl, isTrustedSigninRedirectionUrl } from '../lib/utils';
 
 import { toast } from './ui/useToast';
 import Container from './Container';
@@ -84,6 +84,12 @@ class SignInOrJoinFree extends React.Component {
     autoFocus: PropTypes.bool,
     /** whether to update the page title when the sign in form is active */
     noSignInTitle: PropTypes.bool,
+    whitelabelProvider: PropTypes.shape({
+      name: PropTypes.string,
+      squareLogo: PropTypes.shape({
+        url: PropTypes.string,
+      }),
+    }),
   };
 
   constructor(props) {
@@ -138,16 +144,16 @@ class SignInOrJoinFree extends React.Component {
     this.setState({ submitting: true, error: null });
 
     try {
+      const redirect = this.getRedirectURL();
       const response = await signin({
         user: { email, password },
-        redirect: this.getRedirectURL(),
+        redirect,
         websiteUrl: getWebsiteUrl(),
         sendLink,
         resetPassword,
         createProfile: false,
       });
 
-      // In dev/test, API directly returns a redirect URL for emails like
       // test*@opencollective.com.
       if (response.redirect) {
         // Use browser redirection to guarantee page, login, and router state are all updated.
@@ -156,6 +162,14 @@ class SignInOrJoinFree extends React.Component {
         const user = await this.props.login(response.token);
         if (!user) {
           this.setState({ error: 'Token rejected' });
+        }
+        const isTrustedWhitelabel = isTrustedSigninRedirectionUrl(decodeURIComponent(redirect));
+        if (isTrustedWhitelabel) {
+          const parsedUrl = new URL(decodeURIComponent(redirect));
+          parsedUrl.searchParams.set('token', response.token);
+          parsedUrl.searchParams.set('next', parsedUrl.pathname);
+          parsedUrl.pathname = '/signin';
+          window.location.href = parsedUrl.toString();
         }
       } else if (resetPassword) {
         await this.props.router.push({ pathname: '/reset-password/sent', query: { email } });
@@ -223,6 +237,7 @@ class SignInOrJoinFree extends React.Component {
     const { submitting, error, unknownEmailError, passwordRequired, email, password } = this.state;
     const displayedForm = this.props.form || this.state.form;
     const routes = this.props.routes || {};
+    const whitelabelProvider = this.props.whitelabelProvider;
 
     // No need to show the form if an email is provided
     const hasError = Boolean(unknownEmailError || error);
@@ -261,6 +276,7 @@ class SignInOrJoinFree extends React.Component {
               oAuthAppImage={this.props.oAuthApplication?.account?.imageUrl}
               autoFocus={this.props.autoFocus}
               noSignInTitle={this.props.noSignInTitle}
+              whitelabelProvider={whitelabelProvider}
             />
           ) : (
             <Flex flexDirection="column" width={1} alignItems="center">

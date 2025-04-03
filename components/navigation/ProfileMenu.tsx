@@ -128,7 +128,7 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
   }, []);
 
   if (!LoggedInUser) {
-    return <LoginBtn isWhitelabelDomain={!!whitelabel} />;
+    return <LoginBtn whitelabel={whitelabel} />;
   }
 
   const pendingInvitations = data?.memberInvitations?.length > 0 ? data?.memberInvitations?.length : null;
