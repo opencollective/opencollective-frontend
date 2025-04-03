@@ -336,7 +336,9 @@ function commonScenarios(expenseType: 'invoice' | 'reimbursement') {
 function getExpenseInviteEmailLink(to: string) {
   return cy
     .openEmail(
-      email => email.Tags.some(tag => tag === to.replace('@', '-at-')) && email.Subject.includes('wants to pay you'),
+      email =>
+        email.Tags.some(tag => tag === to.replace('@', '-at-')) &&
+        (email.Subject.includes('wants to pay you') || email.Subject.includes('to send funds to')),
     )
     .then(email => {
       const $html = cheerio.load(email.HTML);

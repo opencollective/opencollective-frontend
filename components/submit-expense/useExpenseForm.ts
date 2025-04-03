@@ -375,6 +375,15 @@ const formSchemaQuery = gql`
     }
   }
 
+  fragment ExpenseFormPayoutMethods on PayoutMethod {
+    id
+    type
+    name
+    data
+    isSaved
+    canBeEditedOrDeleted
+  }
+
   fragment ExpenseFormSchemaHostFields on Host {
     id
     legacyId
@@ -401,6 +410,10 @@ const formSchemaQuery = gql`
     expensesTags {
       id
       tag
+    }
+
+    payoutMethods {
+      ...ExpenseFormPayoutMethods
     }
 
     ...ExpenseFormSchemaPolicyFields
@@ -519,12 +532,7 @@ const formSchemaQuery = gql`
     type
     isAdmin
     payoutMethods {
-      id
-      type
-      name
-      data
-      isSaved
-      canBeEditedOrDeleted
+      ...ExpenseFormPayoutMethods
     }
 
     location {
@@ -679,8 +687,19 @@ function buildFormSchema(
           ) {
             return true;
           }
-          if (v && v !== '__newPayoutMethod' && !options.payee?.payoutMethods?.some(pm => pm.id === v)) {
-            return false;
+
+          // If the payee has a host and the payer account is under a different one, show the host's payout method (cross-host expense)
+          if (v && v !== '__newPayoutMethod') {
+            const payee = options.payee;
+            const account = options.account;
+            const host = account && 'host' in account ? account.host : null;
+            if (payee?.['host'] && host && payee['host'].id !== host.id) {
+              if (!payee['host'].payoutMethods?.some(pm => pm.id === v)) {
+                return false;
+              }
+            } else if (!options.payee?.payoutMethods?.some(pm => pm.id === v)) {
+              return false;
+            }
           }
 
           return true;
@@ -1418,31 +1437,39 @@ async function buildFormOptions(
     if (query.data?.loggedInAccount) {
       options.payoutProfiles = getPayoutProfiles(query.data.loggedInAccount);
       if (payee && payee.type !== CollectiveType.VENDOR) {
-        options.payoutMethods = options.payoutProfiles
-          ?.find(p => p.slug === payee?.slug)
-          ?.payoutMethods?.filter(p => options.supportedPayoutMethods.includes(p.type))
-          .map(pm => {
-            if (pm.type === PayoutMethodType.ACCOUNT_BALANCE && host) {
-              return { ...pm, data: { currency: host.currency } };
-            }
-            return pm;
-          });
+        // If the payee has a host and the payer account is under a different one, show the host's payout method (cross-host expense)
+        if (payee['host'] && host && payee['host'].id !== host.id) {
+          options.payoutMethods = payee['host'].payoutMethods?.filter(p =>
+            options.supportedPayoutMethods.includes(p.type),
+          );
+        } else {
+          // Add ACCOUNT_BALANCE payout method if it's supported and available for the payee
+          options.payoutMethods = options.payoutProfiles
+            ?.find(p => p.slug === payee?.slug)
+            ?.payoutMethods?.filter(p => options.supportedPayoutMethods.includes(p.type))
+            .map(pm => {
+              if (pm.type === PayoutMethodType.ACCOUNT_BALANCE && host) {
+                return { ...pm, data: { currency: host.currency } };
+              }
+              return pm;
+            });
 
-        // Add ACCOUNT_BALANCE payout method if it's supported but not available for the payee
-        if (
-          options.supportedPayoutMethods?.includes(PayoutMethodType.ACCOUNT_BALANCE) &&
-          host &&
-          !options.payoutMethods?.some(pm => pm.type === PayoutMethodType.ACCOUNT_BALANCE)
-        ) {
-          options.payoutMethods = [
-            ...(options.payoutMethods || []),
-            {
-              id: '__newAccountBalancePayoutMethod',
-              type: PayoutMethodType.ACCOUNT_BALANCE,
-              data: { currency: host.currency },
-              isSaved: true,
-            },
-          ];
+          // Add ACCOUNT_BALANCE payout method if it's supported but not available for the payee
+          if (
+            options.supportedPayoutMethods?.includes(PayoutMethodType.ACCOUNT_BALANCE) &&
+            host &&
+            !options.payoutMethods?.some(pm => pm.type === PayoutMethodType.ACCOUNT_BALANCE)
+          ) {
+            options.payoutMethods = [
+              ...(options.payoutMethods || []),
+              {
+                id: '__newAccountBalancePayoutMethod',
+                type: PayoutMethodType.ACCOUNT_BALANCE,
+                data: { currency: host.currency },
+                isSaved: true,
+              },
+            ];
+          }
         }
       } else if (payee && payee.type === CollectiveType.VENDOR) {
         options.payoutMethods = payee.payoutMethods?.filter(p => options.supportedPayoutMethods.includes(p.type));
@@ -1866,6 +1893,11 @@ export function useExpenseForm(opts: {
             ...(errs['newPayoutMethod'] || {}),
             ...newPayoutMethodErrors,
           };
+        }
+
+        if (!isEmpty(errs)) {
+          // eslint-disable-next-line no-console
+          console.warn('Form validation error', errs, values); // The form does not always surface errors properly, this will help to troubleshoot.
         }
 
         return errs;

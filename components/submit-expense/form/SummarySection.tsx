@@ -74,15 +74,16 @@ export function SummarySectionContent(props: { form: ExpenseForm }) {
           totalInvoicedInExpenseCurrency={props.form.options.totalInvoicedInExpenseCurrency}
           taxType={props.form.options.taxType}
         />
-        {props.form.options.expenseCurrency !== props.form.options.payoutMethod?.data?.currency && (
-          <MessageBox className="mt-4" type="warning">
-            <PayoutMethodExchangeRateWarning
-              expenseCurrency={props.form.options.expenseCurrency}
-              payoutMethodCurrency={props.form.options.payoutMethod?.data?.currency}
-              totalInvoicedInExpenseCurrency={props.form.options.totalInvoicedInExpenseCurrency}
-            />
-          </MessageBox>
-        )}
+        {props.form.options.payoutMethod &&
+          props.form.options.expenseCurrency !== props.form.options.payoutMethod.data?.currency && (
+            <MessageBox className="mt-4" type="warning">
+              <PayoutMethodExchangeRateWarning
+                expenseCurrency={props.form.options.expenseCurrency}
+                payoutMethodCurrency={props.form.options.payoutMethod?.data?.currency}
+                totalInvoicedInExpenseCurrency={props.form.options.totalInvoicedInExpenseCurrency}
+              />
+            </MessageBox>
+          )}
       </div>
 
       {props.form.values.additionalAttachments?.length > 0 && (
@@ -756,7 +757,7 @@ function PayoutMethodExchangeRateWarning(props: PayoutMethodExchangeRateWarningP
   const exchangeRate = exchangeRateQuery.data?.currencyExchangeRate?.at(0);
 
   if (!exchangeRate) {
-    return <Skeleton />;
+    return <Skeleton className="h-12" />;
   }
 
   const amount = {
