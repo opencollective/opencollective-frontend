@@ -1,5 +1,6 @@
 import { isEmpty } from 'lodash';
 
+import type { WhitelabelProvider } from './constants/whitelabel-providers';
 import { WHITELABEL_DOMAINS, WHITELABEL_PROVIDERS } from './constants/whitelabel-providers';
 import type { Context } from './apollo-client';
 
@@ -64,4 +65,9 @@ export const getWhitelabelProps = (ctx?: Context): WhitelabelProps => {
   const isWhitelabelDomain = isEmpty(WHITELABEL_DOMAINS) ? false : WHITELABEL_DOMAINS.includes(origin);
   const provider = WHITELABEL_PROVIDERS.find(provider => provider.domain === origin);
   return { origin, path, provider, isNonPlatformDomain, isWhitelabelDomain };
+};
+
+export const getWhitelabelProviderFromRedirectionUrl = (url: string): WhitelabelProvider => {
+  const provider = WHITELABEL_PROVIDERS.find(provider => url.startsWith(provider.domain));
+  return provider || null;
 };

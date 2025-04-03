@@ -2,7 +2,7 @@ import { ProfileMenuIcons } from '@/components/navigation/Icons';
 
 const env = process.env.OC_ENV || process.env.NODE_ENV || 'development';
 
-type WhitelabelProvider = {
+export type WhitelabelProvider = {
   slug: string;
   domain: string;
   name: string;
@@ -10,6 +10,9 @@ type WhitelabelProvider = {
   logo: {
     url: string;
     width?: number;
+  };
+  squareLogo?: {
+    url: string;
   };
   /** List of links to display in our Menus. If the link contains an Icon, we'll also render it in the ProfileMenu */
   links?: {
@@ -44,6 +47,9 @@ const WHITELABEL_PROVIDERS: WhitelabelProvider[] = [
     logo: {
       url: 'https://oscollective.org/wp-content/uploads/2024/02/cropped-OSC-Logo_1_transparency.png',
       width: 200,
+    },
+    squareLogo: {
+      url: 'https://images.opencollective.com/opensource/426badd/logo/256.png',
     },
     border: '1px solid #4b3084ff',
     links: [
