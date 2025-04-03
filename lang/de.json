@@ -2274,7 +2274,7 @@
   "iuxiAF": "Verwandte Ausgaben",
   "iUxV8v": "Beteiligt werden",
   "ivhAav": "Bitte kontaktiere den <SupportLink>Support</SupportLink>, deine PayPal Verbindung aufzuheben.",
-  "iVRVyA": "When you contribute to {collectiveName}, your email address will be shared with it's administrators.{isSelfHosted, select, false { It will also be shared with {hostName}, the legal entity that provides {collectiveName} with financial services and will be receiving this contribution on their behalf.} other {}}",
+  "iVRVyA": "When you contribute to {collectiveName}, your email address will be shared with its administrators.{isSelfHosted, select, false { It will also be shared with {hostName}, the legal entity that provides {collectiveName} with financial services and will be receiving this contribution on their behalf.} other {}}",
   "IVw0RN": "Das Einfrieren dieses Kollektivs bedeutet, vorübergehend zu begrenzen, was ein Kollektiv (und ihre verbundenen Projekte & Veranstaltungen) auf der Plattform tun kann und nicht tun kann.",
   "iVzX67": "Vereinbarung löschen",
   "iW16Sa": "Mitgliedereinladungen",
