@@ -68,6 +68,9 @@ export const getWhitelabelProps = (ctx?: Context): WhitelabelProps => {
 };
 
 export const getWhitelabelProviderFromRedirectionUrl = (url: string): WhitelabelProvider => {
+  if (!url) {
+    return null;
+  }
   const provider = WHITELABEL_PROVIDERS.find(provider => url.startsWith(provider.domain));
-  return provider || null;
+  return provider;
 };
