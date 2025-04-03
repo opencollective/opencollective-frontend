@@ -2274,7 +2274,7 @@
   "iuxiAF": "Related expense",
   "iUxV8v": "参与进来",
   "ivhAav": "请联系<SupportLink>支持</SupportLink>以断开连接 PayPal。",
-  "iVRVyA": "When you contribute to {collectiveName}, your email address will be shared with it's administrators.{isSelfHosted, select, false { It will also be shared with {hostName}, the legal entity that provides {collectiveName} with financial services and will be receiving this contribution on their behalf.} other {}}",
+  "iVRVyA": "When you contribute to {collectiveName}, your email address will be shared with its administrators.{isSelfHosted, select, false { It will also be shared with {hostName}, the legal entity that provides {collectiveName} with financial services and will be receiving this contribution on their behalf.} other {}}",
   "IVw0RN": "冻结此集体意味着暂时限制集体（及其关联项目和活动）在平台上能做和不能做的事情。",
   "iVzX67": "删除协议",
   "iW16Sa": "Member Invitations",
