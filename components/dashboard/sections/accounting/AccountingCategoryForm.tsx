@@ -20,7 +20,7 @@ import StyledSelect from '../../../StyledSelect';
 
 const accountingCategoryFormSchema = z.object({
   name: z.string().min(1).max(60),
-  friendlyName: z.string().max(60).optional(),
+  friendlyName: z.string().max(60).optional().nullable(),
   code: z.string().min(1).max(60),
   appliesTo: z
     .object({
