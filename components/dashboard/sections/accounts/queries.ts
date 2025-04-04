@@ -23,19 +23,35 @@ const dashboardAccountsQueryFields = gql`
         valueInCents
         currency
       }
-      totalAmountSpent {
-        valueInCents
-        currency
-      }
-      totalAmountReceived {
-        valueInCents
-        currency
-      }
     }
     paymentMethods(service: OPENCOLLECTIVE, type: COLLECTIVE) {
       id
       service
       name
+    }
+    ... on AccountWithParent {
+      parent {
+        id
+        slug
+        settings
+        isHost
+      }
+    }
+    ... on AccountWithHost {
+      host {
+        id
+        legacyId
+        slug
+        policies {
+          id
+          REQUIRE_2FA_FOR_ADMINS
+        }
+      }
+    }
+    permissions {
+      addFunds {
+        allowed
+      }
     }
   }
 `;

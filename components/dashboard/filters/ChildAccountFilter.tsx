@@ -18,7 +18,7 @@ function ChildAccountFilter({
   const groupedOptions = React.useMemo(
     () => [
       {
-        label: intl.formatMessage({ defaultMessage: 'Main account', id: 'pE0V//' }),
+        label: intl.formatMessage({ defaultMessage: 'Main account', id: 'AccountType.MainAccount' }),
         options: [
           {
             value: meta.accountSlug,
