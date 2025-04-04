@@ -390,17 +390,21 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
             <div className="px-4 pb-4">
               <FormContainer activeHeader={steps.activeHeaderName} onVisibleSectionChange={onVisibleSectionChange} />
             </div>
-            <div className="sticky bottom-0 bg-[#F8FAFC]">
+            <div className="sticky bottom-0 z-20 bg-[#F8FAFC]">
               <div className="flex justify-between px-4 py-4">
                 {steps.activeHeader.previousButtonMessage ? (
-                  <Button variant="outline" onClick={onBackStepClick}>
+                  <Button variant="outline" onClick={onBackStepClick} disabled={expenseForm.isSubmitting}>
                     {steps.activeHeader.previousButtonMessage}
                   </Button>
                 ) : (
                   <div />
                 )}
                 {steps.activeHeader.nextButtonMessage && (
-                  <Button onClick={onNextStepClick} disabled={expenseForm.initialLoading}>
+                  <Button
+                    onClick={onNextStepClick}
+                    disabled={expenseForm.initialLoading}
+                    loading={expenseForm.isSubmitting}
+                  >
                     {steps.activeHeader.nextButtonMessage}
                   </Button>
                 )}
