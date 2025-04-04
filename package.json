@@ -272,7 +272,7 @@
     "raw-loader": "^4.0.2",
     "react-test-renderer": "^18.3.1",
     "rollup": "^3.20.7",
-    "shx": "^0.3.4",
+    "shx": "^0.4.0",
     "styled-jsx": "^5.1.6",
     "tailwindcss": "^4.0.0",
     "tailwindcss-animate": "1.0.7",
