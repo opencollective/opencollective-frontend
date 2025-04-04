@@ -262,10 +262,6 @@ const contributionsSectionQuery = gql`
                 backgroundImageUrl(height: 200)
               }
             }
-            stats {
-              id
-              contributorsCount
-            }
           }
         }
       }
