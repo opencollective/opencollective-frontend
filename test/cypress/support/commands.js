@@ -151,7 +151,7 @@ Cypress.Commands.add('editCollective', (collective, userEmail = defaultTestUserE
  */
 Cypress.Commands.add(
   'createHostedCollectiveV2',
-  ({ email = defaultTestUserEmail, hostSlug = 'opensource', testPayload, ...attributes } = {}) => {
+  ({ email = defaultTestUserEmail, hostSlug = 'opensource', testPayload, collective, ...attributes } = {}) => {
     return cy.createCollectiveV2({
       ...attributes,
       email,
@@ -159,6 +159,7 @@ Cypress.Commands.add(
       host: { slug: hostSlug },
       collective: {
         repositoryUrl: 'https://github.com/opencollective',
+        ...collective,
       },
       applicationData: {
         useGithubValidation: true,

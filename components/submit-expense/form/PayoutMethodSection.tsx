@@ -202,6 +202,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
           {!(isLoading || isLoadingPayee) && !isVendor && props.newPayoutMethodTypes?.length > 0 && (
             <RadioGroupCard
               value="__newPayoutMethod"
+              data-cy="add-new-payout-method"
               checked={isNewPayoutMethodSelected}
               disabled={isLoading || props.initialLoading || props.isSubmitting}
               showSubcontent={!props.initialLoading && isNewPayoutMethodSelected}
@@ -357,6 +358,7 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
             {({ field }) => (
               <ComboSelect
                 {...field}
+                data-cy="payout-method-type-select"
                 disabled={props.isSubmitting}
                 options={newPayoutMethodComboOptions}
                 onChange={onPayoutMethodTypeChange}
