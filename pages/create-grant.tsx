@@ -56,7 +56,7 @@ function CreateGrantPage(props: Awaited<ReturnType<typeof CreateGrantPage.getIni
   const { queryResult } = props;
   const isGrantPreviewEnabled =
     !LoggedInUser ||
-    LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_GRANT_FLOW) ||
+    LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW) ||
     props.newFlowEnabledInUrl;
 
   if (queryResult.loading || loadingLoggedInUser) {
