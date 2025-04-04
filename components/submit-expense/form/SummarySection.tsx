@@ -14,7 +14,7 @@ import { getExpenseExchangeRateWarningOrError, getTaxAmount, isTaxRateValid } fr
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import { ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
 
-import { I18nBold, I18nItalic } from '@/components/I18nFormatters';
+import { I18nBold } from '@/components/I18nFormatters';
 import { Skeleton } from '@/components/ui/Skeleton';
 
 import { AccountHoverCard } from '../../AccountHoverCard';
