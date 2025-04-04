@@ -14,7 +14,7 @@ import { getExpenseExchangeRateWarningOrError, getTaxAmount, isTaxRateValid } fr
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import { ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
 
-import { I18nBold, I18nItalic } from '@/components/I18nFormatters';
+import { I18nBold } from '@/components/I18nFormatters';
 import { Skeleton } from '@/components/ui/Skeleton';
 
 import { AccountHoverCard } from '../../AccountHoverCard';
@@ -770,12 +770,10 @@ function PayoutMethodExchangeRateWarning(props: PayoutMethodExchangeRateWarningP
   return (
     <div>
       <FormattedMessage
-        defaultMessage="Amount in your payout method currency: <b>{amountInPayoutMethodCurrency}</b>.<br></br><i>This is only an <b>estimate</b> based on today's exchange rate</i><br></br><br></br><b>Payment processor fees can be applied and exchange rate is subject to change until payout.</b>"
-        id="kmQQS/"
+        defaultMessage="Amount in your payout method currency: <b>{amountInPayoutMethodCurrency}</b>. This is only an <b>estimate</b> based on today's exchange rate. <b>Payment processor fees can be applied and exchange rate is subject to change until payout.</b>"
+        id="GSrr51"
         values={{
           b: I18nBold,
-          br: () => <br />,
-          i: I18nItalic,
           amountInPayoutMethodCurrency: (
             <div className="inline-flex">
               <AmountWithExchangeRateInfo amount={amount} />

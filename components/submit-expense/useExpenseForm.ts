@@ -717,7 +717,8 @@ function buildFormSchema(
             options.isAccountingCategoryRequired &&
             options.accountingCategories?.length > 0 &&
             !options.accountingCategories.some(ac => ac.id === v) &&
-            !isNull(v) // null represents "I don't know" and is a valid option
+            !isNull(v) && // null represents "I don't know" and is a valid option
+            values.expenseTypeOption !== ExpenseType.GRANT
           ) {
             return false;
           }

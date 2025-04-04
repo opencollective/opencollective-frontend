@@ -69,7 +69,7 @@ export const WhoIsPayingSection = memoWithGetFormProps(function WhoIsPayingSecti
     <FormSectionContainer
       step={Step.WHO_IS_PAYING}
       inViewChange={props.inViewChange}
-      title={<FormattedMessage defaultMessage="Who are you submitting the expense to?" id="bn8pIi" />}
+      title={<FormattedMessage defaultMessage="Who is paying" id="NpMPF+" />}
     >
       <RadioGroup
         id="accountSlug"

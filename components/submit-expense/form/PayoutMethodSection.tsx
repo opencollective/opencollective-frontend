@@ -701,7 +701,6 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
                 <div className="mt-4 flex justify-end gap-2">
                   <Button
                     disabled={isLoadingEditPayoutMethod || props.isSubmitting}
-                    loading={isLoadingEditPayoutMethod || props.isSubmitting}
                     variant="secondary"
                     onClick={() => {
                       setIsEditingPayoutMethod(false);
