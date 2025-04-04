@@ -178,9 +178,16 @@ const budgetSectionForIndividualQuery = gql`
 `;
 
 const budgetSectionWithHostQuery = gql`
-  query BudgetSectionWithHost($slug: String!, $limit: Int!, $kind: [TransactionKind], $heavyAccount: Boolean!) {
+  query BudgetSectionWithHost(
+    $slug: String!
+    $host: AccountReferenceInput
+    $limit: Int!
+    $kind: [TransactionKind]
+    $heavyAccount: Boolean!
+  ) {
     transactions(
       account: { slug: $slug }
+      host: $host
       limit: $limit
       kind: $kind
       includeIncognitoTransactions: true
@@ -223,12 +230,13 @@ export const getBudgetSectionQuery = (hasHost, isIndividual) => {
   }
 };
 
-export const getBudgetSectionQueryVariables = (collectiveSlug, isIndividual) => {
+export const getBudgetSectionQueryVariables = (collectiveSlug, isIndividual, host) => {
   if (isIndividual) {
     return { slug: collectiveSlug, limit: 3, kind: getDefaultKinds().filter(kind => kind !== TransactionKind.EXPENSE) };
   } else {
     return {
       slug: collectiveSlug,
+      host: host ? { slug: host.slug } : null,
       limit: 3,
       kind: getDefaultKinds(),
       heavyAccount: isHeavyAccount(collectiveSlug),
@@ -336,7 +344,7 @@ const SectionBudget = ({ collective, LoggedInUser }) => {
   const [filter, setFilter] = React.useState('all');
   const isIndividual = isIndividualAccount(collective) && !collective.isHost;
   const budgetQueryResult = useQuery(getBudgetSectionQuery(Boolean(collective.host), isIndividual), {
-    variables: getBudgetSectionQueryVariables(collective.slug, isIndividual),
+    variables: getBudgetSectionQueryVariables(collective.slug, isIndividual, collective.host),
     context: API_V2_CONTEXT,
   });
   const { data, refetch } = budgetQueryResult;

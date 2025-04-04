@@ -68,6 +68,39 @@ const getCustomAgent = () => {
   return customAgent;
 };
 
+const logRequest = (action = 'Fetched', start, options, result?) => {
+  const end = process.hrtime.bigint();
+  const executionTime = Math.round(Number(end - start) / 1000000);
+  const apiExecutionTime = result?.headers.get('Execution-Time');
+  const graphqlCache = result?.headers.get('GraphQL-Cache');
+  const latencyTime = apiExecutionTime ? executionTime - Number(apiExecutionTime) : null;
+  const body = JSON.parse(options.body);
+  if (body.operationName || body.variables) {
+    const pickList = [
+      'CollectiveId',
+      'collectiveSlug',
+      'CollectiveSlug',
+      'id',
+      'legacyId',
+      'legacyExpenseId',
+      'slug',
+      'term',
+      'tierId',
+    ];
+    const operationName = body.operationName || 'anonymous GraphQL query';
+    const variables = process.env.NODE_ENV === 'development' ? body.variables : pick(body.variables || {}, pickList);
+    // eslint-disable-next-line no-console
+    console.log(
+      `-> ${action}`,
+      operationName,
+      variables,
+      executionTime ? `in ${executionTime}ms` : '',
+      latencyTime ? `latency=${latencyTime}ms` : '',
+      graphqlCache ? `GraphQL Cache ${graphqlCache}` : '',
+    );
+  }
+};
+
 const serverSideFetch = async (url, options: { headers?: any; agent?: any; body?: string } = {}) => {
   if (typeof window === 'undefined') {
     const nodeFetch = require('node-fetch'); // eslint-disable-line @typescript-eslint/no-var-requires
@@ -85,43 +118,21 @@ const serverSideFetch = async (url, options: { headers?: any; agent?: any; body?
     // Start benchmarking if the request is server side
     const start = process.hrtime.bigint();
 
-    const result = await nodeFetch(url, options);
+    try {
+      const result = await nodeFetch(url, options);
 
-    // Complete benchmark measure and log
-    if (parseToBoolean(process.env.GRAPHQL_BENCHMARK)) {
-      const end = process.hrtime.bigint();
-      const executionTime = Math.round(Number(end - start) / 1000000);
-      const apiExecutionTime = result.headers.get('Execution-Time');
-      const graphqlCache = result.headers.get('GraphQL-Cache');
-      const latencyTime = apiExecutionTime ? executionTime - Number(apiExecutionTime) : null;
-      const body = JSON.parse(options.body);
-      if (body.operationName || body.variables) {
-        const pickList = [
-          'CollectiveId',
-          'collectiveSlug',
-          'CollectiveSlug',
-          'id',
-          'legacyId',
-          'legacyExpenseId',
-          'slug',
-          'term',
-          'tierId',
-        ];
-        const operationName = body.operationName || 'anonymous GraphQL query';
-        const variables = pick(body.variables || {}, pickList);
-        // eslint-disable-next-line no-console
-        console.log(
-          '-> Fetched',
-          operationName,
-          variables,
-          executionTime ? `in ${executionTime}ms` : '',
-          latencyTime ? `latency=${latencyTime}ms` : '',
-          graphqlCache ? `GraphQL Cache ${graphqlCache}` : '',
-        );
+      // Complete benchmark measure and log
+      if (parseToBoolean(process.env.GRAPHQL_BENCHMARK)) {
+        logRequest('Fetched', start, options, result);
       }
-    }
 
-    return result;
+      return result;
+    } catch (error) {
+      if (parseToBoolean(process.env.GRAPHQL_BENCHMARK)) {
+        logRequest('Failed', start, options);
+      }
+      throw error;
+    }
   }
 };
 
@@ -356,7 +367,7 @@ export function getSSRQueryHelpers<TVariables, TProps = Record<string, unknown>,
           [APOLLO_STATE_PROP_NAME]: client.cache.extract() as NormalizedCacheObject,
           [APOLLO_VARIABLES_PROP_NAME]: omitBy<TVariables>(variables, isUndefined) as Partial<TVariables>,
           [APOLLO_ERROR_PROP_NAME]: !error ? null : JSON.parse(JSON.stringify(error)),
-          [APOLLO_QUERY_DATA_PROP_NAME]: result?.data,
+          [APOLLO_QUERY_DATA_PROP_NAME]: result?.data || null,
         } as ServerSideProps,
       };
     },
