@@ -599,7 +599,6 @@ const searchPageQuery = gql`
         currency
         stats {
           id
-          contributorsCount
           totalAmountReceived(useCache: true) {
             currency
             valueInCents
