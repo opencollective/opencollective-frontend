@@ -367,7 +367,7 @@ export function getSSRQueryHelpers<TVariables, TProps = Record<string, unknown>,
           [APOLLO_STATE_PROP_NAME]: client.cache.extract() as NormalizedCacheObject,
           [APOLLO_VARIABLES_PROP_NAME]: omitBy<TVariables>(variables, isUndefined) as Partial<TVariables>,
           [APOLLO_ERROR_PROP_NAME]: !error ? null : JSON.parse(JSON.stringify(error)),
-          [APOLLO_QUERY_DATA_PROP_NAME]: result?.data,
+          [APOLLO_QUERY_DATA_PROP_NAME]: result?.data || null,
         } as ServerSideProps,
       };
     },
