@@ -202,6 +202,7 @@ const contributionsSectionQuery = gql`
     $role: [MemberRole]
     $accountType: [AccountType]
     $orderBy: OrderByInput
+    $skipTotalDonations: Boolean!
   ) {
     account(slug: $slug) {
       id
@@ -234,7 +235,7 @@ const contributionsSectionQuery = gql`
             description
           }
           since
-          totalDonations {
+          totalDonations @skip(if: $skipTotalDonations) {
             currency
             valueInCents
           }
@@ -275,7 +276,13 @@ const SectionContributions = ({ collective }) => {
   const [filter, setFilter] = React.useState(collective.isHost ? FILTERS.HOSTED_COLLECTIVES : FILTERS.ALL);
   const selectedFilter = FILTER_PROPS.find(f => f.id === filter);
   const { data, loading, fetchMore } = useQuery(contributionsSectionQuery, {
-    variables: { slug: collective.slug, limit: PAGE_SIZE, offset: 0, ...selectedFilter.args },
+    variables: {
+      slug: collective.slug,
+      limit: PAGE_SIZE,
+      offset: 0,
+      skipTotalDonations: [FILTERS.HOSTED_COLLECTIVES, FILTERS.HOSTED_EVENTS, FILTERS.HOSTED_FUNDS].includes(filter),
+      ...selectedFilter.args,
+    },
     context: API_V2_CONTEXT,
     notifyOnNetworkStatusChange: true,
   });

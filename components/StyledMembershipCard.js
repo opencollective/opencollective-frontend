@@ -38,7 +38,7 @@ const StyledMembershipCard = ({ membership, intl, ...props }) => {
               </Span>
             </P>
           )}
-          {role === roles.BACKER ? (
+          {role === roles.BACKER && membership.totalDonations?.valueInCents ? (
             <P mt={3} data-cy="amount-contributed">
               <Span fontSize="12px" lineHeight="18px">
                 <FormattedMessage id="membership.totalDonations.title" defaultMessage="Amount contributed" />{' '}
