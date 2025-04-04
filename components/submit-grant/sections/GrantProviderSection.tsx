@@ -20,7 +20,7 @@ export const GrantProviderSection = memoWithGetFormProps(function GrantProviderS
   props: GrantProviderSectionProps,
 ) {
   if (props.initialLoading) {
-    return <Skeleton />;
+    return <Skeleton className="h-12" />;
   }
   return <ExpenseAccountItem account={props.account} />;
 }, getFormProps);

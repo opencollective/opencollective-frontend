@@ -389,7 +389,9 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
                   <div />
                 )}
                 {steps.activeHeader.nextButtonMessage && (
-                  <Button onClick={onNextStepClick}>{steps.activeHeader.nextButtonMessage}</Button>
+                  <Button onClick={onNextStepClick} disabled={expenseForm.initialLoading}>
+                    {steps.activeHeader.nextButtonMessage}
+                  </Button>
                 )}
               </div>
             </div>

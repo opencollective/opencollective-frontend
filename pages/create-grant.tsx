@@ -64,7 +64,6 @@ function CreateGrantPage(props: Awaited<ReturnType<typeof CreateGrantPage.getIni
       <Page {...pageMetadata} collective={props.account} withTopBar={false} showFooter={false}>
         <div className="flex h-screen flex-col items-center justify-center p-12">
           <Loading />
-          <Loading />
         </div>
       </Page>
     );
