@@ -27,7 +27,7 @@ export enum Step {
   SUMMARY = 'SUMMARY',
 }
 
-const StepValues: Record<Step, Path<ExpenseFormValues>[]> = {
+export const StepValues: Record<Step, Path<ExpenseFormValues>[]> = {
   [Step.WHO_IS_PAYING]: ['accountSlug'],
   [Step.WHO_IS_GETTING_PAID]: ['payeeSlug', 'inviteeNewIndividual', 'inviteeNewOrganization'],
   [Step.PAYOUT_METHOD]: ['payoutMethodId', 'newPayoutMethod', 'payoutMethodNameDiscrepancyReason'],

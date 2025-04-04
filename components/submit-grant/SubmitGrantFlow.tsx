@@ -37,7 +37,7 @@ import { useToast } from '../ui/useToast';
 import { GrantProviderSection } from './sections/GrantProviderSection';
 import { InstructionSection } from './sections/InstructionsSection';
 import { InvitationNoteSection } from './sections/InvitationNoteSection';
-import SubmitGrantFlowSteps, { Step, useExpenseFormSteps } from './SubmitGrantFlowSteps';
+import SubmitGrantFlowSteps, { isExpenseFormStepCompleted, Step, useExpenseFormSteps } from './SubmitGrantFlowSteps';
 
 type SubmitGrantFlowProps = {
   account: { slug: string; name?: string };
@@ -203,6 +203,7 @@ type SubmitGrantDialogContentProps = {
 function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
   const { toast } = useToast();
   const { LoggedInUser } = useLoggedInUser();
+  const [nextClickCount, setNextClickCount] = React.useState(0); // This form has not been designed to use `formik.submitCount`, so we keep track of submissions in a different variables to surfacee validation issues.
   const intl = useIntl();
   const formRef = React.useRef<HTMLFormElement>();
 
@@ -345,6 +346,7 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
     const stepErrors = pick(errors, steps.activeHeader.formValues);
     if (!isEmpty(stepErrors)) {
       objectKeys(stepErrors).forEach(k => setFieldTouched(k, true));
+      setNextClickCount(nextClickCount + 1);
       return;
     }
 
@@ -363,10 +365,19 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
     validateForm,
     steps.activeHeader.formValues,
     steps.activeHeaderName,
+    nextClickCount,
     handleSubmit,
     setFieldTouched,
     setActiveStep,
   ]);
+
+  // Scroll to first step with error
+  const firstIncompleteSection = Object.values(Step).find(s => !isExpenseFormStepCompleted(expenseForm, s));
+  React.useEffect(() => {
+    if (firstIncompleteSection && nextClickCount) {
+      document.querySelector(`#${firstIncompleteSection}`)?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [firstIncompleteSection, nextClickCount]);
 
   return (
     <FormikProvider value={expenseForm}>
