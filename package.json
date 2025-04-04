@@ -210,7 +210,7 @@
     "@graphql-codegen/add": "^5.0.2",
     "@graphql-codegen/cli": "5.0.3",
     "@graphql-codegen/client-preset": "^4.2.6",
-    "@graphql-eslint/eslint-plugin": "^3.20.1",
+    "@graphql-eslint/eslint-plugin": "^4.0.0",
     "@next/bundle-analyzer": "^14.2.3",
     "@rollup/plugin-commonjs": "^26.0.0",
     "@rollup/plugin-image": "^3.0.3",
