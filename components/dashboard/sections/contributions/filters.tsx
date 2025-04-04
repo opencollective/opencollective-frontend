@@ -8,15 +8,15 @@ import type { Currency, DashboardRecurringContributionsQueryVariables } from '..
 import { ContributionFrequency, OrderStatus } from '../../../../lib/graphql/types/v2/graphql';
 import { i18nFrequency, i18nOrderStatus } from '../../../../lib/i18n/order';
 import { sortSelectOptions } from '../../../../lib/utils';
+import type { Account } from '@/lib/graphql/types/v2/schema';
 
 import { amountFilter } from '../../filters/AmountFilter';
+import { childAccountFilter } from '../../filters/ChildAccountFilter';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { expectedDateFilter, orderChargeDateFilter, orderCreateDateFilter } from '../../filters/DateFilter';
 import { expectedFundsFilter } from '../../filters/ExpectedFundsFilter';
 import { searchFilter } from '../../filters/SearchFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
-import { childAccountFilter } from '../../filters/ChildAccountFilter';
-import { Account } from '@/lib/graphql/types/v2/schema';
 
 export const contributionsOrderFilter = buildSortFilter({
   fieldSchema: z.enum(['LAST_CHARGED_AT', 'CREATED_AT']),
@@ -60,7 +60,7 @@ type FilterValues = z.infer<typeof schema>;
 export type FilterMeta = {
   currency?: Currency;
   tierOptions?: Array<{ label: string; value: string }>;
-  childrenAccounts: Account[];
+  childrenAccounts?: Account[];
   accountSlug?: string;
   showChildAccountFilter?: boolean;
 };
@@ -137,6 +137,6 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   },
   account: {
     ...childAccountFilter.filter,
-    hide: ({ meta }) => !meta.showChildAccountFilter || !meta?.childrenAccounts || meta.childrenAccounts.length === 0,
+    hide: ({ meta }) => !meta?.showChildAccountFilter || !meta?.childrenAccounts || meta.childrenAccounts.length === 0,
   },
 };

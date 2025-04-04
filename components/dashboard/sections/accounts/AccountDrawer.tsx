@@ -1,57 +1,42 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
 import clsx from 'clsx';
-import { groupBy } from 'lodash';
 import { AlertTriangle, ArrowLeft, ArrowRight, Undo } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { CollectiveType } from '../../../../lib/constants/collectives';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import type {
-  DashboardAccountsQueryFieldsFragment,
-  HostedCollectiveFieldsFragment,
-} from '../../../../lib/graphql/types/v2/graphql';
-import type { AccountWithHost } from '../../../../lib/graphql/types/v2/schema';
-import formatCollectiveType from '../../../../lib/i18n/collective-type';
+import type { DashboardAccountsQueryFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { i18nTransactionKind } from '../../../../lib/i18n/transaction';
-import { elementFromClass } from '../../../../lib/react-utils';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
+import type { GetActions } from '@/lib/actions/types';
+import { usePrevious } from '@/lib/hooks/usePrevious';
+import formatAccountType from '@/lib/i18n/account-type';
+
+import { CopyID } from '@/components/CopyId';
+import DrawerHeader from '@/components/DrawerHeader';
+import { Sheet, SheetBody, SheetContent } from '@/components/ui/Sheet';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import LinkCollective from '../../../LinkCollective';
-import LoadingPlaceholder from '../../../LoadingPlaceholder';
 import { DataTable } from '../../../table/DataTable';
-import { H4 } from '../../../Text';
 import { Badge } from '../../../ui/Badge';
 import { Button } from '../../../ui/Button';
 import { InfoList, InfoListItem } from '../../../ui/InfoList';
 import ActivityDescription from '../ActivityLog/ActivityDescription';
 import { ActivityUser } from '../ActivityLog/ActivityUser';
 
-import type { HostedCollectivesDataTableMeta } from './common';
-import { cols } from './common';
 import { accountDetailQuery } from './queries';
-import { Sheet, SheetBody, SheetContent } from '@/components/ui/Sheet';
-import DrawerHeader from '@/components/DrawerHeader';
-import { GetActions } from '@/lib/actions/types';
-import { Skeleton } from '@/components/ui/Skeleton';
-import formatAccountType from '@/lib/i18n/account-type';
 
-type CollectiveDetailsProps = {
-  // collective?: HostedCollectiveFieldsFragment & Partial<AccountWithHost>;
-  collectiveId?: string;
-  // loading?: boolean;
-  // onCancel: () => void;
-  // openCollectiveDetails: (HostedCollectiveFieldsFragment) => void;
+type AccountDetailsProps = {
+  accountId?: string;
   getActions: GetActions<DashboardAccountsQueryFieldsFragment>;
 };
-
-const SectionTitle = elementFromClass('div', 'text-md font-bold text-slate-800 mb-2 flex gap-4 items-center');
 
 const transactionsTableColumns = [
   {
@@ -200,14 +185,16 @@ const activitiesTableColumns = [
   },
 ];
 
-const AccountDetails = ({ collectiveId, openCollectiveDetails, getActions }: CollectiveDetailsProps) => {
+const AccountDetails = ({ accountId, getActions }: AccountDetailsProps) => {
   const intl = useIntl();
   const router = useRouter();
+  const prevAccountId = usePrevious(accountId);
+  const id = accountId || prevAccountId; // To keep data while closing the drawer
   const { data, loading, refetch } = useQuery(accountDetailQuery, {
-    variables: { id: collectiveId },
+    variables: { id },
     context: API_V2_CONTEXT,
-    fetchPolicy: 'cache-and-network',
   });
+
   const dropdownTriggerRef = React.useRef();
   const account = data?.account;
 
@@ -217,7 +204,6 @@ const AccountDetails = ({ collectiveId, openCollectiveDetails, getActions }: Col
   const isLoading = loading;
   const isChild = !!account?.parent?.id;
 
-  const children = groupBy(account?.childrenAccounts?.nodes, 'type');
   const balance = account?.stats?.balance;
   const consolidatedBalance = account?.stats?.consolidatedBalance;
   const displayBalance =
@@ -232,18 +218,14 @@ const AccountDetails = ({ collectiveId, openCollectiveDetails, getActions }: Col
     ) : (
       <FormattedMoneyAmount amount={balance?.valueInCents} currency={balance?.currency} />
     );
+
   return (
     <React.Fragment>
       <DrawerHeader
         actions={actions}
         dropdownTriggerRef={dropdownTriggerRef}
         entityName={<FormattedMessage defaultMessage="Account" id="TwyMau" />}
-        entityIdentifier={
-          collectiveId
-          // <CopyID value={id} tooltipLabel={<FormattedMessage defaultMessage="Copy transaction ID" id="zzd7ZI" />}>
-          //   #{id}
-          // </CopyID>
-        }
+        entityIdentifier={<CopyID value={id}>{id}</CopyID>}
         separateRowForEntityLabel
         entityLabel={
           <div className="w-full">
@@ -293,26 +275,6 @@ const AccountDetails = ({ collectiveId, openCollectiveDetails, getActions }: Col
           </React.Fragment>
         ) : (
           <React.Fragment>
-            {/* <div className="flex items-center gap-3">
-              <Avatar collective={account} radius={32} />
-              <div className={'text-xl font-semibold text-foreground'}>{account.name}</div>
-              <Badge type="outline" size="sm">
-                {formatCollectiveType(intl, account.type)}
-              </Badge>
-            </div> */}
-            {/* <SectionTitle>
-              <Avatar collective={collective} radius=ß{48} />
-              <div>
-                <div className="flex flex-row">
-                  <LinkCollective
-                    collective={collective}
-                    className="flex items-center gap-2 font-medium text-slate-700 hover:text-slate-700 hover:underline"
-                  >
-                    {collective.name}
-                  </LinkCollective>
-                </div>
-              </div>
-            </SectionTitle> */}
             <InfoList className="sm:grid-cols-2">
               <InfoListItem
                 className="border-t-0"
@@ -339,35 +301,7 @@ const AccountDetails = ({ collectiveId, openCollectiveDetails, getActions }: Col
                   </div>
                 }
               />
-              {[CollectiveType.PROJECT, CollectiveType.EVENT].map(
-                type =>
-                  children[type] && (
-                    <InfoListItem
-                      key={type}
-                      className="sm:col-span-2"
-                      title={
-                        <span className="text-base">{formatCollectiveType(intl, type, children[type].length)}</span>
-                      }
-                      value={
-                        <DataTable
-                          innerClassName="text-xs text-muted-foreground"
-                          columns={[cols.childCollective, cols.fee, cols.hostedSince, cols.balance, cols.actions]}
-                          data={children[type] || []}
-                          mobileTableView
-                          compact
-                          meta={
-                            {
-                              intl,
-                              onClickRow: row => openCollectiveDetails(row.original),
-                              openCollectiveDetails,
-                            } as HostedCollectivesDataTableMeta
-                          }
-                          onClickRow={row => openCollectiveDetails(row.original)}
-                        />
-                      }
-                    />
-                  ),
-              )}
+
               <InfoListItem
                 className="sm:col-span-2"
                 title={<FormattedMessage id="menu.transactions" defaultMessage="Transactions" />}
@@ -386,7 +320,14 @@ const AccountDetails = ({ collectiveId, openCollectiveDetails, getActions }: Col
                       className="sm:self-end"
                       variant="outline"
                       size="xs"
-                      onClick={() => router.push(getDashboardRoute(account, `transactions`))}
+                      onClick={() =>
+                        router.push(
+                          getDashboardRoute(
+                            'parent' in account ? account.parent : account,
+                            `transactions?account=${account.slug}`,
+                          ),
+                        )
+                      }
                     >
                       <FormattedMessage id="viewTransactions" defaultMessage="View Transactions" />
                     </Button>
@@ -410,7 +351,14 @@ const AccountDetails = ({ collectiveId, openCollectiveDetails, getActions }: Col
                       className="sm:self-end"
                       variant="outline"
                       size="xs"
-                      onClick={() => router.push(getDashboardRoute(account, `activity-log`))}
+                      onClick={() =>
+                        router.push(
+                          getDashboardRoute(
+                            'parent' in account ? account.parent : account,
+                            `activity-log?account=${account.slug}`,
+                          ),
+                        )
+                      }
                     >
                       <FormattedMessage id="viewActivities" defaultMessage="View Activities" />
                     </Button>
@@ -425,13 +373,11 @@ const AccountDetails = ({ collectiveId, openCollectiveDetails, getActions }: Col
   );
 };
 
-export default AccountDetails;
-
-export function AccountDrawer({ open, onOpenChange, onCloseAutoFocus, collectiveId, getActions }) {
+export default function AccountDrawer({ open, onOpenChange, onCloseAutoFocus, accountId, getActions }) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="max-w-2xl" onCloseAutoFocus={onCloseAutoFocus}>
-        <AccountDetails collectiveId={collectiveId} getActions={getActions} />
+        <AccountDetails accountId={accountId} getActions={getActions} />
       </SheetContent>
     </Sheet>
   );

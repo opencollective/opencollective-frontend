@@ -34,6 +34,7 @@ const dashboardAccountsQueryFields = gql`
         id
         slug
         settings
+        isHost
       }
     }
     ... on AccountWithHost {

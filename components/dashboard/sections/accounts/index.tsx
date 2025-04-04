@@ -1,12 +1,11 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { useQuery } from '@apollo/client';
-import { compact, isString, omit } from 'lodash';
+import { compact, isUndefined, omit } from 'lodash';
 import { ChevronDown } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
-import { formatCurrency } from '../../../../lib/currency-utils';
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { integer } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
@@ -14,42 +13,38 @@ import type {
   DashboardAccountsQueryFieldsFragment,
   HostedCollectivesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
-import type { Account, Collective } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import { useDrawer } from '@/lib/hooks/useDrawer';
+import formatCollectiveType from '@/lib/i18n/collective-type';
 
-import { Drawer } from '../../../Drawer';
+import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
+import { useModal } from '@/components/ModalContext';
+
 import Link from '../../../Link';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { actionsColumn, DataTable } from '../../../table/DataTable';
 import { Button } from '../../../ui/Button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/DropdownMenu';
 import { Skeleton } from '../../../ui/Skeleton';
+import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import { ACCOUNT_STATUS, accountStatusFilter } from '../../filters/AccountStatusFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { Pagination } from '../../filters/Pagination';
 import type { DashboardSectionProps } from '../../types';
-import type { HostedCollectivesDataTableMeta } from '../collectives/common';
 
-import AccountDetails, { AccountDrawer } from './AccountDetails';
+import AccountDrawer from './AccountDrawer';
 import { useAccountActions } from './actions';
 import { AddFundsModalAccount, cols } from './common';
 import InternalTransferModal from './InternalTransferModal';
 import { accountsMetadataQuery, accountsQuery } from './queries';
-import { useDrawer } from '@/lib/hooks/useDrawer';
-import { BaseModalProps, useModal } from '@/components/ModalContext';
-import AddFundsModal from '../collectives/AddFundsModal';
-import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
-import { DashboardContext } from '../../DashboardContext';
-import formatCollectiveType from '@/lib/i18n/collective-type';
 const COLLECTIVES_PER_PAGE = 20;
 
 const schema = z.object({
   limit: integer.default(COLLECTIVES_PER_PAGE),
   offset: integer.default(0),
   status: accountStatusFilter.schema,
-  collectiveId: z.string().min(1).optional(),
 });
 
 const toVariables: FiltersToVariables<z.infer<typeof schema>, HostedCollectivesQueryVariables> = {
@@ -63,14 +58,13 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
 const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
   const intl = useIntl();
   const router = useRouter();
-  const [showCollectiveOverview, setShowCollectiveOverview] = React.useState<Account | undefined | string>(subpath[0]);
-  const [showInternalTransferModal, setShowInternalTransferModal] = React.useState(false);
-  const { data: metadata, refetch: refetchMetadata } = useQuery(accountsMetadataQuery, {
+  const { data: metadata } = useQuery(accountsMetadataQuery, {
     variables: { accountSlug },
     fetchPolicy: 'cache-and-network',
     context: API_V2_CONTEXT,
   });
   const { account } = useContext(DashboardContext);
+  const openAccountId = subpath[0];
 
   const pushSubpath = subpath => {
     router.push(
@@ -89,14 +83,14 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
     {
       id: 'all',
       label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
-      count: metadata?.account?.all?.totalCount + 1,
+      count: !isUndefined(metadata?.account?.all?.totalCount) ? metadata.account.all.totalCount + 1 : undefined,
       filter: {},
     },
     {
       id: 'active',
       label: intl.formatMessage({ id: 'Subscriptions.Active', defaultMessage: 'Active' }),
       filter: { status: ACCOUNT_STATUS.ACTIVE },
-      count: metadata?.account?.active?.totalCount + 1,
+      count: !isUndefined(metadata?.account?.active?.totalCount) ? metadata.account.active.totalCount + 1 : undefined,
     },
     {
       id: 'archived',
@@ -115,41 +109,26 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
     meta: { currency: metadata?.host?.currency },
   });
 
-  const { data, error, loading, refetch } = useQuery(accountsQuery, {
+  const {
+    data,
+    error,
+    loading,
+    //  refetch
+  } = useQuery(accountsQuery, {
     variables: { accountSlug, ...queryFilter.variables },
     context: API_V2_CONTEXT,
     // fetchPolicy: 'cache-and-network',
   });
-  // useEffect(() => {
-  //   if (subpath[0] !== ((showCollectiveOverview as Collective)?.id || showCollectiveOverview)) {
-  //     handleDrawer(subpath[0]);
-  //   }
-  // }, [subpath[0]]);
-
-  // const handleDrawer = (collective: Collective | string | undefined) => {
-  //   if (collective) {
-  //     pushSubpath(typeof collective === 'string' ? collective : collective.id);
-  //   } else {
-  //     pushSubpath(undefined);
-  //   }
-  //   setShowCollectiveOverview(collective);
-  // };
 
   const { openDrawer, drawerProps } = useDrawer({
-    open: Boolean(queryFilter.values.collectiveId),
-    onOpen: id => queryFilter.setFilter('collectiveId', id, false),
-    onClose: () => queryFilter.setFilter('collectiveId', undefined, false),
+    open: Boolean(openAccountId),
+    onOpen: id => pushSubpath(id),
+    onClose: () => pushSubpath(undefined),
   });
 
-  const isAllowedAddFunds = Boolean(data?.account?.permissions?.addFunds?.allowed);
+  const isAllowedAddFunds = Boolean(data?.account?.permissions?.addFunds?.allowed) && data?.account.isHost;
 
-  const { showModal, hideModal } = useModal();
-
-  // const handleEdit = () => {
-  //   refetchMetadata();
-  //   refetch();
-  // };
-  // const onClickRow = row => handleDrawer(row.original);
+  const { showModal } = useModal();
 
   const isArchived = queryFilter.hasFilters && queryFilter.values.status === ACCOUNT_STATUS.ARCHIVED;
   const accounts = compact([!isArchived && data?.account, ...(data?.account?.childrenAccounts?.nodes || [])]);
@@ -195,7 +174,13 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
               </DropdownMenuContent>
             </DropdownMenu>
             {activeAccounts?.length > 1 && (
-              <Button size="xs" variant="outline" onClick={() => setShowInternalTransferModal(true)}>
+              <Button
+                size="xs"
+                variant="outline"
+                onClick={() => {
+                  showModal(InternalTransferModal, { accounts: activeAccounts }, 'internal-transfer-modal');
+                }}
+              >
                 <FormattedMessage defaultMessage="New internal transfer" id="v4unZI" />
               </Button>
             )}
@@ -216,7 +201,9 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
         <div className="mt-2 w-full max-w-xs space-y-1 rounded-lg border p-3">
           <div>
             <div className="flex items-center gap-1">
-              <span className="block text-sm font-medium tracking-tight">Total Balance</span>
+              <span className="block text-sm font-medium tracking-tight">
+                <FormattedMessage id="TotalBalance" defaultMessage="Total Balance" />
+              </span>
             </div>
 
             {loading ? (
@@ -235,19 +222,6 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
             )}
           </div>
         </div>
-        {/* <div className="flex">
-          <FormattedMessage id="TotalBalance" defaultMessage="Total Balance" />:
-          {loading ? (
-            <Skeleton className="ml-1 h-6 w-32" />
-          ) : (
-            <span className="ml-1 font-semibold">
-              {formatCurrency(
-                data?.account?.stats?.consolidatedBalance?.valueInCents,
-                data?.account?.stats?.consolidatedBalance?.currency,
-              )}
-            </span>
-          )}
-        </div> */}
       </DashboardHeader>
       <Filterbar {...queryFilter} />
       {error && <MessageBoxGraphqlError error={error} mb={2} />}
@@ -266,17 +240,6 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
             data={accounts}
             loading={loading}
             mobileTableView
-            // compact
-            // meta={
-            //   {
-            //     intl,
-            //     onClickRow,
-            //     onEdit: handleEdit,
-            //     host: data?.host,
-            //     openCollectiveDetails: handleDrawer,
-            //   } as HostedCollectivesDataTableMeta
-            // }
-            // onClickRow={onClickRow}
             onClickRow={(row, menuRef) => openDrawer(row.id, menuRef)}
             getRowDataCy={row => `collective-${row.original.slug}`}
             getActions={getActions}
@@ -287,29 +250,7 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
         </React.Fragment>
       )}
 
-      <AccountDrawer {...drawerProps} collectiveId={queryFilter.values.collectiveId} getActions={getActions} />
-      {/* <Drawer
-        open={Boolean(showCollectiveOverview)}
-        onClose={() => handleDrawer(null)}
-        className={'max-w-2xl'}
-        showActionsContainer
-        showCloseButton
-      >
-        {showCollectiveOverview && (
-          <AccountDetails
-            collective={isString(showCollectiveOverview) ? null : showCollectiveOverview}
-            collectiveId={isString(showCollectiveOverview) ? showCollectiveOverview : null}
-            onCancel={() => handleDrawer(null)}
-            openCollectiveDetails={handleDrawer}
-            loading={loading}
-          />
-        )}
-      </Drawer> */}
-      <InternalTransferModal
-        open={showInternalTransferModal}
-        setOpen={setShowInternalTransferModal}
-        accounts={activeAccounts}
-      />
+      <AccountDrawer {...drawerProps} accountId={openAccountId} getActions={getActions} />
     </div>
   );
 };

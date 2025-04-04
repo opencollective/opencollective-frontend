@@ -159,7 +159,7 @@ export function useTransactionsImportActions({
         actions.primary.push({
           key: 'add-funds',
           Icon: Banknote,
-          label: <FormattedMessage defaultMessage="Add funds" id="h9vJHn" />,
+          label: <FormattedMessage defaultMessage="Add funds" id="sx0aSl" />,
           disabled: isUpdatingRow,
           onClick: showAddFundsModal,
         });

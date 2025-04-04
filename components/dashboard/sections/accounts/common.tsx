@@ -1,21 +1,17 @@
 import React from 'react';
-import type { ColumnDef, TableMeta } from '@tanstack/react-table';
+import type { ColumnDef } from '@tanstack/react-table';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage } from 'react-intl';
 
-import type { HostedCollectiveFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
+import formatAccountType from '@/lib/i18n/account-type';
+
+import type { BaseModalProps } from '@/components/ModalContext';
+import { SubmitExpenseFlow } from '@/components/submit-expense/SubmitExpenseFlow';
 
 import Avatar from '../../../Avatar';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { Badge } from '../../../ui/Badge';
-import formatAccountType from '@/lib/i18n/account-type';
-import { BaseModalProps } from '@/components/ModalContext';
 import AddFundsModal from '../collectives/AddFundsModal';
-import { SubmitExpenseFlow } from '@/components/submit-expense/SubmitExpenseFlow';
-
-export interface HostedCollectivesDataTableMeta extends TableMeta<any> {
-  openCollectiveDetails?: (c: HostedCollectiveFieldsFragment) => void;
-}
 
 export const cols: Record<string, ColumnDef<any, any>> = {
   collective: {
@@ -82,38 +78,7 @@ export function AddFundsModalAccount({
     return null;
   }
 
-  return (
-    <AddFundsModal
-      onClose={() => setOpen(false)}
-      host={host}
-      // transactionsImportRow={row}
-      collective={collective}
-      // initialValues={{
-      //   amount: row.amount.valueInCents,
-      //   description: row.description,
-      //   processedAt: row.date.split('T')[0],
-      //   memo: `Imported from "${transactionsImport.source} - ${transactionsImport.name}". Row values:\n${prettyPrintRawValues(row.rawValue)}`,
-      //   transactionsImportRow: { id: row.id },
-      // }}
-      // onSuccess={order => {
-      //   // Update row
-      //   client.cache.modify({
-      //     id: client.cache.identify(row),
-      //     fields: { order: () => order },
-      //   });
-
-      //   // Update transactions import stats
-      //   client.cache.modify({
-      //     id: client.cache.identify(transactionsImport),
-      //     fields: {
-      //       stats: (stats: TransactionsImportStats): TransactionsImportStats => {
-      //         return { ...stats, processed: stats.processed + 1, orders: stats.orders + 1 };
-      //       },
-      //     },
-      //   });
-      // }}
-    />
-  );
+  return <AddFundsModal onClose={() => setOpen(false)} host={host} collective={collective} />;
 }
 
 export function ExpenseFlowModal({ collective, open, setOpen }) {
