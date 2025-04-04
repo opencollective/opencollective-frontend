@@ -1,9 +1,13 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { FormattedMessage } from 'react-intl';
+import type { z } from 'zod';
 
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import type { FilterComponentConfigs, FiltersToVariables } from '@/lib/filters/filter-types';
+import type { TransactionsTableQueryVariables } from '@/lib/graphql/types/v2/graphql';
+import type { Account } from '@/lib/graphql/types/v2/schema';
 
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { Button } from '../../../ui/Button';
@@ -11,12 +15,46 @@ import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import ExportTransactionsCSVModal from '../../ExportTransactionsCSVModal';
+import { childAccountFilter } from '../../filters/ChildAccountFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import type { DashboardSectionProps } from '../../types';
 
-import { filters, schema, toVariables } from './filters';
+import type { FilterMeta as CommonFilterMeta } from './filters';
+import { filters as commonFilters, schema as commonSchema, toVariables as commonToVariables } from './filters';
 import { transactionsTableQuery } from './queries';
 import TransactionsTable from './TransactionsTable';
+
+type FilterMeta = CommonFilterMeta & {
+  childrenAccounts: Account[];
+  accountSlug: string;
+};
+
+const schema = commonSchema.extend({
+  account: childAccountFilter.schema,
+});
+
+type FilterValues = z.infer<typeof schema>;
+
+const toVariables: FiltersToVariables<FilterValues, TransactionsTableQueryVariables, FilterMeta> = {
+  ...commonToVariables,
+  account: (value, key, meta) => {
+    if (meta?.childrenAccounts && !meta.childrenAccounts.length) {
+      return { includeChildrenTransactions: false };
+    } else if (!value) {
+      return { includeChildrenTransactions: true };
+    } else {
+      return {
+        account: { slug: value },
+        includeChildrenTransactions: false,
+      };
+    }
+  },
+};
+
+const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
+  ...commonFilters,
+  account: childAccountFilter.filter,
+};
 
 const accountTransactionsMetaDataQuery = gql`
   query AccountTransactionsMetaData($slug: String!) {

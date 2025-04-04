@@ -1,25 +1,15 @@
-import {
-  Archive,
-  ArrowLeftRight,
-  Banknote,
-  Coins,
-  Globe2,
-  Landmark,
-  LayoutDashboard,
-  Logs,
-  Receipt,
-} from 'lucide-react';
+import { Archive, ArrowLeftRight, Banknote, Coins, Globe2, LayoutDashboard, Logs, Receipt } from 'lucide-react';
+import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 
 import type { GetActions } from '../../../../lib/actions/types';
 import type { DashboardAccountsQueryFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
+import { getCollectivePageRoute, getDashboardRoute } from '@/lib/url-helpers';
 
 import { useModal } from '../../../ModalContext';
 
-import InternalTransferModal from './InternalTransferModal';
-import { getCollectivePageRoute, getDashboardRoute } from '@/lib/url-helpers';
-import { useRouter } from 'next/router';
 import { AddFundsModalAccount, ExpenseFlowModal } from './common';
+import InternalTransferModal from './InternalTransferModal';
 
 export function useAccountActions<T extends DashboardAccountsQueryFieldsFragment>({ accounts = null } = {}) {
   const intl = useIntl();
@@ -31,7 +21,8 @@ export function useAccountActions<T extends DashboardAccountsQueryFieldsFragment
       return {};
     }
 
-    const isAllowedAddFunds = Boolean(account.permissions?.addFunds?.allowed);
+    const isAllowedAddFunds =
+      Boolean(account.permissions?.addFunds?.allowed) && 'parent' in account ? account.parent.isHost : account.isHost;
 
     return {
       primary: [
@@ -57,8 +48,11 @@ export function useAccountActions<T extends DashboardAccountsQueryFieldsFragment
           label: 'Add funds',
           Icon: Banknote,
           onClick: () => {
-            // TODO
-            showModal(AddFundsModalAccount, { collective: account, host: account.host }, 'add-funds-modal');
+            showModal(
+              AddFundsModalAccount,
+              { collective: account, ...('host' in account && { host: account.host }) },
+              'add-funds-modal',
+            );
           },
           if: isAllowedAddFunds,
         },
@@ -67,7 +61,6 @@ export function useAccountActions<T extends DashboardAccountsQueryFieldsFragment
           label: 'Submit Payment Request',
           Icon: Receipt,
           onClick: () => {
-            // TODO
             showModal(ExpenseFlowModal, { collective: account }, 'submit-payment-request');
           },
         },
@@ -88,7 +81,7 @@ export function useAccountActions<T extends DashboardAccountsQueryFieldsFragment
 
         {
           key: 'transactions',
-          label: intl.formatMessage({ defaultMessage: 'View Transactions', id: 'pVaeTN' }),
+          label: intl.formatMessage({ defaultMessage: 'View Transactions', id: 'viewTransactions' }),
           Icon: ArrowLeftRight,
           onClick: () =>
             // TODO: potentially adjust for Host as the regular transactions page is not part of their dashboard menu
@@ -128,7 +121,7 @@ export function useAccountActions<T extends DashboardAccountsQueryFieldsFragment
         },
         {
           key: 'archive',
-          label: intl.formatMessage({ defaultMessage: 'Archive', id: 'hrgo+E' }),
+          label: intl.formatMessage({ defaultMessage: 'Archive', id: 'collective.archive.confirm.btn' }),
           Icon: Archive,
           onClick: () => router.push(getDashboardRoute(account, `advanced`)),
         },

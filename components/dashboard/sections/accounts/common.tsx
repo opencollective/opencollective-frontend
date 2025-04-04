@@ -1,21 +1,17 @@
 import React from 'react';
-import type { ColumnDef, TableMeta } from '@tanstack/react-table';
+import type { ColumnDef } from '@tanstack/react-table';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage } from 'react-intl';
 
-import type { HostedCollectiveFieldsFragment } from '../../../../lib/graphql/types/v2/graphql';
+import formatAccountType from '@/lib/i18n/account-type';
+
+import type { BaseModalProps } from '@/components/ModalContext';
+import { SubmitExpenseFlow } from '@/components/submit-expense/SubmitExpenseFlow';
 
 import Avatar from '../../../Avatar';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { Badge } from '../../../ui/Badge';
-import formatAccountType from '@/lib/i18n/account-type';
-import { BaseModalProps } from '@/components/ModalContext';
 import AddFundsModal from '../collectives/AddFundsModal';
-import { SubmitExpenseFlow } from '@/components/submit-expense/SubmitExpenseFlow';
-
-export interface HostedCollectivesDataTableMeta extends TableMeta<any> {
-  openCollectiveDetails?: (c: HostedCollectiveFieldsFragment) => void;
-}
 
 export const cols: Record<string, ColumnDef<any, any>> = {
   collective: {

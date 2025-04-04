@@ -44,6 +44,7 @@ import { managedOrderFragment } from '../../../recurring-contributions/graphql/q
 import { actionsColumn, DataTable } from '../../../table/DataTable';
 import { Button } from '../../../ui/Button';
 import { useToast } from '../../../ui/useToast';
+import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import { Filterbar } from '../../filters/Filterbar';
@@ -54,7 +55,6 @@ import CreatePendingContributionModal from './CreatePendingOrderModal';
 import type { FilterMeta } from './filters';
 import { filters as allFilters, schema, toVariables } from './filters';
 import { PausedIncomingContributionsMessage } from './PausedIncomingContributionsMessage';
-import { DashboardContext } from '../../DashboardContext';
 
 enum ContributionsTab {
   ALL = 'ALL',

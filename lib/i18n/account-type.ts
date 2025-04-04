@@ -12,11 +12,11 @@ const TypesI18n = defineMessages({
     defaultMessage: 'Main account',
   },
   [CollectiveType.EVENT]: {
-    id: 'AccountType.Event',
+    id: 'ContributionType.Event',
     defaultMessage: 'Event',
   },
   [CollectiveType.PROJECT]: {
-    id: 'AccountType.Project',
+    id: 'ContributionType.Project',
     defaultMessage: 'Project',
   },
   // TODO: include Funds, are they always a "main account" or can also be a child account?
