@@ -3137,6 +3137,7 @@
   "qBST+n": "Número de tarjeta",
   "qC0ZXX": "Informes de Gastos",
   "qck/cA": "{pausedIncomingContributionsCount, plural, one {Una colaboración recurrente a tu Colectivo está en pausa y puede} other {# colaboraciones recurrentes a tu Colectivo están en pausa y pueden}} <Link>reanudarse</Link>.",
+  "QeM97p": "Sign in to {whitelabelProviderName} with your Open Collective account.",
   "qFfWnO": "Update connection",
   "qFt6F7": "Inicio de Open Collective",
   "QGJ3Z6": "El \"handle\" (identificador URL en el sitio web) de la cuenta de transacción.",
