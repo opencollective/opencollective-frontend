@@ -21,7 +21,7 @@ function getFormProps(form: ExpenseForm) {
 
 export const InstructionSection = memoWithGetFormProps(function InstructionSection(props: InstructionSectionProps) {
   if (props.initialLoading) {
-    return <Skeleton />;
+    return <Skeleton className="h-12" />;
   }
 
   return (
