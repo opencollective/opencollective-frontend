@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 
+import { isHeavyAccount } from '../../../lib/collective';
 import { API_V2_CONTEXT, gql } from '../../../lib/graphql/helpers';
 
 import { Box } from '../../Grid';
@@ -44,6 +45,7 @@ export const transactionsSectionQuery = gql`
     $hasOrder: Boolean
     $hasExpense: Boolean
     $kind: [TransactionKind]
+    $includeGiftCardTransactions: Boolean
   ) {
     transactions(
       account: { slug: $slug }
@@ -52,7 +54,7 @@ export const transactionsSectionQuery = gql`
       hasExpense: $hasExpense
       kind: $kind
       includeIncognitoTransactions: true
-      includeGiftCardTransactions: true
+      includeGiftCardTransactions: $includeGiftCardTransactions
       includeChildrenTransactions: true
     ) {
       ...TransactionsQueryCollectionFragment
@@ -62,7 +64,7 @@ export const transactionsSectionQuery = gql`
 `;
 
 export const getTransactionsSectionQueryVariables = slug => {
-  return { slug, limit: NB_DISPLAYED, kind: getDefaultKinds() };
+  return { slug, limit: NB_DISPLAYED, kind: getDefaultKinds(), includeGiftCardTransactions: !isHeavyAccount(slug) };
 };
 
 const SectionTransactions = props => {
