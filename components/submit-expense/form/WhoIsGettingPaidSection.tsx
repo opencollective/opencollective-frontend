@@ -134,6 +134,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
   return (
     <RadioGroup
       id="payeeSlug"
+      data-cy="payee-selector"
       disabled={props.isSubmitting}
       value={props.payeeSlug}
       onValueChange={payeeSlug => {
@@ -154,6 +155,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
 
       {(personalProfile || isLoading) && (
         <RadioGroupCard
+          data-cy="payee-myself-option"
           value={!isLoading ? personalProfile.slug : ''}
           disabled={isLoading || props.isSubmitting}
           checked={isLoading ? false : props.payeeSlug === personalProfile.slug}
