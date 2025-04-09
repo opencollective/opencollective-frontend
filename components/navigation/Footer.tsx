@@ -81,8 +81,16 @@ const Footer = () => {
               ) : (
                 <React.Fragment>
                   <Link href="/home">
+                    {/*
                     <Image
                       src="/static/images/opencollectivelogo-footer-n.svg"
+                      alt="Open Collective"
+                      height={28}
+                      width={167}
+                    />
+                    */}
+                    <Image
+                      src="/static/images/logotype-ofi-opencollective.svg"
                       alt="Open Collective"
                       height={28}
                       width={167}
@@ -166,9 +174,17 @@ const Footer = () => {
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
             <div className="flex flex-col gap-2">
               <Link href="/home">
+                {/*
                 <Image
                   src="/static/images/opencollectivelogo-footer-n.svg"
                   alt="Open Collective"
+                  height={28}
+                  width={167}
+                />
+                */}
+                <Image
+                  src="/static/images/logotype-ofi-opencollective.svg"
+                  alt="OFi Open Collective"
                   height={28}
                   width={167}
                 />

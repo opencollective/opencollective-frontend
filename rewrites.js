@@ -377,7 +377,7 @@ exports.REWRITES = [
   // set `useFileSystemPublicRoutes` to true (default) in `next.config.js`
   {
     source: '/',
-    destination: '/home',
+    destination: '/prehome',
   },
   {
     source: '/home',
