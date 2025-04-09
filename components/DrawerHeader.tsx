@@ -45,7 +45,7 @@ export default function DrawerHeader({
           </SheetClose>
         </div>
       </div>
-      <div className={clsx('flex justify-between gap-3', separateRowForEntityLabel ? 'flex-col' : '')}>
+      <div className={clsx('flex justify-between gap-3', separateRowForEntityLabel && 'flex-col')}>
         <div className="flex items-center gap-2">{entityLabel}</div>
 
         <div className="ml-auto flex items-center justify-end gap-1">
