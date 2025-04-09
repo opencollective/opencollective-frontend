@@ -109,15 +109,9 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
     meta: { currency: metadata?.host?.currency },
   });
 
-  const {
-    data,
-    error,
-    loading,
-    //  refetch
-  } = useQuery(accountsQuery, {
+  const { data, error, loading } = useQuery(accountsQuery, {
     variables: { accountSlug, ...queryFilter.variables },
     context: API_V2_CONTEXT,
-    // fetchPolicy: 'cache-and-network',
   });
 
   const { openDrawer, drawerProps } = useDrawer({
