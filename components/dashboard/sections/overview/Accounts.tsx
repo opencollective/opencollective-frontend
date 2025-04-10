@@ -109,7 +109,7 @@ export function Accounts({ accountSlug }) {
         <div className="space-y-2 rounded-xl border bg-background p-3">
           <div className="flex items-center justify-between text-sm">
             <span className="font-medium">
-              <FormattedMessage defaultMessage="Main account" id="pE0V//" />
+              <FormattedMessage defaultMessage="Main account" id="AccountType.MainAccount" />
             </span>
           </div>
           {loading ? (
