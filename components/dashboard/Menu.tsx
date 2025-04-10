@@ -113,7 +113,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
 
   const items: MenuItem[] = [
     {
-      if: isIndividual || (LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW) && !isHost),
+      if: isIndividual || !isHost,
       section: ALL_SECTIONS.OVERVIEW,
       Icon: LayoutDashboard,
     },
@@ -495,7 +495,7 @@ const Menu = ({ onRoute, menuItems }) => {
 
   const showLinkToProfilePrototype =
     !['ROOT', 'ORGANIZATION', 'FUND', 'INDIVIDUAL'].includes(account.type) &&
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW);
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.CROWDFUNDING_REDESIGN);
 
   return (
     <div className="space-y-4">
