@@ -8,7 +8,6 @@ import roles from '../lib/constants/roles';
 import { API_V2_CONTEXT } from '../lib/graphql/helpers';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { require2FAForAdmins } from '../lib/policies';
-import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 import type { Context } from '@/lib/apollo-client';
 import { loadGoogleMaps } from '@/lib/google-maps';
 import { getWhitelabelProps } from '@/lib/whitelabel';
@@ -58,10 +57,7 @@ const getDefaultSectionForAccount = (account, loggedInUser) => {
     return null;
   } else if (account.type === 'ROOT') {
     return ROOT_SECTIONS.ALL_COLLECTIVES;
-  } else if (
-    isIndividualAccount(account) ||
-    (!isHostAccount(account) && loggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW))
-  ) {
+  } else if (isIndividualAccount(account) || !isHostAccount(account)) {
     return ALL_SECTIONS.OVERVIEW;
   } else if (isHostAccount(account)) {
     return ALL_SECTIONS.HOST_EXPENSES;
