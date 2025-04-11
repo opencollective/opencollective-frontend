@@ -53,7 +53,7 @@ const nextConfig = {
         API_KEY: null,
         API_URL: null,
         PDF_SERVICE_URL: null,
-        NEXT_PDF_SERVICE_URL: null,
+        PDF_SERVICE_V2_URL: null,
         ML_SERVICE_URL: null,
         DISABLE_MOCK_UPLOADS: false,
         DYNAMIC_IMPORT: true,

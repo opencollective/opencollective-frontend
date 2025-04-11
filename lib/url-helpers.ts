@@ -10,7 +10,7 @@ import { getWebsiteUrl } from './utils';
 import { getWindowLocation } from './window';
 
 export const PDF_SERVICE_URL = process.env.PDF_SERVICE_URL;
-const NEXT_PDF_SERVICE_URL = process.env.NEXT_PDF_SERVICE_URL;
+export const PDF_SERVICE_V2_URL = process.env.PDF_SERVICE_V2_URL;
 
 // ---- Utils ----
 
@@ -45,15 +45,27 @@ const objectToQueryString = options => {
 // ---- Routes to other Open Collective services ----
 
 export const collectiveInvoiceURL = (collectiveSlug, hostSlug, startDate, endDate, format) => {
-  return `${PDF_SERVICE_URL}/receipts/collectives/${collectiveSlug}/${hostSlug}/${startDate}/${endDate}/receipt.${format}`;
+  if (PDF_SERVICE_V2_URL) {
+    return `${PDF_SERVICE_V2_URL}/receipts/period/${collectiveSlug}/${hostSlug}/${startDate}/${endDate}/receipt.${format}`;
+  } else {
+    return `${PDF_SERVICE_URL}/receipts/period/${collectiveSlug}/${hostSlug}/${startDate}/${endDate}/receipt.${format}`;
+  }
 };
 
 export const transactionInvoiceURL = transactionUUID => {
-  return `${PDF_SERVICE_URL}/receipts/transactions/${transactionUUID}/receipt.pdf`;
+  if (PDF_SERVICE_V2_URL) {
+    return `${PDF_SERVICE_V2_URL}/receipts/transaction/${transactionUUID}/receipt.pdf`;
+  } else {
+    return `${PDF_SERVICE_URL}/receipts/transactions/${transactionUUID}/receipt.pdf`;
+  }
 };
 
 export const expenseInvoiceUrl = expenseId => {
-  return `${PDF_SERVICE_URL}/expense/${expenseId}/invoice.pdf`;
+  if (PDF_SERVICE_V2_URL) {
+    return `${PDF_SERVICE_V2_URL}/expenses/${expenseId}/invoice.pdf`;
+  } else {
+    return `${PDF_SERVICE_URL}/expense/${expenseId}/invoice.pdf`;
+  }
 };
 
 /**
@@ -62,7 +74,11 @@ export const expenseInvoiceUrl = expenseId => {
  * @param {string} filename - filename **with** extension
  */
 export const giftCardsDownloadUrl = filename => {
-  return `${PDF_SERVICE_URL}/giftcards/from-data/${filename}`;
+  if (PDF_SERVICE_V2_URL) {
+    return `${PDF_SERVICE_V2_URL}/gift-cards/${filename}`;
+  } else {
+    return `${PDF_SERVICE_URL}/giftcards/from-data/${filename}`;
+  }
 };
 
 // ---- Routes to external services ----
@@ -289,9 +305,14 @@ export const getFileExtensionFromUrl = url => {
   }
 };
 
-export const getTaxFormPDFServiceUrl = (type: TaxFormType, values, { isFinal = false, useNext = false }): string => {
-  const serviceUrl = (useNext && NEXT_PDF_SERVICE_URL) || PDF_SERVICE_URL;
-  const url = new URL(`${serviceUrl}/tax-form/${type}.pdf`);
+export const getTaxFormPDFServiceUrl = (type: TaxFormType, values, { isFinal = false } = {}): string => {
+  let url: URL;
+  if (PDF_SERVICE_V2_URL) {
+    url = new URL(`${PDF_SERVICE_V2_URL}/tax-forms/${type}.pdf`);
+  } else {
+    url = new URL(`${PDF_SERVICE_URL}/tax-form/${type}.pdf`);
+  }
+
   const base64Values = Buffer.from(JSON.stringify(values)).toString('base64');
   url.searchParams.set('formType', type);
   url.searchParams.set('values', base64Values);

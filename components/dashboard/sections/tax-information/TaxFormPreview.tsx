@@ -90,6 +90,6 @@ MemoizedTaxFormPreview.displayName = 'MemoizedTaxFormPreview';
  * Renders are debounced to avoid overloading the server, and the previous render is replaced with the new one.
  */
 export const TaxFormPreview = ({ type, values }) => {
-  const url = getTaxFormPDFServiceUrl(type, values, { useNext: true });
+  const url = getTaxFormPDFServiceUrl(type, values);
   return <MemoizedTaxFormPreview url={url} />;
 };
