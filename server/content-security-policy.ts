@@ -34,7 +34,7 @@ const COMMON_DIRECTIVES = {
     SELF,
     process.env.API_URL,
     process.env.PDF_SERVICE_URL,
-    process.env.NEXT_PDF_SERVICE_URL,
+    process.env.PDF_SERVICE_V2_URL,
     process.env.REST_URL,
     process.env.ML_SERVICE_URL,
     ...WHITELABEL_DOMAINS,
