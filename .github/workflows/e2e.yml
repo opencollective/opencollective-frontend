@@ -163,6 +163,7 @@ jobs:
         with:
           repository: opencollective/opencollective-pdf
           path: opencollective-pdf
+          ref: 2b9b6ccbfcb0cd3198fdab60ee4810681f1e59d8
 
       # Prepare API
 
