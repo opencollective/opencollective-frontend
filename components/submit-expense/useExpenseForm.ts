@@ -2263,7 +2263,33 @@ export function useExpenseForm(opts: {
     ) {
       setFieldValue('payoutMethodId', null);
     }
-  }, [formOptions.payoutMethods, expenseForm.values.payoutMethodId, setFieldValue]);
+
+    const selectedPayoutMethod = formOptions.payoutMethods?.find(p => p.id === expenseForm.values.payoutMethodId);
+    if (
+      selectedPayoutMethod &&
+      selectedPayoutMethod.data?.currency &&
+      !expenseForm.touched.expenseItems &&
+      expenseForm.values.expenseItems[0]?.amount?.currency !== selectedPayoutMethod.data?.currency
+    ) {
+      setFieldValue(
+        'expenseItems',
+        expenseForm.values.expenseItems.map(ei => ({
+          ...ei,
+          amount: {
+            ...ei.amount,
+            currency: selectedPayoutMethod.data?.currency,
+          },
+        })),
+      );
+    }
+  }, [
+    formOptions.payoutMethods,
+    expenseForm.values.payoutMethodId,
+    setFieldValue,
+    setFormOptions,
+    expenseForm.touched.expenseItems,
+    expenseForm.values.expenseItems,
+  ]);
 
   const refresh = React.useCallback(async () => refreshFormOptions(true), [refreshFormOptions]);
 
