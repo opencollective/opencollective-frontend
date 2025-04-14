@@ -2,7 +2,6 @@
 import React, { useId } from 'react';
 import { TaxType } from '@opencollective/taxes';
 import type { CheckedState } from '@radix-ui/react-checkbox';
-import dayjs from 'dayjs';
 import { useFormikContext } from 'formik';
 import { get, pick, round } from 'lodash';
 import { ArrowDown, ArrowUp, Lock, Plus, Trash2 } from 'lucide-react';
@@ -398,8 +397,7 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
                 name={`expenseItems.${props.index}.incurredAt`}
               >
                 {({ field }) => {
-                  const value = field.value ? dayjs.utc(field.value).format('YYYY-MM-DD') : undefined;
-                  return <Input type="date" {...field} value={value} />;
+                  return <Input type="date" {...field} />;
                 }}
               </FormField>
             )}
