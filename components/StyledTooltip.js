@@ -229,7 +229,7 @@ class StyledTooltip extends React.Component {
         onMouseLeave={this.onMouseLeave}
         verticalAlign={this.props.containerVerticalAlign}
         lineHeight={this.props.containerLineHeight}
-        cursor={this.props.containerCursor}
+        cursor={this.props.noTooltip ? undefined : this.props.containerCursor}
         data-cy="tooltip-trigger"
       >
         {this.props.children}

@@ -114,6 +114,7 @@ const ExpenseSummary = ({
   const isCreditCardCharge = expense?.type === expenseTypes.CHARGE;
   const isGrant = expense?.type === expenseTypes.GRANT;
   const isDraft = expense?.status === ExpenseStatus.DRAFT;
+  const isPaid = expense?.status === ExpenseStatus.PAID;
   const existsInAPI = expense && (expense.id || expense.legacyId);
   const createdByAccount =
     (isDraft ? expense?.requestedByAccount || expense?.createdByAccount : expense?.createdByAccount) || {};
@@ -534,11 +535,15 @@ const ExpenseSummary = ({
               <FormattedMessage
                 defaultMessage="Accounted as ({currency}):"
                 id="4Wdhe4"
-                values={{ currency: expense.amountInAccountCurrency.currency }}
+                values={{
+                  currency: isPaid ? expense.amountInHostCurrency.currency : expense.amountInAccountCurrency.currency,
+                }}
               />
             </Container>
             <Container>
-              <AmountWithExchangeRateInfo amount={expense.amountInAccountCurrency} />
+              <AmountWithExchangeRateInfo
+                amount={isPaid ? expense.amountInHostCurrency : expense.amountInAccountCurrency}
+              />
             </Container>
           </div>
         )}
@@ -678,6 +683,7 @@ ExpenseSummary.propTypes = {
     tags: PropTypes.arrayOf(PropTypes.string),
     requiredLegalDocuments: PropTypes.arrayOf(PropTypes.string),
     amountInAccountCurrency: AmountPropTypeShape,
+    amountInHostCurrency: AmountPropTypeShape,
     account: PropTypes.shape({
       id: PropTypes.string.isRequired,
       slug: PropTypes.string.isRequired,

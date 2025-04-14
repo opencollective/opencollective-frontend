@@ -106,7 +106,9 @@ const AmountWithExchangeRateInfo = ({
             currencyCodeClassName={currencyCodeClassName}
           />
         </div>
-        <InfoCircle size="1em" className={cn({ 'text-yellow-600': warning, 'text-red-600': error })} />
+        {exchangeRate && (
+          <InfoCircle size="1em" className={cn({ 'text-yellow-600': warning, 'text-red-600': error })} />
+        )}
       </Flex>
     </StyledTooltip>
   );
