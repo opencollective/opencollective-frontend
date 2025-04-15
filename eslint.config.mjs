@@ -1,5 +1,4 @@
 import { includeIgnoreFile } from '@eslint/compat';
-import { FlatCompat } from '@eslint/eslintrc';
 import js from '@eslint/js';
 import graphqlPlugin from '@graphql-eslint/eslint-plugin'; // eslint-disable-line import/no-unresolved
 import tsParser from '@typescript-eslint/parser'; // eslint-disable-line import/no-unresolved
@@ -16,14 +15,9 @@ import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-  allConfig: js.configs.all,
-});
-
 const gitignorePath = fileURLToPath(new URL('.gitignore', import.meta.url));
 
+// ts-unused-exports:disable-next-line
 export default defineConfig([
   ...openCollectiveConfig,
   pluginCypress.configs.recommended,

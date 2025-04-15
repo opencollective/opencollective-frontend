@@ -317,7 +317,10 @@
       "styled-jsx",
       "tailwindcss",
       "tailwindcss-animate",
-      "pdfjs-dist"
+      "pdfjs-dist",
+      "@typescript-eslint/eslint-plugin",
+      "eslint-import-resolver-typescript",
+      "typescript-eslint"
     ]
   }
 }
