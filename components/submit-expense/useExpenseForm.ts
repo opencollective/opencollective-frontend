@@ -599,7 +599,6 @@ type ExpenseFormOptions = {
 };
 
 const memoizedExpenseFormSchema = memoizeOne(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async (apolloClient: ApolloClient<any>, variables: ExpenseFormSchemaQueryVariables, refresh?: boolean) => {
     return await apolloClient.query<ExpenseFormSchemaQuery, ExpenseFormSchemaQueryVariables>({
       query: formSchemaQuery,
@@ -2170,7 +2169,7 @@ export function useExpenseForm(opts: {
             }
           });
         }
-      } catch (err) {
+      } catch {
         return;
       }
     }

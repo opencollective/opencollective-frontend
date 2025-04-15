@@ -49,7 +49,7 @@ export function ResetTwoFactorButton(props: ResetTwoFactorButtonProps) {
     let twoFactorResult: { code: string; type: string };
     try {
       twoFactorResult = await prompt.open({ supportedMethods: ['recovery_code'], allowRecovery: true });
-    } catch (e) {
+    } catch {
       return;
     }
 

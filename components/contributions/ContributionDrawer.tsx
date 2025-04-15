@@ -260,7 +260,9 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
   );
   const transactionsUrl = React.useMemo(() => {
     const url = order && getTransactionsUrl(LoggedInUser, order);
-    url && url.searchParams?.set('orderId', order.legacyId.toString());
+    if (url) {
+      url.searchParams?.set('orderId', order.legacyId.toString());
+    }
     return url;
   }, [LoggedInUser, order]);
 

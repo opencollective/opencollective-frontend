@@ -15,7 +15,7 @@ type LoggedInUserInfo = {
 
 interface PageProps {
   data?: {
-    error?: {};
+    error?: object;
   };
   children?: React.ReactNode | ((info: LoggedInUserInfo) => React.ReactNode);
   description?: string;
