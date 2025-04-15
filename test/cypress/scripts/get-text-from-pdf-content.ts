@@ -1,4 +1,5 @@
-const pdf = require('pdf-parse'); // eslint-disable-line n/no-unpublished-require, @typescript-eslint/no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const pdf = require('pdf-parse');
 
 // imported using require
 // ts-unused-exports:disable-next-line

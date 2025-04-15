@@ -33,7 +33,7 @@ export const isValidUrl = url => {
   try {
     new URL(url);
     return true;
-  } catch (e) {
+  } catch {
     return false;
   }
 };
@@ -61,7 +61,7 @@ export const isValidRelativeUrl = url => {
     // If we're able to construct a URL, it means it's an absolute URL.
     new URL(url);
     return false;
-  } catch (e) {
+  } catch {
     // Prevent URLs like //example.com or /\n/example.com or /\/example.com/
     if (url.match(/^[\s\\/]{2,}.+/)) {
       return false;
@@ -112,7 +112,6 @@ export function getQueryParams() {
     },
     query = window.location.search.substring(1);
 
-  // eslint-disable-next-line no-cond-assign
   while ((match = search.exec(query))) {
     urlParams[decode(match[1])] = decode(match[2]);
   }

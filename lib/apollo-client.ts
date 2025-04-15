@@ -59,8 +59,8 @@ const getCustomAgent = () => {
     const { FETCH_AGENT_KEEP_ALIVE, FETCH_AGENT_KEEP_ALIVE_MSECS } = process.env;
     const keepAlive = FETCH_AGENT_KEEP_ALIVE !== undefined ? parseToBoolean(FETCH_AGENT_KEEP_ALIVE) : true;
     const keepAliveMsecs = FETCH_AGENT_KEEP_ALIVE_MSECS ? Number(FETCH_AGENT_KEEP_ALIVE_MSECS) : 10000;
-    const http = require('http'); // eslint-disable-line @typescript-eslint/no-var-requires
-    const https = require('https'); // eslint-disable-line @typescript-eslint/no-var-requires
+    const http = require('http'); // eslint-disable-line @typescript-eslint/no-require-imports
+    const https = require('https'); // eslint-disable-line @typescript-eslint/no-require-imports
     const httpAgent = new http.Agent({ keepAlive, keepAliveMsecs });
     const httpsAgent = new https.Agent({ keepAlive, keepAliveMsecs });
     customAgent = _parsedURL => (_parsedURL.protocol === 'http:' ? httpAgent : httpsAgent);
@@ -103,7 +103,7 @@ const logRequest = (action = 'Fetched', start, options, result?) => {
 
 const serverSideFetch = async (url, options: { headers?: any; agent?: any; body?: string } = {}) => {
   if (typeof window === 'undefined') {
-    const nodeFetch = require('node-fetch'); // eslint-disable-line @typescript-eslint/no-var-requires
+    const nodeFetch = require('node-fetch'); // eslint-disable-line @typescript-eslint/no-require-imports
 
     options.agent = getCustomAgent();
 

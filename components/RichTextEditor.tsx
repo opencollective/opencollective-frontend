@@ -272,7 +272,7 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
 
     // Load Trix
     if (typeof window !== 'undefined') {
-      this.Trix = require('@opencollective/trix').default; // eslint-disable-line @typescript-eslint/no-var-requires
+      this.Trix = require('@opencollective/trix').default; // eslint-disable-line @typescript-eslint/no-require-imports
       document.addEventListener('trix-before-initialize', this.trixBeforeInitialize);
     }
   }

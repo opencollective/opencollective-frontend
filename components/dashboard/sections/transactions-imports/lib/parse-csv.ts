@@ -131,7 +131,7 @@ export const parseTransactionsCSVFile = async (
           const parsedCSV = parseCSV(csvData, { columns: true, skip_empty_lines: true, delimiter });
           resolve({ delimiter, parsedCSV });
           return;
-        } catch (e) {
+        } catch {
           continue;
         }
       }

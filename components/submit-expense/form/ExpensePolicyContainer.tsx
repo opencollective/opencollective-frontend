@@ -27,7 +27,9 @@ export function ExpensePolicyContainer(props: ExpensePolicyContainerProps) {
     <Collapsible
       asChild
       onOpenChange={open => {
-        props.checked && setIsOpen(open);
+        if (props.checked) {
+          setIsOpen(open);
+        }
       }}
       open={isOpen}
     >

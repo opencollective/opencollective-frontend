@@ -19,7 +19,6 @@ import 'cypress-real-events';
 import './commands';
 import './typed-commands';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 require('cypress-terminal-report/src/installLogsCollector')({
   xhr: {
     printRequestData: true,

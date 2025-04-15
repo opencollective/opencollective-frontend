@@ -99,7 +99,7 @@ const Dropzone = ({
 
       onDrop?.(acceptedFiles, fileRejections);
       if (collectFilesOnly) {
-        onSuccess?.(acceptedFiles, fileRejections);
+        onSuccess?.(acceptedFiles as File[] & UploadedFile[] & UploadedFile, fileRejections);
       } else if (useGraphQL) {
         uploadFileWithGraphQL(
           acceptedFiles.map(file => ({ file, kind, parseDocument, parsingOptions })),

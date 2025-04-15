@@ -320,7 +320,7 @@ class BannerIframe extends React.Component {
     let style;
     try {
       style = JSON.parse(this.props.style || '{}');
-    } catch (e) {
+    } catch {
       style = {};
     }
 
