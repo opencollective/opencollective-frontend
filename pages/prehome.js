@@ -1,0 +1,70 @@
+import React from 'react';
+import { defineMessages, useIntl } from 'react-intl';
+
+import { getRequestIntl } from '../lib/i18n/request';
+import { getWhitelabelProps } from '../lib/whitelabel';
+
+import OpenCollectiveEvolving from '../components/home/OpenCollectiveEvolving';
+import Page from '../components/Page';
+
+const messages = defineMessages({
+  defaultTitle: {
+    defaultMessage: 'Raise, manage and disburse money with full transparency.',
+    id: 'TZ9FXt',
+  },
+  defaultDescription: {
+    defaultMessage:
+      'Open Collective is a legal and financial toolbox for groups. It’s a fundraising + legal status + money management platform for your community. What do you want to do?',
+    id: 'LrBotK',
+  },
+});
+
+export const HomePage = () => {
+  const { formatMessage } = useIntl();
+
+  return (
+    <Page
+      metaTitle={formatMessage(messages.defaultTitle)}
+      title={formatMessage(messages.defaultTitle)}
+      description={formatMessage(messages.defaultDescription)}
+      showFooter={false}
+      showSearch={false}
+      showProfileAndChangelogMenu={false}
+      identity="opencollective"
+      menuItems={[]}
+    >
+      <OpenCollectiveEvolving />
+    </Page>
+  );
+};
+
+// next.js export
+// ts-unused-exports:disable-next-line
+export const getServerSideProps = async context => {
+  const { req, res } = context;
+
+  const whitelabel = getWhitelabelProps(context);
+  if (whitelabel?.provider) {
+    res?.setHeader('Cache-Control', 'no-cache');
+    return { redirect: { destination: `${whitelabel.provider.domain}/${whitelabel.provider.slug}`, permanent: false } };
+  }
+
+  if (res && req) {
+    const { locale } = getRequestIntl(req);
+    if (locale === 'en') {
+      res.setHeader('Cache-Control', 'public, s-maxage=3600');
+    }
+  }
+
+  let skipDataFromTree = false;
+
+  // If on server side
+  if (req) {
+    skipDataFromTree = true;
+  }
+  return { props: { skipDataFromTree } };
+};
+
+// next.js export
+// ts-unused-exports:disable-next-line
+export default HomePage;
