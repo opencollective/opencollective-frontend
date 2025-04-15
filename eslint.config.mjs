@@ -1,5 +1,4 @@
 import { includeIgnoreFile } from '@eslint/compat';
-import js from '@eslint/js';
 import graphqlPlugin from '@graphql-eslint/eslint-plugin'; // eslint-disable-line import/no-unresolved
 import tsParser from '@typescript-eslint/parser'; // eslint-disable-line import/no-unresolved
 import { defineConfig, globalIgnores } from 'eslint/config'; // eslint-disable-line import/no-unresolved
