@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { differenceBy } from 'lodash';
 import { components as ReactSelectComponents } from 'react-select';
 import styled from 'styled-components';
@@ -43,7 +42,12 @@ export const makeTruncatedValueAllSelectedLabelContainer = (allSelectedNode: Rea
   return TruncatedValueAllSelectedLabelContainer;
 };
 
-export const TruncatedValueContainer = props => {
+interface TruncatedValueContainerProps {
+  selectProps?: object;
+  children?: React.ReactNode;
+}
+
+export const TruncatedValueContainer = (props: TruncatedValueContainerProps) => {
   const { selectProps, children } = props;
   const itemsList = (selectProps.value || []).map(({ label }) => label);
   const itemsListStr = itemsList.join(', ');
@@ -56,11 +60,6 @@ export const TruncatedValueContainer = props => {
       </Flex>
     </ReactSelectComponents.SelectContainer>
   );
-};
-
-TruncatedValueContainer.propTypes = {
-  selectProps: PropTypes.object,
-  children: PropTypes.node,
 };
 
 export const getSelectFilterStyles = stylesFromProps => ({

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
@@ -26,7 +25,51 @@ import ExpensesList from './ExpensesList';
 
 const ORDER_SELECT_STYLE = { control: { background: 'white' } };
 
-const Expenses = props => {
+interface ExpensesProps {
+  LoggedInUser?: object;
+  query?: {
+    type?: string;
+    tag?: string;
+    searchTerm?: string;
+    direction?: string;
+    orderBy?: string;
+  };
+  loading?: boolean;
+  error?: any;
+  refetch?(...args: unknown[]): unknown;
+  variables?: {
+    offset: number;
+    limit: number;
+    account?: object;
+    collectiveSlug?: string;
+  };
+  data?: {
+    account?: {
+      id: string;
+      currency: string;
+      slug: string;
+      name?: string;
+      isArchived?: boolean;
+      isHost?: boolean;
+      host?: object;
+      expensesTags?: unknown[];
+      type?: unknown[];
+    };
+    expenses?: {
+      nodes?: unknown[];
+      totalCount?: number;
+      offset?: number;
+      limit?: number;
+    };
+    scheduledExpenses?: {
+      totalCount?: number;
+    };
+  };
+  isDashboard?: boolean;
+  onlySubmittedExpenses?: boolean;
+}
+
+const Expenses = props: ExpensesProps => {
   const router = useRouter();
   const { query, LoggedInUser, data, loading, variables, refetch, isDashboard, onlySubmittedExpenses } = props;
 
@@ -235,50 +278,6 @@ const Expenses = props => {
       </Flex>
     </Container>
   );
-};
-
-Expenses.propTypes = {
-  LoggedInUser: PropTypes.object,
-  query: PropTypes.shape({
-    type: PropTypes.string,
-    tag: PropTypes.string,
-    searchTerm: PropTypes.string,
-    direction: PropTypes.string,
-    orderBy: PropTypes.string,
-  }),
-  loading: PropTypes.bool,
-  error: PropTypes.any,
-  refetch: PropTypes.func,
-  variables: PropTypes.shape({
-    offset: PropTypes.number.isRequired,
-    limit: PropTypes.number.isRequired,
-    account: PropTypes.object,
-    collectiveSlug: PropTypes.string,
-  }),
-  data: PropTypes.shape({
-    account: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      currency: PropTypes.string.isRequired,
-      slug: PropTypes.string.isRequired,
-      name: PropTypes.string,
-      isArchived: PropTypes.bool,
-      isHost: PropTypes.bool,
-      host: PropTypes.object,
-      expensesTags: PropTypes.array,
-      type: PropTypes.oneOf(Object.keys(CollectiveType)),
-    }),
-    expenses: PropTypes.shape({
-      nodes: PropTypes.array,
-      totalCount: PropTypes.number,
-      offset: PropTypes.number,
-      limit: PropTypes.number,
-    }),
-    scheduledExpenses: PropTypes.shape({
-      totalCount: PropTypes.number,
-    }),
-  }),
-  isDashboard: PropTypes.bool,
-  onlySubmittedExpenses: PropTypes.bool,
 };
 
 export default Expenses;

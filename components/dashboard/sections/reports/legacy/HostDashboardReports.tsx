@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { Question } from '@styled-icons/remix-line/Question';
 import dayjs from 'dayjs';
@@ -130,7 +129,15 @@ const hostReportPageQuery = gql`
   }
 `;
 
-const SectionTitle = ({ children, hint = null }) => (
+interface SectionTitleProps {
+  children: React.ReactNode;
+  hint?: React.ReactNode;
+}
+
+const SectionTitle = ({
+  children,
+  hint = null
+}: SectionTitleProps) => (
   <Flex alignItems="center" justifyContent="space-between" mb={22}>
     <H2 fontWeight="500" fontSize="20px" lineHeight="28px">
       {children}
@@ -145,11 +152,6 @@ const SectionTitle = ({ children, hint = null }) => (
     <StyledHr borderColor="black.300" flex="1" ml={2} />
   </Flex>
 );
-
-SectionTitle.propTypes = {
-  children: PropTypes.node.isRequired,
-  hint: PropTypes.node,
-};
 
 const schema = z.object({
   date: dateFilter.schema,
@@ -181,7 +183,14 @@ const getDefaultFilterValues = (): Partial<FilterValues> => {
     },
   };
 };
-const HostDashboardReports = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
+
+interface HostDashboardReportsProps {
+  accountSlug: string;
+}
+
+const HostDashboardReports = ({
+  accountSlug: hostSlug
+}: HostDashboardReportsProps) => {
   const defaultFilterValues = getDefaultFilterValues();
   const queryFilter = useQueryFilter({
     filters,
@@ -271,10 +280,6 @@ const HostDashboardReports = ({ accountSlug: hostSlug }: DashboardSectionProps) 
       </StyledCard>
     </div>
   );
-};
-
-HostDashboardReports.propTypes = {
-  accountSlug: PropTypes.string.isRequired,
 };
 
 export default HostDashboardReports;

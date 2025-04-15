@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import StyledSystemPropTypes from '@styled-system/prop-types';
 import type { ForwardRefExoticComponent } from 'react';
 import styled, { css } from 'styled-components';
@@ -123,84 +122,77 @@ const StyledButtonContent = styled.button<StyledButtonProps>`
     `}
 `;
 
-/**
- * @deprecated Use `ui/Button` instead
- */
-const StyledButton: ForwardRefExoticComponent<StyledButtonProps> = React.forwardRef<
-  HTMLButtonElement,
-  StyledButtonProps
->(({ loading = false, as = null, buttonSize = 'medium', buttonStyle = 'standard', ...props }, ref) => {
-  const internalRef = React.useRef<HTMLButtonElement>(null);
-  const allRefs = mergeRefs([ref, internalRef]);
-  const baseSize = React.useMemo(() => {
-    if (loading) {
-      return {
-        width: internalRef.current?.offsetWidth,
-        height: internalRef.current?.offsetHeight,
-      };
-    }
-  }, [loading]);
-
-  // TODO(Typescript): We have to hack the `as` prop because styled-components somehow types it as "never"
-  return !loading ? (
-    <StyledButtonContent buttonSize={buttonSize} buttonStyle={buttonStyle} {...props} as={as as never} ref={allRefs} />
-  ) : (
-    <StyledButtonContent
-      {...props}
-      as={as as never}
-      buttonSize={buttonSize}
-      buttonStyle={buttonStyle}
-      width={props.width ?? props.size ?? baseSize?.width}
-      height={props.height ?? props.size ?? baseSize?.height}
-      onClick={undefined}
-      type="button"
-      ref={allRefs}
-    >
-      <StyledSpinner size="0.9em" />
-    </StyledButtonContent>
-  );
-});
-
-StyledButton.displayName = 'StyledButton';
-
-StyledButton.propTypes = {
-  ...StyledSystemPropTypes.background,
-  ...StyledSystemPropTypes.border,
-  ...StyledSystemPropTypes.color,
-  ...StyledSystemPropTypes.flexbox,
-  ...StyledSystemPropTypes.layout,
-  ...StyledSystemPropTypes.space,
-  ...StyledSystemPropTypes.typography,
+interface StyledButtonProps {
   /**
    * Based on the design system theme
    */
-  buttonSize: PropTypes.oneOfType([
-    PropTypes.oneOf(Object.keys(theme.buttonSizes)),
-    PropTypes.arrayOf(PropTypes.oneOf(Object.keys(theme.buttonSizes))),
-  ]),
+  buttonSize?: unknown[] | unknown[][];
   /**
    * Based on the design system theme
    */
-  buttonStyle: PropTypes.oneOfType([
-    PropTypes.oneOf(Object.keys(theme.buttons)),
-    PropTypes.arrayOf(PropTypes.oneOf(Object.keys(theme.buttons))),
-  ]),
+  buttonStyle?: unknown[] | unknown[][];
   /**
    * Show a loading spinner on button
    */
-  loading: PropTypes.bool,
+  loading?: boolean;
   /**
    * @deprecated Please use `isBorderless`
    * If true, will display a link instead of a button
    */
-  asLink: PropTypes.bool,
+  asLink?: boolean;
   /**
    * If true, will display a link instead of a button
    */
-  isBorderless: PropTypes.bool,
-  truncateOverflow: PropTypes.bool,
-  children: PropTypes.node,
-};
+  isBorderless?: boolean;
+  truncateOverflow?: boolean;
+  children?: React.ReactNode;
+  as: any;
+}
+
+/**
+ * @deprecated Use `ui/Button` instead
+ */
+const StyledButton: ForwardRefExoticComponent<StyledButtonProps> = React.forwardRef<HTMLElement, StyledButtonProps>(
+  ({ loading = false, as = null, buttonSize = 'medium', buttonStyle = 'standard', ...props }, ref) => {
+    const internalRef = React.useRef<HTMLButtonElement>(null);
+    const allRefs = mergeRefs([ref, internalRef]);
+    const baseSize = React.useMemo(() => {
+      if (loading) {
+        return {
+          width: internalRef.current?.offsetWidth,
+          height: internalRef.current?.offsetHeight,
+        };
+      }
+    }, [loading]);
+
+    // TODO(Typescript): We have to hack the `as` prop because styled-components somehow types it as "never"
+    return !loading ? (
+      <StyledButtonContent
+        buttonSize={buttonSize}
+        buttonStyle={buttonStyle}
+        {...props}
+        as={as as never}
+        ref={allRefs}
+      />
+    ) : (
+      <StyledButtonContent
+        {...props}
+        as={as as never}
+        buttonSize={buttonSize}
+        buttonStyle={buttonStyle}
+        width={props.width ?? props.size ?? baseSize?.width}
+        height={props.height ?? props.size ?? baseSize?.height}
+        onClick={undefined}
+        type="button"
+        ref={allRefs}
+      >
+        <StyledSpinner size="0.9em" />
+      </StyledButtonContent>
+    );
+  },
+);
+
+StyledButton.displayName = 'StyledButton';
 
 /** @component */
 export default StyledButton;

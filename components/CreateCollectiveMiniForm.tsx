@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { Field, Form, Formik } from 'formik';
 import { assign, cloneDeep, get, pick } from 'lodash';
@@ -209,6 +208,31 @@ const createUserMutation = gqlV1/* GraphQL */ `
   }
 `;
 
+interface CreateCollectiveMiniFormProps {
+  /** The collective type to create */
+  type: unknown[];
+  /** Called when cancel is clicked */
+  onCancel(...args: unknown[]): unknown;
+  /** Called with the collective created when the function succeed */
+  onSuccess(...args: unknown[]): unknown;
+  /** If true, the logged in user will be added as an admin of the collective */
+  addLoggedInUserAsAdmin?: boolean;
+  /** @ignore from withUser */
+  LoggedInUser?: object;
+  /** @ignore from withUser */
+  refetchLoggedInUser?(...args: unknown[]): unknown;
+  /** If true, this does not render the 'admin name' and 'admin email' for create org form */
+  excludeAdminFields?: boolean;
+  /** The collective email */
+  email?: string;
+  /** The collective name */
+  name?: string;
+  /** A list of optional fields to include in the form */
+  optionalFields?: 'location.address' | 'location.country'[];
+  /** Any other initial values to pass to the form */
+  otherInitialValues?: object;
+}
+
 /**
  * A mini-form to create collectives/orgs/users. Meant to be embed in popups or
  * small component where we want to provide just the essential fields.
@@ -225,7 +249,7 @@ const CreateCollectiveMiniForm = ({
   email = '',
   name = '',
   otherInitialValues = {},
-}) => {
+}: CreateCollectiveMiniFormProps) => {
   const isUser = type === CollectiveType.USER;
   const isCollective = type === CollectiveType.COLLECTIVE;
   const isOrganization = type === CollectiveType.ORGANIZATION;
@@ -503,31 +527,6 @@ const CreateCollectiveMiniForm = ({
       }}
     </Formik>
   );
-};
-
-CreateCollectiveMiniForm.propTypes = {
-  /** The collective type to create */
-  type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
-  /** Called when cancel is clicked */
-  onCancel: PropTypes.func.isRequired,
-  /** Called with the collective created when the function succeed */
-  onSuccess: PropTypes.func.isRequired,
-  /** If true, the logged in user will be added as an admin of the collective */
-  addLoggedInUserAsAdmin: PropTypes.bool,
-  /** @ignore from withUser */
-  LoggedInUser: PropTypes.object,
-  /** @ignore from withUser */
-  refetchLoggedInUser: PropTypes.func,
-  /** If true, this does not render the 'admin name' and 'admin email' for create org form */
-  excludeAdminFields: PropTypes.bool,
-  /** The collective email */
-  email: PropTypes.string,
-  /** The collective name */
-  name: PropTypes.string,
-  /** A list of optional fields to include in the form */
-  optionalFields: PropTypes.arrayOf(PropTypes.oneOf(['location.address', 'location.country'])),
-  /** Any other initial values to pass to the form */
-  otherInitialValues: PropTypes.object,
 };
 
 export default withUser(CreateCollectiveMiniForm);

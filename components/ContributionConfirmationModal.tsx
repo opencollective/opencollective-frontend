@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import { ConfirmContributionForm } from './contributions/ConfirmContributionForm';
@@ -7,7 +6,16 @@ import Container from './Container';
 import StyledButton from './StyledButton';
 import StyledModal, { CollectiveModalHeader, ModalBody, ModalFooter } from './StyledModal';
 
-const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
+interface ContributionConfirmationModalProps {
+  /** the order that is being confirmed */
+  order?: { toAccount: { name: string } };
+  /** handles how the modal is closed */
+  onClose(...args: unknown[]): unknown;
+  /** Called if the action request is successful */
+  onSuccess?(...args: unknown[]): unknown;
+}
+
+const ContributionConfirmationModal = ({ order, onClose, onSuccess }: ContributionConfirmationModalProps) => {
   const [submitting, setSubmitting] = useState(false);
 
   return (
@@ -60,15 +68,6 @@ const ContributionConfirmationModal = ({ order, onClose, onSuccess }) => {
       />
     </StyledModal>
   );
-};
-
-ContributionConfirmationModal.propTypes = {
-  /** the order that is being confirmed */
-  order: PropTypes.object,
-  /** handles how the modal is closed */
-  onClose: PropTypes.func.isRequired,
-  /** Called if the action request is successful */
-  onSuccess: PropTypes.func,
 };
 
 export default ContributionConfirmationModal;

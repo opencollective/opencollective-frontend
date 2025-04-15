@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
@@ -70,7 +69,19 @@ const CreatePendingContributionModalContainer = styled(StyledModal)`
   padding: 24px 30px;
 `;
 
-const AmountDetailsLine = ({ label, value, currency, isLargeAmount }) => (
+interface AmountDetailsLineProps {
+  label?: React.ReactNode;
+  currency: string;
+  value?: number;
+  isLargeAmount?: boolean;
+}
+
+const AmountDetailsLine = ({
+  label,
+  value,
+  currency,
+  isLargeAmount
+}: AmountDetailsLineProps) => (
   <Flex justifyContent="space-between" alignItems="center">
     <Span fontSize="12px" lineHeight="18px" fontWeight="500">
       <FormattedMessage id="withColon" defaultMessage="{item}:" values={{ item: label }} />
@@ -80,13 +91,6 @@ const AmountDetailsLine = ({ label, value, currency, isLargeAmount }) => (
     </Span>
   </Flex>
 );
-
-AmountDetailsLine.propTypes = {
-  label: PropTypes.node,
-  currency: PropTypes.string.isRequired,
-  value: PropTypes.number,
-  isLargeAmount: PropTypes.bool,
-};
 
 const createPendingContributionModalQuery = gql`
   query CreatePendingContributionModal($slug: String!) {

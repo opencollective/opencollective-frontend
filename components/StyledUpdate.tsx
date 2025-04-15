@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { Markup } from 'interweave';
 import { withRouter } from 'next/router';
@@ -70,20 +69,20 @@ type StyledUpdateProps = {
   reactions?: any;
 };
 
-class StyledUpdate extends Component<StyledUpdateProps, { mode: string; modified: boolean; update: any }> {
-  static propTypes = {
-    collective: PropTypes.object.isRequired,
-    update: PropTypes.object.isRequired,
-    compact: PropTypes.bool, // if compact true, only show the summary
-    LoggedInUser: PropTypes.object,
-    isReloadingData: PropTypes.bool,
-    deleteUpdate: PropTypes.func.isRequired,
-    intl: PropTypes.object.isRequired,
-    router: PropTypes.object,
-    /** Reactions associated with this update **/
-    reactions: PropTypes.object,
-  };
+interface StyledUpdateProps {
+  collective: object;
+  update: object;
+  compact?: boolean;
+  LoggedInUser?: object // if compact true, only show the summary;
+  isReloadingData?: boolean;
+  deleteUpdate(...args: unknown[]): unknown;
+  intl: object;
+  router?: object;
+  /** Reactions associated with this update **/
+  reactions?: object;
+}
 
+class StyledUpdate extends Component<StyledUpdateProps> {
   constructor(props: StyledUpdateProps) {
     super(props);
     this.state = {

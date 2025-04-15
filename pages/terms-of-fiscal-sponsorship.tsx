@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import type { InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 
@@ -31,7 +30,11 @@ const tosQueryHelper = getSSRQueryHelpers<ReturnType<typeof getVariablesFromCont
 // ts-unused-exports:disable-next-line
 export const getServerSideProps = tosQueryHelper.getServerSideProps;
 
-const TermsOfFiscalSponsorship = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+interface TermsOfFiscalSponsorshipProps {
+  hostCollectiveSlug?: string;
+}
+
+const TermsOfFiscalSponsorship = (props: TermsOfFiscalSponsorshipProps) => {
   const router = useRouter();
   const { data, loading } = tosQueryHelper.useQuery(props);
 
@@ -52,10 +55,6 @@ const TermsOfFiscalSponsorship = (props: InferGetServerSidePropsType<typeof getS
       <Loading />
     </div>
   );
-};
-
-TermsOfFiscalSponsorship.propTypes = {
-  hostCollectiveSlug: PropTypes.string,
 };
 
 // next.js export

@@ -1,5 +1,4 @@
 import React, { Fragment, useEffect, useRef, useState } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { Undo } from '@styled-icons/fa-solid/Undo';
 import { themeGet } from '@styled-system/theme-get';
@@ -107,7 +106,28 @@ const PrivateNoteLabel = () => {
 
 const PAGE_STATUS = { VIEW: 1, EDIT: 2, EDIT_SUMMARY: 3 };
 
-function Expense(props) {
+interface ExpenseProps {
+  collectiveSlug?: string;
+  parentCollectiveSlug?: string;
+  legacyExpenseId?: number;
+  draftKey?: string;
+  edit?: string;
+  client?: object;
+  data?: object;
+  loading?: boolean;
+  error?: any;
+  refetch?(...args: unknown[]): unknown;
+  fetchMore?(...args: unknown[]): unknown;
+  startPolling?(...args: unknown[]): unknown;
+  stopPolling?(...args: unknown[]): unknown;
+  onClose?(...args: unknown[]): unknown;
+  isRefetchingDataForUser?: boolean;
+  drawerActionsContainer?: object;
+  isDrawer?: boolean;
+  enableKeyboardShortcuts?: boolean;
+}
+
+function Expense(props: ExpenseProps) {
   const {
     data,
     loading,
@@ -828,26 +848,5 @@ function Expense(props) {
     </Box>
   );
 }
-
-Expense.propTypes = {
-  collectiveSlug: PropTypes.string,
-  parentCollectiveSlug: PropTypes.string,
-  legacyExpenseId: PropTypes.number,
-  draftKey: PropTypes.string,
-  edit: PropTypes.string,
-  client: PropTypes.object,
-  data: PropTypes.object,
-  loading: PropTypes.bool,
-  error: PropTypes.any,
-  refetch: PropTypes.func,
-  fetchMore: PropTypes.func,
-  startPolling: PropTypes.func,
-  stopPolling: PropTypes.func,
-  onClose: PropTypes.func,
-  isRefetchingDataForUser: PropTypes.bool,
-  drawerActionsContainer: PropTypes.object,
-  isDrawer: PropTypes.bool,
-  enableKeyboardShortcuts: PropTypes.bool,
-};
 
 export default Expense;

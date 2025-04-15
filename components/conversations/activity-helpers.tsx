@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { CheckCircle as CheckIcon } from '@styled-icons/boxicons-regular/CheckCircle';
 import { Ban as RejectedIcon } from '@styled-icons/fa-solid/Ban';
 import { Cogs as CogsIcon } from '@styled-icons/fa-solid/Cogs';
@@ -202,7 +201,13 @@ export const isSupportedActivity = activity => {
   return Object.prototype.hasOwnProperty.call(ACTIVITIES_INFO, activity.type);
 };
 
-function ExpenseTransactionRenderer({ activity }) {
+interface ExpenseTransactionRendererProps {
+  activity?: object;
+}
+
+function ExpenseTransactionRenderer({
+  activity
+}: ExpenseTransactionRendererProps) {
   const intl = useIntl();
   if (!activity.transaction) {
     return null;
@@ -218,7 +223,3 @@ function ExpenseTransactionRenderer({ activity }) {
     </Container>
   );
 }
-
-ExpenseTransactionRenderer.propTypes = {
-  activity: PropTypes.object,
-};

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { diffArrays, diffChars, diffJson } from 'diff';
 import { has, isEmpty, pickBy, startCase } from 'lodash';
 import { Pencil } from 'lucide-react';
@@ -93,7 +92,16 @@ const shouldUseInlineDiff = changes => {
 const DEFAULT_IGNORED_FIELDS = ['id', 'createdAt', 'updatedAt', 'deletedAt', 'CollectiveId'];
 const ALWAYS_DISPLAYED = ['code'];
 
-export const GenericActivityDiffDataWithList = ({ activity }) => {
+interface GenericActivityDiffDataWithListProps {
+  activity: {
+    type: string;
+    data?: object;
+  };
+}
+
+export const GenericActivityDiffDataWithList = ({
+  activity
+}: GenericActivityDiffDataWithListProps) => {
   const { added, removed, edited } = activity.data ?? {};
   if (!added?.length && !removed?.length && !edited?.length) {
     return (
@@ -104,7 +112,7 @@ export const GenericActivityDiffDataWithList = ({ activity }) => {
   }
 
   return (
-    <div className="flex flex-col space-y-3">
+    (<div className="flex flex-col space-y-3">
       {Boolean(added?.length) && (
         <div className="flex">
           <div className="mr-2 w-[25px] rounded bg-green-100 p-2">
@@ -176,9 +184,9 @@ export const GenericActivityDiffDataWithList = ({ activity }) => {
                   const useInlineDiff = shouldUseInlineDiff(changes);
                   return (
                     // eslint-disable-next-line react/no-array-index-key
-                    <div key={`${key}-${index}`}>
+                    (<div key={`${key}-${index}`}>
                       <b>{startCase(key)}</b>:
-                      {action === 'remove' ? (
+                                            {action === 'remove' ? (
                         <InlineRemovedValue>{prevValue}</InlineRemovedValue>
                       ) : action === 'add' ? (
                         <InlineAddedValue>{newValue}</InlineAddedValue>
@@ -188,7 +196,7 @@ export const GenericActivityDiffDataWithList = ({ activity }) => {
                             <InlineDiffContainer>
                               {changes.diff.map((part, index) => (
                                 // eslint-disable-next-line react/no-array-index-key
-                                <React.Fragment key={index}>
+                                (<React.Fragment key={index}>
                                   {part.added ? (
                                     <InlineAddedValue>{part.value}</InlineAddedValue>
                                   ) : part.removed ? (
@@ -200,7 +208,7 @@ export const GenericActivityDiffDataWithList = ({ activity }) => {
                                   {changes.type === 'array' && index < changes.diff.length - 1 && ', '}
                                   {/* For numbers & unknown types, show as "Previous value → New value" */}
                                   {changes.type === 'default' && index < changes.diff.length - 1 && ' → '}
-                                </React.Fragment>
+                                </React.Fragment>)
                               ))}
                             </InlineDiffContainer>
                           ) : (
@@ -211,7 +219,7 @@ export const GenericActivityDiffDataWithList = ({ activity }) => {
                           )}
                         </div>
                       ) : null}
-                    </div>
+                    </div>)
                   );
                 })}
               </div>
@@ -219,10 +227,6 @@ export const GenericActivityDiffDataWithList = ({ activity }) => {
           </div>
         </div>
       )}
-    </div>
+    </div>)
   );
-};
-
-GenericActivityDiffDataWithList.propTypes = {
-  activity: PropTypes.shape({ type: PropTypes.string.isRequired, data: PropTypes.object }).isRequired,
 };

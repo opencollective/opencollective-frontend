@@ -32,14 +32,5 @@ const StyledHr = styled.hr<StyledHrProps>`
   ${display}
 `;
 
-StyledHr.propTypes = {
-  ...propTypes.space,
-  ...propTypes.flex,
-  ...propTypes.layout,
-  ...propTypes.shadow,
-  ...propTypes.border,
-  ...propTypes.display,
-};
-
 /** @component */
 export default StyledHr;

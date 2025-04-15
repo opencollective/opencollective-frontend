@@ -50,17 +50,5 @@ const StyledCard = styled.div.attrs<StyledCardProps>(props => ({
   overflowY: props.overflowY ?? 'hidden',
 }))<StyledCardProps>(compose(flexbox, typography, background, border, shadow, color, layout, position, space));
 
-StyledCard.propTypes = {
-  ...styledPropTypes.flexbox,
-  ...styledPropTypes.typography,
-  ...styledPropTypes.background,
-  ...styledPropTypes.border,
-  ...styledPropTypes.shadow,
-  ...styledPropTypes.color,
-  ...styledPropTypes.layout,
-  ...styledPropTypes.space,
-  ...styledPropTypes.position,
-};
-
 /** @component */
 export default StyledCard;

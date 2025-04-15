@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import { has } from 'lodash';
 import styled, { css } from 'styled-components';
 
@@ -35,13 +34,6 @@ const HappyBackground = styled.div<{
     }
   }}
 `;
-
-HappyBackground.propTypes = {
-  /** On optional collective with settings to get the primary color */
-  collective: PropTypes.shape({
-    settings: PropTypes.object,
-  }),
-};
 
 /** @component */
 export default HappyBackground;

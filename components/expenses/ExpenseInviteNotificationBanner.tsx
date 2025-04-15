@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation } from '@apollo/client';
 import { pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -26,7 +25,13 @@ const resendDraftExpenseInviteMutation = gql`
   }
 `;
 
-const ResendDraftInviteButton = ({ expense }) => {
+interface ResendDraftInviteButtonProps {
+  expense: object;
+}
+
+const ResendDraftInviteButton = ({
+  expense
+}: ResendDraftInviteButtonProps) => {
   const { toast } = useToast();
   const intl = useIntl();
   const [resendDraftInvite, { loading, error, data }] = useMutation(resendDraftExpenseInviteMutation, {
@@ -65,11 +70,13 @@ const ResendDraftInviteButton = ({ expense }) => {
   );
 };
 
-ResendDraftInviteButton.propTypes = {
-  expense: PropTypes.object.isRequired,
-};
+interface ResendSignInEmailButtonProps {
+  createdUser: object;
+}
 
-const ResendSignInEmailButton = ({ createdUser }) => {
+const ResendSignInEmailButton = ({
+  createdUser
+}: ResendSignInEmailButtonProps) => {
   const { loading, call, error, data } = useAsyncCall(async () => {
     const userExists = await checkUserExistence(createdUser.email);
     if (userExists) {
@@ -102,11 +109,12 @@ const ResendSignInEmailButton = ({ createdUser }) => {
   );
 };
 
-ResendSignInEmailButton.propTypes = {
-  createdUser: PropTypes.object.isRequired,
-};
+interface ExpenseInviteNotificationBannerProps {
+  createdUser?: object;
+  expense: object;
+}
 
-const ExpenseInviteNotificationBanner = props => {
+const ExpenseInviteNotificationBanner = props: ExpenseInviteNotificationBannerProps => {
   const canResendEmail = Boolean(props.expense.permissions?.canVerifyDraftExpense);
   return (
     <StyledCard py={3} px="26px" mb={4} borderStyle={'solid'} data-cy="expense-draft-banner">
@@ -155,11 +163,6 @@ const ExpenseInviteNotificationBanner = props => {
       </Flex>
     </StyledCard>
   );
-};
-
-ExpenseInviteNotificationBanner.propTypes = {
-  createdUser: PropTypes.object,
-  expense: PropTypes.object.isRequired,
 };
 
 export default ExpenseInviteNotificationBanner;

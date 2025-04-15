@@ -33,14 +33,6 @@ export const Box = styled.div.withConfig({
 
 Box.displayName = 'Box';
 
-Box.propTypes = {
-  ...propTypes.space,
-  ...propTypes.color,
-  ...propTypes.layout,
-  ...propTypes.typography,
-  ...propTypes.flexbox,
-};
-
 export type FlexProps = BoxProps;
 
 export const Flex = styled(Box)<FlexProps>(

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
 import { ChevronUp } from '@styled-icons/feather/ChevronUp/ChevronUp';
 import { themeGet } from '@styled-system/theme-get';
@@ -91,10 +90,23 @@ const CollapseBtn = styled.div<CollapseBtnProps>`
   ${space}
 `;
 
+interface CollapseProps {
+  title?: React.ReactNode;
+  children?: React.ReactNode;
+  defaultIsOpen?: boolean;
+  buttonSize?: number | string;
+}
+
 /**
  * A stylized version of the `details` HTML element to hide & show content when clicked.
  */
-const Collapse = ({ children, title, buttonSize = 18, defaultIsOpen, ...props }) => {
+const Collapse = ({
+  children,
+  title,
+  buttonSize = 18,
+  defaultIsOpen,
+  ...props
+}: CollapseProps) => {
   return (
     <Details open={defaultIsOpen} {...props}>
       {title && (
@@ -111,13 +123,6 @@ const Collapse = ({ children, title, buttonSize = 18, defaultIsOpen, ...props })
       {children}
     </Details>
   );
-};
-
-Collapse.propTypes = {
-  title: PropTypes.node,
-  children: PropTypes.node,
-  defaultIsOpen: PropTypes.bool,
-  buttonSize: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 };
 
 export default Collapse;

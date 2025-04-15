@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { Download as IconDownload } from '@styled-icons/feather/Download';
 import { isNil, omit, omitBy, pick } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -30,6 +29,7 @@ import { parseTransactionPaymentMethodTypes } from './filters/TransactionsPaymen
 import TransactionsDownloadCSV from './TransactionsDownloadCSV';
 import TransactionsFilters from './TransactionsFilters';
 import TransactionsList from './TransactionsList';
+import { Account } from '@/lib/graphql/types/v2/schema';
 
 const EXPENSES_PER_PAGE = 15;
 
@@ -73,6 +73,40 @@ const convertProcessingOrderIntoTransactionItem = order => ({
   ...pick(order, ['id', 'amount', 'toAccount', 'fromAccount', 'description', 'createdAt', 'paymentMethod']),
 });
 
+interface TransactionsProps {
+  account?: Pick<Account, 'id' | 'slug' | 'name' | 'type' | 'isIncognito'> & {
+    processingOrders?: {
+      nodes?: unknown[];
+      totalCount?: number;
+    };
+    parent?: {
+      id?: string;
+      name?: string;
+    };
+  };
+  transactions?: {
+    nodes?: unknown[];
+    totalCount?: number;
+    paymentMethodTypes?: unknown[];
+    kinds?: unknown[];
+  };
+  variables?: object;
+  loading?: boolean;
+  refetch?(...args: unknown[]): unknown;
+  error?: any;
+  LoggedInUser?: object;
+  query?: {
+    searchTerm?: string;
+    offset?: string;
+    ignoreIncognitoTransactions?: string;
+    ignoreGiftCardsTransactions?: string;
+    ignoreChildrenTransactions?: string;
+    displayPendingContributions?: string;
+  };
+  router?: object;
+  isDashboard?: boolean;
+}
+
 const Transactions = ({
   LoggedInUser,
   transactions,
@@ -83,7 +117,7 @@ const Transactions = ({
   variables,
   router,
   isDashboard,
-}) => {
+}: TransactionsProps) => {
   const intl = useIntl();
   const prevLoggedInUser = usePrevious(LoggedInUser);
   const [state, setState] = useState({
@@ -336,31 +370,6 @@ const Transactions = ({
       </Box>
     </Container>
   );
-};
-
-Transactions.propTypes = {
-  account: PropTypes.object,
-  transactions: PropTypes.shape({
-    nodes: PropTypes.array,
-    totalCount: PropTypes.number,
-    paymentMethodTypes: PropTypes.array,
-    kinds: PropTypes.array,
-  }),
-  variables: PropTypes.object,
-  loading: PropTypes.bool,
-  refetch: PropTypes.func,
-  error: PropTypes.any,
-  LoggedInUser: PropTypes.object,
-  query: PropTypes.shape({
-    searchTerm: PropTypes.string,
-    offset: PropTypes.string,
-    ignoreIncognitoTransactions: PropTypes.string,
-    ignoreGiftCardsTransactions: PropTypes.string,
-    ignoreChildrenTransactions: PropTypes.string,
-    displayPendingContributions: PropTypes.string,
-  }),
-  router: PropTypes.object,
-  isDashboard: PropTypes.bool,
 };
 
 export default Transactions;

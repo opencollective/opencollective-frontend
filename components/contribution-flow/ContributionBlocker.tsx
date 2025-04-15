@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { FEATURES } from '../../lib/allowed-features';
@@ -133,7 +132,22 @@ const paymentMethodUnavailableWarning = (loggedInUser, account, tier) => {
   );
 };
 
-const ContributionBlocker = ({ account, blocker }) => {
+interface ContributionBlockerProps {
+  blocker: {
+    reason: unknown[];
+    intlParams?: object;
+    /** To override the default message.  */
+    content?: React.ReactNode;
+    type?: string;
+    showOtherWaysToContribute?: boolean;
+  };
+  account?: object;
+}
+
+const ContributionBlocker = ({
+  account,
+  blocker
+}: ContributionBlockerProps) => {
   const intl = useIntl();
   return (
     <Flex flexDirection="column" alignItems="center" py={[5, null, 6]}>
@@ -151,18 +165,6 @@ const ContributionBlocker = ({ account, blocker }) => {
       )}
     </Flex>
   );
-};
-
-ContributionBlocker.propTypes = {
-  blocker: PropTypes.shape({
-    reason: PropTypes.oneOf(Object.values(CONTRIBUTION_BLOCKER)).isRequired,
-    intlParams: PropTypes.object,
-    /** To override the default message.  */
-    content: PropTypes.node,
-    type: PropTypes.string,
-    showOtherWaysToContribute: PropTypes.bool,
-  }).isRequired,
-  account: PropTypes.object,
 };
 
 export default ContributionBlocker;

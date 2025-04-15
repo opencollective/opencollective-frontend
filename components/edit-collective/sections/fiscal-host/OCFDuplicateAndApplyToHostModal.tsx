@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useMutation, useQuery } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import { get, isNil, map, pick } from 'lodash';
@@ -201,7 +200,21 @@ const getAccountInput = collective => {
   return typeof collective.id === 'number' ? { legacyId: collective.id } : { id: collective.id };
 };
 
-const ConfirmButtons = ({ onClose, onBack, onSubmit, isSubmitting, canSubmit }) => {
+interface ConfirmButtonsProps {
+  onClose?(...args: unknown[]): unknown;
+  onBack?(...args: unknown[]): unknown;
+  onSubmit?(...args: unknown[]): unknown;
+  isSubmitting?: boolean;
+  canSubmit?: boolean;
+}
+
+const ConfirmButtons = ({
+  onClose,
+  onBack,
+  onSubmit,
+  isSubmitting,
+  canSubmit
+}: ConfirmButtonsProps) => {
   return (
     <div className="flex justify-end gap-3">
       <Button type="button" onClick={onBack || onClose} disabled={isSubmitting} variant="outline">
@@ -226,18 +239,26 @@ const ConfirmButtons = ({ onClose, onBack, onSubmit, isSubmitting, canSubmit }) 
   );
 };
 
-ConfirmButtons.propTypes = {
-  onClose: PropTypes.func,
-  onBack: PropTypes.func,
-  onSubmit: PropTypes.func,
-  isSubmitting: PropTypes.bool,
-  canSubmit: PropTypes.bool,
-};
+interface OCFDuplicateAndApplyToHostModalProps {
+  hostSlug: string;
+  onClose(...args: unknown[]): unknown;
+  /** If not provided, the default is to ad a success toast and to call onClose */
+  onSuccess?(...args: unknown[]): unknown;
+  /** Use this to force the value for `collective`. If not specified, user's administrated collectives will be displayed instead */
+  collective?: object;
+  router?: object;
+}
 
 /**
  * A copy-paste of `ApplyToHostModal` specialized for the OCF shutdown transfer.
  */
-const OCFDuplicateAndApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, ...props }) => {
+const OCFDuplicateAndApplyToHostModal = ({
+  hostSlug,
+  collective,
+  onClose,
+  onSuccess,
+  ...props
+}: OCFDuplicateAndApplyToHostModalProps) => {
   const query = collective ? applyToHostQuery : applyToHostWithAccountsQuery;
   const [successResult, setSuccessResult] = React.useState(null);
   const { refetchLoggedInUser } = useLoggedInUser();
@@ -270,7 +291,7 @@ const OCFDuplicateAndApplyToHostModal = ({ hostSlug, collective, onClose, onSucc
 
   const currentStep = STEPS[stepKey];
   return (
-    <StyledModal onClose={() => onClose(successResult)} {...props}>
+    (<StyledModal onClose={() => onClose(successResult)} {...props}>
       {loading ? (
         <React.Fragment>
           <ModalHeader hideCloseIcon>
@@ -431,7 +452,7 @@ const OCFDuplicateAndApplyToHostModal = ({ hostSlug, collective, onClose, onSucc
                     <Box my={3}>
                       {useTwoSteps && (
                         // @ts-expect-error StepsProgress is not typed
-                        <StepsProgress
+                        (<StepsProgress
                           steps={Object.values(STEPS)}
                           focus={currentStep}
                           onStepSelect={step => setStepKey(step.key)}
@@ -441,7 +462,7 @@ const OCFDuplicateAndApplyToHostModal = ({ hostSlug, collective, onClose, onSucc
                               {step.label}
                             </P>
                           )}
-                        </StepsProgress>
+                        </StepsProgress>)
                       )}
                     </Box>
                   </Flex>
@@ -682,18 +703,8 @@ const OCFDuplicateAndApplyToHostModal = ({ hostSlug, collective, onClose, onSucc
           )}
         </Formik>
       )}
-    </StyledModal>
+    </StyledModal>)
   );
-};
-
-OCFDuplicateAndApplyToHostModal.propTypes = {
-  hostSlug: PropTypes.string.isRequired,
-  onClose: PropTypes.func.isRequired,
-  /** If not provided, the default is to ad a success toast and to call onClose */
-  onSuccess: PropTypes.func,
-  /** Use this to force the value for `collective`. If not specified, user's administrated collectives will be displayed instead */
-  collective: PropTypes.object,
-  router: PropTypes.object,
 };
 
 export default OCFDuplicateAndApplyToHostModal;

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import ReactDropzone from 'react-dropzone';
 import { FormattedMessage } from 'react-intl';
 
@@ -8,7 +7,19 @@ import { attachmentDropzoneParams } from './lib/attachments';
 
 import StyledButton from '../StyledButton';
 
-const AddNewAttachedFilesButton = ({ disabled, mockImageGenerator, onSuccess, isMulti, kind }) => {
+interface AddNewAttachedFilesButtonProps {
+  disabled?: boolean;
+  onSuccess?(...args: unknown[]): unknown;
+  mockImageGenerator?(...args: unknown[]): unknown;
+}
+
+const AddNewAttachedFilesButton = ({
+  disabled,
+  mockImageGenerator,
+  onSuccess,
+  isMulti,
+  kind
+}: AddNewAttachedFilesButtonProps) => {
   const { isUploading, uploadFiles } = useImageUploader({
     isMulti,
     mockImageGenerator,
@@ -30,12 +41,6 @@ const AddNewAttachedFilesButton = ({ disabled, mockImageGenerator, onSuccess, is
       )}
     </ReactDropzone>
   );
-};
-
-AddNewAttachedFilesButton.propTypes = {
-  disabled: PropTypes.bool,
-  onSuccess: PropTypes.func,
-  mockImageGenerator: PropTypes.func,
 };
 
 export default AddNewAttachedFilesButton;

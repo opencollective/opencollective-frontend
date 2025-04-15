@@ -1,6 +1,5 @@
 // @deprecated, use `components/ui/Dialog` instead
 import React from 'react';
-import PropTypes from 'prop-types';
 import propTypes from '@styled-system/prop-types';
 import clsx from 'clsx';
 import { isNil, omitBy } from 'lodash';
@@ -34,16 +33,6 @@ export const ModalBody = styled(Container).attrs<ModalBodyProps>(props => ({
   mb: props.mb ?? '30px',
 }))<ModalBodyProps>``;
 
-ModalBody.propTypes = {
-  /** width of the modal component */
-  width: PropTypes.string,
-  /** height of the modal component */
-  height: PropTypes.string,
-  /** children */
-  children: PropTypes.node,
-  ...propTypes.space,
-};
-
 type DividerProps = SpaceProps & { isFullWidth?: boolean };
 
 const Divider = styled.div<DividerProps>`
@@ -73,7 +62,20 @@ type ModalHeaderProps = {
   hideCloseIcon?: boolean;
 } & Pick<ContainerProps, 'mb'>;
 
-export const ModalHeader = ({ children, onClose, hideCloseIcon, ...props }: ModalHeaderProps) => (
+interface ModalHeaderProps {
+  /** handles how the modal is closed */
+  onClose?(...args: unknown[]): unknown;
+  /** children */
+  children?: React.ReactNode;
+  hideCloseIcon?: boolean;
+}
+
+export const ModalHeader = ({
+  children,
+  onClose,
+  hideCloseIcon,
+  ...props
+}: ModalHeaderProps) => (
   <Header {...props}>
     {children || <div />}
     {!hideCloseIcon && (
@@ -84,20 +86,24 @@ export const ModalHeader = ({ children, onClose, hideCloseIcon, ...props }: Moda
   </Header>
 );
 
-ModalHeader.propTypes = {
-  /** handles how the modal is closed */
-  onClose: PropTypes.func,
-  /** children */
-  children: PropTypes.node,
-  hideCloseIcon: PropTypes.bool,
-};
-
 ModalHeader.displayName = 'Header';
+
+interface CollectiveModalHeaderProps {
+  collective?: {
+    name?: string;
+  };
+  customText?: React.ReactNode;
+}
 
 /**
  * A special header that displays collective name + avatar in the header.
  */
-export const CollectiveModalHeader = ({ collective, preText = null, customText = undefined, ...props }) => (
+export const CollectiveModalHeader = ({
+  collective,
+  preText = null,
+  customText = undefined,
+  ...props
+}: CollectiveModalHeaderProps) => (
   <ModalHeader {...props}>
     <div className="flex items-center gap-2 text-xl font-bold">
       {preText}
@@ -106,13 +112,6 @@ export const CollectiveModalHeader = ({ collective, preText = null, customText =
     </div>
   </ModalHeader>
 );
-
-CollectiveModalHeader.propTypes = {
-  collective: PropTypes.shape({
-    name: PropTypes.string,
-  }),
-  customText: PropTypes.node,
-};
 
 CollectiveModalHeader.displayName = 'Header';
 
@@ -136,6 +135,29 @@ export const ModalFooter = ({
   </Container>
 );
 
+interface StyledModalProps {
+  /** width of the modal component */
+  width?: string | number | unknown[];
+  /** height of the modal component */
+  height?: string | number | unknown[];
+  /** width of the modal component */
+  maxWidth?: string | number;
+  /** height of the modal component */
+  maxHeight?: string | number;
+  /** width of the modal component */
+  minWidth?: string | number;
+  /** height of the modal component */
+  minWeight?: string | number;
+  /** handles how the modal is closed */
+  onClose(...args: unknown[]): unknown;
+  /** if true, a confirmation will be displayed if user tries to close the modal or leave the page */
+  hasUnsavedChanges?: boolean;
+  /** whether to ignore the escape key */
+  ignoreEscapeKey?: boolean;
+  /** children */
+  children?: React.ReactNode;
+}
+
 /**
  * Modal component. Will pass down additional props to `ModalWrapper`, which is
  * a styled `Container`.
@@ -154,7 +176,7 @@ const StyledModal = ({
   maxHeight = undefined,
   className = undefined,
   ...props
-}) => {
+}: StyledModalProps) => {
   const intl = useIntl();
   const closeHandler = React.useCallback(() => {
     if (preventClose) {
@@ -208,29 +230,6 @@ const StyledModal = ({
       </Dialog>
     </React.Fragment>
   );
-};
-
-StyledModal.propTypes = {
-  /** width of the modal component */
-  width: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
-  /** height of the modal component */
-  height: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
-  /** width of the modal component */
-  maxWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  /** height of the modal component */
-  maxHeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  /** width of the modal component */
-  minWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  /** height of the modal component */
-  minWeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  /** handles how the modal is closed */
-  onClose: PropTypes.func.isRequired,
-  /** if true, a confirmation will be displayed if user tries to close the modal or leave the page */
-  hasUnsavedChanges: PropTypes.bool,
-  /** whether to ignore the escape key */
-  ignoreEscapeKey: PropTypes.bool,
-  /** children */
-  children: PropTypes.node,
 };
 
 /** @component */

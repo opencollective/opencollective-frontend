@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useQuery } from '@apollo/client';
 import { create, Mode } from '@transferwise/approve-api-action-helpers';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -52,7 +51,17 @@ export const getScheduledExpensesQueryVariables = hostSlug => ({
   payoutMethodType: 'BANK_ACCOUNT',
 });
 
-const ScheduledExpensesBanner = ({ hostSlug, onSubmit, secondButton }) => {
+interface ScheduledExpensesBannerProps {
+  hostSlug: string;
+  onSubmit?(...args: unknown[]): unknown;
+  secondButton?: React.ReactNode;
+}
+
+const ScheduledExpensesBanner = ({
+  hostSlug,
+  onSubmit,
+  secondButton
+}: ScheduledExpensesBannerProps) => {
   const scheduledExpenses = useQuery(scheduledExpensesQuery, {
     variables: getScheduledExpensesQueryVariables(hostSlug),
     context: API_V2_CONTEXT,
@@ -160,12 +169,6 @@ const ScheduledExpensesBanner = ({ hostSlug, onSubmit, secondButton }) => {
       )}
     </React.Fragment>
   );
-};
-
-ScheduledExpensesBanner.propTypes = {
-  hostSlug: PropTypes.string.isRequired,
-  onSubmit: PropTypes.func,
-  secondButton: PropTypes.node,
 };
 
 export default ScheduledExpensesBanner;
