@@ -441,6 +441,10 @@ const formSchemaQuery = gql`
     description
     imageUrl(height: 64)
     hasPayoutMethod
+    vendorInfo {
+      taxId
+      taxType
+    }
     payoutMethods {
       id
       type
@@ -2083,8 +2087,21 @@ export function useExpenseForm(opts: {
   React.useEffect(() => {
     if (!expenseForm.values.hasTax) {
       setFieldValue('tax', null);
+    } else if (!expenseForm.values.tax) {
+      const selectedVendor = formOptions.vendorsForAccount?.find(
+        v => v.slug === expenseForm.values.payeeSlug && formOptions?.taxType === v.vendorInfo?.taxType,
+      );
+      if (selectedVendor && !expenseForm.values.tax) {
+        setFieldValue('tax', { idNumber: selectedVendor.vendorInfo?.taxId, rate: 0 });
+      }
     }
-  }, [expenseForm.values.hasTax, setFieldValue]);
+  }, [
+    expenseForm.values.hasTax,
+    expenseForm.values.tax,
+    expenseForm.values.payeeSlug,
+    formOptions.vendorsForAccount,
+    setFieldValue,
+  ]);
 
   React.useEffect(() => {
     if (expenseForm.values.accountingCategoryId && (formOptions.accountingCategories || []).length === 0) {
