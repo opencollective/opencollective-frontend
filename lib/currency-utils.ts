@@ -104,7 +104,7 @@ export function formatCurrency(
     // We manually add the exact currency (e.g. "$10 USD") in many places. This is to prevent
     // showing the currency twice is some locales ($US10 USD)
     return formatAmount(options.currencyDisplay ?? 'narrowSymbol');
-  } catch (e) {
+  } catch {
     // ... unfortunately, some old versions of Safari doesn't support it, so we need a fallback
     return formatAmount('symbol');
   }

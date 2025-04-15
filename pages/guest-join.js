@@ -69,7 +69,7 @@ const JoinAsGuest = () => {
     try {
       await callSendGuestConfirmationEmail({ variables: { email } });
       setStatus(STATUS.SUCCESS);
-    } catch (e) {
+    } catch {
       setStatus(STATUS.ERROR);
     }
   };

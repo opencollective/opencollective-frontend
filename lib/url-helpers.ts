@@ -247,7 +247,7 @@ export const isRelativeHref = href => {
     try {
       const parsedUrl = new URL(href, windowLocation.origin);
       return parsedUrl.origin === windowLocation.origin;
-    } catch (e) {
+    } catch {
       return false; // Invalid URL
     }
   }

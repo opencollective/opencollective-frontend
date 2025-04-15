@@ -31,7 +31,7 @@ export function getRequestIntl(req: NextPageContext['req']): IntlProps {
     if (queryLanguage && supportedLanguages.includes(queryLanguage)) {
       language = queryLanguage;
     } else if (typeof window === 'undefined') {
-      const cookie = require('cookie'); // eslint-disable-line @typescript-eslint/no-var-requires
+      const cookie = require('cookie'); // eslint-disable-line @typescript-eslint/no-require-imports
       const cookies = cookie.parse(req.headers['cookie'] ?? '');
       const cookieLanguage = cookies?.['language'];
 
@@ -44,7 +44,7 @@ export function getRequestIntl(req: NextPageContext['req']): IntlProps {
       locale = language || 'en';
     } else {
       if (typeof window === 'undefined') {
-        const accepts = require('accepts'); // eslint-disable-line @typescript-eslint/no-var-requires
+        const accepts = require('accepts'); // eslint-disable-line @typescript-eslint/no-require-imports
         locale = language || accepts(req).language(supportedLanguages) || 'en';
       }
     }
