@@ -1,4 +1,5 @@
 import { defineConfig, globalIgnores } from 'eslint/config';
+import pluginCypress from 'eslint-plugin-cypress/flat';
 import { fixupConfigRules, includeIgnoreFile } from '@eslint/compat';
 import openCollectiveConfig from 'eslint-config-opencollective/eslint-react.config.cjs';
 import formatjs from 'eslint-plugin-formatjs';
@@ -22,6 +23,7 @@ const gitignorePath = fileURLToPath(new URL('.gitignore', import.meta.url));
 
 export default defineConfig([
   ...openCollectiveConfig,
+  pluginCypress.configs.recommended,
   includeIgnoreFile(gitignorePath),
   globalIgnores(['lib/graphql/types/v2/*', 'lib/graphql/*.graphql']),
   {
@@ -336,6 +338,14 @@ export default defineConfig([
 
     rules: {
       'react/prop-types': 'off',
+    },
+  },
+  {
+    files: ['test/cypress/**/*.js', 'test/cypress/**/*.ts'],
+    rules: {
+      'cypress/no-unnecessary-waiting': 'warn',
+      'cypress/unsafe-to-chain-command': 'warn',
+      'cypress/no-assigning-return-values': 'warn',
     },
   },
 ]);
