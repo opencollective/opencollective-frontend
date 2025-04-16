@@ -12,7 +12,7 @@ const FieldWithValidationBadge = ({ field, children }) => {
   return (
     <div className="flex items-center gap-2">
       {field.isValid ? <Check size="14" className="text-green-600" /> : <Ban size="14" className="text-red-600" />}
-      <p className="text-sm text-slate-700">{children({ field })}</p>
+      <div className="text-sm text-slate-700">{children({ field })}</div>
     </div>
   );
 };

@@ -221,7 +221,6 @@ const CommentForm = ({
         )}
         <Flex mt={3} alignItems="center" justifyContent={submitButtonJustify} gap={12}>
           <Button
-            minWidth={150}
             variant={submitButtonVariant}
             disabled={isDisabled || !LoggedInUser || uploading}
             loading={loading}
