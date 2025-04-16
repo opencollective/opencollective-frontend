@@ -26,10 +26,10 @@ export function FormField({
   className,
   ...props
 }: {
-  label?: string;
+  label?: string | React.ReactNode;
   showError?: boolean;
   name: string;
-  hint?: string;
+  hint?: string | React.ReactNode;
   placeholder?: string;
   children?: (props: { form: FormikProps<any>; meta: any; field: any; hasError?: boolean }) => JSX.Element;
   required?: boolean;

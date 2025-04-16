@@ -2406,7 +2406,7 @@ type Expense {
   """
   Taxes applied to this expense
   """
-  taxes: [TaxInfo]!
+  taxes: [TaxInfo!]!
 
   """
   The exchange rate between the expense currency and the account currency
@@ -2519,7 +2519,7 @@ type Expense {
   (Optional - applicable to invoice expense only) The invoice file for this expense
   """
   invoiceFile: FileInfo
-  items: [ExpenseItem]
+  items: [ExpenseItem!]!
 
   """
   Additional information about the payment as HTML. Only visible to user and admins.

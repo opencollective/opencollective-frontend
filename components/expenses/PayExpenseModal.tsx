@@ -154,9 +154,8 @@ const TransferDetailFields = ({ expense, setDisabled, host }: TransferDetailsFie
     });
     if (referenceField) {
       const reference =
-        expense.reference || generateReference
-          ? generateDefaultReference(expense, referenceField.maxLength)
-          : undefined;
+        expense.reference ||
+        (generateReference ? generateDefaultReference(expense, referenceField.maxLength) : undefined);
       if (reference) {
         formik.setFieldValue('transfer.details.reference', truncateMiddle(reference, referenceField.maxLength, ' '));
       }

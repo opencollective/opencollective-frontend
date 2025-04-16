@@ -441,6 +441,10 @@ const formSchemaQuery = gql`
     description
     imageUrl(height: 64)
     hasPayoutMethod
+    vendorInfo {
+      taxId
+      taxType
+    }
     payoutMethods {
       id
       type
@@ -2083,8 +2087,21 @@ export function useExpenseForm(opts: {
   React.useEffect(() => {
     if (!expenseForm.values.hasTax) {
       setFieldValue('tax', null);
+    } else if (!expenseForm.values.tax) {
+      const selectedVendor = formOptions.vendorsForAccount?.find(
+        v => v.slug === expenseForm.values.payeeSlug && formOptions?.taxType === v.vendorInfo?.taxType,
+      );
+      if (selectedVendor && !expenseForm.values.tax) {
+        setFieldValue('tax', { idNumber: selectedVendor.vendorInfo?.taxId, rate: 0 });
+      }
     }
-  }, [expenseForm.values.hasTax, setFieldValue]);
+  }, [
+    expenseForm.values.hasTax,
+    expenseForm.values.tax,
+    expenseForm.values.payeeSlug,
+    formOptions.vendorsForAccount,
+    setFieldValue,
+  ]);
 
   React.useEffect(() => {
     if (expenseForm.values.accountingCategoryId && (formOptions.accountingCategories || []).length === 0) {
@@ -2246,7 +2263,33 @@ export function useExpenseForm(opts: {
     ) {
       setFieldValue('payoutMethodId', null);
     }
-  }, [formOptions.payoutMethods, expenseForm.values.payoutMethodId, setFieldValue]);
+
+    const selectedPayoutMethod = formOptions.payoutMethods?.find(p => p.id === expenseForm.values.payoutMethodId);
+    if (
+      selectedPayoutMethod &&
+      selectedPayoutMethod.data?.currency &&
+      !expenseForm.touched.expenseItems &&
+      expenseForm.values.expenseItems[0]?.amount?.currency !== selectedPayoutMethod.data?.currency
+    ) {
+      setFieldValue(
+        'expenseItems',
+        expenseForm.values.expenseItems.map(ei => ({
+          ...ei,
+          amount: {
+            ...ei.amount,
+            currency: selectedPayoutMethod.data?.currency,
+          },
+        })),
+      );
+    }
+  }, [
+    formOptions.payoutMethods,
+    expenseForm.values.payoutMethodId,
+    setFieldValue,
+    setFormOptions,
+    expenseForm.touched.expenseItems,
+    expenseForm.values.expenseItems,
+  ]);
 
   const refresh = React.useCallback(async () => refreshFormOptions(true), [refreshFormOptions]);
 

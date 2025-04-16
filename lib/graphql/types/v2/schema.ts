@@ -4510,7 +4510,7 @@ export type Expense = {
   invoiceFile?: Maybe<FileInfo>;
   /** Information to display on the invoice. Only visible to user and admins. */
   invoiceInfo?: Maybe<Scalars['String']['output']>;
-  items?: Maybe<Array<Maybe<ExpenseItem>>>;
+  items: Array<ExpenseItem>;
   /** Legacy ID as returned by API V1. Avoid relying on this field as it may be removed in the future. */
   legacyId: Scalars['Int']['output'];
   /** Returns the list of legal documents attached to this expense. Must be logged in as a host admin. */
@@ -4550,7 +4550,7 @@ export type Expense = {
   status: ExpenseStatus;
   tags: Array<Maybe<Scalars['String']['output']>>;
   /** Taxes applied to this expense */
-  taxes: Array<Maybe<TaxInfo>>;
+  taxes: Array<TaxInfo>;
   /** [Host admins only] If the expense associated with a transactions import row, this field will reference it */
   transactionImportRow?: Maybe<TransactionsImportRow>;
   /** The reference text used in the payment transfer */

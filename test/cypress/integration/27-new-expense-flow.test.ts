@@ -644,7 +644,7 @@ function fillTypeOfExpense(opts: { expenseType: 'invoice' | 'reimbursement'; has
         cy.contains('Yes, I have an invoice').click();
         cy.contains('Attach your invoice file').selectFile(getReceiptFixture({ fileName: 'invoice0.jpg' }));
         cy.contains('Clear').should('exist');
-        cy.contains('Invoice number').click().type('INV0001');
+        cy.contains('Invoice reference').click().type('INV0001');
       } else {
         cy.contains('No, generate an invoice for me').click();
       }
