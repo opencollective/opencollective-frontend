@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { omit, omitBy } from 'lodash';
+import { omit } from 'lodash';
 import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -78,14 +78,6 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
     },
     valueRenderer: ({ value, intl }) => intl.formatMessage(LastCommentByFilterLabels[value]),
   },
-};
-
-const ROUTE_PARAMS = ['hostCollectiveSlug', 'slug', 'section', 'view'];
-
-const updateQuery = (router, newParams) => {
-  const query = omitBy({ ...router.query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
-  const pathname = router.asPath.split('?')[0].split('#')[0];
-  return router.push({ pathname, query });
 };
 
 const HostApplications = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
@@ -179,7 +171,7 @@ const HostApplications = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
             hostApplications={hostApplications?.nodes}
             nbPlaceholders={nbPlaceholders}
             loading={loading}
-            openApplication={application => queryFilter.setFilter('hostApplicationId', application.id)}
+            openApplication={application => queryFilter.setFilter('hostApplicationId', application.id, false)}
           />
           <Pagination queryFilter={queryFilter} total={hostApplications?.totalCount} />
         </React.Fragment>
@@ -188,8 +180,7 @@ const HostApplications = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       <HostApplicationDrawer
         open={!!drawerApplicationId}
         onClose={() => {
-          updateQuery(router, { accountId: null });
-          queryFilter.setFilter('hostApplicationId', null);
+          queryFilter.setFilter('hostApplicationId', undefined, false);
         }}
         applicationId={drawerApplicationId}
       />
