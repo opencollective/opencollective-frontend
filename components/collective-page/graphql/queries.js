@@ -38,6 +38,8 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
       isHost
       isIncognito
       isGuest
+      isTrustedHost
+      isFirstPartyHost
       hostFeePercent
       platformFeePercent
       image

@@ -10,6 +10,8 @@ export type GraphQLV1Collective = {
   type: keyof typeof CollectiveType;
   isArchived?: boolean;
   parentCollective?: GraphQLV1Collective;
+  isFirstPartyHost?: boolean;
+  isTrustedHost?: boolean;
   settings?: Record<string, unknown>;
   isHost?: boolean;
   policies: Policies;
