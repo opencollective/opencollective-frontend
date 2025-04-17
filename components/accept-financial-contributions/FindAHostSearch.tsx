@@ -61,6 +61,8 @@ const FindAFiscalHostQuery = gql`
         totalHostedCollectives
         hostFeePercent
         isTrustedHost
+        isFirstPartyHost
+        isVerified
         location {
           id
           country

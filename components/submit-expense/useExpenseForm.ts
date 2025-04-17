@@ -523,8 +523,12 @@ const formSchemaQuery = gql`
   fragment ExpenseFormSubmitterFields on Account {
     id
     slug
+    type
+    isVerified
     name
     imageUrl
+    isHost
+    isArchived
   }
 
   fragment ExpenseFormPayeeFields on Account {

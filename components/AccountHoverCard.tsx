@@ -1,4 +1,5 @@
 import React from 'react';
+import type { QueryResult } from '@apollo/client';
 import { useQuery } from '@apollo/client';
 import type { Content } from '@radix-ui/react-hover-card';
 import clsx from 'clsx';
@@ -9,13 +10,13 @@ import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { isIndividualAccount } from '../lib/collective';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
-import type { UserContextualMembershipsQuery } from '../lib/graphql/types/v2/graphql';
-import type { Account, AccountWithHost } from '../lib/graphql/types/v2/schema';
+import type { AccountHoverCardFieldsFragment, UserContextualMembershipsQuery } from '../lib/graphql/types/v2/graphql';
 import { getCollectivePageRoute } from '../lib/url-helpers';
 
 import PrivateInfoIcon from './icons/PrivateInfoIcon';
 import { Collapsible, CollapsibleContent } from './ui/Collapsible';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from './ui/HoverCard';
+import { AccountTrustBadge } from './AccountTrustBadge';
 import Avatar from './Avatar';
 import FollowButton from './FollowButton';
 import FormattedMoneyAmount from './FormattedMoneyAmount';
@@ -32,15 +33,32 @@ export const accountHoverCardFields = gql`
     imageUrl
     isHost
     isArchived
+    isVerified
     ... on Individual {
+      id
       isGuest
     }
     ... on AccountWithHost {
       host {
         id
         slug
+        type
+        isTrustedHost
+        isFirstPartyHost
+        isVerified
       }
       approvedAt
+    }
+
+    ... on Organization {
+      host {
+        id
+        slug
+        type
+        isTrustedHost
+        isFirstPartyHost
+        isVerified
+      }
     }
 
     ... on AccountWithParent {
@@ -54,28 +72,7 @@ export const accountHoverCardFields = gql`
 
 type AccountHoverCardProps = {
   trigger: React.ReactNode;
-  account: {
-    slug: Account['slug'];
-    name?: Account['name'];
-    type?: Account['type'];
-    imageUrl?: Account['imageUrl'];
-    description?: Account['description'];
-    emails?: Account['emails'];
-    parent?: {
-      slug: Account['slug'];
-    };
-    host?: {
-      slug: Account['slug'];
-    };
-    approvedAt?: AccountWithHost['approvedAt'];
-    hostAgreements?: {
-      totalCount?: AccountWithHost['hostAgreements']['totalCount'];
-    };
-    stats?: {
-      balanceWithBlockedFunds?: Account['stats']['balanceWithBlockedFunds'];
-      totalPaidExpenses?: Account['stats']['totalPaidExpenses'];
-    };
-  };
+  account: QueryResult<AccountHoverCardFieldsFragment>['data'];
   includeAdminMembership?: {
     accountSlug?: string;
     hostSlug?: string;
@@ -315,7 +312,6 @@ export const AccountHoverCard = ({
 
   const infoItems = getInfoItems(account);
   const asyncInfoItems = getInfoItemsFromMembershipData(data);
-
   return (
     // HoverCard currently disabled for Vendors (need to fix styling, appropriate links, etc)
     <HoverCard open={open && !isVendor} onOpenChange={setOpen}>
@@ -338,9 +334,12 @@ export const AccountHoverCard = ({
             </div>
 
             <div className="overflow-hidden">
-              <Link href={getCollectivePageRoute(account)}>
-                <span className="block truncate font-medium hover:underline">{account.name}</span>
-              </Link>
+              <div className="flex items-center gap-1">
+                <Link href={getCollectivePageRoute(account)}>
+                  <span className="block truncate font-medium hover:underline">{account.name}</span>
+                </Link>
+                <AccountTrustBadge account={account} />
+              </div>
               <span className="truncate text-muted-foreground">@{account.slug}</span>
             </div>
           </div>
