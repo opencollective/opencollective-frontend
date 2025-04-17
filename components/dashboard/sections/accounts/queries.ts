@@ -78,7 +78,7 @@ export const accountsMetadataQuery = gql`
 // TODO: This query is using `legacyId` for host and member.account to interface with the
 // legacy `AddFundsForm`. Once the new add funds form will be implemented, we can remove these fields.
 export const accountsQuery = gql`
-  query AccountsDashboard($accountSlug: String!, $limit: Int!, $offset: Int!, $isActive: Boolean) {
+  query AccountsDashboard($accountSlug: String!, $limit: Int, $offset: Int, $isActive: Boolean) {
     account(slug: $accountSlug) {
       id
       legacyId

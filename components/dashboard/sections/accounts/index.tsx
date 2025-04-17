@@ -172,7 +172,7 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
                 size="xs"
                 variant="outline"
                 onClick={() => {
-                  showModal(InternalTransferModal, { accounts: activeAccounts }, 'internal-transfer-modal');
+                  showModal(InternalTransferModal, { accountSlug }, 'internal-transfer-modal');
                 }}
               >
                 <FormattedMessage defaultMessage="New internal transfer" id="v4unZI" />

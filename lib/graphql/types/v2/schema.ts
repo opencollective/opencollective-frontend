@@ -5763,6 +5763,8 @@ export type Host = Account & AccountWithContributions & {
   isAdmin: Scalars['Boolean']['output'];
   /** Returns whether this account is archived */
   isArchived: Scalars['Boolean']['output'];
+  /** Returns whether the host is trusted or not */
+  isFirstPartyHost: Scalars['Boolean']['output'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean']['output'];
   /** Returns whether the account is setup to Host collectives. */
@@ -12022,6 +12024,8 @@ export type TransactionsImportRow = {
   sourceId: Scalars['NonEmptyString']['output'];
   /** The status of the row */
   status: TransactionsImportRowStatus;
+  /** The transactions import associated with the row */
+  transactionsImport: TransactionsImportRow;
 };
 
 /** Action to perform on transactions import rows */

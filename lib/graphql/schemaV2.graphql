@@ -3944,6 +3944,11 @@ type Host implements Account & AccountWithContributions {
   isTrustedHost: Boolean!
 
   """
+  Returns whether the host is trusted or not
+  """
+  isFirstPartyHost: Boolean!
+
+  """
   Returns whether the host has any Stripe disputed orders
   """
   hasDisputedOrders: Boolean
@@ -7398,6 +7403,11 @@ type TransactionsImportRow {
   The order associated with the row
   """
   order: Order
+
+  """
+  The transactions import associated with the row
+  """
+  transactionsImport: TransactionsImportRow!
 }
 
 """
