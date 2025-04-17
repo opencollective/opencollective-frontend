@@ -1,5 +1,6 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
+import type { FormikProps } from 'formik';
 import { Form } from 'formik';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -19,6 +20,8 @@ import { Button } from '../../../ui/Button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../../../ui/Dialog';
 import { InputGroup } from '../../../ui/Input';
 import { toast } from '../../../ui/useToast';
+
+import { accountsQuery } from './queries';
 
 const transferFundsFormValuesSchema = z.object({
   fromAccount: z.object({ id: z.string().optional(), name: z.string().optional() }), // accountReferenceInput
@@ -47,18 +50,45 @@ const internalTransferMutation = gql`
 
 interface InternalTransferModalProps extends BaseModalProps {
   defaultFromAccount?: DashboardAccountsQueryFieldsFragment;
-  accounts: DashboardAccountsQueryFieldsFragment[];
+  accountSlug: string;
 }
 
 export default function InternalTransferModal({
   open,
   setOpen,
-  accounts,
+  accountSlug,
   defaultFromAccount,
   onCloseFocusRef,
 }: InternalTransferModalProps) {
   const intl = useIntl();
-  const [createInternalTransfer, { loading }] = useMutation(internalTransferMutation, { context: API_V2_CONTEXT });
+  const formikRef = React.useRef<FormikProps<z.infer<typeof transferFundsFormValuesSchema>>>(null);
+
+  const { data, loading } = useQuery(accountsQuery, {
+    variables: {
+      accountSlug,
+      limit: 100, // TODO: This is the max limit of childrenAccounts, when refactoring the Collective Picker Async to work with GQL v2, this limitation can be worked around
+    },
+    context: API_V2_CONTEXT,
+  });
+
+  const activeAccounts = React.useMemo(
+    () =>
+      data?.account ? [data?.account, ...(data?.account?.childrenAccounts?.nodes.filter(a => a.isActive) || [])] : [],
+    [data?.account],
+  );
+
+  // Update currency when activeAccounts load
+  React.useEffect(() => {
+    if (activeAccounts.length > 0 && activeAccounts[0]?.currency && formikRef.current) {
+      formikRef.current.setFieldValue('amount.currency', activeAccounts[0].currency);
+    }
+  }, [activeAccounts]);
+
+  const [createInternalTransfer, { loading: loadingMutation }] = useMutation(internalTransferMutation, {
+    context: API_V2_CONTEXT,
+  });
+
+  const isLoading = loadingMutation || loading;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -85,12 +115,12 @@ export default function InternalTransferModal({
             toAccount: undefined,
             amount: {
               valueInCents: 0,
-              currency: accounts[0]?.currency || Currency.USD,
+              currency: activeAccounts[0]?.currency,
             },
           }}
           onSubmit={async values => {
             const paymentMethods = values.fromAccount?.id
-              ? accounts.find(a => a.id === values.fromAccount.id)?.paymentMethods
+              ? activeAccounts.find(a => a.id === values.fromAccount.id)?.paymentMethods
               : null;
             if (!paymentMethods || paymentMethods.length === 0) {
               toast({
@@ -145,11 +175,13 @@ export default function InternalTransferModal({
               toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
             }
           }}
+          innerRef={formikRef}
         >
           {({ setFieldValue, values }) => {
             const availableBalance = values.fromAccount?.id
-              ? accounts.find(a => a.id === values.fromAccount.id)?.stats.balance
+              ? activeAccounts.find(a => a.id === values.fromAccount.id)?.stats.balance
               : null;
+
             return (
               <Form>
                 <div className="space-y-4">
@@ -159,8 +191,9 @@ export default function InternalTransferModal({
                   >
                     {({ field }) => (
                       <CollectivePicker
+                        inputId={field.id}
                         collective={field.value}
-                        collectives={accounts}
+                        collectives={activeAccounts}
                         onChange={({ value }) => {
                           setFieldValue('fromAccount', value);
                         }}
@@ -174,8 +207,9 @@ export default function InternalTransferModal({
                   >
                     {({ field }) => (
                       <CollectivePicker
+                        inputId={field.id}
                         collective={field.value}
-                        collectives={accounts}
+                        collectives={activeAccounts}
                         onChange={({ value }) => setFieldValue('toAccount', value)}
                       />
                     )}
@@ -238,10 +272,10 @@ export default function InternalTransferModal({
                   )}
 
                   <div className="flex items-center justify-end gap-3">
-                    <Button onClick={() => setOpen(false)} variant="outline" disabled={loading}>
+                    <Button onClick={() => setOpen(false)} variant="outline" disabled={loadingMutation}>
                       <FormattedMessage defaultMessage="Cancel" id="actions.cancel" />
                     </Button>
-                    <Button type="submit" loading={loading}>
+                    <Button type="submit" disabled={isLoading} loading={loadingMutation}>
                       <FormattedMessage defaultMessage="Transfer" id="actions.transfer" />
                     </Button>
                   </div>
