@@ -19,6 +19,7 @@ import MessageBox from '../components/MessageBox';
 import SignInOrJoinFree from '../components/SignInOrJoinFree';
 import { P } from '../components/Text';
 import { withUser } from '../components/UserProvider';
+import { getEnvVar } from '@/lib/env-utils';
 
 type SigninPageProps = {
   token: string;
@@ -164,8 +165,9 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
 
   renderContent() {
     const { loadingLoggedInUser, errorLoggedInUser, token, next, form, LoggedInUser, whitelabel } = this.props;
+    const env = getEnvVar('OC_ENV');
 
-    if (whitelabel?.isNonPlatformDomain && !whitelabel?.isWhitelabelDomain) {
+    if (whitelabel?.isNonPlatformDomain && !whitelabel?.isWhitelabelDomain && env === 'production') {
       return (
         <MessageBox type="error" withIcon>
           <FormattedMessage id="domain.notAuthorized" defaultMessage="This page is not available on this domain." />
