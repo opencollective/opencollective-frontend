@@ -393,6 +393,8 @@ const formSchemaQuery = gql`
     type
     currency
     settings
+    isFirstPartyHost
+    isTrustedHost
 
     location {
       id
@@ -463,6 +465,7 @@ const formSchemaQuery = gql`
     currency
     settings
     supportedExpenseTypes
+    isVerified
 
     stats {
       balance {
@@ -523,8 +526,12 @@ const formSchemaQuery = gql`
   fragment ExpenseFormSubmitterFields on Account {
     id
     slug
+    type
+    isVerified
     name
     imageUrl
+    isHost
+    isArchived
   }
 
   fragment ExpenseFormPayeeFields on Account {

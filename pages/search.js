@@ -622,6 +622,7 @@ const searchPageQuery = gql`
         }
         tags
         isHost
+        isVerified
         imageUrl(height: 96)
         backgroundImageUrl(height: 208)
         description
@@ -643,8 +644,21 @@ const searchPageQuery = gql`
             id
             hostFeePercent
             totalHostedCollectives
+            isTrustedHost
+            isFirstPartyHost
           }
         }
+
+        ... on AccountWithHost {
+          host {
+            id
+            hostFeePercent
+            totalHostedCollectives
+            isTrustedHost
+            isFirstPartyHost
+          }
+        }
+
         ... on AccountWithParent {
           parent {
             id

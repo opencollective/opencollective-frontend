@@ -442,6 +442,11 @@ export const ActivityDescriptionI18n = defineMessages({
       'Crypto <Order>contribution</Order> from <FromAccount></FromAccount> to <Account></Account> set as processing',
     id: '6QW6MJ',
   },
+  ORDER_PROCESSED: {
+    defaultMessage:
+      '<Order>Contribution</Order> from <FromAccount></FromAccount> to <Account></Account> processed successfully',
+    id: 'wWPkPb',
+  },
   ORDER_PENDING_CONTRIBUTION_NEW: {
     defaultMessage: 'New <Order>expected funds</Order> from <FromAccount></FromAccount> to <Account></Account>',
     id: 'kh8yZm',

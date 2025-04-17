@@ -12,6 +12,7 @@ export type GraphQLV1Collective = {
   parentCollective?: GraphQLV1Collective;
   isFirstPartyHost?: boolean;
   isTrustedHost?: boolean;
+  isVerified?: boolean;
   settings?: Record<string, unknown>;
   isHost?: boolean;
   policies: Policies;
