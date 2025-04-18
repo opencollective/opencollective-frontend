@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMutation } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { useFormik } from 'formik';
 import { trim } from 'lodash';
 import { FormattedMessage } from 'react-intl';
@@ -13,6 +13,12 @@ import StyledInput from '../StyledInput';
 import StyledInputField from '../StyledInputField';
 import { P } from '../Text';
 import { Button } from '../ui/Button';
+import { TableBody, TableCell, TableRow, Table } from '../ui/Table';
+import { Badge } from '../ui/Badge';
+import { Skeleton } from '../ui/Skeleton';
+import { Tooltip, TooltipTrigger, TooltipContent } from '../ui/Tooltip';
+import { editCollectiveSettingsMutation } from '@/lib/graphql/v1/mutations';
+import StyledCheckbox from '../StyledCheckbox';
 
 const createConnectedAccountMutation = gql`
   mutation CreateConnectedAccount($connectedAccount: ConnectedAccountCreateInput!, $account: AccountReferenceInput!) {
@@ -26,18 +32,51 @@ const createConnectedAccountMutation = gql`
   }
 `;
 
+const editPayPalAccountQuery = gql`
+  query EditPayPalAccount($slug: String!) {
+    account(slug: $slug) {
+      id
+      connectedAccounts(service: paypal) {
+        id
+        legacyId
+        service
+        createdAt
+        settings
+        hash
+        createdByAccount {
+          id
+          legacyId
+          name
+          slug
+        }
+        accountsMirrored {
+          id
+          slug
+          name
+        }
+      }
+      settings
+    }
+  }
+`;
+
 const EditPayPalAccount = props => {
-  const isReceiving = props.variation === 'RECEIVING';
+  const { data, loading, refetch } = useQuery(editPayPalAccountQuery, {
+    variables: { slug: props.collective.slug },
+    context: API_V2_CONTEXT,
+  });
   const mutationOptions = {
     context: API_V2_CONTEXT,
     refetchQueries: [{ query: editCollectivePageQuery, variables: { slug: props.collective.slug } }],
     awaitRefetchQueries: true,
   };
-  const [connectedAccount, setConnectedAccount] = React.useState(props.connectedAccount);
+  const connectedAccount = data?.account?.connectedAccounts?.[0];
   const [createConnectedAccount, { loading: isCreating, error: createError }] = useMutation(
     createConnectedAccountMutation,
     mutationOptions,
   );
+  const [setSettings, { loading: mutating, error: settingUpdateError }] = useMutation(editCollectiveSettingsMutation);
+
   const formik = useFormik({
     initialValues: {
       token: '',
@@ -56,7 +95,7 @@ const EditPayPalAccount = props => {
           account: { slug: props.collective.slug },
         },
       });
-      setConnectedAccount(createdAccount);
+      await refetch();
     },
     validate(values) {
       const errors = {};
@@ -70,7 +109,22 @@ const EditPayPalAccount = props => {
     },
   });
 
-  if (!connectedAccount) {
+  const togglePayPalPayout = async () => {
+    await setSettings({
+      variables: {
+        id: props.collective.id,
+        settings: {
+          ...props.collective.settings,
+          disablePaypalPayouts: !props.collective.settings.disablePaypalPayouts,
+        },
+      },
+    });
+  };
+
+  const isReceiving = props.variation === 'RECEIVING';
+  if (loading) {
+    return <Skeleton className="mb-3 h-10 w-full" />;
+  } else if (!connectedAccount) {
     return (
       <form onSubmit={formik.handleSubmit}>
         <P fontSize="12px" color="black.700" fontWeight="normal" mb={3}>
@@ -128,32 +182,67 @@ const EditPayPalAccount = props => {
     );
   } else {
     return (
-      <React.Fragment>
-        <P>
-          <FormattedMessage
-            id="collective.connectedAccounts.paypal.connected"
-            defaultMessage="PayPal connected on {updatedAt, date, short}"
-            values={{
-              updatedAt: new Date(connectedAccount.updatedAt || connectedAccount.createdAt),
-            }}
-          />
-        </P>
-        <P mt={3} fontStyle="italic">
+      <div className="flex flex-col gap-4">
+        <Table>
+          <TableBody>
+            <TableRow className="text-sm text-gray-700">
+              <TableCell className="w-fit min-w-0">
+                <Badge size="sm">{connectedAccount.hash?.slice(0, 7)}</Badge>
+              </TableCell>
+              <TableCell className="w-full">
+                <p>
+                  <FormattedMessage
+                    id="EditWiseAccounts.connectedby"
+                    defaultMessage="Connected by {createdByName} on {updatedAt, date, short}"
+                    values={{
+                      updatedAt: new Date(connectedAccount.createdAt),
+                      createdByName: connectedAccount.createdByAccount.name,
+                    }}
+                  />
+                </p>
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+        <div className="text-sm">
           <FormattedMessage
             defaultMessage="Please contact <SupportLink>support</SupportLink> to disconnect PayPal."
             id="ivhAav"
             values={{ SupportLink: I18nSignInLink }}
           />
-        </P>
-      </React.Fragment>
+        </div>
+        {!isReceiving && (
+          <div className="flex flex-col gap-2">
+            <h1 className="text-base font-bold">
+              <FormattedMessage id="header.options" defaultMessage="Options" />
+            </h1>
+            <StyledCheckbox
+              name="paypalPayoutsEnabled"
+              label={
+                <FormattedMessage
+                  id="collective.sendMoney.PayPalPayouts.description"
+                  defaultMessage="Enable PayPal Payouts so users are able to request Expenses to be paid with PayPal."
+                />
+              }
+              checked={!props.collective.settings?.disablePaypalPayouts}
+              onChange={togglePayPalPayout}
+              loading={mutating}
+            />
+            <p className="text-xs text-gray-500">
+              <FormattedMessage
+                id="collective.sendMoney.PayPalPayouts.details"
+                defaultMessage="The PayPal Payouts is an opt-in feature and needs to be manually requested on and approved by PayPal before being enabled."
+              />
+            </p>
+          </div>
+        )}
+      </div>
     );
   }
 };
 
 EditPayPalAccount.propTypes = {
-  connectedAccount: PropTypes.object,
   collective: PropTypes.object,
-  intl: PropTypes.object.isRequired,
   variation: PropTypes.string,
 };
 

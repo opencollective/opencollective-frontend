@@ -19,7 +19,6 @@ import { Button } from '../ui/Button';
 import { toast } from '../ui/useToast';
 
 import EditPayPalAccount from './EditPayPalAccount';
-import EditTransferWiseAccount from './EditTransferWiseAccount';
 
 class EditConnectedAccount extends React.Component {
   static propTypes = {
@@ -29,7 +28,7 @@ class EditConnectedAccount extends React.Component {
     intl: PropTypes.object.isRequired,
     service: PropTypes.string,
     connectedAccount: PropTypes.object,
-    variation: PropTypes.bool,
+    variation: PropTypes.string,
     router: PropTypes.object,
     client: PropTypes.object.isRequired,
   };
@@ -177,13 +176,8 @@ class EditConnectedAccount extends React.Component {
     const { intl, service, collective, variation, connectedAccount, router } = this.props;
     const { isConnecting, isDisconnecting } = this.state;
 
-    if (service === 'transferwise') {
-      // Notice we're passing props.connectedAccount to EditTransferWiseAccount
-      // This happens because the component will take care of refetching data from
-      // the DB to make sure it is displaying accurate information.
-      return (
-        <EditTransferWiseAccount collective={collective} connectedAccount={this.props.connectedAccount} intl={intl} />
-      );
+    if (service === 'transferwise' || service === 'paypal') {
+      return null;
     } else if (service === 'paypal') {
       return (
         <EditPayPalAccount

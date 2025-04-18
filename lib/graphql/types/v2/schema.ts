@@ -182,6 +182,12 @@ export type AccountChildrenAccountsArgs = {
 
 
 /** Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization) */
+export type AccountConnectedAccountsArgs = {
+  service?: InputMaybe<ConnectedAccountService>;
+};
+
+
+/** Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization) */
 export type AccountConversationsArgs = {
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
@@ -1586,6 +1592,12 @@ export type BotChildrenAccountsArgs = {
 
 
 /** This represents a Bot account */
+export type BotConnectedAccountsArgs = {
+  service?: InputMaybe<ConnectedAccountService>;
+};
+
+
+/** This represents a Bot account */
 export type BotConversationsArgs = {
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
@@ -2101,6 +2113,12 @@ export type CollectiveChildrenAccountsArgs = {
 
 
 /** This represents a Collective account */
+export type CollectiveConnectedAccountsArgs = {
+  service?: InputMaybe<ConnectedAccountService>;
+};
+
+
+/** This represents a Collective account */
 export type CollectiveContributorsArgs = {
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
@@ -2575,8 +2593,13 @@ export type ConfirmGuestAccountResponse = {
 /** This represents a Connected Account */
 export type ConnectedAccount = {
   __typename?: 'ConnectedAccount';
+  /** The accounts that are mirroring this connected account */
+  accountsMirrored?: Maybe<Array<Maybe<Account>>>;
   /** The date on which the ConnectedAccount was created */
   createdAt: Scalars['DateTime']['output'];
+  /** The account who connected this account */
+  createdByAccount?: Maybe<Account>;
+  hash?: Maybe<Scalars['String']['output']>;
   /** Unique identifier for this connected account */
   id: Scalars['String']['output'];
   /**
@@ -4105,6 +4128,12 @@ export type EventChildrenAccountsArgs = {
 
 
 /** This represents an Event account */
+export type EventConnectedAccountsArgs = {
+  service?: InputMaybe<ConnectedAccountService>;
+};
+
+
+/** This represents an Event account */
 export type EventContributorsArgs = {
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
@@ -5311,6 +5340,12 @@ export type FundChildrenAccountsArgs = {
 
 
 /** This represents an Project account */
+export type FundConnectedAccountsArgs = {
+  service?: InputMaybe<ConnectedAccountService>;
+};
+
+
+/** This represents an Project account */
 export type FundContributorsArgs = {
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
@@ -5763,6 +5798,8 @@ export type Host = Account & AccountWithContributions & {
   isAdmin: Scalars['Boolean']['output'];
   /** Returns whether this account is archived */
   isArchived: Scalars['Boolean']['output'];
+  /** Returns whether the host is trusted or not */
+  isFirstPartyHost: Scalars['Boolean']['output'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean']['output'];
   /** Returns whether the account is setup to Host collectives. */
@@ -5911,6 +5948,12 @@ export type HostChildrenAccountsArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: OrderByInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** This represents an Host account */
+export type HostConnectedAccountsArgs = {
+  service?: InputMaybe<ConnectedAccountService>;
 };
 
 
@@ -6839,6 +6882,12 @@ export type IndividualChildrenAccountsArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: OrderByInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** This represents an Individual account */
+export type IndividualConnectedAccountsArgs = {
+  service?: InputMaybe<ConnectedAccountService>;
 };
 
 
@@ -9252,6 +9301,12 @@ export type OrganizationChildrenAccountsArgs = {
 
 
 /** This represents an Organization account */
+export type OrganizationConnectedAccountsArgs = {
+  service?: InputMaybe<ConnectedAccountService>;
+};
+
+
+/** This represents an Organization account */
 export type OrganizationContributorsArgs = {
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
@@ -10343,6 +10398,12 @@ export type ProjectChildrenAccountsArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: OrderByInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** This represents an Project account */
+export type ProjectConnectedAccountsArgs = {
+  service?: InputMaybe<ConnectedAccountService>;
 };
 
 
@@ -12022,6 +12083,8 @@ export type TransactionsImportRow = {
   sourceId: Scalars['NonEmptyString']['output'];
   /** The status of the row */
   status: TransactionsImportRowStatus;
+  /** The transactions import associated with the row */
+  transactionsImport: TransactionsImportRow;
 };
 
 /** Action to perform on transactions import rows */
@@ -12544,6 +12607,12 @@ export type VendorChildrenAccountsArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: OrderByInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** This represents a Vendor account */
+export type VendorConnectedAccountsArgs = {
+  service?: InputMaybe<ConnectedAccountService>;
 };
 
 

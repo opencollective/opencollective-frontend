@@ -7,11 +7,11 @@ import hasFeature, { FEATURES } from '../../../lib/allowed-features';
 import { editCollectiveSettingsMutation } from '../../../lib/graphql/v1/mutations';
 
 import MessageBox from '../../MessageBox';
-import { P } from '../../Text';
 import { Button } from '../../ui/Button';
 
-import ConnectedAccounts from './ConnectedAccounts';
 import SettingsSectionTitle from './SettingsSectionTitle';
+import EditTransferWiseAccount from '../EditTransferWiseAccount';
+import EditPayPalAccount from '../EditPayPalAccount';
 
 class SendingMoney extends React.Component {
   static propTypes = {
@@ -46,67 +46,31 @@ class SendingMoney extends React.Component {
   };
 
   render() {
-    const services = ['transferwise'];
-    if (hasFeature(this.props.collective, FEATURES.PAYPAL_PAYOUTS)) {
-      services.push('paypal');
-    }
-
-    let paypalConnectButton;
-    if (this.props.collective.settings?.disablePaypalPayouts) {
-      paypalConnectButton = (
-        <FormattedMessage id="collective.paypalPayoutsEnable.button" defaultMessage="Enable PayPal Payouts" />
-      );
-    } else {
-      paypalConnectButton = (
-        <FormattedMessage id="collective.paypalPayoutsDisable.button" defaultMessage="Disable PayPal Payouts" />
-      );
-    }
+    const paypalAccount = this.props.collective.connectedAccounts?.find(c => c.service === 'paypal');
 
     return (
       <Fragment>
-        <ConnectedAccounts
-          collective={this.props.collective}
-          connectedAccounts={this.props.collective.connectedAccounts}
-          services={services}
-        />
-        {services.includes('paypal') && this.props.collective.connectedAccounts?.find(c => c.service === 'paypal') && (
-          <Fragment>
-            <SettingsSectionTitle>
-              <FormattedMessage id="PayoutMethod.Type.Paypal" defaultMessage="PayPal" />
-            </SettingsSectionTitle>
-            {!this.props.collective.settings?.disablePaypalPayouts && (
-              <P mb={3}>
-                <FormattedMessage
-                  id="collective.sendMoney.paypalEnabled.description"
-                  defaultMessage="PayPal Payouts are active. Contributors can request Expenses to be paid with PayPal."
-                />
-              </P>
-            )}
-            {this.props.collective.settings?.disablePaypalPayouts && (
-              <P mb={3}>
-                <FormattedMessage
-                  id="collective.sendMoney.paypalDisabled.description"
-                  defaultMessage="PayPal Payouts are disabled. Contributors are not able to request Expenses to be paid with PayPal."
-                />
-              </P>
-            )}
-            <Button
-              loading={this.state.isSubmitting}
-              onClick={this.togglePaypal}
-              type="submit"
-              size="sm"
-              variant="outline"
-              className="w-fit grow-0"
-            >
-              {paypalConnectButton}
-            </Button>
-            {this.state.error && (
-              <MessageBox type="error" withIcon my={3}>
-                {this.state.error}
-              </MessageBox>
-            )}
-          </Fragment>
-        )}
+        <div className="flex flex-col gap-8">
+          {hasFeature(this.props.collective, FEATURES.PAYPAL_PAYOUTS) && (
+            <div>
+              <SettingsSectionTitle>
+                <FormattedMessage id="PayoutMethod.Type.Paypal" defaultMessage="PayPal" />
+              </SettingsSectionTitle>
+              <EditPayPalAccount
+                collective={this.props.collective}
+                connectedAccount={paypalAccount}
+                variation="SENDING"
+              />
+            </div>
+          )}
+          <div>
+            <SettingsSectionTitle>Wise</SettingsSectionTitle>
+            <EditTransferWiseAccount
+              collective={this.props.collective}
+              connectedAccount={this.props.connectedAccount}
+            />
+          </div>
+        </div>
       </Fragment>
     );
   }
