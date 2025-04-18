@@ -67,7 +67,7 @@ const CreateExpenseFAQ = ({ defaultOpen, ...props }) => (
     <Box mt={2} pl={2}>
       <StyledLink
         as={StyledLink}
-        href="https://docs.opencollective.com/help/expenses-and-getting-paid/submitting-expenses"
+        href="https://documentation.opencollective.com/expenses-and-getting-paid/submitting-expenses"
         openInNewTab
         fontSize="12px"
         color="black.700"
