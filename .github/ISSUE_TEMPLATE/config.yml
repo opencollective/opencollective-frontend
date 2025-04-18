@@ -7,7 +7,7 @@ contact_links:
     url: https://discord.opencollective.com
     about: Engage with the Open Collective community
   - name: Documentation
-    url: https://docs.opencollective.com/help/
+    url: https://documentation.opencollective.com
     about: Documentation for Open Collective
   - name: Security Policy
     url: https://github.com/opencollective/opencollective/security/policy

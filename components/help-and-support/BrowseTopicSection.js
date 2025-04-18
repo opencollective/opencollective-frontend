@@ -101,7 +101,7 @@ const BrowseTopics = () => {
             </SectionTitle>
           </Box>
           <Box display={['none', 'inline-block']}>
-            <Link href="https://docs.opencollective.com" openInNewTab>
+            <Link href="https://documentation.opencollective.com" openInNewTab>
               <StyledButton minWidth={110} buttonStyle="marketing" whiteSpace="nowrap">
                 <FormattedMessage id="helpAndSupport.viewAll" defaultMessage="View All" />
               </StyledButton>
