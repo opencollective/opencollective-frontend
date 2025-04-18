@@ -33,11 +33,14 @@ export const collectivePageQuery = gqlV1/* GraphQL */ `
       settings
       isActive
       isApproved
+      isVerified
       isArchived
       isFrozen
       isHost
       isIncognito
       isGuest
+      isTrustedHost
+      isFirstPartyHost
       hostFeePercent
       platformFeePercent
       image

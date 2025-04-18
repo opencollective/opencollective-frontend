@@ -52,20 +52,25 @@ const AccountRenderer = ({
     // to prevent fetching all accounts when used in the combo select filter that already queries for these fields
     skip: !!account.description && !!account.type,
   });
-  account = data?.account || account;
+
+  const trigger = (
+    <div className="flex h-full w-full max-w-48 items-center justify-between gap-2 overflow-hidden">
+      <Avatar collective={account} radius={20} />
+      <div className="relative flex flex-1 items-center justify-between gap-1 overflow-hidden">
+        <span className="truncate">{account.name ?? account.slug}</span>
+      </div>
+    </div>
+  );
+
+  if (!data?.account) {
+    return trigger;
+  }
 
   return (
     <AccountHoverCard
-      account={account}
+      account={data.account}
       {...(inOptionsList && { hoverCardContentProps: { side: 'right', sideOffset: 24 } })}
-      trigger={
-        <div className="flex h-full w-full max-w-48 items-center justify-between gap-2 overflow-hidden">
-          <Avatar collective={account} radius={20} />
-          <div className="relative flex flex-1 items-center justify-between gap-1 overflow-hidden">
-            <span className="truncate">{account.name ?? account.slug}</span>
-          </div>
-        </div>
-      }
+      trigger={trigger}
     />
   );
 };

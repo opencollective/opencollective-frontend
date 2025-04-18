@@ -15,6 +15,8 @@ import { CollectiveType } from '../../../lib/constants/collectives';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 import { twitterProfileUrl } from '../../../lib/url-helpers';
 
+import { AccountTrustBadge } from '@/components/AccountTrustBadge';
+
 import CodeRepositoryIcon from '../../CodeRepositoryIcon';
 import ContactCollectiveBtn from '../../ContactCollectiveBtn';
 import Container from '../../Container';
@@ -180,6 +182,7 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
               wordBreak="normal"
             >
               {collective.name || collective.slug}
+              <AccountTrustBadge account={collective} size={24} className="ml-3 inline-block" />
             </H1>
           </Box>
           <Flex>
