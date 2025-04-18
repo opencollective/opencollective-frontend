@@ -43,7 +43,7 @@ const ContributeFAQ = ({ collective, ...props }) => (
           values={{
             Link: getI18nLink({
               openInNewTab: true,
-              href: 'https://docs.opencollective.com/help/financial-contributors/platform-tips',
+              href: 'https://documentation.opencollective.com/giving-to-collectives/platform-tips',
             }),
           }}
         />
