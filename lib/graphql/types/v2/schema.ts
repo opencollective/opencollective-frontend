@@ -89,6 +89,8 @@ export type Account = {
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether the account is verified */
+  isVerified: Scalars['Boolean']['output'];
   /**
    * The internal database identifier of the collective (ie: 580)
    * @deprecated 2020-01-01: should only be used during the transition to GraphQL API v2.
@@ -1497,6 +1499,8 @@ export type Bot = Account & {
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether the account is verified */
+  isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
@@ -1992,6 +1996,8 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether the account is verified */
+  isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
@@ -3990,6 +3996,8 @@ export type Event = Account & AccountWithContributions & AccountWithHost & Accou
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether the account is verified */
+  isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
@@ -5202,6 +5210,8 @@ export type Fund = Account & AccountWithContributions & AccountWithHost & {
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether the account is verified */
+  isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
@@ -5774,6 +5784,8 @@ export type Host = Account & AccountWithContributions & {
   isOpenToApplications?: Maybe<Scalars['Boolean']['output']>;
   /** Returns whether the host is trusted or not */
   isTrustedHost: Scalars['Boolean']['output'];
+  /** Whether the account is verified */
+  isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
@@ -6744,6 +6756,8 @@ export type Individual = Account & {
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether the account is verified */
+  isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
@@ -9142,6 +9156,8 @@ export type Organization = Account & AccountWithContributions & {
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether the account is verified */
+  isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
@@ -10238,6 +10254,8 @@ export type Project = Account & AccountWithContributions & AccountWithHost & Acc
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether the account is verified */
+  isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
@@ -10767,6 +10785,7 @@ export type QueryAccountsArgs = {
   isHost?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  onlyOpenToApplications?: InputMaybe<Scalars['Boolean']['input']>;
   orderBy?: InputMaybe<OrderByInput>;
   parent?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
@@ -12025,7 +12044,7 @@ export type TransactionsImportRow = {
   /** The status of the row */
   status: TransactionsImportRowStatus;
   /** The transactions import associated with the row */
-  transactionsImport: TransactionsImportRow;
+  transactionsImport: TransactionsImport;
 };
 
 /** Action to perform on transactions import rows */
@@ -12445,6 +12464,8 @@ export type Vendor = Account & AccountWithContributions & {
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether the account is verified */
+  isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
