@@ -52,7 +52,7 @@ export const ErrorFallbackLinks = ({
         {showDiscover && <FormattedMessage id="menu.discover" defaultMessage="Discover" />}
       </Link>
       {showDocumentation && (
-        <Link href="https://docs.opencollective.com">
+        <Link href="https://documentation.opencollective.com">
           <FormattedMessage id="menu.documentation" defaultMessage="Documentation" />
         </Link>
       )}

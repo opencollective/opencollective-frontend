@@ -260,7 +260,7 @@ const TopBar = ({
                           onClick={onClick}
                           whiteSpace="nowrap"
                         >
-                          <FormattedMessage id="company" defaultMessage="Company" />
+                          <FormattedMessage id="Tags.ORGANIZATION" defaultMessage="Organization" />
                           {popupOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                         </NavButton>
                       )}
@@ -273,7 +273,7 @@ const TopBar = ({
                             <FormattedMessage id="company.blog" defaultMessage="Blog" />
                           </NavItem>
                         </a>
-                        <a href="https://docs.opencollective.com/help/about/introduction">
+                        <a href="https://documentation.opencollective.com/our-organization/about">
                           <NavItem as={Container} mb={16}>
                             <FormattedMessage id="collective.about.title" defaultMessage="About" />
                           </NavItem>

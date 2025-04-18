@@ -71,7 +71,7 @@ const learningChannels = [
   {
     id: 'documentation',
     name: 'Documentation',
-    link: 'https://docs.opencollective.com',
+    link: 'https://documentation.opencollective.com',
     desktopItemOrder: 1,
   },
   {

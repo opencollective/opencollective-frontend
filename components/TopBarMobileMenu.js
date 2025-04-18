@@ -154,7 +154,7 @@ const TopBarMobileMenu = ({ closeMenu, useDashboard, onHomeRoute }) => {
                   justifyContent="space-between"
                   onClick={() => setState({ ...state, viewCompanyMenu: !state.viewCompanyMenu })}
                 >
-                  <FormattedMessage id="company" defaultMessage="Company" />
+                  <FormattedMessage id="Tags.ORGANIZATION" defaultMessage="Organization" />
                   <ChevronDown size={20} />
                 </Flex>
                 {state.viewCompanyMenu && (

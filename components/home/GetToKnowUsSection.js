@@ -147,7 +147,7 @@ const GetToKnowUs = () => {
             >
               <StyledLink
                 color="black.800"
-                href="https://docs.opencollective.com"
+                href="https://documentation.opencollective.com"
                 textDecoration="underline"
                 openInNewTab
               >
