@@ -21,12 +21,10 @@ import { toast } from '../ui/useToast';
 class EditConnectedAccount extends React.Component {
   static propTypes = {
     collective: PropTypes.object.isRequired,
-    connectedAccounts: PropTypes.arrayOf(PropTypes.object),
     options: PropTypes.object,
     intl: PropTypes.object.isRequired,
     service: PropTypes.string,
     connectedAccount: PropTypes.object,
-    variation: PropTypes.string,
     router: PropTypes.object,
     client: PropTypes.object.isRequired,
   };
