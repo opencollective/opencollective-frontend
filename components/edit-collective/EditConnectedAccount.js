@@ -10,16 +10,13 @@ import { connectAccount, connectAccountCallback, disconnectAccount } from '../..
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage';
 import { getWebsiteUrl, isValidUrl, parseToBoolean } from '../../lib/utils';
 
-import DateTime from '../DateTime';
+import { ConnectedAccountsTable } from '../ConnectedAccountsTable';
 import { Box, Flex } from '../Grid';
 import MessageBox from '../MessageBox';
 import StyledSpinner from '../StyledSpinner';
 import { P } from '../Text';
 import { Button } from '../ui/Button';
 import { toast } from '../ui/useToast';
-
-import EditPayPalAccount from './EditPayPalAccount';
-import EditTransferWiseAccount from './EditTransferWiseAccount';
 
 class EditConnectedAccount extends React.Component {
   static propTypes = {
@@ -29,7 +26,7 @@ class EditConnectedAccount extends React.Component {
     intl: PropTypes.object.isRequired,
     service: PropTypes.string,
     connectedAccount: PropTypes.object,
-    variation: PropTypes.bool,
+    variation: PropTypes.string,
     router: PropTypes.object,
     client: PropTypes.object.isRequired,
   };
@@ -174,25 +171,11 @@ class EditConnectedAccount extends React.Component {
   };
 
   render() {
-    const { intl, service, collective, variation, connectedAccount, router } = this.props;
-    const { isConnecting, isDisconnecting } = this.state;
+    const { intl, service, connectedAccount, router } = this.props;
+    const { isConnecting } = this.state;
 
-    if (service === 'transferwise') {
-      // Notice we're passing props.connectedAccount to EditTransferWiseAccount
-      // This happens because the component will take care of refetching data from
-      // the DB to make sure it is displaying accurate information.
-      return (
-        <EditTransferWiseAccount collective={collective} connectedAccount={this.props.connectedAccount} intl={intl} />
-      );
-    } else if (service === 'paypal') {
-      return (
-        <EditPayPalAccount
-          collective={collective}
-          connectedAccount={this.props.connectedAccount}
-          variation={variation}
-          intl={intl}
-        />
-      );
+    if (service === 'transferwise' || service === 'paypal') {
+      return null;
     }
 
     const disableReason = this.messages[`collective.connectedAccounts.${service}.disableReason`];
@@ -213,42 +196,11 @@ class EditConnectedAccount extends React.Component {
               </MessageBox>
             )}
             {connectedAccount ? (
-              <Flex flexDirection="column" width="100%">
-                <P mb={2}>
-                  <FormattedMessage
-                    defaultMessage="{service} account {username} connected on {date}"
-                    id="ur9IXI"
-                    values={{
-                      service: capitalize(connectedAccount.service),
-                      username: !connectedAccount.username ? '' : <strong>@{connectedAccount.username}</strong>,
-                      date: (
-                        <i>
-                          <DateTime value={connectedAccount.updatedAt} />
-                        </i>
-                      ),
-                    }}
-                  />
-                </P>
-                <Flex mt={1} gridGap="8px" flexWrap="wrap">
-                  <Button
-                    size="sm"
-                    onClick={() => this.connect(service)}
-                    loading={isConnecting}
-                    disabled={disableReason}
-                    variant="outline"
-                  >
-                    <FormattedMessage id="collective.connectedAccounts.reconnect.button" defaultMessage="Reconnect" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => this.disconnect(service)}
-                    loading={isDisconnecting}
-                  >
-                    <FormattedMessage id="collective.connectedAccounts.disconnect.button" defaultMessage="Disconnect" />
-                  </Button>
-                </Flex>
-              </Flex>
+              <ConnectedAccountsTable
+                connectedAccounts={[connectedAccount]}
+                disconnect={() => this.disconnect(service)}
+                reconnect={() => this.connect(service)}
+              />
             ) : (
               <Box>
                 <P fontSize="12px" color="black.600" fontWeight="normal" mb={2}>

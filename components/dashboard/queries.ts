@@ -20,6 +20,7 @@ export const adminPanelQuery = gql`
       canHaveChangelogUpdates
       connectedAccounts {
         id
+        hash
         service
       }
       duplicatedAccounts {
