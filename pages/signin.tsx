@@ -7,6 +7,7 @@ import { isEmail } from 'validator';
 
 import { isSuspiciousUserAgent, RobotsDetector } from '../lib/robots-detector';
 import { isTrustedSigninRedirectionUrl, isValidRelativeUrl } from '../lib/utils';
+import { getEnvVar } from '@/lib/env-utils';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '@/lib/local-storage';
 import { getWhitelabelProviderFromRedirectionUrl, type WhitelabelProps } from '@/lib/whitelabel';
 
@@ -164,8 +165,9 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
 
   renderContent() {
     const { loadingLoggedInUser, errorLoggedInUser, token, next, form, LoggedInUser, whitelabel } = this.props;
+    const env = getEnvVar('OC_ENV');
 
-    if (whitelabel?.isNonPlatformDomain && !whitelabel?.isWhitelabelDomain) {
+    if (whitelabel?.isNonPlatformDomain && !whitelabel?.isWhitelabelDomain && env !== 'staging') {
       return (
         <MessageBox type="error" withIcon>
           <FormattedMessage id="domain.notAuthorized" defaultMessage="This page is not available on this domain." />
