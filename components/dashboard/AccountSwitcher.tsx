@@ -126,7 +126,9 @@ const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
 
   // Filter out accounts if the user is also an admin of the parent of that account (since we already show the parent)
   const childAccountIds = flatten(administratedAccounts.map(a => a.children)).map((a: { id: number }) => a.id);
-  administratedAccounts = administratedAccounts.filter(a => !childAccountIds.includes(a.id));
+  administratedAccounts = administratedAccounts
+    .filter(a => !childAccountIds.includes(a.id))
+    .filter(a => a.type !== 'VENDOR');
   administratedAccounts = uniqBy([...administratedAccounts], a => a.id).filter(Boolean);
 
   // Filter out Archived accounts and group it separately
