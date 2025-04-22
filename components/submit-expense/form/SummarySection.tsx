@@ -12,6 +12,7 @@ import { RecurringExpenseIntervals } from '../../../lib/i18n/expense';
 import { i18nTaxType } from '../../../lib/i18n/taxes';
 import { getExpenseExchangeRateWarningOrError, getTaxAmount, isTaxRateValid } from '../../expenses/lib/utils';
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
+import type { AccountHoverCardFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 import { ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
 
 import { I18nBold } from '@/components/I18nFormatters';
@@ -178,7 +179,7 @@ const SummaryHeader = React.memo(function SummaryHeader(props: {
             values={{
               name: (
                 <AccountHoverCard
-                  account={props.submitter}
+                  account={props.submitter as AccountHoverCardFieldsFragment}
                   trigger={
                     <span>
                       <LinkCollective collective={props.submitter} noTitle>
@@ -422,7 +423,7 @@ const WhoIsPayingSummarySection = React.memo(function WhoIsPayingSummarySection(
         <React.Fragment>
           <div className="mt-2">
             <AccountHoverCard
-              account={omit(props.account, 'stats')}
+              account={omit(props.account, 'stats') as AccountHoverCardFieldsFragment}
               trigger={
                 <div className="flex items-center gap-2 truncate font-bold">
                   <AvatarWithLink size={20} account={props.account} />
@@ -480,7 +481,7 @@ const WhoIsGettingPaidSummarySection = React.memo(function WhoIsGettingPaidSumma
         <React.Fragment>
           <div className="mt-2">
             <AccountHoverCard
-              account={props.payee}
+              account={props.payee as unknown as AccountHoverCardFieldsFragment} // TODO fix types
               trigger={
                 <div className="flex items-center gap-2 truncate font-bold">
                   <AvatarWithLink size={20} account={props.payee} />
