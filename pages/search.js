@@ -13,6 +13,7 @@ import { IGNORED_TAGS } from '../lib/constants/collectives';
 import { API_V2_CONTEXT, gql } from '../lib/graphql/helpers';
 import i18nSearchSortingOptions from '../lib/i18n/search-sorting-options';
 import { parseToBoolean } from '../lib/utils';
+import { textTransform } from '@/lib/styled-system-custom-properties';
 
 import Container from '../components/Container';
 import ErrorPage from '../components/ErrorPage';
@@ -102,6 +103,7 @@ const FilterLabel = styled.label`
   padding-bottom: 8px;
   color: #4d4f51;
   ${padding}
+  ${textTransform}
 `;
 
 const constructSortByQuery = sortByValue => {
@@ -378,7 +380,7 @@ class SearchPage extends React.Component {
           </Flex>
           {showonlyOpenToApplicationsFilter && (
             <div className="mb-4 flex items-center justify-center gap-2">
-              <FilterLabel htmlFor="open-to-applications-filter" pb={0}>
+              <FilterLabel htmlFor="open-to-applications-filter" pb={0} textTransform="none">
                 <FormattedMessage defaultMessage="Only show hosts open to applications" id="FoQ3K3" />
               </FilterLabel>
               <Switch
