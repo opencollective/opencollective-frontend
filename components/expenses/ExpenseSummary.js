@@ -536,13 +536,20 @@ const ExpenseSummary = ({
                 defaultMessage="Accounted as ({currency}):"
                 id="4Wdhe4"
                 values={{
-                  currency: isPaid ? expense.amountInHostCurrency.currency : expense.amountInAccountCurrency.currency,
+                  currency:
+                    isPaid && expense.amountInHostCurrency
+                      ? expense.amountInHostCurrency.currency
+                      : expense.amountInAccountCurrency.currency,
                 }}
               />
             </Container>
             <Container>
               <AmountWithExchangeRateInfo
-                amount={isPaid ? expense.amountInHostCurrency : expense.amountInAccountCurrency}
+                amount={
+                  isPaid && expense.amountInHostCurrency
+                    ? expense.amountInHostCurrency
+                    : expense.amountInAccountCurrency
+                }
               />
             </Container>
           </div>
