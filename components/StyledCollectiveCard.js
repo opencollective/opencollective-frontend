@@ -125,7 +125,11 @@ const getBackground = collective => {
 
 const CollectiveContainer = ({ useLink, collective, children }) => {
   if (useLink) {
-    return <LinkCollective collective={collective}>{children}</LinkCollective>;
+    return (
+      <LinkCollective className="max-w-[85%]" collective={collective}>
+        {children}
+      </LinkCollective>
+    );
   } else {
     return children;
   }
