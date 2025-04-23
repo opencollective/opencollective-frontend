@@ -76,13 +76,7 @@ const ConvertedAmountInput = ({ inputId, exchangeRate, onChange, baseAmount, min
         step={1 / 10 ** precision} // Precision=2 -> 0.01, Precision=0 -> 1
         min={minFxRate ? getLimitAmountFromFxRate(minFxRate) : 1 / 10 ** precision}
         max={maxFxRate ? getLimitAmountFromFxRate(maxFxRate) : Number.MAX_SAFE_INTEGER / 100}
-        value={
-          isBaseAmountInvalid
-            ? ''
-            : typeof rawValue === 'string' && rawValue.match(/[,.]$/)
-              ? rawValue
-              : centsAmountToFloat(targetAmount)
-        }
+        value={isBaseAmountInvalid ? '' : typeof rawValue === 'string' ? rawValue : centsAmountToFloat(targetAmount)}
         required
         placeholder={!precision ? '--' : `--.${'-'.repeat(precision)}`}
         disabled={isBaseAmountInvalid}
@@ -100,6 +94,9 @@ const ConvertedAmountInput = ({ inputId, exchangeRate, onChange, baseAmount, min
               date: null,
             });
           }
+        }}
+        onBlur={() => {
+          setRawValue(null);
         }}
       />
       <span className="ml-1">{getEmojiByCurrencyCode(exchangeRate.toCurrency)}</span>
@@ -225,11 +222,13 @@ const StyledInputAmount = ({
           name={name}
           min={minAmount}
           max={roundedMaxAmount}
-          maxLength={roundedMaxAmount.toString().length}
           prefix="​" // Use a zero-width space, see https://github.com/cchanxzy/react-currency-input-field/issues/222
           intlConfig={intlConfig}
           defaultValue={isUndefined(defaultValue) ? undefined : centsAmountToFloat(defaultValue)}
-          value={typeof rawValue === 'string' && rawValue.match(/[,.]$/) ? rawValue : centsAmountToFloat(value)} // Fallback to rawValue if it's an unterminated string (ending with a separator)
+          value={
+            // Use rawValue while typing
+            typeof rawValue === 'string' ? rawValue : centsAmountToFloat(value)
+          }
           onKeyDown={e => {
             // Increase/Decrease the amount by a custom non-round  instead of $0.01 when using the arrows
             // This functions is called AFTER
@@ -249,7 +248,10 @@ const StyledInputAmount = ({
               onChange(floatAmountToCents(values.float));
             }
           }}
-          onBlur={onBlur}
+          onBlur={() => {
+            setRawValue(null);
+            onBlur?.();
+          }}
         />
       </div>
       {canUseExchangeRate && (
