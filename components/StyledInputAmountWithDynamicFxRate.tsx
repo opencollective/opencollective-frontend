@@ -28,10 +28,7 @@ export const StyledInputAmountWithDynamicFxRate = ({
   value,
   onChange,
   ...props
-}: Omit<
-  React.ComponentProps<typeof StyledInputAmount>,
-  'fromCurrency' | 'toCurrency' | 'loadingExchangeRate' | 'hasCurrencyPicker'
-> & {
+}: Omit<React.ComponentProps<typeof StyledInputAmount>, 'currency' | 'loadingExchangeRate' | 'hasCurrencyPicker'> & {
   fromCurrency: string;
   toCurrency: string;
   date?: string;
