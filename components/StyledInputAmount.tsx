@@ -50,7 +50,7 @@ const ConvertedAmountInput = ({ inputId, exchangeRate, onChange, baseAmount, min
   const precision = getDefaultCurrencyPrecision(exchangeRate.toCurrency);
   const targetAmount = round((baseAmount || 0) * exchangeRate.value, precision);
   const isBaseAmountInvalid = isNaN(baseAmount) || isNil(baseAmount);
-  const [rawValue, setRawValue] = React.useState(centsAmountToFloat(targetAmount) || '');
+  const [rawValue, setRawValue] = React.useState<string | number>(centsAmountToFloat(targetAmount));
   const minWidth = useAmountInputMinWidth(targetAmount / 100);
   const intlConfig = React.useMemo(() => {
     return { locale: intl.locale, currency: exchangeRate.toCurrency };
@@ -140,6 +140,7 @@ const CURRENCY_PICKER_STYLES = {
 const StyledInputAmount = ({
   id = 'input-amount',
   placeholder = undefined,
+  'data-cy': dataCy = undefined,
   currency,
   currencyDisplay = 'SYMBOL',
   name = 'amount',
@@ -166,8 +167,8 @@ const StyledInputAmount = ({
   error = false,
 }) => {
   const intl = useIntl();
-  const [rawValue, setRawValue] = React.useState(
-    () => centsAmountToFloat(value) || centsAmountToFloat(defaultValue) || '',
+  const [rawValue, setRawValue] = React.useState<string | number>(
+    () => centsAmountToFloat(value) || centsAmountToFloat(defaultValue),
   );
   const minAmount = precision !== 0 ? min / 10 ** precision : min / 100;
   const canUseExchangeRate = Boolean(!loadingExchangeRate && exchangeRate && exchangeRate.fromCurrency === currency);
@@ -208,6 +209,7 @@ const StyledInputAmount = ({
         <CurrencyInput
           id={id}
           placeholder={placeholder}
+          data-cy={dataCy}
           allowDecimals={precision !== 0}
           decimalScale={precision === 0 ? undefined : precision} // The `undefined` thingy can be removed once https://github.com/cchanxzy/react-currency-input-field/pull/385 is resolved
           decimalsLimit={precision}
@@ -248,9 +250,9 @@ const StyledInputAmount = ({
               onChange(floatAmountToCents(values.float));
             }
           }}
-          onBlur={() => {
+          onBlur={e => {
             setRawValue(null);
-            onBlur?.();
+            onBlur?.(e);
           }}
         />
       </div>
