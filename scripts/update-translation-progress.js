@@ -4,9 +4,13 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import _ from 'lodash';
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import fetch from 'node-fetch';
 
 import locales from '../lib/constants/locales.js';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const PROJECT_ID = 344903;
 const TOKEN = process.env.CROWDIN_TOKEN;
