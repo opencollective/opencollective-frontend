@@ -2943,7 +2943,7 @@
   "PayoutBankInformationForm.HolderAddress": "Dane adresowe właściciela rachunku bankowego (nie adres banku)",
   "PayoutBankInformationForm.RecipientAddress": "Adres odbiorcy",
   "PayoutBankInformationForm.TransactionMethod": "Metoda transakcji",
-  "PayoutMethod": "Metoda Wypłaty",
+  "PayoutMethod": "Payout Method",
   "PayoutMethod.AccountBalance": "Open Collective (Stan konta)",
   "PayoutMethod.New.Alias": "Alias",
   "PayoutMethod.New.Alias.hint": "Give this payout method an alias that will help you identify it",

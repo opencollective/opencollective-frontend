@@ -2943,7 +2943,7 @@
   "PayoutBankInformationForm.HolderAddress": "כתובת בעל חשבון הבנק (לא כתובת הבנק)",
   "PayoutBankInformationForm.RecipientAddress": "כתובת הנמען",
   "PayoutBankInformationForm.TransactionMethod": "אמצעי תשלום",
-  "PayoutMethod": "אמצעי תשלום",
+  "PayoutMethod": "Payout Method",
   "PayoutMethod.AccountBalance": "Open Collective (מאזן חשבון)",
   "PayoutMethod.New.Alias": "Alias",
   "PayoutMethod.New.Alias.hint": "Give this payout method an alias that will help you identify it",
