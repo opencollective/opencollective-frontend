@@ -4,7 +4,6 @@ import type LoggedInUser from './LoggedInUser';
  * A map of keys used for preview features.
  */
 export enum PREVIEW_FEATURE_KEYS {
-  COLLECTIVE_OVERVIEW = 'COLLECTIVE_OVERVIEW',
   NEW_EXPENSE_FLOW = 'NEW_EXPENSE_FLOW',
   INLINE_EDIT_EXPENSE = 'INLINE_EDIT_EXPENSE',
   CROWDFUNDING_REDESIGN = 'CROWDFUNDING_REDESIGN',
@@ -47,20 +46,11 @@ const FIRST_PARTY_HOSTS = [
  */
 export const previewFeatures: PreviewFeature[] = [
   {
-    key: PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW,
-    title: 'Collective Overview',
-    description: 'Overview page for Collectives in Dashboard',
-    publicBeta: true,
-    alwaysEnableInDev: true,
-    enabledByDefaultFor: ['*'],
-    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
-  },
-  {
     key: PREVIEW_FEATURE_KEYS.NEW_EXPENSE_FLOW,
     title: 'New expense submission flow',
     description: 'Improved expense submission flow in Dashboard',
     alwaysEnableInDev: true,
-    publicBeta: false,
+    publicBeta: true,
     closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...FIRST_PARTY_HOSTS],
   },
   {

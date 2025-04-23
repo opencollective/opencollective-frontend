@@ -151,7 +151,7 @@ Cypress.Commands.add('editCollective', (collective, userEmail = defaultTestUserE
  */
 Cypress.Commands.add(
   'createHostedCollectiveV2',
-  ({ email = defaultTestUserEmail, hostSlug = 'opensource', testPayload, ...attributes } = {}) => {
+  ({ email = defaultTestUserEmail, hostSlug = 'opensource', testPayload, collective, ...attributes } = {}) => {
     return cy.createCollectiveV2({
       ...attributes,
       email,
@@ -159,6 +159,7 @@ Cypress.Commands.add(
       host: { slug: hostSlug },
       collective: {
         repositoryUrl: 'https://github.com/opencollective',
+        ...collective,
       },
       applicationData: {
         useGithubValidation: true,
@@ -268,6 +269,46 @@ Cypress.Commands.add('createProject', ({ userEmail = defaultTestUserEmail, colle
   });
 });
 
+Cypress.Commands.add('createHostOrganization', (userEmail, variables) => {
+  return signinRequest({ email: userEmail }, null).then(response => {
+    const token = getTokenFromRedirectUrl(response.body.redirect);
+    return graphqlQueryV2(token, {
+      operationName: 'CreateOrganization',
+      query: gql`
+        mutation CreateOrganization($organization: OrganizationCreateInput!, $inviteMembers: [InviteMemberInput!]) {
+          createOrganization(organization: $organization, inviteMembers: $inviteMembers) {
+            id
+            legacyId
+            slug
+          }
+        }
+      `,
+      variables: {
+        ...variables,
+        organization: {
+          slug: randomSlug(),
+          description: 'Test Host',
+          name: 'Test Host',
+          ...variables?.organization,
+        },
+      },
+    }).then(({ body }) => {
+      const host = body.data.createOrganization;
+      return graphqlQuery(token, {
+        operationName: 'ActivateCollectiveAsHost',
+        query: gqlV1`
+          mutation ActivateCollectiveAsHost($id: Int!) {
+            activateCollectiveAsHost(id: $id) {
+              id
+            }
+          }
+        `,
+        variables: { id: host.legacyId },
+      }).then(() => host);
+    });
+  });
+});
+
 Cypress.Commands.add('graphqlQueryV2', (query, { variables = {}, token = null } = {}) => {
   return graphqlQueryV2(token, { query, variables }).then(({ body }) => {
     return body.data;
@@ -279,11 +320,11 @@ Cypress.Commands.add('graphqlQueryV2', (query, { variables = {}, token = null } 
  */
 Cypress.Commands.add('addCreditCardToCollective', ({ collectiveSlug }) => {
   cy.login({ redirect: `/dashboard/${collectiveSlug}/payment-methods` });
-  cy.contains('button', 'Add a credit card').click();
+  cy.getByDataCy('add-credit-card-button').click();
   cy.wait(2000);
   fillStripeInput();
   cy.wait(1000);
-  cy.contains('button[type="submit"]', 'Save').click();
+  cy.getByDataCy('save-credit-card-button').click();
   cy.get('[data-cy="save-credit-card-button"][data-loading="true"]').should('exist');
   cy.get('[data-cy="save-credit-card-button"][data-loading="true"]').should('not.exist', { timeout: 30_000 });
 });

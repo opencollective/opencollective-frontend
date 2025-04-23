@@ -9,7 +9,7 @@ import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import type { Currency, CurrencyExchangeRateInput } from '../../lib/graphql/types/v2/graphql';
+import { type Currency, type CurrencyExchangeRateInput, PayoutMethodType } from '../../lib/graphql/types/v2/graphql';
 import { cn } from '../../lib/utils';
 import type { Expense } from '@/lib/graphql/types/v2/schema';
 
@@ -77,7 +77,7 @@ const EditPayee = ({ expense, onSubmit }) => {
               exchangeRate: ei.amount.exchangeRate
                 ? ({
                     ...pick(ei.amount.exchangeRate, ['source', 'rate', 'value', 'fromCurrency', 'toCurrency']),
-                    date: ei.amount.exchangeRate.date || ei.incurredAt,
+                    date: new Date(ei.amount.exchangeRate.date || ei.incurredAt),
                   } as CurrencyExchangeRateInput)
                 : null,
             },
@@ -87,9 +87,14 @@ const EditPayee = ({ expense, onSubmit }) => {
           payoutMethod:
             !values.payoutMethodId || values.payoutMethodId === '__newPayoutMethod'
               ? { ...values.newPayoutMethod, isSaved: false }
-              : {
-                  id: values.payoutMethodId,
-                },
+              : values.payoutMethodId === '__newAccountBalancePayoutMethod'
+                ? {
+                    type: PayoutMethodType.ACCOUNT_BALANCE,
+                    data: {},
+                  }
+                : {
+                    id: values.payoutMethodId,
+                  },
         }),
       };
       return onSubmit(editValues);
@@ -167,9 +172,14 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
         payoutMethod:
           !values.payoutMethodId || values.payoutMethodId === '__newPayoutMethod'
             ? { ...values.newPayoutMethod, isSaved: false }
-            : {
-                id: values.payoutMethodId,
-              },
+            : values.payoutMethodId === '__newAccountBalancePayoutMethod'
+              ? {
+                  type: PayoutMethodType.ACCOUNT_BALANCE,
+                  data: {},
+                }
+              : {
+                  id: values.payoutMethodId,
+                },
         payee: {
           slug: formOptions.payee?.slug,
         },

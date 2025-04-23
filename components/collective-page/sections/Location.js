@@ -26,7 +26,7 @@ const Location = ({ collective: event, refetch }) => {
       refetch();
       prevLoggedInUser.current = LoggedInUser;
     }
-  }, [LoggedInUser]);
+  }, [LoggedInUser, refetch]);
 
   if (isEmptyCollectiveLocation(event) || isEmptyOnlineLocation(event)) {
     return null;

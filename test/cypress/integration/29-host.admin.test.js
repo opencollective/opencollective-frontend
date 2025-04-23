@@ -143,7 +143,7 @@ describe('host dashboard', () => {
 
       // Go to contribution page
       cy.get('tbody tr:first td button:last').first().click();
-      cy.contains('Open details').click();
+      cy.contains('View details').click();
       cy.contains(description).should('exist');
       cy.contains('More actions').click();
 

@@ -231,7 +231,7 @@ export default function HostVirtualCardRequests({ accountSlug: hostSlug }: Dashb
       ) : (
         <React.Fragment>
           <VirtualCardRequestsTable
-            onSelectedVirtualCardRequest={vcr => queryFilter.setFilter('virtualCardRequest', vcr.legacyId)}
+            onSelectedVirtualCardRequest={vcr => queryFilter.setFilter('virtualCardRequest', vcr.legacyId, false)}
             loading={query.loading}
             virtualCardRequests={query.data?.virtualCardRequests.nodes}
           />
@@ -239,7 +239,7 @@ export default function HostVirtualCardRequests({ accountSlug: hostSlug }: Dashb
 
           <VirtualCardRequestDrawer
             open={!!queryFilter.values.virtualCardRequest}
-            onClose={() => queryFilter.setFilter('virtualCardRequest', null)}
+            onClose={() => queryFilter.setFilter('virtualCardRequest', null, false)}
             virtualCardRequestId={queryFilter.values.virtualCardRequest}
           />
         </React.Fragment>

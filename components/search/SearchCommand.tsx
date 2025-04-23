@@ -100,7 +100,9 @@ export const SearchCommand = ({ open, setOpen }) => {
 
   const { debouncedValue: debouncedInput, isDebouncing } = useDebouncedValue(input, 500);
   useEffect(() => {
-    debouncedInput?.length > 0 && search({ variables: { searchTerm: debouncedInput } });
+    if (debouncedInput?.length > 0) {
+      search({ variables: { searchTerm: debouncedInput } });
+    }
   }, [debouncedInput, search]);
 
   const handleKeyDown = React.useCallback(
@@ -206,7 +208,7 @@ export const SearchCommand = ({ open, setOpen }) => {
       <DialogTitle className="hidden">
         <FormattedMessage defaultMessage="Search" id="Search" />
       </DialogTitle>
-      {/* eslint-disable-next-line react/no-unknown-property */}
+      {}
       <div className="group flex items-center gap-3 border-b px-3" cmdk-input-wrapper="">
         <SearchIcon className="shrink-0 text-muted-foreground" size={16} />
         {queryFilter.values.context && (

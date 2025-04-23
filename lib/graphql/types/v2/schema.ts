@@ -89,6 +89,8 @@ export type Account = {
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether the account is verified */
+  isVerified: Scalars['Boolean']['output'];
   /**
    * The internal database identifier of the collective (ie: 580)
    * @deprecated 2020-01-01: should only be used during the transition to GraphQL API v2.
@@ -222,6 +224,7 @@ export type AccountExpensesArgs = {
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   payoutMethodType?: InputMaybe<PayoutMethodType>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<ExpenseStatusFilter>>>;
@@ -332,7 +335,7 @@ export type AccountOrdersArgs = {
   oppositeAccount?: InputMaybe<AccountReferenceInput>;
   orderBy?: ChronologicalOrderInput;
   pausedBy?: InputMaybe<Array<InputMaybe<OrderPausedBy>>>;
-  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
@@ -348,6 +351,12 @@ export type AccountPaymentMethodsArgs = {
   includeExpired?: InputMaybe<Scalars['Boolean']['input']>;
   service?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   type?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+};
+
+
+/** Account interface shared by all kind of accounts (Bot, Collective, Event, User, Organization) */
+export type AccountPayoutMethodsArgs = {
+  includeArchived?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
@@ -401,8 +410,10 @@ export type AccountTransactionsArgs = {
   offset?: Scalars['Int']['input'];
   order?: InputMaybe<OrderReferenceInput>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   type?: InputMaybe<TransactionType>;
@@ -853,7 +864,7 @@ export type AccountingCategory = {
   /** The account this category belongs to */
   account: Host;
   /** If the category is applicable to the Host or Hosted Collectives */
-  appliesTo: AccountingCategoryAppliesTo;
+  appliesTo?: Maybe<AccountingCategoryAppliesTo>;
   /** The code of the accounting category */
   code: Scalars['String']['output'];
   /** The time of creation of this accounting category */
@@ -890,8 +901,8 @@ export type AccountingCategoryCollection = Collection & {
 
 /** Input for creating or updating an account category */
 export type AccountingCategoryInput = {
-  /** If the category is applicable to the Host or Hosted Collectives */
-  appliesTo?: AccountingCategoryAppliesTo;
+  /** If the category is applicable to the Host or Hosted Collectives, or both if null */
+  appliesTo?: InputMaybe<AccountingCategoryAppliesTo>;
   /** The code of the accounting category */
   code?: InputMaybe<Scalars['NonEmptyString']['input']>;
   /** If meant for expenses, the types of expenses this category applies to */
@@ -1026,6 +1037,7 @@ export enum ActivityAndClassesType {
   COLLECTIVE_VIRTUAL_CARD_SUSPENDED_DUE_TO_INACTIVITY = 'COLLECTIVE_VIRTUAL_CARD_SUSPENDED_DUE_TO_INACTIVITY',
   CONNECTED_ACCOUNT_CREATED = 'CONNECTED_ACCOUNT_CREATED',
   CONNECTED_ACCOUNT_ERROR = 'CONNECTED_ACCOUNT_ERROR',
+  CONNECTED_ACCOUNT_REMOVED = 'CONNECTED_ACCOUNT_REMOVED',
   CONTRIBUTIONS = 'CONTRIBUTIONS',
   CONTRIBUTION_REJECTED = 'CONTRIBUTION_REJECTED',
   CONVERSATION_COMMENT_CREATED = 'CONVERSATION_COMMENT_CREATED',
@@ -1050,10 +1062,10 @@ export enum ActivityAndClassesType {
   ORDER_PENDING_EXPIRED = 'ORDER_PENDING_EXPIRED',
   ORDER_PENDING_FOLLOWUP = 'ORDER_PENDING_FOLLOWUP',
   ORDER_PENDING_RECEIVED = 'ORDER_PENDING_RECEIVED',
+  ORDER_PROCESSED = 'ORDER_PROCESSED',
   ORDER_PROCESSING = 'ORDER_PROCESSING',
   ORDER_REVIEW_CLOSED = 'ORDER_REVIEW_CLOSED',
   ORDER_REVIEW_OPENED = 'ORDER_REVIEW_OPENED',
-  ORDER_THANKYOU = 'ORDER_THANKYOU',
   ORDER_UPDATED = 'ORDER_UPDATED',
   ORGANIZATION_COLLECTIVE_CREATED = 'ORGANIZATION_COLLECTIVE_CREATED',
   PAYMENT_CREDITCARD_CONFIRMATION = 'PAYMENT_CREDITCARD_CONFIRMATION',
@@ -1213,6 +1225,7 @@ export enum ActivityType {
   COLLECTIVE_VIRTUAL_CARD_SUSPENDED_DUE_TO_INACTIVITY = 'COLLECTIVE_VIRTUAL_CARD_SUSPENDED_DUE_TO_INACTIVITY',
   CONNECTED_ACCOUNT_CREATED = 'CONNECTED_ACCOUNT_CREATED',
   CONNECTED_ACCOUNT_ERROR = 'CONNECTED_ACCOUNT_ERROR',
+  CONNECTED_ACCOUNT_REMOVED = 'CONNECTED_ACCOUNT_REMOVED',
   CONTRIBUTION_REJECTED = 'CONTRIBUTION_REJECTED',
   CONVERSATION_COMMENT_CREATED = 'CONVERSATION_COMMENT_CREATED',
   DEACTIVATED_COLLECTIVE_AS_HOST = 'DEACTIVATED_COLLECTIVE_AS_HOST',
@@ -1234,10 +1247,10 @@ export enum ActivityType {
   ORDER_PENDING_EXPIRED = 'ORDER_PENDING_EXPIRED',
   ORDER_PENDING_FOLLOWUP = 'ORDER_PENDING_FOLLOWUP',
   ORDER_PENDING_RECEIVED = 'ORDER_PENDING_RECEIVED',
+  ORDER_PROCESSED = 'ORDER_PROCESSED',
   ORDER_PROCESSING = 'ORDER_PROCESSING',
   ORDER_REVIEW_CLOSED = 'ORDER_REVIEW_CLOSED',
   ORDER_REVIEW_OPENED = 'ORDER_REVIEW_OPENED',
-  ORDER_THANKYOU = 'ORDER_THANKYOU',
   ORDER_UPDATED = 'ORDER_UPDATED',
   ORGANIZATION_COLLECTIVE_CREATED = 'ORGANIZATION_COLLECTIVE_CREATED',
   PAYMENT_CREDITCARD_CONFIRMATION = 'PAYMENT_CREDITCARD_CONFIRMATION',
@@ -1486,6 +1499,8 @@ export type Bot = Account & {
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether the account is verified */
+  isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
@@ -1615,6 +1630,7 @@ export type BotExpensesArgs = {
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   payoutMethodType?: InputMaybe<PayoutMethodType>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<ExpenseStatusFilter>>>;
@@ -1731,7 +1747,7 @@ export type BotOrdersArgs = {
   oppositeAccount?: InputMaybe<AccountReferenceInput>;
   orderBy?: ChronologicalOrderInput;
   pausedBy?: InputMaybe<Array<InputMaybe<OrderPausedBy>>>;
-  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
@@ -1747,6 +1763,12 @@ export type BotPaymentMethodsArgs = {
   includeExpired?: InputMaybe<Scalars['Boolean']['input']>;
   service?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   type?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+};
+
+
+/** This represents a Bot account */
+export type BotPayoutMethodsArgs = {
+  includeArchived?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
@@ -1800,8 +1822,10 @@ export type BotTransactionsArgs = {
   offset?: Scalars['Int']['input'];
   order?: InputMaybe<OrderReferenceInput>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   type?: InputMaybe<TransactionType>;
@@ -1972,6 +1996,8 @@ export type Collective = Account & AccountWithContributions & AccountWithHost & 
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether the account is verified */
+  isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
@@ -2129,6 +2155,7 @@ export type CollectiveExpensesArgs = {
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   payoutMethodType?: InputMaybe<PayoutMethodType>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<ExpenseStatusFilter>>>;
@@ -2259,7 +2286,7 @@ export type CollectiveOrdersArgs = {
   oppositeAccount?: InputMaybe<AccountReferenceInput>;
   orderBy?: ChronologicalOrderInput;
   pausedBy?: InputMaybe<Array<InputMaybe<OrderPausedBy>>>;
-  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
@@ -2275,6 +2302,12 @@ export type CollectivePaymentMethodsArgs = {
   includeExpired?: InputMaybe<Scalars['Boolean']['input']>;
   service?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   type?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+};
+
+
+/** This represents a Collective account */
+export type CollectivePayoutMethodsArgs = {
+  includeArchived?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
@@ -2348,8 +2381,10 @@ export type CollectiveTransactionsArgs = {
   offset?: Scalars['Int']['input'];
   order?: InputMaybe<OrderReferenceInput>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   type?: InputMaybe<TransactionType>;
@@ -3870,6 +3905,7 @@ export type Expense_Categorization = {
 
 export type Expense_Policies = {
   __typename?: 'EXPENSE_POLICIES';
+  grantPolicy?: Maybe<Scalars['String']['output']>;
   invoicePolicy?: Maybe<Scalars['String']['output']>;
   receiptPolicy?: Maybe<Scalars['String']['output']>;
   titlePolicy?: Maybe<Scalars['String']['output']>;
@@ -3960,6 +3996,8 @@ export type Event = Account & AccountWithContributions & AccountWithHost & Accou
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether the account is verified */
+  isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
@@ -4123,6 +4161,7 @@ export type EventExpensesArgs = {
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   payoutMethodType?: InputMaybe<PayoutMethodType>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<ExpenseStatusFilter>>>;
@@ -4253,7 +4292,7 @@ export type EventOrdersArgs = {
   oppositeAccount?: InputMaybe<AccountReferenceInput>;
   orderBy?: ChronologicalOrderInput;
   pausedBy?: InputMaybe<Array<InputMaybe<OrderPausedBy>>>;
-  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
@@ -4269,6 +4308,12 @@ export type EventPaymentMethodsArgs = {
   includeExpired?: InputMaybe<Scalars['Boolean']['input']>;
   service?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   type?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+};
+
+
+/** This represents an Event account */
+export type EventPayoutMethodsArgs = {
+  includeArchived?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
@@ -4342,8 +4387,10 @@ export type EventTransactionsArgs = {
   offset?: Scalars['Int']['input'];
   order?: InputMaybe<OrderReferenceInput>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   type?: InputMaybe<TransactionType>;
@@ -4471,7 +4518,7 @@ export type Expense = {
   invoiceFile?: Maybe<FileInfo>;
   /** Information to display on the invoice. Only visible to user and admins. */
   invoiceInfo?: Maybe<Scalars['String']['output']>;
-  items?: Maybe<Array<Maybe<ExpenseItem>>>;
+  items: Array<ExpenseItem>;
   /** Legacy ID as returned by API V1. Avoid relying on this field as it may be removed in the future. */
   legacyId: Scalars['Int']['output'];
   /** Returns the list of legal documents attached to this expense. Must be logged in as a host admin. */
@@ -4511,7 +4558,7 @@ export type Expense = {
   status: ExpenseStatus;
   tags: Array<Maybe<Scalars['String']['output']>>;
   /** Taxes applied to this expense */
-  taxes: Array<Maybe<TaxInfo>>;
+  taxes: Array<TaxInfo>;
   /** [Host admins only] If the expense associated with a transactions import row, this field will reference it */
   transactionImportRow?: Maybe<TransactionsImportRow>;
   /** The reference text used in the payment transfer */
@@ -5163,6 +5210,8 @@ export type Fund = Account & AccountWithContributions & AccountWithHost & {
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether the account is verified */
+  isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
@@ -5320,6 +5369,7 @@ export type FundExpensesArgs = {
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   payoutMethodType?: InputMaybe<PayoutMethodType>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<ExpenseStatusFilter>>>;
@@ -5450,7 +5500,7 @@ export type FundOrdersArgs = {
   oppositeAccount?: InputMaybe<AccountReferenceInput>;
   orderBy?: ChronologicalOrderInput;
   pausedBy?: InputMaybe<Array<InputMaybe<OrderPausedBy>>>;
-  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
@@ -5466,6 +5516,12 @@ export type FundPaymentMethodsArgs = {
   includeExpired?: InputMaybe<Scalars['Boolean']['input']>;
   service?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   type?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+};
+
+
+/** This represents an Project account */
+export type FundPayoutMethodsArgs = {
+  includeArchived?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
@@ -5539,8 +5595,10 @@ export type FundTransactionsArgs = {
   offset?: Scalars['Int']['input'];
   order?: InputMaybe<OrderReferenceInput>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   type?: InputMaybe<TransactionType>;
@@ -5715,6 +5773,8 @@ export type Host = Account & AccountWithContributions & {
   isAdmin: Scalars['Boolean']['output'];
   /** Returns whether this account is archived */
   isArchived: Scalars['Boolean']['output'];
+  /** Returns whether the host is trusted or not */
+  isFirstPartyHost: Scalars['Boolean']['output'];
   /** Whether this account is frozen */
   isFrozen: Scalars['Boolean']['output'];
   /** Returns whether the account is setup to Host collectives. */
@@ -5724,6 +5784,8 @@ export type Host = Account & AccountWithContributions & {
   isOpenToApplications?: Maybe<Scalars['Boolean']['output']>;
   /** Returns whether the host is trusted or not */
   isTrustedHost: Scalars['Boolean']['output'];
+  /** Whether the account is verified */
+  isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
@@ -5933,6 +5995,7 @@ export type HostExpensesArgs = {
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   payoutMethodType?: InputMaybe<PayoutMethodType>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<ExpenseStatusFilter>>>;
@@ -6164,7 +6227,7 @@ export type HostOrdersArgs = {
   oppositeAccount?: InputMaybe<AccountReferenceInput>;
   orderBy?: ChronologicalOrderInput;
   pausedBy?: InputMaybe<Array<InputMaybe<OrderPausedBy>>>;
-  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
@@ -6180,6 +6243,12 @@ export type HostPaymentMethodsArgs = {
   includeExpired?: InputMaybe<Scalars['Boolean']['input']>;
   service?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   type?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+};
+
+
+/** This represents an Host account */
+export type HostPayoutMethodsArgs = {
+  includeArchived?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
@@ -6262,8 +6331,10 @@ export type HostTransactionsArgs = {
   offset?: Scalars['Int']['input'];
   order?: InputMaybe<OrderReferenceInput>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   type?: InputMaybe<TransactionType>;
@@ -6685,6 +6756,8 @@ export type Individual = Account & {
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether the account is verified */
+  isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
@@ -6832,6 +6905,7 @@ export type IndividualExpensesArgs = {
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   payoutMethodType?: InputMaybe<PayoutMethodType>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<ExpenseStatusFilter>>>;
@@ -6961,7 +7035,7 @@ export type IndividualOrdersArgs = {
   oppositeAccount?: InputMaybe<AccountReferenceInput>;
   orderBy?: ChronologicalOrderInput;
   pausedBy?: InputMaybe<Array<InputMaybe<OrderPausedBy>>>;
-  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
@@ -6977,6 +7051,12 @@ export type IndividualPaymentMethodsArgs = {
   includeExpired?: InputMaybe<Scalars['Boolean']['input']>;
   service?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   type?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+};
+
+
+/** This represents an Individual account */
+export type IndividualPayoutMethodsArgs = {
+  includeArchived?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
@@ -7037,8 +7117,10 @@ export type IndividualTransactionsArgs = {
   offset?: Scalars['Int']['input'];
   order?: InputMaybe<OrderReferenceInput>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   type?: InputMaybe<TransactionType>;
@@ -7488,6 +7570,7 @@ export type Mutation = {
   editMember: Member;
   /** Edit an existing member invitation of the Collective. Scope: "account". */
   editMemberInvitation?: Maybe<MemberInvitation>;
+  editPayoutMethod: PayoutMethod;
   /** To edit a pending order. Scope: "orders". */
   editPendingOrder: Order;
   /** Edit the public message for the given Member of a Collective. Scope: "account". */
@@ -7546,6 +7629,8 @@ export type Mutation = {
   removeHost: Account;
   /** Remove a member from the Collective. Scope: "account". */
   removeMember?: Maybe<Scalars['Boolean']['output']>;
+  /** Remove a payment method */
+  removePaymentMethod: PaymentMethod;
   /** Remove the given payout method. Scope: "expenses". */
   removePayoutMethod: PayoutMethod;
   /** Remove 2FA from the Individual if it has been enabled. Scope: "account". */
@@ -7556,6 +7641,8 @@ export type Mutation = {
   requestVirtualCard?: Maybe<Scalars['Boolean']['output']>;
   /** To re-send the invitation to complete a draft expense. Scope: "expenses". */
   resendDraftExpenseInvite: Expense;
+  /** Restore the given payout method. Scope: "expenses". */
+  restorePayoutMethod: PayoutMethod;
   /** Resume paused Virtual Card. Scope: "virtualCards". */
   resumeVirtualCard: VirtualCard;
   /** Revoke an OAuth authorization. Scope: "account". */
@@ -8167,6 +8254,12 @@ export type MutationEditMemberInvitationArgs = {
 
 
 /** This is the root mutation */
+export type MutationEditPayoutMethodArgs = {
+  payoutMethod: PayoutMethodInput;
+};
+
+
+/** This is the root mutation */
 export type MutationEditPendingOrderArgs = {
   order: PendingOrderEditInput;
 };
@@ -8385,6 +8478,13 @@ export type MutationRemoveMemberArgs = {
 
 
 /** This is the root mutation */
+export type MutationRemovePaymentMethodArgs = {
+  cancelActiveSubscriptions?: InputMaybe<Scalars['Boolean']['input']>;
+  paymentMethod: PaymentMethodReferenceInput;
+};
+
+
+/** This is the root mutation */
 export type MutationRemovePayoutMethodArgs = {
   payoutMethodId: Scalars['String']['input'];
 };
@@ -8420,6 +8520,12 @@ export type MutationRequestVirtualCardArgs = {
 /** This is the root mutation */
 export type MutationResendDraftExpenseInviteArgs = {
   expense: ExpenseReferenceInput;
+};
+
+
+/** This is the root mutation */
+export type MutationRestorePayoutMethodArgs = {
+  payoutMethod: PayoutMethodReferenceInput;
 };
 
 
@@ -9050,6 +9156,8 @@ export type Organization = Account & AccountWithContributions & {
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether the account is verified */
+  isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
@@ -9210,6 +9318,7 @@ export type OrganizationExpensesArgs = {
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   payoutMethodType?: InputMaybe<PayoutMethodType>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<ExpenseStatusFilter>>>;
@@ -9326,7 +9435,7 @@ export type OrganizationOrdersArgs = {
   oppositeAccount?: InputMaybe<AccountReferenceInput>;
   orderBy?: ChronologicalOrderInput;
   pausedBy?: InputMaybe<Array<InputMaybe<OrderPausedBy>>>;
-  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
@@ -9342,6 +9451,12 @@ export type OrganizationPaymentMethodsArgs = {
   includeExpired?: InputMaybe<Scalars['Boolean']['input']>;
   service?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   type?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+};
+
+
+/** This represents an Organization account */
+export type OrganizationPayoutMethodsArgs = {
+  includeArchived?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
@@ -9408,8 +9523,10 @@ export type OrganizationTransactionsArgs = {
   offset?: Scalars['Int']['input'];
   order?: InputMaybe<OrderReferenceInput>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   type?: InputMaybe<TransactionType>;
@@ -9693,6 +9810,8 @@ export enum PaymentMethodType {
 /** A payout method */
 export type PayoutMethod = {
   __typename?: 'PayoutMethod';
+  /** Whether this payout method can be edit or deleted */
+  canBeEditedOrDeleted?: Maybe<Scalars['Boolean']['output']>;
   /** The actual data for this payout method. Content depends on the type. */
   data?: Maybe<Scalars['JSON']['output']>;
   /** Unique identifier for this payout method */
@@ -9718,6 +9837,11 @@ export type PayoutMethodInput = {
   name?: InputMaybe<Scalars['String']['input']>;
   /** The type of payout method (e.g., PayPal, bank transfer) */
   type?: InputMaybe<PayoutMethodType>;
+};
+
+export type PayoutMethodReferenceInput = {
+  /** The id assigned to the payout method */
+  id?: InputMaybe<Scalars['String']['input']>;
 };
 
 export enum PayoutMethodType {
@@ -9975,6 +10099,7 @@ export type PoliciesExpenseCategorizationInput = {
 };
 
 export type PoliciesExpensePolicies = {
+  grantPolicy?: InputMaybe<Scalars['String']['input']>;
   invoicePolicy?: InputMaybe<Scalars['String']['input']>;
   receiptPolicy?: InputMaybe<Scalars['String']['input']>;
   titlePolicy?: InputMaybe<Scalars['String']['input']>;
@@ -10129,6 +10254,8 @@ export type Project = Account & AccountWithContributions & AccountWithHost & Acc
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether the account is verified */
+  isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
@@ -10288,6 +10415,7 @@ export type ProjectExpensesArgs = {
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   payoutMethodType?: InputMaybe<PayoutMethodType>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<ExpenseStatusFilter>>>;
@@ -10418,7 +10546,7 @@ export type ProjectOrdersArgs = {
   oppositeAccount?: InputMaybe<AccountReferenceInput>;
   orderBy?: ChronologicalOrderInput;
   pausedBy?: InputMaybe<Array<InputMaybe<OrderPausedBy>>>;
-  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
@@ -10434,6 +10562,12 @@ export type ProjectPaymentMethodsArgs = {
   includeExpired?: InputMaybe<Scalars['Boolean']['input']>;
   service?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   type?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+};
+
+
+/** This represents an Project account */
+export type ProjectPayoutMethodsArgs = {
+  includeArchived?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
@@ -10507,8 +10641,10 @@ export type ProjectTransactionsArgs = {
   offset?: Scalars['Int']['input'];
   order?: InputMaybe<OrderReferenceInput>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   type?: InputMaybe<TransactionType>;
@@ -10649,6 +10785,7 @@ export type QueryAccountsArgs = {
   isHost?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  onlyOpenToApplications?: InputMaybe<Scalars['Boolean']['input']>;
   orderBy?: InputMaybe<OrderByInput>;
   parent?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
@@ -10750,6 +10887,7 @@ export type QueryExpensesArgs = {
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   payoutMethodType?: InputMaybe<PayoutMethodType>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<ExpenseStatusFilter>>>;
@@ -10850,7 +10988,7 @@ export type QueryOrdersArgs = {
   oppositeAccount?: InputMaybe<AccountReferenceInput>;
   orderBy?: ChronologicalOrderInput;
   pausedBy?: InputMaybe<Array<InputMaybe<OrderPausedBy>>>;
-  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
@@ -10980,8 +11118,10 @@ export type QueryTransactionsArgs = {
   offset?: Scalars['Int']['input'];
   order?: InputMaybe<OrderReferenceInput>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   type?: InputMaybe<TransactionType>;
@@ -11903,6 +12043,8 @@ export type TransactionsImportRow = {
   sourceId: Scalars['NonEmptyString']['output'];
   /** The status of the row */
   status: TransactionsImportRowStatus;
+  /** The transactions import associated with the row */
+  transactionsImport: TransactionsImport;
 };
 
 /** Action to perform on transactions import rows */
@@ -12322,6 +12464,8 @@ export type Vendor = Account & AccountWithContributions & {
   isHost: Scalars['Boolean']['output'];
   /** Defines if the contributors wants to be incognito (name not displayed) */
   isIncognito: Scalars['Boolean']['output'];
+  /** Whether the account is verified */
+  isVerified: Scalars['Boolean']['output'];
   legacyId: Scalars['Int']['output'];
   /** The legal documents associated with this account */
   legalDocuments?: Maybe<Array<Maybe<LegalDocument>>>;
@@ -12477,6 +12621,7 @@ export type VendorExpensesArgs = {
   minAmount?: InputMaybe<Scalars['Int']['input']>;
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   payoutMethodType?: InputMaybe<PayoutMethodType>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Array<InputMaybe<ExpenseStatusFilter>>>;
@@ -12593,7 +12738,7 @@ export type VendorOrdersArgs = {
   oppositeAccount?: InputMaybe<AccountReferenceInput>;
   orderBy?: ChronologicalOrderInput;
   pausedBy?: InputMaybe<Array<InputMaybe<OrderPausedBy>>>;
-  paymentMethod?: InputMaybe<PaymentMethodReferenceInput>;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
@@ -12609,6 +12754,12 @@ export type VendorPaymentMethodsArgs = {
   includeExpired?: InputMaybe<Scalars['Boolean']['input']>;
   service?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   type?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+};
+
+
+/** This represents a Vendor account */
+export type VendorPayoutMethodsArgs = {
+  includeArchived?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
@@ -12675,8 +12826,10 @@ export type VendorTransactionsArgs = {
   offset?: Scalars['Int']['input'];
   order?: InputMaybe<OrderReferenceInput>;
   orderBy?: ChronologicalOrderInput;
+  paymentMethod?: InputMaybe<Array<InputMaybe<PaymentMethodReferenceInput>>>;
   paymentMethodService?: InputMaybe<Array<InputMaybe<PaymentMethodService>>>;
   paymentMethodType?: InputMaybe<Array<InputMaybe<PaymentMethodType>>>;
+  payoutMethod?: InputMaybe<PayoutMethodReferenceInput>;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   type?: InputMaybe<TransactionType>;

@@ -1,19 +1,21 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import type { ApolloCache, MutationFunction } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
-import { cloneDeep, difference, get, pick } from 'lodash';
+import { cloneDeep, get, pick } from 'lodash';
 import { Info, PlusCircle, Save, Trash, WebhookIcon } from 'lucide-react';
 import memoizeOne from 'memoize-one';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import type { IntlShape } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import { isURL } from 'validator';
 
 import { FEATURES, isFeatureEnabled } from '../../../lib/allowed-features';
 import { CollectiveType } from '../../../lib/constants/collectives';
-import { WebhookEvents, WebhookEventsList } from '../../../lib/constants/notificationEvents';
+import { WebhookEvents } from '../../../lib/constants/notificationEvents';
 import { getErrorFromGraphqlException } from '../../../lib/errors';
 import { gqlV1 } from '../../../lib/graphql/helpers';
 import { i18nWebhookEventType } from '../../../lib/i18n/webhook-event-type';
 import { compose } from '../../../lib/utils';
+import type { GraphQLV1Collective } from '@/lib/custom_typings/GraphQLV1';
 
 import { getI18nLink } from '../../I18nFormatters';
 import Loading from '../../Loading';
@@ -29,16 +31,91 @@ import WebhookActivityInfoModal, { hasWebhookEventInfo } from './WebhookActivity
 
 const EMPTY_WEBHOOKS = [];
 
-class Webhooks extends React.Component {
-  static propTypes = {
-    collectiveSlug: PropTypes.string.isRequired,
-    editWebhooks: PropTypes.func,
-    /** From graphql query */
-    data: PropTypes.object.isRequired,
-    /** From intl */
-    intl: PropTypes.object.isRequired,
-  };
+// Group webhook events by category
+const WEBHOOK_EVENT_GROUPS = defineMessages({
+  all: {
+    defaultMessage: 'General',
+    id: 'settings.general',
+    events: [WebhookEvents.ALL, WebhookEvents.COLLECTIVE_COMMENT_CREATED, WebhookEvents.COLLECTIVE_TRANSACTION_CREATED],
+  },
+  expenses: {
+    defaultMessage: 'Expenses',
+    id: 'Expenses',
+    events: [
+      WebhookEvents.COLLECTIVE_EXPENSE_CREATED,
+      WebhookEvents.COLLECTIVE_EXPENSE_UPDATED,
+      WebhookEvents.COLLECTIVE_EXPENSE_DELETED,
+      WebhookEvents.COLLECTIVE_EXPENSE_REJECTED,
+      WebhookEvents.COLLECTIVE_EXPENSE_APPROVED,
+      WebhookEvents.COLLECTIVE_EXPENSE_PAID,
+    ],
+  },
+  contributions: {
+    defaultMessage: 'Contributions',
+    id: 'Contributions',
+    events: [
+      WebhookEvents.COLLECTIVE_MEMBER_CREATED,
+      WebhookEvents.SUBSCRIPTION_CANCELED,
+      WebhookEvents.ORDER_PROCESSED,
+      WebhookEvents.ORDER_PENDING_CREATED,
+      WebhookEvents.TICKET_CONFIRMED,
+    ],
+  },
+  updates: {
+    defaultMessage: 'Updates',
+    id: 'updates',
+    events: [WebhookEvents.COLLECTIVE_UPDATE_CREATED, WebhookEvents.COLLECTIVE_UPDATE_PUBLISHED],
+  },
+  host: {
+    defaultMessage: 'Fiscal Host',
+    id: 'Fiscalhost',
+    events: [
+      WebhookEvents.COLLECTIVE_APPLY,
+      WebhookEvents.COLLECTIVE_APPROVED,
+      WebhookEvents.COLLECTIVE_CREATED,
+      WebhookEvents.CONNECTED_ACCOUNT_CREATED,
+    ],
+  },
+  virtualCards: {
+    defaultMessage: 'Virtual Cards',
+    id: 'VirtualCards.Title',
+    events: [WebhookEvents.VIRTUAL_CARD_PURCHASE],
+  },
+});
 
+interface Notification {
+  id?: string;
+  type: string;
+  active?: boolean;
+  webhookUrl: string;
+}
+
+interface EditWebhooksResponse {
+  editWebhooks: Notification[];
+}
+
+interface OwnProps {
+  collectiveSlug: string;
+}
+
+interface Props extends OwnProps {
+  intl: IntlShape;
+  data: { Collective: GraphQLV1Collective; loading: boolean };
+  editWebhooks: (args: {
+    collectiveId: number;
+    notifications: Notification[];
+  }) => Promise<{ data: EditWebhooksResponse }>;
+}
+
+interface State {
+  webhooks: Notification[];
+  modified: boolean;
+  status: string | null;
+  moreInfoModal: string | null;
+  isLoaded: boolean;
+}
+
+class Webhooks extends React.Component<Props, State> {
   constructor(props) {
     super(props);
     this.state = {
@@ -68,8 +145,8 @@ class Webhooks extends React.Component {
     return value ? value.trim().replace(/https?:\/\//, '') : '';
   };
 
-  getEventTypes = memoizeOne(collective => {
-    const removeList = [WebhookEvents.COLLECTIVE_TRANSACTION_CREATED]; // Deprecating this event, see https://github.com/opencollective/opencollective/issues/7162
+  getUnsupportedWebhookEvents = (collective): Set<string> => {
+    const removeSet = new Set([WebhookEvents.COLLECTIVE_TRANSACTION_CREATED]); // Deprecating this event, see https://github.com/opencollective/opencollective/issues/7162
 
     // Features
     const canReceiveExpenses = isFeatureEnabled(collective, FEATURES.RECEIVE_EXPENSES);
@@ -77,51 +154,53 @@ class Webhooks extends React.Component {
     const canUseVirtualCards = isFeatureEnabled(collective, FEATURES.VIRTUAL_CARDS);
     const canUseUpdates = isFeatureEnabled(collective, FEATURES.UPDATES);
 
+    // Build remove list based on features
     if (!canReceiveExpenses) {
-      removeList.push(
-        'collective.expense.created',
-        'collective.expense.deleted',
-        'collective.expense.updated',
-        'collective.expense.rejected',
-        'collective.expense.approved',
-        'collective.expense.paid',
-      );
+      WEBHOOK_EVENT_GROUPS.expenses.events.forEach(event => removeSet.add(event));
     }
     if (!canReceiveContributions) {
-      removeList.push('collective.member.created', 'subscription.canceled', 'order.thankyou');
+      WEBHOOK_EVENT_GROUPS.contributions.events.forEach(event => removeSet.add(event));
     }
     if (!canUseVirtualCards) {
-      removeList.push('virtualcard.purchase');
+      WEBHOOK_EVENT_GROUPS.virtualCards.events.forEach(event => removeSet.add(event));
     }
     if (!canUseUpdates) {
-      removeList.push('collective.update.created', 'collective.update.published');
+      WEBHOOK_EVENT_GROUPS.updates.events.forEach(event => removeSet.add(event));
     }
     if (!canReceiveExpenses && !canReceiveContributions && !canUseUpdates) {
-      removeList.push('collective.comment.created');
+      removeSet.add(WebhookEvents.COLLECTIVE_COMMENT_CREATED);
     }
 
     // Collective type
-    if (collective.type !== CollectiveType.COLLECTIVE) {
-      removeList.push('collective.monthly');
-    }
-    if (collective.type !== CollectiveType.ORGANIZATION) {
-      removeList.push('organization.collective.created', 'user.created');
-    }
     if (collective.type === CollectiveType.EVENT) {
-      removeList.push('subscription.canceled'); // No recurring contributions for events
+      removeSet.add(WebhookEvents.SUBSCRIPTION_CANCELED); // No recurring contributions for events
     } else {
-      removeList.push('ticket.confirmed');
+      removeSet.add(WebhookEvents.TICKET_CONFIRMED); // No tickets for non-events
     }
 
     // Host
     if (!collective.isHost) {
-      removeList.push('collective.apply', 'collective.approved', 'collective.created');
-    }
-    if ([CollectiveType.USER, CollectiveType.ORGANIZATION].includes(collective.type) && !collective.isHost) {
-      removeList.push('collective.transaction.created');
+      WEBHOOK_EVENT_GROUPS.host.events.forEach(event => removeSet.add(event));
     }
 
-    return difference(WebhookEventsList, removeList);
+    return removeSet;
+  };
+
+  getEventsOptions = memoizeOne(collective => {
+    const toRemove = this.getUnsupportedWebhookEvents(collective);
+
+    // Create options groups
+    const { intl } = this.props;
+    return Object.values(WEBHOOK_EVENT_GROUPS)
+      .map(groupDetails => {
+        return {
+          label: intl.formatMessage(groupDetails),
+          options: groupDetails.events
+            .filter(type => !toRemove.has(type))
+            .map(type => ({ value: type, label: i18nWebhookEventType(intl, type) })),
+        };
+      })
+      .filter(group => group && group.options.length > 0);
   });
 
   editWebhook = (index, fieldname, value) => {
@@ -191,7 +270,7 @@ class Webhooks extends React.Component {
             onClick={() => this.removeWebhook(index)}
             title={intl.formatMessage({ id: 'webhooks.remove', defaultMessage: 'Remove webhook' })}
           >
-            <Trash size={14} alt={intl.formatMessage({ id: 'webhooks.remove', defaultMessage: 'Remove webhook' })} />
+            <Trash size={14} />
           </Button>
         </div>
 
@@ -219,10 +298,7 @@ class Webhooks extends React.Component {
                 inputId={`event-type-select-${index}`}
                 minWidth={300}
                 isSearchable={false}
-                options={this.getEventTypes(data.Collective).map(eventType => ({
-                  label: i18nWebhookEventType(intl, eventType),
-                  value: eventType,
-                }))}
+                options={this.getEventsOptions(data.Collective)}
                 value={{ label: i18nWebhookEventType(intl, webhook.type), value: webhook.type }}
                 onChange={({ value }) => this.editWebhook(index, 'type', value)}
               />
@@ -370,22 +446,27 @@ const editCollectiveWebhooksMutation = gqlV1/* GraphQL */ `
   }
 `;
 
-const addEditCollectiveWebhooksData = graphql(editCollectiveWebhooksQuery);
+const addEditCollectiveWebhooksData = graphql<Props, GraphQLV1Collective, { collectiveSlug: string }>(
+  editCollectiveWebhooksQuery,
+);
 
 const editEditCollectiveWebhooksMutation = graphql(editCollectiveWebhooksMutation, {
-  props: ({ mutate, ownProps }) => ({
-    editWebhooks: variables =>
+  props: ({ mutate, ownProps }: { mutate: MutationFunction; ownProps: OwnProps }) => ({
+    editWebhooks: (variables: { collectiveId: number; notifications: Notification[] }) =>
       mutate({
         variables,
-        update: (cache, { data: { editWebhooks } }) => {
-          const { Collective } = cache.readQuery({
+        update: (cache: ApolloCache<GraphQLV1Collective>, { data }: { data: EditWebhooksResponse }) => {
+          const queryResult = cache.readQuery<{ Collective: GraphQLV1Collective }, { collectiveSlug: string }>({
             query: editCollectiveWebhooksQuery,
             variables: { collectiveSlug: ownProps.collectiveSlug },
           });
-          cache.writeQuery({
-            query: editCollectiveWebhooksQuery,
-            data: { Collective: { ...Collective, notifications: editWebhooks } },
-          });
+
+          if (queryResult) {
+            cache.writeQuery<{ Collective: GraphQLV1Collective & { notifications: Notification[] } }>({
+              query: editCollectiveWebhooksQuery,
+              data: { Collective: { ...queryResult.Collective, notifications: data.editWebhooks } },
+            });
+          }
         },
       }),
   }),

@@ -442,6 +442,11 @@ export const ActivityDescriptionI18n = defineMessages({
       'Crypto <Order>contribution</Order> from <FromAccount></FromAccount> to <Account></Account> set as processing',
     id: '6QW6MJ',
   },
+  ORDER_PROCESSED: {
+    defaultMessage:
+      '<Order>Contribution</Order> from <FromAccount></FromAccount> to <Account></Account> processed successfully',
+    id: 'wWPkPb',
+  },
   ORDER_PENDING_CONTRIBUTION_NEW: {
     defaultMessage: 'New <Order>expected funds</Order> from <FromAccount></FromAccount> to <Account></Account>',
     id: 'kh8yZm',
@@ -789,9 +794,13 @@ export const ActivityTypeI18n: ActivityTranslations = defineMessages({
     defaultMessage: 'New expected funds',
     id: 'kzIWOG',
   },
-  ORDER_THANKYOU: {
-    defaultMessage: 'New contribution',
-    id: 'raUlsb',
+  ORDER_PROCESSED: {
+    defaultMessage: 'Contribution processed',
+    id: 'mrdaqR',
+  },
+  ORDER_PENDING_CREATED: {
+    defaultMessage: 'New expected funds',
+    id: 'kzIWOG',
   },
   ORDERS_SUSPICIOUS: {
     defaultMessage: 'Suspicious contribution',

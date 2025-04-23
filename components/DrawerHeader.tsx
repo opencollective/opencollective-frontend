@@ -17,6 +17,7 @@ export default function DrawerHeader({
   entityLabel,
   dropdownTriggerRef,
   forceMoreActions = false,
+  separateRowForEntityLabel = false,
 }) {
   const { viewport } = useWindowResize();
   const isMobile = viewport === VIEWPORTS.XSMALL;
@@ -25,7 +26,7 @@ export default function DrawerHeader({
   const hasMoreActions = (shouldPutPrimaryInMoreActions && Boolean(primary?.length)) || Boolean(secondary?.length);
 
   return (
-    <div className="flex flex-col gap-1 border-b px-6 py-4">
+    <div className="flex flex-col gap-2 border-b px-6 py-4">
       <div className={clsx('flex items-center justify-between gap-4')}>
         <div className="flex shrink grow items-center gap-1 text-sm text-muted-foreground">
           <span className="whitespace-nowrap">{entityName}</span>
@@ -44,10 +45,10 @@ export default function DrawerHeader({
           </SheetClose>
         </div>
       </div>
-      <div className="flex justify-between">
+      <div className={clsx('flex justify-between gap-3', separateRowForEntityLabel && 'flex-col')}>
         <div className="flex items-center gap-2">{entityLabel}</div>
 
-        <div className="flex items-center gap-1">
+        <div className="ml-auto flex items-center justify-end gap-1">
           {!forceMoreActions && (
             <div className="items-center gap-1 sm:flex">
               {primary?.map(action => (

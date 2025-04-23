@@ -101,7 +101,7 @@ const suggestContributionMatchQuery = gql`
     $onlySubscriptions: Boolean
     $minAmount: Int
     $maxAmount: Int
-    $paymentMethod: PaymentMethodReferenceInput
+    $paymentMethod: [PaymentMethodReferenceInput]
     $dateFrom: DateTime
     $dateTo: DateTime
     $expectedDateFrom: DateTime

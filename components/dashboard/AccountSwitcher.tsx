@@ -36,6 +36,7 @@ const StyledMenuEntry = styled(Link)`
   max-width: 100%;
   text-align: left;
   border-radius: 8px;
+  margin-left: 16px;
   font-size: 13px;
   font-weight: 500;
   grid-gap: 4px;
@@ -125,7 +126,9 @@ const getGroupedAdministratedAccounts = memoizeOne(loggedInUser => {
 
   // Filter out accounts if the user is also an admin of the parent of that account (since we already show the parent)
   const childAccountIds = flatten(administratedAccounts.map(a => a.children)).map((a: { id: number }) => a.id);
-  administratedAccounts = administratedAccounts.filter(a => !childAccountIds.includes(a.id));
+  administratedAccounts = administratedAccounts
+    .filter(a => !childAccountIds.includes(a.id))
+    .filter(a => a.type !== 'VENDOR');
   administratedAccounts = uniqBy([...administratedAccounts], a => a.id).filter(Boolean);
 
   // Filter out Archived accounts and group it separately
@@ -230,7 +233,6 @@ const MenuEntry = ({ account, activeSlug }: { account: any; activeSlug: string }
               href={`/dashboard/${child.slug}`}
               title={child.name}
               $isActive={activeSlug === child.slug}
-              ml={3}
             >
               <Option collective={child} isChild />
             </StyledMenuEntry>

@@ -141,7 +141,9 @@ class PayoutMethodSelect extends React.Component<PayoutMethodSelectProps> {
           &nbsp;
           {newPayoutMethodMsg[payoutMethod.type]
             ? this.props.intl.formatMessage(newPayoutMethodMsg[payoutMethod.type])
-            : this.props.intl.formatMessage(newPayoutMethodMsg._default, { type: payoutMethod.type })}
+            : payoutMethod.type
+              ? this.props.intl.formatMessage(newPayoutMethodMsg._default, { type: payoutMethod.type })
+              : this.props.intl.formatMessage({ defaultMessage: 'New payout method', id: 'vJEJ0J' })}
         </React.Fragment>
       );
     }

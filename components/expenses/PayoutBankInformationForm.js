@@ -17,6 +17,7 @@ import { I18nSupportLink } from '../I18nFormatters';
 import { InfoTooltipIcon } from '../InfoTooltipIcon';
 import MessageBox from '../MessageBox';
 import StyledSpinner from '../StyledSpinner';
+import { Input } from '../ui/Input';
 import { Separator } from '../ui/Separator';
 
 const formatStringOptions = strings => strings.map(s => ({ label: s, value: s }));
@@ -86,7 +87,7 @@ const CUSTOM_METHOD_LABEL_BY_CURRENCY = {
 const validateRequiredInput = (intl, input, required) =>
   required ? value => (value ? undefined : intl.formatMessage(msg.fieldRequired, { name: input.name })) : undefined;
 
-const Input = ({ input, getFieldName, disabled, loading, refetch, formik }) => {
+const Field = ({ input, getFieldName, disabled, loading, refetch, formik }) => {
   const intl = useIntl();
   const isAccountHolderName = input.key === 'accountHolderName';
   const fieldName = isAccountHolderName ? getFieldName(input.key) : getFieldName(`details.${input.key}`);
@@ -192,7 +193,7 @@ const Input = ({ input, getFieldName, disabled, loading, refetch, formik }) => {
   }
 };
 
-Input.propTypes = {
+Field.propTypes = {
   disabled: PropTypes.bool,
   loading: PropTypes.bool,
   formik: PropTypes.object.isRequired,
@@ -205,7 +206,7 @@ export const FieldGroup = ({ field, ...props }) => {
   return (
     <div className="flex-1">
       {field.group.map(input => (
-        <Input key={input.key} input={input} {...props} />
+        <Field key={input.key} input={input} {...props} />
       ))}
     </div>
   );

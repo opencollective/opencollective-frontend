@@ -134,6 +134,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
   return (
     <RadioGroup
       id="payeeSlug"
+      data-cy="payee-selector"
       disabled={props.isSubmitting}
       value={props.payeeSlug}
       onValueChange={payeeSlug => {
@@ -154,6 +155,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
 
       {(personalProfile || isLoading) && (
         <RadioGroupCard
+          data-cy="payee-myself-option"
           value={!isLoading ? personalProfile.slug : ''}
           disabled={isLoading || props.isSubmitting}
           checked={isLoading ? false : props.payeeSlug === personalProfile.slug}
@@ -293,16 +295,19 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
 
 function VendorOptionWrapper() {
   const form = useFormikContext() as ExpenseForm;
-
-  return (
-    <VendorOption
-      isSubmitting={form.isSubmitting}
-      setFieldValue={form.setFieldValue}
-      payeeSlug={form.values.payeeSlug}
-      payee={form.options.payee}
-      vendors={form.options.vendors || []}
-    />
-  );
+  const showVendorsOption = form.options.showVendorsOption;
+  if (showVendorsOption) {
+    return (
+      <VendorOption
+        isSubmitting={form.isSubmitting}
+        setFieldValue={form.setFieldValue}
+        payeeSlug={form.values.payeeSlug}
+        payee={form.options.payee}
+        vendorsForAccount={form.options.vendorsForAccount || []}
+        host={form.options.host}
+      />
+    );
+  }
 }
 
 // eslint-disable-next-line prefer-arrow-callback
@@ -311,36 +316,42 @@ const VendorOption = React.memo(function VendorOption(props: {
   isSubmitting: ExpenseForm['isSubmitting'];
   payeeSlug: ExpenseForm['values']['payeeSlug'];
   payee: ExpenseForm['options']['payee'];
-  vendors: ExpenseForm['options']['vendors'];
+  vendorsForAccount: ExpenseForm['options']['vendorsForAccount'];
+  host: ExpenseForm['options']['host'];
 }) {
-  const isVendorSelected = props.payeeSlug === '__vendor' || props.vendors.some(v => v.slug === props.payeeSlug);
-
+  // Setting a state variable to keep the Vendor option open when a vendor that is not part of the preloaded vendors is selected
+  const [selectedVendorSlug, setSelectedVendorSlug] = React.useState(undefined);
+  const isVendorSelected =
+    props.payeeSlug === '__vendor' ||
+    props.vendorsForAccount.some(v => v.slug === props.payeeSlug) ||
+    selectedVendorSlug === props.payeeSlug;
   return (
-    <React.Fragment>
-      {props.vendors.length > 0 && (
-        <RadioGroupCard
-          value="__vendor"
-          checked={isVendorSelected}
-          showSubcontent={isVendorSelected}
-          disabled={props.isSubmitting}
-          subContent={
-            <div>
-              <CollectivePicker
-                disabled={props.isSubmitting}
-                collectives={props.vendors}
-                collective={props.payeeSlug === '__vendor' ? null : props.payee}
-                onChange={e => {
-                  const slug = e.value.slug;
-                  props.setFieldValue('payeeSlug', !slug ? '__vendor' : slug);
-                }}
-              />
-            </div>
-          }
-        >
-          <FormattedMessage defaultMessage="A vendor" id="rth3eX" />
-        </RadioGroupCard>
-      )}
-    </React.Fragment>
+    <RadioGroupCard
+      value="__vendor"
+      checked={isVendorSelected}
+      showSubcontent={isVendorSelected}
+      disabled={props.isSubmitting}
+      subContent={
+        <div>
+          <CollectivePickerAsync
+            inputId="__vendor"
+            isSearchable
+            types={['VENDOR']}
+            includeVendorsForHostId={props.host.legacyId}
+            disabled={props.isSubmitting}
+            defaultCollectives={props.vendorsForAccount}
+            collective={props.payeeSlug === '__vendor' ? null : props.payee}
+            onChange={e => {
+              const slug = e.value.slug;
+              setSelectedVendorSlug(slug);
+              props.setFieldValue('payeeSlug', !slug ? '__vendor' : slug);
+            }}
+          />
+        </div>
+      }
+    >
+      <FormattedMessage defaultMessage="A vendor" id="rth3eX" />
+    </RadioGroupCard>
   );
 });
 

@@ -66,6 +66,7 @@ export const getSettingsQuery = gql`
           invoicePolicy
           receiptPolicy
           titlePolicy
+          grantPolicy
         }
         CONTRIBUTOR_INFO_THRESHOLDS {
           legalName

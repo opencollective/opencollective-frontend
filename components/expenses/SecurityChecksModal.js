@@ -111,7 +111,7 @@ const I18nScopes = defineMessages({
     defaultMessage: 'Collective',
   },
   [Scope.PAYOUT_METHOD]: {
-    id: 'SecurityScope.PayoutMethod',
+    id: 'PayoutMethod',
     defaultMessage: 'Payout Method',
   },
 });
@@ -141,14 +141,14 @@ const SecurityChecksModal = ({ expense, onClose, onConfirm, ...modalProps }) => 
       <ModalBody mb={0} mt="24px">
         <StyledFilters
           p={0}
-          filters={['ALL', ...uniq(expense?.securityChecks?.map(check => check.scope))]}
+          filters={['ALL', ...uniq(expense.securityChecks?.map(check => check.scope))]}
           getLabel={key => intl.formatMessage(I18nScopes[key])}
           onChange={filter => (filter === 'ALL' ? setScope() : setScope(filter))}
           selected={scope}
         />
         <StyledCard mt={3}>
           {expense.securityChecks
-            .filter(check => (scope ? check.scope === scope : true))
+            ?.filter(check => (scope ? check.scope === scope : true))
             .map(check => (
               <SecurityCheck key={check.message} {...check} />
             ))}

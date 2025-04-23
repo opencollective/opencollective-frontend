@@ -30,7 +30,7 @@ const getWindowData = () => {
         accessToken: plaidToken.token,
         hostId: plaidToken.hostId,
       };
-    } catch (e) {
+    } catch {
       return {};
     }
   }

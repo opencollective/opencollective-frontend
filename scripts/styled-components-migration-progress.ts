@@ -17,7 +17,7 @@ function countStyledComponentsImports(searchDir: string): number {
       let stat;
       try {
         stat = fs.statSync(fullPath);
-      } catch (error) {
+      } catch {
         continue; // skip entries that cannot be accessed
       }
 

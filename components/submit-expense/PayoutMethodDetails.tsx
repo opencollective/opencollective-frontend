@@ -6,6 +6,7 @@ import { FormattedMessage } from 'react-intl';
 
 import type { PayoutMethod } from '../../lib/graphql/types/v2/schema';
 import { PayoutMethodType } from '../../lib/graphql/types/v2/schema';
+import { cn } from '@/lib/utils';
 
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
 import { Button } from '../ui/Button';
@@ -131,6 +132,7 @@ function getPayoutMethodDetailItems(props: PayoutMethodDetailsProps) {
 export function PayoutMethodDetailsContainer(props: {
   payoutMethod: ExpenseForm['options']['payoutMethod'];
   maxItems?: number;
+  className?: string;
 }) {
   const [isOpen, setIsOpen] = React.useState(false);
   const toggleContainer = React.useCallback(() => {
@@ -149,7 +151,7 @@ export function PayoutMethodDetailsContainer(props: {
 
   return (
     <Collapsible className="group" open={isOpen}>
-      <div className={'relative overflow-hidden rounded-xl bg-muted'}>
+      <div className={cn('relative overflow-hidden rounded-xl bg-muted', props.className)}>
         {isExpandable && (
           <React.Fragment>
             <div

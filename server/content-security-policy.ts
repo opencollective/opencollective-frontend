@@ -1,5 +1,6 @@
-const mergeWith = require('lodash/mergeWith');
-const { kebabCase, omit } = require('lodash');
+import { kebabCase, mergeWith, omit } from 'lodash';
+
+import { WHITELABEL_DOMAINS } from '../lib/constants/whitelabel-providers';
 const env = process.env.OC_ENV;
 
 const SELF = "'self'";
@@ -33,9 +34,10 @@ const COMMON_DIRECTIVES = {
     SELF,
     process.env.API_URL,
     process.env.PDF_SERVICE_URL,
-    process.env.NEXT_PDF_SERVICE_URL,
+    process.env.PDF_SERVICE_V2_URL,
     process.env.REST_URL,
     process.env.ML_SERVICE_URL,
+    ...WHITELABEL_DOMAINS,
     'wtfismyip.com',
     '*.paypal.com',
     '*.paypalobjects.com',
@@ -93,7 +95,7 @@ const COMMON_DIRECTIVES = {
   objectSrc: ['opencollective.com'],
 };
 
-const generateDirectives = customValues => {
+const generateDirectives = (customValues?: Record<string, unknown>) => {
   const toRemove = [];
 
   const result = mergeWith(COMMON_DIRECTIVES, customValues, (objValue, srcValue, key) => {
@@ -203,15 +205,12 @@ const getContentSecurityPolicyConfig = () => {
   }
 };
 
-module.exports = {
-  getContentSecurityPolicyConfig,
-  getCSPHeader: () => {
-    const config = getContentSecurityPolicyConfig();
-    if (config) {
-      return {
-        key: config.reportOnly ? 'Content-Security-Policy-Report-Only' : 'Content-Security-Policy',
-        value: getHeaderValueFromDirectives(config.directives),
-      };
-    }
-  },
+export const getCSPHeader = () => {
+  const config = getContentSecurityPolicyConfig();
+  if (config) {
+    return {
+      key: config.reportOnly ? 'Content-Security-Policy-Report-Only' : 'Content-Security-Policy',
+      value: getHeaderValueFromDirectives(config.directives),
+    };
+  }
 };

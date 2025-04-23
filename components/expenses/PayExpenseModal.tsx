@@ -154,9 +154,8 @@ const TransferDetailFields = ({ expense, setDisabled, host }: TransferDetailsFie
     });
     if (referenceField) {
       const reference =
-        expense.reference || generateReference
-          ? generateDefaultReference(expense, referenceField.maxLength)
-          : undefined;
+        expense.reference ||
+        (generateReference ? generateDefaultReference(expense, referenceField.maxLength) : undefined);
       if (reference) {
         formik.setFieldValue('transfer.details.reference', truncateMiddle(reference, referenceField.maxLength, ' '));
       }
@@ -371,7 +370,7 @@ const getHandleSubmit = (intl, currency, onSubmit) => async values => {
   if (
     values.forceManual &&
     values.paymentProcessorFeeInHostCurrency &&
-    values.paymentProcessorFeeInHostCurrency > values.totalAmountPaidInHostCurrency / 2 &&
+    values.paymentProcessorFeeInHostCurrency > totalAmountPaidInHostCurrency / 2 &&
     !confirm(
       intl.formatMessage(
         {
@@ -677,7 +676,7 @@ const PayExpenseModal = ({ onClose, onSubmit, expense, collective, host, error }
                     />
                   ) : (
                     <FormattedMoneyAmount
-                      amount={amounts.expenseAmountInHostCurrency?.valueInCents}
+                      amount={formik.values.expenseAmountInHostCurrency}
                       currency={amounts.expenseAmountInHostCurrency?.currency}
                       amountClassName="font-medium"
                       currencyCodeClassName="text-muted-foreground"

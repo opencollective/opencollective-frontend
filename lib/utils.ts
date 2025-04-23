@@ -3,6 +3,8 @@ import loadScript from 'load-script';
 import { isEmpty, isObject, omit } from 'lodash';
 import { twMerge } from 'tailwind-merge';
 
+import * as whitelabel from './constants/whitelabel-providers';
+
 /**
  * Helper to make it easier to conditionally add and deduplicate Tailwind CSS classes and deduplicate
  */
@@ -31,7 +33,7 @@ export const isValidUrl = url => {
   try {
     new URL(url);
     return true;
-  } catch (e) {
+  } catch {
     return false;
   }
 };
@@ -59,7 +61,7 @@ export const isValidRelativeUrl = url => {
     // If we're able to construct a URL, it means it's an absolute URL.
     new URL(url);
     return false;
-  } catch (e) {
+  } catch {
     // Prevent URLs like //example.com or /\n/example.com or /\/example.com/
     if (url.match(/^[\s\\/]{2,}.+/)) {
       return false;
@@ -67,6 +69,16 @@ export const isValidRelativeUrl = url => {
       return true;
     }
   }
+};
+
+export const isTrustedSigninRedirectionUrl = (url: string) => {
+  if (!url) {
+    return false;
+  } else if (url.startsWith('http://') || url.startsWith('https://')) {
+    const parsedUrl = new URL(url);
+    return whitelabel.WHITELABEL_DOMAINS.includes(parsedUrl.origin);
+  }
+  return false;
 };
 
 export const isValidEmail = email => {
@@ -100,7 +112,6 @@ export function getQueryParams() {
     },
     query = window.location.search.substring(1);
 
-  // eslint-disable-next-line no-cond-assign
   while ((match = search.exec(query))) {
     urlParams[decode(match[1])] = decode(match[2]);
   }

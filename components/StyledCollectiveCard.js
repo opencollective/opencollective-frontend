@@ -7,6 +7,7 @@ import styled from 'styled-components';
 import { getCollectiveMainTag } from '../lib/collective';
 import { getCountryDisplayName, getFlagEmoji } from '../lib/i18n/countries';
 
+import { AccountTrustBadge } from './AccountTrustBadge';
 import Avatar from './Avatar';
 import Container from './Container';
 import { Box, Flex } from './Grid';
@@ -124,7 +125,11 @@ const getBackground = collective => {
 
 const CollectiveContainer = ({ useLink, collective, children }) => {
   if (useLink) {
-    return <LinkCollective collective={collective}>{children}</LinkCollective>;
+    return (
+      <LinkCollective className="max-w-[85%]" collective={collective}>
+        {children}
+      </LinkCollective>
+    );
   } else {
     return children;
   }
@@ -182,11 +187,14 @@ const StyledCollectiveCard = ({
           {...props.childrenContainerProps}
         >
           <Container p={3}>
-            <CollectiveContainer useLink={useLink} collective={collective}>
-              <P mt={3} fontSize="16px" fontWeight="bold" color="black.800" title={collective.name} truncateOverflow>
-                {collective.name}
-              </P>
-            </CollectiveContainer>
+            <div className="mt-4 flex items-center gap-2">
+              <CollectiveContainer useLink={useLink} collective={collective}>
+                <P fontSize="16px" fontWeight="bold" color="black.800" title={collective.name} truncateOverflow>
+                  {collective.name}
+                </P>
+              </CollectiveContainer>
+              <AccountTrustBadge account={collective} />
+            </div>
             {showWebsite && collective.website && (
               <P fontSize="11px" fontWeight="400" title={collective.website} truncateOverflow mt={1}>
                 <StyledLink color="black.600" href={collective.website} openInNewTabNoFollow>

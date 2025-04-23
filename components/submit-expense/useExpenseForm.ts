@@ -1,6 +1,6 @@
 import React from 'react';
-import type { ApolloClient } from '@apollo/client';
-import { gql, useApolloClient } from '@apollo/client';
+import type { ApolloClient, FetchResult } from '@apollo/client';
+import { gql, useApolloClient, useMutation } from '@apollo/client';
 import { accountHasGST, accountHasVAT, checkVATNumberFormat, TaxType } from '@opencollective/taxes';
 import dayjs from 'dayjs';
 import type { Path, PathValue } from 'dot-path-value';
@@ -17,15 +17,21 @@ import { AccountTypesWithHost, CollectiveType } from '../../lib/constants/collec
 import { getPayoutProfiles } from '../../lib/expenses';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type {
+  CreateExpenseFromDashboardMutation,
+  CreateExpenseFromDashboardMutationVariables,
+  EditExpenseFromDashboardMutation,
+  EditExpenseFromDashboardMutationVariables,
   ExpenseFormExchangeRatesQuery,
   ExpenseFormExchangeRatesQueryVariables,
   ExpenseFormSchemaHostFieldsFragment,
   ExpenseFormSchemaQuery,
   ExpenseFormSchemaQueryVariables,
   ExpenseVendorFieldsFragment,
+  InviteExpenseFromDashboardMutation,
+  InviteExpenseFromDashboardMutationVariables,
   LocationInput,
 } from '../../lib/graphql/types/v2/graphql';
-import type { Amount } from '../../lib/graphql/types/v2/schema';
+import type { Amount, CurrencyExchangeRateInput, RecurringExpenseInterval } from '../../lib/graphql/types/v2/schema';
 import {
   Currency,
   ExpenseLockableFields,
@@ -38,6 +44,8 @@ import type LoggedInUser from '../../lib/LoggedInUser';
 import { isValidEmail } from '../../lib/utils';
 import { userMustSetAccountingCategory } from '../expenses/lib/accounting-categories';
 import { computeExpenseAmounts } from '../expenses/lib/utils';
+import { AnalyticsEvent } from '@/lib/analytics/events';
+import { track } from '@/lib/analytics/plausible';
 
 import { accountHoverCardFields } from '../AccountHoverCard';
 import { loggedInAccountExpensePayoutFieldsFragment } from '../expenses/graphql/fragments';
@@ -128,8 +136,6 @@ export type ExpenseFormValues = {
     data?: { currency?: string; accountHolderName?: string } & Record<string, unknown>;
   };
 
-  editingPayoutMethod?: Record<string, ExpenseFormValues['newPayoutMethod']>;
-
   payeeSlug?: string;
   payeeLocation?: LocationInput;
   expenseTypeOption?: ExpenseType;
@@ -147,9 +153,11 @@ export type ExpenseFormValues = {
   acknowledgedCollectiveInvoiceExpensePolicy?: boolean;
   acknowledgedCollectiveReceiptExpensePolicy?: boolean;
   acknowledgedCollectiveTitleExpensePolicy?: boolean;
+  acknowledgedCollectiveGrantExpensePolicy?: boolean;
   acknowledgedHostInvoiceExpensePolicy?: boolean;
   acknowledgedHostReceiptExpensePolicy?: boolean;
   acknowledgedHostTitleExpensePolicy?: boolean;
+  acknowledgedHostGrantExpensePolicy?: boolean;
   hasInvoiceOption?: YesNoOption;
   invoiceFile?: Attachment;
   invoiceNumber?: string;
@@ -187,20 +195,26 @@ const formSchemaQuery = gql`
 
       ... on AccountWithHost {
         host {
-          vendors(forAccount: { slug: $collectiveSlug }, limit: 5) {
+          vendorsForAccount: vendors(forAccount: { slug: $collectiveSlug }, limit: 5) {
             nodes {
               ...ExpenseVendorFields
             }
+          }
+          vendors(limit: 1) {
+            totalCount
           }
         }
       }
 
       ... on Organization {
         host {
-          vendors(forAccount: { slug: $collectiveSlug }, limit: 5) {
+          vendorsForAccount: vendors(forAccount: { slug: $collectiveSlug }, limit: 5) {
             nodes {
               ...ExpenseVendorFields
             }
+          }
+          vendors(limit: 1) {
+            totalCount
           }
         }
       }
@@ -356,8 +370,18 @@ const formSchemaQuery = gql`
         invoicePolicy
         receiptPolicy
         titlePolicy
+        grantPolicy
       }
     }
+  }
+
+  fragment ExpenseFormPayoutMethods on PayoutMethod {
+    id
+    type
+    name
+    data
+    isSaved
+    canBeEditedOrDeleted
   }
 
   fragment ExpenseFormSchemaHostFields on Host {
@@ -369,6 +393,8 @@ const formSchemaQuery = gql`
     type
     currency
     settings
+    isFirstPartyHost
+    isTrustedHost
 
     location {
       id
@@ -386,6 +412,10 @@ const formSchemaQuery = gql`
     expensesTags {
       id
       tag
+    }
+
+    payoutMethods {
+      ...ExpenseFormPayoutMethods
     }
 
     ...ExpenseFormSchemaPolicyFields
@@ -413,6 +443,10 @@ const formSchemaQuery = gql`
     description
     imageUrl(height: 64)
     hasPayoutMethod
+    vendorInfo {
+      taxId
+      taxType
+    }
     payoutMethods {
       id
       type
@@ -431,6 +465,7 @@ const formSchemaQuery = gql`
     currency
     settings
     supportedExpenseTypes
+    isVerified
 
     stats {
       balance {
@@ -459,6 +494,7 @@ const formSchemaQuery = gql`
         invoicePolicy
         receiptPolicy
         titlePolicy
+        grantPolicy
       }
     }
 
@@ -490,8 +526,12 @@ const formSchemaQuery = gql`
   fragment ExpenseFormSubmitterFields on Account {
     id
     slug
+    type
+    isVerified
     name
     imageUrl
+    isHost
+    isArchived
   }
 
   fragment ExpenseFormPayeeFields on Account {
@@ -503,11 +543,7 @@ const formSchemaQuery = gql`
     type
     isAdmin
     payoutMethods {
-      id
-      type
-      name
-      data
-      isSaved
+      ...ExpenseFormPayoutMethods
     }
 
     location {
@@ -546,6 +582,7 @@ type ExpenseFormOptions = {
     | ExpenseFormSchemaQuery['loggedInAccount']['payoutMethods'][number]
     | ExpenseFormValues['newPayoutMethod'];
   supportedPayoutMethods?: PayoutMethodType[];
+  newPayoutMethodTypes?: PayoutMethodType[];
   expenseTags?: ExpenseFormSchemaHostFieldsFragment['expensesTags'];
   isAccountingCategoryRequired?: boolean;
   accountingCategories?: ExpenseFormSchemaHostFieldsFragment['accountingCategories']['nodes'];
@@ -553,7 +590,8 @@ type ExpenseFormOptions = {
   taxType?: TaxType;
   recentlySubmittedExpenses?: ExpenseFormSchemaQuery['recentlySubmittedExpenses'];
   host?: ExpenseFormSchemaHostFieldsFragment;
-  vendors?: ExpenseVendorFieldsFragment[];
+  vendorsForAccount?: ExpenseVendorFieldsFragment[];
+  showVendorsOption?: boolean;
   account?: ExpenseFormSchemaQuery['account'] | ExpenseFormSchemaQuery['expense']['account'];
   payee?: ExpenseFormSchemaQuery['payee'];
   isAdminOfPayee?: boolean;
@@ -563,12 +601,15 @@ type ExpenseFormOptions = {
   totalInvoicedInExpenseCurrency?: number;
   invitee?: ExpenseFormValues['inviteeNewIndividual'] | ExpenseFormValues['inviteeNewOrganization'];
   expenseCurrency?: Currency;
+  allowDifferentItemCurrency?: boolean;
+  isLongFormItemDescription?: boolean;
+  hasExpenseItemDate?: boolean;
+  canSetupRecurrence?: boolean;
   canChangeAccount?: boolean;
   lockedFields?: ExpenseLockableFields[];
 };
 
 const memoizedExpenseFormSchema = memoizeOne(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async (apolloClient: ApolloClient<any>, variables: ExpenseFormSchemaQueryVariables, refresh?: boolean) => {
     return await apolloClient.query<ExpenseFormSchemaQuery, ExpenseFormSchemaQueryVariables>({
       query: formSchemaQuery,
@@ -650,9 +691,25 @@ function buildFormSchema(
           if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
             return true;
           }
+          if (
+            v === '__newAccountBalancePayoutMethod' &&
+            options.payoutMethods?.some(pm => pm.type === PayoutMethodType.ACCOUNT_BALANCE)
+          ) {
+            return true;
+          }
 
-          if (v && v !== '__newPayoutMethod' && !options.payee?.payoutMethods?.some(pm => pm.id === v)) {
-            return false;
+          // If the payee has a host and the payer account is under a different one, show the host's payout method (cross-host expense)
+          if (v && v !== '__newPayoutMethod') {
+            const payee = options.payee;
+            const account = options.account;
+            const host = account && 'host' in account ? account.host : null;
+            if (payee?.['host'] && host && payee['host'].id !== host.id) {
+              if (!payee['host'].payoutMethods?.some(pm => pm.id === v)) {
+                return false;
+              }
+            } else if (!options.payee?.payoutMethods?.some(pm => pm.id === v)) {
+              return false;
+            }
           }
 
           return true;
@@ -670,7 +727,8 @@ function buildFormSchema(
             options.isAccountingCategoryRequired &&
             options.accountingCategories?.length > 0 &&
             !options.accountingCategories.some(ac => ac.id === v) &&
-            !isNull(v) // null represents "I don't know" and is a valid option
+            !isNull(v) && // null represents "I don't know" and is a valid option
+            values.expenseTypeOption !== ExpenseType.GRANT
           ) {
             return false;
           }
@@ -686,7 +744,10 @@ function buildFormSchema(
       .nullish()
       .refine(
         v => {
-          if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
+          if (
+            ['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug) ||
+            values.expenseTypeOption === ExpenseType.GRANT
+          ) {
             return true;
           }
 
@@ -774,7 +835,7 @@ function buildFormSchema(
             .nullish()
             .refine(
               attachment => {
-                if (values.expenseTypeOption === ExpenseType.INVOICE) {
+                if ([ExpenseType.GRANT, ExpenseType.INVOICE].includes(values.expenseTypeOption)) {
                   return true;
                 }
 
@@ -784,7 +845,21 @@ function buildFormSchema(
                 message: 'Required',
               },
             ),
-          incurredAt: z.string(),
+          incurredAt: z
+            .string()
+            .nullish()
+            .refine(
+              incurredAt => {
+                if (values.expenseTypeOption === ExpenseType.GRANT) {
+                  return true;
+                }
+
+                return !!incurredAt;
+              },
+              {
+                message: 'Required',
+              },
+            ),
           amount: z.object({
             valueInCents: z.number().min(1),
             currency: z.string().refine(v => Object.values(Currency).includes(v as Currency), {
@@ -897,9 +972,29 @@ function buildFormSchema(
     acknowledgedCollectiveTitleExpensePolicy: z
       .boolean()
       .nullish()
-      .refine(v => (options.account?.policies?.EXPENSE_POLICIES?.titlePolicy ? v : true), {
-        message: 'Required',
-      }),
+      .refine(
+        v => {
+          if (values.expenseTypeOption === ExpenseType.GRANT) {
+            return true;
+          }
+          return options.account?.policies?.EXPENSE_POLICIES?.titlePolicy ? v : true;
+        },
+        {
+          message: 'Required',
+        },
+      ),
+    acknowledgedCollectiveGrantExpensePolicy: z
+      .boolean()
+      .nullish()
+      .refine(
+        v =>
+          values.expenseTypeOption === ExpenseType.GRANT && options.account?.policies?.EXPENSE_POLICIES?.grantPolicy
+            ? v
+            : true,
+        {
+          message: 'Required',
+        },
+      ),
     acknowledgedHostInvoiceExpensePolicy: z
       .boolean()
       .nullish()
@@ -932,8 +1027,26 @@ function buildFormSchema(
       .boolean()
       .nullish()
       .refine(
+        v => {
+          if (values.expenseTypeOption === ExpenseType.GRANT) {
+            return true;
+          }
+          return options.host?.policies?.EXPENSE_POLICIES?.titlePolicy && options.host?.slug !== options.account?.slug
+            ? v
+            : true;
+        },
+        {
+          message: 'Required',
+        },
+      ),
+    acknowledgedHostGrantExpensePolicy: z
+      .boolean()
+      .nullish()
+      .refine(
         v =>
-          options.host?.policies?.EXPENSE_POLICIES?.titlePolicy && options.host?.slug !== options.account?.slug
+          values.expenseTypeOption === ExpenseType.GRANT &&
+          options.host?.policies?.EXPENSE_POLICIES?.grantPolicy &&
+          options.host?.slug !== options.account?.slug
             ? v
             : true,
         {
@@ -957,22 +1070,6 @@ function buildFormSchema(
         },
         {
           message: 'Required',
-        },
-      ),
-    editingPayoutMethod: z
-      .object({})
-      .nullish()
-      .refine(
-        () => {
-          if (isEmpty(values.editingPayoutMethod)) {
-            return true;
-          }
-
-          return false;
-        },
-        {
-          message: 'Required',
-          path: ['isEditing'],
         },
       ),
     newPayoutMethod: z.object({
@@ -1008,6 +1105,10 @@ function buildFormSchema(
             .refine(
               currency => {
                 if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
+                  return true;
+                }
+
+                if (values.payoutMethodId === '__newAccountBalancePayoutMethod') {
                   return true;
                 }
 
@@ -1313,10 +1414,13 @@ async function buildFormOptions(
 
     if (host) {
       options.host = host;
-      options.vendors =
-        'vendors' in host
-          ? (((host.vendors as any)?.nodes as ExpenseVendorFieldsFragment[]) || []).filter(v => v.hasPayoutMethod)
+      options.vendorsForAccount =
+        'vendorsForAccount' in host
+          ? (((host.vendorsForAccount as any)?.nodes as ExpenseVendorFieldsFragment[]) || []).filter(
+              v => v.hasPayoutMethod,
+            )
           : [];
+      options.showVendorsOption = 'vendors' in host ? (host.vendors as any)?.totalCount > 0 : false;
       options.supportedPayoutMethods = host.supportedPayoutMethods || [];
       options.expenseTags = host.expensesTags;
       options.isAccountingCategoryRequired = userMustSetAccountingCategory(loggedInUser, account, host);
@@ -1344,18 +1448,46 @@ async function buildFormOptions(
     if (query.data?.loggedInAccount) {
       options.payoutProfiles = getPayoutProfiles(query.data.loggedInAccount);
       if (payee && payee.type !== CollectiveType.VENDOR) {
-        options.payoutMethods = options.payoutProfiles
-          ?.find(p => p.slug === payee?.slug)
-          ?.payoutMethods?.filter(p => options.supportedPayoutMethods.includes(p.type))
-          .map(pm => {
-            if (pm.type === PayoutMethodType.ACCOUNT_BALANCE && host) {
-              return { ...pm, data: { currency: host.currency } };
-            }
-            return pm;
-          });
+        // If the payee has a host and the payer account is under a different one, show the host's payout method (cross-host expense)
+        if (payee['host'] && host && payee['host'].id !== host.id) {
+          options.payoutMethods = payee['host'].payoutMethods?.filter(p =>
+            options.supportedPayoutMethods.includes(p.type),
+          );
+        } else {
+          // Add ACCOUNT_BALANCE payout method if it's supported and available for the payee
+          options.payoutMethods = options.payoutProfiles
+            ?.find(p => p.slug === payee?.slug)
+            ?.payoutMethods?.filter(p => options.supportedPayoutMethods.includes(p.type))
+            .map(pm => {
+              if (pm.type === PayoutMethodType.ACCOUNT_BALANCE && host) {
+                return { ...pm, data: { currency: host.currency } };
+              }
+              return pm;
+            });
+
+          // Add ACCOUNT_BALANCE payout method if it's supported but not available for the payee
+          if (
+            options.supportedPayoutMethods?.includes(PayoutMethodType.ACCOUNT_BALANCE) &&
+            host &&
+            !options.payoutMethods?.some(pm => pm.type === PayoutMethodType.ACCOUNT_BALANCE)
+          ) {
+            options.payoutMethods = [
+              ...(options.payoutMethods || []),
+              {
+                id: '__newAccountBalancePayoutMethod',
+                type: PayoutMethodType.ACCOUNT_BALANCE,
+                data: { currency: host.currency },
+                isSaved: true,
+              },
+            ];
+          }
+        }
       } else if (payee && payee.type === CollectiveType.VENDOR) {
         options.payoutMethods = payee.payoutMethods?.filter(p => options.supportedPayoutMethods.includes(p.type));
       }
+
+      // Filter out ACCOUNT_BALANCE from the list of payout methods, since we add it manually to the default list
+      options.newPayoutMethodTypes = options.supportedPayoutMethods.filter(t => t !== PayoutMethodType.ACCOUNT_BALANCE);
 
       if (values.payoutMethodId && values.payoutMethodId !== '__newPayoutMethod') {
         options.payoutMethod = options.payoutMethods?.find(p => p.id === values.payoutMethodId);
@@ -1370,6 +1502,7 @@ async function buildFormOptions(
         values.payeeSlug === '__findAccountIAdminister';
     } else {
       options.payoutMethod = values.newPayoutMethod;
+      options.newPayoutMethodTypes = options.supportedPayoutMethods;
     }
 
     if (!startOptions.duplicateExpense && options.expense?.lockedFields?.length) {
@@ -1382,10 +1515,24 @@ async function buildFormOptions(
       options.lockedFields?.includes?.(ExpenseLockableFields.AMOUNT)
     ) {
       options.expenseCurrency = options.expense.currency;
+    } else if (values.expenseTypeOption === ExpenseType.GRANT) {
+      options.expenseCurrency = options.account?.currency;
     } else if (options.payoutMethod) {
       options.expenseCurrency = options.payoutMethod.data?.currency || options.account?.currency;
     } else {
       options.expenseCurrency = options.account?.currency;
+    }
+
+    options.isLongFormItemDescription = false;
+    options.allowDifferentItemCurrency = true;
+    options.hasExpenseItemDate = true;
+    options.canSetupRecurrence = true;
+
+    if (values.expenseTypeOption === ExpenseType.GRANT) {
+      options.isLongFormItemDescription = true;
+      options.allowDifferentItemCurrency = false;
+      options.hasExpenseItemDate = false;
+      options.canSetupRecurrence = false;
     }
 
     options.allowExpenseItemAttachment = values.expenseTypeOption === ExpenseType.RECEIPT;
@@ -1456,7 +1603,13 @@ export function useExpenseForm(opts: {
   formRef?: React.MutableRefObject<HTMLFormElement>;
   initialValues: ExpenseFormValues;
   startOptions: ExpenseFormStartOptions;
-  onSubmit: (
+  handleOnSubmit?: boolean;
+  onSuccess?: (
+    result: FetchResult<CreateExpenseFromDashboardMutation> | FetchResult<EditExpenseFromDashboardMutation>,
+    type: 'new' | 'invite' | 'edit',
+  ) => void; // when handleOnSubmit === true
+  onError?: (err) => void; // when handleOnSubmit === true
+  onSubmit?: (
     values: ExpenseFormValues,
     formikHelpers: FormikHelpers<ExpenseFormValues>,
     options: ExpenseFormOptions,
@@ -1476,12 +1629,259 @@ export function useExpenseForm(opts: {
   const initialValues = React.useRef(opts.initialValues);
   const initialStatus = React.useRef({ schema: formOptions.schema });
 
-  const onSubmit = opts.onSubmit;
+  const [createExpense] = useMutation<CreateExpenseFromDashboardMutation, CreateExpenseFromDashboardMutationVariables>(
+    gql`
+      mutation CreateExpenseFromDashboard(
+        $expenseCreateInput: ExpenseCreateInput!
+        $account: AccountReferenceInput!
+        $recurring: RecurringExpenseInput
+        $privateComment: String
+      ) {
+        expense: createExpense(
+          expense: $expenseCreateInput
+          account: $account
+          privateComment: $privateComment
+          recurring: $recurring
+        ) {
+          id
+          legacyId
+        }
+      }
+    `,
+    {
+      context: {
+        ...API_V2_CONTEXT,
+        headers: {
+          'x-is-new-expense-flow': 'true',
+        },
+      },
+    },
+  );
+
+  const [draftExpenseAndInviteUser] = useMutation<
+    InviteExpenseFromDashboardMutation,
+    InviteExpenseFromDashboardMutationVariables
+  >(
+    gql`
+      mutation InviteExpenseFromDashboard(
+        $expenseInviteInput: ExpenseInviteDraftInput!
+        $account: AccountReferenceInput!
+      ) {
+        expense: draftExpenseAndInviteUser(expense: $expenseInviteInput, account: $account) {
+          id
+          legacyId
+        }
+      }
+    `,
+    {
+      context: {
+        ...API_V2_CONTEXT,
+        headers: {
+          'x-is-new-expense-flow': 'true',
+        },
+      },
+    },
+  );
+
+  const [editExpense] = useMutation<EditExpenseFromDashboardMutation, EditExpenseFromDashboardMutationVariables>(
+    gql`
+      mutation EditExpenseFromDashboard($expenseEditInput: ExpenseUpdateInput!, $draftKey: String) {
+        expense: editExpense(expense: $expenseEditInput, draftKey: $draftKey) {
+          id
+          legacyId
+        }
+      }
+    `,
+    {
+      context: {
+        ...API_V2_CONTEXT,
+        headers: {
+          'x-is-new-expense-flow': 'true',
+        },
+      },
+    },
+  );
+
+  const { onSubmit, onError, onSuccess } = opts;
   const onSubmitCallback = React.useCallback(
-    (values: ExpenseFormValues, formikHelpers: FormikHelpers<ExpenseFormValues>) => {
+    async (values: ExpenseFormValues, formikHelpers: FormikHelpers<ExpenseFormValues>) => {
+      if (opts.handleOnSubmit) {
+        let result: FetchResult<CreateExpenseFromDashboardMutation> | FetchResult<EditExpenseFromDashboardMutation>;
+        try {
+          track(AnalyticsEvent.EXPENSE_SUBMISSION_SUBMITTED);
+
+          const attachedFiles = values.additionalAttachments.map(a => ({
+            url: typeof a === 'string' ? a : a?.url,
+          }));
+
+          const expenseInput: CreateExpenseFromDashboardMutationVariables['expenseCreateInput'] = {
+            description:
+              values.expenseTypeOption === ExpenseType.GRANT && isEmpty(values.title)
+                ? generateGrantTitle(formOptions.account, formOptions.payee, formOptions.invitee)
+                : values.title,
+            reference:
+              values.expenseTypeOption === ExpenseType.INVOICE && values.hasInvoiceOption === YesNoOption.YES
+                ? values.invoiceNumber
+                : null,
+            payee: {
+              slug: formOptions.payee?.slug,
+            },
+            payeeLocation: values.payeeLocation,
+            payoutMethod:
+              !values.payoutMethodId || values.payoutMethodId === '__newPayoutMethod'
+                ? { ...values.newPayoutMethod, isSaved: false }
+                : values.payoutMethodId === '__newAccountBalancePayoutMethod'
+                  ? {
+                      type: PayoutMethodType.ACCOUNT_BALANCE,
+                      data: {},
+                    }
+                  : {
+                      id: values.payoutMethodId,
+                    },
+            type: values.expenseTypeOption,
+            accountingCategory: values.accountingCategoryId
+              ? {
+                  id: values.accountingCategoryId,
+                }
+              : null,
+            attachedFiles,
+            currency: formOptions.expenseCurrency,
+            customData: null,
+            invoiceInfo: null,
+            invoiceFile:
+              values.hasInvoiceOption === YesNoOption.NO
+                ? null
+                : values.invoiceFile
+                  ? { url: typeof values.invoiceFile === 'string' ? values.invoiceFile : values.invoiceFile.url }
+                  : undefined,
+            items: values.expenseItems.map(ei => ({
+              description: ei.description,
+              amountV2: {
+                valueInCents: ei.amount.valueInCents,
+                currency: ei.amount.currency as Currency,
+                exchangeRate: ei.amount.exchangeRate
+                  ? ({
+                      ...pick(ei.amount.exchangeRate, ['source', 'rate', 'value', 'fromCurrency', 'toCurrency']),
+                      date: new Date(ei.amount.exchangeRate.date || ei.incurredAt),
+                    } as CurrencyExchangeRateInput)
+                  : null,
+              },
+              incurredAt: values.expenseTypeOption === ExpenseType.GRANT ? new Date() : new Date(ei.incurredAt),
+              url:
+                values.expenseTypeOption === ExpenseType.RECEIPT
+                  ? typeof ei.attachment === 'string'
+                    ? ei.attachment
+                    : ei.attachment?.url
+                  : null,
+            })),
+            longDescription: null,
+            privateMessage: null,
+            tags: values.tags,
+            tax: values.hasTax
+              ? [
+                  {
+                    rate: values.tax.rate,
+                    type: formOptions.taxType,
+                    idNumber: values.tax.idNumber,
+                  },
+                ]
+              : null,
+          };
+
+          if (formOptions.expense?.id && !startOptions.current.duplicateExpense) {
+            const editInput: EditExpenseFromDashboardMutationVariables['expenseEditInput'] = {
+              ...expenseInput,
+              id: formOptions.expense.id,
+              payee:
+                formOptions.expense?.status === ExpenseStatus.DRAFT && !formOptions.payee?.slug
+                  ? formOptions.expense?.draft?.payee
+                  : {
+                      slug: formOptions.payee?.slug,
+                    },
+            };
+            result = await editExpense({
+              variables: {
+                expenseEditInput: editInput,
+                draftKey: startOptions.current.draftKey,
+              },
+            });
+
+            onSuccess(result, 'edit');
+          } else if (
+            formOptions.payee?.type === CollectiveType.VENDOR ||
+            formOptions.payoutProfiles.some(p => p.slug === values.payeeSlug)
+          ) {
+            result = await createExpense({
+              variables: {
+                account: {
+                  slug: formOptions.account?.slug,
+                },
+                expenseCreateInput: expenseInput,
+                ...(values.recurrenceFrequency !== RecurrenceFrequencyOption.NONE
+                  ? {
+                      recurring: {
+                        interval: values.recurrenceFrequency as unknown as RecurringExpenseInterval,
+                        endsAt: dayjs(values.recurrenceEndAt).toDate(),
+                      },
+                    }
+                  : {}),
+                privateComment:
+                  formOptions.payoutMethod?.type === PayoutMethodType.BANK_ACCOUNT &&
+                  formOptions.payoutMethod?.data?.accountHolderName !== formOptions.payee?.legalName
+                    ? values.payoutMethodNameDiscrepancyReason
+                    : null,
+              },
+            });
+
+            onSuccess(result, 'new');
+          } else {
+            const payee =
+              values.payeeSlug === '__inviteExistingUser'
+                ? { slug: values.inviteeExistingAccount }
+                : values.inviteeAccountType === InviteeAccountType.INDIVIDUAL
+                  ? values.inviteeNewIndividual
+                  : values.inviteeNewOrganization;
+            const inviteInput: InviteExpenseFromDashboardMutationVariables['expenseInviteInput'] = {
+              ...expenseInput,
+              payee: {
+                ...payee,
+                isInvite: true,
+              },
+              recipientNote: values.inviteNote,
+            };
+            result = await draftExpenseAndInviteUser({
+              variables: {
+                account: {
+                  slug: formOptions.account?.slug,
+                },
+                expenseInviteInput: inviteInput,
+              },
+            });
+
+            onSuccess(result, 'invite');
+          }
+
+          track(AnalyticsEvent.EXPENSE_SUBMISSION_SUBMITTED_SUCCESS);
+        } catch (err) {
+          track(AnalyticsEvent.EXPENSE_SUBMISSION_SUBMITTED_ERROR);
+          onError(err);
+        } finally {
+          // h.setSubmitting(false);
+        }
+        return;
+      }
       return onSubmit(values, formikHelpers, formOptions, startOptions.current);
     },
-    [onSubmit, formOptions],
+    [
+      opts.handleOnSubmit,
+      onSubmit,
+      formOptions,
+      editExpense,
+      onSuccess,
+      createExpense,
+      draftExpenseAndInviteUser,
+      onError,
+    ],
   );
 
   const validate = React.useCallback(
@@ -1504,6 +1904,11 @@ export function useExpenseForm(opts: {
             ...(errs['newPayoutMethod'] || {}),
             ...newPayoutMethodErrors,
           };
+        }
+
+        if (!isEmpty(errs)) {
+          // eslint-disable-next-line no-console
+          console.warn('Form validation error', errs, values); // The form does not always surface errors properly, this will help to troubleshoot.
         }
 
         return errs;
@@ -1641,8 +2046,8 @@ export function useExpenseForm(opts: {
     if (prevFormOptions?.host?.slug !== formOptions.host?.slug) {
       if (
         (expenseForm.values.payeeSlug === '__vendor' ||
-          prevFormOptions.vendors?.some(v => v.slug === expenseForm.values.payeeSlug)) &&
-        !formOptions.vendors?.some(v => v.slug === expenseForm.values.payeeSlug)
+          prevFormOptions.vendorsForAccount?.some(v => v.slug === expenseForm.values.payeeSlug)) &&
+        !formOptions.vendorsForAccount?.some(v => v.slug === expenseForm.values.payeeSlug)
       ) {
         setFieldValue('payeeSlug', null);
       }
@@ -1650,8 +2055,8 @@ export function useExpenseForm(opts: {
   }, [
     prevFormOptions?.host?.slug,
     formOptions.host?.slug,
-    prevFormOptions?.vendors,
-    formOptions.vendors,
+    prevFormOptions?.vendorsForAccount,
+    formOptions.vendorsForAccount,
     expenseForm.values.payeeSlug,
     setFieldValue,
   ]);
@@ -1673,17 +2078,37 @@ export function useExpenseForm(opts: {
       expenseForm.values.expenseItems.length === 1 &&
       !isEmpty(expenseForm.values.expenseItems[0].description) &&
       !expenseForm.touched.title &&
-      !formOptions.lockedFields?.includes?.(ExpenseLockableFields.DESCRIPTION)
+      !formOptions.lockedFields?.includes?.(ExpenseLockableFields.DESCRIPTION) &&
+      expenseForm.values.expenseTypeOption !== ExpenseType.GRANT
     ) {
       setFieldValue('title', expenseForm.values.expenseItems[0].description);
     }
-  }, [expenseForm.values.expenseItems, expenseForm.touched.title, setFieldValue, formOptions.lockedFields]);
+  }, [
+    expenseForm.values.expenseItems,
+    expenseForm.touched.title,
+    setFieldValue,
+    formOptions.lockedFields,
+    expenseForm.values.expenseTypeOption,
+  ]);
 
   React.useEffect(() => {
     if (!expenseForm.values.hasTax) {
       setFieldValue('tax', null);
+    } else if (!expenseForm.values.tax) {
+      const selectedVendor = formOptions.vendorsForAccount?.find(
+        v => v.slug === expenseForm.values.payeeSlug && formOptions?.taxType === v.vendorInfo?.taxType,
+      );
+      if (selectedVendor && !expenseForm.values.tax) {
+        setFieldValue('tax', { idNumber: selectedVendor.vendorInfo?.taxId, rate: 0 });
+      }
     }
-  }, [expenseForm.values.hasTax, setFieldValue]);
+  }, [
+    expenseForm.values.hasTax,
+    expenseForm.values.tax,
+    expenseForm.values.payeeSlug,
+    formOptions.vendorsForAccount,
+    setFieldValue,
+  ]);
 
   React.useEffect(() => {
     if (expenseForm.values.accountingCategoryId && (formOptions.accountingCategories || []).length === 0) {
@@ -1768,7 +2193,7 @@ export function useExpenseForm(opts: {
             }
           });
         }
-      } catch (err) {
+      } catch {
         return;
       }
     }
@@ -1845,7 +2270,33 @@ export function useExpenseForm(opts: {
     ) {
       setFieldValue('payoutMethodId', null);
     }
-  }, [formOptions.payoutMethods, expenseForm.values.payoutMethodId, setFieldValue]);
+
+    const selectedPayoutMethod = formOptions.payoutMethods?.find(p => p.id === expenseForm.values.payoutMethodId);
+    if (
+      selectedPayoutMethod &&
+      selectedPayoutMethod.data?.currency &&
+      !expenseForm.touched.expenseItems &&
+      expenseForm.values.expenseItems[0]?.amount?.currency !== selectedPayoutMethod.data?.currency
+    ) {
+      setFieldValue(
+        'expenseItems',
+        expenseForm.values.expenseItems.map(ei => ({
+          ...ei,
+          amount: {
+            ...ei.amount,
+            currency: selectedPayoutMethod.data?.currency,
+          },
+        })),
+      );
+    }
+  }, [
+    formOptions.payoutMethods,
+    expenseForm.values.payoutMethodId,
+    setFieldValue,
+    setFormOptions,
+    expenseForm.touched.expenseItems,
+    expenseForm.values.expenseItems,
+  ]);
 
   const refresh = React.useCallback(async () => refreshFormOptions(true), [refreshFormOptions]);
 
@@ -1855,4 +2306,11 @@ export function useExpenseForm(opts: {
     initialLoading: initialLoading.current,
     refresh,
   });
+}
+export function generateGrantTitle(
+  account: ExpenseFormOptions['account'],
+  payee: ExpenseFormOptions['payee'],
+  invitee: ExpenseFormOptions['invitee'],
+): string {
+  return `${account.name} - ${payee ? payee.name : invitee?.name}`;
 }

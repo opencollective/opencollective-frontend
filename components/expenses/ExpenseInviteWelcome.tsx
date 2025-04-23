@@ -94,7 +94,7 @@ type ExpenseInviteRecipientNoteProps = {
   };
 };
 
-function ExpenseInviteRecipientNote(props: ExpenseInviteRecipientNoteProps) {
+export function ExpenseInviteRecipientNote(props: ExpenseInviteRecipientNoteProps) {
   return (
     props.expense.draft?.recipientNote && (
       <div className={cn('space-y-3 rounded-lg border bg-background p-4', props.className)}>

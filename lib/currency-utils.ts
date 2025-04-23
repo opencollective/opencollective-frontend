@@ -11,7 +11,7 @@ export type Options = {
   minimumFractionDigits?: number;
   precision?: number;
   style?: 'currency' | 'decimal';
-  currencyDisplay?: 'symbol' | 'narrowSymbol' | 'code' | 'name';
+  currencyDisplay?: Intl.NumberFormatOptions['currencyDisplay'];
   absolute?: boolean;
 };
 
@@ -90,7 +90,7 @@ export function formatCurrency(
     maximumFractionDigits = 0;
   }
 
-  const formatAmount = (currencyDisplay: Intl.NumberFormatOptions['currencyDisplay']): string => {
+  const formatAmount = (currencyDisplay: Options['currencyDisplay']): string => {
     return amount.toLocaleString(options.locale, {
       style: options.style || 'currency',
       currency,
@@ -104,7 +104,7 @@ export function formatCurrency(
     // We manually add the exact currency (e.g. "$10 USD") in many places. This is to prevent
     // showing the currency twice is some locales ($US10 USD)
     return formatAmount(options.currencyDisplay ?? 'narrowSymbol');
-  } catch (e) {
+  } catch {
     // ... unfortunately, some old versions of Safari doesn't support it, so we need a fallback
     return formatAmount('symbol');
   }

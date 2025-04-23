@@ -70,6 +70,7 @@ export type CSVField =
   | 'expensePaidByHandle'
   | 'expenseReference'
   | 'expenseTransferReference'
+  | 'importSourceName'
   | 'importSourceId'
   | 'importSourceDescription'
   | 'importSourceAmount'
@@ -803,6 +804,12 @@ export const FIELDS: Array<{
     label: <FormattedMessage defaultMessage="Payee Country" id="ZRVrsh" />,
   },
   // Imported data
+  {
+    id: 'importSourceName',
+    group: 'imports',
+    label: <FormattedMessage defaultMessage="Import Source Name" id="Y71SPR" />,
+    tooltip: <FormattedMessage defaultMessage="The name of the import source" id="/0q47+" />,
+  },
   {
     id: 'importSourceId',
     group: 'imports',

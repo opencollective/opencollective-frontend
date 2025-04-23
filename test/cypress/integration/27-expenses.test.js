@@ -780,8 +780,8 @@ describe('Expense flow', () => {
       const date = new Date(expense.createdAt).toISOString().split('T')[0];
       const filename = `Expense-${expense.legacyId}-${collective.slug}-invoice-${date}.pdf`;
       cy.getDownloadedPDFContent(filename)
-        .should('contain', `Expense	#${expense.legacyId}:	Expense	for	E2E	tests`)
-        .should('contain', 'Collective:	Test	Collective')
+        .should('contain', `Expense #${expense.legacyId}: Expense for E2E tests`)
+        .should('contain', 'Collective: Test Collective')
         .should('contain', '$10.00');
     });
 

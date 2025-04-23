@@ -27,7 +27,7 @@ import { useRouter } from 'next/router';
 import { useIntl } from 'react-intl';
 
 import hasFeature, { FEATURES } from '../../lib/allowed-features';
-import { isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective';
+import { isChildAccount, isHostAccount, isIndividualAccount, isSelfHostedAccount } from '../../lib/collective';
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
@@ -109,10 +109,11 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
   const isAccountantOnly = LoggedInUser?.isAccountantOnly(account);
   const isActive = account.isActive;
   const isActiveHost = isHost && isActive;
+  const isChild = isChildAccount(account);
 
   const items: MenuItem[] = [
     {
-      if: isIndividual || (LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW) && !isHost),
+      if: isIndividual || !isHost,
       section: ALL_SECTIONS.OVERVIEW,
       Icon: LayoutDashboard,
     },
@@ -123,7 +124,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       label: intl.formatMessage({ id: 'Expenses', defaultMessage: 'Expenses' }),
     },
     {
-      if: !isIndividual && LoggedInUser.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.CROWDFUNDING_REDESIGN),
+      if: !isIndividual && !isChild,
       section: ALL_SECTIONS.ACCOUNTS,
       Icon: Wallet,
       label: intl.formatMessage({ defaultMessage: 'Accounts', id: 'FvanT6' }),
@@ -494,7 +495,7 @@ const Menu = ({ onRoute, menuItems }) => {
 
   const showLinkToProfilePrototype =
     !['ROOT', 'ORGANIZATION', 'FUND', 'INDIVIDUAL'].includes(account.type) &&
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.COLLECTIVE_OVERVIEW);
+    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.CROWDFUNDING_REDESIGN);
 
   return (
     <div className="space-y-4">

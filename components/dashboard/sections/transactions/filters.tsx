@@ -50,6 +50,8 @@ export const schema = z.object({
   searchTerm: searchFilter.schema,
   kind: isMulti(z.nativeEnum(TransactionKind)).optional(),
   type: z.nativeEnum(TransactionType).optional(),
+  paymentMethodId: isMulti(z.string()).optional(),
+  payoutMethodId: z.string().optional(),
   paymentMethod: paymentMethodFilter.schema,
   virtualCard: isMulti(z.string()).optional(),
   expenseType: isMulti(z.nativeEnum(ExpenseType)).optional(),
@@ -80,6 +82,8 @@ export const toVariables: FiltersToVariables<FilterValues, TransactionsTableQuer
   expenseId: id => ({ expense: { legacyId: id } }),
   orderId: id => ({ order: { legacyId: id } }),
   paymentMethod: paymentMethodFilter.toVariables,
+  paymentMethodId: ids => ({ paymentMethod: ids.map(id => ({ id })) }),
+  payoutMethodId: id => ({ payoutMethod: { id } }),
 };
 
 // The filters config is used to populate the Filters component.
@@ -127,7 +131,6 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     labelMsg: defineMessage({ id: 'PayoutMethod.Type.VirtualCard', defaultMessage: 'Virtual Card' }),
     valueRenderer: ({ value }) => <VirtualCardRenderer id={value} />,
   },
-
   isRefund: {
     labelMsg: defineMessage({ defaultMessage: 'Is Refund', id: 'o+jEZR' }),
     Component: ({ intl, ...props }) => {
@@ -140,7 +143,6 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
       return <ComboSelectFilter options={options} {...props} />;
     },
   },
-
   hasDebt: {
     labelMsg: defineMessage({ defaultMessage: 'Has Debt', id: 'ihvDCr' }),
     Component: ({ intl, ...props }) => {
@@ -153,7 +155,6 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
       return <ComboSelectFilter options={options} {...props} />;
     },
   },
-
   expenseType: {
     labelMsg: defineMessage({ defaultMessage: 'Expense type', id: '9cwufA' }),
 
@@ -218,5 +219,13 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     labelMsg: defineMessage({ defaultMessage: 'Group ID', id: 'nBKj/i' }),
     valueRenderer: ({ value }) => value.substring(0, 8),
     Component: props => <ComboSelectFilter isMulti creatable {...props} valueRenderer={undefined} />, // undefined valueRenderer to show full group ID in select filter
+  },
+  payoutMethodId: {
+    labelMsg: defineMessage({ defaultMessage: 'Payout Method', id: 'PayoutMethod' }),
+    valueRenderer: ({ value }) => value.split('-')[0],
+  },
+  paymentMethodId: {
+    labelMsg: defineMessage({ defaultMessage: 'Payment Method', id: 'paymentmethod.label' }),
+    valueRenderer: ({ value }) => value.split('-')[0],
   },
 };

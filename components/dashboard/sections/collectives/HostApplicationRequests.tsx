@@ -87,7 +87,7 @@ export default function HostApplicationRequests({
             hostApplications={applicationRequests}
             nbPlaceholders={nbPlaceholders}
             loading={loading}
-            openApplication={application => queryFilter.setFilter('hostApplicationId', application.id)}
+            openApplication={application => queryFilter.setFilter('hostApplicationId', application.id, false)}
           />
           <Pagination queryFilter={queryFilter} total={totalCount} />
         </React.Fragment>
@@ -95,7 +95,7 @@ export default function HostApplicationRequests({
 
       <HostApplicationDrawer
         open={!!queryFilter.values.hostApplicationId}
-        onClose={() => queryFilter.setFilter('hostApplicationId', null)}
+        onClose={() => queryFilter.setFilter('hostApplicationId', null, false)}
         applicationId={queryFilter.values.hostApplicationId}
         editCollectiveMutation={editCollectiveMutation}
       />

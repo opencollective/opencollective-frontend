@@ -377,7 +377,7 @@ const OCFDuplicateAndApplyToHostModal = ({ hostSlug, collective, onClose, onSucc
                 if (onSuccess) {
                   await onSuccess(result);
                 }
-              } catch (e) {
+              } catch {
                 // Add a toast to make sure any failure in the following requests does not confuse the user
                 toast({
                   variant: 'error',

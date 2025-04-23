@@ -228,7 +228,6 @@ export function OCFBannerWithData(props: OCFBannerProps) {
             The remaining balance from your previous Fiscal Host is in this account:{' '}
             <StyledLink
               as={Link}
-              collective={oldAccount}
               href={props.isDashboard ? getDashboardRoute(oldAccount) : getCollectivePageRoute(oldAccount)}
             >
               @{oldAccount.slug}

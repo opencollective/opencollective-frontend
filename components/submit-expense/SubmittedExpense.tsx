@@ -4,6 +4,7 @@ import { includes } from 'lodash';
 
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import type { ExpensePageQuery, ExpensePageQueryVariables } from '../../lib/graphql/types/v2/graphql';
+import { ExpenseType } from '@/lib/graphql/types/v2/schema';
 
 import ExpenseSummary from '../expenses/ExpenseSummary';
 import { expensePageQuery } from '../expenses/graphql/queries';
@@ -61,9 +62,11 @@ export function SubmittedExpense(props: SubmittedExpenseProps) {
             collective={expense?.account}
           />
         </div>
-        <div className="flex-1 pb-12 md:max-w-96">
-          <CreateExpenseFAQ defaultOpen />
-        </div>
+        {expense?.type !== ExpenseType.GRANT && (
+          <div className="flex-1 pb-12 md:max-w-96">
+            <CreateExpenseFAQ defaultOpen />
+          </div>
+        )}
       </div>
     </div>
   );

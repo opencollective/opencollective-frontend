@@ -134,7 +134,22 @@ const HostTransactionReport = ({ accountSlug: hostSlug, subpath }: DashboardSect
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   <DropdownMenuItem onClick={() => openExportTransactionsModal()}>
-                    <FormattedMessage defaultMessage="Export transactions" id="T72ceA" />
+                    <FormattedMessage
+                      defaultMessage="Export all transactions"
+                      id="ExportTransactionsCSVModal.ExportAll"
+                    />
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => openExportTransactionsModal({ isHost: false })}>
+                    <FormattedMessage
+                      defaultMessage="Export managed funds transactions"
+                      id="ExportTransactionsCSVModal.ExportManagedFunds"
+                    />
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => openExportTransactionsModal({ isHost: true })}>
+                    <FormattedMessage
+                      defaultMessage="Export operational transactions"
+                      id="ExportTransactionsCSVModal.ExportOperationalFunds"
+                    />
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

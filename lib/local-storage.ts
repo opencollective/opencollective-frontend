@@ -32,7 +32,7 @@ export const LOCAL_STORAGE_KEYS = {
 export const getFromLocalStorage = (key: string): string => {
   try {
     return window.localStorage.getItem(key);
-  } catch (e) {
+  } catch {
     return null;
   }
 };
@@ -44,7 +44,7 @@ export const getFromLocalStorage = (key: string): string => {
 export const setLocalStorage = (key: string, value: string): void => {
   try {
     window.localStorage.setItem(key, value);
-  } catch (e) {
+  } catch {
     // Ignore errors
   }
 };
@@ -56,7 +56,7 @@ export const setLocalStorage = (key: string, value: string): void => {
 export const removeFromLocalStorage = (key: string): void => {
   try {
     window.localStorage.removeItem(key);
-  } catch (e) {
+  } catch {
     // Ignore errors
   }
 };

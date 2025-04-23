@@ -12,7 +12,7 @@ import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { i18nFrequency } from '../../lib/i18n/order';
 import { i18nPaymentMethodProviderType } from '../../lib/i18n/payment-method-provider-type';
 
-import { AccountHoverCard } from '../AccountHoverCard';
+import { AccountHoverCard, accountHoverCardFields } from '../AccountHoverCard';
 import Avatar from '../Avatar';
 import { CopyID } from '../CopyId';
 import DateTime from '../DateTime';
@@ -75,6 +75,7 @@ const contributionDrawerQuery = gql`
           host {
             id
             slug
+            type
           }
         }
       }
@@ -162,6 +163,7 @@ const contributionDrawerQuery = gql`
     imageUrl
     isHost
     isArchived
+    ...AccountHoverCardFields
     ... on Individual {
       isGuest
     }
@@ -230,6 +232,7 @@ const contributionDrawerQuery = gql`
     }
     paymentProcessorUrl
   }
+  ${accountHoverCardFields}
 `;
 
 type ContributionDrawerProps = {
@@ -260,7 +263,9 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
   );
   const transactionsUrl = React.useMemo(() => {
     const url = order && getTransactionsUrl(LoggedInUser, order);
-    url && url.searchParams?.set('orderId', order.legacyId.toString());
+    if (url) {
+      url.searchParams?.set('orderId', order.legacyId.toString());
+    }
     return url;
   }, [LoggedInUser, order]);
 
