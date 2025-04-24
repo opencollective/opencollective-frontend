@@ -9810,8 +9810,10 @@ export enum PaymentMethodType {
 /** A payout method */
 export type PayoutMethod = {
   __typename?: 'PayoutMethod';
-  /** Whether this payout method can be edit or deleted */
-  canBeEditedOrDeleted?: Maybe<Scalars['Boolean']['output']>;
+  /** Whether this payout method can be deleted or only archived */
+  canBeDeleted?: Maybe<Scalars['Boolean']['output']>;
+  /** Whether this payout method can be edited */
+  canBeEdited?: Maybe<Scalars['Boolean']['output']>;
   /** The actual data for this payout method. Content depends on the type. */
   data?: Maybe<Scalars['JSON']['output']>;
   /** Unique identifier for this payout method */

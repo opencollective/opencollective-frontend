@@ -455,7 +455,6 @@ type PayoutMethodRadioGroupItemProps = {
   moreActions?: React.ReactNode;
 };
 
-// eslint-disable-next-line prefer-arrow-callback
 export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(props: PayoutMethodRadioGroupItemProps) {
   const CardComponent = props.Component || RadioGroupCard;
   const intl = useIntl();
@@ -559,7 +558,7 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
       e.stopPropagation();
       e.preventDefault();
       showConfirmationModal({
-        title: props.payoutMethod?.canBeEditedOrDeleted
+        title: props.payoutMethod?.canBeDeleted
           ? intl.formatMessage({
               defaultMessage: 'Delete Payout Method?',
               id: 'weGvmF',
@@ -568,7 +567,7 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
               defaultMessage: 'Archive Payout Method?',
               id: 'dX2XCG',
             }),
-        description: props.payoutMethod?.canBeEditedOrDeleted
+        description: props.payoutMethod?.canBeDeleted
           ? intl.formatMessage({
               defaultMessage: 'Are you sure you want to delete this payout method?',
               id: 'uR+TjD',
@@ -589,7 +588,7 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
             await props.onPaymentMethodDeleted(props.payoutMethod.id);
             toast({
               variant: 'success',
-              message: props.payoutMethod?.canBeEditedOrDeleted ? (
+              message: props.payoutMethod?.canBeDeleted ? (
                 <FormattedMessage defaultMessage="Payout Method deleted successfully" id="2sVunP" />
               ) : (
                 <FormattedMessage defaultMessage="Payout Method archived successfully" id="njlj6i" />
@@ -602,7 +601,7 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
             });
           }
         },
-        confirmLabel: props.payoutMethod?.canBeEditedOrDeleted
+        confirmLabel: props.payoutMethod?.canBeDeleted
           ? intl.formatMessage({ defaultMessage: 'Delete Payout Method', id: 'Rs7g0Y' })
           : intl.formatMessage({ defaultMessage: 'Archive Payout Method', id: 'L0TUHP' }),
         variant: 'destructive',
