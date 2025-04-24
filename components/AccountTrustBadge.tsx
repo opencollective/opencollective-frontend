@@ -18,8 +18,8 @@ export const AccountTrustBadge = ({
 }: {
   size?: number;
   className?: ClassValue;
-  account: Pick<Host | GraphQLV1Collective, 'id' | 'name' | 'isTrustedHost' | 'isFirstPartyHost' | 'isVerified'> & {
-    host?: Pick<Host | GraphQLV1Collective, 'id' | 'name' | 'isTrustedHost' | 'isFirstPartyHost' | 'isVerified'>;
+  account: Pick<Host | GraphQLV1Collective, 'id' | 'name' | 'isFirstPartyHost' | 'isVerified'> & {
+    host?: Pick<Host | GraphQLV1Collective, 'id' | 'name' | 'isFirstPartyHost' | 'isVerified'>;
   };
 }) => {
   const badgeStyles = cn('cursor-help bg-white transition-all duration-200 hover:scale-110', className);
@@ -56,11 +56,7 @@ export const AccountTrustBadge = ({
         </TooltipContent>
       </Tooltip>
     );
-  } else if (
-    account.isTrustedHost ||
-    account.isVerified ||
-    (isSelfHost && (account.host.isTrustedHost || account.host.isVerified))
-  ) {
+  } else if (account.isVerified || (isSelfHost && account.host.isVerified)) {
     return (
       <Tooltip delayDuration={0}>
         <TooltipTrigger asChild>
