@@ -85,19 +85,19 @@ const LineBreak = styled.br`
 const features = [
   {
     id: 'shareBudget',
-    learnMoreLink: 'https://docs.opencollective.com/help/collectives/budget',
+    learnMoreLink: 'https://documentation.opencollective.com/collectives/managing-money',
   },
   {
     id: 'receiveContributions',
-    learnMoreLink: 'https://docs.opencollective.com/help/financial-contributors/financial-contributors',
+    learnMoreLink: 'https://documentation.opencollective.com/giving-to-collectives/giving-to-collectives',
   },
   {
     id: 'manageExpenses',
-    learnMoreLink: 'https://docs.opencollective.com/help/expenses-and-getting-paid/expenses',
+    learnMoreLink: 'https://documentation.opencollective.com/expenses-and-getting-paid/expenses-and-getting-paid',
   },
   {
     id: 'engageCommunity',
-    learnMoreLink: 'https://docs.opencollective.com/help/collectives/conversations',
+    learnMoreLink: 'https://documentation.opencollective.com/collectives/keeping-your-community-updated/conversations',
   },
   {
     id: 'celebrateSupporters',

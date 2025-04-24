@@ -58,7 +58,7 @@ export default function TaxFormMessage({ expense, refetch }) {
                 id="f2Ypkz"
                 values={{
                   HelpDocsLink: getI18nLink({
-                    href: 'https://docs.opencollective.com/help/expenses-and-getting-paid/tax-information',
+                    href: 'https://documentation.opencollective.com/expenses-and-getting-paid/understanding-tax-requirements',
                     openInNewTab: true,
                   }),
                 }}

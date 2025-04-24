@@ -80,7 +80,7 @@ const UnhostAccountModal = ({ collective, host, ...props }) => {
                   Link: value => (
                     <StyledLink
                       color="black.800"
-                      href="https://docs.opencollective.com/help/expenses-and-getting-paid/submitting-expenses"
+                      href="https://documentation.opencollective.com/expenses-and-getting-paid/submitting-expenses"
                       textDecoration="underline"
                       openInNewTab
                     >

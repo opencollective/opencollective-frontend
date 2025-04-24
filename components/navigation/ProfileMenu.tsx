@@ -210,7 +210,7 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
                 />
                 <MenuItem
                   Icon={BookOpen}
-                  href="https://docs.opencollective.com"
+                  href="https://documentation.opencollective.com"
                   external={true}
                   label={intl.formatMessage({ id: 'menu.documentation', defaultMessage: 'Documentation' })}
                 />

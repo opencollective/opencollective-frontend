@@ -51,7 +51,7 @@ function getAllSections(items) {
   }, []);
 }
 
-const DOCS_BASE_URL = 'https://docs.opencollective.com';
+const DOCS_BASE_URL = 'https://documentation.opencollective.com';
 
 const REACT_POPPER_MODIFIERS = [
   {

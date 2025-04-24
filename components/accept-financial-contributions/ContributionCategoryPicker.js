@@ -36,7 +36,8 @@ const HoverImageSizingContainer = styled(ImageSizingContainer)`
   }
 `;
 
-const independentCollectiveMoreInfo = 'https://docs.opencollective.com/help/independent-collectives';
+const independentCollectiveMoreInfo =
+  'https://documentation.opencollective.com/independent-collectives/independent-collectives';
 const applyFiscalHostMoreInfo = 'https://opencollective.com/fiscal-hosting';
 
 class ContributionCategoryPicker extends React.Component {
