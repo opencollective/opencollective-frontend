@@ -139,7 +139,7 @@ export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseS
               <div className="mt-4">
                 <ExpensePolicyContainer
                   title={<FormattedMessage defaultMessage="Collective instructions to submit a receipt" id="cP95i8" />}
-                  policy={props.host?.policies?.EXPENSE_POLICIES?.receiptPolicy}
+                  policy={props.account?.policies?.EXPENSE_POLICIES?.receiptPolicy}
                   checked={props.acknowledgedCollectiveReceiptExpensePolicy}
                   onAcknowledgedChanged={v => props.setFieldValue('acknowledgedCollectiveReceiptExpensePolicy', v)}
                 />
