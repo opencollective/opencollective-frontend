@@ -381,7 +381,8 @@ const formSchemaQuery = gql`
     name
     data
     isSaved
-    canBeEditedOrDeleted
+    canBeEdited
+    canBeDeleted
   }
 
   fragment ExpenseFormSchemaHostFields on Host {

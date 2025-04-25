@@ -5149,9 +5149,14 @@ type PayoutMethod {
   data: JSON
 
   """
-  Whether this payout method can be edit or deleted
+  Whether this payout method can be edited
   """
-  canBeEditedOrDeleted: Boolean
+  canBeEdited: Boolean
+
+  """
+  Whether this payout method can be deleted or only archived
+  """
+  canBeDeleted: Boolean
 }
 
 """
