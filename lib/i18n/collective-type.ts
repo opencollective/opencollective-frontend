@@ -38,7 +38,7 @@ const TypesI18n = defineMessages({
 });
 
 /**
- * Translate a member role
+ * Translate a collective type.
  *
  * @param {object} `intl` - see `injectIntl`
  * @param {string} `type`

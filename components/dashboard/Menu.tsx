@@ -16,6 +16,7 @@ import {
   Megaphone,
   Receipt,
   Settings,
+  Signature,
   Store,
   Ticket,
   Users,
@@ -217,7 +218,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       if: isHost && !isAccountantOnly,
       type: 'group',
       Icon: Building,
-      label: intl.formatMessage({ id: 'Collectives', defaultMessage: 'Collectives' }),
+      label: intl.formatMessage({ defaultMessage: 'Hosting', id: 'DkzeEN' }),
       subMenu: [
         {
           section: ALL_SECTIONS.HOSTED_COLLECTIVES,
@@ -229,21 +230,16 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
+      section: ALL_SECTIONS.HOST_AGREEMENTS,
       if: isHost,
-      type: 'group',
+      Icon: Signature,
+      label: intl.formatMessage({ id: 'Agreements', defaultMessage: 'Agreements' }),
+    },
+    {
+      section: ALL_SECTIONS.HOST_TAX_FORMS,
       Icon: FileText,
-      label: intl.formatMessage({ defaultMessage: 'Legal Documents', id: 'lSFdN4' }),
-      subMenu: [
-        {
-          section: ALL_SECTIONS.HOST_AGREEMENTS,
-          label: intl.formatMessage({ id: 'Agreements', defaultMessage: 'Agreements' }),
-        },
-        {
-          section: ALL_SECTIONS.HOST_TAX_FORMS,
-          label: intl.formatMessage({ defaultMessage: 'Tax Forms', id: 'skSw4d' }),
-          if: Boolean(account.host?.requiredLegalDocuments?.includes('US_TAX_FORM')),
-        },
-      ],
+      label: intl.formatMessage({ defaultMessage: 'Tax Forms', id: 'skSw4d' }),
+      if: isHost && Boolean(account.host?.requiredLegalDocuments?.includes('US_TAX_FORM')),
     },
     {
       if: isHost && hasFeature(account, FEATURES.VIRTUAL_CARDS) && !isAccountantOnly,
