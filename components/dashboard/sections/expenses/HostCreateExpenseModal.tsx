@@ -258,7 +258,12 @@ export const HostCreateExpenseModal = ({
                 id: client.cache.identify(host),
                 fields: {
                   stats: (stats: TransactionsImportStats): TransactionsImportStats => {
-                    return { ...stats, processed: stats.processed + 1, expenses: stats.expenses + 1 };
+                    return {
+                      ...stats,
+                      imported: stats.imported + 1,
+                      processed: stats.processed + 1,
+                      expenses: stats.expenses + 1,
+                    };
                   },
                 },
               });

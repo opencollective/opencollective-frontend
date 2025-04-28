@@ -7482,6 +7482,11 @@ type TransactionsImportStats {
   processed: Int!
 
   """
+  Number of rows that have been imported (converted to expenses or orders)
+  """
+  imported: Int!
+
+  """
   Number of rows that are on hold
   """
   onHold: Int!

@@ -15,6 +15,7 @@ export const TransactionImportListFieldsFragment = gql`
       expenses
       orders
       processed
+      imported
     }
     account {
       ... on Host {

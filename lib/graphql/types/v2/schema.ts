@@ -12123,6 +12123,8 @@ export type TransactionsImportStats = {
   expenses: Scalars['Int']['output'];
   /** Number of rows that have been ignored */
   ignored: Scalars['Int']['output'];
+  /** Number of rows that have been imported (converted to expenses or orders) */
+  imported: Scalars['Int']['output'];
   /** Number of rows that are invalid (e.g. linked but without an expense or order) */
   invalid: Scalars['Int']['output'];
   /** Number of rows that are on hold */
