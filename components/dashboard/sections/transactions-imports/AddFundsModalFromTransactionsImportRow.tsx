@@ -61,7 +61,12 @@ export const AddFundsModalFromImportRow = ({
           id: client.cache.identify(transactionsImport),
           fields: {
             stats: (stats: TransactionsImportStats): TransactionsImportStats => {
-              return { ...stats, processed: stats.processed + 1, orders: stats.orders + 1 };
+              return {
+                ...stats,
+                imported: stats.imported + 1,
+                processed: stats.processed + 1,
+                orders: stats.orders + 1,
+              };
             },
           },
         });
