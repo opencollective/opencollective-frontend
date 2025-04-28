@@ -39,7 +39,7 @@ describe('Contribution Flow: contribute with platform tips', () => {
 
     // Use a custom amount
     cy.contains('[data-cy="amount-picker"] button', 'Other').click();
-    cy.get('input[name="custom-amount"]').type('{backspace}{backspace}');
+    cy.get('input[name="custom-amount"]').type('{selectall}{backspace}');
     cy.get('[data-cy="platform-tip-options"] button').should('be.disabled'); // When empty, the tip input is disabled
     cy.get('input[name="custom-amount"]').type('12');
     cy.getByDataCy('ContributionSummary-Tip').should('contain', '$1.20 USD');
@@ -54,7 +54,7 @@ describe('Contribution Flow: contribute with platform tips', () => {
     cy.contains('[data-cy="platform-tip-options"] button', 'Other').click();
 
     // Can empty
-    cy.get('[data-cy="platform-tip-other-amount"]').type('{backspace}{backspace}{backspace}');
+    cy.get('[data-cy="platform-tip-other-amount"]').type('{selectall}{backspace}');
     cy.getByDataCy('ContributionSummary-Tip').should('not.exist');
     cy.getByDataCy('ContributionSummary-TodaysCharge').should('contain', '$10.00 USD');
 
@@ -72,7 +72,7 @@ describe('Contribution Flow: contribute with platform tips', () => {
     const confirmStub = cy.stub();
     confirmStub.returns(false); // Do not accept
     cy.on('window:confirm', confirmStub);
-    cy.get('[data-cy="platform-tip-other-amount"]').type('{backspace}{backspace}{backspace}48');
+    cy.get('[data-cy="platform-tip-other-amount"]').type('{selectall}{backspace}48');
     cy.getByDataCy('cf-next-step')
       .click()
       .then(() => {
@@ -100,7 +100,7 @@ describe('Contribution Flow: contribute with platform tips', () => {
     // TODO: Would be great to have that as a cypress command for that part, but there's no mutation to edit tiers on GQLV2 yet
     cy.login({ redirect: `/dashboard/${collective.slug}/tiers` });
     cy.getByDataCy('contribute-card-tier').first().find('button').click();
-    cy.get('[data-cy="minimumAmount"]input').type('{backspace}{backspace}{backspace}0');
+    cy.get('[data-cy="minimumAmount"]input').type('{selectall}{backspace}0');
     cy.getByDataCy('confirm-btn').click();
     cy.checkToast({ variant: 'success', message: 'Tier updated.' });
     cy.visit(`/${collective.slug}/contribute`);
@@ -113,7 +113,7 @@ describe('Contribution Flow: contribute with platform tips', () => {
 
     // But the tip disappears when the amount is 0
     cy.contains('[data-cy="amount-picker"] button', 'Other').click();
-    cy.get('input[name="custom-amount"]').type('{backspace}{backspace}0');
+    cy.get('input[name="custom-amount"]').type('{selectall}{backspace}0');
     cy.get('[data-cy="platform-tip-container"]').invoke('css', 'display').should('equal', 'none');
     cy.getByDataCy('ContributionSummary-Tip').should('not.exist');
     cy.getByDataCy('ContributionSummary-TodaysCharge').should('contain', '$0.00 USD');
