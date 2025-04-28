@@ -249,7 +249,7 @@ const addCountsToViews = (views, stats) => {
     PENDING: 'pending',
     IGNORED: 'ignored',
     ON_HOLD: 'onHold',
-    LINKED: 'processed',
+    LINKED: 'imported',
     ALL: 'total',
   };
 
