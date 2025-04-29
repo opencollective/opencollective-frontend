@@ -1,5 +1,18 @@
 import { gql } from '@apollo/client';
 
+export const TransactionsImportStatsFragment = gql`
+  fragment TransactionsImportStats on TransactionsImportStats {
+    total
+    ignored
+    onHold
+    expenses
+    orders
+    processed
+    pending
+    imported
+  }
+`;
+
 export const TransactionImportListFieldsFragment = gql`
   fragment TransactionImportListFields on TransactionsImport {
     id
@@ -10,12 +23,7 @@ export const TransactionImportListFieldsFragment = gql`
     updatedAt
     lastSyncAt
     stats {
-      total
-      ignored
-      expenses
-      orders
-      processed
-      imported
+      ...TransactionsImportStats
     }
     account {
       ... on Host {
@@ -24,6 +32,7 @@ export const TransactionImportListFieldsFragment = gql`
       }
     }
   }
+  ${TransactionsImportStatsFragment}
 `;
 
 export const TransactionsImportRowFieldsFragment = gql`
@@ -62,18 +71,6 @@ export const TransactionsImportRowFieldsFragment = gql`
         imageUrl(height: 48)
       }
     }
-  }
-`;
-
-export const TransactionsImportStatsFragment = gql`
-  fragment TransactionsImportStats on TransactionsImportStats {
-    total
-    ignored
-    onHold
-    expenses
-    orders
-    processed
-    pending
   }
 `;
 
