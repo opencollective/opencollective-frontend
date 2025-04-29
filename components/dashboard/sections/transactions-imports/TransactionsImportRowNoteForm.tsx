@@ -14,11 +14,9 @@ import { useToast } from '@/components/ui/useToast';
 
 export const TransactionsImportRowNoteForm = ({
   row,
-  transactionsImportId,
   autoFocus = false,
 }: {
   row: Pick<TransactionsImportRow, 'id' | 'note'>;
-  transactionsImportId: string;
   autoFocus?: boolean;
 }) => {
   const [updateRows, { loading }] = useMutation(updateTransactionsImportRows, { context: API_V2_CONTEXT });
@@ -47,11 +45,7 @@ export const TransactionsImportRowNoteForm = ({
           onClick={() => {
             try {
               updateRows({
-                variables: {
-                  importId: transactionsImportId,
-                  rows: [{ id: row.id, note: newText }],
-                  action: 'UPDATE_ROWS',
-                },
+                variables: { rows: [{ id: row.id, note: newText }], action: 'UPDATE_ROWS' },
               });
             } catch (error) {
               toast({

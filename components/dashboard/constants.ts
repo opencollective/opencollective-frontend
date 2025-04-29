@@ -27,10 +27,13 @@ export const SECTIONS = {
   TRANSACTIONS: 'transactions',
   UPDATES: 'updates',
   HOST_TRANSACTIONS: 'host-transactions',
+  OFF_PLATFORM_TRANSACTIONS: 'off-platform-transactions',
+  LEDGER_CSV_IMPORTS: 'ledger-csv-imports',
   VIRTUAL_CARDS: 'virtual-cards',
   TEAM: 'team',
   VENDORS: 'vendors',
   ACCOUNTS: 'accounts',
+  OFF_PLATFORM_CONNECTIONS: 'off-platform-connections',
 };
 
 export const ROOT_SECTIONS = {
@@ -75,6 +78,7 @@ export const LEGACY_SETTINGS_SECTIONS = {
   POLICIES: 'policies',
   RECEIVING_MONEY: 'receiving-money',
   SENDING_MONEY: 'sending-money',
+  OFF_PLATFORM_CONNECTIONS: 'off-platform-connections',
   WEBHOOKS: 'webhooks',
   ADVANCED: 'advanced',
   AUTHORIZED_APPS: 'authorized-apps',
@@ -185,6 +189,10 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.SENDING_MONEY]: {
     id: 'editCollective.sendingMoney',
     defaultMessage: 'Sending Money',
+  },
+  [ALL_SECTIONS.OFF_PLATFORM_CONNECTIONS]: {
+    defaultMessage: 'Off-Platform Connections',
+    id: 'tn46Lk',
   },
   [ALL_SECTIONS.FISCAL_HOSTING]: {
     id: 'editCollective.fiscalHosting',

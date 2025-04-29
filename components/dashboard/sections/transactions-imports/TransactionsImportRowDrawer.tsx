@@ -25,14 +25,12 @@ export const TransactionsImportRowDrawer = ({
   getActions,
   row,
   rowIndex,
-  transactionsImportId,
   autoFocusNoteForm,
   ...props
 }: {
   row: TransactionsImportQuery['transactionsImport']['rows']['nodes'][number];
   getActions: GetActions<TransactionsImportQuery['transactionsImport']['rows']['nodes'][number]>;
   rowIndex: number;
-  transactionsImportId: string;
   autoFocusNoteForm: boolean;
 } & ComponentProps<typeof Sheet>) => {
   const dropdownTriggerRef = React.useRef();
@@ -182,11 +180,7 @@ export const TransactionsImportRowDrawer = ({
                 )}
               </DataList>
               <hr className="my-4 border-gray-200" />
-              <TransactionsImportRowNoteForm
-                transactionsImportId={transactionsImportId}
-                row={row}
-                autoFocus={autoFocusNoteForm}
-              />
+              <TransactionsImportRowNoteForm row={row} autoFocus={autoFocusNoteForm} />
             </SheetBody>
           </React.Fragment>
         )}

@@ -13,6 +13,22 @@ export const TransactionsImportStatsFragment = gql`
   }
 `;
 
+export const TransactionsImportAssignmentFieldsFragment = gql`
+  fragment TransactionsImportAssignmentFields on TransactionsImportAssignment {
+    importedAccountId
+    accounts {
+      id
+      legacyId
+      slug
+      type
+      name
+      legalName
+      currency
+      imageUrl(height: 32)
+    }
+  }
+`;
+
 export const TransactionImportListFieldsFragment = gql`
   fragment TransactionImportListFields on TransactionsImport {
     id
@@ -22,17 +38,35 @@ export const TransactionImportListFieldsFragment = gql`
     createdAt
     updatedAt
     lastSyncAt
+    isSyncing
+    plaidAccounts {
+      accountId
+      mask
+      name
+      officialName
+      subtype
+      type
+    }
+    assignments {
+      ...TransactionsImportAssignmentFields
+    }
     stats {
       ...TransactionsImportStats
     }
     account {
+      id
+      legacyId
       ... on Host {
         id
         transactionsImportsSources
       }
     }
+    connectedAccount {
+      id
+    }
   }
   ${TransactionsImportStatsFragment}
+  ${TransactionsImportAssignmentFieldsFragment}
 `;
 
 export const TransactionsImportRowFieldsFragment = gql`
@@ -74,31 +108,16 @@ export const TransactionsImportRowFieldsFragment = gql`
   }
 `;
 
-export const TransactionsImportAssignmentFieldsFragment = gql`
-  fragment TransactionsImportAssignmentFields on TransactionsImportAssignment {
-    importedAccountId
-    accounts {
-      id
-      legacyId
-      slug
-      type
-      name
-      legalName
-      currency
-      imageUrl(height: 32)
-    }
-  }
-`;
 export const updateTransactionsImportRows = gql`
   mutation UpdateTransactionsImportRow(
-    $importId: NonEmptyString!
+    $host: AccountReferenceInput
     $rows: [TransactionsImportRowUpdateInput!]
     $action: TransactionsImportRowAction!
   ) {
-    updateTransactionsImportRows(id: $importId, rows: $rows, action: $action) {
-      import {
+    updateTransactionsImportRows(host: $host, rows: $rows, action: $action) {
+      host {
         id
-        stats {
+        offPlatformTransactionsStats {
           ...TransactionsImportStats
         }
       }

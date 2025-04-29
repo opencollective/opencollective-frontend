@@ -132,7 +132,7 @@ export const TransactionsImportAssignmentsForm = ({
     >
       {({ dirty, isSubmitting, setValues, values }) => {
         const getAssignmentAccounts = (accountId: string) =>
-          values.find(assignment => assignment.importedAccountId === accountId)?.accounts || null;
+          values.find(assignment => assignment.importedAccountId === accountId)?.accounts || [];
         return (
           <Form>
             {transactionsImport.type === 'PLAID' ? (

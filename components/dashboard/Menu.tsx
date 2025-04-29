@@ -7,6 +7,7 @@ import {
   BookUserIcon,
   Building,
   Coins,
+  CoinsIcon,
   CreditCard,
   FileText,
   FlaskConical,
@@ -303,9 +304,24 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     },
     {
       if: isHost,
-      section: ALL_SECTIONS.HOST_TRANSACTIONS,
-      Icon: ArrowRightLeft,
-      label: intl.formatMessage({ id: 'menu.transactions', defaultMessage: 'Transactions' }),
+      type: 'group',
+      label: intl.formatMessage({ defaultMessage: 'Ledger', id: 'scwekL' }),
+      Icon: CoinsIcon,
+      subMenu: [
+        {
+          section: ALL_SECTIONS.HOST_TRANSACTIONS,
+          label: intl.formatMessage({ id: 'menu.transactions', defaultMessage: 'Transactions' }),
+        },
+        {
+          section: ALL_SECTIONS.OFF_PLATFORM_TRANSACTIONS,
+          label: intl.formatMessage({ defaultMessage: 'Off-platform Transactions', id: 'MlrieI' }),
+          if: LoggedInUser.hasPreviewFeatureEnabled('PLAID_INTEGRATION'),
+        },
+        {
+          section: ALL_SECTIONS.LEDGER_CSV_IMPORTS,
+          label: intl.formatMessage({ defaultMessage: 'CSV Imports', id: 'd3jA/o' }),
+        },
+      ],
     },
     {
       if: !isIndividual,
@@ -366,6 +382,10 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
               },
               {
                 section: ALL_SECTIONS.SENDING_MONEY,
+                if: !isAccountantOnly,
+              },
+              {
+                section: ALL_SECTIONS.OFF_PLATFORM_CONNECTIONS,
                 if: !isAccountantOnly,
               },
               {
