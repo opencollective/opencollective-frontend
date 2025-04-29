@@ -127,7 +127,7 @@ describe('Contribution Flow: Guest contributions', () => {
     it('Make a medium contribution ($500)', () => {
       cy.visit('/apex/donate');
       cy.get('[data-cy="amount-picker-btn-other"]').click();
-      cy.get('input[type=number][name=custom-amount]').type('{selectall}500');
+      cy.get('input[name=custom-amount]').type('{selectall}500');
       cy.get('button[data-cy="cf-next-step"]').click();
       cy.contains('Contribute as a guest');
 
@@ -157,7 +157,7 @@ describe('Contribution Flow: Guest contributions', () => {
     it('Make a large contribution ($5000)', () => {
       cy.visit('/apex/donate');
       cy.get('[data-cy="amount-picker-btn-other"]').click();
-      cy.get('input[type=number][name=custom-amount]').type('{selectall}5000');
+      cy.get('input[name=custom-amount]').type('{selectall}5000');
       cy.get('button[data-cy="cf-next-step"]').click();
       cy.contains('Contribute as a guest');
 
