@@ -91,7 +91,7 @@
     "framer-motion": "^11.5.4",
     "glob": "11.0.1",
     "graphql": "16.10.0",
-    "helmet": "8.0.0",
+    "helmet": "8.1.0",
     "interweave": "13.1.1",
     "interweave-ssr": "2.0.0",
     "jose": "5.10.0",
