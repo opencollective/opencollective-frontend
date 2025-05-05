@@ -43,7 +43,7 @@
   "/GCoTA": "Löschen",
   "/GQXtd": "Nicht du? <SignOutLink>Abmelden</SignOutLink> um Profil zu wechseln.",
   "/gUYR+": "Quelle: {source}",
-  "/iIQqg": "Account details that can be used to get paid for reimbursements, invoices, and grants.",
+  "/iIQqg": ".",
   "/J1LvF": "Legacy-Transaktions-ID",
   "/lQgi5": "Dieser Bericht ist derzeit nur in UTC verfügbar",
   "/Lrubf": "Your total contributions in the current fiscal year to {isSelfHosted, select, true {{collectiveName}} other {{hostLink}, the legal entity that provides {collectiveName} with financial services,}} exceeds {amount}. Therefore, {hostName} requires your legal address.",
