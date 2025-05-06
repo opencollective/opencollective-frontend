@@ -12,6 +12,7 @@ import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
 import type { ConnectPlaidAccountMutation, ConnectPlaidAccountMutationVariables } from '@/lib/graphql/types/v2/graphql';
 import { connectPlaidAccountMutation } from '@/lib/hooks/usePlaidConnectDialog';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS, removeFromLocalStorage } from '@/lib/local-storage';
+import { getOffPlatformTransactionsRoute } from '@/lib/url-helpers';
 import { cn } from '@/lib/utils';
 
 import AuthenticatedPage from '@/components/AuthenticatedPage';
@@ -65,7 +66,7 @@ const PlaidOAuthCallbackPage = () => {
         const { transactionsImport } = result.data.connectPlaidAccount;
         const hostSlug = transactionsImport.account.slug;
         confettiFireworks(3000);
-        router.push(`/dashboard/${hostSlug}/host-transactions/import/${transactionsImport.id}`);
+        router.push(getOffPlatformTransactionsRoute(hostSlug, transactionsImport.id));
       } catch (e) {
         setIsLoading(false);
         setApiError(i18nGraphqlException(intl, e));

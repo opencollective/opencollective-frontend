@@ -56,10 +56,6 @@ export const TransactionImportListFieldsFragment = gql`
     account {
       id
       legacyId
-      ... on Host {
-        id
-        transactionsImportsSources
-      }
     }
     connectedAccount {
       id
@@ -82,6 +78,16 @@ export const TransactionsImportRowFieldsFragment = gql`
     amount {
       valueInCents
       currency
+    }
+    assignedAccounts {
+      id
+      legacyId
+      slug
+      type
+      name
+      legalName
+      currency
+      imageUrl(height: 32)
     }
     expense {
       id
@@ -110,11 +116,10 @@ export const TransactionsImportRowFieldsFragment = gql`
 
 export const updateTransactionsImportRows = gql`
   mutation UpdateTransactionsImportRow(
-    $host: AccountReferenceInput
-    $rows: [TransactionsImportRowUpdateInput!]
+    $rows: [TransactionsImportRowUpdateInput!]!
     $action: TransactionsImportRowAction!
   ) {
-    updateTransactionsImportRows(host: $host, rows: $rows, action: $action) {
+    updateTransactionsImportRows(rows: $rows, action: $action) {
       host {
         id
         offPlatformTransactionsStats {
@@ -129,22 +134,4 @@ export const updateTransactionsImportRows = gql`
   }
   ${TransactionsImportRowFieldsFragment}
   ${TransactionsImportStatsFragment}
-`;
-
-export const transactionsImportsQuery = gql`
-  query HostTransactionImports($accountSlug: String!, $limit: Int, $offset: Int) {
-    host(slug: $accountSlug) {
-      id
-      transactionsImports(limit: $limit, offset: $offset) {
-        totalCount
-        limit
-        offset
-        nodes {
-          id
-          ...TransactionImportListFields
-        }
-      }
-    }
-  }
-  ${TransactionImportListFieldsFragment}
 `;

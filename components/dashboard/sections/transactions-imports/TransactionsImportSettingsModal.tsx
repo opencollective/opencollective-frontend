@@ -10,6 +10,7 @@ import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { TransactionsImport } from '../../../../lib/graphql/types/v2/schema';
 import type { PlaidDialogStatus } from '@/lib/hooks/usePlaidConnectDialog';
+import { getOffPlatformTransactionsRoute } from '@/lib/url-helpers';
 
 import DateTime from '@/components/DateTime';
 
@@ -61,6 +62,7 @@ const deleteConnectedAccountMutation = gql`
 `;
 
 export default function TransactionsImportSettingsModal({
+  host,
   transactionsImport,
   plaidStatus,
   onOpenChange,
@@ -69,6 +71,7 @@ export default function TransactionsImportSettingsModal({
   hasRequestedSync,
   setHasRequestedSync,
 }: {
+  host: { slug: string };
   onOpenChange: (isOpen: boolean) => void;
   isOpen: boolean;
   showPlaidDialog: () => void;
@@ -121,7 +124,7 @@ export default function TransactionsImportSettingsModal({
     try {
       await deleteTransactionsImport({ variables: { id: transactionsImport.id } });
       apolloClient.cache.evict({ id: apolloClient.cache.identify(transactionsImport) });
-      router.push(router.asPath.replace(/\/host-transactions\/import\/.*/, '/host-transactions/import'));
+      router.push(getOffPlatformTransactionsRoute(host.slug));
     } catch (error) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, error) });
     }
@@ -335,7 +338,11 @@ export default function TransactionsImportSettingsModal({
                 )}
                 <div>
                   <h3 className="mb-2 text-sm font-medium">
-                    <FormattedMessage defaultMessage="Delete connection" id="ksAAzc" />
+                    {transactionsImport.type === 'CSV' ? (
+                      <FormattedMessage defaultMessage="Delete CSV Import" id="WhpI/L" />
+                    ) : (
+                      <FormattedMessage defaultMessage="Delete connection" id="ksAAzc" />
+                    )}
                   </h3>
                   <p className="mb-4 text-sm text-muted-foreground">
                     <FormattedMessage
@@ -354,7 +361,11 @@ export default function TransactionsImportSettingsModal({
                     <AlertDialogContent>
                       <AlertDialogHeader>
                         <AlertDialogTitle>
-                          <FormattedMessage defaultMessage="Delete connection" id="ksAAzc" />
+                          {transactionsImport.type === 'CSV' ? (
+                            <FormattedMessage defaultMessage="Delete CSV Import" id="WhpI/L" />
+                          ) : (
+                            <FormattedMessage defaultMessage="Delete connection" id="ksAAzc" />
+                          )}
                         </AlertDialogTitle>
                         <AlertDialogDescription>
                           <FormattedMessage

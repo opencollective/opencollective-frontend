@@ -1,5 +1,5 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { ArrowRightLeftIcon, EllipsisVertical, Plus, Settings } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -10,7 +10,8 @@ import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { TransactionsImport } from '../../../../lib/graphql/types/v2/schema';
 import { usePlaidConnectDialog } from '../../../../lib/hooks/usePlaidConnectDialog';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import { transactionsImportsQuery } from './lib/graphql';
+import { TransactionImportListFieldsFragment } from './lib/graphql';
+import { getOffPlatformTransactionsRoute } from '@/lib/url-helpers';
 
 import { getI18nLink } from '@/components/I18nFormatters';
 import Link from '@/components/Link';
@@ -34,6 +35,24 @@ const schema = z.object({
   offset: integer.default(0),
 });
 
+export const offPlatformConnectionsQuery = gql`
+  query OffPlatformConnections($accountSlug: String!, $limit: Int, $offset: Int) {
+    host(slug: $accountSlug) {
+      id
+      transactionsImports(limit: $limit, offset: $offset, type: [PLAID]) {
+        totalCount
+        limit
+        offset
+        nodes {
+          id
+          ...TransactionImportListFields
+        }
+      }
+    }
+  }
+  ${TransactionImportListFieldsFragment}
+`;
+
 export const OffPlatformConnections = ({ accountSlug }) => {
   const intl = useIntl();
   const { toast } = useToast();
@@ -41,7 +60,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
   const queryFilter = useQueryFilter({ schema, filters: {} });
   const [importsWithSyncRequest, setImportsWithSyncRequest] = React.useState(new Set());
   const [selectedImport, setSelectedImport] = React.useState(null);
-  const { data, loading, refetch, error } = useQuery(transactionsImportsQuery, {
+  const { data, loading, refetch, error } = useQuery(offPlatformConnectionsQuery, {
     context: API_V2_CONTEXT,
     variables: { accountSlug, ...queryFilter.variables },
     pollInterval: importsWithSyncRequest.size ? 5_000 : 30_000,
@@ -57,7 +76,8 @@ export const OffPlatformConnections = ({ accountSlug }) => {
           id: 'YZGI7N',
         }),
       });
-      router.push(`/dashboard/${accountSlug}/host-transactions/import/${transactionsImport.id}?step=last`);
+
+      router.push(getOffPlatformTransactionsRoute(accountSlug, transactionsImport.id));
     },
     [intl, toast, accountSlug, refetch, router],
   );
@@ -163,6 +183,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
       )}
       {selectedImport && (
         <TransactionsImportSettingsModal
+          host={data?.host}
           transactionsImport={selectedImport}
           onOpenChange={() => setSelectedImport(null)}
           plaidStatus={plaidConnectDialog.status}

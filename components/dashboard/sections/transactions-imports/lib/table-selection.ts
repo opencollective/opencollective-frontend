@@ -15,7 +15,7 @@ export const getPossibleActionsForSelectedRows = (
   const ignoredRowIds = selectedStatuses[TransactionsImportRowStatus.IGNORED]?.map(row => row.id) || [];
   return {
     canIgnore: [...pendingRowIds, ...onHoldRowIds],
-    canRestore: ignoredRowIds,
+    canRestore: [...ignoredRowIds, ...onHoldRowIds],
     canPutOnHold: pendingRowIds,
   };
 };

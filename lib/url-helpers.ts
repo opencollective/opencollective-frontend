@@ -162,6 +162,26 @@ export const getPersonalTokenSettingsRoute = (account, token) => {
   return getDashboardRoute(account, `for-developers/personal-tokens/${token.id}`);
 };
 
+export const getOffPlatformTransactionsRoute = (hostSlug, importId = null) => {
+  const base = `/dashboard/${hostSlug}/off-platform-transactions`;
+  if (importId) {
+    const params = new URLSearchParams();
+    params.set('importIds', importId);
+    return `${base}?${params.toString()}`;
+  } else {
+    return base;
+  }
+};
+
+export const getCSVTransactionsImportRoute = (hostSlug, importId = null) => {
+  const base = `/dashboard/${hostSlug}/ledger-csv-imports`;
+  if (importId) {
+    return `${base}/${importId}`;
+  } else {
+    return base;
+  }
+};
+
 export const getCollectivePageCanonicalURL = account => {
   return getWebsiteUrl() + getCollectivePageRoute(account);
 };

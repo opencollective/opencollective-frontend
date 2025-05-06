@@ -52,6 +52,7 @@ import Team from './sections/Team';
 import AccountTransactions from './sections/transactions/AccountTransactions';
 import AllTransactions from './sections/transactions/AllTransactions';
 import HostTransactions from './sections/transactions/HostTransactions';
+import { CSVTransactionsImports } from './sections/transactions-imports/CSVTransactionsImports';
 import { OffPlatformConnections } from './sections/transactions-imports/OffPlatformConnections';
 import { OffPlatformTransactions } from './sections/transactions-imports/OffPlatformTransactions';
 import Updates from './sections/updates';
@@ -75,7 +76,7 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.CHART_OF_ACCOUNTS]: HostAdminAccountingSection,
   [SECTIONS.OFF_PLATFORM_CONNECTIONS]: OffPlatformConnections,
   [SECTIONS.OFF_PLATFORM_TRANSACTIONS]: OffPlatformTransactions,
-  [SECTIONS.LEDGER_CSV_IMPORTS]: null, // TODO
+  [SECTIONS.LEDGER_CSV_IMPORTS]: CSVTransactionsImports,
   [SECTIONS.HOST_FINANCIAL_CONTRIBUTIONS]: HostFinancialContributions,
   [SECTIONS.HOST_EXPENSES]: HostExpenses,
   [SECTIONS.HOST_AGREEMENTS]: HostDashboardAgreements,

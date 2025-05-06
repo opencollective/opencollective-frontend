@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { i18nGraphqlException } from '../../../../lib/errors';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { TransactionImportListFieldsFragment } from './lib/graphql';
+import { getCSVTransactionsImportRoute } from '@/lib/url-helpers';
 
 import { FormikZod } from '../../../FormikZod';
 import StyledInputFormikField from '../../../StyledInputFormikField';
@@ -32,7 +33,7 @@ export const NewCSVTransactionsImportDialog = ({ accountSlug, onSuccess, ...prop
       query HostTransactionsImportsSources($accountSlug: String!) {
         host(slug: $accountSlug) {
           id
-          transactionsImportsSources
+          transactionsImportsSources(type: CSV)
         }
       }
     `,
@@ -56,12 +57,12 @@ export const NewCSVTransactionsImportDialog = ({ accountSlug, onSuccess, ...prop
             id
             ... on Host {
               id
-              transactionsImportsSources
+              transactionsImportsSources(type: CSV)
             }
             ... on Organization {
               host {
                 id
-                transactionsImportsSources
+                transactionsImportsSources(type: CSV)
               }
             }
           }
@@ -79,7 +80,7 @@ export const NewCSVTransactionsImportDialog = ({ accountSlug, onSuccess, ...prop
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            <FormattedMessage defaultMessage="New Transactions Import" id="4jJjCO" />
+            <FormattedMessage defaultMessage="Import CSV" id="2uzHxT" />
           </DialogTitle>
         </DialogHeader>
         <FormikZod
@@ -90,7 +91,7 @@ export const NewCSVTransactionsImportDialog = ({ accountSlug, onSuccess, ...prop
               const { data } = await createImport({ variables: { account: { slug: accountSlug }, ...values } });
               onSuccess?.();
               props.onOpenChange(false);
-              router.push(`/dashboard/${accountSlug}/host-transactions/import/${data.createTransactionsImport.id}`);
+              router.push(`${getCSVTransactionsImportRoute(accountSlug, data.createTransactionsImport.id)}&step=last`);
             } catch (e) {
               toast({
                 variant: 'error',

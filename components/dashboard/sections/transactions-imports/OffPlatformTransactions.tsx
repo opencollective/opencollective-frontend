@@ -1,8 +1,8 @@
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
-import { keyBy, truncate } from 'lodash';
+import { gql, useApolloClient, useQuery } from '@apollo/client';
+import { keyBy, size, truncate } from 'lodash';
 import Lottie from 'lottie-react';
-import { Info, MessageCircle, PauseCircle, RotateCcw, SquareSlashIcon } from 'lucide-react';
+import { Info, MessageCircle, PauseCircle, RotateCcw, SquareSlashIcon, UndoDot } from 'lucide-react';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
@@ -19,7 +19,7 @@ import { TransactionsImportRowStatus } from '../../../../lib/graphql/types/v2/sc
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { i18nTransactionsRowStatus } from '../../../../lib/i18n/transactions-import-row';
 import { cn, sortSelectOptions } from '../../../../lib/utils';
-import { useOffPlatformTransactionsActions } from './lib/actions';
+import { useTransactionsImportActions } from './lib/actions';
 import { TransactionsImportRowFieldsFragment, TransactionsImportStatsFragment } from './lib/graphql';
 import { getPossibleActionsForSelectedRows } from './lib/table-selection';
 
@@ -46,10 +46,12 @@ import { useToast } from '../../../ui/useToast';
 import DashboardHeader from '../../DashboardHeader';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
 import { Filterbar } from '../../filters/Filterbar';
+import { buildOrderByFilter } from '../../filters/OrderFilter';
 import { Pagination } from '../../filters/Pagination';
 import { searchFilter } from '../../filters/SearchFilter';
 
 import { TransactionsImportRowDrawer } from './TransactionsImportRowDrawer';
+import { TransactionsImportRowsBatchActionsBar } from './TransactionsImportRowsBatchActionsBar';
 import { TransactionsImportRowStatusBadge } from './TransactionsImportRowStatusBadge';
 
 const offPlatformTransactionsQuery = gql`
@@ -63,6 +65,8 @@ const offPlatformTransactionsQuery = gql`
     $importIds: [NonEmptyString!]
     $importId: NonEmptyString!
     $hasImportFilter: Boolean!
+    $fetchOnlyRowIds: Boolean!
+    $orderBy: TransactionsImportRowOrderInput!
   ) {
     host(slug: $hostSlug) {
       id
@@ -73,21 +77,21 @@ const offPlatformTransactionsQuery = gql`
       slug
       currency
       type
-      accountingCategories {
+      accountingCategories @skip(if: $fetchOnlyRowIds) {
         totalCount
         nodes {
           id
           ...AccountingCategoryFields
         }
       }
-      transactionsImports(status: ACTIVE, limit: 100) {
+      transactionsImports(status: ACTIVE, limit: 100) @skip(if: $fetchOnlyRowIds) {
         nodes {
           id
           source
           name
         }
       }
-      offPlatformTransactionsStats {
+      offPlatformTransactionsStats @skip(if: $fetchOnlyRowIds) {
         ...TransactionsImportStats
       }
       offPlatformTransactions(
@@ -98,25 +102,21 @@ const offPlatformTransactionsQuery = gql`
         accountId: $plaidAccountId
         importType: PLAID
         importId: $importIds
+        orderBy: $orderBy
       ) {
         totalCount
         offset
         limit
         nodes {
-          ...TransactionsImportRowFields
-          assignedAccounts {
-            id
-            legacyId
-            slug
-            type
-            name
-            legalName
-            currency
-            imageUrl(height: 32)
-          }
-          transactionsImport {
+          id
+          ...TransactionsImportRowFields @skip(if: $fetchOnlyRowIds)
+          transactionsImport @skip(if: $fetchOnlyRowIds) {
             id
             source
+            name
+          }
+          plaidAccount @skip(if: $fetchOnlyRowIds) {
+            accountId
             name
           }
         }
@@ -139,18 +139,7 @@ const offPlatformTransactionsQuery = gql`
   ${TransactionsImportStatsFragment}
 `;
 
-// const transactionsImportLasSyncAtPollQuery = gql`
-//   query TransactionsImportLastSyncAt($importId: String!) {
-//     transactionsImport(id: $importId) {
-//       id
-//       lastSyncAt
-//       isSyncing
-//       lastSyncCursor
-//     }
-//   }
-// `;
-
-const DEFAULT_PAGE_SIZE = 50;
+const DEFAULT_PAGE_SIZE = 20;
 
 const getViews = intl =>
   [
@@ -196,6 +185,10 @@ const addCountsToViews = (views, stats) => {
 const rowStatusFilterSchema = z.nativeEnum(TransactionsImportRowStatus).optional();
 const plaidAccountFilterSchema = isMulti(z.string()).optional();
 const transactionsImportFilterSchema = isMulti(z.string()).optional();
+const orderByFilter = buildOrderByFilter(z.enum(['DATE,DESC', 'DATE,ASC']).default('DATE,DESC'), {
+  'DATE,DESC': defineMessage({ id: 'ExpensesOrder.NewestFirst', defaultMessage: 'Newest First' }),
+  'DATE,ASC': defineMessage({ id: 'ExpensesOrder.OldestFirst', defaultMessage: 'Oldest First' }),
+});
 
 const rowStatusFilter: FilterConfig<z.infer<typeof rowStatusFilterSchema>> = {
   schema: rowStatusFilterSchema,
@@ -217,7 +210,7 @@ const plaidAccountFilter: FilterConfig<z.infer<typeof plaidAccountFilterSchema>>
   schema: plaidAccountFilterSchema,
   toVariables: value => ({ plaidAccountId: value }),
   filter: {
-    labelMsg: defineMessage({ defaultMessage: 'Sub-account', id: '1duVXZ' }),
+    labelMsg: defineMessage({ defaultMessage: 'Account', id: 'TwyMau' }),
     static: true,
     hide: ({ meta }) => !meta.plaidAccounts || meta.plaidAccounts.length < 2,
     Component: ({ meta, ...props }) => {
@@ -275,6 +268,7 @@ const filters = {
   status: rowStatusFilter.filter,
   importIds: transactionsImportFilter.filter,
   plaidAccountId: plaidAccountFilter.filter,
+  orderBy: orderByFilter.filter,
 };
 
 const queryFilterSchema = z.object({
@@ -284,6 +278,7 @@ const queryFilterSchema = z.object({
   status: rowStatusFilter.schema,
   importIds: transactionsImportFilterSchema,
   plaidAccountId: plaidAccountFilter.schema,
+  orderBy: orderByFilter.schema,
 });
 
 const defaultFilterValues = {
@@ -296,6 +291,7 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
   const [focus, setFocus] = React.useState<{ rowId: string; noteForm?: boolean } | null>(null);
   const [hasNewData, setHasNewData] = React.useState(false);
   const isInitialSync = false; // TODO: Implement this
+  const apolloClient = useApolloClient();
 
   // const apolloClient = useApolloClient();
   const [selection, dispatchSelection] = React.useReducer(
@@ -309,9 +305,12 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
     schema: queryFilterSchema,
     views: queryFilterViews,
     filters,
+    toVariables: {
+      orderBy: orderByFilter.toVariables,
+    },
   });
 
-  const { data, loading, error, refetch } = useQuery<
+  const { data, loading, error, refetch, variables } = useQuery<
     OffPlatformTransactionsQuery,
     OffPlatformTransactionsQueryVariables
   >(offPlatformTransactionsQuery, {
@@ -323,6 +322,7 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
       hasImportFilter: Boolean(queryFilter.variables.importIds?.length),
       importId: queryFilter.variables.importIds?.[0] || 'none', // Apollo validation ignores the @include directive, so we have to provide a value to skip the non-null check
       ...queryFilter.variables,
+      fetchOnlyRowIds: false,
     },
   });
 
@@ -331,7 +331,25 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
   const selectedRowIdx = !focus ? -1 : importRows.findIndex(row => row.id === focus.rowId);
   const importData = data?.transactionsImport;
 
-  const { getActions, setRowsStatus } = useOffPlatformTransactionsActions({ host });
+  const { getActions, setRowsStatus } = useTransactionsImportActions({
+    host,
+    getAllRowsIds: async () => {
+      const { data, error } = await apolloClient.query<
+        OffPlatformTransactionsQuery,
+        OffPlatformTransactionsQueryVariables
+      >({
+        query: offPlatformTransactionsQuery,
+        context: API_V2_CONTEXT,
+        variables: { ...variables, limit: 100_000, fetchOnlyRowIds: true, hasImportFilter: false },
+      });
+
+      if (error) {
+        toast({ variant: 'error', message: i18nGraphqlException(intl, error) });
+      } else {
+        return data.host.offPlatformTransactions.nodes.map(row => row.id) || [];
+      }
+    },
+  });
 
   // Clear selection whenever the pagination changes
   React.useEffect(() => {
@@ -346,7 +364,10 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
     };
   }, [host, importData]);
 
-  const hasPagination = host?.offPlatformTransactions?.totalCount > queryFilter.values.limit;
+  // const hasPagination = host?.offPlatformTransactions?.totalCount > queryFilter.values.limit;
+  const includeAllPages = selection.includeAllPages;
+  const selectedRows = data?.host?.offPlatformTransactions?.nodes.filter(row => selection.rows[row.id]);
+  const rowsActions = getPossibleActionsForSelectedRows(selectedRows);
   // const isInitialSync = Boolean(!importData?.lastSyncAt && importData?.connectedAccount);
 
   return (
@@ -430,42 +451,14 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
               meta={filtersMeta}
             />
 
-            {/** TODO Select all message */}
-            {/* {size(selection.rows) === importRows.length && hasPagination && (
-                  <div className="flex items-center justify-center rounded-lg bg-neutral-100 p-2 text-sm text-neutral-600">
-                    {!selection.includeAllPages ? (
-                      <React.Fragment>
-                        <FormattedMessage
-                          defaultMessage="All {count} rows on this page are selected."
-                          id="qMKhWs"
-                          values={{ count: importRows.length }}
-                        />
-                        <Button
-                          variant="link"
-                          size="xs"
-                          onClick={() => dispatchSelection({ type: 'SELECT_ALL_PAGES' })}
-                        >
-                          <FormattedMessage
-                            defaultMessage="Select all {count} rows."
-                            id="vbHaiI"
-                            values={{ count: importData.rows.totalCount }}
-                          />
-                        </Button>
-                      </React.Fragment>
-                    ) : (
-                      <React.Fragment>
-                        <FormattedMessage
-                          defaultMessage="All {count} rows are selected."
-                          id="1bUrqi"
-                          values={{ count: importData.rows.totalCount }}
-                        />
-                        <Button variant="link" size="xs" onClick={() => dispatchSelection({ type: 'CLEAR' })}>
-                          <FormattedMessage defaultMessage="Clear selection" id="EYIw2M" />
-                        </Button>
-                      </React.Fragment>
-                    )}
-                  </div>
-                )} */}
+            {/** Selection/batch tool */}
+            <TransactionsImportRowsBatchActionsBar
+              rows={importRows}
+              selection={selection}
+              dispatchSelection={dispatchSelection}
+              totalCount={host.offPlatformTransactions.totalCount}
+              setRowsStatus={setRowsStatus}
+            />
 
             {/** Import data table */}
             <div className="relative mt-2">
@@ -536,28 +529,18 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
                   {
                     header: 'Source',
                     cell: ({ row }) => {
-                      const transactionsImport = row.original
-                        .transactionsImport as (typeof data)['host']['offPlatformTransactions']['nodes'][number]['transactionsImport'];
-                      return (
-                        <div>
-                          <div className="mb-1 font-medium">{transactionsImport.source}</div>
-                          <div className="text-sm text-neutral-500">{transactionsImport.name}</div>
-                        </div>
-                      );
-                    },
-                  },
-                  {
-                    header: 'Collective',
-                    cell: ({ row }) => {
                       const importRow =
                         row.original as (typeof data)['host']['offPlatformTransactions']['nodes'][number];
-                      const assigned = importRow.assignedAccounts;
-                      if (!assigned.length) {
-                        return '-';
-                      } else {
-                        // TODO use a dedicated component that truncates
-                        return assigned.map(account => <Avatar key={account.id} collective={account} size={24} />); // TODO: Add tooltip with account name
-                      }
+                      return (
+                        <div>
+                          <div className="mb-1 font-medium">{importRow.transactionsImport.source}</div>
+                          {importRow.plaidAccount && (
+                            <div className="text-sm text-neutral-500">
+                              {importRow.plaidAccount.name || `#${importRow.plaidAccount.id}`}
+                            </div>
+                          )}
+                        </div>
+                      );
                     },
                   },
                   {
@@ -588,6 +571,32 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
                     },
                   },
                   {
+                    header: 'Collective',
+                    cell: ({ row }) => {
+                      const importRow =
+                        row.original as (typeof data)['host']['offPlatformTransactions']['nodes'][number];
+                      let displayedAccounts;
+
+                      if (importRow.expense) {
+                        displayedAccounts = [row.original.expense.account];
+                      } else if (importRow.order) {
+                        displayedAccounts = [row.original.order.toAccount];
+                      } else {
+                        displayedAccounts = importRow.assignedAccounts;
+                      }
+
+                      if (!displayedAccounts?.length) {
+                        return '-';
+                      }
+
+                      // TODO use a dedicated component that truncates
+                      // TODO: Add tooltip with account name
+                      return displayedAccounts.map(account => (
+                        <Avatar key={account.id} collective={account} size={24} />
+                      ));
+                    },
+                  },
+                  {
                     header: 'Match',
                     cell: ({ row }) => {
                       if (row.original.expense) {
@@ -596,7 +605,6 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
                             className="flex items-center gap-1"
                             href={`/${row.original.expense.account.slug}/expenses/${row.original.expense.legacyId}`}
                           >
-                            <Avatar collective={row.original.expense.account} size={24} />
                             <FormattedMessage
                               id="E9pJQz"
                               defaultMessage="Expense #{id}"
@@ -610,7 +618,6 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
                             className="flex items-center gap-1"
                             href={`/${row.original.order.toAccount.slug}/contributions/${row.original.order.legacyId}`}
                           >
-                            <Avatar collective={row.original.order.toAccount} size={24} />
                             <FormattedMessage
                               id="Siv4wU"
                               defaultMessage="Contribution #{id}"
@@ -644,103 +651,11 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
                     },
                   },
                   {
-                    id: 'actions',
+                    id: 'Actions',
                     ...actionsColumn,
-                    header: ({ table }) => {
-                      const selectedRows = table.getSelectedRowModel().rows.map(row => row.original);
-                      const includeAllPages = selection.includeAllPages;
-                      const rowsActions = getPossibleActionsForSelectedRows(selectedRows);
+                    header: () => {
                       return (
-                        <div className="flex min-w-36 justify-end">
-                          {includeAllPages ||
-                          rowsActions.canIgnore.length ||
-                          rowsActions.canRestore.length ||
-                          rowsActions.canPutOnHold.length ? (
-                            <div className="flex gap-1">
-                              {(includeAllPages || rowsActions.canRestore.length > 0) && (
-                                <Button
-                                  variant="outline"
-                                  size="xs"
-                                  className="text-xs whitespace-nowrap"
-                                  onClick={async () => {
-                                    await setRowsStatus(rowsActions.canRestore, TransactionsImportRowStatus.PENDING, {
-                                      includeAllPages,
-                                    });
-                                    table.setRowSelection({});
-                                  }}
-                                >
-                                  <SquareSlashIcon size={12} />
-                                  {includeAllPages ? (
-                                    <FormattedMessage defaultMessage="Restore all rows" id="8uECrb" />
-                                  ) : (
-                                    <FormattedMessage
-                                      defaultMessage="Restore {selectedCount}"
-                                      id="restore"
-                                      values={{ selectedCount: rowsActions.canRestore.length }}
-                                    />
-                                  )}
-                                </Button>
-                              )}
-
-                              {(includeAllPages || rowsActions.canIgnore.length > 0) && (
-                                <Button
-                                  variant="outline"
-                                  size="xs"
-                                  className="text-xs whitespace-nowrap"
-                                  onClick={async () => {
-                                    await setRowsStatus(rowsActions.canIgnore, TransactionsImportRowStatus.IGNORED, {
-                                      includeAllPages,
-                                    });
-                                    table.setRowSelection({});
-                                  }}
-                                >
-                                  <SquareSlashIcon size={12} />
-                                  {includeAllPages ? (
-                                    <FormattedMessage defaultMessage="No action (all)" id="UFhJFs" />
-                                  ) : (
-                                    <FormattedMessage
-                                      defaultMessage="No action ({selectedCount})"
-                                      id="B2eNk+"
-                                      values={{ selectedCount: rowsActions.canIgnore.length }}
-                                    />
-                                  )}
-                                </Button>
-                              )}
-
-                              {(includeAllPages || rowsActions.canPutOnHold.length > 0) && (
-                                <Button
-                                  variant="outline"
-                                  size="xs"
-                                  className="text-xs whitespace-nowrap"
-                                  onClick={async () => {
-                                    await setRowsStatus(rowsActions.canPutOnHold, TransactionsImportRowStatus.ON_HOLD, {
-                                      includeAllPages,
-                                    });
-                                    table.setRowSelection({});
-                                  }}
-                                >
-                                  <PauseCircle size={12} />
-                                  {includeAllPages ? (
-                                    <FormattedMessage defaultMessage="Put all on hold" id="putAllOnHold" />
-                                  ) : (
-                                    <FormattedMessage
-                                      defaultMessage="Put on hold ({selectedCount})"
-                                      id="putOnHoldCount"
-                                      values={{ selectedCount: rowsActions.canPutOnHold.length }}
-                                    />
-                                  )}
-                                </Button>
-                              )}
-                            </div>
-                          ) : (
-                            <div>
-                              <FormattedMessage
-                                defaultMessage="Actions"
-                                id="CollectivePage.NavBar.ActionMenu.Actions"
-                              />
-                            </div>
-                          )}
-                        </div>
+                        <FormattedMessage defaultMessage="Actions" id="CollectivePage.NavBar.ActionMenu.Actions" />
                       );
                     },
                   },

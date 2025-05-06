@@ -6406,6 +6406,13 @@ export type HostTransactionsImportsArgs = {
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
   status?: InputMaybe<TransactionsImportStatus>;
+  type?: InputMaybe<Array<InputMaybe<TransactionsImportType>>>;
+};
+
+
+/** This represents an Host account */
+export type HostTransactionsImportsSourcesArgs = {
+  type?: InputMaybe<Array<InputMaybe<TransactionsImportType>>>;
 };
 
 
@@ -8750,9 +8757,7 @@ export type MutationUpdateSocialLinksArgs = {
 /** This is the root mutation */
 export type MutationUpdateTransactionsImportRowsArgs = {
   action: TransactionsImportRowAction;
-  host?: InputMaybe<AccountReferenceInput>;
-  rows?: InputMaybe<Array<TransactionsImportRowUpdateInput>>;
-  status?: InputMaybe<TransactionsImportRowStatus>;
+  rows: Array<TransactionsImportRowUpdateInput>;
 };
 
 
@@ -11211,7 +11216,7 @@ export type QueryTransactionsArgs = {
 
 /** This is the root query */
 export type QueryTransactionsImportArgs = {
-  id: Scalars['String']['input'];
+  id: Scalars['NonEmptyString']['input'];
 };
 
 
@@ -12105,9 +12110,9 @@ export type TransactionsImportAssignmentInput = {
 export type TransactionsImportEditResponse = {
   __typename?: 'TransactionsImportEditResponse';
   /** The host account that owns the off-platform transactions */
-  host: Host;
+  host?: Maybe<Host>;
   /** The rows updated by the mutation */
-  rows: Array<Maybe<TransactionsImportRow>>;
+  rows: Array<TransactionsImportRow>;
 };
 
 export type TransactionsImportReferenceInput = {
@@ -12136,6 +12141,8 @@ export type TransactionsImportRow = {
   note?: Maybe<Scalars['String']['output']>;
   /** The order associated with the row */
   order?: Maybe<Order>;
+  /** If the row was imported from plaid, this is the account it was imported from */
+  plaidAccount?: Maybe<PlaidAccount>;
   /** The raw data of the row */
   rawValue?: Maybe<Scalars['JSONObject']['output']>;
   /** The source id of the row */

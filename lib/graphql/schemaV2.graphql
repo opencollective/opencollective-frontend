@@ -4210,12 +4210,22 @@ type Host implements Account & AccountWithContributions {
     The order of results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Filter by type of transactions import
+    """
+    type: [TransactionsImportType]
   ): TransactionsImportsCollection!
 
   """
   Returns a list of transactions imports sources for this host
   """
-  transactionsImportsSources: [NonEmptyString]!
+  transactionsImportsSources(
+    """
+    Filter by type of transactions import
+    """
+    type: [TransactionsImportType]
+  ): [NonEmptyString]!
   offPlatformTransactions(
     """
     The number of results to fetch (default 10, max 1000)
@@ -7504,6 +7514,11 @@ type TransactionsImportRow {
   If an account ID is available in the imported row, it will be stored here. Returns the default account ID otherwise.
   """
   accountId: String
+
+  """
+  If the row was imported from plaid, this is the account it was imported from
+  """
+  plaidAccount: PlaidAccount
 
   """
   The accounts assigned to the row, based on its account ID
@@ -16134,7 +16149,7 @@ type Query {
     """
     The public id identifying the import (ie: rvelja97-pkzqbgq7-bbzyx6wd-50o8n4rm)
     """
-    id: String!
+    id: NonEmptyString!
   ): TransactionsImport
   update(
     """
@@ -21690,24 +21705,14 @@ type Mutation {
   """
   updateTransactionsImportRows(
     """
-    Host account that owns the off-platform transactions
-    """
-    host: AccountReferenceInput
-
-    """
     Rows to update
     """
-    rows: [TransactionsImportRowUpdateInput!]
+    rows: [TransactionsImportRowUpdateInput!]!
 
     """
     Action to perform on all non-processed rows
     """
     action: TransactionsImportRowAction!
-
-    """
-    If provided, only the row matching this status will be updated by the action
-    """
-    status: TransactionsImportRowStatus
   ): TransactionsImportEditResponse!
 
   """
@@ -24025,12 +24030,12 @@ type TransactionsImportEditResponse {
   """
   The host account that owns the off-platform transactions
   """
-  host: Host!
+  host: Host
 
   """
   The rows updated by the mutation
   """
-  rows: [TransactionsImportRow]!
+  rows: [TransactionsImportRow!]!
 }
 
 input TransactionsImportRowUpdateInput {

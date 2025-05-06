@@ -573,7 +573,6 @@ export const MatchContributionDialog = ({
                       setIsSubmitting(true);
                       await updateRows({
                         variables: {
-                          importId: transactionsImport.id,
                           action: TransactionsImportRowAction.UPDATE_ROWS,
                           rows: [{ id: row.id, order: { id: selectedContribution.id } }],
                         },
