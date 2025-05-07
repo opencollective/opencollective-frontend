@@ -5803,6 +5803,9 @@ export type Host = Account & AccountWithContributions & {
   name?: Maybe<Scalars['String']['output']>;
   /** The list of applications created by this account. Admin only. Scope: "applications". */
   oAuthApplications?: Maybe<OAuthApplicationCollection>;
+  offPlatformTransactions: TransactionsImportRowCollection;
+  /** Returns stats for off platform transactions */
+  offPlatformTransactionsStats: TransactionsImportStats;
   orders: OrderCollection;
   /** @deprecated 2022-12-16: use parent on AccountWithParent instead */
   parentAccount?: Maybe<Account>;
@@ -6204,6 +6207,19 @@ export type HostOAuthApplicationsArgs = {
 
 
 /** This represents an Host account */
+export type HostOffPlatformTransactionsArgs = {
+  accountId?: InputMaybe<Array<InputMaybe<Scalars['NonEmptyString']['input']>>>;
+  importId?: InputMaybe<Array<Scalars['NonEmptyString']['input']>>;
+  importType?: InputMaybe<Array<TransactionsImportType>>;
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+  orderBy?: TransactionsImportRowOrderInput;
+  searchTerm?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<TransactionsImportRowStatus>;
+};
+
+
+/** This represents an Host account */
 export type HostOrdersArgs = {
   chargedDateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   chargedDateTo?: InputMaybe<Scalars['DateTime']['input']>;
@@ -6347,6 +6363,14 @@ export type HostTransactionsImportsArgs = {
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
   orderBy?: ChronologicalOrderInput;
+  status?: InputMaybe<TransactionsImportStatus>;
+  type?: InputMaybe<Array<InputMaybe<TransactionsImportType>>>;
+};
+
+
+/** This represents an Host account */
+export type HostTransactionsImportsSourcesArgs = {
+  type?: InputMaybe<Array<InputMaybe<TransactionsImportType>>>;
 };
 
 
@@ -8685,8 +8709,7 @@ export type MutationUpdateSocialLinksArgs = {
 /** This is the root mutation */
 export type MutationUpdateTransactionsImportRowsArgs = {
   action: TransactionsImportRowAction;
-  id: Scalars['NonEmptyString']['input'];
-  rows?: InputMaybe<Array<TransactionsImportRowUpdateInput>>;
+  rows: Array<TransactionsImportRowUpdateInput>;
 };
 
 
@@ -11133,7 +11156,7 @@ export type QueryTransactionsArgs = {
 
 /** This is the root query */
 export type QueryTransactionsImportArgs = {
-  id: Scalars['String']['input'];
+  id: Scalars['NonEmptyString']['input'];
 };
 
 
@@ -11974,11 +11997,14 @@ export type TransactionsImport = {
   name: Scalars['NonEmptyString']['output'];
   /** List of available accounts for the import */
   plaidAccounts?: Maybe<Array<Maybe<PlaidAccount>>>;
-  /** List of rows in the import */
+  /**
+   * List of rows in the import
+   * @deprecated 2025-04-29: Please use `host.offPlatformTransactions` instead.
+   */
   rows: TransactionsImportRowCollection;
   /** Source of the import (e.g. "Bank of America", "Eventbrite", etc...) */
   source: Scalars['NonEmptyString']['output'];
-  stats?: Maybe<TransactionsImportStats>;
+  stats: TransactionsImportStats;
   /** Type of the import */
   type: TransactionsImportType;
   /** When the import was last updated */
@@ -12009,10 +12035,10 @@ export type TransactionsImportAssignmentInput = {
 
 export type TransactionsImportEditResponse = {
   __typename?: 'TransactionsImportEditResponse';
-  /** Updated import */
-  import: TransactionsImport;
+  /** The host account that owns the off-platform transactions */
+  host?: Maybe<Host>;
   /** The rows updated by the mutation */
-  rows: Array<Maybe<TransactionsImportRow>>;
+  rows: Array<TransactionsImportRow>;
 };
 
 export type TransactionsImportReferenceInput = {
@@ -12027,6 +12053,8 @@ export type TransactionsImportRow = {
   accountId?: Maybe<Scalars['String']['output']>;
   /** The amount of the row */
   amount: Amount;
+  /** The accounts assigned to the row, based on its account ID */
+  assignedAccounts: Array<Maybe<Account>>;
   /** The date of the row */
   date: Scalars['DateTime']['output'];
   /** The description of the row */
@@ -12039,6 +12067,8 @@ export type TransactionsImportRow = {
   note?: Maybe<Scalars['String']['output']>;
   /** The order associated with the row */
   order?: Maybe<Order>;
+  /** If the row was imported from plaid, this is the account it was imported from */
+  plaidAccount?: Maybe<PlaidAccount>;
   /** The raw data of the row */
   rawValue?: Maybe<Scalars['JSONObject']['output']>;
   /** The source id of the row */
@@ -12078,6 +12108,18 @@ export type TransactionsImportRowCreateInput = {
   /** The source id of the row */
   sourceId: Scalars['NonEmptyString']['input'];
 };
+
+/** Input to order off platform transactions chronologically */
+export type TransactionsImportRowOrderInput = {
+  /** Ordering direction. */
+  direction?: OrderDirection;
+  /** Field to order by */
+  field?: TransactionsImportRowOrderInputField;
+};
+
+export enum TransactionsImportRowOrderInputField {
+  DATE = 'DATE'
+}
 
 export type TransactionsImportRowReferenceInput = {
   /** The id of the row */
@@ -12138,6 +12180,14 @@ export type TransactionsImportStats = {
   /** Total number of rows in the import */
   total: Scalars['Int']['output'];
 };
+
+/** Status of the import */
+export enum TransactionsImportStatus {
+  /** The import is connected and ready to sync */
+  ACTIVE = 'ACTIVE',
+  /** The import is disconnected / archived */
+  DISCONNECTED = 'DISCONNECTED'
+}
 
 /** Type of the import */
 export enum TransactionsImportType {

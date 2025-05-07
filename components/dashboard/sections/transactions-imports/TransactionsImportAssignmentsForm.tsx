@@ -132,7 +132,7 @@ export const TransactionsImportAssignmentsForm = ({
     >
       {({ dirty, isSubmitting, setValues, values }) => {
         const getAssignmentAccounts = (accountId: string) =>
-          values.find(assignment => assignment.importedAccountId === accountId)?.accounts || null;
+          values.find(assignment => assignment.importedAccountId === accountId)?.accounts || [];
         return (
           <Form>
             {transactionsImport.type === 'PLAID' ? (
@@ -163,15 +163,12 @@ export const TransactionsImportAssignmentsForm = ({
                     defaultMessage="By default, imported transactions will be assigned to the account selected here."
                     id="Neyl6Y"
                   />{' '}
-                  <FormattedMessage
-                    defaultMessage="You can override this assignment for each sub-account."
-                    id="Kn0NEC"
-                  />
+                  <FormattedMessage defaultMessage="You can override this assignment for each account." id="wckrmL" />
                 </p>
                 {!transactionsImport.plaidAccounts?.length ? (
                   <p className="py-6 text-center text-sm text-muted-foreground">
                     <FormattedMessage
-                      defaultMessage="The sub-accounts for this import are not available."
+                      defaultMessage="The accounts for this import are not available."
                       id="settings.accounts.noAccounts"
                     />
                   </p>
@@ -207,6 +204,7 @@ export const TransactionsImportAssignmentsForm = ({
                             onChange={value => {
                               setValues(updateValues(values, plaidAccount.accountId, value));
                             }}
+                            truncationThreshold={30}
                           />
                         </CardContent>
                       </Card>

@@ -4164,15 +4164,76 @@ type Host implements Account & AccountWithContributions {
     offset: Int! = 0
 
     """
+    Filter by status of transactions import
+    """
+    status: TransactionsImportStatus
+
+    """
     The order of results
     """
     orderBy: ChronologicalOrderInput! = { field: CREATED_AT, direction: DESC }
+
+    """
+    Filter by type of transactions import
+    """
+    type: [TransactionsImportType]
   ): TransactionsImportsCollection!
 
   """
   Returns a list of transactions imports sources for this host
   """
-  transactionsImportsSources: [NonEmptyString]!
+  transactionsImportsSources(
+    """
+    Filter by type of transactions import
+    """
+    type: [TransactionsImportType]
+  ): [NonEmptyString]!
+  offPlatformTransactions(
+    """
+    The number of results to fetch (default 10, max 1000)
+    """
+    limit: Int! = 100
+
+    """
+    The offset to use to fetch
+    """
+    offset: Int! = 0
+
+    """
+    Filter rows by status
+    """
+    status: TransactionsImportRowStatus
+
+    """
+    Search by text
+    """
+    searchTerm: String
+
+    """
+    Filter rows by plaid account id
+    """
+    accountId: [NonEmptyString]
+
+    """
+    The transactions import id(s)
+    """
+    importId: [NonEmptyString!]
+
+    """
+    Filter rows by import type
+    """
+    importType: [TransactionsImportType!]
+
+    """
+    The order of results
+    """
+    orderBy: TransactionsImportRowOrderInput! = { field: DATE, direction: DESC }
+  ): TransactionsImportRowCollection!
+
+  """
+  Returns stats for off platform transactions
+  """
+  offPlatformTransactionsStats: TransactionsImportStats!
 }
 
 """
@@ -7287,7 +7348,8 @@ type TransactionsImport {
     """
     accountId: [NonEmptyString]
   ): TransactionsImportRowCollection!
-  stats: TransactionsImportStats
+    @deprecated(reason: "2025-04-29: Please use `host.offPlatformTransactions` instead.")
+  stats: TransactionsImportStats!
 }
 
 """
@@ -7410,6 +7472,16 @@ type TransactionsImportRow {
   accountId: String
 
   """
+  If the row was imported from plaid, this is the account it was imported from
+  """
+  plaidAccount: PlaidAccount
+
+  """
+  The accounts assigned to the row, based on its account ID
+  """
+  assignedAccounts: [Account]!
+
+  """
   The raw data of the row
   """
   rawValue: JSONObject
@@ -7500,6 +7572,40 @@ type TransactionsImportStats {
   Number of rows that are invalid (e.g. linked but without an expense or order)
   """
   invalid: Int!
+}
+
+"""
+Status of the import
+"""
+enum TransactionsImportStatus {
+  """
+  The import is connected and ready to sync
+  """
+  ACTIVE
+
+  """
+  The import is disconnected / archived
+  """
+  DISCONNECTED
+}
+
+"""
+Input to order off platform transactions chronologically
+"""
+input TransactionsImportRowOrderInput {
+  """
+  Field to order by
+  """
+  field: TransactionsImportRowOrderInputField! = DATE
+
+  """
+  Ordering direction.
+  """
+  direction: OrderDirection! = DESC
+}
+
+enum TransactionsImportRowOrderInputField {
+  DATE
 }
 
 enum AccountingCategoryAppliesTo {
@@ -15986,7 +16092,7 @@ type Query {
     """
     The public id identifying the import (ie: rvelja97-pkzqbgq7-bbzyx6wd-50o8n4rm)
     """
-    id: String!
+    id: NonEmptyString!
   ): TransactionsImport
   update(
     """
@@ -21532,14 +21638,9 @@ type Mutation {
   """
   updateTransactionsImportRows(
     """
-    ID of the import to add transactions to
-    """
-    id: NonEmptyString!
-
-    """
     Rows to update
     """
-    rows: [TransactionsImportRowUpdateInput!]
+    rows: [TransactionsImportRowUpdateInput!]!
 
     """
     Action to perform on all non-processed rows
@@ -23860,14 +23961,14 @@ input TransactionsImportRowCreateInput {
 
 type TransactionsImportEditResponse {
   """
-  Updated import
+  The host account that owns the off-platform transactions
   """
-  import: TransactionsImport!
+  host: Host
 
   """
   The rows updated by the mutation
   """
-  rows: [TransactionsImportRow]!
+  rows: [TransactionsImportRow!]!
 }
 
 input TransactionsImportRowUpdateInput {

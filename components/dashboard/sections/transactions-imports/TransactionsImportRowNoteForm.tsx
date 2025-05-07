@@ -14,17 +14,16 @@ import { useToast } from '@/components/ui/useToast';
 
 export const TransactionsImportRowNoteForm = ({
   row,
-  transactionsImportId,
   autoFocus = false,
 }: {
   row: Pick<TransactionsImportRow, 'id' | 'note'>;
-  transactionsImportId: string;
   autoFocus?: boolean;
 }) => {
   const [updateRows, { loading }] = useMutation(updateTransactionsImportRows, { context: API_V2_CONTEXT });
   const [newText, setNewText] = React.useState(row.note || '');
   const { toast } = useToast();
   const intl = useIntl();
+  const hasUnsavedChanges = newText !== (row.note || '');
   return (
     <div>
       <Label htmlFor="import-row-note" className="mb-1 font-bold text-gray-600">
@@ -40,18 +39,14 @@ export const TransactionsImportRowNoteForm = ({
       />
       <div className={'mt-2 flex w-full justify-end'}>
         <Button
-          variant="outline"
+          variant={hasUnsavedChanges ? 'default' : 'outline'}
+          disabled={!hasUnsavedChanges}
           size="sm"
           loading={loading}
-          disabled={newText === (row.note || '')}
           onClick={() => {
             try {
               updateRows({
-                variables: {
-                  importId: transactionsImportId,
-                  rows: [{ id: row.id, note: newText }],
-                  action: 'UPDATE_ROWS',
-                },
+                variables: { rows: [{ id: row.id, note: newText }], action: 'UPDATE_ROWS' },
               });
             } catch (error) {
               toast({
