@@ -204,6 +204,7 @@ export const TransactionsImportAssignmentsForm = ({
                             onChange={value => {
                               setValues(updateValues(values, plaidAccount.accountId, value));
                             }}
+                            truncationThreshold={30}
                           />
                         </CardContent>
                       </Card>

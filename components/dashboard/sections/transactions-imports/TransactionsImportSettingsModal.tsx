@@ -74,8 +74,8 @@ export default function TransactionsImportSettingsModal({
   host: { slug: string };
   onOpenChange: (isOpen: boolean) => void;
   isOpen: boolean;
-  showPlaidDialog: () => void;
-  plaidStatus: PlaidDialogStatus;
+  showPlaidDialog?: () => void;
+  plaidStatus?: PlaidDialogStatus;
   hasRequestedSync: boolean;
   setHasRequestedSync: (hasRequestedSync: boolean) => void;
   transactionsImport: Pick<
@@ -304,7 +304,7 @@ export default function TransactionsImportSettingsModal({
                             disabled={isDeleting}
                           >
                             <ArchiveIcon size={16} />
-                            <FormattedMessage defaultMessage="Archive" id="hrgo+E" />
+                            <FormattedMessage defaultMessage="Archive" id="collective.archive.confirm.btn" />
                           </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
@@ -355,7 +355,7 @@ export default function TransactionsImportSettingsModal({
                     <AlertDialogTrigger asChild>
                       <Button variant="destructive" className="w-full" loading={isDeleting} disabled={isDisconnecting}>
                         <AlertTriangle size={16} />
-                        <FormattedMessage defaultMessage="Delete" id="K3r6DQ" />
+                        <FormattedMessage defaultMessage="Delete" id="actions.delete" />
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>

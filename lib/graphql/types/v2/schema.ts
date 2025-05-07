@@ -2600,7 +2600,7 @@ export type ConfirmGuestAccountResponse = {
 export type ConnectedAccount = {
   __typename?: 'ConnectedAccount';
   /** The accounts that are mirroring this connected account */
-  accountsMirrored?: Maybe<Array<Maybe<Account>>>;
+  accountsMirrored: Array<Maybe<Account>>;
   /** The date on which the ConnectedAccount was created */
   createdAt: Scalars['DateTime']['output'];
   /** The account who connected this account */
@@ -6256,6 +6256,7 @@ export type HostOffPlatformTransactionsArgs = {
   importType?: InputMaybe<Array<TransactionsImportType>>;
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  orderBy?: TransactionsImportRowOrderInput;
   searchTerm?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<TransactionsImportRowStatus>;
 };
@@ -12182,6 +12183,18 @@ export type TransactionsImportRowCreateInput = {
   /** The source id of the row */
   sourceId: Scalars['NonEmptyString']['input'];
 };
+
+/** Input to order off platform transactions chronologically */
+export type TransactionsImportRowOrderInput = {
+  /** Ordering direction. */
+  direction?: OrderDirection;
+  /** Field to order by */
+  field?: TransactionsImportRowOrderInputField;
+};
+
+export enum TransactionsImportRowOrderInputField {
+  DATE = 'DATE'
+}
 
 export type TransactionsImportRowReferenceInput = {
   /** The id of the row */

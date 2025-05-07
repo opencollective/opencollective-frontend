@@ -224,7 +224,7 @@ export const MatchContributionDialog = ({
   ...props
 }: {
   accounts: Pick<Account, 'id' | 'slug'>[];
-  host: Account;
+  host: Pick<Account, 'id' | 'slug'>;
   row: TransactionsImportRow;
   transactionsImport: Pick<TransactionsImport, 'id' | 'source' | 'csvConfig'>;
   onAddFundsClick: () => void;

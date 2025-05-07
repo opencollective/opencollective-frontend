@@ -1,5 +1,6 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
+import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
@@ -7,6 +8,11 @@ import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { TransactionsTableQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
+import { getOffPlatformTransactionsRoute } from '@/lib/url-helpers';
+
+import Image from '@/components/Image';
+import Link from '@/components/Link';
+import { Card, CardContent } from '@/components/ui/Card';
 
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { Button } from '../../../ui/Button';
@@ -176,4 +182,29 @@ const HostTransactionsBase = ({ accountSlug: hostSlug }: DashboardSectionProps) 
   );
 };
 
-export default HostTransactionsBase;
+// TODO: This redirection layer should be removed after some time. Should be safe to do after 2025-10-01.
+const HostTransactions = props => {
+  const router = useRouter();
+  if (router.query.subpath?.[0] === 'import') {
+    return (
+      <div className="flex justify-center py-12">
+        <Card>
+          <CardContent className="flex max-w-xl flex-col items-center justify-center gap-6 pt-4 text-center">
+            <Image src="/static/images/not-found-illustration.png" alt="" width={200} height={200} />
+            <div>
+              This page has moved, please go to the new{' '}
+              <Link className="text-blue-600 underline" href={getOffPlatformTransactionsRoute(props.accountSlug)}>
+                Off-platform Transactions tool
+              </Link>{' '}
+              to continue.
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  } else {
+    return <HostTransactionsBase {...props} />;
+  }
+};
+
+export default HostTransactions;

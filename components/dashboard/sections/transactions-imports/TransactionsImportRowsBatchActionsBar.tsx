@@ -23,8 +23,9 @@ export const TransactionsImportRowsBatchActionsBar = ({
 
   const selectedRows = rows.filter(row => selection.rows[row.id]);
   const nbLinked = selectedRows.filter(row => row.status === TransactionsImportRowStatus.LINKED).length;
-  if (nbLinked === nbSelected) {
-    return null; // Can't do any action on linked rows
+  const totalSelectable = nbSelected - nbLinked; // Can't do any action on linked rows
+  if (totalSelectable === 0) {
+    return null;
   }
 
   const includeAllPages = selection.includeAllPages;
@@ -32,18 +33,7 @@ export const TransactionsImportRowsBatchActionsBar = ({
   return (
     <div className="flex items-center justify-between rounded-lg bg-slate-100 px-6 py-2 text-sm text-neutral-800">
       <div>
-        {!selection.includeAllPages ? (
-          <React.Fragment>
-            <FormattedMessage
-              defaultMessage="{count} rows on this page are selected."
-              id="mJiYf5"
-              values={{ count: nbSelected - nbLinked }}
-            />
-            <Button variant="link" size="xs" onClick={() => dispatchSelection({ type: 'SELECT_ALL_PAGES' })}>
-              <FormattedMessage defaultMessage="Select all {count} rows." id="vbHaiI" values={{ count: totalCount }} />
-            </Button>
-          </React.Fragment>
-        ) : (
+        {selection.includeAllPages || totalSelectable === totalCount || nbSelected === totalCount ? (
           <React.Fragment>
             <FormattedMessage
               defaultMessage="All {count} rows are selected."
@@ -52,6 +42,17 @@ export const TransactionsImportRowsBatchActionsBar = ({
             />
             <Button variant="link" size="xs" onClick={() => dispatchSelection({ type: 'CLEAR' })}>
               <FormattedMessage defaultMessage="Clear selection" id="EYIw2M" />
+            </Button>
+          </React.Fragment>
+        ) : (
+          <React.Fragment>
+            <FormattedMessage
+              defaultMessage="{count} rows on this page are selected."
+              id="mJiYf5"
+              values={{ count: totalSelectable }}
+            />
+            <Button variant="link" size="xs" onClick={() => dispatchSelection({ type: 'SELECT_ALL_PAGES' })}>
+              <FormattedMessage defaultMessage="Select all {count} rows." id="vbHaiI" values={{ count: totalCount }} />
             </Button>
           </React.Fragment>
         )}

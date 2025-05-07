@@ -28,16 +28,16 @@ const getOptimisticResponse = (
 ): UpdateTransactionsImportRowMutation => {
   type ReturnedHost = UpdateTransactionsImportRowMutation['updateTransactionsImportRows']['host'];
   const optimisticResult = {
-    rows: [],
+    __typename: 'TransactionsImportEditResponse',
+    rows: rowIds.map(id => ({ id, status, __typename: 'TransactionsImportRow' })),
     host: cloneDeep(
-      pick<ReturnedHost, 'id' | 'offPlatformTransactionsStats'>(host, ['id', 'offPlatformTransactionsStats']),
+      pick<ReturnedHost, 'id' | 'offPlatformTransactionsStats' | '__typename'>(host, [
+        'id',
+        'offPlatformTransactionsStats',
+        '__typename',
+      ]),
     ),
-  };
-
-  // Update nodes
-  update(optimisticResult, 'rows', nodes =>
-    nodes.map(node => (!rowIds.includes(node.id) ? node : { ...node, status })),
-  );
+  } as const;
 
   // Update stats
   if (status === TransactionsImportRowStatus.IGNORED) {
@@ -48,7 +48,9 @@ const getOptimisticResponse = (
     update(optimisticResult, 'host.offPlatformTransactionsStats.processed', processed => processed - rowIds.length);
   }
 
-  return { updateTransactionsImportRows: optimisticResult };
+  return {
+    updateTransactionsImportRows: optimisticResult,
+  };
 };
 
 export const useTransactionsImportActions = ({
@@ -56,7 +58,8 @@ export const useTransactionsImportActions = ({
   getAllRowsIds,
 }: {
   host: React.ComponentProps<typeof MatchContributionDialog>['host'] &
-    React.ComponentProps<typeof MatchExpenseDialog>['host'];
+    React.ComponentProps<typeof MatchExpenseDialog>['host'] &
+    React.ComponentProps<typeof AddFundsModalFromImportRow>['host'];
   /** A function to get all rows IDs regardless of pagination, to work with the `includeAllPages` option */
   getAllRowsIds: () => Promise<string[]>;
 }): {
@@ -102,7 +105,7 @@ export const useTransactionsImportActions = ({
           action,
           rows: allRowsIds.map(id => ({ id, status: newStatus })),
         },
-        optimisticResponse: getOptimisticResponse(host, rowIds, newStatus), // TODO: Not working yet
+        optimisticResponse: getOptimisticResponse(host, rowIds, newStatus),
       });
 
       return true;
@@ -126,7 +129,7 @@ export const useTransactionsImportActions = ({
     const showAddFundsModal = () => {
       showModal(
         AddFundsModalFromImportRow,
-        { collective: assignedAccounts, transactionsImport, row, onCloseFocusRef },
+        { host, collective: assignedAccounts, transactionsImport, row, onCloseFocusRef },
         'add-funds-modal',
       );
     };
@@ -207,30 +210,36 @@ export const useTransactionsImportActions = ({
           </div>
         ),
       });
+    } else {
+      actions.primary.push({
+        key: 'restore',
+        Icon: ArchiveRestore,
+        onClick: () => setRowsStatus([row.id], TransactionsImportRowStatus.PENDING),
+        disabled: isUpdatingRow,
+        label: (
+          <div>
+            <FormattedMessage defaultMessage="Restore" id="zz6ObK" />
+            {isUpdatingRow && <StyledSpinner size={14} ml={2} />}
+          </div>
+        ),
+      });
     }
 
-    actions.primary.push({
-      key: 'ignore',
-      Icon: row.status === TransactionsImportRowStatus.IGNORED ? ArchiveRestore : SquareSlashIcon,
-      onClick: () =>
-        setRowsStatus(
-          [row.id],
-          row.status === TransactionsImportRowStatus.IGNORED
-            ? TransactionsImportRowStatus.PENDING
-            : TransactionsImportRowStatus.IGNORED,
-        ),
-      disabled: isUpdatingRow,
-      label: (
-        <div>
-          {row.status === TransactionsImportRowStatus.IGNORED ? (
-            <FormattedMessage defaultMessage="Revert" id="amT0Gh" />
-          ) : (
+    if (row.status !== TransactionsImportRowStatus.IGNORED) {
+      actions.primary.push({
+        key: 'ignore',
+        Icon: SquareSlashIcon,
+        onClick: () => setRowsStatus([row.id], TransactionsImportRowStatus.IGNORED),
+        disabled: isUpdatingRow,
+        label: (
+          <div>
             <FormattedMessage defaultMessage="No action" id="zue9QR" />
-          )}
-          {isUpdatingRow && <StyledSpinner size={14} ml={2} />}
-        </div>
-      ),
-    });
+
+            {isUpdatingRow && <StyledSpinner size={14} ml={2} />}
+          </div>
+        ),
+      });
+    }
 
     return actions;
   };

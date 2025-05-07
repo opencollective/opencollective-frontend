@@ -4261,6 +4261,11 @@ type Host implements Account & AccountWithContributions {
     Filter rows by import type
     """
     importType: [TransactionsImportType!]
+
+    """
+    The order of results
+    """
+    orderBy: TransactionsImportRowOrderInput! = { field: DATE, direction: DESC }
   ): TransactionsImportRowCollection!
 
   """
@@ -5468,7 +5473,7 @@ type ConnectedAccount {
   """
   The accounts that are mirroring this connected account
   """
-  accountsMirrored: [Account]
+  accountsMirrored: [Account]!
   hash: String
 
   """
@@ -7631,6 +7636,25 @@ enum TransactionsImportStatus {
   The import is disconnected / archived
   """
   DISCONNECTED
+}
+
+"""
+Input to order off platform transactions chronologically
+"""
+input TransactionsImportRowOrderInput {
+  """
+  Field to order by
+  """
+  field: TransactionsImportRowOrderInputField! = DATE
+
+  """
+  Ordering direction.
+  """
+  direction: OrderDirection! = DESC
+}
+
+enum TransactionsImportRowOrderInputField {
+  DATE
 }
 
 enum AccountingCategoryAppliesTo {

@@ -21,6 +21,7 @@ import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { i18nExpenseType } from '../../../../lib/i18n/expense';
 import { isValidUrl } from '../../../../lib/utils';
 import { attachmentDropzoneParams } from '../../../expenses/lib/attachments';
+import type { AccountingCategory } from '@/lib/graphql/types/v2/graphql';
 import type { PossiblyArray } from '@/lib/types';
 
 import AccountingCategorySelect from '@/components/AccountingCategorySelect';
@@ -182,7 +183,11 @@ export const HostCreateExpenseModal = ({
   account,
   ...props
 }: {
-  host: Pick<Host, 'id' | 'slug' | 'type' | 'legacyId' | 'currency' | 'accountingCategories'>;
+  host: Pick<Host, 'id' | 'slug' | 'type' | 'legacyId' | 'currency'> & {
+    accountingCategories?: Pick<Host['accountingCategories'], 'totalCount'> & {
+      nodes: Array<Pick<AccountingCategory, 'id' | 'code' | 'name' | 'friendlyName' | 'expensesTypes'>>;
+    };
+  };
   account?: PossiblyArray<Pick<Account, 'id' | 'slug' | 'name' | 'type'>>;
   transactionsImport?: Pick<TransactionsImport, 'id' | 'source' | 'csvConfig'>;
   transactionsImportRow?: TransactionsImportRow;

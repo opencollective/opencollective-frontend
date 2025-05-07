@@ -35,7 +35,7 @@ const schema = z.object({
   offset: integer.default(0),
 });
 
-export const offPlatformConnectionsQuery = gql`
+const offPlatformConnectionsQuery = gql`
   query OffPlatformConnections($accountSlug: String!, $limit: Int, $offset: Int) {
     host(slug: $accountSlug) {
       id
@@ -149,7 +149,10 @@ export const OffPlatformConnections = ({ accountSlug }) => {
                 },
               },
               {
-                header: intl.formatMessage({ defaultMessage: 'Actions', id: 'wL7VAE' }),
+                header: intl.formatMessage({
+                  defaultMessage: 'Actions',
+                  id: 'CollectivePage.NavBar.ActionMenu.Actions',
+                }),
                 cell: ({ row }) => {
                   return (
                     <DropdownMenu>
@@ -161,7 +164,7 @@ export const OffPlatformConnections = ({ accountSlug }) => {
                       <DropdownMenuContent className="min-w-[240px]" align="end">
                         <DropdownMenuItem onClick={() => setSelectedImport(row.original)}>
                           <Settings size={16} />
-                          <FormattedMessage defaultMessage="Settings" id="D3idYv" />
+                          <FormattedMessage defaultMessage="Settings" id="Settings" />
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link

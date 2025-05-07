@@ -9,7 +9,7 @@ import {
   FilePenLine,
   FileSliders,
   Info,
-  MessageCircle,
+  MessageSquare,
   RotateCcw,
   Settings,
   Target,
@@ -39,7 +39,6 @@ import {
   TransactionsImportRowFieldsFragment,
   TransactionsImportStatsFragment,
 } from './lib/graphql';
-import { getPossibleActionsForSelectedRows } from './lib/table-selection';
 
 import { accountingCategoryFields } from '@/components/expenses/graphql/fragments';
 
@@ -340,7 +339,7 @@ export const CSVTransactionsImport = ({ accountSlug, importId }) => {
   // Clear selection whenever the pagination changes
   React.useEffect(() => {
     dispatchSelection({ type: 'CLEAR' });
-  }, [queryFilter.variables]);
+  }, [variables]);
 
   const isInitialSync = Boolean(!importData?.lastSyncAt && importData?.connectedAccount);
   return (
@@ -652,10 +651,7 @@ export const CSVTransactionsImport = ({ accountSlug, importId }) => {
                               size="icon-xs"
                               onClick={() => setFocus({ rowId: row.original.id, noteForm: true })}
                             >
-                              <MessageCircle size={16} className={hasNote ? 'text-neutral-600' : 'text-neutral-300'} />
-                              {hasNote && (
-                                <div className="absolute top-[6px] right-[6px] flex h-[8px] w-[8px] items-center justify-center rounded-full bg-yellow-400 text-xs text-white"></div>
-                              )}
+                              <MessageSquare size={16} className={hasNote ? 'text-neutral-700' : 'text-neutral-300'} />
                             </Button>
                           );
                         },
@@ -689,7 +685,7 @@ export const CSVTransactionsImport = ({ accountSlug, importId }) => {
       {hasSettingsModal && (
         <TransactionsImportSettingsModal
           host={importData?.account?.['host']}
-          transactionsImport={importData}
+          transactionsImport={importData as typeof importData & Required<Pick<typeof importData, 'account'>>} // Account is nullable because of the @skip(fetchOnlyRowIds) directive
           onOpenChange={setHasSettingsModal}
           hasRequestedSync={hasRequestedSync}
           setHasRequestedSync={setHasRequestedSync}

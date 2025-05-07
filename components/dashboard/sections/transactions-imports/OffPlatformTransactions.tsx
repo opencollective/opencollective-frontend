@@ -1,8 +1,8 @@
 import React from 'react';
 import { gql, useApolloClient, useQuery } from '@apollo/client';
-import { keyBy, size, truncate } from 'lodash';
+import { truncate } from 'lodash';
 import Lottie from 'lottie-react';
-import { Info, MessageCircle, PauseCircle, RotateCcw, SquareSlashIcon, UndoDot } from 'lucide-react';
+import { Info, MessageSquare, RotateCcw } from 'lucide-react';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
@@ -21,13 +21,12 @@ import { i18nTransactionsRowStatus } from '../../../../lib/i18n/transactions-imp
 import { cn, sortSelectOptions } from '../../../../lib/utils';
 import { useTransactionsImportActions } from './lib/actions';
 import { TransactionsImportRowFieldsFragment, TransactionsImportStatsFragment } from './lib/graphql';
-import { getPossibleActionsForSelectedRows } from './lib/table-selection';
 
 import { accountingCategoryFields } from '@/components/expenses/graphql/fragments';
 import { getI18nLink } from '@/components/I18nFormatters';
+import StackedAvatars from '@/components/StackedAvatars';
 
 import * as SyncAnimation from '../../../../public/static/animations/sync-bank-oc.json';
-import Avatar from '../../../Avatar';
 import DateTime from '../../../DateTime';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import Link from '../../../Link';
@@ -66,7 +65,7 @@ const offPlatformTransactionsQuery = gql`
     $importId: NonEmptyString!
     $hasImportFilter: Boolean!
     $fetchOnlyRowIds: Boolean!
-    $orderBy: TransactionsImportRowOrderInput!
+    $orderBy: TransactionsImportRowOrderInput
   ) {
     host(slug: $hostSlug) {
       id
@@ -77,6 +76,9 @@ const offPlatformTransactionsQuery = gql`
       slug
       currency
       type
+      policies {
+        REQUIRE_2FA_FOR_ADMINS
+      }
       accountingCategories @skip(if: $fetchOnlyRowIds) {
         totalCount
         nodes {
@@ -124,6 +126,10 @@ const offPlatformTransactionsQuery = gql`
     }
     transactionsImport(id: $importId) @include(if: $hasImportFilter) {
       id
+      lastSyncAt
+      connectedAccount {
+        id
+      }
       plaidAccounts {
         accountId
         mask
@@ -290,10 +296,8 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
   const { toast } = useToast();
   const [focus, setFocus] = React.useState<{ rowId: string; noteForm?: boolean } | null>(null);
   const [hasNewData, setHasNewData] = React.useState(false);
-  const isInitialSync = false; // TODO: Implement this
   const apolloClient = useApolloClient();
 
-  // const apolloClient = useApolloClient();
   const [selection, dispatchSelection] = React.useReducer(
     multiPagesRowSelectionReducer,
     MultiPagesRowSelectionInitialState,
@@ -354,7 +358,7 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
   // Clear selection whenever the pagination changes
   React.useEffect(() => {
     dispatchSelection({ type: 'CLEAR' });
-  }, [queryFilter.variables]);
+  }, [variables]);
 
   const filtersMeta = React.useMemo(() => {
     return {
@@ -364,12 +368,7 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
     };
   }, [host, importData]);
 
-  // const hasPagination = host?.offPlatformTransactions?.totalCount > queryFilter.values.limit;
-  const includeAllPages = selection.includeAllPages;
-  const selectedRows = data?.host?.offPlatformTransactions?.nodes.filter(row => selection.rows[row.id]);
-  const rowsActions = getPossibleActionsForSelectedRows(selectedRows);
-  // const isInitialSync = Boolean(!importData?.lastSyncAt && importData?.connectedAccount);
-
+  const isInitialSync = Boolean(importData && !importData?.lastSyncAt && importData?.connectedAccount);
   return (
     <div>
       <div className="flex items-center justify-between">
@@ -400,7 +399,6 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
       ) : !host ? (
         <NotFound />
       ) : (
-        // TODO: query error
         <div>
           {/** "Refresh data" action bar */}
           {!hasNewData ? (
@@ -462,11 +460,11 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
 
             {/** Import data table */}
             <div className="relative mt-2">
-              {/* TODO {isInitialSync && (
-                    <div className="absolute z-50 flex h-full w-full items-center justify-center">
-                      <Lottie animationData={SyncAnimation} loop autoPlay className="max-w-[600px]" />
-                    </div>
-                  )} */}
+              {isInitialSync && (
+                <div className="absolute z-50 flex h-full w-full items-center justify-center">
+                  <Lottie animationData={SyncAnimation} loop autoPlay className="max-w-[600px]" />
+                </div>
+              )}
               <DataTable<OffPlatformTransactionsQuery['host']['offPlatformTransactions']['nodes'][number], unknown>
                 loading={loading || isInitialSync}
                 getRowClassName={row =>
@@ -536,7 +534,7 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
                           <div className="mb-1 font-medium">{importRow.transactionsImport.source}</div>
                           {importRow.plaidAccount && (
                             <div className="text-sm text-neutral-500">
-                              {importRow.plaidAccount.name || `#${importRow.plaidAccount.id}`}
+                              {importRow.plaidAccount.name || `#${importRow.plaidAccount.accountId}`}
                             </div>
                           )}
                         </div>
@@ -587,13 +585,16 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
 
                       if (!displayedAccounts?.length) {
                         return '-';
+                      } else {
+                        return (
+                          <StackedAvatars
+                            accounts={displayedAccounts}
+                            maxDisplayedAvatars={3}
+                            imageSize={24}
+                            withHoverCard
+                          />
+                        );
                       }
-
-                      // TODO use a dedicated component that truncates
-                      // TODO: Add tooltip with account name
-                      return displayedAccounts.map(account => (
-                        <Avatar key={account.id} collective={account} size={24} />
-                      ));
                     },
                   },
                   {
@@ -642,10 +643,7 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
                           size="icon-xs"
                           onClick={() => setFocus({ rowId: row.original.id, noteForm: true })}
                         >
-                          <MessageCircle size={16} className={hasNote ? 'text-neutral-600' : 'text-neutral-300'} />
-                          {hasNote && (
-                            <div className="absolute top-[6px] right-[6px] flex h-[8px] w-[8px] items-center justify-center rounded-full bg-yellow-400 text-xs text-white"></div>
-                          )}
+                          <MessageSquare size={16} className={hasNote ? 'text-neutral-700' : 'text-neutral-300'} />
                         </Button>
                       );
                     },

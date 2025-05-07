@@ -31,7 +31,7 @@ const schema = z.object({
   offset: integer.default(0),
 });
 
-export const ledgerCSVImportsQuery = gql`
+const ledgerCSVImportsQuery = gql`
   query LedgerCSVImportsQuery($accountSlug: String!, $limit: Int, $offset: Int) {
     host(slug: $accountSlug) {
       id

@@ -23,6 +23,7 @@ export const TransactionsImportRowNoteForm = ({
   const [newText, setNewText] = React.useState(row.note || '');
   const { toast } = useToast();
   const intl = useIntl();
+  const hasUnsavedChanges = newText !== (row.note || '');
   return (
     <div>
       <Label htmlFor="import-row-note" className="mb-1 font-bold text-gray-600">
@@ -38,10 +39,10 @@ export const TransactionsImportRowNoteForm = ({
       />
       <div className={'mt-2 flex w-full justify-end'}>
         <Button
-          variant="outline"
+          variant={hasUnsavedChanges ? 'default' : 'outline'}
+          disabled={!hasUnsavedChanges}
           size="sm"
           loading={loading}
-          disabled={newText === (row.note || '')}
           onClick={() => {
             try {
               updateRows({
