@@ -2169,6 +2169,7 @@ interface Transaction {
   group: String!
   type: TransactionType!
   kind: TransactionKind
+  refundKind: RefundKind
   description(
     """
     Wether to generate the description dynamically.
@@ -2320,6 +2321,33 @@ enum TransactionKind {
   PLATFORM_TIP_DEBT
   PREPAID_PAYMENT_METHOD
   TAX
+}
+
+enum RefundKind {
+  """
+  Refund issued by the host
+  """
+  REFUND
+
+  """
+  Rejection issued by the host or collective admin
+  """
+  REJECT
+
+  """
+  Transaction reversed due to an edit
+  """
+  EDIT
+
+  """
+  Transaction was refunded by the platform to fix a duplicated transaction
+  """
+  DUPLICATE
+
+  """
+  Transaction was refunded due to a dispute
+  """
+  DISPUTE
 }
 
 """
@@ -10199,6 +10227,7 @@ type Credit implements Transaction {
   group: String!
   type: TransactionType!
   kind: TransactionKind
+  refundKind: RefundKind
   description(
     """
     Wether to generate the description dynamically.
@@ -10344,6 +10373,7 @@ type Debit implements Transaction {
   group: String!
   type: TransactionType!
   kind: TransactionKind
+  refundKind: RefundKind
   description(
     """
     Wether to generate the description dynamically.
