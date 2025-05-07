@@ -938,7 +938,7 @@ const AddFundsModalContentWithCollective = ({
                   {isEdit ? (
                     <FormattedMessage
                       id="AddFundsModal.editDisclaimer"
-                      defaultMessage="By clicking edit funds, you're refunding the previous added funds transactions (including any fees ocurred by it) and creating new ones."
+                      defaultMessage="For funds added in the previous 24 hours, you'll be editing the original transactions, and no trace of this operation will be left. If this transaction was already consolidated somewhere outside the platform, make sure those records are also updated. Otherwise, by clicking edit funds, you're reverting the existing related transactions (including any fees incurred by them) and creating new ones."
                     />
                   ) : (
                     <FormattedMessage
@@ -950,7 +950,7 @@ const AddFundsModalContentWithCollective = ({
                 </P>
                 {fundError && <MessageBoxGraphqlError error={fundError} mt={3} fontSize="13px" />}
               </div>
-              <div className="flex justify-center gap-4 border-t border-t-1 border-solid border-t-slate-100 pt-4">
+              <div className="flex justify-center gap-4 border-t border-solid border-t-slate-100 pt-4">
                 <Button onClick={handleClose} type="button" variant="outline">
                   <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
                 </Button>

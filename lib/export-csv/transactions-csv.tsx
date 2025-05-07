@@ -24,6 +24,7 @@ export type CSVField =
   | 'isRefunded'
   | 'refundId'
   | 'shortRefundId'
+  | 'refundKind'
   | 'displayAmount'
   | 'amount'
   | 'paymentProcessorFee'
@@ -98,6 +99,7 @@ const FIELD_GROUPS: Record<string, readonly CSVField[]> = {
     'isRefunded',
     'refundId',
     'shortRefundId',
+    'refundKind',
     'displayAmount',
     'amount',
     'paymentProcessorFee',
@@ -185,6 +187,7 @@ export const FieldLabels: Partial<Record<CSVField, React.ReactNode>> = {
   isRefunded: <FormattedMessage defaultMessage="Is Refunded" id="3/XmM5" />,
   refundId: <FormattedMessage defaultMessage="Refund ID" id="INO/bh" />,
   shortRefundId: <FormattedMessage defaultMessage="Short Refund ID" id="OW15R5" />,
+  refundKind: <FormattedMessage defaultMessage="Refund Kind" id="vsKSo6" />,
   displayAmount: <FormattedMessage defaultMessage="Display Amount" id="gKqXcg" />,
   amount: <FormattedMessage id="Fields.amount" defaultMessage="Amount" />,
   paymentProcessorFee: <FormattedMessage defaultMessage="Payment Processor Fee" id="pzs6YY" />,
@@ -730,6 +733,17 @@ export const FIELDS: Array<{
     label: <FormattedMessage defaultMessage="Refund Transaction ID" id="Rxym6C" />,
   },
   {
+    id: 'refundKind',
+    group: 'transaction',
+    label: <FormattedMessage defaultMessage="Refund Kind" id="vsKSo6" />,
+    tooltip: (
+      <FormattedMessage
+        defaultMessage="The kind of refund issued tracks the reason why the transaction was returned."
+        id="eHIFuv"
+      />
+    ),
+  },
+  {
     id: 'expenseTotalAmount',
     group: 'expense',
     tooltip: <FormattedMessage defaultMessage="A sum of the expense line items." id="DbeRk+" />,
@@ -937,7 +951,7 @@ const DEFAULT_FIELDS: Array<CSVField> = [
   'currency',
   'isRefund',
   'isRefunded',
-  'refundId',
+  'refundLegacyId',
   'accountSlug',
   'accountName',
   'oppositeAccountSlug',
@@ -951,6 +965,7 @@ const DEFAULT_FIELDS: Array<CSVField> = [
   'accountingCategoryCode',
   'accountingCategoryName',
   'merchantId',
+  'refundKind',
 ];
 
 export const PLATFORM_PRESETS = {

@@ -34,6 +34,7 @@ const transactionsTableQueryCollectionFragment = gql`
         id
         group
       }
+      refundKind
       host {
         id
         slug
@@ -71,6 +72,10 @@ const transactionsTableQueryCollectionFragment = gql`
         canRefund
         canDownloadInvoice
         canReject
+      }
+      paymentMethod {
+        id
+        service
       }
     }
   }
