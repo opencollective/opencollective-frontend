@@ -1053,9 +1053,15 @@ type ConnectedAccountType {
   id: Int
   service: String
   username: String
+  hash: String
   settings: JSON
   createdAt: DateString
   updatedAt: DateString
+
+  """
+  The account who connected this account
+  """
+  createdByUser: UserDetails
 }
 
 """
