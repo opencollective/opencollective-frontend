@@ -375,37 +375,63 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                 </InfoList>
 
                 <DataList className="mb-4">
-                  <DataListItem>
-                    <DataListItemLabel>
-                      <FormattedMessage defaultMessage="Amount" id="Fields.amount" />
-                    </DataListItemLabel>
-                    <DataListItemValue>
-                      {isLoading ? (
-                        <Skeleton className="h-5 w-32" />
-                      ) : (
-                        <React.Fragment>
+                  {!query.data?.order?.platformTipAmount?.valueInCents && (
+                    <DataListItem>
+                      <DataListItemLabel>
+                        <FormattedMessage defaultMessage="Charge Amount" id="ChargeAmount" />
+                      </DataListItemLabel>
+                      <DataListItemValue>
+                        {isLoading ? (
+                          <Skeleton className="h-5 w-32" />
+                        ) : (
                           <FormattedMoneyAmount
                             showCurrencyCode={true}
                             currency={query.data.order.totalAmount.currency}
                             amount={query.data.order.totalAmount.valueInCents}
                           />
-                        </React.Fragment>
-                      )}
-                    </DataListItemValue>
-                  </DataListItem>
-                  {query.data?.order?.platformTipAmount?.valueInCents > 0 && (
-                    <DataListItem>
-                      <DataListItemLabel>
-                        <FormattedMessage defaultMessage="Platform Tip" id="Fields.platformTip" />
-                      </DataListItemLabel>
-                      <DataListItemValue>
-                        <FormattedMoneyAmount
-                          showCurrencyCode={true}
-                          currency={query.data.order.platformTipAmount.currency}
-                          amount={query.data.order.platformTipAmount.valueInCents}
-                        />
+                        )}
                       </DataListItemValue>
                     </DataListItem>
+                  )}
+                  {query.data?.order?.platformTipAmount?.valueInCents > 0 && (
+                    <React.Fragment>
+                      <DataListItem>
+                        <DataListItemLabel>
+                          <FormattedMessage defaultMessage="Contribution" id="0LK5eg" />
+                        </DataListItemLabel>
+                        <DataListItemValue>
+                          <FormattedMoneyAmount
+                            showCurrencyCode={true}
+                            currency={query.data.order.amount.currency}
+                            amount={query.data.order.amount.valueInCents}
+                          />
+                        </DataListItemValue>
+                      </DataListItem>
+                      <DataListItem>
+                        <DataListItemLabel>
+                          <FormattedMessage defaultMessage="Platform Tip" id="Fields.platformTip" />
+                        </DataListItemLabel>
+                        <DataListItemValue>
+                          <FormattedMoneyAmount
+                            showCurrencyCode={true}
+                            currency={query.data.order.platformTipAmount.currency}
+                            amount={query.data.order.platformTipAmount.valueInCents}
+                          />
+                        </DataListItemValue>
+                      </DataListItem>
+                      <DataListItem>
+                        <DataListItemLabel>
+                          <FormattedMessage defaultMessage="Charge Amount" id="ChargeAmount" />
+                        </DataListItemLabel>
+                        <DataListItemValue>
+                          <FormattedMoneyAmount
+                            showCurrencyCode={true}
+                            currency={query.data.order.totalAmount.currency}
+                            amount={query.data.order.totalAmount.valueInCents}
+                          />
+                        </DataListItemValue>
+                      </DataListItem>
+                    </React.Fragment>
                   )}
                   <DataListItem>
                     <DataListItemLabel>
