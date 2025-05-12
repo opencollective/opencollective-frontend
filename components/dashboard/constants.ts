@@ -34,6 +34,11 @@ export const SECTIONS = {
   VENDORS: 'vendors',
   ACCOUNTS: 'accounts',
   OFF_PLATFORM_CONNECTIONS: 'off-platform-connections',
+  HOSTED_FUNDS: 'hosted-funds',
+  HOSTED_GRANTS: 'hosted-grants',
+  GRANTS: 'grants',
+  SUBMITTED_GRANTS: 'submitted-grants',
+  APPROVE_GRANT_REQUESTS: 'approve-grant-requests',
 };
 
 export const ROOT_SECTIONS = {
@@ -115,6 +120,9 @@ export const SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS = [
   ALL_SECTIONS.INCOMING_CONTRIBUTIONS,
   ALL_SECTIONS.OUTGOING_CONTRIBUTIONS,
   ALL_SECTIONS.CONTRIBUTORS,
+  ALL_SECTIONS.GRANTS,
+  ALL_SECTIONS.HOSTED_GRANTS,
+  ALL_SECTIONS.HOSTED_FUNDS,
 ];
 
 export const SECTIONS_ACCESSIBLE_TO_COMMUNITY_MANAGERS = [ALL_SECTIONS.OVERVIEW, ALL_SECTIONS.UPDATES];
@@ -299,5 +307,25 @@ export const SECTION_LABELS = defineMessages({
   [ALL_SECTIONS.ACCOUNTS]: {
     defaultMessage: 'Accounts',
     id: 'FvanT6',
+  },
+  [ALL_SECTIONS.HOSTED_FUNDS]: {
+    defaultMessage: 'Hosted Funds',
+    id: 'HostedFunds',
+  },
+  [ALL_SECTIONS.GRANTS]: {
+    defaultMessage: 'Grant Requests',
+    id: 'fng2Fr',
+  },
+  [ALL_SECTIONS.HOSTED_GRANTS]: {
+    defaultMessage: 'Hosted Grants Requests',
+    id: 'CQ/VM3',
+  },
+  [ALL_SECTIONS.APPROVE_GRANT_REQUESTS]: {
+    defaultMessage: 'Approve Grant Requests',
+    id: 'RyfEp8',
+  },
+  [ALL_SECTIONS.SUBMITTED_GRANTS]: {
+    defaultMessage: 'Submitted Grants',
+    id: 'rSRlYH',
   },
 });
