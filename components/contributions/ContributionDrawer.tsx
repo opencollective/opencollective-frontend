@@ -469,7 +469,8 @@ export function ContributionDrawer(props: ContributionDrawerProps) {
                       </DataListItem>
                     )}
                   {query.data?.order?.nextChargeDate &&
-                    query.data?.order.frequency !== ContributionFrequency.ONETIME && (
+                    query.data?.order.frequency !== ContributionFrequency.ONETIME &&
+                    query.data?.order.status !== OrderStatus.CANCELLED && (
                       <DataListItem>
                         <DataListItemLabel>
                           <FormattedMessage defaultMessage="Next Charge Date" id="oJNxUE" />
