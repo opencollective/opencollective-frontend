@@ -57,6 +57,18 @@ export default function SubmitGrantFlow(props: SubmitGrantFlowProps) {
   );
 }
 
+export function SubmitGrantFlowModal(
+  props: Omit<SubmitGrantFlowProps, 'handleOnClose'> & { open: boolean; setOpen: (open: boolean) => void },
+) {
+  const { open, setOpen, ...rest } = props;
+
+  if (!open) {
+    return null;
+  }
+
+  return <SubmitGrantFlow {...rest} handleOnClose={() => setOpen(false)} />;
+}
+
 type SubmitGrantDialogProps = {
   handleOnClose: () => void;
   loading?: boolean;

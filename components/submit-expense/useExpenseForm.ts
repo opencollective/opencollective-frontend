@@ -675,6 +675,10 @@ function buildFormSchema(
     expenseId: z.number().nullish(),
     expenseTypeOption: z.nativeEnum(ExpenseType).refine(
       v => {
+        if (v === ExpenseType.GRANT && options.account?.type === CollectiveType.FUND) {
+          return true;
+        }
+
         if (options.account?.supportedExpenseTypes?.length > 0) {
           return options.account.supportedExpenseTypes.includes(v);
         }
