@@ -357,9 +357,6 @@ const VendorOption = React.memo(function VendorOption(props: {
             }}
             onChange={e => {
               const slug = e.value?.slug;
-              if (!slug) {
-                return;
-              }
               setSelectedVendorSlug(slug);
               props.setFieldValue('payeeSlug', !slug ? '__vendor' : slug);
             }}
