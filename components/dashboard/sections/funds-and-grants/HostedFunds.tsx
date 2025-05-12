@@ -1,27 +1,26 @@
 import React, { useEffect, useMemo } from 'react';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { compact, isString, omit } from 'lodash';
 import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
-import { CollectiveType, HostedCollectiveTypes } from '../../../../lib/constants/collectives';
-import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
-import { integer, isMulti } from '../../../../lib/filters/schemas';
-import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import type { HostedCollectivesQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
-import type { Account, Collective } from '../../../../lib/graphql/types/v2/schema';
-import { HostFeeStructure } from '../../../../lib/graphql/types/v2/schema';
-import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import formatCollectiveType from '../../../../lib/i18n/collective-type';
-import { formatHostFeeStructure } from '../../../../lib/i18n/host-fee-structure';
-import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
-import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
+import { HostedCollectiveTypes } from '@/lib/constants/collectives';
+import type { FilterComponentConfigs, FiltersToVariables } from '@/lib/filters/filter-types';
+import { integer } from '@/lib/filters/schemas';
+import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
+import type { HostedCollectivesQueryVariables } from '@/lib/graphql/types/v2/graphql';
+import type { Account, Collective } from '@/lib/graphql/types/v2/schema';
+import { HostFeeStructure } from '@/lib/graphql/types/v2/schema';
+import useQueryFilter from '@/lib/hooks/useQueryFilter';
+import { formatHostFeeStructure } from '@/lib/i18n/host-fee-structure';
 
-import { Drawer } from '../../../Drawer';
-import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
-import { DataTable } from '../../../table/DataTable';
-import { Button } from '../../../ui/Button';
+import { Drawer } from '@/components/Drawer';
+import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
+import { useModal } from '@/components/ModalContext';
+import { DataTable } from '@/components/table/DataTable';
+import { Button } from '@/components/ui/Button';
+
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import ExportHostedCollectivesCSVModal from '../../ExportHostedCollectivesCSVModal';
@@ -38,11 +37,11 @@ import { Pagination } from '../../filters/Pagination';
 import { searchFilter } from '../../filters/SearchFilter';
 import { buildSortFilter } from '../../filters/SortFilter';
 import type { DashboardSectionProps } from '../../types';
+import CollectiveDetails from '../collectives/CollectiveDetails';
+import { cols, type HostedCollectivesDataTableMeta } from '../collectives/common';
+import { hostedCollectivesQuery } from '../collectives/queries';
 
-import CollectiveDetails from './CollectiveDetails';
-import type { HostedCollectivesDataTableMeta } from './common';
-import { cols } from './common';
-import { hostedCollectivesMetadataQuery, hostedCollectivesQuery } from './queries';
+import { CreateFundModal } from './CreateFundModal';
 
 const sortFilter = buildSortFilter({
   fieldSchema: z.enum(['CREATED_AT', 'BALANCE', 'NAME']),
@@ -66,7 +65,7 @@ const schema = z.object({
   searchTerm: searchFilter.schema,
   sort: sortFilter.schema,
   hostFeesStructure: z.nativeEnum(HostFeeStructure).optional(),
-  type: isMulti(z.nativeEnum(HostedCollectiveTypes)).optional(),
+  type: z.enum([HostedCollectiveTypes.FUND]).default(HostedCollectiveTypes.FUND),
   status: collectiveStatusFilter.schema,
   consolidatedBalance: consolidatedBalanceFilter.schema,
   currencies: currencyFilter.schema,
@@ -95,46 +94,45 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
     },
     valueRenderer: ({ value, intl }) => formatHostFeeStructure(intl, value),
   },
-  type: {
-    labelMsg: defineMessage({ id: 'Type', defaultMessage: 'Type' }),
-    Component: ({ intl, ...props }) => {
-      const options = useMemo(
-        () =>
-          Object.values(HostedCollectiveTypes).map(value => ({
-            label: formatCollectiveType(intl, value),
-            value,
-          })),
-        [intl],
-      );
-      return <ComboSelectFilter options={options} isMulti {...props} />;
-    },
-    valueRenderer: ({ value, intl }) => formatCollectiveType(intl, value),
-  },
   currencies: currencyFilter.filter,
   status: collectiveStatusFilter.filter,
   consolidatedBalance: consolidatedBalanceFilter.filter,
 };
 
-const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionProps) => {
+export function HostedFunds({ accountSlug: hostSlug, subpath }: DashboardSectionProps) {
   const intl = useIntl();
   const router = useRouter();
+  const { showModal } = useModal();
   const [displayExportCSVModal, setDisplayExportCSVModal] = React.useState(false);
   const [showCollectiveOverview, setShowCollectiveOverview] = React.useState<Account | undefined | string>(subpath[0]);
-
-  const { LoggedInUser } = useLoggedInUser();
-  const hasGrantAndFundsReorgEnabled = LoggedInUser.hasPreviewFeatureEnabled(
-    PREVIEW_FEATURE_KEYS.GRANT_AND_FUNDS_REORG,
+  const { data: metadata, refetch: refetchMetadata } = useQuery(
+    gql`
+      query HostedFundsMetadata($hostSlug: String!) {
+        host(slug: $hostSlug) {
+          id
+          currency
+          all: hostedAccounts(limit: 1, accountType: [FUND]) {
+            totalCount
+            currencies
+          }
+          active: hostedAccounts(limit: 1, accountType: [FUND], isFrozen: false) {
+            totalCount
+          }
+          frozen: hostedAccounts(limit: 1, isFrozen: true, accountType: [FUND]) {
+            totalCount
+          }
+          unhosted: hostedAccounts(limit: 1, accountType: [FUND], isUnhosted: true) {
+            totalCount
+          }
+        }
+      }
+    `,
+    {
+      variables: { hostSlug },
+      fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
+      context: API_V2_CONTEXT,
+    },
   );
-
-  const accountTypes = hasGrantAndFundsReorgEnabled
-    ? [CollectiveType.COLLECTIVE]
-    : [CollectiveType.COLLECTIVE, CollectiveType.FUND];
-
-  const { data: metadata, refetch: refetchMetadata } = useQuery(hostedCollectivesMetadataQuery, {
-    variables: { hostSlug, accountTypes },
-    fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',
-    context: API_V2_CONTEXT,
-  });
 
   const pushSubpath = subpath => {
     router.push(
@@ -153,36 +151,25 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
     {
       id: 'all',
       label: intl.formatMessage({ defaultMessage: 'All', id: 'zQvVDJ' }),
-      filter: {
-        type: accountTypes,
-      },
+      filter: {},
       count: metadata?.host?.all?.totalCount,
     },
     {
       id: 'active',
       label: intl.formatMessage(CollectiveStatusMessages[COLLECTIVE_STATUS.ACTIVE]),
-      filter: {
-        status: COLLECTIVE_STATUS.ACTIVE,
-        type: accountTypes,
-      },
+      filter: { status: COLLECTIVE_STATUS.ACTIVE },
       count: metadata?.host?.active?.totalCount,
     },
     {
       id: 'frozen',
       label: intl.formatMessage(CollectiveStatusMessages[COLLECTIVE_STATUS.FROZEN]),
-      filter: {
-        status: COLLECTIVE_STATUS.FROZEN,
-        type: accountTypes,
-      },
+      filter: { status: COLLECTIVE_STATUS.FROZEN },
       count: metadata?.host?.frozen?.totalCount,
     },
     {
       id: 'unhosted',
       label: intl.formatMessage(CollectiveStatusMessages[COLLECTIVE_STATUS.UNHOSTED]),
-      filter: {
-        status: COLLECTIVE_STATUS.UNHOSTED,
-        type: accountTypes,
-      },
+      filter: { status: COLLECTIVE_STATUS.UNHOSTED },
       count: metadata?.host?.unhosted?.totalCount,
     },
   ];
@@ -226,20 +213,31 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
   return (
     <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
       <DashboardHeader
-        title={<FormattedMessage id="HostedCollectives" defaultMessage="Hosted Collectives" />}
+        title={<FormattedMessage defaultMessage="Hosted Funds" id="HostedFunds" />}
         actions={
-          <ExportHostedCollectivesCSVModal
-            open={displayExportCSVModal}
-            setOpen={setDisplayExportCSVModal}
-            queryFilter={queryFilter}
-            account={data?.host}
-            isHostReport
-            trigger={
-              <Button size="sm" variant="outline" onClick={() => setDisplayExportCSVModal(true)}>
-                <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
-              </Button>
-            }
-          />
+          <React.Fragment>
+            <ExportHostedCollectivesCSVModal
+              open={displayExportCSVModal}
+              setOpen={setDisplayExportCSVModal}
+              queryFilter={queryFilter}
+              account={data?.host}
+              isHostReport
+              trigger={
+                <Button size="sm" variant="outline" onClick={() => setDisplayExportCSVModal(true)}>
+                  <FormattedMessage id="Export.Format" defaultMessage="Export {format}" values={{ format: 'CSV' }} />
+                </Button>
+              }
+            />
+            <Button
+              onClick={() => {
+                showModal(CreateFundModal, { hostSlug });
+              }}
+              size="sm"
+              variant="outline"
+            >
+              <FormattedMessage defaultMessage="Create fund" id="0frjVr" />
+            </Button>
+          </React.Fragment>
         }
       />
       <Filterbar {...queryFilter} />
@@ -304,6 +302,4 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
       </Drawer>
     </div>
   );
-};
-
-export default HostedCollectives;
+}

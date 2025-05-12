@@ -24,6 +24,12 @@ import type { HostedCollectiveFieldsFragment } from '../../../../lib/graphql/typ
 import type { AccountWithHost } from '../../../../lib/graphql/types/v2/schema';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
 import { getDashboardRoute } from '../../../../lib/url-helpers';
+import { CollectiveType } from '@/lib/constants/collectives';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
+
+import { useModal } from '@/components/ModalContext';
+import { SubmitGrantFlowModal } from '@/components/submit-grant/SubmitGrantFlow';
 
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import AddAgreementModal from '../../../agreements/AddAgreementModal';
@@ -288,10 +294,16 @@ export const MoreActionsMenu = ({
   openCollectiveDetails?: (c: HostedCollectiveFieldsFragment) => void;
 }) => {
   const router = useRouter();
+  const { showModal } = useModal();
   const { account } = React.useContext(DashboardContext);
   const [openModal, setOpenModal] = React.useState<
     null | 'ADD_FUNDS' | 'ADD_EXPENSE' | 'FREEZE' | 'UNHOST' | 'ADD_AGREEMENT' | 'CONTACT'
   >(null);
+
+  const { LoggedInUser } = useLoggedInUser();
+  const hasGrantAndFundsReorgEnabled = LoggedInUser.hasPreviewFeatureEnabled(
+    PREVIEW_FEATURE_KEYS.GRANT_AND_FUNDS_REORG,
+  );
 
   return (
     <React.Fragment>
@@ -315,6 +327,30 @@ export const MoreActionsMenu = ({
             <ReceiptText className="mr-2" size="16" />
             <FormattedMessage id="viewTransactions" defaultMessage="View Transactions" />
           </DropdownMenuItem>
+          {collective.type === CollectiveType.FUND && hasGrantAndFundsReorgEnabled && (
+            <DropdownMenuItem
+              className="cursor-pointer"
+              data-cy="actions-view-disbursed-grants"
+              onClick={() =>
+                router.push(getDashboardRoute(account, `hosted-grants?account=${collective.slug}&status=PAID`))
+              }
+            >
+              <ReceiptText className="mr-2" size="16" />
+              <FormattedMessage defaultMessage="View disbursed grants" id="P/PQ+i" />
+            </DropdownMenuItem>
+          )}
+          {collective.type === CollectiveType.FUND && hasGrantAndFundsReorgEnabled && (
+            <DropdownMenuItem
+              className="cursor-pointer"
+              data-cy="actions-view-grants-requests"
+              onClick={() =>
+                router.push(getDashboardRoute(account, `hosted-grants?account=${collective.slug}&status=ALL`))
+              }
+            >
+              <ReceiptText className="mr-2" size="16" />
+              <FormattedMessage defaultMessage="View grant requests" id="HABa5r" />
+            </DropdownMenuItem>
+          )}
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="cursor-pointer"
@@ -325,6 +361,18 @@ export const MoreActionsMenu = ({
             <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
           </DropdownMenuItem>
           <DropdownMenuSeparator />
+          {collective.type === CollectiveType.FUND && (
+            <DropdownMenuItem
+              className="cursor-pointer"
+              data-cy="actions-create-grant-request"
+              onClick={() => {
+                showModal(SubmitGrantFlowModal, { account: collective });
+              }}
+            >
+              <ReceiptText className="mr-2" size="16" />
+              <FormattedMessage defaultMessage="Create grant request" id="TnG9DJ" />
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem
             className="cursor-pointer"
             data-cy="actions-add-expense"

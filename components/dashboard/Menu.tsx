@@ -113,6 +113,10 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
   const isActiveHost = isHost && isActive;
   const isChild = isChildAccount(account);
 
+  const hasGrantAndFundsReorgEnabled = LoggedInUser?.hasPreviewFeatureEnabled(
+    PREVIEW_FEATURE_KEYS.GRANT_AND_FUNDS_REORG,
+  );
+
   const items: MenuItem[] = [
     {
       if: isIndividual || !isHost,
@@ -161,6 +165,41 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
             },
             { accountName: account.name },
           ),
+        },
+      ],
+    },
+    {
+      if: isIndividual && hasGrantAndFundsReorgEnabled,
+      Icon: Receipt,
+      label: intl.formatMessage({ defaultMessage: 'Grants', id: 'Csh2rX' }),
+      section: ALL_SECTIONS.SUBMITTED_GRANTS,
+    },
+    {
+      if: !isIndividual && hasGrantAndFundsReorgEnabled,
+      type: 'group',
+      Icon: Receipt,
+      label: isHost
+        ? intl.formatMessage({ defaultMessage: 'Funds & Grants', id: 'cjQcnL' })
+        : intl.formatMessage({ defaultMessage: 'Grants', id: 'Csh2rX' }),
+      subMenu: [
+        {
+          if: isHost,
+          section: ALL_SECTIONS.HOSTED_FUNDS,
+        },
+        {
+          if: isHost,
+          section: ALL_SECTIONS.HOSTED_GRANTS,
+        },
+        {
+          section: ALL_SECTIONS.SUBMITTED_GRANTS,
+        },
+        {
+          if: !isIndividual,
+          section: ALL_SECTIONS.GRANTS,
+        },
+        {
+          if: !isIndividual,
+          section: ALL_SECTIONS.APPROVE_GRANT_REQUESTS,
         },
       ],
     },
