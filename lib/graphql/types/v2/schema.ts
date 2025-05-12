@@ -3384,6 +3384,7 @@ export type Credit = Transaction & {
   /** The permissions given to current logged in user for this transaction */
   permissions: TransactionPermissions;
   platformFee: Amount;
+  refundKind?: Maybe<RefundKind>;
   refundTransaction?: Maybe<Transaction>;
   relatedTransactions: Array<Maybe<Transaction>>;
   taxAmount: Amount;
@@ -3845,6 +3846,7 @@ export type Debit = Transaction & {
   /** The permissions given to current logged in user for this transaction */
   permissions: TransactionPermissions;
   platformFee: Amount;
+  refundKind?: Maybe<RefundKind>;
   refundTransaction?: Maybe<Transaction>;
   relatedTransactions: Array<Maybe<Transaction>>;
   taxAmount: Amount;
@@ -11272,6 +11274,19 @@ export enum RecurringExpenseInterval {
   year = 'year'
 }
 
+export enum RefundKind {
+  /** Transaction was refunded due to a dispute */
+  DISPUTE = 'DISPUTE',
+  /** Transaction was refunded by the platform to fix a duplicated transaction */
+  DUPLICATE = 'DUPLICATE',
+  /** Transaction reversed due to an edit */
+  EDIT = 'EDIT',
+  /** Refund issued by the host */
+  REFUND = 'REFUND',
+  /** Rejection issued by the host or collective admin */
+  REJECT = 'REJECT'
+}
+
 export type SearchResponse = {
   __typename?: 'SearchResponse';
   /** Search results */
@@ -11824,6 +11839,7 @@ export type Transaction = {
   payoutMethod?: Maybe<PayoutMethod>;
   permissions?: Maybe<TransactionPermissions>;
   platformFee: Amount;
+  refundKind?: Maybe<RefundKind>;
   refundTransaction?: Maybe<Transaction>;
   relatedTransactions: Array<Maybe<Transaction>>;
   taxAmount: Amount;
