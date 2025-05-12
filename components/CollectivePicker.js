@@ -241,7 +241,13 @@ class CollectivePicker extends React.PureComponent {
   };
 
   setCreateFormCollectiveType = type => {
-    this.setState({ createFormCollectiveType: type || null });
+    if (typeof this.props.onCreateClick === 'function') {
+      this.props.onChange?.({ label: null, value: null });
+      this.setState({ menuIsOpen: false });
+      this.props.onCreateClick(type);
+    } else {
+      this.setState({ createFormCollectiveType: type || null });
+    }
   };
 
   getMenuIsOpen(menuIsOpenFromProps) {
