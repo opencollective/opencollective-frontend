@@ -15,6 +15,7 @@ import {
   Target,
   Upload,
 } from 'lucide-react';
+import { useRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -39,6 +40,7 @@ import {
   TransactionsImportRowFieldsFragment,
   TransactionsImportStatsFragment,
 } from './lib/graphql';
+import { getCSVTransactionsImportRoute } from '@/lib/url-helpers';
 
 import { accountingCategoryFields } from '@/components/expenses/graphql/fragments';
 
@@ -282,6 +284,7 @@ const defaultFilterValues = {
 
 export const CSVTransactionsImport = ({ accountSlug, importId }) => {
   const intl = useIntl();
+  const router = useRouter();
   const { toast } = useToast();
   const steps = React.useMemo(() => getSteps(intl), [intl]);
   const [csvFile, setCsvFile] = React.useState<File | null>(null);
@@ -582,6 +585,9 @@ export const CSVTransactionsImport = ({ accountSlug, importId }) => {
                       {
                         header: 'Amount',
                         accessorKey: 'amount',
+                        meta: {
+                          align: 'right',
+                        },
                         cell: ({ cell }) => {
                           const amount = cell.getValue() as Amount;
                           const isCredit = amount.valueInCents > 0;
@@ -684,12 +690,12 @@ export const CSVTransactionsImport = ({ accountSlug, importId }) => {
       />
       {hasSettingsModal && (
         <TransactionsImportSettingsModal
-          host={importData?.account?.['host']}
           transactionsImport={importData as typeof importData & Required<Pick<typeof importData, 'account'>>} // Account is nullable because of the @skip(fetchOnlyRowIds) directive
           onOpenChange={setHasSettingsModal}
           hasRequestedSync={hasRequestedSync}
           setHasRequestedSync={setHasRequestedSync}
           isOpen={hasSettingsModal}
+          onDelete={() => router.push(getCSVTransactionsImportRoute(accountSlug))}
         />
       )}
     </div>

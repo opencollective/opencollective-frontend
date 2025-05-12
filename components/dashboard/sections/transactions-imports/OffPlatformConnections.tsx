@@ -39,6 +39,7 @@ const offPlatformConnectionsQuery = gql`
   query OffPlatformConnections($accountSlug: String!, $limit: Int, $offset: Int) {
     host(slug: $accountSlug) {
       id
+      slug
       transactionsImports(limit: $limit, offset: $offset, type: [PLAID]) {
         totalCount
         limit
@@ -144,8 +145,18 @@ export const OffPlatformConnections = ({ accountSlug }) => {
               {
                 header: intl.formatMessage({ defaultMessage: 'Status', id: 'transactions.import.status' }),
                 accessorKey: 'status',
-                cell: () => {
-                  return <Badge type="info">Active</Badge>;
+                cell: ({ row }) => {
+                  const transactionsImport = row.original;
+                  const isArchived = !transactionsImport.connectedAccount;
+                  return (
+                    <Badge type={isArchived ? 'neutral' : 'info'}>
+                      {!isArchived ? (
+                        <FormattedMessage defaultMessage="Active" id="Subscriptions.Active" />
+                      ) : (
+                        <FormattedMessage defaultMessage="Archived" id="0HT+Ib" />
+                      )}
+                    </Badge>
+                  );
                 },
               },
               {
@@ -186,7 +197,6 @@ export const OffPlatformConnections = ({ accountSlug }) => {
       )}
       {selectedImport && (
         <TransactionsImportSettingsModal
-          host={data?.host}
           transactionsImport={selectedImport}
           onOpenChange={() => setSelectedImport(null)}
           plaidStatus={plaidConnectDialog.status}
@@ -205,6 +215,8 @@ export const OffPlatformConnections = ({ accountSlug }) => {
               return newSet;
             });
           }}
+          onDelete={() => setSelectedImport(null)}
+          onArchived={() => setSelectedImport(null)}
         />
       )}
     </div>

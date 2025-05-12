@@ -297,6 +297,7 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
   const [focus, setFocus] = React.useState<{ rowId: string; noteForm?: boolean } | null>(null);
   const [hasNewData, setHasNewData] = React.useState(false);
   const apolloClient = useApolloClient();
+  const [pollInterval, setPollInterval] = React.useState<number>(0); // Do not poll by default
 
   const [selection, dispatchSelection] = React.useReducer(
     multiPagesRowSelectionReducer,
@@ -321,6 +322,7 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
     context: API_V2_CONTEXT,
     notifyOnNetworkStatusChange: true,
     fetchPolicy: 'cache-and-network',
+    pollInterval,
     variables: {
       hostSlug: accountSlug,
       hasImportFilter: Boolean(queryFilter.variables.importIds?.length),
@@ -334,6 +336,7 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
   const importRows = host?.offPlatformTransactions?.nodes ?? [];
   const selectedRowIdx = !focus ? -1 : importRows.findIndex(row => row.id === focus.rowId);
   const importData = data?.transactionsImport;
+  const isInitialSync = Boolean(importData && !importData?.lastSyncAt && importData?.connectedAccount);
 
   const { getActions, setRowsStatus } = useTransactionsImportActions({
     host,
@@ -360,6 +363,15 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
     dispatchSelection({ type: 'CLEAR' });
   }, [variables]);
 
+  // Adapt poll interval for first sync
+  React.useEffect(() => {
+    if (isInitialSync && !pollInterval) {
+      setPollInterval(3_000);
+    } else if (!isInitialSync && pollInterval) {
+      setPollInterval(0);
+    }
+  }, [pollInterval, isInitialSync]);
+
   const filtersMeta = React.useMemo(() => {
     return {
       plaidAccounts: importData?.plaidAccounts,
@@ -368,7 +380,6 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
     };
   }, [host, importData]);
 
-  const isInitialSync = Boolean(importData && !importData?.lastSyncAt && importData?.connectedAccount);
   return (
     <div>
       <div className="flex items-center justify-between">
@@ -549,6 +560,9 @@ export const OffPlatformTransactions = ({ accountSlug }) => {
                   {
                     header: 'Amount',
                     accessorKey: 'amount',
+                    meta: {
+                      align: 'right',
+                    },
                     cell: ({ cell }) => {
                       const amount = cell.getValue() as Amount;
                       const isCredit = amount.valueInCents > 0;

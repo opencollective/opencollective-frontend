@@ -7,7 +7,6 @@ import {
   BookUserIcon,
   Building,
   Coins,
-  CoinsIcon,
   CreditCard,
   FileText,
   FlaskConical,
@@ -306,7 +305,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       if: isHost,
       type: 'group',
       label: intl.formatMessage({ defaultMessage: 'Ledger', id: 'scwekL' }),
-      Icon: CoinsIcon,
+      Icon: ArrowRightLeft,
       subMenu: [
         {
           section: ALL_SECTIONS.HOST_TRANSACTIONS,

@@ -162,7 +162,7 @@ export const getPersonalTokenSettingsRoute = (account, token) => {
   return getDashboardRoute(account, `for-developers/personal-tokens/${token.id}`);
 };
 
-export const getOffPlatformTransactionsRoute = (hostSlug, importId = null) => {
+export const getOffPlatformTransactionsRoute = (hostSlug: string, importId = null) => {
   const base = `/dashboard/${hostSlug}/off-platform-transactions`;
   if (importId) {
     const params = new URLSearchParams();
@@ -173,7 +173,7 @@ export const getOffPlatformTransactionsRoute = (hostSlug, importId = null) => {
   }
 };
 
-export const getCSVTransactionsImportRoute = (hostSlug, importId = null) => {
+export const getCSVTransactionsImportRoute = (hostSlug: string, importId = null) => {
   const base = `/dashboard/${hostSlug}/ledger-csv-imports`;
   if (importId) {
     return `${base}/${importId}`;
