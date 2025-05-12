@@ -10,6 +10,7 @@ import { i18nGraphqlException } from '../../../lib/errors';
 import { gqlV1 } from '../../../lib/graphql/helpers';
 import { AccountType } from '../../../lib/graphql/types/v2/schema';
 import { ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
 import LoginBtn from '@/components/LoginBtn';
 import StyledInputFormikField from '@/components/StyledInputFormikField';
@@ -323,6 +324,8 @@ const VendorOption = React.memo(function VendorOption(props: {
   host: ExpenseForm['options']['host'];
   refresh: ExpenseForm['refresh'];
 }) {
+  const { LoggedInUser } = useLoggedInUser();
+  const isHostAdmin = LoggedInUser.isAdminOfCollective(props.host);
   // Setting a state variable to keep the Vendor option open when a vendor that is not part of the preloaded vendors is selected
   const [selectedVendorSlug, setSelectedVendorSlug] = React.useState(undefined);
   const isVendorSelected =
@@ -342,7 +345,7 @@ const VendorOption = React.memo(function VendorOption(props: {
             inputId="__vendor"
             isSearchable
             types={['VENDOR']}
-            creatable={['VENDOR']}
+            creatable={isHostAdmin ? ['VENDOR'] : false}
             includeVendorsForHostId={props.host.legacyId}
             disabled={props.isSubmitting}
             defaultCollectives={props.vendorsForAccount}
