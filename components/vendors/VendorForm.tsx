@@ -78,10 +78,11 @@ const EDITABLE_FIELDS = [
 type VendorFormProps = {
   vendor?: VendorFieldsFragment;
   host?: Omit<DashboardVendorsQuery['account'], 'vendors'>;
-  onSuccess?: () => void;
+  onSuccess?: (vendor: VendorFieldsFragment) => void;
   onCancel: () => void;
   isModal?: boolean;
   supportsTaxForm: boolean;
+  hidePayoutMethod?: boolean;
 };
 
 const AvatarContainer = elementFromClass(
@@ -193,7 +194,7 @@ const validateVendorForm = values => {
   return errors;
 };
 
-const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxForm }: VendorFormProps) => {
+const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxForm, ...props }: VendorFormProps) => {
   const intl = useIntl();
   const { toast } = useToast();
   const [createVendor, { loading: isCreating }] = useMutation(createVendorMutation, { context: API_V2_CONTEXT });
@@ -215,20 +216,23 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
     );
 
     try {
+      let vendorResult;
       if (vendor) {
-        await editVendor({ variables: { vendor: { ...data, id: vendor.id } } });
+        const result = await editVendor({ variables: { vendor: { ...data, id: vendor.id } } });
+        vendorResult = result.data.editVendor;
         toast({
           variant: 'success',
           message: <FormattedMessage defaultMessage="Vendor Updated" id="XqtbM9" />,
         });
       } else {
-        await createVendor({ variables: { vendor: data, host: pick(host, ['id', 'slug']) } });
+        const result = await createVendor({ variables: { vendor: data, host: pick(host, ['id', 'slug']) } });
+        vendorResult = result.data.createVendor;
         toast({
           variant: 'success',
           message: <FormattedMessage defaultMessage="Vendor Created" id="4O9yQ3" />,
         });
       }
-      onSuccess?.();
+      onSuccess?.(vendorResult);
     } catch (e) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
     }
@@ -445,42 +449,47 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
                   />
                 )}
               </StyledInputFormikField>
-              <div className="mt-3 grow">
-                <p className="mb-2 text-[#4D4F51]">
-                  <FormattedMessage
-                    id="OptionalFieldLabel"
-                    defaultMessage="{field} (optional)"
-                    values={{
-                      field: (
-                        <span className="text-base font-bold text-black">
-                          <FormattedMessage id="ExpenseForm.PayoutOptionLabel" defaultMessage="Payout method" />
-                        </span>
-                      ),
-                    }}
-                  />
-                </p>
-                <PayoutMethodSelect
-                  collective={{ host } as any}
-                  payoutMethods={vendor?.payoutMethods || []}
-                  payoutMethod={formik.values.payoutMethod}
-                  onChange={({ value }) => formik.setFieldValue('payoutMethod', value)}
-                  allowNull
-                />
-              </div>
-              {formik.values.payoutMethod && (
-                <Field name="payoutMethod">
-                  {({ field }) => (
-                    <div className="mt-3 grow">
-                      <PayoutMethodForm
-                        fieldsPrefix="payoutMethod"
-                        payoutMethod={field.value}
-                        host={host}
-                        required={Boolean(formik.values.payoutMethod)}
+              {!props.hidePayoutMethod && (
+                <React.Fragment>
+                  <div className="mt-3 grow">
+                    <p className="mb-2 text-[#4D4F51]">
+                      <FormattedMessage
+                        id="OptionalFieldLabel"
+                        defaultMessage="{field} (optional)"
+                        values={{
+                          field: (
+                            <span className="text-base font-bold text-black">
+                              <FormattedMessage id="ExpenseForm.PayoutOptionLabel" defaultMessage="Payout method" />
+                            </span>
+                          ),
+                        }}
                       />
-                    </div>
+                    </p>
+                    <PayoutMethodSelect
+                      collective={{ host } as any}
+                      payoutMethods={vendor?.payoutMethods || []}
+                      payoutMethod={formik.values.payoutMethod}
+                      onChange={({ value }) => formik.setFieldValue('payoutMethod', value)}
+                      allowNull
+                    />
+                  </div>
+                  {formik.values.payoutMethod && (
+                    <Field name="payoutMethod">
+                      {({ field }) => (
+                        <div className="mt-3 grow">
+                          <PayoutMethodForm
+                            fieldsPrefix="payoutMethod"
+                            payoutMethod={field.value}
+                            host={host}
+                            required={Boolean(formik.values.payoutMethod)}
+                          />
+                        </div>
+                      )}
+                    </Field>
                   )}
-                </Field>
+                </React.Fragment>
               )}
+
               <StyledInputFormikField
                 name="vendorInfo.notes"
                 label={intl.formatMessage({ id: 'expense.notes', defaultMessage: 'Notes' })}
