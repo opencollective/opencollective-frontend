@@ -53,6 +53,7 @@ class Member extends React.Component {
       'membership.since': { id: 'membership.since', defaultMessage: 'since {date}' },
       ADMIN: { id: 'Member.Role.ADMIN', defaultMessage: 'Admin' },
       MEMBER: { id: 'Member.Role.MEMBER', defaultMessage: 'Core Contributor' },
+      COMMUNITY_MANAGER: { id: 'Member.Role.COMMUNITY_MANAGER', defaultMessage: 'Community Manager' },
       BACKER: { id: 'Member.Role.BACKER', defaultMessage: 'Financial Contributor' },
       'membership.totalDonations': {
         id: 'membership.totalDonations',

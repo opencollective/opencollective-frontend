@@ -108,6 +108,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
   const isHost = isHostAccount(account);
   const isSelfHosted = isSelfHostedAccount(account);
   const isAccountantOnly = LoggedInUser?.isAccountantOnly(account);
+  const isCommunityManagerOnly = LoggedInUser?.isCommunityManagerOnly(account);
   const isActive = account.isActive;
   const isActiveHost = isHost && isActive;
   const isChild = isChildAccount(account);
@@ -125,13 +126,13 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       label: intl.formatMessage({ id: 'Expenses', defaultMessage: 'Expenses' }),
     },
     {
-      if: !isIndividual && !isChild,
+      if: !isIndividual && !isChild && !isCommunityManagerOnly,
       section: ALL_SECTIONS.ACCOUNTS,
       Icon: Wallet,
       label: intl.formatMessage({ defaultMessage: 'Accounts', id: 'FvanT6' }),
     },
     {
-      if: !isIndividual,
+      if: !isIndividual && !isCommunityManagerOnly,
       type: 'group',
       label: intl.formatMessage({ id: 'Expenses', defaultMessage: 'Expenses' }),
       Icon: Receipt,
@@ -164,19 +165,19 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
-      if: isIndividual,
+      if: isIndividual && !isCommunityManagerOnly,
       section: ALL_SECTIONS.OUTGOING_CONTRIBUTIONS,
       label: intl.formatMessage({ id: 'Contributions', defaultMessage: 'Contributions' }),
       Icon: Coins,
     },
     {
-      if: !isIndividual,
+      if: !isIndividual && !isCommunityManagerOnly,
       section: ALL_SECTIONS.CONTRIBUTORS,
       label: intl.formatMessage({ id: 'Contributors', defaultMessage: 'Contributors' }),
       Icon: BookUserIcon,
     },
     {
-      if: !isIndividual,
+      if: !isIndividual && !isCommunityManagerOnly,
       type: 'group',
       label: intl.formatMessage({ id: 'Contributions', defaultMessage: 'Contributions' }),
       Icon: Coins,
@@ -209,13 +210,13 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
-      if: isHost || isSelfHosted,
+      if: (isHost || isSelfHosted) && !isCommunityManagerOnly,
       label: intl.formatMessage({ defaultMessage: 'Expected Funds', id: 'ExpectedFunds' }),
       Icon: Coins,
       section: ALL_SECTIONS.HOST_EXPECTED_FUNDS,
     },
     {
-      if: isHost && !isAccountantOnly,
+      if: isHost && !isAccountantOnly && !isCommunityManagerOnly,
       type: 'group',
       Icon: Building,
       label: intl.formatMessage({ defaultMessage: 'Hosting', id: 'DkzeEN' }),
@@ -242,7 +243,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       if: isHost && Boolean(account.host?.requiredLegalDocuments?.includes('US_TAX_FORM')),
     },
     {
-      if: isHost && hasFeature(account, FEATURES.VIRTUAL_CARDS) && !isAccountantOnly,
+      if: isHost && hasFeature(account, FEATURES.VIRTUAL_CARDS) && !isAccountantOnly && !isCommunityManagerOnly,
       type: 'group',
       label: intl.formatMessage({ id: 'VirtualCards.Title', defaultMessage: 'Virtual Cards' }),
       Icon: CreditCard,
@@ -258,7 +259,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
-      if: isHost,
+      if: isHost && !isCommunityManagerOnly,
       type: 'group',
       label: intl.formatMessage({ id: 'Reports', defaultMessage: 'Reports' }),
       Icon: BarChart2,
@@ -274,35 +275,35 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       ],
     },
     {
-      if: !isHost && !isIndividual,
+      if: !isHost && !isIndividual && !isCommunityManagerOnly,
       label: intl.formatMessage({ id: 'Reports', defaultMessage: 'Reports' }),
       Icon: BarChart2,
       section: ALL_SECTIONS.TRANSACTION_REPORTS,
     },
     {
-      if: (isHost || isSelfHosted) && !isAccountantOnly,
+      if: (isHost || isSelfHosted) && !isAccountantOnly && !isCommunityManagerOnly,
       section: ALL_SECTIONS.VENDORS,
       Icon: Store,
     },
     {
-      if: isType(account, EVENT),
+      if: isType(account, EVENT) && !isCommunityManagerOnly,
       section: ALL_SECTIONS.TICKETS,
       label: intl.formatMessage({ defaultMessage: 'Ticket tiers', id: 'tG3saB' }),
       Icon: Ticket,
     },
     {
-      if: isType(account, EVENT),
+      if: isType(account, EVENT) && !isCommunityManagerOnly,
       section: ALL_SECTIONS.TIERS,
       label: intl.formatMessage({ defaultMessage: 'Sponsorship tiers', id: '3Qx5eX' }),
       Icon: HeartHandshake,
     },
     {
-      if: !isHost,
+      if: !isHost && !isCommunityManagerOnly,
       section: ALL_SECTIONS.TRANSACTIONS,
       Icon: ArrowRightLeft,
     },
     {
-      if: isHost,
+      if: isHost && !isCommunityManagerOnly,
       type: 'group',
       label: intl.formatMessage({ defaultMessage: 'Ledger', id: 'scwekL' }),
       Icon: ArrowRightLeft,
@@ -329,12 +330,15 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     },
     {
       if:
-        !isOneOfTypes(account, [EVENT, USER]) && (account.type !== 'ORGANIZATION' || isActiveHost) && !isAccountantOnly,
+        !isOneOfTypes(account, [EVENT, USER]) &&
+        (account.type !== 'ORGANIZATION' || isActiveHost) &&
+        !isAccountantOnly &&
+        !isCommunityManagerOnly,
       section: ALL_SECTIONS.TIERS,
       Icon: HeartHandshake,
     },
     {
-      if: !isIndividual && !isAccountantOnly,
+      if: !isIndividual && !isAccountantOnly && !isCommunityManagerOnly,
       section: ALL_SECTIONS.TEAM,
       Icon: Users2,
     },
@@ -342,11 +346,13 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       if:
         isOneOfTypes(account, [COLLECTIVE, FUND, EVENT, PROJECT]) &&
         hasFeature(account.host, FEATURES.VIRTUAL_CARDS) &&
-        account.isApproved,
+        account.isApproved &&
+        !isCommunityManagerOnly,
       section: ALL_SECTIONS.VIRTUAL_CARDS,
       Icon: CreditCard,
     },
     {
+      if: !isCommunityManagerOnly,
       type: 'group',
       label: intl.formatMessage({ id: 'Settings', defaultMessage: 'Settings' }),
       Icon: Settings,

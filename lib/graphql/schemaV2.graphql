@@ -1845,6 +1845,7 @@ enum MemberRole {
   HOST
   ATTENDEE
   MEMBER
+  COMMUNITY_MANAGER
   FUNDRAISER @deprecated(reason: "2022-09-12: This role does not exist anymore")
   FOLLOWER
   ACCOUNTANT

@@ -112,7 +112,7 @@ class LoggedInUser {
     }
 
     return (
-      this.hasRole([MemberRole.HOST, MemberRole.ADMIN], comment.account) ||
+      this.hasRole([MemberRole.HOST, MemberRole.ADMIN, MemberRole.COMMUNITY_MANAGER], comment.account) ||
       this.isHostAdmin(comment.account) ||
       this.isSelf(comment.fromAccount) ||
       this.canEditEvent(comment.account)
@@ -182,6 +182,8 @@ class LoggedInUser {
       return true; // if admin of collective author
     } else if (this.isAdminOfCollectiveOrHost(update.account)) {
       return true;
+    } else if (this.hasRole([MemberRole.COMMUNITY_MANAGER], update.account)) {
+      return true; // if community manager of the collective
     }
   }
 
@@ -214,6 +216,13 @@ class LoggedInUser {
    */
   isAccountantOnly(collective) {
     return !this.isAdminOfCollective(collective) && this.hasRole(MemberRole.ACCOUNTANT, collective);
+  }
+
+  /**
+   * Returns true if the logged in user is a community manager of the collective, and nothing else
+   */
+  isCommunityManagerOnly(collective) {
+    return !this.isAdminOfCollective(collective) && this.hasRole(MemberRole.COMMUNITY_MANAGER, collective);
   }
 
   hasPreviewFeatureEnabled(featureKey: PREVIEW_FEATURE_KEYS | `${PREVIEW_FEATURE_KEYS}`) {

@@ -18,6 +18,7 @@ import {
   ROOT_PROFILE_KEY,
   ROOT_SECTIONS,
   SECTIONS_ACCESSIBLE_TO_ACCOUNTANTS,
+  SECTIONS_ACCESSIBLE_TO_COMMUNITY_MANAGERS,
 } from '../components/dashboard/constants';
 import { DashboardContext } from '../components/dashboard/DashboardContext';
 import DashboardSection from '../components/dashboard/DashboardSection';
@@ -107,6 +108,15 @@ function getBlocker(LoggedInUser, account, section) {
         <FormattedMessage
           defaultMessage="You need to be logged in as an admin or accountant to view this page"
           id="9FWGOh"
+        />
+      );
+    }
+  } else if (SECTIONS_ACCESSIBLE_TO_COMMUNITY_MANAGERS.includes(section)) {
+    if (!isAdmin && !LoggedInUser.hasRole(roles.COMMUNITY_MANAGER, account)) {
+      return (
+        <FormattedMessage
+          defaultMessage="You need to be logged in as a community manager to view this page"
+          id="dnkxQ8"
         />
       );
     }

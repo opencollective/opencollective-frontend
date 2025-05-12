@@ -16,6 +16,11 @@ const ROLES_DETAILS = defineMessages({
       '<strong>Core Contributors</strong> are shown as part of the team on your page but do not have admin access or get notifications. They do not play an active role on the platform.',
     id: 'O8duLC',
   },
+  [roles.COMMUNITY_MANAGER]: {
+    defaultMessage:
+      '<strong>Community Managers</strong> can post updates and moderate comments. They are shown as part of the team on your page but do not have admin access to finances.',
+    id: 'BoCboM',
+  },
   [roles.ACCOUNTANT]: {
     defaultMessage:
       '<strong>Accountants</strong> have read-only access to non-public data, uploaded files, and reports for record-keeping purposes. They cannot make changes and are not shown on your page.',

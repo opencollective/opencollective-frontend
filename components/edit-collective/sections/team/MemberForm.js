@@ -115,7 +115,7 @@ const MemberForm = props => {
                         form.setFieldValue(field.name, value);
                         setMemberRole(value);
                       }}
-                      options={getOptions([roles.ADMIN, roles.MEMBER, roles.ACCOUNTANT])}
+                      options={getOptions([roles.ADMIN, roles.MEMBER, roles.COMMUNITY_MANAGER, roles.ACCOUNTANT])}
                     />
                     {hasRoleDescription(memberRole) && (
                       <div className="mt-2 gap-1 text-xs text-muted-foreground">
