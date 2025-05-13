@@ -15,6 +15,7 @@ import LoginBtn from '@/components/LoginBtn';
 import StyledInputFormikField from '@/components/StyledInputFormikField';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Textarea } from '@/components/ui/Textarea';
+import VendorForm from '@/components/vendors/VendorForm';
 
 import CollectivePicker from '../../CollectivePicker';
 import CollectivePickerAsync from '../../CollectivePickerAsync';
@@ -306,6 +307,7 @@ function VendorOptionWrapper() {
         payee={form.options.payee}
         vendorsForAccount={form.options.vendorsForAccount || []}
         host={form.options.host}
+        refresh={form.refresh}
       />
     );
   }
@@ -319,11 +321,13 @@ const VendorOption = React.memo(function VendorOption(props: {
   payee: ExpenseForm['options']['payee'];
   vendorsForAccount: ExpenseForm['options']['vendorsForAccount'];
   host: ExpenseForm['options']['host'];
+  refresh: ExpenseForm['refresh'];
 }) {
   // Setting a state variable to keep the Vendor option open when a vendor that is not part of the preloaded vendors is selected
   const [selectedVendorSlug, setSelectedVendorSlug] = React.useState(undefined);
   const isVendorSelected =
     props.payeeSlug === '__vendor' ||
+    props.payeeSlug === '__newVendor' ||
     props.vendorsForAccount.some(v => v.slug === props.payeeSlug) ||
     selectedVendorSlug === props.payeeSlug;
   return (
@@ -338,16 +342,46 @@ const VendorOption = React.memo(function VendorOption(props: {
             inputId="__vendor"
             isSearchable
             types={['VENDOR']}
+            creatable={['VENDOR']}
             includeVendorsForHostId={props.host.legacyId}
             disabled={props.isSubmitting}
             defaultCollectives={props.vendorsForAccount}
-            collective={props.payeeSlug === '__vendor' ? null : props.payee}
+            collective={props.payeeSlug === '__vendor' || props.payeeSlug === '__newVendor' ? null : props.payee}
+            handleCreateForm
+            onCreateClick={() => {
+              props.setFieldValue('payeeSlug', '__newVendor');
+              setSelectedVendorSlug(null);
+            }}
             onChange={e => {
-              const slug = e.value.slug;
+              const slug = e.value?.slug;
+              if (!slug) {
+                return;
+              }
               setSelectedVendorSlug(slug);
               props.setFieldValue('payeeSlug', !slug ? '__vendor' : slug);
             }}
           />
+          {props.payeeSlug === '__newVendor' && (
+            <React.Fragment>
+              <Separator className="mt-3" />
+              <div className="mt-3">
+                <VendorForm
+                  onSuccess={async ({ slug }) => {
+                    await props.refresh();
+                    props.setFieldValue('payeeSlug', slug);
+                    setSelectedVendorSlug(slug);
+                  }}
+                  hidePayoutMethod
+                  host={props.host}
+                  supportsTaxForm={false}
+                  onCancel={() => {
+                    props.setFieldValue('payeeSlug', '__vendor');
+                    setSelectedVendorSlug(null);
+                  }}
+                />
+              </div>
+            </React.Fragment>
+          )}
         </div>
       }
     >

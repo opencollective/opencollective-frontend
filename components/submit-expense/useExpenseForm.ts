@@ -1322,6 +1322,7 @@ function getPayeeSlug(values: ExpenseFormValues): string {
     case '__invite':
     case '__inviteSomeone':
     case '__vendor':
+    case '__newVendor':
       return null;
     case '__inviteExistingUser':
       return values.inviteeExistingAccount;
@@ -1422,9 +1423,7 @@ async function buildFormOptions(
       options.host = host;
       options.vendorsForAccount =
         'vendorsForAccount' in host
-          ? (((host.vendorsForAccount as any)?.nodes as ExpenseVendorFieldsFragment[]) || []).filter(
-              v => v.hasPayoutMethod,
-            )
+          ? ((host.vendorsForAccount as any)?.nodes as ExpenseVendorFieldsFragment[]) || []
           : [];
       options.showVendorsOption = 'vendors' in host ? (host.vendors as any)?.totalCount > 0 : false;
       options.supportedPayoutMethods = host.supportedPayoutMethods || [];
@@ -2282,6 +2281,7 @@ export function useExpenseForm(opts: {
     if (
       selectedPayoutMethod &&
       selectedPayoutMethod.data?.currency &&
+      formOptions.allowDifferentItemCurrency &&
       !expenseForm.touched.expenseItems &&
       formOptions.allowDifferentItemCurrency &&
       expenseForm.values.expenseItems[0]?.amount?.currency !== selectedPayoutMethod.data?.currency &&
@@ -2299,6 +2299,7 @@ export function useExpenseForm(opts: {
       );
     }
   }, [
+    formOptions.allowDifferentItemCurrency,
     formOptions.payoutMethods,
     expenseForm.values.payoutMethodId,
     setFieldValue,
