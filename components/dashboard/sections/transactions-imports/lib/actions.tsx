@@ -17,6 +17,7 @@ import { useToast } from '../../../../ui/useToast';
 import { HostCreateExpenseModal } from '../../expenses/HostCreateExpenseModal';
 import { AddFundsModalFromImportRow } from '../AddFundsModalFromTransactionsImportRow';
 import { MatchContributionDialog } from '../MatchContributionDialog';
+import { MatchDebitDialog } from '../MatchDebitDialog';
 import { MatchExpenseDialog } from '../MatchExpenseDialog';
 
 import { updateTransactionsImportRows } from './graphql';
@@ -169,9 +170,26 @@ export const useTransactionsImportActions = ({
         });
       } else if (row.amount.valueInCents < 0) {
         actions.primary.push({
+          key: 'match',
+          Icon: Merge,
+          label: <FormattedMessage defaultMessage="Match" id="Qr9R5O" />,
+          disabled: isUpdatingRow,
+          onClick: () => {
+            showModal(
+              MatchDebitDialog,
+              { host, row, transactionsImport, onCloseFocusRef, accounts: assignedAccounts },
+              'host-match-expense-modal',
+            );
+          },
+        });
+        actions.primary.push({
           key: 'match-expense',
           Icon: Merge,
-          label: <FormattedMessage defaultMessage="Match expense" id="BGB+3j" />,
+          label: (
+            <del title="Deprecated">
+              <FormattedMessage defaultMessage="Match expense" id="BGB+3j" />
+            </del>
+          ),
           disabled: isUpdatingRow,
           onClick: () => {
             showModal(
@@ -184,7 +202,7 @@ export const useTransactionsImportActions = ({
         actions.primary.push({
           key: 'create-expense',
           Icon: Receipt,
-          label: <FormattedMessage defaultMessage="Add expense" id="6/UjBO" />,
+          label: <FormattedMessage defaultMessage="Create expense" id="YUK+rq" />,
           disabled: isUpdatingRow,
           onClick: () => {
             showModal(
