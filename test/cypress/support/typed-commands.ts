@@ -98,7 +98,7 @@ Cypress.Commands.add('retryChain', function <
 Cypress.Commands.add('createVendor', createVendor);
 function createVendor(
   hostSlug: string,
-  vendor: { name: string, payoutMethod?: unknown },
+  vendor: { name: string; payoutMethod?: unknown },
   userEmail: string,
 ): Cypress.Chainable<{ name: string }> {
   return signinRequestAndReturnToken({ email: userEmail }, null).then(token => {

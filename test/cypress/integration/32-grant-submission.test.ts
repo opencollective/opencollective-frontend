@@ -149,11 +149,13 @@ describe('Grant Submission Flow', () => {
   });
 
   it('should allow host admin submit grant existing vendor while adding payout method', function () {
-
-    cy.createVendor(this.host.slug, {
-      name: 'existing vendor',
-    }, this.hostAdmin.email);
-
+    cy.createVendor(
+      this.host.slug,
+      {
+        name: 'existing vendor',
+      },
+      this.hostAdmin.email,
+    );
 
     cy.login({ email: this.hostAdmin.email, redirect: `/${this.collective.slug}/grants/new?newGrantFlowEnabled=true` });
     cy.contains('button', 'Proceed').click();
@@ -204,18 +206,21 @@ describe('Grant Submission Flow', () => {
   });
 
   it('should allow host admin submit grant to existing vendor', function () {
-    cy.createVendor(this.host.slug, {
-      name: 'existing vendor',
-      payoutMethod: {
-        type: 'OTHER',
-        name: '12345',
-        data: {
-          content: 'Please send the funds to my bank account: xxxxxxxxxxx',
-          currency: 'USD'
-        }
-      }
-    }, this.hostAdmin.email);
-
+    cy.createVendor(
+      this.host.slug,
+      {
+        name: 'existing vendor',
+        payoutMethod: {
+          type: 'OTHER',
+          name: '12345',
+          data: {
+            content: 'Please send the funds to my bank account: xxxxxxxxxxx',
+            currency: 'USD',
+          },
+        },
+      },
+      this.hostAdmin.email,
+    );
 
     cy.login({ email: this.hostAdmin.email, redirect: `/${this.collective.slug}/grants/new?newGrantFlowEnabled=true` });
     cy.contains('button', 'Proceed').click();
