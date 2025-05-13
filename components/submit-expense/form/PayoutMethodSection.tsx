@@ -48,6 +48,8 @@ function getFormProps(form: ExpenseForm) {
     ...pick(form, ['setFieldTouched', 'setFieldValue', 'initialLoading', 'refresh', 'isSubmitting']),
     ...pick(form.values, ['payeeSlug', 'payoutMethodId', 'expenseTypeOption']),
     ...pick(form.options, [
+      'host',
+      'isHostAdmin',
       'payee',
       'payoutMethods',
       'newPayoutMethodTypes',
@@ -134,7 +136,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
 
   const isNewPayoutMethodSelected = !isLoadingPayee && props.payoutMethodId === '__newPayoutMethod';
 
-  const isVendor = props.payee?.type === CollectiveType.VENDOR;
+  const isVendor = props.payeeSlug === '__vendor' || props.payee?.type === CollectiveType.VENDOR;
 
   const onPaymentMethodDeleted = React.useCallback(
     async deletedPayoutMethodId => {
@@ -153,6 +155,28 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
     },
     [refresh, setFieldValue],
   );
+
+  if (isVendor && !props.isHostAdmin) {
+    if (!props.payee || props.payee?.['hasPayoutMethod']) {
+      return (
+        <MessageBox type="info">
+          <FormattedMessage defaultMessage="The vendor payout method is managed by the host." id="KnF5xM" />
+        </MessageBox>
+      );
+    } else {
+      return (
+        <MessageBox type="error">
+          <FormattedMessage
+            defaultMessage="This vendor is missing payout method information, please contact {hostName} before submitting to this vendor."
+            id="H4wPrV"
+            values={{
+              hostName: props.host?.name,
+            }}
+          />
+        </MessageBox>
+      );
+    }
+  }
 
   return (
     <div>

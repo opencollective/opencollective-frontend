@@ -116,6 +116,7 @@ export function SummarySectionContent(props: { form: ExpenseForm }) {
             expense={props.form.options.expense}
             loggedInAccount={props.form.options.loggedInAccount}
             expenseTypeOption={props.form.values.expenseTypeOption}
+            isHostAdmin={props.form.options.isHostAdmin}
           />
         </div>
       </div>
@@ -534,6 +535,7 @@ const WhoIsGettingPaidSummarySection = React.memo(function WhoIsGettingPaidSumma
 
 const PayoutMethodSummarySection = React.memo(function PayoutMethodSummarySection(props: {
   isAdminOfPayee: ExpenseForm['options']['isAdminOfPayee'];
+  isHostAdmin: ExpenseForm['options']['isHostAdmin'];
   payee: ExpenseForm['options']['payee'];
   payoutMethod: ExpenseForm['options']['payoutMethod'];
   loggedInAccount: ExpenseForm['options']['loggedInAccount'];
@@ -545,9 +547,14 @@ const PayoutMethodSummarySection = React.memo(function PayoutMethodSummarySectio
       <div className="font-bold">
         <FormattedMessage defaultMessage="Payout Method" id="PayoutMethod" />
       </div>
-      {!props.isAdminOfPayee &&
-      !(props.expense?.status === ExpenseStatus.DRAFT && !props.loggedInAccount) &&
-      props.payee?.type !== CollectiveType.VENDOR ? (
+
+      {props.payee?.type === CollectiveType.VENDOR && !props.isHostAdmin ? (
+        <MessageBox className="mt-2 text-sm text-muted-foreground" type="info">
+          <FormattedMessage defaultMessage="The vendor payout method is managed by the host." id="KnF5xM" />
+        </MessageBox>
+      ) : !props.isAdminOfPayee &&
+        !(props.expense?.status === ExpenseStatus.DRAFT && !props.loggedInAccount) &&
+        props.payee?.type !== CollectiveType.VENDOR ? (
         <React.Fragment>
           <div className="mt-2 text-sm text-muted-foreground">
             {props.expenseTypeOption === ExpenseType.GRANT ? (
