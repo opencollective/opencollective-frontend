@@ -696,7 +696,7 @@ function getTokenFromRedirectUrl(url) {
 /**
  * @param {object} user - should have `email` and `id` set
  */
-function signinRequestAndReturnToken(user, redirect) {
+export function signinRequestAndReturnToken(user, redirect) {
   return signinRequest(user, redirect, true).then(({ body }) => getTokenFromRedirectUrl(body.redirect));
 }
 
@@ -713,7 +713,7 @@ function graphqlQuery(token, body) {
   });
 }
 
-function graphqlQueryV2(token, body) {
+export function graphqlQueryV2(token, body) {
   return cy.request({
     url: '/api/graphql/v2',
     method: 'POST',

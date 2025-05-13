@@ -1443,7 +1443,8 @@ async function buildFormOptions(
         'vendorsForAccount' in host
           ? ((host.vendorsForAccount as any)?.nodes as ExpenseVendorFieldsFragment[]) || []
           : [];
-      options.showVendorsOption = 'vendors' in host ? (host.vendors as any)?.totalCount > 0 : false;
+      options.showVendorsOption =
+        options.isHostAdmin || ('vendors' in host ? (host.vendors as any)?.totalCount > 0 : false);
       options.supportedPayoutMethods = host.supportedPayoutMethods || [];
       options.expenseTags = host.expensesTags;
       options.isAccountingCategoryRequired = userMustSetAccountingCategory(loggedInUser, account, host);
