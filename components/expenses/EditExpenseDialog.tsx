@@ -70,6 +70,7 @@ const EditPayee = ({ expense, onSubmit }) => {
           payeeLocation: values.payeeLocation,
           currency: formOptions.expenseCurrency,
           items: values.expenseItems.map(ei => ({
+            id: ei.id,
             description: ei.description,
             amountV2: {
               valueInCents: ei.amount.valueInCents,
@@ -186,6 +187,7 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
         payeeLocation: values.payeeLocation,
         currency: formOptions.expenseCurrency,
         items: values.expenseItems.map(ei => ({
+          id: ei.id,
           description: ei.description,
           amountV2: {
             valueInCents: ei.amount.valueInCents,
@@ -364,6 +366,7 @@ const EditExpenseItems = ({ expense, onSubmit }) => {
   const transformedOnSubmit = values => {
     const editValues = {
       items: values.expenseItems.map(ei => ({
+        id: ei.id,
         description: ei.description,
         amountV2: {
           valueInCents: ei.amount.valueInCents,
