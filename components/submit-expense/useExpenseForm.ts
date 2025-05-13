@@ -58,6 +58,7 @@ export enum InviteeAccountType {
 }
 
 type ExpenseItem = {
+  id?: string;
   key?: string; // used to enable FlipMove animations (will either be a generated uuid on "Add item", or using the expense item id)
   description?: string;
   incurredAt?: string;
@@ -1496,9 +1497,7 @@ async function buildFormOptions(
         options.payoutMethod = values.newPayoutMethod;
       }
 
-      // Allow setting this flag to true with the `isInlineEdit` flag in start options to enable full editing experience (i.e. editing payotu method)
       options.isAdminOfPayee =
-        startOptions.isInlineEdit ||
         options.payoutProfiles.some(p => p.slug === values.payeeSlug) ||
         values.payeeSlug === '__findAccountIAdminister';
     } else {
@@ -1756,6 +1755,7 @@ export function useExpenseForm(opts: {
                   ? { url: typeof values.invoiceFile === 'string' ? values.invoiceFile : values.invoiceFile.url }
                   : undefined,
             items: values.expenseItems.map(ei => ({
+              id: ei.id,
               description: ei.description,
               amountV2: {
                 valueInCents: ei.amount.valueInCents,
@@ -2013,6 +2013,7 @@ export function useExpenseForm(opts: {
       setFieldValue(
         'expenseItems',
         formOptions.expense.draft?.items?.map(ei => ({
+          id: !startOptions.current.duplicateExpense ? ei.id : undefined,
           key: ei.id,
           attachment: ei.url,
           description: ei.description ?? '',
@@ -2027,6 +2028,7 @@ export function useExpenseForm(opts: {
       setFieldValue(
         'expenseItems',
         formOptions.expense.items?.map(ei => ({
+          id: !startOptions.current.duplicateExpense ? ei.id : undefined,
           key: ei.id,
           attachment: !startOptions.current.duplicateExpense ? ei.url : null,
           description: ei.description ?? '',
@@ -2277,7 +2279,8 @@ export function useExpenseForm(opts: {
       selectedPayoutMethod &&
       selectedPayoutMethod.data?.currency &&
       !expenseForm.touched.expenseItems &&
-      expenseForm.values.expenseItems[0]?.amount?.currency !== selectedPayoutMethod.data?.currency
+      expenseForm.values.expenseItems[0]?.amount?.currency !== selectedPayoutMethod.data?.currency &&
+      !startOptions.current.isInlineEdit // expenseItems will not be touched when editing the payout method, we don't want to update the expense items currency then
     ) {
       setFieldValue(
         'expenseItems',
