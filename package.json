@@ -89,7 +89,7 @@
     "file-saver": "2.0.5",
     "formik": "2.4.6",
     "framer-motion": "^11.5.4",
-    "glob": "11.0.1",
+    "glob": "11.0.2",
     "graphql": "16.10.0",
     "helmet": "8.0.0",
     "interweave": "13.1.1",
