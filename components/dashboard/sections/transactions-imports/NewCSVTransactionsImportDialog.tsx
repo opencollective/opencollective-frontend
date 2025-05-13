@@ -91,7 +91,7 @@ export const NewCSVTransactionsImportDialog = ({ accountSlug, onSuccess, ...prop
               const { data } = await createImport({ variables: { account: { slug: accountSlug }, ...values } });
               onSuccess?.();
               props.onOpenChange(false);
-              router.push(`${getCSVTransactionsImportRoute(accountSlug, data.createTransactionsImport.id)}&step=last`);
+              router.push(`${getCSVTransactionsImportRoute(accountSlug, data.createTransactionsImport.id)}?step=last`);
             } catch (e) {
               toast({
                 variant: 'error',
