@@ -279,6 +279,9 @@ export const StepMapCSVColumns = ({
           {
             id: 'credit',
             accessorKey: 'amount',
+            meta: {
+              align: 'right',
+            },
             header: () => (
               <CSVColumnSelector
                 label="Credit"
@@ -305,6 +308,9 @@ export const StepMapCSVColumns = ({
           {
             id: 'debit',
             accessorKey: 'amount',
+            meta: {
+              align: 'right',
+            },
             header: () => (
               <CSVColumnSelector
                 label="Debit"

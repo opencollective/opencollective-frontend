@@ -312,7 +312,7 @@ class SignInOrJoinFree extends React.Component {
               width={1}
             >
               <StyledHr borderStyle="solid" borderColor="black.200" mb="16px" />
-              <Flex justifyContent="space-between" flexDirection={['column', 'row']} alignItems="center">
+              <Flex justifyContent="space-between" gap="8px" flexDirection={['column', 'row']} alignItems="center">
                 <Span>
                   <SignInFooterLink href="/privacypolicy">
                     <FormattedMessage defaultMessage="Read our privacy policy" id="8aLrwg" />

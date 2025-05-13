@@ -2,8 +2,7 @@ import React from 'react';
 import { gql, useApolloClient, useMutation } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import { omit } from 'lodash';
-import { AlertTriangle, Plug, Unplug } from 'lucide-react';
-import { useRouter } from 'next/router';
+import { AlertTriangle, ArchiveIcon, Plug } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { i18nGraphqlException } from '../../../../lib/errors';
@@ -68,11 +67,15 @@ export default function TransactionsImportSettingsModal({
   isOpen,
   hasRequestedSync,
   setHasRequestedSync,
+  onDelete,
+  onArchived,
 }: {
   onOpenChange: (isOpen: boolean) => void;
+  onDelete: () => void;
+  onArchived?: () => void;
   isOpen: boolean;
-  showPlaidDialog: () => void;
-  plaidStatus: PlaidDialogStatus;
+  showPlaidDialog?: () => void;
+  plaidStatus?: PlaidDialogStatus;
   hasRequestedSync: boolean;
   setHasRequestedSync: (hasRequestedSync: boolean) => void;
   transactionsImport: Pick<
@@ -83,7 +86,6 @@ export default function TransactionsImportSettingsModal({
       connectedAccount?: Pick<TransactionsImport['connectedAccount'], 'id'>;
     };
 }) {
-  const router = useRouter();
   const { toast } = useToast();
   const intl = useIntl();
   const mutationParams = { context: API_V2_CONTEXT };
@@ -110,8 +112,9 @@ export default function TransactionsImportSettingsModal({
       onOpenChange(false);
       toast({
         variant: 'success',
-        message: intl.formatMessage({ defaultMessage: 'Bank account disconnected.', id: 'BankAccount.Disconnected' }),
+        message: intl.formatMessage({ defaultMessage: 'Connection archived', id: 'jZM4f3' }),
       });
+      onArchived?.();
     } catch (error) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, error) });
     }
@@ -121,7 +124,7 @@ export default function TransactionsImportSettingsModal({
     try {
       await deleteTransactionsImport({ variables: { id: transactionsImport.id } });
       apolloClient.cache.evict({ id: apolloClient.cache.identify(transactionsImport) });
-      router.push(router.asPath.replace(/\/host-transactions\/import\/.*/, '/host-transactions/import'));
+      onDelete();
     } catch (error) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, error) });
     }
@@ -241,7 +244,7 @@ export default function TransactionsImportSettingsModal({
                   </Button>
                   <Separator className="my-4" />
                   <h3 className="mb-2 text-sm font-medium">
-                    <FormattedMessage defaultMessage="Synchronize Bank Account" id="+EAopb" />
+                    <FormattedMessage defaultMessage="Force synchronization" id="w4ZT18" />
                   </h3>
                   <p className="mb-4 text-sm text-muted-foreground">
                     <FormattedMessage
@@ -262,8 +265,8 @@ export default function TransactionsImportSettingsModal({
                   </p>
                   <p className="mb-4 text-sm text-muted-foreground">
                     <FormattedMessage
-                      defaultMessage="The synchronization of your bank account is automatic and happens up to 4 times per day. You can manually request a sync at any time using the button below."
-                      id="SNajqm"
+                      defaultMessage="The synchronization is automatic and happens up to 4 times per day. You can manually request a sync at any time using the button below."
+                      id="fRDMf8"
                     />
                   </p>
 
@@ -284,7 +287,7 @@ export default function TransactionsImportSettingsModal({
                   <React.Fragment>
                     <div>
                       <h3 className="mb-2 text-sm font-medium">
-                        <FormattedMessage defaultMessage="Disconnect Bank Account" id="iEOcw+" />
+                        <FormattedMessage defaultMessage="Archive connection" id="zE6WtX" />
                       </h3>
                       <p className="mb-4 text-sm text-muted-foreground">
                         <FormattedMessage
@@ -300,14 +303,14 @@ export default function TransactionsImportSettingsModal({
                             loading={isDisconnecting}
                             disabled={isDeleting}
                           >
-                            <Unplug size={16} />
-                            <FormattedMessage defaultMessage="Disconnect Bank Account" id="iEOcw+" />
+                            <ArchiveIcon size={16} />
+                            <FormattedMessage defaultMessage="Archive" id="collective.archive.confirm.btn" />
                           </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
                             <AlertDialogTitle>
-                              <FormattedMessage defaultMessage="Disconnect Bank Account" id="iEOcw+" />
+                              <FormattedMessage defaultMessage="Archive connection" id="zE6WtX" />
                             </AlertDialogTitle>
                             <AlertDialogDescription>
                               <FormattedMessage
@@ -320,7 +323,7 @@ export default function TransactionsImportSettingsModal({
                             <AlertDialogCancel>
                               <FormattedMessage defaultMessage="Cancel" id="actions.cancel" />
                             </AlertDialogCancel>
-                            <AlertDialogAction onClick={handleDisconnect}>
+                            <AlertDialogAction onClick={handleDisconnect} variant="destructive">
                               <FormattedMessage
                                 defaultMessage="Disconnect"
                                 id="collective.connectedAccounts.disconnect.button"
@@ -335,26 +338,34 @@ export default function TransactionsImportSettingsModal({
                 )}
                 <div>
                   <h3 className="mb-2 text-sm font-medium">
-                    <FormattedMessage defaultMessage="Delete Import" id="naIILe" />
+                    {transactionsImport.type === 'CSV' ? (
+                      <FormattedMessage defaultMessage="Delete CSV Import" id="WhpI/L" />
+                    ) : (
+                      <FormattedMessage defaultMessage="Delete connection" id="ksAAzc" />
+                    )}
                   </h3>
                   <p className="mb-4 text-sm text-muted-foreground">
                     <FormattedMessage
                       values={{ hasConnectedAccount: transactionsImport.connectedAccount ? 0 : 1 }}
-                      defaultMessage="This will {hasConnectedAccount, select, 0 {disconnect the Bank Account and } other {}}permanently delete the import with its associated data. Items imported in your ledger (expenses and added funds) will be preserved."
-                      id="N5p0sU"
+                      defaultMessage="This will {hasConnectedAccount, select, 0 {disconnect and } other {}}permanently delete the import with its associated data. Items imported in your ledger (expenses and added funds) will be preserved."
+                      id="2t040E"
                     />
                   </p>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button variant="destructive" className="w-full" loading={isDeleting} disabled={isDisconnecting}>
                         <AlertTriangle size={16} />
-                        <FormattedMessage defaultMessage="Delete Import" id="naIILe" />
+                        <FormattedMessage defaultMessage="Delete" id="actions.delete" />
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
                         <AlertDialogTitle>
-                          <FormattedMessage defaultMessage="Delete Import" id="naIILe" />
+                          {transactionsImport.type === 'CSV' ? (
+                            <FormattedMessage defaultMessage="Delete CSV Import" id="WhpI/L" />
+                          ) : (
+                            <FormattedMessage defaultMessage="Delete connection" id="ksAAzc" />
+                          )}
                         </AlertDialogTitle>
                         <AlertDialogDescription>
                           <FormattedMessage
@@ -367,7 +378,7 @@ export default function TransactionsImportSettingsModal({
                         <AlertDialogCancel>
                           <FormattedMessage defaultMessage="Cancel" id="actions.cancel" />
                         </AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDelete}>
+                        <AlertDialogAction onClick={handleDelete} variant="destructive">
                           <FormattedMessage defaultMessage="Delete" id="actions.delete" />
                         </AlertDialogAction>
                       </AlertDialogFooter>
