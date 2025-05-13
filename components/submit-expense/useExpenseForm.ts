@@ -223,6 +223,10 @@ const formSchemaQuery = gql`
 
     payee: account(slug: $payeeSlug) @include(if: $hasPayeeSlug) {
       ...ExpenseFormPayeeFields
+
+      ... on Vendor {
+        hasPayoutMethod
+      }
     }
 
     loggedInAccount {
@@ -597,6 +601,7 @@ type ExpenseFormOptions = {
   account?: ExpenseFormSchemaQuery['account'] | ExpenseFormSchemaQuery['expense']['account'];
   payee?: ExpenseFormSchemaQuery['payee'];
   isAdminOfPayee?: boolean;
+  isHostAdmin?: boolean;
   submitter?: ExpenseFormSchemaQuery['submitter'];
   loggedInAccount?: ExpenseFormSchemaQuery['loggedInAccount'];
   expense?: ExpenseFormSchemaQuery['expense'];
@@ -702,6 +707,10 @@ function buildFormSchema(
             options.payoutMethods?.some(pm => pm.type === PayoutMethodType.ACCOUNT_BALANCE)
           ) {
             return true;
+          }
+
+          if (options.payee?.type === CollectiveType.VENDOR && !options.payee?.['hasPayoutMethod']) {
+            return false;
           }
 
           // If the payee has a host and the payer account is under a different one, show the host's payout method (cross-host expense)
@@ -1088,6 +1097,10 @@ function buildFormSchema(
               return true;
             }
 
+            if (options.payee?.type === CollectiveType.VENDOR && !options.isHostAdmin) {
+              return true;
+            }
+
             if (options.expense?.status === ExpenseStatus.DRAFT && !options.loggedInAccount) {
               return !!type;
             }
@@ -1111,6 +1124,10 @@ function buildFormSchema(
             .refine(
               currency => {
                 if (['__invite', '__inviteSomeone', '__inviteExistingUser'].includes(values.payeeSlug)) {
+                  return true;
+                }
+
+                if (options.payee?.type === CollectiveType.VENDOR && !options.isHostAdmin) {
                   return true;
                 }
 
@@ -1420,6 +1437,7 @@ async function buildFormOptions(
     }
 
     if (host) {
+      options.isHostAdmin = loggedInUser?.isAdminOfCollective(host) ?? false;
       options.host = host;
       options.vendorsForAccount =
         'vendorsForAccount' in host
@@ -1496,7 +1514,10 @@ async function buildFormOptions(
 
       if (values.payoutMethodId && values.payoutMethodId !== '__newPayoutMethod') {
         options.payoutMethod = options.payoutMethods?.find(p => p.id === values.payoutMethodId);
-      } else if (values.payoutMethodId === '__newPayoutMethod') {
+      } else if (
+        values.payoutMethodId === '__newPayoutMethod' &&
+        ((options.payee && options.payee.type !== CollectiveType.VENDOR) || options.isHostAdmin)
+      ) {
         options.payoutMethod = values.newPayoutMethod;
       }
 
@@ -1912,7 +1933,7 @@ export function useExpenseForm(opts: {
 
         if (!isEmpty(errs)) {
           // eslint-disable-next-line no-console
-          console.warn('Form validation error', errs, values); // The form does not always surface errors properly, this will help to troubleshoot.
+          console.log('Form validation error', errs, values); // The form does not always surface errors properly, this will help to troubleshoot.
         }
 
         return errs;
