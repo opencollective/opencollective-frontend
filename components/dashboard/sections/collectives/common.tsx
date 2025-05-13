@@ -404,12 +404,20 @@ export const MoreActionsMenu = ({
             {collective.isFrozen ? (
               <React.Fragment>
                 <Play className="mr-2" size="16" />
-                <FormattedMessage defaultMessage="Unfreeze Collective" id="gX79wf" />
+                <FormattedMessage
+                  defaultMessage="Unfreeze {collectiveType, select, FUND {Fund} other {Collective}}"
+                  id="VoOM/F"
+                  values={{ collectiveType: collective.type }}
+                />
               </React.Fragment>
             ) : (
               <React.Fragment>
                 <Pause className="mr-2" size="16" />
-                <FormattedMessage defaultMessage="Freeze Collective" id="ILjcbM" />
+                <FormattedMessage
+                  defaultMessage="Freeze {collectiveType, select, FUND {Fund} other {Collective}}"
+                  id="8Gx2hn"
+                  values={{ collectiveType: collective.type }}
+                />
               </React.Fragment>
             )}
           </DropdownMenuItem>
