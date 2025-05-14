@@ -50,7 +50,14 @@ const TABS = Object.keys(GROUP_FIELDS).map(group => ({
   count: GROUP_FIELDS[group].length,
 }));
 
-const makeUrl = ({ account, isHostReport, queryFilter, flattenTaxesAndPaymentProcessorFees, fields }) => {
+const makeUrl = ({
+  account,
+  isHostReport,
+  queryFilter,
+  flattenTaxesAndPaymentProcessorFees,
+  useFieldNames,
+  fields,
+}) => {
   const url = isHostReport
     ? new URL(`${process.env.REST_URL}/v2/${account?.slug}/hostTransactions.csv`)
     : new URL(`${process.env.REST_URL}/v2/${account?.slug}/transactions.csv`);
@@ -151,6 +158,10 @@ const makeUrl = ({ account, isHostReport, queryFilter, flattenTaxesAndPaymentPro
     url.searchParams.set('flattenTax', '1');
   }
 
+  if (useFieldNames) {
+    url.searchParams.set('useFieldNames', '1');
+  }
+
   if (!isEmpty(fields)) {
     const selectedFields = fields.join(',').replace('debitAndCreditAmounts', 'debitAmount,creditAmount');
     url.searchParams.set('fields', selectedFields);
@@ -238,6 +249,7 @@ const ExportTransactionsCSVModal = ({
   const [fields, setFields] = React.useState([]);
   const [draggingTag, setDraggingTag] = React.useState<string | null>(null);
   const [flattenTaxesAndPaymentProcessorFees, setFlattenTaxesAndPaymentProcessorFees] = React.useState(false);
+  const [useFieldNames, setUseFieldNames] = React.useState(false);
   const [tab, setTab] = React.useState(Object.keys(GROUPS)[0]);
   const [presetName, setPresetName] = React.useState('');
   const [isEditingPreset, setIsEditingPreset] = React.useState(false);
@@ -263,7 +275,14 @@ const ExportTransactionsCSVModal = ({
   } = useAsyncCall(async () => {
     const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
     if (accessToken) {
-      const url = makeUrl({ account, isHostReport, queryFilter, flattenTaxesAndPaymentProcessorFees, fields });
+      const url = makeUrl({
+        account,
+        isHostReport,
+        queryFilter,
+        flattenTaxesAndPaymentProcessorFees,
+        useFieldNames,
+        fields,
+      });
       const response = await fetch(url, {
         method: 'HEAD',
         headers: {
@@ -280,6 +299,7 @@ const ExportTransactionsCSVModal = ({
     label: string;
     fields?: Array<CSVField>;
     flattenTaxesAndPaymentProcessorFees?: boolean;
+    useFieldNames?: boolean;
   }> = React.useMemo(() => {
     return [
       ...Object.keys(customFields).map(key => ({
@@ -308,6 +328,14 @@ const ExportTransactionsCSVModal = ({
       } else {
         setFlattenTaxesAndPaymentProcessorFees(false);
       }
+
+      if (!isNil(selectedSet.useFieldNames)) {
+        setUseFieldNames(selectedSet.useFieldNames);
+      } else {
+        setUseFieldNames(false);
+      }
+    } else if (preset === FIELD_OPTIONS.NEW_PRESET) {
+      setUseFieldNames(true);
     }
   }, [presetOptions, preset]);
 
@@ -319,8 +347,10 @@ const ExportTransactionsCSVModal = ({
 
   React.useEffect(() => {
     setRestAuthorizationCookie();
-    setDownloadUrl(makeUrl({ account, isHostReport, queryFilter, flattenTaxesAndPaymentProcessorFees, fields }));
-  }, [fields, flattenTaxesAndPaymentProcessorFees, queryFilter, account, isHostReport, setDownloadUrl]);
+    setDownloadUrl(
+      makeUrl({ account, isHostReport, queryFilter, flattenTaxesAndPaymentProcessorFees, useFieldNames, fields }),
+    );
+  }, [fields, flattenTaxesAndPaymentProcessorFees, queryFilter, account, isHostReport, setDownloadUrl, useFieldNames]);
 
   const handleFieldSwitch = React.useCallback(
     ({ name, checked }) => {
@@ -393,7 +423,7 @@ const ExportTransactionsCSVModal = ({
       variables: {
         account: { slug: account?.slug },
         key: `exportedTransactionsFieldSets.${key}`,
-        value: { name: presetName, fields, flattenTaxesAndPaymentProcessorFees },
+        value: { name: presetName, fields, flattenTaxesAndPaymentProcessorFees, useFieldNames },
       },
     });
     setIsEditingPreset(false);
