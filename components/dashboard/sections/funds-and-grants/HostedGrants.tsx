@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
-import { omitBy } from 'lodash';
+import { omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
@@ -54,7 +54,7 @@ const toVariables: FiltersToVariables<FilterValues, HostDashboardExpensesQueryVa
 };
 
 const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
-  ...commonFilters,
+  ...omit(commonFilters, ['type', 'chargeHasReceipts']),
   account: hostedAccountFilter.filter,
   tag: expenseTagFilter.filter,
 };
