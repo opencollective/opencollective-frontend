@@ -278,7 +278,7 @@ export function HostedFunds({ accountSlug: hostSlug, subpath }: DashboardSection
                 onEdit: handleEdit,
                 host: data?.host,
                 openCollectiveDetails: handleDrawer,
-              } as HostedCollectivesDataTableMeta
+              } as unknown as HostedCollectivesDataTableMeta
             }
             onClickRow={onClickRow}
             getRowDataCy={row => `collective-${row.original.slug}`}
@@ -296,7 +296,7 @@ export function HostedFunds({ accountSlug: hostSlug, subpath }: DashboardSection
       >
         {showCollectiveOverview && (
           <CollectiveDetails
-            collective={isString(showCollectiveOverview) ? null : showCollectiveOverview}
+            collective={isString(showCollectiveOverview) ? null : (showCollectiveOverview as any)}
             collectiveId={isString(showCollectiveOverview) ? showCollectiveOverview : null}
             host={data?.host}
             onCancel={() => handleDrawer(null)}

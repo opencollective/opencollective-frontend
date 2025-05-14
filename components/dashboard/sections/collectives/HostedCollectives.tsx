@@ -280,7 +280,7 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
                 onEdit: handleEdit,
                 host: data?.host,
                 openCollectiveDetails: handleDrawer,
-              } as HostedCollectivesDataTableMeta
+              } as unknown as HostedCollectivesDataTableMeta
             }
             onClickRow={onClickRow}
             getRowDataCy={row => `collective-${row.original.slug}`}
@@ -298,7 +298,7 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
       >
         {showCollectiveOverview && (
           <CollectiveDetails
-            collective={isString(showCollectiveOverview) ? null : showCollectiveOverview}
+            collective={isString(showCollectiveOverview) ? null : (showCollectiveOverview as any)}
             collectiveId={isString(showCollectiveOverview) ? showCollectiveOverview : null}
             host={data?.host}
             onCancel={() => handleDrawer(null)}
