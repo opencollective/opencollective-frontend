@@ -45,7 +45,6 @@ import InvoicesReceipts from './sections/invoices-receipts/InvoicesReceipts';
 import HostDashboardTaxForms from './sections/legal-documents/HostDashboardTaxForms';
 import NotificationsSettings from './sections/NotificationsSettings';
 import Overview from './sections/overview/Overview';
-import LegacyHostDashboardReports from './sections/reports/legacy/HostDashboardReports';
 import Reports from './sections/reports/Reports';
 import { TaxInformationSettingsSection } from './sections/tax-information';
 import Team from './sections/Team';
@@ -83,7 +82,6 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.HOST_TAX_FORMS]: HostDashboardTaxForms,
   [SECTIONS.HOST_APPLICATIONS]: HostApplications,
   [SECTIONS.REPORTS]: Reports,
-  [SECTIONS.LEGACY_HOST_REPORT]: LegacyHostDashboardReports,
   [SECTIONS.HOST_VIRTUAL_CARDS]: HostVirtualCards,
   [SECTIONS.HOST_VIRTUAL_CARD_REQUESTS]: HostVirtualCardRequests,
   [SECTIONS.OVERVIEW]: Overview,
@@ -152,11 +150,8 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
     );
   }
 
-  let DashboardComponent = DASHBOARD_COMPONENTS[section];
+  const DashboardComponent = DASHBOARD_COMPONENTS[section];
   if (DashboardComponent) {
-    if (section === SECTIONS.REPORTS && subpath[0] === 'legacy') {
-      DashboardComponent = LegacyHostDashboardReports;
-    }
     return (
       <div className="w-full pb-6">
         <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
