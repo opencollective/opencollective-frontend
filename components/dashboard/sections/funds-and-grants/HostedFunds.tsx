@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import { gql, useQuery } from '@apollo/client';
+import type { ColumnDef } from '@tanstack/react-table';
 import { compact, isString, omit } from 'lodash';
 import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
@@ -254,10 +255,15 @@ export function HostedFunds({ accountSlug: hostSlug, subpath }: DashboardSection
             data-cy="transactions-table"
             innerClassName="text-muted-foreground"
             columns={compact([
-              cols.collective,
+              {
+                ...cols.collective,
+                header: () => <FormattedMessage defaultMessage="Fund name" id="nPLfxb" />,
+              } as ColumnDef<any, any>,
               cols.team,
               !isUnhosted && cols.fee,
               !isUnhosted && cols.hostedSince,
+              cols.totalAmountRaised,
+              cols.totalAmountSpent,
               cols.consolidatedBalance,
               cols.actions,
             ])}

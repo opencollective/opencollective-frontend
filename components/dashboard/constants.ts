@@ -312,8 +312,8 @@ export const SECTION_LABELS = defineMessages({
     id: 'HostedFunds',
   },
   [ALL_SECTIONS.GRANTS]: {
-    defaultMessage: 'Grant Requests',
-    id: 'fng2Fr',
+    defaultMessage: 'Received Grant Requests',
+    id: 'Ng3IVE',
   },
   [ALL_SECTIONS.HOSTED_GRANTS]: {
     defaultMessage: 'Hosted Grants Requests',
@@ -324,7 +324,7 @@ export const SECTION_LABELS = defineMessages({
     id: 'RyfEp8',
   },
   [ALL_SECTIONS.SUBMITTED_GRANTS]: {
-    defaultMessage: 'Submitted Grants',
-    id: 'rSRlYH',
+    defaultMessage: 'Issued Grant Requests',
+    id: 'qKKz2G',
   },
 });
