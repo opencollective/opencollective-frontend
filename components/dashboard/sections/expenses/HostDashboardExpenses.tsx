@@ -160,7 +160,7 @@ const HostExpenses = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
       count: metaData?.scheduled_for_payment?.totalCount,
     },
     {
-      label: intl.formatMessage({ defaultMessage: 'On hold', id: '0Hhe6f' }),
+      label: intl.formatMessage({ defaultMessage: 'On hold', id: 'bLx/Q9' }),
       filter: { status: [ExpenseStatusFilter.ON_HOLD], sort: { field: 'CREATED_AT', direction: 'ASC' } },
       id: 'on_hold',
       count: metaData?.on_hold?.totalCount,

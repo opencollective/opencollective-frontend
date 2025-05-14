@@ -1243,7 +1243,7 @@ const AddFundsModal = ({
             <Button onClick={handleClose} variant="outline" type="button">
               <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
             </Button>
-            <Button onClick={() => setHasConfirmedCollective(true)}>
+            <Button onClick={() => setHasConfirmedCollective(true)} disabled={!selectedCollective}>
               <FormattedMessage defaultMessage="Continue" id="actions.continue" />
             </Button>
           </div>

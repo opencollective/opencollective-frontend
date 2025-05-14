@@ -124,7 +124,7 @@ export const useTransactionsImportActions = ({
     const actions: ReturnType<GetActions<TransactionsImportRow>> = { primary: [], secondary: [] };
     const isImported = Boolean(row.expense || row.order);
     const isUpdatingRow = updatingRows.includes(row.id);
-    const assignedAccounts = row.assignedAccounts;
+    const assignedAccounts = row.assignedAccounts?.length ? row.assignedAccounts : null;
     const transactionsImport = row.transactionsImport;
     const showAddFundsModal = () => {
       showModal(
