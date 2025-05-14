@@ -16,6 +16,7 @@ export type GraphQLV1Collective = {
   settings?: Record<string, unknown>;
   isHost?: boolean;
   policies: Policies;
+  children?: GraphQLV1Collective[];
 };
 
 export interface GraphQLV1PaymentMethod {
