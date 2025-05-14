@@ -969,6 +969,6 @@ const DEFAULT_FIELDS: Array<CSVField> = [
 ];
 
 export const PLATFORM_PRESETS = {
-  DEFAULT: { fields: DEFAULT_FIELDS, flattenTaxesAndPaymentProcessorFees: false },
+  DEFAULT: { fields: DEFAULT_FIELDS, flattenTaxesAndPaymentProcessorFees: false, useFieldNames: true },
   DEFAULT_2023: { fields: DEFAULT_FIELDS_2023, flattenTaxesAndPaymentProcessorFees: true },
 };
