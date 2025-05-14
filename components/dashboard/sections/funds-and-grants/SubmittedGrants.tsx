@@ -17,10 +17,11 @@ import { Filterbar } from '../../filters/Filterbar';
 import { Pagination } from '../../filters/Pagination';
 import type { DashboardSectionProps } from '../../types';
 import type { FilterMeta } from '../expenses/filters';
-import { filters, schema, toVariables } from '../expenses/filters';
+import { filters as commonFilters, schema, toVariables } from '../expenses/filters';
 import { accountExpensesQuery } from '../expenses/queries';
 
 const ROUTE_PARAMS = ['slug', 'section', 'subpath'];
+const filters = omit(commonFilters, ['type', 'chargeHasReceipts']);
 
 export function SubmittedGrants({ accountSlug }: DashboardSectionProps) {
   const router = useRouter();

@@ -64,7 +64,7 @@ const toVariables: FiltersToVariables<FilterValues, ExpensesPageQueryVariables, 
 };
 
 const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
-  ...omit(commonFilters, 'type'),
+  ...omit(commonFilters, ['type', 'chargeHasReceipts']),
   tag: expenseTagFilter.filter,
   account: {
     labelMsg: defineMessage({ defaultMessage: 'Account', id: 'TwyMau' }),

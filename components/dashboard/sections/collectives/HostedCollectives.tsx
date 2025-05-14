@@ -97,14 +97,16 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
   },
   type: {
     labelMsg: defineMessage({ id: 'Type', defaultMessage: 'Type' }),
-    Component: ({ intl, ...props }) => {
+    Component: ({ intl, meta, ...props }) => {
       const options = useMemo(
         () =>
-          Object.values(HostedCollectiveTypes).map(value => ({
-            label: formatCollectiveType(intl, value),
-            value,
-          })),
-        [intl],
+          Object.values(HostedCollectiveTypes)
+            .filter(type => (meta.hasGrantAndFundsReorgEnabled ? type !== HostedCollectiveTypes.FUND : true))
+            .map(value => ({
+              label: formatCollectiveType(intl, value),
+              value,
+            })),
+        [intl, meta.hasGrantAndFundsReorgEnabled],
       );
       return <ComboSelectFilter options={options} isMulti {...props} />;
     },
@@ -192,7 +194,11 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
     schema,
     toVariables,
     views,
-    meta: { currency: metadata?.host?.currency, currencies: metadata?.host?.all?.currencies },
+    meta: {
+      currency: metadata?.host?.currency,
+      currencies: metadata?.host?.all?.currencies,
+      hasGrantAndFundsReorgEnabled,
+    },
   });
 
   const { data, error, loading, refetch } = useQuery(hostedCollectivesQuery, {
