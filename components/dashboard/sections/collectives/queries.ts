@@ -208,6 +208,14 @@ const hostedCollectiveFields = gql`
         valueInCents
         currency
       }
+      totalAmountRaised: totalAmountReceived {
+        valueInCents
+        currency
+      }
+      totalAmountSpent(includeChildren: true) {
+        valueInCents
+        currency
+      }
     }
     policies {
       id

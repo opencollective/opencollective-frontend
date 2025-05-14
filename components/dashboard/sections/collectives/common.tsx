@@ -259,6 +259,40 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       );
     },
   },
+  totalAmountRaised: {
+    accessorKey: 'totalAmountRaised',
+    header: () => <FormattedMessage id="budgetSection-raised" defaultMessage="Total raised" />,
+    cell: ({ row }) => {
+      const collective = row.original;
+      const stats = collective.stats;
+      return (
+        <div className="flex items-center font-medium text-foreground">
+          <FormattedMoneyAmount
+            amount={stats.totalAmountRaised?.valueInCents}
+            currency={stats.totalAmountRaised?.currency}
+            showCurrencyCode={true}
+          />
+        </div>
+      );
+    },
+  },
+  totalAmountSpent: {
+    accessorKey: 'totalAmountSpent',
+    header: () => <FormattedMessage defaultMessage="Total disbursed" id="dIoEln" />,
+    cell: ({ row }) => {
+      const collective = row.original;
+      const stats = collective.stats;
+      return (
+        <div className="flex items-center font-medium text-foreground">
+          <FormattedMoneyAmount
+            amount={stats.totalAmountSpent?.valueInCents}
+            currency={stats.totalAmountSpent?.currency}
+            showCurrencyCode={true}
+          />
+        </div>
+      );
+    },
+  },
   actions: {
     accessorKey: 'actions',
     header: '',
