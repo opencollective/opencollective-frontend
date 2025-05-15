@@ -20,7 +20,7 @@ const Welcome = () => {
       showSearch={false}
       menuItemsV2={{ solutions: false, product: false, company: false, docs: false }}
     >
-      <div className="mt-28 mb-16 flex flex-col items-center justify-center lg:flex-row">
+      <div className="mt-28 flex flex-col items-center justify-center pb-16 lg:flex-row">
         <div className="flex flex-col text-center lg:pr-12">
           <div className="flex justify-center">
             <Image src="/static/images/oc-logo-watercolor-256.png" height={96} width={96} alt="OC Logo" />
