@@ -336,6 +336,7 @@ const ExportTransactionsCSVModal = ({
       }
     } else if (preset === FIELD_OPTIONS.NEW_PRESET) {
       setUseFieldNames(true);
+      handleTaxAndPaymentProcessorFeeSwitch(false);
     }
   }, [presetOptions, preset]);
 
@@ -371,6 +372,8 @@ const ExportTransactionsCSVModal = ({
     setFlattenTaxesAndPaymentProcessorFees(checked);
     if (checked) {
       setFields(uniq([...fields, 'paymentProcessorFee', 'taxAmount']));
+    } else if (preset === FIELD_OPTIONS.NEW_PRESET) {
+      setFields(without(fields, 'paymentProcessorFee', 'taxAmount'));
     } else {
       const selectedSet = PLATFORM_PRESETS[preset] || presetOptions.find(option => option.value === preset);
       setFields(selectedSet?.fields || []);
@@ -634,23 +637,43 @@ const ExportTransactionsCSVModal = ({
                 )}
               </div>
             </div>
-            {parseToBoolean(getEnvVar('LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES')) && (
+            <div className="flex flex-col gap-2">
+              <h1 className="font-bold">
+                <FormattedMessage defaultMessage="Export options" id="b7Sq18" />
+              </h1>
               <div className="flex flex-row items-center gap-2">
-                <Switch
-                  checked={flattenTaxesAndPaymentProcessorFees}
-                  onCheckedChange={handleTaxAndPaymentProcessorFeeSwitch}
-                />
+                <Switch checked={!useFieldNames} onCheckedChange={checked => setUseFieldNames(!checked)} />
                 <p className="text-sm">
-                  <FormattedMessage defaultMessage="Export taxes and payment processor fees as columns" id="ZNzyMo" />
+                  <FormattedMessage
+                    defaultMessage="Use field IDs as column headers instead of field names."
+                    id="Xq0DWl"
+                  />
                 </p>
                 <InfoTooltipIcon>
                   <FormattedMessage
-                    defaultMessage="Before 2024 payment processor fees and taxes were columns in transaction records. Since January 2024 they are separate transactions. Enable this option to transform separate payment processor fees and tax transactions into columns in the export."
-                    id="frVonU"
+                    defaultMessage="Select this option to export a backward-compatible CSV header using field IDs (effectiveDate, legacyId) instead of field names (Effective Date & Time, Transaction ID)."
+                    id="ArRZh5"
                   />
                 </InfoTooltipIcon>
               </div>
-            )}
+              {parseToBoolean(getEnvVar('LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES')) && (
+                <div className="flex flex-row items-center gap-2">
+                  <Switch
+                    checked={flattenTaxesAndPaymentProcessorFees}
+                    onCheckedChange={handleTaxAndPaymentProcessorFeeSwitch}
+                  />
+                  <p className="text-sm">
+                    <FormattedMessage defaultMessage="Export taxes and payment processor fees as columns" id="ZNzyMo" />
+                  </p>
+                  <InfoTooltipIcon>
+                    <FormattedMessage
+                      defaultMessage="Before 2024 payment processor fees and taxes were columns in transaction records. Since January 2024 they are separate transactions. Enable this option to transform separate payment processor fees and tax transactions into columns in the export."
+                      id="frVonU"
+                    />
+                  </InfoTooltipIcon>
+                </div>
+              )}
+            </div>
             {isAboveRowLimit && (
               <div className="flex flex-col gap-4 rounded-lg border border-solid border-red-600 bg-red-50 px-6 py-4">
                 <p className="font-bold">
