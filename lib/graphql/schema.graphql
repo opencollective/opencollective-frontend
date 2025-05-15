@@ -4658,6 +4658,11 @@ type Mutation {
     If true, a signIn link will be sent to the user
     """
     sendSignInLink: Boolean = true
+
+    """
+    Captcha verification data
+    """
+    captcha: CaptchaInputType
   ): CreateUserResult
 
   """
@@ -5007,6 +5012,21 @@ input UserInputType {
 }
 
 scalar Email
+
+"""
+Input type for captcha verification
+"""
+input CaptchaInputType {
+  """
+  The captcha token to verify
+  """
+  token: String!
+
+  """
+  The captcha provider (HCAPTCHA, RECAPTCHA, or TURNSTILE)
+  """
+  provider: String!
+}
 
 """
 Input type for ConnectedAccountInputType
