@@ -125,7 +125,11 @@ const EditPaidBy = ({ expense, handleClose }) => {
   };
 
   return (
-    <FormikZod schema={schema} initialValues={initialValues} onSubmit={values => onSubmit(schema.parse(values))}>
+    <FormikZod<z.infer<typeof schema>>
+      schema={schema}
+      initialValues={initialValues}
+      onSubmit={values => onSubmit(schema.parse(values))}
+    >
       {({ setFieldValue, values }) => {
         // Check if the selected account is the same as the current expense account
         const isSameAccount = values.destinationAccount?.id === expense.account.id;
@@ -527,7 +531,7 @@ const EditExpenseTitle = ({ expense, onSubmit }) => {
   });
 
   return (
-    <FormikZod schema={schema} initialValues={expense} onSubmit={values => onSubmit(schema.parse(values))}>
+    <FormikZod schema={schema as any} initialValues={expense} onSubmit={values => onSubmit(schema.parse(values))}>
       <Form className="space-y-4">
         <FormField name="description" label="Title" />
         <EditExpenseActionButtons />
