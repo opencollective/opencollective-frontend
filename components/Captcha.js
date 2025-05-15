@@ -36,7 +36,7 @@ const ReCaptcha = ({ onVerify, onError, ...props }) => {
     try {
       const token = await verify();
       if (token) {
-        onVerify({ token });
+        onVerify({ token, provider: PROVIDERS.RECAPTCHA });
         setVerified(true);
       }
     } catch (e) {
@@ -92,12 +92,13 @@ const Captcha = React.forwardRef(({ onVerify, provider = CAPTCHA_PROVIDER, ...pr
   }
 
   let captcha = null;
+
   if (provider === PROVIDERS.HCAPTCHA && HCAPTCHA_SITEKEY) {
     captcha = (
       <HCaptcha
         ref={captchaRef}
         sitekey={HCAPTCHA_SITEKEY}
-        onVerify={token => handleVerify({ token })}
+        onVerify={token => handleVerify({ provider, token })}
         onError={handleError}
       />
     );
@@ -107,7 +108,7 @@ const Captcha = React.forwardRef(({ onVerify, provider = CAPTCHA_PROVIDER, ...pr
     captcha = (
       <Turnstile
         sitekey={TURNSTILE_SITE_KEY}
-        onVerify={token => handleVerify({ token })}
+        onVerify={token => handleVerify({ provider, token })}
         onError={handleError}
         theme="light"
         {...props}

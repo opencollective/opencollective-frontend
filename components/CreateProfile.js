@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { compact, isEmpty, pick, values } from 'lodash';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import Captcha, { isCaptchaEnabled } from './Captcha';
 import Container from './Container';
 import { Box, Flex } from './Grid';
 import { getI18nLink, WebsiteName } from './I18nFormatters';
@@ -184,6 +185,7 @@ const CreateProfile = ({
   ...props
 }) => {
   const { formatMessage } = useIntl();
+  const [captchaResult, setCaptchaResult] = React.useState(null);
   const { getFieldError, getFieldProps, state } = useForm({
     onEmailChange,
     onFieldChange,
@@ -235,7 +237,16 @@ const CreateProfile = ({
         onSubmit={event => {
           event.preventDefault();
           const data = pick(state, ['name', 'newsletterOptIn', 'tosOptIn']);
-          onSubmit({ ...data, email });
+          onSubmit({
+            ...data,
+            email,
+            captcha: !captchaResult
+              ? undefined
+              : {
+                  token: captchaResult.token,
+                  provider: captchaResult.provider,
+                },
+          });
         }}
         method="POST"
       >
@@ -310,6 +321,9 @@ const CreateProfile = ({
             <Box mt="17px">
               <NewsletterCheckBox checked={state.newsletterOptIn} {...getFieldProps('newsletterOptIn')} />
             </Box>
+            <Box mt="24px">
+              <Captcha onVerify={setCaptchaResult} />
+            </Box>
           </Box>
         </StyledCard>
         <MessageBox type="info" mt="24px">
@@ -360,7 +374,7 @@ const CreateProfile = ({
           <StyledButton
             mt="24px"
             buttonStyle="primary"
-            disabled={!email || !state.name || !isValid || !state.tosOptIn}
+            disabled={!email || !state.name || !isValid || !state.tosOptIn || (!captchaResult && isCaptchaEnabled())}
             width="234px"
             type="submit"
             fontWeight="500"
