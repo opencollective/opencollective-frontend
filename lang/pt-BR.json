@@ -401,7 +401,7 @@
   "addFunds.selectCollective": "Selecione uma conta para adicionar fundos a:",
   "AddFundsModal.accountingCategory": "Accounting category",
   "AddFundsModal.disclaimer": "Ao clicar em 'Adicionar fundos', você concorda em reservar {amount} em sua conta bancária em nome do coletivo.",
-  "AddFundsModal.editDisclaimer": "For funds added in the previous 24 hours, you'll be editing the original transactions, and no trace of this operation will be left. If this transaction was already consolidated somewhere outside the platform, make sure those records are also updated. Otherwise, by clicking edit funds, you're reverting the existing related transactions (including any fees incurred by them) and creating new ones.",
+  "AddFundsModal.editDisclaimer": "By clicking edit funds, you're reverting the existing related transactions (including any fees incurred by them) and creating new ones.",
   "AddFundsModal.ForThePurpose": "Com o seguinte propósito",
   "AddFundsModal.FromTheSource": "Da origem",
   "AddFundsModal.fundingAmount": "Valor da contribuição",

@@ -401,7 +401,7 @@
   "addFunds.selectCollective": "Vyberte účet, na ktorý chcete pridať finančné prostriedky:",
   "AddFundsModal.accountingCategory": "Účtovná kategória",
   "AddFundsModal.disclaimer": "Kliknutím na tlačidlo Pridať prostriedky súhlasíte s tým, že na svojom bankovom účte vyčleníte čiastku {amount} v mene tohto kolektívu.",
-  "AddFundsModal.editDisclaimer": "For funds added in the previous 24 hours, you'll be editing the original transactions, and no trace of this operation will be left. If this transaction was already consolidated somewhere outside the platform, make sure those records are also updated. Otherwise, by clicking edit funds, you're reverting the existing related transactions (including any fees incurred by them) and creating new ones.",
+  "AddFundsModal.editDisclaimer": "By clicking edit funds, you're reverting the existing related transactions (including any fees incurred by them) and creating new ones.",
   "AddFundsModal.ForThePurpose": "Za účelom",
   "AddFundsModal.FromTheSource": "Zo zdroja",
   "AddFundsModal.fundingAmount": "Financovaná čiastka",
