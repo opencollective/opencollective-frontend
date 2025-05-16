@@ -108,7 +108,6 @@ const EditPaidBy = ({ expense, handleClose }) => {
           ),
         });
       } catch (err) {
-        // track(AnalyticsEvent.EXPENSE_SUBMISSION_SUBMITTED_ERROR);
         toast({ variant: 'error', message: i18nGraphqlException(intl, err) });
       }
     },
