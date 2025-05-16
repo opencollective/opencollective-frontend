@@ -136,7 +136,22 @@ const ExpenseSummaryAdditionalInformation = ({
     >
       {collective && (
         <PrivateInfoColumn data-cy="expense-summary-collective">
-          <PrivateInfoColumnHeader>{formatCollectiveType(intl, collective.type)}</PrivateInfoColumnHeader>
+          <div className="flex justify-between gap-2">
+            <PrivateInfoColumnHeader>{formatCollectiveType(intl, collective.type)}</PrivateInfoColumnHeader>
+
+            {useInlineExpenseEdit && expense.permissions?.canEditPaidBy && (
+              <EditExpenseDialog
+                field={'paidBy'}
+                expense={expense}
+                title={intl.formatMessage({ defaultMessage: 'Edit paid by', id: 'expense.editPaidBy' })}
+                description={intl.formatMessage({
+                  defaultMessage: 'You can move the expense within the Collective',
+                  id: 'expense.editPaidBy.description',
+                })}
+                dialogContentClassName="sm:max-w-xl"
+              />
+            )}
+          </div>
           <AccountHoverCard
             account={collective}
             trigger={
@@ -409,6 +424,9 @@ ExpenseSummaryAdditionalInformation.propTypes = {
       id: PropTypes.string,
       name: PropTypes.string,
       last4: PropTypes.string,
+    }),
+    permissions: PropTypes.shape({
+      canEditPaidBy: PropTypes.boolean,
     }),
   }),
   collective: PropTypes.shape({

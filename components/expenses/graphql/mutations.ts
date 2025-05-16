@@ -30,3 +30,14 @@ export const editExpenseCategoryMutation = gql`
   ${accountingCategoryFields}
   ${expenseValuesByRoleFragment}
 `;
+
+export const moveExpenseMutation = gql`
+  mutation MoveExpense($expense: ExpenseReferenceInput!, $destinationAccount: AccountReferenceInput!) {
+    moveExpense(expense: $expense, destinationAccount: $destinationAccount) {
+      id
+      ...ExpensePageExpenseFields
+    }
+  }
+
+  ${expensePageExpenseFieldsFragment}
+`;

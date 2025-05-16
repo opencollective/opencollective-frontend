@@ -4889,8 +4889,11 @@ export type ExpenseParsedFileInfo = {
 export type ExpensePermissions = {
   __typename?: 'ExpensePermissions';
   approve: Permission;
+  attachReceipts: Permission;
   /** Whether the current user can approve this expense */
   canApprove: Scalars['Boolean']['output'];
+  /** Whether the current user can attach receipts */
+  canAttachReceipts: Scalars['Boolean']['output'];
   /** Whether the current user can comment and see comments for this expense */
   canComment: Scalars['Boolean']['output'];
   /** Whether the user or the given draft key is allowed decline the expense invite */
@@ -4902,8 +4905,22 @@ export type ExpensePermissions = {
   canEdit: Scalars['Boolean']['output'];
   /** Whether the current user can edit the expense accounting category */
   canEditAccountingCategory: Scalars['Boolean']['output'];
+  /** Whether the current user can edit the expense item descriptions */
+  canEditItemDescription: Scalars['Boolean']['output'];
+  /** Whether the current user can edit the expense items and attachments */
+  canEditItems: Scalars['Boolean']['output'];
+  /** Whether the current user can edit the paid by account */
+  canEditPaidBy: Scalars['Boolean']['output'];
+  /** Whether the current user can edit the payee */
+  canEditPayee: Scalars['Boolean']['output'];
+  /** Whether the current user can edit the payout method */
+  canEditPayoutMethod: Scalars['Boolean']['output'];
   /** Tags permissions are a bit different, and can be edited by admins even if the expense has already been paid */
   canEditTags: Scalars['Boolean']['output'];
+  /** Whether the current user can edit the expense title */
+  canEditTitle: Scalars['Boolean']['output'];
+  /** Whether the current user can edit the expense type */
+  canEditType: Scalars['Boolean']['output'];
   canHold: Scalars['Boolean']['output'];
   /** Whether the current user can mark this expense as incomplete */
   canMarkAsIncomplete: Scalars['Boolean']['output'];
@@ -4933,7 +4950,14 @@ export type ExpensePermissions = {
   edit: Permission;
   /** Whether the current user can edit the expense accounting category */
   editAccountingCategory: Scalars['Boolean']['output'];
+  editItemDescription: Permission;
+  editItems: Permission;
+  editPaidBy: Permission;
+  editPayee: Permission;
+  editPayoutMethod: Permission;
   editTags: Permission;
+  editTitle: Permission;
+  editType: Permission;
   hold: Permission;
   id: Scalars['String']['output'];
   markAsSpam: Permission;
@@ -7673,6 +7697,8 @@ export type Mutation = {
   inviteMember: MemberInvitation;
   /** [Root only] Merge two accounts, returns the result account */
   mergeAccounts: MergeAccountsResponse;
+  /** Moves an expense from one account within a Collective to another */
+  moveExpense: Expense;
   /** [Root only] A mutation to move expenses from one account to another */
   moveExpenses: Array<Maybe<Expense>>;
   /** [Root only] A mutation to move orders from one account to another */
@@ -8439,6 +8465,13 @@ export type MutationMergeAccountsArgs = {
   dryRun?: Scalars['Boolean']['input'];
   fromAccount: AccountReferenceInput;
   toAccount: AccountReferenceInput;
+};
+
+
+/** This is the root mutation */
+export type MutationMoveExpenseArgs = {
+  destinationAccount: AccountReferenceInput;
+  expense: ExpenseReferenceInput;
 };
 
 
