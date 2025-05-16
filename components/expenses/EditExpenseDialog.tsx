@@ -114,7 +114,7 @@ const EditPaidBy = ({ expense, handleClose }) => {
     },
     [moveExpense, handleClose, intl, expense.id],
   );
-  const isLoading = loading || loadingMutation;
+  const isLoading = loading || submitting;
 
   const initialValues = {
     destinationAccount: {
@@ -148,7 +148,7 @@ const EditPaidBy = ({ expense, handleClose }) => {
                 />
               )}
             </FormField>
-            <EditExpenseActionButtons disabled={isSameAccount || loadingMutation} loading={isLoading} />
+            <EditExpenseActionButtons disabled={isSameAccount || isLoading} loading={submitting} />
           </Form>
         );
       }}
