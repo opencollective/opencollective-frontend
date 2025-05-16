@@ -72,11 +72,11 @@ const nextConfig = {
         OC_APPLICATION: null,
         HEROKU_SLUG_COMMIT: null,
         LEDGER_SEPARATE_TAXES_AND_PAYMENT_PROCESSOR_FEES: false,
+        DISABLE_CONTACT_FORM: false,
       }),
     );
 
     if (['ci', 'test', 'development'].includes(process.env.OC_ENV)) {
-      // eslint-disable-next-line n/no-unpublished-require
       const CircularDependencyPlugin = require('circular-dependency-plugin');
       config.plugins.push(
         new CircularDependencyPlugin({
@@ -320,7 +320,6 @@ let exportedConfig = withSentryConfig(
 );
 
 if (process.env.ANALYZE) {
-  // eslint-disable-next-line n/no-unpublished-require
   const withBundleAnalyzer = require('@next/bundle-analyzer')({
     enabled: true,
   });
