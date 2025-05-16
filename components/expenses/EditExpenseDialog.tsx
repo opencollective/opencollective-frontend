@@ -531,7 +531,7 @@ const EditExpenseTitle = ({ expense, onSubmit }) => {
   });
 
   return (
-    <FormikZod schema={schema as any} initialValues={expense} onSubmit={values => onSubmit(schema.parse(values))}>
+    <FormikZod schema={schema} initialValues={expense} onSubmit={values => onSubmit(schema.parse(values))}>
       <Form className="space-y-4">
         <FormField name="description" label="Title" />
         <EditExpenseActionButtons />
