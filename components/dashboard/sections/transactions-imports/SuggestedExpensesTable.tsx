@@ -9,7 +9,6 @@ import DateTime from '../../../DateTime';
 import ExpenseStatusTag from '../../../expenses/ExpenseStatusTag';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { DataTable } from '../../../table/DataTable';
-import { Badge } from '../../../ui/Badge';
 import { Button } from '../../../ui/Button';
 import { RadioGroup, RadioGroupItem } from '../../../ui/RadioGroup';
 import { EmptyResults } from '../../EmptyResults';
@@ -41,7 +40,7 @@ export const SuggestedExpensesTable = ({
         getRowClassName={({ original }) =>
           selectedExpense?.id === original.id
             ? 'bg-blue-50 font-semibold shadow-inner shadow-blue-100 border-l-2! border-l-blue-500'
-            : ''
+            : 'border-l-2! border-l-transparent'
         }
         emptyMessage={() => (
           <EmptyResults
@@ -67,13 +66,16 @@ export const SuggestedExpensesTable = ({
             id: 'id',
             header: () => <FormattedMessage id="Fields.id" defaultMessage="ID" />,
             accessorKey: 'legacyId',
-            cell: ({ cell }) => <Badge size="xs">#{cell.getValue() as number}</Badge>,
+            cell: ({ cell }) => `#${cell.getValue() as number}`,
           },
           {
-            id: 'description',
-            header: () => <FormattedMessage id="Fields.description" defaultMessage="Description" />,
-            accessorKey: 'description',
-            cell: ({ cell }) => <div className="flex items-center gap-1">{cell.getValue() as string}</div>,
+            id: 'date',
+            header: () => <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />,
+            accessorKey: 'incurredAt',
+            cell: ({ cell }) => {
+              const date = cell.getValue() as string;
+              return <DateTime value={new Date(date)} dateStyle="medium" />;
+            },
           },
           {
             id: 'amount',
@@ -87,18 +89,17 @@ export const SuggestedExpensesTable = ({
             },
           },
           {
-            id: 'status',
-            accessorKey: 'status',
-            header: () => <FormattedMessage defaultMessage="Status" id="Fields.status" />,
-            cell: ({ cell }) => <ExpenseStatusTag status={cell.getValue() as string} />,
-          },
-          {
-            id: 'date',
-            header: () => <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />,
-            accessorKey: 'createdAt',
+            id: 'account',
+            header: () => <FormattedMessage defaultMessage="Account" id="TwyMau" />,
+            accessorKey: 'account',
             cell: ({ cell }) => {
-              const date = cell.getValue() as string;
-              return <DateTime value={new Date(date)} timeStyle="short" />;
+              const account = cell.getValue() as Account;
+              return (
+                <div className="flex items-center gap-1">
+                  <Avatar account={account} size={24} />
+                  {account.name}
+                </div>
+              );
             },
           },
           {
@@ -116,18 +117,16 @@ export const SuggestedExpensesTable = ({
             },
           },
           {
-            id: 'account',
-            header: () => <FormattedMessage defaultMessage="Account" id="TwyMau" />,
-            accessorKey: 'account',
-            cell: ({ cell }) => {
-              const account = cell.getValue() as Account;
-              return (
-                <div className="flex items-center gap-1">
-                  <Avatar account={account} size={24} />
-                  {account.name}
-                </div>
-              );
-            },
+            id: 'description',
+            header: () => <FormattedMessage id="Fields.description" defaultMessage="Description" />,
+            accessorKey: 'description',
+            cell: ({ cell }) => <div className="flex items-center gap-1">{cell.getValue() as string}</div>,
+          },
+          {
+            id: 'status',
+            accessorKey: 'status',
+            header: () => <FormattedMessage defaultMessage="Status" id="Fields.status" />,
+            cell: ({ cell }) => <ExpenseStatusTag status={cell.getValue() as string} />,
           },
         ]}
         footer={

@@ -126,6 +126,7 @@ const suggestExpenseMatchQuery = gql`
         status
         description
         createdAt
+        incurredAt
         payoutMethod {
           id
           type
