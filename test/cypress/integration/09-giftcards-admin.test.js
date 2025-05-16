@@ -21,7 +21,8 @@ describe('Gift cards admin', () => {
     cy.login({ redirect: `/dashboard/${collectiveSlug}/gift-cards-create` });
 
     // Fill form
-    cy.get('#giftcard-amount').type('42');
+    cy.get('#giftcard-amount').should('have.value', '​5.00'); // Prefixed with a zero-width space, see https://github.com/cchanxzy/react-currency-input-field/issues/222
+    cy.get('#giftcard-amount').type('{selectall}542.13');
     cy.get('.deliver-type-selector label[data-name="manual"] .radio-btn').click();
     cy.get('#giftcard-numberOfGiftCards').type(`{selectall}${numberOfGiftCards}`);
     cy.getByDataCy('checkbox-accept-payment-method-warning').click();
@@ -41,7 +42,7 @@ describe('Gift cards admin', () => {
     // Mock date to make sure we have the same filename
     cy.getByDataCy('download-gift-cards-btn').click();
     const filename = `${collectiveSlug}-giftcards.pdf`;
-    cy.getDownloadedPDFContent(filename).should('contain', '$542.00 Gift Card from TestOrg');
+    cy.getDownloadedPDFContent(filename).should('contain', '$542.13 Gift Card from TestOrg');
 
     // Links should also be added to gift cards list
     cy.getByDataCy('back-to-giftcards-list').click();

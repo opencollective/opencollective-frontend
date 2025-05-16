@@ -181,9 +181,9 @@ describe('Expense flow', () => {
 
       // Check date, amount
       cy.get('input[name="items[0].incurredAt"]').should('have.value', '2023-08-01');
-      cy.get('input[name="items[0].amountV2"]').should('have.value', '65');
+      cy.get('input[name="items[0].amountV2"]').should('have.value', '​65.00');
       cy.get('input[name="items[1].incurredAt"]').should('have.value', '2023-08-01');
-      cy.get('input[name="items[1].amountV2"]').should('have.value', '65');
+      cy.get('input[name="items[1].amountV2"]').should('have.value', '​65.00');
 
       // Set descriptions
       cy.get('input[name="items[0].description"]').type('A custom description');
@@ -208,7 +208,7 @@ describe('Expense flow', () => {
 
       // Values should not be overriden
       cy.get('input[name="items[2].description"]').should('have.value', 'A third item');
-      cy.get('input[name="items[2].amountV2"]').should('have.value', '100.00');
+      cy.get('input[name="items[2].amountV2"]').should('have.value', '​100');
       cy.get('input[name="items[2].incurredAt"]').should('have.value', '2021-01-01');
 
       // Check mismatch warnings
@@ -260,9 +260,9 @@ describe('Expense flow', () => {
       cy.get('input[name="items[0].description"]').type('A custom description');
       cy.get('input[name="items[0].incurredAt"]').should('have.value', '2023-08-01');
       cy.getByDataCy('items[0].amountV2-amount-currency-picker').should('contain', 'USD');
-      cy.get('input[name="items[0].amountV2"]').should('have.value', '65');
+      cy.get('input[name="items[0].amountV2"]').should('have.value', '​65.00');
       cy.getByDataCy('items[0].amountV2-amount-converted').should('contain', '= EUR 🇪🇺');
-      cy.get('input[name="items[0].amountV2-amount-converted-input"]').should('have.value', '71.50');
+      cy.get('input[name="items[0].amountV2-amount-converted-input"]').should('have.value', '​71.50');
       cy.getByDataCy('items[0].amountV2-exchange-rate').should('contain', '1 USD = ~1.1 EUR');
       cy.getByDataCy('items[0].amountV2-exchange-rate').realHover();
       cy.getByDataCy('items[0].amountV2-exchange-rate-tooltip')
@@ -275,10 +275,10 @@ describe('Expense flow', () => {
       cy.getByDataCy('items[0].amountV2-exchange-rate-tooltip').should('not.exist');
       cy.get('input[name="items[0].amountV2-amount-converted-input"]').type('{selectall}{backspace}');
       cy.get('input[name="items[0].amountV2-amount-converted-input"]').type('{selectall}100').blur();
-      cy.get('input[name="items[0].amountV2-amount-converted-input"]').should('have.value', '100.00');
+      cy.get('input[name="items[0].amountV2-amount-converted-input"]').should('have.value', '​100');
       cy.get('input[name="items[0].amountV2-amount-converted-input"]').should('have.attr', 'min', '64.35');
       cy.get('input[name="items[0].amountV2-amount-converted-input"]').should('have.attr', 'max', '78.65');
-      cy.get('input[name="items[0].amountV2"]').should('have.value', '65'); // This one doesn't change
+      cy.get('input[name="items[0].amountV2"]').should('have.value', '​65.00'); // This one doesn't change
       cy.getByDataCy('items[0].amountV2-exchange-rate').should('contain', '1 USD = 1.5384615 EUR');
       cy.getByDataCy('items[0].amountV2-exchange-rate').realHover();
       cy.getByDataCy('items[0].amountV2-exchange-rate-tooltip')
@@ -293,8 +293,8 @@ describe('Expense flow', () => {
       cy.get('input[name="items[0].amountV2-amount-converted-input"]').click();
       cy.getByDataCy('items[0].amountV2-exchange-rate-tooltip').should('not.exist');
       cy.get('input[name="items[0].amountV2-amount-converted-input"]').type('{selectall}64.88').blur();
-      cy.get('input[name="items[0].amountV2"]').should('have.value', '65'); // This one doesn't change
-      cy.get('input[name="items[0].amountV2-amount-converted-input"]').should('have.value', '64.88');
+      cy.get('input[name="items[0].amountV2"]').should('have.value', '​65.00'); // This one doesn't change
+      cy.get('input[name="items[0].amountV2-amount-converted-input"]').should('have.value', '​64.88');
       cy.get('input[name="items[0].amountV2-amount-converted-input"]').should('have.attr', 'min', '64.35');
       cy.get('input[name="items[0].amountV2-amount-converted-input"]').should('have.attr', 'max', '78.65');
       cy.getByDataCy('items[0].amountV2-exchange-rate').should('contain', '1 USD = 0.9981539 EUR');
@@ -315,7 +315,7 @@ describe('Expense flow', () => {
         action: 'drag-drop',
       });
       cy.getByDataCy('items[1].amountV2-amount-currency-picker').should('contain', 'EUR'); // Amount/currency shouldn't change
-      cy.get('input[name="items[1].amountV2"]').should('have.value', '100.00');
+      cy.get('input[name="items[1].amountV2"]').should('have.value', '​100.00');
       cy.get('[data-cy="mismatch-warning"]').should('have.length', 1); // But there should be warning about mismatch
       cy.get('[data-cy="mismatch-warning"] button').realHover();
       cy.get('[data-cy="mismatch-warning-tooltip"]').should(
@@ -333,7 +333,7 @@ describe('Expense flow', () => {
       // Go back to EUR and make sure all amounts are correct
       cy.getByDataCy('items[1].amountV2-amount-currency-picker').click();
       cy.contains('[data-cy="select-option"]', 'Euro').click();
-      cy.get('input[name="items[1].amountV2"]').should('have.value', '100.00');
+      cy.get('input[name="items[1].amountV2"]').should('have.value', '​100.00');
       cy.getByDataCy('expense-items-total-amount').should('contain', '€164.88');
 
       // Submit!
