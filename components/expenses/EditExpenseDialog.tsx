@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { DialogClose } from '@radix-ui/react-dialog';
 import { Form, FormikProvider, useFormikContext } from 'formik';
 import { pick } from 'lodash';
@@ -11,8 +11,11 @@ import { i18nGraphqlException } from '../../lib/errors';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
 import { type Currency, type CurrencyExchangeRateInput, PayoutMethodType } from '../../lib/graphql/types/v2/graphql';
 import { cn } from '../../lib/utils';
+import { getAccountReferenceInput } from '@/lib/collective';
 import type { Expense } from '@/lib/graphql/types/v2/schema';
 
+import CollectivePicker from '../CollectivePicker';
+import { accountsQuery } from '../dashboard/sections/accounts/queries';
 import { FormField } from '../FormField';
 import { FormikZod } from '../FormikZod';
 import { AdditionalAttachments, ExpenseItemsForm } from '../submit-expense/form/ExpenseItemsSection';
@@ -35,9 +38,9 @@ import { Label } from '../ui/Label';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 import { toast } from '../ui/useToast';
 
-import { editExpenseMutation } from './graphql/mutations';
+import { editExpenseMutation, moveExpenseMutation } from './graphql/mutations';
 
-const RenderFormFields = ({ field, onSubmit, expense }) => {
+const RenderFormFields = ({ field, onSubmit, expense, handleClose }) => {
   switch (field) {
     case 'title':
       return <EditExpenseTitle onSubmit={onSubmit} expense={expense} />;
@@ -51,8 +54,107 @@ const RenderFormFields = ({ field, onSubmit, expense }) => {
       return <EditAttachments onSubmit={onSubmit} expense={expense} />;
     case 'invoiceFile':
       return <EditInvoiceFile onSubmit={onSubmit} expense={expense} />;
+    case 'paidBy':
+      return <EditPaidBy expense={expense} handleClose={handleClose} />;
   }
 };
+
+const EditPaidBy = ({ expense, handleClose }) => {
+  const schema = z.object({
+    destinationAccount: z.object({
+      id: z.string().optional(),
+      slug: z.string().optional(),
+      name: z.string().optional(),
+    }),
+  });
+
+  const { data, loading } = useQuery(accountsQuery, {
+    variables: {
+      accountSlug: expense.account.parent?.slug ?? expense.account.slug,
+      limit: 100, // TODO: This is the max limit of childrenAccounts, when refactoring the Collective Picker Async to work with GQL v2, this limitation can be worked around
+    },
+    context: API_V2_CONTEXT,
+  });
+
+  const activeAccounts = React.useMemo(
+    () =>
+      data?.account ? [data?.account, ...(data?.account?.childrenAccounts?.nodes.filter(a => a.isActive) || [])] : [],
+    [data?.account],
+  );
+
+  const intl = useIntl();
+  const [moveExpense, { loading: submitting }] = useMutation(moveExpenseMutation, {
+    context: API_V2_CONTEXT,
+  });
+
+  const onSubmit = React.useCallback(
+    async values => {
+      try {
+        const { data } = await moveExpense({
+          variables: {
+            expense: { id: expense.id },
+            destinationAccount: getAccountReferenceInput(values.destinationAccount),
+          },
+        });
+        handleClose();
+        toast({
+          variant: 'success',
+          message: (
+            <FormattedMessage
+              defaultMessage="Expense moved to {accountName}"
+              id="v+/yA3"
+              values={{ accountName: data.moveExpense.account.name }}
+            />
+          ),
+        });
+      } catch (err) {
+        toast({ variant: 'error', message: i18nGraphqlException(intl, err) });
+      }
+    },
+    [moveExpense, handleClose, intl, expense.id],
+  );
+  const isLoading = loading || submitting;
+
+  const initialValues = {
+    destinationAccount: {
+      id: expense.account.id,
+      name: expense.account.name,
+      slug: expense.account.slug,
+    },
+  };
+
+  return (
+    <FormikZod<z.infer<typeof schema>>
+      schema={schema}
+      initialValues={initialValues}
+      onSubmit={values => onSubmit(schema.parse(values))}
+    >
+      {({ setFieldValue, values }) => {
+        // Check if the selected account is the same as the current expense account
+        const isSameAccount = values.destinationAccount?.id === expense.account.id;
+
+        return (
+          <Form className="space-y-4">
+            <FormField name="destinationAccount">
+              {({ field }) => (
+                <CollectivePicker
+                  inputId={field.id}
+                  collective={field.value}
+                  collectives={activeAccounts}
+                  onChange={({ value }) => {
+                    setFieldValue('destinationAccount', value);
+                  }}
+                />
+              )}
+            </FormField>
+            <EditExpenseActionButtons disabled={isSameAccount || isLoading} loading={submitting} />
+          </Form>
+        );
+      }}
+    </FormikZod>
+  );
+};
+
 const EditPayee = ({ expense, onSubmit }) => {
   const formRef = React.useRef<HTMLFormElement>();
   const startOptions = React.useRef({
@@ -473,7 +575,7 @@ export default function EditExpenseDialog({
   goToLegacyEdit,
 }: {
   expense: Expense;
-  field: 'title' | 'expenseItems' | 'payoutMethod' | 'payee' | 'type' | 'attachments' | 'invoiceFile';
+  field: 'title' | 'expenseItems' | 'payoutMethod' | 'payee' | 'paidBy' | 'type' | 'attachments' | 'invoiceFile';
   title: string;
   description?: string;
   dialogContentClassName?: string;
@@ -485,6 +587,8 @@ export default function EditExpenseDialog({
   const [editExpense] = useMutation(editExpenseMutation, {
     context: API_V2_CONTEXT,
   });
+
+  const handleClose = () => setOpen(false);
 
   const onSubmit = React.useCallback(
     async values => {
@@ -539,7 +643,7 @@ export default function EditExpenseDialog({
             <FormattedMessage defaultMessage="Go to edit" id="expense.goToEdit" />
           </Button>
         ) : (
-          <RenderFormFields expense={expense} field={field} onSubmit={onSubmit} />
+          <RenderFormFields expense={expense} field={field} onSubmit={onSubmit} handleClose={handleClose} />
         )}
       </DialogContent>
     </Dialog>
