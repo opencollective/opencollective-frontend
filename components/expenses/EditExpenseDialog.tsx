@@ -83,7 +83,7 @@ const EditPaidBy = ({ expense, handleClose }) => {
   );
 
   const intl = useIntl();
-  const [moveExpense, { loading: loadingMutation }] = useMutation(moveExpenseMutation, {
+  const [moveExpense, { loading: submitting }] = useMutation(moveExpenseMutation, {
     context: API_V2_CONTEXT,
   });
 
