@@ -618,7 +618,7 @@ const CollectiveDetails = ({
                       <FormattedMessage defaultMessage="Show payout method details" id="3P4Al8" />
                     </p>
                     <p className="mt-2 text-slate-700">
-                      {collective?.type === CollectiveType.FUND ? (
+                      {collective.type === CollectiveType.FUND ? (
                         <FormattedMessage
                           defaultMessage="Allow Fund Admins to view sensitive payout method details of payees"
                           id="om2juz"
