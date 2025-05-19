@@ -1,8 +1,8 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
-import { omit, omitBy } from 'lodash';
+import { compact, omit } from 'lodash';
 import { useRouter } from 'next/router';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../lib/filters/filter-types';
@@ -11,16 +11,18 @@ import type {
   AccountHoverCardFieldsFragment,
   HostDashboardExpensesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
+import type { Expense } from '../../../../lib/graphql/types/v2/schema';
 import { ExpenseStatusFilter } from '../../../../lib/graphql/types/v2/schema';
-import { useLazyGraphQLPaginatedResults } from '../../../../lib/hooks/useLazyGraphQLPaginatedResults';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
 import { accountHoverCardFields } from '@/components/AccountHoverCard';
+import ExpenseDrawer from '@/components/expenses/ExpenseDrawer';
+import { DataTable } from '@/components/table/DataTable';
 
-import ExpensesList from '../../../expenses/ExpensesList';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
+import { accountFilter } from '../../filters/AccountFilter';
 import { expenseTagFilter } from '../../filters/ExpenseTagsFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
@@ -34,8 +36,12 @@ import {
 } from '../expenses/filters';
 import { hostDashboardExpensesQuery, hostInfoCardFields } from '../expenses/queries';
 
+import type { GrantsTableMeta } from './common';
+import { grantColumns } from './common';
+
 const filterSchema = commonSchema.extend({
   account: z.string().optional(),
+  fromAccount: accountFilter.schema,
 });
 
 type FilterValues = z.infer<typeof filterSchema>;
@@ -51,31 +57,14 @@ const toVariables: FiltersToVariables<FilterValues, HostDashboardExpensesQueryVa
   ...commonToVariables,
   limit: (value, key) => ({ [key]: value * 2 }), // Times two for the lazy pagination
   account: hostedAccountFilter.toVariables,
+  fromAccount: accountFilter.toVariables,
 };
 
 const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   ...omit(commonFilters, ['type', 'chargeHasReceipts']),
   account: hostedAccountFilter.filter,
   tag: expenseTagFilter.filter,
-};
-
-/**
- * Remove the expense from the query cache if we're filtering by status and the expense status has changed.
- */
-const onExpenseUpdate = ({ updatedExpense, cache, variables, refetchMetaData }) => {
-  refetchMetaData(); // Refetch the metadata to update the view counts
-  if (variables.status && updatedExpense.status !== variables.status) {
-    cache.updateQuery({ query: hostDashboardExpensesQuery, variables }, data => {
-      return {
-        ...data,
-        expenses: {
-          ...data.expenses,
-          totalCount: data.expenses.totalCount - 1,
-          nodes: data.expenses.nodes?.filter(expense => updatedExpense.id !== expense.id),
-        },
-      };
-    });
-  }
+  fromAccount: { ...accountFilter.filter, labelMsg: defineMessage({ defaultMessage: 'From Account', id: 'VVlAZ6' }) },
 };
 
 const ROUTE_PARAMS = ['slug', 'section'];
@@ -83,10 +72,9 @@ const ROUTE_PARAMS = ['slug', 'section'];
 export function HostedGrants({ accountSlug: hostSlug }: DashboardSectionProps) {
   const router = useRouter();
   const intl = useIntl();
-  const query = router.query;
   const pageRoute = `/dashboard/${hostSlug}/hosted-grants`;
 
-  const { data: metaData, refetch: refetchMetaData } = useQuery(
+  const { data: metaData } = useQuery(
     gql`
       query HostedGrantsMetadata($hostSlug: String!) {
         host(slug: $hostSlug) {
@@ -191,13 +179,38 @@ export function HostedGrants({ accountSlug: hostSlug }: DashboardSectionProps) {
     context: API_V2_CONTEXT,
   });
 
-  const paginatedExpenses = useLazyGraphQLPaginatedResults(expenses, 'expenses');
-
   const { data, error, loading } = expenses;
 
-  const getQueryParams = newParams => {
-    return omitBy({ ...query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
-  };
+  const onViewDetailsClick = React.useCallback(
+    (grant: Expense) => {
+      router.push(
+        {
+          pathname: pageRoute,
+          query: { ...omit(router.query, ROUTE_PARAMS), openGrantId: grant?.legacyId },
+        },
+        undefined,
+        { shallow: true },
+      );
+    },
+    [pageRoute, router],
+  );
+
+  const onClickRow = React.useCallback(
+    (row: { original: Expense }) => {
+      onViewDetailsClick(row.original);
+    },
+    [onViewDetailsClick],
+  );
+
+  const onCloseDetails = React.useCallback(() => {
+    onViewDetailsClick(null);
+  }, [onViewDetailsClick]);
+
+  const openGrantId = router.query.openGrantId ? Number(router.query.openGrantId) : null;
+  const openGrant = React.useMemo(
+    () => data?.expenses?.nodes?.find(e => e.legacyId === openGrantId),
+    [openGrantId, data?.expenses?.nodes],
+  );
 
   return (
     <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
@@ -205,41 +218,42 @@ export function HostedGrants({ accountSlug: hostSlug }: DashboardSectionProps) {
 
       <Filterbar {...queryFilter} />
 
-      {error ? (
-        <MessageBoxGraphqlError error={error} />
-      ) : !loading && !data.expenses?.nodes.length ? (
+      {error && <MessageBoxGraphqlError error={error} mb={2} />}
+      {!loading && !data.expenses?.nodes.length ? (
         <EmptyResults
-          entityType="EXPENSES"
+          entityType="GRANTS"
           onResetFilters={() => queryFilter.resetFilters({})}
           hasFilters={queryFilter.hasFilters}
         />
       ) : (
         <React.Fragment>
-          <ExpensesList
-            isLoading={loading}
-            host={data?.host}
-            nbPlaceholders={paginatedExpenses.limit}
-            expenses={paginatedExpenses.nodes}
-            view="admin"
-            onProcess={(expense, cache) => {
-              onExpenseUpdate({ updatedExpense: expense, cache, variables, refetchMetaData });
-            }}
-            useDrawer
-            openExpenseLegacyId={Number(router.query.openExpenseId)}
-            setOpenExpenseLegacyId={(legacyId, attachmentUrl) => {
-              router.push(
-                {
-                  pathname: pageRoute,
-                  query: getQueryParams({ ...query, openExpenseId: legacyId, attachmentUrl }),
-                },
-                undefined,
-                { shallow: true },
-              );
-            }}
+          <DataTable
+            data-cy="grants-table"
+            innerClassName="text-muted-foreground"
+            meta={
+              {
+                onViewDetailsClick,
+              } as GrantsTableMeta
+            }
+            columns={compact([
+              grantColumns.account,
+              grantColumns.beneficiary,
+              grantColumns.createdAt,
+              grantColumns.amount,
+              grantColumns.status,
+              grantColumns.actions,
+            ])}
+            data={data?.expenses?.nodes || []}
+            loading={loading}
+            mobileTableView
+            compact
+            onClickRow={onClickRow}
+            getRowDataCy={row => `grant-${row.original.legacyId}`}
           />
           <Pagination queryFilter={queryFilter} total={data?.expenses?.totalCount} />
         </React.Fragment>
       )}
+      <ExpenseDrawer openExpenseLegacyId={openGrantId} handleClose={onCloseDetails} initialExpenseValues={openGrant} />
     </div>
   );
 }

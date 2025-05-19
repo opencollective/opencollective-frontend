@@ -171,35 +171,37 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     {
       if: isIndividual && hasGrantAndFundsReorgEnabled,
       Icon: Receipt,
-      label: intl.formatMessage({ defaultMessage: 'Grants', id: 'Csh2rX' }),
+      label: intl.formatMessage({ defaultMessage: 'Grant Requests', id: 'fng2Fr' }),
       section: ALL_SECTIONS.SUBMITTED_GRANTS,
     },
     {
       if: !isIndividual && hasGrantAndFundsReorgEnabled,
       type: 'group',
       Icon: Receipt,
-      label: isHost
-        ? intl.formatMessage({ defaultMessage: 'Funds & Grants', id: 'cjQcnL' })
-        : intl.formatMessage({ defaultMessage: 'Grants', id: 'Csh2rX' }),
+      label:
+        isHost || isSelfHosted
+          ? intl.formatMessage({ defaultMessage: 'Funds & Grants', id: 'cjQcnL' })
+          : intl.formatMessage({ defaultMessage: 'Grants', id: 'Csh2rX' }),
       subMenu: [
         {
           if: isHost,
           section: ALL_SECTIONS.HOSTED_FUNDS,
         },
         {
-          if: isHost,
+          if: isHost || isSelfHosted,
           section: ALL_SECTIONS.HOSTED_GRANTS,
+          label: intl.formatMessage({ defaultMessage: 'Grant Requests', id: 'fng2Fr' }),
         },
         {
-          section: ALL_SECTIONS.SUBMITTED_GRANTS,
-        },
-        {
-          if: !isIndividual,
+          if: !isIndividual && !(isHost || isSelfHosted),
           section: ALL_SECTIONS.GRANTS,
         },
         {
           if: !isIndividual,
           section: ALL_SECTIONS.APPROVE_GRANT_REQUESTS,
+        },
+        {
+          section: ALL_SECTIONS.SUBMITTED_GRANTS,
         },
       ],
     },

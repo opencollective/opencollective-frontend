@@ -246,13 +246,13 @@ export function HostedFunds({ accountSlug: hostSlug, subpath }: DashboardSection
       {!error && !loading && !hostedAccounts?.nodes.length ? (
         <EmptyResults
           hasFilters={queryFilter.hasFilters}
-          entityType="COLLECTIVES"
+          entityType="FUNDS"
           onResetFilters={() => queryFilter.resetFilters({})}
         />
       ) : (
         <React.Fragment>
           <DataTable
-            data-cy="transactions-table"
+            data-cy="funds-table"
             innerClassName="text-muted-foreground"
             columns={compact([
               {

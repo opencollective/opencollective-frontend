@@ -312,8 +312,8 @@ export const SECTION_LABELS = defineMessages({
     id: 'HostedFunds',
   },
   [ALL_SECTIONS.GRANTS]: {
-    defaultMessage: 'Received Grant Requests',
-    id: 'Ng3IVE',
+    defaultMessage: 'Grant Requests',
+    id: 'fng2Fr',
   },
   [ALL_SECTIONS.HOSTED_GRANTS]: {
     defaultMessage: 'Hosted Grants Requests',

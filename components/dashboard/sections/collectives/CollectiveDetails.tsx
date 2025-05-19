@@ -516,7 +516,11 @@ const CollectiveDetails = ({
   return (
     <div>
       <H4 mb={32}>
-        <FormattedMessage defaultMessage="Collective's overview" id="28uZ0u" />
+        {collective?.type === CollectiveType.FUND ? (
+          <FormattedMessage defaultMessage="Fund's overview" id="IYoPSx" />
+        ) : (
+          <FormattedMessage defaultMessage="Collective's overview" id="28uZ0u" />
+        )}
       </H4>
       {isLoading ? (
         <React.Fragment>
@@ -614,10 +618,17 @@ const CollectiveDetails = ({
                       <FormattedMessage defaultMessage="Show payout method details" id="3P4Al8" />
                     </p>
                     <p className="mt-2 text-slate-700">
-                      <FormattedMessage
-                        defaultMessage="Allow Collective Admins to view sensitive payout method details of payees"
-                        id="N+kkx3"
-                      />
+                      {collective?.type === CollectiveType.FUND ? (
+                        <FormattedMessage
+                          defaultMessage="Allow Fund Admins to view sensitive payout method details of payees"
+                          id="om2juz"
+                        />
+                      ) : (
+                        <FormattedMessage
+                          defaultMessage="Allow Collective Admins to view sensitive payout method details of payees"
+                          id="N+kkx3"
+                        />
+                      )}
                     </p>
                   </div>
                   <AdminsCanSeePayoutMethodsSwitch collective={collective} />

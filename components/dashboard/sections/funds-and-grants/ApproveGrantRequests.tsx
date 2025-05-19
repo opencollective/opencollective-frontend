@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { get, omit } from 'lodash';
+import { compact, get, omit } from 'lodash';
 import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage } from 'react-intl';
 import { z } from 'zod';
@@ -8,10 +8,14 @@ import { z } from 'zod';
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import { type ExpensesPageQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
-import { type Account, ExpenseStatusFilter, ExpenseType } from '../../../../lib/graphql/types/v2/schema';
+import type { Account, Expense } from '../../../../lib/graphql/types/v2/schema';
+import { ExpenseStatusFilter, ExpenseType } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
-import ExpensesList from '../../../expenses/ExpensesList';
+import ExpenseDrawer from '@/components/expenses/ExpenseDrawer';
+import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
+import { DataTable } from '@/components/table/DataTable';
+
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';
 import ComboSelectFilter from '../../filters/ComboSelectFilter';
@@ -27,6 +31,9 @@ import {
   toVariables as commonToVariables,
 } from '../expenses/filters';
 import { accountExpensesMetadataQuery, accountExpensesQuery } from '../expenses/queries';
+
+import type { GrantsTableMeta } from './common';
+import { grantColumns } from './common';
 
 const schema = commonSchema
   .extend({
@@ -85,7 +92,7 @@ const ROUTE_PARAMS = ['slug', 'section', 'subpath'];
 export function ApproveGrantRequests({ accountSlug }: DashboardSectionProps) {
   const router = useRouter();
 
-  const { data: metadata, loading: loadingMetaData } = useQuery(accountExpensesMetadataQuery, {
+  const { data: metadata } = useQuery(accountExpensesMetadataQuery, {
     variables: { accountSlug },
     context: API_V2_CONTEXT,
   });
@@ -110,7 +117,7 @@ export function ApproveGrantRequests({ accountSlug }: DashboardSectionProps) {
     filters: hostSlug ? filters : filtersWithoutHost,
   });
 
-  const { data, loading } = useQuery(accountExpensesQuery, {
+  const { data, loading, error } = useQuery(accountExpensesQuery, {
     variables: {
       account: { slug: accountSlug },
       fetchHostForExpenses: false, // Already fetched at the root level
@@ -124,47 +131,86 @@ export function ApproveGrantRequests({ accountSlug }: DashboardSectionProps) {
 
   const pageRoute = `/dashboard/${accountSlug}/approve-grant-requests`;
 
+  const onViewDetailsClick = React.useCallback(
+    (grant: Expense) => {
+      router.push(
+        {
+          pathname: pageRoute,
+          query: { ...omit(router.query, ROUTE_PARAMS), openGrantId: grant?.legacyId },
+        },
+        undefined,
+        { shallow: true },
+      );
+    },
+    [pageRoute, router],
+  );
+
+  const onClickRow = React.useCallback(
+    (row: { original: Expense }) => {
+      onViewDetailsClick(row.original);
+    },
+    [onViewDetailsClick],
+  );
+
+  const onCloseDetails = React.useCallback(() => {
+    onViewDetailsClick(null);
+  }, [onViewDetailsClick]);
+
+  const openGrantId = router.query.openGrantId ? Number(router.query.openGrantId) : null;
+  const openGrant = React.useMemo(
+    () => data?.expenses?.nodes?.find(e => e.legacyId === openGrantId),
+    [openGrantId, data?.expenses?.nodes],
+  );
+
   return (
     <React.Fragment>
       <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
         <DashboardHeader
           title={<FormattedMessage defaultMessage="Approve Grants Requests" id="nsfRjl" />}
-          description={<FormattedMessage defaultMessage="Review Grants submitted to your account." id="ZGgpSR" />}
+          description={
+            <FormattedMessage defaultMessage="Review Grant Requests submitted to your account." id="0LRjp6" />
+          }
         />
 
         <Filterbar {...queryFilter} />
+        {error && <MessageBoxGraphqlError error={error} mb={2} />}
 
         {!loading && !data.expenses?.nodes.length ? (
           <EmptyResults
-            entityType="EXPENSES"
+            entityType="GRANTS"
             onResetFilters={() => queryFilter.resetFilters({})}
             hasFilters={queryFilter.hasFilters}
           />
         ) : (
           <React.Fragment>
-            <ExpensesList
-              isLoading={loading || loadingMetaData}
-              collective={metadata?.account}
-              host={metadata?.account?.host}
-              expenses={data?.expenses?.nodes}
-              nbPlaceholders={queryFilter.values.limit}
-              useDrawer
-              openExpenseLegacyId={Number(router.query.openExpenseId)}
-              setOpenExpenseLegacyId={legacyId => {
-                router.push(
-                  {
-                    pathname: pageRoute,
-                    query: { ...omit(router.query, ROUTE_PARAMS), openExpenseId: legacyId },
-                  },
-                  undefined,
-                  { shallow: true },
-                );
-              }}
+            <DataTable
+              data-cy="transactions-table"
+              innerClassName="text-muted-foreground"
+              meta={
+                {
+                  enableViewGrantsByBeneficiary: true,
+                  onViewDetailsClick,
+                } as GrantsTableMeta
+              }
+              columns={compact([
+                grantColumns.beneficiary,
+                grantColumns.createdAt,
+                grantColumns.amount,
+                grantColumns.status,
+                grantColumns.actions,
+              ])}
+              data={data?.expenses?.nodes || []}
+              loading={loading}
+              mobileTableView
+              compact
+              onClickRow={onClickRow}
+              getRowDataCy={row => `grant-${row.original.legacyId}`}
             />
             <Pagination queryFilter={queryFilter} total={data?.expenses?.totalCount} />
           </React.Fragment>
         )}
       </div>
+      <ExpenseDrawer openExpenseLegacyId={openGrantId} handleClose={onCloseDetails} initialExpenseValues={openGrant} />
     </React.Fragment>
   );
 }

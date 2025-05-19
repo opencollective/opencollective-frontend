@@ -155,6 +155,7 @@ export const hostDashboardExpensesQuery = gql`
     $chargeHasReceipts: Boolean
     $virtualCards: [VirtualCardReferenceInput]
     $account: AccountReferenceInput
+    $fromAccount: AccountReferenceInput
     $lastCommentBy: [LastCommentBy]
     $accountingCategory: [String]
   ) {
@@ -177,6 +178,7 @@ export const hostDashboardExpensesQuery = gql`
       virtualCards: $virtualCards
       lastCommentBy: $lastCommentBy
       accountingCategory: $accountingCategory
+      fromAccount: $fromAccount
     ) {
       totalCount
       offset
