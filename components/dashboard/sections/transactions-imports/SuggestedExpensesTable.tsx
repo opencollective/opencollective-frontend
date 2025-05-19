@@ -134,8 +134,8 @@ export const SuggestedExpensesTable = ({
             <div className="flex justify-center border-t border-neutral-200 p-3 text-center">
               <FormattedMessage
                 id="SuggestedExpensesTable.MoreResults"
-                defaultMessage="{totalExpenses, plural, one {# expense} other {# expenses}} also match your filters. Narrow down your search to see them."
-                values={{ totalExpenses }}
+                defaultMessage="{nbExpenses, plural, one {# expense} other {# expenses}} also match your filters. Narrow down your search to see {nbExpenses, plural, one {it} other {them}}."
+                values={{ nbExpenses: totalExpenses - expenses.length }}
               />
             </div>
           )

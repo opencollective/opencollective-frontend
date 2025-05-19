@@ -10,7 +10,6 @@ import { integer, isMulti } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { Account, Host, TransactionsImport, TransactionsImportRow } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
-import { i18nExpenseStatus } from '../../../../lib/i18n/expense';
 import { updateTransactionsImportRows } from './lib/graphql';
 import type { CSVConfig } from './lib/types';
 import { ExpenseMetaStatuses } from '@/lib/expense';
@@ -19,13 +18,19 @@ import type {
   SuggestContributionMatchQueryVariables,
   SuggestExpenseMatchQueryVariables,
 } from '@/lib/graphql/types/v2/graphql';
-import { ExpenseStatus, ExpenseStatusFilter, TransactionsImportRowAction } from '@/lib/graphql/types/v2/graphql';
+import {
+  ExpenseStatus,
+  ExpenseStatusFilter,
+  OrderStatus,
+  TransactionsImportRowAction,
+} from '@/lib/graphql/types/v2/graphql';
 
 import ExpenseStatusTag from '@/components/expenses/ExpenseStatusTag';
 import Image from '@/components/Image';
 import MessageBox from '@/components/MessageBox';
 import OrderStatusTag from '@/components/orders/OrderStatusTag';
 import { Badge } from '@/components/ui/Badge';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/Collapsible';
 import { DataList, DataListItem, NestedObjectDataListItem } from '@/components/ui/DataList';
 import { Separator } from '@/components/ui/Separator';
 
@@ -44,6 +49,7 @@ import { AmountFilterType } from '../../filters/AmountFilter/schema';
 import { Filterbar } from '../../filters/Filterbar';
 import type { HostedAccountFilterMeta } from '../../filters/HostedAccountFilter';
 import { hostedAccountsFilter } from '../../filters/HostedAccountFilter';
+import * as contributionsFilters from '../contributions/filters';
 import * as ExpenseFilters from '../expenses/filters';
 import { HostCreateExpenseModal } from '../expenses/HostCreateExpenseModal';
 
@@ -58,26 +64,7 @@ enum TabType {
   CONTRIBUTIONS = 'Contributions',
 }
 
-const filtersSchema = ExpenseFilters.schema.extend({
-  limit: integer.default(NB_EXPENSES_DISPLAYED),
-  account: isMulti(z.string()).optional(),
-});
-
 type FiltersMeta = ExpenseFilters.FilterMeta & HostedAccountFilterMeta;
-
-const toVariables: FiltersToVariables<z.infer<typeof filtersSchema>, SuggestExpenseMatchQueryVariables, FiltersMeta> = {
-  ...ExpenseFilters.toVariables,
-  account: hostedAccountsFilter.toVariables,
-};
-
-const filters: FilterComponentConfigs<z.infer<typeof filtersSchema>, FiltersMeta> = {
-  searchTerm: ExpenseFilters.filters.searchTerm,
-  account: {
-    ...hostedAccountsFilter.filter,
-    getDisallowEmpty: ({ meta }) => Boolean(meta?.hostedAccounts?.length), // Disable clearing accounts if provided by the parent
-  },
-  ...omit(ExpenseFilters.filters, ['account', 'searchTerm']),
-};
 
 /**
  * Returns a value range filter that matches the given value.
@@ -94,7 +81,7 @@ const getAmountRangeFilter = (valueInCents: number) => {
 };
 
 const suggestExpenseMatchQuery = gql`
-  query SuggestExpenseMatch(
+  query SuggestExpenseForOffPlatformTransaction(
     $hostId: String!
     $searchTerm: String
     $offset: Int
@@ -106,6 +93,7 @@ const suggestExpenseMatchQuery = gql`
     $dateTo: DateTime
     $payoutMethodType: PayoutMethodType
     $account: [AccountReferenceInput!]
+    $sort: ChronologicalOrderInput
   ) {
     expenses(
       host: { id: $hostId }
@@ -120,6 +108,7 @@ const suggestExpenseMatchQuery = gql`
       payoutMethodType: $payoutMethodType
       accounts: $account
       includeChildrenExpenses: true
+      orderBy: $sort
     ) {
       totalCount
       offset
@@ -171,7 +160,7 @@ const suggestExpenseMatchQuery = gql`
 `;
 
 const suggestContributionMatchQuery = gql`
-  query SuggestContributionMatch(
+  query SuggestContributionForOffPlatformTransaction(
     $hostId: String!
     $searchTerm: String
     $offset: Int
@@ -182,6 +171,7 @@ const suggestContributionMatchQuery = gql`
     $dateFrom: DateTime
     $dateTo: DateTime
     $account: [AccountReferenceInput!]
+    $orderBy: ChronologicalOrderInput
   ) {
     account(slug: $hostId) {
       id
@@ -196,6 +186,9 @@ const suggestContributionMatchQuery = gql`
         limit: $limit
         hostedAccounts: $account
         includeChildrenAccounts: true
+        includeHostedAccounts: true
+        filter: OUTGOING
+        orderBy: $orderBy
       ) {
         totalCount
         offset
@@ -269,7 +262,7 @@ const removeEmptyValues = (entry: [string, unknown]): [string, unknown] => {
   }
 };
 
-const filterRawValueEntries = ([key, value]: [string, string], csvConfig: CSVConfig): boolean => {
+const filterRawValueEntries = ([key, value]: [string, unknown], csvConfig: CSVConfig): boolean => {
   // Ignore empty values
   if (isEmpty(value)) {
     return false;
@@ -298,28 +291,6 @@ const filterRawValueEntries = ([key, value]: [string, string], csvConfig: CSVCon
 
   return true;
 };
-
-const getViews = intl => [
-  {
-    id: TabType.EXPENSES_UNPAID,
-    label: intl.formatMessage({ defaultMessage: 'Non-paid expenses', id: '4FkMOJ' }),
-    filter: {
-      status: Object.values(omit(ExpenseStatusFilter, [ExpenseStatusFilter.PAID, ...ExpenseMetaStatuses])),
-    },
-  },
-  {
-    id: TabType.EXPENSES_PAID,
-    label: intl.formatMessage({ defaultMessage: 'Paid expenses', id: 'MAuJ5K' }),
-    filter: {
-      status: [ExpenseStatusFilter.PAID],
-    },
-  },
-  {
-    id: TabType.CONTRIBUTIONS,
-    label: intl.formatMessage({ defaultMessage: 'Outgoing contributions', id: 'outgoingContributions' }),
-    filter: {},
-  },
-];
 
 const getMatchInfo = (
   row,
@@ -363,6 +334,110 @@ const MatchBadge = ({ children, hasMatch }: { children: React.ReactNode; hasMatc
   }
 };
 
+const useMatchDebitDialogQueryFilter = (
+  activeViewId: TabType,
+  row: TransactionsImportRow,
+  host: Pick<Host, 'id' | 'slug'>,
+  accounts: Pick<Account, 'slug'>[],
+) => {
+  const intl = useIntl();
+  const views = React.useMemo(
+    () => [
+      {
+        id: TabType.EXPENSES_UNPAID,
+        label: intl.formatMessage({ defaultMessage: 'Non-paid expenses', id: '4FkMOJ' }),
+        filter: {
+          status: Object.values(omit(ExpenseStatusFilter, [ExpenseStatusFilter.PAID, ...ExpenseMetaStatuses])),
+        },
+      },
+      {
+        id: TabType.EXPENSES_PAID,
+        label: intl.formatMessage({ defaultMessage: 'Paid expenses', id: 'MAuJ5K' }),
+        filter: {
+          status: [ExpenseStatusFilter.PAID],
+        },
+      },
+      {
+        id: TabType.CONTRIBUTIONS,
+        label: intl.formatMessage({ defaultMessage: 'Outgoing contributions', id: 'outgoingContributions' }),
+        filter: {},
+      },
+    ],
+    [intl],
+  );
+
+  const defaultFilterValues = React.useMemo(() => {
+    const filters = {
+      amount: getAmountRangeFilter(row.amount.valueInCents),
+      account: accounts?.map(account => account.slug),
+    };
+
+    if (activeViewId === TabType.EXPENSES_UNPAID) {
+      filters['status'] = Object.values(omit(ExpenseStatusFilter, [ExpenseStatusFilter.PAID, ...ExpenseMetaStatuses]));
+    } else if (activeViewId === TabType.CONTRIBUTIONS) {
+      filters['status'] = [OrderStatus.PAID, OrderStatus.PENDING, OrderStatus.EXPIRED];
+    }
+
+    return filters;
+  }, [row, accounts, activeViewId]);
+
+  const queryFilterMeta = React.useMemo(() => {
+    const meta = {
+      currency: row.amount.currency,
+      hostSlug: host.slug,
+      hostedAccounts: accounts,
+      disableHostedAccountsSearch: Boolean(accounts?.length),
+    };
+
+    if (activeViewId === TabType.EXPENSES_UNPAID || activeViewId === TabType.EXPENSES_PAID) {
+      meta['hideExpensesMetaStatuses'] = true;
+    }
+
+    return meta;
+  }, [row, host, accounts, activeViewId]);
+
+  const { filters, toVariables, schema } = React.useMemo(() => {
+    const commonSchemaOptions = {
+      limit: integer.default(NB_EXPENSES_DISPLAYED),
+      account: isMulti(z.string()).optional(),
+    };
+
+    let schema;
+    const toVariables: FiltersToVariables<z.infer<typeof schema>, SuggestExpenseMatchQueryVariables, FiltersMeta> = {
+      account: hostedAccountsFilter.toVariables,
+    };
+    const filters: FilterComponentConfigs<z.infer<typeof schema>, FiltersMeta> = {
+      account: {
+        ...hostedAccountsFilter.filter,
+        getDisallowEmpty: ({ meta }) => Boolean(meta?.hostedAccounts?.length), // Disable clearing accounts if provided by the parent
+      },
+    };
+
+    if (activeViewId === TabType.EXPENSES_UNPAID || activeViewId === TabType.EXPENSES_PAID) {
+      Object.assign(filters, omit(ExpenseFilters.filters, ['account']));
+      Object.assign(toVariables, omit(ExpenseFilters.toVariables, ['account']));
+      schema = ExpenseFilters.schema.extend(commonSchemaOptions);
+    } else if (activeViewId === TabType.CONTRIBUTIONS) {
+      Object.assign(filters, omit(contributionsFilters.filters, ['account']));
+      Object.assign(toVariables, omit(contributionsFilters.toVariables, ['account']));
+      schema = contributionsFilters.schema.extend(commonSchemaOptions);
+    }
+
+    return { filters, toVariables, schema };
+  }, [activeViewId]);
+
+  return useQueryFilter<typeof schema, SuggestExpenseMatchQueryVariables | SuggestContributionMatchQueryVariables>({
+    schema,
+    skipRouter: true,
+    filters,
+    meta: queryFilterMeta,
+    defaultFilterValues,
+    views: views,
+    activeViewId,
+    toVariables,
+  });
+};
+
 export const MatchDebitDialog = ({
   accounts,
   host,
@@ -387,49 +462,8 @@ export const MatchDebitDialog = ({
   const intl = useIntl();
   const [activeViewId, setActiveViewId] = React.useState(TabType.EXPENSES_UNPAID);
   const matchInfo = getMatchInfo(row, selectedExpense, selectedContribution);
-
-  // TODO adapt sort key based on query
-  // TODO force accounts on contributions query
-
-  const defaultFilterValues = React.useMemo(
-    () => ({
-      amount: getAmountRangeFilter(row.amount.valueInCents),
-      account: accounts?.map(account => account.slug),
-      status:
-        activeViewId === TabType.EXPENSES_UNPAID
-          ? Object.values(omit(ExpenseStatusFilter, [ExpenseStatusFilter.PAID, ...ExpenseMetaStatuses]))
-          : [],
-    }),
-    [row, accounts, activeViewId],
-  );
-
-  const queryFilterMeta = React.useMemo(
-    () => ({
-      currency: row.amount.currency,
-      hostSlug: host.slug,
-      hostedAccounts: accounts,
-      disableHostedAccountsSearch: Boolean(accounts?.length),
-      hideExpensesMetaStatuses: true,
-    }),
-    [row, host, accounts],
-  );
-
-  const views = React.useMemo(() => getViews(intl), [intl]);
-  const queryFilter = useQueryFilter<
-    typeof filtersSchema,
-    SuggestExpenseMatchQueryVariables | SuggestContributionMatchQueryVariables
-  >({
-    schema: filtersSchema,
-    skipRouter: true,
-    toVariables: toVariables,
-    filters: filters,
-    meta: queryFilterMeta,
-    defaultFilterValues,
-    views: views,
-    activeViewId,
-  });
-
   const [updateRows] = useMutation(updateTransactionsImportRows, { context: API_V2_CONTEXT });
+  const queryFilter = useMatchDebitDialogQueryFilter(activeViewId, row, host, accounts);
 
   // Query for expenses
   const {
@@ -459,20 +493,6 @@ export const MatchDebitDialog = ({
   const loading = queryFilter.activeViewId === TabType.CONTRIBUTIONS ? contributionsLoading : expensesLoading;
   const error = queryFilter.activeViewId === TabType.CONTRIBUTIONS ? contributionsError : expensesError;
 
-  // Re-load default filters when changing row
-  const { resetFilters } = queryFilter;
-  React.useEffect(() => {
-    resetFilters(defaultFilterValues);
-  }, [defaultFilterValues, resetFilters]);
-
-  const reset = () => {
-    setSelectedExpense(null);
-    setSelectedContribution(null);
-    setIsSubmitting(false);
-    setOpen(false);
-    resetFilters(defaultFilterValues);
-  };
-
   // When switching tab, clear selection
   React.useEffect(() => {
     setSelectedExpense(null);
@@ -486,7 +506,10 @@ export const MatchDebitDialog = ({
         if (isSubmitting) {
           return;
         } else {
-          reset();
+          setSelectedExpense(null);
+          setSelectedContribution(null);
+          setIsSubmitting(false);
+          setOpen(false);
         }
       }}
     >
@@ -501,14 +524,14 @@ export const MatchDebitDialog = ({
             hideSeparator
             className="mb-5"
             {...queryFilter}
-            primaryFilters={['searchTerm', 'sort', 'orderBy']} // TODO adapt order/expense
+            primaryFilters={['searchTerm', 'sort', 'orderBy']} // Sort filter has a different name for contributions and expenses
             primaryFilterClassName="grid-cols-[8fr_2fr]"
-            onViewChange={view => setActiveViewId(view.id)}
+            onViewChange={view => setActiveViewId(view.id as TabType)}
             activeViewId={activeViewId}
             resetFilters={filter => {
-              resetFilters({
+              queryFilter.resetFilters({
                 ...filter,
-                ...pick(queryFilter.values, ['account', 'amount', 'dateFrom', 'dateTo', 'sort']),
+                ...pick(queryFilter.values, ['account', 'amount', 'dateFrom', 'dateTo']),
               });
             }}
           />
@@ -551,84 +574,90 @@ export const MatchDebitDialog = ({
             <div className="mb-2 text-base font-semibold text-neutral-700">
               <FormattedMessage defaultMessage="Imported data" id="tmfin0" />
             </div>
+            <Collapsible open={hasViewMore}>
+              <DataList className="rounded bg-slate-50 p-4 pb-1">
+                <DataListItem
+                  label={<FormattedMessage id="Fields.amount" defaultMessage="Amount" />}
+                  labelClassName="basis-1/3 min-w-auto max-w-auto"
+                  value={
+                    <MatchBadge hasMatch={matchInfo?.amount}>
+                      <FormattedMoneyAmount amount={row.amount.valueInCents} currency={row.amount.currency} />
+                    </MatchBadge>
+                  }
+                />
+                <DataListItem
+                  label={<FormattedMessage defaultMessage="Date" id="expense.incurredAt" />}
+                  labelClassName="basis-1/3 min-w-auto max-w-auto"
+                  value={
+                    <MatchBadge hasMatch={matchInfo?.date}>
+                      <DateTime value={row.date} />
+                    </MatchBadge>
+                  }
+                />
+                <DataListItem
+                  label={<FormattedMessage id="Fields.description" defaultMessage="Description" />}
+                  value={row.description}
+                  itemClassName="truncate max-w-full"
+                  labelClassName="basis-1/3 min-w-auto max-w-auto"
+                  showValueAsItemTitle
+                />
+                <DataListItem
+                  label={<FormattedMessage id="AddFundsModal.source" defaultMessage="Source" />}
+                  value={transactionsImport.source}
+                  itemClassName="truncate max-w-full"
+                  labelClassName="basis-1/3 min-w-auto max-w-auto"
+                  showValueAsItemTitle
+                />
+                <DataListItem
+                  label={<FormattedMessage defaultMessage="Transaction ID" id="oK0S4l" />}
+                  value={row.sourceId}
+                  itemClassName="truncate max-w-full"
+                  labelClassName="basis-1/3 min-w-auto max-w-auto"
+                  showValueAsItemTitle
+                />
 
-            <DataList className="rounded bg-slate-50 p-4 pb-1">
-              <DataListItem
-                label={<FormattedMessage id="Fields.amount" defaultMessage="Amount" />}
-                labelClassName="basis-1/3 min-w-auto max-w-auto"
-                value={
-                  <MatchBadge hasMatch={matchInfo?.amount}>
-                    <FormattedMoneyAmount amount={row.amount.valueInCents} currency={row.amount.currency} />
-                  </MatchBadge>
-                }
-              />
-              <DataListItem
-                label={<FormattedMessage defaultMessage="Date" id="expense.incurredAt" />}
-                labelClassName="basis-1/3 min-w-auto max-w-auto"
-                value={
-                  <MatchBadge hasMatch={matchInfo?.date}>
-                    <DateTime value={row.date} />
-                  </MatchBadge>
-                }
-              />
-              <DataListItem
-                label={<FormattedMessage id="Fields.description" defaultMessage="Description" />}
-                value={row.description}
-                itemClassName="truncate max-w-full"
-                labelClassName="basis-1/3 min-w-auto max-w-auto"
-                showValueAsItemTitle
-              />
-              <DataListItem
-                label={<FormattedMessage id="AddFundsModal.source" defaultMessage="Source" />}
-                value={transactionsImport.source}
-                itemClassName="truncate max-w-full"
-                labelClassName="basis-1/3 min-w-auto max-w-auto"
-                showValueAsItemTitle
-              />
-              <DataListItem
-                label={<FormattedMessage defaultMessage="Transaction ID" id="oK0S4l" />}
-                value={row.sourceId}
-                itemClassName="truncate max-w-full"
-                labelClassName="basis-1/3 min-w-auto max-w-auto"
-                showValueAsItemTitle
-              />
-              {hasViewMore &&
-                Object.entries(row.rawValue as Record<string, string>)
-                  .map(entry => removeEmptyValues(entry))
-                  .filter(entry => filterRawValueEntries(entry, transactionsImport.csvConfig))
-                  .map(([key, value]) => (
-                    <NestedObjectDataListItem
-                      key={key}
-                      label={key}
-                      itemClassName="truncate max-w-full"
-                      labelClassName="basis-1/3 min-w-auto max-w-auto"
-                      value={value}
-                      showValueAsItemTitle
-                    />
-                  ))}
-              <div className="mt-2 flex flex-col items-center gap-1">
-                <Separator />
-                <Button
-                  variant="ghost"
-                  className="h-auto w-full text-xs font-normal"
-                  onClick={() => {
-                    setHasViewMore(!hasViewMore);
-                  }}
-                >
-                  {hasViewMore ? (
-                    <React.Fragment>
-                      <FormattedMessage defaultMessage="View less" id="EVFai9" />
-                      <ChevronUp size={16} />
-                    </React.Fragment>
-                  ) : (
-                    <React.Fragment>
-                      <FormattedMessage defaultMessage="View more" id="34Up+l" />
-                      <ChevronDown size={16} />
-                    </React.Fragment>
-                  )}
-                </Button>
-              </div>
-            </DataList>
+                <CollapsibleContent>
+                  {Object.entries(row.rawValue as Record<string, string>)
+                    .map(entry => removeEmptyValues(entry))
+                    .filter(entry => filterRawValueEntries(entry, transactionsImport.csvConfig))
+                    .map(([key, value]) => (
+                      <NestedObjectDataListItem
+                        key={key}
+                        label={key}
+                        itemClassName="truncate max-w-full"
+                        labelClassName="basis-1/3 min-w-auto max-w-auto"
+                        value={value}
+                        showValueAsItemTitle
+                      />
+                    ))}
+                </CollapsibleContent>
+
+                <div className="mt-2 flex flex-col items-center gap-1">
+                  <Separator />
+                  <CollapsibleTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="h-auto w-full text-xs font-normal"
+                      onClick={() => {
+                        setHasViewMore(!hasViewMore);
+                      }}
+                    >
+                      {hasViewMore ? (
+                        <React.Fragment>
+                          <FormattedMessage defaultMessage="View less" id="EVFai9" />
+                          <ChevronUp size={16} />
+                        </React.Fragment>
+                      ) : (
+                        <React.Fragment>
+                          <FormattedMessage defaultMessage="View more" id="34Up+l" />
+                          <ChevronDown size={16} />
+                        </React.Fragment>
+                      )}
+                    </Button>
+                  </CollapsibleTrigger>
+                </div>
+              </DataList>
+            </Collapsible>
           </div>
           {!(selectedExpense || selectedContribution) ? (
             <div className="flex flex-col rounded-lg border border-gray-200 p-4">
@@ -750,7 +779,7 @@ export const MatchDebitDialog = ({
                 {selectedExpense ? (
                   <React.Fragment>
                     <DataListItem
-                      label={<FormattedMessage defaultMessage="Account" id="expense.account" />}
+                      label={<FormattedMessage defaultMessage="Account" id="TwyMau" />}
                       value={
                         <LinkCollective
                           collective={selectedExpense.account}
@@ -764,7 +793,7 @@ export const MatchDebitDialog = ({
                       labelClassName="basis-1/3 min-w-auto max-w-auto"
                     />
                     <DataListItem
-                      label={<FormattedMessage defaultMessage="Payee" id="expense.payee" />}
+                      label={<FormattedMessage defaultMessage="Payee" id="SecurityScope.Payee" />}
                       value={
                         <LinkCollective
                           collective={selectedExpense.payee}
@@ -793,7 +822,7 @@ export const MatchDebitDialog = ({
                       labelClassName="basis-1/3 min-w-auto max-w-auto"
                     />
                     <DataListItem
-                      label={<FormattedMessage defaultMessage="To" id="9j3hXO" />}
+                      label={<FormattedMessage defaultMessage="To" id="To" />}
                       value={
                         <LinkCollective
                           collective={selectedContribution.toAccount}
@@ -825,20 +854,6 @@ export const MatchDebitDialog = ({
                     )
                   }
                 />
-                {hasViewMore &&
-                  Object.entries(row.rawValue as Record<string, string>)
-                    .map(entry => removeEmptyValues(entry))
-                    .filter(entry => filterRawValueEntries(entry, transactionsImport.csvConfig))
-                    .map(([key, value]) => (
-                      <NestedObjectDataListItem
-                        key={key}
-                        label={key}
-                        itemClassName="truncate max-w-full"
-                        labelClassName="basis-1/3 min-w-auto max-w-auto"
-                        value={value}
-                        showValueAsItemTitle
-                      />
-                    ))}
               </DataList>
 
               {Boolean(

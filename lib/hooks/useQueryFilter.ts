@@ -85,8 +85,9 @@ export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape, any,
     } else if (result.success === false) {
       addFilterValidationErrorToast(result.error, intl);
     }
+
     return opts.schema.parse(defaultFilterValues);
-  }, [intl, opts.schema, query, defaultFilterValues]);
+  }, [opts.schema, defaultFilterValues, defaultSchemaValues, query, stateQuery, intl]);
 
   const variables = React.useMemo(() => {
     let apiVariables: Partial<GQLQueryVars> = {};

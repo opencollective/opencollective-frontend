@@ -74,7 +74,9 @@ export function NestedObjectDataListItem({
   itemClassName,
   labelClassName,
   showValueAsItemTitle,
-}: DataListItemProps) {
+}: Omit<DataListItemProps, 'value'> & {
+  value: any; // Intended any: the component is meant to recursively display any kind of value
+}) {
   if (isObject(value) && value !== null) {
     return (
       <div className={className}>

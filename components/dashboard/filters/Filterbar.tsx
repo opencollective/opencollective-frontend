@@ -103,23 +103,23 @@ export function Filterbar<FV extends Record<string, any>, FM>({
     }
   }, [displayedFilters, primaryFilters]);
 
+  const onTabChange = React.useCallback(
+    id => {
+      const view = views.find(v => v.id === id);
+      if (view) {
+        if (onViewChange) {
+          onViewChange(view);
+        } else {
+          resetFilters(view.filter);
+        }
+      }
+    },
+    [views, onViewChange, resetFilters],
+  );
+
   return (
     <div className={cn('flex flex-col gap-4', className)}>
-      {views ? (
-        <Tabs
-          tabs={views}
-          selectedId={activeViewId}
-          onChange={id => {
-            const view = views.find(v => v.id === id);
-            if (view) {
-              onViewChange?.(view);
-              resetFilters(view.filter);
-            }
-          }}
-        />
-      ) : (
-        !hideSeparator && <Separator />
-      )}
+      {views ? <Tabs tabs={views} selectedId={activeViewId} onChange={onTabChange} /> : !hideSeparator && <Separator />}
       {Boolean(filtersOnTop.length) && (
         <div className={cn('repeat(auto-fit, minmax(200px, 1fr)) grid gap-2 [&_input]:w-full', primaryFilterClassName)}>
           {filtersOnTop.map(key => {
