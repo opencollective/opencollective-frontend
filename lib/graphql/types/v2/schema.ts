@@ -4545,6 +4545,8 @@ export type Expense = {
   /** The account from where the expense was paid */
   host?: Maybe<Host>;
   id: Scalars['String']['output'];
+  /** Date of the expense */
+  incurredAt: Scalars['DateTime']['output'];
   /** (Optional - applicable to invoice expense only) The invoice file for this expense */
   invoiceFile?: Maybe<FileInfo>;
   /** Information to display on the invoice. Only visible to user and admins. */
