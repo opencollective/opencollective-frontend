@@ -263,7 +263,7 @@
     "jest-styled-components": "^7.2.0",
     "jsdoc-api": "^9.0.0",
     "jsdom": "^26.0.0",
-    "lint-staged": "^15.0.0",
+    "lint-staged": "^16.0.0",
     "markdown-loader": "^8.0.0",
     "mkdirp": "^3.0.1",
     "npm-run-all2": "^7.0.0",
