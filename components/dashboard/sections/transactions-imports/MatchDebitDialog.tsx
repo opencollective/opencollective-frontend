@@ -525,14 +525,19 @@ export const MatchDebitDialog = ({
     setSelectedContribution(null);
   }, [queryFilter.activeViewId]);
 
+  // When opening the modal, make sure we reset the filters to their default values
+  React.useEffect(() => {
+    if (props.open) {
+      queryFilter.resetFilters(getDefaultFilterValues(row, accounts, activeViewId));
+    }
+  }, [props.open]); // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
     <Dialog
       {...props}
-      onOpenChange={open => {
+      onOpenChange={() => {
         if (isSubmitting) {
           return;
-        } else if (open) {
-          queryFilter.resetFilters(getDefaultFilterValues(row, accounts, activeViewId));
         } else {
           setSelectedExpense(null);
           setSelectedContribution(null);
@@ -540,6 +545,7 @@ export const MatchDebitDialog = ({
           setOpen(false);
           setHasViewMore(false);
           setActiveViewId(TabType.EXPENSES_UNPAID);
+          queryFilter.resetFilters(getDefaultFilterValues(row, accounts, activeViewId));
         }
       }}
     >
