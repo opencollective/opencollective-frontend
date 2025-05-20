@@ -18,7 +18,6 @@ import { HostCreateExpenseModal } from '../../expenses/HostCreateExpenseModal';
 import { AddFundsModalFromImportRow } from '../AddFundsModalFromTransactionsImportRow';
 import { MatchContributionDialog } from '../MatchContributionDialog';
 import { MatchDebitDialog } from '../MatchDebitDialog';
-import { MatchExpenseDialog } from '../MatchExpenseDialog';
 
 import { updateTransactionsImportRows } from './graphql';
 
@@ -59,7 +58,7 @@ export const useTransactionsImportActions = ({
   getAllRowsIds,
 }: {
   host: React.ComponentProps<typeof MatchContributionDialog>['host'] &
-    React.ComponentProps<typeof MatchExpenseDialog>['host'] &
+    React.ComponentProps<typeof MatchDebitDialog>['host'] &
     React.ComponentProps<typeof AddFundsModalFromImportRow>['host'];
   /** A function to get all rows IDs regardless of pagination, to work with the `includeAllPages` option */
   getAllRowsIds: () => Promise<string[]>;
@@ -177,23 +176,6 @@ export const useTransactionsImportActions = ({
           onClick: () => {
             showModal(
               MatchDebitDialog,
-              { host, row, transactionsImport, onCloseFocusRef, accounts: assignedAccounts },
-              'host-match-expense-modal',
-            );
-          },
-        });
-        actions.primary.push({
-          key: 'match-expense',
-          Icon: Merge,
-          label: (
-            <del title="Deprecated">
-              <FormattedMessage defaultMessage="Match expense" id="BGB+3j" />
-            </del>
-          ),
-          disabled: isUpdatingRow,
-          onClick: () => {
-            showModal(
-              MatchExpenseDialog,
               { host, row, transactionsImport, onCloseFocusRef, accounts: assignedAccounts },
               'host-match-expense-modal',
             );

@@ -94,7 +94,7 @@ export function Filterbar<FV extends Record<string, any>, FM>({
   const intl = useIntl();
   const { displayedFilters, remainingFilters } = useGetFilterbarOptions(filters, values, defaultSchemaValues, meta);
   const sortFilterKey = filters.sort ? 'sort' : filters.orderBy ? 'orderBy' : null;
-  const SortFilter = filters[sortFilterKey];
+  const sortFilter = filters[sortFilterKey];
   const [filtersOnTop, regularFilters] = React.useMemo(() => {
     if (!primaryFilters) {
       return [[], displayedFilters];
@@ -126,7 +126,7 @@ export function Filterbar<FV extends Record<string, any>, FM>({
             return renderFilter({ filters, values, key, activeViewId, intl, meta, setFilter });
           })}
           {primaryFilters.includes(sortFilterKey) && (
-            <SortFilter.StandaloneComponent
+            <sortFilter.StandaloneComponent
               onChange={value => setFilter(sortFilterKey, value)}
               value={values[sortFilterKey]}
               intl={intl}
@@ -156,7 +156,7 @@ export function Filterbar<FV extends Record<string, any>, FM>({
         </div>
         {sortFilterKey && !primaryFilters?.includes(sortFilterKey) && (
           <div className="flex w-full flex-1 justify-end">
-            <SortFilter.StandaloneComponent
+            <sortFilter.StandaloneComponent
               onChange={value => setFilter(sortFilterKey, value)}
               value={values[sortFilterKey]}
               intl={intl}
