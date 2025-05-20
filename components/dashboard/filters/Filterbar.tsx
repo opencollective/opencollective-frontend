@@ -36,7 +36,10 @@ function useGetFilterbarOptions(filters, values, defaultSchemaValues, meta) {
 
 const renderFilter = ({ filters, values, key, activeViewId, intl, meta, setFilter }) => {
   const filter = filters[key];
-  if (filter.StandaloneComponent) {
+
+  if (!filter) {
+    return null;
+  } else if (filter.StandaloneComponent) {
     return (
       <filter.StandaloneComponent
         key={key}
@@ -48,18 +51,19 @@ const renderFilter = ({ filters, values, key, activeViewId, intl, meta, setFilte
         meta={meta}
       />
     );
+  } else {
+    return (
+      <FilterDropdown
+        key={key}
+        filterKey={key}
+        values={values}
+        filters={filters}
+        setFilter={setFilter}
+        isViewActive={!!activeViewId}
+        meta={meta}
+      />
+    );
   }
-  return (
-    <FilterDropdown
-      key={key}
-      filterKey={key}
-      values={values}
-      filters={filters}
-      setFilter={setFilter}
-      isViewActive={!!activeViewId}
-      meta={meta}
-    />
-  );
 };
 
 export function Filterbar<FV extends Record<string, any>, FM>({

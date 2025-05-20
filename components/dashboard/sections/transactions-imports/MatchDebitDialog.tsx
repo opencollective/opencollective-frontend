@@ -280,6 +280,8 @@ const filterRawValueEntries = ([key, value]: [string, unknown], csvConfig: CSVCo
         'date',
         'description',
         'amount',
+        'name',
+        'transaction_id',
         // Ignore some irrelevant columns
         'personal_finance_category',
         'personal_finance_category_icon_url',
@@ -334,6 +336,27 @@ const MatchBadge = ({ children, hasMatch }: { children: React.ReactNode; hasMatc
   }
 };
 
+const getDefaultFilterValues = (
+  row: TransactionsImportRow,
+  accounts: Pick<Account, 'slug'>[],
+  activeViewId: TabType,
+) => {
+  const filters = {
+    amount: getAmountRangeFilter(row.amount.valueInCents),
+    account: accounts?.map(account => account.slug),
+  };
+
+  if (activeViewId === TabType.EXPENSES_UNPAID) {
+    filters['status'] = Object.values(omit(ExpenseStatusFilter, [ExpenseStatusFilter.PAID, ...ExpenseMetaStatuses]));
+  } else if (activeViewId === TabType.EXPENSES_PAID) {
+    filters['status'] = [ExpenseStatusFilter.PAID];
+  } else if (activeViewId === TabType.CONTRIBUTIONS) {
+    filters['status'] = [OrderStatus.PAID, OrderStatus.PENDING, OrderStatus.EXPIRED];
+  }
+
+  return filters;
+};
+
 const useMatchDebitDialogQueryFilter = (
   activeViewId: TabType,
   row: TransactionsImportRow,
@@ -366,20 +389,10 @@ const useMatchDebitDialogQueryFilter = (
     [intl],
   );
 
-  const defaultFilterValues = React.useMemo(() => {
-    const filters = {
-      amount: getAmountRangeFilter(row.amount.valueInCents),
-      account: accounts?.map(account => account.slug),
-    };
-
-    if (activeViewId === TabType.EXPENSES_UNPAID) {
-      filters['status'] = Object.values(omit(ExpenseStatusFilter, [ExpenseStatusFilter.PAID, ...ExpenseMetaStatuses]));
-    } else if (activeViewId === TabType.CONTRIBUTIONS) {
-      filters['status'] = [OrderStatus.PAID, OrderStatus.PENDING, OrderStatus.EXPIRED];
-    }
-
-    return filters;
-  }, [row, accounts, activeViewId]);
+  const defaultFilterValues = React.useMemo(
+    () => getDefaultFilterValues(row, accounts, activeViewId),
+    [row, accounts, activeViewId],
+  );
 
   const queryFilterMeta = React.useMemo(() => {
     const meta = {
@@ -426,7 +439,10 @@ const useMatchDebitDialogQueryFilter = (
     return { filters, toVariables, schema };
   }, [activeViewId]);
 
-  return useQueryFilter<typeof schema, SuggestExpenseMatchQueryVariables | SuggestContributionMatchQueryVariables>({
+  const queryFilter = useQueryFilter<
+    typeof schema,
+    SuggestExpenseMatchQueryVariables | SuggestContributionMatchQueryVariables
+  >({
     schema,
     skipRouter: true,
     filters,
@@ -436,6 +452,16 @@ const useMatchDebitDialogQueryFilter = (
     activeViewId,
     toVariables,
   });
+
+  // Re-apply default filters after changing view
+  React.useEffect(() => {
+    queryFilter.resetFilters({
+      ...getDefaultFilterValues(row, accounts, activeViewId),
+      ...pick(queryFilter.values, ['account', 'amount', 'dateFrom', 'dateTo']),
+    });
+  }, [activeViewId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  return queryFilter;
 };
 
 export const MatchDebitDialog = ({
@@ -502,14 +528,18 @@ export const MatchDebitDialog = ({
   return (
     <Dialog
       {...props}
-      onOpenChange={() => {
+      onOpenChange={open => {
         if (isSubmitting) {
           return;
+        } else if (open) {
+          queryFilter.resetFilters(getDefaultFilterValues(row, accounts, activeViewId));
         } else {
           setSelectedExpense(null);
           setSelectedContribution(null);
           setIsSubmitting(false);
           setOpen(false);
+          setHasViewMore(false);
+          setActiveViewId(TabType.EXPENSES_UNPAID);
         }
       }}
     >
@@ -526,10 +556,16 @@ export const MatchDebitDialog = ({
             {...queryFilter}
             primaryFilters={['searchTerm', 'sort', 'orderBy']} // Sort filter has a different name for contributions and expenses
             primaryFilterClassName="grid-cols-[8fr_2fr]"
-            onViewChange={view => setActiveViewId(view.id as TabType)}
+            onViewChange={view => {
+              setActiveViewId(view.id as TabType);
+              queryFilter.resetFilters({
+                ...pick(queryFilter.values, ['account', 'amount', 'dateFrom', 'dateTo']),
+              });
+            }}
             activeViewId={activeViewId}
             resetFilters={filter => {
               queryFilter.resetFilters({
+                ...getDefaultFilterValues(row, accounts, activeViewId),
                 ...filter,
                 ...pick(queryFilter.values, ['account', 'amount', 'dateFrom', 'dateTo']),
               });
@@ -616,7 +652,7 @@ export const MatchDebitDialog = ({
                   showValueAsItemTitle
                 />
 
-                <CollapsibleContent>
+                <CollapsibleContent className="flex flex-col gap-2">
                   {Object.entries(row.rawValue as Record<string, string>)
                     .map(entry => removeEmptyValues(entry))
                     .filter(entry => filterRawValueEntries(entry, transactionsImport.csvConfig))
@@ -668,8 +704,8 @@ export const MatchDebitDialog = ({
                 <Image alt="" width={125} height={125} src="/static/images/no-results.png" />
                 <div>
                   <FormattedMessage
-                    defaultMessage="Select an item from the table above to match it against the imported transaction or <Link>Create Expense</Link>."
-                    id="+C8/GG"
+                    defaultMessage="Select an item from the table above to match it against the imported transaction or <Link>create a new Expense</Link>."
+                    id="yUTCoY"
                     values={{
                       Link: chunks => (
                         <Button
