@@ -38,7 +38,7 @@ import StyledSelect from '../../../StyledSelect';
 import { Button } from '../../../ui/Button';
 import { Dialog, DialogContent, DialogHeader } from '../../../ui/Dialog';
 import { useToast } from '../../../ui/useToast';
-import { TransactionsImportRowDetailsAccordion } from '../transactions-imports/TransactionsImportRowDetailsAccordion';
+import { TransactionsImportRowDetails } from '../transactions-imports/TransactionsImportRowDetailsAccordion';
 
 const hostCreateExpenseModalPayeeSelectQuery = gql`
   query HostCreateExpenseModalPayeeSelect($hostId: String!, $forAccount: AccountReferenceInput) {
@@ -209,7 +209,7 @@ export const HostCreateExpenseModal = ({
           </h2>
         </DialogHeader>
         {transactionsImportRow && (
-          <TransactionsImportRowDetailsAccordion transactionsImportRow={transactionsImportRow} className="mb-4" />
+          <TransactionsImportRowDetails transactionsImportRow={transactionsImportRow} className="mb-4" />
         )}
         <FormikZod<FormValuesSchema>
           schema={hostExpenseFormValuesSchema}

@@ -6,7 +6,6 @@ import StyledLink from './StyledLink';
 
 // utility library
 
-// eslint-disable-next-line react/display-name
 export const getI18nLink = linkProps => chunks => (
   <StyledLink {...linkProps}>{linkProps?.children || chunks}</StyledLink>
 );
@@ -50,7 +49,7 @@ export const I18nPrivacyLink = msg => (
   </StyledLink>
 );
 
-export const I18nWithColumn = item => <FormattedMessage id="withColon" defaultMessage="{item}:" values={{ item }} />;
+export const i18nWithColon = item => <FormattedMessage id="withColon" defaultMessage="{item}:" values={{ item }} />;
 
 export const WebsiteName = 'Open Collective';
 

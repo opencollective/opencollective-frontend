@@ -49,7 +49,7 @@ import { TaxesFormikFields, validateTaxInput } from '../../../taxes/TaxesFormikF
 import { P, Span } from '../../../Text';
 import { TwoFactorAuthRequiredMessage } from '../../../TwoFactorAuthRequiredMessage';
 import { Button } from '../../../ui/Button';
-import { TransactionsImportRowDetailsAccordion } from '../transactions-imports/TransactionsImportRowDetailsAccordion';
+import { TransactionsImportRowDetails } from '../transactions-imports/TransactionsImportRowDetailsAccordion';
 
 const AddFundsModalContainer = styled(StyledModal)`
   width: 100%;
@@ -1136,7 +1136,7 @@ const AddFundsModal = ({
   initialValues?: Partial<AddFundsFormValues>;
   onSuccess?: (order: Order) => void;
   transactionsImportRow?: TransactionReferenceInput &
-    React.ComponentProps<typeof TransactionsImportRowDetailsAccordion>['transactionsImportRow'];
+    React.ComponentProps<typeof TransactionsImportRowDetails>['transactionsImportRow'];
   editOrderId?: string;
   onClose: () => void;
 }) => {
@@ -1182,7 +1182,7 @@ const AddFundsModal = ({
       )}
 
       {transactionsImportRow && (
-        <TransactionsImportRowDetailsAccordion transactionsImportRow={transactionsImportRow} className="mb-4" />
+        <TransactionsImportRowDetails transactionsImportRow={transactionsImportRow} className="mb-4" />
       )}
 
       {!LoggedInUser ? (
