@@ -43,7 +43,7 @@ import { cols } from './common';
 import { hostedCollectivesMetadataQuery, hostedCollectivesQuery } from './queries';
 
 const sortFilter = buildSortFilter({
-  fieldSchema: z.enum(['CREATED_AT', 'BALANCE', 'NAME']),
+  fieldSchema: z.enum(['CREATED_AT', 'BALANCE', 'NAME', 'UNHOSTED_AT']),
   defaultValue: {
     field: 'CREATED_AT',
     direction: 'DESC',
@@ -239,6 +239,7 @@ const HostedCollectives = ({ accountSlug: hostSlug, subpath }: DashboardSectionP
               cols.team,
               !isUnhosted && cols.fee,
               !isUnhosted && cols.hostedSince,
+              isUnhosted && cols.unhostedAt,
               cols.consolidatedBalance,
               cols.actions,
             ])}

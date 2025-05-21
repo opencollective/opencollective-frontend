@@ -2468,6 +2468,11 @@ type Expense {
   createdAt: DateTime!
 
   """
+  Date of the expense
+  """
+  incurredAt: DateTime!
+
+  """
   Currency that should be used for the payout
   """
   currency: Currency!
@@ -4631,6 +4636,11 @@ enum OrderByFieldType {
   Order by end date
   """
   ENDS_AT
+
+  """
+  Order by the date the collective was unhosted
+  """
+  UNHOSTED_AT
 }
 
 """

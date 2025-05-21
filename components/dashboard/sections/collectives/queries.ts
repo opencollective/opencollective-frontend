@@ -367,6 +367,7 @@ export const hostedCollectivesQuery = gql`
         totalCount
         nodes {
           id
+          unhostedAt(host: { slug: $hostSlug })
           ...HostedCollectiveFields
         }
       }
