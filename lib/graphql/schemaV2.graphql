@@ -4636,6 +4636,11 @@ enum OrderByFieldType {
   Order by end date
   """
   ENDS_AT
+
+  """
+  Order by the date the collective was unhosted
+  """
+  UNHOSTED_AT
 }
 
 """

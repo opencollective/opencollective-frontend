@@ -3781,6 +3781,7 @@
   "unarchive.modal.header": "Désarchiver {name}",
   "unfrozenAt": "Dégelé à",
   "unhostedAt": "Plus hébergé depuis le",
+  "UnhostedSince": "Unhosted since",
   "Unknown": "Inconnu",
   "uNrhIZ": "Si la devise de la transaction est différente de la devise hôte, ce montant montrera la valeur dans laquelle la transaction a été initiée. Il s'agit d'une chaîne de caractères qui comprend la valeur et la devise d'origine (par exemple : 1000 SK)",
   "unsubscribe.success": "Désinscription réussie !",

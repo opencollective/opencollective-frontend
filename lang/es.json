@@ -3781,6 +3781,7 @@
   "unarchive.modal.header": "Desarchivar {name}",
   "unfrozenAt": "Descongelado en",
   "unhostedAt": "Sin Anfitrión en",
+  "UnhostedSince": "Unhosted since",
   "Unknown": "Desconocido",
   "uNrhIZ": "Si la moneda de la transacción es diferente de la moneda del Anfitrión, este importe mostrará el valor en el que se inició la transacción. Se trata de un texto que incluye el valor y la moneda originales (por ejemplo: 1000 SK)",
   "unsubscribe.success": "¡Has cancelado tu suscripción con éxito!",

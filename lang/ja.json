@@ -3781,6 +3781,7 @@
   "unarchive.modal.header": "Unarchive {name}",
   "unfrozenAt": "Unfrozen At",
   "unhostedAt": "Unhosted At",
+  "UnhostedSince": "Unhosted since",
   "Unknown": "Unknown",
   "uNrhIZ": "If the transaction currency is different from the host currency, this amount will show the value in which the transaction was initiated. This is a string that includes the original value and currency (eg: 1000 SK)",
   "unsubscribe.success": "登録解除が完了しました。",

@@ -9008,7 +9008,9 @@ export enum OrderByFieldType {
   RANK = 'RANK',
   /** Order by start date */
   STARTS_AT = 'STARTS_AT',
-  TOTAL_CONTRIBUTED = 'TOTAL_CONTRIBUTED'
+  TOTAL_CONTRIBUTED = 'TOTAL_CONTRIBUTED',
+  /** Order by the date the collective was unhosted */
+  UNHOSTED_AT = 'UNHOSTED_AT'
 }
 
 /** Input to order collection */

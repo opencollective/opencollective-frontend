@@ -36,6 +36,7 @@ const i18nFieldLabels = defineMessages({
   [OrderByFieldType.BALANCE]: { defaultMessage: 'Balance', id: 'Balance' },
   [OrderByFieldType.CREATED_AT]: { defaultMessage: 'Date', id: 'expense.incurredAt' },
   [OrderByFieldType.NAME]: { defaultMessage: 'Name', id: 'Fields.name' },
+  [OrderByFieldType.UNHOSTED_AT]: { defaultMessage: 'Unhosted since', id: 'UnhostedSince' },
 });
 
 const i18nDefaultDirectionLabels = defineMessages({
@@ -71,6 +72,7 @@ const FieldIconTypes = {
   [OrderByFieldType.ACTIVITY]: 'NUMERICAL',
   [OrderByFieldType.BALANCE]: 'NUMERICAL',
   [OrderByFieldType.CREATED_AT]: 'NUMERICAL',
+  [OrderByFieldType.UNHOSTED_AT]: 'NUMERICAL',
   [OrderByFieldType.LAST_CHARGED_AT]: 'NUMERICAL',
   [OrderByFieldType.HOSTED_COLLECTIVES_COUNT]: 'NUMERICAL',
   [OrderByFieldType.HOST_RANK]: 'NUMERICAL',
