@@ -75,7 +75,7 @@ describe('Grant Submission Flow', () => {
 
     // ---- Step 3: Summary ----
     // Verify we're on the summary page
-    cy.contains('Review application').should('be.visible');
+    cy.contains('Review grant request').should('be.visible');
 
     // Check that the summary shows the correct information
     cy.contains('Grant application for community project').should('be.visible');
