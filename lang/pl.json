@@ -3744,6 +3744,7 @@
   "unarchive.modal.header": "Zdezarchiwizuj {name}",
   "unfrozenAt": "Unfrozen At",
   "unhostedAt": "Unhosted At",
+  "UnhostedSince": "Unhosted since",
   "Unknown": "Nieznane",
   "uNrhIZ": "If the transaction currency is different from the host currency, this amount will show the value in which the transaction was initiated. This is a string that includes the original value and currency (eg: 1000 SK)",
   "unsubscribe.success": "Subskrypcja została anulowana!",
