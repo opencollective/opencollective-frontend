@@ -40,12 +40,10 @@ export const grantColumns: Record<string, ColumnDef<any, any>> = {
           account={account}
           trigger={
             <span className="inline-flex">
-              &nbsp;
-              <LinkCollective noTitle className="inline-flex font-semibold hover:underline" collective={account}>
-                <Avatar collective={account} radius={16} />
-                {account.name}
+              <LinkCollective noTitle className="flex items-center font-semibold hover:underline" collective={account}>
+                <Avatar className="mr-4" collective={account} radius={32} />
+                <div>{account.name}</div>
               </LinkCollective>
-              &nbsp;
             </span>
           }
         />
@@ -75,13 +73,13 @@ export const grantColumns: Record<string, ColumnDef<any, any>> = {
       const hasExchangeRate =
         grant.amountInAccountCurrency && grant.amountInAccountCurrency?.currency !== grant.currency;
       return (
-        <div className="mb-1 flex flex-col items-end text-sm font-medium text-slate-800">
+        <div className="flex flex-col items-end text-sm font-medium text-slate-800">
           <span>
             <FormattedMoneyAmount amount={grant.amount} currency={grant.currency} precision={2} />
           </span>
 
           {hasExchangeRate && (
-            <div className="my-1 text-xs text-slate-600">
+            <div className="text-xs text-slate-600">
               <AmountWithExchangeRateInfo amount={grant.amountInAccountCurrency as any} />
             </div>
           )}
@@ -197,7 +195,7 @@ function BeneficiaryCell({ account, createdByAccount }) {
           trigger={
             <span className="inline-flex">
               <AvatarWithLink
-                size={40}
+                size={32}
                 account={account}
                 secondaryAccount={account.id === createdByAccount.id ? null : createdByAccount}
               />
@@ -206,7 +204,7 @@ function BeneficiaryCell({ account, createdByAccount }) {
         />
       </div>
       <div>
-        <div className="mb-1 font-semibold">
+        <div className="font-semibold">
           <AccountHoverCard
             account={account}
             trigger={

@@ -10,8 +10,7 @@ import { HostedCollectiveTypes } from '@/lib/constants/collectives';
 import type { FilterComponentConfigs, FiltersToVariables } from '@/lib/filters/filter-types';
 import { integer } from '@/lib/filters/schemas';
 import { API_V2_CONTEXT } from '@/lib/graphql/helpers';
-import type { HostedCollectivesQueryVariables } from '@/lib/graphql/types/v2/graphql';
-import type { Account, Collective } from '@/lib/graphql/types/v2/schema';
+import type { HostedCollectiveFieldsFragment, HostedCollectivesQueryVariables } from '@/lib/graphql/types/v2/graphql';
 import { HostFeeStructure } from '@/lib/graphql/types/v2/schema';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import { formatHostFeeStructure } from '@/lib/i18n/host-fee-structure';
@@ -105,7 +104,9 @@ export function HostedFunds({ accountSlug: hostSlug, subpath }: DashboardSection
   const router = useRouter();
   const { showModal } = useModal();
   const [displayExportCSVModal, setDisplayExportCSVModal] = React.useState(false);
-  const [showCollectiveOverview, setShowCollectiveOverview] = React.useState<Account | undefined | string>(subpath[0]);
+  const [showCollectiveOverview, setShowCollectiveOverview] = React.useState<
+    HostedCollectiveFieldsFragment | undefined | string
+  >(subpath[0]);
   const { data: metadata, refetch: refetchMetadata } = useQuery(
     gql`
       query HostedFundsMetadata($hostSlug: String!) {
@@ -190,12 +191,12 @@ export function HostedFunds({ accountSlug: hostSlug, subpath }: DashboardSection
   });
 
   useEffect(() => {
-    if (subpath[0] !== ((showCollectiveOverview as Collective)?.id || showCollectiveOverview)) {
+    if (subpath[0] !== ((showCollectiveOverview as HostedCollectiveFieldsFragment)?.id || showCollectiveOverview)) {
       handleDrawer(subpath[0]);
     }
   }, [subpath[0]]);
 
-  const handleDrawer = (collective: Collective | string | undefined) => {
+  const handleDrawer = (collective: HostedCollectiveFieldsFragment | string | undefined) => {
     if (collective) {
       pushSubpath(typeof collective === 'string' ? collective : collective.id);
     } else {
@@ -278,7 +279,7 @@ export function HostedFunds({ accountSlug: hostSlug, subpath }: DashboardSection
                 onEdit: handleEdit,
                 host: data?.host,
                 openCollectiveDetails: handleDrawer,
-              } as unknown as HostedCollectivesDataTableMeta
+              } as HostedCollectivesDataTableMeta
             }
             onClickRow={onClickRow}
             getRowDataCy={row => `collective-${row.original.slug}`}

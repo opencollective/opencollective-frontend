@@ -45,6 +45,7 @@ type SubmitGrantFlowProps = {
   expenseId?: number;
   draftKey?: string;
   handleOnClose: () => void;
+  onGrantSubmitted?: (grantId: number) => void;
 };
 
 export default function SubmitGrantFlow(props: SubmitGrantFlowProps) {
@@ -54,6 +55,7 @@ export default function SubmitGrantFlow(props: SubmitGrantFlowProps) {
       draftKey={props.draftKey}
       account={props.account}
       handleOnClose={props.handleOnClose}
+      onGrantSubmitted={props.onGrantSubmitted}
     />
   );
 }
@@ -76,6 +78,7 @@ type SubmitGrantDialogProps = {
   expenseId?: number;
   draftKey?: string;
   account: { slug: string; name?: string };
+  onGrantSubmitted?: (grantId: number) => void;
 };
 
 function SubmitGrantDialog(props: SubmitGrantDialogProps) {
@@ -96,6 +99,15 @@ function SubmitGrantDialog(props: SubmitGrantDialogProps) {
       router.replace(`${props.account.slug}/expenses?type=GRANT`);
     }
   }, [LoggedInUser, props.account.slug, router, hasGrantAndFundsReorgEnabled]);
+
+  const { onGrantSubmitted: onGrantSubmittedCallback } = props;
+  const onGrantSubmitted = React.useCallback(
+    grantId => {
+      setSubmittedGrantId(grantId);
+      onGrantSubmittedCallback?.(grantId);
+    },
+    [onGrantSubmittedCallback],
+  );
 
   return (
     <Dialog
@@ -169,7 +181,7 @@ function SubmitGrantDialog(props: SubmitGrantDialogProps) {
                 draftKey={props.draftKey}
                 expenseId={props.expenseId}
                 accountSlug={props.account.slug}
-                onGrantSubmitted={setSubmittedGrantId}
+                onGrantSubmitted={onGrantSubmitted}
               />
             )}
             {submittedGrantId && (
@@ -189,17 +201,14 @@ function SubmitGrantDialog(props: SubmitGrantDialogProps) {
                   values={{
                     link: c => {
                       return (
-                        <React.Fragment>
-                          &nbsp;
-                          <Button
-                            className="h-5 px-0 leading-5"
-                            size="xs"
-                            variant="link"
-                            onClick={onViewAllGrantRequestsClick}
-                          >
-                            {c}
-                          </Button>
-                        </React.Fragment>
+                        <Button
+                          className="h-5 px-0 leading-5"
+                          size="xs"
+                          variant="link"
+                          onClick={onViewAllGrantRequestsClick}
+                        >
+                          {c}
+                        </Button>
                       );
                     },
                   }}

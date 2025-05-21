@@ -104,7 +104,7 @@ export function Grants({ accountSlug }: DashboardSectionProps) {
   const { account } = useContext(DashboardContext);
   const [isCreateSubmitGrantFlowOpen, setIsCreateSubmitGrantFlowOpen] = React.useState(false);
 
-  const { data: metadata } = useQuery(accountExpensesMetadataQuery, {
+  const { data: metadata, refetch: refechMetadata } = useQuery(accountExpensesMetadataQuery, {
     variables: { accountSlug },
     context: API_V2_CONTEXT,
   });
@@ -129,7 +129,7 @@ export function Grants({ accountSlug }: DashboardSectionProps) {
     filters: hostSlug ? filters : filtersWithoutHost,
   });
 
-  const { data, loading, error } = useQuery(accountExpensesQuery, {
+  const { data, loading, error, refetch } = useQuery(accountExpensesQuery, {
     variables: {
       account: { slug: accountSlug },
       fetchHostForExpenses: false, // Already fetched at the root level
@@ -176,7 +176,14 @@ export function Grants({ accountSlug }: DashboardSectionProps) {
   return (
     <React.Fragment>
       {isCreateSubmitGrantFlowOpen && (
-        <SubmitGrantFlow account={metadata?.account} handleOnClose={() => setIsCreateSubmitGrantFlowOpen(false)} />
+        <SubmitGrantFlow
+          account={metadata?.account}
+          handleOnClose={() => setIsCreateSubmitGrantFlowOpen(false)}
+          onGrantSubmitted={() => {
+            refechMetadata();
+            refetch();
+          }}
+        />
       )}
       <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
         <DashboardHeader
@@ -184,7 +191,7 @@ export function Grants({ accountSlug }: DashboardSectionProps) {
           description={<FormattedMessage defaultMessage="Grant requests submitted to your account." id="qSe73a" />}
           actions={
             account.type === CollectiveType.FUND && (
-              <Button onClick={() => setIsCreateSubmitGrantFlowOpen(true)}>
+              <Button size="sm" onClick={() => setIsCreateSubmitGrantFlowOpen(true)}>
                 <FormattedMessage defaultMessage="Create grant request" id="TnG9DJ" />
               </Button>
             )
