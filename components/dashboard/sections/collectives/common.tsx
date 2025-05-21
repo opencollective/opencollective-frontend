@@ -206,6 +206,20 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       );
     },
   },
+  unhostedAt: {
+    accessorKey: 'unhostedAt',
+    header: () => <FormattedMessage defaultMessage="Unhosted since" id="UnhostedSince" />,
+    cell: ({ row }) => {
+      const unhostedAt = row.original.unhostedAt;
+      return isNil(unhostedAt) ? (
+        ''
+      ) : (
+        <div suppressHydrationWarning className="whitespace-nowrap">
+          <FormattedDate value={unhostedAt} day="numeric" month="long" year="numeric" />
+        </div>
+      );
+    },
+  },
   balance: {
     accessorKey: 'balance',
     header: () => <FormattedMessage id="Balance" defaultMessage="Balance" />,
