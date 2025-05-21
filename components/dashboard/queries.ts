@@ -44,6 +44,9 @@ export const adminPanelQuery = gql`
       ) {
         totalCount
       }
+      issuedGrantRequests: expenses(direction: SUBMITTED, limit: 0, type: GRANT) {
+        totalCount
+      }
       pausedIncomingContributions: orders(filter: INCOMING, status: PAUSED, includeIncognito: true) {
         totalCount
       }

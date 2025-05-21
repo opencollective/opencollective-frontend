@@ -109,12 +109,7 @@ export function SubmittedGrants({ accountSlug }: DashboardSectionProps) {
               <FormattedMessage defaultMessage="Issued Grants Requests" id="Tz9Fw1" />
             )
           }
-          description={
-            <FormattedMessage
-              defaultMessage="Grant requests that you have submitted to other Collectives."
-              id="CU04Sf"
-            />
-          }
+          description={<FormattedMessage defaultMessage="Grant requests that you have issued" id="zKZXvF" />}
         />
         <Filterbar {...queryFilter} meta={filterMeta} />
 

@@ -12,7 +12,7 @@ import type {
   HostDashboardExpensesQueryVariables,
 } from '../../../../lib/graphql/types/v2/graphql';
 import type { Expense } from '../../../../lib/graphql/types/v2/schema';
-import { ExpenseStatusFilter } from '../../../../lib/graphql/types/v2/schema';
+import { ExpenseStatusFilter, ExpenseType } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 
 import { accountHoverCardFields } from '@/components/AccountHoverCard';
@@ -27,6 +27,7 @@ import { expenseTagFilter } from '../../filters/ExpenseTagsFilter';
 import { Filterbar } from '../../filters/Filterbar';
 import { hostedAccountFilter } from '../../filters/HostedAccountFilter';
 import { Pagination } from '../../filters/Pagination';
+import { buildSortFilter } from '../../filters/SortFilter';
 import type { DashboardSectionProps } from '../../types';
 import type { FilterMeta as CommonFilterMeta } from '../expenses/filters';
 import {
@@ -39,9 +40,18 @@ import { hostDashboardExpensesQuery, hostInfoCardFields } from '../expenses/quer
 import type { GrantsTableMeta } from './common';
 import { grantColumns } from './common';
 
+const sortByFilter = buildSortFilter({
+  fieldSchema: z.enum(['CREATED_AT']),
+  defaultValue: {
+    field: 'CREATED_AT',
+    direction: 'ASC',
+  },
+});
+
 const filterSchema = commonSchema.extend({
   account: z.string().optional(),
   fromAccount: accountFilter.schema,
+  sort: sortByFilter.schema,
 });
 
 type FilterValues = z.infer<typeof filterSchema>;
@@ -64,7 +74,7 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   ...omit(commonFilters, ['type', 'chargeHasReceipts']),
   account: hostedAccountFilter.filter,
   tag: expenseTagFilter.filter,
-  fromAccount: { ...accountFilter.filter, labelMsg: defineMessage({ defaultMessage: 'From Account', id: 'VVlAZ6' }) },
+  fromAccount: { ...accountFilter.filter, labelMsg: defineMessage({ defaultMessage: 'Beneficiary', id: 'VfJsl4' }) },
 };
 
 const ROUTE_PARAMS = ['slug', 'section'];
@@ -89,13 +99,13 @@ export function HostedGrants({ accountSlug: hostSlug }: DashboardSectionProps) {
             }
           }
         }
-        pending: expenses(host: { slug: $hostSlug }, status: [PENDING]) {
+        pending: expenses(host: { slug: $hostSlug }, status: [PENDING], type: GRANT) {
           totalCount
         }
-        approved: expenses(host: { slug: $hostSlug }, status: [APPROVED]) {
+        approved: expenses(host: { slug: $hostSlug }, status: [APPROVED], type: GRANT) {
           totalCount
         }
-        paid: expenses(host: { slug: $hostSlug }, status: [PAID]) {
+        paid: expenses(host: { slug: $hostSlug }, status: [PAID], type: GRANT) {
           totalCount
         }
 
@@ -172,6 +182,7 @@ export function HostedGrants({ accountSlug: hostSlug }: DashboardSectionProps) {
   const variables = {
     hostSlug,
     ...queryFilter.variables,
+    type: ExpenseType.GRANT,
   };
 
   const expenses = useQuery(hostDashboardExpensesQuery, {
@@ -214,7 +225,10 @@ export function HostedGrants({ accountSlug: hostSlug }: DashboardSectionProps) {
 
   return (
     <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
-      <DashboardHeader title={<FormattedMessage defaultMessage="Grants" id="Csh2rX" />} />
+      <DashboardHeader
+        title={<FormattedMessage defaultMessage="Grants" id="Csh2rX" />}
+        description={<FormattedMessage defaultMessage="Grant requests submitted to your hosted funds" id="TPbcKk" />}
+      />
 
       <Filterbar {...queryFilter} />
 

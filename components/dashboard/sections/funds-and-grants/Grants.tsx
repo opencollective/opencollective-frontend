@@ -92,7 +92,7 @@ const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     },
     valueRenderer: ({ value }) => <AccountRenderer account={{ slug: value }} />,
   },
-  fromAccount: { ...accountFilter.filter, labelMsg: defineMessage({ defaultMessage: 'From Account', id: 'VVlAZ6' }) },
+  fromAccount: { ...accountFilter.filter, labelMsg: defineMessage({ defaultMessage: 'Beneficiary', id: 'VfJsl4' }) },
 };
 
 const filtersWithoutHost = omit(filters, ['accountingCategory', 'type']);

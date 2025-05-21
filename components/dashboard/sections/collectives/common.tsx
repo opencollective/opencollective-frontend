@@ -227,7 +227,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
   },
   consolidatedBalance: {
     accessorKey: 'consolidatedBalence',
-    header: () => <FormattedMessage id="TotalBalance" defaultMessage="Total Balance" />,
+    header: () => <FormattedMessage defaultMessage="Current balance" id="kuYpoI" />,
     cell: ({ row }) => {
       const collective = row.original;
       const isChild = !!collective.parent?.id;
@@ -285,7 +285,7 @@ export const cols: Record<string, ColumnDef<any, any>> = {
       return (
         <div className="flex items-center font-medium text-foreground">
           <FormattedMoneyAmount
-            amount={stats.totalAmountSpent?.valueInCents}
+            amount={Math.abs(stats.totalAmountSpent?.valueInCents)}
             currency={stats.totalAmountSpent?.currency}
             showCurrencyCode={true}
           />
@@ -339,6 +339,8 @@ export const MoreActionsMenu = ({
     PREVIEW_FEATURE_KEYS.GRANT_AND_FUNDS_REORG,
   );
 
+  const isCollectiveAdmin = LoggedInUser.isAdminOfCollective(collective);
+
   return (
     <React.Fragment>
       <DropdownMenu>
@@ -348,10 +350,18 @@ export const MoreActionsMenu = ({
             <React.Fragment>
               <DropdownMenuItem className="cursor-pointer" onClick={() => openCollectiveDetails(collective)}>
                 <Eye className="mr-2" size="16" />
-                <FormattedMessage id="viewDetails" defaultMessage="View Details" />
+                <FormattedMessage defaultMessage="View details" id="MnpUD7" />
               </DropdownMenuItem>
               <DropdownMenuSeparator />
             </React.Fragment>
+          )}
+          {isCollectiveAdmin && (
+            <a href={getDashboardRoute(collective)}>
+              <DropdownMenuItem className="cursor-pointer" data-cy="actions-visit-dashboard">
+                <Eye className="mr-2" size="16" />
+                <FormattedMessage defaultMessage="Visit dashboard" id="I7Vl8J" />
+              </DropdownMenuItem>
+            </a>
           )}
           <DropdownMenuItem
             className="cursor-pointer"
@@ -359,7 +369,7 @@ export const MoreActionsMenu = ({
             onClick={() => router.push(getDashboardRoute(account, `host-transactions?account=${collective.slug}`))}
           >
             <ReceiptText className="mr-2" size="16" />
-            <FormattedMessage id="viewTransactions" defaultMessage="View Transactions" />
+            <FormattedMessage defaultMessage="View transactions" id="DfQJQ6" />
           </DropdownMenuItem>
           {collective.type === CollectiveType.FUND && hasGrantAndFundsReorgEnabled && (
             <DropdownMenuItem
@@ -392,7 +402,7 @@ export const MoreActionsMenu = ({
             onClick={() => setOpenModal('ADD_FUNDS')}
           >
             <Banknote className="mr-2" size="16" />
-            <FormattedMessage id="menu.addFunds" defaultMessage="Add Funds" />
+            <FormattedMessage defaultMessage="Add funds" id="sx0aSl" />
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           {collective.type === CollectiveType.FUND && (
@@ -422,7 +432,7 @@ export const MoreActionsMenu = ({
             onClick={() => setOpenModal('ADD_AGREEMENT')}
           >
             <FilePlus2 className="mr-2" size="16" />
-            <FormattedMessage defaultMessage="Add Agreement" id="apnXKF" />
+            <FormattedMessage defaultMessage="Add agreement" id="aHYj2r" />
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
@@ -439,8 +449,8 @@ export const MoreActionsMenu = ({
               <React.Fragment>
                 <Play className="mr-2" size="16" />
                 <FormattedMessage
-                  defaultMessage="Unfreeze {collectiveType, select, FUND {Fund} other {Collective}}"
-                  id="VoOM/F"
+                  defaultMessage="Unfreeze {collectiveType, select, FUND {fund} other {collective}}"
+                  id="62ZM+e"
                   values={{ collectiveType: collective.type }}
                 />
               </React.Fragment>
@@ -448,8 +458,8 @@ export const MoreActionsMenu = ({
               <React.Fragment>
                 <Pause className="mr-2" size="16" />
                 <FormattedMessage
-                  defaultMessage="Freeze {collectiveType, select, FUND {Fund} other {Collective}}"
-                  id="8Gx2hn"
+                  defaultMessage="Freeze {collectiveType, select, FUND {fund} other {collective}}"
+                  id="pq79Xh"
                   values={{ collectiveType: collective.type }}
                 />
               </React.Fragment>

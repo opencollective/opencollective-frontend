@@ -1,23 +1,26 @@
 import React from 'react';
 import type { ColumnDef, TableMeta } from '@tanstack/react-table';
 import { includes } from 'lodash';
-import { Filter, MoreHorizontal, PanelRightOpen } from 'lucide-react';
+import { Check, Filter, MinusCircle, MoreHorizontal, PanelRightOpen } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { isHostAccount } from '@/lib/collective';
+import useProcessExpense from '@/lib/expenses/useProcessExpense';
 import type { Expense } from '@/lib/graphql/types/v2/schema';
 import formatCollectiveType from '@/lib/i18n/collective-type';
 import { getDashboardRoute } from '@/lib/url-helpers';
 
 import { AccountHoverCard } from '@/components/AccountHoverCard';
 import AmountWithExchangeRateInfo from '@/components/AmountWithExchangeRateInfo';
-import Avatar from '@/components/Avatar';
 import { AvatarWithLink } from '@/components/AvatarWithLink';
 import DateTime from '@/components/DateTime';
+import type { ConfirmProcessExpenseModalType } from '@/components/expenses/ConfirmProcessExpenseModal';
+import ConfirmProcessExpenseModal from '@/components/expenses/ConfirmProcessExpenseModal';
 import ExpenseStatusTag, { getExpenseStatusMsgType } from '@/components/expenses/ExpenseStatusTag';
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
 import LinkCollective from '@/components/LinkCollective';
+import StyledSpinner from '@/components/StyledSpinner';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,20 +37,7 @@ export const grantColumns: Record<string, ColumnDef<any, any>> = {
     accessorKey: 'account',
     header: () => <FormattedMessage defaultMessage="Fund" id="Tags.FUND" />,
     cell: ({ cell }) => {
-      const account = cell.getValue();
-      return (
-        <AccountHoverCard
-          account={account}
-          trigger={
-            <span className="inline-flex">
-              <LinkCollective noTitle className="flex items-center font-semibold hover:underline" collective={account}>
-                <Avatar className="mr-4" collective={account} radius={32} />
-                <div>{account.name}</div>
-              </LinkCollective>
-            </span>
-          }
-        />
-      );
+      return <FundCell account={cell.getValue()} />;
     },
   },
   beneficiary: {
@@ -145,12 +135,21 @@ function MoreActionsMenu(props: MoreActionsMenuProps) {
   const { account } = React.useContext(DashboardContext);
 
   const isHost = isHostAccount(account);
+
+  const permissions = props.grant?.permissions;
+
+  const [processModal, setProcessModal] = React.useState<ConfirmProcessExpenseModalType>(null);
+  const processExpense = useProcessExpense({
+    expense: props.grant,
+  });
+
   return (
     <React.Fragment>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>{props.children}</DropdownMenuTrigger>
         <DropdownMenuContent className="min-w-[240px]" align="end">
           <DropdownMenuItem
+            disabled={processExpense.loading}
             onClick={() => props.onViewDetailsClick(props.grant)}
             className="cursor-pointer"
             data-cy="actions-view-grant"
@@ -162,6 +161,7 @@ function MoreActionsMenu(props: MoreActionsMenuProps) {
             <React.Fragment>
               <DropdownMenuSeparator />
               <DropdownMenuItem
+                disabled={processExpense.loading}
                 onClick={() =>
                   router.push(
                     getDashboardRoute(
@@ -176,8 +176,31 @@ function MoreActionsMenu(props: MoreActionsMenuProps) {
               </DropdownMenuItem>
             </React.Fragment>
           )}
+          {(permissions.canApprove || permissions.canReject) && <DropdownMenuSeparator />}
+          {permissions.canApprove && (
+            <DropdownMenuItem
+              disabled={processExpense.loading}
+              onClick={async e => {
+                e.preventDefault();
+                await processExpense.approve();
+              }}
+            >
+              <Check className="text-muted-foreground" size={16} />
+              <FormattedMessage defaultMessage="Approve grant" id="202vW9" />
+              {processExpense.loading && processExpense.currentAction === 'APPROVE' && <StyledSpinner size={16} />}
+            </DropdownMenuItem>
+          )}
+          {permissions.canReject && (
+            <DropdownMenuItem disabled={processExpense.loading} onClick={() => setProcessModal('REJECT')}>
+              <MinusCircle className="text-muted-foreground" size={16} />
+              <FormattedMessage defaultMessage="Reject grant" id="laRuyZ" />
+            </DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
+      {processModal && (
+        <ConfirmProcessExpenseModal type={processModal} expense={props.grant} onClose={() => setProcessModal(null)} />
+      )}
     </React.Fragment>
   );
 }
@@ -232,6 +255,54 @@ function BeneficiaryCell({ account, createdByAccount }) {
             </span>
           )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+function FundCell({ account }) {
+  return (
+    <div className="flex">
+      <div className="pr-4">
+        <AccountHoverCard
+          account={account}
+          trigger={
+            <span className="inline-flex">
+              <AvatarWithLink size={32} account={account} />
+            </span>
+          }
+        />
+      </div>
+      <div>
+        <div className="font-semibold">
+          <AccountHoverCard
+            account={account}
+            trigger={
+              <span className="inline-flex">
+                <LinkCollective noTitle className="inline-flex hover:underline" collective={account}>
+                  {account.name}
+                </LinkCollective>
+              </span>
+            }
+          />
+        </div>
+        {account.stats?.balanceWithBlockedFunds && (
+          <div className="text-sm">
+            <FormattedMessage
+              defaultMessage="Balance: {amount}"
+              id="C0kGx0"
+              values={{
+                amount: (
+                  <FormattedMoneyAmount
+                    showCurrencyCode={false}
+                    currency={account.stats.balanceWithBlockedFunds.currency}
+                    amount={account.stats.balanceWithBlockedFunds.valueInCents}
+                  />
+                ),
+              }}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

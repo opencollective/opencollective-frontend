@@ -117,6 +117,9 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
     PREVIEW_FEATURE_KEYS.GRANT_AND_FUNDS_REORG,
   );
 
+  const hasPendingGrants = account.pendingGrants?.totalCount > 0;
+  const hasIssuedGrantRequests = account.issuedGrantRequests?.totalCount > 0;
+
   const items: MenuItem[] = [
     {
       if: isIndividual || !isHost,
@@ -197,10 +200,11 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
           section: ALL_SECTIONS.GRANTS,
         },
         {
-          if: !isIndividual,
+          if: isHost || isSelfHosted ? hasPendingGrants : !isIndividual,
           section: ALL_SECTIONS.APPROVE_GRANT_REQUESTS,
         },
         {
+          if: isHost || isSelfHosted ? hasIssuedGrantRequests : true,
           section: ALL_SECTIONS.SUBMITTED_GRANTS,
         },
       ],

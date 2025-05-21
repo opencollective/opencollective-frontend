@@ -566,7 +566,7 @@ function FormContainer(props: FormContainerProps) {
           <FormSectionContainer
             id={Step.SUMMARY}
             inViewChange={onInViewChange}
-            title={<FormattedMessage defaultMessage="Review application" id="lB/ra7" />}
+            title={<FormattedMessage defaultMessage="Review grant request" id="QQ0CHl" />}
           >
             <SummarySectionContent form={form} />
           </FormSectionContainer>

@@ -49,7 +49,7 @@ function getFormProps(form: ExpenseForm) {
       'expense',
       'loggedInAccount',
     ]),
-    ...pick(form.values, ['payeeSlug', 'inviteeAccountType']),
+    ...pick(form.values, ['payeeSlug', 'inviteeAccountType', 'expenseTypeOption']),
   };
 }
 
@@ -203,6 +203,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
                 disabled={props.isSubmitting}
                 onFocus={() => props.setFieldValue('payeeSlug', '__inviteSomeone')}
                 invitable
+                expenseType={props.expenseTypeOption}
                 collective={props.payeeSlug === '__inviteExistingUser' ? props.payee : null}
                 types={[
                   CollectiveType.COLLECTIVE,
