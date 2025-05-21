@@ -26,7 +26,6 @@ const defaults = {
   IMAGES_URL: 'https://images-staging.opencollective.com',
   WEBSITE_URL: 'http://localhost:3000',
   REST_URL: 'https://rest-staging.opencollective.com',
-  PDF_SERVICE_URL: 'https://pdf-staging.opencollective.com',
   PDF_SERVICE_V2_URL: 'https://pdf-staging.opencollective.com',
   ML_SERVICE_URL: 'https://ml.opencollective.com',
   DISABLE_MOCK_UPLOADS: false,
