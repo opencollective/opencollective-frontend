@@ -24,7 +24,7 @@ import {
   PLATFORM_PRESETS,
 } from '../../lib/export-csv/transactions-csv';
 import { API_V2_CONTEXT } from '../../lib/graphql/helpers';
-import type { HostReportsPageQueryVariables, TransactionsPageQueryVariables } from '../../lib/graphql/types/v2/graphql';
+import type { HostReportsQueryVariables, TransactionsPageQueryVariables } from '../../lib/graphql/types/v2/graphql';
 import type { Account } from '../../lib/graphql/types/v2/schema';
 import { useAsyncCall } from '../../lib/hooks/useAsyncCall';
 import type { useQueryFilterReturnType } from '../../lib/hooks/useQueryFilter';
@@ -219,7 +219,7 @@ const editAccountSettingsMutation = gql`
 type ExportTransactionsCSVModalProps = {
   open?: boolean;
   setOpen?: (open: boolean) => void;
-  queryFilter: useQueryFilterReturnType<any, TransactionsPageQueryVariables | HostReportsPageQueryVariables>;
+  queryFilter: useQueryFilterReturnType<any, TransactionsPageQueryVariables | HostReportsQueryVariables>;
   account?: Pick<Account, 'slug' | 'settings'>;
   isHostReport?: boolean;
   trigger?: React.ReactNode;
