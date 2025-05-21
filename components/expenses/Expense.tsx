@@ -727,7 +727,7 @@ function Expense(props) {
         <Fragment>
           <Box my={4}>
             <PrivateCommentsMessage
-              expenseType={expense.type}
+              expenseType={expense?.type}
               isAllowed={expense?.permissions.canComment}
               isLoading={loadingLoggedInUser || isRefetchingDataForUser}
             />

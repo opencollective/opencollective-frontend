@@ -136,7 +136,7 @@ function MoreActionsMenu(props: MoreActionsMenuProps) {
 
   const isHost = isHostAccount(account);
 
-  const permissions = props.grant?.permissions;
+  const permissions = props.grant?.permissions || {};
 
   const [processModal, setProcessModal] = React.useState<ConfirmProcessExpenseModalType>(null);
   const processExpense = useProcessExpense({
