@@ -136,7 +136,7 @@ function MoreActionsMenu(props: MoreActionsMenuProps) {
 
   const isHost = isHostAccount(account);
 
-  const permissions = props.grant?.permissions || {};
+  const permissions = props.grant?.permissions;
 
   const [processModal, setProcessModal] = React.useState<ConfirmProcessExpenseModalType>(null);
   const processExpense = useProcessExpense({
@@ -176,8 +176,8 @@ function MoreActionsMenu(props: MoreActionsMenuProps) {
               </DropdownMenuItem>
             </React.Fragment>
           )}
-          {(permissions.canApprove || permissions.canReject) && <DropdownMenuSeparator />}
-          {permissions.canApprove && (
+          {(permissions?.canApprove || permissions?.canReject) && <DropdownMenuSeparator />}
+          {permissions?.canApprove && (
             <DropdownMenuItem
               disabled={processExpense.loading}
               onClick={async e => {
@@ -190,7 +190,7 @@ function MoreActionsMenu(props: MoreActionsMenuProps) {
               {processExpense.loading && processExpense.currentAction === 'APPROVE' && <StyledSpinner size={16} />}
             </DropdownMenuItem>
           )}
-          {permissions.canReject && (
+          {permissions?.canReject && (
             <DropdownMenuItem disabled={processExpense.loading} onClick={() => setProcessModal('REJECT')}>
               <MinusCircle className="text-muted-foreground" size={16} />
               <FormattedMessage defaultMessage="Reject grant" id="laRuyZ" />
