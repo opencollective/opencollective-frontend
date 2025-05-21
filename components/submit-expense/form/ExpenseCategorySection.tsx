@@ -23,7 +23,7 @@ type ExpenseCategorySectionProps = {
 function getFormProps(form: ExpenseForm) {
   return {
     ...pick(form, 'setFieldValue', 'isSubmitting'),
-    ...pick(form.values, ['accountingCategoryId', 'expenseTypeOption']),
+    ...pick(form.values, ['accountingCategoryId', 'expenseTypeOption', 'expenseItems', 'title']),
     ...pick(form.options, ['accountingCategories', 'host', 'account', 'isAccountingCategoryRequired']),
   };
 }
@@ -54,6 +54,14 @@ export const ExpenseCategorySection = memoWithGetFormProps(function ExpenseCateg
     },
     [setFieldValue],
   );
+  const expenseValues = React.useMemo(
+    () => ({
+      type: props.expenseTypeOption,
+      description: props.title,
+      items: props.expenseItems,
+    }),
+    [props.expenseTypeOption, props.title, props.expenseItems],
+  );
 
   return (
     <FormSectionContainer
@@ -72,10 +80,14 @@ export const ExpenseCategorySection = memoWithGetFormProps(function ExpenseCateg
             host={host}
             showCode={isHostAdmin}
             expenseType={props.expenseTypeOption}
+            expenseValues={expenseValues}
             account={props.account}
             selectedCategory={selectedAccountingCategory}
             allowNone={true}
+            selectFirstOptionIfSingle
+            predictionStyle="full"
             buttonClassName="max-w-full w-full"
+            hasFixedPredictionsSize={false}
           />
         )}
       </FormField>

@@ -54,11 +54,11 @@ export function SubmitExpenseFlowForm(props: SubmitExpenseFlowFormProps) {
       <WhoIsGettingPaidSection inViewChange={onInViewChange} {...WhoIsGettingPaidSection.getFormProps(form)} />
       <PayoutMethodSection inViewChange={onInViewChange} {...PayoutMethodSection.getFormProps(form)} />
       <TypeOfExpenseSection inViewChange={onInViewChange} {...TypeOfExpenseSection.getFormProps(form)} />
+      <ExpenseItemsSection inViewChange={onInViewChange} form={form} />
+      <AdditionalDetailsSection inViewChange={onInViewChange} {...AdditionalDetailsSection.getFormProps(form)} />
       {form.options.isAccountingCategoryRequired && form.options.accountingCategories?.length > 0 && (
         <ExpenseCategorySection inViewChange={onInViewChange} {...ExpenseCategorySection.getFormProps(form)} />
       )}
-      <ExpenseItemsSection inViewChange={onInViewChange} form={form} />
-      <AdditionalDetailsSection inViewChange={onInViewChange} {...AdditionalDetailsSection.getFormProps(form)} />
       <SummarySection inViewChange={onInViewChange} form={form} />
       <div className="flex justify-end">
         <Button

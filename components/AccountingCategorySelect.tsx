@@ -37,6 +37,8 @@ type AccountingCategorySelectProps = {
     items?: Array<{ description?: string }>;
   };
   predictionStyle?: 'full' | 'inline-preload';
+  /** When used with predictionStyle=full, this ensures the block below the input keeps the same size always */
+  hasFixedPredictionsSize: boolean;
   selectedCategory: Pick<AccountingCategory, 'friendlyName' | 'name' | 'code' | 'id'> | undefined | null;
   valuesByRole?: Expense['valuesByRole'];
   onChange: (category: AccountingCategory | null) => void;
@@ -334,6 +336,7 @@ const AccountingCategorySelect = ({
   expenseValues = undefined,
   buttonClassName = '',
   children = null,
+  hasFixedPredictionsSize = true,
   selectFirstOptionIfSingle,
   disabled,
 }: AccountingCategorySelectProps) => {
@@ -493,7 +496,7 @@ const AccountingCategorySelect = ({
           </Command>
         </PopoverContent>
       </Popover>
-      {predictionStyle === 'full' && (
+      {predictionStyle === 'full' && (Boolean(suggestedOptions.length) || hasFixedPredictionsSize) && (
         <div className="mt-2 min-h-[33px] text-xs text-gray-700">
           {Boolean(suggestedOptions.length) && (
             <div>
