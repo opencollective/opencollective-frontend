@@ -64,7 +64,6 @@ const nextConfig = {
         WISE_PLATFORM_COLLECTIVE_SLUG: null,
         WISE_ENVIRONMENT: 'sandbox',
         HCAPTCHA_SITEKEY: false,
-        OCF_DUPLICATE_FLOW: false,
         TURNSTILE_SITEKEY: false,
         CAPTCHA_ENABLED: false,
         CAPTCHA_PROVIDER: 'HCAPTCHA',

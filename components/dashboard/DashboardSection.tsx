@@ -8,7 +8,6 @@ import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import Container from '../Container';
 import LoadingPlaceholder from '../LoadingPlaceholder';
 import NotFound from '../NotFound';
-import { OCFBannerWithData } from '../OCFBanner';
 import AccountSettingsForm from '../root-actions/AccountSettings';
 import AccountType from '../root-actions/AccountType';
 import { AnonymizeAccount } from '../root-actions/AnonymizeAccount';
@@ -134,7 +133,6 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
   if (isLoading) {
     return (
       <div className="w-full pb-6">
-        <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
         <LoadingPlaceholder height={26} mb={4} maxWidth={500} />
         <LoadingPlaceholder height={300} />
       </div>
@@ -154,7 +152,6 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
   if (DashboardComponent) {
     return (
       <div className="w-full pb-6">
-        <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
         <DashboardComponent accountSlug={account.slug} subpath={subpath} isDashboard />
       </div>
     );
@@ -163,7 +160,6 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
   if (values(LEGACY_SECTIONS).includes(section)) {
     return (
       <div className="w-full max-w-(--breakpoint-lg) pb-6">
-        <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
         {SECTION_LABELS[section] && section !== ALL_SECTIONS.GIFT_CARDS && (
           <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />
         )}
@@ -179,7 +175,6 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
     return (
       // <div className="flex max-w-(--breakpoint-lg) justify-center">
       <div className="max-w-(--breakpoint-md) flex-1 pb-6">
-        <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
         <SettingsComponent account={account} accountSlug={account.slug} subpath={subpath} />
       </div>
     );
@@ -189,7 +184,6 @@ const DashboardSection = ({ account, isLoading, section, subpath }) => {
     return (
       // <div className="flex max-w-(--breakpoint-lg) justify-center">
       <div className="max-w-(--breakpoint-md) flex-1 pb-6">
-        <OCFBannerWithData isDashboard collective={account} hideNextSteps={section === 'host'} />
         {SECTION_LABELS[section] && section !== ALL_SECTIONS.GIFT_CARDS && (
           <DashboardHeader className="mb-2" title={formatMessage(SECTION_LABELS[section])} />
         )}

@@ -297,7 +297,7 @@ const useExpenseCategoryPredictionService = (
   return { loading, predictions: predictions || (showPreviousPredictions && previousPredictions.current) || [] };
 };
 
-const hostSupportsPredictions = (host: RequiredHostFields) => ['foundation', 'opensource'].includes(host?.slug);
+const hostSupportsPredictions = (host: RequiredHostFields) => ['opensource'].includes(host?.slug);
 
 const shouldUsePredictions = (
   host: RequiredHostFields,
