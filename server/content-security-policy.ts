@@ -14,6 +14,7 @@ const COMMON_DIRECTIVES = {
     SELF,
     process.env.IMAGES_URL,
     process.env.NEXT_IMAGES_URL,
+    process.env.PDF_SERVICE_V2_URL,
     'data:',
     '*.paypal.com',
     '*.paypalobjects.com',
