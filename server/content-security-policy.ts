@@ -33,7 +33,6 @@ const COMMON_DIRECTIVES = {
   connectSrc: [
     SELF,
     process.env.API_URL,
-    process.env.PDF_SERVICE_URL,
     process.env.PDF_SERVICE_V2_URL,
     process.env.REST_URL,
     process.env.ML_SERVICE_URL,
