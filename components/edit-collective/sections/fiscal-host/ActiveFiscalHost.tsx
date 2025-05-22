@@ -2,7 +2,6 @@ import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
-import { OPENCOLLECTIVE_FOUNDATION_ID } from '../../../../lib/constants/collectives';
 import { formatCurrency } from '../../../../lib/currency-utils';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
 import type { ActiveFiscalHostQuery, ActiveFiscalHostQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
@@ -21,8 +20,6 @@ import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import StyledHr from '../../../StyledHr';
 import { Button } from '../../../ui/Button';
 import { LeaveHostModal } from '../../LeaveHostModal';
-
-import { FiscalHostOCFTransition } from './FiscalHostOCFTransition';
 
 type ActiveFiscalHostProps = {
   collectiveSlug: string;
@@ -162,86 +159,79 @@ export function ActiveFiscalHost(props: ActiveFiscalHostProps) {
           </div>
         )}
       </div>
-      {host?.legacyId === OPENCOLLECTIVE_FOUNDATION_ID && !('parent' in collective) ? (
-        <div className="mt-8">
-          <FiscalHostOCFTransition collective={collective} />
-        </div>
-      ) : (
-        <React.Fragment>
-          <div className="mt-6">
-            {collective?.stats?.consolidatedBalance.valueInCents > 0 && (
-              <p className="mb-2">
-                <FormattedMessage
-                  id="editCollective.host.balance"
-                  defaultMessage="It currently holds {balance} on behalf of {type, select, COLLECTIVE {your Collective} FUND {your Fund} other {your Account}}."
-                  values={{
-                    balance: (
-                      <strong>
-                        {formatCurrency(
-                          collective.stats.consolidatedBalance.valueInCents,
-                          collective.stats.consolidatedBalance.currency,
-                          { locale: intl.locale },
-                        )}
-                      </strong>
-                    ),
-                    type: collective.type,
-                  }}
-                />
-              </p>
-            )}
-            {collective?.stats?.consolidatedBalance.valueInCents > 0 && (
-              <p>
-                <FormattedMessage
-                  id="editCollective.host.change.balanceNotEmpty"
-                  defaultMessage="To change your Fiscal Host, you first need to empty {type, select, COLLECTIVE {your Collective's balance} FUND {your Fund's balance} other {your balance}}. You can do this by <SubmitExpenseLink>submitting expenses</SubmitExpenseLink>, making financial contributions, or sending the balance to your Fiscal Host using the <EmptyBalanceLink>Empty Balance</EmptyBalanceLink> feature."
-                  values={{
-                    type: collective.type,
-                    SubmitExpenseLink: getI18nLink({
-                      as: Link,
-                      href: `/${collective.slug}/expenses/new`,
-                    }),
-                    EmptyBalanceLink: getI18nLink({
-                      as: Link,
-                      href: getDashboardRoute(collective, 'advanced'),
-                    }),
-                  }}
-                />
-              </p>
-            )}
-            {collective?.stats?.consolidatedBalance.valueInCents === 0 && (
-              <div className="mt-2 flex">
-                <div>
-                  <Button variant="outline" size="lg" onClick={() => setIsConfirmingLeaveHost(true)}>
-                    <FormattedMessage id="editCollective.host.leave" defaultMessage="Leave Host" />
-                  </Button>
-                </div>
-              </div>
-            )}
-            {props.showLegalNameInfoBox && (
-              <Container mt={4}>
-                <MessageBox type="info" fontSize="13px" withIcon>
-                  <FormattedMessage
-                    id="collective.edit.host.legalName.info"
-                    defaultMessage="Please set the legal name {isSelfHosted, select, false {of the host} other {}} in the Info section of <SettingsLink>the settings</SettingsLink>. This is required if the legal name is different than the display name for tax and accounting purposes."
-                    values={{
-                      SettingsLink: getI18nLink({ href: `/dashboard/${host?.slug}` }),
-                      isSelfHosted: collective.id === host?.id,
-                    }}
-                  />
-                </MessageBox>
-              </Container>
-            )}
-            {isConfirmingLeaveHost && (
-              <LeaveHostModal account={collective} host={host} onClose={() => setIsConfirmingLeaveHost(false)} />
-            )}
+
+      <div className="mt-6">
+        {collective?.stats?.consolidatedBalance.valueInCents > 0 && (
+          <p className="mb-2">
+            <FormattedMessage
+              id="editCollective.host.balance"
+              defaultMessage="It currently holds {balance} on behalf of {type, select, COLLECTIVE {your Collective} FUND {your Fund} other {your Account}}."
+              values={{
+                balance: (
+                  <strong>
+                    {formatCurrency(
+                      collective.stats.consolidatedBalance.valueInCents,
+                      collective.stats.consolidatedBalance.currency,
+                      { locale: intl.locale },
+                    )}
+                  </strong>
+                ),
+                type: collective.type,
+              }}
+            />
+          </p>
+        )}
+        {collective?.stats?.consolidatedBalance.valueInCents > 0 && (
+          <p>
+            <FormattedMessage
+              id="editCollective.host.change.balanceNotEmpty"
+              defaultMessage="To change your Fiscal Host, you first need to empty {type, select, COLLECTIVE {your Collective's balance} FUND {your Fund's balance} other {your balance}}. You can do this by <SubmitExpenseLink>submitting expenses</SubmitExpenseLink>, making financial contributions, or sending the balance to your Fiscal Host using the <EmptyBalanceLink>Empty Balance</EmptyBalanceLink> feature."
+              values={{
+                type: collective.type,
+                SubmitExpenseLink: getI18nLink({
+                  as: Link,
+                  href: `/${collective.slug}/expenses/new`,
+                }),
+                EmptyBalanceLink: getI18nLink({
+                  as: Link,
+                  href: getDashboardRoute(collective, 'advanced'),
+                }),
+              }}
+            />
+          </p>
+        )}
+        {collective?.stats?.consolidatedBalance.valueInCents === 0 && (
+          <div className="mt-2 flex">
+            <div>
+              <Button variant="outline" size="lg" onClick={() => setIsConfirmingLeaveHost(true)}>
+                <FormattedMessage id="editCollective.host.leave" defaultMessage="Leave Host" />
+              </Button>
+            </div>
           </div>
-          <StyledHr my={4} />
-          <h2 className="mb-3 font-bold">
-            <FormattedMessage defaultMessage="Applications" id="DqD1yK" />
-          </h2>
-          <HostApplicationRequests accountSlug={collective?.slug} />
-        </React.Fragment>
-      )}
+        )}
+        {props.showLegalNameInfoBox && (
+          <Container mt={4}>
+            <MessageBox type="info" fontSize="13px" withIcon>
+              <FormattedMessage
+                id="collective.edit.host.legalName.info"
+                defaultMessage="Please set the legal name {isSelfHosted, select, false {of the host} other {}} in the Info section of <SettingsLink>the settings</SettingsLink>. This is required if the legal name is different than the display name for tax and accounting purposes."
+                values={{
+                  SettingsLink: getI18nLink({ href: `/dashboard/${host?.slug}` }),
+                  isSelfHosted: collective.id === host?.id,
+                }}
+              />
+            </MessageBox>
+          </Container>
+        )}
+        {isConfirmingLeaveHost && (
+          <LeaveHostModal account={collective} host={host} onClose={() => setIsConfirmingLeaveHost(false)} />
+        )}
+      </div>
+      <StyledHr my={4} />
+      <h2 className="mb-3 font-bold">
+        <FormattedMessage defaultMessage="Applications" id="DqD1yK" />
+      </h2>
+      <HostApplicationRequests accountSlug={collective?.slug} />
     </div>
   );
 }

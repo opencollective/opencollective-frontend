@@ -197,7 +197,7 @@ const TRUSTED_DOMAINS = [
   'gatherfor.org',
   'funds.ecosyste.ms',
 ];
-const TRUSTED_ROOT_DOMAINS = ['opencollective.com', 'opencollective.foundation', 'oscollective.org'];
+const TRUSTED_ROOT_DOMAINS = ['opencollective.com', 'oscollective.org'];
 
 export const isTrustedRedirectURL = (url: URL) => {
   if (url.protocol !== 'https:') {
