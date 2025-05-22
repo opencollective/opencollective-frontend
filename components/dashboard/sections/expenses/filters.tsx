@@ -21,6 +21,7 @@ import { LastCommentByFilterLabels } from '../../../../lib/i18n/last-comment-by-
 import i18nPayoutMethodType from '../../../../lib/i18n/payout-method-type';
 import { i18nChargeHasReceipts } from '../../../../lib/i18n/receipts-filter';
 import { sortSelectOptions } from '../../../../lib/utils';
+import { ExpenseMetaStatuses } from '@/lib/expense';
 
 import { accountingCategoryFilter } from '../../filters/AccountingCategoryFilter';
 import { amountFilter } from '../../filters/AmountFilter';
@@ -61,6 +62,7 @@ export type FilterValues = z.infer<typeof schema>;
 
 export type FilterMeta = {
   currency?: Currency;
+  hideExpensesMetaStatuses?: boolean;
 };
 
 // Only needed when either the key or the expected query variables are different
@@ -89,6 +91,10 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
     Component: ({ valueRenderer, intl, ...props }) => (
       <ComboSelectFilter
         options={Object.values(ExpenseStatusFilter)
+          .filter(
+            value =>
+              !props.meta?.hideExpensesMetaStatuses || !(ExpenseMetaStatuses as readonly string[]).includes(value),
+          )
           .map(value => ({ label: valueRenderer({ intl, value }), value }))
           .sort(sortSelectOptions)}
         isMulti
