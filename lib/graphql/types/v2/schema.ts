@@ -222,6 +222,7 @@ export type AccountExpensesArgs = {
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   direction?: InputMaybe<ExpenseDirection>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
+  fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
@@ -1634,6 +1635,7 @@ export type BotExpensesArgs = {
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   direction?: InputMaybe<ExpenseDirection>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
+  fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
@@ -2165,6 +2167,7 @@ export type CollectiveExpensesArgs = {
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   direction?: InputMaybe<ExpenseDirection>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
+  fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
@@ -4184,6 +4187,7 @@ export type EventExpensesArgs = {
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   direction?: InputMaybe<ExpenseDirection>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
+  fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
@@ -5424,6 +5428,7 @@ export type FundExpensesArgs = {
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   direction?: InputMaybe<ExpenseDirection>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
+  fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
@@ -6059,6 +6064,7 @@ export type HostExpensesArgs = {
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   direction?: InputMaybe<ExpenseDirection>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
+  fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
@@ -6468,6 +6474,7 @@ export type HostVendorsArgs = {
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
   searchTerm?: InputMaybe<Scalars['String']['input']>;
+  visibleToAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
 };
 
 
@@ -6996,6 +7003,7 @@ export type IndividualExpensesArgs = {
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   direction?: InputMaybe<ExpenseDirection>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
+  fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
@@ -9426,6 +9434,7 @@ export type OrganizationExpensesArgs = {
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   direction?: InputMaybe<ExpenseDirection>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
+  fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
@@ -10531,6 +10540,7 @@ export type ProjectExpensesArgs = {
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   direction?: InputMaybe<ExpenseDirection>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
+  fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
@@ -11003,6 +11013,7 @@ export type QueryExpensesArgs = {
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
+  fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
@@ -12699,6 +12710,8 @@ export type Vendor = Account & AccountWithContributions & {
   virtualCardMerchants?: Maybe<AccountCollection>;
   /** Virtual Cards attached to the account. Admin only. Scope: "virtualCards". */
   virtualCards?: Maybe<VirtualCardCollection>;
+  /** The accounts where this vendor is visible, if empty or null applies to all collectives under the vendor host */
+  visibleToAccounts?: Maybe<Array<Maybe<Account>>>;
   webhooks: WebhookCollection;
   /** @deprecated 2023-01-16: Please use socialLinks */
   website?: Maybe<Scalars['String']['output']>;
@@ -12786,6 +12799,7 @@ export type VendorExpensesArgs = {
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   direction?: InputMaybe<ExpenseDirection>;
   fromAccount?: InputMaybe<AccountReferenceInput>;
+  fromAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
   host?: InputMaybe<AccountReferenceInput>;
   includeChildrenExpenses?: Scalars['Boolean']['input'];
   lastCommentBy?: InputMaybe<Array<InputMaybe<LastCommentBy>>>;
@@ -13090,6 +13104,7 @@ export type VendorCreateInput = {
   payoutMethod?: InputMaybe<PayoutMethodInput>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['NonEmptyString']['input']>>>;
   vendorInfo?: InputMaybe<VendorInfoInput>;
+  visibleToAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
 };
 
 export type VendorEditInput = {
@@ -13114,6 +13129,7 @@ export type VendorEditInput = {
   slug?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['NonEmptyString']['input']>>>;
   vendorInfo?: InputMaybe<VendorInfoInput>;
+  visibleToAccounts?: InputMaybe<Array<InputMaybe<AccountReferenceInput>>>;
 };
 
 /** Some context about the vendor */

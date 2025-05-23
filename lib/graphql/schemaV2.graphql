@@ -670,6 +670,11 @@ interface Account {
     fromAccount: AccountReferenceInput
 
     """
+    An alternative to filter by fromAccount (singular), both cannot be used together
+    """
+    fromAccounts: [AccountReferenceInput]
+
+    """
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
@@ -3290,6 +3295,11 @@ type Host implements Account & AccountWithContributions {
     fromAccount: AccountReferenceInput
 
     """
+    An alternative to filter by fromAccount (singular), both cannot be used together
+    """
+    fromAccounts: [AccountReferenceInput]
+
+    """
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
@@ -4050,6 +4060,11 @@ type Host implements Account & AccountWithContributions {
     Rank vendors based on their relationship with this account
     """
     forAccount: AccountReferenceInput
+
+    """
+    Only returns vendors that are visible to the given accounts
+    """
+    visibleToAccounts: [AccountReferenceInput]
 
     """
     Filter on archived vendors
@@ -8846,6 +8861,11 @@ type Bot implements Account {
     fromAccount: AccountReferenceInput
 
     """
+    An alternative to filter by fromAccount (singular), both cannot be used together
+    """
+    fromAccounts: [AccountReferenceInput]
+
+    """
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
@@ -9762,6 +9782,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Reference of an account that is the payee of an expense
     """
     fromAccount: AccountReferenceInput
+
+    """
+    An alternative to filter by fromAccount (singular), both cannot be used together
+    """
+    fromAccounts: [AccountReferenceInput]
 
     """
     Reference of an account that is the payer of an expense
@@ -11233,6 +11258,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     fromAccount: AccountReferenceInput
 
     """
+    An alternative to filter by fromAccount (singular), both cannot be used together
+    """
+    fromAccounts: [AccountReferenceInput]
+
+    """
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
@@ -12420,6 +12450,11 @@ type Individual implements Account {
     fromAccount: AccountReferenceInput
 
     """
+    An alternative to filter by fromAccount (singular), both cannot be used together
+    """
+    fromAccounts: [AccountReferenceInput]
+
+    """
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
@@ -13585,6 +13620,11 @@ type Organization implements Account & AccountWithContributions {
     fromAccount: AccountReferenceInput
 
     """
+    An alternative to filter by fromAccount (singular), both cannot be used together
+    """
+    fromAccounts: [AccountReferenceInput]
+
+    """
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
@@ -14616,6 +14656,11 @@ type Vendor implements Account & AccountWithContributions {
     fromAccount: AccountReferenceInput
 
     """
+    An alternative to filter by fromAccount (singular), both cannot be used together
+    """
+    fromAccounts: [AccountReferenceInput]
+
+    """
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
@@ -15091,6 +15136,11 @@ type Vendor implements Account & AccountWithContributions {
   The account who created this order
   """
   createdByAccount: Account
+
+  """
+  The accounts where this vendor is visible, if empty or null applies to all collectives under the vendor host
+  """
+  visibleToAccounts: [Account]
 }
 
 """
@@ -15451,6 +15501,11 @@ type Query {
     Reference of an account that is the payee of an expense
     """
     fromAccount: AccountReferenceInput
+
+    """
+    An alternative to filter by fromAccount (singular), both cannot be used together
+    """
+    fromAccounts: [AccountReferenceInput]
 
     """
     Reference of an account that is the payer of an expense
@@ -18324,6 +18379,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     fromAccount: AccountReferenceInput
 
     """
+    An alternative to filter by fromAccount (singular), both cannot be used together
+    """
+    fromAccounts: [AccountReferenceInput]
+
+    """
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
@@ -19387,6 +19447,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Reference of an account that is the payee of an expense
     """
     fromAccount: AccountReferenceInput
+
+    """
+    An alternative to filter by fromAccount (singular), both cannot be used together
+    """
+    fromAccounts: [AccountReferenceInput]
 
     """
     Reference of an account that is the payer of an expense
@@ -24493,6 +24558,7 @@ input VendorCreateInput {
   imageUrl: String @deprecated(reason: "2024-11-26: Please use image + backgroundImage fields")
   vendorInfo: VendorInfoInput
   payoutMethod: PayoutMethodInput
+  visibleToAccounts: [AccountReferenceInput]
 
   """
   The profile avatar image
@@ -24547,6 +24613,7 @@ input VendorEditInput {
   imageUrl: String @deprecated(reason: "2024-11-26: Please use image + backgroundImage fields")
   vendorInfo: VendorInfoInput
   payoutMethod: PayoutMethodInput
+  visibleToAccounts: [AccountReferenceInput]
 
   """
   The profile avatar image
