@@ -670,6 +670,11 @@ interface Account {
     fromAccount: AccountReferenceInput
 
     """
+    An alternative to filter by fromAccount (singular), both cannot be used together
+    """
+    fromAccounts: [AccountReferenceInput]
+
+    """
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
@@ -724,6 +729,11 @@ interface Account {
     Only return expenses where the amount is lower than or equal to this value (in cents)
     """
     maxAmount: Int
+
+    """
+    The currency to use for the amount filter
+    """
+    amountCurrency: Currency
 
     """
     Only return expenses that use the given type as payout method
@@ -3290,6 +3300,11 @@ type Host implements Account & AccountWithContributions {
     fromAccount: AccountReferenceInput
 
     """
+    An alternative to filter by fromAccount (singular), both cannot be used together
+    """
+    fromAccounts: [AccountReferenceInput]
+
+    """
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
@@ -3344,6 +3359,11 @@ type Host implements Account & AccountWithContributions {
     Only return expenses where the amount is lower than or equal to this value (in cents)
     """
     maxAmount: Int
+
+    """
+    The currency to use for the amount filter
+    """
+    amountCurrency: Currency
 
     """
     Only return expenses that use the given type as payout method
@@ -8846,6 +8866,11 @@ type Bot implements Account {
     fromAccount: AccountReferenceInput
 
     """
+    An alternative to filter by fromAccount (singular), both cannot be used together
+    """
+    fromAccounts: [AccountReferenceInput]
+
+    """
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
@@ -8900,6 +8925,11 @@ type Bot implements Account {
     Only return expenses where the amount is lower than or equal to this value (in cents)
     """
     maxAmount: Int
+
+    """
+    The currency to use for the amount filter
+    """
+    amountCurrency: Currency
 
     """
     Only return expenses that use the given type as payout method
@@ -9764,6 +9794,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     fromAccount: AccountReferenceInput
 
     """
+    An alternative to filter by fromAccount (singular), both cannot be used together
+    """
+    fromAccounts: [AccountReferenceInput]
+
+    """
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
@@ -9818,6 +9853,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     Only return expenses where the amount is lower than or equal to this value (in cents)
     """
     maxAmount: Int
+
+    """
+    The currency to use for the amount filter
+    """
+    amountCurrency: Currency
 
     """
     Only return expenses that use the given type as payout method
@@ -11233,6 +11273,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     fromAccount: AccountReferenceInput
 
     """
+    An alternative to filter by fromAccount (singular), both cannot be used together
+    """
+    fromAccounts: [AccountReferenceInput]
+
+    """
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
@@ -11287,6 +11332,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     Only return expenses where the amount is lower than or equal to this value (in cents)
     """
     maxAmount: Int
+
+    """
+    The currency to use for the amount filter
+    """
+    amountCurrency: Currency
 
     """
     Only return expenses that use the given type as payout method
@@ -12420,6 +12470,11 @@ type Individual implements Account {
     fromAccount: AccountReferenceInput
 
     """
+    An alternative to filter by fromAccount (singular), both cannot be used together
+    """
+    fromAccounts: [AccountReferenceInput]
+
+    """
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
@@ -12474,6 +12529,11 @@ type Individual implements Account {
     Only return expenses where the amount is lower than or equal to this value (in cents)
     """
     maxAmount: Int
+
+    """
+    The currency to use for the amount filter
+    """
+    amountCurrency: Currency
 
     """
     Only return expenses that use the given type as payout method
@@ -13585,6 +13645,11 @@ type Organization implements Account & AccountWithContributions {
     fromAccount: AccountReferenceInput
 
     """
+    An alternative to filter by fromAccount (singular), both cannot be used together
+    """
+    fromAccounts: [AccountReferenceInput]
+
+    """
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
@@ -13639,6 +13704,11 @@ type Organization implements Account & AccountWithContributions {
     Only return expenses where the amount is lower than or equal to this value (in cents)
     """
     maxAmount: Int
+
+    """
+    The currency to use for the amount filter
+    """
+    amountCurrency: Currency
 
     """
     Only return expenses that use the given type as payout method
@@ -14616,6 +14686,11 @@ type Vendor implements Account & AccountWithContributions {
     fromAccount: AccountReferenceInput
 
     """
+    An alternative to filter by fromAccount (singular), both cannot be used together
+    """
+    fromAccounts: [AccountReferenceInput]
+
+    """
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
@@ -14670,6 +14745,11 @@ type Vendor implements Account & AccountWithContributions {
     Only return expenses where the amount is lower than or equal to this value (in cents)
     """
     maxAmount: Int
+
+    """
+    The currency to use for the amount filter
+    """
+    amountCurrency: Currency
 
     """
     Only return expenses that use the given type as payout method
@@ -15453,6 +15533,11 @@ type Query {
     fromAccount: AccountReferenceInput
 
     """
+    An alternative to filter by fromAccount (singular), both cannot be used together
+    """
+    fromAccounts: [AccountReferenceInput]
+
+    """
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
@@ -15507,6 +15592,11 @@ type Query {
     Only return expenses where the amount is lower than or equal to this value (in cents)
     """
     maxAmount: Int
+
+    """
+    The currency to use for the amount filter
+    """
+    amountCurrency: Currency
 
     """
     Only return expenses that use the given type as payout method
@@ -18324,6 +18414,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     fromAccount: AccountReferenceInput
 
     """
+    An alternative to filter by fromAccount (singular), both cannot be used together
+    """
+    fromAccounts: [AccountReferenceInput]
+
+    """
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
@@ -18378,6 +18473,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     Only return expenses where the amount is lower than or equal to this value (in cents)
     """
     maxAmount: Int
+
+    """
+    The currency to use for the amount filter
+    """
+    amountCurrency: Currency
 
     """
     Only return expenses that use the given type as payout method
@@ -19389,6 +19489,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     fromAccount: AccountReferenceInput
 
     """
+    An alternative to filter by fromAccount (singular), both cannot be used together
+    """
+    fromAccounts: [AccountReferenceInput]
+
+    """
     Reference of an account that is the payer of an expense
     """
     account: AccountReferenceInput
@@ -19443,6 +19548,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     Only return expenses where the amount is lower than or equal to this value (in cents)
     """
     maxAmount: Int
+
+    """
+    The currency to use for the amount filter
+    """
+    amountCurrency: Currency
 
     """
     Only return expenses that use the given type as payout method
