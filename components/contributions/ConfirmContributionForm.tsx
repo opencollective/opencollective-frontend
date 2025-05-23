@@ -233,7 +233,7 @@ export const ConfirmContributionForm = ({
               id="confirmContribution-amountReceived"
               name="amountReceived"
               data-cy="amount-received"
-              width="142px"
+              className="w-[142px]"
               currency={currency}
               onChange={value => setAmountReceived(value)}
               value={amountReceived}
@@ -251,7 +251,7 @@ export const ConfirmContributionForm = ({
               id="confirmContribution-processorFee"
               name="paymentProcessorFee"
               data-cy="payment-processor-fee"
-              width="142px"
+              className="w-[142px]"
               currency={currency}
               onChange={value => setPaymentProcessorFee(value)}
               value={paymentProcessorFee}
@@ -268,7 +268,7 @@ export const ConfirmContributionForm = ({
               id="confirmContribution-platformTip"
               name="platformTip"
               data-cy="platform-tip"
-              width="142px"
+              className="w-[142px]"
               currency={currency}
               onChange={value => setPlatformTip(value)}
               value={platformTip}
