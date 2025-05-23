@@ -16,6 +16,7 @@ export const accountExpensesQuery = gql`
     $type: ExpenseType
     $tags: [String]
     $status: [ExpenseStatusFilter]
+    $amountCurrency: Currency
     $minAmount: Int
     $maxAmount: Int
     $payoutMethod: PayoutMethodReferenceInput
@@ -40,6 +41,7 @@ export const accountExpensesQuery = gql`
       type: $type
       tag: $tags
       status: $status
+      amountCurrency: $amountCurrency
       minAmount: $minAmount
       maxAmount: $maxAmount
       payoutMethod: $payoutMethod
@@ -143,6 +145,7 @@ export const hostDashboardExpensesQuery = gql`
     $type: ExpenseType
     $tags: [String]
     $status: [ExpenseStatusFilter]
+    $amountCurrency: Currency
     $minAmount: Int
     $maxAmount: Int
     $payoutMethodType: PayoutMethodType
@@ -164,6 +167,7 @@ export const hostDashboardExpensesQuery = gql`
       type: $type
       tag: $tags
       status: $status
+      amountCurrency: $amountCurrency
       minAmount: $minAmount
       maxAmount: $maxAmount
       payoutMethodType: $payoutMethodType
