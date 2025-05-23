@@ -4,7 +4,7 @@ import Avatar from '../Avatar';
 import Link from '../Link';
 import { Separator } from '../ui/Separator';
 
-export const Footer = ({ account }) => {
+export const Footer = ({ account, identity }) => {
   const mainAccount = account?.parent ?? account;
   return (
     <footer className="border-t px-6 py-12">

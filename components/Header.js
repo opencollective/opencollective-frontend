@@ -32,6 +32,7 @@ class Header extends React.Component {
     showProfileAndChangelogMenu: PropTypes.bool,
     withTopBar: PropTypes.bool,
     menuItems: PropTypes.object,
+    identity: PropTypes.string,
     /** If true, a no-robots meta will be added to the page */
     noRobots: PropTypes.bool,
     /** @ignore from injectIntl */
@@ -126,6 +127,7 @@ class Header extends React.Component {
             menuItems={this.props.menuItems}
             showProfileAndChangelogMenu={this.props.showProfileAndChangelogMenu}
             loading={this.props.loading}
+            identity={this.props.identity}
           />
         )}
         <GlobalWarnings collective={this.props.collective} />
