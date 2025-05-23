@@ -196,12 +196,12 @@ const formSchemaQuery = gql`
 
       ... on AccountWithHost {
         host {
-          vendorsForAccount: vendors(forAccount: { slug: $collectiveSlug }, limit: 5) {
+          vendorsForAccount: vendors(visibleToAccounts: [{ slug: $collectiveSlug }], limit: 5) {
             nodes {
               ...ExpenseVendorFields
             }
           }
-          vendors(limit: 1) {
+          vendors(visibleToAccounts: [{ slug: $collectiveSlug }], limit: 1) {
             totalCount
           }
         }
@@ -209,12 +209,12 @@ const formSchemaQuery = gql`
 
       ... on Organization {
         host {
-          vendorsForAccount: vendors(forAccount: { slug: $collectiveSlug }, limit: 5) {
+          vendorsForAccount: vendors(visibleToAccounts: [{ slug: $collectiveSlug }], limit: 5) {
             nodes {
               ...ExpenseVendorFields
             }
           }
-          vendors(limit: 1) {
+          vendors(visibleToAccounts: [{ slug: $collectiveSlug }], limit: 1) {
             totalCount
           }
         }
@@ -459,6 +459,12 @@ const formSchemaQuery = gql`
       name
       data
       isSaved
+    }
+    visibleToAccounts {
+      id
+      legacyId
+      slug
+      name
     }
   }
 

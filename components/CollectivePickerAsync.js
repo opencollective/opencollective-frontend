@@ -20,6 +20,7 @@ const collectivePickerSearchQuery = gqlV1/* GraphQL */ `
     $skipGuests: Boolean
     $includeArchived: Boolean
     $includeVendorsForHostId: Int
+    $vendorVisibleToAccountIds: [Int]
   ) {
     search(
       term: $term
@@ -30,6 +31,7 @@ const collectivePickerSearchQuery = gqlV1/* GraphQL */ `
       skipGuests: $skipGuests
       includeArchived: $includeArchived
       includeVendorsForHostId: $includeVendorsForHostId
+      vendorVisibleToAccountIds: $vendorVisibleToAccountIds
     ) {
       id
       collectives {
@@ -50,6 +52,11 @@ const collectivePickerSearchQuery = gqlV1/* GraphQL */ `
         isHost
         ... on Vendor {
           hasPayoutMethod
+          visibleToAccounts {
+            id
+            slug
+            name
+          }
         }
         ... on User {
           isTwoFactorAuthEnabled
@@ -138,6 +145,7 @@ const CollectivePickerAsync = ({
   includeArchived = false,
   includeVendorsForHostId = undefined,
   defaultCollectives = undefined,
+  vendorVisibleToAccountIds = undefined,
   ...props
 }) => {
   const fetchPolicy = noCache ? 'network-only' : undefined;
@@ -200,9 +208,10 @@ const CollectivePickerAsync = ({
         skipGuests,
         includeArchived,
         includeVendorsForHostId,
+        vendorVisibleToAccountIds,
       });
     }
-  }, [types, limit, hostCollectiveIds, parentCollectiveIds, term]);
+  }, [types, limit, hostCollectiveIds, parentCollectiveIds, vendorVisibleToAccountIds, term]);
 
   return (
     <CollectivePicker
@@ -261,6 +270,7 @@ CollectivePickerAsync.propTypes = {
   includeArchived: PropTypes.bool,
   /** Include vendors for the given host id**/
   includeVendorsForHostId: PropTypes.number,
+  vendorVisibleToAccountIds: PropTypes.arrayOf(PropTypes.number),
 };
 
 export default CollectivePickerAsync;

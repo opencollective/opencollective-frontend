@@ -16,7 +16,7 @@ import { ExpenseMetaStatuses } from '@/lib/expense';
 import type { FilterComponentConfigs, FiltersToVariables } from '@/lib/filters/filter-types';
 import type {
   SuggestContributionMatchQueryVariables,
-  SuggestExpenseMatchQueryVariables,
+  SuggestExpenseForOffPlatformTransactionQueryVariables,
 } from '@/lib/graphql/types/v2/graphql';
 import {
   ExpenseStatus,
@@ -416,7 +416,11 @@ const useMatchDebitDialogQueryFilter = (
     };
 
     let schema;
-    const toVariables: FiltersToVariables<z.infer<typeof schema>, SuggestExpenseMatchQueryVariables, FiltersMeta> = {
+    const toVariables: FiltersToVariables<
+      z.infer<typeof schema>,
+      SuggestExpenseForOffPlatformTransactionQueryVariables,
+      FiltersMeta
+    > = {
       account: hostedAccountsFilter.toVariables,
     };
     const filters: FilterComponentConfigs<z.infer<typeof schema>, FiltersMeta> = {
@@ -441,7 +445,7 @@ const useMatchDebitDialogQueryFilter = (
 
   const queryFilter = useQueryFilter<
     typeof schema,
-    SuggestExpenseMatchQueryVariables | SuggestContributionMatchQueryVariables
+    SuggestExpenseForOffPlatformTransactionQueryVariables | SuggestContributionMatchQueryVariables
   >({
     schema,
     skipRouter: true,

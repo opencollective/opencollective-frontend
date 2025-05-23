@@ -307,6 +307,7 @@ function VendorOptionWrapper() {
         payeeSlug={form.values.payeeSlug}
         payee={form.options.payee}
         vendorsForAccount={form.options.vendorsForAccount || []}
+        account={form.options.account}
         host={form.options.host}
         refresh={form.refresh}
       />
@@ -321,6 +322,7 @@ const VendorOption = React.memo(function VendorOption(props: {
   payeeSlug: ExpenseForm['values']['payeeSlug'];
   payee: ExpenseForm['options']['payee'];
   vendorsForAccount: ExpenseForm['options']['vendorsForAccount'];
+  account: ExpenseForm['options']['account'];
   host: ExpenseForm['options']['host'];
   refresh: ExpenseForm['refresh'];
 }) {
@@ -360,12 +362,14 @@ const VendorOption = React.memo(function VendorOption(props: {
               setSelectedVendorSlug(slug);
               props.setFieldValue('payeeSlug', !slug ? '__vendor' : slug);
             }}
+            vendorVisibleToAccountIds={props.account.legacyId}
           />
           {props.payeeSlug === '__newVendor' && (
             <React.Fragment>
               <Separator className="mt-3" />
               <div className="mt-3">
                 <VendorForm
+                  limitVisibilityOptionToAccount={props.account}
                   onSuccess={async ({ slug }) => {
                     await props.refresh();
                     props.setFieldValue('payeeSlug', slug);

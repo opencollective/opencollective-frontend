@@ -11,14 +11,16 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { i18nGraphqlException } from '../../lib/errors';
 import { requireFields, verifyEmailPattern, verifyURLPattern } from '../../lib/form-utils';
 import { API_V2_CONTEXT, gql } from '../../lib/graphql/helpers';
-import type { DashboardVendorsQuery } from '../../lib/graphql/types/v2/graphql';
+import type { AccountHoverCardFieldsFragment, DashboardVendorsQuery } from '../../lib/graphql/types/v2/graphql';
 import { UploadedFileKind } from '../../lib/graphql/types/v2/schema';
 import { useImageUploader } from '../../lib/hooks/useImageUploader';
 import { elementFromClass } from '../../lib/react-utils';
 import { cn, omitDeep } from '../../lib/utils';
 import { isImageServiceUrl } from '@/lib/image-utils';
 
+import { AccountHoverCard } from '../AccountHoverCard';
 import Avatar from '../Avatar';
+import CollectivePickerAsync from '../CollectivePickerAsync';
 import { useDrawerActionsContainer } from '../Drawer';
 import { DROPZONE_ACCEPT_IMAGES } from '../Dropzone';
 import PayoutMethodForm from '../expenses/PayoutMethodForm';
@@ -83,6 +85,7 @@ type VendorFormProps = {
   isModal?: boolean;
   supportsTaxForm: boolean;
   hidePayoutMethod?: boolean;
+  limitVisibilityOptionToAccount?: AccountHoverCardFieldsFragment;
 };
 
 const AvatarContainer = elementFromClass(
@@ -215,6 +218,18 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
       ['__typename'],
     );
 
+    if (props.limitVisibilityOptionToAccount && values.visibleAccountOnly) {
+      data.visibleToAccounts = [
+        {
+          slug: props.limitVisibilityOptionToAccount.slug,
+        },
+      ];
+    } else {
+      data.visibleToAccounts = (values.visibleToAccounts ?? []).map(acc => ({
+        slug: acc.slug,
+      }));
+    }
+
     try {
       let vendorResult;
       if (vendor) {
@@ -253,6 +268,14 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
   if (vendor?.payoutMethods?.length > 0) {
     initialValues['payoutMethod'] = vendor.payoutMethods[0];
   }
+  if (vendor?.visibleToAccounts?.length > 0) {
+    initialValues['visibleToAccounts'] = vendor.visibleToAccounts;
+  }
+
+  if (props.limitVisibilityOptionToAccount) {
+    initialValues['visibleAccountOnly'] = true;
+  }
+
   const loading = isCreating || isEditing;
 
   return (
@@ -328,6 +351,89 @@ const VendorForm = ({ vendor, host, onSuccess, onCancel, isModal, supportsTaxFor
                   <StyledInput {...field} width="100%" maxWidth={500} maxLength={60} placeholder={formik.values.name} />
                 )}
               </StyledInputFormikField>
+
+              {props.limitVisibilityOptionToAccount ? (
+                <StyledInputFormikField
+                  name="visibleAccountOnly"
+                  label={intl.formatMessage({ defaultMessage: 'Limit visibility', id: 'G+YYVv' })}
+                  labelProps={FIELD_LABEL_PROPS}
+                  required={false}
+                  mt={3}
+                >
+                  {({ field, form }) => (
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        {...field}
+                        checked={field.value}
+                        onCheckedChange={checked => {
+                          form.setFieldValue(field.name, checked);
+                          if (!checked) {
+                            form.setFieldValue(field.name, null);
+                          }
+                        }}
+                      />
+                      <label htmlFor="visibleAccountOnly" className="flex items-center font-normal">
+                        {field.value ? (
+                          <FormattedMessage
+                            defaultMessage="Visible to {account} only"
+                            id="q02wF4"
+                            values={{
+                              account: (
+                                <AccountHoverCard
+                                  account={props.limitVisibilityOptionToAccount}
+                                  trigger={
+                                    <span>
+                                      &nbsp;
+                                      <span className="rounded border">
+                                        {props.limitVisibilityOptionToAccount.name}
+                                      </span>
+                                      &nbsp;
+                                    </span>
+                                  }
+                                />
+                              ),
+                            }}
+                          />
+                        ) : (
+                          <FormattedMessage defaultMessage="Visible to all hosted accounts" id="jPCIv9" />
+                        )}
+                      </label>
+                    </div>
+                  )}
+                </StyledInputFormikField>
+              ) : (
+                <StyledInputFormikField
+                  name="visibleToAccounts"
+                  label={intl.formatMessage({ defaultMessage: 'Visible to accounts', id: 'z3aZR5' })}
+                  labelProps={FIELD_LABEL_PROPS}
+                  required={false}
+                  mt={3}
+                >
+                  {({ field, form }) => (
+                    <div>
+                      <CollectivePickerAsync
+                        inputId="visibleToAccountsInput"
+                        isMulti
+                        collective={field.value}
+                        hostCollectiveIds={host.legacyId}
+                        filterResults={results =>
+                          results.filter(r => !(field.value ?? []).some(v => v.slug === r.slug))
+                        }
+                        onChange={selection => {
+                          form.setFieldValue('visibleToAccounts', [...(selection ?? []).map(sel => sel.value)]);
+                        }}
+                      />
+                      <div className="text-xs text-muted-foreground">
+                        <FormattedMessage
+                          defaultMessage="By default, vendors are visible to all hosted accounts. To restrict visibility of this vendor, pick hosted accounts."
+                          id="jEkeo9"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </StyledInputFormikField>
+              )}
+
               {supportsTaxForm && (
                 <React.Fragment>
                   <StyledInputFormikField
