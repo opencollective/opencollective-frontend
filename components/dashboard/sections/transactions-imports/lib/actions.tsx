@@ -16,7 +16,7 @@ import StyledSpinner from '../../../../StyledSpinner';
 import { useToast } from '../../../../ui/useToast';
 import { HostCreateExpenseModal } from '../../expenses/HostCreateExpenseModal';
 import { AddFundsModalFromImportRow } from '../AddFundsModalFromTransactionsImportRow';
-import { MatchContributionDialog } from '../MatchContributionDialog';
+import { MatchCreditDialog } from '../MatchCreditDialog';
 import { MatchDebitDialog } from '../MatchDebitDialog';
 
 import { updateTransactionsImportRows } from './graphql';
@@ -57,7 +57,7 @@ export const useTransactionsImportActions = ({
   host,
   getAllRowsIds,
 }: {
-  host: React.ComponentProps<typeof MatchContributionDialog>['host'] &
+  host: React.ComponentProps<typeof MatchCreditDialog>['host'] &
     React.ComponentProps<typeof MatchDebitDialog>['host'] &
     React.ComponentProps<typeof AddFundsModalFromImportRow>['host'];
   /** A function to get all rows IDs regardless of pagination, to work with the `includeAllPages` option */
@@ -141,17 +141,17 @@ export const useTransactionsImportActions = ({
         actions.primary.push({
           key: 'match',
           Icon: Merge,
-          label: <FormattedMessage defaultMessage="Match contribution" id="c7INEq" />,
+          label: <FormattedMessage defaultMessage="Match" id="Qr9R5O" />,
           disabled: isUpdatingRow,
           onClick: () =>
             showModal(
-              MatchContributionDialog,
+              MatchCreditDialog,
               {
-                accounts: assignedAccounts,
-                transactionsImport,
-                row,
                 host,
+                row,
+                transactionsImport,
                 onCloseFocusRef,
+                accounts: assignedAccounts,
                 onAddFundsClick: () => {
                   hideModal('match-contribution-modal');
                   showAddFundsModal();

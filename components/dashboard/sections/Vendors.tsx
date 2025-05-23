@@ -15,7 +15,7 @@ import useQueryFilter from '../../../lib/hooks/useQueryFilter';
 import Avatar from '../../Avatar';
 import DismissibleMessage from '../../DismissibleMessage';
 import { Drawer } from '../../Drawer';
-import { I18nWithColumn } from '../../I18nFormatters';
+import { i18nWithColon } from '../../I18nFormatters';
 import MessageBox from '../../MessageBox';
 import MessageBoxGraphqlError from '../../MessageBoxGraphqlError';
 import StyledModal from '../../StyledModal';
@@ -141,7 +141,7 @@ const VendorsTable = ({ vendors, loading, editVendor, openVendor, handleSetArchi
             {contact && (
               <VendorContactTag className="ml-3">
                 <span className="font-normal">
-                  {I18nWithColumn(<FormattedMessage id="Contact" defaultMessage="Contact" />)}
+                  {i18nWithColon(<FormattedMessage id="Contact" defaultMessage="Contact" />)}
                 </span>
                 <a href={`mailto:${contact.email}`}>{contact.name}</a>
               </VendorContactTag>

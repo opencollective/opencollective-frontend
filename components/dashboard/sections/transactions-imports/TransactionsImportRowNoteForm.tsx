@@ -1,5 +1,6 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
+import { get } from 'lodash';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { updateTransactionsImportRows } from './lib/graphql';
@@ -24,6 +25,7 @@ export const TransactionsImportRowNoteForm = ({
   const { toast } = useToast();
   const intl = useIntl();
   const hasUnsavedChanges = newText !== (row.note || '');
+
   return (
     <div>
       <Label htmlFor="import-row-note" className="mb-1 font-bold text-gray-600">
@@ -43,11 +45,15 @@ export const TransactionsImportRowNoteForm = ({
           disabled={!hasUnsavedChanges}
           size="sm"
           loading={loading}
-          onClick={() => {
+          onClick={async () => {
             try {
-              updateRows({
+              const result = await updateRows({
                 variables: { rows: [{ id: row.id, note: newText }], action: 'UPDATE_ROWS' },
               });
+              const responseText = get(result, 'data.updateTransactionsImportRows.rows.0.note');
+              if (typeof responseText === 'string') {
+                setNewText(responseText);
+              }
             } catch (error) {
               toast({
                 variant: 'error',
