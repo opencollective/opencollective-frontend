@@ -128,9 +128,9 @@ export const SuggestedContributionsTable = ({
           totalContributions > contributions.length && (
             <div className="flex justify-center border-t border-neutral-200 p-3 text-center">
               <FormattedMessage
-                id="/zSZjG"
-                defaultMessage="{totalContributions, plural, one {# contribution} other {# contributions}} also match your filters. Narrow down your search to see them."
-                values={{ totalContributions }}
+                defaultMessage="{nbContributions, plural, one {# contribution} other {# contributions}} also match your filters. Narrow down your search to see {nbContributions, plural, one {it} other {them}}."
+                id="wC4Ydk"
+                values={{ nbContributions: totalContributions - contributions.length }}
               />
             </div>
           )

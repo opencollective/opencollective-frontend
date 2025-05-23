@@ -44,6 +44,7 @@ type useQueryFilterOptions<S extends z.ZodObject<z.ZodRawShape, any, any>, GQLQu
   meta?: FilterMeta;
   views?: readonly View<z.infer<S>>[];
   skipRouter?: boolean; // Used when not updating the URL query is desired, this will instead use internal state.
+  activeViewId?: string; // To use as a control for the active view
 };
 
 export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape, any, any>, GQLQueryVars, FilterMeta = any>(
@@ -61,7 +62,7 @@ export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape, any,
     [opts.defaultFilterValues, opts.views],
   );
   // Default values defined by the schema
-  const defaultSchemaValues = opts.schema.parse({});
+  const defaultSchemaValues = React.useMemo(() => opts.schema.parse({}), [opts.schema]);
 
   const values = React.useMemo(() => {
     const structuredQuery = structureQueryValues(query);
@@ -84,8 +85,9 @@ export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape, any,
     } else if (result.success === false) {
       addFilterValidationErrorToast(result.error, intl);
     }
+
     return opts.schema.parse(defaultFilterValues);
-  }, [intl, opts.schema, query, defaultFilterValues]);
+  }, [opts.schema, defaultFilterValues, defaultSchemaValues, query, stateQuery, intl]);
 
   const variables = React.useMemo(() => {
     let apiVariables: Partial<GQLQueryVars> = {};
@@ -170,8 +172,9 @@ export default function useQueryFilter<S extends z.ZodObject<z.ZodRawShape, any,
   );
 
   const activeViewId = React.useMemo(
-    () => getActiveViewId(values, { filters: opts.filters, views: opts.views, defaultSchemaValues }),
-    [values, opts.filters, opts.views],
+    () =>
+      opts.activeViewId || getActiveViewId(values, { filters: opts.filters, views: opts.views, defaultSchemaValues }),
+    [values, opts.filters, opts.views, opts.activeViewId, defaultSchemaValues],
   );
 
   return {

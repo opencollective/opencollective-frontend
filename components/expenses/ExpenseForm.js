@@ -8,7 +8,7 @@ import { createPortal } from 'react-dom';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { getAccountReferenceInput, isInternalHost } from '../../lib/collective';
+import { getAccountReferenceInput } from '../../lib/collective';
 import { CollectiveType } from '../../lib/constants/collectives';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
@@ -31,6 +31,7 @@ import {
   getSupportedCurrencies,
   validateExpenseTaxes,
 } from './lib/utils';
+import { FIRST_PARTY_HOSTS } from '@/lib/preview-features';
 
 import AccountingCategorySelect, { isSupportedExpenseCategory } from '../AccountingCategorySelect';
 import ConfirmationModal from '../ConfirmationModal';
@@ -287,7 +288,7 @@ const getDefaultStep = (defaultStep, stepOneCompleted, isCreditCardCharge) => {
 
 const checkOCREnabled = (router, host) => {
   const urlFlag = router.query.ocr && parseToBoolean(router.query.ocr);
-  return urlFlag !== false && isInternalHost(host);
+  return urlFlag !== false && FIRST_PARTY_HOSTS.includes(host?.slug);
 };
 
 const STYLED_CURRENCY_PICKER_STYLE = { menu: { width: '280px' } };

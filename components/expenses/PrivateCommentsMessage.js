@@ -31,19 +31,19 @@ const PrivateCommentsMessage = ({ isAllowed, isLoading, ...props }) => {
             {isAllowed ? (
               props.expenseType === ExpenseType.GRANT ? (
                 <FormattedMessage
-                  defaultMessage="Grant request comments are private, because they sometimes contain confidential information such as payment details. Only the grant request submitter and the admins can see them."
-                  id="59s0gc"
+                  defaultMessage="Grant request comments are private, because they sometimes contain confidential information such as payment details. Only the grant request submitter, the admins and the accountants can see them."
+                  id="OysmzD"
                 />
               ) : (
                 <FormattedMessage
                   id="PrivateCommentsMessage.AllowedDetails"
-                  defaultMessage="Expenses comments are private, because they sometimes contain confidential information such as payment details. Only the expense submitter and the admins can see them."
+                  defaultMessage="Expenses comments are private, because they sometimes contain confidential information such as payment details. Only the expense submitter, the admins and the accountants can see them."
                 />
               )
             ) : (
               <FormattedMessage
                 id="PrivateCommentsMessage.NotAllowedDetails"
-                defaultMessage="You must be signed in as an admin or the expense submitter to read comments on an expense."
+                defaultMessage="You must be signed in as an admin, an accountant or the expense submitter to read comments on an expense."
               />
             )}
           </P>

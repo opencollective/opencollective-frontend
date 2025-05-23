@@ -14,6 +14,7 @@ const COMMON_DIRECTIVES = {
     SELF,
     process.env.IMAGES_URL,
     process.env.NEXT_IMAGES_URL,
+    process.env.PDF_SERVICE_V2_URL,
     'data:',
     '*.paypal.com',
     '*.paypalobjects.com',
@@ -33,7 +34,6 @@ const COMMON_DIRECTIVES = {
   connectSrc: [
     SELF,
     process.env.API_URL,
-    process.env.PDF_SERVICE_URL,
     process.env.PDF_SERVICE_V2_URL,
     process.env.REST_URL,
     process.env.ML_SERVICE_URL,
