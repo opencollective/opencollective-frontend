@@ -26,7 +26,7 @@ describe('Grant Submission Flow', () => {
     cy.visit(`/${collective.slug}/grants/new?newGrantFlowEnabled=true`);
 
     // Verify the page header shows the correct collective name
-    cy.contains(`Grant Application to ${collective.name}`).should('be.visible');
+    cy.contains(`Grant request to ${collective.name}`).should('be.visible');
 
     // ---- Step 1: Information ----
     // Grant Provider section should be visible
@@ -75,7 +75,7 @@ describe('Grant Submission Flow', () => {
 
     // ---- Step 3: Summary ----
     // Verify we're on the summary page
-    cy.contains('Review application').should('be.visible');
+    cy.contains('Review grant request').should('be.visible');
 
     // Check that the summary shows the correct information
     cy.contains('Grant application for community project').should('be.visible');
@@ -85,10 +85,10 @@ describe('Grant Submission Flow', () => {
     cy.contains('Please send the funds to my bank account: xxxxxxxxxxx').should('be.visible');
 
     // Submit the grant application
-    cy.contains('button', 'Submit Application').click();
+    cy.contains('button', 'Submit Grant Request').click();
 
     // Verify success message is shown
-    cy.contains('Grant application #', { timeout: 20000 }).should('be.visible');
+    cy.contains('Grant request #', { timeout: 20000 }).should('be.visible');
     cy.contains('has been submitted successfully!').should('be.visible');
 
     // Verify we can see the "View All Expenses" button

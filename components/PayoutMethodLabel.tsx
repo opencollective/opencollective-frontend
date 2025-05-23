@@ -4,6 +4,7 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 
 import type { PayoutMethod } from '../lib/graphql/types/v2/schema';
 import { PayoutMethodType } from '../lib/graphql/types/v2/schema';
+import { cn } from '@/lib/utils';
 
 import { PayoutMethodIcon } from './PayoutMethodIcon';
 
@@ -29,7 +30,9 @@ export const I18nPayoutMethodLabels = defineMessages({
 });
 
 type PayoutMethodLabelProps = {
+  className?: string;
   showIcon?: boolean;
+  iconSize?: number;
   payoutMethod?: Omit<PayoutMethod, 'id'>;
 };
 
@@ -80,8 +83,8 @@ export function PayoutMethodLabel(props: PayoutMethodLabelProps) {
   }
 
   return (
-    <div className="flex min-h-8 items-center gap-2 whitespace-nowrap">
-      {props.showIcon && <PayoutMethodIcon payoutMethod={pm} />}
+    <div className={cn('flex min-h-8 items-center gap-2 whitespace-nowrap', props.className)}>
+      {props.showIcon && <PayoutMethodIcon size={props.iconSize} payoutMethod={pm} />}
       {defaultLabel} {customLabel ? <span className="text-muted-foreground">{customLabel}</span> : null}
     </div>
   );

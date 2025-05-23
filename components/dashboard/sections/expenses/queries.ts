@@ -14,6 +14,7 @@ export const accountExpensesQuery = gql`
     $limit: Int!
     $offset: Int!
     $type: ExpenseType
+    $types: [ExpenseType]
     $tags: [String]
     $status: [ExpenseStatusFilter]
     $minAmount: Int
@@ -38,6 +39,7 @@ export const accountExpensesQuery = gql`
       limit: $limit
       offset: $offset
       type: $type
+      types: $types
       tag: $tags
       status: $status
       minAmount: $minAmount
@@ -153,6 +155,7 @@ export const hostDashboardExpensesQuery = gql`
     $chargeHasReceipts: Boolean
     $virtualCards: [VirtualCardReferenceInput]
     $account: AccountReferenceInput
+    $fromAccount: AccountReferenceInput
     $lastCommentBy: [LastCommentBy]
     $accountingCategory: [String]
   ) {
@@ -175,6 +178,7 @@ export const hostDashboardExpensesQuery = gql`
       virtualCards: $virtualCards
       lastCommentBy: $lastCommentBy
       accountingCategory: $accountingCategory
+      fromAccount: $fromAccount
     ) {
       totalCount
       offset
@@ -195,7 +199,7 @@ export const hostDashboardExpensesQuery = gql`
   ${expenseHostFields}
 `;
 
-const hostInfoCardFields = gql`
+export const hostInfoCardFields = gql`
   fragment HostInfoCardFields on Host {
     id
     legacyId

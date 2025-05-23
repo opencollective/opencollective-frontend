@@ -675,6 +675,10 @@ function buildFormSchema(
     expenseId: z.number().nullish(),
     expenseTypeOption: z.nativeEnum(ExpenseType).refine(
       v => {
+        if (v === ExpenseType.GRANT && options.account?.type === CollectiveType.FUND) {
+          return true;
+        }
+
         if (options.account?.supportedExpenseTypes?.length > 0) {
           return options.account.supportedExpenseTypes.includes(v);
         }
@@ -2279,6 +2283,7 @@ export function useExpenseForm(opts: {
       selectedPayoutMethod &&
       selectedPayoutMethod.data?.currency &&
       !expenseForm.touched.expenseItems &&
+      formOptions.allowDifferentItemCurrency &&
       expenseForm.values.expenseItems[0]?.amount?.currency !== selectedPayoutMethod.data?.currency &&
       !startOptions.current.isInlineEdit // expenseItems will not be touched when editing the payout method, we don't want to update the expense items currency then
     ) {
@@ -2297,6 +2302,7 @@ export function useExpenseForm(opts: {
     formOptions.payoutMethods,
     expenseForm.values.payoutMethodId,
     setFieldValue,
+    formOptions.allowDifferentItemCurrency,
     setFormOptions,
     expenseForm.touched.expenseItems,
     expenseForm.values.expenseItems,

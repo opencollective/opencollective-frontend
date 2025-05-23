@@ -9,8 +9,10 @@ import { CollectiveType } from '../../../../lib/constants/collectives';
 import type { FilterComponentConfigs, FiltersToVariables } from '../../../../lib/filters/filter-types';
 import { integer, isMulti } from '../../../../lib/filters/schemas';
 import { API_V2_CONTEXT } from '../../../../lib/graphql/helpers';
-import type { HostedCollectivesQueryVariables } from '../../../../lib/graphql/types/v2/graphql';
-import type { Account, Collective } from '../../../../lib/graphql/types/v2/schema';
+import type {
+  HostedCollectiveFieldsFragment,
+  HostedCollectivesQueryVariables,
+} from '../../../../lib/graphql/types/v2/graphql';
 import { HostFeeStructure } from '../../../../lib/graphql/types/v2/schema';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import formatCollectiveType from '../../../../lib/i18n/collective-type';
@@ -95,7 +97,9 @@ const filters: FilterComponentConfigs<z.infer<typeof schema>> = {
 const AllCollectives = ({ subpath }: Omit<DashboardSectionProps, 'accountSlug'>) => {
   const intl = useIntl();
   const router = useRouter();
-  const [showCollectiveOverview, setShowCollectiveOverview] = React.useState<Account | undefined | string>(subpath[0]);
+  const [showCollectiveOverview, setShowCollectiveOverview] = React.useState<
+    HostedCollectiveFieldsFragment | undefined | string
+  >(subpath[0]);
   const query = useMemo(() => omit(router.query, ['slug', 'section', 'subpath']), [router.query]);
 
   const pushSubpath = subpath => {
@@ -126,12 +130,12 @@ const AllCollectives = ({ subpath }: Omit<DashboardSectionProps, 'accountSlug'>)
   });
 
   useEffect(() => {
-    if (subpath[0] !== ((showCollectiveOverview as Collective)?.id || showCollectiveOverview)) {
+    if (subpath[0] !== ((showCollectiveOverview as HostedCollectiveFieldsFragment)?.id || showCollectiveOverview)) {
       handleDrawer(subpath[0]);
     }
   }, [subpath[0]]);
 
-  const handleDrawer = (collective: Collective | string | undefined) => {
+  const handleDrawer = (collective: HostedCollectiveFieldsFragment | string | undefined) => {
     if (collective) {
       pushSubpath(typeof collective === 'string' ? collective : collective.id);
     } else {
@@ -192,7 +196,7 @@ const AllCollectives = ({ subpath }: Omit<DashboardSectionProps, 'accountSlug'>)
       >
         {showCollectiveOverview && (
           <CollectiveDetails
-            collective={isString(showCollectiveOverview) ? null : showCollectiveOverview}
+            collective={isString(showCollectiveOverview) ? null : (showCollectiveOverview as any)}
             collectiveId={isString(showCollectiveOverview) ? showCollectiveOverview : null}
             onCancel={() => handleDrawer(null)}
             openCollectiveDetails={handleDrawer}

@@ -241,7 +241,13 @@ class CollectivePicker extends React.PureComponent {
   };
 
   setCreateFormCollectiveType = type => {
-    this.setState({ createFormCollectiveType: type || null });
+    if (typeof this.props.onCreateClick === 'function') {
+      this.props.onChange?.({ label: null, value: null });
+      this.setState({ menuIsOpen: false });
+      this.props.onCreateClick(type);
+    } else {
+      this.setState({ createFormCollectiveType: type || null });
+    }
   };
 
   getMenuIsOpen(menuIsOpenFromProps) {
@@ -300,6 +306,7 @@ class CollectivePicker extends React.PureComponent {
       addLoggedInUserAsAdmin,
       renderNewCollectiveOption,
       isSearchable,
+      expenseType,
       ...props
     } = this.props;
     const { createFormCollectiveType, createdCollectives, displayInviteMenu, searchText } = this.state;
@@ -346,6 +353,7 @@ class CollectivePicker extends React.PureComponent {
                     return (
                       <InviteCollectiveDropdownOption
                         isSearching={!!searchText && !collectives.length}
+                        expenseType={expenseType}
                         onClick={() => {
                           onInvite?.(true);
                           onChange?.({ label: null, value: null });
@@ -494,6 +502,7 @@ CollectivePicker.propTypes = {
   /** StyledSelect pass-through property */
   styles: PropTypes.object,
   HostCollectiveId: PropTypes.number,
+  expenseType: PropTypes.string,
 };
 
 CollectivePicker.defaultProps = {

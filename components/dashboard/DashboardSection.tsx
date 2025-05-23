@@ -37,6 +37,11 @@ import Contributors from './sections/Contributors';
 import HostExpenses from './sections/expenses/HostDashboardExpenses';
 import ReceivedExpenses from './sections/expenses/ReceivedExpenses';
 import SubmittedExpenses from './sections/expenses/SubmittedExpenses';
+import { ApproveGrantRequests } from './sections/funds-and-grants/ApproveGrantRequests';
+import { Grants } from './sections/funds-and-grants/Grants';
+import { HostedFunds } from './sections/funds-and-grants/HostedFunds';
+import { HostedGrants } from './sections/funds-and-grants/HostedGrants';
+import { SubmittedGrants } from './sections/funds-and-grants/SubmittedGrants';
 import HostDashboardAgreements from './sections/HostDashboardAgreements';
 import HostVirtualCardRequests from './sections/HostVirtualCardRequests';
 import HostVirtualCards from './sections/HostVirtualCards';
@@ -86,6 +91,11 @@ const DASHBOARD_COMPONENTS = {
   [SECTIONS.OVERVIEW]: Overview,
   [SECTIONS.EXPENSES]: ReceivedExpenses,
   [SECTIONS.SUBMITTED_EXPENSES]: SubmittedExpenses,
+  [SECTIONS.HOSTED_FUNDS]: HostedFunds,
+  [SECTIONS.HOSTED_GRANTS]: HostedGrants,
+  [SECTIONS.GRANTS]: Grants,
+  [SECTIONS.APPROVE_GRANT_REQUESTS]: ApproveGrantRequests,
+  [SECTIONS.SUBMITTED_GRANTS]: SubmittedGrants,
   [SECTIONS.CONTRIBUTORS]: Contributors,
   [SECTIONS.INCOMING_CONTRIBUTIONS]: IncomingContributions,
   [SECTIONS.OUTGOING_CONTRIBUTIONS]: OutgoingContributions,
