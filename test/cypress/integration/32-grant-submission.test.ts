@@ -74,7 +74,7 @@ describe('Grant Submission Flow', () => {
 
     // ---- Step 3: Summary ----
     // Verify we're on the summary page
-    cy.contains('Review application').should('be.visible');
+    cy.contains('Review grant request').should('be.visible');
 
     // Check that the summary shows the correct information
     cy.contains('Grant application for community project').should('be.visible');
@@ -138,7 +138,7 @@ describe('Grant Submission Flow', () => {
     cy.contains('Please send the funds to my bank account: xxxxxxxxxxx').should('be.visible');
 
     // Submit the grant application
-    cy.contains('button', 'Submit Application').click();
+    cy.contains('button', 'Submit Grant Request').click();
 
     // Verify success message is shown
     cy.contains('Grant request #', { timeout: 20000 }).should('be.visible');
@@ -195,7 +195,7 @@ describe('Grant Submission Flow', () => {
     cy.contains('Please send the funds to my bank account: xxxxxxxxxxx').should('be.visible');
 
     // Submit the grant application
-    cy.contains('button', 'Submit grant request').click();
+    cy.contains('button', 'Submit Grant Request').click();
 
     // Verify success message is shown
     cy.contains('Grant request #', { timeout: 20000 }).should('be.visible');
@@ -246,7 +246,7 @@ describe('Grant Submission Flow', () => {
     cy.contains('Please send the funds to my bank account: xxxxxxxxxxx').should('be.visible');
 
     // Submit the grant application
-    cy.contains('button', 'Submit grant request').click();
+    cy.contains('button', 'Submit Grant Request').click();
 
     // Verify success message is shown
     cy.contains('Grant request #', { timeout: 20000 }).should('be.visible');
