@@ -10,11 +10,13 @@ import { i18nGraphqlException } from '../../../lib/errors';
 import { gqlV1 } from '../../../lib/graphql/helpers';
 import { AccountType } from '../../../lib/graphql/types/v2/schema';
 import { ExpenseStatus } from '@/lib/graphql/types/v2/graphql';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
 import LoginBtn from '@/components/LoginBtn';
 import StyledInputFormikField from '@/components/StyledInputFormikField';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Textarea } from '@/components/ui/Textarea';
+import VendorForm from '@/components/vendors/VendorForm';
 
 import CollectivePicker from '../../CollectivePicker';
 import CollectivePickerAsync from '../../CollectivePickerAsync';
@@ -305,7 +307,9 @@ function VendorOptionWrapper() {
         payeeSlug={form.values.payeeSlug}
         payee={form.options.payee}
         vendorsForAccount={form.options.vendorsForAccount || []}
+        account={form.options.account}
         host={form.options.host}
+        refresh={form.refresh}
       />
     );
   }
@@ -318,12 +322,17 @@ const VendorOption = React.memo(function VendorOption(props: {
   payeeSlug: ExpenseForm['values']['payeeSlug'];
   payee: ExpenseForm['options']['payee'];
   vendorsForAccount: ExpenseForm['options']['vendorsForAccount'];
+  account: ExpenseForm['options']['account'];
   host: ExpenseForm['options']['host'];
+  refresh: ExpenseForm['refresh'];
 }) {
+  const { LoggedInUser } = useLoggedInUser();
+  const isHostAdmin = LoggedInUser.isAdminOfCollective(props.host);
   // Setting a state variable to keep the Vendor option open when a vendor that is not part of the preloaded vendors is selected
   const [selectedVendorSlug, setSelectedVendorSlug] = React.useState(undefined);
   const isVendorSelected =
     props.payeeSlug === '__vendor' ||
+    props.payeeSlug === '__newVendor' ||
     props.vendorsForAccount.some(v => v.slug === props.payeeSlug) ||
     selectedVendorSlug === props.payeeSlug;
   return (
@@ -338,16 +347,45 @@ const VendorOption = React.memo(function VendorOption(props: {
             inputId="__vendor"
             isSearchable
             types={['VENDOR']}
+            creatable={isHostAdmin ? ['VENDOR'] : false}
             includeVendorsForHostId={props.host.legacyId}
             disabled={props.isSubmitting}
             defaultCollectives={props.vendorsForAccount}
-            collective={props.payeeSlug === '__vendor' ? null : props.payee}
+            collective={props.payeeSlug === '__vendor' || props.payeeSlug === '__newVendor' ? null : props.payee}
+            handleCreateForm
+            onCreateClick={() => {
+              props.setFieldValue('payeeSlug', '__newVendor');
+              setSelectedVendorSlug(null);
+            }}
             onChange={e => {
-              const slug = e.value.slug;
+              const slug = e.value?.slug;
               setSelectedVendorSlug(slug);
               props.setFieldValue('payeeSlug', !slug ? '__vendor' : slug);
             }}
+            vendorVisibleToAccountIds={props.account.legacyId}
           />
+          {props.payeeSlug === '__newVendor' && (
+            <React.Fragment>
+              <Separator className="mt-3" />
+              <div className="mt-3">
+                <VendorForm
+                  limitVisibilityOptionToAccount={props.account}
+                  onSuccess={async ({ slug }) => {
+                    await props.refresh();
+                    props.setFieldValue('payeeSlug', slug);
+                    setSelectedVendorSlug(slug);
+                  }}
+                  hidePayoutMethod
+                  host={props.host}
+                  supportsTaxForm={false}
+                  onCancel={() => {
+                    props.setFieldValue('payeeSlug', '__vendor');
+                    setSelectedVendorSlug(null);
+                  }}
+                />
+              </div>
+            </React.Fragment>
+          )}
         </div>
       }
     >

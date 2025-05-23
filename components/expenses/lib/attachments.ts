@@ -12,3 +12,7 @@ export const attachmentDropzoneParams = {
 export const expenseTypeSupportsAttachments = (type: ExpenseType) => {
   return type === ExpenseType.INVOICE || type === ExpenseType.GRANT || type === ExpenseType.SETTLEMENT;
 };
+
+export const expenseTypeSupportsInvoice = (type: ExpenseType) => {
+  return type === ExpenseType.INVOICE || type === ExpenseType.SETTLEMENT;
+};

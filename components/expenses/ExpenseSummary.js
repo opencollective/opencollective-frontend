@@ -10,12 +10,12 @@ import styled from 'styled-components';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { i18nGraphqlException } from '../../lib/errors';
-import { ExpenseStatus, ExpenseType } from '../../lib/graphql/types/v2/graphql';
+import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { AmountPropTypeShape } from '../../lib/prop-types';
 import { shouldDisplayExpenseCategoryPill } from './lib/accounting-categories';
-import { expenseTypeSupportsAttachments } from './lib/attachments';
+import { expenseTypeSupportsAttachments, expenseTypeSupportsInvoice } from './lib/attachments';
 import { expenseItemsMustHaveFiles, getExpenseItemAmountV2FromNewAttrs } from './lib/items';
 import { getExpenseExchangeRateWarningOrError } from './lib/utils';
 
@@ -130,7 +130,6 @@ const ExpenseSummary = ({
   const useInlineExpenseEdit =
     LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE) &&
     expense?.permissions?.canEdit &&
-    expense?.type !== ExpenseType.GRANT &&
     expense?.status !== ExpenseStatus.DRAFT;
 
   const invoiceFile = React.useMemo(
@@ -555,7 +554,7 @@ const ExpenseSummary = ({
           </div>
         )}
       </Flex>
-      {expenseTypeSupportsAttachments(expense?.type) && (invoiceFile || useInlineExpenseEdit) && (
+      {expenseTypeSupportsInvoice(expense?.type) && (invoiceFile || useInlineExpenseEdit) && (
         <React.Fragment>
           <Flex my={4} alignItems="center" gridGap={2}>
             {!expense && isLoading ? (
