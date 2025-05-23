@@ -13,13 +13,19 @@ import { AmountFilterValue } from './AmountFilterValue';
 import type { AmountFilterValueType } from './schema';
 import { amountFilterSchema, AmountFilterType } from './schema';
 
-function amountToVariables(value: z.infer<typeof amountFilterSchema>): {
+function amountToVariables(
+  value: z.infer<typeof amountFilterSchema>,
+  _k,
+  meta,
+): {
   minAmount: undefined | number;
   maxAmount: undefined | number;
+  amountCurrency: undefined | string;
 } {
   return {
     minAmount: 'gte' in value ? value.gte : undefined,
     maxAmount: 'lte' in value ? value.lte : undefined,
+    amountCurrency: meta?.currency || undefined,
   };
 }
 
