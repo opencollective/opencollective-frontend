@@ -29,12 +29,12 @@ const PrivateCommentsMessage = ({ isAllowed, isLoading, ...props }) => {
             {isAllowed ? (
               <FormattedMessage
                 id="PrivateCommentsMessage.AllowedDetails"
-                defaultMessage="Expenses comments are private, because they sometimes contain confidential information such as payment details. Only the expense submitter and the admins can see them."
+                defaultMessage="Expenses comments are private, because they sometimes contain confidential information such as payment details. Only the expense submitter, the admins and the accountants can see them."
               />
             ) : (
               <FormattedMessage
                 id="PrivateCommentsMessage.NotAllowedDetails"
-                defaultMessage="You must be signed in as an admin or the expense submitter to read comments on an expense."
+                defaultMessage="You must be signed in as an admin, an accountant or the expense submitter to read comments on an expense."
               />
             )}
           </P>
