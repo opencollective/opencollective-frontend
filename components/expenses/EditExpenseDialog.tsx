@@ -516,8 +516,9 @@ const AttachReceipts = ({ expense, onSubmit }) => {
     <FormikProvider value={expenseForm}>
       <form className="space-y-4" ref={formRef} onSubmit={e => e.preventDefault()}>
         <div className="space-y-4">
-          {expenseForm.values.expenseItems.map((_, i) => (
+          {expenseForm.values.expenseItems.map((item, i) => (
             <ExpenseItemWrapper
+              key={item.id}
               index={i}
               isAmountLocked={true}
               isDateLocked={true}
@@ -753,8 +754,9 @@ const EditTypeDetailsStep = ({ expenseForm }) => {
             </MessageBox>
           )}
 
-          {expenseForm.values.expenseItems.map((_, i) => (
+          {expenseForm.values.expenseItems.map((item, i) => (
             <ExpenseItemWrapper
+              key={item.id}
               index={i}
               isAmountLocked={true}
               isDateLocked={true}
