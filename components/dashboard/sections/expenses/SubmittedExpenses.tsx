@@ -9,7 +9,7 @@ import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import useQueryFilter from '../../../../lib/hooks/useQueryFilter';
 import { PREVIEW_FEATURE_KEYS } from '../../../../lib/preview-features';
 import type { FilterComponentConfigs } from '@/lib/filters/filter-types';
-import type { Currency} from '@/lib/graphql/types/v2/schema';
+import type { Currency } from '@/lib/graphql/types/v2/schema';
 import { ExpenseType } from '@/lib/graphql/types/v2/schema';
 import { i18nExpenseType } from '@/lib/i18n/expense';
 import { sortSelectOptions } from '@/lib/utils';
