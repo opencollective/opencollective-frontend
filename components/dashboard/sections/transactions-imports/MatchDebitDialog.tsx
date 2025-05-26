@@ -86,8 +86,7 @@ const findExpenseMatchForOffPlatformDebitQuery = gql`
     $offset: Int
     $limit: Int
     $status: [ExpenseStatusFilter!]
-    $minAmount: Int
-    $maxAmount: Int
+    $amount: AmountRangeInput
     $dateFrom: DateTime
     $dateTo: DateTime
     $payoutMethodType: PayoutMethodType
@@ -99,8 +98,7 @@ const findExpenseMatchForOffPlatformDebitQuery = gql`
       status: $status
       dateFrom: $dateFrom
       dateTo: $dateTo
-      minAmount: $minAmount
-      maxAmount: $maxAmount
+      amount: $amount
       searchTerm: $searchTerm
       offset: $offset
       limit: $limit
@@ -165,8 +163,7 @@ const findContributionsMatchForOffPlatformDebitQuery = gql`
     $offset: Int
     $limit: Int
     $status: [OrderStatus!]
-    $minAmount: Int
-    $maxAmount: Int
+    $amount: AmountRangeInput
     $dateFrom: DateTime
     $dateTo: DateTime
     $account: [AccountReferenceInput!]
@@ -178,8 +175,7 @@ const findContributionsMatchForOffPlatformDebitQuery = gql`
         status: $status
         dateFrom: $dateFrom
         dateTo: $dateTo
-        minAmount: $minAmount
-        maxAmount: $maxAmount
+        amount: $amount
         searchTerm: $searchTerm
         offset: $offset
         limit: $limit
