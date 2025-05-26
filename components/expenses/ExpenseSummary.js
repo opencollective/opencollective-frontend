@@ -10,7 +10,7 @@ import styled from 'styled-components';
 import expenseTypes from '../../lib/constants/expenseTypes';
 import { PayoutMethodType } from '../../lib/constants/payout-method';
 import { i18nGraphqlException } from '../../lib/errors';
-import { ExpenseStatus, ExpenseType } from '../../lib/graphql/types/v2/graphql';
+import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import { AmountPropTypeShape } from '../../lib/prop-types';
@@ -47,7 +47,6 @@ import ExpenseStatusTag from './ExpenseStatusTag';
 import ExpenseSummaryAdditionalInformation from './ExpenseSummaryAdditionalInformation';
 import ExpenseTypeTag from './ExpenseTypeTag';
 import ProcessExpenseButtons, { hasProcessButtons } from './ProcessExpenseButtons';
-import { ExpenseItem } from './ExpenseItem';
 
 export const SummaryHeader = styled(H1)`
   > a {

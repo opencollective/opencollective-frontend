@@ -4,7 +4,8 @@ import { DialogClose } from '@radix-ui/react-dialog';
 import { Form, FormikProvider, useFormikContext } from 'formik';
 import { pick } from 'lodash';
 import { Pen } from 'lucide-react';
-import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
+import type { IntlShape } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../lib/errors';
@@ -17,12 +18,13 @@ import {
 } from '../../lib/graphql/types/v2/graphql';
 import { cn } from '../../lib/utils';
 import { getAccountReferenceInput } from '@/lib/collective';
-import { ExpenseLockableFields, type Expense } from '@/lib/graphql/types/v2/schema';
+import { type Expense, ExpenseLockableFields } from '@/lib/graphql/types/v2/schema';
 
 import CollectivePicker from '../CollectivePicker';
 import { accountsQuery } from '../dashboard/sections/accounts/queries';
 import { FormField } from '../FormField';
 import { FormikZod } from '../FormikZod';
+import MessageBox from '../MessageBox';
 import {
   AdditionalAttachments,
   ExpenseItemsForm,
@@ -32,6 +34,7 @@ import { PayoutMethodFormContent } from '../submit-expense/form/PayoutMethodSect
 import { InvoiceFormOption } from '../submit-expense/form/TypeOfExpenseSection';
 import { WhoIsGettingPaidForm } from '../submit-expense/form/WhoIsGettingPaidSection';
 import { InviteeAccountType, useExpenseForm, YesNoOption } from '../submit-expense/useExpenseForm';
+import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { Collapsible, CollapsibleContent } from '../ui/Collapsible';
 import {
@@ -44,17 +47,14 @@ import {
   DialogTrigger,
 } from '../ui/Dialog';
 import { Label } from '../ui/Label';
+import { RadioGroup, RadioGroupCard } from '../ui/RadioGroup';
+import { Skeleton } from '../ui/Skeleton';
+import type { StepItem } from '../ui/Stepper';
+import { Step, Stepper, useStepper } from '../ui/Stepper';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 import { toast } from '../ui/useToast';
 
 import { editExpenseMutation, moveExpenseMutation } from './graphql/mutations';
-import { ComboSelect } from '../ComboSelect';
-import { RadioGroup, RadioGroupCard } from '../ui/RadioGroup';
-import { Badge } from '../ui/Badge';
-import { Step, StepItem, Stepper, useStepper } from '../ui/Stepper';
-import { Skeleton } from '../ui/Skeleton';
-import MessageBox from '../MessageBox';
-import { ExpenseItem } from './ExpenseItem';
 
 const RenderFormFields = ({ field, onSubmit, expense, handleClose }) => {
   switch (field) {
@@ -64,18 +64,12 @@ const RenderFormFields = ({ field, onSubmit, expense, handleClose }) => {
       return <EditExpenseType onSubmit={onSubmit} expense={expense} />;
     case 'attachReceipts':
       return <AttachReceipts onSubmit={onSubmit} expense={expense} />;
-    // case 'expenseItems':
-    //   return <EditExpenseItems onSubmit={onSubmit} expense={expense} />;
     case 'expenseDetails':
       return <EditExpenseDetails onSubmit={onSubmit} expense={expense} />;
     case 'payoutMethod':
       return <EditPayoutMethod onSubmit={onSubmit} expense={expense} />;
     case 'payee':
       return <EditPayee onSubmit={onSubmit} expense={expense} />;
-    // case 'attachments':
-    //   return <EditAttachments onSubmit={onSubmit} expense={expense} />;
-    // case 'invoiceFile':
-    //   return <EditInvoiceFile onSubmit={onSubmit} expense={expense} />;
     case 'paidBy':
       return <EditPaidBy expense={expense} handleClose={handleClose} />;
   }
@@ -367,185 +361,6 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
     </FormikProvider>
   );
 };
-const EditAttachments = ({ expense, onSubmit }) => {
-  const formRef = React.useRef<HTMLFormElement>();
-  const startOptions = React.useRef({
-    expenseId: expense.legacyId,
-    isInlineEdit: true,
-    pickSchemaFields: { expenseAttachedFiles: true },
-  });
-  const transformedOnSubmit = values => {
-    const attachedFiles = values.additionalAttachments.map(a => ({
-      url: typeof a === 'string' ? a : a?.url,
-    }));
-
-    const editValues = {
-      attachedFiles,
-    };
-    return onSubmit(editValues);
-  };
-
-  const expenseForm = useExpenseForm({
-    formRef,
-    initialValues: {
-      inviteeAccountType: InviteeAccountType.INDIVIDUAL,
-      expenseItems: [
-        {
-          amount: {
-            valueInCents: 0,
-            currency: 'USD',
-          },
-          description: '',
-        },
-      ],
-      additionalAttachments: [],
-      hasInvoiceOption: YesNoOption.YES,
-      inviteeNewIndividual: {},
-      inviteeNewOrganization: {
-        organization: {},
-      },
-      newPayoutMethod: {
-        data: {},
-      },
-    },
-    startOptions: startOptions.current,
-    onSubmit: transformedOnSubmit,
-  });
-
-  return (
-    <FormikProvider value={expenseForm}>
-      <form className="space-y-4" ref={formRef} onSubmit={e => e.preventDefault()}>
-        <AdditionalAttachments {...AdditionalAttachments.getFormProps(expenseForm)} />
-        <EditExpenseActionButtons loading={expenseForm.initialLoading} handleSubmit={expenseForm.handleSubmit} />
-      </form>
-    </FormikProvider>
-  );
-};
-
-const EditInvoiceFile = ({ expense, onSubmit }) => {
-  const formRef = React.useRef<HTMLFormElement>();
-  const startOptions = React.useRef({
-    expenseId: expense.legacyId,
-    isInlineEdit: true,
-    pickSchemaFields: { invoiceFile: true, invoiceNumber: true },
-  });
-  const transformedOnSubmit = values => {
-    let invoiceFile;
-    if (values.hasInvoiceOption === YesNoOption.YES && values.invoiceFile) {
-      invoiceFile = { url: typeof values.invoiceFile === 'string' ? values.invoiceFile : values.invoiceFile.url };
-    } else if (values.hasInvoiceOption === YesNoOption.NO) {
-      invoiceFile = null;
-    }
-
-    const editValues = {
-      invoiceFile,
-      reference: values.invoiceNumber,
-    };
-    return onSubmit(editValues);
-  };
-
-  const expenseForm = useExpenseForm({
-    formRef,
-    initialValues: {
-      inviteeAccountType: InviteeAccountType.INDIVIDUAL,
-      expenseItems: [
-        {
-          amount: {
-            valueInCents: 0,
-            currency: 'USD',
-          },
-          description: '',
-        },
-      ],
-      additionalAttachments: [],
-      hasInvoiceOption: YesNoOption.YES,
-      inviteeNewIndividual: {},
-      inviteeNewOrganization: {
-        organization: {},
-      },
-      newPayoutMethod: {
-        data: {},
-      },
-    },
-    startOptions: startOptions.current,
-    onSubmit: transformedOnSubmit,
-  });
-
-  return (
-    <FormikProvider value={expenseForm}>
-      <form className="space-y-4" ref={formRef} onSubmit={e => e.preventDefault()}>
-        <InvoiceFormOption {...InvoiceFormOption.getFormProps(expenseForm)} />
-        <EditExpenseActionButtons loading={expenseForm.initialLoading} handleSubmit={expenseForm.handleSubmit} />
-      </form>
-    </FormikProvider>
-  );
-};
-
-const EditExpenseItems = ({ expense, onSubmit }) => {
-  const formRef = React.useRef<HTMLFormElement>();
-  const startOptions = React.useRef({
-    expenseId: expense.legacyId,
-    isInlineEdit: false,
-    pickSchemaFields: { expenseItems: true, hasTax: true, tax: true },
-  });
-  const transformedOnSubmit = values => {
-    const editValues = {
-      items: values.expenseItems.map(ei => ({
-        id: ei.id,
-        description: ei.description,
-        amountV2: {
-          valueInCents: ei.amount.valueInCents,
-          currency: ei.amount.currency as Currency,
-          exchangeRate: ei.amount.exchangeRate
-            ? ({
-                ...pick(ei.amount.exchangeRate, ['source', 'rate', 'value', 'fromCurrency', 'toCurrency']),
-                date: ei.amount.exchangeRate.date || ei.incurredAt,
-              } as CurrencyExchangeRateInput)
-            : null,
-        },
-        incurredAt: new Date(ei.incurredAt),
-        url: typeof ei.attachment === 'string' ? ei.attachment : ei.attachment?.url,
-      })),
-    };
-    return onSubmit(editValues);
-  };
-
-  const expenseForm = useExpenseForm({
-    formRef,
-    initialValues: {
-      inviteeAccountType: InviteeAccountType.INDIVIDUAL,
-      expenseItems: [
-        {
-          amount: {
-            valueInCents: 0,
-            currency: 'USD',
-          },
-          description: '',
-        },
-      ],
-      additionalAttachments: [],
-      hasInvoiceOption: YesNoOption.YES,
-      inviteeNewIndividual: {},
-      inviteeNewOrganization: {
-        organization: {},
-      },
-      newPayoutMethod: {
-        data: {},
-      },
-    },
-    startOptions: startOptions.current,
-    onSubmit: transformedOnSubmit,
-  });
-
-  return (
-    <FormikProvider value={expenseForm}>
-      <form className="space-y-4" ref={formRef} onSubmit={e => e.preventDefault()}>
-        <ExpenseItemsForm {...ExpenseItemsForm.getFormProps(expenseForm)} />
-        <EditExpenseActionButtons handleSubmit={expenseForm.handleSubmit} />
-      </form>
-    </FormikProvider>
-  );
-};
 
 const EditExpenseDetails = ({ expense, onSubmit }) => {
   const formRef = React.useRef<HTMLFormElement>();
@@ -625,19 +440,11 @@ const EditExpenseDetails = ({ expense, onSubmit }) => {
   return (
     <FormikProvider value={expenseForm}>
       <form className="space-y-4" ref={formRef} onSubmit={e => e.preventDefault()}>
-        {/* <h2>Items</h2> */}
         <ExpenseItemsForm {...ExpenseItemsForm.getFormProps(expenseForm)} />
         {expenseForm.values.expenseTypeOption === ExpenseType.INVOICE && (
-          <div>
-            {/* <h2>Invoice</h2> */}
-            <InvoiceFormOption {...InvoiceFormOption.getFormProps(expenseForm)} />
-          </div>
+          <InvoiceFormOption {...InvoiceFormOption.getFormProps(expenseForm)} />
         )}
-
-        {/* <h2>Additional attachments</h2> */}
-
         <AdditionalAttachments {...AdditionalAttachments.getFormProps(expenseForm)} />
-
         <EditExpenseActionButtons handleSubmit={expenseForm.handleSubmit} />
       </form>
     </FormikProvider>
@@ -725,29 +532,14 @@ const AttachReceipts = ({ expense, onSubmit }) => {
   );
 };
 
-const getSteps = (
-  intl: IntlShape,
-  typeSelection?: {
-    prev: ExpenseType;
-    new: ExpenseType;
-  },
-): StepItem[] => {
+const getEditExpenseTypeSteps = (intl: IntlShape): StepItem[] => {
   return [
     {
       id: 'type',
-      // icon: Upload,
-      label:
-        // typeSelection
-        //   ? intl.formatMessage(
-        //       { defaultMessage: 'Changed type from {prev} to {new}', id: 'bxIGm+' }, // TODO: fix ID
-        //       { prev: typeSelection.prev, new: typeSelection.new },
-        //     )
-        //   :
-        intl.formatMessage({ defaultMessage: 'Change type', id: '+KQjHt' }),
+      label: intl.formatMessage({ defaultMessage: 'Change type', id: '+KQjHt' }),
     },
     {
       id: 'details',
-      // icon: FileSliders,
       label: intl.formatMessage({ defaultMessage: 'Update details', id: '9HFIjd' }),
     },
   ];
@@ -800,7 +592,6 @@ const EditExpenseType = ({ expense, onSubmit }) => {
       reference: values.invoiceNumber,
       type: values.expenseTypeOption,
     };
-    console.log({ editValues });
     return onSubmit(editValues);
   };
 
@@ -831,15 +622,8 @@ const EditExpenseType = ({ expense, onSubmit }) => {
     onSubmit: transformedOnSubmit,
   });
 
-  const typeSelection =
-    expenseForm.options.expense && expenseForm.values.expenseTypeOption !== expenseForm.options.expense.type
-      ? {
-          new: expenseForm.values.expenseTypeOption,
-          prev: expenseForm.options.expense?.type,
-        }
-      : undefined;
-  const steps = React.useMemo(() => getSteps(intl, typeSelection), [intl, typeSelection]);
-  console.log({ expenseForm });
+  const steps = React.useMemo(() => getEditExpenseTypeSteps(intl), [intl]);
+
   return (
     <FormikProvider value={expenseForm}>
       <form className="space-y-4" ref={formRef} onSubmit={e => e.preventDefault()}>
@@ -868,11 +652,10 @@ const EditExpenseType = ({ expense, onSubmit }) => {
 };
 
 const ExpenseTypeStep = ({ expenseForm }) => {
-  const { nextStep, prevStep } = useStepper();
+  const { nextStep } = useStepper();
 
   return (
     <React.Fragment>
-      {/* <h2>Type</h2> */}
       <RadioGroup
         disabled={expenseForm.options.lockedFields?.includes?.(ExpenseLockableFields.TYPE) || expenseForm.isSubmitting} // TODO: should type be locked here? Perhaps prevent it before in this case
         value={expenseForm.values.expenseTypeOption}
@@ -913,7 +696,7 @@ const ExpenseTypeStep = ({ expenseForm }) => {
               </div>
               {expenseForm.options.expense?.type === ExpenseType.RECEIPT && (
                 <Badge type="info" size="sm">
-                  Current
+                  <FormattedMessage defaultMessage="Current" id="Current" />
                 </Badge>
               )}
             </div>
@@ -936,10 +719,7 @@ const ExpenseTypeStep = ({ expenseForm }) => {
             expenseForm.initialLoading || expenseForm.options.expense?.type === expenseForm.values.expenseTypeOption
           }
           loading={expenseForm.isSubmitting}
-          onClick={() => {
-            console.log('next step!');
-            nextStep();
-          }}
+          onClick={nextStep}
         >
           <FormattedMessage defaultMessage="Proceed" id="VNX4fn" />
         </Button>
@@ -956,12 +736,23 @@ const EditTypeDetailsStep = ({ expenseForm }) => {
       {expenseForm.values.expenseTypeOption === ExpenseType.RECEIPT && (
         <div className="space-y-4">
           {expenseForm.values.expenseItems[0].attachment ? (
-            <MessageBox type="info">The invoice file was moved to be the expense item attachment.</MessageBox>
+            <MessageBox type="info">
+              <FormattedMessage
+                defaultMessage="The invoice file was moved to be the expense {count, plural, one {item} other {items}} attachment."
+                id="EditExpense.InvoiceFileMovedToAttachment"
+                values={{ count: expenseForm.values.expenseItems.length }}
+              />
+            </MessageBox>
           ) : (
-            <MessageBox type="info">You need to attach a receipt to the expense item.</MessageBox>
+            <MessageBox type="info">
+              <FormattedMessage
+                defaultMessage="You need to attach {count, plural, one {a receipt to the expense item} other {receipts to the expense items}}."
+                id="EditExpense.AttachReceiptRequired"
+                values={{ count: expenseForm.values.expenseItems.length }}
+              />
+            </MessageBox>
           )}
 
-          {/* TODO: handle for drafts */}
           {expenseForm.values.expenseItems.map((_, i) => (
             <ExpenseItemWrapper
               index={i}
@@ -971,19 +762,20 @@ const EditTypeDetailsStep = ({ expenseForm }) => {
               isSubjectToTax={Boolean(expenseForm.options.taxType)}
             />
           ))}
-
-          {/* <ExpenseItemsForm {...ExpenseItemsForm.getFormProps(expenseForm)} /> */}
         </div>
       )}
       {expenseForm.values.expenseTypeOption === ExpenseType.INVOICE && (
         <div className="space-y-4">
-          <MessageBox type="info">The expense item attachment was moved to become the invoice file.</MessageBox>
-          {/* <h2>Invoice</h2> */}
+          <MessageBox type="info">
+            <FormattedMessage
+              defaultMessage="The expense {count, plural, one {item attachment was moved to become the invoice file} other {item attachments were moved to additional attachments, you need to pick a single invoice file or generate one automatically}}."
+              id="EditExpense.ExpenseItemAttachmentMoved"
+              values={{ count: expenseForm.values.expenseItems.length }}
+            />
+          </MessageBox>
           <InvoiceFormOption {...InvoiceFormOption.getFormProps(expenseForm)} />
         </div>
       )}
-
-      {/* <h2>Additional attachments</h2> */}
 
       <AdditionalAttachments {...AdditionalAttachments.getFormProps(expenseForm)} />
       <DialogFooter>

@@ -251,7 +251,6 @@ type ExpenseItemProps = {
   isAmountLocked?: boolean;
   isDateLocked?: boolean;
   isDescriptionLocked?: boolean;
-  isDescriptionLocked?: boolean;
   item: ExpenseForm['values']['expenseItems'][number];
   isSubjectToTax?: boolean;
 } & ReturnType<typeof getExpenseItemProps>;

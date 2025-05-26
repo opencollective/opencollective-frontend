@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { Box, Flex } from '../../components/Grid';
+import { Flex } from '../../components/Grid';
 import MessageBox from '../../components/MessageBox';
 import StyledButton from '../../components/StyledButton';
 import { H4, P } from '../../components/Text';
