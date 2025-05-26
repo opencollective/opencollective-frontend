@@ -191,7 +191,7 @@ export const hostDashboardExpensesQuery = gql`
   ${expenseHostFields}
 `;
 
-const hostInfoCardFields = gql`
+export const hostInfoCardFields = gql`
   fragment HostInfoCardFields on Host {
     id
     legacyId
