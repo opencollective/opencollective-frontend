@@ -4,7 +4,7 @@ import { accountHasGST, accountHasVAT, TaxType } from '@opencollective/taxes';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { Form, Formik } from 'formik';
 import { compact, get, groupBy, isEmpty, map } from 'lodash';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Lock, Unlock } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { css } from 'styled-components';
 
@@ -454,6 +454,7 @@ const AddFundsModalContentWithCollective = ({
   editOrderId?: string;
 }) => {
   const intl = useIntl();
+  const [isAmountLocked, setIsAmountLocked] = React.useState(Boolean(initialValues?.amount));
   const {
     data,
     loading,
@@ -757,7 +758,7 @@ const AddFundsModalContentWithCollective = ({
                 >
                   {({ field }) => <StyledTextarea data-cy="add-funds-memo" {...field} />}
                 </Field>
-                <Flex mt={3} flexWrap="wrap">
+                <Flex mt={3} flexWrap="wrap" alignItems="flex-end">
                   <Field
                     name="amount"
                     htmlFor="addFunds-amount"
@@ -766,19 +767,42 @@ const AddFundsModalContentWithCollective = ({
                     flex="1 1"
                   >
                     {({ form, field }) => (
-                      <StyledInputAmount
-                        id={field.id}
-                        data-cy="add-funds-amount"
-                        currency={currency}
-                        placeholder="0.00"
-                        error={field.error}
-                        value={field.value}
-                        maxWidth="100%"
-                        onChange={value => form.setFieldValue(field.name, value)}
-                        onBlur={() => form.setFieldTouched(field.name, true)}
-                      />
+                      <div>
+                        <div className="flex justify-between gap-2 [&>div]:w-full">
+                          <StyledInputAmount
+                            id={field.id}
+                            data-cy="add-funds-amount"
+                            currency={currency}
+                            placeholder="0.00"
+                            error={field.error}
+                            value={field.value}
+                            maxWidth="100%"
+                            onChange={value => form.setFieldValue(field.name, value)}
+                            onBlur={() => form.setFieldTouched(field.name, true)}
+                            disabled={isAmountLocked}
+                          />
+                          {Boolean(initialValues?.amount) && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="h-[38px]"
+                              onClick={() => setIsAmountLocked(locked => !locked)}
+                              aria-label={isAmountLocked ? 'Unlock amount field' : 'Lock amount field'}
+                            >
+                              {isAmountLocked ? <Lock size={18} /> : <Unlock size={18} />}
+                            </Button>
+                          )}
+                        </div>
+                        {isAmountLocked && Boolean(initialValues?.amount) && (
+                          <span className="mt-1 text-xs text-gray-500">
+                            <FormattedMessage defaultMessage="Unlock the field to edit the amount." id="hmdkRP" />
+                          </span>
+                        )}
+                      </div>
                     )}
                   </Field>
+
                   {canAddHostFee && (
                     <Field
                       name="hostFeePercent"

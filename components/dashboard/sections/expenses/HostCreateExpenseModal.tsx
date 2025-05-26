@@ -2,6 +2,7 @@ import React from 'react';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import { Form } from 'formik';
 import { groupBy, map, omit, pick } from 'lodash';
+import { Lock, Unlock } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
@@ -25,17 +26,16 @@ import type { AccountingCategory } from '@/lib/graphql/types/v2/graphql';
 import type { PossiblyArray } from '@/lib/types';
 
 import AccountingCategorySelect from '@/components/AccountingCategorySelect';
+import { Button } from '@/components/ui/Button';
 
 import CollectivePicker, { DefaultCollectiveLabel } from '../../../CollectivePicker';
 import CollectivePickerAsync from '../../../CollectivePickerAsync';
 import Dropzone from '../../../Dropzone';
-import { ExchangeRate } from '../../../ExchangeRate';
 import { FormikZod } from '../../../FormikZod';
 import type { BaseModalProps } from '../../../ModalContext';
 import { StyledInputAmountWithDynamicFxRate } from '../../../StyledInputAmountWithDynamicFxRate';
 import StyledInputFormikField from '../../../StyledInputFormikField';
 import StyledSelect from '../../../StyledSelect';
-import { Button } from '../../../ui/Button';
 import { Dialog, DialogContent, DialogHeader } from '../../../ui/Dialog';
 import { useToast } from '../../../ui/useToast';
 import { TransactionsImportRowDetails } from '../transactions-imports/TransactionsImportRowDetailsAccordion';
@@ -193,6 +193,7 @@ export const HostCreateExpenseModal = ({
   transactionsImportRow?: TransactionsImportRow;
 } & BaseModalProps) => {
   const intl = useIntl();
+  const [isAmountLocked, setIsAmountLocked] = React.useState(Boolean(transactionsImportRow?.amount?.valueInCents));
   const [createExpense, { client }] = useMutation(hostCreateExpenseMutation, { context: API_V2_CONTEXT });
   const { toast } = useToast();
   const expenseTypeOptions = React.useMemo(
@@ -299,27 +300,40 @@ export const HostCreateExpenseModal = ({
                     label={<FormattedMessage defaultMessage="Amount" id="Fields.amount" />}
                   >
                     {({ field }) => (
-                      <React.Fragment>
-                        <StyledInputAmountWithDynamicFxRate
-                          onChange={valueInCents => setFieldValue('amount', { ...values.amount, valueInCents })}
-                          onCurrencyChange={currency => setFieldValue('amount', { ...values.amount, currency })}
-                          onExchangeRateChange={exchangeRate =>
-                            setFieldValue('amount', { ...values.amount, exchangeRate })
-                          }
-                          exchangeRate={field.value.exchangeRate}
-                          fromCurrency={field.value.currency}
-                          toCurrency={host.currency}
-                          value={field.value.valueInCents}
-                          disabled={field.disabled}
-                          date={values.incurredAt}
-                        />
-                        {Boolean(field.value.exchangeRate && field.value.exchangeRate.value !== 1) && (
-                          <ExchangeRate
-                            className="mt-2 justify-end text-neutral-600"
+                      <div>
+                        <div className="flex justify-between gap-2 [&>div]:w-full">
+                          <StyledInputAmountWithDynamicFxRate
+                            onChange={valueInCents => setFieldValue('amount', { ...values.amount, valueInCents })}
+                            onCurrencyChange={currency => setFieldValue('amount', { ...values.amount, currency })}
+                            onExchangeRateChange={exchangeRate =>
+                              setFieldValue('amount', { ...values.amount, exchangeRate })
+                            }
                             exchangeRate={field.value.exchangeRate}
+                            fromCurrency={field.value.currency}
+                            toCurrency={host.currency}
+                            value={field.value.valueInCents}
+                            disabled={isAmountLocked || field.disabled}
+                            date={values.incurredAt}
                           />
+                          {Boolean(transactionsImportRow?.amount?.valueInCents) && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="h-[38px]"
+                              onClick={() => setIsAmountLocked(locked => !locked)}
+                              aria-label={isAmountLocked ? 'Unlock amount field' : 'Lock amount field'}
+                            >
+                              {isAmountLocked ? <Lock size={18} /> : <Unlock size={18} />}
+                            </Button>
+                          )}
+                        </div>
+                        {isAmountLocked && Boolean(transactionsImportRow?.amount?.valueInCents) && (
+                          <span className="mt-1 text-xs text-gray-500">
+                            <FormattedMessage defaultMessage="Unlock the field to edit the amount." id="hmdkRP" />
+                          </span>
                         )}
-                      </React.Fragment>
+                      </div>
                     )}
                   </StyledInputFormikField>
                   <StyledInputFormikField
