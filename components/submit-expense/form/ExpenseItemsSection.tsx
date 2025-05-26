@@ -347,6 +347,7 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
                 name={`expenseItems.${props.index}.attachment`}
               >
                 {({ field }) => {
+                  console.log({ field });
                   return (
                     <MemoizedDropzone
                       {...attachmentDropzoneParams}

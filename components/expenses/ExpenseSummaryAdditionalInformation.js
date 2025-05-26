@@ -119,6 +119,8 @@ const ExpenseSummaryAdditionalInformation = ({
   const isCharge = expense?.type === expenseTypes.CHARGE;
   const isPaid = expense?.status === ExpenseStatus.PAID;
 
+  const { canEditPaidBy, canEditPayee, canEditPayoutMethod } = useInlineExpenseEdit ? expense?.permissions || {} : {};
+
   if (isLoading) {
     return <LoadingPlaceholder height={150} mt={3} />;
   }
@@ -139,7 +141,7 @@ const ExpenseSummaryAdditionalInformation = ({
           <div className="flex justify-between gap-2">
             <PrivateInfoColumnHeader>{formatCollectiveType(intl, collective.type)}</PrivateInfoColumnHeader>
 
-            {useInlineExpenseEdit && expense.permissions?.canEditPaidBy && (
+            {canEditPaidBy && (
               <EditExpenseDialog
                 field={'paidBy'}
                 expense={expense}
@@ -222,7 +224,7 @@ const ExpenseSummaryAdditionalInformation = ({
               <FormattedMessage id="Expense.PayTo" defaultMessage="Pay to" />
             )}
           </PrivateInfoColumnHeader>
-          {useInlineExpenseEdit && (
+          {canEditPayee && (
             <EditExpenseDialog
               field={'payee'}
               expense={expense}
@@ -290,7 +292,7 @@ const ExpenseSummaryAdditionalInformation = ({
           <PrivateInfoColumnHeader>
             <FormattedMessage id="expense.payoutMethod" defaultMessage="payout method" />
           </PrivateInfoColumnHeader>
-          {useInlineExpenseEdit && (
+          {canEditPayoutMethod && (
             <EditExpenseDialog
               field={'payoutMethod'}
               expense={expense}

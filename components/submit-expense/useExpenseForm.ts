@@ -51,6 +51,7 @@ import { accountHoverCardFields } from '../AccountHoverCard';
 import { loggedInAccountExpensePayoutFieldsFragment } from '../expenses/graphql/fragments';
 import { validatePayoutMethod } from '../expenses/PayoutMethodForm';
 import { getCustomZodErrorMap } from '../FormikZod';
+import Expense from '../expenses/Expense';
 
 export enum InviteeAccountType {
   INDIVIDUAL = 'INDIVIDUAL',
@@ -2074,6 +2075,37 @@ export function useExpenseForm(opts: {
       setFieldValue('tax', null);
     }
   }, [formOptions.taxType, setFieldValue]);
+
+  React.useEffect(() => {
+    // if expenseTypeOption.touched?
+    if (expenseForm.values.expenseTypeOption === ExpenseType.INVOICE) {
+      if (expenseForm.values.expenseItems.length === 1) {
+        if (expenseForm.values.expenseItems[0].attachment) {
+          setFieldValue('invoiceFile', expenseForm.values.expenseItems[0].attachment);
+          setFieldValue('expenseItems.0.attachment', undefined);
+        }
+        setFieldValue('hasInvoiceOption', YesNoOption.YES);
+      } else {
+        const numberOfAdditionalAttachments = expenseForm.values.additionalAttachments.length;
+        let count = 0;
+
+        expenseForm.values.expenseItems.forEach((item, i) => {
+          if (item.attachment) {
+            setFieldValue(`additionalAttachments.${numberOfAdditionalAttachments + count}`, item.attachment);
+            setFieldValue(`expenseItems.${i}.attachment`, undefined);
+            count++;
+          }
+        });
+      }
+    } else if (expenseForm.values.expenseTypeOption === ExpenseType.RECEIPT) {
+      if (expenseForm.values.invoiceFile) {
+        for (let i = 0; i < expenseForm.values.expenseItems.length; i++) {
+          setFieldValue(`expenseItems.${i}.attachment`, expenseForm.values.invoiceFile);
+        }
+        setFieldValue('invoiceFile', undefined);
+      }
+    }
+  }, [expenseForm.values.expenseTypeOption]);
 
   React.useEffect(() => {
     setFieldValue('payoutMethodNameDiscrepancyReason', '');
