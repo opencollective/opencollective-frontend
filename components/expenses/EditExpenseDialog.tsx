@@ -23,7 +23,11 @@ import CollectivePicker from '../CollectivePicker';
 import { accountsQuery } from '../dashboard/sections/accounts/queries';
 import { FormField } from '../FormField';
 import { FormikZod } from '../FormikZod';
-import { AdditionalAttachments, ExpenseItemsForm } from '../submit-expense/form/ExpenseItemsSection';
+import {
+  AdditionalAttachments,
+  ExpenseItemsForm,
+  ExpenseItemWrapper,
+} from '../submit-expense/form/ExpenseItemsSection';
 import { PayoutMethodFormContent } from '../submit-expense/form/PayoutMethodSection';
 import { InvoiceFormOption } from '../submit-expense/form/TypeOfExpenseSection';
 import { WhoIsGettingPaidForm } from '../submit-expense/form/WhoIsGettingPaidSection';
@@ -58,6 +62,8 @@ const RenderFormFields = ({ field, onSubmit, expense, handleClose }) => {
       return <EditExpenseTitle onSubmit={onSubmit} expense={expense} />;
     case 'type':
       return <EditExpenseType onSubmit={onSubmit} expense={expense} />;
+    case 'attachReceipts':
+      return <AttachReceipts onSubmit={onSubmit} expense={expense} />;
     // case 'expenseItems':
     //   return <EditExpenseItems onSubmit={onSubmit} expense={expense} />;
     case 'expenseDetails':
@@ -271,6 +277,7 @@ const EditPayee = ({ expense, onSubmit }) => {
     </FormikProvider>
   );
 };
+
 const EditPayoutMethod = ({ expense, onSubmit }) => {
   const formRef = React.useRef<HTMLFormElement>();
   const startOptions = React.useRef({
@@ -637,6 +644,87 @@ const EditExpenseDetails = ({ expense, onSubmit }) => {
   );
 };
 
+const AttachReceipts = ({ expense, onSubmit }) => {
+  const formRef = React.useRef<HTMLFormElement>();
+  const startOptions = React.useRef({
+    expenseId: expense.legacyId,
+    isInlineEdit: true,
+    pickSchemaFields: {
+      expenseItems: true,
+    },
+  });
+  const transformedOnSubmit = values => {
+    const editValues = {
+      items: values.expenseItems.map(ei => ({
+        id: ei.id,
+        description: ei.description,
+        amountV2: {
+          valueInCents: ei.amount.valueInCents,
+          currency: ei.amount.currency as Currency,
+          exchangeRate: ei.amount.exchangeRate
+            ? ({
+                ...pick(ei.amount.exchangeRate, ['source', 'rate', 'value', 'fromCurrency', 'toCurrency']),
+                date: ei.amount.exchangeRate.date || ei.incurredAt,
+              } as CurrencyExchangeRateInput)
+            : null,
+        },
+        incurredAt: new Date(ei.incurredAt),
+        url: typeof ei.attachment === 'string' ? ei.attachment : (ei.attachment?.url ?? null),
+      })),
+      attachedFiles: values.additionalAttachments.map(a => ({
+        url: typeof a === 'string' ? a : a?.url,
+      })),
+    };
+    return onSubmit(editValues);
+  };
+
+  const expenseForm = useExpenseForm({
+    formRef,
+    initialValues: {
+      inviteeAccountType: InviteeAccountType.INDIVIDUAL,
+      expenseItems: [
+        {
+          amount: {
+            valueInCents: 0,
+            currency: 'USD',
+          },
+          description: '',
+        },
+      ],
+      additionalAttachments: [],
+      hasInvoiceOption: YesNoOption.YES,
+      inviteeNewIndividual: {},
+      inviteeNewOrganization: {
+        organization: {},
+      },
+      newPayoutMethod: {
+        data: {},
+      },
+    },
+    startOptions: startOptions.current,
+    onSubmit: transformedOnSubmit,
+  });
+
+  return (
+    <FormikProvider value={expenseForm}>
+      <form className="space-y-4" ref={formRef} onSubmit={e => e.preventDefault()}>
+        <div className="space-y-4">
+          {expenseForm.values.expenseItems.map((_, i) => (
+            <ExpenseItemWrapper
+              index={i}
+              isAmountLocked={true}
+              isDateLocked={true}
+              isSubjectToTax={Boolean(expenseForm.options.taxType)}
+            />
+          ))}
+        </div>
+
+        <EditExpenseActionButtons handleSubmit={expenseForm.handleSubmit} />
+      </form>
+    </FormikProvider>
+  );
+};
+
 const getSteps = (
   intl: IntlShape,
   typeSelection?: {
@@ -874,28 +962,16 @@ const EditTypeDetailsStep = ({ expenseForm }) => {
           )}
 
           {/* TODO: handle for drafts */}
+          {expenseForm.values.expenseItems.map((_, i) => (
+            <ExpenseItemWrapper
+              index={i}
+              isAmountLocked={true}
+              isDateLocked={true}
+              isDescriptionLocked={true}
+              isSubjectToTax={Boolean(expenseForm.options.taxType)}
+            />
+          ))}
 
-          {expenseForm.options.expense?.items.map((item, i) => {
-            const attachment = expenseForm.values.expenseItems[i].attachment;
-            const newItem = { ...item, url: typeof attachment === 'string' ? attachment : attachment?.url };
-            console.log({
-              item,
-              attachment,
-              expenseItems: expenseForm.options.expense.items,
-              formItems: expenseForm.values.expenseItems,
-            });
-            return (
-              <ExpenseItem
-                item={newItem} // transforming form value to expected value
-                expense={expenseForm.options.expense}
-                canEditAttachment
-                onAttachmentSuccess={file => {
-                  expenseForm.setFieldValue(`expenseItems.${i}.attachment`, file);
-                }}
-                key={item.id}
-              />
-            );
-          })}
           {/* <ExpenseItemsForm {...ExpenseItemsForm.getFormProps(expenseForm)} /> */}
         </div>
       )}
@@ -912,7 +988,7 @@ const EditTypeDetailsStep = ({ expenseForm }) => {
       <AdditionalAttachments {...AdditionalAttachments.getFormProps(expenseForm)} />
       <DialogFooter>
         <Button variant="outline" onClick={prevStep}>
-          <FormattedMessage defaultMessage="Back" id="cyR7Kh" />
+          <FormattedMessage defaultMessage="Back" id="Back" />
         </Button>
 
         <Button
@@ -976,6 +1052,7 @@ export default function EditExpenseDialog({
   description,
   dialogContentClassName,
   triggerClassName,
+  trigger,
 }: {
   expense: Expense;
   field:
@@ -992,7 +1069,7 @@ export default function EditExpenseDialog({
   description?: string;
   dialogContentClassName?: string;
   triggerClassName?: string;
-  goToLegacyEdit?: () => void;
+  trigger?: React.ReactNode;
 }) {
   const [open, setOpen] = React.useState(false);
   const intl = useIntl();
@@ -1031,9 +1108,11 @@ export default function EditExpenseDialog({
       <Tooltip>
         <TooltipTrigger asChild>
           <DialogTrigger asChild>
-            <Button size="icon-xs" variant="outline" className={cn('h-7 w-7', triggerClassName)}>
-              <Pen size={16} />
-            </Button>
+            {trigger || (
+              <Button size="icon-xs" variant="outline" className={cn('h-7 w-7', triggerClassName)}>
+                <Pen size={16} />
+              </Button>
+            )}
           </DialogTrigger>
         </TooltipTrigger>
         <TooltipContent>{title}</TooltipContent>

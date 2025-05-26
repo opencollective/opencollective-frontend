@@ -529,6 +529,7 @@ export const expensePageExpenseFieldsFragment = gql`
       canEditPaidBy
       canEditPayee
       canEditPayoutMethod
+      canAttachReceipts
       canDelete
       canSeeInvoiceInfo
       canApprove

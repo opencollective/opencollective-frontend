@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 import type { Path, PathValue } from 'dot-path-value';
 import type { FieldInputProps, FormikErrors, FormikHelpers } from 'formik';
 import { useFormik } from 'formik';
-import { isEmpty, isEqual, isNull, omit, pick, set, uniqBy } from 'lodash';
+import { isEmpty, isEqual, isNull, omit, pick, set, uniq, uniqBy } from 'lodash';
 import memoizeOne from 'memoize-one';
 import type { IntlShape } from 'react-intl';
 import { useIntl } from 'react-intl';
@@ -51,7 +51,6 @@ import { accountHoverCardFields } from '../AccountHoverCard';
 import { loggedInAccountExpensePayoutFieldsFragment } from '../expenses/graphql/fragments';
 import { validatePayoutMethod } from '../expenses/PayoutMethodForm';
 import { getCustomZodErrorMap } from '../FormikZod';
-import Expense from '../expenses/Expense';
 
 export enum InviteeAccountType {
   INDIVIDUAL = 'INDIVIDUAL',
@@ -1540,7 +1539,8 @@ async function buildFormOptions(
       options.canSetupRecurrence = false;
     }
 
-    options.allowExpenseItemAttachment = values.expenseTypeOption === ExpenseType.RECEIPT;
+    options.allowExpenseItemAttachment =
+      values.expenseTypeOption === ExpenseType.RECEIPT || values.expenseTypeOption === ExpenseType.CHARGE;
 
     options.allowInvite = !startOptions.isInlineEdit && options.expense?.status !== ExpenseStatus.DRAFT;
 

@@ -249,6 +249,9 @@ export const ExpenseItemsForm = memoWithGetFormProps(function ExpenseItemsForm(
 type ExpenseItemProps = {
   index: number;
   isAmountLocked?: boolean;
+  isDateLocked?: boolean;
+  isDescriptionLocked?: boolean;
+  isDescriptionLocked?: boolean;
   item: ExpenseForm['values']['expenseItems'][number];
   isSubjectToTax?: boolean;
 } & ReturnType<typeof getExpenseItemProps>;
@@ -267,13 +270,21 @@ function getExpenseItemProps(form: ExpenseForm) {
   };
 }
 
-function ExpenseItemWrapper(props: { index: number; isAmountLocked?: boolean; isSubjectToTax?: boolean }) {
+export function ExpenseItemWrapper(props: {
+  index: number;
+  isAmountLocked?: boolean;
+  isDateLocked?: boolean;
+  isDescriptionLocked?: boolean;
+  isSubjectToTax?: boolean;
+}) {
   const form = useFormikContext() as ExpenseForm;
   return (
     <ExpenseItem
       index={props.index}
       item={get(form.values, `expenseItems.${props.index}`)}
       isAmountLocked={props.isAmountLocked}
+      isDateLocked={props.isDateLocked}
+      isDescriptionLocked={props.isDescriptionLocked}
       isSubjectToTax={props.isSubjectToTax}
       {...ExpenseItem.getFormProps(form)}
     />
@@ -286,7 +297,6 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
   const item = props.item;
 
   const hasAttachment = props.allowExpenseItemAttachment;
-
   const attachmentId = useId();
 
   const { setFieldValue } = props;
@@ -347,7 +357,6 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
                 name={`expenseItems.${props.index}.attachment`}
               >
                 {({ field }) => {
-                  console.log({ field });
                   return (
                     <MemoizedDropzone
                       {...attachmentDropzoneParams}
@@ -376,7 +385,7 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
           <div className="mb-2">
             <FormField
               required={props.isAdminOfPayee}
-              disabled={props.isSubmitting}
+              disabled={props.isDescriptionLocked || props.isSubmitting}
               label={intl.formatMessage({ defaultMessage: 'Item Description', id: 'xNL/oy' })}
               placeholder={intl.formatMessage({ defaultMessage: 'Enter what best describes the item', id: '/eapvj' })}
               name={`expenseItems.${props.index}.description`}
@@ -393,7 +402,7 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
             {props.hasExpenseItemDate && (
               <FormField
                 required={props.isAdminOfPayee}
-                disabled={props.isSubmitting}
+                disabled={props.isDateLocked || props.isSubmitting}
                 label={intl.formatMessage({ defaultMessage: 'Date', id: 'expense.incurredAt' })}
                 name={`expenseItems.${props.index}.incurredAt`}
               >

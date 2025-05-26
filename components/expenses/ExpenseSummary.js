@@ -131,8 +131,6 @@ const ExpenseSummary = ({
   const useInlineExpenseEdit =
     LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE) &&
     expense?.status !== ExpenseStatus.DRAFT;
-
-  console.log({ permissions: expense?.permissions });
   const { canEditTitle, canEditType, canEditItems } = useInlineExpenseEdit ? expense?.permissions || {} : {};
   const invoiceFile = React.useMemo(
     () => expense?.invoiceFile || expense?.draft?.invoiceFile,
@@ -398,7 +396,9 @@ const ExpenseSummary = ({
 
       <div className="my-8 rounded-lg border p-6">
         <div className="flex items-center justify-between gap-2">
-          <h3 className="text-lg font-semibold">Expense details</h3>
+          <h3 className="text-lg font-semibold">
+            <FormattedMessage defaultMessage="Expense Details" id="+5Kafe" />
+          </h3>
           {canEditItems && (
             <EditExpenseDialog
               expense={expense}
@@ -428,8 +428,95 @@ const ExpenseSummary = ({
           <LoadingPlaceholder height={68} mb={3} />
         ) : (
           <div data-cy="expense-summary-items">
-            {expenseItems.map((item, itemIdx) => (
-              <ExpenseItem item={item} expense={expense} key={item.id || itemIdx} />
+            {expenseItems.map((attachment, attachmentIdx) => (
+              <React.Fragment key={attachment.id || attachmentIdx}>
+                <Flex my={24} flexWrap="wrap" data-cy="expense-summary-item">
+                  {attachment.url && expenseItemsMustHaveFiles(expense.type) && (
+                    <Box mr={3} mb={3} width={['100%', 'auto']}>
+                      <UploadedFilePreview
+                        url={attachment.url}
+                        isLoading={isLoading || isLoadingLoggedInUser}
+                        isPrivate={!attachment.url && !isLoading}
+                        size={[64, 48]}
+                        maxHeight={48}
+                        openFileViewer={openFileViewer}
+                      />
+                    </Box>
+                  )}
+                  <Flex justifyContent="space-between" alignItems="flex-start" flex="1">
+                    <Flex flexDirection="column" justifyContent="center" flexGrow="1">
+                      {attachment.description ? (
+                        <HTMLContent
+                          content={attachment.description}
+                          fontSize="14px"
+                          color="black.900"
+                          collapsable
+                          fontWeight="500"
+                          maxCollapsedHeight={100}
+                          collapsePadding={22}
+                        />
+                      ) : (
+                        <Span color="black.600" fontStyle="italic">
+                          <FormattedMessage id="NoDescription" defaultMessage="No description provided" />
+                        </Span>
+                      )}
+                      {!isGrant && (
+                        <Span mt={1} fontSize="12px" color="black.700">
+                          <FormattedMessage
+                            id="withColon"
+                            defaultMessage="{item}:"
+                            values={{
+                              item: <FormattedMessage id="expense.incurredAt" defaultMessage="Date" />,
+                            }}
+                          />{' '}
+                          {/* Using timeZone=UTC as we only store the date as a UTC string, without time */}
+                          <FormattedDate value={attachment.incurredAt} dateStyle="long" timeZone="UTC" />{' '}
+                        </Span>
+                      )}
+                    </Flex>
+                    <Container
+                      fontSize={15}
+                      color="black.600"
+                      mt={2}
+                      textAlign="right"
+                      ml={3}
+                      data-cy="expense-summary-item-amount"
+                    >
+                      {attachment.amountV2?.exchangeRate ? (
+                        <div>
+                          <FormattedMoneyAmount
+                            amount={Math.round(
+                              attachment.amountV2.valueInCents * attachment.amountV2.exchangeRate.value,
+                            )}
+                            currency={expense.currency}
+                            amountClassName="font-medium text-foreground"
+                            precision={2}
+                          />
+                          <div className="mt-[2px] text-xs">
+                            <AmountWithExchangeRateInfo
+                              amount={attachment.amountV2}
+                              invertIconPosition
+                              {...getExpenseExchangeRateWarningOrError(
+                                intl,
+                                attachment.amountV2.exchangeRate,
+                                attachment.referenceExchangeRate,
+                              )}
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <FormattedMoneyAmount
+                          amount={attachment.amountV2?.valueInCents || attachment.amount}
+                          currency={attachment.amountV2?.currency || expense.currency}
+                          amountClassName="font-medium text-foreground"
+                          precision={2}
+                        />
+                      )}
+                    </Container>
+                  </Flex>
+                </Flex>
+                <StyledHr borderStyle="dotted" />
+              </React.Fragment>
             ))}
           </div>
         )}
