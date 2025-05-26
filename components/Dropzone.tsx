@@ -315,7 +315,7 @@ const Dropzone = ({
   );
 };
 
-export type UploadedFile = {
+type UploadedFile = {
   name?: string;
   url: string;
   size?: number;
