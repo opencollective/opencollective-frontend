@@ -15140,7 +15140,7 @@ type Vendor implements Account & AccountWithContributions {
   """
   The accounts where this vendor is visible, if empty or null applies to all collectives under the vendor host
   """
-  visibleToAccounts: [Account]
+  visibleToAccounts: [Account]!
 }
 
 """
