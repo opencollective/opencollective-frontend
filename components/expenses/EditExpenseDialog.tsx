@@ -266,7 +266,10 @@ const EditPayee = ({ expense, onSubmit }) => {
           </CollapsibleContent>
         </Collapsible>
 
-        <EditExpenseActionButtons disabled={!hasChangedPayee} handleSubmit={expenseForm.handleSubmit} />
+        <EditExpenseActionButtons
+          disabled={!hasChangedPayee || expenseForm.initialLoading}
+          handleSubmit={expenseForm.handleSubmit}
+        />
       </form>
     </FormikProvider>
   );
@@ -356,7 +359,7 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
     <FormikProvider value={expenseForm}>
       <form className="space-y-4" ref={formRef} onSubmit={e => e.preventDefault()}>
         <PayoutMethodFormContent {...PayoutMethodFormContent.getFormProps(expenseForm)} />
-        <EditExpenseActionButtons handleSubmit={expenseForm.handleSubmit} />
+        <EditExpenseActionButtons disabled={expenseForm.initialLoading} handleSubmit={expenseForm.handleSubmit} />
       </form>
     </FormikProvider>
   );
@@ -445,7 +448,7 @@ const EditExpenseDetails = ({ expense, onSubmit }) => {
           <InvoiceFormOption {...InvoiceFormOption.getFormProps(expenseForm)} />
         )}
         <AdditionalAttachments {...AdditionalAttachments.getFormProps(expenseForm)} />
-        <EditExpenseActionButtons handleSubmit={expenseForm.handleSubmit} />
+        <EditExpenseActionButtons disabled={expenseForm.initialLoading} handleSubmit={expenseForm.handleSubmit} />
       </form>
     </FormikProvider>
   );
@@ -527,7 +530,7 @@ const AttachReceipts = ({ expense, onSubmit }) => {
           ))}
         </div>
 
-        <EditExpenseActionButtons handleSubmit={expenseForm.handleSubmit} />
+        <EditExpenseActionButtons disabled={expenseForm.initialLoading} handleSubmit={expenseForm.handleSubmit} />
       </form>
     </FormikProvider>
   );
