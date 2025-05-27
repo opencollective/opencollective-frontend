@@ -86,7 +86,7 @@ const columns: ColumnDef<LegalDocument>[] = [
     meta: { className: 'w-32' },
     cell: ({ row }) => {
       const legalDocument = row.original;
-      return <LegalDocumentStatusBadge status={legalDocument.status} isExpired={legalDocument.isExpired} />;
+      return <LegalDocumentStatusBadge status={legalDocument.status} />;
     },
   },
   actionsColumn,

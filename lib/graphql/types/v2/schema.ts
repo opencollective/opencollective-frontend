@@ -7373,6 +7373,7 @@ export type LegalDocumentCollection = Collection & {
 /** Status for a legal document */
 export enum LegalDocumentRequestStatus {
   ERROR = 'ERROR',
+  EXPIRED = 'EXPIRED',
   INVALID = 'INVALID',
   NOT_REQUESTED = 'NOT_REQUESTED',
   RECEIVED = 'RECEIVED',
