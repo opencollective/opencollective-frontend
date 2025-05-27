@@ -2078,11 +2078,10 @@ export function useExpenseForm(opts: {
 
   // Move attachments when switching expense type
   React.useEffect(() => {
-    // if expenseTypeOption.touched?
     if (expenseForm.values.expenseTypeOption === ExpenseType.INVOICE) {
       if (expenseForm.values.expenseItems.length === 1 && expenseForm.values.expenseItems[0].attachment) {
         setFieldValue('invoiceFile', expenseForm.values.expenseItems[0].attachment);
-        setFieldValue('expenseItems.0.attachment', undefined);
+        setFieldValue('expenseItems.0.attachment', null);
         setFieldValue('hasInvoiceOption', YesNoOption.YES);
       } else {
         const numberOfAdditionalAttachments = expenseForm.values.additionalAttachments.length;
@@ -2091,7 +2090,7 @@ export function useExpenseForm(opts: {
         expenseForm.values.expenseItems.forEach((item, i) => {
           if (item.attachment) {
             setFieldValue(`additionalAttachments.${numberOfAdditionalAttachments + count}`, item.attachment);
-            setFieldValue(`expenseItems.${i}.attachment`, undefined);
+            setFieldValue(`expenseItems.${i}.attachment`, null);
             count++;
           }
         });
@@ -2101,7 +2100,7 @@ export function useExpenseForm(opts: {
         for (let i = 0; i < expenseForm.values.expenseItems.length; i++) {
           setFieldValue(`expenseItems.${i}.attachment`, expenseForm.values.invoiceFile);
         }
-        setFieldValue('invoiceFile', undefined);
+        setFieldValue('invoiceFile', null);
       }
     }
   }, [expenseForm.values.expenseTypeOption]);

@@ -638,7 +638,7 @@ const EditExpenseType = ({ expense, onSubmit }) => {
                       <Skeleton className="h-20 w-full" />
                     ) : (
                       <ExpenseTypeStep expenseForm={expenseForm} />
-                    )}{' '}
+                    )}
                   </React.Fragment>
                 ) : stepProps.id === 'details' ? (
                   <EditTypeDetailsStep expenseForm={expenseForm} />
