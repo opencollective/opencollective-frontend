@@ -11,6 +11,8 @@ import { INVITE, PayoutMethodType, VIRTUAL_CARD } from '../../lib/constants/payo
 import { ExpenseStatus } from '../../lib/graphql/types/v2/schema';
 import formatCollectiveType from '../../lib/i18n/collective-type';
 import { getDashboardRoute } from '../../lib/url-helpers';
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
 
 import { AccountHoverCard } from '../AccountHoverCard';
 import Avatar from '../Avatar';
@@ -109,7 +111,6 @@ const ExpenseSummaryAdditionalInformation = ({
   isLoadingLoggedInUser,
   isDraft,
   collective,
-  useInlineExpenseEdit,
 }) => {
   const intl = useIntl();
   const payeeLocation = expense?.payeeLocation || expense?.draft?.payeeLocation;
@@ -118,8 +119,12 @@ const ExpenseSummaryAdditionalInformation = ({
   const isInvoice = expense?.type === expenseTypes.INVOICE;
   const isCharge = expense?.type === expenseTypes.CHARGE;
   const isPaid = expense?.status === ExpenseStatus.PAID;
-
-  const { canEditPaidBy, canEditPayee, canEditPayoutMethod } = useInlineExpenseEdit ? expense?.permissions || {} : {};
+  const { LoggedInUser } = useLoggedInUser();
+  const { canEditPaidBy, canEditPayee, canEditPayoutMethod } = LoggedInUser?.hasPreviewFeatureEnabled(
+    PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE,
+  )
+    ? expense?.permissions || {}
+    : {};
 
   if (isLoading) {
     return <LoadingPlaceholder height={150} mt={3} />;
@@ -363,7 +368,6 @@ ExpenseSummaryAdditionalInformation.propTypes = {
   isDraft: PropTypes.bool,
   /** Set this to true if the logged in user is currenltly loading */
   isLoadingLoggedInUser: PropTypes.bool,
-  useInlineExpenseEdit: PropTypes.bool,
   host: PropTypes.shape({
     slug: PropTypes.string.isRequired,
   }),

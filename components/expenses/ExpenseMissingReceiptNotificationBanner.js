@@ -2,6 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '@/lib/preview-features';
+
 import { Flex } from '../../components/Grid';
 import MessageBox from '../../components/MessageBox';
 import StyledButton from '../../components/StyledButton';
@@ -13,7 +16,11 @@ import EditExpenseDialog from './EditExpenseDialog';
 
 const ExpenseMissingReceiptNotificationBanner = props => {
   const intl = useIntl();
-  const { canAttachReceipts } = props.useInlineExpenseEdit ? props.expense?.permissions || {} : {};
+  const { LoggedInUser } = useLoggedInUser();
+
+  const { canAttachReceipts } = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE)
+    ? props.expense?.permissions || {}
+    : {};
 
   return (
     <MessageBox py={3} px="26px" mb={4} type="warning">
@@ -57,7 +64,6 @@ const ExpenseMissingReceiptNotificationBanner = props => {
 
 ExpenseMissingReceiptNotificationBanner.propTypes = {
   onEdit: PropTypes.func,
-  useInlineExpenseEdit: PropTypes.bool,
   expense: PropTypes.any,
 };
 

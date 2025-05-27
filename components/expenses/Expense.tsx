@@ -310,9 +310,6 @@ function Expense(props) {
   const isEditing = status === PAGE_STATUS.EDIT || status === PAGE_STATUS.EDIT_SUMMARY;
   const showTaxFormMsg = includes(expense?.requiredLegalDocuments, 'US_TAX_FORM') && !isEditing;
   const isEditingExistingExpense = isEditing && expense !== undefined;
-  const useInlineExpenseEdit =
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE) &&
-    expense?.status !== ExpenseStatus.DRAFT;
 
   const handlePolling = debounce(() => {
     if (state.isPollingEnabled) {
@@ -572,7 +569,6 @@ function Expense(props) {
       {isMissingReceipt && (
         <ExpenseMissingReceiptNotificationBanner
           onEdit={status !== PAGE_STATUS.EDIT && onEditBtnClick}
-          useInlineExpenseEdit={useInlineExpenseEdit}
           expense={expense}
         />
       )}

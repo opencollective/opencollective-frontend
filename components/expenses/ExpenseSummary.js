@@ -127,10 +127,11 @@ const ExpenseSummary = ({
   const isLoggedInUserExpenseHostAdmin = LoggedInUser?.isHostAdmin(expense?.account);
   const isLoggedInUserExpenseAdmin = LoggedInUser?.isAdminOfCollective(expense?.account);
   const isViewingExpenseInHostContext = isLoggedInUserExpenseHostAdmin && !isLoggedInUserExpenseAdmin;
-  const useInlineExpenseEdit =
-    LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE) &&
-    expense?.status !== ExpenseStatus.DRAFT;
-  const { canEditTitle, canEditType, canEditItems } = useInlineExpenseEdit ? expense?.permissions || {} : {};
+  const { canEditTitle, canEditType, canEditItems } = LoggedInUser?.hasPreviewFeatureEnabled(
+    PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE,
+  )
+    ? expense?.permissions || {}
+    : {};
   const invoiceFile = React.useMemo(
     () => expense?.invoiceFile || expense?.draft?.invoiceFile,
     [expense?.invoiceFile, expense?.draft?.invoiceFile],
@@ -150,7 +151,7 @@ const ExpenseSummary = ({
       gridGap={[2, 3]}
     >
       <ExpenseMoreActionsButton
-        onEdit={useInlineExpenseEdit ? undefined : onEdit}
+        onEdit={LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.INLINE_EDIT_EXPENSE) ? undefined : onEdit}
         expense={expense}
         isViewingExpenseInHostContext={isViewingExpenseInHostContext}
         enableKeyboardShortcuts={enableKeyboardShortcuts}
@@ -628,7 +629,6 @@ const ExpenseSummary = ({
         expense={expense}
         collective={collective}
         isDraft={!isEditing && expense?.status === ExpenseStatus.DRAFT}
-        useInlineExpenseEdit={useInlineExpenseEdit}
       />
       {!isEditing &&
         (drawerActionsContainer ? (
